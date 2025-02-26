@@ -21,6 +21,10 @@ package eu.essi_lab.cfga.gs.setting;
  * #L%
  */
 
+import eu.essi_lab.cfga.option.BooleanChoice;
+import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
+import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.lib.utils.LabeledEnum;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,18 +45,21 @@ import eu.essi_lab.model.GSSource;
 public class SourcePrioritySetting extends Setting implements EditableSetting {
 
     /**
-     * 
+     *
      */
     private static final String SOURCES_SETTING_IDENTIFIER = "availableSources";
+    private static final String MANTAIN_UUID_KEY = "MANTAIN_UUID_KEY";
+    private static final String MANTAIN_COLLECTIONID_KEY = "MANTAIN_COLLECTIONID_KEY";
+    private static final String PRESERVE_ID_KEY = "PRESERVE_ID_KEY";
+    private static final String NULL_ORIGINAL_ID_KEY = "NULL_ORIGINAL_ID_KEY";
 
     /**
-     * 
+     *
      */
     public SourcePrioritySetting() {
 
-	setName("Priority sources");
-	setDescription(
-		"Collections and datasets of priority sources maintain their original id during harvesting.\nSelect one or more sources to prioritize");
+	setName("Identifier Management");
+	setDescription("Define global (DAB-level) Identifier Management options and optionally select one or more sources to prioritize. Collections and datasets of 'priority sources' maintain their original id during harvesting");
 	setCanBeDisabled(false);
 	enableCompactMode(false);
 
@@ -60,10 +67,10 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 	// setting with available sources
 	//
 	Setting sourcesSetting = new Setting();
+	sourcesSetting.setName("Select one or more 'priority source'");
 	sourcesSetting.setCanBeDisabled(false);
 	sourcesSetting.setEditable(false);
-	sourcesSetting.setShowHeader(false);
-
+	sourcesSetting.setShowHeader(true);
 	sourcesSetting.setIdentifier(SOURCES_SETTING_IDENTIFIER);
 	sourcesSetting.setSelectionMode(SelectionMode.MULTI);
 
@@ -90,6 +97,60 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 	// set the rendering extension
 	//
 	setExtension(new SourcePrioritySettingComponentInfo());
+
+	Option<BooleanChoice> mantainuuid = BooleanChoiceOptionBuilder.get().//
+		withKey(MANTAIN_UUID_KEY).//
+		withLabel("Always use original ID when it is a valid UUID").//
+		withDescription(
+			"Metadata with an original identifier which is a valid UUID will maintain the original id after the " + "mapping")
+		.//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(BooleanChoice.class)).//
+		withSelectedValue(BooleanChoice.TRUE).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(mantainuuid);
+
+	Option<BooleanChoice> collectionid = BooleanChoiceOptionBuilder.get().//
+		withKey(MANTAIN_COLLECTIONID_KEY).//
+		withLabel("Always use original ID when the metadata describes a collection").//
+		withDescription("Metadata which describe a colleciton will maintain the original id after the " + "mapping").//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(BooleanChoice.class)).//
+		withSelectedValue(BooleanChoice.TRUE).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(collectionid);
+
+	Option<BooleanChoice> preserveid = BooleanChoiceOptionBuilder.get().//
+		withKey(PRESERVE_ID_KEY).//
+		withLabel("Mantain persistent id").//
+		withDescription(
+			"Metadata with the same original identifier will mantain the same DAB identifier after each " + "re-harvesting")
+		.//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(BooleanChoice.class)).//
+		withSelectedValue(BooleanChoice.FALSE).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(preserveid);
+
+	Option<BooleanChoice> null_original = BooleanChoiceOptionBuilder.get().//
+		withKey(NULL_ORIGINAL_ID_KEY).//
+		withLabel("Allow null original id").//
+		withDescription("Metadata with a null original identifier are allowed, DAB will generate a random id which will change "
+			+ "after each re-harvesting")
+		.//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(BooleanChoice.class)).//
+		withSelectedValue(BooleanChoice.TRUE).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(null_original);
     }
 
     /**
@@ -114,7 +175,7 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
     public static class SourcePrioritySettingComponentInfo extends ComponentInfo {
 
 	/**
-	 * 
+	 *
 	 */
 	public SourcePrioritySettingComponentInfo() {
 
@@ -122,7 +183,7 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
 		    withIndex(TabIndex.SOURCE_PRIORITY_SETTING.getIndex()).//
-		    withShowDirective("Priority sources").//
+		    withShowDirective("Identifier Management").//
 		    build();
 
 	    setTabInfo(tabInfo);
@@ -167,6 +228,30 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 	String sourceId = source.getUniqueIdentifier();
 
 	return getSelectedSourcesIds().contains(sourceId);
+    }
+
+    public Boolean mantainCollectionId() {
+
+	return BooleanChoice.toBoolean(((Option<BooleanChoice>) getOption(MANTAIN_COLLECTIONID_KEY).get()).getValue());
+
+    }
+
+    public Boolean mantainUUID() {
+
+	return BooleanChoice.toBoolean(((Option<BooleanChoice>) getOption(MANTAIN_UUID_KEY).get()).getValue());
+
+    }
+
+    public Boolean preserveIdentifiers() {
+
+	return BooleanChoice.toBoolean(((Option<BooleanChoice>) getOption(PRESERVE_ID_KEY).get()).getValue());
+
+    }
+
+    public Boolean allowNullOriginalId() {
+
+	return BooleanChoice.toBoolean(((Option<BooleanChoice>) getOption(NULL_ORIGINAL_ID_KEY).get()).getValue());
+
     }
 
     /**

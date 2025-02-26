@@ -1,5 +1,10 @@
 package eu.essi_lab.identifierdecorator;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -21,11 +26,6 @@ package eu.essi_lab.identifierdecorator;
  * #L%
  */
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
 import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.SourceStorage;
@@ -35,7 +35,9 @@ import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.ResultsPriority;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceType;
 
@@ -46,10 +48,10 @@ public class IdentifierDecorator {
 
     private DatabaseReader dbReader;
     private SourcePrioritySetting sourcePrioritySetting;
-    private Boolean preserveIds;
+    private static final String PID_SEPARATOR = "@";
 
     /**
-     * 
+     *
      */
     public IdentifierDecorator() {
     }
@@ -62,20 +64,6 @@ public class IdentifierDecorator {
 	    SourcePrioritySetting sourcePrioritySetting, //
 	    DatabaseReader dataBaseReader) {
 
-	this(sourcePrioritySetting, false, dataBaseReader);
-    }
-
-    /**
-     * @param dataBaseReader
-     * @param preserveIds
-     * @param sourcePrioritySetting
-     */
-    public IdentifierDecorator(//
-	    SourcePrioritySetting sourcePrioritySetting, //
-	    Boolean preserveIds, //
-	    DatabaseReader dataBaseReader) {
-
-	this.preserveIds = preserveIds;
 	this.dbReader = dataBaseReader;
 	this.sourcePrioritySetting = sourcePrioritySetting;
     }
@@ -85,7 +73,7 @@ public class IdentifierDecorator {
      */
     public void decorateDistributedIdentifier(GSResource resource) {
 
-	decorateIdentifier(resource);
+	decorateIdentifier(resource, resource.getSource(), resource.getOriginalId().orElse(UUID.randomUUID().toString()));
     }
 
     /**
@@ -105,23 +93,66 @@ public class IdentifierDecorator {
 	    boolean isRecovery, //
 	    boolean isIncremental) throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
-	if (useOriginalId(incomingResource)) {
+	Optional<String> opOrig = incomingResource.getOriginalId();
+	boolean allowNullOriginalId = sourcePrioritySetting.allowNullOriginalId();
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Using original identifier");
+	if (!opOrig.isPresent() && !allowNullOriginalId) {
 
-	    String originalId = incomingResource.getOriginalId().get();
-	    //
-	    // this method searches for resources with the provided original identifier
-	    // in the whole DB, included the temporary/writing folders in order
-	    // to apply the isDuplicate check 
-	    //
-	    List<GSResource> existingResources = getDatabaseReader().getResources(IdentifierType.ORIGINAL, originalId);
+	    throw GSException.createException(getClass(), "No Original Id Found", null, null, ErrorInfo.ERRORTYPE_SERVICE,
+		    ErrorInfo.SEVERITY_ERROR, "NoOriginalId");
+
+	}
+	String originalId = opOrig.orElse(UUID.randomUUID().toString());
+
+	if (!opOrig.isPresent())
+	    GSLoggerFactory.getLogger(getClass()).debug("Harvesting metadata without original id, generated random rignal id is {}",
+		    originalId);
+
+	boolean preserveIds = sourcePrioritySetting.preserveIdentifiers();
+
+	//
+	// this method searches for resources with the provided original identifier
+	// in the whole DB, included the temporary/writing folders in order
+	// to apply the isDuplicate check
+	//
+	List<GSResource> existingResources = getDatabaseReader().getResources(IdentifierType.ORIGINAL, originalId);
+
+	if (!existingResources.isEmpty()) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Found [{}] existing resources with original id [{}]", //
+		    existingResources.size(), //
+		    originalId);
+
+	    ConflictingResourceException crex = null;
+
+	    for (GSResource existingResource : existingResources) {
+
+		GSLoggerFactory.getLogger(getClass()).warn("Existing resource \"{}\"", existingResource);
+		GSLoggerFactory.getLogger(getClass()).warn("Existing resource source \"{}\"", existingResource.getSource().getLabel());
+
+		int duplicationCase = isDuplicate(//
+			existingResource, //
+			incomingResource, //
+			harvestingProperties, //
+			isFirstHarvesting, //
+			isRecovery, //
+			isIncremental);
+
+		if (duplicationCase > 0) {
+		    //
+		    // the source administrator should be warn since it means that the source
+		    // provides records with same identifier.
+		    // the exception is thrown so the HarvesterPlan which catches it, skips this
+		    // resource
+		    //
+		    throw new DuplicatedResourceException(incomingResource, existingResource, originalId, duplicationCase);
+		}
+	    }
+	}
+
+	if (useOriginalId(incomingResource, originalId)) {
 
 	    if (!existingResources.isEmpty()) {
-
-		GSLoggerFactory.getLogger(getClass()).debug("Found [{}] existing resources with original id [{}]", //
-			existingResources.size(), //
-			originalId);
 
 		ConflictingResourceException crex = null;
 
@@ -130,24 +161,7 @@ public class IdentifierDecorator {
 		    GSLoggerFactory.getLogger(getClass()).warn("Existing resource \"{}\"", existingResource);
 		    GSLoggerFactory.getLogger(getClass()).warn("Existing resource source \"{}\"", existingResource.getSource().getLabel());
 
-		    int duplicationCase = isDuplicate(//
-			    existingResource, //
-			    incomingResource, //
-			    harvestingProperties, //
-			    isFirstHarvesting, //
-			    isRecovery, //
-			    isIncremental);
-
-		    if (duplicationCase > 0) {
-			//
-			// the source administrator should be warn since it means that the source
-			// provides records with same identifier.
-			// the exception is thrown so the HarvesterPlan which catches it, skips this
-			// resource
-			//
-			throw new DuplicatedResourceException(incomingResource, existingResource, originalId, duplicationCase);
-
-		    } else if (isConflictingResource(existingResource, incomingResource.getSource())) {
+		    if (isConflictingResource(existingResource, incomingResource.getSource())) {
 			//
 			// in the consolidated folders of the whole DB several records with same original id can exist.
 			// this exception gathers all the triples (originalId, source, existing source)
@@ -186,31 +200,62 @@ public class IdentifierDecorator {
 	    }
 	} else if (preserveIds) {
 
-	    Optional<String> opOrig = incomingResource.getOriginalId();
+	    GSResource existingResource = getDatabaseReader().getResource(originalId, incomingResource.getSource());
 
-	    if (opOrig.isPresent()) {// to preserve ids, it must be present!
+	    if (existingResource != null) {
 
-		String originalId = opOrig.get();
+		// successive harvesting
+		incomingResource.setPrivateId(existingResource.getPrivateId());
+		incomingResource.setPublicId(existingResource.getPublicId());
 
-		GSResource existingResource = getDatabaseReader().getResource(originalId, incomingResource.getSource());
+	    } else {
 
-		if (existingResource != null) {
-
-		    // successive harvesting
-		    incomingResource.setPrivateId(existingResource.getPrivateId());
-		    incomingResource.setPublicId(existingResource.getPublicId());
-
-		} else {
-
-		    // first harvesting
-		    decorateIdentifier(incomingResource);
-		}
+		// first harvesting
+		decorateIdentifier(incomingResource, incomingResource.getSource(), originalId);
 	    }
 
 	} else {
 
-	    decorateIdentifier(incomingResource);
+	    decorateIdentifier(incomingResource, incomingResource.getSource(), originalId);
 	}
+
+	if (requiresParentIdDecorator(incomingResource, originalId)) {
+
+	    String oldparentid = incomingResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
+	    String newparentid = generatePersistentIdentifier(oldparentid, incomingResource.getSource().getUniqueIdentifier());
+
+	    incomingResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(newparentid);
+	    GSLoggerFactory.getLogger(getClass()).debug("Updated parent identifier of {} from {} to {}", incomingResource.getPublicId(),
+		    oldparentid, newparentid);
+	}
+
+    }
+
+    /**
+     * @param resource
+     * @param originalid
+     * @return
+     */
+    public boolean requiresParentIdDecorator(GSResource resource, String originalid) {
+
+	String parentid = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
+
+	boolean validParentId = parentid != null && !parentid.equalsIgnoreCase("")
+		&& !parentid.equalsIgnoreCase(resource.getSource().getUniqueIdentifier());
+
+	if (!validParentId)
+	    return false;
+
+	if (parentid.equalsIgnoreCase(originalid))
+	    return !useOriginalId(resource, originalid);
+
+	GSResource collection = new DatasetCollection();
+	collection.setSource(resource.getSource());
+
+	if (useOriginalId(collection, parentid))
+	    return false;
+
+	return true;
     }
 
     /**
@@ -224,10 +269,33 @@ public class IdentifierDecorator {
     /**
      * @param resource
      */
-    private void decorateIdentifier(GSResource resource) {
+    private void decorateIdentifier(GSResource resource, GSSource source, String originalid) {
 
-	resource.setPrivateId(UUID.randomUUID().toString());
-	resource.setPublicId(resource.getPrivateId());
+	String pid = generatePersistentIdentifier(originalid, source.getUniqueIdentifier());
+
+	GSLoggerFactory.getLogger(getClass()).debug("Created persistent identifier {} for resource with original id {} from source {} ({})",
+		pid, originalid, source.getUniqueIdentifier(), source.getLabel());
+
+	resource.setPrivateId(pid);
+	resource.setPublicId(pid);
+    }
+
+    public boolean isDecoratedId(String identifier, GSSource source) {
+	return identifier.contains(PID_SEPARATOR) && identifier.contains(source.getUniqueIdentifier());
+    }
+
+    public String retrieveOriginalId(String identifier, GSSource source) {
+	return identifier.replace(source.getUniqueIdentifier(), "").replace(PID_SEPARATOR, "");
+    }
+
+    public String generatePersistentIdentifier(String originalid, String sourceid) {
+	StringBuilder builder = new StringBuilder();
+
+	builder.append(originalid);
+	builder.append(PID_SEPARATOR);
+	builder.append(sourceid);
+
+	return builder.toString();
     }
 
     /**
@@ -331,12 +399,13 @@ public class IdentifierDecorator {
     }
 
     /**
-     * Two datasets (existing and incoming) conflict if all the following conditions apply:<ol>
+     * Two datasets (existing and incoming) conflict if all the following conditions apply:
+     * <ol>
      * <li>they have the same original id</li>
      * <li>they come from different sources</li>
      * <li>the existing resource uses the original id as public id</li>
      * </ul>
-     * 
+     *
      * @param existingResource
      * @param incomingSource
      * @return
@@ -357,19 +426,19 @@ public class IdentifierDecorator {
     }
 
     /**
-     * The original identifier is used in 3 cases:
+     * The original identifier is used if:
      * <ol>
-     * <li>The resource is a collection and the related source has the collection priority</li>
      * <li>The source is configured as priority source</li>
-     * <li>The original id is an UUID</li>
      * </ol>
      *
      * @param resource
      * @return
      */
-    private boolean useOriginalId(GSResource resource) {
+    boolean useOriginalId(GSResource resource, String originalId) {
 
-	Optional<String> originalId = resource.getOriginalId();
+	// return sourcePrioritySetting.isPrioritySource(resource.getSource());
+
+	// Optional<String> originalId = resource.getOriginalId();
 
 	//
 	// if the source has a collection priority set and the current resource is a collection,
@@ -379,13 +448,15 @@ public class IdentifierDecorator {
 	boolean hasCollectionPriority = resource.getSource().getResultsPriority() == ResultsPriority.COLLECTION;
 	boolean collection = resource.getResourceType() == ResourceType.DATASET_COLLECTION;
 
+	boolean collectionCondition = collection && hasCollectionPriority && sourcePrioritySetting.mantainCollectionId();
+
+	boolean uuidCondition = StringUtils.isUUID(originalId) && sourcePrioritySetting.mantainUUID();
+
 	boolean isPrioritySource = sourcePrioritySetting.isPrioritySource(resource.getSource());
 
-	return originalId.isPresent() && (//
-	(collection && hasCollectionPriority) || //
-		StringUtils.isUUID(originalId.get()) || //
-		isPrioritySource//
-	);
+	return collectionCondition || //
+		uuidCondition || //
+		isPrioritySource;
     }
 
 }

@@ -34,165 +34,149 @@ import eu.essi_lab.model.BrokeringStrategy;
  */
 public abstract class HarvestedConnectorSetting extends ConnectorSetting implements KeyValueOptionDecorator {
 
-    /**
-     * 
-     */
-    private static final String MAX_RECORDS_OPTION_KEY = "maxRecords";
+	/**
+	 *
+	 */
+	private static final String MAX_RECORDS_OPTION_KEY = "maxRecords";
 
-    /**
-     * 
-     */
-    private static final String PAGE_SIZE_OPTION_KEY = "pageSize";
+	/**
+	 *
+	 */
+	private static final String PAGE_SIZE_OPTION_KEY = "pageSize";
 
-    /**
-     * 
-     */
-    private static final int DEFAULT_MAX_RECORDS = 0;
+	/**
+	 *
+	 */
+	private static final int DEFAULT_MAX_RECORDS = 0;
 
-    /**
-     * 
-     */
-    private static final int DEFAULT_PAGE_SIZE = 50;
+	/**
+	 *
+	 */
+	private static final int DEFAULT_PAGE_SIZE = 50;
 
-    /**
-     * 
-     */
-    public HarvestedConnectorSetting() {
+	/**
+	 *
+	 */
+	public HarvestedConnectorSetting() {
 
-	setName(initSettingName());
+		setName(initSettingName());
 
-	setConfigurableType(initConnectorType());
+		setConfigurableType(initConnectorType());
 
-	addKeyValueOption();
+		addKeyValueOption();
 
-	putKeyValue(MAX_RECORDS_OPTION_KEY, String.valueOf(DEFAULT_MAX_RECORDS));
-	putKeyValue(PAGE_SIZE_OPTION_KEY, String.valueOf(getDefaultPageSize()));
-    }
-
-    /**
-     * @param name
-     * @param configurableType
-     * @return
-     */
-    public static HarvestedConnectorSetting create(String name, String configurableType) {
-
-	return new HarvestedConnectorSetting() {
-
-	    @Override
-	    protected String initConnectorType() {
-
-		return configurableType;
-	    }
-
-	    @Override
-	    protected String initSettingName() {
-
-		return name;
-	    }
-	};
-    }
-
-    /**
-     * @param object
-     */
-    public HarvestedConnectorSetting(JSONObject object) {
-
-	super(object);
-    }
-
-    /**
-     * @param object
-     */
-    public HarvestedConnectorSetting(String object) {
-
-	super(object);
-    }
-
-    /**
-     * Returns <code>true</code> (default) to show the max records option, <code>false</code> otherwise
-     */
-    public boolean enableMaxRecordsOption() {
-
-	return true;
-    }
-
-    /**
-     * @return
-     */
-    public int getPageSize() {
-
-	return getKeyValueOptions().//
-		map(p -> Integer.valueOf(p.getOrDefault(PAGE_SIZE_OPTION_KEY, DEFAULT_PAGE_SIZE).toString())).//
-		orElse(DEFAULT_PAGE_SIZE);
-
-    }
-
-    /**
-     * @param maxRecords
-     */
-    public void setPageSize(int pageSize) {
-
-	putKeyValue(PAGE_SIZE_OPTION_KEY, String.valueOf(pageSize));
-    }
-
-    /**
-     * @return
-     */
-    public Optional<Integer> getMaxRecords() {
-
-	Integer max = getKeyValueOptions().//
-		map(p -> Integer.valueOf(p.getOrDefault(MAX_RECORDS_OPTION_KEY, DEFAULT_MAX_RECORDS).toString())).//
-		orElse(DEFAULT_MAX_RECORDS);
-
-	return max == 0 ? Optional.empty() : Optional.of(max);
-    }
-
-    /**
-     * @param maxRecords
-     */
-    public void setMaxRecords(int maxRecords) {
-
-	putKeyValue(MAX_RECORDS_OPTION_KEY, String.valueOf(maxRecords));
-    }
-
-    /**
-     * @return
-     */
-    public boolean isMaxRecordsUnlimited() {
-
-	return getMaxRecords().isEmpty();
-    }
-
-    /**
-     * @return
-     */
-    public boolean preserveIdentifiers() {
-
-	Optional<Properties> keyValueOptions = getKeyValueOptions();
-
-	if (keyValueOptions.isPresent()) {
-	    
-	    return Boolean.valueOf(//
-		    keyValueOptions.get().getProperty("preserveIds", "false"));
+		putKeyValue(MAX_RECORDS_OPTION_KEY, String.valueOf(DEFAULT_MAX_RECORDS));
+		putKeyValue(PAGE_SIZE_OPTION_KEY, String.valueOf(getDefaultPageSize()));
 	}
 
-	return false;
-    }
+	/**
+	 * @param name
+	 * @param configurableType
+	 * @return
+	 */
+	public static HarvestedConnectorSetting create(String name, String configurableType) {
 
-    /**
-     * 
-     */
-    protected BrokeringStrategy getBrokeringStrategy() {
+		return new HarvestedConnectorSetting() {
 
-	return BrokeringStrategy.HARVESTED;
-    }
+			@Override
+			protected String initConnectorType() {
 
-    /**
-     * @return
-     */
-    protected int getDefaultPageSize() {
+				return configurableType;
+			}
 
-	return DEFAULT_PAGE_SIZE;
-    }
+			@Override
+			protected String initSettingName() {
+
+				return name;
+			}
+		};
+	}
+
+	/**
+	 * @param object
+	 */
+	public HarvestedConnectorSetting(JSONObject object) {
+
+		super(object);
+	}
+
+	/**
+	 * @param object
+	 */
+	public HarvestedConnectorSetting(String object) {
+
+		super(object);
+	}
+
+	/**
+	 * Returns <code>true</code> (default) to show the max records option, <code>false</code> otherwise
+	 */
+	public boolean enableMaxRecordsOption() {
+
+		return true;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getPageSize() {
+
+		return getKeyValueOptions().//
+				map(p -> Integer.valueOf(p.getOrDefault(PAGE_SIZE_OPTION_KEY, DEFAULT_PAGE_SIZE).toString())).//
+				orElse(DEFAULT_PAGE_SIZE);
+
+	}
+
+	/**
+	 * @param maxRecords
+	 */
+	public void setPageSize(int pageSize) {
+
+		putKeyValue(PAGE_SIZE_OPTION_KEY, String.valueOf(pageSize));
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<Integer> getMaxRecords() {
+
+		Integer max = getKeyValueOptions().//
+				map(p -> Integer.valueOf(p.getOrDefault(MAX_RECORDS_OPTION_KEY, DEFAULT_MAX_RECORDS).toString())).//
+				orElse(DEFAULT_MAX_RECORDS);
+
+		return max == 0 ? Optional.empty() : Optional.of(max);
+	}
+
+	/**
+	 * @param maxRecords
+	 */
+	public void setMaxRecords(int maxRecords) {
+
+		putKeyValue(MAX_RECORDS_OPTION_KEY, String.valueOf(maxRecords));
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isMaxRecordsUnlimited() {
+
+		return getMaxRecords().isEmpty();
+	}
+
+	/**
+	 *
+	 */
+	protected BrokeringStrategy getBrokeringStrategy() {
+
+		return BrokeringStrategy.HARVESTED;
+	}
+
+	/**
+	 * @return
+	 */
+	protected int getDefaultPageSize() {
+
+		return DEFAULT_PAGE_SIZE;
+	}
 
 }
