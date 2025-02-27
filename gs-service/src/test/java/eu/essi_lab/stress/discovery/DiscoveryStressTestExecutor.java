@@ -32,34 +32,29 @@ public class DiscoveryStressTestExecutor implements Callable<DiscoveryStressTest
     @Override
     public DiscoveryStressTestResult call() throws Exception {
 
-	String params = test.createRequestParameters();
+	return testSearch(test.createRequest(this.host));
 
-	String requestUrl = this.host + "/gs-service/services/opensearch/query?" + params;
-
-	return testSearch(requestUrl);
     }
 
-    private DiscoveryStressTestResult testSearch(String url) throws URISyntaxException, InterruptedException {
+    private DiscoveryStressTestResult testSearch(HttpRequest request) throws URISyntaxException, InterruptedException {
 
 	DiscoveryStressTestResult result = new DiscoveryStressTestResult();
 
-	HttpRequest request = HttpRequestUtils.build(HttpRequestUtils.MethodNoBody.GET, url);
-
 	try {
 
-	    logger.info("Sending {}", url);
+	    logger.info("Sending {}", test.requestString(this.host));
 
 	    long start = System.currentTimeMillis();
 	    HttpResponse<InputStream> response = HttpClient.newBuilder().build().send(request,
 		    HttpResponse.BodyHandlers.ofInputStream());
 
 	    long end = System.currentTimeMillis();
-	    logger.info("Completed {}", url);
+	    logger.info("Completed {}", test.requestString(this.host));
 
 	    Integer code = response.statusCode();
 
 	    result.setCode(code);
-	    result.setRequest(url);
+	    result.setRequest(test.requestString(this.host));
 
 	    result.setStart(start);
 	    result.setEnd(end);
@@ -77,7 +72,7 @@ public class DiscoveryStressTestExecutor implements Callable<DiscoveryStressTest
     }
 
     private String saveResponseToFile(InputStream body) throws IOException {
-	Path file = Files.createTempFile("stresstest", ".xml");
+	Path file = Files.createTempFile("stresstest", test.getResponseFileFormat());
 	OutputStream outfile = new FileOutputStream(file.toFile());
 	IOUtils.copy(body, outfile);
 

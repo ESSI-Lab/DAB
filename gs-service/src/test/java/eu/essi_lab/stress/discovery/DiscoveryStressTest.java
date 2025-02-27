@@ -1,5 +1,8 @@
 package eu.essi_lab.stress.discovery;
 
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
+import java.net.URISyntaxException;
+import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -98,5 +101,33 @@ public class DiscoveryStressTest {
 
     public void setView(String view) {
 	this.view = view;
+    }
+
+    public String createPath() {
+	return "/gs-service/services/opensearch/query";
+    }
+
+    public HttpRequest createRequest(String host) throws URISyntaxException {
+	String params = createRequestParameters();
+
+	String path = createPath();
+
+	String requestUrl = host + path + "?" + params;
+
+	return HttpRequestUtils.build(HttpRequestUtils.MethodNoBody.GET, requestUrl);
+    }
+
+    public String requestString(String host) {
+	String params = createRequestParameters();
+
+	String path = createPath();
+
+	String requestUrl = host + path + "?" + params;
+
+	return requestUrl;
+    }
+
+    public String getResponseFileFormat() {
+	return ".xml";
     }
 }
