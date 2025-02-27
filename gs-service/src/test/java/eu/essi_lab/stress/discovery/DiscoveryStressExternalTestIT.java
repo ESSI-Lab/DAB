@@ -63,7 +63,7 @@ public class DiscoveryStressExternalTestIT {
 	    }
 	});
 
-	writer.write("\n");
+	writer.write(System.lineSeparator());
 	valueList.stream().forEach(values -> {
 	    values.stream().forEach(c -> {
 		try {
@@ -74,7 +74,9 @@ public class DiscoveryStressExternalTestIT {
 		}
 	    });
 	    try {
-		writer.write("\n");
+		writer.write(System.lineSeparator());
+
+
 	    } catch (IOException e) {
 		throw new RuntimeException(e);
 	    }
@@ -103,7 +105,7 @@ public class DiscoveryStressExternalTestIT {
 	    }
 	}
 
-	Arrays.asList("production").stream().forEach(env -> {
+	Arrays.asList("production", "test").stream().forEach(env -> {
 
 	    String hostname = "https://gs-service-" + env + ".geodab.eu";
 	    StressPlanExecutor planExecutor = new StressPlanExecutor(plan, hostname);

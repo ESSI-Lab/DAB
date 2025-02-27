@@ -99,7 +99,7 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 	    }
 	});
 
-	writer.write("\n");
+	writer.write(System.lineSeparator());
 
 	values.stream().forEach(c -> {
 	    try {
@@ -118,8 +118,9 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 
 	String title = String.format("Results of Discovery Stress Tests on host %s", host);
 
-	String summary = String.format("Number of tests: %d\nSuccess: %d\nMean Execution Time: %d milliseconds", getResults().size(),
-		totalOkTests(),
+	String summary = String.format("Number of tests: %d%sSuccess: %d%sMean Execution Time: %d milliseconds", getResults().size(),
+		System.lineSeparator(),
+		totalOkTests(), System.lineSeparator(),
 		meanExecutionTime());
 
 	String planSummary = createPlanSummary();
@@ -127,19 +128,19 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 	OutputStreamWriter writer = new OutputStreamWriter(out);
 
 	try {
-	    writer.write("\n\n");
+	    writer.write(System.lineSeparator() + System.lineSeparator());
 	    writer.write(title);
-	    writer.write("\n\n");
+	    writer.write(System.lineSeparator() + System.lineSeparator());
 	    writer.write(summary);
-	    writer.write("\n\n");
+	    writer.write(System.lineSeparator() + System.lineSeparator());
 	    writer.write(planSummary);
-	    writer.write("\n\n");
+	    writer.write(System.lineSeparator() + System.lineSeparator());
 
 	    for (StressTestResult result : getResults()) {
 		writer.write(result.getRequest());
-		writer.write("\n");
+		writer.write(System.lineSeparator());
 		writer.write(result.getResponseFile());
-		writer.write("\n");
+		writer.write(System.lineSeparator());
 	    }
 	    writer.flush();
 	} catch (IOException e) {
@@ -239,12 +240,13 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 
     private String createPlanSummary() {
 
-	String planSummary = String.format("Total Number of Requests: %d\nParallel Requests: %d",
-		getPlan().getStressTests().size() * getPlan().getMultiplicationFactor(), getPlan().getParallelRequests());
+	String planSummary = String.format("Total Number of Requests: %d%sParallel Requests: %d",
+		getPlan().getStressTests().size() * getPlan().getMultiplicationFactor(), System.lineSeparator(),
+		getPlan().getParallelRequests());
 
 	List<String> testLines = new ArrayList<>();
 	StringBuilder builder = new StringBuilder(planSummary);
-	builder.append("\n");
+	builder.append(System.lineSeparator());
 
 	Map<String, Integer> map = totalByType();
 
@@ -256,7 +258,7 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 
 	    testLines.add(testline);
 	    builder.append(testline);
-	    builder.append("\n");
+	    builder.append(System.lineSeparator());
 
 	});
 
