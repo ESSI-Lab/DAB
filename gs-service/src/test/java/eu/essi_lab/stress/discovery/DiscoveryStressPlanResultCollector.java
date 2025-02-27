@@ -151,6 +151,9 @@ public class DiscoveryStressPlanResultCollector {
 	if (test.getBbox() != null)
 	    contraintsBuilder.append("bbox__").append(test.getBboxrel()).append("__");
 
+	if (test.getView()!=null)
+	    contraintsBuilder.append("view__").append(test.getView()).append("__");
+
 	contraintsBuilder.append("n_sources=").append(test.getSources().size());
 
 	String testcontraints = contraintsBuilder.toString();

@@ -17,6 +17,8 @@ public class DiscoveryStressTest {
 
     private List<String> sources = new ArrayList<>();
 
+    private String view;
+
     public String createRequestParameters() {
 	String rid = "stresstest-" + UUID.randomUUID().toString();
 
@@ -28,6 +30,10 @@ public class DiscoveryStressTest {
 	if (bbox != null)
 	    boundignbox = bbox;
 
+	String viewid = "";
+	if (view != null)
+	    viewid = view;
+
 	StringBuilder builder = new StringBuilder("");
 
 	builder.append("searchFields=title,keywords")//
@@ -37,7 +43,7 @@ public class DiscoveryStressTest {
 		.append("si=1&ct=12&tf=keyword,format,protocol,providerID,organisationName,sscScore")//
 		.append("rel=").append(bboxrel)//
 		.append("&")//
-		.append("viewid=")//
+		.append("viewid=").append(viewid)//
 		.append("&")//
 		.append("st=").append(st)//
 		.append("&")//
@@ -84,5 +90,13 @@ public class DiscoveryStressTest {
 
     public void setBboxrel(BBOXREL bboxrel) {
 	this.bboxrel = bboxrel;
+    }
+
+    public String getView() {
+	return view;
+    }
+
+    public void setView(String view) {
+	this.view = view;
     }
 }

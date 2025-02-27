@@ -100,7 +100,7 @@ public class DiscoveryStressExternalTestIT {
 	    }
 	}
 
-	Arrays.asList("production", "test").stream().forEach(env -> {
+	Arrays.asList("production", "preproduction", "test").stream().forEach(env -> {
 
 	    String hostname = "https://gs-service-" + env + ".geodab.eu";
 	    DiscoveryStressPlanExecutor planExecutor = new DiscoveryStressPlanExecutor(plan, hostname);
