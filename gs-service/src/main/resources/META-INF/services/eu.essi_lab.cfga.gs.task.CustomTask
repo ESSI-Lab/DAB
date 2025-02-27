@@ -18,3 +18,4 @@ eu.essi_lab.gssrv.conf.task.CorruptedBlobTriggersCleanerTask
 eu.essi_lab.gssrv.conf.task.WISMetadataTask
 eu.essi_lab.gssrv.conf.task.turtle.TurtleTask
 eu.essi_lab.gssrv.conf.task.SourceAdderTask
+eu.essi_lab.gssrv.conf.task.ParentIdentifierDecoratorTask

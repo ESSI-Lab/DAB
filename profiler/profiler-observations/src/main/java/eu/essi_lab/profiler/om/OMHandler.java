@@ -371,6 +371,7 @@ public class OMHandler extends StreamingRequestHandler {
 				} else {
 
 				    AccessMessage accessMessage = new AccessMessage();
+				    accessMessage.setWebRequest(webRequest);
 				    accessMessage.setOnlineId(observation.getId());
 				    accessMessage.setSources(discoveryMessage.getSources());
 				    accessMessage.setCurrentUser(discoveryMessage.getCurrentUser().orElse(null));
