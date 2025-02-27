@@ -27,7 +27,7 @@ public class StressPlanExecutor {
 	executor = Executors.newFixedThreadPool(plan.getParallelRequests());
     }
 
-    public void execute(IStressPlanResultCollector resultCollector) throws InterruptedException {
+    public void execute(StressPlanResultCollector resultCollector) throws InterruptedException {
 
 	resultCollector.setHost(host);
 	resultCollector.setPlan(plan);

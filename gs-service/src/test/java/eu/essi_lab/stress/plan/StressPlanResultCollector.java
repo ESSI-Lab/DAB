@@ -12,14 +12,13 @@ import java.util.Map;
 /**
  * @author Mattia Santoro
  */
-public class StressPlanResultCollector implements IStressPlanResultCollector {
+public class StressPlanResultCollector {
 
     private List<StressTestResult> results = new ArrayList<>();
 
     private String host;
     private StressPlan plan;
 
-    @Override
     public void addResult(StressTestResult result) {
 	getResults().add((StressTestResult) result);
 
@@ -33,7 +32,6 @@ public class StressPlanResultCollector implements IStressPlanResultCollector {
 	return Math.toIntExact(getResults().stream().filter(r -> r.getCode() == 200).count());
     }
 
-    @Override
     public List<String> getCSVColumns() {
 	List<String> columns = new ArrayList<>();
 
@@ -54,7 +52,6 @@ public class StressPlanResultCollector implements IStressPlanResultCollector {
 	return columns;
     }
 
-    @Override
     public List<String> getCSVColumnValues() {
 
 	List<String> values = new ArrayList<>();
@@ -110,7 +107,6 @@ public class StressPlanResultCollector implements IStressPlanResultCollector {
 	writer.flush();
     }
 
-    @Override
     public void printReport(OutputStream out) {
 
 	String title = String.format("Results of Discovery Stress Tests on host %s", host);
@@ -258,12 +254,10 @@ public class StressPlanResultCollector implements IStressPlanResultCollector {
 	return host;
     }
 
-    @Override
     public void setHost(String host) {
 	this.host = host;
     }
 
-    @Override
     public void setPlan(StressPlan plan) {
 	this.plan = plan;
     }
