@@ -229,7 +229,8 @@ public class OMHandler extends StreamingRequestHandler {
 		CSVField[] fields = null;
 		switch (format) {
 		case "CSV":
-		    fields = new CSVField[] { CSVField.TIMESERIES_ID, CSVField.DATE_TIME, CSVField.VALUE };
+		    fields = new CSVField[] { CSVField.MONITORING_POINT, CSVField.OBSERVED_PROPERTY, CSVField.TIMESERIES_ID,
+			    CSVField.DATE_TIME, CSVField.VALUE, CSVField.UOM };
 		    break;
 		case "JSON":
 		    break;
@@ -790,29 +791,36 @@ public class OMHandler extends StreamingRequestHandler {
 
     private void writeCSVobservation(OutputStreamWriter writer, JSONObservation observation, CSVField... fields) throws IOException {
 	JSONArray points = observation.points;
-
+	String observedPropertyTitle = observation.getObservedPropertyTitle();
+	if (observedPropertyTitle == null) {
+	    observedPropertyTitle = "";
+	}
+	String timeseriesId = observation.getId();
+	if (timeseriesId == null) {
+	    timeseriesId = "";
+	}
+	String platformTitle = observation.getFeatureOfInterest().getSampledFeatureTitle();
+	if (platformTitle == null) {
+	    platformTitle = "";
+	}
+	String uom = observation.getUOM();
+	if (uom == null) {
+	    uom = "";
+	}
 	for (int i = 0; i < points.length(); i++) {
 	    JSONObject point = points.getJSONObject(i);
 	    JSONObject timeObject = point.getJSONObject("time");
 	    String time = timeObject.getString("instant");
 	    BigDecimal value = point.getBigDecimal("value");
-	    String observedPropertyTitle = observation.getObservedPropertyTitle();
-	    if (observedPropertyTitle == null) {
-		observedPropertyTitle = "";
-	    }
-	    String timeseriesId = observation.getId();
-	    if (timeseriesId == null) {
-		timeseriesId = "";
-	    }
-	    String platformTitle = observation.getFeatureOfInterest().getSampledFeatureTitle();
-	    if (platformTitle == null) {
-		platformTitle = "";
-	    }
+
 	    int j = 0;
 	    for (CSVField field : fields) {
 		switch (field) {
 		case TIMESERIES_ID:
 		    writer.write(timeseriesId);
+		    break;
+		case UOM:
+		    writer.write(uom);
 		    break;
 		case OBSERVED_PROPERTY:
 		    writer.write(observedPropertyTitle);
@@ -843,8 +851,8 @@ public class OMHandler extends StreamingRequestHandler {
 
     public enum CSVField {
 
-	TIMESERIES_ID("Timeseries identifier"), MONITORING_POINT("Monitoring point"), OBSERVED_PROPERTY("Observed property"), DATE_TIME(
-		"Date time"), VALUE("Value");
+	TIMESERIES_ID("Timeseries identifier"), MONITORING_POINT("Monitoring point"), UOM("Units"), OBSERVED_PROPERTY(
+		"Observed property"), DATE_TIME("Date time"), VALUE("Value");
 
 	private String label;
 
