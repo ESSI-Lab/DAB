@@ -25,9 +25,13 @@ public class DiscoveryStressExternalTestIT {
 	t2.setSearchText("temperature");
 	t2.setBbox("-10.9,35.23,2.2,43.434");
 
+	DiscoveryStressTest t3 = new DiscoveryStressTest();
+	t3.setBbox("-10.9,35.23,2.2,43.434");
+
 	DiscoveryStressPlan plan = new DiscoveryStressPlan();
 	plan.addStressTest(t1);
 	plan.addStressTest(t2);
+	plan.addStressTest(t3);
 	plan.setParallelRequests(3);
 	plan.setMultiplicationFactor(2);
 
@@ -118,7 +122,12 @@ public class DiscoveryStressExternalTestIT {
 
 	    try {
 
-		Path file = Files.createFile(Paths.get(testresultFolder.getAbsolutePath() + "/stresstest-report-env-" + env + ".txt"));
+		Path p = Paths.get(testresultFolder.getAbsolutePath() + "/stresstest-report-env-" + env + ".txt");
+
+		if (Files.exists(p))
+		    Files.delete(p);
+
+		Path file = Files.createFile(p);
 
 		OutputStream outfile = new FileOutputStream(file.toFile());
 		collector.printReport(outfile);
@@ -136,7 +145,13 @@ public class DiscoveryStressExternalTestIT {
 	});
 
 	try {
-	    Path file = Files.createFile(Paths.get(testresultFolder.getAbsolutePath() + "/stresstestresult-all.csv"));
+
+	    Path p = Paths.get(testresultFolder.getAbsolutePath() + "/stresstestresult-all.csv");
+
+	    if (Files.exists(p))
+		Files.delete(p);
+
+	    Path file = Files.createFile(p);
 
 	    OutputStream outfile = new FileOutputStream(file.toFile());
 
