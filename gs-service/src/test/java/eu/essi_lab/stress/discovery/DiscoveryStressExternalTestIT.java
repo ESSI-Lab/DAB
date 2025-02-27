@@ -1,6 +1,7 @@
 package eu.essi_lab.stress.discovery;
 
 import eu.essi_lab.stress.plan.StressPlan;
+import eu.essi_lab.stress.plan.StressPlanExecutor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -104,7 +105,7 @@ public class DiscoveryStressExternalTestIT {
 	Arrays.asList("production").stream().forEach(env -> {
 
 	    String hostname = "https://gs-service-" + env + ".geodab.eu";
-	    DiscoveryStressPlanExecutor planExecutor = new DiscoveryStressPlanExecutor(plan, hostname);
+	    StressPlanExecutor planExecutor = new StressPlanExecutor(plan, hostname);
 
 	    DiscoveryStressPlanResultCollector collector = new DiscoveryStressPlanResultCollector();
 	    try {

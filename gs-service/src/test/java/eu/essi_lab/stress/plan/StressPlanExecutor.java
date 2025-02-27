@@ -1,8 +1,6 @@
-package eu.essi_lab.stress.discovery;
+package eu.essi_lab.stress.plan;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.stress.plan.StressPlan;
-import eu.essi_lab.stress.plan.StressTestExecutor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,20 +14,20 @@ import java.util.stream.Collectors;
 /**
  * @author Mattia Santoro
  */
-public class DiscoveryStressPlanExecutor {
+public class StressPlanExecutor {
 
     private final StressPlan plan;
     private final ExecutorService executor;
     private final String host;
 
-    public DiscoveryStressPlanExecutor(StressPlan plan, String host) {
+    public StressPlanExecutor(StressPlan plan, String host) {
 	this.plan = plan;
 	this.host = host;
 
 	executor = Executors.newFixedThreadPool(plan.getParallelRequests());
     }
 
-    public void execute(DiscoveryStressPlanResultCollector resultCollector) throws InterruptedException {
+    public void execute(IStressPlanResultCollector resultCollector) throws InterruptedException {
 
 	resultCollector.setHost(host);
 	resultCollector.setPlan(plan);
@@ -44,7 +42,7 @@ public class DiscoveryStressPlanExecutor {
 
 	Collections.shuffle(tasks);
 
-	List<Future<DiscoveryStressTestResult>> futures = executor.invokeAll(tasks);
+	List<Future<IStressTestResult>> futures = executor.invokeAll(tasks);
 
 	GSLoggerFactory.getLogger(getClass()).info("start collect");
 	futures.stream().forEach(result -> {

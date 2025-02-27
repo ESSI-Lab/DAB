@@ -1,5 +1,7 @@
 package eu.essi_lab.stress.discovery;
 
+import eu.essi_lab.stress.plan.IStressPlanResultCollector;
+import eu.essi_lab.stress.plan.IStressTestResult;
 import eu.essi_lab.stress.plan.StressPlan;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,15 +15,16 @@ import java.util.Map;
 /**
  * @author Mattia Santoro
  */
-public class DiscoveryStressPlanResultCollector {
+public class DiscoveryStressPlanResultCollector implements IStressPlanResultCollector {
 
     private List<DiscoveryStressTestResult> results = new ArrayList<>();
 
     private String host;
     private StressPlan plan;
 
-    public void addResult(DiscoveryStressTestResult result) {
-	getResults().add(result);
+    @Override
+    public void addResult(IStressTestResult result) {
+	getResults().add((DiscoveryStressTestResult) result);
 
     }
 
@@ -272,10 +275,12 @@ public class DiscoveryStressPlanResultCollector {
 	return host;
     }
 
+    @Override
     public void setHost(String host) {
 	this.host = host;
     }
 
+    @Override
     public void setPlan(StressPlan plan) {
 	this.plan = plan;
     }

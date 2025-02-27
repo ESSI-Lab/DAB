@@ -18,7 +18,7 @@ import org.apache.commons.io.IOUtils;
 /**
  * @author Mattia Santoro
  */
-public class StressTestExecutor implements Callable<DiscoveryStressTestResult> {
+public class StressTestExecutor implements Callable<IStressTestResult> {
 
     private final IStressTest test;
     private final String host;
@@ -30,15 +30,15 @@ public class StressTestExecutor implements Callable<DiscoveryStressTestResult> {
     }
 
     @Override
-    public DiscoveryStressTestResult call() throws Exception {
+    public IStressTestResult call() throws Exception {
 
 	return executeRequest(test.createRequest(this.host));
 
     }
 
-    private DiscoveryStressTestResult executeRequest(HttpRequest request) throws URISyntaxException, InterruptedException {
+    private IStressTestResult executeRequest(HttpRequest request) throws URISyntaxException, InterruptedException {
 
-	DiscoveryStressTestResult result = new DiscoveryStressTestResult();
+	IStressTestResult result = new DiscoveryStressTestResult();
 
 	try {
 
