@@ -66,7 +66,7 @@ public class DiscoveryStressPlanResultCollector {
 
     private String createPlanSummary() {
 
-	String planSummary = String.format("Total Number of Requests: %d\nParallel Requests: %d\n",
+	String planSummary = String.format("Total Number of Requests: %d\nParallel Requests: %d",
 		getPlan().getStressTests().size() * getPlan().getMultiplicationFactor(), getPlan().getParallelRequests());
 
 	Map<String, Integer> map = new HashMap<>();
@@ -95,6 +95,8 @@ public class DiscoveryStressPlanResultCollector {
 	});
 
 	List<String> testLines = new ArrayList<>();
+	StringBuilder builder = new StringBuilder(planSummary);
+	builder.append("\n");
 
 	map.keySet().stream().forEach(key -> {
 
@@ -103,13 +105,12 @@ public class DiscoveryStressPlanResultCollector {
 	    String testline = String.format("Number of requests by type [%s] = %d", key, total);
 
 	    testLines.add(testline);
+	    builder.append(testline);
+	    builder.append("\n");
 
 	});
 
-	for (String line : testLines)
-	    planSummary += line + "\n";
-
-	return planSummary;
+	return builder.toString();
     }
 
     private Long meanExecutionTime() {
