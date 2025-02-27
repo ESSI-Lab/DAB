@@ -27,7 +27,7 @@ public class StressPlanExecutor {
 	executor = Executors.newFixedThreadPool(plan.getParallelRequests());
     }
 
-    public void execute(StressPlanResultCollector resultCollector) throws InterruptedException {
+    public void execute(StressPlanResultCollector resultCollector, Long maxWait, TimeUnit unit) throws InterruptedException {
 
 	resultCollector.setHost(host);
 	resultCollector.setPlan(plan);
@@ -58,7 +58,7 @@ public class StressPlanExecutor {
 
 	GSLoggerFactory.getLogger(getClass()).info("collect ENDED");
 	executor.shutdown();
-	executor.awaitTermination(10L, TimeUnit.MINUTES);
+	executor.awaitTermination(maxWait, unit);
 
     }
 

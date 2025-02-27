@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Mattia Santoro
@@ -40,14 +41,19 @@ public class DiscoveryStressExternalTestIT {
 	t5.setBbox("-10.9,35.23,2.2,43.434");
 	t5.setBboxrel(DiscoveryStressTest.BBOXREL.CONTAINS);
 
+	DiscoveryStressTest t6 = new DiscoveryStressTest();
+	t6.setBbox("-10.9,35.23,2.2,43.434");
+	t6.setView("geoss");
+
 	StressPlan plan = new StressPlan();
 	plan.addStressTest(t1);
 	plan.addStressTest(t2);
 	plan.addStressTest(t3);
 	plan.addStressTest(t4);
 	plan.addStressTest(t5);
-	plan.setParallelRequests(3);
-	plan.setMultiplicationFactor(1);
+	plan.addStressTest(t6);
+	plan.setParallelRequests(2);
+	plan.setMultiplicationFactor(3);
 
 	return plan;
     }
@@ -75,7 +81,6 @@ public class DiscoveryStressExternalTestIT {
 	    });
 	    try {
 		writer.write(System.lineSeparator());
-
 
 	    } catch (IOException e) {
 		throw new RuntimeException(e);
@@ -105,41 +110,45 @@ public class DiscoveryStressExternalTestIT {
 	    }
 	}
 
-	Arrays.asList("production", "test").stream().forEach(env -> {
+	Arrays.asList("production", "preproduction", "test").stream().forEach(env -> {
 
-	    String hostname = "https://gs-service-" + env + ".geodab.eu";
-	    StressPlanExecutor planExecutor = new StressPlanExecutor(plan, hostname);
+	    Arrays.asList(1, 2, 4).stream().forEach(parallel -> {
 
-	    StressPlanResultCollector collector = new StressPlanResultCollector();
-	    try {
-		planExecutor.execute(collector);
-	    } catch (InterruptedException e) {
-		throw new RuntimeException(e);
-	    }
+		String hostname = "https://gs-service-" + env + ".geodab.eu";
+		plan.setParallelRequests(parallel);
+		StressPlanExecutor planExecutor = new StressPlanExecutor(plan, hostname);
 
-	    collector.printReport(System.out);
+		StressPlanResultCollector collector = new StressPlanResultCollector();
+		try {
+		    planExecutor.execute(collector, 10L, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+		    throw new RuntimeException(e);
+		}
 
-	    try {
+		collector.printReport(System.out);
 
-		Path p = Paths.get(testresultFolder.getAbsolutePath() + "/stresstest-report-env-" + env + ".txt");
+		try {
 
-		if (Files.exists(p))
-		    Files.delete(p);
+		    Path p = Paths.get(testresultFolder.getAbsolutePath() + "/stresstest-report-env-" + env + "-" + parallel + ".txt");
 
-		Path file = Files.createFile(p);
+		    if (Files.exists(p))
+			Files.delete(p);
 
-		OutputStream outfile = new FileOutputStream(file.toFile());
-		collector.printReport(outfile);
-		System.out.println("TXT file: " + file.toFile().getAbsolutePath());
-	    } catch (IOException e) {
-		throw new RuntimeException(e);
-	    }
+		    Path file = Files.createFile(p);
 
-	    if (csvColumns.size() == 0) {
-		csvColumns.addAll(collector.getCSVColumns());
-	    }
+		    OutputStream outfile = new FileOutputStream(file.toFile());
+		    collector.printReport(outfile);
+		    System.out.println("TXT file: " + file.toFile().getAbsolutePath());
+		} catch (IOException e) {
+		    throw new RuntimeException(e);
+		}
 
-	    valueList.add(collector.getCSVColumnValues());
+		if (csvColumns.size() == 0) {
+		    csvColumns.addAll(collector.getCSVColumns());
+		}
+
+		valueList.add(collector.getCSVColumnValues());
+	    });
 
 	});
 
