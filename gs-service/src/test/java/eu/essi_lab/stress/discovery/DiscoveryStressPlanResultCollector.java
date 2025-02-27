@@ -36,6 +36,7 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 	return Math.toIntExact(getResults().stream().filter(r -> r.getCode() == 200).count());
     }
 
+    @Override
     public List<String> getCSVColumns() {
 	List<String> columns = new ArrayList<>();
 
@@ -56,6 +57,7 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 	return columns;
     }
 
+    @Override
     public List<String> getCSVColumnValues() {
 
 	List<String> values = new ArrayList<>();
@@ -111,6 +113,7 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 	writer.flush();
     }
 
+    @Override
     public void printReport(OutputStream out) {
 
 	String title = String.format("Results of Discovery Stress Tests on host %s", host);
