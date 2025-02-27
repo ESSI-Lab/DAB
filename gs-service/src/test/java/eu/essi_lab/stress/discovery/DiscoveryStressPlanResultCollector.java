@@ -34,7 +34,7 @@ public class DiscoveryStressPlanResultCollector {
 	return Math.toIntExact(getResults().stream().filter(r -> r.getCode() == 200).count());
     }
 
-    public void saveReportToCSV(OutputStream out) throws IOException {
+    public List<String> getCSVColumns() {
 	List<String> columns = new ArrayList<>();
 
 	columns.addAll(Arrays.asList("host", "total_req", "total_succ", "total_fail", "total_mean_exec_time",
@@ -51,6 +51,40 @@ public class DiscoveryStressPlanResultCollector {
 	    columns.add("mean_exec_" + c);
 	});
 
+	return columns;
+    }
+
+    public List<String> getCSVColumnValues() {
+
+	List<String> values = new ArrayList<>();
+
+	values.add(host);
+	values.add(getResults().size() + "");
+	values.add(totalOkTests() + "");
+	values.add(getResults().size() - totalOkTests() + "");
+	values.add(meanExecutionTime() + "");
+	values.add(getPlan().getParallelRequests() + "");
+
+	Map<String, Integer> totalByType = totalByType();
+	Map<String, Integer> successByType = successByType();
+	Map<String, Long> meanExecByType = meanExecByType();
+
+	totalByType.keySet().stream().forEach(c -> {
+
+	    values.add(totalByType.get(c) + "");
+	    values.add(successByType.get(c) + "");
+	    values.add(totalByType.get(c) - successByType.get(c) + "");
+	    values.add(meanExecByType.get(c) + "");
+
+	});
+
+	return values;
+    }
+
+    public void saveReportToCSV(OutputStream out) throws IOException {
+	List<String> columns = getCSVColumns();
+	List<String> values = getCSVColumnValues();
+
 	OutputStreamWriter writer = new OutputStreamWriter(out);
 	columns.stream().forEach(c -> {
 	    try {
@@ -62,21 +96,11 @@ public class DiscoveryStressPlanResultCollector {
 	});
 
 	writer.write("\n");
-	writer.write(host + ",");
-	writer.write(getResults().size() + ",");
-	writer.write(totalOkTests() + ",");
-	writer.write(getResults().size() - totalOkTests() + ",");
-	writer.write(meanExecutionTime() + ",");
-	writer.write(getPlan().getParallelRequests() + ",");
 
-	totalByType.keySet().stream().forEach(c -> {
+	values.stream().forEach(c -> {
 	    try {
-		writer.write(totalByType.get(c) + ",");
-
-		writer.write(successByType.get(c) + ",");
-
-		writer.write(totalByType.get(c) - successByType.get(c) + ",");
-		writer.write(meanExecByType.get(c) + ",");
+		writer.write(c);
+		writer.write(",");
 	    } catch (IOException e) {
 		throw new RuntimeException(e);
 	    }
