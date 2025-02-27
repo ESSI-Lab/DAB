@@ -1,5 +1,6 @@
 package eu.essi_lab.stress.discovery;
 
+import eu.essi_lab.stress.plan.StressPlan;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -8,8 +9,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Mattia Santoro
@@ -19,7 +18,7 @@ public class DiscoveryStressPlanResultCollector {
     private List<DiscoveryStressTestResult> results = new ArrayList<>();
 
     private String host;
-    private DiscoveryStressPlan plan;
+    private StressPlan plan;
 
     public void addResult(DiscoveryStressTestResult result) {
 	getResults().add(result);
@@ -151,7 +150,7 @@ public class DiscoveryStressPlanResultCollector {
 	if (test.getBbox() != null)
 	    contraintsBuilder.append("bbox__").append(test.getBboxrel()).append("__");
 
-	if (test.getView()!=null)
+	if (test.getView() != null)
 	    contraintsBuilder.append("view__").append(test.getView()).append("__");
 
 	contraintsBuilder.append("n_sources=").append(test.getSources().size());
@@ -165,7 +164,7 @@ public class DiscoveryStressPlanResultCollector {
 	Map<String, Integer> map = new HashMap<>();
 
 	getResults().stream().map(r ->
-		r.getTest()
+		(DiscoveryStressTest) r.getTest()
 	).forEach(test -> {
 	    Integer total = 0;
 
@@ -186,7 +185,7 @@ public class DiscoveryStressPlanResultCollector {
 
 	getResults().stream().filter(r -> r.getCode() == 200).
 		forEach(r -> {
-		    DiscoveryStressTest test = r.getTest();
+		    DiscoveryStressTest test = (DiscoveryStressTest) r.getTest();
 
 		    Long total = 0L;
 
@@ -215,7 +214,7 @@ public class DiscoveryStressPlanResultCollector {
 
 	getResults().stream().filter(r -> r.getCode() == 200).
 		map(r ->
-			r.getTest()
+			(DiscoveryStressTest) r.getTest()
 		).forEach(test -> {
 
 		    Integer total = 0;
@@ -277,11 +276,11 @@ public class DiscoveryStressPlanResultCollector {
 	this.host = host;
     }
 
-    public void setPlan(DiscoveryStressPlan plan) {
+    public void setPlan(StressPlan plan) {
 	this.plan = plan;
     }
 
-    public DiscoveryStressPlan getPlan() {
+    public StressPlan getPlan() {
 	return plan;
     }
 }

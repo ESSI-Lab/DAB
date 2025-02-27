@@ -1,7 +1,7 @@
-package eu.essi_lab.stress.discovery;
+package eu.essi_lab.stress.plan;
 
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.stress.discovery.DiscoveryStressTestResult;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,13 +18,13 @@ import org.apache.commons.io.IOUtils;
 /**
  * @author Mattia Santoro
  */
-public class DiscoveryStressTestExecutor implements Callable<DiscoveryStressTestResult> {
+public class StressTestExecutor implements Callable<DiscoveryStressTestResult> {
 
-    private final DiscoveryStressTest test;
+    private final IStressTest test;
     private final String host;
     private GSLoggerFactory.GSLogger logger = GSLoggerFactory.getLogger(getClass());
 
-    public DiscoveryStressTestExecutor(DiscoveryStressTest test, String host) {
+    public StressTestExecutor(IStressTest test, String host) {
 	this.test = test;
 	this.host = host;
     }
@@ -32,11 +32,11 @@ public class DiscoveryStressTestExecutor implements Callable<DiscoveryStressTest
     @Override
     public DiscoveryStressTestResult call() throws Exception {
 
-	return testSearch(test.createRequest(this.host));
+	return executeRequest(test.createRequest(this.host));
 
     }
 
-    private DiscoveryStressTestResult testSearch(HttpRequest request) throws URISyntaxException, InterruptedException {
+    private DiscoveryStressTestResult executeRequest(HttpRequest request) throws URISyntaxException, InterruptedException {
 
 	DiscoveryStressTestResult result = new DiscoveryStressTestResult();
 
@@ -55,12 +55,9 @@ public class DiscoveryStressTestExecutor implements Callable<DiscoveryStressTest
 
 	    result.setCode(code);
 	    result.setRequest(test.requestString(this.host));
-
 	    result.setStart(start);
 	    result.setEnd(end);
-
 	    result.setTest(test);
-
 	    result.setResponseFile(saveResponseToFile(response.body()));
 
 	    return result;

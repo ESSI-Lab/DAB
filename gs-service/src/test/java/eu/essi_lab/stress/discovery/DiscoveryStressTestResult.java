@@ -1,5 +1,7 @@
 package eu.essi_lab.stress.discovery;
 
+import eu.essi_lab.stress.plan.IStressTest;
+
 /**
  * @author Mattia Santoro
  */
@@ -12,7 +14,7 @@ public class DiscoveryStressTestResult {
     private Long start;
     private Long end;
 
-    private DiscoveryStressTest test;
+    private IStressTest test;
 
     private String responseFile;
 
@@ -36,11 +38,11 @@ public class DiscoveryStressTestResult {
 	return end - start;
     }
 
-    public void setTest(DiscoveryStressTest test) {
+    public void setTest(IStressTest test) {
 	this.test = test;
     }
 
-    public DiscoveryStressTest getTest() {
+    public IStressTest getTest() {
 	return test;
     }
 

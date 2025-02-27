@@ -1,17 +1,18 @@
-package eu.essi_lab.stress.discovery;
+package eu.essi_lab.stress.plan;
 
+import eu.essi_lab.stress.discovery.DiscoveryStressTest;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Mattia Santoro
  */
-public class DiscoveryStressPlan {
+public class StressPlan {
 
     private int parallelRequests = 1;
     private int multiplicationFactor = 4;
 
-    private List<DiscoveryStressTest> stressTests = new ArrayList<>();
+    private List<IStressTest> stressTests = new ArrayList<>();
 
     public int getParallelRequests() {
 	return parallelRequests;
@@ -25,7 +26,7 @@ public class DiscoveryStressPlan {
 	getStressTests().add(test);
     }
 
-    public List<DiscoveryStressTest> getStressTests() {
+    public List<IStressTest> getStressTests() {
 	return stressTests;
     }
 

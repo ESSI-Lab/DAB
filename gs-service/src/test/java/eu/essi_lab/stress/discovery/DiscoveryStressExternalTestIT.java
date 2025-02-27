@@ -1,5 +1,6 @@
 package eu.essi_lab.stress.discovery;
 
+import eu.essi_lab.stress.plan.StressPlan;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class DiscoveryStressExternalTestIT {
 
-    private DiscoveryStressPlan definePlan() {
+    private StressPlan definePlan() {
 	DiscoveryStressTest t1 = new DiscoveryStressTest();
 	t1.setSearchText("ozone");
 
@@ -37,7 +38,7 @@ public class DiscoveryStressExternalTestIT {
 	t5.setBbox("-10.9,35.23,2.2,43.434");
 	t5.setBboxrel(DiscoveryStressTest.BBOXREL.CONTAINS);
 
-	DiscoveryStressPlan plan = new DiscoveryStressPlan();
+	StressPlan plan = new StressPlan();
 	plan.addStressTest(t1);
 	plan.addStressTest(t2);
 	plan.addStressTest(t3);
@@ -83,7 +84,7 @@ public class DiscoveryStressExternalTestIT {
 
     public static void main(String[] args) {
 
-	DiscoveryStressPlan plan = new DiscoveryStressExternalTestIT().definePlan();
+	StressPlan plan = new DiscoveryStressExternalTestIT().definePlan();
 	Path source = Paths.get(DiscoveryStressExternalTestIT.class.getResource("/").getPath());
 
 	List<String> csvColumns = new ArrayList<>();

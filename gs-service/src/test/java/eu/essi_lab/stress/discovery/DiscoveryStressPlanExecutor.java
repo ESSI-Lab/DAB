@@ -1,28 +1,28 @@
 package eu.essi_lab.stress.discovery;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.stress.plan.StressPlan;
+import eu.essi_lab.stress.plan.StressTestExecutor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Mattia Santoro
  */
 public class DiscoveryStressPlanExecutor {
 
-    private final DiscoveryStressPlan plan;
+    private final StressPlan plan;
     private final ExecutorService executor;
     private final String host;
 
-    public DiscoveryStressPlanExecutor(DiscoveryStressPlan plan, String host) {
+    public DiscoveryStressPlanExecutor(StressPlan plan, String host) {
 	this.plan = plan;
 	this.host = host;
 
@@ -34,12 +34,12 @@ public class DiscoveryStressPlanExecutor {
 	resultCollector.setHost(host);
 	resultCollector.setPlan(plan);
 
-	List<DiscoveryStressTestExecutor> tasks = new ArrayList<>();
+	List<StressTestExecutor> tasks = new ArrayList<>();
 
 	for (int i = 0; i < plan.getMultiplicationFactor(); i++) {
 
 	    this.plan.getStressTests().stream().map(
-		    test -> new DiscoveryStressTestExecutor(test, host)).collect(Collectors.toCollection(() -> tasks));
+		    test -> new StressTestExecutor(test, host)).collect(Collectors.toCollection(() -> tasks));
 	}
 
 	Collections.shuffle(tasks);
