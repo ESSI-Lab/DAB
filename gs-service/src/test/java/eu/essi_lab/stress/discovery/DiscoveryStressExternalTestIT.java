@@ -28,31 +28,25 @@ public class DiscoveryStressExternalTestIT {
 	DiscoveryStressTest t3 = new DiscoveryStressTest();
 	t3.setBbox("-10.9,35.23,2.2,43.434");
 
+	DiscoveryStressTest t4 = new DiscoveryStressTest();
+	t4.setSearchText("temperature");
+	t4.setBbox("-10.9,35.23,2.2,43.434");
+	t4.setBboxrel(DiscoveryStressTest.BBOXREL.CONTAINS);
+
+	DiscoveryStressTest t5 = new DiscoveryStressTest();
+	t5.setBbox("-10.9,35.23,2.2,43.434");
+	t5.setBboxrel(DiscoveryStressTest.BBOXREL.CONTAINS);
+
 	DiscoveryStressPlan plan = new DiscoveryStressPlan();
 	plan.addStressTest(t1);
 	plan.addStressTest(t2);
 	plan.addStressTest(t3);
+	plan.addStressTest(t4);
+	plan.addStressTest(t5);
 	plan.setParallelRequests(3);
 	plan.setMultiplicationFactor(2);
 
 	return plan;
-    }
-
-    private void executeAndPrint(DiscoveryStressPlan plan, String hostname, OutputStream report_out, OutputStream csv_out)
-	    throws IOException {
-	DiscoveryStressPlanExecutor planExecutor = new DiscoveryStressPlanExecutor(plan, hostname);
-
-	DiscoveryStressPlanResultCollector collector = new DiscoveryStressPlanResultCollector();
-
-	try {
-	    planExecutor.execute(collector);
-	} catch (InterruptedException e) {
-	    throw new RuntimeException(e);
-	}
-
-	collector.printReport(report_out);
-
-	collector.saveReportToCSV(csv_out);
     }
 
     private static void saveCSV(List<String> csvColumns, List<List<String>> valueList, OutputStream outfile) throws IOException {
