@@ -1,12 +1,13 @@
 package eu.essi_lab.stress.discovery;
 
-import eu.essi_lab.lib.utils.Base64Utils;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,13 +51,56 @@ public class DiscoveryStressExternalTestIT {
 	collector.saveReportToCSV(csv_out);
     }
 
+    private static void saveCSV(List<String> csvColumns, List<List<String>> valueList, OutputStream outfile) throws IOException {
+	OutputStreamWriter writer = new OutputStreamWriter(outfile);
+	csvColumns.stream().forEach(c -> {
+	    try {
+		writer.write(c);
+		writer.write(",");
+	    } catch (IOException e) {
+		throw new RuntimeException(e);
+	    }
+	});
+
+	writer.write("\n");
+	valueList.stream().forEach(values -> {
+	    values.stream().forEach(c -> {
+		try {
+		    writer.write(c);
+		    writer.write(",");
+		} catch (IOException e) {
+		    throw new RuntimeException(e);
+		}
+	    });
+	    try {
+		writer.write("\n");
+	    } catch (IOException e) {
+		throw new RuntimeException(e);
+	    }
+	});
+
+	writer.flush();
+
+    }
+
     public static void main(String[] args) {
 
 	DiscoveryStressPlan plan = new DiscoveryStressExternalTestIT().definePlan();
+	Path source = Paths.get(DiscoveryStressExternalTestIT.class.getResource("/").getPath());
 
 	List<String> csvColumns = new ArrayList<>();
 
 	List<List<String>> valueList = new ArrayList<>();
+
+	File testresultFolder = new File(source + "/stresstest/");
+
+	if (!testresultFolder.exists()) {
+	    try {
+		Files.createDirectory(testresultFolder.toPath());
+	    } catch (IOException e) {
+		throw new RuntimeException(e);
+	    }
+	}
 
 	Arrays.asList("production", "test").stream().forEach(env -> {
 
@@ -73,7 +117,8 @@ public class DiscoveryStressExternalTestIT {
 	    collector.printReport(System.out);
 
 	    try {
-		Path file = Files.createTempFile("stresstest-report-env-", ".txt");
+
+		Path file = Files.createFile(Paths.get(testresultFolder.getAbsolutePath() + "/stresstest-report-env-" + env + ".txt"));
 
 		OutputStream outfile = new FileOutputStream(file.toFile());
 		collector.printReport(outfile);
@@ -91,54 +136,16 @@ public class DiscoveryStressExternalTestIT {
 	});
 
 	try {
-	    Path file = Files.createTempFile("stresstestresult-all-", ".csv");
+	    Path file = Files.createFile(Paths.get(testresultFolder.getAbsolutePath() + "/stresstestresult-all.csv"));
+
 	    OutputStream outfile = new FileOutputStream(file.toFile());
 
-	    OutputStreamWriter writer = new OutputStreamWriter(outfile);
-	    csvColumns.stream().forEach(c -> {
-		try {
-		    writer.write(c);
-		    writer.write(",");
-		} catch (IOException e) {
-		    throw new RuntimeException(e);
-		}
-	    });
-
-	    writer.write("\n");
-	    valueList.stream().forEach(values -> {
-		values.stream().forEach(c -> {
-		    try {
-			writer.write(c);
-			writer.write(",");
-		    } catch (IOException e) {
-			throw new RuntimeException(e);
-		    }
-		});
-		try {
-		    writer.write("\n");
-		} catch (IOException e) {
-		    throw new RuntimeException(e);
-		}
-	    });
-
-	    writer.flush();
-
+	    saveCSV(csvColumns, valueList, outfile);
 	    System.out.println("CSV file: " + file.toFile().getAbsolutePath());
+
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	}
-
-	//	String hostname = "https://gs-service-production.geodab.eu";
-	//
-	//	try {
-	//	    Path file = Files.createTempFile("stresstest", ".csv");
-	//	    OutputStream outfile = new FileOutputStream(file.toFile());
-	//	    new DiscoveryStressExternalTestIT().executeAndPrint(plan, hostname, System.out, outfile);
-	//
-	//	    System.out.println("CSV file: " + file.toFile().getAbsolutePath());
-	//	} catch (IOException e) {
-	//	    throw new RuntimeException(e);
-	//	}
 
     }
 
