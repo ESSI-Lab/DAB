@@ -19,6 +19,18 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		
+		<dependency>
+          <groupId>org.apache.parquet</groupId>
+          <artifactId>parquet-avro</artifactId>
+          <version>1.15.0</version> <!-- or latest version -->
+       </dependency>
+       
+      <dependency>
+      	<groupId>org.apache.parquet</groupId>
+      	<artifactId>parquet-hadoop</artifactId>
+      	<version>1.15.0</versio>
+      </dependency>
+		
 	</dependencies>
 
 	<build>
