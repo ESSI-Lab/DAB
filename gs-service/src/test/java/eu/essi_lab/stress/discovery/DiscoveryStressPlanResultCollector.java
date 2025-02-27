@@ -1,8 +1,8 @@
 package eu.essi_lab.stress.discovery;
 
 import eu.essi_lab.stress.plan.IStressPlanResultCollector;
-import eu.essi_lab.stress.plan.IStressTestResult;
 import eu.essi_lab.stress.plan.StressPlan;
+import eu.essi_lab.stress.plan.StressTestResult;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -17,18 +17,18 @@ import java.util.Map;
  */
 public class DiscoveryStressPlanResultCollector implements IStressPlanResultCollector {
 
-    private List<DiscoveryStressTestResult> results = new ArrayList<>();
+    private List<StressTestResult> results = new ArrayList<>();
 
     private String host;
     private StressPlan plan;
 
     @Override
-    public void addResult(IStressTestResult result) {
-	getResults().add((DiscoveryStressTestResult) result);
+    public void addResult(StressTestResult result) {
+	getResults().add((StressTestResult) result);
 
     }
 
-    public List<DiscoveryStressTestResult> getResults() {
+    public List<StressTestResult> getResults() {
 	return results;
     }
 
@@ -132,7 +132,7 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 	    writer.write(planSummary);
 	    writer.write("\n\n");
 
-	    for (DiscoveryStressTestResult result : getResults()) {
+	    for (StressTestResult result : getResults()) {
 		writer.write(result.getRequest());
 		writer.write("\n");
 		writer.write(result.getResponseFile());
@@ -264,7 +264,7 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 
 	Long total = 0L;
 
-	for (DiscoveryStressTestResult result : getResults()) {
+	for (StressTestResult result : getResults()) {
 	    total += result.getExecTime();
 	}
 

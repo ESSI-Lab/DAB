@@ -42,7 +42,7 @@ public class StressPlanExecutor {
 
 	Collections.shuffle(tasks);
 
-	List<Future<IStressTestResult>> futures = executor.invokeAll(tasks);
+	List<Future<StressTestResult>> futures = executor.invokeAll(tasks);
 
 	GSLoggerFactory.getLogger(getClass()).info("start collect");
 	futures.stream().forEach(result -> {

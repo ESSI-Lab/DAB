@@ -1,12 +1,9 @@
-package eu.essi_lab.stress.discovery;
-
-import eu.essi_lab.stress.plan.IStressTest;
-import eu.essi_lab.stress.plan.IStressTestResult;
+package eu.essi_lab.stress.plan;
 
 /**
  * @author Mattia Santoro
  */
-public class DiscoveryStressTestResult implements IStressTestResult {
+public class StressTestResult {
 
     private int code;
 
@@ -23,7 +20,6 @@ public class DiscoveryStressTestResult implements IStressTestResult {
 	return code;
     }
 
-    @Override
     public void setCode(Integer code) {
 	this.code = code;
     }
@@ -32,7 +28,6 @@ public class DiscoveryStressTestResult implements IStressTestResult {
 	return request;
     }
 
-    @Override
     public void setRequest(String request) {
 	this.request = request;
     }
@@ -41,7 +36,6 @@ public class DiscoveryStressTestResult implements IStressTestResult {
 	return end - start;
     }
 
-    @Override
     public void setTest(IStressTest test) {
 	this.test = test;
     }
@@ -54,7 +48,6 @@ public class DiscoveryStressTestResult implements IStressTestResult {
 	return end;
     }
 
-    @Override
     public void setEnd(Long end) {
 	this.end = end;
     }
@@ -63,7 +56,6 @@ public class DiscoveryStressTestResult implements IStressTestResult {
 	return start;
     }
 
-    @Override
     public void setStart(Long start) {
 	this.start = start;
     }
@@ -72,7 +64,6 @@ public class DiscoveryStressTestResult implements IStressTestResult {
 	return responseFile;
     }
 
-    @Override
     public void setResponseFile(String responseFile) {
 	this.responseFile = responseFile;
     }

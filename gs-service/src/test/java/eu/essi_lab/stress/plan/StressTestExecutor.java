@@ -1,7 +1,6 @@
 package eu.essi_lab.stress.plan;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.stress.discovery.DiscoveryStressTestResult;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +17,7 @@ import org.apache.commons.io.IOUtils;
 /**
  * @author Mattia Santoro
  */
-public class StressTestExecutor implements Callable<IStressTestResult> {
+public class StressTestExecutor implements Callable<StressTestResult> {
 
     private final IStressTest test;
     private final String host;
@@ -30,15 +29,15 @@ public class StressTestExecutor implements Callable<IStressTestResult> {
     }
 
     @Override
-    public IStressTestResult call() throws Exception {
+    public StressTestResult call() throws Exception {
 
 	return executeRequest(test.createRequest(this.host));
 
     }
 
-    private IStressTestResult executeRequest(HttpRequest request) throws URISyntaxException, InterruptedException {
+    private StressTestResult executeRequest(HttpRequest request) throws URISyntaxException, InterruptedException {
 
-	IStressTestResult result = new DiscoveryStressTestResult();
+	StressTestResult result = new StressTestResult();
 
 	try {
 
