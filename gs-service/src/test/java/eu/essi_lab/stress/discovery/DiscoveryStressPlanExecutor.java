@@ -32,6 +32,7 @@ public class DiscoveryStressPlanExecutor {
     public void execute(DiscoveryStressPlanResultCollector resultCollector) throws InterruptedException {
 
 	resultCollector.setHost(host);
+	resultCollector.setPlan(plan);
 
 	List<DiscoveryStressTestExecutor> tasks = new ArrayList<>();
 

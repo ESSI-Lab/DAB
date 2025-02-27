@@ -13,17 +13,12 @@ public class DiscoveryStressTest {
 
     private String bbox;
 
-    private BBOXREL bboxrel;
+    private BBOXREL bboxrel = BBOXREL.OVERLAPS;
 
     private List<String> sources = new ArrayList<>();
 
     public String createRequestParameters() {
 	String rid = "stresstest-" + UUID.randomUUID().toString();
-
-	BBOXREL rel = BBOXREL.OVERLAPS;
-
-	if (bboxrel != null)
-	    rel = bboxrel;
 
 	String st = "";
 	if (searchText != null)
@@ -40,7 +35,7 @@ public class DiscoveryStressTest {
 		.append("reqID=").append(rid)//
 		.append("&")//
 		.append("si=1&ct=12&tf=keyword,format,protocol,providerID,organisationName,sscScore")//
-		.append("rel=").append(rel)//
+		.append("rel=").append(bboxrel)//
 		.append("&")//
 		.append("viewid=")//
 		.append("&")//
