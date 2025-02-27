@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -53,6 +54,7 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
+import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
@@ -108,9 +110,19 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    message.setUserBond(constraints);
 	    MarkLogicDiscoveryBondHandler bondHandler = new MarkLogicDiscoveryBondHandler(message, getDatabase());
-	    DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getUserBond().get());
+	    Optional<Bond> optBond = message.getUserBond();
+	    Bond bond = null;
+	    if (optBond.isPresent()) {
+		bond = optBond.get();
+	    }
+	    
+	    DiscoveryBondParser bondParser = new DiscoveryBondParser(bond);
 	    bondParser.parse(bondHandler);
-	    template = template.replace("PARAMS_QUERY", bondHandler.getParsedQuery());
+	    String sub = bondHandler.getParsedQuery();
+	    if (sub.isEmpty()) {
+		sub = "()";
+	    }
+	    template = template.replace("PARAMS_QUERY", sub);
 
 	    //
 	    //

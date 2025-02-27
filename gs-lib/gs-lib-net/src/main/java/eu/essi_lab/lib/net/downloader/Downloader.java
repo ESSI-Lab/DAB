@@ -24,9 +24,11 @@ package eu.essi_lab.lib.net.downloader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
+import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Builder;
 import java.net.http.HttpClient.Redirect;
@@ -251,7 +253,18 @@ public class Downloader {
      */
     public Optional<String> downloadOptionalString(String url) {
 
-	return downloadOptionalString(url, HttpHeaderUtils.buildEmpty());
+	String[] userInfo = getUserInfo(url);
+
+	return downloadOptionalString(url, userInfo[0], userInfo[1], HttpHeaderUtils.buildEmpty());
+    }
+
+    /**
+     * @param url
+     * @return
+     */
+    public Optional<String> downloadOptionalString(String url, String user, String pwd) {
+
+	return downloadOptionalString(url, user, pwd, HttpHeaderUtils.buildEmpty());
     }
 
     /**
@@ -261,7 +274,33 @@ public class Downloader {
      */
     public Optional<String> downloadOptionalString(String url, HttpHeaders headers) {
 
+	String[] userInfo = getUserInfo(url);
+
+	return downloadOptionalString(url, userInfo[0], userInfo[1], headers);
+    }
+
+    /**
+     * @param url
+     * @param user
+     * @param password
+     * @param headers
+     * @return
+     */
+    public Optional<String> downloadOptionalString(String url, String user, String pwd, HttpHeaders headers) {
+
 	try {
+
+	    if (user != null && pwd != null) {
+
+		HttpResponse<InputStream> response = downloadResponse(url, user, pwd);
+
+		Optional<InputStream> stream = getStream(response);
+
+		if (stream.isPresent()) {
+
+		    return Optional.of(IOUtils.toString(stream.get(), StandardCharsets.UTF_8));
+		}
+	    }
 
 	    Optional<InputStream> optionalStream = downloadOptionalStream(url, headers);
 
@@ -279,7 +318,7 @@ public class Downloader {
 		return Optional.of(response);
 	    }
 
-	} catch (IOException e) {
+	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
@@ -312,16 +351,7 @@ public class Downloader {
 
 	    HttpResponse<InputStream> ret = downloadResponse(url, headers);
 
-	    boolean emptyBody = HttpConnectionUtils.emptyBody(ret);
-
-	    int statusCode = ret.statusCode();
-	    	    
-	    if (emptyBody || statusCode != 200) {
-
-		return Optional.empty();
-	    }
-
-	    return Optional.of(ret.body());
+	    return getStream(ret);
 
 	} catch (Exception e) {
 
@@ -329,6 +359,24 @@ public class Downloader {
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * @param response
+     * @return
+     */
+    public static Optional<InputStream> getStream(HttpResponse<InputStream> response) {
+
+	boolean emptyBody = HttpConnectionUtils.emptyBody(response);
+
+	int statusCode = response.statusCode();
+
+	if (emptyBody || statusCode != 200) {
+
+	    return Optional.empty();
+	}
+
+	return Optional.of(response.body());
     }
 
     /**
@@ -510,6 +558,35 @@ public class Downloader {
 	GSLoggerFactory.getLogger(getClass()).trace("Execution of {} ENDED with code {}", request.uri().toString(), response.statusCode());
 
 	return response;
+    }
+
+    /**
+     * @param url
+     * @return
+     */
+    private String[] getUserInfo(String url) {
+    
+        String user = null;
+        String pwd = null;
+    
+        try {
+    
+            String userInfo = new URL(url).getUserInfo();
+    
+            if (userInfo != null) {
+        	String[] split = userInfo.split(":");
+    
+        	if (split.length == 2) {
+        	    user = split[0];
+        	    pwd = split[1];
+        	}
+            }
+        } catch (MalformedURLException e) {
+    
+            GSLoggerFactory.getLogger(getClass()).error(e);
+        }
+    
+        return new String[] { user, pwd };
     }
 
     /**

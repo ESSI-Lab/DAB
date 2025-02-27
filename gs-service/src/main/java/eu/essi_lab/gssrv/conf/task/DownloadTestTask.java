@@ -103,11 +103,11 @@ public class DownloadTestTask extends AbstractCustomTask {
 	discoveryMessage.setPage(new Page(1, 1000));
 	discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 	discoveryMessage.setDataBaseURI(uri);
 
-	Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
-	WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getDatabaseURI(), discoveryMessage);
+	Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+	WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
 	discoveryMessage.setUserBond(BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_DOWNLOADABLE, "true"));
 	discoveryMessage.setDistinctValuesElement(ResourceProperty.SOURCE_ID);
 	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
@@ -124,7 +124,7 @@ public class DownloadTestTask extends AbstractCustomTask {
 	    ((StationPortalAugmenter) augmenter).setView(viewId);
 	}
 
-	DatabaseWriter writer = DatabaseProviderFactory.getWriter(ConfigurationWrapper.getDatabaseURI());
+	DatabaseWriter writer = DatabaseProviderFactory.getWriter(ConfigurationWrapper.getStorageInfo());
 
 	GSLoggerFactory.getLogger(getClass()).info("Found {} sources", resources.size());
 

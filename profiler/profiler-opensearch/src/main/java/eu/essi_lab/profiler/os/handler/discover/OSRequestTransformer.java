@@ -29,6 +29,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.core.MediaType;
 
@@ -56,10 +58,13 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.StorageInfo;
@@ -72,6 +77,7 @@ import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.pdk.wrt.WebRequestParameter;
+import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.os.OSParameter;
 import eu.essi_lab.profiler.os.OSParameters;
 import eu.essi_lab.profiler.os.OSProfilerSetting;
@@ -108,7 +114,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	message = super.refineMessage(message);
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
 	//
 	// covering mode: overrides the satellites sources results priority,
@@ -335,16 +341,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	KeyValueParser keyValueParser = new KeyValueParser(request.getFormData().get());
 	OSRequestParser parser = new OSRequestParser(keyValueParser);
 
-	OSParameter sources = WebRequestParameter.findParameter(OSParameters.PARENTS.getName(), OSParameters.class);
-	OSParameter id = WebRequestParameter.findParameter(OSParameters.ID.getName(), OSParameters.class);
-	String sourcesValue = parser.parse(sources);
-	String idValue = parser.parse(id);
-	if ((sourcesValue != null && sourcesValue.equals("ROOT"))
-		|| (request.getQueryString().toLowerCase().contains("getcontent") && idValue.equals("ROOT"))) {
-	    // get sources request
-	    return null;
-	}
-
 	// creates the bond list
 	ArrayList<Bond> bondList = new ArrayList<>();
 
@@ -369,110 +365,83 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	String rosetta = parser.parse(OSParameters.ROSETTA);
 	String semantics = parser.parse(OSParameters.SEMANTICS);
 	String ontology = parser.parse(OSParameters.ONTOLOGY);
+
+	//
+	// the portal set no sources if all are selected, here we add them in order to be in synch with
+	// the message.getSources (see DiscoveryRequestTransformer)
+	//
+
 	// adds the bonds created from the the available OS params
 	List<OSParameter> parameters = WebRequestParameter.findParameters(OSParameters.class);
+
 	for (OSParameter osParameter : parameters) {
-
-	    if (osParameter.getName().equals(OSParameters.SEARCH_TERMS.getName())
-		    || osParameter.getName().equals(OSParameters.SEARCH_FIELDS.getName())) {
-		continue;
-	    }
-
-	    String value = parser.parse(osParameter);
-
-	    if (osParameter.equals(OSParameters.ATTRIBUTE_TITLE) && value != null) {
-		Set<Bond> operands = new HashSet<>();
-
-		HydroOntology ho = null;
-
-		if (semantics != null && !semantics.isEmpty() && ontology != null && !ontology.isEmpty()) {
-		    switch (ontology.toLowerCase()) {
-		    case "whos":
-			ho = new WHOSOntology();
-			break;
-		    case "his-central":
-			ho = new HISCentralOntology();
-			break;
-		    default:
-			break;
-		    }
-		}
-		SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ATTRIBUTE_TITLE, value);
-		operands.add(bond);
-		if (ho != null) {
-		    List<SKOSConcept> concepts = ho.findConcepts(value, true, false);
-		    HashSet<String> uris = new HashSet<String>();
-		    for (SKOSConcept concept : concepts) {
-			uris.add(concept.getURI());
-		    }
-		    for (String uri : uris) {
-			SimpleValueBond b = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI,
-				uri);
-			operands.add(b);
-		    }
-		}
-		switch (operands.size()) {
-		case 0:
-		    break;
-		case 1:
-		    bondList.add(operands.iterator().next());
-		    break;
-		default:
-		    bondList.add(BondFactory.createOrBond(operands));
-		}
-	    }
-
-	    if (osParameter.equals(OSParameters.INSTRUMENT_IDENTIFIER) || //
-		    osParameter.equals(OSParameters.PLATFORM_IDENTIFIER) || //
-		    osParameter.equals(OSParameters.ORIGINATOR_ORGANISATION_IDENTIFIER) || //
-		    osParameter.equals(OSParameters.ATTRIBUTE_IDENTIFIER)) {
-		if (rosetta != null && !rosetta.equals("false") && value != null) {
-		    RosettaStone rs = new RosettaStoneConnector();
-		    Set<String> terms = new TreeSet<>();
-		    terms.add(value);
-		    terms.addAll(rs.getTranslations(value));
-		    switch (rosetta) {
-		    case "narrow":
-			Set<String> narrowerTerms = rs.getNarrower(value);
-			if (narrowerTerms != null) {
-			    terms.addAll(narrowerTerms);
-			}
-			break;
-		    case "broad":
-			Set<String> broaderTerms = rs.getBroader(value);
-			if (broaderTerms != null) {
-			    terms.addAll(broaderTerms);
-			}
-			break;
-
-		    case "true":
-		    default:
-			// do nothing, because translations are always added
-			break;
-		    }
-		    if (terms != null && !terms.isEmpty()) {
-			value = createOrSearch(terms);
-		    } else {
-			value = null;
-		    }
-		}
-	    }
 
 	    Optional<Bond> bond = Optional.empty();
 
 	    try {
 
+		String value = parser.parse(osParameter);
+
+		//
+		// sources
+		//
+
+		if (osParameter.getName().equals(OSParameters.SOURCES.getName())) {
+
+		    bond = handleSources(parser, request, osParameter, value);
+		}
+
+		//
+		// already handled separately
+		//
+		if (osParameter.getName().equals(OSParameters.SEARCH_TERMS.getName())
+			|| osParameter.getName().equals(OSParameters.SEARCH_FIELDS.getName())) {
+
+		    continue;
+		}
+
+		//
+		// semantics and ontology
+		//
+		if (osParameter.equals(OSParameters.ATTRIBUTE_TITLE) && value != null) {
+
+		    handleSemanticsAndOntology(bondList, value, semantics, ontology);
+		}
+
+		//
+		// rosetta
+		//
+		if ((osParameter.equals(OSParameters.INSTRUMENT_IDENTIFIER) || //
+			osParameter.equals(OSParameters.PLATFORM_IDENTIFIER) || //
+			osParameter.equals(OSParameters.ORIGINATOR_ORGANISATION_IDENTIFIER) || //
+			osParameter.equals(OSParameters.ATTRIBUTE_IDENTIFIER)) && ( //
+		rosetta != null && !rosetta.equals("false") && value != null)) {
+
+		    value = handleRosetta(rosetta, value);
+		}
+
+		//
+		// spatial
+		//
 		if (osParameter == OSParameters.BBOX || osParameter == OSParameters.W3W) {
 
 		    String spatialRelation = parser.parse(OSParameters.SPATIAL_RELATION);
 		    bond = osParameter.asBond(value, spatialRelation);
 
+		    //
+		    // temporal
+		    //
 		} else if (osParameter == OSParameters.TIME_START || osParameter == OSParameters.TIME_END) {
 
 		    String spatialRelation = parser.parse(OSParameters.TIME_RELATION);
 		    bond = osParameter.asBond(value, spatialRelation);
 
-		} else if (osParameter != OSParameters.VIEW_ID && osParameter != OSParameters.ATTRIBUTE_TITLE) {
+		    //
+		    // others
+		    //
+		} else if (osParameter != OSParameters.VIEW_ID && //
+			osParameter != OSParameters.ATTRIBUTE_TITLE && //
+			osParameter != OSParameters.SOURCES) {
 
 		    bond = osParameter.asBond(value);
 		}
@@ -490,14 +459,19 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    }
 
 	    if (bond.isPresent()) {
+
 		bondList.add(bond.get());
 	    }
 	}
 
 	Bond bond = null;
+
 	if (bondList.size() > 1) {
+
 	    bond = BondFactory.createAndBond(bondList.toArray(new Bond[] {}));
+
 	} else if (bondList.size() == 1) {
+
 	    bond = bondList.get(0);
 	}
 
@@ -557,6 +531,175 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	int count = Integer.parseInt(parser.parse(OSParameters.COUNT));
 
 	return new Page(startIndex, count);
+    }
+
+    /**
+     * @param parser
+     * @param request
+     * @param osParameter
+     * @param value
+     * @return
+     * @throws Exception
+     */
+    private Optional<Bond> handleSources(//
+	    OSRequestParser parser, //
+	    WebRequest request, //
+	    OSParameter osParameter, //
+	    String value) throws Exception {
+
+	Optional<Bond> out = Optional.empty();
+
+	String sources = parser.parse(OSParameters.SOURCES);
+
+	String viewId = request.extractViewId().orElse(parser.parse(OSParameters.VIEW_ID));
+
+	Optional<View> view = Optional.empty();
+
+	if (viewId != null && !viewId.equals(KeyValueParser.UNDEFINED)) {
+
+	    view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+	}
+
+	if (sources == null || sources.equals(KeyValueParser.UNDEFINED)) {
+
+	    Stream<GSSource> stream = null;
+
+	    if (view.isPresent()) {
+
+		stream = ConfigurationWrapper.getViewSources(view.get()).stream();
+
+	    } else {
+
+		stream = ConfigurationWrapper.getAllSources().stream();
+	    }
+
+	    value = stream.map(s -> s.getUniqueIdentifier()).collect(Collectors.joining(","));
+
+	    out = osParameter.asBond(value);
+
+//	} else if (view.isPresent() && view.get().getSourceDeployment() != null) {
+//
+//	    String sourceDeployment = view.get().getSourceDeployment();
+//
+//	    List<String> sourceIdsByDeployment = ConfigurationWrapper.getAllSources().//
+//		    stream().filter(s -> s.getDeployment().contains(sourceDeployment)).//
+//		    map(s -> s.getUniqueIdentifier()).//
+//		    collect(Collectors.toList());//
+//
+//	    List<String> selected = Arrays.asList(sources.split(","));
+//	    List<String> unselected = sourceIdsByDeployment.stream().//
+//		    filter(id -> !selected.contains(id)).//
+//		    collect(Collectors.toList());
+//
+//	    int selectedCount = selected.size();
+//	    int unSelectedCount = unselected.size();
+//
+//	    if (selectedCount <= unSelectedCount) {
+//
+//		out = osParameter.asBond(value);
+//
+//	    } else {
+//
+//		LogicalBond orBond = BondFactory.createOrBond();
+//		unselected.forEach(id -> orBond.getOperands().add(BondFactory.createNotBond(BondFactory.createSourceIdentifierBond(id))));
+//
+//		out = Optional.of(orBond);
+//	    }
+
+	} else {
+
+	    out = osParameter.asBond(value);
+	}
+
+	return out;
+    }
+
+    /**
+     * @param bondList
+     * @param value
+     * @param semantics
+     * @param ontology
+     */
+    private void handleSemanticsAndOntology(List<Bond> bondList, String value, String semantics, String ontology) {
+
+	Set<Bond> operands = new HashSet<>();
+
+	HydroOntology ho = null;
+
+	if (semantics != null && !semantics.isEmpty() && ontology != null && !ontology.isEmpty()) {
+	    switch (ontology.toLowerCase()) {
+	    case "whos":
+		ho = new WHOSOntology();
+		break;
+	    case "his-central":
+		ho = new HISCentralOntology();
+		break;
+	    default:
+		break;
+	    }
+	}
+	SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ATTRIBUTE_TITLE, value);
+	operands.add(bond);
+	if (ho != null) {
+	    List<SKOSConcept> concepts = ho.findConcepts(value, true, false);
+	    HashSet<String> uris = new HashSet<String>();
+	    for (SKOSConcept concept : concepts) {
+		uris.add(concept.getURI());
+	    }
+	    for (String uri : uris) {
+		SimpleValueBond b = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, uri);
+		operands.add(b);
+	    }
+	}
+	switch (operands.size()) {
+	case 0:
+	    break;
+	case 1:
+	    bondList.add(operands.iterator().next());
+	    break;
+	default:
+	    bondList.add(BondFactory.createOrBond(operands));
+	}
+    }
+
+    /**
+     * @param rosetta
+     * @param value
+     * @return
+     */
+    private String handleRosetta(String rosetta, String value) {
+
+	RosettaStone rs = new RosettaStoneConnector();
+	Set<String> terms = new TreeSet<>();
+	terms.add(value);
+	terms.addAll(rs.getTranslations(value));
+	switch (rosetta) {
+	case "narrow":
+	    Set<String> narrowerTerms = rs.getNarrower(value);
+	    if (narrowerTerms != null) {
+		terms.addAll(narrowerTerms);
+	    }
+	    break;
+	case "broad":
+	    Set<String> broaderTerms = rs.getBroader(value);
+	    if (broaderTerms != null) {
+		terms.addAll(broaderTerms);
+	    }
+	    break;
+
+	case "true":
+	default:
+	    // do nothing, because translations are always added
+	    break;
+	}
+	if (terms != null && !terms.isEmpty()) {
+	    value = createOrSearch(terms);
+	} else {
+	    value = null;
+	}
+
+	return value;
+
     }
 
     /**

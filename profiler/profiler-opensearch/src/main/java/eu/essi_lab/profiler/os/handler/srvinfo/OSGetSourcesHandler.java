@@ -80,7 +80,7 @@ public class OSGetSourcesHandler extends DefaultRequestHandler {
 
 	if (viewId.isPresent()) {
 
-	    view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId.get());
+	    view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId.get());
 	}
 
 	String outputFormat = OSProfiler.readOutputFormat(request);

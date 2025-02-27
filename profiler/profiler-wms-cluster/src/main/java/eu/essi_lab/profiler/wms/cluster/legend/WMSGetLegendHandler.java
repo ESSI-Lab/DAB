@@ -244,7 +244,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 
 		    List<InfoLegend> infos = new ArrayList<>();
 
-		    Optional<View> view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
+		    Optional<View> view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 
 		    List<GSSource> sources = ConfigurationWrapper.getViewSources(view.get());
 

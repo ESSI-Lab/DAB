@@ -148,7 +148,7 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 
 	    // set the required properties
 	    discoveryMessage.setSources(allSources);
-	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	    discoveryMessage.setWebRequest(webRequest);
 

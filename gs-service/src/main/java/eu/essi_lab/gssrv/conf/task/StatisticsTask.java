@@ -113,7 +113,7 @@ public class StatisticsTask extends AbstractCustomTask {
 
 		DownloadInformation goodInfo = AvailabilityMonitor.getInstance().getLastDownloadDate(source);
 		Date lastGoodDownload = goodInfo == null ? null : goodInfo.getDate();
-		DownloadInformation badInfo = AvailabilityMonitor.getInstance().getLastDownloadDate(source);
+		DownloadInformation badInfo = AvailabilityMonitor.getInstance().getLastFailedDownloadDate(source);
 		Date lastBadDownload = badInfo == null ? null : badInfo.getDate();
 
 		Integer downloadAvailable = 0;
@@ -125,43 +125,43 @@ public class StatisticsTask extends AbstractCustomTask {
 		availability.put(source, downloadAvailable);
 		io.micrometer.core.instrument.Gauge.builder("download_availability", availability, g -> g.get(source))//
 			.description("Download availability ")//
-			.tag("source", source).//
+			.tag("source_id", source).//
 			register(registry);
 
 		datasets.put(source, Integer.parseInt(stats.getTimeSeriesCount()));
 		io.micrometer.core.instrument.Gauge.builder("timeseries_total", datasets, g -> g.get(source))//
 			.description("Total number of timeseries ")//
-			.tag("source", source).//
+			.tag("source_id", source).//
 			register(registry);
 
 		platforms.put(source, Integer.parseInt(stats.getSiteCount()));
 		io.micrometer.core.instrument.Gauge.builder("platforms_total", platforms, g -> g.get(source))//
 			.description("Total number of platforms ")//
-			.tag("source", source).//
+			.tag("source_id", source).//
 			register(registry);
 
 		variables.put(source, Integer.parseInt(stats.getAttributeCount()));
 		io.micrometer.core.instrument.Gauge.builder("variables_total", variables, g -> g.get(source))//
 			.description("Total number of variables ")//
-			.tag("source", source).//
+			.tag("source_id", source).//
 			register(registry);
 
 		platforms.put(source, Integer.parseInt(stats.getSiteCount()));
 		io.micrometer.core.instrument.Gauge.builder("platforms_total", platforms, g -> g.get(source))//
 			.description("Total number of platforms ")//
-			.tag("source", source).//
+			.tag("source_id", source).//
 			register(registry);
 
 		coreMetadataCompleteness.put(source, 95.);
 		io.micrometer.core.instrument.Gauge.builder("core_metadata_completeness", coreMetadataCompleteness, g -> g.get(source))//
 			.description("Core metadata availability percentage")//
-			.tag("source", source).//
+			.tag("source_id", source).//
 			register(registry);
 
 		fullMetadataCompleteness.put(source, 70.);
 		io.micrometer.core.instrument.Gauge.builder("full_metadata_completeness", fullMetadataCompleteness, g -> g.get(source))//
 			.description("Full metadata availability percentage")//
-			.tag("source", source).//
+			.tag("source_id", source).//
 			register(registry);
 
 		// String content = "<tr><td colspan='15'><br/>"//

@@ -157,6 +157,13 @@ public class JSONObservation {
 	defaultPointMetadata.put("uom", uom);
     }
 
+    public String getUOM() {
+	if (defaultPointMetadata.has("uom")) {
+	    return defaultPointMetadata.getString("uom");
+	}
+	return null;
+    }
+
     public void setAggregationDuration(Duration duration) {
 	defaultPointMetadata.put("aggregationDuration", duration.toString());
     }
@@ -176,7 +183,7 @@ public class JSONObservation {
 	JSONObject time = new JSONObject();
 	time.put("instant", ISO8601DateTimeUtils.getISO8601DateTime(date));
 	JSONObject shape = new JSONObject();
-	shape.put("type","Point");
+	shape.put("type", "Point");
 	JSONArray coords = new JSONArray();
 	for (Double c : coordinates) {
 	    coords.put(c);
@@ -189,8 +196,8 @@ public class JSONObservation {
     }
 
     public String getGeometryName() {
-   	return "shape";
-       }
+	return "shape";
+    }
 
     // UTILS
     public JSONObject getJSONObject() {
@@ -202,6 +209,17 @@ public class JSONObservation {
 	parameter.put("name", name);
 	parameter.put("value", value);
 	parameters.put(parameter);
+
+    }
+
+    public void addInstrument(String instrument) {
+	if (!timeseries.has("procedure")) {
+	    JSONArray array = new JSONArray();
+	    timeseries.put("procedure", array);
+	}
+	JSONArray array = timeseries.getJSONArray("procedure");
+	array.put(instrument);
+	timeseries.put("procedure", array);
 
     }
 

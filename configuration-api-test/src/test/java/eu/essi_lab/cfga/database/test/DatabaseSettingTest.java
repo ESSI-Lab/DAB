@@ -159,7 +159,7 @@ public class DatabaseSettingTest {
 
 	Assert.assertTrue(databaseSetting.getDatabaseType().isEmpty());
 
-	Assert.assertNotNull(databaseSetting.asStorageUri());
+	Assert.assertNotNull(databaseSetting.asStorageInfo());
 
 	String configurationFolder = databaseSetting.getConfigurationFolder();
 	Assert.assertNull(configurationFolder);
@@ -176,7 +176,7 @@ public class DatabaseSettingTest {
 	String databasePassword = databaseSetting.getDatabasePassword();
 	Assert.assertNull(databasePassword);
 
-	StorageInfo storageUri = databaseSetting.asStorageUri();
+	StorageInfo storageUri = databaseSetting.asStorageInfo();
 
 	Assert.assertNull(storageUri.getIdentifier());
 
@@ -195,7 +195,7 @@ public class DatabaseSettingTest {
 	// asStorageUri test
 	//
 	{
-	    String databaseUri = databaseSetting.asStorageUri().getUri();
+	    String databaseUri = databaseSetting.asStorageInfo().getUri();
 
 	    if (databaseSetting.isVolatile()) {
 
@@ -206,7 +206,7 @@ public class DatabaseSettingTest {
 		Assert.assertEquals("uri", databaseUri);
 	    }
 
-	    String storageName = databaseSetting.asStorageUri().getName();
+	    String storageName = databaseSetting.asStorageInfo().getName();
 
 	    if (databaseSetting.isVolatile()) {
 
@@ -217,7 +217,7 @@ public class DatabaseSettingTest {
 		Assert.assertEquals("dataBaseName", storageName);
 	    }
 
-	    String configurationFolder = databaseSetting.asStorageUri().getIdentifier();
+	    String configurationFolder = databaseSetting.asStorageInfo().getIdentifier();
 
 	    if (databaseSetting.isVolatile()) {
 
@@ -228,7 +228,7 @@ public class DatabaseSettingTest {
 		Assert.assertEquals("folder", configurationFolder);
 	    }
 
-	    String databasePassword = databaseSetting.asStorageUri().getPassword();
+	    String databasePassword = databaseSetting.asStorageInfo().getPassword();
 
 	    if (databaseSetting.isVolatile()) {
 
@@ -239,7 +239,7 @@ public class DatabaseSettingTest {
 		Assert.assertEquals("password", databasePassword);
 	    }
 
-	    String user = databaseSetting.asStorageUri().getUser();
+	    String user = databaseSetting.asStorageInfo().getUser();
 
 	    if (databaseSetting.isVolatile()) {
 
@@ -250,7 +250,7 @@ public class DatabaseSettingTest {
 		Assert.assertEquals("user", user);
 	    }
 	    
-	    Optional<String> type = databaseSetting.asStorageUri().getType();
+	    Optional<String> type = databaseSetting.asStorageInfo().getType();
 
 	    if (databaseSetting.isVolatile()) {
 

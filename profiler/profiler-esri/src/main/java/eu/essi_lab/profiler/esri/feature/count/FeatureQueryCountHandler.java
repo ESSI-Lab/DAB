@@ -91,7 +91,7 @@ public class FeatureQueryCountHandler implements WebRequestHandler, WebRequestVa
     
 
     protected StorageInfo getStorageURI(DiscoveryMessage message) throws GSException {
-	StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 	if (storageUri != null) {
 
 	    message.setDataBaseURI(storageUri);

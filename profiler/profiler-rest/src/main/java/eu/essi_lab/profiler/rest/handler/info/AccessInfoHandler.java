@@ -229,7 +229,7 @@ public class AccessInfoHandler extends RestInfoHandler {
 	message.getResourceSelector().setSubset(ResourceSubset.EXTENDED);
 
 	message.setSources(ConfigurationWrapper.getHarvestedSources());
-	message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	
 
 	ResourcePropertyBond bond = BondFactory.createIsExecutableBond(true);

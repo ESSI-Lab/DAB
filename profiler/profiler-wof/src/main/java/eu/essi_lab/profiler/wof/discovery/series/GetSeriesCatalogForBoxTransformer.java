@@ -142,7 +142,7 @@ public class GetSeriesCatalogForBoxTransformer extends DiscoveryRequestTransform
 		String viewCreator = null;
 		Optional<String> viewId = webRequest.extractViewId();
 		if (viewId.isPresent()) {		    
-		    StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+		    StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 		    Optional<View> view = WebRequestTransformer.findView(storageUri , viewId.get());
 		    if (view.isPresent()) {
 			viewCreator = view.get().getCreator();			
@@ -154,6 +154,7 @@ public class GetSeriesCatalogForBoxTransformer extends DiscoveryRequestTransform
 		    break;
 		case 1:
 		    operands.add(keywords.get(0));
+		    break;
 		default:
 		    LogicalBond orBond = BondFactory.createOrBond(keywords.toArray(new Bond[] {}));
 		    operands.add(orBond);

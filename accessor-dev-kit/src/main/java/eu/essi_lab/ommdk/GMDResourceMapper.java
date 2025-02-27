@@ -28,6 +28,7 @@ import javax.xml.bind.JAXBException;
 import eu.essi_lab.iso.datamodel.classes.MDMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -52,9 +53,11 @@ public class GMDResourceMapper extends FileIdentifierMapper {
 	try {
 	    miMetadata = createMIMetatata(originalMD.getMetadata());
 	} catch (Exception e) {
+	    
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 
 	    String message = e.getMessage();
-	    if (message.contains("Expected elements are")) {
+	    if (message != null && message.contains("Expected elements are")) {
 
 		message = message.substring(0, message.indexOf("Expected elements are"));
 	    }

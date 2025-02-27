@@ -85,7 +85,7 @@ public class CountriesTableHandler implements WebRequestHandler, WebRequestValid
 	discoveryMessage.setPage(new Page(1, DEFAULT_PAGE_SIZE));
 	discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 	discoveryMessage.setDataBaseURI(uri);
 
 	String viewId = null;

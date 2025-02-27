@@ -240,7 +240,7 @@ public class HISCentralEmiliaDownloader extends WMLDataDownloader {
 
 				JSONObject propertiesObject = js.optJSONObject("vars");
 				if (propertiesObject != null) {
-				    JSONObject jsonValue = propertiesObject.getJSONObject(varCode);
+				    JSONObject jsonValue = propertiesObject.optJSONObject(varCode);
 				    if (jsonValue != null) {
 					value = jsonValue.optString("v");
 					break;

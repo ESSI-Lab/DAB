@@ -395,7 +395,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	message.getResourceSelector().setSubset(ResourceSubset.EXTENDED);
 	message.getResourceSelector().setIncludeOriginal(false);
 	message.setSources(ConfigurationWrapper.getHarvestedSources());
-	message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	// message.setSharedRepositoryInfo(ConfigurationWrapper.getSharedRepositoryInfo());
 	message.setDistinctValuesElement(MetadataElement.COUNTRY_ISO3);
 	WebRequestTransformer.setView(//

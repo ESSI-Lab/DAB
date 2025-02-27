@@ -23,8 +23,6 @@ public class HISCentralLombardiaClientExternalTestIT {
     @Test
     public void test() throws Exception {
 
-
-
 	HISCentralLombardiaClient.setGiProxyEndpoint(System.getProperty("giProxyEndpoint"));
 	URL endpoint = new URL(System.getProperty("HIS-CENTRAL-LOMBARDIA-ENDPOINT"));
 	String keystorePassword = System.getProperty("HIS-CENTRAL-LOMBARDIA-KEYSTORE-PASSWORD");

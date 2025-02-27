@@ -49,8 +49,6 @@ import eu.essi_lab.lib.utils.StreamUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
-import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
@@ -155,7 +153,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    if (message.getDistinctValuesElement().isPresent()) {
 
-		Query query = builQuery(message, false);
+		Query query = buildQuery(message, false);
 
 		List<Queryable> queryables = message.getResourceSelector().getIndexesQueryables();
 
@@ -344,7 +342,7 @@ public class OpenSearchFinder implements DatabaseFinder {
      * @return
      * @throws GSException
      */
-    private Query builQuery(DiscoveryMessage message, boolean count) throws GSException {
+    public Query buildQuery(DiscoveryMessage message, boolean count) throws GSException {
 
 	if (message.getUserBond().isPresent()) {
 
@@ -402,12 +400,9 @@ public class OpenSearchFinder implements DatabaseFinder {
 		    Optional.ofNullable(message.getWebRequest()));
 	}
 
-	Query query = builQuery(message, count);
+	Query query = buildQuery(message, count);
 
 	try {
-
-	    int start = message.getPage().getStart() - 1;
-	    int size = message.getPage().getSize();
 
 	    if (debugQueries) {
 
@@ -415,9 +410,19 @@ public class OpenSearchFinder implements DatabaseFinder {
 		GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", ConversionUtils.toJSONObject(query).toString(3));
 	    }
 
-	    SearchResponse<Object> response = count ? //
-		    wrapper.count(query, message) : //
-		    wrapper.search(DataFolderMapping.get().getIndex(), query, start, size);
+	    SearchResponse<Object> response = null;
+
+	    if (count) {
+
+		response = wrapper.count(query, message);
+
+	    } else {
+
+		int start = message.getPage().getStart() - 1;
+		int size = message.getPage().getSize();
+
+		response = wrapper.search(DataFolderMapping.get().getIndex(), query, start, size);
+	    }
 
 	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 

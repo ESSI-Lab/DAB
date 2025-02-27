@@ -141,7 +141,7 @@ public class AggregationIdentifiersTask extends AbstractCustomTask {
 	//
 	//
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
 	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 	DatabaseFinder dbFinder = DatabaseProviderFactory.getFinder(databaseURI);

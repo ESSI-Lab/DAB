@@ -240,7 +240,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	}
 
 	Optional<String> viewId = this.extractViewId();
-	viewId.ifPresent(id -> out.put(RuntimeInfoElement.WEB_REQUEST_VIEW_ID.getName(), Arrays.asList(id)));
+	viewId.ifPresent(id -> out.put(RuntimeInfoElement.VIEW_ID.getName(), Arrays.asList(id)));
 
 	String queryString = this.getQueryString();
 	if (StringUtils.isNotEmptyAndNotNull(queryString)) {

@@ -360,7 +360,6 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 
 	toDelete.add("WEB_REQUEST_TIME_STAMP_MILLIS");
 	toDelete.add("WEB_REQUEST_TIME_STAMP");
-	toDelete.add("WEB_REQUEST_VIEW_ID");
 
 	toDelete.add("RESULT_SET_TIME_STAMP_MILLIS");
 	toDelete.add("RESULT_SET_TIME_STAMP");

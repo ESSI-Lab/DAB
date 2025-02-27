@@ -78,7 +78,7 @@ public class WOFQueryUtils {
 	discoveryMessage.setPage(new Page(1, 1));
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	
 
 	SimpleValueBond bond1 = BondFactory.createSimpleValueBond(//

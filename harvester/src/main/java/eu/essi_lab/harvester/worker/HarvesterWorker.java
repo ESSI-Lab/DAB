@@ -231,7 +231,7 @@ public class HarvesterWorker extends SchedulerWorker<HarvestingSetting> {
 
 	Harvester harvester = new Harvester();
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
 	GSLoggerFactory.getLogger(this.getClass()).debug("Configured Database URI: {}", databaseURI.getUri());
 
@@ -252,11 +252,10 @@ public class HarvesterWorker extends SchedulerWorker<HarvestingSetting> {
 	// 1) IndentifierDecoratorComponent
 	//
 
-	Boolean preserveIds = harvConnSetting.preserveIdentifiers();
+
 
 	IdentifierDecorator identifierDecorator = new IdentifierDecorator(//
 		ConfigurationWrapper.getSourcePrioritySetting(), //
-		preserveIds, //
 		dataBaseReader);
 
 	harvester.getPlan().getComponents().add(new IdentifierDecoratorComponent(identifierDecorator));

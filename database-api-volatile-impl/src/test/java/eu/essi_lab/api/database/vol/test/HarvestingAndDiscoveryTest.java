@@ -72,7 +72,7 @@ public class HarvestingAndDiscoveryTest {
     protected String suiteIdentifier;
     protected Database provider;
 
-    private static final StorageInfo TEST_DB_URI = new DatabaseSetting(true).asStorageUri();
+    private static final StorageInfo TEST_DB_URI = new DatabaseSetting(true).asStorageInfo();
     static {
 	TEST_DB_URI.setIdentifier("SUITE_ID");
     }

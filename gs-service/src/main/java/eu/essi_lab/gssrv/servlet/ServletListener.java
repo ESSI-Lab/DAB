@@ -34,7 +34,7 @@ import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
-import eu.essi_lab.gssrv.starter.GIPStarter;
+import eu.essi_lab.gssrv.starter.DABStarter;
 import eu.essi_lab.lib.utils.Chronometer;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageInfo;
@@ -91,7 +91,7 @@ public class ServletListener implements ServletContextListener {
 	GSLoggerFactory.getLogger(ServletListener.class).info("Context destroyng STARTED");
 
 	try {
-	    StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 
 	    GSLoggerFactory.getLogger(getClass()).info("Releasing database resources");
 
@@ -119,8 +119,8 @@ public class ServletListener implements ServletContextListener {
 	GSLoggerFactory.getLogger(ServletListener.class).info("Context destroyng ENDED");
     }
 
-    private GIPStarter getStarter() {
+    private DABStarter getStarter() {
 
-	return new GIPStarter();
+	return new DABStarter();
     }
 }

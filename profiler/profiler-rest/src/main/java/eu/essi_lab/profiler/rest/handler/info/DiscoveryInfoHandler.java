@@ -105,7 +105,7 @@ public class DiscoveryInfoHandler extends RestInfoHandler {
 	discoveryMessage.setPage(new Page(1, 1));
 
 	discoveryMessage.setSources(ConfigurationWrapper.getAllSources());
-	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	
 
 	List<Queryable> queryables = Arrays.asList( //

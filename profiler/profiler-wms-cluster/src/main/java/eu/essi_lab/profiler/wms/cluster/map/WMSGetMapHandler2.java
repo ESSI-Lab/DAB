@@ -167,7 +167,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
     public static Color getRandomColorFromSourceId(String sourceId, boolean availability) {
 	if (availability) {
 	    Color cachedAvailability = availibilityCache.get(sourceId);
-	    if (cachedAvailability!=null ) {
+	    if (cachedAvailability != null) {
 		return cachedAvailability;
 	    }
 	    DownloadInformation goodInfo = AvailabilityMonitor.getInstance().getLastDownloadDate(sourceId);
@@ -278,7 +278,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	    String viewId = webRequest.extractViewId().get();
 
-	    Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
+	    Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 
 	    String version = checkParameter(map, Parameter.VERSION).isEmpty() ? "1.3.0" : checkParameter(map, Parameter.VERSION);
 	    String layers = checkParameter(map, Parameter.LAYERS);
@@ -316,7 +316,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    int stationDiameterInPixels = 8;
 		    int minimumClusterDiameterInPixels = 10;
 		    int fontSizeInPixels = 10;
-		    double maxDiameterRatio = 0.4; // pie diameter with respect to sub image
+		    double maxDiameterRatio = 0.6; // pie diameter with respect to sub image
 
 		    boolean eachPieinEachSubTile = false;
 
@@ -398,7 +398,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 			double tol = 0.0000000001;
 
-			StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+			StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 			DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 			WMSClusterRequest request = new WMSClusterRequest();
@@ -451,7 +451,9 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 				if (tmpBboxMaxY > 90) {
 				    tmpBboxMaxY = 90 - tol;
 				}
+				String name = "region." + i + "." + j;
 				SpatialExtent tmp = new SpatialExtent(tmpBboxMinY, tmpBboxMinX, tmpBboxMaxY, tmpBboxMaxX);
+				tmp.setName(name);
 				request.addExtent(tmp);
 				// System.out.println("Created request with bbox " + tmp);
 
@@ -509,8 +511,8 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 				TermFrequencyMap tfm = response.getMap().get();
 
-				int totalCount = response.getTotalCount().get();
-				int stationsCount = response.getStationsCount().get();
+//				int totalCount = response.getTotalCount().get();
+				int totalCount = response.getStationsCount().get();
 
 				List<TermFrequencyItem> items = tfm.getItems(TermFrequencyTarget.SOURCE);
 				List<SimpleEntry<String, Double>> percentages = new ArrayList<SimpleEntry<String, Double>>();
@@ -572,7 +574,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 				    centroidY = getYPixel(height, avgbboxMinY, maxy.doubleValue(), heightGeo);
 
 				}
-				String centerLabel = "" + stationsCount;
+				String centerLabel = "" + totalCount;
 				// Draw center label with white background
 				ig2.setFont(new Font("SansSerif", Font.BOLD, fontSizeInPixels));
 				FontMetrics metrics = ig2.getFontMetrics();
@@ -985,12 +987,12 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    isValidated.get()));
 	}
 
-	// if (andBond.getOperands().isEmpty()) {
-	// return null;
-	// }
-	// if (andBond.getOperands().size() == 1) {
-	// return andBond.getOperands().get(0);
-	// }
+	 if (andBond.getOperands().isEmpty()) {
+	 return null;
+	 }
+	 if (andBond.getOperands().size() == 1) {
+	 return andBond.getOperands().get(0);
+	 }
 	return andBond;
     }
 

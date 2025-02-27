@@ -1,294 +1,1380 @@
-//package eu.essi_lab.identifierdecorator;
-//
-//import java.util.Map;
-//import java.util.UUID;
-//
-//import org.junit.Assert;
-//import org.junit.Before;
-//import org.junit.Rule;
-//import org.junit.Test;
-//import org.junit.rules.ExpectedException;
-//import org.mockito.Mockito;
-//
-//import eu.essi_lab.api.database.DatabaseReader;
-//import eu.essi_lab.api.database.DatabaseWriter;
-//import eu.essi_lab.model.GSSource;
-//import eu.essi_lab.model.configuration.option.GSConfOption;
-//import eu.essi_lab.model.exceptions.GSException;
-//import eu.essi_lab.model.resource.Dataset;
-//import eu.essi_lab.model.resource.GSResource;
-//import eu.essi_lab.model.resource.OriginalMetadata;
-//
-///**
-// * Given an HarmonizedMetadata model IdentifierDecorator returns back a PublicId
-// * value. The assert 'exitsts in db' means there is an existing resource in the
-// * database who: existing_resource.publicId == resource.OID. The assert 'OID in
-// * database' means there is an existing resource in the database who:
-// * existing_resource.OID == resource.OID and existing_resource.source ==
-// * resource.source.
-// * 
-// * @author pezzati
-// */
-//public class IdentifierDecoratorTest {
-//
-//    @Rule
-//    public ExpectedException expectedException = ExpectedException.none();
-//    private IIdentifierDecorator identifierDecorator;
-//    private SourcePriorityDocument sourcePriorityDoc;
-//    private DatabaseReader dbReader;
-//    private DatabaseWriter dbWriter;
-//    private GSResource resource;
-//    private OriginalMetadata originalMetadata;
-//    private GSSource gSSource;
-//
-//    @Before
-//    public void init() {
-//	sourcePriorityDoc = Mockito.mock(SourcePriorityDocument.class);
-//	dbReader = Mockito.mock(DatabaseReader.class);
-//	dbWriter = Mockito.mock(DatabaseWriter.class);
-//	gSSource = Mockito.spy(new GSSource());
-//	originalMetadata = Mockito.spy(new OriginalMetadata());
-//	resource = Mockito.spy(new Dataset());
-//	Mockito.when(resource.getOriginalMetadata()).thenReturn(originalMetadata);
-//	Mockito.when(resource.getSource()).thenReturn(gSSource);
-//	identifierDecorator = Mockito.spy(new IdentifierDecorator(sourcePriorityDoc, dbReader, dbWriter));
-//    }
-//    
-//    @Test
-//    public void checkSSS(){
-//	
-//    }
-//
-//    @Test
-//    public void checkEmptyConstructorAndGetterAndSetters() {
-//	identifierDecorator = new IdentifierDecorator();
-//	identifierDecorator.setDbReader(null);
-//	identifierDecorator.setDbWriter(null);
-//	identifierDecorator.setSourcePriorityDocument(null);
-//	Assert.assertNull(identifierDecorator.getDbReader());
-//	Assert.assertNull(identifierDecorator.getDbWriter());
-//	Assert.assertNull(identifierDecorator.getSourcePriorityDocument());
-//    }
-//
-//    @Test
-//    public void getIdentifierAboutDistributedNullMetadata() throws GSException {
-//	expectedException.expect(NullPointerException.class);
-//	identifierDecorator.decorateDistributedIdentifier(null);
-//    }
-//
-//    @Test
-//    public void getIdentifierAboutHarvestedNullMetadata() throws GSException {
-//	expectedException.expect(NullPointerException.class);
-//	identifierDecorator.decorateHarvestedIdentifier(null);
-//    }
-//
-//    /**
-//     * Test checks that given distributed resource public identifier and private
-//     * identifier will be set with the same identifier. publicId = privateId =
-//     * UUID.
-//     * 
-//     * @throws GSException
-//     */
-//    @Test
-//    public void getIdentifierAboutDistributedValidMetadata() throws GSException {
-//	String expectedPrivateIdentifier = UUID.randomUUID().toString();
-//	String expectedPublicIdentifier = expectedPrivateIdentifier;
-//	Mockito.when(((IdentifierDecorator) identifierDecorator).generateUniqueIdentifier()).thenReturn(expectedPrivateIdentifier);
-//	identifierDecorator.decorateDistributedIdentifier(resource);
-//	String actualPrivateIdentifier = resource.getPrivateId();
-//	String actualPublicIdentifier = resource.getPublicId();
-//	Assert.assertEquals(expectedPrivateIdentifier, actualPrivateIdentifier);
-//	Assert.assertEquals(expectedPublicIdentifier, actualPublicIdentifier);
-//	Assert.assertEquals(actualPrivateIdentifier, actualPublicIdentifier);
-//    }
-//
-//    /**
-//     * Test checks that resource who does not exists in database and is not
-//     * present in the priority doc will have its private and public identifiers
-//     * set this way: publicId = privateId = UUID.
-//     * 
-//     * @throws GSException
-//     */
-//    @Test
-//    public void assignIdentifiersToResourceNotInPriorityQueueAndNotExistingsInDatabase() throws GSException {
-//	String uniqueId = UUID.randomUUID().toString();
-//	String expectedPrivateIdentifier = uniqueId;
-//	String expectedPublicIdentifier = expectedPrivateIdentifier;
-//	Mockito.when(resource.getOriginalId()).thenReturn("resourceOriginalId");
-//	Mockito.when(sourcePriorityDoc.isPrioritySource(resource.getSource())).thenReturn(false);
-//	Mockito.when(dbReader.resourceExists(resource.getOriginalId())).thenReturn(false);
-//	Mockito.when(((IdentifierDecorator) identifierDecorator).generateUniqueIdentifier()).thenReturn(uniqueId);
-//	identifierDecorator.decorateHarvestedIdentifier(resource);
-//	String actualPrivateIdentifier = resource.getPrivateId();
-//	String actualPublicIdentifier = resource.getPublicId();
-//	Mockito.verify(((IdentifierDecorator) identifierDecorator), Mockito.times(1)).generateUniqueIdentifier();
-//	Assert.assertEquals(expectedPrivateIdentifier, actualPrivateIdentifier);
-//	Assert.assertEquals(expectedPublicIdentifier, actualPublicIdentifier);
-//	Assert.assertEquals(actualPrivateIdentifier, actualPublicIdentifier);
-//    }
-//    
-//    /**
-//     * Test checks that resource who does not exists in database and is not
-//     * present in the priority doc will have its private and public identifiers
-//     * set this way: publicId = privateId = UUID.
-//     * 
-//     * @throws GSException
-//     */
-////    @Test
-////    public void assignIdentifiersToResourceNotInPriorityQueueAndNotExistingsInDatabaseNEW() throws GSException {
-////	String uniqueId = UUID.randomUUID().toString();
-////	String expectedPrivateIdentifier = uniqueId;
-////	String expectedPublicIdentifier = expectedPrivateIdentifier;
-////	Mockito.when(resource.getOriginalId()).thenReturn(uniqueId);
-////	Mockito.when(sourcePriorityDoc.isPrioritySource(resource.getSource())).thenReturn(false);
-////	Mockito.when(dbReader.resourceExists(resource.getOriginalId())).thenReturn(false);
-////	//Mockito.when(((IdentifierDecorator) identifierDecorator).generateUniqueIdentifier()).thenReturn(uniqueId);
-////	identifierDecorator.decorateHarvestedIdentifier(resource);
-////	String actualPrivateIdentifier = resource.getPrivateId();
-////	String actualPublicIdentifier = resource.getPublicId();
-////	Mockito.verify(((IdentifierDecorator) identifierDecorator), Mockito.times(0)).generateUniqueIdentifier();
-////	Assert.assertEquals(expectedPrivateIdentifier, actualPrivateIdentifier);
-////	Assert.assertEquals(expectedPublicIdentifier, actualPublicIdentifier);
-////	Assert.assertEquals(actualPrivateIdentifier, actualPublicIdentifier);
-////    }
-//
-//    /**
-//     * Test checks that resource who exists in database but is not in the
-//     * priority doc will have its private and public identifier set this way:
-//     * publicId = privateId = UUID.
-//     * 
-//     * @throws GSException
-//     */
-//    @Test
-//    public void assignIdentifiersToResourceNotInPriorityQueueAndExistingInDatabase() throws GSException {
-//	String resourceId = "existingResourcePublicId";
-//	String expectedPrivateIdentifier = "expectedGeneartedUniqueIdentifier";
-//	String expectedPublicIdentifier = expectedPrivateIdentifier;
-//	GSResource existingGSResource = Mockito.mock(GSResource.class);
-//	Mockito.when(existingGSResource.getPrivateId()).thenReturn("existingResourcePrivateId");
-//	Mockito.when(existingGSResource.getPublicId()).thenReturn(resourceId);
-//	Mockito.when(existingGSResource.getSource()).thenReturn(gSSource);
-//	Mockito.when(resource.getOriginalId()).thenReturn(resourceId);
-//	Mockito.when(resource.getOriginalMetadata()).thenReturn(originalMetadata);
-//	Mockito.when(resource.getSource()).thenReturn(gSSource);
-//	Mockito.when(sourcePriorityDoc.isPrioritySource(resource.getSource())).thenReturn(false);
-//	Mockito.when(dbReader.resourceExists(resource.getOriginalId(), resource.getSource())).thenReturn(true);
-//	Mockito.when(dbReader.getResource(resource.getOriginalId(), resource.getSource())).thenReturn(existingGSResource);
-//	Mockito.when(((IdentifierDecorator) identifierDecorator).generateUniqueIdentifier()).thenReturn(expectedPrivateIdentifier);
-//	identifierDecorator.decorateHarvestedIdentifier(resource);
-//	String actualPrivateIdentifier = resource.getPrivateId();
-//	String actualPublicIdentifier = resource.getPublicId();
-//	Mockito.verify(((IdentifierDecorator) identifierDecorator), Mockito.times(1)).generateUniqueIdentifier();
-//	Assert.assertEquals(expectedPrivateIdentifier, actualPrivateIdentifier);
-//	Assert.assertEquals(expectedPublicIdentifier, actualPublicIdentifier);
-//	Assert.assertEquals(actualPrivateIdentifier, actualPublicIdentifier);
-//    }
-//
-//    /**
-//     * Test checks that resource who doesn't exists in database but is in the
-//     * priority doc and it's OID is not in database will have its private and
-//     * public identifier set this way: publicId = OID, privateId = UUID.
-//     * 
-//     * @throws GSException
-//     */
-//    @Test
-//    public void assignIdentifiersToResourceInPriorityQueueNotExistingsInDatabaseAndOIDNotInDatabase() throws GSException {
-//	String resourceId = "existingResourcePublicId";
-//	String randomId = UUID.randomUUID().toString();
-//	String expectedPrivateIdentifier = randomId;
-//	String expectedPublicIdentifier = resourceId;
-//	Mockito.when(resource.getOriginalId()).thenReturn(resourceId);
-//	Mockito.when(sourcePriorityDoc.isPrioritySource(resource.getSource())).thenReturn(true);
-//	Mockito.when(dbReader.resourceExists(resource.getOriginalId(), resource.getSource())).thenReturn(false);
-//	Mockito.when(((IdentifierDecorator) identifierDecorator).generateUniqueIdentifier()).thenReturn(randomId);
-//	identifierDecorator.decorateHarvestedIdentifier(resource);
-//	String actualPrivateIdentifier = resource.getPrivateId();
-//	String actualPublicIdentifier = resource.getPublicId();
-//	Mockito.verify(((IdentifierDecorator) identifierDecorator), Mockito.times(1)).generateUniqueIdentifier();
-//	Assert.assertEquals(expectedPrivateIdentifier, actualPrivateIdentifier);
-//	Assert.assertEquals(expectedPublicIdentifier, actualPublicIdentifier);
-//    }
-//
-//    /**
-//     * Test checks that resource who doesn't exists in database but is in the
-//     * priority doc and it's OID is in database with LOW priority will have its
-//     * private and public identifier set this way: publicId = privateId = UUID.
-//     * 
-//     * @throws GSException
-//     */
-//    @Test
-//    public void assignIdentifiersToResourceInPriorityQueueNotExistingsInDatabaseAndOIDInDatabaseWithLowPriority() throws GSException {
-//	String resourceId = "existingResourcePublicId";
-//	String randomId = UUID.randomUUID().toString();
-//	String expectedPrivateIdentifier = randomId;
-//	String expectedPublicIdentifier = expectedPrivateIdentifier;
-//	Mockito.when(resource.getOriginalId()).thenReturn(resourceId);
-//	GSSource lowerPrioritySource = Mockito.mock(GSSource.class);
-//	Mockito.when(sourcePriorityDoc.isPrioritySource(resource.getSource())).thenReturn(true);
-//	Mockito.when(sourcePriorityDoc.hasGreaterPriorityThan(resource.getSource(), lowerPrioritySource)).thenReturn(false);
-//	GSResource lowerPriorityResource = Mockito.mock(GSResource.class);
-//	Mockito.when(lowerPriorityResource.getSource()).thenReturn(lowerPrioritySource);
-//	Mockito.when(dbReader.resourceExists(resource.getOriginalId(), resource.getSource())).thenReturn(false);
-//	Mockito.when(dbReader.resourceExists(resource.getOriginalId())).thenReturn(true);
-//	Mockito.when(dbReader.getResource(resource.getOriginalId())).thenReturn(lowerPriorityResource);
-//	Mockito.when(((IdentifierDecorator) identifierDecorator).generateUniqueIdentifier()).thenReturn(randomId);
-//	identifierDecorator.decorateHarvestedIdentifier(resource);
-//	String actualPrivateIdentifier = resource.getPrivateId();
-//	String actualPublicIdentifier = resource.getPublicId();
-//	Mockito.verify(((IdentifierDecorator) identifierDecorator), Mockito.times(1)).generateUniqueIdentifier();
-//    }
-//
-//    /**
-//     * test check that resource who doesn't exists in database but is in the
-//     * priority doc and it's OID is in database with HIGH priority will have its
-//     * private and public identifier set this way: publicId = OID, privateId =
-//     * UUID. Test also checks that existing resource will be saved with its
-//     * identifier set this way: existing.publicId = existing.privateId.
-//     * 
-//     * @throws GSException
-//     */
-//    @Test
-//    public void assignIdentifiersToResourceInPriorityQueueNotExistingsInDatabaseAndOIDInDatabaseWithHighPriority() throws GSException {
-//	String resourceId = "existingResourcePublicId";
-//	String randomId = UUID.randomUUID().toString();
-//	String expectedPrivateIdentifier = randomId;
-//	String expectedPublicIdentifier = resourceId;
-//	Mockito.when(resource.getOriginalId()).thenReturn(resourceId);
-//	GSSource lowerPrioritySource = Mockito.mock(GSSource.class);
-//	Mockito.when(sourcePriorityDoc.isPrioritySource(resource.getSource())).thenReturn(true);
-//	Mockito.when(sourcePriorityDoc.hasGreaterPriorityThan(resource.getSource(), lowerPrioritySource)).thenReturn(true);
-//	GSResource lowerPriorityResource = Mockito.mock(GSResource.class);
-//	Mockito.when(lowerPriorityResource.getSource()).thenReturn(lowerPrioritySource);
-//	Mockito.when(dbReader.resourceExists(resource.getOriginalId(), resource.getSource())).thenReturn(false);
-//	Mockito.when(dbReader.resourceExists(resource.getOriginalId())).thenReturn(true);
-//	Mockito.when(dbReader.getResource(resource.getOriginalId())).thenReturn(lowerPriorityResource);
-//	Mockito.when(((IdentifierDecorator) identifierDecorator).generateUniqueIdentifier()).thenReturn(randomId);
-//	identifierDecorator.decorateHarvestedIdentifier(resource);
-//	String actualPrivateIdentifier = resource.getPrivateId();
-//	String actualPublicIdentifier = resource.getPublicId();
-//	Mockito.verify(((IdentifierDecorator) identifierDecorator), Mockito.times(1)).generateUniqueIdentifier();
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    @Test
-//    public void identifierDecoratorDoesNotSupportOptions() {
-//	GSConfOption<String> option1 = Mockito.mock(GSConfOption.class);
-//	GSConfOption<String> option2 = Mockito.mock(GSConfOption.class);
-//	((IdentifierDecorator) identifierDecorator).getSupportedOptions().put("Option1", option1);
-//	((IdentifierDecorator) identifierDecorator).getSupportedOptions().put("Option2", option2);
-//	Map<String, GSConfOption<?>> supportedOptions = ((IdentifierDecorator) identifierDecorator).getSupportedOptions();
-//	Assert.assertTrue(supportedOptions.isEmpty());
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    @Test
-//    public void identifierDecoratorDoesNotSetOptions() throws GSException {
-//	GSConfOption<String> option1 = Mockito.mock(GSConfOption.class);
-//	((IdentifierDecorator) identifierDecorator).onOptionSet(option1);
-//    }
-//
-//    @Test
-//    public void identifierDecoratorDoesNotFlushAnything() throws GSException {
-//	((IdentifierDecorator) identifierDecorator).onFlush();
-//    }
-//}
+package eu.essi_lab.identifierdecorator;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import eu.essi_lab.api.database.Database.IdentifierType;
+import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
+import eu.essi_lab.messages.HarvestingProperties;
+import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.ResultsPriority;
+import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.Dataset;
+import eu.essi_lab.model.resource.DatasetCollection;
+import eu.essi_lab.model.resource.GSResource;
+import java.util.Arrays;
+import java.util.UUID;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+public class IdentifierDecoratorTest {
+
+	private DatabaseReader dbReader;
+	private SourcePrioritySetting sourcePrioritySetting;
+
+	@Before
+	public void init() {
+
+		dbReader = Mockito.mock(DatabaseReader.class);
+
+		sourcePrioritySetting = Mockito.mock(SourcePrioritySetting.class);
+
+	}
+
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
+
+	@Test
+	public void test0() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		expectedException.expect(GSException.class);
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+	}
+
+	@Test
+	public void test0_1() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).allowNullOriginalId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		Assert.assertNull(resource.getPublicId());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertNotNull(resource.getPublicId());
+	}
+
+	@Test
+	public void test1() {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		decorator.decorateDistributedIdentifier(resource);
+
+		Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
+	}
+
+	@Test
+	public void test2() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
+	}
+
+	@Test
+	public void test3() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
+	}
+
+	@Test
+	public void test4() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		expectedException.expect(DuplicatedResourceException.class);
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+
+		GSResource existing = new Dataset();
+		existing.setOriginalId(originalId);
+		existing.setSource(source);
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource, existing);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+	}
+
+	@Test
+	public void test5() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		expectedException.expect(DuplicatedResourceException.class);
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+
+		GSResource existing = new Dataset();
+		existing.setOriginalId(originalId);
+		existing.setSource(source);
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource, existing);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, true, false);
+
+	}
+
+	@Test
+	public void test6() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		expectedException.expect(DuplicatedResourceException.class);
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+
+		GSResource existing = new Dataset();
+		existing.setOriginalId(originalId);
+		existing.setSource(source);
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource, existing);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, true);
+
+	}
+
+	@Test
+	public void test7() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		expectedException.expect(DuplicatedResourceException.class);
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+
+		GSResource existing = new Dataset();
+		existing.setOriginalId(originalId);
+		existing.setSource(source);
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource, existing);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, true, true);
+
+	}
+
+	@Test
+	public void test8() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource incomingResource = new Dataset();
+		incomingResource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		incomingResource.setOriginalId(originalId);
+
+		GSResource storedResource = new Dataset();
+		storedResource.setOriginalId(originalId);
+		storedResource.setSource(source);
+		// time stamp is before the end harvesting timestamp, consolidated resource
+		storedResource.getPropertyHandler().setResourceTimeStamp();
+		HarvestingProperties harvestingProperties = new HarvestingProperties();
+		harvestingProperties.setEndHarvestingTimestamp();
+
+		// time stamp is after the end harvesting timestamp, is an incoming resource
+		incomingResource.getPropertyHandler().setResourceTimeStamp();
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(storedResource);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(incomingResource, harvestingProperties, null, false, false, false);
+
+		Assert.assertEquals(originalId + "@identifier", incomingResource.getPublicId());
+
+	}
+
+	@Test
+	public void test9() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		expectedException.expect(DuplicatedResourceException.class);
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource incomingResource = new Dataset();
+		incomingResource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		incomingResource.setOriginalId(originalId);
+
+		GSResource storedResource = new Dataset();
+		storedResource.setOriginalId(originalId);
+		storedResource.setSource(source);
+		// time stamp is before the end harvesting timestamp, consolidated resource
+		storedResource.getPropertyHandler().setResourceTimeStamp();
+		HarvestingProperties harvestingProperties = new HarvestingProperties();
+		harvestingProperties.setEndHarvestingTimestamp();
+
+		// it means this is a re-harvesting
+		harvestingProperties.setHarvestingCount(1);
+
+		GSResource re_storedResource = new Dataset();
+		re_storedResource.setOriginalId(originalId);
+		re_storedResource.setSource(source);
+
+		// time stamp is after the end harvesting timestamp, is a re-stored resource
+		re_storedResource.getPropertyHandler().setResourceTimeStamp();
+
+		// time stamp is after the end harvesting timestamp, is an incoming resource
+		incomingResource.getPropertyHandler().setResourceTimeStamp();
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(storedResource, re_storedResource);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(incomingResource, harvestingProperties, null, false, false, false);
+
+	}
+
+	@Test
+	public void test10() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		expectedException.expect(DuplicatedResourceException.class);
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource incomingResource = new Dataset();
+		incomingResource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		incomingResource.setOriginalId(originalId);
+
+		GSResource storedResource = new Dataset();
+		storedResource.setOriginalId(originalId);
+		storedResource.setSource(source);
+		// time stamp is before the end harvesting timestamp, consolidated resource
+		storedResource.getPropertyHandler().setResourceTimeStamp();
+		HarvestingProperties harvestingProperties = new HarvestingProperties();
+		harvestingProperties.setEndHarvestingTimestamp();
+
+		// it means this is a re-harvesting
+		harvestingProperties.setHarvestingCount(1);
+
+		GSResource re_storedResource = new Dataset();
+		re_storedResource.setOriginalId(originalId);
+		re_storedResource.setSource(source);
+
+		// time stamp is after the end harvesting timestamp, is a re-stored resource
+		re_storedResource.getPropertyHandler().setResourceTimeStamp();
+
+		// time stamp is after the end harvesting timestamp, is an incoming resource
+		incomingResource.getPropertyHandler().setResourceTimeStamp();
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(storedResource, re_storedResource);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(incomingResource, harvestingProperties, null, false, true, false);
+
+		Assert.assertEquals(originalId + "@identifier", incomingResource.getPublicId());
+
+	}
+
+	@Test
+	public void test11() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+
+		GSResource existing = new Dataset();
+		existing.setSource(source);
+		existing.setOriginalId(originalId);
+		String existingDABId = "existingDABId";
+		existing.setPublicId(existingDABId);
+		existing.setPrivateId(existingDABId);
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource, existing);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				String oid = invocationOnMock.getArgument(0);
+
+				if (!oid.equalsIgnoreCase(originalId))
+					throw new Exception("Expected " + originalId);
+
+				GSSource gsSource = invocationOnMock.getArgument(1);
+				if (!gsSource.getUniqueIdentifier().equalsIgnoreCase(source.getUniqueIdentifier()))
+					throw new Exception("Expected " + source.getUniqueIdentifier());
+
+				return existing;
+			}
+		}).when(dbReader).getResource(Mockito.any(), Mockito.any());
+
+		Assert.assertNotEquals(existingDABId, resource.getPublicId());
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, false, false, false);
+
+		Assert.assertEquals(existingDABId, resource.getPublicId());
+	}
+
+	@Test
+	public void test12() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+
+		GSResource existing = new Dataset();
+		existing.setSource(source);
+		existing.setOriginalId(originalId);
+		String existingDABId = "existingDABId";
+		existing.setPublicId(existingDABId);
+		existing.setPrivateId(existingDABId);
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource, existing);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				String oid = invocationOnMock.getArgument(0);
+
+				if (!oid.equalsIgnoreCase(originalId))
+					throw new Exception("Expected " + originalId);
+
+				GSSource gsSource = invocationOnMock.getArgument(1);
+				if (!gsSource.getUniqueIdentifier().equalsIgnoreCase(source.getUniqueIdentifier()))
+					throw new Exception("Expected " + source.getUniqueIdentifier());
+
+				return existing;
+			}
+		}).when(dbReader).getResource(Mockito.any(), Mockito.any());
+
+		Assert.assertNotEquals(existingDABId, resource.getPublicId());
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, false, true, false);
+
+		Assert.assertEquals(existingDABId, resource.getPublicId());
+	}
+
+	@Test
+	public void test13() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		expectedException.expect(DuplicatedResourceException.class);
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+
+		GSResource existing = new Dataset();
+		existing.setSource(source);
+		existing.setOriginalId(originalId);
+		String existingDABId = "existingDABId";
+		existing.setPublicId(existingDABId);
+		existing.setPrivateId(existingDABId);
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource, existing);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				String oid = invocationOnMock.getArgument(0);
+
+				if (!oid.equalsIgnoreCase(originalId))
+					throw new Exception("Expected " + originalId);
+
+				GSSource gsSource = invocationOnMock.getArgument(1);
+				if (!gsSource.getUniqueIdentifier().equalsIgnoreCase(source.getUniqueIdentifier()))
+					throw new Exception("Expected " + source.getUniqueIdentifier());
+
+				return existing;
+			}
+		}).when(dbReader).getResource(Mockito.any(), Mockito.any());
+
+		Assert.assertNotEquals(existingDABId, resource.getPublicId());
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, false, false, true);
+
+	}
+
+	@Test
+	public void test14() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		expectedException.expect(DuplicatedResourceException.class);
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+
+		GSResource existing = new Dataset();
+		existing.setSource(source);
+		existing.setOriginalId(originalId);
+		String existingDABId = "existingDABId";
+		existing.setPublicId(existingDABId);
+		existing.setPrivateId(existingDABId);
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource, existing);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				String oid = invocationOnMock.getArgument(0);
+
+				if (!oid.equalsIgnoreCase(originalId))
+					throw new Exception("Expected " + originalId);
+
+				GSSource gsSource = invocationOnMock.getArgument(1);
+				if (!gsSource.getUniqueIdentifier().equalsIgnoreCase(source.getUniqueIdentifier()))
+					throw new Exception("Expected " + source.getUniqueIdentifier());
+
+				return existing;
+			}
+		}).when(dbReader).getResource(Mockito.any(), Mockito.any());
+
+		Assert.assertNotEquals(existingDABId, resource.getPublicId());
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, false, true, true);
+
+	}
+
+	@Test
+	public void test15() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+
+				GSSource gsSource = invocationOnMock.getArgument(0);
+				if (!source.getUniqueIdentifier().equalsIgnoreCase(gsSource.getUniqueIdentifier()))
+					throw new Exception("Expected " + source.getUniqueIdentifier());
+
+				return true;
+			}
+		}).when(sourcePrioritySetting).isPrioritySource(Mockito.any());
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+		sameOrigiIdDifferentSource.setPublicId(UUID.randomUUID().toString());
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId, resource.getPublicId());
+
+	}
+
+	@Test
+	public void test16() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		expectedException.expect(ConflictingResourceException.class);
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+
+				GSSource gsSource = invocationOnMock.getArgument(0);
+				if (!source.getUniqueIdentifier().equalsIgnoreCase(gsSource.getUniqueIdentifier()))
+					throw new Exception("Expected " + source.getUniqueIdentifier());
+
+				return true;
+			}
+		}).when(sourcePrioritySetting).isPrioritySource(Mockito.any());
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+		sameOrigiIdDifferentSource.setPublicId(originalId);
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+	}
+
+	@Test
+	public void test17() {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainUUID();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		Assert.assertTrue(decorator.useOriginalId(resource, originalId));
+	}
+
+	@Test
+	public void test18() {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
+	}
+
+	@Test
+	public void test19() {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.COLLECTION);
+
+		GSResource resource = new DatasetCollection();
+		resource.setSource(source);
+		String originalId = "collectionid";
+		resource.setOriginalId(originalId);
+
+		Assert.assertTrue(decorator.useOriginalId(resource, originalId));
+	}
+
+	@Test
+	public void test20() {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.DATASET);
+
+		GSResource resource = new DatasetCollection();
+		resource.setSource(source);
+		String originalId = "collectionid";
+		resource.setOriginalId(originalId);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
+	}
+
+	@Test
+	public void test21() {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.COLLECTION);
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = "datasetid";
+		resource.setOriginalId(originalId);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
+	}
+
+	@Test
+	public void test22() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+		String parentid = "parentid";
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentid);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+		sameOrigiIdDifferentSource.setPublicId(UUID.randomUUID().toString());
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
+		Assert.assertEquals(parentid + "@identifier",
+				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
+
+	}
+
+	@Test
+	public void test23() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+
+				GSSource gsSource = invocationOnMock.getArgument(0);
+				if (!source.getUniqueIdentifier().equalsIgnoreCase(gsSource.getUniqueIdentifier()))
+					throw new Exception("Expected " + source.getUniqueIdentifier());
+
+				return true;
+			}
+		}).when(sourcePrioritySetting).isPrioritySource(Mockito.any());
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+		String parentid = "parentid";
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentid);
+
+		GSSource source2 = new GSSource();
+		source2.setLabel("Source2");
+		source2.setUniqueIdentifier("identifier2");
+
+		GSResource sameOrigiIdDifferentSource = new Dataset();
+		sameOrigiIdDifferentSource.setOriginalId(originalId);
+		sameOrigiIdDifferentSource.setSource(source2);
+		sameOrigiIdDifferentSource.setPublicId(UUID.randomUUID().toString());
+
+		Mockito.doAnswer(new Answer() {
+			@Override
+			public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+				IdentifierType identifierType = invocationOnMock.getArgument(0);
+
+				if (IdentifierType.ORIGINAL.compareTo(identifierType) != 0)
+					throw new Exception("Expected " + IdentifierType.ORIGINAL);
+
+				String identifier = invocationOnMock.getArgument(1);
+				if (!originalId.equalsIgnoreCase(identifier))
+					throw new Exception("Expected " + originalId);
+
+				return Arrays.asList(sameOrigiIdDifferentSource);
+			}
+		}).when(dbReader).getResources(Mockito.any(), Mockito.any());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId, resource.getPublicId());
+		Assert.assertEquals(parentid, resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
+
+	}
+
+	@Test
+	public void test24() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.COLLECTION);
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+		String parentid = "parentid";
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentid);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
+		Assert.assertEquals(parentid,
+				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
+
+	}
+
+	@Test
+	public void test25() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.COLLECTION);
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+		String parentid = "parentid";
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentid);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
+		Assert.assertEquals(parentid + "@identifier",
+				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
+
+	}
+
+	@Test
+	public void test26() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.COLLECTION);
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = "originalId";
+		resource.setOriginalId(originalId);
+		String parentid = UUID.randomUUID().toString();
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentid);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
+		Assert.assertEquals(parentid,
+				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
+
+	}
+
+	@Test
+	public void test27() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.COLLECTION);
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+		String parentid = source.getUniqueIdentifier();
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentid);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
+		Assert.assertEquals(parentid,
+				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
+
+	}
+
+	@Test
+	public void test28() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.COLLECTION);
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+		String parentid = originalId;
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentid);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
+		Assert.assertEquals(parentid + "@identifier",
+				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
+
+	}
+
+	@Test
+	public void test29() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.COLLECTION);
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+		String parentid = originalId;
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentid);
+
+		Assert.assertTrue(decorator.useOriginalId(resource, originalId));
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertEquals(originalId, resource.getPublicId());
+		Assert.assertEquals(parentid,
+				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
+
+	}
+}

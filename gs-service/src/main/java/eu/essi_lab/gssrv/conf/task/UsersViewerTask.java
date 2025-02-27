@@ -51,7 +51,7 @@ public class UsersViewerTask extends AbstractCustomTask {
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
 	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 

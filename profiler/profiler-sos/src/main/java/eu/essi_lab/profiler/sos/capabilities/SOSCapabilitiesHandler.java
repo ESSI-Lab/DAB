@@ -153,7 +153,7 @@ public class SOSCapabilitiesHandler extends DefaultRequestHandler {
 
 	    // set the required properties
 	    statisticsMessage.setSources(allSources);
-	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	    statisticsMessage.setWebRequest(webRequest);
 
 	    // set the view
@@ -285,7 +285,7 @@ public class SOSCapabilitiesHandler extends DefaultRequestHandler {
 	    message.setPage(new Page(1, 1));
 
 	    message.setSources(ConfigurationWrapper.getHarvestedSources());
-	    message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	    // set the view
 	    if (viewId.isPresent()) {

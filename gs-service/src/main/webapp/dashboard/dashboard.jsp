@@ -45,11 +45,11 @@
 	<%
 	AvailabilityMonitor.getInstance().getS3TransferManager();
 
-	String viewId = request.getParameter("view");
+		String viewId = request.getParameter("view");
 
-	if (viewId != null && !viewId.trim().isEmpty()) {
+		if (viewId != null && !viewId.trim().isEmpty()) {
 
-	    View view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId).get();
+	    View view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId).get();
 
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    message.setOutputSources(true);
@@ -77,9 +77,9 @@
 	    "<table><tr><th>Source</th><th>Status</th><th>Detailed info</th><th>Last success download date</th><th>Last failed download date</th></tr>");
 
 	    sources.sort(new Comparator<GSSource>() {
-		public int compare(GSSource o1, GSSource o2) {
+			public int compare(GSSource o1, GSSource o2) {
 	    return o1.getLabel().compareTo(o2.getLabel());
-		}
+			}
 	    });
 
 	    ExecutorService executor = Executors.newFixedThreadPool(5);
@@ -89,26 +89,26 @@
 
 	    for (GSSource source : sources) {
 
-		final GSSource fSource = source;
-		Callable<DownloadReport> task = new Callable<DownloadReport>() {
+			final GSSource fSource = source;
+			Callable<DownloadReport> task = new Callable<DownloadReport>() {
 	    public DownloadReport call() throws Exception {
-			AvailabilityMonitor monitor = AvailabilityMonitor.getInstance();
+				AvailabilityMonitor monitor = AvailabilityMonitor.getInstance();
 
-			DownloadInformation goodInfo = monitor.getLastDownloadDate(fSource.getUniqueIdentifier());
-			DownloadInformation badInfo = monitor.getLastFailedDownloadDate(fSource.getUniqueIdentifier());
-			DownloadReport report = new DownloadReport(fSource, goodInfo, badInfo);
-			return report;
+				DownloadInformation goodInfo = monitor.getLastDownloadDate(fSource.getUniqueIdentifier());
+				DownloadInformation badInfo = monitor.getLastFailedDownloadDate(fSource.getUniqueIdentifier());
+				DownloadReport report = new DownloadReport(fSource, goodInfo, badInfo);
+				return report;
 	    }
-		};
-		tasks.add(task);
+			};
+			tasks.add(task);
 	    }
 
 	    try {
-		// Invoke all tasks and wait for completion
-		List<Future<DownloadReport>> results = executor.invokeAll(tasks);
+			// Invoke all tasks and wait for completion
+			List<Future<DownloadReport>> results = executor.invokeAll(tasks);
 
-		// Retrieve results
-		for (Future<DownloadReport> result : results) {
+			// Retrieve results
+			for (Future<DownloadReport> result : results) {
 	    DownloadReport report = result.get();
 	    GSSource source = report.getSource();
 	    String sourceId = source.getUniqueIdentifier();
@@ -122,25 +122,25 @@
 	    String sourceString = sourceLabel;
 	    String status = "<td bgcolor='blue'><b>Only metadata available</b></td>";
 	    if (lastBad != null) {
-			status = "<td bgcolor='red'><b>Download issues</b></td>";
+				status = "<td bgcolor='red'><b>Download issues</b></td>";
 	    }
 	    if (lastGood != null && (lastBad == null || lastGood.after(lastBad))) {
-			status = "<td bgcolor='green'><b>Download available</b></td>";
+				status = "<td bgcolor='green'><b>Download available</b></td>";
 	    }
 	    out.println("<tr><td>" + sourceString + "</td>" + status + "<td><button onclick=\"loadIframe('" + sourceId + "')\">Details</button></td><td>" + lastGood + "</td><td>" + lastBad
-			    + "</td></tr>");
-		}
+				    + "</td></tr>");
+			}
 	    } catch (Exception e) {
-		e.printStackTrace();
+			e.printStackTrace();
 	    } finally {
-		executor.shutdown();
+			executor.shutdown();
 	    }
 
 	    out.println("</table><p>Details:</p><div id=\"details\">Click the info buttons to load the details.</div></body></html>");
 
-	} else {
+		} else {
 	    out.println("A view parameter is needed here");
-	}
+		}
 	%>
 </body>
 </html>

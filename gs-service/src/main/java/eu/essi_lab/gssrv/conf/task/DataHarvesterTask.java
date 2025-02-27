@@ -95,7 +95,7 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	    }
 
 	    // INIT CACHE CONNECTOR
-	    StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
 	    DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
 

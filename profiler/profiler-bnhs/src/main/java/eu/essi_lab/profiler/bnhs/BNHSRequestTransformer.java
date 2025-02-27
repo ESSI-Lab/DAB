@@ -75,7 +75,7 @@ public class BNHSRequestTransformer extends DiscoveryRequestTransformer {
 
 	DiscoveryMessage message = super.transform(request);
 
-	setView(viewId, ConfigurationWrapper.getDatabaseURI(), message);
+	setView(viewId, ConfigurationWrapper.getStorageInfo(), message);
 
 	message.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 

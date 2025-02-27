@@ -59,7 +59,7 @@ public class DatabaseCacheStatusTask extends AbstractCustomTask {
 
 	    log(status, "\nProvided hosts: " + Arrays.asList(hosts));
 
-	    StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
 	    DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 	    MarkLogicWrapper wrapper = ((MarkLogicDatabase) dbReader.getDatabase()).getWrapper();

@@ -88,7 +88,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 	DownloadSetting downloadSetting = ConfigurationWrapper.getDownloadSetting();
 	message.setUserJobStorageURI(downloadSetting.getStorageUri());
 
-	StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 
 	message.setDataBaseURI(storageUri);
 

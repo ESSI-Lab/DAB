@@ -232,8 +232,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifie
 	    String marsRequestClass = marsRequest.optString("class");
 	    String platformName = datasetInfo.optString("platform");
 
-	    String queryPath = "?class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream="
-		    + marsRequestStream + "&aggregation_type=by_time&platform=" + platformName + "&station_id=" + internalId;
+
 
 	    String variableLabel = null;
 	    String variableKey = null;
@@ -360,7 +359,9 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifie
 	    // 44.3910255, 8.6391694 44.386031))",
 
 	    List<JSONObject> jsonResponse = new ArrayList<JSONObject>();
-
+	    String queryPath = "?class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream="
+		    + marsRequestStream + "&aggregation_type=by_time&platform=" + platformName + "&station_id=" + internalId;
+	    
 	    String linkage = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + queryPath;
 	    jsonResponse = getSessionData(queryPath);
 	    // startDate = startDate.replace("Z", "+00:00");

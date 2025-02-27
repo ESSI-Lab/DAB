@@ -61,7 +61,7 @@ public class HarvesterWorkerExternalTestIT {
 	ConfigurationWrapper.setConfiguration(configuration);
 
 	// clears the volatile db
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 	Database provider = DatabaseFactory.get(databaseURI);
 	VolatileDatabase database = (VolatileDatabase) provider;
 	database.clear();
@@ -114,8 +114,8 @@ public class HarvesterWorkerExternalTestIT {
 	// Makes some test on the empty DB
 	//
 
-	DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getDatabaseURI());
-	DatabaseFinder finder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getDatabaseURI());
+	DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
 
 	DiscoveryCountResponse count = finder.count(new DiscoveryMessage());
 
@@ -137,7 +137,7 @@ public class HarvesterWorkerExternalTestIT {
 
 	Assert.assertEquals(0, resultsList.size());
 
-	SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getDatabaseURI());
+	SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
 
 	HarvestingProperties harvestingProperties = sourceStorage
 		.retrieveHarvestingProperties(workerSetting.getSelectedAccessorSetting().getSource());

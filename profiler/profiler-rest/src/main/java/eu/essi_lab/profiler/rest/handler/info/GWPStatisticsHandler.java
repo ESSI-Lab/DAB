@@ -244,7 +244,7 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
 	} else {
 	    // marklogic implementation
 
-	    StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 	    GSLoggerFactory.getLogger(FullStatisticsHandler.class).debug("Storage uri: {}", uri);
 
 	    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);

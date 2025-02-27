@@ -240,6 +240,11 @@ public interface DatabaseExecutor extends DatabaseProvider {
 
 	    this.bbox = new SpatialExtent(south, west, north, east);
 	}
+	
+	public void setBbox(SpatialExtent bbox) {
+
+	    this.bbox = bbox;
+	}
 
 	/**
 	 * @return

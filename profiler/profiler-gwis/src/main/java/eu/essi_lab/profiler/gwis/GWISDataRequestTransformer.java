@@ -133,7 +133,7 @@ public class GWISDataRequestTransformer extends AccessRequestTransformer {
 	discoveryMessage.setPage(new Page(1, 1));
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	discoveryMessage.setResultsPriority(ResultsPriority.ALL);
 
@@ -212,7 +212,7 @@ public class GWISDataRequestTransformer extends AccessRequestTransformer {
 	discoveryMessage.setPage(new Page(1, 1));
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //

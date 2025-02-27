@@ -119,7 +119,7 @@ public class FeatureQueryHandler implements WebRequestHandler, WebRequestValidat
 	    }
 
 	    discoveryMessage.setSources(ConfigurationWrapper.getAllSources());
-	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	    tmpResultSet = executor.retrieveNodes(discoveryMessage);
 
@@ -140,7 +140,7 @@ public class FeatureQueryHandler implements WebRequestHandler, WebRequestValidat
     }
 
     protected static StorageInfo getStorageURI(DiscoveryMessage message) throws GSException {
-	StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 	if (storageUri != null) {
 
 	    message.setDataBaseURI(storageUri);
