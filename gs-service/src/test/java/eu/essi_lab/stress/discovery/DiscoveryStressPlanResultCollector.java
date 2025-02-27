@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Mattia Santoro
@@ -29,6 +32,57 @@ public class DiscoveryStressPlanResultCollector {
 
     public Integer totalOkTests() {
 	return Math.toIntExact(getResults().stream().filter(r -> r.getCode() == 200).count());
+    }
+
+    public void saveReportToCSV(OutputStream out) throws IOException {
+	List<String> columns = new ArrayList<>();
+
+	columns.addAll(Arrays.asList("host", "total_req", "total_succ", "total_fail", "total_mean_exec_time",
+		"max_parallel"));
+
+	Map<String, Integer> totalByType = totalByType();
+	Map<String, Integer> successByType = successByType();
+	Map<String, Long> meanExecByType = meanExecByType();
+
+	totalByType.keySet().stream().forEach(c -> {
+	    columns.add("total_" + c);
+	    columns.add("success_" + c);
+	    columns.add("fail_" + c);
+	    columns.add("mean_exec_" + c);
+	});
+
+	OutputStreamWriter writer = new OutputStreamWriter(out);
+	columns.stream().forEach(c -> {
+	    try {
+		writer.write(c);
+		writer.write(",");
+	    } catch (IOException e) {
+		throw new RuntimeException(e);
+	    }
+	});
+
+	writer.write("\n");
+	writer.write(host + ",");
+	writer.write(getResults().size() + ",");
+	writer.write(totalOkTests() + ",");
+	writer.write(getResults().size() - totalOkTests() + ",");
+	writer.write(meanExecutionTime() + ",");
+	writer.write(getPlan().getParallelRequests() + ",");
+
+	totalByType.keySet().stream().forEach(c -> {
+	    try {
+		writer.write(totalByType.get(c) + ",");
+
+		writer.write(successByType.get(c) + ",");
+
+		writer.write(totalByType.get(c) - successByType.get(c) + ",");
+		writer.write(meanExecByType.get(c) + ",");
+	    } catch (IOException e) {
+		throw new RuntimeException(e);
+	    }
+	});
+
+	writer.flush();
     }
 
     public void printReport(OutputStream out) {
@@ -64,28 +118,31 @@ public class DiscoveryStressPlanResultCollector {
 	}
     }
 
-    private String createPlanSummary() {
+    private String createContraint(DiscoveryStressTest test) {
+	StringBuilder contraintsBuilder = new StringBuilder();
 
-	String planSummary = String.format("Total Number of Requests: %d\nParallel Requests: %d",
-		getPlan().getStressTests().size() * getPlan().getMultiplicationFactor(), getPlan().getParallelRequests());
+	if (test.getSearchText() != null)
+	    contraintsBuilder.append("searchtext").append("__");
 
+	if (test.getBbox() != null)
+	    contraintsBuilder.append("bbox__").append(test.getBboxrel()).append("__");
+
+	contraintsBuilder.append("n_sources=").append(test.getSources().size());
+
+	String testcontraints = contraintsBuilder.toString();
+
+	return testcontraints;
+    }
+
+    private Map<String, Integer> totalByType() {
 	Map<String, Integer> map = new HashMap<>();
 
-	getPlan().getStressTests().stream().forEach(test -> {
-
-	    StringBuilder contraintsBuilder = new StringBuilder();
-
-	    if (test.getSearchText() != null)
-		contraintsBuilder.append("searchtext").append(",");
-
-	    if (test.getBbox() != null)
-		contraintsBuilder.append("bbox,").append(test.getBboxrel()).append(",");
-
-	    contraintsBuilder.append("n_sources=").append(test.getSources().size());
-
+	getResults().stream().map(r ->
+		r.getTest()
+	).forEach(test -> {
 	    Integer total = 0;
 
-	    String testcontraints = contraintsBuilder.toString();
+	    String testcontraints = createContraint(test);
 
 	    if (map.get(testcontraints) != null)
 		total = map.get(testcontraints);
@@ -94,13 +151,74 @@ public class DiscoveryStressPlanResultCollector {
 
 	});
 
+	return map;
+    }
+
+    private Map<String, Long> meanExecByType() {
+	Map<String, Long> map = new HashMap<>();
+
+	getResults().stream().filter(r -> r.getCode() == 200).
+		forEach(r -> {
+		    DiscoveryStressTest test = r.getTest();
+
+		    Long total = 0L;
+
+		    String testcontraints = createContraint(test);
+
+		    if (map.get(testcontraints) != null)
+			total = map.get(testcontraints);
+
+		    map.put(testcontraints, total + r.getExecTime());
+
+		});
+
+	Map<String, Integer> successByType = successByType();
+
+	map.keySet().stream().forEach(key -> {
+
+	    map.put(key, map.get(key) / successByType.get(key));
+
+	});
+
+	return map;
+    }
+
+    private Map<String, Integer> successByType() {
+	Map<String, Integer> map = new HashMap<>();
+
+	getResults().stream().filter(r -> r.getCode() == 200).
+		map(r ->
+			r.getTest()
+		).forEach(test -> {
+
+		    Integer total = 0;
+
+		    String testcontraints = createContraint(test);
+
+		    if (map.get(testcontraints) != null)
+			total = map.get(testcontraints);
+
+		    map.put(testcontraints, total + 1);
+
+		});
+
+	return map;
+    }
+
+    private String createPlanSummary() {
+
+	String planSummary = String.format("Total Number of Requests: %d\nParallel Requests: %d",
+		getPlan().getStressTests().size() * getPlan().getMultiplicationFactor(), getPlan().getParallelRequests());
+
 	List<String> testLines = new ArrayList<>();
 	StringBuilder builder = new StringBuilder(planSummary);
 	builder.append("\n");
 
+	Map<String, Integer> map = totalByType();
+
 	map.keySet().stream().forEach(key -> {
 
-	    Integer total = map.get(key) * plan.getMultiplicationFactor();
+	    Integer total = map.get(key);
 
 	    String testline = String.format("Number of requests by type [%s] = %d", key, total);
 
