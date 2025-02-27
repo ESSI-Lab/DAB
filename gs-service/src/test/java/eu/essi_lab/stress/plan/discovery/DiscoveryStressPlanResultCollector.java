@@ -1,4 +1,4 @@
-package eu.essi_lab.stress.discovery;
+package eu.essi_lab.stress.plan.discovery;
 
 import eu.essi_lab.stress.plan.IStressPlanResultCollector;
 import eu.essi_lab.stress.plan.StressPlan;
