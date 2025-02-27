@@ -257,6 +257,18 @@
 		<dependencies>
 
 			<dependency>
+				<groupId>org.apache.parquet</groupId>
+				<artifactId>parquet-avro</artifactId>
+				<version>1.15.0</version> <!-- or latest version -->
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.parquet</groupId>
+				<artifactId>parquet-hadoop</artifactId>
+				<version>1.15.0</version>
+			</dependency>
+
+			<dependency>
 				<groupId>io.micrometer</groupId>
 				<artifactId>micrometer-registry-prometheus</artifactId>
 				<version>1.12.13</version> <!-- Check for the latest version -->
@@ -410,11 +422,11 @@
 				<version>${aws-java-sdk-bom.version}</version>
 				<type>pom</type>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>software.amazon.awssdk</groupId>
 				<artifactId>s3-transfer-manager</artifactId>
-			<version>${aws-java-sdk-bom.version}</version>
+				<version>${aws-java-sdk-bom.version}</version>
 			</dependency>
 
 			<dependency>
