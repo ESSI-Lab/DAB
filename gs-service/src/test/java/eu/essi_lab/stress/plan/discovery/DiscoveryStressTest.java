@@ -59,6 +59,26 @@ public class DiscoveryStressTest implements IStressTest {
 	return builder.toString();
     }
 
+    @Override
+    public String createTestKey() {
+	StringBuilder contraintsBuilder = new StringBuilder();
+
+	if (getSearchText() != null)
+	    contraintsBuilder.append("searchtext").append("__");
+
+	if (getBbox() != null)
+	    contraintsBuilder.append("bbox__").append(getBboxrel()).append("__");
+
+	if (getView() != null)
+	    contraintsBuilder.append("view__").append(getView()).append("__");
+
+	contraintsBuilder.append("n_sources=").append(getSources().size());
+
+	String testcontraints = contraintsBuilder.toString();
+
+	return testcontraints;
+    }
+
     public String getSearchText() {
 	return searchText;
     }

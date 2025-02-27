@@ -1,8 +1,5 @@
-package eu.essi_lab.stress.plan.discovery;
+package eu.essi_lab.stress.plan;
 
-import eu.essi_lab.stress.plan.IStressPlanResultCollector;
-import eu.essi_lab.stress.plan.StressPlan;
-import eu.essi_lab.stress.plan.StressTestResult;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -15,7 +12,7 @@ import java.util.Map;
 /**
  * @author Mattia Santoro
  */
-public class DiscoveryStressPlanResultCollector implements IStressPlanResultCollector {
+public class StressPlanResultCollector implements IStressPlanResultCollector {
 
     private List<StressTestResult> results = new ArrayList<>();
 
@@ -148,34 +145,15 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 	}
     }
 
-    private String createContraint(DiscoveryStressTest test) {
-	StringBuilder contraintsBuilder = new StringBuilder();
-
-	if (test.getSearchText() != null)
-	    contraintsBuilder.append("searchtext").append("__");
-
-	if (test.getBbox() != null)
-	    contraintsBuilder.append("bbox__").append(test.getBboxrel()).append("__");
-
-	if (test.getView() != null)
-	    contraintsBuilder.append("view__").append(test.getView()).append("__");
-
-	contraintsBuilder.append("n_sources=").append(test.getSources().size());
-
-	String testcontraints = contraintsBuilder.toString();
-
-	return testcontraints;
-    }
-
     private Map<String, Integer> totalByType() {
 	Map<String, Integer> map = new HashMap<>();
 
 	getResults().stream().map(r ->
-		(DiscoveryStressTest) r.getTest()
+		r.getTest()
 	).forEach(test -> {
 	    Integer total = 0;
 
-	    String testcontraints = createContraint(test);
+	    String testcontraints = test.createTestKey();
 
 	    if (map.get(testcontraints) != null)
 		total = map.get(testcontraints);
@@ -192,11 +170,11 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 
 	getResults().stream().filter(r -> r.getCode() == 200).
 		forEach(r -> {
-		    DiscoveryStressTest test = (DiscoveryStressTest) r.getTest();
+		    IStressTest test = r.getTest();
 
 		    Long total = 0L;
 
-		    String testcontraints = createContraint(test);
+		    String testcontraints = test.createTestKey();
 
 		    if (map.get(testcontraints) != null)
 			total = map.get(testcontraints);
@@ -221,12 +199,12 @@ public class DiscoveryStressPlanResultCollector implements IStressPlanResultColl
 
 	getResults().stream().filter(r -> r.getCode() == 200).
 		map(r ->
-			(DiscoveryStressTest) r.getTest()
+			r.getTest()
 		).forEach(test -> {
 
 		    Integer total = 0;
 
-		    String testcontraints = createContraint(test);
+		    String testcontraints = test.createTestKey();
 
 		    if (map.get(testcontraints) != null)
 			total = map.get(testcontraints);
