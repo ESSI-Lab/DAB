@@ -1,0 +1,268 @@
+package eu.essi_lab.stress.plan;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author Mattia Santoro
+ */
+public class StressPlanResultCollector {
+
+    private List<StressTestResult> results = new ArrayList<>();
+
+    private String host;
+    private StressPlan plan;
+
+    public void addResult(StressTestResult result) {
+	getResults().add((StressTestResult) result);
+
+    }
+
+    public List<StressTestResult> getResults() {
+	return results;
+    }
+
+    public Integer totalOkTests() {
+	return Math.toIntExact(getResults().stream().filter(r -> r.getCode() == 200).count());
+    }
+
+    public List<String> getCSVColumns() {
+	List<String> columns = new ArrayList<>();
+
+	columns.addAll(Arrays.asList("host", "total_req", "total_succ", "total_fail", "total_mean_exec_time",
+		"max_parallel"));
+
+	Map<String, Integer> totalByType = totalByType();
+	Map<String, Integer> successByType = successByType();
+	Map<String, Long> meanExecByType = meanExecByType();
+
+	totalByType.keySet().stream().forEach(c -> {
+	    columns.add("total_" + c);
+	    columns.add("success_" + c);
+	    columns.add("fail_" + c);
+	    columns.add("mean_exec_" + c);
+	});
+
+	return columns;
+    }
+
+    public List<String> getCSVColumnValues() {
+
+	List<String> values = new ArrayList<>();
+
+	values.add(host);
+	values.add(getResults().size() + "");
+	values.add(totalOkTests() + "");
+	values.add(getResults().size() - totalOkTests() + "");
+	values.add(meanExecutionTime() + "");
+	values.add(getPlan().getParallelRequests() + "");
+
+	Map<String, Integer> totalByType = totalByType();
+	Map<String, Integer> successByType = successByType();
+	Map<String, Long> meanExecByType = meanExecByType();
+
+	totalByType.keySet().stream().forEach(c -> {
+
+	    values.add(totalByType.get(c) + "");
+	    values.add(successByType.get(c) + "");
+	    values.add(totalByType.get(c) - successByType.get(c) + "");
+	    values.add(meanExecByType.get(c) + "");
+
+	});
+
+	return values;
+    }
+
+    public void saveReportToCSV(OutputStream out) throws IOException {
+	List<String> columns = getCSVColumns();
+	List<String> values = getCSVColumnValues();
+
+	OutputStreamWriter writer = new OutputStreamWriter(out);
+	columns.stream().forEach(c -> {
+	    try {
+		writer.write(c);
+		writer.write(",");
+	    } catch (IOException e) {
+		throw new RuntimeException(e);
+	    }
+	});
+
+	writer.write(System.lineSeparator());
+
+	values.stream().forEach(c -> {
+	    try {
+		writer.write(c);
+		writer.write(",");
+	    } catch (IOException e) {
+		throw new RuntimeException(e);
+	    }
+	});
+
+	writer.flush();
+    }
+
+    public void printReport(OutputStream out) {
+
+	String title = String.format("Results of Discovery Stress Tests on host %s", host);
+
+	String summary = String.format("Number of tests: %d%sSuccess: %d%sMean Execution Time: %d milliseconds", getResults().size(),
+		System.lineSeparator(),
+		totalOkTests(), System.lineSeparator(),
+		meanExecutionTime());
+
+	String planSummary = createPlanSummary();
+
+	OutputStreamWriter writer = new OutputStreamWriter(out);
+
+	try {
+	    writer.write(System.lineSeparator() + System.lineSeparator());
+	    writer.write(title);
+	    writer.write(System.lineSeparator() + System.lineSeparator());
+	    writer.write(summary);
+	    writer.write(System.lineSeparator() + System.lineSeparator());
+	    writer.write(planSummary);
+	    writer.write(System.lineSeparator() + System.lineSeparator());
+
+	    for (StressTestResult result : getResults()) {
+		writer.write(result.getRequest());
+		writer.write(System.lineSeparator());
+		writer.write(result.getResponseFile());
+		writer.write(System.lineSeparator());
+	    }
+	    writer.flush();
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	}
+    }
+
+    private Map<String, Integer> totalByType() {
+	Map<String, Integer> map = new HashMap<>();
+
+	getResults().stream().map(r ->
+		r.getTest()
+	).forEach(test -> {
+	    Integer total = 0;
+
+	    String testcontraints = test.createTestKey();
+
+	    if (map.get(testcontraints) != null)
+		total = map.get(testcontraints);
+
+	    map.put(testcontraints, total + 1);
+
+	});
+
+	return map;
+    }
+
+    private Map<String, Long> meanExecByType() {
+	Map<String, Long> map = new HashMap<>();
+
+	getResults().stream().filter(r -> r.getCode() == 200).
+		forEach(r -> {
+		    IStressTest test = r.getTest();
+
+		    Long total = 0L;
+
+		    String testcontraints = test.createTestKey();
+
+		    if (map.get(testcontraints) != null)
+			total = map.get(testcontraints);
+
+		    map.put(testcontraints, total + r.getExecTime());
+
+		});
+
+	Map<String, Integer> successByType = successByType();
+
+	map.keySet().stream().forEach(key -> {
+
+	    map.put(key, map.get(key) / successByType.get(key));
+
+	});
+
+	return map;
+    }
+
+    private Map<String, Integer> successByType() {
+	Map<String, Integer> map = new HashMap<>();
+
+	getResults().stream().filter(r -> r.getCode() == 200).
+		map(r ->
+			r.getTest()
+		).forEach(test -> {
+
+		    Integer total = 0;
+
+		    String testcontraints = test.createTestKey();
+
+		    if (map.get(testcontraints) != null)
+			total = map.get(testcontraints);
+
+		    map.put(testcontraints, total + 1);
+
+		});
+
+	return map;
+    }
+
+    private String createPlanSummary() {
+
+	String planSummary = String.format("Total Number of Requests: %d%sParallel Requests: %d",
+		getPlan().getStressTests().size() * getPlan().getMultiplicationFactor(), System.lineSeparator(),
+		getPlan().getParallelRequests());
+
+	List<String> testLines = new ArrayList<>();
+	StringBuilder builder = new StringBuilder(planSummary);
+	builder.append(System.lineSeparator());
+
+	Map<String, Integer> map = totalByType();
+
+	map.keySet().stream().forEach(key -> {
+
+	    Integer total = map.get(key);
+
+	    String testline = String.format("Number of requests by type [%s] = %d", key, total);
+
+	    testLines.add(testline);
+	    builder.append(testline);
+	    builder.append(System.lineSeparator());
+
+	});
+
+	return builder.toString();
+    }
+
+    private Long meanExecutionTime() {
+
+	Long total = 0L;
+
+	for (StressTestResult result : getResults()) {
+	    total += result.getExecTime();
+	}
+
+	return total / totalOkTests();
+    }
+
+    public String getHost() {
+	return host;
+    }
+
+    public void setHost(String host) {
+	this.host = host;
+    }
+
+    public void setPlan(StressPlan plan) {
+	this.plan = plan;
+    }
+
+    public StressPlan getPlan() {
+	return plan;
+    }
+}

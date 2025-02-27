@@ -187,7 +187,8 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 	    }
 	    String startTime = ISO8601DateTimeUtils.getISO8601Date(begin);
 	    String endTime = ISO8601DateTimeUtils.getISO8601Date(end);
-	    //http://93.57.89.5:9000/api/data/aggregation/101/station/6/measure/3/date-from/2024-01-01 00:00/date-to/2024-01-21 00:00
+	    // http://93.57.89.5:9000/api/data/aggregation/101/station/6/measure/3/date-from/2024-01-01
+	    // 00:00/date-to/2024-01-21 00:00
 	    String link = online.getLinkage().endsWith("/") ? online.getLinkage() + "date-from/" + startTime + "/date-to/" + endTime
 		    : online.getLinkage() + "/date-from/" + startTime + "/date-to/" + endTime;
 
@@ -201,7 +202,7 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 		JSONArray jsonArray = jsonObj.optJSONArray("data");
-		
+
 		for (Object arr : jsonArray) {
 
 		    JSONObject data = (JSONObject) arr;
@@ -230,10 +231,19 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 		    //
 
 		    String date = data.optString("inizio_periodo");// data.optString("datetime");
+		    if (date.isEmpty()) {
+			date = data.optString("data_giorno");
+		    }
 		    date = date.replaceFirst(" ", "T").trim();
 		    if (iso8601OutputFormat == null) {
-			iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ITALIAN);
-			iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+			if (date.contains("T")) {
+			    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ITALIAN);
+			    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+			} else {
+			    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+			    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+			}
+
 		    }
 
 		    Date parsed = iso8601OutputFormat.parse(date);
@@ -300,7 +310,7 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
 		    linkage.trim(), //
 		    HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralPugliaConnector.BEARER_TOKEN));
-	    
+
 	    stream = getStationResponse.body();
 
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
@@ -311,8 +321,8 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 		HISCentralPugliaConnector.BEARER_TOKEN = ConfigurationWrapper.getCredentialsSetting().getPugliaToken().orElse(null);
 
 		getStationResponse = downloader.downloadResponse(//
-			    linkage.trim(), //
-			    HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralPugliaConnector.BEARER_TOKEN));
+			linkage.trim(), //
+			HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralPugliaConnector.BEARER_TOKEN));
 
 		stream = getStationResponse.body();
 
