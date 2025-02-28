@@ -453,7 +453,7 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	String endPosition = series.getEndTimePositionUTC();
 	endPosition = normalizeUTCPosition(endPosition);
 
-	try {
+	try {	    
 	    iso8601WMLFormat.parse(beginPosition);
 	    iso8601WMLFormat.parse(endPosition);
 	    coreMetadata.addTemporalExtent(beginPosition, endPosition);

@@ -1048,9 +1048,6 @@ public class IndexData {
 		array.toList().//
 			stream().//
 
-			// indexed as date only if not preceding the epoch
-			filter(v -> Long.valueOf(v.toString()).compareTo(ISO8601DateTimeUtils.EPOCH) >= 0).//
-
 			// mapping to ISO-8601 string
 			map(v -> ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.valueOf(v.toString())))).
 
