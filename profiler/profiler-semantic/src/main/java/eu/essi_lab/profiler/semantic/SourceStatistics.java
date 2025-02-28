@@ -85,8 +85,13 @@ public class SourceStatistics {
 
 	// computes union of bboxes
 	statisticsMessage.computeBboxUnion();
-	statisticsMessage.computeMin(Arrays.asList(MetadataElement.TEMP_EXTENT_BEGIN, MetadataElement.ALTITUDE));
-	statisticsMessage.computeMax(Arrays.asList(MetadataElement.TEMP_EXTENT_END, MetadataElement.ALTITUDE));
+//	statisticsMessage.computeMin(Arrays.asList(MetadataElement.TEMP_EXTENT_BEGIN, MetadataElement.ALTITUDE));
+//	statisticsMessage.computeMax(Arrays.asList(MetadataElement.TEMP_EXTENT_END, MetadataElement.ALTITUDE));
+//	statisticsMessage.computeMin(Arrays.asList(MetadataElement.TEMP_EXTENT_BEGIN));
+//	statisticsMessage.computeMax(Arrays.asList(MetadataElement.TEMP_EXTENT_END));
+	statisticsMessage.computeMin(Arrays.asList(MetadataElement.ELEVATION_MIN));
+	statisticsMessage.computeMax(Arrays.asList(MetadataElement.ELEVATION_MAX));
+	statisticsMessage.computeTempExtentUnion();
 
 	// computes count distinct of 2 queryables
 	statisticsMessage.countDistinct(//
@@ -111,15 +116,17 @@ public class SourceStatistics {
 	    stats.setAttributeCount(responseItem.getCountDistinct(MetadataElement.ATTRIBUTE_TITLE).get().getValue());
 	    stats.setTimeSeriesCount(responseItem.getCountDistinct(MetadataElement.ONLINE_ID).get().getValue());
 	    CardinalValues cardinalValues = responseItem.getBBoxUnion().getCardinalValues().get();
-
+	    String union = responseItem.getTempExtentUnion().getValue();
+	    String begin = union.split(" ")[0];
+	    String end = union.split(" ")[1];
 	    stats.setEast(Double.parseDouble(cardinalValues.getEast()));
 	    stats.setNorth(Double.parseDouble(cardinalValues.getNorth()));
 	    stats.setWest(Double.parseDouble(cardinalValues.getWest()));
 	    stats.setSouth(Double.parseDouble(cardinalValues.getSouth()));
-	    stats.setBegin(responseItem.getMin(MetadataElement.TEMP_EXTENT_BEGIN).get().getValue());
-	    stats.setEnd(responseItem.getMax(MetadataElement.TEMP_EXTENT_END).get().getValue());
-	    stats.setMinimumAltitude(responseItem.getMin(MetadataElement.ALTITUDE).get().getValue());
-	    stats.setMaximumAltitude(responseItem.getMax(MetadataElement.ALTITUDE).get().getValue());
+	    stats.setBegin(begin);
+	    stats.setEnd(end);
+	    stats.setMinimumAltitude(responseItem.getMin(MetadataElement.ELEVATION_MIN).get().getValue());
+	    stats.setMaximumAltitude(responseItem.getMax(MetadataElement.ELEVATION_MAX).get().getValue());
 	    String id = responseItem.getGroupedBy().isPresent() ? responseItem.getGroupedBy().get() : null;
 	    this.statistics.put(id, stats);
 	}

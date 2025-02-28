@@ -143,7 +143,7 @@ public class Shape {
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 	}
     }
 
@@ -219,7 +219,7 @@ public class Shape {
 
 	    } catch (Exception e) {
 
-		GSLoggerFactory.getLogger(getClass()).error(e);
+		GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 
 		return;
 	    }
