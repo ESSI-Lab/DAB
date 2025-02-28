@@ -24,16 +24,22 @@ package eu.essi_lab.accessor.polytope.metadata;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.http.HttpResponse;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -100,6 +106,8 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
     private JSONArray stationsArray;
 
+    private List<CSVRecord> meteotrackerCSV;
+
     private Logger logger = GSLoggerFactory.getLogger(this.getClass());
 
     private int partialNumbers;
@@ -108,6 +116,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
 	this.downloader = new Downloader();
 	stationsArray = new JSONArray();
+	meteotrackerCSV = new ArrayList<CSVRecord>();
 
     }
 
@@ -160,20 +169,32 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 		    @SuppressWarnings("deprecation")
 		    long time = ISO8601DateTimeUtils.parseISO8601(timestamp).getTime();
 		    iso8601DateTime = ISO8601DateTimeUtils.getISO8601DateTime(new Date(time));
-		    //dateTime = new Date(time);
+		    // dateTime = new Date(time);
 		    GSLoggerFactory.getLogger(getClass()).info("Incremental harvesting enabled starting from: " + iso8601DateTime);
 		}
 	    }
 
-	    if(start == 0) {
-		//first loop
+	    if (start == 0) {
+		// first loop
 		stationsArray = getList(STATIONS_URL, iso8601DateTime);
-	    }else {
+	    } else {
 		if (stationsArray.isEmpty()) {
 		    stationsArray = getList(STATIONS_URL, iso8601DateTime);
 		}
 	    }
-	    
+
+	    if (meteotrackerCSV.isEmpty()) {
+		if(iso8601DateTime == null) {
+		    iso8601DateTime = ISO8601DateTimeUtils.getISO8601DateTime(new Date());
+		}
+		Date[] dates = enlargeDates(iso8601DateTime, iso8601DateTime);
+		String linkage = getSourceURL() + RETRIEVE_URL
+			+ "?class=rd&expver=xxxx&stream=lwda&aggregation_type=by_time&platform=meteotracker";
+		String startTime = ISO8601DateTimeUtils.getISO8601DateTime(dates[0]);
+		String endTime = ISO8601DateTimeUtils.getISO8601DateTime(new Date());
+		meteotrackerCSV = getCSVData(linkage, startTime, endTime, null, "meteotracker");
+	    }
+
 	    boolean isLast = false;
 	    GSLoggerFactory.getLogger(getClass()).info("Station number: " + stationsArray.length());
 	    if (start < stationsArray.length() && !maxNumberReached) {
@@ -216,9 +237,16 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
 			    } else if (platform.toLowerCase().contains("meteo")) {
 
+				List<CSVRecord> mtCSV = new ArrayList<CSVRecord>();
+				for(CSVRecord csv: meteotrackerCSV) {
+				    String toMatch = csv.get("station_id");
+				    if(toMatch.equals(id)) {
+					mtCSV.add(csv);
+				    }
+				}
 				for (PolytopeIonBeamMetadataMeteoTrackerVariable var : PolytopeIonBeamMetadataMeteoTrackerVariable
 					.values()) {
-				    ret.addRecord(PolytopeIonBeamMetadataMeteoTrackerMapper.create(datasetMetadata, var.getKey()));
+				    ret.addRecord(PolytopeIonBeamMetadataMeteoTrackerMapper.create(datasetMetadata, var.getKey(), mtCSV));
 				    partialNumbers++;
 				}
 			    } else if (platform.toLowerCase().contains("smart_citizen_kit")) {
@@ -233,6 +261,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 		}
 		if (isLast) {
 		    ret.setResumptionToken(null);
+		    meteotrackerCSV = new ArrayList<CSVRecord>();
 		} else {
 		    ret.setResumptionToken(String.valueOf(start + count));
 		}
@@ -259,8 +288,8 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 	String url = getSourceURL() + path;
 
 	if (dateString != null) {
-	    //String iso8601DateTime = ISO8601DateTimeUtils.getISO8601DateTime(date);
-	    url+= "?start_time=" + dateString; 
+	    // String iso8601DateTime = ISO8601DateTimeUtils.getISO8601DateTime(date);
+	    url += "?start_time=" + dateString;
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
@@ -375,6 +404,107 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
     protected PolytopeIonBeamMetadataConnectorSetting initSetting() {
 
 	return new PolytopeIonBeamMetadataConnectorSetting();
+    }
+
+    public static List<CSVRecord> getCSVData(String linkage, String startTime, String endTime, String stationId, String platform)
+	    throws Exception {
+
+	List<CSVRecord> ret = new ArrayList<CSVRecord>();
+
+	Iterable<CSVRecord> out = null;
+
+	if (PolytopeIonBeamMetadataConnector.BEARER_TOKEN == null) {
+	    PolytopeIonBeamMetadataConnector.BEARER_TOKEN = PolytopeIonBeamMetadataConnector.getBearerToken();
+	}
+
+	// Create the new parameters for the request
+	// ?format=csv&start_time=2025-01-31T00%3A00%3A00Z&end_time=2025-01-31T23%3A59%3A59Z&station_id=246ede0dd7e9d4c8
+	String updatedParameters = "";
+	String updatedUrl = "";
+	//get meteotracker sessions
+	if (stationId == null) {
+	    updatedParameters = "&start_time=" + startTime + "&end_time=" + endTime + "&format=csv";
+	    updatedUrl = linkage + updatedParameters;
+
+	//get data for downloaders
+	} else {
+	    updatedParameters = "format=csv&platform=" + platform + "&start_time=" + startTime + "&end_time=" + endTime + "&station_id="
+		    + stationId;
+	    updatedUrl = linkage.split("\\?")[0] + "?" + updatedParameters;
+	}
+
+	GSLoggerFactory.getLogger(PolytopeIonBeamMetadataConnector.class).info("Getting " + updatedUrl);
+
+	HashMap<String, String> headers = new HashMap<>();
+	headers.put("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN);
+	Downloader downloader = new Downloader();
+	Optional<String> response = downloader.downloadOptionalString(updatedUrl.trim(), HttpHeaderUtils.build(headers));
+
+	if (response.isPresent()) {
+
+	    String responseString = response.get();
+	    // *no data use-case
+	    if (responseString.toLowerCase().contains("no data found")) {
+		return ret;
+	    }
+	    // *multiple requests needed
+	    if (responseString.toLowerCase().contains("200 data granules")) {
+		return null;
+	    }
+	    try {
+		// delimiter seems to be ; by default
+		Reader in = new StringReader(responseString);
+		out = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
+		for (CSVRecord r : out) {
+		    ret.add(r);
+		}
+
+	    } catch (Exception e) {
+		// multiple requests needeed
+		GSLoggerFactory.getLogger(PolytopeIonBeamMetadataConnector.class).error(e.getMessage());
+
+	    }
+
+	}
+
+	return ret;
+    }
+    
+    public static Date[] enlargeDates(String startDate, String endDate) {
+	Date[] dateRanges = null;
+	Optional<Date> optStartDate = ISO8601DateTimeUtils.parseISO8601ToDate(startDate);
+	Optional<Date> optEndDate = ISO8601DateTimeUtils.parseISO8601ToDate(endDate);
+	
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+	sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+	Date newStartDate = optStartDate.get();
+	Calendar startCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        startCalendar.setTime(newStartDate);
+
+        // Set minutes, seconds, and milliseconds to zero (HH:00:00.000)
+        startCalendar.set(Calendar.MINUTE, 0);
+        startCalendar.set(Calendar.SECOND, 0);
+        startCalendar.set(Calendar.MILLISECOND, 0);
+        startCalendar.add(Calendar.HOUR_OF_DAY, -1);
+
+        // Format the adjusted date back to string
+        Optional<Date> newOptStartDate = ISO8601DateTimeUtils.parseISO8601ToDate(sdf.format(startCalendar.getTime()));
+       
+	Date newEndDate = optEndDate.get();
+	
+	Calendar endCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        endCalendar.setTime(newEndDate);
+
+        endCalendar.add(Calendar.HOUR_OF_DAY, 1);
+        endCalendar.set(Calendar.MINUTE, 0);
+        endCalendar.set(Calendar.SECOND, 0);
+        endCalendar.set(Calendar.MILLISECOND, 0);
+	
+        Optional<Date> endOptStartDate = ISO8601DateTimeUtils.parseISO8601ToDate(sdf.format(endCalendar.getTime()));
+	
+        dateRanges = new Date[] { newOptStartDate.get(), endOptStartDate.get() };
+
+	return dateRanges;
     }
 
     public static String getBearerToken() {
