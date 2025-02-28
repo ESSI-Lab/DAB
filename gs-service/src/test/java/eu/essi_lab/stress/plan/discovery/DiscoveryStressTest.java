@@ -151,7 +151,12 @@ public class DiscoveryStressTest implements IStressTest {
     }
 
     @Override
-    public String getResponseFileFormat() {
+    public String getResponseFileExtension() {
 	return ".xml";
+    }
+
+    @Override
+    public List<String> getResponseMetrics() {
+	return List.of("resultsnum");
     }
 }

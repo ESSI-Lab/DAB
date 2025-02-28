@@ -1,5 +1,8 @@
 package eu.essi_lab.stress.plan;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Mattia Santoro
  */
@@ -15,6 +18,7 @@ public class StressTestResult {
     private IStressTest test;
 
     private String responseFile;
+    private List<String> responseMetrics = new ArrayList<>();
 
     public int getCode() {
 	return code;
@@ -66,5 +70,9 @@ public class StressTestResult {
 
     public void setResponseFile(String responseFile) {
 	this.responseFile = responseFile;
+    }
+
+    public List<String> getResponseMetrics() {
+	return responseMetrics;
     }
 }

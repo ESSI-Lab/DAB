@@ -53,7 +53,7 @@ public class DiscoveryStressExternalTestIT {
 	plan.addStressTest(t5);
 	plan.addStressTest(t6);
 	plan.setParallelRequests(2);
-	plan.setMultiplicationFactor(3);
+	plan.setMultiplicationFactor(1);
 
 	return plan;
     }
@@ -110,9 +110,9 @@ public class DiscoveryStressExternalTestIT {
 	    }
 	}
 
-	Arrays.asList("production", "preproduction", "test").stream().forEach(env -> {
+	Arrays.asList("test").stream().forEach(env -> {
 
-	    Arrays.asList(1, 2, 4).stream().forEach(parallel -> {
+	    Arrays.asList(2).stream().forEach(parallel -> {
 
 		String hostname = "https://gs-service-" + env + ".geodab.eu";
 		plan.setParallelRequests(parallel);

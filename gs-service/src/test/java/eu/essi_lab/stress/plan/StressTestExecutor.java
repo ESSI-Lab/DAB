@@ -48,9 +48,8 @@ public class StressTestExecutor implements Callable<StressTestResult> {
 		    HttpResponse.BodyHandlers.ofInputStream());
 
 	    long end = System.currentTimeMillis();
-	    logger.info("Completed {}", test.requestString(this.host));
-
 	    Integer code = response.statusCode();
+	    logger.info("({}) Completed {}", code, test.requestString(this.host));
 
 	    result.setCode(code);
 	    result.setRequest(test.requestString(this.host));
@@ -58,6 +57,8 @@ public class StressTestExecutor implements Callable<StressTestResult> {
 	    result.setEnd(end);
 	    result.setTest(test);
 	    result.setResponseFile(saveResponseToFile(response.body()));
+
+	    result.getResponseMetrics().addAll(test.getResponseMetrics());
 
 	    return result;
 
@@ -68,7 +69,7 @@ public class StressTestExecutor implements Callable<StressTestResult> {
     }
 
     private String saveResponseToFile(InputStream body) throws IOException {
-	Path file = Files.createTempFile("stresstest", test.getResponseFileFormat());
+	Path file = Files.createTempFile("stresstest", test.getResponseFileExtension());
 	OutputStream outfile = new FileOutputStream(file.toFile());
 	IOUtils.copy(body, outfile);
 
