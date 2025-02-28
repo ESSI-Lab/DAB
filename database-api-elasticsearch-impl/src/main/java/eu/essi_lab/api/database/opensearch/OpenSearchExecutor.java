@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,8 +31,6 @@ import java.util.HashMap;
 
 import java.util.List;
 import java.util.Map;
-import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -39,10 +38,7 @@ import java.util.Set;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.CoordsGeoBounds;
 import org.opensearch.client.opensearch._types.FieldValue;
-import org.opensearch.client.opensearch._types.LatLonGeoLocation;
-import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.SortOptions;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.TopLeftBottomRightGeoBounds;
@@ -51,16 +47,13 @@ import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.BucketSortAggregation;
 import org.opensearch.client.opensearch._types.aggregations.Buckets;
 import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregation;
-import org.opensearch.client.opensearch._types.aggregations.FiltersAggregation;
 import org.opensearch.client.opensearch._types.aggregations.FiltersBucket;
 import org.opensearch.client.opensearch._types.aggregations.GeoBoundsAggregate;
 import org.opensearch.client.opensearch._types.aggregations.GeoCentroidAggregate;
 import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
 import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
-import org.opensearch.client.opensearch._types.query_dsl.GeoBoundingBoxQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchRequest.Builder;
 import org.opensearch.client.opensearch.core.SearchResponse;
@@ -69,7 +62,6 @@ import org.opensearch.client.opensearch.core.search.Hit;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -84,7 +76,6 @@ import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -93,7 +84,6 @@ import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.index.IndexedResourceProperty;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.index.jaxb.CardinalValues;
-import eu.essi_lab.model.index.jaxb.DisjointValues;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -149,6 +139,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
     public static final String BBOX_AGGREGATION = "bbox";
     public static final String TIME_MIN_AGGREGATION = "time-min";
     public static final String TIME_MAX_AGGREGATION = "time-max";
+    public static final String TIME_NOW_AGGREGATION = "time-now";
 
     @Override
     public StatisticsResponse compute(StatisticsMessage message) throws GSException {
@@ -269,6 +260,9 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    String targetMax = MetadataElement.TEMP_EXTENT_END.getName() + "_date";
 	    Aggregation aggregationMax = Aggregation.of(b -> b.max(bb -> bb.field(targetMax)));
 	    map.put(TIME_MAX_AGGREGATION, aggregationMax);
+	    String targetNow = "tmpExtentEnd_Now";
+	    Aggregation aggregationNow = Aggregation.of(a -> a.filter(f -> f.term(t -> t.field(targetNow).value(FieldValue.of(true)))));
+	    map.put(TIME_NOW_AGGREGATION, aggregationNow);
 	}
 
 	StatisticsResponse ret;
@@ -387,6 +381,13 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		    Date dateMax = new Date(max);
 		    String dateMaxStr = ISO8601DateTimeUtils.getISO8601DateTime(dateMax);
 		    String dateMinStr = ISO8601DateTimeUtils.getISO8601DateTime(dateMin);
+		    Aggregate aggNow = mapa.get(TIME_NOW_AGGREGATION);
+		    if (aggNow != null && aggNow.isFilter()) {
+			if (aggNow.filter().docCount() > 0) {
+			    dateMaxStr = ISO8601DateTimeUtils.getISO8601DateTime();
+			}
+		    }
+
 		    ComputationResult result = new ComputationResult();
 		    result.setTarget("time-min");
 		    result.setValue(dateMinStr + " " + dateMaxStr);
