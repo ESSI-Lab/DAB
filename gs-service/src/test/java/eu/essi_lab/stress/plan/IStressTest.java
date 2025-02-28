@@ -17,4 +17,6 @@ public interface IStressTest {
     String getResponseFileExtension();
 
     List<String> getResponseMetrics();
+
+    Long readMetric(String metric, String filePath);
 }

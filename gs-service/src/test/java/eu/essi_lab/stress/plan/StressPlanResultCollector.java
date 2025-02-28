@@ -190,7 +190,7 @@ public class StressPlanResultCollector {
 		    List<String> metrics = r.getResponseMetrics();
 
 		    metrics.stream().forEach(m -> {
-			Long metricValue = Math.round(Math.random()*1000);//r.readMetric(m, test);
+			Long metricValue = r.readMetric(m, test);
 
 			Long total = 0L;
 

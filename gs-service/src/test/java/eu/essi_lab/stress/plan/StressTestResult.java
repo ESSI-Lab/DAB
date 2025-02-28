@@ -75,4 +75,8 @@ public class StressTestResult {
     public List<String> getResponseMetrics() {
 	return responseMetrics;
     }
+
+    public Long readMetric(String metric, IStressTest test) {
+	return test.readMetric(metric, responseFile);
+    }
 }
