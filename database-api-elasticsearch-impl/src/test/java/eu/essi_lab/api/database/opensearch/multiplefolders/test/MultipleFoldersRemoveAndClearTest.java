@@ -24,6 +24,7 @@ import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.HarvestingProperties;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.Dataset;
 
 /**
@@ -714,6 +715,7 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 	    dataset.setPrivateId(privateId);
 	    dataset.setOriginalId(UUID.randomUUID().toString());
 	    dataset.setPublicId(UUID.randomUUID().toString());
+	    dataset.setSource(new GSSource("sourceId"));
 
 	    IndexedElementsWriter.write(dataset);
 
@@ -741,6 +743,7 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
+	dataset.setSource(new GSSource("sourceId"));
 
 	IndexedElementsWriter.write(dataset);
 

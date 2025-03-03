@@ -21,6 +21,7 @@ import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
 
@@ -48,6 +49,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
+	dataset.setSource(new GSSource("sourceId"));
 
 	BoundingPolygon boundingPolygon = new BoundingPolygon();
 
@@ -129,6 +131,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
+	dataset.setSource(new GSSource("sourceId"));
 
 	BoundingPolygon boundingPolygon = new BoundingPolygon();
 
@@ -214,6 +217,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box = new GeographicBoundingBox();
 
@@ -289,6 +293,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box1 = new GeographicBoundingBox();
 
@@ -384,6 +389,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box = new GeographicBoundingBox();
 
@@ -459,6 +465,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box = new GeographicBoundingBox();
 
@@ -515,7 +522,6 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	TestUtils.compareResources(wrapper, dataset, folder, key);
     }
 
-    
     @Test
     public void multiPolygonTest() throws Exception {
 
@@ -535,6 +541,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box1 = new GeographicBoundingBox();
 
@@ -632,6 +639,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box1 = new GeographicBoundingBox();
 

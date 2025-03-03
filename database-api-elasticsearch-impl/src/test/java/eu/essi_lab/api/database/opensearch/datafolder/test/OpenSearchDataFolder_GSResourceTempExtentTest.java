@@ -21,6 +21,7 @@ import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent.FrameValue;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
@@ -49,7 +50,8 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
-
+	dataset.setSource(new GSSource("sourceId"));
+	
 	String dateTime = ISO8601DateTimeUtils.getISO8601DateTime();
 
 	TemporalExtent temporalExtent = new TemporalExtent();
@@ -131,7 +133,8 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
-
+	dataset.setSource(new GSSource("sourceId"));
+	
 	TemporalExtent temporalExtent = new TemporalExtent();
 
 	FrameValue frameValue = FrameValue.P10D;
@@ -213,7 +216,8 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
-
+	dataset.setSource(new GSSource("sourceId"));
+	
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setIndeterminateBeginPosition(TimeIndeterminateValueType.NOW);
 
@@ -293,7 +297,8 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
-
+	dataset.setSource(new GSSource("sourceId"));
+	
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setBeginPosition("now");
 
@@ -373,7 +378,8 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
-
+	dataset.setSource(new GSSource("sourceId"));
+	
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
 
@@ -453,7 +459,8 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
-
+	dataset.setSource(new GSSource("sourceId"));
+	
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setEndPosition("now");
 
@@ -533,7 +540,8 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
-
+	dataset.setSource(new GSSource("sourceId"));
+	
 	String dateTime = ISO8601DateTimeUtils.getISO8601DateTime();
 
 	TemporalExtent temporalExtent = new TemporalExtent();
@@ -615,7 +623,8 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
-
+	dataset.setSource(new GSSource("sourceId"));
+	
 	String beginDateTime = ISO8601DateTimeUtils.getISO8601DateTime();
 	String endDateTime = ISO8601DateTimeUtils.getISO8601DateTime();
 

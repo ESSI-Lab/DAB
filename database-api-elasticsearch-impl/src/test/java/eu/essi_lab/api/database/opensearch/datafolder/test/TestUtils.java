@@ -71,7 +71,7 @@ public class TestUtils {
 		SourceStorageWorker.DATA_1_POSTFIX;//
     }
 
-    public static boolean EXIT_ON_ERROR = true;
+    public static boolean EXIT_ON_ERROR = false;
 
     /**
      * @param targetSource
