@@ -78,10 +78,20 @@ public class GSSource implements Serializable {
     /**
      * 
      */
-    public GSSource() {
+    public GSSource(String sourceId) {
 	setResultsPriority(ResultsPriority.UNSET);
 	setOrderingDirection(OrderingDirection.ASCENDING);
+	if (sourceId != null) {
+	    setUniqueIdentifier(sourceId);
+	}
 	this.deployment = new ArrayList<String>();
+    }
+
+    /**
+     * 
+     */
+    public GSSource() {
+	this(null);
     }
 
     @XmlTransient
