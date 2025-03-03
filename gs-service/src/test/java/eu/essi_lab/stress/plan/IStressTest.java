@@ -2,6 +2,7 @@ package eu.essi_lab.stress.plan;
 
 import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
+import java.util.List;
 
 /**
  * @author Mattia Santoro
@@ -13,5 +14,9 @@ public interface IStressTest {
 
     String requestString(String host);
 
-    String getResponseFileFormat();
+    String getResponseFileExtension();
+
+    List<String> getResponseMetrics();
+
+    Long readMetric(String metric, String filePath);
 }

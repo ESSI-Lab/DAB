@@ -53,7 +53,7 @@ public class DiscoveryStressExternalTestIT {
 	plan.addStressTest(t5);
 	plan.addStressTest(t6);
 	plan.setParallelRequests(2);
-	plan.setMultiplicationFactor(3);
+	plan.setMultiplicationFactor(1);
 
 	return plan;
     }
