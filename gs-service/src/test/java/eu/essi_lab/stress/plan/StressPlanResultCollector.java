@@ -39,14 +39,16 @@ public class StressPlanResultCollector {
 		"max_parallel"));
 
 	Map<String, Integer> totalByType = totalByType();
-	Map<String, Integer> successByType = successByType();
-	Map<String, Long> meanExecByType = meanExecByType();
+
+	List<String> rsponseMetrics = getResults().get(0).getResponseMetrics();
 
 	totalByType.keySet().stream().forEach(c -> {
 	    columns.add("total_" + c);
 	    columns.add("success_" + c);
 	    columns.add("fail_" + c);
 	    columns.add("mean_exec_" + c);
+
+	    rsponseMetrics.stream().forEach(m -> columns.add(m + "_" + c));
 	});
 
 	return columns;
@@ -67,12 +69,16 @@ public class StressPlanResultCollector {
 	Map<String, Integer> successByType = successByType();
 	Map<String, Long> meanExecByType = meanExecByType();
 
+	Map<String, Map<String, Long>> metricsByType = metricsByType();
+
 	totalByType.keySet().stream().forEach(c -> {
 
 	    values.add(totalByType.get(c) + "");
 	    values.add(successByType.get(c) + "");
 	    values.add(totalByType.get(c) - successByType.get(c) + "");
 	    values.add(meanExecByType.get(c) + "");
+
+	    metricsByType.get(c).keySet().stream().forEach(m -> values.add(metricsByType.get(c).get(m) + ""));
 
 	});
 
@@ -161,8 +167,66 @@ public class StressPlanResultCollector {
 	return map;
     }
 
+    private Map<String, Map<String, Long>> metricsByType() {
+	Map<String, Map<String, Long>> map = new HashMap<>();
+
+	getResults().stream().forEach(
+		r -> {
+		    IStressTest test = r.getTest();
+		    String testcontraints = test.createTestKey();
+		    Map<String, Long> testMetricsMap = new HashMap<>();
+
+		    r.getResponseMetrics().forEach(m -> testMetricsMap.put(m, 0L));
+
+		    map.put(testcontraints, testMetricsMap);
+		}
+	);
+
+	getResults().stream().filter(r -> r.getCode() == 200).forEach(
+		r -> {
+		    IStressTest test = r.getTest();
+		    String testcontraints = test.createTestKey();
+		    Map<String, Long> testMetricsMap = map.get(testcontraints);
+		    List<String> metrics = r.getResponseMetrics();
+
+		    metrics.stream().forEach(m -> {
+			Long metricValue = r.readMetric(m, test);
+
+			Long total = 0L;
+
+			if (testMetricsMap.get(m) != null)
+			    total = testMetricsMap.get(m);
+
+			testMetricsMap.put(m, total + metricValue);
+
+		    });
+
+		}
+	);
+
+	Map<String, Integer> successByType = successByType();
+
+	map.keySet().stream().forEach(key -> {
+
+	    map.get(key).keySet().stream().forEach(metric -> {
+		Long n = map.get(key).get(metric);
+		Integer d = successByType.get(key);
+
+		if (d > 0) {
+		    Long mean = n / d;
+
+		    map.get(key).put(metric, mean);
+		}
+	    });
+
+	});
+
+	return map;
+    }
+
     private Map<String, Long> meanExecByType() {
 	Map<String, Long> map = new HashMap<>();
+	getResults().stream().forEach(r -> map.put(r.getTest().createTestKey(), 0L));
 
 	getResults().stream().filter(r -> r.getCode() == 200).
 		forEach(r -> {
@@ -182,8 +246,14 @@ public class StressPlanResultCollector {
 	Map<String, Integer> successByType = successByType();
 
 	map.keySet().stream().forEach(key -> {
+	    Long n = map.get(key);
+	    Integer d = successByType.get(key);
 
-	    map.put(key, map.get(key) / successByType.get(key));
+	    if (d > 0) {
+		Long mean = n / d;
+
+		map.put(key, mean);
+	    }
 
 	});
 
@@ -192,12 +262,11 @@ public class StressPlanResultCollector {
 
     private Map<String, Integer> successByType() {
 	Map<String, Integer> map = new HashMap<>();
+	getResults().stream().forEach(r -> map.put(r.getTest().createTestKey(), 0));
 
 	getResults().stream().filter(r -> r.getCode() == 200).
-		map(r ->
-			r.getTest()
-		).forEach(test -> {
-
+		forEach(r -> {
+		    IStressTest test = r.getTest();
 		    Integer total = 0;
 
 		    String testcontraints = test.createTestKey();

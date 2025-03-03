@@ -1,12 +1,18 @@
 package eu.essi_lab.stress.plan.discovery;
 
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
+import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.stress.plan.IStressTest;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.xml.xpath.XPathExpressionException;
+import org.xml.sax.SAXException;
 
 /**
  * @author Mattia Santoro
@@ -44,7 +50,7 @@ public class DiscoveryStressTest implements IStressTest {
 		.append("&")//
 		.append("reqID=").append(rid)//
 		.append("&")//
-		.append("si=1&ct=12&tf=keyword,format,protocol,providerID,organisationName,sscScore")//
+		.append("si=1&ct=12&tf=keyword,format,protocol,providerID,organisationName,sscScore").append("&")//
 		.append("rel=").append(bboxrel)//
 		.append("&")//
 		.append("viewid=").append(viewid)//
@@ -151,7 +157,27 @@ public class DiscoveryStressTest implements IStressTest {
     }
 
     @Override
-    public String getResponseFileFormat() {
+    public String getResponseFileExtension() {
 	return ".xml";
+    }
+
+    @Override
+    public List<String> getResponseMetrics() {
+	return List.of("resultsnum");
+    }
+
+    @Override
+    public Long readMetric(String metric, String filePath) {
+
+	try {
+	    XMLDocumentReader reader = new XMLDocumentReader(new FileInputStream(new File(filePath)));
+
+	    Number results = reader.evaluateNumber("/*:feed/*:totalResults");
+
+	    return results.longValue();
+	} catch (SAXException | IOException | XPathExpressionException e) {
+	    e.printStackTrace();
+	}
+	return 0L;
     }
 }
