@@ -984,6 +984,9 @@ public class OpenSearchQueryBuilder {
             //
             // creates the query
             //
+            
+            value = ConversionUtils.parseToLongString(value);
+            
             Query literalQuery = buildRangeQuery(el.getName(), operator, value);
     
             if (operands.isEmpty()) {
