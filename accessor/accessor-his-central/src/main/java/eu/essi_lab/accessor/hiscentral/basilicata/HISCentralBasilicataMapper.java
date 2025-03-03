@@ -383,6 +383,18 @@ public class HISCentralBasilicataMapper extends FileIdentifierMapper {
 	if (measureName.contains("Velocita' Vento")) {
 	    measureName = "Velocita Vento";
 	}
+	if (measureName.contains("Igro ")) {
+	    measureName = "Igro";
+	}
+	if (measureName.contains("Igrometro ")) {
+	    measureName = "Igrometro";
+	}
+	if (measureName.startsWith("T ")) {
+	    measureName = "T";
+	}
+	if (measureName.startsWith("Tensiometro ")) {
+	    measureName = "Tensiometro";
+	}
 	coverageDescription.setAttributeTitle(measureName);
 
 	String missingValue = "-9999";
