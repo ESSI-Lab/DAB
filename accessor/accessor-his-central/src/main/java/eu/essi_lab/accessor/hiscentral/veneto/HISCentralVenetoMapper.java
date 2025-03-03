@@ -403,6 +403,12 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	}else {
 	    HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
 	}
+	if (measureName.startsWith("Portata ")) {
+	    measureName = "Portata";
+	}
+	if (measureName.startsWith("Livello idrometrico ")) {
+	    measureName = "Livello idrometrico";
+	}
 	
 	coverageDescription.setAttributeTitle(measureName);
 
