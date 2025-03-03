@@ -449,6 +449,15 @@ public class HISCentralToscanaMapper extends FileIdentifierMapper {
 	    default:
 		break;
 	    }
+	    if (attributeTitle.contains("Velocita Raffica Giornaliera")) {
+		attributeTitle = "Velocita Raffica";
+	    }
+	    if (attributeTitle.contains("Velocita Media Giornaliera")) {
+		attributeTitle = "Velocita Vento";
+	    }
+	    if (attributeTitle.contains("Direzione Media Giornaliera")) {
+		attributeTitle = "Direzione Vento";
+	    }
 
 	    coverageDescription.setAttributeTitle(attributeTitle);
 
