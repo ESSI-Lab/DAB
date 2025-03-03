@@ -21,24 +21,18 @@ package eu.essi_lab.accessor.polytope.metadata;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.parquet.hadoop.ParquetReader;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -55,6 +49,8 @@ import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -78,7 +74,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifie
 	// do nothing
     }
 
-    public static OriginalMetadata create(JSONObject datasetInfo, String varType) {
+    public static OriginalMetadata create(JSONObject datasetInfo, String varType, List<CSVRecord> csvRecords) {
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
 	originalMetadata.setSchemeURI(CommonNameSpaceContext.IONBEAM_TRACKER);
@@ -88,6 +84,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifie
 	jsonObject.put("var-type", varType);
 
 	originalMetadata.setMetadata(jsonObject.toString(4));
+	originalMetadata.setAdditionalInfo(GSPropertyHandler.of(new GSProperty<List<CSVRecord>>("csvRecord", csvRecords)));
 
 	return originalMetadata;
 
@@ -210,6 +207,10 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifie
 	    JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
 
 	    String varType = retrieveVarInfo(originalMD);
+	    
+	    
+	    GSPropertyHandler addInfo = originalMD.getAdditionalInfo();
+	    List<CSVRecord> listCsv = addInfo.get("csvRecord", List.class);
 
 	    String stationName = datasetInfo.optString("name");
 	    String stationId = datasetInfo.optString("external_id");
@@ -358,12 +359,17 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifie
 	    // 44.4005098, 8.675219 44.400353, 8.6750815 44.4002186, 8.6655395 44.3914033, 8.665203 44.3911424, 8.664728
 	    // 44.3910255, 8.6391694 44.386031))",
 
-	    List<JSONObject> jsonResponse = new ArrayList<JSONObject>();
+	    //List<JSONObject> jsonResponse = new ArrayList<JSONObject>();
+	    
 	    String queryPath = "?class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream="
 		    + marsRequestStream + "&aggregation_type=by_time&platform=" + platformName + "&station_id=" + internalId;
 	    
 	    String linkage = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + queryPath;
-	    jsonResponse = getSessionData(queryPath);
+	    
+	    //jsonResponse = getSessionData(queryPath);
+	    
+	    
+	    
 	    // startDate = startDate.replace("Z", "+00:00");
 	    // linkage = PolytopeIonBeamMetadataConnector.BASE_URL +
 	    // "retrieve?project=public&platform=meteotracker&observation_variable="
@@ -380,14 +386,23 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifie
 	    Double maxLat = null;
 	    Double minAlt = null;
 	    Double maxAlt = null;
-	    for (JSONObject obj : jsonResponse) {
+	    
+	    if(listCsv != null && !listCsv.isEmpty()) {
+	    for (CSVRecord csv : listCsv) {
 
-		BigDecimal alt = obj.optBigDecimal("altitude", null);
-		Double lonDouble = obj.optDouble("lon");
-		Double latDouble = obj.optDouble("lat");
-		// Double latDouble = Double.valueOf(lat);
-		// Double lonDouble = Double.valueOf(lon);
-		Double altDouble = alt.doubleValue();
+		String csvLat = csv.get("lat");
+		String csvLon = csv.get("lon");
+		String altitude = csv.get("altitude");
+		
+		Double latDouble = Double.valueOf(csvLat);
+		Double lonDouble = Double.valueOf(csvLon);
+		Double altDouble = Double.valueOf(altitude);
+		
+//		BigDecimal alt = obj.optBigDecimal("altitude", null);
+//		Double lonDouble = obj.optDouble("lon");
+//		Double latDouble = obj.optDouble("lat");
+
+//		Double altDouble = alt.doubleValue();
 
 		List<Double> lat_lon_alt = new ArrayList<>();
 		lat_lon_alt.add(latDouble);
@@ -427,6 +442,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifie
 		    maxAlt = altDouble;
 		}
 
+	    }
 	    }
 
 	    // Double[] bbox = multipointToBbox(coordinates);
@@ -787,6 +803,21 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifie
 
     public static void main(String[] args) {
 
+	
+	
+	
+//	 Path path;
+//	// Create Parquet reader
+//        try (ParquetReader<GenericRecord> reader = AvroParquetReader.<GenericRecord>builder(path).build()) {
+//            GenericRecord record;
+//            while ((record = reader.read()) != null) {
+//                System.out.println("Read record: " + record);
+//            }
+//        }
+//	
+	
+	
+	
 	String t = "2024-12-12T23:06:20.011000Z";
 
 	Optional<Date> ddd = ISO8601DateTimeUtils.parseISO8601ToDate(t);

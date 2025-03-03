@@ -1098,8 +1098,8 @@ public class HISCentralLombardiaClient {
 	GSLoggerFactory.getLogger(getClass()).info("Sending request to HIS-Lombardia: {} {}", url, soapAction);
 
 	Downloader executor = new Downloader();
-	executor.setConnectionTimeout(TimeUnit.SECONDS, 30);
-	executor.setResponseTimeout(TimeUnit.SECONDS, 120);
+	executor.setConnectionTimeout(TimeUnit.SECONDS, 60);
+	executor.setResponseTimeout(TimeUnit.SECONDS, 240);
 	return executor.downloadResponse(request);
 
     }

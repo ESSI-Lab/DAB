@@ -27,6 +27,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -56,7 +57,8 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
-
+	dataset.setSource(new GSSource("sourceId"));
+	
 	//
 	//
 	//
@@ -546,7 +548,8 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    dataset.setPrivateId(privateIdPrefix + "_" + i);
 	    dataset.setOriginalId(UUID.randomUUID().toString());
 	    dataset.setPublicId(UUID.randomUUID().toString());
-
+	    dataset.setSource(new GSSource("sourceId"));
+	    
 	    dataset.getHarmonizedMetadata().getCoreMetadata().setTitle(title);
 	    dataset.getHarmonizedMetadata().getCoreMetadata().setAbstract(_abstract);
 
@@ -571,7 +574,8 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    dataset.setPrivateId("GSResource_" + i);
 	    dataset.setOriginalId(UUID.randomUUID().toString());
 	    dataset.setPublicId(UUID.randomUUID().toString());
-
+	    dataset.setSource(new GSSource("sourceId"));
+	    
 	    dataset.getHarmonizedMetadata().getCoreMetadata().setTitle("Title_" + i);
 
 	    IndexedElementsWriter.write(dataset);

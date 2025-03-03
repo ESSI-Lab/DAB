@@ -150,6 +150,8 @@ public class RateLimiterFilter implements Filter {
 	RateLimiterSetting setting = ConfigurationWrapper.getRateLimiterSettingSettings();
 
 	if (bouncer == null || //
+		address.startsWith("149.139.19") || // CNR-IIA
+		address.equals("[0:0:0:0:0:0:0:1]") || //
 		requestPath.contains("configuration") || //
 		requestPath.contains("check") || //
 		requestPath.contains("giapi") || //

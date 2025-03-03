@@ -1660,6 +1660,32 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    defineBNHSProperty(BNHSProperty.DATUM_ALTITUDE, resource);
 	}
     };
+    public static final IndexedMetadataElement ELEVATION_MIN = new IndexedMetadataElement(MetadataElement.ELEVATION_MIN) {
+	@Override
+	public void defineValues(GSResource resource) {
+	    MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+	    VerticalExtent vertical = miMetadata.getDataIdentification().getVerticalExtent();
+	    if (vertical != null) {
+		Double minimum = vertical.getMinimumValue();
+		if (minimum != null ) {
+		    getValues().add(minimum.toString());
+		}
+	    }
+	}
+    };
+    public static final IndexedMetadataElement ELEVATION_MAX = new IndexedMetadataElement(MetadataElement.ELEVATION_MAX) {
+	@Override
+	public void defineValues(GSResource resource) {
+	    MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+	    VerticalExtent vertical = miMetadata.getDataIdentification().getVerticalExtent();
+	    if (vertical != null) {
+		Double maximum = vertical.getMaximumValue();
+		if (maximum != null ) {
+		    getValues().add(maximum.toString());
+		}
+	    }
+	}
+    };
     public static final IndexedMetadataElement ALTITUDE_DATUM = new IndexedMetadataElement(MetadataElement.ALTITUDE_DATUM) {
 	@Override
 	public void defineValues(GSResource resource) {

@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,7 @@ import javax.ws.rs.core.Response.Status;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage.IterationMode;
@@ -260,6 +262,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		e1.printStackTrace();
 	    }
 	    Stats stats = sourceStats.getStatistics().get(null);
+	    
 	    content += "<tr><td colspan='15'><br/>"//
 		    + "Data provider: <b>" + source + "</b><br/>"//
 		    + "#Platforms: " + stats.getSiteCount() + "<br/>"//
@@ -267,8 +270,9 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    + "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
 		    + "Begin:" + stats.getBegin() + "<br/>"//
 		    + "End:" + stats.getEnd() + "<br/>"//
-		    + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth()+"<br/>" //
-		    + "Altitude:" + stats.getMinimumAltitude()+"/"+stats.getMaximumAltitude() + "<br/>"//		    
+		    + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth()
+		    + "<br/>" //
+		    + "Altitude:" + stats.getMinimumAltitude() + "/" + stats.getMaximumAltitude() + "<br/>"//
 		    + "</td></tr>" + "" //
 		    + "<tr>" + //
 		    getHeader("#Platforms") + //
@@ -374,6 +378,20 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	return Response.status(Status.OK).type(MediaType.TEXT_HTML).entity(stream).build();
 
     }
+
+//    private String date(String string) {
+//	if (string == null) {
+//	    return "";
+//	}
+//	try {
+//	    double d = Double.parseDouble(string);
+//	    Date date = new Date((long)d);
+//	    return ISO8601DateTimeUtils.getISO8601DateTime(date);
+//	} catch (Exception e) {
+//	    // TODO: handle exception
+//	}
+//	return "";
+//    }
 
     private String getHeader(String header) {
 	return "<th>" + header + "</th>";

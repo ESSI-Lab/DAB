@@ -490,14 +490,14 @@ public class ConversionUtils {
      * @throws TransformerException
      */
     public static String toString(Document document) throws TransformerException {
-    
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-    
-        StringWriter stringWriter = new StringWriter();
-        transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
-    
-        return stringWriter.toString();
+
+	TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	Transformer transformer = transformerFactory.newTransformer();
+
+	StringWriter stringWriter = new StringWriter();
+	transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
+
+	return stringWriter.toString();
     }
 
     /**
@@ -523,11 +523,7 @@ public class ConversionUtils {
 
 	    date = ISO8601DateTimeUtils.parseNotStandardToDate(dateTime);
 
-	} else if (dateTime.length() == "yyyy-MM-ddTHH:mm:ss.SSSZ".length() || //
-		dateTime.length() == "yyyy-MM-ddTHH:mm:ssZ".length() || //
-		dateTime.length() == "yyyy-MM-ddTHH:mm:ss.SSS".length() || //
-		dateTime.length() == "yyyy-MM-ddTHH:mm:ss".length()//
-	) {
+	} else {
 
 	    date = ISO8601DateTimeUtils.parseISO8601ToDate(dateTime);
 	}

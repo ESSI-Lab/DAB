@@ -16,6 +16,7 @@ import eu.essi_lab.api.database.opensearch.index.Shape;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.resource.Dataset;
 
@@ -107,6 +108,7 @@ public class ShapeTest {
     public void pointTest() {
 
 	Dataset dataset = new Dataset();
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box = new GeographicBoundingBox();
 
@@ -146,6 +148,7 @@ public class ShapeTest {
     public void multiPointTest() {
 
 	Dataset dataset = new Dataset();
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box1 = new GeographicBoundingBox();
 
@@ -205,6 +208,7 @@ public class ShapeTest {
     public void polygonTest() {
 
 	Dataset dataset = new Dataset();
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box = new GeographicBoundingBox();
 
@@ -245,6 +249,7 @@ public class ShapeTest {
     public void southGTNorthPolygonTest() {
 
 	Dataset dataset = new Dataset();
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box = new GeographicBoundingBox();
 
@@ -291,6 +296,7 @@ public class ShapeTest {
 	{
 
 	    Dataset dataset = new Dataset();
+	    dataset.setSource(new GSSource("sourceId"));
 
 	    GeographicBoundingBox box = new GeographicBoundingBox();
 
@@ -317,6 +323,7 @@ public class ShapeTest {
 	{
 
 	    Dataset dataset = new Dataset();
+	    dataset.setSource(new GSSource("sourceId"));
 
 	    GeographicBoundingBox box = new GeographicBoundingBox();
 
@@ -343,6 +350,7 @@ public class ShapeTest {
 	{
 
 	    Dataset dataset = new Dataset();
+	    dataset.setSource(new GSSource("sourceId"));
 
 	    GeographicBoundingBox box = new GeographicBoundingBox();
 
@@ -374,6 +382,7 @@ public class ShapeTest {
 
 	{
 	    Dataset dataset = new Dataset();
+	    dataset.setSource(new GSSource("sourceId"));
 
 	    GeographicBoundingBox box = new GeographicBoundingBox();
 
@@ -401,6 +410,7 @@ public class ShapeTest {
     public void multiPolygonTest() {
 
 	Dataset dataset = new Dataset();
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box1 = new GeographicBoundingBox();
 
@@ -462,6 +472,7 @@ public class ShapeTest {
     public void geometryCollectionTest() {
 
 	Dataset dataset = new Dataset();
+	dataset.setSource(new GSSource("sourceId"));
 
 	GeographicBoundingBox box1 = new GeographicBoundingBox();
 
