@@ -3,6 +3,7 @@ package eu.essi_lab.stress.plan.discovery;
 import eu.essi_lab.stress.plan.StressPlan;
 import eu.essi_lab.stress.plan.StressPlanExecutor;
 import eu.essi_lab.stress.plan.StressPlanResultCollector;
+import eu.essi_lab.stress.plan.StressTestCSVValue;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,29 +38,60 @@ public class DiscoveryStressExternalTestIT {
 	t4.setSearchText("temperature");
 	t4.setBbox("-10.9,35.23,2.2,43.434");
 	t4.setBboxrel(DiscoveryStressTest.BBOXREL.CONTAINS);
-
-	DiscoveryStressTest t5 = new DiscoveryStressTest();
-	t5.setBbox("-10.9,35.23,2.2,43.434");
-	t5.setBboxrel(DiscoveryStressTest.BBOXREL.CONTAINS);
-
+//
+//	DiscoveryStressTest t5 = new DiscoveryStressTest();
+//	t5.setBbox("-10.9,35.23,2.2,43.434");
+//	t5.setBboxrel(DiscoveryStressTest.BBOXREL.CONTAINS);
+//
+//	DiscoveryStressTest t5_1 = new DiscoveryStressTest();
+//	t5_1.setBbox("-160.9,-35.23,2.2,43.434");
+//	t5_1.setBboxrel(DiscoveryStressTest.BBOXREL.CONTAINS);
+//
+//	DiscoveryStressTest t5_2 = new DiscoveryStressTest();
+//	t5_2.setBbox("-160.9,-35.23,2.2,43.434");
+//	t5_2.setBboxrel(DiscoveryStressTest.BBOXREL.OVERLAPS);
+//
+//	DiscoveryStressTest t5_3 = new DiscoveryStressTest();
+//	t5_3.setBbox("0.9,42.23,2.2,43.434");
+//	t5_3.setBboxrel(DiscoveryStressTest.BBOXREL.CONTAINS);
+//
+//	DiscoveryStressTest t5_4 = new DiscoveryStressTest();
+//	t5_4.setBbox("0.9,42.23,2.2,43.434");
+//	t5_4.setBboxrel(DiscoveryStressTest.BBOXREL.OVERLAPS);
+//
 	DiscoveryStressTest t6 = new DiscoveryStressTest();
 	t6.setBbox("-10.9,35.23,2.2,43.434");
 	t6.setView("geoss");
+//
+//	DiscoveryStressTest t6_1 = new DiscoveryStressTest();
+//	t6_1.setSearchText("deforestation");
+//	t6_1.setView("geoss");
+//
+//	DiscoveryStressTest t6_2 = new DiscoveryStressTest();
+//	t6_2.setSearchText("deforestation");
+//	t6_2.setBbox("-10.9,35.23,2.2,43.434");
+//	t6_2.setView("geoss");
 
 	StressPlan plan = new StressPlan();
 	plan.addStressTest(t1);
 	plan.addStressTest(t2);
 	plan.addStressTest(t3);
 	plan.addStressTest(t4);
-	plan.addStressTest(t5);
+//	plan.addStressTest(t5);
+//	plan.addStressTest(t5_1);
+//	plan.addStressTest(t5_2);
+//	plan.addStressTest(t5_3);
+//	plan.addStressTest(t5_4);
 	plan.addStressTest(t6);
+//	plan.addStressTest(t6_1);
+//	plan.addStressTest(t6_2);
 	plan.setParallelRequests(2);
-	plan.setMultiplicationFactor(1);
+	plan.setMultiplicationFactor(4);
 
 	return plan;
     }
 
-    private static void saveCSV(List<String> csvColumns, List<List<String>> valueList, OutputStream outfile) throws IOException {
+    private static void saveCSV(List<String> csvColumns, List<Map<String, StressTestCSVValue>> valueList, OutputStream outfile) throws IOException {
 	OutputStreamWriter writer = new OutputStreamWriter(outfile);
 	csvColumns.stream().forEach(c -> {
 	    try {
@@ -71,9 +104,9 @@ public class DiscoveryStressExternalTestIT {
 
 	writer.write(System.lineSeparator());
 	valueList.stream().forEach(values -> {
-	    values.stream().forEach(c -> {
+	    csvColumns.stream().forEach(c -> {
 		try {
-		    writer.write(c);
+		    writer.write(values.get(c).getValue());
 		    writer.write(",");
 		} catch (IOException e) {
 		    throw new RuntimeException(e);
@@ -98,7 +131,7 @@ public class DiscoveryStressExternalTestIT {
 
 	List<String> csvColumns = new ArrayList<>();
 
-	List<List<String>> valueList = new ArrayList<>();
+	List<Map<String, StressTestCSVValue>> valueList = new ArrayList<>();
 
 	File testresultFolder = new File(source + "/stresstest/");
 
@@ -112,7 +145,7 @@ public class DiscoveryStressExternalTestIT {
 
 	Arrays.asList("production", "preproduction", "test").stream().forEach(env -> {
 
-	    Arrays.asList(1, 2, 4).stream().forEach(parallel -> {
+	    Arrays.asList(1, 2 , 4, 8).stream().forEach(parallel -> {
 
 		String hostname = "https://gs-service-" + env + ".geodab.eu";
 		plan.setParallelRequests(parallel);

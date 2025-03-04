@@ -1,5 +1,6 @@
 package eu.essi_lab.stress.plan;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -54,16 +55,16 @@ public class StressPlanResultCollector {
 	return columns;
     }
 
-    public List<String> getCSVColumnValues() {
+    public Map<String, StressTestCSVValue> getCSVColumnValues() {
 
-	List<String> values = new ArrayList<>();
+	Map<String, StressTestCSVValue> values = new HashMap<>();
 
-	values.add(host);
-	values.add(getResults().size() + "");
-	values.add(totalOkTests() + "");
-	values.add(getResults().size() - totalOkTests() + "");
-	values.add(meanExecutionTime() + "");
-	values.add(getPlan().getParallelRequests() + "");
+	values.put("host", new StressTestCSVValue("host", host));
+	values.put("total_req", new StressTestCSVValue("total_req", getResults().size() + ""));
+	values.put("total_succ", new StressTestCSVValue("total_succ", totalOkTests() + ""));
+	values.put("total_fail", new StressTestCSVValue("total_fail", getResults().size() - totalOkTests() + ""));
+	values.put("total_mean_exec_time", new StressTestCSVValue("total_mean_exec_time", meanExecutionTime() + ""));
+	values.put("max_parallel", new StressTestCSVValue("max_parallel", getPlan().getParallelRequests() + ""));
 
 	Map<String, Integer> totalByType = totalByType();
 	Map<String, Integer> successByType = successByType();
@@ -73,12 +74,14 @@ public class StressPlanResultCollector {
 
 	totalByType.keySet().stream().forEach(c -> {
 
-	    values.add(totalByType.get(c) + "");
-	    values.add(successByType.get(c) + "");
-	    values.add(totalByType.get(c) - successByType.get(c) + "");
-	    values.add(meanExecByType.get(c) + "");
+	    values.put("total_" + c, new StressTestCSVValue("total_" + c, totalByType.get(c) + ""));
+	    values.put("success_" + c, new StressTestCSVValue("success_" + c, successByType.get(c) + ""));
+	    values.put("fail_" + c, new StressTestCSVValue("fail_" + c, totalByType.get(c) - successByType.get(c) + ""));
+	    values.put("mean_exec_" + c, new StressTestCSVValue("mean_exec_" + c, meanExecByType.get(c) + ""));
 
-	    metricsByType.get(c).keySet().stream().forEach(m -> values.add(metricsByType.get(c).get(m) + ""));
+	    metricsByType.get(c).keySet().stream().forEach(m ->
+		    values.put(m + "_" + c, new StressTestCSVValue(m + "_" + c, metricsByType.get(c).get(m) + ""))
+	    );
 
 	});
 
@@ -87,7 +90,7 @@ public class StressPlanResultCollector {
 
     public void saveReportToCSV(OutputStream out) throws IOException {
 	List<String> columns = getCSVColumns();
-	List<String> values = getCSVColumnValues();
+	Map<String, StressTestCSVValue> values = getCSVColumnValues();
 
 	OutputStreamWriter writer = new OutputStreamWriter(out);
 	columns.stream().forEach(c -> {
@@ -101,9 +104,9 @@ public class StressPlanResultCollector {
 
 	writer.write(System.lineSeparator());
 
-	values.stream().forEach(c -> {
+	columns.stream().forEach(c -> {
 	    try {
-		writer.write(c);
+		writer.write(values.get(c).getValue());
 		writer.write(",");
 	    } catch (IOException e) {
 		throw new RuntimeException(e);
@@ -215,6 +218,8 @@ public class StressPlanResultCollector {
 		if (d > 0) {
 		    Long mean = n / d;
 
+		    logger.debug("For test key {} total of metric {} is {}, calculated mean is {}", key, metric, n, mean);
+
 		    map.get(key).put(metric, mean);
 		}
 	    });
@@ -223,6 +228,8 @@ public class StressPlanResultCollector {
 
 	return map;
     }
+
+    private GSLoggerFactory.GSLogger logger = GSLoggerFactory.getLogger(getClass());
 
     private Map<String, Long> meanExecByType() {
 	Map<String, Long> map = new HashMap<>();

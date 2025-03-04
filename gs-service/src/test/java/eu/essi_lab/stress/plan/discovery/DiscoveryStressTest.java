@@ -1,6 +1,7 @@
 package eu.essi_lab.stress.plan.discovery;
 
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.stress.plan.IStressTest;
 import java.io.File;
@@ -28,6 +29,8 @@ public class DiscoveryStressTest implements IStressTest {
     private List<String> sources = new ArrayList<>();
 
     private String view;
+
+    private GSLoggerFactory.GSLogger logger = GSLoggerFactory.getLogger(getClass());
 
     private String createRequestParameters() {
 	String rid = "stresstest-" + UUID.randomUUID().toString();
@@ -174,9 +177,14 @@ public class DiscoveryStressTest implements IStressTest {
 
 	    Number results = reader.evaluateNumber("/*:feed/*:totalResults");
 
-	    return results.longValue();
+	    Long value = results.longValue();
+
+	    logger.debug("Read metric {} with value {} from file {} for test key {}", metric,value, filePath, createTestKey());
+
+	    return value;
 	} catch (SAXException | IOException | XPathExpressionException e) {
 	    e.printStackTrace();
+	    logger.error(e);
 	}
 	return 0L;
     }
