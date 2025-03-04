@@ -96,7 +96,7 @@ public class ComputationResult {
 
 	    return Optional.of(values);
 
-	} catch (IndexOutOfBoundsException ex) {
+	} catch (Exception ex) {
 	    return Optional.empty();
 	}
     }

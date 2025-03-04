@@ -4,6 +4,7 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -265,6 +266,22 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    map.put(TIME_NOW_AGGREGATION, aggregationNow);
 	}
 
+	if (frequencyTargets.isPresent()) {
+	    int max = 10;
+	    if (maxFrequencyItems.isPresent()) {
+		max = maxFrequencyItems.get();
+	    }
+	    List<Queryable> targets = frequencyTargets.get();
+	    for (Queryable target : targets) {
+		int fmax = max;
+		String fieldName = target.getName();
+		map.put("top-" + target.getName(), Aggregation.of(a -> a.terms(t -> //
+		t.field(DataFolderMapping.toKeywordField(fieldName)) //
+			.size(fmax) //
+		)));
+	    }
+	}
+
 	StatisticsResponse ret;
 	if (groupByTarget.isPresent()) {
 	    int maxGroupBySize = 1000;
@@ -366,9 +383,11 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		    if (geoBound != null) {
 			ComputationResult result = new ComputationResult();
 			result.setTarget("bbox");
-			TopLeftBottomRightGeoBounds tlbr = geoBound.bounds().tlbr();
-			result.setValue(tlbr.topLeft().latlon().lon() + " " + tlbr.bottomRight().latlon().lat() + " "
-				+ tlbr.bottomRight().latlon().lon() + " " + tlbr.topLeft().latlon().lat());
+			if (geoBound.bounds() != null) {
+			    TopLeftBottomRightGeoBounds tlbr = geoBound.bounds().tlbr();
+			    result.setValue(tlbr.topLeft().latlon().lon() + " " + tlbr.bottomRight().latlon().lat() + " "
+				    + tlbr.bottomRight().latlon().lon() + " " + tlbr.topLeft().latlon().lat());
+			}
 			item.setBBoxUnion(result);
 		    }
 		}
@@ -393,7 +412,29 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		    result.setValue(dateMinStr + " " + dateMaxStr);
 		    item.setTempExtentUnion(result);
 		}
+		if (frequencyTargets.isPresent()) {
+		    List<Queryable> targets = frequencyTargets.get();
+		    for (Queryable target : targets) {
+			Aggregate agg = mapa.get("top-" + target.getName());
+			if (agg != null && agg.isSterms()) {
+			    StringTermsAggregate sterms = agg.sterms();
+			    List<StringTermsBucket> groups = sterms.buckets().array();
+			    ComputationResult freq = new ComputationResult();
+			    freq.setTarget(target.getName());
+			    String frequencyValue = "";
+			    for (StringTermsBucket group : groups) {
+				String value = group.key();
+				long count = group.docCount();
+				frequencyValue += URLEncoder.encode(value, "UTF-8") + ComputationResult.FREQUENCY_ITEM_SEP + count + " ";
+			    }
+			    freq.setValue(frequencyValue);
+			    item.addFrequency(freq);
+			}
+
+		    }
+		}
 		ret.getItems().add(item);
+
 	    }
 
 	    return ret;
