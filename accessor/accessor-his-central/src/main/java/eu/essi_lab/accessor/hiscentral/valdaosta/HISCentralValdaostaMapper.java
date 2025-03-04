@@ -48,6 +48,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.FileIdentifierMapper;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
@@ -479,7 +480,7 @@ public class HISCentralValdaostaMapper extends FileIdentifierMapper {
 	referenceSystem.setCode("EPSG:4326");
 	referenceSystem.setCodeSpace("EPSG");
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
-	
+
 	if (pointLat != null && pointLon != null) {
 	    coreMetadata.addBoundingBox(//
 		    pointLat, //
@@ -571,6 +572,18 @@ public class HISCentralValdaostaMapper extends FileIdentifierMapper {
 	CoverageDescription coverageDescription = new CoverageDescription();
 
 	coverageDescription.setAttributeIdentifier(measureName);
+
+	if (measureName.contains(" max")) {
+	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MAX);
+	}
+	if (measureName.contains(" min")) {
+	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MIN);
+	}
+
+	if (measureName.startsWith("Portata ")) {
+	    measureName = "Portata";
+	}
+
 	coverageDescription.setAttributeTitle(measureName);
 
 	String missingValue = "-9999";
@@ -586,7 +599,7 @@ public class HISCentralValdaostaMapper extends FileIdentifierMapper {
 
 	// as no description is given this field is calculated
 	HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
-	
+
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
 	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
