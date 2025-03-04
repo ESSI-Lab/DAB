@@ -218,8 +218,6 @@ public class StressPlanResultCollector {
 		if (d > 0) {
 		    Long mean = n / d;
 
-		    logger.debug("For test key {} total of metric {} is {}, calculated mean is {}", key, metric, n, mean);
-
 		    map.get(key).put(metric, mean);
 		}
 	    });
@@ -228,8 +226,6 @@ public class StressPlanResultCollector {
 
 	return map;
     }
-
-    private GSLoggerFactory.GSLogger logger = GSLoggerFactory.getLogger(getClass());
 
     private Map<String, Long> meanExecByType() {
 	Map<String, Long> map = new HashMap<>();

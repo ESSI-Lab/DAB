@@ -30,8 +30,6 @@ public class DiscoveryStressTest implements IStressTest {
 
     private String view;
 
-    private GSLoggerFactory.GSLogger logger = GSLoggerFactory.getLogger(getClass());
-
     private String createRequestParameters() {
 	String rid = "stresstest-" + UUID.randomUUID().toString();
 
@@ -179,12 +177,10 @@ public class DiscoveryStressTest implements IStressTest {
 
 	    Long value = results.longValue();
 
-	    logger.debug("Read metric {} with value {} from file {} for test key {}", metric,value, filePath, createTestKey());
-
 	    return value;
 	} catch (SAXException | IOException | XPathExpressionException e) {
 	    e.printStackTrace();
-	    logger.error(e);
+
 	}
 	return 0L;
     }
