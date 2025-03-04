@@ -41,6 +41,7 @@ import eu.essi_lab.lib.xml.XMLDocumentReader;
 import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
 import net.opengis.iso19139.gmx.v_20060504.AnchorType;
+import net.opengis.iso19139.gmx.v_20060504.MimeFileTypeType;
 
 /**
  * @author Fabrizio
@@ -249,6 +250,9 @@ public class ISOMetadata<T> extends DOMSerializer {
 	    } else if (value instanceof CodeListValueType) {
 		CodeListValueType clvt = (CodeListValueType) value;
 		return clvt.getValue();
+	    } else if (value instanceof MimeFileTypeType) {
+		MimeFileTypeType mftt = (MimeFileTypeType) value;
+		return mftt.getValue();
 	    } else {
 		return value.toString();
 	    }
