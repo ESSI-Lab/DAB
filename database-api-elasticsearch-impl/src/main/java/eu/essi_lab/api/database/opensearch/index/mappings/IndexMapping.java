@@ -83,8 +83,17 @@ public abstract class IndexMapping {
      */
     public static List<String> getIndexes() {
 
+	return getIndexes(true);
+    }
+
+    /**
+     * @param indexAlias indexAlias <code>true</code> to get the index alias, if present
+     * @return
+     */
+    public static List<String> getIndexes(boolean indexAlias) {
+
 	return MAPPINGS.stream().//
-		map(i -> i.getIndex()).//
+		map(i -> i.getIndex(indexAlias)).//
 		collect(Collectors.toList());
     }
 
