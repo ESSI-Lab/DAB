@@ -15,12 +15,14 @@ import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.client.opensearch.indices.CreateIndexResponse;
 import org.opensearch.client.opensearch.indices.ExistsRequest;
+import org.opensearch.client.opensearch.indices.PutAliasRequest;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.aws.AwsSdk2Transport;
 import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
@@ -173,11 +175,28 @@ public class OpenSearchDatabase extends Database {
 
 	for (IndexMapping mapping : IndexMapping.MAPPINGS) {
 
-	    boolean exists = checkIndex(getClient(), mapping.getIndex());
+	    boolean exists = checkIndex(getClient(), mapping.getIndex(false));
 
 	    if (!exists) {
 
 		createIndexWithGenericCLient(mapping);
+
+		if (mapping.hasIndexAlias()) {
+
+		    GSLoggerFactory.getLogger(getClass()).info("Put alias {} STARTED", mapping.getIndex());
+
+		    PutAliasRequest putAliasRequest = mapping.createPutAliasRequest();
+
+		    try {
+			client.indices().putAlias(putAliasRequest);
+
+		    } catch (OpenSearchException | IOException e) {
+
+			throw GSException.createException(getClass(), "OpenSearchDatabaseCreatePutAliasError", e);
+		    }
+		    
+		    GSLoggerFactory.getLogger(getClass()).info("Put alias {} ENDED", mapping.getIndex());
+		}
 	    }
 	}
 
@@ -453,7 +472,7 @@ public class OpenSearchDatabase extends Database {
 
 	    Response response = client.generic().execute(//
 		    Requests.builder().//
-			    endpoint(mapping.getIndex()).//
+			    endpoint(mapping.getIndex(false)).//
 			    method("PUT").//
 			    json(mapping.getMapping()).build());
 
