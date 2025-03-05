@@ -220,7 +220,17 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	String measureName = measure.optString("measure_name");
 	String measureUnits = measure.optString("measure_unit");
 	
-	measureName = measureName.toLowerCase().contains("precipitazione") ? "Precipitazione" : measureName;
+	String varName = measureName;
+	
+	if(measureName.toLowerCase().contains("precipitazione")){
+	    varName = "Precipitazione";
+	}else if (measureName.toLowerCase().contains("pioggia")) {
+	    varName = "Pioggia";
+	}else if(measureName.toLowerCase().contains("temperatura")) {
+	    varName = "Temperatura";
+	}
+	
+
 
 	String timeSeriesId = stationInfo.optString("time-series-id");
 
@@ -513,6 +523,8 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 
 	coverageDescription.setAttributeIdentifier(measureName);
 	coverageDescription.setAttributeTitle(measureName);
+	
+	coverageDescription.setAttributeDescription(varName);
 
 	String missingValue = "-9999";
 	dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
