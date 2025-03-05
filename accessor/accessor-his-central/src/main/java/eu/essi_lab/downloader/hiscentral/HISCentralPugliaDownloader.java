@@ -209,6 +209,8 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 
 		    Double value = data.optDouble("valore_misura");// data.optString("value");
 
+		    Integer validationCode = data.optIntegerObject("codice_validazione", null);
+		    
 		    ValueSingleVariable variable = new ValueSingleVariable();
 
 		    BigDecimal missingValue = new BigDecimal("-9999.0");
@@ -225,6 +227,10 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 		    //
 
 		    variable.setValue(dataValue);
+		    
+		    if(validationCode != null) {
+			variable.setQualityControlLevelCode(String.valueOf(validationCode));
+		    }
 
 		    //
 		    // date
