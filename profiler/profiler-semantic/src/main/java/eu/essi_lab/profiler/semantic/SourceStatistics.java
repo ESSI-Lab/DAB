@@ -115,14 +115,16 @@ public class SourceStatistics {
 	    stats.setUniqueAttributeCount(responseItem.getCountDistinct(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER).get().getValue());
 	    stats.setAttributeCount(responseItem.getCountDistinct(MetadataElement.ATTRIBUTE_TITLE).get().getValue());
 	    stats.setTimeSeriesCount(responseItem.getCountDistinct(MetadataElement.ONLINE_ID).get().getValue());
-	    CardinalValues cardinalValues = responseItem.getBBoxUnion().getCardinalValues().get();
+	    Optional<CardinalValues> cardinalValues = responseItem.getBBoxUnion().getCardinalValues();
 	    String union = responseItem.getTempExtentUnion().getValue();
 	    String begin = union.split(" ")[0];
 	    String end = union.split(" ")[1];
-	    stats.setEast(Double.parseDouble(cardinalValues.getEast()));
-	    stats.setNorth(Double.parseDouble(cardinalValues.getNorth()));
-	    stats.setWest(Double.parseDouble(cardinalValues.getWest()));
-	    stats.setSouth(Double.parseDouble(cardinalValues.getSouth()));
+	    if (cardinalValues.isPresent()) {
+	    stats.setEast(Double.parseDouble(cardinalValues.get().getEast()));
+	    stats.setNorth(Double.parseDouble(cardinalValues.get().getNorth()));
+	    stats.setWest(Double.parseDouble(cardinalValues.get().getWest()));
+	    stats.setSouth(Double.parseDouble(cardinalValues.get().getSouth()));
+	    }
 	    stats.setBegin(begin);
 	    stats.setEnd(end);
 	    stats.setMinimumAltitude(responseItem.getMin(MetadataElement.ELEVATION_MIN).get().getValue());
