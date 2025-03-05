@@ -566,6 +566,20 @@ public class OpenSearchQueryBuilder {
 
     /**
      * @param databaseId
+     * @param viewId
+     * @return
+     */
+    public static Query buildSearchViewQuery(String databaseId, String viewId) {
+
+	Query databaseIdQuery = buildDatabaseIdQuery(databaseId);
+
+	Query viewIdQuery = buildMatchPhraseQuery(ViewsMapping.VIEW_ID, viewId);
+
+	return buildBoolQuery(Arrays.asList(databaseIdQuery, viewIdQuery), Arrays.asList(), Arrays.asList());
+    }
+
+    /**
+     * @param databaseId
      * @param creator
      * @param owner
      * @param visibility
@@ -886,118 +900,118 @@ public class OpenSearchQueryBuilder {
      */
     @SuppressWarnings("incomplete-switch")
     private Query buildTempExtentQuery(MetadataElement el, BondOperator operator, String value) {
-    
-        switch (operator) {
-        case EXISTS:
-    
-            return buildExistsFieldQuery(el.getName());
-    
-        case NOT_EXISTS:
-    
-            return buildNotExistsFieldQuery(el.getName());
-    
-        default:
-    
-            List<Query> operands = new ArrayList<>();
-            Date nowDate = new Date();
-            DateTimeFormatter formatter = ISODateTimeFormat.dateTimeParser().withChronology(ISOChronology.getInstance(DateTimeZone.UTC));
-            DateTime parsed;
-            if (value.equals("now") || value.equals("NOW")) {
-        	parsed = new DateTime();
-            } else {
-        	parsed = formatter.parseDateTime(value);
-            }
-    
-            Date literalDate = parsed.toDate();
-    
-            switch (el) {
-    
-            case TEMP_EXTENT_BEGIN: {
-        	// ------------------------------------------------------------
-        	//
-        	// creates the now query in case of TEMP_EXTENT_BEGIN element and:
-        	//
-        	// OP = '<' AND (TARGET > NOW) OR
-        	// OP = '<=' AND (TARGET >= NOW) OR
-        	// OP = '>' AND (TARGET < NOW) OR
-        	// OP = '>=' AND (TARGET <= NOW)
-        	//
-        	if (operator == BondOperator.LESS && literalDate.compareTo(nowDate) > 0 || //
-        		operator == BondOperator.LESS_OR_EQUAL && literalDate.compareTo(nowDate) >= 0 || //
-        		operator == BondOperator.GREATER && literalDate.compareTo(nowDate) < 0 || //
-        		operator == BondOperator.GREATER_OR_EQUAL && literalDate.compareTo(nowDate) <= 0) {
-    
-        	    operands.add(buildTempExtentNowQuery(el));
-        	}
-    
-        	//
-        	//
-        	// ------------------------------------------------
-        	//
-        	//
-    
-        	for (FrameValue frameValue : FrameValue.values()) {
-    
-        	    Date dateBeforeNow = new Date(System.currentTimeMillis() - Long.valueOf(frameValue.asMillis()));
-    
-        	    if (operator == BondOperator.LESS && literalDate.compareTo(dateBeforeNow) > 0 || //
-        		    operator == BondOperator.LESS_OR_EQUAL && literalDate.compareTo(dateBeforeNow) >= 0 || //
-    
-        		    operator == BondOperator.GREATER && literalDate.compareTo(dateBeforeNow) < 0 || //
-        		    operator == BondOperator.GREATER_OR_EQUAL && literalDate.compareTo(dateBeforeNow) <= 0) {
-    
-        		Query beforeNowQuery = buildTempExtentBeforeNowQuery(el, frameValue.name());
-    
-        		operands.add(beforeNowQuery);
-        	    }
-        	}
-    
-        	//
-        	//
-        	// ------------------------------------------------
-        	//
-        	//
-    
-        	break;
-            }
-    
-            case TEMP_EXTENT_END:
-        	// ------------------------------------------------------------
-        	//
-        	// creates the now query in case of TEMP_EXTENT_END element and:
-        	//
-        	// OP = '>' AND (TARGET < NOW) OR
-        	// OP = '>=' AND (TARGET <= NOW) OR
-        	// OP = '<' AND (TARGET > NOW) OR
-        	// OP = '<=' AND (TARGET >= NOW)
-        	//
-        	if (operator == BondOperator.GREATER && literalDate.compareTo(nowDate) < 0 || //
-        		operator == BondOperator.GREATER_OR_EQUAL && literalDate.compareTo(nowDate) <= 0 || //
-        		operator == BondOperator.LESS && literalDate.compareTo(nowDate) > 0 || //
-        		operator == BondOperator.LESS_OR_EQUAL && literalDate.compareTo(nowDate) >= 0) {
-    
-        	    operands.add(buildTempExtentNowQuery(el));
-        	}
-            }
-    
-            // -----------------
-            //
-            // creates the query
-            //
-            
-            value = ConversionUtils.parseToLongString(value);
-            
-            Query literalQuery = buildRangeQuery(el.getName(), operator, value);
-    
-            if (operands.isEmpty()) {
-    
-        	return literalQuery;
-            }
-    
-            operands.add(literalQuery);
-    
-            return buildShouldQuery(operands);
-        }
+
+	switch (operator) {
+	case EXISTS:
+
+	    return buildExistsFieldQuery(el.getName());
+
+	case NOT_EXISTS:
+
+	    return buildNotExistsFieldQuery(el.getName());
+
+	default:
+
+	    List<Query> operands = new ArrayList<>();
+	    Date nowDate = new Date();
+	    DateTimeFormatter formatter = ISODateTimeFormat.dateTimeParser().withChronology(ISOChronology.getInstance(DateTimeZone.UTC));
+	    DateTime parsed;
+	    if (value.equals("now") || value.equals("NOW")) {
+		parsed = new DateTime();
+	    } else {
+		parsed = formatter.parseDateTime(value);
+	    }
+
+	    Date literalDate = parsed.toDate();
+
+	    switch (el) {
+
+	    case TEMP_EXTENT_BEGIN: {
+		// ------------------------------------------------------------
+		//
+		// creates the now query in case of TEMP_EXTENT_BEGIN element and:
+		//
+		// OP = '<' AND (TARGET > NOW) OR
+		// OP = '<=' AND (TARGET >= NOW) OR
+		// OP = '>' AND (TARGET < NOW) OR
+		// OP = '>=' AND (TARGET <= NOW)
+		//
+		if (operator == BondOperator.LESS && literalDate.compareTo(nowDate) > 0 || //
+			operator == BondOperator.LESS_OR_EQUAL && literalDate.compareTo(nowDate) >= 0 || //
+			operator == BondOperator.GREATER && literalDate.compareTo(nowDate) < 0 || //
+			operator == BondOperator.GREATER_OR_EQUAL && literalDate.compareTo(nowDate) <= 0) {
+
+		    operands.add(buildTempExtentNowQuery(el));
+		}
+
+		//
+		//
+		// ------------------------------------------------
+		//
+		//
+
+		for (FrameValue frameValue : FrameValue.values()) {
+
+		    Date dateBeforeNow = new Date(System.currentTimeMillis() - Long.valueOf(frameValue.asMillis()));
+
+		    if (operator == BondOperator.LESS && literalDate.compareTo(dateBeforeNow) > 0 || //
+			    operator == BondOperator.LESS_OR_EQUAL && literalDate.compareTo(dateBeforeNow) >= 0 || //
+
+			    operator == BondOperator.GREATER && literalDate.compareTo(dateBeforeNow) < 0 || //
+			    operator == BondOperator.GREATER_OR_EQUAL && literalDate.compareTo(dateBeforeNow) <= 0) {
+
+			Query beforeNowQuery = buildTempExtentBeforeNowQuery(el, frameValue.name());
+
+			operands.add(beforeNowQuery);
+		    }
+		}
+
+		//
+		//
+		// ------------------------------------------------
+		//
+		//
+
+		break;
+	    }
+
+	    case TEMP_EXTENT_END:
+		// ------------------------------------------------------------
+		//
+		// creates the now query in case of TEMP_EXTENT_END element and:
+		//
+		// OP = '>' AND (TARGET < NOW) OR
+		// OP = '>=' AND (TARGET <= NOW) OR
+		// OP = '<' AND (TARGET > NOW) OR
+		// OP = '<=' AND (TARGET >= NOW)
+		//
+		if (operator == BondOperator.GREATER && literalDate.compareTo(nowDate) < 0 || //
+			operator == BondOperator.GREATER_OR_EQUAL && literalDate.compareTo(nowDate) <= 0 || //
+			operator == BondOperator.LESS && literalDate.compareTo(nowDate) > 0 || //
+			operator == BondOperator.LESS_OR_EQUAL && literalDate.compareTo(nowDate) >= 0) {
+
+		    operands.add(buildTempExtentNowQuery(el));
+		}
+	    }
+
+	    // -----------------
+	    //
+	    // creates the query
+	    //
+
+	    value = ConversionUtils.parseToLongString(value);
+
+	    Query literalQuery = buildRangeQuery(el.getName(), operator, value);
+
+	    if (operands.isEmpty()) {
+
+		return literalQuery;
+	    }
+
+	    operands.add(literalQuery);
+
+	    return buildShouldQuery(operands);
+	}
     }
 
     /**
@@ -1006,11 +1020,11 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     private Query buildTempExtentBeforeNowQuery(MetadataElement el, String longTime) {
-    
-        // using the keyword field
-        String field = DataFolderMapping.toKeywordField(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW.getName());
-    
-        return buildRangeQuery(field, BondOperator.EQUAL, longTime);
+
+	// using the keyword field
+	String field = DataFolderMapping.toKeywordField(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW.getName());
+
+	return buildRangeQuery(field, BondOperator.EQUAL, longTime);
     }
 
     /**
@@ -1018,12 +1032,12 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     private Query buildTempExtentNowQuery(MetadataElement el) {
-    
-        String field = el == MetadataElement.TEMP_EXTENT_BEGIN ? //
-        	IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName() : //
-        	IndexedElements.TEMP_EXTENT_END_NOW.getElementName();
-    
-        return buildRangeQuery(field, BondOperator.EQUAL, "true");
+
+	String field = el == MetadataElement.TEMP_EXTENT_BEGIN ? //
+		IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName() : //
+		IndexedElements.TEMP_EXTENT_END_NOW.getElementName();
+
+	return buildRangeQuery(field, BondOperator.EQUAL, "true");
     }
 
     /**
