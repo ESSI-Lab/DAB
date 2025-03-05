@@ -50,6 +50,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.FileIdentifierMapper;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
@@ -142,12 +143,12 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
 
 	JSONObject stationInfo = retrieveStationInfo(originalMD);
-	
+
 	JSONObject aggregationInfo = retrieveAggregationInfo(originalMD);
-	
+
 	String aggregationId = aggregationInfo.optString("id_aggregation");
-	String aggregationName =aggregationInfo.optString("name");
-	String aggregationType =aggregationInfo.optString("aggregration");
+	String aggregationName = aggregationInfo.optString("name");
+	String aggregationAggregation = aggregationInfo.optString("aggregation");
 
 	String resourceTitle = stationInfo.optString("station_name");
 	String resourceAbstract = datasetInfo.optString("description"); // always null
@@ -219,8 +220,16 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	String measureId = measure.optString("id_measure");
 	String measureName = measure.optString("measure_name");
 	String measureUnits = measure.optString("measure_unit");
-	
-	measureName = measureName.toLowerCase().contains("precipitazione") ? "Precipitazione" : measureName;
+
+	String varName = measureName;
+
+	if (measureName.toLowerCase().contains("precipitazione")) {
+	    varName = "Precipitazione";
+	} else if (measureName.toLowerCase().contains("pioggia")) {
+	    varName = "Pioggia";
+	} else if (measureName.toLowerCase().contains("temperatura aria")) {
+	    varName = "Temperatura aria";
+	}
 
 	String timeSeriesId = stationInfo.optString("time-series-id");
 
@@ -299,9 +308,8 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 	coreMetadata.addDistributionFormat("WaterML 1.1");
 
-	coreMetadata.getMIMetadata().getDataIdentification()
-		.setCitationTitle(resourceTitle +  " - " + aggregationName);
-	coreMetadata.getMIMetadata().getDataIdentification().setAbstract(resourceTitle +  " - " + aggregationName);
+	coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(resourceTitle + " - " + aggregationName);
+	coreMetadata.getMIMetadata().getDataIdentification().setAbstract(resourceTitle + " - " + aggregationName);
 
 	//
 	// id
@@ -407,10 +415,12 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	//
 	// keywords
 	//
-	coreMetadata.getMIMetadata().getDataIdentification().addKeyword(measureName);
-	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword(measureDescription);
 
-	coreMetadata.getMIMetadata().getDataIdentification().addKeyword("PUGLIA");
+	Keywords general = new Keywords();
+	general.setTypeCode("general");
+	general.addKeyword("Puglia");
+	general.addKeyword(measureName);
+	coreMetadata.getMIMetadata().getDataIdentification().addKeywords(general);
 
 	Keywords kwd = new Keywords();
 	kwd.setTypeCode("platform");
@@ -490,11 +500,13 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	//
 	// distribution info, download
 	//
-	
+
 	// data linkage (last 24 hours)
 	String linkage = HISCentralPugliaConnector.BASE_URL.endsWith("/")
-		? HISCentralPugliaConnector.BASE_URL + "data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/" + measureId
-		: HISCentralPugliaConnector.BASE_URL + "/data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/" + measureId;
+		? HISCentralPugliaConnector.BASE_URL + "data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/"
+			+ measureId
+		: HISCentralPugliaConnector.BASE_URL + "/data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/"
+			+ measureId;
 
 	Online online = new Online();
 	online.setLinkage(linkage);
@@ -511,8 +523,72 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 
 	CoverageDescription coverageDescription = new CoverageDescription();
 
-	coverageDescription.setAttributeIdentifier(measureName);
+	String[] splitAggregation = aggregationAggregation.split("_"); // p_sum_1y
+	String aggParameter = null;
+	String aggProcedure = null;
+	String aggPeriod = null;
+	if (splitAggregation.length == 3) {
+	    aggParameter = splitAggregation[0];// p
+	    aggProcedure = splitAggregation[1]; // sum
+	    aggPeriod = splitAggregation[2]; // 1y
+	} else if (splitAggregation.length == 2) {
+	    aggParameter = splitAggregation[0];// p
+	    aggProcedure = splitAggregation[1]; //
+	    aggPeriod = splitAggregation[1]; // rt
+	} else {
+	    System.out.println();
+	}
+
+	String aggPeriodNumbers = aggPeriod.replaceAll("\\D+", ""); // 1
+	String aggPeriodString = aggPeriod.replaceAll("\\d+", ""); // y
+
+	String duration = null;
+	switch (aggPeriodString) {
+	case "d":
+	    duration = "P" + aggPeriodNumbers + "D";
+	    break;
+	case "m":
+	    duration = "P" + aggPeriodNumbers + "M";
+	    break;
+	case "y":
+	    duration = "P" + aggPeriodNumbers + "Y";
+	    break;
+	case "min":
+	    duration = "PT" + aggPeriodNumbers + "M";
+	    break;
+	case "rt":
+	default:
+	    break;
+	}
+	if (duration != null) {
+	    dataset.getExtensionHandler().setTimeAggregationDuration8601(duration);
+	    dataset.getExtensionHandler().setTimeResolutionDuration8601(duration);
+	}
+	switch (aggProcedure) {
+	case "max":
+	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MAX);
+	    break;
+	case "min":
+	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MIN);
+	    break;
+	case "avg":
+	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.AVERAGE);
+	    break;
+	case "sum":
+	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
+	    break;
+	case "real-time":
+	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
+	    break;
+	default:
+	    dataset.getExtensionHandler().setTimeInterpolation(aggProcedure);
+	    break;
+	}
+
+	coverageDescription.setAttributeIdentifier(aggregationAggregation);
 	coverageDescription.setAttributeTitle(measureName);
+
+	coverageDescription.setAttributeDescription(aggregationName);
 
 	String missingValue = "-9999";
 	dataset.getExtensionHandler().setAttributeMissingValue(missingValue);

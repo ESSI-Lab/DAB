@@ -211,45 +211,41 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 		    }
 		    JSONArray data = (JSONArray) arr;
 
-		    Double value = data.optDouble(1);// data.optString("value");
-
 		    ValueSingleVariable variable = new ValueSingleVariable();
 
-		    if (value != null && !value.isNaN()) {
+		    //
+		    // value
+		    //
 
-			//
-			// value
-			//
+		    BigDecimal dataValue = data.optBigDecimal(1, new BigDecimal("-9999.0"));
+		    variable.setValue(dataValue);
 
-			BigDecimal dataValue = new BigDecimal(value);
-			variable.setValue(dataValue);
+		    //
+		    // date
+		    //
 
-			//
-			// date
-			//
+		    String date = data.optString(0);// data.optString("datetime");
 
-			String date = data.optString(0);// data.optString("datetime");
-
-			if (iso8601OutputFormat == null) {
-			    iso8601OutputFormat = date.contains(" ") ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN)
-				    : new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ITALIAN);
-			    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-			}
-
-			Date parsed = iso8601OutputFormat.parse(date);
-
-			GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-			gregCal.setTime(parsed);
-
-			XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
-			variable.setDateTimeUTC(xmlGregCal);
-
-			//
-			//
-			//
-
-			addValue(tsrt, variable);
+		    if (iso8601OutputFormat == null) {
+			iso8601OutputFormat = date.contains(" ") ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN)
+				: new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ITALIAN);
+			iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 		    }
+
+		    Date parsed = iso8601OutputFormat.parse(date);
+
+		    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+		    gregCal.setTime(parsed);
+
+		    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+		    variable.setDateTimeUTC(xmlGregCal);
+
+		    //
+		    //
+		    //
+
+		    addValue(tsrt, variable);
+
 		}
 
 		JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);

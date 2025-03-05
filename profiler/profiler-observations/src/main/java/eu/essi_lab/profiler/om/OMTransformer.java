@@ -237,7 +237,10 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 
 	String providerCode = request.getParameterValue(APIParameters.PROVIDER);
 	if (providerCode != null) {
-	    operands.add(BondFactory.createSourceIdentifierBond(providerCode));
+	    String[] split = providerCode.split(",");
+	    for (String s : split) {
+		operands.add(BondFactory.createSourceIdentifierBond(s));
+	    }	    
 	}
 
 	switch (operands.size()) {

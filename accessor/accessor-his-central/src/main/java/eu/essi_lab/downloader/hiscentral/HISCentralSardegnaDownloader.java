@@ -203,18 +203,11 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 
 		    JSONObject data = (JSONObject) arr;
 
-		    Double value = data.optDouble("valore");// data.optString("value");
-
 		    ValueSingleVariable variable = new ValueSingleVariable();
 
 		    BigDecimal missingValue = new BigDecimal("-9999.0");
 
-		    BigDecimal dataValue = null;
-		    if (value == null || value.isNaN()) {
-			dataValue = missingValue;
-		    } else {
-			dataValue = new BigDecimal(value);
-		    }
+		    BigDecimal dataValue = data.optBigDecimal("valore", missingValue);
 
 		    //
 		    // value
