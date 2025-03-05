@@ -97,7 +97,7 @@ public class Dimension extends ISOMetadata<MDDimensionType> {
      * @XPathDirective(target = "gmd:dimensionSize/gco:Integer")
      */
     public BigInteger getDimensionSize() {
-	if (type.getDimensionSize()==null) {
+	if (type==null || type.getDimensionSize()==null) {
 	    return null;
 	}
 	return type.getDimensionSize().getInteger();	
