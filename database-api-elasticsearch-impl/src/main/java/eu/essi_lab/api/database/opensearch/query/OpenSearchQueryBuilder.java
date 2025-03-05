@@ -575,7 +575,7 @@ public class OpenSearchQueryBuilder {
 
 	Query viewIdQuery = buildMatchPhraseQuery(ViewsMapping.VIEW_ID, viewId);
 
-	return buildBoolQuery(Arrays.asList(databaseIdQuery, viewIdQuery), Arrays.asList(), Arrays.asList());
+	return buildFilterQuery(Arrays.asList(databaseIdQuery, viewIdQuery));
     }
 
     /**
