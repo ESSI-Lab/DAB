@@ -28,11 +28,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.opensearch.client.opensearch._types.mapping.BinaryProperty;
 import org.opensearch.client.opensearch._types.mapping.Property;
+import org.opensearch.client.opensearch.indices.PutAliasRequest;
 import org.opensearch.client.opensearch.indices.PutMappingRequest;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
@@ -74,6 +76,7 @@ public abstract class IndexMapping {
     // Elasticsearch suggests to use ignore_above = 32766 / 4 = 8191 since UTF-8 characters may occupy at most 4 bytes.
     //
     public static final int MAX_KEYWORD_LENGTH = 32766 / 4;
+    private boolean indexAlias;
 
     /**
      * @return
@@ -90,16 +93,45 @@ public abstract class IndexMapping {
      */
     protected IndexMapping(String index) {
 
+	this(index, false);
+    }
+
+    /**
+     * @param index
+     * @param indexAlias <code>true</code> to use an index alias
+     */
+    protected IndexMapping(String index, boolean indexAlias) {
+
 	this.index = index;
+	this.indexAlias = indexAlias;
 	this.mapping = new JSONObject(getBaseMapping());
     }
 
     /**
+     * Return the index associated to this mapping, or if present and <code>alias</code> is <code>true</code>, the index
+     * alias
+     * 
+     * @param alias
+     * @return
+     */
+    public String getIndex(boolean alias) {
+
+	if (alias) {
+
+	    return getIndexAlias().orElse(index);
+	}
+
+	return index;
+    }
+
+    /**
+     * Return the index associated to this mapping, or if present, the index alias
+     * 
      * @return
      */
     public String getIndex() {
 
-	return index;
+	return getIndex(true);
     }
 
     /**
@@ -136,6 +168,14 @@ public abstract class IndexMapping {
     }
 
     /**
+     * @return
+     */
+    public boolean hasIndexAlias() {
+
+	return indexAlias;
+    }
+
+    /**
      * @param key
      * @param type
      */
@@ -160,6 +200,23 @@ public abstract class IndexMapping {
 	mapping.getJSONObject("mappings").//
 		getJSONObject("properties").//
 		put(key, property);
+    }
+
+    /**
+     * @return
+     */
+    private Optional<String> getIndexAlias() {
+
+	return indexAlias ? Optional.ofNullable(toAlias(index)) : Optional.empty();
+    }
+
+    /**
+     * @param indexName
+     * @return
+     */
+    private static String toAlias(String indexName) {
+
+	return indexName + "_alias";
     }
 
     /**
