@@ -194,4 +194,12 @@ public abstract class IndexMapping {
 		index(index).//
 		build();
     }
+
+    /**
+     * @return
+     */
+    public PutAliasRequest createPutAliasRequest() {
+
+	return new PutAliasRequest.Builder().index(index).name(toAlias(index)).build();
+    }
 }
