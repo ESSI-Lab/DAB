@@ -150,7 +150,11 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 		}
 	    }
 
-	    ret.setResumptionToken(String.valueOf(page + 1));
+	    if(page == (metadataArray.length()-1)) {
+		ret.setResumptionToken(null);
+	    } else {
+		ret.setResumptionToken(String.valueOf(page + 1));
+	    }
 	    logger.debug("ADDED {} records for variable {}", partialNumbers, datasetMetadata.optString("description"));
 
 	} else {
