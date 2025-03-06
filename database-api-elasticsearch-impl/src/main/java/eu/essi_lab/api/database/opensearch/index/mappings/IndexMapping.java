@@ -126,10 +126,10 @@ public abstract class IndexMapping {
      */
     public String getIndex(boolean alias) {
 
-	if (alias) {
-
-	    return getIndexAlias().orElse(index);
-	}
+//	if (alias) {
+//
+//	    return getIndexAlias().orElse(index);
+//	}
 
 	return index;
     }
