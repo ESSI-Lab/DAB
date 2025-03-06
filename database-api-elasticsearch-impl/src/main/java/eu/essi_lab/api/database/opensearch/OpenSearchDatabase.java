@@ -177,26 +177,48 @@ public class OpenSearchDatabase extends Database {
 
 	    boolean exists = checkIndex(getClient(), mapping.getIndex(false));
 
+	    PutAliasRequest putAliasRequest = null;
+
 	    if (!exists) {
+
+		GSLoggerFactory.getLogger(getClass()).info("Creating index {} STARTED", mapping.getIndex());
 
 		createIndexWithGenericCLient(mapping);
 
+		GSLoggerFactory.getLogger(getClass()).info("Creating index {} ENDED", mapping.getIndex());
+
 		if (mapping.hasIndexAlias()) {
 
-		    GSLoggerFactory.getLogger(getClass()).info("Put alias {} STARTED", mapping.getIndex());
-
-		    PutAliasRequest putAliasRequest = mapping.createPutAliasRequest();
-
-		    try {
-			client.indices().putAlias(putAliasRequest);
-
-		    } catch (OpenSearchException | IOException e) {
-
-			throw GSException.createException(getClass(), "OpenSearchDatabaseCreatePutAliasError", e);
-		    }
-		    
-		    GSLoggerFactory.getLogger(getClass()).info("Put alias {} ENDED", mapping.getIndex());
+		    putAliasRequest = mapping.createPutAliasRequest();
 		}
+	    } else if (mapping.hasIndexAlias()) {
+
+		try {
+
+		    if (!client.indices().existsAlias(mapping.createExistsAliasRequest()).value()) {
+
+			putAliasRequest = mapping.createPutAliasRequest();
+		    }
+
+		} catch (OpenSearchException | IOException e) {
+
+		    throw GSException.createException(getClass(), "OpenSearchDatabaseExistsAliasError", e);
+		}
+	    }
+
+	    if (putAliasRequest != null) {
+
+		GSLoggerFactory.getLogger(getClass()).info("Put alias {} STARTED", mapping.getIndex());
+
+		try {
+		    client.indices().putAlias(putAliasRequest);
+
+		} catch (OpenSearchException | IOException e) {
+
+		    throw GSException.createException(getClass(), "OpenSearchDatabasePutAliasError", e);
+		}
+
+		GSLoggerFactory.getLogger(getClass()).info("Put alias {} ENDED", mapping.getIndex());
 	    }
 	}
 

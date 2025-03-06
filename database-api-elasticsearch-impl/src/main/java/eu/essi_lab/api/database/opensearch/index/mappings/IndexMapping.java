@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.opensearch.client.opensearch._types.mapping.BinaryProperty;
 import org.opensearch.client.opensearch._types.mapping.Property;
+import org.opensearch.client.opensearch.indices.ExistsAliasRequest;
 import org.opensearch.client.opensearch.indices.PutAliasRequest;
 import org.opensearch.client.opensearch.indices.PutMappingRequest;
 
@@ -259,6 +260,14 @@ public abstract class IndexMapping {
 		properties(key, property).//
 		index(index).//
 		build();
+    }
+
+    /**
+     * @return
+     */
+    public ExistsAliasRequest createExistsAliasRequest() {
+
+	return new ExistsAliasRequest.Builder().index(index).name(toAlias(index)).build();
     }
 
     /**
