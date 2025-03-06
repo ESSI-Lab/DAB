@@ -586,7 +586,7 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	}
 
 	coverageDescription.setAttributeIdentifier(aggregationAggregation);
-	coverageDescription.setAttributeTitle(measureName);
+	coverageDescription.setAttributeTitle(varName);
 
 	coverageDescription.setAttributeDescription(aggregationName);
 
