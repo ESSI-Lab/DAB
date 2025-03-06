@@ -55,6 +55,7 @@ import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
+import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -303,6 +304,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 		    Arrays.asList(MetaFolderMapping.SOURCE_ID, MetaFolderMapping.DATA_FOLDER), //
 		    0, //
 		    ids.size(), //
+		    Optional.empty(), //
+		    Optional.empty(), //
 		    true);// requesting cache
 
 	    response.//
@@ -420,8 +423,14 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		int start = message.getPage().getStart() - 1;
 		int size = message.getPage().getSize();
-
-		response = wrapper.search(DataFolderMapping.get().getIndex(), query, start, size);
+		
+		response = wrapper.search(//
+			DataFolderMapping.get().getIndex(),//
+			query,//
+			start,//
+			size,//
+			message.getOrderingProperty(),//
+			message.getOrderingDirection());
 	    }
 
 	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
