@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import eu.essi_lab.messages.count.AbstractCountResponse;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.rip.RuntimeInfoProvider;
@@ -38,11 +39,12 @@ import eu.essi_lab.rip.RuntimeInfoProvider;
  * @author Fabrizio
  */
 public abstract class MessageResponse<T, C extends AbstractCountResponse> implements RuntimeInfoProvider {
-   
+
     private List<T> results;
     private C countResponse;
     private GSException exception;
     private String profilerName;
+    private GSPropertyHandler propertyHandler;
 
     /**
      * 
@@ -50,6 +52,7 @@ public abstract class MessageResponse<T, C extends AbstractCountResponse> implem
     public MessageResponse() {
 	setException(GSException.createException());
 	setResultsList(new ArrayList<T>());
+	propertyHandler = new GSPropertyHandler();
     }
 
     /**
@@ -61,6 +64,7 @@ public abstract class MessageResponse<T, C extends AbstractCountResponse> implem
     public MessageResponse(MessageResponse<?, C> response) {
 	setException(response.getException());
 	setCountResponse(response.getCountResponse());
+	propertyHandler = new GSPropertyHandler();
     }
 
     /**
@@ -133,10 +137,19 @@ public abstract class MessageResponse<T, C extends AbstractCountResponse> implem
     }
 
     /**
+     * @return the propertyHandler
+     */
+    public GSPropertyHandler getPropertyHandler() {
+
+	return propertyHandler;
+    }
+
+    /**
      * @param exception
      */
     protected void setException(GSException exception) {
 
 	this.exception = exception;
     }
+
 }
