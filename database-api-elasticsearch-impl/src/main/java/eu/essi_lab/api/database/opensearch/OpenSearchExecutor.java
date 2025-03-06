@@ -3,8 +3,8 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.net.URLEncoder;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
