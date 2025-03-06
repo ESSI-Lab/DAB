@@ -612,9 +612,7 @@ public class OpenSearchQueryBuilder {
 
 	filterList.add(databaseIdQuery);
 
-	List<Query> shouldList = buildIndexesQueryList();
-
-	return buildBoolQuery(filterList, shouldList, Arrays.asList());
+	return buildFilterQuery(filterList);
     }
 
     /**
