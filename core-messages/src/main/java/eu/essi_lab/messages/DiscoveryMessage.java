@@ -511,6 +511,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     /**
      * @return
      */
+    @Deprecated
     public boolean isDataFolderCheckEnabled() {
 
 	Boolean enabled = getHeader().get(DATA_FOLDER_CHECK, Boolean.class);
@@ -524,6 +525,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     /**
      * 
      */
+    @Deprecated
     public void disableDataFolderCheck() {
 
 	getHeader().add(new GSProperty<Boolean>(DATA_FOLDER_CHECK, true));
