@@ -147,9 +147,9 @@ public abstract class IndexMapping {
     /**
      * @return
      */
-    public String getMapping() {
+    public JSONObject getMapping() {
 
-	return mapping.toString();
+	return mapping.getJSONObject("mappings");
     }
 
     /**
@@ -157,7 +157,7 @@ public abstract class IndexMapping {
      */
     public InputStream getMappingStream() {
 
-	return IOStreamUtils.asStream(getMapping());
+	return IOStreamUtils.asStream(getMapping().toString());
     }
 
     /**
