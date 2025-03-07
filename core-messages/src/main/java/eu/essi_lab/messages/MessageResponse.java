@@ -137,6 +137,14 @@ public abstract class MessageResponse<T, C extends AbstractCountResponse> implem
     }
 
     /**
+     * @param handler
+     */
+    public void setPropertyHandler(GSPropertyHandler handler) {
+
+	this.propertyHandler = handler;
+    }
+
+    /**
      * @return the propertyHandler
      */
     public GSPropertyHandler getPropertyHandler() {
