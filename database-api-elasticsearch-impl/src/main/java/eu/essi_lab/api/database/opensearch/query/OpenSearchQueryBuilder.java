@@ -569,11 +569,11 @@ public class OpenSearchQueryBuilder {
      * @param viewId
      * @return
      */
-    public static Query buildSearchViewQuery(String databaseId, String viewId) {
+    public static Query buildGetViewQuery(String databaseId, String viewId) {
 
 	Query databaseIdQuery = buildDatabaseIdQuery(databaseId);
 
-	Query viewIdQuery = buildMatchPhraseQuery(ViewsMapping.VIEW_ID, viewId);
+	Query viewIdQuery = buildMatchPhraseQuery(IndexMapping.toKeywordField(ViewsMapping.VIEW_ID), viewId);
 
 	return buildFilterQuery(Arrays.asList(databaseIdQuery, viewIdQuery));
     }

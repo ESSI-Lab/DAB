@@ -102,7 +102,7 @@ public class OpenSearchReader implements DatabaseReader {
     @Override
     public Optional<View> getView(String viewId) throws GSException {
 
-	Query query = OpenSearchQueryBuilder.buildSearchViewQuery(//
+	Query query = OpenSearchQueryBuilder.buildGetViewQuery(//
 		getDatabase().getIdentifier(), //
 		viewId);
 
