@@ -162,7 +162,7 @@ public class RateLimiterFilter implements Filter {
 		requestPath.contains("/FeatureServer/") || //
 		requestPath.contains("/worldcereal/") || //
 		setting.getComputationType() == ComputationType.DISABLED) {
-GSLoggerFactory.getLogger(getClass()).info("Skipping RLF");
+	    GSLoggerFactory.getLogger(getClass()).info("Skipping RLF");
 	    filterChain.doFilter(servletRequest, response);
 	    return;
 	}
