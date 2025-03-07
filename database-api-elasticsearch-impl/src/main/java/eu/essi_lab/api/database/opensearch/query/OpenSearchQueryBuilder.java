@@ -573,7 +573,7 @@ public class OpenSearchQueryBuilder {
 
 	Query databaseIdQuery = buildDatabaseIdQuery(databaseId);
 
-	Query viewIdQuery = buildTermQuery(DataFolderMapping.toKeywordField(ViewsMapping.VIEW_ID), viewId);
+	Query viewIdQuery = buildMatchPhraseQuery(ViewsMapping.VIEW_ID, viewId);
 
 	return buildFilterQuery(Arrays.asList(databaseIdQuery, viewIdQuery));
     }
