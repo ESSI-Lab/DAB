@@ -338,34 +338,17 @@ public class ResultSet<T> extends MessageResponse<T, CountSet> {
     /**
      * @param searchAfter
      */
-    public void setSearchAfter(double searchAfter) {
+    public void setSearchAfter(SearchAfter searchAfter) {
 
-	getPropertyHandler().add(GSProperty.of("search_afer", searchAfter));
+	getPropertyHandler().add(GSProperty.of("search_after", searchAfter));
     }
 
     /**
-     * @param searchAfter
-     */
-    public void setSearchAfter(long searchAfter) {
-
-	getPropertyHandler().add(GSProperty.of("search_afer", searchAfter));
-    }
-
-    /**
-     * @param searchAfter
-     */
-    public void setSearchAfter(String searchAfter) {
-
-	getPropertyHandler().add(GSProperty.of("search_afer", searchAfter));
-    }
-
-    /**
-     * @param clazz
      * @return
      */
-    public Optional<T> getSearchAfter(Class<T> clazz) {
+    public Optional<SearchAfter> getSearchAfter() {
 
-	return Optional.ofNullable(getPropertyHandler().get("search_afer", clazz));
+	return Optional.ofNullable(getPropertyHandler().get("search_after", SearchAfter.class));
     }
 
     @Override
