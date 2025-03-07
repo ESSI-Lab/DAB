@@ -52,13 +52,13 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
-import eu.essi_lab.model.GSProperty;
-import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -351,6 +351,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 		    ids.size(), //
 		    Optional.empty(), //
 		    Optional.empty(), //
+		    Optional.empty(), //
 		    true);// requesting cache
 
 	    response.//
@@ -404,15 +405,15 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		if (fieldValue.isString()) {
 
-		    resultSet.setSearchAfter(fieldValue.stringValue());
+		    resultSet.setSearchAfter(SearchAfter.of(fieldValue.stringValue()));
 
 		} else if (fieldValue.isDouble()) {
 
-		    resultSet.setSearchAfter(fieldValue.doubleValue());
+		    resultSet.setSearchAfter(SearchAfter.of(fieldValue.doubleValue()));
 
 		} else if (fieldValue.isLong()) {
 
-		    resultSet.setSearchAfter(fieldValue.longValue());
+		    resultSet.setSearchAfter(SearchAfter.of(fieldValue.longValue()));
 		}
 	    }
 	}
@@ -462,16 +463,14 @@ public class OpenSearchFinder implements DatabaseFinder {
 		int start = message.getPage().getStart() - 1;
 		int size = message.getPage().getSize();
 
-		message.setOrderingDirection(OrderingDirection.ASCENDING);
-		message.setOrderingProperty(MetadataElement.TITLE);
-
 		response = wrapper.search(//
 			DataFolderMapping.get().getIndex(), //
 			query, //
 			start, //
 			size, //
 			message.getOrderingProperty(), //
-			message.getOrderingDirection());
+			message.getOrderingDirection(), //
+			message.getSearchAfter());
 	    }
 
 	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
