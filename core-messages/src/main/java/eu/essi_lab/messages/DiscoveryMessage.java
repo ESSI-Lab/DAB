@@ -54,7 +54,6 @@ import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
@@ -124,6 +123,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     private static final String INLCUDE_DELETED = "includeDeleted";
     private static final String MAX_TERM_FREQUENCY_MAP_ITEMS = "maxTfMapItems";
     private static final String RESOURCE_SELECTOR = "resourceSelector";
+    private static final String SEARCH_AFTER = "searchAfter";
     private static final String PARENTS_GSRESOURCE = "PARENTS_GSRESOURCE";
     private static final String QUAKE_ML_EVENT_ORDER = "QUAKE_ML_EVENT_ORDER";
     private static final String DATA_FOLDER_CHECK = "DATA_FOLDER_CHECK";
@@ -406,6 +406,22 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     public void setOrderingDirection(OrderingDirection direction) {
 
 	getHeader().add(new GSProperty<OrderingDirection>(ORDERING_DIRECTION, direction));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<SearchAfter> getSearchAfter() {
+
+	return Optional.ofNullable(getHeader().get(SEARCH_AFTER, SearchAfter.class));
+    }
+
+    /*
+     * 
+     */
+    public void setSearchAfter(SearchAfter searchAfter) {
+
+	getHeader().add(new GSProperty<SearchAfter>(SEARCH_AFTER, searchAfter));
     }
 
     /**
