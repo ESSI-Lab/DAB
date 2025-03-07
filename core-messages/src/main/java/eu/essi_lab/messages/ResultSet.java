@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
 
 import org.json.JSONObject;
 
@@ -41,6 +40,7 @@ import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.stax.StAXDocumentParser;
 import eu.essi_lab.messages.DataDescriptorRuntimeInfo.TargetProvider;
 import eu.essi_lab.messages.count.CountSet;
+import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.exceptions.GSException;
@@ -65,290 +65,295 @@ import eu.essi_lab.model.resource.data.DataObject;
  */
 public class ResultSet<T> extends MessageResponse<T, CountSet> {
 
-	private XMLInputFactory factory;
+    /**
+     * 
+     */
+    public ResultSet() {
+	super();
+    }
 
-	/**
-	 * 
-	 */
-	public ResultSet() {
-		super();
+    /**
+     * @param results
+     */
+    public ResultSet(List<T> results) {
+	setException(GSException.createException());
+	setResultsList(results);
+    }
+
+    @Override
+    public HashMap<String, List<String>> provideInfo() {
+
+	HashMap<String, List<String>> map = super.provideInfo();
+
+	map.put(//
+		RuntimeInfoElement.RESULT_SET_TIME_STAMP.getName(), //
+		Arrays.asList(ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds()));
+	map.put(//
+		RuntimeInfoElement.RESULT_SET_TIME_STAMP_MILLIS.getName(), //
+		Arrays.asList(String.valueOf(System.currentTimeMillis())));
+
+	CountSet countResponse = getCountResponse();
+	if (countResponse != null) {
+
+	    int count = countResponse.getCount();
+	    map.put(RuntimeInfoElement.RESULT_SET_MATCHED.getName(), Arrays.asList(String.valueOf(count)));
 	}
 
-	public ResultSet(List<T> results) {
-		setException(GSException.createException());
-		setResultsList(results);
-	}
+	List<? extends T> resultsList = getResultsList();
+	if (resultsList != null) {
 
-	@Override
-	public HashMap<String, List<String>> provideInfo() {
+	    int size = resultsList.size();
+	    map.put(RuntimeInfoElement.RESULT_SET_RETURNED.getName(), Arrays.asList(String.valueOf(size)));
 
-		HashMap<String, List<String>> map = super.provideInfo();
+	    if (!resultsList.isEmpty()) {
 
-		map.put(//
-				RuntimeInfoElement.RESULT_SET_TIME_STAMP.getName(), //
-				Arrays.asList(ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds()));
-		map.put(//
-				RuntimeInfoElement.RESULT_SET_TIME_STAMP_MILLIS.getName(), //
-				Arrays.asList(String.valueOf(System.currentTimeMillis())));
+		List<String> discResourceTitlesList = new ArrayList<String>();
+		List<String> discResourceAttributeTitlesList = new ArrayList<String>();
+		List<String> discResourceIdsList = new ArrayList<String>();
 
-		CountSet countResponse = getCountResponse();
-		if (countResponse != null) {
+		List<String> discSourceIdsList = new ArrayList<String>();
+		List<String> discSourceLabelsList = new ArrayList<String>();
 
-			int count = countResponse.getCount();
-			map.put(RuntimeInfoElement.RESULT_SET_MATCHED.getName(), Arrays.asList(String.valueOf(count)));
-		}
+		List<String> discBboxNorthList = new ArrayList<String>();
+		List<String> discBboxSouthList = new ArrayList<String>();
+		List<String> discBboxEastList = new ArrayList<String>();
+		List<String> discBboxWestList = new ArrayList<String>();
 
-		List<? extends T> resultsList = getResultsList();
-		if (resultsList != null) {
+		List<String> accessSourceIdsList = new ArrayList<String>();
+		List<String> accessSourceLabelsList = new ArrayList<String>();
 
-			int size = resultsList.size();
-			map.put(RuntimeInfoElement.RESULT_SET_RETURNED.getName(), Arrays.asList(String.valueOf(size)));
+		resultsList.forEach(item -> {
 
-			if (!resultsList.isEmpty()) {
+		    if (item instanceof GSResource) {
 
-				List<String> discResourceTitlesList = new ArrayList<String>();
-				List<String> discResourceAttributeTitlesList = new ArrayList<String>();
-				List<String> discResourceIdsList = new ArrayList<String>();
+			GSResource resource = (GSResource) item;
 
-				List<String> discSourceIdsList = new ArrayList<String>();
-				List<String> discSourceLabelsList = new ArrayList<String>();
+			String title = resource.getHarmonizedMetadata().getCoreMetadata().getTitle();
 
-				List<String> discBboxNorthList = new ArrayList<String>();
-				List<String> discBboxSouthList = new ArrayList<String>();
-				List<String> discBboxEastList = new ArrayList<String>();
-				List<String> discBboxWestList = new ArrayList<String>();
-
-				List<String> accessSourceIdsList = new ArrayList<String>();
-				List<String> accessSourceLabelsList = new ArrayList<String>();
-
-				resultsList.forEach(item -> {
-
-					if (item instanceof GSResource) {
-
-						GSResource resource = (GSResource) item;
-
-						String title = resource.getHarmonizedMetadata().getCoreMetadata().getTitle();
-
-						if (StringUtils.isNotEmptyAndNotNull(title)) {
-							discResourceTitlesList.add(title);
-						}
-
-						discResourceIdsList.add(resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier());
-
-						try {
-
-							discResourceAttributeTitlesList.add(resource.getHarmonizedMetadata().getCoreMetadata()
-									.getMIMetadata().getCoverageDescription().getAttributeTitle());
-
-						} catch (Exception e) {
-						}
-
-						//
-						//
-						//
-						
-						GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata()
-								.getBoundingBox();
-						if (bbox != null) {
-							BigDecimal optEast = bbox.getBigDecimalEast();
-							BigDecimal optWest = bbox.getBigDecimalEast();
-							BigDecimal optSouth = bbox.getBigDecimalEast();
-							BigDecimal optNorth = bbox.getBigDecimalEast();
-							discBboxNorthList.add(optNorth.toString());
-							discBboxSouthList.add(optSouth.toString());
-							discBboxEastList.add(optEast.toString());
-							discBboxWestList.add(optWest.toString());
-						}
-
-						GSSource source = resource.getSource();
-
-						discSourceIdsList.add(source.getUniqueIdentifier());
-						discSourceLabelsList.add(source.getLabel());
-
-					} else if (item instanceof DataObject) {
-
-						DataObject object = (DataObject) item;
-						DataDescriptor descriptor = object.getDataDescriptor();
-
-						DataDescriptorRuntimeInfo.publishDataDescriptorInfo(TargetProvider.RESULT_SET, descriptor, map);
-
-						Optional<GSResource> resource = object.getResource();
-
-						if (resource.isPresent()) {
-
-							GSSource source = resource.get().getSource();
-
-							GSLoggerFactory.getLogger(getClass()).trace("Accessed source: " + source.getLabel());
-							GSLoggerFactory.getLogger(getClass())
-									.trace("Accessed source id: " + source.getUniqueIdentifier());
-
-							accessSourceIdsList.add(source.getUniqueIdentifier());
-							accessSourceLabelsList.add(source.getLabel());
-							GeographicBoundingBox bbox = resource.get().getHarmonizedMetadata().getCoreMetadata()
-									.getBoundingBox();
-							if (bbox != null) {
-								BigDecimal optEast = bbox.getBigDecimalEast();
-								BigDecimal optWest = bbox.getBigDecimalEast();
-								BigDecimal optSouth = bbox.getBigDecimalEast();
-								BigDecimal optNorth = bbox.getBigDecimalEast();
-								discBboxNorthList.add(optNorth.toString());
-								discBboxSouthList.add(optSouth.toString());
-								discBboxEastList.add(optEast.toString());
-								discBboxWestList.add(optWest.toString());
-							}
-
-						}
-					} else if (item instanceof String) {
-
-						String strJSON = (String) item;
-
-						try {
-							JSONObject json = new JSONObject(strJSON);
-
-							if (json.has("title")) {
-
-								discResourceTitlesList.add(json.getString("title"));
-							}
-
-							if (json.has("id")) {
-
-								discResourceIdsList.add(json.getString("id"));
-							}
-
-							if (json.has("attributeTitle")) {
-
-								discResourceAttributeTitlesList.add(json.getString("attributeTitle"));
-							}
-
-							if (json.has("source")) {
-
-								JSONObject jsonSource = json.getJSONObject("source");
-
-								String sourceId = jsonSource.getString("id");
-								String sourceLabel = jsonSource.getString("title");
-
-								discSourceIdsList.add(sourceId);
-								discSourceLabelsList.add(sourceLabel);
-							}
-
-						} catch (Exception e) {
-
-							if (strJSON.startsWith("<entry")) {
-
-								String xmlEntry = strJSON;
-
-								try {
-
-									StAXDocumentParser parser = new StAXDocumentParser(xmlEntry);
-
-									parser.add(Arrays.asList(new QName("entry"), new QName("id")),
-											v -> discResourceIdsList.add(v));
-
-									parser.add(Arrays.asList(new QName("entry"), new QName("title")),
-											v -> discResourceTitlesList.add(v));
-
-									parser.add(Arrays.asList(new QName("entry"), new QName("sourceId")),
-											v -> discSourceIdsList.add(v));
-
-									parser.add(Arrays.asList(new QName("entry"), new QName("sourceTitle")),
-											v -> discSourceLabelsList.add(v));
-
-									parser.parse();
-
-								} catch (Exception ex) {
-
-									GSLoggerFactory.getLogger(getClass()).error(ex.getMessage());
-								}
-							}
-						}
-					}
-				});
-
-				if (!discResourceIdsList.isEmpty()) {
-					map.put(RuntimeInfoElement.RESULT_SET_RESOURCE_ID.getName(), discResourceIdsList);
-				}
-
-				if (!discResourceTitlesList.isEmpty()) {
-					map.put(RuntimeInfoElement.RESULT_SET_RESOURCE_TITLE.getName(), discResourceTitlesList);
-				}
-
-				if (!discResourceAttributeTitlesList.isEmpty()) {
-					map.put(RuntimeInfoElement.RESULT_SET_ATTRIBUTE_TITLE.getName(), discResourceAttributeTitlesList);
-				}
-				
-				if (!discBboxNorthList.isEmpty()) {
-				    map.put(RuntimeInfoElement.RESULT_SET_BBOX_NORTH.getName(), discBboxNorthList);
-				}
-				if (!discBboxSouthList.isEmpty()) {
-				    map.put(RuntimeInfoElement.RESULT_SET_BBOX_SOUTH.getName(), discBboxSouthList);
-				}
-				if (!discBboxWestList.isEmpty()) {
-				    map.put(RuntimeInfoElement.RESULT_SET_BBOX_WEST.getName(), discBboxWestList);
-				}
-				if (!discBboxEastList.isEmpty()) {
-				    map.put(RuntimeInfoElement.RESULT_SET_BBOX_EAST.getName(), discBboxEastList);
-				}
-
-				//
-				//
-				//
-
-				if (!discSourceIdsList.isEmpty()) {
-					map.put(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_ID.getName(), discSourceIdsList);
-				}
-
-				if (!discSourceLabelsList.isEmpty()) {
-					map.put(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_LABEL.getName(), discSourceLabelsList);
-				}
-
-				//
-				//
-				//
-
-				if (!accessSourceIdsList.isEmpty()) {
-					map.put(RuntimeInfoElement.RESULT_SET_ACCESS_SOURCE_ID.getName(), accessSourceIdsList);
-				}
-
-				if (!accessSourceLabelsList.isEmpty()) {
-					map.put(RuntimeInfoElement.RESULT_SET_ACCESS_SOURCE_LABEL.getName(), accessSourceLabelsList);
-				}
+			if (StringUtils.isNotEmptyAndNotNull(title)) {
+			    discResourceTitlesList.add(title);
 			}
+
+			discResourceIdsList.add(resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier());
+
+			try {
+
+			    discResourceAttributeTitlesList.add(resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+				    .getCoverageDescription().getAttributeTitle());
+
+			} catch (Exception e) {
+			}
+
+			//
+			//
+			//
+
+			GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
+			if (bbox != null) {
+			    BigDecimal optEast = bbox.getBigDecimalEast();
+			    BigDecimal optWest = bbox.getBigDecimalEast();
+			    BigDecimal optSouth = bbox.getBigDecimalEast();
+			    BigDecimal optNorth = bbox.getBigDecimalEast();
+			    discBboxNorthList.add(optNorth.toString());
+			    discBboxSouthList.add(optSouth.toString());
+			    discBboxEastList.add(optEast.toString());
+			    discBboxWestList.add(optWest.toString());
+			}
+
+			GSSource source = resource.getSource();
+
+			discSourceIdsList.add(source.getUniqueIdentifier());
+			discSourceLabelsList.add(source.getLabel());
+
+		    } else if (item instanceof DataObject) {
+
+			DataObject object = (DataObject) item;
+			DataDescriptor descriptor = object.getDataDescriptor();
+
+			DataDescriptorRuntimeInfo.publishDataDescriptorInfo(TargetProvider.RESULT_SET, descriptor, map);
+
+			Optional<GSResource> resource = object.getResource();
+
+			if (resource.isPresent()) {
+
+			    GSSource source = resource.get().getSource();
+
+			    GSLoggerFactory.getLogger(getClass()).trace("Accessed source: " + source.getLabel());
+			    GSLoggerFactory.getLogger(getClass()).trace("Accessed source id: " + source.getUniqueIdentifier());
+
+			    accessSourceIdsList.add(source.getUniqueIdentifier());
+			    accessSourceLabelsList.add(source.getLabel());
+			    GeographicBoundingBox bbox = resource.get().getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
+			    if (bbox != null) {
+				BigDecimal optEast = bbox.getBigDecimalEast();
+				BigDecimal optWest = bbox.getBigDecimalEast();
+				BigDecimal optSouth = bbox.getBigDecimalEast();
+				BigDecimal optNorth = bbox.getBigDecimalEast();
+				discBboxNorthList.add(optNorth.toString());
+				discBboxSouthList.add(optSouth.toString());
+				discBboxEastList.add(optEast.toString());
+				discBboxWestList.add(optWest.toString());
+			    }
+
+			}
+		    } else if (item instanceof String) {
+
+			String strJSON = (String) item;
+
+			try {
+			    JSONObject json = new JSONObject(strJSON);
+
+			    if (json.has("title")) {
+
+				discResourceTitlesList.add(json.getString("title"));
+			    }
+
+			    if (json.has("id")) {
+
+				discResourceIdsList.add(json.getString("id"));
+			    }
+
+			    if (json.has("attributeTitle")) {
+
+				discResourceAttributeTitlesList.add(json.getString("attributeTitle"));
+			    }
+
+			    if (json.has("source")) {
+
+				JSONObject jsonSource = json.getJSONObject("source");
+
+				String sourceId = jsonSource.getString("id");
+				String sourceLabel = jsonSource.getString("title");
+
+				discSourceIdsList.add(sourceId);
+				discSourceLabelsList.add(sourceLabel);
+			    }
+
+			} catch (Exception e) {
+
+			    if (strJSON.startsWith("<entry")) {
+
+				String xmlEntry = strJSON;
+
+				try {
+
+				    StAXDocumentParser parser = new StAXDocumentParser(xmlEntry);
+
+				    parser.add(Arrays.asList(new QName("entry"), new QName("id")), v -> discResourceIdsList.add(v));
+
+				    parser.add(Arrays.asList(new QName("entry"), new QName("title")), v -> discResourceTitlesList.add(v));
+
+				    parser.add(Arrays.asList(new QName("entry"), new QName("sourceId")), v -> discSourceIdsList.add(v));
+
+				    parser.add(Arrays.asList(new QName("entry"), new QName("sourceTitle")),
+					    v -> discSourceLabelsList.add(v));
+
+				    parser.parse();
+
+				} catch (Exception ex) {
+
+				    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage());
+				}
+			    }
+			}
+		    }
+		});
+
+		if (!discResourceIdsList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_RESOURCE_ID.getName(), discResourceIdsList);
 		}
 
-		return map;
+		if (!discResourceTitlesList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_RESOURCE_TITLE.getName(), discResourceTitlesList);
+		}
+
+		if (!discResourceAttributeTitlesList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_ATTRIBUTE_TITLE.getName(), discResourceAttributeTitlesList);
+		}
+
+		if (!discBboxNorthList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_BBOX_NORTH.getName(), discBboxNorthList);
+		}
+		if (!discBboxSouthList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_BBOX_SOUTH.getName(), discBboxSouthList);
+		}
+		if (!discBboxWestList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_BBOX_WEST.getName(), discBboxWestList);
+		}
+		if (!discBboxEastList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_BBOX_EAST.getName(), discBboxEastList);
+		}
+
+		//
+		//
+		//
+
+		if (!discSourceIdsList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_ID.getName(), discSourceIdsList);
+		}
+
+		if (!discSourceLabelsList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_LABEL.getName(), discSourceLabelsList);
+		}
+
+		//
+		//
+		//
+
+		if (!accessSourceIdsList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_ACCESS_SOURCE_ID.getName(), accessSourceIdsList);
+		}
+
+		if (!accessSourceLabelsList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_ACCESS_SOURCE_LABEL.getName(), accessSourceLabelsList);
+		}
+	    }
 	}
 
-	/**
-	 * Creates a new {@link ResultSet} which is a clone of the supplied
-	 * <code>resultSet</code> but without {@link #getResultsList()}
-	 * 
-	 * @param resultSet a non <code>null</code> {@link ResultSet} to clone
-	 */
-	public ResultSet(ResultSet<?> resultSet) {
-		setException(resultSet.getException());
-		setCountResponse(resultSet.getCountResponse());
-	}
+	return map;
+    }
 
-	/**
-	 * Creates a new {@link ResultSet} which is a clone of the supplied
-	 * <code>resultSet</code> but without {@link #getResultsList()}
-	 * 
-	 * @param resultSet a non <code>null</code> {@link ResultSet} to clone
-	 */
-	public ResultSet(MessageResponse<?, CountSet> resultSet) {
-		setException(resultSet.getException());
-		setCountResponse(resultSet.getCountResponse());
-	}
+    /**
+     * Creates a new {@link ResultSet} which is a clone of the supplied
+     * <code>resultSet</code> but without {@link #getResultsList()}
+     * 
+     * @param resultSet a non <code>null</code> {@link ResultSet} to clone
+     */
+    public ResultSet(ResultSet<?> resultSet) {
+	setException(resultSet.getException());
+	setCountResponse(resultSet.getCountResponse());
+    }
 
-	@Override
-	public String getName() {
+    /**
+     * Creates a new {@link ResultSet} which is a clone of the supplied
+     * <code>resultSet</code> but without {@link #getResultsList()}
+     * 
+     * @param resultSet a non <code>null</code> {@link ResultSet} to clone
+     */
+    public ResultSet(MessageResponse<?, CountSet> resultSet) {
+	setException(resultSet.getException());
+	setCountResponse(resultSet.getCountResponse());
+    }
 
-		return "RESULT_SET";
-	}
+    /**
+     * @param searchAfter
+     */
+    public void setSearchAfter(SearchAfter searchAfter) {
 
-	public static void main(String[] args) {
-		JSONObject test = new JSONObject();
-		test.put("key", "test':{{\" \b \f \n \r \t \\");
-		System.out.println(test.toString());
-	}
+	getPropertyHandler().add(GSProperty.of("search_after", searchAfter));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<SearchAfter> getSearchAfter() {
+
+	return Optional.ofNullable(getPropertyHandler().get("search_after", SearchAfter.class));
+    }
+
+    @Override
+    public String getName() {
+
+	return "RESULT_SET";
+    }
 }

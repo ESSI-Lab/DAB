@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
@@ -38,6 +39,7 @@ import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -49,6 +51,7 @@ import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -77,6 +80,30 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
     public OAIPMHRequestTransformer() {
 	// nothing to do here
+    }
+    
+    @Override
+    protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
+
+	DiscoveryMessage refinedMessage = super.refineMessage(message);
+
+	refinedMessage.setOrderingDirection(OrderingDirection.ASCENDING);
+	refinedMessage.setOrderingProperty(ResourceProperty.PRIVATE_ID);
+	
+	OAIPMHRequestReader reader = createReader(message.getWebRequest());
+	String tokenValue = reader.getResumptionToken();
+	
+	if(tokenValue != null) {
+	 
+	    ResumptionToken resumptionToken = ResumptionToken.of(tokenValue);
+	    Optional<String> searchAfter = resumptionToken.getSearchAfter();
+	    
+	    if(searchAfter.isPresent()) {
+		refinedMessage.setSearchAfter(SearchAfter.of(searchAfter.get()));
+	    }
+	}
+
+	return refinedMessage;
     }
 
     /**
@@ -142,7 +169,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	String tokenValue = reader.getResumptionToken();
 	if (tokenValue != null) {
 
-	    ResumptionToken rt = new ResumptionToken(tokenValue);
+	    ResumptionToken rt = ResumptionToken.of(tokenValue);
 	    from = rt.getFrom();
 	    until = rt.getUntil();
 	    setSpec = rt.getSet();
@@ -226,7 +253,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	    return new Page(getPageSize());
 	}
 
-	ResumptionToken rt = new ResumptionToken(tokenValue);
+	ResumptionToken rt = ResumptionToken.of(tokenValue);
 	int adv = rt.getAdvancement();
 
 	return new Page(adv, getPageSize());
@@ -355,16 +382,10 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
     private List<String> getHarvestedSourcesIds() throws GSException {
 
-	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
-
-	ArrayList<String> ids = new ArrayList<>();
-	for (GSSource gsSource : allSources) {
-	    if (gsSource.getBrokeringStrategy() == BrokeringStrategy.HARVESTED) {
-		ids.add(gsSource.getUniqueIdentifier());
-	    }
-	}
-
-	return ids;
+	return ConfigurationWrapper.getHarvestedSources().//
+		stream().//
+		map(s -> s.getUniqueIdentifier()).//
+		collect(Collectors.toList());
     }
 
     @Override

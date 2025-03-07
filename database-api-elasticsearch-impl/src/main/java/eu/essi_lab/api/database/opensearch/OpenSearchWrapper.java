@@ -40,8 +40,12 @@ import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ErrorResponse;
+import org.opensearch.client.opensearch._types.FieldSort;
+import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Result;
+import org.opensearch.client.opensearch._types.SortOptions;
+import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.Buckets;
@@ -83,6 +87,8 @@ import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -313,14 +319,7 @@ public class OpenSearchWrapper {
     }
 
     /**
-     * @param index
-     * @param searchQuery
-     * @param fields
-     * @param start
-     * @param size
-     * @param requestCache
-     * @return
-     * @throws Exception
+     * 
      */
     public SearchResponse<Object> search(//
 	    String index, //
@@ -328,6 +327,9 @@ public class OpenSearchWrapper {
 	    List<String> fields, //
 	    int start, //
 	    int size, //
+	    Optional<Queryable> orderingProperty, //
+	    Optional<OrderingDirection> orderingDirection, //
+	    Optional<SearchAfter> searchAfter, //
 	    boolean requestCache)
 
 	    throws Exception {
@@ -336,11 +338,26 @@ public class OpenSearchWrapper {
 
 	    builder.query(searchQuery).//
 		    index(index).//
-		    from(start).//
 		    source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
 			    build()));
 
 	    builder.size(size > 0 ? size : MAX_DEFAULT_HISTS);
+
+	    if (searchAfter.isPresent()) {
+
+		searchAfter.get().getDoubleValue().ifPresent(val -> builder.searchAfterVals(FieldValue.of(val)));
+		searchAfter.get().getLongValue().ifPresent(val -> builder.searchAfterVals(FieldValue.of(val)));
+		searchAfter.get().getStringValue().ifPresent(val -> builder.searchAfterVals(FieldValue.of(val)));
+
+	    } else {
+
+		builder.from(start);
+	    }
+
+	    if (orderingProperty.isPresent() && orderingDirection.isPresent()) {
+
+		handleSort(builder, orderingProperty.get(), orderingDirection.get());
+	    }
 
 	    handleSourceFields(null, builder, fields);
 
@@ -374,22 +391,44 @@ public class OpenSearchWrapper {
 	    int start, //
 	    int size) throws Exception {
 
-	return search(index, searchQuery, fields, start, size, false);
+	return search(index, //
+		searchQuery, //
+		fields, //
+		start, //
+		size, //
+		Optional.empty(), //
+		Optional.empty(), //
+		Optional.empty(), //
+		false);
     }
 
     /**
      * @param index
      * @param searchQuery
-     * @param properties
      * @param start
      * @param size
-     * @param distinct
+     * @param orderingProperty
+     * @param ordertingDirection
      * @return
      * @throws Exception
      */
-    public SearchResponse<Object> search(String index, Query searchQuery, int start, int size) throws Exception {
+    public SearchResponse<Object> search(String index, //
+	    Query searchQuery, //
+	    int start, //
+	    int size, //
+	    Optional<Queryable> orderingProperty, //
+	    Optional<OrderingDirection> ordertingDirection, Optional<SearchAfter> searchAfter) throws Exception {
 
-	return search(index, searchQuery, Arrays.asList(), start, size, false);
+	return search(//
+		index, //
+		searchQuery, //
+		Arrays.asList(), //
+		start, //
+		size, //
+		orderingProperty, //
+		ordertingDirection, //
+		searchAfter, //
+		false);
     }
 
     /**
@@ -402,7 +441,15 @@ public class OpenSearchWrapper {
      */
     public List<InputStream> searchBinaries(String index, Query searchQuery, int start, int size) throws Exception {
 
-	SearchResponse<Object> searchResponse = search(index, searchQuery, Arrays.asList(), start, size, false);
+	SearchResponse<Object> searchResponse = search(//
+		index, //
+		searchQuery, //
+		Arrays.asList(), //
+		start, //
+		size, //
+		Optional.empty(), //
+		Optional.empty(), //
+		Optional.empty(), false);
 
 	return ConversionUtils.toBinaryList(searchResponse);
     }
@@ -428,7 +475,16 @@ public class OpenSearchWrapper {
      */
     public List<JSONObject> searchSources(String index, Query searchQuery, int start, int size) throws Exception {
 
-	SearchResponse<Object> response = search(index, searchQuery, Arrays.asList(), start, size, false);
+	SearchResponse<Object> response = search(//
+		index, //
+		searchQuery, //
+		Arrays.asList(), //
+		start, //
+		size, //
+		Optional.empty(), //
+		Optional.empty(), //
+		Optional.empty(), //
+		false);
 
 	return ConversionUtils.toJSONSourcesList(response);
     }
@@ -441,7 +497,16 @@ public class OpenSearchWrapper {
      */
     public List<JSONObject> searchSources(String index, Query searchQuery) throws Exception {
 
-	SearchResponse<Object> response = search(index, searchQuery, Arrays.asList(), 0, -1, false);
+	SearchResponse<Object> response = search(//
+		index, //
+		searchQuery, //
+		Arrays.asList(), //
+		0, //
+		-1, //
+		Optional.empty(), //
+		Optional.empty(), //
+		Optional.empty(), //
+		false);
 
 	return ConversionUtils.toJSONSourcesList(response);
     }
@@ -472,7 +537,16 @@ public class OpenSearchWrapper {
 	    int start, //
 	    int size) throws Exception {
 
-	SearchResponse<Object> response = search(index, searchQuery, Arrays.asList(field), start, size, false);
+	SearchResponse<Object> response = search(//
+		index, //
+		searchQuery, //
+		Arrays.asList(field), //
+		start, //
+		size, //
+		Optional.empty(), //
+		Optional.empty(), //
+		Optional.empty(), //
+		false);
 
 	HitsMetadata<Object> hits = response.hits();
 	List<Hit<Object>> hitsList = hits.hits();
@@ -662,6 +736,26 @@ public class OpenSearchWrapper {
     public void synch() throws OpenSearchException, IOException {
 
 	client.indices().refresh();
+    }
+
+    /**
+     * @param builder
+     * @param orderingProperty
+     * @param orderingDirection
+     */
+    private void handleSort(org.opensearch.client.opensearch.core.SearchRequest.Builder builder, Queryable orderingProperty,
+	    OrderingDirection orderingDirection) {
+
+	ContentType contentType = orderingProperty.getContentType();
+	String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
+		: orderingProperty.getName();
+
+	builder.sort(new SortOptions.Builder().//
+		field(new FieldSort.Builder().//
+			field(field).//
+			order(orderingDirection == OrderingDirection.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
+		.//
+		build());
     }
 
     /**

@@ -173,7 +173,7 @@ public class OAIPMHResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    String prefix = reqReader.getMetadataPrefix();
 	    String resumptionToken = reqReader.getResumptionToken();
 	    if (resumptionToken != null) {
-		ResumptionToken rt = new ResumptionToken(resumptionToken);
+		ResumptionToken rt = ResumptionToken.of(resumptionToken);
 		prefix = rt.getMetadataPrefix();
 	    }
 

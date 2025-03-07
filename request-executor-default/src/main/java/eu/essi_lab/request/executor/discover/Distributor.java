@@ -248,7 +248,7 @@ public class Distributor implements IDistributor {
     }
 
     private int getTimeout(DiscoveryMessage message) {
-	Integer timeout = message.getRequestTimeout();
+	Integer timeout = Integer.MAX_VALUE; // message.getRequestTimeout();
 	if (timeout == null) {
 	    timeout = DEFAULT_EXECUTION_TIMEOUT;
 	    // String msg = "Timeout not specified in message. Using default of: " + timeout + "s";
@@ -453,6 +453,9 @@ public class Distributor implements IDistributor {
 	    try {
 
 		ResultSet<T> futureSet = future.get();
+
+		// set the the property handler
+		outputSet.setPropertyHandler(futureSet.getPropertyHandler());
 
 		List<T> resultsList = futureSet.getResultsList();
 

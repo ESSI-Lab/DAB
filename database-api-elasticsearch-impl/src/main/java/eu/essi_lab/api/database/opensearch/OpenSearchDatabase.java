@@ -183,7 +183,7 @@ public class OpenSearchDatabase extends Database {
 
 		GSLoggerFactory.getLogger(getClass()).info("Creating index {} STARTED", mapping.getIndex());
 
-		createIndexWithGenericCLient(mapping);
+		createIndex(mapping);
 
 		GSLoggerFactory.getLogger(getClass()).info("Creating index {} ENDED", mapping.getIndex());
 
@@ -459,7 +459,7 @@ public class OpenSearchDatabase extends Database {
 		build();
 
 	CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().//
-		index(mapping.getIndex()).//
+		index(mapping.getIndex(false)).//
 		mappings(typeMapping).//
 		build();
 
@@ -476,6 +476,9 @@ public class OpenSearchDatabase extends Database {
 			ErrorInfo.SEVERITY_FATAL, //
 			"OpenSearchDatabaseCreate" + mapping.getIndex() + "NotAcknowledgedError");
 	    }
+
+	    // synch
+	    client.indices().refresh();
 
 	} catch (Exception ex) {
 
@@ -496,7 +499,7 @@ public class OpenSearchDatabase extends Database {
 		    Requests.builder().//
 			    endpoint(mapping.getIndex(false)).//
 			    method("PUT").//
-			    json(mapping.getMapping()).build());
+			    json(mapping.getMapping().toString()).build());
 
 	    // synch
 	    client.indices().refresh();

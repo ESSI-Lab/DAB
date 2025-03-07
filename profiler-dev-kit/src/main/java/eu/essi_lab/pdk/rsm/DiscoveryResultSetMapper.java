@@ -134,6 +134,8 @@ public abstract class DiscoveryResultSetMapper<T>
 
 	List<T> out = new ArrayList<T>();
 	mappedResSet.setResultsList(out);
+	// set the property handler
+	mappedResSet.setPropertyHandler(resultSet.getPropertyHandler());
 
 	List<String> ids = ConfigurationWrapper.getGDCSourceSetting().getSelectedSourcesIds();
 
