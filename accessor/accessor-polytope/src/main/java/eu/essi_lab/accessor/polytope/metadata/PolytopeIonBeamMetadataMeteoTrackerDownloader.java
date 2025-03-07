@@ -394,8 +394,10 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 	SimpleDateFormat inputFormat = null;
 	try {
 	    // Define a SimpleDateFormat with the combined pattern
-	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssXXX");
-
+	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    if(date.contains(".")) {
+		date = date.split("\\.")[0];
+	    }
 	    // Parse the combined string into a Date object
 	    Date d = inputFormat.parse(date);
 	    inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -403,7 +405,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 
 	} catch (RuntimeException e) {
 	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", date, e);
-	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
+	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssXXX");
 	    Date d = inputFormat.parse(date);
 	    inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
