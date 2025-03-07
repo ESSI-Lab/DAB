@@ -23,7 +23,6 @@ package eu.essi_lab.profiler.oaipmh.handler.discover;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -49,8 +48,6 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.BrokeringStrategy;
-import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -81,24 +78,26 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
     public OAIPMHRequestTransformer() {
 	// nothing to do here
     }
-    
+
     @Override
     protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
 
 	DiscoveryMessage refinedMessage = super.refineMessage(message);
 
-	refinedMessage.setOrderingDirection(OrderingDirection.ASCENDING);
-	refinedMessage.setOrderingProperty(ResourceProperty.PRIVATE_ID);
-	
+	if (sortResults()) {
+	    refinedMessage.setOrderingDirection(OrderingDirection.ASCENDING);
+	    refinedMessage.setOrderingProperty(ResourceProperty.PRIVATE_ID);
+	}
+
 	OAIPMHRequestReader reader = createReader(message.getWebRequest());
 	String tokenValue = reader.getResumptionToken();
-	
-	if(tokenValue != null) {
-	 
+
+	if (tokenValue != null) {
+
 	    ResumptionToken resumptionToken = ResumptionToken.of(tokenValue);
 	    Optional<String> searchAfter = resumptionToken.getSearchAfter();
-	    
-	    if(searchAfter.isPresent()) {
+
+	    if (searchAfter.isPresent()) {
 		refinedMessage.setSearchAfter(SearchAfter.of(searchAfter.get()));
 	    }
 	}
@@ -342,6 +341,21 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
     public static String getMinMaxDateStamp(String requestId, BondOperator operator) throws GSException {
 
 	return getMinMaxDateStamp(requestId, operator, null);
+    }
+
+    /**
+     * @return
+     */
+    private boolean sortResults() {
+    
+        Optional<Properties> properties = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+        boolean sortResults = false;
+        if (properties.isPresent()) {
+    
+            sortResults = Boolean.valueOf(properties.get().getProperty("sortResults", "false"));
+        }
+    
+        return sortResults;
     }
 
     /**
