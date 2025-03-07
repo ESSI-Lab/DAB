@@ -58,13 +58,19 @@ public class ViewsMapping extends IndexMapping {
 
 	super(VIEWS_INDEX);
 
-	// mandatory
 	addProperty(VIEW_ID, FieldType.Text.jsonValue());
 	addProperty(VIEW_LABEL, FieldType.Text.jsonValue());
 	addProperty(VIEW_OWNER, FieldType.Text.jsonValue());
 	addProperty(VIEW_CREATOR, FieldType.Text.jsonValue());
 	addProperty(VIEW_VISIBILITY, FieldType.Text.jsonValue());
 	addProperty(SOURCE_DEPLOYMENT, FieldType.Text.jsonValue());
+
+	addProperty(toKeywordField(VIEW_ID), FieldType.Keyword.jsonValue());
+	addProperty(toKeywordField(VIEW_LABEL), FieldType.Keyword.jsonValue());
+	addProperty(toKeywordField(VIEW_OWNER), FieldType.Keyword.jsonValue());
+	addProperty(toKeywordField(VIEW_CREATOR), FieldType.Keyword.jsonValue());
+	addProperty(toKeywordField(VIEW_VISIBILITY), FieldType.Keyword.jsonValue());
+	addProperty(toKeywordField(SOURCE_DEPLOYMENT), FieldType.Keyword.jsonValue());
     }
 
     /**
