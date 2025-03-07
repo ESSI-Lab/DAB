@@ -186,6 +186,15 @@ public abstract class IndexMapping {
     }
 
     /**
+     * @param field
+     * @return
+     */
+    public static String toKeywordField(String field) {
+
+	return field + "_keyword";
+    }
+
+    /**
      * @param key
      * @param type
      */

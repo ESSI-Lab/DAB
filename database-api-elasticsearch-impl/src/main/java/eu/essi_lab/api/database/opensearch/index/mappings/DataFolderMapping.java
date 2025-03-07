@@ -207,15 +207,6 @@ public class DataFolderMapping extends IndexMapping {
     }
 
     /**
-     * @param field
-     * @return
-     */
-    public static String toKeywordField(String field) {
-
-	return field + "_keyword";
-    }
-
-    /**
      * @return
      */
     public static final DataFolderMapping get() {
