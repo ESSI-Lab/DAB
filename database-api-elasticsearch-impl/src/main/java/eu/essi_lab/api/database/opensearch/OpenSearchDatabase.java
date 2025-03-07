@@ -210,13 +210,13 @@ public class OpenSearchDatabase extends Database {
 
 		GSLoggerFactory.getLogger(getClass()).info("Put alias {} STARTED", mapping.getIndex());
 
-//		try {
-//		    client.indices().putAlias(putAliasRequest);
-//
-//		} catch (OpenSearchException | IOException e) {
-//
-//		    throw GSException.createException(getClass(), "OpenSearchDatabasePutAliasError", e);
-//		}
+		try {
+		    client.indices().putAlias(putAliasRequest);
+
+		} catch (OpenSearchException | IOException e) {
+
+		    throw GSException.createException(getClass(), "OpenSearchDatabasePutAliasError", e);
+		}
 
 		GSLoggerFactory.getLogger(getClass()).info("Put alias {} ENDED", mapping.getIndex());
 	    }
