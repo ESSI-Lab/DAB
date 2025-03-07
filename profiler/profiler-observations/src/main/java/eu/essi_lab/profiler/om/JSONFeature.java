@@ -22,11 +22,14 @@ package eu.essi_lab.profiler.om;
  */
 
 import java.math.BigDecimal;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import eu.essi_lab.access.datacache.BBOX;
 
 public class JSONFeature {
 
@@ -118,6 +121,23 @@ public class JSONFeature {
 	return platform;
     }
 
+    public SimpleEntry<BigDecimal, BigDecimal> getLatLonPoint() {
+	SimpleEntry<BigDecimal, BigDecimal> latLon = null;
+	JSONObject coordObj = platform.optJSONObject(getGeometryName());
+	if (coordObj != null && !coordObj.isEmpty()) {
+	    String type = coordObj.optString("type");
+	    if (type != null && type.equals("Point")) {
+		JSONArray coords = coordObj.optJSONArray("coordinates");
+		if (coords != null && coords.length() == 2) {
+		    BigDecimal lat = coords.optBigDecimal(1, null);
+		    BigDecimal lon = coords.optBigDecimal(0, null);
+		    return new SimpleEntry<BigDecimal, BigDecimal>(lat, lon);
+		}
+	    }
+	}
+	return latLon;
+    }
+
     public List<Double> getCoordinates() {
 	List<Double> ret = new ArrayList<Double>();
 
@@ -184,7 +204,7 @@ public class JSONFeature {
     private JSONArray getCoordinateArray(BigDecimal... coordinates) {
 	JSONArray ret = new JSONArray();
 	for (BigDecimal coordinate : coordinates) {
-	    ret.put(coordinate.doubleValue());
+	    ret.put(coordinate);
 	}
 	return ret;
     }

@@ -411,6 +411,10 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		if (!download) {
 		    URL host;
 		    try {
+			if (!linkage.contains("://")) {
+			    // default
+			    linkage = "http://" + linkage;
+			}
 			host = new URL(linkage);
 			String serverId = "exdata:subset-service-" + host.getHost().hashCode();
 			ret += "dcat:accessService " + serverId + ".\n";
