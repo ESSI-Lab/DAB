@@ -804,12 +804,12 @@ public class OpenSearchQueryBuilder {
     @SuppressWarnings("incomplete-switch")
     public static Query buildRangeQuery(String field, BondOperator operator, String value, double boost) {
 
-	Builder builder = new RangeQuery.Builder().//
-		field(value);
+	Builder rangeBuilder = new RangeQuery.Builder().//
+		field(field);
 
 	if (boost > 1) {
 
-	    builder = builder.boost(null);
+	    rangeBuilder = rangeBuilder.boost((float)boost);
 	}
 
 	switch (operator) {
@@ -823,26 +823,26 @@ public class OpenSearchQueryBuilder {
 
 	case GREATER:
 
-	    builder = builder.gt(JsonData.of(value)).field(field);
+	    rangeBuilder = rangeBuilder.gt(JsonData.of(value));
 	    break;
 
 	case GREATER_OR_EQUAL:
 
-	    builder = builder.gte(JsonData.of(value)).field(field);
+	    rangeBuilder = rangeBuilder.gte(JsonData.of(value));
 	    break;
 
 	case LESS:
 
-	    builder = builder.lt(JsonData.of(value)).field(field);
+	    rangeBuilder = rangeBuilder.lt(JsonData.of(value));
 	    break;
 
 	case LESS_OR_EQUAL:
 
-	    builder = builder.lte(JsonData.of(value)).field(field);
+	    rangeBuilder = rangeBuilder.lte(JsonData.of(value));
 	    break;
 	}
 
-	return builder.build().toQuery();
+	return rangeBuilder.build().toQuery();
     }
 
     /**
