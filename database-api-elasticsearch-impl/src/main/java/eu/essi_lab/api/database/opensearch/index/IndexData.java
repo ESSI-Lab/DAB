@@ -453,6 +453,13 @@ public class IndexData {
 	    indexData.put(UsersMapping.ENABLED, user.isEnabled());
 	    indexData.put(UsersMapping.USER_ROLE, user.getRole());
 
+	    indexData.put(IndexMapping.toKeywordField(UsersMapping.USER_ID), user.getIdentifier());
+	    user.getUserIdentifierType().ifPresent(t -> indexData.put(
+
+		    IndexMapping.toKeywordField(UsersMapping.USER_ID_TYPE), t.getType()));
+
+	    indexData.put(IndexMapping.toKeywordField(UsersMapping.USER_ROLE), user.getRole());
+
 	    indexData.mapping = UsersMapping.get();
 
 	    break;
@@ -473,6 +480,15 @@ public class IndexData {
 		indexData.put(ViewsMapping.VIEW_VISIBILITY, view.getVisibility().name());
 		if (view.getSourceDeployment() != null) {
 		    indexData.put(ViewsMapping.SOURCE_DEPLOYMENT, view.getSourceDeployment());
+		}
+
+		indexData.put(IndexMapping.toKeywordField(ViewsMapping.VIEW_ID), view.getId());
+		indexData.put(IndexMapping.toKeywordField(ViewsMapping.VIEW_LABEL), view.getLabel());
+		indexData.put(IndexMapping.toKeywordField(ViewsMapping.VIEW_OWNER), view.getOwner());
+		indexData.put(IndexMapping.toKeywordField(ViewsMapping.VIEW_CREATOR), view.getCreator());
+		indexData.put(IndexMapping.toKeywordField(ViewsMapping.VIEW_VISIBILITY), view.getVisibility().name());
+		if (view.getSourceDeployment() != null) {
+		    indexData.put(IndexMapping.toKeywordField(ViewsMapping.SOURCE_DEPLOYMENT), view.getSourceDeployment());
 		}
 
 	    } catch (JAXBException e) {
