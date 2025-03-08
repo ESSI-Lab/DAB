@@ -74,9 +74,14 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
      * 
      */
     private static final String OAI_PMH_POST_QUERY_EXTRACTION_ERROR = "OAI_PMH_POST_QUERY_EXTRACTION_ERROR";
+    private OAIPMHProfilerSetting setting;
 
-    public OAIPMHRequestTransformer() {
-	// nothing to do here
+    /**
+     * @param setting
+     */
+    public OAIPMHRequestTransformer(OAIPMHProfilerSetting setting) {
+
+	this.setting = setting;
     }
 
     @Override
@@ -103,29 +108,6 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	}
 
 	return refinedMessage;
-    }
-
-    /**
-     * @return
-     */
-    protected int getPageSize() {
-
-	Optional<Properties> properties = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
-	int pageSize = getDefaultPageSize();
-	if (properties.isPresent()) {
-
-	    pageSize = Integer.valueOf(properties.get().getProperty(getPageSizeOptionKey(), String.valueOf(getDefaultPageSize())));
-	}
-
-	return pageSize;
-    }
-
-    /**
-     * @return
-     */
-    protected String getPageSizeOptionKey() {
-
-	return "oaiPmhPageSize";
     }
 
     /**
@@ -346,16 +328,31 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
     /**
      * @return
      */
-    private boolean sortResults() {
+    private int getPageSize() {
     
-        Optional<Properties> properties = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
-        boolean sortResults = false;
+        Optional<Properties> properties = setting.getKeyValueOptions();
+        int pageSize = getDefaultPageSize();
         if (properties.isPresent()) {
     
-            sortResults = Boolean.valueOf(properties.get().getProperty("sortResults", "false"));
+            pageSize = Integer.valueOf(properties.get().getProperty("pageSize", String.valueOf(getDefaultPageSize())));
         }
     
-        return sortResults;
+        return pageSize;
+    }
+
+    /**
+     * @return
+     */
+    private boolean sortResults() {
+
+	Optional<Properties> properties = setting.getKeyValueOptions();
+	boolean sortResults = false;
+	if (properties.isPresent()) {
+
+	    sortResults = Boolean.valueOf(properties.get().getProperty("sortResults", "false"));
+	}
+
+	return sortResults;
     }
 
     /**

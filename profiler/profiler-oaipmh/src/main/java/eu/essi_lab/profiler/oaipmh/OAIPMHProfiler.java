@@ -96,7 +96,7 @@ public class OAIPMHProfiler<OAIPS extends OAIPMHProfilerSetting> extends Profile
 
     protected OAIPMHRequestTransformer getWebRequestTransformer() {
 
-	return new OAIPMHRequestTransformer();
+	return new OAIPMHRequestTransformer(getSetting());
     }
 
     protected OAIPMHResultSetMapper getResultSetMapper() {
