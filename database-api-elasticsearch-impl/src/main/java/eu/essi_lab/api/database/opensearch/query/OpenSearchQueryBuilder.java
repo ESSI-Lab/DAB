@@ -809,17 +809,17 @@ public class OpenSearchQueryBuilder {
 
 	if (boost > 1) {
 
-	    rangeBuilder = rangeBuilder.boost((float)boost);
+	    rangeBuilder = rangeBuilder.boost((float) boost);
 	}
 
 	switch (operator) {
 	case EQUAL:
 
-	    return buildMatchPhraseQuery(field, value);
+	    return buildTermQuery(field, value, boost);
 
 	case NOT_EQUAL:
 
-	    return createNotQuery(buildMatchPhraseQuery(field, value));
+	    return createNotQuery(buildTermQuery(field, value, boost));
 
 	case GREATER:
 
@@ -1570,9 +1570,16 @@ public class OpenSearchQueryBuilder {
      * @param value
      * @return
      */
-    private static Query buildTermQuery(String field, String value) {
+    private static Query buildTermQuery(String field, String value, double boost) {
 
-	return new TermQuery.Builder().//
+	org.opensearch.client.opensearch._types.query_dsl.TermQuery.Builder builder = new TermQuery.Builder();
+	
+	if (boost > 1) {
+	    
+	    builder = builder.boost((float) boost);
+	}
+
+	return builder.//
 		field(field).//
 		value(new FieldValue.Builder().stringValue(value).build()).//
 		build().//
