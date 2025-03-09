@@ -337,9 +337,7 @@ public class OpenSearchWrapper {
 	SearchResponse<Object> response = client.search(builder -> {
 
 	    builder.query(searchQuery).//
-		    index(index).//
-		    source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
-			    build()));
+		    index(index);
 
 	    builder.size(size > 0 ? size : MAX_DEFAULT_HISTS);
 
@@ -417,7 +415,9 @@ public class OpenSearchWrapper {
 	    int start, //
 	    int size, //
 	    Optional<Queryable> orderingProperty, //
-	    Optional<OrderingDirection> ordertingDirection, Optional<SearchAfter> searchAfter) throws Exception {
+	    Optional<OrderingDirection> ordertingDirection,// 
+	    Optional<SearchAfter> searchAfter) throws Exception {
+	    
 
 	return search(//
 		index, //
@@ -789,6 +789,17 @@ public class OpenSearchWrapper {
 	    //
 	    List<String> toExclude = get_keywordsFields(ResourceProperty.listQueryables());
 	    toExclude.addAll(get_keywordsFields(MetadataElement.listQueryables()));
+
+	    // it excludes also the anyText field since it is usually ignored
+	    toExclude.add(MetadataElement.ANY_TEXT.getName());
+	    
+	    // it excludes also tha data index fields since they are usually ignored
+	    toExclude.add(IndexData.BINARY_DATA_TYPE);
+	    toExclude.add(IndexData.DATA_TYPE);
+	    toExclude.add(IndexData.DATABASE_ID);
+	    toExclude.add(IndexData.ENTRY_NAME);
+	    toExclude.add(IndexData.FOLDER_ID);
+	    toExclude.add(IndexData.FOLDER_NAME);
 
 	    if (topHitsBuilder != null) {
 
