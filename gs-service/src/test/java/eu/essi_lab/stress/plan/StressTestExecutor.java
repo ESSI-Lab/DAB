@@ -11,6 +11,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import org.apache.commons.io.IOUtils;
 
@@ -22,6 +23,7 @@ public class StressTestExecutor implements Callable<StressTestResult> {
     private final IStressTest test;
     private final String host;
     private GSLoggerFactory.GSLogger logger = GSLoggerFactory.getLogger(getClass());
+    private String rid;
 
     public StressTestExecutor(IStressTest test, String host) {
 	this.test = test;
@@ -31,7 +33,8 @@ public class StressTestExecutor implements Callable<StressTestResult> {
     @Override
     public StressTestResult call() throws Exception {
 
-	return executeRequest(test.createRequest(this.host));
+	rid = "stresstest-" + UUID.randomUUID();
+	return executeRequest(test.createRequest(this.host, rid));
 
     }
 
@@ -41,7 +44,8 @@ public class StressTestExecutor implements Callable<StressTestResult> {
 
 	try {
 
-	    logger.info("Sending {}", test.requestString(this.host));
+	    String requestString = test.requestString(this.host, rid);
+	    logger.info("Sending {}", requestString);
 
 	    long start = System.currentTimeMillis();
 	    HttpResponse<InputStream> response = HttpClient.newBuilder().build().send(request,
@@ -49,16 +53,18 @@ public class StressTestExecutor implements Callable<StressTestResult> {
 
 	    long end = System.currentTimeMillis();
 	    Integer code = response.statusCode();
-	    logger.info("({}) Completed {}", code, test.requestString(this.host));
+	    logger.info("({}) Completed {}", code, requestString);
 
 	    result.setCode(code);
-	    result.setRequest(test.requestString(this.host));
+	    result.setRequest(requestString);
 	    result.setStart(start);
 	    result.setEnd(end);
 	    result.setTest(test);
 	    result.setResponseFile(saveResponseToFile(response.body()));
 
 	    result.getResponseMetrics().addAll(test.getResponseMetrics());
+	    result.getServerMetrics().addAll(test.getServerMetrics());
+	    result.setRequestId(rid);
 
 	    return result;
 

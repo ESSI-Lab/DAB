@@ -1,7 +1,6 @@
 package eu.essi_lab.stress.plan.discovery;
 
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.stress.plan.IStressTest;
 import java.io.File;
@@ -9,11 +8,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+import java.util.Optional;
 import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
+import software.amazon.awssdk.services.cloudwatchlogs.model.FilterLogEventsRequest;
+import software.amazon.awssdk.services.cloudwatchlogs.model.FilterLogEventsResponse;
 
 /**
  * @author Mattia Santoro
@@ -30,8 +37,7 @@ public class DiscoveryStressTest implements IStressTest {
 
     private String view;
 
-    private String createRequestParameters() {
-	String rid = "stresstest-" + UUID.randomUUID().toString();
+    private String createRequestParameters(String rid) {
 
 	String st = "";
 	if (searchText != null)
@@ -136,8 +142,8 @@ public class DiscoveryStressTest implements IStressTest {
     }
 
     @Override
-    public HttpRequest createRequest(String host) throws URISyntaxException {
-	String params = createRequestParameters();
+    public HttpRequest createRequest(String host, String rid) throws URISyntaxException {
+	String params = createRequestParameters(rid);
 
 	String path = createPath();
 
@@ -147,8 +153,8 @@ public class DiscoveryStressTest implements IStressTest {
     }
 
     @Override
-    public String requestString(String host) {
-	String params = createRequestParameters();
+    public String requestString(String host, String rid) {
+	String params = createRequestParameters(rid);
 
 	String path = createPath();
 
@@ -164,24 +170,85 @@ public class DiscoveryStressTest implements IStressTest {
 
     @Override
     public List<String> getResponseMetrics() {
+
 	return List.of("resultsnum");
     }
 
     @Override
     public Long readMetric(String metric, String filePath) {
 
-	try {
-	    XMLDocumentReader reader = new XMLDocumentReader(new FileInputStream(new File(filePath)));
+	if ("resultsnum".equalsIgnoreCase(metric)) {
 
-	    Number results = reader.evaluateNumber("/*:feed/*:totalResults");
+	    try {
+		XMLDocumentReader reader = new XMLDocumentReader(new FileInputStream(new File(filePath)));
 
-	    Long value = results.longValue();
+		Number results = reader.evaluateNumber("/*:feed/*:totalResults");
 
-	    return value;
-	} catch (SAXException | IOException | XPathExpressionException e) {
-	    e.printStackTrace();
+		Long value = results.longValue();
+
+		return value;
+	    } catch (SAXException | IOException | XPathExpressionException e) {
+		e.printStackTrace();
+
+	    }
 
 	}
 	return 0L;
+
+    }
+
+    @Override
+    public List<String> getServerMetrics() {
+
+	return List.of("MESSAGE_AUTHORIZATION", "BOND_NORMALIZATION", "OPENSEARCH_FINDER_GET_SOURCES_DATA_DIR_MAP",
+		"OPENSEARCH_FINDER_COUNT", "RESULT_SET_COUNTING", "OPENSEARCH_FINDER_GET_SOURCES_DATA_DIR_MAP",
+		"OPENSEARCH_FINDER_DISCOVERY", "OPENSEARCH_FINDER_RESOURCES_CREATION", "RESULT_SET_RETRIEVING",
+		"RESULT_SET_OVERALL_RETRIEVING", "RESULT_SET_MAPPING", "RESULT_SET_FORMATTING", "REQUEST_HANDLING");
+    }
+
+    private Map<String, FilterLogEventsResponse> responses = new HashMap<>();
+
+    @Override
+    public Long readServerMetric(String serverMetric, String requestId, String logGroup, String logNamePrefix) {
+	CloudWatchLogsClient client = CloudWatchLogsClient.builder().region(Region.US_EAST_1).credentialsProvider(
+		ProfileCredentialsProvider.create()
+	).build();
+
+	FilterLogEventsResponse response = responses.get(requestId);
+	if (response == null) {
+	    Long now = Instant.now().toEpochMilli();
+	    FilterLogEventsRequest request =
+		    FilterLogEventsRequest.builder().filterPattern("%." + requestId + ".%")
+			    .logGroupName(logGroup)
+			    .logStreamNamePrefix(logNamePrefix)
+			    .startTime(now - (1000L * 60 * 60 * 1))
+			    .endTime(now)
+
+			    .build();
+	    response = client.filterLogEvents(request);
+	    responses.put(requestId, response);
+
+	}
+
+	return readCloudWatchMetric(serverMetric, response);
+
+    }
+
+    private Long readCloudWatchMetric(String metric, FilterLogEventsResponse response) {
+
+	Optional<Long> val = response.events().stream().map(event -> {
+	    String evstring = event.toString();
+	    if (evstring.contains(metric)) {
+		String time = evstring.split(metric + "] \\[")[1].split("] \\[secs]")[0];
+
+		Long ltime = Long.valueOf(time.replace(".", ""));
+
+		return ltime;
+	    }
+
+	    return Long.valueOf("0");
+	}).filter(v -> v > 0).findFirst();
+
+	return val.orElse(-10L);
     }
 }

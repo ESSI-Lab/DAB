@@ -74,19 +74,19 @@ public class DiscoveryStressExternalTestIT {
 
 	StressPlan plan = new StressPlan();
 	plan.addStressTest(t1);
-	plan.addStressTest(t2);
-	plan.addStressTest(t3);
-	plan.addStressTest(t4);
-	plan.addStressTest(t5);
-	plan.addStressTest(t5_1);
-	plan.addStressTest(t5_2);
-	plan.addStressTest(t5_3);
-	plan.addStressTest(t5_4);
-	plan.addStressTest(t6);
-	plan.addStressTest(t6_1);
-	plan.addStressTest(t6_2);
+	//	plan.addStressTest(t2);
+	//	plan.addStressTest(t3);
+	//	plan.addStressTest(t4);
+	//	plan.addStressTest(t5);
+	//	plan.addStressTest(t5_1);
+	//	plan.addStressTest(t5_2);
+	//	plan.addStressTest(t5_3);
+	//	plan.addStressTest(t5_4);
+	//	plan.addStressTest(t6);
+	//	plan.addStressTest(t6_1);
+	//	plan.addStressTest(t6_2);
 	plan.setParallelRequests(2);
-	plan.setMultiplicationFactor(4);
+	plan.setMultiplicationFactor(5);
 
 	return plan;
     }
@@ -125,6 +125,33 @@ public class DiscoveryStressExternalTestIT {
 
     }
 
+    private static String logGroup(String host) {
+	if ("https://gs-service-test.geodab.eu".equalsIgnoreCase(host))
+	    return "gstestcluster";
+
+	if ("https://gs-service-preproduction.geodab.eu".equalsIgnoreCase(host))
+	    return "gsprodcluster";
+
+	if ("https://gs-service-production.geodab.eu".equalsIgnoreCase(host))
+	    return "gsprodcluster";
+	return null;
+    }
+
+    private static String logPrefix(String host) {
+
+	if ("https://gs-service-test.geodab.eu".equalsIgnoreCase(host))
+	    return "gs-service-test";
+
+	if ("https://gs-service-preproduction.geodab.eu".equalsIgnoreCase(host))
+	    return "gs-service-preprod";
+
+	if ("https://gs-service-production.geodab.eu".equalsIgnoreCase(host))
+	    return "gs-service-production";
+
+	return null;
+
+    }
+
     public static void main(String[] args) {
 
 	StressPlan plan = new DiscoveryStressExternalTestIT().definePlan();
@@ -143,14 +170,18 @@ public class DiscoveryStressExternalTestIT {
 		throw new RuntimeException(e);
 	    }
 	}
-	Arrays.asList(1, 2, 4, 8).stream().forEach(parallel -> {
+	Arrays.asList(1).stream().forEach(parallel -> {
 	    Arrays.asList("production", "preproduction", "test").stream().forEach(env -> {
+		//	    Arrays.asList("test").stream().forEach(env -> {
 
 		String hostname = "https://gs-service-" + env + ".geodab.eu";
+		String logGroup = logGroup(hostname);
+		String logPrefix = logPrefix(hostname);
+
 		plan.setParallelRequests(parallel);
 		StressPlanExecutor planExecutor = new StressPlanExecutor(plan, hostname);
 
-		StressPlanResultCollector collector = new StressPlanResultCollector();
+		StressPlanResultCollector collector = new StressPlanResultCollector(logGroup, logPrefix);
 		try {
 		    planExecutor.execute(collector, 10L, TimeUnit.MINUTES);
 		} catch (InterruptedException e) {
