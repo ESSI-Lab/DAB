@@ -1,5 +1,6 @@
 package eu.essi_lab.stress.plan;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -18,6 +19,13 @@ public class StressPlanResultCollector {
 
     private String host;
     private StressPlan plan;
+    private final String logPrefix;
+    private final String logGroup;
+
+    public StressPlanResultCollector(String logGroup, String logPrefix) {
+	this.logGroup = logGroup;
+	this.logPrefix = logPrefix;
+    }
 
     public void addResult(StressTestResult result) {
 	getResults().add((StressTestResult) result);
@@ -38,6 +46,10 @@ public class StressPlanResultCollector {
 	columns.addAll(Arrays.asList("host", "total_req", "total_succ", "total_fail", "total_mean_exec_time",
 		"max_parallel"));
 
+	List<String> serverMetrics = getResults().get(0).getServerMetrics();
+
+	serverMetrics.stream().forEach(m -> columns.add("total_" + m));
+
 	Map<String, Integer> totalByType = totalByType();
 
 	List<String> rsponseMetrics = getResults().get(0).getResponseMetrics();
@@ -54,16 +66,23 @@ public class StressPlanResultCollector {
 	return columns;
     }
 
-    public List<String> getCSVColumnValues() {
+    public Map<String, StressTestCSVValue> getCSVColumnValues() {
 
-	List<String> values = new ArrayList<>();
+	Map<String, StressTestCSVValue> values = new HashMap<>();
 
-	values.add(host);
-	values.add(getResults().size() + "");
-	values.add(totalOkTests() + "");
-	values.add(getResults().size() - totalOkTests() + "");
-	values.add(meanExecutionTime() + "");
-	values.add(getPlan().getParallelRequests() + "");
+	values.put("host", new StressTestCSVValue("host", host));
+	values.put("total_req", new StressTestCSVValue("total_req", getResults().size() + ""));
+	values.put("total_succ", new StressTestCSVValue("total_succ", totalOkTests() + ""));
+	values.put("total_fail", new StressTestCSVValue("total_fail", getResults().size() - totalOkTests() + ""));
+	values.put("total_mean_exec_time", new StressTestCSVValue("total_mean_exec_time", meanExecutionTime() + ""));
+
+	List<String> serverMetrics = getResults().get(0).getServerMetrics();
+
+	serverMetrics.stream().forEach(sm -> {
+	    values.put("total_" + sm, new StressTestCSVValue("total_" + sm, meanServerMetric(sm) + ""));
+	});
+
+	values.put("max_parallel", new StressTestCSVValue("max_parallel", getPlan().getParallelRequests() + ""));
 
 	Map<String, Integer> totalByType = totalByType();
 	Map<String, Integer> successByType = successByType();
@@ -73,12 +92,14 @@ public class StressPlanResultCollector {
 
 	totalByType.keySet().stream().forEach(c -> {
 
-	    values.add(totalByType.get(c) + "");
-	    values.add(successByType.get(c) + "");
-	    values.add(totalByType.get(c) - successByType.get(c) + "");
-	    values.add(meanExecByType.get(c) + "");
+	    values.put("total_" + c, new StressTestCSVValue("total_" + c, totalByType.get(c) + ""));
+	    values.put("success_" + c, new StressTestCSVValue("success_" + c, successByType.get(c) + ""));
+	    values.put("fail_" + c, new StressTestCSVValue("fail_" + c, totalByType.get(c) - successByType.get(c) + ""));
+	    values.put("mean_exec_" + c, new StressTestCSVValue("mean_exec_" + c, meanExecByType.get(c) + ""));
 
-	    metricsByType.get(c).keySet().stream().forEach(m -> values.add(metricsByType.get(c).get(m) + ""));
+	    metricsByType.get(c).keySet().stream().forEach(m ->
+		    values.put(m + "_" + c, new StressTestCSVValue(m + "_" + c, metricsByType.get(c).get(m) + ""))
+	    );
 
 	});
 
@@ -87,7 +108,7 @@ public class StressPlanResultCollector {
 
     public void saveReportToCSV(OutputStream out) throws IOException {
 	List<String> columns = getCSVColumns();
-	List<String> values = getCSVColumnValues();
+	Map<String, StressTestCSVValue> values = getCSVColumnValues();
 
 	OutputStreamWriter writer = new OutputStreamWriter(out);
 	columns.stream().forEach(c -> {
@@ -101,9 +122,9 @@ public class StressPlanResultCollector {
 
 	writer.write(System.lineSeparator());
 
-	values.stream().forEach(c -> {
+	columns.stream().forEach(c -> {
 	    try {
-		writer.write(c);
+		writer.write(values.get(c).getValue());
 		writer.write(",");
 	    } catch (IOException e) {
 		throw new RuntimeException(e);
@@ -308,6 +329,27 @@ public class StressPlanResultCollector {
 	return builder.toString();
     }
 
+    private Long meanServerMetric(String serverMetric) {
+
+	Long total = 0L;
+	int count = 0;
+
+	for (StressTestResult result : getResults()) {
+	    Long value = result.getTest().readServerMetric(serverMetric, result.getRequestId(), getLogGroup(), getLogPrefix());
+	    if (value > -1) {
+		total += value;
+		count += 1;
+	    } else
+		GSLoggerFactory.getLogger(getClass()).error("Unable to find server metric {} for request {}", serverMetric,
+			result.getRequest());
+	}
+
+	if (count > 0)
+	    return total / count;
+
+	return -10L;
+    }
+
     private Long meanExecutionTime() {
 
 	Long total = 0L;
@@ -333,5 +375,13 @@ public class StressPlanResultCollector {
 
     public StressPlan getPlan() {
 	return plan;
+    }
+
+    public String getLogGroup() {
+	return logGroup;
+    }
+
+    public String getLogPrefix() {
+	return logPrefix;
     }
 }

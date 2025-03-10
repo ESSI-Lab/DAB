@@ -10,13 +10,18 @@ import java.util.List;
 public interface IStressTest {
     String createTestKey();
 
-    HttpRequest createRequest(String host) throws URISyntaxException;
+    HttpRequest createRequest(String host, String requestId) throws URISyntaxException;
 
-    String requestString(String host);
+    String requestString(String host, String requestId);
 
     String getResponseFileExtension();
 
     List<String> getResponseMetrics();
 
     Long readMetric(String metric, String filePath);
+
+    List<String> getServerMetrics();
+
+    Long readServerMetric(String serverMetric, String requestId, String logGroup, String logNamePrefix);
+
 }

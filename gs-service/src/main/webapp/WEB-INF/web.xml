@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="3.0"  
-    xmlns="http://java.sun.com/xml/ns/javaee" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
 	<display-name>${project.name} ${project.version}</display-name>
-	
+
 	<context-param>
-	    
-	    <!-- See https://vaadin.com/docs/v14/guide/configuration for other properties   -->
-	    
-	    <!-- Set the Vaadin heartbeat interval to 30 seconds -->
-	    <!-- Used by SingleTabManager to detect if the tab with the configuration view has been closed -->
-	    
-    	<param-name>heartbeatInterval</param-name>
-    	<param-value>30</param-value>
-  	</context-param> 
+
+		<!-- See https://vaadin.com/docs/v14/guide/configuration for other properties -->
+
+		<!-- Set the Vaadin heartbeat interval to 30 seconds -->
+		<!-- Used by SingleTabManager to detect if the tab with the configuration 
+			view has been closed -->
+
+		<param-name>heartbeatInterval</param-name>
+		<param-value>30</param-value>
+	</context-param>
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -29,11 +29,11 @@
 	<listener>
 		<listener-class>eu.essi_lab.gssrv.servlet.ServletListener</listener-class>
 	</listener>
-	
+
 	<!-- ===================== -->
 	<!-- Authenticator servlet -->
 	<!-- ===================== -->
-	
+
 	<servlet>
 		<servlet-name>authenticator</servlet-name>
 		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
@@ -46,105 +46,116 @@
 	</servlet-mapping>
 
 	<!-- ===================== -->
-	<!--  Dispatcher servlet   -->
+	<!-- Dispatcher servlet -->
 	<!-- ===================== -->
-	
+
 	<servlet>
 		<servlet-name>dispatcher</servlet-name>
-		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>	 
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
-		<!-- remove comment to enable async support  -->
-		<!-- <async-supported>true</async-supported> -->	
-	<async-supported>true</async-supported>
-		
+		<!-- remove comment to enable async support -->
+		<!-- <async-supported>true</async-supported> -->
+		<async-supported>true</async-supported>
+
 	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>dispatcher</servlet-name>
 		<url-pattern>/services/*</url-pattern>
 	</servlet-mapping>
-	
+
 	<!-- ===================== -->
-	<!--     PubSub servlet    -->
+	<!-- PubSub servlet -->
 	<!-- ===================== -->
-	
+
 	<servlet>
 		<servlet-name>PubSubService</servlet-name>
 		<servlet-class>eu.essi_lab.gssrv.servlet.PubSubService</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>PubSubService</servlet-name>
 		<url-pattern>/services/essi/pubsub/*</url-pattern>
-	</servlet-mapping>	
-		
+	</servlet-mapping>
+
 	<!-- ===================== -->
-	<!--    Vaadin servlet     -->
+	<!-- Vaadin servlet -->
 	<!-- ===================== -->
-	
+
 	<servlet>
 		<servlet-name>Vaadin</servlet-name>
 		<servlet-class>com.vaadin.flow.server.VaadinServlet</servlet-class>
 		<init-param>
-			<!-- See https://vaadin.com/docs/v23/configuration/properties for other properties   -->	    
-		   
-		    <!-- Set the Vaadin heartbeat interval to 30 seconds -->
-		    <!-- Used by SingleTabManager to detect if the tab with the configuration view has been closed -->
-	    	
-	    	<param-name>heartbeatInterval</param-name>
-	    	<param-value>30</param-value>
+			<!-- See https://vaadin.com/docs/v23/configuration/properties for other 
+				properties -->
+
+			<!-- Set the Vaadin heartbeat interval to 30 seconds -->
+			<!-- Used by SingleTabManager to detect if the tab with the configuration 
+				view has been closed -->
+
+			<param-name>heartbeatInterval</param-name>
+			<param-value>30</param-value>
 		</init-param>
-		
+
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>Vaadin</servlet-name>
 		<url-pattern>/configuration/*</url-pattern>
-	</servlet-mapping>	
-	
+	</servlet-mapping>
+
+	<filter>
+		<filter-name>RequestLoggingFilter</filter-name>
+		<filter-class>eu.essi_lab.gssrv.servlet.RequestLoggingFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>RequestLoggingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<!-- ================================== -->
-	<!--         RateLimiterFilter          -->
+	<!-- RateLimiterFilter -->
 	<!-- ================================== -->
-		 
+
 	<filter>
 		<filter-name>RateLimiterFilter</filter-name>
-		<filter-class>eu.essi_lab.gssrv.servlet.RateLimiterFilter</filter-class>		
- 	</filter> 
-			
+		<filter-class>eu.essi_lab.gssrv.servlet.RateLimiterFilter</filter-class>
+	</filter>
+
 	<filter-mapping>
 		<filter-name>RateLimiterFilter</filter-name>
 		<url-pattern>*</url-pattern>
 	</filter-mapping>
-	 		  
+
 	<!-- ===================== -->
-	<!--   UserFinderFilter    -->
+	<!-- UserFinderFilter -->
 	<!-- ===================== -->
 
 	<filter>
 		<filter-name>user-finder-filter</filter-name>
 		<filter-class>eu.essi_lab.gssrv.servlet.UserFinderFilter</filter-class>
 	</filter>
- 		
+
 	<filter-mapping>
 		<filter-name>user-finder-filter</filter-name>
 		<url-pattern>/configuration/*</url-pattern>
 	</filter-mapping>
-	
+
 	<filter-mapping>
 		<filter-name>user-finder-filter</filter-name>
 		<url-pattern>/services/*</url-pattern>
 	</filter-mapping>
-	
+
 	<!-- ===================== -->
-	<!--        CorsFilter     -->
+	<!-- CorsFilter -->
 	<!-- ===================== -->
-	
+
 	<filter>
 		<filter-name>CorsFilter</filter-name>
 		<filter-class>eu.essi_lab.gssrv.servlet.CORSDelegatorFilter</filter-class>
-		<async-supported>true</async-supported>	
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>cors.allowed.origins</param-name>
 			<param-value>*</param-value>
@@ -161,10 +172,8 @@
 			<param-name>cors.exposed.headers</param-name>
 			<param-value>Access-Control-Allow-Origin,Access-Control-Allow-Credentials</param-value>
 		</init-param>
-		<!-- commented, as raises an error on the new tomcat init-param>
-			<param-name>cors.support.credentials</param-name>
-			<param-value>true</param-value>
-		</init-param-->
+		<!-- commented, as raises an error on the new tomcat init-param> <param-name>cors.support.credentials</param-name> 
+			<param-value>true</param-value> </init-param -->
 		<init-param>
 			<param-name>cors.preflight.maxage</param-name>
 			<param-value>10</param-value>
@@ -174,25 +183,25 @@
 			<param-value>true</param-value>
 		</init-param>
 	</filter>
-	
+
 	<filter-mapping>
 		<filter-name>CorsFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
+
 	<!-- ======================== -->
-	<!--   ProfilerServiceFilter  -->
+	<!-- ProfilerServiceFilter -->
 	<!-- ======================== -->
-		
+
 	<filter>
 		<filter-name>ProfilerServiceFilter</filter-name>
-		<filter-class>eu.essi_lab.gssrv.servlet.ProfilerServiceFilter</filter-class>		
-		<async-supported>true</async-supported>	
-	</filter> 
-			
+		<filter-class>eu.essi_lab.gssrv.servlet.ProfilerServiceFilter</filter-class>
+		<async-supported>true</async-supported>
+	</filter>
+
 	<filter-mapping>
 		<filter-name>ProfilerServiceFilter</filter-name>
 		<url-pattern>*</url-pattern>
 	</filter-mapping>
-	
+
 </web-app>

@@ -289,8 +289,11 @@
 
 
 	<dependencies>
-	
-	
+
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>cloudwatchlogs</artifactId>
+		</dependency>
 
 		<dependency>
 		    <groupId>org.apache.jena</groupId>

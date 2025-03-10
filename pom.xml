@@ -435,7 +435,11 @@
 				<version>${aws-java-sdk-bom.version}</version>
 				<type>pom</type>
 			</dependency>
-
+			<dependency>
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>cloudwatchlogs</artifactId>
+				<version>${aws-java-sdk-bom.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>software.amazon.awssdk</groupId>
 				<artifactId>s3-transfer-manager</artifactId>
