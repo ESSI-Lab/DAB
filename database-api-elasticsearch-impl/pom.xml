@@ -50,11 +50,11 @@
 			<version>${opensearch.client-opensearch-rest-client.version}</version>			
 		</dependency>
 
-		<!--dependency>
+		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>${jackson-core.version}</version>
-		</dependency-->
+			<version>${jackson-core.version}</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
 
 		<dependency>
 			<artifactId>apache-client</artifactId>
