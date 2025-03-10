@@ -75,7 +75,7 @@ public class SearchAfter {
      * @return the stringValue
      */
     public Optional<String> getStringValue() {
-	
+
 	return Optional.ofNullable(stringValue);
     }
 
@@ -112,5 +112,28 @@ public class SearchAfter {
      */
     public void setDoubleValue(double doubleValue) {
 	this.doubleValue = doubleValue;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> toStringValue() {
+
+	if (doubleValue != null) {
+
+	    return Optional.of(String.valueOf(doubleValue));
+	}
+
+	if (longValue != null) {
+
+	    return Optional.of(String.valueOf(longValue));
+	}
+
+	if (stringValue != null) {
+
+	    return Optional.of(stringValue);
+	}
+
+	return Optional.empty();
     }
 }
