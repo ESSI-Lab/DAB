@@ -19,7 +19,7 @@
 			<artifactId>database-api</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>eu.essi_lab</groupId>
 			<artifactId>database-indexes</artifactId>
@@ -41,9 +41,20 @@
 		<dependency>
 			<groupId>org.opensearch.client</groupId>
 			<artifactId>opensearch-java</artifactId>
-			<version>2.19.0</version>
+			<version>${opensearch.client-opensearch-java.version}</version>
 		</dependency>
-	
+
+		<dependency>
+			<groupId>org.opensearch.client</groupId>
+			<artifactId>opensearch-rest-client</artifactId>
+			<version>${opensearch.client-opensearch-rest-client.version}</version>
+		</dependency>
+
+		<!--dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson-core.version}</version>
+		</dependency-->
 
 		<dependency>
 			<artifactId>apache-client</artifactId>
@@ -51,17 +62,6 @@
 			<version>2.29.46</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.opensearch.client</groupId>
-			<artifactId>opensearch-rest-client</artifactId>
-			<version>2.18.0</version>
-		</dependency>
-
-		<!--	<dependency>
-			<groupId>org.apache.httpcomponents.client5</groupId>
-			<artifactId>httpclient5</artifactId>
-			<version>5.4.1</version>
-		</dependency>-->
 
 	</dependencies>
 

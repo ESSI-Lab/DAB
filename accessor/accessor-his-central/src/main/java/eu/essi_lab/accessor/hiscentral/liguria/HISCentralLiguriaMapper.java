@@ -511,6 +511,9 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	CoverageDescription coverageDescription = new CoverageDescription();
 
 	coverageDescription.setAttributeIdentifier(varId);
+	if(varName.equals("Mean river discharge")) {
+	    varName = "river discharge";
+	}
 	coverageDescription.setAttributeTitle(varName);
 
 	String missingValue = "-9999";

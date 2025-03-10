@@ -393,14 +393,13 @@ public class HISCentralLazioMapper extends FileIdentifierMapper {
 	CoverageDescription coverageDescription = new CoverageDescription();
 
 	coverageDescription.setAttributeIdentifier(measureName);
-	switch (measureName) {
-	case "Portata A":
-	case "Portata B":
+	if (measureName.startsWith("Portata ")) {
 	    measureName = "Portata";
-	    break;
-	default:
-	    break;
 	}
+	if (measureName.startsWith("Idrometro ")) {
+	    measureName = "Idrometro";
+	}
+	
 	coverageDescription.setAttributeTitle(measureName);
 
 	String missingValue = "-9999";

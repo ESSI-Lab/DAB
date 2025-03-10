@@ -11,10 +11,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.OpenSearchServiceType;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.Database.OpenSearchServiceType;
 import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;

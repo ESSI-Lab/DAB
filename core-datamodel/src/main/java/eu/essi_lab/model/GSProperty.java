@@ -43,6 +43,15 @@ public class GSProperty<T> implements Serializable {
     private String name;
 
     /**
+     * @param name
+     * @param value
+     */
+    public static <T> GSProperty<T> of(String name, T value) {
+
+	return new GSProperty<T>(name, value);
+    }
+
+    /**
      * 
      */
     public GSProperty() {

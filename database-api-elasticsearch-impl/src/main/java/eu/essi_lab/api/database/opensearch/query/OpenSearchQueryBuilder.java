@@ -26,11 +26,17 @@ package eu.essi_lab.api.database.opensearch.query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.chrono.ISOChronology;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonData;
@@ -65,7 +71,9 @@ import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.SpatialIndexHelper;
+import eu.essi_lab.iso.datamodel.classes.TemporalExtent.FrameValue;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
@@ -338,6 +346,11 @@ public class OpenSearchQueryBuilder {
     @SuppressWarnings("incomplete-switch")
     public Query buildMetadataElementQuery(MetadataElement el, BondOperator operator, String value) {
 
+	if (el == MetadataElement.TEMP_EXTENT_BEGIN || el == MetadataElement.TEMP_EXTENT_END) {
+
+	    return buildTempExtentQuery(el, operator, value);
+	}
+
 	switch (operator) {
 	case EXISTS:
 	    return buildExistsFieldQuery(el.getName());
@@ -553,6 +566,20 @@ public class OpenSearchQueryBuilder {
 
     /**
      * @param databaseId
+     * @param viewId
+     * @return
+     */
+    public static Query buildGetViewQuery(String databaseId, String viewId) {
+
+	Query databaseIdQuery = buildDatabaseIdQuery(databaseId);
+
+	Query viewIdQuery = buildMatchPhraseQuery(IndexMapping.toKeywordField(ViewsMapping.VIEW_ID), viewId);
+
+	return buildFilterQuery(Arrays.asList(databaseIdQuery, viewIdQuery));
+    }
+
+    /**
+     * @param databaseId
      * @param creator
      * @param owner
      * @param visibility
@@ -585,9 +612,7 @@ public class OpenSearchQueryBuilder {
 
 	filterList.add(databaseIdQuery);
 
-	List<Query> shouldList = buildIndexesQueryList();
-
-	return buildBoolQuery(filterList, shouldList, Arrays.asList());
+	return buildFilterQuery(filterList);
     }
 
     /**
@@ -644,7 +669,8 @@ public class OpenSearchQueryBuilder {
 
     /**
      * Builds a bool <i>must query</i> which searches the entries with the given <code>fields</code> matching
-     * the related value in <code>fieldValues</code>, according to the <code>field/fieldValue</code> position in the lists
+     * the related value in <code>fieldValues</code>, according to the <code>field/fieldValue</code> position in the
+     * lists
      * 
      * @param databaseId
      * @param fields
@@ -778,45 +804,45 @@ public class OpenSearchQueryBuilder {
     @SuppressWarnings("incomplete-switch")
     public static Query buildRangeQuery(String field, BondOperator operator, String value, double boost) {
 
-	Builder builder = new RangeQuery.Builder().//
-		field(value);
+	Builder rangeBuilder = new RangeQuery.Builder().//
+		field(field);
 
 	if (boost > 1) {
 
-	    builder = builder.boost(null);
+	    rangeBuilder = rangeBuilder.boost((float) boost);
 	}
 
 	switch (operator) {
 	case EQUAL:
 
-	    return buildMatchPhraseQuery(field, value);
+	    return buildTermQuery(field, value, boost);
 
 	case NOT_EQUAL:
 
-	    return createNotQuery(buildMatchPhraseQuery(field, value));
+	    return createNotQuery(buildTermQuery(field, value, boost));
 
 	case GREATER:
 
-	    builder = builder.gt(JsonData.of(value)).field(field);
+	    rangeBuilder = rangeBuilder.gt(JsonData.of(value));
 	    break;
 
 	case GREATER_OR_EQUAL:
 
-	    builder = builder.gte(JsonData.of(value)).field(field);
+	    rangeBuilder = rangeBuilder.gte(JsonData.of(value));
 	    break;
 
 	case LESS:
 
-	    builder = builder.lt(JsonData.of(value)).field(field);
+	    rangeBuilder = rangeBuilder.lt(JsonData.of(value));
 	    break;
 
 	case LESS_OR_EQUAL:
 
-	    builder = builder.lte(JsonData.of(value)).field(field);
+	    rangeBuilder = rangeBuilder.lte(JsonData.of(value));
 	    break;
 	}
 
-	return builder.build().toQuery();
+	return rangeBuilder.build().toQuery();
     }
 
     /**
@@ -862,6 +888,154 @@ public class OpenSearchQueryBuilder {
 			build()
 
 		).collect(Collectors.toList());
+    }
+
+    /**
+     * @param el
+     * @param operator
+     * @param value
+     * @return
+     */
+    @SuppressWarnings("incomplete-switch")
+    private Query buildTempExtentQuery(MetadataElement el, BondOperator operator, String value) {
+
+	switch (operator) {
+	case EXISTS:
+
+	    return buildExistsFieldQuery(el.getName());
+
+	case NOT_EXISTS:
+
+	    return buildNotExistsFieldQuery(el.getName());
+
+	default:
+
+	    List<Query> operands = new ArrayList<>();
+	    Date nowDate = new Date();
+	    DateTimeFormatter formatter = ISODateTimeFormat.dateTimeParser().withChronology(ISOChronology.getInstance(DateTimeZone.UTC));
+	    DateTime parsed;
+	    if (value.equals("now") || value.equals("NOW")) {
+		parsed = new DateTime();
+	    } else {
+		parsed = formatter.parseDateTime(value);
+	    }
+
+	    Date literalDate = parsed.toDate();
+
+	    switch (el) {
+
+	    case TEMP_EXTENT_BEGIN: {
+		// ------------------------------------------------------------
+		//
+		// creates the now query in case of TEMP_EXTENT_BEGIN element and:
+		//
+		// OP = '<' AND (TARGET > NOW) OR
+		// OP = '<=' AND (TARGET >= NOW) OR
+		// OP = '>' AND (TARGET < NOW) OR
+		// OP = '>=' AND (TARGET <= NOW)
+		//
+		if (operator == BondOperator.LESS && literalDate.compareTo(nowDate) > 0 || //
+			operator == BondOperator.LESS_OR_EQUAL && literalDate.compareTo(nowDate) >= 0 || //
+			operator == BondOperator.GREATER && literalDate.compareTo(nowDate) < 0 || //
+			operator == BondOperator.GREATER_OR_EQUAL && literalDate.compareTo(nowDate) <= 0) {
+
+		    operands.add(buildTempExtentNowQuery(el));
+		}
+
+		//
+		//
+		// ------------------------------------------------
+		//
+		//
+
+		for (FrameValue frameValue : FrameValue.values()) {
+
+		    Date dateBeforeNow = new Date(System.currentTimeMillis() - Long.valueOf(frameValue.asMillis()));
+
+		    if (operator == BondOperator.LESS && literalDate.compareTo(dateBeforeNow) > 0 || //
+			    operator == BondOperator.LESS_OR_EQUAL && literalDate.compareTo(dateBeforeNow) >= 0 || //
+
+			    operator == BondOperator.GREATER && literalDate.compareTo(dateBeforeNow) < 0 || //
+			    operator == BondOperator.GREATER_OR_EQUAL && literalDate.compareTo(dateBeforeNow) <= 0) {
+
+			Query beforeNowQuery = buildTempExtentBeforeNowQuery(el, frameValue.name());
+
+			operands.add(beforeNowQuery);
+		    }
+		}
+
+		//
+		//
+		// ------------------------------------------------
+		//
+		//
+
+		break;
+	    }
+
+	    case TEMP_EXTENT_END:
+		// ------------------------------------------------------------
+		//
+		// creates the now query in case of TEMP_EXTENT_END element and:
+		//
+		// OP = '>' AND (TARGET < NOW) OR
+		// OP = '>=' AND (TARGET <= NOW) OR
+		// OP = '<' AND (TARGET > NOW) OR
+		// OP = '<=' AND (TARGET >= NOW)
+		//
+		if (operator == BondOperator.GREATER && literalDate.compareTo(nowDate) < 0 || //
+			operator == BondOperator.GREATER_OR_EQUAL && literalDate.compareTo(nowDate) <= 0 || //
+			operator == BondOperator.LESS && literalDate.compareTo(nowDate) > 0 || //
+			operator == BondOperator.LESS_OR_EQUAL && literalDate.compareTo(nowDate) >= 0) {
+
+		    operands.add(buildTempExtentNowQuery(el));
+		}
+	    }
+
+	    // -----------------
+	    //
+	    // creates the query
+	    //
+
+	    value = ConversionUtils.parseToLongString(value);
+
+	    Query literalQuery = buildRangeQuery(el.getName(), operator, value);
+
+	    if (operands.isEmpty()) {
+
+		return literalQuery;
+	    }
+
+	    operands.add(literalQuery);
+
+	    return buildShouldQuery(operands);
+	}
+    }
+
+    /**
+     * @param el
+     * @param longTime
+     * @return
+     */
+    private Query buildTempExtentBeforeNowQuery(MetadataElement el, String longTime) {
+
+	// using the keyword field
+	String field = DataFolderMapping.toKeywordField(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW.getName());
+
+	return buildRangeQuery(field, BondOperator.EQUAL, longTime);
+    }
+
+    /**
+     * @param el
+     * @return
+     */
+    private Query buildTempExtentNowQuery(MetadataElement el) {
+
+	String field = el == MetadataElement.TEMP_EXTENT_BEGIN ? //
+		IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName() : //
+		IndexedElements.TEMP_EXTENT_END_NOW.getElementName();
+
+	return buildRangeQuery(field, BondOperator.EQUAL, "true");
     }
 
     /**
@@ -1396,9 +1570,16 @@ public class OpenSearchQueryBuilder {
      * @param value
      * @return
      */
-    private static Query buildTermQuery(String field, String value) {
+    private static Query buildTermQuery(String field, String value, double boost) {
 
-	return new TermQuery.Builder().//
+	org.opensearch.client.opensearch._types.query_dsl.TermQuery.Builder builder = new TermQuery.Builder();
+	
+	if (boost > 1) {
+	    
+	    builder = builder.boost((float) boost);
+	}
+
+	return builder.//
 		field(field).//
 		value(new FieldValue.Builder().stringValue(value).build()).//
 		build().//

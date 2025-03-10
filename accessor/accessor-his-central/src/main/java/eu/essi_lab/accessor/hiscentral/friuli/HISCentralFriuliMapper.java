@@ -56,7 +56,6 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 
     private SimpleDateFormat iso8601Format;
 
-    
     @Override
     public String getSupportedOriginalMetadataSchema() {
 	return CommonNameSpaceContext.HISCENTRAL_FRIULI_NS_URI;
@@ -285,7 +284,7 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	referenceSystem.setCode("EPSG:4326");
 	referenceSystem.setCodeSpace("EPSG");
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
-	
+
 	coreMetadata.addBoundingBox(//
 		pointLat, //
 		pointLon, //
@@ -388,7 +387,23 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	    }
 	    dataset.getExtensionHandler().setTimeInterpolation(interpolation);
 	}
-
+	if (attributeTitle.startsWith("Altezza idrometrica ")) {
+	    attributeTitle = "Altezza idrometrica";
+	}
+	if (attributeTitle.startsWith("Portata")) {
+	    attributeTitle = "Portata";
+	}
+	if (attributeTitle.toLowerCase().contains("temperatura")) {
+	    if (attributeTitle.toLowerCase().contains("suolo")) {
+		attributeTitle = "Temperatura suolo";
+	    }else if (attributeTitle.toLowerCase().contains("aria")) {
+		attributeTitle = "Temperatura aria";
+	    }else if (attributeTitle.toLowerCase().contains("mare")) {
+		attributeTitle = "Temperatura mare";
+	    }else {
+		attributeTitle = "Temperatura";
+	    }
+	}
 	coverageDescription.setAttributeTitle(attributeTitle);
 
 	String missingValue = "-9999";

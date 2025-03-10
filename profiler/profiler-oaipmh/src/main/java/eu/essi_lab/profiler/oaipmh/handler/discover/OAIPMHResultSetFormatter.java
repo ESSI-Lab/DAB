@@ -107,11 +107,15 @@ public class OAIPMHResultSetFormatter extends DiscoveryResultSetFormatter<String
 	int totalResults = mappedResultSet.getCountResponse().getCount();
 
 	int advancement = 1;
+
 	String prefix = reader.getMetadataPrefix();
 	String resumptionToken = reader.getResumptionToken();
 	String tokenId = null;
+
 	if (resumptionToken != null) {
-	    ResumptionToken rt = new ResumptionToken(resumptionToken);
+
+	    ResumptionToken rt = ResumptionToken.of(resumptionToken);
+
 	    advancement = rt.getAdvancement();
 	    prefix = rt.getMetadataPrefix();
 	    tokenId = rt.getId();
@@ -131,7 +135,19 @@ public class OAIPMHResultSetFormatter extends DiscoveryResultSetFormatter<String
 
 	} else {
 
-	    rtt = ResumptionToken.create(reader, tokenId, totalResults, advancement, message.getPage().getSize(), prefix);
+	    String searchAfter = mappedResultSet.//
+		    getSearchAfter().//
+		    map(v -> v.getStringValue().get()).//
+		    orElse(ResumptionToken.NONE_SEARCH_AFTER);
+
+	    rtt = ResumptionToken.of(//
+		    reader, //
+		    tokenId, //
+		    totalResults, //
+		    advancement, //
+		    message.getPage().getSize(), //
+		    prefix, //
+		    searchAfter);
 	}
 
 	// to let harvesting stop after the first page decomment the following:

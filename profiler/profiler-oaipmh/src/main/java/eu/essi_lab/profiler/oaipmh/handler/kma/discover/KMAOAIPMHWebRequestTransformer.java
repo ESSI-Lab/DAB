@@ -27,6 +27,7 @@ package eu.essi_lab.profiler.oaipmh.handler.kma.discover;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.profiler.oaipmh.OAIPMHProfilerSetting;
 import eu.essi_lab.profiler.oaipmh.handler.discover.OAIPMHRequestTransformer;
 
 /**
@@ -35,9 +36,11 @@ import eu.essi_lab.profiler.oaipmh.handler.discover.OAIPMHRequestTransformer;
 public class KMAOAIPMHWebRequestTransformer extends OAIPMHRequestTransformer {
 
     /**
-     * 
+     * @param setting
      */
-    public KMAOAIPMHWebRequestTransformer() {
+    public KMAOAIPMHWebRequestTransformer(OAIPMHProfilerSetting setting) {
+
+	super(setting);
     }
 
     @Override
@@ -48,14 +51,6 @@ public class KMAOAIPMHWebRequestTransformer extends OAIPMHRequestTransformer {
 	setView("KMA", ConfigurationWrapper.getStorageInfo(), refinedMessage);
 
 	return refinedMessage;
-    }
-
-    /**
-     * @return
-     */
-    protected String getPageSizeOptionKey() {
-
-	return "KMAoaiPmhPageSize";
     }
 
     /**

@@ -201,6 +201,11 @@ public class CSWEMODNETConnector extends CSWConnector {
 
 			for (MDDigitalTransferOptionsPropertyType transfer : transferOptions) {
 
+			    if (transfer == null || transfer.getMDDigitalTransferOptions() == null
+				    || transfer.getMDDigitalTransferOptions().getOnLine() == null) {
+				continue;
+			    }
+
 			    List<CIOnlineResourcePropertyType> onlinesList = new ArrayList<CIOnlineResourcePropertyType>();
 
 			    List<CIOnlineResourcePropertyType> onlines = transfer.getMDDigitalTransferOptions().getOnLine();

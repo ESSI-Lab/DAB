@@ -23,10 +23,10 @@ package eu.essi_lab.profiler.oaipmh.handler.discover;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
@@ -38,6 +38,7 @@ import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -47,8 +48,7 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.BrokeringStrategy;
-import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -74,32 +74,40 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
      * 
      */
     private static final String OAI_PMH_POST_QUERY_EXTRACTION_ERROR = "OAI_PMH_POST_QUERY_EXTRACTION_ERROR";
-
-    public OAIPMHRequestTransformer() {
-	// nothing to do here
-    }
+    private OAIPMHProfilerSetting setting;
 
     /**
-     * @return
+     * @param setting
      */
-    protected int getPageSize() {
+    public OAIPMHRequestTransformer(OAIPMHProfilerSetting setting) {
 
-	Optional<Properties> properties = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
-	int pageSize = getDefaultPageSize();
-	if (properties.isPresent()) {
+	this.setting = setting;
+    }
 
-	    pageSize = Integer.valueOf(properties.get().getProperty(getPageSizeOptionKey(), String.valueOf(getDefaultPageSize())));
+    @Override
+    protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
+
+	DiscoveryMessage refinedMessage = super.refineMessage(message);
+
+	if (sortResults()) {
+	    refinedMessage.setOrderingDirection(OrderingDirection.ASCENDING);
+	    refinedMessage.setOrderingProperty(ResourceProperty.PRIVATE_ID);
 	}
 
-	return pageSize;
-    }
+	OAIPMHRequestReader reader = createReader(message.getWebRequest());
+	String tokenValue = reader.getResumptionToken();
 
-    /**
-     * @return
-     */
-    protected String getPageSizeOptionKey() {
+	if (tokenValue != null) {
 
-	return "oaiPmhPageSize";
+	    ResumptionToken resumptionToken = ResumptionToken.of(tokenValue);
+	    Optional<String> searchAfter = resumptionToken.getSearchAfter();
+
+	    if (searchAfter.isPresent()) {
+		refinedMessage.setSearchAfter(SearchAfter.of(searchAfter.get()));
+	    }
+	}
+
+	return refinedMessage;
     }
 
     /**
@@ -142,7 +150,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	String tokenValue = reader.getResumptionToken();
 	if (tokenValue != null) {
 
-	    ResumptionToken rt = new ResumptionToken(tokenValue);
+	    ResumptionToken rt = ResumptionToken.of(tokenValue);
 	    from = rt.getFrom();
 	    until = rt.getUntil();
 	    setSpec = rt.getSet();
@@ -226,7 +234,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	    return new Page(getPageSize());
 	}
 
-	ResumptionToken rt = new ResumptionToken(tokenValue);
+	ResumptionToken rt = ResumptionToken.of(tokenValue);
 	int adv = rt.getAdvancement();
 
 	return new Page(adv, getPageSize());
@@ -318,6 +326,36 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     /**
+     * @return
+     */
+    private int getPageSize() {
+    
+        Optional<Properties> properties = setting.getKeyValueOptions();
+        int pageSize = getDefaultPageSize();
+        if (properties.isPresent()) {
+    
+            pageSize = Integer.valueOf(properties.get().getProperty("pageSize", String.valueOf(getDefaultPageSize())));
+        }
+    
+        return pageSize;
+    }
+
+    /**
+     * @return
+     */
+    private boolean sortResults() {
+
+	Optional<Properties> properties = setting.getKeyValueOptions();
+	boolean sortResults = false;
+	if (properties.isPresent()) {
+
+	    sortResults = Boolean.valueOf(properties.get().getProperty("sortResults", "false"));
+	}
+
+	return sortResults;
+    }
+
+    /**
      * If the "set" parameter in the request is set, the returned bond is a single {@link SourceIdentifierBond} built
      * with the <code>setSpec</code> value. If the "set" parameter in the request is not set, the returned bond is an OR
      * logical bond with {@link SourceIdentifierBond} bonds built with the identifiers of the harvested sources. If
@@ -355,16 +393,10 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
     private List<String> getHarvestedSourcesIds() throws GSException {
 
-	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
-
-	ArrayList<String> ids = new ArrayList<>();
-	for (GSSource gsSource : allSources) {
-	    if (gsSource.getBrokeringStrategy() == BrokeringStrategy.HARVESTED) {
-		ids.add(gsSource.getUniqueIdentifier());
-	    }
-	}
-
-	return ids;
+	return ConfigurationWrapper.getHarvestedSources().//
+		stream().//
+		map(s -> s.getUniqueIdentifier()).//
+		collect(Collectors.toList());
     }
 
     @Override

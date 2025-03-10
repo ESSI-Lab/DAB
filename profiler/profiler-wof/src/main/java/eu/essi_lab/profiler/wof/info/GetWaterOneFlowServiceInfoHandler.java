@@ -222,6 +222,9 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	if (valueCount == null || valueCount.isEmpty() || valueCount.equals("0") || valueCount.startsWith("-")) {
 	    valueCount = "100";
 	}
+	if (valueCount.contains(".")) {
+	    valueCount = valueCount.substring(0,valueCount.indexOf("."));
+	}
 	serviceInfo.setValueCount(valueCount);
 
 	CardinalValues cardinalValues = responseItem.getBBoxUnion().getCardinalValues().get();

@@ -258,6 +258,9 @@ public abstract class ProfilerHandler//
 	pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.RESULT_SET_MAPPING, rid, owr);
 
 	OUT mappedResponse = getMessageResponseMapper().map(message, executorResponse);
+	
+	// set the property handler to the mapped response
+	mappedResponse.setPropertyHandler(executorResponse.getPropertyHandler());
 
 	message.getProfilerName().ifPresent(name -> mappedResponse.setProfilerName(name));
 

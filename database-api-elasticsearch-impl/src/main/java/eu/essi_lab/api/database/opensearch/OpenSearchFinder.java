@@ -11,9 +11,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.Hit;
 
 /*-
  * #%L
@@ -50,6 +52,8 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
@@ -185,6 +189,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 			collect(Collectors.toList());
 
 		pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+
+		handleSearchAfter(response, resultSet);
 	    }
 
 	    //
@@ -262,6 +268,46 @@ public class OpenSearchFinder implements DatabaseFinder {
     }
 
     /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
+    public Query buildQuery(DiscoveryMessage message, boolean count) throws GSException {
+
+	if (message.getUserBond().isPresent()) {
+
+	    IdentifierBondHandler parser = new IdentifierBondHandler(message.getUserBond().get());
+
+	    if (parser.isCanonicalQueryByIdentifiers()) {
+
+		List<String> identifiers = parser.getIdentifiers();
+
+		return OpenSearchQueryBuilder.buildSearchQuery(//
+			database.getIdentifier(), //
+			MetadataElement.IDENTIFIER.getName(), //
+			identifiers.get(0));//
+	    }
+	}
+
+	PerformanceLogger pl = new PerformanceLogger(//
+		PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_GET_SOURCES_DATA_DIR_MAP, //
+		message.getRequestId(), //
+		Optional.ofNullable(message.getWebRequest()));
+
+	HashMap<String, String> map = getSourcesDataMap(message);
+
+	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+
+	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getPermittedBond());
+
+	OpenSearchBondHandler handler = new OpenSearchBondHandler(wrapper, message, map);
+
+	bondParser.parse(handler);
+
+	return handler.getQuery(count);
+    }
+
+    /**
      * @param aggregations
      * @param element
      * @return
@@ -303,6 +349,9 @@ public class OpenSearchFinder implements DatabaseFinder {
 		    Arrays.asList(MetaFolderMapping.SOURCE_ID, MetaFolderMapping.DATA_FOLDER), //
 		    0, //
 		    ids.size(), //
+		    Optional.empty(), //
+		    Optional.empty(), //
+		    Optional.empty(), //
 		    true);// requesting cache
 
 	    response.//
@@ -338,43 +387,36 @@ public class OpenSearchFinder implements DatabaseFinder {
     }
 
     /**
-     * @param message
-     * @return
-     * @throws GSException
+     * @param response
+     * @param resultSet
      */
-    public Query buildQuery(DiscoveryMessage message, boolean count) throws GSException {
+    private void handleSearchAfter(SearchResponse<Object> response, ResultSet<GSResource> resultSet) {
 
-	if (message.getUserBond().isPresent()) {
+	List<Hit<Object>> hits = response.hits().hits();
+	int size = hits.size();
+	if (size > 0) {
 
-	    IdentifierBondHandler parser = new IdentifierBondHandler(message.getUserBond().get());
+	    Hit<Object> hit = hits.get(size - 1);
+	    List<FieldValue> sortVals = hit.sortVals();
 
-	    if (parser.isCanonicalQueryByIdentifiers()) {
+	    if (!sortVals.isEmpty()) {
 
-		List<String> identifiers = parser.getIdentifiers();
+		FieldValue fieldValue = sortVals.get(0);
 
-		return OpenSearchQueryBuilder.buildSearchQuery(//
-			database.getIdentifier(), //
-			MetadataElement.IDENTIFIER.getName(), //
-			identifiers.get(0));//
+		if (fieldValue.isString()) {
+
+		    resultSet.setSearchAfter(SearchAfter.of(fieldValue.stringValue()));
+
+		} else if (fieldValue.isDouble()) {
+
+		    resultSet.setSearchAfter(SearchAfter.of(fieldValue.doubleValue()));
+
+		} else if (fieldValue.isLong()) {
+
+		    resultSet.setSearchAfter(SearchAfter.of(fieldValue.longValue()));
+		}
 	    }
 	}
-
-	PerformanceLogger pl = new PerformanceLogger(//
-		PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_GET_SOURCES_DATA_DIR_MAP, //
-		message.getRequestId(), //
-		Optional.ofNullable(message.getWebRequest()));
-
-	HashMap<String, String> map = getSourcesDataMap(message);
-
-	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
-
-	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getPermittedBond());
-
-	OpenSearchBondHandler handler = new OpenSearchBondHandler(wrapper, message, map);
-
-	bondParser.parse(handler);
-
-	return handler.getQuery(count);
     }
 
     /**
@@ -421,7 +463,14 @@ public class OpenSearchFinder implements DatabaseFinder {
 		int start = message.getPage().getStart() - 1;
 		int size = message.getPage().getSize();
 
-		response = wrapper.search(DataFolderMapping.get().getIndex(), query, start, size);
+		response = wrapper.search(//
+			DataFolderMapping.get().getIndex(), //
+			query, //
+			start, //
+			size, //
+			message.getOrderingProperty(), //
+			message.getOrderingDirection(), //
+			message.getSearchAfter());
 	    }
 
 	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));

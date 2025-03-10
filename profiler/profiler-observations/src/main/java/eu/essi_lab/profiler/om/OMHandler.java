@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -230,7 +231,7 @@ public class OMHandler extends StreamingRequestHandler {
 		switch (format) {
 		case "CSV":
 		    fields = new CSVField[] { CSVField.MONITORING_POINT, CSVField.OBSERVED_PROPERTY, CSVField.TIMESERIES_ID,
-			    CSVField.DATE_TIME, CSVField.VALUE, CSVField.UOM };
+			    CSVField.DATE_TIME, CSVField.VALUE, CSVField.UOM, CSVField.LATITUDE, CSVField.LONGITUDE };
 		    break;
 		case "JSON":
 		    break;
@@ -791,6 +792,13 @@ public class OMHandler extends StreamingRequestHandler {
 
     private void writeCSVobservation(OutputStreamWriter writer, JSONObservation observation, CSVField... fields) throws IOException {
 	JSONArray points = observation.points;
+	SimpleEntry<BigDecimal, BigDecimal> latLon = observation.getFeatureOfInterest().getLatLonPoint();
+	String lat = "";
+	String lon = "";
+	if (latLon != null) {
+	    lat = latLon.getKey() == null ? "" : latLon.getKey().toString();
+	    lon = latLon.getValue() == null ? "" : latLon.getValue().toString();
+	}
 	String observedPropertyTitle = observation.getObservedPropertyTitle();
 	if (observedPropertyTitle == null) {
 	    observedPropertyTitle = "";
@@ -836,6 +844,12 @@ public class OMHandler extends StreamingRequestHandler {
 			writer.write(value.toString());
 		    }
 		    break;
+		case LATITUDE:
+		    writer.write(lat);
+		    break;
+		case LONGITUDE:
+		    writer.write(lon);
+		    break;
 		default:
 		    break;
 		}
@@ -852,7 +866,7 @@ public class OMHandler extends StreamingRequestHandler {
     public enum CSVField {
 
 	TIMESERIES_ID("Timeseries identifier"), MONITORING_POINT("Monitoring point"), UOM("Units"), OBSERVED_PROPERTY(
-		"Observed property"), DATE_TIME("Date time"), VALUE("Value");
+		"Observed property"), DATE_TIME("Date time"), VALUE("Value"), LATITUDE("Latitude"), LONGITUDE("Longitude");
 
 	private String label;
 

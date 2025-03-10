@@ -226,7 +226,7 @@ public class OAIPMHRequestValidator implements WebRequestValidator {
 
 		    String tokenValue = parameters.get("resumptionToken");
 		    try {
-			ResumptionToken resumptionToken = new ResumptionToken(tokenValue);
+			ResumptionToken resumptionToken = ResumptionToken.of(tokenValue);
 
 			if (ResumptionToken.isExpired(resumptionToken.getId())) {
 

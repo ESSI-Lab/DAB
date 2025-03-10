@@ -33,6 +33,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpClient.Redirect;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Node;
 
+import dev.failsafe.FailsafeException;
 import eu.essi_lab.accessor.csw.parser.CSWOperationParser;
 import eu.essi_lab.cdk.harvest.wrapper.WrappedConnector;
 import eu.essi_lab.jaxb.common.CommonContext;
@@ -173,7 +175,7 @@ public class CSWConnector extends WrappedConnector {
 	Integer code = null;
 	try {
 
-	    HttpResponse<InputStream> httpResponse = new Downloader().downloadResponse(httpRequest);
+	    HttpResponse<InputStream> httpResponse = download(httpRequest);
 
 	    code = httpResponse.statusCode();
 
@@ -206,6 +208,12 @@ public class CSWConnector extends WrappedConnector {
 		    CSW_EXCEPTIO_REPORT_ERROR, //
 		    e1);
 	}
+    }
+
+    private HttpResponse<InputStream> download(HttpRequest httpRequest) throws Exception {
+	Downloader downloader = new Downloader();
+	downloader.setRedirectStrategy(Redirect.ALWAYS);
+	return downloader.downloadResponse(httpRequest);
     }
 
     protected int calculateStart(String token) {
@@ -858,7 +866,7 @@ public class CSWConnector extends WrappedConnector {
 
     InputStream doExecGetRequest(URI uri, boolean silent) throws Exception {
 
-	HttpResponse<InputStream> response = new Downloader().downloadResponse(HttpRequestUtils.build(MethodNoBody.GET, uri.toString()));
+	HttpResponse<InputStream> response = download(HttpRequestUtils.build(MethodNoBody.GET, uri.toString()));
 
 	if (!silent && GSLoggerFactory.getLogger(CSWConnector.class).isTraceEnabled()) {
 

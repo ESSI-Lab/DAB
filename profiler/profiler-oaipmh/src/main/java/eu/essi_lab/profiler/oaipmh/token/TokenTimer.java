@@ -32,6 +32,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.XMLGregorianCalendarUtils;
 
+/**
+ * @author Fabrizio
+ */
 public class TokenTimer {
 
     private class TokenTask extends TimerTask {
@@ -91,47 +94,47 @@ public class TokenTimer {
     }
 
     public synchronized XMLGregorianCalendar restartTiming(String tokenId) {
-	
+
 	GSLoggerFactory.getLogger(getClass()).info("Temporary disabled token functionalities, see GIP-304");
 
-//	GSLoggerFactory.getLogger(getClass()).debug("Restarting token: {}", tokenId);
-//
-//	Timer timer = timerMap.get(tokenId);
-//	timer.cancel();
+	// GSLoggerFactory.getLogger(getClass()).debug("Restarting token: {}", tokenId);
+	//
+	// Timer timer = timerMap.get(tokenId);
+	// timer.cancel();
 
 	return addToken(tokenId);
     }
 
     public synchronized void removeToken(String tokenId) {
-	
+
 	GSLoggerFactory.getLogger(getClass()).info("Temporary disabled token functionalities, see GIP-304");
 	return;
 
-//	GSLoggerFactory.getLogger(getClass()).debug("Removing expired token: {}", tokenId);
-//	GSLoggerFactory.getLogger(getClass()).debug("Current timer map tokens");
-//	timerMap.forEach((k, v) -> {
-//	    GSLoggerFactory.getLogger(getClass()).debug("Token: {}", k);
-//	});
-//
-//	Timer timer = timerMap.get(tokenId);
-//	timer.cancel();
-//
-//	timerMap.remove(tokenId);
-//
-//	GSLoggerFactory.getLogger(getClass()).debug("Removed expired token :{}", tokenId);
+	// GSLoggerFactory.getLogger(getClass()).debug("Removing expired token: {}", tokenId);
+	// GSLoggerFactory.getLogger(getClass()).debug("Current timer map tokens");
+	// timerMap.forEach((k, v) -> {
+	// GSLoggerFactory.getLogger(getClass()).debug("Token: {}", k);
+	// });
+	//
+	// Timer timer = timerMap.get(tokenId);
+	// timer.cancel();
+	//
+	// timerMap.remove(tokenId);
+	//
+	// GSLoggerFactory.getLogger(getClass()).debug("Removed expired token :{}", tokenId);
     }
 
     public synchronized boolean isExpired(String tokenId) {
-	
+
 	GSLoggerFactory.getLogger(getClass()).info("Temporary disabled token functionalities, see GIP-304");
 	return false;
 
-//	GSLoggerFactory.getLogger(getClass()).debug("Testing token {} expiration", tokenId);
-//
-//	boolean expired = timerMap.get(tokenId) == null;
-//
-//	GSLoggerFactory.getLogger(getClass()).debug("Token {} is expired {}: ", tokenId, expired);
-//
-//	return expired;
+	// GSLoggerFactory.getLogger(getClass()).debug("Testing token {} expiration", tokenId);
+	//
+	// boolean expired = timerMap.get(tokenId) == null;
+	//
+	// GSLoggerFactory.getLogger(getClass()).debug("Token {} is expired {}: ", tokenId, expired);
+	//
+	// return expired;
     }
 }

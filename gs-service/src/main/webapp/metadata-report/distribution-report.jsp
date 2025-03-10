@@ -71,7 +71,7 @@
 	    List<Queryable> queriables = new ArrayList();
 	    queriables.add(MetadataElement.ONLINE_PROTOCOL);
 	    queriables.add(ResourceProperty.SOURCE_ID);
-	    statisticsMessage.computeFrequency(queriables);
+	    statisticsMessage.computeFrequency(queriables,100);
 	    // computes count distinct of 2 queryables
 	    // 	statisticsMessage.countDistinct(//
 	    // 		java.util.Arrays.asList(//

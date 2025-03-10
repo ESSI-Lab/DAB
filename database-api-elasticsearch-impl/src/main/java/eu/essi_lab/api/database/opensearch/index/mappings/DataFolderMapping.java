@@ -60,7 +60,7 @@ public class DataFolderMapping extends IndexMapping {
     @SuppressWarnings("incomplete-switch")
     protected DataFolderMapping() {
 
-	super(DATA_FOLDER_INDEX);
+	super(DATA_FOLDER_INDEX, true);
 
 	addProperty(GS_RESOURCE, FieldType.Binary.jsonValue());
 	addProperty(WRITING_FOLDER_TAG, FieldType.Binary.jsonValue());
@@ -204,15 +204,6 @@ public class DataFolderMapping extends IndexMapping {
     public static String toDateField(String field) {
 
 	return field + "_date";
-    }
-
-    /**
-     * @param field
-     * @return
-     */
-    public static String toKeywordField(String field) {
-
-	return field + "_keyword";
     }
 
     /**

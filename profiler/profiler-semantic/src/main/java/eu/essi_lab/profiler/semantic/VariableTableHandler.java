@@ -30,8 +30,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -42,7 +40,6 @@ import javax.ws.rs.core.Response.Status;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage.IterationMode;
@@ -51,16 +48,22 @@ import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.views.DefaultViewManager;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 
 public class VariableTableHandler implements WebRequestHandler, WebRequestValidator {
@@ -73,198 +76,175 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
     @Override
     public Response handle(WebRequest webRequest) throws GSException {
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
-
-	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-
-	discoveryMessage.setRequestId(webRequest.getRequestId());
-
-	discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
-	discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
-	discoveryMessage.setPage(new Page(1, DEFAULT_PAGE_SIZE));
-	discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
-	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
-	discoveryMessage.setDataBaseURI(uri);
-
-	String viewId = null;
 	Optional<String> optionalView = webRequest.extractViewId();
 
-	if (optionalView.isPresent()) {
-	    viewId = optionalView.get();
-	    WebRequestTransformer.setView(viewId, uri, discoveryMessage);
-	} else {
-	    ByteArrayInputStream stream = new ByteArrayInputStream("<html><body>No view provided!</body></html>".getBytes());
-	    return Response.status(Status.INTERNAL_SERVER_ERROR).type(MediaType.TEXT_HTML).entity(stream).build();
+	if (!optionalView.isPresent()) {
+	    ByteArrayInputStream stream = new ByteArrayInputStream("A view identifier is needed".getBytes(StandardCharsets.UTF_8));
+	    return Response.status(Status.BAD_REQUEST).type(MediaType.TEXT_HTML).entity(stream).build();
 	}
-	discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
-
-	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
-
-	List<GSResource> resources = resultSet.getResultsList();
-
-	HashMap<String, List<SimpleEntry<RowInfo, String>>> rowsBySource = new HashMap<>();
-	HashMap<String, String> sourcesMap = new HashMap<>();
-	for (int i = 0; i < resources.size(); i++) {
-
-	    GSResource resource = resources.get(i);
-	    GSSource s = resource.getSource();
-	    sourcesMap.put(s.getLabel(), s.getUniqueIdentifier());
-	    String source = s.getLabel();
-	    String protocol = null;
-	    String uniqueVariableCode = null;
-	    String variableCode = null;
-	    String variableName = null;
-	    String variableURI = null;
-	    String variableDescription = null;
-	    String variableUnits = null;
-	    String variableUnitsURI = null;
-	    String interpolation = null;
-	    String interpolationSupport = null;
-	    String aggregationPeriod = null;
-	    String interval = null;
-	    String intendedObservationSpacing = null;
-	    String interpolationSupportUnits = null;
-	    String realtime = null;
-	    String country = "";
-	    String countryISO3 = "";
-	    try {
-		TemporalExtent temporal = resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent();
-		if (temporal != null) {
-		    TimeIndeterminateValueType end = temporal.getIndeterminateEndPosition();
-		    if (end != null && end.equals(TimeIndeterminateValueType.NOW)) {
-			realtime = "yes";
-		    }
-		}
-		if (resource.getExtensionHandler().getUniqueAttributeIdentifier().isPresent()) {
-		    uniqueVariableCode = resource.getExtensionHandler().getUniqueAttributeIdentifier().get();
-		}
-		variableName = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
-			.getAttributeTitle();
-		variableDescription = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
-			.getAttributeDescription();
-		if (resource.getExtensionHandler().getObservedPropertyURI().isPresent()) {
-		    variableURI = resource.getExtensionHandler().getObservedPropertyURI().get();
-		}
-		variableCode = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
-			.getAttributeIdentifier();
-		if (resource.getExtensionHandler().getAttributeUnits().isPresent()) {
-		    variableUnits = resource.getExtensionHandler().getAttributeUnits().get();
-		}
-		if (resource.getExtensionHandler().getAttributeUnitsURI().isPresent()) {
-		    variableUnitsURI = resource.getExtensionHandler().getAttributeUnitsURI().get();
-		}
-		if (resource.getExtensionHandler().getTimeInterpolation().isPresent()) {
-		    interpolation = resource.getExtensionHandler().getTimeInterpolation().get().name();
-		}
-		if (resource.getExtensionHandler().getTimeSupport().isPresent()) {
-		    interpolationSupport = resource.getExtensionHandler().getTimeSupport().get();
-		}
-		if (resource.getExtensionHandler().getTimeAggregationDuration8601().isPresent()) {
-		    aggregationPeriod = resource.getExtensionHandler().getTimeAggregationDuration8601().get();
-		}
-		if (resource.getExtensionHandler().getTimeResolution().isPresent()) {
-		    interval = resource.getExtensionHandler().getTimeResolution().get();
-		}
-		if (resource.getExtensionHandler().getTimeResolutionDuration8601().isPresent()) {
-		    intendedObservationSpacing = resource.getExtensionHandler().getTimeResolutionDuration8601().get();
-		}
-		if (resource.getExtensionHandler().getTimeUnits().isPresent()) {
-		    interpolationSupportUnits = resource.getExtensionHandler().getTimeUnits().get();
-		}
-		if (resource.getExtensionHandler().getCountry().isPresent()) {
-		    country = resource.getExtensionHandler().getCountry().get();
-		}
-		if (resource.getExtensionHandler().getCountryISO3().isPresent()) {
-		    countryISO3 = resource.getExtensionHandler().getCountryISO3().get();
-		}
-
-	    } catch (Exception e) {
-	    }
-	    List<SimpleEntry<RowInfo, String>> rows = rowsBySource.get(source);
-	    if (rows == null) {
-		rows = new ArrayList<SimpleEntry<RowInfo, String>>();
-	    }
-	    String lb = "%0D%0A";
-	    String body = "Dear Hydrology-ontology admin,\n\n" + lb + lb + //
-		    "I'd like to suggest semantic mapping(s) for the following variable(s) accessible through WHOS (from " + viewId
-		    + " view):\n\n" + lb + lb + //
-		    "Variable Name: " + variableName + "\n" + lb + //
-		    "Variable Description: " + variableDescription + "\n" + lb + //
-		    "Identifier at data provider web service: " + variableCode + "\n" + lb + //
-		    "WHOS identifier: " + uniqueVariableCode + "\n" + lb + //
-		    "From service: " + source + "\n\n" + lb + lb + //
-
-		    "Reporter: -YOUR NAME HERE-\n" + lb + //
-		    "Contact e-mail: -YOUR EMAIL HERE-\n" + lb + //
-		    "Organization: -YOUR ORGANIZATION HERE-\n" + lb + //
-		    "Country: -YOUR COUNTRY HERE-\n\n" + lb + lb + //
-		    "EXAMPLE MAPPING(S) - MODIFY AS NEEDED\n\n" + lb + lb + //
-		    "Mapping #1 (to WMO Codes Registry at http://codes.wmo.int/wmdr/_ObservedVariableTerrestrial):\n" + lb + //
-		    "WMO Concept URI: (e.g. <http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/_171>)\n" + lb + //
-		    "WMO Concept label: (e.g. River discharge)\n" + lb + //
-		    "WMO Concept description: (e.g. Volume of water flowing through a river per unit of time)\n\n" + lb + lb; //
-
-	    RowInfo info = new RowInfo();
-	    info.setUniqueVariableCode(uniqueVariableCode);
-	    info.setVariableCode(variableCode);
-	    info.setVariableName(variableName);
-	    info.setVariableURI(variableURI);
-	    info.setVariableDescription(variableDescription);
-	    info.setVariableUnits(variableUnits);
-	    info.setVariableUnitsURI(variableUnitsURI);
-	    info.setInterpolation(interpolation);
-	    info.setInterpolationSupport(interpolationSupport);
-	    info.setAggregationPeriod(aggregationPeriod);
-	    info.setInterval(interval);
-	    info.setIntendedObservationSpacing(intendedObservationSpacing);
-	    info.setInterpolationSupportUnits(interpolationSupportUnits);
-	    info.setRealtime(realtime);
-	    info.setCountry(country);
-	    info.setCountryISO3(countryISO3);
-
-	    String csv = uniqueVariableCode + "\t" + protocol + "\t" + variableCode + "\t" + variableName + "\t" + variableDescription
-		    + "\t\n";
-	    rows.add(new SimpleEntry<RowInfo, String>(info, csv));
-
-	    rowsBySource.put(source, rows);
-
-	}
+	String viewId = optionalView.get();
+	Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);	
+	List<GSSource> sources = ConfigurationWrapper.getViewSources(view.get());
 
 	String content = "<table border='1px'>";
-	File file = new File("/home/boldrini/ontologiaFALSE");
-	BufferedWriter writer = null;
-	if (file.exists()) {
-	    try {
-		writer = new BufferedWriter(new FileWriter(new File(file, "whos-arctic.csv")));
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
-	}
-	if (writer != null) {
-	    try {
-		writer.write(
-			"WHOS identifier\tData provider service\tData provider identifier\tVariable name\tVariable description\tHydro-ontology concept\n");
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
-	}
+	for (GSSource s : sources) {
 
-	for (String source : rowsBySource.keySet()) {
-	    String sourceId = sourcesMap.get(source);
+	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
+	    IDiscoveryExecutor executor = loader.iterator().next();
+
+	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+	    discoveryMessage.setRequestId(webRequest.getRequestId());
+	    discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
+	    discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
+	    discoveryMessage.setPage(new Page(1, DEFAULT_PAGE_SIZE));
+	    discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
+	    discoveryMessage.setSources(sources);
+	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
+	    discoveryMessage.setDataBaseURI(uri);
+
+	    if (optionalView.isPresent()) {
+//		WebRequestTransformer.setView(viewId, uri, discoveryMessage);
+	    } else {
+		ByteArrayInputStream stream = new ByteArrayInputStream("<html><body>No view provided!</body></html>".getBytes());
+		return Response.status(Status.INTERNAL_SERVER_ERROR).type(MediaType.TEXT_HTML).entity(stream).build();
+	    }
+	    discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
+
+	    Bond bond = BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.SOURCE_ID, s.getUniqueIdentifier());
+	    discoveryMessage.setUserBond(bond);
+	    discoveryMessage.setPermittedBond(bond);
+	    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
+	    List<GSResource> resources = resultSet.getResultsList();
+	    List<SimpleEntry<RowInfo, String>> rows = new ArrayList();
+	    for (int i = 0; i < resources.size(); i++) {
+
+		GSResource resource = resources.get(i);
+		String source = s.getLabel();
+		String protocol = null;
+		String uniqueVariableCode = null;
+		String variableCode = null;
+		String variableName = null;
+		String variableURI = null;
+		String variableDescription = null;
+		String variableUnits = null;
+		String variableUnitsURI = null;
+		String interpolation = null;
+		String interpolationSupport = null;
+		String aggregationPeriod = null;
+		String interval = null;
+		String intendedObservationSpacing = null;
+		String interpolationSupportUnits = null;
+		String realtime = null;
+		String country = "";
+		String countryISO3 = "";
+		try {
+		    TemporalExtent temporal = resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent();
+		    if (temporal != null) {
+			TimeIndeterminateValueType end = temporal.getIndeterminateEndPosition();
+			if (end != null && end.equals(TimeIndeterminateValueType.NOW)) {
+			    realtime = "yes";
+			}
+		    }
+		    if (resource.getExtensionHandler().getUniqueAttributeIdentifier().isPresent()) {
+			uniqueVariableCode = resource.getExtensionHandler().getUniqueAttributeIdentifier().get();
+		    }
+		    variableName = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
+			    .getAttributeTitle();
+		    variableDescription = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
+			    .getAttributeDescription();
+		    if (resource.getExtensionHandler().getObservedPropertyURI().isPresent()) {
+			variableURI = resource.getExtensionHandler().getObservedPropertyURI().get();
+		    }
+		    variableCode = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
+			    .getAttributeIdentifier();
+		    if (resource.getExtensionHandler().getAttributeUnits().isPresent()) {
+			variableUnits = resource.getExtensionHandler().getAttributeUnits().get();
+		    }
+		    if (resource.getExtensionHandler().getAttributeUnitsURI().isPresent()) {
+			variableUnitsURI = resource.getExtensionHandler().getAttributeUnitsURI().get();
+		    }
+		    if (resource.getExtensionHandler().getTimeInterpolation().isPresent()) {
+			interpolation = resource.getExtensionHandler().getTimeInterpolation().get().name();
+		    }
+		    if (resource.getExtensionHandler().getTimeSupport().isPresent()) {
+			interpolationSupport = resource.getExtensionHandler().getTimeSupport().get();
+		    }
+		    if (resource.getExtensionHandler().getTimeAggregationDuration8601().isPresent()) {
+			aggregationPeriod = resource.getExtensionHandler().getTimeAggregationDuration8601().get();
+		    }
+		    if (resource.getExtensionHandler().getTimeResolution().isPresent()) {
+			interval = resource.getExtensionHandler().getTimeResolution().get();
+		    }
+		    if (resource.getExtensionHandler().getTimeResolutionDuration8601().isPresent()) {
+			intendedObservationSpacing = resource.getExtensionHandler().getTimeResolutionDuration8601().get();
+		    }
+		    if (resource.getExtensionHandler().getTimeUnits().isPresent()) {
+			interpolationSupportUnits = resource.getExtensionHandler().getTimeUnits().get();
+		    }
+		    if (resource.getExtensionHandler().getCountry().isPresent()) {
+			country = resource.getExtensionHandler().getCountry().get();
+		    }
+		    if (resource.getExtensionHandler().getCountryISO3().isPresent()) {
+			countryISO3 = resource.getExtensionHandler().getCountryISO3().get();
+		    }
+
+		} catch (Exception e) {
+		}
+		String lb = "%0D%0A";
+
+		RowInfo info = new RowInfo();
+		info.setUniqueVariableCode(uniqueVariableCode);
+		info.setVariableCode(variableCode);
+		info.setVariableName(variableName);
+		info.setVariableURI(variableURI);
+		info.setVariableDescription(variableDescription);
+		info.setVariableUnits(variableUnits);
+		info.setVariableUnitsURI(variableUnitsURI);
+		info.setInterpolation(interpolation);
+		info.setInterpolationSupport(interpolationSupport);
+		info.setAggregationPeriod(aggregationPeriod);
+		info.setInterval(interval);
+		info.setIntendedObservationSpacing(intendedObservationSpacing);
+		info.setInterpolationSupportUnits(interpolationSupportUnits);
+		info.setRealtime(realtime);
+		info.setCountry(country);
+		info.setCountryISO3(countryISO3);
+
+		String csv = uniqueVariableCode + "\t" + protocol + "\t" + variableCode + "\t" + variableName + "\t" + variableDescription
+			+ "\t\n";
+		rows.add(new SimpleEntry<RowInfo, String>(info, csv));
+
+	    }
+
+	    File file = new File("/home/boldrini/ontologiaFALSE");
+	    BufferedWriter writer = null;
+	    if (file.exists()) {
+		try {
+		    writer = new BufferedWriter(new FileWriter(new File(file, "whos-arctic.csv")));
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+	    }
+	    if (writer != null) {
+		try {
+		    writer.write(
+			    "WHOS identifier\tData provider service\tData provider identifier\tVariable name\tVariable description\tHydro-ontology concept\n");
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+	    }
 
 	    // STATISTICS
 	    SourceStatistics sourceStats = null;
 	    try {
-		sourceStats = new SourceStatistics(sourceId, webRequest.extractViewId(), null);
+		sourceStats = new SourceStatistics(s.getUniqueIdentifier(), webRequest.extractViewId(), null);
 	    } catch (Exception e1) {
 		e1.printStackTrace();
 	    }
 	    Stats stats = sourceStats.getStatistics().get(null);
-	    
+
 	    content += "<tr><td colspan='15'><br/>"//
-		    + "Data provider: <b>" + source + "</b><br/>"//
+		    + "Data provider: <b>" + s.getLabel() + "</b><br/>"//
 		    + "#Platforms: " + stats.getSiteCount() + "<br/>"//
 		    + "#Variables:" + stats.getAttributeCount() + "<br/>"//
 		    + "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
@@ -299,13 +279,10 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    getHeader("Country ISO3") + //
 		    "</tr>";
 	    try {
-		sourceStats = new SourceStatistics(sourceId, webRequest.extractViewId(), MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
+		sourceStats = new SourceStatistics(s.getUniqueIdentifier(), webRequest.extractViewId(), MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
 	    } catch (Exception e1) {
 		e1.printStackTrace();
 	    }
-	    List<SimpleEntry<RowInfo, String>> rows = rowsBySource.get(source);
-	    // rows.sort(new Comparator<T>() {
-	    // })
 	    for (SimpleEntry<RowInfo, String> row : rows) {
 		RowInfo ri = row.getKey();
 		Stats vs = sourceStats.getStatistics().get(ri.getUniqueVariableCode());
@@ -363,12 +340,13 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    }
 		}
 	    }
-	}
-	if (writer != null) {
-	    try {
-		writer.close();
-	    } catch (IOException e) {
-		e.printStackTrace();
+
+	    if (writer != null) {
+		try {
+		    writer.close();
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
 	    }
 	}
 	String str = "<html><head><meta charset=\"UTF-8\"></head><body><h1>Metadata content analysis for view: " + viewId + "</h1>" //
@@ -379,19 +357,19 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 
     }
 
-//    private String date(String string) {
-//	if (string == null) {
-//	    return "";
-//	}
-//	try {
-//	    double d = Double.parseDouble(string);
-//	    Date date = new Date((long)d);
-//	    return ISO8601DateTimeUtils.getISO8601DateTime(date);
-//	} catch (Exception e) {
-//	    // TODO: handle exception
-//	}
-//	return "";
-//    }
+    // private String date(String string) {
+    // if (string == null) {
+    // return "";
+    // }
+    // try {
+    // double d = Double.parseDouble(string);
+    // Date date = new Date((long)d);
+    // return ISO8601DateTimeUtils.getISO8601DateTime(date);
+    // } catch (Exception e) {
+    // // TODO: handle exception
+    // }
+    // return "";
+    // }
 
     private String getHeader(String header) {
 	return "<th>" + header + "</th>";

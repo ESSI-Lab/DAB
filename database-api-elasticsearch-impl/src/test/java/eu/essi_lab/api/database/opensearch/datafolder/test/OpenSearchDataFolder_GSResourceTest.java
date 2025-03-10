@@ -39,6 +39,51 @@ import eu.essi_lab.model.resource.ResourceProperty;
 public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 
     @Test
+    public void removeTest() throws Exception {
+
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+
+	String folderName = TestUtils.getDataFolderName(database);
+
+	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
+
+	//
+	//
+
+	String privateId = UUID.randomUUID().toString();
+
+	Dataset dataset = new Dataset();
+	dataset.setPrivateId(privateId);
+	dataset.setOriginalId(UUID.randomUUID().toString());
+	dataset.setPublicId(UUID.randomUUID().toString());
+	dataset.setSource(new GSSource("sourceId"));
+
+	//
+	//
+	//
+	IndexedElementsWriter.write(dataset);
+	//
+	//
+	//
+
+	String key = privateId;
+
+	//
+	//
+	//
+
+	Assert.assertTrue(folder.store(key, //
+		FolderEntry.of(dataset.asDocument(true)), //
+		EntryType.GS_RESOURCE));
+
+	Assert.assertTrue(folder.remove(key));
+
+	Assert.assertFalse(folder.exists(key));
+
+	Assert.assertNull(folder.get(key));
+    }
+
+    @Test
     public void sourceTest() throws Exception {
 
 	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
@@ -58,7 +103,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
 	dataset.setSource(new GSSource("sourceId"));
-	
+
 	//
 	//
 	//
@@ -549,7 +594,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    dataset.setOriginalId(UUID.randomUUID().toString());
 	    dataset.setPublicId(UUID.randomUUID().toString());
 	    dataset.setSource(new GSSource("sourceId"));
-	    
+
 	    dataset.getHarmonizedMetadata().getCoreMetadata().setTitle(title);
 	    dataset.getHarmonizedMetadata().getCoreMetadata().setAbstract(_abstract);
 
@@ -575,7 +620,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    dataset.setOriginalId(UUID.randomUUID().toString());
 	    dataset.setPublicId(UUID.randomUUID().toString());
 	    dataset.setSource(new GSSource("sourceId"));
-	    
+
 	    dataset.getHarmonizedMetadata().getCoreMetadata().setTitle("Title_" + i);
 
 	    IndexedElementsWriter.write(dataset);

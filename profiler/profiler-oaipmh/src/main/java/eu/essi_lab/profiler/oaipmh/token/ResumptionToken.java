@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.oaipmh.token;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
+import java.util.Optional;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -31,7 +32,12 @@ import eu.essi_lab.jaxb.oaipmh.ResumptionTokenType;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.profiler.oaipmh.OAIPMHRequestReader;
 
+/**
+ * @author Fabrizio
+ */
 public class ResumptionToken {
+
+    public static String NONE_SEARCH_AFTER = "null";
 
     private String tokenId;
     private int advancement;
@@ -39,17 +45,129 @@ public class ResumptionToken {
     private String until;
     private String set;
     private String prefix;
+    private String searchAfter;
 
-    public ResumptionToken(String value) {
+    /**
+     * @param value
+     * @return
+     */
+    public static ResumptionToken of(String value) {
+
+	return new ResumptionToken(value);
+    }
+
+    /**
+     * @param reader
+     * @param tokenId
+     * @param listSize
+     * @param advancement
+     * @param itemsPerPage
+     * @param prefix
+     * @param searchAfter
+     * @return
+     */
+    public static ResumptionTokenType of(//
+	    OAIPMHRequestReader reader, //
+	    String tokenId, //
+	    int listSize, //
+	    int advancement, //
+	    int itemsPerPage, //
+	    String prefix, //
+	    String searchAfter) {
+
+	// this is the first token created for this request
+	XMLGregorianCalendar expiration = null;
+	if (tokenId == null) {
+	    tokenId = createId();
+	    expiration = TokenTimer.getInstance().addToken(tokenId);
+	    // adds this token id to the timer
+	} else {
+	    // restart the timer for this token id
+	    expiration = TokenTimer.getInstance().restartTiming(tokenId);
+	}
+
+	ResumptionTokenType rtt = _createEmpty(tokenId, listSize, advancement);
+	rtt.setExpirationDate(expiration);
+
+	String from = null;
+	String until = null;
+	String set = null;
+
+	String value = reader.getResumptionToken();
+	if (value != null) {
+	    ResumptionToken rt = new ResumptionToken(value);
+
+	    from = rt.getFrom();
+	    until = rt.getUntil();
+	    set = rt.getSet();
+	} else {
+	    from = reader.getFrom();
+	    until = reader.getUntil();
+	    set = reader.getSet();
+	}
+
+	// REQUEST_ID/ADVANCEMENT/FROM/UNTIL/SETID/PREFIX/SEARCH_AFTER
+	rtt.setValue(//
+		tokenId + "/" + //
+			(advancement + itemsPerPage) + "/" + //
+			from + "/" + //
+			until + "/" + //
+			set + "/" + //
+			prefix + "/" + //
+			searchAfter);
+
+	return rtt;
+    }
+
+    /**
+     * @return
+     */
+    public static String createId() {
+
+	GSLoggerFactory.getLogger(ResumptionToken.class).info("Using same token, see GIP-304");
+
+	return "restoken";
+	// return UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    /**
+     * @param tokenId
+     * @return
+     */
+    public static boolean isExpired(String tokenId) {
+
+	return TokenTimer.getInstance().isExpired(tokenId);
+    }
+
+    /**
+     * @param tokenId
+     * @param listSize
+     * @param advancement
+     * @return
+     */
+    public static ResumptionTokenType createEmpty(String tokenId, int listSize, int advancement) {
+
+	// if (!tokenId.equals("")) {
+	// // removes the token id from the timer
+	// TokenTimer.getInstance().removeToken(tokenId);
+	// }
+
+	return _createEmpty(tokenId, listSize, advancement);
+    }
+
+    /**
+     * @param value
+     */
+    private ResumptionToken(String value) {
 
 	try {
 	    value = URLDecoder.decode(value, "UTF8");
 	} catch (UnsupportedEncodingException e) {
 	}
 
-	// REQUEST_ID/ADVANCEMENT/FROM/UNTIL/SETID/PREFIX
+	// REQUEST_ID/ADVANCEMENT/FROM/UNTIL/SETID/PREFIX/SEARCH_AFTER
 	String[] slashSplit = value.split("/");
-	if (slashSplit.length != 6) {
+	if (slashSplit.length != 7) {
 	    throw new IllegalArgumentException("Invalid resumption token");
 	}
 
@@ -85,31 +203,20 @@ public class ResumptionToken {
 	if (prefix != null && prefix.equals("null")) {
 	    prefix = null;
 	}
+
+	// SEARCH_AFTER
+	searchAfter = slashSplit[6];
+	if (searchAfter != null && searchAfter.equals("null")) {
+	    searchAfter = null;
+	}
     }
 
-    public static String createId() {
-
-	GSLoggerFactory.getLogger(ResumptionToken.class).info("Using same token, see GIP-304");
-
-	return "restoken";
-	// return UUID.randomUUID().toString().substring(0, 8);
-    }
-
-    public static boolean isExpired(String tokenId) {
-
-	return TokenTimer.getInstance().isExpired(tokenId);
-    }
-
-    public static ResumptionTokenType createEmpty(String tokenId, int listSize, int advancement) {
-
-	// if (!tokenId.equals("")) {
-	// // removes the token id from the timer
-	// TokenTimer.getInstance().removeToken(tokenId);
-	// }
-
-	return _createEmpty(tokenId, listSize, advancement);
-    }
-
+    /**
+     * @param tokenId
+     * @param listSize
+     * @param advancement
+     * @return
+     */
     private static ResumptionTokenType _createEmpty(String tokenId, int listSize, int advancement) {
 
 	ResumptionTokenType rtt = new ResumptionTokenType();
@@ -120,73 +227,60 @@ public class ResumptionToken {
 	return rtt;
     }
 
-    public static ResumptionTokenType create(OAIPMHRequestReader reader, String tokenId, int listSize, int advancement, int itemsPerPage,
-	    String prefix) {
-
-	// this is the first token created for this request
-	XMLGregorianCalendar expiration = null;
-	if (tokenId == null) {
-	    tokenId = createId();
-	    expiration = TokenTimer.getInstance().addToken(tokenId);
-	    // adds this token id to the timer
-	} else {
-	    // restart the timer for this token id
-	    expiration = TokenTimer.getInstance().restartTiming(tokenId);
-	}
-
-	ResumptionTokenType rtt = _createEmpty(tokenId, listSize, advancement);
-	rtt.setExpirationDate(expiration);
-
-	String from = null;
-	String until = null;
-	String set = null;
-
-	String value = reader.getResumptionToken();
-	if (value != null) {
-	    ResumptionToken rt = new ResumptionToken(value);
-
-	    from = rt.getFrom();
-	    until = rt.getUntil();
-	    set = rt.getSet();
-	} else {
-	    from = reader.getFrom();
-	    until = reader.getUntil();
-	    set = reader.getSet();
-	}
-
-	// REQUEST_ID/ADVANCEMENT/FROM/UNTIL/SETID/PREFIX
-	rtt.setValue(tokenId + "/" + (advancement + itemsPerPage) + "/" + from + "/" + until + "/" + set + "/" + prefix);
-
-	return rtt;
-    }
-
+    /**
+     * @return
+     */
     public String getId() {
 
 	return tokenId;
     }
 
+    /**
+     * @return
+     */
     public String getMetadataPrefix() {
 
 	return prefix;
     }
 
+    /**
+     * @return
+     */
     public int getAdvancement() {
 
 	return advancement;
     }
 
+    /**
+     * @return
+     */
     public String getFrom() {
 
 	return from;
     }
 
+    /**
+     * @return
+     */
     public String getUntil() {
 
 	return until;
     }
 
+    /**
+     * @return
+     */
     public String getSet() {
+
 	return set;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getSearchAfter() {
+
+	return searchAfter == null || searchAfter.equals(NONE_SEARCH_AFTER) ? Optional.empty() : Optional.of(searchAfter);
     }
 
     public static void main(String[] args) {

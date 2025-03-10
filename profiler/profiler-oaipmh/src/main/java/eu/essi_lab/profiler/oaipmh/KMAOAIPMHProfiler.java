@@ -54,7 +54,7 @@ public class KMAOAIPMHProfiler extends OAIPMHProfiler<KMAOAIPMHProfilerSetting> 
     @Override
     protected OAIPMHRequestTransformer getWebRequestTransformer() {
 
-	return new KMAOAIPMHWebRequestTransformer();
+	return new KMAOAIPMHWebRequestTransformer(getSetting());
     }
 
     @Override

@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -70,7 +71,6 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
      */
     public static final String TYPE = "TRIGGERConnector";
 
-
     /**
      *
      */
@@ -78,15 +78,11 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
     private int partialNumbers = 0;
 
-    // private int maxNumberRequest = 1000;
-
     private static final String TRIGGER_CONNECTOR_DOWNLOAD_ERROR = "TRIGGER_CONNECTOR_DOWNLOAD_ERROR";
 
     /**
      * In the API V2 it is required
      */
-    // private static final String BEARER_TOKEN =
-    // "0kCjPHBPlQQJiIXT3Y14_qCxHKumC4i0WTyTqofGM4M.fAqUuOfnL6XYxF4kqJ9JBf67gsfnsefUxEz02B7OvmY";
 
     private static final String TOKEN_REQUEST_URL = "https://trigger-io.difa.unibo.it/api/";
     private static final String REFRESH_REQUEST_URL = "https://app.meteotracker.com/auth/refreshtoken";
@@ -107,8 +103,6 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
     Map<String, List<String>> deviceMap = new HashMap<String, List<String>>();
 
-    // private static final String REFRESH_REQUEST_URL = "https://app.meteotracker.com/auth/refreshtoken";
-
     public static String TRIGGER_TOKEN = null;
     public static String METEOTRACKER_REFRESH_TOKEN = null;
     // private boolean isLastSearchTerm = false;
@@ -116,9 +110,6 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
     private static int searchIndex = 0;
 
     protected Map<String, List<TRIGGERTimePosition>> latLonMap = new HashMap<String, List<TRIGGERTimePosition>>();
-
-    // https://app.meteotracker.com/api/sessions?
-    // https://app.meteotracker.com/api/points/session?id=62b9a83a9ab32d28d7530849&page=2
 
     public enum TRIGGER_VARIABLES {
 	// MYAIR
@@ -236,8 +227,13 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
 
-	// if (latLonMap.isEmpty())
-	// latLonMap = getGPSValues();
+	// Start date: January 2024
+	YearMonth startMonth = YearMonth.of(2024, 1);
+	// Get current year and month
+	YearMonth todayMonth = YearMonth.now();
+
+	if (latLonMap.isEmpty())
+	    latLonMap = getGPSValues(startMonth, todayMonth);
 
 	String token = request.getResumptionToken();
 	int start = 0;
@@ -246,8 +242,8 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	}
 
 	int pageSize = getSetting().getPageSize();
-//	if (pageSize == 0)
-//	    pageSize = 100;
+	// if (pageSize == 0)
+	// pageSize = 100;
 
 	Optional<Integer> mr = getSetting().getMaxRecords();
 	boolean maxNumberReached = false;
@@ -278,21 +274,18 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	    try {
 
 		String queryPath = SEARCH_TERMS[searchIndex];
-		LocalDateTime currentDateTime = LocalDateTime.now();
-		int currentMonth = currentDateTime.getMonthValue();
+		// LocalDateTime currentDateTime = LocalDateTime.now();
+		// int currentMonth = currentDateTime.getMonthValue();
+		// int currentYear = currentDateTime.getYear();
+
 		Map<String, TRIGGERDevice> results = new HashMap<String, TRIGGERDevice>();
 		// current month for 2024
-		for (int i = 1; i <= currentMonth; i++) {
+		for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusMonths(1)) {
 
-		    String url = getSourceURL().endsWith("/") ? getSourceURL() + queryPath + "year=2024&month=" + i// +
-														   // start
-														   // +
-			    // "&items=" +
-			    // pageSize
-			    : getSourceURL() + "/" + queryPath + "year=2024&month=" + i;// "&reverseSort=false&page=" +
-											// start +
-		    // "&items=" +
-		    // pageSize;
+		    String url = getSourceURL().endsWith("/")
+			    ? getSourceURL() + queryPath + "year=" + current.getYear() + "&month=" + current.getMonthValue()// +
+
+			    : getSourceURL() + "/" + queryPath + "year=" + current.getYear() + "&month=" + current.getMonthValue();
 
 		    GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 
@@ -390,85 +383,81 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	return response;
     }
 
-    private Map<String, List<TRIGGERTimePosition>> getGPSValues() {
+    private Map<String, List<TRIGGERTimePosition>> getGPSValues(YearMonth startMonth, YearMonth todayMonth) {
 	Map<String, List<TRIGGERTimePosition>> ret = new HashMap<String, List<TRIGGERTimePosition>>();
-	String url = BASE_URL + GPS_URL + "year=2024";
 
 	try {
-	    // add authorization token
-	    if (TRIGGER_TOKEN == null) {
-		TRIGGER_TOKEN = getBearerToken();
-	    }
 
-	    // HttpGet get = new HttpGet(url.trim());
-	    // get.addHeader("token", TRIGGER_TOKEN);
-	    //
-	    // InputStream stream = null;
-	    // HttpResponse triggerResponse = null;
-	    // HttpClient httpClient = HttpClientBuilder.create().build();
-	    //
-	    HashMap<String, String> params = new HashMap<String, String>();
-	    params.put("refreshToken", TRIGGER_TOKEN);
+	    for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusYears(1)) {
 
-	    HttpRequest request = HttpRequestUtils.build(//
-		    MethodWithBody.POST, //
-		    url.trim(), //
-		    params);
+		String url = BASE_URL + GPS_URL + "year=" + current.getYear();
 
-	    HttpResponse<InputStream> triggerResponse = new Downloader().downloadResponse(request);
-
-	    int statusCode = triggerResponse.statusCode();
-	    if (statusCode > 400) {
-		// token expired - refresh token
-		getBearerToken();
-
-		params = new HashMap<String, String>();
-		params.put("refreshToken", TRIGGER_TOKEN);
-
-		request = HttpRequestUtils.build(//
-			MethodWithBody.POST, //
-			url.trim(), //
-			params);
-
-		triggerResponse = new Downloader().downloadResponse(request);
-
-	    }
-	    InputStream stream = triggerResponse.body();
-	    GSLoggerFactory.getLogger(TRIGGERConnector.class).info("Got " + url);
-
-	    if (stream != null) {
-
-		ClonableInputStream clone = new ClonableInputStream(stream);
-
-		JSONArray array = new JSONArray(IOStreamUtils.asUTF8String(clone.clone()));
-
-		for (int i = 0; i < array.length(); i++) {
-
-		    JSONObject obj = array.getJSONObject(i);
-		    String deviceId = obj.optString(DEVICE_ID);
-		    Double lon = obj.optDoubleObject(LONGITUDE);
-		    Double lat = obj.optDoubleObject(LATITUDE);
-		    int year = obj.optInt("year");
-		    int month = obj.optInt("month");
-		    int day = obj.optInt("day");
-		    int hour = obj.optInt("hour");
-		    int minute = obj.optInt("minute");
-		    int second = obj.optInt("second");
-		    LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
-		    TRIGGERTimePosition tp = new TRIGGERTimePosition(lon, lat, dateTime);
-		    List<TRIGGERTimePosition> timePositionList = new ArrayList<TRIGGERTimePosition>();
-		    if (ret.containsKey(deviceId)) {
-			timePositionList = ret.get(deviceId);
-			timePositionList.add(tp);
-			ret.put(deviceId, timePositionList);
-		    } else {
-			// first element
-			timePositionList.add(tp);
-			ret.put(deviceId, timePositionList);
-		    }
+		// add authorization token
+		if (TRIGGER_TOKEN == null) {
+		    TRIGGER_TOKEN = getBearerToken();
 		}
-		if (stream != null)
-		    stream.close();
+
+		// HttpGet get = new HttpGet(url.trim());
+		// get.addHeader("token", TRIGGER_TOKEN);
+		//
+		// InputStream stream = null;
+		// HttpResponse triggerResponse = null;
+		// HttpClient httpClient = HttpClientBuilder.create().build();
+		//
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("token", TRIGGER_TOKEN);
+
+		HttpResponse<InputStream> triggerResponse = new Downloader().downloadResponse(//
+			url.trim(), //
+			HttpHeaderUtils.build("token", TRIGGER_TOKEN));
+
+		int statusCode = triggerResponse.statusCode();
+		if (statusCode > 400) {
+		    // token expired - refresh token
+		    getBearerToken();
+
+		    triggerResponse = new Downloader().downloadResponse(//
+			    url.trim(), //
+			    HttpHeaderUtils.build("token", TRIGGER_TOKEN));
+
+		}
+		InputStream stream = triggerResponse.body();
+		GSLoggerFactory.getLogger(TRIGGERConnector.class).info("Got " + url);
+
+		if (stream != null) {
+
+		    ClonableInputStream clone = new ClonableInputStream(stream);
+
+		    JSONArray array = new JSONArray(IOStreamUtils.asUTF8String(clone.clone()));
+
+		    for (int i = 0; i < array.length(); i++) {
+
+			JSONObject obj = array.getJSONObject(i);
+			String deviceId = obj.optString(DEVICE_ID);
+			Double lon = obj.optDoubleObject(LONGITUDE);
+			Double lat = obj.optDoubleObject(LATITUDE);
+			int year = obj.optInt("year");
+			int month = obj.optInt("month");
+			int day = obj.optInt("day");
+			int hour = obj.optInt("hour");
+			int minute = obj.optInt("minute");
+			int second = obj.optInt("second");
+			LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
+			TRIGGERTimePosition tp = new TRIGGERTimePosition(lon, lat, dateTime);
+			List<TRIGGERTimePosition> timePositionList = new ArrayList<TRIGGERTimePosition>();
+			if (ret.containsKey(deviceId)) {
+			    timePositionList = ret.get(deviceId);
+			    timePositionList.add(tp);
+			    ret.put(deviceId, timePositionList);
+			} else {
+			    // first element
+			    timePositionList.add(tp);
+			    ret.put(deviceId, timePositionList);
+			}
+		    }
+		    if (stream != null)
+			stream.close();
+		}
 	    }
 
 	} catch (Exception e) {
@@ -581,7 +570,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 			HttpHeaderUtils.build("token", TRIGGER_TOKEN));
 
 	    }
-	    
+
 	    stream = triggerResponse.body();
 	    GSLoggerFactory.getLogger(TRIGGERConnector.class).info("Got " + url);
 
@@ -699,14 +688,13 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	for (String s : search) {
 
 	    String url = BASE_URL + s + "year=2024&month=03";
-	 
+
 	    InputStream stream = null;
- 
+
 	    HttpResponse<InputStream> meteoTrackerResponse = new Downloader().downloadResponse(//
 		    url.trim(), //
 		    HttpHeaderUtils.build("token", res));
 
-	 	    
 	    int statusCode = meteoTrackerResponse.statusCode();
 	    if (statusCode > 400) {
 		// token expired - refresh token

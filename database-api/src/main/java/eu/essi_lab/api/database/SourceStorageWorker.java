@@ -63,6 +63,7 @@ import eu.essi_lab.jaxb.common.schemas.SchemaValidator;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.IterationLogger;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -887,7 +888,7 @@ public class SourceStorageWorker {
 
 	int writingFolderSize = writingFolder.size() - 1;
 
-	debug("Writing folder size: " + writingFolderSize, writingFolderSize, status);
+	debug("Writing folder size: " + StringUtils.format(writingFolderSize), StringUtils.format(writingFolderSize), status);
 
 	double treshold = -1;
 
@@ -899,16 +900,16 @@ public class SourceStorageWorker {
 
 		treshold = request.get().getExpectedRecords().get();
 
-		GSLoggerFactory.getLogger(getClass()).info("Setting treshold according to the expected number of records: {}", treshold);
+		GSLoggerFactory.getLogger(getClass()).info("Setting treshold according to the expected number of records: {}", StringUtils.format(treshold));
 
 	    } else {
 
 		int consolidatedFolderSize = writingData1 ? getData2Folder().size() : getData1Folder().size();
 		treshold = ((double) consolidatedFolderSize / 100) * DEFAULT_SMART_STORAGE_PERCENTAGE_TRESHOLD;
 
-		debug("Consolidated folder size: " + consolidatedFolderSize, consolidatedFolderSize, status);
+		debug("Consolidated folder size: " + StringUtils.format(consolidatedFolderSize), StringUtils.format(consolidatedFolderSize), status);
 
-		GSLoggerFactory.getLogger(getClass()).info("Setting treshold according to the consolidated folder size: {}", treshold);
+		GSLoggerFactory.getLogger(getClass()).info("Setting treshold according to the consolidated folder size: {}", StringUtils.format(treshold));
 	    }
 	}
 
@@ -918,11 +919,11 @@ public class SourceStorageWorker {
 
 		if (request.isPresent() && request.get().getExpectedRecords().isPresent()) {
 
-		    debug("Writing folder size >= of the expected number of records (" + (int) treshold + ")", status);
+		    debug("Writing folder size >= of the expected number of records (" + StringUtils.format((int) treshold) + ")", status);
 
 		} else {
 
-		    debug("Writing folder size >= " + DEFAULT_SMART_STORAGE_PERCENTAGE_TRESHOLD + "% (" + (int) treshold
+		    debug("Writing folder size >= " + DEFAULT_SMART_STORAGE_PERCENTAGE_TRESHOLD + "% (" + StringUtils.format((int) treshold)
 			    + ") consolidated size", status);
 		}
 	    }

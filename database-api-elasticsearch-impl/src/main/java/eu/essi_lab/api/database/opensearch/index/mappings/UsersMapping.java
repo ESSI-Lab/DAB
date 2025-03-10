@@ -74,8 +74,11 @@ public class UsersMapping extends IndexMapping {
 	addProperty(USER_ID, FieldType.Text.jsonValue());
 	addProperty(USER_ROLE, FieldType.Text.jsonValue());
 	addProperty(ENABLED, FieldType.Boolean.jsonValue());
-
 	// optional
 	addProperty(USER_ID_TYPE, FieldType.Text.jsonValue());
+
+	addProperty(toKeywordField(USER_ID), FieldType.Keyword.jsonValue());
+	addProperty(toKeywordField(USER_ROLE), FieldType.Keyword.jsonValue());
+	addProperty(toKeywordField(USER_ID_TYPE), FieldType.Keyword.jsonValue());
     }
 }

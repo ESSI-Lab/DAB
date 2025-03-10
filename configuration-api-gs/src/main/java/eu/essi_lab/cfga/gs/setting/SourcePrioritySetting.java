@@ -1,5 +1,17 @@
 package eu.essi_lab.cfga.gs.setting;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.json.JSONObject;
+
+import eu.essi_lab.cfga.EditableSetting;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gui.extension.ComponentInfo;
+import eu.essi_lab.cfga.gui.extension.TabInfo;
+import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -24,19 +36,8 @@ package eu.essi_lab.cfga.gs.setting;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.lib.utils.LabeledEnum;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.GSSource;
 
 /**
@@ -59,7 +60,8 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
     public SourcePrioritySetting() {
 
 	setName("Identifier Management");
-	setDescription("Define global (DAB-level) Identifier Management options and optionally select one or more sources to prioritize. Collections and datasets of 'priority sources' maintain their original id during harvesting");
+	setDescription(
+		"Define global (DAB-level) Identifier Management options and optionally select one or more sources to prioritize. Collections and datasets of 'priority sources' maintain their original id during harvesting");
 	setCanBeDisabled(false);
 	enableCompactMode(false);
 
@@ -230,28 +232,36 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 	return getSelectedSourcesIds().contains(sourceId);
     }
 
+    /**
+     * @return
+     */
     public Boolean mantainCollectionId() {
 
-	return BooleanChoice.toBoolean(((Option<BooleanChoice>) getOption(MANTAIN_COLLECTIONID_KEY).get()).getValue());
-
+	return BooleanChoice.toBoolean(getOption(MANTAIN_COLLECTIONID_KEY, BooleanChoice.class).get().getValue());
     }
 
+    /**
+     * @return
+     */
     public Boolean mantainUUID() {
 
-	return BooleanChoice.toBoolean(((Option<BooleanChoice>) getOption(MANTAIN_UUID_KEY).get()).getValue());
-
+	return BooleanChoice.toBoolean(getOption(MANTAIN_UUID_KEY, BooleanChoice.class).get().getValue());
     }
 
+    /**
+     * @return
+     */
     public Boolean preserveIdentifiers() {
 
-	return BooleanChoice.toBoolean(((Option<BooleanChoice>) getOption(PRESERVE_ID_KEY).get()).getValue());
-
+	return BooleanChoice.toBoolean(getOption(PRESERVE_ID_KEY, BooleanChoice.class).get().getValue());
     }
 
+    /**
+     * @return
+     */
     public Boolean allowNullOriginalId() {
 
-	return BooleanChoice.toBoolean(((Option<BooleanChoice>) getOption(NULL_ORIGINAL_ID_KEY).get()).getValue());
-
+	return BooleanChoice.toBoolean(getOption(NULL_ORIGINAL_ID_KEY, BooleanChoice.class).get().getValue());
     }
 
     /**

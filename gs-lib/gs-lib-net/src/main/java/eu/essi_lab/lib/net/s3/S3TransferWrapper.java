@@ -25,8 +25,10 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -44,8 +46,11 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3CrtAsyncClientBuilder;
 import software.amazon.awssdk.services.s3.S3Utilities;
 import software.amazon.awssdk.services.s3.model.Bucket;
+import software.amazon.awssdk.services.s3.model.Delete;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
+import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectsResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
@@ -53,6 +58,7 @@ import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
@@ -542,6 +548,34 @@ public class S3TransferWrapper {
 	}
     }
 
+    public void deleteObjects(String bucketName, Collection<String> objectKey) {
+
+	try {
+	    List<ObjectIdentifier> objects = new ArrayList<ObjectIdentifier>();
+	    for (String key : objectKey) {
+		objects.add(ObjectIdentifier.builder().key(key).build());
+		if (objects.size() == 1000) {
+		    deleteBatch(bucketName, objects);
+		    objects.clear();
+		}
+	    }
+	    if (!objects.isEmpty()) {
+		deleteBatch(bucketName, objects);
+	    }
+
+	} catch (S3Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e.awsErrorDetails().errorMessage(), e);
+	}
+    }
+
+    private void deleteBatch(String bucketName, List<ObjectIdentifier> objects) {
+	Delete delete = Delete.builder().objects(objects).build();
+	DeleteObjectsRequest request = DeleteObjectsRequest.builder().bucket(bucketName).delete(delete).build();
+	initialize();
+	CompletableFuture<DeleteObjectsResponse> future = client.deleteObjects(request);
+	future.join();
+    }
+
     /**
      * @param bucketName
      * @param key
@@ -611,6 +645,24 @@ public class S3TransferWrapper {
 		S3TransferManager.//
 			builder().//
 			s3Client(client).build();
+
+    }
+
+    public void deleteObjectsBeforeDate(String bucket, String prefix, Instant targetDate) {
+	String token = null;
+	ListObjectsV2Response list = null;
+	Collection<String> keys = new ArrayList<String>();
+	do {
+	    list = listObjects(bucket, prefix, token);
+	    List<S3Object> contents = list.contents();
+	    for (S3Object content : contents) {
+		Instant instant = content.lastModified();
+		if (instant.isBefore(targetDate)) {
+		    keys.add(content.key());
+		}
+	    }
+	} while ((token = list.nextContinuationToken()) != null);
+	deleteObjects(bucket, keys);
 
     }
 }
