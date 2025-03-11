@@ -40,7 +40,9 @@ import eu.essi_lab.messages.UserBondMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.count.AbstractCountResponse;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
 import eu.essi_lab.pdk.rsm.MessageResponseMapper;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
@@ -258,7 +260,7 @@ public abstract class ProfilerHandler//
 	pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.RESULT_SET_MAPPING, rid, owr);
 
 	OUT mappedResponse = getMessageResponseMapper().map(message, executorResponse);
-	
+
 	// set the property handler to the mapped response
 	mappedResponse.setPropertyHandler(executorResponse.getPropertyHandler());
 
@@ -328,7 +330,18 @@ public abstract class ProfilerHandler//
 	    userBond = ((UserBondMessage) message).getUserBond();
 	}
 
+	//
+	// sorting is necessary to use the OpenSearch search after feature
+	//
+	message.setSortOrder(SortOrder.ASCENDING);
+	message.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
+
 	do {
+
+	    //
+	    // set the search after to the message according to the executor response
+	    //
+	    executorResponse.getSearchAfter().ifPresent(sa -> message.setSearchAfter(sa));
 
 	    //
 	    // set the original user bond. this is required to avoid that QueryInitializer.initializeQuery at row 87
