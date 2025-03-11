@@ -266,10 +266,14 @@ public class OpenSearchQueryBuilder {
 
 	BondOperator operator = bond.getOperator();
 
+	if (property == ResourceProperty.SOURCE_DEPLOYMENT) {
+
+	    return buildSourceDeploymentQuery(value);
+	}
+
 	if (operator == BondOperator.EXISTS) {
 
 	    return buildExistsFieldQuery(name);
-
 	}
 
 	if (operator == BondOperator.NOT_EXISTS) {
@@ -888,6 +892,34 @@ public class OpenSearchQueryBuilder {
 			build()
 
 		).collect(Collectors.toList());
+    }
+
+    /**
+     * In the data migration from MarkLogic to OpenSearch, the <code>sourceDeployment</code> has been indexed
+     * only as <i>text</i> field,
+     * and not as <i>keyword</i> field. As consequence, a term query on this <i>text</i> field works only if the
+     * deployment value has a single token, such as "geoss". If the deployment value has more than one token, such as
+     * "i-change" or "blue-cloud", the term query fails since it is an exact match query.
+     * As workaround for this issue, we can use a match phrase query, but since
+     * it searches for the tokenized values, a query for "blue-cloud" would match also results for
+     * "blue-cloud-terms".
+     * To avoid this, the <code>deployment</code> value is tokenized according to the '-' symbol and
+     * all the resulting tokens are used to build a must query of match phrase queries, which should be logically
+     * equals to a term query on a <i>keyword</i> field.
+     * 
+     * @param deployment
+     */
+    private Query buildSourceDeploymentQuery(String deployment) {
+
+	Query termQuery = buildTermQuery(IndexMapping.toKeywordField(ResourceProperty.SOURCE_DEPLOYMENT.getName()), deployment);
+
+	List<Query> tokenQueries = Arrays.asList(deployment.split("-")).//
+		stream().//
+		map(token -> buildMatchPhraseQuery(ResourceProperty.SOURCE_DEPLOYMENT.getName(), token)).collect(Collectors.toList());
+
+	Query mustQuery = buildMustQuery(tokenQueries);
+
+	return buildShouldQuery(termQuery, mustQuery);
     }
 
     /**
