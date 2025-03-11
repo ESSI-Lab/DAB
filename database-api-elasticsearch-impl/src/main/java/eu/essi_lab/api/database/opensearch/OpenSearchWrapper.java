@@ -85,6 +85,7 @@ import org.opensearch.client.opensearch.generic.Response;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.SearchAfter;
@@ -793,8 +794,9 @@ public class OpenSearchWrapper {
 
 	    // it excludes also the anyText field since it is usually ignored
 	    toExclude.add(MetadataElement.ANY_TEXT.getName());
-	    
-	    // it excludes also tha data index fields since they are usually ignored
+	    toExclude.add(IndexMapping.toKeywordField(MetadataElement.ANY_TEXT.getName()));
+
+	    // it excludes also the data index fields since they are usually ignored
 	    toExclude.add(IndexData.BINARY_DATA_TYPE);
 	    toExclude.add(IndexData.DATA_TYPE);
 	    toExclude.add(IndexData.DATABASE_ID);
