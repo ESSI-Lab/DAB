@@ -338,7 +338,13 @@ public class OpenSearchQueryBuilder {
 		value = ConversionUtils.parseToLongString(value);
 	    }
 
-	    return buildRangeQuery(name, operator, value);
+	    //
+	    // using keyword for textual fields
+	    //
+
+	    String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(name) : name;
+
+	    return buildRangeQuery(field, operator, value);
 	}
     }
 
@@ -375,10 +381,16 @@ public class OpenSearchQueryBuilder {
 		value = ConversionUtils.parseToLongString(value);
 	    }
 
+	    //
+	    // using keyword for textual fields
+	    //
+
+	    String field = el.getContentType() == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(el.getName()) : el.getName();
+
 	    return buildRangeQuery(//
-		    DataFolderMapping.toKeywordField(el.getName()),//
-		    operator,//
-		    value,//
+		    field, //
+		    operator, //
+		    value, //
 		    ranking.computePropertyWeight(el));
 
 	case TEXT_SEARCH:
