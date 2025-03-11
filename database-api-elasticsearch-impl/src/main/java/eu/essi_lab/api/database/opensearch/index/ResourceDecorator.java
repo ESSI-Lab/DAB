@@ -25,8 +25,10 @@ package eu.essi_lab.api.database.opensearch.index;
  */
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.json.JSONObject;
+import org.locationtech.jts.geom.Geometry;
 
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.indexes.IndexedElements;
@@ -102,7 +104,18 @@ public class ResourceDecorator {
 
 	    if (source.has(el.getName())) {
 
-		// bbox is already in, the IndexesMetadata.clear(false) do not remove it
+		//
+		// adds the shape to the extension handler, it can be used in case the resource binary
+		// is excluded and the bbox is not present in the indexed metadata
+		//
+		if (source.has(MetadataElement.BOUNDING_BOX.getName())) {
+
+		    String shape = source.getString(MetadataElement.BOUNDING_BOX.getName());
+		    res.getExtensionHandler().setShape(shape);
+		}
+
+		// if the resource binary is present, bbox is already in,
+		// since the IndexesMetadata.clear(false) do not remove it
 		// @see IndexData
 		if (!el.getName().equals(MetadataElement.BOUNDING_BOX.getName())) {
 
