@@ -49,7 +49,8 @@ public class RequestLoggingFilter implements Filter {
             if ("GET".equalsIgnoreCase(httpRequest.getMethod())) {
         	String target = httpRequest.getRequestURI();
                 if (target.contains("test")) {
-                GSLoggerFactory.getLogger(getClass()).info("Received GET request at: " + timestamp + " for " + target);
+                    return;
+//                GSLoggerFactory.getLogger(getClass()).info("Received GET request at: " + timestamp + " for " + target);
                 }
             }
         }
