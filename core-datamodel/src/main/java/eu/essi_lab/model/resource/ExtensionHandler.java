@@ -30,12 +30,12 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.Duration;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.locationtech.jts.geom.Geometry;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.NameSpace;
-import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 
 /**
@@ -55,6 +55,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String AVAILABLE_GRANULES = "availableGranules";
     private static final String THEME_CATEGORY = "themeCategory";
     private static final String IN_SITU = "inSitu";
+    private static final String GEOMETRY = "geometry";
 
     private ExtendedMetadata metadata;
 
@@ -140,7 +141,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
-    
+
     /**
      * @return
      */
@@ -416,7 +417,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
 	return Optional.empty();
     }
-    
+
     /**
      * @param scene
      */
@@ -450,7 +451,6 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
 	return Optional.empty();
     }
-    
 
     /**
      * @return
@@ -476,8 +476,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 
     }
-    
-    
+
     /**
      * @return
      */
@@ -518,6 +517,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 	return Optional.empty();
     }
+
     public Optional<String> getTimeInterpolationString() {
 	try {
 	    String str = this.metadata.getTextContent(MetadataElement.TIME_INTERPOLATION_EL_NAME);
@@ -528,7 +528,6 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 	return Optional.empty();
     }
-    
 
     public void setTimeInterpolation(InterpolationType interpolationType) {
 	if (interpolationType != null) {
@@ -624,7 +623,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 
     }
-    
+
     /**
      * @return
      */
@@ -665,7 +664,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 
     }
-    
+
     /**
      * @return
      */
@@ -779,30 +778,30 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 	return Optional.empty();
     }
-    
+
     public void setWISTopicHierarchy(String topic) {
-   	try {
-   	    this.metadata.add(MetadataElement.WIS_TOPIC_HIERARCHY_EL_NAME, topic);
-   	} catch (Exception e) {
-   	    e.printStackTrace();
-   	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-   	}
+	try {
+	    this.metadata.add(MetadataElement.WIS_TOPIC_HIERARCHY_EL_NAME, topic);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
 
-       }
+    }
 
-       /**
-        * @return
-        */
-       public Optional<String> getWISTopicHierarchy() {
-   	try {
-   	    String str = this.metadata.getTextContent(MetadataElement.WIS_TOPIC_HIERARCHY_EL_NAME);
-   	    return Optional.ofNullable(str);
-   	} catch (XPathExpressionException e) {
-   	    e.printStackTrace();
-   	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-   	}
-   	return Optional.empty();
-       }
+    /**
+     * @return
+     */
+    public Optional<String> getWISTopicHierarchy() {
+	try {
+	    String str = this.metadata.getTextContent(MetadataElement.WIS_TOPIC_HIERARCHY_EL_NAME);
+	    return Optional.ofNullable(str);
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+	return Optional.empty();
+    }
 
     /**
      * @return
@@ -1030,6 +1029,34 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
+     * @param shape
+     */
+    public void setShape(String shape) {
+
+	try {
+	    this.metadata.add(GEOMETRY, shape);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getShape() {
+
+	try {
+	    return Optional.of(this.metadata.getTextContent(GEOMETRY));
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
      * @param themeCategory
      */
     public void addThemeCategory(String themeCategory) {
@@ -1039,9 +1066,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-	
+
     }
-    
+
     /**
      * @return
      */
@@ -1056,7 +1083,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
 	return Optional.empty();
     }
-    
+
     /**
      * 
      */
@@ -1069,7 +1096,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
-    
+
     /**
      * @param themeCategory
      */
@@ -1080,9 +1107,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-	
+
     }
-    
+
     /**
      * @return
      */
@@ -1105,10 +1132,5 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
 	return false;
     }
-    
-    
-    
-    
-
 
 }
