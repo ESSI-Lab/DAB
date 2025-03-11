@@ -127,8 +127,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     private static final String PARENTS_GSRESOURCE = "PARENTS_GSRESOURCE";
     private static final String QUAKE_ML_EVENT_ORDER = "QUAKE_ML_EVENT_ORDER";
     private static final String DATA_FOLDER_CHECK = "DATA_FOLDER_CHECK";
-    private static final String ORDERING_PROPERTY = "ORDERING_PROPERTY";
-    private static final String ORDERING_DIRECTION = "ORDERING_DIRECTION";
     private static final String DISINCT_VALUES_ELEMENT = "DISINCT_VALUES_ELEMENT";
     private static final String QUERY_REGISTRATION = "QUERY_REGISTRATION";
     private static final String RESULTS_PRIORITY = "RESULTS_PRIORITY"; // UNSET, DATASET, COLLECTION,
@@ -395,22 +393,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     /**
      * @return
      */
-    public Optional<OrderingDirection> getOrderingDirection() {
-
-	return Optional.ofNullable(getHeader().get(ORDERING_DIRECTION, OrderingDirection.class));
-    }
-
-    /**
-     * @param direction
-     */
-    public void setOrderingDirection(OrderingDirection direction) {
-
-	getHeader().add(new GSProperty<OrderingDirection>(ORDERING_DIRECTION, direction));
-    }
-
-    /**
-     * @return
-     */
     public Optional<SearchAfter> getSearchAfter() {
 
 	return Optional.ofNullable(getHeader().get(SEARCH_AFTER, SearchAfter.class));
@@ -462,22 +444,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	return Optional.ofNullable(getHeader().get(DISINCT_VALUES_ELEMENT, Queryable.class));
     }
 
-    /**
-     * @param element
-     */
-    public void setOrderingProperty(Queryable element) {
-
-	getHeader().add(new GSProperty<Queryable>(ORDERING_PROPERTY, element));
-    }
-
-    /**
-     * @return
-     */
-    public Optional<Queryable> getOrderingProperty() {
-
-	return Optional.ofNullable(getHeader().get(ORDERING_PROPERTY, Queryable.class));
-    }
-
+ 
     /**
      * @return
      */

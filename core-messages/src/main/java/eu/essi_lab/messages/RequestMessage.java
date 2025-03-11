@@ -32,6 +32,8 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
@@ -81,7 +83,8 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     private static final String REQUEST_TIMEOUT = "requestTimeout";
     private static final String ITERATED_WORKFLOW = "ITERATED_WORKFLOW";
     private static final String PROFILER_NAME = "profilerName";
-
+    private static final String ORDERING_PROPERTY = "ORDERING_PROPERTY";
+    private static final String ORDERING_DIRECTION = "ORDERING_DIRECTION";
     private String requestId;
 
     /**
@@ -388,4 +391,37 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
 	getHeader().add(new GSProperty<IterationMode>(ITERATED_WORKFLOW, iterationMode));
     }
+
+    /**
+     * @return
+     */
+    public Optional<OrderingDirection> getOrderingDirection() {
+
+	return Optional.ofNullable(getHeader().get(ORDERING_DIRECTION, OrderingDirection.class));
+    }
+
+    /**
+     * @param direction
+     */
+    public void setOrderingDirection(OrderingDirection direction) {
+
+	getHeader().add(new GSProperty<OrderingDirection>(ORDERING_DIRECTION, direction));
+    }
+
+    /**
+     * @param element
+     */
+    public void setOrderingProperty(Queryable element) {
+
+	getHeader().add(new GSProperty<Queryable>(ORDERING_PROPERTY, element));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Queryable> getOrderingProperty() {
+
+	return Optional.ofNullable(getHeader().get(ORDERING_PROPERTY, Queryable.class));
+    }
+
 }
