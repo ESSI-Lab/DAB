@@ -59,6 +59,22 @@ public class Shape {
     public static String CENTROID = "centroid";
 
     /**
+     * @param shape
+     * @return
+     */
+    public static Optional<Geometry> of(String shape) {
+
+	try {
+	    return Optional.of(READER.read(shape));
+	} catch (ParseException e) {
+
+	    GSLoggerFactory.getLogger(Shape.class).error(e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
      * @param bbox
      * @return
      */
