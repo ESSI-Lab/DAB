@@ -161,13 +161,26 @@ public class OpenSearchDatabase extends Database {
 	    //
 	    //
 
-	    if (ExecutionMode.get() == ExecutionMode.MIXED) {
+	    if (indexesInitEnabled()) {
 
 		initializeIndexes();
 	    }
 
 	    initialized = true;
 	}
+    }
+
+    /**
+     * @return
+     */
+    private boolean indexesInitEnabled() {
+
+	String initIndexes = System.getProperty("initIndexes");
+	if (initIndexes == null) {
+	    initIndexes = System.getenv("initIndexes");
+	}
+
+	return initIndexes != null && initIndexes.equals("true");
     }
 
     /**
