@@ -188,7 +188,7 @@
 							<directory>target/frontend</directory>
 							<targetPath>frontend</targetPath>
 						</resource>
-				
+
 					</webResources>
 				</configuration>
 			</plugin>
@@ -214,7 +214,8 @@
 			</plugin>
 
 			<!-- Take care of synchronizing java dependencies and imports in
-			package.json and main.js files. It also creates webpack.config.js if not exists yet. -->
+			package.json and main.js files. It also creates webpack.config.js if not exists
+			yet. -->
 			<plugin>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
@@ -289,12 +290,11 @@
 
 
 	<dependencies>
-	
-	
+
 
 		<dependency>
-		    <groupId>org.apache.jena</groupId>
-		    <artifactId>jena-shacl</artifactId>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-shacl</artifactId>
 		</dependency>
 
 		<dependency>
@@ -320,6 +320,18 @@
 		<dependency>
 			<groupId>com.indeed</groupId>
 			<artifactId>status-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-core</artifactId>
+					<version>2.14.3</version>
 		</dependency>
 
 		<!-- spring -->
@@ -327,20 +339,20 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>org.springframework</groupId>
-		    <artifactId>spring-beans</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>org.springframework</groupId>
-		    <artifactId>spring-core</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>org.springframework</groupId>
-		    <artifactId>spring-context</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
 		</dependency>
 
 		<!-- generates the wadl -->
@@ -445,7 +457,7 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-terms</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-esri</artifactId>
@@ -555,7 +567,7 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-worldcereal</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>		
+		</dependency>
 
 		<!-- shared content -->
 		<dependency>
@@ -582,13 +594,13 @@
 			<artifactId>accessor-egy-mwri</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-niwa</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-s3-shapefile</artifactId>
@@ -611,7 +623,7 @@
 			<artifactId>accessor-south-africa</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-smhi</artifactId>
@@ -1055,7 +1067,7 @@
 			<artifactId>accessor-seanoe</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-eiffel-s3</artifactId>
@@ -1065,12 +1077,12 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-copernicus-dataspace</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-trigger</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-smartcitizenkit</artifactId>
@@ -1080,7 +1092,7 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-acronet</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>					
+		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-geo-mountain</artifactId>
@@ -1090,14 +1102,14 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-agrostac</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>		
-		
+		</dependency>
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-oai-pmh-wrapper</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>		
-					
+		</dependency>
+
 		<!-- odip utils -->
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
@@ -1138,7 +1150,6 @@
 		</dependency>
 
 
-		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools-downloader-wof</artifactId>
@@ -1237,7 +1248,6 @@
 						<configuration>
 							<images>
 
-								
 
 								<image>
 									<alias>gi-elasticsearch</alias>
@@ -1305,7 +1315,6 @@
 
 						<configuration>
 							<images>
-
 
 
 								<image>
