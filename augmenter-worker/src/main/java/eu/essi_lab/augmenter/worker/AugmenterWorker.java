@@ -37,11 +37,11 @@ import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.augmenter.Augmenter;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -67,7 +67,7 @@ import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
@@ -147,7 +147,7 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 	// ordering set option
 	//
 
-	handleOderingSetOption(getSetting(), status, message);
+	handleSortOption(getSetting(), status, message);
 
 	//
 	// view option
@@ -435,17 +435,17 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
      * @param status
      * @param message
      */
-    private void handleOderingSetOption(AugmenterWorkerSetting setting, SchedulerJobStatus status, DiscoveryMessage message) {
+    private void handleSortOption(AugmenterWorkerSetting setting, SchedulerJobStatus status, DiscoveryMessage message) {
 
-	boolean orderingSet = getSetting().isLessRecentOrderingSet();
+	boolean sorting = getSetting().isLessRecentSortSet();
 
-	GSLoggerFactory.getLogger(getClass()).debug("Less recent ordering set: {} ", orderingSet);
-	status.addInfoMessage("Less recent ordering set: " + orderingSet);
+	GSLoggerFactory.getLogger(getClass()).debug("Less recent ordering set: {} ", sorting);
+	status.addInfoMessage("Less recent ordering set: " + sorting);
 
-	if (orderingSet) {
+	if (sorting) {
 
-	    message.setOrderingDirection(OrderingDirection.ASCENDING);
-	    message.setOrderingProperty(ResourceProperty.RESOURCE_TIME_STAMP);
+	    message.setSortOrder(SortOrder.ASCENDING);
+	    message.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
 	}
     }
 

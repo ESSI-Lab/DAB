@@ -49,7 +49,7 @@ import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.RuntimeInfoElement;
@@ -123,12 +123,9 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     private static final String INLCUDE_DELETED = "includeDeleted";
     private static final String MAX_TERM_FREQUENCY_MAP_ITEMS = "maxTfMapItems";
     private static final String RESOURCE_SELECTOR = "resourceSelector";
-    private static final String SEARCH_AFTER = "searchAfter";
     private static final String PARENTS_GSRESOURCE = "PARENTS_GSRESOURCE";
     private static final String QUAKE_ML_EVENT_ORDER = "QUAKE_ML_EVENT_ORDER";
     private static final String DATA_FOLDER_CHECK = "DATA_FOLDER_CHECK";
-    private static final String ORDERING_PROPERTY = "ORDERING_PROPERTY";
-    private static final String ORDERING_DIRECTION = "ORDERING_DIRECTION";
     private static final String DISINCT_VALUES_ELEMENT = "DISINCT_VALUES_ELEMENT";
     private static final String QUERY_REGISTRATION = "QUERY_REGISTRATION";
     private static final String RESULTS_PRIORITY = "RESULTS_PRIORITY"; // UNSET, DATASET, COLLECTION,
@@ -273,11 +270,11 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_MAX_FREQUENCY_MAP_ITEMS.getName(),
 		Arrays.asList(String.valueOf(maxFrequencyMapItems)));
 
-	Optional<OrderingDirection> orderingDirection = getOrderingDirection();
+	Optional<SortOrder> orderingDirection = getSortOrder();
 	orderingDirection
 		.ifPresent(d -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_DIRECTION.getName(), Arrays.asList(d.getLabel())));
 
-	Optional<Queryable> orderingProperty = getOrderingProperty();
+	Optional<Queryable> orderingProperty = getSortProperty();
 	orderingProperty
 		.ifPresent(p -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_PROPERTY.getName(), Arrays.asList(p.getName())));
 
@@ -393,38 +390,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     }
 
     /**
-     * @return
-     */
-    public Optional<OrderingDirection> getOrderingDirection() {
-
-	return Optional.ofNullable(getHeader().get(ORDERING_DIRECTION, OrderingDirection.class));
-    }
-
-    /**
-     * @param direction
-     */
-    public void setOrderingDirection(OrderingDirection direction) {
-
-	getHeader().add(new GSProperty<OrderingDirection>(ORDERING_DIRECTION, direction));
-    }
-
-    /**
-     * @return
-     */
-    public Optional<SearchAfter> getSearchAfter() {
-
-	return Optional.ofNullable(getHeader().get(SEARCH_AFTER, SearchAfter.class));
-    }
-
-    /*
-     * 
-     */
-    public void setSearchAfter(SearchAfter searchAfter) {
-
-	getHeader().add(new GSProperty<SearchAfter>(SEARCH_AFTER, searchAfter));
-    }
-
-    /**
      * Used to indicate the type of results expected (e.g. datasets only, collection only or datasets and collection).
      * This is useful for the case of mixed sources, to indicate the desired results
      * 
@@ -460,22 +425,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     public Optional<Queryable> getDistinctValuesElement() {
 
 	return Optional.ofNullable(getHeader().get(DISINCT_VALUES_ELEMENT, Queryable.class));
-    }
-
-    /**
-     * @param element
-     */
-    public void setOrderingProperty(Queryable element) {
-
-	getHeader().add(new GSProperty<Queryable>(ORDERING_PROPERTY, element));
-    }
-
-    /**
-     * @return
-     */
-    public Optional<Queryable> getOrderingProperty() {
-
-	return Optional.ofNullable(getHeader().get(ORDERING_PROPERTY, Queryable.class));
     }
 
     /**

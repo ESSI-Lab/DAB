@@ -20,7 +20,7 @@ import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -66,7 +66,7 @@ public class SortByResourceTimeStampExternalTestIT {
 		0, // start
 		10, // size
 		Optional.of(ResourceProperty.RESOURCE_TIME_STAMP), // orderingProperty
-		Optional.of(OrderingDirection.ASCENDING), // orderingDirection
+		Optional.of(SortOrder.ASCENDING), // orderingDirection
 		Optional.empty(), // search after
 		false); // cache
 

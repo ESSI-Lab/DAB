@@ -67,7 +67,7 @@ public class GSSource implements Serializable {
     private List<String> deployment;
 
     @XmlAttribute(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private OrderingDirection orderingDirection = OrderingDirection.ASCENDING;
+    private SortOrder orderingDirection = SortOrder.ASCENDING;
 
     @XmlAttribute(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private String orderingProperty;
@@ -80,7 +80,7 @@ public class GSSource implements Serializable {
      */
     public GSSource(String sourceId) {
 	setResultsPriority(ResultsPriority.UNSET);
-	setOrderingDirection(OrderingDirection.ASCENDING);
+	setSortOrder(SortOrder.ASCENDING);
 	if (sourceId != null) {
 	    setUniqueIdentifier(sourceId);
 	}
@@ -95,24 +95,24 @@ public class GSSource implements Serializable {
     }
 
     @XmlTransient
-    public OrderingDirection getOrderingDirection() {
+    public SortOrder getSortOrder() {
 	return orderingDirection;
     }
 
-    public void setOrderingDirection(OrderingDirection orderingDirection) {
-	this.orderingDirection = orderingDirection;
+    public void setSortOrder(SortOrder order) {
+	this.orderingDirection = order;
     }
 
     @XmlTransient
-    public String getOrderingProperty() {
+    public String getSortProperty() {
 	return orderingProperty;
     }
 
     /**
-     * @param orderingProperty
+     * @param property
      */
-    public void setOrderingProperty(String orderingProperty) {
-	this.orderingProperty = orderingProperty;
+    public void setSortProperty(String property) {
+	this.orderingProperty = property;
     }
 
     @XmlTransient
@@ -195,7 +195,7 @@ public class GSSource implements Serializable {
 	    GSSource s = (GSSource) o;
 	    return s.getBrokeringStrategy() == this.getBrokeringStrategy() && //
 		    (s.getEndpoint() == null && this.getEndpoint() == null || s.getEndpoint().equals(this.getEndpoint()) && //
-			    s.getOrderingDirection() == this.getOrderingDirection() && s.getOrderingProperty() == this.getOrderingProperty()
+			    s.getSortOrder() == this.getSortOrder() && s.getSortProperty() == this.getSortProperty()
 			    && //
 			    s.getResultsPriority() == this.getResultsPriority() && //
 			    (s.getUniqueIdentifier() == null && this.getUniqueIdentifier() == null

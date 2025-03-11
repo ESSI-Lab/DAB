@@ -49,7 +49,7 @@ import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.Pluggable;
@@ -133,12 +133,12 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 
 	Optional<Queryable> orderingProperty = getOrderingProperty();
 	if (orderingProperty.isPresent()) {
-	    message.setOrderingProperty(orderingProperty.get());
+	    message.setSortProperty(orderingProperty.get());
 	}
 
-	Optional<OrderingDirection> orderingDirection = getOrderingDirection();
+	Optional<SortOrder> orderingDirection = getOrderingDirection();
 	if (orderingDirection.isPresent()) {
-	    message.setOrderingDirection(orderingDirection.get());
+	    message.setSortOrder(orderingDirection.get());
 	}
 
 	Optional<View> optionalView = message.getView();
@@ -206,7 +206,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
      * 
      * @return the optional ordering direction
      */
-    protected Optional<OrderingDirection> getOrderingDirection() {
+    protected Optional<SortOrder> getOrderingDirection() {
 	return Optional.empty();
     }
 

@@ -10,7 +10,7 @@ import eu.essi_lab.cfga.gs.setting.GSSourceSetting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.resource.MetadataElement;
 
@@ -25,33 +25,33 @@ public class GSSourceSettingTest {
 	GSSourceSetting setting = new GSSourceSetting();
 
 	Assert.assertEquals(ResultsPriority.UNSET, setting.getResultsPriority());
-	Assert.assertFalse(setting.getOrderingProperty().isPresent());
-	Assert.assertEquals(OrderingDirection.ASCENDING, setting.getOrderingDirection());
+	Assert.assertFalse(setting.getSortProperty().isPresent());
+	Assert.assertEquals(SortOrder.ASCENDING, setting.getSortOrder());
 
 	setting.setDiscoveryOptions(ResultsPriority.ALL, null, null);
 
 	Assert.assertEquals(ResultsPriority.ALL, setting.getResultsPriority());
-	Assert.assertFalse(setting.getOrderingProperty().isPresent());
-	Assert.assertEquals(OrderingDirection.ASCENDING, setting.getOrderingDirection());
+	Assert.assertFalse(setting.getSortProperty().isPresent());
+	Assert.assertEquals(SortOrder.ASCENDING, setting.getSortOrder());
 
 	setting.setDiscoveryOptions(null, MetadataElement.ABSTRACT, null);
 
 	Assert.assertEquals(ResultsPriority.UNSET, setting.getResultsPriority());
-	Assert.assertEquals(MetadataElement.ABSTRACT, setting.getOrderingProperty().get());
-	Assert.assertEquals(OrderingDirection.ASCENDING, setting.getOrderingDirection());
+	Assert.assertEquals(MetadataElement.ABSTRACT, setting.getSortProperty().get());
+	Assert.assertEquals(SortOrder.ASCENDING, setting.getSortOrder());
 
 	// if direction is set but the property  is missing, the default ASCENDING is returned
-	setting.setDiscoveryOptions(null, null, OrderingDirection.DESCENDING);
+	setting.setDiscoveryOptions(null, null, SortOrder.DESCENDING);
 
 	Assert.assertEquals(ResultsPriority.UNSET, setting.getResultsPriority());
-	Assert.assertFalse(setting.getOrderingProperty().isPresent());
-	Assert.assertEquals(OrderingDirection.ASCENDING, setting.getOrderingDirection());
+	Assert.assertFalse(setting.getSortProperty().isPresent());
+	Assert.assertEquals(SortOrder.ASCENDING, setting.getSortOrder());
 
 	setting.setDiscoveryOptions(null, null, null);
 
 	Assert.assertEquals(ResultsPriority.UNSET, setting.getResultsPriority());
-	Assert.assertFalse(setting.getOrderingProperty().isPresent());
-	Assert.assertEquals(OrderingDirection.ASCENDING, setting.getOrderingDirection());
+	Assert.assertFalse(setting.getSortProperty().isPresent());
+	Assert.assertEquals(SortOrder.ASCENDING, setting.getSortOrder());
     }
 
     /**
@@ -71,7 +71,7 @@ public class GSSourceSettingTest {
 	sourceSetting.setSourceIdentifier("id");
 	sourceSetting.setSourceEndpoint("endpoint");
 	sourceSetting.setSourceLabel("label");
-	sourceSetting.setDiscoveryOptions(ResultsPriority.COLLECTION, MetadataElement.ABSTRACT, OrderingDirection.DESCENDING);
+	sourceSetting.setDiscoveryOptions(ResultsPriority.COLLECTION, MetadataElement.ABSTRACT, SortOrder.DESCENDING);
 	sourceSetting.addSourceDeployment("dep1");
 	sourceSetting.addSourceDeployment("dep2");
 	sourceSetting.addSourceDeployment("dep3");
@@ -103,9 +103,9 @@ public class GSSourceSettingTest {
 	gsSource.setUniqueIdentifier("id2");
 	gsSource.setEndpoint("endpoint2");
 	gsSource.setLabel("label2");
-	gsSource.setOrderingDirection(OrderingDirection.ASCENDING);
+	gsSource.setSortOrder(SortOrder.ASCENDING);
 	gsSource.setResultsPriority(ResultsPriority.DATASET);
-	gsSource.setOrderingProperty(MetadataElement.TITLE.getName());
+	gsSource.setSortProperty(MetadataElement.TITLE.getName());
 	gsSource.setVersion("3.0.0");
 
 	sourceSetting.setSource(gsSource);
@@ -144,8 +144,8 @@ public class GSSourceSettingTest {
 	Assert.assertFalse(sourceSetting.getBrokeringStrategy().isPresent());
 
 	Assert.assertEquals(ResultsPriority.UNSET, sourceSetting.getResultsPriority());
-	Assert.assertEquals(OrderingDirection.ASCENDING, sourceSetting.getOrderingDirection());
-	Assert.assertFalse(sourceSetting.getOrderingProperty().isPresent());
+	Assert.assertEquals(SortOrder.ASCENDING, sourceSetting.getSortOrder());
+	Assert.assertFalse(sourceSetting.getSortProperty().isPresent());
 
 	Assert.assertNull(sourceSetting.getSourceLabel());
 	Assert.assertNull(sourceSetting.getSourceEndpoint());
@@ -167,13 +167,13 @@ public class GSSourceSettingTest {
 	Assert.assertNull(asSource.getBrokeringStrategy());
 	Assert.assertNull(asSource.getVersion());
 	Assert.assertEquals(ResultsPriority.UNSET, asSource.getResultsPriority());
-	Assert.assertEquals(OrderingDirection.ASCENDING, asSource.getOrderingDirection());
+	Assert.assertEquals(SortOrder.ASCENDING, asSource.getSortOrder());
 
 	Assert.assertNull(asSource.getLabel());
 	Assert.assertNull(asSource.getEndpoint());
 	Assert.assertNull(asSource.getUniqueIdentifier());
 
-	Assert.assertNull(asSource.getOrderingProperty());
+	Assert.assertNull(asSource.getSortProperty());
 	
 	Assert.assertTrue(asSource.getDeployment().isEmpty());
     }
@@ -183,13 +183,13 @@ public class GSSourceSettingTest {
 	Assert.assertEquals(BrokeringStrategy.DISTRIBUTED, sourceSetting.getBrokeringStrategy().get());
 	// Assert.assertEquals("2.0.0", sourceSetting.getSourceVersion().get());
 	Assert.assertEquals(ResultsPriority.COLLECTION, sourceSetting.getResultsPriority());
-	Assert.assertEquals(OrderingDirection.DESCENDING, sourceSetting.getOrderingDirection());
+	Assert.assertEquals(SortOrder.DESCENDING, sourceSetting.getSortOrder());
 
 	Assert.assertEquals("label", sourceSetting.getSourceLabel());
 	Assert.assertEquals("endpoint", sourceSetting.getSourceEndpoint());
 	Assert.assertEquals("id", sourceSetting.getSourceIdentifier());
 
-	Assert.assertEquals(MetadataElement.ABSTRACT, sourceSetting.getOrderingProperty().get());
+	Assert.assertEquals(MetadataElement.ABSTRACT, sourceSetting.getSortProperty().get());
 
 	Assert.assertEquals("comment", sourceSetting.getSourceComment().get());
 	
@@ -208,13 +208,13 @@ public class GSSourceSettingTest {
 	Assert.assertEquals(BrokeringStrategy.DISTRIBUTED, asSource.getBrokeringStrategy());
 
 	Assert.assertEquals(ResultsPriority.COLLECTION, asSource.getResultsPriority());
-	Assert.assertEquals(OrderingDirection.DESCENDING, asSource.getOrderingDirection());
+	Assert.assertEquals(SortOrder.DESCENDING, asSource.getSortOrder());
 
 	Assert.assertEquals("label", asSource.getLabel());
 	Assert.assertEquals("endpoint", asSource.getEndpoint());
 	Assert.assertEquals("id", asSource.getUniqueIdentifier());
 
-	Assert.assertEquals(MetadataElement.ABSTRACT.getName(), asSource.getOrderingProperty());
+	Assert.assertEquals(MetadataElement.ABSTRACT.getName(), asSource.getSortProperty());
     }
 
     private void setValuesTest2(GSSourceSetting sourceSetting) {
@@ -223,13 +223,13 @@ public class GSSourceSettingTest {
 
 	// Assert.assertEquals("3.0.0", sourceSetting.getSourceVersion().get());
 	Assert.assertEquals(ResultsPriority.DATASET, sourceSetting.getResultsPriority());
-	Assert.assertEquals(OrderingDirection.ASCENDING, sourceSetting.getOrderingDirection());
+	Assert.assertEquals(SortOrder.ASCENDING, sourceSetting.getSortOrder());
 
 	Assert.assertEquals("label2", sourceSetting.getSourceLabel());
 	Assert.assertEquals("endpoint2", sourceSetting.getSourceEndpoint());
 	Assert.assertEquals("id2", sourceSetting.getSourceIdentifier());
 
-	Assert.assertEquals(MetadataElement.TITLE, sourceSetting.getOrderingProperty().get());
+	Assert.assertEquals(MetadataElement.TITLE, sourceSetting.getSortProperty().get());
 
 	//
 	//
@@ -240,13 +240,13 @@ public class GSSourceSettingTest {
 	Assert.assertEquals(BrokeringStrategy.MIXED, asSource.getBrokeringStrategy());
 
 	Assert.assertEquals(ResultsPriority.DATASET, asSource.getResultsPriority());
-	Assert.assertEquals(OrderingDirection.ASCENDING, asSource.getOrderingDirection());
+	Assert.assertEquals(SortOrder.ASCENDING, asSource.getSortOrder());
 
 	Assert.assertEquals("label2", asSource.getLabel());
 	Assert.assertEquals("endpoint2", asSource.getEndpoint());
 	Assert.assertEquals("id2", asSource.getUniqueIdentifier());
 
-	Assert.assertEquals(MetadataElement.TITLE.getName(), asSource.getOrderingProperty());
+	Assert.assertEquals(MetadataElement.TITLE.getName(), asSource.getSortProperty());
     }
 
 }

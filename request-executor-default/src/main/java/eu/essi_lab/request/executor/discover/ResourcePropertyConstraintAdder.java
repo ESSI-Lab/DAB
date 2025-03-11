@@ -40,7 +40,7 @@ import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -191,7 +191,7 @@ public class ResourcePropertyConstraintAdder {
 				//
 				if (!identifiers.isEmpty()) {
 
-				    String propertyString = gsSource.getOrderingProperty();
+				    String propertyString = gsSource.getSortProperty();
 
 				    //
 				    // if a particular collection ordering is required, here it is set
@@ -201,10 +201,10 @@ public class ResourcePropertyConstraintAdder {
 
 					MetadataElement property = MetadataElement.fromName(propertyString);
 
-					OrderingDirection direction = gsSource.getOrderingDirection();
+					SortOrder direction = gsSource.getSortOrder();
 
-					message.setOrderingProperty(property);
-					message.setOrderingDirection(direction);
+					message.setSortProperty(property);
+					message.setSortOrder(direction);
 				    }
 
 				    //

@@ -88,7 +88,6 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.SearchAfter;
-import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -328,7 +327,7 @@ public class OpenSearchWrapper {
 	    int start, //
 	    int size, //
 	    Optional<Queryable> orderingProperty, //
-	    Optional<OrderingDirection> orderingDirection, //
+	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
 	    Optional<SearchAfter> searchAfter, //
 	    boolean requestCache)
 
@@ -352,9 +351,9 @@ public class OpenSearchWrapper {
 		builder.from(start);
 	    }
 
-	    if (orderingProperty.isPresent() && orderingDirection.isPresent()) {
+	    if (orderingProperty.isPresent() && sortOrder.isPresent()) {
 
-		handleSort(builder, orderingProperty.get(), orderingDirection.get());
+		handleSort(builder, orderingProperty.get(), sortOrder.get());
 	    }
 
 	    handleSourceFields(null, builder, fields);
@@ -406,7 +405,7 @@ public class OpenSearchWrapper {
      * @param start
      * @param size
      * @param orderingProperty
-     * @param ordertingDirection
+     * @param sortOrder
      * @return
      * @throws Exception
      */
@@ -415,7 +414,7 @@ public class OpenSearchWrapper {
 	    int start, //
 	    int size, //
 	    Optional<Queryable> orderingProperty, //
-	    Optional<OrderingDirection> ordertingDirection,// 
+	    Optional<eu.essi_lab.model.SortOrder> sortOrder,// 
 	    Optional<SearchAfter> searchAfter) throws Exception {
 	    
 
@@ -426,7 +425,7 @@ public class OpenSearchWrapper {
 		start, //
 		size, //
 		orderingProperty, //
-		ordertingDirection, //
+		sortOrder, //
 		searchAfter, //
 		false);
     }
@@ -741,10 +740,12 @@ public class OpenSearchWrapper {
     /**
      * @param builder
      * @param orderingProperty
-     * @param orderingDirection
+     * @param sortOrder
      */
-    private void handleSort(org.opensearch.client.opensearch.core.SearchRequest.Builder builder, Queryable orderingProperty,
-	    OrderingDirection orderingDirection) {
+    private void handleSort(//
+	    org.opensearch.client.opensearch.core.SearchRequest.Builder builder,//
+	    Queryable orderingProperty,
+	    eu.essi_lab.model.SortOrder sortOrder) {
 
 	ContentType contentType = orderingProperty.getContentType();
 	String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
@@ -753,7 +754,7 @@ public class OpenSearchWrapper {
 	builder.sort(new SortOptions.Builder().//
 		field(new FieldSort.Builder().//
 			field(field).//
-			order(orderingDirection == OrderingDirection.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
+			order(sortOrder == eu.essi_lab.model.SortOrder.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
 		.//
 		build());
     }

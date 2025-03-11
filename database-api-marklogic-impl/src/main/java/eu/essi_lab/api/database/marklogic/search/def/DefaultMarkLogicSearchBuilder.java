@@ -65,7 +65,7 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.RuntimeInfoElement;
@@ -94,7 +94,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
     private MarkLogicSpatialQueryBuilder spatialBuilder;
     private List<Queryable> tfTargets;
     private boolean registerQuery;
-    private Optional<OrderingDirection> orderingDirection;
+    private Optional<SortOrder> orderingDirection;
     private Optional<Queryable> orderingProperty;
     private boolean unfilteredQuery;
 
@@ -125,8 +125,8 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	this.tfTargets = message.getTermFrequencyTargets();
 	this.registerQuery = message.isQueryRegistrationEnabled();
 	this.unfilteredQuery = true;
-	this.orderingDirection = message.getOrderingDirection();
-	this.orderingProperty = message.getOrderingProperty();
+	this.orderingDirection = message.getSortOrder();
+	this.orderingProperty = message.getSortProperty();
     }
 
     /**

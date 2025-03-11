@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import eu.essi_lab.messages.count.AbstractCountResponse;
+import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.exceptions.GSException;
@@ -45,6 +46,8 @@ public abstract class MessageResponse<T, C extends AbstractCountResponse> implem
     private GSException exception;
     private String profilerName;
     private GSPropertyHandler propertyHandler;
+
+    private static final String SEARCH_AFTER = "searchAfter";
 
     /**
      * 
@@ -150,6 +153,22 @@ public abstract class MessageResponse<T, C extends AbstractCountResponse> implem
     public GSPropertyHandler getPropertyHandler() {
 
 	return propertyHandler;
+    }
+
+    /**
+     * @param searchAfter
+     */
+    public void setSearchAfter(SearchAfter searchAfter) {
+
+	getPropertyHandler().add(GSProperty.of(SEARCH_AFTER, searchAfter));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<SearchAfter> getSearchAfter() {
+
+	return Optional.ofNullable(getPropertyHandler().get(SEARCH_AFTER, SearchAfter.class));
     }
 
     /**

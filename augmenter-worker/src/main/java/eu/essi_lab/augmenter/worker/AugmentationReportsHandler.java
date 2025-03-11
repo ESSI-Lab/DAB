@@ -72,7 +72,7 @@ public class AugmentationReportsHandler {
 
 	message += "Name: " + setting.getAugmentationJobName() + "\n";
 	message += "Max records: " + setting.getMaxRecords() + "\n";
-	message += "Less recent ordering ordering set: " + setting.isLessRecentOrderingSet() + "\n";
+	message += "Less recent ordering ordering set: " + setting.isLessRecentSortSet() + "\n";
 	message += "Time back: " + setting.getMaxAge() + "\n";
 	message += "\nSelected sources: \n";
 

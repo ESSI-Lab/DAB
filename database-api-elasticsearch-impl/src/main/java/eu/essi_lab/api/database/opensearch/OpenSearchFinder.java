@@ -468,8 +468,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 			query, //
 			start, //
 			size, //
-			message.getOrderingProperty(), //
-			message.getOrderingDirection(), //
+			message.getSortProperty(), //
+			message.getSortOrder(), //
 			message.getSearchAfter());
 	    }
 

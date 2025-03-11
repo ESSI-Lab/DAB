@@ -44,7 +44,7 @@ import eu.essi_lab.cfga.setting.validation.Validator;
 import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.resource.MetadataElement;
 
@@ -372,7 +372,7 @@ public class GSSourceSetting extends Setting {
      * @param orderingProperty
      * @param direction
      */
-    public void setDiscoveryOptions(ResultsPriority priority, MetadataElement orderingProperty, OrderingDirection direction) {
+    public void setDiscoveryOptions(ResultsPriority priority, MetadataElement orderingProperty, SortOrder direction) {
 
 	if (priority == null && orderingProperty == null && direction == null || priority == null && orderingProperty == null) {
 	    getOption(DISCOVERY_OPTIONS_KEY, String.class).get().clearValues();
@@ -425,7 +425,7 @@ public class GSSourceSetting extends Setting {
     /**
      * @return
      */
-    public Optional<MetadataElement> getOrderingProperty() {
+    public Optional<MetadataElement> getSortProperty() {
 
 	List<String> options = getDiscoveryOptions();
 
@@ -440,16 +440,16 @@ public class GSSourceSetting extends Setting {
     /**
      * @return
      */
-    public OrderingDirection getOrderingDirection() {
+    public SortOrder getSortOrder() {
 
 	List<String> options = getDiscoveryOptions();
 
 	if (options.isEmpty() || options.get(2).equals("-")) {
 
-	    return OrderingDirection.ASCENDING;
+	    return SortOrder.ASCENDING;
 	}
 
-	return LabeledEnum.valueOf(OrderingDirection.class, options.get(2)).get();
+	return LabeledEnum.valueOf(SortOrder.class, options.get(2)).get();
     }
 
     /**
@@ -505,9 +505,9 @@ public class GSSourceSetting extends Setting {
 
 	source.getDeployment().forEach(dep -> addSourceDeployment(dep));
 
-	MetadataElement ordProperty = source.getOrderingProperty() != null ? MetadataElement.fromName(source.getOrderingProperty()) : null;
+	MetadataElement ordProperty = source.getSortProperty() != null ? MetadataElement.fromName(source.getSortProperty()) : null;
 
-	setDiscoveryOptions(source.getResultsPriority(), ordProperty, source.getOrderingDirection());
+	setDiscoveryOptions(source.getResultsPriority(), ordProperty, source.getSortOrder());
     }
 
     /***
@@ -527,18 +527,18 @@ public class GSSourceSetting extends Setting {
 
 	getSourceDeployment().forEach(dep -> source.addDeployment(dep));
 
-	Optional<MetadataElement> orderingProperty = getOrderingProperty();
+	Optional<MetadataElement> orderingProperty = getSortProperty();
 
 	if (orderingProperty.isPresent()) {
 
-	    source.setOrderingProperty(getOrderingProperty().get().getName());
+	    source.setSortProperty(getSortProperty().get().getName());
 
 	} else {
 
-	    source.setOrderingProperty(null);
+	    source.setSortProperty(null);
 	}
 
-	source.setOrderingDirection(getOrderingDirection());
+	source.setSortOrder(getSortOrder());
 
 	source.setResultsPriority(getResultsPriority());
 

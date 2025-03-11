@@ -335,22 +335,6 @@ public class ResultSet<T> extends MessageResponse<T, CountSet> {
 	setCountResponse(resultSet.getCountResponse());
     }
 
-    /**
-     * @param searchAfter
-     */
-    public void setSearchAfter(SearchAfter searchAfter) {
-
-	getPropertyHandler().add(GSProperty.of("search_after", searchAfter));
-    }
-
-    /**
-     * @return
-     */
-    public Optional<SearchAfter> getSearchAfter() {
-
-	return Optional.ofNullable(getPropertyHandler().get("search_after", SearchAfter.class));
-    }
-
     @Override
     public String getName() {
 

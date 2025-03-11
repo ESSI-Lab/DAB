@@ -29,7 +29,7 @@ import eu.essi_lab.lib.utils.LabeledEnum;
 /**
  * @author Fabrizio
  */
-public enum OrderingDirection implements LabeledEnum {
+public enum SortOrder implements LabeledEnum {
 
     /**
      * 
@@ -45,7 +45,7 @@ public enum OrderingDirection implements LabeledEnum {
     /**
      * @param label
      */
-    private OrderingDirection(String label) {
+    private SortOrder(String label) {
 
 	this.label = label;
     }

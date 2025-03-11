@@ -24,7 +24,7 @@ package eu.essi_lab.profiler.wof.discovery.sites;
 import java.util.Optional;
 
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
@@ -75,8 +75,8 @@ public class GetSitesByBoxTransformerWithSeries extends GetSitesTransformer {
     }
 
     @Override
-    protected Optional<OrderingDirection> getOrderingDirection() {
-	return Optional.of(OrderingDirection.ASCENDING);
+    protected Optional<SortOrder> getOrderingDirection() {
+	return Optional.of(SortOrder.ASCENDING);
     }
 
 }

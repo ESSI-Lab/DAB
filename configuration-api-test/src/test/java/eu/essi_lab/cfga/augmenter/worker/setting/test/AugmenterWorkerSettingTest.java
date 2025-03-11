@@ -151,14 +151,14 @@ public class AugmenterWorkerSettingTest {
 	//
 	Assert.assertEquals(0, setting2.getMaxAge());
 	Assert.assertEquals(0, setting2.getMaxRecords());
-	Assert.assertFalse(setting2.isLessRecentOrderingSet());
+	Assert.assertFalse(setting2.isLessRecentSortSet());
 
 	//
 	// ---
 	//
 
 	setting.setMaxAge(5);
-	setting.setIsLessRecentOrderingSet(true);
+	setting.setLessRecentSort(true);
 	setting.setMaxRecords(11);
 	setting.setAugmentationJobName("Name");
 
@@ -166,7 +166,7 @@ public class AugmenterWorkerSettingTest {
 	setting2 = worker.getSetting();
 
 	Assert.assertEquals(setting.getMaxAge(), setting2.getMaxAge());
-	Assert.assertEquals(setting.isLessRecentOrderingSet(), setting2.isLessRecentOrderingSet());
+	Assert.assertEquals(setting.isLessRecentSortSet(), setting2.isLessRecentSortSet());
 	Assert.assertEquals(setting.getMaxRecords(), setting2.getMaxRecords());
 	Assert.assertEquals("Name", setting2.getAugmentationJobName());
 
@@ -215,7 +215,7 @@ public class AugmenterWorkerSettingTest {
 
 	Assert.assertEquals(0, setting.getMaxAge());
 	Assert.assertEquals(0, setting.getMaxRecords());
-	Assert.assertFalse(setting.isLessRecentOrderingSet());
+	Assert.assertFalse(setting.isLessRecentSortSet());
 
 	Assert.assertFalse(setting.getViewIdentifier().isPresent());
 

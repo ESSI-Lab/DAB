@@ -37,7 +37,7 @@ import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -119,8 +119,8 @@ public class HydroCSVRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     @Override
-    protected Optional<OrderingDirection> getOrderingDirection() {
-	return Optional.of(OrderingDirection.ASCENDING);
+    protected Optional<SortOrder> getOrderingDirection() {
+	return Optional.of(SortOrder.ASCENDING);
     }
 
     @Override

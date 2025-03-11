@@ -32,7 +32,9 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.RuntimeInfoElement;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
@@ -81,6 +83,9 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     private static final String REQUEST_TIMEOUT = "requestTimeout";
     private static final String ITERATED_WORKFLOW = "ITERATED_WORKFLOW";
     private static final String PROFILER_NAME = "profilerName";
+    private static final String SORT_PROPERTY = "ORDERING_PROPERTY";
+    private static final String SORT_ORDER = "ORDERING_DIRECTION";
+    private static final String SEARCH_AFTER = "searchAfter";
 
     private String requestId;
 
@@ -388,4 +393,53 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
 	getHeader().add(new GSProperty<IterationMode>(ITERATED_WORKFLOW, iterationMode));
     }
+
+    /**
+     * @return
+     */
+    public Optional<SortOrder> getSortOrder() {
+
+	return Optional.ofNullable(getHeader().get(SORT_ORDER, SortOrder.class));
+    }
+
+    /**
+     * @param order
+     */
+    public void setSortOrder(SortOrder order) {
+
+	getHeader().add(new GSProperty<SortOrder>(SORT_ORDER, order));
+    }
+
+    /**
+     * @param property
+     */
+    public void setSortProperty(Queryable property) {
+
+	getHeader().add(new GSProperty<Queryable>(SORT_PROPERTY, property));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Queryable> getSortProperty() {
+
+	return Optional.ofNullable(getHeader().get(SORT_PROPERTY, Queryable.class));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<SearchAfter> getSearchAfter() {
+
+	return Optional.ofNullable(getHeader().get(SEARCH_AFTER, SearchAfter.class));
+    }
+
+    /*
+     * 
+     */
+    public void setSearchAfter(SearchAfter searchAfter) {
+
+	getHeader().add(new GSProperty<SearchAfter>(SEARCH_AFTER, searchAfter));
+    }
+
 }
