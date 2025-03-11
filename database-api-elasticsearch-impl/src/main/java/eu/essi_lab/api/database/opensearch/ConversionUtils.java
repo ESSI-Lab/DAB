@@ -66,8 +66,11 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.ResourceDecorator;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -77,7 +80,11 @@ import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
+import eu.essi_lab.model.resource.Dataset;
+import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.model.resource.ResourceType;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
 
@@ -411,12 +418,33 @@ public class ConversionUtils {
      * @param source
      * @return
      */
+    @SuppressWarnings("incomplete-switch")
     public static Optional<GSResource> toGSResource(JSONObject source) {
 
 	try {
 
-	    InputStream stream = toStream(source);
-	    GSResource res = GSResource.create(stream);
+	    GSResource res = null;
+
+	    if (source.has(DataFolderMapping.GS_RESOURCE)) {
+
+		InputStream stream = toStream(source);
+		res = GSResource.create(stream);
+
+	    } else {
+
+		ResourceType type = ResourceType.fromType(//
+			source.getJSONArray(ResourceProperty.TYPE.getName()).getString(0));
+		
+		switch (type) {
+		case DATASET:
+		    res = new Dataset();
+		    break;
+		    
+		case DATASET_COLLECTION:
+		    res = new DatasetCollection();
+		    break;
+		}
+	    }
 
 	    return Optional.of(ResourceDecorator.get().decorate(source, res));
 
@@ -478,7 +506,7 @@ public class ConversionUtils {
      */
     public static InputStream toStream(JSONObject source) {
 
-	String binaryProperty = source.getString("binaryProperty");
+	String binaryProperty = source.getString(IndexData.BINARY_PROPERTY);
 	String binaryData = source.getString(binaryProperty);
 
 	return decode(binaryData);
