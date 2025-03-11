@@ -61,6 +61,7 @@ import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
 import org.opensearch.client.opensearch.core.msearch.MultisearchHeader;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
+import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
@@ -374,7 +375,11 @@ public class OpenSearchQueryBuilder {
 		value = ConversionUtils.parseToLongString(value);
 	    }
 
-	    return buildRangeQuery(el.getName(), operator, value, ranking.computePropertyWeight(el));
+	    return buildRangeQuery(//
+		    DataFolderMapping.toKeywordField(el.getName()),//
+		    operator,//
+		    value,//
+		    ranking.computePropertyWeight(el));
 
 	case TEXT_SEARCH:
 
