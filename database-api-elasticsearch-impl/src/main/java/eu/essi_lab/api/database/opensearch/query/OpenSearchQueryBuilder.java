@@ -1533,7 +1533,7 @@ public class OpenSearchQueryBuilder {
 
 	if (boost > 1) {
 
-	    builder = builder.boost((float)boost);
+	    builder = builder.boost((float) boost);
 	}
 
 	return builder.//
@@ -1570,12 +1570,22 @@ public class OpenSearchQueryBuilder {
      * @param value
      * @return
      */
+    private static Query buildTermQuery(String field, String value) {
+
+	return buildTermQuery(field, value, 0);
+    }
+
+    /**
+     * @param field
+     * @param value
+     * @return
+     */
     private static Query buildTermQuery(String field, String value, double boost) {
 
 	org.opensearch.client.opensearch._types.query_dsl.TermQuery.Builder builder = new TermQuery.Builder();
-	
+
 	if (boost > 1) {
-	    
+
 	    builder = builder.boost((float) boost);
 	}
 
