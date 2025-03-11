@@ -123,7 +123,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     private static final String INLCUDE_DELETED = "includeDeleted";
     private static final String MAX_TERM_FREQUENCY_MAP_ITEMS = "maxTfMapItems";
     private static final String RESOURCE_SELECTOR = "resourceSelector";
-    private static final String SEARCH_AFTER = "searchAfter";
     private static final String PARENTS_GSRESOURCE = "PARENTS_GSRESOURCE";
     private static final String QUAKE_ML_EVENT_ORDER = "QUAKE_ML_EVENT_ORDER";
     private static final String DATA_FOLDER_CHECK = "DATA_FOLDER_CHECK";
@@ -391,22 +390,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     }
 
     /**
-     * @return
-     */
-    public Optional<SearchAfter> getSearchAfter() {
-
-	return Optional.ofNullable(getHeader().get(SEARCH_AFTER, SearchAfter.class));
-    }
-
-    /*
-     * 
-     */
-    public void setSearchAfter(SearchAfter searchAfter) {
-
-	getHeader().add(new GSProperty<SearchAfter>(SEARCH_AFTER, searchAfter));
-    }
-
-    /**
      * Used to indicate the type of results expected (e.g. datasets only, collection only or datasets and collection).
      * This is useful for the case of mixed sources, to indicate the desired results
      * 
@@ -444,7 +427,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	return Optional.ofNullable(getHeader().get(DISINCT_VALUES_ELEMENT, Queryable.class));
     }
 
- 
     /**
      * @return
      */
