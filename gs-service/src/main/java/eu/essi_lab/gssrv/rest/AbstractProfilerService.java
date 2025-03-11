@@ -56,160 +56,154 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  */
 public abstract class AbstractProfilerService {
 
-	/**
-	 * Creates a {@link WebRequest} from the given arguments, selects the suitable
-	 * {@link Profiler} basing on the given <code>strategy</code> and serves the
-	 * request by delegating to the selected {@link Profiler}
-	 *
-	 * @param strategy
-	 * @param httpServletRequest
-	 * @param uriInfo
-	 * @return
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected Response serve(ProfilerSettingFilter strategy, HttpServletRequest httpServletRequest, UriInfo uriInfo) {
+    /**
+     * Creates a {@link WebRequest} from the given arguments, selects the suitable
+     * {@link Profiler} basing on the given <code>strategy</code> and serves the
+     * request by delegating to the selected {@link Profiler}
+     *
+     * @param strategy
+     * @param httpServletRequest
+     * @param uriInfo
+     * @return
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected Response serve(ProfilerSettingFilter strategy, HttpServletRequest httpServletRequest, UriInfo uriInfo) {
 
-		
+	ChronometerInfoProvider chronometer = new ChronometerInfoProvider(TimeFormat.MIN_SEC_MLS);
+	chronometer.start();
 
-		ChronometerInfoProvider chronometer = new ChronometerInfoProvider(TimeFormat.MIN_SEC_MLS);
-		chronometer.start();
+	Optional<Profiler> optProfiler = Optional.empty();
+	Response response = null;
 
-		Optional<Profiler> optProfiler = Optional.empty();
-		Response response = null;
+	WebRequest webRequest = new WebRequest(Thread.currentThread().getName());
 
-		WebRequest webRequest = new WebRequest(Thread.currentThread().getName());
+	webRequest.setUriInfo(uriInfo);
 
-		webRequest.setUriInfo(uriInfo);
+	GSException ex = null;
 
-		GSException ex = null;
+	try {
+	    webRequest.setServletRequest(httpServletRequest);
+
+	} catch (IOException thr) {
+
+	    ex = GSException.createException(//
+		    getClass(), //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "ServletRequestError", //
+		    thr);
+	}
+
+	if (ex == null) {
+
+	    Optional<ProfilerSetting> profilerSetting = ConfigurationWrapper.//
+		    getProfilerSettings().//
+		    stream().//
+		    filter(strategy::accept).//
+		    findFirst();
+
+	    if (profilerSetting.isPresent()) {
 
 		try {
-			webRequest.setServletRequest(httpServletRequest);
 
-		} catch (IOException thr) {
+		    optProfiler = Optional.of(profilerSetting.get().createConfigurable());
 
-			ex = GSException.createException(//
-					getClass(), //
-					ErrorInfo.ERRORTYPE_INTERNAL, //
-					ErrorInfo.SEVERITY_ERROR, //
-					"ServletRequestError", //
-					thr);
+		} catch (Exception e) {
+
+		    ex = GSException.createException(//
+			    getClass(), //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_ERROR, //
+			    "ProfilerConfigurableCreationError", //
+			    e);
 		}
-		
+	    }
+
+	    if (optProfiler.isEmpty()) {
+
 		if (ex == null) {
 
-			Optional<ProfilerSetting> profilerSetting = ConfigurationWrapper.//
-					getProfilerSettings().//
-					stream().//
-					filter(strategy::accept).//
-					findFirst();
-
-			if (profilerSetting.isPresent()) {
-
-				try {
-
-					optProfiler = Optional.of(profilerSetting.get().createConfigurable());
-
-				} catch (Exception e) {
-
-					ex = GSException.createException(//
-							getClass(), //
-							ErrorInfo.ERRORTYPE_INTERNAL, //
-							ErrorInfo.SEVERITY_ERROR, //
-							"ProfilerConfigurableCreationError", //
-							e);
-				}
-			}
-
-			if (optProfiler.isEmpty()) {
-
-				if (ex == null) {
-
-					ex = GSException.createException(//
-							getClass(), //
-							"No profiler listening at this URL: " + uriInfo.getPath(), //
-							"No service listening at this URL: " + uriInfo.getPath(), //
-							ErrorInfo.ERRORTYPE_INTERNAL, //
-							ErrorInfo.SEVERITY_FATAL, //
-							"NoProfilerListeningError");
-				}
-			} else {
-
-				Profiler profiler = optProfiler.get();
-
-				webRequest.setProfilerName(profiler.getName());
-				webRequest.setProfilerPath(profiler.getSetting().getServicePath());
-
-				try {
-
-					//
-					// configures the profiler
-					//
-
-					profiler.configure(profilerSetting.get());
-
-					//
-					// handles the request
-					//
-
-					response = profiler.handle(webRequest);
-
-				} catch (GSException gsEx) {
-
-					ex = gsEx;
-
-				} catch (Exception thr) {
-
-					ex = GSException.createException(//
-							getClass(), //
-							ErrorInfo.ERRORTYPE_INTERNAL, //
-							ErrorInfo.SEVERITY_ERROR, //
-							"ProfilerServeError", //
-							thr);
-				}
-			}
+		    ex = GSException.createException(//
+			    getClass(), //
+			    "No profiler listening at this URL: " + uriInfo.getPath(), //
+			    "No service listening at this URL: " + uriInfo.getPath(), //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_FATAL, //
+			    "NoProfilerListeningError");
 		}
+	    } else {
 
-		if (ex != null) {
+		Profiler profiler = optProfiler.get();
 
-			ex.log();
+		webRequest.setProfilerName(profiler.getName());
+		webRequest.setProfilerPath(profiler.getSetting().getServicePath());
 
-			
+		try {
 
-			if (optProfiler.isPresent()) {
+		    //
+		    // configures the profiler
+		    //
 
-				response = optProfiler.get().createUncaughtError(webRequest, Status.INTERNAL_SERVER_ERROR,
-						ExceptionUtils.getStackTrace(ex));
+		    profiler.configure(profilerSetting.get());
 
-			} else {
+		    //
+		    // handles the request
+		    //
 
-				JSONObject error = new JSONObject();
-				error.put("Service not found", "No service listening at this URL");
+		    response = profiler.handle(webRequest);
 
-				response =  Response.serverError().//
-						status(Status.NOT_FOUND).//
-						entity(error.toString(3)).//
-						type(MediaType.APPLICATION_JSON).//
-						build();
-			}
+		} catch (GSException gsEx) {
+
+		    ex = gsEx;
+
+		} catch (Exception thr) {
+
+		    ex = GSException.createException(//
+			    getClass(), //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_ERROR, //
+			    "ProfilerServeError", //
+			    thr);
 		}
-		
-		
-		
-		Optional<ElasticsearchInfoPublisher> optPublisher = ElasticsearchInfoPublisher.create(webRequest); 
-		if (optPublisher.isPresent()) {
-			try {
-				ElasticsearchInfoPublisher p = optPublisher.get();
-				p.publish(chronometer);
-				p.publish(webRequest);
-				p.publish(new ResponseInfoProvider(response));
-				p.write();
-
-			} catch (GSException e) {
-				GSLoggerFactory.getLogger(getClass()).error(e);
-			}			
-		}
-
-		return response;
+	    }
 	}
+
+	if (ex != null) {
+
+	    ex.log();
+
+	    if (optProfiler.isPresent()) {
+
+		response = optProfiler.get().createUncaughtError(webRequest, Status.INTERNAL_SERVER_ERROR,
+			ExceptionUtils.getStackTrace(ex));
+
+	    } else {
+
+		JSONObject error = new JSONObject();
+		error.put("Service not found", "No service listening at this URL");
+
+		response = Response.serverError().//
+			status(Status.NOT_FOUND).//
+			entity(error.toString(3)).//
+			type(MediaType.APPLICATION_JSON).//
+			build();
+	    }
+	}
+
+	Optional<ElasticsearchInfoPublisher> optPublisher = ElasticsearchInfoPublisher.create(webRequest);
+	if (optPublisher.isPresent()) {
+	    try {
+		ElasticsearchInfoPublisher p = optPublisher.get();
+		p.publish(chronometer);
+		p.publish(webRequest);
+		p.publish(new ResponseInfoProvider(response));
+		p.write();
+
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
+	}
+
+	return response;
+    }
 }
