@@ -86,6 +86,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     private static final String SORT_PROPERTY = "ORDERING_PROPERTY";
     private static final String SORT_ORDER = "ORDERING_DIRECTION";
     private static final String SEARCH_AFTER = "searchAfter";
+    private static final String EXCLUDE_RESOURCE_BINARY = "excludeResourceBinary";
 
     private String requestId;
 
@@ -440,6 +441,22 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     public void setSearchAfter(SearchAfter searchAfter) {
 
 	getHeader().add(new GSProperty<SearchAfter>(SEARCH_AFTER, searchAfter));
+    }
+
+    /**
+     * @return
+     */
+    public Boolean excludeResourceBinary() {
+
+	return Optional.ofNullable(getHeader().get(EXCLUDE_RESOURCE_BINARY, Boolean.class)).orElse(false);
+    }
+
+    /**
+     * @param exclude
+     */
+    public void setExcludeResourceBinary(boolean exclude) {
+
+	getHeader().add(new GSProperty<Boolean>(EXCLUDE_RESOURCE_BINARY, exclude));
     }
 
 }
