@@ -1523,7 +1523,7 @@ public class OpenSearchQueryBuilder {
      * @param value
      * @return
      */
-    private static Query buildMatchPhraseQuery(String field, String value, float boost) {
+    private static Query buildMatchPhraseQuery(String field, String value, double boost) {
 
 	org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery.Builder builder = new MatchPhraseQuery.Builder().//
 		field(field).//
@@ -1533,7 +1533,7 @@ public class OpenSearchQueryBuilder {
 
 	if (boost > 1) {
 
-	    builder = builder.boost(boost);
+	    builder = builder.boost((float)boost);
 	}
 
 	return builder.//
