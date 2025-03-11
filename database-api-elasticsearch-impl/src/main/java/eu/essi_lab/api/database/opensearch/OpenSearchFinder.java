@@ -98,7 +98,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
 	try {
-	    // debugQueries = true;
+//	    debugQueries = true;
 
 	    SearchResponse<Object> searchResponse = search_(message, true);
 
@@ -149,6 +149,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 
     @Override
     public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
+
+//	debugQueries = true;
 
 	ResultSet<GSResource> resultSet = new ResultSet<>();
 	List<GSResource> resources = null;
@@ -352,7 +354,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 		    Optional.empty(), //
 		    Optional.empty(), //
 		    Optional.empty(), //
-		    true);// requesting cache
+		    true, // requesting cache
+		    false);
 
 	    response.//
 		    hits().//
@@ -470,7 +473,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 			size, //
 			message.getSortProperty(), //
 			message.getSortOrder(), //
-			message.getSearchAfter());
+			message.getSearchAfter(), //
+			message.excludeResourceBinary());
 	    }
 
 	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
