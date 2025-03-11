@@ -48,7 +48,7 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -89,8 +89,8 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
 	DiscoveryMessage refinedMessage = super.refineMessage(message);
 
-	refinedMessage.setOrderingDirection(OrderingDirection.ASCENDING);
-	refinedMessage.setOrderingProperty(ResourceProperty.RESOURCE_TIME_STAMP);
+	refinedMessage.setSortOrder(SortOrder.ASCENDING);
+	refinedMessage.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
 
 	OAIPMHRequestReader reader = createReader(message.getWebRequest());
 	String tokenValue = reader.getResumptionToken();

@@ -49,7 +49,7 @@ import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.RuntimeInfoElement;
@@ -271,11 +271,11 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_MAX_FREQUENCY_MAP_ITEMS.getName(),
 		Arrays.asList(String.valueOf(maxFrequencyMapItems)));
 
-	Optional<OrderingDirection> orderingDirection = getOrderingDirection();
+	Optional<SortOrder> orderingDirection = getSortOrder();
 	orderingDirection
 		.ifPresent(d -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_DIRECTION.getName(), Arrays.asList(d.getLabel())));
 
-	Optional<Queryable> orderingProperty = getOrderingProperty();
+	Optional<Queryable> orderingProperty = getSortProperty();
 	orderingProperty
 		.ifPresent(p -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_PROPERTY.getName(), Arrays.asList(p.getName())));
 

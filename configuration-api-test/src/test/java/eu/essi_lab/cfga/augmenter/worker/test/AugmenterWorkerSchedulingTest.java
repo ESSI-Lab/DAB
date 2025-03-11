@@ -42,7 +42,7 @@ public class AugmenterWorkerSchedulingTest {
 	worker.getSetting().setConfigurableType("TestAugmenterWorker");
 
 	worker.getSetting().setMaxRecords(5);
-	worker.getSetting().setIsLessRecentOrderingSet(true);
+	worker.getSetting().setLessRecentSort(true);
 	worker.getSetting().setMaxAge(7);
 
 	List<AugmenterSetting> settings = worker.getSetting().getAugmentersSetting().getSettings(AugmenterSetting.class, false);
@@ -82,7 +82,7 @@ public class AugmenterWorkerSchedulingTest {
 	setting.setConfigurableType("TestAugmenterWorker");
 
 	setting.setMaxRecords(5);
-	setting.setIsLessRecentOrderingSet(true);
+	setting.setLessRecentSort(true);
 	setting.setMaxAge(7);
 
 	List<AugmenterSetting> settings = setting.getAugmentersSetting().getSettings(AugmenterSetting.class, false);

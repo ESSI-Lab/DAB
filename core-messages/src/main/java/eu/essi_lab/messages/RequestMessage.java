@@ -32,7 +32,7 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.OrderingDirection;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.StorageInfo;
@@ -83,8 +83,8 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     private static final String REQUEST_TIMEOUT = "requestTimeout";
     private static final String ITERATED_WORKFLOW = "ITERATED_WORKFLOW";
     private static final String PROFILER_NAME = "profilerName";
-    private static final String ORDERING_PROPERTY = "ORDERING_PROPERTY";
-    private static final String ORDERING_DIRECTION = "ORDERING_DIRECTION";
+    private static final String SORT_PROPERTY = "ORDERING_PROPERTY";
+    private static final String SORT_ORDER = "ORDERING_DIRECTION";
     private String requestId;
 
     /**
@@ -395,33 +395,33 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     /**
      * @return
      */
-    public Optional<OrderingDirection> getOrderingDirection() {
+    public Optional<SortOrder> getSortOrder() {
 
-	return Optional.ofNullable(getHeader().get(ORDERING_DIRECTION, OrderingDirection.class));
+	return Optional.ofNullable(getHeader().get(SORT_ORDER, SortOrder.class));
     }
 
     /**
-     * @param direction
+     * @param order
      */
-    public void setOrderingDirection(OrderingDirection direction) {
+    public void setSortOrder(SortOrder order) {
 
-	getHeader().add(new GSProperty<OrderingDirection>(ORDERING_DIRECTION, direction));
+	getHeader().add(new GSProperty<SortOrder>(SORT_ORDER, order));
     }
 
     /**
-     * @param element
+     * @param property
      */
-    public void setOrderingProperty(Queryable element) {
+    public void setSortProperty(Queryable property) {
 
-	getHeader().add(new GSProperty<Queryable>(ORDERING_PROPERTY, element));
+	getHeader().add(new GSProperty<Queryable>(SORT_PROPERTY, property));
     }
 
     /**
      * @return
      */
-    public Optional<Queryable> getOrderingProperty() {
+    public Optional<Queryable> getSortProperty() {
 
-	return Optional.ofNullable(getHeader().get(ORDERING_PROPERTY, Queryable.class));
+	return Optional.ofNullable(getHeader().get(SORT_PROPERTY, Queryable.class));
     }
 
 }

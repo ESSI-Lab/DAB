@@ -483,7 +483,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     /**
      * @param set
      */
-    public void setIsLessRecentOrderingSet(boolean set) {
+    public void setLessRecentSort(boolean set) {
 
 	getOption(LESS_RECENT_ORDERING_KEY, BooleanChoice.class).get().select(v -> v == BooleanChoice.fromBoolean(set));
     }
@@ -491,7 +491,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     /**
      * @return
      */
-    public Boolean isLessRecentOrderingSet() {
+    public Boolean isLessRecentSortSet() {
 
 	return BooleanChoice.toBoolean(getOption(LESS_RECENT_ORDERING_KEY, BooleanChoice.class).get().getSelectedValue());
     }

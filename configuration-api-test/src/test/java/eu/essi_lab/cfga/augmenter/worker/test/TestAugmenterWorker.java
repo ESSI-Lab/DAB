@@ -37,7 +37,7 @@ public class TestAugmenterWorker extends AugmenterWorker {
 	int maxRecords = getSetting().getMaxRecords();
 	testSucceeded &= 5 == maxRecords;
 
-	boolean orderingSet = getSetting().isLessRecentOrderingSet();
+	boolean orderingSet = getSetting().isLessRecentSortSet();
 	testSucceeded &= orderingSet;
 
 	int timeBack = getSetting().getMaxAge();

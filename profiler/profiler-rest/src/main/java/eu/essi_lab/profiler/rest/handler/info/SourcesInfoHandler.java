@@ -30,8 +30,8 @@ import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.ResultsPriority;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
@@ -55,11 +55,11 @@ public class SourcesInfoHandler extends DiscoveryInfoHandler {
 	    String id = source.getUniqueIdentifier();
 	    String endpoint = source.getEndpoint();
 	    BrokeringStrategy brokeringStrategy = source.getBrokeringStrategy();
-	    OrderingDirection orderingDirection = source.getOrderingDirection();
+	    SortOrder sortOrder = source.getSortOrder();
 	    ResultsPriority resultsPriority = source.getResultsPriority();
 
-	    out += "<gs:source gs:orderingDirection=\"" + orderingDirection + "\" gs:resultsPriority=\"" + resultsPriority
-		    + "\" gs:strategy=\"" + brokeringStrategy + "\" gs:uniqueIdentifier=\"" + id + "\">";
+	    out += "<gs:source gs:orderingDirection=\"" + sortOrder + "\" gs:resultsPriority=\"" + resultsPriority + "\" gs:strategy=\""
+		    + brokeringStrategy + "\" gs:uniqueIdentifier=\"" + id + "\">";
 	    out += "<gs:label>" + StringEscapeUtils.escapeXml11(label) + "</gs:label>";
 	    out += "<gs:endpoint>" + StringEscapeUtils.escapeXml11(endpoint) + "</gs:endpoint>";
 	    out += "</gs:source>";
