@@ -11,6 +11,7 @@ public class StressTestResult {
     private int code;
 
     private String request;
+    private String requestId;
 
     private Long start;
     private Long end;
@@ -19,6 +20,8 @@ public class StressTestResult {
 
     private String responseFile;
     private List<String> responseMetrics = new ArrayList<>();
+
+    private List<String> serverMetrics = new ArrayList<>();
 
     public int getCode() {
 	return code;
@@ -78,5 +81,17 @@ public class StressTestResult {
 
     public Long readMetric(String metric, IStressTest test) {
 	return test.readMetric(metric, responseFile);
+    }
+
+    public List<String> getServerMetrics() {
+	return serverMetrics;
+    }
+
+    public String getRequestId() {
+	return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+	this.requestId = requestId;
     }
 }

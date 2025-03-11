@@ -23,6 +23,7 @@ package eu.essi_lab.profiler.oaipmh.handler.discover;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -30,6 +31,8 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.checkerframework.checker.units.qual.s;
 
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.oaipmh.GetRecordType;
@@ -45,6 +48,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.XMLGregorianCalendarUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -137,7 +141,7 @@ public class OAIPMHResultSetFormatter extends DiscoveryResultSetFormatter<String
 
 	    String searchAfter = mappedResultSet.//
 		    getSearchAfter().//
-		    map(v -> v.getStringValue().get()).//
+		    map(v -> v.toStringValue().orElse(ResumptionToken.NONE_SEARCH_AFTER)).//
 		    orElse(ResumptionToken.NONE_SEARCH_AFTER);
 
 	    rtt = ResumptionToken.of(//

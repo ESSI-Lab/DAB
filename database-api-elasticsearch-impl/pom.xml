@@ -41,27 +41,26 @@
 		<dependency>
 			<groupId>org.opensearch.client</groupId>
 			<artifactId>opensearch-java</artifactId>
-			<version>${opensearch.client-opensearch-java.version}</version>
+			<version>${opensearch.client-opensearch-java.version}</version>		
 		</dependency>
 
 		<dependency>
 			<groupId>org.opensearch.client</groupId>
 			<artifactId>opensearch-rest-client</artifactId>
-			<version>${opensearch.client-opensearch-rest-client.version}</version>
+			<version>${opensearch.client-opensearch-rest-client.version}</version>			
 		</dependency>
 
-		<!--dependency>
+		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>${jackson-core.version}</version>
-		</dependency-->
+			<version>${jackson-core.version}</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
 
 		<dependency>
 			<artifactId>apache-client</artifactId>
 			<groupId>software.amazon.awssdk</groupId>
 			<version>2.29.46</version>
 		</dependency>
-
 
 	</dependencies>
 

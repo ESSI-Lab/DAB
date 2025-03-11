@@ -89,10 +89,8 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
 	DiscoveryMessage refinedMessage = super.refineMessage(message);
 
-	if (sortResults()) {
-	    refinedMessage.setOrderingDirection(OrderingDirection.ASCENDING);
-	    refinedMessage.setOrderingProperty(ResourceProperty.PRIVATE_ID);
-	}
+	refinedMessage.setOrderingDirection(OrderingDirection.ASCENDING);
+	refinedMessage.setOrderingProperty(ResourceProperty.RESOURCE_TIME_STAMP);
 
 	OAIPMHRequestReader reader = createReader(message.getWebRequest());
 	String tokenValue = reader.getResumptionToken();
@@ -329,15 +327,15 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
      * @return
      */
     private int getPageSize() {
-    
-        Optional<Properties> properties = setting.getKeyValueOptions();
-        int pageSize = getDefaultPageSize();
-        if (properties.isPresent()) {
-    
-            pageSize = Integer.valueOf(properties.get().getProperty("pageSize", String.valueOf(getDefaultPageSize())));
-        }
-    
-        return pageSize;
+
+	Optional<Properties> properties = setting.getKeyValueOptions();
+	int pageSize = getDefaultPageSize();
+	if (properties.isPresent()) {
+
+	    pageSize = Integer.valueOf(properties.get().getProperty("pageSize", String.valueOf(getDefaultPageSize())));
+	}
+
+	return pageSize;
     }
 
     /**
