@@ -68,6 +68,7 @@ public class SortByResourceTimeStampExternalTestIT {
 		Optional.of(ResourceProperty.RESOURCE_TIME_STAMP), // orderingProperty
 		Optional.of(SortOrder.ASCENDING), // orderingDirection
 		Optional.empty(), // search after
+		false,
 		false); // cache
 
 	List<Hit<Object>> hits = response.hits().hits();

@@ -226,7 +226,10 @@ public class OpenSearchWrapper {
 	Builder topHitsBuilder = new TopHitsAggregation.Builder().//
 		size(1);
 
-	handleSourceFields(topHitsBuilder, null, sourceFields.stream().map(q -> q.getName()).collect(Collectors.toList()));
+	handleSourceFields(//
+		topHitsBuilder, //
+		null, //
+		sourceFields.stream().map(q -> q.getName()).collect(Collectors.toList()));
 
 	Aggregation topHitsAgg = new Aggregation.Builder().// takes the first result
 
@@ -330,7 +333,8 @@ public class OpenSearchWrapper {
 	    Optional<Queryable> orderingProperty, //
 	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
 	    Optional<SearchAfter> searchAfter, //
-	    boolean requestCache)
+	    boolean requestCache,
+	    boolean excludeResourceBinary)
 
 	    throws Exception {
 
@@ -357,7 +361,7 @@ public class OpenSearchWrapper {
 		handleSort(builder, orderingProperty.get(), sortOrder.get());
 	    }
 
-	    handleSourceFields(null, builder, fields);
+	    handleSourceFields(null, builder, fields, excludeResourceBinary);
 
 	    if (requestCache) {
 
@@ -397,6 +401,7 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
+		false,//
 		false);
     }
 
@@ -415,9 +420,9 @@ public class OpenSearchWrapper {
 	    int start, //
 	    int size, //
 	    Optional<Queryable> orderingProperty, //
-	    Optional<eu.essi_lab.model.SortOrder> sortOrder,// 
-	    Optional<SearchAfter> searchAfter) throws Exception {
-	    
+	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
+	    Optional<SearchAfter> searchAfter,
+	    boolean excludeResourceBinary) throws Exception {
 
 	return search(//
 		index, //
@@ -428,7 +433,8 @@ public class OpenSearchWrapper {
 		orderingProperty, //
 		sortOrder, //
 		searchAfter, //
-		false);
+		false,//
+		excludeResourceBinary);
     }
 
     /**
@@ -449,7 +455,9 @@ public class OpenSearchWrapper {
 		size, //
 		Optional.empty(), //
 		Optional.empty(), //
-		Optional.empty(), false);
+		Optional.empty(),//
+		false,//
+		false);
 
 	return ConversionUtils.toBinaryList(searchResponse);
     }
@@ -484,6 +492,7 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
+		false,//
 		false);
 
 	return ConversionUtils.toJSONSourcesList(response);
@@ -506,6 +515,7 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
+		false,//
 		false);
 
 	return ConversionUtils.toJSONSourcesList(response);
@@ -546,6 +556,7 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
+		false,//
 		false);
 
 	HitsMetadata<Object> hits = response.hits();
@@ -744,9 +755,8 @@ public class OpenSearchWrapper {
      * @param sortOrder
      */
     private void handleSort(//
-	    org.opensearch.client.opensearch.core.SearchRequest.Builder builder,//
-	    Queryable orderingProperty,
-	    eu.essi_lab.model.SortOrder sortOrder) {
+	    org.opensearch.client.opensearch.core.SearchRequest.Builder builder, //
+	    Queryable orderingProperty, eu.essi_lab.model.SortOrder sortOrder) {
 
 	ContentType contentType = orderingProperty.getContentType();
 	String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
@@ -768,7 +778,7 @@ public class OpenSearchWrapper {
     private void handleSourceFields(//
 	    org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.Builder topHitsBuilder, //
 	    org.opensearch.client.opensearch.core.SearchRequest.Builder searchBuilder, //
-	    List<String> fields) {
+	    List<String> fields, boolean excludeResourceBinary) {
 
 	if (!fields.isEmpty()) {
 
@@ -796,6 +806,11 @@ public class OpenSearchWrapper {
 	    toExclude.add(MetadataElement.ANY_TEXT.getName());
 	    toExclude.add(IndexMapping.toKeywordField(MetadataElement.ANY_TEXT.getName()));
 
+	    if (excludeResourceBinary) {
+
+		toExclude.add(DataFolderMapping.GS_RESOURCE);
+	    }
+
 	    // it excludes also the data index fields since they are usually ignored
 	    toExclude.add(IndexData.BINARY_DATA_TYPE);
 	    toExclude.add(IndexData.DATA_TYPE);
@@ -814,6 +829,19 @@ public class OpenSearchWrapper {
 			build()));
 	    }
 	}
+    }
+
+    /**
+     * @param topHitsBuilder
+     * @param searchBuilder
+     * @param fields
+     */
+    private void handleSourceFields(//
+	    org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.Builder topHitsBuilder, //
+	    org.opensearch.client.opensearch.core.SearchRequest.Builder searchBuilder, //
+	    List<String> fields) {
+
+	handleSourceFields(topHitsBuilder, searchBuilder, fields, false);
     }
 
     /**
