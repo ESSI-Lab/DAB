@@ -161,7 +161,7 @@ public class OpenSearchDatabase extends Database {
 	    //
 	    //
 
-	    if (ExecutionMode.get() == ExecutionMode.LOCAL_PRODUCTION || ExecutionMode.get() == ExecutionMode.MIXED) {
+	    if (ExecutionMode.get() == ExecutionMode.MIXED) {
 
 		initializeIndexes();
 	    }
