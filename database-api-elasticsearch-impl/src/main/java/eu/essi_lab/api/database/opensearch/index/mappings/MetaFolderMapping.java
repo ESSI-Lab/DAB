@@ -70,13 +70,16 @@ public class MetaFolderMapping extends IndexMapping {
 
 	// mandatory
 	addProperty(SOURCE_ID, FieldType.Text.jsonValue());
+	addProperty(IndexMapping.toKeywordField(SOURCE_ID), FieldType.Keyword.jsonValue());
+
+	// set only when the index doc is stored
+	addProperty(DATA_FOLDER, FieldType.Text.jsonValue()); // data-1 or data-2
+	addProperty(IndexMapping.toKeywordField(DATA_FOLDER), FieldType.Keyword.jsonValue()); // data-1 or data-2
 
 	// optional, only one of them can be set
 	addProperty(HARVESTING_PROPERTIES, FieldType.Binary.jsonValue());
 	addProperty(ERRORS_REPORT, FieldType.Binary.jsonValue());
 	addProperty(WARN_REPORT, FieldType.Binary.jsonValue());
 	addProperty(INDEX_DOC, FieldType.Binary.jsonValue());
-	// set only when the index doc is stored
-	addProperty(DATA_FOLDER, FieldType.Text.jsonValue()); // data-1 or data-2
     }
 }
