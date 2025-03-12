@@ -68,6 +68,7 @@ import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialEntity;
 import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
@@ -146,8 +147,14 @@ public class CachedCollections {
 			StorageInfo storageUri = FeatureQueryHandler.getStorageURI(discoveryMessage);
 
 			WebRequestTransformer.setView(view, storageUri, discoveryMessage);
+			Optional<View> optionalView = discoveryMessage.getView();
+			if (optionalView.isPresent()) {
+			    discoveryMessage.setSources(ConfigurationWrapper.getViewSources(optionalView.get()));
+			}else {
+			    discoveryMessage.setSources(ConfigurationWrapper.getAllSources());    
+			}
 
-			discoveryMessage.setSources(ConfigurationWrapper.getAllSources());
+			
 			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 			discoveryMessage.setSortOrder(SortOrder.ASCENDING);
 			discoveryMessage.setSortProperty(ResourceProperty.PUBLIC_ID);
@@ -447,8 +454,9 @@ public class CachedCollections {
 	SimpleFeatureIterator featuresIterator = collection.features();
 	while (featuresIterator.hasNext()) {
 	    SimpleFeature feature = featuresIterator.next();
+	    String i  = feature.getAttribute("hycosid").toString();
 	    String c = feature.getAttribute("country").toString();
-	    System.out.println(c);
+	    System.out.println(i+" "+c);
 	    
 	    
 	    

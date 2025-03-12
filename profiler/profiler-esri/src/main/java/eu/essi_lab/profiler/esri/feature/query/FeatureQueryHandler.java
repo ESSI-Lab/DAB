@@ -116,9 +116,11 @@ public class FeatureQueryHandler implements WebRequestHandler, WebRequestValidat
 
 	    if (viewId.isPresent()) {
 		WebRequestTransformer.setView(viewId.get(), storageUri, discoveryMessage);
+		discoveryMessage.setSources(ConfigurationWrapper.getViewSources(discoveryMessage.getView().get()));
+	    }else {
+		discoveryMessage.setSources(ConfigurationWrapper.getAllSources());		
 	    }
-
-	    discoveryMessage.setSources(ConfigurationWrapper.getAllSources());
+	    
 	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	    tmpResultSet = executor.retrieveNodes(discoveryMessage);

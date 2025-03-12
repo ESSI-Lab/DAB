@@ -1,5 +1,7 @@
 package eu.essi_lab.gssrv.conf.task;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -88,16 +90,16 @@ public class WISMetadataTask extends AbstractCustomTask {
 	//
 	// DatabaseReader dbReader = DatabaseConsumerFactory.createDataBaseReader(databaseURI);
 
-	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
+	
 	StatisticsMessage statisticsMessage = new StatisticsMessage();
-	// set the required properties
-	statisticsMessage.setSources(allSources);
+	// set the required properties	
 	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	// statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 	WebRequestTransformer.setView(//
 		"gs-view-source(" + targetSource + ")", //
 		statisticsMessage.getDataBaseURI(), //
 		statisticsMessage);
+	statisticsMessage.setSources(new ArrayList<GSSource>(Arrays.asList(ConfigurationWrapper.getSource(targetSource))));
 
 	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
 	IStatisticsExecutor executor = loader.iterator().next();

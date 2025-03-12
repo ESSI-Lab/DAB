@@ -275,10 +275,9 @@ public class SourceCollectionCreator {
     }
 
     protected List<ResponseItem> getStatistics(String sourceId, Queryable queryable) throws GSException {
-	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
 	StatisticsMessage statisticsMessage = new StatisticsMessage();
 	// set the required properties
-	statisticsMessage.setSources(allSources);
+	statisticsMessage.setSources(new ArrayList<GSSource>(Arrays.asList(ConfigurationWrapper.getSource(sourceId))));
 	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	// statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 

@@ -40,10 +40,10 @@
 	    return;
 		}
 
-	    List<GSSource> allSources = ConfigurationWrapper.getAllSources();
+	    
 	    StatisticsMessage statisticsMessage = new StatisticsMessage();
 	    // set the required properties
-	    statisticsMessage.setSources(allSources);
+	    
 	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	    // statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 
@@ -55,7 +55,7 @@
 				    view, //
 				    statisticsMessage.getDataBaseURI(), //
 				    statisticsMessage);
-
+	    statisticsMessage.setSources(ConfigurationWrapper.getViewSources(statisticsMessage.getView().get()));
 	    // pagination works with grouped results. in this case there is one result item for each
 	    // source/country/etc.
 	    // in order to be sure to get all the items in the same statistics response,
