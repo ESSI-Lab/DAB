@@ -184,6 +184,9 @@ public class OpenSearchQueryBuilder {
 	}
 
 	return buildFilterQuery(buildSourceIdQuery(bond.getPropertyValue()), //
+		
+		// the keyword field of dataFolder is not present in the DataFolderMapping
+		// and the term query cannot be done, but it's ok anyway
 		buildMatchPhraseQuery(MetaFolderMapping.DATA_FOLDER, dataFolder));
 
     }
@@ -1402,7 +1405,7 @@ public class OpenSearchQueryBuilder {
      */
     private static Query buildSourceIdQuery(String sourceId) {
 
-	return buildMatchPhraseQuery(MetaFolderMapping.SOURCE_ID, sourceId);
+	return buildTermQuery(IndexMapping.toKeywordField(MetaFolderMapping.SOURCE_ID), sourceId);
     }
 
     /**
