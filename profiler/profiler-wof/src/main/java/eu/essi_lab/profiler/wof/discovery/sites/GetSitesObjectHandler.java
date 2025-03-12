@@ -62,6 +62,8 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 	return new StreamingOutput() {
 
+	    private String latitude;
+	    private String longitude;
 	    private String west;
 	    private String east;
 	    private String north;
@@ -151,6 +153,9 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "south"), v -> south = v);
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "east"), v -> east = v);
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "north"), v -> north = v);
+				
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Latitude"), v -> latitude = v);
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Longitude"), v -> longitude = v);
 
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "platformTitle"), v -> platformName = v);
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "uniquePlatformId"), v -> platformCode = v);
@@ -160,7 +165,13 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 				parser.parse();
 
 				if (west != null && !west.equals("") && east != null && !east.equals("") && north != null
-					&& !north.equals("") && south != null && !south.equals("") && platformName != null
+					&& !north.equals("") && south != null && !south.equals("")
+				) {
+				    latitude = north;
+				    longitude = west;
+				}
+				
+				if (latitude != null && !latitude.equals("") && longitude != null && !longitude.equals("") && platformName != null
 					&& !platformName.equals("")//
 					&& platformCode != null && !platformCode.equals("")//
 				// && sourceID != null && !sourceID.equals("")//
@@ -185,10 +196,10 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 				    writer.writeAttribute("srs", "EPSG:4326");
 				    writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", "LatLonPointType");
 				    writer.writeStartElement("", "latitude", wmlNS);
-				    writer.writeCharacters(south);
+				    writer.writeCharacters(latitude);
 				    writer.writeEndElement();
 				    writer.writeStartElement("", "longitude", wmlNS);
-				    writer.writeCharacters(west);
+				    writer.writeCharacters(longitude);
 				    writer.writeEndElement();
 				    writer.writeEndElement();
 				    writer.writeEndElement();
