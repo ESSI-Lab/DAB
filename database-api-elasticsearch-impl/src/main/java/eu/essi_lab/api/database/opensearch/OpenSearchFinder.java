@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +12,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
@@ -39,6 +44,7 @@ import org.opensearch.client.opensearch.core.search.Hit;
  */
 
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFinder;
@@ -97,7 +103,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
 	try {
-//	    debugQueries = true;
+	    // debugQueries = true;
 
 	    SearchResponse<Object> searchResponse = search_(message, true);
 
@@ -149,7 +155,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     @Override
     public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
 
-//	debugQueries = true;
+	// debugQueries = true;
 
 	ResultSet<GSResource> resultSet = new ResultSet<>();
 	List<GSResource> resources = null;
@@ -225,17 +231,32 @@ public class OpenSearchFinder implements DatabaseFinder {
     @Override
     public ResultSet<Node> discoverNodes(DiscoveryMessage message) throws GSException {
 
-	ResultSet<Node> resultSet = new ResultSet<>();
+	ResultSet<Node> out = new ResultSet<>();
 
 	try {
 
-	    SearchResponse<Object> response = search_(message, false);
+	    ResultSet<GSResource> response = discover(message);
 
-	    List<Node> nodes = ConversionUtils.toNodeList(response);
+	    out.setCountResponse(response.getCountResponse());
 
-	    resultSet.setResultsList(nodes);
+	    List<Node> nodes = response.getResultsList().stream().map(res -> {
 
-	    return resultSet;
+		try {
+		    return res.asDocument(true);
+
+		} catch (ParserConfigurationException | JAXBException | SAXException | IOException e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+
+		return null;
+
+	    }).filter(Objects::nonNull).//
+		    collect(Collectors.toList());
+
+	    out.setResultsList(nodes);
+
+	    return out;
 
 	} catch (Exception ex) {
 
@@ -248,17 +269,32 @@ public class OpenSearchFinder implements DatabaseFinder {
     @Override
     public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
 
-	ResultSet<String> resultSet = new ResultSet<>();
+	ResultSet<String> out = new ResultSet<>();
 
 	try {
 
-	    SearchResponse<Object> response = search_(message, false);
+	    ResultSet<GSResource> response = discover(message);
 
-	    List<String> nodes = ConversionUtils.toStringList(response);
+	    out.setCountResponse(response.getCountResponse());
 
-	    resultSet.setResultsList(nodes);
+	    List<String> strings = response.getResultsList().stream().map(res -> {
 
-	    return resultSet;
+		try {
+		    return res.asString(true);
+
+		} catch (Exception e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+
+		return null;
+
+	    }).filter(Objects::nonNull).//
+		    collect(Collectors.toList());
+
+	    out.setResultsList(strings);
+
+	    return out;
 
 	} catch (Exception ex) {
 
