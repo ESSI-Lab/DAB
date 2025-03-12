@@ -40,6 +40,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.esri.arcgis.protobuf.FeatureCollection;
@@ -245,8 +246,13 @@ public class FeatureQueryResultSetFormatter extends DiscoveryResultSetFormatter<
 		JSONArray featureArray = new JSONArray();
 
 		for (Node node : nodes) {
-		    XMLDocumentReader reader = new XMLDocumentReader(node.getOwnerDocument());
-
+		    XMLDocumentReader reader;
+		    if (node instanceof org.w3c.dom.Document) {
+			reader = new XMLDocumentReader((Document) node);			
+		    }else {
+			reader = new XMLDocumentReader(node.getOwnerDocument());
+		    }
+		     
 		    String bnhs = reader.evaluateString("//*:" + MetadataElement.BNHS_INFO_EL_NAME + "[1]");
 		    HashMap<String, String> bnhsMap = new HashMap<>();
 		    if (bnhs != null) {

@@ -169,11 +169,11 @@ public class ObservationMapper {
 	} else {
 	    observation = createObservation(view.get().getId(), ObservationType.TimeSeriesObservation);
 	}
-	
-	if (parser.getInstrumentNames()!=null ) {
-		for (String instrument : parser.getInstrumentNames()) {
-			observation.addInstrument(instrument);
-		}
+
+	if (parser.getInstrumentNames() != null) {
+	    for (String instrument : parser.getInstrumentNames()) {
+		observation.addInstrument(instrument);
+	    }
 	}
 
 	if (parser.getPlatformName() != null && !parser.getPlatformName().equals("")) {
@@ -190,8 +190,12 @@ public class ObservationMapper {
 
 	    }
 	}
-	GSSource source = ConfigurationWrapper.getSource(parser.getSourceId());
-	platform.addParameter("source", source.getLabel());
+	String sourceId = parser.getSourceId();
+	GSSource source = null;
+	if (sourceId != null && !sourceId.isEmpty()) {
+	    source = ConfigurationWrapper.getSource(sourceId);
+	    platform.addParameter("source", source.getLabel());
+	}
 
 	String originalPlatformCode = parser.originalPlatformCode;
 
@@ -232,7 +236,9 @@ public class ObservationMapper {
 
 	// timeseries.setFeatureOfInterest(uniquePlatformCode, platformName);
 
+	if (source!=null) {
 	observation.addParameter("source", source.getLabel());
+	}
 
 	observation.addParameter("observedPropertyDefinition", parser.getAttributeDescription());
 

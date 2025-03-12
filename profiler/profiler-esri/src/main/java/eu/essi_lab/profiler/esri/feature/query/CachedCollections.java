@@ -32,6 +32,7 @@ import java.util.ServiceLoader;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -46,6 +47,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -70,9 +72,11 @@ import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.resource.BNHSProperty;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.esri.feature.ESRIFieldType;
 import eu.essi_lab.profiler.esri.feature.FeatureLayer;
@@ -145,7 +149,8 @@ public class CachedCollections {
 
 			discoveryMessage.setSources(ConfigurationWrapper.getAllSources());
 			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-
+			discoveryMessage.setSortOrder(SortOrder.ASCENDING);
+			discoveryMessage.setSortProperty(ResourceProperty.PUBLIC_ID);
 			tmpResultSet = executor.retrieveNodes(discoveryMessage);
 
 			if (resultSet == null) {
@@ -161,7 +166,13 @@ public class CachedCollections {
 		    GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
 
 		    for (Node result : resultSet.getResultsList()) {
-			XMLDocumentReader reader = new XMLDocumentReader(result.getOwnerDocument());
+			XMLDocumentReader reader ;
+			if (result instanceof org.w3c.dom.Document) {
+			    reader = new XMLDocumentReader((Document) result);			    
+			}else {
+			    reader = new XMLDocumentReader(result.getOwnerDocument());
+			}
+			
 
 			String bnhs = reader.evaluateString("//*:" + MetadataElement.BNHS_INFO_EL_NAME + "[1]");
 			HashMap<String, String> bnhsMap = new HashMap<>();
@@ -433,6 +444,15 @@ public class CachedCollections {
 	}
 
 	SimpleFeatureCollection ret = collection.subCollection(filter);
+	SimpleFeatureIterator featuresIterator = collection.features();
+	while (featuresIterator.hasNext()) {
+	    SimpleFeature feature = featuresIterator.next();
+	    String c = feature.getAttribute("country").toString();
+	    System.out.println(c);
+	    
+	    
+	    
+	}
 	GSLoggerFactory.getLogger(getClass()).info("returnin sub collection, size {}", ret.size());
 	return ret;
 

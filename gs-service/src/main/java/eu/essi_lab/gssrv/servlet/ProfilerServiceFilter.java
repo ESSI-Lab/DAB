@@ -51,20 +51,20 @@ public class ProfilerServiceFilter implements Filter {
 	HttpServletRequest httpRequest = (HttpServletRequest) request;
 	String pathInfo = httpRequest.getPathInfo(); // e.g: /essi/oaipmh
 
-	boolean isProfilerPath = ConfigurationWrapper.getProfilerSettings().//
-		stream().//
-		anyMatch(s -> pathInfo!= null && pathInfo.contains(s.getServicePath()));
+//	boolean isProfilerPath = ConfigurationWrapper.getProfilerSettings().//
+//		stream().//
+//		anyMatch(s -> pathInfo!= null && pathInfo.contains(s.getServicePath()));
 
-	if (isProfilerPath && isOffline(pathInfo)) {
-
-	    HttpServletResponse httpResponse = (HttpServletResponse) response;
-	    httpResponse.setStatus(404);
-
-	} else {
+//	if (isProfilerPath && isOffline(pathInfo)) {
+//
+//	    HttpServletResponse httpResponse = (HttpServletResponse) response;
+//	    httpResponse.setStatus(404);
+//
+//	} else {
 
 	    filterChain.doFilter(request, response);
 	    return;
-	}
+//	}
     }
 
     /**
