@@ -28,12 +28,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -233,9 +235,24 @@ public class ConversionUtils {
 
 	List<String> list = toList(searchResponse, hit -> {
 
-	    SourceWrapper wrapper = new SourceWrapper(toJSONObject(hit.source()));
-	    String binaryValue = wrapper.getBinaryValue();
-	    return decodeToString(binaryValue);
+	    Optional<GSResource> resource = toGSResource(toJSONObject(hit.source()));
+
+	    if (resource.isEmpty()) {
+
+		GSLoggerFactory.getLogger(ConversionUtils.class).error("Error occurred while mapping resource of source {}",
+			toJSONObject(hit.source()));
+		return null;
+	    }
+
+	    try {
+		return resource.get().asString(true);
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(ConversionUtils.class).error(e);
+	    }
+
+	    return null;
 	});
 
 	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
@@ -256,12 +273,24 @@ public class ConversionUtils {
 
 	List<Node> list = toList(searchResponse, hit -> {
 
-	    SourceWrapper wrapper = new SourceWrapper(toJSONObject(hit.source()));
-	    String binaryValue = wrapper.getBinaryValue();
+	    Optional<GSResource> resource = toGSResource(toJSONObject(hit.source()));
 
-	    InputStream stream = decode(binaryValue);
+	    if (resource.isEmpty()) {
 
-	    return toNodeOrNull(stream);
+		GSLoggerFactory.getLogger(ConversionUtils.class).error("Error occurred while mapping resource of source {}",
+			toJSONObject(hit.source()));
+		return null;
+	    }
+
+	    try {
+		return resource.get().asDocument(true);
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(ConversionUtils.class).error(e);
+	    }
+
+	    return null;
 	});
 
 	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
@@ -433,12 +462,12 @@ public class ConversionUtils {
 
 		ResourceType type = ResourceType.fromType(//
 			source.getJSONArray(ResourceProperty.TYPE.getName()).getString(0));
-		
+
 		switch (type) {
 		case DATASET:
 		    res = new Dataset();
 		    break;
-		    
+
 		case DATASET_COLLECTION:
 		    res = new DatasetCollection();
 		    break;
@@ -620,6 +649,8 @@ public class ConversionUtils {
 	List<T> list = hitsList.stream().//
 
 		map(mapper).//
+
+		filter(Objects::nonNull).//
 
 		collect(Collectors.toList());
 
