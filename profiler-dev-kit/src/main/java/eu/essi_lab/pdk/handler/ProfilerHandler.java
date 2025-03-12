@@ -341,7 +341,9 @@ public abstract class ProfilerHandler//
 	    //
 	    // set the search after to the message according to the executor response
 	    //
-	    executorResponse.getSearchAfter().ifPresent(sa -> message.setSearchAfter(sa));
+	    if (executorResponse!=null) {
+		executorResponse.getSearchAfter().ifPresent(sa -> message.setSearchAfter(sa));
+	    }
 
 	    //
 	    // set the original user bond. this is required to avoid that QueryInitializer.initializeQuery at row 87
