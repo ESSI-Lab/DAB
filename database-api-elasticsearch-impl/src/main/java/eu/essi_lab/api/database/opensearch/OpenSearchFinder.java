@@ -508,7 +508,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			message.getSortProperty(), //
 			message.getSortOrder(), //
 			message.getSearchAfter(), //
-			message.excludeResourceBinary());
+			message.isResourceBinaryExcluded());
 	    }
 
 	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));

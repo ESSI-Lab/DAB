@@ -446,7 +446,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     /**
      * @return
      */
-    public Boolean excludeResourceBinary() {
+    public Boolean isResourceBinaryExcluded() {
 
 	return Optional.ofNullable(getHeader().get(EXCLUDE_RESOURCE_BINARY, Boolean.class)).orElse(false);
     }
