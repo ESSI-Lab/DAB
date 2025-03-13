@@ -59,12 +59,6 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 public abstract class AbstractProfilerService {
 
     /**
-     * 
-     */
-    @SuppressWarnings("rawtypes")
-    private static final List<Profiler> PROFILERS = new PluginsLoader<Profiler>().loadPlugins(Profiler.class);
-
-    /**
      * Creates a {@link WebRequest} from the given arguments, selects the suitable
      * {@link Profiler} basing on the given <code>strategy</code> and serves the
      * request by delegating to the selected {@link Profiler}
@@ -114,7 +108,10 @@ public abstract class AbstractProfilerService {
 
 		try {
 
-		    optProfiler = PROFILERS.stream().//
+		    PluginsLoader<Profiler> pluginsLoader = new PluginsLoader<>();
+		    List<Profiler> profilers = pluginsLoader.loadPlugins(Profiler.class);
+
+		    optProfiler = profilers.stream().//
 			    filter(p -> p.getType().equals(profilerSetting.get().getConfigurableType())).//
 			    findFirst();
 
