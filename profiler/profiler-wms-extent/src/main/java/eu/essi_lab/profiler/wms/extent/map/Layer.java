@@ -530,7 +530,8 @@ public class Layer {
 						collectionLines.add(feature);
 					    }
 					    Date tmpHarvesting = record.getLastHarvesting();
-					    if (lastHarvesting == null || lastHarvesting.before(tmpHarvesting)) {
+					    if (lastHarvesting == null || (tmpHarvesting!=null && lastHarvesting.before(tmpHarvesting))) {
+//					    if (lastHarvesting == null || lastHarvesting.before(tmpHarvesting)) {
 						lastHarvesting = tmpHarvesting;
 					    }
 					}
