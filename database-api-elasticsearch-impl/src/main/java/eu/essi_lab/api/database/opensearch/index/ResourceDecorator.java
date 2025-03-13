@@ -25,6 +25,7 @@ package eu.essi_lab.api.database.opensearch.index;
  */
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.json.JSONObject;
 
@@ -136,13 +137,17 @@ public class ResourceDecorator {
 	//
 	// adds the shape to the extension handler; it can be used in case the resource binary
 	// is excluded thus the bbox is not present in the indexed metadata
-	// furthermore this extension can include the geometry in case of multi polygon, which 
+	// furthermore this extension can include the geometry in case of multi polygon, which
 	// is never put in the indexes metadata
 	//
 	if (source.has(MetadataElement.BOUNDING_BOX.getName())) {
 
 	    String shape = source.getString(MetadataElement.BOUNDING_BOX.getName());
 	    res.getExtensionHandler().setShape(shape);
+
+	    Optional.ofNullable(source.optString(Shape.CENTROID, null)).ifPresent(v -> res.getExtensionHandler().setCentroid(v));
+
+	    Optional.ofNullable(source.opt(Shape.AREA)).ifPresent(v -> res.getExtensionHandler().setArea(Double.valueOf(v.toString())));
 	}
 
 	if (source.has(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
