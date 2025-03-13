@@ -27,11 +27,14 @@ package eu.essi_lab.api.database.opensearch.index;
 import java.util.Date;
 import java.util.Optional;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
@@ -175,6 +178,22 @@ public class ResourceDecorator {
 	if (!source.has(MetadataElement.BOUNDING_BOX.getName())) {
 
 	    indexesMd.write(IndexedElements.BOUNDING_BOX_NULL);
+	}
+
+	//
+	// if the binary is excluded, gssource must be set
+	//
+	if (res.getSource() == null) {
+
+	    Optional<JSONArray> sourceId = Optional.ofNullable(source.optJSONArray(ResourceProperty.SOURCE_ID.getName(), null));
+	    if (sourceId.isPresent()) {
+
+		ConfigurationWrapper.getAllSources().//
+			stream().//
+			filter(s -> s.getUniqueIdentifier().equals(sourceId.get().get(0))).//
+			findFirst().//
+			ifPresent(s -> res.setSource(s));
+	    }
 	}
 
 	return res;
