@@ -30,7 +30,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.Duration;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.locationtech.jts.geom.Geometry;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -56,6 +55,8 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String THEME_CATEGORY = "themeCategory";
     private static final String IN_SITU = "inSitu";
     private static final String GEOMETRY = "geometry";
+    private static final String CENTROID = "centroid";
+    private static final String AREA = "area";
 
     private ExtendedMetadata metadata;
 
@@ -1048,6 +1049,62 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
 	try {
 	    return Optional.of(this.metadata.getTextContent(GEOMETRY));
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param centroid
+     */
+    public void setCentroid(String centroid) {
+
+	try {
+	    this.metadata.add(CENTROID, centroid);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getCentroid() {
+
+	try {
+	    return Optional.of(this.metadata.getTextContent(CENTROID));
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param area
+     */
+    public void setArea(double area) {
+
+	try {
+	    this.metadata.add(AREA, String.valueOf(area));
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Double> getArea() {
+
+	try {
+	    return Optional.of(this.metadata.getTextContent(AREA)).map(v -> Double.valueOf(v));
 	} catch (XPathExpressionException e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);

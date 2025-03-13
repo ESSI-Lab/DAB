@@ -284,6 +284,11 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 	    option.clearValues();
 	    return;
 	}
+	
+	//
+	// for Integer and String values, multi comma separated values are 
+	// also supported (e.g: 1,5,7 or a,b,c)
+	//  
 
 	if (valueClass.equals(Double.class)) {
 
