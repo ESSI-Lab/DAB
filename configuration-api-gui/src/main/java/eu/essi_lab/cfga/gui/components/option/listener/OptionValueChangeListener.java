@@ -1,5 +1,7 @@
 package eu.essi_lab.cfga.gui.components.option.listener;
 
+import java.util.Arrays;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -283,19 +285,27 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 	    return;
 	}
 
-	if (valueClass.equals(Integer.class)) {
-
-	    Integer integer = Integer.valueOf(value.toString());
-	    option.setObjectValue(integer);
-
-	} else if (valueClass.equals(Double.class)) {
+	if (valueClass.equals(Double.class)) {
 
 	    Double double_ = Double.valueOf(value.toString());
 	    option.setObjectValue(double_);
 
+	} else if (valueClass.equals(Integer.class)) {
+
+	    List<Integer> values = Arrays.asList(value.toString().split(",")).//
+		    stream().//
+		    map(v -> Integer.valueOf(v)).//
+		    collect(Collectors.toList());
+
+	    option.setObjectValues(values);
+
 	} else if (valueClass.equals(String.class)) {
 
-	    option.setObjectValue(value.toString());
+	    List<String> values = Arrays.asList(value.toString().split(",")).//
+		    stream().//
+		    collect(Collectors.toList());
+
+	    option.setObjectValues(values);
 	}
     }
 
