@@ -87,6 +87,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     private static final String SORT_ORDER = "ORDERING_DIRECTION";
     private static final String SEARCH_AFTER = "searchAfter";
     private static final String EXCLUDE_RESOURCE_BINARY = "excludeResourceBinary";
+    private static final String USE_CACHED_SOURCES_DATAFOLDER_MAP = "useSourcesDataFolderMap";
 
     private String requestId;
 
@@ -457,6 +458,22 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     public void setExcludeResourceBinary(boolean exclude) {
 
 	getHeader().add(new GSProperty<Boolean>(EXCLUDE_RESOURCE_BINARY, exclude));
+    }
+
+    /**
+     * @return
+     */
+    public Boolean isCachedSourcesDataFolderMapUsed() {
+
+	return Optional.ofNullable(getHeader().get(USE_CACHED_SOURCES_DATAFOLDER_MAP, Boolean.class)).orElse(false);
+    }
+
+    /**
+     * @param use
+     */
+    public void setUseCachedSourcesDataFolderMap(boolean use) {
+
+	getHeader().add(new GSProperty<Boolean>(USE_CACHED_SOURCES_DATAFOLDER_MAP, use));
     }
 
 }

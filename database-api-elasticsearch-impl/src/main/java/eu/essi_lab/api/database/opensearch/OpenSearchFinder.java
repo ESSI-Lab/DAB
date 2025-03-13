@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
@@ -51,6 +54,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchBondHandler;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StreamUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -78,6 +82,81 @@ public class OpenSearchFinder implements DatabaseFinder {
 
     private OpenSearchDatabase database;
     private OpenSearchWrapper wrapper;
+
+    /**
+     * 
+     */
+    private static final long MAP_UPDATE_PERIOD = TimeUnit.MINUTES.toMillis(5);
+    /**
+     * 
+     */
+    private static CachedMapUpdater MAP_UPDATER_TASK;
+
+    /**
+     * 
+     */
+    private static HashMap<String, String> SOURCES_DATA_FOLDER_MAP = new HashMap<String, String>();
+
+    /**
+     * @author Fabrizio
+     */
+    private static class CachedMapUpdater extends TimerTask {
+
+	private OpenSearchFinder finder;
+
+	/**
+	 * @param finder
+	 */
+	public void setOpenSearchFinder(OpenSearchFinder finder) {
+
+	    this.finder = finder;
+	}
+
+	@Override
+	public void run() {
+
+	    synchronized (this) {
+
+		try {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Updating sources to data folder map STARTED");
+
+		    SOURCES_DATA_FOLDER_MAP = finder.getSourcesDataMap(//
+
+			    ConfigurationWrapper.getHarvestedAndMixedSources().//
+				    stream().//
+				    map(s -> s.getUniqueIdentifier()).//
+				    collect(Collectors.toList()),
+
+			    false);
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Updating sources to data folder map ENDED");
+
+		} catch (Exception e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error("Error occurred while updating sources to data folder map cache");
+
+		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+		}
+	    }
+	};
+    }
+
+    /**
+     * 
+     */
+    public OpenSearchFinder() {
+
+	if (MAP_UPDATER_TASK == null) {
+
+	    MAP_UPDATER_TASK = new CachedMapUpdater();
+
+	    Timer timer = new Timer();
+	    timer.scheduleAtFixedRate(MAP_UPDATER_TASK, 0, MAP_UPDATE_PERIOD);
+	}
+
+	MAP_UPDATER_TASK.setOpenSearchFinder(this);
+    }
 
     @Override
     public void setDatabase(Database database) {
@@ -355,72 +434,95 @@ public class OpenSearchFinder implements DatabaseFinder {
     }
 
     /**
-     * @param message
+     * @param sourceIds
      * @return
      * @throws GSException
-     * @throws Exception
      */
-    private HashMap<String, String> getSourcesDataMap(RequestMessage message) throws GSException {
+    private HashMap<String, String> getSourcesDataMap(List<String> sourceIds, boolean useCache) throws GSException {
 
 	HashMap<String, String> out = new HashMap<>();
 
-	List<String> ids = message.getSources().//
-		stream().//
-		map(s -> s.getUniqueIdentifier()).//
-		collect(Collectors.toList());
+	if (useCache && !SOURCES_DATA_FOLDER_MAP.isEmpty()) {
 
-	Query query = OpenSearchQueryBuilder.buildDataFolderQuery(getDatabase().getIdentifier(), ids);
+	    synchronized (MAP_UPDATER_TASK) {
 
-	if (debugQueries) {
+		SOURCES_DATA_FOLDER_MAP.keySet().//
+			stream().//
+			filter(id -> sourceIds.contains(id)).//
+			forEach(id -> out.put(id, SOURCES_DATA_FOLDER_MAP.get(id)));
 
-	    GSLoggerFactory.getLogger(getClass()).debug("--- GET SOURCES DATA MAP ---");
-	    GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", ConversionUtils.toJSONObject(query).toString(3));
-	}
-
-	try {
-
-	    SearchResponse<Object> response = wrapper.search(//
-		    MetaFolderMapping.get().getIndex(), //
-		    query, //
-		    Arrays.asList(MetaFolderMapping.SOURCE_ID, MetaFolderMapping.DATA_FOLDER), //
-		    0, //
-		    ids.size(), //
-		    Optional.empty(), //
-		    Optional.empty(), //
-		    Optional.empty(), //
-		    true, // requesting cache
-		    false);
-
-	    response.//
-		    hits().//
-		    hits().//
-		    stream().//
-		    map(hit -> ConversionUtils.toJSONObject(hit.source()))//
-		    .forEach(obj -> {
-
-			out.put(obj.getString(MetaFolderMapping.SOURCE_ID), //
-				obj.getString(MetaFolderMapping.DATA_FOLDER));
-		    });
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(ex);
-	    throw GSException.createException(getClass(), "OpenSearchFinderSourceDataFolderMapError", ex);
-	}
-
-	ids.forEach(id -> {
-	    //
-	    // this is to avoid retrieval of resources belonging to a source that is
-	    // referenced in the query, but that is currently executing its first harvesting
-	    // or that is not yet been harvested
-	    //
-	    if (out.get(id) == null) {
-
-		out.put(id, "not-available");
 	    }
-	});
+
+	} else {
+
+	    Query query = OpenSearchQueryBuilder.buildDataFolderQuery(getDatabase().getIdentifier(), sourceIds);
+
+	    if (debugQueries) {
+
+		GSLoggerFactory.getLogger(getClass()).debug("--- GET SOURCES DATA MAP ---");
+		GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", ConversionUtils.toJSONObject(query).toString(3));
+	    }
+
+	    try {
+
+		SearchResponse<Object> response = wrapper.search(//
+			MetaFolderMapping.get().getIndex(), //
+			query, //
+			Arrays.asList(MetaFolderMapping.SOURCE_ID, MetaFolderMapping.DATA_FOLDER), //
+			0, //
+			sourceIds.size(), //
+			Optional.empty(), //
+			Optional.empty(), //
+			Optional.empty(), //
+			true, // requesting cache
+			false);
+
+		response.//
+			hits().//
+			hits().//
+			stream().//
+			map(hit -> ConversionUtils.toJSONObject(hit.source()))//
+			.forEach(obj -> {
+
+			    out.put(obj.getString(MetaFolderMapping.SOURCE_ID), //
+				    obj.getString(MetaFolderMapping.DATA_FOLDER));
+			});
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
+		throw GSException.createException(getClass(), "OpenSearchFinderSourceDataFolderMapError", ex);
+	    }
+
+	    sourceIds.forEach(id -> {
+		//
+		// this is to avoid retrieval of resources belonging to a source that is
+		// referenced in the query, but that is currently executing its first harvesting
+		// or that is not yet been harvested
+		//
+		if (out.get(id) == null) {
+
+		    out.put(id, "not-available");
+		}
+	    });
+	}
 
 	return out;
+    }
+
+    /**
+     * @param message
+     * @param useCache
+     * @return
+     * @throws GSException
+     */
+    private HashMap<String, String> getSourcesDataMap(RequestMessage message) throws GSException {
+
+	return getSourcesDataMap(message.getSources().//
+		stream().//
+		map(s -> s.getUniqueIdentifier()).//
+		collect(Collectors.toList()), //
+		message.isCachedSourcesDataFolderMapUsed());
     }
 
     /**
