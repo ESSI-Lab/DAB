@@ -22,6 +22,7 @@ package eu.essi_lab.gssrv.rest;
  */
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +41,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.pluggable.PluginsLoader;
 import eu.essi_lab.pdk.ChronometerInfoProvider;
 import eu.essi_lab.pdk.Profiler;
 import eu.essi_lab.pdk.ResponseInfoProvider;
@@ -55,6 +57,12 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  * @see ProfilerSettingFilter
  */
 public abstract class AbstractProfilerService {
+
+    /**
+     * 
+     */
+    @SuppressWarnings("rawtypes")
+    private static final List<Profiler> PROFILERS = new PluginsLoader<Profiler>().loadPlugins(Profiler.class);
 
     /**
      * Creates a {@link WebRequest} from the given arguments, selects the suitable
@@ -106,7 +114,9 @@ public abstract class AbstractProfilerService {
 
 		try {
 
-		    optProfiler = Optional.of(profilerSetting.get().createConfigurable());
+		    optProfiler = PROFILERS.stream().//
+			    filter(p -> p.getType().equals(profilerSetting.get().getConfigurableType())).//
+			    findFirst();
 
 		} catch (Exception e) {
 
