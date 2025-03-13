@@ -4,7 +4,6 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
