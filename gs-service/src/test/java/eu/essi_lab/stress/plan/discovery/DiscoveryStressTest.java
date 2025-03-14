@@ -1,8 +1,5 @@
 package eu.essi_lab.stress.plan.discovery;
 
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.stress.plan.IStressTest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,8 +11,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import javax.xml.xpath.XPathExpressionException;
+
 import org.xml.sax.SAXException;
+
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
+import eu.essi_lab.lib.xml.XMLDocumentReader;
+import eu.essi_lab.stress.plan.IStressTest;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;

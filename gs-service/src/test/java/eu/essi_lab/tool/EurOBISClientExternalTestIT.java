@@ -16,8 +16,8 @@ import org.junit.Test;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.accessor.eurobis.EurOBISClient;
-import eu.essi_lab.gssrv.conf.task.bluecloud.DocumentReport;
 import eu.essi_lab.gssrv.conf.task.bluecloud.BlueCloudMetadataElement;
+import eu.essi_lab.gssrv.conf.task.bluecloud.DocumentReport;
 import eu.essi_lab.gssrv.conf.task.bluecloud.MetadataManager;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;

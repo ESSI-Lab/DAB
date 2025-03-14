@@ -1,8 +1,9 @@
 package eu.essi_lab.stress.plan;
 
-import eu.essi_lab.stress.plan.discovery.DiscoveryStressTest;
 import java.util.ArrayList;
 import java.util.List;
+
+import eu.essi_lab.stress.plan.discovery.DiscoveryStressTest;
 
 /**
  * @author Mattia Santoro

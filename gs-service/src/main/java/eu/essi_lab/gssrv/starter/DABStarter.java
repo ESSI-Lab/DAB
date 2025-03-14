@@ -34,7 +34,6 @@ import javax.xml.bind.JAXBException;
 
 import org.quartz.SchedulerException;
 
-import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.api.database.cfg.DatabaseSource;
 import eu.essi_lab.api.database.cfg.DatabaseSourceUrl;
 import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
