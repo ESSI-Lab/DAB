@@ -35,6 +35,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.ConfigurationChangeListener;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.utils.Chronometer.TimeFormat;
@@ -64,6 +65,27 @@ public abstract class AbstractProfilerService {
      * 
      */
     private static final HashMap<String, Class<? extends Profiler>> PROFILERS_MAP = new HashMap<>();
+    private static List<ProfilerSetting> profilerSettings;
+
+    /**
+     * 
+     */
+    private static final ProfilerSettingsListener LISTENER = new ProfilerSettingsListener();
+
+    /**
+     * @author Fabrizio
+     */
+    private static class ProfilerSettingsListener implements ConfigurationChangeListener {
+
+	@Override
+	public void configurationChanged(ConfigurationChangeEvent event) {
+
+	    if (event.getEventType() == ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED) {
+
+		profilerSettings = ConfigurationWrapper.getProfilerSettings();
+	    }
+	}
+    }
 
     static {
 
@@ -88,6 +110,11 @@ public abstract class AbstractProfilerService {
      */
     @SuppressWarnings("unchecked")
     protected Response serve(ProfilerSettingFilter strategy, HttpServletRequest httpServletRequest, UriInfo uriInfo) {
+
+	if (profilerSettings == null) {
+	    ConfigurationWrapper.getConfiguration().get().addChangeEventListener(LISTENER);
+	    profilerSettings = ConfigurationWrapper.getProfilerSettings();
+	}
 
 	ChronometerInfoProvider chronometer = new ChronometerInfoProvider(TimeFormat.MIN_SEC_MLS);
 	chronometer.start();
@@ -116,9 +143,8 @@ public abstract class AbstractProfilerService {
 
 	if (ex == null) {
 
-	    Optional<ProfilerSetting> profilerSetting = ConfigurationWrapper.//
-		    getProfilerSettings().//
-		    stream().//
+	    Optional<ProfilerSetting> profilerSetting = profilerSettings.//
+		    parallelStream().//
 		    filter(strategy::accept).//
 		    findFirst();
 
