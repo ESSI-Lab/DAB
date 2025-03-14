@@ -48,6 +48,7 @@ import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.cuahsi.waterml._1.essi.JAXBWML;
 
 import eu.essi_lab.access.wml.WMLDataDownloaderAdapter;
+import eu.essi_lab.accessor.sos.AbstractSOSConnector;
 import eu.essi_lab.accessor.sos.SOSConnector;
 import eu.essi_lab.accessor.sos.SOSIdentifierMangler;
 import eu.essi_lab.accessor.sos.SOSRequestBuilder;
@@ -171,7 +172,7 @@ public class SOSDownloader extends eu.essi_lab.accessor.sos.downloader.SOSDownlo
 	String property = mangler.getObservedProperty();
 	String procedure = mangler.getProcedure();
 
-	SOSConnector connector = getConnector();
+	 AbstractSOSConnector connector = getConnector();
 	connector.setSourceURL(linkage);
 
 	try {
@@ -205,7 +206,7 @@ public class SOSDownloader extends eu.essi_lab.accessor.sos.downloader.SOSDownlo
     }
 
     @Override
-    public SOSConnector getConnector() {
+    public AbstractSOSConnector getConnector() {
     
         return new eu.essi_lab.accessor.sos._1_0_0.SOSConnector();
     }

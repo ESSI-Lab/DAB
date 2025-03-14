@@ -57,8 +57,8 @@ import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.sos._2_0.CapabilitiesType;
 import eu.essi_lab.jaxb.sos._2_0.GetFeatureOfInterestResponseType;
 import eu.essi_lab.jaxb.sos._2_0.GetObservationResponseType;
-import eu.essi_lab.jaxb.sos._2_0.ObservationOfferingType;
 import eu.essi_lab.jaxb.sos._2_0.GetObservationResponseType.ObservationData;
+import eu.essi_lab.jaxb.sos._2_0.ObservationOfferingType;
 import eu.essi_lab.jaxb.sos._2_0.ObservationOfferingType.PhenomenonTime;
 import eu.essi_lab.jaxb.sos._2_0.gda.DataAvailabilityMemberType;
 import eu.essi_lab.jaxb.sos._2_0.gda.GetDataAvailabilityResponseType;
@@ -101,11 +101,13 @@ public abstract class AbstractSOSConnector extends WrappedConnector {
 	protected static final String SOS_CONNECTOR_DOWNLOAD_ERROR = "SOS_CONNECTOR_DOWNLOAD_ERROR";
 	protected static final String SOC_CONNECTOR_LIST_RECORDS_ERROR = "SOC_CONNECTOR_LIST_RECORDS_ERROR";
 
-	protected CapabilitiesType capabilities;
-	protected HashMap<String, GetFeatureOfInterestResponseType> featuresCache = new HashMap<>();
-
 	public String getDownloadProtocol() {
 		return NetProtocols.SOS_2_0_0.getCommonURN();
+	}
+
+	public SOSCache getSOSCache() {
+		return SOSCacheManager.getInstance().getSOSCache(getSourceURL());
+
 	}
 
 	protected SimpleEntry<String, String> getTemporal(AbstractOfferingType abstractOffering) {
@@ -319,11 +321,13 @@ public abstract class AbstractSOSConnector extends WrappedConnector {
 	}
 
 	protected SOSProperties retrieveCapabilitiesMetadata() throws Exception {
-		if (capabilities == null) {
-			this.capabilities = retrieveCapabilities();
+
+		if (getSOSCache().getCapabilities() == null) {
+			CapabilitiesType caps = retrieveCapabilities();
+			getSOSCache().setCapabilities(caps);
 		}
 
-		ServiceProvider serviceProvider = capabilities.getServiceProvider();
+		ServiceProvider serviceProvider = getSOSCache().getCapabilities().getServiceProvider();
 		String providerName = null;
 		String providerSite = null;
 		String providerIndividualName = null;
@@ -653,10 +657,11 @@ public abstract class AbstractSOSConnector extends WrappedConnector {
 	}
 
 	public boolean hasGetDataAvailabilityOperation() throws Exception {
-		if (capabilities == null) {
-			this.capabilities = retrieveCapabilities();
+		if (getSOSCache().getCapabilities() == null) {
+			CapabilitiesType caps = retrieveCapabilities();
+			getSOSCache().setCapabilities(caps);
 		}
-		List<Operation> operations = capabilities.getOperationsMetadata().getOperation();
+		List<Operation> operations = getSOSCache().getCapabilities().getOperationsMetadata().getOperation();
 		for (Operation operation : operations) {
 			String name = operation.getName();
 			if (name != null && name.equals("GetDataAvailability")) {
@@ -780,7 +785,7 @@ public abstract class AbstractSOSConnector extends WrappedConnector {
 	 * @return
 	 */
 	public AbstractOfferingType getOffering(String procedure) {
-		List<Offering> offerings = capabilities.getContents().getContents().getOffering();
+		List<Offering> offerings = getSOSCache().getCapabilities().getContents().getContents().getOffering();
 		for (Offering offering : offerings) {
 			AbstractOfferingType abstractOffering = offering.getAbstractOffering().getValue();
 			String myProcedure = abstractOffering.getProcedure();

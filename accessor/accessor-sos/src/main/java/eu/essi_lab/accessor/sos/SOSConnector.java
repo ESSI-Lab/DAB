@@ -29,21 +29,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.xml.bind.JAXBElement;
-
 import eu.essi_lab.accessor.sos.SOSProperties.SOSProperty;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.sos._2_0.GetFeatureOfInterestResponseType;
-import eu.essi_lab.jaxb.sos._2_0.ObservationOfferingType;
-import eu.essi_lab.jaxb.sos._2_0.ObservationOfferingType.PhenomenonTime;
 import eu.essi_lab.jaxb.sos._2_0.gda.DataAvailabilityMemberType;
 import eu.essi_lab.jaxb.sos._2_0.gda.GetDataAvailabilityResponseType;
-import eu.essi_lab.jaxb.sos._2_0.gda.TimeObjectPropertyType;
 import eu.essi_lab.jaxb.sos._2_0.gml._3_2_1.AbstractFeatureType;
-import eu.essi_lab.jaxb.sos._2_0.gml._3_2_1.AbstractTimeObjectType;
 import eu.essi_lab.jaxb.sos._2_0.gml._3_2_1.FeaturePropertyType;
 import eu.essi_lab.jaxb.sos._2_0.gml._3_2_1.ReferenceType;
-import eu.essi_lab.jaxb.sos._2_0.gml._3_2_1.TimePeriodType;
 import eu.essi_lab.jaxb.sos._2_0.swes_2.AbstractContentsType.Offering;
 import eu.essi_lab.jaxb.sos._2_0.swes_2.AbstractOfferingType;
 import eu.essi_lab.jaxb.sos._2_0.swes_2.DescribeSensorResponseType;
@@ -79,7 +72,7 @@ public class SOSConnector extends AbstractSOSConnector {
 
 	@Override
 	public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
-
+		getSOSCache();
 		ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 		try {
 			SOSProperties capMetadata = retrieveCapabilitiesMetadata();
@@ -117,7 +110,7 @@ public class SOSConnector extends AbstractSOSConnector {
 				}
 			}
 
-			List<Offering> offerings = capabilities.getContents().getContents().getOffering();
+			List<Offering> offerings = getSOSCache().getCapabilities().getContents().getContents().getOffering();
 			int offeringSize = offerings.size();
 
 			GSLoggerFactory.getLogger(getClass()).info("Serving offering " + offeringIndex + "/" + offeringSize);
@@ -132,12 +125,13 @@ public class SOSConnector extends AbstractSOSConnector {
 
 			GetFeatureOfInterestResponseType featureResponse;
 
-			featureResponse = featuresCache.get(procedure);
+			featureResponse = getSOSCache().getFeaturesCache().get(procedure);
 
 			if (featureResponse == null) {
 				featureResponse = retrieveFeatures(procedure);
-				featuresCache.clear(); // only last retrieved is stored, otherwise it will become too big
-				featuresCache.put(procedure, featureResponse);
+				getSOSCache().getFeaturesCache().clear(); // only last retrieved is stored, otherwise it will become too
+															// big
+				getSOSCache().getFeaturesCache().put(procedure, featureResponse);
 			}
 
 			List<FeaturePropertyType> features = featureResponse.getFeatureMember();
@@ -190,7 +184,7 @@ public class SOSConnector extends AbstractSOSConnector {
 					// in case observable properties list is empty, those are inherited from
 					// contents
 					observableProperties = new HashSet<String>(
-							capabilities.getContents().getContents().getObservableProperty());
+							getSOSCache().getCapabilities().getContents().getContents().getObservableProperty());
 				}
 
 				HashMap<String, DescribeSensorResponseType> procedureDescriptions = retrieveProcedureDescriptions(
