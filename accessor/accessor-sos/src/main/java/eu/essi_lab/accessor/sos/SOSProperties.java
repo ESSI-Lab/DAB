@@ -30,120 +30,132 @@ import java.util.Properties;
 
 public class SOSProperties {
 
-    Properties properties = new Properties();
+	Properties properties = new Properties();
 
-    public enum SOSProperty {
+	public enum SOSProperty {
 
-	// PROCEDURE
-	PROCEDURE_TITLE, //
-	PROCEDURE_HREF, //
-	PROCEDURE_IDENTIFIER, //
+		// PROCEDURE
+		PROCEDURE_TITLE, //
+		PROCEDURE_HREF, //
+		PROCEDURE_IDENTIFIER, //
 
-	// FROM CAPABILITIES
-	OFFERING, //
-	SERVICE_PROVIDER_NAME, //
-	SERVICE_PROVIDER_SITE, //
-	SERVICE_PROVIDER_ROLE, //
-	SERVICE_PROVIDER_IndividualName, //
-	SERVICE_PROVIDER_PositionName, //
-	SERVICE_PROVIDER_Phone, //
-	SERVICE_PROVIDER_AddressDeliveryPoint, //
-	SERVICE_PROVIDER_AddressCity, //
-	SERVICE_PROVIDER_AddressAdministrativeArea, //
-	SERVICE_PROVIDER_AddressPostalCode, //
-	SERVICE_PROVIDER_AddressCountry, //
-	SERVICE_PROVIDER_AddressEmailAddress, //
-	SERVICE_PROVIDER_Keywords, //
-	ELEVATION, //
+		// FROM CAPABILITIES
+		OFFERING, //
+		SERVICE_PROVIDER_NAME, //
+		SERVICE_PROVIDER_SITE, //
+		SERVICE_PROVIDER_ROLE, //
+		SERVICE_PROVIDER_IndividualName, //
+		SERVICE_PROVIDER_PositionName, //
+		SERVICE_PROVIDER_Phone, //
+		SERVICE_PROVIDER_AddressDeliveryPoint, //
+		SERVICE_PROVIDER_AddressCity, //
+		SERVICE_PROVIDER_AddressAdministrativeArea, //
+		SERVICE_PROVIDER_AddressPostalCode, //
+		SERVICE_PROVIDER_AddressCountry, //
+		SERVICE_PROVIDER_AddressEmailAddress, //
+		SERVICE_PROVIDER_Keywords, //
+		ELEVATION, //
 
-	// FEATURE OF INTEREST
-	FOI_ID, //
-	FOI_NAME, //
+		// FEATURE OF INTEREST
+		FOI_ID, //
+		FOI_NAME, //
 
-	// TEMPORAL EXTENT
-	TEMP_EXTENT_BEGIN, //
-	TEMP_EXTENT_END, //
+		// TEMPORAL EXTENT
+		TEMP_EXTENT_BEGIN, //
+		TEMP_EXTENT_END, //
 
-	// SPATIAL EXTENT
-	LATITUDE, //
-	LONGITUDE, //
+		// SPATIAL EXTENT
+		LATITUDE, //
+		LONGITUDE, //
 
-	// OBSERVED PROPERTY
-	OBSERVED_PROPERTY_ID, //
-	OBSERVED_PROPERTY_NAME, //
-	OBSERVED_PROPERTY_UOM, //
+		// OBSERVED PROPERTY
+		OBSERVED_PROPERTY_ID, //
+		OBSERVED_PROPERTY_NAME, //
+		OBSERVED_PROPERTY_UOM, //
 
-	// SENSOR PROPERTIES
-	SENSOR_Name, //
-	SENSOR_Description, //
-	SENSOR_Keywords, //
-	SENSOR_UniqueId, //
-	SENSOR_ManufacturerName, //
-	SENSOR_ShortName, //
-	SENSOR_LongName, //
-	SENSOR_Material, //
-	SENSOR_Status, //
-	SENSOR_Mobile, //
-	SENSOR_ContactManufacturerOrganization, //
-	SENSOR_ContactOwnerOrganization, //
-	SENSOR_ContactOwnerPhone, //
-	SENSOR_ContactOwnerAddressDeliveryPoint, //
-	SENSOR_ContactOwnerAddressCity, //
-	SENSOR_ContactOwnerAddressCountry, //
-	SENSOR_ContactOwnerAddressEmail, //
-	SENSOR_ContactOwnerHomepage, //
-	SENSOR_DocumentationImage, //
-	SENSOR_DocumentationImageDescription, //
-	SENSOR_DocumentationImageFormat, //
-	DOWNLOAD_PROTOCOL;//
-    }
-
-    public SOSProperties(String str) throws IOException {
-	byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-	InputStream stream = new ByteArrayInputStream(bytes);
-	this.properties.load(stream);
-    }
-
-    public SOSProperties() {
-    }
-
-    public String asString() throws IOException {
-	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	properties.store(baos, null);
-	byte[] bytes = baos.toByteArray();
-	return new String(bytes, StandardCharsets.UTF_8);
-    }
-
-    public void setProperty(SOSProperty property, String value) {
-	if (value != null && !value.equals("")) {
-	    properties.setProperty(property.name(), value);
+		// SENSOR PROPERTIES
+		SENSOR_Name, //
+		SENSOR_Description, //
+		SENSOR_Keywords, //
+		SENSOR_UniqueId, //
+		SENSOR_ManufacturerName, //
+		SENSOR_ShortName, //
+		SENSOR_LongName, //
+		SENSOR_Material, //
+		SENSOR_Status, //
+		SENSOR_Mobile, //
+		SENSOR_ContactManufacturerOrganization, //
+		SENSOR_ContactOwnerOrganization, //
+		SENSOR_ContactOwnerPhone, //
+		SENSOR_ContactOwnerAddressDeliveryPoint, //
+		SENSOR_ContactOwnerAddressCity, //
+		SENSOR_ContactOwnerAddressCountry, //
+		SENSOR_ContactOwnerAddressEmail, //
+		SENSOR_ContactOwnerHomepage, //
+		SENSOR_DocumentationImage, //
+		SENSOR_DocumentationImageDescription, //
+		SENSOR_DocumentationImageFormat, //
+		DOWNLOAD_PROTOCOL;//
 	}
-    }
 
-    public String getProperty(SOSProperty property) {
-	return properties.getProperty(property.name());
-    }
+	public SOSProperties(String str) throws IOException {
+		byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+		InputStream stream = new ByteArrayInputStream(bytes);
+		this.properties.load(stream);
+	}
 
-    @Override
-    public String toString() {
+	public SOSProperties() {
+	}
 
-	final StringBuilder builder = new StringBuilder();
+	public SOSProperties(Properties news) {
+		this.properties = news;
+	}
 
-	properties.keySet().//
-		stream().//
-		sorted().//
-		forEach(key -> {
+	public String asString() throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		properties.store(baos, null);
+		byte[] bytes = baos.toByteArray();
+		return new String(bytes, StandardCharsets.UTF_8);
+	}
 
-		    String property = properties.getProperty(key.toString());
+	public void setProperty(SOSProperty property, String value) {
+		if (value != null && !value.equals("")) {
+			properties.setProperty(property.name(), value);
+		}
+	}
 
-		    if (property != null) {
-			builder.append(key);
-			builder.append(":");
-			builder.append(properties.getProperty(key.toString()));
-			builder.append("\n");
-		    }
-		});
+	public String getProperty(SOSProperty property) {
+		return properties.getProperty(property.name());
+	}
 
-	return builder.toString();
-    }
+	@Override
+	public String toString() {
+
+		final StringBuilder builder = new StringBuilder();
+
+		properties.keySet().//
+				stream().//
+				sorted().//
+				forEach(key -> {
+
+					String property = properties.getProperty(key.toString());
+
+					if (property != null) {
+						builder.append(key);
+						builder.append(":");
+						builder.append(properties.getProperty(key.toString()));
+						builder.append("\n");
+					}
+				});
+
+		return builder.toString();
+	}
+
+	@Override
+	protected SOSProperties clone() throws CloneNotSupportedException {
+		Properties news = new Properties();
+		news.putAll(properties);
+		SOSProperties ret = new SOSProperties(news);
+		return ret;
+	}
 }
