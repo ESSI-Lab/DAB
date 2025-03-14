@@ -1,6 +1,5 @@
 package eu.essi_lab.stress.plan;
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -9,6 +8,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Mattia Santoro

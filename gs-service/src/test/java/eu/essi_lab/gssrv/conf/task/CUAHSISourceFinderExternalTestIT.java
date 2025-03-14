@@ -1,6 +1,6 @@
 package eu.essi_lab.gssrv.conf.task;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 

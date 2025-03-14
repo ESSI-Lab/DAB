@@ -32,9 +32,9 @@ import org.w3c.dom.Document;
 
 import eu.essi_lab.access.augmenter.DataCacheAugmenter;
 import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
