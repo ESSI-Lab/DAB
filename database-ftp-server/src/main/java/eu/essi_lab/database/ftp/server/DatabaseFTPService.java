@@ -1,0 +1,100 @@
+/**
+ * 
+ */
+package eu.essi_lab.database.ftp.server;
+
+import java.io.File;
+
+import org.apache.ftpserver.FtpServer;
+import org.apache.ftpserver.FtpServerFactory;
+import org.apache.ftpserver.ftplet.FtpException;
+import org.apache.ftpserver.ftplet.User;
+import org.apache.ftpserver.ftplet.UserManager;
+import org.apache.ftpserver.listener.ListenerFactory;
+import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
+import org.apache.ftpserver.usermanager.UserFactory;
+
+import eu.essi_lab.api.database.Database;
+
+/**
+ * @author Fabrizio
+ */
+public class DatabaseFTPService {
+
+    private Database database;
+
+    /**
+     * @param database
+     */
+    private DatabaseFTPService(Database database) {
+
+	this.database = database;
+    }
+
+    /**
+     * @param database
+     * @return
+     */
+    public static DatabaseFTPService get(Database database) {
+
+	return new DatabaseFTPService(database);
+    }
+
+    /**
+     * @throws FtpException
+     */
+    public void start() throws FtpException {
+
+	FtpServerFactory serverFactory = new FtpServerFactory();
+
+	//
+	//
+	//
+
+	PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
+	userManagerFactory.setAdminName("admin");
+
+	UserFactory userFactory = new UserFactory();
+	userFactory.setName("admin");
+	userFactory.setPassword("admin");
+
+	User admin = userFactory.createUser();
+
+	UserManager userManager = userManagerFactory.createUserManager();
+	userManager.save(admin);
+
+	serverFactory.setUserManager(userManager);
+
+	//
+	//
+	//
+
+	DatabaseFileSystemFactory factory = DatabaseFileSystemFactory.get(database);
+
+	serverFactory.setFileSystem(factory);
+
+	//
+	//
+	//
+
+	ListenerFactory listenerFactory = new ListenerFactory();
+	listenerFactory.setPort(2221);
+	serverFactory.addListener("default", listenerFactory.createListener());
+
+	//
+	//
+	//
+
+	FtpServer server = serverFactory.createServer();
+
+	server.start();
+    }
+
+    /**
+     * @param args
+     * @throws FtpException
+     */
+    public static void main(String[] args) throws FtpException {
+
+    }
+}

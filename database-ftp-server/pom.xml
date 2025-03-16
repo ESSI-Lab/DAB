@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>DAB</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>database-ftp-server</artifactId>
+	<name>ESSI-Lab Database modules for FTP Server</name>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>eu.essi_lab</groupId>
+			<artifactId>database-api</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<!--
+			https://mvnrepository.com/artifact/org.apache.ftpserver/ftpserver-core -->
+		<dependency>
+			<groupId>org.apache.ftpserver</groupId>
+			<artifactId>ftpserver-core</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

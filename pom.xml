@@ -1705,6 +1705,7 @@
 		<module>database-api-volatile-impl</module>
 		<module>database-indexes</module>
 		<module>database-wrapper-marklogic</module>
+		<module>database-ftp-server</module>
 
 		<module>request-executor</module>
 		<module>request-executor-default</module>
