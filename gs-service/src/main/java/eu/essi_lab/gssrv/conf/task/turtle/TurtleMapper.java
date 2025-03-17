@@ -420,8 +420,11 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 			ret += "dcat:accessService " + serverId + ".\n";
 
 			ret += serverId + "\n";
-			ret += "rdf:type dcat:DataService ;\n";
+			ret += "rdf:type dcat:DataService ;\n";			
 			if (protocol != null) {
+			    if (protocol.equals("EEA:FILEPATH")&&linkage.endsWith("/")) {
+				protocol = "EEA:FOLDERPATH";
+			    }
 			    ret += "dct:conformsTo \"" + protocol + "\" ;\n";
 			}
 			ret += "dct:type <https://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/invoke> ;\n";

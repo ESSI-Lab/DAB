@@ -464,6 +464,9 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	return null;
     }
 
+    private static String lastBond = null;
+    private static Query lastQuery = null;
+
     @Override
     public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
 
@@ -546,8 +549,20 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    message.setPermittedBond(BondFactory.createAndBond(bonds));
 	    break;
 	}
+	message.setUseCachedSourcesDataFolderMap(true);
 
-	Query query = bonds.isEmpty() ? null : finder.buildQuery(message, true);
+	Query tmp = null;
+	if (!bonds.isEmpty()) {
+	    String s = bonds.toString();
+	    if (lastBond != null && lastBond.equals(s)) {
+		tmp= lastQuery;
+	    } else {
+		tmp = finder.buildQuery(message, true);
+		lastBond = s;
+		lastQuery = tmp;
+	    }
+	}
+	Query query = tmp;
 
 	// Bounding box queries for regions
 	List<SpatialExtent> extents = request.getExtents();

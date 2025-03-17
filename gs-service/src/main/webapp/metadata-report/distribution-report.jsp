@@ -1,3 +1,13 @@
+<%@page import="eu.essi_lab.iso.datamodel.classes.Online"%>
+<%@page import="java.util.Iterator"%>
+<%@page import="tech.units.indriya.AbstractSystemOfUnits"%>
+<%@page import="eu.essi_lab.model.resource.GSResource"%>
+<%@page import="eu.essi_lab.messages.ResultSet"%>
+<%@page import="eu.essi_lab.messages.bond.Bond"%>
+<%@page import="eu.essi_lab.messages.bond.SimpleValueBond"%>
+<%@page import="eu.essi_lab.messages.bond.BondOperator"%>
+<%@page import="java.nio.charset.StandardCharsets"%>
+<%@page import="java.net.URLEncoder"%>
 <%@page import="net.sf.saxon.expr.instruct.ForEach"%>
 <%@page import="java.util.HashSet"%>
 <%@page import="eu.essi_lab.model.resource.ResourceProperty"%>
@@ -31,19 +41,73 @@
 <title>Metadata report</title>
 <style>
 </style>
+<style>
+iframe {
+	width: 100%;
+	height: 400px;
+	border: 1px solid #ccc;
+}
+</style>
 </head>
 <body>
+	<script>
+		function loadIframe(id, url) {
+			event.preventDefault(); // Prevents the page from jumping to the top
+			document.getElementById(id).src = url;
+		}
+	</script>
 	<%
 	String view = request.getParameter("view");
-		if (view==null || view.isEmpty()){
+	if (view == null || view.isEmpty()) {
 	    out.println("Unexpected: view parameter missing");
 	    return;
-		}
+	}
 
-	    
+	String protocol = request.getParameter("protocol");
+	String sourceParameter = request.getParameter("source");
+
+	if (protocol != null && !protocol.isEmpty() && sourceParameter != null && !sourceParameter.isEmpty()) {
+	    DiscoveryMessage message = new DiscoveryMessage();
+	    ServiceLoader<IDiscoveryExecutor> discovery = ServiceLoader.load(IDiscoveryExecutor.class);
+	    IDiscoveryExecutor executor = discovery.iterator().next();
+
+	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+	    discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
+	    discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
+	    List<GSSource> sources = new ArrayList();
+	    sources.add(ConfigurationWrapper.getSource(sourceParameter));
+	    discoveryMessage.setSources(sources);
+	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+	    ResourcePropertyBond sBond = BondFactory.createSourceIdentifierBond(sourceParameter);
+	    SimpleValueBond pBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ONLINE_PROTOCOL, protocol);
+	    Bond bond = BondFactory.createAndBond(sBond, pBond);
+	    discoveryMessage.setPermittedBond(bond);
+	    discoveryMessage.setUserBond(bond);
+	    discoveryMessage.setNormalizedBond(bond);
+	    discoveryMessage.setPage(new Page(1, 15));
+	    ResultSet<GSResource> result = executor.retrieve(discoveryMessage);
+	    List<GSResource> list = result.getResultsList();
+	    out.println("<table><tr><th>Id</th><th>Linkage</th></tr>");
+	    String linkage = "";
+	    for (GSResource res : list) {
+		Iterator<Online> onlineIterator = res.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution()
+			.getDistributionOnlines();
+		while (onlineIterator.hasNext()) {
+	    Online online = onlineIterator.next();
+	    String prot = online.getProtocol();
+	    if (prot != null && prot.equals(protocol)) {
+			linkage = online.getLinkage();
+	    }
+		}
+		out.println("<tr><td>" + res.getPublicId() + "</td><td>" + linkage + "</td></tr>");
+	    }
+	    out.println("</table>");
+
+	} else {
+
 	    StatisticsMessage statisticsMessage = new StatisticsMessage();
 	    // set the required properties
-	    
+
 	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	    // statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 
@@ -52,9 +116,9 @@
 	    statisticsMessage.groupBy(ResourceProperty.SOURCE_ID);
 	    // set the view
 	    WebRequestTransformer.setView(//
-				    view, //
-				    statisticsMessage.getDataBaseURI(), //
-				    statisticsMessage);
+	    view, //
+	    statisticsMessage.getDataBaseURI(), //
+	    statisticsMessage);
 	    statisticsMessage.setSources(ConfigurationWrapper.getViewSources(statisticsMessage.getView().get()));
 	    // pagination works with grouped results. in this case there is one result item for each
 	    // source/country/etc.
@@ -71,7 +135,7 @@
 	    List<Queryable> queriables = new ArrayList();
 	    queriables.add(MetadataElement.ONLINE_PROTOCOL);
 	    queriables.add(ResourceProperty.SOURCE_ID);
-	    statisticsMessage.computeFrequency(queriables,100);
+	    statisticsMessage.computeFrequency(queriables, 100);
 	    // computes count distinct of 2 queryables
 	    // 	statisticsMessage.countDistinct(//
 	    // 		java.util.Arrays.asList(//
@@ -81,39 +145,50 @@
 	    // 	statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond("seadatanet-open"));
 	    // 	statisticsMessage.groupBy(queryable);
 	    List<ResponseItem> items = executor.compute(statisticsMessage).getItems();
-			out.println("<p>This page lists available protocols from distribution information of each source</p>");
+	    out.println("<h1>Metadata assessment report: distribution protocols</h1>");
 
 	    for (ResponseItem item : items) {
 
-			String sourceId = item.getGroupedBy().get();
-			
-			GSSource source = ConfigurationWrapper.getSource(sourceId);
-			
-			
-			out.println("<h2>"+source.getLabel()+"</h2>");
-			
-				Optional<ComputationResult> frequency = item.getFrequency(MetadataElement.ONLINE_PROTOCOL);
+		String sourceId = item.getGroupedBy().get();
 
-				if (frequency.isPresent()) {
-				    List<TermFrequencyItem> list = frequency.get().getFrequencyItems();
-				    if (!list.isEmpty()) {
-					out.println("<table>");
-					out.println("<tr><th>Term</th><th>Occurrences</th></tr>");
-					for (TermFrequencyItem it : list) {
-					    String label = it.getLabel();
-					    int freq = it.getFreq();
-					    String term = it.getTerm();
-					    out.println("<tr><td>"+term + "</td><td>"+ freq + "</td></tr>");
-					}
-					out.println("</table>");
-				    } else {
-					out.println("Empty list");
-				    }
-				} else {
-				    out.println("Frequency not present");
-				}
+		GSSource source = ConfigurationWrapper.getSource(sourceId);
+
+		if (source == null) {
+	    out.println("<br/><br/><b>SOURCE NOT FOUND: " + sourceId + "</b>");
+	    continue;
+		}
+
+		out.println("<h2>" + source.getLabel() + "</h2>");
+
+		Optional<ComputationResult> frequency = item.getFrequency(MetadataElement.ONLINE_PROTOCOL);
+
+		if (frequency.isPresent()) {
+
+	    List<TermFrequencyItem> list = frequency.get().getFrequencyItems();
+
+	    if (!list.isEmpty()) {
+			out.println("<table>");
+			out.println("<tr><th>Count</th><th>Value</th></tr>");
+			for (TermFrequencyItem it : list) {
+			    String label = it.getLabel();
+			    int freq = it.getFreq();
+			    String term = it.getTerm();
+			    String encodedTerm = URLEncoder.encode(term, StandardCharsets.UTF_8);
+			    out.println("<tr><td>" + freq + "</td><td><a href='#' onclick=loadIframe('contentFrame-" + source.getUniqueIdentifier()
+				    + "','distribution-report.jsp?view=" + view + "&source=" + source.getUniqueIdentifier() + "&protocol="
+				    + encodedTerm + "')>" + term + "</a></td></tr>");
+			}
+			out.println("</table><iframe id='contentFrame-" + source.getUniqueIdentifier() + "'></iframe>");
+
+	    } else {
+			out.println("Empty list");
+	    }
+		} else {
+	    out.println("Frequency not present");
+		}
 
 	    }
+	}
 	%>
 </body>
 </html>
