@@ -1,6 +1,5 @@
 package eu.essi_lab.stress.plan;
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+
 import org.apache.commons.io.IOUtils;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Mattia Santoro

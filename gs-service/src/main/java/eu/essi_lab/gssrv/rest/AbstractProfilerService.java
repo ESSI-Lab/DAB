@@ -22,6 +22,7 @@ package eu.essi_lab.gssrv.rest;
  */
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.ConfigurationChangeListener;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.utils.Chronometer.TimeFormat;
@@ -56,7 +58,45 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  * @see Profiler
  * @see ProfilerSettingFilter
  */
+@SuppressWarnings("rawtypes")
 public abstract class AbstractProfilerService {
+
+    /**
+     * 
+     */
+    private static final HashMap<String, Class<? extends Profiler>> PROFILERS_MAP = new HashMap<>();
+    private static List<ProfilerSetting> profilerSettings;
+
+    /**
+     * 
+     */
+    private static final ProfilerSettingsListener LISTENER = new ProfilerSettingsListener();
+
+    /**
+     * @author Fabrizio
+     */
+    private static class ProfilerSettingsListener implements ConfigurationChangeListener {
+
+	@Override
+	public void configurationChanged(ConfigurationChangeEvent event) {
+
+	    if (event.getEventType() == ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED) {
+
+		profilerSettings = ConfigurationWrapper.getProfilerSettings();
+	    }
+	}
+    }
+
+    static {
+
+	PluginsLoader<Profiler> pluginsLoader = new PluginsLoader<>();
+	List<Profiler> profilers = pluginsLoader.loadPlugins(Profiler.class);
+
+	for (Profiler profiler : profilers) {
+
+	    PROFILERS_MAP.put(profiler.getType(), profiler.getClass());
+	}
+    }
 
     /**
      * Creates a {@link WebRequest} from the given arguments, selects the suitable
@@ -68,8 +108,13 @@ public abstract class AbstractProfilerService {
      * @param uriInfo
      * @return
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("unchecked")
     protected Response serve(ProfilerSettingFilter strategy, HttpServletRequest httpServletRequest, UriInfo uriInfo) {
+
+	if (profilerSettings == null) {
+	    ConfigurationWrapper.getConfiguration().get().addChangeEventListener(LISTENER);
+	    profilerSettings = ConfigurationWrapper.getProfilerSettings();
+	}
 
 	ChronometerInfoProvider chronometer = new ChronometerInfoProvider(TimeFormat.MIN_SEC_MLS);
 	chronometer.start();
@@ -98,9 +143,8 @@ public abstract class AbstractProfilerService {
 
 	if (ex == null) {
 
-	    Optional<ProfilerSetting> profilerSetting = ConfigurationWrapper.//
-		    getProfilerSettings().//
-		    stream().//
+	    Optional<ProfilerSetting> profilerSetting = profilerSettings.//
+		    parallelStream().//
 		    filter(strategy::accept).//
 		    findFirst();
 
@@ -108,12 +152,8 @@ public abstract class AbstractProfilerService {
 
 		try {
 
-		    PluginsLoader<Profiler> pluginsLoader = new PluginsLoader<>();
-		    List<Profiler> profilers = pluginsLoader.loadPlugins(Profiler.class);
-
-		    optProfiler = profilers.stream().//
-			    filter(p -> p.getType().equals(profilerSetting.get().getConfigurableType())).//
-			    findFirst();
+		    optProfiler = Optional
+			    .of(PROFILERS_MAP.get(profilerSetting.get().getConfigurableType()).getDeclaredConstructor().newInstance());
 
 		} catch (Exception e) {
 

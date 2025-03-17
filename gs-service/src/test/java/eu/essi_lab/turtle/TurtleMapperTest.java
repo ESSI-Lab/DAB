@@ -5,7 +5,6 @@ import java.io.InputStream;
 import org.junit.Test;
 
 import eu.essi_lab.gssrv.conf.task.turtle.TurtleMapper;
-import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.DatasetCollection;
 
 public class TurtleMapperTest {

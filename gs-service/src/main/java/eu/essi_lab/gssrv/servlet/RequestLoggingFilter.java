@@ -33,8 +33,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-
 public class RequestLoggingFilter implements Filter {
 
     @Override
