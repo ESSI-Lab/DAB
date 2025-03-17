@@ -3,8 +3,6 @@
  */
 package eu.essi_lab.database.ftp.server;
 
-import java.io.File;
-
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.FtpException;
@@ -57,6 +55,7 @@ public class DatabaseFTPService {
 	UserFactory userFactory = new UserFactory();
 	userFactory.setName("admin");
 	userFactory.setPassword("admin");
+	// userFactory.setHomeDirectory(new File("D://MLCPData").getAbsolutePath());
 
 	User admin = userFactory.createUser();
 
@@ -70,6 +69,7 @@ public class DatabaseFTPService {
 	//
 
 	DatabaseFileSystemFactory factory = DatabaseFileSystemFactory.get(database);
+	factory.setSTORTempDir("C:\\Users\\Fabrizio\\AppData\\Local\\Temp\\fz3temp-2");
 
 	serverFactory.setFileSystem(factory);
 
@@ -80,6 +80,14 @@ public class DatabaseFTPService {
 	ListenerFactory listenerFactory = new ListenerFactory();
 	listenerFactory.setPort(2221);
 	serverFactory.addListener("default", listenerFactory.createListener());
+
+	//
+	//
+	//
+
+	// DatabaseFtpCommandFactory commandFactory =
+	// DatabaseFtpCommandFactory.get(serverFactory.getCommandFactory());//
+	// serverFactory.setCommandFactory(commandFactory);
 
 	//
 	//

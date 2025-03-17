@@ -181,7 +181,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
 	try {
-	    // debugQueries = true;
+	     debugQueries = true;
 
 	    SearchResponse<Object> searchResponse = search_(message, true);
 
@@ -233,7 +233,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     @Override
     public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
 
-	// debugQueries = true;
+	 debugQueries = true;
 
 	ResultSet<GSResource> resultSet = new ResultSet<>();
 	List<GSResource> resources = null;

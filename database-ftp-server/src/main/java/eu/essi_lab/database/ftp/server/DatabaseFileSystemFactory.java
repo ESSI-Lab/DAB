@@ -37,6 +37,7 @@ import eu.essi_lab.api.database.Database;
 public class DatabaseFileSystemFactory implements FileSystemFactory {
 
     private Database database;
+    private String tempSTORdir;
 
     /**
      * 
@@ -63,6 +64,14 @@ public class DatabaseFileSystemFactory implements FileSystemFactory {
     @Override
     public FileSystemView createFileSystemView(User user) throws FtpException {
 
-	return new DatabaseFileSystemView(database,user);
+	return new DatabaseFileSystemView(database,user,tempSTORdir);
+    }
+
+    /**
+     * @param tempSTORdir
+     */
+    public void setSTORTempDir(String tempSTORdir) {
+	
+	this.tempSTORdir = tempSTORdir;	
     }
 }

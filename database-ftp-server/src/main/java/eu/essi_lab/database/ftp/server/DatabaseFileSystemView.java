@@ -47,17 +47,20 @@ public class DatabaseFileSystemView implements FileSystemView {
     private Database database;
     private User user;
     private String currDir;
+    private String tempSTORdir;
 
     static final List<File> TEMP_FILES = new ArrayList<File>();
 
     /**
      * @param database
      * @param user
+     * @param tempSTORdir 
      */
-    DatabaseFileSystemView(Database database, User user) {
+    DatabaseFileSystemView(Database database, User user, String tempSTORdir) {
 
 	this.database = database;
 	this.user = user;
+	this.tempSTORdir = tempSTORdir;
 	this.currDir = ROOT;
     }
 
@@ -91,7 +94,7 @@ public class DatabaseFileSystemView implements FileSystemView {
     @Override
     public FtpFile getFile(String file) throws FtpException {
 
-	return new DatabaseFtpFile(database, currDir, file, user);
+	return new DatabaseFtpFile(database, currDir, file, user, tempSTORdir);
     }
 
     @Override

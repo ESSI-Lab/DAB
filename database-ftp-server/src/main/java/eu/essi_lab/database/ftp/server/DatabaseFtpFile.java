@@ -5,6 +5,7 @@ package eu.essi_lab.database.ftp.server;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 /*-
  * #%L
@@ -43,8 +44,14 @@ import org.apache.ftpserver.ftplet.User;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
 
 /**
  * @author Fabrizio
@@ -60,6 +67,7 @@ public class DatabaseFtpFile implements FtpFile {
     private String _file;
     private User user;
     private File file;
+    private String tempSTORdir;
 
     /**
      * @param database
@@ -68,7 +76,7 @@ public class DatabaseFtpFile implements FtpFile {
      */
     DatabaseFtpFile(Database database, String source, User user) {
 
-	this(database, source, null, user);
+	this(database, source, null, user, null);
     }
 
     /**
@@ -76,12 +84,13 @@ public class DatabaseFtpFile implements FtpFile {
      * @param file
      * @param user
      */
-    DatabaseFtpFile(Database database, String dir, String file, User user) {
+    DatabaseFtpFile(Database database, String dir, String file, User user, String tempSTORdir) {
 
 	this.database = database;
 	this.dir = dir;
 	this._file = file;
 	this.user = user;
+	this.tempSTORdir = tempSTORdir;
     }
 
     @Override
@@ -131,7 +140,7 @@ public class DatabaseFtpFile implements FtpFile {
     @Override
     public boolean isWritable() {
 
-	return false;
+	return true;
     }
 
     @Override
@@ -230,7 +239,7 @@ public class DatabaseFtpFile implements FtpFile {
 			database, //
 			folder.getName(), //
 			key, //
-			user)));
+			user, tempSTORdir)));
 	    }
 
 	    return list;
@@ -243,10 +252,75 @@ public class DatabaseFtpFile implements FtpFile {
 	return null;
     }
 
+    /**
+     * @return
+     */
+    public DatabaseFolder getFolder() {
+
+	try {
+	    return database.getFolder(this.dir);
+	} catch (GSException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
+	return null;
+    }
+
+    /**
+     * @return
+     */
+    public String get_fileName() {
+
+	return _file;
+    }
+
     @Override
     public OutputStream createOutputStream(long offset) throws IOException {
 
-	return null;
+	FileInputStream fileInputStream = new FileInputStream(new File(tempSTORdir, _file));
+
+	FolderEntry entry = null;
+	EntryType type = null;
+
+	try {
+
+	    if (_file.equals(HarvestingProperties.FILE_NAME)) {
+
+		entry = FolderEntry.of(fileInputStream);
+		type = EntryType.HARVESTING_PROPERTIES;
+
+	    } else if (_file.endsWith(SourceStorageWorker.DATA_FOLDER_POSTFIX)) {
+
+		entry = FolderEntry.of(new DataFolderIndexDocument(fileInputStream).getDocument());
+		type = EntryType.DATA_FOLDER_INDEX_DOC;
+
+	    } else {
+
+		GSResource gsResource = GSResource.create(fileInputStream);
+
+		entry = FolderEntry.of(gsResource.asDocument(false));
+		type = EntryType.GS_RESOURCE;
+	    }
+
+	    getFolder().replace(_file, entry, type);
+
+	} catch (Exception e) {
+
+	    throw new IOException(e.getMessage());
+	}
+
+	RandomAccessFile raf = new RandomAccessFile(new File(tempSTORdir, _file), "rw");
+	raf.setLength(offset);
+	raf.seek(offset);
+
+	return new FileOutputStream(raf.getFD()) {
+	    @Override
+	    public void close() throws IOException {
+		super.close();
+		raf.close();
+	    }
+	};
     }
 
     @Override
