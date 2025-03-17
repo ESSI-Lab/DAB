@@ -20,22 +20,24 @@ import eu.essi_lab.api.database.Database;
 public class DatabaseFTPService {
 
     private Database database;
+    private String storTempDir;
 
     /**
      * @param database
      */
-    private DatabaseFTPService(Database database) {
+    private DatabaseFTPService(Database database, String storTempDir) {
 
 	this.database = database;
+	this.storTempDir = storTempDir;
     }
 
     /**
      * @param database
      * @return
      */
-    public static DatabaseFTPService get(Database database) {
+    public static DatabaseFTPService get(Database database, String storTempDir) {
 
-	return new DatabaseFTPService(database);
+	return new DatabaseFTPService(database,storTempDir);
     }
 
     /**
@@ -69,7 +71,7 @@ public class DatabaseFTPService {
 	//
 
 	DatabaseFileSystemFactory factory = DatabaseFileSystemFactory.get(database);
-	factory.setSTORTempDir("C:\\Users\\Fabrizio\\AppData\\Local\\Temp\\fz3temp-2");
+	factory.setSTORTempDir(storTempDir);
 
 	serverFactory.setFileSystem(factory);
 
