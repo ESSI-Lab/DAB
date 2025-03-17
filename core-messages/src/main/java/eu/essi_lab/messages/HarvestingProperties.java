@@ -52,6 +52,11 @@ public class HarvestingProperties extends Properties {
     /**
      * 
      */
+    public static final String FILE_NAME = "harvesting.properties";
+
+    /**
+     * 
+     */
     public HarvestingProperties() {
 
 	setHarvestingCount(0);
@@ -62,7 +67,7 @@ public class HarvestingProperties extends Properties {
      */
     public static String getFileName() {
 
-	return "harvesting.properties";
+	return FILE_NAME;
     }
 
     /**
