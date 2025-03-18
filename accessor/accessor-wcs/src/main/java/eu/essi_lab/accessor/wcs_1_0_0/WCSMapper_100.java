@@ -55,7 +55,7 @@ public class WCSMapper_100 extends WCSMapper {
 
 	List<String> out = null;
 	try {
-	    out = capabilities.evaluateTextContent("/*:WCS_Capabilities/*:Service/*:keywords/*:keyword/text()");
+	    out = capabilities.evaluateTextContent("/*:CoverageDescription/*:CoverageOffering/*:keywords/*:keyword/text()");
 	} catch (XPathExpressionException e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}

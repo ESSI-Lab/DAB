@@ -69,7 +69,7 @@ public class WCSMapper_110 extends WCSMapper {
 
 	List<String> out = null;
 	try {
-	    out = reader.evaluateTextContent("/*:Capabilities/*:ServiceIdentification/*:Keywords/*:Keyword/text()");
+	    out = reader.evaluateTextContent("/*:CoverageDescription/*:CoverageOffering/*:Keywords/*:Keyword/text()");
 	} catch (XPathExpressionException e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
