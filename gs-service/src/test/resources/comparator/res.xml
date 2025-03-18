@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<gs:Dataset xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<gs:source gs:uniqueIdentifier="FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--c1abb3c3-6ce6-48a1-a646-deb8d68d6954" gs:strategy="HARVESTED" gs:resultsPriority="UNSET" gs:orderingDirection="ASCENDING">
+		<gs:endpoint>http://nsidc.org/cgi-bin/atlas_south?</gs:endpoint>
+		<gs:label>Atlas of the Cryosphere: Southern Hemisphere (WCS)</gs:label>
+		<gs:deployment>geoss</gs:deployment>
+	</gs:source>
+	<gs:harmonizedMetadata>
+		<gs:coreMetadata>
+			<gs:isoMetadata>
+				<gmi:MI_Metadata>
+					<gmd:fileIdentifier>
+						<gco:CharacterString>sea_ice_concentration_01@FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--c1abb3c3-6ce6-48a1-a646-deb8d68d6954</gco:CharacterString>
+					</gmd:fileIdentifier>
+					<gmd:contact>
+						<gmd:CI_ResponsibleParty>
+							<gmd:individualName>
+								<gco:CharacterString>NSIDC User Services</gco:CharacterString>
+							</gmd:individualName>
+							<gmd:organisationName>
+								<gco:CharacterString>National Snow and Ice Data Center</gco:CharacterString>
+							</gmd:organisationName>
+							<gmd:positionName>
+								<gco:CharacterString>User Services</gco:CharacterString>
+							</gmd:positionName>
+							<gmd:contactInfo>
+								<gmd:CI_Contact>
+									<gmd:address>
+										<gmd:CI_Address>
+											<gmd:deliveryPoint>
+												<gco:CharacterString>CIRES, 449 UCB, University of Colorado</gco:CharacterString>
+											</gmd:deliveryPoint>
+											<gmd:city>
+												<gco:CharacterString>Boulder</gco:CharacterString>
+											</gmd:city>
+											<gmd:administrativeArea>
+												<gco:CharacterString>CO</gco:CharacterString>
+											</gmd:administrativeArea>
+											<gmd:postalCode>
+												<gco:CharacterString>80309-0449</gco:CharacterString>
+											</gmd:postalCode>
+											<gmd:country>
+												<gco:CharacterString>USA</gco:CharacterString>
+											</gmd:country>
+											<gmd:electronicMailAddress>
+												<gco:CharacterString>nsidc@nsidc.org</gco:CharacterString>
+											</gmd:electronicMailAddress>
+										</gmd:CI_Address>
+									</gmd:address>
+								</gmd:CI_Contact>
+							</gmd:contactInfo>
+						</gmd:CI_ResponsibleParty>
+					</gmd:contact>
+					<gmd:spatialRepresentationInfo>
+						<gmd:AbstractMD_SpatialRepresentation xsi:type="gmd:MD_GridSpatialRepresentation_Type">
+							<gmd:numberOfDimensions>
+								<gco:Integer>2</gco:Integer>
+							</gmd:numberOfDimensions>
+							<gmd:axisDimensionProperties>
+								<gmd:MD_Dimension>
+									<gmd:dimensionName>
+										<gmd:MD_DimensionNameTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_DimensionNameTypeCode" codeListValue="row" codeSpace="ISOTC211/19115">row</gmd:MD_DimensionNameTypeCode>
+									</gmd:dimensionName>
+									<gmd:dimensionSize>
+										<gco:Integer>316</gco:Integer>
+									</gmd:dimensionSize>
+									<gmd:resolution>
+										<gco:Measure uom="unknown">25000.0</gco:Measure>
+									</gmd:resolution>
+								</gmd:MD_Dimension>
+							</gmd:axisDimensionProperties>
+							<gmd:axisDimensionProperties>
+								<gmd:MD_Dimension>
+									<gmd:dimensionName>
+										<gmd:MD_DimensionNameTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_DimensionNameTypeCode" codeListValue="column" codeSpace="ISOTC211/19115">column</gmd:MD_DimensionNameTypeCode>
+									</gmd:dimensionName>
+									<gmd:dimensionSize>
+										<gco:Integer>332</gco:Integer>
+									</gmd:dimensionSize>
+									<gmd:resolution>
+										<gco:Measure uom="unknown">-25000.0</gco:Measure>
+									</gmd:resolution>
+								</gmd:MD_Dimension>
+							</gmd:axisDimensionProperties>
+						</gmd:AbstractMD_SpatialRepresentation>
+					</gmd:spatialRepresentationInfo>
+					<gmd:referenceSystemInfo>
+						<gmd:MD_ReferenceSystem>
+							<gmd:referenceSystemIdentifier>
+								<gmd:RS_Identifier>
+									<gmd:code>
+										<gco:CharacterString>EPSG:3031</gco:CharacterString>
+									</gmd:code>
+								</gmd:RS_Identifier>
+							</gmd:referenceSystemIdentifier>
+						</gmd:MD_ReferenceSystem>
+					</gmd:referenceSystemInfo>
+					<gmd:referenceSystemInfo>
+						<gmd:MD_ReferenceSystem>
+							<gmd:referenceSystemIdentifier>
+								<gmd:RS_Identifier>
+									<gmd:code>
+										<gco:CharacterString>EPSG:4326</gco:CharacterString>
+									</gmd:code>
+								</gmd:RS_Identifier>
+							</gmd:referenceSystemIdentifier>
+						</gmd:MD_ReferenceSystem>
+					</gmd:referenceSystemInfo>
+					<gmd:referenceSystemInfo>
+						<gmd:MD_ReferenceSystem>
+							<gmd:referenceSystemIdentifier>
+								<gmd:RS_Identifier>
+									<gmd:code>
+										<gco:CharacterString>EPSG:3409</gco:CharacterString>
+									</gmd:code>
+								</gmd:RS_Identifier>
+							</gmd:referenceSystemIdentifier>
+						</gmd:MD_ReferenceSystem>
+					</gmd:referenceSystemInfo>
+					<gmd:referenceSystemInfo>
+						<gmd:MD_ReferenceSystem>
+							<gmd:referenceSystemIdentifier>
+								<gmd:RS_Identifier>
+									<gmd:code>
+										<gco:CharacterString>EPSG:3410</gco:CharacterString>
+									</gmd:code>
+								</gmd:RS_Identifier>
+							</gmd:referenceSystemIdentifier>
+						</gmd:MD_ReferenceSystem>
+					</gmd:referenceSystemInfo>
+					<gmd:referenceSystemInfo>
+						<gmd:MD_ReferenceSystem>
+							<gmd:referenceSystemIdentifier>
+								<gmd:RS_Identifier>
+									<gmd:code>
+										<gco:CharacterString>EPSG:3412</gco:CharacterString>
+									</gmd:code>
+								</gmd:RS_Identifier>
+							</gmd:referenceSystemIdentifier>
+						</gmd:MD_ReferenceSystem>
+					</gmd:referenceSystemInfo>
+					<gmd:referenceSystemInfo>
+						<gmd:MD_ReferenceSystem>
+							<gmd:referenceSystemIdentifier>
+								<gmd:RS_Identifier>
+									<gmd:code>
+										<gco:CharacterString>EPSG:3974</gco:CharacterString>
+									</gmd:code>
+								</gmd:RS_Identifier>
+							</gmd:referenceSystemIdentifier>
+						</gmd:MD_ReferenceSystem>
+					</gmd:referenceSystemInfo>
+					<gmd:referenceSystemInfo>
+						<gmd:MD_ReferenceSystem>
+							<gmd:referenceSystemIdentifier>
+								<gmd:RS_Identifier>
+									<gmd:code>
+										<gco:CharacterString>EPSG:3975</gco:CharacterString>
+									</gmd:code>
+								</gmd:RS_Identifier>
+							</gmd:referenceSystemIdentifier>
+						</gmd:MD_ReferenceSystem>
+					</gmd:referenceSystemInfo>
+					<gmd:referenceSystemInfo>
+						<gmd:MD_ReferenceSystem>
+							<gmd:referenceSystemIdentifier>
+								<gmd:RS_Identifier>
+									<gmd:code>
+										<gco:CharacterString>EPSG:3976</gco:CharacterString>
+									</gmd:code>
+								</gmd:RS_Identifier>
+							</gmd:referenceSystemIdentifier>
+						</gmd:MD_ReferenceSystem>
+					</gmd:referenceSystemInfo>
+					<gmd:referenceSystemInfo>
+						<gmd:MD_ReferenceSystem>
+							<gmd:referenceSystemIdentifier>
+								<gmd:RS_Identifier>
+									<gmd:code>
+										<gco:CharacterString>EPSG:32761</gco:CharacterString>
+									</gmd:code>
+								</gmd:RS_Identifier>
+							</gmd:referenceSystemIdentifier>
+						</gmd:MD_ReferenceSystem>
+					</gmd:referenceSystemInfo>
+					<gmd:identificationInfo>
+						<gmd:MD_DataIdentification>
+							<gmd:citation>
+								<gmd:CI_Citation>
+									<gmd:title>
+										<gco:CharacterString>sea ice concentration, January (1979-2007)</gco:CharacterString>
+									</gmd:title>
+								</gmd:CI_Citation>
+							</gmd:citation>
+							<gmd:abstract>
+								<gco:CharacterString>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</gco:CharacterString>
+							</gmd:abstract>
+							<gmd:descriptiveKeywords>
+								<gmd:MD_Keywords>
+									<gmd:keyword>
+										<gco:CharacterString>Antarctica</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:keyword>
+										<gco:CharacterString>Cryosphere</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:keyword>
+										<gco:CharacterString>Earth Science</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:keyword>
+										<gco:CharacterString>Oceans</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:keyword>
+										<gco:CharacterString>Polar</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:keyword>
+										<gco:CharacterString>Sea Ice</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:keyword>
+										<gco:CharacterString>Sea Ice Concentration</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:keyword>
+										<gco:CharacterString>Southern Hemisphere</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:keyword>
+										<gco:CharacterString>Southern Ocean</gco:CharacterString>
+									</gmd:keyword>
+								</gmd:MD_Keywords>
+							</gmd:descriptiveKeywords>
+							<gmd:extent>
+								<gmd:EX_Extent>
+									<gmd:geographicElement>
+										<gmd:EX_GeographicBoundingBox>
+											<gmd:westBoundLongitude>
+												<gco:Decimal>-179.99999861886300323021714575588703155517578125</gco:Decimal>
+											</gmd:westBoundLongitude>
+											<gmd:eastBoundLongitude>
+												<gco:Decimal>178.854238518267010249473969452083110809326171875</gco:Decimal>
+											</gmd:eastBoundLongitude>
+											<gmd:southBoundLatitude>
+												<gco:Decimal>-53.77171810624979997328409808687865734100341796875</gco:Decimal>
+											</gmd:southBoundLatitude>
+											<gmd:northBoundLatitude>
+												<gco:Decimal>-34.90371526437530036446332815103232860565185546875</gco:Decimal>
+											</gmd:northBoundLatitude>
+										</gmd:EX_GeographicBoundingBox>
+									</gmd:geographicElement>
+								</gmd:EX_Extent>
+							</gmd:extent>
+						</gmd:MD_DataIdentification>
+					</gmd:identificationInfo>
+					<gmd:distributionInfo>
+						<gmd:MD_Distribution>
+							<gmd:distributionFormat>
+								<gmd:MD_Format>
+									<gmd:name>
+										<gco:CharacterString>GeoTIFF</gco:CharacterString>
+									</gmd:name>
+								</gmd:MD_Format>
+							</gmd:distributionFormat>
+							<gmd:transferOptions>
+								<gmd:MD_DigitalTransferOptions>
+									<gmd:onLine>
+										<gmd:CI_OnlineResource>
+											<gmd:linkage>
+												<gmd:URL>http://nsidc.org/cgi-bin/atlas_south?</gmd:URL>
+											</gmd:linkage>
+											<gmd:protocol>
+												<gco:CharacterString>urn:ogc:serviceType:WebCoverageService:1.0.0:HTTP</gco:CharacterString>
+											</gmd:protocol>
+											<gmd:name>
+												<gco:CharacterString>sea_ice_concentration_01</gco:CharacterString>
+											</gmd:name>
+											<gmd:function>
+												<gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="ISOTC211/19115">download</gmd:CI_OnLineFunctionCode>
+											</gmd:function>
+										</gmd:CI_OnlineResource>
+									</gmd:onLine>
+								</gmd:MD_DigitalTransferOptions>
+							</gmd:transferOptions>
+						</gmd:MD_Distribution>
+					</gmd:distributionInfo>
+				</gmi:MI_Metadata>
+			</gs:isoMetadata>
+		</gs:coreMetadata>
+		<gs:augmentedMetadata/>
+		<gs:extendedMetadata>
+			<gs:extension>
+				<gs:geometry>POLYGON ((-179.999998618863 -53.7717181062498, -179.999998618863 -34.9037152643753, 178.854238518267 -34.9037152643753, 178.854238518267 -53.7717181062498, -179.999998618863 -53.7717181062498))</gs:geometry>
+				<gs:centroid>POINT (-0.5728800502979985 -44.33771668531255)</gs:centroid>
+				<gs:area>6770.862766122074</gs:area>
+			</gs:extension>
+		</gs:extendedMetadata>
+	</gs:harmonizedMetadata>
+	<gs:originalMetadata>
+		<gs:schemeURI>WCS_SCHEME_WCSConnector_100</gs:schemeURI>
+		<gs:metadata>&lt;![CDATA[&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;CoverageDescription xmlns=&amp;quot;http://www.opengis.net/wcs&amp;quot;
+                     xmlns:gml=&amp;quot;http://www.opengis.net/gml&amp;quot;
+                     xmlns:xlink=&amp;quot;http://www.w3.org/1999/xlink&amp;quot;
+                     xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;
+                     updateSequence=&amp;quot;0&amp;quot;
+                     version=&amp;quot;1.0.0&amp;quot;
+                     xsi:schemaLocation=&amp;quot;http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/describeCoverage.xsd&amp;quot;&amp;gt;
+  &amp;lt;CoverageOffering&amp;gt;
+      &amp;lt;description&amp;gt;Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.&amp;lt;/description&amp;gt;
+      &amp;lt;name&amp;gt;sea_ice_concentration_01&amp;lt;/name&amp;gt;
+      &amp;lt;label&amp;gt;sea ice concentration, January (1979-2007)&amp;lt;/label&amp;gt;
+      &amp;lt;lonLatEnvelope srsName=&amp;quot;urn:ogc:def:crs:OGC:1.3:CRS84&amp;quot;&amp;gt;
+         &amp;lt;gml:pos&amp;gt;-179.999998618863 -53.7717181062498&amp;lt;/gml:pos&amp;gt;
+         &amp;lt;gml:pos&amp;gt;178.854238518267 -34.9037152643753&amp;lt;/gml:pos&amp;gt;
+      &amp;lt;/lonLatEnvelope&amp;gt;
+      &amp;lt;keywords&amp;gt;
+         &amp;lt;keyword&amp;gt;Antarctica&amp;lt;/keyword&amp;gt;
+         &amp;lt;keyword&amp;gt;Cryosphere&amp;lt;/keyword&amp;gt;
+         &amp;lt;keyword&amp;gt;Earth Science&amp;lt;/keyword&amp;gt;
+         &amp;lt;keyword&amp;gt;Oceans&amp;lt;/keyword&amp;gt;
+         &amp;lt;keyword&amp;gt;Polar&amp;lt;/keyword&amp;gt;
+         &amp;lt;keyword&amp;gt;Sea Ice&amp;lt;/keyword&amp;gt;
+         &amp;lt;keyword&amp;gt;Sea Ice Concentration&amp;lt;/keyword&amp;gt;
+         &amp;lt;keyword&amp;gt;Southern Hemisphere&amp;lt;/keyword&amp;gt;
+         &amp;lt;keyword&amp;gt;Southern Ocean&amp;lt;/keyword&amp;gt;
+      &amp;lt;/keywords&amp;gt;
+      &amp;lt;domainSet&amp;gt;
+         &amp;lt;spatialDomain&amp;gt;
+            &amp;lt;gml:Envelope srsName=&amp;quot;EPSG:4326&amp;quot;&amp;gt;
+               &amp;lt;gml:pos&amp;gt;-179.999998618863 -53.7717181062498&amp;lt;/gml:pos&amp;gt;
+               &amp;lt;gml:pos&amp;gt;178.854238518267 -34.9037152643753&amp;lt;/gml:pos&amp;gt;
+            &amp;lt;/gml:Envelope&amp;gt;
+            &amp;lt;gml:Envelope srsName=&amp;quot;EPSG:3031&amp;quot;&amp;gt;
+               &amp;lt;gml:pos&amp;gt;-3961770.085 -3961769.906&amp;lt;/gml:pos&amp;gt;
+               &amp;lt;gml:pos&amp;gt;3961769.894 4362961.971&amp;lt;/gml:pos&amp;gt;
+            &amp;lt;/gml:Envelope&amp;gt;
+            &amp;lt;gml:RectifiedGrid dimension=&amp;quot;2&amp;quot;&amp;gt;
+               &amp;lt;gml:limits&amp;gt;
+                  &amp;lt;gml:GridEnvelope&amp;gt;
+                     &amp;lt;gml:low&amp;gt;0 0&amp;lt;/gml:low&amp;gt;
+                     &amp;lt;gml:high&amp;gt;316 332&amp;lt;/gml:high&amp;gt;
+                  &amp;lt;/gml:GridEnvelope&amp;gt;
+               &amp;lt;/gml:limits&amp;gt;
+               &amp;lt;gml:axisName&amp;gt;x&amp;lt;/gml:axisName&amp;gt;
+               &amp;lt;gml:axisName&amp;gt;y&amp;lt;/gml:axisName&amp;gt;
+               &amp;lt;gml:origin&amp;gt;
+                  &amp;lt;gml:pos&amp;gt;-3961770.085 4362961.971&amp;lt;/gml:pos&amp;gt;
+               &amp;lt;/gml:origin&amp;gt;
+               &amp;lt;gml:offsetVector&amp;gt;25000 0&amp;lt;/gml:offsetVector&amp;gt;
+               &amp;lt;gml:offsetVector&amp;gt;0 -25000&amp;lt;/gml:offsetVector&amp;gt;
+            &amp;lt;/gml:RectifiedGrid&amp;gt;
+         &amp;lt;/spatialDomain&amp;gt;
+      &amp;lt;/domainSet&amp;gt;
+      &amp;lt;rangeSet&amp;gt;
+         &amp;lt;RangeSet&amp;gt;
+            &amp;lt;description&amp;gt;0 = open water; 15-100 = % concentration (e.g. 50 = 50%); 253 = coastline; 254 = land mask; 255 = missing data&amp;lt;/description&amp;gt;
+            &amp;lt;name&amp;gt;pixels&amp;lt;/name&amp;gt;
+            &amp;lt;label&amp;gt;sea ice concentration&amp;lt;/label&amp;gt;
+         &amp;lt;/RangeSet&amp;gt;
+      &amp;lt;/rangeSet&amp;gt;
+      &amp;lt;supportedCRSs&amp;gt;
+         &amp;lt;requestResponseCRSs&amp;gt;EPSG:3031&amp;lt;/requestResponseCRSs&amp;gt;
+         &amp;lt;requestResponseCRSs&amp;gt;EPSG:4326&amp;lt;/requestResponseCRSs&amp;gt;
+         &amp;lt;requestResponseCRSs&amp;gt;EPSG:3409&amp;lt;/requestResponseCRSs&amp;gt;
+         &amp;lt;requestResponseCRSs&amp;gt;EPSG:3410&amp;lt;/requestResponseCRSs&amp;gt;
+         &amp;lt;requestResponseCRSs&amp;gt;EPSG:3412&amp;lt;/requestResponseCRSs&amp;gt;
+         &amp;lt;requestResponseCRSs&amp;gt;EPSG:3974&amp;lt;/requestResponseCRSs&amp;gt;
+         &amp;lt;requestResponseCRSs&amp;gt;EPSG:3975&amp;lt;/requestResponseCRSs&amp;gt;
+         &amp;lt;requestResponseCRSs&amp;gt;EPSG:3976&amp;lt;/requestResponseCRSs&amp;gt;
+         &amp;lt;requestResponseCRSs&amp;gt;EPSG:32761&amp;lt;/requestResponseCRSs&amp;gt;
+         &amp;lt;nativeCRSs&amp;gt;EPSG:3031&amp;lt;/nativeCRSs&amp;gt;
+      &amp;lt;/supportedCRSs&amp;gt;
+      &amp;lt;supportedFormats&amp;gt;
+         &amp;lt;formats&amp;gt;GeoTIFF&amp;lt;/formats&amp;gt;
+      &amp;lt;/supportedFormats&amp;gt;
+      &amp;lt;supportedInterpolations default=&amp;quot;nearest neighbor&amp;quot;&amp;gt;
+         &amp;lt;interpolationMethod&amp;gt;nearest neighbor&amp;lt;/interpolationMethod&amp;gt;
+         &amp;lt;interpolationMethod&amp;gt;bilinear&amp;lt;/interpolationMethod&amp;gt;
+      &amp;lt;/supportedInterpolations&amp;gt;
+  &amp;lt;/CoverageOffering&amp;gt;
+&amp;lt;/CoverageDescription&amp;gt;
+]]&gt;</gs:metadata>
+		<additionalInfo/>
+	</gs:originalMetadata>
+	<gs:indexesMetadata>
+		<gs:originalId>sea_ice_concentration_01</gs:originalId>
+		<gs:privateId>sea_ice_concentration_01@FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--c1abb3c3-6ce6-48a1-a646-deb8d68d6954</gs:privateId>
+		<gs:resourceType>Dataset</gs:resourceType>
+		<gs:resourceTimeStamp>2025-03-18T09:54:36.465Z</gs:resourceTimeStamp>
+		<gs:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--c1abb3c3-6ce6-48a1-a646-deb8d68d6954</gs:sourceId>
+		<gs:sourceDeployment>geoss</gs:sourceDeployment>
+		<gs:metadataQuality>4</gs:metadataQuality>
+		<gs:recoveryRemovalToken>a47a4421-9d27-4c28-b2a7-e3c9e6d5bc44</gs:recoveryRemovalToken>
+		<gs:anyText>sea_ice_concentration_01@FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--c1abb3c3-6ce6-48a1-a646-deb8d68d6954 NSIDC User Services National Snow and Ice Data Center User Services CIRES, 449 UCB, University of Colorado Boulder CO 80309-0449 USA nsidc@nsidc.org 2 row 316 25000.0 column 332 -25000.0 EPSG:3031 EPSG:4326 EPSG:3409 EPSG:3410 EPSG:3412 EPSG:3974 EPSG:3975 EPSG:3976 EPSG:32761 sea ice concentration, January (1979-2007) Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies. Antarctica Cryosphere Earth Science Oceans Polar Sea Ice Sea Ice Concentration Southern Hemisphere Southern Ocean -179.99999861886300323021714575588703155517578125 178.854238518267010249473969452083110809326171875 -53.77171810624979997328409808687865734100341796875 -34.90371526437530036446332815103232860565185546875 GeoTIFF http://nsidc.org/cgi-bin/atlas_south? urn:ogc:serviceType:WebCoverageService:1.0.0:HTTP sea_ice_concentration_01 download</gs:anyText>
+		<gs:keywordBlueCloud>Antarctica</gs:keywordBlueCloud>
+		<gs:keywordBlueCloud>Cryosphere</gs:keywordBlueCloud>
+		<gs:keywordBlueCloud>Earth Science</gs:keywordBlueCloud>
+		<gs:keywordBlueCloud>Oceans</gs:keywordBlueCloud>
+		<gs:keywordBlueCloud>Polar</gs:keywordBlueCloud>
+		<gs:keywordBlueCloud>Sea Ice</gs:keywordBlueCloud>
+		<gs:keywordBlueCloud>Sea Ice Concentration</gs:keywordBlueCloud>
+		<gs:keywordBlueCloud>Southern Hemisphere</gs:keywordBlueCloud>
+		<gs:keywordBlueCloud>Southern Ocean</gs:keywordBlueCloud>
+		<gs:keyword>Antarctica</gs:keyword>
+		<gs:keyword>Cryosphere</gs:keyword>
+		<gs:keyword>Earth Science</gs:keyword>
+		<gs:keyword>Oceans</gs:keyword>
+		<gs:keyword>Polar</gs:keyword>
+		<gs:keyword>Sea Ice</gs:keyword>
+		<gs:keyword>Sea Ice Concentration</gs:keyword>
+		<gs:keyword>Southern Hemisphere</gs:keyword>
+		<gs:keyword>Southern Ocean</gs:keyword>
+		<gs:dataSize>104912</gs:dataSize>
+		<gs:onlineLinkage>http://nsidc.org/cgi-bin/atlas_south?</gs:onlineLinkage>
+		<gs:fileId>sea_ice_concentration_01@FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--c1abb3c3-6ce6-48a1-a646-deb8d68d6954</gs:fileId>
+		<gs:title>sea ice concentration, January (1979-2007)</gs:title>
+		<gs:abstract>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</gs:abstract>
+		<gs:format>GeoTIFF</gs:format>
+		<gs:crsId>EPSG:3031</gs:crsId>
+		<gs:crsId>EPSG:4326</gs:crsId>
+		<gs:crsId>EPSG:3409</gs:crsId>
+		<gs:crsId>EPSG:3410</gs:crsId>
+		<gs:crsId>EPSG:3412</gs:crsId>
+		<gs:crsId>EPSG:3974</gs:crsId>
+		<gs:crsId>EPSG:3975</gs:crsId>
+		<gs:crsId>EPSG:3976</gs:crsId>
+		<gs:crsId>EPSG:32761</gs:crsId>
+		<gs:hasSecurityConst>false</gs:hasSecurityConst>
+		<gs:hasUseLegalConst>false</gs:hasUseLegalConst>
+		<gs:hasAccessLegalConst>false</gs:hasAccessLegalConst>
+		<gs:hasOtherLegalConst>false</gs:hasOtherLegalConst>
+		<gs:protocol>urn:ogc:serviceType:WebCoverageService:1.0.0:HTTP</gs:protocol>
+		<gs:inSitu>false</gs:inSitu>
+		<gs:tmpExtentBegin_Null/>
+		<gs:tmpExtentEnd_Null/>
+		<gs:bbox>
+			<gs:sw>-53.7717181062498 -179.999998618863</gs:sw>
+			<gs:se>-53.7717181062498 178.854238518267</gs:se>
+			<gs:nw>-34.9037152643753 -179.999998618863</gs:nw>
+			<gs:ne>-34.9037152643753 178.854238518267</gs:ne>
+			<gs:isCrossed>false</gs:isCrossed>
+			<gs:area>6770.863</gs:area>
+			<gs:center>-44.33771668531255 -0.5728800502980107</gs:center>
+			<gs:disjValues>
+				<gs:disjSouth>-53.7717181062498</gs:disjSouth>
+				<gs:disjWest>-179.999998618863</gs:disjWest>
+				<gs:disjNorth>-34.9037152643753</gs:disjNorth>
+				<gs:disjEast>178.854238518267</gs:disjEast>
+			</gs:disjValues>
+			<gs:cardinalValues>
+				<gs:values>
+					<gs:south>-53.7717181062498</gs:south>
+					<gs:west>-179.999998618863</gs:west>
+					<gs:east>178.854238518267</gs:east>
+					<gs:north>-34.9037152643753</gs:north>
+				</gs:values>
+			</gs:cardinalValues>
+		</gs:bbox>
+	</gs:indexesMetadata>
+</gs:Dataset>
