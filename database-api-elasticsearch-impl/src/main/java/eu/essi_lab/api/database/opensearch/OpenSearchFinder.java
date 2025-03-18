@@ -267,11 +267,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			message.getRequestId(), //
 			Optional.ofNullable(message.getWebRequest()));
 
-		resources = ConversionUtils.toJSONSourcesList(response).//
-			stream().//
-			map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
-			filter(Objects::nonNull).//
-			collect(Collectors.toList());
+		resources = ConversionUtils.toGSResourcesList(response);
 
 		pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
