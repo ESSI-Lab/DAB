@@ -75,7 +75,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 
 	Properties properties = setting.getKeyValueOptions().orElse(new Properties());
 	fontSize = Integer.valueOf(properties.getOrDefault("legendFontSize", "13").toString());
-	lineSize = Integer.valueOf(properties.getOrDefault("legendLineSize", "20").toString());
+	lineSize = Integer.valueOf(properties.getOrDefault("legendLineSize", "18").toString());
 	fontStyle = properties.getOrDefault("legendFontStyle", "plain").toString().equals("plain") ? Font.PLAIN : Font.BOLD;
     }
 
@@ -303,7 +303,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    }
 
 		    Integer width = Integer.parseInt(widthString);
-		    Integer height = Integer.parseInt(heightString) - lineSize;
+		    Integer height = Integer.parseInt(heightString);
 
 		    BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		    Graphics2D ig2 = bi.createGraphics();
@@ -312,7 +312,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 
 		    ig2.setStroke(new BasicStroke(2));
 
-		    int offset = 10;
+		    int offset = 6;
 
 		    for (InfoLegend infoLegend : infos) {
 
