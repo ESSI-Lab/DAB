@@ -53,6 +53,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio
+ * @author boldrini
  */
 public class SourceAdderTask extends AbstractCustomTask {
 
@@ -75,6 +76,7 @@ public class SourceAdderTask extends AbstractCustomTask {
 	 * offset 1 (minutes to wait before starting the tasks)
 	 * offset 2 (minutes between the start of each task)
 	 * schedule (yes or no)
+	 * sourceDeployment
 	 * Example: (it will expand the his-central at the given endpoint, scheduling the related hydroserver sources at
 	 * interval of 2 minutes from each other. The sources id will have the gfhc prefix)
 	 * CUAHSI_HIS_CENTRAL
@@ -82,7 +84,8 @@ public class SourceAdderTask extends AbstractCustomTask {
 	 * cuahsi-hc
 	 * 0
 	 * 2
-	 * yes
+	 * no
+	 * whos
 	 */
 
 	String type = null;
@@ -91,13 +94,14 @@ public class SourceAdderTask extends AbstractCustomTask {
 	Integer offset1 = null;
 	Integer offset2 = null;
 	String schedule = null;
+	String deployment = null;
 
 	if (taskOptions.isPresent()) {
 	    String options = taskOptions.get();
 	    if (options != null) {
 		if (options.contains("\n")) {
 		    String[] split = options.split("\n");
-		    if (split.length < 6) {
+		    if (split.length < 7) {
 			GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
 			return;
 		    }
@@ -107,10 +111,12 @@ public class SourceAdderTask extends AbstractCustomTask {
 		    offset1 = Integer.parseInt(split[3].trim());
 		    offset2 = Integer.parseInt(split[4].trim());
 		    schedule = split[5].trim();
+		    deployment = split[6].trim();
 		}
 	    }
 	}
-	if (type == null || endpoint == null || id == null || offset1 == null || offset2 == null || schedule == null) {
+	if (type == null || endpoint == null || id == null || offset1 == null || offset2 == null || schedule == null
+		|| deployment == null) {
 	    GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
 	    return;
 	}
@@ -141,6 +147,13 @@ public class SourceAdderTask extends AbstractCustomTask {
 	}
 
 	List<HarvestingSetting> sources = finder.getSources(endpoint, id);
+
+	for (HarvestingSetting source : sources) {
+	    List<String> deployments = source.getSelectedAccessorSetting().getGSSourceSetting().getSourceDeployment();
+	    if (!deployments.contains(deployment)) {
+		source.getSelectedAccessorSetting().getGSSourceSetting().addSourceDeployment(deployment);
+	    }
+	}
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 
@@ -184,48 +197,46 @@ public class SourceAdderTask extends AbstractCustomTask {
 		    stream().//
 		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).findFirst();
 
-	    if (optional.isEmpty()) {
+	    if (schedule.equals("yes")) {
+		Scheduling scheduling = source.getScheduling();
+		scheduling.setEnabled(true);
+		scheduling.setRunIndefinitely();
+		scheduling.setRepeatInterval(1000, TimeUnit.DAYS);
 
-		if (schedule.equals("yes")) {
-		    Scheduling scheduling = source.getScheduling();
-		    scheduling.setEnabled(true);
-		    scheduling.setRunIndefinitely();
-		    scheduling.setRepeatInterval(1000, TimeUnit.DAYS);
+		ZonedDateTime now = ZonedDateTime.now();
 
-		    ZonedDateTime now = ZonedDateTime.now();
+		// the start offset
+		int offset = offset1;
 
-		    // the start offset
-		    int offset = offset1;
-
-		    // the first n sources in a big set starts together (hack for CUAHSI HIS-CENTRAL)
-		    if (bigSet) {
-			int n = 60;
-			if (i < n) {
-			    // the first sources start together
-			} else {
-			    // then the other sources at regular intervals
-			    offset = offset + (i - n) * offset2;
-			}
+		// the first n sources in a big set starts together (hack for CUAHSI HIS-CENTRAL)
+		if (bigSet) {
+		    int n = 60;
+		    if (i < n) {
+			// the first sources start together
 		    } else {
-			offset = offset + i * offset2;
+			// then the other sources at regular intervals
+			offset = offset + (i - n) * offset2;
 		    }
-		    now = now.plusMinutes(offset);
-
-		    ZonedDateTime tokyoTime = now.withZoneSameInstant(ZoneId.of(schedulerSetting.getUserDateTimeZone().getID())); // Format
-
-		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
-		    String formattedDate = tokyoTime.format(formatter);
-
-		    scheduling.setStartTime(formattedDate);
-
-		    scheduler.schedule(source);
-
+		} else {
+		    offset = offset + i * offset2;
 		}
-		SelectionUtils.deepClean(source);
-		configuration.put(source);
-		GSLoggerFactory.getLogger(getClass()).info("Added source: {}", source.getName());
+		now = now.plusMinutes(offset);
+
+		ZonedDateTime tokyoTime = now.withZoneSameInstant(ZoneId.of(schedulerSetting.getUserDateTimeZone().getID())); // Format
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+		String formattedDate = tokyoTime.format(formatter);
+
+		scheduling.setStartTime(formattedDate);
+
+		scheduler.schedule(source);
+
 	    }
+	    SelectionUtils.deepClean(source);
+	    configuration.put(source);
+	    GSLoggerFactory.getLogger(getClass()).info("Added source: {}", source.getName());
+
 	}
 
 	//

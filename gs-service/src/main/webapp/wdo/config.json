@@ -1,0 +1,27 @@
+{
+    "title": "WHOS test portal",
+    "view": "whos-aus-bom-wdo",
+    "centerLat": 0,
+    "centerLon": 0,
+    "zoom": 1,
+    "minZoom": 1,
+    "maxZoom": 10,
+    "token": "whos-d40a452b-b865-4fbe-8165-43a96ebf1b3d",
+    "disclaimer":"<b>Content and purpose</b><br><br>\nAll data on the WMO Hydrological Observing System (hereinafter: WHOS) is made available in accordance with WMO data policy, which supports broadening and enhancing, whenever possible, the free and unrestricted<sup>1</a></sup>\ninternational exchange of meteorological, hydrological, climatological and related environmental data and products. <br><br>\nPlease note that WHOS does not store or archive any data. By leveraging the Discovery and Access Broker technology, WHOS harmonizes, makes interoperable and shares the data that are published by original data providers through their web services.<br><br>\nPlease note that not all data available on WHOS have undergone quality control procedures. Please contact the original data provider in order to get detailed information regarding data quality aspects.<br><br>\nBy accessing WHOS, the user accepts the Terms of Use specified below.<br><br>\n\n<b>Terms of Use</b><br><br>\nThe user accepts all risks which may occur by using the data available on WHOS and accepts to not use the data for commercial purposes without the prior consent of the original data provider, noting that specific conditions of uses and licenses might apply.<br><br>\nThe user may not copy content available on WHOS to create a database in electronic or any other format, or publicly use and distribute it to third persons without prior consent of the original data provider.<br><br>\nThe user will attribute the source of the data for scientific publications and for operational products and services.<br><br>\nWorld Meteorological Organization (hereinafter: WMO) shall not be held liable for any direct or indirect, accidental, material or non-material damages, loses or costs incurred as a result of using data on WHOS. Data that can be searched, viewed or downloaded using WHOS may be updated or modified at any time and WMO shall accept no responsibility for any harm resulting from such changes.<br><br>\nWMO reserves the right to change or amend the Terms of Use for using WHOS and shall not be responsible for any harm that may result from such changes.<br><br>\n<div class='footer_dialog'><span><sup id='footnote-1'>1</sup> “Free and unrestricted” means the data is provided on a non-discriminatory basis and without charge.</span></div><br><br>\n</div>",
+    "disclaimerTitle": "Welcome to WHOS test portal - terms of use",
+    "resultsVisibility": false,
+    "bboxSelectorVisibility": false,
+    "layersSelectorVisibility": false,
+    "layersSelectorButtonVisibility": true,
+    "zoomSlider":true,
+    "defaultLayer": "United Nations",
+    "filters": "source,keyword,organisationName,attributeTitle,platformTitle",
+    "instrumentSearch": true,
+    "attributeSearch": true,
+    "platformSearch": true,
+    "semanticSearch": true,    
+    "semanticSearchValue":1,
+    "ontology": "whos",
+    "riverSearch": true
+    
+}

@@ -275,7 +275,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		}
 		ResponsibleParty poc = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContact();
 		String institute = null;
-		if (poc!=null) {
+		if (poc != null) {
 		    institute = poc.getOrganisationName();
 		}
 		String country = resource.getExtensionHandler().getCountry().isPresent() ? //
@@ -348,11 +348,10 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 		object = create(object, "platform_label", platformLabel, "Station/platform name");
 
-		if (country !=null) {
+		if (country != null) {
 		    object = create(object, "COUNTRY", country, "Country");
 		}
-		if (institute
-			!=null) {
+		if (institute != null) {
 		    object = create(object, "ORIGINATOR", institute, "Originator");
 		}
 		//
@@ -371,8 +370,6 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 		object = create(object, "attribute_units_abbreviation", attributeUnitsAbbreviation, "Measurement unit (abbreviation)");
 
-
-		
 		//
 		// time
 		//
@@ -442,6 +439,11 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		break;
 	    case "his-central":
 		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("hisc/station.html");
+		break;
+	    default:
+		if (viewId.contains("whos")) {
+		    stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("whos/station.html");
+		}
 		break;
 	    }
 
