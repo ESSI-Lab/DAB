@@ -140,7 +140,7 @@ public class WAFClient {
      */
     public List<URL> listFiles() throws Exception {
 
-	return findURLs(this.url, true, null, null, this.absolutePathReference);
+	return findURLs(this.url, true, null, null, this.absolutePathReference, null, null);
     }
 
     /**
@@ -332,7 +332,7 @@ public class WAFClient {
      */
     public static List<URL> listFiles(WAF_URL url) throws Exception {
 
-	return findURLs(url.getURL(), true, null, null, false);
+	return findURLs(url.getURL(), true, null, null, false, null, null);
     }
 
     /**
@@ -343,7 +343,20 @@ public class WAFClient {
      */
     public static List<URL> listFiles(WAF_URL url, boolean absolutePathReference) throws Exception {
 
-	return findURLs(url.getURL(), true, null, null, absolutePathReference);
+	return findURLs(url.getURL(), true, null, null, absolutePathReference, null, null);
+    }
+    
+    /**
+     * @param url
+     * @param absolutePathReference
+     * @param user
+     * @param password
+     * @return
+     * @throws Exception
+     */
+    public static List<URL> listFiles(WAF_URL url, boolean absolutePathReference, String user, String password) throws Exception {
+
+	return findURLs(url.getURL(), true, null, null, absolutePathReference, user, password);
     }
 
     /**
@@ -355,7 +368,7 @@ public class WAFClient {
      */
     public static List<URL> listFiles(WAF_URL url, Predicate<? super URL> filter, boolean absolutePathReference) throws Exception {
 
-	return findURLs(url.getURL(), true, filter, null, absolutePathReference);
+	return findURLs(url.getURL(), true, filter, null, absolutePathReference, null, null);
     }
 
     /**
@@ -364,7 +377,7 @@ public class WAFClient {
      */
     public static List<URL> listFiles(WAF_URL url, Predicate<? super URL> filter) throws Exception {
 
-	return findURLs(url.getURL(), true, filter, null, false);
+	return findURLs(url.getURL(), true, filter, null, false, null, null);
     }
 
     /**
@@ -376,7 +389,7 @@ public class WAFClient {
      */
     public static List<URL> listFiles(WAF_URL url, Predicate<? super URL> filter, Predicate<? super URL> foldersFilter) throws Exception {
 
-	return findURLs(url.getURL(), true, filter, foldersFilter, false);
+	return findURLs(url.getURL(), true, filter, foldersFilter, false, null, null);
     }
 
     /**
@@ -393,7 +406,7 @@ public class WAFClient {
 	    Predicate<? super URL> foldersFilter, //
 	    boolean absolutePathReference) throws Exception {
 
-	return findURLs(url.getURL(), true, filter, foldersFilter, absolutePathReference);
+	return findURLs(url.getURL(), true, filter, foldersFilter, absolutePathReference, null, null);
     }
 
     /**
@@ -404,7 +417,7 @@ public class WAFClient {
      */
     public static List<WAF_URL> listFolders(WAF_URL url, Predicate<? super URL> foldersFilter) throws Exception {
 
-	return findURLs(url.getURL(), false, null, foldersFilter, false).//
+	return findURLs(url.getURL(), false, null, foldersFilter, false, null, null).//
 		stream().//
 		map(WAF_URL::new).//
 		collect(Collectors.toList());
@@ -420,7 +433,7 @@ public class WAFClient {
     public static List<WAF_URL> listFolders(WAF_URL url, Predicate<? super URL> foldersFilter, boolean absolutePathReference)
 	    throws Exception {
 
-	return findURLs(url.getURL(), false, null, foldersFilter, absolutePathReference).stream().//
+	return findURLs(url.getURL(), false, null, foldersFilter, absolutePathReference, null, null).stream().//
 		map(WAF_URL::new).//
 		collect(Collectors.toList());
     }
@@ -497,14 +510,19 @@ public class WAFClient {
     private List<URL> findURLs(boolean files, Predicate<? super URL> fileFilter, Predicate<? super URL> dirFilter,
 	    boolean absolutePathReference) throws Exception {
 
-	return findURLs(this.url, files, fileFilter, dirFilter, absolutePathReference);
+	return findURLs(this.url, files, fileFilter, dirFilter, absolutePathReference, null, null);
     }
 
+    
+    
     /**
      * @param url
      * @param files
      * @param fileFilter
      * @param dirFilter
+     * @param absPathRef
+     * @param username
+     * @param password
      * @return
      */
     private static List<URL> findURLs(//
@@ -512,7 +530,7 @@ public class WAFClient {
 	    boolean files, //
 	    Predicate<? super URL> fileFilter, //
 	    Predicate<? super URL> dirFilter, //
-	    boolean absPathRef) throws Exception {
+	    boolean absPathRef, String username, String password) throws Exception {
 
 	if (fileFilter == null) {
 
@@ -525,6 +543,10 @@ public class WAFClient {
 	}
 
 	HREFGrabberClient client = new HREFGrabberClient();
+	if(username != null && password != null) {
+	    client.setUsername(username);
+	    client.setPassword(password);
+	}
 
 	List<String> links = client.grabLinks(url, null);
 
