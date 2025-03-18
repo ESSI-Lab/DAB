@@ -581,7 +581,6 @@ public class OpenSearchQueryBuilder {
 
 	return buildFilterQuery(//
 		buildDatabaseIdQuery(databaseId), //
-		buildIndexQuery(MetaFolderMapping.get().getIndex()), //
 		buildExistsFieldQuery(MetaFolderMapping.DATA_FOLDER), //
 		buildShouldQuery(idsQueries)//
 	);
