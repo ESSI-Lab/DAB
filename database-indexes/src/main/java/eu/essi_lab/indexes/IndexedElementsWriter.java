@@ -60,7 +60,7 @@ public class IndexedElementsWriter {
 	// add the source deployment
 	//
 	List<String> deployment = resource.getSource().getDeployment();
-	if (deployment != null) {
+	if (deployment != null && !resource.getPropertyHandler().getSourceDeployment().equals(deployment)) {
 	    deployment.forEach(dep -> resource.getPropertyHandler().addSourceDeployment(dep));
 	}
 
