@@ -30,7 +30,8 @@ import org.quartz.JobExecutionContext;
 import eu.essi_lab.adk.harvest.IHarvestedAccessor;
 import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.task.CustomTask;
+import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
+import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask.ExecutionStage;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.harvester.worker.HarvesterWorker.RecoveringContext;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
@@ -55,7 +56,7 @@ public class Harvester {
     private HarvesterPlan harvesterPlan;
     private SourceStorage sourceStorage;
     private HarvestingReportsHandler reportsHandler;
-    private CustomTask customTask;
+    private HarvestingEmbeddedTask customTask;
     @SuppressWarnings("rawtypes")
     private IHarvestedAccessor harvesterAccessor;
 
@@ -217,6 +218,13 @@ public class Harvester {
 		properties.setCompleted(true);
 	    }
 
+	    ExecutionStage executionStage = customTask.getExecutionStage();
+
+	    if (executionStage == ExecutionStage.BEFORE_HARVESTING_END) {
+
+		handleCustomTask(getAccessor().getSource(), context, status);
+	    }
+
 	    getSourceStorage().harvestingEnded(//
 		    getAccessor().getSource(), //
 		    Optional.of(properties), //
@@ -224,8 +232,10 @@ public class Harvester {
 		    Optional.ofNullable(status), //
 		    Optional.of(request));
 
-	    // handles custom task only if the end procedure is successful
-	    handleCustomTask(getAccessor().getSource(), context, status);
+	    if (executionStage == ExecutionStage.AFTER_HARVESTING_END) {
+
+		handleCustomTask(getAccessor().getSource(), context, status);
+	    }
 
 	} catch (GSException ex) {
 
@@ -275,7 +285,7 @@ public class Harvester {
     /**
      * @param customTask
      */
-    public void setCustomTask(CustomTask customTask) {
+    public void setCustomTask(HarvestingEmbeddedTask customTask) {
 
 	this.customTask = customTask;
     }

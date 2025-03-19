@@ -39,6 +39,8 @@ import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
+import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
+import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask.ExecutionStage;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.gssrv.conf.task.collection.ParameterCollectionCreator;
 import eu.essi_lab.gssrv.conf.task.collection.SourceCollectionCreator;
@@ -54,7 +56,7 @@ import eu.essi_lab.profiler.wis.WISUtils;
 /**
  * @author boldrini
  */
-public class CollectionCreatorTask extends AbstractCustomTask {
+public class CollectionCreatorTask extends AbstractCustomTask implements HarvestingEmbeddedTask {
 
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
@@ -206,6 +208,12 @@ public class CollectionCreatorTask extends AbstractCustomTask {
     public String getName() {
 
 	return "Collection creator task";
+    }
+
+    @Override
+    public ExecutionStage getExecutionStage() {
+
+	return ExecutionStage.AFTER_HARVESTING_END;
     }
 
 }
