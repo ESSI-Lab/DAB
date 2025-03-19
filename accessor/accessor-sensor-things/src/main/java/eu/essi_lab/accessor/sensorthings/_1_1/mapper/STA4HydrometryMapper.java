@@ -113,16 +113,22 @@ public class STA4HydrometryMapper extends SensorThingsMapper {
 	//
 	String unitName = unitOfMeasurement.getName();
 	if (!unitName.isEmpty()) {
+	    // e.g. millimeters
 	    handler.setAttributeUnits(unitName);
 	}
-	// String unitDef = unitOfMeasurement.getDefinition();
-
 	//
 	// Attribute units abbreviation
 	//
 	String unitSymbol = unitOfMeasurement.getSymbol();
 	if (!unitSymbol.isEmpty()) {
+	    // e.g. mm
 	    handler.setAttributeUnitsAbbreviation(unitSymbol);
+	}
+	
+	String unitDefinition= unitOfMeasurement.getDefinition();
+	if (!unitDefinition.isEmpty()) {
+	    // e.g. https://data.geoscience.fr/ncl/uom/491
+	    handler.setAttributeUnitsURI(unitDefinition);
 	}
 
 	// Example:

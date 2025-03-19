@@ -1,4 +1,4 @@
 eu.essi_lab.accessor.sos.downloader.SOSDownloader
-eu.essi_lab.accessor.sos.bom.downloader.SOSBOMDownloader
+eu.essi_lab.accessor.sos.bom.SOSBOMDownloader
 eu.essi_lab.accessor.sos.downloader._1_0_0.SOSDownloader
 eu.essi_lab.accessor.sos.tahmo.SOSTAHMODownloader

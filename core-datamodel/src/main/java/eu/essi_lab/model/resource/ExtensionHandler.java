@@ -232,6 +232,48 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
+    
+    public Optional<String> getRiverBasin() {
+
+   	try {
+   	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.RIVER_BASIN_EL_NAME));
+   	} catch (XPathExpressionException e) {
+   	    e.printStackTrace();
+   	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+   	}
+
+   	return Optional.empty();
+       }
+
+       public void setRiverBasin(String riverBasin) {
+   	try {
+   	    this.metadata.add(MetadataElement.RIVER_BASIN_EL_NAME, riverBasin);
+   	} catch (Exception e) {
+   	    e.printStackTrace();
+   	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+   	}
+       }
+
+    public Optional<String> getRiver() {
+
+	try {
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.RIVER_EL_NAME));
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    public void setRiver(String river) {
+	try {
+	    this.metadata.add(MetadataElement.RIVER_EL_NAME, river);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
 
     public Optional<String> getCountry() {
 

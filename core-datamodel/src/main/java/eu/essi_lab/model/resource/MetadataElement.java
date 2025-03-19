@@ -537,7 +537,8 @@ public enum MetadataElement implements Queryable {
     STATION_IDENTIFIER(MetadataElement.STATION_IDENTIFIER_EL_NAME), //
     COUNTRY(MetadataElement.COUNTRY_EL_NAME, false, true, ContentType.TEXTUAL, true), //
     COUNTRY_ISO3(MetadataElement.COUNTRY_ISO3_EL_NAME, false, true, ContentType.TEXTUAL, true), //
-    RIVER(MetadataElement.RIVER_EL_NAME), //
+    RIVER(MetadataElement.RIVER_EL_NAME, ContentType.TEXTUAL), //
+    RIVER_BASIN(MetadataElement.RIVER_BASIN_EL_NAME, ContentType.TEXTUAL), //
     LAKE_STATION(MetadataElement.LAKE_STATION_EL_NAME), //
     GRDC_ID(MetadataElement.GRDC_ID_EL_NAME), //
     GRDC_ARDB(MetadataElement.GRDC_ARDB_EL_NAME), //
@@ -656,6 +657,7 @@ public enum MetadataElement implements Queryable {
     // public static final String INSTITUTE = "Institute";
     // public static final String STATION_NAME="StationName";
     public static final String RIVER_EL_NAME = "River";
+    public static final String RIVER_BASIN_EL_NAME = "RiverBasin";
     public static final String LAKE_STATION_EL_NAME = "LakeStation";
     public static final String GRDC_ID_EL_NAME = "GRDCid";
     public static final String GRDC_ARDB_EL_NAME = "GRDCardb";
