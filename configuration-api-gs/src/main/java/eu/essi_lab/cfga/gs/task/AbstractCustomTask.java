@@ -27,6 +27,7 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.GSSource;
 
 /**
  * @author Fabrizio
@@ -37,6 +38,25 @@ public abstract class AbstractCustomTask implements CustomTask {
      * 
      */
     protected Optional<S3TransferWrapper> manager;
+    private GSSource source;
+
+    /**
+     * @param source
+     */
+    @Override
+    public void setSource(GSSource source) {
+
+	this.source = source;
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public Optional<GSSource> getSource() {
+
+	return Optional.ofNullable(source);
+    }
 
     /**
      * @param status

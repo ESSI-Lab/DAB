@@ -1,5 +1,7 @@
 package eu.essi_lab.cfga.gs.task;
 
+import java.util.Optional;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -26,6 +28,7 @@ import org.quartz.JobExecutionContext;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
 import eu.essi_lab.cfga.scheduler.Task;
 import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.model.GSSource;
 
 /**
  * @author Fabrizio
@@ -48,6 +51,16 @@ public interface CustomTask extends Task {
 
 	return false;
     }
+
+    /**
+     * @param source
+     */
+    public void setSource(GSSource source);
+
+    /**
+     * @return
+     */
+    public Optional<GSSource> getSource();
 
     /**
      * @return
