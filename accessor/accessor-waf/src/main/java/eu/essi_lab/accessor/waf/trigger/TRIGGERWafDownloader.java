@@ -54,7 +54,7 @@ public class TRIGGERWafDownloader extends DataDownloader {
 
     @Override
     public boolean canDownload() {
-	return online.getProtocol().equals(TRIGGERWafConnector.S3_TRIGGER_PROTOCOL);
+	return online.getProtocol().equals(TRIGGERWafConnector.WAF_TRIGGER_PROTOCOL);
     }
 
     @Override
