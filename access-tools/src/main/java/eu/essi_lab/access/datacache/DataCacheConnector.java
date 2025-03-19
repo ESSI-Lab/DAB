@@ -234,6 +234,8 @@ public abstract class DataCacheConnector {
     public abstract void deleteStations(String sourceIdentifier) throws Exception;
     
     public abstract void deleteStations(String sourceIdentifier,String theme) throws Exception;
+    
+    public abstract void deleteStation(String stationId) throws Exception;
 
     public abstract void writeStation(StationRecord record) throws Exception;
 

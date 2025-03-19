@@ -282,12 +282,13 @@ public class NetCDF_To_WML20_Processor extends DataProcessor {
 	Attribute unitAbbreviationAttribute = mainVariable.findAttributeIgnoreCase(NetCDFAttribute.WML_UNIT_ABBREVIATION.getNetCDFName());
 	if (unitAbbreviationAttribute != null) {
 	    String unitAbbreviation = unitAbbreviationAttribute.getStringValue();
+	    unitReference.setCode(unitAbbreviation);
 
 	}
 	Attribute unitCodeAttribute = mainVariable.findAttributeIgnoreCase(NetCDFAttribute.WML_UNIT_CODE.getNetCDFName());
 	if (unitCodeAttribute != null) {
 	    String unitCode = unitCodeAttribute.getStringValue();
-	    unitReference.setCode(unitCode);
+	    unitReference.setHref(unitCode);
 	}
 	Attribute unitNameAttribute = mainVariable.findAttributeIgnoreCase(NetCDFAttribute.WML_UNIT_NAME.getNetCDFName());
 	if (unitNameAttribute != null) {

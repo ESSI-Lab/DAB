@@ -35,6 +35,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -864,17 +867,18 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	if (what.isPresent() && !what.get().equals(KeyValueParser.UNDEFINED)) {
 
+	    String w = URLDecoder.decode(what.get(),StandardCharsets.UTF_8);
 	    LogicalBond orBond = BondFactory.createOrBond();
 
 	    orBond.getOperands().add(BondFactory.createSimpleValueBond(//
 		    BondOperator.TEXT_SEARCH, //
 		    MetadataElement.TITLE, //
-		    what.get()));
+		    w));
 
 	    orBond.getOperands().add(BondFactory.createSimpleValueBond(//
 		    BondOperator.TEXT_SEARCH, //
 		    MetadataElement.KEYWORD, //
-		    what.get()));
+		    w));
 
 	    andBond.getOperands().add(orBond);
 	}
@@ -887,6 +891,9 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	    if (csSources != null && !csSources.isEmpty()) {
 
+		csSources= URLDecoder.decode(csSources,StandardCharsets.UTF_8);
+
+		
 		if (csSources.contains(",")) {
 
 		    String[] split = csSources.split(",");
@@ -1023,6 +1030,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    String value = propertyString.get();
 
 	    if (value != null && !value.isEmpty()) {
+		value = URLDecoder.decode(value, StandardCharsets.UTF_8);
 		if (value.contains(",")) {
 		    String[] split = value.split(",");
 
@@ -1073,7 +1081,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    String value = propertyString.get();
 
 	    if (value != null && !value.isEmpty()) {
-
+		value = URLDecoder.decode(value, StandardCharsets.UTF_8);
 		if (value.contains(",")) {
 		    String[] split = value.split(",");
 		    LogicalBond orBond = BondFactory.createOrBond();
@@ -1081,7 +1089,6 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 			SimpleValueBond sourceBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, s);
 			orBond.getOperands().add(sourceBond);
 		    }
-
 		    andBond.getOperands().add(orBond);
 		} else {
 		    SimpleValueBond sourceBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, value);
