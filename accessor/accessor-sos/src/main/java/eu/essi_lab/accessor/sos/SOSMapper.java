@@ -122,10 +122,24 @@ public class SOSMapper extends OriginalIdentifierMapper {
 	    parameterName = parameterIdentifier;
 	}
 
-	String uom = properties.getProperty(SOSProperty.OBSERVED_PROPERTY_UOM);
+	String uom = properties.getProperty(SOSProperty.OBSERVED_PROPERTY_UOM_CODE);
 	if (uom != null) {
-
 	    dataset.getExtensionHandler().setAttributeUnitsAbbreviation(uom);
+	}
+	
+	String timeInterpolation = properties.getProperty(SOSProperty.PROCEDURE_TIME_INTERPOLATION);
+	if (timeInterpolation != null) {
+	    dataset.getExtensionHandler().setTimeInterpolation(timeInterpolation);
+	}
+	
+	String timeResolution = properties.getProperty(SOSProperty.PROCEDURE_TIME_RESOLUTION);
+	if (timeResolution != null) {
+	    dataset.getExtensionHandler().setTimeResolutionDuration8601(timeResolution);
+	}
+	
+	String timeAggregation = properties.getProperty(SOSProperty.PROCEDURE_TIME_AGGREGATION);
+	if (timeAggregation != null) {
+	    dataset.getExtensionHandler().setTimeAggregationDuration8601(timeAggregation);
 	}
 
 	String stationCode = properties.getProperty(SOSProperty.FOI_ID);
@@ -365,7 +379,13 @@ public class SOSMapper extends OriginalIdentifierMapper {
 	//
 	//
 	//
-	dataset.getExtensionHandler().setCountry(properties.getProperty(SOSProperty.SENSOR_ContactOwnerAddressCountry));
+	
+	String country = properties.getProperty(SOSProperty.FOI_COUNTRY);
+	if (country==null) {
+	    // as a second attempt
+	    country  = properties.getProperty(SOSProperty.SENSOR_ContactOwnerAddressCountry);
+	}	
+	dataset.getExtensionHandler().setCountry(country);
 
 	// try {
 	// VerticalExtent verticalExtent = new VerticalExtent();

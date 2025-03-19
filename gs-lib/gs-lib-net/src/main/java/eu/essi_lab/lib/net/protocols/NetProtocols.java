@@ -61,6 +61,7 @@ import eu.essi_lab.lib.net.protocols.impl.SAVAHISProtocol;
 import eu.essi_lab.lib.net.protocols.impl.SOSProtocol;
 import eu.essi_lab.lib.net.protocols.impl.SOS_1_0_0Protocol;
 import eu.essi_lab.lib.net.protocols.impl.SOS_2_0_0Protocol;
+import eu.essi_lab.lib.net.protocols.impl.SOS_2_0_0_BOMProtocol;
 import eu.essi_lab.lib.net.protocols.impl.SOS_2_0_0_HydroProfileProtocol;
 import eu.essi_lab.lib.net.protocols.impl.SOS_2_0_0_TAHMOProtocol;
 import eu.essi_lab.lib.net.protocols.impl.SensorThings_1_0_BRGM_WQ_Protocol;
@@ -141,6 +142,7 @@ public class NetProtocols {
     public static NetProtocol SOS_1_0_0 = new SOS_1_0_0Protocol();
     public static NetProtocol SOS_2_0_0_HydroProfile = new SOS_2_0_0_HydroProfileProtocol();
     public static NetProtocol SOS_2_0_0 = new SOS_2_0_0Protocol();
+    public static NetProtocol SOS_2_0_0_BOM = new SOS_2_0_0_BOMProtocol();
     public static NetProtocol SOS_2_0_0_TAHMO = new SOS_2_0_0_TAHMOProtocol();
     public static NetProtocol SOS = new SOSProtocol();
     public static NetProtocol TILED_SERVICE = new TILED_SERVICEProtocol();

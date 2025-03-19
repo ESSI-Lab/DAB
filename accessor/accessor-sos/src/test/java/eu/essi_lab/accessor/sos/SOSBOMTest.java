@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Node;
 
+import eu.essi_lab.accessor.sos.bom.SOSBOMConnector;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 

@@ -403,7 +403,7 @@ public class SOSConnector extends eu.essi_lab.accessor.sos.SOSConnector {
 
 			    sosProperties.setProperty(SOSProperty.OBSERVED_PROPERTY_ID, propertyDef);
 			    sosProperties.setProperty(SOSProperty.OBSERVED_PROPERTY_NAME, propertyName);
-			    sosProperties.setProperty(SOSProperty.OBSERVED_PROPERTY_UOM, propertyUom);
+			    sosProperties.setProperty(SOSProperty.OBSERVED_PROPERTY_UOM_CODE, propertyUom);
 
 			    sosProperties.setProperty(SOSProperty.PROCEDURE_TITLE, name.get());
 
