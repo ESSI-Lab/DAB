@@ -44,7 +44,6 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
@@ -64,9 +63,7 @@ public class SourceAdderTask extends AbstractCustomTask {
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
-	CustomTaskSetting taskSettings = retrieveSetting(context);
-
-	Optional<String> taskOptions = taskSettings.getTaskOptions();
+	Optional<String> taskOptions = readTaskOptions(context);
 
 	/**
 	 * Three options are present:

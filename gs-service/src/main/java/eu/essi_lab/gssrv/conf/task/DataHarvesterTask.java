@@ -40,7 +40,6 @@ import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.TaskListExecutor;
@@ -62,11 +61,10 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	log(status, "Data harvester task STARTED");
 
 	while (true) {
-	    
-	    // SETTINGS RETRIEVAL
-	    CustomTaskSetting taskSettings = retrieveSetting(context);
 
-	    Optional<String> taskOptions = taskSettings.getTaskOptions();
+	    // SETTINGS RETRIEVAL
+
+	    Optional<String> taskOptions = readTaskOptions(context);
 
 	    String sourceId = null;
 	    Integer threadsCount = 1;
@@ -84,9 +82,9 @@ public class DataHarvesterTask extends AbstractCustomTask {
 		    }
 		}
 	    }
-	    
+
 	    // CHECKING CANCELED JOB
-	    
+
 	    if (ConfigurationWrapper.isJobCanceled(context)) {
 		GSLoggerFactory.getLogger(getClass()).info("Data harvester task CANCELED source id {} ", sourceId);
 
@@ -110,7 +108,6 @@ public class DataHarvesterTask extends AbstractCustomTask {
 		dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
 		DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
 	    }
-
 
 	    List<SimpleEntry<String, Date>> nextExpectedRecords = dataCacheConnector.getExpectedAvailableRecords(sourceId);
 
@@ -228,9 +225,8 @@ public class DataHarvesterTask extends AbstractCustomTask {
 		throwable.printStackTrace();
 	    }
 
-
 	}
-	
+
 	log(status, "Data harvester task ENDED");
     }
 

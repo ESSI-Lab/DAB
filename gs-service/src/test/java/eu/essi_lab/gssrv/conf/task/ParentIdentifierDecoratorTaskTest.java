@@ -53,7 +53,7 @@ public class ParentIdentifierDecoratorTaskTest {
 	@Test
 	public void test1() throws Exception {
 
-		Mockito.doReturn(Optional.empty()).when(task).readTaskOptions(Mockito.any(), Mockito.any());
+		Mockito.doReturn(Optional.empty()).when(task).readTaskOptions(Mockito.any());
 
 		task.doJob(Mockito.mock(JobExecutionContext.class), Mockito.mock(SchedulerJobStatus.class));
 	}
@@ -62,7 +62,7 @@ public class ParentIdentifierDecoratorTaskTest {
 	public void test2() throws Exception {
 
 		String sourceids = "s1,s2";
-		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any(), Mockito.any());
+		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any());
 
 		List<GSSource> configuredSources = new ArrayList<>();
 		GSSource source1 = new GSSource();
@@ -90,7 +90,7 @@ public class ParentIdentifierDecoratorTaskTest {
 	public void test3() throws Exception {
 
 		String sourceids = "s1,s2";
-		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any(), Mockito.any());
+		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any());
 
 		List<GSSource> configuredSources = new ArrayList<>();
 		GSSource source1 = new GSSource();
@@ -163,7 +163,7 @@ public class ParentIdentifierDecoratorTaskTest {
 	public void test4() throws Exception {
 
 		String sourceids = "s1,s2";
-		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any(), Mockito.any());
+		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any());
 
 		List<GSSource> configuredSources = new ArrayList<>();
 		GSSource source1 = new GSSource();
@@ -249,7 +249,7 @@ public class ParentIdentifierDecoratorTaskTest {
 	public void test5() throws Exception {
 
 		String sourceids = "s1,s2";
-		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any(), Mockito.any());
+		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any());
 
 		List<GSSource> configuredSources = new ArrayList<>();
 		GSSource source1 = new GSSource();
@@ -339,7 +339,7 @@ public class ParentIdentifierDecoratorTaskTest {
 	public void test6() throws Exception {
 
 		String sourceids = "s1,s2";
-		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any(), Mockito.any());
+		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any());
 
 		List<GSSource> configuredSources = new ArrayList<>();
 		GSSource source1 = new GSSource();
@@ -475,7 +475,7 @@ public class ParentIdentifierDecoratorTaskTest {
 	public void test7() throws Exception {
 
 		String sourceids = "s1,s2";
-		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any(), Mockito.any());
+		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any());
 
 		List<GSSource> configuredSources = new ArrayList<>();
 		GSSource source1 = new GSSource();
@@ -651,7 +651,7 @@ public class ParentIdentifierDecoratorTaskTest {
 	public void test8() throws Exception {
 
 		String sourceids = "s1,s2";
-		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any(), Mockito.any());
+		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any());
 
 		List<GSSource> configuredSources = new ArrayList<>();
 		GSSource source1 = new GSSource();
@@ -800,7 +800,7 @@ public class ParentIdentifierDecoratorTaskTest {
 	public void test9() throws Exception {
 
 		String sourceids = "s1,s2";
-		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any(), Mockito.any());
+		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any());
 
 		List<GSSource> configuredSources = new ArrayList<>();
 		GSSource source1 = new GSSource();
@@ -962,7 +962,7 @@ public class ParentIdentifierDecoratorTaskTest {
 	public void test10() throws Exception {
 
 		String sourceids = "s1,s2";
-		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any(), Mockito.any());
+		Mockito.doReturn(Optional.of(sourceids)).when(task).readTaskOptions(Mockito.any());
 
 		List<GSSource> configuredSources = new ArrayList<>();
 		GSSource source1 = new GSSource();

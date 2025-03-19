@@ -33,7 +33,6 @@ import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.JobStatus.JobPhase;
@@ -55,9 +54,7 @@ public class PrivateIdEncoderTask extends AbstractCustomTask {
 	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 	MarkLogicWrapper wrapper = ((MarkLogicDatabase) dbReader.getDatabase()).getWrapper();
 
-	CustomTaskSetting setting = retrieveSetting(context);
-
-	Optional<String> taskOptions = setting.getTaskOptions();
+	Optional<String> taskOptions = readTaskOptions(context);
 
 	if (!taskOptions.isPresent()) {
 

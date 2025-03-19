@@ -143,7 +143,7 @@ public class ErrorLogsPublisherTask extends AbstractCustomTask implements ErrorL
 		createLogFolder();
 	    }
 
-	    Optional<String> taskOptions = retrieveSetting(context).getTaskOptions();
+	    Optional<String> taskOptions = readTaskOptions(context);
 
 	    boolean daysBeforeLogs = taskOptions.isPresent() && taskOptions.get().contains("true");
 
