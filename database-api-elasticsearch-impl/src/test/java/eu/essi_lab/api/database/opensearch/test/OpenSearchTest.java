@@ -19,9 +19,10 @@ import eu.essi_lab.model.exceptions.GSException;
  */
 public class OpenSearchTest {
 
-   
     @Before
     public void before() throws GSException, OpenSearchException, IOException {
+
+	System.setProperty("initIndexes", "true");
 
 	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(OpenSearchDatabase.createLocalServiceInfo());
 
