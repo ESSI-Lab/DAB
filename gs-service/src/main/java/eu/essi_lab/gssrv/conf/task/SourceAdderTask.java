@@ -49,6 +49,7 @@ import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.GSSource;
 
 /**
  * @author Fabrizio
@@ -57,7 +58,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class SourceAdderTask extends AbstractCustomTask {
 
     public enum SourceType {
-	SIMPLE_CUAHSI_SOURCES, CUAHSI_HIS_CENTRAL
+	SIMPLE_CUAHSI_SOURCES, CUAHSI_HIS_CENTRAL, ISPRA_HIS_CENTRAL
     }
 
     @Override
@@ -83,6 +84,15 @@ public class SourceAdderTask extends AbstractCustomTask {
 	 * 2
 	 * no
 	 * whos
+	 * 
+	 * Example for ISPRA HIS-CENTRAL:
+	 * ISPRA_HIS_CENTRAL
+	 * null
+	 * null
+	 * 0
+	 * 2
+	 * no
+	 * his-central
 	 */
 
 	String type = null;
@@ -137,6 +147,9 @@ public class SourceAdderTask extends AbstractCustomTask {
 	    break;
 	case CUAHSI_HIS_CENTRAL:
 	    finder = new CUAHSISourceFinder();
+	    break;
+	case ISPRA_HIS_CENTRAL:
+	    finder = new ISPRASourceFinder();
 	    break;
 	default:
 	    GSLoggerFactory.getLogger(getClass()).error("This should not happen");
@@ -198,11 +211,14 @@ public class SourceAdderTask extends AbstractCustomTask {
 
 	    String sourceId = source.getSelectedAccessorSetting().getSource().getUniqueIdentifier();
 
-	    Optional<HarvestingSetting> optional = ConfigurationWrapper.//
+	    SelectionUtils.deepClean(source);
+	    Optional<HarvestingSetting> existingSource = ConfigurationWrapper.//
 		    getHarvestingSettings().//
 		    stream().//
 		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).findFirst();
-
+	    if (existingSource.isEmpty()) {
+		configuration.put(source);
+	    }
 	    if (schedule.equals("yes")) {
 		Scheduling scheduling = source.getScheduling();
 		scheduling.setEnabled(true);
@@ -239,8 +255,6 @@ public class SourceAdderTask extends AbstractCustomTask {
 		scheduler.schedule(source);
 
 	    }
-	    SelectionUtils.deepClean(source);
-	    configuration.put(source);
 	    GSLoggerFactory.getLogger(getClass()).info("Added source: {}", source.getName());
 
 	}
