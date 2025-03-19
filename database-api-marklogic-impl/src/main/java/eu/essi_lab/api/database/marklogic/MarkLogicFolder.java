@@ -31,9 +31,11 @@ import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
+import eu.essi_lab.model.resource.GSResource;
 
 /**
  * @author Fabrizio
@@ -111,6 +113,12 @@ public class MarkLogicFolder implements DatabaseFolder {
     public Node get(String key) throws Exception {
 
 	return mlDataBase.getWrapper().get(createResourceUri(uri, key));
+    }
+
+    @Override
+    public Optional<GSResource> get(IdentifierType type, String identifier) {
+
+	return Optional.empty();
     }
 
     /**

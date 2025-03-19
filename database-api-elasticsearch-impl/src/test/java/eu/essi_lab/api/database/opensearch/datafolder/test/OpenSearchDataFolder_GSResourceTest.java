@@ -3,16 +3,23 @@
  */
 package eu.essi_lab.api.database.opensearch.datafolder.test;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.opensearch.ConversionUtils;
@@ -37,6 +44,212 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * @author Fabrizio
  */
 public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
+
+    @Test
+    public void getByIdentifierTest() throws ParserConfigurationException, JAXBException, SAXException, IOException, Exception {
+
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+
+	String folderName = TestUtils.getDataFolderName(database);
+
+	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
+
+	//
+	//
+	//
+
+	for (int i = 1; i <= 3; i++) {
+
+	    Dataset dataset = new Dataset();
+	    dataset.getHarmonizedMetadata().getCoreMetadata().setTitle("TITLE_" + i);
+	    dataset.setPrivateId("PRIVATE_ID_" + i);
+	    dataset.setOriginalId("ORIGINAL_ID_" + i);
+	    dataset.setPublicId("PUBLIC_ID_" + i);
+	    dataset.getPropertyHandler().setOAIPMHHeaderIdentifier("OAI_ID_" + i);
+	    dataset.setSource(new GSSource("sourceId"));
+
+	    IndexedElementsWriter.write(dataset);
+
+	    Assert.assertTrue(folder.store(dataset.getPrivateId(), //
+		    FolderEntry.of(dataset.asDocument(true)), //
+		    EntryType.GS_RESOURCE));
+	}
+
+	//
+	//
+	//
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.ORIGINAL, "PRIVATE_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.ORIGINAL, "PUBLIC_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.ORIGINAL, "OAI_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PRIVATE, "ORIGINAL_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PRIVATE, "PUBLIC_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PRIVATE, "OAI_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PUBLIC, "ORIGINAL_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PUBLIC, "PRIVATE_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PUBLIC, "OAI_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.OAI_HEADER, "ORIGINAL_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.OAI_HEADER, "PRIVATE_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.OAI_HEADER, "PUBLIC_ID_1");
+	    Assert.assertFalse(optional.isPresent());
+	}
+
+	//
+	//
+	//
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.ORIGINAL, "ORIGINAL_ID_1");
+	    Assert.assertTrue(optional.isPresent());
+
+	    Assert.assertEquals("ORIGINAL_ID_1", optional.get().getOriginalId().get());
+	    Assert.assertEquals("PRIVATE_ID_1", optional.get().getPrivateId());
+	    Assert.assertEquals("PUBLIC_ID_1", optional.get().getPublicId());
+	    Assert.assertEquals("TITLE_1", optional.get().getHarmonizedMetadata().getCoreMetadata().getTitle());
+
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PRIVATE, "PRIVATE_ID_1");
+	    Assert.assertTrue(optional.isPresent());
+
+	    Assert.assertEquals("ORIGINAL_ID_1", optional.get().getOriginalId().get());
+	    Assert.assertEquals("PRIVATE_ID_1", optional.get().getPrivateId());
+	    Assert.assertEquals("PUBLIC_ID_1", optional.get().getPublicId());
+	    Assert.assertEquals("TITLE_1", optional.get().getHarmonizedMetadata().getCoreMetadata().getTitle());
+
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PUBLIC, "PUBLIC_ID_1");
+	    Assert.assertTrue(optional.isPresent());
+
+	    Assert.assertEquals("ORIGINAL_ID_1", optional.get().getOriginalId().get());
+	    Assert.assertEquals("PRIVATE_ID_1", optional.get().getPrivateId());
+	    Assert.assertEquals("PUBLIC_ID_1", optional.get().getPublicId());
+	    Assert.assertEquals("TITLE_1", optional.get().getHarmonizedMetadata().getCoreMetadata().getTitle());
+
+	}
+
+	//
+	//
+	//
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.ORIGINAL, "ORIGINAL_ID_2");
+	    Assert.assertTrue(optional.isPresent());
+
+	    Assert.assertEquals("ORIGINAL_ID_2", optional.get().getOriginalId().get());
+	    Assert.assertEquals("PRIVATE_ID_2", optional.get().getPrivateId());
+	    Assert.assertEquals("PUBLIC_ID_2", optional.get().getPublicId());
+	    Assert.assertEquals("TITLE_2", optional.get().getHarmonizedMetadata().getCoreMetadata().getTitle());
+
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PRIVATE, "PRIVATE_ID_2");
+	    Assert.assertTrue(optional.isPresent());
+
+	    Assert.assertEquals("ORIGINAL_ID_2", optional.get().getOriginalId().get());
+	    Assert.assertEquals("PRIVATE_ID_2", optional.get().getPrivateId());
+	    Assert.assertEquals("PUBLIC_ID_2", optional.get().getPublicId());
+	    Assert.assertEquals("TITLE_2", optional.get().getHarmonizedMetadata().getCoreMetadata().getTitle());
+
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PUBLIC, "PUBLIC_ID_2");
+	    Assert.assertTrue(optional.isPresent());
+
+	    Assert.assertEquals("ORIGINAL_ID_2", optional.get().getOriginalId().get());
+	    Assert.assertEquals("PRIVATE_ID_2", optional.get().getPrivateId());
+	    Assert.assertEquals("PUBLIC_ID_2", optional.get().getPublicId());
+	    Assert.assertEquals("TITLE_2", optional.get().getHarmonizedMetadata().getCoreMetadata().getTitle());
+
+	}
+
+	//
+	//
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.ORIGINAL, "ORIGINAL_ID_3");
+	    Assert.assertTrue(optional.isPresent());
+
+	    Assert.assertEquals("ORIGINAL_ID_3", optional.get().getOriginalId().get());
+	    Assert.assertEquals("PRIVATE_ID_3", optional.get().getPrivateId());
+	    Assert.assertEquals("PUBLIC_ID_3", optional.get().getPublicId());
+	    Assert.assertEquals("TITLE_3", optional.get().getHarmonizedMetadata().getCoreMetadata().getTitle());
+
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PRIVATE, "PRIVATE_ID_3");
+	    Assert.assertTrue(optional.isPresent());
+
+	    Assert.assertEquals("ORIGINAL_ID_3", optional.get().getOriginalId().get());
+	    Assert.assertEquals("PRIVATE_ID_3", optional.get().getPrivateId());
+	    Assert.assertEquals("PUBLIC_ID_3", optional.get().getPublicId());
+	    Assert.assertEquals("TITLE_3", optional.get().getHarmonizedMetadata().getCoreMetadata().getTitle());
+
+	}
+
+	{
+	    Optional<GSResource> optional = folder.get(IdentifierType.PUBLIC, "PUBLIC_ID_3");
+	    Assert.assertTrue(optional.isPresent());
+
+	    Assert.assertEquals("ORIGINAL_ID_3", optional.get().getOriginalId().get());
+	    Assert.assertEquals("PRIVATE_ID_3", optional.get().getPrivateId());
+	    Assert.assertEquals("PUBLIC_ID_3", optional.get().getPublicId());
+	    Assert.assertEquals("TITLE_3", optional.get().getHarmonizedMetadata().getCoreMetadata().getTitle());
+
+	}
+
+    }
 
     @Test
     public void removeTest() throws Exception {
@@ -75,6 +288,8 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	Assert.assertTrue(folder.store(key, //
 		FolderEntry.of(dataset.asDocument(true)), //
 		EntryType.GS_RESOURCE));
+
+	Assert.assertTrue(folder.exists(key));
 
 	Assert.assertTrue(folder.remove(key));
 

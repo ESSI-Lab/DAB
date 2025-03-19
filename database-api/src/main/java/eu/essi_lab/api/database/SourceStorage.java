@@ -262,7 +262,9 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
     }
 
     /**
-     * @param sourceIdentifier
+     * Returns the data folder for the source with the given <code>sourceIdentifier</code>.
+     * 
+     * @param sourceIdentifier it <code>true</code>, returns the
      * @return
      * @throws GSException
      */
@@ -282,9 +284,8 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
 		if (worker.existsData1Folder()) {
 
 		    folder = worker.getData1Folder();
-		}
 
-		if (worker.existsData2Folder()) {
+		} else if (worker.existsData2Folder()) {
 
 		    folder = worker.getData2Folder();
 		}

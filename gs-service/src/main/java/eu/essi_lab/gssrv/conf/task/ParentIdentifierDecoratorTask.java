@@ -37,13 +37,8 @@ import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.cfga.scheduler.SchedulerUtils;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.harvester.worker.HarvestingSettingImpl;
 import eu.essi_lab.identifierdecorator.IdentifierDecorator;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -76,7 +71,7 @@ public class ParentIdentifierDecoratorTask extends AbstractCustomTask {
 
 	log(status, "Parent Identifier Decorator Task START");
 
-	Optional<String> taskOptions = readTaskOptions(context, status);
+	Optional<String> taskOptions = readTaskOptions(context);
 
 	if (!taskOptions.isPresent()) {
 
@@ -183,22 +178,6 @@ public class ParentIdentifierDecoratorTask extends AbstractCustomTask {
 
     List<GSSource> readConfiguredSources() {
 	return ConfigurationWrapper.getAllSources();
-    }
-
-    Optional<String> readTaskOptions(JobExecutionContext context, SchedulerJobStatus status) {
-
-	HarvestingSetting harvestingSetting = SettingUtils.downCast(SchedulerUtils.getSetting(context), HarvestingSettingImpl.class);
-
-	Optional<CustomTaskSetting> customTaskSetting = harvestingSetting.getCustomTaskSetting();
-
-	if (!customTaskSetting.isPresent()) {
-	    log(status, "Custom task setting is missing, unable to perform task");
-
-	    return Optional.empty();
-	}
-
-	return customTaskSetting.get().getTaskOptions();
-
     }
 
     DatabaseReader getDataBaseReader() throws GSException {

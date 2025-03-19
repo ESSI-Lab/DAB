@@ -225,7 +225,7 @@ public class Harvester {
 		    Optional.of(request));
 
 	    // handles custom task only if the end procedure is successful
-	    handleCustomTask(context, status);
+	    handleCustomTask(getAccessor().getSource(), context, status);
 
 	} catch (GSException ex) {
 
@@ -334,10 +334,11 @@ public class Harvester {
     }
 
     /**
+     * @param gsSource
      * @param context
      * @param status
      */
-    private void handleCustomTask(JobExecutionContext context, SchedulerJobStatus status) {
+    private void handleCustomTask(GSSource gsSource, JobExecutionContext context, SchedulerJobStatus status) {
 
 	if (customTask != null) {
 
@@ -345,6 +346,7 @@ public class Harvester {
 
 		GSLoggerFactory.getLogger(getClass()).info("Execution of custom task {} STARTED", customTask.getName());
 
+		customTask.setSource(gsSource);
 		customTask.doJob(context, status);
 
 		GSLoggerFactory.getLogger(getClass()).info("Execution of custom task {} ENDED", customTask.getName());

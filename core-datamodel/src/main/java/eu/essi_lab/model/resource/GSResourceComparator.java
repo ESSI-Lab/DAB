@@ -1,6 +1,3 @@
-/**
- * 
- */
 package eu.essi_lab.model.resource;
 
 /*-
@@ -23,12 +20,9 @@ package eu.essi_lab.model.resource;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.model.Queryable;
@@ -39,6 +33,13 @@ import eu.essi_lab.model.index.jaxb.IndexesMetadata;
  * @author Fabrizio
  */
 public class GSResourceComparator {
+
+    /**
+     * 
+     */
+    private GSResourceComparator() {
+
+    }
 
     /**
      * @param targets

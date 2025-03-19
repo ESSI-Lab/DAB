@@ -209,6 +209,19 @@ public class ConversionUtils {
      * @param searchResponse
      * @return
      */
+    public static List<GSResource> toGSResourcesList(SearchResponse<Object> searchResponse) {
+
+	return ConversionUtils.toJSONSourcesList(searchResponse).//
+		stream().//
+		map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
+		filter(Objects::nonNull).//
+		collect(Collectors.toList());
+    }
+
+    /**
+     * @param searchResponse
+     * @return
+     */
     public static List<InputStream> toBinaryList(SearchResponse<Object> searchResponse) {
 
 	List<InputStream> list = toList(searchResponse, hit -> {

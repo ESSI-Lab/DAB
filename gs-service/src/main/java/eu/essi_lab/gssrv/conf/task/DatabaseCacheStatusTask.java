@@ -33,7 +33,6 @@ import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
@@ -48,8 +47,7 @@ public class DatabaseCacheStatusTask extends AbstractCustomTask {
 
 	log(status, "Cache status task STARTED");
 
-	CustomTaskSetting setting = retrieveSetting(context);
-	Optional<String> taskOptions = setting.getTaskOptions();
+	Optional<String> taskOptions = readTaskOptions(context);
 
 	if (taskOptions.isPresent()) {
 

@@ -34,7 +34,6 @@ import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.stats.ComputationResult;
@@ -60,9 +59,7 @@ public class WISMetadataTask extends AbstractCustomTask {
 
 	log(status, "WIS metadata task STARTED");
 
-	CustomTaskSetting taskSettings = retrieveSetting(context);
-
-	Optional<String> taskOptions = taskSettings.getTaskOptions();
+	Optional<String> taskOptions = readTaskOptions(context);
 
 	String sourceId = null;
 	if (taskOptions.isPresent()) {
@@ -90,9 +87,8 @@ public class WISMetadataTask extends AbstractCustomTask {
 	//
 	// DatabaseReader dbReader = DatabaseConsumerFactory.createDataBaseReader(databaseURI);
 
-	
 	StatisticsMessage statisticsMessage = new StatisticsMessage();
-	// set the required properties	
+	// set the required properties
 	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	// statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 	WebRequestTransformer.setView(//

@@ -38,7 +38,6 @@ import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.augmenter.ResourceAugmenter;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -72,10 +71,7 @@ public class DownloadTestTask extends AbstractCustomTask {
 
 	log(status, "Data download test task STARTED");
 
-	// SETTINGS RETRIEVAL
-	CustomTaskSetting taskSettings = retrieveSetting(context);
-
-	Optional<String> taskOptions = taskSettings.getTaskOptions();
+	Optional<String> taskOptions = readTaskOptions(context);
 
 	String viewId = null;
 	if (taskOptions.isPresent()) {

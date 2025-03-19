@@ -1094,7 +1094,7 @@ public class OpenSearchQueryBuilder {
      * @param must
      * @return
      */
-    private static Query buildBoolQuery(List<Query> filter, List<Query> should, List<Query> must) {
+    public static Query buildBoolQuery(List<Query> filter, List<Query> should, List<Query> must) {
 
 	org.opensearch.client.opensearch._types.query_dsl.BoolQuery.Builder builder = new BoolQuery.Builder();
 
@@ -1118,7 +1118,7 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildFilterQuery(List<Query> operands) {
+    public static Query buildFilterQuery(List<Query> operands) {
 
 	return new BoolQuery.Builder().//
 		filter(operands).//
@@ -1130,7 +1130,7 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildFilterQuery(Query... operands) {
+    public static Query buildFilterQuery(Query... operands) {
 
 	return buildFilterQuery(Arrays.asList(operands));
     }
@@ -1139,7 +1139,7 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildMustQuery(List<Query> operands) {
+    public static Query buildMustQuery(List<Query> operands) {
 
 	return new BoolQuery.Builder().//
 		must(operands).//
@@ -1151,7 +1151,7 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildShouldQuery(List<Query> operands, int minimumShouldMatch) {
+    public static Query buildShouldQuery(List<Query> operands, int minimumShouldMatch) {
 
 	return new BoolQuery.Builder().//
 		should(operands).//
@@ -1164,7 +1164,7 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildShouldQuery(List<Query> operands) {
+    public static Query buildShouldQuery(List<Query> operands) {
 
 	return buildShouldQuery(operands, 1);
     }
@@ -1173,7 +1173,7 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildShouldQuery(int minimumShouldMatch, Query... operands) {
+    public static Query buildShouldQuery(int minimumShouldMatch, Query... operands) {
 
 	return buildShouldQuery(Arrays.asList(operands), minimumShouldMatch);
     }
@@ -1182,7 +1182,7 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildShouldQuery(Query... operands) {
+    public static Query buildShouldQuery(Query... operands) {
 
 	return buildShouldQuery(Arrays.asList(operands), 1);
     }
@@ -1191,7 +1191,7 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildMustQuery(Query... operands) {
+    public static Query buildMustQuery(Query... operands) {
 
 	return buildMustQuery(Arrays.asList(operands));
     }

@@ -1,5 +1,7 @@
 package eu.essi_lab.cfga.gs.task;
 
+import java.util.Optional;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -23,9 +25,13 @@ package eu.essi_lab.cfga.gs.task;
 
 import org.quartz.JobExecutionContext;
 
+import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
+import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
 import eu.essi_lab.cfga.scheduler.Task;
 import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
+import eu.essi_lab.model.GSSource;
 
 /**
  * @author Fabrizio
@@ -38,7 +44,39 @@ public interface CustomTask extends Task {
      */
     public default CustomTaskSetting retrieveSetting(JobExecutionContext context) {
 
-	return SettingUtils.downCast(SchedulerUtils.getSetting(context), CustomTaskSetting.class);
+	SchedulerWorkerSetting workerSetting = SchedulerUtils.getSetting(context);
+
+	switch (workerSetting.getGroup()) {
+
+	//
+	// custom task embedded in a HarvestingSetting
+	//
+	case HARVESTING:
+
+	    HarvestingSetting harvestingSetting = SettingUtils.downCast(workerSetting, HarvestingSettingLoader.load().getClass());
+
+	    return harvestingSetting.getCustomTaskSetting().get();
+
+	//
+	// stand-alone custom task
+	//
+	case CUSTOM_TASK:
+	default:
+
+	}
+
+	return SettingUtils.downCast(workerSetting, CustomTaskSetting.class);
+    }
+
+    /**
+     * @param context
+     * @return
+     */
+    default Optional<String> readTaskOptions(JobExecutionContext context) {
+
+	CustomTaskSetting setting = retrieveSetting(context);
+
+	return setting.getTaskOptions();
     }
 
     /**
@@ -48,6 +86,16 @@ public interface CustomTask extends Task {
 
 	return false;
     }
+
+    /**
+     * @param source
+     */
+    public void setSource(GSSource source);
+
+    /**
+     * @return
+     */
+    public Optional<GSSource> getSource();
 
     /**
      * @return

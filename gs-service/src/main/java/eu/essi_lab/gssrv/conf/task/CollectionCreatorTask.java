@@ -38,15 +38,10 @@ import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.cfga.scheduler.SchedulerUtils;
-import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.gssrv.conf.task.collection.ParameterCollectionCreator;
 import eu.essi_lab.gssrv.conf.task.collection.SourceCollectionCreator;
-import eu.essi_lab.harvester.worker.HarvestingSettingImpl;
 import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ResultSet;
@@ -66,27 +61,11 @@ public class CollectionCreatorTask extends AbstractCustomTask {
 
 	log(status, "Collection creator task STARTED");
 
-	HarvestingSetting harvestingSetting = SettingUtils.downCast(SchedulerUtils.getSetting(context), HarvestingSettingImpl.class);
-
-	Optional<CustomTaskSetting> customTaskSetting = harvestingSetting.getCustomTaskSetting();
-
-	if (!customTaskSetting.isPresent()) {
-
-	    CustomTaskSetting ctso = SettingUtils.downCast(SchedulerUtils.getSetting(context), CustomTaskSetting.class);
-	    if (ctso == null) {
-
-		log(status, "Custom task setting missing, unable to perform task");
-
-		return;
-	    }
-	    customTaskSetting = Optional.of(ctso);
-	}
-
-	Optional<String> taskOptions = customTaskSetting.get().getTaskOptions();
+	Optional<String> taskOptions = readTaskOptions(context);
 
 	if (!taskOptions.isPresent()) {
 
-	    log(status, "Required options not provided, unable to perform task");
+	    log(status, "Custom task options missing, unable to perform task");
 
 	    return;
 	}
@@ -166,9 +145,9 @@ public class CollectionCreatorTask extends AbstractCustomTask {
 	    String key = dataset.getOriginalId().get();
 	    if (folder.exists(key)) {
 		toDelete.remove(key);
-		folder.replace(key, FolderEntry.of(asDocument),EntryType.GS_RESOURCE);
+		folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 	    } else {
-		folder.store(key, FolderEntry.of(asDocument),EntryType.GS_RESOURCE);
+		folder.store(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 	    }
 
 	}

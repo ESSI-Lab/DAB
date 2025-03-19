@@ -29,7 +29,6 @@ import org.quartz.JobExecutionContext;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.cfga.scheduler.impl.PersistentJobStoreScheduler;
@@ -45,8 +44,6 @@ public class SchedulerJobDataChecker extends AbstractCustomTask {
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
 	log(status, "Scheduler job data checker STARTED");
-
-	CustomTaskSetting taskSetting = retrieveSetting(context);
 
 	//
 	//

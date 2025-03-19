@@ -34,7 +34,6 @@ import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.access.availability.DownloadInformation;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -61,9 +60,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	log(status, "Statistics task STARTED");
 
 	// SETTINGS RETRIEVAL
-	CustomTaskSetting taskSettings = retrieveSetting(context);
-
-	Optional<String> taskOptions = taskSettings.getTaskOptions();
+	Optional<String> taskOptions = readTaskOptions(context);
 
 	String viewId = null;
 	if (taskOptions.isPresent()) {

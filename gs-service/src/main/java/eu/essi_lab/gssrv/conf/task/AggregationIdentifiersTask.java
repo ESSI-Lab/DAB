@@ -42,13 +42,8 @@ import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.cfga.scheduler.SchedulerUtils;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.harvester.worker.HarvestingSettingImpl;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.indexes.IndexedMetadataElements;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
@@ -89,22 +84,11 @@ public class AggregationIdentifiersTask extends AbstractCustomTask {
 
 	log(status, "Aggregation identifiers task STARTED");
 
-	HarvestingSetting harvestingSetting = SettingUtils.downCast(SchedulerUtils.getSetting(context), HarvestingSettingImpl.class);
-
-	Optional<CustomTaskSetting> customTaskSetting = harvestingSetting.getCustomTaskSetting();
-
-	if (!customTaskSetting.isPresent()) {
-
-	    log(status, "Custom task setting missing, unable to perform task");
-
-	    return;
-	}
-
-	Optional<String> taskOptions = customTaskSetting.get().getTaskOptions();
+	Optional<String> taskOptions = readTaskOptions(context);
 
 	if (!taskOptions.isPresent()) {
 
-	    log(status, "Required options not provided, unable to perform task");
+	    log(status, "Custom task options missing, unable to perform task");
 
 	    return;
 	}
@@ -127,7 +111,6 @@ public class AggregationIdentifiersTask extends AbstractCustomTask {
 	}
 
 	log(status, "Aggregation identifiers task ENDED");
-
     }
 
     /**

@@ -252,8 +252,6 @@ public class HarvesterWorker extends SchedulerWorker<HarvestingSetting> {
 	// 1) IndentifierDecoratorComponent
 	//
 
-
-
 	IdentifierDecorator identifierDecorator = new IdentifierDecorator(//
 		ConfigurationWrapper.getSourcePrioritySetting(), //
 		dataBaseReader);
@@ -324,7 +322,7 @@ public class HarvesterWorker extends SchedulerWorker<HarvestingSetting> {
 	    @SuppressWarnings("unchecked")
 	    Class<CustomTask> taskClass = (Class<CustomTask>) Class.forName(taskClassName);
 
-	    CustomTask customTask = taskClass.newInstance();
+	    CustomTask customTask = taskClass.getDeclaredConstructor().newInstance();
 
 	    harvester.setCustomTask(customTask);
 
