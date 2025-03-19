@@ -22,7 +22,6 @@ package eu.essi_lab.harvester.worker;
  */
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -56,13 +55,11 @@ import eu.essi_lab.harvester.component.AugmenterComponent;
 import eu.essi_lab.harvester.component.DatabaseComponent;
 import eu.essi_lab.harvester.component.IdentifierDecoratorComponent;
 import eu.essi_lab.harvester.component.IndexedElementsWriterComponent;
-import eu.essi_lab.harvester.component.ResourceComparatorComponent;
 import eu.essi_lab.harvester.component.ResourceValidatorComponent;
 import eu.essi_lab.identifierdecorator.IdentifierDecorator;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.MetadataElement;
 
 /**
  * @author Fabrizio
