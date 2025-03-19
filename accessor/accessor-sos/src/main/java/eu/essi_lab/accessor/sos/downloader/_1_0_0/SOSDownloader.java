@@ -93,7 +93,7 @@ public class SOSDownloader extends eu.essi_lab.accessor.sos.downloader.SOSDownlo
 
 	    String procedureHref = mangler.getProcedure();
 
-	    SOSSensorML sosSensorML = eu.essi_lab.accessor.sos._1_0_0.SOSConnector.PROCERDURES_MAP.get(procedureHref);
+	    SOSSensorML sosSensorML = eu.essi_lab.accessor.sos._1_0_0.SOSConnector.PROCEDURES_MAP.get(procedureHref);
 
 	    if (sosSensorML == null) {
 
@@ -101,7 +101,7 @@ public class SOSDownloader extends eu.essi_lab.accessor.sos.downloader.SOSDownlo
 
 	    } else {
 
-		eu.essi_lab.accessor.sos._1_0_0.SOSConnector.PROCERDURES_MAP.remove(procedureHref);
+		eu.essi_lab.accessor.sos._1_0_0.SOSConnector.PROCEDURES_MAP.remove(procedureHref);
 	    }
 
 	    try {

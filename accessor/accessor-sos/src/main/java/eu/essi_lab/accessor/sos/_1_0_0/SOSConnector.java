@@ -69,7 +69,7 @@ public class SOSConnector extends eu.essi_lab.accessor.sos.SOSConnector {
     private int observedPropertiesCount;
     private List<String> offeringNames;
 
-    public static final HashMap<String, SOSSensorML> PROCERDURES_MAP = new HashMap<>();
+    public static final HashMap<String, SOSSensorML> PROCEDURES_MAP = new HashMap<>();
     private int parallelTasks;
     private int errorsCount;
     private static final int MAX_ERRORS = 10;
@@ -333,7 +333,7 @@ public class SOSConnector extends eu.essi_lab.accessor.sos.SOSConnector {
 
 		    SOSSensorML sosSensorML = new SOSSensorML(reader);
 
-		    PROCERDURES_MAP.put(procHref, sosSensorML);
+		    PROCEDURES_MAP.put(procHref, sosSensorML);
 
 		    Optional<String> name = sosSensorML.getName();
 
@@ -436,17 +436,14 @@ public class SOSConnector extends eu.essi_lab.accessor.sos.SOSConnector {
 			    //
 
 			    if (temporalExtent.isPresent()) {
-
 				sosProperties.setProperty(SOSProperty.TEMP_EXTENT_BEGIN, temporalExtent.get().getBeginPosition());
 				sosProperties.setProperty(SOSProperty.TEMP_EXTENT_END, temporalExtent.get().getEndPosition());
 			    } else {
-
 				GSLoggerFactory.getLogger(getClass()).warn("Missing temporal extent!");
 				continue;
 			    }
 
 			    if (location.isPresent()) {
-
 				sosProperties.setProperty(SOSProperty.LATITUDE, String.valueOf(location.get().getMinY()));
 				sosProperties.setProperty(SOSProperty.LONGITUDE, String.valueOf(location.get().getMinX()));
 			    }

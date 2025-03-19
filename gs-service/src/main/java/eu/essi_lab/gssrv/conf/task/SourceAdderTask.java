@@ -150,9 +150,18 @@ public class SourceAdderTask extends AbstractCustomTask {
 
 	for (HarvestingSetting source : sources) {
 	    List<String> deployments = source.getSelectedAccessorSetting().getGSSourceSetting().getSourceDeployment();
-	    if (!deployments.contains(deployment)) {
-		source.getSelectedAccessorSetting().getGSSourceSetting().addSourceDeployment(deployment);
+	    String deps[];
+	    if (deployment.contains(",")) {
+		deps = deployment.split(",");
+	    } else {
+		deps = new String[] { deployment };
 	    }
+	    for (String dep : deps) {
+		if (!deployments.contains(dep)) {
+		    source.getSelectedAccessorSetting().getGSSourceSetting().addSourceDeployment(dep);
+		}
+	    }
+
 	}
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
