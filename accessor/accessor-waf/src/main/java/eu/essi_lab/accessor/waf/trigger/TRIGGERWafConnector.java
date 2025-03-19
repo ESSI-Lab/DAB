@@ -127,8 +127,8 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
     }
 
     public TRIGGERWafConnector() {
-	username = ConfigurationWrapper.getCredentialsSetting().getTriggerUser().orElse(null);
-	password = ConfigurationWrapper.getCredentialsSetting().getTriggerUser().orElse(null);
+	username = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFUser().orElse(null);
+	password = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFPassword().orElse(null);
     }
 
     @Override
