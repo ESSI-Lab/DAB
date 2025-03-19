@@ -109,6 +109,7 @@ public class OpenSearchConnector extends DataCacheConnector {
     private static final String DATA_IDENTIFIER_PROPERTY = "dataIdentifier";
     private static final String SOURCE_IDENTIFIER_PROPERTY = "sourceIdentifier";
     private static final String THEME_CATEGORY_PROPERTY = "themeCategory";
+    private static final String PLATFORM_IDENTIFIER_PROPERTY = "platformIdentifier";
     private static final String NEXT_RECORD_EXPECTED_TIME_PROPERTY = "nextRecordExpectedTime";
 
     private static final String SOUTH_PROPERTY = "south";
@@ -1073,6 +1074,21 @@ public class OpenSearchConnector extends DataCacheConnector {
 	if (theme != null) {
 	    query.must(QueryBuilders.termQuery(THEME_CATEGORY_PROPERTY + ".keyword", theme));
 	}
+	deleteByQueryRequest.setQuery(query);
+	BulkByScrollResponse response = client.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
+	long deleted = response.getDeleted();
+	GSLoggerFactory.getLogger(getClass()).info("Deleted records: {}", deleted);
+
+    }
+
+    @Override
+    public void deleteStation(String stationId) throws Exception {
+	if (stationId==null) {
+	    throw new RuntimeException("missing station id");
+	}
+	DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(DataCacheIndex.STATIONS.getIndex(databaseName));
+	BoolQueryBuilder query = QueryBuilders.boolQuery();
+	query.must(QueryBuilders.termQuery(PLATFORM_IDENTIFIER_PROPERTY+ ".keyword", stationId));
 	deleteByQueryRequest.setQuery(query);
 	BulkByScrollResponse response = client.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
 	long deleted = response.getDeleted();
