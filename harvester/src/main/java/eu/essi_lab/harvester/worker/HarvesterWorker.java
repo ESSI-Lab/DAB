@@ -46,6 +46,7 @@ import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.task.CustomTask;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
+import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
@@ -324,7 +325,7 @@ public class HarvesterWorker extends SchedulerWorker<HarvestingSetting> {
 
 	    CustomTask customTask = taskClass.getDeclaredConstructor().newInstance();
 
-	    harvester.setCustomTask(customTask);
+	    harvester.setCustomTask((HarvestingEmbeddedTask) customTask);
 
 	} else if (!customTaskSetting.isPresent()) {
 
