@@ -27,6 +27,9 @@ import java.util.Optional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import eu.essi_lab.api.database.Database.IdentifierType;
+import eu.essi_lab.model.resource.GSResource;
+
 /**
  * @author Fabrizio
  */
@@ -211,6 +214,13 @@ public interface DatabaseFolder {
      * @throws Exception if problems occur
      */
     boolean replace(String key, FolderEntry entry, EntryType type) throws Exception;
+
+    /**
+     * @param type
+     * @param identifier
+     * @return
+     */
+    Optional<GSResource> get(IdentifierType type, String identifier) throws Exception;
 
     /**
      * Returns the DOM resource with the specified <code>key</code>.<br>

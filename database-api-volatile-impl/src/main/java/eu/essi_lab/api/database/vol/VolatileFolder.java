@@ -32,7 +32,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.model.resource.GSResource;
 
 /**
  */
@@ -200,5 +202,11 @@ public class VolatileFolder implements DatabaseFolder {
     public Database getDatabase() {
 
 	return null;
+    }
+
+    @Override
+    public Optional<GSResource> get(IdentifierType type, String identifier) {
+
+	return Optional.empty();
     }
 }

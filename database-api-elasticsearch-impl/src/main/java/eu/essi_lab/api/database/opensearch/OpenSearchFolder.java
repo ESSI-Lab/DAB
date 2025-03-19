@@ -25,6 +25,8 @@ package eu.essi_lab.api.database.opensearch;
  */
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,12 +36,21 @@ import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
+import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.ResourcePropertyBond;
+import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.RankingStrategy;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -115,6 +126,50 @@ public class OpenSearchFolder implements DatabaseFolder {
 	}
 
 	return ConversionUtils.toNode(ConversionUtils.toStream(source.get()));
+    }
+
+    @Override
+    public Optional<GSResource> get(IdentifierType type, String identifier) throws Exception {
+
+	OpenSearchQueryBuilder builder = new OpenSearchQueryBuilder(wrapper, new RankingStrategy(), new HashMap<String, String>(), false);
+
+	Bond bond = null;
+	Query query = null;
+	switch (type) {
+	case OAI_HEADER:
+	    bond = BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.OAI_PMH_HEADER_ID, identifier);
+	    query = builder.buildResourcePropertyQuery((ResourcePropertyBond) bond);
+	    break;
+	case ORIGINAL:
+	    bond = BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.ORIGINAL_ID, identifier);
+	    query = builder.buildResourcePropertyQuery((ResourcePropertyBond) bond);
+	    break;
+	case PRIVATE:
+	    Node node = get(identifier);
+	    if (node != null) {
+		return Optional.of(GSResource.create(node));
+	    }
+	    return Optional.empty();
+	case PUBLIC:
+	    bond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, identifier);
+	    query = builder.buildMetadataElementQuery(MetadataElement.IDENTIFIER, BondOperator.EQUAL, identifier);
+	    break;
+	}
+
+	Query folderEntriesQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
+	Query boolQuery = OpenSearchQueryBuilder.buildBoolQuery(//
+		Arrays.asList(query, folderEntriesQuery), //
+		Arrays.asList(), //
+		Arrays.asList());
+
+	List<JSONObject> sources = wrapper.searchSources(DataFolderMapping.get().getIndex(), boolQuery, 0, 1);
+
+	if (!sources.isEmpty()) {
+
+	    return ConversionUtils.toGSResource(sources.get(0));
+	}
+
+	return Optional.empty();
     }
 
     @Override
@@ -194,11 +249,11 @@ public class OpenSearchFolder implements DatabaseFolder {
 
     @Override
     public int size() throws Exception {
-	
+
 	String index = IndexData.detectIndex(this);
 
 	Query query = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
-	
+
 	return (int) wrapper.count(index, query);
     }
 
