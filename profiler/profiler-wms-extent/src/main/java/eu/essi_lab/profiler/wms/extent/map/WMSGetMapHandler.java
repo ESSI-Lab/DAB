@@ -132,7 +132,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 			Integer width = Integer.parseInt(widthString);
 			Integer height = Integer.parseInt(heightString);
 
-			if (layers.equals("i-change-monitoring-points")) {
+			if (layers.equals("i-change-monitoring-points") || layers.equals("trigger-monitoring-points")) {
 				Layer cachedLayer = getCachedLayer(layers, webRequest.extractViewId());
 				if (cachedLayer != null) {
 					return cachedLayer.getImageResponse(version, crs, bboxString, width, height, format, time);
@@ -143,7 +143,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 
 				@Override
 				public void write(OutputStream output) throws IOException, WebApplicationException {
-					if (layers.equals("i-change-monitoring-points")) {
+					if (layers.equals("i-change-monitoring-points") || layers.equals("trigger-monitoring-points")) {
 						BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 						String[] split = bboxString.split(",");
 						BigDecimal minx = null;

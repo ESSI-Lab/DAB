@@ -41,7 +41,8 @@ public enum WMSLayer {
     EMOD_PACE_OCEANOGRAPHY_NRT("emod-pace", "Oceanography NRT", "themeCategory", "Oceanography NRT", new EMODPaceLegendCreator(), new DatasetFeatureInfoGenerator()), //
     WHOS_ACTIVITY("whos", "activity", "whosCategory", "sensor", new WHOSActivityLegendCreator(), new DatasetFeatureInfoGenerator()), //
     WHOS_SOURCES("whos", "sources", "whosCategory", "sensor", new WHOSSourcesLegendCreator(), new DatasetFeatureInfoGenerator()),//
-    ICHANGE_MONITORING_POINTS("i-change", "i-change-monitoring-points", "themeCategory", "i-change", new ICHANGESourcesLegendCreator(), new StationFeatureInfoGenerator())
+    ICHANGE_MONITORING_POINTS("i-change", "i-change-monitoring-points", "themeCategory", "i-change", new ICHANGESourcesLegendCreator(), new StationFeatureInfoGenerator()),
+    TRIGGER_MONITORING_POINTS("trigger", "trigger-monitoring-points", "themeCategory", "trigger", new TRIGGERSourcesLegendCreator(), new StationFeatureInfoGenerator())
     ;
 
     private String view;
