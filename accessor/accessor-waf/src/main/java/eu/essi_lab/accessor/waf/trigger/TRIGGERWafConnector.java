@@ -415,17 +415,17 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	 **/
 
 	CoverageDescription coverageDescription = new CoverageDescription();
-	String varId = noSpaceName + ":" + variableName + ":" + interpolation.getId();
+	String varId = noSpaceName + ":" + variableName;
 
 	coverageDescription.setAttributeIdentifier(varId);
-	coverageDescription.setAttributeTitle(variableName + " (" + interpolation.getLabel() + ")");
+	coverageDescription.setAttributeTitle(variableName);
 
 	String attributeDescription = variableDescription + " Units: " + variableUnit;
 
 	coverageDescription.setAttributeDescription(attributeDescription);
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
-	dataset.getExtensionHandler().setTimeInterpolation(interpolation.getInterpolationType());
+	dataset.getExtensionHandler().setTimeInterpolation(interpolation.getLabel());
 
 	/**
 	 * ONLINE
