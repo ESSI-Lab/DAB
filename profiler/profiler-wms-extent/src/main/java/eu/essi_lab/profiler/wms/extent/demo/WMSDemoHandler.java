@@ -88,6 +88,9 @@ public class WMSDemoHandler extends DefaultRequestHandler {
 		case ICHANGE_MONITORING_POINTS:
 		    resource += "i-change-monitoring-points.html";
 		    break;
+		case TRIGGER_MONITORING_POINTS:
+		    resource += "trigger-monitoring-points.html";
+		    break;
 		default:
 		    resource += "404.html";
 		    break;

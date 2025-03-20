@@ -213,7 +213,7 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			List<StationRecord> stations;
 
 			Layer cachedLayer = null;
-			if (layers.equals("i-change-monitoring-points")
+			if ((layers.equals("i-change-monitoring-points") || layers.equals("trigger-monitoring-points"))
 				&& (cachedLayer = WMSGetMapHandler.getCachedLayer(layers, webRequest.extractViewId())) != null) {
 			    stations = cachedLayer.getStations(bbox, beginDate, endDate);
 			} else {
