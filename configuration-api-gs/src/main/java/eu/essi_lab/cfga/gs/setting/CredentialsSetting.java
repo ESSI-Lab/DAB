@@ -90,6 +90,9 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 
     private static final String TRIGGER_PASSWORD = "triggerPassword";
     private static final String TRIGGER_USER = "triggerUser";
+    
+    private static final String TRIGGER_WAF_PASSWORD = "triggerWAFPassword";
+    private static final String TRIGGER_WAF_USER = "triggerWAFUser";
 
     public static void main(String[] args) {
 
@@ -634,6 +637,31 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 	    addOption(password);
 
 	}
+	
+	// Trigger WAF ECMWF
+		{
+
+		    Option<String> user = StringOptionBuilder.//
+			    get().//
+			    withKey(TRIGGER_WAF_USER).//
+			    withLabel("The username used by TRIGGER WAF  connector").//
+			    required().//
+			    cannotBeDisabled().//
+			    build();
+
+		    addOption(user);
+
+		    Option<String> password = StringOptionBuilder.//
+			    get().//
+			    withKey(TRIGGER_WAF_PASSWORD).//
+			    withLabel("The password used by TRIGGER WAF connector").//
+			    required().//
+			    cannotBeDisabled().//
+			    build();
+
+		    addOption(password);
+
+		}
 
 	//
 	// set the rendering extension
@@ -1371,5 +1399,39 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 
 	return getOption(TRIGGER_PASSWORD, String.class).get().getOptionalValue();
     }
+    
+    
+    /**
+     * @param user
+     */
+    public void setTriggerWAFUser(String user) {
+
+	getOption(TRIGGER_WAF_USER, String.class).get().setValue(user);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getTriggerWAFUser() {
+
+	return getOption(TRIGGER_WAF_USER, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param password
+     */
+    public void setTriggerWAFPassword(String password) {
+
+	getOption(TRIGGER_WAF_PASSWORD, String.class).get().setValue(password);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getTriggerWAFPassword() {
+
+	return getOption(TRIGGER_WAF_PASSWORD, String.class).get().getOptionalValue();
+    }
+
 
 }
