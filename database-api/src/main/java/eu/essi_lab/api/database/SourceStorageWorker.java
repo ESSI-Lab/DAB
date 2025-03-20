@@ -98,7 +98,7 @@ public class SourceStorageWorker {
     private static final String SOURCE_STORAGE_GET_WRITING_FOLDER_ERROR = "SOURCE_STORAGE_GET_WRITING_FOLDER_ERROR";
     private static final String SOURCE_STORAGE_GET_WRITING_FOLDER_HARVESTING_STARTED_ERROR = "SOURCE_STORAGE_GET_WRITING_FOLDER_HARVESTING_STARTED_ERROR";
     private static final String SOURCE_STORAGE_DECTECT_WRITING_FOLDER_HARVESTING_END_ERROR = "SOURCE_STORAGE_DECTECT_WRITING_FOLDER_HARVESTING_END_ERROR";
-   
+
     public static final String ERRORS_REPORT_FILE_NAME = "errorsReport";
     public static final String WARN_REPORT_FILE_NAME = "warnReport";
 
@@ -199,6 +199,15 @@ public class SourceStorageWorker {
     }
 
     /**
+     * @return
+     * @throws GSException
+     */
+    public DatabaseFolder getWritingFolder() throws GSException {
+
+	return getWritingFolder(Optional.empty());
+    }
+
+    /**
      * @param status
      * @return
      * @throws GSException
@@ -232,7 +241,7 @@ public class SourceStorageWorker {
      * @return
      * @throws Exception
      */
-    public HarvestingProperties getSourceHarvestingProperties() throws Exception {
+    public HarvestingProperties getHarvestingProperties() throws Exception {
 
 	// -------------------------------------------------------------------------------------------------
 	//
@@ -900,16 +909,19 @@ public class SourceStorageWorker {
 
 		treshold = request.get().getExpectedRecords().get();
 
-		GSLoggerFactory.getLogger(getClass()).info("Setting treshold according to the expected number of records: {}", StringUtils.format(treshold));
+		GSLoggerFactory.getLogger(getClass()).info("Setting treshold according to the expected number of records: {}",
+			StringUtils.format(treshold));
 
 	    } else {
 
 		int consolidatedFolderSize = writingData1 ? getData2Folder().size() : getData1Folder().size();
 		treshold = ((double) consolidatedFolderSize / 100) * DEFAULT_SMART_STORAGE_PERCENTAGE_TRESHOLD;
 
-		debug("Consolidated folder size: " + StringUtils.format(consolidatedFolderSize), StringUtils.format(consolidatedFolderSize), status);
+		debug("Consolidated folder size: " + StringUtils.format(consolidatedFolderSize), StringUtils.format(consolidatedFolderSize),
+			status);
 
-		GSLoggerFactory.getLogger(getClass()).info("Setting treshold according to the consolidated folder size: {}", StringUtils.format(treshold));
+		GSLoggerFactory.getLogger(getClass()).info("Setting treshold according to the consolidated folder size: {}",
+			StringUtils.format(treshold));
 	    }
 	}
 
