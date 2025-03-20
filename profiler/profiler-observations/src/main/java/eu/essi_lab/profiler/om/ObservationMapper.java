@@ -340,7 +340,7 @@ public class ObservationMapper {
 	}
 
 	if (parser.getUnits() == null || parser.getUnits().isEmpty()) {
-	    if (!view.isPresent() || !(view.get().getCreator().contains("change") || view.get().getCreator().contains("trigger"))) {
+	    if (!view.isPresent() || !view.get().getCreator().contains("change")) {
 		observation.setUOM(parser.unitsAbbreviation);
 	    } else {
 		String u = parser.unitsAbbreviation;
@@ -355,7 +355,7 @@ public class ObservationMapper {
 		observation.setUOM(u);
 	    }
 	} else {
-	    if (!view.isPresent() || !(view.get().getCreator().contains("change") || view.get().getCreator().contains("trigger"))) {
+	    if (!view.isPresent() || !view.get().getCreator().contains("change")) {
 		observation.setUOM(parser.units);
 	    } else {
 		String u = parser.units;
