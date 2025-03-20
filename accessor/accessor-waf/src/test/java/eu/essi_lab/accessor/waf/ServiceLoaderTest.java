@@ -24,6 +24,8 @@ import eu.essi_lab.accessor.waf.onamet_stations.ONAMETStationsConnector;
 import eu.essi_lab.accessor.waf.onamet_stations.ONAMETStationsMapper;
 import eu.essi_lab.accessor.waf.s3bucket.S3BucketAccessor;
 import eu.essi_lab.accessor.waf.s3bucket.S3BucketConnector;
+import eu.essi_lab.accessor.waf.trigger.TRIGGERWafAccessor;
+import eu.essi_lab.accessor.waf.trigger.TRIGGERWafConnector;
 import eu.essi_lab.accessor.waf.zenodo.ZenodoS3BucketAccessor;
 import eu.essi_lab.accessor.waf.zenodo.ZenodoS3BucketConnector;
 import eu.essi_lab.adk.AccessorFactory;
@@ -49,7 +51,7 @@ public class ServiceLoaderTest {
 
 	    accessors.sort((a1, a2) -> a1.getClass().getName().compareTo(a2.getClass().getName()));
 
-	    Assert.assertEquals(8, accessors.size());
+	    Assert.assertEquals(9, accessors.size());
 
 	    Assert.assertEquals(DirectoryListingAccessor.class, accessors.get(0).getClass());
 	    Assert.assertEquals(ECOPotentialVlabAccessor.class, accessors.get(1).getClass());
@@ -58,7 +60,8 @@ public class ServiceLoaderTest {
 	    Assert.assertEquals(ONAMETAccessor.class, accessors.get(4).getClass());
 	    Assert.assertEquals(ONAMETStationsAccessor.class, accessors.get(5).getClass());
 	    Assert.assertEquals(S3BucketAccessor.class, accessors.get(6).getClass());
-	    Assert.assertEquals(ZenodoS3BucketAccessor.class, accessors.get(7).getClass());
+	    Assert.assertEquals(TRIGGERWafAccessor.class, accessors.get(7).getClass());
+	    Assert.assertEquals(ZenodoS3BucketAccessor.class, accessors.get(8).getClass());
 
 	}
 
@@ -67,7 +70,7 @@ public class ServiceLoaderTest {
 
 	    accessors.sort((a1, a2) -> a1.getClass().getName().compareTo(a2.getClass().getName()));
 
-	    Assert.assertEquals(8, accessors.size());
+	    Assert.assertEquals(9, accessors.size());
 
 	    Assert.assertEquals(DirectoryListingAccessor.class, accessors.get(0).getClass());
 	    Assert.assertEquals(ECOPotentialVlabAccessor.class, accessors.get(1).getClass());
@@ -76,7 +79,8 @@ public class ServiceLoaderTest {
 	    Assert.assertEquals(ONAMETAccessor.class, accessors.get(4).getClass());
 	    Assert.assertEquals(ONAMETStationsAccessor.class, accessors.get(5).getClass());
 	    Assert.assertEquals(S3BucketAccessor.class, accessors.get(6).getClass());
-	    Assert.assertEquals(ZenodoS3BucketAccessor.class, accessors.get(7).getClass());
+	    Assert.assertEquals(TRIGGERWafAccessor.class, accessors.get(7).getClass());
+	    Assert.assertEquals(ZenodoS3BucketAccessor.class, accessors.get(8).getClass());
 	}
 
 	{
@@ -90,7 +94,7 @@ public class ServiceLoaderTest {
     public void harvestedQueryConnectorTest() {
 
 	long count = StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator()).count();
-	Assert.assertEquals(8, count);
+	Assert.assertEquals(9, count);
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
@@ -130,6 +134,11 @@ public class ServiceLoaderTest {
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
 			.filter(c -> c.getClass().equals(ZenodoS3BucketConnector.class)).//
 			findFirst().isPresent());//
+	
+	Assert.assertTrue(//
+		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
+			.filter(c -> c.getClass().equals(TRIGGERWafConnector.class)).//
+			findFirst().isPresent());//
     }
 
     @SuppressWarnings("rawtypes")
@@ -139,7 +148,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	long count = StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator()).count();
-	Assert.assertEquals(8, count);
+	Assert.assertEquals(9, count);
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
 		filter(c -> c.getClass().getName().equals(DirectoryListingAccessor.class.getName())).//

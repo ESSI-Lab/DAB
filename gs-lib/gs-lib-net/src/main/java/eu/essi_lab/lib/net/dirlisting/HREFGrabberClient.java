@@ -47,6 +47,8 @@ public class HREFGrabberClient {
     protected URL url;
     protected String html;
     private String closingTag;
+    protected String username;
+    protected String password;
 
     /**
      * 
@@ -117,9 +119,16 @@ public class HREFGrabberClient {
     public List<String> grabLinks(URL url, String linkText) throws Exception {
 
 	Downloader downloader = new Downloader();
+
 	ArrayList<String> list = Lists.newArrayList();
 
-	String html_ = this.html != null ? this.html : downloader.downloadOptionalString(url.toExternalForm()).orElse(null);
+	
+	String html_ = "";
+	if(this.username != null && this.password != null) {
+	    html_ = downloader.downloadOptionalString(url.toExternalForm(), username, password).orElse(null);
+	} else {
+	    html_ = this.html != null ? this.html : downloader.downloadOptionalString(url.toExternalForm()).orElse(null);
+	}
 	if (html_ == null) {
 	    return list;
 	}
@@ -193,5 +202,21 @@ public class HREFGrabberClient {
 	}
 
 	return link;
+    }
+    
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
