@@ -29,9 +29,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.file.Files;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +74,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.IterationLogger;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
@@ -81,6 +84,8 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.ExtensionHandler;
+import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.Datum;
@@ -118,7 +123,47 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
     private Downloader downloader;
 
-    private List<String> INTERPOLATIONS = Arrays.asList("10", "25", "50", "75", "90", "min", "max", "stdev");
+    public enum TRIGGER_INTERPOLATIONS {
+
+	PERCENTILE_10("10", "10th Percentile", InterpolationType.STATISTICAL), PERCENTILE_25("25", "25th Percentile",
+		InterpolationType.STATISTICAL), PERCENTILE_50("50", "50th Percentile", InterpolationType.STATISTICAL), PERCENTILE_75("75",
+			"75th Percentile", InterpolationType.STATISTICAL), PERCENTILE_90("90", "90th Percentile",
+				InterpolationType.STATISTICAL), MIN("min", "Minimum", InterpolationType.MIN), MAX("max", "Maximum",
+					InterpolationType.MAX), STDEV("stdev", "Standard deviation", InterpolationType.STATISTICAL);
+
+	private String id;
+	private String label;
+	private InterpolationType type;
+
+	public String getLabel() {
+	    return label;
+	}
+
+	public String getId() {
+	    return id;
+	}
+
+	public InterpolationType getInterpolationType() {
+	    return type;
+	}
+
+	private TRIGGER_INTERPOLATIONS(String id, String label, InterpolationType type) {
+	    this.id = id;
+	    this.label = label;
+	    this.type = type;
+	}
+
+	public static TRIGGER_INTERPOLATIONS decode(String parameterCode) {
+	    for (TRIGGER_INTERPOLATIONS var : values()) {
+		if (parameterCode.equals(var.name())) {
+		    return var;
+		}
+	    }
+	    return null;
+
+	}
+    }
+
     private String username;
     private String password;
 
@@ -127,16 +172,11 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
     }
 
     public TRIGGERWafConnector() {
-	username = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFUser().orElse(null);
-	password = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFPassword().orElse(null);
+
     }
 
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
-
-	GSLoggerFactory.getLogger(getClass()).debug("Download URLs from ECMWF WAF ENDED");
-
-	String resumptionToken = request.getResumptionToken();
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<OriginalMetadata>();
 
@@ -148,9 +188,17 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	}
 
 	Optional<Integer> mr = getSetting().getMaxRecords();
+	if (username == null) {
+	    username = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFUser().orElse(null);
+	}
+	if (password == null) {
+	    password = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFPassword().orElse(null);
+	}
 
-	if (allFiles == null) {
-	    try {
+	try {
+
+	    if (allFiles == null) {
+
 		GSLoggerFactory.getLogger(getClass()).debug("Download URLs from ECMWF WAF STARTED");
 		URL listURL = new URL(getSourceURL());
 		allFiles = WAFClient.listFiles(new WAF_URL(listURL), true, username, password);
@@ -165,269 +213,84 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
 		GSLoggerFactory.getLogger(getClass()).debug("Download URLs from ECMWF WAF ENDED");
 
-	    } catch (Exception e) {
-
-		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-
-		throw GSException.createException(//
-			getClass(), //
-			e.getMessage(), //
-			null, //
-			ErrorInfo.ERRORTYPE_INTERNAL, //
-			ErrorInfo.SEVERITY_ERROR, //
-			WAF_LISTING_ERROR, //
-			e);
 	    }
-	}
 
-	List<URL> filteredURLs = filterURLsByToday(allFiles, 0);
-	if (filteredURLs == null || filteredURLs.isEmpty()) {
-	    filteredURLs = filterURLsByToday(allFiles, -1);
+	    List<URL> filteredURLs = filterURLsByToday(allFiles, 0);
+	    if (filteredURLs == null || filteredURLs.isEmpty()) {
+		filteredURLs = filterURLsByToday(allFiles, -1);
 
-	}
+	    }
 
-	int end = start + STEP;
-	if (end > filteredURLs.size()) {
-	    end = filteredURLs.size();
-	} else {
-	    response.setResumptionToken(String.valueOf(end));
-	}
+	    int end = start + STEP;
+	    if (end > filteredURLs.size()) {
+		end = filteredURLs.size();
+	    } else {
+		response.setResumptionToken(String.valueOf(end));
+	    }
 
-	List<URL> subList = filteredURLs.subList(start, end);
-	GSLoggerFactory.getLogger(getClass()).debug("Downloading files [{}-{}/{}] STARTED", start, end, allFiles.size());
+	    List<URL> subList = filteredURLs.subList(start, end);
+	    GSLoggerFactory.getLogger(getClass()).debug("Downloading files [{}-{}/{}] STARTED", start, end, filteredURLs.size());
 
-	for (URL url : subList) {
+	    for (URL url : subList) {
 
-	    String fileURL = url.toExternalForm();
-	    String name = url.getFile();
+		String fileURL = url.toExternalForm();
+		String name = url.getFile();
 
-	    String[] parts = name.split("/");
-	    String fileName = parts[parts.length - 1];
-	    String[] splittedName = fileName.split("_");
-	    // check splitted names - for now we take only the simple files
-	    String varId = null;
-	    String city = null;
-	    String date = null;
-	    OriginalMetadata originalMetadata = null;
-	    if (splittedName.length == 3) {
+		String[] parts = name.split("/");
+		String fileName = parts[parts.length - 1];
+		String[] splittedName = fileName.split("_");
+		// check splitted names - for now we take only the simple files
+		String varId = null;
+		String city = null;
+		String date = null;
 
-		varId = splittedName[0];
-		TRIGGERWAFVariable variable = TRIGGERWAFVariable.decode(varId);
-		if (variable == null) {
-		    continue;
-		}
+		if (splittedName.length == 3) {
 
-		String json = getDownloader().downloadOptionalString(url.toExternalForm(), username, password).orElse(null);
-		JSONObject jsonObject = new JSONObject(json);
-		for (String s : INTERPOLATIONS) {
-		    Dataset dataset = mapJSONToISO(jsonObject, s, variable);
-		    String str = dataset.asString(true);
-		    originalMetadata = new OriginalMetadata();
-		    originalMetadata.setMetadata(str);
-		    originalMetadata.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
+		    varId = splittedName[0];
+		    TRIGGERWAFVariable variable = TRIGGERWAFVariable.decode(varId);
+		    if (variable == null) {
+			continue;
+		    }
+
+		    String json = getDownloader().downloadOptionalString(url.toExternalForm(), username, password).orElse(null);
+		    JSONObject jsonObject = new JSONObject(json);
+		    OriginalMetadata originalMetadata = null;
+		    TRIGGER_INTERPOLATIONS[] interpolations = TRIGGER_INTERPOLATIONS.values();
+		    for (TRIGGER_INTERPOLATIONS interpolation : interpolations) {
+			Dataset dataset = mapJSONToISO(jsonObject, interpolation, variable, url);
+			String str = dataset.asString(true);
+			originalMetadata = new OriginalMetadata();
+			originalMetadata.setMetadata(str);
+			originalMetadata.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
+			response.addRecord(originalMetadata);
+
+		    }
 
 		}
 
 	    }
 
-	}
-
-	if (response.getResumptionToken() == null) {
-	    allFiles = null;
-	    filteredURLs = null;
-	}
-
-	GSLoggerFactory.getLogger(getClass()).debug("Downloading files [{}-{}/{}] ENDED", start, end, allFiles.size());
-	return response;
-
-	Downloader downloader = new Downloader();
-	Optional<InputStream> stream = downloader.downloadOptionalStream(getSourceURL());
-
-	if (stream.isPresent()) {
-
-	    InputStream inputStream = stream.get();
-	    final String url = getSourceURL().endsWith("/") ? getSourceURL() : getSourceURL() + "/";
-
-	    try {
-		XMLDocumentReader reader = new XMLDocumentReader(inputStream);
-
-		Arrays.asList(reader.evaluateNodes("//*:Key/text()")).//
-			stream().//
-
-			map(node -> {
-			    String filename = node.getNodeValue();
-
-			    OriginalMetadata originalMetadata = null;
-			    NetcdfDataset ncDataset = null;
-
-			    try {
-
-				File tmpFile = getLocalCopy(url, filename);
-
-				Dataset dataset = new Dataset();
-				GSSource source = new GSSource();
-				source.setEndpoint(getSourceURL());
-				dataset.setSource(source);
-
-				// read NETCDF
-
-				ncDataset = NetcdfDataset.openDataset(tmpFile.getAbsolutePath());
-
-				List<Variable> mainVariables = NetCDFUtils.getGeographicVariables(ncDataset);
-				Variable mainVariable = mainVariables.get(0);
-				CoordinateReferenceSystem decodedCRS = GeoToolsNetCDFReader.extractCRS(ncDataset, mainVariable);
-
-				CRS crs;
-				if (decodedCRS != null) {
-				    // this workaround is because by default GeoTools NetcdfUtils uses OGC CRS 84
-				    // for NetCDF latitude
-				    // longitude crs
-				    if (decodedCRS.equals(NetCDFCRSUtilities.WGS84)) {
-					decodedCRS = org.geotools.referencing.CRS.decode("EPSG:4326");
-				    }
-
-				    crs = CRS.fromGeoToolsCRS(decodedCRS);
-
-				}
-
-				List<CoordinateAxis> axes = ncDataset.getCoordinateAxes();
-
-				ContinueDimension spatialEast = null;
-				ContinueDimension spatialNorth = null;
-				ContinueDimension time = null;
-
-				for (CoordinateAxis axe : axes) {
-				    ContinueDimension dimension = new ContinueDimension(NetCDFUtils.getAxisName(axe));
-				    double min = axe.getMinValue();
-				    double max = axe.getMaxValue();
-				    long size = axe.getSize();
-				    Double resolution = NetCDFUtils.readResolution(axe.read());
-				    Unit uom = Unit.fromIdentifier(NetCDFUtils.getAxisUnit(axe));
-				    Datum datum = null;
-
-				    AxisType type = axe.getAxisType();
-				    if (type == null) {
-				    } else {
-					switch (type) {
-					case GeoX:
-					case Lon:
-					    spatialEast = dimension;
-					    dimension.setType(DimensionType.ROW);
-					    break;
-					case GeoY:
-					case Lat:
-					    spatialNorth = dimension;
-					    dimension.setType(DimensionType.COLUMN);
-					    break;
-					case Time:
-					    CoordinateAxis1DTime timeAxis = CoordinateAxis1DTime.factory(ncDataset, axe, null);
-					    time = dimension;
-					    dimension.setType(DimensionType.TIME);
-					    resolution = NetCDFUtils.readMinimumResolutionInMilliseconds(timeAxis);
-					    min = timeAxis.getCalendarDateRange().getStart().getMillis();
-					    max = timeAxis.getCalendarDateRange().getEnd().getMillis();
-					    uom = Unit.MILLI_SECOND;
-					    datum = Datum.UNIX_EPOCH_TIME();
-					    // }
-					    break;
-					default:
-					    break;
-					}
-				    }
-				    dimension.setLower(min);
-				    dimension.setUpper(max);
-				    dimension.setSize(size);
-				    dimension.setResolution(resolution);
-				    dimension.setDatum(datum);
-				    dimension.setUom(uom);
-				}
-
-				CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
-
-				String observedParameter = mainVariable.findAttribute("long_name").getStringValue();
-				String observedParameterUnits = mainVariable.findAttribute("units").getStringValue();
-				String locationName = filename.contains("amsterdam") ? "Amsterdam" : "Genova";
-				coreMetadata.setTitle("ERA5 " + observedParameter + " - " + locationName);
-				coreMetadata.setAbstract("ERA5 " + observedParameter + " - " + locationName);
-				CoverageDescription coverageDescription = new CoverageDescription();
-				coverageDescription.setAttributeIdentifier(mainVariable.getShortName());
-				coverageDescription.setAttributeTitle(observedParameter);
-				coverageDescription.setAttributeDescription("");
-				coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
-
-				dataset.getExtensionHandler().setAttributeUnits(observedParameterUnits);
-				double n = spatialNorth.getUpper().doubleValue();
-				double w = spatialEast.getLower().doubleValue();
-				double s = spatialNorth.getLower().doubleValue();
-				double e = spatialEast.getUpper().doubleValue();
-				coreMetadata.addBoundingBox(n, w, s, e);
-				Date start = new Date(time.getLower().longValue());
-				Date endDate = new Date(time.getUpper().longValue());
-				String startString = ISO8601DateTimeUtils.getISO8601DateTime(start);
-				String endString = ISO8601DateTimeUtils.getISO8601DateTime(endDate);
-				coreMetadata.addTemporalExtent(startString, endString);
-
-				coreMetadata.getMIMetadata().getElementType().getContentInfo().get(0).getAbstractMDContentInformation();
-
-				GridSpatialRepresentation grid = new GridSpatialRepresentation();
-
-				Dimension timeDimension = new Dimension();
-				timeDimension.setResolution(time.getUom().getIdentifier(), time.getResolution().doubleValue());
-				grid.addAxisDimension(timeDimension);
-				dataset.getExtensionHandler().setTimeUnits("milliseconds");
-				dataset.getExtensionHandler().setTimeResolution("" + time.getResolution().longValue());
-				Dimension latDimension = new Dimension();
-				latDimension.setResolution(spatialNorth.getUom().getIdentifier(),
-					spatialNorth.getResolution().doubleValue());
-				grid.addAxisDimension(latDimension);
-
-				Dimension lonDimension = new Dimension();
-				lonDimension.setResolution(spatialEast.getUom().getIdentifier(), spatialEast.getResolution().doubleValue());
-				grid.addAxisDimension(lonDimension);
-
-				coreMetadata.getMIMetadata().addGridSpatialRepresentation(grid);
-
-				MIPlatform platform = new MIPlatform();
-				Citation citation = new Citation();
-				citation.setTitle(filename);
-				platform.setMDIdentifierCode(filename);
-				platform.setCitation(citation);
-				coreMetadata.getMIMetadata().addMIPlatform(platform);
-
-				coreMetadata.addDistributionOnlineResource(//
-					filename, //
-					url, //
-					WAF_TRIGGER_PROTOCOL, //
-					"download");
-
-				String resourceIdentifier = AbstractResourceMapper.generateCode(dataset, filename);
-
-				coreMetadata.getOnline().setIdentifier(resourceIdentifier);
-
-				String str = dataset.asString(true);
-				originalMetadata = new OriginalMetadata();
-				originalMetadata.setMetadata(str);
-				originalMetadata.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
-
-			    } catch (Exception e) {
-				GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-			    } finally {
-				try {
-				    ncDataset.close();
-				} catch (IOException e) {
-				    e.printStackTrace();
-				}
-			    }
-
-			    return originalMetadata;
-			}).//
-			filter(Objects::nonNull).//
-			forEach(o -> response.addRecord(o));
-
-	    } catch (SAXException | IOException | XPathExpressionException e) {
-
-		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    GSLoggerFactory.getLogger(getClass()).debug("Downloading files [{}-{}/{}] ENDED", start, end, allFiles.size());
+	    
+	    if (response.getResumptionToken() == null) {
+		allFiles = null;
+		filteredURLs = null;
 	    }
+
+	    
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    WAF_LISTING_ERROR, //
+		    e);
 	}
 
 	return response;
@@ -453,7 +316,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
     }
 
-    private Dataset mapJSONToISO(JSONObject jsonObject, String s, TRIGGERWAFVariable variable) {
+    private Dataset mapJSONToISO(JSONObject jsonObject, TRIGGER_INTERPOLATIONS interpolation, TRIGGERWAFVariable variable, URL fileURL) {
 	Dataset dataset = new Dataset();
 	GSSource source = new GSSource();
 	source.setEndpoint(getSourceURL());
@@ -531,8 +394,8 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
 	String variableName = variable.getLabel();
 	String variableDescription = variable.getDescription();
-	String variableUnit =  variable.getUnit();
-	
+	String variableUnit = variable.getUnit();
+
 	coreMetadata.setTitle("Forecats of " + variableName + " through the station at:" + title);
 
 	coreMetadata.setAbstract("This dataset contains " + variableDescription + " timeseries from station: " + title);
@@ -554,7 +417,6 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
 	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 
-
 	if (latitude != null && longitude != null) {
 
 	    coreMetadata.addBoundingBox(latitude, longitude, latitude, longitude);
@@ -568,17 +430,15 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	MIPlatform platform = new MIPlatform();
 
 	String noSpaceName = title.replaceAll(" ", ":");
-	
+
 	String platformIdentifier = "trigger-waf:" + noSpaceName;
 
 	platform.setMDIdentifierCode(platformIdentifier);
 
-	String siteDescription = noSpaceName;
-
-	platform.setDescription(siteDescription);
+	platform.setDescription(title);
 
 	Citation platformCitation = new Citation();
-	platformCitation.setTitle(noSpaceName);
+	platformCitation.setTitle(title);
 	platform.setCitation(platformCitation);
 
 	coreMetadata.getMIMetadata().addMIPlatform(platform);
@@ -588,15 +448,17 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	 **/
 
 	CoverageDescription coverageDescription = new CoverageDescription();
-	String varId = noSpaceName + ":" + variableName;
+	String varId = noSpaceName + ":" + variableName + ":" + interpolation.getId();
 
 	coverageDescription.setAttributeIdentifier(varId);
-	coverageDescription.setAttributeTitle(variableName);
+	coverageDescription.setAttributeTitle(variableName + " (" + interpolation.getLabel() + ")");
 
 	String attributeDescription = variableDescription + " Units: " + variableUnit;
 
 	coverageDescription.setAttributeDescription(attributeDescription);
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
+
+	dataset.getExtensionHandler().setTimeInterpolation(interpolation.getInterpolationType());
 
 	/**
 	 * ONLINE
@@ -612,7 +474,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	//
 	// coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
 
-	String resourceIdentifier = generateCode(dataset, variableName + ":" + noSpaceName);
+	String resourceIdentifier = generateCode(dataset, variableName + ":" + interpolation.getId() + ":" + noSpaceName);
 
 	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
@@ -624,15 +486,15 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	 */
 	try {
 
-	    String linkage = getSourceURL();
+	    // String linkage = getSourceURL();
 
 	    Online o = new Online();
-	    o.setLinkage(linkage);
+	    o.setLinkage(fileURL.toExternalForm());
 	    o.setFunctionCode("download");
-	    o.setName(stationId + ":" + varName + ":" + variableUnit);
-	    o.setIdentifier(noSpaceName + ":" + variableDescription);
+	    o.setName(variableName + ":" + variableUnit + ":" + interpolation.getId());
+	    o.setIdentifier(noSpaceName + ":" + variableDescription + ":" + interpolation.getId());
 	    o.setProtocol(WAF_TRIGGER_PROTOCOL);
-	    o.setDescription(variableDescription + " Station name: " + stationName);
+	    o.setDescription("Station name: " + title);
 	    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(o);
 
 	} catch (Exception e) {
@@ -642,6 +504,24 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 
 	return dataset;
+    }
+
+    /**
+     * @param gsResource
+     * @param identifier
+     * @return
+     */
+    private String generateCode(GSResource gsResource, String identifier) {
+
+	String out = gsResource.getSource().getUniqueIdentifier() + identifier;
+
+	try {
+	    out = StringUtils.hashSHA1messageDigest(identifier);
+	} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+	    GSLoggerFactory.getLogger(AbstractResourceMapper.class).error(e);
+	}
+
+	return out;
     }
 
     private Date addDays(Date beginDate, int days) {
