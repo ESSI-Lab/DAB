@@ -30,10 +30,10 @@ public class SOSBOMTest {
 		for (Node node : nodes) {
 			String procedure = reader.evaluateString(node, ".");
 			procedures.add(procedure);
-			if (SOSBOMConnector.isToBeSkipped(procedure)) {
-				bad.add(procedure);
-			} else {
+			if (SOSBOMConnector.isToBeMaintained(procedure)) {
 				good.add(procedure);
+			} else {
+				bad.add(procedure);
 			}
 			System.out.println("At " + i++ + "/" + nodes.length + " procedure");
 //			if (procedure.contains("http://bom.gov.au/waterdata/services/tstypes/R")) {

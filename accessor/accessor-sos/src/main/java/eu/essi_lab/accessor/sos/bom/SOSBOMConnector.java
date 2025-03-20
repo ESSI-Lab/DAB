@@ -92,20 +92,10 @@ public class SOSBOMConnector extends SOSConnector {
 	return TYPE;
     }
 
-    public static boolean isToBeSkipped(String procedure) {
-	String[] endsWith = new String[] { "_1ST", "_P_1", "_PB_1", "_PC_1", "_P_C_1", "_V_1", "_C_Std_QaQc_1", "_C_Std_Qcf_1",
-		"_C_Std_DMmanQcf_1", "_C_Std_DMmanQcf_1"//
-		, "R_PF_1", "R_PF_2", "R_PF_3", "R_PF_4", "Pat3_C_PR01manQcf_1", "Pat3_PF_1", "Pat3_PF_1", "Pat4_D_F_1", "Pat9_P_Std_1",
-		"Pat9_V_Std_1"//
-		, "Pat4_D_1", "Pat4_D_F_1", "Pat4_C_Std_PR01ManQcf_1", "Pat4_C_Std_PR01ManQcf_HR", "Pat4_C_B_1_Hourly_PR01",
-		"Pat4_C_Std_PR01ManQcf_09hr", "Pat4_C_B_1_Daily09_PR01", //
-		"Pat6_PR02_ManQc_1", "Pat6_D_1", "Pat7_PR02_ManQc_1"
+    public static boolean isToBeMaintained(String procedure) {
 
-	};
-	for (String end : endsWith) {
-	    if (procedure.endsWith(end)) {
-		return true;
-	    }
+	if (procedure.contains("Pat") && procedure.contains("_C_B_1")) {
+	    return true;
 	}
 
 	return false;
@@ -163,7 +153,7 @@ public class SOSBOMConnector extends SOSConnector {
 	    }
 	    ret.setResumptionToken(nextResumptionToken);
 
-	    if (isToBeSkipped(procedure)) {
+	    if (!isToBeMaintained(procedure)) {
 		GSLoggerFactory.getLogger(getClass()).info("Skipping procedure {}: {}", token, procedure);
 		return ret;
 	    }
