@@ -25,11 +25,15 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -45,6 +49,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.access.wml.WMLDataDownloader;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
@@ -63,6 +68,14 @@ import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
 public class TRIGGERWafDownloader extends WMLDataDownloader {
+
+    private Downloader downloader;
+    private String user;
+    private String psw;
+
+    public TRIGGERWafDownloader() {
+	this.downloader = new Downloader();
+    }
 
     @Override
     public boolean canDownload() {
@@ -184,17 +197,12 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 	    String name = online.getName();
 	    String[] splittedId = name.split(":");
 
-	    String variableName = splittedId[1];
-	    String stationId = splittedId[0];
-	    String units = splittedId[2];
+	    String variableName = splittedId[0];
+	    String variableUnits = splittedId[1];
+	    String interpolation = splittedId[2];
 
 	    Optional<Date> startDate = ISO8601DateTimeUtils.parseISO8601ToDate(startString);
 	    Optional<Date> endDate = ISO8601DateTimeUtils.parseISO8601ToDate(endString);
-
-	    List<Date[]> dates = new ArrayList<Date[]>();
-	    if (startDate.isPresent() && endDate.isPresent()) {
-		dates = checkDates(startDate.get(), endDate.get());
-	    }
 
 	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
@@ -202,83 +210,82 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 	    File tempFile;
 	    boolean isTemperature = false;
 
-//	    if (units.contains("°C") || units.contains("ºC") || units.contains("K")) {
-//		units = units.replace("°C", "K").replace("ºC", "K");
-//		isTemperature = true;
-//	    }
+	    // if (units.contains("°C") || units.contains("ºC") || units.contains("K")) {
+	    // units = units.replace("°C", "K").replace("ºC", "K");
+	    // isTemperature = true;
+	    // }
 
-	    for (Date[] d : dates) {
+	    if(user == null) {
+		user = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFUser().orElse(null);
+	    }
+	    if(psw == null) {
+		psw = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFPassword().orElse(null);
+	    }
+	    
+	    String jsonResp = downloader.downloadOptionalString(linkage, user, psw).orElse(null);
+	    if(jsonResp != null && !jsonResp.isEmpty()) {
+		
+		ret = new JSONObject(jsonResp);
+	    	JSONArray data = ret.optJSONArray(interpolation);
+	    	
+	    	Map<String, BigDecimal> result = getDateValue(data);
+	    	
+	    	
+	    	 for (Map.Entry<String,BigDecimal> entry : result.entrySet()) {
 
-		startString = convertISODateToAcronetDate(ISO8601DateTimeUtils.getISO8601DateTime(d[0]));
-		endString = convertISODateToAcronetDate(ISO8601DateTimeUtils.getISO8601DateTime(d[1]));
-		ret = client.getData(variableName, stationId, startString, endString);
-		int count = 0;
-		if (ret != null && !ret.isEmpty()) {
+		    
 
-		    JSONArray data = ret.optJSONArray("values");
-		    JSONArray timeLine = ret.optJSONArray("timeline");
-		    System.out.println(data.length());
-		    System.out.println(timeLine.length());
-		    for (int j = 0; j < data.length(); j++) {
+		    BigDecimal value = entry.getValue();// data.optBigDecimal(1, null);//
+								   // obj.optBigDecimal(varId.toLowerCase(),
+								   // null);// data.optString("value");
+		    ValueSingleVariable variable = new ValueSingleVariable();
 
-			JSONArray dataTime = data.optJSONArray(j);
+		    if (value != null && value.doubleValue() != -9999.0) {
 
-			BigDecimal value = data.optBigDecimal(j, null);// data.optBigDecimal(1, null);//
-								       // obj.optBigDecimal(varId.toLowerCase(),
-								       // null);// data.optString("value");
-			ValueSingleVariable variable = new ValueSingleVariable();
+			//
+			// value
+			//
 
-			if (value != null && value.doubleValue() != -9998.0) {
+			// BigDecimal dataValue = new BigDecimal(value);
+//			if (isTemperature) {
+//			    // from Celsius to Kelvin
+//			    BigDecimal kelvin = new BigDecimal("273.15");
+//			    value = value.add(kelvin);
+//			}
 
-			    //
-			    // value
-			    //
+			value = value.setScale(2, BigDecimal.ROUND_FLOOR);
+			// int valueInteger = value.multiply(new BigDecimal(100)).intValue();
 
-			    // BigDecimal dataValue = new BigDecimal(value);
-			    if (isTemperature) {
-				// from Celsius to Kelvin
-				BigDecimal kelvin = new BigDecimal("273.15");
-				value = value.add(kelvin);
-			    }
+			variable.setValue(value);
 
-			    value = value.setScale(2, BigDecimal.ROUND_FLOOR);
-			    // int valueInteger = value.multiply(new BigDecimal(100)).intValue();
+			String date = entry.getKey();
 
-			    variable.setValue(value);
+			if (date != null) {
 
-			    String date = timeLine.optString(j, null);
+			    Optional<Date> parsed = ISO8601DateTimeUtils.parseISO8601ToDate(date);
 
-			    if (date != null) {
+			    if (parsed != null && parsed.isPresent()) {
 
-				Optional<Date> parsed = ISO8601DateTimeUtils.parseNotStandard2ToDate(date);
+				// Date parsed = iso8601OutputFormat.parse(date);
 
-				// Date parsed =
-				// Date.from(dateTime.atZone(ZoneId.of(TimeZone.getTimeZone("GMT").getID())).toInstant());
+				GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+				gregCal.setTime(parsed.get());
 
-				if (parsed != null && parsed.isPresent()) {
+				XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+				variable.setDateTimeUTC(xmlGregCal);
 
-				    // Date parsed = iso8601OutputFormat.parse(date);
+				//
+				//
+				//
 
-				    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-				    gregCal.setTime(parsed.get());
-
-				    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
-				    variable.setDateTimeUTC(xmlGregCal);
-
-				    //
-				    //
-				    //
-
-				    addValue(tsrt, variable);
-				    count++;
-				}
+				addValue(tsrt, variable);
+				
 			    }
 			}
 		    }
 
 		}
-		if(count > 0)
-		    break;
+
 	    }
 
 	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
@@ -306,16 +313,51 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 		"TRIGGER WAF DOWNLOAD ERROR");
     }
 
+    private Map<String, BigDecimal> getDateValue(JSONArray data) {
+	// Get today's date at 00:00 UTC
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        // Store the results
+        Map<String, BigDecimal> result = new LinkedHashMap<>();
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        // First 90 values - Hourly data
+        for (int i = 0; i < 90; i++) {
+            calendar.add(Calendar.HOUR_OF_DAY, 1); // Add 1 hour
+            result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
+        }
+
+        // Next 18 values - Every 3 hours
+        for (int i = 90; i < 108; i++) {
+            calendar.add(Calendar.HOUR_OF_DAY, 3); // Add 3 hours
+            result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
+        }
+
+        // Last 16 values - Every 6 hours
+        for (int i = 108; i < 124; i++) {
+            calendar.add(Calendar.HOUR_OF_DAY, 6); // Add 6 hours
+            result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
+        }
+
+        //result.forEach((key, value) -> System.out.println(key + " -> " + value));
+	return result;
+    }
+
     @Override
     public boolean canConnect() throws GSException {
-//	try {
-//	    return HttpConnectionUtils.checkConnectivity(online.getLinkage());
-//	} catch (URISyntaxException e) {
-//
-//	    GSLoggerFactory.getLogger(getClass()).error(e);
-//	}
-//
-//	return false;
+	try {
+	    return HttpConnectionUtils.checkConnectivity(online.getLinkage());
+	} catch (URISyntaxException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
+	return false;
     }
 
     @Override
