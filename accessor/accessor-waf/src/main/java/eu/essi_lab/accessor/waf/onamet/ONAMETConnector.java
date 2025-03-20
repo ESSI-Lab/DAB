@@ -48,7 +48,7 @@ import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.lib.utils.TarExtractor;
+import eu.essi_lab.lib.utils.zip.TarExtractor;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;

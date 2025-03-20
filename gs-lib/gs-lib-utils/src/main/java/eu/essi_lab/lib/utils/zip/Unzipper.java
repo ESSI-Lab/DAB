@@ -1,7 +1,7 @@
 /**
  *
  */
-package eu.essi_lab.lib.utils;
+package eu.essi_lab.lib.utils.zip;
 
 /*-
  * #%L

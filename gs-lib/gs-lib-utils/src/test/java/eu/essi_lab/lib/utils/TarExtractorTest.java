@@ -14,6 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.essi_lab.lib.utils.zip.TarExtractor;
+
 /**
  * @author Fabrizio
  */

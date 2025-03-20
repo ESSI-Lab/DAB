@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.utils;
+package eu.essi_lab.lib.utils.zip;
 
 /*-
  * #%L
@@ -40,6 +40,8 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio

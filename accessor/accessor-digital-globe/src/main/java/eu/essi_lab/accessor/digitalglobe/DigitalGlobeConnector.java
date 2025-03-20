@@ -49,7 +49,7 @@ import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IterationLogger;
 import eu.essi_lab.lib.utils.ShapeReader;
-import eu.essi_lab.lib.utils.Unzipper;
+import eu.essi_lab.lib.utils.zip.Unzipper;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;

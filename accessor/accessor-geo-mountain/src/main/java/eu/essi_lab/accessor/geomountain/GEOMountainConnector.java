@@ -24,23 +24,13 @@ package eu.essi_lab.accessor.geomountain;
  * #L%
  */
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -51,19 +41,12 @@ import com.github.jsonldjava.shaded.com.google.common.base.Charsets;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.dirlisting.HREFGrabberClient;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.utils.WebConnector;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.GZIPUnzipper;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
 
 /**

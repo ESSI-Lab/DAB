@@ -1,32 +1,22 @@
 package eu.essi_lab.accessor.geomountain;
 
-import static org.junit.Assert.*;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.ibatis.reflection.SystemMetaObject;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.github.jsonldjava.shaded.com.google.common.base.Charsets;
 
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.utils.IOStreamUtils;
-import junit.framework.TestCase;
 
 public class GEOMountainAccessorExternalTestIT {
 

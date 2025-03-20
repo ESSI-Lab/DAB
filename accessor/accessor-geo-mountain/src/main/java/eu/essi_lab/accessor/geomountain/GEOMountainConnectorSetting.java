@@ -21,13 +21,9 @@ package eu.essi_lab.accessor.geomountain;
  * #L%
  */
 
-import java.util.Optional;
-
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.StringOptionBuilder;
 
 /**
  * @author Fabrizio
