@@ -25,57 +25,37 @@ package eu.essi_lab.accessor.waf.trigger;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.xml.xpath.XPathExpressionException;
-
 import org.apache.commons.io.IOUtils;
-import org.geotools.imageio.netcdf.GeoToolsNetCDFReader;
-import org.geotools.imageio.netcdf.utilities.NetCDFCRSUtilities;
 import org.json.JSONObject;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.xml.sax.SAXException;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting;
-import eu.essi_lab.cfga.gs.setting.S3StorageSetting;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.Dimension;
-import eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.dirlisting.WAFClient;
 import eu.essi_lab.lib.net.dirlisting.WAF_URL;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.utils.IterationLogger;
 import eu.essi_lab.lib.utils.StringUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;
@@ -87,19 +67,8 @@ import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
-import eu.essi_lab.model.resource.data.CRS;
-import eu.essi_lab.model.resource.data.Datum;
-import eu.essi_lab.model.resource.data.DimensionType;
-import eu.essi_lab.model.resource.data.Unit;
-import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
-import eu.essi_lab.netcdf.timeseries.NetCDFUtils;
 import eu.essi_lab.ommdk.AbstractResourceMapper;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
-import ucar.nc2.Variable;
-import ucar.nc2.constants.AxisType;
-import ucar.nc2.dataset.CoordinateAxis;
-import ucar.nc2.dataset.CoordinateAxis1DTime;
-import ucar.nc2.dataset.NetcdfDataset;
 
 /**
  * @author roncella
@@ -396,7 +365,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	String variableDescription = variable.getDescription();
 	String variableUnit = variable.getUnit();
 
-	coreMetadata.setTitle("Forecats of " + variableName + " through the station at:" + title);
+	coreMetadata.setTitle("Forecats of " + variableName + " ( "+ interpolation.getLabel() +") through the station at:" + title);
 
 	coreMetadata.setAbstract("This dataset contains " + variableDescription + " timeseries from station: " + title);
 

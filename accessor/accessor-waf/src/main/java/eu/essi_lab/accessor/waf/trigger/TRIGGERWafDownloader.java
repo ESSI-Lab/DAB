@@ -22,7 +22,6 @@ package eu.essi_lab.accessor.waf.trigger;
  */
 
 import java.io.File;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -246,13 +245,6 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 			// value
 			//
 
-			// BigDecimal dataValue = new BigDecimal(value);
-//			if (isTemperature) {
-//			    // from Celsius to Kelvin
-//			    BigDecimal kelvin = new BigDecimal("273.15");
-//			    value = value.add(kelvin);
-//			}
-
 			value = value.setScale(2, BigDecimal.ROUND_FLOOR);
 			// int valueInteger = value.multiply(new BigDecimal(100)).intValue();
 
@@ -314,15 +306,15 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
     }
 
     private Map<String, BigDecimal> getDateValue(JSONArray data) {
+	Map<String, BigDecimal> result = new LinkedHashMap<>();
+	
 	// Get today's date at 00:00 UTC
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-
-        // Store the results
-        Map<String, BigDecimal> result = new LinkedHashMap<>();
+        
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
