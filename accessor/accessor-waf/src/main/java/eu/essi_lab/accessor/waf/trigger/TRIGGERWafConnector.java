@@ -86,9 +86,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
     private List<URL> allFiles;
     private static final String BUCKET_NAME = "trigger-json-files";
-    private static final int TARGET_COUNT = 2888086;
-    private static final Integer PAGE_SIZE = 100;
-    private int recordsCount;
+
 
     private Downloader downloader;
 
