@@ -218,9 +218,12 @@ public class Harvester {
 		properties.setCompleted(true);
 	    }
 
-	    ExecutionStage executionStage = customTask.getExecutionStage();
-
-	    if (executionStage == ExecutionStage.BEFORE_HARVESTING_END) {
+	    ExecutionStage executionStage = null;
+	    if (customTask != null) {
+		executionStage = customTask.getExecutionStage();
+	    }
+	   
+	    if (executionStage != null && executionStage == ExecutionStage.BEFORE_HARVESTING_END) {
 
 		handleCustomTask(getAccessor().getSource(), context, status);
 	    }
@@ -232,7 +235,7 @@ public class Harvester {
 		    Optional.ofNullable(status), //
 		    Optional.of(request));
 
-	    if (executionStage == ExecutionStage.AFTER_HARVESTING_END) {
+	    if (executionStage != null && executionStage == ExecutionStage.AFTER_HARVESTING_END) {
 
 		handleCustomTask(getAccessor().getSource(), context, status);
 	    }

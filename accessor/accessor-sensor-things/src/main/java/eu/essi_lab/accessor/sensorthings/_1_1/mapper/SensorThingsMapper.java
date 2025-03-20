@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import eu.essi_lab.accessor.sensorthings._1_1.SensorThingsConnector;
 import eu.essi_lab.accessor.sensorthings._1_1.SensorThingsMangler;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
@@ -372,23 +371,23 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
     protected void mapDataset(String streamId, Dataset dataset, Boolean discardStations) throws GSException {
 
 	Datastream stream = downloadStrem(streamId);
-//	if (discardStations) {
-//	    stream = downloadStrem(streamId);
-//	} else {
-//	    try {
-//		String optString = SensorThingsConnector.getFakeStream();
-//		if (optString != null) {
-//		    JSONObject jsonEntity = new JSONObject(optString);
-//		    stream = new Datastream(jsonEntity);
-//		}
-//	    } catch (Exception e) {
-//
-//		GSLoggerFactory.getLogger(getClass()).equals(e);
-//
-//		throw GSException.createException(getClass(), getDownloadStreamErrorMessage(), e);
-//	    }
-//
-//	}
+	// if (discardStations) {
+	// stream = downloadStrem(streamId);
+	// } else {
+	// try {
+	// String optString = SensorThingsConnector.getFakeStream();
+	// if (optString != null) {
+	// JSONObject jsonEntity = new JSONObject(optString);
+	// stream = new Datastream(jsonEntity);
+	// }
+	// } catch (Exception e) {
+	//
+	// GSLoggerFactory.getLogger(getClass()).equals(e);
+	//
+	// throw GSException.createException(getClass(), getDownloadStreamErrorMessage(), e);
+	// }
+	//
+	// }
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 	DataIdentification dataId = coreMetadata.getDataIdentification();
@@ -450,6 +449,34 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	//
 
 	addBoundingBox(thing, dataId, keywords);
+
+	Optional<JSONObject> properties = thing.getProperties();
+	if (properties.isPresent()) {
+	    JSONObject prop = properties.get();
+	    JSONArray relatedArray = prop.optJSONArray("relatedTo");
+	    if (relatedArray != null) {
+		for (int i = 0; i < relatedArray.length(); i++) {
+		    JSONObject relatedProperty = relatedArray.optJSONObject(i);
+		    if (relatedProperty != null) {
+			String href = relatedProperty.optString("href");
+			String title = relatedProperty.optString("title");
+			if (href != null && title != null) {
+			    switch (title) {
+			    case "Watershed":
+				dataset.getExtensionHandler().setRiverBasin(href);
+				break;
+			    case "Watercourse":
+				dataset.getExtensionHandler().setRiver(href);
+				break;
+			    default:
+				GSLoggerFactory.getLogger(getClass()).warn("Unmapped property: {}", title);
+				break;
+			    }
+			}
+		    }
+		}
+	    }
+	}
 
 	//
 	// MI_Instument

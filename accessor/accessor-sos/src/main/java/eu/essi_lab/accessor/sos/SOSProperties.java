@@ -38,6 +38,9 @@ public class SOSProperties {
 		PROCEDURE_TITLE, //
 		PROCEDURE_HREF, //
 		PROCEDURE_IDENTIFIER, //
+		PROCEDURE_TIME_INTERPOLATION, //
+		PROCEDURE_TIME_RESOLUTION, //
+		PROCEDURE_TIME_AGGREGATION, //
 
 		// FROM CAPABILITIES
 		OFFERING, //
@@ -59,6 +62,7 @@ public class SOSProperties {
 		// FEATURE OF INTEREST
 		FOI_ID, //
 		FOI_NAME, //
+		FOI_COUNTRY, //
 
 		// TEMPORAL EXTENT
 		TEMP_EXTENT_BEGIN, //
@@ -71,7 +75,9 @@ public class SOSProperties {
 		// OBSERVED PROPERTY
 		OBSERVED_PROPERTY_ID, //
 		OBSERVED_PROPERTY_NAME, //
-		OBSERVED_PROPERTY_UOM, //
+		OBSERVED_PROPERTY_UOM_CODE, //
+		OBSERVED_PROPERTY_UOM_HREF, //
+		OBSERVED_PROPERTY_UOM_TITLE, //
 
 		// SENSOR PROPERTIES
 		SENSOR_Name, //
@@ -152,7 +158,7 @@ public class SOSProperties {
 	}
 
 	@Override
-	protected SOSProperties clone() throws CloneNotSupportedException {
+	public SOSProperties clone() throws CloneNotSupportedException {
 		Properties news = new Properties();
 		news.putAll(properties);
 		SOSProperties ret = new SOSProperties(news);

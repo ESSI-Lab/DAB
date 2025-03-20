@@ -1,7 +1,4 @@
-/**
- * 
- */
-package eu.essi_lab.cfga.gs.task;
+package eu.essi_lab.accessor.waf.trigger;
 
 /*-
  * #%L
@@ -24,29 +21,33 @@ package eu.essi_lab.cfga.gs.task;
  * #L%
  */
 
+import eu.essi_lab.adk.harvest.HarvestedAccessor;
+
 /**
- * This interface must be implemented by harvesting embedded tasks
- * 
- * @author Fabrizio
+ * @author roncella
  */
-public interface HarvestingEmbeddedTask extends CustomTask {
+public class TRIGGERWafAccessor extends HarvestedAccessor<TRIGGERWafConnector> {
 
     /**
-     * @author Fabrizio
+     * 
      */
-    public enum ExecutionStage {
-	/**
-	 * 
-	 */
-	BEFORE_HARVESTING_END,
-	/**
-	 * 
-	 */
-	AFTER_HARVESTING_END;
+    public static final String TYPE = "TRIGGERWAF";
+
+    @Override
+    protected String initSettingName() {
+
+	return "WAF Accessor - TRIGGER JSON files";
     }
 
-    /**
-     * @return
-     */
-    public ExecutionStage getExecutionStage();
+    @Override
+    protected String initAccessorType() {
+
+	return TYPE;
+    }
+
+    @Override
+    protected TRIGGERWafConnectorSetting initHarvestedConnectorSetting() {
+
+	return new TRIGGERWafConnectorSetting();
+    }
 }

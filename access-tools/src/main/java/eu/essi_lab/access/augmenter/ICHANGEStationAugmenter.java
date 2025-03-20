@@ -142,7 +142,7 @@ public class ICHANGEStationAugmenter extends ResourceAugmenter<ICHANGEStationAug
 
 	    String metadataURL = null;
 	    
-	    if(resource.getSource().getEndpoint().contains("trigger-io.difa.unibo.it")) {
+	    if(resource.getSource().getEndpoint().contains("trigger-io.difa.unibo.it") || resource.getSource().getEndpoint().contains("aux.ecmwf.int")) {
 		record.setThemeCategory("trigger");
 		metadataURL = "https://gs-service-production.geodab.eu/gs-service/services/essi/view/trigger/info?monitoringPoint=" + id;
 	    } else {

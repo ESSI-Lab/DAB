@@ -624,11 +624,8 @@ public abstract class AbstractSOSConnector extends WrappedConnector {
 	public List<OMObservationType> retrieveData(String procedure, String featureIdentifier, String property, Date begin,
 			Date end) {
 
-		SOSRequestBuilder builder = createRequestBuilder();
-		String dataRequest = builder.createDataRequest(procedure, featureIdentifier, property, begin, end);
-
 		try {
-			InputStream stream = downloadStreamWithRetry(dataRequest);
+			InputStream stream = retrieveDataStream(procedure, featureIdentifier, property, begin, end);
 			if (stream == null) {
 				throw new RuntimeException("Error downloading SOS data");
 			}
@@ -655,6 +652,26 @@ public abstract class AbstractSOSConnector extends WrappedConnector {
 			throw new RuntimeException("Error downloading SOS data");
 		}
 	}
+	
+	public InputStream retrieveDataStream(String procedure, String featureIdentifier, String property, Date begin,
+		Date end) {
+
+	SOSRequestBuilder builder = createRequestBuilder();
+	String dataRequest = builder.createDataRequest(procedure, featureIdentifier, property, begin, end);
+
+	try {
+		InputStream stream = downloadStreamWithRetry(dataRequest);
+		if (stream == null) {
+			throw new RuntimeException("Error downloading SOS data");
+		}
+
+		stream = modifyObservationResponse(stream);
+		return stream;
+	} catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error(e);
+		throw new RuntimeException("Error downloading SOS data");
+	}
+}
 
 	public boolean hasGetDataAvailabilityOperation() throws Exception {
 		if (getSOSCache().getCapabilities() == null) {

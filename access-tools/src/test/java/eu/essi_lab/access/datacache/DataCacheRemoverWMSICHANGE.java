@@ -24,8 +24,8 @@ public class DataCacheRemoverWMSICHANGE {
 	connector.configure(OpenSearchConnector.MAX_BULK_SIZE, "1000");
 	connector.configure(OpenSearchConnector.CACHED_DAYS, "0");
 
-	connector.deleteStation("ED1D342AC8B20375DA9CD0D19BB7EEAF3E358374");
-	connector.deleteStation("439803A65293F4C708AE441FEF3608ED6FDFFB6F");
+	connector.deleteStation("0AFC342750AB0A1EB4AB6EE1859F45D29ADC4641");
+	connector.deleteStation("7A46E8629E1E37C8DB6BDEFB1C06C1C55C6060A1");
 //	connector.deleteStations(sourceIdentifier, theme);
 //	connector.clearStations(); // this deletes all the indeX!!
 	

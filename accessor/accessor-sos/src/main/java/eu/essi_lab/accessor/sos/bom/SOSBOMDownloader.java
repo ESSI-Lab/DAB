@@ -1,7 +1,4 @@
-/**
- * 
- */
-package eu.essi_lab.cfga.gs.task;
+package eu.essi_lab.accessor.sos.bom;
 
 /*-
  * #%L
@@ -24,29 +21,19 @@ package eu.essi_lab.cfga.gs.task;
  * #L%
  */
 
-/**
- * This interface must be implemented by harvesting embedded tasks
- * 
- * @author Fabrizio
- */
-public interface HarvestingEmbeddedTask extends CustomTask {
+import eu.essi_lab.accessor.sos.SOSConnector;
+import eu.essi_lab.accessor.sos.downloader.SOSDownloader;
+import eu.essi_lab.lib.net.protocols.NetProtocols;
 
-    /**
-     * @author Fabrizio
-     */
-    public enum ExecutionStage {
-	/**
-	 * 
-	 */
-	BEFORE_HARVESTING_END,
-	/**
-	 * 
-	 */
-	AFTER_HARVESTING_END;
+public class SOSBOMDownloader extends SOSDownloader {
+    @Override
+    public String getSupportedProtocol() {
+	return NetProtocols.SOS_2_0_0_BOM.getCommonURN();
     }
 
-    /**
-     * @return
-     */
-    public ExecutionStage getExecutionStage();
+    @Override
+    public SOSConnector getConnector() {
+	return new SOSBOMConnector();
+    }
+
 }

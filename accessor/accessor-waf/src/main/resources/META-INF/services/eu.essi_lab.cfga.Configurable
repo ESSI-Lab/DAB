@@ -16,3 +16,5 @@ eu.essi_lab.accessor.waf.netcdf.NetCDFAccessor
 eu.essi_lab.accessor.waf.netcdf.NetCDFConnector
 eu.essi_lab.accessor.waf.zenodo.ZenodoS3BucketAccessor
 eu.essi_lab.accessor.waf.zenodo.ZenodoS3BucketConnector
+eu.essi_lab.accessor.waf.trigger.TRIGGERWafAccessor
+eu.essi_lab.accessor.waf.trigger.TRIGGERWafConnector

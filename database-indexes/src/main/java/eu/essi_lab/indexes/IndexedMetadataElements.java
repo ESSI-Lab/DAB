@@ -1567,6 +1567,31 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 	    defineBNHSProperty(BNHSProperty.RIVER, resource);
+	    
+	    Optional<String> optional = resource.getExtensionHandler().getRiver();
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	    
+	}
+    };
+    
+    public static final IndexedMetadataElement RIVER_BASIN = new IndexedMetadataElement(MetadataElement.RIVER_BASIN) {
+	@Override
+	public void defineValues(GSResource resource) {
+	    Optional<String> optional = resource.getExtensionHandler().getRiverBasin();
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	    
 	}
     };
 

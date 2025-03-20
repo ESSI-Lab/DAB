@@ -6,3 +6,4 @@ eu.essi_lab.accessor.waf.onamet.ONAMETAccessor
 eu.essi_lab.accessor.waf.onamet_stations.ONAMETStationsAccessor
 eu.essi_lab.accessor.waf.netcdf.NetCDFAccessor
 eu.essi_lab.accessor.waf.zenodo.ZenodoS3BucketAccessor
+eu.essi_lab.accessor.waf.trigger.TRIGGERWafAccessor

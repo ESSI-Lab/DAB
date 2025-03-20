@@ -31,9 +31,8 @@ import javax.xml.bind.JAXBElement;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.accessor.sos.AbstractSOSConnector;
-import eu.essi_lab.accessor.sos.SOSBOMConnector;
-import eu.essi_lab.accessor.sos.SOSConnector;
 import eu.essi_lab.accessor.sos.SOSIdentifierMangler;
+import eu.essi_lab.accessor.sos.bom.SOSBOMConnector;
 import eu.essi_lab.jaxb.sos._2_0.ObservationOfferingType;
 import eu.essi_lab.jaxb.sos._2_0.ObservationOfferingType.PhenomenonTime;
 import eu.essi_lab.jaxb.sos._2_0.gda.DataAvailabilityMemberType;
