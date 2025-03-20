@@ -27,6 +27,7 @@ package eu.essi_lab.profiler.wms.extent.legend;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -171,7 +172,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 		    Graphics2D ig2 = bi.createGraphics();
-
+		    ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		    ig2.setStroke(new BasicStroke(2));
 
 		    int offset = 0;

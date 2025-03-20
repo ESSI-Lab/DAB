@@ -41,7 +41,7 @@ import eu.essi_lab.accessor.satellite.common.SatelliteUtils;
 import eu.essi_lab.lib.net.dirlisting.HREFGrabberClient;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.GZIPUnzipper;
+import eu.essi_lab.lib.utils.zip.GZIPUnzipper;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;

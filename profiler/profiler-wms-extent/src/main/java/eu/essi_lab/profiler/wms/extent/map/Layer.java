@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.wms.extent.map;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -328,6 +329,7 @@ public class Layer {
 			mapContent.addLayer(layerLines);
 			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D graphics = image.createGraphics();
+			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			StreamingRenderer renderer = new StreamingRenderer();
 			renderer.setMapContent(mapContent);
 			renderer.paint(graphics, new Rectangle(width, height), mapBounds);

@@ -105,7 +105,7 @@ public class S3Source implements ConfigurationSource {
 
 	Optional<SimpleEntry<InputStream, File>> binaryConfig = getBinaryConfig();
 
-	if (!binaryConfig.isPresent()) {
+	if (isEmptyOrMissing(binaryConfig)) {
 
 	    return new ArrayList<Setting>();
 	}
@@ -154,10 +154,12 @@ public class S3Source implements ConfigurationSource {
 	GSLoggerFactory.getLogger(getClass()).trace("Flushing source ENDED");
     }
 
-    @Override
-    public boolean isEmptyOrMissing() throws Exception {
-
-	Optional<SimpleEntry<InputStream, File>> binaryConfig = getBinaryConfig();
+    /**
+     * @param binaryConfig
+     * @return
+     * @throws Exception
+     */
+    private boolean isEmptyOrMissing(Optional<SimpleEntry<InputStream, File>> binaryConfig) throws Exception {
 
 	if (!binaryConfig.isPresent()) {
 
@@ -183,6 +185,14 @@ public class S3Source implements ConfigurationSource {
 	binaryConfig.get().getValue().delete();
 
 	return out;
+    }
+
+    @Override
+    public boolean isEmptyOrMissing() throws Exception {
+
+	Optional<SimpleEntry<InputStream, File>> binaryConfig = getBinaryConfig();
+
+	return isEmptyOrMissing(binaryConfig);
     }
 
     /**

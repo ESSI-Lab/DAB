@@ -390,6 +390,8 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		String linkage = online.getLinkage();
 		String protocol = online.getProtocol();
 
+		protocol = FAIREaseMapper.map(protocol, linkage, resource.getSource().getUniqueIdentifier());
+		
 		boolean download = false;
 
 		if (isURI(linkage)) {
@@ -422,9 +424,6 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 			ret += serverId + "\n";
 			ret += "rdf:type dcat:DataService ;\n";			
 			if (protocol != null) {
-			    if (protocol.equals("EEA:FILEPATH")&&linkage.endsWith("/")) {
-				protocol = "EEA:FOLDERPATH";
-			    }
 			    ret += "dct:conformsTo \"" + protocol + "\" ;\n";
 			}
 			ret += "dct:type <https://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/invoke> ;\n";

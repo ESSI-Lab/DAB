@@ -189,7 +189,7 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
 	try {
 
 	    SourceStorageWorker worker = database.getWorker(sid);
-	    return worker.getSourceHarvestingProperties();
+	    return worker.getHarvestingProperties();
 
 	} catch (Exception e) {
 
