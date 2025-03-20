@@ -1579,6 +1579,21 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    
 	}
     };
+    
+    public static final IndexedMetadataElement RIVER_BASIN = new IndexedMetadataElement(MetadataElement.RIVER_BASIN) {
+	@Override
+	public void defineValues(GSResource resource) {
+	    Optional<String> optional = resource.getExtensionHandler().getRiverBasin();
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	    
+	}
+    };
 
     public static final IndexedMetadataElement LAKE_STATION = new IndexedMetadataElement(MetadataElement.LAKE_STATION) {
 	@Override
