@@ -27,6 +27,7 @@ package eu.essi_lab.profiler.wms.extent.map;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -191,6 +192,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 						int pixsMaxX = getXPixel(width, bboxMaxx, bminx, w);
 
 						Graphics2D ig2 = bi.createGraphics();
+						ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 						ig2.setColor(Color.LIGHT_GRAY);
 						ig2.fillRect(pixsMinX, pixsMaxY, pixsMaxX - pixsMinX, pixsMinY - pixsMaxY);
 						ig2.setColor(Color.BLACK);
@@ -204,7 +206,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 							BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 							Graphics2D ig2 = bi.createGraphics();
-
+							ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 							int r = 8;
 
 							if (bboxString != null && crs2 != null) {
