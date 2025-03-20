@@ -245,7 +245,7 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 			// value
 			//
 
-			value = value.setScale(2, BigDecimal.ROUND_FLOOR);
+			//value = value.setScale(2, BigDecimal.ROUND_FLOOR);
 			// int valueInteger = value.multiply(new BigDecimal(100)).intValue();
 
 			variable.setValue(value);
