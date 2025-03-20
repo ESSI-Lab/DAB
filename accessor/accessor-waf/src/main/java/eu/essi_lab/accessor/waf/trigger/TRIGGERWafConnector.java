@@ -82,7 +82,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
     public static final String WAF_TRIGGER_PROTOCOL = "WAF_TRIGGER_PROTOCOL";
     private static final String WAF_LISTING_ERROR = "WAF_LISTING_ERROR";
 
-    private static final int STEP = 50;
+    private static final int STEP = 10;
 
     private List<URL> allFiles;
     private static final String BUCKET_NAME = "trigger-json-files";
