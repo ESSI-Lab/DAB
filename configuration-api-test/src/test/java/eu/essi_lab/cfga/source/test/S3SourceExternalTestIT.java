@@ -24,7 +24,7 @@ public class S3SourceExternalTestIT {
     /**
      * 
      */
-    private static final String TEST_BUCKET_NAME = "dabconfigurationtest";
+    private static final String TEST_BUCKET_NAME = "essitestbucket";
 
     /**
      * 
@@ -149,6 +149,8 @@ public class S3SourceExternalTestIT {
 	//
 
 	S3Source source = new S3Source(manager, TEST_BUCKET_NAME, TEST_CONFIG_NAME);
+	
+	Assert.assertFalse(source.isEmptyOrMissing());
 
 	List<Setting> list = source.list();
 

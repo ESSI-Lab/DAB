@@ -27,7 +27,39 @@ import com.amazonaws.util.IOUtils;
 
 public class FAIREaseMapper {
 
-    public static String map(String protocol, String linkage, String sourceId) {
+    public static FAIREaseMapping map(String protocol, String linkage, String sourceId) {
+	FAIREaseMapping ret = new FAIREaseMapping();
+	String mappedProtocol = mapProtocol(protocol, linkage, sourceId);
+	ret.setProtocol(mappedProtocol);
+	ret.setInAccessService(isInAccessService(mappedProtocol));
+	FAIREaseProtocol mapped = FAIREaseProtocol.decode(mappedProtocol);
+	if (mapped != null) {
+	    switch (mapped) {
+	    case APPLICATION_XML:
+		ret.setProtocol(FAIREaseProtocol.METADATA.getUri());
+		ret.setMediaType(FAIREaseProtocol.APPLICATION_XML.getUri());
+		break;
+	    case GML:
+		ret.setProtocol(FAIREaseProtocol.DIRECT_DOWNLOAD.getUri());
+		ret.setMediaType(FAIREaseProtocol.GML.getUri());
+		break;
+	    case KML:
+		ret.setProtocol(FAIREaseProtocol.DIRECT_DOWNLOAD.getUri());
+		ret.setMediaType(FAIREaseProtocol.KML.getUri());
+		break;
+	    case SHAPE_FILE:
+		ret.setProtocol(FAIREaseProtocol.DIRECT_DOWNLOAD.getUri());
+		ret.setMediaType(FAIREaseProtocol.SHAPE_FILE.getUri());
+		break;
+
+	    default:
+		break;
+	    }
+	}
+	return ret;
+    }
+
+    public static String mapProtocol(String protocol, String linkage, String sourceId) {
 
 	if (sourceId == null) {
 	    return protocol;
@@ -205,13 +237,13 @@ public class FAIREaseMapper {
 		return FAIREaseProtocol.LANDING_PAGE.getUri();
 
 	    case "application/xml":
-		return FAIREaseProtocol.METADATA.getUri();// check TODO
+		return FAIREaseProtocol.APPLICATION_XML.getUri();// check TODO
 
 	    case "application/gml+xml":
-		return FAIREaseProtocol.DIRECT_DOWNLOAD.getUri();// TODO
+		return FAIREaseProtocol.GML.getUri();// TODO
 
 	    case "OGC:GML":
-		return FAIREaseProtocol.DIRECT_DOWNLOAD.getUri(); // TODO
+		return FAIREaseProtocol.GML.getUri(); // TODO
 
 	    case "application/vnd.google-earth.kml+xml":
 		return FAIREaseProtocol.KML.getUri(); // check
@@ -323,6 +355,31 @@ public class FAIREaseMapper {
 	    break;
 	}
 	return protocol;
+
+    }
+
+    public static boolean isInAccessService(String protocol) {
+	if (protocol == null) {
+	    return false;
+	}
+	FAIREaseProtocol fep = FAIREaseProtocol.decode(protocol);
+	switch (fep) {
+	case ARCGIS_REST:
+	case OGC_OPENSEARCH_GEO:
+	case OGC_WCS:
+	case OGC_WFS:
+	case OGC_WFS_1_0:
+	case OGC_WMS:
+	case OGC_WMS_1_1:
+	case OGC_WMS_1_3:
+	case OGC_WMTS:
+	case OPENDAP:
+	case SPARQL:
+	case STAC:
+	    return true;
+	default:
+	    return false;
+	}
 
     }
 
