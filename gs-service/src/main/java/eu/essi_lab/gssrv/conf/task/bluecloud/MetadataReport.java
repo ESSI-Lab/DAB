@@ -473,7 +473,7 @@ public abstract class MetadataReport {
 	String bucketName = "dabreporting";
 	try {
 	    manager.setACLPublicRead(true);
-	    manager.uploadFile(f.getAbsolutePath(), bucketName, getS3Folder() + "/" + name);
+	    manager.uploadFile(f.getAbsolutePath(), bucketName, getS3Folder() + "/" + name, "text/html");
 	    System.out.println("Uploaded");
 	} catch (Exception e) {
 	    e.printStackTrace();

@@ -203,7 +203,7 @@ public class S3TransferWrapper {
 		}
 	    }
 	    if (file.isFile()) {
-		uploadFile(file.getAbsolutePath(), bucketName, keyPrefix + "/" + file.getName());
+		uploadFile(file.getAbsolutePath(), bucketName, keyPrefix + "/" + file.getName(), null);
 	    }
 	}
 
@@ -275,19 +275,20 @@ public class S3TransferWrapper {
     public void uploadFileList(List<File> files, String bucketName, String virtualDirectoryKeyPrefix) {
 
 	for (File file : files) {
-	    uploadFile(file.getAbsolutePath(), bucketName, virtualDirectoryKeyPrefix + file.getName());
+	    uploadFile(file.getAbsolutePath(), bucketName, virtualDirectoryKeyPrefix + file.getName(), null);
 	}
 
 	System.out.println("All files uploaded successfully.");
     }
 
-    /**
-     * @param filePath
-     * @param bucketName
-     */
     public void uploadFile(String filePath, String bucketName) {
 
-	uploadFile(filePath, bucketName, null);
+	uploadFile(filePath, bucketName, null, null);
+    }
+
+    public void uploadFile(String filePath, String bucketName, String contentType) {
+
+	uploadFile(filePath, bucketName, null, contentType);
     }
 
     /**
@@ -295,7 +296,7 @@ public class S3TransferWrapper {
      * @param bucketName
      * @param namePrefix
      */
-    public void uploadFile(String filePath, String bucketName, String keyName) {
+    public void uploadFile(String filePath, String bucketName, String keyName, String contentType) {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Upload file STARTED");
 
@@ -308,9 +309,13 @@ public class S3TransferWrapper {
 	PutObjectRequest.Builder requestBuilder = PutObjectRequest.builder().bucket(bucketName).key(keyName);
 
 	if (aclPublicRead) {
-	    requestBuilder.acl(ObjectCannedACL.PUBLIC_READ);
+	    requestBuilder = requestBuilder.acl(ObjectCannedACL.PUBLIC_READ);
 	} else {
-	    requestBuilder.acl(ObjectCannedACL.PRIVATE);
+	    requestBuilder = requestBuilder.acl(ObjectCannedACL.PRIVATE);
+	}
+
+	if (contentType != null) {
+	    requestBuilder = requestBuilder.contentType(contentType);
 	}
 
 	PutObjectRequest putObjectRequest = requestBuilder.build();

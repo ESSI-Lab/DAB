@@ -387,7 +387,14 @@ public class Layer {
 
     public void prepare() {
 	GSLoggerFactory.getLogger(getClass()).info("Preparing cached layer {}", name);
-
+	
+	GSLoggerFactory.getLogger(getClass()).info("Sleeping a bit");
+	try {
+	    Thread.sleep(TimeUnit.MILLISECONDS.toMinutes(15));
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	}
+	GSLoggerFactory.getLogger(getClass()).info("Slept");
 	this.collectionPoints = new DefaultFeatureCollection();
 	this.collectionLines = new DefaultFeatureCollection();
 	featureIdentifiers = new HashSet<>();

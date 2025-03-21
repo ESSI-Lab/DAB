@@ -41,6 +41,7 @@ import org.w3c.dom.Node;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
@@ -200,6 +201,42 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 	    ret += "dct:title \"" + normalize(info.getCitationTitle()) + "\";\n";
 	    if (info.getAbstract() != null) {
 		ret += "dct:description \"" + normalize(info.getAbstract()) + "\";\n";
+	    }
+
+	    Iterator<LegalConstraints> lci = info.getLegalConstraints();
+	    if (lci != null) {
+		while (lci.hasNext()) {
+		    String license = null;
+		    LegalConstraints legalConstraints = (LegalConstraints) lci.next();
+		    String code = legalConstraints.getAccessConstraintCode();
+		    if (code != null && !code.equals("otherRestrictions")) {
+			license = code;
+		    } else {
+			String other = legalConstraints.getOtherConstraint();
+			if (other != null) {
+			    license = other;
+			}
+		    }
+		    if (license != null) {
+			String uri = null;
+			if (license.contains("http")) {
+			    uri = license.substring(license.indexOf("http"));
+			    if (uri.contains(" ")) {
+				uri = uri.substring(0, uri.indexOf(" "));
+			    }
+			    if (uri.contains(")")) {
+				uri = uri.substring(0, uri.indexOf(")"));
+			    }
+			    ret += "dct:license \"" + license + "\" ;\n";
+			    if (!license.equals(uri)) {
+				ret += "dct:rights \"" + license + "\" ;\n";
+			    }
+			} else {
+			    ret += "dct:rights \"" + license + "\" ;\n";
+			}
+
+		    }
+		}
 	    }
 
 	    String resourceId = info.getResourceIdentifier();
@@ -390,8 +427,10 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		String linkage = online.getLinkage();
 		String protocol = online.getProtocol();
 
-		protocol = FAIREaseMapper.map(protocol, linkage, resource.getSource().getUniqueIdentifier());
-		
+		FAIREaseMapping mapping = FAIREaseMapper.map(protocol, linkage, resource.getSource().getUniqueIdentifier());
+		protocol = mapping.getProtocol();
+		boolean inAccessService = mapping.isInAccessService();
+		String mediaType = mapping.getMediaType();
 		boolean download = false;
 
 		if (isURI(linkage)) {
@@ -402,12 +441,18 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 			ret += "dcat:accessURL <" + encodeURL(linkage) + "> ;\n";
 		    }
 		}
+		if (protocol != null && !protocol.isEmpty()) {
+		    ret += "dcat:conformsTo <" + encodeURL(protocol) + "> ;\n";
+		}
 		String name = online.getName();
 		String description = online.getDescription();
 		if (name != null) {
 		    ret += "dct:title \"" + normalize(name) + "\"@en ;\n";
 		}
-		// dcat:mediaType <http://www.iana.org/assignments/media-types/text/csv> ;
+
+		if (mediaType != null && mediaType.startsWith("http")) {
+		    ret += "dcat:mediaType <" + mediaType + "> ;\n";
+		}
 		//
 		// dcat:byteSize "5120"^^xsd:nonNegativeInteger .
 		if (!download) {
@@ -418,23 +463,25 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 			    linkage = "http://" + linkage;
 			}
 			host = new URL(linkage);
-			String serverId = "exdata:subset-service-" + host.getHost().hashCode();
-			ret += "dcat:accessService " + serverId + ".\n";
+			if (inAccessService) {
+			    String serverId = "exdata:subset-service-" + host.getHost().hashCode();
+			    ret += "dcat:accessService " + serverId + ".\n";
 
-			ret += serverId + "\n";
-			ret += "rdf:type dcat:DataService ;\n";			
-			if (protocol != null) {
-			    ret += "dct:conformsTo \"" + protocol + "\" ;\n";
+			    ret += serverId + "\n";
+			    ret += "rdf:type dcat:DataService ;\n";
+			    if (protocol != null) {
+				ret += "dct:conformsTo \"" + protocol + "\" ;\n";
+			    }
+			    ret += "dct:type <https://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/invoke> ;\n";
+			    if (description != null) {
+				ret += "dcat:endpointDescription \"" + description.replace("\n", "").replace("\"", "\\\"") + "\" ;\n";
+			    }
+			    ret += "dcat:endpointURL <" + encodeURL(linkage)
+			    // + linkage.replace(" ", "%20").replace("[", "%5B").replace("]", "%5D").replace("{",
+			    // "%7B").replace("}", "%7D") +
+				    + "> ;\n";
+			    ret += "dcat:servesDataset " + myDataset + " .\n";
 			}
-			ret += "dct:type <https://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/invoke> ;\n";
-			if (description != null) {
-			    ret += "dcat:endpointDescription \"" + description.replace("\n", "").replace("\"", "\\\"") + "\" ;\n";
-			}
-			ret += "dcat:endpointURL <" + encodeURL(linkage)
-			// + linkage.replace(" ", "%20").replace("[", "%5B").replace("]", "%5D").replace("{",
-			// "%7B").replace("}", "%7D") +
-				+ "> ;\n";
-			ret += "dcat:servesDataset " + myDataset + " .\n";
 
 		    } catch (Exception e) {
 			GSLoggerFactory.getLogger(getClass()).error(e);
