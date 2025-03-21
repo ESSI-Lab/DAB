@@ -39,6 +39,7 @@ import org.json.JSONObject;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
+import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -107,6 +108,9 @@ public class S3Source implements ConfigurationSource {
 
 	if (isEmptyOrMissing(binaryConfig)) {
 
+	    binaryConfig.get().getKey().close();
+	    binaryConfig.get().getValue().delete();
+
 	    return new ArrayList<Setting>();
 	}
 
@@ -161,12 +165,14 @@ public class S3Source implements ConfigurationSource {
      */
     private boolean isEmptyOrMissing(Optional<SimpleEntry<InputStream, File>> binaryConfig) throws Exception {
 
-	if (!binaryConfig.isPresent()) {
+	if (binaryConfig.isEmpty()) {
 
 	    return true;
 	}
 
-	InputStream stream = binaryConfig.get().getKey();
+	InputStream stream = Files.newInputStream(//
+		binaryConfig.get().getValue().toPath(), //
+		StandardOpenOption.READ);
 
 	boolean out = false;
 
@@ -183,7 +189,7 @@ public class S3Source implements ConfigurationSource {
 
 	stream.close();
 	binaryConfig.get().getValue().delete();
-
+	
 	return out;
     }
 
