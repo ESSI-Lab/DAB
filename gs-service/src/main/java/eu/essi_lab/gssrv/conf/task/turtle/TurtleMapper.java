@@ -218,7 +218,23 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 			}
 		    }
 		    if (license != null) {
-			ret += "dct:license \"" + license + "\" ;\n";
+			String uri = null;
+			if (license.contains("http")) {
+			    uri = license.substring(license.indexOf("http"));
+			    if (uri.contains(" ")) {
+				uri = uri.substring(0, uri.indexOf(" "));
+			    }
+			    if (uri.contains(")")) {
+				uri = uri.substring(0, uri.indexOf(")"));
+			    }
+			    ret += "dct:license \"" + license + "\" ;\n";
+			    if (!license.equals(uri)) {
+				ret += "dct:rights \"" + license + "\" ;\n";
+			    }
+			} else {
+			    ret += "dct:rights \"" + license + "\" ;\n";
+			}
+
 		    }
 		}
 	    }
