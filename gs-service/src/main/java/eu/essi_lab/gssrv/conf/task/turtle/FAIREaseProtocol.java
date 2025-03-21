@@ -32,15 +32,15 @@ public enum FAIREaseProtocol {
     OGC_WMS_1_3("http://www.opengis.net/def/serviceType/ogc/wms/1.3"), //
     OGC_WMTS("http://www.opengis.net/def/serviceType/ogc/wmts"), //
     ARCGIS_REST("https://developers.arcgis.com/rest/"), //
-    DIRECT_DOWNLOAD("https://lab.fairease.eu/asset-standards/profiles#direct-download"), //
-    FOLDER_PATH("https://lab.fairease.eu/asset-standards/profiles#folder-path"), //
-    FTP("https://lab.fairease.eu/asset-standards/profiles#ftp"), //
-    HTTP("https://lab.fairease.eu/asset-standards/profiles#http"), //
-    HTTPS("https://lab.fairease.eu/asset-standards/profiles#https"), //
-    LANDING_PAGE("https://lab.fairease.eu/asset-standards/profiles#landing-page"), //
-    METADATA("https://lab.fairease.eu/asset-standards/profiles#metadata"), //
-    OPENDAP("https://lab.fairease.eu/asset-standards/profiles#opendap"), //
-    STAC("https://lab.fairease.eu/asset-standards/profiles#stac"), //
+    DIRECT_DOWNLOAD("https://lab.fairease.eu/asset-standards/endpoint-type#direct-download"), //
+    FOLDER_PATH("https://lab.fairease.eu/asset-standards/endpoint-type#folder-path"), //
+    FTP("https://lab.fairease.eu/asset-standards/endpoint-type#ftp"), //
+    HTTP("https://lab.fairease.eu/asset-standards/endpoint-type#http"), //
+    HTTPS("https://lab.fairease.eu/asset-standards/endpoint-type#https"), //
+    LANDING_PAGE("https://lab.fairease.eu/asset-standards/endpoint-type#landing-page"), //
+    METADATA("https://lab.fairease.eu/asset-standards/endpoint-type#metadata"), //
+    OPENDAP("https://lab.fairease.eu/asset-standards/endpoint-type#opendap"), //
+    STAC("https://lab.fairease.eu/asset-standards/endpoint-type#stac"), //
     GML("https://www.iana.org/assignments/media-types/application/gml+xml"), //
     SPARQL("https://www.iana.org/assignments/media-types/application/sparql-query"), //
     KML("https://www.iana.org/assignments/media-types/application/vnd.google-earth.kml+xml"), //
@@ -56,5 +56,17 @@ public enum FAIREaseProtocol {
 
     public String getUri() {
 	return uri;
+    }
+
+    public static FAIREaseProtocol decode(String protocol) {
+	if (protocol ==null) {
+	    return null;
+	}
+	for (FAIREaseProtocol ret : FAIREaseProtocol.values()) {
+	    if (ret.getUri().equals(protocol)) {
+		return ret;
+	    }
+	}
+	return null;
     }
 }
