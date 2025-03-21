@@ -390,7 +390,7 @@ public class Layer {
 	
 	GSLoggerFactory.getLogger(getClass()).info("Sleeping a bit");
 	try {
-	    Thread.sleep(TimeUnit.MILLISECONDS.toMinutes(10));
+	    Thread.sleep(TimeUnit.MILLISECONDS.toMinutes(15));
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
 	}
