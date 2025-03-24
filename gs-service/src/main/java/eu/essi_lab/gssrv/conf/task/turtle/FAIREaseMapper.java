@@ -363,6 +363,7 @@ public class FAIREaseMapper {
 	    return false;
 	}
 	FAIREaseProtocol fep = FAIREaseProtocol.decode(protocol);
+	if (fep!=null) {
 	switch (fep) {
 	case ARCGIS_REST:
 	case OGC_OPENSEARCH_GEO:
@@ -378,6 +379,9 @@ public class FAIREaseMapper {
 	case STAC:
 	    return true;
 	default:
+	    return false;
+	}
+	}else {
 	    return false;
 	}
 

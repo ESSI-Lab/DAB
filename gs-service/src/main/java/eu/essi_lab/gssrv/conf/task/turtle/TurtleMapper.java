@@ -291,26 +291,52 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 	    }
 
 	    for (Node organization : organizations) {
-		String uri = reader.evaluateString(organization, "*:organisationName/*[1]/@*:href");
-		if (isURI(uri)) {
 
-		    String role = reader.evaluateString(organization, "*:role/*:CI_RoleCode/@codeListValue");
-		    if (role != null && !role.isEmpty()) {
-			switch (role) {
-			case "distributor":
-			case "publisher":
-			    ret += "dct:publisher  <" + uri + ">;\n";
-			    break;
-			case "originator":
-			case "author":
-			    ret += "dct:creator  <" + uri + ">;\n";
-			    break;
-			case "custodian":
-			case "pointOfContact":
-			default:
-			    break;
+		String dctOrganizationType = null;
+		String role = reader.evaluateString(organization, "*:role/*:CI_RoleCode/@codeListValue");
+		boolean roleToBeSpecified = false;
+		if (role != null && !role.isEmpty()) {
+		    switch (role) {
+		    case "distributor":
+		    case "publisher":
+			dctOrganizationType = "dct:publisher";
+			break;
+		    case "originator":
+		    case "author":
+			dctOrganizationType = "dct:creator";
+			break;
+		    case "custodian":
+		    case "pointOfContact":
+		    default:
+			dctOrganizationType = "dct:contributor";
+			roleToBeSpecified = true;
+			break;
+		    }
+		}
+		String uri = reader.evaluateString(organization, "*:organisationName/*[1]/@*:href");
+
+		if (isURI(uri)) {
+		    ret += dctOrganizationType + " ";
+
+		    ret += "<" + uri + ">;\n";
+		} else {
+		    String name = reader.evaluateString(organization, "*:organisationName/*[1]");
+		    if (name != null && !name.isEmpty()) {
+			ret += dctOrganizationType + " ";
+
+			ret += "[\n"//
+				+ "        a dct:Agent ;\n"//
+				+ "        foaf:name \"" + name + "\" ;\n";//
+
+			if (roleToBeSpecified) {
+
+			    ret += "        dcat:hadRole [\n"//
+				    + "            a skos:Concept ;\n"//
+				    + "            skos:prefLabel \"" + role + "\"@en\n"//
+				    + "        ]\n";//
 			}
 
+			ret += "    ] .";
 		    }
 		}
 	    }
