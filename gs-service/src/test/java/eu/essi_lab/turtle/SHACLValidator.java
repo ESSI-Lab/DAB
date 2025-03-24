@@ -1,21 +1,18 @@
 package eu.essi_lab.turtle;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.shacl.ShaclValidator;
+import java.net.URL;
+
 import org.apache.jena.shacl.ValidationReport;
-import org.apache.jena.util.FileManager;
+
+import eu.essi_lab.gssrv.conf.task.turtle.TurtleValidator;
 
 public class SHACLValidator {
-    public static void main(String[] args) {
-	// Load the RDF data model (data.ttl) and SHACL shapes model (shapes.ttl)
-	String base = "/home/boldrini/git/asset-standards/Dataset/";
-//	Model dataModel = FileManager.get().loadModel(base + "original.ttl");
-	Model dataModel = FileManager.get().loadModel(base + "dataset.ttl");
-//	Model dataModel = FileManager.get().loadModel("/home/boldrini/git/asset-standards/examples/bc_bdi_dab_seadatanet.ttl");
-	Model shapesModel = FileManager.get().loadModel(base + "FE-DCAT-AP-SHACLshapes.ttl");
+    public static void main(String[] args) throws Exception {
+	// ValidationReport report = TurtleValidator.validate(new
+	// File("/home/boldrini/git/asset-standards/DCAT-AP/dataset-example.ttl"));
 
-	// Perform SHACL validation
-	ValidationReport report = ShaclValidator.get().validate(shapesModel.getGraph(), dataModel.getGraph());
+	ValidationReport report = TurtleValidator
+		.validate(new URL("https://s3.amazonaws.com/dataset.geodab.eu/dataset/easydata/860c980a-d107-4f57-aa04-f49a94833d95.ttl"));
 
 	// Check if the data conforms to the SHACL shapes
 	if (report.conforms()) {

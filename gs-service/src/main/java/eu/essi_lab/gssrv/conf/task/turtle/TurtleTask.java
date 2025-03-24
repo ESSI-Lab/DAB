@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shacl.ShaclValidator;
@@ -51,6 +52,7 @@ import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
+import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.JobStatus.JobPhase;
@@ -131,13 +133,6 @@ public class TurtleTask extends AbstractCustomTask {
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 	GSLoggerFactory.getLogger(getClass()).info("Turtle task STARTED");
 	log(status, "Turtle task STARTED");
-
-	InputStream modelStream = getClass().getClassLoader().getResourceAsStream("FE-DCAT-AP-SHACLshapes.ttl");
-	File tmpModelFile = File.createTempFile(getClass().getSimpleName(), "model.ttl");
-	FileOutputStream fosModel = new FileOutputStream(tmpModelFile);
-	IoUtils.copy(modelStream, fosModel);
-	modelStream.close();
-	Model schemaModel = FileManager.get().loadModel(tmpModelFile.getAbsolutePath());
 
 	// SETTINGS RETRIEVAL
 	CustomTaskSetting taskSettings = retrieveSetting(context);
@@ -338,9 +333,8 @@ public class TurtleTask extends AbstractCustomTask {
 			String webTurtle = path + "/" + sourceId + "/" + turtle.getName();
 			// Perform SHACL validation
 			try {
-			    Model datasetModel = FileManager.get().loadModel(turtle.getAbsolutePath());
-			    ValidationReport report = ShaclValidator.get().validate(datasetModel.getGraph(), schemaModel.getGraph());
-
+			    ValidationReport report = TurtleValidator.validate(turtle);
+			    
 			    // Check if the data conforms to the SHACL shapes
 			    if (report.conforms()) {
 				GSLoggerFactory.getLogger(getClass()).info("conforms: {}", turtle.getName());
@@ -420,7 +414,6 @@ public class TurtleTask extends AbstractCustomTask {
 		sourceFile.delete();
 	    }
 
-	    tmpModelFile.delete();
 
 	    GSLoggerFactory.getLogger(getClass()).info("Number of sources: {}", sources.size());
 
@@ -428,6 +421,8 @@ public class TurtleTask extends AbstractCustomTask {
 	GSLoggerFactory.getLogger(getClass()).info("Turtle task ENDED");
 	log(status, "Turtle task ENDED");
     }
+
+
 
     private File downloadFile(String url, String filename) throws Exception {
 	Downloader downloader = new Downloader();

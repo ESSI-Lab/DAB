@@ -356,7 +356,7 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 	    String revisionDate = reader.evaluateString(
 		    "//*:MD_DataIdentification/*:citation/*:CI_Citation/*:date/*:CI_Date[*:dateType/*:CI_DateTypeCode/@codeListValue='revision']/*:date/*:Date");
 	    if (revisionDate != null) {
-		ret += "dct:issued \"" + revisionDate + "\";\n";
+		ret += "dct:issued " + formatTime(revisionDate) + ";\n";
 	    }
 
 	    // #Temporal Info
@@ -366,13 +366,13 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		String begin = temporalExtent.getBeginPosition();
 		String end = temporalExtent.getEndPosition();
 		if (begin != null && end != null) {
-		    String timeBegin = formatTime(begin);
-		    String timeEnd = formatTime(end);
+		    String timeBegin = formatTime(begin) + ";\n";
+		    String timeEnd = formatTime(end) + ";\n";
 		    if (timeBegin != null && timeEnd != null) {
 			ret += "dct:temporal [\n";
 			ret += "a dct:PeriodOfTime ;\n";
-			ret += "dcat:startDate \"" + timeBegin;
-			ret += "dcat:endDate   \"" + timeEnd;
+			ret += "dcat:startDate " + timeBegin;
+			ret += "dcat:endDate   " + timeEnd;
 			ret += "];\n";
 		    }
 		}
@@ -579,13 +579,13 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 	    // return time + "\"^^xsd:date;\n";
 	    try {
 		Date d = ISO8601DateTimeUtils.parseISO8601(time);
-		return ISO8601DateTimeUtils.getISO8601DateTime(d) + "\"^^xsd:dateTime;\n";
+		return "\"" + ISO8601DateTimeUtils.getISO8601DateTime(d) + "\"^^xsd:dateTime";
 	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(getClass()).error("Error parsing time: {}", time);
 		return null;
 	    }
 	} else {
-	    return time + "\"^^xsd:dateTime;\n";
+	    return "\"" + time + "\"^^xsd:dateTime";
 	}
 
     }
