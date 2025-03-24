@@ -52,6 +52,7 @@ public class OptionTest {
 	configurationOption.setValues(Arrays.asList("a", "b", "c"));
 	configurationOption.setKey("lettersOption");
 	configurationOption.setLabel("Choose the letter");
+	configurationOption.setSelectionMode(SelectionMode.SINGLE);
 	configurationOption.select(v -> v.equals("a"));
 
 	configurationOption.setRequired(true);
@@ -77,6 +78,7 @@ public class OptionTest {
 		withLabel("Choose the letter").//
 		withDescription("desc").//
 		withValues(Arrays.asList("a", "b", "c")).//
+		withSingleSelection().//
 		withSelectedValue("a").//
 		required().//
 		disabled().//

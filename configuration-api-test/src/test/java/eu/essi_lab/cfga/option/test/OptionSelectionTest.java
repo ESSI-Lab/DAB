@@ -1,5 +1,7 @@
 package eu.essi_lab.cfga.option.test;
 
+import static org.junit.Assert.assertThrows;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,9 +12,11 @@ import org.junit.Test;
 import eu.essi_lab.augmenter.reindexer.ResourceReindexerSetting;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.SelectionUtils;
+import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
+import eu.essi_lab.cfga.option.UnsetSelectionModeException;
 import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -41,6 +45,7 @@ public class OptionSelectionTest {
 	// selects all
 	//
 
+	option.setSelectionMode(SelectionMode.SINGLE);
 	option.select(s -> true);
 
 	count = option.getSelectedValues().size();
@@ -144,6 +149,7 @@ public class OptionSelectionTest {
 	//
 	// selects HARVESTING without removing
 	//
+	option.setSelectionMode(SelectionMode.SINGLE);
 	option.select(s -> s == BrokeringStrategy.HARVESTED);
 
 	allValuesHarvestedSelectedTest(option);
@@ -437,8 +443,8 @@ public class OptionSelectionTest {
      */
     private void allValuesHarvestedSelectedTest(Option<BrokeringStrategy> option) {
 
-	SelectionMode multiSelectionMode = option.getSelectionMode();
-	Assert.assertEquals(SelectionMode.UNSET, multiSelectionMode);
+	SelectionMode selMode = option.getSelectionMode();
+	Assert.assertEquals(SelectionMode.SINGLE, selMode);
 
 	//
 	// the value is selected ...
@@ -480,7 +486,9 @@ public class OptionSelectionTest {
 	List<String> values = emptyOption.getValues();
 	Assert.assertTrue(values.isEmpty());
 
-	emptyOption.select(v -> true);
+	assertThrows(UnsetSelectionModeException.class, () -> {
+	    emptyOption.select(v -> true);
+	});
 
 	values = emptyOption.getValues();
 	Assert.assertTrue(values.isEmpty());

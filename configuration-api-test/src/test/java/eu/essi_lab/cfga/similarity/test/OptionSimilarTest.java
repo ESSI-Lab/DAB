@@ -258,6 +258,7 @@ public class OptionSimilarTest {
 	option1.clean();
 
 	Option<String> option2 = new Option<String>(option1.toString());
+	option2.setSelectionMode(SelectionMode.SINGLE);
 	option2.select(v -> v.equals("b"));
 	option2.clean();
 

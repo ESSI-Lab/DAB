@@ -51,7 +51,7 @@ public abstract class DatabaseSourceTest extends ConfigurationSourceTest {
      * @return
      * @throws GSException
      */
-    protected abstract DatabaseSource create() throws GSException;
+    protected abstract DatabaseSource create() throws Exception;
 
     @Test
     public void backupTest() throws Exception {
