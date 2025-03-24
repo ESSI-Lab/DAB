@@ -256,6 +256,15 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
 	return BooleanChoice.toBoolean(//
 		getOption(ENABLE_AUGMENTION_MAIL_REPORTS_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
     }
+    
+    /**
+     * @param enable
+     */
+    public void enableDownloadReportMail(boolean enable) {
+
+	Option<BooleanChoice> option = getOption(ENABLE_DOWNLOAD_MAIL_REPORTS_OPTION_KEY, BooleanChoice.class).get();
+	option.select(v -> BooleanChoice.toBoolean(v) == enable);
+    }
 
     /**
      * 

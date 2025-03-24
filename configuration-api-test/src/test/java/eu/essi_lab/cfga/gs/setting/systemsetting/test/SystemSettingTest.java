@@ -143,11 +143,14 @@ public class SystemSettingTest {
 	setting.enableAugmentationReportMail(true);
 	setting.enableErrorLogsReportEmail(true);
 	setting.enableHarvestingReportEmail(true);
+	setting.enableDownloadReportMail(true);
 	
 	Assert.assertTrue(setting.isAugmentationReportMailEnabled());
 	Assert.assertTrue(setting.isErrorLogsReportEnabled());
 	Assert.assertTrue(setting.isHarvestingReportMailEnabled());
-	
+	Assert.assertTrue(setting.isDownloadReportMailEnabled());
+
+	setting.enableDownloadReportMail(false);
 	setting.enableAugmentationReportMail(false);
 	setting.enableErrorLogsReportEmail(false);
 	setting.enableHarvestingReportEmail(false);
@@ -174,8 +177,9 @@ public class SystemSettingTest {
 
 	Assert.assertFalse(setting.isHarvestingReportMailEnabled());
 	Assert.assertFalse(setting.isAugmentationReportMailEnabled());
+	Assert.assertFalse(setting.isDownloadReportMailEnabled());
 	Assert.assertFalse(setting.isErrorLogsReportEnabled());
-
+	
 	Assert.assertFalse(setting.getEmailSetting().isPresent());
 
 	Assert.assertFalse(setting.areStatisticsEnabled());

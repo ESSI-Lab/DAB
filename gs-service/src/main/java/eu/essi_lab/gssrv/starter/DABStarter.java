@@ -390,8 +390,8 @@ public class DABStarter {
 		systemSetting.enableHarvestingReportEmail(false);
 		systemSetting.enableErrorLogsReportEmail(false);
 		systemSetting.enableAugmentationReportMail(false);
-		systemSetting.enableErrorLogsReportEmail(false);
-		
+		systemSetting.enableDownloadReportMail(false);
+
 		SelectionUtils.deepClean(systemSetting);
 
 		boolean replaced = configuration.replace(systemSetting);
@@ -768,7 +768,7 @@ public class DABStarter {
      * 
      */
     private void initCaches() {
-	
+
 	// init caches, but only for specific production nodes
 	ExecutionMode executionMode = ExecutionMode.get();
 	switch (executionMode) {
