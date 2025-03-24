@@ -177,7 +177,10 @@ public class DownloadTestTask extends AbstractCustomTask {
 
 		Files.copy(IOStreamUtils.asStream(text), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-		manager.uploadFile(tempFile.getAbsolutePath(), "dabreporting", "download-availability/" + sourceId + "-" + result + ".txt");
+		manager.uploadFile(
+			tempFile.getAbsolutePath(), 
+			"dabreporting", 
+			"download-availability/" + sourceId + "-" + result + ".txt");
 
 		tempFile.delete();
 
