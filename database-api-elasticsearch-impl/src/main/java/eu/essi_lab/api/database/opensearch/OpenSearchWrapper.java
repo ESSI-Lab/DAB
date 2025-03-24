@@ -781,15 +781,22 @@ public class OpenSearchWrapper {
 	    boolean excludeResourceBinary) {
 
 	if (!fields.isEmpty()) {
+	    
+	    ArrayList<String> fields_ = new ArrayList<String>(fields);
+	    
+	    if(!fields.contains(ResourceProperty.TYPE.getName())) {
+		
+		fields_.add(ResourceProperty.TYPE.getName());
+	    }
 
 	    if (topHitsBuilder != null) {
 
-		topHitsBuilder.source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
+		topHitsBuilder.source(src -> src.filter(new SourceFilter.Builder().includes(fields_).//
 			build()));
 
 	    } else {
 
-		searchBuilder.source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
+		searchBuilder.source(src -> src.filter(new SourceFilter.Builder().includes(fields_).//
 			build()));
 	    }
 	} else {
