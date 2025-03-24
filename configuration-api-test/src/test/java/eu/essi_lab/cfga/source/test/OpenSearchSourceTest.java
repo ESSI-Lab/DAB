@@ -3,10 +3,13 @@
  */
 package eu.essi_lab.cfga.source.test;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
 
 import eu.essi_lab.api.database.Database;
@@ -37,18 +40,38 @@ public class OpenSearchSourceTest extends DatabaseSourceTest {
 	INFO.setUri("http://localhost:9200");
     }
 
+    @Before
+    public void clear() throws GSException, OpenSearchException, IOException {
+
+	System.setProperty("initIndexes", "true");
+
+	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(OpenSearchDatabase.createLocalServiceInfo());
+
+	for (String index : IndexMapping.getIndexes(false)) {
+
+	    if (OpenSearchDatabase.checkIndex(client, index)) {
+
+		DeleteIndexRequest indexRequest = new DeleteIndexRequest.Builder().//
+			index(index).//
+			build();
+
+		client.indices().delete(indexRequest);
+	    }
+	}
+    }
+
     @Test
     public void locationTest() throws Exception {
 
 	DatabaseSource source = create();
-	Assert.assertEquals("configuration\\test-config.json", source.getLocation());
+	Assert.assertEquals("test_configuration\\test-config.json", source.getLocation());
     }
 
     /**
      * @return
      * @throws GSException
      */
-    protected DatabaseSource create() throws GSException {
+    protected DatabaseSource create() throws Exception {
 
 	return DatabaseSource.of(DatabaseImpl.OPENSEARCH, storageInfo, "test-config");
     }

@@ -58,6 +58,7 @@ import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
+import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
 import eu.essi_lab.cfga.source.FileSource;
 import eu.essi_lab.cfga.source.S3Source;
@@ -376,16 +377,22 @@ public class DABStarter {
 		configuration.pauseAutoreload();
 
 		//
-		// disables harvesting and error logs email reports
+		// disables email delivery of reports
 		//
 
 		SystemSetting systemSetting = configuration.get(//
 			MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel(), //
 			SystemSetting.class).get();
 
+		systemSetting = SettingUtils.downCast(//
+			SelectionUtils.resetAndSelect(systemSetting, false), SystemSetting.class);
+
 		systemSetting.enableHarvestingReportEmail(false);
 		systemSetting.enableErrorLogsReportEmail(false);
 		systemSetting.enableAugmentationReportMail(false);
+		systemSetting.enableErrorLogsReportEmail(false);
+		
+		SelectionUtils.deepClean(systemSetting);
 
 		boolean replaced = configuration.replace(systemSetting);
 
