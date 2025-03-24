@@ -107,7 +107,12 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     @Override
-    public void select(Predicate<T> predicate) {
+    public void select(Predicate<T> predicate) throws UnsetSelectionModeException{
+
+	if (getSelectionMode() == SelectionMode.UNSET) {
+
+	    throw new UnsetSelectionModeException();
+	}
 
 	List<Integer> selIndexes = getValues().//
 		stream().//
