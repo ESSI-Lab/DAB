@@ -350,7 +350,13 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    ResultSet<GSResource> response = discover(message);
 
 	    out.setCountResponse(response.getCountResponse());
-
+	    if (response.getProfilerName().isPresent()) {
+		out.setProfilerName(response.getProfilerName().get());
+	    }
+	    out.setPropertyHandler(response.getPropertyHandler());
+	    if (response.getSearchAfter().isPresent()) {
+		out.setSearchAfter(response.getSearchAfter().get());
+	    }
 	    List<String> strings = response.getResultsList().stream().map(res -> {
 
 		try {

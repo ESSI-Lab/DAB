@@ -66,10 +66,12 @@ import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -213,6 +215,8 @@ public class TimeseriesHandler extends StreamingRequestHandler {
 		    // selector.addIndex(MetadataElement.BOUNDING_BOX);
 		    // selector.addIndex(MetadataElement.COUNTRY);
 		    discoveryMessage.setResourceSelector(selector);
+		    discoveryMessage.setSortOrder(SortOrder.ASCENDING);
+		    discoveryMessage.setSortProperty(MetadataElement.ONLINE_ID);
 		}
 
 		OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
@@ -226,11 +230,15 @@ public class TimeseriesHandler extends StreamingRequestHandler {
 		int tempSize = 0;
 
 		boolean first = true;
-
+		SearchAfter searchAfter = null;
 		do {
 
 		    try {
+			if (searchAfter != null) {
+			    discoveryMessage.setSearchAfter(searchAfter);
+			}
 			resultSet = exec(discoveryMessage);
+			searchAfter = resultSet.getSearchAfter().isPresent() ? resultSet.getSearchAfter().get() : null;
 
 			List<String> results = resultSet.getResultsList();
 			tempSize += pageSize;
@@ -246,7 +254,7 @@ public class TimeseriesHandler extends StreamingRequestHandler {
 			List<String> identifiers = new ArrayList<>();
 			int j = 0;
 			for (String result : results) {
-				TimeseriesMapper observationMapper = new TimeseriesMapper();
+			    TimeseriesMapper observationMapper = new TimeseriesMapper();
 
 			    JSONTimeseries observation = observationMapper.map(result, propertySet);
 			    observations.add(observation);
@@ -496,14 +504,14 @@ public class TimeseriesHandler extends StreamingRequestHandler {
 
 	JSONObject jsonFoi = new JSONObject();
 	JSONObject foi = feature.getJSONObject("featureOfInterest");
-	if (!foi.has("id")){
+	if (!foi.has("id")) {
 	    System.err.println(feature);
-	    System.err.println("feature without id: this should not happen");	    
-	}else {
+	    System.err.println("feature without id: this should not happen");
+	} else {
 	    String href = foi.getString("id");
 	    jsonFoi.put("href", href);
 	}
-	
+
 	feature.put("featureOfInterest", jsonFoi);
 
 	writer.write(feature.toString());
