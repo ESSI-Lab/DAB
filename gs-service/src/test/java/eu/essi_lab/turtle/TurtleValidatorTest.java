@@ -1,12 +1,14 @@
 package eu.essi_lab.turtle;
 
 import java.net.URL;
+import java.util.Collection;
 
 import org.apache.jena.shacl.ValidationReport;
+import org.apache.jena.shacl.validation.ReportEntry;
 
 import eu.essi_lab.gssrv.conf.task.turtle.TurtleValidator;
 
-public class SHACLValidator {
+public class TurtleValidatorTest {
     public static void main(String[] args) throws Exception {
 	// ValidationReport report = TurtleValidator.validate(new
 	// File("/home/boldrini/git/asset-standards/DCAT-AP/dataset-example.ttl"));
@@ -21,13 +23,15 @@ public class SHACLValidator {
 	    System.out.println("The data does NOT conform to the SHACL shapes.");
 	}
 
-	// Print the validation report (optional)
-	report.getEntries().forEach(entry -> {
+	Collection<ReportEntry> entries = report.getEntries();
+	for (ReportEntry entry : entries) {
 	    System.out.println(entry.message());
 	    System.out.println(entry.focusNode());
 	    System.out.println(entry.resultPath());
 	    System.out.println(entry.sourceConstraintComponent());
 	    System.out.println("------------------------");
-	});
+	}
+	
+	
     }
 }

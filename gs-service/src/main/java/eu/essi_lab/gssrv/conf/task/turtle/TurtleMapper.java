@@ -292,51 +292,55 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 
 	    for (Node organization : organizations) {
 
-		String dctOrganizationType = null;
+		String organizationOpen = "prov:qualifiedAttribution [\n"//
+			+ "    a prov:Attribution ;\n"//
+			+ "    prov:agent [\n"//
+			+ "        rdf:type prov:Agent;";//
+		String organizationClose = " ] ;\n"//
+			+ "].";
 		String role = reader.evaluateString(organization, "*:role/*:CI_RoleCode/@codeListValue");
-		boolean roleToBeSpecified = false;
+		String roleInfo = "";
 		if (role != null && !role.isEmpty()) {
 		    switch (role) {
 		    case "distributor":
 		    case "publisher":
-			dctOrganizationType = "dct:publisher";
+			organizationOpen = "dct:publisher [ a foaf:Agent ;";
+			organizationClose = "    ] .";
 			break;
 		    case "originator":
 		    case "author":
-			dctOrganizationType = "dct:creator";
+			organizationOpen = "dct:creator [ a foaf:Agent ;";
+			organizationClose = "    ] .";
 			break;
-		    case "custodian":
-		    case "pointOfContact":
+		    case "contributor":
+			roleInfo = "dcat:hadRole <http://vocab.nerc.ac.uk/collection/G04/current/018/> ";
+			break;
 		    default:
-			dctOrganizationType = "dct:contributor";
-			roleToBeSpecified = true;
+			roleInfo = "dcat:hadRole [\n"//
+				+ "       a skos:Concept ;\n"//
+				+ "       skos:prefLabel \"" + role + "\"@en\n"//
+				+ "       ]";
 			break;
 		    }
 		}
 		String uri = reader.evaluateString(organization, "*:organisationName/*[1]/@*:href");
 
 		if (isURI(uri)) {
-		    ret += dctOrganizationType + " ";
+		    ret += organizationOpen + " ";
 
 		    ret += "<" + uri + ">;\n";
 		} else {
 		    String name = reader.evaluateString(organization, "*:organisationName/*[1]");
 		    if (name != null && !name.isEmpty()) {
-			ret += dctOrganizationType + " ";
+			ret += organizationOpen + " "; // dct:creator
 
 			ret += "[\n"//
-				+ "        a dct:Agent ;\n"//
+				+ "        a foaf:Agent ;\n"//
 				+ "        foaf:name \"" + name + "\" ;\n";//
 
-			if (roleToBeSpecified) {
+			ret += roleInfo;
 
-			    ret += "        dcat:hadRole [\n"//
-				    + "            a skos:Concept ;\n"//
-				    + "            skos:prefLabel \"" + role + "\"@en\n"//
-				    + "        ]\n";//
-			}
-
-			ret += "    ] .";
+			ret += organizationClose;
 		    }
 		}
 	    }
@@ -355,7 +359,7 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 
 	    String revisionDate = reader.evaluateString(
 		    "//*:MD_DataIdentification/*:citation/*:CI_Citation/*:date/*:CI_Date[*:dateType/*:CI_DateTypeCode/@codeListValue='revision']/*:date/*:Date");
-	    if (revisionDate != null) {
+	    if (revisionDate != null&&!revisionDate.isEmpty()) {
 		ret += "dct:issued " + formatTime(revisionDate) + ";\n";
 	    }
 

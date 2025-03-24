@@ -207,7 +207,7 @@ public class TimeseriesHandler extends StreamingRequestHandler {
 		    selector.setIndexesPolicy(IndexesPolicy.NONE);
 		    selector.addIndex(MetadataElement.ONLINE_ID);
 		    selector.setIncludeOriginal(false);
-
+		    discoveryMessage.setExcludeResourceBinary(true);
 		    // selector.addIndex(MetadataElement.PLATFORM_TITLE);
 		    // selector.addIndex(ResourceProperty.SOURCE_ID);
 		    // selector.addIndex(MetadataElement.BOUNDING_BOX);

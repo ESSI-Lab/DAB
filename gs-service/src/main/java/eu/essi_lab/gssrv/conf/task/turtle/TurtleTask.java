@@ -246,7 +246,7 @@ public class TurtleTask extends AbstractCustomTask {
 
 	    for (String sourceId : sources) {
 
-		int pageSize = 10;
+		int pageSize = 50;
 
 		ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
 		IDiscoveryExecutor executor = loader.iterator().next();
