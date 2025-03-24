@@ -782,6 +782,7 @@ public class DABStarter {
 	    break;
 	case ACCESS:
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
 	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
 		    new FeatureLayer1StationsArctic());
 	    break;
