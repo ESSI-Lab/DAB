@@ -333,8 +333,7 @@ public class OpenSearchWrapper {
 	    Optional<Queryable> orderingProperty, //
 	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
 	    Optional<SearchAfter> searchAfter, //
-	    boolean requestCache,
-	    boolean excludeResourceBinary)
+	    boolean requestCache, boolean excludeResourceBinary)
 
 	    throws Exception {
 
@@ -393,7 +392,8 @@ public class OpenSearchWrapper {
 	    int start, //
 	    int size) throws Exception {
 
-	return search(index, //
+	return search(//
+		index, //
 		searchQuery, //
 		fields, //
 		start, //
@@ -401,7 +401,7 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
-		false,//
+		false, //
 		false);
     }
 
@@ -421,8 +421,7 @@ public class OpenSearchWrapper {
 	    int size, //
 	    Optional<Queryable> orderingProperty, //
 	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
-	    Optional<SearchAfter> searchAfter,
-	    boolean excludeResourceBinary) throws Exception {
+	    Optional<SearchAfter> searchAfter, boolean excludeResourceBinary) throws Exception {
 
 	return search(//
 		index, //
@@ -433,7 +432,7 @@ public class OpenSearchWrapper {
 		orderingProperty, //
 		sortOrder, //
 		searchAfter, //
-		false,//
+		false, //
 		excludeResourceBinary);
     }
 
@@ -455,8 +454,8 @@ public class OpenSearchWrapper {
 		size, //
 		Optional.empty(), //
 		Optional.empty(), //
-		Optional.empty(),//
-		false,//
+		Optional.empty(), //
+		false, //
 		false);
 
 	return ConversionUtils.toBinaryList(searchResponse);
@@ -492,7 +491,7 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
-		false,//
+		false, //
 		false);
 
 	return ConversionUtils.toJSONSourcesList(response);
@@ -515,7 +514,7 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
-		false,//
+		false, //
 		false);
 
 	return ConversionUtils.toJSONSourcesList(response);
@@ -556,7 +555,7 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
-		false,//
+		false, //
 		false);
 
 	HitsMetadata<Object> hits = response.hits();
@@ -778,7 +777,8 @@ public class OpenSearchWrapper {
     private void handleSourceFields(//
 	    org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.Builder topHitsBuilder, //
 	    org.opensearch.client.opensearch.core.SearchRequest.Builder searchBuilder, //
-	    List<String> fields, boolean excludeResourceBinary) {
+	    List<String> fields, //
+	    boolean excludeResourceBinary) {
 
 	if (!fields.isEmpty()) {
 
