@@ -317,7 +317,10 @@ public class AggregationIdentifiersTask extends AbstractCustomTask implements Ha
 
 		Files.copy(IOStreamUtils.asStream(text), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-		manager.uploadFile(tempFile.getAbsolutePath(), "aggregationidslog", tempFile.getName());
+		manager.uploadFile(
+			tempFile.getAbsolutePath(), 
+			"aggregationidslog", 
+			tempFile.getName());
 
 		tempFile.delete();
 

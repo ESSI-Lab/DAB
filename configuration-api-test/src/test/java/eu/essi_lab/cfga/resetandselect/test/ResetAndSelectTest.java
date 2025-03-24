@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl;
+import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
@@ -34,6 +35,9 @@ public class ResetAndSelectTest {
 
 	AugmenterWorkerSetting setting = ConfigurationWrapper.getAugmenterWorkerSettings().get(0);
 
+	Option<String> option = setting.getOption("sourcesOption", String.class).get();
+	option.setSelectionMode(SelectionMode.MULTI);
+
 	SettingUtils.loadValues(setting.getOption("sourcesOption", String.class).get(), Optional.empty());
 
 	setting.setSelectedSources(Arrays.asList("DAB OAIPMH Service", "Atlas of the Cryosphere: Southern Hemisphere (WCS)", "GBIF"));
@@ -55,7 +59,7 @@ public class ResetAndSelectTest {
 		stream().//
 		sorted().//
 		collect(Collectors.toList());
-	
+
 	Assert.assertEquals(3, selectedIndexes.size());
 
 	Assert.assertEquals(Integer.valueOf(0), selectedIndexes.get(0));

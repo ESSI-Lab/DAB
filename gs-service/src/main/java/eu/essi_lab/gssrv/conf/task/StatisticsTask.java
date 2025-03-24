@@ -207,7 +207,10 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	    Files.copy(IOStreamUtils.asStream(text), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-	    manager.uploadFile(tempFile.getAbsolutePath(), "dabreporting", "monitoring/" + viewId + ".txt");
+	    manager.uploadFile(
+		    tempFile.getAbsolutePath(), 
+		    "dabreporting", 
+		    "monitoring/" + viewId + ".txt");
 
 	    tempFile.delete();
 

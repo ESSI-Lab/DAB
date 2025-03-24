@@ -209,7 +209,12 @@ public class S3TransferWrapper {
 
     }
 
+    /**
+     * @param destination
+     * @param bucketName
+     */
     public void downloadDir(File destination, String bucketName) {
+
 	downloadDir(destination, bucketName, null);
     }
 
@@ -281,20 +286,33 @@ public class S3TransferWrapper {
 	System.out.println("All files uploaded successfully.");
     }
 
+    /**
+     * 
+     * @param filePath
+     * @param bucketName
+     */
     public void uploadFile(String filePath, String bucketName) {
 
 	uploadFile(filePath, bucketName, null, null);
     }
 
-    public void uploadFile(String filePath, String bucketName, String contentType) {
+    /**
+     * 
+     * @param filePath
+     * @param bucketName
+     * @param keyName
+     */
+    public void uploadFile(String filePath, String bucketName, String keyName) {
 
-	uploadFile(filePath, bucketName, null, contentType);
+	uploadFile(filePath, bucketName, keyName, null);
     }
 
     /**
+     * 
      * @param filePath
      * @param bucketName
-     * @param namePrefix
+     * @param keyName
+     * @param contentType
      */
     public void uploadFile(String filePath, String bucketName, String keyName, String contentType) {
 

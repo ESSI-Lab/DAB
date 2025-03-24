@@ -222,14 +222,20 @@ public class TurtleTask extends AbstractCustomTask {
 	    File finalFile = File.createTempFile(getClass().getSimpleName(), aggregatedTarget + ".ttl");
 	    aggregator.aggregate(finalFile.getAbsolutePath(), sourceFiles);
 	    if (wrapper != null) {
-		wrapper.uploadFile(finalFile.getAbsolutePath(), hostname, path + "/view/" + aggregatedTarget + ".ttl");
+		wrapper.uploadFile(
+			finalFile.getAbsolutePath(), 
+			hostname, 
+			path + "/view/" + aggregatedTarget + ".ttl");
 	    }
 	    finalFile.delete();
 
 	    File validfinalFile = File.createTempFile(getClass().getSimpleName(), aggregatedTarget + "-valid.ttl");
 	    aggregator.aggregate(validfinalFile.getAbsolutePath(), validSourceFiles);
 	    if (wrapper != null) {
-		wrapper.uploadFile(validfinalFile.getAbsolutePath(), hostname, path + "/view/" + aggregatedTarget + "-valid.ttl");
+		wrapper.uploadFile(
+			validfinalFile.getAbsolutePath(), 
+			hostname, 
+			path + "/view/" + aggregatedTarget + "-valid.ttl");
 	    }
 	    validfinalFile.delete();
 
@@ -391,7 +397,10 @@ public class TurtleTask extends AbstractCustomTask {
 
 			// upload turtle file
 			if (wrapper != null) {
-			    wrapper.uploadFile(turtle.getAbsolutePath(), hostname, webTurtle);
+			    wrapper.uploadFile(
+				    turtle.getAbsolutePath(), 
+				    hostname, 
+				    webTurtle);
 			}
 
 			turtle.delete();
@@ -406,9 +415,20 @@ public class TurtleTask extends AbstractCustomTask {
 		GSLoggerFactory.getLogger(getClass()).info("Created turtle output {}", sourceFile.getAbsolutePath());
 		// upload outputFile
 		if (wrapper != null) {
-		    wrapper.uploadFile(sourceFile.getAbsolutePath(), hostname, path + "/" + sourceId + "/" + sourceId + ".ttl");
-		    wrapper.uploadFile(validSourceFile.getAbsolutePath(), hostname, path + "/" + sourceId + "/" + sourceId + "-valid.ttl");
-		    wrapper.uploadFile(reportSourceFile.getAbsolutePath(), hostname,
+		   
+		    wrapper.uploadFile(
+			    sourceFile.getAbsolutePath(), 
+			    hostname, 
+			    path + "/" + sourceId + "/" + sourceId + ".ttl");
+		   
+		    wrapper.uploadFile(
+			    validSourceFile.getAbsolutePath(),
+			    hostname, 
+			    path + "/" + sourceId + "/" + sourceId + "-valid.ttl");
+		
+		    wrapper.uploadFile(
+			    reportSourceFile.getAbsolutePath(),
+			    hostname,
 			    path + "/" + sourceId + "/" + sourceId + "-report.txt");
 		}
 		sourceFile.delete();
