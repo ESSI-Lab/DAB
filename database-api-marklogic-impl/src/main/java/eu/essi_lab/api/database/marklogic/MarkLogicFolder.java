@@ -22,6 +22,7 @@ package eu.essi_lab.api.database.marklogic;
  */
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 
 import org.w3c.dom.Document;
@@ -131,40 +132,6 @@ public class MarkLogicFolder implements DatabaseFolder {
 	return mlDataBase.getWrapper().getBinary(createResourceUri(uri, key));
     }
 
-    // @Override
-    // public Optional<Node> getBinaryProperties(String key) throws Exception {
-    //
-    // return mlDataBase.getWrapper().getBinaryProperties(createResourceUri(uri, key));
-    // }
-    //
-    // @Override
-    // public boolean storeBinary(String key, InputStream res, Date timeStamp) throws Exception {
-    //
-    // return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res, timeStamp);
-    // }
-    //
-    // @Override
-    // public Optional<Date> getBinaryTimestamp(String key) throws Exception {
-    //
-    // Optional<Node> props = getBinaryProperties(key);
-    //
-    // if (props.isPresent()) {
-    //
-    // XMLNodeReader reader = new XMLNodeReader(props.get());
-    //
-    // String timeStampString = reader.evaluateString("//*[local-name()='" + MarkLogicWrapper.DOC_TIMESTAMP + "']");
-    //
-    // if (timeStampString != null && !timeStampString.isEmpty()) {
-    //
-    // long timeStamp = Long.valueOf(timeStampString);
-    //
-    // return Optional.of(new Date(timeStamp));
-    // }
-    // }
-    //
-    // return Optional.empty();
-    // }
-
     @Override
     public boolean remove(String key) throws Exception {
 
@@ -193,6 +160,12 @@ public class MarkLogicFolder implements DatabaseFolder {
 	}
 
 	return asStrings;
+    }
+
+    @Override
+    public List<String> listIdentifiers(IdentifierType identifierType) throws Exception {
+
+        return null;
     }
 
     @Override
