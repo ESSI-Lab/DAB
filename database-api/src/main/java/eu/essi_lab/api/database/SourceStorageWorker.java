@@ -111,6 +111,7 @@ public class SourceStorageWorker {
     private DatabaseReader reader;
     private DatabaseFinder finder;
     private List<String> report;
+    private HarvestingStrategy strategy;
 
     /**
      * @param sourceId
@@ -324,6 +325,30 @@ public class SourceStorageWorker {
     }
 
     /**
+     * @return 
+     */
+    public String getSourceId() {
+
+	return sourceId;
+    }
+
+    /**
+     * @return
+     */
+    public String getStartTimeStamp() {
+
+	return startTimeStamp;
+    }
+
+    /**
+     * @return
+     */
+    public HarvestingStrategy getStrategy() {
+
+	return strategy;
+    }
+
+    /**
      * @param strategy
      * @param recovery
      * @param resumed
@@ -335,6 +360,8 @@ public class SourceStorageWorker {
 	    boolean recovery, //
 	    boolean resumed, //
 	    Optional<SchedulerJobStatus> status) throws Exception {
+
+	this.strategy = strategy;
 
 	report = new LinkedList<String>();
 
