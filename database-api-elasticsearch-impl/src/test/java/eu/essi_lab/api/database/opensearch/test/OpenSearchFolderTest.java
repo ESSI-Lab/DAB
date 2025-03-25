@@ -3,12 +3,15 @@
  */
 package eu.essi_lab.api.database.opensearch.test;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.OpenSearchServiceType;
@@ -19,6 +22,9 @@ import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.datafolder.test.TestUtils;
+import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.StorageInfo;
 
@@ -26,6 +32,45 @@ import eu.essi_lab.model.StorageInfo;
  * @author Fabrizio
  */
 public class OpenSearchFolderTest extends OpenSearchTest {
+
+    /**
+     * @param wrapper
+     * @param folder
+     * @return
+     * @throws Exception
+     */
+    public static List<String> listEntryIdentifiers(OpenSearchFolder folder) throws Exception {
+
+	String index = IndexData.detectIndex(folder);
+
+	Query searchQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(folder);
+
+	return folder.getWrapper().searchField(//
+		index, //
+		searchQuery, //
+		IndexData.ENTRY_ID);//
+    }
+
+    @Test
+    public void sizeTooBigTest() throws Exception {
+
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+
+	String folderName = Database.VIEWS_FOLDER;
+
+	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
+
+	Assert.assertThrows(OpenSearchException.class, () -> {
+
+	    folder.getWrapper().searchField(//
+		    ViewsMapping.get().getIndex(), //
+		    OpenSearchQueryBuilder.buildMatchAllQuery(), //
+		    ViewsMapping.VIEW_ID, //
+		    0, //
+		    Integer.MAX_VALUE);
+	});
+
+    }
 
     /**
      * Not a test, use it to remove folders
@@ -91,12 +136,12 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 
 	Assert.assertEquals(1, folder.size());
 	Assert.assertEquals(1, folder.listKeys().length);
-	Assert.assertEquals(1, folder.listIds().size());
+	Assert.assertEquals(1, listEntryIdentifiers(folder).size());
 
 	Assert.assertTrue(replace(folder, view2, key));
 	Assert.assertEquals(1, folder.size());
 	Assert.assertEquals(1, folder.listKeys().length);
-	Assert.assertEquals(1, folder.listIds().size());
+	Assert.assertEquals(1, listEntryIdentifiers(folder).size());
 
 	Assert.assertEquals("Creator2", View.fromStream(folder.getBinary(key)).getCreator());
 
@@ -156,12 +201,12 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 
 	Assert.assertEquals(1, folder.size());
 	Assert.assertEquals(1, folder.listKeys().length);
-	Assert.assertEquals(1, folder.listIds().size());
+	Assert.assertEquals(1, listEntryIdentifiers(folder).size());
 
 	Assert.assertTrue(replace(folder, doc2, key));
 	Assert.assertEquals(1, folder.size());
 	Assert.assertEquals(1, folder.listKeys().length);
-	Assert.assertEquals(1, folder.listIds().size());
+	Assert.assertEquals(1, listEntryIdentifiers(folder).size());
 
 	Assert.assertEquals(SourceStorageWorker.DATA_2_POSTFIX, new DataFolderIndexDocument(folder.getBinary(key)).getDataFolderPrefix());
 
@@ -197,7 +242,7 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 
 	Assert.assertEquals(0, folder.size());
 	Assert.assertEquals(0, folder.listKeys().length);
-	Assert.assertEquals(0, folder.listIds().size());
+	Assert.assertEquals(0, listEntryIdentifiers(folder).size());
     }
 
     /**
@@ -217,7 +262,7 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 
 	Assert.assertEquals(0, folder.size());
 	Assert.assertEquals(0, folder.listKeys().length);
-	Assert.assertEquals(0, folder.listIds().size());
+	Assert.assertEquals(0, listEntryIdentifiers(folder).size());
     }
 
     /**
