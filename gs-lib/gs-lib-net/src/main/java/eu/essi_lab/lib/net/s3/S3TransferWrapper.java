@@ -287,7 +287,6 @@ public class S3TransferWrapper {
     }
 
     /**
-     * 
      * @param filePath
      * @param bucketName
      */
@@ -297,7 +296,6 @@ public class S3TransferWrapper {
     }
 
     /**
-     * 
      * @param filePath
      * @param bucketName
      * @param keyName
@@ -308,7 +306,6 @@ public class S3TransferWrapper {
     }
 
     /**
-     * 
      * @param filePath
      * @param bucketName
      * @param keyName
@@ -350,6 +347,55 @@ public class S3TransferWrapper {
 	uploadCompletion.join(); // Blocking call to wait for upload completion
 
 	GSLoggerFactory.getLogger(getClass()).debug("Upload file ENDED");
+    }
+
+    public void uploadFiles(List<UploadFileRequest> requests) {
+	GSLoggerFactory.getLogger(getClass()).debug("Upload files STARTED ({})", requests.size());
+	initialize();
+	List<CompletableFuture<CompletedFileUpload>> futures = new ArrayList<CompletableFuture<CompletedFileUpload>>();
+
+	for (UploadFileRequest request : requests) {
+	    FileUpload future = manager.uploadFile(request);
+	    futures.add(future.completionFuture());
+	}
+
+	CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+	GSLoggerFactory.getLogger(getClass()).debug("Upload files ENDED");
+
+    }
+
+    public UploadFileRequest getUploadRequest(String filePath, String bucketName, String keyName) {
+	return getUploadRequest(filePath, bucketName, keyName, null);
+    }
+
+    public UploadFileRequest getUploadRequest(String filePath, String bucketName, String keyName, String contentType) {
+
+	File file = new File(filePath);
+
+	if (keyName == null) {
+	    keyName = file.getName();
+	}
+
+	PutObjectRequest.Builder requestBuilder = PutObjectRequest.builder().bucket(bucketName).key(keyName);
+
+	if (aclPublicRead) {
+	    requestBuilder = requestBuilder.acl(ObjectCannedACL.PUBLIC_READ);
+	} else {
+	    requestBuilder = requestBuilder.acl(ObjectCannedACL.PRIVATE);
+	}
+
+	if (contentType != null) {
+	    requestBuilder = requestBuilder.contentType(contentType);
+	}
+
+	PutObjectRequest putObjectRequest = requestBuilder.build();
+
+	// Create UploadFileRequest
+	UploadFileRequest uploadFileRequest = UploadFileRequest.builder().putObjectRequest(putObjectRequest).source(file.toPath()).build();
+
+	return uploadFileRequest;
+
     }
 
     /**
