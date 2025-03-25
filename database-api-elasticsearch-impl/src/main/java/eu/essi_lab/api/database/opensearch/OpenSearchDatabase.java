@@ -28,6 +28,8 @@ import org.opensearch.client.transport.aws.AwsSdk2Transport;
 import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
 
+import com.fasterxml.jackson.core.StreamReadConstraints;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -65,6 +67,14 @@ import software.amazon.awssdk.regions.Region;
  * @author Fabrizio
  */
 public class OpenSearchDatabase extends Database {
+
+    //
+    // set the Jackson StreamReadConstraints maxStringLength to 50 MB instead of the default 20 MB
+    //
+    static {
+
+	StreamReadConstraints.overrideDefaultStreamReadConstraints(StreamReadConstraints.builder().maxStringLength(50000000).build());
+    }
 
     private OpenSearchClient client;
     private String identifier;
