@@ -32,10 +32,8 @@ import java.util.Optional;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
@@ -55,6 +53,7 @@ import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.HarvestingStrategy;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -65,6 +64,11 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * @author Fabrizio
  */
 public class ResourcesComparatorTask extends AbstractCustomTask implements HarvestingEmbeddedTask {
+
+    /**
+     * 
+     */
+    private static final int PAGE_SIZE = 1000;
 
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
@@ -88,6 +92,14 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 
 	SourceStorageWorker worker = database.getWorker(gsSource.getUniqueIdentifier());
 
+	HarvestingStrategy strategy = worker.getStrategy();
+
+	String startTimeStamp = worker.getStartTimeStamp();
+
+	//
+	//
+	//
+
 	DatabaseFolder data1Folder = null;
 	DatabaseFolder data2Folder = null;
 
@@ -104,6 +116,7 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 	if (data1Folder == null && data2Folder == null) {
 
 	    GSLoggerFactory.getLogger(getClass()).error("Both data folders missing, exit!");
+	    return;
 	}
 
 	ArrayList<String> newRecords = new ArrayList<>();
@@ -112,51 +125,79 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 
 	HarvestingProperties properties = worker.getHarvestingProperties();
 
-	//
-	// first harvesting, only new records added
-	//
-	if (properties == null) {
+	switch (strategy) {
+	case FULL:
 
+	    if (data1Folder != null && data2Folder == null) {
+
+		//
+		// first full harvesting, only new records added in the data-1 folder
+		//
+
+	    } else {
+
+		//
+		// successive harvesting, comparing data-1 and data-2 folders
+		//
+
+	    }
+
+	case SELECTIVE:
+
+	    if (data1Folder != null && data2Folder == null) {
+
+		//
+		// first selective harvesting, only new records added in the data-1 folder
+		//
+		
+
+	    } else {
+		
+		//
+		// successive selective harvesting, searching for new records
+		//
+
+		String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTime();
+
+		long minTimeStamp = ISO8601DateTimeUtils.parseISO8601ToDate(startTimeStamp).get().getTime();
+		long maxTimeStamp = ISO8601DateTimeUtils.parseISO8601ToDate(untilDateStamp).get().getTime();
+
+		ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
+			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(minTimeStamp));
+
+		ResourcePropertyBond maxTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
+			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(maxTimeStamp));
+
+		ResourcePropertyBond sourceIdBond = BondFactory.createSourceIdentifierBond(gsSource.getUniqueIdentifier());
+
+		LogicalBond andBond = BondFactory.createAndBond(minTimeStampBond, maxTimeStampBond, sourceIdBond);
+
+		DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+		discoveryMessage.setExcludeResourceBinary(true);
+
+		ResourceSelector resourceSelector = new ResourceSelector();
+		resourceSelector.addIndex(MetadataElement.IDENTIFIER);
+
+		discoveryMessage.setResourceSelector(resourceSelector);
+		discoveryMessage.setSources(Arrays.asList(gsSource));
+		discoveryMessage.setUserBond(andBond);
+		discoveryMessage.setNormalizedBond(andBond);
+		discoveryMessage.setPermittedBond(andBond);
+		discoveryMessage.setIncludeDeleted(false);
+		discoveryMessage.setPage(new Page(0, PAGE_SIZE));
+
+		ResultSet<GSResource> resultSet = finder.discover(discoveryMessage);
+		resultSet.getResultsList().forEach(res -> newRecords.add(res.getIndexesMetadata().read(MetadataElement.IDENTIFIER).get(0)));
+	    }
 	}
 
-	//
-	// incremental harvesting, only new records added
-	//
-	if (data1Folder != null && data2Folder == null) {
+	GSLoggerFactory.getLogger(getClass()).info("New records: {}", newRecords.size());
+	GSLoggerFactory.getLogger(getClass()).info("Modified records: {}", modifiedRecords.size());
+	GSLoggerFactory.getLogger(getClass()).info("Deleted records: {}", deletedRecords.size());
 
-	    String fromDateStamp = properties.getStartHarvestingTimestamp();
-	    String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTime();
-
-	    long minTimeStamp = ISO8601DateTimeUtils.parseISO8601ToDate(fromDateStamp).get().getTime();
-	    long maxTimeStamp = ISO8601DateTimeUtils.parseISO8601ToDate(untilDateStamp).get().getTime();
-
-	    ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
-		    ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(minTimeStamp));
-
-	    ResourcePropertyBond maxTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
-		    ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(maxTimeStamp));
-
-	    ResourcePropertyBond sourceIdBond = BondFactory.createSourceIdentifierBond(gsSource.getUniqueIdentifier());
-
-	    LogicalBond andBond = BondFactory.createAndBond(minTimeStampBond, maxTimeStampBond, sourceIdBond);
-
-	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-	    discoveryMessage.setExcludeResourceBinary(true);
-
-	    ResourceSelector resourceSelector = new ResourceSelector();
-	    resourceSelector.addIndex(MetadataElement.IDENTIFIER);
-
-	    discoveryMessage.setResourceSelector(resourceSelector);
-	    discoveryMessage.setSources(Arrays.asList(gsSource));
-	    discoveryMessage.setUserBond(andBond);
-	    discoveryMessage.setNormalizedBond(andBond);
-	    discoveryMessage.setPermittedBond(andBond);
-	    discoveryMessage.setIncludeDeleted(false);
-	    discoveryMessage.setPage(new Page(0, Integer.MAX_VALUE));
-
-	    ResultSet<GSResource> resultSet = finder.discover(discoveryMessage);
-	    resultSet.getResultsList().forEach(res -> newRecords.add(res.getIndexesMetadata().read(MetadataElement.IDENTIFIER).get(0)));
-	}
+	log(status, "New records: " + newRecords.size());
+	log(status, "Modified records:" + modifiedRecords.size());
+	log(status, "Deleted records:" + deletedRecords.size());
 
 	log(status, "Resources comparator task ENDED");
     }

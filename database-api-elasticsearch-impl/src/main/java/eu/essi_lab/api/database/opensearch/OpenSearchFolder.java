@@ -122,10 +122,10 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	if (wrapper.getBinaryProperty().equals(DataFolderMapping.GS_RESOURCE)) {
 
-	    return ConversionUtils.toGSResource(source.get()).get().asDocument(true);
+	    return OpenSearchUtils.toGSResource(source.get()).get().asDocument(true);
 	}
 
-	return ConversionUtils.toNode(ConversionUtils.toStream(source.get()));
+	return OpenSearchUtils.toNode(OpenSearchUtils.toStream(source.get()));
     }
 
     @Override
@@ -166,7 +166,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	if (!sources.isEmpty()) {
 
-	    return ConversionUtils.toGSResource(sources.get(0));
+	    return OpenSearchUtils.toGSResource(sources.get(0));
 	}
 
 	return Optional.empty();
@@ -186,10 +186,10 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	if (wrapper.getBinaryProperty().equals(DataFolderMapping.GS_RESOURCE)) {
 
-	    return ConversionUtils.toGSResource(source.get()).get().asStream();
+	    return OpenSearchUtils.toGSResource(source.get()).get().asStream();
 	}
 
-	return ConversionUtils.toStream(source.get());
+	return OpenSearchUtils.toStream(source.get());
     }
 
     @Override
@@ -313,6 +313,14 @@ public class OpenSearchFolder implements DatabaseFolder {
     public SourceWrapper getSourceWrapper(String key) throws Exception {
 
 	return new SourceWrapper(_getSource(key).orElse(null));
+    }
+
+    /**
+     * @return
+     */
+    public OpenSearchWrapper getWrapper() {
+
+	return wrapper;
     }
 
     /**

@@ -202,7 +202,7 @@ public class OpenSearchReader implements DatabaseReader {
 	try {
 	    return wrapper.searchSources(DataFolderMapping.get().getIndex(), query).//
 		    stream().//
-		    map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
+		    map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
 
@@ -225,7 +225,7 @@ public class OpenSearchReader implements DatabaseReader {
 	try {
 	    return wrapper.searchSources(DataFolderMapping.get().getIndex(), query).//
 		    stream().//
-		    map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
+		    map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
 

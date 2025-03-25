@@ -20,9 +20,9 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.GetViewIdentifiersRequest;
-import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
@@ -98,7 +98,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	Assert.assertEquals(view.getVisibility(), wrapper.getViewVisibility().get());
 
 	Assert.assertEquals(//
-		ConversionUtils.encode(FolderEntry.of(view.toStream())), wrapper.getView().get());
+		OpenSearchUtils.encode(FolderEntry.of(view.toStream())), wrapper.getView().get());
     }
 
     @Test
@@ -159,7 +159,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	Assert.assertEquals(view.getVisibility(), wrapper.getViewVisibility().get());
 
 	Assert.assertEquals(//
-		ConversionUtils.encode(FolderEntry.of(view.toStream())), wrapper.getView().get());
+		OpenSearchUtils.encode(FolderEntry.of(view.toStream())), wrapper.getView().get());
     }
 
     @Test
@@ -852,7 +852,6 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 
 	    Assert.assertEquals(CREATOR_1_OWNER_B, ids.size());
 	}
-
     }
 
     /**

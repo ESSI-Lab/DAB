@@ -61,8 +61,8 @@ import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
 import org.opensearch.client.opensearch.core.msearch.MultisearchHeader;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
-import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
@@ -120,7 +120,7 @@ public class OpenSearchQueryBuilder {
      */
     public void append(Query query) {
 
-	builder.append(ConversionUtils.toJSONObject(query).toString(3));
+	builder.append(OpenSearchUtils.toJSONObject(query).toString(3));
     }
 
     /**
@@ -337,7 +337,7 @@ public class OpenSearchQueryBuilder {
 
 	    if (contentType == ContentType.ISO8601_DATE || contentType == ContentType.ISO8601_DATE_TIME) {
 
-		value = ConversionUtils.parseToLongString(value);
+		value = OpenSearchUtils.parseToLongString(value);
 	    }
 
 	    //
@@ -380,7 +380,7 @@ public class OpenSearchQueryBuilder {
 
 	    if (el.getContentType() == ContentType.ISO8601_DATE || el.getContentType() == ContentType.ISO8601_DATE_TIME) {
 
-		value = ConversionUtils.parseToLongString(value);
+		value = OpenSearchUtils.parseToLongString(value);
 	    }
 
 	    //
@@ -435,7 +435,7 @@ public class OpenSearchQueryBuilder {
      */
     public Query build(boolean count) {
 
-	Query searchQuery = ConversionUtils.toQuery(new JSONObject(builder.toString()));
+	Query searchQuery = OpenSearchUtils.toQuery(new JSONObject(builder.toString()));
 
 	Query basicQuery = buildBasicQuery(count);
 
@@ -1047,7 +1047,7 @@ public class OpenSearchQueryBuilder {
 	    // creates the query
 	    //
 
-	    value = ConversionUtils.parseToLongString(value);
+	    value = OpenSearchUtils.parseToLongString(value);
 
 	    Query literalQuery = buildRangeQuery(el.getName(), operator, value);
 

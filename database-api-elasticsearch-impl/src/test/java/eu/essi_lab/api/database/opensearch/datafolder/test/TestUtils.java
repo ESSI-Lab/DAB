@@ -13,9 +13,9 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.ResourceDecorator;
 import eu.essi_lab.api.database.opensearch.index.Shape;
@@ -114,7 +114,7 @@ public class TestUtils {
 
 	String base64Dataset = wrapper.getGSResource().get();
 
-	ClonableInputStream storedDatasetStream = new ClonableInputStream(ConversionUtils.decode(base64Dataset));
+	ClonableInputStream storedDatasetStream = new ClonableInputStream(OpenSearchUtils.decode(base64Dataset));
 
 	GSResource storedDataset = GSResource.create(storedDatasetStream.clone());
 
@@ -309,7 +309,7 @@ public class TestUtils {
 
 		    List<Long> collect = prop1Values.//
 			    stream().//
-			    map(v -> ConversionUtils.parseToLong(v).get()).//
+			    map(v -> OpenSearchUtils.parseToLong(v).get()).//
 			    sorted().//
 			    collect(Collectors.toList());
 

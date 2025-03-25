@@ -14,9 +14,9 @@ import org.junit.Test;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.ConfigurationMapping;
@@ -97,7 +97,7 @@ public class OpenSearchConfigurationFolderTest extends OpenSearchTest {
 	    Assert.assertEquals(configName, wrapper.getConfigurationName().get());
 
 	    Assert.assertEquals(//
-		    ConversionUtils.encode(FolderEntry.of(IOStreamUtils.asStream(configuration.toString()))), //
+		    OpenSearchUtils.encode(FolderEntry.of(IOStreamUtils.asStream(configuration.toString()))), //
 		    wrapper.getConfiguration().get());
 
 	    //
@@ -135,7 +135,7 @@ public class OpenSearchConfigurationFolderTest extends OpenSearchTest {
 	    //
 
 	    Assert.assertEquals(//
-		    ConversionUtils.encode(FolderEntry.of(IOStreamUtils.asStream(lockFile.toString(3)))), //
+		    OpenSearchUtils.encode(FolderEntry.of(IOStreamUtils.asStream(lockFile.toString(3)))), //
 		    wrapper.getConfigurationLock().get());
 	}
     }
