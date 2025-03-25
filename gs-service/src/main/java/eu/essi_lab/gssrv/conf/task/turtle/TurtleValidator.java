@@ -1,5 +1,7 @@
 package eu.essi_lab.gssrv.conf.task.turtle;
 
+import java.io.BufferedReader;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -23,6 +25,7 @@ package eu.essi_lab.gssrv.conf.task.turtle;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -62,6 +65,21 @@ public class TurtleValidator {
     }
 
     public static ValidationReport validate(File turtle) {
+	return validate(turtle, false);
+    }
+
+    public static ValidationReport validate(File turtle, boolean debug) {
+	if (debug) {
+	    try (BufferedReader reader = new BufferedReader(new FileReader(turtle))) {
+		String line;
+		int lineNumber = 1;
+		while ((line = reader.readLine()) != null) {
+		    System.out.printf("%d: %s%n", lineNumber++, line);
+		}
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
+	}
 	Model datasetModel = FileManager.get().loadModel(turtle.getAbsolutePath());
 	if (model == null) {
 	    File tmpModelFile;
@@ -80,6 +98,10 @@ public class TurtleValidator {
     }
 
     public static ValidationReport validate(URL url) throws Exception {
+	return validate(url, false);
+    }
+
+    public static ValidationReport validate(URL url, boolean debug) throws Exception {
 	Downloader d = new Downloader();
 	InputStream stream = d.downloadOptionalStream(url.toString()).get();
 	File tmp = File.createTempFile(TurtleValidator.class.getClassLoader().getName(), ".ttl");
@@ -87,8 +109,9 @@ public class TurtleValidator {
 	IOUtils.copy(stream, fos);
 	stream.close();
 	fos.close();
-	ValidationReport ret = validate(tmp);
+	ValidationReport ret = validate(tmp, debug);
 	tmp.delete();
-	return ret;	
+	return ret;
     }
+
 }

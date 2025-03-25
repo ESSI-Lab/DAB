@@ -76,6 +76,19 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 	return new ESSILabProvider();
     }
 
+    private boolean isDOI(String id) {
+	if (id == null) {
+	    return false;
+	}
+	if (id.startsWith("10.")) {
+	    return true;
+	}
+	if (id.contains("doi.org")) {
+	    return true;
+	}
+	return false;
+    }
+
     private boolean isURI(String id) {
 	if (id == null) {
 	    return false;
@@ -115,7 +128,7 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		String title = valueURI.getKey();
 
 		if (isURI(id)) {
-		    ret += "<" + id + "> a skos:Concept, sosa:ObservedProperty, iop:Variable;\n";
+		    ret += "<" + normalizeURI(id) + "> a skos:Concept, sosa:ObservedProperty, iop:Variable;\n";
 
 		    if (title != null && !title.isEmpty()) {
 			ret += "skos:prefLabel \"" + title + "\" .\n";
@@ -134,11 +147,15 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 	    for (Node organization : organizations) {
 		String uri = reader.evaluateString(organization, "*:organisationName/*[1]/@*:href");
 		if (isURI(uri)) {
-		    ret += "<" + uri + "> a prov:Organization ;\n";
+		    ret += "<" + normalizeURI(uri) + "> a prov:Organization, foaf:Agent ;\n";
 		    String name = reader.evaluateString(organization, "*:organisationName/*[1]");
 		    if (name != null && !name.isEmpty()) {
-			ret += "rdfs:label \"" + normalize(name) + "\".\n";
+			ret += "foaf:name \"" + normalize(name) + "\";\n";
+		    } else {
+
 		    }
+		    ret += "foaf:name \"" + normalize(name) + "\";\n";
+		    ret += ".\n";
 
 		}
 	    }
@@ -149,7 +166,7 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 	    for (Node keyword : keywords) {
 		String uri = reader.evaluateString(keyword, "*[1]/@*:href");
 		if (isURI(uri)) {
-		    ret += "<" + uri + "> a skos:Concept;\n";
+		    ret += "<" + normalizeURI(uri) + "> a skos:Concept;\n";
 		    String value = reader.evaluateString(keyword, "*[1]");
 		    ret += "skos:prefLabel \"" + normalize(value) + "\" .\n";
 		}
@@ -203,50 +220,23 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		ret += "dct:description \"" + normalize(info.getAbstract()) + "\";\n";
 	    }
 
-	    Iterator<LegalConstraints> lci = info.getLegalConstraints();
-	    if (lci != null) {
-		while (lci.hasNext()) {
-		    String license = null;
-		    LegalConstraints legalConstraints = (LegalConstraints) lci.next();
-		    String code = legalConstraints.getAccessConstraintCode();
-		    if (code != null && !code.equals("otherRestrictions")) {
-			license = code;
-		    } else {
-			String other = legalConstraints.getOtherConstraint();
-			if (other != null) {
-			    license = other;
-			}
-		    }
-		    if (license != null) {
-			String uri = null;
-			if (license.contains("http")) {
-			    uri = license.substring(license.indexOf("http"));
-			    if (uri.contains(" ")) {
-				uri = uri.substring(0, uri.indexOf(" "));
-			    }
-			    if (uri.contains(")")) {
-				uri = uri.substring(0, uri.indexOf(")"));
-			    }
-			    ret += "dct:license \"" + license + "\" ;\n";
-			    if (!license.equals(uri)) {
-				ret += "dct:rights \"" + license + "\" ;\n";
-			    }
-			} else {
-			    ret += "dct:rights \"" + license + "\" ;\n";
-			}
-
-		    }
-		}
-	    }
-
 	    String resourceId = info.getResourceIdentifier();
 	    if (resourceId != null) {
 		if (isURI(resourceId)) {
-		    ret += "dct:identifier <" + resourceId + "> ;\n";
+		    ret += "dct:identifier <" + normalizeURI(resourceId) + "> ;\n";
 		} else {
 		    ret += "dct:identifier \"" + resourceId + "\" ;\n";
-		}
 
+		}
+		if (isDOI(resourceId)) {
+		    ret += "adms:identifier [\n"//
+			    + "			rdf:type adms:Identifier;\n"//
+			    + "			rdf:parseType \"Resource\";\n"//
+			    + "			skos:notation \"" + resourceId + "\" ;\n"//
+			    + "			adms:schemaAgency <https://registry.identifiers.org/registry/doi> ;\n"//
+			    + "			];";
+
+		}
 	    }
 
 	    for (int i = 0; i < onlines.size(); i++) {
@@ -280,9 +270,9 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 
 		ret += "sdo:variableMeasured [\n";
 		ret += "rdf:type sdo:PropertyValue;\n";
-		ret += "sdo:name \"" + title + "\";\n";
+		ret += "sdo:name \"" + normalize(title) + "\";\n";
 		if (isURI(id)) {
-		    ret += "sdo:propertyID <" + id + "> ;\n";
+		    ret += "sdo:propertyID <" + normalizeURI(id) + "> ;\n";
 		}
 		// sdo:alternateName "WC_temp68";
 
@@ -292,57 +282,79 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 
 	    for (Node organization : organizations) {
 
-		String organizationOpen = "prov:qualifiedAttribution [\n"//
-			+ "    a prov:Attribution ;\n"//
-			+ "    prov:agent [\n"//
-			+ "        rdf:type prov:Agent;";//
-		String organizationClose = " ] ;\n"//
-			+ "].";
 		String role = reader.evaluateString(organization, "*:role/*:CI_RoleCode/@codeListValue");
+		String uri = reader.evaluateString(organization, "*:organisationName/*[1]/@*:href");
+		String name = reader.evaluateString(organization, "*:organisationName/*[1]");
+
+		if (!isURI(uri) && name.isEmpty()) {
+		    continue;
+		}
+		if (role == null || role.isEmpty()) {
+		    role = "contributor";
+		}
+
+		String organizationOpen = "";//
+		String organizationClose = "";
+
 		String roleInfo = "";
 		if (role != null && !role.isEmpty()) {
 		    switch (role) {
-		    case "distributor":
 		    case "publisher":
-			organizationOpen = "dct:publisher [ a foaf:Agent ;";
-			organizationClose = "    ] .";
+			organizationOpen = "dct:publisher ";
+			organizationClose = " ;\n";
 			break;
 		    case "originator":
 		    case "author":
-			organizationOpen = "dct:creator [ a foaf:Agent ;";
-			organizationClose = "    ] .";
+			organizationOpen = "dct:creator ";
+			organizationClose = " ;\n";
 			break;
 		    case "contributor":
+			organizationOpen = "prov:qualifiedAttribution [\n"//
+				+ "    a prov:Attribution ;\n"//
+				+ "    prov:agent ";
+			organizationClose = " ] ;\n";
+
 			roleInfo = "dcat:hadRole <http://vocab.nerc.ac.uk/collection/G04/current/018/> ";
 			break;
 		    default:
+			// other roles
+			organizationOpen = "prov:qualifiedAttribution [\n"//
+				+ "    a prov:Attribution ;\n"//
+				+ "    prov:agent ";
+			organizationClose = " ] ;\n";
+
 			roleInfo = "dcat:hadRole [\n"//
-				+ "       a skos:Concept ;\n"//
-				+ "       skos:prefLabel \"" + role + "\"@en\n"//
-				+ "       ]";
+				+ "a skos:Concept ;\n"//
+				+ "skos:prefLabel \"" + role + "\"@en;\n"//
+				+ "]\n";
 			break;
 		    }
 		}
-		String uri = reader.evaluateString(organization, "*:organisationName/*[1]/@*:href");
+
+		ret += organizationOpen + " "; // dct:creator
 
 		if (isURI(uri)) {
-		    ret += organizationOpen + " ";
-
-		    ret += "<" + uri + ">;\n";
-		} else {
-		    String name = reader.evaluateString(organization, "*:organisationName/*[1]");
+		    ret += "<" + normalizeURI(uri) + ">";
+		} else if (roleInfo.isEmpty()) {
 		    if (name != null && !name.isEmpty()) {
-			ret += organizationOpen + " "; // dct:creator
 
-			ret += "[\n"//
-				+ "        a foaf:Agent ;\n"//
-				+ "        foaf:name \"" + name + "\" ;\n";//
+			ret += " [ rdf:type prov:Agent; \n foaf:name \"" + normalize(name) + "\" ;\n";//
 
-			ret += roleInfo;
+			ret += roleInfo + "  ] ";
 
-			ret += organizationClose;
+		    }
+		} else {
+
+		    if (name != null && !name.isEmpty()) {
+
+			ret += " [ a foaf:Agent ;\n       foaf:name \"" + normalize(name) + "\" ;\n";//
+
+			ret += roleInfo + "  ] ";
+
 		    }
 		}
+
+		ret += organizationClose;
 	    }
 
 	    // THEMEs
@@ -351,7 +363,7 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		String id = valueURI.getValue();
 		String value = valueURI.getKey();
 		if (isURI(id)) {
-		    ret += "dcat:theme <" + id + "> ;\n";
+		    ret += "dcat:theme <" + normalizeURI(id) + "> ;\n";
 		} else {
 		    ret += "dcat:theme \"" + value.replace("\n", "") + "\" ;\n";
 		}
@@ -359,7 +371,7 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 
 	    String revisionDate = reader.evaluateString(
 		    "//*:MD_DataIdentification/*:citation/*:CI_Citation/*:date/*:CI_Date[*:dateType/*:CI_DateTypeCode/@codeListValue='revision']/*:date/*:Date");
-	    if (revisionDate != null&&!revisionDate.isEmpty()) {
+	    if (revisionDate != null && !revisionDate.isEmpty()) {
 		ret += "dct:issued " + formatTime(revisionDate) + ";\n";
 	    }
 
@@ -370,13 +382,13 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		String begin = temporalExtent.getBeginPosition();
 		String end = temporalExtent.getEndPosition();
 		if (begin != null && end != null) {
-		    String timeBegin = formatTime(begin) + ";\n";
-		    String timeEnd = formatTime(end) + ";\n";
+		    String timeBegin = formatTime(begin);
+		    String timeEnd = formatTime(end);
 		    if (timeBegin != null && timeEnd != null) {
 			ret += "dct:temporal [\n";
 			ret += "a dct:PeriodOfTime ;\n";
-			ret += "dcat:startDate " + timeBegin;
-			ret += "dcat:endDate   " + timeEnd;
+			ret += "dcat:startDate " + timeBegin + ";\n";
+			ret += "dcat:endDate   " + timeEnd + ";\n";
 			ret += "];\n";
 		    }
 		}
@@ -401,7 +413,7 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		    // "
 		    // + n;
 		    // ret += "))\"\"\"^^geosparql:wktLiteral ;\n";
-		    ret += "] .\n";
+		    ret += "] ;\n";
 		}
 	    }
 
@@ -418,8 +430,8 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 
 		if (isURI(id)) {
 		    ret += "exdata:Activity" + idd + " a prov:Activity;\n";
-		    ret += "prov:used <" + id + "> .\n";
-		    ret += "<" + id + ">  a sosa:Sensor, prov:Entity, skos:Concept;\n";
+		    ret += "prov:used <" + normalizeURI(id) + "> .\n";
+		    ret += "<" + normalizeURI(id) + ">  a sosa:Sensor, prov:Entity, skos:Concept;\n";
 		    ret += "skos:prefLabel \"" + title + "\".\n";
 		}
 
@@ -436,10 +448,10 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		String title = valueURI.getKey();
 		if (isURI(id)) {
 		    if (title != null) {
-			ret += "<" + id + "> a sosa:Platform;\n";
+			ret += "<" + normalizeURI(id) + "> a sosa:Platform;\n";
 			ret += "skos:prefLabel \"" + title + "\".\n";
 		    } else {
-			ret += "<" + id + "> a sosa:Platform.\n";
+			ret += "<" + normalizeURI(id) + "> a sosa:Platform.\n";
 		    }
 
 		}
@@ -481,11 +493,47 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		}
 
 		if (mediaType != null && mediaType.startsWith("http")) {
-		    ret += "dcat:mediaType <" + mediaType + "> ;\n";
+		    ret += "dcat:mediaType <" + normalizeURI(mediaType) + "> ;\n";
+		}
+
+		Iterator<LegalConstraints> lci = info.getLegalConstraints();
+		if (lci != null) {
+		    while (lci.hasNext()) {
+			String license = null;
+			LegalConstraints legalConstraints = (LegalConstraints) lci.next();
+			String code = legalConstraints.getAccessConstraintCode();
+			if (code != null && !code.equals("otherRestrictions")) {
+			    license = code;
+			} else {
+			    String other = legalConstraints.getOtherConstraint();
+			    if (other != null) {
+				license = other;
+			    }
+			}
+			if (license != null) {
+			    String uri = null;
+			    if (license.contains("http")) {
+				uri = license.substring(license.indexOf("http"));
+				if (uri.contains(" ")) {
+				    uri = uri.substring(0, uri.indexOf(" "));
+				}
+				if (uri.contains(")")) {
+				    uri = uri.substring(0, uri.indexOf(")"));
+				}
+				ret += "dct:license <" + normalize(uri) + "> ;\n";
+				if (!license.equals(uri)) {
+				    ret += getRightsText(license);
+				}
+			    } else {
+				ret += getRightsText(license);
+			    }
+
+			}
+		    }
 		}
 		//
 		// dcat:byteSize "5120"^^xsd:nonNegativeInteger .
-		if (!download) {
+		if (!download && linkage != null) {
 		    URL host;
 		    try {
 			if (!linkage.contains("://")) {
@@ -510,7 +558,7 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 			    // + linkage.replace(" ", "%20").replace("[", "%5B").replace("]", "%5D").replace("{",
 			    // "%7B").replace("}", "%7D") +
 				    + "> ;\n";
-			    ret += "dcat:servesDataset " + myDataset + " .\n";
+			    ret += "dcat:servesDataset " + myDataset + " ;\n";
 			}
 
 		    } catch (Exception e) {
@@ -536,6 +584,20 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    return null;
 	}
+    }
+
+    private String normalizeURI(String uri) {
+	if (uri == null) {
+	    return null;
+	}
+	uri = uri.replace(" ", "+");
+	return uri;
+    }
+
+    private String getRightsText(String license) {
+	return "dct:rights [ a dct:RightsStatement ;\n"//
+		+ "    rdfs:label \"" + normalize(license) + "\"@en \n"//
+		+ "  ] ;\n";
     }
 
     public static String encodeURL(String linkage) {
@@ -575,7 +637,10 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
     }
 
     private String normalize(String text) {
-	return text.replace("\\", "\\\\").replace("\r", "").replace("\n", "").replace("\"", "\\\"");
+	if (text == null) {
+	    return "";
+	}
+	return text.replace("\\", "\\\\").replace("\r", "").replace("\n", "").replace("\"", "\\\"").trim();
     }
 
     private String formatTime(String time) {

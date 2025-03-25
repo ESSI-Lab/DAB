@@ -14,7 +14,7 @@ public class TurtleValidatorTest {
 	// File("/home/boldrini/git/asset-standards/DCAT-AP/dataset-example.ttl"));
 
 	ValidationReport report = TurtleValidator
-		.validate(new URL("https://s3.amazonaws.com/dataset.geodab.eu/dataset/easydata/860c980a-d107-4f57-aa04-f49a94833d95.ttl"));
+		.validate(new URL("https://s3.amazonaws.com/dataset.geodab.eu/dataset/emodnet-network/9f445d9e-ce24-449d-b4a6-1fcb3d3dd1cd.ttl"),true);
 
 	// Check if the data conforms to the SHACL shapes
 	if (report.conforms()) {
@@ -31,7 +31,6 @@ public class TurtleValidatorTest {
 	    System.out.println(entry.sourceConstraintComponent());
 	    System.out.println("------------------------");
 	}
-	
-	
+
     }
 }
