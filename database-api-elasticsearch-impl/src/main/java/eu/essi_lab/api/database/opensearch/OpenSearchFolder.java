@@ -289,7 +289,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    List<String> fieldsList = OpenSearchUtils.toFieldsList(response, field);
 
 	    out.addAll(fieldsList);
-	    
+
 	    searchAfter = OpenSearchUtils.getSearchAfter(response);
 
 	} while (searchAfter.isPresent());
@@ -342,10 +342,9 @@ public class OpenSearchFolder implements DatabaseFolder {
     }
 
     /**
-     * The resource id, used as source id for the stored items, is formed by the folder id followed by '_' and
+     * The entry id, used as source id for the stored items, is formed by the folder id followed by '_' and
      * the resource key.<br>
-     * E.g.: E.g.: database id = 'test'; folder name = 'acronet'; resource key = 'key'; resource key =
-     * 'test_acronet_key'.
+     * E.g.: database id = 'test'; folder name = 'acronet'; resource key = 'key'; entry id = 'test_acronet_key'
      * 
      * @param key
      * @return
