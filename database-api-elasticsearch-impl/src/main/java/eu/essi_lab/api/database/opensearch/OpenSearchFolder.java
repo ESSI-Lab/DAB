@@ -316,6 +316,14 @@ public class OpenSearchFolder implements DatabaseFolder {
     }
 
     /**
+     * @return
+     */
+    public OpenSearchWrapper getWrapper() {
+
+	return wrapper;
+    }
+
+    /**
      * @param key
      * @return
      * @throws Exception
