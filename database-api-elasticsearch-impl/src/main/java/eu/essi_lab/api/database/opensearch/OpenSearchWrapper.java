@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -99,7 +98,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
  */
 public class OpenSearchWrapper {
 
-    private static final Integer MAX_DEFAULT_HISTS = 10000;
+    private static final Integer MAX_DEFAULT_HITS = 10000;
 
     private OpenSearchClient client;
 
@@ -126,9 +125,9 @@ public class OpenSearchWrapper {
 
 	if (response.found()) {
 
-	    JSONObject source = ConversionUtils.toJSONObject(response.source());
+	    JSONObject source = OpenSearchUtils.toJSONObject(response.source());
 
-	    decorateSource(source, index, entryId);
+	    OpenSearchUtils.decorateSource(source, index, entryId);
 
 	    return Optional.of(source);
 	}
@@ -316,13 +315,27 @@ public class OpenSearchWrapper {
 
 	return responses.//
 		stream().//
-		map(r -> ConversionUtils.toJSONObject(r.result().hits().hits().get(0).source())).//
+		map(r -> OpenSearchUtils.toJSONObject(r.result().hits().hits().get(0).source())).//
 		collect(Collectors.toList());
 
     }
 
     /**
+     * <b>NOTE</b>: if <code>size</code> is greater than {@link #MAX_DEFAULT_HITS}, the request will fail and an
+     * {@link OpenSearchException} will be thrown
      * 
+     * @param index
+     * @param searchQuery
+     * @param fields
+     * @param start
+     * @param size
+     * @param orderingProperty
+     * @param sortOrder
+     * @param searchAfter
+     * @param requestCache
+     * @param excludeResourceBinary
+     * @return
+     * @throws Exception
      */
     public SearchResponse<Object> search(//
 	    String index, //
@@ -333,7 +346,8 @@ public class OpenSearchWrapper {
 	    Optional<Queryable> orderingProperty, //
 	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
 	    Optional<SearchAfter> searchAfter, //
-	    boolean requestCache, boolean excludeResourceBinary)
+	    boolean requestCache, //
+	    boolean excludeResourceBinary)
 
 	    throws Exception {
 
@@ -342,7 +356,7 @@ public class OpenSearchWrapper {
 	    builder.query(searchQuery).//
 		    index(index);
 
-	    builder.size(size > 0 ? size : MAX_DEFAULT_HISTS);
+	    builder.size(size);
 
 	    if (searchAfter.isPresent()) {
 
@@ -377,91 +391,11 @@ public class OpenSearchWrapper {
     }
 
     /**
-     * @param index
-     * @param searchQuery
-     * @param fields
-     * @param start
-     * @param size
-     * @return
-     * @throws Exception
-     */
-    public SearchResponse<Object> search(//
-	    String index, //
-	    Query searchQuery, //
-	    List<String> fields, //
-	    int start, //
-	    int size) throws Exception {
-
-	return search(//
-		index, //
-		searchQuery, //
-		fields, //
-		start, //
-		size, //
-		Optional.empty(), //
-		Optional.empty(), //
-		Optional.empty(), //
-		false, //
-		false);
-    }
-
-    /**
-     * @param index
-     * @param searchQuery
-     * @param start
-     * @param size
-     * @param orderingProperty
-     * @param sortOrder
-     * @return
-     * @throws Exception
-     */
-    public SearchResponse<Object> search(String index, //
-	    Query searchQuery, //
-	    int start, //
-	    int size, //
-	    Optional<Queryable> orderingProperty, //
-	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
-	    Optional<SearchAfter> searchAfter, boolean excludeResourceBinary) throws Exception {
-
-	return search(//
-		index, //
-		searchQuery, //
-		Arrays.asList(), //
-		start, //
-		size, //
-		orderingProperty, //
-		sortOrder, //
-		searchAfter, //
-		false, //
-		excludeResourceBinary);
-    }
-
-    /**
-     * @param searchQuery
-     * @param properties
-     * @param start
-     * @param size
-     * @return
-     * @throws Exception
-     */
-    public List<InputStream> searchBinaries(String index, Query searchQuery, int start, int size) throws Exception {
-
-	SearchResponse<Object> searchResponse = search(//
-		index, //
-		searchQuery, //
-		Arrays.asList(), //
-		start, //
-		size, //
-		Optional.empty(), //
-		Optional.empty(), //
-		Optional.empty(), //
-		false, //
-		false);
-
-	return ConversionUtils.toBinaryList(searchResponse);
-    }
-
-    /**
+     * <b>NOTE</b>: use it with care! It returns a maximum of {@link #MAX_DEFAULT_HITS} which are requested (and
+     * optionally returned) in a single query.<br>
+     * This method is actually used by {@link OpenSearchReader} to get the users and the views, so the limit of
+     * {@link #MAX_DEFAULT_HITS} is not a problem
+     * 
      * @param searchQuery
      * @param key
      * @return
@@ -469,10 +403,28 @@ public class OpenSearchWrapper {
      */
     public List<InputStream> searchBinaries(String index, Query searchQuery) throws Exception {
 
-	return searchBinaries(index, searchQuery, 0, -1);
+	SearchResponse<Object> searchResponse = search(//
+		index, //
+		searchQuery, //
+		Arrays.asList(), //
+		0, //
+		MAX_DEFAULT_HITS, //
+		Optional.empty(), //
+		Optional.empty(), //
+		Optional.empty(), //
+		false, //
+		false);
+
+	return OpenSearchUtils.toBinaryList(searchResponse);
     }
 
     /**
+     * <b>NOTE</b>: if <code>size</code> is greater than {@link #MAX_DEFAULT_HITS}, the request will fail and an
+     * {@link OpenSearchException} will be thrown.<br>
+     * This method is actually used by
+     * {@link OpenSearchFolder#get(eu.essi_lab.api.database.Database.IdentifierType, String)} method with
+     * a <code>size</code> of 1, so the limit of {@link #MAX_DEFAULT_HITS} is not a problem
+     * 
      * @param index
      * @param searchQuery
      * @param start
@@ -494,10 +446,17 @@ public class OpenSearchWrapper {
 		false, //
 		false);
 
-	return ConversionUtils.toJSONSourcesList(response);
+	return OpenSearchUtils.toJSONSourcesList(response);
     }
 
     /**
+     * <b>NOTE</b>: use it with care! It returns a maximum of {@link #MAX_DEFAULT_HITS} which are requested (and
+     * optionally returned) in a single query.<br>
+     * <b>WARNING</b>: this method is actually called by
+     * {@link OpenSearchReader#getResources(eu.essi_lab.api.database.Database.IdentifierType, String)}
+     * and {@link OpenSearchReader#getResources(String, eu.essi_lab.model.GSSource, boolean)} methods where ALL
+     * resources should be searched and the limit of {@link #MAX_DEFAULT_HITS} is a problem
+     * 
      * @param index
      * @param searchQuery
      * @return
@@ -510,17 +469,26 @@ public class OpenSearchWrapper {
 		searchQuery, //
 		Arrays.asList(), //
 		0, //
-		-1, //
+		MAX_DEFAULT_HITS, //
 		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
 		false, //
 		false);
 
-	return ConversionUtils.toJSONSourcesList(response);
+	return OpenSearchUtils.toJSONSourcesList(response);
     }
 
     /**
+     * <b>NOTE</b>: use it with care! It returns a maximum of {@link #MAX_DEFAULT_HITS} which are requested (and
+     * optionally returned) in a single query.<br>
+     * The search request is performed excluding binaries and only the given <code>field</code> is searched and
+     * returned.<br>
+     * Actually this method is called by {@link FolderRegistry#getRegisteredFolders()},
+     * {@link OpenSearchFolder#listKeys()} for non-data folders,
+     * and by {@link OpenSearchReader#getViewIdentifiers(eu.essi_lab.api.database.GetViewIdentifiersRequest)}; in all
+     * these cases the limitation of {@link #MAX_DEFAULT_HITS} is not a problem
+     * 
      * @param searchQuery
      * @param field
      * @return
@@ -528,10 +496,14 @@ public class OpenSearchWrapper {
      */
     public List<String> searchField(String index, Query searchQuery, String field) throws Exception {
 
-	return searchField(index, searchQuery, field, 0, -1);
+	return searchField(index, searchQuery, field, 0, MAX_DEFAULT_HITS);
     }
 
     /**
+     * <b>NOTE</b>: if <code>size</code> is greater than {@link #MAX_DEFAULT_HITS}, the request will fail and an
+     * {@link OpenSearchException} will be thrown.<br>
+     * The search request is performed excluding binaries and only the given <code>field</code> is searched and returned
+     * 
      * @param searchQuery
      * @param field
      * @param start
@@ -552,26 +524,13 @@ public class OpenSearchWrapper {
 		Arrays.asList(field), //
 		start, //
 		size, //
-		Optional.empty(), //
-		Optional.empty(), //
-		Optional.empty(), //
-		false, //
-		false);
+		Optional.empty(), // ordering property
+		Optional.empty(), // sort order
+		Optional.empty(), // search after
+		false, // request cache
+		true); // exclude binary
 
-	HitsMetadata<Object> hits = response.hits();
-	List<Hit<Object>> hitsList = hits.hits();
-
-	return hitsList.stream().//
-
-		map(hit -> {
-
-		    JSONObject source = ConversionUtils.toJSONObject(hit.source());
-		    return decorateSource(source, hit.index(), hit.id());
-		}).//
-
-		map(source -> source.has(field) ? source.getString(field) : null).//
-		filter(Objects::nonNull).//
-		collect(Collectors.toList());
+	return OpenSearchUtils.toFieldsList(response, field);
     }
 
     /**
@@ -590,10 +549,12 @@ public class OpenSearchWrapper {
 
 	Map<String, Aggregation> map = new HashMap<>();
 
+	String aggName = "minMaxAgg";
+	
 	Aggregation agg = max ? new Aggregation.Builder().max(new MaxAggregation.Builder().field(field).build()).build()
 		: new Aggregation.Builder().min(new MinAggregation.Builder().field(field).build()).build();
 
-	map.put("1", agg);
+	map.put(aggName, agg);
 
 	SearchResponse<Object> response = client.search(builder -> {
 
@@ -608,10 +569,10 @@ public class OpenSearchWrapper {
 
 	if (max) {
 
-	    return aggregations.get("1").max().value();
+	    return aggregations.get(aggName).max().value();
 	}
 
-	return aggregations.get("1").min().value();
+	return aggregations.get(aggName).min().value();
     }
 
     /**
@@ -622,8 +583,6 @@ public class OpenSearchWrapper {
     public DeleteByQueryRequest buildDeleteByQueryRequest(String index, Query searchQuery) {
 
 	return new DeleteByQueryRequest.Builder().//
-	// allowNoIndices(true).//
-	// index(IndexData.ALL_INDEXES).//
 		index(index).//
 		query(searchQuery).//
 		build();
@@ -781,11 +740,11 @@ public class OpenSearchWrapper {
 	    boolean excludeResourceBinary) {
 
 	if (!fields.isEmpty()) {
-	    
+
 	    ArrayList<String> fields_ = new ArrayList<String>(fields);
-	    
-	    if(!fields.contains(ResourceProperty.TYPE.getName())) {
-		
+
+	    if (!fields.contains(ResourceProperty.TYPE.getName())) {
+
 		fields_.add(ResourceProperty.TYPE.getName());
 	    }
 
@@ -916,20 +875,6 @@ public class OpenSearchWrapper {
     }
 
     /**
-     * @param source
-     * @param _index
-     * @param _id
-     * @return
-     */
-    private JSONObject decorateSource(JSONObject source, String _index, String _id) {
-
-	source.put(IndexData.INDEX, _index);
-	source.put(IndexData.ENTRY_ID, _id);
-
-	return source;
-    }
-
-    /**
      * @param index
      * @param entryId
      * @return
@@ -940,19 +885,5 @@ public class OpenSearchWrapper {
 		index(index).//
 		id(entryId).//
 		build();
-    }
-
-    public static void main(String[] args) throws Exception {
-
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
-
-	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
-
-	Query query = OpenSearchQueryBuilder.buildMatchAllQuery();
-
-	double maxValue = wrapper.findMinMaxValue(query, "title", true);
-
-	System.out.println(maxValue);
-
     }
 }
