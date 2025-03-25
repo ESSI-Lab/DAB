@@ -54,7 +54,7 @@ import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
-import eu.essi_lab.api.database.opensearch.ConversionUtils;
+import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.CacheMapping;
@@ -206,7 +206,7 @@ public class IndexData {
 	//
 	// Optional<Long> toLong = ConversionUtils.parseToLong("2025-01-01");
 
-	Optional<Long> toLong = ConversionUtils.parseToLong("19841231-01-01T00:00:00Z");
+	Optional<Long> toLong = OpenSearchUtils.parseToLong("19841231-01-01T00:00:00Z");
 
 	// Optional<Date> notStandardToDate = ISO8601DateTimeUtils.parseNotStandard3ToDate("2023");
 	System.out.println(toLong);
@@ -224,7 +224,7 @@ public class IndexData {
 
 	IndexData indexData = new IndexData();
 
-	Document doc = (Document) ConversionUtils.toNode(resourceStream);
+	Document doc = (Document) OpenSearchUtils.toNode(resourceStream);
 
 	XMLDocumentHandler handler = new XMLDocumentHandler(doc);
 
@@ -251,7 +251,7 @@ public class IndexData {
 
 	handleResource(indexData, handler);
 
-	String encodedString = ConversionUtils.encode(handler.getDocument());
+	String encodedString = OpenSearchUtils.encode(handler.getDocument());
 
 	indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
 	indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
@@ -306,7 +306,7 @@ public class IndexData {
 
 	handleResource(indexData, gsResource);
 
-	String encodedString = ConversionUtils.encode(gsResource);
+	String encodedString = OpenSearchUtils.encode(gsResource);
 
 	indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
 	indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
@@ -364,7 +364,7 @@ public class IndexData {
 	    stream = new ClonableInputStream(entry.getStream().get());
 	}
 
-	String encodedString = ConversionUtils.encode(entry.getDocument().orElse(null), stream);
+	String encodedString = OpenSearchUtils.encode(entry.getDocument().orElse(null), stream);
 
 	//
 	//
@@ -384,7 +384,7 @@ public class IndexData {
 
 	    handleResource(indexData, gsResource);
 
-	    encodedString = ConversionUtils.encode(gsResource);
+	    encodedString = OpenSearchUtils.encode(gsResource);
 
 	    indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
 	    indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
@@ -1057,7 +1057,7 @@ public class IndexData {
 
 	    } else if (valueClass.equals(DateTime.class)) {
 
-		ConversionUtils.parseToLong(value).ifPresent(dt -> array.put(dt));
+		OpenSearchUtils.parseToLong(value).ifPresent(dt -> array.put(dt));
 	    }
 	});
 

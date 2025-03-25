@@ -51,9 +51,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonpSerializable;
 import org.opensearch.client.json.jsonb.JsonbJsonpMapper;
+import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Buckets;
 import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
@@ -62,6 +64,7 @@ import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.opensearch.client.opensearch.core.search.HitsMetadata;
+import org.opensearch.client.opensearch.core.search.SearchResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -77,6 +80,7 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.messages.PerformanceLogger;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
@@ -91,7 +95,43 @@ import jakarta.json.stream.JsonParser;
 /**
  * @author Fabrizio
  */
-public class ConversionUtils {
+public class OpenSearchUtils {
+
+    /**
+     * @param response
+     * @return
+     */
+    public static Optional<SearchAfter> getSearchAfter(SearchResult<Object> response) {
+
+	List<Hit<Object>> hits = response.hits().hits();
+	int size = hits.size();
+	if (size > 0) {
+
+	    Hit<Object> hit = hits.get(size - 1);
+	    List<FieldValue> sortVals = hit.sortVals();
+
+	    if (!sortVals.isEmpty()) {
+
+		FieldValue fieldValue = sortVals.get(0);
+
+		if (fieldValue.isString()) {
+
+		    return Optional.of(SearchAfter.of(fieldValue.stringValue()));
+
+		} else if (fieldValue.isDouble()) {
+
+		    return Optional.of(SearchAfter.of(fieldValue.doubleValue()));
+
+		} else if (fieldValue.isLong()) {
+
+		    return Optional.of(SearchAfter.of(fieldValue.longValue()));
+		}
+	    }
+	}
+
+	return Optional.empty();
+
+    }
 
     /**
      * @param aggs
@@ -211,9 +251,9 @@ public class ConversionUtils {
      */
     public static List<GSResource> toGSResourcesList(SearchResponse<Object> searchResponse) {
 
-	return ConversionUtils.toJSONSourcesList(searchResponse).//
+	return OpenSearchUtils.toJSONSourcesList(searchResponse).//
 		stream().//
-		map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
+		map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
 		filter(Objects::nonNull).//
 		collect(Collectors.toList());
     }
@@ -251,7 +291,7 @@ public class ConversionUtils {
 
 	    if (resource.isEmpty()) {
 
-		GSLoggerFactory.getLogger(ConversionUtils.class).error("Error occurred while mapping resource of source {}",
+		GSLoggerFactory.getLogger(OpenSearchUtils.class).error("Error occurred while mapping resource of source {}",
 			toJSONObject(hit.source()));
 		return null;
 	    }
@@ -261,7 +301,7 @@ public class ConversionUtils {
 
 	    } catch (Exception e) {
 
-		GSLoggerFactory.getLogger(ConversionUtils.class).error(e);
+		GSLoggerFactory.getLogger(OpenSearchUtils.class).error(e);
 	    }
 
 	    return null;
@@ -270,6 +310,59 @@ public class ConversionUtils {
 	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
 
 	return list;
+    }
+
+    /**
+     * <b>NOTE</b>: if the given field is an array, only the first element is returned
+     * 
+     * @param response
+     * @param field
+     * @return
+     */
+    public static List<String> toFieldsList(SearchResponse<Object> response, String field) {
+
+	HitsMetadata<Object> hits = response.hits();
+	List<Hit<Object>> hitsList = hits.hits();
+
+	return hitsList.stream().//
+
+		map(hit -> {
+
+		    JSONObject source = toJSONObject(hit.source());
+		    return decorateSource(source, hit.index(), hit.id());
+		}).//
+
+		map(source -> {
+
+		    if (source.has(field)) {
+
+			Object object = source.get(field);
+			if (object instanceof JSONArray) {
+
+			    return ((JSONArray) object).get(0).toString();
+			}
+
+			return source.get(field).toString();
+		    }
+
+		    return null;
+		}).//
+		filter(Objects::nonNull).//
+		collect(Collectors.toList());
+    }
+
+    /**
+     * @param source
+     * @param _index
+     * @param _id
+     * @return
+     */
+    public static JSONObject decorateSource(JSONObject source, String _index, String _id) {
+
+	source.put(IndexData.INDEX, _index);
+	source.put(IndexData.ENTRY_ID, _id);
+
+	return source;
     }
 
     /**
@@ -289,7 +382,7 @@ public class ConversionUtils {
 
 	    if (resource.isEmpty()) {
 
-		GSLoggerFactory.getLogger(ConversionUtils.class).error("Error occurred while mapping resource of source {}",
+		GSLoggerFactory.getLogger(OpenSearchUtils.class).error("Error occurred while mapping resource of source {}",
 			toJSONObject(hit.source()));
 		return null;
 	    }
@@ -299,7 +392,7 @@ public class ConversionUtils {
 
 	    } catch (Exception e) {
 
-		GSLoggerFactory.getLogger(ConversionUtils.class).error(e);
+		GSLoggerFactory.getLogger(OpenSearchUtils.class).error(e);
 	    }
 
 	    return null;
@@ -381,7 +474,7 @@ public class ConversionUtils {
 
 	} catch (Exception ex) {
 
-	    GSLoggerFactory.getLogger(ConversionUtils.class).error(ex);
+	    GSLoggerFactory.getLogger(OpenSearchUtils.class).error(ex);
 	}
 
 	return null;
@@ -403,7 +496,7 @@ public class ConversionUtils {
 	    return Base64.getEncoder().encodeToString(bytes);
 	} catch (Exception ex) {
 
-	    GSLoggerFactory.getLogger(ConversionUtils.class).error(ex);
+	    GSLoggerFactory.getLogger(OpenSearchUtils.class).error(ex);
 	}
 
 	return null;
@@ -490,7 +583,7 @@ public class ConversionUtils {
 
 	} catch (Exception ex) {
 
-	    GSLoggerFactory.getLogger(ConversionUtils.class).error(ex);
+	    GSLoggerFactory.getLogger(OpenSearchUtils.class).error(ex);
 	}
 
 	return Optional.empty();
@@ -616,7 +709,7 @@ public class ConversionUtils {
      */
     public static String parseToLongString(String dateTime) {
 
-	Optional<Long> longValue = ConversionUtils.parseToLong(dateTime);
+	Optional<Long> longValue = OpenSearchUtils.parseToLong(dateTime);
 	if (longValue.isPresent()) {
 
 	    return longValue.get().toString();

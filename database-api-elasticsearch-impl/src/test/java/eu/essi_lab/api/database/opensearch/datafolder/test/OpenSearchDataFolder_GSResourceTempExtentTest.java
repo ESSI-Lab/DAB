@@ -12,9 +12,9 @@ import org.junit.Test;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.IndexedElementsWriter;
@@ -718,7 +718,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	if (dateTime.isPresent()) {
 
-	    Long longValue = ConversionUtils.parseToLong(dateTime.get()).get();
+	    Long longValue = OpenSearchUtils.parseToLong(dateTime.get()).get();
 
 	    Assert.assertEquals(longValue, Long.valueOf(list.get(0)));
 
