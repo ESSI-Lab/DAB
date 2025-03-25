@@ -25,6 +25,7 @@ package eu.essi_lab.api.database.opensearch;
  */
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,10 @@ import java.util.Optional;
 import org.json.JSONObject;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
 import org.w3c.dom.Node;
+
+import com.google.api.client.util.Lists;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.IdentifierType;
@@ -43,10 +47,12 @@ import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
@@ -56,6 +62,8 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * @author Fabrizio
  */
 public class OpenSearchFolder implements DatabaseFolder {
+
+    private static final int MAX_PAGE_SIZE = 1000;
 
     private String name;
     private OpenSearchDatabase database;
@@ -221,30 +229,70 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	String index = IndexData.detectIndex(this);
 
-	Query searchQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
+	if (!index.equals(DataFolderMapping.get().getIndex())) {
 
-	return wrapper.searchField(//
-		index, //
-		searchQuery, //
-		IndexData.ENTRY_NAME).//
-		toArray(new String[] {});
+	    Query searchQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
+
+	    return wrapper.searchField(//
+		    index, //
+		    searchQuery, //
+		    IndexData.ENTRY_NAME).//
+		    toArray(new String[] {});
+
+	}
+
+	return listIdentifiers(IdentifierType.PRIVATE).toArray(new String[] {});
     }
 
-    /**
-     * @return
-     * @throws Exception
-     */
-    public List<String> listIds() throws Exception {
+    @Override
+    public List<String> listIdentifiers(IdentifierType identifierType) throws Exception {
+
+	String field = null;
+
+	switch (identifierType) {
+	case OAI_HEADER:
+	    field = DataFolderMapping.toKeywordField(ResourceProperty.OAI_PMH_HEADER_ID.getName());
+	    break;
+	case ORIGINAL:
+	    field = DataFolderMapping.toKeywordField(ResourceProperty.ORIGINAL_ID.getName());
+	    break;
+	case PRIVATE:
+	    field = DataFolderMapping.toKeywordField(ResourceProperty.PRIVATE_ID.getName());
+	    break;
+	case PUBLIC:
+	    field = DataFolderMapping.toKeywordField(MetadataElement.IDENTIFIER.getName());
+	    break;
+	}
+
+	ArrayList<String> out = Lists.newArrayList();
+
+	Query searchQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
+
+	Optional<SearchAfter> searchAfter = Optional.empty();
 
 	String index = IndexData.detectIndex(this);
 
-	Query searchQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
+	do {
 
-	return wrapper.searchField(//
-		index, //
-		searchQuery, //
-		IndexData.ENTRY_ID);//
+	    SearchResponse<Object> response = wrapper.search(//
+		    index, // index
+		    searchQuery, // search query
+		    Arrays.asList(field), // fields
+		    0, //
+		    MAX_PAGE_SIZE, //
+		    Optional.of(ResourceProperty.RESOURCE_TIME_STAMP), //
+		    Optional.of(SortOrder.ASCENDING), //
+		    searchAfter, //
+		    false, // request cache
+		    true);// binaries excluded
 
+	    List<String> fieldsList = OpenSearchUtils.toFieldsList(response, field);
+
+	    out.addAll(fieldsList);
+
+	} while (searchAfter.isPresent());
+
+	return out;
     }
 
     @Override
