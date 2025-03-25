@@ -289,6 +289,8 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    List<String> fieldsList = OpenSearchUtils.toFieldsList(response, field);
 
 	    out.addAll(fieldsList);
+	    
+	    searchAfter = OpenSearchUtils.getSearchAfter(response);
 
 	} while (searchAfter.isPresent());
 
