@@ -34,7 +34,6 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
