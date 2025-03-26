@@ -1,5 +1,8 @@
 package eu.essi_lab.model.resource;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -25,8 +28,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.JAXBException;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
+import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
 
 /**
@@ -56,14 +63,57 @@ public class GSResourceComparator {
 	    IndexesMetadata im1 = res1.getIndexesMetadata();
 	    IndexesMetadata im2 = res2.getIndexesMetadata();
 
-	    List<String> prop1 = im1.read(target.getName()).stream().sorted().collect(Collectors.toList());
-	    List<String> prop2 = im2.read(target.getName()).stream().sorted().collect(Collectors.toList());
+	    if (target.getName().equals(MetadataElement.BOUNDING_BOX.getName())) {
 
-	    if (!prop1.equals(prop2)) {
+		Optional<BoundingBox> optBbox1 = im1.readBoundingBox();
+		Optional<BoundingBox> optBbox2 = im2.readBoundingBox();
 
-		ComparisonValues comparisonValues = new ComparisonValues(target.getContentType(), prop1, prop2);
+		ComparisonValues values = null;
 
-		response.addComparisonValues(target, comparisonValues);
+		if (optBbox1.isPresent() && optBbox2.isEmpty()) {
+
+		    values = new ComparisonValues(ContentType.SPATIAL, optBbox1.get());
+
+		} else if (optBbox1.isEmpty() && optBbox2.isPresent()) {
+
+		    values = new ComparisonValues(ContentType.SPATIAL, optBbox2.get());
+
+		} else {
+
+		    BoundingBox bbox1 = optBbox1.get();
+		    BoundingBox bbox2 = optBbox2.get();
+
+		    if (!bbox1.getCardinalValues().equals(bbox2.getCardinalValues())) {
+
+			values = new ComparisonValues(ContentType.SPATIAL, bbox1, bbox2);
+		    }
+		}
+
+		if (values != null) {
+
+		    response.addComparisonValues(target, values);
+		}
+
+	    } else {
+
+		List<String> prop1 = im1.read(target.getName()).stream().sorted().collect(Collectors.toList());
+		List<String> prop2 = im2.read(target.getName()).stream().sorted().collect(Collectors.toList());
+
+		if (!prop1.equals(prop2)) {
+
+		    ComparisonValues values = new ComparisonValues(target.getContentType(), prop1, prop2);
+
+		    if (prop1.isEmpty()) {
+
+			values = new ComparisonValues(target.getContentType(), prop2);
+
+		    } else if (prop2.isEmpty()) {
+
+			values = new ComparisonValues(target.getContentType(), prop1);
+		    }
+
+		    response.addComparisonValues(target, values);
+		}
 	    }
 	});
 
@@ -126,6 +176,15 @@ public class GSResourceComparator {
 	/**
 	 * @param contentType
 	 * @param values1
+	 */
+	public ComparisonValues(ContentType contentType, List<String> values1) {
+
+	    this(contentType, values1, new ArrayList<String>());
+	}
+
+	/**
+	 * @param contentType
+	 * @param values1
 	 * @param values2
 	 */
 	public ComparisonValues(ContentType contentType, List<String> values1, List<String> values2) {
@@ -135,7 +194,43 @@ public class GSResourceComparator {
 	}
 
 	/**
-	 * @return the value1
+	 * @param contentType
+	 * @param bbox1
+	 */
+	public ComparisonValues(ContentType contentType, BoundingBox bbox1) {
+
+	    this(contentType, bbox1, null);
+	}
+
+	/**
+	 * @param contentType
+	 * @param bbox1
+	 * @param bbox2
+	 */
+	public ComparisonValues(ContentType contentType, BoundingBox bbox1, BoundingBox bbox2) {
+
+	    this.contentType = contentType;
+
+	    try {
+		this.values1 = Arrays.asList(bbox1.asString(true));
+
+		if (bbox2 != null) {
+
+		    this.values2 = Arrays.asList(bbox2.asString(true));
+
+		} else {
+
+		    this.values2 = new ArrayList<String>();
+		}
+
+	    } catch (UnsupportedEncodingException | JAXBException e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
+	}
+
+	/**
+	 * @return
 	 */
 	public List<String> getValues1() {
 
@@ -143,7 +238,7 @@ public class GSResourceComparator {
 	}
 
 	/**
-	 * @return the value2
+	 * @return
 	 */
 	public List<String> getValues2() {
 
@@ -151,7 +246,7 @@ public class GSResourceComparator {
 	}
 
 	/**
-	 * @return the contentType
+	 * @return
 	 */
 	protected ContentType getContentType() {
 

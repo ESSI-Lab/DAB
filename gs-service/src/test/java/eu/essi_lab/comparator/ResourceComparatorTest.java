@@ -3,12 +3,15 @@
  */
 package eu.essi_lab.comparator;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.collections.ArrayStack;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,6 +41,97 @@ public class ResourceComparatorTest {
 	ComparisonResponse response = GSResourceComparator.compare(listValues, res1, res2);
 
 	Assert.assertTrue(response.getProperties().isEmpty());
+    }
+
+    @Test
+    public void bboxTest1() throws JAXBException {
+
+	GSResource res1 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+	GSResource res2 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+
+	res1.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().clearGeographicBoundingBoxes();
+	res1.getHarmonizedMetadata().getCoreMetadata().addBoundingBox(//
+		new BigDecimal(0), //
+		new BigDecimal(0), //
+		new BigDecimal(0), //
+		new BigDecimal(0));
+
+	IndexedElementsWriter.write(res1);
+
+	List<Queryable> listValues = new ArrayList<Queryable>(ResourceProperty.listQueryables());
+	listValues.addAll(MetadataElement.listQueryables());
+
+	ComparisonResponse response = GSResourceComparator.compare(listValues, res1, res2);
+
+	List<Queryable> properties = response.getProperties();
+
+	Assert.assertEquals(3, properties.size());
+
+	Assert.assertEquals(MetadataElement.ANY_TEXT, properties.get(0));
+	Assert.assertEquals(MetadataElement.BOUNDING_BOX, properties.get(1));
+	Assert.assertEquals(ResourceProperty.RESOURCE_TIME_STAMP, properties.get(2));
+
+	Optional<ComparisonValues> values = response.getComparisonValues(MetadataElement.BOUNDING_BOX);
+	Assert.assertFalse(values.get().getValues1().isEmpty());
+	Assert.assertFalse(values.get().getValues2().isEmpty());
+    }
+
+    @Test
+    public void bboxTest2() throws JAXBException {
+
+	GSResource res1 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+	GSResource res2 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+
+	res1.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().clearGeographicBoundingBoxes();
+	res1.getIndexesMetadata().remove(MetadataElement.BOUNDING_BOX.getName());
+
+	IndexedElementsWriter.write(res1);
+
+	List<Queryable> listValues = new ArrayList<Queryable>(ResourceProperty.listQueryables());
+	listValues.addAll(MetadataElement.listQueryables());
+
+	ComparisonResponse response = GSResourceComparator.compare(listValues, res1, res2);
+
+	List<Queryable> properties = response.getProperties();
+
+	Assert.assertEquals(3, properties.size());
+
+	Assert.assertEquals(MetadataElement.ANY_TEXT, properties.get(0));
+	Assert.assertEquals(MetadataElement.BOUNDING_BOX, properties.get(1));
+	Assert.assertEquals(ResourceProperty.RESOURCE_TIME_STAMP, properties.get(2));
+
+	Optional<ComparisonValues> values = response.getComparisonValues(MetadataElement.BOUNDING_BOX);
+	Assert.assertFalse(values.get().getValues1().isEmpty());
+	Assert.assertTrue(values.get().getValues2().isEmpty());
+    }
+
+    @Test
+    public void bboxTest3() throws JAXBException {
+
+	GSResource res1 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+	GSResource res2 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+
+	res2.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().clearGeographicBoundingBoxes();
+	res2.getIndexesMetadata().remove(MetadataElement.BOUNDING_BOX.getName());
+
+	IndexedElementsWriter.write(res2);
+
+	List<Queryable> listValues = new ArrayList<Queryable>(ResourceProperty.listQueryables());
+	listValues.addAll(MetadataElement.listQueryables());
+
+	ComparisonResponse response = GSResourceComparator.compare(listValues, res1, res2);
+
+	List<Queryable> properties = response.getProperties();
+
+	Assert.assertEquals(3, properties.size());
+
+	Assert.assertEquals(MetadataElement.ANY_TEXT, properties.get(0));
+	Assert.assertEquals(MetadataElement.BOUNDING_BOX, properties.get(1));
+	Assert.assertEquals(ResourceProperty.RESOURCE_TIME_STAMP, properties.get(2));
+
+	Optional<ComparisonValues> values = response.getComparisonValues(MetadataElement.BOUNDING_BOX);
+	Assert.assertFalse(values.get().getValues1().isEmpty());
+	Assert.assertTrue(values.get().getValues2().isEmpty());
     }
 
     @Test
@@ -76,7 +170,76 @@ public class ResourceComparatorTest {
 	Assert.assertEquals(1, values1.size());
 
 	Assert.assertEquals("Title", values1.get(0));
+    }
 
+    @Test
+    public void test2_1() throws JAXBException {
+
+	GSResource res1 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+	GSResource res2 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+
+	res1.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().clearKeywords();
+	res1.getIndexesMetadata().remove(MetadataElement.KEYWORD.getName());
+
+	IndexedElementsWriter.write(res1);
+
+	List<Queryable> listValues = Arrays.asList(MetadataElement.KEYWORD);
+
+	//
+	//
+	//
+
+	ComparisonResponse response = GSResourceComparator.compare(listValues, res1, res2);
+
+	List<Queryable> properties = response.getProperties();
+
+	Assert.assertEquals(1, properties.size());
+
+	Assert.assertEquals(MetadataElement.KEYWORD, properties.get(0));
+
+	//
+	//
+	//
+
+	ComparisonValues comparisonValues = response.getComparisonValues(MetadataElement.KEYWORD).get();
+	
+	Assert.assertFalse(comparisonValues.getValues1().isEmpty());
+	Assert.assertTrue(comparisonValues.getValues2().isEmpty());	
+    }
+    
+    @Test
+    public void test2_2() throws JAXBException {
+
+	GSResource res1 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+	GSResource res2 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+
+	res2.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().clearKeywords();
+	res2.getIndexesMetadata().remove(MetadataElement.KEYWORD.getName());
+
+	IndexedElementsWriter.write(res2);
+
+	List<Queryable> listValues = Arrays.asList(MetadataElement.KEYWORD);
+
+	//
+	//
+	//
+
+	ComparisonResponse response = GSResourceComparator.compare(listValues, res1, res2);
+
+	List<Queryable> properties = response.getProperties();
+
+	Assert.assertEquals(1, properties.size());
+
+	Assert.assertEquals(MetadataElement.KEYWORD, properties.get(0));
+
+	//
+	//
+	//
+
+	ComparisonValues comparisonValues = response.getComparisonValues(MetadataElement.KEYWORD).get();
+	
+	Assert.assertFalse(comparisonValues.getValues1().isEmpty());
+	Assert.assertTrue(comparisonValues.getValues2().isEmpty());	
     }
 
     @Test
