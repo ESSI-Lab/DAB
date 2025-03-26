@@ -320,6 +320,77 @@ public class SourceStorageWorker {
 
     /**
      * @return
+     * @throws Exception
+     */
+    public boolean isData1WritingFolder() throws Exception {
+
+	if (existsData1Folder()) {
+
+	    return getData1Folder().exists(WRITING_FOLDER_TAG);
+	}
+
+	return false;
+    }
+
+    /**
+     * @return
+     * @throws Exception
+     */
+    public boolean isData2WritingFolder() throws Exception {
+
+	if (existsData2Folder()) {
+
+	    return getData2Folder().exists(WRITING_FOLDER_TAG);
+	}
+
+	return false;
+    }
+
+    /**
+     * If there is only a data folder (for example in case of a first harvesting or in case
+     * of selective harvesting), or smart storage is disabled for this source, this method returns
+     * {@link Optional#empty()}.<br>
+     * In all the other cases,
+     * this method returns <code>true</code> if the size of the writing folder is less than the treshold
+     * defined as the smart storage treshold or as the {@link ListRecordsRequest#getExpectedRecords()}, if present
+     */
+    public Optional<Boolean> consolidatedFolderSurvives() throws Exception {
+
+	Boolean smartStorageDisabled = storage.getSetting().isSmartStorageDisabledSet(this.sourceId);
+
+	if (!smartStorageDisabled) {
+
+	    boolean writingData1 = isData1WritingFolder();
+
+	    DatabaseFolder writingFolder = writingData1 ? getData1Folder() : getData2Folder();
+
+	    int writingFolderSize = writingFolder.size() - 1;
+
+	    double treshold = -1;
+
+	    boolean dataYexists = writingData1 ? existsData2Folder() : existsData1Folder();
+
+	    if (dataYexists) {
+
+		if (request.isPresent() && request.get().getExpectedRecords().isPresent()) {
+
+		    treshold = request.get().getExpectedRecords().get();
+
+		} else {
+
+		    int consolidatedFolderSize = writingData1 ? getData2Folder().size() : getData1Folder().size();
+		    treshold = ((double) consolidatedFolderSize / 100) * DEFAULT_SMART_STORAGE_PERCENTAGE_TRESHOLD;
+		}
+
+		return Optional.of(writingFolderSize < treshold);
+	    }
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @return
      */
     public List<String> getStorageReport() {
 
