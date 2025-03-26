@@ -40,7 +40,6 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
-import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask.ExecutionStage;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.gssrv.conf.task.collection.ParameterCollectionCreator;
 import eu.essi_lab.gssrv.conf.task.collection.SourceCollectionCreator;
