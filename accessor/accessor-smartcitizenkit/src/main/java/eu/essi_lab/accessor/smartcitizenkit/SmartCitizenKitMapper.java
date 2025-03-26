@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.smartcitizenkit;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -558,13 +560,13 @@ public class SmartCitizenKitMapper extends OriginalIdentifierMapper {
 	}
 
 	// SmartCitizenKitVariable variable = SmartCitizenKitVariable.decode(key);
-	Double pointLon = null;
-	Double pointLat = null;
-	Double altitude = null;
+	BigDecimal pointLon = null;
+	BigDecimal pointLat = null;
+	BigDecimal altitude = null;
 	if (locationObj != null) {
-	    pointLon = locationObj.optDouble("longitude");
-	    pointLat = locationObj.optDouble("latitude");
-	    // altitude = locationObj.getDouble("altitude");
+	    pointLon = locationObj.optBigDecimal("longitude", null);
+	    pointLat = locationObj.optBigDecimal("latitude", null);
+	    // altitude = locationObj.optBigDecimal("altitude", null);
 	}
 
 	Resolution resolution = Resolution.HOURLY;
@@ -578,11 +580,22 @@ public class SmartCitizenKitMapper extends OriginalIdentifierMapper {
 	    extent.setBeginPosition(startDate);
 
 	    if (endDate != null && !endDate.isEmpty()) {
+		String now = ISO8601DateTimeUtils.getISO8601Date(new Date());
+		String[] splittedNow = now.split("T");
+		if (endDate.contains(splittedNow[0])) {
+		    logger.info("LAST_DAY_ONGOING!!: " + endDate);
+		    logger.info("DEVICE_ID: " + stationId + " DEVICE_NAME: " + stationName);
+		    extent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+		} else {
 
-		extent.setEndPosition(endDate);
-	    } else {
-		extent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+		    extent.setEndPosition(endDate);
+		}
 	    }
+	    // else {
+	    // System.out.println("NO END DATE!!");
+	    // System.out.println("IDENTIFIER: " + stationId + " NAME: " + stationName);
+	    // extent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+	    // }
 
 	    /**
 	     * CODE COMMENTED BELOW COULD BE USEFUL
@@ -675,8 +688,8 @@ public class SmartCitizenKitMapper extends OriginalIdentifierMapper {
 
 	if (altitude != null) {
 	    VerticalExtent verticalExtent = new VerticalExtent();
-	    verticalExtent.setMinimumValue(altitude);
-	    verticalExtent.setMaximumValue(altitude);
+	    verticalExtent.setMinimumValue(altitude.doubleValue());
+	    verticalExtent.setMaximumValue(altitude.doubleValue());
 	    coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(verticalExtent);
 	}
 
@@ -820,6 +833,14 @@ public class SmartCitizenKitMapper extends OriginalIdentifierMapper {
     }
 
     public static void main(String[] args) {
+
+	String now = ISO8601DateTimeUtils.getISO8601Date(new Date());
+	String date = "2025-03-26T10:12:13Z";
+	String[] splittedNow = now.split("T");
+	if (date.contains(splittedNow[0])) {
+	    System.out.println("true");
+	}
+
 	TemporalExtent extent = new TemporalExtent();
 	TimeIndeterminateValueType endTimeInderminate = TimeIndeterminateValueType.NOW;
 	extent.setIndeterminateEndPosition(endTimeInderminate);
