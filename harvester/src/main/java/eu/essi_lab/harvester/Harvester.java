@@ -144,6 +144,8 @@ public class Harvester {
 	// starts the harvesting procedure
 	//
 
+	ListRecordsRequest request = new ListRecordsRequest(status);
+
 	try {
 
 	    getSourceStorage().harvestingStarted(//
@@ -151,7 +153,8 @@ public class Harvester {
 		    strategy, //
 		    recovery, //
 		    resumed, //
-		    Optional.ofNullable(status));
+		    Optional.ofNullable(status), //
+		    Optional.of(request));
 
 	} catch (GSException ex) {
 
@@ -168,8 +171,6 @@ public class Harvester {
 	//
 	// executes the harvesting procedure
 	//
-
-	ListRecordsRequest request = new ListRecordsRequest(status);
 
 	boolean harvestingInterrupted = false;
 
@@ -219,10 +220,12 @@ public class Harvester {
 	    }
 
 	    ExecutionStage executionStage = null;
+
 	    if (customTask != null) {
+
 		executionStage = customTask.getExecutionStage();
 	    }
-	   
+
 	    if (executionStage != null && executionStage == ExecutionStage.BEFORE_HARVESTING_END) {
 
 		handleCustomTask(getAccessor().getSource(), context, status);
@@ -232,8 +235,7 @@ public class Harvester {
 		    getAccessor().getSource(), //
 		    Optional.of(properties), //
 		    strategy, //
-		    Optional.ofNullable(status), //
-		    Optional.of(request));
+		    Optional.ofNullable(status));
 
 	    if (executionStage != null && executionStage == ExecutionStage.AFTER_HARVESTING_END) {
 
