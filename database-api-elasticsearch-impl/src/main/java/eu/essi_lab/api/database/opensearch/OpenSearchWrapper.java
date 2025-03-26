@@ -455,7 +455,7 @@ public class OpenSearchWrapper {
      * <b>WARNING</b>: this method is actually called by
      * {@link OpenSearchReader#getResources(eu.essi_lab.api.database.Database.IdentifierType, String)}
      * and {@link OpenSearchReader#getResources(String, eu.essi_lab.model.GSSource, boolean)} methods where ALL
-     * resources should be searched and the limit of {@link #MAX_DEFAULT_HITS} is a problem
+     * resources should be searched and the limit of {@link #MAX_DEFAULT_HITS} could be a problem
      * 
      * @param index
      * @param searchQuery
