@@ -111,6 +111,9 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 	    //
 	}
 
+	List<String> modifiedRecords = Lists.newArrayList();
+	List<String> deletedRecords = Lists.newArrayList();
+
 	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
 	DatabaseFinder finder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
@@ -119,147 +122,154 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 
 	SourceStorageWorker worker = database.getWorker(gsSource.getUniqueIdentifier());
 
-	HarvestingStrategy strategy = worker.getStrategy();
+	Optional<Boolean> consFolderSurvives = worker.consolidatedFolderSurvives();
 
-	String startTimeStamp = worker.getStartTimeStamp();
+	if (consFolderSurvives.isEmpty() || (consFolderSurvives.isPresent() && consFolderSurvives.get() == false)) {
 
-	//
-	//
-	//
+	    HarvestingStrategy strategy = worker.getStrategy();
 
-	if (worker.existsData1Folder()) {
+	    String startTimeStamp = worker.getStartTimeStamp();
 
-	    data1Folder = worker.getData1Folder();
-	}
+	    //
+	    //
+	    //
 
-	if (worker.existsData2Folder()) {
+	    if (worker.existsData1Folder()) {
 
-	    data2Folder = worker.getData2Folder();
-	}
+		data1Folder = worker.getData1Folder();
+	    }
 
-	if (data1Folder == null && data2Folder == null) {
+	    if (worker.existsData2Folder()) {
 
-	    GSLoggerFactory.getLogger(getClass()).error("Both data folders missing, exit!");
-	    return;
-	}
+		data2Folder = worker.getData2Folder();
+	    }
 
-	List<String> modifiedRecords = Lists.newArrayList();
-	List<String> deletedRecords = Lists.newArrayList();
+	    if (data1Folder == null && data2Folder == null) {
 
-	switch (strategy) {
-	case FULL:
+		GSLoggerFactory.getLogger(getClass()).error("Both data folders missing, exit!");
+		log(status, "Both data folders missing, exit!");
 
-	    if (data1Folder != null && data2Folder == null) {
+		return;
+	    }
 
-		//
-		// first full/selective harvesting, only new records added in the data-1 folder
-		//
+	    switch (strategy) {
+	    case FULL:
 
-		data1Folder.listIdentifiers(IdentifierType.ORIGINAL).forEach(id -> newRecords.add(id));
+		if (data1Folder != null && data2Folder == null) {
 
-	    } else {
+		    //
+		    // first full/selective harvesting, only new records added in the data-1 folder
+		    //
 
-		//
-		// successive harvesting, comparing data-1 and data-2 folders
-		//
-
-		List<String> currIds = Lists.newArrayList();
-		List<String> prevIds = Lists.newArrayList();
-
-		if (worker.isData1WritingFolder()) {
-
-		    currIds.addAll(data1Folder.listIdentifiers(IdentifierType.ORIGINAL));
-		    prevIds.addAll(data2Folder.listIdentifiers(IdentifierType.ORIGINAL));
+		    data1Folder.listIdentifiers(IdentifierType.ORIGINAL).forEach(id -> newRecords.add(id));
 
 		} else {
 
-		    currIds.addAll(data2Folder.listIdentifiers(IdentifierType.ORIGINAL));
-		    prevIds.addAll(data1Folder.listIdentifiers(IdentifierType.ORIGINAL));
-		}
+		    //
+		    // successive harvesting, comparing data-1 and data-2 folders
+		    //
 
-		deletedRecords = prevIds.//
-			stream().//
-			filter(id -> !currIds.contains(id)).//
-			collect(Collectors.toList());
+		    List<String> currIds = Lists.newArrayList();
+		    List<String> prevIds = Lists.newArrayList();
 
-		newRecords = currIds.stream().//
-			filter(id -> !prevIds.contains(id)).//
-			collect(Collectors.toList());
+		    if (worker.isData1WritingFolder()) {
 
-		List<String> commonIds = currIds.stream().//
-			filter(id -> prevIds.contains(id)).//
-			collect(Collectors.toList());
+			currIds.addAll(data1Folder.listIdentifiers(IdentifierType.ORIGINAL));
+			prevIds.addAll(data2Folder.listIdentifiers(IdentifierType.ORIGINAL));
 
-		for (String id : commonIds) {
+		    } else {
 
-		    try {
+			currIds.addAll(data2Folder.listIdentifiers(IdentifierType.ORIGINAL));
+			prevIds.addAll(data1Folder.listIdentifiers(IdentifierType.ORIGINAL));
+		    }
 
-			Optional<GSResource> opt1 = data1Folder.get(IdentifierType.ORIGINAL, id);
-			Optional<GSResource> opt2 = data2Folder.get(IdentifierType.ORIGINAL, id);
+		    deletedRecords = prevIds.//
+			    stream().//
+			    filter(id -> !currIds.contains(id)).//
+			    collect(Collectors.toList());
 
-			if (opt1.isEmpty()) {
+		    newRecords = currIds.stream().//
+			    filter(id -> !prevIds.contains(id)).//
+			    collect(Collectors.toList());
 
-			    throw new Exception("Resource " + id + " not found in data-1 folder");
+		    List<String> commonIds = currIds.stream().//
+			    filter(id -> prevIds.contains(id)).//
+			    collect(Collectors.toList());
+
+		    for (String id : commonIds) {
+
+			try {
+
+			    Optional<GSResource> opt1 = data1Folder.get(IdentifierType.ORIGINAL, id);
+			    Optional<GSResource> opt2 = data2Folder.get(IdentifierType.ORIGINAL, id);
+
+			    if (opt1.isEmpty()) {
+
+				throw new Exception("Resource " + id + " not found in data-1 folder");
+			    }
+
+			    if (opt2.isEmpty()) {
+
+				throw new Exception("Resource " + id + " not found in data-2 folder");
+			    }
+
+			    ComparisonResponse response = GSResourceComparator.compare(COMPARISON_PROPERTIES, opt1.get(), opt2.get());
+
+			    if (!response.getProperties().isEmpty()) {
+
+				modifiedRecords.add(id);
+			    }
+
+			} catch (Exception ex) {
+
+			    GSLoggerFactory.getLogger(getClass()).error(ex);
+			    throw ex;
 			}
-
-			if (opt2.isEmpty()) {
-
-			    throw new Exception("Resource " + id + " not found in data-2 folder");
-			}
-
-			ComparisonResponse response = GSResourceComparator.compare(COMPARISON_PROPERTIES, opt1.get(), opt2.get());
-
-			if (!response.getProperties().isEmpty()) {
-
-			    modifiedRecords.add(id);
-			}
-
-		    } catch (Exception ex) {
-
-			GSLoggerFactory.getLogger(getClass()).error(ex);
-			throw ex;
 		    }
 		}
+
+		break;
+
+	    case SELECTIVE:
+
+		//
+		// successive selective harvesting, searching for new records
+		//
+
+		String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTime();
+
+		ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
+			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(startTimeStamp));
+
+		ResourcePropertyBond maxTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.LESS,
+			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(untilDateStamp));
+
+		ResourcePropertyBond sourceIdBond = BondFactory.createSourceIdentifierBond(gsSource.getUniqueIdentifier());
+
+		LogicalBond andBond = BondFactory.createAndBond(minTimeStampBond, maxTimeStampBond, sourceIdBond);
+
+		DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+		discoveryMessage.setExcludeResourceBinary(true);
+
+		ResourceSelector resourceSelector = new ResourceSelector();
+		resourceSelector.addIndex(ResourceProperty.ORIGINAL_ID);
+
+		discoveryMessage.setResourceSelector(resourceSelector);
+		discoveryMessage.setSources(Arrays.asList(gsSource));
+		discoveryMessage.setUserBond(andBond);
+		discoveryMessage.setNormalizedBond(andBond);
+		discoveryMessage.setPermittedBond(andBond);
+		discoveryMessage.setIncludeDeleted(false);
+		discoveryMessage.setPage(new Page(1, PAGE_SIZE));
+
+		ResultSet<GSResource> resultSet = finder.discover(discoveryMessage);
+		resultSet.//
+			getResultsList().//
+			forEach(res -> newRecords.add(res.getIndexesMetadata().read(ResourceProperty.ORIGINAL_ID.getName()).get(0)));
 	    }
+	} else {
 
-	    break;
-
-	case SELECTIVE:
-
-	    //
-	    // successive selective harvesting, searching for new records
-	    //
-
-	    String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTime();
-
-	    ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
-		    ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(startTimeStamp));
-
-	    ResourcePropertyBond maxTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.LESS,
-		    ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(untilDateStamp));
-
-	    ResourcePropertyBond sourceIdBond = BondFactory.createSourceIdentifierBond(gsSource.getUniqueIdentifier());
-
-	    LogicalBond andBond = BondFactory.createAndBond(minTimeStampBond, maxTimeStampBond, sourceIdBond);
-
-	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-	    discoveryMessage.setExcludeResourceBinary(true);
-
-	    ResourceSelector resourceSelector = new ResourceSelector();
-	    resourceSelector.addIndex(ResourceProperty.ORIGINAL_ID);
-
-	    discoveryMessage.setResourceSelector(resourceSelector);
-	    discoveryMessage.setSources(Arrays.asList(gsSource));
-	    discoveryMessage.setUserBond(andBond);
-	    discoveryMessage.setNormalizedBond(andBond);
-	    discoveryMessage.setPermittedBond(andBond);
-	    discoveryMessage.setIncludeDeleted(false);
-	    discoveryMessage.setPage(new Page(1, PAGE_SIZE));
-
-	    ResultSet<GSResource> resultSet = finder.discover(discoveryMessage);
-	    resultSet.//
-		    getResultsList().//
-		    forEach(res -> newRecords.add(res.getIndexesMetadata().read(ResourceProperty.ORIGINAL_ID.getName()).get(0)));
+	    log(status, "Consolidated folder survived, nothing is changed");
 	}
 
 	log(status, "New records: " + newRecords.size());
