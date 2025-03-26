@@ -11,12 +11,12 @@ import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 
-import org.apache.commons.collections.ArrayStack;
 import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.model.Queryable;
+import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.GSResourceComparator;
 import eu.essi_lab.model.resource.GSResourceComparator.ComparisonResponse;
@@ -74,6 +74,8 @@ public class ResourceComparatorTest {
 	Optional<ComparisonValues> values = response.getComparisonValues(MetadataElement.BOUNDING_BOX);
 	Assert.assertFalse(values.get().getValues1().isEmpty());
 	Assert.assertFalse(values.get().getValues2().isEmpty());
+
+	Assert.assertEquals(ContentType.SPATIAL, values.get().getContentType());
     }
 
     @Test
@@ -103,6 +105,8 @@ public class ResourceComparatorTest {
 	Optional<ComparisonValues> values = response.getComparisonValues(MetadataElement.BOUNDING_BOX);
 	Assert.assertFalse(values.get().getValues1().isEmpty());
 	Assert.assertTrue(values.get().getValues2().isEmpty());
+
+	Assert.assertEquals(ContentType.SPATIAL, values.get().getContentType());
     }
 
     @Test
@@ -132,6 +136,8 @@ public class ResourceComparatorTest {
 	Optional<ComparisonValues> values = response.getComparisonValues(MetadataElement.BOUNDING_BOX);
 	Assert.assertFalse(values.get().getValues1().isEmpty());
 	Assert.assertTrue(values.get().getValues2().isEmpty());
+
+	Assert.assertEquals(ContentType.SPATIAL, values.get().getContentType());
     }
 
     @Test
@@ -164,12 +170,26 @@ public class ResourceComparatorTest {
 	//
 	//
 
-	ComparisonValues comparisonValues = response.getComparisonValues(MetadataElement.TITLE).get();
+	{
+	    ComparisonValues comparisonValues = response.getComparisonValues(MetadataElement.TITLE).get();
 
-	List<String> values1 = comparisonValues.getValues1();
-	Assert.assertEquals(1, values1.size());
+	    List<String> values1 = comparisonValues.getValues1();
+	    Assert.assertEquals(1, values1.size());
 
-	Assert.assertEquals("Title", values1.get(0));
+	    Assert.assertEquals("Title", values1.get(0));
+
+	    Assert.assertEquals(ContentType.TEXTUAL, comparisonValues.getContentType());
+	}
+
+	//
+	//
+	//
+
+	{
+	    ComparisonValues comparisonValues = response.getComparisonValues(ResourceProperty.RESOURCE_TIME_STAMP).get();
+
+	    Assert.assertEquals(ContentType.ISO8601_DATE_TIME, comparisonValues.getContentType());
+	}
     }
 
     @Test
@@ -202,11 +222,11 @@ public class ResourceComparatorTest {
 	//
 
 	ComparisonValues comparisonValues = response.getComparisonValues(MetadataElement.KEYWORD).get();
-	
+
 	Assert.assertFalse(comparisonValues.getValues1().isEmpty());
-	Assert.assertTrue(comparisonValues.getValues2().isEmpty());	
+	Assert.assertTrue(comparisonValues.getValues2().isEmpty());
     }
-    
+
     @Test
     public void test2_2() throws JAXBException {
 
@@ -237,9 +257,9 @@ public class ResourceComparatorTest {
 	//
 
 	ComparisonValues comparisonValues = response.getComparisonValues(MetadataElement.KEYWORD).get();
-	
+
 	Assert.assertFalse(comparisonValues.getValues1().isEmpty());
-	Assert.assertTrue(comparisonValues.getValues2().isEmpty());	
+	Assert.assertTrue(comparisonValues.getValues2().isEmpty());
     }
 
     @Test
@@ -381,5 +401,75 @@ public class ResourceComparatorTest {
 	{
 	    Assert.assertTrue(response.getComparisonValues(ResourceProperty.RESOURCE_TIME_STAMP).isPresent());
 	}
+    }
+
+    @Test
+    public void test6() throws JAXBException {
+
+	GSResource res1 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+	GSResource res2 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+
+	res1.getPropertyHandler().setAccessQuality(1);
+	res2.getPropertyHandler().setAccessQuality(3);
+
+	IndexedElementsWriter.write(res1);
+	IndexedElementsWriter.write(res2);
+
+	List<Queryable> listValues = Arrays.asList(ResourceProperty.ACCESS_QUALITY);
+
+	//
+	//
+	//
+
+	ComparisonResponse response = GSResourceComparator.compare(listValues, res1, res2);
+
+	List<Queryable> properties = response.getProperties();
+
+	Assert.assertEquals(1, properties.size());
+
+	Assert.assertEquals(ResourceProperty.ACCESS_QUALITY, properties.get(0));
+
+	//
+	//
+	//
+
+	ComparisonValues comparisonValues = response.getComparisonValues(ResourceProperty.ACCESS_QUALITY).get();
+
+	Assert.assertEquals(ContentType.INTEGER, comparisonValues.getContentType());
+    }
+
+    @Test
+    public void test7() throws JAXBException {
+
+	GSResource res1 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+	GSResource res2 = GSResource.create(getClass().getClassLoader().getResourceAsStream("comparator/res.xml"));
+
+	res1.getPropertyHandler().setIsDeleted(true);
+	res2.getPropertyHandler().setIsDeleted(false);
+
+	IndexedElementsWriter.write(res1);
+	IndexedElementsWriter.write(res2);
+
+	List<Queryable> listValues = Arrays.asList(ResourceProperty.IS_DELETED);
+
+	//
+	//
+	//
+
+	ComparisonResponse response = GSResourceComparator.compare(listValues, res1, res2);
+
+	List<Queryable> properties = response.getProperties();
+
+	Assert.assertEquals(1, properties.size());
+
+	Assert.assertEquals(ResourceProperty.IS_DELETED, properties.get(0));
+
+	//
+	//
+	//
+
+	ComparisonValues comparisonValues = response.getComparisonValues(ResourceProperty.IS_DELETED).get();
+
+	Assert.assertEquals(ContentType.BOOLEAN, comparisonValues.getContentType());
     }
 }

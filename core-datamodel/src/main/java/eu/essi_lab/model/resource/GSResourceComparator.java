@@ -248,7 +248,7 @@ public class GSResourceComparator {
 	/**
 	 * @return
 	 */
-	protected ContentType getContentType() {
+	public ContentType getContentType() {
 
 	    return contentType;
 	}
