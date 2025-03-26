@@ -66,13 +66,14 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
 	    HarvestingStrategy strategy, //
 	    boolean recovery, //
 	    boolean resumed, //
-	    Optional<SchedulerJobStatus> status) throws GSException {
+	    Optional<SchedulerJobStatus> status, //
+	    Optional<ListRecordsRequest> request) throws GSException {
 
 	Database database = getDatabase();
 	try {
 
 	    SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
-	    worker.harvestingStarted(strategy, recovery, resumed, status);
+	    worker.harvestingStarted(strategy, this, recovery, resumed, status, request);
 
 	} catch (Exception e) {
 
@@ -104,7 +105,7 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
 	    boolean recovery, //
 	    boolean resume) throws GSException {
 
-	harvestingStarted(source, strategy, recovery, resume, Optional.empty());
+	harvestingStarted(source, strategy, recovery, resume, Optional.empty(), Optional.empty());
     }
 
     /**
@@ -121,14 +122,13 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
 	    GSSource source, //
 	    Optional<HarvestingProperties> properties, //
 	    HarvestingStrategy strategy, //
-	    Optional<SchedulerJobStatus> status, //
-	    Optional<ListRecordsRequest> request) throws GSException {
+	    Optional<SchedulerJobStatus> status) throws GSException {
 
 	Database database = getDatabase();
 	try {
 
 	    SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
-	    worker.harvestingEnded(this, properties, strategy, status, request);
+	    worker.harvestingEnded(properties, strategy, status);
 
 	} catch (Exception e) {
 
@@ -158,7 +158,7 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
 	    Optional<HarvestingProperties> properties, //
 	    HarvestingStrategy strategy) throws GSException {
 
-	harvestingEnded(source, properties, strategy, Optional.empty(), Optional.empty());
+	harvestingEnded(source, properties, strategy, Optional.empty());
     }
 
     /**
@@ -171,7 +171,7 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
      */
     public void harvestingEnded(GSSource source, HarvestingStrategy strategy) throws GSException {
 
-	harvestingEnded(source, Optional.empty(), strategy, Optional.empty(), Optional.empty());
+	harvestingEnded(source, Optional.empty(), strategy, Optional.empty());
     }
 
     /**
