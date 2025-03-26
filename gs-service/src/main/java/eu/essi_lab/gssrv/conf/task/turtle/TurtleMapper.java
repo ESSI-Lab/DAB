@@ -466,36 +466,8 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		String distributionId = myDataset.replace(">", "/distribution/" + i + ">");
 		ret += distributionId + " a dcat:Distribution ;\n";
 
-		String linkage = online.getLinkage();
-		String protocol = online.getProtocol();
-
-		FAIREaseMapping mapping = FAIREaseMapper.map(protocol, linkage, resource.getSource().getUniqueIdentifier());
-		protocol = mapping.getProtocol();
-		boolean inAccessService = mapping.isInAccessService();
-		String mediaType = mapping.getMediaType();
-		boolean download = false;
-
-		if (isURI(linkage)) {
-		    if (protocol != null && protocol.toLowerCase().contains("download")) {
-			ret += "dcat:downloadURL <" + encodeURL(linkage) + "> ;\n";
-			download = true;
-		    } else {
-			ret += "dcat:accessURL <" + encodeURL(linkage) + "> ;\n";
-		    }
-		}
-		if (protocol != null && !protocol.isEmpty()) {
-		    ret += "dcat:conformsTo <" + encodeURL(protocol) + "> ;\n";
-		}
-		String name = online.getName();
-		String description = online.getDescription();
-		if (name != null) {
-		    ret += "dct:title \"" + normalize(name) + "\"@en ;\n";
-		}
-
-		if (mediaType != null && mediaType.startsWith("http")) {
-		    ret += "dcat:mediaType <" + normalizeURI(mediaType) + "> ;\n";
-		}
-
+		
+		// LICENSE
 		Iterator<LegalConstraints> lci = info.getLegalConstraints();
 		if (lci != null) {
 		    while (lci.hasNext()) {
@@ -531,6 +503,37 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 			}
 		    }
 		}
+
+		String linkage = online.getLinkage();
+		String protocol = online.getProtocol();
+
+		FAIREaseMapping mapping = FAIREaseMapper.map(protocol, linkage, resource.getSource().getUniqueIdentifier());
+		protocol = mapping.getProtocol();
+		boolean inAccessService = mapping.isInAccessService();
+		String mediaType = mapping.getMediaType();
+		boolean download = false;
+
+		if (isURI(linkage)) {
+		    if (protocol != null && protocol.toLowerCase().contains("download")) {
+			ret += "dcat:downloadURL <" + encodeURL(linkage) + "> ;\n";
+			download = true;
+		    } else {
+			ret += "dcat:accessURL <" + encodeURL(linkage) + "> ;\n";
+		    }
+		}
+		if (protocol != null && !protocol.isEmpty()) {
+		    ret += "dcat:conformsTo <" + encodeURL(protocol) + "> ;\n";
+		}
+		String name = online.getName();
+		String description = online.getDescription();
+		if (name != null) {
+		    ret += "dct:title \"" + normalize(name) + "\"@en ;\n";
+		}
+
+		if (mediaType != null && mediaType.startsWith("http")) {
+		    ret += "dcat:mediaType <" + normalizeURI(mediaType) + "> ;\n";
+		}
+
 		//
 		// dcat:byteSize "5120"^^xsd:nonNegativeInteger .
 		if (!download && linkage != null) {
