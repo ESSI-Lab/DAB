@@ -247,6 +247,15 @@ public class OpenSearchFolder implements DatabaseFolder {
     @Override
     public List<String> listIdentifiers(IdentifierType identifierType) throws Exception {
 
+	String index = IndexData.detectIndex(this);
+
+	ArrayList<String> out = Lists.newArrayList();
+
+	if (!index.equals(DataFolderMapping.get().getIndex())) {
+
+	    return out;
+	}
+
 	String field = null;
 
 	switch (identifierType) {
@@ -264,13 +273,9 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    break;
 	}
 
-	ArrayList<String> out = Lists.newArrayList();
-
 	Query searchQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
 
 	Optional<SearchAfter> searchAfter = Optional.empty();
-
-	String index = IndexData.detectIndex(this);
 
 	do {
 

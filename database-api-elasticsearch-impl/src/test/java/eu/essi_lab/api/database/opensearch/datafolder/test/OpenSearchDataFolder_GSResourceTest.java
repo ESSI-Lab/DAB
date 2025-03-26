@@ -114,6 +114,16 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	test(folder1, folder1Entries);
 	test(folder2, folder2Entries);
 	test(folder3, folder3Entries);
+	
+	//
+	//
+	//
+	
+	folder1.clear();
+	Assert.assertEquals(0, folder1.listIdentifiers(IdentifierType.ORIGINAL).size());
+	Assert.assertEquals(0, folder1.listIdentifiers(IdentifierType.PRIVATE).size());
+	Assert.assertEquals(0, folder1.listIdentifiers(IdentifierType.PUBLIC).size());
+	Assert.assertEquals(0, folder1.listIdentifiers(IdentifierType.OAI_HEADER).size());
     }
 
     /**
