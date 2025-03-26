@@ -112,6 +112,8 @@ public class SourceStorageWorker {
     private DatabaseFinder finder;
     private List<String> report;
     private HarvestingStrategy strategy;
+    private Optional<ListRecordsRequest> request;
+    private SourceStorage storage;
 
     /**
      * @param sourceId
