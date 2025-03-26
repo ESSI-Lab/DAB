@@ -584,12 +584,10 @@ public class SmartCitizenKitMapper extends OriginalIdentifierMapper {
 		String[] splittedNow = now.split("T");
 		if (endDate.contains(splittedNow[0])) {
 		    logger.info("LAST_DAY_ONGOING!!: " + endDate);
-		    logger.info("DEVICE_ID: " + stationId + " DEVICE_NAME: " + stationName);
-		    extent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
-		} else {
-
-		    extent.setEndPosition(endDate);
+		    logger.info("DEVICE_ID: " + stationId + " DEVICE_NAME: " + stationName);    
 		}
+		extent.setEndPosition(endDate);
+		
 	    }
 	    // else {
 	    // System.out.println("NO END DATE!!");
