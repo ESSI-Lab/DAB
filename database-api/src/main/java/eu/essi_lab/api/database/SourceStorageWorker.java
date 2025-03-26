@@ -398,7 +398,7 @@ public class SourceStorageWorker {
     }
 
     /**
-     * @return 
+     * @return
      */
     public String getSourceId() {
 
@@ -430,11 +430,14 @@ public class SourceStorageWorker {
      */
     void harvestingStarted(//
 	    HarvestingStrategy strategy, //
-	    boolean recovery, //
+	    SourceStorage storage, boolean recovery, //
 	    boolean resumed, //
-	    Optional<SchedulerJobStatus> status) throws Exception {
+	    Optional<SchedulerJobStatus> status,//
+	    Optional<ListRecordsRequest> request) throws Exception {
 
 	this.strategy = strategy;
+	this.request = request;
+	this.storage = storage;
 
 	report = new LinkedList<String>();
 
@@ -670,11 +673,9 @@ public class SourceStorageWorker {
      * @throws Exception
      */
     void harvestingEnded(//
-	    SourceStorage storage, //
 	    Optional<HarvestingProperties> properties, //
 	    HarvestingStrategy strategy, //
-	    Optional<SchedulerJobStatus> status, //
-	    Optional<ListRecordsRequest> request) throws Exception {
+	    Optional<SchedulerJobStatus> status) throws Exception {
 
 	// -----------------------------------------------------
 	//
@@ -724,7 +725,7 @@ public class SourceStorageWorker {
 
 	    if (!smartStorageDisabled) {
 
-		writingFolder = smartStorageFinalization(isData1WritingFolder(), status, request);
+		writingFolder = smartStorageFinalization(status);
 
 	    } else {
 
@@ -980,10 +981,9 @@ public class SourceStorageWorker {
      * @return
      * @throws Exception
      */
-    private DatabaseFolder smartStorageFinalization(//
-	    boolean writingData1, //
-	    Optional<SchedulerJobStatus> status, //
-	    Optional<ListRecordsRequest> request) throws Exception {
+    private DatabaseFolder smartStorageFinalization(Optional<SchedulerJobStatus> status) throws Exception {
+
+	boolean writingData1 = isData1WritingFolder();
 
 	debug("Smart storage finalization STARTED", status);
 
@@ -1297,34 +1297,6 @@ public class SourceStorageWorker {
 
 	GSLoggerFactory.getLogger(getClass()).warn(message);
 	report.add(message);
-    }
-
-    /**
-     * @return
-     * @throws Exception
-     */
-    public boolean isData1WritingFolder() throws Exception {
-
-	if (existsData1Folder()) {
-
-	    return getData1Folder().exists(WRITING_FOLDER_TAG);
-	}
-
-	return false;
-    }
-
-    /**
-     * @return
-     * @throws Exception
-     */
-    public boolean isData2WritingFolder() throws Exception {
-
-	if (existsData2Folder()) {
-
-	    return getData2Folder().exists(WRITING_FOLDER_TAG);
-	}
-
-	return false;
     }
 
     /**
