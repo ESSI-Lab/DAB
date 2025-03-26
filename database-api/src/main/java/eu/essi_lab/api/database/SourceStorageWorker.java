@@ -217,7 +217,7 @@ public class SourceStorageWorker {
 
 	try {
 
-	    if (isWritingData1Folder()) {
+	    if (isData1WritingFolder()) {
 
 		return getData1Folder();
 	    }
@@ -651,13 +651,13 @@ public class SourceStorageWorker {
 
 	    if (!smartStorageDisabled) {
 
-		writingFolder = smartStorageFinalization(isWritingData1Folder(), status, request);
+		writingFolder = smartStorageFinalization(isData1WritingFolder(), status, request);
 
 	    } else {
 
 		debug("Classic storage finalization STARTED", status);
 
-		if (isWritingData1Folder()) {
+		if (isData1WritingFolder()) {
 
 		    writingFolder = getData1Folder();
 
@@ -667,7 +667,7 @@ public class SourceStorageWorker {
 			removeData2Folder();
 		    }
 
-		} else if (isWritingData2Folder()) {
+		} else if (isData2WritingFolder()) {
 
 		    writingFolder = getData2Folder();
 
@@ -1230,7 +1230,7 @@ public class SourceStorageWorker {
      * @return
      * @throws Exception
      */
-    private boolean isWritingData1Folder() throws Exception {
+    public boolean isData1WritingFolder() throws Exception {
 
 	if (existsData1Folder()) {
 
@@ -1244,7 +1244,7 @@ public class SourceStorageWorker {
      * @return
      * @throws Exception
      */
-    private boolean isWritingData2Folder() throws Exception {
+    public boolean isData2WritingFolder() throws Exception {
 
 	if (existsData2Folder()) {
 
@@ -1266,7 +1266,7 @@ public class SourceStorageWorker {
 	    DatabaseFolder newFolder = getWritingFolder(status);
 	    DatabaseFolder oldFolder = null;
 
-	    if (isWritingData1Folder()) {
+	    if (isData1WritingFolder()) {
 		oldFolder = getData2Folder();
 	    } else {
 		oldFolder = getData1Folder();
@@ -1320,9 +1320,9 @@ public class SourceStorageWorker {
 
 	DatabaseFolder oldFolder = null;
 
-	if (isWritingData1Folder() && existsData2Folder()) {
+	if (isData1WritingFolder() && existsData2Folder()) {
 	    oldFolder = getData2Folder();
-	} else if (isWritingData2Folder() && existsData1Folder()) {
+	} else if (isData2WritingFolder() && existsData1Folder()) {
 	    oldFolder = getData1Folder();
 	}
 
@@ -1390,7 +1390,7 @@ public class SourceStorageWorker {
 	    DatabaseFolder newFolder = getWritingFolder(status);
 	    DatabaseFolder oldFolder = null;
 
-	    if (isWritingData1Folder()) {
+	    if (isData1WritingFolder()) {
 		oldFolder = getData2Folder();
 	    } else {
 		oldFolder = getData1Folder();

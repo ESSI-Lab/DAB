@@ -75,4 +75,21 @@ public class CardinalValues {
     public void setNorth(String north) {
 	this.north = north;
     }
+
+    public boolean equals(Object o) {
+
+	if (o instanceof CardinalValues) {
+
+	    CardinalValues other = (CardinalValues) o;
+	    return ((this.east == null && other.east == null) || (this.east != null && other.east != null && this.east.equals(other.east)))
+		    && ((this.west == null && other.west == null)
+			    || (this.west != null && other.west != null && this.west.equals(other.west)))
+		    && ((this.south == null && other.south == null)
+			    || (this.south != null && other.south != null && this.south.equals(other.south)))
+		    && ((this.north == null && other.north == null)
+			    || (this.north != null && other.north != null && this.north.equals(other.north)));
+	}
+
+	return false;
+    }
 }
