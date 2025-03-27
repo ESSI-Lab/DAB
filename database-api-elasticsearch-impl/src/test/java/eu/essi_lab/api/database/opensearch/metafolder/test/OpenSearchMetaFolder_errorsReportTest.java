@@ -8,6 +8,7 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
@@ -131,5 +132,15 @@ public class OpenSearchMetaFolder_errorsReportTest extends OpenSearchTest {
 	//
 
 	Assert.assertNull(folder.get(key));
+	
+	//
+	//
+	//
+
+	Assert.assertEquals(0, folder.listIdentifiers(IdentifierType.ORIGINAL).size());
+	Assert.assertEquals(0, folder.listIdentifiers(IdentifierType.PRIVATE).size());
+	Assert.assertEquals(0, folder.listIdentifiers(IdentifierType.PUBLIC).size());
+	Assert.assertEquals(0, folder.listIdentifiers(IdentifierType.OAI_HEADER).size());
+
     }
 }

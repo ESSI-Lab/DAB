@@ -3,8 +3,8 @@
  */
 package eu.essi_lab.gssrv.conf.task;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /*-
  * #%L
@@ -28,10 +28,14 @@ import java.util.Arrays;
  */
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.quartz.JobExecutionContext;
 
+import com.beust.jcommander.internal.Lists;
+
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
@@ -44,7 +48,6 @@ import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResultSet;
@@ -54,7 +57,10 @@ import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.HarvestingStrategy;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.GSResourceComparator;
+import eu.essi_lab.model.resource.GSResourceComparator.ComparisonResponse;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 
@@ -69,6 +75,27 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
      * 
      */
     private static final int PAGE_SIZE = 1000;
+    private List<String> newRecords;
+    private DatabaseFolder data1Folder;
+    private DatabaseFolder data2Folder;
+
+    private static final List<Queryable> COMPARISON_PROPERTIES = Lists.newArrayList();
+    {
+	COMPARISON_PROPERTIES.add(MetadataElement.TITLE);
+	COMPARISON_PROPERTIES.add(MetadataElement.ABSTRACT);
+	COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_BEGIN);
+	COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_END);
+	COMPARISON_PROPERTIES.add(MetadataElement.BOUNDING_BOX);
+	COMPARISON_PROPERTIES.add(MetadataElement.KEYWORD);
+    }
+
+    /**
+     * 
+     */
+    public ResourcesComparatorTask() {
+
+	newRecords = Lists.newArrayList();
+    }
 
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
@@ -77,12 +104,15 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 
 	Optional<String> taskOptions = readTaskOptions(context);
 
-	if (!taskOptions.isPresent()) {
+	if (taskOptions.isPresent()) {
 
-	    log(status, "Custom task options missing, unable to perform task");
-
-	    return;
+	    //
+	    // reading target comparison properties to override default ones
+	    //
 	}
+
+	List<String> modifiedRecords = Lists.newArrayList();
+	List<String> deletedRecords = Lists.newArrayList();
 
 	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
@@ -92,81 +122,127 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 
 	SourceStorageWorker worker = database.getWorker(gsSource.getUniqueIdentifier());
 
-	HarvestingStrategy strategy = worker.getStrategy();
+	Optional<Boolean> consFolderSurvives = worker.consolidatedFolderSurvives();
 
-	String startTimeStamp = worker.getStartTimeStamp();
+	if (consFolderSurvives.isEmpty() || (consFolderSurvives.isPresent() && consFolderSurvives.get() == false)) {
 
-	//
-	//
-	//
+	    HarvestingStrategy strategy = worker.getStrategy();
 
-	DatabaseFolder data1Folder = null;
-	DatabaseFolder data2Folder = null;
+	    String startTimeStamp = worker.getStartTimeStamp();
 
-	if (worker.existsData1Folder()) {
+	    //
+	    //
+	    //
 
-	    data1Folder = worker.getData1Folder();
-	}
+	    if (worker.existsData1Folder()) {
 
-	if (worker.existsData2Folder()) {
-
-	    data2Folder = worker.getData2Folder();
-	}
-
-	if (data1Folder == null && data2Folder == null) {
-
-	    GSLoggerFactory.getLogger(getClass()).error("Both data folders missing, exit!");
-	    return;
-	}
-
-	ArrayList<String> newRecords = new ArrayList<>();
-	ArrayList<String> modifiedRecords = new ArrayList<>();
-	ArrayList<String> deletedRecords = new ArrayList<>();
-
-	HarvestingProperties properties = worker.getHarvestingProperties();
-
-	switch (strategy) {
-	case FULL:
-
-	    if (data1Folder != null && data2Folder == null) {
-
-		//
-		// first full harvesting, only new records added in the data-1 folder
-		//
-
-	    } else {
-
-		//
-		// successive harvesting, comparing data-1 and data-2 folders
-		//
-
+		data1Folder = worker.getData1Folder();
 	    }
 
-	case SELECTIVE:
+	    if (worker.existsData2Folder()) {
 
-	    if (data1Folder != null && data2Folder == null) {
+		data2Folder = worker.getData2Folder();
+	    }
 
-		//
-		// first selective harvesting, only new records added in the data-1 folder
-		//
-		
+	    if (data1Folder == null && data2Folder == null) {
 
-	    } else {
-		
+		GSLoggerFactory.getLogger(getClass()).error("Both data folders missing, exit!");
+		log(status, "Both data folders missing, exit!");
+
+		return;
+	    }
+
+	    switch (strategy) {
+	    case FULL:
+
+		if (data1Folder != null && data2Folder == null) {
+
+		    //
+		    // first full/selective harvesting, only new records added in the data-1 folder
+		    //
+
+		    data1Folder.listIdentifiers(IdentifierType.ORIGINAL).forEach(id -> newRecords.add(id));
+
+		} else {
+
+		    //
+		    // successive harvesting, comparing data-1 and data-2 folders
+		    //
+
+		    List<String> currIds = Lists.newArrayList();
+		    List<String> prevIds = Lists.newArrayList();
+
+		    if (worker.isData1WritingFolder()) {
+
+			currIds.addAll(data1Folder.listIdentifiers(IdentifierType.ORIGINAL));
+			prevIds.addAll(data2Folder.listIdentifiers(IdentifierType.ORIGINAL));
+
+		    } else {
+
+			currIds.addAll(data2Folder.listIdentifiers(IdentifierType.ORIGINAL));
+			prevIds.addAll(data1Folder.listIdentifiers(IdentifierType.ORIGINAL));
+		    }
+
+		    deletedRecords = prevIds.//
+			    stream().//
+			    filter(id -> !currIds.contains(id)).//
+			    collect(Collectors.toList());
+
+		    newRecords = currIds.stream().//
+			    filter(id -> !prevIds.contains(id)).//
+			    collect(Collectors.toList());
+
+		    List<String> commonIds = currIds.stream().//
+			    filter(id -> prevIds.contains(id)).//
+			    collect(Collectors.toList());
+
+		    for (String id : commonIds) {
+
+			try {
+
+			    Optional<GSResource> opt1 = data1Folder.get(IdentifierType.ORIGINAL, id);
+			    Optional<GSResource> opt2 = data2Folder.get(IdentifierType.ORIGINAL, id);
+
+			    if (opt1.isEmpty()) {
+
+				throw new Exception("Resource " + id + " not found in data-1 folder");
+			    }
+
+			    if (opt2.isEmpty()) {
+
+				throw new Exception("Resource " + id + " not found in data-2 folder");
+			    }
+
+			    ComparisonResponse response = GSResourceComparator.compare(COMPARISON_PROPERTIES, opt1.get(), opt2.get());
+
+			    if (!response.getProperties().isEmpty()) {
+
+				modifiedRecords.add(id);
+			    }
+
+			} catch (Exception ex) {
+
+			    GSLoggerFactory.getLogger(getClass()).error(ex);
+			    throw ex;
+			}
+		    }
+		}
+
+		break;
+
+	    case SELECTIVE:
+
 		//
 		// successive selective harvesting, searching for new records
 		//
 
 		String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTime();
 
-		long minTimeStamp = ISO8601DateTimeUtils.parseISO8601ToDate(startTimeStamp).get().getTime();
-		long maxTimeStamp = ISO8601DateTimeUtils.parseISO8601ToDate(untilDateStamp).get().getTime();
-
 		ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
-			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(minTimeStamp));
+			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(startTimeStamp));
 
-		ResourcePropertyBond maxTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
-			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(maxTimeStamp));
+		ResourcePropertyBond maxTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.LESS,
+			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(untilDateStamp));
 
 		ResourcePropertyBond sourceIdBond = BondFactory.createSourceIdentifierBond(gsSource.getUniqueIdentifier());
 
@@ -176,7 +252,7 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 		discoveryMessage.setExcludeResourceBinary(true);
 
 		ResourceSelector resourceSelector = new ResourceSelector();
-		resourceSelector.addIndex(MetadataElement.IDENTIFIER);
+		resourceSelector.addIndex(ResourceProperty.ORIGINAL_ID);
 
 		discoveryMessage.setResourceSelector(resourceSelector);
 		discoveryMessage.setSources(Arrays.asList(gsSource));
@@ -184,20 +260,21 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 		discoveryMessage.setNormalizedBond(andBond);
 		discoveryMessage.setPermittedBond(andBond);
 		discoveryMessage.setIncludeDeleted(false);
-		discoveryMessage.setPage(new Page(0, PAGE_SIZE));
+		discoveryMessage.setPage(new Page(1, PAGE_SIZE));
 
 		ResultSet<GSResource> resultSet = finder.discover(discoveryMessage);
-		resultSet.getResultsList().forEach(res -> newRecords.add(res.getIndexesMetadata().read(MetadataElement.IDENTIFIER).get(0)));
+		resultSet.//
+			getResultsList().//
+			forEach(res -> newRecords.add(res.getIndexesMetadata().read(ResourceProperty.ORIGINAL_ID.getName()).get(0)));
 	    }
+	} else {
+
+	    log(status, "Consolidated folder survived, nothing is changed");
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("New records: {}", newRecords.size());
-	GSLoggerFactory.getLogger(getClass()).info("Modified records: {}", modifiedRecords.size());
-	GSLoggerFactory.getLogger(getClass()).info("Deleted records: {}", deletedRecords.size());
-
 	log(status, "New records: " + newRecords.size());
-	log(status, "Modified records:" + modifiedRecords.size());
-	log(status, "Deleted records:" + deletedRecords.size());
+	log(status, "Modified records: " + modifiedRecords.size());
+	log(status, "Deleted records: " + deletedRecords.size());
 
 	log(status, "Resources comparator task ENDED");
     }

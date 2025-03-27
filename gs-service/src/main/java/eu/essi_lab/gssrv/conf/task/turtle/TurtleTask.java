@@ -36,12 +36,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.ValidationReport;
-import org.apache.jena.util.FileManager;
 import org.quartz.JobExecutionContext;
 
 import com.amazonaws.util.IOUtils;
@@ -52,7 +48,6 @@ import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
-import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.JobStatus.JobPhase;
@@ -68,7 +63,6 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
-import software.amazon.awssdk.utils.IoUtils;
 
 /**
  * @author boldrini

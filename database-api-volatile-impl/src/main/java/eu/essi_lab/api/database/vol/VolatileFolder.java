@@ -186,6 +186,12 @@ public class VolatileFolder implements DatabaseFolder {
     }
 
     @Override
+    public List<String> listIdentifiers(IdentifierType identifierType) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public int size() throws Exception {
 
 	return listKeys().length;

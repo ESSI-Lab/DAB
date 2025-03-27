@@ -1,9 +1,5 @@
 package eu.essi_lab.gssrv.conf.task.turtle;
 
-import java.io.InputStream;
-
-import com.amazonaws.util.IOUtils;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)

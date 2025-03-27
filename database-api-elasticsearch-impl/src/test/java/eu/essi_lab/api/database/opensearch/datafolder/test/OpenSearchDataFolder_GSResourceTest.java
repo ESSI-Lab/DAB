@@ -87,6 +87,69 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
     }
 
     @Test
+    public void listIdentifiersTest() throws Exception {
+
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+
+	OpenSearchFolder folder1 = createDataFolder(database, "sourceId_1");
+	OpenSearchFolder folder2 = createDataFolder(database, "sourceId_2");
+	OpenSearchFolder folder3 = createDataFolder(database, "sourceId_3");
+
+	//
+	//
+	//
+
+	int folder1Entries = 5;
+	int folder2Entries = 9;
+	int folder3Entries = 3;
+
+	storeDatasets(folder1, folder1Entries);
+	storeDatasets(folder2, folder2Entries);
+	storeDatasets(folder3, folder3Entries);
+
+	//
+	//
+	//
+
+	test(folder1, folder1Entries);
+	test(folder2, folder2Entries);
+	test(folder3, folder3Entries);
+	
+	//
+	//
+	//
+	
+	folder1.clear();
+	Assert.assertEquals(0, folder1.listIdentifiers(IdentifierType.ORIGINAL).size());
+	Assert.assertEquals(0, folder1.listIdentifiers(IdentifierType.PRIVATE).size());
+	Assert.assertEquals(0, folder1.listIdentifiers(IdentifierType.PUBLIC).size());
+	Assert.assertEquals(0, folder1.listIdentifiers(IdentifierType.OAI_HEADER).size());
+    }
+
+    /**
+     * @param folder
+     * @param entries
+     * @throws Exception
+     */
+    private void test(OpenSearchFolder folder, int entries) throws Exception {
+
+	List<String> privateIds = folder.listIdentifiers(IdentifierType.PRIVATE);
+	List<String> originalIds = folder.listIdentifiers(IdentifierType.ORIGINAL);
+	List<String> oaiIds = folder.listIdentifiers(IdentifierType.OAI_HEADER);
+	List<String> publicIds = folder.listIdentifiers(IdentifierType.PUBLIC);
+
+	Assert.assertEquals(entries, privateIds.size());
+	Assert.assertEquals(entries, originalIds.size());
+	Assert.assertEquals(entries, oaiIds.size());
+	Assert.assertEquals(entries, publicIds.size());
+
+	Assert.assertTrue(privateIds.stream().allMatch(id -> id.startsWith(folder.getName() + "_PRIVATE_ID_")));
+	Assert.assertTrue(originalIds.stream().allMatch(id -> id.startsWith(folder.getName() + "_ORIGINAL_ID_")));
+	Assert.assertTrue(oaiIds.stream().allMatch(id -> id.startsWith(folder.getName() + "_OAI_ID_")));
+	Assert.assertTrue(publicIds.stream().allMatch(id -> id.startsWith(folder.getName() + "_PUBLIC_ID_")));
+    }
+
+    @Test
     public void getByIdentifierTest() throws ParserConfigurationException, JAXBException, SAXException, IOException, Exception {
 
 	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();

@@ -112,6 +112,8 @@ public class SourceStorageWorker {
     private DatabaseFinder finder;
     private List<String> report;
     private HarvestingStrategy strategy;
+    private Optional<ListRecordsRequest> request;
+    private SourceStorage storage;
 
     /**
      * @param sourceId
@@ -217,7 +219,7 @@ public class SourceStorageWorker {
 
 	try {
 
-	    if (isWritingData1Folder()) {
+	    if (isData1WritingFolder()) {
 
 		return getData1Folder();
 	    }
@@ -318,6 +320,77 @@ public class SourceStorageWorker {
 
     /**
      * @return
+     * @throws Exception
+     */
+    public boolean isData1WritingFolder() throws Exception {
+
+	if (existsData1Folder()) {
+
+	    return getData1Folder().exists(WRITING_FOLDER_TAG);
+	}
+
+	return false;
+    }
+
+    /**
+     * @return
+     * @throws Exception
+     */
+    public boolean isData2WritingFolder() throws Exception {
+
+	if (existsData2Folder()) {
+
+	    return getData2Folder().exists(WRITING_FOLDER_TAG);
+	}
+
+	return false;
+    }
+
+    /**
+     * If there is only a data folder (for example in case of a first harvesting or in case
+     * of selective harvesting), or smart storage is disabled for this source, this method returns
+     * {@link Optional#empty()}.<br>
+     * In all the other cases,
+     * this method returns <code>true</code> if the size of the writing folder is less than the treshold
+     * defined as the smart storage treshold or as the {@link ListRecordsRequest#getExpectedRecords()}, if present
+     */
+    public Optional<Boolean> consolidatedFolderSurvives() throws Exception {
+
+	Boolean smartStorageDisabled = storage.getSetting().isSmartStorageDisabledSet(this.sourceId);
+
+	if (!smartStorageDisabled) {
+
+	    boolean writingData1 = isData1WritingFolder();
+
+	    DatabaseFolder writingFolder = writingData1 ? getData1Folder() : getData2Folder();
+
+	    int writingFolderSize = writingFolder.size() - 1;
+
+	    double treshold = -1;
+
+	    boolean dataYexists = writingData1 ? existsData2Folder() : existsData1Folder();
+
+	    if (dataYexists) {
+
+		if (request.isPresent() && request.get().getExpectedRecords().isPresent()) {
+
+		    treshold = request.get().getExpectedRecords().get();
+
+		} else {
+
+		    int consolidatedFolderSize = writingData1 ? getData2Folder().size() : getData1Folder().size();
+		    treshold = ((double) consolidatedFolderSize / 100) * DEFAULT_SMART_STORAGE_PERCENTAGE_TRESHOLD;
+		}
+
+		return Optional.of(writingFolderSize < treshold);
+	    }
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @return
      */
     public List<String> getStorageReport() {
 
@@ -325,7 +398,7 @@ public class SourceStorageWorker {
     }
 
     /**
-     * @return 
+     * @return
      */
     public String getSourceId() {
 
@@ -357,11 +430,14 @@ public class SourceStorageWorker {
      */
     void harvestingStarted(//
 	    HarvestingStrategy strategy, //
-	    boolean recovery, //
+	    SourceStorage storage, boolean recovery, //
 	    boolean resumed, //
-	    Optional<SchedulerJobStatus> status) throws Exception {
+	    Optional<SchedulerJobStatus> status,//
+	    Optional<ListRecordsRequest> request) throws Exception {
 
 	this.strategy = strategy;
+	this.request = request;
+	this.storage = storage;
 
 	report = new LinkedList<String>();
 
@@ -597,11 +673,9 @@ public class SourceStorageWorker {
      * @throws Exception
      */
     void harvestingEnded(//
-	    SourceStorage storage, //
 	    Optional<HarvestingProperties> properties, //
 	    HarvestingStrategy strategy, //
-	    Optional<SchedulerJobStatus> status, //
-	    Optional<ListRecordsRequest> request) throws Exception {
+	    Optional<SchedulerJobStatus> status) throws Exception {
 
 	// -----------------------------------------------------
 	//
@@ -651,13 +725,13 @@ public class SourceStorageWorker {
 
 	    if (!smartStorageDisabled) {
 
-		writingFolder = smartStorageFinalization(isWritingData1Folder(), status, request);
+		writingFolder = smartStorageFinalization(status);
 
 	    } else {
 
 		debug("Classic storage finalization STARTED", status);
 
-		if (isWritingData1Folder()) {
+		if (isData1WritingFolder()) {
 
 		    writingFolder = getData1Folder();
 
@@ -667,7 +741,7 @@ public class SourceStorageWorker {
 			removeData2Folder();
 		    }
 
-		} else if (isWritingData2Folder()) {
+		} else if (isData2WritingFolder()) {
 
 		    writingFolder = getData2Folder();
 
@@ -907,10 +981,9 @@ public class SourceStorageWorker {
      * @return
      * @throws Exception
      */
-    private DatabaseFolder smartStorageFinalization(//
-	    boolean writingData1, //
-	    Optional<SchedulerJobStatus> status, //
-	    Optional<ListRecordsRequest> request) throws Exception {
+    private DatabaseFolder smartStorageFinalization(Optional<SchedulerJobStatus> status) throws Exception {
+
+	boolean writingData1 = isData1WritingFolder();
 
 	debug("Smart storage finalization STARTED", status);
 
@@ -1227,34 +1300,6 @@ public class SourceStorageWorker {
     }
 
     /**
-     * @return
-     * @throws Exception
-     */
-    private boolean isWritingData1Folder() throws Exception {
-
-	if (existsData1Folder()) {
-
-	    return getData1Folder().exists(WRITING_FOLDER_TAG);
-	}
-
-	return false;
-    }
-
-    /**
-     * @return
-     * @throws Exception
-     */
-    private boolean isWritingData2Folder() throws Exception {
-
-	if (existsData2Folder()) {
-
-	    return getData2Folder().exists(WRITING_FOLDER_TAG);
-	}
-
-	return false;
-    }
-
-    /**
      * @param status
      * @throws RequestException
      * @throws Exception
@@ -1266,7 +1311,7 @@ public class SourceStorageWorker {
 	    DatabaseFolder newFolder = getWritingFolder(status);
 	    DatabaseFolder oldFolder = null;
 
-	    if (isWritingData1Folder()) {
+	    if (isData1WritingFolder()) {
 		oldFolder = getData2Folder();
 	    } else {
 		oldFolder = getData1Folder();
@@ -1320,9 +1365,9 @@ public class SourceStorageWorker {
 
 	DatabaseFolder oldFolder = null;
 
-	if (isWritingData1Folder() && existsData2Folder()) {
+	if (isData1WritingFolder() && existsData2Folder()) {
 	    oldFolder = getData2Folder();
-	} else if (isWritingData2Folder() && existsData1Folder()) {
+	} else if (isData2WritingFolder() && existsData1Folder()) {
 	    oldFolder = getData1Folder();
 	}
 
@@ -1390,7 +1435,7 @@ public class SourceStorageWorker {
 	    DatabaseFolder newFolder = getWritingFolder(status);
 	    DatabaseFolder oldFolder = null;
 
-	    if (isWritingData1Folder()) {
+	    if (isData1WritingFolder()) {
 		oldFolder = getData2Folder();
 	    } else {
 		oldFolder = getData1Folder();
