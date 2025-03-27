@@ -36,13 +36,13 @@ public class ISPRASourceFinder extends SourceFinder {
 		"SIR_BASILICATA"), //
 	EMILIA_ROMAGNA("Italy, Sistema Informativo Regionale Emilia-Romagna", "ita-sir-emilia-romagna",
 		"https://dati-simc.arpae.it/opendata/osservati/meteo/realtime/realtime.jsonl", "SIR_EMILIA"), //
-	FRIULI_VENEZIA_GIULIA("Italy, Sistema Informativo Regionale Friuli Venezia Giulia", "hisCentralItaFriuli",
+	FRIULI_VENEZIA_GIULIA("Italy, Sistema Informativo Regionale Friuli Venezia Giulia", "ita-sir-friuli-venezia-giulia",
 		"https://api.meteo.fvg.it/", "SIR_FRIULI"), //
-	LAZIO("Italy, Sistema Informativo Regionale Lazio", "hisCentralItaLazio", "http://rlazio.dynalias.org/datascape/v1/", "SIR_LAZIO"), //
-	LIGURIA("Italy, Sistema Informativo Regionale Liguria", "hisCentralItaLiguria", "https://aws.arpal.liguria.it/ords/ws/HIS_CENTRAL/",
+	LAZIO("Italy, Sistema Informativo Regionale Lazio", "ita-sir-lazio", "http://rlazio.dynalias.org/datascape/v1/", "SIR_LAZIO"), //
+	LIGURIA("Italy, Sistema Informativo Regionale Liguria", "ita-sir-liguria", "https://aws.arpal.liguria.it/ords/ws/HIS_CENTRAL/",
 		"SIR_LIGURIA"), //
-	MARCHE("Italy, Sistema Informativo Regionale Marche", "hisCentralItaMarche", "http://app.protezionecivile.marche.it", "SIR_MARCHE"), //
-	PIEMONTE("Italy, Sistema Informativo Regionale Piemonte", "hisCentralItaPiemonte", "https://utility.arpa.piemonte.it/meteoidro/",
+	MARCHE("Italy, Sistema Informativo Regionale Marche", "ita-sir-marche", "http://app.protezionecivile.marche.it", "SIR_MARCHE"), //
+	PIEMONTE("Italy, Sistema Informativo Regionale Piemonte", "ita-sir-piemonte", "https://utility.arpa.piemonte.it/meteoidro/",
 		"SIR_PIEMONTE"), //
 	PUGLIA("Italy, Sistema Informativo Regionale Puglia", "ita-sir-puglia", "http://93.57.89.5:9000/api/", "SIR_PUGLIA"), //
 	SARDEGNA("Italy, Sistema Informativo Regionale Sardegna", "ita-sir-sardegna",
@@ -51,12 +51,12 @@ public class ISPRASourceFinder extends SourceFinder {
 		"http://www.sir.toscana.it/archivio/dati.php?D=json_stations", "SIR_TOSCANA"), //
 	UMBRIA("Italy, Sistema Informativo Regionale Umbria", "ita-sir-umbria",
 		"https://dati.regione.umbria.it/api/3/action/datastore_search", "SIR_UMBRIA"), //
-	VAL_D_AOSTA("Italy, Sistema Informativo Regionale Valle d'Aosta", "hisCentralItaAosta", "https://cf-api.regione.vda.it/ws2",
+	VAL_D_AOSTA("Italy, Sistema Informativo Regionale Valle d'Aosta", "ita-sir-val-d-aosta", "https://cf-api.regione.vda.it/ws2",
 		"SIR_VALDAOSTA"), //
 	VENETO("Italy, Sistema Informativo Regionale Veneto", "ita-sir-veneto", "https://api.arpa.veneto.it/REST/v1/", "SIR_VENETO"), //
 	LOMBARDIA("Italy, Sistema Informativo Regionale, Lombardia", "ita-sir-lombardia", "https://remws.arpalombardia.it",
 		"SIR_LOMBARDIA"), //
-	BOLZANO("Italy, Sistema Informativo della Provincia Autonoma di Bolzano", "hisCentralItaBolzano",
+	BOLZANO("Italy, Sistema Informativo della Provincia Autonoma di Bolzano", "ita-sir-bolzano",
 		"http://daten.buergernetz.bz.it/services/meteo/v1/", "SIR_BOLZANO"), //
 	HIS_CENTRAL_SHAPE_FILES("HIS Central shape files", "his-central-shapes", "https://his-central.s3.amazonaws.com/polygons/",
 		"S3-SHAPEFILE");//
