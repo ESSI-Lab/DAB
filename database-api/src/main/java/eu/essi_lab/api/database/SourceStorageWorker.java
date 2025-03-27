@@ -430,7 +430,8 @@ public class SourceStorageWorker {
      */
     void harvestingStarted(//
 	    HarvestingStrategy strategy, //
-	    SourceStorage storage, boolean recovery, //
+	    SourceStorage storage,//
+	    boolean recovery, //
 	    boolean resumed, //
 	    Optional<SchedulerJobStatus> status,//
 	    Optional<ListRecordsRequest> request) throws Exception {
