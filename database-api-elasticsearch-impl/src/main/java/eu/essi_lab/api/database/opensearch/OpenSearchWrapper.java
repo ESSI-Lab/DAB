@@ -550,7 +550,7 @@ public class OpenSearchWrapper {
 	Map<String, Aggregation> map = new HashMap<>();
 
 	String aggName = "minMaxAgg";
-	
+
 	Aggregation agg = max ? new Aggregation.Builder().max(new MaxAggregation.Builder().field(field).build()).build()
 		: new Aggregation.Builder().min(new MinAggregation.Builder().field(field).build()).build();
 
@@ -746,6 +746,16 @@ public class OpenSearchWrapper {
 	    if (!fields.contains(ResourceProperty.TYPE.getName())) {
 
 		fields_.add(ResourceProperty.TYPE.getName());
+	    }
+
+	    if (!fields.contains(IndexData.BINARY_PROPERTY)) {
+
+		fields_.add(IndexData.BINARY_PROPERTY);
+	    }
+
+	    if (!fields.contains(DataFolderMapping.GS_RESOURCE) && !excludeResourceBinary) {
+
+		fields_.add(DataFolderMapping.GS_RESOURCE);
 	    }
 
 	    if (topHitsBuilder != null) {
