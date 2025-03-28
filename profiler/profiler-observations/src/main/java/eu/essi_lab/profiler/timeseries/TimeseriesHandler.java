@@ -331,7 +331,8 @@ public class TimeseriesHandler extends StreamingRequestHandler {
 				    accessMessage.setSources(discoveryMessage.getSources());
 				    accessMessage.setCurrentUser(discoveryMessage.getCurrentUser().orElse(null));
 				    accessMessage.setDataBaseURI(discoveryMessage.getDataBaseURI());
-
+				    accessMessage.setWebRequest(webRequest);
+				    
 				    DataDescriptor descriptor = new DataDescriptor();
 
 				    descriptor.setDataFormat(dataFormat);
