@@ -149,7 +149,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    MAP_UPDATER_TASK = new CachedMapUpdater();
 
 	    Timer timer = new Timer();
-	    timer.scheduleAtFixedRate(MAP_UPDATER_TASK, 0, MAP_UPDATE_PERIOD);
+	    timer.scheduleAtFixedRate(MAP_UPDATER_TASK, TimeUnit.MINUTES.toMillis(15), MAP_UPDATE_PERIOD);
 	}
 
 	MAP_UPDATER_TASK.setOpenSearchFinder(this);
