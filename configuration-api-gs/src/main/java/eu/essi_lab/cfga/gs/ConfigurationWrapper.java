@@ -93,6 +93,11 @@ public class ConfigurationWrapper {
     /**
      * 
      */
+    private static List<GSSource> allSourcesCache;
+
+    /**
+     * 
+     */
     private static Configuration configuration;
 
     private ConfigurationWrapper() {
@@ -122,7 +127,6 @@ public class ConfigurationWrapper {
 		    break;
 		}
 	    }
-
 	});
 
 	allSourcesCache = getSources(null, false);
@@ -445,8 +449,6 @@ public class ConfigurationWrapper {
 	return collect;
     }
 
-    private static List<GSSource> allSourcesCache = null;
-
     /**
      * Retrieves all the {@link GSSource}s defined by the current configuration: brokered, harvested, mixed
      *
@@ -454,8 +456,8 @@ public class ConfigurationWrapper {
      * @throws GSException
      */
     public static List<GSSource> getAllSources() {
-	return allSourcesCache;
 
+	return allSourcesCache;
     }
 
     /**
@@ -473,7 +475,7 @@ public class ConfigurationWrapper {
 
 	findSourceIdentifiers(bond, sourceIds, view.getSourceDeployment());
 
-	return getSources(null, false).//
+	return getAllSources().//
 		stream().//
 		filter(s -> sourceIds.isEmpty() || sourceIds.contains(s.getUniqueIdentifier())).//
 		collect(Collectors.toList());
@@ -498,7 +500,7 @@ public class ConfigurationWrapper {
 	} else if (bond instanceof ResourcePropertyBond) {
 
 	    ResourcePropertyBond resBond = (ResourcePropertyBond) bond;
-	    
+
 	    if (resBond.getProperty() == ResourceProperty.SOURCE_ID) {
 
 		BondOperator operator = resBond.getOperator();
@@ -543,7 +545,10 @@ public class ConfigurationWrapper {
      */
     public static List<GSSource> getHarvestedSources() {
 
-	return getSources(BrokeringStrategy.HARVESTED, false);
+	return getAllSources().//
+		stream().//
+		filter(s -> s.getBrokeringStrategy() == BrokeringStrategy.HARVESTED).//
+		collect(Collectors.toList());
     }
 
     /**
@@ -554,7 +559,10 @@ public class ConfigurationWrapper {
      */
     public static List<GSSource> getDistributedSources() {
 
-	return getSources(BrokeringStrategy.DISTRIBUTED, false);
+	return getAllSources().//
+		stream().//
+		filter(s -> s.getBrokeringStrategy() == BrokeringStrategy.DISTRIBUTED).//
+		collect(Collectors.toList());
     }
 
     /**
@@ -564,7 +572,10 @@ public class ConfigurationWrapper {
      */
     public static List<GSSource> getMixedSources() {
 
-	return getSources(BrokeringStrategy.MIXED, false);
+	return getAllSources().//
+		stream().//
+		filter(s -> s.getBrokeringStrategy() == BrokeringStrategy.MIXED).//
+		collect(Collectors.toList());
     }
 
     /**
@@ -575,8 +586,10 @@ public class ConfigurationWrapper {
      */
     public static List<GSSource> getHarvestedAndMixedSources() {
 
-	return getSources(null, true);
-
+	return getAllSources().//
+		stream().//
+		filter(s -> s.getBrokeringStrategy() == BrokeringStrategy.MIXED || s.getBrokeringStrategy() == BrokeringStrategy.HARVESTED).//
+		collect(Collectors.toList());
     }
 
     /**
