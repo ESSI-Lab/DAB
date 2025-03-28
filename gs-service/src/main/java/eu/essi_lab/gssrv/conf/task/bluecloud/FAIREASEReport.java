@@ -42,16 +42,21 @@ public class FAIREASEReport extends MetadataReport {
 	 EUROBIS("eurobis", "EurOBIS"), //
 	 // ECOTAXA("ecotaxa", "EcoTaxa"), //
 	 ELIXIR_ENA("elixir-ena", "ELIXIR-ENA"), //
-	 WEKEO("wekeo", "WEKEO"), //
+	
 	 // ICOS("icos-marine", "ICOS Marine"), //
 	 ICOS_SOCAT("icos-socat", "ICOS SOCAT"), //
 	 ICOS_DATA_PORTAL("icos-data-portal", "ICOS Data Portal"), //
+	 
+	 //FAIR EASE ONLY
+	 WEKEO("wekeo", "WEKEO"), //
 	 CMEMS("marineID", "Copernicus Marine Environment Monitoring Service (CMEMS)"), //
 	 VITO("FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--dad0859e-206c-480b-a080-d4eea70ee22d",
 	 "VITO/Copernicus Global Land Services"), //
 	 US_NODC("usnodcdbid", "US NODC Collections"), //
 	EEA("UUID-456602db-4275-4410-8b68-436fd23ace69", "European Environment Agency SDI Catalog"),
-	EMODNET("emodnet-network", "European Marine Observation and Data Network (EMODnet)")//;
+	EMODNET("emodnet-network", "European Marine Observation and Data Network (EMODnet)"),//;
+	EASYDATA("easydata", "EasyData"),//;
+	JRC("jrcdatacatalogdbid", "Joint Research Centre Data Catalog")//;
 	;
 
 	private String label;
@@ -94,7 +99,8 @@ public class FAIREASEReport extends MetadataReport {
 	S3TransferWrapper s3 = new S3TransferWrapper();
 	s3.setAccessKey(System.getProperty("accessKey"));
 	s3.setSecretKey(System.getProperty("secretKey"));
-	new FAIREASEReport(s3, true, null, new String[] { "UUID-456602db-4275-4410-8b68-436fd23ace69" });
+	new FAIREASEReport(s3, true, null, new String[] { "marineID" });
+	//new FAIREASEReport(s3, true, null, new String[] { "emodnet-network", "wekeo", "UUID-456602db-4275-4410-8b68-436fd23ace69","jrcdatacatalogdbid", "easydata", "FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--dad0859e-206c-480b-a080-d4eea70ee22d", "marineID" });
     }
 
     public List<ReportViews> getViews() {
