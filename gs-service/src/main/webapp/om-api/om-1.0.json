@@ -128,7 +128,7 @@
                         "content": {
                             "application/json": {
                                 "examples": {
-                                    "0": {"value": "{\n\"timeInterpolations\": [\n{\n\"observationCount\": 1960,\n\"value\": \"TOTAL\"\n},\n{\n\"observationCount\": 431,\n\"value\": \"MAX\"\n},\n{\n\"observationCount\": 431,\n\"value\": \"MIN\"\n},\n{\n\"observationCount\": 162,\n\"value\": \"AVERAGE\"\n}\n]\n}"}
+                                    "0": {"value": "{\n  \"countries\": [\n    {\n      \"observationCount\": 35012,\n      \"shortName\": \"Italy\",\n      \"officialName\": \"the Republic of Italy\",\n      \"value\": \"ITA\"\n    }\n  ]\n}"}
                                 }
                             }
                         }
