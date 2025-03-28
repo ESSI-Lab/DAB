@@ -37,6 +37,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -87,7 +89,6 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
     private List<URL> allFiles;
     private static final String BUCKET_NAME = "trigger-json-files";
 
-
     private Downloader downloader;
 
     public enum TRIGGER_INTERPOLATIONS {
@@ -122,6 +123,47 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
 	public static TRIGGER_INTERPOLATIONS decode(String parameterCode) {
 	    for (TRIGGER_INTERPOLATIONS var : values()) {
+		if (parameterCode.equals(var.name())) {
+		    return var;
+		}
+	    }
+	    return null;
+
+	}
+    }
+
+    public enum ADVANCED_TRIGGER_INTERPOLATIONS {
+
+	PERCENTILE_10("10", "10th Percentile", InterpolationType.STATISTICAL), PERCENTILE_25("25", "25th Percentile",
+		InterpolationType.STATISTICAL), PERCENTILE_50("50", "50th Percentile", InterpolationType.STATISTICAL), PERCENTILE_75("75",
+			"75th Percentile", InterpolationType.STATISTICAL), PERCENTILE_90("90", "90th Percentile",
+				InterpolationType.STATISTICAL), MIN("min", "Minimum", InterpolationType.MIN), MAX("max", "Maximum",
+					InterpolationType.MAX), STDEV("stdev", "Standard deviation", InterpolationType.STATISTICAL);
+
+	private String id;
+	private String label;
+	private InterpolationType type;
+
+	public String getLabel() {
+	    return label;
+	}
+
+	public String getId() {
+	    return id;
+	}
+
+	public InterpolationType getInterpolationType() {
+	    return type;
+	}
+
+	private ADVANCED_TRIGGER_INTERPOLATIONS(String id, String label, InterpolationType type) {
+	    this.id = id;
+	    this.label = label;
+	    this.type = type;
+	}
+
+	public static ADVANCED_TRIGGER_INTERPOLATIONS decode(String parameterCode) {
+	    for (ADVANCED_TRIGGER_INTERPOLATIONS var : values()) {
 		if (parameterCode.equals(var.name())) {
 		    return var;
 		}
@@ -214,37 +256,57 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 		if (splittedName.length == 3) {
 
 		    varId = splittedName[0];
-		    TRIGGERWAFVariable variable = TRIGGERWAFVariable.decode(varId);
-		    if (variable == null) {
+
+		} else {
+		    // other variables: e.g.cams_eu_ragweed_pollen_web
+		    if (!fileName.contains("extended_anomaly")) {
+			Pattern pattern = Pattern.compile("^(.*?)_(\\w+)_\\d+\\.json$");
+			Matcher matcher = pattern.matcher(fileName);
+			if (matcher.matches()) {
+			    String enumName = matcher.group(1); // Extract ENUM name
+			    String cityName = matcher.group(2); // Extract city name
+
+			}
+
+			// cams_eu_ragweed_pollen_web
+			// cams_eu_particulate_matter_2.5um_web
+			// cams_eu_particulate_matter_10um_web
+			// cams_eu_ozone_web
+			// cams_eu_nitrogen_dioxide_web
+			// cams_eu_mugwort_pollen_web
+			// cams_eu_grass_pollen_web
+			// cams_eu_birch_pollen_web
+		    } else {
 			continue;
 		    }
+		}
+		TRIGGERWAFVariable variable = TRIGGERWAFVariable.decode(varId);
+		if (variable == null) {
+		    continue;
+		}
 
-		    String json = getDownloader().downloadOptionalString(url.toExternalForm(), username, password).orElse(null);
-		    JSONObject jsonObject = new JSONObject(json);
-		    OriginalMetadata originalMetadata = null;
-		    TRIGGER_INTERPOLATIONS[] interpolations = TRIGGER_INTERPOLATIONS.values();
-		    for (TRIGGER_INTERPOLATIONS interpolation : interpolations) {
-			Dataset dataset = mapJSONToISO(jsonObject, interpolation, variable, url);
-			String str = dataset.asString(true);
-			originalMetadata = new OriginalMetadata();
-			originalMetadata.setMetadata(str);
-			originalMetadata.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
-			response.addRecord(originalMetadata);
-
-		    }
+		String json = getDownloader().downloadOptionalString(url.toExternalForm(), username, password).orElse(null);
+		JSONObject jsonObject = new JSONObject(json);
+		OriginalMetadata originalMetadata = null;
+		TRIGGER_INTERPOLATIONS[] interpolations = TRIGGER_INTERPOLATIONS.values();
+		for (TRIGGER_INTERPOLATIONS interpolation : interpolations) {
+		    Dataset dataset = mapJSONToISO(jsonObject, interpolation, variable, url);
+		    String str = dataset.asString(true);
+		    originalMetadata = new OriginalMetadata();
+		    originalMetadata.setMetadata(str);
+		    originalMetadata.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
+		    response.addRecord(originalMetadata);
 
 		}
 
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Downloading files [{}-{}/{}] ENDED", start, end, allFiles.size());
-	    
+
 	    if (response.getResumptionToken() == null) {
 		allFiles = null;
 		filteredURLs = null;
 	    }
-
-	    
 
 	} catch (Exception e) {
 
@@ -363,7 +425,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	String variableDescription = variable.getDescription();
 	String variableUnit = variable.getUnit();
 
-	coreMetadata.setTitle("Forecats of " + variableName + " ( "+ interpolation.getLabel() +") through the station at:" + title);
+	coreMetadata.setTitle("Forecats of " + variableName + " ( " + interpolation.getLabel() + ") through the station at:" + title);
 
 	coreMetadata.setAbstract("This dataset contains " + variableDescription + " timeseries from station: " + title);
 
