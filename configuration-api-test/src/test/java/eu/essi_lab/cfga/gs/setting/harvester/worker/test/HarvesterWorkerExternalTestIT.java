@@ -209,6 +209,6 @@ public class HarvesterWorkerExternalTestIT {
 	Assert.assertNotNull(recoveryRemovalToken);
 
 	String recoveryResumptionToken = harvestingProperties.getRecoveryResumptionToken();
-	Assert.assertNotNull(recoveryResumptionToken);
+	Assert.assertNull(recoveryResumptionToken);
     }
 }

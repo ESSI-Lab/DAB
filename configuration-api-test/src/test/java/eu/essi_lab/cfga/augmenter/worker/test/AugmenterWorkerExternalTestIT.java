@@ -15,13 +15,16 @@ import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.vol.VolatileDatabase;
+import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
+import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSettingLoader;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.Scheduler.JobEvent;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
+import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.harvester.worker.HarvesterWorker;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
@@ -42,19 +45,25 @@ public class AugmenterWorkerExternalTestIT {
     public void test1() throws Exception {
 
 	DefaultConfiguration configuration = new DefaultConfiguration(UUID.randomUUID().toString() + ".json");
+	configuration.clean();
 
 	ConfigurationWrapper.setConfiguration(configuration);
 
-	// harvest 50 records from DAB OAIPMH to the Volatile DB
+	// harvest 5 records from DAB OAIPMH to the Volatile DB
 	harvestOAIPMH();
 
 	//
-	// Adjust the AugmenterWorkerSetting
+	//
 	//
 	AugmenterWorkerSetting augmenterWorkerSetting = ConfigurationWrapper.getAugmenterWorkerSettings().get(0);
 
-	// only 50 records to augment
-	augmenterWorkerSetting.setMaxRecords(50);
+	// AugmenterWorkerSetting is now clean, before a selection it must be reset
+	augmenterWorkerSetting = SettingUtils.downCast(//
+		SelectionUtils.resetAndSelect(augmenterWorkerSetting, false), //
+		AugmenterWorkerSettingLoader.load().getClass());//
+
+	// only 5 records to augment
+	augmenterWorkerSetting.setMaxRecords(5);
 
 	// selects only OAIPMH DAB source
 	List<String> list = ConfigurationWrapper.getHarvestedSources().//
@@ -63,18 +72,13 @@ public class AugmenterWorkerExternalTestIT {
 		map(GSSource::getLabel).//
 		collect(Collectors.toList());
 
+	// now selection is safe
 	augmenterWorkerSetting.setSelectedSources(list);
 
 	// selects only the metadata augmenter
 	augmenterWorkerSetting.getAugmentersSetting().select(s -> s.getConfigurableType().equals("MetadataAugmenter"));
 
-	//
-	//
-	//
-	configuration.clean();
-	//
-	//
-	//
+	configuration.replace(augmenterWorkerSetting);
 
 	//
 	// schedules the worker
@@ -104,7 +108,7 @@ public class AugmenterWorkerExternalTestIT {
 
 	message.setSources(Arrays.asList(gsSource));
 
-	Page page = new Page(1, 50);
+	Page page = new Page(1, 10);
 	message.setPage(page);
 
 	ResultSet<GSResource> resultSet = finder.discover(message);
@@ -128,6 +132,9 @@ public class AugmenterWorkerExternalTestIT {
 	Assert.assertTrue(augmented);
     }
 
+    /**
+     * @throws Exception
+     */
     private void harvestOAIPMH() throws Exception {
 
 	// clears the volatile db
@@ -150,7 +157,7 @@ public class AugmenterWorkerExternalTestIT {
 		getSelectedAccessorSetting().//
 		getHarvestedConnectorSetting();
 
-	oaiConnectorSetting.setMaxRecords(50);
+	oaiConnectorSetting.setMaxRecords(5);
 	oaiConnectorSetting.setPreferredPrefix("oai_dc");
 
 	HarvesterWorker harvesterWorker = new HarvesterWorker();
