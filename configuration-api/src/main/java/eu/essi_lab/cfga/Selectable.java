@@ -26,6 +26,7 @@ package eu.essi_lab.cfga;
 
 import java.util.function.Predicate;
 
+import eu.essi_lab.cfga.option.UnsetSelectionModeException;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
@@ -89,11 +90,13 @@ public interface Selectable<T> {
 
     /**
      * Selects all the objects which satisfy the given <code>predicate</code> and
-     * <i>deselects</i> all the others
+     * <i>deselects</i> all the others.<br>
+     * If the {@link #getSelectionMode()} of this object is {@link SelectionMode#UNSET}, a
+     * {@link UnsetSelectionModeException} <i>could</i> be thrown
      * 
      * @param predicate
      */
-    public void select(Predicate<T> predicate);
+    public void select(Predicate<T> predicate) throws UnsetSelectionModeException;
 
     /**
      * Removes all the unselected objects and set the {@link #getSelectionMode()} to {@link SelectionMode#UNSET}.<br>

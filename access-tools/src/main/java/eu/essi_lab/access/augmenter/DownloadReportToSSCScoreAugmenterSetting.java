@@ -59,7 +59,6 @@ public class DownloadReportToSSCScoreAugmenterSetting extends AugmenterSetting {
 		withKey(DOWNLOAD_TIME_TRESHOLD_KEY).//
 		withLabel("Download time (seconds) sometimes/frequently unavailable treshold").//
 		withValue(DEFAULT_DOWNLOAD_TIME_TRESHOLD).//
-		withSelectedValue(DEFAULT_DOWNLOAD_TIME_TRESHOLD).//
 		cannotBeDisabled().//
 		build();
 
@@ -69,7 +68,6 @@ public class DownloadReportToSSCScoreAugmenterSetting extends AugmenterSetting {
 		withKey(EXECUTION_TIME_TRESHOLD_KEY).//
 		withLabel("Execution time (seconds) mostly/very reliable treshold").//
 		withValue(DEFAULT_EXECUTION_TIME_TRESHOLD).//
-		withSelectedValue(DEFAULT_EXECUTION_TIME_TRESHOLD).//
 		cannotBeDisabled().//
 		build();
 
@@ -81,7 +79,7 @@ public class DownloadReportToSSCScoreAugmenterSetting extends AugmenterSetting {
      */
     public int getDownloadTimeTreshold() {
 
-	return getOption(DOWNLOAD_TIME_TRESHOLD_KEY, Integer.class).get().getSelectedValue();
+	return getOption(DOWNLOAD_TIME_TRESHOLD_KEY, Integer.class).get().getValue();
     }
 
     /**
@@ -89,7 +87,7 @@ public class DownloadReportToSSCScoreAugmenterSetting extends AugmenterSetting {
      */
     public int getExecutionTimeTreshold() {
 
-	return getOption(EXECUTION_TIME_TRESHOLD_KEY, Integer.class).get().getSelectedValue();
+	return getOption(EXECUTION_TIME_TRESHOLD_KEY, Integer.class).get().getValue();
     }
 
     /**

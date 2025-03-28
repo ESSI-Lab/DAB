@@ -24,7 +24,6 @@ package eu.essi_lab.gssrv.conf.task.bluecloud;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 

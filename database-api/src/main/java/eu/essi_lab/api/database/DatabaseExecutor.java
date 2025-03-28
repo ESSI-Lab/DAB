@@ -33,7 +33,6 @@ import org.json.JSONObject;
 
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.stats.StatisticsMessage;

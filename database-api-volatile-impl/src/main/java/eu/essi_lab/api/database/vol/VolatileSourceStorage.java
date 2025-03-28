@@ -80,7 +80,8 @@ public class VolatileSourceStorage extends SourceStorage {
 	    HarvestingStrategy strategy, //
 	    boolean recovery, //
 	    boolean resume, //
-	    Optional<SchedulerJobStatus> status) throws GSException {
+	    Optional<SchedulerJobStatus> status,
+	    Optional<ListRecordsRequest> request) throws GSException {
 
 	startTimeStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
     }
@@ -90,8 +91,7 @@ public class VolatileSourceStorage extends SourceStorage {
 	    GSSource source, //
 	    Optional<HarvestingProperties> optProperties, //
 	    HarvestingStrategy strategy, //
-	    Optional<SchedulerJobStatus> status, //
-	    Optional<ListRecordsRequest> request) throws GSException {
+	    Optional<SchedulerJobStatus> status) throws GSException {
 
 	HarvestingProperties properties = optProperties.orElse(new HarvestingProperties());
 

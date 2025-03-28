@@ -37,10 +37,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.ValidationReport;
-import org.apache.jena.util.FileManager;
 import org.quartz.JobExecutionContext;
 
 import com.amazonaws.util.IOUtils;
@@ -58,11 +55,14 @@ import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import software.amazon.awssdk.utils.IoUtils;
+import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
 
 /**
  * @author boldrini
@@ -131,13 +131,6 @@ public class TurtleTask extends AbstractCustomTask {
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 	GSLoggerFactory.getLogger(getClass()).info("Turtle task STARTED");
 	log(status, "Turtle task STARTED");
-
-	InputStream modelStream = getClass().getClassLoader().getResourceAsStream("FE-DCAT-AP-SHACLshapes.ttl");
-	File tmpModelFile = File.createTempFile(getClass().getSimpleName(), "model.ttl");
-	FileOutputStream fosModel = new FileOutputStream(tmpModelFile);
-	IoUtils.copy(modelStream, fosModel);
-	modelStream.close();
-	Model schemaModel = FileManager.get().loadModel(tmpModelFile.getAbsolutePath());
 
 	// SETTINGS RETRIEVAL
 	CustomTaskSetting taskSettings = retrieveSetting(context);
@@ -245,7 +238,7 @@ public class TurtleTask extends AbstractCustomTask {
 
 	    for (String sourceId : sources) {
 
-		int pageSize = 10;
+		int pageSize = 250;
 
 		ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
 		IDiscoveryExecutor executor = loader.iterator().next();
@@ -254,7 +247,7 @@ public class TurtleTask extends AbstractCustomTask {
 		discoveryMessage.setRequestId("turtle-task-" + sourceId + "-" + UUID.randomUUID());
 		discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
 		discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
-
+		discoveryMessage.setExcludeResourceBinary(true);
 		discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
 		discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 		ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
@@ -271,7 +264,9 @@ public class TurtleTask extends AbstractCustomTask {
 		File sourceDir = new File(tmpSourcedir);
 
 		List<File> turtles = new ArrayList<>();
-
+		discoveryMessage.setSortOrder(SortOrder.ASCENDING);
+		discoveryMessage.setSortProperty(ResourceProperty.PUBLIC_ID);
+		SearchAfter searchAfter = null;
 		main: while (true) {
 
 		    // CHECKING CANCELED JOB
@@ -287,7 +282,13 @@ public class TurtleTask extends AbstractCustomTask {
 		    discoveryMessage.setPage(new Page(start, pageSize));
 		    start = start + pageSize;
 
+		    if (searchAfter != null) {
+			discoveryMessage.setSearchAfter(searchAfter);
+		    }
 		    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
+		    if (resultSet.getSearchAfter().isPresent()) {
+			searchAfter = resultSet.getSearchAfter().get();
+		    }
 		    List<GSResource> resources = resultSet.getResultsList();
 
 		    int i = 0;
@@ -332,14 +333,14 @@ public class TurtleTask extends AbstractCustomTask {
 			BufferedWriter reportWriter = new BufferedWriter(new FileWriter(reportSourceFile));) {
 		    long all = 0;
 		    long good = 0;
+		    List<File> toBeUploaded = new ArrayList<File>();
 		    for (File turtle : turtles) {
 			all++;
 			boolean valid = false;
 			String webTurtle = path + "/" + sourceId + "/" + turtle.getName();
 			// Perform SHACL validation
 			try {
-			    Model datasetModel = FileManager.get().loadModel(turtle.getAbsolutePath());
-			    ValidationReport report = ShaclValidator.get().validate(datasetModel.getGraph(), schemaModel.getGraph());
+			    ValidationReport report = TurtleValidator.validate(turtle);
 
 			    // Check if the data conforms to the SHACL shapes
 			    if (report.conforms()) {
@@ -394,14 +395,12 @@ public class TurtleTask extends AbstractCustomTask {
 			} catch (Exception e) {
 			    e.printStackTrace();
 			}
-
-			// upload turtle file
-			if (wrapper != null) {
-			    wrapper.uploadFile(turtle.getAbsolutePath(), hostname, webTurtle);
+			toBeUploaded.add(turtle);
+			if (toBeUploaded.size() == 100) {
+			    uploadFiles(wrapper, sourceId, toBeUploaded);
 			}
-
-			turtle.delete();
 		    }
+		    uploadFiles(wrapper, sourceId, toBeUploaded);
 
 		    reportWriter.newLine();
 		    reportWriter.write("Total files: " + all);
@@ -412,21 +411,40 @@ public class TurtleTask extends AbstractCustomTask {
 		GSLoggerFactory.getLogger(getClass()).info("Created turtle output {}", sourceFile.getAbsolutePath());
 		// upload outputFile
 		if (wrapper != null) {
+
 		    wrapper.uploadFile(sourceFile.getAbsolutePath(), hostname, path + "/" + sourceId + "/" + sourceId + ".ttl");
+
 		    wrapper.uploadFile(validSourceFile.getAbsolutePath(), hostname, path + "/" + sourceId + "/" + sourceId + "-valid.ttl");
+
 		    wrapper.uploadFile(reportSourceFile.getAbsolutePath(), hostname,
 			    path + "/" + sourceId + "/" + sourceId + "-report.txt");
 		}
 		sourceFile.delete();
 	    }
 
-	    tmpModelFile.delete();
-
 	    GSLoggerFactory.getLogger(getClass()).info("Number of sources: {}", sources.size());
 
 	}
 	GSLoggerFactory.getLogger(getClass()).info("Turtle task ENDED");
 	log(status, "Turtle task ENDED");
+    }
+
+    private void uploadFiles(S3TransferWrapper wrapper, String sourceId, List<File> toBeUploaded) {
+	if (wrapper != null) {
+	    List<UploadFileRequest> requests = new ArrayList<UploadFileRequest>();
+	    for (File file : toBeUploaded) {
+		String webTurtle = path + "/" + sourceId + "/" + file.getName();
+		UploadFileRequest uploadRequest = wrapper.getUploadRequest(file.getAbsolutePath(), hostname, webTurtle, "text/turtle");
+		requests.add(uploadRequest);
+	    }
+	    wrapper.uploadFiles(requests);
+	}
+	GSLoggerFactory.getLogger(getClass()).info("removing temporary files");
+	for (File file : toBeUploaded) {
+	    file.delete();
+	}
+	toBeUploaded.clear();
+
     }
 
     private File downloadFile(String url, String filename) throws Exception {

@@ -262,6 +262,12 @@ public class IndexesMetadata extends DOMSerializer {
      */
     public void remove(String elementName) {
 
+	if (elementName.equals(MetadataElement.BOUNDING_BOX.getName())) {
+
+	    this.bbox = null;
+	    return;
+	}
+
 	@SuppressWarnings("rawtypes")
 	Iterator iterator = properties.iterator();
 

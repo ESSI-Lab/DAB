@@ -112,7 +112,7 @@ public class DefaultConfigurationTest {
 	long count = StreamUtils.iteratorToStream(profilers.iterator())
 		.filter(p -> p.getSetting().getSettingClass().equals(ProfilerSetting.class)).count();
 
-	Assert.assertEquals(0, count);	
+	Assert.assertEquals(0, count);
 
 	//
 	//
@@ -170,7 +170,9 @@ public class DefaultConfigurationTest {
 	// Harvested AccessorSetting test
 	//
 
-	List<AccessorSetting> harvestedAccessorSettings = ConfigurationWrapper.getHarvestedAccessorSettings();
+	List<AccessorSetting> harvestedAccessorSettings = ConfigurationWrapper.getHarvestedAccessorSettings().stream().//
+		sorted((a1, a2) -> a1.getGSSourceSetting().getSourceLabel().compareTo(a2.getGSSourceSetting().getSourceLabel())).//
+		collect(Collectors.toList());
 
 	Assert.assertEquals(2, harvestedAccessorSettings.size());
 	Assert.assertEquals(BrokeringStrategy.HARVESTED, harvestedAccessorSettings.get(0).getBrokeringStrategy());
@@ -224,7 +226,10 @@ public class DefaultConfigurationTest {
 	//
 	// Harvested Sources test
 	//
-	List<GSSource> harvestedSources = ConfigurationWrapper.getHarvestedSources();
+	List<GSSource> harvestedSources = ConfigurationWrapper.getHarvestedSources().//
+		stream().//
+		sorted((a1, a2) -> a1.getLabel().compareTo(a2.getLabel())).//
+		collect(Collectors.toList());
 
 	Assert.assertEquals(2, harvestedSources.size());
 

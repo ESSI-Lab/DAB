@@ -22,6 +22,7 @@ package eu.essi_lab.api.database;
  */
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 
 import org.w3c.dom.Document;
@@ -216,11 +217,25 @@ public interface DatabaseFolder {
     boolean replace(String key, FolderEntry entry, EntryType type) throws Exception;
 
     /**
-     * @param type
+     * If this folder is a <i>data-folder</i>, get the {@link Optional} {@link GSResource} with the given
+     * <code>identifier</code> of type <code>identifierType</code>, or {@link Optional#empty()} if such resource do not
+     * exists.<br>
+     * 
+     * @param identifierType
      * @param identifier
      * @return
      */
-    Optional<GSResource> get(IdentifierType type, String identifier) throws Exception;
+    Optional<GSResource> get(IdentifierType identifierType, String identifier) throws Exception;
+
+    /**
+     * If this folder is a <i>data-folder</i>, retrieves the list of the {@link GSResource} identifiers of the given
+     * <code>identifierType</code>, otherwise returns an empty list
+     * 
+     * @param identifierType
+     * @return
+     * @throws Exception
+     */
+    List<String> listIdentifiers(IdentifierType identifierType) throws Exception;
 
     /**
      * Returns the DOM resource with the specified <code>key</code>.<br>

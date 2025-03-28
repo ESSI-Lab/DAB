@@ -1,9 +1,5 @@
 package eu.essi_lab.gssrv.conf.task.turtle;
 
-import java.io.InputStream;
-
-import com.amazonaws.util.IOUtils;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -363,6 +359,7 @@ public class FAIREaseMapper {
 	    return false;
 	}
 	FAIREaseProtocol fep = FAIREaseProtocol.decode(protocol);
+	if (fep!=null) {
 	switch (fep) {
 	case ARCGIS_REST:
 	case OGC_OPENSEARCH_GEO:
@@ -378,6 +375,9 @@ public class FAIREaseMapper {
 	case STAC:
 	    return true;
 	default:
+	    return false;
+	}
+	}else {
 	    return false;
 	}
 

@@ -18,11 +18,9 @@ import java.util.stream.Collectors;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
-import org.opensearch.client.opensearch.core.search.Hit;
 
 /*-
  * #%L
@@ -61,7 +59,6 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
@@ -152,7 +149,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    MAP_UPDATER_TASK = new CachedMapUpdater();
 
 	    Timer timer = new Timer();
-	    timer.scheduleAtFixedRate(MAP_UPDATER_TASK, 0, MAP_UPDATE_PERIOD);
+	    timer.scheduleAtFixedRate(MAP_UPDATER_TASK, TimeUnit.MINUTES.toMillis(15), MAP_UPDATE_PERIOD);
 	}
 
 	MAP_UPDATER_TASK.setOpenSearchFinder(this);
@@ -181,7 +178,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
 	try {
-//	    debugQueries = true;
+	    // debugQueries = true;
 
 	    SearchResponse<Object> searchResponse = search_(message, true);
 
@@ -213,7 +210,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    if (element.isEmpty()) {
 
-		TermFrequencyMapType mapType = ConversionUtils.fromAgg(aggregations);
+		TermFrequencyMapType mapType = OpenSearchUtils.fromAgg(aggregations);
 
 		TermFrequencyMap tfMap = new TermFrequencyMap(mapType);
 
@@ -233,7 +230,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     @Override
     public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
 
-//	debugQueries = true;
+	// debugQueries = true;
 
 	ResultSet<GSResource> resultSet = new ResultSet<>();
 	List<GSResource> resources = null;
@@ -254,7 +251,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			message.getPage().getSize()).//
 
 			stream().//
-			map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
+			map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
 			filter(Objects::nonNull).//
 			collect(Collectors.toList());
 
@@ -267,11 +264,12 @@ public class OpenSearchFinder implements DatabaseFinder {
 			message.getRequestId(), //
 			Optional.ofNullable(message.getWebRequest()));
 
-		resources = ConversionUtils.toGSResourcesList(response);
+		resources = OpenSearchUtils.toGSResourcesList(response);
 
 		pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
-		handleSearchAfter(response, resultSet);
+		// set the search after, if present
+		OpenSearchUtils.getSearchAfter(response).ifPresent(sa -> resultSet.setSearchAfter(sa));
 	    }
 
 	    //
@@ -350,7 +348,13 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    ResultSet<GSResource> response = discover(message);
 
 	    out.setCountResponse(response.getCountResponse());
-
+	    if (response.getProfilerName().isPresent()) {
+		out.setProfilerName(response.getProfilerName().get());
+	    }
+	    out.setPropertyHandler(response.getPropertyHandler());
+	    if (response.getSearchAfter().isPresent()) {
+		out.setSearchAfter(response.getSearchAfter().get());
+	    }
 	    List<String> strings = response.getResultsList().stream().map(res -> {
 
 		try {
@@ -456,7 +460,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    if (debugQueries) {
 
 		GSLoggerFactory.getLogger(getClass()).debug("--- GET SOURCES DATA MAP ---");
-		GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", ConversionUtils.toJSONObject(query).toString(3));
+		GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", OpenSearchUtils.toJSONObject(query).toString(3));
 	    }
 
 	    try {
@@ -477,7 +481,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			hits().//
 			hits().//
 			stream().//
-			map(hit -> ConversionUtils.toJSONObject(hit.source()))//
+			map(hit -> OpenSearchUtils.toJSONObject(hit.source()))//
 			.forEach(obj -> {
 
 			    out.put(obj.getString(MetaFolderMapping.SOURCE_ID), //
@@ -522,39 +526,6 @@ public class OpenSearchFinder implements DatabaseFinder {
     }
 
     /**
-     * @param response
-     * @param resultSet
-     */
-    private void handleSearchAfter(SearchResponse<Object> response, ResultSet<GSResource> resultSet) {
-
-	List<Hit<Object>> hits = response.hits().hits();
-	int size = hits.size();
-	if (size > 0) {
-
-	    Hit<Object> hit = hits.get(size - 1);
-	    List<FieldValue> sortVals = hit.sortVals();
-
-	    if (!sortVals.isEmpty()) {
-
-		FieldValue fieldValue = sortVals.get(0);
-
-		if (fieldValue.isString()) {
-
-		    resultSet.setSearchAfter(SearchAfter.of(fieldValue.stringValue()));
-
-		} else if (fieldValue.isDouble()) {
-
-		    resultSet.setSearchAfter(SearchAfter.of(fieldValue.doubleValue()));
-
-		} else if (fieldValue.isLong()) {
-
-		    resultSet.setSearchAfter(SearchAfter.of(fieldValue.longValue()));
-		}
-	    }
-	}
-    }
-
-    /**
      * @param message
      * @return
      * @throws GSException
@@ -584,7 +555,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    if (debugQueries) {
 
 		GSLoggerFactory.getLogger(getClass()).debug(count ? "--- COUNT ---" : "--- DISCOVER ---");
-		GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", ConversionUtils.toJSONObject(query).toString(3));
+		GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", OpenSearchUtils.toJSONObject(query).toString(3));
 	    }
 
 	    SearchResponse<Object> response = null;
@@ -598,15 +569,16 @@ public class OpenSearchFinder implements DatabaseFinder {
 		int start = message.getPage().getStart() - 1;
 		int size = message.getPage().getSize();
 
-		response = wrapper.search(//
-			DataFolderMapping.get().getIndex(), //
-			query, //
+		response = wrapper.search(DataFolderMapping.get().getIndex(), // index
+			query, // search query
+			message.getResourceSelector().getIndexes(), // fields
 			start, //
 			size, //
 			message.getSortProperty(), //
 			message.getSortOrder(), //
 			message.getSearchAfter(), //
-			message.isResourceBinaryExcluded());
+			false, // request cache
+			message.isResourceBinaryExcluded());//
 	    }
 
 	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));

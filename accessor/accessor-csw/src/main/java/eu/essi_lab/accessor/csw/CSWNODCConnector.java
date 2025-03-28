@@ -170,7 +170,10 @@ public class CSWNODCConnector extends CSWGetConnector {
 
 			Files.copy(IOStreamUtils.asStream(text), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-			optS3TransferManager.get().uploadFile(tempFile.getAbsolutePath(), "nodcglobal", globalFileName);
+			optS3TransferManager.get().uploadFile(
+				tempFile.getAbsolutePath(), 
+				"nodcglobal", 
+				globalFileName);
 
 			tempFile.delete();
 
