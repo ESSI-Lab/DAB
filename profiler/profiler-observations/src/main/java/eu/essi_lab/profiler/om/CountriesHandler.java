@@ -24,30 +24,39 @@ package eu.essi_lab.profiler.om;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.ServiceLoader;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
-import javax.xml.namespace.QName;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.base.Charsets;
 
-import eu.essi_lab.lib.xml.stax.StAXDocumentParser;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.messages.stats.ComputationResult;
+import eu.essi_lab.messages.stats.ResponseItem;
+import eu.essi_lab.messages.stats.StatisticsMessage;
+import eu.essi_lab.messages.stats.StatisticsResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.exceptions.ErrorInfo;
+import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Country;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
+import eu.essi_lab.request.executor.IStatisticsExecutor;
 
 public class CountriesHandler extends StreamingRequestHandler {
 
@@ -67,87 +76,122 @@ public class CountriesHandler extends StreamingRequestHandler {
 
 	return new StreamingOutput() {
 
-	    private String countryISO3;
-
 	    @Override
 	    public void write(OutputStream output) throws IOException, WebApplicationException {
-
-		DiscoveryRequestTransformer transformer = getTransformer();
-
-		DiscoveryMessage discoveryMessage;
-		try {
-		    discoveryMessage = transformer.transform(webRequest);
-		} catch (GSException gse) {
-		    List<ErrorInfo> list = gse.getErrorInfoList();
-		    if (list.isEmpty()) {
-			printErrorMessage(output, "Unknown error");
-		    } else {
-			ErrorInfo error = list.get(0);
-			printErrorMessage(output, error.getErrorDescription());
-
-		    }
-		    return;
-		}
 		OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
 
-		Page userPage = discoveryMessage.getPage();
-		int userSize = userPage.getSize();
-		int pageSize = Math.min(userSize, 1000);
-		userPage.setSize(pageSize);
+		OMTransformer transformer = new OMTransformer();
+		DiscoveryMessage discoveryMessage = null;
+		try {
+		    discoveryMessage = transformer.transform(webRequest);
+		} catch (GSException e) {
+		    e.printStackTrace();
+		}
+		String pathInfo = webRequest.getServletRequest().getPathInfo();
+		String objectPart = pathInfo.substring(pathInfo.lastIndexOf("/") + 1);
 
-		ResultSet<String> resultSet = null;
-		int tempSize = 0;
+		StatisticsMessage statisticsMessage = new StatisticsMessage();
+
+		statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+		if (discoveryMessage.getView().isPresent()) {
+		    statisticsMessage.setView(discoveryMessage.getView().get());
+		}
+
+		if (discoveryMessage.getUserBond().isPresent()) {
+		    statisticsMessage.setUserBond(discoveryMessage.getUserBond().get());
+		}
+
+		List<Queryable> queryables = new ArrayList<Queryable>();
+		Queryable q = null;
+
+		switch (objectPart.toLowerCase()) {
+		case "countries":
+		    q = MetadataElement.COUNTRY_ISO3;
+		    break;
+		case "observedproperties":
+		    q = MetadataElement.ATTRIBUTE_TITLE;
+		    break;
+		case "observedpropertiesuri":
+		    q = MetadataElement.OBSERVED_PROPERTY_URI;
+		    break;
+		case "timeinterpolations":
+		    q = MetadataElement.TIME_INTERPOLATION;
+		    break;
+		case "intendedobservationspacings":
+		    q = MetadataElement.TIME_RESOLUTION_DURATION_8601;
+		    break;
+		case "aggregationdurations":
+		    q = MetadataElement.TIME_AGGREGATION_DURATION_8601;
+		    break;
+		case "providers":
+		    q = ResourceProperty.SOURCE_ID;
+		    break;
+		default:
+
+		    writer.write("Not recognized object: " + objectPart);
+		    writer.flush();
+		    writer.close();
+		    output.close();
+		    break;
+		}
+
+		queryables.add(q);
+		int max = discoveryMessage.getPage().getSize();
+
+		statisticsMessage.computeFrequency(queryables, max);
+
+		ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
+		IStatisticsExecutor executor = loader.iterator().next();
+
+		StatisticsResponse response = null;
+		try {
+		    response = executor.compute(statisticsMessage);
+		} catch (GSException e) {
+		    e.printStackTrace();
+		    writer.write("Error during processing: " + e);
+		    writer.flush();
+		    writer.close();
+		    output.close();
+		    return;
+		}
+
+		List<ResponseItem> items = response.getItems();
+
+		ResponseItem responseItem = items.get(0);
+
+		Optional<ComputationResult> freq = responseItem.getFrequency(q);
 
 		JSONObject ret = new JSONObject();
-		JSONArray countries = new JSONArray();
-		ret.put("countries", countries);
 
-		do {
+		if (freq.isPresent()) {
+		    JSONArray array = new JSONArray();
+		    ret.put(objectPart, array);
+		    ComputationResult cr = freq.get();
+		    List<TermFrequencyItem> fitems = cr.getFrequencyItems();
+		    for (TermFrequencyItem fitem : fitems) {
+			String term = fitem.getDecodedTerm();
+			JSONObject obj = new JSONObject();
+			obj.put("value", term);
+			obj.put("observationCount", fitem.getFreq());
+			array.put(obj);
 
-		    try {
-			resultSet = exec(discoveryMessage);
-			
-			List<String> results = resultSet.getResultsList();
-			tempSize += pageSize;
-
-			if (results.isEmpty()) {
-			    printErrorMessage(output, "No " + getObject() + " matched");
-			    return;
-			}
-
-			boolean first = true;
-			for (String result : results) {
-
-			    first = false;
-
-			    StAXDocumentParser parser = new StAXDocumentParser(result);
-			    parser.add(new QName("CountryISO3"), v -> countryISO3 = v);
-			    parser.parse();
-
-			    if (countryISO3 != null && !countryISO3.isEmpty()) {
-				Country country = Country.decode(countryISO3);
-				JSONObject countryObject = new JSONObject();
-				countryObject.put("code", countryISO3);
-				if (country != null) {
-				    countryObject.put("shortName", country.getShortName());
-				    countryObject.put("officialName", country.getOfficialName());
-				}
-				countries.put(countryObject);
-
+			if (q.equals(MetadataElement.COUNTRY_ISO3)) {
+			    Country country = Country.decode(term);
+			    if (country != null) {
+				obj.put("shortName", country.getShortName());
+				obj.put("officialName", country.getOfficialName());
 			    }
-
 			}
-		    } catch (Exception e) {
-			e.printStackTrace();
+			if (q.equals(ResourceProperty.SOURCE_ID)) {
+			    GSSource s = ConfigurationWrapper.getSource(term);
+			    if (s != null) {
+				obj.put("label", s.getLabel());
+			    }
+			}
 		    }
-		    int rest = userSize - tempSize;
-		    if (rest > 0 && rest < pageSize) {
-			userPage.setSize(rest);
-		    }
-		    userPage.setStart(userPage.getStart() + pageSize);
+		}
 
-		} while (tempSize < userSize && tempSize < resultSet.getCountResponse().getCount()
-			&& !resultSet.getResultsList().isEmpty());
+		//
 
 		writer.write(ret.toString());
 		writer.flush();
@@ -155,12 +199,6 @@ public class CountriesHandler extends StreamingRequestHandler {
 		output.close();
 	    }
 	};
-    }
-
-   
-
-    public String getObject() {
-	return "countries";
     }
 
     @Override

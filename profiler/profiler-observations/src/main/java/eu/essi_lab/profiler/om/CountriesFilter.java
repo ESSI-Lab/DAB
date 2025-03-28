@@ -30,7 +30,14 @@ public class CountriesFilter implements WebRequestFilter {
     @Override
     public boolean accept(WebRequest request) throws GSException {
 	String path = request.getRequestPath();
-	return path.endsWith("countries");
+	path = path.toLowerCase();
+	return path.endsWith("countries") || //
+		path.endsWith("ontologies") || //
+		path.endsWith("providers") || //
+		path.endsWith("observedproperties") || //
+		path.endsWith("timeinterpolations") || //
+		path.endsWith("intendedobservationspacings") || //
+		path.endsWith("aggregationdurations");
     }
 
 }
