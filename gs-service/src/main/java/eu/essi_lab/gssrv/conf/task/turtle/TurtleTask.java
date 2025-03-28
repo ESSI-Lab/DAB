@@ -247,7 +247,7 @@ public class TurtleTask extends AbstractCustomTask {
 		discoveryMessage.setRequestId("turtle-task-" + sourceId + "-" + UUID.randomUUID());
 		discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
 		discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
-		discoveryMessage.setExcludeResourceBinary(true);
+		discoveryMessage.setExcludeResourceBinary(false);
 		discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
 		discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 		ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);

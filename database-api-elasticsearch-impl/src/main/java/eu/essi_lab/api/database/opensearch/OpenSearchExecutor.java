@@ -153,7 +153,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	Optional<Queryable> groupByTarget = message.getGroupByTarget();
 
-	Optional<Bond> bond = message.getUserBond();
 
 	boolean isQueryBBOXUnion = message.isQueryBboxUnionComputationSet();
 	boolean isOutputSources = message.isOutputSources();
