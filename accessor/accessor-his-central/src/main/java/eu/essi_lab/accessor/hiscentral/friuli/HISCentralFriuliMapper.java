@@ -150,7 +150,12 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	// String resourceAbstract = datasetInfo.optString("ResourceAbstract");
 
 	String resourceTitle = datasetInfo.optString("nome");
-	String organisationName = datasetInfo.optString("proprietario");
+
+	String ownerOrganisationName = "";
+	JSONObject propObject = datasetInfo.optJSONObject("proprietario");
+	if (propObject != null) {
+	    ownerOrganisationName = propObject.optString("ragione_sociale");
+	}
 	String tempExtenBegin = datasetInfo.optString("data_inizio");
 	String tempExtenEnd = datasetInfo.optString("data_fine");
 
@@ -248,8 +253,8 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	//
 	ResponsibleParty publisherContact = new ResponsibleParty();
 
-	publisherContact.setOrganisationName(organisationName);
-	publisherContact.setRoleCode("publisher");
+	publisherContact.setOrganisationName(ownerOrganisationName);
+	publisherContact.setRoleCode("owner");
 
 	// Contact contact = new Contact();
 	//
@@ -396,11 +401,11 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	if (attributeTitle.toLowerCase().contains("temperatura")) {
 	    if (attributeTitle.toLowerCase().contains("suolo")) {
 		attributeTitle = "Temperatura suolo";
-	    }else if (attributeTitle.toLowerCase().contains("aria")) {
+	    } else if (attributeTitle.toLowerCase().contains("aria")) {
 		attributeTitle = "Temperatura aria";
-	    }else if (attributeTitle.toLowerCase().contains("mare")) {
+	    } else if (attributeTitle.toLowerCase().contains("mare")) {
 		attributeTitle = "Temperatura mare";
-	    }else {
+	    } else {
 		attributeTitle = "Temperatura";
 	    }
 	}
