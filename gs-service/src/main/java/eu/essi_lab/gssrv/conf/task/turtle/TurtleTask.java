@@ -255,7 +255,7 @@ public class TurtleTask extends AbstractCustomTask {
 		discoveryMessage.setUserBond(bond);
 		discoveryMessage.setNormalizedBond(bond);
 
-		int start = 1;
+		int start = 9750;
 		int file = 0;
 		TurtleMapper mapper = new TurtleMapper();
 
@@ -265,18 +265,18 @@ public class TurtleTask extends AbstractCustomTask {
 
 		List<File> turtles = new ArrayList<>();
 		discoveryMessage.setSortOrder(SortOrder.ASCENDING);
-		discoveryMessage.setSortProperty(ResourceProperty.PUBLIC_ID);
+		discoveryMessage.setSortProperty(ResourceProperty.PRIVATE_ID);
 		SearchAfter searchAfter = null;
 		main: while (true) {
 
 		    // CHECKING CANCELED JOB
 
-		    if (ConfigurationWrapper.isJobCanceled(context)) {
-			GSLoggerFactory.getLogger(getClass()).info("Turtle task CANCELED");
-			log(status, "Turtle task CANCELED");
-			status.setPhase(JobPhase.CANCELED);
-			return;
-		    }
+//		    if (ConfigurationWrapper.isJobCanceled(context)) {
+//			GSLoggerFactory.getLogger(getClass()).info("Turtle task CANCELED");
+//			log(status, "Turtle task CANCELED");
+//			status.setPhase(JobPhase.CANCELED);
+//			return;
+//		    }
 
 		    GSLoggerFactory.getLogger(getClass()).info("Turtle task {} at record {}", sourceId, start);
 		    discoveryMessage.setPage(new Page(start, pageSize));
