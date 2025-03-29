@@ -475,7 +475,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			Optional.empty(), //
 			Optional.empty(), //
 			true, // requesting cache
-			false);
+			true);// excluding binary
 
 		response.//
 			hits().//
