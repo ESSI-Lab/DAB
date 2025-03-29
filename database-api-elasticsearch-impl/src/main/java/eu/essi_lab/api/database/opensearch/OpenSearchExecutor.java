@@ -549,13 +549,12 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    message.setPermittedBond(BondFactory.createAndBond(bonds));
 	    break;
 	}
-	message.setUseCachedSourcesDataFolderMap(true);
 
 	Query tmp = null;
 	if (!bonds.isEmpty()) {
 	    String s = bonds.toString();
 	    if (lastBond != null && lastBond.equals(s)) {
-		tmp= lastQuery;
+		tmp = lastQuery;
 	    } else {
 		tmp = finder.buildQuery(message, true);
 		lastBond = s;

@@ -114,6 +114,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 	setException(GSException.createException());
 	setSources(new ArrayList<GSSource>());
 	setOutputSources(false);
+	setUseCachedSourcesDataFolderMap(true);
 
 	requestId = UUID.randomUUID().toString();
     }
@@ -465,7 +466,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public Boolean isCachedSourcesDataFolderMapUsed() {
 
-	return Optional.ofNullable(getHeader().get(USE_CACHED_SOURCES_DATAFOLDER_MAP, Boolean.class)).orElse(false);
+	return Optional.ofNullable(getHeader().get(USE_CACHED_SOURCES_DATAFOLDER_MAP, Boolean.class)).orElse(true);
     }
 
     /**
