@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.json.JSONObject;
+import org.opensearch.client.opensearch._types.ErrorCause;
+import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
@@ -177,54 +180,46 @@ public class OpenSearchFinder implements DatabaseFinder {
     @Override
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
-	try {
-	    // debugQueries = true;
+	// debugQueries = true;
 
-	    SearchResponse<Object> searchResponse = search_(message, true);
+	SearchResponse<Object> searchResponse = search_(message, true);
 
-	    Map<String, Aggregate> aggregations = searchResponse.aggregations();
+	Map<String, Aggregate> aggregations = searchResponse.aggregations();
 
-	    int total = 0;
+	int total = 0;
 
-	    Optional<Queryable> element = message.getDistinctValuesElement();
+	Optional<Queryable> element = message.getDistinctValuesElement();
 
-	    if (element.isPresent()) {
+	if (element.isPresent()) {
 
-		total = getCardinalityValue(aggregations, element);
+	    total = getCardinalityValue(aggregations, element);
 
-	    } else {
+	} else {
 
-		total = (int) searchResponse.hits().total().value();
-	    }
-
-	    DiscoveryCountResponse response = new DiscoveryCountResponse();
-
-	    if (message.isOutputSources()) {
-
-		response.setCount(message.getSources().size());
-
-	    } else {
-
-		response.setCount(total);
-	    }
-
-	    if (element.isEmpty()) {
-
-		TermFrequencyMapType mapType = OpenSearchUtils.fromAgg(aggregations);
-
-		TermFrequencyMap tfMap = new TermFrequencyMap(mapType);
-
-		response.setTermFrequencyMap(tfMap);
-	    }
-
-	    return response;
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
-
-	    throw GSException.createException(getClass(), "OpenSearchFinderCountError", ex);
+	    total = (int) searchResponse.hits().total().value();
 	}
+
+	DiscoveryCountResponse response = new DiscoveryCountResponse();
+
+	if (message.isOutputSources()) {
+
+	    response.setCount(message.getSources().size());
+
+	} else {
+
+	    response.setCount(total);
+	}
+
+	if (element.isEmpty()) {
+
+	    TermFrequencyMapType mapType = OpenSearchUtils.fromAgg(aggregations);
+
+	    TermFrequencyMap tfMap = new TermFrequencyMap(mapType);
+
+	    response.setTermFrequencyMap(tfMap);
+	}
+
+	return response;
     }
 
     @Override
@@ -292,6 +287,10 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    return resultSet;
 
+	} catch (OpenSearchException osex) {
+
+	    throw createGSException(osex, "OpenSearchFinderDiscoverError");
+
 	} catch (Exception ex) {
 
 	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
@@ -305,37 +304,40 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	ResultSet<Node> out = new ResultSet<>();
 
-	try {
+	ResultSet<GSResource> response = discover(message);
 
-	    ResultSet<GSResource> response = discover(message);
+	out.setCountResponse(response.getCountResponse());
 
-	    out.setCountResponse(response.getCountResponse());
+	if (response.getProfilerName().isPresent()) {
 
-	    List<Node> nodes = response.getResultsList().stream().map(res -> {
-
-		try {
-		    return res.asDocument(true);
-
-		} catch (ParserConfigurationException | JAXBException | SAXException | IOException e) {
-
-		    GSLoggerFactory.getLogger(getClass()).error(e);
-		}
-
-		return null;
-
-	    }).filter(Objects::nonNull).//
-		    collect(Collectors.toList());
-
-	    out.setResultsList(nodes);
-
-	    return out;
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
-
-	    throw GSException.createException(getClass(), "OpenSearchFinderDiscoverError", ex);
+	    out.setProfilerName(response.getProfilerName().get());
 	}
+
+	out.setPropertyHandler(response.getPropertyHandler());
+
+	if (response.getSearchAfter().isPresent()) {
+
+	    out.setSearchAfter(response.getSearchAfter().get());
+	}
+
+	List<Node> nodes = response.getResultsList().stream().map(res -> {
+
+	    try {
+		return res.asDocument(true);
+
+	    } catch (ParserConfigurationException | JAXBException | SAXException | IOException e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
+
+	    return null;
+
+	}).filter(Objects::nonNull).//
+		collect(Collectors.toList());
+
+	out.setResultsList(nodes);
+
+	return out;
     }
 
     @Override
@@ -343,43 +345,41 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	ResultSet<String> out = new ResultSet<>();
 
-	try {
+	ResultSet<GSResource> response = discover(message);
 
-	    ResultSet<GSResource> response = discover(message);
+	out.setCountResponse(response.getCountResponse());
 
-	    out.setCountResponse(response.getCountResponse());
-	    if (response.getProfilerName().isPresent()) {
-		out.setProfilerName(response.getProfilerName().get());
-	    }
-	    out.setPropertyHandler(response.getPropertyHandler());
-	    if (response.getSearchAfter().isPresent()) {
-		out.setSearchAfter(response.getSearchAfter().get());
-	    }
-	    List<String> strings = response.getResultsList().stream().map(res -> {
+	if (response.getProfilerName().isPresent()) {
 
-		try {
-		    return res.asString(true);
-
-		} catch (Exception e) {
-
-		    GSLoggerFactory.getLogger(getClass()).error(e);
-		}
-
-		return null;
-
-	    }).filter(Objects::nonNull).//
-		    collect(Collectors.toList());
-
-	    out.setResultsList(strings);
-
-	    return out;
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
-
-	    throw GSException.createException(getClass(), "OpenSearchFinderDiscoverError", ex);
+	    out.setProfilerName(response.getProfilerName().get());
 	}
+
+	out.setPropertyHandler(response.getPropertyHandler());
+
+	if (response.getSearchAfter().isPresent()) {
+
+	    out.setSearchAfter(response.getSearchAfter().get());
+	}
+
+	List<String> strings = response.getResultsList().stream().map(res -> {
+
+	    try {
+		return res.asString(true);
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
+
+	    return null;
+
+	}).filter(Objects::nonNull).//
+		collect(Collectors.toList());
+
+	out.setResultsList(strings);
+
+	return out;
+
     }
 
     /**
@@ -487,6 +487,9 @@ public class OpenSearchFinder implements DatabaseFinder {
 			    out.put(obj.getString(MetaFolderMapping.SOURCE_ID), //
 				    obj.getString(MetaFolderMapping.DATA_FOLDER));
 			});
+	    } catch (OpenSearchException osex) {
+
+		throw createGSException(osex, "OpenSearchFinderSourceDataFolderMapError");
 
 	    } catch (Exception ex) {
 
@@ -585,11 +588,29 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    return response;
 
+	} catch (OpenSearchException osex) {
+
+	    throw createGSException(osex, "OpenSearchFinderDiscover_Error");
+
 	} catch (Exception ex) {
 
 	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
 
 	    throw GSException.createException(getClass(), "OpenSearchFinderDiscover_Error", ex);
 	}
+    }
+
+    /**
+     * @param osex
+     * @throws GSException
+     */
+    private GSException createGSException(OpenSearchException osex, String errorType) throws GSException {
+
+	ErrorCause error = osex.error();
+	String jsonString = error.toJsonString();
+
+	GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(new JSONObject(jsonString).toString(3));
+
+	return GSException.createException(getClass(), errorType, osex);
     }
 }
