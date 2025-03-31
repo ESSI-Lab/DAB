@@ -113,7 +113,11 @@ public class QueryableBond<T> implements Bond {
     @Override
     public int hashCode() {
 
-	return operator.hashCode() + (getPropertyValue() != null ? getPropertyValue().hashCode() : 0) + getProperty().hashCode();
+	int opCode = operator != null ? operator.hashCode() : 0;
+	int valCode = getPropertyValue() != null ? getPropertyValue().hashCode() : 0;
+	int propCode = getProperty() != null ? getProperty().hashCode() : 0;
+
+	return opCode + valCode + propCode;
     }
 
     public String toString() {

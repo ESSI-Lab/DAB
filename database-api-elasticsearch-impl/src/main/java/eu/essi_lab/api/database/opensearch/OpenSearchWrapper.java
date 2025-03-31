@@ -86,6 +86,7 @@ import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.model.Queryable;
@@ -379,6 +380,21 @@ public class OpenSearchWrapper {
 	    if (requestCache) {
 
 		builder.requestCache(true);
+	    }
+
+	    if (OpenSearchFinder.debugQueries) {
+
+		debugSearchRequest(//
+			searchQuery, //
+			index, //
+			size, //
+			searchAfter, //
+			start, //
+			orderingProperty, //
+			sortOrder, //
+			fields, //
+			excludeResourceBinary, //
+			requestCache);//
 	    }
 
 	    return builder;
@@ -705,6 +721,66 @@ public class OpenSearchWrapper {
     public void synch() throws OpenSearchException, IOException {
 
 	client.indices().refresh();
+    }
+
+    /**
+     * @param searchQuery
+     * @param index
+     * @param size
+     * @param searchAfter
+     * @param start
+     * @param orderingProperty
+     * @param sortOrder
+     * @param fields
+     * @param excludeResourceBinary
+     * @param requestCache
+     */
+    private void debugSearchRequest(//
+            Query searchQuery, //
+            String index, //
+            Integer size, //
+            Optional<SearchAfter> searchAfter, //
+            Integer start, //
+            Optional<Queryable> orderingProperty, //
+            Optional<eu.essi_lab.model.SortOrder> sortOrder, //
+            List<String> fields, //
+            boolean excludeResourceBinary, //
+            boolean requestCache) {
+    
+        org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
+    
+        clone.query(searchQuery).//
+        	index(index);
+    
+        clone.size(size);
+    
+        if (searchAfter.isPresent()) {
+    
+            searchAfter.get().getDoubleValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
+            searchAfter.get().getLongValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
+            searchAfter.get().getStringValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
+    
+        } else {
+    
+            clone.from(start);
+        }
+    
+        if (orderingProperty.isPresent() && sortOrder.isPresent()) {
+    
+            handleSort(clone, orderingProperty.get(), sortOrder.get());
+        }
+    
+        handleSourceFields(null, clone, fields, excludeResourceBinary);
+    
+        if (requestCache) {
+    
+            clone.requestCache(true);
+        }
+    
+        JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
+        object.put("index", index);
+    
+        GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
     }
 
     /**
