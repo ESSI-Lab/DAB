@@ -84,7 +84,7 @@ public class SourceAdderTask extends AbstractCustomTask {
 	 * 0
 	 * 2
 	 * no
-	 * whos
+	 * whos,whos-cuahsi
 	 * 
 	 * Example for ISPRA HIS-CENTRAL:
 	 * ISPRA_HIS_CENTRAL

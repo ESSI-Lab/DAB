@@ -22,12 +22,15 @@ package eu.essi_lab.model.resource.stax;
  */
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.lib.geo.BBOXUtils;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.stax.StAXDocumentParser;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -38,18 +41,95 @@ public class GIResourceParser extends StAXDocumentParser {
     public String west;
 
     public String getWest() {
+	if (!west.isEmpty()) {
+	    return west;
+	}
+	GeographicBoundingBox bbox = getBBOX();
+	if (bbox != null) {
+	    return bbox.getBigDecimalWest().toString();
+	}
 	return west;
     }
 
     public String getEast() {
+	if (!east.isEmpty()) {
+	    return east;
+	}
+	GeographicBoundingBox bbox = getBBOX();
+	if (bbox != null) {
+	    return bbox.getBigDecimalEast().toString();
+	}
 	return east;
     }
 
+    public GeographicBoundingBox getBBOX() {
+	if (geometry.isEmpty()) {
+	    return null;
+	}
+	String geometry = this.geometry.trim().toLowerCase();
+	if (geometry.startsWith("point")) {
+	    geometry = geometry.substring(geometry.indexOf("(") + 1).replace("(", "").replace(")", "").trim();
+	    String[] split = geometry.split(" ");
+	    GeographicBoundingBox ret = new GeographicBoundingBox();
+	    ret.setBigDecimalEast(new BigDecimal(split[0]));
+	    ret.setBigDecimalWest(new BigDecimal(split[0]));
+	    ret.setBigDecimalNorth(new BigDecimal(split[1]));
+	    ret.setBigDecimalSouth(new BigDecimal(split[1]));
+	    return ret;
+	} else if (geometry.startsWith("polygon")) {
+	    geometry = geometry.substring(geometry.indexOf("(") + 1).replace("(", "").replace(")", "").trim();
+	    String[] pps = geometry.split(",");
+	    BigDecimal west = null;
+	    BigDecimal east = null;
+	    BigDecimal north = null;
+	    BigDecimal south = null;
+	    for (String pp : pps) {
+		String[] split = pp.trim().split(" ");
+		BigDecimal lon = new BigDecimal(split[0]);
+		BigDecimal lat = new BigDecimal(split[1]);
+		if (west == null || west.compareTo(lon) == 1) {
+		    west = lon;
+		}
+		if (east == null || east.compareTo(lon) == -1) {
+		    east = lon;
+		}
+		if (south == null || south.compareTo(lat) == 1) {
+		    south = lat;
+		}
+		if (north == null || north.compareTo(lat) == -1) {
+		    north = lat;
+		}
+	    }
+	    GeographicBoundingBox ret = new GeographicBoundingBox();
+	    ret.setBigDecimalEast(east);
+	    ret.setBigDecimalWest(west);
+	    ret.setBigDecimalNorth(north);
+	    ret.setBigDecimalSouth(south);
+	    return ret;
+	} else {
+	    return null;
+	}
+    }
+
     public String getNorth() {
+	if (!north.isEmpty()) {
+	    return north;
+	}
+	GeographicBoundingBox bbox = getBBOX();
+	if (bbox != null) {
+	    return bbox.getBigDecimalNorth().toString();
+	}
 	return north;
     }
 
     public String getSouth() {
+	if (!south.isEmpty()) {
+	    return south;
+	}
+	GeographicBoundingBox bbox = getBBOX();
+	if (bbox != null) {
+	    return bbox.getBigDecimalSouth().toString();
+	}
 	return south;
     }
 
@@ -84,24 +164,24 @@ public class GIResourceParser extends StAXDocumentParser {
     public List<String> getAttributeNames() {
 	return attributeNames;
     }
-    
+
     public String getAttributeName() {
 	if (attributeNames.isEmpty()) {
 	    return "";
 	}
 	return attributeNames.get(0);
     }
-    
+
     public List<String> getAttributeDescriptions() {
- 	return attributeDescriptions;
-     }
-     
-     public String getAttributeDescription() {
- 	if (attributeDescriptions.isEmpty()) {
- 	    return "";
- 	}
- 	return attributeDescriptions.get(0);
-     }
+	return attributeDescriptions;
+    }
+
+    public String getAttributeDescription() {
+	if (attributeDescriptions.isEmpty()) {
+	    return "";
+	}
+	return attributeDescriptions.get(0);
+    }
 
     public String getAttributeCode() {
 	return attributeCode;
@@ -209,6 +289,11 @@ public class GIResourceParser extends StAXDocumentParser {
     public String timeSpacing = "";
     public String timeUnits = "";
     public String fileIdentifier = "";
+    public String geometry = "";
+
+    public String getGeometry() {
+	return geometry;
+    }
 
     public String getFileIdentifier() {
 	return fileIdentifier;
@@ -251,13 +336,14 @@ public class GIResourceParser extends StAXDocumentParser {
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "south"), v -> south = v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "east"), v -> east = v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "north"), v -> north = v);
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "geometry"), v -> geometry = v);
 
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.RESOURCE_IDENTIFIER.getName()), v -> this.resourceId = v);
 
 	// INSTRUMENT
-	
+
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.INSTRUMENT_TITLE_EL_NAME), v -> this.instrumentNames.add(v));
-	
+
 	// PLATFORM
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.PLATFORM_TITLE_EL_NAME), v -> this.platformNames.add(v));
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.PLATFORM_IDENTIFIER_EL_NAME), v -> this.originalPlatformCode = v);
@@ -268,7 +354,8 @@ public class GIResourceParser extends StAXDocumentParser {
 	// ATTRIBUTE
 
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.ATTRIBUTE_TITLE_EL_NAME), v -> this.attributeNames.add(v));
-	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.ATTRIBUTE_DESCRIPTION_EL_NAME), v -> this.attributeDescriptions.add(v));
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.ATTRIBUTE_DESCRIPTION_EL_NAME),
+		v -> this.attributeDescriptions.add(v));
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER_EL_NAME),
 		v -> this.attributeCode = v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME),
