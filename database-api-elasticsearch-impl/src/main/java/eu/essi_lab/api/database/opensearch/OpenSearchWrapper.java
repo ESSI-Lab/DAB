@@ -171,6 +171,11 @@ public class OpenSearchWrapper {
 			index(DataFolderMapping.get().getIndex()).//
 			size(0);
 
+		if (OpenSearchFinder.debugQueries) {
+
+		    debugCountRequest(searchQuery, DataFolderMapping.toKeywordField(element.get().getName()), aggregation);
+		}
+
 		return builder;
 
 	    }, Object.class);
@@ -193,6 +198,11 @@ public class OpenSearchWrapper {
 			trackTotalHits(new TrackHits.Builder().enabled(true).build()).//
 			index(DataFolderMapping.get().getIndex()).//
 			size(0);
+
+		if (OpenSearchFinder.debugQueries) {
+
+		    debugCountRequest(searchQuery, targets, maxItems);
+		}
 
 		return builder;
 
@@ -259,6 +269,11 @@ public class OpenSearchWrapper {
 		size(0).//
 		aggregations(map).//
 		build();
+
+	if (OpenSearchFinder.debugQueries) {
+
+	    GSLoggerFactory.getLogger(OpenSearchFinder.class).debug(OpenSearchUtils.toJSONObject(searchRequest).toString(3));
+	}
 
 	SearchResponse<Object> response = client.search(searchRequest, Object.class);
 
@@ -742,6 +757,56 @@ public class OpenSearchWrapper {
     public void synch() throws OpenSearchException, IOException {
 
 	client.indices().refresh();
+    }
+
+    /**
+     * @param searchQuery
+     * @param field
+     * @param aggregation
+     */
+    private void debugCountRequest(Query searchQuery, String field, Aggregation aggregation) {
+    
+        org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
+    
+        clone.query(searchQuery).//
+        	index(DataFolderMapping.get().getIndex());
+    
+        clone.aggregations(DataFolderMapping.toKeywordField(field), aggregation);
+    
+        clone.size(0);
+    
+        JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
+        object.put("index", DataFolderMapping.get().getIndex());
+    
+        GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
+    }
+
+    /**
+     * @param searchQuery
+     * @param maxItems
+     */
+    private void debugCountRequest(Query searchQuery, List<Queryable> targets, int maxItems) {
+    
+        org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
+    
+        targets.forEach(trg -> {
+    
+            clone.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
+    
+        	    DataFolderMapping.toKeywordField(trg.getName())).size(maxItems)));
+        });
+    
+        clone.query(searchQuery).//
+        	index(DataFolderMapping.get().getIndex());
+    
+        clone.size(0);
+    
+        clone.trackTotalHits(new TrackHits.Builder().enabled(true).build());
+    
+        JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
+        object.put("index", DataFolderMapping.get().getIndex());
+    
+        GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
     }
 
     /**

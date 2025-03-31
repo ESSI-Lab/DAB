@@ -448,8 +448,7 @@ public class OpenSearchFinder implements DatabaseFinder {
      * Returns couples [source id -> query folder ] only of the sources that are
      * currently harvested, or more in general, of the sources that have a writing folder (for example a source in its
      * first harvesting, or a source with interrupted harvesting having both data-1 and and data-2 folder where one of
-     * them is
-     * the writing folder and the other is the query folder)
+     * them is the writing folder and the other is the query folder)
      * 
      * @param sourceIds
      * @param useCache
