@@ -233,7 +233,7 @@ public class OpenSearchWrapper {
 
 	Aggregation topHitsAgg = new Aggregation.Builder().// takes the first result
 
-		topHits(new TopHitsAggregation.Builder().//
+		topHits(topHitsBuilder.//
 			size(1).//
 			build())
 		.build();
