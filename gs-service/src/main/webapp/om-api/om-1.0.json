@@ -6,9 +6,144 @@
         "version": "1.0"
     },
     "servers": [
-        {"url": "https://gs-service-preproduction.geodab.eu"},{"url": "http://localhost:9090"}
+        {"url": "https://gs-service-preproduction.geodab.eu"},
+        {"url": "http://localhost:9090"}
     ],
     "paths": {
+                "/gs-service/services/essi/token/{token}/view/{view}/om-api/countries": {
+            "get": {
+                "description": "Used to search and list information about the countries",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "description": "Token identifying the user",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "view",
+                        "in": "path",
+                        "required": true,
+                        "description": "Identifier of the data subset interesting for the user",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "feature",
+                        "in": "query",
+                        "description": "Identifier of the feature",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "observationIdentifier",
+                        "in": "query",
+                        "description": "Identifier of the observation",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "beginPosition",
+                        "in": "query",
+                        "description": "Temporal interval begin position",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "endPosition",
+                        "in": "query",
+                        "description": "Temporal interval end position",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "west",
+                        "in": "query",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "south",
+                        "in": "query",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "east",
+                        "in": "query",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "north",
+                        "in": "query",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "observedProperty",
+                        "in": "query",
+                        "description": "observed property name or URI",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "ontology",
+                        "in": "query",
+                        "description": "The ontology to be used to expand the observed property search term (or URI) with additional terms from the ontology that are synonyms and associated to narrower concepts. Two ontologies are available: whos or his-central",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "timeInterpolation",
+                        "in": "query",
+                        "description": "The interpolation used on the time axis (for example, MAX, MIN, TOTAL, AVERAGE, MAX_PREC, MAX_SUCC, CONTINUOUS, ...)",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "intendedObservationSpacing",
+                        "in": "query",
+                        "description": "The expected duration between individual observations, expressed as ISO8601 duration (e.g., P1D)",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "aggregationDuration",
+                        "in": "query",
+                        "description": "Time aggregation that has occurred to the value in the timeseries, expressed as ISO8601 duration (e.g., P1D)",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "country",
+                        "in": "query",
+                        "description": "Country code (ISO3)",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "provider",
+                        "in": "query",
+                        "description": "Data provider identifier",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of matched records",
+                        "schema": {"type": "string"},
+                        "example": "10"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "JSON encoded terms with occurrences",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "0": {"value": "{\n  \"countries\": [\n    {\n      \"observationCount\": 35012,\n      \"shortName\": \"Italy\",\n      \"officialName\": \"the Republic of Italy\",\n      \"value\": \"ITA\"\n    }\n  ]\n}"}
+                                }
+                            }
+                        }
+                    }
+                },
+                "servers": [
+                    {"url": "https://gs-service-preproduction.geodab.eu"},
+                    {"url": "http://localhost:9090"}
+                ]
+            },
+            "servers": [
+                {"url": "https://gs-service-preproduction.geodab.eu"},
+                {"url": "http://localhost:9090"}
+            ]
+        },
         "/gs-service/services/essi/token/{token}/view/{view}/om-api/features": {
             "get": {
                 "description": "Used to search and list information about the available features",
@@ -27,91 +162,91 @@
                         "description": "Identifier of the data subset interesting for the user",
                         "schema": {"type": "string"}
                     },
-					{
+                    {
                         "name": "feature",
                         "in": "query",
                         "description": "Identifier of the feature",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "observationIdentifier",
                         "in": "query",
                         "description": "Identifier of the observation",
-                        "schema": {"type": "string"}                       
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "beginPosition",
                         "in": "query",
                         "description": "Temporal interval begin position",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "endPosition",
                         "in": "query",
                         "description": "Temporal interval end position",
-                        "schema": {"type": "string"}                        
-                    },                                        
+                        "schema": {"type": "string"}
+                    },
                     {
                         "name": "west",
                         "in": "query",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "south",
                         "in": "query",
-                        "schema": {"type": "string"}                       
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "east",
                         "in": "query",
-                        "schema": {"type": "string"}                     
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "north",
                         "in": "query",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "observedProperty",
                         "in": "query",
-                        "description":"observed property name or URI",
-                        "schema": {"type": "string"}                        
+                        "description": "observed property name or URI",
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "ontology",
                         "in": "query",
                         "description": "The ontology to be used to expand the observed property search term (or URI) with additional terms from the ontology that are synonyms and associated to narrower concepts. Two ontologies are available: whos or his-central",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "timeInterpolation",
                         "in": "query",
                         "description": "The interpolation used on the time axis (for example, MAX, MIN, TOTAL, AVERAGE, MAX_PREC, MAX_SUCC, CONTINUOUS, ...)",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "intendedObservationSpacing",
                         "in": "query",
                         "description": "The expected duration between individual observations, expressed as ISO8601 duration (e.g., P1D)",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "aggregationDuration",
                         "in": "query",
                         "description": "Time aggregation that has occurred to the value in the timeseries, expressed as ISO8601 duration (e.g., P1D)",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "country",
                         "in": "query",
                         "description": "Country code (ISO3)",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "provider",
                         "in": "query",
                         "description": "Data provider identifier",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "offset",
@@ -141,11 +276,13 @@
                     }
                 },
                 "servers": [
-                    {"url": "https://gs-service-preproduction.geodab.eu"},{"url": "http://localhost:9090"}
+                    {"url": "https://gs-service-preproduction.geodab.eu"},
+                    {"url": "http://localhost:9090"}
                 ]
             },
             "servers": [
-                {"url": "https://gs-service-preproduction.geodab.eu"},{"url": "http://localhost:9090"}
+                {"url": "https://gs-service-preproduction.geodab.eu"},
+                {"url": "http://localhost:9090"}
             ]
         },
         "/gs-service/services/essi/token/{token}/view/{view}/om-api/observations": {
@@ -164,111 +301,111 @@
                         "in": "path",
                         "required": true,
                         "description": "Identifier of the data subset interesting for the user",
-                        "schema": {"type": "string"}                     
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "feature",
                         "in": "query",
                         "description": "Identifier of the feature",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "observationIdentifier",
                         "in": "query",
                         "description": "Identifier of the observation",
-                        "schema": {"type": "string"}                       
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "beginPosition",
                         "in": "query",
                         "description": "Temporal interval begin position",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "endPosition",
                         "in": "query",
                         "description": "Temporal interval end position",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
-                                        {
+                    {
                         "name": "west",
                         "in": "query",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "south",
                         "in": "query",
-                        "schema": {"type": "string"}                       
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "east",
                         "in": "query",
-                        "schema": {"type": "string"}                     
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "north",
                         "in": "query",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "observedProperty",
                         "in": "query",
-                        "description":"observed property name or URI",
-                        "schema": {"type": "string"}                        
+                        "description": "observed property name or URI",
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "ontology",
                         "in": "query",
                         "description": "The ontology to be used to expand the observed property search term (or URI) with additional terms from the ontology that are synonyms and associated to narrower concepts. Two ontologies are available: whos or his-central",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "timeInterpolation",
                         "in": "query",
                         "description": "The interpolation used on the time axis (for example, MAX, MIN, TOTAL, AVERAGE, MAX_PREC, MAX_SUCC, CONTINUOUS, ...)",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "intendedObservationSpacing",
                         "in": "query",
                         "description": "The expected duration between individual observations, expressed as ISO8601 duration (e.g., P1D)",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "aggregationDuration",
                         "in": "query",
                         "description": "Time aggregation that has occurred to the value in the timeseries, expressed as ISO8601 duration (e.g., P1D)",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "includeData",
                         "in": "query",
                         "description": "Include data in the response. Not needed if a temporal period is specified",
-                        "schema": {"type": "string"}                       
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "useCache",
                         "in": "query",
                         "description": "Use the broker cache to retrieve the data, avoiding to contact the remote data providers",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "offset",
                         "in": "query",
                         "description": "Start position of matched records",
-                        "schema": {"type": "string"}                       
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "limit",
                         "in": "query",
                         "description": "Maximum number of matched records",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "format",
                         "in": "query",
                         "description": "Response format (JSON or CSV)",
-                        "schema": {"type": "string"}                        
+                        "schema": {"type": "string"}
                     }
                 ],
                 "responses": {
@@ -284,11 +421,13 @@
                     }
                 },
                 "servers": [
-                    {"url": "https://gs-service-preproduction.geodab.eu"},{"url": "http://localhost:9090"}
+                    {"url": "https://gs-service-preproduction.geodab.eu"},
+                    {"url": "http://localhost:9090"}
                 ]
             },
             "servers": [
-                {"url": "https://gs-service-preproduction.geodab.eu"},{"url": "http://localhost:9090"}
+                {"url": "https://gs-service-preproduction.geodab.eu"},
+                {"url": "http://localhost:9090"}
             ]
         }
     }

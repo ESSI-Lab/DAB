@@ -75,10 +75,10 @@ public class OMProfiler extends Profiler<OMProfilerSetting> {
 	////////////////////
 	selector.register(new CountriesFilter(), new CountriesHandler());
 
-	////////////////////
-	// PROVIDERS
-	////////////////////
-	selector.register(new ProvidersFilter(), new ProvidersHandler());
+//	////////////////////
+//	// PROVIDERS
+//	////////////////////
+//	selector.register(new ProvidersFilter(), new ProvidersHandler());
 
 	return selector;
     }

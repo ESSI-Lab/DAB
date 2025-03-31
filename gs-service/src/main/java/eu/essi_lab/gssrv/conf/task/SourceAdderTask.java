@@ -37,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.quartz.JobExecutionContext;
 
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
+
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.SelectionUtils;
@@ -219,7 +221,7 @@ public class SourceAdderTask extends AbstractCustomTask {
 		configuration.put(source);
 	    }
 	    if (schedule.equals("yes")) {
-		Scheduling scheduling = source.getScheduling();
+		Scheduling scheduling = source.getScheduling();		
 		scheduling.setEnabled(true);
 		scheduling.setRunIndefinitely();
 		scheduling.setRepeatInterval(1000, TimeUnit.DAYS);

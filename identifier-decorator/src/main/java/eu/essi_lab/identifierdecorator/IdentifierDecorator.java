@@ -105,7 +105,7 @@ public class IdentifierDecorator {
 	String originalId = opOrig.orElse(UUID.randomUUID().toString());
 
 	if (!opOrig.isPresent())
-	    GSLoggerFactory.getLogger(getClass()).debug("Harvesting metadata without original id, generated random rignal id is {}",
+	    GSLoggerFactory.getLogger(getClass()).debug("Harvesting metadata without original id, generated random orignal id is {}",
 		    originalId);
 
 	boolean preserveIds = sourcePrioritySetting.preserveIdentifiers();
