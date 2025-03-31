@@ -80,6 +80,12 @@ public class OpenSearchFinder implements DatabaseFinder {
 
     static boolean debugQueries = false;
 
+    static {
+
+	String property = System.getProperty("debugOpenSearchQueries");
+	debugQueries = property != null && property.equals("true");
+    }
+
     private OpenSearchDatabase database;
     private OpenSearchWrapper wrapper;
 
