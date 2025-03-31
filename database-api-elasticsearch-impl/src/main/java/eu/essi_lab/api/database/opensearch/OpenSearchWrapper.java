@@ -206,6 +206,7 @@ public class OpenSearchWrapper {
 
     /**
      * @param searchQuery
+     * @param sourceFields
      * @param target
      * @param size
      * @return
@@ -214,7 +215,7 @@ public class OpenSearchWrapper {
     @SuppressWarnings("serial")
     public List<JSONObject> aggregateWithNestedAgg(//
 	    Query searchQuery, //
-	    List<Queryable> sourceFields, //
+	    List<String> sourceFields, //
 	    Queryable target, //
 	    int size) throws Exception {
 
@@ -229,7 +230,7 @@ public class OpenSearchWrapper {
 	handleSourceFields(//
 		topHitsBuilder, //
 		null, //
-		sourceFields.stream().map(q -> q.getName()).collect(Collectors.toList()));
+		sourceFields);
 
 	Aggregation topHitsAgg = new Aggregation.Builder().// takes the first result
 
@@ -288,6 +289,26 @@ public class OpenSearchWrapper {
 	}
 
 	return out;
+    }
+
+    /**
+     * @param searchQuery
+     * @param target
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<JSONObject> aggregateWithNestedAgg_(//
+	    Query searchQuery, //
+	    List<Queryable> sourceFields, //
+	    Queryable target, //
+	    int size) throws Exception {
+
+	return aggregateWithNestedAgg(//
+		searchQuery, //
+		sourceFields.stream().map(q -> q.getName()).collect(Collectors.toList()), //
+		target, //
+		size);
     }
 
     /**
@@ -736,51 +757,51 @@ public class OpenSearchWrapper {
      * @param requestCache
      */
     private void debugSearchRequest(//
-            Query searchQuery, //
-            String index, //
-            Integer size, //
-            Optional<SearchAfter> searchAfter, //
-            Integer start, //
-            Optional<Queryable> orderingProperty, //
-            Optional<eu.essi_lab.model.SortOrder> sortOrder, //
-            List<String> fields, //
-            boolean excludeResourceBinary, //
-            boolean requestCache) {
-    
-        org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
-    
-        clone.query(searchQuery).//
-        	index(index);
-    
-        clone.size(size);
-    
-        if (searchAfter.isPresent()) {
-    
-            searchAfter.get().getDoubleValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
-            searchAfter.get().getLongValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
-            searchAfter.get().getStringValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
-    
-        } else {
-    
-            clone.from(start);
-        }
-    
-        if (orderingProperty.isPresent() && sortOrder.isPresent()) {
-    
-            handleSort(clone, orderingProperty.get(), sortOrder.get());
-        }
-    
-        handleSourceFields(null, clone, fields, excludeResourceBinary);
-    
-        if (requestCache) {
-    
-            clone.requestCache(true);
-        }
-    
-        JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
-        object.put("index", index);
-    
-        GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
+	    Query searchQuery, //
+	    String index, //
+	    Integer size, //
+	    Optional<SearchAfter> searchAfter, //
+	    Integer start, //
+	    Optional<Queryable> orderingProperty, //
+	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
+	    List<String> fields, //
+	    boolean excludeResourceBinary, //
+	    boolean requestCache) {
+
+	org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
+
+	clone.query(searchQuery).//
+		index(index);
+
+	clone.size(size);
+
+	if (searchAfter.isPresent()) {
+
+	    searchAfter.get().getDoubleValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
+	    searchAfter.get().getLongValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
+	    searchAfter.get().getStringValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
+
+	} else {
+
+	    clone.from(start);
+	}
+
+	if (orderingProperty.isPresent() && sortOrder.isPresent()) {
+
+	    handleSort(clone, orderingProperty.get(), sortOrder.get());
+	}
+
+	handleSourceFields(null, clone, fields, excludeResourceBinary);
+
+	if (requestCache) {
+
+	    clone.requestCache(true);
+	}
+
+	JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
+	object.put("index", index);
+
+	GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
     }
 
     /**
