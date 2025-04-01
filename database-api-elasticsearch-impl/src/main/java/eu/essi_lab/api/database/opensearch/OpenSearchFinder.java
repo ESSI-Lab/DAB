@@ -51,7 +51,6 @@ import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
@@ -249,12 +248,13 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		List<Queryable> queryables = message.getResourceSelector().getIndexesQueryables();
 
-		resources = wrapper.aggregateWithNestedAgg_(//
+		resources = wrapper.aggregateWithNestedAgg(//
 
 			query, //
-			queryables, //
+			queryables.stream().map(q -> q.getName()).collect(Collectors.toList()), //
 			message.getDistinctValuesElement().get(), //
-			message.getPage().getSize()).//
+			message.getPage().getSize(), //
+			false).// binaries included
 
 			stream().//
 			map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
@@ -489,7 +489,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 			query, //
 			Arrays.asList(ResourceProperty.SOURCE_ID.getName(), MetaFolderMapping.DATA_FOLDER), //
 			ResourceProperty.SOURCE_ID, //
-			sourceIds.size());
+			sourceIds.size(), //
+			false); // binaries excluded
 
 		aggregateWithNestedAgg.forEach(agg -> {
 

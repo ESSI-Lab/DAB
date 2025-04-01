@@ -227,7 +227,8 @@ public class OpenSearchWrapper {
 	    Query searchQuery, //
 	    List<String> sourceFields, //
 	    Queryable target, //
-	    int size) throws Exception {
+	    int size, //
+	    boolean excludeBinaries) throws Exception {
 
 	String topHitsAggName = "top_hits_agg";
 	String termsAggName = "terms_agg";
@@ -240,7 +241,8 @@ public class OpenSearchWrapper {
 	handleSourceFields(//
 		topHitsBuilder, //
 		null, //
-		sourceFields);
+		sourceFields, //
+		excludeBinaries); // excluding resource binaries
 
 	Aggregation topHitsAgg = new Aggregation.Builder().// takes the first result
 
@@ -304,26 +306,6 @@ public class OpenSearchWrapper {
 	}
 
 	return out;
-    }
-
-    /**
-     * @param searchQuery
-     * @param target
-     * @param size
-     * @return
-     * @throws Exception
-     */
-    public List<JSONObject> aggregateWithNestedAgg_(//
-	    Query searchQuery, //
-	    List<Queryable> sourceFields, //
-	    Queryable target, //
-	    int size) throws Exception {
-
-	return aggregateWithNestedAgg(//
-		searchQuery, //
-		sourceFields.stream().map(q -> q.getName()).collect(Collectors.toList()), //
-		target, //
-		size);
     }
 
     /**
@@ -765,20 +747,20 @@ public class OpenSearchWrapper {
      * @param aggregation
      */
     private void debugCountRequest(Query searchQuery, String field, Aggregation aggregation) {
-    
-        org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
-    
-        clone.query(searchQuery).//
-        	index(DataFolderMapping.get().getIndex());
-    
-        clone.aggregations(DataFolderMapping.toKeywordField(field), aggregation);
-    
-        clone.size(0);
-    
-        JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
-        object.put("index", DataFolderMapping.get().getIndex());
-    
-        GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
+
+	org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
+
+	clone.query(searchQuery).//
+		index(DataFolderMapping.get().getIndex());
+
+	clone.aggregations(DataFolderMapping.toKeywordField(field), aggregation);
+
+	clone.size(0);
+
+	JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
+	object.put("index", DataFolderMapping.get().getIndex());
+
+	GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
     }
 
     /**
@@ -786,27 +768,27 @@ public class OpenSearchWrapper {
      * @param maxItems
      */
     private void debugCountRequest(Query searchQuery, List<Queryable> targets, int maxItems) {
-    
-        org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
-    
-        targets.forEach(trg -> {
-    
-            clone.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
-    
-        	    DataFolderMapping.toKeywordField(trg.getName())).size(maxItems)));
-        });
-    
-        clone.query(searchQuery).//
-        	index(DataFolderMapping.get().getIndex());
-    
-        clone.size(0);
-    
-        clone.trackTotalHits(new TrackHits.Builder().enabled(true).build());
-    
-        JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
-        object.put("index", DataFolderMapping.get().getIndex());
-    
-        GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
+
+	org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
+
+	targets.forEach(trg -> {
+
+	    clone.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
+
+		    DataFolderMapping.toKeywordField(trg.getName())).size(maxItems)));
+	});
+
+	clone.query(searchQuery).//
+		index(DataFolderMapping.get().getIndex());
+
+	clone.size(0);
+
+	clone.trackTotalHits(new TrackHits.Builder().enabled(true).build());
+
+	JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
+	object.put("index", DataFolderMapping.get().getIndex());
+
+	GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
     }
 
     /**
@@ -967,19 +949,6 @@ public class OpenSearchWrapper {
 			build()));
 	    }
 	}
-    }
-
-    /**
-     * @param topHitsBuilder
-     * @param searchBuilder
-     * @param fields
-     */
-    private void handleSourceFields(//
-	    org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.Builder topHitsBuilder, //
-	    org.opensearch.client.opensearch.core.SearchRequest.Builder searchBuilder, //
-	    List<String> fields) {
-
-	handleSourceFields(topHitsBuilder, searchBuilder, fields, false);
     }
 
     /**

@@ -61,7 +61,6 @@ import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
 import org.opensearch.client.opensearch.core.msearch.MultisearchHeader;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
-import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
@@ -108,7 +107,8 @@ public class OpenSearchQueryBuilder {
 	    OpenSearchWrapper wrapper, //
 	    RankingStrategy ranking, //
 	    HashMap<String, String> dataFolderMap, //
-	    boolean deletedIncluded, boolean weightedQueriesInclued) {
+	    boolean deletedIncluded,//
+	    boolean weightedQueriesInclued) {
 
 	this.wrapper = wrapper;
 	this.ranking = ranking;
