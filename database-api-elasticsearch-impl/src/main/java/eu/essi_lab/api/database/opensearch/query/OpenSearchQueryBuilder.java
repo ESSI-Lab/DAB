@@ -185,7 +185,7 @@ public class OpenSearchQueryBuilder {
 	}
 
 	return buildFilterQuery(buildSourceIdQuery(bond.getPropertyValue()), //
-		
+
 		// the keyword field of dataFolder is not present in the DataFolderMapping
 		// and the term query cannot be done, but it's ok anyway
 		buildMatchPhraseQuery(MetaFolderMapping.DATA_FOLDER, dataFolder));
@@ -549,7 +549,6 @@ public class OpenSearchQueryBuilder {
 	Query indexQuery = buildIndexQuery(DataFolderMapping.get().getIndex());
 
 	return buildFilterQuery(sourceIdQuery, indexQuery);
-
     }
 
     /**
@@ -581,11 +580,11 @@ public class OpenSearchQueryBuilder {
 	sourceIds.forEach(id -> idsQueries.add(buildSourceIdQuery(id)));
 
 	return buildFilterQuery(//
-		
+
 		buildDatabaseIdQuery(databaseId), //
-		
+
 		buildMatchPhraseQuery(IndexData.BINARY_PROPERTY, DataFolderMapping.WRITING_FOLDER_TAG), //
-				
+
 		buildShouldQuery(idsQueries)//
 	);
     }
@@ -1454,7 +1453,7 @@ public class OpenSearchQueryBuilder {
 
 	if (count) {
 
-	    return deletedIncluded ? buildDeletedExcludedQuery() : buildDeletedExcludedQuery();
+	    return deletedIncluded ? buildMatchAllQuery() : buildDeletedExcludedQuery();
 	}
 
 	ArrayList<Query> list = new ArrayList<>();
@@ -1464,7 +1463,6 @@ public class OpenSearchQueryBuilder {
 	list.add(buildMatchAllQuery());
 	list.add(buildGDCWeightQuery());
 	list.add(buildMDQWeightQuery());
-	// list.add(buildEVWeightQuery());
 	list.add(buildAQWeightQuery());
 
 	if (!deletedIncluded) {
@@ -1482,13 +1480,9 @@ public class OpenSearchQueryBuilder {
 
 	Query missingField = createNotQuery(buildExistsFieldQuery(ResourceProperty.IS_DELETED.getName()));
 
-	return new BoolQuery.Builder().//
-		should(missingField, //
-			buildMatchPhraseQuery(ResourceProperty.IS_DELETED.getName(), "false"))
-		.//
-		minimumShouldMatch("1").//
-		build().//
-		toQuery();
+	return buildShouldQuery(//
+		missingField, //
+		buildMatchPhraseQuery(ResourceProperty.IS_DELETED.getName(), "false"));
     }
 
     /**
