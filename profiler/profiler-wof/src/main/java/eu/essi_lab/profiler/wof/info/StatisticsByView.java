@@ -51,7 +51,7 @@ public class StatisticsByView implements StatisticsGenerator {
 	    StatisticsMessage statisticsMessage = new StatisticsMessage();
 
 	    // set the required properties
-	    statisticsMessage.setSources(allSources);
+
 	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	    // statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 	    statisticsMessage.setWebRequest(webRequest);
@@ -60,8 +60,11 @@ public class StatisticsByView implements StatisticsGenerator {
 		    view, //
 		    statisticsMessage.getDataBaseURI(), //
 		    statisticsMessage);
-
-	    // groupBy(statisticsMessage);
+	    if (statisticsMessage.getView().isPresent()) {
+		statisticsMessage.setSources(ConfigurationWrapper.getViewSources(statisticsMessage.getView().get()));
+	    } else {
+		statisticsMessage.setSources(allSources);
+	    }
 
 	    // set the user bond
 	    statisticsMessage.setUserBond(andBond);
