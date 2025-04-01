@@ -51,6 +51,8 @@ import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFinder;
+import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchBondHandler;
@@ -72,6 +74,7 @@ import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -246,7 +249,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		List<Queryable> queryables = message.getResourceSelector().getIndexesQueryables();
 
-		resources = wrapper.aggregateWithNestedAgg(//
+		resources = wrapper.aggregateWithNestedAgg_(//
 
 			query, //
 			queryables, //
@@ -442,12 +445,20 @@ public class OpenSearchFinder implements DatabaseFinder {
     }
 
     /**
+     * Returns couples [source id -> query folder ] only of the sources that are
+     * currently harvested, or more in general, of the sources that have a writing folder (for example a source in its
+     * first harvesting, or a source with interrupted harvesting having both data-1 and and data-2 folder where one of
+     * them is the writing folder and the other is the query folder)
+     * 
      * @param sourceIds
      * @param useCache
      * @return
      * @throws GSException
      */
-    private static HashMap<String, String> getSourcesDataMap(OpenSearchDatabase database, OpenSearchWrapper wrapper, List<String> sourceIds,
+    private static HashMap<String, String> getSourcesDataMap(//
+	    OpenSearchDatabase database, //
+	    OpenSearchWrapper wrapper, //
+	    List<String> sourceIds, //
 	    boolean useCache) throws GSException {
 
 	HashMap<String, String> out = new HashMap<>();
@@ -474,28 +485,23 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    try {
 
-		SearchResponse<Object> response = wrapper.search(//
-			MetaFolderMapping.get().getIndex(), //
+		List<JSONObject> aggregateWithNestedAgg = wrapper.aggregateWithNestedAgg(//
 			query, //
-			Arrays.asList(MetaFolderMapping.SOURCE_ID, MetaFolderMapping.DATA_FOLDER), //
-			0, //
-			sourceIds.size(), //
-			Optional.empty(), //
-			Optional.empty(), //
-			Optional.empty(), //
-			true, // requesting cache
-			true);// excluding binary
+			Arrays.asList(ResourceProperty.SOURCE_ID.getName(), MetaFolderMapping.DATA_FOLDER), //
+			ResourceProperty.SOURCE_ID, //
+			sourceIds.size());
 
-		response.//
-			hits().//
-			hits().//
-			stream().//
-			map(hit -> OpenSearchUtils.toJSONObject(hit.source()))//
-			.forEach(obj -> {
+		aggregateWithNestedAgg.forEach(agg -> {
 
-			    out.put(obj.getString(MetaFolderMapping.SOURCE_ID), //
-				    obj.getString(MetaFolderMapping.DATA_FOLDER));
-			});
+		    String writingFolder = agg.getString(MetaFolderMapping.DATA_FOLDER);
+		    // query folder is opposite of the writing folder
+		    String queryFolder = writingFolder.equals(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
+			    ? SourceStorageWorker.DATA_2_SHORT_POSTFIX //
+			    : SourceStorageWorker.DATA_1_SHORT_POSTFIX;
+
+		    out.put(agg.getString(MetaFolderMapping.SOURCE_ID), queryFolder);
+		});
+
 	    } catch (OpenSearchException osex) {
 
 		throw createGSException(osex, "OpenSearchFinderSourceDataFolderMapError");
@@ -505,18 +511,6 @@ public class OpenSearchFinder implements DatabaseFinder {
 		GSLoggerFactory.getLogger(OpenSearchFinder.class).error(ex);
 		throw GSException.createException(OpenSearchFinder.class, "OpenSearchFinderSourceDataFolderMapError", ex);
 	    }
-
-	    sourceIds.forEach(id -> {
-		//
-		// this is to avoid retrieval of resources belonging to a source that is
-		// referenced in the query, but that is currently executing its first harvesting
-		// or that is not yet been harvested
-		//
-		if (out.get(id) == null) {
-
-		    out.put(id, "not-available");
-		}
-	    });
 	}
 
 	return out;
