@@ -251,7 +251,7 @@ public class DABStarter {
 	    ConfigurationSource source = null;
 
 	    if (DatabaseSourceUrl.check(configURL)) {
-
+		GSLoggerFactory.getLogger(getClass()).info("Found XML database URL");
 		//
 		// -Dconfiguration.url=xdbc://user:password@hostname:8000,8004/dbName/folder/
 		// -Dconfiguration.url=osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig
@@ -262,7 +262,8 @@ public class DABStarter {
 		source = DatabaseSource.of(startupUri);
 
 	    } else if (S3Source.check(configURL)) {
-
+		GSLoggerFactory.getLogger(getClass()).info("Found S3 URL");
+		
 		//
 		// -Dconfiguration.url=s3://awsaccesskey:awssecretkey@bucket/config.json
 		//
@@ -271,11 +272,13 @@ public class DABStarter {
 
 		source = S3Source.of(startupUri);
 
-	    } else {
-
+	    } else {		
+		
 		String configFileName = "gs-configuration";
 
 		if (configURL.startsWith("file:temp")) {
+		    
+		    GSLoggerFactory.getLogger(getClass()).info("Found local temp file");
 
 		    //
 		    // -Dconfiguration.url=file:temp
@@ -288,6 +291,8 @@ public class DABStarter {
 
 		} else if (configURL.startsWith("file://")) {
 
+		    GSLoggerFactory.getLogger(getClass()).info("Found local file");
+		    
 		    //
 		    // -Dconfiguration.url=file://path/preprodenvconf/
 		    // -Dconfiguration.url=file://path/preprodenvconf!demo
@@ -298,6 +303,8 @@ public class DABStarter {
 		    path = path + File.separator + configFileName + ".json";
 
 		    source = new FileSource(new File(path));
+		} else {
+		    GSLoggerFactory.getLogger(DABStarter.class).error("Unrecognized config URL: {}",configURL);
 		}
 	    }
 
