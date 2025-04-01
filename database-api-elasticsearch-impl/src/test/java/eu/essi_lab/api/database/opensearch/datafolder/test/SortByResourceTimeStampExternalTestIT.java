@@ -52,6 +52,7 @@ public class SortByResourceTimeStampExternalTestIT {
 		wrapper, //
 		new RankingStrategy(), //
 		map, //
+		false,
 		false);
 
 	Query sourceIdQuery = builder

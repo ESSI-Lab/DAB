@@ -143,6 +143,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 		wrapper, //
 		new RankingStrategy(), //
 		new HashMap<String, String>(), //
+		false,//
 		false);
 
 	Bond bond = null;

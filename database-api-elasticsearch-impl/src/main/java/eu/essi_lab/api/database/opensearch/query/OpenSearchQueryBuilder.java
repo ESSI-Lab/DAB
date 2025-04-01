@@ -98,6 +98,7 @@ public class OpenSearchQueryBuilder {
     private RankingStrategy ranking;
     private boolean deletedIncluded;
     private OpenSearchWrapper wrapper;
+    private boolean weightedQueriesInclued;
 
     /**
      * @param wrapper
@@ -107,12 +108,13 @@ public class OpenSearchQueryBuilder {
 	    OpenSearchWrapper wrapper, //
 	    RankingStrategy ranking, //
 	    HashMap<String, String> dataFolderMap, //
-	    boolean deletedIncluded) {
+	    boolean deletedIncluded, boolean weightedQueriesInclued) {
 
 	this.wrapper = wrapper;
 	this.ranking = ranking;
 	this.dfMap = dataFolderMap;
 	this.deletedIncluded = deletedIncluded;
+	this.weightedQueriesInclued = weightedQueriesInclued;
 	this.builder = new StringBuilder();
     }
 
@@ -438,9 +440,9 @@ public class OpenSearchQueryBuilder {
 
 	Query searchQuery = OpenSearchUtils.toQuery(new JSONObject(builder.toString()));
 
-	Query basicQuery = buildBasicQuery(count);
+	Optional<Query> basicQuery = buildBasicQuery(count);
 
-	return buildMustQuery(searchQuery, basicQuery);
+	return basicQuery.isPresent() ? buildMustQuery(searchQuery, basicQuery.get()) : searchQuery;
     }
 
     @SuppressWarnings("incomplete-switch")
@@ -1449,11 +1451,11 @@ public class OpenSearchQueryBuilder {
      * This query also allows to filter in/out the deleted records.
      * For a count query, the weight query is omitted in order to resize the overall query
      */
-    private Query buildBasicQuery(boolean count) {
+    private Optional<Query> buildBasicQuery(boolean count) {
 
-	if (count) {
+	if (count || !weightedQueriesInclued) {
 
-	    return deletedIncluded ? buildMatchAllQuery() : buildDeletedExcludedQuery();
+	    return deletedIncluded ? Optional.empty() : Optional.of(buildDeletedExcludedQuery());
 	}
 
 	ArrayList<Query> list = new ArrayList<>();
@@ -1470,7 +1472,7 @@ public class OpenSearchQueryBuilder {
 	    list.add(buildDeletedExcludedQuery());
 	}
 
-	return buildShouldQuery(list);
+	return Optional.of(buildShouldQuery(list));
     }
 
     /**

@@ -58,7 +58,8 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
 	this.queryBuilder = new OpenSearchQueryBuilder(//
 		wrapper, message.getRankingStrategy(), //
 		map, //
-		message.isDeletedIncluded());
+		message.isDeletedIncluded(), //
+		message.isWeightedQueriesIncluded());
     }
 
     @Override
