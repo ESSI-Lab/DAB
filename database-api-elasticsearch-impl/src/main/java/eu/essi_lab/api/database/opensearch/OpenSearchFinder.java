@@ -415,14 +415,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    }
 	}
 
-	PerformanceLogger pl = new PerformanceLogger(//
-		PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_GET_SOURCES_DATA_DIR_MAP, //
-		message.getRequestId(), //
-		Optional.ofNullable(message.getWebRequest()));
-
 	HashMap<String, String> map = getSourcesDataMap(message);
-
-	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getPermittedBond());
 
