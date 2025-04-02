@@ -399,6 +399,7 @@ public class TurtleTask extends AbstractCustomTask {
 	discoveryMessage.setSortOrder(SortOrder.ASCENDING);
 	discoveryMessage.setSortProperty(ResourceProperty.PRIVATE_ID);
 	SearchAfter searchAfter = null;
+	 int i = 0;
 	main: while (true) {
 
 	    // CHECKING CANCELED JOB
@@ -423,13 +424,12 @@ public class TurtleTask extends AbstractCustomTask {
 	    }
 	    List<GSResource> resources = resultSet.getResultsList();
 
-	    int i = 0;
+	   
 	    for (GSResource resource : resources) {
 		i++;
-		if (test && i > 3) {
+		if (test && i > 2000) {
 		    break main;
 		}
-		String turtle = mapper.map(discoveryMessage, resource);
 		String filename = null;
 		if (resource.getOriginalId().isPresent()) {
 		    filename = resource.getOriginalId().get();
@@ -442,6 +442,8 @@ public class TurtleTask extends AbstractCustomTask {
 		}
 		File temp = new File(sourceDir, filename + ".ttl");
 		BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
+		String turtle = mapper.map(discoveryMessage, resource);
+
 		if (turtle != null) {
 		    writer.write(turtle);
 		} else {
