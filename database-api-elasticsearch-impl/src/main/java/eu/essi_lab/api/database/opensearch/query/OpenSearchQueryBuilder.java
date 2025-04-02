@@ -189,7 +189,7 @@ public class OpenSearchQueryBuilder {
 	return buildFilterQuery(buildSourceIdQuery(bond.getPropertyValue()), //
 
 		// the keyword field of dataFolder is not present in the DataFolderMapping
-		// and the term query cannot be done, but it's ok anyway
+		// and the term query cannot be done, but it's OK anyway
 		buildMatchPhraseQuery(MetaFolderMapping.DATA_FOLDER, dataFolder));
 
     }

@@ -53,7 +53,10 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
      * @param message
      * @param map
      */
-    public OpenSearchBondHandler(OpenSearchWrapper wrapper, DiscoveryMessage message, HashMap<String, String> map) {
+    public OpenSearchBondHandler(//
+	    OpenSearchWrapper wrapper, //
+	    DiscoveryMessage message, //
+	    HashMap<String, String> map) {
 
 	this.queryBuilder = new OpenSearchQueryBuilder(//
 		wrapper, message.getRankingStrategy(), //
