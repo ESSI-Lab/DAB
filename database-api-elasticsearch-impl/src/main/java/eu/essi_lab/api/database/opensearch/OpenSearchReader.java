@@ -38,6 +38,7 @@ import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
@@ -194,10 +195,10 @@ public class OpenSearchReader implements DatabaseReader {
 	    break;
 	}
 
-	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
-		database.getIdentifier(), //
-		property.getName(), //
-		identifier);
+	Query query = OpenSearchQueryBuilder.buildFilterQuery(//
+		Arrays.asList(//
+			OpenSearchQueryBuilder.buildDatabaseIdQuery(database.getIdentifier()), //
+			OpenSearchQueryBuilder.buildTermQuery(IndexMapping.toKeywordField(property.getName()), identifier)));
 
 	try {
 	    return wrapper.searchSources(DataFolderMapping.get().getIndex(), query).//
@@ -217,10 +218,15 @@ public class OpenSearchReader implements DatabaseReader {
     @Override
     public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
 
-	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
-		database.getIdentifier(), //
-		Arrays.asList(ResourceProperty.ORIGINAL_ID.getName(), ResourceProperty.SOURCE_ID.getName()), //
-		Arrays.asList(originalIdentifier, source.getUniqueIdentifier()));
+	Query query = OpenSearchQueryBuilder.buildFilterQuery(//
+		Arrays.asList(//
+			OpenSearchQueryBuilder.buildDatabaseIdQuery(database.getIdentifier()), //
+			OpenSearchQueryBuilder.buildTermQuery(IndexMapping.toKeywordField(ResourceProperty.ORIGINAL_ID.getName()),
+				originalIdentifier),
+			OpenSearchQueryBuilder.buildTermQuery(IndexMapping.toKeywordField(ResourceProperty.SOURCE_ID.getName()),
+				source.getUniqueIdentifier())
+
+		));
 
 	try {
 	    return wrapper.searchSources(DataFolderMapping.get().getIndex(), query).//
