@@ -126,7 +126,11 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 	SimpleValueBond variableBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER,
 		uniqueVariableCode);
 
-	String onlineId = WOFQueryUtils.getOnlineId(request.getRequestId(), uniqueSiteCode, uniqueVariableCode);
+	String onlineId = WOFQueryUtils.getOnlineId(//
+		request.getRequestId(), //
+		request.extractViewId(), //
+		uniqueSiteCode, //
+		uniqueVariableCode);
 
 	if (onlineId == null) {
 
@@ -368,7 +372,11 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 		uniqueSiteCode = uniqueSiteCode.substring(uniqueSiteCode.indexOf(":") + 1);
 	    }
 
-	    return WOFQueryUtils.getOnlineId(request.getRequestId(), uniqueSiteCode, uniqueVariableCode);
+	    return WOFQueryUtils.getOnlineId(//
+		    request.getRequestId(), //
+		    request.extractViewId(), //
+		    uniqueSiteCode, //
+		    uniqueVariableCode);
 
 	} catch (Exception e) {
 
