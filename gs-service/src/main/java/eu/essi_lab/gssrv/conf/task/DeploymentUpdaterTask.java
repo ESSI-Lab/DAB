@@ -428,6 +428,6 @@ public class DeploymentUpdaterTask extends AbstractCustomTask {
 	@Override
 	public String getName() {
 
-		return "Updater task";
+		return "Deployment updater task";
 	}
 }
