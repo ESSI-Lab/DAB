@@ -214,29 +214,53 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 	    // isTemperature = true;
 	    // }
 
-	    if(user == null) {
+	    if (user == null) {
 		user = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFUser().orElse(null);
 	    }
-	    if(psw == null) {
+	    if (psw == null) {
 		psw = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFPassword().orElse(null);
 	    }
-	    
-	    String jsonResp = downloader.downloadOptionalString(linkage, user, psw).orElse(null);
-	    if(jsonResp != null && !jsonResp.isEmpty()) {
-		
-		ret = new JSONObject(jsonResp);
-	    	JSONArray data = ret.optJSONArray(interpolation);
-	    	
-	    	Map<String, BigDecimal> result = getDateValue(data);
-	    	
-	    	
-	    	 for (Map.Entry<String,BigDecimal> entry : result.entrySet()) {
 
-		    
+	    String jsonResp = downloader.downloadOptionalString(linkage, user, psw).orElse(null);
+	    if (jsonResp != null && !jsonResp.isEmpty()) {
+		ret = new JSONObject(jsonResp);
+		Boolean isCams = null;
+		isCams = linkage.contains("cams") ? true : false;
+		String nameId = null;
+		JSONArray data = null;
+		String percentiles = null;
+		if (isCams) {
+		    String[] parts = linkage.split("/");
+		    String fileName = parts[parts.length - 1];
+		    String[] splittedCams = fileName.split("cams_eu_");
+		    nameId = splittedCams[1].split("_web")[0];
+		    percentiles = nameId + "-percentiles";
+		    JSONObject percentilesObj = ret.optJSONObject(percentiles);
+		    if (percentilesObj != null && !percentilesObj.isEmpty()) {
+			data = percentilesObj.optJSONArray(interpolation);
+		    }
+		} else {
+		    data = ret.optJSONArray(interpolation);
+		}
+
+		if (data == null) {
+		    throw GSException.createException(//
+
+			    getClass(), //
+			    ex.getMessage(), //
+			    null, //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_ERROR, //
+			    "TRIGGER WAF DOWNLOAD ERROR");
+		}
+
+		Map<String, BigDecimal> result = getDateValue(data, isCams);
+
+		for (Map.Entry<String, BigDecimal> entry : result.entrySet()) {
 
 		    BigDecimal value = entry.getValue();// data.optBigDecimal(1, null);//
-								   // obj.optBigDecimal(varId.toLowerCase(),
-								   // null);// data.optString("value");
+							// obj.optBigDecimal(varId.toLowerCase(),
+							// null);// data.optString("value");
 		    ValueSingleVariable variable = new ValueSingleVariable();
 
 		    if (value != null && value.doubleValue() != -9999.0) {
@@ -245,7 +269,7 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 			// value
 			//
 
-			//value = value.setScale(2, BigDecimal.ROUND_FLOOR);
+			// value = value.setScale(2, BigDecimal.ROUND_FLOOR);
 			// int valueInteger = value.multiply(new BigDecimal(100)).intValue();
 
 			variable.setValue(value);
@@ -271,7 +295,7 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 				//
 
 				addValue(tsrt, variable);
-				
+
 			    }
 			}
 		    }
@@ -305,38 +329,47 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 		"TRIGGER WAF DOWNLOAD ERROR");
     }
 
-    private Map<String, BigDecimal> getDateValue(JSONArray data) {
+    private Map<String, BigDecimal> getDateValue(JSONArray data, Boolean isCams) {
 	Map<String, BigDecimal> result = new LinkedHashMap<>();
-	
 	// Get today's date at 00:00 UTC
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        
-        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+	Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+	calendar.set(Calendar.HOUR_OF_DAY, 0);
+	calendar.set(Calendar.MINUTE, 0);
+	calendar.set(Calendar.SECOND, 0);
+	calendar.set(Calendar.MILLISECOND, 0);
 
-        // First 90 values - Hourly data
-        for (int i = 0; i < 90; i++) {
-            calendar.add(Calendar.HOUR_OF_DAY, 1); // Add 1 hour
-            result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
-        }
+	SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        // Next 18 values - Every 3 hours
-        for (int i = 90; i < 108; i++) {
-            calendar.add(Calendar.HOUR_OF_DAY, 3); // Add 3 hours
-            result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
-        }
+	if (isCams) {
+	    // First 90 values - Hourly data
+	    for (int i = 0; i < 96; i++) {
+		calendar.add(Calendar.HOUR_OF_DAY, 1); // Add 1 hour
+		result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
+	    }
+	} else {
 
-        // Last 16 values - Every 6 hours
-        for (int i = 108; i < 124; i++) {
-            calendar.add(Calendar.HOUR_OF_DAY, 6); // Add 6 hours
-            result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
-        }
+	    // First 90 values - Hourly data
+	    for (int i = 0; i < 90; i++) {
+		calendar.add(Calendar.HOUR_OF_DAY, 1); // Add 1 hour
+		result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
+	    }
 
-        //result.forEach((key, value) -> System.out.println(key + " -> " + value));
+	    // Next 18 values - Every 3 hours
+	    for (int i = 90; i < 108; i++) {
+		calendar.add(Calendar.HOUR_OF_DAY, 3); // Add 3 hours
+		result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
+	    }
+
+	    // Last 16 values - Every 6 hours
+	    for (int i = 108; i < 124; i++) {
+		calendar.add(Calendar.HOUR_OF_DAY, 6); // Add 6 hours
+		result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
+	    }
+
+	}
+
+	// result.forEach((key, value) -> System.out.println(key + " -> " + value));
 	return result;
     }
 
