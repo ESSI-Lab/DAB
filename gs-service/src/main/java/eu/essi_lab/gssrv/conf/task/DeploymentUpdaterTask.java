@@ -75,8 +75,8 @@ public class DeploymentUpdaterTask extends AbstractCustomTask {
 
 	// One usages is expected, with the aim of updating record source deployment
 	//
-	// source: s1,s2,s3
-	// deployment: whos,whos-test
+	// source: s1;s2;s3
+	// deployment: whos;whos-test
 
 	public enum DeploymentUpdaterTaskKey {
 		SOURCE_KEY("source:"), //
@@ -165,7 +165,7 @@ public class DeploymentUpdaterTask extends AbstractCustomTask {
 		OpenSearchDatabase database = new OpenSearchDatabase();
 
 		database.initialize(ConfigurationWrapper.getStorageInfo());
-		setDeploymentsToSources(database, source.trim().split(","), deployment.trim().split(","));
+		setDeploymentsToSources(database, source.trim().split(";"), deployment.trim().split(";"));
 	}
 
 	public static void setDeploymentsToSources(OpenSearchDatabase db, String[] sources, String[] deployments)
