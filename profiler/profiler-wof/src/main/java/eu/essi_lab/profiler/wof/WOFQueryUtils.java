@@ -40,10 +40,12 @@ import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class WOFQueryUtils {
@@ -55,7 +57,19 @@ public class WOFQueryUtils {
 	onlineCache.setMaxSize(100);
     }
 
-    public static String getOnlineId(String requestId, String siteCode, String variableCode) throws GSException {
+    /**
+     * @param requestId
+     * @param optional
+     * @param siteCode
+     * @param variableCode
+     * @return
+     * @throws GSException
+     */
+    public static String getOnlineId(//
+	    String requestId, //
+	    Optional<String> viewId, //
+	    String siteCode, //
+	    String variableCode) throws GSException {
 
 	if (requestId != null) {
 	    synchronized (onlineCache) {
@@ -77,9 +91,21 @@ public class WOFQueryUtils {
 	discoveryMessage.getResourceSelector().setIncludeOriginal(false);
 	discoveryMessage.setPage(new Page(1, 1));
 
-	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+	Optional<View> view = viewId.map(id -> {
+	    try {
+		return DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), id).get();
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(WOFQueryUtils.class).error(e);
+		return null;
+	    }
+	});
+
+	discoveryMessage.setSources(view.isPresent() //
+		? ConfigurationWrapper.getViewSources(view.get()) //
+		: ConfigurationWrapper.getHarvestedSources());
+
 	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-	
 
 	SimpleValueBond bond1 = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //

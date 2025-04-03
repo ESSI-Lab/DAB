@@ -467,7 +467,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    }
 
-	} else {
+	} else if (!sourceIds.isEmpty()) {
 
 	    Query query = OpenSearchQueryBuilder.buildDataFolderQuery(database.getIdentifier(), sourceIds);
 
@@ -517,6 +517,12 @@ public class OpenSearchFinder implements DatabaseFinder {
      * @throws GSException
      */
     private HashMap<String, String> getSourcesDataMap(RequestMessage message) throws GSException {
+
+	if (message.getSources().isEmpty()) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Missing sources in message {}", message.getRequestId());
+	    return new HashMap<String, String>();
+	}
 
 	return getSourcesDataMap(//
 		database, //
