@@ -3,6 +3,14 @@
  */
 package eu.essi_lab.messages;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -29,8 +37,12 @@ import java.util.Optional;
 /**
  * @author Fabrizio
  */
-public class SearchAfter {
+public class SearchAfter implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6533469371427721506L;
     private String stringValue;
     private Long longValue;
     private Double doubleValue;
@@ -135,5 +147,37 @@ public class SearchAfter {
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * @param searchAfter
+     * @return
+     * @throws Exception
+     */
+    public static InputStream serialize(SearchAfter searchAfter) throws Exception {
+
+	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	
+	ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+	objectOutputStream.writeObject(searchAfter);
+	objectOutputStream.flush();
+	objectOutputStream.close();
+
+	return new ByteArrayInputStream(outputStream.toByteArray());
+    }
+
+    /**
+     * @param stream
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public static SearchAfter deserialize(InputStream stream) throws Exception {
+
+	ObjectInputStream objectInputStream = new ObjectInputStream(stream);
+	SearchAfter out = (SearchAfter) objectInputStream.readObject();
+	objectInputStream.close();
+
+	return out;
     }
 }
