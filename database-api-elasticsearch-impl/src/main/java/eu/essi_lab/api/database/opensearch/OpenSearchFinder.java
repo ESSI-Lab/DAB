@@ -419,7 +419,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getPermittedBond());
 
-	OpenSearchBondHandler handler = new OpenSearchBondHandler(wrapper, message, map);
+	OpenSearchBondHandler handler = new OpenSearchBondHandler(wrapper, message, map, count);
 
 	bondParser.parse(handler);
 

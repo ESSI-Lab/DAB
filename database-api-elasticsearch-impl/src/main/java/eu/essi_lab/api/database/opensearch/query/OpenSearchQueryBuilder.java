@@ -107,7 +107,7 @@ public class OpenSearchQueryBuilder {
 	    OpenSearchWrapper wrapper, //
 	    RankingStrategy ranking, //
 	    HashMap<String, String> dataFolderMap, //
-	    boolean deletedIncluded,//
+	    boolean deletedIncluded, //
 	    boolean weightedQueriesInclued) {
 
 	this.wrapper = wrapper;
@@ -445,8 +445,13 @@ public class OpenSearchQueryBuilder {
 	return basicQuery.isPresent() ? buildMustQuery(searchQuery, basicQuery.get()) : searchQuery;
     }
 
+    /**
+     * @param bond
+     * @param count
+     * @return
+     */
     @SuppressWarnings("incomplete-switch")
-    public Query buildGeoShapeQuery(SpatialBond bond) {
+    public Query buildGeoShapeQuery(SpatialBond bond, boolean count) {
 
 	JSONObject shape = buildEnvelope(bond);
 
@@ -517,7 +522,7 @@ public class OpenSearchQueryBuilder {
 		build().//
 		toQuery();
 
-	return weightedQuery == null ? geoShapeQuery : buildMustQuery(weightedQuery, geoShapeQuery);
+	return weightedQuery == null || count ? geoShapeQuery : buildMustQuery(weightedQuery, geoShapeQuery);
     }
 
     /**
@@ -924,23 +929,23 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildBoolQuery(List<Query> filter, List<Query> should, List<Query> must) {
-    
-        org.opensearch.client.opensearch._types.query_dsl.BoolQuery.Builder builder = new BoolQuery.Builder();
-    
-        if (!filter.isEmpty()) {
-            builder.filter(filter);
-        }
-    
-        if (!should.isEmpty()) {
-            builder.should(should);
-            builder.minimumShouldMatch("1");
-        }
-    
-        if (!must.isEmpty()) {
-            builder.must(must);
-        }
-    
-        return builder.build().toQuery();
+
+	org.opensearch.client.opensearch._types.query_dsl.BoolQuery.Builder builder = new BoolQuery.Builder();
+
+	if (!filter.isEmpty()) {
+	    builder.filter(filter);
+	}
+
+	if (!should.isEmpty()) {
+	    builder.should(should);
+	    builder.minimumShouldMatch("1");
+	}
+
+	if (!must.isEmpty()) {
+	    builder.must(must);
+	}
+
+	return builder.build().toQuery();
     }
 
     /**
@@ -948,11 +953,11 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildFilterQuery(List<Query> operands) {
-    
-        return new BoolQuery.Builder().//
-        	filter(operands).//
-        	build().//
-        	toQuery();
+
+	return new BoolQuery.Builder().//
+		filter(operands).//
+		build().//
+		toQuery();
     }
 
     /**
@@ -960,8 +965,8 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildFilterQuery(Query... operands) {
-    
-        return buildFilterQuery(Arrays.asList(operands));
+
+	return buildFilterQuery(Arrays.asList(operands));
     }
 
     /**
@@ -969,11 +974,11 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildMustQuery(List<Query> operands) {
-    
-        return new BoolQuery.Builder().//
-        	must(operands).//
-        	build().//
-        	toQuery();
+
+	return new BoolQuery.Builder().//
+		must(operands).//
+		build().//
+		toQuery();
     }
 
     /**
@@ -981,12 +986,12 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildShouldQuery(List<Query> operands, int minimumShouldMatch) {
-    
-        return new BoolQuery.Builder().//
-        	should(operands).//
-        	minimumShouldMatch(String.valueOf(minimumShouldMatch)).//
-        	build().//
-        	toQuery();
+
+	return new BoolQuery.Builder().//
+		should(operands).//
+		minimumShouldMatch(String.valueOf(minimumShouldMatch)).//
+		build().//
+		toQuery();
     }
 
     /**
@@ -994,8 +999,8 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildShouldQuery(List<Query> operands) {
-    
-        return buildShouldQuery(operands, 1);
+
+	return buildShouldQuery(operands, 1);
     }
 
     /**
@@ -1003,8 +1008,8 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildShouldQuery(int minimumShouldMatch, Query... operands) {
-    
-        return buildShouldQuery(Arrays.asList(operands), minimumShouldMatch);
+
+	return buildShouldQuery(Arrays.asList(operands), minimumShouldMatch);
     }
 
     /**
@@ -1012,8 +1017,8 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildShouldQuery(Query... operands) {
-    
-        return buildShouldQuery(Arrays.asList(operands), 1);
+
+	return buildShouldQuery(Arrays.asList(operands), 1);
     }
 
     /**
@@ -1021,16 +1026,16 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildMustQuery(Query... operands) {
-    
-        return buildMustQuery(Arrays.asList(operands));
+
+	return buildMustQuery(Arrays.asList(operands));
     }
 
     /**
      * @param databaseId
      */
     public static Query buildDatabaseIdQuery(String databaseId) {
-    
-        return buildMatchPhraseQuery(IndexData.DATABASE_ID, databaseId);
+
+	return buildMatchPhraseQuery(IndexData.DATABASE_ID, databaseId);
     }
 
     /**
@@ -1039,8 +1044,8 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildTermQuery(String field, String value) {
-    
-        return buildTermQuery(field, value, 0);
+
+	return buildTermQuery(field, value, 0);
     }
 
     /**
@@ -1049,20 +1054,20 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildTermQuery(String field, String value, double boost) {
-    
-        org.opensearch.client.opensearch._types.query_dsl.TermQuery.Builder builder = new TermQuery.Builder();
-    
-        if (boost > 1) {
-    
-            builder = builder.boost((float) boost);
-        }
-    
-        return builder.//
-        	field(field).//
-        	value(new FieldValue.Builder().stringValue(value).build()).//
-        	build().//
-        	toQuery();
-    
+
+	org.opensearch.client.opensearch._types.query_dsl.TermQuery.Builder builder = new TermQuery.Builder();
+
+	if (boost > 1) {
+
+	    builder = builder.boost((float) boost);
+	}
+
+	return builder.//
+		field(field).//
+		value(new FieldValue.Builder().stringValue(value).build()).//
+		build().//
+		toQuery();
+
     }
 
     /**
