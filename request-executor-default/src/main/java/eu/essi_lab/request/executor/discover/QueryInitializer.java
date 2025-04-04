@@ -116,6 +116,9 @@ public class QueryInitializer implements IQueryInitializer {
 	if (requestAuthorizationConverter != null) {
 	    // permission given to a subset of sources, depending on the user
 	    authorizedBond = requestAuthorizationConverter.generateAuthorizedBond(message);
+	} else {
+	    // permission given to all sources
+	    authorizedBond = generateDefaultAuthorizedBond(message);
 	}
 
 	authorizedBond = simplifyAuthorizedBond(message.getUserBond().orElse(null), authorizedBond);
