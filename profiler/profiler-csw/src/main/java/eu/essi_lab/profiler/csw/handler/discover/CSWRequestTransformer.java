@@ -108,11 +108,6 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	Page page = refinedMessage.getPage();
 
-	if (page.getSize() > MAX_SUPPORTED_PAGE_SIZE) {
-
-	    refinedMessage.setIteratedWorkflow(IterationMode.PARTIAL_RESPONSE);
-	}
-
 	if (CSWSearchAfterManager.isEnabled(setting)) {
 
 	    refinedMessage.setSortOrder(SortOrder.ASCENDING);
@@ -124,6 +119,9 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 		refinedMessage.setSearchAfter(searchAfter.get());
 	    }
+	} else if (page.getSize() > MAX_SUPPORTED_PAGE_SIZE) {
+
+	    refinedMessage.setIteratedWorkflow(IterationMode.PARTIAL_RESPONSE);
 	}
 
 	return refinedMessage;
