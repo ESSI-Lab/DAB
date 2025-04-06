@@ -106,6 +106,10 @@ public class NetCDFConnector extends HarvestedQueryConnector<NetCDFConnectorSett
 			map(node -> {
 			    String filename = node.getNodeValue();
 
+			    if(!filename.toLowerCase().endsWith(".nc")) {
+				return null;
+			    }
+			    
 			    OriginalMetadata originalMetadata = null;
 			    NetcdfDataset ncDataset = null;
 
@@ -193,11 +197,10 @@ public class NetCDFConnector extends HarvestedQueryConnector<NetCDFConnectorSett
 
 				CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
-				String observedParameter = mainVariable.findAttribute("long_name").getStringValue();
+				String observedParameter = mainVariable.findAttribute("description").getStringValue();
 				String observedParameterUnits = mainVariable.findAttribute("units").getStringValue();
-				String locationName = filename.contains("amsterdam") ? "Amsterdam" : "Genova";
-				    coreMetadata.setTitle("ERA5 " + observedParameter + " - " + locationName);
-				    coreMetadata.setAbstract("ERA5 " + observedParameter + " - " + locationName);
+				    coreMetadata.setTitle("Average monthly temperature (" + observedParameter + ") - Europe ");
+				    coreMetadata.setAbstract("Average monthly temperature (" + observedParameter + ") - Europe ");
 				CoverageDescription coverageDescription = new CoverageDescription();
 				coverageDescription.setAttributeIdentifier(mainVariable.getShortName());
 				coverageDescription.setAttributeTitle(observedParameter);
