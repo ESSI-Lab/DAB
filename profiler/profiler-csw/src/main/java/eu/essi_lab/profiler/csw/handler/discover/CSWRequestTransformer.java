@@ -108,7 +108,7 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	Page page = refinedMessage.getPage();
 
-	if (CSWSearchAfterManager.isEnabled(setting)) {
+	if (CSWSearchAfterManager.isEnabled(setting, message.getWebRequest())) {
 
 	    refinedMessage.setSortOrder(SortOrder.ASCENDING);
 	    refinedMessage.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
