@@ -145,7 +145,7 @@ public class NetCDFDownloader extends DataDownloader {
 
 	    descriptor.setCRS(crs);
 
-	    descriptor.setDataFormat(DataFormat.NETCDF());
+	    descriptor.setDataFormat(DataFormat.NETCDF_4());
 
 	    List<DataDimension> spatialDimensions = crs.getDefaultDimensions();
 

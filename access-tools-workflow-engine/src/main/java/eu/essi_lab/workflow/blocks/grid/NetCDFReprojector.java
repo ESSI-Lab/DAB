@@ -38,7 +38,7 @@ import eu.essi_lab.workflow.processor.SubsettingCapability;
 public class NetCDFReprojector extends WorkblockBuilder {
 
     private DataType type = DataType.GRID;
-    private DataFormat format = DataFormat.NETCDF_3();
+    private DataFormat format = DataFormat.NETCDF();
 
     public NetCDFReprojector() {
 
