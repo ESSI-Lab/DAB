@@ -71,7 +71,6 @@ public class SettingResetTest {
 	Assert.assertEquals("user", storageUri.getUser());
 
 	Assert.assertEquals("password", storageUri.getPassword());
-
     }
 
     /**
@@ -81,7 +80,7 @@ public class SettingResetTest {
 
 	Assert.assertFalse(databaseSetting.isVolatile());
 
-	Assert.assertNotNull(databaseSetting.asStorageInfo());
+	Assert.assertThrows(IllegalArgumentException.class, () -> databaseSetting.asStorageInfo());
 
 	String configurationFolder = databaseSetting.getConfigurationFolder();
 	Assert.assertNull(configurationFolder);
@@ -98,17 +97,6 @@ public class SettingResetTest {
 	String databasePassword = databaseSetting.getDatabasePassword();
 	Assert.assertNull(databasePassword);
 
-	StorageInfo storageUri = databaseSetting.asStorageInfo();
-
-	Assert.assertNull(storageUri.getIdentifier());
-
-	Assert.assertNull(storageUri.getName());
-
-	Assert.assertNull(storageUri.getUri());
-
-	Assert.assertNull(storageUri.getUser());
-
-	Assert.assertNull(storageUri.getPassword());
-
+	Assert.assertThrows(IllegalArgumentException.class, () -> databaseSetting.asStorageInfo());
     }
 }
