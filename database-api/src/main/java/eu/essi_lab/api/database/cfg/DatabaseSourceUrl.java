@@ -132,14 +132,7 @@ public class DatabaseSourceUrl {
 
 	    OpenSearchServiceType serviceType = OpenSearchServiceType.decode(uri.getScheme());
 
-	    String myURI = null;
-	    if (serviceType == OpenSearchServiceType.OPEN_SEARCH_LOCAL) {
-		myURI = "http://" + host + port;
-	    } else {
-		myURI = "https://" + host;
-	    }
-	    
-	    info = new StorageInfo(myURI);
+	    info = new StorageInfo();
 	    info.setType(serviceType.getProtocol());
 
 	    info.setIdentifier(env);
@@ -147,6 +140,12 @@ public class DatabaseSourceUrl {
 
 	    info.setUser(accessKey);
 	    info.setPassword(secretKey);
+
+	    if (serviceType == OpenSearchServiceType.OPEN_SEARCH_LOCAL) {
+		info.setUri("http://" + host + port);
+	    } else {
+		info.setUri("https://" + host);
+	    }
 	}
 
 	return info;

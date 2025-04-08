@@ -216,10 +216,11 @@ public class StorageInfo implements Serializable {
 	@Override
 	public StorageInfo clone() {
 
-		StorageInfo clone = new StorageInfo(this.getUri());
+		StorageInfo clone = new StorageInfo();
 		clone.setIdentifier(this.getIdentifier());
 		clone.setPassword(this.getPassword());
 		clone.setName(this.getName());
+		clone.setUri(this.getUri());
 		clone.setUser(this.getUser());
 		clone.setType(this.getType().orElse(null));
 
