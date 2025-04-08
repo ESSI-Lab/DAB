@@ -109,7 +109,7 @@ public class CSWSearchAfterManager {
     public static boolean isEnabled(CSWProfilerSetting setting, WebRequest webRequest) throws GSException {
 
 	boolean fromGET = CSWRequestUtils.isGetRecordsFromGET(webRequest);
-	boolean fromPOST = CSWRequestUtils.isGetRecordByIdFromPOST(webRequest);
+	boolean fromPOST = CSWRequestUtils.isGetRecordsFromPOST(webRequest);
 
 	return (fromGET || fromPOST) && setting.getKeyValueOptions().//
 		map(opt -> opt.getOrDefault(USE_SEARCH_AFTER_OPTION, "false").equals("true")).//
