@@ -233,7 +233,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	    }
 
 	    List<URL> filteredURLs = filterURLsByToday(allFiles, 0);
-	    if (filteredURLs == null || filteredURLs.isEmpty()) {
+	    if (filteredURLs == null || filteredURLs.isEmpty() || filteredURLs.size() < 97) {
 		filteredURLs = filterURLsByToday(allFiles, -1);
 
 	    }
