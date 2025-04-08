@@ -22,7 +22,10 @@ package eu.essi_lab.accessor.waf.netcdf;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +33,8 @@ import java.util.Optional;
 import org.geotools.imageio.netcdf.GeoToolsNetCDFReader;
 import org.geotools.imageio.netcdf.utilities.NetCDFCRSUtilities;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.amazonaws.util.IOUtils;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.lib.net.downloader.Downloader;
@@ -180,7 +185,13 @@ public class NetCDFDownloader extends DataDownloader {
 	File file;
 	try {
 	    file = NetCDFConnector.getLocalCopy(online.getLinkage(), online.getName());
-	    return file;
+	    FileInputStream fis = new FileInputStream(file);
+	    File out = Files.createTempFile(getClass().getName(), ".nc").toFile();
+	    FileOutputStream fos = new FileOutputStream(out);
+	    IOUtils.copy(fis, fos);
+	    fis.close();
+	    fos.close();
+	    return out;
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
