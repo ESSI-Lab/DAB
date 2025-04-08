@@ -256,7 +256,7 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 		addResults(resultsList, errorElements, searchResultsType);
 	    }
 
-	    if (CSWSearchAfterManager.isEnabled(setting)) {
+	    if (CSWSearchAfterManager.isEnabled(setting, webRequest)) {
 
 		Optional<SearchAfter> searchAfter = mappedResultSet.getSearchAfter();
 
