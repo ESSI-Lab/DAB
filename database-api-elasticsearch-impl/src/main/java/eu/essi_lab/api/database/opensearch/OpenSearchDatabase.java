@@ -76,12 +76,17 @@ import software.amazon.awssdk.regions.Region;
  */
 public class OpenSearchDatabase extends Database {
 
-    //
-    // set the Jackson StreamReadConstraints maxStringLength to 50 MB instead of the
-    // default 20 MB
-    //
+    static boolean debugQueries = false;
+
     static {
 
+	String property = System.getProperty("debugOpenSearchQueries");
+	debugQueries = property != null && property.equals("true");
+
+	//
+	// set the Jackson StreamReadConstraints maxStringLength to 50 MB instead of the
+	// default 20 MB
+	//
 	StreamReadConstraints.overrideDefaultStreamReadConstraints(StreamReadConstraints.builder().maxStringLength(50000000).build());
     }
 

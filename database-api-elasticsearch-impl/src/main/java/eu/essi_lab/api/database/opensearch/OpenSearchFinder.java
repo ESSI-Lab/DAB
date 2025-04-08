@@ -80,14 +80,6 @@ import eu.essi_lab.model.resource.ResourceProperty;
  */
 public class OpenSearchFinder implements DatabaseFinder {
 
-    static boolean debugQueries = false;
-
-    static {
-
-	String property = System.getProperty("debugOpenSearchQueries");
-	debugQueries = property != null && property.equals("true");
-    }
-
     private OpenSearchDatabase database;
     private OpenSearchWrapper wrapper;
 
@@ -471,9 +463,9 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    Query query = OpenSearchQueryBuilder.buildDataFolderQuery(database.getIdentifier(), sourceIds);
 
-	    if (debugQueries) {
+	    if (OpenSearchDatabase.debugQueries) {
 
-		GSLoggerFactory.getLogger(OpenSearchFinder.class).debug("--- GET SOURCES DATA MAP ---");
+		GSLoggerFactory.getLogger(OpenSearchFinder.class).debug("\n--- GET SOURCES DATA MAP ---");
 	    }
 
 	    try {
@@ -561,9 +553,9 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    if (debugQueries) {
+	    if (OpenSearchDatabase.debugQueries) {
 
-		GSLoggerFactory.getLogger(getClass()).debug(count ? "--- COUNT ---" : "--- DISCOVER ---");
+		GSLoggerFactory.getLogger(getClass()).debug(count ? "\n--- COUNT ---" : "\n--- DISCOVER ---");
 	    }
 
 	    SearchResponse<Object> response = null;
