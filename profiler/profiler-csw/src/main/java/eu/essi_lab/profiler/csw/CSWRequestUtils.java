@@ -60,7 +60,7 @@ public class CSWRequestUtils {
      * @return
      * @throws Exception
      */
-    public static boolean isGetRecordsFromPOST(WebRequest webRequest) throws Exception {
+    public static boolean isGetRecordsFromPOST(WebRequest webRequest) throws GSException {
 
 	return getGetRecordFromPOST(webRequest) != null;
     }
@@ -114,18 +114,25 @@ public class CSWRequestUtils {
      * @return
      * @throws Exception
      */
-    public static GetRecords getGetRecordFromPOST(WebRequest webRequest) throws Exception {
+    public static GetRecords getGetRecordFromPOST(WebRequest webRequest) throws GSException {
 
-	if (webRequest.isPostRequest()) {
+	try {
 
-	    XMLDocumentReader reader = new XMLDocumentReader(webRequest.getBodyStream().clone());
-	    reader.setNamespaceContext(new CommonNameSpaceContext());
+	    if (webRequest.isPostRequest()) {
 
-	    if (reader.evaluateBoolean("exists(//csw:GetRecords)")) {
+		XMLDocumentReader reader = new XMLDocumentReader(webRequest.getBodyStream().clone());
+		reader.setNamespaceContext(new CommonNameSpaceContext());
 
-		GetRecords getRecords = CommonContext.unmarshal(webRequest.getBodyStream().clone(), GetRecords.class);
-		return getRecords;
+		if (reader.evaluateBoolean("exists(//csw:GetRecords)")) {
+
+		    GetRecords getRecords = CommonContext.unmarshal(webRequest.getBodyStream().clone(), GetRecords.class);
+		    return getRecords;
+		}
 	    }
+	} catch (Exception ex) {
+
+	    throw GSException.createException(CSWRequestUtils.class, "CSWRequestUtilsIsGetRecordByIdFromPOSTError", ex);
+
 	}
 
 	return null;

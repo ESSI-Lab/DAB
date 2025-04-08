@@ -148,6 +148,12 @@ public class SearchAfter implements Serializable {
 
 	return Optional.empty();
     }
+    
+    @Override
+    public String toString() {
+	
+	return toStringValue().orElse("empty");
+    }
 
     /**
      * @param searchAfter
