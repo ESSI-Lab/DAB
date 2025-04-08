@@ -1,4 +1,4 @@
-package eu.essi_lab.gssrv.conf.task.opensearch;
+package eu.essi_lab.gssrv.conf.task.views;
 
 /*-
  * #%L
@@ -21,40 +21,39 @@ package eu.essi_lab.gssrv.conf.task.opensearch;
  * #L%
  */
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Optional;
 
 import org.quartz.JobExecutionContext;
 
-import eu.essi_lab.api.database.Database.OpenSearchServiceType;
-import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
+import com.amazonaws.util.IOUtils;
+
+import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.bond.jaxb.ViewFactory;
 
 /**
- * This task creates metadata db indexes
+ * This task can create views
  * 
  * @author boldrini
  */
-public class OpenSearchMetadataDBInitTask extends AbstractCustomTask {
+public class ViewManagerTask extends AbstractCustomTask {
 
-    // Usage expected
-    // url: https://my-host/opensearch");
-    // database: db-name
-    // user: admin
-    // password: my-pass
-    // identifier: config-id
-    // type: osl
+    // Usages expected
+    //
+    // task: create
+    // class: fully.qualified.class.Name
     public enum TaskParameterKey {
-	URL("url:"), //
-	DATABASE("database:"), //
-	USER("user:"), //
-	PASSWORD("password:"), //
-	IDENTIFIER("identifier:"), //
-	TYPE("type:"), //
+	TASK("task:"), //
+	CLASS("class:"), //
 	;
 
 	private String id;
@@ -89,8 +88,8 @@ public class OpenSearchMetadataDBInitTask extends AbstractCustomTask {
 
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
-	GSLoggerFactory.getLogger(getClass()).info("DB Init task STARTED");
-	log(status, "DB Init task STARTED");
+	GSLoggerFactory.getLogger(getClass()).info("View manager task STARTED");
+	log(status, "View Manager task STARTED");
 
 	// SETTINGS RETRIEVAL
 	CustomTaskSetting taskSettings = retrieveSetting(context);
@@ -105,66 +104,45 @@ public class OpenSearchMetadataDBInitTask extends AbstractCustomTask {
 	    }
 	}
 	if (settings == null) {
-	    GSLoggerFactory.getLogger(getClass()).error("missing settings for db init task");
+	    GSLoggerFactory.getLogger(getClass()).error("missing settings for view manager task");
 	    return;
 	}
 	String[] lines = settings.split("\n");
-	String url = null;
-	String database = null;
-	String user = null;
-	String password = null;
-	String identifier = null;
-	String type = null;
+	String task = null;
+	String className = null;
+
 	for (String line : lines) {
 	    SimpleEntry<TaskParameterKey, String> decoded = TaskParameterKey.decodeLine(line);
 	    if (decoded == null) {
 		GSLoggerFactory.getLogger(getClass())
-			.error("unexpected settings for db init task. Expected: " + TaskParameterKey.getExpectedKeys());
+			.error("unexpected settings for mysql init task. Expected: " + TaskParameterKey.getExpectedKeys());
 		return;
 	    }
 	    switch (decoded.getKey()) {
-	    case URL:
-		url = decoded.getValue();
+	    case TASK:
+		task = decoded.getValue();
 		break;
-	    case DATABASE:
-		database = decoded.getValue();
-		break;
-	    case USER:
-		user = decoded.getValue();
-		break;
-	    case PASSWORD:
-		password = decoded.getValue();
-		break;
-	    case IDENTIFIER:
-		identifier = decoded.getValue();
-		break;
-	    case TYPE:
-		type = decoded.getValue();
+	    case CLASS:
+		className = decoded.getValue();
 		break;
 	    default:
 		break;
 	    }
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Connecting to {} with user {}", url, user);
+	Class<View> clazz = (Class<View>) Class.forName(className);
+        View view = clazz.getDeclaredConstructor().newInstance();
 
-	StorageInfo osStorageInfo = new StorageInfo(url);
-	osStorageInfo.setName(database);
-	osStorageInfo.setUser(user);
-	osStorageInfo.setPassword(password);
-	osStorageInfo.setIdentifier(identifier);
-	osStorageInfo.setType(OpenSearchServiceType.decode(type).getProtocol());
-	System.setProperty("initIndexes", "true");
-	OpenSearchDatabase db = new OpenSearchDatabase();
-	db.initialize(osStorageInfo);
+	DatabaseWriter writer = DatabaseProviderFactory.getWriter(ConfigurationWrapper.getStorageInfo());
+	writer.store(view);
 
-	GSLoggerFactory.getLogger(getClass()).info("DB init task ENDED");
-	log(status, "DB init task ENDED");
+	GSLoggerFactory.getLogger(getClass()).info("View manager task ENDED");
+	log(status, "View manager task ENDED");
     }
 
     @Override
     public String getName() {
 
-	return "OpenSearch Metadata DB init task";
+	return "View manager task";
     }
 }
