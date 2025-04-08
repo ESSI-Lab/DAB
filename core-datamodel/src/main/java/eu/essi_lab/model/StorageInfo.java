@@ -47,6 +47,10 @@ public class StorageInfo implements Serializable {
 	private String type;
 	private String path;
 
+	public void setPath(String path) {
+		this.path = path;
+	}
+
 	public StorageInfo() {
 	}
 
@@ -223,7 +227,9 @@ public class StorageInfo implements Serializable {
 		clone.setUri(this.getUri());
 		clone.setUser(this.getUser());
 		clone.setType(this.getType().orElse(null));
-
+		if (this.getPath().isPresent()) {
+			clone.setPath(this.getPath().get());
+		}
 		return clone;
 	}
 

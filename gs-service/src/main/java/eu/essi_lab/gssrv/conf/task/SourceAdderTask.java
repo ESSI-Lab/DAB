@@ -85,7 +85,6 @@ public class SourceAdderTask extends AbstractCustomTask {
 	 * 2
 	 * no
 	 * whos,whos-cuahsi
-	 * 
 	 * Example for ISPRA HIS-CENTRAL:
 	 * ISPRA_HIS_CENTRAL
 	 * null
@@ -210,21 +209,14 @@ public class SourceAdderTask extends AbstractCustomTask {
 
 	    HarvestingSetting source = sources.get(i);
 
-	    String sourceId = source.getSelectedAccessorSetting().getSource().getUniqueIdentifier();
-
-	    SelectionUtils.deepClean(source);
-	    Optional<HarvestingSetting> existingSource = ConfigurationWrapper.//
-		    getHarvestingSettings().//
-		    stream().//
-		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).findFirst();
-	    if (existingSource.isEmpty()) {
-		configuration.put(source);
-	    }
 	    if (schedule.equals("yes")) {
-		Scheduling scheduling = source.getScheduling();		
+
+		Scheduling scheduling = source.getScheduling();
 		scheduling.setEnabled(true);
 		scheduling.setRunIndefinitely();
 		scheduling.setRepeatInterval(1000, TimeUnit.DAYS);
+
+		SelectionUtils.deepClean(source);
 
 		ZonedDateTime now = ZonedDateTime.now();
 
@@ -254,8 +246,20 @@ public class SourceAdderTask extends AbstractCustomTask {
 		scheduling.setStartTime(formattedDate);
 
 		scheduler.schedule(source);
-
 	    }
+
+	    String sourceId = source.getSelectedAccessorSetting().getSource().getUniqueIdentifier();
+
+	    Optional<HarvestingSetting> existingSource = ConfigurationWrapper.//
+		    getHarvestingSettings().//
+		    stream().//
+		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).findFirst();
+
+	    if (existingSource.isEmpty()) {
+
+		configuration.put(source);
+	    }
+
 	    GSLoggerFactory.getLogger(getClass()).info("Added source: {}", source.getName());
 
 	}

@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
@@ -47,73 +46,74 @@ import eu.essi_lab.rip.RuntimeInfoProvider;
  */
 public class ResponseInfoProvider implements RuntimeInfoProvider {
 
-	@Override
-	public String getBaseType() {
+    @Override
+    public String getBaseType() {
 
-		return "Response";
+	return "Response";
+    }
+
+    private Response response;
+
+    /**
+     * @param response
+     */
+    public ResponseInfoProvider(Response response) {
+
+	this.response = response;
+    }
+
+    private List<String> toListOfStrings(String headerName, List<Object> values) {
+	if (values == null) {
+	    return null;
+	} else {
+	    List<String> stringValues = new ArrayList<String>(values.size());
+	    HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.get(0));
+	    for (Object value : values) {
+		String actualValue = hd == null ? value.toString() : hd.toString(value);
+		stringValues.add(actualValue);
+	    }
+	    return stringValues;
+	}
+    }
+
+    @Override
+    public HashMap<String, List<String>> provideInfo() {
+
+	HashMap<String, List<String>> out = new HashMap<>();
+
+	MultivaluedMap<String, Object> metadata = new MetadataMap<>(response.getMetadata());
+	MetadataMap<String, String> headers = new MetadataMap<>(metadata.size());
+	for (Map.Entry<String, List<Object>> entry : metadata.entrySet()) {
+	    String headerName = entry.getKey();
+	    headers.put(headerName, toListOfStrings(headerName, entry.getValue()));
 	}
 
-	private Response response;
+	//
+	//
+	// these headers have at the moment no related statistical element
+	//
+	//
+	headers.forEach((k, v) -> out.put(getName() + RuntimeInfoElement.NAME_SEPARATOR + k, v));
+	// headers.keySet().forEach(key -> out.put(getName() + RuntimeInfoElement.NAME_SEPARATOR + key,
+	// headers.get(key)));
 
-	/**
-	 * @param response
-	 */
-	public ResponseInfoProvider(Response response) {
+	int length = response.getLength();
+	out.put(RuntimeInfoElement.RESPONSE_LENGTH.getName(), Arrays.asList(String.valueOf(length)));
 
-		this.response = response;
+	MediaType mediaType = response.getMediaType();
+	if (mediaType != null) {
+	    out.put(RuntimeInfoElement.RESPONSE_MEDIA_TYPE.getName(), Arrays.asList(mediaType.toString()));
 	}
 
-	private List<String> toListOfStrings(String headerName, List<Object> values) {
-		if (values == null) {
-			return null;
-		} else {
-			List<String> stringValues = new ArrayList<String>(values.size());
-			HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.get(0));
-			for (Object value : values) {
-				String actualValue = hd == null ? value.toString() : hd.toString(value);
-				stringValues.add(actualValue);
-			}
-			return stringValues;
-		}
-	}
+	int status = response.getStatus();
+	out.put(RuntimeInfoElement.RESPONSE_STATUS.getName(), Arrays.asList(String.valueOf(status)));
 
-	@Override
-	public HashMap<String, List<String>> provideInfo() {
+	return out;
+    }
 
-		HashMap<String, List<String>> out = new HashMap<>();
+    @Override
+    public String getName() {
 
-		MultivaluedMap<String, Object> metadata = new MetadataMap<>(response.getMetadata());
-		MetadataMap<String, String> headers = new MetadataMap<>(metadata.size());
-		for (Map.Entry<String, List<Object>> entry : metadata.entrySet()) {
-		    String headerName = entry.getKey();
-		    headers.put(headerName, toListOfStrings(headerName, entry.getValue()));
-		}
-
-		//
-		//
-		// these headers have at the moment no related statistical element
-		//
-		//
-		headers.forEach((k, v) -> out.put(getName() + RuntimeInfoElement.NAME_SEPARATOR + k, v));
-//		headers.keySet().forEach(key -> out.put(getName() + RuntimeInfoElement.NAME_SEPARATOR + key, headers.get(key)));
-
-		int length = response.getLength();
-		out.put(RuntimeInfoElement.RESPONSE_LENGTH.getName(), Arrays.asList(String.valueOf(length)));
-
-		MediaType mediaType = response.getMediaType();
-		if (mediaType != null) {
-			out.put(RuntimeInfoElement.RESPONSE_MEDIA_TYPE.getName(), Arrays.asList(mediaType.toString()));
-		}
-
-		int status = response.getStatus();
-		out.put(RuntimeInfoElement.RESPONSE_STATUS.getName(), Arrays.asList(String.valueOf(status)));
-
-		return out;
-	}
-
-	@Override
-	public String getName() {
-
-		return "RESPONSE";
-	}
+	return "RESPONSE";
+    }
 }
