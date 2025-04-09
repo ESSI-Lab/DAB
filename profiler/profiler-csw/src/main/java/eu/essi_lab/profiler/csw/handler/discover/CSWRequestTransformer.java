@@ -113,7 +113,7 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 	    refinedMessage.setSortOrder(SortOrder.ASCENDING);
 	    refinedMessage.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
 
-	    Optional<SearchAfter> searchAfter = CSWSearchAfterManager.get(page, setting);
+	    Optional<SearchAfter> searchAfter = CSWSearchAfterManager.get(message.getView().map(v -> v.getId()), page, setting);
 
 	    if (searchAfter.isPresent()) {
 

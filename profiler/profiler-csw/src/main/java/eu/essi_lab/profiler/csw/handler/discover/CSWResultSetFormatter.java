@@ -262,7 +262,7 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 
 		if (searchAfter.isPresent()) {
 
-		    CSWSearchAfterManager.put(webRequest, setting, searchAfter.get());
+		    CSWSearchAfterManager.put(message.getView().map(v -> v.getId()), setting, searchAfter.get());
 		}
 	    }
 

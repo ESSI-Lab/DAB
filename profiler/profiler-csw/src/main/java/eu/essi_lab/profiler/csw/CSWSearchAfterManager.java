@@ -55,14 +55,14 @@ public class CSWSearchAfterManager {
     private static final Object USE_SEARCH_AFTER_OPTION = "useSearchAfter";
 
     /**
-     * @param request
+     * @param viewId
      * @param setting
      * @param searchAfter
      * @throws Exception
      */
-    public static void put(WebRequest request, CSWProfilerSetting setting, SearchAfter searchAfter) throws Exception {
+    public static void put(Optional<String> viewId, CSWProfilerSetting setting, SearchAfter searchAfter) throws Exception {
 
-	String key = getKey(setting);
+	String key = getKey(viewId, setting);
 
 	getFolder().remove(key);
 
@@ -72,16 +72,17 @@ public class CSWSearchAfterManager {
     }
 
     /**
-     * @param message
+     * @param viewId
+     * @param page
      * @param setting
      * @return
      * @throws GSException
      */
-    public static Optional<SearchAfter> get(Page page, CSWProfilerSetting setting) throws GSException {
+    public static Optional<SearchAfter> get(Optional<String> viewId, Page page, CSWProfilerSetting setting) throws GSException {
 
 	try {
 
-	    String key = getKey(setting);
+	    String key = getKey(viewId, setting);
 
 	    if (page.getStart() == 1) {
 
@@ -117,12 +118,15 @@ public class CSWSearchAfterManager {
     }
 
     /**
+     * @param viewId
      * @param setting
      * @return
      */
-    private static String getKey(CSWProfilerSetting setting) {
+    private static String getKey(Optional<String> viewId, CSWProfilerSetting setting) {
 
-	return setting.getKeyValueOptions().get().getProperty(SEARCH_AFTER_KEY_OPTION);
+	String key = setting.getKeyValueOptions().get().getProperty(SEARCH_AFTER_KEY_OPTION);
+
+	return viewId.isEmpty() ? key : key + "_" + viewId.get();
     }
 
     /**
