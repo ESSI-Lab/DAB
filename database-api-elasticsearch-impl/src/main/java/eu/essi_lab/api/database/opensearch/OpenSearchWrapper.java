@@ -274,7 +274,7 @@ public class OpenSearchWrapper {
 
 	if (OpenSearchDatabase.debugQueries) {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("\n--- NESTED AGGREGATION ---");
+	    GSLoggerFactory.getLogger(getClass()).debug("\n\n--- NESTED AGGREGATION ---\n");
 	    GSLoggerFactory.getLogger(OpenSearchFinder.class).debug(OpenSearchUtils.toJSONObject(searchRequest).toString(3));
 	}
 

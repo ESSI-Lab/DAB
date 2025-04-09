@@ -465,7 +465,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    if (OpenSearchDatabase.debugQueries) {
 
-		GSLoggerFactory.getLogger(OpenSearchFinder.class).debug("\n--- GET SOURCES DATA MAP ---");
+		GSLoggerFactory.getLogger(OpenSearchFinder.class).debug("\n\n--- GET SOURCES DATA MAP ---\n");
 	    }
 
 	    try {
@@ -555,7 +555,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    if (OpenSearchDatabase.debugQueries) {
 
-		GSLoggerFactory.getLogger(getClass()).debug(count ? "\n--- COUNT ---" : "\n--- DISCOVER ---");
+		GSLoggerFactory.getLogger(getClass()).debug(count ? "\n\n--- COUNT ---\n" : "\n\n--- DISCOVER ---\n");
 	    }
 
 	    SearchResponse<Object> response = null;
