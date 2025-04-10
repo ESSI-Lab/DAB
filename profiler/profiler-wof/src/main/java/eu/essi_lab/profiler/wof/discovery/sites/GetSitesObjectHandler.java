@@ -62,12 +62,7 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 	return new StreamingOutput() {
 
-	    private String latitude;
-	    private String longitude;
-	    private String west;
-	    private String east;
-	    private String north;
-	    private String south;
+	    private String center;
 	    private String platformName;
 	    private String platformCode;
 	    private String sourceID;
@@ -80,6 +75,7 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 		    GetSitesObjectFastTransformer transformer = new GetSitesObjectFastTransformer();
 		    DiscoveryMessage discoveryMessage = transformer.transform(webRequest);
+		    discoveryMessage.setExcludeResourceBinary(true);
 		    discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
 
 		    String cuahsiNS = "http://www.cuahsi.org/his/1.1/ws/";
@@ -126,21 +122,21 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 		    int totalExpected = 0;
 		    int currentSize = 0;
 		    int totalSize = 0;
-		    
+
 		    Optional<Bond> optUserBond = discoveryMessage.getUserBond();
 		    Bond userBond = null;
-		    
-		    if(optUserBond.isPresent()){
-			
+
+		    if (optUserBond.isPresent()) {
+
 			userBond = optUserBond.get();
 		    }
-		    
+
 		    do {
 
 			try {
-			    
+
 			    discoveryMessage.setUserBond(userBond);
-			    
+
 			    ResultSet<String> resultSet = exec(discoveryMessage);
 
 			    List<String> results = resultSet.getResultsList();
@@ -149,13 +145,7 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 				StAXDocumentParser parser = new StAXDocumentParser(result);
 
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "west"), v -> west = v);
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "south"), v -> south = v);
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "east"), v -> east = v);
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "north"), v -> north = v);
-				
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Latitude"), v -> latitude = v);
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Longitude"), v -> longitude = v);
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "center"), v -> center = v);
 
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "platformTitle"), v -> platformName = v);
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "uniquePlatformId"), v -> platformCode = v);
@@ -164,15 +154,16 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 				parser.parse();
 
-				if (west != null && !west.equals("") && east != null && !east.equals("") && north != null
-					&& !north.equals("") && south != null && !south.equals("")
-				) {
-				    latitude = north;
-				    longitude = west;
+				String latitude = "";
+				String longitude = "";
+				if (center != null && center.contains(" ")) {
+				    String[] split = center.trim().split(" ");
+				    latitude = split[0];
+				    longitude = split[1];
 				}
-				
-				if (latitude != null && !latitude.equals("") && longitude != null && !longitude.equals("") && platformName != null
-					&& !platformName.equals("")//
+
+				if (latitude != null && !latitude.equals("") && longitude != null && !longitude.equals("")
+					&& platformName != null && !platformName.equals("")//
 					&& platformCode != null && !platformCode.equals("")//
 				// && sourceID != null && !sourceID.equals("")//
 				) {
