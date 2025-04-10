@@ -67,23 +67,21 @@
 			<ref bean="jsonProvider" />
 		</jaxrs:providers>
 	</jaxrs:server>
+	
 	<bean id="essiHealthService" class="eu.essi_lab.gssrv.rest.HealthCheckService" />
 
-
-
-	<!-- <jaxrs:server id="essiAdminServer" address="/admin">
+	<jaxrs:server id="harvestingConfigServer" address="/harvestingconfig">
+		
 		<jaxrs:serviceBeans>
-			<ref bean="essiAdminService" />
+			<ref bean="harvestingConfigService" />
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="jsonProvider" />
 		</jaxrs:providers>
 	</jaxrs:server>
 
-	<bean id="essiAdminService" class="eu.essi_lab.gssrv.rest.ESSIAdminService" />  -->
-	
-	
-	<bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
-	
+	<bean id="harvestingConfigService" class="eu.essi_lab.gssrv.rest.HarvestingConfigService" />
+		
+	<bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />	
 
 </beans>
