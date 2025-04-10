@@ -59,6 +59,7 @@ import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
+import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.Chronometer;
@@ -752,13 +753,14 @@ public class ConfigurationWrapper {
      * configuration.<br>
      * For example. An harvested accessor is added to the configuration and the scheduling is immediately started. The
      * task which runs the harvester, will
-     * update its own copy of the configuration in 2 minutes so in its own copy <i>the new setting is missing</i>.
+     * update its own copy of the configuration in {@value #CONFIG_RELOAD_TIME} minutes so in its own copy <i>the new
+     * setting is missing</i>.
      * Thus, calling this method would return <code>true</code> since the task is not in synch with the DB
      * configuration.<br>
      * To avoid this, when this method is called from a production task for a given worker setting,
-     * we ensure that at least {@value #CONFIG_RELOAD_TIME} minutes are passed from the first call of this method
+     * we ensure that at least ({@value #CONFIG_RELOAD_TIME} * 2) minutes are passed from the first call of this method
      * for that worker setting. If
-     * {@value #CONFIG_RELOAD_TIME} minutes are not passed, the method returns <code>false</code> because we
+     * ({@value #CONFIG_RELOAD_TIME} * 2) minutes are not passed, the method returns <code>false</code> because we
      * cannot be sure that the setting is
      * actually not present in the configuration
      * 
@@ -767,7 +769,7 @@ public class ConfigurationWrapper {
      */
     public synchronized static boolean isJobCanceled(JobExecutionContext context) {
 
-	SchedulerWorkerSetting setting = SchedulerUtils.getSetting(context);
+	SchedulerWorkerSetting contextSetting = SchedulerUtils.getSetting(context);
 
 	//
 	//
@@ -776,80 +778,62 @@ public class ConfigurationWrapper {
 	List<SchedulerWorkerSetting> workerSettingList = getAugmenterWorkerSettings().//
 		stream().//
 		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
+		filter(s -> s.getIdentifier().equals(contextSetting.getIdentifier())).//
 		collect(Collectors.toList());
 
 	workerSettingList.addAll(getHarvestingSettings().//
 		stream().//
 		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
+		filter(s -> s.getIdentifier().equals(contextSetting.getIdentifier())).//
 		collect(Collectors.toList()));
 
 	workerSettingList.addAll(getCustomTaskSettings().//
 		stream().//
 		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
+		filter(s -> s.getIdentifier().equals(contextSetting.getIdentifier())).//
 		collect(Collectors.toList()));
 
-	if (workerSettingList.//
-		stream().//
-		filter(s -> s.getIdentifier().equals(//
-			setting.getIdentifier()) && //
-			!s.getScheduling().isRunOnceSet() && // this is to exclude the worker with disabled scheduler
-							     // that are manually started with the "Start harvesting"
-							     // context menu button
-			!s.getScheduling().isEnabled())
-		.//
-		findFirst().//
-		isPresent()) {
+	//
+	//
+	//
 
-	    GSLoggerFactory.getLogger(ConfigurationWrapper.class).info("Scheduling of worker '" + setting.getWorkerName() + "' disabled");
+	if (!workerSettingList.isEmpty()) {
 
-	    return true;
+	    Scheduling scheduling = workerSettingList.get(0).getScheduling();
+
+	    return !scheduling.isEnabled();
 	}
 
 	//
+	// if the list is empty, it means that the context setting is no longer in the configuration, it has been
+	// removed
 	//
-	//
+	if (ExecutionMode.get() != ExecutionMode.MIXED && ExecutionMode.get() != ExecutionMode.LOCAL_PRODUCTION) {
 
-	List<String> idList = workerSettingList.//
-		stream().//
-		map(s -> s.getIdentifier()).//
-		collect(Collectors.toList());
+	    Chronometer chronometer = isJobCanceledMap.get(contextSetting.getIdentifier());
 
-	boolean settingMissing = !idList.contains(setting.getIdentifier());
+	    if (chronometer == null) {
 
-	if (settingMissing) {
+		chronometer = new Chronometer();
+		chronometer.start();
 
-	    //
-	    // time check!
-	    //
-	    if (ExecutionMode.get() != ExecutionMode.MIXED && ExecutionMode.get() != ExecutionMode.LOCAL_PRODUCTION) {
+		isJobCanceledMap.put(contextSetting.getIdentifier(), chronometer);
 
-		Chronometer chronometer = isJobCanceledMap.get(setting.getIdentifier());
-
-		if (chronometer == null) {
-
-		    chronometer = new Chronometer();
-		    chronometer.start();
-
-		    isJobCanceledMap.put(setting.getIdentifier(), chronometer);
-
-		    return false;
-		}
-
-		long elapsedTimeMillis = chronometer.getElapsedTimeMillis();
-		long reloadTime = CONFIG_RELOAD_TIME_UNIT.toMillis(CONFIG_RELOAD_TIME * 2);
-
-		if (elapsedTimeMillis < reloadTime) {
-
-		    return false;
-		}
+		return false;
 	    }
 
-	    GSLoggerFactory.getLogger(ConfigurationWrapper.class).info("Setting of worker '" + setting.getWorkerName() + "' removed");
+	    long elapsedTimeMillis = chronometer.getElapsedTimeMillis();
+	    long reloadTime = CONFIG_RELOAD_TIME_UNIT.toMillis(CONFIG_RELOAD_TIME * 2);
 
-	    return true;
+	    if (elapsedTimeMillis < reloadTime) {
+
+		return false;
+	    }
 	}
 
-	return false;
+	GSLoggerFactory.getLogger(ConfigurationWrapper.class).info("Setting of worker '" + contextSetting.getWorkerName() + "' removed");
+
+	return true;
     }
 
     /**
