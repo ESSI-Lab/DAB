@@ -25,9 +25,14 @@ import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
@@ -52,6 +57,7 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
+import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
@@ -408,6 +414,28 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
      */
     // setContact() ;
 
+    // Map of lowercase name -> Country
+    private static final Map<String, Country> NAME_TO_COUNTRY = new HashMap<>();
+    private static final Pattern COUNTRY_PATTERN;
+
+    static {
+	Set<String> allNames = new HashSet<>();
+
+	for (Country country : Country.values()) {
+	    String shortName = country.getShortName().toLowerCase();
+	    String officialName = country.getOfficialName().toLowerCase();
+
+	    NAME_TO_COUNTRY.put(shortName, country);
+	    NAME_TO_COUNTRY.put(officialName, country);
+
+	    allNames.add(Pattern.quote(shortName));
+	    allNames.add(Pattern.quote(officialName));
+	}
+
+	// Build a single regex pattern like: (argentina|brazil|the republic of paraguay|italy)
+	COUNTRY_PATTERN = Pattern.compile("\\b(" + String.join("|", allNames) + ")\\b", Pattern.CASE_INSENSITIVE);
+    }
+
     @Override
     public Element map(DiscoveryMessage message, GSResource resource) throws GSException {
 
@@ -418,7 +446,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    HydroOntology ontology = new WHOSOntology();
 
 	    WIGOSMetadata record = new WIGOSMetadata();
-	    // record.setApplicationArea("");
+	    
 
 	    record = addHeader(record);
 
@@ -437,7 +465,23 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    } else {
 		// TODO: IMPLEMENT: UNDERSTAND THE COUNTRY NAME
 		GSLoggerFactory.getLogger(getClass()).error("NO VALID COUNTRY NAME!!!");
-		// record.setTerritoryOfOrigin(countryCode.get(), beginPosition, endPosition);
+		String label = resource.getSource().getLabel().toLowerCase();
+		String cCode = null;
+		if (label.contains("hmfs")) {
+		    cCode = Country.ARGENTINA.getISO3();
+		} else {
+		    Matcher matcher = COUNTRY_PATTERN.matcher(label.toLowerCase());
+
+		    if (matcher.find()) {
+			String matchedName = matcher.group(1).toLowerCase();
+			Country matchedCountry = NAME_TO_COUNTRY.get(matchedName);
+			cCode = matchedCountry != null ? matchedCountry.getISO3() : null;
+		    }
+		}
+
+		if (cCode != null) {
+		    record.setTerritoryOfOrigin(cCode, beginPosition, endPosition);
+		}
 	    }
 
 	    /*
@@ -612,7 +656,8 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		    record.setMeasurementUnit(variableUnits.get());
 		} else {
 		    // TODO: decode the unit of measure
-		    record.setMeasurementUnit("unknown");
+		    //extensionHandler.getAttributeUnits()
+		    record.setMeasurementUnit("mm");
 		    GSLoggerFactory.getLogger(getClass()).error("NO VALID UNITS OF MEASURE CODE!!!");
 		}
 
@@ -662,8 +707,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		record.setObservationGeometryType("point");
 
 		// it seems that wmdr:observation should be inside the facility>ObservingFacility
-
-		record.setObservationInFacility();
+		//record.setObservationInFacility();
 
 	    } catch (Exception e) {
 		e.printStackTrace();
