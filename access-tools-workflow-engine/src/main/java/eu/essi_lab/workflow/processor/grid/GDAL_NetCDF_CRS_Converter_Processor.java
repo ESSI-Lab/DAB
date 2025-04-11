@@ -76,7 +76,7 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 		break;
 	    }
 	}
-	dataset.close();
+
 
 	Vector<String> vector = new Vector<String>(20, 20);
 	vector.add("-of");
@@ -215,9 +215,12 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 
 	ret.setDataDescriptor(outputDescriptor);
 	// needed to group the multi variables created by GDAL
-	ret = GDALNetCDFPostConversionUtils.doBandCorrections(ret);
+	ret = GDALNetCDFPostConversionUtils.doBandCorrections(dataset, ret);
+	
 	// copy attributes, because GDAL removes them after transformation from NetCDF to NetCDF
 	ret = GDALNetCDFPostConversionUtils.copyAttributes(dataObject, ret);
+	
+	dataset.close();
 
 	return ret;
     }
