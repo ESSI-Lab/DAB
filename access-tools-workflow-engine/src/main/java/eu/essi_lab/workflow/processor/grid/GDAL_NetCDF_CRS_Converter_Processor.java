@@ -214,15 +214,20 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 	ret.setFile(outputFile);
 
 	ret.setDataDescriptor(outputDescriptor);
+	
 	// needed to group the multi variables created by GDAL
-	ret = GDALNetCDFPostConversionUtils.doBandCorrections(dataset, ret);
+	DataObject ret2 = GDALNetCDFPostConversionUtils.doBandCorrections(dataObject, ret);
+	
+	ret.getFile().delete();
 	
 	// copy attributes, because GDAL removes them after transformation from NetCDF to NetCDF
-	ret = GDALNetCDFPostConversionUtils.copyAttributes(dataObject, ret);
+	DataObject ret3 = GDALNetCDFPostConversionUtils.copyAttributes(dataObject, ret2);
+	
+	ret2.getFile().delete();
 	
 	dataset.close();
 
-	return ret;
+	return ret3;
     }
 
     /**

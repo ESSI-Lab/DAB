@@ -22,6 +22,7 @@ package eu.essi_lab.workflow.processor.grid;
  */
 
 import java.io.File;
+import java.util.Date;
 
 import org.slf4j.Logger;
 
@@ -36,6 +37,8 @@ import eu.essi_lab.workflow.processor.TargetHandler;
 import ucar.nc2.constants.AxisType;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.time.CalendarDate;
+import ucar.nc2.time.CalendarDateUnit;
 
 /**
  * Using NCKS, this processor subsets along the time dimension a given NetCDF
@@ -44,83 +47,94 @@ import ucar.nc2.dataset.NetcdfDataset;
  */
 public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
 
-	private static Logger logger = GSLoggerFactory.getLogger(NCKS_NetCDF_Time_Subset_Processor.class);
+    private static Logger logger = GSLoggerFactory.getLogger(NCKS_NetCDF_Time_Subset_Processor.class);
 
-	@Override
-	public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
-		File inputFile = dataObject.getFile();
-		File outputFile = File.createTempFile(getClass().getSimpleName(), ".nc");
-		outputFile.deleteOnExit();
-		DataObject ret = new DataObject();
+    @Override
+    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+	File inputFile = dataObject.getFile();
+	File outputFile = File.createTempFile(getClass().getSimpleName(), ".nc");
+	outputFile.deleteOnExit();
+	DataObject ret = new DataObject();
 
-		DataDescriptor inputDescriptor = dataObject.getDataDescriptor();
-		DataDescriptor outputDescriptor = inputDescriptor.clone();
+	DataDescriptor inputDescriptor = dataObject.getDataDescriptor();
+	DataDescriptor outputDescriptor = inputDescriptor.clone();
 
-		NetcdfDataset dataset = NetcdfDataset.openDataset(inputFile.getAbsolutePath());
+	NetcdfDataset dataset = NetcdfDataset.openDataset(inputFile.getAbsolutePath());
+
+	CoordinateAxis1D timeAxis = NetCDFUtils.getAxis(dataset, AxisType.Time);
+
+	String options = "";
+
+	if (timeAxis != null) {
+	    int start = 0;
+	    int end = 0;
+
+	    DataDimension targetTemporal = handler.getTargetTemporalDimension();
+
+	    Number l = targetTemporal.getContinueDimension().getLower();
+	    Number u = targetTemporal.getContinueDimension().getUpper();
+
+	    if (l != null && u != null) {
+		long lower = targetTemporal.getContinueDimension().getLower().longValue();
+		long upper = targetTemporal.getContinueDimension().getUpper().longValue();
+		String unitsString = timeAxis.getUnitsString();
+		CalendarDateUnit dateUnit = CalendarDateUnit.of("standard",unitsString);
+		CalendarDate userCalDate = CalendarDate.of(new Date(lower));
 		
-		CoordinateAxis1D timeAxis = NetCDFUtils.getAxis(dataset, AxisType.Time);
-		
-		dataset.close();
-		
-		String options = "";
-		
-		if (timeAxis!=null) {
-			int start = 0;
-			int end = 0;
+		dateUnit.m
 
-			DataDimension targetTemporal = handler.getTargetTemporalDimension();
+		// Find the closest index on the axis
+		int index = timeAxis.findTimeIndexFromCalendarDate(userCalDate);
+		start = timeAxis.findCoordElement(lower);
+		end = timeAxis.findCoordElement(upper);
+		options = "-d time," + start + "," + end + " ";
+	    }
 
-			long lower = targetTemporal.getContinueDimension().getLower().longValue();
-			long upper = targetTemporal.getContinueDimension().getLower().longValue();
-			
-			start = timeAxis.findCoordElement(lower);
-			end = timeAxis.findCoordElement(upper);
-			options = "-d time," + start + "," + end + " ";
-			
-		}
-				
-		executeWithRuntime(inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), options);
-
-		ret.setFile(outputFile);
-
-		ret.setDataDescriptor(outputDescriptor);
-
-		return ret;
 	}
 
-	/**
-	 * Calls NCKS directly
-	 * 
-	 * @param inputPath
-	 * @param outputPath
-	 * @param options
-	 * @throws Exception
-	 */
-	protected static void executeWithRuntime(String inputPath, String outputPath, String options) throws Exception {
+	dataset.close();
 
-		Runtime rt = Runtime.getRuntime();
+	executeWithRuntime(inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), options);
 
-		if (options == null) {
-			options = "";
-		}
+	ret.setFile(outputFile);
 
-		String command = "ncks " + options + inputPath + " " + outputPath;
+	ret.setDataDescriptor(outputDescriptor);
 
-		logger.info("Executing NCKS Runtime: " + command);
+	return ret;
+    }
 
-		Process ps = rt.exec(command);
+    /**
+     * Calls NCKS directly
+     * 
+     * @param inputPath
+     * @param outputPath
+     * @param options
+     * @throws Exception
+     */
+    protected static void executeWithRuntime(String inputPath, String outputPath, String options) throws Exception {
 
-		int exitVal = ps.waitFor();
+	Runtime rt = Runtime.getRuntime();
 
-		if (exitVal > 0) {
+	if (options == null) {
+	    options = "";
+	}
 
-			GSLoggerFactory.getLogger(NCKS_NetCDF_Time_Subset_Processor.class)
-					.error(IOStreamUtils.asUTF8String(ps.getErrorStream()));
+	String command = "ncks " + options + inputPath + " " + outputPath;
 
-		}
+	logger.info("Executing NCKS Runtime: " + command);
 
-		logger.info("Executed");
+	Process ps = rt.exec(command);
+
+	int exitVal = ps.waitFor();
+
+	if (exitVal > 0) {
+
+	    GSLoggerFactory.getLogger(NCKS_NetCDF_Time_Subset_Processor.class).error(IOStreamUtils.asUTF8String(ps.getErrorStream()));
 
 	}
+
+	logger.info("Executed");
+
+    }
 
 }

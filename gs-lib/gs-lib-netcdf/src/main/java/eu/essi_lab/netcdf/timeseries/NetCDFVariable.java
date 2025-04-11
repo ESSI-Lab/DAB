@@ -165,7 +165,7 @@ public class NetCDFVariable<T> {
 	    ret = new ArrayChar.D1(size);
 	    break;
 	case BYTE:
-	    ret = new ArrayByte.D1(size);
+	    ret = new ArrayByte.D1(size,false);
 	    break;
 	case DOUBLE:
 	    ret = new ArrayDouble.D1(size);
@@ -174,16 +174,16 @@ public class NetCDFVariable<T> {
 	    ret = new ArrayFloat.D1(size);
 	    break;
 	case INT:
-	    ret = new ArrayInt.D1(size);
+	    ret = new ArrayInt.D1(size,false);
 	    break;
 	case LONG:
-	    ret = new ArrayLong.D1(size);
+	    ret = new ArrayLong.D1(size,false);
 	    break;
 	case SHORT:
-	    ret = new ArrayShort.D1(size);
+	    ret = new ArrayShort.D1(size,false);
 	    break;
 	case STRING:
-	    ret = new ArrayObject(String.class, new int[] { size });
+	    ret = new Array.factory(DataType.STRING, new int[] { size });
 	    break;
 	default:
 	    break;

@@ -105,19 +105,8 @@ public class WMSMapTransformer extends AccessRequestTransformer {
 		    if (optionalDate.isPresent()) {
 			Date date = optionalDate.get();
 			descriptor.setTemporalDimension(date, date);
+			descriptor.getTemporalDimension().getContinueDimension().setSize(1l);
 		    }
-		}
-
-		DataDimension temporalDimension = descriptor.getTemporalDimension();
-		if (temporalDimension != null) {
-		    // Number lower = temporalDimension.getContinueDimension().getLower();
-		    // if (lower != null) {
-		    // temporalDimension.getContinueDimension().setUpper(lower);
-		    temporalDimension.getContinueDimension().setLower(null);
-		    temporalDimension.getContinueDimension().setUpper(null);
-		    temporalDimension.getContinueDimension().setSize(1l);
-
-		    // }
 		}
 
 		String bbox = mapRequest.getParameterValue(Parameter.BBOX);
