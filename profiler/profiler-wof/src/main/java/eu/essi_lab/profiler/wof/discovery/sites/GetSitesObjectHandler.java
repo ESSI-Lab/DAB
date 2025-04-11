@@ -33,6 +33,9 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.locationtech.jts.geom.Geometry;
+
+import eu.essi_lab.api.database.opensearch.index.Shape;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLStreamWriterUtils;
@@ -62,7 +65,7 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 	return new StreamingOutput() {
 
-	    private String center;
+	    private String geometry;
 	    private String platformName;
 	    private String platformCode;
 	    private String sourceID;
@@ -145,7 +148,7 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 				StAXDocumentParser parser = new StAXDocumentParser(result);
 
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "center"), v -> center = v);
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "geometry"), v -> geometry = v);
 
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "platformTitle"), v -> platformName = v);
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "uniquePlatformId"), v -> platformCode = v);
@@ -156,10 +159,12 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 				String latitude = "";
 				String longitude = "";
-				if (center != null && center.contains(" ")) {
-				    String[] split = center.trim().split(" ");
-				    latitude = split[0];
-				    longitude = split[1];
+				if (geometry != null && !geometry.isEmpty()) {
+				    Optional<Geometry> shape = Shape.of(geometry);
+				    if (shape.isPresent()) {
+					latitude = ""+shape.get().getEnvelopeInternal().getMaxY();
+					longitude = ""+shape.get().getEnvelopeInternal().getMaxX();
+				    }
 				}
 
 				if (latitude != null && !latitude.equals("") && longitude != null && !longitude.equals("")
