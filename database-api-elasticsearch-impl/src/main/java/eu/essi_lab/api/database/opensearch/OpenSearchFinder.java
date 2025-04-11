@@ -246,7 +246,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			queryables.stream().map(q -> q.getName()).collect(Collectors.toList()), //
 			message.getDistinctValuesElement().get(), //
 			message.getPage().getSize(), //
-			false).// binaries included
+			message.isResourceBinaryExcluded()).
 
 			stream().//
 			map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
@@ -475,7 +475,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			Arrays.asList(ResourceProperty.SOURCE_ID.getName(), MetaFolderMapping.DATA_FOLDER), //
 			ResourceProperty.SOURCE_ID, //
 			sourceIds.size(), //
-			false); // binaries excluded
+			true); // binaries excluded
 
 		aggregateWithNestedAgg.forEach(agg -> {
 
