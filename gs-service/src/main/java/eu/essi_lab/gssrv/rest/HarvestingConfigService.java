@@ -45,12 +45,16 @@ public class HarvestingConfigService {
     /**
      * Optional<br>
      * <ul>
-     * <li>If missing, a new harvested source is created with a random id. CREATED 201 is returned</li>
-     * <li>If provided and a source with given id do not exists, it is created. The id MUST contains only alphanumeric characters and the '_' symbol. CREATED 201 is returned</li>
+     * <li>If missing, a new harvested source is created with a random id.<br>
+     * - 201 Created is returned</li>
+     * <li>If provided and a source with given id do not exists, it is created.<br>
+     * - The id MUST contains only alphanumeric characters and the '_' symbol.<br>
+     * - If the id is not regular, 404 Bad Request is returned, otherwise  
+     *  201 Created is returned</li>
      * <li>If provided and a source with given id already exists, the related source is modified according to the other request parameters 
-     * "label", "type", "repeatInterval", "repeatIntervalUnit", "startTime". NO CONTENT 204  is returned</li>
+     * "label", "type", "repeatInterval", "repeatIntervalUnit", "startTime".<br>
+     * - 204 No Content is returned</li>
      * </ul>
-     * 
      */
     private static String ID_PARAM = "id";
    
