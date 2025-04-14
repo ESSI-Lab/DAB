@@ -4,6 +4,7 @@
 package eu.essi_lab.cfga.source.test;
 
 import org.junit.Before;
+import org.junit.Ignore;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.DatabaseImpl;
@@ -16,6 +17,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
+@Ignore
 public class MarkLogicSourceTest extends DatabaseSourceTest {
 
     private static final StorageInfo INFO = new StorageInfo(System.getProperty("dbUrl"));

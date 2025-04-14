@@ -19,8 +19,21 @@ import eu.essi_lab.model.exceptions.GSException;
  */
 public class OpenSearchTest {
 
+    /**
+     * @param args
+     * @throws OpenSearchException
+     * @throws GSException
+     * @throws IOException
+     */
+    public static void main(String[] args) throws OpenSearchException, GSException, IOException {
+
+	before();
+	
+	System.exit(0);
+    }
+
     @Before
-    public void before() throws GSException, OpenSearchException, IOException {
+    public static void before() throws GSException, OpenSearchException, IOException {
 
 	System.setProperty("initIndexes", "true");
 

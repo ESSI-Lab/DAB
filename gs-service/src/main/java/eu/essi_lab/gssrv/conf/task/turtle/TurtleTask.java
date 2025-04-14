@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -50,7 +51,6 @@ import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
@@ -85,6 +85,7 @@ public class TurtleTask extends AbstractCustomTask {
     // source: source2-id
     // aggregate: fair-ease
     public enum TurtleTaskKey {
+	DATA_DIR_KEY("datadir:"), //
 	TEST_KEY("test:"), //
 	AGGREGATE_KEY("aggregate:"), //
 	SOURCE_KEY("source:"), //
@@ -153,6 +154,7 @@ public class TurtleTask extends AbstractCustomTask {
 	String access = null;
 	boolean aggregateMode = false;
 	String aggregatedTarget = null;
+	String dataDir = null;
 	boolean test = false;
 	List<String> sources = new ArrayList<>();
 	for (String line : lines) {
@@ -163,6 +165,9 @@ public class TurtleTask extends AbstractCustomTask {
 		return;
 	    }
 	    switch (decoded.getKey()) {
+	    case DATA_DIR_KEY:
+		dataDir = decoded.getValue();
+		break;
 	    case TEST_KEY:
 		test = (decoded.getValue() != null && decoded.getValue().toLowerCase().contains("true")) ? true : false;
 		break;
@@ -238,95 +243,33 @@ public class TurtleTask extends AbstractCustomTask {
 
 	    for (String sourceId : sources) {
 
-		int pageSize = 250;
-
-		ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-		IDiscoveryExecutor executor = loader.iterator().next();
-
-		DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-		discoveryMessage.setRequestId("turtle-task-" + sourceId + "-" + UUID.randomUUID());
-		discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
-		discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
-		discoveryMessage.setExcludeResourceBinary(true);
-		discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-		discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-		ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
-		discoveryMessage.setPermittedBond(bond);
-		discoveryMessage.setUserBond(bond);
-		discoveryMessage.setNormalizedBond(bond);
-
-		int start = 1;
-		int file = 0;
-		TurtleMapper mapper = new TurtleMapper();
-
-		String tmpSourcedir = Files.createTempDirectory("turtle-task-" + sourceId).toFile().getAbsolutePath();
-		GSLoggerFactory.getLogger(getClass()).info("Created turtle dir {}", tmpSourcedir);
-		File sourceDir = new File(tmpSourcedir);
-
-		List<File> turtles = new ArrayList<>();
-		discoveryMessage.setSortOrder(SortOrder.ASCENDING);
-		discoveryMessage.setSortProperty(ResourceProperty.PUBLIC_ID);
-		SearchAfter searchAfter = null;
-		main: while (true) {
-
-		    // CHECKING CANCELED JOB
-
-		    if (ConfigurationWrapper.isJobCanceled(context)) {
-			GSLoggerFactory.getLogger(getClass()).info("Turtle task CANCELED");
-			log(status, "Turtle task CANCELED");
-			status.setPhase(JobPhase.CANCELED);
-			return;
-		    }
-
-		    GSLoggerFactory.getLogger(getClass()).info("Turtle task {} at record {}", sourceId, start);
-		    discoveryMessage.setPage(new Page(start, pageSize));
-		    start = start + pageSize;
-
-		    if (searchAfter != null) {
-			discoveryMessage.setSearchAfter(searchAfter);
-		    }
-		    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
-		    if (resultSet.getSearchAfter().isPresent()) {
-			searchAfter = resultSet.getSearchAfter().get();
-		    }
-		    List<GSResource> resources = resultSet.getResultsList();
-
-		    int i = 0;
-		    for (GSResource resource : resources) {
-			i++;
-			if (test && i > 3) {
-			    break main;
-			}
-			String turtle = mapper.map(discoveryMessage, resource);
-			String filename = null;
-			if (resource.getOriginalId().isPresent()) {
-			    filename = resource.getOriginalId().get();
-			}
-			if (filename == null) {
-			    filename = resource.getPrivateId();
-			}
-			if (filename == null) {
-			    filename = resource.getPublicId();
-			}
-			File temp = new File(sourceDir, filename + ".ttl");
-			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
-			if (turtle != null) {
-			    writer.write(turtle);
-			} else {
-			    GSLoggerFactory.getLogger(getClass()).error("Error in the turtle mapper");
-			}
-			writer.close();
-			turtles.add(temp);
-		    }
-
-		    if (resources.isEmpty()) {
-			break;
-		    }
+		File sourceDir = null;
+		if (dataDir == null) {
+		    String tmpSourcedir = Files.createTempDirectory("turtle-task-" + sourceId).toFile().getAbsolutePath();
+		    GSLoggerFactory.getLogger(getClass()).info("Created turtle dir {}", tmpSourcedir);
+		    downloadData(sourceId, tmpSourcedir, test);
+		    sourceDir = new File(tmpSourcedir);
+		} else {
+		    sourceDir = new File(dataDir);
 		}
 
-		File sourceFile = new File(tmpSourcedir, sourceId + ".ttl");
-		File validSourceFile = new File(tmpSourcedir, sourceId + "-valid.ttl");
-		File reportSourceFile = new File(tmpSourcedir, sourceId + "-report.txt");
+		File sourceFile = new File(sourceDir, sourceId + ".ttl");
+		File validSourceFile = new File(sourceDir, sourceId + "-valid.ttl");
+		File reportSourceFile = new File(sourceDir, sourceId + "-report.txt");
+
+		File[] turtles = sourceDir.listFiles(new FilenameFilter() {
+
+		    @Override
+		    public boolean accept(File dir, String name) {
+			if (name == null) {
+			    return false;
+			}
+			if (name.endsWith(".ttl")) {
+			    return true;
+			}
+			return false;
+		    }
+		});
 
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(sourceFile));
 			BufferedWriter validWriter = new BufferedWriter(new FileWriter(validSourceFile));
@@ -334,6 +277,7 @@ public class TurtleTask extends AbstractCustomTask {
 		    long all = 0;
 		    long good = 0;
 		    List<File> toBeUploaded = new ArrayList<File>();
+		    int partial = 0;
 		    for (File turtle : turtles) {
 			all++;
 			boolean valid = false;
@@ -398,6 +342,7 @@ public class TurtleTask extends AbstractCustomTask {
 			toBeUploaded.add(turtle);
 			if (toBeUploaded.size() == 100) {
 			    uploadFiles(wrapper, sourceId, toBeUploaded);
+			    GSLoggerFactory.getLogger(getClass()).info("Uploaded {}/{} turtles",(partial+=100),turtles.length);
 			}
 		    }
 		    uploadFiles(wrapper, sourceId, toBeUploaded);
@@ -427,6 +372,91 @@ public class TurtleTask extends AbstractCustomTask {
 	}
 	GSLoggerFactory.getLogger(getClass()).info("Turtle task ENDED");
 	log(status, "Turtle task ENDED");
+    }
+
+    private void downloadData(String sourceId, String tmpSourcedir, boolean test) throws Exception {
+	int pageSize = 250;
+	File sourceDir = new File(tmpSourcedir);
+	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
+	IDiscoveryExecutor executor = loader.iterator().next();
+
+	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+	discoveryMessage.setRequestId("turtle-task-" + sourceId + "-" + UUID.randomUUID());
+	discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
+	discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
+	discoveryMessage.setExcludeResourceBinary(false);
+	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+	ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
+	discoveryMessage.setPermittedBond(bond);
+	discoveryMessage.setUserBond(bond);
+	discoveryMessage.setNormalizedBond(bond);
+
+	int start = 1;
+	int file = 0;
+	TurtleMapper mapper = new TurtleMapper();
+
+	discoveryMessage.setSortOrder(SortOrder.ASCENDING);
+	discoveryMessage.setSortProperty(ResourceProperty.PRIVATE_ID);
+	SearchAfter searchAfter = null;
+	 int i = 0;
+	main: while (true) {
+
+	    // CHECKING CANCELED JOB
+
+	    // if (ConfigurationWrapper.isJobCanceled(context)) {
+	    // GSLoggerFactory.getLogger(getClass()).info("Turtle task CANCELED");
+	    // log(status, "Turtle task CANCELED");
+	    // status.setPhase(JobPhase.CANCELED);
+	    // return;
+	    // }
+
+	    GSLoggerFactory.getLogger(getClass()).info("Turtle task {} at record {}", sourceId, start);
+	    discoveryMessage.setPage(new Page(start, pageSize));
+	    start = start + pageSize;
+
+	    if (searchAfter != null) {
+		discoveryMessage.setSearchAfter(searchAfter);
+	    }
+	    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
+	    if (resultSet.getSearchAfter().isPresent()) {
+		searchAfter = resultSet.getSearchAfter().get();
+	    }
+	    List<GSResource> resources = resultSet.getResultsList();
+
+	   
+	    for (GSResource resource : resources) {
+		i++;
+		if (test && i > 2000) {
+		    break main;
+		}
+		String filename = null;
+		if (resource.getOriginalId().isPresent()) {
+		    filename = resource.getOriginalId().get();
+		}
+		if (filename == null) {
+		    filename = resource.getPrivateId();
+		}
+		if (filename == null) {
+		    filename = resource.getPublicId();
+		}
+		File temp = new File(sourceDir, filename + ".ttl");
+		BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
+		String turtle = mapper.map(discoveryMessage, resource);
+
+		if (turtle != null) {
+		    writer.write(turtle);
+		} else {
+		    GSLoggerFactory.getLogger(getClass()).error("Error in the turtle mapper");
+		}
+		writer.close();
+	    }
+
+	    if (resources.isEmpty()) {
+		break;
+	    }
+	}
+
     }
 
     private void uploadFiles(S3TransferWrapper wrapper, String sourceId, List<File> toBeUploaded) {

@@ -80,11 +80,7 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 
 		    List<KISTERSEntity> stationsList = null;
 
-		    if (siteName == null || siteName.isEmpty()) {
-			stationsList = kistersClient.retrieveStations();
-		    } else {
-			stationsList = kistersClient.retrieveStationsBySiteName(siteName);
-		    }
+		    stationsList = kistersClient.retrieveStations();
 
 		    if (onlyOneStation) {
 			stationsList = stationsList.subList(0, 1);
@@ -92,6 +88,12 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 
 		    for (KISTERSEntity ke : stationsList) {
 			String stationId = ke.getObject().getString(KISTERSClient.STATION_ID);
+			String mySiteName = ke.getObject().optString(KISTERSClient.SITE_NAME);
+			if (siteName != null && !siteName.isEmpty()) {
+			    if (!mySiteName.startsWith(siteName)) {
+				continue;
+			    }
+			}
 			stationIdentifiers.add(stationId);
 			stations.put(stationId, ke);
 		    }
@@ -139,6 +141,10 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 	String resumptionToken = request.getResumptionToken();
 	if (resumptionToken != null) {
 	    stationIndex = Integer.valueOf(resumptionToken);
+	}
+	if (stationIndex>=stationIdentifiers.size()) {
+	    ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<OriginalMetadata>();
+	    return ret ;
 	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Retrieving timeSeries STARTED");
@@ -189,7 +195,7 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 
 	int maxRecords = getSetting().getMaxRecords().orElse(Integer.MAX_VALUE);
 
-	if (stationIndex < stations.size() && recordsCount < maxRecords) {
+	if (stationIndex < (stations.size() - 1) && recordsCount < maxRecords) {
 	    response.setResumptionToken(String.valueOf(++stationIndex));
 	} else {
 	    response.setResumptionToken(null);

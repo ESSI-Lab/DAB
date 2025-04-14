@@ -44,9 +44,9 @@ import org.apache.ftpserver.ftplet.User;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.HarvestingProperties;
@@ -227,6 +227,12 @@ public class DatabaseFtpFile implements FtpFile {
 			parallelStream().//
 			map(f -> new DatabaseFtpFile(database, f.getName(), user)).//
 			forEach(f -> list.add(f));
+
+		DatabaseFolder usersFolder = database.getUsersFolder();
+		list.add(new DatabaseFtpFile(database, usersFolder.getName(), user));
+
+		DatabaseFolder viewFolder = database.getViewFolder(false);
+		list.add(new DatabaseFtpFile(database, viewFolder.getName(), user));
 
 	    } else {
 

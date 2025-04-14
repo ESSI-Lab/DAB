@@ -1,4 +1,4 @@
-package eu.essi_lab.profiler.om;
+package eu.essi_lab.gssrv.conf.task.views;
 
 /*-
  * #%L
@@ -21,23 +21,19 @@ package eu.essi_lab.profiler.om;
  * #L%
  */
 
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.pdk.handler.selector.WebRequestFilter;
+import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.model.resource.ResourceProperty;
 
-public class CountriesFilter implements WebRequestFilter {
+public class HISCentralView extends View {
 
-    @Override
-    public boolean accept(WebRequest request) throws GSException {
-	String path = request.getRequestPath();
-	path = path.toLowerCase();
-	return path.endsWith("countries") || //
-		path.endsWith("ontologies") || //
-		path.endsWith("providers") || //
-		path.endsWith("observedproperties") || //
-		path.endsWith("timeinterpolations") || //
-		path.endsWith("intendedobservationspacings") || //
-		path.endsWith("aggregationdurations");
+    public HISCentralView() {	
+	super();
+	setLabel("HIS CENTRAL");
+	setBond(BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.SOURCE_DEPLOYMENT, "his-central"));
+	setCreator("his_central");
+	setId("his-central");
     }
-
+    
 }

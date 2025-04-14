@@ -45,8 +45,8 @@ public enum Country {
     BOLIVIA_PLURINATIONAL_STATE_OF("Bolivia (Plurinational State of)", "the Plurinational State of Bolivia", "BOL", "BO"), //
     BOSNIA_AND_HERZEGOVINA("Bosnia and Herzegovina", "Bosnia and Herzegovina", "BIH", "BA"), //
     BOTSWANA("Botswana", "the Republic of Botswana", "BWA", "BW"), //
-    BRAZIL("Brazil", "the Federative Republic of Brazil", "BRA", "BR","Brasil" //@pt
-	    ), //
+    BRAZIL("Brazil", "the Federative Republic of Brazil", "BRA", "BR", "Brasil" // @pt
+    ), //
     BRUNEI_DARUSSALAM("Brunei Darussalam", "Brunei Darussalam", "BRN", "BN"), //
     BULGARIA("Bulgaria", "the Republic of Bulgaria", "BGR", "BG"), //
     BURKINA_FASO("Burkina Faso", "Burkina Faso", "BFA", "BF"), //
@@ -167,7 +167,7 @@ public enum Country {
     REPUBLIC_OF_KOREA("Republic of Korea", "the Republic of Korea", "KOR", "KR"), //
     REPUBLIC_OF_MOLDOVA("Moldova", "the Republic of Moldova", "MDA", "MD"), //
     ROMANIA("Romania", "Romania", "ROU", "RO"), //
-    RUSSIAN_FEDERATION("Russian Federation", "the Russian Federation", "RUS", "RU","Russia"), //
+    RUSSIAN_FEDERATION("Russian Federation", "the Russian Federation", "RUS", "RU", "Russia"), //
     RWANDA("Rwanda", "the Republic of Rwanda", "RWA", "RW"), //
     SAINT_KITTS_AND_NEVIS("Saint Kitts and Nevis", "Saint Kitts and Nevis", "KNA", "KN"), //
     SAINT_LUCIA("Saint Lucia", "Saint Lucia", "LCA", "LC"), //
@@ -209,7 +209,7 @@ public enum Country {
     UKRAINE("Ukraine", "Ukraine", "UKR", "UA"), //
     UNITED_ARAB_EMIRATES("United Arab Emirates", "the United Arab Emirates", "ARE", "AE"), //
     UNITED_KINGDOM_OF_GREAT_BRITAIN_AND_NORTHERN_IRELAND("United Kingdom of Great Britain and Northern Ireland",
-	    "the United Kingdom of Great Britain and Northern Ireland", "GBR", "GB","United Kingdom"), //
+	    "the United Kingdom of Great Britain and Northern Ireland", "GBR", "GB", "United Kingdom"), //
     UNITED_REPUBLIC_OF_TANZANIA("United Republic of Tanzania", "the United Republic of Tanzania", "TZA", "TZ"), //
     UNITED_STATES_OF_AMERICA("United States of America", "the United States of America", "United States", "USA", "US"), //
     URUGUAY("Uruguay", "the Eastern Republic of Uruguay", "URY", "UY"), //
@@ -279,9 +279,21 @@ public enum Country {
 		}
 	    }
 	}
+	if (country.contains("-")) {
+	    // e.g. IT - Italy
+	    String[] split = country.split("-");
+	    Country c = decode(split[0].trim());
+	    if (c != null) {
+		return c;
+	    }
+	    c = decode(split[1].trim());
+	    if (c != null) {
+		return c;
+	    }
+	}
 	return null;
     }
-    
+
     public static void main(String[] args) {
 	Country us = Country.decode("US");
 	System.out.println(us.getShortName());

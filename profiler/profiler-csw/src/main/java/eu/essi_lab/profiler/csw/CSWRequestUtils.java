@@ -29,6 +29,7 @@ import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.csw._2_0_2.GetRecords;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
@@ -59,46 +60,79 @@ public class CSWRequestUtils {
      * @return
      * @throws Exception
      */
-    public static boolean isGetRecordsFromPOST(WebRequest webRequest) throws Exception {
+    public static boolean isGetRecordsFromPOST(WebRequest webRequest) throws GSException {
 
 	return getGetRecordFromPOST(webRequest) != null;
     }
 
     /**
-     * @param webRequest
+     * @param request
      * @return
-     * @throws Exception
      */
-    public static boolean isGetRecordByIdFromPOST(WebRequest webRequest) throws Exception {
+    public static boolean isGetRecordByIdFromGET(WebRequest request) {
 
-	if (webRequest.isPostRequest()) {
+	if (request.isGetRequest()) {
 
-	    XMLDocumentReader reader = new XMLDocumentReader(webRequest.getBodyStream().clone());
-	    reader.setNamespaceContext(new CommonNameSpaceContext());
+	    String queryString = request.getURLDecodedQueryString();
 
-	    return reader.evaluateBoolean("exists(//csw:GetRecordById)");
+	    if (queryString != null && !queryString.isBlank()) {
+
+		return queryString.toLowerCase().contains("request=getrecordbyid");
+	    }
 	}
 
 	return false;
     }
-    
+
+    /**
+     * @param webRequest
+     * @return
+     * @throws GSException
+     * @throws Exception
+     */
+    public static boolean isGetRecordByIdFromPOST(WebRequest webRequest) throws GSException {
+
+	try {
+
+	    if (webRequest.isPostRequest()) {
+
+		XMLDocumentReader reader = new XMLDocumentReader(webRequest.getBodyStream().clone());
+		reader.setNamespaceContext(new CommonNameSpaceContext());
+
+		return reader.evaluateBoolean("exists(//csw:GetRecordById)");
+	    }
+	} catch (Exception ex) {
+
+	    throw GSException.createException(CSWRequestUtils.class, "CSWRequestUtilsIsGetRecordByIdFromPOSTError", ex);
+	}
+
+	return false;
+    }
+
     /**
      * @param webRequest
      * @return
      * @throws Exception
      */
-    public static GetRecords getGetRecordFromPOST(WebRequest webRequest) throws Exception {
+    public static GetRecords getGetRecordFromPOST(WebRequest webRequest) throws GSException {
 
-	if (webRequest.isPostRequest()) {
+	try {
 
-	    XMLDocumentReader reader = new XMLDocumentReader(webRequest.getBodyStream().clone());
-	    reader.setNamespaceContext(new CommonNameSpaceContext());
+	    if (webRequest.isPostRequest()) {
 
-	    if (reader.evaluateBoolean("exists(//csw:GetRecords)")) {
+		XMLDocumentReader reader = new XMLDocumentReader(webRequest.getBodyStream().clone());
+		reader.setNamespaceContext(new CommonNameSpaceContext());
 
-		GetRecords getRecords = CommonContext.unmarshal(webRequest.getBodyStream().clone(), GetRecords.class);
-		return getRecords;
+		if (reader.evaluateBoolean("exists(//csw:GetRecords)")) {
+
+		    GetRecords getRecords = CommonContext.unmarshal(webRequest.getBodyStream().clone(), GetRecords.class);
+		    return getRecords;
+		}
 	    }
+	} catch (Exception ex) {
+
+	    throw GSException.createException(CSWRequestUtils.class, "CSWRequestUtilsIsGetRecordByIdFromPOSTError", ex);
+
 	}
 
 	return null;

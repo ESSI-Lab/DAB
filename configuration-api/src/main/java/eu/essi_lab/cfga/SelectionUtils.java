@@ -382,7 +382,14 @@ public class SelectionUtils {
 		    outOption.setObjectValues(list);
 		}
 
-		outOption.select(v -> list.contains(v));
+		if (outOption.getSelectionMode() == SelectionMode.UNSET) {
+
+		    outOption.setObjectValues(list);
+		    
+		} else {
+
+		    outOption.select(v -> list.contains(v));
+		}
 	    }
 	});
 

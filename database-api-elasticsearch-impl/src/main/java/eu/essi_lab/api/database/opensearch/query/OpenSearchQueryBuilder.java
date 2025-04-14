@@ -97,6 +97,7 @@ public class OpenSearchQueryBuilder {
     private RankingStrategy ranking;
     private boolean deletedIncluded;
     private OpenSearchWrapper wrapper;
+    private boolean weightedQueriesInclued;
 
     /**
      * @param wrapper
@@ -106,12 +107,14 @@ public class OpenSearchQueryBuilder {
 	    OpenSearchWrapper wrapper, //
 	    RankingStrategy ranking, //
 	    HashMap<String, String> dataFolderMap, //
-	    boolean deletedIncluded) {
+	    boolean deletedIncluded, //
+	    boolean weightedQueriesInclued) {
 
 	this.wrapper = wrapper;
 	this.ranking = ranking;
 	this.dfMap = dataFolderMap;
 	this.deletedIncluded = deletedIncluded;
+	this.weightedQueriesInclued = weightedQueriesInclued;
 	this.builder = new StringBuilder();
     }
 
@@ -184,9 +187,9 @@ public class OpenSearchQueryBuilder {
 	}
 
 	return buildFilterQuery(buildSourceIdQuery(bond.getPropertyValue()), //
-		
+
 		// the keyword field of dataFolder is not present in the DataFolderMapping
-		// and the term query cannot be done, but it's ok anyway
+		// and the term query cannot be done, but it's OK anyway
 		buildMatchPhraseQuery(MetaFolderMapping.DATA_FOLDER, dataFolder));
 
     }
@@ -437,13 +440,18 @@ public class OpenSearchQueryBuilder {
 
 	Query searchQuery = OpenSearchUtils.toQuery(new JSONObject(builder.toString()));
 
-	Query basicQuery = buildBasicQuery(count);
+	Optional<Query> basicQuery = buildBasicQuery(count);
 
-	return buildMustQuery(searchQuery, basicQuery);
+	return basicQuery.isPresent() ? buildMustQuery(searchQuery, basicQuery.get()) : searchQuery;
     }
 
+    /**
+     * @param bond
+     * @param count
+     * @return
+     */
     @SuppressWarnings("incomplete-switch")
-    public Query buildGeoShapeQuery(SpatialBond bond) {
+    public Query buildGeoShapeQuery(SpatialBond bond, boolean count) {
 
 	JSONObject shape = buildEnvelope(bond);
 
@@ -481,7 +489,7 @@ public class OpenSearchQueryBuilder {
 
 	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Contains);
 
-	    weightedQuery = buildContainedWeightQuery(area, 500);
+	    weightedQuery = weightedQueriesInclued ? buildContainedWeightQuery(area, 500) : null;
 
 	    break;
 
@@ -496,7 +504,7 @@ public class OpenSearchQueryBuilder {
 		operands.add(buildAreaWeightedQuery(min, area));
 	    }
 
-	    weightedQuery = buildShouldQuery(operands);
+	    weightedQuery = weightedQueriesInclued ? buildShouldQuery(operands) : null;
 
 	    break;
 	case DISJOINT:
@@ -514,7 +522,7 @@ public class OpenSearchQueryBuilder {
 		build().//
 		toQuery();
 
-	return weightedQuery == null ? geoShapeQuery : buildMustQuery(weightedQuery, geoShapeQuery);
+	return weightedQuery == null || count ? geoShapeQuery : buildMustQuery(weightedQuery, geoShapeQuery);
     }
 
     /**
@@ -548,7 +556,6 @@ public class OpenSearchQueryBuilder {
 	Query indexQuery = buildIndexQuery(DataFolderMapping.get().getIndex());
 
 	return buildFilterQuery(sourceIdQuery, indexQuery);
-
     }
 
     /**
@@ -580,8 +587,11 @@ public class OpenSearchQueryBuilder {
 	sourceIds.forEach(id -> idsQueries.add(buildSourceIdQuery(id)));
 
 	return buildFilterQuery(//
+
 		buildDatabaseIdQuery(databaseId), //
-		buildExistsFieldQuery(MetaFolderMapping.DATA_FOLDER), //
+
+		buildMatchPhraseQuery(IndexData.BINARY_PROPERTY, DataFolderMapping.WRITING_FOLDER_TAG), //
+
 		buildShouldQuery(idsQueries)//
 	);
     }
@@ -913,6 +923,154 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
+     * @param filter
+     * @param should
+     * @param must
+     * @return
+     */
+    public static Query buildBoolQuery(List<Query> filter, List<Query> should, List<Query> must) {
+
+	org.opensearch.client.opensearch._types.query_dsl.BoolQuery.Builder builder = new BoolQuery.Builder();
+
+	if (!filter.isEmpty()) {
+	    builder.filter(filter);
+	}
+
+	if (!should.isEmpty()) {
+	    builder.should(should);
+	    builder.minimumShouldMatch("1");
+	}
+
+	if (!must.isEmpty()) {
+	    builder.must(must);
+	}
+
+	return builder.build().toQuery();
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    public static Query buildFilterQuery(List<Query> operands) {
+
+	return new BoolQuery.Builder().//
+		filter(operands).//
+		build().//
+		toQuery();
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    public static Query buildFilterQuery(Query... operands) {
+
+	return buildFilterQuery(Arrays.asList(operands));
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    public static Query buildMustQuery(List<Query> operands) {
+
+	return new BoolQuery.Builder().//
+		must(operands).//
+		build().//
+		toQuery();
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    public static Query buildShouldQuery(List<Query> operands, int minimumShouldMatch) {
+
+	return new BoolQuery.Builder().//
+		should(operands).//
+		minimumShouldMatch(String.valueOf(minimumShouldMatch)).//
+		build().//
+		toQuery();
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    public static Query buildShouldQuery(List<Query> operands) {
+
+	return buildShouldQuery(operands, 1);
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    public static Query buildShouldQuery(int minimumShouldMatch, Query... operands) {
+
+	return buildShouldQuery(Arrays.asList(operands), minimumShouldMatch);
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    public static Query buildShouldQuery(Query... operands) {
+
+	return buildShouldQuery(Arrays.asList(operands), 1);
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    public static Query buildMustQuery(Query... operands) {
+
+	return buildMustQuery(Arrays.asList(operands));
+    }
+
+    /**
+     * @param databaseId
+     */
+    public static Query buildDatabaseIdQuery(String databaseId) {
+
+	return buildMatchPhraseQuery(IndexData.DATABASE_ID, databaseId);
+    }
+
+    /**
+     * @param field
+     * @param value
+     * @return
+     */
+    public static Query buildTermQuery(String field, String value) {
+
+	return buildTermQuery(field, value, 0);
+    }
+
+    /**
+     * @param field
+     * @param value
+     * @return
+     */
+    public static Query buildTermQuery(String field, String value, double boost) {
+
+	org.opensearch.client.opensearch._types.query_dsl.TermQuery.Builder builder = new TermQuery.Builder();
+
+	if (boost > 1) {
+
+	    builder = builder.boost((float) boost);
+	}
+
+	return builder.//
+		field(field).//
+		value(new FieldValue.Builder().stringValue(value).build()).//
+		build().//
+		toQuery();
+
+    }
+
+    /**
      * In the data migration from MarkLogic to OpenSearch, the <code>sourceDeployment</code> has been indexed
      * only as <i>text</i> field,
      * and not as <i>keyword</i> field. As consequence, a term query on this <i>text</i> field works only if the
@@ -1086,114 +1244,6 @@ public class OpenSearchQueryBuilder {
 		IndexedElements.TEMP_EXTENT_END_NOW.getElementName();
 
 	return buildRangeQuery(field, BondOperator.EQUAL, "true");
-    }
-
-    /**
-     * @param filter
-     * @param should
-     * @param must
-     * @return
-     */
-    public static Query buildBoolQuery(List<Query> filter, List<Query> should, List<Query> must) {
-
-	org.opensearch.client.opensearch._types.query_dsl.BoolQuery.Builder builder = new BoolQuery.Builder();
-
-	if (!filter.isEmpty()) {
-	    builder.filter(filter);
-	}
-
-	if (!should.isEmpty()) {
-	    builder.should(should);
-	    builder.minimumShouldMatch("1");
-	}
-
-	if (!must.isEmpty()) {
-	    builder.must(must);
-	}
-
-	return builder.build().toQuery();
-    }
-
-    /**
-     * @param operands
-     * @return
-     */
-    public static Query buildFilterQuery(List<Query> operands) {
-
-	return new BoolQuery.Builder().//
-		filter(operands).//
-		build().//
-		toQuery();
-    }
-
-    /**
-     * @param operands
-     * @return
-     */
-    public static Query buildFilterQuery(Query... operands) {
-
-	return buildFilterQuery(Arrays.asList(operands));
-    }
-
-    /**
-     * @param operands
-     * @return
-     */
-    public static Query buildMustQuery(List<Query> operands) {
-
-	return new BoolQuery.Builder().//
-		must(operands).//
-		build().//
-		toQuery();
-    }
-
-    /**
-     * @param operands
-     * @return
-     */
-    public static Query buildShouldQuery(List<Query> operands, int minimumShouldMatch) {
-
-	return new BoolQuery.Builder().//
-		should(operands).//
-		minimumShouldMatch(String.valueOf(minimumShouldMatch)).//
-		build().//
-		toQuery();
-    }
-
-    /**
-     * @param operands
-     * @return
-     */
-    public static Query buildShouldQuery(List<Query> operands) {
-
-	return buildShouldQuery(operands, 1);
-    }
-
-    /**
-     * @param operands
-     * @return
-     */
-    public static Query buildShouldQuery(int minimumShouldMatch, Query... operands) {
-
-	return buildShouldQuery(Arrays.asList(operands), minimumShouldMatch);
-    }
-
-    /**
-     * @param operands
-     * @return
-     */
-    public static Query buildShouldQuery(Query... operands) {
-
-	return buildShouldQuery(Arrays.asList(operands), 1);
-    }
-
-    /**
-     * @param operands
-     * @return
-     */
-    public static Query buildMustQuery(Query... operands) {
-
-	return buildMustQuery(Arrays.asList(operands));
     }
 
     /**
@@ -1378,14 +1428,6 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
-     * @param databaseId
-     */
-    private static Query buildDatabaseIdQuery(String databaseId) {
-
-	return buildMatchPhraseQuery(IndexData.DATABASE_ID, databaseId);
-    }
-
-    /**
      * @param folder
      * @return
      */
@@ -1446,11 +1488,11 @@ public class OpenSearchQueryBuilder {
      * This query also allows to filter in/out the deleted records.
      * For a count query, the weight query is omitted in order to resize the overall query
      */
-    private Query buildBasicQuery(boolean count) {
+    private Optional<Query> buildBasicQuery(boolean count) {
 
-	if (count) {
+	if (count || !weightedQueriesInclued) {
 
-	    return deletedIncluded ? buildDeletedExcludedQuery() : buildDeletedExcludedQuery();
+	    return deletedIncluded ? Optional.empty() : Optional.of(buildDeletedExcludedQuery());
 	}
 
 	ArrayList<Query> list = new ArrayList<>();
@@ -1460,7 +1502,6 @@ public class OpenSearchQueryBuilder {
 	list.add(buildMatchAllQuery());
 	list.add(buildGDCWeightQuery());
 	list.add(buildMDQWeightQuery());
-	// list.add(buildEVWeightQuery());
 	list.add(buildAQWeightQuery());
 
 	if (!deletedIncluded) {
@@ -1468,7 +1509,7 @@ public class OpenSearchQueryBuilder {
 	    list.add(buildDeletedExcludedQuery());
 	}
 
-	return buildShouldQuery(list);
+	return Optional.of(buildShouldQuery(list));
     }
 
     /**
@@ -1478,13 +1519,9 @@ public class OpenSearchQueryBuilder {
 
 	Query missingField = createNotQuery(buildExistsFieldQuery(ResourceProperty.IS_DELETED.getName()));
 
-	return new BoolQuery.Builder().//
-		should(missingField, //
-			buildMatchPhraseQuery(ResourceProperty.IS_DELETED.getName(), "false"))
-		.//
-		minimumShouldMatch("1").//
-		build().//
-		toQuery();
+	return buildShouldQuery(//
+		missingField, //
+		buildMatchPhraseQuery(ResourceProperty.IS_DELETED.getName(), "false"));
     }
 
     /**
@@ -1613,38 +1650,6 @@ public class OpenSearchQueryBuilder {
 	return builder.//
 		build().//
 		toQuery();
-    }
-
-    /**
-     * @param field
-     * @param value
-     * @return
-     */
-    private static Query buildTermQuery(String field, String value) {
-
-	return buildTermQuery(field, value, 0);
-    }
-
-    /**
-     * @param field
-     * @param value
-     * @return
-     */
-    private static Query buildTermQuery(String field, String value, double boost) {
-
-	org.opensearch.client.opensearch._types.query_dsl.TermQuery.Builder builder = new TermQuery.Builder();
-
-	if (boost > 1) {
-
-	    builder = builder.boost((float) boost);
-	}
-
-	return builder.//
-		field(field).//
-		value(new FieldValue.Builder().stringValue(value).build()).//
-		build().//
-		toQuery();
-
     }
 
     /**

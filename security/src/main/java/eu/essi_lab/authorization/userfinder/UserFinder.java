@@ -77,7 +77,7 @@ public class UserFinder {
 	timer.scheduleAtFixedRate(USERS_UPDATER_TASK, 0, USERS_UPDATE_PERIOD);
     }
 
-    private static List<GSUser> users = new ArrayList<GSUser>();
+    private static List<GSUser> users;
     private static final ExpiringCache<View> VIEWS = new ExpiringCache<>();
     static {
 	VIEWS.setDuration(VIEWS_CACHE_DURATION);
@@ -284,7 +284,7 @@ public class UserFinder {
 
 	synchronized (USERS_UPDATER_TASK) {
 
-	    if (Objects.nonNull(client)) {
+	    if (client != null) {
 
 		users = client.getUsers();
 	    }
@@ -304,7 +304,7 @@ public class UserFinder {
 
 	synchronized (USERS_UPDATER_TASK) {
 
-	    if (users.isEmpty() && Objects.nonNull(client) || !useCache) {
+	    if (users == null && client != null || !useCache) {
 
 		updateUsersCache();
 
@@ -387,7 +387,7 @@ public class UserFinder {
     }
 
     protected List<GSProperty<String>> findIdentifiers(HttpServletRequest request) throws Exception {
-	
+
 	//
 	// find all the identifiers in the request according
 	// to different strategies

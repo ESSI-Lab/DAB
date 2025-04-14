@@ -43,7 +43,7 @@ public abstract class StatisticsByGroup implements StatisticsGenerator {
 	StatisticsMessage statisticsMessage = new StatisticsMessage();
 
 	// set the required properties
-	statisticsMessage.setSources(allSources);
+	
 	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 //	statisticsMessage.setSharedRepositoryInfo(ConfigurationWrapper.getSharedRepositoryInfo());
 	statisticsMessage.setWebRequest(webRequest);
@@ -53,6 +53,12 @@ public abstract class StatisticsByGroup implements StatisticsGenerator {
 		statisticsMessage.getDataBaseURI(), //
 		statisticsMessage);
 
+	if (statisticsMessage.getView().isPresent()) {
+	    statisticsMessage.setSources(ConfigurationWrapper.getViewSources(statisticsMessage.getView().get()));
+	}else {
+	    statisticsMessage.setSources(allSources);
+	}
+	
 	groupBy(statisticsMessage);
 	
 	

@@ -53,7 +53,7 @@ public class GetSitesObjectFastTransformer extends GetSitesObjectTransformer {
 	selector.addIndex(ResourceProperty.SOURCE_ID);
 	selector.addIndex(MetadataElement.BOUNDING_BOX);
 	selector.addIndex(MetadataElement.COUNTRY);
-	selector.setIncludeOriginal(false);
+	selector.setIncludeOriginal(false);	
 	return selector;
     }
 

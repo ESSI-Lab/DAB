@@ -55,6 +55,7 @@ public class DatabaseSettingTest {
     public void test() {
 
 	DatabaseSetting databaseSetting = new DatabaseSetting();
+	databaseSetting.setDatabaseUri("http://localhost:9200");
 
 	System.out.println(databaseSetting);
 
@@ -136,7 +137,7 @@ public class DatabaseSettingTest {
 	    fail("Exception not thrown");
 	} catch (UnsupportedOperationException ex) {
 	}
-	
+
 	try {
 	    databaseSetting.setDatabaseType("type");
 	    fail("Exception not thrown");
@@ -168,7 +169,7 @@ public class DatabaseSettingTest {
 	Assert.assertNull(databaseName);
 
 	String databaseUri = databaseSetting.getDatabaseUri();
-	Assert.assertNull(databaseUri);
+	Assert.assertEquals("http://localhost:9200", databaseUri);
 
 	String databaseUser = databaseSetting.getDatabaseUser();
 	Assert.assertNull(databaseUser);
@@ -182,7 +183,7 @@ public class DatabaseSettingTest {
 
 	Assert.assertNull(storageUri.getName());
 
-	Assert.assertNull(storageUri.getUri());
+	Assert.assertEquals("http://localhost:9200", storageUri.getUri());
 
 	Assert.assertNull(storageUri.getUser());
 
@@ -249,7 +250,7 @@ public class DatabaseSettingTest {
 
 		Assert.assertEquals("user", user);
 	    }
-	    
+
 	    Optional<String> type = databaseSetting.asStorageInfo().getType();
 
 	    if (databaseSetting.isVolatile()) {
@@ -321,7 +322,7 @@ public class DatabaseSettingTest {
 
 		Assert.assertEquals("user", user);
 	    }
-	    
+
 	    Optional<String> type = databaseSetting.getDatabaseType();
 
 	    if (databaseSetting.isVolatile()) {

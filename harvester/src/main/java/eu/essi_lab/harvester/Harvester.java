@@ -29,6 +29,7 @@ import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.adk.harvest.IHarvestedAccessor;
 import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
 import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask.ExecutionStage;
@@ -42,6 +43,8 @@ import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.HarvestingStrategy;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -145,6 +148,13 @@ public class Harvester {
 	//
 
 	ListRecordsRequest request = new ListRecordsRequest(status);
+
+	//
+	// set the source storage worker to the request
+	//
+	SourceStorageWorker worker = getSourceStorage().getDatabase().getWorker(getAccessor().getSource().getUniqueIdentifier());
+	request.setAdditionalInfo(
+		GSPropertyHandler.of(new GSProperty<SourceStorageWorker>(ListRecordsRequest.SOURCE_STORAGE_WORKER_PROPERTY, worker)));
 
 	try {
 

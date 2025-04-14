@@ -103,8 +103,8 @@ public class CSWProfiler<CSWPS extends CSWProfilerSetting> extends Profiler<CSWP
 	HandlerSelector selector = new HandlerSelector();
 
 	discoveryHandler = new DiscoveryHandler<Element>();
-	discoveryHandler.setRequestTransformer(new CSWRequestTransformer());
-	discoveryHandler.setMessageResponseFormatter(new CSWResultSetFormatter());
+	discoveryHandler.setRequestTransformer(new CSWRequestTransformer(getSetting()));
+	discoveryHandler.setMessageResponseFormatter(new CSWResultSetFormatter(getSetting()));
 
 	//
 	// GetRecord (GET and POST) and GetRecordById (GET)

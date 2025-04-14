@@ -373,7 +373,7 @@ public class MySQLConnectionManager {
      */
     private static String createConnectionURL(String dbUri, String dbName, boolean useSSl, boolean autoReconnect) {
 
-	String url = null;
+	String url = dbUri;
 
 	if (dbName != null) {
 
@@ -382,12 +382,11 @@ public class MySQLConnectionManager {
 		dbName = "/" + dbName;
 	    }
 
-	    url = dbUri + dbName + "?useSSL=" + useSSl;
+	    url += dbName;
 
-	} else {
-
-	    url = dbUri + "?useSSL=" + useSSl;
 	}
+	
+	url += "?useSSL=" + useSSl+"&allowPublicKeyRetrieval=true";
 
 	return url;
     }

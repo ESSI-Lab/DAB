@@ -54,7 +54,7 @@ public class OpenSearchFTPService {
 	OpenSearchDatabase database = new OpenSearchDatabase();
 	database.initialize(osStorageInfo);
 
-	DatabaseFTPService service = DatabaseFTPService.get(database, "C:\\Users\\Fabrizio\\AppData\\Local\\Temp\\fz3temp-2");
+	DatabaseFTPService service = DatabaseFTPService.get(database, "D:\\Desktop\\FTP\\");
 
 	service.start();
     }

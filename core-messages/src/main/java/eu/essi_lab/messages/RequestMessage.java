@@ -69,6 +69,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     private static final long serialVersionUID = 3898362167520217358L;
     private static final String WEB_REQUEST = "webRequest";
     private static final String REQUEST_ABSOLUTE_PATH = "request_absolute_path";
+    private static final String INLCUDE_WEIGHTED_QUERIES = "includeWeightedQueries";
 
     private static final String DATABASE_URL = "databaseURL";
     private static final String USER_JOB_STORAGE_URI = "user_job_storage_uri";
@@ -114,6 +115,8 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 	setException(GSException.createException());
 	setSources(new ArrayList<GSSource>());
 	setOutputSources(false);
+	setUseCachedSourcesDataFolderMap(true);
+	setIncludeWeightedQueries(false);
 
 	requestId = UUID.randomUUID().toString();
     }
@@ -465,7 +468,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public Boolean isCachedSourcesDataFolderMapUsed() {
 
-	return Optional.ofNullable(getHeader().get(USE_CACHED_SOURCES_DATAFOLDER_MAP, Boolean.class)).orElse(false);
+	return Optional.ofNullable(getHeader().get(USE_CACHED_SOURCES_DATAFOLDER_MAP, Boolean.class)).orElse(true);
     }
 
     /**
@@ -474,6 +477,24 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     public void setUseCachedSourcesDataFolderMap(boolean use) {
 
 	getHeader().add(new GSProperty<Boolean>(USE_CACHED_SOURCES_DATAFOLDER_MAP, use));
+    }
+
+    /**
+     * Default value: false
+     *
+     * @return
+     */
+    public boolean isWeightedQueriesIncluded() {
+
+	return Optional.ofNullable(getHeader().get(INLCUDE_WEIGHTED_QUERIES, Boolean.class)).orElse(false);
+    }
+
+    /**
+     * @param include
+     */
+    public void setIncludeWeightedQueries(boolean include) {
+
+	getHeader().add(new GSProperty<Boolean>(INLCUDE_WEIGHTED_QUERIES, include));
     }
 
 }

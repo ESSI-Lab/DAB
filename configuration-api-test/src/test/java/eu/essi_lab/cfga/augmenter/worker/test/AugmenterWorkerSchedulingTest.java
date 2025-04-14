@@ -31,6 +31,8 @@ public class AugmenterWorkerSchedulingTest {
     public void before() throws Exception {
 
 	configuration = new DefaultConfiguration(UUID.randomUUID().toString() + ".json");
+	configuration.clean();
+
 	ConfigurationWrapper.setConfiguration(configuration);
     }
 
@@ -54,7 +56,6 @@ public class AugmenterWorkerSchedulingTest {
 	    setting.setPriority(i);
 	}
 
-	configuration.clean();
 
 	Scheduler scheduler = SchedulerFactory.getVolatileScheduler();
 
@@ -94,8 +95,7 @@ public class AugmenterWorkerSchedulingTest {
 	    s.setPriority(i);
 	}
 
-	configuration.clean();
-
+ 
 	//
 	//
 	// creates the worker configured instance

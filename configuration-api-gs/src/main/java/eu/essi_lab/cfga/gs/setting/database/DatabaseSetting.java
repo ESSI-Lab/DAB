@@ -449,10 +449,9 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
      */
     public StorageInfo asStorageInfo() {
 
-	StorageInfo storageUri = new StorageInfo();
+	StorageInfo storageUri = new StorageInfo(getDatabaseUri());
 
 	storageUri.setName(getDatabaseName());
-	storageUri.setUri(getDatabaseUri());
 
 	if (!isVolatile()) {
 

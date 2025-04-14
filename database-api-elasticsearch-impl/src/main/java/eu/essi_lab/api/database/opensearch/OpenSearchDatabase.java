@@ -4,12 +4,20 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.json.JSONObject;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
@@ -68,11 +76,17 @@ import software.amazon.awssdk.regions.Region;
  */
 public class OpenSearchDatabase extends Database {
 
-    //
-    // set the Jackson StreamReadConstraints maxStringLength to 50 MB instead of the default 20 MB
-    //
+    static boolean debugQueries = false;
+
     static {
 
+	String property = System.getProperty("debugOpenSearchQueries");
+	debugQueries = property != null && property.equals("true");
+
+	//
+	// set the Jackson StreamReadConstraints maxStringLength to 50 MB instead of the
+	// default 20 MB
+	//
 	StreamReadConstraints.overrideDefaultStreamReadConstraints(StreamReadConstraints.builder().maxStringLength(50000000).build());
     }
 
@@ -210,6 +224,7 @@ public class OpenSearchDatabase extends Database {
 		GSLoggerFactory.getLogger(getClass()).info("Creating index {} STARTED", mapping.getIndex());
 
 		createIndex(mapping);
+		// createIndexWithGenericCLient(mapping);
 
 		GSLoggerFactory.getLogger(getClass()).info("Creating index {} ENDED", mapping.getIndex());
 
@@ -254,18 +269,58 @@ public class OpenSearchDatabase extends Database {
     /**
      * @param storageInfo
      * @return
+     * @throws URISyntaxException
      */
-    public static OpenSearchClient createNoSSLContextClient(StorageInfo storageInfo) {
+    public static OpenSearchClient createNoSSLContextClient(StorageInfo storageInfo) throws GSException {
 
-	HttpHost httpHost = HttpHost.create(storageInfo.getUri());
+	URI uri = null;
+	try {
+	    uri = new URI(storageInfo.getUri());
 
-	RestClient restClient = RestClient.builder(httpHost).setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
-	    @Override
-	    public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+	} catch (URISyntaxException e) {
 
-		return httpClientBuilder.setSSLContext(null);
-	    }
-	}).build();
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(e);
+	    throw GSException.createException(OpenSearchDatabase.class, e.getMessage(), e);
+	}
+
+	HttpHost httpHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+
+	RestClientBuilder builder = RestClient.builder(httpHost)
+		.setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+		    @Override
+		    public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+
+			try {
+			    SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(null, (chain, authType) -> true).build();
+			    return httpClientBuilder.setSSLContext(sslContext).setSSLHostnameVerifier((hostname1, session) -> true);
+
+			} catch (Exception e) {
+			    GSLoggerFactory.getLogger(getClass()).error(e);
+			}
+
+			return null;
+		    }
+		});
+
+	if (storageInfo.getUser() != null && !storageInfo.getUser().isEmpty() && //
+		storageInfo.getPassword() != null && !storageInfo.getPassword().isEmpty()) {
+
+	    BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+
+	    credentialsProvider.setCredentials(AuthScope.ANY,
+		    new UsernamePasswordCredentials(storageInfo.getUser(), storageInfo.getPassword()));
+
+	    builder = builder
+		    .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+
+	}
+
+	if (storageInfo.getPath().isPresent()) {
+
+	    builder = builder.setPathPrefix(storageInfo.getPath().get());
+	}
+
+	RestClient restClient = builder.build();
 
 	OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
 
@@ -402,7 +457,8 @@ public class OpenSearchDatabase extends Database {
     }
 
     //
-    // NOT IMPLEMENTED AT THE MOMENT. Used in deprecated SourceStorageWorker testISOCompliance, recoverTags and
+    // NOT IMPLEMENTED AT THE MOMENT. Used in deprecated SourceStorageWorker
+    // testISOCompliance, recoverTags and
     // testISCompliance methods and also in markDeletedRecords (which could be used)
     //
     @Override
@@ -552,6 +608,5 @@ public class OpenSearchDatabase extends Database {
 
 	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + mapping.getIndex() + "Error", ex);
 	}
-
     }
 }

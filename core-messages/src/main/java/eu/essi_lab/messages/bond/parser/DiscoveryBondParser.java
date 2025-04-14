@@ -67,16 +67,17 @@ public class DiscoveryBondParser implements BondParser<DiscoveryBondHandler> {
      */
     public void parse(DiscoveryBondHandler handler) {
 
-//	GSLoggerFactory.getLogger(getClass()).trace("Start parsing");
 	this.handler = handler;
 	this.parse(bond);
-//	GSLoggerFactory.getLogger(getClass()).trace("Parsing completed");
     }
 
     private void parse(Bond bond) {
-	if (bond==null) {
+
+	if (bond == null) {
+
 	    return;
 	}
+
 	if (bond instanceof LogicalBond) {
 
 	    LogicalBond b = (LogicalBond) bond;
@@ -99,7 +100,7 @@ public class DiscoveryBondParser implements BondParser<DiscoveryBondHandler> {
 	    handler.endLogicalBond(b);
 
 	} else {
-	    
+
 	    handler.nonLogicalBond(bond);
 
 	    parseNonLogicalBond(bond);
@@ -125,7 +126,7 @@ public class DiscoveryBondParser implements BondParser<DiscoveryBondHandler> {
 	    ResourcePropertyBond b = (ResourcePropertyBond) bond;
 
 	    handler.resourcePropertyBond(b);
-	    
+
 	} else if (bond instanceof RuntimeInfoElementBond) {
 
 	    RuntimeInfoElementBond b = (RuntimeInfoElementBond) bond;
@@ -134,7 +135,8 @@ public class DiscoveryBondParser implements BondParser<DiscoveryBondHandler> {
 
 	} else if (bond instanceof QueryableBond<?>) {
 
-	    @SuppressWarnings("unchecked") QueryableBond<String> b = (QueryableBond<String>) bond;
+	    @SuppressWarnings("unchecked")
+	    QueryableBond<String> b = (QueryableBond<String>) bond;
 
 	    handler.customBond(b);
 
@@ -143,7 +145,6 @@ public class DiscoveryBondParser implements BondParser<DiscoveryBondHandler> {
 	    ViewBond viewBond = (ViewBond) bond;
 
 	    handler.viewBond(viewBond);
-
 	}
     }
 }

@@ -23,6 +23,7 @@ package eu.essi_lab.profiler.csw.handler.discover;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.csw._2_0_2.GetRecordById;
@@ -34,6 +35,7 @@ import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -42,15 +44,19 @@ import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.csw.CSWGetRecordsParser;
+import eu.essi_lab.profiler.csw.CSWProfilerSetting;
 import eu.essi_lab.profiler.csw.CSWRequestConverter;
 import eu.essi_lab.profiler.csw.CSWRequestUtils;
+import eu.essi_lab.profiler.csw.CSWSearchAfterManager;
 
 /**
  * @author Fabrizio
@@ -66,7 +72,25 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
      */
     private static final int MAX_SUPPORTED_PAGE_SIZE = 10;
 
+    /**
+     * 
+     */
+    private CSWProfilerSetting setting;
+
+    /**
+     * For test purpose
+     */
     public CSWRequestTransformer() {
+
+	this(new CSWProfilerSetting());
+    }
+
+    /**
+     * @param setting
+     */
+    public CSWRequestTransformer(CSWProfilerSetting setting) {
+
+	this.setting = setting;
     }
 
     @Override
@@ -80,16 +104,27 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
     protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
 
-	DiscoveryMessage out = super.refineMessage(message);
+	DiscoveryMessage refinedMessage = super.refineMessage(message);
 
-	Page page = out.getPage();
+	Page page = refinedMessage.getPage();
 
-	if (page.getSize() > MAX_SUPPORTED_PAGE_SIZE) {
+	if (CSWSearchAfterManager.isEnabled(setting, message.getWebRequest())) {
 
-	    out.setIteratedWorkflow(IterationMode.PARTIAL_RESPONSE);
+	    refinedMessage.setSortOrder(SortOrder.ASCENDING);
+	    refinedMessage.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
+
+	    Optional<SearchAfter> searchAfter = CSWSearchAfterManager.get(message.getView().map(v -> v.getId()), page, setting);
+
+	    if (searchAfter.isPresent()) {
+
+		refinedMessage.setSearchAfter(searchAfter.get());
+	    }
+	} else if (page.getSize() > MAX_SUPPORTED_PAGE_SIZE) {
+
+	    refinedMessage.setIteratedWorkflow(IterationMode.PARTIAL_RESPONSE);
 	}
 
-	return out;
+	return refinedMessage;
     }
 
     @Override

@@ -139,7 +139,12 @@ public class OpenSearchFolder implements DatabaseFolder {
     @Override
     public Optional<GSResource> get(IdentifierType type, String identifier) throws Exception {
 
-	OpenSearchQueryBuilder builder = new OpenSearchQueryBuilder(wrapper, new RankingStrategy(), new HashMap<String, String>(), false);
+	OpenSearchQueryBuilder builder = new OpenSearchQueryBuilder(//
+		wrapper, //
+		new RankingStrategy(), //
+		new HashMap<String, String>(), //
+		false,//
+		false);
 
 	Bond bond = null;
 	Query query = null;

@@ -58,7 +58,6 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
@@ -116,6 +115,9 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
+	// including weighted queries to improve ranking
+	message.setIncludeWeightedQueries(true);
+	
 	//
 	// covering mode: overrides the satellites sources results priority,
 	// set the covering mode view and adjusts the ranking to give a weight only to

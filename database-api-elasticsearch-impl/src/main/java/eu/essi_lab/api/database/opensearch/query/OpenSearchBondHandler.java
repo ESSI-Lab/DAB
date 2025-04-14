@@ -47,18 +47,26 @@ import eu.essi_lab.model.resource.MetadataElement;
 public class OpenSearchBondHandler implements DiscoveryBondHandler {
 
     private OpenSearchQueryBuilder queryBuilder;
+    private boolean count;
 
     /**
      * @param wrapper
      * @param message
      * @param map
+     * @param count 
      */
-    public OpenSearchBondHandler(OpenSearchWrapper wrapper, DiscoveryMessage message, HashMap<String, String> map) {
+    public OpenSearchBondHandler(//
+	    OpenSearchWrapper wrapper, //
+	    DiscoveryMessage message, //
+	    HashMap<String, String> map,//
+	    boolean count) {
 
+	this.count = count;
 	this.queryBuilder = new OpenSearchQueryBuilder(//
 		wrapper, message.getRankingStrategy(), //
 		map, //
-		message.isDeletedIncluded());
+		message.isDeletedIncluded(), //
+		message.isWeightedQueriesIncluded());
     }
 
     @Override
@@ -131,7 +139,7 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     @Override
     public void spatialBond(SpatialBond bond) {
 
-	queryBuilder.append(queryBuilder.buildGeoShapeQuery(bond));
+	queryBuilder.append(queryBuilder.buildGeoShapeQuery(bond, count));
     }
 
     @Override

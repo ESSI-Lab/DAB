@@ -65,6 +65,7 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.MessageResponse;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.count.CountSet;
@@ -76,8 +77,10 @@ import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatter;
 import eu.essi_lab.pdk.rsf.FormattingEncoding;
 import eu.essi_lab.profiler.csw.CSWProfiler;
+import eu.essi_lab.profiler.csw.CSWProfilerSetting;
 import eu.essi_lab.profiler.csw.CSWRequestConverter;
 import eu.essi_lab.profiler.csw.CSWRequestUtils;
+import eu.essi_lab.profiler.csw.CSWSearchAfterManager;
 
 /**
  * @author Fabrizio
@@ -103,11 +106,28 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
      * 
      */
     private static final String CSS_VIEW_IDENTIFIER = "emod-pace";
+    private CSWProfilerSetting setting;
 
     static {
 	CSW_FORMATTING_ENCODING.setEncoding(CSW_FORMATTING_ENCODING_NAME);
 	CSW_FORMATTING_ENCODING.setEncodingVersion(CSW_FORMATTING_ENCODING_VERSION);
 	CSW_FORMATTING_ENCODING.setMediaType(MediaType.APPLICATION_XML_TYPE);
+    }
+
+    /**
+     * 
+     */
+    public CSWResultSetFormatter() {
+
+	this(new CSWProfilerSetting());
+    }
+
+    /**
+     * @param setting
+     */
+    public CSWResultSetFormatter(CSWProfilerSetting setting) {
+
+	this.setting = setting;
     }
 
     /**
@@ -234,6 +254,16 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 		// Adding results
 		//
 		addResults(resultsList, errorElements, searchResultsType);
+	    }
+
+	    if (CSWSearchAfterManager.isEnabled(setting, webRequest)) {
+
+		Optional<SearchAfter> searchAfter = mappedResultSet.getSearchAfter();
+
+		if (searchAfter.isPresent()) {
+
+		    CSWSearchAfterManager.put(message.getView().map(v -> v.getId()), setting, searchAfter.get());
+		}
 	    }
 
 	    return buildResponse(recordsResponse);
@@ -396,7 +426,7 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 	}
 
 	if (errorElements != null) {
-	    
+
 	    errorElements.forEach(el -> searchResultsType.getAnies().add(el));
 	}
     }

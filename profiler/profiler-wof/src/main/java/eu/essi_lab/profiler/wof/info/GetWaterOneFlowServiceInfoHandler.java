@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
 
@@ -164,7 +165,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	// creates the message(s)
 	//
 	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
-
+	;
 	List<StatisticsMessage> statisticsMessages = generator.getStatisticMessages(webRequest, viewId.get(), selected, allSources,
 		andBond);
 
@@ -201,7 +202,9 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	    for (ResponseItem responseItem : items) {
 
 		ServiceInfo serviceInfo = parseResponse(responseItem, selected, statisticsMessage, allSources);
-		arrayOfServiceInfo.addServiceInfo(serviceInfo);
+		if (serviceInfo.title != null) {
+		    arrayOfServiceInfo.addServiceInfo(serviceInfo);
+		}
 	    }
 	}
 
@@ -223,7 +226,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	    valueCount = "100";
 	}
 	if (valueCount.contains(".")) {
-	    valueCount = valueCount.substring(0,valueCount.indexOf("."));
+	    valueCount = valueCount.substring(0, valueCount.indexOf("."));
 	}
 	serviceInfo.setValueCount(valueCount);
 
@@ -252,6 +255,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	    // by view
 	    updateByView(serviceInfo, statisticsMessage.getView().get(), statisticsMessage);
 	}
+
 	return serviceInfo;
 
     }
@@ -337,14 +341,19 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 
     private void updateBySource(ServiceInfo serviceInfo, String groupBy, List<GSSource> allSources, StatisticsMessage statisticsMessage) {
 
-	GSSource source = allSources.stream().//
+	Optional<GSSource> source = allSources.stream().//
 		filter(s -> s.getUniqueIdentifier().equals(groupBy)).//
-		findFirst().//
-		get();
+		findFirst()//
+	;
 
-	String title = source.getLabel();
+	if (source.isEmpty()) {
+	    return;
 
-	String servURL = WOFMapperUtils.getServiceUrl(new DiscoveryMessage(statisticsMessage), source);
+	}
+
+	String title = source.get().getLabel();
+
+	String servURL = WOFMapperUtils.getServiceUrl(new DiscoveryMessage(statisticsMessage), source.get());
 	serviceInfo.setServURL(servURL);
 
 	String serviceDescriptionURL = ""; //
@@ -354,7 +363,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 
 	String orgWebSite = "http://localhost"; //
 	String citation = ""; //
-	String aabstract = "Original data publication service endpoint: " + source.getEndpoint(); //
+	String aabstract = "Original data publication service endpoint: " + source.get().getEndpoint(); //
 	String networkName = "ESSI"; //
 
 	serviceInfo.setTitle(title);
@@ -370,7 +379,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	String serviceID;
 	// the serviceID should be an integer for CUAHSI WOF
 	if (WOFMapperUtils.IDENTIFIER_FROM_SOURCE) {
-	    serviceID = HISCentralProfiler.generateUniqueIdFromString(source.getUniqueIdentifier());
+	    serviceID = HISCentralProfiler.generateUniqueIdFromString(source.get().getUniqueIdentifier());
 	} else {
 	    serviceID = SERVICE_ID;
 	}
@@ -577,9 +586,10 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 
 	    return "<ServiceInfo>\n" + //
 		    "	<servURL>" + servURL + "</servURL>\n" + // http://icewater.usu.edu/littlebearriverwof/cuahsi_1_1.asmx?WSDL
-		    "	<Title>" + normalize(title) + "</Title>\n" + // Little Bear River Experimental Watershed, Northern
-							  // Utah,
-							  // USA\n" + //
+		    "	<Title>" + normalize(title) + "</Title>\n" + // Little Bear River Experimental Watershed,
+								     // Northern
+		    // Utah,
+		    // USA\n" + //
 		    "	<ServiceDescriptionURL>" + serviceDescriptionURL + "</ServiceDescriptionURL>\n" + // http://hiscentral.cuahsi.org/pub_network.aspx?n=52\n
 		    "	<Email>" + email + "</Email>\n" + // jeff.horsburgh@usu.edu
 		    "	<phone>" + phone + "</phone>\n" + // 435-797-2946
@@ -591,8 +601,8 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 								   // Tarboton,
 								   // N. O. ..." + //
 		    "	<aabstract>" + normalize(aabstract) + "</aabstract>\n" + // Utah State University is conducting
-								      // continuous
-								      // monitoring...
+		    // continuous
+		    // monitoring...
 		    "	<valuecount>" + valueCount + "</valuecount>\n" + // 4546654
 		    "	<variablecount>" + variableCount + "</variablecount>\n" + // 59
 		    "	<sitecount>" + siteCount + "</sitecount>\n" + // 16

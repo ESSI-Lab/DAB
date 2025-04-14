@@ -63,6 +63,7 @@ import org.opensearch.client.opensearch.core.search.Hit;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -153,7 +154,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	Optional<Queryable> groupByTarget = message.getGroupByTarget();
 
-	Optional<Bond> bond = message.getUserBond();
 
 	boolean isQueryBBOXUnion = message.isQueryBboxUnionComputationSet();
 	boolean isOutputSources = message.isOutputSources();
@@ -167,6 +167,9 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	}
 	if (message.getView() != null && message.getView().isPresent() && message.getView().get().getBond() != null) {
 	    bonds.add(message.getView().get().getBond());
+	    dMessage.setSources(ConfigurationWrapper.getViewSources(message.getView().get()));
+	}else {
+	    dMessage.setSources(message.getSources());
 	}
 	switch (bonds.size()) {
 	case 0:
@@ -549,13 +552,12 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    message.setPermittedBond(BondFactory.createAndBond(bonds));
 	    break;
 	}
-	message.setUseCachedSourcesDataFolderMap(true);
 
 	Query tmp = null;
 	if (!bonds.isEmpty()) {
 	    String s = bonds.toString();
 	    if (lastBond != null && lastBond.equals(s)) {
-		tmp= lastQuery;
+		tmp = lastQuery;
 	    } else {
 		tmp = finder.buildQuery(message, true);
 		lastBond = s;

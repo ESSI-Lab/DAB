@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.JobStatus;
+import eu.essi_lab.model.GSPropertyHandler;
 
 /**
  * @author Fabrizio
@@ -41,6 +42,12 @@ public class ListRecordsRequest {
     private boolean isFirst;
     private JobStatus status;
     private Integer expectedRecords;
+    private GSPropertyHandler additionalInfo;
+
+    /**
+     * 
+     */
+    public static String SOURCE_STORAGE_WORKER_PROPERTY = "sourceStorageWorker";
 
     /**
      * 
@@ -204,5 +211,21 @@ public class ListRecordsRequest {
     public Optional<JobStatus> getStatus() {
 
 	return Optional.ofNullable(status);
+    }
+
+    /**
+     * @return
+     */
+    public GSPropertyHandler getAdditionalInfo() {
+
+	return additionalInfo;
+    }
+
+    /**
+     * @param additionalInfo
+     */
+    public void setAdditionalInfo(GSPropertyHandler additionalInfo) {
+
+	this.additionalInfo = additionalInfo;
     }
 }
