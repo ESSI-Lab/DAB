@@ -35,6 +35,7 @@ import ucar.ma2.ArrayInt;
 import ucar.ma2.ArrayLong;
 import ucar.ma2.ArrayObject;
 import ucar.ma2.ArrayShort;
+import ucar.ma2.ArrayString;
 import ucar.ma2.DataType;
 import ucar.ma2.Index;
 
@@ -183,7 +184,7 @@ public class NetCDFVariable<T> {
 	    ret = new ArrayShort.D1(size,false);
 	    break;
 	case STRING:
-	    ret = new Array.factory(DataType.STRING, new int[] { size });
+		ret = ArrayString.factory(DataType.STRING, new int[] { size });
 	    break;
 	default:
 	    break;

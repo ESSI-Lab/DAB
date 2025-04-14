@@ -143,7 +143,7 @@ public class NetCDF_To_RDB_Processor extends DataProcessor {
 	    lat = station.getLatitude();
 	    lon = station.getLongitude();
 
-	    Date date = pf.getObservationTimeAsDate();
+	    Date date = new Date(pf.getObservationTimeAsCalendarDate().getMillis());
 	    if (t1 == null) {
 		t1 = date;
 	    }

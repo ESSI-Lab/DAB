@@ -261,7 +261,7 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
 	    lat = station.getLatitude();
 	    lon = station.getLongitude();
 
-	    Date date = pf.getObservationTimeAsDate();
+	    Date date = new Date( pf.getObservationTimeAsCalendarDate().getMillis());
 
 	    Double valueDouble = featureData.getScalarDouble(mainVariable.getShortName());
 	    if (valueDouble == null || !Double.isFinite(valueDouble)) {
@@ -285,7 +285,7 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
 
 	if (lat == null || lon == null || stationName == null || stationName.equals("")) { // it could be null in case
 											   // of no values
-	    Station station = fc.getStations().get(0);
+	    Station station = fc.getStationFeatures().get(0);
 	    stationName = station.getName();
 	    lat = station.getLatitude();
 	    lon = station.getLongitude();

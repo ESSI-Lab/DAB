@@ -326,7 +326,7 @@ public class NetCDF_To_WML20_Processor extends DataProcessor {
 	    // MeasureTVPType measurement = new MeasureTVPType();
 
 	    TimePositionType time = new TimePositionType();
-	    Date date = pf.getObservationTimeAsDate();
+	    Date date = new Date(pf.getObservationTimeAsCalendarDate().getMillis());
 	    if (t1 == null) {
 		t1 = date;
 	    }
@@ -367,7 +367,7 @@ public class NetCDF_To_WML20_Processor extends DataProcessor {
 	dpt.setSrsName("EPSG:4326");
 	if (lat == null || lon == null || stationName == null || stationName.equals("")) { // it could be null in case
 											   // of no values
-	    Station station = fc.getStations().get(0);
+	    Station station = fc.getStationFeatures().get(0);
 	    stationName = station.getName();
 	    lat = station.getLatitude();
 	    lon = station.getLongitude();

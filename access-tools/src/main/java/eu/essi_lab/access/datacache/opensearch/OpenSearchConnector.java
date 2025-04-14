@@ -57,6 +57,7 @@ import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.search.SearchScrollRequest;
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
@@ -126,7 +127,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 
     private Integer cachedDays = null;
 
-    private RestHighLevelClient client = null;
+    private OpenSearchClient client = null;
     private String databaseName = null;
 
     public enum DataCacheIndex {
@@ -219,7 +220,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	client = createClient(endpoint, username, password);
 	try {
-	    client.ping(RequestOptions.DEFAULT);
+	    client.ping();
 	} catch (IOException e) {
 	    e.printStackTrace();
 	    throw new Exception("OpenSearch remote service connection issue");
@@ -286,7 +287,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 
     }
 
-    protected RestHighLevelClient createClient(URL endpoint, String username, String password) {
+    protected OpenSearchClient createClient(URL endpoint, String username, String password) {
 	CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
 	if (username != null && password != null) {

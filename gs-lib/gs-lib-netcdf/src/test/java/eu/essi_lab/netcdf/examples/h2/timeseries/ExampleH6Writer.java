@@ -116,7 +116,7 @@ public class ExampleH6Writer extends NetCDFCFExampleWriter {
 	ArrayChar stationNamesArray = new ArrayChar.D2(stationSize, stationNamesShape[0]);
 	Index namesIndex = stationNamesArray.getIndex();
 
-	ArrayInt rowInts = new ArrayInt.D1(stationSize);
+	ArrayInt rowInts = new ArrayInt.D1(stationSize,false);
 	Index rIndex = rowInts.getIndex();
 	double meanRowSize = (double) observationSize / (double) stationSize;
 	int total = 0;

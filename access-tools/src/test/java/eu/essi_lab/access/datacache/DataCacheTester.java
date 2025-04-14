@@ -25,6 +25,7 @@ public class DataCacheTester {
 	connector.configure(OpenSearchConnector.MAX_BULK_SIZE, "1000");
 	connector.configure(OpenSearchConnector.CACHED_DAYS, "0");
 
+	
 	SimpleEntry<String, Date> ner = connector.getNextExpectedRecord(sourceId);
 	
 	System.out.println(ner.getKey());

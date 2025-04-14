@@ -81,13 +81,13 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
 		CalendarDateUnit dateUnit = CalendarDateUnit.of("standard",unitsString);
 		CalendarDate userCalDate = CalendarDate.of(new Date(lower));
 		
-		dateUnit.m
-
-		// Find the closest index on the axis
-		int index = timeAxis.findTimeIndexFromCalendarDate(userCalDate);
-		start = timeAxis.findCoordElement(lower);
-		end = timeAxis.findCoordElement(upper);
-		options = "-d time," + start + "," + end + " ";
+//		dateUnit.m
+//
+//		// Find the closest index on the axis
+//		int index = timeAxis.findTimeIndexFromCalendarDate(userCalDate);
+//		start = timeAxis.findCoordElement(lower);
+//		end = timeAxis.findCoordElement(upper);
+//		options = "-d time," + start + "," + end + " ";
 	    }
 
 	}

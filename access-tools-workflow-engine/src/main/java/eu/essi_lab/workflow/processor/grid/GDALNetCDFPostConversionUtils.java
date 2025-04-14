@@ -440,7 +440,7 @@ public class GDALNetCDFPostConversionUtils {
 		}
 		// writing to band variable
 		if (otherDimension == null) {
-		    ArrayInt.D1 bandValues = new ArrayInt.D1(bands.size());
+		    ArrayInt.D1 bandValues = new ArrayInt.D1(bands.size(),false);
 		    for (int i = 0; i < bands.size(); i++) {
 			bandValues.set(i, i);
 		    }

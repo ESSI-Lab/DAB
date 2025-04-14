@@ -113,7 +113,7 @@ public class ExampleH7Writer extends NetCDFCFExampleWriter {
 	Index hIndex = humidityFloats.getIndex();
 	ArrayFloat temperatureFloats = new ArrayFloat.D1(observationSize);
 	Index teIndex = temperatureFloats.getIndex();
-	ArrayInt stationInts = new ArrayInt.D1(observationSize);
+	ArrayInt stationInts = new ArrayInt.D1(observationSize,false);
 	Index sIndex = stationInts.getIndex();
 	int[] stationNamesShape = stationNames.getShape();
 	ArrayChar stationNamesArray = new ArrayChar.D2(stationSize, stationNamesShape[0]);
