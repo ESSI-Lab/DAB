@@ -489,7 +489,7 @@ public class OpenSearchQueryBuilder {
 
 	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Contains);
 
-	    weightedQuery = buildContainedWeightQuery(area, 500);
+	    weightedQuery = weightedQueriesInclued ? buildContainedWeightQuery(area, 500) : null;
 
 	    break;
 
@@ -504,7 +504,7 @@ public class OpenSearchQueryBuilder {
 		operands.add(buildAreaWeightedQuery(min, area));
 	    }
 
-	    weightedQuery = buildShouldQuery(operands);
+	    weightedQuery = weightedQueriesInclued ? buildShouldQuery(operands) : null;
 
 	    break;
 	case DISJOINT:
