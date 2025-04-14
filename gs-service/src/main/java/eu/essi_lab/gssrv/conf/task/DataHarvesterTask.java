@@ -161,7 +161,7 @@ public class DataHarvesterTask extends AbstractCustomTask {
 			    if (onlineId.startsWith("urn")) {
 				dcc.deleteBefore(null, fid, onlineId);
 			    }
-			    ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(onlineId, sources, onlineId, databaseURI);
+			    ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(onlineId, Optional.empty(), onlineId);
 			    if (!resultSet.getResultsList().isEmpty()) {
 				if (resultSet.getResultsList().size() > 1) {
 				    GSLoggerFactory.getLogger(getClass())

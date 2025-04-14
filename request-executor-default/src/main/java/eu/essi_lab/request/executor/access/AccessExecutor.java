@@ -118,9 +118,10 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 	// GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
 
-	List<GSSource> sources = accessMessage.getSources();
-	StorageInfo databaseURI = accessMessage.getDataBaseURI();
-	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(accessMessage.getRequestId(), sources, onlineId, databaseURI);
+	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(//
+		accessMessage.getRequestId(), //
+		accessMessage.getView(), //
+		onlineId);
 
 	if (resultSet.getResultsList().isEmpty()) {
 
@@ -167,8 +168,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
 	    }
 	}
-    
-	
+
 	GSResource resource = resultSet.getResultsList().get(0);
 	DataDescriptor targetDescriptor = accessMessage.getTargetDataDescriptor();
 
@@ -320,7 +320,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		remoteDescriptor.fillMissingInformationOf(targetDescriptor);
 	    }
 	    CRS validatedCRS = remoteDescriptor.getCRS();
-	    if(validatedCRS == null) {
+	    if (validatedCRS == null) {
 		validatedCRS = CRS.EPSG_4326();
 		remoteDescriptor.setCRS(validatedCRS);
 	    }
