@@ -271,9 +271,20 @@ public class IndexData {
      * @return
      * @throws Exception
      */
-    public static IndexData of(OpenSearchFolder folder, File file) throws Exception {
+    public static IndexData of(OpenSearchFolder folder, InputStream resourceStream) throws Exception {
 
-	return of(folder, new FileInputStream(file));
+	return IndexData.of(folder, (Document) OpenSearchUtils.toNode(resourceStream));
+    }
+
+    /**
+     * @param folder
+     * @param resourcefile
+     * @return
+     * @throws Exception
+     */
+    public static IndexData of(OpenSearchFolder folder, File resourcefile) throws Exception {
+
+	return of(folder, new FileInputStream(resourcefile));
     }
 
     /**
