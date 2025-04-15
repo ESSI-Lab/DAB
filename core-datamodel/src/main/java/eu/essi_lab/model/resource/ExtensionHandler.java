@@ -200,18 +200,6 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
     }
 
-    /**
-     * @param id
-     */
-    public void setUniqueInstrumentIdentifier(String id) {
-	try {
-	    this.metadata.add(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME, id);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
     public Optional<String> getBNHSInfo() {
 
 	try {
@@ -334,6 +322,18 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * @param id
+     */
+    public void setUniqueInstrumentIdentifier(String id) {
+	try {
+	    this.metadata.add(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME, id);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
     }
 
     /**
