@@ -174,28 +174,6 @@ public class StationsCreatorTask extends AbstractCustomTask implements Harvestin
 			res.getExtensionHandler().getCountry().ifPresent(country -> collection.getExtensionHandler().setCountry(country));
 
 			//
-			// abstract
-			//
-
-			List<String> abstract_ = res.getIndexesMetadata().read(MetadataElement.ABSTRACT);
-
-			if (!abstract_.isEmpty()) {
-
-			    collection.getHarmonizedMetadata().getCoreMetadata().setAbstract(abstract_.get(0));
-			}
-
-			//
-			// title
-			//
-
-			List<String> title = res.getIndexesMetadata().read(MetadataElement.TITLE);
-
-			if (!title.isEmpty()) {
-
-			    collection.getHarmonizedMetadata().getCoreMetadata().setTitle(title.get(0));
-			}
-
-			//
 			// shape
 			//
 
@@ -260,6 +238,9 @@ public class StationsCreatorTask extends AbstractCustomTask implements Harvestin
 				    getCoreMetadata().//
 				    getMIMetadata().//
 				    addMIPlatform(miPlatform);
+
+			    collection.getHarmonizedMetadata().getCoreMetadata().setAbstract(platformTitle.get(0));
+			    collection.getHarmonizedMetadata().getCoreMetadata().setTitle(platformTitle.get(0));
 			}
 
 			//
