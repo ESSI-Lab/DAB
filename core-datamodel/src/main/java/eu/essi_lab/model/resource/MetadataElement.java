@@ -180,6 +180,11 @@ public enum MetadataElement implements Queryable {
     /**
      * 
      */
+    ATTRIBUTE_UNITS_URI(MetadataElement.ATTRIBUTE_UNITS_URI_EL_NAME),
+
+    /**
+     * 
+     */
     ATTRIBUTE_UNITS_ABBREVIATION(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
