@@ -41,11 +41,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 
 import eu.essi_lab.jaxb.common.ISO2014NameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
@@ -518,27 +513,27 @@ public class BLUECloudDownloadReport {
 	System.out.println("Uploading to S3");
 	Regions clientRegion = Regions.US_EAST_1;
 	String bucketName = "dabreporting";
-
-	try {
-	    // This code expects that you have AWS credentials set up per:
-	    // https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html Expects
-	    // (~/.aws/credentials)
-	    AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(clientRegion).build();
-
-	    // Upload a file as a new object with ContentType and title specified.
-	    PutObjectRequest request = new PutObjectRequest(bucketName, "BlueCloud/" + name, f)
-		    .withCannedAcl(CannedAccessControlList.PublicRead);
-	    ObjectMetadata metadata = new ObjectMetadata();
-	    metadata.setContentType("text/html");
-	    metadata.addUserMetadata("title", "BlueCloud Report");
-	    request.setMetadata(metadata);
-	    s3Client.putObject(request);
-	    // s3Client.putObject(bucketName, "BlueCloud/" + name, f);
-	    System.out.println("Uploaded");
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    System.err.println("Error during S3 upload!");
-	}
+	 System.err.println("THIS NEED TO BE RE-IMPLEMENTED WITH S3TransferWrapper");
+//	try {
+//	    // This code expects that you have AWS credentials set up per:
+//	    // https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html Expects
+//	    // (~/.aws/credentials)
+//	    AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(clientRegion).build();
+//
+//	    // Upload a file as a new object with ContentType and title specified.
+//	    PutObjectRequest request = new PutObjectRequest(bucketName, "BlueCloud/" + name, f)
+//		    .withCannedAcl(CannedAccessControlList.PublicRead);
+//	    ObjectMetadata metadata = new ObjectMetadata();
+//	    metadata.setContentType("text/html");
+//	    metadata.addUserMetadata("title", "BlueCloud Report");
+//	    request.setMetadata(metadata);
+//	    s3Client.putObject(request);
+//	    // s3Client.putObject(bucketName, "BlueCloud/" + name, f);
+//	    System.out.println("Uploaded");
+//	} catch (Exception e) {
+//	    e.printStackTrace();
+//	    System.err.println("Error during S3 upload!");
+//	}
     }
 
 }

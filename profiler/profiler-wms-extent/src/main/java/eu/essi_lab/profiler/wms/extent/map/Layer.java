@@ -47,6 +47,22 @@ import javax.imageio.ImageIO;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.filter.Filter;
+import org.geotools.api.filter.FilterFactory;
+import org.geotools.api.filter.expression.PropertyName;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.api.style.FeatureTypeStyle;
+import org.geotools.api.style.Fill;
+import org.geotools.api.style.Graphic;
+import org.geotools.api.style.Mark;
+import org.geotools.api.style.Rule;
+import org.geotools.api.style.Stroke;
+import org.geotools.api.style.Style;
+import org.geotools.api.style.StyleFactory;
+import org.geotools.api.style.Symbolizer;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.factory.CommonFactoryFinder;
@@ -60,27 +76,11 @@ import org.geotools.map.FeatureLayer;
 import org.geotools.map.MapContent;
 import org.geotools.referencing.CRS;
 import org.geotools.renderer.lite.StreamingRenderer;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Fill;
-import org.geotools.styling.Graphic;
-import org.geotools.styling.Mark;
-import org.geotools.styling.Rule;
-import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.Symbolizer;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.PropertyName;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 
 import eu.essi_lab.access.datacache.BBOX;
 import eu.essi_lab.access.datacache.BBOX3857;
@@ -144,7 +144,8 @@ public class Layer {
 	    targetLines = targetLines.subCollection(timeFilter);
 	}
 	if (bbox != null) {
-	    org.opengis.filter.spatial.BBOX bboxFilter;
+	    
+	    org.geotools.api.filter.spatial.BBOX bboxFilter;
 	    switch (bbox.getCrs()) {
 	    case "CRS:84":
 		bboxFilter = ff.bbox(geometryAttributeName, bbox.getMinx().doubleValue(), bbox.getMiny().doubleValue(),
@@ -603,7 +604,7 @@ public class Layer {
     }
 
     private static StyleFactory sf = CommonFactoryFinder.getStyleFactory();
-    private static FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
+    private static FilterFactory ff = CommonFactoryFinder.getFilterFactory();
 
     private enum GeomType {
 	POINT, LINE, POLYGON, LINESTRING

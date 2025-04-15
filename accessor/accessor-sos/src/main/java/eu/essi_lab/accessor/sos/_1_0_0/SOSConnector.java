@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPathExpressionException;
 
-import org.opengis.geometry.BoundingBox;
+import org.geotools.api.geometry.BoundingBox;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.accessor.sos.SOSProperties;

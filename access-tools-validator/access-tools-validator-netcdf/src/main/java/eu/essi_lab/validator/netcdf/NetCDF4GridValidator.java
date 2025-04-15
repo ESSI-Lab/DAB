@@ -25,9 +25,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.imageio.netcdf.GeoToolsNetCDFReader;
 import org.geotools.imageio.netcdf.utilities.NetCDFCRSUtilities;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import eu.essi_lab.access.DataValidatorErrorCode;
 import eu.essi_lab.access.DataValidatorImpl;

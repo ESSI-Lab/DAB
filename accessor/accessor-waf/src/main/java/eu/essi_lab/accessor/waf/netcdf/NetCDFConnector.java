@@ -37,9 +37,9 @@ import java.util.Optional;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.IOUtils;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.imageio.netcdf.GeoToolsNetCDFReader;
 import org.geotools.imageio.netcdf.utilities.NetCDFCRSUtilities;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;

@@ -20,7 +20,7 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
-		<dependency>
+		<!--dependency>
 			<groupId>edu.ucar</groupId>
 			<artifactId>cdm</artifactId>			
 		</dependency>
@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>edu.ucar</groupId>
 			<artifactId>opendap</artifactId>
-		</dependency>
+		</dependency-->
 
 	</dependencies>
 

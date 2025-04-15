@@ -88,7 +88,7 @@ public class GDALNetCDFPostConversionUtils {
 
 	    File tmpFile = File.createTempFile("GDAL_To_NetCDF_Processor", ".nc");
 	    tmpFile.deleteOnExit();
-	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf3, tmpFile.getAbsolutePath());
+	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, tmpFile.getAbsolutePath());
 
 	    // global attributes
 	    for (Attribute globalAttribute : sourceReader.getGlobalAttributes()) {
@@ -215,7 +215,7 @@ public class GDALNetCDFPostConversionUtils {
 	    }
 
 	    File tmpFile = File.createTempFile("GDAL_To_NetCDF_Processor", ".nc");
-	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf3, tmpFile.getAbsolutePath());
+	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, tmpFile.getAbsolutePath());
 
 	    // global attributes
 	    for (Attribute globalAttribute : reader.getGlobalAttributes()) {
@@ -349,7 +349,7 @@ public class GDALNetCDFPostConversionUtils {
 
 	    if (bands.size() > 1) {
 
-		NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf3, tmpFile.getAbsolutePath());
+		NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, tmpFile.getAbsolutePath());
 
 		// global attributes
 		for (Attribute globalAttribute : inputDataset.getGlobalAttributes()) {

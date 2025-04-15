@@ -1,4 +1,4 @@
-package eu.essi_lab.access.datacache.opensearch;
+//package eu.essi_lab.access.datacache.opensearch;
 
 /*-
  * #%L
@@ -20,67 +20,69 @@ package eu.essi_lab.access.datacache.opensearch;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+//
 
-import java.net.URL;
-
-import org.apache.http.HttpHost;
-import org.opensearch.client.RestHighLevelClient;
-import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.transport.aws.AwsSdk2Transport;
-import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
-
-import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
-import eu.essi_lab.api.database.Database.OpenSearchServiceType;
-import software.amazon.awssdk.http.SdkHttpClient;
-import software.amazon.awssdk.http.apache.ApacheHttpClient;
-import software.amazon.awssdk.regions.Region;
-
-public class AWSOpenSearchConnector extends OpenSearchConnector {
-
-    @Override
-    public boolean supports(DataConnectorType type) {
-	switch (type) {
-	case OPEN_SEARCH_AWS_1_3:
-	    return true;
-	default:
-	    return false;
-	}
-    }
-
-    
-    protected OpenSearchClient createClient(URL endpoint, String accessKey, String secretKey) {
-       
-
-   	    AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
-
-   		    build();
-
-   	    SdkHttpClient httpClient = ApacheHttpClient.builder().build();
-
-   	    
-   	    HttpHost httpHost = HttpHost.create(endpoint.toString());
-
-   		AwsSdk2Transport awsSdk2Transport = new AwsSdk2Transport(//
-   			httpClient, //
-   			httpHost.getHostName(), //
-   			"es", //
-   			Region.US_EAST_1, //
-   			awsSdk2TransportOptions);
-
-   		OpenSearchClient ret = new OpenSearchClient(awsSdk2Transport);
-   		
-   		return ret;
-   	    
-    	
-    }
-//    protected RestHighLevelClient createClient(URL endpoint, String username, String password) {
-//	AWS4Signer signer = new AWS4Signer();
-//	signer.setServiceName("es");
-//	signer.setRegionName("us-east-1");
-//	AWSCredentials credentials = new BasicAWSCredentials(username, password);
-//	AWSCredentialsProvider credentialsProvier = new AWSStaticCredentialsProvider(credentials);
-//	HttpRequestInterceptor interceptor = new AWSRequestSigningApacheInterceptor("es", signer, credentialsProvier);
-//	return new RestHighLevelClient(RestClient.builder(HttpHost.create(endpoint.toString()))
-//		.setHttpClientConfigCallback(hacb -> hacb.addInterceptorLast(interceptor)));
+////
+//import java.net.URL;
+//
+//import org.apache.http.HttpHost;
+//import org.opensearch.client.RestHighLevelClient;
+//import org.opensearch.client.opensearch.OpenSearchClient;
+//import org.opensearch.client.transport.aws.AwsSdk2Transport;
+//import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
+//
+//import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
+//import eu.essi_lab.api.database.Database.OpenSearchServiceType;
+//import software.amazon.awssdk.http.SdkHttpClient;
+//import software.amazon.awssdk.http.apache.ApacheHttpClient;
+//import software.amazon.awssdk.regions.Region;
+//
+//public class AWSOpenSearchConnector extends OpenSearchConnector {
+//
+//    @Override
+//    public boolean supports(DataConnectorType type) {
+//	switch (type) {
+//	case OPEN_SEARCH_AWS_1_3:
+//	    return true;
+//	default:
+//	    return false;
+//	}
 //    }
-}
+//
+//    
+//    protected OpenSearchClient createClient(URL endpoint, String accessKey, String secretKey) {
+//       
+//
+//   	    AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
+//
+//   		    build();
+//
+//   	    SdkHttpClient httpClient = ApacheHttpClient.builder().build();
+//
+//   	    
+//   	    HttpHost httpHost = HttpHost.create(endpoint.toString());
+//
+//   		AwsSdk2Transport awsSdk2Transport = new AwsSdk2Transport(//
+//   			httpClient, //
+//   			httpHost.getHostName(), //
+//   			"es", //
+//   			Region.US_EAST_1, //
+//   			awsSdk2TransportOptions);
+//
+//   		OpenSearchClient ret = new OpenSearchClient(awsSdk2Transport);
+//   		
+//   		return ret;
+//   	    
+//    	
+//    }
+////    protected RestHighLevelClient createClient(URL endpoint, String username, String password) {
+////	AWS4Signer signer = new AWS4Signer();
+////	signer.setServiceName("es");
+////	signer.setRegionName("us-east-1");
+////	AWSCredentials credentials = new BasicAWSCredentials(username, password);
+////	AWSCredentialsProvider credentialsProvier = new AWSStaticCredentialsProvider(credentials);
+////	HttpRequestInterceptor interceptor = new AWSRequestSigningApacheInterceptor("es", signer, credentialsProvier);
+////	return new RestHighLevelClient(RestClient.builder(HttpHost.create(endpoint.toString()))
+////		.setHttpClientConfigCallback(hacb -> hacb.addInterceptorLast(interceptor)));
+////    }
+//}

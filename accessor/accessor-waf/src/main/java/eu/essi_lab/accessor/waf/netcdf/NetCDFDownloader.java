@@ -30,11 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.imageio.netcdf.GeoToolsNetCDFReader;
 import org.geotools.imageio.netcdf.utilities.NetCDFCRSUtilities;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.amazonaws.util.IOUtils;
+import com.google.api.client.util.IOUtils;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.lib.net.downloader.Downloader;

@@ -105,7 +105,7 @@ import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1DTime;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.NetcdfDataset.Enhance;
-import ucar.nc2.ft.FeatureCollection;
+import ucar.nc2.ft.DsgFeatureCollection;
 import ucar.nc2.ft.FeatureDataset;
 import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.nc2.ft.PointFeature;
@@ -603,7 +603,7 @@ public class OMHandler extends StreamingRequestHandler {
 	    private void addPointsFromTrajectoryNetCDF(File file, JSONObservation observation, String viewId) {
 		FeatureDataset dataset = null;
 		NetcdfDataset.setDefaultEnhanceMode(
-			Collections.unmodifiableSet(EnumSet.of(Enhance.ScaleMissing, Enhance.CoordSystems, Enhance.ConvertEnums)));
+			Collections.unmodifiableSet(EnumSet.of(Enhance.ApplyScaleOffset, Enhance.CoordSystems, Enhance.ConvertEnums)));
 		try {
 
 		    dataset = FeatureDatasetFactoryManager.open(FeatureType.TRAJECTORY, file.getAbsolutePath(), null, null);
@@ -616,12 +616,12 @@ public class OMHandler extends StreamingRequestHandler {
 
 		    PointDatasetImpl fdp = (PointDatasetImpl) dataset;
 
-		    List<FeatureCollection> collections = fdp.getPointFeatureCollectionList();
+		    List<DsgFeatureCollection> collections = fdp.getPointFeatureCollectionList();
 
 		    if (collections.get(0) instanceof StandardTrajectoryCollectionImpl) {
 			StandardTrajectoryCollectionImpl collection = (StandardTrajectoryCollectionImpl) collections.get(0);
 
-			PointFeatureCollectionIterator iterator = collection.getPointFeatureCollectionIterator(-1);
+			PointFeatureCollectionIterator iterator = collection.getPointFeatureCollectionIterator();
 
 			while (iterator.hasNext()) {
 			    PointFeatureCollection pfc = iterator.next();
@@ -631,7 +631,7 @@ public class OMHandler extends StreamingRequestHandler {
 				double alt = spf.getLocation().getAltitude();
 				double lon = spf.getLocation().getLongitude();
 				double lat = spf.getLocation().getLatitude();
-				long time = spf.getNominalTimeAsDate().getTime();
+				long time = spf.getNominalTimeAsCalendarDate().getMillis();
 				StructureData data = spf.getFeatureData();
 				// List<Member> members = data.getMembers();
 				// StructureMembers structureMembers = data.getStructureMembers();
