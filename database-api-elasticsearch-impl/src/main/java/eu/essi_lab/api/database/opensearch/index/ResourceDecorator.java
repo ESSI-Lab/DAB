@@ -180,11 +180,14 @@ public class ResourceDecorator {
 	}
 
 	//
-	// if the binary is excluded, gssource must be set
+	// if the binary is excluded
+	// 1) source can be set, if the source id is available
+	// 2) all extended properties can be set, if available
 	//
-	if (res.getSource() == null) {
+	if (!source.has(DataFolderMapping.GS_RESOURCE)) {
 
 	    Optional<JSONArray> sourceId = Optional.ofNullable(source.optJSONArray(ResourceProperty.SOURCE_ID.getName(), null));
+
 	    if (sourceId.isPresent()) {
 
 		ConfigurationWrapper.getAllSources().//
@@ -192,6 +195,136 @@ public class ResourceDecorator {
 			filter(s -> s.getUniqueIdentifier().equals(sourceId.get().get(0))).//
 			findFirst().//
 			ifPresent(s -> res.setSource(s));
+	    }
+
+	    if (source.has(MetadataElement.BNHS_INFO.getName())) {
+
+		res.getExtensionHandler().setBNHSInfo(source.getJSONArray(MetadataElement.BNHS_INFO.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.RIVER_BASIN.getName())) {
+
+		res.getExtensionHandler().setRiverBasin(source.getJSONArray(MetadataElement.RIVER_BASIN.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.RIVER.getName())) {
+
+		res.getExtensionHandler().setRiver(source.getJSONArray(MetadataElement.RIVER.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.COUNTRY.getName())) {
+
+		res.getExtensionHandler().setCountry(source.getJSONArray(MetadataElement.COUNTRY.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.COUNTRY_ISO3.getName())) {
+
+		res.getExtensionHandler().setCountryISO3(source.getJSONArray(MetadataElement.COUNTRY_ISO3.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.DATA_SIZE.getName())) {
+
+		res.getExtensionHandler()
+			.setDataSize(Long.valueOf(source.getJSONArray(MetadataElement.DATA_SIZE.getName()).get(0).toString()));
+	    }
+
+	    if (source.has(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER.getName())) {
+
+		res.getExtensionHandler().setUniqueInstrumentIdentifier(
+			source.getJSONArray(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER.getName())) {
+
+		res.getExtensionHandler().setUniquePlatformIdentifier(
+			source.getJSONArray(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER.getName())) {
+
+		res.getExtensionHandler().setUniqueAttributeIdentifier(
+			source.getJSONArray(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.CROP_TYPES.getName())) {
+
+		res.getExtensionHandler().setCropTypes(source.getJSONArray(MetadataElement.CROP_TYPES.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.TIME_INTERPOLATION.getName())) {
+
+		res.getExtensionHandler()
+			.setTimeInterpolation(source.getJSONArray(MetadataElement.TIME_INTERPOLATION.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.TIME_SUPPORT.getName())) {
+
+		res.getExtensionHandler().setTimeSupport(source.getJSONArray(MetadataElement.TIME_SUPPORT.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.TIME_RESOLUTION.getName())) {
+
+		res.getExtensionHandler()
+			.setTimeResolution(source.getJSONArray(MetadataElement.TIME_RESOLUTION.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.TIME_UNITS.getName())) {
+
+		res.getExtensionHandler().setTimeUnits(source.getJSONArray(MetadataElement.TIME_UNITS.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.TIME_UNITS_ABBREVIATION.getName())) {
+
+		res.getExtensionHandler()
+			.setTimeUnitsAbbreviation(source.getJSONArray(MetadataElement.TIME_UNITS_ABBREVIATION.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.TIME_RESOLUTION_DURATION_8601.getName())) {
+
+		res.getExtensionHandler().setTimeResolutionDuration8601(
+			source.getJSONArray(MetadataElement.TIME_RESOLUTION_DURATION_8601.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.TIME_AGGREGATION_DURATION_8601.getName())) {
+
+		res.getExtensionHandler().setTimeAggregationDuration8601(
+			source.getJSONArray(MetadataElement.TIME_AGGREGATION_DURATION_8601.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.OBSERVED_PROPERTY_URI.getName())) {
+
+		res.getExtensionHandler()
+			.setObservedPropertyURI(source.getJSONArray(MetadataElement.OBSERVED_PROPERTY_URI.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.WIS_TOPIC_HIERARCHY.getName())) {
+
+		res.getExtensionHandler()
+			.setWISTopicHierarchy(source.getJSONArray(MetadataElement.WIS_TOPIC_HIERARCHY.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.ATTRIBUTE_UNITS.getName())) {
+
+		res.getExtensionHandler()
+			.setAttributeUnits(source.getJSONArray(MetadataElement.ATTRIBUTE_UNITS.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.ATTRIBUTE_UNITS_URI.getName())) {
+
+		res.getExtensionHandler()
+			.setAttributeUnitsURI(source.getJSONArray(MetadataElement.ATTRIBUTE_UNITS_URI.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION.getName())) {
+
+		res.getExtensionHandler().setAttributeUnitsAbbreviation(
+			source.getJSONArray(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION.getName()).get(0).toString());
+	    }
+
+	    if (source.has(MetadataElement.ATTRIBUTE_MISSING_VALUE.getName())) {
+
+		res.getExtensionHandler()
+			.setAttributeMissingValue(source.getJSONArray(MetadataElement.ATTRIBUTE_MISSING_VALUE.getName()).get(0).toString());
 	    }
 	}
 
