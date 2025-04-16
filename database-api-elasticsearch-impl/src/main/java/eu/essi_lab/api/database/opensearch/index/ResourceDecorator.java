@@ -152,24 +152,24 @@ public class ResourceDecorator {
 	    Optional.ofNullable(source.opt(Shape.AREA)).ifPresent(v -> res.getExtensionHandler().setArea(Double.valueOf(v.toString())));
 	}
 
-	if (source.has(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
+	if (source.has(MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName())) {
 
 	    indexesMd.write(IndexedElements.TEMP_EXTENT_BEGIN_NOW);
 	}
 
-	if (source.has(IndexedElements.TEMP_EXTENT_END_NOW.getElementName())) {
+	if (source.has(MetadataElement.TEMP_EXTENT_END_NOW.getName())) {
 
 	    indexesMd.write(IndexedElements.TEMP_EXTENT_END_NOW);
 	}
 
 	if (!source.has(MetadataElement.TEMP_EXTENT_BEGIN.getName()) && //
 		!source.has(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW.getName()) //
-		&& !source.has(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
+		&& !source.has(MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName())) {
 
 	    indexesMd.write(IndexedElements.TEMP_EXTENT_BEGIN_NULL);
 	}
 
-	if (!source.has(MetadataElement.TEMP_EXTENT_END.getName()) && !source.has(IndexedElements.TEMP_EXTENT_END_NOW.getElementName())) {
+	if (!source.has(MetadataElement.TEMP_EXTENT_END.getName()) && !source.has(MetadataElement.TEMP_EXTENT_END_NOW.getName())) {
 
 	    indexesMd.write(IndexedElements.TEMP_EXTENT_END_NULL);
 	}

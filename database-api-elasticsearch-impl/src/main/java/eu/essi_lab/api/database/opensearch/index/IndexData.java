@@ -760,9 +760,9 @@ public class IndexData {
 	// temp extent begin now
 	//
 
-	if (exists(handler, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
+	if (exists(handler, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName())) {
 
-	    put(Arrays.asList("true"), indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
+	    put(Arrays.asList("true"), indexData, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName(), Boolean.class);
 	}
 
 	//
@@ -780,9 +780,9 @@ public class IndexData {
 	// temp extent end now
 	//
 
-	if (exists(handler, IndexedElements.TEMP_EXTENT_END_NOW.getElementName())) {
+	if (exists(handler, MetadataElement.TEMP_EXTENT_END_NOW.getName())) {
 
-	    put(Arrays.asList("true"), indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
+	    put(Arrays.asList("true"), indexData, MetadataElement.TEMP_EXTENT_END_NOW.getName(), Boolean.class);
 	}
 
 	//
@@ -883,10 +883,10 @@ public class IndexData {
 	// temp extent begin now
 	//
 
-	if (!indexesMd.read(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()).isEmpty()) {
+	if (!indexesMd.read(MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName()).isEmpty()) {
 
 	    // this element has the empty string value!
-	    put(indexesMd, indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
+	    put(indexesMd, indexData, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName(), Boolean.class);
 	}
 
 	//
@@ -899,10 +899,10 @@ public class IndexData {
 	// temp extent end now
 	//
 
-	if (!indexesMd.read(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()).isEmpty()) {
+	if (!indexesMd.read(MetadataElement.TEMP_EXTENT_END_NOW.getName()).isEmpty()) {
 
 	    // this element has the empty string value!
-	    put(indexesMd, indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
+	    put(indexesMd, indexData, MetadataElement.TEMP_EXTENT_END_NOW.getName(), Boolean.class);
 	}
 
 	//

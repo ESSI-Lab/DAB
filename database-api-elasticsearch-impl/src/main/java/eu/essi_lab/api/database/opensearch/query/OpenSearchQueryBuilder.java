@@ -1240,8 +1240,8 @@ public class OpenSearchQueryBuilder {
     private Query buildTempExtentNowQuery(MetadataElement el) {
 
 	String field = el == MetadataElement.TEMP_EXTENT_BEGIN ? //
-		IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName() : //
-		IndexedElements.TEMP_EXTENT_END_NOW.getElementName();
+		MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName() : //
+		    MetadataElement.TEMP_EXTENT_END_NOW.getName();
 
 	return buildRangeQuery(field, BondOperator.EQUAL, "true");
     }

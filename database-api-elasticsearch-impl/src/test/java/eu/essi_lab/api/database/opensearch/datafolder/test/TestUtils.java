@@ -258,8 +258,8 @@ public class TestUtils {
 	    List<String> prop1Values = indexesMd1.read(prop);
 	    List<String> prop2Values = indexesMd2.read(prop);
 
-	    if (prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()) || //
-		    prop.equals(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()) //
+	    if (prop.equals(MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName()) || //
+		    prop.equals(MetadataElement.TEMP_EXTENT_END_NOW.getName()) //
 	    ) {
 
 		//

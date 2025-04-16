@@ -382,11 +382,22 @@ public enum MetadataElement implements Queryable {
      *
      */
     TEMP_EXTENT_BEGIN("tmpExtentBegin", ContentType.ISO8601_DATE_TIME),
+    
+    /**
+     * 
+     */
+    TEMP_EXTENT_BEGIN_NOW("tmpExtentBegin_Now", ContentType.BOOLEAN),
+    
 
     /**
      *
      */
     TEMP_EXTENT_END("tmpExtentEnd", ContentType.ISO8601_DATE_TIME),
+    
+    /**
+     * 
+     */
+    TEMP_EXTENT_END_NOW("tmpExtentEnd_Now", ContentType.BOOLEAN),
 
     /**
     *

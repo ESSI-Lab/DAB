@@ -743,7 +743,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
      */
     private void checkTempExtentBeginNow(SourceWrapper wrapper, boolean expectPresent) {
 
-	checkProperty(wrapper, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), expectPresent);
+	checkProperty(wrapper, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName(), expectPresent);
     }
 
     /**
@@ -770,7 +770,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
      */
     private void checkTempExtentEndNow(SourceWrapper wrapper, boolean expectPresent) {
 
-	checkProperty(wrapper, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), expectPresent);
+	checkProperty(wrapper, MetadataElement.TEMP_EXTENT_END_NOW.getName(), expectPresent);
     }
 
     /**
