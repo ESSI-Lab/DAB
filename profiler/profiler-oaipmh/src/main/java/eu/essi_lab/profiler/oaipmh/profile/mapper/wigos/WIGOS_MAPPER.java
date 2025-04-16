@@ -526,6 +526,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    }
 	    Optional<String> identifier = extensionHandler.getUniquePlatformIdentifier();
 	    if (identifier.isPresent()) {
+		System.out.println("UNIQUE_PLATFORM_IDENTIFIER: " + identifier.get());
 		record.setStationOrPlatformIdentifier(identifier.get());
 	    }
 
@@ -696,6 +697,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		} else {
 		    // TODO found another way to add the relative code
 		    // record.setObservedVariable(name, code);
+		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213");
 		    GSLoggerFactory.getLogger(getClass()).error("NO VALID OBSERVED PROPERTIES CODE!!!");
 
 		}
@@ -707,7 +709,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		record.setObservationGeometryType("point");
 
 		// it seems that wmdr:observation should be inside the facility>ObservingFacility
-		//record.setObservationInFacility();
+		record.setObservationInFacility();
 
 	    } catch (Exception e) {
 		e.printStackTrace();
