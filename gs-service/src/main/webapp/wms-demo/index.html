@@ -112,7 +112,21 @@
             if (newDate > fp.config.minDate && newDate < fp.config.maxDate) {
 
             fp.setDate(newDate.toISOString());  // Update the Flatpickr with the new date
-            console.log("Updated Date:", newDate);
+            console.log("Updated Date:", newDate.toISOString());
+
+            map.removeLayer(wmsLayer);
+            wmsLayer = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    url: wmsUrl,
+                    params: {'LAYERS': layerName,'TIME': fp.selectedDates[0].toISOString()},
+                    ratio: 1,
+                    serverType: 'geoserver',
+                }),
+                visible: true // Initially hidden
+            });
+
+            // Add the WMS layer to the map
+            map.addLayer(wmsLayer);
             }
         } else {
             console.error("No date selected.");
@@ -128,7 +142,8 @@
     });
     
         const wmsUrl = 'http://localhost:9090/gs-service/services/essi/token/his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f/view/i-change/wms?'; // Example WMS URL
-
+        var wmsLayer;
+        var layerName ;
         // Fetch the GetCapabilities from the WMS server
         fetch(`${wmsUrl}?service=WMS&version=1.1.1&request=GetCapabilities`)
             .then(response => response.text())
@@ -143,7 +158,7 @@
 
                 for (let i = 0; i < layers.length; i++) {
                     const layer = layers[i];
-                    const layerName = layer.getElementsByTagName('Name')[0].textContent;
+                    layerName = layer.getElementsByTagName('Name')[0].textContent;
                     const layerTitle = layer.getElementsByTagName('Title')[0] ? layer.getElementsByTagName('Title')[0].textContent : layerName;
                     const time = layer.getElementsByTagName('Dimension')[0].textContent;
                     if (time!=="undefined"){                    	
@@ -162,7 +177,7 @@
 
                     if (layerName) {
                         // Create the WMS layer
-                        const wmsLayer = new ol.layer.Image({
+                        wmsLayer = new ol.layer.Image({
                             source: new ol.source.ImageWMS({
                                 url: wmsUrl,
                                 params: {'LAYERS': layerName,'TIME': fp.selectedDates[0].toISOString()},
