@@ -41,6 +41,7 @@ import eu.essi_lab.netcdf.timeseries.NetCDFUtils;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayInt;
 import ucar.ma2.DataType;
+import ucar.ma2.IndexIterator;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFileWriter;
@@ -440,7 +441,7 @@ public class GDALNetCDFPostConversionUtils {
 		}
 		// writing to band variable
 		if (otherDimension == null) {
-		    ArrayInt.D1 bandValues = new ArrayInt.D1(bands.size(),false);
+		    ArrayInt.D1 bandValues = new ArrayInt.D1(bands.size(), false);
 		    for (int i = 0; i < bands.size(); i++) {
 			bandValues.set(i, i);
 		    }
@@ -455,6 +456,29 @@ public class GDALNetCDFPostConversionUtils {
 		for (int i = 0; i < bands.size(); i++) {
 		    Variable band = bands.get(i);
 		    Array array = band.read();
+		    IndexIterator iter = array.getIndexIterator();
+		    while (iter.hasNext()) {
+			Object val = iter.getObjectNext();
+			if (val instanceof Number) {
+			    Number n = (Number) val;
+			    switch (array.getDataType()) {
+			    case FLOAT:
+				if (Float.isNaN(n.floatValue())) {
+				    iter.setFloatCurrent(-9999.0f);
+				}
+				break;
+			    case DOUBLE:
+				if (Double.isNaN(n.doubleValue())) {
+				    iter.setDoubleCurrent(-9999.0f);
+				}
+				break;
+
+			    default:
+				break;
+			    }
+			}
+
+		    }
 		    long size = array.getSize();
 		    Array.arraycopy(array, 0, dataValues, (int) (i * size), (int) size);
 		}

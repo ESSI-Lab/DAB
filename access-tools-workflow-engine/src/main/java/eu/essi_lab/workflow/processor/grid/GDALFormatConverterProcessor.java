@@ -22,6 +22,7 @@ package eu.essi_lab.workflow.processor.grid;
  */
 
 import java.io.File;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -29,6 +30,8 @@ import org.gdal.gdal.Dataset;
 import org.gdal.gdal.TranslateOptions;
 import org.gdal.gdal.gdal;
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableList;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -66,6 +69,7 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 	DataFormat outputFormat = DataFormat.fromIdentifier(getOutputFormat());
 
 	DataDescriptor inputDescriptor = inputData.getDataDescriptor();
+	boolean netcdf2png = false;
 	if (inputDescriptor != null) {
 	    DataFormat inputFormat = inputDescriptor.getDataFormat();
 
@@ -102,6 +106,7 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 
 	    Number min = null;
 	    Number max = null;
+
 	    if (inputFormat.isSubTypeOf(DataFormat.NETCDF()) || inputFormat.equals(DataFormat.NETCDF())) {
 
 		NetcdfDataset dataset = NetcdfDataset.openDataset(inputFile.getAbsolutePath());
@@ -116,7 +121,19 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 			if (outputFormat.equals(DataFormat.IMAGE_PNG()) || //
 				outputFormat.equals(DataFormat.IMAGE_JPG())) {
 
+			    if (outputFormat.equals(DataFormat.IMAGE_PNG())) {
+				netcdf2png = true;
+			    }
+
 			    Variable mainVariable = mainVariables.get(0);
+
+			    Attribute fva = mainVariable.findAttribute("_FillValue");
+			    if (fva != null) {
+				String sv = fva.getNumericValue().toString();
+				vector.add("-a_nodata");
+				vector.add(sv);
+
+			    }
 
 			    List<Dimension> dimensions = mainVariable.getDimensions();
 
@@ -164,6 +181,10 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 			vector.add("-ot");
 			vector.add("Int16");
 			break;
+		    case FLOAT:
+			vector.add("-ot");
+			vector.add("Byte");
+			break;
 		    default:
 			break;
 		    }
@@ -179,23 +200,28 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 
 	    if (scaleOutput()) {
 
+		vector.add("-scale");
+
 		if (min != null && max != null) {
 
 		    String minString = "" + min;
 		    String maxString = "" + max;
-
 		    if (!minString.toLowerCase().contains("nan") && !maxString.toLowerCase().contains("nan")) {
 			if (!minString.toLowerCase().contains("inf") && !maxString.toLowerCase().contains("inf")) {
-			    vector.add("-scale");
+
 			    vector.add(minString);
 			    vector.add(maxString);
 			}
+
 		    }
+
 		}
 	    }
 	}
 
-	switch (GDALConstants.IMPLEMENTATION) {
+	switch (GDALConstants.IMPLEMENTATION)
+
+	{
 	case JNI:
 	    executeWithJNI(inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), vector);
 	    break;
@@ -206,7 +232,9 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 	}
 
 	outputData.setFile(outputFile);
-	outputData = postProcessCorrections(inputData, outputData);
+	outputData =
+
+		postProcessCorrections(inputData, outputData);
 	DataDescriptor outputDescriptor = inputDescriptor.clone();
 	outputDescriptor.setDataFormat(DataFormat.fromIdentifier(getOutputFormat()));
 	outputData.setDataDescriptor(outputDescriptor);
@@ -277,6 +305,25 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 
 	logger.info("Executing GDAL Runtime: " + command);
 
+    }
+
+    public static void main(String[] args) throws Exception {
+	// NetcdfDataset dataset =
+	// NetcdfDataset.openDataset("/tmp/GDAL_NetCDF_CRS_Converter_Processor17186081486351980502.nc");
+	// ImmutableList<Variable> variables = dataset.getVariables();
+	// for (Variable variable : variables) {
+	// System.out.println(variable.getShortName());
+	// List<Attribute> attributes = variable.getAttributes();
+	// for (Attribute attribute : attributes) {
+	// System.out.println(attribute.getName()+": "+attribute.getValue(0).toString());
+	// }
+	// System.out.println();
+	// }
+	// Variable v = dataset.findVariable("Band1");
+	NetcdfDataset.setDefaultEnhanceMode(EnumSet.of(NetcdfDataset.Enhance.CoordSystems));
+
+	System.out.println(NetcdfDataset.openDataset("/tmp/NCKS_NetCDF_Time_Subset_Processor11851913022143027454.nc").findVariable("T2")
+		.read().getDouble(0));
     }
 
 }

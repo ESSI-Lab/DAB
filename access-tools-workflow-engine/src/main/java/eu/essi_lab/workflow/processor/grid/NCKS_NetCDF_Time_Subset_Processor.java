@@ -58,7 +58,7 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
     public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
 	File inputFile = dataObject.getFile();
 	File outputFile = File.createTempFile(getClass().getSimpleName(), ".nc");
-	outputFile.deleteOnExit();
+	outputFile.delete();
 	DataObject ret = new DataObject();
 
 	DataDescriptor inputDescriptor = dataObject.getDataDescriptor();
@@ -68,8 +68,7 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
 
 	CoordinateAxis1D timeAxis = NetCDFUtils.getAxis(dataset, AxisType.Time);
 
-	String options = "";
-
+	String timeSubset = "";
 	if (timeAxis != null) {
 	    int start = 0;
 	    int end = 0;
@@ -82,27 +81,26 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
 	    if (l != null && u != null) {
 		long lower = targetTemporal.getContinueDimension().getLower().longValue();
 		long upper = targetTemporal.getContinueDimension().getUpper().longValue();
-		
-		double i = getIndex(timeAxis,lower);
-		double j = getIndex(timeAxis,upper);
-		
-		//		dateUnit.m
-//
-//		// Find the closest index on the axis
-		
+
+		double i = getIndex(timeAxis, lower);
+		double j = getIndex(timeAxis, upper);
+
+		// dateUnit.m
+		//
+		// // Find the closest index on the axis
+
 		start = timeAxis.findCoordElement(i);
 		end = timeAxis.findCoordElement(j);
-		options = "-d "+timeAxis.getShortName()+"," + start + "," + end + " ";
+		timeSubset = timeAxis.getShortName() + "," + start + "," + end;
 	    }
 
 	}
 
 	dataset.close();
 
-//	executeWithRuntime(inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), options);
+	executeWithRuntime("ncks", "-d", timeSubset, inputFile.getAbsolutePath(), outputFile.getAbsolutePath());
+	outputFile.deleteOnExit();
 
-	runNcks(options, inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), GSLoggerFactory.getLogger(getClass()));
-	
 	ret.setFile(outputFile);
 
 	ret.setDataDescriptor(outputDescriptor);
@@ -112,58 +110,11 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
 
     private double getIndex(CoordinateAxis1D timeAxis, long value) {
 	String unitsString = timeAxis.getUnitsString();
-	CalendarDateUnit dateUnit = CalendarDateUnit.of("standard",unitsString);
+	CalendarDateUnit dateUnit = CalendarDateUnit.of("standard", unitsString);
 	CalendarDate userCalDate = CalendarDate.of(new Date(value));
-	return dateUnit.makeOffsetFromRefDate(userCalDate);	
+	return dateUnit.makeOffsetFromRefDate(userCalDate);
     }
 
-    public static int runNcks(String options, String inputPath, String outputPath, Logger logger) throws IOException, InterruptedException {
-        if (options == null) {
-            options = "";
-        }
-
-        // Split options safely
-        List<String> command = new ArrayList<>();
-        command.add("ncks");
-
-        // If options is a single string, split by space — better: parse it properly
-        String[] opts = options.trim().split("\\s+");
-        for (String opt : opts) {
-            if (!opt.isBlank()) {
-                command.add(opt);
-            }
-        }
-
-        command.add(inputPath);
-        command.add(outputPath);
-
-        logger.info("Executing NCKS with ProcessBuilder: " + String.join(" ", command));
-
-        ProcessBuilder pb = new ProcessBuilder(command);
-
-        // Optional: Set working directory or environment if needed
-        // pb.directory(new File("/your/working/directory"));
-        // Map<String, String> env = pb.environment();
-        // env.put("PATH", env.get("PATH") + ":/custom/path/for/nco");
-
-        pb.redirectErrorStream(true); // combine stderr and stdout
-
-        Process process = pb.start();
-
-        // Read all output (both stdout and stderr)
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                logger.info("ncks: " + line);
-            }
-        }
-
-        int exitCode = process.waitFor();
-        logger.info("ncks process exited with code: " + exitCode);
-
-        return exitCode;
-    }
-    
     /**
      * Calls NCKS directly
      * 
@@ -172,48 +123,39 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
      * @param options
      * @throws Exception
      */
-    protected static void executeWithRuntime(String inputPath, String outputPath, String options) throws Exception {
+    protected static void executeWithRuntime(String... cmd) throws Exception {
 
 	Runtime rt = Runtime.getRuntime();
 
-	if (options == null) {
-	    options = "";
-	}
-
-
-	
-	String[] cmd = {"ncks", options, inputPath, outputPath};
 	String cmdString = "";
 	for (String c : cmd) {
-	    cmdString+=c+" ";
+	    cmdString += c + " ";
 	}
 	logger.info("Executing NCKS Runtime: " + cmdString);
 
 	Process ps = rt.exec(cmd);
 
-	
-
 	// Read output stream
 	new Thread(() -> {
 	    try (BufferedReader reader = new BufferedReader(new InputStreamReader(ps.getInputStream()))) {
-	        String line;
-	        while ((line = reader.readLine()) != null) {
-	            logger.info("stdout: " + line);
-	        }
+		String line;
+		while ((line = reader.readLine()) != null) {
+		    logger.info("stdout: " + line);
+		}
 	    } catch (IOException e) {
-	        logger.error("Error reading stdout", e);
+		logger.error("Error reading stdout", e);
 	    }
 	}).start();
 
 	// Read error stream
 	new Thread(() -> {
 	    try (BufferedReader reader = new BufferedReader(new InputStreamReader(ps.getErrorStream()))) {
-	        String line;
-	        while ((line = reader.readLine()) != null) {
-	            logger.error("stderr: " + line);
-	        }
+		String line;
+		while ((line = reader.readLine()) != null) {
+		    logger.error("stderr: " + line);
+		}
 	    } catch (IOException e) {
-	        logger.error("Error reading stderr", e);
+		logger.error("Error reading stderr", e);
 	    }
 	}).start();
 
@@ -222,6 +164,10 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
 	logger.info("Process finished with exit code: " + exitVal);
 	logger.info("Executed");
 
+    }
+
+    public static void main(String[] args) throws Exception {
+	executeWithRuntime("ncks", "-d", "XTIME,11", "/tmp/input.nc", "/tmp/output.nc");
     }
 
 }

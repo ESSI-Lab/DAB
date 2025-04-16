@@ -47,8 +47,8 @@ import eu.essi_lab.workflow.processor.ProcessorCapabilities;
  */
 public class WorkflowBuilder {
 
-	private static boolean logsEnabled = true;
-	private static boolean deepLogsEnabled = true;
+	private static boolean logsEnabled = false;
+	private static boolean deepLogsEnabled = false;
 
 	private LinkedList<Workblock> blockList;
 	private int maxWorkflowLength;
