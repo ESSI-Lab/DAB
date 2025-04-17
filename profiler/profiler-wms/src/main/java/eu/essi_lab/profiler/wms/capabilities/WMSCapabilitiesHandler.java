@@ -25,6 +25,7 @@ package eu.essi_lab.profiler.wms.capabilities;
  */
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,7 @@ import eu.essi_lab.jaxb.wms._1_3_0.ContactAddress;
 import eu.essi_lab.jaxb.wms._1_3_0.ContactInformation;
 import eu.essi_lab.jaxb.wms._1_3_0.ContactPersonPrimary;
 import eu.essi_lab.jaxb.wms._1_3_0.DCPType;
+import eu.essi_lab.jaxb.wms._1_3_0.Dimension;
 import eu.essi_lab.jaxb.wms._1_3_0.EXGeographicBoundingBox;
 import eu.essi_lab.jaxb.wms._1_3_0.Get;
 import eu.essi_lab.jaxb.wms._1_3_0.HTTP;
@@ -55,6 +57,7 @@ import eu.essi_lab.jaxb.wms._1_3_0.Request;
 import eu.essi_lab.jaxb.wms._1_3_0.Service;
 import eu.essi_lab.jaxb.wms._1_3_0.WMSCapabilities;
 import eu.essi_lab.jaxb.wms.extension.JAXBWMS;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
@@ -73,7 +76,11 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.CRS;
+import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
+import eu.essi_lab.model.resource.data.Unit;
+import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
+import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wms.WMSProfilerSetting;
@@ -268,8 +275,8 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 		List<DataComplianceReport> reports = handler.getReports();
 		if (!reports.isEmpty()) {
 		    Layer layer = new Layer();
-		    layer.setTitle(resource.getHarmonizedMetadata().getCoreMetadata().getTitle());
-		    layer.setAbstract(resource.getHarmonizedMetadata().getCoreMetadata().getAbstract());
+		    layer.setTitle(resource.getHarmonizedMetadata().getCoreMetadata().getTitle().trim());
+		    layer.setAbstract(resource.getHarmonizedMetadata().getCoreMetadata().getAbstract().trim());
 		    DataComplianceReport report = reports.get(0);
 		    String onlineId = report.getOnlineId();
 		    layer.setName(onlineId);
@@ -289,6 +296,27 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 			bbox.setSouthBoundLatitude(-90);
 			bbox.setWestBoundLongitude(-180);
 			bbox.setEastBoundLongitude(180);
+		    }
+		    DataDescriptor descriptor = report.getFullDataDescriptor();
+		    if (descriptor != null) {
+			DataDimension temporal = descriptor.getTemporalDimension();
+			if (temporal != null) {
+			    ContinueDimension dimension = temporal.getContinueDimension();
+			    if (dimension != null) {
+				Number lower = dimension.getLower();
+				Number upper = dimension.getUpper();
+				Number resolution = dimension.getResolution();
+				Dimension timeDimension = new Dimension();
+				timeDimension.setName("time");
+				Unit uom = new Unit("ISO8601");
+				String start = ISO8601DateTimeUtils.getISO8601DateTime(new Date(lower.longValue()));
+				String end = ISO8601DateTimeUtils.getISO8601DateTime(new Date(upper.longValue()));
+				timeDimension.setDefault(end);
+				timeDimension.setValue(start + "/" + end + "/PT" + (resolution.longValue() / 1000) + "S");
+				dimension.setUom(uom);
+				layer.getDimensions().add(timeDimension);
+			    }
+			}
 		    }
 
 		    layer.setEXGeographicBoundingBox(bbox);

@@ -147,7 +147,7 @@ public class NetCDF_Grid_Subset_Processor extends AbstractTimeSubsetProcessor {
 			unlimited = true;
 		    }
 		}
-		writer.addDimension(null, dimension.getShortName(), length, dimension.isShared(), unlimited, dimension.isVariableLength());
+		writer.addDimension(null, dimension.getShortName(), length, unlimited, dimension.isVariableLength());
 	    }
 	    List<Variable> variables = dataset.getVariables();
 	    for (Variable variable : variables) {
@@ -174,7 +174,7 @@ public class NetCDF_Grid_Subset_Processor extends AbstractTimeSubsetProcessor {
 		List<Range> ranges = variable.getRanges();
 		List<Range> newRanges = new ArrayList<>();
 		for (Range range : ranges) {
-		    Range newRange = new Range(range);
+		    Range newRange = new Range(range.getName(),range.first(),range.last(),range.stride());
 		    if (range.getName().equals(timeDimension.getShortName())) {
 			newRange = new Range(range.getName(), startIndex, endIndex);
 		    }

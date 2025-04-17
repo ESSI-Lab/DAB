@@ -13,6 +13,12 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
+		
+		<dependency>
+			<groupId>org.opensearch.client</groupId>
+			<artifactId>opensearch-java</artifactId>
+			<version>${opensearch.client-opensearch-java.version}</version>		
+		</dependency>
 
 		<dependency>
 			<groupId>org.json</groupId>

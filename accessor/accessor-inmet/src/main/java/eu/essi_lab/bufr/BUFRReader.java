@@ -84,7 +84,7 @@ public class BUFRReader {
 
 		ret.add(headerRecord);
 
-		SequenceDS obs = (SequenceDS) ncfile.findVariable(BufrIosp2.obsRecord);
+		SequenceDS obs = (SequenceDS) ncfile.findVariable(BufrIosp2.obsRecordName);
 		StructureDataIterator sdataIter = obs.getStructureIterator(-1);
 		List<BUFRRecord> records = getRecords(obs, sdataIter, false);
 		ret.addAll(records);
@@ -328,16 +328,16 @@ public class BUFRReader {
 	    BUFRElement ret = new BUFRElement();
 
 	    String name = v.getShortName();
-	    ret.setName(StringUtil2.quoteXmlAttribute(name));
+	    ret.setName(StringUtil2.quoteHtmlContent(name));
 
 	    String units = v.getUnitsString();
 	    if ((units != null) && !units.equals(name) && !units.startsWith("Code")) {
-		ret.setUnits(StringUtil2.quoteXmlAttribute(v.getUnitsString()));
+		ret.setUnits(StringUtil2.quoteHtmlContent(v.getUnitsString()));
 	    }
 
 	    Attribute att = v.findAttribute(BufrIosp2.fxyAttName);
 	    String desc = (att == null) ? "N/A" : att.getStringValue();
-	    ret.setCode(StringUtil2.quoteXmlAttribute(desc));
+	    ret.setCode(StringUtil2.quoteHtmlContent(desc));
 
 	    if (v.getDataType() == DataType.CHAR) {
 		ArrayChar ac = (ArrayChar) mdata;
@@ -372,7 +372,7 @@ public class BUFRReader {
 			if (s.toLowerCase().equals("missing value") || s.toLowerCase().equals("missing")) {
 			    value += "";
 			} else {
-			    value += StringUtil2.quoteXmlContent(s);
+			    value += StringUtil2.quoteHtmlContent(s);
 			}
 		    }
 		}

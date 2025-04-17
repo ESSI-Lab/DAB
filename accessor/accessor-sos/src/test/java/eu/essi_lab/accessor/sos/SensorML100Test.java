@@ -10,8 +10,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
+import org.geotools.api.geometry.BoundingBox;
 import org.junit.Test;
-import org.opengis.geometry.BoundingBox;
 
 import eu.essi_lab.accessor.sos._1_0_0.SOSObservedProperty;
 import eu.essi_lab.accessor.sos._1_0_0.SOSSensorML;

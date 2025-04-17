@@ -1,4 +1,4 @@
-package eu.essi_lab.workflow.blocks.grid;
+package eu.essi_lab.access.datacache.opensearch;
 
 /*-
  * #%L
@@ -21,29 +21,23 @@ package eu.essi_lab.workflow.blocks.grid;
  * #L%
  */
 
-import eu.essi_lab.model.resource.data.CRS;
-import eu.essi_lab.model.resource.data.DataFormat;
-import eu.essi_lab.model.resource.data.DataType;
-import eu.essi_lab.workflow.blocks.DataFormatConverter;
-import eu.essi_lab.workflow.processor.DataProcessor;
-import eu.essi_lab.workflow.processor.grid.NetCDF_To_DAS_FormatConverterProcessor;
+import java.util.Arrays;
 
-/**
- * @author boldrini
- */
-public class NetCDF_To_DDS_FormatConverter extends DataFormatConverter {
+import org.apache.http.HttpRequest;
 
-    public NetCDF_To_DDS_FormatConverter() {
-	super(DataType.GRID, //
-		CRS.GDAL_ALL(), //
-		DataFormat.NETCDF(), // INPUT FORMAT
-		DataFormat.DAS() // OUTPUT FORMAT
-	);
-    }
+import software.amazon.awssdk.http.SdkHttpFullRequest;
 
-    @Override
-    protected DataProcessor createProcessor() {
+public class ApacheHttpRequestAdapter {
+    public static void applySignedRequest(SdkHttpFullRequest signed, HttpRequest apacheRequest) {
+        // Clear existing headers (optional)
+        Arrays.stream(apacheRequest.getAllHeaders()).forEach(header -> 
+            apacheRequest.removeHeaders(header.getName()));
 
-	return new NetCDF_To_DAS_FormatConverterProcessor();
+        // Add signed headers
+        signed.headers().forEach((name, values) -> {
+            for (String value : values) {
+                apacheRequest.addHeader(name, value);
+            }
+        });
     }
 }

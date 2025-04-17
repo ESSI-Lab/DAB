@@ -29,9 +29,9 @@ import java.util.Optional;
 
 import javax.xml.xpath.XPathExpressionException;
 
+import org.geotools.api.geometry.BoundingBox;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.opengis.geometry.BoundingBox;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;

@@ -37,10 +37,10 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Point;
-import org.opengis.feature.simple.SimpleFeature;
 import org.w3c.dom.Node;
 
 import com.esri.arcgis.protobuf.FeatureCollection;

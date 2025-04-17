@@ -12,9 +12,20 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
+import org.geotools.api.data.DataStore;
+import org.geotools.api.data.DataStoreFinder;
+import org.geotools.api.data.FeatureSource;
+import org.geotools.api.filter.FilterFactory;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.style.FeatureTypeStyle;
+import org.geotools.api.style.Fill;
+import org.geotools.api.style.Graphic;
+import org.geotools.api.style.Mark;
+import org.geotools.api.style.Rule;
+import org.geotools.api.style.Stroke;
+import org.geotools.api.style.Style;
+import org.geotools.api.style.StyleFactory;
+import org.geotools.api.style.Symbolizer;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -23,17 +34,6 @@ import org.geotools.map.FeatureLayer;
 import org.geotools.map.MapContent;
 import org.geotools.referencing.CRS;
 import org.geotools.renderer.lite.StreamingRenderer;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Fill;
-import org.geotools.styling.Graphic;
-import org.geotools.styling.Mark;
-import org.geotools.styling.Rule;
-import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.Symbolizer;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.model.resource.data.CRSUtils;
@@ -161,7 +161,7 @@ public class ProhmsatShapeReader {
     private static final float LINE_WIDTH = 1.0f;
     private static final float POINT_SIZE = 10.0f;
     private static StyleFactory sf = CommonFactoryFinder.getStyleFactory();
-    private static FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
+    private static FilterFactory ff = CommonFactoryFinder.getFilterFactory();
     private static GeomType geometryType = GeomType.POLYGON;
 
     private enum GeomType {

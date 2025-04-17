@@ -187,7 +187,7 @@ public class H4SingleTimeSeriesWriter extends TimeSeriesWriter {
 
 	// Filling with values
 
-	ucar.ma2.ArrayLong.D1 timeLongs = new ArrayLong.D1(timeSize);
+	ucar.ma2.ArrayLong.D1 timeLongs = new ArrayLong.D1(timeSize, false);
 	List<Long> timeValues = timeVariable.getValues();
 	for (int i = 0; i < timeSize; i++) {
 	    timeLongs.setLong(i, timeValues.get(i));

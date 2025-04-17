@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenLayers WMS Layer Toggle</title>
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.2.1/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 500px;
+            width: 100%;
+        }
+        #layerList {
+            margin-top: 10px;
+        }
+        #layerList li {
+            cursor: pointer;
+            list-style: none;
+            padding: 5px;
+            background-color: #f3f3f3;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+        }
+        #layerList li:hover {
+            background-color: #e3e3e3;
+        }
+    </style>
+</head>
+<body>
+    <h2>OpenLayers WMS Example</h2>
+    <div id="map" class="map"></div>
+    <ul id="layerList"></ul>
+
+<input type="text" id="datePicker" placeholder="Select a date">
+<button id="previous">&lt;&lt; Previous</button>
+<button id="next">&gt;&gt; Next</button>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/ol@v10.2.1/dist/ol.js"></script>
+    <script type="text/javascript">
+    function parseTimeRange(timeString) {
+    	if (typeof timeString === 'string' && timeString.trim() !== '') {
+
+        const timestampRegex = /^([0-9\-T:Z]+)\/([0-9\-T:Z]+)(\/PT(\d+)S)?$/;
+        const match = timeString.match(timestampRegex);
+
+        if (match) {
+            const startTime = match[1];  // Start timestamp
+            const endTime = match[2];    // End timestamp
+            const duration = match[4];   // Duration in seconds (if any)
+
+            const timestamps = {
+                start: startTime,
+                end: endTime,
+                duration: duration ? parseInt(duration) : null,
+            };
+
+            return timestamps;
+        } else {
+            // If no range/duration, just return the single timestamp
+            return { start: timeString, end: null, duration: null };
+        }
+    	}
+    }
+
+    // Helper function to parse the timestamp string to a Date object
+    function parseTimestamp(timestamp) {
+        return new Date(timestamp);
+    }
+
+    // Helper function to add seconds to a timestamp and return a new timestamp string
+    function addSecondsToTimestamp(timestamp, seconds) {
+        const date = new Date(timestamp);
+        date.setSeconds(date.getSeconds() + seconds);
+        return date.toISOString();
+    }
+
+    // Function to generate the time instants
+    function getTimeInstants(start, end, duration) {
+        const startTime = parseTimestamp(start);
+        const endTime = parseTimestamp(end);
+        const durationSeconds = duration;
+
+        const instants = [start];
+        let currentTime = startTime;
+
+        while (currentTime < endTime) {
+            currentTime = new Date(currentTime);
+            currentTime.setSeconds(currentTime.getSeconds() + durationSeconds);
+            instants.push(currentTime.toISOString());
+        }
+
+        return instants;
+    }
+    
+    var duration;
+    
+    const fp = flatpickr("#datePicker", {
+        enableTime: true,  // Set to true if you want to allow time selection
+        dateFormat: "Y-m-d\TH:i:S", // Choose the desired date format
+      });
+    
+    function addDurationToDate(durationInSeconds) {
+        const selectedDate = fp.selectedDates[0];  // Get the selected date (first selected date)
+        
+        if (selectedDate) {
+            const newDate = new Date(selectedDate);
+            newDate.setSeconds(newDate.getSeconds() + durationInSeconds);  // Add duration (in seconds)
+            if (newDate > fp.config.minDate && newDate < fp.config.maxDate) {
+
+            fp.setDate(newDate.toISOString());  // Update the Flatpickr with the new date
+            console.log("Updated Date:", newDate.toISOString());
+
+            map.removeLayer(wmsLayer);
+            wmsLayer = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    url: wmsUrl,
+                    params: {'LAYERS': layerName,'TIME': fp.selectedDates[0].toISOString()},
+                    ratio: 1,
+                    serverType: 'geoserver',
+                }),
+                visible: true // Initially hidden
+            });
+
+            // Add the WMS layer to the map
+            map.addLayer(wmsLayer);
+            }
+        } else {
+            console.error("No date selected.");
+        }
+    }
+    
+    document.getElementById("previous").addEventListener("click", function() {
+        addDurationToDate(-duration);  // Add the duration to the selected date
+    });
+    
+    document.getElementById("next").addEventListener("click", function() {
+        addDurationToDate(duration);  // Add the duration to the selected date
+    });
+    
+        const wmsUrl = 'http://localhost:9090/gs-service/services/essi/token/his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f/view/i-change/wms?'; // Example WMS URL
+        var wmsLayer;
+        var layerName ;
+        // Fetch the GetCapabilities from the WMS server
+        fetch(`${wmsUrl}?service=WMS&version=1.1.1&request=GetCapabilities`)
+            .then(response => response.text())
+            .then(xml => {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xml, 'application/xml');
+                
+                // Retrieve layers and their titles from the XML
+                const layers = xmlDoc.getElementsByTagName('Layer');
+                const layerList = document.getElementById('layerList');
+                let olLayers = {};
+
+                for (let i = 0; i < layers.length; i++) {
+                    const layer = layers[i];
+                    layerName = layer.getElementsByTagName('Name')[0].textContent;
+                    const layerTitle = layer.getElementsByTagName('Title')[0] ? layer.getElementsByTagName('Title')[0].textContent : layerName;
+                    const time = layer.getElementsByTagName('Dimension')[0].textContent;
+                    if (time!=="undefined"){                    	
+                    	const parsedTimes = parseTimeRange(time);
+                    	fp.set("minDate",parsedTimes.start);
+                    	fp.set("maxDate",parsedTimes.end);
+                    	fp.setDate(parsedTimes.end);
+                    	duration = parsedTimes.duration;
+                    	if (parsedTimes.duration !== null) {
+                            const timeInstants = getTimeInstants(parsedTimes.start, parsedTimes.end, parsedTimes.duration);
+                            console.log('Time Instants:', timeInstants);
+                        } else {
+                            console.log('Single timestamp:', parsedTimes.start);
+                        }
+                    }
+
+                    if (layerName) {
+                        // Create the WMS layer
+                        wmsLayer = new ol.layer.Image({
+                            source: new ol.source.ImageWMS({
+                                url: wmsUrl,
+                                params: {'LAYERS': layerName,'TIME': fp.selectedDates[0].toISOString()},
+                                ratio: 1,
+                                serverType: 'geoserver',
+                            }),
+                            visible: false // Initially hidden
+                        });
+
+                        // Add the WMS layer to the map
+                        map.addLayer(wmsLayer);
+                        olLayers[layerName] = wmsLayer;
+
+                        // Create a list item for the layer using the Title
+                        const listItem = document.createElement('li');
+                        listItem.innerText = layerTitle; // Display the Title instead of Name
+                        layerList.appendChild(listItem);
+
+                        // Toggle layer visibility on click
+                        listItem.addEventListener('click', () => {
+                            const isVisible = wmsLayer.getVisible();
+                            wmsLayer.setVisible(!isVisible);
+                            listItem.style.backgroundColor = !isVisible ? '#d3ffd3' : '#f3f3f3';
+                        });
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching WMS GetCapabilities:', error));
+
+        // Create the OpenLayers map
+        const map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([-100, 40]), // Centered on USA
+                zoom: 4
+            })
+        });
+        
+
+    	
+    </script>
+</body>
+</html>
