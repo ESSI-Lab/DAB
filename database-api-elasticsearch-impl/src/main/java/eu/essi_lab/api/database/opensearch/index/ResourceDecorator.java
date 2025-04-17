@@ -152,16 +152,6 @@ public class ResourceDecorator {
 	    Optional.ofNullable(source.opt(Shape.AREA)).ifPresent(v -> res.getExtensionHandler().setArea(Double.valueOf(v.toString())));
 	}
 
-	if (source.has(MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName())) {
-
-	    indexesMd.write(IndexedElements.TEMP_EXTENT_BEGIN_NOW);
-	}
-
-	if (source.has(MetadataElement.TEMP_EXTENT_END_NOW.getName())) {
-
-	    indexesMd.write(IndexedElements.TEMP_EXTENT_END_NOW);
-	}
-
 	if (!source.has(MetadataElement.TEMP_EXTENT_BEGIN.getName()) && //
 		!source.has(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW.getName()) //
 		&& !source.has(MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName())) {
