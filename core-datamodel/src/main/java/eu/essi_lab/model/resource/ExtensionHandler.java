@@ -788,18 +788,11 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
     }
 
-    /**
-     * @param property
-     * @param value
-     */
-    public void setBNHSProperty(BNHSProperty property, String value) {
-	try {
-	    this.metadata.add(property.getElement().getName(), value);
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
+    // -------------------------------------------------------
+    //
+    // Shape properties
+    //
+    // -------------------------------------------------------
 
     /**
      * @param shape
@@ -813,12 +806,6 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
-
-    // -------------------------------------------------------
-    //
-    // Shape properties
-    //
-    // -------------------------------------------------------
 
     /**
      * @return
@@ -896,6 +883,19 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     // Non queryable properties
     //
     // ---------------------------------------------
+
+    /**
+     * @param property
+     * @param value
+     */
+    public void setBNHSProperty(BNHSProperty property, String value) {
+	try {
+	    this.metadata.add(property.getElement().getName(), value);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
 
     /**
      * @param themeCategory
