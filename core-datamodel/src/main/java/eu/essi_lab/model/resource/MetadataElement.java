@@ -180,6 +180,11 @@ public enum MetadataElement implements Queryable {
     /**
      * 
      */
+    ATTRIBUTE_UNITS_URI(MetadataElement.ATTRIBUTE_UNITS_URI_EL_NAME),
+
+    /**
+     * 
+     */
     ATTRIBUTE_UNITS_ABBREVIATION(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
@@ -377,11 +382,22 @@ public enum MetadataElement implements Queryable {
      *
      */
     TEMP_EXTENT_BEGIN("tmpExtentBegin", ContentType.ISO8601_DATE_TIME),
+    
+    /**
+     * 
+     */
+    TEMP_EXTENT_BEGIN_NOW("tmpExtentBegin_Now", ContentType.BOOLEAN),
+    
 
     /**
      *
      */
     TEMP_EXTENT_END("tmpExtentEnd", ContentType.ISO8601_DATE_TIME),
+    
+    /**
+     * 
+     */
+    TEMP_EXTENT_END_NOW("tmpExtentEnd_Now", ContentType.BOOLEAN),
 
     /**
     *

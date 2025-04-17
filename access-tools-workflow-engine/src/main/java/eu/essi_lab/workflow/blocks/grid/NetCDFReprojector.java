@@ -31,14 +31,14 @@ import eu.essi_lab.workflow.processor.BooleanCapabilityElement;
 import eu.essi_lab.workflow.processor.CapabilityElement;
 import eu.essi_lab.workflow.processor.CapabilityElement.PresenceType;
 import eu.essi_lab.workflow.processor.DataProcessor;
-import eu.essi_lab.workflow.processor.IdentityProcessor;
 import eu.essi_lab.workflow.processor.ResamplingCapability;
 import eu.essi_lab.workflow.processor.SubsettingCapability;
+import eu.essi_lab.workflow.processor.grid.GDAL_NetCDF_CRS_Converter_Processor;
 
 public class NetCDFReprojector extends WorkblockBuilder {
 
     private DataType type = DataType.GRID;
-    private DataFormat format = DataFormat.NETCDF_3();
+    private DataFormat format = DataFormat.NETCDF();
 
     public NetCDFReprojector() {
 
@@ -87,7 +87,7 @@ public class NetCDFReprojector extends WorkblockBuilder {
 
     @Override
     protected DataProcessor createProcessor() {
-	return new IdentityProcessor();
+	return new GDAL_NetCDF_CRS_Converter_Processor();
     }
 
 }

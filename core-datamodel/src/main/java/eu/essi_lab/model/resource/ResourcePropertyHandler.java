@@ -383,6 +383,24 @@ public class ResourcePropertyHandler {
 	resource.addProperty(ResourceProperty.SOURCE_DEPLOYMENT, deployment);
     }
 
+    /**
+     * Get the {@link ResourceProperty#COLLECTION_TYPE} property
+     */
+    public Optional<CollectionType> getCollectionType() {
+
+	return resource.getPropertyValue(ResourceProperty.COLLECTION_TYPE).map(type -> CollectionType.fromType(type));
+    }
+
+    /**
+     * Set the {@link ResourceProperty#COLLECTION_TYPE} property
+     * 
+     * @param collectionType
+     */
+    public void setCollectionType(CollectionType collectionType) {
+
+	resource.addProperty(ResourceProperty.COLLECTION_TYPE, collectionType.getType());
+    }
+
     // ----------------------------------------
     //
     // ACCESS PROPERTIES SET BY AccessAugmenter

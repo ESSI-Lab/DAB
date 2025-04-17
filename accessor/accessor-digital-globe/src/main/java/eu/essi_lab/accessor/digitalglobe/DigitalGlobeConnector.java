@@ -37,7 +37,6 @@ import java.util.Optional;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.opengis.geometry.BoundingBox;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
@@ -297,7 +296,7 @@ public class DigitalGlobeConnector extends HarvestedQueryConnector<DigitalGlobeC
 	    ShapeReader reader = new ShapeReader(shape);
 	    String typeName = reader.getTypeNames().get(0);
 
-	    BoundingBox bBox = reader.getBBox(typeName);
+	    org.geotools.api.geometry.BoundingBox bBox = reader.getBBox(typeName);
 
 	    if (bBox != null) {
 

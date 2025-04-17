@@ -60,7 +60,7 @@ public class DatabaseFtpFile implements FtpFile {
 
     private static final Object FILE_LOCK = new Object();
 
-    private static final int MAX_FILES_LISTING = 10;
+    private static final int DEFAULT_MAX_LIST_SIZE = 10;
 
     private Database database;
     private String dir;
@@ -68,6 +68,9 @@ public class DatabaseFtpFile implements FtpFile {
     private User user;
     private File file;
     private String tempSTORdir;
+
+    private static Integer listSize;
+    private static Integer startIndex;
 
     /**
      * @param database
@@ -91,6 +94,26 @@ public class DatabaseFtpFile implements FtpFile {
 	this._file = file;
 	this.user = user;
 	this.tempSTORdir = tempSTORdir;
+    }
+
+    /**
+     * @param listSize
+     */
+    public static void setMaxListSize(Integer listSize) {
+
+	DatabaseFtpFile.listSize = listSize;
+
+	GSLoggerFactory.getLogger(DatabaseFtpFile.class).info("List size -> {}", listSize);
+    }
+
+    /**
+     * @param startIndex
+     */
+    public static void setStartIndex(Integer startIndex) {
+
+	DatabaseFtpFile.startIndex = startIndex;
+
+	GSLoggerFactory.getLogger(DatabaseFtpFile.class).info("Start index -> {}", startIndex);
     }
 
     @Override
@@ -234,18 +257,46 @@ public class DatabaseFtpFile implements FtpFile {
 		DatabaseFolder viewFolder = database.getViewFolder(false);
 		list.add(new DatabaseFtpFile(database, viewFolder.getName(), user));
 
+		DatabaseFolder cacheFolder = database.getCacheFolder();
+		list.add(new DatabaseFtpFile(database, cacheFolder.getName(), user));
+
 	    } else {
 
 		DatabaseFolder folder = database.getFolder(this.dir);
 
 		List<String> keys = Arrays.asList(folder.listKeys());
-		keys = keys.subList(0, Math.min(keys.size(), MAX_FILES_LISTING));
+
+		int start = 0;
+		int size = 0;
+
+		if (startIndex == null) {
+
+		    start = 0;
+
+		} else {
+
+		    start = startIndex > keys.size() - 1 ? 0 : startIndex;
+		}
+
+		if (listSize == null) {
+
+		    size = Math.min(keys.size(), DEFAULT_MAX_LIST_SIZE);
+
+		} else {
+
+		    size = Math.min(keys.size(), listSize);
+		}
+
+		GSLoggerFactory.getLogger(getClass()).info("Listing {}/{}", start, size);
+
+		keys = keys.subList(start, size);
 
 		keys.forEach(key -> list.add(new DatabaseFtpFile(//
 			database, //
 			folder.getName(), //
 			key, //
-			user, tempSTORdir)));
+			user, //
+			tempSTORdir)));
 	    }
 
 	    return list;

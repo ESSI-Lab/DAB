@@ -200,18 +200,6 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
     }
 
-    /**
-     * @param id
-     */
-    public void setUniqueInstrumentIdentifier(String id) {
-	try {
-	    this.metadata.add(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME, id);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
     public Optional<String> getBNHSInfo() {
 
 	try {
@@ -232,27 +220,27 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
-    
+
     public Optional<String> getRiverBasin() {
 
-   	try {
-   	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.RIVER_BASIN_EL_NAME));
-   	} catch (XPathExpressionException e) {
-   	    e.printStackTrace();
-   	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-   	}
+	try {
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.RIVER_BASIN_EL_NAME));
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
 
-   	return Optional.empty();
-       }
+	return Optional.empty();
+    }
 
-       public void setRiverBasin(String riverBasin) {
-   	try {
-   	    this.metadata.add(MetadataElement.RIVER_BASIN_EL_NAME, riverBasin);
-   	} catch (Exception e) {
-   	    e.printStackTrace();
-   	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-   	}
-       }
+    public void setRiverBasin(String riverBasin) {
+	try {
+	    this.metadata.add(MetadataElement.RIVER_BASIN_EL_NAME, riverBasin);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
 
     public Optional<String> getRiver() {
 
@@ -334,6 +322,18 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * @param id
+     */
+    public void setUniqueInstrumentIdentifier(String id) {
+	try {
+	    this.metadata.add(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME, id);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
     }
 
     /**

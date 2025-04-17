@@ -99,7 +99,7 @@ public class CRSConverterTest {
 	NetcdfDataset netCDFdataset = NetcdfDataset.openDataset(ncPath);
 	GridDataset gds = ucar.nc2.dt.grid.GridDataset.open(//
 		netCDFdataset.getLocation(), //
-		EnumSet.of(Enhance.ScaleMissing, Enhance.CoordSystems, Enhance.ConvertEnums));
+		EnumSet.of(Enhance.ApplyScaleOffset, Enhance.CoordSystems, Enhance.ConvertEnums));
 
 	@SuppressWarnings("deprecation")
 	LatLonRect datasetBbox = gds.getBoundingBox();

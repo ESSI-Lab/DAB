@@ -66,6 +66,11 @@ public enum ResourceProperty implements Queryable {
     /**
      * 
      */
+    COLLECTION_TYPE("collectionType"),
+
+    /**
+     * 
+     */
     IS_DELETED("isDeleted", ContentType.BOOLEAN),
 
     /**
@@ -314,7 +319,7 @@ public enum ResourceProperty implements Queryable {
 
 	return Arrays.asList(values());
     }
-    
+
     /**
      * @return
      */

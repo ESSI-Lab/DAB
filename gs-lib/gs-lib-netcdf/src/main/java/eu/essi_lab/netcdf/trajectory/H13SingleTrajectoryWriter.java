@@ -205,7 +205,7 @@ public class H13SingleTrajectoryWriter extends TrajectoryWriter {
 
 	// Filling with values
 
-	ucar.ma2.ArrayLong.D1 timeLongs = new ArrayLong.D1(timeSize);
+	ucar.ma2.ArrayLong.D1 timeLongs = new ArrayLong.D1(timeSize,false);
 	ucar.ma2.ArrayDouble.D1 altFloats = new ArrayDouble.D1(timeSize);
 	ucar.ma2.ArrayDouble.D1 lonFloats = new ArrayDouble.D1(timeSize);
 	ucar.ma2.ArrayDouble.D1 latFloats = new ArrayDouble.D1(timeSize);

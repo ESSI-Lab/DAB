@@ -1,7 +1,4 @@
-/**
- * 
- */
-package eu.essi_lab.database.ftp.server;
+package eu.essi_lab.model.resource;
 
 /*-
  * #%L
@@ -24,42 +21,52 @@ package eu.essi_lab.database.ftp.server;
  * #L%
  */
 
-import org.apache.ftpserver.command.Command;
-import org.apache.ftpserver.command.CommandFactory;
-import org.apache.ftpserver.command.impl.DefaultCommandFactory;
+import java.util.Arrays;
+
+import javax.xml.bind.annotation.XmlEnumValue;
 
 /**
  * @author Fabrizio
  */
-public class DatabaseFtpCommandFactory extends DefaultCommandFactory {
+public enum CollectionType {
+
+    @XmlEnumValue("Station")
+    STATION("Station");
+
+    private String type;
 
     /**
-     * @param commandFactory
      * @return
      */
-    public static DatabaseFtpCommandFactory get(CommandFactory commandFactory) {
+    public String getType() {
 
-	return new DatabaseFtpCommandFactory(commandFactory);
+	return type;
     }
 
-    private CommandFactory commandFactory;
-
     /**
-     * @param commandFactory
+     * @param type
+     * @return
      */
-    private DatabaseFtpCommandFactory(CommandFactory commandFactory) {
+    public static CollectionType fromType(String type) {
 
-	this.commandFactory = commandFactory;
+	return Arrays.asList(values()).//
+		stream().//
+		filter(rt -> rt.getType().equals(type)).//
+		findFirst().//
+		orElseThrow(() -> new IllegalArgumentException("Invalid name: name"));
     }
 
     @Override
-    public Command getCommand(final String cmdName) {
+    public String toString() {
 
-	if (cmdName.equals("OPTS")) {
+	return this.type;
+    }
 
-	    return new OPTS_MLSD();
-	}
+    /**
+     * @param type
+     */
+    private CollectionType(String type) {
 
-	return commandFactory.getCommand(cmdName);
+	this.type = type;
     }
 }

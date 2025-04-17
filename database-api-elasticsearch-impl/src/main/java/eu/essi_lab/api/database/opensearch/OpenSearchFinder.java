@@ -4,6 +4,7 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -63,11 +64,13 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -516,11 +519,22 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    return new HashMap<String, String>();
 	}
 
+	List<GSSource> sources = new ArrayList<>();
+
+	Optional<View> view = message.getView();
+	if (view.isPresent()) {
+
+	    sources = ConfigurationWrapper.getViewSources(view.get());
+
+	} else {
+
+	    sources = message.getSources();
+	}
+
 	return getSourcesDataMap(//
 		database, //
 		wrapper, //
-		message.getSources().//
-			stream().//
+		sources.stream().//
 			map(s -> s.getUniqueIdentifier()).//
 			collect(Collectors.toList()), //
 		message.isCachedSourcesDataFolderMapUsed());

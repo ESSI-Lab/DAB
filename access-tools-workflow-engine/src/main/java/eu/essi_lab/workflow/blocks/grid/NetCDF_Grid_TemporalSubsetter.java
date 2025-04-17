@@ -27,7 +27,7 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.workflow.blocks.TemporalSubsetter;
 import eu.essi_lab.workflow.builder.WorkblockBuilder;
 import eu.essi_lab.workflow.processor.DataProcessor;
-import eu.essi_lab.workflow.processor.IdentityProcessor;
+import eu.essi_lab.workflow.processor.grid.NCKS_NetCDF_Time_Subset_Processor;
 
 /**
  * @author boldrini
@@ -44,7 +44,7 @@ public class NetCDF_Grid_TemporalSubsetter extends TemporalSubsetter {
     @Override
     protected DataProcessor createProcessor() {
 
-	return new IdentityProcessor();
+	return new NCKS_NetCDF_Time_Subset_Processor();
     }
     
     public static void main(String[] args) {

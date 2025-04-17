@@ -21,6 +21,7 @@ import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.StationTimeSeriesFeatureCollection;
 import ucar.nc2.ft.point.StationPointFeature;
+import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.units.DateRange;
 import ucar.unidata.geoloc.Station;
 
@@ -102,17 +103,17 @@ public class WML_2_0ToNetCDFProcessTest {
 	FeatureDatasetPoint fdp = (FeatureDatasetPoint) featureDataset;
 	StationTimeSeriesFeatureCollection fc = (StationTimeSeriesFeatureCollection) fdp.getPointFeatureCollectionList().get(0);
 
-	Assert.assertEquals(1, fc.getStations().size());
+	Assert.assertEquals(1, fc.getStationFeatures().size());
 
 	int total = 0;
 	Long start = null;
 	Long end = null;
-	ucar.nc2.ft.PointFeatureCollection pfc = fc.flatten(null, (DateRange) null); // LOOK
+	ucar.nc2.ft.PointFeatureCollection pfc = fc.flatten(null, (CalendarDateRange) null); // LOOK
 
 	while (pfc.hasNext()) {
 	    PointFeature pf = pfc.next();
 	    StationPointFeature spf = (StationPointFeature) pf;
-	    long time = spf.getNominalTimeAsDate().getTime();
+	    long time = spf.getNominalTimeAsCalendarDate().getMillis();
 	    if (start == null || time < start) {
 		start = time;
 	    }
@@ -135,9 +136,9 @@ public class WML_2_0ToNetCDFProcessTest {
 	    FeatureDatasetPoint fdp = (FeatureDatasetPoint) featureDataset;
 	    StationTimeSeriesFeatureCollection fc = (StationTimeSeriesFeatureCollection) fdp.getPointFeatureCollectionList().get(0);
 
-	    Assert.assertEquals(1, fc.getStations().size());
+	    Assert.assertEquals(1, fc.getStationFeatures().size());
 
-	    Station station = fc.getStations().get(0);
+	    Station station = fc.getStationFeatures().get(0);
 
 	    // Assert.assertEquals(1345, station.getAltitude(), 10 ^ -10);
 	    Assert.assertEquals(-111.946402, station.getLongitude(), 10 ^ -10);

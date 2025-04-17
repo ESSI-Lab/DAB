@@ -50,6 +50,7 @@ import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.PointFeature;
 import ucar.nc2.ft.StationTimeSeriesFeatureCollection;
 import ucar.nc2.ft.point.StationPointFeature;
+import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.units.DateRange;
 
 public class NetCDF4TimeSeriesValidator extends DataValidatorImpl {
@@ -127,7 +128,7 @@ public class NetCDF4TimeSeriesValidator extends DataValidatorImpl {
 
 	    ret.setDataType(DataType.TIME_SERIES);
 
-	    ucar.nc2.ft.PointFeatureCollection pfc = fc.flatten(null, (DateRange) null); // LOOK
+	    ucar.nc2.ft.PointFeatureCollection pfc = fc.flatten(null, (CalendarDateRange) null); // LOOK
 	    Double verticalBegin = null;
 	    Double verticalEnd = null;
 	    Double s = null;
@@ -162,7 +163,7 @@ public class NetCDF4TimeSeriesValidator extends DataValidatorImpl {
 		if (w == null || lon < w) {
 		    w = lon;
 		}
-		long time = spf.getNominalTimeAsDate().getTime();
+		long time = spf.getNominalTimeAsCalendarDate().getMillis();
 		if (timeBegin == null || time < timeBegin) {
 		    timeBegin = time;
 		}

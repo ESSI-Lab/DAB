@@ -36,7 +36,7 @@ public class NetCDF_To_DAS_FormatConverter extends DataFormatConverter {
     public NetCDF_To_DAS_FormatConverter() {
 	super(DataType.GRID, //
 		CRS.GDAL_ALL(), //
-		DataFormat.NETCDF_3(), // INPUT FORMAT
+		DataFormat.NETCDF(), // INPUT FORMAT
 		DataFormat.DDS() // OUTPUT FORMAT
 	);
     }
