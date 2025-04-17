@@ -166,6 +166,10 @@ public class OMHandler extends StreamingRequestHandler {
 		    }
 		}
 
+		// TODO check if offset is present and return error -> deprecated, replaced by resumptionToken
+//		    printErrorMessage(output, "No " + getObject() + " matched");
+//		    return;
+		    
 		String useCacheParameter = request.getParameterValue(APIParameters.USE_CACHE);
 		DataCacheConnector dataCacheConnector = null;
 		Date begin = null;
@@ -285,6 +289,15 @@ public class OMHandler extends StreamingRequestHandler {
 
 		boolean first = true;
 		SearchAfter searchAfter = null;
+
+		// read resumption token from request
+		String resumptionToken = request.getParameterValue(APIParameters.RESUMPTION_TOKEN);
+		boolean userResumptionToken = false;
+		if (resumptionToken != null) {
+		    searchAfter = SearchAfter.of(resumptionToken);
+		    userResumptionToken = true;
+		}
+
 		do {
 
 		    try {
@@ -293,6 +306,11 @@ public class OMHandler extends StreamingRequestHandler {
 			}
 			resultSet = exec(discoveryMessage);
 			searchAfter = resultSet.getSearchAfter().isPresent() ? resultSet.getSearchAfter().get() : null;
+
+			if (userResumptionToken&&searchAfter!=null) {			    
+			    // TODO add resumption token
+//			    writer.write("resumptionToken","");
+			}
 
 			List<String> results = resultSet.getResultsList();
 			tempSize += pageSize;
@@ -362,6 +380,8 @@ public class OMHandler extends StreamingRequestHandler {
 			    String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
 			    if ((includeValues != null
 				    && (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
+
+				// TODO if observationId not present, give error
 
 				if (useCache) {
 
@@ -464,7 +484,7 @@ public class OMHandler extends StreamingRequestHandler {
 
 		    writer.flush();
 
-		} while (tempSize < userSize && tempSize < resultSet.getCountResponse().getCount()
+		} while (!userResumptionToken && tempSize < userSize && tempSize < resultSet.getCountResponse().getCount()
 			&& !resultSet.getResultsList().isEmpty());
 
 		if (format.equals("JSON")) {

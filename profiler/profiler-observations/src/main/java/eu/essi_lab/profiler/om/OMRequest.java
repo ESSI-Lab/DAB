@@ -60,6 +60,7 @@ public class OMRequest {
 	OBSERVATION("observationIdentifier", "observationId", "observation"), //
 	OUTPUT_PROPERTIES("outputProperties"), //
 	COUNTRY("country"), //
+	RESUMPTION_TOKEN("resumptionToken"), //
 	PROVIDER("provider"), //
 	OFFSET("offset", "start"), //
 	LIMIT("maxRecords", "limit", "count"), //
