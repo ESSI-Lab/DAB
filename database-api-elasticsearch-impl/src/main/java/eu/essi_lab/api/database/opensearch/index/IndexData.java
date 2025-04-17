@@ -65,7 +65,6 @@ import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
-import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -289,44 +288,11 @@ public class IndexData {
      * @param folder
      * @param gsResource
      * @return
+     * @throws Exception
      */
-    public static IndexData of(OpenSearchFolder folder, GSResource gsResource) {
+    public static IndexData of(OpenSearchFolder folder, GSResource gsResource) throws Exception {
 
-	IndexData indexData = new IndexData();
-
-	//
-	// put the base properties
-	//
-
-	indexData.put(ENTRY_NAME, gsResource.getPrivateId());
-	indexData.put(DATABASE_ID, folder.getDatabase().getIdentifier());
-	indexData.put(FOLDER_NAME, folder.getName());
-	indexData.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
-
-	indexData.put(DATA_TYPE, "doc");
-
-	indexData.entryId = OpenSearchFolder.getEntryId(folder, gsResource.getPrivateId());
-
-	String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
-		? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
-		: SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
-
-	indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
-
-	handleResource(indexData, gsResource);
-
-	String encodedString = OpenSearchUtils.encode(gsResource);
-
-	indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
-	indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
-
-	indexData.mapping = DataFolderMapping.get();
-
-	indexData.index = indexData.mapping.getIndex();
-
-	indexData.mapping.setEntryType(EntryType.GS_RESOURCE);
-
-	return indexData;
+	return IndexData.of(folder, gsResource.asDocument(false));
     }
 
     /**
@@ -685,15 +651,15 @@ public class IndexData {
      * @throws TransformerException
      */
     private static String encodeString(FolderEntry entry) throws IOException, TransformerException {
-    
-        ClonableInputStream stream = null;
-    
-        if (entry.getStream().isPresent()) {
-    
-            stream = new ClonableInputStream(entry.getStream().get());
-        }
-    
-        return OpenSearchUtils.encode(entry.getDocument().orElse(null), stream);
+
+	ClonableInputStream stream = null;
+
+	if (entry.getStream().isPresent()) {
+
+	    stream = new ClonableInputStream(entry.getStream().get());
+	}
+
+	return OpenSearchUtils.encode(entry.getDocument().orElse(null), stream);
     }
 
     /**
@@ -841,6 +807,7 @@ public class IndexData {
      * @param indexData
      * @param gsResource
      */
+    @Deprecated
     private static void handleResource(IndexData indexData, GSResource gsResource) {
 
 	IndexesMetadata indexesMd = gsResource.getIndexesMetadata();
