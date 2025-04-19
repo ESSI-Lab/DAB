@@ -71,37 +71,40 @@ public class CollectionCreatorTask extends AbstractCustomTask implements Harvest
 	    return;
 	}
 
-	try {
+	if (client == null) {
 
-	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+	    try {
 
-	    Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+		SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
 
-	    if (keyValueOption.isPresent()) {
+		Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
 
-		String host = keyValueOption.get().getProperty("mqttBrokerHost");
-		String port = keyValueOption.get().getProperty("mqttBrokerPort");
-		String user = keyValueOption.get().getProperty("mqttBrokerUser");
-		String pwd = keyValueOption.get().getProperty("mqttBrokerPwd");
+		if (keyValueOption.isPresent()) {
 
-		if (host == null || port == null || user == null || pwd == null) {
+		    String host = keyValueOption.get().getProperty("mqttBrokerHost");
+		    String port = keyValueOption.get().getProperty("mqttBrokerPort");
+		    String user = keyValueOption.get().getProperty("mqttBrokerUser");
+		    String pwd = keyValueOption.get().getProperty("mqttBrokerPwd");
 
-		    GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
+		    if (host == null || port == null || user == null || pwd == null) {
 
+			GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
+
+		    } else {
+
+			client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
+		    }
 		} else {
 
-		    client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
+		    GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
+
 		}
-	    } else {
 
-		GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
+	    } catch (Exception e) {
 
+		GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
+		throw e;
 	    }
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
-	    throw e;
 	}
 
 	String targetSourceIdentifiers = taskOptions.get().trim();
@@ -125,7 +128,7 @@ public class CollectionCreatorTask extends AbstractCustomTask implements Harvest
 		run(targetSource.get().getUniqueIdentifier());
 	    }
 	}
-	
+
 	log(status, "Collection creator task ENDED");
     }
 
