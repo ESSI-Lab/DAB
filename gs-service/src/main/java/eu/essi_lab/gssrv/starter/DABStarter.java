@@ -195,7 +195,13 @@ public class DABStarter {
 	case INTENSIVE:
 	    break;
 	}
-
+	GSLoggerFactory.getLogger(getClass()).info("Sleeping a bit");
+	try {
+	    Thread.sleep(TimeUnit.MINUTES.toMillis(3));
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	}
+	GSLoggerFactory.getLogger(getClass()).info("Slept");
 	initCaches();
     }
 
@@ -788,8 +794,8 @@ public class DABStarter {
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_PHYSICS);
 	    break;
 	case ACCESS:
-	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
 	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
 		    new FeatureLayer1StationsArctic());
 	    break;
