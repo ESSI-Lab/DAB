@@ -787,12 +787,6 @@ public class DABStarter {
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_PHYSICS);
 	    break;
 	case ACCESS:
-	    GSLoggerFactory.getLogger(getClass()).info("Sleeping a bit");
-	    try {
-		Thread.sleep(TimeUnit.MINUTES.toMillis(3));
-	    } catch (InterruptedException e) {
-		e.printStackTrace();
-	    }
 	    GSLoggerFactory.getLogger(getClass()).info("Slept");
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
