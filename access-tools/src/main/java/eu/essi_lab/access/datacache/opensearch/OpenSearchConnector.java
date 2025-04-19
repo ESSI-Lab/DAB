@@ -67,6 +67,7 @@ import org.opensearch.client.opensearch._types.query_dsl.Query.Builder;
 import org.opensearch.client.opensearch.core.DeleteByQueryResponse;
 import org.opensearch.client.opensearch.core.ScrollRequest;
 import org.opensearch.client.opensearch.core.ScrollResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.bulk.BulkOperation;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
@@ -217,8 +218,8 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	client = createClient(endpoint, username, password);//
 	try {
-	    client.info();
-	} catch (IOException e) {
+	    isClusterUp(client);
+	} catch (Exception e) {
 	    e.printStackTrace();
 	    throw new Exception("OpenSearch remote service connection issue");
 	}
@@ -256,6 +257,20 @@ public class OpenSearchConnector extends DataCacheConnector {
 
     }
 
+    public boolean isClusterUp(OpenSearchClient client) {
+	    try {
+	        SearchRequest ping = new SearchRequest.Builder()
+	            .index("*")
+	            .size(0)
+	            .build();
+	        client.search(ping, Void.class);
+	        return true;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+    
     private void indexInitialization() throws Exception {
 	for (DataCacheIndex index : DataCacheIndex.values()) {
 
