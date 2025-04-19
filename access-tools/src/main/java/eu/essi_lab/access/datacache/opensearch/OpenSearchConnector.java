@@ -215,9 +215,9 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    }
 	}
 
-	client = createClient(endpoint, username, password);
+	client = createClient(endpoint, username, password);//
 	try {
-	    client.ping();
+	    client.info();
 	} catch (IOException e) {
 	    e.printStackTrace();
 	    throw new Exception("OpenSearch remote service connection issue");
