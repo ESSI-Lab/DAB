@@ -96,7 +96,15 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 
     private static MQTTPublisherHive client;
 
-    static {
+    /**
+     * 
+     */
+    private static final String DATA_CACHE_AUGMENTER_CONNECTOR_FACTORY_ERROR = "DATA_CACHE_AUGMENTER_CONNECTOR_FACTORY_ERROR";
+    private static final int MAX_RETRY = 10;
+
+    @Override
+    public Optional<GSResource> augment(GSResource resource) throws GSException {
+
 	try {
 
 	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
@@ -112,7 +120,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 
 		if (host == null || port == null || user == null || pwd == null) {
 
-		    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error("MQTT options not found!");
+		    GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
 
 		} else {
 
@@ -120,28 +128,15 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 		}
 	    } else {
 
-		GSLoggerFactory.getLogger(DataCacheAugmenter.class).error("Key-value pair options not found!");
+		GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
 
 	    }
-	} catch (NullPointerException e) {
-
-	    // it happens in test env when calling ConfigurationWrapper.getSystemSettings() and a configuration is not
-	    // set
 
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
+	    throw GSException.createException(getClass(), "MQTTClientInitError", e);
 	}
-    }
-
-    /**
-     * 
-     */
-    private static final String DATA_CACHE_AUGMENTER_CONNECTOR_FACTORY_ERROR = "DATA_CACHE_AUGMENTER_CONNECTOR_FACTORY_ERROR";
-    private static final int MAX_RETRY = 10;
-
-    @Override
-    public Optional<GSResource> augment(GSResource resource) throws GSException {
 
 	DataCacheConnector dataCacheConnector = null;
 	String sourceId = null;

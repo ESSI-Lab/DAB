@@ -71,6 +71,39 @@ public class CollectionCreatorTask extends AbstractCustomTask implements Harvest
 	    return;
 	}
 
+	try {
+
+	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+
+	    Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+
+	    if (keyValueOption.isPresent()) {
+
+		String host = keyValueOption.get().getProperty("mqttBrokerHost");
+		String port = keyValueOption.get().getProperty("mqttBrokerPort");
+		String user = keyValueOption.get().getProperty("mqttBrokerUser");
+		String pwd = keyValueOption.get().getProperty("mqttBrokerPwd");
+
+		if (host == null || port == null || user == null || pwd == null) {
+
+		    GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
+
+		} else {
+
+		    client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
+		}
+	    } else {
+
+		GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
+
+	    }
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
+	    throw e;
+	}
+
 	String targetSourceIdentifiers = taskOptions.get().trim();
 
 	String[] splits = targetSourceIdentifiers.split("\n");
@@ -92,8 +125,8 @@ public class CollectionCreatorTask extends AbstractCustomTask implements Harvest
 		run(targetSource.get().getUniqueIdentifier());
 	    }
 	}
+	
 	log(status, "Collection creator task ENDED");
-
     }
 
     /**
@@ -160,48 +193,6 @@ public class CollectionCreatorTask extends AbstractCustomTask implements Harvest
     }
 
     private static MQTTPublisherHive client;
-
-    public static void setClient(MQTTPublisherHive client) {
-	CollectionCreatorTask.client = client;
-    }
-
-    static {
-	try {
-
-	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
-
-	    Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
-
-	    if (keyValueOption.isPresent()) {
-
-		String host = keyValueOption.get().getProperty("mqttBrokerHost");
-		String port = keyValueOption.get().getProperty("mqttBrokerPort");
-		String user = keyValueOption.get().getProperty("mqttBrokerUser");
-		String pwd = keyValueOption.get().getProperty("mqttBrokerPwd");
-
-		if (host == null || port == null || user == null || pwd == null) {
-
-		    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error("MQTT options not found!");
-
-		} else {
-
-		    client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
-		}
-	    } else {
-
-		GSLoggerFactory.getLogger(DataCacheAugmenter.class).error("Key-value pair options not found!");
-
-	    }
-	} catch (NullPointerException e) {
-
-	    // it happens in test env when calling ConfigurationWrapper.getSystemSettings() and a configuration is not
-	    // set
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
-	}
-    }
 
     @Override
     public String getName() {
