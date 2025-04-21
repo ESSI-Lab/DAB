@@ -1,10 +1,10 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest;
+package eu.essi_lab.gssrv.rest.config;
 
 import javax.jws.WebService;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -40,7 +40,7 @@ import javax.ws.rs.core.UriInfo;
  */
 @WebService
 @Path("/")
-public class HarvestingConfigService {
+public class ConfigService {
 
     /**
      * Optional<br>
@@ -72,9 +72,10 @@ public class HarvestingConfigService {
     private static String REPEAT_INTERVAL_UNIT_PARAM = "repeatIntervalUnit"; // optional
     private static String START_TIME_PARAM = "startTime"; // optional
 
-    @GET
+    @POST
+    @Path("source")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response config(@Context UriInfo uriInfo) {
+    public Response source(@Context UriInfo uriInfo) {
 
 	MultivaluedMap<String, String> params = uriInfo.getQueryParameters();
 
