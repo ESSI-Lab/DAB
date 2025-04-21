@@ -182,7 +182,7 @@ public class ONAMETMapper extends FileIdentifierMapper {
 
 	    GridDataset gds = ucar.nc2.dt.grid.GridDataset.open(//
 		    netCDFdataset.getLocation(), //
-		    EnumSet.of(Enhance.ScaleMissing, Enhance.CoordSystems, Enhance.ConvertEnums));
+		    EnumSet.of(Enhance.ApplyScaleOffset, Enhance.CoordSystems, Enhance.ConvertEnums));
 
 	    setTitle(netCDFdataset, dataset);
 

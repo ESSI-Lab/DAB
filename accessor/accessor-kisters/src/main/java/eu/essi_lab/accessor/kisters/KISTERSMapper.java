@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.kisters;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -217,8 +219,8 @@ public class KISTERSMapper extends AbstractResourceMapper {
 
 	String stationName = entity.getObject().getString(KISTERSClient.STATION_NAME);
 
-	double lat = Double.valueOf(entity.getObject().getString(KISTERSClient.STATION_LAT));
-	double lon = Double.valueOf(entity.getObject().getString(KISTERSClient.STATION_LON));
+	String lat = entity.getObject().getString(KISTERSClient.STATION_LAT);
+	String lon = entity.getObject().getString(KISTERSClient.STATION_LON);
 
 	String from = entity.getObject().getString(KISTERSClient.TS_FROM);
 	String to = entity.getObject().getString(KISTERSClient.TS_TO);
@@ -281,7 +283,9 @@ public class KISTERSMapper extends AbstractResourceMapper {
 	// Spatial extent
 	//
 
-	coreMetadata.addBoundingBox(lat, lon, lat, lon);
+	BigDecimal blat = new BigDecimal(lat);
+	BigDecimal blon = new BigDecimal(lon);
+	coreMetadata.addBoundingBox(blat, blon, blat, blon);
 
 	//
 	// Platform

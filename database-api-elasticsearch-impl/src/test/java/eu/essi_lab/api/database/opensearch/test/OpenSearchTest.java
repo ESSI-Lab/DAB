@@ -27,13 +27,13 @@ public class OpenSearchTest {
      */
     public static void main(String[] args) throws OpenSearchException, GSException, IOException {
 
-	before();
-	
+	new OpenSearchTest().before();
+
 	System.exit(0);
     }
 
     @Before
-    public static void before() throws GSException, OpenSearchException, IOException {
+    public void before() throws GSException, OpenSearchException, IOException {
 
 	System.setProperty("initIndexes", "true");
 

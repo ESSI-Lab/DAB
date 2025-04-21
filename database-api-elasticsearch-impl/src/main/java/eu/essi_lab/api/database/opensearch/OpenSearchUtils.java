@@ -458,6 +458,20 @@ public class OpenSearchUtils {
     }
 
     /**
+     * @param doc
+     * @param stream
+     * @return
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public static String encode(InputStream stream) throws IOException, TransformerException {
+
+	byte[] bytes = IOStreamUtils.getBytes(stream);
+
+	return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    /**
      * @param resource
      * @return
      * @throws IOException

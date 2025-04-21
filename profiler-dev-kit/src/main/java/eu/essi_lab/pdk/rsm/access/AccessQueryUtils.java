@@ -22,9 +22,11 @@ package eu.essi_lab.pdk.rsm.access;
  */
 
 import java.util.List;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeUnit;
 
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
@@ -34,6 +36,7 @@ import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -51,8 +54,19 @@ public class AccessQueryUtils {
 	resultCache.setMaxSize(50);
     }
 
-    public static ResultSet<GSResource> findResource(String requestId, List<GSSource> sources,
-	    String onlineIdentifier, StorageInfo databaseURI) throws GSException {
+    /**
+     * @param requestId
+     * @param view
+     * @param sources
+     * @param onlineIdentifier
+     * @param databaseURI
+     * @return
+     * @throws GSException
+     */
+    public static ResultSet<GSResource> findResource(//
+	    String requestId, //
+	    Optional<View> view, //
+	    String onlineIdentifier) throws GSException {
 
 	if (requestId != null) {
 	    synchronized (resultCache) {
@@ -70,11 +84,15 @@ public class AccessQueryUtils {
 	discoveryMessage.setRequestId(requestId);
 	discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
 	discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
-
 	discoveryMessage.setPage(new Page(1, 1));
 
-	discoveryMessage.setSources(sources);
-	discoveryMessage.setDataBaseURI(databaseURI);
+	view.ifPresent(v -> discoveryMessage.setView(v));
+
+	discoveryMessage.setSources(view.isPresent() //
+		? ConfigurationWrapper.getViewSources(view.get()) //
+		: ConfigurationWrapper.getHarvestedSources());
+
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //

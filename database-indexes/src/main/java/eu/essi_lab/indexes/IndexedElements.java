@@ -33,6 +33,7 @@ import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.IndexedElementInfo;
 import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
+import eu.essi_lab.model.resource.MetadataElement;
 
 /**
  * This class groups elements written by {@link IndexedMetadataElement}s. They store additional
@@ -147,7 +148,7 @@ public final class IndexedElements extends IndexedElementsGroup {
      * Accessory to {@link IndexedMetadataElements#TEMP_EXTENT_BEGIN}<br>
      * Set (with empty value) by the the correspondent {@link IndexedMetadataElement}
      */
-    public static final IndexedElement TEMP_EXTENT_BEGIN_NOW = new IndexedElement("tmpExtentBegin_Now") {
+    public static final IndexedElement TEMP_EXTENT_BEGIN_NOW = new IndexedElement(MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName()) {
 
 	public List<String> getValues() {
 
@@ -177,7 +178,7 @@ public final class IndexedElements extends IndexedElementsGroup {
      * Accessory to {@link IndexedMetadataElements#TEMP_EXTENT_END}<br>
      * Set (with empty value) by the the correspondent {@link IndexedMetadataElement}
      */
-    public static final IndexedElement TEMP_EXTENT_END_NOW = new IndexedElement("tmpExtentEnd_Now") {
+    public static final IndexedElement TEMP_EXTENT_END_NOW = new IndexedElement(MetadataElement.TEMP_EXTENT_END_NOW.getName()) {
 
 	public List<String> getValues() {
 

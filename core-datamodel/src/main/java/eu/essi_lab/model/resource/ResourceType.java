@@ -50,11 +50,9 @@ public enum ResourceType {
 
     private String type;
 
-    private ResourceType(String type) {
-
-	this.type = type;
-    }
-
+    /**
+     * @return
+     */
     public String getType() {
 
 	return type;
@@ -77,5 +75,13 @@ public enum ResourceType {
     public String toString() {
 
 	return this.type;
+    }
+
+    /**
+     * @param type
+     */
+    private ResourceType(String type) {
+    
+        this.type = type;
     }
 }

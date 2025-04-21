@@ -28,6 +28,7 @@ import ucar.nc2.ft.point.StationPointFeature;
 import ucar.nc2.ft.point.writer.CFPointWriter;
 import ucar.nc2.ft.point.writer.CFPointWriterConfig;
 import ucar.nc2.ft.point.writer.WriterCFStationCollection;
+import ucar.nc2.time.CalendarDateRange;
 import ucar.nc2.units.DateRange;
 
 public class NetCDFWriterTest {
@@ -114,11 +115,11 @@ public class NetCDFWriterTest {
 	    // int total = 0;
 	    Long start = null;
 	    Long end = null;
-	    ucar.nc2.ft.PointFeatureCollection pfc = fc.flatten(null, (DateRange) null); // LOOK
+	    ucar.nc2.ft.PointFeatureCollection pfc = fc.flatten(null, (CalendarDateRange) null); // LOOK
 	    while (pfc.hasNext()) {
 		PointFeature pf = pfc.next();
 		StationPointFeature spf = (StationPointFeature) pf;
-		long time = spf.getNominalTimeAsDate().getTime();
+		long time = spf.getNominalTimeAsCalendarDate().getMillis();
 		if (start == null || time < start) {
 		    start = time;
 		}
@@ -127,10 +128,11 @@ public class NetCDFWriterTest {
 		}
 		// System.out.println(total++ + " start " + start + " end " + end);
 	    }
-
+	    
 	    DateRange dateRange = new DateRange(new Date(start), new Date(end - (end - start) / 2));
+	    CalendarDateRange cdr = CalendarDateRange.of(dateRange);
 	    // this.outputFile = File.createTempFile(OUT_PREFIX, SUFFIX);
-	    subset(fdp, location, Version.netcdf3, dataset, fc, dateRange);
+	    subset(fdp, location, Version.netcdf3, dataset, fc, cdr);
 	} else {
 	    Assert.fail();
 	}
@@ -143,9 +145,9 @@ public class NetCDFWriterTest {
     }
 
     private int subset(FeatureDatasetPoint fdp, String fileOut, Version version, FeatureDataset dataset,
-	    StationTimeSeriesFeatureCollection fc, DateRange dateRange) throws IOException {
+	    StationTimeSeriesFeatureCollection fc, CalendarDateRange dateRange) throws IOException {
 	try (WriterCFStationCollection cfWriter = new WriterCFStationCollection(fileOut, dataset.getGlobalAttributes(),
-		dataset.getDataVariables(), fc.getExtraVariables(), fc.getTimeUnit(), fc.getAltUnits(), new CFPointWriterConfig(version))) {
+		dataset.getDataVariables(),  fc.getTimeUnit(), fc.getAltUnits(), new CFPointWriterConfig(version))) {
 	    ucar.nc2.ft.PointFeatureCollection pfc = fc.flatten(null, dateRange); // LOOK
 
 	    int count = 0;

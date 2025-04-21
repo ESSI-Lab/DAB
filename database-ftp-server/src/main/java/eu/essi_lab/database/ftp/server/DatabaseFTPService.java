@@ -108,9 +108,8 @@ public class DatabaseFTPService {
 	//
 	//
 
-	// DatabaseFtpCommandFactory commandFactory =
-	// DatabaseFtpCommandFactory.get(serverFactory.getCommandFactory());//
-	// serverFactory.setCommandFactory(commandFactory);
+	DatabaseFtpCommandFactory commandFactory = DatabaseFtpCommandFactory.get(serverFactory.getCommandFactory());//
+	serverFactory.setCommandFactory(commandFactory);
 
 	//
 	//

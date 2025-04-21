@@ -37,9 +37,9 @@ import java.util.Optional;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.IOUtils;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.imageio.netcdf.GeoToolsNetCDFReader;
 import org.geotools.imageio.netcdf.utilities.NetCDFCRSUtilities;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
@@ -105,6 +105,10 @@ public class NetCDFConnector extends HarvestedQueryConnector<NetCDFConnectorSett
 
 			map(node -> {
 			    String filename = node.getNodeValue();
+
+			    if (!filename.toLowerCase().endsWith(".nc")) {
+				return null;
+			    }
 
 			    OriginalMetadata originalMetadata = null;
 			    NetcdfDataset ncDataset = null;
@@ -173,7 +177,7 @@ public class NetCDFConnector extends HarvestedQueryConnector<NetCDFConnectorSett
 					    time = dimension;
 					    dimension.setType(DimensionType.TIME);
 					    resolution = NetCDFUtils.readMinimumResolutionInMilliseconds(timeAxis);
-					      min = timeAxis.getCalendarDateRange().getStart().getMillis();
+					    min = timeAxis.getCalendarDateRange().getStart().getMillis();
 					    max = timeAxis.getCalendarDateRange().getEnd().getMillis();
 					    uom = Unit.MILLI_SECOND;
 					    datum = Datum.UNIX_EPOCH_TIME();
@@ -193,11 +197,10 @@ public class NetCDFConnector extends HarvestedQueryConnector<NetCDFConnectorSett
 
 				CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
-				String observedParameter = mainVariable.findAttribute("long_name").getStringValue();
+				String observedParameter = mainVariable.findAttribute("description").getStringValue();
 				String observedParameterUnits = mainVariable.findAttribute("units").getStringValue();
-				String locationName = filename.contains("amsterdam") ? "Amsterdam" : "Genova";
-				    coreMetadata.setTitle("ERA5 " + observedParameter + " - " + locationName);
-				    coreMetadata.setAbstract("ERA5 " + observedParameter + " - " + locationName);
+				coreMetadata.setTitle("Average monthly temperature (" + observedParameter + ") - Europe ");
+				coreMetadata.setAbstract("Average monthly temperature (" + observedParameter + ") - Europe ");
 				CoverageDescription coverageDescription = new CoverageDescription();
 				coverageDescription.setAttributeIdentifier(mainVariable.getShortName());
 				coverageDescription.setAttributeTitle(observedParameter);
@@ -284,6 +287,13 @@ public class NetCDFConnector extends HarvestedQueryConnector<NetCDFConnectorSett
 
     public static File getLocalCopy(String url, String filename) throws Exception {
 	String u = url + filename;
+
+	String tmpDirsLocation = System.getProperty("java.io.tmpdir");
+	File tmpFile = new File(tmpDirsLocation, "netcdf-connector-" + filename);
+	if (tmpFile.exists()&&tmpFile.length()>0) {
+	    // already downloaded
+	    return tmpFile;
+	}
 	Downloader down = new Downloader();
 	Optional<InputStream> netCDF = down.downloadOptionalStream(u);
 
@@ -292,12 +302,7 @@ public class NetCDFConnector extends HarvestedQueryConnector<NetCDFConnectorSett
 	    // coverageDescription.setAttributeIdentifier("urn:ca:qc:gouv:cehq:depot:variable:" +
 	    // var.name());
 	    // coverageDescription.setAttributeTitle(var.getLabel());
-	    String tmpDirsLocation = System.getProperty("java.io.tmpdir");
-	    File tmpFile = new File(tmpDirsLocation, "netcdf-connector-" + filename);
-	    if (tmpFile.exists()) {
-		// already downloaded
-		return tmpFile;
-	    }
+
 	    FileOutputStream fos = new FileOutputStream(tmpFile);
 	    IOUtils.copy(netCDF.get(), fos);
 	    fos.close();
