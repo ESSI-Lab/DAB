@@ -81,7 +81,7 @@
 		</jaxrs:providers>
 	</jaxrs:server>
 
-	<bean id="configService" class="eu.essi_lab.gssrv.rest.config.ConfigService" />
+	<bean id="configService" class="eu.essi_lab.gssrv.rest.conf.ConfigService" />
 		
 	<bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />	
 

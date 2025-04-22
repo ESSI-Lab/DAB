@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.config;
+package eu.essi_lab.gssrv.rest.conf;
 
 import javax.jws.WebService;
 import javax.ws.rs.POST;
