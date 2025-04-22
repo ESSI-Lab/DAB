@@ -26,12 +26,15 @@ package eu.essi_lab.gssrv.rest.conf;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.checkerframework.checker.units.qual.m;
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.Queryable.ContentType;
 
 /**
@@ -61,30 +64,16 @@ public abstract class ConfigRequest {
 	this.object = object;
     }
 
-    /**
-     * @return
-     */
-    protected abstract List<Parameter> getSupportedParameters();
+    @Override
+    public String toString() {
 
-    /**
-     * @return
-     */
-    private List<String> readParameters() {
-
-	return object.getJSONObject("parameters").//
-		keySet().//
-		stream().//
-		collect(Collectors.toList());
-
+	return object.toString(3);
     }
 
-    /**
-     * @param parameter
-     * @return
-     */
-    private Object readValue(String parameter) {
+    @Override
+    public boolean equals(Object object) {
 
-	return object.getJSONObject("parameters").get(parameter);
+	return object instanceof ConfigRequest && ((ConfigRequest) object).toString().equals(this.toString());
     }
 
     /**
@@ -97,84 +86,20 @@ public abstract class ConfigRequest {
 	    throw new IllegalArgumentException("Missing 'parameters' object");
 	}
 
-	//
-	// mandatory parameters check
-	//
+	mandatoryCheck();
 
-	List<String> mandatoryParams = getSupportedParameters().//
-		stream().//
-		filter(p -> p.isMandatory()).//
-		map(p -> p.getName()).//
-		collect(Collectors.toList());
+	supportedCheck();
 
-	mandatoryParams.removeAll(readParameters());
-	if (!mandatoryParams.isEmpty()) {
-
-	    throw new IllegalArgumentException(
-		    "Missing mandatory parameters: " + mandatoryParams.stream().collect(Collectors.joining(",")));
-	}
-
-	//
-	// supported parameters check
-	//
-
-	List<String> supported = getSupportedParameters().//
-		stream().//
-		map(p -> p.getName()).//
-		collect(Collectors.toList());
-
-	List<String> requestParams = readParameters();
-	requestParams.removeAll(supported);
-
-	if (!requestParams.isEmpty()) {
-
-	    throw new IllegalArgumentException("Unknown parameters: " + requestParams.stream().collect(Collectors.joining(","))
-		    + ". Supported parameters: " + supported.stream().collect(Collectors.joining(",")));
-	}
-
-	//
-	// values check
-	//
-
-	requestParams.forEach(paramName -> {
+	readParameters().forEach(paramName -> {
 
 	    Object value = readValue(paramName);
 
-	    ContentType type = getSupportedParameters().//
-		    stream().//
-		    filter(p -> p.getName().equals(paramName)).//
-		    findFirst().//
-		    get().//
-		    getType();
+	    contentTypeCheck(paramName, value);
 
-	    switch (type) {
-	    case BOOLEAN:
+	    patternCheck(paramName, value);
 
-		break;
-
-	    case DOUBLE:
-
-		break;
-
-	    case INTEGER:
-
-		break;
-
-	    case ISO8601_DATE_TIME:
-
-		break;
-
-	    case LONG:
-
-		break;
-
-	    case TEXTUAL:
-
-		break;
-	    }
-
+	    enumCheck(paramName, value);
 	});
-
     }
 
     /**
@@ -195,16 +120,205 @@ public abstract class ConfigRequest {
     }
 
     /**
-     * @param paramName
+     * @param parameter
      * @return
      */
-    protected Optional<String> get(String paramName) {
+    public Optional<Object> read(String parameter) {
 
-	if (object.getJSONObject("parameters").has("name")) {
+	if (object.getJSONObject("parameters").has(parameter)) {
 
-	    return Optional.ofNullable(object.getJSONObject("parameters").optString(paramName, null));
+	    return Optional.of(readValue(parameter));
 	}
 
-	throw new IllegalArgumentException("Parameter");
+	return Optional.empty();
+    }
+
+    /**
+     * @return
+     */
+    protected abstract List<Parameter> getSupportedParameters();
+
+    /**
+     * 
+     */
+    protected void mandatoryCheck() {
+
+	List<String> mandatoryParams = getSupportedParameters().//
+		stream().//
+		filter(p -> p.isMandatory()).//
+		map(p -> p.getName()).//
+		collect(Collectors.toList());
+
+	mandatoryParams.removeAll(readParameters());
+	if (!mandatoryParams.isEmpty()) {
+
+	    throw new IllegalArgumentException(
+		    "Missing mandatory parameters: " + mandatoryParams.stream().collect(Collectors.joining(",")));
+	}
+    }
+
+    /**
+     * 
+     */
+    protected void supportedCheck() {
+
+	List<String> supported = getSupportedParameters().//
+		stream().//
+		map(p -> p.getName()).//
+		collect(Collectors.toList());
+
+	List<String> requestParams = readParameters();
+	requestParams.removeAll(supported);
+
+	if (!requestParams.isEmpty()) {
+
+	    throw new IllegalArgumentException("Unknown parameters: " + requestParams.stream().collect(Collectors.joining(","))
+		    + ". Supported parameters: " + supported.stream().collect(Collectors.joining(",")));
+	}
+    }
+
+    /**
+     * @param value
+     */
+    @SuppressWarnings("incomplete-switch")
+    protected void contentTypeCheck(String paramName, Object value) {
+
+	ContentType type = getSupportedParameters().//
+		stream().//
+		filter(p -> p.getName().equals(paramName)).//
+		findFirst().//
+		get().//
+		getContentType();
+
+	switch (type) {
+	case BOOLEAN:
+	    if (!value.toString().equals("true") && !value.toString().equals("false")) {
+
+		throw new IllegalArgumentException("Parameter " + paramName + " should be of type boolean");
+	    }
+
+	    break;
+
+	case DOUBLE:
+
+	    try {
+		Double.valueOf(value.toString());
+	    } catch (NumberFormatException ex) {
+
+		throw new IllegalArgumentException("Parameter " + paramName + " should be of type double");
+	    }
+
+	    break;
+
+	case INTEGER:
+
+	    try {
+		Integer.valueOf(value.toString());
+	    } catch (NumberFormatException ex) {
+
+		throw new IllegalArgumentException("Parameter " + paramName + " should be of type integer");
+	    }
+
+	    break;
+
+	case ISO8601_DATE_TIME:
+
+	    if (ISO8601DateTimeUtils.parseISO8601ToDate(paramName).isEmpty()) {
+
+		throw new IllegalArgumentException("Parameter " + paramName + " should be of type ISO8601 date time");
+	    }
+
+	    break;
+
+	case LONG:
+
+	    try {
+		Long.valueOf(value.toString());
+	    } catch (NumberFormatException ex) {
+
+		throw new IllegalArgumentException("Parameter " + paramName + " should be of type long");
+	    }
+
+	    break;
+	}
+    }
+
+    /**
+     * 
+     */
+    protected void patternCheck(String paramName, Object value) {
+
+	Optional<InputPattern> optPattern = getSupportedParameters().//
+		stream().//
+		filter(p -> p.getName().equals(paramName)).//
+		findFirst().//
+		get().//
+		getInputPattern();
+
+	if (optPattern.isPresent()) {
+
+	    Pattern pattern = Pattern.compile(optPattern.get().getPattern());
+	    Matcher matcher = pattern.matcher(value.toString());
+
+	    if (!matcher.matches()) {
+
+		throw new IllegalArgumentException(
+			"Parameter " + paramName + " should match the '" + optPattern.get().getPattern() + "' pattern");
+	    }
+	}
+    }
+
+    /**
+     * @param paramName
+     * @param value
+     */
+    protected void enumCheck(String paramName, Object value) {
+
+	Optional<Class<? extends LabeledEnum>> optEnum = getSupportedParameters().//
+		stream().//
+		filter(p -> p.getName().equals(paramName)).//
+		findFirst().//
+		get().//
+		getEnum();
+
+	if (optEnum.isPresent()) {
+
+	    if (!LabeledEnum.values(optEnum.get()).//
+		    stream().//
+		    map(e -> e.getLabel()).//
+		    collect(Collectors.toList()).//
+		    contains(value.toString())) {
+
+		String supValues = LabeledEnum.values(optEnum.get()).//
+			stream().//
+			map(e -> e.getLabel()).//
+			collect(Collectors.joining(","));
+
+		throw new IllegalArgumentException(
+			"Unsupported value '" + value + "' for paramter '" + paramName + "'. Supported values are: " + supValues);
+
+	    }
+	}
+    }
+
+    /**
+     * @return
+     */
+    protected List<String> readParameters() {
+
+	return object.getJSONObject("parameters").//
+		keySet().//
+		stream().//
+		collect(Collectors.toList());
+
+    }
+
+    /**
+     * @param parameter
+     * @return
+     */
+    private Object readValue(String parameter) {
+
+	return object.getJSONObject("parameters").get(parameter);
     }
 }

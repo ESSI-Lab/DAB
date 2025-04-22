@@ -27,6 +27,7 @@ package eu.essi_lab.gssrv.rest.conf;
 import java.util.Optional;
 
 import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.Queryable.ContentType;
 
 /**
@@ -38,6 +39,7 @@ public class Parameter {
     private ContentType type;
     private boolean mandatory;
     private InputPattern pattern;
+    private Class<? extends LabeledEnum> enum_;
 
     /**
      * @param name
@@ -49,6 +51,18 @@ public class Parameter {
 
 	return new Parameter(name, type, mandatory);
 
+    }
+
+    /**
+     * @param name
+     * @param type
+     * @param enum_
+     * @param mandatory
+     * @return
+     */
+    public static Parameter of(String name, ContentType type, Class<? extends LabeledEnum> enum_, boolean mandatory) {
+
+	return new Parameter(name, type, enum_, mandatory);
     }
 
     /**
@@ -70,7 +84,9 @@ public class Parameter {
      */
     public Parameter(String name, ContentType type, boolean mandatory) {
 
-	this(name, type, null, mandatory);
+	this.name = name;
+	this.type = type;
+	this.mandatory = mandatory;
     }
 
     /**
@@ -87,11 +103,33 @@ public class Parameter {
     }
 
     /**
-     * @return the pattern
+     * @param name
+     * @param type
+     * @param enum_
+     * @param mandatory
      */
-    public Optional<InputPattern> getPattern() {
+    public Parameter(String name, ContentType type, Class<? extends LabeledEnum> enum_, boolean mandatory) {
+
+	this.name = name;
+	this.type = type;
+	this.enum_ = enum_;
+	this.mandatory = mandatory;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<InputPattern> getInputPattern() {
 
 	return Optional.ofNullable(pattern);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Class<? extends LabeledEnum>> getEnum() {
+
+	return Optional.ofNullable(enum_);
     }
 
     /**
@@ -105,9 +143,17 @@ public class Parameter {
     /**
      * @return the type
      */
-    public ContentType getType() {
+    public ContentType getContentType() {
 
 	return type;
+    }
+
+    /**
+     * @param mandatory
+     */
+    public void setMandatory(boolean mandatory) {
+
+	this.mandatory = mandatory;
     }
 
     /**
