@@ -1358,15 +1358,16 @@ public class OpenSearchConnector extends DataCacheConnector {
     public StationsStatistics getStationStatisticsWithProperties(BBOX bbox, boolean allProperties,
 	    SimpleEntry<String, String>... propertyValues) throws Exception {
 
-	BoolQuery.Builder query = getQuery(bbox, allProperties, propertyValues);
+	//BoolQuery.Builder query = getQuery(bbox, allProperties, propertyValues);
+	BoolQuery boolQuery = getQuery(bbox, allProperties, propertyValues).build();
 
-	SimpleEntry<Long, StationRecord> stationSouth = getStation(query, SOUTH_PROPERTY,
+	SimpleEntry<Long, StationRecord> stationSouth = getStation(boolQuery, SOUTH_PROPERTY,
 		org.opensearch.client.opensearch._types.SortOrder.Asc);
-	SimpleEntry<Long, StationRecord> stationNorth = getStation(query, NORTH_PROPERTY,
+	SimpleEntry<Long, StationRecord> stationNorth = getStation(boolQuery, NORTH_PROPERTY,
 		org.opensearch.client.opensearch._types.SortOrder.Desc);
-	SimpleEntry<Long, StationRecord> stationEast = getStation(query, EAST_PROPERTY,
+	SimpleEntry<Long, StationRecord> stationEast = getStation(boolQuery, EAST_PROPERTY,
 		org.opensearch.client.opensearch._types.SortOrder.Desc);
-	SimpleEntry<Long, StationRecord> stationWest = getStation(query, WEST_PROPERTY,
+	SimpleEntry<Long, StationRecord> stationWest = getStation(boolQuery, WEST_PROPERTY,
 		org.opensearch.client.opensearch._types.SortOrder.Asc);
 
 	if (stationSouth.getKey().equals(0l)) {
@@ -1388,12 +1389,12 @@ public class OpenSearchConnector extends DataCacheConnector {
 
     }
 
-    private SimpleEntry<Long, StationRecord> getStation(BoolQuery.Builder bq, String sortProperty,
+    private SimpleEntry<Long, StationRecord> getStation(BoolQuery boolQuery, String sortProperty,
 	    org.opensearch.client.opensearch._types.SortOrder order) throws Exception {
 	org.opensearch.client.opensearch.core.SearchRequest.Builder srb = new org.opensearch.client.opensearch.core.SearchRequest.Builder();
 	srb.index(DataCacheIndex.STATIONS.getIndex(databaseName));
 	Query.Builder qb = new Query.Builder();
-	qb.bool(bq.build());
+	qb.bool(boolQuery); 
 	srb.query(qb.build());
 	srb.size(1);
 	srb.sort(f -> f.field(fs -> fs.field(sortProperty).order(order)));

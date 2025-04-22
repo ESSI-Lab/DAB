@@ -195,7 +195,6 @@ public class DABStarter {
 	case INTENSIVE:
 	    break;
 	}
-
 	initCaches();
     }
 
@@ -263,7 +262,7 @@ public class DABStarter {
 
 	    } else if (S3Source.check(configURL)) {
 		GSLoggerFactory.getLogger(getClass()).info("Found S3 URL");
-		
+
 		//
 		// -Dconfiguration.url=s3://awsaccesskey:awssecretkey@bucket/config.json
 		//
@@ -272,12 +271,12 @@ public class DABStarter {
 
 		source = S3Source.of(startupUri);
 
-	    } else {		
-		
+	    } else {
+
 		String configFileName = "gs-configuration";
 
 		if (configURL.startsWith("file:temp")) {
-		    
+
 		    GSLoggerFactory.getLogger(getClass()).info("Found local temp file");
 
 		    //
@@ -292,7 +291,7 @@ public class DABStarter {
 		} else if (configURL.startsWith("file://")) {
 
 		    GSLoggerFactory.getLogger(getClass()).info("Found local file");
-		    
+
 		    //
 		    // -Dconfiguration.url=file://path/preprodenvconf/
 		    // -Dconfiguration.url=file://path/preprodenvconf!demo
@@ -304,7 +303,7 @@ public class DABStarter {
 
 		    source = new FileSource(new File(path));
 		} else {
-		    GSLoggerFactory.getLogger(DABStarter.class).error("Unrecognized config URL: {}",configURL);
+		    GSLoggerFactory.getLogger(DABStarter.class).error("Unrecognized config URL: {}", configURL);
 		}
 	    }
 
@@ -788,8 +787,8 @@ public class DABStarter {
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_PHYSICS);
 	    break;
 	case ACCESS:
-	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
 	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
 		    new FeatureLayer1StationsArctic());
 	    break;

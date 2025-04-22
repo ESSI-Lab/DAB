@@ -29,7 +29,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -392,7 +391,7 @@ public class Layer {
 	
 	GSLoggerFactory.getLogger(getClass()).info("Sleeping a bit");
 	try {
-	    Thread.sleep(Duration.ofMinutes(10).toMillis());
+	    Thread.sleep(TimeUnit.MILLISECONDS.toMinutes(15));
 	} catch (InterruptedException e) {
 	    e.printStackTrace();
 	}
