@@ -1,8 +1,12 @@
 package eu.essi_lab.gssrv.conf.task;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +38,12 @@ import org.json.JSONObject;
  */
 
 import org.quartz.JobExecutionContext;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
+import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
@@ -73,11 +79,39 @@ public class OSCARTask extends AbstractCustomTask {
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 	// TODO Auto-generated method stub
+	Optional<String> taskOptions = readTaskOptions(context);
+
+	String settings = null;
+	if (taskOptions.isPresent()) {
+	    String options = taskOptions.get();
+	    if (options != null) {
+		settings = options;
+	    }
+	}
+	String sourceId;
+	if (settings != null) {
+	    sourceId = settings.split(" ")[1];
+	} else {
+	    GSLoggerFactory.getLogger(getClass()).error("missing source id for Duplicated Online Identifiers task");
+	    return;
+	}
+
+	// String[] lines = settings.split("\n");
+	// String secret = null;
+	// String access = null;
+	// boolean aggregateMode = false;
+	// String aggregatedTarget = null;
+	// String dataDir = null;
+	// boolean test = false;
+	// List<String> sources = new ArrayList<>();
+	// for (String line : lines) {
+	//
+	// }
 
 	WIGOS_MAPPER wigosMapper = new WIGOS_MAPPER();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-	discoveryMessage.setRequestId("oscar-task-" + "argentina-ina" + "-" + UUID.randomUUID());
+	discoveryMessage.setRequestId("oscar-task-" + sourceId + "-" + UUID.randomUUID());
 	discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
 	discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
 	discoveryMessage.setExcludeResourceBinary(false);
@@ -92,27 +126,63 @@ public class OSCARTask extends AbstractCustomTask {
 	discoveryMessage.setSortProperty(ResourceProperty.PRIVATE_ID);
 	SearchAfter searchAfter = null;
 	int i = 0;
-	int start = 1;
+	int start = 0;
 	int pageSize = 50;
+	Downloader downloader = new Downloader();
+	HashMap<String, String> params = new HashMap<String, String>();
+	params.put("X-WMO-WMDR-Token", System.getProperty("WMO_TOKEN"));
+	main: while (true) {
 
-	discoveryMessage.setPage(new Page(start, pageSize));
-	start = start + pageSize;
+	    GSLoggerFactory.getLogger(getClass()).info("OSCAR task {} at record {}", sourceId, start);
+	    discoveryMessage.setPage(new Page(start, pageSize));
+	    start = start + pageSize;
 
-	if (searchAfter != null) {
-	    discoveryMessage.setSearchAfter(searchAfter);
+	    discoveryMessage.setPage(new Page(start, pageSize));
+	    start = start + pageSize;
+
+	    if (searchAfter != null) {
+		discoveryMessage.setSearchAfter(searchAfter);
+	    }
+	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
+	    IDiscoveryExecutor executor = loader.iterator().next();
+	    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
+	    if (resultSet.getSearchAfter().isPresent()) {
+		searchAfter = resultSet.getSearchAfter().get();
+	    }
+	    List<GSResource> resources = resultSet.getResultsList();
+
+	    for (GSResource resource : resources) {
+		i++;
+		if (i > 100) {
+		    break main;
+		}
+		Element res = wigosMapper.map(discoveryMessage, resource);
+		String doc = XMLDocumentReader.asString(res);
+		doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+		HttpRequest postRequest = HttpRequestUtils.build(//
+			MethodWithBody.POST, //
+			System.getProperty("WMO_ENDPOINT"), doc, params);
+
+		HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
+
+		InputStream content = response.body();
+
+		JSONObject jsonObject = JSONUtils.fromStream(content);
+
+		String xmlStatus = jsonObject.optString("xmlStatus");
+		String logs = jsonObject.optString("logs");
+		String idResponse = jsonObject.optString("id");
+
+		System.out.println(xmlStatus + ": " + logs);
+
+	    }
+
+	    if (resources.isEmpty()) {
+		break;
+	    }
+
 	}
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
-	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
-	if (resultSet.getSearchAfter().isPresent()) {
-	    searchAfter = resultSet.getSearchAfter().get();
-	}
-	List<GSResource> resources = resultSet.getResultsList();
 
-	for (GSResource resource : resources) {
-	    wigosMapper.map(discoveryMessage, resource);
-
-	}
 
     }
 
@@ -120,7 +190,7 @@ public class OSCARTask extends AbstractCustomTask {
 
 	WIGOS_MAPPER wigosMapper = new WIGOS_MAPPER();
 
-	String request = "http://localhost:9090/gs-service/services/essi/token/whos/view/gs-view-source(argentina-ina)/oaipmh?verb=ListRecords&metadataPrefix=WIGOS-1.0";
+	String request = "http://localhost:9090/gs-service/services/essi/token/whos-d40a452b-b865-4fbe-8165-43a96ebf1b3d/view/gs-view-source(argentina-ina)/oaipmh?verb=ListRecords&metadataPrefix=WIGOS-1.0&resumptionToken=restoken/101/null/null/null/WIGOS-1.0/1729189908361";
 
 	Downloader d = new Downloader();
 	Optional<String> resp = d.downloadOptionalString(request);
@@ -137,7 +207,7 @@ public class OSCARTask extends AbstractCustomTask {
 
 	    for (Node node : nodes) {
 		String doc = XMLDocumentReader.asString(node);
-		doc= doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+		doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
 		HttpRequest postRequest = HttpRequestUtils.build(//
 			MethodWithBody.POST, //
 			System.getProperty("WMO_ENDPOINT"), doc, params);
@@ -151,7 +221,7 @@ public class OSCARTask extends AbstractCustomTask {
 		String xmlStatus = jsonObject.optString("xmlStatus");
 		String logs = jsonObject.optString("logs");
 		String idResponse = jsonObject.optString("id");
-		
+
 		System.out.println(xmlStatus + ": " + logs);
 
 	    }

@@ -24,3 +24,4 @@ eu.essi_lab.gssrv.conf.task.DeploymentUpdaterTask
 eu.essi_lab.gssrv.conf.task.mysql.MySqlInitTask
 eu.essi_lab.gssrv.conf.task.opensearch.OpenSearchMetadataDBInitTask
 eu.essi_lab.gssrv.conf.task.views.ViewManagerTask
+eu.essi_lab.gssrv.conf.task.OSCARTask
