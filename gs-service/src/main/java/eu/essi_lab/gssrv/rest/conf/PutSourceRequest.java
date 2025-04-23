@@ -111,7 +111,7 @@ public class PutSourceRequest extends ConfigRequest {
 
 	ArrayList<Parameter> list = new ArrayList<>();
 
-	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE, false));
+	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false));
 	list.add(Parameter.of(SOURCE_LABEL, ContentType.TEXTUAL, true));
 	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, true));
 	list.add(Parameter.of(SOURCE_TYPE, ContentType.TEXTUAL, SourceType.class, true));

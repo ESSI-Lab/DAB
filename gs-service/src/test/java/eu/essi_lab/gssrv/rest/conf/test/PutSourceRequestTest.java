@@ -4,6 +4,7 @@
 package eu.essi_lab.gssrv.rest.conf.test;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -29,26 +30,12 @@ public class PutSourceRequestTest {
 
 	Assert.assertEquals(4, parameters.size());
 
-	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE, false),
+	Assert.assertEquals(
+		Parameter.of(PutSourceRequest.SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false),
 		parameters.get(0));
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_LABEL, ContentType.TEXTUAL, true), parameters.get(1));
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_ENDPOINT, ContentType.TEXTUAL, true), parameters.get(2));
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_TYPE, ContentType.TEXTUAL, SourceType.class, true), parameters.get(3));
-    }
-
-    @Test
-    public void validationTest1() {
-
-	PutSourceRequest request = new PutSourceRequest();
-
-	request.put(PutSourceRequest.SOURCE_ID, "sourceId");
-	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
-	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
-
-	request.validate();
-	
-	System.out.println(request);
     }
 
     @Test
@@ -110,6 +97,58 @@ public class PutSourceRequestTest {
 	request.put("xxx", "xxx");
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
+    }
+
+    @Test
+    public void validationTest1() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_ID, "sourceId");
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.validate();
+    }
+
+    @Test
+    public void validationTest1_2() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_ID, "sourceId-");
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.validate();
+    }
+
+    @Test
+    public void validationTest1_3() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_ID, "sourceId-_");
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.validate();
+    }
+
+    @Test
+    public void validationTest1_4() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_ID, UUID.randomUUID().toString());
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.validate();
     }
 
     @Test

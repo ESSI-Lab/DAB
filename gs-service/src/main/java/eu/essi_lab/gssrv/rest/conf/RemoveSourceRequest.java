@@ -58,7 +58,7 @@ public class RemoveSourceRequest extends PutSourceRequest {
 
 	ArrayList<Parameter> list = new ArrayList<>();
 
-	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE, true));
+	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
 	list.add(Parameter.of(REMOVE_DATA, ContentType.BOOLEAN, false));
 
 	return list;

@@ -106,7 +106,7 @@ public class HarvestSourceRequest extends PutSourceRequest {
 
 	ArrayList<Parameter> list = new ArrayList<>();
 
-	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE, true));
+	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
 	list.add(Parameter.of(START_TIME, ContentType.ISO8601_DATE_TIME, false));
 	list.add(Parameter.of(REPEAT_INTERVAL, ContentType.INTEGER, false));
 	list.add(Parameter.of(REPEAT_INTERVAL_UNIT, ContentType.TEXTUAL, RepeatIntervalUnit.class, false));
