@@ -170,6 +170,8 @@ public class DuplicatedOnlineIdentifiersTask extends AbstractCustomTask {
 			GSLoggerFactory.getLogger(getClass()).info(text);
 			writer.write(text);
 			writer.close();
+		    } else {
+			setIds.add(onlineId);
 		    }
 		}
 
