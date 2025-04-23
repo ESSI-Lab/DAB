@@ -57,6 +57,11 @@ public class InputPattern {
 	    "alphaNumUnderscoreSpace", //
 	    "^(\\w+|\\w+ {1})+$", //
 	    "^(\\w+|\\w+ {1})*$");
+    
+    public static final InputPattern ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS = new InputPattern(//
+	    "alphaNumUnderscoreMinus", //
+	    "^(\\w+|\\w+-{1})+$", //
+	    "^(\\w+|\\w+-{1})*$");
 
     private String pattern;
     private String requiredPattern;
