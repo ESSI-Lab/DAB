@@ -3,16 +3,25 @@
  */
 package eu.essi_lab.gssrv.rest.conf;
 
+import java.io.IOException;
+import java.util.Optional;
+
 import javax.jws.WebService;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+
+import org.json.JSONObject;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.IOStreamUtils;
 
 /*-
  * #%L
@@ -42,48 +51,157 @@ import javax.ws.rs.core.UriInfo;
 @Path("/")
 public class ConfigService {
 
-    /**
-     * Optional<br>
-     * <ul>
-     * <li>If missing, a new harvested source is created with a random id.<br>
-     * - 201 Created is returned</li>
-     * <li>If provided and a source with given id do not exists, it is created.<br>
-     * - The id MUST contains only alphanumeric characters and the '_' symbol.<br>
-     * - If the id is not regular, 404 Bad Request is returned, otherwise  
-     *  201 Created is returned</li>
-     * <li>If provided and a source with given id already exists, the related source is modified according to the other request parameters 
-     * "label", "type", "repeatInterval", "repeatIntervalUnit", "startTime".<br>
-     * - 204 No Content is returned</li>
-     * </ul>
-     */
-    private static String ID_PARAM = "id";
-   
-    /**
-     * Optional<br>
-     * <ul>
-     * <li>If missing, random label is created basing on the mandatory endpoint</li>
-     * </ul>
-     */
-    private static String LABEL_PARAM = "label"; // optional
-    private static String ENDPOINT_PARAM = "endpoint"; // mandatory
-    private static String TYPE_PARAM = "type"; // mandatory
-
-    private static String REPEAT_INTERVAL_PARAM = "repeatInterval"; // optional
-    private static String REPEAT_INTERVAL_UNIT_PARAM = "repeatIntervalUnit"; // optional
-    private static String START_TIME_PARAM = "startTime"; // optional
-
     @POST
     @Path("source")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response source(@Context UriInfo uriInfo) {
+    public Response source(@Context HttpServletRequest hsr, @Context UriInfo uriInfo) {
 
-	MultivaluedMap<String, String> params = uriInfo.getQueryParameters();
+	String stringStream = null;
+	try {
 
-	if (params.isEmpty()) {
+	    ServletInputStream inputStream = hsr.getInputStream();
 
-	    return Response.status(Status.BAD_REQUEST).build();
+	    stringStream = IOStreamUtils.asUTF8String(inputStream);
+
+	} catch (IOException ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, ex.getMessage());
 	}
 
+	JSONObject requestObject = null;
+
+	try {
+
+	    requestObject = new JSONObject(stringStream);
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    return buildErrorResponse(Status.BAD_REQUEST, "Missing or corrupted request body");
+	}
+
+	Optional<String> optRequestName = ConfigRequest.getRequestName(requestObject);
+
+	if (optRequestName.isEmpty()) {
+
+	    return buildErrorResponse(Status.BAD_REQUEST, "Invalid request body. Missing request name");
+	}
+
+	String requestName = optRequestName.get();
+
+	if (requestName.equals(PutSourceRequest.class.getSimpleName())) {
+
+	    PutSourceRequest request = new PutSourceRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    return validate.isPresent() ? validate.get() : handlePutSourceRequest(request);
+	}
+
+	if (requestName.equals(EditSourceRequest.class.getSimpleName())) {
+
+	    EditSourceRequest request = new EditSourceRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    return validate.isPresent() ? validate.get() : handleEditSourceRequest(request);
+	}
+
+	if (requestName.equals(HarvestSourceRequest.class.getSimpleName())) {
+
+	    HarvestSourceRequest request = new HarvestSourceRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    return validate.isPresent() ? validate.get() : handleHarvestSourceRequest(request);
+	}
+
+	if (requestName.equals(RemoveSourceRequest.class.getSimpleName())) {
+
+	    RemoveSourceRequest request = new RemoveSourceRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    return validate.isPresent() ? validate.get() : handleRemoveSourceRequest(request);
+	}
+
+	return buildErrorResponse(Status.BAD_REQUEST, "Unknown request '" + requestName + "'");
+    }
+
+    /**
+     * @param putSourceRequest
+     * @return
+     */
+    private Response handlePutSourceRequest(PutSourceRequest putSourceRequest) {
+
 	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param editSourceRequest
+     * @return
+     */
+    private Response handleEditSourceRequest(EditSourceRequest editSourceRequest) {
+
+	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param harvestSourceRequest
+     * @return
+     */
+    private Response handleHarvestSourceRequest(HarvestSourceRequest harvestSourceRequest) {
+
+	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param removeSourceRequest
+     * @return
+     */
+    private Response handleRemoveSourceRequest(RemoveSourceRequest removeSourceRequest) {
+
+	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param status
+     * @param message
+     * @return
+     */
+    private Response buildErrorResponse(Status status, String message) {
+
+	JSONObject object = new JSONObject();
+	JSONObject error = new JSONObject();
+	object.put("error", error);
+	error.put("statusCode", status.getStatusCode());
+	error.put("reasonPrase", status.toString());
+	error.put("message", message);
+
+	return Response.status(Status.BAD_REQUEST).//
+		entity(object.toString(3)).//
+		type(MediaType.APPLICATION_JSON).//
+		build();
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Optional<Response> validate(ConfigRequest request) {
+
+	try {
+
+	    request.validate();
+
+	    return Optional.empty();
+
+	} catch (IllegalArgumentException ex) {
+
+	    return Optional.of(buildErrorResponse(Status.BAD_REQUEST, ex.getMessage()));
+	}
     }
 }

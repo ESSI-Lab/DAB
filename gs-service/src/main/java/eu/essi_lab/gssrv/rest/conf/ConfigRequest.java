@@ -49,14 +49,15 @@ public abstract class ConfigRequest {
     /**
      * 
      */
-    public ConfigRequest(String name) {
+    public ConfigRequest() {
 
 	object = new JSONObject();
 
-	object.put("name", name);
+	object.put("name", getClass().getSimpleName());
 
 	object.put("parameters", new JSONObject());
     }
+    
 
     /**
      * @param object
@@ -66,6 +67,21 @@ public abstract class ConfigRequest {
 	this.object = object;
     }
 
+    /**
+     * @param object
+     * @return
+     */
+    public static Optional<String> getRequestName(JSONObject object) {
+
+	if (object.has("name")) {
+
+	    return Optional.of(object.getString("name"));
+	}
+
+	return Optional.empty();
+    }
+    
+   
     @Override
     public String toString() {
 
@@ -85,7 +101,7 @@ public abstract class ConfigRequest {
 
 	if (!object.has("parameters")) {
 
-	    throw new IllegalArgumentException("Missing 'parameters' object");
+	    throw new IllegalArgumentException("Missing request parameters");
 	}
 
 	mandatoryCheck();
