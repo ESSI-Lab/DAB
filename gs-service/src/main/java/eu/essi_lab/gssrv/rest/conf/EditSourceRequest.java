@@ -6,6 +6,8 @@ package eu.essi_lab.gssrv.rest.conf;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.json.JSONObject;
+
 /**
  * @author Fabrizio
  */
@@ -19,8 +21,24 @@ public class EditSourceRequest extends PutSourceRequest {
 	super("EditSourceRequest");
     }
 
+    /**
+     * 
+     */
+    public EditSourceRequest(String name) {
+
+	super(name);
+    }
+
+    /**
+     * @param object
+     */
+    public EditSourceRequest(JSONObject object) {
+
+	super(object);
+    }
+
     @Override
-    protected List<Parameter> getSupportedParameters() {
+    public List<Parameter> getSupportedParameters() {
 
 	List<Parameter> supportedParameters = super.getSupportedParameters();
 

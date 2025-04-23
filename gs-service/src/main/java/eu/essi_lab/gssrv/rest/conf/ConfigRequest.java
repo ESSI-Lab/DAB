@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.gssrv.rest.conf;
 
+import java.util.Date;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -194,7 +196,8 @@ public abstract class ConfigRequest {
 	case BOOLEAN:
 	    if (!value.toString().equals("true") && !value.toString().equals("false")) {
 
-		throw new IllegalArgumentException("Parameter " + paramName + " should be of type boolean");
+		throw new IllegalArgumentException(
+			"Unsupported value '" + value + "'. Parameter '" + paramName + "' should be of type boolean");
 	    }
 
 	    break;
@@ -205,7 +208,8 @@ public abstract class ConfigRequest {
 		Double.valueOf(value.toString());
 	    } catch (NumberFormatException ex) {
 
-		throw new IllegalArgumentException("Parameter " + paramName + " should be of type double");
+		throw new IllegalArgumentException(
+			"Unsupported value '" + value + "'. Parameter '" + paramName + "' should be of type double");
 	    }
 
 	    break;
@@ -216,16 +220,21 @@ public abstract class ConfigRequest {
 		Integer.valueOf(value.toString());
 	    } catch (NumberFormatException ex) {
 
-		throw new IllegalArgumentException("Parameter " + paramName + " should be of type integer");
+		throw new IllegalArgumentException(
+			"Unsupported value '" + value + "'. Parameter '" + paramName + "' should be of type integer");
 	    }
 
 	    break;
 
 	case ISO8601_DATE_TIME:
 
-	    if (ISO8601DateTimeUtils.parseISO8601ToDate(paramName).isEmpty()) {
+	    Optional<Date> iso8601ToDate = ISO8601DateTimeUtils.parseISO8601ToDate(value.toString());
 
-		throw new IllegalArgumentException("Parameter " + paramName + " should be of type ISO8601 date time");
+	    if (iso8601ToDate.isEmpty() || (value.toString().length() != "YYYY-MM-DDThh:mm:ssZ".length()
+		    && value.toString().length() != "YYYY-MM-DDThh:mm:ss".length())) {
+
+		throw new IllegalArgumentException("Unsupported value '" + value + "'. Parameter '" + paramName
+			+ "' should be of type ISO8601 date time YYYY-MM-DDThh:mm:ssZ");
 	    }
 
 	    break;
@@ -236,7 +245,8 @@ public abstract class ConfigRequest {
 		Long.valueOf(value.toString());
 	    } catch (NumberFormatException ex) {
 
-		throw new IllegalArgumentException("Parameter " + paramName + " should be of type long");
+		throw new IllegalArgumentException(
+			"Unsupported value '" + value + "'. Parameter '" + paramName + "' should be of type long");
 	    }
 
 	    break;
@@ -262,8 +272,8 @@ public abstract class ConfigRequest {
 
 	    if (!matcher.matches()) {
 
-		throw new IllegalArgumentException(
-			"Parameter " + paramName + " should match the '" + optPattern.get().getPattern() + "' pattern");
+		throw new IllegalArgumentException("Unsupported value '" + value + "'. Parameter '" + paramName + "' should match the '"
+			+ optPattern.get().getPattern() + "' pattern");
 	    }
 	}
     }
@@ -295,7 +305,7 @@ public abstract class ConfigRequest {
 			collect(Collectors.joining(","));
 
 		throw new IllegalArgumentException(
-			"Unsupported value '" + value + "' for paramter '" + paramName + "'. Supported values are: " + supValues);
+			"Unsupported value '" + value + "' for parameter '" + paramName + "'. Supported values are: " + supValues);
 
 	    }
 	}

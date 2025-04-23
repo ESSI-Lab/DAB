@@ -149,18 +149,26 @@ public class Parameter {
     }
 
     /**
-     * @param mandatory
-     */
-    public void setMandatory(boolean mandatory) {
-
-	this.mandatory = mandatory;
-    }
-
-    /**
      * @return the mandatory
      */
     public boolean isMandatory() {
 
 	return mandatory;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+
+	return object instanceof Parameter
+
+		&& ((Parameter) object).getName().equals(this.getName()) //
+
+		&& ((Parameter) object).getContentType() == this.getContentType() //
+
+		&& ((Parameter) object).getEnum().equals(this.getEnum()) //
+
+		&& ((Parameter) object).isMandatory() == this.isMandatory() //
+
+		&& ((Parameter) object).getInputPattern().equals(this.getInputPattern());
     }
 }

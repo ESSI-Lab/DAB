@@ -92,7 +92,7 @@ public class PutSourceRequest extends ConfigRequest {
     }
 
     @Override
-    protected List<Parameter> getSupportedParameters() {
+    public List<Parameter> getSupportedParameters() {
 
 	ArrayList<Parameter> list = new ArrayList<>();
 
