@@ -495,13 +495,16 @@ public class GDALNetCDFPostConversionUtils {
 	    } else {
 		FileInputStream fis = new FileInputStream(input.getFile());
 		FileOutputStream fos = new FileOutputStream(tmpFile);
+		DataObject ret = new DataObject();
+		ret.setDataDescriptor(input.getDataDescriptor());
+		
 		IOUtils.copy(fis, fos);
-		input.setFile(tmpFile);
+		ret.setFile(tmpFile);
 		inputDataset.close();
 		sourceDataset.close();
 		fis.close();
 		fos.close();
-		return input;
+		return ret;
 	    }
 
 	} catch (Exception e) {

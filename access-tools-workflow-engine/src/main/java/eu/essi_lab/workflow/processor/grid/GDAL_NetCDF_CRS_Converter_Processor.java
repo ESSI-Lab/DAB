@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.Authority;
 import eu.essi_lab.model.resource.data.AxisOrder;
 import eu.essi_lab.model.resource.data.CRS;
@@ -55,7 +56,7 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
     private static Logger logger = GSLoggerFactory.getLogger(GDAL_NetCDF_CRS_Converter_Processor.class);
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
 	File inputFile = dataObject.getFile();
 	File outputFile = File.createTempFile(getClass().getSimpleName(), ".nc");
 	outputFile.deleteOnExit();

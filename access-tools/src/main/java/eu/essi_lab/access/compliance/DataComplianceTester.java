@@ -581,7 +581,7 @@ public class DataComplianceTester {
 	    DataDescriptor targetDescriptor) throws GSException {
 
 	try {
-	    return preferred.execute(dataObject, targetDescriptor);
+	    return preferred.execute(null, dataObject, targetDescriptor);
 
 	} catch (Exception e) {
 

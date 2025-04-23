@@ -218,7 +218,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		    ACCESS_EXECUTOR_UNABLE_TO_FIND_DATA_DOWNLOADER);
 	}
 
-	DataObject dataObject = retrieveDataObject(downloader, report.getFullDataDescriptor(), targetDescriptor);
+	DataObject dataObject = retrieveDataObject(resource,downloader, report.getFullDataDescriptor(), targetDescriptor);
 
 	if (dataObject == null) {
 
@@ -257,7 +257,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
      * @return
      * @throws GSException
      */
-    public DataObject retrieveDataObject(DataDownloader downloader, DataDescriptor reportDescriptor, DataDescriptor targetDescriptor)
+    public DataObject retrieveDataObject(GSResource resource, DataDownloader downloader, DataDescriptor reportDescriptor, DataDescriptor targetDescriptor)
 	    throws GSException {
 
 	// first, we ask the downloader which are the updated remote descriptors that it can download.
@@ -396,7 +396,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		    targetDescriptor.setRangeMaximum(reportDescriptor.getRangeMaximum());
 		}
 
-		DataObject result = workflow.execute(dataObject, targetDescriptor);
+		DataObject result = workflow.execute(resource, dataObject, targetDescriptor);
 
 		// GSLoggerFactory.getLogger(getClass()).info("Workflow execution ENDED");
 

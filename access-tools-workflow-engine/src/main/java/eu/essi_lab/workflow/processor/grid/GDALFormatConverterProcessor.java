@@ -22,6 +22,9 @@ package eu.essi_lab.workflow.processor.grid;
  */
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Vector;
@@ -36,6 +39,7 @@ import com.google.common.collect.ImmutableList;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
@@ -54,7 +58,11 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
     private static Logger logger = GSLoggerFactory.getLogger(GDALFormatConverterProcessor.class);
 
     @Override
-    public DataObject process(DataObject inputData, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource, DataObject inputData, TargetHandler handler) throws Exception {
+	if (resource != null && resource.getSource().getEndpoint().contains("i-change")) {
+	    // apply I-change color map
+	    return processForIchange(inputData);
+	}
 	File inputFile = inputData.getFile();
 	File outputFile = File.createTempFile(GDALFormatConverterProcessor.class.getSimpleName() + getOutputFormat(), getExtension());
 	outputFile.deleteOnExit();
@@ -227,7 +235,7 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 	    break;
 	case RUNTIME:
 	default:
-	    executeWithRuntime(inputName, outputFile.getAbsolutePath(), vector);
+	    executeWithRuntime("gdal_translate", inputName, outputFile.getAbsolutePath(), vector);
 	    break;
 	}
 
@@ -237,6 +245,45 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 		postProcessCorrections(inputData, outputData);
 	DataDescriptor outputDescriptor = inputDescriptor.clone();
 	outputDescriptor.setDataFormat(DataFormat.fromIdentifier(getOutputFormat()));
+	outputData.setDataDescriptor(outputDescriptor);
+	return outputData;
+    }
+
+    private DataObject processForIchange(DataObject inputData) throws Exception {
+	// gdaldem color-relief test.nc colormap.txt output_colored.png -alpha
+	File outputFile = File.createTempFile(GDALFormatConverterProcessor.class.getSimpleName() + getOutputFormat(), getExtension());
+	outputFile.delete();
+	Runtime rt = Runtime.getRuntime();
+	String temp = System.getProperty("java.io.tmpdir");
+	File tempDir = new File(temp);
+	File colormap = new File(tempDir, "i-change-colormap.txt");
+	if (!colormap.exists()) {
+	    colormap.createNewFile();
+	    FileOutputStream fos = new FileOutputStream(colormap);
+	    InputStream stream = GDALFormatConverterProcessor.class.getClassLoader().getResourceAsStream("i-change-colormap.txt");
+	    IOStreamUtils.copy(stream, fos);
+	    stream.close();
+	    fos.close();
+	}
+
+	String command = "gdaldem color-relief " + inputData.getFile().getAbsolutePath() + " " + colormap.getAbsolutePath() + " " + outputFile.getAbsolutePath()
+		+ " -alpha";
+	Process ps = rt.exec(command);
+	int exitVal = ps.waitFor();
+
+	if (exitVal > 0) {
+
+	    GSLoggerFactory.getLogger(GDAL_NetCDF_CRS_Converter_Processor.class).error(IOStreamUtils.asUTF8String(ps.getErrorStream()));
+
+	}
+
+	logger.info("Executing GDAL Runtime: " + command);
+
+	outputFile.deleteOnExit();
+	DataObject outputData = new DataObject();
+	DataDescriptor outputDescriptor = inputData.getDataDescriptor().clone();
+	outputDescriptor.setDataFormat(DataFormat.IMAGE_PNG());
+	outputData.setFile(outputFile);
 	outputData.setDataDescriptor(outputDescriptor);
 	return outputData;
     }
@@ -287,13 +334,14 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
      * @param vector
      * @throws Exception
      */
-    protected static void executeWithRuntime(String inputPath, String outputPath, Vector<String> vector) throws Exception {
+    protected static void executeWithRuntime(String executable, String inputPath, String outputPath, Vector<String> vector)
+	    throws Exception {
 	Runtime rt = Runtime.getRuntime();
 	String options = "";
 	for (String option : vector) {
 	    options += option + " ";
 	}
-	String command = "gdal_translate " + inputPath + " " + options + " " + outputPath;
+	String command = executable + " " + inputPath + " " + options + " " + outputPath;
 	Process ps = rt.exec(command);
 	int exitVal = ps.waitFor();
 

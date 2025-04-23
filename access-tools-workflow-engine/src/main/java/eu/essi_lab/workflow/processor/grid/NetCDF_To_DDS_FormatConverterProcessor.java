@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.DataObject;
@@ -44,7 +45,7 @@ public class NetCDF_To_DDS_FormatConverterProcessor extends DataProcessor {
     private static Logger logger = GSLoggerFactory.getLogger(NetCDF_To_DDS_FormatConverterProcessor.class);
 
     @Override
-    public DataObject process(DataObject inputData, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject inputData, TargetHandler handler) throws Exception {
 	File inputFile = inputData.getFile();
 	File outputFile = File.createTempFile(NetCDF_To_DDS_FormatConverterProcessor.class.getSimpleName(), ".dds");
 	outputFile.deleteOnExit();
