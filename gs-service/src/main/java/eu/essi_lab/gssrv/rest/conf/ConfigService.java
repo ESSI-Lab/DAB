@@ -141,8 +141,6 @@ public class ConfigService {
      */
     private Response handlePutSourceRequest(PutSourceRequest putSourceRequest) {
 
-	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
-
 	Optional<String> optSourceId = putSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
 
 	if (optSourceId.isPresent()) {
@@ -164,6 +162,8 @@ public class ConfigService {
 	}
 
 	HarvestingSetting setting = HarvestingSettingBuilder.build(putSourceRequest);
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 
 	boolean put = configuration.put(setting);
 
@@ -197,8 +197,6 @@ public class ConfigService {
      */
     private Response handleEditSourceRequest(EditSourceRequest editSourceRequest) {
 
-	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
-
 	Optional<String> optSourceId = editSourceRequest.read(EditSourceRequest.SOURCE_ID).map(v -> v.toString());
 
 	String settingId = null;
@@ -230,6 +228,8 @@ public class ConfigService {
 
 	HarvestingSetting setting = HarvestingSettingBuilder.build(editSourceRequest);
 	setting.setIdentifier(settingId);
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 
 	boolean replaced = configuration.replace(setting);
 
