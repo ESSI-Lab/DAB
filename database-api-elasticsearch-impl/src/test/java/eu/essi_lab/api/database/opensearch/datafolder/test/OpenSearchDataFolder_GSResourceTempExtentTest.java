@@ -16,7 +16,7 @@ import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
-import eu.essi_lab.indexes.IndexedElements;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent.FrameValue;
@@ -29,7 +29,7 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 /**
  * @author Fabrizio
  */
-public class OpenSearchDataFolder_GSResourceTempExtentTest {
+public class OpenSearchDataFolder_GSResourceTempExtentTest extends OpenSearchTest {
 
     @Test
     public void onlyTempExtentBeginTest() throws Exception {
@@ -51,7 +51,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
 	dataset.setSource(new GSSource("sourceId"));
-	
+
 	String dateTime = ISO8601DateTimeUtils.getISO8601DateTime();
 
 	TemporalExtent temporalExtent = new TemporalExtent();
@@ -134,7 +134,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
 	dataset.setSource(new GSSource("sourceId"));
-	
+
 	TemporalExtent temporalExtent = new TemporalExtent();
 
 	FrameValue frameValue = FrameValue.P10D;
@@ -217,7 +217,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
 	dataset.setSource(new GSSource("sourceId"));
-	
+
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setIndeterminateBeginPosition(TimeIndeterminateValueType.NOW);
 
@@ -298,7 +298,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
 	dataset.setSource(new GSSource("sourceId"));
-	
+
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setBeginPosition("now");
 
@@ -379,7 +379,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
 	dataset.setSource(new GSSource("sourceId"));
-	
+
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
 
@@ -460,7 +460,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
 	dataset.setSource(new GSSource("sourceId"));
-	
+
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setEndPosition("now");
 
@@ -541,7 +541,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
 	dataset.setSource(new GSSource("sourceId"));
-	
+
 	String dateTime = ISO8601DateTimeUtils.getISO8601DateTime();
 
 	TemporalExtent temporalExtent = new TemporalExtent();
@@ -624,7 +624,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
 	dataset.setSource(new GSSource("sourceId"));
-	
+
 	String beginDateTime = ISO8601DateTimeUtils.getISO8601DateTime();
 	String endDateTime = ISO8601DateTimeUtils.getISO8601DateTime();
 
@@ -743,7 +743,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
      */
     private void checkTempExtentBeginNow(SourceWrapper wrapper, boolean expectPresent) {
 
-	checkProperty(wrapper, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), expectPresent);
+	checkProperty(wrapper, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName(), expectPresent);
     }
 
     /**
@@ -770,7 +770,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
      */
     private void checkTempExtentEndNow(SourceWrapper wrapper, boolean expectPresent) {
 
-	checkProperty(wrapper, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), expectPresent);
+	checkProperty(wrapper, MetadataElement.TEMP_EXTENT_END_NOW.getName(), expectPresent);
     }
 
     /**

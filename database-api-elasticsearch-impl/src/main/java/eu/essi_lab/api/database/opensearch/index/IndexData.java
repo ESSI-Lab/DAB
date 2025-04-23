@@ -65,7 +65,6 @@ import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
-import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -216,17 +215,15 @@ public class IndexData {
 
     /**
      * @param folder
-     * @param resourceStream
+     * @param resourceDocument
      * @return
      * @throws Exception
      */
-    public static IndexData of(OpenSearchFolder folder, InputStream resourceStream) throws Exception {
+    public static IndexData of(OpenSearchFolder folder, Document resourceDoc) throws Exception {
 
 	IndexData indexData = new IndexData();
 
-	Document doc = (Document) OpenSearchUtils.toNode(resourceStream);
-
-	XMLDocumentHandler handler = new XMLDocumentHandler(doc);
+	XMLDocumentHandler handler = new XMLDocumentHandler(resourceDoc);
 
 	String privateId = readValues(handler, ResourceProperty.PRIVATE_ID.getName()).get(0);
 
@@ -267,57 +264,35 @@ public class IndexData {
 
     /**
      * @param folder
-     * @param file
+     * @param resourceStream
      * @return
      * @throws Exception
      */
-    public static IndexData of(OpenSearchFolder folder, File file) throws Exception {
+    public static IndexData of(OpenSearchFolder folder, InputStream resourceStream) throws Exception {
 
-	return of(folder, new FileInputStream(file));
+	return IndexData.of(folder, (Document) OpenSearchUtils.toNode(resourceStream));
+    }
+
+    /**
+     * @param folder
+     * @param resourcefile
+     * @return
+     * @throws Exception
+     */
+    public static IndexData of(OpenSearchFolder folder, File resourcefile) throws Exception {
+
+	return of(folder, new FileInputStream(resourcefile));
     }
 
     /**
      * @param folder
      * @param gsResource
      * @return
+     * @throws Exception
      */
-    public static IndexData of(OpenSearchFolder folder, GSResource gsResource) {
+    public static IndexData of(OpenSearchFolder folder, GSResource gsResource) throws Exception {
 
-	IndexData indexData = new IndexData();
-
-	//
-	// put the base properties
-	//
-
-	indexData.put(ENTRY_NAME, gsResource.getPrivateId());
-	indexData.put(DATABASE_ID, folder.getDatabase().getIdentifier());
-	indexData.put(FOLDER_NAME, folder.getName());
-	indexData.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
-
-	indexData.put(DATA_TYPE, "doc");
-
-	indexData.entryId = OpenSearchFolder.getEntryId(folder, gsResource.getPrivateId());
-
-	String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
-		? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
-		: SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
-
-	indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
-
-	handleResource(indexData, gsResource);
-
-	String encodedString = OpenSearchUtils.encode(gsResource);
-
-	indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
-	indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
-
-	indexData.mapping = DataFolderMapping.get();
-
-	indexData.index = indexData.mapping.getIndex();
-
-	indexData.mapping.setEntryType(EntryType.GS_RESOURCE);
-
-	return indexData;
+	return IndexData.of(folder, gsResource.asDocument(false));
     }
 
     /**
@@ -336,7 +311,7 @@ public class IndexData {
 	    FolderEntry entry, //
 	    EntryType type)
 
-	    throws IOException, TransformerException {
+	    throws Exception {
 
 	IndexData indexData = new IndexData();
 
@@ -354,19 +329,6 @@ public class IndexData {
 	indexData.entryId = OpenSearchFolder.getEntryId(folder, key);
 
 	//
-	// encodes the binary property
-	//
-
-	ClonableInputStream stream = null;
-
-	if (entry.getStream().isPresent()) {
-
-	    stream = new ClonableInputStream(entry.getStream().get());
-	}
-
-	String encodedString = OpenSearchUtils.encode(entry.getDocument().orElse(null), stream);
-
-	//
 	//
 	//
 
@@ -374,29 +336,12 @@ public class IndexData {
 
 	case GS_RESOURCE:
 
-	    String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
-		    ? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
-		    : SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
-
-	    indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
-
-	    GSResource gsResource = GSResource.createOrNull(entry.getDocument().get());
-
-	    handleResource(indexData, gsResource);
-
-	    encodedString = OpenSearchUtils.encode(gsResource);
-
-	    indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
-	    indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
-
-	    indexData.mapping = DataFolderMapping.get();
-
-	    break;
+	    return IndexData.of((OpenSearchFolder) folder, entry.getDocument().get());
 
 	case AUGMENTER_PROPERTIES:
 
 	    indexData.put(BINARY_PROPERTY, AugmentersMapping.AUGMENTER_PROPERTIES);
-	    indexData.put(AugmentersMapping.AUGMENTER_PROPERTIES, encodedString);
+	    indexData.put(AugmentersMapping.AUGMENTER_PROPERTIES, encodeString(entry));
 
 	    indexData.mapping = AugmentersMapping.get();
 
@@ -405,7 +350,7 @@ public class IndexData {
 	case CONFIGURATION:
 
 	    indexData.put(BINARY_PROPERTY, ConfigurationMapping.CONFIGURATION);
-	    indexData.put(ConfigurationMapping.CONFIGURATION, encodedString);
+	    indexData.put(ConfigurationMapping.CONFIGURATION, encodeString(entry));
 
 	    indexData.put(ConfigurationMapping.CONFIGURATION_NAME, key);
 
@@ -416,7 +361,7 @@ public class IndexData {
 	case CONFIGURATION_LOCK:
 
 	    indexData.put(BINARY_PROPERTY, ConfigurationMapping.CONFIGURATION_LOCK);
-	    indexData.put(ConfigurationMapping.CONFIGURATION_LOCK, encodedString);
+	    indexData.put(ConfigurationMapping.CONFIGURATION_LOCK, encodeString(entry));
 
 	    indexData.mapping = ConfigurationMapping.get();
 
@@ -425,7 +370,7 @@ public class IndexData {
 	case USER:
 
 	    indexData.put(BINARY_PROPERTY, UsersMapping.USER);
-	    indexData.put(UsersMapping.USER, encodedString);
+	    indexData.put(UsersMapping.USER, encodeString(entry));
 
 	    GSUser user = GSUser.createOrNull(entry.getDocument().get());
 
@@ -448,8 +393,10 @@ public class IndexData {
 
 	case VIEW:
 
+	    ClonableInputStream stream = new ClonableInputStream(entry.getStream().get());
+
 	    indexData.put(BINARY_PROPERTY, ViewsMapping.VIEW);
-	    indexData.put(ViewsMapping.VIEW, encodedString);
+	    indexData.put(ViewsMapping.VIEW, OpenSearchUtils.encode(stream.clone()));
 
 	    try {
 
@@ -460,7 +407,9 @@ public class IndexData {
 		indexData.put(ViewsMapping.VIEW_OWNER, view.getOwner());
 		indexData.put(ViewsMapping.VIEW_CREATOR, view.getCreator());
 		indexData.put(ViewsMapping.VIEW_VISIBILITY, view.getVisibility().name());
+
 		if (view.getSourceDeployment() != null) {
+
 		    indexData.put(ViewsMapping.SOURCE_DEPLOYMENT, view.getSourceDeployment());
 		}
 
@@ -469,7 +418,9 @@ public class IndexData {
 		indexData.put(IndexMapping.toKeywordField(ViewsMapping.VIEW_OWNER), view.getOwner());
 		indexData.put(IndexMapping.toKeywordField(ViewsMapping.VIEW_CREATOR), view.getCreator());
 		indexData.put(IndexMapping.toKeywordField(ViewsMapping.VIEW_VISIBILITY), view.getVisibility().name());
+
 		if (view.getSourceDeployment() != null) {
+
 		    indexData.put(IndexMapping.toKeywordField(ViewsMapping.SOURCE_DEPLOYMENT), view.getSourceDeployment());
 		}
 
@@ -481,17 +432,17 @@ public class IndexData {
 	    indexData.mapping = ViewsMapping.get();
 
 	    break;
-	    
+
 	case WRITING_FOLDER_TAG:
 
-	    dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
+	    String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
 		    ? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
 		    : SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
 
 	    indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
 
 	    String sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
-	   
+
 	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 	    indexData.put(IndexMapping.toKeywordField(MetaFolderMapping.SOURCE_ID), sourceId);
 
@@ -505,7 +456,7 @@ public class IndexData {
 	case DATA_FOLDER_INDEX_DOC:
 
 	    indexData.put(BINARY_PROPERTY, MetaFolderMapping.INDEX_DOC);
-	    indexData.put(MetaFolderMapping.INDEX_DOC, encodedString);
+	    indexData.put(MetaFolderMapping.INDEX_DOC, encodeString(entry));
 
 	    DataFolderIndexDocument doc = new DataFolderIndexDocument(entry.getDocument().get());
 
@@ -513,7 +464,7 @@ public class IndexData {
 	    indexData.put(IndexMapping.toKeywordField(MetaFolderMapping.DATA_FOLDER), doc.getShortDataFolderPostfix());
 
 	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
-	   
+
 	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 	    indexData.put(IndexMapping.toKeywordField(MetaFolderMapping.SOURCE_ID), sourceId);
 
@@ -524,10 +475,10 @@ public class IndexData {
 	case HARVESTING_ERROR_REPORT:
 
 	    indexData.put(BINARY_PROPERTY, MetaFolderMapping.ERRORS_REPORT);
-	    indexData.put(MetaFolderMapping.ERRORS_REPORT, encodedString);
+	    indexData.put(MetaFolderMapping.ERRORS_REPORT, encodeString(entry));
 
 	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
-		   
+
 	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 	    indexData.put(IndexMapping.toKeywordField(MetaFolderMapping.SOURCE_ID), sourceId);
 
@@ -538,13 +489,13 @@ public class IndexData {
 	case HARVESTING_WARN_REPORT:
 
 	    indexData.put(BINARY_PROPERTY, MetaFolderMapping.WARN_REPORT);
-	    indexData.put(MetaFolderMapping.WARN_REPORT, encodedString);
+	    indexData.put(MetaFolderMapping.WARN_REPORT, encodeString(entry));
 
 	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
-		   
+
 	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 	    indexData.put(IndexMapping.toKeywordField(MetaFolderMapping.SOURCE_ID), sourceId);
-	    
+
 	    indexData.mapping = MetaFolderMapping.get();
 
 	    break;
@@ -552,21 +503,21 @@ public class IndexData {
 	case HARVESTING_PROPERTIES:
 
 	    indexData.put(BINARY_PROPERTY, MetaFolderMapping.HARVESTING_PROPERTIES);
-	    indexData.put(MetaFolderMapping.HARVESTING_PROPERTIES, encodedString);
+	    indexData.put(MetaFolderMapping.HARVESTING_PROPERTIES, encodeString(entry));
 
 	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
-		   
+
 	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 	    indexData.put(IndexMapping.toKeywordField(MetaFolderMapping.SOURCE_ID), sourceId);
 
 	    indexData.mapping = MetaFolderMapping.get();
 
 	    break;
-	    
+
 	case CACHE_ENTRY:
 
 	    indexData.put(BINARY_PROPERTY, CacheMapping.CACHED_ENTRY);
-	    indexData.put(CacheMapping.CACHED_ENTRY, encodedString);
+	    indexData.put(CacheMapping.CACHED_ENTRY, encodeString(entry));
 
 	    indexData.mapping = CacheMapping.get();
 
@@ -694,6 +645,24 @@ public class IndexData {
     }
 
     /**
+     * @param entry
+     * @return
+     * @throws IOException
+     * @throws TransformerException
+     */
+    private static String encodeString(FolderEntry entry) throws IOException, TransformerException {
+
+	ClonableInputStream stream = null;
+
+	if (entry.getStream().isPresent()) {
+
+	    stream = new ClonableInputStream(entry.getStream().get());
+	}
+
+	return OpenSearchUtils.encode(entry.getDocument().orElse(null), stream);
+    }
+
+    /**
      * @param field
      * @param value
      */
@@ -757,9 +726,9 @@ public class IndexData {
 	// temp extent begin now
 	//
 
-	if (exists(handler, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
+	if (exists(handler, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName())) {
 
-	    put(Arrays.asList("true"), indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
+	    put(Arrays.asList("true"), indexData, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName(), Boolean.class);
 	}
 
 	//
@@ -777,9 +746,9 @@ public class IndexData {
 	// temp extent end now
 	//
 
-	if (exists(handler, IndexedElements.TEMP_EXTENT_END_NOW.getElementName())) {
+	if (exists(handler, MetadataElement.TEMP_EXTENT_END_NOW.getName())) {
 
-	    put(Arrays.asList("true"), indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
+	    put(Arrays.asList("true"), indexData, MetadataElement.TEMP_EXTENT_END_NOW.getName(), Boolean.class);
 	}
 
 	//
@@ -838,6 +807,7 @@ public class IndexData {
      * @param indexData
      * @param gsResource
      */
+    @Deprecated
     private static void handleResource(IndexData indexData, GSResource gsResource) {
 
 	IndexesMetadata indexesMd = gsResource.getIndexesMetadata();
@@ -880,10 +850,10 @@ public class IndexData {
 	// temp extent begin now
 	//
 
-	if (!indexesMd.read(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()).isEmpty()) {
+	if (!indexesMd.read(MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName()).isEmpty()) {
 
 	    // this element has the empty string value!
-	    put(indexesMd, indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
+	    put(indexesMd, indexData, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName(), Boolean.class);
 	}
 
 	//
@@ -896,10 +866,10 @@ public class IndexData {
 	// temp extent end now
 	//
 
-	if (!indexesMd.read(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()).isEmpty()) {
+	if (!indexesMd.read(MetadataElement.TEMP_EXTENT_END_NOW.getName()).isEmpty()) {
 
 	    // this element has the empty string value!
-	    put(indexesMd, indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
+	    put(indexesMd, indexData, MetadataElement.TEMP_EXTENT_END_NOW.getName(), Boolean.class);
 	}
 
 	//

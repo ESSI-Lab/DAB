@@ -28,16 +28,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.api.metadata.citation.Citation;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.ReferenceIdentifier;
+import org.geotools.api.referencing.crs.CRSFactory;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.cs.CoordinateSystemAxis;
 import org.geotools.referencing.crs.AbstractSingleCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.ReferencingObjectFactory;
 import org.geotools.referencing.operation.projection.MapProjection;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.ReferenceIdentifier;
-import org.opengis.referencing.crs.CRSFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
@@ -393,7 +393,7 @@ public class CRS implements Serializable {
 	}
 	if (decodedCRS instanceof AbstractSingleCRS) {
 	    AbstractSingleCRS asCRS = (AbstractSingleCRS) decodedCRS;
-	    org.opengis.referencing.datum.Datum decodedDatum = asCRS.getDatum();
+	    org.geotools.api.referencing.datum.Datum decodedDatum = asCRS.getDatum();
 	    if (decodedDatum != null) {
 		Set<ReferenceIdentifier> identifiers = decodedDatum.getIdentifiers();
 		if (!identifiers.isEmpty()) {

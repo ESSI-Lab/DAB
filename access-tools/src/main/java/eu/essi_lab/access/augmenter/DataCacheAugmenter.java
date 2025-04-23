@@ -96,44 +96,6 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 
     private static MQTTPublisherHive client;
 
-    static {
-	try {
-
-	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
-
-	    Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
-
-	    if (keyValueOption.isPresent()) {
-
-		String host = keyValueOption.get().getProperty("mqttBrokerHost");
-		String port = keyValueOption.get().getProperty("mqttBrokerPort");
-		String user = keyValueOption.get().getProperty("mqttBrokerUser");
-		String pwd = keyValueOption.get().getProperty("mqttBrokerPwd");
-
-		if (host == null || port == null || user == null || pwd == null) {
-
-		    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error("MQTT options not found!");
-
-		} else {
-
-		    client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
-		}
-	    } else {
-
-		GSLoggerFactory.getLogger(DataCacheAugmenter.class).error("Key-value pair options not found!");
-
-	    }
-	} catch (NullPointerException e) {
-
-	    // it happens in test env when calling ConfigurationWrapper.getSystemSettings() and a configuration is not
-	    // set
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
-	}
-    }
-
     /**
      * 
      */
@@ -142,6 +104,41 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 
     @Override
     public Optional<GSResource> augment(GSResource resource) throws GSException {
+
+	if (client == null) {
+	    try {
+
+		SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+
+		Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+
+		if (keyValueOption.isPresent()) {
+
+		    String host = keyValueOption.get().getProperty("mqttBrokerHost");
+		    String port = keyValueOption.get().getProperty("mqttBrokerPort");
+		    String user = keyValueOption.get().getProperty("mqttBrokerUser");
+		    String pwd = keyValueOption.get().getProperty("mqttBrokerPwd");
+
+		    if (host == null || port == null || user == null || pwd == null) {
+
+			GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
+
+		    } else {
+
+			client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
+		    }
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
+
+		}
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
+		throw GSException.createException(getClass(), "MQTTClientInitError", e);
+	    }
+	}
 
 	DataCacheConnector dataCacheConnector = null;
 	String sourceId = null;

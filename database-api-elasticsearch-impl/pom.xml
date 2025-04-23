@@ -57,9 +57,9 @@
 		</dependency>
 
 		<dependency>
-			<artifactId>apache-client</artifactId>
 			<groupId>software.amazon.awssdk</groupId>
-			<version>2.29.46</version>
+			<artifactId>apache-client</artifactId>			
+			<version>${aws-java-sdk-bom.version}</version>
 		</dependency>
 		
 		<dependency>

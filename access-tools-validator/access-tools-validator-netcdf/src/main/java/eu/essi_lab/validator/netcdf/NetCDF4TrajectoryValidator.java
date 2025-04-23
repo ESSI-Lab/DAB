@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import org.geotools.feature.FeatureCollection;
+
 import eu.essi_lab.access.DataValidatorErrorCode;
 import eu.essi_lab.access.DataValidatorImpl;
 import eu.essi_lab.messages.ValidationMessage;
@@ -44,7 +46,7 @@ import ucar.nc2.constants.AxisType;
 import ucar.nc2.constants.FeatureType;
 import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.ft.FeatureCollection;
+import ucar.nc2.ft.DsgFeatureCollection;
 import ucar.nc2.ft.FeatureDataset;
 import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.nc2.ft.PointFeature;
@@ -125,13 +127,13 @@ public class NetCDF4TrajectoryValidator extends DataValidatorImpl {
 
 	    PointDatasetImpl fdp = (PointDatasetImpl) dataset;
 
-	    List<FeatureCollection> collections = fdp.getPointFeatureCollectionList();
+	    List<DsgFeatureCollection> collections = fdp.getPointFeatureCollectionList();
 
 	    if (collections.get(0) instanceof StandardTrajectoryCollectionImpl) {
 		StandardTrajectoryCollectionImpl collection = (StandardTrajectoryCollectionImpl) collections.get(0);
 		ret.setDataType(DataType.TRAJECTORY);
 
-		PointFeatureCollectionIterator iterator = collection.getPointFeatureCollectionIterator(-1);
+		PointFeatureCollectionIterator iterator = collection.getPointFeatureCollectionIterator();
 		
 		while(iterator.hasNext()) {
 		    PointFeatureCollection pfc = iterator.next();
@@ -169,7 +171,7 @@ public class NetCDF4TrajectoryValidator extends DataValidatorImpl {
 			if (w == null || lon < w) {
 			    w = lon;
 			}
-			long time = spf.getNominalTimeAsDate().getTime();
+			long time = spf.getNominalTimeAsCalendarDate().getMillis();
 			if (timeBegin == null || time < timeBegin) {
 			    timeBegin = time;
 			}

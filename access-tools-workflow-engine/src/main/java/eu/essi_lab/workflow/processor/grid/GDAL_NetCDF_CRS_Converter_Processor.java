@@ -76,16 +76,34 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 		break;
 	    }
 	}
-	dataset.close();
+
 
 	Vector<String> vector = new Vector<String>(20, 20);
 	vector.add("-of");
 	vector.add("netCDF");
 
-	if (fillValue != null) {
-	    vector.add("-dstnodata");
-	    vector.add(fillValue);
+	CRS sourceCRS = handler.getCurrentCRS();
+
+	if (sourceCRS == null) {
+	    sourceCRS = dataObject.getDataDescriptor().getCRS();
 	}
+	if (sourceCRS != null) {
+	    String crs = sourceCRS.getIdentifier();
+	    if (sourceCRS.getAuthority() != null && sourceCRS.getAuthority().equals(Authority.EPSG)) {
+		crs = "EPSG:" + sourceCRS.getCode();
+	    }
+	    if (crs == null || crs.equals("")) {
+		crs = sourceCRS.getWkt();
+	    }
+	    vector.add("-s_srs");
+	    vector.add(crs);
+	}
+
+	if (fillValue == null) {
+	    fillValue = "-9999.0";
+	}
+	vector.add("-dstnodata");
+	vector.add(fillValue);
 
 	CRS targetCRS = handler.getTargetCRS();
 	if (targetCRS == null) {
@@ -95,7 +113,7 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 	    targetCRS = dataObject.getDataDescriptor().getCRS();
 	}
 	String crs = targetCRS.getIdentifier();
-	if (targetCRS.getAuthority()!=null && targetCRS.getAuthority().equals(Authority.EPSG)) {
+	if (targetCRS.getAuthority() != null && targetCRS.getAuthority().equals(Authority.EPSG)) {
 	    crs = "EPSG:" + targetCRS.getCode();
 	}
 	if (crs == null || crs.equals("")) {
@@ -196,12 +214,20 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 	ret.setFile(outputFile);
 
 	ret.setDataDescriptor(outputDescriptor);
+	
 	// needed to group the multi variables created by GDAL
-	ret = GDALNetCDFPostConversionUtils.doBandCorrections(ret);
+	DataObject ret2 = GDALNetCDFPostConversionUtils.doBandCorrections(dataObject, ret);
+	
+	ret.getFile().delete();
+	
 	// copy attributes, because GDAL removes them after transformation from NetCDF to NetCDF
-	ret = GDALNetCDFPostConversionUtils.copyAttributes(dataObject, ret);
+	DataObject ret3 = GDALNetCDFPostConversionUtils.copyAttributes(dataObject, ret2);
+	
+	ret2.getFile().delete();
+	
+	dataset.close();
 
-	return ret;
+	return ret3;
     }
 
     /**

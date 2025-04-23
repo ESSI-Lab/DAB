@@ -130,13 +130,13 @@ public class DataFolderMapping extends IndexMapping {
 	addProperty(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW.getName(), FieldType.Text.jsonValue());
 
 	// true if indeterminate and TimeIndeterminateValueType.NOW
-	addProperty(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), FieldType.Boolean.jsonValue());
+	addProperty(MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName(), FieldType.Boolean.jsonValue());
 
 	// true if missing
 	addProperty(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName(), FieldType.Boolean.jsonValue());
 
 	// true if indeterminate and TimeIndeterminateValueType.NOW
-	addProperty(IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), FieldType.Boolean.jsonValue());
+	addProperty(MetadataElement.TEMP_EXTENT_END_NOW.getName(), FieldType.Boolean.jsonValue());
 
 	// true if missing
 	addProperty(IndexedElements.TEMP_EXTENT_END_NULL.getElementName(), FieldType.Boolean.jsonValue());

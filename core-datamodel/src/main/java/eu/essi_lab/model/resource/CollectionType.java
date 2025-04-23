@@ -28,25 +28,10 @@ import javax.xml.bind.annotation.XmlEnumValue;
 /**
  * @author Fabrizio
  */
-public enum ResourceType {
+public enum CollectionType {
 
-    @XmlEnumValue("Dataset")
-    DATASET("Dataset"), //
-
-    @XmlEnumValue("DatasetCollection")
-    DATASET_COLLECTION("DatasetCollection"), //
-
-    @XmlEnumValue("Document")
-    DOCUMENT("Document"), //
-
-    @XmlEnumValue("Ontology")
-    ONTOLOGY("Ontology"), //
-
-    @XmlEnumValue("Service")
-    SERVICE("Service"), //
-
-    @XmlEnumValue("Observation")
-    OBSERVATION("Observation");
+    @XmlEnumValue("Station")
+    STATION("Station");
 
     private String type;
 
@@ -62,7 +47,7 @@ public enum ResourceType {
      * @param type
      * @return
      */
-    public static ResourceType fromType(String type) {
+    public static CollectionType fromType(String type) {
 
 	return Arrays.asList(values()).//
 		stream().//
@@ -80,8 +65,8 @@ public enum ResourceType {
     /**
      * @param type
      */
-    private ResourceType(String type) {
-    
-        this.type = type;
+    private CollectionType(String type) {
+
+	this.type = type;
     }
 }

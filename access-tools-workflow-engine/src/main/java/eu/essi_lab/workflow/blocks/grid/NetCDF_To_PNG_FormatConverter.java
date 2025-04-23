@@ -36,7 +36,7 @@ public class NetCDF_To_PNG_FormatConverter extends DataFormatConverter {
     public NetCDF_To_PNG_FormatConverter() {
 	super(DataType.GRID, //
 		CRS.GDAL_ALL(), //
-		DataFormat.NETCDF_3(), // INPUT FORMAT
+		DataFormat.NETCDF(), // INPUT FORMAT
 		DataFormat.IMAGE_PNG() // OUTPUT FORMAT
 	);
     }

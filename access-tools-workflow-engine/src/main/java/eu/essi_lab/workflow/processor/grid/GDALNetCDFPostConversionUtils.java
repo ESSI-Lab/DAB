@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -40,11 +41,13 @@ import eu.essi_lab.netcdf.timeseries.NetCDFUtils;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayInt;
 import ucar.ma2.DataType;
+import ucar.ma2.IndexIterator;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFileWriter;
 import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.Variable;
+import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.NetcdfDataset;
 
 public class GDALNetCDFPostConversionUtils {
@@ -61,40 +64,35 @@ public class GDALNetCDFPostConversionUtils {
     public static DataObject copyAttributes(DataObject source, DataObject input) throws GSException {
 	try {
 
-	    HashMap<String, Variable> sourceBands = new HashMap<>();
-	    if (source != null) {
+	    DataDescriptor sourceDescriptor = source.getDataDescriptor();
+	    if (sourceDescriptor != null) {
+		DataFormat format = sourceDescriptor.getDataFormat();
+		if (format != null) {
+		    if (format.equals(DataFormat.NETCDF()) || format.isSubTypeOf(DataFormat.NETCDF())) {
 
-		DataDescriptor sourceDescriptor = source.getDataDescriptor();
-		if (sourceDescriptor != null) {
-		    DataFormat format = sourceDescriptor.getDataFormat();
-		    if (format != null) {
-			if (format.equals(DataFormat.NETCDF()) || format.isSubTypeOf(DataFormat.NETCDF())) {
-
-			    File inputFile = source.getFile();
-			    NetcdfDataset inputReader = NetcdfDataset.openDataset(inputFile.getAbsolutePath());
-			    List<Variable> bands = NetCDFUtils.getGeographicVariables(inputReader);
-			    for (Variable band : bands) {
-				sourceBands.put(band.getShortName(), band);
-			    }
-			    inputReader.close();
-			}
+		    } else {
+			return input;
 		    }
 		}
 	    }
 
-	    if (sourceBands.isEmpty()) {
-		return input;
-	    }
-
+	    HashMap<String, Variable> mainVariablesMap = new HashMap<>();
+	    File sourceFile = source.getFile();
+	    NetcdfDataset sourceReader = NetcdfDataset.openDataset(sourceFile.getAbsolutePath());
 	    File inputFile = input.getFile();
-	    NetcdfDataset reader = NetcdfDataset.openDataset(inputFile.getAbsolutePath());
+	    NetcdfDataset inputReader = NetcdfDataset.openDataset(inputFile.getAbsolutePath());
+
+	    List<Variable> mainVariables = NetCDFUtils.getGeographicVariables(inputReader);
+	    for (Variable mainVariable : mainVariables) {
+		mainVariablesMap.put(mainVariable.getShortName(), mainVariable);
+	    }
 
 	    File tmpFile = File.createTempFile("GDAL_To_NetCDF_Processor", ".nc");
 	    tmpFile.deleteOnExit();
-	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf3, tmpFile.getAbsolutePath());
+	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, tmpFile.getAbsolutePath());
 
 	    // global attributes
-	    for (Attribute globalAttribute : reader.getGlobalAttributes()) {
+	    for (Attribute globalAttribute : sourceReader.getGlobalAttributes()) {
 		String name = globalAttribute.getShortName();
 		if (name.equals("history")) {
 		    globalAttribute = new Attribute("history",
@@ -104,21 +102,21 @@ public class GDALNetCDFPostConversionUtils {
 	    }
 
 	    // dimensions
-	    for (Dimension dimension : reader.getDimensions()) {
+	    for (Dimension dimension : inputReader.getDimensions()) {
 		writer.addDimension(null, dimension.getShortName(), dimension.getLength());
 	    }
 
 	    // variables
 	    HashMap<String, Variable> newVariables = new HashMap<>();
-	    for (Variable variable : reader.getVariables()) {
-		String name = variable.getShortName();
-		Variable newVariable = writer.addVariable(null, name, variable.getDataType(), variable.getDimensionsString());
-		for (Attribute attribute : variable.getAttributes()) {
-		    Attribute newAttribute = new Attribute(attribute.getShortName(), attribute);
-		    newVariable.addAttribute(newAttribute);
-		}
-		if (sourceBands.containsKey(name)) {
-		    Variable sourceBand = sourceBands.get(name);
+	    for (Variable inputVariable : inputReader.getVariables()) {
+		String name = inputVariable.getShortName();
+		Variable newVariable = writer.addVariable(null, name, inputVariable.getDataType(), inputVariable.getDimensionsString());
+		Variable sourceVariable = sourceReader.findVariable(name);
+		Variable copyFrom = sourceVariable != null ? sourceVariable : inputVariable;
+
+		if (mainVariablesMap.containsKey(name)) {
+		    // copy in case of main variables
+		    Variable sourceBand = mainVariablesMap.get(name);
 		    List<Attribute> sourceAttributes = sourceBand.getAttributes();
 		    for (Attribute sourceAttribute : sourceAttributes) {
 			String attributeName = sourceAttribute.getShortName();
@@ -137,6 +135,12 @@ public class GDALNetCDFPostConversionUtils {
 			    break;
 			}
 		    }
+		} else {
+		    // copy in case of general variables
+		    for (Attribute attribute : copyFrom.getAttributes()) {
+			Attribute newAttribute = new Attribute(attribute.getShortName(), attribute);
+			newVariable.addAttribute(newAttribute);
+		    }
 		}
 		newVariables.put(name, newVariable);
 
@@ -145,31 +149,34 @@ public class GDALNetCDFPostConversionUtils {
 	    writer.create();
 
 	    // finished definition, start writing of data
-	    for (Variable variable : reader.getVariables()) {
+	    for (Variable variable : inputReader.getVariables()) {
 		String name = variable.getShortName();
 		Variable newVariable = newVariables.get(name);
 		writer.write(newVariable, variable.read());
 	    }
 
 	    writer.close();
-	    reader.close();
+	    inputReader.close();
+	    sourceReader.close();
 
 	    DataObject output = new DataObject();
 	    output.setDataDescriptor(input.getDataDescriptor());
 	    output.setFile(tmpFile);
-	    inputFile.delete();
+	    sourceFile.delete();
 
 	    return output;
 
-	} catch (Exception e) {
-	    
+	} catch (
+
+	Exception e) {
+
 	    e.printStackTrace();
 
 	    throw GSException.createException(//
 		    GDALNetCDFPostConversionUtils.class, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    GDAL_NETCDF_POST_CONVERSION_ERROR,//
+		    GDAL_NETCDF_POST_CONVERSION_ERROR, //
 		    e);
 	}
     }
@@ -205,52 +212,11 @@ public class GDALNetCDFPostConversionUtils {
 		    bandToMinMax.put(bandName, new SimpleEntry<Number, Number>(globalMin, globalMax));
 		}
 	    } else {
-		// for (Variable band : bands) {
-		// Number min = null;
-		// Number max = null;
-		//
-		// Array array = band.read();
-		// switch (array.getDataType()) {
-		// default:
-		// case DOUBLE:
-		// Double minDouble = null;
-		// Double maxDouble = null;
-		// for (int j = 0; j < array.getSize(); j++) {
-		// double d = array.getDouble(j);
-		// if (minDouble == null || d < minDouble) {
-		// minDouble = d;
-		// }
-		// if (maxDouble == null || d > maxDouble) {
-		// maxDouble = d;
-		// }
-		// }
-		// min = minDouble;
-		// max = maxDouble;
-		// break;
-		// case SHORT:
-		// Short minInteger = null;
-		// Short maxInteger = null;
-		// for (int j = 0; j < array.getSize(); j++) {
-		// short s = array.getShort(j);
-		// if (minInteger == null || s < minInteger) {
-		// minInteger = s;
-		// }
-		// if (maxInteger == null || s > maxInteger) {
-		// maxInteger = s;
-		// }
-		// }
-		// min = minInteger;
-		// max = maxInteger;
-		// break;
-		// }
-		// if (min != null && max != null) {
-		// bandToMinMax.put(band.getShortName(), new SimpleEntry<Number, Number>(min, max));
-		// }
-		// }
+
 	    }
 
 	    File tmpFile = File.createTempFile("GDAL_To_NetCDF_Processor", ".nc");
-	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf3, tmpFile.getAbsolutePath());
+	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, tmpFile.getAbsolutePath());
 
 	    // global attributes
 	    for (Attribute globalAttribute : reader.getGlobalAttributes()) {
@@ -310,38 +276,84 @@ public class GDALNetCDFPostConversionUtils {
 	    return output;
 
 	} catch (Exception e) {
-	    
+
 	    e.printStackTrace();
-	    
+
 	    throw GSException.createException(//
 		    GDALNetCDFPostConversionUtils.class, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    GDAL_NETCDF_POST_CONVERSION_ERROR,//
+		    GDAL_NETCDF_POST_CONVERSION_ERROR, //
 		    e);
 	}
     }
 
-    public static DataObject doBandCorrections(DataObject output) throws GSException {
+    public static DataObject doBandCorrections(DataObject source, DataObject input) throws GSException {
 	try {
+	    NetcdfDataset sourceDataset = NetcdfDataset.openDataset(source.getFile().getAbsolutePath());
+	    NetcdfDataset inputDataset = NetcdfDataset.openDataset(input.getFile().getAbsolutePath());
+	    List<Variable> sourceVariables = NetCDFUtils.getGeographicVariables(sourceDataset);
+	    Variable sourceVariable = sourceVariables.get(0);
+	    List<CoordinateAxis> nonSpatialAxes = new ArrayList<CoordinateAxis>();
+	    List<CoordinateAxis> axes = sourceDataset.getCoordinateAxes();
+	    for (CoordinateAxis axis : axes) {
+		switch (axis.getAxisType()) {
+		case GeoX:
+		case GeoY:
+		case Lat:
+		case Lon:
+		    break;
+		default:
+		    nonSpatialAxes.add(axis);
+		}
+	    }
+
+	    CoordinateAxis otherDimension = null;
+	    // additional dimensions and variables to be copied, e.g.temporal bonds
+	    // XTIME_bnds(TXTIM, bnds)
+	    HashSet<String> additionalDimensionNames = new HashSet<String>();
+	    List<Dimension> additionalDimensions = new ArrayList<Dimension>();
+	    List<Variable> additionalVariables = new ArrayList<Variable>();
+	    List<Variable> bands = NetCDFUtils.getGeographicVariables(inputDataset);
+	    HashSet<String> bandNames = new HashSet<>();
+	    for (Variable band : bands) {
+		bandNames.add(band.getFullName());
+	    }
+	    List<Variable> sourceBands = NetCDFUtils.getGeographicVariables(sourceDataset);
+	    HashSet<String> sourceBandNames = new HashSet<>();
+	    for (Variable sourceBand : sourceBands) {
+		sourceBandNames.add(sourceBand.getFullName());
+	    }
+	    if (!axes.isEmpty()) {
+		otherDimension = axes.get(0);
+		main: for (Variable v : sourceDataset.getVariables()) {
+		    List<Dimension> dimensions = v.getDimensions();
+		    for (Dimension dimension : dimensions) {
+			if (dimension.getShortName().equals(otherDimension.getShortName())) {
+			    if (sourceBandNames.contains(v.getFullName())) {
+				continue main;
+			    }
+			    for (Dimension d : dimensions) {
+				if (!additionalDimensionNames.contains(d.getShortName())) {
+				    additionalDimensions.add(d);
+				    additionalDimensionNames.add(d.getShortName());
+				}
+			    }
+			    additionalVariables.add(v);
+			}
+		    }
+		}
+	    }
 
 	    File tmpFile = File.createTempFile(GDALNetCDFPostConversionUtils.class.getSimpleName() + "doBandCorrections", ".nc");
 	    tmpFile.deleteOnExit();
 
-	    File outputFile = output.getFile();
-	    NetcdfDataset reader = NetcdfDataset.openDataset(outputFile.getAbsolutePath());
-
-	    List<Variable> bands = NetCDFUtils.getGeographicVariables(reader);
-
 	    if (bands.size() > 1) {
-		List<String> bandNames = new ArrayList<>();
-		for (Variable band : bands) {
-		    bandNames.add(band.getFullName());
-		}
-		NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf3, tmpFile.getAbsolutePath());
+
+		NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, tmpFile.getAbsolutePath());
 
 		// global attributes
-		for (Attribute globalAttribute : reader.getGlobalAttributes()) {
+		for (Attribute globalAttribute : inputDataset.getGlobalAttributes()) {
 		    String name = globalAttribute.getShortName();
 		    if (name.equals("history")) {
 			globalAttribute = new Attribute("history",
@@ -351,16 +363,26 @@ public class GDALNetCDFPostConversionUtils {
 		}
 
 		// dimensions
-		for (Dimension dimension : reader.getDimensions()) {
+		HashSet<String> newDimensions = new HashSet<String>();
+		for (Dimension dimension : inputDataset.getDimensions()) {
 		    writer.addDimension(null, dimension.getShortName(), dimension.getLength());
+		    newDimensions.add(dimension.getShortName());
 		}
+
 		// band dimension (because of GDAL splitting of bands in separate variables)
-		String bandName = "gdalband";
+		String bandName = otherDimension != null ? otherDimension.getShortName() : "gdalband";
 		writer.addDimension(null, bandName, bands.size());
+		newDimensions.add(bandName);
+		// additional dimensions
+		for (Dimension dimension : additionalDimensions) {
+		    if (!newDimensions.contains(dimension.getShortName())) {
+			writer.addDimension(null, dimension.getShortName(), dimension.getLength());
+		    }
+		}
 
 		// variables
 		HashMap<String, Variable> newVariables = new HashMap<>();
-		for (Variable variable : reader.getVariables()) {
+		for (Variable variable : inputDataset.getVariables()) {
 		    String name = variable.getShortName();
 		    if (!bandNames.contains(name)) {
 			Variable newVariable = writer.addVariable(null, name, variable.getDataType(), variable.getDimensionsString());
@@ -371,10 +393,25 @@ public class GDALNetCDFPostConversionUtils {
 			newVariables.put(name, newVariable);
 		    }
 		}
+		DataType dataType = otherDimension == null ? DataType.INT : otherDimension.getDataType();
 		// band variable (because of GDAL splitting of bands in separate variables)
-		Variable bandVariable = writer.addVariable(null, bandName, DataType.INT, bandName);
+		Variable bandVariable = writer.addVariable(null, bandName, dataType, bandName);
+		newVariables.put(bandName, bandVariable);
 
-		Variable dataVariable = writer.addVariable(null, "gdaldata", bands.get(0).getDataType(),
+		for (Variable variable : additionalVariables) {
+		    if (newVariables.get(variable.getShortName()) == null) {
+			Variable newVariable = writer.addVariable(null, variable.getShortName(), variable.getDataType(),
+				variable.getDimensionsString());
+			for (Attribute attribute : variable.getAttributes()) {
+			    Attribute newAttribute = new Attribute(attribute.getShortName(), attribute);
+			    newVariable.addAttribute(newAttribute);
+			}
+			newVariables.put(variable.getShortName(), newVariable);
+		    }
+
+		}
+
+		Variable dataVariable = writer.addVariable(null, sourceVariable.getShortName(), bands.get(0).getDataType(),
 			bandName + " " + bands.get(0).getDimensionsString());
 		for (Attribute attribute : bands.get(0).getAttributes()) {
 		    Attribute newAttribute = new Attribute(attribute.getShortName(), attribute);
@@ -388,19 +425,30 @@ public class GDALNetCDFPostConversionUtils {
 		writer.create();
 
 		// finished definition, start writing of data
-		for (Variable variable : reader.getVariables()) {
+		for (Variable variable : inputDataset.getVariables()) {
 		    String name = variable.getShortName();
 		    if (!bandNames.contains(name)) {
 			Variable newVariable = newVariables.get(name);
 			writer.write(newVariable, variable.read());
 		    }
 		}
-		// writing to band variable
-		ArrayInt.D1 bandValues = new ArrayInt.D1(bands.size());
-		for (int i = 0; i < bands.size(); i++) {
-		    bandValues.set(i, i);
+		//
+		for (Variable variable : additionalVariables) {
+		    String name = variable.getShortName();
+		    Variable newVariable = newVariables.get(name);
+		    writer.write(newVariable, variable.read());
+
 		}
-		writer.write(bandVariable, bandValues);
+		// writing to band variable
+		if (otherDimension == null) {
+		    ArrayInt.D1 bandValues = new ArrayInt.D1(bands.size(), false);
+		    for (int i = 0; i < bands.size(); i++) {
+			bandValues.set(i, i);
+		    }
+		    writer.write(bandVariable, bandValues);
+		} else {
+		    writer.write(bandVariable, otherDimension.read());
+		}
 
 		// writing to data variable
 		int[] shape = dataVariable.getShape();
@@ -408,6 +456,29 @@ public class GDALNetCDFPostConversionUtils {
 		for (int i = 0; i < bands.size(); i++) {
 		    Variable band = bands.get(i);
 		    Array array = band.read();
+		    IndexIterator iter = array.getIndexIterator();
+		    while (iter.hasNext()) {
+			Object val = iter.getObjectNext();
+			if (val instanceof Number) {
+			    Number n = (Number) val;
+			    switch (array.getDataType()) {
+			    case FLOAT:
+				if (Float.isNaN(n.floatValue())) {
+				    iter.setFloatCurrent(-9999.0f);
+				}
+				break;
+			    case DOUBLE:
+				if (Double.isNaN(n.doubleValue())) {
+				    iter.setDoubleCurrent(-9999.0f);
+				}
+				break;
+
+			    default:
+				break;
+			    }
+			}
+
+		    }
 		    long size = array.getSize();
 		    Array.arraycopy(array, 0, dataValues, (int) (i * size), (int) size);
 		}
@@ -415,33 +486,33 @@ public class GDALNetCDFPostConversionUtils {
 		writer.close();
 
 		DataObject ret = new DataObject();
-		ret.setDataDescriptor(output.getDataDescriptor());
+		ret.setDataDescriptor(input.getDataDescriptor());
 		ret.setFile(tmpFile);
-		reader.close();
-		outputFile.delete();
+		inputDataset.close();
+		sourceDataset.close();
 		return ret;
 
 	    } else {
-		FileInputStream fis = new FileInputStream(outputFile);
+		FileInputStream fis = new FileInputStream(input.getFile());
 		FileOutputStream fos = new FileOutputStream(tmpFile);
 		IOUtils.copy(fis, fos);
-		output.setFile(tmpFile);
-		reader.close();
+		input.setFile(tmpFile);
+		inputDataset.close();
+		sourceDataset.close();
 		fis.close();
 		fos.close();
-		outputFile.delete();
-		return output;
+		return input;
 	    }
 
 	} catch (Exception e) {
-	    
+
 	    e.printStackTrace();
-	    
+
 	    throw GSException.createException(//
 		    GDALNetCDFPostConversionUtils.class, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    GDAL_NETCDF_POST_CONVERSION_ERROR,//
+		    GDAL_NETCDF_POST_CONVERSION_ERROR, //
 		    e);
 	}
     }

@@ -37,10 +37,10 @@ import java.util.TimeZone;
 import org.cuahsi.waterml._1.SiteInfoType;
 import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.essi.JAXBWML;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
 import org.geotools.geometry.jts.JTS;
 import org.locationtech.jts.geom.Envelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.access.wml.WMLDataDownloader;

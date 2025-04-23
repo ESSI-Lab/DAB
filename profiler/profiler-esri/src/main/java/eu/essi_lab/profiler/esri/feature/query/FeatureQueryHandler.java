@@ -28,9 +28,9 @@ import java.util.ServiceLoader;
 
 import javax.ws.rs.core.Response;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.opengis.feature.simple.SimpleFeature;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;

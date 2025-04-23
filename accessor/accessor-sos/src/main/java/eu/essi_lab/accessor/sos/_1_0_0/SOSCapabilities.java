@@ -44,9 +44,9 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.io.IOUtils;
+import org.geotools.api.geometry.BoundingBox;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.opengis.geometry.BoundingBox;
 
 import eu.essi_lab.accessor.sos.SOSRequestBuilder;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;

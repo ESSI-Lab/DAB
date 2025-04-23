@@ -32,189 +32,203 @@ import ucar.nc2.Dimension;
 import ucar.nc2.Variable;
 import ucar.nc2.constants.AxisType;
 import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.CoordinateAxis1DTime;
 import ucar.nc2.dataset.NetcdfDataset;
 
 public class NetCDFUtils {
 
-    private static final double TOL = Math.pow(10, -8);
+	private static final double TOL = Math.pow(10, -8);
 
-    public static String getNetCDFName(String name) {
-	return name.toLowerCase().replace(" ", "_");
-    }
-
-    public static String getAxisName(CoordinateAxis axe) {
-	Attribute attribute = axe.findAttribute("long_name");
-	if (attribute != null) {
-	    return attribute.getStringValue();
-	} else {
-	    return axe.getShortName();
+	public static String getNetCDFName(String name) {
+		return name.toLowerCase().replace(" ", "_");
 	}
-    }
 
-    public static String getAxisUnit(CoordinateAxis axe) {
-	Attribute attribute = axe.findAttribute("units");
-	if (attribute != null) {
-	    return attribute.getStringValue();
-	} else {
-	    return null;
-	}
-    }
-
-    public static Double readMinimumResolutionInMilliseconds(CoordinateAxis1DTime timeAxis) throws Exception {
-	Array array = timeAxis.read();
-	IndexIterator index = array.getIndexIterator();
-	Double tmp = null;
-	Double res = null;
-	Double min = null;
-	Double max = null;
-	while (index.hasNext()) {
-	    double d = index.getDoubleNext();
-	    if (min == null || d < min) {
-		min = d;
-	    }
-	    if (max == null || d > max) {
-		max = d;
-	    }
-	    if (tmp == null) {
-		tmp = d;
-	    } else {
-		double res2 = Math.abs(d - tmp);
-		tmp = d;
-		if (res == null || res2 < res) {
-		    res = res2;
+	public static String getAxisName(CoordinateAxis axe) {
+		Attribute attribute = axe.findAttribute("long_name");
+		if (attribute != null) {
+			return attribute.getStringValue();
+		} else {
+			return axe.getShortName();
 		}
-	    }
 	}
-	long milliSeconds = timeAxis.getCalendarDateRange().getDurationInSecs() * 1000;
-	double allPeriod = max - min;
-	double ms = res * (milliSeconds / allPeriod);
-	return ms;
-    }
 
-    public static Double readMinimumResolution(Array array) {
-	IndexIterator index = array.getIndexIterator();
-	Double tmp = null;
-	Double res = null;
-	while (index.hasNext()) {
-	    double d = index.getDoubleNext();
-	    if (tmp == null) {
-		tmp = d;
-	    } else {
-		double res2 = Math.abs(d - tmp);
-		tmp = d;
-		if (res == null || res2 < res) {
-		    res = res2;
+	public static String getAxisUnit(CoordinateAxis axe) {
+		Attribute attribute = axe.findAttribute("units");
+		if (attribute != null) {
+			return attribute.getStringValue();
+		} else {
+			return null;
 		}
-	    }
 	}
-	return res;
-    }
 
-    public static Double readResolution(Array array) {
-	IndexIterator index = array.getIndexIterator();
-	Double tmp = null;
-	Double res = null;
-	while (index.hasNext()) {
-	    double d = index.getDoubleNext();
-	    if (tmp == null) {
-		tmp = d;
-	    } else {
-		double res2 = Math.abs(d - tmp);
-		tmp = d;
-		if (res == null) {
-		    res = res2;
-		} else if (Math.abs(res2 - res) > TOL) {
-		    return null;
+	public static Double readMinimumResolutionInMilliseconds(CoordinateAxis1DTime timeAxis) throws Exception {
+		Array array = timeAxis.read();
+		IndexIterator index = array.getIndexIterator();
+		Double tmp = null;
+		Double res = null;
+		Double min = null;
+		Double max = null;
+		while (index.hasNext()) {
+			double d = index.getDoubleNext();
+			if (min == null || d < min) {
+				min = d;
+			}
+			if (max == null || d > max) {
+				max = d;
+			}
+			if (tmp == null) {
+				tmp = d;
+			} else {
+				double res2 = Math.abs(d - tmp);
+				tmp = d;
+				if (res == null || res2 < res) {
+					res = res2;
+				}
+			}
 		}
-	    }
+		long milliSeconds = timeAxis.getCalendarDateRange().getDurationInSecs() * 1000;
+		double allPeriod = max - min;
+		double ms = res * (milliSeconds / allPeriod);
+		return ms;
 	}
-	return res;
-    }
 
-    public static Double readExtent(Array array) {
-	IndexIterator index = array.getIndexIterator();
-	Double min = null;
-	Double max = null;
-	while (index.hasNext()) {
-	    double d = index.getDoubleNext();
-	    if (min == null) {
-		min = d;
-	    }
-	    if (max == null) {
-		max = d;
-	    }
-	    if (d > max) {
-		max = d;
-	    }
-	    if (d < min) {
-		min = d;
-	    }
-	}
-	if (min == null) {
-	    return 0.;
-	}
-	return max - min;
-    }
-
-    public static List<Variable> getGeographicVariables(NetcdfDataset dataset) {
-	List<CoordinateAxis> axes = dataset.getCoordinateAxes();
-	List<String> geographicDimensions = new ArrayList<>();
-	for (CoordinateAxis axe : axes) {
-	    AxisType axisType = axe.getAxisType();
-	    if (axisType != null) {
-		switch (axisType) {
-		case GeoX:
-		case Lon:
-		case GeoY:
-		case Lat:
-		    geographicDimensions.add(axe.getShortName());
-		default:
-		    break;
+	public static Double readMinimumResolution(Array array) {
+		IndexIterator index = array.getIndexIterator();
+		Double tmp = null;
+		Double res = null;
+		while (index.hasNext()) {
+			double d = index.getDoubleNext();
+			if (tmp == null) {
+				tmp = d;
+			} else {
+				double res2 = Math.abs(d - tmp);
+				tmp = d;
+				if (res == null || res2 < res) {
+					res = res2;
+				}
+			}
 		}
-	    }
-	}
-	LinkedHashMap<String, Variable> map = new LinkedHashMap<>();
-	for (Variable variable : dataset.getVariables()) {
-	    int dimensionsToFind = geographicDimensions.size();
-	    List<Dimension> dimensions = variable.getDimensions();
-	    for (Dimension dimension : dimensions) {
-		String name = dimension.getShortName();
-		if (geographicDimensions.contains(name)) {
-		    dimensionsToFind--;
-		}
-	    }
-	    if (dimensionsToFind == 0) {
-		map.put(variable.getShortName(), variable);
-	    }
-	}
-	List<String> toRemoves = new ArrayList<>();
-	for (Variable variable : map.values()) {
-	    toRemoves.addAll(extractVariables(variable.findAttribute("ancillary_variables")));
-	    toRemoves.addAll(extractVariables(variable.findAttribute("formula_terms")));
-	    toRemoves.addAll(extractVariables(variable.findAttribute("coordinates")));
-	    toRemoves.addAll(extractVariables(variable.findAttribute("bounds")));
-	    toRemoves.addAll(extractVariables(variable.findAttribute("cell_measures")));
-	}
-	for (String toRemove : toRemoves) {
-	    map.remove(toRemove);
+		return res;
 	}
 
-	return new ArrayList<Variable>(map.values());
-    }
-
-    private static List<String> extractVariables(Attribute attribute) {
-	List<String> ret = new ArrayList<>();
-	if (attribute != null) {
-	    String string = attribute.getStringValue();
-	    if (string != null) {
-		String[] split = string.split(" ");
-		for (String s : split) {
-		    ret.add(s);
+	public static Double readResolution(Array array) {
+		IndexIterator index = array.getIndexIterator();
+		Double tmp = null;
+		Double res = null;
+		while (index.hasNext()) {
+			double d = index.getDoubleNext();
+			if (tmp == null) {
+				tmp = d;
+			} else {
+				double res2 = Math.abs(d - tmp);
+				tmp = d;
+				if (res == null) {
+					res = res2;
+				} else if (Math.abs(res2 - res) > TOL) {
+					return null;
+				}
+			}
 		}
-	    }
+		return res;
 	}
-	return ret;
-    }
+
+	public static Double readExtent(Array array) {
+		IndexIterator index = array.getIndexIterator();
+		Double min = null;
+		Double max = null;
+		while (index.hasNext()) {
+			double d = index.getDoubleNext();
+			if (min == null) {
+				min = d;
+			}
+			if (max == null) {
+				max = d;
+			}
+			if (d > max) {
+				max = d;
+			}
+			if (d < min) {
+				min = d;
+			}
+		}
+		if (min == null) {
+			return 0.;
+		}
+		return max - min;
+	}
+
+	public static List<Variable> getGeographicVariables(NetcdfDataset dataset) {
+		List<CoordinateAxis> axes = dataset.getCoordinateAxes();
+		List<String> geographicDimensions = new ArrayList<>();
+		for (CoordinateAxis axe : axes) {
+			AxisType axisType = axe.getAxisType();
+			if (axisType != null) {
+				switch (axisType) {
+				case GeoX:
+				case Lon:
+				case GeoY:
+				case Lat:
+					geographicDimensions.add(axe.getShortName());
+				default:
+					break;
+				}
+			}
+		}
+		LinkedHashMap<String, Variable> map = new LinkedHashMap<>();
+		for (Variable variable : dataset.getVariables()) {
+			int dimensionsToFind = geographicDimensions.size();
+			List<Dimension> dimensions = variable.getDimensions();
+			for (Dimension dimension : dimensions) {
+				String name = dimension.getShortName();
+				if (geographicDimensions.contains(name)) {
+					dimensionsToFind--;
+				}
+			}
+			if (dimensionsToFind == 0) {
+				map.put(variable.getShortName(), variable);
+			}
+		}
+		List<String> toRemoves = new ArrayList<>();
+		for (Variable variable : map.values()) {
+			toRemoves.addAll(extractVariables(variable.findAttribute("ancillary_variables")));
+			toRemoves.addAll(extractVariables(variable.findAttribute("formula_terms")));
+			toRemoves.addAll(extractVariables(variable.findAttribute("coordinates")));
+			toRemoves.addAll(extractVariables(variable.findAttribute("bounds")));
+			toRemoves.addAll(extractVariables(variable.findAttribute("cell_measures")));
+		}
+		for (String toRemove : toRemoves) {
+			map.remove(toRemove);
+		}
+
+		return new ArrayList<Variable>(map.values());
+	}
+
+	private static List<String> extractVariables(Attribute attribute) {
+		List<String> ret = new ArrayList<>();
+		if (attribute != null) {
+			String string = attribute.getStringValue();
+			if (string != null) {
+				String[] split = string.split(" ");
+				for (String s : split) {
+					ret.add(s);
+				}
+			}
+		}
+		return ret;
+	}
+
+	public static CoordinateAxis1D getAxis(NetcdfDataset dataset, AxisType type) {
+		for (CoordinateAxis axis : dataset.getCoordinateAxes()) {
+			if (axis.getAxisType() == AxisType.Time) {
+				System.out.println("Time axis found: " + axis.getFullName());
+				if (axis instanceof CoordinateAxis1D) {
+					CoordinateAxis1D timeAxis = (CoordinateAxis1D) axis;
+					return timeAxis;
+				}
+			}
+		}
+		return null;
+	}
 
 }
