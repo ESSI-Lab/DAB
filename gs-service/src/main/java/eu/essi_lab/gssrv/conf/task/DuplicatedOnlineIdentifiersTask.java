@@ -38,6 +38,7 @@ import org.quartz.JobExecutionContext;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
@@ -48,6 +49,7 @@ import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.SortOrder;
+import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.ommdk.GMIResourceMapper;
@@ -148,19 +150,27 @@ public class DuplicatedOnlineIdentifiersTask extends AbstractCustomTask {
 		// break main;
 		// }
 
-		String fileIdentifier = resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier();
-		String onlineId = resource.getHarmonizedMetadata().getCoreMetadata().getOnline().getIdentifier();
+		CoreMetadata coreMetadata = resource.getHarmonizedMetadata().getCoreMetadata();
+		if (coreMetadata != null) {
+		    String fileIdentifier = coreMetadata.getIdentifier();
+		    Online online = coreMetadata.getOnline();
 
-		if (setIds.contains(onlineId)) {
-		    File temp = new File(sourceDir, onlineId + ".txt");
-		    BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
-		    String publicationDate = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
-			    .getCitationPublicationDate();
-		    String text = "ONLINE_ID:" + onlineId + " - FILE_IDENTIFIER:" + fileIdentifier + " - PUBLICATION_DATE: "
-			    + publicationDate;
-		    GSLoggerFactory.getLogger(getClass()).info(text);
-		    writer.write(text);
-		    writer.close();
+		    if (online == null) {
+			continue;
+		    }
+		    String onlineId = online.getIdentifier();
+
+		    if (setIds.contains(onlineId)) {
+			File temp = new File(sourceDir, onlineId + ".txt");
+			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
+			String publicationDate = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
+				.getCitationPublicationDate();
+			String text = "ONLINE_ID:" + onlineId + " - FILE_IDENTIFIER:" + fileIdentifier + " - PUBLICATION_DATE: "
+				+ publicationDate;
+			GSLoggerFactory.getLogger(getClass()).info(text);
+			writer.write(text);
+			writer.close();
+		    }
 		}
 
 	    }
