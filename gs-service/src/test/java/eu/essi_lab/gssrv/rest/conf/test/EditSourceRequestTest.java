@@ -43,7 +43,7 @@ public class EditSourceRequestTest {
 
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS.getLabel());
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
     }
@@ -56,7 +56,7 @@ public class EditSourceRequestTest {
 	request.put(PutSourceRequest.SOURCE_ID, "sourceId");
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS.getLabel());
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	request.validate();
     }

@@ -55,15 +55,19 @@ public class PutSourceRequest extends ConfigRequest {
 	/**
 	 * 
 	 */
-	WMS("WMS"),
+	WMS_111("WMS 1.1.1"),
 	/**
 	 * 
 	 */
-	WCS("WCS"),
+	WMS_130("WMS 1.3.0"),
 	/**
 	 * 
 	 */
-	OAI_PMH("OAI-PMH");
+	WCS_111("WCS 1.1.1"),
+	/**
+	 * 
+	 */
+	WFS_110("WCS 1.1.0");
 
 	private String label;
 

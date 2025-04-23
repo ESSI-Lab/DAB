@@ -44,9 +44,11 @@ public class PutSourceRequestTest {
 	request.put(PutSourceRequest.SOURCE_ID, "sourceId");
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS.getLabel());
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	request.validate();
+	
+	System.out.println(request);
     }
 
     @Test
@@ -85,12 +87,12 @@ public class PutSourceRequestTest {
 	request.put(PutSourceRequest.SOURCE_ID, "sourceId");
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS.getLabel());
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	Assert.assertEquals("sourceId", request.read(PutSourceRequest.SOURCE_ID).get());
 	Assert.assertEquals("sourceLabel", request.read(PutSourceRequest.SOURCE_LABEL).get());
 	Assert.assertEquals("http://localhost", request.read(PutSourceRequest.SOURCE_ENDPOINT).get());
-	Assert.assertEquals(SourceType.WCS.getLabel(), request.read(PutSourceRequest.SOURCE_TYPE).get());
+	Assert.assertEquals(SourceType.WCS_111.getLabel(), request.read(PutSourceRequest.SOURCE_TYPE).get());
 
 	request.validate();
     }
@@ -103,7 +105,7 @@ public class PutSourceRequestTest {
 	request.put(PutSourceRequest.SOURCE_ID, "sourceId");
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS.getLabel());
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	request.put("xxx", "xxx");
 
@@ -118,7 +120,7 @@ public class PutSourceRequestTest {
 	request.put(PutSourceRequest.SOURCE_ID, "sourceId!");
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS.getLabel());
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
     }
@@ -131,7 +133,7 @@ public class PutSourceRequestTest {
 	request.put(PutSourceRequest.SOURCE_ID, "sourceId#");
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS.getLabel());
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
     }
@@ -156,7 +158,7 @@ public class PutSourceRequestTest {
 
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS.getLabel());
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	request.validate();
     }
@@ -168,7 +170,7 @@ public class PutSourceRequestTest {
 
 	request.put(PutSourceRequest.SOURCE_ID, "sourceId");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS.getLabel());
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
     }
@@ -180,7 +182,7 @@ public class PutSourceRequestTest {
 
 	request.put(PutSourceRequest.SOURCE_ID, "sourceId");
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS.getLabel());
+	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
     }

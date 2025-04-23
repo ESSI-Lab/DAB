@@ -5,6 +5,7 @@ package eu.essi_lab.gssrv.rest.conf;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.jws.WebService;
 import javax.servlet.ServletInputStream;
@@ -20,6 +21,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 
@@ -137,7 +141,54 @@ public class ConfigService {
      */
     private Response handlePutSourceRequest(PutSourceRequest putSourceRequest) {
 
-	return Response.status(Status.OK).build();
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	Optional<String> optSourceId = putSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
+
+	if (optSourceId.isPresent()) {
+
+	    String sourceId = optSourceId.get();
+
+	    if (ConfigurationWrapper.getAllSources().//
+		    stream().//
+		    filter(s -> s.getUniqueIdentifier().equals(sourceId)).//
+		    findFirst().//
+		    isPresent()) {
+
+		return buildErrorResponse(Status.BAD_REQUEST, "Source with id '" + sourceId + "' already exists");
+	    }
+
+	} else {
+
+	    putSourceRequest.put(PutSourceRequest.SOURCE_ID, UUID.randomUUID().toString());
+	}
+
+	HarvestingSetting setting = HarvestingSettingBuilder.build(putSourceRequest);
+
+	boolean put = configuration.put(setting);
+
+	if (!put) {
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to put new source");
+
+	} else {
+
+	    try {
+
+		configuration.flush();
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
+
+		return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to save changes: " + ex.getMessage());
+	    }
+	}
+
+	return Response.status(Status.CREATED).//
+		entity(putSourceRequest.toString()).//
+		type(MediaType.APPLICATION_JSON.toString()).//
+		build();
     }
 
     /**
@@ -146,7 +197,64 @@ public class ConfigService {
      */
     private Response handleEditSourceRequest(EditSourceRequest editSourceRequest) {
 
-	return Response.status(Status.OK).build();
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	Optional<String> optSourceId = editSourceRequest.read(EditSourceRequest.SOURCE_ID).map(v -> v.toString());
+
+	String settingId = null;
+
+	if (!optSourceId.isPresent()) {
+
+	    return buildErrorResponse(Status.BAD_REQUEST, "Missing source identifier");
+
+	} else {
+
+	    String sourceId = optSourceId.get();
+
+	    if (!ConfigurationWrapper.getAllSources().//
+		    stream().//
+		    filter(s -> s.getUniqueIdentifier().equals(sourceId)).//
+		    findFirst().//
+		    isPresent()) {
+
+		return buildErrorResponse(Status.BAD_REQUEST, "Source with id '" + sourceId + "' no not exists");
+	    }
+
+	    settingId = ConfigurationWrapper.getHarvestingSettings().//
+		    stream().//
+		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).//
+		    findFirst().//
+		    get().//
+		    getIdentifier();
+	}
+
+	HarvestingSetting setting = HarvestingSettingBuilder.build(editSourceRequest);
+	setting.setIdentifier(settingId);
+
+	boolean replaced = configuration.replace(setting);
+
+	if (!replaced) {
+
+	    return buildErrorResponse(Status.NOT_MODIFIED, "Unable to edit source");
+
+	} else {
+
+	    try {
+
+		configuration.flush();
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
+
+		return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to save changes: " + ex.getMessage());
+	    }
+	}
+
+	return Response.status(Status.OK).//
+		entity(editSourceRequest.toString()).//
+		type(MediaType.APPLICATION_JSON.toString()).//
+		build();
     }
 
     /**
