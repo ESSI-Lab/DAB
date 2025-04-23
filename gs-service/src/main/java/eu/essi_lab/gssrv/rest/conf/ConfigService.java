@@ -22,8 +22,15 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
+import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
+import eu.essi_lab.cfga.scheduler.Scheduler;
+import eu.essi_lab.cfga.scheduler.SchedulerFactory;
+import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
+import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 
@@ -161,7 +168,7 @@ public class ConfigService {
 	    putSourceRequest.put(PutSourceRequest.SOURCE_ID, UUID.randomUUID().toString());
 	}
 
-	HarvestingSetting setting = HarvestingSettingBuilder.build(putSourceRequest);
+	HarvestingSetting setting = HarvestingSettingUtils.build(putSourceRequest);
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 
@@ -197,36 +204,16 @@ public class ConfigService {
      */
     private Response handleEditSourceRequest(EditSourceRequest editSourceRequest) {
 
-	Optional<String> optSourceId = editSourceRequest.read(EditSourceRequest.SOURCE_ID).map(v -> v.toString());
+	IdHolder holder = getHolder(editSourceRequest);
 
-	String settingId = null;
+	if (holder.getErrorResponse().isPresent()) {
 
-	if (!optSourceId.isPresent()) {
-
-	    return buildErrorResponse(Status.BAD_REQUEST, "Missing source identifier");
-
-	} else {
-
-	    String sourceId = optSourceId.get();
-
-	    if (!ConfigurationWrapper.getAllSources().//
-		    stream().//
-		    filter(s -> s.getUniqueIdentifier().equals(sourceId)).//
-		    findFirst().//
-		    isPresent()) {
-
-		return buildErrorResponse(Status.BAD_REQUEST, "Source with id '" + sourceId + "' no not exists");
-	    }
-
-	    settingId = ConfigurationWrapper.getHarvestingSettings().//
-		    stream().//
-		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).//
-		    findFirst().//
-		    get().//
-		    getIdentifier();
+	    return holder.getErrorResponse().get();
 	}
 
-	HarvestingSetting setting = HarvestingSettingBuilder.build(editSourceRequest);
+	String settingId = holder.getSettingId().get();
+
+	HarvestingSetting setting = HarvestingSettingUtils.build(editSourceRequest);
 	setting.setIdentifier(settingId);
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
@@ -263,7 +250,79 @@ public class ConfigService {
      */
     private Response handleHarvestSourceRequest(HarvestSourceRequest harvestSourceRequest) {
 
-	return Response.status(Status.OK).build();
+	IdHolder holder = getHolder(harvestSourceRequest);
+
+	if (holder.getErrorResponse().isPresent()) {
+
+	    return holder.getErrorResponse().get();
+	}
+
+	String settingId = holder.getSettingId().get();
+
+	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
+		stream().//
+		filter(s -> s.getIdentifier().equals(settingId)).//
+		findFirst().get();
+
+	setting = SettingUtils.downCast(SelectionUtils.resetAndSelect(setting, false), HarvestingSettingLoader.load().getClass());
+
+	Scheduling scheduling = setting.getScheduling();
+
+	boolean reschedule = scheduling.isEnabled();
+
+	HarvestingSettingUtils.udpate(harvestSourceRequest, scheduling);
+
+	SelectionUtils.deepClean(setting);
+	SelectionUtils.deepAfterClean(setting);
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	boolean replaced = configuration.replace(setting);
+
+	if (!replaced) {
+
+	    return buildErrorResponse(Status.NOT_MODIFIED, "Unable to edit source");
+
+	} else {
+
+	    try {
+
+		configuration.flush();
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
+
+		return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to save changes: " + ex.getMessage());
+	    }
+	}
+
+	SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+
+	Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
+
+	try {
+
+	    if (reschedule) {
+
+		scheduler.reschedule(setting);
+
+	    } else {
+
+		scheduler.schedule(setting);
+	    }
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to schedule task: " + ex.getMessage());
+	}
+
+	return Response.status(Status.OK).//
+		entity(harvestSourceRequest.toString()).//
+		type(MediaType.APPLICATION_JSON.toString()).//
+		build();
     }
 
     /**
@@ -311,5 +370,84 @@ public class ConfigService {
 
 	    return Optional.of(buildErrorResponse(Status.BAD_REQUEST, ex.getMessage()));
 	}
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    private class IdHolder {
+
+	private String settingId;
+	private Response errorResponse;
+
+	/**
+	 * @param settingId
+	 */
+	private IdHolder(String settingId) {
+
+	    this.settingId = settingId;
+	}
+
+	/**
+	 * @param response
+	 */
+	private IdHolder(Response response) {
+
+	    errorResponse = response;
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<String> getSettingId() {
+
+	    return Optional.ofNullable(settingId);
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<Response> getErrorResponse() {
+
+	    return Optional.ofNullable(errorResponse);
+	}
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private IdHolder getHolder(ConfigRequest request) {
+
+	Optional<String> optSourceId = request.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
+
+	String settingId = null;
+
+	if (!optSourceId.isPresent()) {
+
+	    return new IdHolder(buildErrorResponse(Status.BAD_REQUEST, "Missing source identifier"));
+
+	} else {
+
+	    String sourceId = optSourceId.get();
+
+	    if (!ConfigurationWrapper.getAllSources().//
+		    stream().//
+		    filter(s -> s.getUniqueIdentifier().equals(sourceId)).//
+		    findFirst().//
+		    isPresent()) {
+
+		return new IdHolder(buildErrorResponse(Status.BAD_REQUEST, "Source with id '" + sourceId + "' no not exists"));
+	    }
+
+	    settingId = ConfigurationWrapper.getHarvestingSettings().//
+		    stream().//
+		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).//
+		    findFirst().//
+		    get().//
+		    getIdentifier();
+	}
+
+	return new IdHolder(settingId);
     }
 }

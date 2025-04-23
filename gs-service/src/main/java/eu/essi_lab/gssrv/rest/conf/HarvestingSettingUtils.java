@@ -25,6 +25,7 @@ package eu.essi_lab.gssrv.rest.conf;
  */
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import eu.essi_lab.cdk.harvest.wrapper.ConnectorWrapperSetting;
 import eu.essi_lab.cfga.SelectionUtils;
@@ -32,13 +33,15 @@ import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
+import eu.essi_lab.cfga.setting.scheduling.Scheduling;
+import eu.essi_lab.gssrv.rest.conf.HarvestSourceRequest.RepeatIntervalUnit;
 import eu.essi_lab.gssrv.rest.conf.PutSourceRequest.SourceType;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
-public class HarvestingSettingBuilder {
+public class HarvestingSettingUtils {
 
     /**
      * @param service
@@ -193,79 +196,52 @@ public class HarvestingSettingBuilder {
 	return harvSetting;
     }
 
-    // /**
-    // * @param accessorType
-    // * @param connectorType
-    // * @param sourceId
-    // * @param sourceLabel
-    // * @param sourceEndpoint
-    // * @param schedulerDelay
-    // * @return
-    // */
-    // private static HarvestingSetting createSetting(//
-    // String accessorType, //
-    // Optional<String> connectorType, //
-    // String sourceId, //
-    // String sourceLabel, //
-    // String sourceEndpoint,//
-    // String startTime
-    //
-    // ) {
-    //
-    // HarvestingSetting harvSetting = HarvestingSettingLoader.load();
-    //
-    // harvSetting.selectAccessorSetting(s -> s.getAccessorType().equals(accessorType));
-    //
-    // harvSetting.setName(sourceLabel);
-    //
-    // //
-    // // scheduling
-    // //
-    //
-    // Scheduling scheduling = harvSetting.getScheduling();
-    // scheduling.setEnabled(true);
-    //
-    // scheduling.setRunIndefinitely();
-    // scheduling.setRepeatInterval(1000, TimeUnit.DAYS);
-    //
-    // scheduling.setStartTime(startTime);
-    //
-    // //
-    // // source
-    // //
-    //
-    // AccessorSetting accessorSetting = harvSetting.getSelectedAccessorSetting();
-    //
-    // accessorSetting.getGSSourceSetting().setSourceIdentifier(sourceId);
-    // accessorSetting.getGSSourceSetting().setSourceLabel(sourceLabel);
-    // accessorSetting.getGSSourceSetting().setSourceEndpoint(sourceEndpoint);
-    //
-    // //
-    // // optional wrapped connector
-    // //
-    //
-    // if (connectorType.isPresent()) {
-    //
-    // HarvestedConnectorSetting connectorSetting = accessorSetting.getHarvestedConnectorSetting();
-    //
-    // if (connectorSetting instanceof ConnectorWrapperSetting) {
-    //
-    // @SuppressWarnings("rawtypes")
-    // ConnectorWrapperSetting wrapper = (ConnectorWrapperSetting) connectorSetting;
-    // wrapper.selectConnectorType(connectorType.get());
-    // }
-    // }
-    //
-    // //
-    // //
-    // //
-    //
-    // SelectionUtils.deepClean(harvSetting);
-    //
-    // //
-    // //
-    // //
-    //
-    // return harvSetting;
-    // }
+    /**
+     * @param request
+     * @param scheduling
+     * @return
+     */
+    public static void udpate(HarvestSourceRequest request, Scheduling scheduling) {
+
+	Optional<String> startTime = request.read(HarvestSourceRequest.START_TIME).map(v -> v.toString());
+
+	Optional<String> interval = request.read(HarvestSourceRequest.REPEAT_INTERVAL).map(v -> v.toString());
+	Optional<String> unit = request.read(HarvestSourceRequest.REPEAT_INTERVAL_UNIT).map(v -> v.toString());
+
+	scheduling.setEnabled(true);
+
+	if (interval.isPresent()) {
+
+	    scheduling.setRunIndefinitely();
+
+	    RepeatIntervalUnit intUnit = LabeledEnum.valueOf(RepeatIntervalUnit.class, unit.get()).get();
+	    switch (intUnit) {
+	    case DAYS:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.DAYS);
+		break;
+	    case MINUTES:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.MINUTES);
+		break;
+	    case MONTHS:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()) * 30, TimeUnit.DAYS);
+		break;
+	    case WEEKS:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()) * 7, TimeUnit.DAYS);
+		break;
+	    }
+
+	} else {
+
+	    scheduling.setRunOnce();
+	}
+
+	if (startTime.isPresent()) {
+
+	    scheduling.setStartTime(startTime.get());
+
+	} else {
+
+	    scheduling.setStartNow();
+	}
+    }
 }

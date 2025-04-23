@@ -49,6 +49,8 @@ public class HarvestSourceRequestTest {
 	request.put(HarvestSourceRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.WEEKS.getLabel());
 
 	request.validate();
+	
+	System.out.println(request);
     }
 
     @Test
