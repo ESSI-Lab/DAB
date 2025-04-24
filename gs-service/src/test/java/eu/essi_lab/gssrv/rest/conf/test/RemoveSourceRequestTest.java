@@ -28,7 +28,7 @@ public class RemoveSourceRequestTest {
 	Assert.assertEquals(2, parameters.size());
 
 	Assert.assertEquals(
-		Parameter.of(RemoveSourceRequest.SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE, true),
+		Parameter.of(RemoveSourceRequest.SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true),
 		parameters.get(0));
 
 	Assert.assertEquals(Parameter.of(RemoveSourceRequest.REMOVE_DATA, ContentType.BOOLEAN, false), parameters.get(1));

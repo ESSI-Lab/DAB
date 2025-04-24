@@ -63,9 +63,8 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 public class ConfigService {
 
     @POST
-    @Path("source")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response source(@Context HttpServletRequest hsr, @Context UriInfo uriInfo) {
+    public Response config(@Context HttpServletRequest hsr, @Context UriInfo uriInfo) {
 
 	String stringStream = null;
 	try {
@@ -94,7 +93,7 @@ public class ConfigService {
 	    return buildErrorResponse(Status.BAD_REQUEST, "Missing or corrupted request body");
 	}
 
-	Optional<String> optRequestName = ConfigRequest.getRequestName(requestObject);
+	Optional<String> optRequestName = ConfigRequest.getName(requestObject);
 
 	if (optRequestName.isEmpty()) {
 
@@ -121,9 +120,9 @@ public class ConfigService {
 	    return validate.isPresent() ? validate.get() : handleEditSourceRequest(request);
 	}
 
-	if (requestName.equals(HarvestSourceRequest.class.getSimpleName())) {
+	if (requestName.equals(HarvestSchedulingRequest.class.getSimpleName())) {
 
-	    HarvestSourceRequest request = new HarvestSourceRequest(requestObject);
+	    HarvestSchedulingRequest request = new HarvestSchedulingRequest(requestObject);
 
 	    Optional<Response> validate = validate(request);
 
@@ -248,7 +247,7 @@ public class ConfigService {
      * @param harvestSourceRequest
      * @return
      */
-    private Response handleHarvestSourceRequest(HarvestSourceRequest harvestSourceRequest) {
+    private Response handleHarvestSourceRequest(HarvestSchedulingRequest harvestSourceRequest) {
 
 	IdHolder holder = getHolder(harvestSourceRequest);
 

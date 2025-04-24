@@ -110,6 +110,8 @@ public class PutSourceRequestTest {
 	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
 
 	request.validate();
+	
+	System.out.println(request);
     }
 
     @Test

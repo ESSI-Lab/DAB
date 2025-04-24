@@ -36,7 +36,7 @@ import eu.essi_lab.model.Queryable.ContentType;
 /**
  * @author Fabrizio
  */
-public class HarvestSourceRequest extends PutSourceRequest {
+public class HarvestSchedulingRequest extends PutSourceRequest {
 
     public static final String START_TIME = "startTime";
     public static final String REPEAT_INTERVAL = "repeatInterval";
@@ -90,13 +90,13 @@ public class HarvestSourceRequest extends PutSourceRequest {
     /**
      * 
      */
-    public HarvestSourceRequest() {
+    public HarvestSchedulingRequest() {
     }
 
     /**
      * @param object
      */
-    public HarvestSourceRequest(JSONObject object) {
+    public HarvestSchedulingRequest(JSONObject object) {
 
 	super(object);
     }

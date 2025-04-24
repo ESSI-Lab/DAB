@@ -53,11 +53,10 @@ public abstract class ConfigRequest {
 
 	object = new JSONObject();
 
-	object.put("name", getClass().getSimpleName());
+	object.put("request", getClass().getSimpleName());
 
 	object.put("parameters", new JSONObject());
     }
-    
 
     /**
      * @param object
@@ -71,17 +70,16 @@ public abstract class ConfigRequest {
      * @param object
      * @return
      */
-    public static Optional<String> getRequestName(JSONObject object) {
+    public static Optional<String> getName(JSONObject object) {
 
-	if (object.has("name")) {
+	if (object.has("request")) {
 
-	    return Optional.of(object.getString("name"));
+	    return Optional.of(object.getString("request"));
 	}
 
 	return Optional.empty();
     }
-    
-   
+
     @Override
     public String toString() {
 
@@ -125,7 +123,7 @@ public abstract class ConfigRequest {
      */
     public String getName() {
 
-	return object.getString("name");
+	return object.getString("request");
     }
 
     /**
@@ -171,7 +169,7 @@ public abstract class ConfigRequest {
 	if (!mandatoryParams.isEmpty()) {
 
 	    throw new IllegalArgumentException(
-		    "Missing mandatory parameters: " + mandatoryParams.stream().collect(Collectors.joining(",")));
+		    "Missing mandatory parameters: " + mandatoryParams.stream().collect(Collectors.joining(", ")));
 	}
     }
 
@@ -190,8 +188,8 @@ public abstract class ConfigRequest {
 
 	if (!requestParams.isEmpty()) {
 
-	    throw new IllegalArgumentException("Unknown parameters: " + requestParams.stream().collect(Collectors.joining(","))
-		    + ". Supported parameters: " + supported.stream().collect(Collectors.joining(",")));
+	    throw new IllegalArgumentException("Unknown parameters: " + requestParams.stream().collect(Collectors.joining(", "))
+		    + ". Supported parameters: " + supported.stream().collect(Collectors.joining(", ")));
 	}
     }
 
@@ -318,7 +316,7 @@ public abstract class ConfigRequest {
 		String supValues = LabeledEnum.values(optEnum.get()).//
 			stream().//
 			map(e -> e.getLabel()).//
-			collect(Collectors.joining(","));
+			collect(Collectors.joining(", "));
 
 		throw new IllegalArgumentException(
 			"Unsupported value '" + value + "' for parameter '" + paramName + "'. Supported values are: " + supValues);

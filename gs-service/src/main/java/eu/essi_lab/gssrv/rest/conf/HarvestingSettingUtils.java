@@ -34,7 +34,7 @@ import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
-import eu.essi_lab.gssrv.rest.conf.HarvestSourceRequest.RepeatIntervalUnit;
+import eu.essi_lab.gssrv.rest.conf.HarvestSchedulingRequest.RepeatIntervalUnit;
 import eu.essi_lab.gssrv.rest.conf.PutSourceRequest.SourceType;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
@@ -71,6 +71,34 @@ public class HarvestingSettingUtils {
 		    sourceEndpoint);
 
 	    break;
+
+	case WCS_100: {
+
+	    String wrappedConnectorType = "WCS Connector 1.0.0";
+
+	    harvSetting = createSetting(//
+		    "WCS", //
+		    Optional.of(wrappedConnectorType), //
+		    sourceID, //
+		    label, //
+		    sourceEndpoint);
+
+	    break;
+	}
+
+	case WCS_110: {
+
+	    String wrappedConnectorType = "WCS Connector 1.1.0";
+
+	    harvSetting = createSetting(//
+		    "WCS", //
+		    Optional.of(wrappedConnectorType), //
+		    sourceID, //
+		    label, //
+		    sourceEndpoint);
+
+	    break;
+	}
 
 	case WCS_111: {
 
@@ -127,7 +155,6 @@ public class HarvestingSettingUtils {
 
 	    break;
 	}
-
 	}
 
 	return harvSetting;
@@ -201,12 +228,12 @@ public class HarvestingSettingUtils {
      * @param scheduling
      * @return
      */
-    public static void udpate(HarvestSourceRequest request, Scheduling scheduling) {
+    public static void udpate(HarvestSchedulingRequest request, Scheduling scheduling) {
 
-	Optional<String> startTime = request.read(HarvestSourceRequest.START_TIME).map(v -> v.toString());
+	Optional<String> startTime = request.read(HarvestSchedulingRequest.START_TIME).map(v -> v.toString());
 
-	Optional<String> interval = request.read(HarvestSourceRequest.REPEAT_INTERVAL).map(v -> v.toString());
-	Optional<String> unit = request.read(HarvestSourceRequest.REPEAT_INTERVAL_UNIT).map(v -> v.toString());
+	Optional<String> interval = request.read(HarvestSchedulingRequest.REPEAT_INTERVAL).map(v -> v.toString());
+	Optional<String> unit = request.read(HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT).map(v -> v.toString());
 
 	scheduling.setEnabled(true);
 
