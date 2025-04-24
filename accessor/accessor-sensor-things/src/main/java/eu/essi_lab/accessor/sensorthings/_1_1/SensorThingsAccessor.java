@@ -28,6 +28,9 @@ import eu.essi_lab.adk.harvest.HarvestedAccessor;
  */
 public class SensorThingsAccessor extends HarvestedAccessor<SensorThingsConnector> {
 
+	public SensorThingsAccessor() {
+		
+	}
     /**
      * 
      * 

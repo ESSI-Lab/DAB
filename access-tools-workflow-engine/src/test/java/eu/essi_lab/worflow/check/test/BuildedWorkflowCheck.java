@@ -75,7 +75,7 @@ public class BuildedWorkflowCheck {
 
 	// -----------------------------------------------
 
-	List<Workflow> build = builder.build(initDescriptor, targetDescriptor);
+	List<Workflow> build = builder.build(null, initDescriptor, targetDescriptor);
 
 	Assert.assertEquals(1, build.size());
     }
@@ -133,7 +133,7 @@ public class BuildedWorkflowCheck {
 
 	// -----------------------------------------------
 
-	List<Workflow> build = builder.build(initDescriptor, targetDescriptor);
+	List<Workflow> build = builder.build(null, initDescriptor, targetDescriptor);
 
 	Assert.assertEquals(0, build.size());
     }
@@ -183,7 +183,7 @@ public class BuildedWorkflowCheck {
 
 	// -----------------------------------------------
 
-	List<Workflow> build = builder.build(initDescriptor, targetDescriptor);
+	List<Workflow> build = builder.build(null, initDescriptor, targetDescriptor);
 
 	Assert.assertEquals(1, build.size());
     }

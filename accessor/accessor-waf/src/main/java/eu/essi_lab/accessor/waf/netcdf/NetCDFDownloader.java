@@ -185,13 +185,8 @@ public class NetCDFDownloader extends DataDownloader {
 	File file;
 	try {
 	    file = NetCDFConnector.getLocalCopy(online.getLinkage(), online.getName());
-	    FileInputStream fis = new FileInputStream(file);
-	    File out = Files.createTempFile(getClass().getName(), ".nc").toFile();
-	    FileOutputStream fos = new FileOutputStream(out);
-	    IOUtils.copy(fis, fos);
-	    fis.close();
-	    fos.close();
-	    return out;
+	    return file;
+	    
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}

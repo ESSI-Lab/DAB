@@ -141,7 +141,7 @@ public class Workflow {
 
 	    dataObject = process.process(resource, dataObject, target);
 
-	    if (tmpFile.exists() && !tmpFile.getPath().contains("change")) {
+	    if (tmpFile.exists() && !tmpFile.getPath().contains("change")&&!tmpFile.getPath().contains("netcdf-connector")) {
 		eu.essi_lab.lib.utils.FileTrash.deleteLater(tmpFile);
 	    }
 
@@ -155,8 +155,10 @@ public class Workflow {
 
 	// updates the data descriptor to the target
 	dataObject.setDataDescriptor(targetDescriptor);
+    if (dataObject.getFile().exists() && !dataObject.getFile().getPath().contains("change")&& !dataObject.getFile().getPath().contains("netcdf-connector")) {
 
 	dataObject.getFile().deleteOnExit();
+    }
 
 	return dataObject;
     }

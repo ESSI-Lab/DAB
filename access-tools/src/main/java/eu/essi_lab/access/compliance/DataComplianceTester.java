@@ -330,7 +330,7 @@ public class DataComplianceTester {
 
 	WorkflowBuilder builder = WorkflowBuilder.createLoadedBuilder();
 
-	List<Workflow> workflows = builder.build(previewDescriptor, targetDescriptor);
+	List<Workflow> workflows = builder.build(null, previewDescriptor, targetDescriptor);
 	report.getWorkflows().addAll(workflows);
 
 	if (!workflows.isEmpty()) {

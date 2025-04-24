@@ -56,7 +56,7 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
 
     private static Logger logger = GSLoggerFactory.getLogger(NCKS_NetCDF_Time_Subset_Processor.class);
 
-    HashMap<Integer, DataObject> cache = new HashMap<Integer, DataObject>();
+    private static HashMap<Integer, DataObject> cache = new HashMap<Integer, DataObject>();
 
     @Override
     public DataObject process(GSResource resource, DataObject dataObject, TargetHandler handler) throws Exception {
@@ -65,15 +65,18 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
 	outputFile.delete();
 
 	if (resource != null && resource.getSource().getEndpoint().contains("i-change")) {
-	    String targetDimension = handler.getTargetTemporalDimension().toString();
+	    String targetDimension = "time-subset-"+handler.getTargetTemporalDimension().toString();
 	    int hash = targetDimension.hashCode();
-	    DataObject ret = cache.get(hash);
-	    if (ret != null) {
+	    DataObject ret = cache.get(hash);	    
+	    if (ret != null&& ret.getFile().exists()) {
 		return ret;
 	    }
 	    String tempDir = System.getProperty("java.io.tmpdir");
 	    File tempFile = new File(tempDir);
 	    outputFile = new File(tempFile, "i-change" + hash + ".nc");
+	    if (outputFile.exists()) {
+	    	outputFile.delete();
+	    }
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Starting temporal subset");
@@ -126,7 +129,7 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
 	ret.setDataDescriptor(outputDescriptor);
 	GSLoggerFactory.getLogger(getClass()).info("Ended temporal subset");
 	if (resource != null && resource.getSource().getEndpoint().contains("i-change")) {
-	    String targetDimension = handler.getTargetTemporalDimension().toString();
+	    String targetDimension = "time-subset-"+handler.getTargetTemporalDimension().toString();
 	    int hash = targetDimension.hashCode();
 	    cache.put(hash, ret);
 	}
