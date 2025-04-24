@@ -57,6 +57,7 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 
     @Override
     public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
+	GSLoggerFactory.getLogger(getClass()).info("Starting CRS converter");
 	File inputFile = dataObject.getFile();
 	File outputFile = File.createTempFile(getClass().getSimpleName(), ".nc");
 	outputFile.deleteOnExit();
@@ -124,6 +125,9 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 	vector.add(crs);
 	outputDescriptor.setCRS(targetCRS);
 	List<DataDimension> spatialDimensions = handler.getTargetSpatialDimensions();
+	if (onlyCRS()) {
+	    spatialDimensions = null;
+	}
 	outputDescriptor.setSpatialDimensions(spatialDimensions);
 	if (spatialDimensions != null && !spatialDimensions.isEmpty()) {
 	    ContinueDimension cd1 = spatialDimensions.get(0).getContinueDimension();
@@ -218,17 +222,20 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 	
 	// needed to group the multi variables created by GDAL
 	DataObject ret2 = GDALNetCDFPostConversionUtils.doBandCorrections(dataObject, ret);
-	
-	ret.getFile().delete();
+	eu.essi_lab.lib.utils.FileTrash.deleteLater(ret.getFile());
 	
 	// copy attributes, because GDAL removes them after transformation from NetCDF to NetCDF
 	DataObject ret3 = GDALNetCDFPostConversionUtils.copyAttributes(dataObject, ret2);
-	
-	ret2.getFile().delete();
+
+	eu.essi_lab.lib.utils.FileTrash.deleteLater(ret2.getFile());
 	
 	dataset.close();
-
+	GSLoggerFactory.getLogger(getClass()).info("Ending CRS converter");
 	return ret3;
+    }
+
+    public boolean onlyCRS() {
+	return false;
     }
 
     /**
@@ -265,17 +272,18 @@ public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 	    options += option + " ";
 	}
 	String command = "gdalwarp " + inputPath + " " + options + " " + outputPath;
+	logger.info("Executing GDAL Runtime: " + command);
+
 	Process ps = rt.exec(command);
 
 	int exitVal = ps.waitFor();
-
+	logger.info("Executed GDAL Runtime: " + command);
 	if (exitVal > 0) {
 
 	    GSLoggerFactory.getLogger(GDAL_NetCDF_CRS_Converter_Processor.class).error(IOStreamUtils.asUTF8String(ps.getErrorStream()));
 
 	}
 
-	logger.info("Executing GDAL Runtime: " + command);
 
     }
 

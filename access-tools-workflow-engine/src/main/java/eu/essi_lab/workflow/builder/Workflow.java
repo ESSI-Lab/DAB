@@ -139,9 +139,10 @@ public class Workflow {
 
 	    File tmpFile = dataObject.getFile();
 
-	    dataObject = process.process(resource,dataObject, target);
-	    if (tmpFile.exists()) {
-		tmpFile.delete();
+	    dataObject = process.process(resource, dataObject, target);
+
+	    if (tmpFile.exists() && !tmpFile.getPath().contains("change")) {
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(tmpFile);
 	    }
 
 	    if (debug) {

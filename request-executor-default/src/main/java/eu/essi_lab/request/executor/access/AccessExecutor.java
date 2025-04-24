@@ -41,8 +41,6 @@ import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.CountSet;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -60,6 +58,10 @@ import eu.essi_lab.request.executor.AbstractAuthorizedExecutor;
 import eu.essi_lab.request.executor.IAccessExecutor;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
+import eu.essi_lab.workflow.blocks.grid.NetCDFOnlyReprojector;
+import eu.essi_lab.workflow.blocks.grid.NetCDFReprojector;
+import eu.essi_lab.workflow.blocks.grid.NetCDF_Grid_TemporalSubsetter;
+import eu.essi_lab.workflow.blocks.grid.NetCDF_To_PNG_FormatConverter;
 import eu.essi_lab.workflow.builder.Workflow;
 import eu.essi_lab.workflow.builder.WorkflowBuilder;
 
@@ -218,7 +220,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		    ACCESS_EXECUTOR_UNABLE_TO_FIND_DATA_DOWNLOADER);
 	}
 
-	DataObject dataObject = retrieveDataObject(resource,downloader, report.getFullDataDescriptor(), targetDescriptor);
+	DataObject dataObject = retrieveDataObject(resource, downloader, report.getFullDataDescriptor(), targetDescriptor);
 
 	if (dataObject == null) {
 
@@ -257,8 +259,8 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
      * @return
      * @throws GSException
      */
-    public DataObject retrieveDataObject(GSResource resource, DataDownloader downloader, DataDescriptor reportDescriptor, DataDescriptor targetDescriptor)
-	    throws GSException {
+    public DataObject retrieveDataObject(GSResource resource, DataDownloader downloader, DataDescriptor reportDescriptor,
+	    DataDescriptor targetDescriptor) throws GSException {
 
 	// first, we ask the downloader which are the updated remote descriptors that it can download.
 	// This is needed as remote descriptors might change over time (e.g. in case of
@@ -364,8 +366,19 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 	    // GSLoggerFactory.getLogger(getClass()).info("Workflow execution STARTED");
 
-	    WorkflowBuilder builder = WorkflowBuilder.createLoadedBuilder();
-	    Optional<Workflow> optWorkflow = builder.buildPreferred(remoteDescriptor, targetDescriptor);
+	    Optional<Workflow> optWorkflow;
+
+	    if (resource != null && resource.getSource().getEndpoint().contains("i-change")) {
+		Workflow workflow = new Workflow();
+		workflow.getWorkblocks().add(new NetCDF_Grid_TemporalSubsetter().build());
+		workflow.getWorkblocks().add(new NetCDFOnlyReprojector().build());
+		workflow.getWorkblocks().add(new NetCDFReprojector().build());
+		workflow.getWorkblocks().add(new NetCDF_To_PNG_FormatConverter().build());
+		optWorkflow = Optional.of(workflow); 
+	    } else {
+		WorkflowBuilder builder = WorkflowBuilder.createLoadedBuilder();
+		optWorkflow = builder.buildPreferred(resource, remoteDescriptor, targetDescriptor);
+	    }
 
 	    if (!optWorkflow.isPresent()) {
 

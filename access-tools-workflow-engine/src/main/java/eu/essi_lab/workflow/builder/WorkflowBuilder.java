@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.workflow.processor.DescriptorUtils;
 import eu.essi_lab.workflow.processor.IdentityProcessor;
@@ -196,9 +197,9 @@ public class WorkflowBuilder {
 	 * @see Workflow#getPreference()
 	 * @see #create(InputDescriptor, OutputDescriptor)
 	 */
-	public Optional<Workflow> buildPreferred(DataDescriptor initDescriptor, DataDescriptor targetDescriptor) {
+	public Optional<Workflow> buildPreferred(GSResource resource,  DataDescriptor initDescriptor, DataDescriptor targetDescriptor) {
 
-		List<Workflow> workflows = build(initDescriptor, targetDescriptor);
+		List<Workflow> workflows = build(resource, initDescriptor, targetDescriptor);
 
 		for (Workflow workflow : workflows) {
 		    Workblock block0 = workflow.getWorkblocks().get(0);
@@ -330,8 +331,8 @@ public class WorkflowBuilder {
 	 * @param targetDescriptor
 	 * @return
 	 */
-	public List<Workflow> build(DataDescriptor initDescriptor, DataDescriptor targetDescriptor) {
-
+	public List<Workflow> build(GSResource resource,  DataDescriptor initDescriptor, DataDescriptor targetDescriptor) {
+	    	GSLoggerFactory.getLogger(getClass()).info("Building workflow");
 		printLog("Building workflow STARTED");
 		ProcessorCapabilities input = DescriptorUtils.fromInputDescriptor(initDescriptor);
 

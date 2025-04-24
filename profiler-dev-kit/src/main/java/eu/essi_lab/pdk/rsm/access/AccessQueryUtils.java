@@ -68,9 +68,9 @@ public class AccessQueryUtils {
 	    Optional<View> view, //
 	    String onlineIdentifier) throws GSException {
 
-	if (requestId != null) {
+	if (onlineIdentifier != null) {
 	    synchronized (resultCache) {
-		ResultSet<GSResource> result = resultCache.get(requestId);
+		ResultSet<GSResource> result = resultCache.get(onlineIdentifier);
 		if (result != null) {
 		    return result;
 		}
@@ -106,7 +106,7 @@ public class AccessQueryUtils {
 	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
 
 	synchronized (resultCache) {
-	    resultCache.put(requestId, resultSet);
+	    resultCache.put(onlineIdentifier, resultSet);
 	}
 
 	return resultSet;

@@ -162,7 +162,8 @@ public class GDALNetCDFPostConversionUtils {
 	    DataObject output = new DataObject();
 	    output.setDataDescriptor(input.getDataDescriptor());
 	    output.setFile(tmpFile);
-	    sourceFile.delete();
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(sourceFile);
+
 
 	    return output;
 
@@ -271,7 +272,7 @@ public class GDALNetCDFPostConversionUtils {
 	    DataObject output = new DataObject();
 	    output.setDataDescriptor(input.getDataDescriptor());
 	    output.setFile(tmpFile);
-	    inputFile.delete();
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(inputFile);
 
 	    return output;
 
