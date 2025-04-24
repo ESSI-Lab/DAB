@@ -244,11 +244,12 @@ public abstract class ConfigRequest {
 
 	    Optional<Date> iso8601ToDate = ISO8601DateTimeUtils.parseISO8601ToDate(value.toString());
 
-	    if (iso8601ToDate.isEmpty() || (value.toString().length() != "YYYY-MM-DDThh:mm:ssZ".length()
-		    && value.toString().length() != "YYYY-MM-DDThh:mm:ss".length())) {
+	    if (iso8601ToDate.isEmpty() || //
+		    (value.toString().length() != "YYYY-MM-DDThh:mm:ssZ".length()
+			    && value.toString().length() != "YYYY-MM-DDThh:mm:ss".length())) {
 
 		throw new IllegalArgumentException("Unsupported value '" + value + "'. Parameter '" + paramName
-			+ "' should be of type ISO8601 date time YYYY-MM-DDThh:mm:ssZ");
+			+ "' should be of type ISO8601 date time: 'YYYY-MM-DDThh:mm:ss' or 'YYYY-MM-DDThh:mm:ssZ'");
 	    }
 
 	    break;

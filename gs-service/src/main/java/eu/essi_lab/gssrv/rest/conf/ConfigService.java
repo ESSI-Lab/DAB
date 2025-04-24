@@ -203,7 +203,7 @@ public class ConfigService {
      */
     private Response handleEditSourceRequest(EditSourceRequest editSourceRequest) {
 
-	IdHolder holder = getHolder(editSourceRequest);
+	SettingIdHolder holder = getHolder(editSourceRequest);
 
 	if (holder.getErrorResponse().isPresent()) {
 
@@ -249,7 +249,7 @@ public class ConfigService {
      */
     private Response handleHarvestSourceRequest(HarvestSchedulingRequest harvestSourceRequest) {
 
-	IdHolder holder = getHolder(harvestSourceRequest);
+	SettingIdHolder holder = getHolder(harvestSourceRequest);
 
 	if (holder.getErrorResponse().isPresent()) {
 
@@ -374,7 +374,7 @@ public class ConfigService {
     /**
      * @author Fabrizio
      */
-    private class IdHolder {
+    private class SettingIdHolder {
 
 	private String settingId;
 	private Response errorResponse;
@@ -382,7 +382,7 @@ public class ConfigService {
 	/**
 	 * @param settingId
 	 */
-	private IdHolder(String settingId) {
+	private SettingIdHolder(String settingId) {
 
 	    this.settingId = settingId;
 	}
@@ -390,7 +390,7 @@ public class ConfigService {
 	/**
 	 * @param response
 	 */
-	private IdHolder(Response response) {
+	private SettingIdHolder(Response response) {
 
 	    errorResponse = response;
 	}
@@ -416,7 +416,7 @@ public class ConfigService {
      * @param request
      * @return
      */
-    private IdHolder getHolder(ConfigRequest request) {
+    private SettingIdHolder getHolder(ConfigRequest request) {
 
 	Optional<String> optSourceId = request.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
 
@@ -424,7 +424,7 @@ public class ConfigService {
 
 	if (!optSourceId.isPresent()) {
 
-	    return new IdHolder(buildErrorResponse(Status.BAD_REQUEST, "Missing source identifier"));
+	    return new SettingIdHolder(buildErrorResponse(Status.BAD_REQUEST, "Missing source identifier"));
 
 	} else {
 
@@ -436,7 +436,7 @@ public class ConfigService {
 		    findFirst().//
 		    isPresent()) {
 
-		return new IdHolder(buildErrorResponse(Status.BAD_REQUEST, "Source with id '" + sourceId + "' no not exists"));
+		return new SettingIdHolder(buildErrorResponse(Status.BAD_REQUEST, "Source with id '" + sourceId + "' no not exists"));
 	    }
 
 	    settingId = ConfigurationWrapper.getHarvestingSettings().//
@@ -447,6 +447,6 @@ public class ConfigService {
 		    getIdentifier();
 	}
 
-	return new IdHolder(settingId);
+	return new SettingIdHolder(settingId);
     }
 }
