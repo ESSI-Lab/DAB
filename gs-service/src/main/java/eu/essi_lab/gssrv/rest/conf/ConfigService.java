@@ -330,6 +330,24 @@ public class ConfigService {
      */
     private Response handleRemoveSourceRequest(RemoveSourceRequest removeSourceRequest) {
 
+	SettingIdHolder holder = getHolder(removeSourceRequest);
+
+	if (holder.getErrorResponse().isPresent()) {
+
+	    return holder.getErrorResponse().get();
+	}
+
+	String settingId = holder.getSettingId().get();
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	boolean removed = configuration.remove(settingId);
+
+	if (!removed) {
+
+	    return buildErrorResponse(Status.NOT_MODIFIED, "Unable to remove source");
+	}
+
 	return Response.status(Status.OK).build();
     }
 
@@ -436,7 +454,7 @@ public class ConfigService {
 		    findFirst().//
 		    isPresent()) {
 
-		return new SettingIdHolder(buildErrorResponse(Status.BAD_REQUEST, "Source with id '" + sourceId + "' no not exists"));
+		return new SettingIdHolder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' no not exists"));
 	    }
 
 	    settingId = ConfigurationWrapper.getHarvestingSettings().//
