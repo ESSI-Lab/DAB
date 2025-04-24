@@ -480,7 +480,18 @@ public class OpenSearchFinder implements DatabaseFinder {
 			sourceIds.size(), //
 			true); // binaries excluded
 
-		aggregateWithNestedAgg.forEach(agg -> {
+		List<String> incrementalSourceIds = Arrays.asList("UUID-2dc3a01b-934e-4c3d-9311-527ac93ec058", //
+			"i-change-coa", //
+			"ASI_PRISMA", //
+			"meteo-tracker"//
+		);
+
+		List<JSONObject> incrementalExcluded = aggregateWithNestedAgg.//
+			stream().//
+			filter(v -> !incrementalSourceIds.contains(v.getString(MetaFolderMapping.SOURCE_ID))).//
+			collect(Collectors.toList());
+
+		incrementalExcluded.forEach(agg -> {
 
 		    String writingFolder = agg.getString(MetaFolderMapping.DATA_FOLDER);
 		    // query folder is opposite of the writing folder
