@@ -26,6 +26,7 @@ import java.util.Date;
 
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.model.resource.data.Datum;
 import eu.essi_lab.model.resource.data.Unit;
@@ -43,7 +44,7 @@ public abstract class AbstractTimeSubsetProcessor extends DataProcessor {
     public abstract File subset(File input, Date timeBegin, LimitType beginType, Date timeEnd, LimitType endType) throws Exception;
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
 
 	DataDimension temporalDimension = handler.getTargetTemporalDimension();
 	Long begin = null;

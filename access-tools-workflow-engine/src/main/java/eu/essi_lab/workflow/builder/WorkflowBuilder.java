@@ -38,6 +38,7 @@ import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.workflow.processor.DescriptorUtils;
 import eu.essi_lab.workflow.processor.IdentityProcessor;
 import eu.essi_lab.workflow.processor.ProcessorCapabilities;
+import eu.essi_lab.workflow.processor.SubsettingCapability;
 
 /**
  * Builds a set of available {@link Workflow}s of minimum length from a supplied
@@ -199,6 +200,15 @@ public class WorkflowBuilder {
 
 		List<Workflow> workflows = build(initDescriptor, targetDescriptor);
 
+		for (Workflow workflow : workflows) {
+		    Workblock block0 = workflow.getWorkblocks().get(0);
+		    SubsettingCapability subCap = block0.getOutput().getSubsettingCapability();
+		    if (subCap!=null &&subCap.getTemporalSubsetting().getFirstValue().equals(Boolean.TRUE)) {
+			return Optional.of(workflow);
+		    }
+
+		}
+		
 		return workflows.stream().//
 				max((w1, w2) -> Integer.compare(w1.getPreference(), w2.getPreference()));
 	}

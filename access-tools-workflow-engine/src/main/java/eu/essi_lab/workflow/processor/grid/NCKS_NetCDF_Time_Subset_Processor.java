@@ -33,6 +33,7 @@ import java.util.List;
 import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
@@ -55,7 +56,7 @@ public class NCKS_NetCDF_Time_Subset_Processor extends DataProcessor {
     private static Logger logger = GSLoggerFactory.getLogger(NCKS_NetCDF_Time_Subset_Processor.class);
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
 	File inputFile = dataObject.getFile();
 	File outputFile = File.createTempFile(getClass().getSimpleName(), ".nc");
 	outputFile.delete();

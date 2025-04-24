@@ -143,7 +143,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 		wrapper, //
 		new RankingStrategy(), //
 		new HashMap<String, String>(), //
-		false,//
+		false, //
 		false);
 
 	Bond bond = null;
@@ -213,6 +213,26 @@ public class OpenSearchFolder implements DatabaseFolder {
 	String id = getEntryId(this, key);
 
 	boolean deleted = wrapper.delete(index, id);
+
+	wrapper.synch();
+
+	return deleted;
+    }
+
+    public boolean remove(List<String> toRemove) throws Exception {
+
+	String index = IndexData.detectIndex(this);
+
+	String folderId = getFolderId(this);
+
+	List<String> entries = new ArrayList<String>();
+
+	for (String r : toRemove) {
+	    String entryId = folderId + "_" + r;
+	    entries.add(entryId);
+	}
+
+	boolean deleted = wrapper.delete(index, entries);
 
 	wrapper.synch();
 
@@ -395,4 +415,5 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	return wrapper.getSource(index, entryId);
     }
+
 }

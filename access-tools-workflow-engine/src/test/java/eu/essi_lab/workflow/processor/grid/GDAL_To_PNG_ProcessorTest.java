@@ -41,7 +41,7 @@ public class GDAL_To_PNG_ProcessorTest {
 	target.setDataFormat(DataFormat.IMAGE_PNG());
 	ProcessorCapabilities capabilities = new ProcessorCapabilities();
 	TargetHandler targetHandler = new TargetHandler(source, target, capabilities);
-	DataObject result = processor.process(input, targetHandler);
+	DataObject result = processor.process(null, input, targetHandler);
 
 	File output = result.getFile();
 	assertTrue(output.length() > 0);

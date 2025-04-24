@@ -25,6 +25,7 @@ import java.io.File;
 
 import com.google.common.io.Files;
 
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataObject;
 
 /**
@@ -50,7 +51,7 @@ public class IdentityProcessor extends DataProcessor {
     }
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource, DataObject dataObject, TargetHandler handler) throws Exception {
 
 	File file = dataObject.getFile();
 	File temp = File.createTempFile("identity", null);

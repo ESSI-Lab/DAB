@@ -77,6 +77,7 @@ import eu.essi_lab.jaxb.wml._2_0.om__2.TimeObjectPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.sams._2_0.ShapeType;
 import eu.essi_lab.jaxb.wml._2_0.swe._2.UnitReference;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.wml._2.JAXBWML2;
 import eu.essi_lab.wml._2.ResultWrapper;
@@ -90,7 +91,7 @@ public class WML11_To_WML20_Processor extends DataProcessor {
     }
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
 
 	File timeSeriesFile = dataObject.getFile();
 
