@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
 
+import javax.persistence.criteria.Join;
+
 import org.json.JSONObject;
 
 /*-
@@ -81,18 +83,34 @@ public class OSCARTask extends AbstractCustomTask {
 	// TODO Auto-generated method stub
 	Optional<String> taskOptions = readTaskOptions(context);
 
-	String settings = null;
+	String tokenName = null;
+	String tokenValue = null;
+	String endpoint = null;
+	String sourceId = null;
+
+
 	if (taskOptions.isPresent()) {
 	    String options = taskOptions.get();
 	    if (options != null) {
-		settings = options;
+		if (options.contains("\n")) {
+		    String[] split = options.split("\n");
+		    if (split.length < 3) {
+			GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
+			return;
+		    }
+		    
+		    String[] token = split[0].trim().split(":");
+		    tokenName = token[0].trim();
+		    tokenValue = token[1].trim();
+		    String[] splittedEndpoint = split[1].trim().split(":");
+		    endpoint = splittedEndpoint[1].trim() + ":" + splittedEndpoint[2].trim();
+		    sourceId = split[2].trim().split(":")[1].trim();
+
+		}
 	    }
 	}
-	String sourceId;
-	if (settings != null) {
-	    sourceId = settings.split(" ")[1];
-	} else {
-	    GSLoggerFactory.getLogger(getClass()).error("missing source id for Duplicated Online Identifiers task");
+	if (tokenName == null || tokenValue == null || endpoint == null || sourceId == null ) {
+	    GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
 	    return;
 	}
 
@@ -117,7 +135,7 @@ public class OSCARTask extends AbstractCustomTask {
 	discoveryMessage.setExcludeResourceBinary(false);
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
 	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-	ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond("argentina-ina");
+	ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
 	discoveryMessage.setPermittedBond(bond);
 	discoveryMessage.setUserBond(bond);
 	discoveryMessage.setNormalizedBond(bond);
@@ -126,11 +144,11 @@ public class OSCARTask extends AbstractCustomTask {
 	discoveryMessage.setSortProperty(ResourceProperty.PRIVATE_ID);
 	SearchAfter searchAfter = null;
 	int i = 0;
-	int start = 0;
+	int start = 1;
 	int pageSize = 50;
 	Downloader downloader = new Downloader();
 	HashMap<String, String> params = new HashMap<String, String>();
-	params.put("X-WMO-WMDR-Token", System.getProperty("WMO_TOKEN"));
+	params.put(tokenName, tokenValue);
 	main: while (true) {
 
 	    GSLoggerFactory.getLogger(getClass()).info("OSCAR task {} at record {}", sourceId, start);
@@ -161,7 +179,7 @@ public class OSCARTask extends AbstractCustomTask {
 		doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
 		HttpRequest postRequest = HttpRequestUtils.build(//
 			MethodWithBody.POST, //
-			System.getProperty("WMO_ENDPOINT"), doc, params);
+			endpoint, doc, params);
 
 		HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
 
