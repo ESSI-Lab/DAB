@@ -34,7 +34,7 @@ public enum TRIGGERWAFVariable {
     RAGWEED_POLLEN("Ragweed pollen","cams_eu_ragweed_pollen_web","Ragweed is a species native to the American continent but has become an invasive species in Europe, causing allergies in many people. The blossom starts in August and its highest pollen season is in September.", "grains/m³"),
     PM2_5("Particulate matter 2.5 (PM2.5)","cams_eu_particulate_matter_2.5um_web","These refer to airborne particles with diameters less than 2.5 micrometers (PM2.5).", "µg/m³"),
     PM10("Particulate matter 10 (PM10)","cams_eu_particulate_matter_10um_web","These refer to airborne particles with diameters less than 10 micrometers (PM10).", "µg/m³"),
-    OZONE("Ozone","cams_eu_ozone_web","A reactive gas composed of three oxygen atoms, ozone is found in both the Earth's upper atmosphere and at ground level.", "kg/m³"),
+    OZONE("Ozone","cams_eu_ozone_web","A reactive gas composed of three oxygen atoms, ozone is found in both the Earth's upper atmosphere and at ground level.", "µg/m³"),
     NO2("Nitrogen dioxide (NO2)","cams_eu_nitrogen_dioxide_web","A significant air pollutant produced mainly from vehicle emissions and industrial processes.", "µg/m³"),
     MUGWORT_POLLEN("Mugwort pollen","cams_eu_mugwort_pollen_web","The AUX provides forecasts for various pollen types, measured in grains per cubic meter.", "grains/m³"),
     GRASS_POLLEN("Grass pollen","cams_eu_grass_pollen_web","The AUX provides forecasts for various pollen types, measured in grains per cubic meter.", "grains/m³"),
