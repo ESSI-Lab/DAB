@@ -59,6 +59,7 @@ import eu.essi_lab.jaxb.wml._2_0.swe._2.UnitReference;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.netcdf.NetCDFAttribute;
 import eu.essi_lab.wml._2.JAXBWML2;
@@ -95,7 +96,7 @@ public class NetCDF_To_WML20_Processor extends DataProcessor {
     private static final String NETCDF_TO_WML_PROCESSOR_ERROR = "NETCDF_TO_WML_PROCESSOR_ERROR";
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
 
 	FeatureDataset dataset = FeatureDatasetFactoryManager.open(FeatureType.STATION, dataObject.getFile().getAbsolutePath(), null, null);
 

@@ -1,5 +1,7 @@
 package eu.essi_lab.workflow.processor;
 
+import eu.essi_lab.model.resource.GSResource;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -60,13 +62,14 @@ public abstract class DataProcessor {
 
     /**
      * Processes the supplied <code>dataObject</code> according to the given <code>handler</code>
+     * @param resource 
      * 
      * @param dataObject
      * @param handler
      * @return
      * @throws Exception
      */
-    public abstract DataObject process(DataObject dataObject, TargetHandler handler) throws Exception;
+    public abstract DataObject process(GSResource resource, DataObject dataObject, TargetHandler handler) throws Exception;
 
     /**
      * @param outputCap

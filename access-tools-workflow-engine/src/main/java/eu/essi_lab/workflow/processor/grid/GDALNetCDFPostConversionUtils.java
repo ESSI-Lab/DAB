@@ -61,7 +61,7 @@ public class GDALNetCDFPostConversionUtils {
      * @return
      * @throws GSException
      */
-    public static DataObject copyAttributes(DataObject source, DataObject input) throws GSException {
+    public static DataObject copyAttributes(DataObject source, DataObject input,String outputFileName) throws GSException {
 	try {
 
 	    DataDescriptor sourceDescriptor = source.getDataDescriptor();
@@ -87,9 +87,8 @@ public class GDALNetCDFPostConversionUtils {
 		mainVariablesMap.put(mainVariable.getShortName(), mainVariable);
 	    }
 
-	    File tmpFile = File.createTempFile("GDAL_To_NetCDF_Processor", ".nc");
-	    tmpFile.deleteOnExit();
-	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, tmpFile.getAbsolutePath());
+	    
+	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, outputFileName);
 
 	    // global attributes
 	    for (Attribute globalAttribute : sourceReader.getGlobalAttributes()) {
@@ -161,8 +160,11 @@ public class GDALNetCDFPostConversionUtils {
 
 	    DataObject output = new DataObject();
 	    output.setDataDescriptor(input.getDataDescriptor());
-	    output.setFile(tmpFile);
-	    sourceFile.delete();
+	    output.setFile(new File(outputFileName));
+	    if (sourceFile.exists() && !sourceFile.getPath().contains("change")) {
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(sourceFile);
+	    }
+
 
 	    return output;
 
@@ -271,7 +273,7 @@ public class GDALNetCDFPostConversionUtils {
 	    DataObject output = new DataObject();
 	    output.setDataDescriptor(input.getDataDescriptor());
 	    output.setFile(tmpFile);
-	    inputFile.delete();
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(inputFile);
 
 	    return output;
 
@@ -495,13 +497,16 @@ public class GDALNetCDFPostConversionUtils {
 	    } else {
 		FileInputStream fis = new FileInputStream(input.getFile());
 		FileOutputStream fos = new FileOutputStream(tmpFile);
+		DataObject ret = new DataObject();
+		ret.setDataDescriptor(input.getDataDescriptor());
+		
 		IOUtils.copy(fis, fos);
-		input.setFile(tmpFile);
+		ret.setFile(tmpFile);
 		inputDataset.close();
 		sourceDataset.close();
 		fis.close();
 		fos.close();
-		return input;
+		return ret;
 	    }
 
 	} catch (Exception e) {

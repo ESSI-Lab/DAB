@@ -39,7 +39,7 @@ public class WML_1_1ToWML_2_0ProcessTest {
 
 	DataDescriptor wml1Descriptor = wml1Validator.readDataAttributes(dataObject);
 
-	DataObject wml2Object = process.process(dataObject, null);
+	DataObject wml2Object = process.process(null, dataObject, null);
 
 	WML_2_0Validator wml2Validator = new WML_2_0Validator();
 

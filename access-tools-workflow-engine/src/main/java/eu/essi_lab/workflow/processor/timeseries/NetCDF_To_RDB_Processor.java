@@ -33,6 +33,7 @@ import java.util.List;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.workflow.processor.DataProcessor;
 import eu.essi_lab.workflow.processor.TargetHandler;
@@ -65,7 +66,7 @@ public class NetCDF_To_RDB_Processor extends DataProcessor {
     private static final String NETCDF_TO_RDB_ERROR = "NETCDF_TO_RDB_ERROR";
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
 
 	File file = File.createTempFile(getClass().getSimpleName(), ".rdb");
 	file.deleteOnExit();

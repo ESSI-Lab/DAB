@@ -22,6 +22,7 @@ package eu.essi_lab.workflow.processor.grid;
  */
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.Authority;
 import eu.essi_lab.model.resource.data.AxisOrder;
 import eu.essi_lab.model.resource.data.CRS;
@@ -52,230 +54,269 @@ import ucar.nc2.dataset.NetcdfDataset;
  */
 public class GDAL_NetCDF_CRS_Converter_Processor extends DataProcessor {
 
-    private static Logger logger = GSLoggerFactory.getLogger(GDAL_NetCDF_CRS_Converter_Processor.class);
+	private static Logger logger = GSLoggerFactory.getLogger(GDAL_NetCDF_CRS_Converter_Processor.class);
 
-    @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
-	File inputFile = dataObject.getFile();
-	File outputFile = File.createTempFile(getClass().getSimpleName(), ".nc");
-	outputFile.deleteOnExit();
-	DataObject ret = new DataObject();
+	private static HashMap<Integer, DataObject> cache = new HashMap<Integer, DataObject>();
 
-	DataDescriptor inputDescriptor = dataObject.getDataDescriptor();
-	DataDescriptor outputDescriptor = inputDescriptor.clone();
+	@Override
+	public DataObject process(GSResource resource, DataObject dataObject, TargetHandler handler) throws Exception {
+		GSLoggerFactory.getLogger(getClass()).info("Starting CRS converter");
+		File inputFile = dataObject.getFile();
+		File outputFile = File.createTempFile(getClass().getSimpleName(), ".nc");
+		outputFile.deleteOnExit();
+		DataObject ret = new DataObject();
 
-	NetcdfDataset dataset = NetcdfDataset.openDataset(inputFile.getAbsolutePath());
-	List<Variable> variables = dataset.getVariables();
-	String fillValue = null;
-	for (Variable variable : variables) {
-	    Attribute fillAttribute = variable.findAttribute("_FillValue");
-	    if (fillAttribute != null) {
-		if (fillAttribute.getLength() > 0) {
-		    fillValue = "" + fillAttribute.getValue(0);
-		}
-		break;
-	    }
-	}
+		DataDescriptor inputDescriptor = dataObject.getDataDescriptor();
+		DataDescriptor outputDescriptor = inputDescriptor.clone();
 
-
-	Vector<String> vector = new Vector<String>(20, 20);
-	vector.add("-of");
-	vector.add("netCDF");
-
-	CRS sourceCRS = handler.getCurrentCRS();
-
-	if (sourceCRS == null) {
-	    sourceCRS = dataObject.getDataDescriptor().getCRS();
-	}
-	if (sourceCRS != null) {
-	    String crs = sourceCRS.getIdentifier();
-	    if (sourceCRS.getAuthority() != null && sourceCRS.getAuthority().equals(Authority.EPSG)) {
-		crs = "EPSG:" + sourceCRS.getCode();
-	    }
-	    if (crs == null || crs.equals("")) {
-		crs = sourceCRS.getWkt();
-	    }
-	    vector.add("-s_srs");
-	    vector.add(crs);
-	}
-
-	if (fillValue == null) {
-	    fillValue = "-9999.0";
-	}
-	vector.add("-dstnodata");
-	vector.add(fillValue);
-
-	CRS targetCRS = handler.getTargetCRS();
-	if (targetCRS == null) {
-	    targetCRS = handler.getCurrentCRS();
-	}
-	if (targetCRS == null) {
-	    targetCRS = dataObject.getDataDescriptor().getCRS();
-	}
-	String crs = targetCRS.getIdentifier();
-	if (targetCRS.getAuthority() != null && targetCRS.getAuthority().equals(Authority.EPSG)) {
-	    crs = "EPSG:" + targetCRS.getCode();
-	}
-	if (crs == null || crs.equals("")) {
-	    crs = targetCRS.getWkt();
-	}
-	vector.add("-t_srs");
-	vector.add(crs);
-	outputDescriptor.setCRS(targetCRS);
-	List<DataDimension> spatialDimensions = handler.getTargetSpatialDimensions();
-	outputDescriptor.setSpatialDimensions(spatialDimensions);
-	if (spatialDimensions != null && !spatialDimensions.isEmpty()) {
-	    ContinueDimension cd1 = spatialDimensions.get(0).getContinueDimension();
-	    ContinueDimension cd2 = spatialDimensions.get(1).getContinueDimension();
-	    if (cd1 != null && cd2 != null) {
-		boolean neAxisOrder = targetCRS != null && targetCRS.getAxisOrder().equals(AxisOrder.NORTH_EAST);
-		Number res1 = cd1.getResolution();
-		Number res2 = cd2.getResolution();
-		Number lower1 = cd1.getLower();
-		Number upper1 = cd1.getUpper();
-		Number lower2 = cd2.getLower();
-		Number upper2 = cd2.getUpper();
-		Long size1 = cd1.getSize();
-		Long size2 = cd2.getSize();
-		if (res1 == null) {
-		    if (lower1 != null && upper1 != null && size1 != null) {
-			double extent = upper1.doubleValue() - lower1.doubleValue();
-			res1 = extent / (size1 - 1);
-		    }
-		}
-		if (res2 == null) {
-		    if (lower2 != null && upper2 != null && size2 != null) {
-			double extent = upper2.doubleValue() - lower2.doubleValue();
-			res2 = extent / (size2 - 1);
-		    }
+		if (onlyCRS() && resource != null && resource.getSource().getEndpoint().contains("i-change")) {
+			int hash = ("crs-" + inputFile.getAbsoluteFile()).hashCode();
+			DataObject r = cache.get(hash);
+			if (r != null && r.getFile().exists()) {
+				return r;
+			}			
 		}
 
-		if (res1 != null && res2 != null) {
-		    vector.add("-tr");
-		    if (neAxisOrder) {
-			vector.add("" + res2.doubleValue());
-			vector.add("" + res1.doubleValue());
-		    } else {
-			vector.add("" + res1.doubleValue());
-			vector.add("" + res2.doubleValue());
-		    }
-
-		} else {
-		    if (size1 != null && size2 != null) {
-			vector.add("-ts");
-			if (neAxisOrder) {
-			    vector.add("" + size2.longValue());
-			    vector.add("" + size1.longValue());
-			} else {
-			    vector.add("" + size1.longValue());
-			    vector.add("" + size2.longValue());
+		NetcdfDataset dataset = NetcdfDataset.openDataset(inputFile.getAbsolutePath());
+		List<Variable> variables = dataset.getVariables();
+		String fillValue = null;
+		for (Variable variable : variables) {
+			Attribute fillAttribute = variable.findAttribute("_FillValue");
+			if (fillAttribute != null) {
+				if (fillAttribute.getLength() > 0) {
+					fillValue = "" + fillAttribute.getValue(0);
+				}
+				break;
 			}
-		    }
 		}
 
-		if (lower1 != null && lower2 != null && upper1 != null && upper2 != null) {
-		    if (res1 != null && res2 != null) {
-			// the -te parameter considers the total envelope, while our datamodel is based on center grid
-			// points.
-			// half the resolution is added to the exterior grid points to calculate the total envelope
-			double res1_2 = res1.doubleValue() / 2.0;
-			lower1 = lower1.doubleValue() - res1_2;
-			upper1 = upper1.doubleValue() + res1_2;
-			double res2_2 = res2.doubleValue() / 2.0;
-			lower2 = lower2.doubleValue() - res2_2;
-			upper2 = upper2.doubleValue() + res2_2;
-		    }
-		    vector.add("-te");
-		    if (neAxisOrder) {
-			vector.add("" + lower2.doubleValue());
-			vector.add("" + lower1.doubleValue());
-			vector.add("" + upper2.doubleValue());
-			vector.add("" + upper1.doubleValue());
-		    } else {
-			vector.add("" + lower1.doubleValue());
-			vector.add("" + lower2.doubleValue());
-			vector.add("" + upper1.doubleValue());
-			vector.add("" + upper2.doubleValue());
-		    }
+		Vector<String> vector = new Vector<String>(20, 20);
+		vector.add("-of");
+		vector.add("netCDF");
+
+		CRS sourceCRS = handler.getCurrentCRS();
+
+		if (sourceCRS == null) {
+			sourceCRS = dataObject.getDataDescriptor().getCRS();
 		}
-	    }
+		if (sourceCRS != null) {
+			String crs = sourceCRS.getIdentifier();
+			if (sourceCRS.getAuthority() != null && sourceCRS.getAuthority().equals(Authority.EPSG)) {
+				crs = "EPSG:" + sourceCRS.getCode();
+			}
+			if (crs == null || crs.equals("")) {
+				crs = sourceCRS.getWkt();
+			}
+			vector.add("-s_srs");
+			vector.add(crs);
+		}
+
+		if (fillValue == null) {
+			fillValue = "-9999.0";
+		}
+		vector.add("-dstnodata");
+		vector.add(fillValue);
+
+		CRS targetCRS = handler.getTargetCRS();
+		if (targetCRS == null) {
+			targetCRS = handler.getCurrentCRS();
+		}
+		if (targetCRS == null) {
+			targetCRS = dataObject.getDataDescriptor().getCRS();
+		}
+		String crs = targetCRS.getIdentifier();
+		if (targetCRS.getAuthority() != null && targetCRS.getAuthority().equals(Authority.EPSG)) {
+			crs = "EPSG:" + targetCRS.getCode();
+		}
+		if (crs == null || crs.equals("")) {
+			crs = targetCRS.getWkt();
+		}
+		vector.add("-t_srs");
+		vector.add(crs);
+		outputDescriptor.setCRS(targetCRS);
+		List<DataDimension> spatialDimensions = handler.getTargetSpatialDimensions();
+		if (onlyCRS()) {
+			spatialDimensions = null;
+		}
+		outputDescriptor.setSpatialDimensions(spatialDimensions);
+		if (spatialDimensions != null && !spatialDimensions.isEmpty()) {
+			ContinueDimension cd1 = spatialDimensions.get(0).getContinueDimension();
+			ContinueDimension cd2 = spatialDimensions.get(1).getContinueDimension();
+			if (cd1 != null && cd2 != null) {
+				boolean neAxisOrder = targetCRS != null && targetCRS.getAxisOrder().equals(AxisOrder.NORTH_EAST);
+				Number res1 = cd1.getResolution();
+				Number res2 = cd2.getResolution();
+				Number lower1 = cd1.getLower();
+				Number upper1 = cd1.getUpper();
+				Number lower2 = cd2.getLower();
+				Number upper2 = cd2.getUpper();
+				Long size1 = cd1.getSize();
+				Long size2 = cd2.getSize();
+				if (res1 == null) {
+					if (lower1 != null && upper1 != null && size1 != null) {
+						double extent = upper1.doubleValue() - lower1.doubleValue();
+						res1 = extent / (size1 - 1);
+					}
+				}
+				if (res2 == null) {
+					if (lower2 != null && upper2 != null && size2 != null) {
+						double extent = upper2.doubleValue() - lower2.doubleValue();
+						res2 = extent / (size2 - 1);
+					}
+				}
+
+				if (res1 != null && res2 != null) {
+					vector.add("-tr");
+					if (neAxisOrder) {
+						vector.add("" + res2.doubleValue());
+						vector.add("" + res1.doubleValue());
+					} else {
+						vector.add("" + res1.doubleValue());
+						vector.add("" + res2.doubleValue());
+					}
+
+				} else {
+					if (size1 != null && size2 != null) {
+						vector.add("-ts");
+						if (neAxisOrder) {
+							vector.add("" + size2.longValue());
+							vector.add("" + size1.longValue());
+						} else {
+							vector.add("" + size1.longValue());
+							vector.add("" + size2.longValue());
+						}
+					}
+				}
+
+				if (lower1 != null && lower2 != null && upper1 != null && upper2 != null) {
+					if (res1 != null && res2 != null) {
+						// the -te parameter considers the total envelope, while our datamodel is based
+						// on center grid
+						// points.
+						// half the resolution is added to the exterior grid points to calculate the
+						// total envelope
+						double res1_2 = res1.doubleValue() / 2.0;
+						lower1 = lower1.doubleValue() - res1_2;
+						upper1 = upper1.doubleValue() + res1_2;
+						double res2_2 = res2.doubleValue() / 2.0;
+						lower2 = lower2.doubleValue() - res2_2;
+						upper2 = upper2.doubleValue() + res2_2;
+					}
+					vector.add("-te");
+					if (neAxisOrder) {
+						vector.add("" + lower2.doubleValue());
+						vector.add("" + lower1.doubleValue());
+						vector.add("" + upper2.doubleValue());
+						vector.add("" + upper1.doubleValue());
+					} else {
+						vector.add("" + lower1.doubleValue());
+						vector.add("" + lower2.doubleValue());
+						vector.add("" + upper1.doubleValue());
+						vector.add("" + upper2.doubleValue());
+					}
+				}
+			}
+		}
+
+		switch (GDALConstants.IMPLEMENTATION) {
+		case JNI:
+			executeWithJNI(inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), vector);
+			break;
+		case RUNTIME:
+		default:
+			executeWithRuntime(inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), vector);
+			break;
+		}
+
+		ret.setFile(outputFile);
+
+		ret.setDataDescriptor(outputDescriptor);
+
+		// needed to group the multi variables created by GDAL
+		DataObject ret2 = GDALNetCDFPostConversionUtils.doBandCorrections(dataObject, ret);
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(ret.getFile());
+
+		// copy attributes, because GDAL removes them after transformation from NetCDF
+		// to NetCDF
+		File tmpFile = File.createTempFile("GDAL_To_NetCDF_Processor", ".nc");
+	    tmpFile.deleteOnExit();	    
+	    if (onlyCRS() && resource != null && resource.getSource().getEndpoint().contains("i-change")) {
+			int hash = ("crs-" + inputFile.getAbsoluteFile()).hashCode();
+			String tempDir = System.getProperty("java.io.tmpdir");
+			File tempFile = new File(tempDir);
+			tmpFile = new File(tempFile, "i-change" + hash + ".nc");
+			if (tmpFile.exists()) {
+				tmpFile.delete();
+			}
+		}
+	    
+		DataObject ret3 = GDALNetCDFPostConversionUtils.copyAttributes(dataObject, ret2,tmpFile.getAbsolutePath());
+
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(ret2.getFile());
+
+		dataset.close();
+		GSLoggerFactory.getLogger(getClass()).info("Ending CRS converter");
+		if (onlyCRS() && resource != null && resource.getSource().getEndpoint().contains("i-change")) {
+			int hash = ("crs-" + inputFile.getAbsoluteFile()).hashCode();
+
+		    cache.put(hash, ret3);
+		}
+		return ret3;
+	    
 	}
 
-	switch (GDALConstants.IMPLEMENTATION) {
-	case JNI:
-	    executeWithJNI(inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), vector);
-	    break;
-	case RUNTIME:
-	default:
-	    executeWithRuntime(inputFile.getAbsolutePath(), outputFile.getAbsolutePath(), vector);
-	    break;
+	public boolean onlyCRS() {
+		return false;
 	}
 
-	ret.setFile(outputFile);
+	/**
+	 * Calls GDAL using JNI Unfortunately this method doesn't write NetCDF lat lon
+	 * dimensions when the result has no data... because of this use
+	 * executeWithRuntime!
+	 * 
+	 * @param inputPath
+	 * @param outputPath
+	 * @param vector
+	 */
+	protected static void executeWithJNI(String inputPath, String outputPath, Vector<String> vector) {
+		GDALConstants.initJNI();
+		Dataset dataset = gdal.Open(inputPath);
+		GSLoggerFactory.getLogger(GDAL_NetCDF_CRS_Converter_Processor.class).info(vector.toString());
 
-	ret.setDataDescriptor(outputDescriptor);
-	
-	// needed to group the multi variables created by GDAL
-	DataObject ret2 = GDALNetCDFPostConversionUtils.doBandCorrections(dataObject, ret);
-	
-	ret.getFile().delete();
-	
-	// copy attributes, because GDAL removes them after transformation from NetCDF to NetCDF
-	DataObject ret3 = GDALNetCDFPostConversionUtils.copyAttributes(dataObject, ret2);
-	
-	ret2.getFile().delete();
-	
-	dataset.close();
+		logger.info("Executing GDAL JNI Warp: " + vector.toString());
 
-	return ret3;
-    }
-
-    /**
-     * Calls GDAL using JNI
-     * Unfortunately this method doesn't write NetCDF lat lon dimensions when the result has no data... because of this
-     * use executeWithRuntime!
-     * 
-     * @param inputPath
-     * @param outputPath
-     * @param vector
-     */
-    protected static void executeWithJNI(String inputPath, String outputPath, Vector<String> vector) {
-	GDALConstants.initJNI();
-	Dataset dataset = gdal.Open(inputPath);
-	GSLoggerFactory.getLogger(GDAL_NetCDF_CRS_Converter_Processor.class).info(vector.toString());
-
-	logger.info("Executing GDAL JNI Warp: " + vector.toString());
-
-	gdal.Warp(outputPath, new Dataset[] { dataset }, new WarpOptions(vector));
-    }
-
-    /**
-     * Calls GDAL directly
-     * 
-     * @param inputPath
-     * @param outputPath
-     * @param vector
-     * @throws Exception
-     */
-    protected static void executeWithRuntime(String inputPath, String outputPath, Vector<String> vector) throws Exception {
-	Runtime rt = Runtime.getRuntime();
-	String options = "";
-	for (String option : vector) {
-	    options += option + " ";
-	}
-	String command = "gdalwarp " + inputPath + " " + options + " " + outputPath;
-	Process ps = rt.exec(command);
-
-	int exitVal = ps.waitFor();
-
-	if (exitVal > 0) {
-
-	    GSLoggerFactory.getLogger(GDAL_NetCDF_CRS_Converter_Processor.class).error(IOStreamUtils.asUTF8String(ps.getErrorStream()));
-
+		gdal.Warp(outputPath, new Dataset[] { dataset }, new WarpOptions(vector));
 	}
 
-	logger.info("Executing GDAL Runtime: " + command);
+	/**
+	 * Calls GDAL directly
+	 * 
+	 * @param inputPath
+	 * @param outputPath
+	 * @param vector
+	 * @throws Exception
+	 */
+	protected static void executeWithRuntime(String inputPath, String outputPath, Vector<String> vector)
+			throws Exception {
+		Runtime rt = Runtime.getRuntime();
+		String options = "";
+		for (String option : vector) {
+			options += option + " ";
+		}
+		String command = "gdalwarp " + inputPath + " " + options + " " + outputPath;
+		logger.info("Executing GDAL Runtime: " + command);
 
-    }
+		Process ps = rt.exec(command);
+
+		int exitVal = ps.waitFor();
+		logger.info("Executed GDAL Runtime: " + command);
+		if (exitVal > 0) {
+
+			GSLoggerFactory.getLogger(GDAL_NetCDF_CRS_Converter_Processor.class)
+					.error(IOStreamUtils.asUTF8String(ps.getErrorStream()));
+
+		}
+
+	}
 
 }

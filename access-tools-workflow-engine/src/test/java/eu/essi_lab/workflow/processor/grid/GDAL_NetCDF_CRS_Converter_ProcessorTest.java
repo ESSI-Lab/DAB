@@ -64,7 +64,7 @@ public class GDAL_NetCDF_CRS_Converter_ProcessorTest {
 
 		GDALConstants.IMPLEMENTATION = Implementation.RUNTIME;
 
-		DataObject result = processor.process(object, handler);
+		DataObject result = processor.process(null, object, handler);
 		File outputFile2 = result.getFile();
 		System.out.println(outputFile2.getAbsolutePath());
 		

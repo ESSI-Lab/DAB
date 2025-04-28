@@ -33,6 +33,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.workflow.processor.DataProcessor;
@@ -88,7 +89,7 @@ public class Workflow {
      * @throws Exception
      * @see #getWorkblocks()
      */
-    public DataObject execute(DataObject dataObject, DataDescriptor targetDescriptor) throws Exception {
+    public DataObject execute(GSResource resource, DataObject dataObject, DataDescriptor targetDescriptor) throws Exception {
 
 	ProcessorCapabilities currentCap = DescriptorUtils.fromInputDescriptor(dataObject.getDataDescriptor());
 	ProcessorCapabilities targetCap = DescriptorUtils.fromTargetDescriptor(//
@@ -138,9 +139,10 @@ public class Workflow {
 
 	    File tmpFile = dataObject.getFile();
 
-	    dataObject = process.process(dataObject, target);
-	    if (tmpFile.exists()) {
-		tmpFile.delete();
+	    dataObject = process.process(resource, dataObject, target);
+
+	    if (tmpFile.exists() && !tmpFile.getPath().contains("change")&&!tmpFile.getPath().contains("netcdf-connector")) {
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(tmpFile);
 	    }
 
 	    if (debug) {
@@ -153,8 +155,10 @@ public class Workflow {
 
 	// updates the data descriptor to the target
 	dataObject.setDataDescriptor(targetDescriptor);
+    if (dataObject.getFile().exists() && !dataObject.getFile().getPath().contains("change")&& !dataObject.getFile().getPath().contains("netcdf-connector")) {
 
 	dataObject.getFile().deleteOnExit();
+    }
 
 	return dataObject;
     }

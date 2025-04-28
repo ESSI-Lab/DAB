@@ -54,7 +54,7 @@ public class NetCDFToWML_2_0ProcessTest {
     }
 
     private void commonTest() throws Exception {
-	DataObject wmlObject = process.process(dataObject, null);
+	DataObject wmlObject = process.process(null, dataObject, null);
 
 	WML_2_0Validator validator = new WML_2_0Validator();
 

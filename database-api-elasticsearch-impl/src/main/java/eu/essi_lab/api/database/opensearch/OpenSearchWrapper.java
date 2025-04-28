@@ -58,6 +58,8 @@ import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregate;
 import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation;
 import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.Builder;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.BulkRequest;
+import org.opensearch.client.opensearch.core.BulkResponse;
 import org.opensearch.client.opensearch.core.CountRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryResponse;
@@ -72,6 +74,7 @@ import org.opensearch.client.opensearch.core.MsearchRequest;
 import org.opensearch.client.opensearch.core.MsearchResponse;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.bulk.BulkOperation;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchResponseItem;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
 import org.opensearch.client.opensearch.core.search.Hit;
@@ -656,6 +659,33 @@ public class OpenSearchWrapper {
 	synch();
 
 	return response.result() == Result.Deleted;
+    }
+
+    public boolean delete(String index, List<String> entries) throws OpenSearchException, IOException {
+
+	List<BulkOperation> operations = new ArrayList<>();
+	for (String id : entries) {
+	    operations.add(BulkOperation.of(b -> b.delete(d -> d.index(index).id(id))));
+	}
+
+	BulkRequest bulkRequest = new BulkRequest.Builder().operations(operations).build();
+
+	BulkResponse response = client.bulk(bulkRequest);
+
+	synch();
+
+	if (response.errors()) {
+
+	    response.items().forEach(item -> {
+		if (item.error() != null) {
+		    GSLoggerFactory.getLogger(getClass()).error("Failed to delete document ID {}: {}", item.id(), item.error().reason());
+		}
+	    });
+	    return false;
+	} else {
+	    return true;
+	}
+
     }
 
     /**

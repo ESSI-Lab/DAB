@@ -1,4 +1,4 @@
-package eu.essi_lab.accessor.sensorthings._1_1;
+package eu.essi_lab.workflow.processor.grid;
 
 /*-
  * #%L
@@ -21,37 +21,16 @@ package eu.essi_lab.accessor.sensorthings._1_1;
  * #L%
  */
 
-import eu.essi_lab.adk.harvest.HarvestedAccessor;
-
 /**
- * @author Fabrizio
+ * Using GDAL, this processor converts CRS only of the given NetCDF
+ * 
+ * @author boldrini
  */
-public class SensorThingsAccessor extends HarvestedAccessor<SensorThingsConnector> {
-
-	public SensorThingsAccessor() {
-		
-	}
-    /**
-     * 
-     * 
-     */
-    public static final String TYPE = "SensorThings_1_1";
+public class GDAL_NetCDF_CRS_Only_Converter_Processor extends GDAL_NetCDF_CRS_Converter_Processor {
 
     @Override
-    protected String initSettingName() {
-
-	return "SensorThings Accessor v.1.1";
+    public boolean onlyCRS() {
+	return true;
     }
 
-    @Override
-    protected String initAccessorType() {
-
-	return TYPE;
-    }
-
-    @Override
-    protected SensorThingsConnectorSetting initHarvestedConnectorSetting() {
-
-	return new SensorThingsConnectorSetting();
-    }
 }
