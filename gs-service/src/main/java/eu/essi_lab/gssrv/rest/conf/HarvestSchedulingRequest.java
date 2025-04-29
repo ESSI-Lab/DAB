@@ -41,6 +41,7 @@ public class HarvestSchedulingRequest extends PutSourceRequest {
     public static final String START_TIME = "startTime";
     public static final String REPEAT_INTERVAL = "repeatInterval";
     public static final String REPEAT_INTERVAL_UNIT = "repeatIntervalUnit";
+    public static final String REPEAT_COUNT = "repeatCount";
 
     /**
      * @author Fabrizio
@@ -88,6 +89,43 @@ public class HarvestSchedulingRequest extends PutSourceRequest {
     }
 
     /**
+     * @author Fabrizio
+     */
+    public enum RepeatCount implements LabeledEnum {
+
+	/**
+	 * 
+	 */
+	ONCE("Once"),
+	/**
+	 * 
+	 */
+	INDEFINITELY("Indefinitely");
+
+	private String label;
+
+	/**
+	 * @param label
+	 */
+	private RepeatCount(String label) {
+
+	    this.label = label;
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return label;
+	}
+
+	@Override
+	public String toString() {
+
+	    return getLabel();
+	}
+    }
+
+    /**
      * 
      */
     public HarvestSchedulingRequest() {
@@ -108,6 +146,9 @@ public class HarvestSchedulingRequest extends PutSourceRequest {
 
 	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
 	list.add(Parameter.of(START_TIME, ContentType.ISO8601_DATE_TIME, false));
+
+	list.add(Parameter.of(REPEAT_COUNT, ContentType.TEXTUAL, RepeatCount.class, true));
+
 	list.add(Parameter.of(REPEAT_INTERVAL, ContentType.INTEGER, false));
 	list.add(Parameter.of(REPEAT_INTERVAL_UNIT, ContentType.TEXTUAL, RepeatIntervalUnit.class, false));
 
@@ -121,16 +162,34 @@ public class HarvestSchedulingRequest extends PutSourceRequest {
 
 	List<String> parameters = readParameters();
 
-	if (!parameters.contains(REPEAT_INTERVAL) && parameters.contains(REPEAT_INTERVAL_UNIT)) {
+	if (parameters.contains(REPEAT_COUNT) && read(REPEAT_COUNT).get().equals(RepeatCount.INDEFINITELY.getLabel())) {
 
-	    throw new IllegalArgumentException(
-		    "Missing parameter 'repeatInterval' which is mandatory when 'repeatIntervalUnit' is provided");
+	    if (!parameters.contains(REPEAT_INTERVAL) && !parameters.contains(REPEAT_INTERVAL_UNIT)) {
+
+		throw new IllegalArgumentException("Missing parameters '" + REPEAT_INTERVAL + "' and " + REPEAT_INTERVAL_UNIT
+			+ "' which are mandatory when '" + REPEAT_COUNT + "' is '" + RepeatCount.INDEFINITELY.getLabel() + "'");
+	    }
+
+	    if (!parameters.contains(REPEAT_INTERVAL) && parameters.contains(REPEAT_INTERVAL_UNIT)) {
+
+		throw new IllegalArgumentException("Missing parameter '" + REPEAT_INTERVAL + "' which is mandatory when '" + REPEAT_COUNT
+			+ "' is '" + RepeatCount.INDEFINITELY.getLabel() + "'");
+	    }
+
+	    if (parameters.contains(REPEAT_INTERVAL) && !parameters.contains(REPEAT_INTERVAL_UNIT)) {
+
+		throw new IllegalArgumentException("Missing parameter '" + REPEAT_INTERVAL + "' which is mandatory when '" + REPEAT_COUNT
+			+ "' is '" + RepeatCount.INDEFINITELY.getLabel() + "'");
+	    }
 	}
 
-	if (parameters.contains(REPEAT_INTERVAL) && !parameters.contains(REPEAT_INTERVAL_UNIT)) {
+	if (parameters.contains(REPEAT_COUNT) && read(REPEAT_COUNT).get().equals(RepeatCount.ONCE.getLabel())) {
 
-	    throw new IllegalArgumentException(
-		    "Missing parameter 'repeatIntervalUnit' which is mandatory when 'repeatInterval' is provided");
+	    if (parameters.contains(REPEAT_INTERVAL) || parameters.contains(REPEAT_INTERVAL_UNIT)) {
+
+		throw new IllegalArgumentException("Parameters '" + REPEAT_INTERVAL + "' and '" + REPEAT_INTERVAL_UNIT
+			+ "' must be omitted when " + REPEAT_COUNT + "' is '" + RepeatCount.ONCE.getLabel() + "'");
+	    }
 	}
     }
 }

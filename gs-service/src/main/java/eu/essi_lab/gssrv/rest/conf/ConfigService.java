@@ -290,7 +290,7 @@ public class ConfigService {
 
 	if (!replaced) {
 
-	    return buildErrorResponse(Status.NOT_MODIFIED, "Unable to edit source");
+	    return buildErrorResponse(Status.NOT_MODIFIED, "Scheduling not modified");
 
 	} else {
 
