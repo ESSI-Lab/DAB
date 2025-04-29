@@ -59,13 +59,12 @@ public abstract class ConfigRequest {
     }
 
     /**
-     * 
      * @param clazz
      * @return
      */
     static String computeName(Class<? extends ConfigRequest> clazz) {
-	
-	return clazz.getSimpleName().replace("Request", ""); 
+
+	return clazz.getSimpleName().replace("Request", "");
     }
 
     /**
@@ -157,6 +156,14 @@ public abstract class ConfigRequest {
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * @return the object
+     */
+    public JSONObject getObject() {
+
+	return object;
     }
 
     /**

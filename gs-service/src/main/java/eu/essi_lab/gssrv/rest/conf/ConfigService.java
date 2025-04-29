@@ -4,6 +4,7 @@
 package eu.essi_lab.gssrv.rest.conf;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -159,6 +160,8 @@ public class ConfigService {
 
 	Optional<String> optSourceId = putSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
 
+	Optional<String> randomId = Optional.empty();
+
 	if (optSourceId.isPresent()) {
 
 	    String sourceId = optSourceId.get();
@@ -174,7 +177,9 @@ public class ConfigService {
 
 	} else {
 
-	    putSourceRequest.put(PutSourceRequest.SOURCE_ID, UUID.randomUUID().toString());
+	    randomId = Optional.of(UUID.randomUUID().toString());
+
+	    putSourceRequest.put(PutSourceRequest.SOURCE_ID, randomId.get());
 	}
 
 	HarvestingSetting setting = HarvestingSettingUtils.build(putSourceRequest);
@@ -201,8 +206,18 @@ public class ConfigService {
 	    }
 	}
 
+	if (randomId.isPresent()) {
+
+	    JSONObject object = new JSONObject();
+	    object.put(PutSourceRequest.SOURCE_ID, randomId.get());
+
+	    return Response.status(Status.CREATED).//
+		    entity(object.toString(3)).//
+		    type(MediaType.APPLICATION_JSON.toString()).//
+		    build();
+	}
+
 	return Response.status(Status.CREATED).//
-		entity(putSourceRequest.toString()).//
 		type(MediaType.APPLICATION_JSON.toString()).//
 		build();
     }
@@ -231,7 +246,7 @@ public class ConfigService {
 
 	if (!replaced) {
 
-	    return buildErrorResponse(Status.NOT_MODIFIED, "Unable to edit source");
+	    return buildErrorResponse(Status.NOT_MODIFIED, "Source not modified");
 
 	} else {
 
@@ -248,7 +263,6 @@ public class ConfigService {
 	}
 
 	return Response.status(Status.OK).//
-		entity(editSourceRequest.toString()).//
 		type(MediaType.APPLICATION_JSON.toString()).//
 		build();
     }
@@ -368,7 +382,7 @@ public class ConfigService {
 
 	SchedulerSupport support = SchedulerSupport.getInstance();
 	support.update();
-	
+
 	List<HarvestingSetting> settings = ConfigurationWrapper.getHarvestingSettings();
 
 	JSONArray out = new JSONArray();
