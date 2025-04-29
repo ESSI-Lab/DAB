@@ -367,7 +367,8 @@ public class ConfigService {
     private Response handleListSourcesRequest() {
 
 	SchedulerSupport support = SchedulerSupport.getInstance();
-
+	support.update();
+	
 	List<HarvestingSetting> settings = ConfigurationWrapper.getHarvestingSettings();
 
 	JSONArray out = new JSONArray();
