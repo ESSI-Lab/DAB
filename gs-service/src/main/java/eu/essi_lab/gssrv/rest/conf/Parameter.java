@@ -40,6 +40,7 @@ public class Parameter {
     private boolean mandatory;
     private InputPattern pattern;
     private Class<? extends LabeledEnum> enum_;
+    private String parent;
 
     /**
      * @param name
@@ -63,6 +64,45 @@ public class Parameter {
     public static Parameter of(String name, ContentType type, Class<? extends LabeledEnum> enum_, boolean mandatory) {
 
 	return new Parameter(name, type, enum_, mandatory);
+    }
+
+    /**
+     * @param parent
+     * @param name
+     * @param type
+     * @param pattern
+     * @param mandatory
+     * @return
+     */
+    public static Parameter of(String parent, String name, ContentType type, InputPattern pattern, boolean mandatory) {
+
+	return new Parameter(parent, name, type, pattern, mandatory);
+    }
+
+    /**
+     * @param parent
+     * @param name
+     * @param type
+     * @param mandatory
+     * @return
+     */
+    public static Parameter of(String parent, String name, ContentType type, boolean mandatory) {
+
+	return new Parameter(parent, name, type, mandatory);
+
+    }
+
+    /**
+     * @param parent
+     * @param name
+     * @param type
+     * @param enum_
+     * @param mandatory
+     * @return
+     */
+    public static Parameter of(String parent, String name, ContentType type, Class<? extends LabeledEnum> enum_, boolean mandatory) {
+
+	return new Parameter(parent, name, type, enum_, mandatory);
     }
 
     /**
@@ -117,11 +157,61 @@ public class Parameter {
     }
 
     /**
+     * @param name
+     * @param type
+     * @param mandatory
+     */
+    public Parameter(String parent, String name, ContentType type, boolean mandatory) {
+
+	this.parent = parent;
+	this.name = name;
+	this.type = type;
+	this.mandatory = mandatory;
+    }
+
+    /**
+     * @param name
+     * @param type
+     * @param mandatory
+     */
+    public Parameter(String parent, String name, ContentType type, InputPattern pattern, boolean mandatory) {
+
+	this.parent = parent;
+	this.name = name;
+	this.type = type;
+	this.pattern = pattern;
+	this.mandatory = mandatory;
+    }
+
+    /**
+     * @param name
+     * @param type
+     * @param enum_
+     * @param mandatory
+     */
+    public Parameter(String parent, String name, ContentType type, Class<? extends LabeledEnum> enum_, boolean mandatory) {
+
+	this.parent = parent;
+	this.name = name;
+	this.type = type;
+	this.enum_ = enum_;
+	this.mandatory = mandatory;
+    }
+
+    /**
      * @return
      */
     public Optional<InputPattern> getInputPattern() {
 
 	return Optional.ofNullable(pattern);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getParent() {
+
+	return Optional.ofNullable(parent);
     }
 
     /**
