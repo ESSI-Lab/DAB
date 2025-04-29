@@ -53,9 +53,19 @@ public abstract class ConfigRequest {
 
 	object = new JSONObject();
 
-	object.put("request", getClass().getSimpleName());
+	object.put("request", computeName(getClass()));
 
 	object.put("parameters", new JSONObject());
+    }
+
+    /**
+     * 
+     * @param clazz
+     * @return
+     */
+    static String computeName(Class<? extends ConfigRequest> clazz) {
+	
+	return clazz.getSimpleName().replace("Request", ""); 
     }
 
     /**

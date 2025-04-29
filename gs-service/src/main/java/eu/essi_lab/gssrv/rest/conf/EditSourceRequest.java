@@ -55,7 +55,7 @@ public class EditSourceRequest extends PutSourceRequest {
 
 	return supportedParameters.//
 		stream().// sourceId is mandatory in this request
-		map(p -> p.getName().equals("sourceId") ? Parameter.of(p.getName(), p.getContentType(), p.getInputPattern().get(), true)
+		map(p -> p.getName().equals(SOURCE_ID) ? Parameter.of(p.getName(), p.getContentType(), p.getInputPattern().get(), true)
 			: p)
 		.//
 		collect(Collectors.toList());

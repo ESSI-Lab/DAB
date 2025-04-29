@@ -33,7 +33,7 @@ public class EditSourceRequestTest {
 		parameters.get(0));
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_LABEL, ContentType.TEXTUAL, true), parameters.get(1));
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_ENDPOINT, ContentType.TEXTUAL, true), parameters.get(2));
-	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_TYPE, ContentType.TEXTUAL, SourceType.class, true), parameters.get(3));
+	Assert.assertEquals(Parameter.of(PutSourceRequest.SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, true), parameters.get(3));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class EditSourceRequestTest {
 
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
     }
@@ -56,7 +56,7 @@ public class EditSourceRequestTest {
 	request.put(PutSourceRequest.SOURCE_ID, "sourceId");
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
-	request.put(PutSourceRequest.SOURCE_TYPE, SourceType.WCS_111.getLabel());
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
 
 	request.validate();
     }

@@ -49,7 +49,7 @@ public class HarvestingSettingUtils {
      */
     public static HarvestingSetting build(PutSourceRequest request) {
 
-	String type = request.read(PutSourceRequest.SOURCE_TYPE).get().toString();
+	String type = request.read(PutSourceRequest.SERVICE_TYPE).get().toString();
 
 	SourceType sourceType = LabeledEnum.valueOf(SourceType.class, type).get();
 

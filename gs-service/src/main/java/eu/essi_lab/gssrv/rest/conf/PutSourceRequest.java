@@ -38,10 +38,10 @@ import eu.essi_lab.model.Queryable.ContentType;
  */
 public class PutSourceRequest extends ConfigRequest {
 
-    public static final String SOURCE_ID = "sourceId";
-    public static final String SOURCE_LABEL = "sourceLabel";
-    public static final String SOURCE_ENDPOINT = "sourceEndpoint";
-    public static final String SOURCE_TYPE = "sourceType";
+    public static final String SOURCE_ID = "id";
+    public static final String SOURCE_LABEL = "label";
+    public static final String SOURCE_ENDPOINT = "endpoint";
+    public static final String SERVICE_TYPE = "serviceType";
 
     /**
      * @author Fabrizio
@@ -124,7 +124,7 @@ public class PutSourceRequest extends ConfigRequest {
 	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false));
 	list.add(Parameter.of(SOURCE_LABEL, ContentType.TEXTUAL, true));
 	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, true));
-	list.add(Parameter.of(SOURCE_TYPE, ContentType.TEXTUAL, SourceType.class, true));
+	list.add(Parameter.of(SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, true));
 
 	return list;
     }
