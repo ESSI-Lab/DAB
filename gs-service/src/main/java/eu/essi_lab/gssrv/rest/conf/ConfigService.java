@@ -4,6 +4,7 @@
 package eu.essi_lab.gssrv.rest.conf;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,13 +20,16 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
+import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.SettingUtils;
@@ -33,6 +37,7 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.model.GSSource;
 
 /*-
  * #%L
@@ -102,7 +107,7 @@ public class ConfigService {
 
 	String requestName = optRequestName.get();
 
-	if (requestName.equals(PutSourceRequest.class.getSimpleName())) {
+	if (requestName.equals(ConfigRequest.computeName(PutSourceRequest.class))) {
 
 	    PutSourceRequest request = new PutSourceRequest(requestObject);
 
@@ -111,7 +116,7 @@ public class ConfigService {
 	    return validate.isPresent() ? validate.get() : handlePutSourceRequest(request);
 	}
 
-	if (requestName.equals(EditSourceRequest.class.getSimpleName())) {
+	if (requestName.equals(ConfigRequest.computeName(EditSourceRequest.class))) {
 
 	    EditSourceRequest request = new EditSourceRequest(requestObject);
 
@@ -120,7 +125,7 @@ public class ConfigService {
 	    return validate.isPresent() ? validate.get() : handleEditSourceRequest(request);
 	}
 
-	if (requestName.equals(HarvestSchedulingRequest.class.getSimpleName())) {
+	if (requestName.equals(ConfigRequest.computeName(HarvestSchedulingRequest.class))) {
 
 	    HarvestSchedulingRequest request = new HarvestSchedulingRequest(requestObject);
 
@@ -129,13 +134,18 @@ public class ConfigService {
 	    return validate.isPresent() ? validate.get() : handleHarvestSourceRequest(request);
 	}
 
-	if (requestName.equals(RemoveSourceRequest.class.getSimpleName())) {
+	if (requestName.equals(ConfigRequest.computeName(RemoveSourceRequest.class))) {
 
 	    RemoveSourceRequest request = new RemoveSourceRequest(requestObject);
 
 	    Optional<Response> validate = validate(request);
 
 	    return validate.isPresent() ? validate.get() : handleRemoveSourceRequest(request);
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(ListSourcesRequest.class))) {
+
+	    return handleListSourcesRequest();
 	}
 
 	return buildErrorResponse(Status.BAD_REQUEST, "Unknown request '" + requestName + "'");
@@ -349,6 +359,93 @@ public class ConfigService {
 	}
 
 	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @return
+     */
+    private Response handleListSourcesRequest() {
+
+	SchedulerSupport support = SchedulerSupport.getInstance();
+
+	List<HarvestingSetting> settings = ConfigurationWrapper.getHarvestingSettings();
+
+	JSONArray out = new JSONArray();
+
+	settings.forEach(setting -> {
+
+	    AccessorSetting accessorSetting = setting.getSelectedAccessorSetting();
+
+	    GSSource source = accessorSetting.getSource();
+
+	    JSONObject sourceObject = new JSONObject();
+	    out.put(sourceObject);
+
+	    sourceObject.put(PutSourceRequest.SOURCE_ID, source.getUniqueIdentifier());
+	    sourceObject.put(PutSourceRequest.SOURCE_LABEL, source.getLabel());
+	    sourceObject.put(PutSourceRequest.SOURCE_ENDPOINT, source.getEndpoint());
+	    sourceObject.put(PutSourceRequest.SERVICE_TYPE, accessorSetting.getAccessorType());
+
+	    JSONObject scheduling = new JSONObject();
+
+	    String jobPhase = support.getJobPhase(setting);
+	    if (!jobPhase.isEmpty()) {
+
+		scheduling.put("phase", jobPhase);
+	    }
+
+	    String elapsedTime = support.getElapsedTime(setting);
+	    if (!elapsedTime.isEmpty()) {
+
+		scheduling.put("elapsedTime", elapsedTime);
+	    }
+
+	    String endTime = support.getEndTime(setting);
+	    if (!endTime.isEmpty()) {
+
+		scheduling.put("endTime", endTime);
+	    }
+
+	    String firedTime = support.getFiredTime(setting);
+	    if (!firedTime.isEmpty()) {
+
+		scheduling.put("firedTime", firedTime);
+	    }
+
+	    String nextFireTime = support.getNextFireTime(setting);
+	    if (!nextFireTime.isEmpty()) {
+
+		scheduling.put("nextFireTime", nextFireTime);
+	    }
+
+	    String repeatCount = support.getRepeatCount(setting);
+	    if (!repeatCount.isEmpty()) {
+
+		scheduling.put("repeatCount", repeatCount);
+	    }
+
+	    String repeatInterval = support.getRepeatInterval(setting);
+	    if (!repeatInterval.isEmpty()) {
+
+		scheduling.put("repeatInterval", repeatInterval);
+	    }
+
+	    String size = support.getSize(setting);
+	    if (!size.isEmpty()) {
+
+		scheduling.put("size", size);
+	    }
+
+	    if (!scheduling.keySet().isEmpty()) {
+
+		sourceObject.put("scheduling", scheduling);
+	    }
+	});
+
+	return Response.status(Status.OK).//
+		entity(out.toString(3)).//
+		type(MediaType.APPLICATION_JSON.toString()).//
+		build();
     }
 
     /**
