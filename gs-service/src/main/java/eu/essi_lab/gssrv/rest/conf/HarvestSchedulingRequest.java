@@ -145,10 +145,9 @@ public class HarvestSchedulingRequest extends PutSourceRequest {
 	ArrayList<Parameter> list = new ArrayList<>();
 
 	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
+
 	list.add(Parameter.of(START_TIME, ContentType.ISO8601_DATE_TIME, false));
-
 	list.add(Parameter.of(REPEAT_COUNT, ContentType.TEXTUAL, RepeatCount.class, true));
-
 	list.add(Parameter.of(REPEAT_INTERVAL, ContentType.INTEGER, false));
 	list.add(Parameter.of(REPEAT_INTERVAL_UNIT, ContentType.TEXTUAL, RepeatIntervalUnit.class, false));
 
@@ -160,9 +159,17 @@ public class HarvestSchedulingRequest extends PutSourceRequest {
 
 	super.mandatoryCheck();
 
-	List<String> parameters = readParameters();
+	mandatoryCheck(this);
+    }
 
-	if (parameters.contains(REPEAT_COUNT) && read(REPEAT_COUNT).get().equals(RepeatCount.INDEFINITELY.getLabel())) {
+    /**
+     * @param parameters
+     */
+    static void mandatoryCheck(HarvestSchedulingRequest request) {
+
+	List<String> parameters = request.readParameters();
+
+	if (parameters.contains(REPEAT_COUNT) && request.read(REPEAT_COUNT).get().equals(RepeatCount.INDEFINITELY.getLabel())) {
 
 	    if (!parameters.contains(REPEAT_INTERVAL) && !parameters.contains(REPEAT_INTERVAL_UNIT)) {
 
@@ -183,7 +190,7 @@ public class HarvestSchedulingRequest extends PutSourceRequest {
 	    }
 	}
 
-	if (parameters.contains(REPEAT_COUNT) && read(REPEAT_COUNT).get().equals(RepeatCount.ONCE.getLabel())) {
+	if (parameters.contains(REPEAT_COUNT) && request.read(REPEAT_COUNT).get().equals(RepeatCount.ONCE.getLabel())) {
 
 	    if (parameters.contains(REPEAT_INTERVAL) || parameters.contains(REPEAT_INTERVAL_UNIT)) {
 

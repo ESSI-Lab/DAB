@@ -30,6 +30,8 @@ import java.util.List;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.gssrv.rest.conf.HarvestSchedulingRequest.RepeatCount;
+import eu.essi_lab.gssrv.rest.conf.HarvestSchedulingRequest.RepeatIntervalUnit;
 import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.Queryable.ContentType;
 
@@ -42,6 +44,7 @@ public class PutSourceRequest extends ConfigRequest {
     public static final String SOURCE_LABEL = "label";
     public static final String SOURCE_ENDPOINT = "endpoint";
     public static final String SERVICE_TYPE = "serviceType";
+    public static final String HARVEST_SCHEDULING = "harvestScheduling";
 
     /**
      * @author Fabrizio
@@ -126,6 +129,36 @@ public class PutSourceRequest extends ConfigRequest {
 	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, true));
 	list.add(Parameter.of(SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, true));
 
+	list.add(Parameter.of(HARVEST_SCHEDULING, false, HarvestSchedulingRequest.START_TIME, ContentType.ISO8601_DATE_TIME, false));
+	list.add(Parameter.of(HARVEST_SCHEDULING, false, HarvestSchedulingRequest.REPEAT_COUNT, ContentType.TEXTUAL, RepeatCount.class,
+		true));
+	list.add(Parameter.of(HARVEST_SCHEDULING, false, HarvestSchedulingRequest.REPEAT_INTERVAL, ContentType.INTEGER, false));
+	list.add(Parameter.of(HARVEST_SCHEDULING, false, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, ContentType.TEXTUAL,
+		RepeatIntervalUnit.class, false));
+
 	return list;
     }
+
+    @Override
+    protected void mandatoryCheck() {
+
+	super.mandatoryCheck();
+
+	List<String> nestedParameters = readNestedParameters();
+
+	if (!nestedParameters.isEmpty() && nestedParameters.get(0).equals(HARVEST_SCHEDULING)) {
+
+	    HarvestSchedulingRequest harvestSchedulingRequest = new HarvestSchedulingRequest();
+
+	    readSubParameters(HARVEST_SCHEDULING).forEach(subParam -> {
+
+		Object subValue = readSubValue(HARVEST_SCHEDULING, subParam);
+
+		harvestSchedulingRequest.put(subParam, subValue.toString());
+	    });
+
+	    HarvestSchedulingRequest.mandatoryCheck(harvestSchedulingRequest);
+	}
+    }
+
 }

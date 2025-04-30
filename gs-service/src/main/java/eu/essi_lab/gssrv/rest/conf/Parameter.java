@@ -38,9 +38,10 @@ public class Parameter {
     private String name;
     private ContentType type;
     private boolean mandatory;
+    private boolean nestedMandatory;
     private InputPattern pattern;
     private Class<? extends LabeledEnum> enum_;
-    private String parent;
+    private String nested;
 
     /**
      * @param name
@@ -67,42 +68,62 @@ public class Parameter {
     }
 
     /**
-     * @param parent
+     * @param nested
+     * @param nestedMandatory
      * @param name
      * @param type
      * @param pattern
      * @param mandatory
      * @return
      */
-    public static Parameter of(String parent, String name, ContentType type, InputPattern pattern, boolean mandatory) {
+    public static Parameter of(//
+	    String nested, //
+	    boolean nestedMandatory, //
+	    String name, //
+	    ContentType type, //
+	    InputPattern pattern, //
+	    boolean mandatory) {
 
-	return new Parameter(parent, name, type, pattern, mandatory);
+	return new Parameter(nested, nestedMandatory, name, type, pattern, mandatory);
     }
 
     /**
-     * @param parent
+     * @param nested
+     * @param nestedMandatory
      * @param name
      * @param type
      * @param mandatory
      * @return
      */
-    public static Parameter of(String parent, String name, ContentType type, boolean mandatory) {
+    public static Parameter of(//
+	    String nested, //
+	    boolean nestedMandatory, //
+	    String name, //
+	    ContentType type, //
+	    boolean mandatory) {
 
-	return new Parameter(parent, name, type, mandatory);
+	return new Parameter(nested, nestedMandatory, name, type, mandatory);
 
     }
 
     /**
-     * @param parent
+     * @param nested
+     * @param nestedMandatory
      * @param name
      * @param type
      * @param enum_
      * @param mandatory
      * @return
      */
-    public static Parameter of(String parent, String name, ContentType type, Class<? extends LabeledEnum> enum_, boolean mandatory) {
+    public static Parameter of(//
+	    String nested, //
+	    boolean nestedMandatory, //
+	    String name, //
+	    ContentType type, //
+	    Class<? extends LabeledEnum> enum_, //
+	    boolean mandatory) {
 
-	return new Parameter(parent, name, type, enum_, mandatory);
+	return new Parameter(nested, nestedMandatory, name, type, enum_, mandatory);
     }
 
     /**
@@ -157,26 +178,39 @@ public class Parameter {
     }
 
     /**
+     * @param nested
+     * @param nestedMandatory
      * @param name
      * @param type
      * @param mandatory
      */
-    public Parameter(String parent, String name, ContentType type, boolean mandatory) {
+    public Parameter(String nested, boolean nestedMandatory, String name, ContentType type, boolean mandatory) {
 
-	this.parent = parent;
+	this.nested = nested;
+	this.nestedMandatory = nestedMandatory;
 	this.name = name;
 	this.type = type;
 	this.mandatory = mandatory;
     }
 
     /**
+     * @param nested
+     * @param nestedMandatory
      * @param name
      * @param type
+     * @param pattern
      * @param mandatory
      */
-    public Parameter(String parent, String name, ContentType type, InputPattern pattern, boolean mandatory) {
+    public Parameter(//
+	    String nested, //
+	    boolean nestedMandatory, //
+	    String name, //
+	    ContentType type, //
+	    InputPattern pattern, //
+	    boolean mandatory) {
 
-	this.parent = parent;
+	this.nested = nested;
+	this.nestedMandatory = nestedMandatory;
 	this.name = name;
 	this.type = type;
 	this.pattern = pattern;
@@ -184,14 +218,23 @@ public class Parameter {
     }
 
     /**
+     * @param nested
+     * @param nestedMandatory
      * @param name
      * @param type
      * @param enum_
      * @param mandatory
      */
-    public Parameter(String parent, String name, ContentType type, Class<? extends LabeledEnum> enum_, boolean mandatory) {
+    public Parameter(//
+	    String nested, //
+	    boolean nestedMandatory, //
+	    String name, //
+	    ContentType type, //
+	    Class<? extends LabeledEnum> enum_, //
+	    boolean mandatory) {
 
-	this.parent = parent;
+	this.nested = nested;
+	this.nestedMandatory = nestedMandatory;
 	this.name = name;
 	this.type = type;
 	this.enum_ = enum_;
@@ -204,14 +247,6 @@ public class Parameter {
     public Optional<InputPattern> getInputPattern() {
 
 	return Optional.ofNullable(pattern);
-    }
-
-    /**
-     * @return
-     */
-    public Optional<String> getParent() {
-
-	return Optional.ofNullable(parent);
     }
 
     /**
@@ -239,11 +274,27 @@ public class Parameter {
     }
 
     /**
-     * @return the mandatory
+     * @return
      */
     public boolean isMandatory() {
 
 	return mandatory;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getNested() {
+
+	return Optional.ofNullable(nested);
+    }
+
+    /**
+     * @return
+     */
+    public boolean isNestedMandatory() {
+
+	return nestedMandatory;
     }
 
     @Override
@@ -258,6 +309,10 @@ public class Parameter {
 		&& ((Parameter) object).getEnum().equals(this.getEnum()) //
 
 		&& ((Parameter) object).isMandatory() == this.isMandatory() //
+
+		&& ((Parameter) object).isNestedMandatory() == this.isNestedMandatory() //
+
+		&& ((Parameter) object).getNested().equals(this.getNested()) //
 
 		&& ((Parameter) object).getInputPattern().equals(this.getInputPattern());
     }

@@ -11,9 +11,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.gssrv.rest.conf.HarvestSchedulingRequest;
+import eu.essi_lab.gssrv.rest.conf.HarvestSchedulingRequest.RepeatCount;
+import eu.essi_lab.gssrv.rest.conf.HarvestSchedulingRequest.RepeatIntervalUnit;
 import eu.essi_lab.gssrv.rest.conf.Parameter;
 import eu.essi_lab.gssrv.rest.conf.PutSourceRequest;
 import eu.essi_lab.gssrv.rest.conf.PutSourceRequest.SourceType;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.Queryable.ContentType;
 
 /**
@@ -28,7 +32,7 @@ public class PutSourceRequestTest {
 
 	List<Parameter> parameters = request.getSupportedParameters();
 
-	Assert.assertEquals(4, parameters.size());
+	Assert.assertEquals(8, parameters.size());
 
 	Assert.assertEquals(
 		Parameter.of(PutSourceRequest.SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false),
@@ -36,6 +40,17 @@ public class PutSourceRequestTest {
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_LABEL, ContentType.TEXTUAL, true), parameters.get(1));
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_ENDPOINT, ContentType.TEXTUAL, true), parameters.get(2));
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, true), parameters.get(3));
+
+	Assert.assertEquals(
+		Parameter.of("harvestScheduling", false, HarvestSchedulingRequest.START_TIME, ContentType.ISO8601_DATE_TIME, false),
+		parameters.get(4));
+	Assert.assertEquals(Parameter.of("harvestScheduling", false, HarvestSchedulingRequest.REPEAT_COUNT, ContentType.TEXTUAL,
+		RepeatCount.class, true), parameters.get(5));
+	Assert.assertEquals(Parameter.of("harvestScheduling", false, HarvestSchedulingRequest.REPEAT_INTERVAL, ContentType.INTEGER, false),
+		parameters.get(6));
+	Assert.assertEquals(Parameter.of("harvestScheduling", false, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, ContentType.TEXTUAL,
+		RepeatIntervalUnit.class, false), parameters.get(7));
+
     }
 
     @Test
@@ -110,7 +125,7 @@ public class PutSourceRequestTest {
 	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
 
 	request.validate();
-	
+
 	System.out.println(request);
     }
 
@@ -236,6 +251,181 @@ public class PutSourceRequestTest {
 	request.put(PutSourceRequest.SOURCE_ID, "sourceId");
 	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
 	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+
+	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
+    }
+
+    @Test
+    public void validationTest8() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, "xxx", "value");
+
+	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
+    }
+
+    @Test
+    public void validationTest9() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.ONCE.getLabel());
+
+	request.validate();
+    }
+
+    @Test
+    public void validationTest10() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
+
+	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
+    }
+
+    @Test
+    public void validationTest11() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL, "10");
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.DAYS.toString());
+
+	request.validate();
+    }
+
+    @Test
+    public void validationTest12() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL, "xxx");
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.DAYS.toString());
+
+	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
+    }
+
+    @Test
+    public void validationTest13() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL, "10");
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, "xxx");
+
+	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
+    }
+
+    @Test
+    public void validationTest14() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL, "10");
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.DAYS.toString());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.START_TIME, "xx");
+
+	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
+    }
+
+    @Test
+    public void validationTest15() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL, "10");
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.DAYS.toString());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.START_TIME, ISO8601DateTimeUtils.getISO8601DateTime());
+
+	request.validate();
+    }
+
+    @Test
+    public void validationTest16() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL, "10");
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.DAYS.toString());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.START_TIME, ISO8601DateTimeUtils.getISO8601DateTime());
+
+	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
+    }
+
+    @Test
+    public void validationTest17() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put("xxx", HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
+
+	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
+    }
+
+    @Test
+    public void validationTest18() {
+
+	PutSourceRequest request = new PutSourceRequest();
+
+	request.put(PutSourceRequest.SOURCE_LABEL, "sourceLabel");
+	request.put(PutSourceRequest.SOURCE_ENDPOINT, "http://localhost");
+	request.put(PutSourceRequest.SERVICE_TYPE, SourceType.WCS_111.getLabel());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL, "10");
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.DAYS.toString());
+
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, "xxx", ISO8601DateTimeUtils.getISO8601DateTime());
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
     }

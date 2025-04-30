@@ -4,7 +4,6 @@
 package eu.essi_lab.gssrv.rest.conf;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -204,6 +203,22 @@ public class ConfigService {
 
 		return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to save changes: " + ex.getMessage());
 	    }
+	}
+
+	if (!putSourceRequest.readNestedParameters().isEmpty()) {
+
+	    HarvestSchedulingRequest harvestSchedulingRequest = new HarvestSchedulingRequest();
+
+	    putSourceRequest.readSubParameters().forEach(subParam -> {
+
+		Object value = putSourceRequest.read(PutSourceRequest.HARVEST_SCHEDULING, subParam).get();
+
+		harvestSchedulingRequest.put(subParam, value.toString());
+	    });
+
+	    harvestSchedulingRequest.put(PutSourceRequest.SOURCE_ID, putSourceRequest.read(PutSourceRequest.SOURCE_ID).get().toString());
+
+	    handleHarvestSourceRequest(harvestSchedulingRequest);
 	}
 
 	if (randomId.isPresent()) {

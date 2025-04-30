@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.gssrv.rest.conf;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -25,9 +27,11 @@ package eu.essi_lab.gssrv.rest.conf;
  */
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+
+import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.model.Queryable.ContentType;
 
 /**
  * @author Fabrizio
@@ -51,13 +55,13 @@ public class EditSourceRequest extends PutSourceRequest {
     @Override
     public List<Parameter> getSupportedParameters() {
 
-	List<Parameter> supportedParameters = super.getSupportedParameters();
+	ArrayList<Parameter> list = new ArrayList<>();
 
-	return supportedParameters.//
-		stream().// sourceId is mandatory in this request
-		map(p -> p.getName().equals(SOURCE_ID) ? Parameter.of(p.getName(), p.getContentType(), p.getInputPattern().get(), true)
-			: p)
-		.//
-		collect(Collectors.toList());
+	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
+	list.add(Parameter.of(SOURCE_LABEL, ContentType.TEXTUAL, true));
+	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, true));
+	list.add(Parameter.of(SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, true));
+
+	return list;
     }
 }
