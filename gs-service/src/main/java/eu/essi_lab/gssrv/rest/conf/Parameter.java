@@ -42,6 +42,7 @@ public class Parameter {
     private InputPattern pattern;
     private Class<? extends LabeledEnum> enum_;
     private String nested;
+    private boolean multiValue;
 
     /**
      * @param name
@@ -52,7 +53,6 @@ public class Parameter {
     public static Parameter of(String name, ContentType type, boolean mandatory) {
 
 	return new Parameter(name, type, mandatory);
-
     }
 
     /**
@@ -297,6 +297,22 @@ public class Parameter {
 	return nestedMandatory;
     }
 
+    /**
+     * 
+     */
+    public void setMultiValue() {
+
+	this.multiValue = true;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isMultiValue() {
+
+	return multiValue;
+    }
+
     @Override
     public boolean equals(Object object) {
 
@@ -313,6 +329,8 @@ public class Parameter {
 		&& ((Parameter) object).isNestedMandatory() == this.isNestedMandatory() //
 
 		&& ((Parameter) object).getNested().equals(this.getNested()) //
+
+		&& ((Parameter) object).isMultiValue() ==  this.isMultiValue() //
 
 		&& ((Parameter) object).getInputPattern().equals(this.getInputPattern());
     }
