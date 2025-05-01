@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.gssrv.rest.conf;
 
+import java.util.Arrays;
 import java.util.Date;
 
 /*-
@@ -119,11 +120,13 @@ public abstract class ConfigRequest {
 
 	    Object value = readValue(paramName);
 
-	    contentTypeCheck(getSupportedParameters(), paramName, value);
+	    List<Parameter> supportedParameters = getSupportedParameters();
 
-	    patternCheck(getSupportedParameters(), paramName, value);
+	    contentTypeCheck(supportedParameters, paramName, value);
 
-	    enumCheck(getSupportedParameters(), paramName, value);
+	    patternCheck(supportedParameters, paramName, value);
+
+	    enumCheck(supportedParameters, paramName, value);
 	});
 
 	readNestedRootParameters().forEach(parentParam -> {
@@ -132,16 +135,16 @@ public abstract class ConfigRequest {
 
 		Object value = readNestedValue(parentParam, subParam);
 
-		List<Parameter> supportedSubParams = getSupportedParameters().//
+		List<Parameter> supportedNestedParams = getSupportedParameters().//
 			stream().filter(p -> p.getNested().isPresent()).//
 			filter(p -> p.getNested().get().equals(parentParam)).//
 			collect(Collectors.toList());
 
-		contentTypeCheck(supportedSubParams, subParam, value);
+		contentTypeCheck(supportedNestedParams, subParam, value);
 
-		patternCheck(supportedSubParams, subParam, value);
+		patternCheck(supportedNestedParams, subParam, value);
 
-		enumCheck(supportedSubParams, subParam, value);
+		enumCheck(supportedNestedParams, subParam, value);
 	    });
 	});
     }
@@ -190,7 +193,7 @@ public abstract class ConfigRequest {
      */
     public Optional<Object> read(String parameter) {
 
-	if (getParametersObject().has(parameter)) {
+	if (object.has("parameters") && getParametersObject().has(parameter)) {
 
 	    return Optional.of(readValue(parameter));
 	}
@@ -391,73 +394,89 @@ public abstract class ConfigRequest {
     @SuppressWarnings("incomplete-switch")
     protected void contentTypeCheck(List<Parameter> supportedParams, String paramName, Object value) {
 
-	ContentType type = supportedParams.//
+	Parameter parameter = supportedParams.//
 		stream().//
 		filter(p -> p.getName().equals(paramName)).//
 		findFirst().//
-		get().//
-		getContentType();
+		get();
 
-	switch (type) {
-	case BOOLEAN:
-	    if (!value.toString().equals("true") && !value.toString().equals("false")) {
+	ContentType type = parameter.getContentType();
 
-		throw new IllegalArgumentException(
-			"Unsupported value '" + value + "'. Parameter '" + paramName + "' should be of type boolean");
-	    }
+	boolean multiValue = parameter.isMultiValue();
 
-	    break;
+	List<String> values = Arrays.asList(value.toString());
 
-	case DOUBLE:
+	if (multiValue) {
 
-	    try {
-		Double.valueOf(value.toString());
-	    } catch (NumberFormatException ex) {
-
-		throw new IllegalArgumentException(
-			"Unsupported value '" + value + "'. Parameter '" + paramName + "' should be of type double");
-	    }
-
-	    break;
-
-	case INTEGER:
-
-	    try {
-		Integer.valueOf(value.toString());
-	    } catch (NumberFormatException ex) {
-
-		throw new IllegalArgumentException(
-			"Unsupported value '" + value + "'. Parameter '" + paramName + "' should be of type integer");
-	    }
-
-	    break;
-
-	case ISO8601_DATE_TIME:
-
-	    Optional<Date> iso8601ToDate = ISO8601DateTimeUtils.parseISO8601ToDate(value.toString());
-
-	    if (iso8601ToDate.isEmpty() || //
-		    (value.toString().length() != "YYYY-MM-DDThh:mm:ssZ".length()
-			    && value.toString().length() != "YYYY-MM-DDThh:mm:ss".length())) {
-
-		throw new IllegalArgumentException("Unsupported value '" + value + "'. Parameter '" + paramName
-			+ "' should be of type ISO8601 date time: 'YYYY-MM-DDThh:mm:ss' or 'YYYY-MM-DDThh:mm:ssZ'");
-	    }
-
-	    break;
-
-	case LONG:
-
-	    try {
-		Long.valueOf(value.toString());
-	    } catch (NumberFormatException ex) {
-
-		throw new IllegalArgumentException(
-			"Unsupported value '" + value + "'. Parameter '" + paramName + "' should be of type long");
-	    }
-
-	    break;
+	    values = Arrays.asList(value.toString().split(",")).//
+		    stream().//
+		    map(v -> v.trim().strip()).//
+		    collect(Collectors.toList());
 	}
+
+	values.forEach(val -> {
+
+	    switch (type) {
+	    case BOOLEAN:
+		if (!val.toString().equals("true") && !val.toString().equals("false")) {
+
+		    throw new IllegalArgumentException(
+			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' should be of type boolean");
+		}
+
+		break;
+
+	    case DOUBLE:
+
+		try {
+		    Double.valueOf(val.toString());
+		} catch (NumberFormatException ex) {
+
+		    throw new IllegalArgumentException(
+			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' should be of type double");
+		}
+
+		break;
+
+	    case INTEGER:
+
+		try {
+		    Integer.valueOf(val.toString());
+		} catch (NumberFormatException ex) {
+
+		    throw new IllegalArgumentException(
+			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' should be of type integer");
+		}
+
+		break;
+
+	    case ISO8601_DATE_TIME:
+
+		Optional<Date> iso8601ToDate = ISO8601DateTimeUtils.parseISO8601ToDate(val.toString());
+
+		if (iso8601ToDate.isEmpty() || //
+			(val.toString().length() != "YYYY-MM-DDThh:mm:ssZ".length()
+				&& val.toString().length() != "YYYY-MM-DDThh:mm:ss".length())) {
+
+		    throw new IllegalArgumentException("Unsupported value '" + val + "'. Parameter '" + paramName
+			    + "' should be of type ISO8601 date time: 'YYYY-MM-DDThh:mm:ss' or 'YYYY-MM-DDThh:mm:ssZ'");
+		}
+
+		break;
+
+	    case LONG:
+
+		try {
+		    Long.valueOf(val.toString());
+		} catch (NumberFormatException ex) {
+
+		    throw new IllegalArgumentException(
+			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' should be of type long");
+		}
+
+		break;
+	    }
+	});
     }
 
     /**
@@ -467,23 +486,39 @@ public abstract class ConfigRequest {
      */
     protected void patternCheck(List<Parameter> supportedParams, String paramName, Object value) {
 
-	Optional<InputPattern> optPattern = supportedParams.//
+	Parameter parameter = supportedParams.//
 		stream().//
 		filter(p -> p.getName().equals(paramName)).//
 		findFirst().//
-		get().//
-		getInputPattern();
+		get();
+
+	Optional<InputPattern> optPattern = parameter.getInputPattern();
+
+	boolean multiValue = parameter.isMultiValue();
 
 	if (optPattern.isPresent()) {
 
-	    Pattern pattern = Pattern.compile(optPattern.get().getPattern());
-	    Matcher matcher = pattern.matcher(value.toString());
+	    List<String> values = Arrays.asList(value.toString());
 
-	    if (!matcher.matches()) {
+	    if (multiValue) {
 
-		throw new IllegalArgumentException("Unsupported value '" + value + "'. Parameter '" + paramName + "' should match the '"
-			+ optPattern.get().getPattern() + "' pattern");
+		values = Arrays.asList(value.toString().split(",")).//
+			stream().//
+			map(v -> v.trim().strip()).//
+			collect(Collectors.toList());
 	    }
+
+	    values.forEach(val -> {
+
+		Pattern pattern = Pattern.compile(optPattern.get().getPattern());
+		Matcher matcher = pattern.matcher(val);
+
+		if (!matcher.matches()) {
+
+		    throw new IllegalArgumentException("Unsupported value '" + val + "'. Parameter '" + paramName + "' should match the '"
+			    + optPattern.get().getPattern() + "' pattern");
+		}
+	    });
 	}
     }
 
@@ -494,31 +529,48 @@ public abstract class ConfigRequest {
      */
     protected void enumCheck(List<Parameter> supportedParams, String paramName, Object value) {
 
-	Optional<Class<? extends LabeledEnum>> optEnum = supportedParams.//
+	Parameter parameter = supportedParams.//
 		stream().//
 		filter(p -> p.getName().equals(paramName)).//
 		findFirst().//
-		get().//
-		getEnum();
+		get();
+
+	boolean multiValue = parameter.isMultiValue();
+
+	List<String> values = Arrays.asList(value.toString());
+
+	if (multiValue) {
+
+	    values = Arrays.asList(value.toString().split(",")).//
+		    stream().//
+		    map(v -> v.trim().strip()).//
+		    collect(Collectors.toList());
+	}
+
+	Optional<Class<? extends LabeledEnum>> optEnum = parameter.getEnum();
 
 	if (optEnum.isPresent()) {
 
-	    if (!LabeledEnum.values(optEnum.get()).//
-		    stream().//
-		    map(e -> e.getLabel()).//
-		    collect(Collectors.toList()).//
-		    contains(value.toString())) {
+	    values.forEach(val -> {
 
-		String supValues = LabeledEnum.values(optEnum.get()).//
+		if (!LabeledEnum.values(optEnum.get()).//
 			stream().//
-			map(e -> "'" + e.getLabel() + "'").//
-			collect(Collectors.joining(", "));
+			map(e -> e.getLabel()).//
+			collect(Collectors.toList()).//
+			contains(val.toString())) {
 
-		throw new IllegalArgumentException(
-			"Unsupported value '" + value + "' for parameter '" + paramName + "'. Supported values are: " + supValues);
+		    String supValues = LabeledEnum.values(optEnum.get()).//
+			    stream().//
+			    map(e -> "'" + e.getLabel() + "'").//
+			    collect(Collectors.joining(", "));
 
-	    }
+		    throw new IllegalArgumentException(
+			    "Unsupported value '" + val + "' for parameter '" + paramName + "'. Supported values are: " + supValues);
+
+		}
+	    });
 	}
+
     }
 
     /**

@@ -4,9 +4,12 @@
 package eu.essi_lab.gssrv.rest.conf;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.jws.WebService;
 import javax.servlet.ServletInputStream;
@@ -145,7 +148,9 @@ public class ConfigService {
 
 	if (requestName.equals(ConfigRequest.computeName(ListSourcesRequest.class))) {
 
-	    return handleListSourcesRequest();
+	    ListSourcesRequest request = new ListSourcesRequest(requestObject);
+
+	    return handleListSourcesRequest(request);
 	}
 
 	return buildErrorResponse(Status.BAD_REQUEST, "Unknown request '" + requestName + "'");
@@ -391,9 +396,10 @@ public class ConfigService {
     }
 
     /**
+     * @param request
      * @return
      */
-    private Response handleListSourcesRequest() {
+    private Response handleListSourcesRequest(ListSourcesRequest request) {
 
 	SchedulerSupport support = SchedulerSupport.getInstance();
 	support.update();
@@ -402,73 +408,87 @@ public class ConfigService {
 
 	JSONArray out = new JSONArray();
 
+	final List<String> sourceIds = new ArrayList<String>();
+
+	Optional<Object> optional = request.read(ListSourcesRequest.SOURCE_ID);
+	if (optional.isPresent()) {
+
+	    sourceIds.addAll(Arrays.asList(optional.get().toString().split(",")).//
+		    stream().//
+		    map(v -> v.trim().strip()).//
+		    collect(Collectors.toList()));
+	}
+
 	settings.forEach(setting -> {
 
 	    AccessorSetting accessorSetting = setting.getSelectedAccessorSetting();
 
 	    GSSource source = accessorSetting.getSource();
 
-	    JSONObject sourceObject = new JSONObject();
-	    out.put(sourceObject);
+	    if (sourceIds.isEmpty() || sourceIds.contains(source.getUniqueIdentifier())) {
 
-	    sourceObject.put(PutSourceRequest.SOURCE_ID, source.getUniqueIdentifier());
-	    sourceObject.put(PutSourceRequest.SOURCE_LABEL, source.getLabel());
-	    sourceObject.put(PutSourceRequest.SOURCE_ENDPOINT, source.getEndpoint());
-	    sourceObject.put(PutSourceRequest.SERVICE_TYPE, accessorSetting.getAccessorType());
+		JSONObject sourceObject = new JSONObject();
+		out.put(sourceObject);
 
-	    JSONObject scheduling = new JSONObject();
+		sourceObject.put(PutSourceRequest.SOURCE_ID, source.getUniqueIdentifier());
+		sourceObject.put(PutSourceRequest.SOURCE_LABEL, source.getLabel());
+		sourceObject.put(PutSourceRequest.SOURCE_ENDPOINT, source.getEndpoint());
+		sourceObject.put(PutSourceRequest.SERVICE_TYPE, accessorSetting.getAccessorType());
 
-	    String jobPhase = support.getJobPhase(setting);
-	    if (!jobPhase.isEmpty()) {
+		JSONObject scheduling = new JSONObject();
 
-		scheduling.put("phase", jobPhase);
-	    }
+		String jobPhase = support.getJobPhase(setting);
+		if (!jobPhase.isEmpty()) {
 
-	    String elapsedTime = support.getElapsedTime(setting);
-	    if (!elapsedTime.isEmpty()) {
+		    scheduling.put("phase", jobPhase);
+		}
 
-		scheduling.put("elapsedTime", elapsedTime);
-	    }
+		String elapsedTime = support.getElapsedTime(setting);
+		if (!elapsedTime.isEmpty()) {
 
-	    String endTime = support.getEndTime(setting);
-	    if (!endTime.isEmpty()) {
+		    scheduling.put("elapsedTime", elapsedTime);
+		}
 
-		scheduling.put("endTime", endTime);
-	    }
+		String endTime = support.getEndTime(setting);
+		if (!endTime.isEmpty()) {
 
-	    String firedTime = support.getFiredTime(setting);
-	    if (!firedTime.isEmpty()) {
+		    scheduling.put("endTime", endTime);
+		}
 
-		scheduling.put("firedTime", firedTime);
-	    }
+		String firedTime = support.getFiredTime(setting);
+		if (!firedTime.isEmpty()) {
 
-	    String nextFireTime = support.getNextFireTime(setting);
-	    if (!nextFireTime.isEmpty()) {
+		    scheduling.put("firedTime", firedTime);
+		}
 
-		scheduling.put("nextFireTime", nextFireTime);
-	    }
+		String nextFireTime = support.getNextFireTime(setting);
+		if (!nextFireTime.isEmpty()) {
 
-	    String repeatCount = support.getRepeatCount(setting);
-	    if (!repeatCount.isEmpty()) {
+		    scheduling.put("nextFireTime", nextFireTime);
+		}
 
-		scheduling.put("repeatCount", repeatCount);
-	    }
+		String repeatCount = support.getRepeatCount(setting);
+		if (!repeatCount.isEmpty()) {
 
-	    String repeatInterval = support.getRepeatInterval(setting);
-	    if (!repeatInterval.isEmpty()) {
+		    scheduling.put("repeatCount", repeatCount);
+		}
 
-		scheduling.put("repeatInterval", repeatInterval);
-	    }
+		String repeatInterval = support.getRepeatInterval(setting);
+		if (!repeatInterval.isEmpty()) {
 
-	    String size = support.getSize(setting);
-	    if (!size.isEmpty()) {
+		    scheduling.put("repeatInterval", repeatInterval);
+		}
 
-		scheduling.put("size", size);
-	    }
+		String size = support.getSize(setting);
+		if (!size.isEmpty()) {
 
-	    if (!scheduling.keySet().isEmpty()) {
+		    scheduling.put("size", size);
+		}
 
-		sourceObject.put("scheduling", scheduling);
+		if (!scheduling.keySet().isEmpty()) {
+
+		    sourceObject.put("scheduling", scheduling);
+		}
 	    }
 	});
 
