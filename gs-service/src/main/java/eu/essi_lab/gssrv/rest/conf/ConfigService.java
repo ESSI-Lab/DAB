@@ -40,6 +40,7 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.model.GSSource;
 
 /*-
@@ -381,6 +382,14 @@ public class ConfigService {
 	    return holder.getErrorResponse().get();
 	}
 
+	String sourceId = removeSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString()).get();
+
+	if (isHarvesting(sourceId)) {
+
+	    return buildErrorResponse(Status.BAD_REQUEST,
+		    "The requested source is currently being harvested and cannot be removed until harvest is complete");
+	}
+
 	String settingId = holder.getSettingId().get();
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
@@ -389,7 +398,7 @@ public class ConfigService {
 
 	if (!removed) {
 
-	    return buildErrorResponse(Status.NOT_MODIFIED, "Unable to remove source");
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to remove source");
 	}
 
 	return Response.status(Status.OK).build();
@@ -496,6 +505,24 @@ public class ConfigService {
 		entity(out.toString(3)).//
 		type(MediaType.APPLICATION_JSON.toString()).//
 		build();
+    }
+
+    /**
+     * @param sourceId
+     * @return
+     */
+    private boolean isHarvesting(String sourceId) {
+
+	SchedulerSupport support = SchedulerSupport.getInstance();
+	support.update();
+
+	return ConfigurationWrapper.getHarvestingSettings().//
+		stream().//
+		filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).//
+		filter(s -> support.getJobPhase(s).equals(JobPhase.RUNNING.getLabel())).//
+		findFirst().//
+		isPresent();
+
     }
 
     /**
