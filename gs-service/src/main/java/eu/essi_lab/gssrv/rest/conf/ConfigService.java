@@ -205,11 +205,11 @@ public class ConfigService {
 	    }
 	}
 
-	if (!putSourceRequest.readNestedParameters().isEmpty()) {
+	if (!putSourceRequest.readNestedRootParameters().isEmpty()) {
 
 	    HarvestSchedulingRequest harvestSchedulingRequest = new HarvestSchedulingRequest();
 
-	    putSourceRequest.readSubParameters().forEach(subParam -> {
+	    putSourceRequest.readNestedParameters().forEach(subParam -> {
 
 		Object value = putSourceRequest.read(PutSourceRequest.HARVEST_SCHEDULING, subParam).get();
 

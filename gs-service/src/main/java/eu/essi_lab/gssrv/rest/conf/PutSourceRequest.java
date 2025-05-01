@@ -44,7 +44,7 @@ public class PutSourceRequest extends ConfigRequest {
     public static final String SOURCE_LABEL = "label";
     public static final String SOURCE_ENDPOINT = "endpoint";
     public static final String SERVICE_TYPE = "serviceType";
-    public static final String HARVEST_SCHEDULING = "harvestScheduling";
+    public static final String HARVEST_SCHEDULING = "HarvestScheduling";
 
     /**
      * @author Fabrizio
@@ -144,15 +144,15 @@ public class PutSourceRequest extends ConfigRequest {
 
 	super.mandatoryCheck();
 
-	List<String> nestedParameters = readNestedParameters();
+	List<String> nestedParameters = readNestedRootParameters();
 
 	if (!nestedParameters.isEmpty() && nestedParameters.get(0).equals(HARVEST_SCHEDULING)) {
 
 	    HarvestSchedulingRequest harvestSchedulingRequest = new HarvestSchedulingRequest();
 
-	    readSubParameters(HARVEST_SCHEDULING).forEach(subParam -> {
+	    readNestedParameters(HARVEST_SCHEDULING).forEach(subParam -> {
 
-		Object subValue = readSubValue(HARVEST_SCHEDULING, subParam);
+		Object subValue = readNestedValue(HARVEST_SCHEDULING, subParam);
 
 		harvestSchedulingRequest.put(subParam, subValue.toString());
 	    });

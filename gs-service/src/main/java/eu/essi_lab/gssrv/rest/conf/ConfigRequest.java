@@ -126,11 +126,11 @@ public abstract class ConfigRequest {
 	    enumCheck(getSupportedParameters(), paramName, value);
 	});
 
-	readNestedParameters().forEach(parentParam -> {
+	readNestedRootParameters().forEach(parentParam -> {
 
-	    readSubParameters(parentParam).forEach(subParam -> {
+	    readNestedParameters(parentParam).forEach(subParam -> {
 
-		Object value = readSubValue(parentParam, subParam);
+		Object value = readNestedValue(parentParam, subParam);
 
 		List<Parameter> supportedSubParams = getSupportedParameters().//
 			stream().filter(p -> p.getNested().isPresent()).//
@@ -144,7 +144,6 @@ public abstract class ConfigRequest {
 		enumCheck(supportedSubParams, subParam, value);
 	    });
 	});
-
     }
 
     /**
@@ -161,28 +160,28 @@ public abstract class ConfigRequest {
      */
     public void put(String paramName, String value) {
 
-	object.getJSONObject("parameters").put(paramName, value);
+	getParametersObject().put(paramName, value);
     }
 
     /**
-     * @param parentParam
-     * @param paramName
+     * @param nestedRootParam
+     * @param nestedParam
      * @param value
      */
-    public void put(String parentParam, String paramName, String value) {
+    public void put(String nestedRootParam, String nestedParam, String value) {
 
 	JSONObject nestedObject = new JSONObject();
 
-	if (!object.getJSONObject("parameters").has(parentParam)) {
+	if (!getParametersObject().has(nestedRootParam)) {
 
-	    object.getJSONObject("parameters").put(parentParam, nestedObject);
-	    
+	    getParametersObject().put(nestedRootParam, nestedObject);
+
 	} else {
 
-	    nestedObject = object.getJSONObject("parameters").getJSONObject(parentParam);
+	    nestedObject = getParametersObject().getJSONObject(nestedRootParam);
 	}
 
-	nestedObject.put(paramName, value);
+	nestedObject.put(nestedParam, value);
     }
 
     /**
@@ -191,7 +190,7 @@ public abstract class ConfigRequest {
      */
     public Optional<Object> read(String parameter) {
 
-	if (object.getJSONObject("parameters").has(parameter)) {
+	if (getParametersObject().has(parameter)) {
 
 	    return Optional.of(readValue(parameter));
 	}
@@ -200,19 +199,19 @@ public abstract class ConfigRequest {
     }
 
     /**
-     * @param parent
-     * @param parameter
+     * @param nestedRootParam
+     * @param nestedParam
      * @return
      */
-    public Optional<Object> read(String parent, String parameter) {
+    public Optional<Object> read(String nestedRootParam, String nestedParam) {
 
-	if (object.getJSONObject("parameters").has(parent)) {
+	if (getParametersObject().has(nestedRootParam)) {
 
-	    JSONObject parentObject = object.getJSONObject("parameters").getJSONObject(parent);
+	    JSONObject parentObject = getParametersObject().getJSONObject(nestedRootParam);
 
-	    if (parentObject.has(parameter)) {
+	    if (parentObject.has(nestedParam)) {
 
-		return Optional.of(readSubValue(parent, parameter));
+		return Optional.of(readNestedValue(nestedRootParam, nestedParam));
 	    }
 	}
 
@@ -268,7 +267,7 @@ public abstract class ConfigRequest {
 		map(p -> p.getName()).//
 		collect(Collectors.toList());
 
-	List<String> nestedParameters = readNestedParameters();
+	List<String> nestedParameters = readNestedRootParameters();
 	supportedMandatoryNestedNames.removeAll(nestedParameters);
 
 	if (!supportedMandatoryNestedNames.isEmpty()) {
@@ -283,23 +282,23 @@ public abstract class ConfigRequest {
 	//
 	//
 
-	List<Parameter> mandatorySubParams = getSupportedParameters().//
+	List<Parameter> mandatoryNestedParams = getSupportedParameters().//
 		stream().//
 		filter(p -> p.getNested().isPresent()).//
 		filter(p -> p.isMandatory()).//
-		filter(p -> readNestedParameters().contains(p.getNested().get())).//
+		filter(p -> readNestedRootParameters().contains(p.getNested().get())).//
 		collect(Collectors.toList());
 
-	List<String> mandatorySubParamsNames = mandatorySubParams.//
+	List<String> mandatorySubParamsNames = mandatoryNestedParams.//
 		stream().//
 		map(p -> p.getName()).//
 		collect(Collectors.toList());
 
-	mandatorySubParamsNames.removeAll(readSubParameters());
+	mandatorySubParamsNames.removeAll(readNestedParameters());
 
 	if (!mandatorySubParamsNames.isEmpty()) {
 
-	    throw new IllegalArgumentException("Missing mandatory sub-parameters: " + mandatorySubParams.//
+	    throw new IllegalArgumentException("Missing mandatory sub-parameters: " + mandatoryNestedParams.//
 		    stream().//
 		    map(p -> "'" + p.getNested().get() + "." + p.getName() + "'").//
 		    collect(Collectors.joining(", ")));
@@ -341,7 +340,7 @@ public abstract class ConfigRequest {
 		distinct().//
 		collect(Collectors.toList());
 
-	List<String> nestedParameters = readNestedParameters();
+	List<String> nestedParameters = readNestedRootParameters();
 	nestedParameters.removeAll(supportedNestedNames);
 
 	if (!nestedParameters.isEmpty()) {
@@ -369,7 +368,7 @@ public abstract class ConfigRequest {
 		map(p -> p.getName()).//
 		collect(Collectors.toList());
 
-	List<String> subParameters = readSubParameters();
+	List<String> subParameters = readNestedParameters();
 	subParameters.removeAll(supportedSubnNames);
 
 	if (!subParameters.isEmpty()) {
@@ -527,11 +526,22 @@ public abstract class ConfigRequest {
      */
     protected List<String> readParameters() {
 
-	return object.getJSONObject("parameters").//
+	return getParametersObject().//
 		keySet().//
 		stream().//
-		filter(key -> !(object.getJSONObject("parameters").get(key) instanceof JSONObject)).//
+		filter(key -> !(getParametersObject().get(key) instanceof JSONObject)).//
 		collect(Collectors.toList());
+    }
+
+    /**
+     * @return
+     */
+    protected List<String> readNestedRootParameters() {
+
+	return getParametersObject().//
+		keySet().//
+		stream().filter(key -> getParametersObject().get(key) instanceof JSONObject).//
+		collect(Collectors.toList());//
     }
 
     /**
@@ -539,20 +549,9 @@ public abstract class ConfigRequest {
      */
     protected List<String> readNestedParameters() {
 
-	return object.getJSONObject("parameters").//
-		keySet().//
-		stream().filter(key -> object.getJSONObject("parameters").get(key) instanceof JSONObject).//
-		collect(Collectors.toList());//
-    }
-
-    /**
-     * @return
-     */
-    protected List<String> readSubParameters() {
-
-	return readNestedParameters().//
+	return readNestedRootParameters().//
 		stream().//
-		map(key -> object.getJSONObject("parameters").getJSONObject(key)).//
+		map(key -> getParametersObject().getJSONObject(key)).//
 		flatMap(object -> object.keySet().stream()).//
 		collect(Collectors.toList());//
     }
@@ -560,12 +559,12 @@ public abstract class ConfigRequest {
     /*
      * 
      */
-    protected List<String> readSubParameters(String parent) {
+    protected List<String> readNestedParameters(String nested) {
 
-	return readNestedParameters().//
+	return readNestedRootParameters().//
 		stream().//
-		filter(p -> p.equals(parent)).//
-		map(key -> object.getJSONObject("parameters").getJSONObject(key)).//
+		filter(p -> p.equals(nested)).//
+		map(key -> getParametersObject().getJSONObject(key)).//
 		flatMap(object -> object.keySet().stream()).//
 		collect(Collectors.toList());//
     }
@@ -576,16 +575,24 @@ public abstract class ConfigRequest {
      */
     protected Object readValue(String parameter) {
 
-	return object.getJSONObject("parameters").get(parameter);
+	return getParametersObject().get(parameter);
     }
 
     /**
-     * @param parent
+     * @param nested
      * @param parameter
      * @return
      */
-    protected Object readSubValue(String parent, String parameter) {
+    protected Object readNestedValue(String nested, String parameter) {
 
-	return object.getJSONObject("parameters").getJSONObject(parent).get(parameter);
+	return getParametersObject().getJSONObject(nested).get(parameter);
+    }
+
+    /**
+     * @return
+     */
+    protected JSONObject getParametersObject() {
+
+	return object.getJSONObject("parameters");
     }
 }
