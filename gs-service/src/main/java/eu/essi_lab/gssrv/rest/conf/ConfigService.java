@@ -25,6 +25,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.quartz.SchedulerException;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
@@ -330,7 +331,7 @@ public class ConfigService {
 
 	if (!replaced) {
 
-	    return buildErrorResponse(Status.NOT_MODIFIED, "Scheduling not modified");
+	    return buildErrorResponse(Status.BAD_REQUEST, "No changes to apply");
 
 	} else {
 
@@ -369,7 +370,6 @@ public class ConfigService {
 	}
 
 	return Response.status(Status.OK).//
-		entity(harvestSourceRequest.toString()).//
 		type(MediaType.APPLICATION_JSON.toString()).//
 		build();
     }
@@ -387,6 +387,10 @@ public class ConfigService {
 	    return holder.getErrorResponse().get();
 	}
 
+	//
+	//
+	//
+
 	String sourceId = removeSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString()).get();
 
 	if (isHarvesting(sourceId)) {
@@ -396,6 +400,35 @@ public class ConfigService {
 	}
 
 	String settingId = holder.getSettingId().get();
+
+	//
+	//
+	//
+
+	SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+
+	Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
+
+	HarvestingSetting harvestingSetting = ConfigurationWrapper.getHarvestingSettings().//
+		stream().//
+		filter(s -> s.getIdentifier().equals(settingId)).//
+		findFirst().//
+		get();
+
+	try {
+
+	    scheduler.unschedule(harvestingSetting);
+
+	} catch (SchedulerException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Job unscheduling failed: " + e.getMessage());
+	}
+
+	//
+	//
+	//
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 
@@ -633,7 +666,7 @@ public class ConfigService {
 		    findFirst().//
 		    isPresent()) {
 
-		return new SettingIdHolder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' no not exists"));
+		return new SettingIdHolder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' do not exists"));
 	    }
 
 	    settingId = ConfigurationWrapper.getHarvestingSettings().//
