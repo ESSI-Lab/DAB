@@ -100,10 +100,11 @@ public class ISO8601DateTimeUtils {
     /**
      * @return
      */
-    public static String getISO8601DateTimeNoUTC() {
+    public static String getISO8601DateTime(String timeZone) {
 
 	Date now = new Date();
-	String iso8601DateTime = getISO8601DateTime(now);
+
+	String iso8601DateTime = getISO8601DateTime(now, timeZone);
 
 	return iso8601DateTime.substring(0, iso8601DateTime.length() - 1);
     }
@@ -207,8 +208,19 @@ public class ISO8601DateTimeUtils {
      * @return
      */
     public static String getISO8601DateTime(Date date) {
+
+	return getISO8601DateTime(date, "UTC");
+    }
+
+    /**
+     * @param date
+     * @param timeZone
+     * @return
+     */
+    public static String getISO8601DateTime(Date date, String timeZone) {
+
 	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-	dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+	dateFormat.setTimeZone(TimeZone.getTimeZone(timeZone));
 	return dateFormat.format(date);
     }
 
