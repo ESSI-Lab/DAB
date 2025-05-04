@@ -41,6 +41,7 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.gssrv.rest.conf.requests.EditSourceRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.HarvestUnschedulingRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.ListSourcesRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.PutSourceRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.RemoveSourceRequest;
@@ -142,7 +143,16 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    return validate.isPresent() ? validate.get() : handleHarvestSourceRequest(request);
+	    return validate.isPresent() ? validate.get() : handleHarvestSchedulingRequest(request);
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(HarvestUnschedulingRequest.class))) {
+
+	    HarvestUnschedulingRequest request = new HarvestUnschedulingRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    return validate.isPresent() ? validate.get() : handleHarvestUnschedulingRequest(request);
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(RemoveSourceRequest.class))) {
@@ -177,7 +187,7 @@ public class ConfigService {
 	//
 	// source id presence check
 	//
-	
+
 	if (optSourceId.isPresent()) {
 
 	    String sourceId = optSourceId.get();
@@ -192,7 +202,7 @@ public class ConfigService {
 	    }
 
 	} else {
-	    
+
 	    //
 	    // random id creation
 	    //
@@ -201,7 +211,7 @@ public class ConfigService {
 
 	    putSourceRequest.put(PutSourceRequest.SOURCE_ID, randomId.get());
 	}
-	
+
 	//
 	// putting new harvesting setting and flushing
 	//
@@ -229,7 +239,7 @@ public class ConfigService {
 		return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to save changes: " + ex.getMessage());
 	    }
 	}
-	
+
 	//
 	// optional harvesting scheduling
 	//
@@ -247,13 +257,13 @@ public class ConfigService {
 
 	    harvestSchedulingRequest.put(PutSourceRequest.SOURCE_ID, putSourceRequest.read(PutSourceRequest.SOURCE_ID).get().toString());
 
-	    handleHarvestSourceRequest(harvestSchedulingRequest);
+	    handleHarvestSchedulingRequest(harvestSchedulingRequest);
 	}
 
 	//
 	// in case of random id, it is provided in the response
-	// 
-	
+	//
+
 	if (randomId.isPresent()) {
 
 	    JSONObject object = new JSONObject();
@@ -264,7 +274,7 @@ public class ConfigService {
 		    type(MediaType.APPLICATION_JSON.toString()).//
 		    build();
 	}
-	
+
 	//
 	//
 	//
@@ -288,7 +298,7 @@ public class ConfigService {
 
 	    return finder.getErrorResponse().get();
 	}
-	
+
 	//
 	// building harvesting setting
 	//
@@ -299,7 +309,7 @@ public class ConfigService {
 	setting.setIdentifier(settingId);
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
-	
+
 	//
 	// replacing and flushing
 	//
@@ -335,7 +345,7 @@ public class ConfigService {
      * @param harvestSourceRequest
      * @return
      */
-    private Response handleHarvestSourceRequest(HarvestSchedulingRequest harvestSourceRequest) {
+    private Response handleHarvestSchedulingRequest(HarvestSchedulingRequest harvestSourceRequest) {
 
 	//
 	// finding setting id from the given source id
@@ -455,6 +465,67 @@ public class ConfigService {
     }
 
     /**
+     * @param request
+     * @return
+     */
+    private Response handleHarvestUnschedulingRequest(HarvestUnschedulingRequest harvestUnschedulingRequest) {
+
+	//
+	// finding setting id from the given source id
+	//
+
+	SettingIdFinder finder = getFinder(harvestUnschedulingRequest);
+
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
+	}
+
+	//
+	// unscheduling
+	//
+
+	SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+
+	Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
+
+	String settingId = finder.getSettingId().get();
+
+	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
+		stream().//
+		filter(s -> s.getIdentifier().equals(settingId)).//
+		findFirst().//
+		get();
+
+	try {
+
+	    scheduler.unschedule(setting);
+
+	} catch (SchedulerException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unscheduling failed: " + e.getMessage());
+	}
+
+	//
+	// disabling scheduling
+	//
+
+	setting.getScheduling().setEnabled(false);
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	configuration.replace(setting);
+
+	//
+	//
+	//
+
+	return Response.status(Status.OK).build();
+    }
+
+    /**
      * @param removeSourceRequest
      * @return
      */
@@ -507,7 +578,7 @@ public class ConfigService {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 
-	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Job unscheduling failed: " + e.getMessage());
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unscheduling failed: " + e.getMessage());
 	}
 
 	//
