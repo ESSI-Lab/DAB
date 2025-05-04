@@ -49,7 +49,7 @@ public class HarvestSchedulingRequestTest {
 	HarvestSchedulingRequest request = new HarvestSchedulingRequest();
 
 	request.put(HarvestSchedulingRequest.SOURCE_ID, "sourceId");
-	request.put(HarvestSchedulingRequest.START_TIME, ISO8601DateTimeUtils.getISO8601DateTimeNoUTC());
+	request.put(HarvestSchedulingRequest.START_TIME, ISO8601DateTimeUtils.getISO8601DateTime("Europe/Berlin"));
 	request.put(HarvestSchedulingRequest.REPEAT_INTERVAL, "1");
 	request.put(HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.WEEKS.getLabel());
 	request.put(HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());

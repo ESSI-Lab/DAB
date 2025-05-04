@@ -6,6 +6,7 @@ package eu.essi_lab.gssrv.rest.conf;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,6 +47,7 @@ import eu.essi_lab.gssrv.rest.conf.requests.PutSourceRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.RemoveSourceRequest;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.model.GSSource;
 
@@ -317,7 +319,22 @@ public class ConfigService {
 
 	if (startTime.isEmpty() && isHarvestingUnderway(sourceId)) {
 
-	    return buildErrorResponse(Status.BAD_REQUEST, "Unable to start harvesting now since harvesting of the requested source is currently underway");
+	    return buildErrorResponse(Status.BAD_REQUEST,
+		    "Unable to start harvesting now since harvesting of the requested source is currently underway");
+	}
+
+	//
+	//
+	//
+
+	if (startTime.isPresent()) {
+
+	    String currentTime = ISO8601DateTimeUtils.getISO8601DateTime("Europe/Berlin");
+
+	    if (startTime.get().toString().compareTo(currentTime) < 0) {
+
+		return buildErrorResponse(Status.BAD_REQUEST, "The provided start time '" + startTime.get() + "' is in the past");
+	    }
 	}
 
 	//
@@ -346,11 +363,7 @@ public class ConfigService {
 
 	boolean replaced = configuration.replace(setting);
 
-	if (!replaced) {
-
-	    return buildErrorResponse(Status.BAD_REQUEST, "No changes to apply");
-
-	} else {
+	if (replaced) {
 
 	    try {
 
