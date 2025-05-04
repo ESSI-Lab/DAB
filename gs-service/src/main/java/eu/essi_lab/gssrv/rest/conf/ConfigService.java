@@ -307,6 +307,23 @@ public class ConfigService {
 	    return holder.getErrorResponse().get();
 	}
 
+	//
+	//
+	//
+
+	Optional<Object> startTime = harvestSourceRequest.read(HarvestSchedulingRequest.START_TIME);
+
+	String sourceId = harvestSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString()).get();
+
+	if (startTime.isEmpty() && isHarvestingUnderway(sourceId)) {
+
+	    return buildErrorResponse(Status.BAD_REQUEST, "Unable to start harvesting now since harvesting of the requested source is currently underway");
+	}
+
+	//
+	//
+	//
+
 	String settingId = holder.getSettingId().get();
 
 	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
@@ -346,6 +363,10 @@ public class ConfigService {
 		return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to save changes: " + ex.getMessage());
 	    }
 	}
+
+	//
+	//
+	//
 
 	SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
@@ -393,7 +414,7 @@ public class ConfigService {
 
 	String sourceId = removeSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString()).get();
 
-	if (isHarvesting(sourceId)) {
+	if (isHarvestingUnderway(sourceId)) {
 
 	    return buildErrorResponse(Status.BAD_REQUEST,
 		    "The requested source is currently being harvested and cannot be removed until harvest is complete");
@@ -549,7 +570,7 @@ public class ConfigService {
      * @param sourceId
      * @return
      */
-    private boolean isHarvesting(String sourceId) {
+    private boolean isHarvestingUnderway(String sourceId) {
 
 	SchedulerSupport support = SchedulerSupport.getInstance();
 	support.update();
