@@ -12,6 +12,7 @@ import org.junit.Test;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
@@ -111,7 +112,7 @@ public class GridExecutionTest {
 	GSLoggerFactory.getLogger(getClass()).info(workflow.toString());
 
 	// executes the workflow
-	DataObject result = workflow.execute(dataObject, targetDescriptor);
+	DataObject result = workflow.execute(new Dataset(), dataObject, targetDescriptor);
 
 	// formal validation
 	DataDescriptor resultDescriptor = result.getDataDescriptor();
