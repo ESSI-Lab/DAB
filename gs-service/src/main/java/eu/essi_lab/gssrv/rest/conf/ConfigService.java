@@ -6,7 +6,6 @@ package eu.essi_lab.gssrv.rest.conf;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -175,6 +174,10 @@ public class ConfigService {
 
 	Optional<String> randomId = Optional.empty();
 
+	//
+	// source id presence check
+	//
+	
 	if (optSourceId.isPresent()) {
 
 	    String sourceId = optSourceId.get();
@@ -189,11 +192,19 @@ public class ConfigService {
 	    }
 
 	} else {
+	    
+	    //
+	    // random id creation
+	    //
 
 	    randomId = Optional.of(UUID.randomUUID().toString());
 
 	    putSourceRequest.put(PutSourceRequest.SOURCE_ID, randomId.get());
 	}
+	
+	//
+	// putting new harvesting setting and flushing
+	//
 
 	HarvestingSetting setting = HarvestingSettingUtils.build(putSourceRequest);
 
@@ -218,6 +229,10 @@ public class ConfigService {
 		return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to save changes: " + ex.getMessage());
 	    }
 	}
+	
+	//
+	// optional harvesting scheduling
+	//
 
 	if (!putSourceRequest.readNestedRootParameters().isEmpty()) {
 
@@ -235,6 +250,10 @@ public class ConfigService {
 	    handleHarvestSourceRequest(harvestSchedulingRequest);
 	}
 
+	//
+	// in case of random id, it is provided in the response
+	// 
+	
 	if (randomId.isPresent()) {
 
 	    JSONObject object = new JSONObject();
@@ -245,10 +264,12 @@ public class ConfigService {
 		    type(MediaType.APPLICATION_JSON.toString()).//
 		    build();
 	}
+	
+	//
+	//
+	//
 
-	return Response.status(Status.CREATED).//
-		type(MediaType.APPLICATION_JSON.toString()).//
-		build();
+	return Response.status(Status.CREATED).build();
     }
 
     /**
@@ -257,25 +278,37 @@ public class ConfigService {
      */
     private Response handleEditSourceRequest(EditSourceRequest editSourceRequest) {
 
-	SettingIdHolder holder = getHolder(editSourceRequest);
+	//
+	// finding setting id from the given source id
+	//
 
-	if (holder.getErrorResponse().isPresent()) {
+	SettingIdFinder finder = getFinder(editSourceRequest);
 
-	    return holder.getErrorResponse().get();
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
 	}
+	
+	//
+	// building harvesting setting
+	//
 
-	String settingId = holder.getSettingId().get();
+	String settingId = finder.getSettingId().get();
 
 	HarvestingSetting setting = HarvestingSettingUtils.build(editSourceRequest);
 	setting.setIdentifier(settingId);
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+	
+	//
+	// replacing and flushing
+	//
 
 	boolean replaced = configuration.replace(setting);
 
 	if (!replaced) {
 
-	    return buildErrorResponse(Status.NOT_MODIFIED, "Source not modified");
+	    return buildErrorResponse(Status.BAD_REQUEST, "No changes to appply");
 
 	} else {
 
@@ -291,9 +324,11 @@ public class ConfigService {
 	    }
 	}
 
-	return Response.status(Status.OK).//
-		type(MediaType.APPLICATION_JSON.toString()).//
-		build();
+	//
+	//
+	//
+
+	return Response.status(Status.OK).build();
     }
 
     /**
@@ -302,15 +337,19 @@ public class ConfigService {
      */
     private Response handleHarvestSourceRequest(HarvestSchedulingRequest harvestSourceRequest) {
 
-	SettingIdHolder holder = getHolder(harvestSourceRequest);
+	//
+	// finding setting id from the given source id
+	//
 
-	if (holder.getErrorResponse().isPresent()) {
+	SettingIdFinder finder = getFinder(harvestSourceRequest);
 
-	    return holder.getErrorResponse().get();
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
 	}
 
 	//
-	//
+	// harvesting underway check in case of start harvesting now
 	//
 
 	Optional<Object> startTime = harvestSourceRequest.read(HarvestSchedulingRequest.START_TIME);
@@ -324,7 +363,7 @@ public class ConfigService {
 	}
 
 	//
-	//
+	// start time in the past check
 	//
 
 	if (startTime.isPresent()) {
@@ -338,10 +377,10 @@ public class ConfigService {
 	}
 
 	//
-	//
+	// updating harvesting setting scheduling
 	//
 
-	String settingId = holder.getSettingId().get();
+	String settingId = finder.getSettingId().get();
 
 	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
 		stream().//
@@ -358,6 +397,11 @@ public class ConfigService {
 
 	SelectionUtils.deepClean(setting);
 	SelectionUtils.deepAfterClean(setting);
+
+	//
+	// replacing setting. if the operation fails, it means that the provided scheduling is the same as the previous
+	// one
+	//
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 
@@ -378,7 +422,7 @@ public class ConfigService {
 	}
 
 	//
-	//
+	// scheduling or rescheduling
 	//
 
 	SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
@@ -403,9 +447,11 @@ public class ConfigService {
 	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to schedule task: " + ex.getMessage());
 	}
 
-	return Response.status(Status.OK).//
-		type(MediaType.APPLICATION_JSON.toString()).//
-		build();
+	//
+	//
+	//
+
+	return Response.status(Status.OK).build();
     }
 
     /**
@@ -414,15 +460,19 @@ public class ConfigService {
      */
     private Response handleRemoveSourceRequest(RemoveSourceRequest removeSourceRequest) {
 
-	SettingIdHolder holder = getHolder(removeSourceRequest);
+	//
+	// finding setting id from the given source id
+	//
 
-	if (holder.getErrorResponse().isPresent()) {
+	SettingIdFinder finder = getFinder(removeSourceRequest);
 
-	    return holder.getErrorResponse().get();
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
 	}
 
 	//
-	//
+	// harvesting underway check
 	//
 
 	String sourceId = removeSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString()).get();
@@ -433,10 +483,10 @@ public class ConfigService {
 		    "The requested source is currently being harvested and cannot be removed until harvest is complete");
 	}
 
-	String settingId = holder.getSettingId().get();
+	String settingId = finder.getSettingId().get();
 
 	//
-	//
+	// unscheduling job
 	//
 
 	SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
@@ -461,7 +511,7 @@ public class ConfigService {
 	}
 
 	//
-	//
+	// removing setting
 	//
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
@@ -473,6 +523,10 @@ public class ConfigService {
 	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to remove source");
 	}
 
+	//
+	//
+	//
+
 	return Response.status(Status.OK).build();
     }
 
@@ -482,16 +536,23 @@ public class ConfigService {
      */
     private Response handleListSourcesRequest(ListSourcesRequest request) {
 
+	//
+	// updating scheduling support
+	//
+
 	SchedulerSupport support = SchedulerSupport.getInstance();
 	support.update();
 
-	List<HarvestingSetting> settings = ConfigurationWrapper.getHarvestingSettings();
+	//
+	// reading optional source ids
+	//
 
 	JSONArray out = new JSONArray();
 
 	final List<String> sourceIds = new ArrayList<String>();
 
 	Optional<Object> optional = request.read(ListSourcesRequest.SOURCE_ID);
+
 	if (optional.isPresent()) {
 
 	    sourceIds.addAll(Arrays.asList(optional.get().toString().split(",")).//
@@ -499,6 +560,12 @@ public class ConfigService {
 		    map(v -> v.trim().strip()).//
 		    collect(Collectors.toList()));
 	}
+
+	//
+	//
+	//
+
+	List<HarvestingSetting> settings = ConfigurationWrapper.getHarvestingSettings();
 
 	settings.forEach(setting -> {
 
@@ -638,7 +705,7 @@ public class ConfigService {
     /**
      * @author Fabrizio
      */
-    private class SettingIdHolder {
+    private class SettingIdFinder {
 
 	private String settingId;
 	private Response errorResponse;
@@ -646,7 +713,7 @@ public class ConfigService {
 	/**
 	 * @param settingId
 	 */
-	private SettingIdHolder(String settingId) {
+	private SettingIdFinder(String settingId) {
 
 	    this.settingId = settingId;
 	}
@@ -654,7 +721,7 @@ public class ConfigService {
 	/**
 	 * @param response
 	 */
-	private SettingIdHolder(Response response) {
+	private SettingIdFinder(Response response) {
 
 	    errorResponse = response;
 	}
@@ -680,7 +747,7 @@ public class ConfigService {
      * @param request
      * @return
      */
-    private SettingIdHolder getHolder(ConfigRequest request) {
+    private SettingIdFinder getFinder(ConfigRequest request) {
 
 	Optional<String> optSourceId = request.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
 
@@ -688,7 +755,7 @@ public class ConfigService {
 
 	if (!optSourceId.isPresent()) {
 
-	    return new SettingIdHolder(buildErrorResponse(Status.BAD_REQUEST, "Missing source identifier"));
+	    return new SettingIdFinder(buildErrorResponse(Status.BAD_REQUEST, "Missing source identifier"));
 
 	} else {
 
@@ -700,7 +767,7 @@ public class ConfigService {
 		    findFirst().//
 		    isPresent()) {
 
-		return new SettingIdHolder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' do not exists"));
+		return new SettingIdFinder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' do not exists"));
 	    }
 
 	    settingId = ConfigurationWrapper.getHarvestingSettings().//
@@ -711,6 +778,6 @@ public class ConfigService {
 		    getIdentifier();
 	}
 
-	return new SettingIdHolder(settingId);
+	return new SettingIdFinder(settingId);
     }
 }
