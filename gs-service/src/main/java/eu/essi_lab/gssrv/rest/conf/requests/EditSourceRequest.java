@@ -1,7 +1,9 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf;
+package eu.essi_lab.gssrv.rest.conf.requests;
+
+import java.util.ArrayList;
 
 /*-
  * #%L
@@ -24,31 +26,29 @@ package eu.essi_lab.gssrv.rest.conf;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.gssrv.rest.conf.Parameter;
 import eu.essi_lab.model.Queryable.ContentType;
 
 /**
  * @author Fabrizio
  */
-public class RemoveSourceRequest extends PutSourceRequest {
-
-    public static final String REMOVE_DATA = "removeData";
+public class EditSourceRequest extends PutSourceRequest {
 
     /**
      * 
      */
-    public RemoveSourceRequest() {
+    public EditSourceRequest() {
     }
 
     /**
      * @param object
      */
-    public RemoveSourceRequest(JSONObject object) {
+    public EditSourceRequest(JSONObject object) {
 
 	super(object);
     }
@@ -59,7 +59,9 @@ public class RemoveSourceRequest extends PutSourceRequest {
 	ArrayList<Parameter> list = new ArrayList<>();
 
 	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
-	list.add(Parameter.of(REMOVE_DATA, ContentType.BOOLEAN, false));
+	list.add(Parameter.of(SOURCE_LABEL, ContentType.TEXTUAL, true));
+	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, true));
+	list.add(Parameter.of(SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, true));
 
 	return list;
     }

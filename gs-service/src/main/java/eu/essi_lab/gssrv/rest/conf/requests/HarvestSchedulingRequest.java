@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf;
+package eu.essi_lab.gssrv.rest.conf.requests;
 
 /*-
  * #%L
@@ -30,6 +30,7 @@ import java.util.List;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.gssrv.rest.conf.Parameter;
 import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.Queryable.ContentType;
 

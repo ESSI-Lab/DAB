@@ -9,10 +9,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.cfga.option.InputPattern;
-import eu.essi_lab.gssrv.rest.conf.HarvestSchedulingRequest;
-import eu.essi_lab.gssrv.rest.conf.HarvestSchedulingRequest.RepeatCount;
-import eu.essi_lab.gssrv.rest.conf.HarvestSchedulingRequest.RepeatIntervalUnit;
 import eu.essi_lab.gssrv.rest.conf.Parameter;
+import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest.RepeatCount;
+import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest.RepeatIntervalUnit;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.Queryable.ContentType;
 

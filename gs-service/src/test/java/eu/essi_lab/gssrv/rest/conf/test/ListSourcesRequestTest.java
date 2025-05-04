@@ -9,9 +9,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.cfga.option.InputPattern;
-import eu.essi_lab.gssrv.rest.conf.ListSourcesRequest;
 import eu.essi_lab.gssrv.rest.conf.Parameter;
-import eu.essi_lab.gssrv.rest.conf.RemoveSourceRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.ListSourcesRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.RemoveSourceRequest;
 import eu.essi_lab.model.Queryable.ContentType;
 
 /**

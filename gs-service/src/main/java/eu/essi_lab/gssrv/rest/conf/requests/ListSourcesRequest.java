@@ -1,9 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf;
-
-import java.util.ArrayList;
+package eu.essi_lab.gssrv.rest.conf.requests;
 
 /*-
  * #%L
@@ -26,28 +24,30 @@ import java.util.ArrayList;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.gssrv.rest.conf.Parameter;
 import eu.essi_lab.model.Queryable.ContentType;
 
 /**
  * @author Fabrizio
  */
-public class EditSourceRequest extends PutSourceRequest {
+public class ListSourcesRequest extends PutSourceRequest {
 
     /**
      * 
      */
-    public EditSourceRequest() {
+    public ListSourcesRequest() {
     }
 
     /**
      * @param object
      */
-    public EditSourceRequest(JSONObject object) {
+    public ListSourcesRequest(JSONObject object) {
 
 	super(object);
     }
@@ -57,10 +57,10 @@ public class EditSourceRequest extends PutSourceRequest {
 
 	ArrayList<Parameter> list = new ArrayList<>();
 
-	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
-	list.add(Parameter.of(SOURCE_LABEL, ContentType.TEXTUAL, true));
-	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, true));
-	list.add(Parameter.of(SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, true));
+	Parameter parameter = Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false);
+	parameter.setMultiValue();
+
+	list.add(parameter);
 
 	return list;
     }
