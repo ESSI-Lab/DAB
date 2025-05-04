@@ -6,7 +6,6 @@ package eu.essi_lab.gssrv.rest.conf;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -257,14 +256,14 @@ public class ConfigService {
      */
     private Response handleEditSourceRequest(EditSourceRequest editSourceRequest) {
 
-	SettingIdHolder holder = getHolder(editSourceRequest);
+	SettingIdFinder finder = getFinder(editSourceRequest);
 
-	if (holder.getErrorResponse().isPresent()) {
+	if (finder.getErrorResponse().isPresent()) {
 
-	    return holder.getErrorResponse().get();
+	    return finder.getErrorResponse().get();
 	}
 
-	String settingId = holder.getSettingId().get();
+	String settingId = finder.getSettingId().get();
 
 	HarvestingSetting setting = HarvestingSettingUtils.build(editSourceRequest);
 	setting.setIdentifier(settingId);
@@ -302,11 +301,11 @@ public class ConfigService {
      */
     private Response handleHarvestSourceRequest(HarvestSchedulingRequest harvestSourceRequest) {
 
-	SettingIdHolder holder = getHolder(harvestSourceRequest);
+	SettingIdFinder finder = getFinder(harvestSourceRequest);
 
-	if (holder.getErrorResponse().isPresent()) {
+	if (finder.getErrorResponse().isPresent()) {
 
-	    return holder.getErrorResponse().get();
+	    return finder.getErrorResponse().get();
 	}
 
 	//
@@ -341,7 +340,7 @@ public class ConfigService {
 	//
 	//
 
-	String settingId = holder.getSettingId().get();
+	String settingId = finder.getSettingId().get();
 
 	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
 		stream().//
@@ -414,11 +413,11 @@ public class ConfigService {
      */
     private Response handleRemoveSourceRequest(RemoveSourceRequest removeSourceRequest) {
 
-	SettingIdHolder holder = getHolder(removeSourceRequest);
+	SettingIdFinder finder = getFinder(removeSourceRequest);
 
-	if (holder.getErrorResponse().isPresent()) {
+	if (finder.getErrorResponse().isPresent()) {
 
-	    return holder.getErrorResponse().get();
+	    return finder.getErrorResponse().get();
 	}
 
 	//
@@ -433,7 +432,7 @@ public class ConfigService {
 		    "The requested source is currently being harvested and cannot be removed until harvest is complete");
 	}
 
-	String settingId = holder.getSettingId().get();
+	String settingId = finder.getSettingId().get();
 
 	//
 	//
@@ -638,7 +637,7 @@ public class ConfigService {
     /**
      * @author Fabrizio
      */
-    private class SettingIdHolder {
+    private class SettingIdFinder {
 
 	private String settingId;
 	private Response errorResponse;
@@ -646,7 +645,7 @@ public class ConfigService {
 	/**
 	 * @param settingId
 	 */
-	private SettingIdHolder(String settingId) {
+	private SettingIdFinder(String settingId) {
 
 	    this.settingId = settingId;
 	}
@@ -654,7 +653,7 @@ public class ConfigService {
 	/**
 	 * @param response
 	 */
-	private SettingIdHolder(Response response) {
+	private SettingIdFinder(Response response) {
 
 	    errorResponse = response;
 	}
@@ -680,7 +679,7 @@ public class ConfigService {
      * @param request
      * @return
      */
-    private SettingIdHolder getHolder(ConfigRequest request) {
+    private SettingIdFinder getFinder(ConfigRequest request) {
 
 	Optional<String> optSourceId = request.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
 
@@ -688,7 +687,7 @@ public class ConfigService {
 
 	if (!optSourceId.isPresent()) {
 
-	    return new SettingIdHolder(buildErrorResponse(Status.BAD_REQUEST, "Missing source identifier"));
+	    return new SettingIdFinder(buildErrorResponse(Status.BAD_REQUEST, "Missing source identifier"));
 
 	} else {
 
@@ -700,7 +699,7 @@ public class ConfigService {
 		    findFirst().//
 		    isPresent()) {
 
-		return new SettingIdHolder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' do not exists"));
+		return new SettingIdFinder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' do not exists"));
 	    }
 
 	    settingId = ConfigurationWrapper.getHarvestingSettings().//
@@ -711,6 +710,6 @@ public class ConfigService {
 		    getIdentifier();
 	}
 
-	return new SettingIdHolder(settingId);
+	return new SettingIdFinder(settingId);
     }
 }
