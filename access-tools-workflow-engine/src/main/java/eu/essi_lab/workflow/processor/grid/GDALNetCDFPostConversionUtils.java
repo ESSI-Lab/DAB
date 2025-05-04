@@ -61,7 +61,7 @@ public class GDALNetCDFPostConversionUtils {
      * @return
      * @throws GSException
      */
-    public static DataObject copyAttributes(DataObject source, DataObject input) throws GSException {
+    public static DataObject copyAttributes(DataObject source, DataObject input,String outputFileName) throws GSException {
 	try {
 
 	    DataDescriptor sourceDescriptor = source.getDataDescriptor();
@@ -87,9 +87,8 @@ public class GDALNetCDFPostConversionUtils {
 		mainVariablesMap.put(mainVariable.getShortName(), mainVariable);
 	    }
 
-	    File tmpFile = File.createTempFile("GDAL_To_NetCDF_Processor", ".nc");
-	    tmpFile.deleteOnExit();
-	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, tmpFile.getAbsolutePath());
+	    
+	    NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, outputFileName);
 
 	    // global attributes
 	    for (Attribute globalAttribute : sourceReader.getGlobalAttributes()) {
@@ -161,8 +160,11 @@ public class GDALNetCDFPostConversionUtils {
 
 	    DataObject output = new DataObject();
 	    output.setDataDescriptor(input.getDataDescriptor());
-	    output.setFile(tmpFile);
-	    sourceFile.delete();
+	    output.setFile(new File(outputFileName));
+	    if (sourceFile.exists() && !sourceFile.getPath().contains("change")) {
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(sourceFile);
+	    }
+
 
 	    return output;
 
@@ -271,7 +273,7 @@ public class GDALNetCDFPostConversionUtils {
 	    DataObject output = new DataObject();
 	    output.setDataDescriptor(input.getDataDescriptor());
 	    output.setFile(tmpFile);
-	    inputFile.delete();
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(inputFile);
 
 	    return output;
 

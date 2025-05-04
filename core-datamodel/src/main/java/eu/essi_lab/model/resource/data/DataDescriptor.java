@@ -178,7 +178,7 @@ public class DataDescriptor implements Serializable {
 		Number upper = spatialDimension.getContinueDimension().getUpper();
 		Long size = spatialDimension.getContinueDimension().getSize();
 
-		if (size!=null && size.equals(targetSize)) {
+		if (size != null && size.equals(targetSize)) {
 
 		    if (targetLower == null) {
 			targetSpatialDimension.getContinueDimension().setLower(lower);
@@ -326,29 +326,29 @@ public class DataDescriptor implements Serializable {
 
 	setSpatialDimensions(spatialDimensions);
     }
-    
+
     public void setEPSG3857SpatialDimensions(Double minx, Double miny, Double maxx, Double maxy) {
 
- 	List<DataDimension> spatialDimensions = new ArrayList<>();
+	List<DataDimension> spatialDimensions = new ArrayList<>();
 
- 	ContinueDimension dim1 = new ContinueDimension(X_DIMENSION_NAME);
- 	dim1.setType(DimensionType.ROW);
- 	dim1.setLower(minx);
- 	dim1.setUpper(maxx);
- 	dim1.setUom(Unit.METRE);
+	ContinueDimension dim1 = new ContinueDimension(X_DIMENSION_NAME);
+	dim1.setType(DimensionType.ROW);
+	dim1.setLower(minx);
+	dim1.setUpper(maxx);
+	dim1.setUom(Unit.METRE);
 
- 	spatialDimensions.add(dim1);
+	spatialDimensions.add(dim1);
 
- 	ContinueDimension dim2 = new ContinueDimension(Y_DIMENSION_NAME);
- 	dim2.setType(DimensionType.COLUMN);
- 	dim2.setLower(miny);
- 	dim2.setUpper(maxy);
- 	dim2.setUom(Unit.METRE);
+	ContinueDimension dim2 = new ContinueDimension(Y_DIMENSION_NAME);
+	dim2.setType(DimensionType.COLUMN);
+	dim2.setLower(miny);
+	dim2.setUpper(maxy);
+	dim2.setUom(Unit.METRE);
 
- 	spatialDimensions.add(dim2);
+	spatialDimensions.add(dim2);
 
- 	setSpatialDimensions(spatialDimensions);
-     }
+	setSpatialDimensions(spatialDimensions);
+    }
 
     /**
      * Sets the temporal dimension
@@ -402,7 +402,8 @@ public class DataDescriptor implements Serializable {
 	outDataDescriptor.setDataFormat(getDataFormat());
 	outDataDescriptor.setDataType(getDataType());
 
-	outDataDescriptor.setSpatialDimensions(getSpatialDimensions().stream().map(d -> d.clone()).collect(Collectors.toList()));
+	outDataDescriptor.setSpatialDimensions(
+		getSpatialDimensions() == null ? null : getSpatialDimensions().stream().map(d -> d.clone()).collect(Collectors.toList()));
 	outDataDescriptor.setTemporalDimension(getTemporalDimension() == null ? null : getTemporalDimension().clone());
 	outDataDescriptor.setOtherDimensions(getOtherDimensions().stream().map(d -> d.clone()).collect(Collectors.toList()));
 

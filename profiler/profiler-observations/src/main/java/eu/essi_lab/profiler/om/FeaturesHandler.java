@@ -60,8 +60,11 @@ public class FeaturesHandler extends OMHandler {
 	JSONObject monitoringPoint = feature.getJSONObject("featureOfInterest");
 	monitoringPoint.remove("type");
 	
-	JSONObject shape = monitoringPoint.getJSONObject(getGeometryName());
+	String geometryName = getGeometryName();
+	if (monitoringPoint.has(geometryName)) {
+	JSONObject shape = monitoringPoint.getJSONObject(geometryName);
 	monitoringPoint.put(getGeometryName(), shape);
+	}
 
 	writer.write(monitoringPoint.toString());
 

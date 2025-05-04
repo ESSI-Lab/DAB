@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.workflow.processor.DescriptorUtils;
 import eu.essi_lab.workflow.processor.IdentityProcessor;
@@ -197,18 +198,23 @@ public class WorkflowBuilder {
 	 * @see #create(InputDescriptor, OutputDescriptor)
 	 */
 	public Optional<Workflow> buildPreferred(DataDescriptor initDescriptor, DataDescriptor targetDescriptor) {
+		return buildPreferred(null, initDescriptor, targetDescriptor);
+	}
 
-		List<Workflow> workflows = build(initDescriptor, targetDescriptor);
+	public Optional<Workflow> buildPreferred(GSResource resource, DataDescriptor initDescriptor,
+			DataDescriptor targetDescriptor) {
+
+		List<Workflow> workflows = build(resource, initDescriptor, targetDescriptor);
 
 		for (Workflow workflow : workflows) {
-		    Workblock block0 = workflow.getWorkblocks().get(0);
-		    SubsettingCapability subCap = block0.getOutput().getSubsettingCapability();
-		    if (subCap!=null &&subCap.getTemporalSubsetting().getFirstValue().equals(Boolean.TRUE)) {
-			return Optional.of(workflow);
-		    }
+			Workblock block0 = workflow.getWorkblocks().get(0);
+			SubsettingCapability subCap = block0.getOutput().getSubsettingCapability();
+			if (subCap != null && subCap.getTemporalSubsetting().getFirstValue().equals(Boolean.TRUE)) {
+				return Optional.of(workflow);
+			}
 
 		}
-		
+
 		return workflows.stream().//
 				max((w1, w2) -> Integer.compare(w1.getPreference(), w2.getPreference()));
 	}
@@ -331,7 +337,11 @@ public class WorkflowBuilder {
 	 * @return
 	 */
 	public List<Workflow> build(DataDescriptor initDescriptor, DataDescriptor targetDescriptor) {
+		return build(null, initDescriptor, targetDescriptor);
+	}
 
+	public List<Workflow> build(GSResource resource, DataDescriptor initDescriptor, DataDescriptor targetDescriptor) {
+		GSLoggerFactory.getLogger(getClass()).info("Building workflow");
 		printLog("Building workflow STARTED");
 		ProcessorCapabilities input = DescriptorUtils.fromInputDescriptor(initDescriptor);
 

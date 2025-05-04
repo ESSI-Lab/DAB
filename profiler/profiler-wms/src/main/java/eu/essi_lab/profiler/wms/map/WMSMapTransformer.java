@@ -25,10 +25,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.concurrent.TimeUnit;
 
 import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -64,6 +66,12 @@ public class WMSMapTransformer extends AccessRequestTransformer {
 
     private static final String WMS_MAP_TRANSFORMER_DATA_COMPLIANCE_REPORT_NOT_FOUND = "WMS_MAP_TRANSFORMER_DATA_COMPLIANCE_REPORT_NOT_FOUND";
     private static final String WMS_MAP_TRANSFORMER_ONLINE_ID_NOT_FOUND = "WMS_MAP_TRANSFORMER_ONLINE_ID_NOT_FOUND";
+
+    private static ExpiringCache<GSResource> cache = new ExpiringCache();
+    static {
+	cache.setDuration(TimeUnit.MINUTES.toMillis(30));
+	cache.setMaxSize(1000);
+    }
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -147,44 +155,50 @@ public class WMSMapTransformer extends AccessRequestTransformer {
     }
 
     private DataDescriptor getDefaultDescriptor(String requestId, String onlineIdentifier) throws GSException {
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	GSResource ret = cache.get(onlineIdentifier);
+	if (ret == null) {
+	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
+	    IDiscoveryExecutor executor = loader.iterator().next();
 
-	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-	discoveryMessage.setRequestId(requestId);
-	discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
-	discoveryMessage.getResourceSelector().setSubset(ResourceSubset.EXTENDED);
+	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+	    discoveryMessage.setRequestId(requestId);
+	    discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
+	    discoveryMessage.getResourceSelector().setSubset(ResourceSubset.EXTENDED);
 
-	discoveryMessage.setPage(new Page(1, 1));
+	    discoveryMessage.setPage(new Page(1, 1));
 
-	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+	    discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
-	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
-		BondOperator.EQUAL, //
-		MetadataElement.ONLINE_ID, //
-		onlineIdentifier);
+	    SimpleValueBond bond = BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.ONLINE_ID, //
+		    onlineIdentifier);
 
-	discoveryMessage.setPermittedBond(bond);
-	discoveryMessage.setUserBond(bond);
-	discoveryMessage.setNormalizedBond(bond);
+	    discoveryMessage.setPermittedBond(bond);
+	    discoveryMessage.setUserBond(bond);
+	    discoveryMessage.setNormalizedBond(bond);
 
-	discoveryMessage.setResultsPriority(ResultsPriority.ALL);
+	    discoveryMessage.setResultsPriority(ResultsPriority.ALL);
 
-	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
+	    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
 
-	if (resultSet.getResultsList().isEmpty()) {
+	    if (resultSet.getResultsList().isEmpty()) {
 
-	    throw GSException.createException(//
-		    getClass(), //
-		    "Online id [" + onlineIdentifier + "] not found", //
-		    ErrorInfo.ERRORTYPE_SERVICE, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    WMS_MAP_TRANSFORMER_ONLINE_ID_NOT_FOUND);
+		throw GSException.createException(//
+			getClass(), //
+			"Online id [" + onlineIdentifier + "] not found", //
+			ErrorInfo.ERRORTYPE_SERVICE, //
+			ErrorInfo.SEVERITY_ERROR, //
+			WMS_MAP_TRANSFORMER_ONLINE_ID_NOT_FOUND);
+	    }
+	    ret = resultSet.getResultsList().get(0);
+	    cache.put(onlineIdentifier, ret);
+	   
 	}
 
-	GSResource result = resultSet.getResultsList().get(0);
-	ReportsMetadataHandler handler = new ReportsMetadataHandler(result);
+	
+	ReportsMetadataHandler handler = new ReportsMetadataHandler(ret);
 
 	List<DataComplianceReport> reports = handler.getReports();
 	Optional<DataComplianceReport> optReport = reports.stream().filter(r -> r.getOnlineId().equals(onlineIdentifier)).findFirst();
@@ -192,7 +206,7 @@ public class WMSMapTransformer extends AccessRequestTransformer {
 
 	    throw GSException.createException(//
 		    getClass(), //
-		    "Data compliance report for dataset with original id [" + result.getOriginalId() + "] not found", //
+		    "Data compliance report for dataset with original id [" + ret.getOriginalId() + "] not found", //
 		    ErrorInfo.ERRORTYPE_SERVICE, //
 		    ErrorInfo.SEVERITY_ERROR, //
 		    WMS_MAP_TRANSFORMER_DATA_COMPLIANCE_REPORT_NOT_FOUND);

@@ -64,7 +64,7 @@ public class MultiInputTest {
 	    DataDescriptor input = TestUtils.create(DataType.POINT, "c1", "f1");
 	    DataDescriptor output = TestUtils.create(DataType.POINT, "c9", "f9");
 
-	    List<Workflow> workflows = builder.build(input, output);//
+	    List<Workflow> workflows = builder.build(null, input, output);//
 
 	    // TestUtils.enablePrinting(true);
 	    TestUtils.printWorkflows(workflows);
@@ -137,7 +137,7 @@ public class MultiInputTest {
 	    DataDescriptor input = TestUtils.create(DataType.POINT, "c1", "f1");
 	    DataDescriptor output = TestUtils.create(DataType.POINT, "c9", "f9");
 
-	    List<Workflow> workflows = builder.build(input, output);//
+	    List<Workflow> workflows = builder.build(null, input, output);//
 
 	    // TestUtils.enablePrinting(true);
 
@@ -221,7 +221,7 @@ public class MultiInputTest {
 	    DataDescriptor input = TestUtils.create(DataType.POINT, "c1", "f1");
 	    DataDescriptor output = TestUtils.create(DataType.POINT, "c9", "f9");
 
-	    List<Workflow> workflows = builder.build(input, output);//
+	    List<Workflow> workflows = builder.build(null, input, output);//
 
 	    // TestUtils.enablePrinting(true);
 
@@ -314,7 +314,7 @@ public class MultiInputTest {
 	    DataDescriptor input = TestUtils.create(DataType.POINT, "c1", "f1");
 	    DataDescriptor output = TestUtils.create(DataType.POINT, "c9", "f9");
 
-	    List<Workflow> workflows = builder.build(input, output);//
+	    List<Workflow> workflows = builder.build(null, input, output);//
 
 	    // TestUtils.enablePrinting(true);
 
@@ -418,7 +418,7 @@ public class MultiInputTest {
 	    DataDescriptor input = TestUtils.create(DataType.POINT, "c1", "f1");
 	    DataDescriptor output = TestUtils.create(DataType.POINT, "c9", "f9");
 
-	    List<Workflow> workflows = builder.build(input, output);//
+	    List<Workflow> workflows = builder.build(null, input, output);//
 
 	    // TestUtils.enablePrinting(true);
 
@@ -485,7 +485,7 @@ public class MultiInputTest {
 	    DataDescriptor input = TestUtils.create(DataType.POINT, "c1", "f1");
 	    DataDescriptor output = TestUtils.create(DataType.POINT, "c9", "f9");
 
-	    List<Workflow> workflows = builder.build(input, output);//
+	    List<Workflow> workflows = builder.build(null, input, output);//
 
 	    // TestUtils.enablePrinting(true);
 
@@ -561,7 +561,7 @@ public class MultiInputTest {
 	    DataDescriptor input = TestUtils.create(DataType.POINT, "c1", "f1");
 	    DataDescriptor output = TestUtils.create(DataType.POINT, "c9", "f9");
 
-	    List<Workflow> workflows = builder.build(input, output);//
+	    List<Workflow> workflows = builder.build(null, input, output);//
 
 	    // TestUtils.enablePrinting(true);
 

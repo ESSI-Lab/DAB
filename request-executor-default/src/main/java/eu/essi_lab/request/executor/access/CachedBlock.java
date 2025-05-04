@@ -1,4 +1,4 @@
-package eu.essi_lab.accessor.sensorthings._1_1;
+package eu.essi_lab.request.executor.access;
 
 /*-
  * #%L
@@ -21,37 +21,14 @@ package eu.essi_lab.accessor.sensorthings._1_1;
  * #L%
  */
 
-import eu.essi_lab.adk.harvest.HarvestedAccessor;
+import eu.essi_lab.workflow.builder.Workblock;
+import eu.essi_lab.workflow.builder.WorkblockBuilder;
+import eu.essi_lab.workflow.processor.DataProcessor;
 
-/**
- * @author Fabrizio
- */
-public class SensorThingsAccessor extends HarvestedAccessor<SensorThingsConnector> {
+public class CachedBlock extends Workblock {
 
-	public SensorThingsAccessor() {
-		
-	}
-    /**
-     * 
-     * 
-     */
-    public static final String TYPE = "SensorThings_1_1";
-
-    @Override
-    protected String initSettingName() {
-
-	return "SensorThings Accessor v.1.1";
+    public CachedBlock(DataProcessor process, WorkblockBuilder builder) {
+	super(process, builder);
     }
 
-    @Override
-    protected String initAccessorType() {
-
-	return TYPE;
-    }
-
-    @Override
-    protected SensorThingsConnectorSetting initHarvestedConnectorSetting() {
-
-	return new SensorThingsConnectorSetting();
-    }
 }

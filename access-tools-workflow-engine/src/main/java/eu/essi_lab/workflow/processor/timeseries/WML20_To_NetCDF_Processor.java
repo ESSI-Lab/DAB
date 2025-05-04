@@ -632,7 +632,8 @@ public class WML20_To_NetCDF_Processor extends DataProcessor {
 	    IOUtils.copy(fis, baos);
 	    fis.close();
 	    baos.close();
-	    out.delete();
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(out);
+
 	    return new ByteArrayInputStream(baos.toByteArray());
 	} catch (Exception e) {
 	    e.printStackTrace();

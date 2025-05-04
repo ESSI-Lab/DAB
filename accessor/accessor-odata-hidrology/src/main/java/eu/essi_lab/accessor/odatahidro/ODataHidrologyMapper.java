@@ -85,6 +85,10 @@ public class ODataHidrologyMapper extends OriginalIdentifierMapper {
     private static final String ODATA_HIDROLOGY_MAPPER_ERROR = "ODATA_HIDROLOGY_MAPPER_ERROR";
     private static final String URN_SIKE = "urn:syke:station:";
 
+    public ODataHidrologyMapper() {
+	
+	}
+    
     @Override
     protected GSResource execMapping(OriginalMetadata originalMD, GSSource source) throws GSException {
 

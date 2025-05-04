@@ -253,6 +253,7 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 	// gdaldem color-relief test.nc colormap.txt output_colored.png -alpha
 	File outputFile = File.createTempFile(GDALFormatConverterProcessor.class.getSimpleName() + getOutputFormat(), getExtension());
 	outputFile.delete();
+
 	Runtime rt = Runtime.getRuntime();
 	String temp = System.getProperty("java.io.tmpdir");
 	File tempDir = new File(temp);
@@ -268,16 +269,17 @@ public abstract class GDALFormatConverterProcessor extends DataProcessor {
 
 	String command = "gdaldem color-relief " + inputData.getFile().getAbsolutePath() + " " + colormap.getAbsolutePath() + " " + outputFile.getAbsolutePath()
 		+ " -alpha";
-	Process ps = rt.exec(command);
+	logger.info("Executing GDAL Runtime: " + command);
+	Process ps = rt.exec(command);	
 	int exitVal = ps.waitFor();
-
+	logger.info("Executed GDAL Runtime: " + command);
 	if (exitVal > 0) {
 
 	    GSLoggerFactory.getLogger(GDAL_NetCDF_CRS_Converter_Processor.class).error(IOStreamUtils.asUTF8String(ps.getErrorStream()));
 
 	}
 
-	logger.info("Executing GDAL Runtime: " + command);
+	
 
 	outputFile.deleteOnExit();
 	DataObject outputData = new DataObject();
