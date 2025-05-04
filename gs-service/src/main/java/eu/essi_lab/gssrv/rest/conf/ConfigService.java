@@ -41,6 +41,7 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.gssrv.rest.conf.requests.EditSourceRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.HarvestUnschedulingRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.ListSourcesRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.PutSourceRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.RemoveSourceRequest;
@@ -142,7 +143,16 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    return validate.isPresent() ? validate.get() : handleHarvestSourceRequest(request);
+	    return validate.isPresent() ? validate.get() : handleHarvestSchedulingRequest(request);
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(HarvestUnschedulingRequest.class))) {
+
+	    HarvestUnschedulingRequest request = new HarvestUnschedulingRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    return validate.isPresent() ? validate.get() : handleHarvestUnschedulingRequest(request);
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(RemoveSourceRequest.class))) {
@@ -174,6 +184,10 @@ public class ConfigService {
 
 	Optional<String> randomId = Optional.empty();
 
+	//
+	// source id presence check
+	//
+
 	if (optSourceId.isPresent()) {
 
 	    String sourceId = optSourceId.get();
@@ -189,10 +203,18 @@ public class ConfigService {
 
 	} else {
 
+	    //
+	    // random id creation
+	    //
+
 	    randomId = Optional.of(UUID.randomUUID().toString());
 
 	    putSourceRequest.put(PutSourceRequest.SOURCE_ID, randomId.get());
 	}
+
+	//
+	// putting new harvesting setting and flushing
+	//
 
 	HarvestingSetting setting = HarvestingSettingUtils.build(putSourceRequest);
 
@@ -218,6 +240,10 @@ public class ConfigService {
 	    }
 	}
 
+	//
+	// optional harvesting scheduling
+	//
+
 	if (!putSourceRequest.readNestedRootParameters().isEmpty()) {
 
 	    HarvestSchedulingRequest harvestSchedulingRequest = new HarvestSchedulingRequest();
@@ -231,8 +257,12 @@ public class ConfigService {
 
 	    harvestSchedulingRequest.put(PutSourceRequest.SOURCE_ID, putSourceRequest.read(PutSourceRequest.SOURCE_ID).get().toString());
 
-	    handleHarvestSourceRequest(harvestSchedulingRequest);
+	    handleHarvestSchedulingRequest(harvestSchedulingRequest);
 	}
+
+	//
+	// in case of random id, it is provided in the response
+	//
 
 	if (randomId.isPresent()) {
 
@@ -245,9 +275,11 @@ public class ConfigService {
 		    build();
 	}
 
-	return Response.status(Status.CREATED).//
-		type(MediaType.APPLICATION_JSON.toString()).//
-		build();
+	//
+	//
+	//
+
+	return Response.status(Status.CREATED).build();
     }
 
     /**
@@ -256,12 +288,20 @@ public class ConfigService {
      */
     private Response handleEditSourceRequest(EditSourceRequest editSourceRequest) {
 
+	//
+	// finding setting id from the given source id
+	//
+
 	SettingIdFinder finder = getFinder(editSourceRequest);
 
 	if (finder.getErrorResponse().isPresent()) {
 
 	    return finder.getErrorResponse().get();
 	}
+
+	//
+	// building harvesting setting
+	//
 
 	String settingId = finder.getSettingId().get();
 
@@ -270,11 +310,15 @@ public class ConfigService {
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 
+	//
+	// replacing and flushing
+	//
+
 	boolean replaced = configuration.replace(setting);
 
 	if (!replaced) {
 
-	    return buildErrorResponse(Status.NOT_MODIFIED, "Source not modified");
+	    return buildErrorResponse(Status.BAD_REQUEST, "No changes to appply");
 
 	} else {
 
@@ -290,16 +334,22 @@ public class ConfigService {
 	    }
 	}
 
-	return Response.status(Status.OK).//
-		type(MediaType.APPLICATION_JSON.toString()).//
-		build();
+	//
+	//
+	//
+
+	return Response.status(Status.OK).build();
     }
 
     /**
      * @param harvestSourceRequest
      * @return
      */
-    private Response handleHarvestSourceRequest(HarvestSchedulingRequest harvestSourceRequest) {
+    private Response handleHarvestSchedulingRequest(HarvestSchedulingRequest harvestSourceRequest) {
+
+	//
+	// finding setting id from the given source id
+	//
 
 	SettingIdFinder finder = getFinder(harvestSourceRequest);
 
@@ -309,7 +359,7 @@ public class ConfigService {
 	}
 
 	//
-	//
+	// harvesting underway check in case of start harvesting now
 	//
 
 	Optional<Object> startTime = harvestSourceRequest.read(HarvestSchedulingRequest.START_TIME);
@@ -323,7 +373,7 @@ public class ConfigService {
 	}
 
 	//
-	//
+	// start time in the past check
 	//
 
 	if (startTime.isPresent()) {
@@ -337,7 +387,7 @@ public class ConfigService {
 	}
 
 	//
-	//
+	// updating harvesting setting scheduling
 	//
 
 	String settingId = finder.getSettingId().get();
@@ -358,6 +408,11 @@ public class ConfigService {
 	SelectionUtils.deepClean(setting);
 	SelectionUtils.deepAfterClean(setting);
 
+	//
+	// replacing setting. if the operation fails, it means that the provided scheduling is the same as the previous
+	// one
+	//
+
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 
 	boolean replaced = configuration.replace(setting);
@@ -377,7 +432,7 @@ public class ConfigService {
 	}
 
 	//
-	//
+	// scheduling or rescheduling
 	//
 
 	SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
@@ -402,9 +457,72 @@ public class ConfigService {
 	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to schedule task: " + ex.getMessage());
 	}
 
-	return Response.status(Status.OK).//
-		type(MediaType.APPLICATION_JSON.toString()).//
-		build();
+	//
+	//
+	//
+
+	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleHarvestUnschedulingRequest(HarvestUnschedulingRequest harvestUnschedulingRequest) {
+
+	//
+	// finding setting id from the given source id
+	//
+
+	SettingIdFinder finder = getFinder(harvestUnschedulingRequest);
+
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
+	}
+
+	//
+	// unscheduling
+	//
+
+	SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+
+	Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
+
+	String settingId = finder.getSettingId().get();
+
+	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
+		stream().//
+		filter(s -> s.getIdentifier().equals(settingId)).//
+		findFirst().//
+		get();
+
+	try {
+
+	    scheduler.unschedule(setting);
+
+	} catch (SchedulerException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unscheduling failed: " + e.getMessage());
+	}
+
+	//
+	// disabling scheduling
+	//
+
+	setting.getScheduling().setEnabled(false);
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	configuration.replace(setting);
+
+	//
+	//
+	//
+
+	return Response.status(Status.OK).build();
     }
 
     /**
@@ -412,6 +530,10 @@ public class ConfigService {
      * @return
      */
     private Response handleRemoveSourceRequest(RemoveSourceRequest removeSourceRequest) {
+
+	//
+	// finding setting id from the given source id
+	//
 
 	SettingIdFinder finder = getFinder(removeSourceRequest);
 
@@ -421,7 +543,7 @@ public class ConfigService {
 	}
 
 	//
-	//
+	// harvesting underway check
 	//
 
 	String sourceId = removeSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString()).get();
@@ -435,7 +557,7 @@ public class ConfigService {
 	String settingId = finder.getSettingId().get();
 
 	//
-	//
+	// unscheduling job
 	//
 
 	SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
@@ -456,11 +578,11 @@ public class ConfigService {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 
-	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Job unscheduling failed: " + e.getMessage());
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unscheduling failed: " + e.getMessage());
 	}
 
 	//
-	//
+	// removing setting
 	//
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
@@ -472,6 +594,10 @@ public class ConfigService {
 	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to remove source");
 	}
 
+	//
+	//
+	//
+
 	return Response.status(Status.OK).build();
     }
 
@@ -481,16 +607,23 @@ public class ConfigService {
      */
     private Response handleListSourcesRequest(ListSourcesRequest request) {
 
+	//
+	// updating scheduling support
+	//
+
 	SchedulerSupport support = SchedulerSupport.getInstance();
 	support.update();
 
-	List<HarvestingSetting> settings = ConfigurationWrapper.getHarvestingSettings();
+	//
+	// reading optional source ids
+	//
 
 	JSONArray out = new JSONArray();
 
 	final List<String> sourceIds = new ArrayList<String>();
 
 	Optional<Object> optional = request.read(ListSourcesRequest.SOURCE_ID);
+
 	if (optional.isPresent()) {
 
 	    sourceIds.addAll(Arrays.asList(optional.get().toString().split(",")).//
@@ -498,6 +631,12 @@ public class ConfigService {
 		    map(v -> v.trim().strip()).//
 		    collect(Collectors.toList()));
 	}
+
+	//
+	//
+	//
+
+	List<HarvestingSetting> settings = ConfigurationWrapper.getHarvestingSettings();
 
 	settings.forEach(setting -> {
 
