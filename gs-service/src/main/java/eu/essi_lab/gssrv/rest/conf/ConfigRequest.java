@@ -4,7 +4,6 @@
 package eu.essi_lab.gssrv.rest.conf;
 
 import java.util.Arrays;
-import java.util.Date;
 
 /*-
  * #%L
@@ -33,10 +32,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.option.InputPattern;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.Queryable.ContentType;
 
@@ -452,14 +452,10 @@ public abstract class ConfigRequest {
 
 	    case ISO8601_DATE_TIME:
 
-		Optional<Date> iso8601ToDate = ISO8601DateTimeUtils.parseISO8601ToDate(val.toString());
-
-		if (iso8601ToDate.isEmpty() || //
-			(val.toString().length() != "YYYY-MM-DDThh:mm:ssZ".length()
-				&& val.toString().length() != "YYYY-MM-DDThh:mm:ss".length())) {
+		if (!parseDateTime(val.toString()) || val.toString().length() != "YYYY-MM-DDThh:mm:ss".length()) {
 
 		    throw new IllegalArgumentException("Unsupported value '" + val + "'. Parameter '" + paramName
-			    + "' should be of type ISO8601 date time: 'YYYY-MM-DDThh:mm:ss' or 'YYYY-MM-DDThh:mm:ssZ'");
+			    + "' should be of type ISO8601 date time (no UTC): 'YYYY-MM-DDThh:mm:ss'");
 		}
 
 		break;
@@ -646,5 +642,24 @@ public abstract class ConfigRequest {
     protected JSONObject getParametersObject() {
 
 	return object.getJSONObject("parameters");
+    }
+
+    /**
+     * @param dateTime
+     * @return
+     */
+    private boolean parseDateTime(String dateTime) {
+    
+        DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
+    
+        try {
+            parser.parseDateTime(dateTime);
+            return true;
+    
+        } catch (Exception ex) {
+    
+        }
+    
+        return false;
     }
 }

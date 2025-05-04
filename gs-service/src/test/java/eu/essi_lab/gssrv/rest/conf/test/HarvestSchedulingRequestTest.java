@@ -49,7 +49,7 @@ public class HarvestSchedulingRequestTest {
 	HarvestSchedulingRequest request = new HarvestSchedulingRequest();
 
 	request.put(HarvestSchedulingRequest.SOURCE_ID, "sourceId");
-	request.put(HarvestSchedulingRequest.START_TIME, ISO8601DateTimeUtils.getISO8601DateTime());
+	request.put(HarvestSchedulingRequest.START_TIME, ISO8601DateTimeUtils.getISO8601DateTimeNoUTC());
 	request.put(HarvestSchedulingRequest.REPEAT_INTERVAL, "1");
 	request.put(HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.WEEKS.getLabel());
 	request.put(HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
@@ -58,7 +58,7 @@ public class HarvestSchedulingRequestTest {
 
 	System.out.println(request);
     }
-    
+
     @Test
     public void validationTest_1() {
 
@@ -66,15 +66,14 @@ public class HarvestSchedulingRequestTest {
 
 	request.put(HarvestSchedulingRequest.SOURCE_ID, "sourceId");
 	request.put(HarvestSchedulingRequest.START_TIME, ISO8601DateTimeUtils.getISO8601DateTime());
-	
 
 	request.put(HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.WEEKS.getLabel());
-	
+
 	request.put(HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
     }
-    
+
     @Test
     public void validationTest_1_2() {
 
@@ -82,9 +81,9 @@ public class HarvestSchedulingRequestTest {
 
 	request.put(HarvestSchedulingRequest.SOURCE_ID, "sourceId");
 	request.put(HarvestSchedulingRequest.START_TIME, ISO8601DateTimeUtils.getISO8601DateTime());
-	
+
 	request.put(HarvestSchedulingRequest.REPEAT_INTERVAL, "1");
- 	
+
 	request.put(HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
@@ -185,7 +184,7 @@ public class HarvestSchedulingRequestTest {
 
 	request.put(HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
 
-	request.validate();
+	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
     }
 
     @Test
