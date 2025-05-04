@@ -100,6 +100,17 @@ public class ISO8601DateTimeUtils {
     /**
      * @return
      */
+    public static String getISO8601DateTimeNoUTC() {
+
+	Date now = new Date();
+	String iso8601DateTime = getISO8601DateTime(now);
+
+	return iso8601DateTime.substring(0, iso8601DateTime.length() - 1);
+    }
+
+    /**
+     * @return
+     */
     public static String getISO8601DateTimeWithMilliseconds() {
 
 	Date now = new Date();
@@ -357,8 +368,6 @@ public class ISO8601DateTimeUtils {
 
 	return parseToDate(dateTimeString, NOT_STANDARD2);
     }
-
-  
 
     /**
      * @param dateTimeString
