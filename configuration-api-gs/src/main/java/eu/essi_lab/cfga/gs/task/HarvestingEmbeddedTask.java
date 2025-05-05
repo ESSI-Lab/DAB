@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.cfga.gs.task;
 
+import eu.essi_lab.messages.listrecords.ListRecordsRequest;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -49,4 +51,14 @@ public interface HarvestingEmbeddedTask extends CustomTask {
      * @return
      */
     public ExecutionStage getExecutionStage();
+
+    /**
+     * @param request
+     */
+    public void setListRecordsRequest(ListRecordsRequest request);
+
+    /**
+     * @return
+     */
+    public ListRecordsRequest getListRecordsRequest();
 }
