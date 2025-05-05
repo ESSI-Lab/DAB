@@ -42,8 +42,7 @@ import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
+import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -69,13 +68,14 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * 
  * @author Fabrizio
  */
-public class ResourcesComparatorTask extends AbstractCustomTask implements HarvestingEmbeddedTask {
+public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
     /**
      * 
      */
     private static final int PAGE_SIZE = 1000;
     private List<String> newRecords;
+    private List<String> deletedRecords;
     private DatabaseFolder data1Folder;
     private DatabaseFolder data2Folder;
 
@@ -95,6 +95,7 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
     public ResourcesComparatorTask() {
 
 	newRecords = Lists.newArrayList();
+	deletedRecords = Lists.newArrayList();
     }
 
     @Override
@@ -112,7 +113,6 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 	}
 
 	List<String> modifiedRecords = Lists.newArrayList();
-	List<String> deletedRecords = Lists.newArrayList();
 
 	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
@@ -233,7 +233,11 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 	    case SELECTIVE:
 
 		//
-		// successive selective harvesting, searching for new records
+		// successive selective harvesting
+		//
+
+		//
+		// 1) searching for new records
 		//
 
 		String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTime();
@@ -266,6 +270,41 @@ public class ResourcesComparatorTask extends AbstractCustomTask implements Harve
 		resultSet.//
 			getResultsList().//
 			forEach(res -> newRecords.add(res.getIndexesMetadata().read(ResourceProperty.ORIGINAL_ID.getName()).get(0)));
+
+		//
+		// 2) deleted records
+		//
+
+		getListRecordsRequest().getIncrementalDeletedResources().forEach(res -> deletedRecords.add(res.getOriginalId().get()));
+
+		//
+		// 3) modified records
+		//
+
+		//
+		// these are the previous records, now replaced by the ones in the writing folder
+		// with the same original ids
+		//
+		List<GSResource> modifiedResources = getListRecordsRequest().//
+			getIncrementalModifiedResources().//
+			stream().//
+			filter(res -> res.getOriginalId().isPresent()).//
+			collect(Collectors.toList());
+
+		DatabaseFolder writingFolder = worker.getWritingFolder();
+
+		for (GSResource modified : modifiedResources) {
+
+		    GSResource incoming = writingFolder.get(IdentifierType.ORIGINAL, modified.getOriginalId().get()).get();
+
+		    ComparisonResponse response = GSResourceComparator.compare(COMPARISON_PROPERTIES, incoming, modified);
+
+		    // at least one change is expected!
+		    if (!response.getProperties().isEmpty()) {
+
+			modifiedRecords.add(modified.getOriginalId().get());
+		    }
+		}
 	    }
 	} else {
 
