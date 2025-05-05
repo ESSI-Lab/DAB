@@ -465,7 +465,7 @@ public class Harvester {
 
 	    applyHarvestingPlan(//
 		    response.getRecords(), //
-		    request.isFirstHarvesting(), //
+		    request, //
 		    recovery, //
 		    isIncremental, //
 		    resumptionToken, //
@@ -505,7 +505,7 @@ public class Harvester {
      */
     private void applyHarvestingPlan(//
 	    Iterator<GSResource> records, //
-	    boolean firstHarvesting, //
+	    ListRecordsRequest request, //
 	    boolean isRecovering, //
 	    boolean isIncremental, //
 	    String resumptionToken, //
@@ -525,9 +525,10 @@ public class Harvester {
 
 	    HarvesterPlan plan = getPlan();
 
+	    plan.setRequest(request);
 	    plan.setResumptionToken(resumptionToken);
 	    plan.setHarvestingProperties(harvestingProperties);
-	    plan.setIsFirstHarvesting(firstHarvesting);
+	    plan.setIsFirstHarvesting(request.isFirstHarvesting());
 
 	    try {
 
