@@ -128,8 +128,6 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    HarvestingStrategy strategy = worker.getStrategy();
 
-	    String startTimeStamp = worker.getStartTimeStamp();
-
 	    //
 	    //
 	    //
@@ -240,6 +238,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		// 1) searching for new records
 		//
 
+		String startTimeStamp = worker.getStartTimeStamp();
 		String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTime();
 
 		ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
