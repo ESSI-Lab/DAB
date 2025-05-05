@@ -278,6 +278,22 @@ public class SourceStorageWorker {
 
 	    return folderName;
 	}
+	
+	if (folderName.endsWith(SourceStorageWorker.DATA_1_POSTFIX)) {
+
+	    folderName = folderName.replace(suiteId + "_", "");
+	    folderName = folderName.replace(DATA_1_POSTFIX, "");
+
+	    return folderName;
+	}
+	
+	if (folderName.endsWith(SourceStorageWorker.DATA_2_POSTFIX)) {
+
+	    folderName = folderName.replace(suiteId + "_", "");
+	    folderName = folderName.replace(DATA_2_POSTFIX, "");
+
+	    return folderName;
+	}
 
 	return null;
     }
