@@ -133,8 +133,6 @@ public class IdentifierDecorator {
 		    existingResources.size(), //
 		    originalId);
 
-	    ConflictingResourceException crex = null;
-
 	    for (GSResource existingResource : existingResources) {
 
 		GSLoggerFactory.getLogger(getClass()).warn("Existing resource \"{}\"", existingResource);
@@ -152,9 +150,9 @@ public class IdentifierDecorator {
 		// incremental harvesting after the first
 		//
 		if (duplicationCase == 3) {
-		    
+
 		    //
-		    // set the existing resource as modified resource, before it will be 
+		    // set the existing resource as modified resource, before it will be
 		    // replaced by the database component
 		    //
 		    request.addIncrementalModifiedResource(existingResource);
@@ -221,18 +219,23 @@ public class IdentifierDecorator {
 	    }
 	} else if (preserveIds) {
 
-	    GSResource existingResource = getDatabaseReader().getResource(originalId, incomingResource.getSource());
+	    if (request.isFirstHarvesting()) {
 
-	    if (existingResource != null) {
-
-		// successive harvesting
-		incomingResource.setPrivateId(existingResource.getPrivateId());
-		incomingResource.setPublicId(existingResource.getPublicId());
+		decorateIdentifier(incomingResource, incomingResource.getSource(), originalId);
 
 	    } else {
 
-		// first harvesting
-		decorateIdentifier(incomingResource, incomingResource.getSource(), originalId);
+		GSResource existingResource = getDatabaseReader().getResource(originalId, incomingResource.getSource());
+
+		if (existingResource != null) {
+
+		    incomingResource.setPrivateId(existingResource.getPrivateId());
+		    incomingResource.setPublicId(existingResource.getPublicId());
+
+		} else {
+
+		    decorateIdentifier(incomingResource, incomingResource.getSource(), originalId);
+		}
 	    }
 
 	} else {
