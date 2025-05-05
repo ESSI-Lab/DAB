@@ -529,6 +529,7 @@ public class Harvester {
 	    plan.setResumptionToken(resumptionToken);
 	    plan.setHarvestingProperties(harvestingProperties);
 	    plan.setIsFirstHarvesting(request.isFirstHarvesting());
+	    plan.setIsIncrementalHarvesting(isIncremental);
 
 	    try {
 
