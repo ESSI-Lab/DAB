@@ -17,7 +17,7 @@ public class BandCorrectionTest {
 	source.setFile(new File("/tmp/netcdf-connector-Monthly_T2m.nc"));
 	
 	DataObject output = GDALNetCDFPostConversionUtils.doBandCorrections(source, input);
-	output = GDALNetCDFPostConversionUtils.copyAttributes(source, output);
+	output = GDALNetCDFPostConversionUtils.copyAttributes(source, output,"out.nc");
 
 	System.out.println(output.getFile());
 	System.out.println();

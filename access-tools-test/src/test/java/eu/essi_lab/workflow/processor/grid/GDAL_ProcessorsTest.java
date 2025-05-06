@@ -10,6 +10,7 @@ import org.junit.Before;
 
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
@@ -43,7 +44,7 @@ public abstract class GDAL_ProcessorsTest {
 
 	DataDescriptor descriptor = geotiffValidator.readDataAttributes(geotiff);
 	CRS originalCRS = descriptor.getCRS();
-	this.netcdf1 = processor1.process(geotiff, null);
+	this.netcdf1 = processor1.process(new Dataset(), geotiff, null);
 	netcdf1.getFile().deleteOnExit();
 	descriptor.setDataFormat(DataFormat.NETCDF());
 	netcdf1.setDataDescriptor(descriptor);
@@ -57,7 +58,7 @@ public abstract class GDAL_ProcessorsTest {
 	capabilities.setCRSCapability(CapabilityElement.anyFromCRS(targetCRS));
 
 	TargetHandler target = new TargetHandler(null, null, capabilities);
-	this.netcdf2 = processor2.process(netcdf1, target);
+	this.netcdf2 = processor2.process(new Dataset(), netcdf1, target);
 	netcdf2.getFile().deleteOnExit();
 	// to check that the result has the desired CRS
 	descriptor.setCRS(targetCRS);

@@ -56,6 +56,7 @@
 		</jaxrs:providers>
 		
 	</jaxrs:server>
+	
 	<bean id="essiUserService" class="eu.essi_lab.gssrv.rest.UserService" />
 
 
@@ -67,23 +68,21 @@
 			<ref bean="jsonProvider" />
 		</jaxrs:providers>
 	</jaxrs:server>
+	
 	<bean id="essiHealthService" class="eu.essi_lab.gssrv.rest.HealthCheckService" />
 
-
-
-	<!-- <jaxrs:server id="essiAdminServer" address="/admin">
+	<jaxrs:server id="configServer" address="/config">
+		
 		<jaxrs:serviceBeans>
-			<ref bean="essiAdminService" />
+			<ref bean="configService" />
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="jsonProvider" />
 		</jaxrs:providers>
 	</jaxrs:server>
 
-	<bean id="essiAdminService" class="eu.essi_lab.gssrv.rest.ESSIAdminService" />  -->
-	
-	
-	<bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
-	
+	<bean id="configService" class="eu.essi_lab.gssrv.rest.conf.ConfigService" />
+		
+	<bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />	
 
 </beans>

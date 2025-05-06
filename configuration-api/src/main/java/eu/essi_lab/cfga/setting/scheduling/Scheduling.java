@@ -215,8 +215,8 @@ public class Scheduling extends Setting {
 
 	    } else if (scheduling.isRunIndefinitelySet() && !scheduling.getEndTime().isPresent()) {
 
-		validationResponse.getWarnings().add(
-			"The scheduling is set to run indefinitely at interval of " + scheduling.getRepeatInterval() + " " +scheduling.getRepeatIntervalUnit());
+		validationResponse.getWarnings().add("The scheduling is set to run indefinitely at interval of "
+			+ scheduling.getRepeatInterval() + " " + scheduling.getRepeatIntervalUnit());
 
 	    } else if (endTimePresent) {
 
@@ -332,6 +332,14 @@ public class Scheduling extends Setting {
     public void setStartTime(Date startTime) {
 
 	setStartTime(new ISODateTime(startTime).getValue());
+    }
+
+    /**
+     * 
+     */
+    public void setStartNow() {
+
+	getOption(START_TIME_OPTION_KEY, ISODateTime.class).get().setEnabled(false);
     }
 
     /**
