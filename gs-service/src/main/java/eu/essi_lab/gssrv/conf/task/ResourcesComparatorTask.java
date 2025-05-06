@@ -290,6 +290,8 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		List<GSResource> modifiedResources = getListRecordsRequest().//
 			getIncrementalModifiedResources().//
 			stream().//
+			// deleted records can be found also in the modified records list, they must be discarded
+			filter(res -> !deletedRecords.contains(res.getOriginalId().get())).//
 			filter(res -> res.getOriginalId().isPresent()).//
 			collect(Collectors.toList());
 
