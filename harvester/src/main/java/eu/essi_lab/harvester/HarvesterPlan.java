@@ -64,11 +64,7 @@ public class HarvesterPlan extends HarvestingComponent {
 
 		current = component;
 
-//		GSLoggerFactory.getLogger(getClass()).trace(//
-//			"Application of {} on resource {} STARTED", //
-//			component.getClass().getSimpleName(), //
-//			resource);
-
+		component.setRequest(getRequest());
 		component.setAccessor(getAccessor());
 		component.setSourceStorage(getSourceStorage());
 
@@ -88,11 +84,6 @@ public class HarvesterPlan extends HarvestingComponent {
 	    throw spse;
 
 	} finally {
-
-//	    GSLoggerFactory.getLogger(getClass()).trace( //
-//		    "Application of {} on resource {} ENDED", //
-//		    current.getClass().getSimpleName(), //
-//		    resource);
 	}
     }
 }

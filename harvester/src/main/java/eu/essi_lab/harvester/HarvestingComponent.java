@@ -26,6 +26,7 @@ import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
 import eu.essi_lab.messages.HarvestingProperties;
+import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.model.resource.GSResource;
 
 /**
@@ -44,6 +45,23 @@ public abstract class HarvestingComponent {
     private boolean isRecovering;
     private boolean isFirstHarvesting;
     private boolean isIncrementalHarvesting;
+    private ListRecordsRequest request;
+
+    /**
+     * @return
+     */
+    public ListRecordsRequest getRequest() {
+
+	return request;
+    }
+
+    /**
+     * @param request
+     */
+    public void setRequest(ListRecordsRequest request) {
+
+	this.request = request;
+    }
 
     /**
      * @return

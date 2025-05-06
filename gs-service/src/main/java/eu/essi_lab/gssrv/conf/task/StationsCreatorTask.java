@@ -41,8 +41,7 @@ import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.opensearch.index.Shape;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
+import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.Citation;
@@ -69,7 +68,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
 /**
  * @author boldrini
  */
-public class StationsCreatorTask extends AbstractCustomTask implements HarvestingEmbeddedTask {
+public class StationsCreatorTask extends AbstractEmbeddedTask  {
 
     /**
      * 

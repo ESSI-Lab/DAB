@@ -33,6 +33,7 @@ import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.messages.HarvestingProperties;
+import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -49,6 +50,7 @@ public class IdentifierDecorator {
     private DatabaseReader dbReader;
     private SourcePrioritySetting sourcePrioritySetting;
     private static final String PID_SEPARATOR = "@";
+    private ListRecordsRequest request;
 
     /**
      *
@@ -66,6 +68,14 @@ public class IdentifierDecorator {
 
 	this.dbReader = dataBaseReader;
 	this.sourcePrioritySetting = sourcePrioritySetting;
+    }
+
+    /**
+     * @param request
+     */
+    public void setListRecordsRequest(ListRecordsRequest request) {
+
+	this.request = request;
     }
 
     /**
@@ -123,8 +133,6 @@ public class IdentifierDecorator {
 		    existingResources.size(), //
 		    originalId);
 
-	    ConflictingResourceException crex = null;
-
 	    for (GSResource existingResource : existingResources) {
 
 		GSLoggerFactory.getLogger(getClass()).warn("Existing resource \"{}\"", existingResource);
@@ -138,7 +146,18 @@ public class IdentifierDecorator {
 			isRecovery, //
 			isIncremental);
 
-		if (duplicationCase > 0) {
+		//
+		// incremental harvesting after the first
+		//
+		if (duplicationCase == 3) {
+
+		    //
+		    // set the existing resource as modified resource, before it will be
+		    // replaced by the database component
+		    //
+		    request.addIncrementalModifiedResource(existingResource);
+
+		} else if (duplicationCase > 0) {
 		    //
 		    // the source administrator should be warn since it means that the source
 		    // provides records with same identifier.
@@ -200,18 +219,23 @@ public class IdentifierDecorator {
 	    }
 	} else if (preserveIds) {
 
-	    GSResource existingResource = getDatabaseReader().getResource(originalId, incomingResource.getSource());
+	    if (request.isFirstHarvesting()) {
 
-	    if (existingResource != null) {
-
-		// successive harvesting
-		incomingResource.setPrivateId(existingResource.getPrivateId());
-		incomingResource.setPublicId(existingResource.getPublicId());
+		decorateIdentifier(incomingResource, incomingResource.getSource(), originalId);
 
 	    } else {
 
-		// first harvesting
-		decorateIdentifier(incomingResource, incomingResource.getSource(), originalId);
+		GSResource existingResource = getDatabaseReader().getResource(originalId, incomingResource.getSource());
+
+		if (existingResource != null) {
+
+		    incomingResource.setPrivateId(existingResource.getPrivateId());
+		    incomingResource.setPublicId(existingResource.getPublicId());
+
+		} else {
+
+		    decorateIdentifier(incomingResource, incomingResource.getSource(), originalId);
+		}
 	    }
 
 	} else {
