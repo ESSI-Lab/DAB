@@ -596,6 +596,30 @@ public class ConfigurationWrapper {
     }
 
     /**
+     * @return
+     */
+    public static List<GSSource> getIncrementalSources() {
+
+	List<String> incrementalConnectors = Arrays.asList(//
+		"ChinaGeossConnector", //
+		"INPEConnector", //
+		"Landsat8Connector", //
+		"MeteoTrackerConnector", //
+		"OAIPMHConnector", //
+		"ONAMETConnector", //
+		"PRISMAConnector", //
+		"PolytopeIonBeamConnector", //
+		"SentinelConnector");//
+
+	return getHarvestingSettings().//
+		stream().//
+		map(s -> s.getSelectedAccessorSetting()).//
+		filter(as -> incrementalConnectors.contains(as.getHarvestedConnectorSetting().getConfigurableType())).//
+		map(as -> as.getSource()).//
+		collect(Collectors.toList());
+    }
+
+    /**
      * Since the mixed sources are also harvested, this is a quick way to get all the
      * sources that can be harvested
      * 
