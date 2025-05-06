@@ -235,11 +235,13 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		//
 
 		//
-		// 1) searching for new records
+		// 1) searching for new records. if the returned records are in the ListRecordsRequest modified list,
+		// they will be removed
+		// from the new records list
 		//
 
 		String startTimeStamp = worker.getStartTimeStamp();
-		String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTime();
+		String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
 
 		ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
 			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(startTimeStamp));
@@ -253,6 +255,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 		discoveryMessage.setExcludeResourceBinary(true);
+		discoveryMessage.setUseCachedSourcesDataFolderMap(false);
 
 		ResourceSelector resourceSelector = new ResourceSelector();
 		resourceSelector.addIndex(ResourceProperty.ORIGINAL_ID);
@@ -293,6 +296,10 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		DatabaseFolder writingFolder = worker.getWritingFolder();
 
 		for (GSResource modified : modifiedResources) {
+
+		    // modified records are also new (because of the resource time stamp), so here they are removed from
+		    // the new records list
+		    newRecords.remove(modified.getOriginalId().get());
 
 		    GSResource incoming = writingFolder.get(IdentifierType.ORIGINAL, modified.getOriginalId().get()).get();
 
