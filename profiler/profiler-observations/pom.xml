@@ -11,11 +11,19 @@
 	<artifactId>profiler-observations</artifactId>
 
 	<dependencies>
+		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>database-api-elasticsearch-impl</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+				
 		<dependency>
 			<groupId>eu.essi_lab</groupId>
 			<artifactId>access-tools</artifactId>
