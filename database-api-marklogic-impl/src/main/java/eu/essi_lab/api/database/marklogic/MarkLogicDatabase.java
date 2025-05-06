@@ -345,6 +345,12 @@ public class MarkLogicDatabase extends Database {
 
     }
 
+    @Override
+    protected SourceStorageWorker createSourceStorageWorker(String sourceId) throws GSException {
+
+	return new MarkLogicSourceStorageWorker(sourceId, this);
+    }
+
     private void initializeStorageWorkers() throws GSException {
 	try {
 

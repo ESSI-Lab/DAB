@@ -22,6 +22,7 @@ package eu.essi_lab.cfga.gs;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -99,6 +100,11 @@ public class ConfigurationWrapper {
     /**
      * 
      */
+    private static List<HarvestingSetting> harvestingSettingsCache;
+
+    /**
+     * 
+     */
     private static Configuration configuration;
 
     private ConfigurationWrapper() {
@@ -123,6 +129,7 @@ public class ConfigurationWrapper {
 		case ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED:
 		case ConfigurationChangeEvent.CONFIGURATION_FLUSHED:
 		    allSourcesCache = getSources(null, false);
+		    harvestingSettingsCache = _getHarvestingSettings();
 		    break;
 		default:
 		    break;
@@ -131,6 +138,7 @@ public class ConfigurationWrapper {
 	});
 
 	allSourcesCache = getSources(null, false);
+	harvestingSettingsCache = _getHarvestingSettings();
     }
 
     /**
@@ -299,6 +307,14 @@ public class ConfigurationWrapper {
      * @return
      */
     public static List<HarvestingSetting> getHarvestingSettings() {
+
+	return harvestingSettingsCache;
+    }
+
+    /**
+     * @return
+     */
+    private static List<HarvestingSetting> _getHarvestingSettings() {
 
 	@SuppressWarnings("unchecked")
 	Class<HarvestingSetting> clazz = (Class<HarvestingSetting>) HarvestingSettingLoader.load().getClass();
@@ -576,6 +592,30 @@ public class ConfigurationWrapper {
 	return getAllSources().//
 		stream().//
 		filter(s -> s.getBrokeringStrategy() == BrokeringStrategy.MIXED).//
+		collect(Collectors.toList());
+    }
+
+    /**
+     * @return
+     */
+    public static List<GSSource> getIncrementalSources() {
+
+	List<String> incrementalConnectors = Arrays.asList(//
+		"ChinaGeossConnector", //
+		"INPEConnector", //
+		"Landsat8Connector", //
+		"MeteoTrackerConnector", //
+		"OAIPMHConnector", //
+		"ONAMETConnector", //
+		"PRISMAConnector", //
+		"PolytopeIonBeamConnector", //
+		"SentinelConnector");//
+
+	return getHarvestingSettings().//
+		stream().//
+		map(s -> s.getSelectedAccessorSetting()).//
+		filter(as -> incrementalConnectors.contains(as.getHarvestedConnectorSetting().getConfigurableType())).//
+		map(as -> as.getSource()).//
 		collect(Collectors.toList());
     }
 

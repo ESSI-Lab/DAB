@@ -102,11 +102,17 @@ public class DatabaseComponent extends HarvestingComponent {
 
 			    for (GSResource gsResource : resources) {
 
+				//
+				// gathers the deleted resources to be eventually handled by
+				// the resources comparator task
+				//
+				getRequest().addIncrementalDeletedResource(gsResource);
+
 				GSLoggerFactory.getLogger(getClass()).debug("Removing deleted dataset: {}", gsResource.toString());
 
 				//
 				// removes resources with given headerIdentifier since they have been deleted from the
-				// origin OAI-PMH service
+				// source OAI-PMH service
 				//
 
 				dBWriter.remove(gsResource);
@@ -116,7 +122,24 @@ public class DatabaseComponent extends HarvestingComponent {
 
 		} else {
 
-		    dBWriter.store(resource);
+		    boolean isModified = getRequest().//
+			    getIncrementalModifiedResources().//
+			    stream().//
+			    filter(res -> res.getPrivateId().equals(resource.getPrivateId())).//
+			    findFirst().//
+			    isPresent();
+
+		    if (isModified) {
+			//
+			// in incremental harvesting there is only one data folder, so the store
+			// operation would fail since a record with this private id already exists
+			//
+			dBWriter.update(resource);
+
+		    } else {
+
+			dBWriter.store(resource);
+		    }
 		}
 
 		return;

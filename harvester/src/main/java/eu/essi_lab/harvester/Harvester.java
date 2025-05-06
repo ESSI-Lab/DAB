@@ -238,7 +238,7 @@ public class Harvester {
 
 	    if (executionStage != null && executionStage == ExecutionStage.BEFORE_HARVESTING_END) {
 
-		handleCustomTask(getAccessor().getSource(), context, status);
+		handleCustomTask(getAccessor().getSource(), context, status, request);
 	    }
 
 	    getSourceStorage().harvestingEnded(//
@@ -249,7 +249,7 @@ public class Harvester {
 
 	    if (executionStage != null && executionStage == ExecutionStage.AFTER_HARVESTING_END) {
 
-		handleCustomTask(getAccessor().getSource(), context, status);
+		handleCustomTask(getAccessor().getSource(), context, status, request);
 	    }
 
 	} catch (GSException ex) {
@@ -362,8 +362,13 @@ public class Harvester {
      * @param gsSource
      * @param context
      * @param status
+     * @param request
      */
-    private void handleCustomTask(GSSource gsSource, JobExecutionContext context, SchedulerJobStatus status) {
+    private void handleCustomTask(//
+	    GSSource gsSource, //
+	    JobExecutionContext context, //
+	    SchedulerJobStatus status, //
+	    ListRecordsRequest request) {
 
 	if (customTask != null) {
 
@@ -371,6 +376,7 @@ public class Harvester {
 
 		GSLoggerFactory.getLogger(getClass()).info("Execution of custom task {} STARTED", customTask.getName());
 
+		customTask.setListRecordsRequest(request);
 		customTask.setSource(gsSource);
 		customTask.doJob(context, status);
 
@@ -465,7 +471,7 @@ public class Harvester {
 
 	    applyHarvestingPlan(//
 		    response.getRecords(), //
-		    request.isFirstHarvesting(), //
+		    request, //
 		    recovery, //
 		    isIncremental, //
 		    resumptionToken, //
@@ -505,7 +511,7 @@ public class Harvester {
      */
     private void applyHarvestingPlan(//
 	    Iterator<GSResource> records, //
-	    boolean firstHarvesting, //
+	    ListRecordsRequest request, //
 	    boolean isRecovering, //
 	    boolean isIncremental, //
 	    String resumptionToken, //
@@ -525,9 +531,11 @@ public class Harvester {
 
 	    HarvesterPlan plan = getPlan();
 
+	    plan.setRequest(request);
 	    plan.setResumptionToken(resumptionToken);
 	    plan.setHarvestingProperties(harvestingProperties);
-	    plan.setIsFirstHarvesting(firstHarvesting);
+	    plan.setIsFirstHarvesting(request.isFirstHarvesting());
+	    plan.setIsIncrementalHarvesting(isIncremental);
 
 	    try {
 

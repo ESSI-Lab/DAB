@@ -42,8 +42,7 @@ import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
+import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.indexes.IndexedMetadataElements;
@@ -73,7 +72,7 @@ import eu.essi_lab.request.executor.discover.ResourcePropertyConstraintAdder;
 /**
  * @author Fabrizio
  */
-public class AggregationIdentifiersTask extends AbstractCustomTask implements HarvestingEmbeddedTask{
+public class AggregationIdentifiersTask extends AbstractEmbeddedTask  {
 
     /**
      * 
