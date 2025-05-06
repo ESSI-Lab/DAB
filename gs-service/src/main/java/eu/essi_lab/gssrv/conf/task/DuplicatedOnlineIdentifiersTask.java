@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /*-
@@ -28,6 +30,7 @@ import java.util.HashSet;
  */
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -38,6 +41,7 @@ import org.quartz.JobExecutionContext;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
@@ -48,6 +52,7 @@ import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.SortOrder;
+import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.ommdk.GMIResourceMapper;
@@ -118,6 +123,7 @@ public class DuplicatedOnlineIdentifiersTask extends AbstractCustomTask {
 	SearchAfter searchAfter = null;
 	int i = 0;
 	Set<String> setIds = new HashSet<String>();
+	Map<String, List<String>> idMap = new HashMap<String, List<String>>();
 	main: while (true) {
 
 	    // CHECKING CANCELED JOB
@@ -148,26 +154,50 @@ public class DuplicatedOnlineIdentifiersTask extends AbstractCustomTask {
 		// break main;
 		// }
 
-		String fileIdentifier = resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier();
-		String onlineId = resource.getHarmonizedMetadata().getCoreMetadata().getOnline().getIdentifier();
+		CoreMetadata coreMetadata = resource.getHarmonizedMetadata().getCoreMetadata();
+		if (coreMetadata != null) {
+		    String fileIdentifier = coreMetadata.getIdentifier();
+		    Online online = coreMetadata.getOnline();
+		    String publicationDate = coreMetadata.getDataIdentification().getCitationPublicationDate();
+		    if (online == null) {
+			continue;
+		    }
+		    String onlineId = online.getIdentifier();
 
-		if (setIds.contains(onlineId)) {
-		    File temp = new File(sourceDir, onlineId + ".txt");
-		    BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
-		    String publicationDate = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
-			    .getCitationPublicationDate();
-		    String text = "ONLINE_ID:" + onlineId + " - FILE_IDENTIFIER:" + fileIdentifier + " - PUBLICATION_DATE: "
-			    + publicationDate;
-		    GSLoggerFactory.getLogger(getClass()).info(text);
-		    writer.write(text);
-		    writer.close();
+		    if (idMap.containsKey(onlineId)) {
+			List<String> currentList = idMap.get(onlineId);
+			currentList.add(fileIdentifier);
+			idMap.put(onlineId, currentList);
+			File temp = new File(sourceDir, onlineId + ".txt");
+			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
+			String text = "ONLINE_ID:" + onlineId + " - FILE_IDENTIFIER:" + String.join(";", currentList)
+				+ " - PUBLICATION_DATE: " + publicationDate;
+			GSLoggerFactory.getLogger(getClass()).info(text);
+			writer.write(text);
+			writer.close();
+		    } else {
+			List<String> newList = new ArrayList<String>();
+			newList.add(fileIdentifier);
+			idMap.put(onlineId, newList);
+			// setIds.add(onlineId);
+		    }
 		}
 
 	    }
 
 	    if (resources.isEmpty()) {
-		break;
+		break main;
 	    }
+	}
+
+	for (Map.Entry<String, List<String>> entry : idMap.entrySet()) {
+
+	    String key = entry.getKey();
+	    List<String> listIds = entry.getValue();
+	    if(listIds.size() > 1) {
+		GSLoggerFactory.getLogger(getClass()).info("ONLINE_ID:" + key + " - FILE_IDENTIFIERS:" + String.join(";", listIds));
+	    }
+
 	}
 
     }
