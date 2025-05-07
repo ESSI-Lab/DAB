@@ -122,7 +122,7 @@ public class DuplicatedOnlineIdentifiersTask extends AbstractCustomTask {
 	int file = 0;
 
 	discoveryMessage
-		.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(SortOrder.ASCENDING, ResourceProperty.PRIVATE_ID))));
+		.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.PRIVATE_ID,SortOrder.ASCENDING))));
 
 	SearchAfter searchAfter = null;
 	int i = 0;

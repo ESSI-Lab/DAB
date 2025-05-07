@@ -275,7 +275,7 @@ public class OMHandler extends StreamingRequestHandler {
 		}
 
 		discoveryMessage
-			.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(SortOrder.ASCENDING, MetadataElement.ONLINE_ID))));
+			.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.ONLINE_ID,SortOrder.ASCENDING ),new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER,SortOrder.ASCENDING))));
 
 		OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
 
