@@ -284,11 +284,11 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 	    option.clearValues();
 	    return;
 	}
-	
+
 	//
-	// for Integer and String values, multi comma separated values are 
+	// for Integer and String values, multi comma separated values are
 	// also supported (e.g: 1,5,7 or a,b,c)
-	//  
+	//
 
 	if (valueClass.equals(Double.class)) {
 
@@ -297,20 +297,35 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 
 	} else if (valueClass.equals(Integer.class)) {
 
-	    List<Integer> values = Arrays.asList(value.toString().split(",")).//
-		    stream().//
-		    map(v -> Integer.valueOf(v)).//
-		    collect(Collectors.toList());
+	    if (option.isMultiValue()) {
 
-	    option.setObjectValues(values);
+		List<Integer> values = Arrays.asList(value.toString().split(",")).//
+			stream().//
+			map(v -> Integer.valueOf(v)).//
+			collect(Collectors.toList());
+
+		option.setObjectValues(values);
+
+	    } else {
+
+		Integer integer = Integer.valueOf(value.toString());
+		option.setObjectValue(integer);
+	    }
 
 	} else if (valueClass.equals(String.class)) {
 
-	    List<String> values = Arrays.asList(value.toString().split(",")).//
-		    stream().//
-		    collect(Collectors.toList());
+	    if (option.isMultiValue()) {
 
-	    option.setObjectValues(values);
+		List<String> values = Arrays.asList(value.toString().split(",")).//
+			stream().//
+			collect(Collectors.toList());
+
+		option.setObjectValues(values);
+
+	    } else {
+
+		option.setObjectValue(value.toString());
+	    }
 	}
     }
 
