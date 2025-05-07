@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.esri.feature.query;
 
+import java.util.AbstractMap.SimpleEntry;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -22,6 +24,7 @@ package eu.essi_lab.profiler.esri.feature.query;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +61,7 @@ import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
@@ -156,8 +160,8 @@ public class CachedCollections {
 
 			
 			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-			discoveryMessage.setSortOrder(SortOrder.ASCENDING);
-			discoveryMessage.setSortProperty(ResourceProperty.PUBLIC_ID);
+			SortedFields sortedFields = new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.PUBLIC_ID,SortOrder.ASCENDING)));
+			discoveryMessage.setSortedFields(sortedFields );
 			tmpResultSet = executor.retrieveNodes(discoveryMessage);
 
 			if (resultSet == null) {

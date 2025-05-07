@@ -26,9 +26,11 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -92,6 +94,7 @@ import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -366,8 +369,7 @@ public class OpenSearchWrapper {
 	    List<String> fields, //
 	    int start, //
 	    int size, //
-	    Optional<Queryable> orderingProperty, //
-	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
+	    Optional<SortedFields> sortedProperties,
 	    Optional<SearchAfter> searchAfter, //
 	    boolean requestCache, //
 	    boolean excludeResourceBinary)
@@ -392,9 +394,9 @@ public class OpenSearchWrapper {
 		builder.from(start);
 	    }
 
-	    if (orderingProperty.isPresent() && sortOrder.isPresent()) {
+	    if (sortedProperties.isPresent() ) {
 
-		handleSort(builder, orderingProperty.get(), sortOrder.get());
+		handleSort(builder, sortedProperties.get());
 	    }
 
 	    handleSourceFields(null, builder, fields, excludeResourceBinary);
@@ -412,8 +414,7 @@ public class OpenSearchWrapper {
 			size, //
 			searchAfter, //
 			start, //
-			orderingProperty, //
-			sortOrder, //
+			sortedProperties,//
 			fields, //
 			excludeResourceBinary, //
 			requestCache);//
@@ -449,7 +450,6 @@ public class OpenSearchWrapper {
 		MAX_DEFAULT_HITS, //
 		Optional.empty(), //
 		Optional.empty(), //
-		Optional.empty(), //
 		false, //
 		false);
 
@@ -480,7 +480,6 @@ public class OpenSearchWrapper {
 		size, //
 		Optional.empty(), //
 		Optional.empty(), //
-		Optional.empty(), //
 		false, //
 		false);
 
@@ -508,7 +507,6 @@ public class OpenSearchWrapper {
 		Arrays.asList(), //
 		0, //
 		MAX_DEFAULT_HITS, //
-		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
 		false, //
@@ -562,8 +560,7 @@ public class OpenSearchWrapper {
 		Arrays.asList(field), //
 		start, //
 		size, //
-		Optional.empty(), // ordering property
-		Optional.empty(), // sort order
+		Optional.empty(), // sorted properties
 		Optional.empty(), // search after
 		false, // request cache
 		true); // exclude binary
@@ -840,8 +837,7 @@ public class OpenSearchWrapper {
 	    Integer size, //
 	    Optional<SearchAfter> searchAfter, //
 	    Integer start, //
-	    Optional<Queryable> orderingProperty, //
-	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
+	    Optional<SortedFields>sortedProperties,
 	    List<String> fields, //
 	    boolean excludeResourceBinary, //
 	    boolean requestCache) {
@@ -864,9 +860,9 @@ public class OpenSearchWrapper {
 	    clone.from(start);
 	}
 
-	if (orderingProperty.isPresent() && sortOrder.isPresent()) {
+	if (sortedProperties.isPresent() ) {
 
-	    handleSort(clone, orderingProperty.get(), sortOrder.get());
+	    handleSort(clone, sortedProperties.get());
 	}
 
 	handleSourceFields(null, clone, fields, excludeResourceBinary);
@@ -889,18 +885,23 @@ public class OpenSearchWrapper {
      */
     private void handleSort(//
 	    org.opensearch.client.opensearch.core.SearchRequest.Builder builder, //
-	    Queryable orderingProperty, eu.essi_lab.model.SortOrder sortOrder) {
-
-	ContentType contentType = orderingProperty.getContentType();
-	String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
-		: orderingProperty.getName();
-
-	builder.sort(new SortOptions.Builder().//
+	    SortedFields sortedFields) {
+	List<SortOptions> sortOptions = new ArrayList<SortOptions>();
+	for (SimpleEntry<Queryable, eu.essi_lab.model.SortOrder> sortedField : sortedFields.getFields()) {
+	    Queryable orderingProperty = sortedField.getKey();
+	    eu.essi_lab.model.SortOrder sortOrder = sortedField.getValue();
+	    ContentType contentType = orderingProperty.getContentType();
+		String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
+			: orderingProperty.getName();
+	    SortOptions sortOption = new SortOptions.Builder().//
 		field(new FieldSort.Builder().//
 			field(field).//
 			order(sortOrder == eu.essi_lab.model.SortOrder.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
 		.//
-		build());
+		build();
+	    sortOptions.add(sortOption);
+	}
+	builder.sort(sortOptions);
     }
 
     /**

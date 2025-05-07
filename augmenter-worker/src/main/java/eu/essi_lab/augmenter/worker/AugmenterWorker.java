@@ -62,6 +62,7 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
@@ -443,9 +444,10 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 	status.addInfoMessage("Less recent ordering set: " + sorting);
 
 	if (sorting) {
+	    
+	    message.setSortedFields(new SortedFields(ResourceProperty.RESOURCE_TIME_STAMP,SortOrder.ASCENDING));
 
-	    message.setSortOrder(SortOrder.ASCENDING);
-	    message.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
+
 	}
     }
 

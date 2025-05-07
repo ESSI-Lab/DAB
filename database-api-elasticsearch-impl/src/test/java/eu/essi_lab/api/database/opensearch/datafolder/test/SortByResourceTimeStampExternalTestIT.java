@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch.datafolder.test;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.StorageInfo;
@@ -52,8 +54,7 @@ public class SortByResourceTimeStampExternalTestIT {
 		wrapper, //
 		new RankingStrategy(), //
 		map, //
-		false,
-		false);
+		false, false);
 
 	Query sourceIdQuery = builder
 		.buildSourceIdQuery(BondFactory.createSourceIdentifierBond("UUID-2dc3a01b-934e-4c3d-9311-527ac93ec058"));
@@ -66,11 +67,9 @@ public class SortByResourceTimeStampExternalTestIT {
 		Arrays.asList(), //
 		0, // start
 		10, // size
-		Optional.of(ResourceProperty.RESOURCE_TIME_STAMP), // orderingProperty
-		Optional.of(SortOrder.ASCENDING), // orderingDirection
+		Optional.of(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING)))), // orderingProperty
 		Optional.empty(), // search after
-		false,
-		false); // cache
+		false, false); // cache
 
 	List<Hit<Object>> hits = response.hits().hits();
 	Assert.assertEquals(10, hits.size());

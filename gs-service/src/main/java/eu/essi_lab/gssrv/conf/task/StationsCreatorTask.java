@@ -1,6 +1,7 @@
 package eu.essi_lab.gssrv.conf.task;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 /*-
  * #%L
@@ -25,6 +26,7 @@ import java.math.BigDecimal;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.AbstractMap.SimpleEntry;
 
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -55,6 +57,7 @@ import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.GSSource;
@@ -126,8 +129,7 @@ public class StationsCreatorTask extends AbstractEmbeddedTask  {
 	message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	message.setExcludeResourceBinary(true);
 
-	message.setSortProperty(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
-	message.setSortOrder(SortOrder.ASCENDING);
+	message.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING))));
 
 	//
 	//

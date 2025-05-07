@@ -34,6 +34,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResourceSelector;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.LogicalBond;
@@ -131,14 +132,9 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	    message.setDistinctValuesElement(distinctElement.get());
 	}
 
-	Optional<Queryable> orderingProperty = getOrderingProperty();
-	if (orderingProperty.isPresent()) {
-	    message.setSortProperty(orderingProperty.get());
-	}
-
-	Optional<SortOrder> orderingDirection = getOrderingDirection();
-	if (orderingDirection.isPresent()) {
-	    message.setSortOrder(orderingDirection.get());
+	Optional<SortedFields> sortedFields = getSortedFields();
+	if (sortedFields.isPresent()) {
+	    message.setSortedFields(sortedFields.get());
 	}
 
 	Optional<View> optionalView = message.getView();
@@ -192,21 +188,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	return Optional.empty();
     }
 
-    /**
-     * Returns the queryable property to order results returned by the discovery operation.
-     * 
-     * @return the optional distinct queryable
-     */
-    protected Optional<Queryable> getOrderingProperty() {
-	return Optional.empty();
-    }
-
-    /**
-     * Returns the ordering direction to order results returned by the discovery operation.
-     * 
-     * @return the optional ordering direction
-     */
-    protected Optional<SortOrder> getOrderingDirection() {
+    protected Optional<SortedFields> getSortedFields() {
 	return Optional.empty();
     }
 
