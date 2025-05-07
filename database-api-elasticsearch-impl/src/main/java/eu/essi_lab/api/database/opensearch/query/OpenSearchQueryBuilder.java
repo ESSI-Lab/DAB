@@ -531,15 +531,17 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildIsGDCQuery(String value) {
 
-	ArrayList<Query> list = new ArrayList<Query>();
+	ArrayList<Query> shouldList = new ArrayList<Query>();
 
 	List<String> ids = ConfigurationWrapper.getGDCSourceSetting().getSelectedSourcesIds();
-	ids.forEach(id -> list.add(buildRangeQuery(//
-		ResourceProperty.SOURCE_ID.getName(), BondOperator.EQUAL, id)));
+	ids.forEach(id -> shouldList.add(buildSourceIdQuery(id)));
 
-	list.add(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value));
+	shouldList.add(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value));
 
-	return buildFilterQuery(list);
+	return buildBoolQuery(//
+		Arrays.asList(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value)), //
+		shouldList, //
+		Arrays.asList());
     }
 
     /**
@@ -1241,7 +1243,7 @@ public class OpenSearchQueryBuilder {
 
 	String field = el == MetadataElement.TEMP_EXTENT_BEGIN ? //
 		MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName() : //
-		    MetadataElement.TEMP_EXTENT_END_NOW.getName();
+		MetadataElement.TEMP_EXTENT_END_NOW.getName();
 
 	return buildRangeQuery(field, BondOperator.EQUAL, "true");
     }
