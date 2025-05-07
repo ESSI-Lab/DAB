@@ -225,7 +225,15 @@ public class IdentifierDecorator {
 
 	    } else {
 
-		GSResource existingResource = getDatabaseReader().getResource(originalId, incomingResource.getSource());
+		GSResource existingResource = null;
+		try {
+
+		    existingResource = getDatabaseReader().getResource(originalId, incomingResource.getSource());
+
+		} catch (Exception ex) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(ex);
+		}
 
 		if (existingResource != null) {
 
