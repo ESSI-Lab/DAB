@@ -298,7 +298,7 @@ public class OMHandler extends StreamingRequestHandler {
 			searchAfter = resultSet.getSearchAfter().isPresent() ? resultSet.getSearchAfter().get() : null;
 
 			List<String> results = resultSet.getResultsList();
-			tempSize += pageSize;
+			
 
 			if (results.isEmpty()) {
 			    printErrorMessage(output, "No " + getObject() + " matched");
@@ -334,6 +334,7 @@ public class OMHandler extends StreamingRequestHandler {
 			if (useCache) {
 			    datas = dataCacheConnector.getRecords(begin, end, identifiers.toArray(new String[] {}));
 			}
+			tempSize += observations.size();
 			GSLoggerFactory.getLogger(getClass()).info("formatting");
 			for (JSONObservation observation : observations) {
 
