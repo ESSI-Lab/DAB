@@ -1,0 +1,255 @@
+{
+	"openapi": "3.0.1",
+	"info": {
+		"title": "Configuration DAB REST API",
+		"description": "DAB REST API which allow to put, edit, remove and schedule harvesting of brokered sources",
+		"version": "1.0"
+	},
+	"tags": [
+		{
+			"name": "config",
+			"description": "The path to execute the supported requests"
+		}
+	],
+	"paths": {
+		"/gs-service/services/config": {
+			"post": {
+			"tags": [
+					"config"
+				],
+				"description": "The path to execute the supported requests",
+				"requestBody": {
+					"required": true,
+					"description": "The request to execute, in JSON format. Before to be processes, each request is validated according to its specification. In case of validation errors, the response code is '405'",
+					"content": {
+						"application/json": {
+							"schema": {
+								"oneOf": [
+									{
+										"$ref": "#/components/schemas/PutSource"
+									},
+									{
+										"$ref": "#/components/schemas/EditSource"
+									},
+									{
+										"$ref": "#/components/schemas/HarvestScheduling"
+									}
+								]
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Request correctly executed"
+					},
+					"201": {
+						"description": "DAB source created"
+					},
+					"400": {
+						"description": "Request not executable"
+					},
+					"405": {
+						"description": "Request validation failed"
+					},
+					"500": {
+						"description": "Internal server error"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"PutSource": {
+				"description": "This request allows to put a new DAB source. If the source creation succeeds, the response cose is '201'",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "PutSource"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"serviceType",
+							"endpoint",
+							"label"
+						],
+						"properties": {
+							"id": {
+								"description": "The optional source id. If omitted, a random id is created and returned in the response. If provided, it must contains alphanumerical characters and/or '_' or '-' characters and if a source with the given id already exists, the response code is '400'",
+								"type": "string"
+							},
+							"serviceType": {
+								"description": "The mandatory service type",
+								"type": "string",
+								"enum": [
+									"CSW",
+									"WCS 1.0.0",
+									"WCS 1.1.0",
+									"WCS 1.1.1",
+									"WMS 1.1.1",
+									"WMS 1.3.0",
+									"WFS 1.1.0"
+								]
+							},
+							"label": {
+								"description": "The mandatory source label",
+								"type": "string"
+							},
+							"endpoint": {
+								"description": "The mandatory source endpoint",
+								"type": "string"
+							},
+							"HarvestScheduling": {
+								"description": "Optionally, the harvest of the source just created can be scheduled",
+								"type": "object",
+								"required": [
+									"repeatCount"
+								],
+								"properties": {
+									"repeatCount": {
+										"description": "This mandatory parameter defines the scheduling to be performed just once or indefinitely. In the first case ('Once'), the only additional supported parameter is 'startTime'; if omitted, the harvest is scheduled to start as soon as possible, immediately after the creation of the new source. In the second case ('Indefinitely'), the parameters 'repeatIntervalUnit' and 'repeatInterval' are mandatory, while 'startTime' can be omitted, as previously described",
+										"type": "string",
+										"enum": [
+											"Once",
+											"Indefinitely"
+										]
+									},
+									"repeatIntervalUnit": {
+										"type": "string",
+										"description": "Mandatory parameter in case 'repeatCount' is 'Indefinitely'. Defines the interval unit between the scheduled harvests",
+										"enum": [
+											"Minutes",
+											"Hours",
+											"Days",
+											"Weeks",
+											"Months"
+										]
+									},
+									"repeatInterval": {
+										"description": "Mandatory parameter in case 'repeatCount' is 'Indefinitely'. Defines the interval (expressed according to 'repeatIntervalUnit') between the scheduled harvests",
+										"type": "integer"
+									},
+									"startTime": {
+										"description": "Optional parameter. If omitted, the harvest is scheduled to start as soon as possible, immediately after the creation of the new source. If provided, it must be of type ISO8601 according to the 'Europe/Berlin' TimeZone (e.g: '2025-01-01T15:00:00')",
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"EditSource": {
+				"description": "This request allows to edit an existing DAB source. If the request content does not involve any modification to the indicated source, the response is '400'",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "EditSource"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"id"
+						],
+						"properties": {
+							"id": {
+								"description": "The mandatory source id. It must contains alphanumerical characters and/or '_' or '-' characters. If a source with the given id do not exists, the response code is be '404'",
+								"type": "string"
+							},
+							"serviceType": {
+								"description": "The service type",
+								"type": "string",
+								"enum": [
+									"CSW",
+									"WCS 1.0.0",
+									"WCS 1.1.0",
+									"WCS 1.1.1",
+									"WMS 1.1.1",
+									"WMS 1.3.0",
+									"WFS 1.1.0"
+								]
+							},
+							"label": {
+								"description": "The source label",
+								"type": "string"
+							},
+							"endpoint": {
+								"description": "The source endpoint",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"HarvestScheduling": {
+				"description": "This request allows to schedule the harvest of a DAB source",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "HarvestScheduling"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"id",
+							"repeatCount"
+						],
+						"properties": {
+							"id": {
+								"description": "The mandatory source id. It must contains alphanumerical characters and/or '_' or '-' characters. If a source with the given id do not exists, the response code is be '404'",
+								"type": "string"
+							},
+							"repeatCount": {
+								"description": "This mandatory parameter defines the scheduling to be performed just once or indefinitely. In the first case ('Once'), the only additional supported parameter is 'startTime'; if omitted, the harvest is scheduled to start as soon as possible. In the second case ('Indefinitely'), the parameters 'repeatIntervalUnit' and 'repeatInterval' are mandatory, while 'startTime' can be omitted, as previously described",
+								"type": "string",
+								"enum": [
+									"Once",
+									"Indefinitely"
+								]
+							},
+							"repeatIntervalUnit": {
+								"type": "string",
+								"description": "Mandatory parameter in case 'repeatCount' is 'Indefinitely'. Defines the interval unit between the scheduled harvests",
+								"enum": [
+									"Minutes",
+									"Hours",
+									"Days",
+									"Weeks",
+									"Months"
+								]
+							},
+							"repeatInterval": {
+								"description": "Mandatory parameter in case 'repeatCount' is 'Indefinitely'. Defines the interval (expressed according to 'repeatIntervalUnit') between the scheduled harvests",
+								"type": "integer"
+							},
+							"startTime": {
+								"description": "Optional parameter. If omitted, the harvest is scheduled to start as soon as possible. If provided, it must be of type ISO8601 according to the 'Europe/Berlin' TimeZone (e.g: '2025-01-01T15:00:00')",
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
