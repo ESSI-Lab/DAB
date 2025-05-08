@@ -22,10 +22,12 @@ package eu.essi_lab.profiler.om;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.AbstractMap.SimpleEntry;
 
 import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
@@ -35,6 +37,7 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.ResourceSelector;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ValidationMessage;
@@ -45,6 +48,7 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -77,6 +81,9 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 
 	    message.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	}
+
+	message
+	.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER,SortOrder.ASCENDING),new SimpleEntry(MetadataElement.ONLINE_ID,SortOrder.ASCENDING ))));
 
 	return message;
     }

@@ -72,7 +72,9 @@ public class FeaturesHandler extends OMHandler {
 
     }
     
-
+    protected boolean getDistinctStations() {		
+	return true;
+    }
 
     public String getObject() {
 	return "feature";

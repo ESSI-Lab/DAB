@@ -47,13 +47,20 @@ public class JSONFeature {
 	platform.put("relatedParty", relatedParties);
     }
 
-    // OBSERVATION
 
-    public void setId(String href) {
-
-	platform.put("id", href);
+    public String getId() {
+	if (platform.has("id")) {
+	    return platform.getString("id");
+	}
+	return null;
 
     }
+    
+    public void setId(String href) {
+
+  	platform.put("id", href);
+
+      }
 
     public void setName(String name) {
 

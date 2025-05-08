@@ -369,8 +369,7 @@ public class OpenSearchWrapper {
 	    List<String> fields, //
 	    int start, //
 	    int size, //
-	    Optional<SortedFields> sortedProperties,
-	    Optional<SearchAfter> searchAfter, //
+	    Optional<SortedFields> sortedProperties, Optional<SearchAfter> searchAfter, //
 	    boolean requestCache, //
 	    boolean excludeResourceBinary)
 
@@ -385,16 +384,21 @@ public class OpenSearchWrapper {
 
 	    if (searchAfter.isPresent()) {
 
-		searchAfter.get().getDoubleValue().ifPresent(val -> builder.searchAfterVals(FieldValue.of(val)));
-		searchAfter.get().getLongValue().ifPresent(val -> builder.searchAfterVals(FieldValue.of(val)));
-		searchAfter.get().getStringValue().ifPresent(val -> builder.searchAfterVals(FieldValue.of(val)));
+		Optional<List<Object>> values = searchAfter.get().getValues();
+
+		if (values.isPresent()) {
+
+		    List<FieldValue> myFields = getFieldValues(values);
+
+		    builder.searchAfterVals(myFields);
+		}
 
 	    } else {
 
 		builder.from(start);
 	    }
 
-	    if (sortedProperties.isPresent() ) {
+	    if (sortedProperties.isPresent()) {
 
 		handleSort(builder, sortedProperties.get());
 	    }
@@ -414,7 +418,7 @@ public class OpenSearchWrapper {
 			size, //
 			searchAfter, //
 			start, //
-			sortedProperties,//
+			sortedProperties, //
 			fields, //
 			excludeResourceBinary, //
 			requestCache);//
@@ -427,6 +431,29 @@ public class OpenSearchWrapper {
 	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	return response;
+    }
+
+    private List<FieldValue> getFieldValues(Optional<List<Object>> values) {
+	ArrayList<FieldValue> ret = new ArrayList<FieldValue>();
+	if (values.isEmpty()) {
+	    return ret;
+	}
+	for (Object obj : values.get()) {
+	    if (obj instanceof String) {
+		String str = (String) obj;
+		FieldValue fv = FieldValue.of(str);
+		ret.add(fv);
+	    } else if (obj instanceof Long) {
+		Long l = (Long) obj;
+		FieldValue fv = FieldValue.of(l);
+		ret.add(fv);
+	    } else if (obj instanceof Double) {
+		Double d = (Double) obj;
+		FieldValue fv = FieldValue.of(d);
+		ret.add(fv);
+	    }
+	}
+	return ret;
     }
 
     /**
@@ -837,8 +864,7 @@ public class OpenSearchWrapper {
 	    Integer size, //
 	    Optional<SearchAfter> searchAfter, //
 	    Integer start, //
-	    Optional<SortedFields>sortedProperties,
-	    List<String> fields, //
+	    Optional<SortedFields> sortedProperties, List<String> fields, //
 	    boolean excludeResourceBinary, //
 	    boolean requestCache) {
 
@@ -851,16 +877,16 @@ public class OpenSearchWrapper {
 
 	if (searchAfter.isPresent()) {
 
-	    searchAfter.get().getDoubleValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
-	    searchAfter.get().getLongValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
-	    searchAfter.get().getStringValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
-
+	    
+	    List<FieldValue> myFields = getFieldValues(searchAfter.get().getValues());
+	    clone.searchAfterVals(myFields);
+	    
 	} else {
 
 	    clone.from(start);
 	}
 
-	if (sortedProperties.isPresent() ) {
+	if (sortedProperties.isPresent()) {
 
 	    handleSort(clone, sortedProperties.get());
 	}
@@ -891,14 +917,14 @@ public class OpenSearchWrapper {
 	    Queryable orderingProperty = sortedField.getKey();
 	    eu.essi_lab.model.SortOrder sortOrder = sortedField.getValue();
 	    ContentType contentType = orderingProperty.getContentType();
-		String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
-			: orderingProperty.getName();
+	    String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
+		    : orderingProperty.getName();
 	    SortOptions sortOption = new SortOptions.Builder().//
-		field(new FieldSort.Builder().//
-			field(field).//
-			order(sortOrder == eu.essi_lab.model.SortOrder.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
-		.//
-		build();
+		    field(new FieldSort.Builder().//
+			    field(field).//
+			    order(sortOrder == eu.essi_lab.model.SortOrder.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
+		    .//
+		    build();
 	    sortOptions.add(sortOption);
 	}
 	builder.sort(sortOptions);

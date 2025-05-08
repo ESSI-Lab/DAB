@@ -274,9 +274,6 @@ public class OMHandler extends StreamingRequestHandler {
 		    discoveryMessage.setResourceSelector(selector);
 		}
 
-		discoveryMessage
-			.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER,SortOrder.ASCENDING),new SimpleEntry(MetadataElement.ONLINE_ID,SortOrder.ASCENDING ))));
-
 		OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
 
 		Page userPage = discoveryMessage.getPage();
@@ -289,6 +286,8 @@ public class OMHandler extends StreamingRequestHandler {
 
 		boolean first = true;
 		SearchAfter searchAfter = null;
+		boolean distinctStations = getDistinctStations();
+		String lastStation = null;
 		do {
 
 		    try {
@@ -307,25 +306,27 @@ public class OMHandler extends StreamingRequestHandler {
 			}
 
 			List<JSONObservation> observations = new ArrayList<>();
-			GSLoggerFactory.getLogger(getClass()).info("sorting");
 			GSLoggerFactory.getLogger(getClass()).info("mapping");
 			List<String> identifiers = new ArrayList<>();
-			int j = 0;
-			for (String result : results) {
-			    ObservationMapper observationMapper = new ObservationMapper();
-			    Optional<View> view = discoveryMessage.getView();
-			    JSONObservation observation = observationMapper.map(view, result, propertySet);
-			    observations.add(observation);
-			}
-			Collections.sort(observations, new Comparator<JSONObservation>() {
+			ObservationMapper observationMapper = new ObservationMapper();
+			Optional<View> view = discoveryMessage.getView();
 
-			    @Override
-			    public int compare(JSONObservation o1, JSONObservation o2) {
-				return o1.getId().compareTo(o2.getId());
+			for (String result : results) {
+			    JSONObservation observation = observationMapper.map(view, result, propertySet);
+			    if (distinctStations) {
+				String stationId = observation.getFeatureOfInterest().getId();
+				if (lastStation == null || !lastStation.equals(stationId)) {
+				    observations.add(observation);
+				    lastStation = stationId;
+				} else {
+				    // skip
+				}
+			    } else {
+				observations.add(observation);
 			    }
-			});
-			for (JSONObservation feature : observations) {
-			    identifiers.add(feature.getId());
+			}
+			for (JSONObservation observation : observations) {
+			    identifiers.add(observation.getId());
 			}
 			GSLoggerFactory.getLogger(getClass()).info("getting data");
 			List<DataRecord> datas = new ArrayList<>();
@@ -479,6 +480,8 @@ public class OMHandler extends StreamingRequestHandler {
 		output.close();
 
 	    }
+
+
 
 	    private void addPointsFromGridNetCDF(File file, JSONObservation observation, DataDescriptor descriptor) {
 		NetcdfDataset dataset = null;
@@ -732,7 +735,9 @@ public class OMHandler extends StreamingRequestHandler {
 	};
 
     }
-
+    protected boolean getDistinctStations() {
+	return false;
+    }
     protected String getSetName() {
 	return "member";
     }

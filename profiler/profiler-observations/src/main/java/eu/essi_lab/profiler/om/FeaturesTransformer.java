@@ -21,13 +21,10 @@ package eu.essi_lab.profiler.om;
  * #L%
  */
 
-import java.util.Optional;
-
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 
@@ -49,10 +46,6 @@ public class FeaturesTransformer extends OMTransformer {
 	return selector;
     }
 
-    @Override
-    protected Optional<Queryable> getDistinctElement(WebRequest request) {
-	return Optional.of(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
-
-    }
+  
 
 }

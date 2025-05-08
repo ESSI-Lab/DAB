@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -111,21 +112,19 @@ public class OpenSearchUtils {
 	    List<FieldValue> sortVals = hit.sortVals();
 
 	    if (!sortVals.isEmpty()) {
-
-		FieldValue fieldValue = sortVals.get(0);
-
-		if (fieldValue.isString()) {
-
-		    return Optional.of(SearchAfter.of(fieldValue.stringValue()));
-
-		} else if (fieldValue.isDouble()) {
-
-		    return Optional.of(SearchAfter.of(fieldValue.doubleValue()));
-
-		} else if (fieldValue.isLong()) {
-
-		    return Optional.of(SearchAfter.of(fieldValue.longValue()));
+		List<Object> values = new ArrayList<Object>();
+		for (FieldValue fv : sortVals) {
+		    if (fv.isDouble()) {
+			values.add(fv.doubleValue());
+		    } else if (fv.isLong()) {
+			values.add(fv.longValue());
+		    } else if (fv.isString()) {
+			values.add(fv.stringValue());
+		    }
 		}
+		SearchAfter sa = new SearchAfter(values);
+		return Optional.of(sa);
+
 	    }
 	}
 
