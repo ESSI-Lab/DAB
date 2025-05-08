@@ -527,7 +527,7 @@ public class ConfigurationWrapper {
 		    break;
 		case TEXT_SEARCH:
 
-		    List<String> ids = getHarvestedAndMixedSources().//
+		    List<String> ids = getAllSources().//
 			    stream().//
 			    filter(s -> s.getUniqueIdentifier().startsWith(resBond.getPropertyValue())).//
 			    map(s -> s.getUniqueIdentifier()).//
@@ -540,7 +540,7 @@ public class ConfigurationWrapper {
 
 		BondOperator operator = resBond.getOperator();
 
-		List<String> ids = getHarvestedAndMixedSources().//
+		List<String> ids = getAllSources().//
 			stream().//
 
 			filter(s -> operator == BondOperator.EQUAL ? s.getDeployment().contains(sourceDeployment) : //
