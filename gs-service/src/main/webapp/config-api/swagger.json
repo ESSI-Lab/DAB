@@ -44,6 +44,48 @@
 										"$ref": "#/components/schemas/HarvestScheduling"
 									}
 								]
+							},
+							"examples": {
+								"putSource1": {
+									"summary": "'PutSource' request with explicit source identifier",
+									"description": "Example of 'PutSource' request with explicit source identifier",
+									"value": {
+										"request": "PutSource",
+										"parameters": {
+											"id": "sourceIdentifier",
+											"label": "sourceLabel",
+											"serviceType": "WCS 1.1.1",
+											"endpoint": "http://localhost"
+										}
+									}
+								},
+								"putSource2": {
+									"summary": "'PutSource' request without source identifier",
+									"description": "Example of 'PutSource' request without source identifier, a random one is created and returned in the response",
+									"value": {
+										"request": "PutSource",
+										"parameters": {
+											"serviceType": "WCS 1.1.1",
+											"endpoint": "http://localhost"
+										}
+									}
+								},
+								"putSource3": {
+									"summary": "'PutSource' request with harvest scheduling",
+									"description": "Example of 'PutSource' request with harvest scheduled to start 'Once' as soon as possible",
+									"value": {
+										"request": "PutSource",
+										"parameters": {
+											"id": "sourceIdentifier",
+											"label": "sourceLabel",
+											"serviceType": "WCS 1.1.1",
+											"endpoint": "http://localhost",
+											"HarvestScheduling": {											
+												"repeatCount": "Once"
+											}
+										}
+									}
+								}
 							}
 						}
 					}
@@ -60,7 +102,7 @@
 					},
 					"401": {
 						"description": "Invalid uthorization token"
-					},					
+					},
 					"405": {
 						"description": "Request validation failed"
 					},
