@@ -470,7 +470,7 @@ public class OMHandler extends StreamingRequestHandler {
 
 		    writer.flush();
 
-		} while (tempSize < userSize && tempSize < resultSet.getCountResponse().getCount()
+		} while (tempSize < userSize
 			&& !resultSet.getResultsList().isEmpty());
 
 		if (format.equals("JSON")) {
