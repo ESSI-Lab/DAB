@@ -599,8 +599,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			message.getResourceSelector().getIndexes(), // fields
 			start, //
 			size, //
-			message.getSortProperty(), //
-			message.getSortOrder(), //
+			message.getSortedFields(),
 			message.getSearchAfter(), //
 			false, // request cache
 			message.isResourceBinaryExcluded());//

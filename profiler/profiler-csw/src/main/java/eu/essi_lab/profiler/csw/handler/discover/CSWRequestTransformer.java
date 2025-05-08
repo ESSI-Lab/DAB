@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.csw.handler.discover;
 
+import java.util.AbstractMap.SimpleEntry;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -36,6 +38,7 @@ import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -110,9 +113,8 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (CSWSearchAfterManager.isEnabled(setting, message.getWebRequest())) {
 
-	    refinedMessage.setSortOrder(SortOrder.ASCENDING);
-	    refinedMessage.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
-
+	    refinedMessage.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.RESOURCE_TIME_STAMP,SortOrder.ASCENDING) )));
+	    
 	    Optional<SearchAfter> searchAfter = CSWSearchAfterManager.get(message.getView().map(v -> v.getId()), page, setting);
 
 	    if (searchAfter.isPresent()) {

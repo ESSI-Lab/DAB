@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -70,6 +71,7 @@ import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.SimpleValueBond;
@@ -82,6 +84,7 @@ import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
@@ -269,9 +272,10 @@ public class OMHandler extends StreamingRequestHandler {
 		    // selector.addIndex(MetadataElement.BOUNDING_BOX);
 		    // selector.addIndex(MetadataElement.COUNTRY);
 		    discoveryMessage.setResourceSelector(selector);
-		    discoveryMessage.setSortOrder(SortOrder.ASCENDING);
-		    discoveryMessage.setSortProperty(MetadataElement.ONLINE_ID);
 		}
+
+		discoveryMessage
+			.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER,SortOrder.ASCENDING),new SimpleEntry(MetadataElement.ONLINE_ID,SortOrder.ASCENDING ))));
 
 		OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
 

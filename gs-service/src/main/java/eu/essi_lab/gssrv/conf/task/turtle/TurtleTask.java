@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -56,10 +57,12 @@ import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
@@ -342,7 +345,7 @@ public class TurtleTask extends AbstractCustomTask {
 			toBeUploaded.add(turtle);
 			if (toBeUploaded.size() == 100) {
 			    uploadFiles(wrapper, sourceId, toBeUploaded);
-			    GSLoggerFactory.getLogger(getClass()).info("Uploaded {}/{} turtles",(partial+=100),turtles.length);
+			    GSLoggerFactory.getLogger(getClass()).info("Uploaded {}/{} turtles", (partial += 100), turtles.length);
 			}
 		    }
 		    uploadFiles(wrapper, sourceId, toBeUploaded);
@@ -396,10 +399,11 @@ public class TurtleTask extends AbstractCustomTask {
 	int file = 0;
 	TurtleMapper mapper = new TurtleMapper();
 
-	discoveryMessage.setSortOrder(SortOrder.ASCENDING);
-	discoveryMessage.setSortProperty(ResourceProperty.PRIVATE_ID);
+	discoveryMessage
+		.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.PRIVATE_ID, SortOrder.ASCENDING))));
+
 	SearchAfter searchAfter = null;
-	 int i = 0;
+	int i = 0;
 	main: while (true) {
 
 	    // CHECKING CANCELED JOB
@@ -424,7 +428,6 @@ public class TurtleTask extends AbstractCustomTask {
 	    }
 	    List<GSResource> resources = resultSet.getResultsList();
 
-	   
 	    for (GSResource resource : resources) {
 		i++;
 		if (test && i > 2000) {

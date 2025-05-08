@@ -270,14 +270,14 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_MAX_FREQUENCY_MAP_ITEMS.getName(),
 		Arrays.asList(String.valueOf(maxFrequencyMapItems)));
 
-	Optional<SortOrder> orderingDirection = getSortOrder();
-	orderingDirection
-		.ifPresent(d -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_DIRECTION.getName(), Arrays.asList(d.getLabel())));
-
-	Optional<Queryable> orderingProperty = getSortProperty();
-	orderingProperty
-		.ifPresent(p -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_PROPERTY.getName(), Arrays.asList(p.getName())));
-
+	Optional<SortedFields> sortedFields = getSortedFields();
+	sortedFields
+		.ifPresent(d -> 
+		map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_DIRECTION.getName(), Arrays.asList(d.getFields().get(0).getValue().getLabel())));
+	sortedFields
+	.ifPresent(d -> 
+	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_PROPERTY.getName(), Arrays.asList(d.getFields().get(0).getKey().getName())));
+	
 	int size = getPage().getSize();
 	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_PAGE_SIZE.getName(), Arrays.asList(String.valueOf(size)));
 

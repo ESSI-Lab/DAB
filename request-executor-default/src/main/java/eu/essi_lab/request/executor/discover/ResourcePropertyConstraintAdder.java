@@ -1,5 +1,7 @@
 package eu.essi_lab.request.executor.discover;
 
+import java.util.AbstractMap.SimpleEntry;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -22,12 +24,14 @@ package eu.essi_lab.request.executor.discover;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.LogicalBond;
@@ -178,7 +182,7 @@ public class ResourcePropertyConstraintAdder {
 				List<String> identifiers = getIds(userBond);
 				//
 				// If the discovery message contains some bonds with
-				// MetadataElement.PARENT_IDENTIFIER, 
+				// MetadataElement.PARENT_IDENTIFIER,
 				// MetadataElement.ONLINE_ID or
 				// MetadataElement.IDENTIFIER
 				// as property (in this case the query is probably a GetRecordsById),
@@ -203,8 +207,8 @@ public class ResourcePropertyConstraintAdder {
 
 					SortOrder direction = gsSource.getSortOrder();
 
-					message.setSortProperty(property);
-					message.setSortOrder(direction);
+					message.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(property, direction))));
+
 				    }
 
 				    //
@@ -346,8 +350,8 @@ public class ResourcePropertyConstraintAdder {
 	    public void simpleValueBond(SimpleValueBond bond) {
 
 		if (bond.getProperty() == MetadataElement.PARENT_IDENTIFIER || //
-		bond.getProperty() == MetadataElement.IDENTIFIER || //
-		bond.getProperty() == MetadataElement.ONLINE_ID) {
+			bond.getProperty() == MetadataElement.IDENTIFIER || //
+			bond.getProperty() == MetadataElement.ONLINE_ID) {
 
 		    ids.add(bond.getPropertyValue());
 		}

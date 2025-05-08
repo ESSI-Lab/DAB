@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.arpa;
 
+import java.util.Arrays;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -24,9 +26,11 @@ package eu.essi_lab.profiler.arpa;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.AbstractMap.SimpleEntry;
 
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ValidationMessage;
@@ -112,16 +116,14 @@ public class HydroCSVRequestTransformer extends DiscoveryRequestTransformer {
 	return BondFactory.createAndBond(operands);
 
     }
-
+    
     @Override
-    protected Optional<Queryable> getOrderingProperty() {
-	return Optional.of(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+    protected Optional<SortedFields> getSortedFields() {
+	return Optional.of(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER,SortOrder.ASCENDING)))) ;
     }
 
-    @Override
-    protected Optional<SortOrder> getOrderingDirection() {
-	return Optional.of(SortOrder.ASCENDING);
-    }
+
+   
 
     @Override
     protected ResourceSelector getSelector(WebRequest request) {

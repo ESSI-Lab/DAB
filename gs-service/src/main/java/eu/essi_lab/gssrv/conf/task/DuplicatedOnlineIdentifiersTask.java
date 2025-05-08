@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -49,6 +51,7 @@ import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.SortOrder;
@@ -118,8 +121,9 @@ public class DuplicatedOnlineIdentifiersTask extends AbstractCustomTask {
 	int start = 1;
 	int file = 0;
 
-	discoveryMessage.setSortOrder(SortOrder.ASCENDING);
-	discoveryMessage.setSortProperty(ResourceProperty.PRIVATE_ID);
+	discoveryMessage
+		.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.PRIVATE_ID,SortOrder.ASCENDING))));
+
 	SearchAfter searchAfter = null;
 	int i = 0;
 	Set<String> setIds = new HashSet<String>();
@@ -194,7 +198,7 @@ public class DuplicatedOnlineIdentifiersTask extends AbstractCustomTask {
 
 	    String key = entry.getKey();
 	    List<String> listIds = entry.getValue();
-	    if(listIds.size() > 1) {
+	    if (listIds.size() > 1) {
 		GSLoggerFactory.getLogger(getClass()).info("ONLINE_ID:" + key + " - FILE_IDENTIFIERS:" + String.join(";", listIds));
 	    }
 
