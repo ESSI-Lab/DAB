@@ -12,12 +12,21 @@
 		}
 	],
 	"paths": {
-		"/gs-service/services/config": {
+		"/gs-service/services/config/{authenticationToken}": {
 			"post": {
-			"tags": [
+				"tags": [
 					"config"
 				],
 				"description": "The path to execute the supported requests",
+				"parameters": [
+					{
+						"name": "authenticationToken",
+						"in": "path",
+						"description": "Authentication token required to execute configuration requests",
+						"required": true,
+						"type": "string"
+					}
+				],
 				"requestBody": {
 					"required": true,
 					"description": "The request to execute, in JSON format. Before to be processes, each request is validated according to its specification. In case of validation errors, the response code is '405'",
@@ -49,6 +58,9 @@
 					"400": {
 						"description": "Request not executable"
 					},
+					"401": {
+						"description": "Invalid uthorization token"
+					},					
 					"405": {
 						"description": "Request validation failed"
 					},

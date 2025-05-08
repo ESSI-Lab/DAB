@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -30,6 +32,7 @@ import org.quartz.SchedulerException;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
@@ -76,12 +79,30 @@ import eu.essi_lab.model.GSSource;
  * @author Fabrizio
  */
 @WebService
-@Path("/")
+@Path("/{authToken}")
 public class ConfigService {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response config(@Context HttpServletRequest hsr, @Context UriInfo uriInfo) {
+
+	Properties keyValeOptions = ConfigurationWrapper.getSystemSettings().getKeyValueOptions().get();
+	String configServiceAuthToken = keyValeOptions.getProperty("configServiceAuthToken", null);
+	if (configServiceAuthToken == null) {
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Configuration service authentication token not defined");
+	}
+
+	Optional<String> path = uriInfo.getPathSegments().stream().map(s -> s.getPath()).findFirst();
+	if(path.isEmpty()) {
+	    
+	    return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing required authentication token");
+	}
+	
+	if(!path.get().equals(configServiceAuthToken)) {
+	    
+	    return buildErrorResponse(Status.UNAUTHORIZED, "Invalid uthorization token");
+	}
 
 	String stringStream = null;
 	try {
