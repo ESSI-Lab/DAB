@@ -204,6 +204,20 @@ public class HarvestSchedulingRequestTest {
     }
 
     @Test
+    public void validationTest3_6() {
+
+	HarvestSchedulingRequest request = new HarvestSchedulingRequest();
+
+	request.put(HarvestSchedulingRequest.SOURCE_ID, "sourceId");
+	request.put(HarvestSchedulingRequest.START_TIME, "1980-01-01T00:00:00");
+	request.put(HarvestSchedulingRequest.REPEAT_INTERVAL, "1");
+	request.put(HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.HOURS.getLabel());
+	request.put(HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
+
+	request.validate();
+    }
+
+    @Test
     public void validationTest4() {
 
 	HarvestSchedulingRequest request = new HarvestSchedulingRequest();

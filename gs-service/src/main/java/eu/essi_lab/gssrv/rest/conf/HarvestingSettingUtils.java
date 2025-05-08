@@ -35,8 +35,8 @@ import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest;
-import eu.essi_lab.gssrv.rest.conf.requests.PutSourceRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest.RepeatIntervalUnit;
+import eu.essi_lab.gssrv.rest.conf.requests.PutSourceRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.PutSourceRequest.SourceType;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
@@ -245,11 +245,14 @@ public class HarvestingSettingUtils {
 
 	    RepeatIntervalUnit intUnit = LabeledEnum.valueOf(RepeatIntervalUnit.class, unit.get()).get();
 	    switch (intUnit) {
+	    case MINUTES:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.MINUTES);
+		break;
 	    case DAYS:
 		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.DAYS);
 		break;
-	    case MINUTES:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.MINUTES);
+	    case HOURS:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.HOURS);
 		break;
 	    case MONTHS:
 		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()) * 30, TimeUnit.DAYS);

@@ -56,6 +56,10 @@ public class HarvestSchedulingRequest extends PutSourceRequest {
 	/**
 	 * 
 	 */
+	HOURS("Hours"),
+	/**
+	 * 
+	 */
 	DAYS("Days"),
 	/**
 	 * 
