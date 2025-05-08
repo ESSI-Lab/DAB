@@ -59,9 +59,9 @@ public class EditSourceRequest extends PutSourceRequest {
 	ArrayList<Parameter> list = new ArrayList<>();
 
 	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
-	list.add(Parameter.of(SOURCE_LABEL, ContentType.TEXTUAL, true));
-	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, true));
-	list.add(Parameter.of(SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, true));
+	list.add(Parameter.of(SOURCE_LABEL, ContentType.TEXTUAL, false));
+	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, false));
+	list.add(Parameter.of(SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, false));
 
 	return list;
     }
