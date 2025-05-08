@@ -107,14 +107,14 @@ public class ConfigService {
 
 	    GSLoggerFactory.getLogger(getClass()).error(ex);
 
-	    return buildErrorResponse(Status.BAD_REQUEST, "Missing or corrupted request body");
+	    return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing or corrupted request body");
 	}
 
 	Optional<String> optRequestName = ConfigRequest.getName(requestObject);
 
 	if (optRequestName.isEmpty()) {
 
-	    return buildErrorResponse(Status.BAD_REQUEST, "Invalid request body. Missing request name");
+	    return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Invalid request body. Missing request name");
 	}
 
 	String requestName = optRequestName.get();
@@ -171,7 +171,7 @@ public class ConfigService {
 	    return handleListSourcesRequest(request);
 	}
 
-	return buildErrorResponse(Status.BAD_REQUEST, "Unknown request '" + requestName + "'");
+	return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Unknown request '" + requestName + "'");
     }
 
     /**
@@ -318,7 +318,7 @@ public class ConfigService {
 
 	if (!replaced) {
 
-	    return buildErrorResponse(Status.BAD_REQUEST, "No changes to appply");
+	    return buildErrorResponse(Status.BAD_REQUEST, "No changes to apply");
 
 	} else {
 
@@ -382,7 +382,7 @@ public class ConfigService {
 
 	    if (startTime.get().toString().compareTo(currentTime) < 0) {
 
-		return buildErrorResponse(Status.BAD_REQUEST, "The provided start time '" + startTime.get() + "' is in the past");
+		return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "The provided start time '" + startTime.get() + "' is in the past");
 	    }
 	}
 
@@ -749,7 +749,7 @@ public class ConfigService {
 	error.put("reasonPrase", status.toString());
 	error.put("message", message);
 
-	return Response.status(Status.BAD_REQUEST).//
+	return Response.status(status).//
 		entity(object.toString(3)).//
 		type(MediaType.APPLICATION_JSON).//
 		build();
@@ -769,7 +769,7 @@ public class ConfigService {
 
 	} catch (IllegalArgumentException ex) {
 
-	    return Optional.of(buildErrorResponse(Status.BAD_REQUEST, ex.getMessage()));
+	    return Optional.of(buildErrorResponse(Status.METHOD_NOT_ALLOWED, ex.getMessage()));
 	}
     }
 
@@ -826,7 +826,7 @@ public class ConfigService {
 
 	if (!optSourceId.isPresent()) {
 
-	    return new SettingIdFinder(buildErrorResponse(Status.BAD_REQUEST, "Missing source identifier"));
+	    return new SettingIdFinder(buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing source identifier"));
 
 	} else {
 
