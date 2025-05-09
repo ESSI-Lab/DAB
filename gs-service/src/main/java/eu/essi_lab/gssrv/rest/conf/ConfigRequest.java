@@ -455,7 +455,7 @@ public abstract class ConfigRequest {
 		if (!parseDateTime(val.toString()) || val.toString().length() != "YYYY-MM-DDThh:mm:ss".length()) {
 
 		    throw new IllegalArgumentException("Unsupported value '" + val + "'. Parameter '" + paramName
-			    + "' should be of type ISO8601 date time (no UTC): 'YYYY-MM-DDThh:mm:ss'");
+			    + "' should be of type ISO8601 date time according to the 'Europe/Berlin' TimeZone: 'YYYY-MM-DDThh:mm:ss'");
 		}
 
 		break;

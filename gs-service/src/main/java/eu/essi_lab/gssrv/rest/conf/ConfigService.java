@@ -20,7 +20,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -32,7 +31,6 @@ import org.quartz.SchedulerException;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
@@ -94,14 +92,14 @@ public class ConfigService {
 	}
 
 	Optional<String> path = uriInfo.getPathSegments().stream().map(s -> s.getPath()).findFirst();
-	if(path.isEmpty()) {
-	    
+	if (path.isEmpty()) {
+
 	    return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing required authentication token");
 	}
-	
-	if(!path.get().equals(configServiceAuthToken)) {
-	    
-	    return buildErrorResponse(Status.UNAUTHORIZED, "Invalid uthorization token");
+
+	if (!path.get().equals(configServiceAuthToken)) {
+
+	    return buildErrorResponse(Status.UNAUTHORIZED, "Unrecognized uthorization token");
 	}
 
 	String stringStream = null;
@@ -651,6 +649,21 @@ public class ConfigService {
 		    stream().//
 		    map(v -> v.trim().strip()).//
 		    collect(Collectors.toList()));
+
+	    List<String> sources = ConfigurationWrapper.getHarvestedAndMixedSources().//
+		    stream().//
+		    map(s -> s.getUniqueIdentifier()).//
+		    collect(Collectors.toList());
+
+	    String missingSources = sourceIds.stream().filter(id -> !sources.contains(id)).collect(Collectors.joining(","));
+
+	    if (missingSources != null && !missingSources.isEmpty()) {
+
+		String message = missingSources.contains(",") ? "Sources with id '" + missingSources + "' not found"
+			: "Source with id '" + missingSources + "' not found";
+
+		return buildErrorResponse(Status.NOT_FOUND, message);
+	    }
 	}
 
 	//
@@ -859,7 +872,7 @@ public class ConfigService {
 		    findFirst().//
 		    isPresent()) {
 
-		return new SettingIdFinder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' do not exists"));
+		return new SettingIdFinder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' not found"));
 	    }
 
 	    settingId = ConfigurationWrapper.getHarvestingSettings().//

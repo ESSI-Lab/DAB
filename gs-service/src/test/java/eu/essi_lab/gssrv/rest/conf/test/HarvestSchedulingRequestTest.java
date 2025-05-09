@@ -169,6 +169,8 @@ public class HarvestSchedulingRequestTest {
 	request.put(HarvestSchedulingRequest.REPEAT_COUNT, RepeatCount.INDEFINITELY.getLabel());
 
 	request.validate();
+	
+	System.out.println(request);
     }
 
     @Test
