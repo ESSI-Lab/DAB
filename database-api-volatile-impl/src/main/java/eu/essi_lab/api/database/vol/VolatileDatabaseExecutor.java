@@ -53,6 +53,11 @@ public class VolatileDatabaseExecutor extends VolatileDatabaseReader implements 
     }
 
     @Override
+    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws Exception {
+        return null;
+    }
+    
+    @Override
     public JSONObject executePartitionsQuery(DiscoveryMessage message, boolean temporalConstraintEnabled) throws GSException {
 
 	return null;
