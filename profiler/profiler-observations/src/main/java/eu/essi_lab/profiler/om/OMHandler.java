@@ -462,16 +462,16 @@ public class OMHandler extends StreamingRequestHandler {
 			throw new RuntimeException("Exception writing response");
 
 		    }
-		    int rest = userSize - tempSize;
-		    if (rest > 0 && rest < pageSize) {
-			userPage.setSize(rest);
-		    }
-		    userPage.setStart(userPage.getStart() + pageSize);
+//		    int rest = userSize - tempSize;
+//		    if (rest > 0 && rest < pageSize) {
+//			userPage.setSize(rest);
+//		    }
+//		    userPage.setStart(userPage.getStart() + pageSize);
 
 		    writer.flush();
 
 		} while (tempSize < userSize
-			&& !resultSet.getResultsList().isEmpty());
+			&& searchAfter!=null);
 
 		if (format.equals("JSON")) {
 		    writer.write("]}"); // result array closed, main JSON closed
