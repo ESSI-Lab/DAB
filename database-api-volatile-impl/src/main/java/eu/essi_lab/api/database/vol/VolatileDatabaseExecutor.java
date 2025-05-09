@@ -30,6 +30,7 @@ import org.json.JSONObject;
 
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.model.exceptions.GSException;
@@ -43,6 +44,11 @@ public class VolatileDatabaseExecutor extends VolatileDatabaseReader implements 
     @Override
     public List<String> retrieveEiffelIds(DiscoveryMessage message, int start, int count) throws GSException {
 
+	return null;
+    }
+
+    @Override
+    public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
 	return null;
     }
 
