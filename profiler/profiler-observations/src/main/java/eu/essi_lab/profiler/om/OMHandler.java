@@ -300,10 +300,10 @@ public class OMHandler extends StreamingRequestHandler {
 			List<String> results = resultSet.getResultsList();
 			
 
-			if (results.isEmpty()) {
-			    printErrorMessage(output, "No " + getObject() + " matched");
-			    return;
-			}
+//			if (results.isEmpty()) {
+//			    printErrorMessage(output, "No " + getObject() + " matched");
+//			    return;
+//			}
 
 			List<JSONObservation> observations = new ArrayList<>();
 			GSLoggerFactory.getLogger(getClass()).info("mapping");
