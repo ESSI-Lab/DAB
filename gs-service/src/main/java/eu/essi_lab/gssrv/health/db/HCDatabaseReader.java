@@ -80,7 +80,7 @@ public class HCDatabaseReader extends Database implements DatabaseReader, Databa
     }
 
     @Override
-    public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
+    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws GSException {
 
 	return null;
     }

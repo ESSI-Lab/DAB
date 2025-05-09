@@ -52,6 +52,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
 
 import com.google.common.base.Charsets;
 
@@ -74,6 +75,7 @@ import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialEntity;
@@ -288,13 +290,20 @@ public class OMHandler extends StreamingRequestHandler {
 		SearchAfter searchAfter = null;
 		boolean distinctStations = getDistinctStations();
 		String lastStation = null;
+		
+		Optional<Bond> initial = discoveryMessage.getUserBond();
+		
 		do {
 
 		    try {
 			if (searchAfter != null) {
 			    discoveryMessage.setSearchAfter(searchAfter);
 			}
+			if (initial.isPresent()) {
+			    discoveryMessage.setUserBond(initial.get());
+			}
 			resultSet = exec(discoveryMessage);
+			
 			searchAfter = resultSet.getSearchAfter().isPresent() ? resultSet.getSearchAfter().get() : null;
 
 			List<String> results = resultSet.getResultsList();

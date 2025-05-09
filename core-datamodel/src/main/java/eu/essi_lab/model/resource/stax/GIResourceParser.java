@@ -337,6 +337,7 @@ public class GIResourceParser extends StAXDocumentParser {
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "east"), v -> east = v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "north"), v -> north = v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "geometry"), v -> geometry = v);
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "bbox"), v -> geometry = v);
 
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.RESOURCE_IDENTIFIER.getName()), v -> this.resourceId = v);
 

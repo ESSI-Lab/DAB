@@ -68,6 +68,11 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>eu.essi_lab</groupId>
+			<artifactId>access-tools</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 </project>

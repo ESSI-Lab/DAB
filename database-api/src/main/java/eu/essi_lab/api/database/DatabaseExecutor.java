@@ -32,6 +32,7 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
@@ -316,5 +317,7 @@ public interface DatabaseExecutor extends DatabaseProvider {
      * @throws GSException
      */
     public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException;
+
+    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws Exception;
 
 }
