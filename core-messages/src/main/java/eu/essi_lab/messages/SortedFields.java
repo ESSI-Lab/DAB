@@ -37,7 +37,7 @@ public class SortedFields {
 	this.fields = fields;
     }
 
-    public SortedFields(ResourceProperty property, SortOrder order) {
+    public SortedFields(Queryable property, SortOrder order) {
 	this(Arrays.asList(new SimpleEntry(property,order)));
     }
 
