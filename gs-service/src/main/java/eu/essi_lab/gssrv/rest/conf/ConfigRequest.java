@@ -301,7 +301,7 @@ public abstract class ConfigRequest {
 
 	if (!mandatorySubParamsNames.isEmpty()) {
 
-	    throw new IllegalArgumentException("Missing mandatory sub-parameters: " + mandatoryNestedParams.//
+	    throw new IllegalArgumentException("Missing mandatory nested parameters: " + mandatoryNestedParams.//
 		    stream().//
 		    map(p -> "'" + p.getNested().get() + "." + p.getName() + "'").//
 		    collect(Collectors.joining(", ")));
@@ -348,7 +348,7 @@ public abstract class ConfigRequest {
 
 	if (!nestedParameters.isEmpty()) {
 
-	    throw new IllegalArgumentException("Unknown nested parameters: " + nestedParameters.//
+	    throw new IllegalArgumentException("Unsupported nested parameters: " + nestedParameters.//
 		    stream().//
 		    map(p -> "'" + p + "'").//
 		    collect(Collectors.joining(", ")) + ". Supported nested parameters: " + supportedNestedNames.//
@@ -376,10 +376,10 @@ public abstract class ConfigRequest {
 
 	if (!subParameters.isEmpty()) {
 
-	    throw new IllegalArgumentException("Unknown sub-parameters: " + subParameters.//
+	    throw new IllegalArgumentException("Unsupported nested parameters: " + subParameters.//
 		    stream().//
 		    map(p -> "'" + p + "'").//
-		    collect(Collectors.joining(", ")) + ". Supported sub-parameters: " + supportedSubParams.//
+		    collect(Collectors.joining(", ")) + ". Supported nested parameters: " + supportedSubParams.//
 			    stream().//
 			    map(p -> "'" + p.getNested().get() + "." + p.getName() + "'").//
 			    collect(Collectors.joining(", ")));

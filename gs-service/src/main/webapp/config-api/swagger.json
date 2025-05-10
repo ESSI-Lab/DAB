@@ -2,27 +2,27 @@
 	"openapi": "3.0.1",
 	"info": {
 		"title": "Configuration DAB REST API",
-		"description": "DAB REST API which allow to put, edit, remove and schedule harvesting of brokered sources",
+		"description": "DAB REST API to create, edit and remove the DAB brokered sources. It also allows to manage the harvesting scheduling of the DAB brokered sources",
 		"version": "1.0"
 	},
 	"tags": [
 		{
-			"name": "config",
-			"description": "The path to execute the supported requests"
+			"name": "/config-api",
+			"description": "The path to execute the API requests"
 		}
 	],
 	"paths": {
-		"/gs-service/services/config/{authenticationToken}": {
+		"/gs-service/services/config-api/{authenticationToken}": {
 			"post": {
 				"tags": [
-					"config"
+					"/config-api"
 				],
-				"description": "The path to execute the supported requests",
+				"description": "The path to execute the API requests",
 				"parameters": [
 					{
 						"name": "authenticationToken",
 						"in": "path",
-						"description": "Authentication token required to execute configuration requests",
+						"description": "Authentication token required to execute the API requests",
 						"required": true,
 						"type": "string"
 					}
@@ -80,15 +80,15 @@
 									}
 								},
 								"putSource3": {
-									"summary": "'PutSource' request with harvest scheduling",
-									"description": "Example of 'PutSource' request with harvest scheduled to start 'Once' now",
+									"summary": "'PutSource' request with harvesting scheduling",
+									"description": "Example of 'PutSource' request with harvesting scheduled to start 'Once' now",
 									"value": {
 										"request": "PutSource",
 										"parameters": {
 											"id": "nsidcAtlasSouth",
 											"label": "Atlas of the Cryosphere: Southern Hemisphere",
 											"serviceType": "WCS 1.0.0",
-											"endpoint": "http://localhost",
+											"endpoint": "http://nsidc.org/cgi-bin/atlas_south?",
 											"HarvestScheduling": {
 												"repeatCount": "Once"
 											}
@@ -109,7 +109,7 @@
 									}
 								},
 								"harvestScheduling1": {
-									"summary": "'HarvestScheduling' request: run 'Once', start now",
+									"summary": "'HarvestScheduling' request to run 'Once' starting now",
 									"description": "Example of 'HarvestScheduling' request configured to run 'Once' and to start now (as soon as possible)",
 									"value": {
 										"request": "HarvestScheduling",
@@ -120,8 +120,8 @@
 									}
 								},
 								"harvestScheduling2": {
-									"summary": "'HarvestScheduling' request: run 'Once', with defined 'startTime'",
-									"description": "Example of 'HarvestScheduling' request configured to run 'Once' and to start in a specific date and time. The 'startTime' parameter it must be of type ISO8601 according to the 'Europe/Berlin' TimeZone",
+									"summary": "'HarvestScheduling' request to run 'Once', with defined 'startTime'",
+									"description": "Example of 'HarvestScheduling' request configured to run 'Once' and to start in a specific date and time. The 'startTime' parameter must be of type ISO8601 according to the 'Europe/Berlin' TimeZone",
 									"value": {
 										"request": "HarvestScheduling",
 										"parameters": {
@@ -132,7 +132,7 @@
 									}
 								},
 								"harvestScheduling3": {
-									"summary": "'HarvestScheduling' request: run 'Indefinitely', every week",
+									"summary": "'HarvestScheduling' request to run 'Indefinitely' every week",
 									"description": "Example of 'HarvestScheduling' request configured to run 'Indefinitely' with intervals of one week, starting now (as soon as possible)",
 									"value": {
 										"request": "HarvestScheduling",
@@ -166,14 +166,14 @@
 								},
 								"listSources1": {
 									"summary": "'ListSources' request for all the available sources",
-									"description": "Example of 'ListSources' request which shows all the available sources and their harvesting phase (if available)",
+									"description": "Example of 'ListSources' request which shows all the available sources",
 									"value": {
 										"request": "ListSources"
 									}
 								},
 								"listSources2": {
 									"summary": "'ListSources' request for a specific source",
-									"description": "Example of 'ListSources' request which shows a specific source and its harvesting phase (if available)",
+									"description": "Example of 'ListSources' request limited to a specific source",
 									"value": {
 										"request": "ListSources",
 										"parameters": {
@@ -183,7 +183,7 @@
 								},
 								"listSources3": {
 									"summary": "'ListSources' request for two specific sources",
-									"description": "Example of 'ListSources' request which shows two specific sources and their harvesting phase (if available)",
+									"description": "Example of 'ListSources' request limited to two specific sources. The second source id must be modified with the id of an existing source",
 									"value": {
 										"request": "ListSources",
 										"parameters": {
@@ -201,8 +201,8 @@
 						"content": {
 							"application/json": {
 								"examples": {
-									"randomId": {
-										"summary": "'ListSources' request response",
+									"listSources1": {
+										"summary": "'ListSources' request response of a running harvesting",
 										"value": [
 											{
 												"serviceType": "WCS",
@@ -218,6 +218,25 @@
 												"label": "Atlas of the Cryosphere: Southern Hemisphere (WCS)"
 											}
 										]
+									},
+									"listSources2": {
+										"summary": "'ListSources' request response of a completed harvesting",
+										"value": {
+											"serviceType": "WCS",
+											"endpoint": "http://nsidc.org/cgi-bin/atlas_south?",
+											"scheduling": {
+												"phase": "Completed",
+												"firedTime": "2025-05-10 14:54:57",
+												"size": "29",
+												"nextFireTime": "2025-05-17 14:54:57",
+												"repeatInterval": "0007 day/s",
+												"endTime": "2025-05-10 14:56:58",
+												"elapsedTime": "00:02:01",
+												"repeatCount": "Indefinitely"
+											},
+											"id": "nsidcAtlasSouth",
+											"label": "Atlas of the Cryosphere: Southern Hemisphere"
+										}
 									}
 								}
 							}
@@ -244,7 +263,7 @@
 							"application/json": {
 								"examples": {
 									"sourceExists": {
-										"summary": "'PutSource' request failed beacause source already exists",
+										"summary": "'PutSource' request failed due to already existing source",
 										"value": {
 											"error": {
 												"reasonPrase": "Bad Request",
@@ -254,7 +273,7 @@
 										}
 									},
 									"noChanges": {
-										"summary": "'EditSource' request failed beacause there are no changes to apply",
+										"summary": "'EditSource' request failed due to no changes to apply",
 										"value": {
 											"error": {
 												"reasonPrase": "Bad Request",
@@ -264,7 +283,7 @@
 										}
 									},
 									"harvestUnderWay": {
-										"summary": "'HarvestSource' request failed to start now beacause harvesting is already underway",
+										"summary": "'HarvestScheduling' request failed to start now due to an underway harvesting",
 										"value": {
 											"error": {
 												"reasonPrase": "Bad Request",
@@ -274,11 +293,11 @@
 										}
 									},
 									"harvestUnderWay2": {
-										"summary": "'RemoveSource' request failed beacause harvesting is underway",
+										"summary": "'RemoveSource' request failed due to an underway harvesting",
 										"value": {
 											"error": {
 												"reasonPrase": "Bad Request",
-												"message": "The requested source is currently being harvested and cannot be removed until harvest is complete",
+												"message": "The requested source is currently being harvested and cannot be removed until harvesting is complete",
 												"statusCode": 400
 											}
 										}
@@ -321,7 +340,7 @@
 							"application/json": {
 								"examples": {
 									"invalidId": {
-										"summary": "'PutSource' request failed for invalid 'id' parameter",
+										"summary": "'PutSource' request failed due to invalid 'id' parameter",
 										"value": {
 											"error": {
 												"reasonPrase": "Method Not Allowed",
@@ -331,7 +350,7 @@
 										}
 									},
 									"missingLabel": {
-										"summary": "'PutSource' request failed because the mandatory parameter 'label' is missing'",
+										"summary": "'PutSource' request failed due to missing of mandatory parameter 'label'",
 										"value": {
 											"error": {
 												"reasonPrase": "Method Not Allowed",
@@ -340,8 +359,28 @@
 											}
 										}
 									},
+									"unsupportedParameter": {
+										"summary": "'PutSource' request failed due to unsupported parameter 'foo'",
+										"value": {
+											"error": {
+												"reasonPrase": "Method Not Allowed",
+												"message": "Unknown parameters: 'foo'. Supported parameters: 'id', 'label', 'endpoint', 'serviceType', 'startTime', 'repeatCount', 'repeatInterval', 'repeatIntervalUnit'",
+												"statusCode": 405
+											}
+										}
+									},
+									"unsupportedNestedParameter": {
+										"summary": "'PutSource' request failed due to unsupported nested parameter 'id' in the nested 'HarvestScheduling' request",
+										"value": {
+											"error": {
+												"reasonPrase": "Method Not Allowed",
+												"message": "Unsupported nested parameters: 'id'. Supported nested parameters: 'HarvestScheduling.startTime', 'HarvestScheduling.repeatCount', 'HarvestScheduling.repeatInterval', 'HarvestScheduling.repeatIntervalUnit'",
+												"statusCode": 405
+											}
+										}
+									},
 									"invalidStartTime": {
-										"summary": "'HarvestSource' request failed for invalid 'startTime'",
+										"summary": "'HarvestScheduling' request failed due to unsupported 'startTime'",
 										"value": {
 											"error": {
 												"reasonPrase": "Method Not Allowed",
@@ -351,7 +390,7 @@
 										}
 									},
 									"startTimeInThePast": {
-										"summary": "'HarvestSource' request failed because 'startTime' is in the past",
+										"summary": "'HarvestScheduling' request failed since 'startTime' is in the past",
 										"value": {
 											"error": {
 												"reasonPrase": "Method Not Allowed",
@@ -361,7 +400,7 @@
 										}
 									},
 									"invalidRepeatCount": {
-										"summary": "'HarvestSource' request failed for invalid 'repeatCount'",
+										"summary": "'HarvestScheduling' request failed due to unsupported 'repeatCount'",
 										"value": {
 											"error": {
 												"reasonPrase": "Method Not Allowed",
@@ -371,7 +410,7 @@
 										}
 									},
 									"invalidRepeatIntervalUnit": {
-										"summary": "'HarvestSource' request failed for invalid 'repeatIntervalUnit'",
+										"summary": "'HarvestScheduling' request failed due to unsupported 'repeatIntervalUnit'",
 										"value": {
 											"error": {
 												"reasonPrase": "Method Not Allowed",
@@ -381,7 +420,7 @@
 										}
 									},
 									"missingHarvestParameters": {
-										"summary": "'HarvestSource' request failed because mandatory parameters are missing",
+										"summary": "'HarvestScheduling' request failed due to missing of mandatory parameters",
 										"value": {
 											"error": {
 												"reasonPrase": "Method Not Allowed",
@@ -429,17 +468,7 @@
 								"type": "string"
 							},
 							"serviceType": {
-								"description": "The mandatory service type",
-								"type": "string",
-								"enum": [
-									"CSW",
-									"WCS 1.0.0",
-									"WCS 1.1.0",
-									"WCS 1.1.1",
-									"WMS 1.1.1",
-									"WMS 1.3.0",
-									"WFS 1.1.0"
-								]
+								"$ref": "#/components/schemas/ServiceType"
 							},
 							"label": {
 								"description": "The mandatory source label",
@@ -450,7 +479,7 @@
 								"type": "string"
 							},
 							"HarvestScheduling": {
-								"description": "The harvest of the source just created can optionally be scheduled. The parameters are the same of the 'HarvestScheduling' request, except 'id'",
+								"description": "The harvesting of the source just created can optionally be scheduled. The parameters are the same of the 'HarvestScheduling' request, except 'id' that must be omitted",
 								"type": "object",
 								"required": [
 									"repeatCount"
@@ -467,7 +496,7 @@
 										"type": "integer"
 									},
 									"startTime": {
-										"description": "Optional parameter. If omitted, the harvest is scheduled to start now (as soon as possible), immediately after the creation of the new source. If provided, it must be of type ISO8601 according to the 'Europe/Berlin' TimeZone (e.g: '2025-01-01T15:00:00')",
+										"description": "Optional parameter. If omitted, the harvesting is scheduled to start now (as soon as possible), immediately after the creation of the new source. If provided, it must be of type ISO8601 according to the 'Europe/Berlin' TimeZone (e.g: '2025-01-01T15:00:00')",
 										"type": "string"
 									}
 								}
@@ -500,17 +529,7 @@
 								"type": "string"
 							},
 							"serviceType": {
-								"description": "The service type",
-								"type": "string",
-								"enum": [
-									"CSW",
-									"WCS 1.0.0",
-									"WCS 1.1.0",
-									"WCS 1.1.1",
-									"WMS 1.1.1",
-									"WMS 1.3.0",
-									"WFS 1.1.0"
-								]
+								"$ref": "#/components/schemas/ServiceType"
 							},
 							"label": {
 								"description": "The source label",
@@ -552,7 +571,7 @@
 				}
 			},
 			"HarvestScheduling": {
-				"description": "Schedules the harvest of a DAB source",
+				"description": "Schedules the harvesting of a DAB source",
 				"type": "object",
 				"required": [
 					"request",
@@ -586,7 +605,7 @@
 								"type": "integer"
 							},
 							"startTime": {
-								"description": "Optional parameter. If omitted, the harvest is scheduled to start now (as soon as possible). If provided, it must be of type ISO8601 according to the 'Europe/Berlin' TimeZone (e.g: '2025-01-01T15:00:00')",
+								"description": "Optional parameter. If omitted, the harvesting is scheduled to start now (as soon as possible). If provided, it must be of type ISO8601 according to the 'Europe/Berlin' TimeZone (e.g: '2025-01-01T15:00:00')",
 								"type": "string"
 							}
 						}
@@ -594,7 +613,7 @@
 				}
 			},
 			"HarvestUnscheduling": {
-				"description": "Unschedules the harvest of a DAB source. If the harvesting of the provided source is underway, it is canceled and it will terminate as soon as possible",
+				"description": "Unschedules the harvesting of a DAB source. If the harvesting of the provided source is underway, it is canceled and it will terminate as soon as possible",
 				"type": "object",
 				"required": [
 					"request",
@@ -621,7 +640,7 @@
 				}
 			},
 			"ListSources": {
-				"description": "Lists all or a subset of the DAB sources. All the sources properties as listed, harvest scheduling included",
+				"description": "Lists all or a subset of the DAB sources. All the sources properties as listed, as well as the harvesting scheduling",
 				"type": "object",
 				"required": [
 					"request",
@@ -643,6 +662,19 @@
 						}
 					}
 				}
+			},
+			"ServiceType": {
+				"description": "The supported service types",
+				"type": "string",
+				"enum": [
+					"CSW",
+					"WCS 1.0.0",
+					"WCS 1.1.0",
+					"WCS 1.1.1",
+					"WMS 1.1.1",
+					"WMS 1.3.0",
+					"WFS 1.1.0"
+				]
 			},
 			"HarvestingPhase": {
 				"description": "The possible phases of DAB source harvesting",
@@ -667,7 +699,7 @@
 				]
 			},
 			"RepeatCount": {
-				"description": "This mandatory parameter defines the scheduling to be performed just once or indefinitely. In the first case ('Once'), the only additional supported parameter is 'startTime'; if omitted, the harvest is scheduled to start now (as soon as possible), immediately after the creation of the new source. In the second case ('Indefinitely'), the parameters 'repeatIntervalUnit' and 'repeatInterval' are mandatory, while 'startTime' can be omitted, as previously described",
+				"description": "This mandatory parameter defines the scheduling to be performed just once or indefinitely. In the first case ('Once'), the only additional supported parameter is 'startTime'; if omitted, the harvesting is scheduled to start now (as soon as possible), immediately after the creation of the new source. In the second case ('Indefinitely'), the parameters 'repeatIntervalUnit' and 'repeatInterval' are mandatory, while 'startTime' can be omitted, as previously described",
 				"type": "string",
 				"enum": [
 					"Once",

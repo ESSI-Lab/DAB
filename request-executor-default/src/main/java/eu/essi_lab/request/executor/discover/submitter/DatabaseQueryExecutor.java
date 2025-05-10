@@ -129,7 +129,7 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
 	message.setPage(page);
 
-	ResultSet<String> resultSet = finder.discoverStrings(message);
+	ResultSet<String> resultSet = finder.discoverDistinctStrings(message);
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieve ENDED");
 

@@ -25,10 +25,19 @@ package eu.essi_lab.api.database.vol;
  */
 
 import eu.essi_lab.api.database.DatabaseFinder;
+import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
  */
 public class VolatileDatabaseFinder extends VolatileDatabaseReader implements DatabaseFinder{
+
+    @Override
+    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws GSException {
+	// TODO Auto-generated method stub
+	return null;
+    }
 
 }

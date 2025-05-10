@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.om;
 
+import eu.essi_lab.messages.DiscoveryMessage;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -25,6 +27,7 @@ import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 
@@ -46,6 +49,12 @@ public class FeaturesTransformer extends OMTransformer {
 	return selector;
     }
 
-  
+    @Override
+    public DiscoveryMessage transform(WebRequest request) throws GSException {
+	DiscoveryMessage ret = super.transform(request);
+	ret.setDistinctValuesElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+	ret.setExcludeResourceBinary(true);
+	return ret;
+    }
 
 }

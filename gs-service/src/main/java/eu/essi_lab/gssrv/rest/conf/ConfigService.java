@@ -570,7 +570,7 @@ public class ConfigService {
 	if (isHarvestingUnderway(sourceId)) {
 
 	    return buildErrorResponse(Status.BAD_REQUEST,
-		    "The requested source is currently being harvested and cannot be removed until harvest is complete");
+		    "The requested source is currently being harvested and cannot be removed until harvesting is complete");
 	}
 
 	String settingId = finder.getSettingId().get();
