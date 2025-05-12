@@ -345,12 +345,8 @@ public class OMHandler extends StreamingRequestHandler {
 			}
 			tempSize += observations.size();
 			GSLoggerFactory.getLogger(getClass()).info("formatting");
-			for (JSONObservation observation : observations) {
-
-			    ObservationType type = observation.getType();
-			    String dataId = observation.getId();
-
-			    if (format.equals("JSON")) {
+			
+			 if (format.equals("JSON")) {
 				if (first) {
 				    writer.write("{");
 				    addIdentifier(writer);
@@ -371,6 +367,12 @@ public class OMHandler extends StreamingRequestHandler {
 
 				}
 			    }
+			
+			
+			for (JSONObservation observation : observations) {
+
+			    ObservationType type = observation.getType();
+			    String dataId = observation.getId();
 
 			    // DATA part
 
