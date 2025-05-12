@@ -129,15 +129,15 @@ public abstract class ConfigRequest {
 	    enumCheck(supportedParameters, paramName, value);
 	});
 
-	readNestedRootParameters().forEach(parentParam -> {
+	readCompositeParameters().forEach(compositeName -> {
 
-	    readNestedParameters(parentParam).forEach(subParam -> {
+	    readNestedParameters(compositeName).forEach(subParam -> {
 
-		Object value = readNestedValue(parentParam, subParam);
+		Object value = readNestedValue(compositeName, subParam);
 
 		List<Parameter> supportedNestedParams = getSupportedParameters().//
-			stream().filter(p -> p.getNested().isPresent()).//
-			filter(p -> p.getNested().get().equals(parentParam)).//
+			stream().filter(p -> p.getComposite().isPresent()).//
+			filter(p -> p.getComposite().get().equals(compositeName)).//
 			collect(Collectors.toList());
 
 		contentTypeCheck(supportedNestedParams, subParam, value);
@@ -167,24 +167,24 @@ public abstract class ConfigRequest {
     }
 
     /**
-     * @param nestedRootParam
+     * @param compositeParam
      * @param nestedParam
      * @param value
      */
-    public void put(String nestedRootParam, String nestedParam, String value) {
+    public void put(String compositeParam, String nestedParam, String value) {
 
-	JSONObject nestedObject = new JSONObject();
+	JSONObject compositeObject = new JSONObject();
 
-	if (!getParametersObject().has(nestedRootParam)) {
+	if (!getParametersObject().has(compositeParam)) {
 
-	    getParametersObject().put(nestedRootParam, nestedObject);
+	    getParametersObject().put(compositeParam, compositeObject);
 
 	} else {
 
-	    nestedObject = getParametersObject().getJSONObject(nestedRootParam);
+	    compositeObject = getParametersObject().getJSONObject(compositeParam);
 	}
 
-	nestedObject.put(nestedParam, value);
+	compositeObject.put(nestedParam, value);
     }
 
     /**
@@ -202,19 +202,19 @@ public abstract class ConfigRequest {
     }
 
     /**
-     * @param nestedRootParam
+     * @param compositeParam
      * @param nestedParam
      * @return
      */
-    public Optional<Object> read(String nestedRootParam, String nestedParam) {
+    public Optional<Object> read(String compositeParam, String nestedParam) {
 
-	if (getParametersObject().has(nestedRootParam)) {
+	if (getParametersObject().has(compositeParam)) {
 
-	    JSONObject parentObject = getParametersObject().getJSONObject(nestedRootParam);
+	    JSONObject parentObject = getParametersObject().getJSONObject(compositeParam);
 
 	    if (parentObject.has(nestedParam)) {
 
-		return Optional.of(readNestedValue(nestedRootParam, nestedParam));
+		return Optional.of(readNestedValue(compositeParam, nestedParam));
 	    }
 	}
 
@@ -241,7 +241,7 @@ public abstract class ConfigRequest {
 
 	List<String> mandatoryParams = getSupportedParameters().//
 		stream().//
-		filter(p -> p.getNested().isEmpty()).//
+		filter(p -> p.getComposite().isEmpty()).//
 		filter(p -> p.isMandatory()).//
 		map(p -> p.getName()).//
 		collect(Collectors.toList());
@@ -261,8 +261,8 @@ public abstract class ConfigRequest {
 
 	List<Parameter> supportedMandatoryNested = getSupportedParameters().//
 		stream().//
-		filter(p -> p.getNested().isPresent()).//
-		filter(p -> p.isNestedMandatory()).//
+		filter(p -> p.getComposite().isPresent()).//
+		filter(p -> p.isCompositeMandatory()).//
 		collect(Collectors.toList());
 
 	List<String> supportedMandatoryNestedNames = supportedMandatoryNested.//
@@ -270,7 +270,7 @@ public abstract class ConfigRequest {
 		map(p -> p.getName()).//
 		collect(Collectors.toList());
 
-	List<String> nestedParameters = readNestedRootParameters();
+	List<String> nestedParameters = readCompositeParameters();
 	supportedMandatoryNestedNames.removeAll(nestedParameters);
 
 	if (!supportedMandatoryNestedNames.isEmpty()) {
@@ -285,25 +285,25 @@ public abstract class ConfigRequest {
 	//
 	//
 
-	List<Parameter> mandatoryNestedParams = getSupportedParameters().//
+	List<Parameter> mandatoryCompositeParams = getSupportedParameters().//
 		stream().//
-		filter(p -> p.getNested().isPresent()).//
+		filter(p -> p.getComposite().isPresent()).//
 		filter(p -> p.isMandatory()).//
-		filter(p -> readNestedRootParameters().contains(p.getNested().get())).//
+		filter(p -> readCompositeParameters().contains(p.getComposite().get())).//
 		collect(Collectors.toList());
 
-	List<String> mandatorySubParamsNames = mandatoryNestedParams.//
+	List<String> mandatoryNestedParamsNames = mandatoryCompositeParams.//
 		stream().//
 		map(p -> p.getName()).//
 		collect(Collectors.toList());
 
-	mandatorySubParamsNames.removeAll(readNestedParameters());
+	mandatoryNestedParamsNames.removeAll(readNestedParameters());
 
-	if (!mandatorySubParamsNames.isEmpty()) {
+	if (!mandatoryNestedParamsNames.isEmpty()) {
 
-	    throw new IllegalArgumentException("Missing mandatory nested parameters: " + mandatoryNestedParams.//
+	    throw new IllegalArgumentException("Missing mandatory nested parameters: " + mandatoryCompositeParams.//
 		    stream().//
-		    map(p -> "'" + p.getNested().get() + "." + p.getName() + "'").//
+		    map(p -> "'" + p.getComposite().get() + "." + p.getName() + "'").//
 		    collect(Collectors.joining(", ")));
 	}
     }
@@ -338,12 +338,12 @@ public abstract class ConfigRequest {
 
 	List<String> supportedNestedNames = getSupportedParameters().//
 		stream().//
-		filter(p -> p.getNested().isPresent()).//
-		map(p -> p.getNested().get()).//
+		filter(p -> p.getComposite().isPresent()).//
+		map(p -> p.getComposite().get()).//
 		distinct().//
 		collect(Collectors.toList());
 
-	List<String> nestedParameters = readNestedRootParameters();
+	List<String> nestedParameters = readCompositeParameters();
 	nestedParameters.removeAll(supportedNestedNames);
 
 	if (!nestedParameters.isEmpty()) {
@@ -363,7 +363,7 @@ public abstract class ConfigRequest {
 
 	List<Parameter> supportedSubParams = getSupportedParameters().//
 		stream().//
-		filter(p -> p.getNested().isPresent()).//
+		filter(p -> p.getComposite().isPresent()).//
 		collect(Collectors.toList());
 
 	List<String> supportedSubnNames = supportedSubParams.//
@@ -381,7 +381,7 @@ public abstract class ConfigRequest {
 		    map(p -> "'" + p + "'").//
 		    collect(Collectors.joining(", ")) + ". Supported nested parameters: " + supportedSubParams.//
 			    stream().//
-			    map(p -> "'" + p.getNested().get() + "." + p.getName() + "'").//
+			    map(p -> "'" + p.getComposite().get() + "." + p.getName() + "'").//
 			    collect(Collectors.joining(", ")));
 	}
     }
@@ -421,7 +421,7 @@ public abstract class ConfigRequest {
 		if (!val.toString().equals("true") && !val.toString().equals("false")) {
 
 		    throw new IllegalArgumentException(
-			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' should be of type boolean");
+			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' must be of type boolean");
 		}
 
 		break;
@@ -433,7 +433,7 @@ public abstract class ConfigRequest {
 		} catch (NumberFormatException ex) {
 
 		    throw new IllegalArgumentException(
-			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' should be of type double");
+			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' must be of type double");
 		}
 
 		break;
@@ -445,7 +445,7 @@ public abstract class ConfigRequest {
 		} catch (NumberFormatException ex) {
 
 		    throw new IllegalArgumentException(
-			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' should be of type integer");
+			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' must be of type integer");
 		}
 
 		break;
@@ -455,7 +455,7 @@ public abstract class ConfigRequest {
 		if (!parseDateTime(val.toString()) || val.toString().length() != "YYYY-MM-DDThh:mm:ss".length()) {
 
 		    throw new IllegalArgumentException("Unsupported value '" + val + "'. Parameter '" + paramName
-			    + "' should be of type ISO8601 date time according to the 'Europe/Berlin' TimeZone: 'YYYY-MM-DDThh:mm:ss'");
+			    + "' must be of type ISO8601 date time according to the 'Europe/Berlin' TimeZone: 'YYYY-MM-DDThh:mm:ss'");
 		}
 
 		break;
@@ -467,7 +467,7 @@ public abstract class ConfigRequest {
 		} catch (NumberFormatException ex) {
 
 		    throw new IllegalArgumentException(
-			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' should be of type long");
+			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' must be of type long");
 		}
 
 		break;
@@ -584,7 +584,7 @@ public abstract class ConfigRequest {
     /**
      * @return
      */
-    protected List<String> readNestedRootParameters() {
+    protected List<String> readCompositeParameters() {
 
 	return getParametersObject().//
 		keySet().//
@@ -597,7 +597,7 @@ public abstract class ConfigRequest {
      */
     protected List<String> readNestedParameters() {
 
-	return readNestedRootParameters().//
+	return readCompositeParameters().//
 		stream().//
 		map(key -> getParametersObject().getJSONObject(key)).//
 		flatMap(object -> object.keySet().stream()).//
@@ -607,11 +607,11 @@ public abstract class ConfigRequest {
     /*
      * 
      */
-    protected List<String> readNestedParameters(String nested) {
+    protected List<String> readNestedParameters(String compositeName) {
 
-	return readNestedRootParameters().//
+	return readCompositeParameters().//
 		stream().//
-		filter(p -> p.equals(nested)).//
+		filter(p -> p.equals(compositeName)).//
 		map(key -> getParametersObject().getJSONObject(key)).//
 		flatMap(object -> object.keySet().stream()).//
 		collect(Collectors.toList());//
@@ -627,13 +627,13 @@ public abstract class ConfigRequest {
     }
 
     /**
+     * @param composite
      * @param nested
-     * @param parameter
      * @return
      */
-    protected Object readNestedValue(String nested, String parameter) {
+    protected Object readNestedValue(String composite, String nested) {
 
-	return getParametersObject().getJSONObject(nested).get(parameter);
+	return getParametersObject().getJSONObject(composite).get(nested);
     }
 
     /**

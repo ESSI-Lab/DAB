@@ -99,7 +99,7 @@ public class ConfigService {
 
 	if (!path.get().equals(configServiceAuthToken)) {
 
-	    return buildErrorResponse(Status.UNAUTHORIZED, "Unrecognized uthorization token");
+	    return buildErrorResponse(Status.UNAUTHORIZED, "Unrecognized authentication token");
 	}
 
 	String stringStream = null;
@@ -263,7 +263,7 @@ public class ConfigService {
 	// optional harvesting scheduling
 	//
 
-	if (!putSourceRequest.readNestedRootParameters().isEmpty()) {
+	if (!putSourceRequest.readCompositeParameters().isEmpty()) {
 
 	    HarvestSchedulingRequest harvestSchedulingRequest = new HarvestSchedulingRequest();
 

@@ -1,7 +1,7 @@
 {
 	"openapi": "3.0.1",
 	"info": {
-		"title": "Configuration DAB REST API",
+		"title": "DAB REST Configuration API",
 		"description": "DAB REST API to create, edit and remove the DAB brokered sources. It also allows to manage the harvesting scheduling of the DAB brokered sources",
 		"version": "1.0"
 	},
@@ -29,7 +29,7 @@
 				],
 				"requestBody": {
 					"required": true,
-					"description": "The request to execute, in JSON format. Before to be processed, each request is validated according to its specification. In case of validation errors, the request execution fails with reponse code '405'",
+					"description": "The request to execute, in JSON format. Before to be processed, each request is validated according to its specification. In case of validation errors, the request fails with reponse code '405'",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -70,7 +70,7 @@
 								},
 								"putSource2": {
 									"summary": "'PutSource' request with random source identifier",
-									"description": "Example of 'PutSource' request without source identifier, a random one is created and returned in the response",
+									"description": "Example of 'PutSource' request without source identifier; a random one is created and returned in the response",
 									"value": {
 										"request": "PutSource",
 										"parameters": {
@@ -81,7 +81,7 @@
 								},
 								"putSource3": {
 									"summary": "'PutSource' request with harvesting scheduling",
-									"description": "Example of 'PutSource' request with harvesting scheduled to start 'Once' now",
+									"description": "Example of 'PutSource' request with harvesting scheduled to start 'Once' now (as soon as possible)",
 									"value": {
 										"request": "PutSource",
 										"parameters": {
@@ -165,8 +165,8 @@
 									}
 								},
 								"listSources1": {
-									"summary": "'ListSources' request for all the available sources",
-									"description": "Example of 'ListSources' request which shows all the available sources",
+									"summary": "'ListSources' request for all the brokered sources",
+									"description": "Example of 'ListSources' request which shows all the brokered sources",
 									"value": {
 										"request": "ListSources"
 									}
@@ -221,22 +221,24 @@
 									},
 									"listSources2": {
 										"summary": "'ListSources' request response of a completed harvesting",
-										"value": {
-											"serviceType": "WCS",
-											"endpoint": "http://nsidc.org/cgi-bin/atlas_south?",
-											"scheduling": {
-												"phase": "Completed",
-												"firedTime": "2025-05-10 14:54:57",
-												"size": "29",
-												"nextFireTime": "2025-05-17 14:54:57",
-												"repeatInterval": "0007 day/s",
-												"endTime": "2025-05-10 14:56:58",
-												"elapsedTime": "00:02:01",
-												"repeatCount": "Indefinitely"
-											},
-											"id": "nsidcAtlasSouth",
-											"label": "Atlas of the Cryosphere: Southern Hemisphere"
-										}
+										"value": [
+											{
+												"serviceType": "WCS",
+												"endpoint": "http://nsidc.org/cgi-bin/atlas_south?",
+												"scheduling": {
+													"phase": "Completed",
+													"firedTime": "2025-05-10 14:54:57",
+													"size": "29",
+													"nextFireTime": "2025-05-17 14:54:57",
+													"repeatInterval": "0007 day/s",
+													"endTime": "2025-05-10 14:56:58",
+													"elapsedTime": "00:02:01",
+													"repeatCount": "Indefinitely"
+												},
+												"id": "nsidcAtlasSouth",
+												"label": "Atlas of the Cryosphere: Southern Hemisphere"
+											}
+										]
 									}
 								}
 							}
@@ -307,13 +309,13 @@
 						}
 					},
 					"401": {
-						"description": "Unrecognized uthorization token",
+						"description": "Unrecognized authentication token",
 						"content": {
 							"application/json": {
 								"example": {
 									"error": {
 										"reasonPrase": "Unauthorized",
-										"message": "Unrecognized uthorization token",
+										"message": "Unrecognized authenticationtoken",
 										"statusCode": 401
 									}
 								}
@@ -370,7 +372,7 @@
 										}
 									},
 									"unsupportedNestedParameter": {
-										"summary": "'PutSource' request failed due to unsupported nested parameter 'id' in the nested 'HarvestScheduling' request",
+										"summary": "'PutSource' request failed due to unsupported nested parameter 'id' in the composite 'HarvestScheduling' parameter",
 										"value": {
 											"error": {
 												"reasonPrase": "Method Not Allowed",
@@ -379,12 +381,12 @@
 											}
 										}
 									},
-									"invalidStartTime": {
+									"unsupportedStartTime": {
 										"summary": "'HarvestScheduling' request failed due to unsupported 'startTime'",
 										"value": {
 											"error": {
 												"reasonPrase": "Method Not Allowed",
-												"message": "Unsupported value '2025-06-09'. Parameter 'startTime' should be of type ISO8601 date time according to the 'Europe/Berlin' TimeZone: 'YYYY-MM-DDThh:mm:ss'",
+												"message": "Unsupported value '2025-06-09'. Parameter 'startTime' must be of type ISO8601 date time according to the 'Europe/Berlin' TimeZone: 'YYYY-MM-DDThh:mm:ss'",
 												"statusCode": 405
 											}
 										}
@@ -399,7 +401,7 @@
 											}
 										}
 									},
-									"invalidRepeatCount": {
+									"unsupportedRepeatCount": {
 										"summary": "'HarvestScheduling' request failed due to unsupported 'repeatCount'",
 										"value": {
 											"error": {
@@ -409,7 +411,17 @@
 											}
 										}
 									},
-									"invalidRepeatIntervalUnit": {
+									"unsupportedRepeatInterval": {
+										"summary": "'HarvestScheduling' request failed due to unsupported 'repeatInterval' value",
+										"value": {
+											"error": {
+												"reasonPrase": "Method Not Allowed",
+												"message": "Value of 'repeatInterval' parameter must be >= 1",
+												"statusCode": 405
+											}
+										}
+									},
+									"unsupportedRepeatIntervalUnit": {
 										"summary": "'HarvestScheduling' request failed due to unsupported 'repeatIntervalUnit'",
 										"value": {
 											"error": {
@@ -464,7 +476,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The optional source id. If omitted, a random id is created and returned in the response. If provided, it must contains alphanumeric characters and/or '_' or '-' characters and if a source with the given id already exists, the request execution fails with reponse code '400'",
+								"description": "The optional source id. If omitted, a random id is created and returned in the response. If provided, it must contains alphanumeric characters and/or '_' or '-' characters and if a source with the given id already exists, the request fails with reponse code '400'",
 								"type": "string"
 							},
 							"serviceType": {
@@ -492,7 +504,7 @@
 										"$ref": "#/components/schemas/RepeatIntervalUnit"
 									},
 									"repeatInterval": {
-										"description": "Mandatory parameter in case 'repeatCount' is 'Indefinitely'. Defines the interval (expressed according to 'repeatIntervalUnit') between the scheduled harvests",
+										"description": "Mandatory parameter in case 'repeatCount' is 'Indefinitely'. Defines the interval (expressed according to 'repeatIntervalUnit') between the scheduled harvesting. It must be an integer value >= 1",
 										"type": "integer"
 									},
 									"startTime": {
@@ -525,7 +537,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request execution fails with reponse code be '404'",
+								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with reponse code be '404'",
 								"type": "string"
 							},
 							"serviceType": {
@@ -544,7 +556,7 @@
 				}
 			},
 			"RemoveSource": {
-				"description": "Removes an existing DAB source. When a source is removed, it is also unscheduled. If the harvesting of the provided source is underway, the request execution fails with reponse code '400'",
+				"description": "Removes an existing DAB source. When a source is removed, it is also unscheduled. If the harvesting of the provided source is underway, the request fails with reponse code '400'",
 				"type": "object",
 				"required": [
 					"request",
@@ -563,7 +575,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request execution fails with reponse code be '404'",
+								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with reponse code be '404'",
 								"type": "string"
 							}
 						}
@@ -591,7 +603,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request execution fails with reponse code be '404'",
+								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with reponse code be '404'",
 								"type": "string"
 							},
 							"repeatCount": {
@@ -601,7 +613,7 @@
 								"$ref": "#/components/schemas/RepeatIntervalUnit"
 							},
 							"repeatInterval": {
-								"description": "Mandatory parameter in case 'repeatCount' is 'Indefinitely'. Defines the interval (expressed according to 'repeatIntervalUnit') between the scheduled harvests",
+								"description": "Mandatory parameter in case 'repeatCount' is 'Indefinitely'. Defines the interval (expressed according to 'repeatIntervalUnit') between the scheduled harvesting. It must be an integer value >= 1",
 								"type": "integer"
 							},
 							"startTime": {
@@ -632,7 +644,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request execution fails with reponse code be '404'",
+								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with reponse code be '404'",
 								"type": "string"
 							}
 						}
@@ -640,7 +652,7 @@
 				}
 			},
 			"ListSources": {
-				"description": "Lists all or a subset of the DAB sources. All the sources properties as listed, as well as the harvesting scheduling",
+				"description": "Lists all or a subset of the DAB sources. All the sources properties as listed, as well as the harvesting scheduling (when available)",
 				"type": "object",
 				"required": [
 					"request",
@@ -656,7 +668,7 @@
 						"type": "object",
 						"properties": {
 							"id": {
-								"description": "Optional comma separated list of source ids. If one or more of the provided sources are not found, the request execution fails with reponse code '404'",
+								"description": "Optional comma separated list of source ids. If one or more of the provided sources are not found, the request fails with reponse code '404'",
 								"type": "string"
 							}
 						}
@@ -676,19 +688,8 @@
 					"WFS 1.1.0"
 				]
 			},
-			"HarvestingPhase": {
-				"description": "The possible phases of DAB source harvesting",
-				"type": "string",
-				"enum": [
-					"Running",
-					"Rescheduled",
-					"Completed",
-					"Canceled",
-					"Error"
-				]
-			},
 			"RepeatIntervalUnit": {
-				"description": "Mandatory parameter in case 'repeatCount' is 'Indefinitely'. Defines the interval unit between the scheduled harvests",
+				"description": "Mandatory parameter in case 'repeatCount' is 'Indefinitely'. Defines defines the unit of measurement between harvesting intervals",
 				"type": "string",
 				"enum": [
 					"Minutes",
@@ -699,12 +700,59 @@
 				]
 			},
 			"RepeatCount": {
-				"description": "This mandatory parameter defines the scheduling to be performed just once or indefinitely. In the first case ('Once'), the only additional supported parameter is 'startTime'; if omitted, the harvesting is scheduled to start now (as soon as possible), immediately after the creation of the new source. In the second case ('Indefinitely'), the parameters 'repeatIntervalUnit' and 'repeatInterval' are mandatory, while 'startTime' can be omitted, as previously described",
+				"description": "Defines the scheduling to be performed just once or indefinitely. In the first case ('Once'), the only additional supported parameter is 'startTime'; if omitted, the harvesting is scheduled to start now (as soon as possible). In the second case ('Indefinitely'), the parameters 'repeatIntervalUnit' and 'repeatInterval' are mandatory, while 'startTime' can be omitted, as previously described",
 				"type": "string",
 				"enum": [
 					"Once",
 					"Indefinitely"
 				]
+			},
+			"SchedulingPhase": {
+				"description": "The possible phases of a scheduled harvesting. The harvesting phase of the DAB sources can be consulted with the 'ListSources' request",
+				"type": "string",
+				"enum": [
+					"Running",
+					"Rescheduled",
+					"Completed",
+					"Canceled",
+					"Error"
+				]
+			},
+			"SchedulingInfo": {
+				"description": "Provides information about the scheduling of an harvested source. This information can be consulted with the 'ListSources' request",
+				"type": "object",
+				"properties": {
+					"phase": {
+						"$ref": "#/components/schemas/SchedulingPhase"
+					},
+					"size": {
+						"type": "integer",
+						"description": "The number of records of the brokered source. This value is available only if the harvesting is scheduled to tun 'Indefinitely'"
+					},
+					"firedTime": {
+						"type": "string",
+						"description": "The date and time of the last started harvesting"
+					},
+					"nextFiredTime": {
+						"type": "string",
+						"description": "The date and time of the next scheduled start"
+					},
+					"endTime": {
+						"type": "string",
+						"description": "The date and time of the last completed harvesting"
+					},
+					"elapsedTime": {
+						"type": "string",
+						"description": "The elapsed time of the last completed harvesting "
+					},
+					"repeatInterval": {
+						"type": "string",
+						"description": "A composition of 'repeatatIntervalUnit' and 'repeatatInterval' (e.g.: '0007 day/s')"
+					},
+					"repeatCount": {
+						"$ref": "#/components/schemas/RepeatCount"
+					}
+				}
 			}
 		}
 	}
