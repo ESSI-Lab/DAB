@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.terms;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +45,10 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.SimpleValueBond;
@@ -51,9 +56,13 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialEntity;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.model.resource.stax.GIResourceParser;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.terms.TermsRequest.APIParameters;
@@ -153,6 +162,7 @@ public class TermsHandler extends StreamingRequestHandler {
 		if (type == null) {
 		    type = "";
 		}
+
 		switch (type) {
 		case "parameter":
 		case "observed_property":
@@ -220,24 +230,47 @@ public class TermsHandler extends StreamingRequestHandler {
 		    break;
 		}
 
+		discoveryMessage.setDistinctValuesElement(metadata);
+		SortedFields fields = new SortedFields(ResourceProperty.PUBLIC_ID,SortOrder.ASCENDING);
+		discoveryMessage.setSortedFields(fields );
+		discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
+		discoveryMessage.getResourceSelector().addIndex(metadata);
 		try {
 
 		    Page page = discoveryMessage.getPage();
 
 		    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
-
-		    List<String> results = executor.getIndexValues(discoveryMessage, metadata, page.getStart(), page.getSize());
+		    String resumption = request.getParameterValue(APIParameters.RESUMPTION_TOKEN);
+		    if (resumption!=null&&!resumption.trim().isEmpty()) {
+			List<Object> values  =new ArrayList<Object>();
+			values.add(resumption);
+			SearchAfter sa = new SearchAfter(values  );
+			discoveryMessage.setSearchAfter(sa );
+		    }
+		    ResultSet<String> results = executor.discoverDistinctStrings(discoveryMessage);
 
 		    OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
 
 		    JSONObject ret = new JSONObject();
 		    ret.put("type", type);
 		    // ret.put("expected", resultSet.getCountResponse().getCount());
-		    ret.put("requestOffset", page.getStart());
-		    ret.put("requestSize", page.getSize());
-		    ret.put("responseSize", results.size());
+		    if (results.getSearchAfter().isPresent()) {
+			ret.put("completed", false);
+			ret.put("resumptionToken", results.getSearchAfter().get().getValues().get().get(0).toString());
+
+		    } else {
+			ret.put("completed", true);
+		    }
+
+		    ret.put("responseSize", results.getResultsList().size());
 		    JSONArray terms = new JSONArray();
-		    terms.putAll(results);
+		    for (String result : results.getResultsList()) {
+			Dataset ds = (Dataset) Dataset.create(result);
+			List<String> values = ds.getIndexesMetadata().read(metadata);
+			for (String value : values) {
+			    terms.put(value);
+			}
+		    }		    
 		    ret.put("terms", terms);
 
 		    writer.write(ret.toString());

@@ -54,6 +54,7 @@ public class TermsRequest {
 	OBSERVED_PROPERTY_URI("observedPropertyUri", "observedPropertyHref"), //	
 	COUNTRY("country"), //	
 	OFFSET("offset", "start"), //
+	RESUMPTION_TOKEN("resumptionToken"), //
 	LIMIT("maxRecords", "limit", "count"), //
 	WEST("west", "xmin", "minx"), //
 	SOUTH("south", "ymin", "miny"), //
