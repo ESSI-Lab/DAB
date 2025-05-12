@@ -167,6 +167,22 @@ public class HarvestSchedulingRequest extends PutSourceRequest {
 	mandatoryCheck(this);
     }
 
+    @Override
+    protected void contentTypeCheck(List<Parameter> supportedParams, String paramName, Object value) {
+
+	if (paramName.equals(REPEAT_INTERVAL)) {
+	    {
+		Integer interval = Integer.valueOf(value.toString());
+		if (interval < 1) {
+
+		    throw new IllegalArgumentException("Value of '" + REPEAT_INTERVAL + "' parameter must be >= 1");
+		}
+	    }
+	}
+	
+	super.contentTypeCheck(supportedParams, paramName, value);
+    }
+
     /**
      * @param parameters
      */

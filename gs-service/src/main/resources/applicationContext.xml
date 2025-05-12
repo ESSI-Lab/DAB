@@ -71,7 +71,7 @@
 	
 	<bean id="essiHealthService" class="eu.essi_lab.gssrv.rest.HealthCheckService" />
 
-	<jaxrs:server id="configServer" address="/config">
+	<jaxrs:server id="configServer" address="/config-api">
 		
 		<jaxrs:serviceBeans>
 			<ref bean="configService" />

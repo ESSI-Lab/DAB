@@ -375,7 +375,7 @@ public class PutSourceRequestTest {
 	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL, "10");
 	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, RepeatIntervalUnit.DAYS.toString());
 
-	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.START_TIME, ISO8601DateTimeUtils.getISO8601DateTime());
+	request.put(PutSourceRequest.HARVEST_SCHEDULING, HarvestSchedulingRequest.START_TIME, ISO8601DateTimeUtils.getISO8601DateTime("Europe/Berlin"));
 
 	request.validate();
     }

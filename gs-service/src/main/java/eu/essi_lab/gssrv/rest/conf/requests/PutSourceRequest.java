@@ -146,7 +146,7 @@ public class PutSourceRequest extends ConfigRequest {
 
 	super.mandatoryCheck();
 
-	List<String> nestedParameters = readNestedRootParameters();
+	List<String> nestedParameters = readCompositeParameters();
 
 	if (!nestedParameters.isEmpty() && nestedParameters.get(0).equals(HARVEST_SCHEDULING)) {
 

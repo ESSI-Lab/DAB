@@ -38,10 +38,10 @@ public class Parameter {
     private String name;
     private ContentType type;
     private boolean mandatory;
-    private boolean nestedMandatory;
+    private boolean compositeMandatory;
     private InputPattern pattern;
     private Class<? extends LabeledEnum> enum_;
-    private String nested;
+    private String composite;
     private boolean multiValue;
 
     /**
@@ -68,8 +68,8 @@ public class Parameter {
     }
 
     /**
-     * @param nested
-     * @param nestedMandatory
+     * @param composite
+     * @param compositeMandatory
      * @param name
      * @param type
      * @param pattern
@@ -77,38 +77,38 @@ public class Parameter {
      * @return
      */
     public static Parameter of(//
-	    String nested, //
-	    boolean nestedMandatory, //
+	    String composite, //
+	    boolean compositeMandatory, //
 	    String name, //
 	    ContentType type, //
 	    InputPattern pattern, //
 	    boolean mandatory) {
 
-	return new Parameter(nested, nestedMandatory, name, type, pattern, mandatory);
+	return new Parameter(composite, compositeMandatory, name, type, pattern, mandatory);
     }
 
     /**
-     * @param nested
-     * @param nestedMandatory
+     * @param composite
+     * @param compositeMandatory
      * @param name
      * @param type
      * @param mandatory
      * @return
      */
     public static Parameter of(//
-	    String nested, //
-	    boolean nestedMandatory, //
+	    String composite, //
+	    boolean compositeMandatory, //
 	    String name, //
 	    ContentType type, //
 	    boolean mandatory) {
 
-	return new Parameter(nested, nestedMandatory, name, type, mandatory);
+	return new Parameter(composite, compositeMandatory, name, type, mandatory);
 
     }
 
     /**
-     * @param nested
-     * @param nestedMandatory
+     * @param composite
+     * @param compositeMandatory
      * @param name
      * @param type
      * @param enum_
@@ -116,14 +116,14 @@ public class Parameter {
      * @return
      */
     public static Parameter of(//
-	    String nested, //
-	    boolean nestedMandatory, //
+	    String composite, //
+	    boolean compositeMandatory, //
 	    String name, //
 	    ContentType type, //
 	    Class<? extends LabeledEnum> enum_, //
 	    boolean mandatory) {
 
-	return new Parameter(nested, nestedMandatory, name, type, enum_, mandatory);
+	return new Parameter(composite, compositeMandatory, name, type, enum_, mandatory);
     }
 
     /**
@@ -178,39 +178,39 @@ public class Parameter {
     }
 
     /**
-     * @param nested
-     * @param nestedMandatory
+     * @param composite
+     * @param compositeMandatory
      * @param name
      * @param type
      * @param mandatory
      */
-    public Parameter(String nested, boolean nestedMandatory, String name, ContentType type, boolean mandatory) {
+    public Parameter(String composite, boolean compositeMandatory, String name, ContentType type, boolean mandatory) {
 
-	this.nested = nested;
-	this.nestedMandatory = nestedMandatory;
+	this.composite = composite;
+	this.compositeMandatory = compositeMandatory;
 	this.name = name;
 	this.type = type;
 	this.mandatory = mandatory;
     }
 
     /**
-     * @param nested
-     * @param nestedMandatory
+     * @param composite
+     * @param compositeMandatory
      * @param name
      * @param type
      * @param pattern
      * @param mandatory
      */
     public Parameter(//
-	    String nested, //
-	    boolean nestedMandatory, //
+	    String composite, //
+	    boolean compositeMandatory, //
 	    String name, //
 	    ContentType type, //
 	    InputPattern pattern, //
 	    boolean mandatory) {
 
-	this.nested = nested;
-	this.nestedMandatory = nestedMandatory;
+	this.composite = composite;
+	this.compositeMandatory = compositeMandatory;
 	this.name = name;
 	this.type = type;
 	this.pattern = pattern;
@@ -218,23 +218,23 @@ public class Parameter {
     }
 
     /**
-     * @param nested
-     * @param nestedMandatory
+     * @param composite
+     * @param compositeMandatory
      * @param name
      * @param type
      * @param enum_
      * @param mandatory
      */
     public Parameter(//
-	    String nested, //
-	    boolean nestedMandatory, //
+	    String composite, //
+	    boolean compositeMandatory, //
 	    String name, //
 	    ContentType type, //
 	    Class<? extends LabeledEnum> enum_, //
 	    boolean mandatory) {
 
-	this.nested = nested;
-	this.nestedMandatory = nestedMandatory;
+	this.composite = composite;
+	this.compositeMandatory = compositeMandatory;
 	this.name = name;
 	this.type = type;
 	this.enum_ = enum_;
@@ -284,17 +284,17 @@ public class Parameter {
     /**
      * @return
      */
-    public Optional<String> getNested() {
+    public Optional<String> getComposite() {
 
-	return Optional.ofNullable(nested);
+	return Optional.ofNullable(composite);
     }
 
     /**
      * @return
      */
-    public boolean isNestedMandatory() {
+    public boolean isCompositeMandatory() {
 
-	return nestedMandatory;
+	return compositeMandatory;
     }
 
     /**
@@ -326,9 +326,9 @@ public class Parameter {
 
 		&& ((Parameter) object).isMandatory() == this.isMandatory() //
 
-		&& ((Parameter) object).isNestedMandatory() == this.isNestedMandatory() //
+		&& ((Parameter) object).isCompositeMandatory() == this.isCompositeMandatory() //
 
-		&& ((Parameter) object).getNested().equals(this.getNested()) //
+		&& ((Parameter) object).getComposite().equals(this.getComposite()) //
 
 		&& ((Parameter) object).isMultiValue() ==  this.isMultiValue() //
 
