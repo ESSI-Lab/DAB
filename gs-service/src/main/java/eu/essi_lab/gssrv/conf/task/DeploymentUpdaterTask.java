@@ -64,6 +64,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.SortedFields;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.ResourceProperty;
 
@@ -231,7 +232,8 @@ public class DeploymentUpdaterTask extends AbstractCustomTask {
 			Arrays.asList(), // fields
 			0, // start index is ignored when using search after, no need to update it
 			requestSize, //
-			Optional.of(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING)))), // sortOrder
+			Optional.of(SortedFields
+				.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING)), // sortOrder
 			searchAfter, // search after
 			false, // request cache
 			false);// exclude res binary

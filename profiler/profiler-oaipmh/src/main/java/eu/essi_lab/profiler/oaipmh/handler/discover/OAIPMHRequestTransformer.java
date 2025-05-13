@@ -90,7 +90,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
 	DiscoveryMessage refinedMessage = super.refineMessage(message);
 
-	refinedMessage.setSortedFields(new SortedFields(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING));
+	refinedMessage.setSortedFields(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING));
 
 	OAIPMHRequestReader reader = createReader(message.getWebRequest());
 	String tokenValue = reader.getResumptionToken();

@@ -54,6 +54,7 @@ import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
@@ -122,7 +123,7 @@ public class DuplicatedOnlineIdentifiersTask extends AbstractCustomTask {
 	int file = 0;
 
 	discoveryMessage
-		.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.PRIVATE_ID,SortOrder.ASCENDING))));
+		.setSortedFields(SortedFields.of(ResourceProperty.PRIVATE_ID, SortOrder.ASCENDING));
 
 	SearchAfter searchAfter = null;
 	int i = 0;

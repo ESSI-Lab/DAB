@@ -22,30 +22,84 @@ package eu.essi_lab.messages;
  */
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
-import eu.essi_lab.model.resource.ResourceProperty;
 
+/**
+ * 
+ */
 public class SortedFields {
-    private List<SimpleEntry<Queryable, SortOrder>> fields = new ArrayList<>();
 
+    private List<SimpleEntry<Queryable, SortOrder>> fields;
+
+    /**
+     * @param fields
+     */
+    public static SortedFields of(List<SimpleEntry<Queryable, SortOrder>> fields) {
+
+	return new SortedFields(fields);
+    }
+
+    /**
+     * @param fields
+     */
+    @SafeVarargs
+    public static SortedFields of(SimpleEntry<Queryable, SortOrder>... fields) {
+
+	return new SortedFields(fields);
+    }
+
+    /**
+     * @param property
+     * @param order
+     */
+    public static SortedFields of(Queryable property, SortOrder order) {
+
+	return new SortedFields(property, order);
+    }
+
+    /**
+     * @param fields
+     */
     public SortedFields(List<SimpleEntry<Queryable, SortOrder>> fields) {
+
 	this.fields = fields;
     }
 
+    /**
+     * @param fields
+     */
+    @SafeVarargs
+    public SortedFields(SimpleEntry<Queryable, SortOrder>... fields) {
+
+	this(Arrays.asList(fields));
+    }
+
+    /**
+     * @param property
+     * @param order
+     */
     public SortedFields(Queryable property, SortOrder order) {
-	this(Arrays.asList(new SimpleEntry(property,order)));
+
+	this(Arrays.asList(new SimpleEntry<Queryable, SortOrder>(property, order)));
     }
 
+    /**
+     * @return
+     */
     public List<SimpleEntry<Queryable, SortOrder>> getFields() {
-        return fields;
+
+	return fields;
     }
 
+    /**
+     * @param fields
+     */
     public void setFields(List<SimpleEntry<Queryable, SortOrder>> fields) {
-        this.fields = fields;
+
+	this.fields = fields;
     }
 }

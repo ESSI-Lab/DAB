@@ -60,6 +60,7 @@ import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -400,7 +401,7 @@ public class TurtleTask extends AbstractCustomTask {
 	TurtleMapper mapper = new TurtleMapper();
 
 	discoveryMessage
-		.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.PRIVATE_ID, SortOrder.ASCENDING))));
+		.setSortedFields(SortedFields.of(ResourceProperty.PRIVATE_ID, SortOrder.ASCENDING));
 
 	SearchAfter searchAfter = null;
 	int i = 0;

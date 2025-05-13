@@ -61,6 +61,7 @@ import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.CollectionType;
 import eu.essi_lab.model.resource.DatasetCollection;
@@ -71,7 +72,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
 /**
  * @author boldrini
  */
-public class StationsCreatorTask extends AbstractEmbeddedTask  {
+public class StationsCreatorTask extends AbstractEmbeddedTask {
 
     /**
      * 
@@ -129,7 +130,8 @@ public class StationsCreatorTask extends AbstractEmbeddedTask  {
 	message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	message.setExcludeResourceBinary(true);
 
-	message.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING))));
+	message.setSortedFields(
+		SortedFields.of(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING));
 
 	//
 	//
