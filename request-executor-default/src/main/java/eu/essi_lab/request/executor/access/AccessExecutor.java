@@ -271,7 +271,6 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	 */
 	public DataObject retrieveDataObject(GSResource resource, DataDownloader downloader,
 			DataDescriptor reportDescriptor, DataDescriptor targetDescriptor) throws GSException {
-		GSLoggerFactory.getLogger(getClass()).debug("aa1");
 
 		// first, we ask the downloader which are the updated remote descriptors that it
 		// can download.
@@ -285,10 +284,8 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		// similar to the report descriptor
 		// that we know it can be safely used for access, as it has been passed the
 		// execution tests
-		GSLoggerFactory.getLogger(getClass()).debug("aa2");
 
 		DataDescriptor remoteDescriptor = chooseDescriptor(remoteDescriptors, reportDescriptor);
-		GSLoggerFactory.getLogger(getClass()).debug("aa3");
 
 		if (remoteDescriptor == null) {
 
@@ -305,28 +302,24 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		// subset interval from the target
 		// descriptor)
 		enhanceRemoteDescriptor(downloader, remoteDescriptor, targetDescriptor);
-		GSLoggerFactory.getLogger(getClass()).debug("aa4");
 
 		if (downloader.getOnline().getLinkage().contains("http://services.sentinel-hub.com/")) {
 			if (targetDescriptor.getDataType() == null) {
 				remoteDescriptor.setIsPreview(true);
 			}
 		}
-		GSLoggerFactory.getLogger(getClass()).debug("aa5");
 
 		// then we download the possibly modified remote descriptor
 		File dataFile = downloader.download(remoteDescriptor);
 		if (!dataFile.getAbsolutePath().contains("netcdf-connector")) {
 			dataFile.deleteOnExit();
 		}
-		GSLoggerFactory.getLogger(getClass()).debug("aa6");
 
 		// GSLoggerFactory.getLogger(getClass()).debug("Data download ENDED");
 
 		DataObject dataObject = new DataObject();
 		dataObject.setDataDescriptor(remoteDescriptor);
 		dataObject.setFile(dataFile);
-		GSLoggerFactory.getLogger(getClass()).debug("aa7");
 
 		// a data validator is here used to assure that the downloaded file corresponds
 		// to the descriptor
@@ -392,7 +385,6 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 					ACCESS_EXECUTOR_WORKFLOW_EXECUTION_ERROR//
 			);
 		}
-		GSLoggerFactory.getLogger(getClass()).debug("aa8");
 
 		if (targetDescriptor == null) {
 
