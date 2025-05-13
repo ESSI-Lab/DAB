@@ -587,7 +587,7 @@ public class MarkLogicReader implements DatabaseReader {
      * @return
      * @throws GSException
      */
-    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws GSException {
+    public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
 
 	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_STARTED);
 

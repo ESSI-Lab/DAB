@@ -100,6 +100,6 @@ public interface DatabaseFinder extends DatabaseProvider{
      * @return
      * @throws GSException if error occurs during the request processing
      */
-    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws GSException;
+    public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException;
 
 }

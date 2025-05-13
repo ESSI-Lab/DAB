@@ -347,7 +347,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     }
 
     @Override
-    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws GSException {
+    public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
 
 	ResultSet<String> out = new ResultSet<>();
 
