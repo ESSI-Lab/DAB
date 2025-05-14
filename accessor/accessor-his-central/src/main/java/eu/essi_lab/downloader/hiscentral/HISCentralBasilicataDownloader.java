@@ -67,6 +67,7 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
+import eu.essi_lab.wml._2.WML2QualityCategory;
 
 /**
  * @author Roberto
@@ -80,6 +81,8 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 public class HISCentralBasilicataDownloader extends WMLDataDownloader {
 
     private static final String HISCENTRAL_BASILICATA_DOWNLOAD_ERROR = "HISCENTRAL_BASILICATA_DOWNLOAD_ERROR";
+
+    public static final String MISSING_VALUE = "-9999.0";
 
     private HISCentralBasilicataConnector connector;
     private Downloader downloader;
@@ -213,9 +216,25 @@ public class HISCentralBasilicataDownloader extends WMLDataDownloader {
 		    // value
 		    //
 
-		    BigDecimal dataValue = data.optBigDecimal(1, new BigDecimal("-9999.0"));
+		    BigDecimal dataValue = data.optBigDecimal(1, new BigDecimal(MISSING_VALUE));
 		    variable.setValue(dataValue);
 
+		    
+//		    if (qualityCode != null) {
+//			WML2QualityCategory quality = null;
+//			switch (qualityCode) {
+//			case 2:
+//			    // quality = WML2QualityCategory.GOOD;
+//			    break;
+//			case 3:
+//			    break;
+//			default:
+//			    break;
+//			}
+//			if (quality != null) {
+//			    variable.setQualityControlLevelCode(quality.getUri());
+//			}
+//		    }
 		    //
 		    // date
 		    //

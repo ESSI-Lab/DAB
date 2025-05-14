@@ -69,6 +69,7 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
+import eu.essi_lab.wml._2.WML2QualityCategory;
 
 /**
  * @author Roberto
@@ -82,6 +83,8 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 public class HISCentralValdaostaDownloader extends WMLDataDownloader {
 
     private static final String HISCENTRAL_VALDAOSTA_DOWNLOAD_ERROR = "HISCENTRAL_VALDAOSTA_DOWNLOAD_ERROR";
+
+    public static final String MISSING_VALUE = "-9999.0";
 
     private HISCentralValdaostaConnector connector;
     private Downloader downloader;
@@ -201,7 +204,9 @@ public class HISCentralValdaostaDownloader extends WMLDataDownloader {
 		JSONArray valuesData = jsonObj.optJSONArray("data");
 
 		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		BigDecimal missingValue = new BigDecimal(MISSING_VALUE);
 
+		tsrt.getTimeSeries().get(0).getVariable().setNoDataValue(missingValue.doubleValue());
 		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 		DateFormat iso8601OutputFormat = null;
@@ -212,9 +217,24 @@ public class HISCentralValdaostaDownloader extends WMLDataDownloader {
 
 		    ValueSingleVariable variable = new ValueSingleVariable();
 
-		    BigDecimal missingValue = new BigDecimal("-9999.0");
+		    BigDecimal dataValue = data.optBigDecimal("measure", missingValue);
 
-		    BigDecimal dataValue = data.optBigDecimal("measure", missingValue);	    
+		    Integer qualityCode = data.optIntegerObject("data-quality", null);
+		    if (qualityCode != null) {
+			WML2QualityCategory quality = null;
+			switch (qualityCode) {
+			case 0:
+			    // quality = WML2QualityCategory.GOOD;
+			    break;
+			case -1:
+			    break;
+			default:
+			    break;
+			}
+			if (quality != null) {
+			    variable.setQualityControlLevelCode(quality.getUri());
+			}
+		    }
 
 		    //
 		    // value

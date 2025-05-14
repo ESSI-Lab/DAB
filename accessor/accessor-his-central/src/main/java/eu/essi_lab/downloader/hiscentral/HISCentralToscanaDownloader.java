@@ -67,11 +67,13 @@ import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension.LimitType;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
+import eu.essi_lab.wml._2.WML2QualityCategory;
 
 public class HISCentralToscanaDownloader extends WMLDataDownloader {
 
-    private static final String HISCENTRAL_TOSCANA_READER_AS_STREAM_ERROR = "HISCENTRAL_TOSCANA_READER_AS_STREAM_ERROR";
     private static final String HISCENTRAL_TOSCANA_DOWNLOAD_ERROR = "HISCENTRAL_TOSCANA_DOWNLOAD_ERROR";
+
+    private static final BigDecimal NO_DATA_VALUE = new BigDecimal("-9999.0");
 
     private Downloader downloader = new Downloader();
 
@@ -183,88 +185,6 @@ public class HISCentralToscanaDownloader extends WMLDataDownloader {
 		    }
 		}
 
-		// TimeSeries timeSeries = mySite.getSeries(variableCode, method, quality, source);
-		//
-		// if(timeSeries == null){
-		//
-		// GSLoggerFactory.getLogger(getClass()).warn("No time series found");
-		// return ret;
-		// }
-		//
-		// Date begin = timeSeries.getBeginTimePositionDate();
-		// Date end = timeSeries.getEndTimePositionDate();
-		//
-		// descriptor.setTemporalDimension(begin, end);
-		// DataDimension temporalDimension = descriptor.getTemporalDimension();
-		//
-		// boolean regularTimeDimension = timeSeries.isTimeScaleRegular();
-		// Number resolution = timeSeries.getTimeScaleTimeSupport();
-		// Number resolutionTolerance = 0;
-		// if (regularTimeDimension && resolution != null && Math.abs(resolution.doubleValue()) >
-		// 0.00000000000001) {
-		// String unitCode = timeSeries.getTimeScaleUnitCode();
-		// long oneDay = 1000 * 60 * 60 * 24l;
-		// switch (unitCode) {
-		// case "100": // second
-		// resolution = getUpdatedResolution(resolution, 1000l);
-		// break;
-		// case "101": // millisecond
-		// // nothing to do
-		// resolution = getUpdatedResolution(resolution, 1l);
-		// break;
-		// case "102": // minute
-		// resolution = getUpdatedResolution(resolution, 1000 * 60l);
-		// break;
-		// case "103": // hour
-		// resolution = getUpdatedResolution(resolution, 1000 * 60 * 60l);
-		// break;
-		// case "104": // day
-		// resolution = getUpdatedResolution(resolution, oneDay);
-		// break;
-		// case "105": // week
-		// resolution = getUpdatedResolution(resolution, oneDay * 7l);
-		// break;
-		// case "106": // month
-		// resolution = getUpdatedResolution(resolution, oneDay * 30l);
-		// resolutionTolerance = oneDay * 5l;
-		// break;
-		// case "107": // year
-		// resolution = getUpdatedResolution(resolution, oneDay * 365l);
-		// resolutionTolerance = oneDay * 2l;
-		// break;
-		// case "108": // leap year
-		// resolution = getUpdatedResolution(resolution, oneDay * 366l);
-		// resolutionTolerance = oneDay * 2l;
-		// break;
-		// case "109": // Gregorian year
-		// resolution = getUpdatedResolution(resolution, oneDay * 365.2425);
-		// break;
-		// default:
-		// break;
-		// }
-		// temporalDimension.getContinueDimension().setResolution(resolution);
-		// temporalDimension.getContinueDimension().setResolutionTolerance(resolutionTolerance);
-		// /**
-		// * N.B.the value count is not used, as it only reports the number of non missing values and not the
-		// * total number of values considering the temporal extent and the resolution
-		// */
-		// // temporalDimension.getContinueDimension().setSize(valueCount);
-		//
-		// // Long valueCount = timeSeries.getValueCount();
-		// // // a check also on value count is needed to assure that the time series has a regular resolution,
-		// // // there are cases (e.g. USU4 of little bear river that the resolution is specified as regular,
-		// // but
-		// // // the specified temporal domain isn't completely filled with values
-		// // if (valueCount != null) {
-		// // long expectedResolution = (end.getTime() - begin.getTime()) / (valueCount - 1);
-		// // if (expectedResolution == resolution.longValue()) {
-		// // temporalDimension.getContinueDimension().setResolution(resolution);
-		// // temporalDimension.getContinueDimension().setSize(valueCount);
-		// // }
-		// // }
-		//
-		// }
-		//
 		VerticalExtent verticalExtent = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
 			.getVerticalExtent();
 
@@ -346,7 +266,7 @@ public class HISCentralToscanaDownloader extends WMLDataDownloader {
 
 		    ObjectFactory factory = new ObjectFactory();
 		    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-
+		    tsrt.getTimeSeries().get(0).getVariable().setNoDataValue(NO_DATA_VALUE.doubleValue());
 		    // DataDimension dimension = descriptor.getTemporalDimension();
 		    // Date begin = null;
 		    // Date end = null;
@@ -369,8 +289,6 @@ public class HISCentralToscanaDownloader extends WMLDataDownloader {
 
 		    if (dataResponse.isPresent()) {
 
-			TsValuesSingleVariableType value = new TsValuesSingleVariableType();
-
 			DateFormat iso8601OutputFormat = null;
 			DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
@@ -387,12 +305,26 @@ public class HISCentralToscanaDownloader extends WMLDataDownloader {
 				// String date = data.optString("Data");
 				// date = date.contains(" ") ? date.replace(" ", "T") : date;
 				String valueString = data.optString("Valore");
-
+				String tipoString = data.optString("TipoValore", "");
+				WML2QualityCategory wml2Quality = null;
+				switch (tipoString) {
+				case "@":
+				    wml2Quality = WML2QualityCategory.MISSING;
+				    break;
+				case "N":
+				    wml2Quality = WML2QualityCategory.UNCHECKED;
+				    break;
+				case "V":
+				    wml2Quality = WML2QualityCategory.GOOD;
+				    break;
+				default:
+				    break;
+				}
 				ValueSingleVariable v = new ValueSingleVariable();
 
 				// XMLNodeReader reader = new XMLNodeReader(n);
 				// String variableValue = reader.evaluateString("*:" + variableName);
-				if (valueString != null && !valueString.isEmpty()) {
+				if (valueString != null) {
 				    // String date = reader.evaluateString("*:DataHora");
 				    String date = data.optString("Data");
 				    if (iso8601OutputFormat == null) {
@@ -401,12 +333,21 @@ public class HISCentralToscanaDownloader extends WMLDataDownloader {
 				    }
 				    Date parsed = iso8601OutputFormat.parse(date);
 				    BigDecimal dataValue = null;
-				    dataValue = new BigDecimal(valueString);
-				    v.setValue(dataValue);
+				    if (!valueString.isEmpty()) {
+					dataValue = new BigDecimal(valueString);
+					v.setValue(dataValue);
+				    }else {
+					v.setValue(NO_DATA_VALUE);
+				    }
 				    GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 				    c.setTime(parsed);
 				    XMLGregorianCalendar date2 = xmlFactory.newXMLGregorianCalendar(c);
 				    v.setDateTimeUTC(date2);
+				    if (wml2Quality != null) {
+					v.setQualityControlLevelCode(wml2Quality.getUri());
+				    }else {
+					v.setQualityControlLevelCode(tipoString);
+				    }
 				    addValue(tsrt, v);
 				}
 			    }

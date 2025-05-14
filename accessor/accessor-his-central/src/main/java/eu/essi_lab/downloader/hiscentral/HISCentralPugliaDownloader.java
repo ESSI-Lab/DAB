@@ -50,7 +50,6 @@ import org.json.JSONObject;
 
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.puglia.HISCentralPugliaConnector;
-import eu.essi_lab.accessor.hiscentral.sardegna.HISCentralSardegnaConnector;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
@@ -71,6 +70,7 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
+import eu.essi_lab.wml._2.WML2QualityCategory;
 
 /**
  * @author Roberto
@@ -85,8 +85,9 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 
     private static final String HISCENTRAL_PUGLIA_DOWNLOAD_ERROR = "HISCENTRAL_PUGLIA_DOWNLOAD_ERROR";
 
+    public static final String MISSING_VALUE = "-9999.0";
+
     private HISCentralPugliaConnector connector;
-    private Downloader downloader;
 
     /**
      * 
@@ -94,7 +95,6 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
     public HISCentralPugliaDownloader() {
 
 	connector = new HISCentralPugliaConnector();
-	downloader = new Downloader();
     }
 
     @Override
@@ -207,24 +207,36 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 
 		    JSONObject data = (JSONObject) arr;
 
-		    
 		    Integer validationCode = data.optIntegerObject("codice_validazione", null);
-		    
+
 		    ValueSingleVariable variable = new ValueSingleVariable();
 
-		    BigDecimal missingValue = new BigDecimal("-9999.0");
+		    BigDecimal missingValue = new BigDecimal(MISSING_VALUE);
 
 		    BigDecimal dataValue = data.optBigDecimal("valore_misura", missingValue);
-		    
 
 		    //
 		    // value
 		    //
 
 		    variable.setValue(dataValue);
-		    
-		    if(validationCode != null) {
-			variable.setQualityControlLevelCode(String.valueOf(validationCode));
+
+		    if (validationCode != null) {
+
+			WML2QualityCategory quality = null;
+			switch (validationCode) {
+			case 1:
+			    // quality = WML2QualityCategory.GOOD;
+			    break;
+			case 11:
+			    break;
+			default:
+			    break;
+			}
+			if (quality != null) {
+			    variable.setQualityControlLevelCode(quality.getUri());
+			}
+
 		    }
 
 		    //
@@ -289,9 +301,6 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 
     private JSONObject getData(String linkage) throws GSException {
 	GSLoggerFactory.getLogger(getClass()).info("Getting data");
-
-	String result = null;
-	String token = null;
 
 	try {
 

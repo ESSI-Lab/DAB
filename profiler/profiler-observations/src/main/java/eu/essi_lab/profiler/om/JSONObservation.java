@@ -170,28 +170,34 @@ public class JSONObservation {
 
     // POINTS
     public void addPoint(Date date, BigDecimal value) {
-	JSONObject point = new JSONObject();
-	JSONObject time = new JSONObject();
-	time.put("instant", ISO8601DateTimeUtils.getISO8601DateTime(date));
-	point.put("time", time);
-	point.put("value", value);
+	PointBuilder builder = new PointBuilder();
+	builder.setDateValue(date,value);
+	JSONObject point = builder.build();
+	points.put(point);
+    }
+    
+    public void addPointAndQuality(Date date, BigDecimal value,String quality) {
+	PointBuilder builder = new PointBuilder();
+	builder.setDateValue(date,value);
+	builder.setQuality(quality);
+	JSONObject point = builder.build();
 	points.put(point);
     }
 
     public void addPointAndLocation(Date date, BigDecimal value, List<Double> coordinates) {
-	JSONObject point = new JSONObject();
-	JSONObject time = new JSONObject();
-	time.put("instant", ISO8601DateTimeUtils.getISO8601DateTime(date));
-	JSONObject shape = new JSONObject();
-	shape.put("type", "Point");
-	JSONArray coords = new JSONArray();
-	for (Double c : coordinates) {
-	    coords.put(c);
-	}
-	shape.put("coordinates", coords);
-	point.put(getGeometryName(), shape);
-	point.put("time", time);
-	point.put("value", value);
+	PointBuilder builder = new PointBuilder();
+	builder.setDateValue(date,value);
+	builder.setLocation(getGeometryName(),coordinates);
+	JSONObject point = builder.build();
+	points.put(point);
+    }
+    
+    public void addPointAndLocationAndQuality(Date date, BigDecimal value, List<Double> coordinates,String quality) {
+	PointBuilder builder = new PointBuilder();
+	builder.setDateValue(date,value);
+	builder.setLocation(getGeometryName(),coordinates);
+	builder.setQuality(quality);
+	JSONObject point = builder.build();
 	points.put(point);
     }
 

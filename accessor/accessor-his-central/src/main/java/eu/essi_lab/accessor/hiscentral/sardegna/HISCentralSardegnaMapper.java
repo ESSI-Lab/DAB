@@ -41,6 +41,7 @@ import org.json.JSONObject;
 
 import eu.essi_lab.accessor.hiscentral.utils.HISCentralUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.downloader.hiscentral.HISCentralSardegnaDownloader;
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.Citation;
@@ -661,8 +662,7 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	    coverageDescription.setAttributeIdentifier(paramCode);
 	    coverageDescription.setAttributeTitle(parameterName);
 
-	    String missingValue = "-9999";
-	    dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
+	    dataset.getExtensionHandler().setAttributeMissingValue(HISCentralSardegnaDownloader.MISSING_VALUE);
 
 	    if (uom != null) {
 		dataset.getExtensionHandler().setAttributeUnits(uom);
