@@ -369,7 +369,8 @@ public class OpenSearchWrapper {
 	    List<String> fields, //
 	    int start, //
 	    int size, //
-	    Optional<SortedFields> sortedProperties, Optional<SearchAfter> searchAfter, //
+	    Optional<SortedFields> sortedFields, //
+	    Optional<SearchAfter> searchAfter, //
 	    boolean requestCache, //
 	    boolean excludeResourceBinary)
 
@@ -398,9 +399,9 @@ public class OpenSearchWrapper {
 		builder.from(start);
 	    }
 
-	    if (sortedProperties.isPresent()) {
+	    if (sortedFields.isPresent()) {
 
-		handleSort(builder, sortedProperties.get());
+		handleSort(builder, sortedFields.get());
 	    }
 
 	    handleSourceFields(null, builder, fields, excludeResourceBinary);
@@ -418,7 +419,7 @@ public class OpenSearchWrapper {
 			size, //
 			searchAfter, //
 			start, //
-			sortedProperties, //
+			sortedFields, //
 			fields, //
 			excludeResourceBinary, //
 			requestCache);//
@@ -864,7 +865,8 @@ public class OpenSearchWrapper {
 	    Integer size, //
 	    Optional<SearchAfter> searchAfter, //
 	    Integer start, //
-	    Optional<SortedFields> sortedProperties, List<String> fields, //
+	    Optional<SortedFields> sortedFields, //
+	    List<String> fields, //
 	    boolean excludeResourceBinary, //
 	    boolean requestCache) {
 
@@ -877,18 +879,17 @@ public class OpenSearchWrapper {
 
 	if (searchAfter.isPresent()) {
 
-	    
 	    List<FieldValue> myFields = getFieldValues(searchAfter.get().getValues());
 	    clone.searchAfterVals(myFields);
-	    
+
 	} else {
 
 	    clone.from(start);
 	}
 
-	if (sortedProperties.isPresent()) {
+	if (sortedFields.isPresent()) {
 
-	    handleSort(clone, sortedProperties.get());
+	    handleSort(clone, sortedFields.get());
 	}
 
 	handleSourceFields(null, clone, fields, excludeResourceBinary);

@@ -3,7 +3,9 @@
  */
 package eu.essi_lab.gssrv.conf.task;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /*-
@@ -28,12 +30,14 @@ import java.util.List;
  */
 
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.quartz.JobExecutionContext;
 
 import com.beust.jcommander.internal.Lists;
 
+import eu.essi_lab.access.augmenter.DataCacheAugmenter;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFinder;
@@ -42,8 +46,10 @@ import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -112,7 +118,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	    //
 	}
 
-	List<String> modifiedRecords = Lists.newArrayList();
+	HashMap<String, List<String>> modifiedRecords = new HashMap<>();
 
 	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
@@ -159,7 +165,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    // first full/selective harvesting, only new records added in the data-1 folder
 		    //
 
-		    data1Folder.listIdentifiers(IdentifierType.ORIGINAL).forEach(id -> newRecords.add(id));
+		    data1Folder.listIdentifiers(IdentifierType.PUBLIC).forEach(id -> newRecords.add(id));
 
 		} else {
 
@@ -172,13 +178,13 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    if (worker.isData1WritingFolder()) {
 
-			currIds.addAll(data1Folder.listIdentifiers(IdentifierType.ORIGINAL));
-			prevIds.addAll(data2Folder.listIdentifiers(IdentifierType.ORIGINAL));
+			currIds.addAll(data1Folder.listIdentifiers(IdentifierType.PUBLIC));
+			prevIds.addAll(data2Folder.listIdentifiers(IdentifierType.PUBLIC));
 
 		    } else {
 
-			currIds.addAll(data2Folder.listIdentifiers(IdentifierType.ORIGINAL));
-			prevIds.addAll(data1Folder.listIdentifiers(IdentifierType.ORIGINAL));
+			currIds.addAll(data2Folder.listIdentifiers(IdentifierType.PUBLIC));
+			prevIds.addAll(data1Folder.listIdentifiers(IdentifierType.PUBLIC));
 		    }
 
 		    deletedRecords = prevIds.//
@@ -198,8 +204,8 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 			try {
 
-			    Optional<GSResource> opt1 = data1Folder.get(IdentifierType.ORIGINAL, id);
-			    Optional<GSResource> opt2 = data2Folder.get(IdentifierType.ORIGINAL, id);
+			    Optional<GSResource> opt1 = data1Folder.get(IdentifierType.PUBLIC, id);
+			    Optional<GSResource> opt2 = data2Folder.get(IdentifierType.PUBLIC, id);
 
 			    if (opt1.isEmpty()) {
 
@@ -215,7 +221,16 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 			    if (!response.getProperties().isEmpty()) {
 
-				modifiedRecords.add(id);
+				response.getProperties().forEach(prop -> {
+
+				    List<String> list = modifiedRecords.get(prop.getName());
+				    if (list == null) {
+					list = new ArrayList<>();
+					modifiedRecords.put(prop.getName(), list);
+				    }
+
+				    list.add(id);
+				});
 			    }
 
 			} catch (Exception ex) {
@@ -258,7 +273,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		discoveryMessage.setUseCachedSourcesDataFolderMap(false);
 
 		ResourceSelector resourceSelector = new ResourceSelector();
-		resourceSelector.addIndex(ResourceProperty.ORIGINAL_ID);
+		resourceSelector.addIndex(MetadataElement.IDENTIFIER);
 
 		discoveryMessage.setResourceSelector(resourceSelector);
 		discoveryMessage.setSources(Arrays.asList(gsSource));
@@ -271,7 +286,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		ResultSet<GSResource> resultSet = finder.discover(discoveryMessage);
 		resultSet.//
 			getResultsList().//
-			forEach(res -> newRecords.add(res.getIndexesMetadata().read(ResourceProperty.ORIGINAL_ID.getName()).get(0)));
+			forEach(res -> newRecords.add(res.getIndexesMetadata().read(MetadataElement.IDENTIFIER.getName()).get(0)));
 
 		//
 		// 2) deleted records
@@ -303,25 +318,67 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    // the new records list
 		    newRecords.remove(modified.getOriginalId().get());
 
-		    GSResource incoming = writingFolder.get(IdentifierType.ORIGINAL, modified.getOriginalId().get()).get();
+		    GSResource incoming = writingFolder.get(IdentifierType.PUBLIC, modified.getPublicId()).get();
 
 		    ComparisonResponse response = GSResourceComparator.compare(COMPARISON_PROPERTIES, incoming, modified);
 
 		    // at least one change is expected!
 		    if (!response.getProperties().isEmpty()) {
 
-			modifiedRecords.add(modified.getOriginalId().get());
+			response.getProperties().forEach(prop -> {
+
+			    List<String> list = modifiedRecords.get(prop.getName());
+			    if (list == null) {
+				list = new ArrayList<>();
+				modifiedRecords.put(prop.getName(), list);
+			    }
+
+			    list.add(modified.getPublicId());
+			});
 		    }
 		}
 	    }
-	} else {
+	} else
+
+	{
 
 	    log(status, "Consolidated folder survived, nothing is changed");
 	}
 
 	log(status, "New records: " + newRecords.size());
-	log(status, "Modified records: " + modifiedRecords.size());
+	log(status, "Modified records: " + modifiedRecords.values().stream().flatMap(l -> l.stream()).distinct().count());
 	log(status, "Deleted records: " + deletedRecords.size());
+
+	MQTTPublisherHive client = createClient();
+
+	if (!newRecords.isEmpty()) {
+
+	    String topic = buildTopic(gsSource, "added");
+	    String message = buildMessage(newRecords);
+
+	    client.publish(topic, message);
+	}
+
+	if (!deletedRecords.isEmpty()) {
+
+	    String topic = buildTopic(gsSource, "deleted");
+	    String message = buildMessage(deletedRecords);
+
+	    client.publish(topic, message);
+	}
+
+	if (!modifiedRecords.isEmpty()) {
+
+	    for (String property : modifiedRecords.keySet()) {
+
+		List<String> idsList = modifiedRecords.get(property);
+
+		String topic = buildTopic(gsSource, "modified/" + property);
+		String message = buildMessage(idsList);
+
+		client.publish(topic, message);
+	    }
+	}
 
 	log(status, "Resources comparator task ENDED");
     }
@@ -330,6 +387,67 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     public String getName() {
 
 	return "Resources comparator task";
+    }
+
+    /**
+     * @param source
+     * @param topic
+     * @return
+     */
+    private String buildTopic(GSSource source, String topic) {
+
+	return "dab/" + source.getUniqueIdentifier() + "/" + topic;
+    }
+
+    /**
+     * @param list
+     * @return
+     */
+    private String buildMessage(List<String> list) {
+
+	return list.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(",", "[", "]"));
+    }
+
+    /**
+     * @return
+     * @throws Exception
+     */
+    private MQTTPublisherHive createClient() throws Exception {
+
+	try {
+
+	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+
+	    Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+
+	    if (keyValueOption.isPresent()) {
+
+		String host = keyValueOption.get().getProperty("mqttBrokerHost");
+		String port = keyValueOption.get().getProperty("mqttBrokerPort");
+		String user = keyValueOption.get().getProperty("mqttBrokerUser");
+		String pwd = keyValueOption.get().getProperty("mqttBrokerPwd");
+
+		if (host == null || port == null || user == null || pwd == null) {
+
+		    GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
+		    throw new Exception("Key-value pair options not found!");
+
+		} else {
+
+		    return new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
+		}
+	    } else {
+
+		GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
+		throw new Exception("Key-value pair options not found!");
+	    }
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
+
+	    throw e;
+	}
     }
 
     @Override

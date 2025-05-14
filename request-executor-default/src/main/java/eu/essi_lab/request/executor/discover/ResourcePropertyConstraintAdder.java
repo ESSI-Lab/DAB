@@ -1,7 +1,5 @@
 package eu.essi_lab.request.executor.discover;
 
-import java.util.AbstractMap.SimpleEntry;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -24,7 +22,6 @@ import java.util.AbstractMap.SimpleEntry;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,8 +41,8 @@ import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.ResultsPriority;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -207,7 +204,7 @@ public class ResourcePropertyConstraintAdder {
 
 					SortOrder direction = gsSource.getSortOrder();
 
-					message.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(property, direction))));
+					message.setSortedFields( SortedFields.of(property, direction));
 
 				    }
 

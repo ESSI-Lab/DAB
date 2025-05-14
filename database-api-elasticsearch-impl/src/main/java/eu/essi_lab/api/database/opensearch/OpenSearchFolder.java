@@ -54,6 +54,7 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -312,7 +313,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 		    Arrays.asList(field), // fields
 		    0, //
 		    MAX_PAGE_SIZE, //
-		    Optional.of(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.RESOURCE_TIME_STAMP,SortOrder.ASCENDING)))), //
+		    Optional.of(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING)), //
 		    searchAfter, //
 		    false, // request cache
 		    true);// binaries excluded

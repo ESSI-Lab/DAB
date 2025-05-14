@@ -444,10 +444,8 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 	status.addInfoMessage("Less recent ordering set: " + sorting);
 
 	if (sorting) {
-	    
-	    message.setSortedFields(new SortedFields(ResourceProperty.RESOURCE_TIME_STAMP,SortOrder.ASCENDING));
 
-
+	    message.setSortedFields(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING));
 	}
     }
 

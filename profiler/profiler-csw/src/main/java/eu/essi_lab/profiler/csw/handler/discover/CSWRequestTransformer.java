@@ -47,6 +47,7 @@ import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -113,8 +114,8 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (CSWSearchAfterManager.isEnabled(setting, message.getWebRequest())) {
 
-	    refinedMessage.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.RESOURCE_TIME_STAMP,SortOrder.ASCENDING) )));
-	    
+	    refinedMessage.setSortedFields(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING));
+
 	    Optional<SearchAfter> searchAfter = CSWSearchAfterManager.get(message.getView().map(v -> v.getId()), page, setting);
 
 	    if (searchAfter.isPresent()) {

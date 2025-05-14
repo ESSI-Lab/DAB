@@ -47,6 +47,7 @@ import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
+import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalCRS;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -62,6 +63,7 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.FileIdentifierMapper;
+import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 
 public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 
@@ -325,12 +327,16 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    // }
 	    // }
 	    //
-
+	    TemporalExtent temporalExtent = new TemporalExtent();
 	    if (startDate != null && endDate != null) {
-
-		coreMetadata.addTemporalExtent(startDate, endDate);
+		temporalExtent.setBeginPosition(startDate);
+		temporalExtent.setEndPosition(endDate);
+		temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+		coreMetadata.getDataIdentification().addTemporalExtent(temporalExtent);
 
 	    }
+	    
+	    setIndeterminatePosition(dataset);
 
 	    coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(stationName + " - " + varName + interpLabel);
 

@@ -336,16 +336,15 @@ public abstract class ProfilerHandler//
 	//
 	// sorting is necessary to use the OpenSearch search after feature
 	//
-	
-	message
-	.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING))));
+
+	message.setSortedFields(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING));
 
 	do {
 
 	    //
 	    // set the search after to the message according to the executor response
 	    //
-	    if (executorResponse!=null) {
+	    if (executorResponse != null) {
 		executorResponse.getSearchAfter().ifPresent(sa -> message.setSearchAfter(sa));
 	    }
 

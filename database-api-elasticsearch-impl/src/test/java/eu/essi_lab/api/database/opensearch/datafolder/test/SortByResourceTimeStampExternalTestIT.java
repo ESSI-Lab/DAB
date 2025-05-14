@@ -22,6 +22,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.resource.RankingStrategy;
@@ -67,7 +68,8 @@ public class SortByResourceTimeStampExternalTestIT {
 		Arrays.asList(), //
 		0, // start
 		10, // size
-		Optional.of(new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING)))), // orderingProperty
+		Optional.of(
+			SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING)), //
 		Optional.empty(), // search after
 		false, false); // cache
 
