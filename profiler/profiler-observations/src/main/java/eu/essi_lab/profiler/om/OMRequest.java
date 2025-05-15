@@ -48,7 +48,7 @@ public class OMRequest {
 	INCLUDE_VALUES("includeValues", "includeData"), //
 	BEGIN_DATE("beginDate", "startDate", "beginTime", "startTime", "begin", "beginPosition"), //
 	END_DATE("endDate", "endTime", "end", "endPosition"), //
-	PLATFORM_CODE("sampledFeature", "feature", "monitoringPoint", "monitoringPointIdentifier", "platform", "platformCode", "site",
+	PLATFORM_CODE("sampledFeature", "feature","featureIdentifier","featureId", "monitoringPoint", "monitoringPointIdentifier", "platform", "platformCode", "site",
 		"location", "siteCode"), //
 	ONTOLOGY("ontology"), //
 	OBSERVED_PROPERTY("observedProperty"), //
