@@ -80,6 +80,7 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.stats.ComputationResult;
 import eu.essi_lab.messages.stats.ResponseItem;
 import eu.essi_lab.messages.stats.StatisticsMessage;
@@ -784,6 +785,78 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	return tmp;
     }
 
+    @Override
+    public ResultSet<TermFrequencyItem> getIndexValues(DiscoveryMessage message, Queryable queryable, int count, String resumptionToken)
+	    throws GSException {
+
+	Query query = getQuery(message.getUserBond().isPresent() ? message.getUserBond().get() : null,
+		message.getView().isPresent() ? message.getView().get() : null);
+
+	if (queryable == null) {
+	    return null;
+	}
+
+	int size = Math.min(1000, message.getPage().getSize());
+
+	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder()
+		.terms(t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
+
+	org.opensearch.client.opensearch._types.aggregations.CompositeAggregation.Builder cab = new CompositeAggregation.Builder();
+	cab = cab.size(size).sources(Map.of(queryable.getName(), stationIdSource));
+	if (resumptionToken!=null) {
+	    cab = cab.after(Map.of(queryable.getName(), resumptionToken));
+	}
+	CompositeAggregation compositeAgg =
+
+		cab.build();
+
+	List<String> includeList = new ArrayList<String>();
+
+	includeList.add(queryable.getName());
+
+	Aggregation distinctsAggregation = new Aggregation.Builder().composite(compositeAgg).build();
+
+	SearchRequest searchRequest = SearchRequest//
+		.of(s -> s.index(DataFolderMapping.get().getIndex()).size(0).query(query).aggregations("distincts", distinctsAggregation));
+
+	// --- Execute the Search Request ---
+	SearchResponse<Void> response;
+	try {
+	    response = client.search(searchRequest, Void.class);
+	} catch (OpenSearchException | IOException e) {
+	    e.printStackTrace();
+	    throw GSException.createException();
+	}
+
+	List<CompositeBucket> buckets = response.aggregations().get("distincts").composite().buckets().array();
+
+	ResultSet<TermFrequencyItem> ret = new ResultSet<TermFrequencyItem>();
+	for (CompositeBucket bucket : buckets) {
+	    String term = bucket.key().get(queryable.getName()).to(String.class);
+	    long termCount = bucket.docCount();
+
+	    TermFrequencyItem item = new TermFrequencyItem();
+	    item.setTerm(term);
+	    item.setDecodedTerm(term);
+	    item.setFreq((int) termCount);
+	    item.setLabel(queryable.getName());
+	    ret.getResultsList().add(item);
+
+	}
+
+	// Update the `afterKey` for the next iteration
+	Map<String, JsonData> afterKey = response.aggregations().get("distincts").composite().afterKey();
+
+	if (afterKey != null && !afterKey.isEmpty()) {
+	    List<Object> values = new ArrayList<Object>();
+	    values.add(afterKey.values().iterator().next().toString().replace("\"", ""));
+	    SearchAfter sa = new SearchAfter(values);
+	    ret.setSearchAfter(sa);
+	}
+	return ret;
+
+    }
+
     public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws Exception {
 	ResultSet<String> ret = new ResultSet<String>();
 
@@ -858,7 +931,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 			    }
 			}
 
-		    }		    
+		    }
 		    ret.getResultsList().add(d.asString(true));
 		}
 	    }

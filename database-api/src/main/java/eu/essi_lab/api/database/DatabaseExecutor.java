@@ -36,9 +36,12 @@ import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -91,6 +94,8 @@ public interface DatabaseExecutor extends DatabaseProvider {
      * @throws GSException
      */
     public List<String> getIndexValues(DiscoveryMessage message, MetadataElement element, int start, int count) throws GSException;
+    
+    public ResultSet<TermFrequencyItem> getIndexValues(DiscoveryMessage message, Queryable element, int count, String resumptionToken) throws GSException;
 
     /**
      * @author Fabrizio
