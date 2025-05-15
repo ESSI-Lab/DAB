@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
 import eu.essi_lab.gssrv.servlet.RateLimiterFilter;
@@ -42,7 +43,7 @@ public class ProfilerMethod implements GSPingMethod {
 	Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
 	if (keyValueOption.isPresent()) {
 
-	    ping = Boolean.valueOf(keyValueOption.get().getOrDefault("profilerHealthCheckMethodEnabled", "true").toString());
+	    ping = Boolean.valueOf(keyValueOption.get().getOrDefault(KeyValueOptionKeys.PROFILER_HEALTH_CHECK_METHOD_ENABLED.getLabel(), "true").toString());
 	}
 
 	if (RateLimiterFilter.everythingIsBlocked() && ping) {

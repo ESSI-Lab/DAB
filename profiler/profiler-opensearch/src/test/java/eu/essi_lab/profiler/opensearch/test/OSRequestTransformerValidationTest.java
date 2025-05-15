@@ -10,6 +10,7 @@ import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.profiler.os.OSProfilerSetting;
 import eu.essi_lab.profiler.os.handler.discover.OSRequestTransformer;
 
 public class OSRequestTransformerValidationTest {
@@ -23,7 +24,7 @@ public class OSRequestTransformerValidationTest {
 
 	WebRequest webRequest = WebRequest.createGET("http://opensearch/description");
 
-	OSRequestTransformer osRequestTransformer = new OSRequestTransformer();
+	OSRequestTransformer osRequestTransformer = new OSRequestTransformer(new OSProfilerSetting());
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 
@@ -48,7 +49,7 @@ public class OSRequestTransformerValidationTest {
 	} catch (Exception ex) {
 	}
 
-	OSRequestTransformer osRequestTransformer = new OSRequestTransformer();
+	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 
@@ -70,7 +71,7 @@ public class OSRequestTransformerValidationTest {
 
 	WebRequest webRequest = WebRequest.createGET("http://opensearch?");
 
-	OSRequestTransformer osRequestTransformer = new OSRequestTransformer();
+	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 
@@ -92,7 +93,7 @@ public class OSRequestTransformerValidationTest {
 
 	WebRequest webRequest = WebRequest.createGET("http://opensearch?ct=10&si=0&st=pippo&ts=XXX");
 
-	OSRequestTransformer osRequestTransformer = new OSRequestTransformer();
+	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 
@@ -114,7 +115,7 @@ public class OSRequestTransformerValidationTest {
 
 	WebRequest webRequest = WebRequest.createGET("http://opensearch?ct=10&si=0&st=pippo&te=XXX");
 
-	OSRequestTransformer osRequestTransformer = new OSRequestTransformer();
+	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 
@@ -136,7 +137,7 @@ public class OSRequestTransformerValidationTest {
 
 	WebRequest webRequest = WebRequest.createGET("http://opensearch?ct=10&si=0&st=pippo&bbox=XXX");
 
-	OSRequestTransformer osRequestTransformer = new OSRequestTransformer();
+	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 
@@ -158,7 +159,7 @@ public class OSRequestTransformerValidationTest {
 
 	WebRequest webRequest = WebRequest.createGET("http://opensearch?ct=10&si=0&st=pippo");
 
-	OSRequestTransformer osRequestTransformer = new OSRequestTransformer();
+	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 
@@ -176,7 +177,7 @@ public class OSRequestTransformerValidationTest {
 
 	WebRequest webRequest = WebRequest.createGET("http://opensearch?ct=10&si=0&st=pippo&outputFormat=application/pippo");
 
-	OSRequestTransformer osRequestTransformer = new OSRequestTransformer();
+	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 
@@ -199,7 +200,7 @@ public class OSRequestTransformerValidationTest {
 	WebRequest webRequest = WebRequest
 		.createGET("http://opensearch?ct=10&si=0&st=pippo&ts=2000&te=2010&bbox=-180,-90,180,90&outputFormat=application/json");
 
-	OSRequestTransformer osRequestTransformer = new OSRequestTransformer();
+	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 

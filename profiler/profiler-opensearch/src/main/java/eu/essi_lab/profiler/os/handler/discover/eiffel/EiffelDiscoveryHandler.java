@@ -55,6 +55,7 @@ import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.pdk.wrt.WebRequestParameter;
 import eu.essi_lab.profiler.os.OSParameter;
 import eu.essi_lab.profiler.os.OSParameters;
+import eu.essi_lab.profiler.os.OSProfilerSetting;
 import eu.essi_lab.profiler.os.OSRequestParser;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHelper.CountSetWrapper;
 import eu.essi_lab.request.executor.discover.QueryInitializer;
@@ -85,9 +86,15 @@ public class EiffelDiscoveryHandler extends DiscoveryHandler<String> {
      */
     private static final HashMap<String, List<String>> SORTED_IDS_MAP_FILTER_API = new HashMap<String, List<String>>();
 
-    public EiffelDiscoveryHandler() {
+    private OSProfilerSetting setting;
+
+    /**
+     * @param setting
+     */
+    public EiffelDiscoveryHandler(OSProfilerSetting setting) {
 
 	super();
+	this.setting = setting;
     }
 
     @Override
@@ -465,7 +472,7 @@ public class EiffelDiscoveryHandler extends DiscoveryHandler<String> {
 	    return createEmptyResponse(message);
 	}
 
-	final int MAX_PARTITION_SIZE = EiffelDiscoveryHelper.getSortAndFilterIdsPartitionSize();
+	final int MAX_PARTITION_SIZE = EiffelDiscoveryHelper.getSortAndFilterIdsPartitionSize(setting);
 
 	List<List<String>> idsParition = Lists.partition(sortedIds, MAX_PARTITION_SIZE);
 
@@ -707,9 +714,9 @@ public class EiffelDiscoveryHandler extends DiscoveryHandler<String> {
 
 	GSLoggerFactory.getLogger(getClass()).info("User query count: {}", userQueryCount);
 
-	if (userQueryCount > EiffelDiscoveryHelper.getMaxSortIdentifiers()) {
+	if (userQueryCount > EiffelDiscoveryHelper.getMaxSortIdentifiers(setting)) {
 
-	    userQueryCount = EiffelDiscoveryHelper.getMaxSortIdentifiers();
+	    userQueryCount = EiffelDiscoveryHelper.getMaxSortIdentifiers(setting);
 
 	    GSLoggerFactory.getLogger(getClass()).info("User query count reduced to the maximum number or sortable ids: {}",
 		    userQueryCount);
@@ -728,7 +735,7 @@ public class EiffelDiscoveryHandler extends DiscoveryHandler<String> {
 	//
 	CountSet countSet = userQueryCountSet;
 
-	if (userQueryCountSet.getCount() > EiffelDiscoveryHelper.getMaxSortIdentifiers()) {
+	if (userQueryCountSet.getCount() > EiffelDiscoveryHelper.getMaxSortIdentifiers(setting)) {
 
 	    int actualPageCount = (int) (Math.ceil(((double) userQueryCount / message.getPage().getSize())));
 

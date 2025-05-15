@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.eiffel.api.EiffelAPI;
 import eu.essi_lab.eiffel.api.EiffelAPI.SearchIdentifiersApi;
 import eu.essi_lab.messages.DiscoveryMessage.EiffelAPIDiscoveryOption;
@@ -46,6 +47,7 @@ import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.profiler.os.OSParameters;
+import eu.essi_lab.profiler.os.OSProfiler.KeyValueOptionKeys;
 import eu.essi_lab.profiler.os.OSRequestParser;
 
 /**
@@ -77,9 +79,10 @@ public class EiffelDiscoveryHelper {
 
     /**
      * @param request
+     * @param setting
      * @return
      */
-    public static Optional<EiffelAPIDiscoveryOption> readEiffelOption(WebRequest request) {
+    public static Optional<EiffelAPIDiscoveryOption> readEiffelOption(WebRequest request, ProfilerSetting setting) {
 
 	if (request.getFormData().isPresent()) {
 
@@ -93,11 +96,11 @@ public class EiffelDiscoveryHelper {
 	    }
 	}
 
-	Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+	Optional<Properties> keyValueOption = setting.getKeyValueOptions();
 	if (keyValueOption.isPresent()) {
 
 	    Properties properties = keyValueOption.get();
-	    String option = properties.getProperty("forceEiffelAPIDiscoveryOption");
+	    String option = properties.getProperty(KeyValueOptionKeys.EIFFEL_FORCE_API_DISCOVERY_OPTION.getLabel());
 
 	    if (option != null) {
 
@@ -109,11 +112,14 @@ public class EiffelDiscoveryHelper {
     }
 
     /**
+     * @param option
+     * @param def
+     * @param setting
      * @return
      */
-    private static int readIntegerOption(String option, int def) {
+    private static int readIntegerOption(String option, int def, ProfilerSetting setting) {
 
-	Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+	Optional<Properties> keyValueOption = setting.getKeyValueOptions();
 
 	int value = def;
 
@@ -135,9 +141,10 @@ public class EiffelDiscoveryHelper {
     /**
      * @return
      */
-    static int getMaxSortIdentifiers() {
+    static int getMaxSortIdentifiers(ProfilerSetting setting) {
 
-	return readIntegerOption("eiffelAPIMaxSortIdentifiers", EiffelAPI.DEFAULT_MAX_SORT_IDENTIFIERS);
+	return readIntegerOption(KeyValueOptionKeys.EIFFEL_API_MAX_SORT_IDENTIFIERS.getLabel(), EiffelAPI.DEFAULT_MAX_SORT_IDENTIFIERS,
+		setting);
     }
 
     /**
@@ -147,9 +154,10 @@ public class EiffelDiscoveryHelper {
      * 
      * @return
      */
-    public static Optional<Integer> getFilterAndSortSplitTreshold() {
+    public static Optional<Integer> getFilterAndSortSplitTreshold(ProfilerSetting setting) {
 
-	int value = readIntegerOption("eiffelFilterAndSortSplitTreshold", DEFAULT_FILTER_AND_SORT_SPLIT_TRESHOLD);
+	int value = readIntegerOption(KeyValueOptionKeys.EIFFEL_FILTER_AND_SORT_SPLIT_TRESHOLD.getLabel(),
+		DEFAULT_FILTER_AND_SORT_SPLIT_TRESHOLD, setting);
 
 	return value >= 1 ? Optional.of(value) : Optional.empty();
     }
@@ -157,9 +165,10 @@ public class EiffelDiscoveryHelper {
     /**
      * @return
      */
-    static int getSortAndFilterIdsPartitionSize() {
+    static int getSortAndFilterIdsPartitionSize(ProfilerSetting setting) {
 
-	return readIntegerOption("eiffelSortAndFilterPartitionSize", DEFAULT_SORT_AND_FILTER_IDS_PARTITION_SIZE);
+	return readIntegerOption(KeyValueOptionKeys.EIFFEL_SORT_AND_FILTER_PARTITION_SIZE.getLabel(),
+		DEFAULT_SORT_AND_FILTER_IDS_PARTITION_SIZE, setting);
     }
 
     /**
@@ -191,7 +200,7 @@ public class EiffelDiscoveryHelper {
      */
     static boolean useEiffelFilterApiCache() {
 
-	return readBooleanOption("eiffelUseFilterAPICache", DEFAULT_USE_EIFFEL_FILTER_API_CACHE);
+	return readBooleanOption(KeyValueOptionKeys.EIFFEL_USEFILTER_API_CACHE.getLabel(), DEFAULT_USE_EIFFEL_FILTER_API_CACHE);
     }
 
     /**
@@ -199,7 +208,7 @@ public class EiffelDiscoveryHelper {
      */
     static boolean useEiffelMergedIdsCache() {
 
-	return readBooleanOption("eiffelUseMergedIdsCache", DEFAULT_USE_MERGED_IDS_CACHE);
+	return readBooleanOption(KeyValueOptionKeys.EIFFEL_USE_MERGED_IDS_CACHE.getLabel(), DEFAULT_USE_MERGED_IDS_CACHE);
     }
 
     /**
@@ -215,7 +224,7 @@ public class EiffelDiscoveryHelper {
 
 	    Properties properties = keyValueOption.get();
 
-	    String propValue = properties.getProperty("eiffelSortAndFilterAPI");
+	    String propValue = properties.getProperty(KeyValueOptionKeys.EIFFEL_SORT_AND_FILTER_API.getLabel());
 
 	    if (propValue != null) {
 

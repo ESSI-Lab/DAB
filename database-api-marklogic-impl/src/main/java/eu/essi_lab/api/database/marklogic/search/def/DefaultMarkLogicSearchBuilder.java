@@ -49,6 +49,7 @@ import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSearchBuilder;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSpatialQueryBuilder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.indexes.CustomIndexedElements;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.IndexedMetadataElements;
@@ -100,7 +101,6 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
     private Optional<SortedFields> sortedFields;
 
     private static final String UTF8_ENCODING = "UTF-8";
-    private static final String ENABLE_FILTERED_TRAILING_WILDCARDS_QUERIES = "enableFilteredTrailingWildcardQueries";
 
     private static final List<IndexedMetadataElement> INDEXED_ELEMENTS = IndexedMetadataElements.getIndexes();
 
@@ -710,7 +710,8 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	    if (keyValueOption.isPresent()) {
 
 		Properties properties = keyValueOption.get();
-		Boolean enabled = Boolean.valueOf(properties.getOrDefault(ENABLE_FILTERED_TRAILING_WILDCARDS_QUERIES, "false").toString());
+		Boolean enabled = Boolean.valueOf(properties
+			.getOrDefault(KeyValueOptionKeys.ENABLE_FILTERED_TRAILING_WILDCARD_QUERIES.getLabel(), "false").toString());
 
 		if (enabled && (value.startsWith("*") || value.endsWith("*"))) {
 

@@ -40,6 +40,7 @@ import eu.essi_lab.accessor.sos.SOSProperties;
 import eu.essi_lab.accessor.sos.SOSProperties.SOSProperty;
 import eu.essi_lab.accessor.sos.SOSRequestBuilder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
@@ -155,7 +156,7 @@ public class SOSConnector extends eu.essi_lab.accessor.sos.SOSConnector {
 
 	ConfigurationWrapper.getSystemSettings().//
 		getKeyValueOptions().ifPresent(o -> parallelTasks = Integer.valueOf(//
-			o.getProperty("sos100ParallelTasks", String.valueOf(DEFAULT_PARALLEL_TASKS))));
+			o.getProperty(KeyValueOptionKeys.SOS_100_PARALLEL_TASKS.getLabel(), String.valueOf(DEFAULT_PARALLEL_TASKS))));
 
 	boolean exit = proceduresIndex + parallelTasks > procedures.size();
 

@@ -48,6 +48,7 @@ import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
 import eu.essi_lab.cfga.gs.setting.GSSourceSetting;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
 import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting.DistributionSettingComponentInfo;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
@@ -256,7 +257,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	if (keyValueOption.isPresent()) {
 
-	    String multipleTabs = keyValueOption.get().getOrDefault("multipleConfigurationTabs", "false").toString();
+	    String multipleTabs = keyValueOption.get().getOrDefault(KeyValueOptionKeys.MULTIPLE_CONFIGURATION_TABS.getLabel(), "false").toString();
 	    return Boolean.parseBoolean(multipleTabs);
 	}
 

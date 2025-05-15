@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import eu.essi_lab.authorization.rps.GEOSSPrivateWriteRolePolicySet;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
@@ -46,10 +47,6 @@ import eu.essi_lab.model.exceptions.GSException;
  */
 public class MirrorSiteTokenGeneratorHandler extends TokenGeneratorHandler {
 
-    /**
-     * 
-     */
-    private static final String MIRROR_SITE_HEADER_NAME_PREFIX = "mirrorsiteclient";
     /**
      * 
      */
@@ -76,7 +73,7 @@ public class MirrorSiteTokenGeneratorHandler extends TokenGeneratorHandler {
 	    return message;
 	}
 
-	String headerValue = request.getServletRequest().getHeader(MIRROR_SITE_HEADER_NAME_PREFIX);
+	String headerValue = request.getServletRequest().getHeader(KeyValueOptionKeys.MIRROR_SITE_HEADER_NAME_PREFIX);
 
 	//
 	//
@@ -92,7 +89,7 @@ public class MirrorSiteTokenGeneratorHandler extends TokenGeneratorHandler {
 	    Properties properties = keyValueOption.get();
 	    List<String> keys = properties.keySet().//
 		    stream().//
-		    filter(k -> k.toString().startsWith(MIRROR_SITE_HEADER_NAME_PREFIX)).//
+		    filter(k -> k.toString().startsWith(KeyValueOptionKeys.MIRROR_SITE_HEADER_NAME_PREFIX)).//
 		    map(k -> k.toString()).//
 		    collect(Collectors.toList());
 

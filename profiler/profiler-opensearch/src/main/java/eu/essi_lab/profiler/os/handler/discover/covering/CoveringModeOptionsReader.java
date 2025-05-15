@@ -24,7 +24,9 @@ package eu.essi_lab.profiler.os.handler.discover.covering;
 import java.util.Optional;
 import java.util.Properties;
 
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.profiler.os.OSProfiler.KeyValueOptionKeys;
 
 /**
  * @author Fabrizio
@@ -47,92 +49,101 @@ public class CoveringModeOptionsReader {
     private static final Integer DEFAULT_MAX_ITERATIONS = 4;
 
     /**
+     * @param setting
      * @return
      */
-    public static boolean isCoveringModeEnabled() {
+    public static boolean isCoveringModeEnabled(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty("coveringMode");
+	Optional<String> property = getProperty(SystemSetting.KeyValueOptionKeys.COVERING_MODE.getLabel(), setting);
 
 	return property.isPresent() && property.get().equals("enabled");
     }
 
     /**
+     * @param setting
      * @return
      */
-    static int getMaxIterations() {
+    static int getMaxIterations(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty("coveringModeMaxIterations");
+	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_MAX_ITERATIONS.getLabel(), setting);
 
 	return property.isPresent() ? Integer.valueOf(property.get()) : DEFAULT_MAX_ITERATIONS;
     }
 
     /**
+     * @param setting
      * @return
      */
-    static double getPartitionSize() {
+    static double getPartitionSize(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty("coveringModePartitionSize");
+	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_PARTITION_SIZE.getLabel(), setting);
 
 	return property.isPresent() ? Double.valueOf(property.get()) : DEFAULT_PARTITION_SIZE;
     }
 
     /**
+     * @param setting
      * @return
      */
-    static Optional<Integer> getPageSize() {
+    static Optional<Integer> getPageSize(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty("coveringModePageSize");
+	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_PAGE_SIZE.getLabel(), setting);
 
 	return property.isPresent() ? Optional.of(Integer.valueOf(property.get())) : Optional.empty();
     }
 
     /**
+     * @param setting
      * @return
      */
-    static int getCoveringThreshold() {
+    static int getCoveringThreshold(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty("coveringModeCoveringTreshold");
+	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_COVERING_TRESHOLD.getLabel(), setting);
 
 	return property.isPresent() ? Integer.valueOf(property.get()) : DEFAULT_COVERING_TRESHOLD;
     }
 
     /**
+     * @param setting
      * @return
      */
-    static Optional<String> getProductType() {
+    static Optional<String> getProductType(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty("coveringModeProductType");
+	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_PRODUCT_TYPE.getLabel(), setting);
 
 	return property.isPresent() && !property.get().equals("none") ? property : Optional.empty();
     }
 
     /**
+     * @param setting
      * @return
      */
-    static boolean isViewOnlyEnabled() {
+    static boolean isViewOnlyEnabled(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty("coveringModeViewOnly");
+	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_VIEW_ONLY.getLabel(), setting);
 
 	return property.isPresent() && property.get().equals("enabled");
     }
 
     /**
+     * @param setting
      * @return
      */
-    static boolean isTemporalConstraintEnabled() {
+    static boolean isTemporalConstraintEnabled(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty("coveringModeTemporalConstraint");
+	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_TEMPORAL_CONSTRAINT.getLabel(), setting);
 
 	return property.isPresent() && property.get().equals("enabled");
     }
 
     /**
      * @param propertyName
+     * @param setting
      * @return
      */
-    static Optional<String> getProperty(String propertyName) {
+    static Optional<String> getProperty(String propertyName, ProfilerSetting setting) {
 
-	Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+	Optional<Properties> keyValueOption = setting.getKeyValueOptions();
 	if (keyValueOption.isPresent()) {
 
 	    Properties properties = keyValueOption.get();

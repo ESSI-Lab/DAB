@@ -31,6 +31,7 @@ import org.quartz.SchedulerException;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
@@ -85,7 +86,7 @@ public class ConfigService {
     public Response config(@Context HttpServletRequest hsr, @Context UriInfo uriInfo) {
 
 	Properties keyValeOptions = ConfigurationWrapper.getSystemSettings().getKeyValueOptions().get();
-	String configServiceAuthToken = keyValeOptions.getProperty("configServiceAuthToken", null);
+	String configServiceAuthToken = keyValeOptions.getProperty(KeyValueOptionKeys.CONFIG_SERVICE_AUTHTOKEN.getLabel(), null);
 	if (configServiceAuthToken == null) {
 
 	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Configuration service authentication token not defined");

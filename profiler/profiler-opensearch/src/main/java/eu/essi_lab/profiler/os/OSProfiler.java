@@ -31,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage.EiffelAPIDiscoveryOption;
 import eu.essi_lab.messages.ValidationMessage;
@@ -78,6 +79,50 @@ import eu.essi_lab.profiler.os.handler.srvinfo.WMSLayersHandler;
  */
 public class OSProfiler extends Profiler<OSProfilerSetting> {
 
+    /**
+     * @author Fabrizio
+     */
+    public enum KeyValueOptionKeys implements LabeledEnum {
+
+	COVERING_MODE_MAX_ITERATIONS("coveringModeMaxIterations"), //
+	COVERING_MODE_PARTITION_SIZE("coveringModePartitionSize"), //
+	COVERING_MODE_PAGE_SIZE("coveringModePageSize"), //
+	COVERING_MODE_COVERING_TRESHOLD("coveringModeCoveringTreshold"), //
+	COVERING_MODE_PRODUCT_TYPE("coveringModeProductType"), //
+	COVERING_MODE_VIEW_ONLY("coveringModeViewOnly"), //
+	COVERING_MODE_TEMPORAL_CONSTRAINT("coveringModeTemporalConstraint"),
+
+	EIFFEL_FORCE_API_DISCOVERY_OPTION("forceEiffelAPIDiscoveryOption"), //
+	EIFFEL_SORT_AND_FILTER_PARTITION_SIZE("eiffelSortAndFilterPartitionSize"), //
+	EIFFEL_SORT_AND_FILTER_API("eiffelSortAndFilterAPI"), //
+	EIFFEL_USEFILTER_API_CACHE("eiffelUseFilterAPICache"), //
+	EIFFEL_USE_MERGED_IDS_CACHE("eiffelUseMergedIdsCache"), //
+	EIFFEL_API_MAX_SORT_IDENTIFIERS("eiffelAPIMaxSortIdentifiers"), //
+	EIFFEL_FILTER_AND_SORT_SPLIT_TRESHOLD("eiffelFilterAndSortSplitTreshold"); //
+
+	private String name;
+
+	/**
+	 * @param name
+	 */
+	private KeyValueOptionKeys(String name) {
+
+	    this.name = name;
+	}
+
+	@Override
+	public String toString() {
+
+	    return getLabel();
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return name;
+	}
+    }
+
     private static final String INVALID_OS_REQUEST = "INVALID_OS_REQUEST";
 
     private DiscoveryHandler<String> discoveryHandler;
@@ -91,9 +136,9 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 
 	HandlerSelector selector = new HandlerSelector();
 
-	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request);
+	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request, getSetting());
 
-	boolean coveringModeEnabled = CoveringModeOptionsReader.isCoveringModeEnabled();
+	boolean coveringModeEnabled = CoveringModeOptionsReader.isCoveringModeEnabled(getSetting());
 
 	//
 	// Discovery
@@ -103,18 +148,18 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Detected Eiffel API discovery option: {}", eiffelOption.get());
 
-	    discoveryHandler = new EiffelDiscoveryHandler();
-	    discoveryHandler.setRequestTransformer(new EiffelRequestTransformer());
+	    discoveryHandler = new EiffelDiscoveryHandler(getSetting());
+	    discoveryHandler.setRequestTransformer(new EiffelRequestTransformer(getSetting()));
 
 	} else if (coveringModeEnabled) {
 
-	    discoveryHandler = new CoveringModeDiscoveryHandler();
-	    discoveryHandler.setRequestTransformer(new OSRequestTransformer());
+	    discoveryHandler = new CoveringModeDiscoveryHandler(getSetting());
+	    discoveryHandler.setRequestTransformer(new OSRequestTransformer(getSetting()));
 
 	} else {
 
 	    discoveryHandler = new DiscoveryHandler<>();
-	    discoveryHandler.setRequestTransformer(new OSRequestTransformer());
+	    discoveryHandler.setRequestTransformer(new OSRequestTransformer(getSetting()));
 	}
 
 	selector.register(//
@@ -204,7 +249,7 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 
 	String version = parser.parse(OSParameters.OUTPUT_VERSION);
 
-	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request);
+	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request, getSetting());
 
 	DiscoveryResultSetMapper<String> mapper = null;
 	DiscoveryResultSetFormatter<String> formatter = null;
