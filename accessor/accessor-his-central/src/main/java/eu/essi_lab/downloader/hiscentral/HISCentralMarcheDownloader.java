@@ -64,6 +64,7 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
+import eu.essi_lab.wml._2.WML2QualityCategory;
 
 /**
  * @author Fabrizio
@@ -189,8 +190,8 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 		JSONArray valuesData = jsonObj.optJSONArray("values");
 
 		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-	        DateFormat iso8601OutputFormat = null;
-	        DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
+		DateFormat iso8601OutputFormat = null;
+		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 		if (valuesData != null) {
 
@@ -199,11 +200,24 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 			JSONObject data = (JSONObject) arr;
 
 			String valueString = data.optString("value");
-
+			String qualityString = data.optString("quality", "unknown");
+			WML2QualityCategory quality = null;
+			switch (qualityString) {
+			case "unknown":
+			    quality = WML2QualityCategory.UNCHECKED;
+			    break;
+			case "good":
+			    quality = WML2QualityCategory.GOOD;
+			    break;
+			default:
+			    GSLoggerFactory.getLogger(getClass()).error("Unexpected quality flag, the mapping should be updated: {}",
+				    qualityString);
+			    break;
+			}
 			ValueSingleVariable variable = new ValueSingleVariable();
 
 			if (valueString != null && !valueString.isEmpty()) {
-			    
+
 			    //
 			    // value
 			    //
@@ -211,29 +225,32 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 			    BigDecimal dataValue = new BigDecimal(valueString);
 			    variable.setValue(dataValue);
 
+			    if (quality!=null) {
+				variable.setQualityControlLevelCode(quality.getUri());
+			    }
 			    //
 			    // date
 			    //
 
 			    String date = data.optString("date");
 
-		            if (iso8601OutputFormat == null) {
-		                iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.ITALIAN);		                    
-		                iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-		            }
+			    if (iso8601OutputFormat == null) {
+				iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.ITALIAN);
+				iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+			    }
 
 			    Date parsed = iso8601OutputFormat.parse(date);
 
 			    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 			    gregCal.setTime(parsed);
 
-		            XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+			    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
 			    variable.setDateTimeUTC(xmlGregCal);
 
 			    //
 			    //
 			    //
-			    
+
 			    addValue(tsrt, variable);
 			}
 		    }

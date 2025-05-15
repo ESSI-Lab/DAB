@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 
 import eu.essi_lab.accessor.hiscentral.utils.HISCentralUtils;
+import eu.essi_lab.downloader.hiscentral.HISCentralBasilicataDownloader;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.Distribution;
@@ -397,8 +398,7 @@ public class HISCentralBasilicataMapper extends FileIdentifierMapper {
 	}
 	coverageDescription.setAttributeTitle(measureName);
 
-	String missingValue = "-9999";
-	dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
+	dataset.getExtensionHandler().setAttributeMissingValue(HISCentralBasilicataDownloader.MISSING_VALUE);
 
 	if (measureUnits != null) {
 	    dataset.getExtensionHandler().setAttributeUnits(measureUnits);

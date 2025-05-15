@@ -29,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.accessor.hiscentral.utils.HISCentralUtils;
+import eu.essi_lab.downloader.hiscentral.HISCentralValdaostaDownloader;
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.Citation;
@@ -586,8 +587,7 @@ public class HISCentralValdaostaMapper extends FileIdentifierMapper {
 
 	coverageDescription.setAttributeTitle(measureName);
 
-	String missingValue = "-9999";
-	dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
+	dataset.getExtensionHandler().setAttributeMissingValue(HISCentralValdaostaDownloader.MISSING_VALUE);
 
 	if (measureUnits != null) {
 	    dataset.getExtensionHandler().setAttributeUnits(measureUnits);

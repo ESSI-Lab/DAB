@@ -473,7 +473,7 @@ public class HISCentralToscanaMapper extends FileIdentifierMapper {
 	    // String timeUnitsAbbreviation = getTimeScaleUnitAbbreviation(series);
 	    // dataset.getExtensionHandler().setTimeUnitsAbbreviation(timeUnitsAbbreviation);
 	    //
-	    String missingValue = "-9999";
+	    String missingValue = "-9999.0";
 	    dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
 	    //
 	    if (unitName != null) {

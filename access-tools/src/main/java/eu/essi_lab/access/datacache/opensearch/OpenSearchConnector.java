@@ -596,7 +596,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 			String finalId = id;
 
 			BulkOperation.Builder bob = new BulkOperation.Builder();
-			bob.index(idx -> idx.index(DataCacheIndex.VALUES.getIndex(databaseName)).id(finalId).document(json));
+			bob.index(idx -> idx.index(DataCacheIndex.VALUES.getIndex(databaseName)).id(finalId).document(json.toMap()));
 			operations.add(bob.build());
 
 		    } else if (record instanceof StatisticsRecord) {
@@ -611,7 +611,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 			String finalId = id;
 
 			BulkOperation.Builder bob = new BulkOperation.Builder();
-			bob.index(idx -> idx.index(DataCacheIndex.STATISTICS.getIndex(databaseName)).id(finalId).document(json));
+			bob.index(idx -> idx.index(DataCacheIndex.STATISTICS.getIndex(databaseName)).id(finalId).document(json.toMap()));
 			operations.add(bob.build());
 
 		    } else if (record instanceof StationRecord) {
@@ -626,7 +626,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 			String finalId = id;
 
 			BulkOperation.Builder bob = new BulkOperation.Builder();
-			bob.index(idx -> idx.index(DataCacheIndex.STATIONS.getIndex(databaseName)).id(finalId).document(json));
+			bob.index(idx -> idx.index(DataCacheIndex.STATIONS.getIndex(databaseName)).id(finalId).document(json.toMap()));
 			operations.add(bob.build());
 
 		    }
