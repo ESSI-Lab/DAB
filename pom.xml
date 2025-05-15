@@ -1291,12 +1291,15 @@
 				</configuration>
 			</plugin>
 
+			<!-- .................  -->
+            <!-- Compiler set to 21 -->
+		    <!-- .................  -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>11</source>
-					<target>11</target>
+					<source>21</source>
+					<target>21</target>
 					<useIncrementalCompilation>false</useIncrementalCompilation>
 				</configuration>
 			</plugin>
@@ -1652,23 +1655,25 @@
 			</build>
 		</profile>
 		<profile>
-			<id>java7</id>
+			<id>java21</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 				<property>
-					<name>java7</name>
+					<name>java21</name>
 					<value>true</value>
 				</property>
 			</activation>
 			<build>
 				<plugins>
-					<!-- compiler set to 1.7 -->
+					<!-- .................  -->
+					<!-- Compiler set to 21 -->
+					<!-- .................  -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
-							<source>1.7</source>
-							<target>1.7</target>
+							<source>21</source>
+							<target>21</target>
 						</configuration>
 					</plugin>
 				</plugins>

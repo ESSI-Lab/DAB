@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import eu.essi_lab.api.database.DatabaseReader;
@@ -48,6 +49,43 @@ import eu.essi_lab.model.exceptions.GSException;
  * @author boldrini
  */
 public class DefaultViewManager implements IViewManager {
+
+    sealed interface Shape permits Circle, Rectangle {
+    }
+
+    record Circle(double radius) implements Shape {
+    }
+
+    record Rectangle(double width, double height) implements Shape {
+    }
+
+    static double area(Shape shape) {
+	return switch (shape) {
+	case Circle(double r) -> Math.PI * r * r;
+	case Rectangle(double w, double h) -> w * h;
+	};
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+
+	Circle c = new Circle(5);
+
+	Rectangle r = new Rectangle(1, 2);
+
+	System.out.println(area(c));
+	System.out.println(area(r));
+	Runnable printThread = () -> System.out.println(Thread.currentThread());
+        
+	ThreadFactory virtualThreadFactory = Thread.ofVirtual().factory();
+	ThreadFactory kernelThreadFactory = Thread.ofPlatform().factory();
+
+	Thread virtualThread = virtualThreadFactory.newThread(printThread);
+	Thread kernelThread = kernelThreadFactory.newThread(printThread);
+
+	virtualThread.start();
+	kernelThread.start();
+	
+    }
 
     private static final long CACHE_DURATION = TimeUnit.MINUTES.toMillis(30);
     private static final int CACHE_SIZE = 10;
