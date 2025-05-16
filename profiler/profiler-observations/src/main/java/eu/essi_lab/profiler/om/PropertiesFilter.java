@@ -25,19 +25,13 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.selector.WebRequestFilter;
 
-public class CountriesFilter implements WebRequestFilter {
+public class PropertiesFilter implements WebRequestFilter {
 
     @Override
     public boolean accept(WebRequest request) throws GSException {
 	String path = request.getRequestPath();
 	path = path.toLowerCase();
-	return path.endsWith("countries") || //
-		path.endsWith("ontologies") || //
-		path.endsWith("providers") || //
-		path.endsWith("observedproperties") || //
-		path.endsWith("timeinterpolations") || //
-		path.endsWith("intendedobservationspacings") || //
-		path.endsWith("aggregationdurations");
+	return path.endsWith("properties") ;
     }
 
 }

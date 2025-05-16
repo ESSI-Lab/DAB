@@ -10,9 +10,9 @@
         {"url": "http://localhost:9090"}
     ],
     "paths": {
-                "/gs-service/services/essi/token/{token}/view/{view}/om-api/countries": {
+                "/gs-service/services/essi/token/{token}/view/{view}/om-api/properties": {
             "get": {
-                "description": "Used to search and list information about the countries",
+                "description": "Used to search and list information about specific properties",
                 "parameters": [
                     {
                         "name": "token",
@@ -26,6 +26,18 @@
                         "in": "path",
                         "required": true,
                         "description": "Identifier of the data subset interesting for the user",
+                        "schema": {"type": "string"}
+                    },
+                                        {
+                        "name": "property",
+                        "in": "query",
+                        "description": "Property string. To view the available properties, do not include'",
+                        "schema": {"type": "string"}
+                    },
+                                                            {
+                        "name": "resumptionToken",
+                        "in": "query",
+                        "description": "Resumption token",
                         "schema": {"type": "string"}
                     },
                     {

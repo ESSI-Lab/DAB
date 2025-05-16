@@ -66,7 +66,11 @@ public class OMRequest {
 	WEST("west", "xmin", "minx"), //
 	SOUTH("south", "ymin", "miny"), //
 	EAST("east", "xmax", "maxx"), //
-	NORTH("north", "ymax", "maxy");
+	NORTH("north", "ymax", "maxy"), //
+	PROPERTY("property"),//
+	RESUMPTION_TOKEN("resumptionToken")
+	
+	;
 
 	private String[] keys;
 
