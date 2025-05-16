@@ -71,7 +71,7 @@ public class PropertiesHandler extends StreamingRequestHandler {
 
     public enum DatasetProperty {
 	COUNTRY(new String[] { "country" }, MetadataElement.COUNTRY_ISO3), //
-	FEATURE(new String[] { "feature", "featureId" }, MetadataElement.PLATFORM_IDENTIFIER), //
+	FEATURE(new String[] { "feature", "featureId" }, MetadataElement.UNIQUE_PLATFORM_IDENTIFIER), //
 	OBSERVATION(new String[] { "observation" }, MetadataElement.ONLINE_ID), //
 	OBSERVED_PROPERTY(new String[] { "observedProperty" }, MetadataElement.ATTRIBUTE_TITLE), //
 	OBSERVED_PROPERTY_URI(new String[] { "observedPropertyURI" }, MetadataElement.OBSERVED_PROPERTY_URI), //
@@ -179,7 +179,7 @@ public class PropertiesHandler extends StreamingRequestHandler {
 
 		}
 		case FORMAT: {
-		    results = getResult("CSV","JSON");
+		    results = getResult("CSV", "JSON");
 		    break;
 
 		}
@@ -194,7 +194,7 @@ public class PropertiesHandler extends StreamingRequestHandler {
 		    break;
 		}
 
-		JSONObject ret = getJSONEncoding(results, q);
+		JSONObject ret = getJSONEncoding(results, dp);
 
 		writer.write(ret.toString());
 		writer.flush();
@@ -219,7 +219,7 @@ public class PropertiesHandler extends StreamingRequestHandler {
 	};
     }
 
-    private JSONObject getJSONEncoding(ResultSet<TermFrequencyItem> results, Queryable q) {
+    private JSONObject getJSONEncoding(ResultSet<TermFrequencyItem> results, DatasetProperty dp) {
 	List<TermFrequencyItem> fitems = results.getResultsList();
 
 	JSONObject ret = new JSONObject();
@@ -237,7 +237,8 @@ public class PropertiesHandler extends StreamingRequestHandler {
 	}
 
 	JSONArray array = new JSONArray();
-	ret.put(q.getName(), array);
+
+	ret.put(dp.getNames()[0], array);
 	for (TermFrequencyItem fitem : fitems) {
 	    String term = fitem.getDecodedTerm();
 	    JSONObject obj = new JSONObject();
@@ -246,14 +247,14 @@ public class PropertiesHandler extends StreamingRequestHandler {
 	    obj.put("observationCount", fitem.getFreq());
 	    array.put(obj);
 
-	    if (q.equals(MetadataElement.COUNTRY_ISO3)) {
+	    if (dp.equals(DatasetProperty.COUNTRY)) {
 		Country country = Country.decode(term);
 		if (country != null) {
 		    obj.put("shortName", country.getShortName());
 		    obj.put("officialName", country.getOfficialName());
 		}
 	    }
-	    if (q.equals(ResourceProperty.SOURCE_ID)) {
+	    if (dp.equals(DatasetProperty.PROVIDER)) {
 		GSSource s = ConfigurationWrapper.getSource(term);
 		if (s != null) {
 		    obj.put("label", s.getLabel());
