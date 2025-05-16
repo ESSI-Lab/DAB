@@ -1,0 +1,23 @@
+Creating the project:
+from root folder:
+npx create-react-app npm-project
+cp SparqlOntologyNavigator.jsx in src/components/.
+cp App.jsx in src
+from the project root:
+
+customization needed:
+modify package.json:
+"homepage": ".",
+
+npm install
+npm install react-router-dom
+
+npm run build 
+
+mv build/* ../.
+
+npm start // to instead run the app for demo
+
+
+ 
+ 
