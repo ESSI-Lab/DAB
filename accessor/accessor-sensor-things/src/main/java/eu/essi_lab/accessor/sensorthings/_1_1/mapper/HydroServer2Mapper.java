@@ -403,7 +403,7 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 	    } else {
 
-		intTimeUnit = properties.getString("intendedTimeSpacingUnitOfMeasurement");
+		intTimeUnit = properties.optString("intendedTimeSpacingUnitOfMeasurement", null);
 	    }
 	}
 
@@ -466,36 +466,40 @@ public class HydroServer2Mapper extends SensorThingsMapper {
     @Override
     protected void addVerticalExtent(Thing thing, Keywords keywords, DataIdentification dataId) {
 
-	Location location = thing.getLocations().get(0);
+	Optional<Location> location = thing.getLocations().isEmpty() ? Optional.empty() : Optional.of(thing.getLocations().get(0));
 
-	Optional<JSONObject> optLocationProperties = location.getProperties();
+	if (location.isPresent()) {
 
-	if (optLocationProperties.isPresent()) {
+	    Optional<JSONObject> optLocationProperties = location.get().getProperties();
 
-	    JSONObject properties = optLocationProperties.get();
+	    if (optLocationProperties.isPresent()) {
 
-	    //
-	    // Vertical extent
-	    //
+		JSONObject properties = optLocationProperties.get();
 
-	    VerticalExtent verticalExtent = new VerticalExtent();
+		//
+		// Vertical extent
+		//
 
-	    double elevation = properties.optDouble("elevation_m", Double.MAX_VALUE);
-	    if (elevation != Double.MAX_VALUE) {
+		VerticalExtent verticalExtent = new VerticalExtent();
 
-		verticalExtent.setMinimumValue(elevation);
-		verticalExtent.setMaximumValue(elevation);
+		double elevation = properties.optDouble("elevation_m", Double.MAX_VALUE);
 
-		String elevationDatum = properties.optString("elevationDatum");
-		if (!elevationDatum.isEmpty()) {
+		if (elevation != Double.MAX_VALUE) {
 
-		    VerticalCRS verticalCRS = new VerticalCRS();
-		    verticalCRS.setId(elevationDatum);
+		    verticalExtent.setMinimumValue(elevation);
+		    verticalExtent.setMaximumValue(elevation);
 
-		    verticalExtent.setVerticalCRS(verticalCRS);
+		    String elevationDatum = properties.optString("elevationDatum");
+		    if (!elevationDatum.isEmpty()) {
+
+			VerticalCRS verticalCRS = new VerticalCRS();
+			verticalCRS.setId(elevationDatum);
+
+			verticalExtent.setVerticalCRS(verticalCRS);
+		    }
+
+		    dataId.addVerticalExtent(verticalExtent);
 		}
-
-		dataId.addVerticalExtent(verticalExtent);
 	    }
 	}
     }
@@ -508,51 +512,54 @@ public class HydroServer2Mapper extends SensorThingsMapper {
      * @return
      */
     @Override
-    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,ExtensionHandler handler) {
+    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,
+	    ExtensionHandler handler) {
 
-	Location location = thing.getLocations().get(0);
+	Optional<Location> location = thing.getLocations().isEmpty() ? Optional.empty() : Optional.of(thing.getLocations().get(0));
 
 	MIPlatform platform = new MIPlatform();
 
-	//
-	// Platform Title
-	//
+	if (location.isPresent()) {
 
-	if (location.getName().isPresent()) {
+	    //
+	    // Platform Title
+	    //
 
-	    String locName = location.getName().get();
-	    locName = normalize(locName);
+	    if (location.get().getName().isPresent()) {
 
-	    Citation citation = new Citation();
-	    citation.setTitle(locName);
-	    platform.setCitation(citation);
-	}
+		String locName = location.get().getName().get();
+		locName = normalize(locName);
 
-	Optional<JSONObject> optLocationProp = location.getProperties();
-
-	//
-	// Platform description and keywords
-	//
-
-	if (optLocationProp.isPresent()) {
-
-	    String state = optLocationProp.get().optString("state");
-	    String county = optLocationProp.get().optString("county");
-
-	    platform.setDescription("State: " + state + ", county: " + county);
-
-	    addKeyword(keywords, state);
-	    addKeyword(keywords, county);
-
-	    String countryCode = optLocationProp.get().optString("countryCode");
-	    if (countryCode != null && !countryCode.isEmpty()) {
-		Country c = Country.decode(countryCode);
-		if (c!=null) {
-		    handler.setCountry(c.getShortName());
-		    handler.setCountryISO3(c.getISO3());
-		}		
+		Citation citation = new Citation();
+		citation.setTitle(locName);
+		platform.setCitation(citation);
 	    }
 
+	    Optional<JSONObject> optLocationProp = location.get().getProperties();
+
+	    //
+	    // Platform description and keywords
+	    //
+
+	    if (optLocationProp.isPresent()) {
+
+		String state = optLocationProp.get().optString("state");
+		String county = optLocationProp.get().optString("county");
+
+		platform.setDescription("State: " + state + ", county: " + county);
+
+		addKeyword(keywords, state);
+		addKeyword(keywords, county);
+
+		String countryCode = optLocationProp.get().optString("countryCode");
+		if (countryCode != null && !countryCode.isEmpty()) {
+		    Country c = Country.decode(countryCode);
+		    if (c != null) {
+			handler.setCountry(c.getShortName());
+			handler.setCountryISO3(c.getISO3());
+		    }
+		}
+	    }
 	}
 
 	//
@@ -594,25 +601,28 @@ public class HydroServer2Mapper extends SensorThingsMapper {
     @Override
     protected void addBoundingBox(Thing thing, DataIdentification dataId, Keywords keywords) {
 
-	Location location = thing.getLocations().get(0);
+	Optional<Location> location = thing.getLocations().isEmpty() ? Optional.empty() : Optional.of(thing.getLocations().get(0));
 
-	GeographicBoundingBox boundingBox = null;
+	if (location.isPresent()) {
 
-	// should be "application/geo+json"
-	Optional<String> locationEncodingType = location.getEncodingType();
-	locationEncodingType.ifPresent(enc -> addKeyword(keywords, enc));
+	    GeographicBoundingBox boundingBox = null;
 
-	if (location.getLocation().has("geometry")) {
+	    // should be "application/geo+json"
+	    Optional<String> locationEncodingType = location.get().getEncodingType();
+	    locationEncodingType.ifPresent(enc -> addKeyword(keywords, enc));
 
-	    JSONObject geometry = location.getLocation().getJSONObject("geometry");
+	    if (location.get().getLocation().has("geometry")) {
 
-	    if (geometry.has("coordinates")) {
+		JSONObject geometry = location.get().getLocation().getJSONObject("geometry");
 
-		boundingBox = createBoundingBox(//
-			location.getName(), //
-			geometry.getJSONArray("coordinates"));
+		if (geometry.has("coordinates")) {
 
-		dataId.addGeographicBoundingBox(boundingBox);
+		    boundingBox = createBoundingBox(//
+			    location.get().getName(), //
+			    geometry.getJSONArray("coordinates"));
+
+		    dataId.addGeographicBoundingBox(boundingBox);
+		}
 	    }
 	}
     }
