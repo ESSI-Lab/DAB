@@ -191,24 +191,8 @@
 							}
 						}
 					}
-				},
-				"servers": [
-					{
-						"url": "https://whos.geodab.eu"
-					},
-					{
-						"url": "http://localhost:9090"
-					}
-				]
-			},
-			"servers": [
-				{
-					"url": "https://whos.geodab.eu"
-				},
-				{
-					"url": "http://localhost:9090"
 				}
-			]
+			}
 		},
 		"/gs-service/services/essi/token/{token}/view/{view}/om-api/features": {
 			"get": {
@@ -379,24 +363,8 @@
 							}
 						}
 					}
-				},
-				"servers": [
-					{
-						"url": "https://whos.geodab.eu"
-					},
-					{
-						"url": "http://localhost:9090"
-					}
-				]
-			},
-			"servers": [
-				{
-					"url": "https://whos.geodab.eu"
-				},
-				{
-					"url": "http://localhost:9090"
 				}
-			]
+			}
 		},
 		"/gs-service/services/essi/token/{token}/view/{view}/om-api/observations": {
 			"get": {
@@ -583,24 +551,55 @@
 							}
 						}
 					}
-				},
-				"servers": [
+				}
+			}
+		},
+		"/gs-service/services/essi/token/{token}/view/{view}/om-api/status": {
+			"get": {
+				"description": "Used to retrieve the status of asynchronous operations (i.e., data download)",
+				"parameters": [
 					{
-						"url": "https://whos.geodab.eu"
+						"name": "token",
+						"in": "path",
+						"required": true,
+						"description": "Token identifying the user",
+						"schema": {
+							"type": "string"
+						}
 					},
 					{
-						"url": "http://localhost:9090"
+						"name": "view",
+						"in": "path",
+						"required": true,
+						"description": "Identifier of the data subset interesting for the user",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "operationId",
+						"in": "query",
+						"description": "Identifier of the asynchronous operation",
+						"schema": {
+							"type": "string"
+						}
 					}
-				]
-			},
-			"servers": [
-				{
-					"url": "https://whos.geodab.eu"
-				},
-				{
-					"url": "http://localhost:9090"
+				],
+				"responses": {
+					"200": {
+						"description": "Status",
+						"content": {
+							"application/json": {
+								"examples": {
+									"0": {
+										"value": "{\n    \"operationId\": \"operationId\",\n    \"status\": \"completed\",\n    \"locator\": \"http://my.host/link.to.download.package.zip\"\n}"
+									}
+								}
+							}
+						}
+					}
 				}
-			]
+			}
 		}
 	}
 }

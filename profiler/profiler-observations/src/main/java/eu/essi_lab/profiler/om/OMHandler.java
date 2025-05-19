@@ -291,8 +291,8 @@ public class OMHandler extends StreamingRequestHandler {
 		    List<Object> values = new ArrayList<Object>();
 		    String[] split = resumption.split(",");
 		    for (String rs : split) {
-			 values.add(rs);
-		    }		   
+			values.add(rs);
+		    }
 		    searchAfter = new SearchAfter(values);
 		    discoveryMessage.setSearchAfter(searchAfter);
 		}
@@ -310,8 +310,23 @@ public class OMHandler extends StreamingRequestHandler {
 			searchAfter = resultSet.getSearchAfter().isPresent() ? resultSet.getSearchAfter().get() : null;
 
 			List<String> results = resultSet.getResultsList();
-			
 
+			String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
+
+			if ((includeValues != null
+				&& (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
+
+			    if (results.size() > 1) {
+				String info = resultSet.getCountResponse().getExpectedLabel();
+				if (info == null) {
+				    info = "";
+				}
+				printErrorMessage(output,
+					"Requests to download more than one dataset should be handled asynchronously. " + info);
+				return;
+			    }
+
+			}
 			// if (results.isEmpty()) {
 			// printErrorMessage(output, "No " + getObject() + " matched");
 			// return;
@@ -378,7 +393,6 @@ public class OMHandler extends StreamingRequestHandler {
 
 			    // DATA part
 
-			    String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
 			    if ((includeValues != null
 				    && (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
 
