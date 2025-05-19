@@ -269,8 +269,6 @@ public class PropertiesHandler extends StreamingRequestHandler {
 	return MediaType.APPLICATION_JSON_TYPE;
     }
 
-    public DiscoveryRequestTransformer getTransformer() {
-	return new CountriesTransformer();
-    }
+
 
 }

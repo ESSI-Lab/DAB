@@ -25,6 +25,7 @@ import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.TotalHitsRelation;
 
 /*-
  * #%L
@@ -67,6 +68,7 @@ import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
+import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
@@ -271,6 +273,22 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		// set the search after, if present
 		OpenSearchUtils.getSearchAfter(response).ifPresent(sa -> resultSet.setSearchAfter(sa));
+
+		TotalHitsRelation relation = response.hits().total().relation();
+		String expected = "";
+		switch (relation) {
+		case Gte:
+		    expected = "More than " + response.hits().total().value();
+		    break;
+		case Eq:
+		default:
+		    expected = "Exactly " + response.hits().total().value();
+		    break;
+		}
+
+		CountSet count = new CountSet();
+		count.setExpectedLabel(expected);
+		resultSet.setCountResponse(count);
 	    }
 
 	    //
@@ -599,8 +617,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			message.getResourceSelector().getIndexes(), // fields
 			start, //
 			size, //
-			message.getSortedFields(),
-			message.getSearchAfter(), //
+			message.getSortedFields(), message.getSearchAfter(), //
 			false, // request cache
 			message.isResourceBinaryExcluded());//
 	    }

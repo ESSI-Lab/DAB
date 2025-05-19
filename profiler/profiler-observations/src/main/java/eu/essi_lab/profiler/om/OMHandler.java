@@ -29,9 +29,7 @@ import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -52,7 +50,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
 
 import com.google.common.base.Charsets;
 
@@ -72,7 +69,6 @@ import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.SearchAfter;
-import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
@@ -82,11 +78,9 @@ import eu.essi_lab.messages.bond.SpatialEntity;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
@@ -292,7 +286,16 @@ public class OMHandler extends StreamingRequestHandler {
 		String lastStation = null;
 
 		Optional<Bond> initial = discoveryMessage.getUserBond();
-
+		String resumption = request.getParameterValue(eu.essi_lab.profiler.om.OMRequest.APIParameters.RESUMPTION_TOKEN);
+		if (resumption != null) {
+		    List<Object> values = new ArrayList<Object>();
+		    String[] split = resumption.split(",");
+		    for (String rs : split) {
+			 values.add(rs);
+		    }		   
+		    searchAfter = new SearchAfter(values);
+		    discoveryMessage.setSearchAfter(searchAfter);
+		}
 		do {
 
 		    try {
@@ -307,6 +310,7 @@ public class OMHandler extends StreamingRequestHandler {
 			searchAfter = resultSet.getSearchAfter().isPresent() ? resultSet.getSearchAfter().get() : null;
 
 			List<String> results = resultSet.getResultsList();
+			
 
 			// if (results.isEmpty()) {
 			// printErrorMessage(output, "No " + getObject() + " matched");
@@ -482,7 +486,23 @@ public class OMHandler extends StreamingRequestHandler {
 		} while (tempSize < userSize && searchAfter != null);
 
 		if (format.equals("JSON")) {
-		    writer.write("]}"); // result array closed, main JSON closed
+
+		    String resumptionToken = "";
+		    boolean completed = true;
+		    if (searchAfter != null && searchAfter.getValues().isPresent() && !searchAfter.getValues().get().isEmpty()) {
+			String rt = "";
+			for (Object v : searchAfter.getValues().get()) {
+			    rt += v.toString() + ",";
+			}
+			if (rt.endsWith(",")) {
+			    rt = rt.substring(0, rt.length() - 1);
+			}
+			resumptionToken = ",\"resumptionToken\":\"" + rt + "\"";
+			completed = false;
+		    }
+
+		    writer.write("],\"completed\":" + completed + "" + resumptionToken + " }"); // result array closed,
+												// main JSON closed
 		}
 		writer.flush();
 		writer.close();
