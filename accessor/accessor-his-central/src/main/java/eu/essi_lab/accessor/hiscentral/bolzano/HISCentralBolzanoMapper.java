@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.bolzano;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -162,11 +164,11 @@ public class HISCentralBolzanoMapper extends FileIdentifierMapper {
 	// String tempExtenBegin = datasetInfo.optString("data_inizio");
 	// String tempExtenEnd = datasetInfo.optString("data_fine");
 
-	Double pointLon = properties.optDouble("LONG");
-	Double pointLat = properties.optDouble("LAT");
-	Double altitude = properties.optDouble("ALT");
+	BigDecimal pointLon = properties.optBigDecimal("LONG", null);
+	BigDecimal pointLat = properties.optBigDecimal("LAT", null);
+	BigDecimal altitude = properties.optBigDecimal("ALT", null);
 
-	String id = properties.optString("SCODE");
+	String stationId = properties.optString("SCODE");
 
 	//
 	// MEASURE INFO
@@ -203,8 +205,9 @@ public class HISCentralBolzanoMapper extends FileIdentifierMapper {
 	//
 	// id
 	//
-	coreMetadata.setIdentifier(id);
-	coreMetadata.getMIMetadata().setFileIdentifier(id);
+	String resourceIdentifier = stationId + "-" + parameterType;
+	coreMetadata.setIdentifier(resourceIdentifier);
+	coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
 
 	//
 	// responsible party
@@ -256,7 +259,9 @@ public class HISCentralBolzanoMapper extends FileIdentifierMapper {
 		pointLon);
 
 	// vertical extent
-	coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(altitude, altitude);
+	if (altitude != null) {
+	    coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(altitude.doubleValue(), altitude.doubleValue());
+	}
 
 	//
 	// platform
@@ -264,7 +269,7 @@ public class HISCentralBolzanoMapper extends FileIdentifierMapper {
 
 	MIPlatform platform = new MIPlatform();
 
-	platform.setMDIdentifierCode(id);
+	platform.setMDIdentifierCode(stationId);
 
 	dataset.getExtensionHandler().setCountry("ITA");
 
@@ -321,7 +326,7 @@ public class HISCentralBolzanoMapper extends FileIdentifierMapper {
 	// tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
 	// }
 
-	String linkage = HISCentralBolzanoConnector.BASE_URL + "timeseries?station_code=" + id + "&sensor_code=" + parameterType;
+	String linkage = HISCentralBolzanoConnector.BASE_URL + "timeseries?station_code=" + stationId + "&sensor_code=" + parameterType;
 
 	Online online = new Online();
 	online.setLinkage(linkage);

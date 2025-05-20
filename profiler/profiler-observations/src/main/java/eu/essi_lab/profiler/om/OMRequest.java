@@ -46,6 +46,7 @@ public class OMRequest {
 	FORMAT("format"), //
 	USE_CACHE("useCache"), //
 	INCLUDE_VALUES("includeValues", "includeData"), //
+	ASYNCH_DOWNLOAD("asynchDownload"), //
 	BEGIN_DATE("beginDate", "startDate", "beginTime", "startTime", "begin", "beginPosition"), //
 	END_DATE("endDate", "endTime", "end", "endPosition"), //
 	PLATFORM_CODE("sampledFeature", "feature","featureIdentifier","featureId", "monitoringPoint", "monitoringPointIdentifier", "platform", "platformCode", "site",

@@ -316,14 +316,22 @@ public class OMHandler extends StreamingRequestHandler {
 			if ((includeValues != null
 				&& (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
 
+			    String asynch = request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD);
+
 			    if (results.size() > 1) {
-				String info = resultSet.getCountResponse().getExpectedLabel();
-				if (info == null) {
-				    info = "";
+				if (asynch != null && asynch.toLowerCase().equals("true")) {
+				    printErrorMessage(output,
+					    "Asynch download is not yet implemented: coming soon.");
+				    return;
+				} else {
+				    String info = resultSet.getCountResponse().getExpectedLabel();
+				    if (info == null) {
+					info = "";
+				    }
+				    printErrorMessage(output,
+					    "Requests to download more than one dataset should be handled asynchronously. " + info);
+				    return;
 				}
-				printErrorMessage(output,
-					"Requests to download more than one dataset should be handled asynchronously. " + info);
-				return;
 			    }
 
 			}
