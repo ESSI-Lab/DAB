@@ -213,8 +213,11 @@ public class GETRequestFilter extends PathRequestFilter {
 
 	Set<String> querySet = queryConditions.keySet();
 	boolean validQuery = querySet.isEmpty() ? true : false;
+	
 	for (String query : querySet) {
+	
 	    if (accept(getQueryString(webRequest), query, queryConditions.get(query))) {
+		
 		validQuery = true;
 		break;
 	    }
