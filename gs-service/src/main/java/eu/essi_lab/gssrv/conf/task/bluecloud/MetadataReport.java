@@ -37,10 +37,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import org.w3c.dom.Node;
 
+import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
+import eu.essi_lab.api.database.opensearch.OpenSearchFinder;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.common.ISO2014NameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
@@ -50,6 +56,17 @@ import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
+import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.SimpleValueBond;
+import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.count.DiscoveryCountResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
+import eu.essi_lab.pdk.wrt.WebRequestTransformer;
+import eu.essi_lab.profiler.terms.TermsRequest.APIParameters;
+import software.amazon.awssdk.services.cloudwatchlogs.model.OpenSearchDataAccessPolicy;
 
 public abstract class MetadataReport {
 
@@ -83,79 +100,46 @@ public abstract class MetadataReport {
 
 	    HashMap<String, List<String[]>> tables = new HashMap<>();
 
-	    String host = getProtocol() + "://" + getHostname();
-
 	    ReportManager reportManager = new ReportManager();
 
 	    String viewId = view.getId();
 	    String label = view.getLabel();
 
-	    String postUrl = host + "/gs-service/services/essi/view/" + viewId + "/csw";
+	    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
+	    
+	    
+	    OpenSearchFinder finder = new OpenSearchFinder();
+	    DiscoveryMessage message = new DiscoveryMessage();
+	    Optional<View> v = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+	    message.setView(v.get());
+	    DiscoveryCountResponse total = finder.count(message);
 
-	    InputStream stream = MetadataReport.class.getClassLoader().getResourceAsStream(getPostRequest());
-
-	    ClonableInputStream cis = new ClonableInputStream(stream);
-
-	    XMLDocumentReader xmlRequest = new XMLDocumentReader(cis.clone());
-	    System.out.println("POST REQUEST: " + xmlRequest.asString());
-	    XMLDocumentWriter writer = new XMLDocumentWriter(xmlRequest);
-
-	    List<Node> recordsList = new ArrayList<>();
-	    Node[] metadatas = new Node[] {};
-	    XMLDocumentReader xdoc = executeRequestPOST(postUrl, cis.clone());
-	    String countString = xdoc.evaluateString("//*:SearchResults/@numberOfRecordsMatched");
-	    String returnedString = xdoc.evaluateString("//*:SearchResults/@numberOfRecordsReturned");
-	    String nextIndexString = xdoc.evaluateString("//*:SearchResults/@nextRecord");
-	    int count = Integer.parseInt(countString);
-	    int returned = Integer.parseInt(returnedString);
-	    int nextIndex = Integer.parseInt(nextIndexString);
 	    ViewReport viewReport = new ViewReport();
-	    viewReport.setCount(count);
-	    viewReport.setReturned(returned);
+	    viewReport.setCount(total.getCount());
+	    viewReport.setReturned(total.getCount());
 	    viewReport.setLabel(label);
 	    viewReports.put(viewId, viewReport);
-	    metadatas = xdoc.evaluateNodes("//*:MI_Metadata");
 
-	    List<Node> tmpList = Arrays.asList(metadatas);
-	    recordsList.addAll(tmpList);
-	    while (nextIndex > 0 && (maxRecords == null || recordsList.size() < maxRecords)) {// while nextIndex > 0
+	    DocumentReport documentReport = new DocumentReport();
 
-		writer.setText("//*:GetRecords/@startPosition", nextIndexString);
-		xdoc = executeRequestPOST(postUrl, xmlRequest.asStream());
-		returnedString = xdoc.evaluateString("//*:SearchResults/@numberOfRecordsReturned");
-		nextIndexString = xdoc.evaluateString("//*:SearchResults/@nextRecord");
-		metadatas = xdoc.evaluateNodes("//*:MI_Metadata");
-		returned = returned + Integer.parseInt(returnedString);
-		nextIndex = Integer.parseInt(nextIndexString);
-		viewReports.get(viewId).setReturned(returned);
-		tmpList = Arrays.asList(metadatas);
-		recordsList.addAll(tmpList);
-		if (stream != null)
-		    stream.close();
+	    List<BlueCloudMetadataElement> toTest = new ArrayList<>();
+	    toTest.addAll(Arrays.asList(getCoreMetadataElements()));
+	    toTest.addAll(Arrays.asList(getOptionalMetadataElements()));
+
+	    HashMap<BlueCloudMetadataElement, ReportResult> results = new HashMap<BlueCloudMetadataElement, ReportResult>();
+	    
+	    Bond sourceBond = message.getUserBond().get().clone();
+	    for (BlueCloudMetadataElement element : toTest) {
+		ReportResult report = new ReportResult();
+		report.setTotal(total.getCount());
+		SimpleValueBond bond = BondFactory.createExistsSimpleValueBond(element.getQueryable());
+		message.setUserBond(BondFactory.createAndBond(bond,sourceBond));
+		DiscoveryCountResponse c2 = finder.count(message);
+		report.setCount(c2.getCount());
+		
+		results.put(element, report );
 	    }
-
-	    if (stream != null)
-		stream.close();
-	    for (Node n : recordsList) {
-
-		XMLDocumentReader document = new XMLDocumentReader(XMLDocumentReader.asString(n));
-		document.setNamespaceContext(new ISO2014NameSpaceContext());
-		DocumentReport documentReport = new DocumentReport(document);
-
-		List<BlueCloudMetadataElement> toTest = new ArrayList<>();
-		toTest.addAll(Arrays.asList(getCoreMetadataElements()));
-		toTest.addAll(Arrays.asList(getOptionalMetadataElements()));
-		for (BlueCloudMetadataElement element : toTest) {
-		    documentReport.addValues(element);
-		}
-
-		String id = document.evaluateString("//gmd:fileIdentifier/gco:CharacterString");
-		reportManager.addDocumentReport(id, documentReport);
-
-	    }
-
-	    reportManager.printStatistics();
-	    HashMap<BlueCloudMetadataElement, ReportResult> results = reportManager.getReportResults();
+	    
 	    List<String[]> table = createTable(results);
 	    tables.put(viewId, table);
 

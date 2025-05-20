@@ -651,4 +651,5 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	return GSException.createException(OpenSearchFinder.class, errorType, osex);
     }
+
 }
