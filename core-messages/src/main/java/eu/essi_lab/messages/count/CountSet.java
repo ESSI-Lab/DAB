@@ -31,7 +31,8 @@ import java.util.Set;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 
 /**
- * A count set collecting pairs of (source identifier/count) and the exceptions generated during a count, listed per source
+ * A count set collecting pairs of (source identifier/count) and the exceptions generated during a count, listed per
+ * source
  *
  * @author boldrini
  */
@@ -41,6 +42,7 @@ public class CountSet extends AbstractCountResponse {
     private TermFrequencyMap mergedMap;
     private int pageCount;
     private int pageIndex;
+    private String expected;
 
     public CountSet() {
 	countPairs = new HashMap<>();
@@ -79,7 +81,8 @@ public class CountSet extends AbstractCountResponse {
     }
 
     /**
-     * Returns the {@link TermFrequencyMap} resulting from the merging of the {@link TermFrequencyMap}s retrieved by all the
+     * Returns the {@link TermFrequencyMap} resulting from the merging of the {@link TermFrequencyMap}s retrieved by all
+     * the
      * <code>&lt;String, CountResult&gt;</code> pairs
      *
      * @param maxItemsCount
@@ -138,7 +141,8 @@ public class CountSet extends AbstractCountResponse {
     }
 
     /**
-     * Returns the total count of {@link #getCount(String)} invoked with the source identifier of all the <code>&lt;String,
+     * Returns the total count of {@link #getCount(String)} invoked with the source identifier of all the
+     * <code>&lt;String,
      * CountResult&gt;</code> pairs
      *
      * @return
@@ -156,5 +160,13 @@ public class CountSet extends AbstractCountResponse {
 	    }
 	}
 	return totalCount;
+    }
+
+    public void setExpectedLabel(String expected) {
+	this.expected = expected;
+    }
+
+    public String getExpectedLabel() {
+	return expected;
     }
 }

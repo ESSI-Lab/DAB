@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.om;
 
+import java.util.AbstractMap.SimpleEntry;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -27,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.AbstractMap.SimpleEntry;
 
 import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
@@ -37,9 +38,9 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -83,7 +84,7 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 	}
 
 	message
-	.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER,SortOrder.ASCENDING),new SimpleEntry(MetadataElement.ONLINE_ID,SortOrder.ASCENDING ))));
+		.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER,SortOrder.ASCENDING),new SimpleEntry(MetadataElement.ONLINE_ID,SortOrder.ASCENDING ))));
 
 	return message;
     }
