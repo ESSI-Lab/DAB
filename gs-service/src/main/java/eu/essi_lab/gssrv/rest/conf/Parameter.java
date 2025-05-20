@@ -284,7 +284,7 @@ public class Parameter {
     /**
      * @return
      */
-    public Optional<String> getComposite() {
+    public Optional<String> getCompositeName() {
 
 	return Optional.ofNullable(composite);
     }
@@ -328,7 +328,7 @@ public class Parameter {
 
 		&& ((Parameter) object).isCompositeMandatory() == this.isCompositeMandatory() //
 
-		&& ((Parameter) object).getComposite().equals(this.getComposite()) //
+		&& ((Parameter) object).getCompositeName().equals(this.getCompositeName()) //
 
 		&& ((Parameter) object).isMultiValue() ==  this.isMultiValue() //
 

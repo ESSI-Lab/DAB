@@ -74,11 +74,20 @@ public class ListSourcesRequestTest {
 
 	Assert.assertThrows(IllegalArgumentException.class, () -> request.validate());
     }
-    
+
     @Test
     public void validationTest5() {
 
 	ListSourcesRequest request = new ListSourcesRequest();
+
+	request.validate();
+    }
+
+    @Test
+    public void validationTest5_1() {
+
+	ListSourcesRequest request = new ListSourcesRequest();
+	request.getObject().remove("parameters");
 
 	request.validate();
     }

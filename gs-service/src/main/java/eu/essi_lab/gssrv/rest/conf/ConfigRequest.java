@@ -107,7 +107,10 @@ public abstract class ConfigRequest {
      */
     public void validate() {
 
-	if (!object.has("parameters")) {
+	List<Parameter> mandatoryParameters = getMandatoryParameters(false);
+	mandatoryParameters.addAll(getMandatoryParameters(true));
+
+	if (!mandatoryParameters.isEmpty() && !object.has("parameters")) {
 
 	    throw new IllegalArgumentException("Missing request parameters");
 	}
@@ -136,8 +139,8 @@ public abstract class ConfigRequest {
 		Object value = readNestedValue(compositeName, subParam);
 
 		List<Parameter> supportedNestedParams = getSupportedParameters().//
-			stream().filter(p -> p.getComposite().isPresent()).//
-			filter(p -> p.getComposite().get().equals(compositeName)).//
+			stream().filter(p -> p.getCompositeName().isPresent()).//
+			filter(p -> p.getCompositeName().get().equals(compositeName)).//
 			collect(Collectors.toList());
 
 		contentTypeCheck(supportedNestedParams, subParam, value);
@@ -239,9 +242,13 @@ public abstract class ConfigRequest {
      */
     protected void mandatoryCheck() {
 
+	//
+	// mandatory check
+	//
+
 	List<String> mandatoryParams = getSupportedParameters().//
 		stream().//
-		filter(p -> p.getComposite().isEmpty()).//
+		filter(p -> p.getCompositeName().isEmpty()).//
 		filter(p -> p.isMandatory()).//
 		map(p -> p.getName()).//
 		collect(Collectors.toList());
@@ -256,40 +263,34 @@ public abstract class ConfigRequest {
 	}
 
 	//
-	//
+	// mandatory composite check
 	//
 
-	List<Parameter> supportedMandatoryNested = getSupportedParameters().//
+	List<String> mandatoryCompositeNames = getMandatoryParameters(true).//
 		stream().//
-		filter(p -> p.getComposite().isPresent()).//
-		filter(p -> p.isCompositeMandatory()).//
+		map(p -> p.getCompositeName().get()).//
+		distinct().//
 		collect(Collectors.toList());
 
-	List<String> supportedMandatoryNestedNames = supportedMandatoryNested.//
-		stream().//
-		map(p -> p.getName()).//
-		collect(Collectors.toList());
+	mandatoryCompositeNames.removeAll(readCompositeParameters());
 
-	List<String> nestedParameters = readCompositeParameters();
-	supportedMandatoryNestedNames.removeAll(nestedParameters);
+	if (!mandatoryCompositeNames.isEmpty()) {
 
-	if (!supportedMandatoryNestedNames.isEmpty()) {
-
-	    throw new IllegalArgumentException("Missing mandatory nested parameters: " + supportedMandatoryNestedNames.//
+	    throw new IllegalArgumentException("Missing mandatory composite parameters: " + mandatoryCompositeNames.//
 		    stream().//
 		    map(p -> "'" + p + "'").//
 		    collect(Collectors.joining(", ")));
 	}
 
 	//
-	//
+	// mandatory nested check
 	//
 
 	List<Parameter> mandatoryCompositeParams = getSupportedParameters().//
 		stream().//
-		filter(p -> p.getComposite().isPresent()).//
+		filter(p -> p.getCompositeName().isPresent()).//
 		filter(p -> p.isMandatory()).//
-		filter(p -> readCompositeParameters().contains(p.getComposite().get())).//
+		filter(p -> readCompositeParameters().contains(p.getCompositeName().get())).//
 		collect(Collectors.toList());
 
 	List<String> mandatoryNestedParamsNames = mandatoryCompositeParams.//
@@ -303,7 +304,7 @@ public abstract class ConfigRequest {
 
 	    throw new IllegalArgumentException("Missing mandatory nested parameters: " + mandatoryCompositeParams.//
 		    stream().//
-		    map(p -> "'" + p.getComposite().get() + "." + p.getName() + "'").//
+		    map(p -> "'" + p.getCompositeName().get() + "." + p.getName() + "'").//
 		    collect(Collectors.joining(", ")));
 	}
     }
@@ -336,22 +337,22 @@ public abstract class ConfigRequest {
 	//
 	//
 
-	List<String> supportedNestedNames = getSupportedParameters().//
+	List<String> supportedCompositeNames = getSupportedParameters().//
 		stream().//
-		filter(p -> p.getComposite().isPresent()).//
-		map(p -> p.getComposite().get()).//
+		filter(p -> p.getCompositeName().isPresent()).//
+		map(p -> p.getCompositeName().get()).//
 		distinct().//
 		collect(Collectors.toList());
 
-	List<String> nestedParameters = readCompositeParameters();
-	nestedParameters.removeAll(supportedNestedNames);
+	List<String> compositeParameters = readCompositeParameters();
+	compositeParameters.removeAll(supportedCompositeNames);
 
-	if (!nestedParameters.isEmpty()) {
+	if (!compositeParameters.isEmpty()) {
 
-	    throw new IllegalArgumentException("Unsupported nested parameters: " + nestedParameters.//
+	    throw new IllegalArgumentException("Unsupported composite parameters: " + compositeParameters.//
 		    stream().//
 		    map(p -> "'" + p + "'").//
-		    collect(Collectors.joining(", ")) + ". Supported nested parameters: " + supportedNestedNames.//
+		    collect(Collectors.joining(", ")) + ". Supported composite parameters: " + supportedCompositeNames.//
 			    stream().//
 			    map(p -> "'" + p + "'").//
 			    collect(Collectors.joining(", ")));
@@ -361,27 +362,27 @@ public abstract class ConfigRequest {
 	//
 	//
 
-	List<Parameter> supportedSubParams = getSupportedParameters().//
+	List<Parameter> supportedNestedParams = getSupportedParameters().//
 		stream().//
-		filter(p -> p.getComposite().isPresent()).//
+		filter(p -> p.getCompositeName().isPresent()).//
 		collect(Collectors.toList());
 
-	List<String> supportedSubnNames = supportedSubParams.//
+	List<String> supportedNestedNames = supportedNestedParams.//
 		stream().//
 		map(p -> p.getName()).//
 		collect(Collectors.toList());
 
-	List<String> subParameters = readNestedParameters();
-	subParameters.removeAll(supportedSubnNames);
+	List<String> nestedParameters = readNestedParameters();
+	nestedParameters.removeAll(supportedNestedNames);
 
-	if (!subParameters.isEmpty()) {
+	if (!nestedParameters.isEmpty()) {
 
-	    throw new IllegalArgumentException("Unsupported nested parameters: " + subParameters.//
+	    throw new IllegalArgumentException("Unsupported nested parameters: " + nestedParameters.//
 		    stream().//
 		    map(p -> "'" + p + "'").//
-		    collect(Collectors.joining(", ")) + ". Supported nested parameters: " + supportedSubParams.//
+		    collect(Collectors.joining(", ")) + ". Supported nested parameters: " + supportedNestedParams.//
 			    stream().//
-			    map(p -> "'" + p.getComposite().get() + "." + p.getName() + "'").//
+			    map(p -> "'" + p.getCompositeName().get() + "." + p.getName() + "'").//
 			    collect(Collectors.joining(", ")));
 	}
     }
@@ -566,7 +567,6 @@ public abstract class ConfigRequest {
 		}
 	    });
 	}
-
     }
 
     /**
@@ -604,8 +604,9 @@ public abstract class ConfigRequest {
 		collect(Collectors.toList());//
     }
 
-    /*
-     * 
+    /**
+     * @param compositeName
+     * @return
      */
     protected List<String> readNestedParameters(String compositeName) {
 
@@ -641,7 +642,20 @@ public abstract class ConfigRequest {
      */
     protected JSONObject getParametersObject() {
 
-	return object.getJSONObject("parameters");
+	return object.has("parameters") ? object.getJSONObject("parameters") : new JSONObject();
+    }
+
+    /**
+     * @param composite
+     * @return
+     */
+    private List<Parameter> getMandatoryParameters(boolean composite) {
+
+	return getSupportedParameters().//
+		stream().//
+		filter(p -> composite ? p.getCompositeName().isPresent() : p.getCompositeName().isEmpty()).//
+		filter(p -> composite ? p.isCompositeMandatory() : p.isMandatory()).//
+		collect(Collectors.toList());
     }
 
     /**
@@ -649,17 +663,17 @@ public abstract class ConfigRequest {
      * @return
      */
     private boolean parseDateTime(String dateTime) {
-    
-        DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
-    
-        try {
-            parser.parseDateTime(dateTime);
-            return true;
-    
-        } catch (Exception ex) {
-    
-        }
-    
-        return false;
+
+	DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser();
+
+	try {
+	    parser.parseDateTime(dateTime);
+	    return true;
+
+	} catch (Exception ex) {
+
+	}
+
+	return false;
     }
 }
