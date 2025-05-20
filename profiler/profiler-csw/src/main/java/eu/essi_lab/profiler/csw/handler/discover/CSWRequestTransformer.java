@@ -284,7 +284,7 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (webRequest.isGetRequest()) {
 
-	    KeyValueParser parser = new KeyValueParser(webRequest.getURLDecodedQueryString());
+	    KeyValueParser parser = new KeyValueParser(webRequest.getURLDecodedQueryString().get());
 	    String ids = parser.getValue("id", true);
 	    return Arrays.asList(ids.split(","));
 	}

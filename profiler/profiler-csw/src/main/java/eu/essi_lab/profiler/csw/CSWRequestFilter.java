@@ -158,6 +158,6 @@ public class CSWRequestFilter extends GETRequestFilter {
     @Override
     protected String getQueryString(WebRequest request) throws GSException {
 
-	return request.getURLDecodedQueryString();
+	return request.getURLDecodedQueryString().orElse(null);
     }
 }

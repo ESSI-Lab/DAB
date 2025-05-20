@@ -88,7 +88,7 @@ public class CSWDescribeRecordHandler extends DefaultRequestHandler {
 
 	    String queryString = null;
 	    if (webRequest.isGetRequest()) {
-		queryString = webRequest.getURLDecodedQueryString();
+		queryString = webRequest.getURLDecodedQueryString().get();
 	    } else {
 		CSWRequestConverter converter = new CSWRequestConverter();
 		queryString = converter.convert(CSWRequest.DESCRIBE_RECORD, webRequest.getBodyStream());

@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.csw;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -206,7 +207,7 @@ public class CSWProfiler<CSWPS extends CSWProfilerSetting> extends Profiler<CSWP
 	    if (getRecords == null) {
 		if (webRequest.isGetRequest()) {
 
-		    KeyValueParser parser = new KeyValueParser(webRequest.getURLDecodedQueryString());
+		    KeyValueParser parser = new KeyValueParser(webRequest.getURLDecodedQueryString().get());
 		    outputSchema = parser.getValue("outputSchema", true);
 		    String set = parser.getValue("ElementSetName", true);
 		    if (set != null) {
@@ -304,8 +305,13 @@ public class CSWProfiler<CSWPS extends CSWProfilerSetting> extends Profiler<CSWP
     @Override
     protected Response onHandlerNotFound(WebRequest request) {
 
-	KeyValueParser parser = new KeyValueParser(request.getURLDecodedQueryString());
-	String req = parser.getValue("request", true);
+	String req = null;
+	Optional<String> queryString = request.getURLDecodedQueryString();
+	if (queryString.isPresent()) {
+	    KeyValueParser parser = new KeyValueParser(queryString.get());
+	    req = parser.getValue("request", true);
+	}
+
 	ValidationMessage message = new ValidationMessage();
 
 	if (req == null) {
@@ -313,7 +319,9 @@ public class CSWProfiler<CSWPS extends CSWProfilerSetting> extends Profiler<CSWP
 	    message.setError("Missing mandatory request parameter");
 	    message.setErrorCode(ExceptionCode.MISSING_PARAMETER.toString());
 	    message.setLocator("request");
+
 	} else {
+
 	    message.setErrorCode(ExceptionCode.INVALID_PARAMETER.getCode());
 	    message.setError("Invalid request parameter");
 	    message.setLocator("request");

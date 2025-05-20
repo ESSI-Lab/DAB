@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.profiler.csw;
 
+import java.util.Optional;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -44,11 +46,11 @@ public class CSWRequestUtils {
 
 	if (request.isGetRequest()) {
 
-	    String queryString = request.getURLDecodedQueryString();
+	    Optional<String> queryString = request.getURLDecodedQueryString();
 
-	    if (queryString != null && !queryString.isBlank()) {
+	    if (queryString.isPresent() && !queryString.get().isBlank()) {
 
-		return queryString.toLowerCase().contains("request=getrecords");
+		return queryString.get().toLowerCase().contains("request=getrecords");
 	    }
 	}
 
@@ -73,11 +75,11 @@ public class CSWRequestUtils {
 
 	if (request.isGetRequest()) {
 
-	    String queryString = request.getURLDecodedQueryString();
+	    Optional<String> queryString = request.getURLDecodedQueryString();
 
-	    if (queryString != null && !queryString.isBlank()) {
+	    if (queryString.isPresent() && !queryString.get().isBlank()) {
 
-		return queryString.toLowerCase().contains("request=getrecordbyid");
+		return queryString.get().toLowerCase().contains("request=getrecordbyid");
 	    }
 	}
 
