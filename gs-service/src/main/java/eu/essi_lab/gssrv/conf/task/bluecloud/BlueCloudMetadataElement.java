@@ -42,7 +42,7 @@ public enum BlueCloudMetadataElement {
 	    "/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox/gmd:northBoundLatitude/gco:Decimal"
 
     ), //
-    TEMPORAL_EXTENT(MetadataElement.TEMP_EXTENT,
+    TEMPORAL_EXTENT(MetadataElement.TEMP_EXTENT_BEGIN,
 	    "/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent/gml32:TimePeriod/gml32:beginPosition", //
 	    "/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent/gml32:TimePeriod/gml32:endPosition"), //
     PARAMETER(MetadataElement.ATTRIBUTE_TITLE,

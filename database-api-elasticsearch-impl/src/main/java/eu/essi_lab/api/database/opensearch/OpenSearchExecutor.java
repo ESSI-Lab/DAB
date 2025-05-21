@@ -795,14 +795,14 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    return null;
 	}
 
-	int size = Math.min(1000, message.getPage().getSize());
+	int size = message.getPage() == null ? 1000 : Math.min(1000, message.getPage().getSize());
 
 	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder()
 		.terms(t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
 
 	org.opensearch.client.opensearch._types.aggregations.CompositeAggregation.Builder cab = new CompositeAggregation.Builder();
 	cab = cab.size(size).sources(Map.of(queryable.getName(), stationIdSource));
-	if (resumptionToken!=null) {
+	if (resumptionToken != null) {
 	    cab = cab.after(Map.of(queryable.getName(), resumptionToken));
 	}
 	CompositeAggregation compositeAgg =

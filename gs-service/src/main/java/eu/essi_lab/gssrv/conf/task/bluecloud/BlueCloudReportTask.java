@@ -86,7 +86,7 @@ public class BlueCloudReportTask extends AbstractCustomTask {
 
 		if (manager.isPresent()) {
 
-			new BLUECloudReport(manager.get(), true, maxRecords, views);
+			new BLUECloudReport(manager.get(), false, maxRecords, views);
 
 		} else {
 			GSLoggerFactory.getLogger(getClass()).error("S3 manager not present");

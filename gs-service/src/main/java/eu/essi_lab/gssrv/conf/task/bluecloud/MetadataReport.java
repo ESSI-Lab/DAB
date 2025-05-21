@@ -43,6 +43,7 @@ import java.util.Set;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFinder;
@@ -106,12 +107,13 @@ public abstract class MetadataReport {
 	    String label = view.getLabel();
 
 	    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
-	    
-	    
-	    OpenSearchFinder finder = new OpenSearchFinder();
+
+	    DatabaseFinder finder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    Optional<View> v = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 	    message.setView(v.get());
+	    message.setUserBond(v.get().getBond());
+	    message.setPermittedBond(v.get().getBond());
 	    DiscoveryCountResponse total = finder.count(message);
 
 	    ViewReport viewReport = new ViewReport();
@@ -127,23 +129,32 @@ public abstract class MetadataReport {
 	    toTest.addAll(Arrays.asList(getOptionalMetadataElements()));
 
 	    HashMap<BlueCloudMetadataElement, ReportResult> results = new HashMap<BlueCloudMetadataElement, ReportResult>();
-	    
+
 	    Bond sourceBond = message.getUserBond().get().clone();
 	    for (BlueCloudMetadataElement element : toTest) {
 		ReportResult report = new ReportResult();
 		report.setTotal(total.getCount());
 		SimpleValueBond bond = BondFactory.createExistsSimpleValueBond(element.getQueryable());
-		message.setUserBond(BondFactory.createAndBond(bond,sourceBond));
+		message.setUserBond(BondFactory.createAndBond(bond, sourceBond));
+		message.setPermittedBond(BondFactory.createAndBond(bond, sourceBond));
 		DiscoveryCountResponse c2 = finder.count(message);
 		report.setCount(c2.getCount());
-		
-		results.put(element, report );
+		ResultSet<TermFrequencyItem> valuesResponse = executor.getIndexValues(message, element.getQueryable(), 0, null);
+		if (valuesResponse != null) {
+		    List<TermFrequencyItem> frequencies = valuesResponse.getResultsList();
+		    List<String> vvs = new ArrayList<String>();
+		    for (TermFrequencyItem frequency : frequencies) {
+			vvs.add(frequency.getTerm());
+		    }
+		    report.addValue(vvs);
+		}
+		results.put(element, report);
 	    }
-	    
+
 	    List<String[]> table = createTable(results);
 	    tables.put(viewId, table);
 
-	    String htmlTable = createHTMLTable(tables);
+	    String htmlTable = createHTMLTable(tables, getProjectName(), viewReports, getHostname());
 	    String pathName = view.getId();
 	    File tmpFile = File.createTempFile(MetadataReport.class.getClass().getSimpleName(), pathName + ".html");
 	    System.out.println("Writing table to: " + tmpFile.getAbsolutePath());
@@ -205,7 +216,7 @@ public abstract class MetadataReport {
 	return table;
     }
 
-    private String[] getRow(HashMap<BlueCloudMetadataElement, ReportResult> map, BlueCloudMetadataElement reportElement) {
+    public static String[] getRow(HashMap<BlueCloudMetadataElement, ReportResult> map, BlueCloudMetadataElement reportElement) {
 	String metadata = reportElement.toString();
 	String path = reportElement.getPathHtml();
 	boolean isVocabulary = false;
@@ -249,7 +260,7 @@ public abstract class MetadataReport {
 	}
     }
 
-    private String checkVocabulary(String metadata, Set<String> values) {
+    public static String checkVocabulary(String metadata, Set<String> values) {
 	String vocs = "Vocabularies found:<br/>";
 	Set<String> set = new HashSet<>();
 	int vocNumber = 0;
@@ -329,7 +340,8 @@ public abstract class MetadataReport {
 
     public abstract BlueCloudMetadataElement[] getOptionalMetadataElements();
 
-    private String createHTMLTable(HashMap<String, List<String[]>> tableMap) {
+    public static String createHTMLTable(HashMap<String, List<String[]>> tableMap, String projectName,
+	    HashMap<String, ViewReport> viewReports, String hostname) {
 
 	StringBuilder builder = new StringBuilder();
 
@@ -358,9 +370,8 @@ public abstract class MetadataReport {
 
 	builder.append("<body>");
 
-	builder.append("<h1>" + getProjectName() + " metadata completeness report (last update on: "
-		+ ISO8601DateTimeUtils.getISO8601DateTime() + ")</h1><p>The following tables show individual reports for each "
-		+ getProjectName()
+	builder.append("<h1>" + projectName + " metadata completeness report (last update on: " + ISO8601DateTimeUtils.getISO8601DateTime()
+		+ ")</h1><p>The following tables show individual reports for each " + projectName
 		+ " service harvested by the DAB (first level metadata only). The main metadata elements are reported, along with their completeness score.</p>");
 
 	for (Entry<String, List<String[]>> entry : tableMap.entrySet()) {
@@ -383,8 +394,8 @@ public abstract class MetadataReport {
 	    int rows = table.size();
 	    int cols = table.get(0).length;
 
-	    String testPortal = "https://" + getHostname() + "/gs-service/search?view=" + viewId;
-	    builder.append("<div><strong>" + label + "</strong> available service at: <strong>https://" + getHostname()
+	    String testPortal = "https://" + hostname + "/gs-service/search?view=" + viewId;
+	    builder.append("<div><strong>" + label + "</strong> available service at: <strong>https://" + hostname
 		    + "/gs-service/services/essi/view/" + viewId + "/csw</strong><br/>" + "<strong>" + label
 		    + "</strong> available test portal at: <a href=\"" + testPortal + "\">" + testPortal + "</a><br/>"
 		    + "Total number of records: <strong>" + count + "</strong> Number of records analyzed: <strong>" + returned

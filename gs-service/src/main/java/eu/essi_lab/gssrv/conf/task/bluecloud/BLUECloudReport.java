@@ -29,6 +29,7 @@ import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 
 public class BLUECloudReport extends MetadataReport {
 
+     
 	public BLUECloudReport(S3TransferWrapper manager, boolean uploadToS3, Integer maxRecords, String[] viewIdentifiers)
 			throws Exception {
 		super(manager, uploadToS3, maxRecords, viewIdentifiers);
