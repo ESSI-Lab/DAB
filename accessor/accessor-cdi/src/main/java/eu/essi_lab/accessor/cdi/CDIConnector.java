@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.xpath.XPathExpressionException;
 
@@ -56,245 +57,253 @@ import eu.essi_lab.model.resource.OriginalMetadata;
  */
 public class CDIConnector extends HarvestedQueryConnector<CDIConnectorSetting> {
 
-	/**
-	 *
-	 */
-	public static final String TYPE = "CDIConnector";
+    /**
+     *
+     */
+    public static final String TYPE = "CDIConnector";
 
-	private static final String CDI_STREAM_ERROR = "CDI_STREAM_ERROR";
+    private static final String CDI_STREAM_ERROR = "CDI_STREAM_ERROR";
 
-	private static final String CDI_CONNECTOR_LIST_RECORDS_ERROR = "CDI_CONNECTOR_LIST_RECORDS_ERROR";
+    private static final String CDI_CONNECTOR_LIST_RECORDS_ERROR = "CDI_CONNECTOR_LIST_RECORDS_ERROR";
 
-	private static final String CDI_CONNECTOR_PARSING_ERROR = "CDI_CONNECTOR_PARSING_ERROR";
+    private static final String CDI_CONNECTOR_PARSING_ERROR = "CDI_CONNECTOR_PARSING_ERROR";
 
-	private Downloader downloader;
+    private Downloader downloader;
 
-	private Logger logger = GSLoggerFactory.getLogger(this.getClass());
-	/**
-	 * This is the cached set of CDI urls, used during subsequent list records.
-	 */
+    private Logger logger = GSLoggerFactory.getLogger(this.getClass());
+    /**
+     * This is the cached set of CDI urls, used during subsequent list records.
+     */
 
-	private Set<String> cachedCDIUrls = null;
+    private Set<String> cachedCDIUrls = null;
 
-	public Downloader getDownloader() {
-		return downloader == null ? new Downloader() : downloader;
+    public Downloader getDownloader() {
+
+	if (downloader == null) {
+
+	    downloader = new Downloader();
+	    downloader.setConnectionTimeout(TimeUnit.SECONDS, 15);
+	    downloader.setRetryPolicy(3, TimeUnit.SECONDS, 15);
 	}
 
-	public void setDownloader(Downloader downloader) {
-		this.downloader = downloader;
+	return downloader;
+    }
+
+    public void setDownloader(Downloader downloader) {
+	this.downloader = downloader;
+    }
+
+    public CDIConnector() {
+	this.downloader = new Downloader();
+    }
+
+    @Override
+    public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest listRecords) throws GSException {
+
+	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
+
+	if (cachedCDIUrls == null) {
+	    cachedCDIUrls = getCDIUrls();
 	}
 
-	public CDIConnector() {
-		this.downloader = new Downloader();
-	}
+	listRecords.setExpectedRecords(cachedCDIUrls.size());
 
-	@Override
-	public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest listRecords) throws GSException {
-		
-		ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
-
-		if (cachedCDIUrls == null) {
-			cachedCDIUrls = getCDIUrls();
+	Iterator<String> iterator = cachedCDIUrls.iterator();
+	String id = listRecords.getResumptionToken();
+	String nextId = null;
+	if (id == null) {
+	    if (iterator.hasNext()) {
+		// we start from the first
+		id = iterator.next();
+		if (iterator.hasNext()) {
+		    nextId = iterator.next();
 		}
-		
-		listRecords.setExpectedRecords(cachedCDIUrls.size());
-		
-		Iterator<String> iterator = cachedCDIUrls.iterator();
-		String id = listRecords.getResumptionToken();
-		String nextId = null;
-		if (id == null) {
-			if (iterator.hasNext()) {
-				// we start from the first
-				id = iterator.next();
-				if (iterator.hasNext()) {
-					nextId = iterator.next();
-				}
-			} else {
-				// empty CDI urls
-				// nextId remains null
-			}
-		} else {
-			if (cachedCDIUrls.contains(id)) {
-				while (iterator.hasNext()) {
-					String tmp = iterator.next();
-					if (tmp.equals(id) && iterator.hasNext()) {
-						nextId = iterator.next();
-						break;
-					}
-					// if it is the last element
-					// nextId remains null
+	    } else {
+		// empty CDI urls
+		// nextId remains null
+	    }
+	} else {
+	    if (cachedCDIUrls.contains(id)) {
+		while (iterator.hasNext()) {
+		    String tmp = iterator.next();
+		    if (tmp.equals(id) && iterator.hasNext()) {
+			nextId = iterator.next();
+			break;
+		    }
+		    // if it is the last element
+		    // nextId remains null
 
-				}
-			} else {
-				// if the package id is not found in the package list
-				throw GSException.createException(//
-						getClass(), //
-						"Unable to resume from resumption token: " + id, //
-						null, ErrorInfo.ERRORTYPE_INTERNAL, //
-						ErrorInfo.SEVERITY_ERROR, //
-						CDI_CONNECTOR_LIST_RECORDS_ERROR //
-				);
-			}
 		}
-		if (id != null) {
-			OriginalMetadata metadataRecord = new OriginalMetadata();
-			if (id.contains("eml-")) {
-				metadataRecord.setSchemeURI(CommonNameSpaceContext.EUROBIS_NS_URI);
-			} else {
-				metadataRecord.setSchemeURI(CommonNameSpaceContext.SDN_NS_URI);
-			}
+	    } else {
+		// if the package id is not found in the package list
+		throw GSException.createException(//
+			getClass(), //
+			"Unable to resume from resumption token: " + id, //
+			null, ErrorInfo.ERRORTYPE_INTERNAL, //
+			ErrorInfo.SEVERITY_ERROR, //
+			CDI_CONNECTOR_LIST_RECORDS_ERROR //
+		);
+	    }
+	}
+	if (id != null) {
+	    OriginalMetadata metadataRecord = new OriginalMetadata();
+	    if (id.contains("eml-")) {
+		metadataRecord.setSchemeURI(CommonNameSpaceContext.EUROBIS_NS_URI);
+	    } else {
+		metadataRecord.setSchemeURI(CommonNameSpaceContext.SDN_NS_URI);
+	    }
 
-			String metadata = getCDIMetadata(id);
-			metadataRecord.setMetadata(metadata);
-			ret.addRecord(metadataRecord);
-		}
-		
-		ret.setResumptionToken(nextId);
-		return ret;
+	    String metadata = getCDIMetadata(id);
+	    metadataRecord.setMetadata(metadata);
+	    ret.addRecord(metadataRecord);
 	}
 
-	@Override
-	public List<String> listMetadataFormats() {
-		List<String> toret = new ArrayList<>();
-		toret.add(CommonNameSpaceContext.SDN_NS_URI);
-		return toret;
+	ret.setResumptionToken(nextId);
+	return ret;
+    }
+
+    @Override
+    public List<String> listMetadataFormats() {
+	List<String> toret = new ArrayList<>();
+	toret.add(CommonNameSpaceContext.SDN_NS_URI);
+	return toret;
+    }
+
+    @Override
+    public boolean supports(GSSource source) {
+	String baseEndpoint = source.getEndpoint();
+
+	try {
+	    Optional<InputStream> stream = getDownloader().downloadOptionalStream(baseEndpoint);
+
+	    if (stream.isPresent()) {
+		XMLDocumentReader reader = new XMLDocumentReader(stream.get());
+		Boolean cdiFormat = reader.evaluateBoolean("/*:cdiGroup");
+		if (Boolean.TRUE.equals(cdiFormat)) {
+		    return true;
+		}
+	    }
+	} catch (Exception e) {
+	    // any exception during download or during XML parsing
+	    logger.warn("Exception during download or during XML parsing", e);
+	}
+	return false;
+    }
+
+    /**
+     * Retrieves an alphabetically ordered list of CDI urls from the remote CDI
+     * service
+     *
+     * @return a list of CDI urls
+     * @throws GSException
+     */
+
+    public SortedSet<String> getCDIUrls() throws GSException {
+
+	TreeSet<String> toret = new TreeSet<>();
+	String cdiGroupUrl = getSourceURL();
+
+	Optional<InputStream> stream = getDownloader().downloadOptionalStream(cdiGroupUrl);
+
+	XMLDocumentReader reader = null;
+
+	if (stream.isPresent()) {
+	    try {
+		reader = new XMLDocumentReader(stream.get());
+	    } catch (SAXException | IOException e) {
+
+		logger.error("Error parsing the XML CDI group at: {}", cdiGroupUrl);
+
+		throw GSException.createException(//
+			getClass(), //
+			"Error parsing the XML CDI group at: " + cdiGroupUrl, //
+			null, //
+			ErrorInfo.ERRORTYPE_INTERNAL, //
+			ErrorInfo.SEVERITY_ERROR, //
+			CDI_CONNECTOR_PARSING_ERROR //
+		);
+	    }
+	} else {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "Unable to download CDI stream", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    CDI_STREAM_ERROR);
 	}
 
-	@Override
-	public boolean supports(GSSource source) {
-		String baseEndpoint = source.getEndpoint();
+	Node[] cdiUrlNodes;
+	try {
+	    cdiUrlNodes = reader.evaluateNodes("//*:cdiUrl");
+	} catch (XPathExpressionException e) {
 
+	    logger.error("Error evaluating XPath on the XML CDI group at: {}", cdiGroupUrl);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "Error evaluating XPath on the XML CDI group at: " + cdiGroupUrl, //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    CDI_CONNECTOR_PARSING_ERROR //
+	    );
+	}
+
+	GSLoggerFactory.getLogger(getClass()).info("Downloaded {} CDI URLs from remote service", cdiUrlNodes.length);
+	for (Node nodeResult : cdiUrlNodes) {
+
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+
+	    if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && toret.size() > mr.get()) {
+		break;
+	    }
+
+	    String targetUrl = nodeResult.getTextContent();
+
+	    if (cdiGroupUrl.contains("url=")) {
+		// we are under a proxy, because only specific ips are allowed to harvest
+		// SeaDataNet service
 		try {
-			Optional<InputStream> stream = getDownloader().downloadOptionalStream(baseEndpoint);
-
-			if (stream.isPresent()) {
-				XMLDocumentReader reader = new XMLDocumentReader(stream.get());
-				Boolean cdiFormat = reader.evaluateBoolean("/*:cdiGroup");
-				if (Boolean.TRUE.equals(cdiFormat)) {
-					return true;
-				}
-			}
-		} catch (Exception e) {
-			// any exception during download or during XML parsing
-			logger.warn("Exception during download or during XML parsing", e);
-		}
-		return false;
-	}
-
-	/**
-	 * Retrieves an alphabetically ordered list of CDI urls from the remote CDI
-	 * service
-	 *
-	 * @return a list of CDI urls
-	 * @throws GSException
-	 */
-
-	public SortedSet<String> getCDIUrls() throws GSException {
-
-		TreeSet<String> toret = new TreeSet<>();
-		String cdiGroupUrl = getSourceURL();
-
-		Optional<InputStream> stream = getDownloader().downloadOptionalStream(cdiGroupUrl);
-
-		XMLDocumentReader reader = null;
-
-		if (stream.isPresent()) {
-			try {
-				reader = new XMLDocumentReader(stream.get());
-			} catch (SAXException | IOException e) {
-
-				logger.error("Error parsing the XML CDI group at: {}", cdiGroupUrl);
-
-				throw GSException.createException(//
-						getClass(), //
-						"Error parsing the XML CDI group at: " + cdiGroupUrl, //
-						null, //
-						ErrorInfo.ERRORTYPE_INTERNAL, //
-						ErrorInfo.SEVERITY_ERROR, //
-						CDI_CONNECTOR_PARSING_ERROR //
-				);
-			}
-		} else {
-
-			throw GSException.createException(//
-					getClass(), //
-					"Unable to download CDI stream", //
-					null, //
-					ErrorInfo.ERRORTYPE_SERVICE, //
-					ErrorInfo.SEVERITY_ERROR, //
-					CDI_STREAM_ERROR);
+		    String encodedUrl = URLEncoder.encode(targetUrl, "UTF-8");
+		    targetUrl = cdiGroupUrl.substring(0, cdiGroupUrl.indexOf("url=")) + "url=" + encodedUrl;
+		} catch (UnsupportedEncodingException e) {
+		    e.printStackTrace();
 		}
 
-		Node[] cdiUrlNodes;
-		try {
-			cdiUrlNodes = reader.evaluateNodes("//*:cdiUrl");
-		} catch (XPathExpressionException e) {
+	    }
 
-			logger.error("Error evaluating XPath on the XML CDI group at: {}", cdiGroupUrl);
-
-			throw GSException.createException(//
-					getClass(), //
-					"Error evaluating XPath on the XML CDI group at: " + cdiGroupUrl, //
-					null, //
-					ErrorInfo.ERRORTYPE_INTERNAL, //
-					ErrorInfo.SEVERITY_ERROR, //
-					CDI_CONNECTOR_PARSING_ERROR //
-			);
-		}
-
-		GSLoggerFactory.getLogger(getClass()).info("Downloaded {} CDI URLs from remote service", cdiUrlNodes.length);
-		for (Node nodeResult : cdiUrlNodes) {
-
-			Optional<Integer> mr = getSetting().getMaxRecords();
-
-			if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && toret.size() > mr.get()) {
-				break;
-			}
-
-			String targetUrl = nodeResult.getTextContent();
-
-			if (cdiGroupUrl.contains("url=")) {
-				// we are under a proxy, because only specific ips are allowed to harvest
-				// SeaDataNet service
-				try {
-					String encodedUrl = URLEncoder.encode(targetUrl, "UTF-8");
-					targetUrl = cdiGroupUrl.substring(0, cdiGroupUrl.indexOf("url=")) + "url=" + encodedUrl;
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				}
-
-			}
-
-			toret.add(targetUrl);
-		}
-		GSLoggerFactory.getLogger(getClass()).info("Consolidated {} CDI URLs from remote service", toret.size());
-		return toret;
+	    toret.add(targetUrl);
 	}
+	GSLoggerFactory.getLogger(getClass()).info("Consolidated {} CDI URLs from remote service", toret.size());
+	return toret;
+    }
 
-	/**
-	 * Retrieves the SeaDataNet CDI metadata from its url
-	 *
-	 * @param url the package id
-	 * @return the package description as a JSON string
-	 * @throws GSException
-	 */
+    /**
+     * Retrieves the SeaDataNet CDI metadata from its url
+     *
+     * @param url the package id
+     * @return the package description as a JSON string
+     * @throws GSException
+     */
 
-	public String getCDIMetadata(String url) {
+    public String getCDIMetadata(String url) {
 
-		url = url.contains(" ") ? url.replaceAll(" ", "%20") : url;
-		return getDownloader().downloadOptionalString(url).orElse(null);
+	url = url.contains(" ") ? url.replaceAll(" ", "%20") : url;
+	return getDownloader().downloadOptionalString(url).orElse(null);
 
-	}
+    }
 
-	@Override
-	public String getType() {
+    @Override
+    public String getType() {
 
-		return TYPE;
-	}
+	return TYPE;
+    }
 
-	@Override
-	protected CDIConnectorSetting initSetting() {
+    @Override
+    protected CDIConnectorSetting initSetting() {
 
-		return new CDIConnectorSetting();
-	}
+	return new CDIConnectorSetting();
+    }
 }
