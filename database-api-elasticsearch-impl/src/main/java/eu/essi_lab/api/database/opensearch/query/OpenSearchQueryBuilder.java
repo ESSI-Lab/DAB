@@ -417,8 +417,9 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public Query build(boolean count) {
-
-	Query searchQuery = OpenSearchUtils.toQuery(new JSONObject(builder.toString()));
+	String str = builder.toString().trim();
+	
+	Query searchQuery = str.isEmpty()?null: OpenSearchUtils.toQuery(new JSONObject(str));
 
 	Optional<Query> basicQuery = buildBasicQuery(count);
 
@@ -957,8 +958,15 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildMustQuery(List<Query> operands) {
 
+	List<Query>notNulls = new ArrayList<Query>();
+	for (Query operand: operands) {
+	    if (operand!=null) {
+		notNulls.add(operand);
+	    }
+	}
+	
 	return new BoolQuery.Builder().//
-		must(operands).//
+		must(notNulls).//
 		build().//
 		toQuery();
     }

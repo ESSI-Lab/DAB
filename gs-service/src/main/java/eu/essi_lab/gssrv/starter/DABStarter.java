@@ -57,6 +57,7 @@ import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
+import eu.essi_lab.cfga.gs.task.CustomTaskRunner;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.SettingUtils;
@@ -66,6 +67,7 @@ import eu.essi_lab.cfga.source.S3Source;
 import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask;
+import eu.essi_lab.gssrv.conf.task.bluecloud.BlueCloudReportTask;
 import eu.essi_lab.gssrv.health.HealthCheck;
 import eu.essi_lab.gssrv.servlet.ServletListener;
 import eu.essi_lab.harvester.HarvestingReportsHandler;
@@ -197,6 +199,8 @@ public class DABStarter {
 	    break;
 	}
 	initCaches();
+	
+	
     }
 
     /**
