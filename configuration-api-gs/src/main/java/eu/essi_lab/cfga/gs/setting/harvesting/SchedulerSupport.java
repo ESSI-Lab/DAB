@@ -466,19 +466,12 @@ public class SchedulerSupport {
 	    intervalValue = StringUtils.leftPad(intervalValue, 4, "0");
 
 	    String unit = scheduling.getJSONObject("repeatIntervalUnit").getJSONArray("values").get(0).toString().toLowerCase();
-	    switch (unit) {
-	    case "days":
-		intervalValue = intervalValue + " day/s";
-		break;
-	    case "hours":
-		intervalValue = intervalValue + " hour/s";
-		break;
-	    case "minutes":
-		intervalValue = intervalValue + " minute/s";
-		break;
-	    }
-
-	    return intervalValue;
+	    return switch (unit) {
+	    case "days" -> intervalValue + " day/s";
+	    case "hours" -> intervalValue + " hour/s";
+	    case "minutes" -> intervalValue + " minute/s";
+	    default -> intervalValue+ " N/A";
+	    };
 	}
 
 	return "";

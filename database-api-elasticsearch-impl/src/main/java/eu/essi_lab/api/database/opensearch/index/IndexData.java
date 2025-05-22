@@ -944,29 +944,17 @@ public class IndexData {
     private static void put(Queryable quer, List<String> values, IndexData indexData) {
 
 	switch (quer.getContentType()) {
-	case BOOLEAN:
-	    put(values, indexData, quer.getName(), Boolean.class);
-	    break;
-	case DOUBLE:
-	    put(values, indexData, quer.getName(), Double.class);
-	    break;
-	case INTEGER:
-	    put(values, indexData, quer.getName(), Integer.class);
-	    break;
-	case LONG:
-	    put(values, indexData, quer.getName(), Long.class);
-	    break;
-	case TEXTUAL:
+	case BOOLEAN -> put(values, indexData, quer.getName(), Boolean.class);
+	case DOUBLE -> put(values, indexData, quer.getName(), Double.class);
+	case INTEGER -> put(values, indexData, quer.getName(), Integer.class);
+	case LONG -> put(values, indexData, quer.getName(), Long.class);
+	case TEXTUAL -> {
 	    put(values, indexData, quer.getName(), String.class);
 	    // keyword fields used for aggregation and wildcard queries
 	    put(values, indexData, quer.getName(), KeywordProperty.class);
-	    break;
-	case ISO8601_DATE:
-	case ISO8601_DATE_TIME:
-	    put(values, indexData, quer.getName(), DateTime.class);
-	    break;
 	}
-
+	case ISO8601_DATE, ISO8601_DATE_TIME -> put(values, indexData, quer.getName(), DateTime.class);
+	}
     }
 
     /**

@@ -53,12 +53,12 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
      * @param wrapper
      * @param message
      * @param map
-     * @param count 
+     * @param count
      */
     public OpenSearchBondHandler(//
 	    OpenSearchWrapper wrapper, //
 	    DiscoveryMessage message, //
-	    HashMap<String, String> map,//
+	    HashMap<String, String> map, //
 	    boolean count) {
 
 	this.count = count;
@@ -73,15 +73,9 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     public void startLogicalBond(LogicalBond bond) {
 
 	switch (bond.getLogicalOperator()) {
-	case AND:
-	    queryBuilder.appendBoolMustOpenTag();
-	    break;
-	case OR:
-	    queryBuilder.appendBoolShouldOpenTag();
-	    break;
-	case NOT:
-	    queryBuilder.appendBoolMustNotOpenTag();
-	    break;
+	case AND -> queryBuilder.appendBoolMustOpenTag();
+	case OR -> queryBuilder.appendBoolShouldOpenTag();
+	case NOT -> queryBuilder.appendBoolMustNotOpenTag();
 	}
     }
 
@@ -89,16 +83,9 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     public void endLogicalBond(LogicalBond bond) {
 
 	switch (bond.getLogicalOperator()) {
-	case AND:
-	    queryBuilder.appendClosingTag(false);
-	    break;
-	case OR:
-	    queryBuilder.appendClosingTag(true);
-	    break;
-
-	case NOT:
-	    queryBuilder.appendClosingTag(false);
-	    break;
+	case AND -> queryBuilder.appendClosingTag(false);
+	case OR -> queryBuilder.appendClosingTag(true);
+	case NOT -> queryBuilder.appendClosingTag(false);
 	}
     }
 

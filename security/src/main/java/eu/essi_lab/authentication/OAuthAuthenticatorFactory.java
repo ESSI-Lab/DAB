@@ -46,26 +46,13 @@ public class OAuthAuthenticatorFactory {
 
 	try {
 
-	    OAuthAuthenticator authenticator = null;
-
 	    OAuthProvider provider = setting.getSelectedProvider();
-	    switch (provider) {
-	    case FACEBOOK:
-
-		authenticator = new FacebookOAuth2Authenticator();
-
-		break;
-	    case GOOGLE:
-
-		authenticator = new GoogleOAuth2Authenticator();
-
-		break;
-	    case TWITTER:
-
-		authenticator = new TwitterOAuthAuthenticator();
-
-		break;
-	    }
+	    
+	    OAuthAuthenticator authenticator = switch (provider) {
+	    case FACEBOOK -> new FacebookOAuth2Authenticator();
+	    case GOOGLE -> new GoogleOAuth2Authenticator();
+	    case TWITTER -> new TwitterOAuthAuthenticator();
+	    };
 
 	    authenticator.configure(setting);
 

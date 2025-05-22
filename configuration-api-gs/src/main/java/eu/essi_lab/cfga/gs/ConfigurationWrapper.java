@@ -120,20 +120,8 @@ public class ConfigurationWrapper {
 
 	    @Override
 	    public void configurationChanged(ConfigurationChangeEvent event) {
-		int eventType = event.getEventType();
-		switch (eventType) {
-		case ConfigurationChangeEvent.SETTING_PUT:
-		case ConfigurationChangeEvent.SETTING_REMOVED:
-		case ConfigurationChangeEvent.SETTING_REPLACED:
-		case ConfigurationChangeEvent.CONFIGURATION_CLEARED:
-		case ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED:
-		case ConfigurationChangeEvent.CONFIGURATION_FLUSHED:
-		    allSourcesCache = getSources(null, false);
-		    harvestingSettingsCache = _getHarvestingSettings();
-		    break;
-		default:
-		    break;
-		}
+		allSourcesCache = getSources(null, false);
+		harvestingSettingsCache = _getHarvestingSettings();
 	    }
 	});
 
