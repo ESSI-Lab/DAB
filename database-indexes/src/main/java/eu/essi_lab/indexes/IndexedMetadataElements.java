@@ -1127,7 +1127,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    getValues().add(value);
 		}
 	    }
-
 	}
     };
 

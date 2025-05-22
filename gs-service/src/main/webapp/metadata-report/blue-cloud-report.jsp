@@ -1,4 +1,5 @@
 
+<%@page import="eu.essi_lab.model.GSSource"%>
 <%@page import="java.nio.charset.StandardCharsets"%>
 <%@page import="eu.essi_lab.gssrv.conf.task.bluecloud.MetadataReport"%>
 <%@page import="eu.essi_lab.messages.termfrequency.TermFrequencyItem"%>
@@ -36,12 +37,35 @@ HashMap<String, List<String[]>> tables = new HashMap<>();
 ReportManager reportManager = new ReportManager();
 
 String viewId = request.getParameter("view");
-String label = viewId;
+
+if (viewId==null){
+    Optional<View> bcv = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), "blue-cloud");
+    List<GSSource>sources = ConfigurationWrapper.getViewSources(bcv.get());
+    out.println("<html><head></head><body><h1>Blue-Cloud BDI metadata dashboard</h1>");
+    out.println("<p>The BDI dashboard supports BDIs to improve their metadata publication. Links to test portals, tools, and reports for each BDI are reported.</p>");
+	out.println("<a target='_blank' href='https://blue-cloud.geodab.eu/gs-service/search?view=blue-cloud'>Level 1 test portal</a><br/>");
+	out.println("<a target='_blank' href='https://semantics.bodc.ac.uk/'>Semantic analyser (BODC)</a><br/>");
+	out.println("<a target='_blank' href='https://data.blue-cloud.org/search'>Official Blue-Cloud portal</a><br/>");
+	
+	
+	
+    for(GSSource source:sources){
+	out.println("<h2>"+source.getLabel()+"</h2>");
+	out.println("<a target='_blank' href='blue-cloud-report.jsp?view="+source.getUniqueIdentifier()+"'>Metadata report</a><br/>");
+	out.println("<a target='_blank' href='https://blue-cloud.geodab.eu/gs-service/search?view="+source.getUniqueIdentifier()+"'>Test portal</a><br/>");
+	
+    }
+    out.println("</body></html>");
+    return;
+}
+
+Optional<View> v = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+String label = v.get().getLabel();
 DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
 
 DatabaseFinder finder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
 DiscoveryMessage message = new DiscoveryMessage();
-Optional<View> v = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+
 message.setView(v.get());
 message.setUserBond(v.get().getBond());
 message.setPermittedBond(v.get().getBond());

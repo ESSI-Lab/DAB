@@ -47,7 +47,7 @@ public enum BlueCloudMetadataElement {
 	    "/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent/gml32:TimePeriod/gml32:endPosition"), //
     PARAMETER(MetadataElement.ATTRIBUTE_TITLE,
 	    "/gmi2019:MI_Metadata/gmd:contentInfo/gmi2019:MI_CoverageDescription/gmd:attributeDescription/gco:RecordType"), //
-    PARAMETER_URI(MetadataElement.OBSERVED_PROPERTY_URI,
+    PARAMETER_URI(MetadataElement.ATTRIBUTE_IDENTIFIER,
 	    "/gmi2019:MI_Metadata/gmd:contentInfo/gmi2019:MI_CoverageDescription/gmd:attributeDescription/gco:RecordType/@xlink:href"), //
     INSTRUMENT(MetadataElement.INSTRUMENT_TITLE,
 	    "/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords[gmd:type/gmd:MD_KeywordTypeCode/@codeListValue='instrument']/gmd:keyword/*[1]"), //
