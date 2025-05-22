@@ -29,6 +29,8 @@
 <%@page import="java.util.List"%>
 <%@page import="java.util.HashMap"%>
 <%
+
+
 HashMap<String, List<String[]>> tables = new HashMap<>();
 
 ReportManager reportManager = new ReportManager();
@@ -66,7 +68,7 @@ for (BlueCloudMetadataElement element : toTest) {
     message.setUserBond(BondFactory.createAndBond(bond, sourceBond));
     message.setPermittedBond(BondFactory.createAndBond(bond, sourceBond));
     DiscoveryCountResponse c2 = finder.count(message);
-    report.setCount(c2.getCount());
+   
     ResultSet<TermFrequencyItem> valuesResponse = executor.getIndexValues(message, element.getQueryable(), 0, null);
     if (valuesResponse != null) {
 	List<TermFrequencyItem> frequencies = valuesResponse.getResultsList();
@@ -75,6 +77,7 @@ for (BlueCloudMetadataElement element : toTest) {
     vvs.add(frequency.getTerm());
 	}
 	report.addValue(vvs);
+	 report.setCount(c2.getCount());
     }
     results.put(element, report);
 }
@@ -96,7 +99,6 @@ tables.put(viewId, table);
 HashMap<String, ViewReport> viewReports = new HashMap<>();
 viewReports.put(viewId, viewReport);
 
-String htmlTable = MetadataReport.createHTMLTable(tables,"Blue-Cloud",viewReports,"https://blue-cloud.geodab.eu/");
+String htmlTable = MetadataReport.createHTMLTable(tables, "Blue-Cloud", viewReports, "https://blue-cloud.geodab.eu/");
 out.println(htmlTable);
-
 %>
