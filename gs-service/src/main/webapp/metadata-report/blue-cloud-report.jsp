@@ -1,4 +1,9 @@
 
+<%@page import="java.util.Comparator"%>
+<%@page import="eu.essi_lab.messages.HarvestingProperties"%>
+<%@page import="eu.essi_lab.api.database.SourceStorageWorker"%>
+<%@page import="eu.essi_lab.api.database.Database"%>
+<%@page import="eu.essi_lab.api.database.factory.DatabaseFactory"%>
 <%@page import="eu.essi_lab.model.GSSource"%>
 <%@page import="java.nio.charset.StandardCharsets"%>
 <%@page import="eu.essi_lab.gssrv.conf.task.bluecloud.MetadataReport"%>
@@ -30,30 +35,37 @@
 <%@page import="java.util.List"%>
 <%@page import="java.util.HashMap"%>
 <%
-
-
 HashMap<String, List<String[]>> tables = new HashMap<>();
 
 ReportManager reportManager = new ReportManager();
 
 String viewId = request.getParameter("view");
 
-if (viewId==null){
+if (viewId == null) {
     Optional<View> bcv = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), "blue-cloud");
-    List<GSSource>sources = ConfigurationWrapper.getViewSources(bcv.get());
+    List<GSSource> sources = ConfigurationWrapper.getViewSources(bcv.get());
     out.println("<html><head></head><body><h1>Blue-Cloud BDI metadata dashboard</h1>");
-    out.println("<p>The BDI dashboard supports BDIs to improve their metadata publication. Links to test portals, tools, and reports for each BDI are reported.</p>");
-	out.println("<a target='_blank' href='https://blue-cloud.geodab.eu/gs-service/search?view=blue-cloud'>Level 1 test portal</a><br/>");
-	out.println("<a target='_blank' href='https://semantics.bodc.ac.uk/'>Semantic analyser (BODC)</a><br/>");
-	out.println("<a target='_blank' href='https://data.blue-cloud.org/search'>Official Blue-Cloud portal</a><br/>");
-	
-	
-	
-    for(GSSource source:sources){
-	out.println("<h2>"+source.getLabel()+"</h2>");
-	out.println("<a target='_blank' href='blue-cloud-report.jsp?view="+source.getUniqueIdentifier()+"'>Metadata report</a><br/>");
-	out.println("<a target='_blank' href='https://blue-cloud.geodab.eu/gs-service/search?view="+source.getUniqueIdentifier()+"'>Test portal</a><br/>");
-	
+    out.println(
+    "<p>This dashboard supports BDIs (Blue-Cloud Data Infrastructures) in enhancing the publication and quality of their metadata. It provides access to test portals, tools, and metadata assessment reports for each BDI.</p>");
+    out.println(
+    "<p><b>Contacts:</b><br/><a href='mailto:enrico.boldrini@cnr.it'>Enrico Boldrini (CNR)</a>, <a href='mailto:roberto.roncella@cnr.it'>Roberto Roncella (CNR)</a>, <a href='mailto:dick@maris.nl'>Dick Schaap (MARIS)</a></p>");
+    out.println("<h2>Resources and tools</h2>");
+    out.println("<a target='_blank' href='https://blue-cloud.geodab.eu/gs-service/search?view=blue-cloud'>Level 1 test portal</a><br/>");
+    out.println("<a target='_blank' href='https://semantics.bodc.ac.uk/'>Semantic analyser (provided by BODC)</a><br/>");
+    out.println("<a target='_blank' href='https://data.blue-cloud.org/search'>Official Blue-Cloud portal</a><br/>");
+
+    out.println("<h2>Metadata quality and test portals by BDI</h2>");
+    sources.sort(new Comparator<GSSource>() {
+	public int compare(GSSource o1, GSSource o2) {
+    return o1.getLabel().compareTo(o2.getLabel());
+	}
+    });
+    for (GSSource source : sources) {
+	out.println("<h3>" + source.getLabel() + "</h3>");
+	out.println("<a target='_blank' href='blue-cloud-report.jsp?view=" + source.getUniqueIdentifier() + "'>Metadata report</a><br/>");
+	out.println("<a target='_blank' href='https://blue-cloud.geodab.eu/gs-service/search?view=" + source.getUniqueIdentifier()
+		+ "'>Test portal</a><br/>");
+
     }
     out.println("</body></html>");
     return;
@@ -61,6 +73,15 @@ if (viewId==null){
 
 Optional<View> v = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 String label = v.get().getLabel();
+
+GSSource source = ConfigurationWrapper.getViewSources(v.get()).get(0);
+
+Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
+
+SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
+HarvestingProperties harvestingProperties = worker.getHarvestingProperties();
+String endHarvestingTimestamp = harvestingProperties.getEndHarvestingTimestamp();
+
 DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
 
 DatabaseFinder finder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
@@ -92,7 +113,7 @@ for (BlueCloudMetadataElement element : toTest) {
     message.setUserBond(BondFactory.createAndBond(bond, sourceBond));
     message.setPermittedBond(BondFactory.createAndBond(bond, sourceBond));
     DiscoveryCountResponse c2 = finder.count(message);
-   
+
     ResultSet<TermFrequencyItem> valuesResponse = executor.getIndexValues(message, element.getQueryable(), 0, null);
     if (valuesResponse != null) {
 	List<TermFrequencyItem> frequencies = valuesResponse.getResultsList();
@@ -101,7 +122,7 @@ for (BlueCloudMetadataElement element : toTest) {
     vvs.add(frequency.getTerm());
 	}
 	report.addValue(vvs);
-	 report.setCount(c2.getCount());
+	report.setCount(c2.getCount());
     }
     results.put(element, report);
 }
@@ -123,6 +144,7 @@ tables.put(viewId, table);
 HashMap<String, ViewReport> viewReports = new HashMap<>();
 viewReports.put(viewId, viewReport);
 
-String htmlTable = MetadataReport.createHTMLTable(tables, "Blue-Cloud", viewReports, "https://blue-cloud.geodab.eu/");
+String htmlTable = MetadataReport.createHTMLTable(tables, "Blue-Cloud", viewReports, "https://blue-cloud.geodab.eu/",
+	endHarvestingTimestamp);
 out.println(htmlTable);
 %>

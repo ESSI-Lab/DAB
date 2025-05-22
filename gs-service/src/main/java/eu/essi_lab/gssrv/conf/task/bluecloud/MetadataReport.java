@@ -148,7 +148,7 @@ public abstract class MetadataReport {
 	    List<String[]> table = createTable(results);
 	    tables.put(viewId, table);
 
-	    String htmlTable = createHTMLTable(tables, getProjectName(), viewReports, getHostname());
+	    String htmlTable = createHTMLTable(tables, getProjectName(), viewReports, getHostname(),null);
 	    String pathName = view.getId();
 	    File tmpFile = File.createTempFile(MetadataReport.class.getClass().getSimpleName(), pathName + ".html");
 	    System.out.println("Writing table to: " + tmpFile.getAbsolutePath());
@@ -335,7 +335,7 @@ public abstract class MetadataReport {
     public abstract BlueCloudMetadataElement[] getOptionalMetadataElements();
 
     public static String createHTMLTable(HashMap<String, List<String[]>> tableMap, String projectName,
-	    HashMap<String, ViewReport> viewReports, String hostname) {
+	    HashMap<String, ViewReport> viewReports, String hostname, String lastHarvesting) {
 
 	StringBuilder builder = new StringBuilder();
 
@@ -364,8 +364,8 @@ public abstract class MetadataReport {
 
 	builder.append("<body>");
 
-	builder.append("<h1>" + projectName + " metadata completeness report (calculated on: " + ISO8601DateTimeUtils.getISO8601DateTime()
-		+ ")</h1><p>The following tables show individual reports for each " + projectName
+	builder.append("<h1>" + projectName + " metadata completeness report</h1><p>Generated on: " + ISO8601DateTimeUtils.getISO8601DateTime()
+		+ "</p><p>Last metadat aharvesting of the source: " + lastHarvesting + "</p><p>The following tables show individual reports for each " + projectName
 		+ " service harvested by the DAB (first level metadata only). The main metadata elements are reported, along with their completeness score.</p>");
 
 	for (Entry<String, List<String[]>> entry : tableMap.entrySet()) {
@@ -491,6 +491,5 @@ public abstract class MetadataReport {
     public abstract String getReportFilename();
 
     public abstract List<ReportViews> getViews();
-
 
 }
