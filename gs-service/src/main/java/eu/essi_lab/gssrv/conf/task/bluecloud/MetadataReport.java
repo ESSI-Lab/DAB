@@ -24,6 +24,7 @@ package eu.essi_lab.gssrv.conf.task.bluecloud;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -45,18 +46,13 @@ import org.w3c.dom.Node;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
-import eu.essi_lab.api.database.opensearch.OpenSearchFinder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.jaxb.common.ISO2014NameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
-import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.lib.xml.XMLDocumentWriter;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.Bond;
@@ -66,8 +62,6 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.profiler.terms.TermsRequest.APIParameters;
-import software.amazon.awssdk.services.cloudwatchlogs.model.OpenSearchDataAccessPolicy;
 
 public abstract class MetadataReport {
 
@@ -228,7 +222,7 @@ public abstract class MetadataReport {
 	    ReportResult result = map.get(reportElement);
 	    int count = result.getCount();
 	    int total = result.getTotal();
-	    int percent = (int) (((double) count / (double) total) * 100.0);
+	    BigDecimal percent = calculatePercentage(count, total);
 	    Set<String> values = result.getCache().keySet();
 	    String terms = "";
 
@@ -250,9 +244,9 @@ public abstract class MetadataReport {
 	    }
 	    if (isVocabulary) {
 		String vocabularies = checkVocabulary(metadata, values);
-		return new String[] { metadata, path, terms, vocabularies, Integer.toString(percent) };
+		return new String[] { metadata, path, terms, vocabularies, percent.toString() };
 	    } else {
-		return new String[] { metadata, path, terms, "", Integer.toString(percent) };
+		return new String[] { metadata, path, terms, "", percent.toString() };
 	    }
 
 	} else {
@@ -370,7 +364,7 @@ public abstract class MetadataReport {
 
 	builder.append("<body>");
 
-	builder.append("<h1>" + projectName + " metadata completeness report (last update on: " + ISO8601DateTimeUtils.getISO8601DateTime()
+	builder.append("<h1>" + projectName + " metadata completeness report (calculated on: " + ISO8601DateTimeUtils.getISO8601DateTime()
 		+ ")</h1><p>The following tables show individual reports for each " + projectName
 		+ " service harvested by the DAB (first level metadata only). The main metadata elements are reported, along with their completeness score.</p>");
 
@@ -384,7 +378,7 @@ public abstract class MetadataReport {
 	    String label = viewReport.getLabel();
 	    int count = viewReport.getCount();
 	    int returned = viewReport.getReturned();
-	    double percent = (((double) returned / (double) count) * 100.00);
+	    BigDecimal percent = calculatePercentage(returned, count);
 	    DecimalFormatSymbols sym = DecimalFormatSymbols.getInstance();
 	    sym.setDecimalSeparator('.');
 	    DecimalFormat df2 = new DecimalFormat("#.##");
@@ -463,6 +457,18 @@ public abstract class MetadataReport {
 
     }
 
+    public static BigDecimal calculatePercentage(int good, int total) {
+	if (total == 0) {
+	    return BigDecimal.ZERO;
+	}
+
+	BigDecimal goodDecimal = new BigDecimal(good);
+	BigDecimal totalDecimal = new BigDecimal(total);
+
+	return goodDecimal.divide(totalDecimal, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).setScale(2,
+		RoundingMode.HALF_UP);
+    }
+
     private void uploadToS3(S3TransferWrapper manager, File f, String name) throws Exception {
 	System.out.println("Uploading to S3");
 	String bucketName = "dabreporting";
@@ -485,5 +491,6 @@ public abstract class MetadataReport {
     public abstract String getReportFilename();
 
     public abstract List<ReportViews> getViews();
+
 
 }
