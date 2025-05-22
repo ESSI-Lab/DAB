@@ -278,7 +278,7 @@ public class SourceStorageWorker {
 
 	    return folderName;
 	}
-	
+
 	if (folderName.endsWith(SourceStorageWorker.DATA_1_POSTFIX)) {
 
 	    folderName = folderName.replace(suiteId + "_", "");
@@ -286,7 +286,7 @@ public class SourceStorageWorker {
 
 	    return folderName;
 	}
-	
+
 	if (folderName.endsWith(SourceStorageWorker.DATA_2_POSTFIX)) {
 
 	    folderName = folderName.replace(suiteId + "_", "");
@@ -446,10 +446,10 @@ public class SourceStorageWorker {
      */
     void harvestingStarted(//
 	    HarvestingStrategy strategy, //
-	    SourceStorage storage,//
+	    SourceStorage storage, //
 	    boolean recovery, //
 	    boolean resumed, //
-	    Optional<SchedulerJobStatus> status,//
+	    Optional<SchedulerJobStatus> status, //
 	    Optional<ListRecordsRequest> request) throws Exception {
 
 	this.strategy = strategy;
@@ -1025,6 +1025,8 @@ public class SourceStorageWorker {
 	    if (request.isPresent() && request.get().getExpectedRecords().isPresent()) {
 
 		treshold = request.get().getExpectedRecords().get();
+
+		debug("Setting treshold according to the expected number of records: " + StringUtils.format(treshold), status);
 
 		GSLoggerFactory.getLogger(getClass()).info("Setting treshold according to the expected number of records: {}",
 			StringUtils.format(treshold));
