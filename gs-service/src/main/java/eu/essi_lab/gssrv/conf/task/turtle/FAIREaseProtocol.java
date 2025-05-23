@@ -32,15 +32,15 @@ public enum FAIREaseProtocol {
     OGC_WMS_1_3("http://www.opengis.net/def/serviceType/ogc/wms/1.3"), //
     OGC_WMTS("http://www.opengis.net/def/serviceType/ogc/wmts"), //
     ARCGIS_REST("https://developers.arcgis.com/rest/"), //
-    DIRECT_DOWNLOAD("https://w3id.org/fair-ease/ns/endpoint-types/direct-download"), //
-    FOLDER_PATH("https://w3id.org/fair-ease/ns/endpoint-types/folder-path"), //
-    FTP("https://w3id.org/fair-ease/ns/endpoint-types/ftp"), //
-    HTTP("https://w3id.org/fair-ease/ns/endpoint-types/http"), //
-    HTTPS("https://w3id.org/fair-ease/ns/endpoint-types/https"), //
-    LANDING_PAGE("https://w3id.org/fair-ease/ns/endpoint-types/landing-page"), //
-    METADATA("https://w3id.org/fair-ease/ns/endpoint-types/metadata"), //
-    OPENDAP("https://w3id.org/fair-ease/ns/endpoint-types/opendap"), //
-    STAC("https://w3id.org/fair-ease/ns/endpoint-types/stac"), //
+    DIRECT_DOWNLOAD("https://w3id.org/fair-ease/ns/endpoint-types#direct-download"), //
+    FOLDER_PATH("https://w3id.org/fair-ease/ns/endpoint-types#folder-path"), //
+    FTP("https://w3id.org/fair-ease/ns/endpoint-types#ftp"), //
+    HTTP("https://w3id.org/fair-ease/ns/endpoint-types#http"), //
+    HTTPS("https://w3id.org/fair-ease/ns/endpoint-types#https"), //
+    LANDING_PAGE("https://w3id.org/fair-ease/ns/endpoint-types#landing-page"), //
+    METADATA("https://w3id.org/fair-ease/ns/endpoint-types#metadata"), //
+    OPENDAP("https://w3id.org/fair-ease/ns/endpoint-types#opendap"), //
+    STAC("https://w3id.org/fair-ease/ns/endpoint-types#stac"), //
     GML("https://www.iana.org/assignments/media-types/application/gml+xml"), //
     SPARQL("https://www.iana.org/assignments/media-types/application/sparql-query"), //
     KML("https://www.iana.org/assignments/media-types/application/vnd.google-earth.kml+xml"), //
