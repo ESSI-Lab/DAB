@@ -244,10 +244,7 @@ public class OpenSearchQueryBuilder {
 
 	if (sourceId != null) {
 
-	    sourceIdQuery = OpenSearchQueryBuilder.buildRangeQuery(//
-		    ResourceProperty.SOURCE_ID.getName(), //
-		    BondOperator.EQUAL, //
-		    sourceId);
+	    sourceIdQuery = buildSourceIdQuery(sourceId);
 	}
 
 	return buildMinMaxValueQuery(//

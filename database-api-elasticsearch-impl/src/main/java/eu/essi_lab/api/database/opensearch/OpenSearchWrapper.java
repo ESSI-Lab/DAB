@@ -621,8 +621,15 @@ public class OpenSearchWrapper {
 
 	SearchResponse<Object> response = client.search(builder -> {
 
-	    builder.query(searchQuery).//
+	    builder.index(DataFolderMapping.get().getIndex()).//
+		    query(searchQuery).//
+		    size(0).//
 		    aggregations(map);
+
+	    if (OpenSearchDatabase.debugQueries) {
+
+		debugMinMaxRequest(searchQuery, field, map);
+	    }
 
 	    return builder;
 
@@ -812,6 +819,28 @@ public class OpenSearchWrapper {
 	clone.aggregations(DataFolderMapping.toKeywordField(field), aggregation);
 
 	clone.size(0);
+
+	JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
+	object.put("index", DataFolderMapping.get().getIndex());
+
+	GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
+    }
+
+    /**
+     * @param searchQuery
+     * @param field
+     * @param map
+     */
+    private void debugMinMaxRequest(Query searchQuery, String field, Map<String, Aggregation> map) {
+
+	GSLoggerFactory.getLogger(getClass()).debug("\n\n--- MIN/MAX QUERY ---\n");
+
+	org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
+
+	clone.index(DataFolderMapping.get().getIndex()).//
+		query(searchQuery).//
+		size(0).//
+		aggregations(map);
 
 	JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
 	object.put("index", DataFolderMapping.get().getIndex());
