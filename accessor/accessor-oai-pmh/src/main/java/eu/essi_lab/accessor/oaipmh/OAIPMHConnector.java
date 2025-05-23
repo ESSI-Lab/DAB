@@ -126,6 +126,7 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 
 	String token = request.getResumptionToken();
+
 	//
 	// most OAI-PMH services provide a temporary resumption token, so it cannot be reused
 	//
@@ -403,6 +404,7 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	    // set the resumption token
 	    Node tokenNode = reader.evaluateNode("//*:resumptionToken");
 	    String resToken = null;
+
 	    if (tokenNode != null) {
 
 		if (GSLoggerFactory.getLogger(getClass()).isDebugEnabled())
@@ -412,6 +414,12 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 		resToken = reader.evaluateString(tokenNode, "text()");
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).debug("No resumption token element found, connection closed");
+	    }
+
+	    if (getSourceURL().contains("bluecloud-sios")) {
+		if (resToken != null && resToken.equals("0")) {
+		    resToken = null;
+		}
 	    }
 
 	    if (resToken != null && !resToken.equals("")) {
