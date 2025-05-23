@@ -376,7 +376,7 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 		JSONArray arr = dataOwners.getJSONArray(j);
 		String label = arr.optString(1);
 
-		Integer edmo = arr.optIntegerObject(0,null);
+		Integer edmo = arr.optIntegerObject(0, null);
 		Party party = new Party();
 		if (edmo != null) {
 		    EDMOClient client = new EDMOClient();
@@ -484,7 +484,7 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 	    for (int i = 0; i < parameterURNs.size(); i++) {
 
 		String urn = parameterURNs.toArray(new String[] {})[i];
-	
+
 		CoverageDescription descr = new CoverageDescription();
 		descr.setAttributeIdentifier(urn);
 		if (parameterLabels.size() == parameterURNs.size()) {
