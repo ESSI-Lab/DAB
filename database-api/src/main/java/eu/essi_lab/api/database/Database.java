@@ -374,7 +374,7 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 
 	return getProtectedFolder(AUGMENTERS_FOLDER, true);
     }
-    
+
     /**
      * @return
      * @throws GSException
@@ -399,6 +399,21 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     }
 
     /**
+     * @param sourceId
+     * @return
+     * @throws GSException
+     */
+    public List<DatabaseFolder> getDataFolders(String sourceId) throws GSException {
+
+	return Arrays.asList(getFolders()).//
+		stream().//
+		filter(f -> f.getName().endsWith("_" + sourceId + SourceStorageWorker.DATA_1_POSTFIX)
+			|| f.getName().endsWith("_" + sourceId + SourceStorageWorker.DATA_2_POSTFIX))
+		.//
+		collect(Collectors.toList());
+    }
+
+    /**
      * @return
      * @throws GSException
      */
@@ -408,6 +423,19 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 		stream().//
 		filter(f -> f.getName().endsWith(SourceStorageWorker.META_POSTFIX)).//
 		collect(Collectors.toList());
+    }
+
+    /**
+     * @param sourceId
+     * @return
+     * @throws GSException
+     */
+    public Optional<DatabaseFolder> getMetaFolder(String sourceId) throws GSException {
+
+	return Arrays.asList(getFolders()).//
+		stream().//
+		filter(f -> f.getName().endsWith("_" + sourceId + SourceStorageWorker.META_POSTFIX)).//
+		findFirst();
     }
 
     /**
