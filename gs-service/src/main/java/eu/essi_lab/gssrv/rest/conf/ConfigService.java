@@ -28,6 +28,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.SchedulerException;
 
+import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -46,12 +49,14 @@ import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.HarvestUnschedulingRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.ListSourcesRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.PutSourceRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.RemoveSourceDataRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.RemoveSourceRequest;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.exceptions.GSException;
 
 /*-
  * #%L
@@ -182,6 +187,15 @@ public class ConfigService {
 	    Optional<Response> validate = validate(request);
 
 	    return validate.isPresent() ? validate.get() : handleRemoveSourceRequest(request);
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(RemoveSourceDataRequest.class))) {
+
+	    RemoveSourceDataRequest request = new RemoveSourceDataRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    return validate.isPresent() ? validate.get() : handleRemoveSourceDataRequest(request);
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(ListSourcesRequest.class))) {
@@ -615,10 +629,91 @@ public class ConfigService {
 	}
 
 	//
+	// removing source data
+	//
+
+	try {
+
+	    removeSourceData(sourceId);
+
+	} catch (GSException e) {
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to remove source data: " + e.getMessage());
+	}
+
+	//
 	//
 	//
 
 	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleRemoveSourceDataRequest(RemoveSourceDataRequest request) {
+
+	//
+	// finding setting id from the given source id
+	//
+
+	SettingIdFinder finder = getFinder(request);
+
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
+	}
+
+	//
+	// harvesting underway check
+	//
+
+	String sourceId = request.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString()).get();
+
+	if (isHarvestingUnderway(sourceId)) {
+
+	    return buildErrorResponse(Status.BAD_REQUEST,
+		    "The requested source is currently being harvested and its data cannot be removed until harvesting is complete");
+	}
+
+	//
+	// removing source data
+	//
+
+	try {
+
+	    removeSourceData(sourceId);
+
+	} catch (GSException e) {
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to remove source data: " + e.getMessage());
+	}
+
+	//
+	//
+	//
+
+	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param sourceId
+     * @throws GSException
+     */
+    private void removeSourceData(String sourceId) throws GSException {
+
+	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
+
+	Optional<DatabaseFolder> metaFolder = database.getMetaFolder(sourceId);
+	if (metaFolder.isPresent()) {
+	    database.removeFolder(metaFolder.get().getName());
+	}
+
+	List<DatabaseFolder> dataFolders = database.getDataFolders(sourceId);
+	for (DatabaseFolder folder : dataFolders) {
+	    database.removeFolder(folder.getName());
+	}
     }
 
     /**
