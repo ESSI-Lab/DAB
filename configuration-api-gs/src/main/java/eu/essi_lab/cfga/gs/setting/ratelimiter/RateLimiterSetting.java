@@ -326,37 +326,15 @@ public class RateLimiterSetting extends ConfigurableSetting implements EditableS
      */
     public Optional<ExecutionModeSetting> getExecutionModeSetting(ExecutionMode mode) {
 
-	String identifier = null;
-
-	switch (mode) {
-	case ACCESS:
-	    identifier = ACCCESS_SETTING_ID;
-	    break;
-	case AUGMENTER:
-	    identifier = AUGMENTER_SETTING_ID;
-	    break;
-
-	case FRONTEND:
-	    identifier = FRONTEND_SETTING_ID;
-	    break;
-
-	case INTENSIVE:
-	    identifier = INTENSIVE_SETTING_ID;
-	    break;
-
-	case LOCAL_PRODUCTION:
-	    identifier = LOCAL_PROD_SETTING_ID;
-	    break;
-	case MIXED:
-	    identifier = MIXED_MODE_SETTING_ID;
-	    break;
-	default:
-	    return Optional.empty();
-	}
-
-	ExecutionModeSetting setting = getSetting(identifier, ExecutionModeSetting.class).get();
-
-	return Optional.of(setting);
+	return switch (mode) {
+	case ACCESS -> Optional.of(getSetting(ACCCESS_SETTING_ID, ExecutionModeSetting.class).get());
+	case AUGMENTER -> Optional.of(getSetting(AUGMENTER_SETTING_ID, ExecutionModeSetting.class).get());
+	case FRONTEND -> Optional.of(getSetting(FRONTEND_SETTING_ID, ExecutionModeSetting.class).get());
+	case INTENSIVE -> Optional.of(getSetting(INTENSIVE_SETTING_ID, ExecutionModeSetting.class).get());
+	case LOCAL_PRODUCTION -> Optional.of(getSetting(LOCAL_PROD_SETTING_ID, ExecutionModeSetting.class).get());
+	case MIXED -> Optional.of(getSetting(MIXED_MODE_SETTING_ID, ExecutionModeSetting.class).get());
+	default -> Optional.empty();
+	};
     }
 
     @Override

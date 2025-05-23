@@ -22,6 +22,7 @@ package eu.essi_lab.api.database.marklogic.search.def;
  */
 
 import java.net.URLDecoder;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -48,6 +49,7 @@ import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSearchBuilder;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSpatialQueryBuilder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.indexes.CustomIndexedElements;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.IndexedMetadataElements;
@@ -58,6 +60,7 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.QualifiedName;
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.QueryableBond;
@@ -94,12 +97,10 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
     private MarkLogicSpatialQueryBuilder spatialBuilder;
     private List<Queryable> tfTargets;
     private boolean registerQuery;
-    private Optional<SortOrder> orderingDirection;
-    private Optional<Queryable> orderingProperty;
     private boolean unfilteredQuery;
+    private Optional<SortedFields> sortedFields;
 
     private static final String UTF8_ENCODING = "UTF-8";
-    private static final String ENABLE_FILTERED_TRAILING_WILDCARDS_QUERIES = "enableFilteredTrailingWildcardQueries";
 
     private static final List<IndexedMetadataElement> INDEXED_ELEMENTS = IndexedMetadataElements.getIndexes();
 
@@ -125,8 +126,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	this.tfTargets = message.getTermFrequencyTargets();
 	this.registerQuery = message.isQueryRegistrationEnabled();
 	this.unfilteredQuery = true;
-	this.orderingDirection = message.getSortOrder();
-	this.orderingProperty = message.getSortProperty();
+	this.sortedFields = message.getSortedFields();
     }
 
     /**
@@ -710,7 +710,8 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	    if (keyValueOption.isPresent()) {
 
 		Properties properties = keyValueOption.get();
-		Boolean enabled = Boolean.valueOf(properties.getOrDefault(ENABLE_FILTERED_TRAILING_WILDCARDS_QUERIES, "false").toString());
+		Boolean enabled = Boolean.valueOf(properties
+			.getOrDefault(KeyValueOptionKeys.ENABLE_FILTERED_TRAILING_WILDCARD_QUERIES.getLabel(), "false").toString());
 
 		if (enabled && (value.startsWith("*") || value.endsWith("*"))) {
 
@@ -986,14 +987,14 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
 	String ctsIndexOrder = "";
 
-	if (orderingProperty.isPresent()) {
+	if (sortedFields.isPresent() && !sortedFields.get().getFields().isEmpty()) {
 
+	    SimpleEntry<Queryable, SortOrder> sortedField = sortedFields.get().getFields().get(0);
+	    Queryable property = sortedField.getKey();
 	    String direction = "ascending";
+	    if (sortedField.getValue() != null) {
 
-	    Queryable property = orderingProperty.get();
-	    if (orderingDirection.isPresent()) {
-
-		direction = orderingDirection.get().getLabel().toLowerCase();
+		direction = sortedField.getValue().getLabel().toLowerCase();
 	    }
 
 	    ctsIndexOrder = ", " + createCTSIndexOrderOption(property, direction);

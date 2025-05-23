@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /*-
  * #%L
@@ -43,9 +45,14 @@ public class SearchAfter implements Serializable {
      * 
      */
     private static final long serialVersionUID = -6533469371427721506L;
-    private String stringValue;
-    private Long longValue;
-    private Double doubleValue;
+    private List<Object> values = new ArrayList<>();
+
+    public SearchAfter(List<Object> values) {
+	this.values.addAll(values);
+    }
+    
+    public SearchAfter() {	
+    }
 
     /**
      * @param value
@@ -54,7 +61,7 @@ public class SearchAfter implements Serializable {
     public static SearchAfter of(String value) {
 
 	SearchAfter searchAfter = new SearchAfter();
-	searchAfter.setStringValue(value);
+	searchAfter.addStringValue(value);
 
 	return searchAfter;
     }
@@ -66,7 +73,7 @@ public class SearchAfter implements Serializable {
     public static SearchAfter of(double value) {
 
 	SearchAfter searchAfter = new SearchAfter();
-	searchAfter.setDoubleValue(value);
+	searchAfter.addDoubleValue(value);
 
 	return searchAfter;
     }
@@ -78,52 +85,37 @@ public class SearchAfter implements Serializable {
     public static SearchAfter of(long value) {
 
 	SearchAfter searchAfter = new SearchAfter();
-	searchAfter.setLongValue(value);
+	searchAfter.addLongValue(value);
 
 	return searchAfter;
     }
 
     /**
-     * @return the stringValue
+     * @return the values
      */
-    public Optional<String> getStringValue() {
-
-	return Optional.ofNullable(stringValue);
+    public Optional<List<Object>> getValues() {
+	return Optional.ofNullable(values);
     }
 
     /**
      * @param stringValue
      */
-    public void setStringValue(String stringValue) {
-	this.stringValue = stringValue;
-    }
-
-    /**
-     * @return the longValue
-     */
-    public Optional<Long> getLongValue() {
-	return Optional.ofNullable(longValue);
-    }
-
-    /**
-     * @param longValue
-     */
-    public void setLongValue(long longValue) {
-	this.longValue = longValue;
-    }
-
-    /**
-     * @return the doubleValue
-     */
-    public Optional<Double> getDoubleValue() {
-	return Optional.ofNullable(doubleValue);
+    public void addStringValue(String stringValue) {
+	this.values.add(stringValue);
     }
 
     /**
      * @param doubleValue
      */
-    public void setDoubleValue(double doubleValue) {
-	this.doubleValue = doubleValue;
+    public void addDoubleValue(Double doubleValue) {
+	this.values.add(doubleValue);
+    }
+
+    /**
+     * @param longValue
+     */
+    public void addLongValue(Long longValue) {
+	this.values.add(longValue);
     }
 
     /**
@@ -131,27 +123,25 @@ public class SearchAfter implements Serializable {
      */
     public Optional<String> toStringValue() {
 
-	if (doubleValue != null) {
-
-	    return Optional.of(String.valueOf(doubleValue));
+	if (values.isEmpty()) {
+	    return Optional.empty();
 	}
 
-	if (longValue != null) {
+	String ret = "";
 
-	    return Optional.of(String.valueOf(longValue));
+	for (Object value : values) {
+	    ret += String.valueOf(value) + ",";
 	}
-
-	if (stringValue != null) {
-
-	    return Optional.of(stringValue);
+	if (ret.endsWith(",")) {
+	    ret = ret.substring(0, ret.length() - 1);
 	}
+	return Optional.of(ret);
 
-	return Optional.empty();
     }
-    
+
     @Override
     public String toString() {
-	
+
 	return toStringValue().orElse("empty");
     }
 
@@ -163,7 +153,7 @@ public class SearchAfter implements Serializable {
     public static InputStream serialize(SearchAfter searchAfter) throws Exception {
 
 	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-	
+
 	ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 	objectOutputStream.writeObject(searchAfter);
 	objectOutputStream.flush();

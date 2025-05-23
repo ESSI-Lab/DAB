@@ -30,11 +30,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Optional;
 
-import org.geotools.geometry.DirectPosition2D;
+import org.geotools.api.geometry.Position;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.geometry.Position2D;
 import org.geotools.referencing.CRS;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 
 import eu.essi_lab.accessor.odatahidro.client.ClientResponseWrapper;
 import eu.essi_lab.accessor.odatahidro.client.ODataHidrologyClient;
@@ -85,6 +85,10 @@ public class ODataHidrologyMapper extends OriginalIdentifierMapper {
     private static final String ODATA_HIDROLOGY_MAPPER_ERROR = "ODATA_HIDROLOGY_MAPPER_ERROR";
     private static final String URN_SIKE = "urn:syke:station:";
 
+    public ODataHidrologyMapper() {
+	
+	}
+    
     @Override
     protected GSResource execMapping(OriginalMetadata originalMD, GSSource source) throws GSException {
 
@@ -457,8 +461,8 @@ public class ODataHidrologyMapper extends OriginalIdentifierMapper {
 
 	try {
 	    MathTransform transform = getMathTransform();
-	    DirectPosition ptSrc = new DirectPosition2D(koordErTmPohj, koordErTmIta);
-	    DirectPosition ptDst = transform.transform(ptSrc, null);
+	    Position2D ptSrc = new Position2D(koordErTmPohj, koordErTmIta);
+	    Position ptDst = transform.transform(ptSrc, null);
 	    SimpleEntry<Double, Double> ret = new SimpleEntry<Double, Double>(ptDst.getOrdinate(0), ptDst.getOrdinate(1));
 	    return ret;
 	} catch (Exception e) {

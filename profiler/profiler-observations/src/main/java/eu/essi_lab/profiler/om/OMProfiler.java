@@ -71,14 +71,11 @@ public class OMProfiler extends Profiler<OMProfilerSetting> {
 	selector.register(new OMFilter(), new OMHandler());
 
 	////////////////////
-	// COUNTRIES
+	// PROPERTIES
 	////////////////////
-	selector.register(new CountriesFilter(), new CountriesHandler());
+	selector.register(new PropertiesFilter(), new PropertiesHandler());
 
-//	////////////////////
-//	// PROVIDERS
-//	////////////////////
-//	selector.register(new ProvidersFilter(), new ProvidersHandler());
+
 
 	return selector;
     }

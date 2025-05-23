@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
 import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
@@ -67,8 +68,8 @@ public class FreeMemoryMethod implements GSPingMethod {
 	Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
 	if (keyValueOption.isPresent()) {
 
-	    treshold = Integer
-		    .valueOf(keyValueOption.get().getProperty("freeMemoryHealthCheckMethodTreshold", String.valueOf(DEFAULT_TRESHOLD)));
+	    treshold = Integer.valueOf(keyValueOption.get()
+		    .getProperty(KeyValueOptionKeys.FREE_MEMORY_HEALTH_CHECK_METHOD_TRESHOLD.getLabel(), String.valueOf(DEFAULT_TRESHOLD)));
 	}
 
 	return treshold;

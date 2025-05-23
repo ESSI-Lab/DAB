@@ -38,8 +38,9 @@ import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.gssrv.conf.task.collection.ParameterCollectionCreator;
 import eu.essi_lab.gssrv.conf.task.collection.SourceCollectionCreator;
@@ -55,7 +56,7 @@ import eu.essi_lab.profiler.wis.WISUtils;
 /**
  * @author boldrini
  */
-public class CollectionCreatorTask extends AbstractCustomTask implements HarvestingEmbeddedTask {
+public class CollectionCreatorTask extends AbstractEmbeddedTask  {
 
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
@@ -69,6 +70,42 @@ public class CollectionCreatorTask extends AbstractCustomTask implements Harvest
 	    log(status, "Custom task options missing, unable to perform task");
 
 	    return;
+	}
+
+	if (client == null) {
+
+	    try {
+
+		SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+
+		Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+
+		if (keyValueOption.isPresent()) {
+
+		    String host = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel());
+		    String port = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel());
+		    String user = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_USER.getLabel());
+		    String pwd = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel());
+
+		    if (host == null || port == null || user == null || pwd == null) {
+
+			GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
+
+		    } else {
+
+			client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
+		    }
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
+
+		}
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
+		throw e;
+	    }
 	}
 
 	String targetSourceIdentifiers = taskOptions.get().trim();
@@ -92,8 +129,8 @@ public class CollectionCreatorTask extends AbstractCustomTask implements Harvest
 		run(targetSource.get().getUniqueIdentifier());
 	    }
 	}
-	log(status, "Collection creator task ENDED");
 
+	log(status, "Collection creator task ENDED");
     }
 
     /**
@@ -160,48 +197,6 @@ public class CollectionCreatorTask extends AbstractCustomTask implements Harvest
     }
 
     private static MQTTPublisherHive client;
-
-    public static void setClient(MQTTPublisherHive client) {
-	CollectionCreatorTask.client = client;
-    }
-
-    static {
-	try {
-
-	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
-
-	    Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
-
-	    if (keyValueOption.isPresent()) {
-
-		String host = keyValueOption.get().getProperty("mqttBrokerHost");
-		String port = keyValueOption.get().getProperty("mqttBrokerPort");
-		String user = keyValueOption.get().getProperty("mqttBrokerUser");
-		String pwd = keyValueOption.get().getProperty("mqttBrokerPwd");
-
-		if (host == null || port == null || user == null || pwd == null) {
-
-		    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error("MQTT options not found!");
-
-		} else {
-
-		    client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
-		}
-	    } else {
-
-		GSLoggerFactory.getLogger(DataCacheAugmenter.class).error("Key-value pair options not found!");
-
-	    }
-	} catch (NullPointerException e) {
-
-	    // it happens in test env when calling ConfigurationWrapper.getSystemSettings() and a configuration is not
-	    // set
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
-	}
-    }
 
     @Override
     public String getName() {

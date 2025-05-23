@@ -39,23 +39,23 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.geotools.data.FileDataStore;
-import org.geotools.data.FileDataStoreFinder;
-import org.geotools.data.Query;
+import org.geotools.api.data.FileDataStore;
+import org.geotools.api.data.FileDataStoreFinder;
+import org.geotools.api.data.Query;
+import org.geotools.api.data.SimpleFeatureSource;
+import org.geotools.api.filter.Filter;
+import org.geotools.api.filter.FilterFactory;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.style.LineSymbolizer;
+import org.geotools.api.style.Stroke;
+import org.geotools.api.style.Style;
 import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.MapContent;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.accessor.s3.FeatureMetadata;
@@ -241,7 +241,7 @@ public class S3ShapeDownloader extends DataDownloader {
 						FileDataStore store = FileDataStoreFinder.getDataStore(file);
 						SimpleFeatureSource featureSource = store.getFeatureSource();
 
-						FilterFactory2 ff = org.geotools.factory.CommonFactoryFinder.getFilterFactory2(null);
+						FilterFactory ff = org.geotools.factory.CommonFactoryFinder.getFilterFactory(null);
 						Filter filter = ff.id(Collections.singleton(ff.featureId(online.getName())));
 
 						// Define the target CRS (e.g., EPSG:3857)

@@ -25,6 +25,7 @@ package eu.essi_lab.api.database.opensearch;
  */
 
 import java.io.InputStream;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,10 +49,12 @@ import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -143,7 +146,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 		wrapper, //
 		new RankingStrategy(), //
 		new HashMap<String, String>(), //
-		false,//
+		false, //
 		false);
 
 	Bond bond = null;
@@ -213,6 +216,26 @@ public class OpenSearchFolder implements DatabaseFolder {
 	String id = getEntryId(this, key);
 
 	boolean deleted = wrapper.delete(index, id);
+
+	wrapper.synch();
+
+	return deleted;
+    }
+
+    public boolean remove(List<String> toRemove) throws Exception {
+
+	String index = IndexData.detectIndex(this);
+
+	String folderId = getFolderId(this);
+
+	List<String> entries = new ArrayList<String>();
+
+	for (String r : toRemove) {
+	    String entryId = folderId + "_" + r;
+	    entries.add(entryId);
+	}
+
+	boolean deleted = wrapper.delete(index, entries);
 
 	wrapper.synch();
 
@@ -290,8 +313,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 		    Arrays.asList(field), // fields
 		    0, //
 		    MAX_PAGE_SIZE, //
-		    Optional.of(ResourceProperty.RESOURCE_TIME_STAMP), //
-		    Optional.of(SortOrder.ASCENDING), //
+		    Optional.of(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING)), //
 		    searchAfter, //
 		    false, // request cache
 		    true);// binaries excluded
@@ -395,4 +417,5 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	return wrapper.getSource(index, entryId);
     }
+
 }

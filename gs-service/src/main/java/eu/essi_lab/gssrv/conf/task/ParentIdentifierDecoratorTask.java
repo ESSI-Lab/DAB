@@ -37,8 +37,7 @@ import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
+import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.identifierdecorator.IdentifierDecorator;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -60,7 +59,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
 /**
  * @author Mattia Santoro
  */
-public class ParentIdentifierDecoratorTask extends AbstractCustomTask implements HarvestingEmbeddedTask {
+public class ParentIdentifierDecoratorTask extends AbstractEmbeddedTask  {
 
     @Override
     public String getName() {

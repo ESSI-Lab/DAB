@@ -33,6 +33,9 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.locationtech.jts.geom.Geometry;
+
+import eu.essi_lab.api.database.opensearch.index.Shape;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLStreamWriterUtils;
@@ -62,12 +65,7 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 	return new StreamingOutput() {
 
-	    private String latitude;
-	    private String longitude;
-	    private String west;
-	    private String east;
-	    private String north;
-	    private String south;
+	    private String geometry;
 	    private String platformName;
 	    private String platformCode;
 	    private String sourceID;
@@ -80,6 +78,7 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 		    GetSitesObjectFastTransformer transformer = new GetSitesObjectFastTransformer();
 		    DiscoveryMessage discoveryMessage = transformer.transform(webRequest);
+		    discoveryMessage.setExcludeResourceBinary(true);
 		    discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
 
 		    String cuahsiNS = "http://www.cuahsi.org/his/1.1/ws/";
@@ -126,21 +125,21 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 		    int totalExpected = 0;
 		    int currentSize = 0;
 		    int totalSize = 0;
-		    
+
 		    Optional<Bond> optUserBond = discoveryMessage.getUserBond();
 		    Bond userBond = null;
-		    
-		    if(optUserBond.isPresent()){
-			
+
+		    if (optUserBond.isPresent()) {
+
 			userBond = optUserBond.get();
 		    }
-		    
+
 		    do {
 
 			try {
-			    
+
 			    discoveryMessage.setUserBond(userBond);
-			    
+
 			    ResultSet<String> resultSet = exec(discoveryMessage);
 
 			    List<String> results = resultSet.getResultsList();
@@ -149,13 +148,7 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 				StAXDocumentParser parser = new StAXDocumentParser(result);
 
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "west"), v -> west = v);
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "south"), v -> south = v);
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "east"), v -> east = v);
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "north"), v -> north = v);
-				
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Latitude"), v -> latitude = v);
-				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Longitude"), v -> longitude = v);
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "geometry"), v -> geometry = v);
 
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "platformTitle"), v -> platformName = v);
 				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "uniquePlatformId"), v -> platformCode = v);
@@ -164,15 +157,18 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 				parser.parse();
 
-				if (west != null && !west.equals("") && east != null && !east.equals("") && north != null
-					&& !north.equals("") && south != null && !south.equals("")
-				) {
-				    latitude = north;
-				    longitude = west;
+				String latitude = "";
+				String longitude = "";
+				if (geometry != null && !geometry.isEmpty()) {
+				    Optional<Geometry> shape = Shape.of(geometry);
+				    if (shape.isPresent()) {
+					latitude = ""+shape.get().getEnvelopeInternal().getMaxY();
+					longitude = ""+shape.get().getEnvelopeInternal().getMaxX();
+				    }
 				}
-				
-				if (latitude != null && !latitude.equals("") && longitude != null && !longitude.equals("") && platformName != null
-					&& !platformName.equals("")//
+
+				if (latitude != null && !latitude.equals("") && longitude != null && !longitude.equals("")
+					&& platformName != null && !platformName.equals("")//
 					&& platformCode != null && !platformCode.equals("")//
 				// && sourceID != null && !sourceID.equals("")//
 				) {

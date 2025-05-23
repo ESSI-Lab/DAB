@@ -4,6 +4,7 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.TotalHitsRelation;
 
 /*-
  * #%L
@@ -63,11 +65,14 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
+import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -246,7 +251,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			queryables.stream().map(q -> q.getName()).collect(Collectors.toList()), //
 			message.getDistinctValuesElement().get(), //
 			message.getPage().getSize(), //
-			false).// binaries included
+			message.isResourceBinaryExcluded()).
 
 			stream().//
 			map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
@@ -268,6 +273,22 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		// set the search after, if present
 		OpenSearchUtils.getSearchAfter(response).ifPresent(sa -> resultSet.setSearchAfter(sa));
+
+		TotalHitsRelation relation = response.hits().total().relation();
+		String expected = "";
+		switch (relation) {
+		case Gte:
+		    expected = "More than " + response.hits().total().value();
+		    break;
+		case Eq:
+		default:
+		    expected = "Exactly " + response.hits().total().value();
+		    break;
+		}
+
+		CountSet count = new CountSet();
+		count.setExpectedLabel(expected);
+		resultSet.setCountResponse(count);
 	    }
 
 	    //
@@ -475,9 +496,20 @@ public class OpenSearchFinder implements DatabaseFinder {
 			Arrays.asList(ResourceProperty.SOURCE_ID.getName(), MetaFolderMapping.DATA_FOLDER), //
 			ResourceProperty.SOURCE_ID, //
 			sourceIds.size(), //
-			false); // binaries excluded
+			true); // binaries excluded
 
-		aggregateWithNestedAgg.forEach(agg -> {
+		List<String> incrementalSourceIds = ConfigurationWrapper.//
+			getIncrementalSources().//
+			stream().//
+			map(s -> s.getUniqueIdentifier()).//
+			collect(Collectors.toList());
+
+		List<JSONObject> incrementalExcluded = aggregateWithNestedAgg.//
+			stream().//
+			filter(v -> !incrementalSourceIds.contains(v.getString(MetaFolderMapping.SOURCE_ID))).//
+			collect(Collectors.toList());
+
+		incrementalExcluded.forEach(agg -> {
 
 		    String writingFolder = agg.getString(MetaFolderMapping.DATA_FOLDER);
 		    // query folder is opposite of the writing folder
@@ -516,11 +548,22 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    return new HashMap<String, String>();
 	}
 
+	List<GSSource> sources = new ArrayList<>();
+
+	Optional<View> view = message.getView();
+	if (view.isPresent()) {
+
+	    sources = ConfigurationWrapper.getViewSources(view.get());
+
+	} else {
+
+	    sources = message.getSources();
+	}
+
 	return getSourcesDataMap(//
 		database, //
 		wrapper, //
-		message.getSources().//
-			stream().//
+		sources.stream().//
 			map(s -> s.getUniqueIdentifier()).//
 			collect(Collectors.toList()), //
 		message.isCachedSourcesDataFolderMapUsed());
@@ -574,9 +617,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			message.getResourceSelector().getIndexes(), // fields
 			start, //
 			size, //
-			message.getSortProperty(), //
-			message.getSortOrder(), //
-			message.getSearchAfter(), //
+			message.getSortedFields(), message.getSearchAfter(), //
 			false, // request cache
 			message.isResourceBinaryExcluded());//
 	    }
@@ -610,4 +651,5 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	return GSException.createException(OpenSearchFinder.class, errorType, osex);
     }
+
 }

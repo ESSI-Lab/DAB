@@ -29,7 +29,8 @@ import java.util.Map;
 
 import org.geotools.coverage.io.netcdf.NetCDFReader;
 import org.geotools.coverage.io.netcdf.crs.NetCDFProjection;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.CRS;
+import org.geotools.util.factory.Hints;
 
 import ucar.ma2.Array;
 import ucar.nc2.Attribute;
@@ -60,31 +61,43 @@ public class GeoToolsNetCDFReader {
 
     }
 
-    public static CoordinateReferenceSystem extractCRS(NetcdfDataset dataset, Variable variable) throws Exception {
+    public static org.geotools.api.referencing.crs.CoordinateReferenceSystem extractCRS(NetcdfDataset dataset, Variable variable) throws Exception {
 	File tmpFile = File.createTempFile(GeoToolsNetCDFReader.class.getSimpleName(), ".nc");
 	tmpFile.deleteOnExit();
-	NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf3, tmpFile.getAbsolutePath());
+	NetcdfFileWriter writer = NetcdfFileWriter.createNew(Version.netcdf4, tmpFile.getAbsolutePath());
 
 	List<CoordinateAxis> axes = dataset.getCoordinateAxes();
 	Variable xAxis = null;
 	Variable yAxis = null;
+	Variable lonAxis = null;
+	Variable latAxis = null;
 	for (CoordinateAxis axe : axes) {
 	    AxisType type = axe.getAxisType();
 	    if (type != null) {
 		switch (type) {
 		case GeoX:
-		case Lon:
 		    xAxis = axe.getOriginalVariable();
 		    break;
+		case Lon:
+		    xAxis = axe.getOriginalVariable();
+		    lonAxis = axe.getOriginalVariable();
+		    break;
 		case GeoY:
+		    yAxis = axe.getOriginalVariable();
+		    break;
 		case Lat:
 		    yAxis = axe.getOriginalVariable();
+		    latAxis = axe.getOriginalVariable();
 		default:
 		    break;
 		}
 	    }
 	}
 
+	if (latAxis!=null && lonAxis!=null) {
+	    // likely EPSG:4326
+	    return CRS.decode("EPSG:4326", true);
+	}
 	if (xAxis == null || yAxis == null) {
 	    return null;
 	}
@@ -144,10 +157,10 @@ public class GeoToolsNetCDFReader {
 	NetcdfDataset newDataset = NetcdfDataset.openDataset(tmpFile.getAbsolutePath());
 
 	mainVariable = newDataset.findVariable(mainVariable.getShortName());
-
+	
 	NetCDFReader netCDFReader = new NetCDFReader(tmpFile.toURI().toURL(), null);
 
-	CoordinateReferenceSystem ret = netCDFReader.getCoordinateReferenceSystem();
+	org.geotools.api.referencing.crs.CoordinateReferenceSystem ret = netCDFReader.getCoordinateReferenceSystem();
 	
 	netCDFReader.dispose();
 

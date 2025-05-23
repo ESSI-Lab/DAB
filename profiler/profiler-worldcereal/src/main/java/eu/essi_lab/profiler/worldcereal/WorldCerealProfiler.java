@@ -68,7 +68,7 @@ public class WorldCerealProfiler extends Profiler<WorldCerealProfilerSetting> {
 	HandlerSelector selector = new HandlerSelector();
 
 	discoveryHandler = new WorldCerealHandler();
-	discoveryHandler.setRequestTransformer(new OSRequestTransformer());
+	discoveryHandler.setRequestTransformer(new OSRequestTransformer(getSetting()));
 
 	selector.register(new GETRequestFilter("worldcereal/query"), discoveryHandler);
 

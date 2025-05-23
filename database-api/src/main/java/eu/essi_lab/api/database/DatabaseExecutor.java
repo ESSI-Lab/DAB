@@ -32,12 +32,16 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -90,6 +94,8 @@ public interface DatabaseExecutor extends DatabaseProvider {
      * @throws GSException
      */
     public List<String> getIndexValues(DiscoveryMessage message, MetadataElement element, int start, int count) throws GSException;
+    
+    public ResultSet<TermFrequencyItem> getIndexValues(DiscoveryMessage message, Queryable element, int count, String resumptionToken) throws GSException;
 
     /**
      * @author Fabrizio
@@ -98,6 +104,7 @@ public interface DatabaseExecutor extends DatabaseProvider {
 
 	private int maxResults;
 	private int maxTermFrequencyItems = 50;
+
 	public int getMaxTermFrequencyItems() {
 	    return maxTermFrequencyItems;
 	}
@@ -170,17 +177,17 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	 * @param requestBond
 	 */
 	public void setConstraints(Bond requestBond) {
-	    
+
 	    this.constraints = requestBond;
 	}
 
 	/**
-	 * @return  
+	 * @return
 	 */
 	public Bond getConstraints() {
-	    
+
 	    return constraints;
-	}	
+	}
     }
 
     /**
@@ -239,7 +246,7 @@ public interface DatabaseExecutor extends DatabaseProvider {
 
 	    this.bbox = new SpatialExtent(south, west, north, east);
 	}
-	
+
 	public void setBbox(SpatialExtent bbox) {
 
 	    this.bbox = bbox;
@@ -316,5 +323,12 @@ public interface DatabaseExecutor extends DatabaseProvider {
      * @throws GSException
      */
     public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException;
+
+    /**
+     * @param message
+     * @return
+     * @throws Exception
+     */
+    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws Exception;
 
 }

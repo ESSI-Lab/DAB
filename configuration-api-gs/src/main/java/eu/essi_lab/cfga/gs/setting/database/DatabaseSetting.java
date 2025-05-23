@@ -119,6 +119,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 	    uriOption.setKey(DATABASE_URI_OPTION_KEY);
 	    uriOption.setRequired(true);
 	    uriOption.setCanBeDisabled(false);
+	    uriOption.setMultiValue(false);
 
 	    dbSettings.addOption(uriOption);
 

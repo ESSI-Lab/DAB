@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -86,7 +87,7 @@ public class TaskAgeMethod implements GSPingMethod {
 	if (option.isPresent()) {
 
 	    treshold = Integer
-		    .valueOf(option.get().getProperty("taskAgeHealthCheckMethodTreshold", String.valueOf(DEFAULT_TIME_THRESHOLD)));
+		    .valueOf(option.get().getProperty(KeyValueOptionKeys.TASK_AGE_HEALTH_CHECK_METHOD_TRESHOLD.getLabel(), String.valueOf(DEFAULT_TIME_THRESHOLD)));
 	}
 
 	return treshold;

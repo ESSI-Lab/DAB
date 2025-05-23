@@ -8,11 +8,11 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
+import org.geotools.api.referencing.NoSuchAuthorityCodeException;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.imageio.netcdf.GeoToolsNetCDFReader;
 import org.geotools.imageio.netcdf.utilities.NetCDFCRSUtilities;
 import org.junit.Test;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;

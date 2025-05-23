@@ -170,7 +170,7 @@ public class DownloadSetting extends ConfigurableSetting implements EditableSett
     public void setDownloadStorage(DownloadStorage downloadStorage) {
 
 	switch (downloadStorage) {
-	case LOCAL_DOWNLOAD_STORAGE:
+	case LOCAL_DOWNLOAD_STORAGE -> {
 
 	    if (getSetting(LOCAL_DOWNLOAD_SETTING_ID).isPresent()) {
 
@@ -181,10 +181,9 @@ public class DownloadSetting extends ConfigurableSetting implements EditableSett
 
 		getSetting(S3_DOWNLOAD_SETTING_ID).get().setSelected(false);
 	    }
+	}
 
-	    break;
-
-	case S3_DOWNLOAD_STORAGE:
+	case S3_DOWNLOAD_STORAGE -> {
 
 	    if (getSetting(LOCAL_DOWNLOAD_SETTING_ID).isPresent()) {
 
@@ -195,6 +194,7 @@ public class DownloadSetting extends ConfigurableSetting implements EditableSett
 
 		getSetting(S3_DOWNLOAD_SETTING_ID).get().setSelected(true);
 	    }
+	}
 	}
     }
 

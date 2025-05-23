@@ -70,6 +70,7 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
+import eu.essi_lab.wml._2.WML2QualityCategory;
 
 /**
  * @author Roberto
@@ -83,6 +84,8 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 
     private static final String HISCENTRAL_SARDEGNA_DOWNLOAD_ERROR = "HISCENTRAL_SARDEGNA_DOWNLOAD_ERROR";
+
+    public static final String MISSING_VALUE = "-9999.0";
 
     private HISCentralSardegnaConnector connector;
     private Downloader downloader;
@@ -205,7 +208,7 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 
 		    ValueSingleVariable variable = new ValueSingleVariable();
 
-		    BigDecimal missingValue = new BigDecimal("-9999.0");
+		    BigDecimal missingValue = new BigDecimal(MISSING_VALUE);
 
 		    BigDecimal dataValue = data.optBigDecimal("valore", missingValue);
 
@@ -221,6 +224,22 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 
 		    String date = data.optString("data_mis");// data.optString("datetime");
 
+		    Integer qualityCode = data.optIntegerObject("liv_validaz", null);
+		    if (qualityCode != null) {
+			WML2QualityCategory quality = null;
+			switch (qualityCode) {
+			case 2:
+			    // quality = WML2QualityCategory.GOOD;
+			    break;
+			case 3:
+			    break;
+			default:
+			    break;
+			}
+			if (quality != null) {
+			    variable.setQualityControlLevelCode(quality.getUri());
+			}
+		    }
 		    if (iso8601OutputFormat == null) {
 			iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ITALIAN);
 			iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));

@@ -216,7 +216,14 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
 
 	boolean unscheduled = scheduler.unscheduleJob(SchedulerUtils.createTriggerKey(setting));
 
-	GSLoggerFactory.getLogger(getClass()).info("Unscheduling: " + (unscheduled ? " SUCCEEDED" : "FAILED"));
+	if (unscheduled) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Unscheduling succeeded");
+
+	} else {
+
+	    GSLoggerFactory.getLogger(getClass()).warn("Worker {} is not scheduled, unscheduling skipped", setting.getName());
+	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Unscheduling of worker {} ENDED", setting.getName());
     }

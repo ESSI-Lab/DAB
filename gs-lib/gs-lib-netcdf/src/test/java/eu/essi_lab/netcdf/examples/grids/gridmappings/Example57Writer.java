@@ -84,7 +84,7 @@ public class Example57Writer {
 
 	// Filling with values
 
-	ucar.ma2.ArrayInt.D1 timeDoubles = new ArrayInt.D1(timeSize);
+	ucar.ma2.ArrayInt.D1 timeDoubles = new ArrayInt.D1(timeSize,false);
 	for (int i = 0; i < timeSize; i++) {
 	    timeDoubles.setDouble(i, startTime + i);
 	}

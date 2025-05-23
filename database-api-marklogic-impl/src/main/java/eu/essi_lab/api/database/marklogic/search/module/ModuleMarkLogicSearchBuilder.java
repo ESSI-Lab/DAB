@@ -34,6 +34,7 @@ import eu.essi_lab.api.database.marklogic.search.MarkLogicSpatialQueryBuilder;
 import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSearchBuilder;
 import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSpatialQueryBuilder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.lib.xml.QualifiedName;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -106,7 +107,7 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
 	if (keyValueOption.isPresent()) {
 
 	    Properties properties = keyValueOption.get();
-	    String option = properties.getProperty("coveringMode");
+	    String option = properties.getProperty(KeyValueOptionKeys.COVERING_MODE.getLabel());
 
 	    return option != null && option.equals("enabled");
 	}

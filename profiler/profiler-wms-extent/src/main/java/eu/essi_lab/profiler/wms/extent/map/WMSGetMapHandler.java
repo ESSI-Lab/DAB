@@ -55,6 +55,7 @@ import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.StationsStatistics;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
@@ -461,6 +462,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 			if (cachedLayer == null) {
 				if (!inPreparation.contains(layers)) {
 					inPreparation.add(layers);
+					GSLoggerFactory.getLogger(WMSGetMapHandler.class).info("Added layer in preparation: " + layers);
 					cachedLayer = new Layer(layers, view);
 					cachedLayer.prepare();
 					cachedLayers.put(layers, cachedLayer);

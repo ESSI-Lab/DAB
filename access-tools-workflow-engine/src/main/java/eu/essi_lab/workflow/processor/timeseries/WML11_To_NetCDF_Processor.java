@@ -65,6 +65,7 @@ import org.joda.time.DateTimeZone;
 
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.netcdf.NetCDFAttribute;
 import eu.essi_lab.netcdf.timeseries.H4SingleTimeSeriesWriter;
@@ -92,7 +93,7 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
     public static Double TOL = Math.pow(10, -8);
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
 
 	InputStream stream = new FileInputStream(dataObject.getFile());
 	InputStream result = convert(stream);
@@ -449,7 +450,8 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 	    IOUtils.copy(fis, baos);
 	    fis.close();
 	    baos.close();
-	    out.delete();
+		eu.essi_lab.lib.utils.FileTrash.deleteLater(out);
+
 	    return new ByteArrayInputStream(baos.toByteArray());
 	} catch (Exception e) {
 	    e.printStackTrace();

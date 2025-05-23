@@ -46,6 +46,7 @@ import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaClient;
 import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaClient.ID_FUNZIONE;
 import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaClient.ID_OPERATORE;
 import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaClient.ID_PERIODO;
+import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaClient.ID_VALIDITY_FLAG;
 import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaIdentifierMangler;
 import eu.essi_lab.accessor.hiscentral.lombardia.RendiDatiResult;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
@@ -64,6 +65,7 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
+import eu.essi_lab.wml._2.WML2QualityCategory;
 
 public class HISCentralLombardiaDownloader extends WMLDataDownloader {
 
@@ -172,8 +174,8 @@ public class HISCentralLombardiaDownloader extends WMLDataDownloader {
 
 	    ObjectFactory factory = new ObjectFactory();
 	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-	    
-	    
+	    BigDecimal nd = new BigDecimal("-999.0");
+	    tsrt.getTimeSeries().get(0).getVariable().setNoDataValue(nd.doubleValue());
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 	    if (name != null) {
@@ -209,10 +211,26 @@ public class HISCentralLombardiaDownloader extends WMLDataDownloader {
 		    vsv.setValue(v);
 		    GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 		    c.setTime(d);
-	            XMLGregorianCalendar date2 = xmlFactory.newXMLGregorianCalendar(c);
+		    XMLGregorianCalendar date2 = xmlFactory.newXMLGregorianCalendar(c);
 		    vsv.setDateTimeUTC(date2);
+		    WML2QualityCategory quality = null;		    
+		    if (v.compareTo(nd)==0) {
+			quality = WML2QualityCategory.MISSING;
+		    }
+		    ID_VALIDITY_FLAG validityFlag = dato.getValidityFlag();
+		    if (validityFlag!=null) {
+			switch (validityFlag) {
+			case V0:
+			    quality= WML2QualityCategory.GOOD;
+			    break;
+			default:
+			    break;
+			}
+		    }		    
+		    if (quality != null) {
+			vsv.setQualityControlLevelCode(quality.getUri());
+		    }
 		    addValue(tsrt, vsv);
-
 		}
 	    }
 	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);

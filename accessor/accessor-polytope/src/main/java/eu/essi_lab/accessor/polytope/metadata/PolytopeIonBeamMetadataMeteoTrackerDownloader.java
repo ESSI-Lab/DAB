@@ -145,8 +145,9 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 	descriptor.getFirstSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
 	descriptor.getSecondSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
 	descriptor.getSecondSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
-
-	descriptor.setVerticalDimension(bottom, top);
+	if (bottom != null && top != null) {
+	    descriptor.setVerticalDimension(bottom, top);
+	}
 
 	//
 	// temp extent
@@ -395,7 +396,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 	try {
 	    // Define a SimpleDateFormat with the combined pattern
 	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	    if(date.contains(".")) {
+	    if (date.contains(".")) {
 		date = date.split("\\.")[0];
 	    }
 	    // Parse the combined string into a Date object

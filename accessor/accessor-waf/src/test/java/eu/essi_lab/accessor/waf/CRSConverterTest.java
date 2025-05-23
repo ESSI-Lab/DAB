@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
@@ -99,7 +100,7 @@ public class CRSConverterTest {
 	NetcdfDataset netCDFdataset = NetcdfDataset.openDataset(ncPath);
 	GridDataset gds = ucar.nc2.dt.grid.GridDataset.open(//
 		netCDFdataset.getLocation(), //
-		EnumSet.of(Enhance.ScaleMissing, Enhance.CoordSystems, Enhance.ConvertEnums));
+		EnumSet.of(Enhance.ApplyScaleOffset, Enhance.CoordSystems, Enhance.ConvertEnums));
 
 	@SuppressWarnings("deprecation")
 	LatLonRect datasetBbox = gds.getBoundingBox();
@@ -122,7 +123,7 @@ public class CRSConverterTest {
 	TargetHandler handler = new TargetHandler(source, target, capabilities);
 
 	GDAL_NetCDF_CRS_Converter_Processor processor = new GDAL_NetCDF_CRS_Converter_Processor();
-	DataObject result = processor.process(dataObject, handler);
+	DataObject result = processor.process(new Dataset(), dataObject, handler);
 
 	File file = result.getFile();
 	System.out.println(file);

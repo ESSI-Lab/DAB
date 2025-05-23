@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +47,7 @@ import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
+import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalCRS;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -61,6 +63,7 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.FileIdentifierMapper;
+import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 
 public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 
@@ -145,9 +148,16 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
      * @param metadata
      * @return
      */
-    private String retrieveInterpolationCode(OriginalMetadata metadata) {
+    private Optional<String> retrieveInterpolationCode(OriginalMetadata metadata) {
 
-	return new JSONObject(metadata.getMetadata()).getString("interpolation");
+	try {
+	    return Optional.of(new JSONObject(metadata.getMetadata()).getString("interpolation"));
+	} catch (Exception ex) {
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	}
+
+	return Optional.empty();
     }
 
     /**
@@ -180,9 +190,18 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 
 	EMILIA_VARIABLE var = EMILIA_VARIABLE.decode(variable);
 
-	String interp = retrieveInterpolationCode(originalMD);
+	Optional<String> interp = retrieveInterpolationCode(originalMD);
 
-	EMILIA_TIMERANGE eInterp = EMILIA_TIMERANGE.decode(interp);
+	// EMILIA_TIMERANGE eInterp;
+
+	String interpLabel = "";
+
+	if (interp.isPresent()) {
+
+	    interpLabel = " (" + EMILIA_TIMERANGE.decode(interp.get()).getLabel() + ")";
+
+	    // eInterp = EMILIA_TIMERANGE.decode(interp.get());
+	}
 
 	// String level = retrieveLevel(originalMD);
 
@@ -209,7 +228,6 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    String dataUrl = HISCentralEmiliaConnector.BASE_URL;
 	    String unitName = null;
 	    int dataLength = 0;
-	    String title = null;
 
 	    CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
@@ -309,20 +327,22 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    // }
 	    // }
 	    //
-
+	    TemporalExtent temporalExtent = new TemporalExtent();
 	    if (startDate != null && endDate != null) {
-
-		coreMetadata.addTemporalExtent(startDate, endDate);
+		temporalExtent.setBeginPosition(startDate);
+		temporalExtent.setEndPosition(endDate);
+		temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+		coreMetadata.getDataIdentification().addTemporalExtent(temporalExtent);
 
 	    }
+	    
+	    setIndeterminatePosition(dataset);
 
-	    coreMetadata.getMIMetadata().getDataIdentification()
-		    .setCitationTitle(stationName + " - " + varName + " (" + eInterp.getLabel() + ")");
+	    coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(stationName + " - " + varName + interpLabel);
 
-	    coreMetadata.getMIMetadata().getDataIdentification().setCitationAlternateTitle(title);
+	    // coreMetadata.getMIMetadata().getDataIdentification().setCitationAlternateTitle(title);
 
-	    coreMetadata.getMIMetadata().getDataIdentification()
-		    .setAbstract(stationName + " - " + varName + " (" + eInterp.getLabel() + ")");
+	    coreMetadata.getMIMetadata().getDataIdentification().setAbstract(stationName + " - " + varName + interpLabel);
 
 	    GridSpatialRepresentation grid = new GridSpatialRepresentation();
 	    grid.setNumberOfDimensions(1);
@@ -354,7 +374,10 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    // variable vocabulary + variable code: both needed for access
 	    mangler.setParameterIdentifier(PLATFORM_PREFIX + ":" + var.name());
 
-	    mangler.setInterpolationIdentifier(interp);
+	    if (interp.isPresent()) {
+		
+		mangler.setInterpolationIdentifier(interp.get());
+	    }
 
 	    // String qualityCode = series.getQualityControlLevelID();
 	    //
@@ -374,37 +397,40 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    // variable = (variable.contains(" ")) ? variable.split(" ")[0] : varName;
 	    coverageDescription.setAttributeTitle(varName);
 
-	    InterpolationType interpolation = null;
+	    if (interp.isPresent()) {
 
-	    switch (interp.toLowerCase()) {
-	    case "average":
-		interpolation = InterpolationType.AVERAGE;
-		break;
-	    case "minimum":
-		interpolation = InterpolationType.MIN;
-		break;
-	    case "maximum":
-		interpolation = InterpolationType.MAX;
-		break;
-	    case "accumulation":
-		interpolation = InterpolationType.TOTAL;
-		break;
-	    case "istantaneous":
-		interpolation = InterpolationType.INSTANT_TOTAL;
-		break;
-	    case "vectorial":
-		interpolation = InterpolationType.STATISTICAL;
-		break;
-	    case "valid":
-		interpolation = InterpolationType.CONTINUOUS;
-		break;
-	    default:
-		interpolation = InterpolationType.decode(interp);
-		GSLoggerFactory.getLogger(getClass()).error("not known interpolation: {}", interp);
-		break;
+		InterpolationType interpolation = null;
+
+		switch (interp.get().toLowerCase()) {
+		case "average":
+		    interpolation = InterpolationType.AVERAGE;
+		    break;
+		case "minimum":
+		    interpolation = InterpolationType.MIN;
+		    break;
+		case "maximum":
+		    interpolation = InterpolationType.MAX;
+		    break;
+		case "accumulation":
+		    interpolation = InterpolationType.TOTAL;
+		    break;
+		case "istantaneous":
+		    interpolation = InterpolationType.INSTANT_TOTAL;
+		    break;
+		case "vectorial":
+		    interpolation = InterpolationType.STATISTICAL;
+		    break;
+		case "valid":
+		    interpolation = InterpolationType.CONTINUOUS;
+		    break;
+		default:
+		    interpolation = InterpolationType.decode(interp.get());
+		    GSLoggerFactory.getLogger(getClass()).error("not known interpolation: {}", interp);
+		    break;
+		}
+
+		dataset.getExtensionHandler().setTimeInterpolation(interpolation);
 	    }
-
-	    dataset.getExtensionHandler().setTimeInterpolation(interpolation);
 
 	    //
 	    // intendedObservationSpacing = "PT1H"
@@ -466,7 +492,7 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    coreMetadata.getDataIdentification().setResourceIdentifier(identifier);
 
 	    String resourceIdentifier = generateCode(dataset, stationName + "-" + varName);
-	    
+
 	    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
 	    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);

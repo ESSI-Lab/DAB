@@ -107,7 +107,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     @Override
-    public void select(Predicate<T> predicate) throws UnsetSelectionModeException{
+    public void select(Predicate<T> predicate) throws UnsetSelectionModeException {
 
 	if (getSelectionMode() == SelectionMode.UNSET) {
 
@@ -407,6 +407,26 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     public T getValue() {
 
 	return getOptionalValue().orElse(null);
+    }
+
+    /**
+     * Default: true
+     * 
+     * @return
+     */
+    public boolean isMultiValue() {
+
+	return isPropertySet("multiValue", true);
+    }
+
+    /**
+     * Default: false
+     * 
+     * @param required
+     */
+    public void setMultiValue(boolean multiValue) {
+
+	setProperty("multiValue", multiValue, true);
     }
 
     /**

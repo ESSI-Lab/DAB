@@ -26,9 +26,11 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,6 +60,8 @@ import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregate;
 import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation;
 import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.Builder;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.BulkRequest;
+import org.opensearch.client.opensearch.core.BulkResponse;
 import org.opensearch.client.opensearch.core.CountRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryResponse;
@@ -72,6 +76,7 @@ import org.opensearch.client.opensearch.core.MsearchRequest;
 import org.opensearch.client.opensearch.core.MsearchResponse;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.bulk.BulkOperation;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchResponseItem;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
 import org.opensearch.client.opensearch.core.search.Hit;
@@ -89,6 +94,7 @@ import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -363,8 +369,7 @@ public class OpenSearchWrapper {
 	    List<String> fields, //
 	    int start, //
 	    int size, //
-	    Optional<Queryable> orderingProperty, //
-	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
+	    Optional<SortedFields> sortedFields, //
 	    Optional<SearchAfter> searchAfter, //
 	    boolean requestCache, //
 	    boolean excludeResourceBinary)
@@ -380,18 +385,23 @@ public class OpenSearchWrapper {
 
 	    if (searchAfter.isPresent()) {
 
-		searchAfter.get().getDoubleValue().ifPresent(val -> builder.searchAfterVals(FieldValue.of(val)));
-		searchAfter.get().getLongValue().ifPresent(val -> builder.searchAfterVals(FieldValue.of(val)));
-		searchAfter.get().getStringValue().ifPresent(val -> builder.searchAfterVals(FieldValue.of(val)));
+		Optional<List<Object>> values = searchAfter.get().getValues();
+
+		if (values.isPresent()) {
+
+		    List<FieldValue> myFields = getFieldValues(values);
+
+		    builder.searchAfterVals(myFields);
+		}
 
 	    } else {
 
 		builder.from(start);
 	    }
 
-	    if (orderingProperty.isPresent() && sortOrder.isPresent()) {
+	    if (sortedFields.isPresent()) {
 
-		handleSort(builder, orderingProperty.get(), sortOrder.get());
+		handleSort(builder, sortedFields.get());
 	    }
 
 	    handleSourceFields(null, builder, fields, excludeResourceBinary);
@@ -409,8 +419,7 @@ public class OpenSearchWrapper {
 			size, //
 			searchAfter, //
 			start, //
-			orderingProperty, //
-			sortOrder, //
+			sortedFields, //
 			fields, //
 			excludeResourceBinary, //
 			requestCache);//
@@ -423,6 +432,29 @@ public class OpenSearchWrapper {
 	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	return response;
+    }
+
+    private List<FieldValue> getFieldValues(Optional<List<Object>> values) {
+	ArrayList<FieldValue> ret = new ArrayList<FieldValue>();
+	if (values.isEmpty()) {
+	    return ret;
+	}
+	for (Object obj : values.get()) {
+	    if (obj instanceof String) {
+		String str = (String) obj;
+		FieldValue fv = FieldValue.of(str);
+		ret.add(fv);
+	    } else if (obj instanceof Long) {
+		Long l = (Long) obj;
+		FieldValue fv = FieldValue.of(l);
+		ret.add(fv);
+	    } else if (obj instanceof Double) {
+		Double d = (Double) obj;
+		FieldValue fv = FieldValue.of(d);
+		ret.add(fv);
+	    }
+	}
+	return ret;
     }
 
     /**
@@ -444,7 +476,6 @@ public class OpenSearchWrapper {
 		Arrays.asList(), //
 		0, //
 		MAX_DEFAULT_HITS, //
-		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
 		false, //
@@ -477,7 +508,6 @@ public class OpenSearchWrapper {
 		size, //
 		Optional.empty(), //
 		Optional.empty(), //
-		Optional.empty(), //
 		false, //
 		false);
 
@@ -505,7 +535,6 @@ public class OpenSearchWrapper {
 		Arrays.asList(), //
 		0, //
 		MAX_DEFAULT_HITS, //
-		Optional.empty(), //
 		Optional.empty(), //
 		Optional.empty(), //
 		false, //
@@ -559,8 +588,7 @@ public class OpenSearchWrapper {
 		Arrays.asList(field), //
 		start, //
 		size, //
-		Optional.empty(), // ordering property
-		Optional.empty(), // sort order
+		Optional.empty(), // sorted properties
 		Optional.empty(), // search after
 		false, // request cache
 		true); // exclude binary
@@ -593,8 +621,15 @@ public class OpenSearchWrapper {
 
 	SearchResponse<Object> response = client.search(builder -> {
 
-	    builder.query(searchQuery).//
+	    builder.index(DataFolderMapping.get().getIndex()).//
+		    query(searchQuery).//
+		    size(0).//
 		    aggregations(map);
+
+	    if (OpenSearchDatabase.debugQueries) {
+
+		debugMinMaxRequest(searchQuery, field, map);
+	    }
 
 	    return builder;
 
@@ -656,6 +691,33 @@ public class OpenSearchWrapper {
 	synch();
 
 	return response.result() == Result.Deleted;
+    }
+
+    public boolean delete(String index, List<String> entries) throws OpenSearchException, IOException {
+
+	List<BulkOperation> operations = new ArrayList<>();
+	for (String id : entries) {
+	    operations.add(BulkOperation.of(b -> b.delete(d -> d.index(index).id(id))));
+	}
+
+	BulkRequest bulkRequest = new BulkRequest.Builder().operations(operations).build();
+
+	BulkResponse response = client.bulk(bulkRequest);
+
+	synch();
+
+	if (response.errors()) {
+
+	    response.items().forEach(item -> {
+		if (item.error() != null) {
+		    GSLoggerFactory.getLogger(getClass()).error("Failed to delete document ID {}: {}", item.id(), item.error().reason());
+		}
+	    });
+	    return false;
+	} else {
+	    return true;
+	}
+
     }
 
     /**
@@ -766,6 +828,28 @@ public class OpenSearchWrapper {
 
     /**
      * @param searchQuery
+     * @param field
+     * @param map
+     */
+    private void debugMinMaxRequest(Query searchQuery, String field, Map<String, Aggregation> map) {
+
+	GSLoggerFactory.getLogger(getClass()).debug("\n\n--- MIN/MAX QUERY ---\n");
+
+	org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
+
+	clone.index(DataFolderMapping.get().getIndex()).//
+		query(searchQuery).//
+		size(0).//
+		aggregations(map);
+
+	JSONObject object = OpenSearchUtils.toJSONObject(clone.build());
+	object.put("index", DataFolderMapping.get().getIndex());
+
+	GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
+    }
+
+    /**
+     * @param searchQuery
      * @param maxItems
      */
     private void debugCountRequest(Query searchQuery, List<Queryable> targets, int maxItems) {
@@ -810,8 +894,7 @@ public class OpenSearchWrapper {
 	    Integer size, //
 	    Optional<SearchAfter> searchAfter, //
 	    Integer start, //
-	    Optional<Queryable> orderingProperty, //
-	    Optional<eu.essi_lab.model.SortOrder> sortOrder, //
+	    Optional<SortedFields> sortedFields, //
 	    List<String> fields, //
 	    boolean excludeResourceBinary, //
 	    boolean requestCache) {
@@ -825,18 +908,17 @@ public class OpenSearchWrapper {
 
 	if (searchAfter.isPresent()) {
 
-	    searchAfter.get().getDoubleValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
-	    searchAfter.get().getLongValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
-	    searchAfter.get().getStringValue().ifPresent(val -> clone.searchAfterVals(FieldValue.of(val)));
+	    List<FieldValue> myFields = getFieldValues(searchAfter.get().getValues());
+	    clone.searchAfterVals(myFields);
 
 	} else {
 
 	    clone.from(start);
 	}
 
-	if (orderingProperty.isPresent() && sortOrder.isPresent()) {
+	if (sortedFields.isPresent()) {
 
-	    handleSort(clone, orderingProperty.get(), sortOrder.get());
+	    handleSort(clone, sortedFields.get());
 	}
 
 	handleSourceFields(null, clone, fields, excludeResourceBinary);
@@ -859,18 +941,23 @@ public class OpenSearchWrapper {
      */
     private void handleSort(//
 	    org.opensearch.client.opensearch.core.SearchRequest.Builder builder, //
-	    Queryable orderingProperty, eu.essi_lab.model.SortOrder sortOrder) {
-
-	ContentType contentType = orderingProperty.getContentType();
-	String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
-		: orderingProperty.getName();
-
-	builder.sort(new SortOptions.Builder().//
-		field(new FieldSort.Builder().//
-			field(field).//
-			order(sortOrder == eu.essi_lab.model.SortOrder.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
-		.//
-		build());
+	    SortedFields sortedFields) {
+	List<SortOptions> sortOptions = new ArrayList<SortOptions>();
+	for (SimpleEntry<Queryable, eu.essi_lab.model.SortOrder> sortedField : sortedFields.getFields()) {
+	    Queryable orderingProperty = sortedField.getKey();
+	    eu.essi_lab.model.SortOrder sortOrder = sortedField.getValue();
+	    ContentType contentType = orderingProperty.getContentType();
+	    String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
+		    : orderingProperty.getName();
+	    SortOptions sortOption = new SortOptions.Builder().//
+		    field(new FieldSort.Builder().//
+			    field(field).//
+			    order(sortOrder == eu.essi_lab.model.SortOrder.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
+		    .//
+		    build();
+	    sortOptions.add(sortOption);
+	}
+	builder.sort(sortOptions);
     }
 
     /**

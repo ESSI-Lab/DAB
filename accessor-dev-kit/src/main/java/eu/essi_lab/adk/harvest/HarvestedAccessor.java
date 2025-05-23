@@ -22,8 +22,10 @@ package eu.essi_lab.adk.harvest;
  */
 
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.cdk.harvest.IHarvestedQueryConnector;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
@@ -289,7 +291,15 @@ public abstract class HarvestedAccessor<C extends IHarvestedQueryConnector> impl
     @Override
     public boolean supportsIncrementalHarvesting() throws GSException {
 
-	return getConnector().supportsIncrementalHarvesting();
+	HarvestedConnectorSetting setting = ((HarvestedQueryConnector) getConnector()).getSetting();
+
+	boolean optionValue = Boolean.valueOf(setting.//
+		getKeyValueOptions().//
+		orElse(new Properties()).//
+		getOrDefault("incrementalHarvesting", "true").//
+		toString());
+
+	return optionValue && getConnector().supportsIncrementalHarvesting();
     }
 
     @Override

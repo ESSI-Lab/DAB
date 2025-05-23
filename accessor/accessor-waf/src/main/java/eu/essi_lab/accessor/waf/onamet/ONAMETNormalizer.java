@@ -76,7 +76,7 @@ public class ONAMETNormalizer {
 	    if (dimName.equals(timeName)) {
 		dimName = "time";
 	    }
-	    writer.addDimension(null, dimName, dimension.getLength(), dimension.isShared(), dimension.isUnlimited(),
+	    writer.addDimension(null, dimName, dimension.getLength(), dimension.isUnlimited(),
 		    dimension.isVariableLength());
 	}
 

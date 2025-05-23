@@ -36,9 +36,15 @@ public class IdentifierDecoratorComponent extends HarvestingComponent {
 
     private IdentifierDecorator identifierDecorator;
 
+    /**
+     * 
+     */
     public IdentifierDecoratorComponent() {
     }
 
+    /**
+     * @param identifierDecorator
+     */
     public IdentifierDecoratorComponent(IdentifierDecorator identifierDecorator) {
 
 	this.identifierDecorator = identifierDecorator;
@@ -48,6 +54,8 @@ public class IdentifierDecoratorComponent extends HarvestingComponent {
     public void apply(GSResource resource) throws HarvestingComponentException, DuplicatedResourceException, ConflictingResourceException {
 
 	try {
+
+	    this.identifierDecorator.setListRecordsRequest(getRequest());
 
 	    this.identifierDecorator.decorateHarvestedIdentifier(//
 		    resource, //

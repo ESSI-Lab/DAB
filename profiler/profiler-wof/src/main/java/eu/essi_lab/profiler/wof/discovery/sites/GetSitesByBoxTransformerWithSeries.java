@@ -1,5 +1,8 @@
 package eu.essi_lab.profiler.wof.discovery.sites;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -23,6 +26,7 @@ package eu.essi_lab.profiler.wof.discovery.sites;
 
 import java.util.Optional;
 
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.Queryable;
@@ -70,13 +74,9 @@ public class GetSitesByBoxTransformerWithSeries extends GetSitesTransformer {
     }
 
     @Override
-    protected Optional<Queryable> getOrderingProperty() {
-	return Optional.of(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+    protected Optional<SortedFields> getSortedFields() {
+	return Optional.of(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER,SortOrder.ASCENDING)))) ;
     }
 
-    @Override
-    protected Optional<SortOrder> getOrderingDirection() {
-	return Optional.of(SortOrder.ASCENDING);
-    }
 
 }

@@ -26,13 +26,31 @@ import java.io.OutputStreamWriter;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 
 public class FeaturesHandler extends OMHandler {
+
+    private DatabaseExecutor executor;
+
+    public FeaturesHandler()  {
+	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
+	try {
+	    this.executor = DatabaseProviderFactory.getExecutor(uri);
+	} catch (GSException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+    }
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -46,30 +64,45 @@ public class FeaturesHandler extends OMHandler {
     }
 
     protected void addIdentifier(OutputStreamWriter writer) throws IOException {
-	
+
     }
-    
+
+    protected ResultSet<String> exec(DiscoveryMessage message) throws GSException {
+	try {
+	    return executor.discoverDistinctStrings(message);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    throw GSException.createException();
+	}
+
+    }
+
     protected String getSetName() {
 	return "results";
     }
-    
+
     public void writeFeature(OutputStreamWriter writer, JSONObject feature) throws IOException {
 
-//	JSONObject properties = feature.getJSONObject("properties");
+	// JSONObject properties = feature.getJSONObject("properties");
 
 	JSONObject monitoringPoint = feature.getJSONObject("featureOfInterest");
 	monitoringPoint.remove("type");
-	
-	JSONObject shape = monitoringPoint.getJSONObject(getGeometryName());
-	monitoringPoint.put(getGeometryName(), shape);
+
+	String geometryName = getGeometryName();
+	if (monitoringPoint.has(geometryName)) {
+	    JSONObject shape = monitoringPoint.getJSONObject(geometryName);
+	    monitoringPoint.put(getGeometryName(), shape);
+	}
 
 	writer.write(monitoringPoint.toString());
 
 	writer.flush();
 
     }
-    
 
+    protected boolean getDistinctStations() {
+	return true;
+    }
 
     public String getObject() {
 	return "feature";

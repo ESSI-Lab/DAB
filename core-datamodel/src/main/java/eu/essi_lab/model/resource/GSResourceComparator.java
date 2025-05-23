@@ -78,7 +78,7 @@ public class GSResourceComparator {
 
 		    values = new ComparisonValues(ContentType.SPATIAL, optBbox2.get());
 
-		} else {
+		} else if (optBbox1.isPresent() && optBbox2.isPresent()) {
 
 		    BoundingBox bbox1 = optBbox1.get();
 		    BoundingBox bbox2 = optBbox2.get();

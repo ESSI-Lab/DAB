@@ -23,18 +23,10 @@ package eu.essi_lab.profiler.wms.extent.feature.info;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.math.BigDecimal;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Collection;
 import java.util.List;
 
-import javax.activation.MimeType;
-
-import org.apache.http.entity.mime.MIME;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.ibm.wsdl.extensions.mime.MIMEConstants;
 
 import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;

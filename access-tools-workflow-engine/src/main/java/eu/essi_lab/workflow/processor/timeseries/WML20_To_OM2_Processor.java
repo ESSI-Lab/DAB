@@ -30,6 +30,7 @@ import eu.essi_lab.jaxb.wml._2_0.CollectionType;
 import eu.essi_lab.jaxb.wml._2_0.om__2.OMObservationType;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.wml._2.JAXBWML2;
 import eu.essi_lab.workflow.processor.DataProcessor;
@@ -43,7 +44,7 @@ public class WML20_To_OM2_Processor extends DataProcessor {
     }
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
 
 	InputStream stream = new FileInputStream(dataObject.getFile());
 	InputStream result = convert(stream);

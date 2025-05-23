@@ -31,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.accessor.hiscentral.utils.HISCentralUtils;
+import eu.essi_lab.downloader.hiscentral.HISCentralPugliaDownloader;
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.Citation;
@@ -590,8 +591,7 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 
 	coverageDescription.setAttributeDescription(aggregationName);
 
-	String missingValue = "-9999";
-	dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
+	dataset.getExtensionHandler().setAttributeMissingValue(HISCentralPugliaDownloader.MISSING_VALUE);
 
 	if (measureUnits != null) {
 	    dataset.getExtensionHandler().setAttributeUnits(measureUnits);

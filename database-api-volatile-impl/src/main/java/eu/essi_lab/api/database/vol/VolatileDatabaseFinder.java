@@ -29,6 +29,6 @@ import eu.essi_lab.api.database.DatabaseFinder;
 /**
  * @author Fabrizio
  */
-public class VolatileDatabaseFinder extends VolatileDatabaseReader implements DatabaseFinder{
+public class VolatileDatabaseFinder extends VolatileDatabaseReader implements DatabaseFinder {
 
 }

@@ -27,15 +27,16 @@ import java.util.List;
 
 import javax.media.jai.PlanarImage;
 
+import org.geotools.api.coverage.grid.GridCoordinates;
+import org.geotools.api.coverage.grid.GridEnvelope;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.gce.geotiff.GeoTiffReader;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.image.util.ImageUtilities;
 import org.geotools.util.factory.Hints;
-import org.opengis.coverage.grid.GridCoordinates;
-import org.opengis.coverage.grid.GridEnvelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import eu.essi_lab.access.DataValidatorErrorCode;
 import eu.essi_lab.access.DataValidatorImpl;
@@ -139,13 +140,13 @@ public class GeoTIFFValidator extends DataValidatorImpl {
 	    coverage = reader.read(null);
 	    GridGeometry2D geometry = coverage.getGridGeometry();
 
-	    org.geotools.geometry.Envelope2D lowerCornerPixelEnvelope = geometry.gridToWorld(new GridEnvelope2D(0, 0, 1, 1));
+	    ReferencedEnvelope lowerCornerPixelEnvelope = geometry.gridToWorld(new GridEnvelope2D(0, 0, 1, 1));
 
 	    double min1 = lowerCornerPixelEnvelope.getCenterX();
 	    double min2 = lowerCornerPixelEnvelope.getCenterY();
 	    double res1 = lowerCornerPixelEnvelope.getWidth();
 
-	    org.geotools.geometry.Envelope2D upperCornerPixelEnvelope = geometry
+	    ReferencedEnvelope upperCornerPixelEnvelope = geometry
 		    .gridToWorld(new GridEnvelope2D(width - 1, height - 1, 1, 1));
 
 	    double max1 = upperCornerPixelEnvelope.getCenterX();

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPathExpressionException;
@@ -125,6 +126,7 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 
 	String token = request.getResumptionToken();
+
 	//
 	// most OAI-PMH services provide a temporary resumption token, so it cannot be reused
 	//
@@ -140,60 +142,54 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 
 	if (token == null) {
 
-	    /**
-	     * FIX FOR GEOSS EUMETSAT DATA CATALOGUE
-	     * It seems that TIME is not supported by EUMETSAT OAI-PMH catalogue
-	     **/
+	    from = request.getFromDateStamp();
+	    until = request.getUntilDateStamp();
 
-	    if (!getSourceURL().contains("eoportal.eumetsat.int")) {
+	    if (until == null) {
+		until = ISO8601DateTimeUtils.getISO8601DateTime();
+	    }
 
-		from = request.getFromDateStamp();
-		until = request.getUntilDateStamp();
-		if (until == null) {
-		    until = ISO8601DateTimeUtils.getISO8601DateTime();
-		}
+	    //
+	    // removing milliseconds, if present (never supported)
+	    //
+	    if (from != null && from.contains(".")) {
+		from = from.substring(0, from.indexOf("."));
+	    }
 
-		//
-		// removing milliseconds, if present (never supported)
-		//
-		if (from != null && from.contains(".")) {
-		    from = from.substring(0, from.indexOf("."));
-		}
-		if (until != null && until.contains(".")) {
-		    until = from.substring(0, until.indexOf("."));
-		}
+	    if (until != null && until.contains(".")) {
+		until = from.substring(0, until.indexOf("."));
+	    }
 
-		//
-		// granularity check
-		//
-		XMLDocumentReader identifyResponse = getIdentifyResponse(getSourceURL());
-		String granularity = getGranularity(identifyResponse);
+	    //
+	    // granularity check
+	    //
+	    XMLDocumentReader identifyResponse = getIdentifyResponse(getSourceURL());
+	    String granularity = getGranularity(identifyResponse);
 
-		if (granularity != null) {
+	    if (granularity != null) {
 
-		    if (!granularity.contains("T")) {
-			if (from != null && from.contains("T")) {
-			    from = from.substring(0, from.indexOf('T'));
-			}
-			if (until != null && until.contains("T")) {
-			    until = until.substring(0, until.indexOf('T'));
-			}
+		if (!granularity.contains("T")) {
+		    if (from != null && from.contains("T")) {
+			from = from.substring(0, from.indexOf('T'));
 		    }
+		    if (until != null && until.contains("T")) {
+			until = until.substring(0, until.indexOf('T'));
+		    }
+		}
 
-		    if (granularity.endsWith("Z")) {
-			if (from != null && !from.endsWith("Z")) {
-			    from = from + "Z";
-			}
-			if (until != null && !until.endsWith("Z")) {
-			    until = until + "Z";
-			}
-		    } else {
-			if (from != null && from.endsWith("Z")) {
-			    from = from.substring(0, from.length() - 1);
-			}
-			if (until != null && until.endsWith("Z")) {
-			    until = until.substring(0, until.length() - 1);
-			}
+		if (granularity.endsWith("Z")) {
+		    if (from != null && !from.endsWith("Z")) {
+			from = from + "Z";
+		    }
+		    if (until != null && !until.endsWith("Z")) {
+			until = until + "Z";
+		    }
+		} else {
+		    if (from != null && from.endsWith("Z")) {
+			from = from.substring(0, from.length() - 1);
+		    }
+		    if (until != null && until.endsWith("Z")) {
+			until = until.substring(0, until.length() - 1);
 		    }
 		}
 	    }
@@ -318,9 +314,9 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 
 	if (super.getSourceURL().contains("sios.csw.met.no")) {
 	    return super.getSourceURL().endsWith("mode=oaipmh&") ? super.getSourceURL() : super.getSourceURL() + "&";
-	} else if(super.getSourceURL().contains("www.vliz.be/projects/mission-atlantic")) {
+	} else if (super.getSourceURL().contains("www.vliz.be/projects/mission-atlantic")) {
 	    return super.getSourceURL().endsWith("module=dataset&") ? super.getSourceURL() : super.getSourceURL() + "&";
-	} 
+	}
 	return super.getSourceURL().endsWith("?") ? super.getSourceURL() : super.getSourceURL() + "?";
     }
 
@@ -408,6 +404,7 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	    // set the resumption token
 	    Node tokenNode = reader.evaluateNode("//*:resumptionToken");
 	    String resToken = null;
+
 	    if (tokenNode != null) {
 
 		if (GSLoggerFactory.getLogger(getClass()).isDebugEnabled())
@@ -417,6 +414,12 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 		resToken = reader.evaluateString(tokenNode, "text()");
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).debug("No resumption token element found, connection closed");
+	    }
+
+	    if (getSourceURL().contains("bluecloud-sios")) {
+		if (resToken != null && resToken.equals("0")) {
+		    resToken = null;
+		}
 	    }
 
 	    if (resToken != null && !resToken.equals("")) {
@@ -517,7 +520,8 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 
 	if (token != null) {
 	    listRecords += "&resumptionToken=" + token;
-	    if ((listRecords.contains("sios.csw.met.no") || listRecords.contains("www.vliz.be/projects/mission-atlantic")) && !listRecords.contains("metadataPrefix")) {
+	    if ((listRecords.contains("sios.csw.met.no") || listRecords.contains("www.vliz.be/projects/mission-atlantic"))
+		    && !listRecords.contains("metadataPrefix")) {
 		listRecords += "&metadataPrefix=" + preferredPrefix;
 	    }
 	} else {

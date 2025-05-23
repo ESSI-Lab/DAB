@@ -13,6 +13,7 @@ import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.profiler.os.OSProfilerSetting;
 import eu.essi_lab.profiler.os.handler.discover.OSRequestTransformer;
 
 public class OSSearchTermsRequestTest {
@@ -25,7 +26,7 @@ public class OSSearchTermsRequestTest {
 
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
-	OSRequestTransformer transformer = new OSRequestTransformer();
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
 	try {
 
@@ -51,7 +52,7 @@ public class OSSearchTermsRequestTest {
 
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
-	OSRequestTransformer transformer = new OSRequestTransformer();
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
 	try {
 
@@ -77,7 +78,7 @@ public class OSSearchTermsRequestTest {
 
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
-	OSRequestTransformer transformer = new OSRequestTransformer();
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
 	try {
 
@@ -110,7 +111,7 @@ public class OSSearchTermsRequestTest {
 
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
-	OSRequestTransformer transformer = new OSRequestTransformer();
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
 	try {
 
@@ -143,7 +144,7 @@ public class OSSearchTermsRequestTest {
 
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
-	OSRequestTransformer transformer = new OSRequestTransformer();
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
 	try {
 
@@ -176,7 +177,7 @@ public class OSSearchTermsRequestTest {
 
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
-	OSRequestTransformer transformer = new OSRequestTransformer();
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
 	try {
 
@@ -209,7 +210,7 @@ public class OSSearchTermsRequestTest {
 
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
-	OSRequestTransformer transformer = new OSRequestTransformer();
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
 	try {
 
@@ -246,7 +247,7 @@ public class OSSearchTermsRequestTest {
 
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
-	OSRequestTransformer transformer = new OSRequestTransformer();
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
 	try {
 
@@ -298,7 +299,7 @@ public class OSSearchTermsRequestTest {
 
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
-	OSRequestTransformer transformer = new OSRequestTransformer();
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
 	try {
 
@@ -350,7 +351,7 @@ public class OSSearchTermsRequestTest {
 
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
-	OSRequestTransformer transformer = new OSRequestTransformer();
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
 	try {
 

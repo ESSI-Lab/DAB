@@ -51,7 +51,7 @@ public class NetCDFToRDBProcessTest {
     }
 
     private void commonTest() throws Exception {
-	DataObject rdbObject = process.process(dataObject, null);
+	DataObject rdbObject = process.process(null, dataObject, null);
 
 	File file = rdbObject.getFile();
 	FileInputStream fis = new FileInputStream(file);

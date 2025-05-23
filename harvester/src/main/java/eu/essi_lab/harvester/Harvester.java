@@ -29,6 +29,7 @@ import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.adk.harvest.IHarvestedAccessor;
 import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
 import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask.ExecutionStage;
@@ -42,6 +43,8 @@ import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.HarvestingStrategy;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -146,6 +149,13 @@ public class Harvester {
 
 	ListRecordsRequest request = new ListRecordsRequest(status);
 
+	//
+	// set the source storage worker to the request
+	//
+	SourceStorageWorker worker = getSourceStorage().getDatabase().getWorker(getAccessor().getSource().getUniqueIdentifier());
+	request.setAdditionalInfo(
+		GSPropertyHandler.of(new GSProperty<SourceStorageWorker>(ListRecordsRequest.SOURCE_STORAGE_WORKER_PROPERTY, worker)));
+
 	try {
 
 	    getSourceStorage().harvestingStarted(//
@@ -228,7 +238,7 @@ public class Harvester {
 
 	    if (executionStage != null && executionStage == ExecutionStage.BEFORE_HARVESTING_END) {
 
-		handleCustomTask(getAccessor().getSource(), context, status);
+		handleCustomTask(getAccessor().getSource(), context, status, request);
 	    }
 
 	    getSourceStorage().harvestingEnded(//
@@ -239,7 +249,7 @@ public class Harvester {
 
 	    if (executionStage != null && executionStage == ExecutionStage.AFTER_HARVESTING_END) {
 
-		handleCustomTask(getAccessor().getSource(), context, status);
+		handleCustomTask(getAccessor().getSource(), context, status, request);
 	    }
 
 	} catch (GSException ex) {
@@ -352,8 +362,13 @@ public class Harvester {
      * @param gsSource
      * @param context
      * @param status
+     * @param request
      */
-    private void handleCustomTask(GSSource gsSource, JobExecutionContext context, SchedulerJobStatus status) {
+    private void handleCustomTask(//
+	    GSSource gsSource, //
+	    JobExecutionContext context, //
+	    SchedulerJobStatus status, //
+	    ListRecordsRequest request) {
 
 	if (customTask != null) {
 
@@ -361,6 +376,7 @@ public class Harvester {
 
 		GSLoggerFactory.getLogger(getClass()).info("Execution of custom task {} STARTED", customTask.getName());
 
+		customTask.setListRecordsRequest(request);
 		customTask.setSource(gsSource);
 		customTask.doJob(context, status);
 
@@ -455,7 +471,7 @@ public class Harvester {
 
 	    applyHarvestingPlan(//
 		    response.getRecords(), //
-		    request.isFirstHarvesting(), //
+		    request, //
 		    recovery, //
 		    isIncremental, //
 		    resumptionToken, //
@@ -495,7 +511,7 @@ public class Harvester {
      */
     private void applyHarvestingPlan(//
 	    Iterator<GSResource> records, //
-	    boolean firstHarvesting, //
+	    ListRecordsRequest request, //
 	    boolean isRecovering, //
 	    boolean isIncremental, //
 	    String resumptionToken, //
@@ -515,9 +531,11 @@ public class Harvester {
 
 	    HarvesterPlan plan = getPlan();
 
+	    plan.setRequest(request);
 	    plan.setResumptionToken(resumptionToken);
 	    plan.setHarvestingProperties(harvestingProperties);
-	    plan.setIsFirstHarvesting(firstHarvesting);
+	    plan.setIsFirstHarvesting(request.isFirstHarvesting());
+	    plan.setIsIncrementalHarvesting(isIncremental);
 
 	    try {
 

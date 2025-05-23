@@ -48,7 +48,7 @@ public enum RDFElement {
     INSTRUMENTS(true, false, getInstrumentsQuery()), //
     INSTRUMENTLABELSANDURIS(true, true, getInstrumentsURIQuery()), //
     URLS_AND_TYPES(true, true, getDistributionsQuery()), //
-    CREATORS(true, false, getMultipleQueryTemplate("dct:creator")), //
+    CREATORS(true, true, getCreatorURIQuery()), //
     //
     ORGNAME(false, false, getSimpleQueryTemplate("schema:Organization", "schema:name")), //
     ORGALTERNATENAME(false, false, getSimpleQueryTemplate("schema:Organization", "schema:alternateName")), //
@@ -203,6 +203,17 @@ public enum RDFElement {
 		+ //
 		"  }}";
     }
+    
+    private static String getCreatorURIQuery() {
+ 	return getMultipleQueryHeader() + //
+
+ 		" WHERE { ?dataset a dcat:Dataset; \n" + //
+ 		"  OPTIONAL {\n" + //
+ 		"    ?dataset dct:creator ?creator.\n" + //
+ 		"    ?creator a schema:Organization .\n" + //
+		"                OPTIONAL{?creator schema:identifier ?" + VAR_PLACEHOLDER + "1 }\n" + // 		
+ 		"  }}";
+     }
 
     private static String getInstrumentsQuery() {
 	return getMultipleQueryHeader() + //

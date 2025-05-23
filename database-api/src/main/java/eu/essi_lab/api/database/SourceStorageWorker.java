@@ -279,6 +279,22 @@ public class SourceStorageWorker {
 	    return folderName;
 	}
 
+	if (folderName.endsWith(SourceStorageWorker.DATA_1_POSTFIX)) {
+
+	    folderName = folderName.replace(suiteId + "_", "");
+	    folderName = folderName.replace(DATA_1_POSTFIX, "");
+
+	    return folderName;
+	}
+
+	if (folderName.endsWith(SourceStorageWorker.DATA_2_POSTFIX)) {
+
+	    folderName = folderName.replace(suiteId + "_", "");
+	    folderName = folderName.replace(DATA_2_POSTFIX, "");
+
+	    return folderName;
+	}
+
 	return null;
     }
 
@@ -430,10 +446,10 @@ public class SourceStorageWorker {
      */
     void harvestingStarted(//
 	    HarvestingStrategy strategy, //
-	    SourceStorage storage,//
+	    SourceStorage storage, //
 	    boolean recovery, //
 	    boolean resumed, //
-	    Optional<SchedulerJobStatus> status,//
+	    Optional<SchedulerJobStatus> status, //
 	    Optional<ListRecordsRequest> request) throws Exception {
 
 	this.strategy = strategy;
@@ -760,9 +776,30 @@ public class SourceStorageWorker {
 
 	case SELECTIVE:
 
-	    writingFolder = getData1Folder();
+	    debug("Selective harvesting finalization STARTED", status);
 
-	    getData1Folder().remove(WRITING_FOLDER_TAG);
+	    if (isData1WritingFolder()) {
+
+		writingFolder = getData1Folder();
+
+		getData1Folder().remove(WRITING_FOLDER_TAG);
+
+		if (existsData2Folder()) {
+		    removeData2Folder();
+		}
+
+	    } else if (isData2WritingFolder()) {
+
+		writingFolder = getData2Folder();
+
+		getData2Folder().remove(WRITING_FOLDER_TAG);
+
+		if (existsData1Folder()) {
+		    removeData1Folder();
+		}
+	    }
+	    
+	    debug("Selective harvesting finalization ENDED", status);
 	}
 
 	debug("Updating harvesting properties STARTED", status);
@@ -1009,6 +1046,8 @@ public class SourceStorageWorker {
 	    if (request.isPresent() && request.get().getExpectedRecords().isPresent()) {
 
 		treshold = request.get().getExpectedRecords().get();
+
+		debug("Setting treshold according to the expected number of records: " + StringUtils.format(treshold), status);
 
 		GSLoggerFactory.getLogger(getClass()).info("Setting treshold according to the expected number of records: {}",
 			StringUtils.format(treshold));

@@ -329,14 +329,15 @@ public class GIResourceParser extends StAXDocumentParser {
 
     public GIResourceParser(String result) throws XMLStreamException, IOException {
 	super(result);
-	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.IDENTIFIER.getName()), v -> fileIdentifier = v);
-	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, ResourceProperty.SOURCE_ID_NAME), v -> sourceId = v);
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.IDENTIFIER.getName()), v -> fileIdentifier = normalize(v));
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, ResourceProperty.SOURCE_ID_NAME), v -> sourceId = normalize(v));
 
-	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "west"), v -> west = v);
-	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "south"), v -> south = v);
-	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "east"), v -> east = v);
-	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "north"), v -> north = v);
-	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "geometry"), v -> geometry = v);
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "west"), v -> west = normalize(v));
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "south"), v -> south = normalize(v));
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "east"), v -> east = normalize(v));
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "north"), v -> north = normalize(v));
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "geometry"), v -> geometry = normalize(v));
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "bbox"), v -> geometry = normalize(v));
 
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.RESOURCE_IDENTIFIER.getName()), v -> this.resourceId = v);
 
@@ -413,6 +414,13 @@ public class GIResourceParser extends StAXDocumentParser {
 	if (result.contains("tmpExtentEnd_Now")) {
 	    this.tmpExtentEndNow = "true";
 	}
+    }
+
+    private String normalize(String v) {
+	if (v==null) {
+	    return null;
+	}
+	return v.trim();
     }
 
     public String getTitle() {

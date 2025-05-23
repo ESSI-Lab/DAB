@@ -30,7 +30,6 @@ import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -72,13 +71,13 @@ import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialEntity;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -105,7 +104,7 @@ import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1DTime;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dataset.NetcdfDataset.Enhance;
-import ucar.nc2.ft.FeatureCollection;
+import ucar.nc2.ft.DsgFeatureCollection;
 import ucar.nc2.ft.FeatureDataset;
 import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.nc2.ft.PointFeature;
@@ -233,7 +232,7 @@ public class OMHandler extends StreamingRequestHandler {
 		switch (format) {
 		case "CSV":
 		    fields = new CSVField[] { CSVField.MONITORING_POINT, CSVField.OBSERVED_PROPERTY, CSVField.TIMESERIES_ID,
-			    CSVField.DATE_TIME, CSVField.VALUE, CSVField.UOM, CSVField.LATITUDE, CSVField.LONGITUDE };
+			    CSVField.DATE_TIME, CSVField.VALUE, CSVField.UOM, CSVField.LATITUDE, CSVField.LONGITUDE, CSVField.QUALITY };
 		    break;
 		case "JSON":
 		    break;
@@ -269,8 +268,6 @@ public class OMHandler extends StreamingRequestHandler {
 		    // selector.addIndex(MetadataElement.BOUNDING_BOX);
 		    // selector.addIndex(MetadataElement.COUNTRY);
 		    discoveryMessage.setResourceSelector(selector);
-		    discoveryMessage.setSortOrder(SortOrder.ASCENDING);
-		    discoveryMessage.setSortProperty(MetadataElement.ONLINE_ID);
 		}
 
 		OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
@@ -285,43 +282,86 @@ public class OMHandler extends StreamingRequestHandler {
 
 		boolean first = true;
 		SearchAfter searchAfter = null;
+		boolean distinctStations = getDistinctStations();
+		String lastStation = null;
+
+		Optional<Bond> initial = discoveryMessage.getUserBond();
+		String resumption = request.getParameterValue(eu.essi_lab.profiler.om.OMRequest.APIParameters.RESUMPTION_TOKEN);
+		if (resumption != null) {
+		    List<Object> values = new ArrayList<Object>();
+		    String[] split = resumption.split(",");
+		    for (String rs : split) {
+			values.add(rs);
+		    }
+		    searchAfter = new SearchAfter(values);
+		    discoveryMessage.setSearchAfter(searchAfter);
+		}
 		do {
 
 		    try {
 			if (searchAfter != null) {
 			    discoveryMessage.setSearchAfter(searchAfter);
 			}
+			if (initial.isPresent()) {
+			    discoveryMessage.setUserBond(initial.get());
+			}
 			resultSet = exec(discoveryMessage);
+
 			searchAfter = resultSet.getSearchAfter().isPresent() ? resultSet.getSearchAfter().get() : null;
 
 			List<String> results = resultSet.getResultsList();
-			tempSize += pageSize;
 
-			if (results.isEmpty()) {
-			    printErrorMessage(output, "No " + getObject() + " matched");
-			    return;
+			String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
+
+			if ((includeValues != null
+				&& (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
+
+			    String asynch = request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD);
+
+			    if (results.size() > 1) {
+				if (asynch != null && asynch.toLowerCase().equals("true")) {
+				    printErrorMessage(output,
+					    "Asynch download is not yet implemented: coming soon.");
+				    return;
+				} else {
+				    String info = resultSet.getCountResponse().getExpectedLabel();
+				    if (info == null) {
+					info = "";
+				    }
+				    printErrorMessage(output,
+					    "Requests to download more than one dataset should be handled asynchronously. " + info);
+				    return;
+				}
+			    }
+
 			}
+			// if (results.isEmpty()) {
+			// printErrorMessage(output, "No " + getObject() + " matched");
+			// return;
+			// }
 
 			List<JSONObservation> observations = new ArrayList<>();
-			GSLoggerFactory.getLogger(getClass()).info("sorting");
 			GSLoggerFactory.getLogger(getClass()).info("mapping");
 			List<String> identifiers = new ArrayList<>();
-			int j = 0;
-			for (String result : results) {
-			    ObservationMapper observationMapper = new ObservationMapper();
-			    Optional<View> view = discoveryMessage.getView();
-			    JSONObservation observation = observationMapper.map(view, result, propertySet);
-			    observations.add(observation);
-			}
-			Collections.sort(observations, new Comparator<JSONObservation>() {
+			ObservationMapper observationMapper = new ObservationMapper();
+			Optional<View> view = discoveryMessage.getView();
 
-			    @Override
-			    public int compare(JSONObservation o1, JSONObservation o2) {
-				return o1.getId().compareTo(o2.getId());
+			for (String result : results) {
+			    JSONObservation observation = observationMapper.map(view, result, propertySet);
+			    if (distinctStations) {
+				String stationId = observation.getFeatureOfInterest().getId();
+				if (lastStation == null || !lastStation.equals(stationId)) {
+				    observations.add(observation);
+				    lastStation = stationId;
+				} else {
+				    // skip
+				}
+			    } else {
+				observations.add(observation);
 			    }
-			});
-			for (JSONObservation feature : observations) {
-			    identifiers.add(feature.getId());
+			}
+			for (JSONObservation observation : observations) {
+			    identifiers.add(observation.getId());
 			}
 			GSLoggerFactory.getLogger(getClass()).info("getting data");
 			List<DataRecord> datas = new ArrayList<>();
@@ -329,37 +369,38 @@ public class OMHandler extends StreamingRequestHandler {
 			if (useCache) {
 			    datas = dataCacheConnector.getRecords(begin, end, identifiers.toArray(new String[] {}));
 			}
+			tempSize += observations.size();
 			GSLoggerFactory.getLogger(getClass()).info("formatting");
+
+			if (format.equals("JSON")) {
+			    if (first) {
+				writer.write("{");
+				addIdentifier(writer);
+				writer.write("\"" + getSetName() + "\":[");
+			    }
+			}
+			if (format.equals("CSV")) {
+			    if (first) {
+				int i = 0;
+				for (CSVField field : fields) {
+				    writer.write(field.label);
+				    if (i++ == fields.length - 1) {
+					writer.write("\n");
+				    } else {
+					writer.write("\t");
+				    }
+				}
+
+			    }
+			}
+
 			for (JSONObservation observation : observations) {
 
 			    ObservationType type = observation.getType();
 			    String dataId = observation.getId();
 
-			    if (format.equals("JSON")) {
-				if (first) {
-				    writer.write("{");
-				    addIdentifier(writer);
-				    writer.write("\"" + getSetName() + "\":[");
-				}
-			    }
-			    if (format.equals("CSV")) {
-				if (first) {
-				    int i = 0;
-				    for (CSVField field : fields) {
-					writer.write(field.label);
-					if (i++ == fields.length - 1) {
-					    writer.write("\n");
-					} else {
-					    writer.write("\t");
-					}
-				    }
-
-				}
-			    }
-
 			    // DATA part
 
-			    String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
 			    if ((includeValues != null
 				    && (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
 
@@ -456,19 +497,34 @@ public class OMHandler extends StreamingRequestHandler {
 			throw new RuntimeException("Exception writing response");
 
 		    }
-		    int rest = userSize - tempSize;
-		    if (rest > 0 && rest < pageSize) {
-			userPage.setSize(rest);
-		    }
-		    userPage.setStart(userPage.getStart() + pageSize);
+		    // int rest = userSize - tempSize;
+		    // if (rest > 0 && rest < pageSize) {
+		    // userPage.setSize(rest);
+		    // }
+		    // userPage.setStart(userPage.getStart() + pageSize);
 
 		    writer.flush();
 
-		} while (tempSize < userSize && tempSize < resultSet.getCountResponse().getCount()
-			&& !resultSet.getResultsList().isEmpty());
+		} while (tempSize < userSize && searchAfter != null);
 
 		if (format.equals("JSON")) {
-		    writer.write("]}"); // result array closed, main JSON closed
+
+		    String resumptionToken = "";
+		    boolean completed = true;
+		    if (searchAfter != null && searchAfter.getValues().isPresent() && !searchAfter.getValues().get().isEmpty()) {
+			String rt = "";
+			for (Object v : searchAfter.getValues().get()) {
+			    rt += v.toString() + ",";
+			}
+			if (rt.endsWith(",")) {
+			    rt = rt.substring(0, rt.length() - 1);
+			}
+			resumptionToken = ",\"resumptionToken\":\"" + rt + "\"";
+			completed = false;
+		    }
+
+		    writer.write("],\"completed\":" + completed + "" + resumptionToken + " }"); // result array closed,
+												// main JSON closed
 		}
 		writer.flush();
 		writer.close();
@@ -603,7 +659,7 @@ public class OMHandler extends StreamingRequestHandler {
 	    private void addPointsFromTrajectoryNetCDF(File file, JSONObservation observation, String viewId) {
 		FeatureDataset dataset = null;
 		NetcdfDataset.setDefaultEnhanceMode(
-			Collections.unmodifiableSet(EnumSet.of(Enhance.ScaleMissing, Enhance.CoordSystems, Enhance.ConvertEnums)));
+			Collections.unmodifiableSet(EnumSet.of(Enhance.ApplyScaleOffset, Enhance.CoordSystems, Enhance.ConvertEnums)));
 		try {
 
 		    dataset = FeatureDatasetFactoryManager.open(FeatureType.TRAJECTORY, file.getAbsolutePath(), null, null);
@@ -616,12 +672,12 @@ public class OMHandler extends StreamingRequestHandler {
 
 		    PointDatasetImpl fdp = (PointDatasetImpl) dataset;
 
-		    List<FeatureCollection> collections = fdp.getPointFeatureCollectionList();
+		    List<DsgFeatureCollection> collections = fdp.getPointFeatureCollectionList();
 
 		    if (collections.get(0) instanceof StandardTrajectoryCollectionImpl) {
 			StandardTrajectoryCollectionImpl collection = (StandardTrajectoryCollectionImpl) collections.get(0);
 
-			PointFeatureCollectionIterator iterator = collection.getPointFeatureCollectionIterator(-1);
+			PointFeatureCollectionIterator iterator = collection.getPointFeatureCollectionIterator();
 
 			while (iterator.hasNext()) {
 			    PointFeatureCollection pfc = iterator.next();
@@ -631,7 +687,7 @@ public class OMHandler extends StreamingRequestHandler {
 				double alt = spf.getLocation().getAltitude();
 				double lon = spf.getLocation().getLongitude();
 				double lat = spf.getLocation().getLatitude();
-				long time = spf.getNominalTimeAsDate().getTime();
+				long time = spf.getNominalTimeAsCalendarDate().getMillis();
 				StructureData data = spf.getFeatureData();
 				// List<Member> members = data.getMembers();
 				// StructureMembers structureMembers = data.getStructureMembers();
@@ -689,22 +745,30 @@ public class OMHandler extends StreamingRequestHandler {
 				if (dateTimeAttribute != null) {
 				    String date = dateTimeAttribute.getValue();
 				    String value = readValue(reader);
+				    BigDecimal v = null;
 				    if (nodataValue == null || !nodataValue.equals(value)) {
-					Optional<Date> d = ISO8601DateTimeUtils.parseISO8601ToDate(date);
-					try {
-					    BigDecimal v = new BigDecimal(value);
-					    if (d.isPresent() && v != null) {
-
-						List<Double> coord = observation.getFeatureOfInterest().getCoordinates();
-						if (coord != null) {
-						    observation.addPointAndLocation(d.get(), v, coord);
-						} else {
-						    observation.addPoint(d.get(), v);
-						}
-					    }
-					} catch (Exception e) {
-					}
+					v = new BigDecimal(value);
 				    }
+				    Attribute qualityAttribute = startElement.getAttributeByName(new QName("qualityControlLevelCode"));
+				    String quality = null;
+				    if (qualityAttribute != null) {
+					quality = qualityAttribute.getValue();
+				    }
+
+				    Optional<Date> d = ISO8601DateTimeUtils.parseISO8601ToDate(date);
+				    try {
+					if (d.isPresent()) {
+
+					    List<Double> coord = observation.getFeatureOfInterest().getCoordinates();
+					    if (coord != null) {
+						observation.addPointAndLocationAndQuality(d.get(), v, coord, quality);
+					    } else {
+						observation.addPointAndQuality(d.get(), v, quality);
+					    }
+					}
+				    } catch (Exception e) {
+				    }
+
 				}
 				break;
 			    default:
@@ -727,6 +791,10 @@ public class OMHandler extends StreamingRequestHandler {
 
 	};
 
+    }
+
+    protected boolean getDistinctStations() {
+	return false;
     }
 
     protected String getSetName() {
@@ -827,8 +895,24 @@ public class OMHandler extends StreamingRequestHandler {
 	    JSONObject point = points.getJSONObject(i);
 	    JSONObject timeObject = point.getJSONObject("time");
 	    String time = timeObject.getString("instant");
-	    BigDecimal value = point.getBigDecimal("value");
-
+	    String quality = null;
+	    if (point.has("metadata")) {
+		JSONObject metadataObject = point.getJSONObject("metadata");
+		if (metadataObject.has("quality")) {
+		    JSONObject qualityObject = metadataObject.getJSONObject("quality");
+		    String term = qualityObject.getString("term");
+		    String vocab = qualityObject.getString("vocabulary");
+		    String separator = "";
+		    if (!vocab.endsWith("/") && !term.startsWith("/")) {
+			separator = "/";
+		    }
+		    quality = vocab + separator + term;
+		}
+	    }
+	    BigDecimal value = null;
+	    if (point.has("value")) {
+		value = point.getBigDecimal("value");
+	    }
 	    int j = 0;
 	    for (CSVField field : fields) {
 		switch (field) {
@@ -858,6 +942,11 @@ public class OMHandler extends StreamingRequestHandler {
 		case LONGITUDE:
 		    writer.write(lon);
 		    break;
+		case QUALITY:
+		    if (quality != null) {
+			writer.write(quality);
+		    }
+		    break;
 		default:
 		    break;
 		}
@@ -874,7 +963,8 @@ public class OMHandler extends StreamingRequestHandler {
     public enum CSVField {
 
 	TIMESERIES_ID("Timeseries identifier"), MONITORING_POINT("Monitoring point"), UOM("Units"), OBSERVED_PROPERTY(
-		"Observed property"), DATE_TIME("Date time"), VALUE("Value"), LATITUDE("Latitude"), LONGITUDE("Longitude");
+		"Observed property"), DATE_TIME(
+			"Date time"), VALUE("Value"), LATITUDE("Latitude"), LONGITUDE("Longitude"), QUALITY("Quality");
 
 	private String label;
 

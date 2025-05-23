@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -36,10 +37,12 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.SortOptions;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.TopLeftBottomRightGeoBounds;
@@ -48,6 +51,9 @@ import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.BucketSortAggregation;
 import org.opensearch.client.opensearch._types.aggregations.Buckets;
 import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregation;
+import org.opensearch.client.opensearch._types.aggregations.CompositeAggregation;
+import org.opensearch.client.opensearch._types.aggregations.CompositeAggregationSource;
+import org.opensearch.client.opensearch._types.aggregations.CompositeBucket;
 import org.opensearch.client.opensearch._types.aggregations.FiltersBucket;
 import org.opensearch.client.opensearch._types.aggregations.GeoBoundsAggregate;
 import org.opensearch.client.opensearch._types.aggregations.GeoCentroidAggregate;
@@ -63,13 +69,17 @@ import org.opensearch.client.opensearch.core.search.Hit;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.stats.ComputationResult;
 import eu.essi_lab.messages.stats.ResponseItem;
 import eu.essi_lab.messages.stats.StatisticsMessage;
@@ -154,7 +164,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	Optional<Queryable> groupByTarget = message.getGroupByTarget();
 
-
 	boolean isQueryBBOXUnion = message.isQueryBboxUnionComputationSet();
 	boolean isOutputSources = message.isOutputSources();
 	boolean isTemporalUnion = message.isQueryTempExtentUnionComputationSet();
@@ -168,7 +177,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	if (message.getView() != null && message.getView().isPresent() && message.getView().get().getBond() != null) {
 	    bonds.add(message.getView().get().getBond());
 	    dMessage.setSources(ConfigurationWrapper.getViewSources(message.getView().get()));
-	}else {
+	} else {
 	    dMessage.setSources(message.getSources());
 	}
 	switch (bonds.size()) {
@@ -530,41 +539,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	// }
 	// }
 
-	DiscoveryMessage message = new DiscoveryMessage();
-	List<Bond> bonds = new ArrayList<Bond>();
-	if (request.getConstraints() != null) {
-	    bonds.add(request.getConstraints());
-	}
-	if (request.getView() != null && request.getView().getBond() != null) {
-	    // message.setSources(ConfigurationWrapper.getViewSources(request.getView()));
-	    bonds.add(request.getView().getBond());
-	}
-	switch (bonds.size()) {
-	case 0:
-	    // nothing to do
-	    break;
-	case 1:
-	    message.setUserBond(bonds.get(0));
-	    message.setPermittedBond(bonds.get(0));
-	    break;
-	default:
-	    message.setUserBond(BondFactory.createAndBond(bonds));
-	    message.setPermittedBond(BondFactory.createAndBond(bonds));
-	    break;
-	}
-
-	Query tmp = null;
-	if (!bonds.isEmpty()) {
-	    String s = bonds.toString();
-	    if (lastBond != null && lastBond.equals(s)) {
-		tmp = lastQuery;
-	    } else {
-		tmp = finder.buildQuery(message, true);
-		lastBond = s;
-		lastQuery = tmp;
-	    }
-	}
-	Query query = tmp;
+	Query query = getQuery(request.getConstraints(), request.getView());
 
 	// Bounding box queries for regions
 	List<SpatialExtent> extents = request.getExtents();
@@ -768,6 +743,209 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	}
 	//
 	return null;
+
+    }
+
+    private Query getQuery(Bond constraints, View view) throws GSException {
+	DiscoveryMessage message = new DiscoveryMessage();
+	List<Bond> bonds = new ArrayList<Bond>();
+	if (constraints != null) {
+	    bonds.add(constraints);
+	}
+	if (view != null && view.getBond() != null) {
+	    // message.setSources(ConfigurationWrapper.getViewSources(request.getView()));
+	    bonds.add(view.getBond());
+	}
+	switch (bonds.size()) {
+	case 0:
+	    // nothing to do
+	    break;
+	case 1:
+	    message.setUserBond(bonds.get(0));
+	    message.setPermittedBond(bonds.get(0));
+	    break;
+	default:
+	    message.setUserBond(BondFactory.createAndBond(bonds));
+	    message.setPermittedBond(BondFactory.createAndBond(bonds));
+	    break;
+	}
+
+	Query tmp = null;
+	if (!bonds.isEmpty()) {
+	    String s = bonds.toString();
+	    if (lastBond != null && lastBond.equals(s)) {
+		tmp = lastQuery;
+	    } else {
+		tmp = finder.buildQuery(message, true);
+		lastBond = s;
+		lastQuery = tmp;
+	    }
+	}
+	return tmp;
+    }
+
+    @Override
+    public ResultSet<TermFrequencyItem> getIndexValues(DiscoveryMessage message, Queryable queryable, int count, String resumptionToken)
+	    throws GSException {
+
+	Query query = getQuery(message.getUserBond().isPresent() ? message.getUserBond().get() : null,
+		message.getView().isPresent() ? message.getView().get() : null);
+
+	if (queryable == null) {
+	    return null;
+	}
+
+	int size = message.getPage() == null ? 1000 : Math.min(1000, message.getPage().getSize());
+
+	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder()
+		.terms(t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
+
+	org.opensearch.client.opensearch._types.aggregations.CompositeAggregation.Builder cab = new CompositeAggregation.Builder();
+	cab = cab.size(size).sources(Map.of(queryable.getName(), stationIdSource));
+	if (resumptionToken != null) {
+	    cab = cab.after(Map.of(queryable.getName(), resumptionToken));
+	}
+	CompositeAggregation compositeAgg =
+
+		cab.build();
+
+	List<String> includeList = new ArrayList<String>();
+
+	includeList.add(queryable.getName());
+
+	Aggregation distinctsAggregation = new Aggregation.Builder().composite(compositeAgg).build();
+
+	SearchRequest searchRequest = SearchRequest//
+		.of(s -> s.index(DataFolderMapping.get().getIndex()).size(0).query(query).aggregations("distincts", distinctsAggregation));
+
+	// --- Execute the Search Request ---
+	SearchResponse<Void> response;
+	try {
+	    response = client.search(searchRequest, Void.class);
+	} catch (OpenSearchException | IOException e) {
+	    e.printStackTrace();
+	    throw GSException.createException();
+	}
+
+	List<CompositeBucket> buckets = response.aggregations().get("distincts").composite().buckets().array();
+
+	ResultSet<TermFrequencyItem> ret = new ResultSet<TermFrequencyItem>();
+	for (CompositeBucket bucket : buckets) {
+	    String term = bucket.key().get(queryable.getName()).to(String.class);
+	    long termCount = bucket.docCount();
+
+	    TermFrequencyItem item = new TermFrequencyItem();
+	    item.setTerm(term);
+	    item.setDecodedTerm(term);
+	    item.setFreq((int) termCount);
+	    item.setLabel(queryable.getName());
+	    ret.getResultsList().add(item);
+
+	}
+
+	// Update the `afterKey` for the next iteration
+	Map<String, JsonData> afterKey = response.aggregations().get("distincts").composite().afterKey();
+
+	if (afterKey != null && !afterKey.isEmpty()) {
+	    List<Object> values = new ArrayList<Object>();
+	    values.add(afterKey.values().iterator().next().toString().replace("\"", ""));
+	    SearchAfter sa = new SearchAfter(values);
+	    ret.setSearchAfter(sa);
+	}
+	return ret;
+
+    }
+
+    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws Exception {
+	ResultSet<String> ret = new ResultSet<String>();
+
+	Query query = getQuery(message.getUserBond().isPresent() ? message.getUserBond().get() : null,
+		message.getView().isPresent() ? message.getView().get() : null);
+
+	Optional<Queryable> distinct = message.getDistinctValuesElement();
+	if (distinct.isEmpty()) {
+	    return null;
+	}
+
+	Queryable queryable = distinct.get();
+
+	int size = Math.min(1000, message.getPage().getSize());
+
+	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder()
+		.terms(t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
+
+	org.opensearch.client.opensearch._types.aggregations.CompositeAggregation.Builder cab = new CompositeAggregation.Builder();
+	cab = cab.size(size).sources(Map.of(queryable.getName(), stationIdSource));
+	if (message.getSearchAfter().isPresent()) {
+	    SearchAfter sa = message.getSearchAfter().get();
+	    cab = cab.after(Map.of(queryable.getName(), sa.getValues().get().get(0).toString()));
+	}
+	CompositeAggregation compositeAgg =
+
+		cab.build();
+
+	List<String> includeList = new ArrayList<String>();
+	for (String element : message.getResourceSelector().getIndexes()) {
+	    includeList.add(element);
+	}
+
+	Aggregation topHitsAgg = new Aggregation.Builder()
+		.topHits(th -> th.size(1).source(src -> src.filter(f -> f.includes(includeList)))
+			.sort(sort -> sort.field(f -> f.field(IndexMapping.toKeywordField(queryable.getName())).order(SortOrder.Desc))))
+		.build();
+
+	Aggregation distinctsAggregation = new Aggregation.Builder().composite(compositeAgg)
+		.aggregations(Map.of("sample_record", topHitsAgg)).build();
+
+	SearchRequest searchRequest = SearchRequest//
+		.of(s -> s.index(DataFolderMapping.get().getIndex()).size(0).query(query).aggregations("distincts", distinctsAggregation));
+
+	// --- Execute the Search Request ---
+	SearchResponse<Void> response = client.search(searchRequest, Void.class);
+
+	List<CompositeBucket> buckets = response.aggregations().get("distincts").composite().buckets().array();
+
+	for (CompositeBucket bucket : buckets) {
+
+	    List<Hit<JsonData>> hits = bucket.aggregations().get("sample_record").topHits().hits().hits();
+
+	    // --- Parse and print each document ---
+	    for (Hit<JsonData> hit : hits) {
+		JsonData source = hit.source();
+		if (source != null) {
+		    JSONObject sj = new JSONObject(source.toString());
+		    Dataset d = new Dataset();
+		    for (String element : message.getResourceSelector().getIndexes()) {
+			if (sj.has(element)) {
+			    JSONArray array = sj.optJSONArray(element, null);
+			    String s = null;
+			    if (array != null && array.length() > 0) {
+				s = array.get(0).toString();
+			    } else {
+				s = sj.optString(element);
+			    }
+			    if (s != null) {
+				IndexedElement ie = new IndexedElement(element, s);
+				d.getIndexesMetadata().write(ie);
+			    }
+			}
+
+		    }
+		    ret.getResultsList().add(d.asString(true));
+		}
+	    }
+	}
+
+	// Update the `afterKey` for the next iteration
+	Map<String, JsonData> afterKey = response.aggregations().get("distincts").composite().afterKey();
+
+	if (afterKey != null && !afterKey.isEmpty()) {
+	    List<Object> values = new ArrayList<Object>();
+	    values.add(afterKey.values().iterator().next().toString().replace("\"", ""));
+	    SearchAfter sa = new SearchAfter(values);
+	    ret.setSearchAfter(sa);
+	}
+	return ret;
 
     }
 

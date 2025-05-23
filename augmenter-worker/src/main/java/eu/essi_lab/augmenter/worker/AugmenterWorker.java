@@ -62,6 +62,7 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
@@ -444,8 +445,7 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 
 	if (sorting) {
 
-	    message.setSortOrder(SortOrder.ASCENDING);
-	    message.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
+	    message.setSortedFields(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING));
 	}
     }
 

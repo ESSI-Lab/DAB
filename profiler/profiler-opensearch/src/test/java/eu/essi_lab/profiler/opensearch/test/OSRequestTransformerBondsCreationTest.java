@@ -27,6 +27,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.os.OSBox;
 import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
 import eu.essi_lab.profiler.os.OSParameters;
+import eu.essi_lab.profiler.os.OSProfilerSetting;
 import eu.essi_lab.profiler.os.OSRequestParser;
 import eu.essi_lab.profiler.os.handler.discover.OSRequestTransformer;
 
@@ -295,7 +296,7 @@ public class OSRequestTransformerBondsCreationTest {
     }
 
     private OSRequestTransformer createTransformer() {
-	OSRequestTransformer transformer = new OSRequestTransformer() {
+	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting()) {
 	    @Override
 	    public DiscoveryMessage transform(WebRequest request) throws GSException {
 

@@ -71,7 +71,6 @@ import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.SpatialIndexHelper;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent.FrameValue;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -245,10 +244,7 @@ public class OpenSearchQueryBuilder {
 
 	if (sourceId != null) {
 
-	    sourceIdQuery = OpenSearchQueryBuilder.buildRangeQuery(//
-		    ResourceProperty.SOURCE_ID.getName(), //
-		    BondOperator.EQUAL, //
-		    sourceId);
+	    sourceIdQuery = buildSourceIdQuery(sourceId);
 	}
 
 	return buildMinMaxValueQuery(//
@@ -307,11 +303,7 @@ public class OpenSearchQueryBuilder {
 		// see BondFactory.createMinMaxResourcePropertyBond
 		//
 		switch (bond.getProperty().getContentType()) {
-		case DOUBLE:
-		case INTEGER:
-		case LONG:
-		case ISO8601_DATE:
-		case ISO8601_DATE_TIME:
+		case DOUBLE, INTEGER, LONG, ISO8601_DATE, ISO8601_DATE_TIME -> {
 
 		    try {
 			return buildMinMaxValueQuery(name, operator == BondOperator.MAX, true);
@@ -320,23 +312,16 @@ public class OpenSearchQueryBuilder {
 
 			GSLoggerFactory.getLogger(getClass()).error(ex);
 		    }
-
-		default:
-		    throw new IllegalArgumentException("Min/max query on non numeric field: " + name);
+		}
+		default -> throw new IllegalArgumentException("Min/max query on non numeric field: " + name);
 		}
 	    }
 	}
 
-	switch (property) {
-	case SOURCE_ID:
-
-	    return buildSourceIdQuery(bond);
-
-	case IS_GEOSS_DATA_CORE:
-
-	    return buildIsGDCQuery(value);
-
-	default:
+	return switch (property) {
+	case SOURCE_ID -> buildSourceIdQuery(bond);
+	case IS_GEOSS_DATA_CORE -> buildIsGDCQuery(value);
+	default -> {
 
 	    if (contentType == ContentType.ISO8601_DATE || contentType == ContentType.ISO8601_DATE_TIME) {
 
@@ -349,8 +334,9 @@ public class OpenSearchQueryBuilder {
 
 	    String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(name) : name;
 
-	    return buildRangeQuery(field, operator, value);
+	    yield buildRangeQuery(field, operator, value);
 	}
+	};
     }
 
     /**
@@ -359,7 +345,6 @@ public class OpenSearchQueryBuilder {
      * @param value
      * @return
      */
-    @SuppressWarnings("incomplete-switch")
     public Query buildMetadataElementQuery(MetadataElement el, BondOperator operator, String value) {
 
 	if (el == MetadataElement.TEMP_EXTENT_BEGIN || el == MetadataElement.TEMP_EXTENT_END) {
@@ -367,19 +352,10 @@ public class OpenSearchQueryBuilder {
 	    return buildTempExtentQuery(el, operator, value);
 	}
 
-	switch (operator) {
-	case EXISTS:
-	    return buildExistsFieldQuery(el.getName());
-
-	case NOT_EXISTS:
-	    return buildNotExistsFieldQuery(el.getName());
-
-	case NOT_EQUAL:
-	case EQUAL:
-	case GREATER:
-	case GREATER_OR_EQUAL:
-	case LESS:
-	case LESS_OR_EQUAL:
+	return switch (operator) {
+	case EXISTS -> buildExistsFieldQuery(el.getName());
+	case NOT_EXISTS -> buildNotExistsFieldQuery(el.getName());
+	case NOT_EQUAL, EQUAL, GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EQUAL -> {
 
 	    if (el.getContentType() == ContentType.ISO8601_DATE || el.getContentType() == ContentType.ISO8601_DATE_TIME) {
 
@@ -392,13 +368,14 @@ public class OpenSearchQueryBuilder {
 
 	    String field = el.getContentType() == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(el.getName()) : el.getName();
 
-	    return buildRangeQuery(//
+	    yield buildRangeQuery(//
 		    field, //
 		    operator, //
 		    value, //
 		    ranking.computePropertyWeight(el));
+	}
 
-	case TEXT_SEARCH:
+	case TEXT_SEARCH -> {
 
 	    List<String> terms = Arrays.asList(value.split(" "));
 
@@ -406,19 +383,19 @@ public class OpenSearchQueryBuilder {
 
 		if (isWildcardQuery(value)) {
 
-		    return buildWildCardQuery(DataFolderMapping.toKeywordField(el.getName()), value, ranking.computePropertyWeight(el));
+		    yield buildWildCardQuery(DataFolderMapping.toKeywordField(el.getName()), value, ranking.computePropertyWeight(el));
 		}
 
-		return buildMatchPhraseQuery(el.getName(), value, ranking.computePropertyWeight(el));
+		yield buildMatchPhraseQuery(el.getName(), value, ranking.computePropertyWeight(el));
 	    }
 
-	    return buildWildCardQuery(//
+	    yield buildWildCardQuery(//
 		    DataFolderMapping.toKeywordField(el.getName()), //
 		    "*" + value + "*", //
 		    ranking.computePropertyWeight(el));
 	}
-
-	throw new IllegalArgumentException("Operator " + operator + " not supported for field " + el.getName());
+	default -> throw new IllegalArgumentException("Operator " + operator + " not supported for field " + el.getName());
+	};
     }
 
     /**
@@ -437,8 +414,9 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public Query build(boolean count) {
-
-	Query searchQuery = OpenSearchUtils.toQuery(new JSONObject(builder.toString()));
+	String str = builder.toString().trim();
+	
+	Query searchQuery = str.isEmpty()?null: OpenSearchUtils.toQuery(new JSONObject(str));
 
 	Optional<Query> basicQuery = buildBasicQuery(count);
 
@@ -489,7 +467,7 @@ public class OpenSearchQueryBuilder {
 
 	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Contains);
 
-	    weightedQuery = buildContainedWeightQuery(area, 500);
+	    weightedQuery = weightedQueriesInclued ? buildContainedWeightQuery(area, 500) : null;
 
 	    break;
 
@@ -504,7 +482,7 @@ public class OpenSearchQueryBuilder {
 		operands.add(buildAreaWeightedQuery(min, area));
 	    }
 
-	    weightedQuery = buildShouldQuery(operands);
+	    weightedQuery = weightedQueriesInclued ? buildShouldQuery(operands) : null;
 
 	    break;
 	case DISJOINT:
@@ -531,15 +509,17 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildIsGDCQuery(String value) {
 
-	ArrayList<Query> list = new ArrayList<Query>();
+	ArrayList<Query> shouldList = new ArrayList<Query>();
 
 	List<String> ids = ConfigurationWrapper.getGDCSourceSetting().getSelectedSourcesIds();
-	ids.forEach(id -> list.add(buildRangeQuery(//
-		ResourceProperty.SOURCE_ID.getName(), BondOperator.EQUAL, id)));
+	ids.forEach(id -> shouldList.add(buildSourceIdQuery(id)));
 
-	list.add(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value));
+	shouldList.add(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value));
 
-	return buildFilterQuery(list);
+	return buildBoolQuery(//
+		Arrays.asList(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value)), //
+		shouldList, //
+		Arrays.asList());
     }
 
     /**
@@ -975,8 +955,15 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildMustQuery(List<Query> operands) {
 
+	List<Query>notNulls = new ArrayList<Query>();
+	for (Query operand: operands) {
+	    if (operand!=null) {
+		notNulls.add(operand);
+	    }
+	}
+	
 	return new BoolQuery.Builder().//
-		must(operands).//
+		must(notNulls).//
 		build().//
 		toQuery();
     }
@@ -1240,8 +1227,8 @@ public class OpenSearchQueryBuilder {
     private Query buildTempExtentNowQuery(MetadataElement el) {
 
 	String field = el == MetadataElement.TEMP_EXTENT_BEGIN ? //
-		IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName() : //
-		IndexedElements.TEMP_EXTENT_END_NOW.getElementName();
+		MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName() : //
+		MetadataElement.TEMP_EXTENT_END_NOW.getName();
 
 	return buildRangeQuery(field, BondOperator.EQUAL, "true");
     }

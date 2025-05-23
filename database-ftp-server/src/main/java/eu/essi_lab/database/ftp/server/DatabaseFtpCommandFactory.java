@@ -48,11 +48,17 @@ public class DatabaseFtpCommandFactory extends DefaultCommandFactory {
      * @param commandFactory
      */
     private DatabaseFtpCommandFactory(CommandFactory commandFactory) {
+
 	this.commandFactory = commandFactory;
     }
 
     @Override
     public Command getCommand(final String cmdName) {
+
+	if (cmdName.equals("OPTS")) {
+
+	    return new OPTS_MLSD();
+	}
 
 	return commandFactory.getCommand(cmdName);
     }

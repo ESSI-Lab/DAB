@@ -1,5 +1,8 @@
 package eu.essi_lab.messages.listrecords;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -26,6 +29,8 @@ import java.util.Optional;
 
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.JobStatus;
+import eu.essi_lab.model.GSPropertyHandler;
+import eu.essi_lab.model.resource.GSResource;
 
 /**
  * @author Fabrizio
@@ -41,6 +46,14 @@ public class ListRecordsRequest {
     private boolean isFirst;
     private JobStatus status;
     private Integer expectedRecords;
+    private GSPropertyHandler additionalInfo;
+    private List<GSResource> modifiedResources;
+    private List<GSResource> deletedResources;
+
+    /**
+     * 
+     */
+    public static String SOURCE_STORAGE_WORKER_PROPERTY = "sourceStorageWorker";
 
     /**
      * 
@@ -48,6 +61,9 @@ public class ListRecordsRequest {
     public ListRecordsRequest() {
 
 	setFirst(true);
+
+	modifiedResources = new ArrayList<>();
+	deletedResources = new ArrayList<>();
     }
 
     /**
@@ -58,6 +74,9 @@ public class ListRecordsRequest {
 	this.status = status;
 
 	setFirst(true);
+
+	modifiedResources = new ArrayList<GSResource>();
+	deletedResources = new ArrayList<>();
     }
 
     /**
@@ -204,5 +223,53 @@ public class ListRecordsRequest {
     public Optional<JobStatus> getStatus() {
 
 	return Optional.ofNullable(status);
+    }
+
+    /**
+     * @return
+     */
+    public GSPropertyHandler getAdditionalInfo() {
+
+	return additionalInfo;
+    }
+
+    /**
+     * @param additionalInfo
+     */
+    public void setAdditionalInfo(GSPropertyHandler additionalInfo) {
+
+	this.additionalInfo = additionalInfo;
+    }
+
+    /**
+     * @param resource
+     */
+    public void addIncrementalModifiedResource(GSResource resource) {
+
+	this.modifiedResources.add(resource);
+    }
+
+    /**
+     * @return
+     */
+    public List<GSResource> getIncrementalModifiedResources() {
+
+	return modifiedResources;
+    }
+
+    /**
+     * @param gsResource
+     */
+    public void addIncrementalDeletedResource(GSResource resource) {
+
+	this.deletedResources.add(resource);
+    }
+
+    /**
+     * @return
+     */
+    public List<GSResource> getIncrementalDeletedResources() {
+
+	return deletedResources;
     }
 }

@@ -79,46 +79,29 @@ public class DataFolderMapping extends IndexMapping {
 	MetadataElement.listValues().forEach(el -> {
 
 	    switch (el.getContentType()) {
-	    case BOOLEAN:
-		addProperty(el.getName(), FieldType.Boolean.jsonValue());
-		break;
+	    case BOOLEAN -> addProperty(el.getName(), FieldType.Boolean.jsonValue());
+	    case DOUBLE -> addProperty(el.getName(), FieldType.Double.jsonValue());
+	    case INTEGER -> addProperty(el.getName(), FieldType.Integer.jsonValue());
+	    case LONG -> addProperty(el.getName(), FieldType.Long.jsonValue());
+	    case ISO8601_DATE, ISO8601_DATE_TIME -> {
 
-	    case DOUBLE:
-		addProperty(el.getName(), FieldType.Double.jsonValue());
-		break;
-
-	    case INTEGER:
-		addProperty(el.getName(), FieldType.Integer.jsonValue());
-		break;
-
-	    case LONG:
-		addProperty(el.getName(), FieldType.Long.jsonValue());
-		break;
-
-	    case ISO8601_DATE:
-	    case ISO8601_DATE_TIME:
 		// indexed as long to save also date before the epoch
 		addProperty(el.getName(), FieldType.Long.jsonValue());
 
 		// indexes as date (when possible) for manual searches and for dashboard
 		// ignoring malformed dates
 		addProperty(toDateField(el.getName()), FieldType.Date.jsonValue(), true);
+	    }
 
-		break;
-
-	    case SPATIAL:
-		// ignoring malformed shapes
-		addProperty(el.getName(), FieldType.GeoShape.jsonValue(), true);
-		break;
-
-	    case TEXTUAL:
+	    case SPATIAL -> addProperty(el.getName(), FieldType.GeoShape.jsonValue(), true); // ignoring malformed
+											     // shapes
+	    case TEXTUAL -> {
 		addProperty(el.getName(), FieldType.Text.jsonValue());
 
 		// textual fields are mapped also as 'keyword' type in order to be aggregated
 		// since 'text' fields are not optimised for aggregations
 		addProperty(toKeywordField(el.getName()), FieldType.Keyword.jsonValue());
-
-		break;
+	    }
 	    }
 	});
 
@@ -130,13 +113,13 @@ public class DataFolderMapping extends IndexMapping {
 	addProperty(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW.getName(), FieldType.Text.jsonValue());
 
 	// true if indeterminate and TimeIndeterminateValueType.NOW
-	addProperty(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), FieldType.Boolean.jsonValue());
+	addProperty(MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName(), FieldType.Boolean.jsonValue());
 
 	// true if missing
 	addProperty(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName(), FieldType.Boolean.jsonValue());
 
 	// true if indeterminate and TimeIndeterminateValueType.NOW
-	addProperty(IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), FieldType.Boolean.jsonValue());
+	addProperty(MetadataElement.TEMP_EXTENT_END_NOW.getName(), FieldType.Boolean.jsonValue());
 
 	// true if missing
 	addProperty(IndexedElements.TEMP_EXTENT_END_NULL.getElementName(), FieldType.Boolean.jsonValue());
@@ -164,17 +147,10 @@ public class DataFolderMapping extends IndexMapping {
 	ResourceProperty.listValues().forEach(rp -> {
 
 	    switch (rp.getContentType()) {
-	    case BOOLEAN:
-		addProperty(rp.getName(), FieldType.Boolean.jsonValue());
-		break;
-	    case DOUBLE:
-		addProperty(rp.getName(), FieldType.Double.jsonValue());
-		break;
-	    case INTEGER:
-		addProperty(rp.getName(), FieldType.Integer.jsonValue());
-		break;
-	    case ISO8601_DATE:
-	    case ISO8601_DATE_TIME:
+	    case BOOLEAN -> addProperty(rp.getName(), FieldType.Boolean.jsonValue());
+	    case DOUBLE -> addProperty(rp.getName(), FieldType.Double.jsonValue());
+	    case INTEGER -> addProperty(rp.getName(), FieldType.Integer.jsonValue());
+	    case ISO8601_DATE, ISO8601_DATE_TIME -> {
 
 		addProperty(rp.getName(), FieldType.Long.jsonValue());
 
@@ -182,17 +158,14 @@ public class DataFolderMapping extends IndexMapping {
 		// ignoring malformed dates (it should never happen)
 		addProperty(toDateField(rp.getName()), FieldType.Date.jsonValue(), true);
 
-		break;
-	    case LONG:
-		addProperty(rp.getName(), FieldType.Long.jsonValue());
-		break;
-	    case TEXTUAL:
+	    }
+	    case LONG -> addProperty(rp.getName(), FieldType.Long.jsonValue());
+	    case TEXTUAL -> {
 		addProperty(rp.getName(), FieldType.Text.jsonValue());
 		// textual fields are mapped also as 'keyword' type in order to be aggregated
 		// since 'text' fields are not optimised for aggregations
 		addProperty(toKeywordField(rp.getName()), FieldType.Keyword.jsonValue());
-
-		break;
+	    }
 	    }
 	});
     }

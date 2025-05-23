@@ -54,6 +54,7 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageInfo;
@@ -68,6 +69,7 @@ import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
 import eu.essi_lab.pdk.rsm.access.DefaultAccessResultSetMapper;
 import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
+import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.wof.HydroServerProfiler;
 import eu.essi_lab.profiler.wof.HydroServerProfilerSetting;
 import eu.essi_lab.profiler.wof.TimeFormatConverter;
@@ -276,11 +278,22 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 
 	try {
 
-	    String id = getOnlineId(request);
+	    Optional<View> view = request.extractViewId().map(id -> {
+		try {
+		    return DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), id).get();
+		} catch (Exception e) {
 
-	    DataDescriptor descriptor = getDefaultDescriptor(request.getRequestId(), id);
+		    GSLoggerFactory.getLogger(WOFQueryUtils.class).error(e);
+		    return null;
+		}
+	    });
+
+	    String onlineId = getOnlineId(request);
+
+	    DataDescriptor descriptor = getDefaultDescriptor(request.getRequestId(), onlineId, view);
 
 	    if (descriptor != null) {
+
 		WOFRequest getValuesRequest = getValuesRequest(request);
 
 		String startDate = getValuesRequest.getParameterValue(Parameter.BEGIN_DATE);
@@ -326,15 +339,22 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 	return Optional.empty();
     }
 
-    private DataDescriptor getDefaultDescriptor(String requestId, String onlineIdentifier) throws GSException {
+    /**
+     * @param requestId
+     * @param onlineIdentifier
+     * @return
+     */
+    private DataDescriptor getDefaultDescriptor(String requestId, String onlineIdentifier, Optional<View> view) throws GSException {
 
-	List<GSSource> sources = ConfigurationWrapper.getHarvestedSources();
-	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
-	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(requestId, sources, onlineIdentifier, databaseURI);
+	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(//
+		requestId, //
+		view, //
+		onlineIdentifier);
 
 	if (resultSet.getResultsList().isEmpty()) {
 	    // TODO: error!
 	}
+	
 	GSResource result = resultSet.getResultsList().get(0);
 	ReportsMetadataHandler handler = new ReportsMetadataHandler(result);
 

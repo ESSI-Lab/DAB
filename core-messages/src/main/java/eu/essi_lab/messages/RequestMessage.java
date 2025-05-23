@@ -84,8 +84,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     private static final String REQUEST_TIMEOUT = "requestTimeout";
     private static final String ITERATED_WORKFLOW = "ITERATED_WORKFLOW";
     private static final String PROFILER_NAME = "profilerName";
-    private static final String SORT_PROPERTY = "ORDERING_PROPERTY";
-    private static final String SORT_ORDER = "ORDERING_DIRECTION";
+    private static final String SORTED_FIELDS = "SORTED_FIELDS";
     private static final String SEARCH_AFTER = "searchAfter";
     private static final String EXCLUDE_RESOURCE_BINARY = "excludeResourceBinary";
     private static final String USE_CACHED_SOURCES_DATAFOLDER_MAP = "useSourcesDataFolderMap";
@@ -402,33 +401,17 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     /**
      * @return
      */
-    public Optional<SortOrder> getSortOrder() {
+    public Optional<SortedFields> getSortedFields() {
 
-	return Optional.ofNullable(getHeader().get(SORT_ORDER, SortOrder.class));
+	return Optional.ofNullable(getHeader().get(SORTED_FIELDS, SortedFields.class));
     }
 
     /**
      * @param order
      */
-    public void setSortOrder(SortOrder order) {
+    public void setSortedFields(SortedFields fields) {
 
-	getHeader().add(new GSProperty<SortOrder>(SORT_ORDER, order));
-    }
-
-    /**
-     * @param property
-     */
-    public void setSortProperty(Queryable property) {
-
-	getHeader().add(new GSProperty<Queryable>(SORT_PROPERTY, property));
-    }
-
-    /**
-     * @return
-     */
-    public Optional<Queryable> getSortProperty() {
-
-	return Optional.ofNullable(getHeader().get(SORT_PROPERTY, Queryable.class));
+	getHeader().add(new GSProperty<SortedFields>(SORTED_FIELDS, fields));
     }
 
     /**

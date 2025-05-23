@@ -35,6 +35,7 @@ import ucar.nc2.Variable;
 import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.ft.point.StationFeature;
 import ucar.nc2.ft.point.StationPointFeature;
+import ucar.nc2.time.CalendarDateUnit;
 import ucar.nc2.units.DateUnit;
 
 /**
@@ -47,18 +48,18 @@ public class ESSIWriterCFStationCollection extends WriterCFStationCollection {
 
     List<String> coords = new ArrayList<>();
 
-    public ESSIWriterCFStationCollection(String fileOut, List<Attribute> atts, List<VariableSimpleIF> dataVars, List<Variable> extra,
-	    DateUnit timeUnit, String altUnits, CFPointWriterConfig config) throws IOException {
-	super(fileOut, atts, dataVars, extra, timeUnit, altUnits, config);
+    public ESSIWriterCFStationCollection(String fileOut, List<Attribute> atts, List<VariableSimpleIF> dataVars,
+	    CalendarDateUnit timeUnit, String altUnits, CFPointWriterConfig config) throws IOException {
+	super(fileOut, atts, dataVars,  timeUnit, altUnits, config);
     }
 
-    protected void addDataVariablesExtended(StructureData obsData, String coordVars) throws IOException {
+    protected void addDataVariablesExtended(StructureData obsData, String coordVars) {
 	coordVars = getCoordinates(coordVars);
 	super.addDataVariablesExtended(obsData, coordVars);
     }
 
     protected void addDataVariablesClassic(Dimension recordDim, StructureData stnData, Map<String, Variable> varMap, String coordVars)
-	    throws IOException {
+	     {
 	coordVars = getCoordinates(coordVars);
 	super.addDataVariablesClassic(recordDim, stnData, varMap, coordVars);
     }
@@ -75,7 +76,7 @@ public class ESSIWriterCFStationCollection extends WriterCFStationCollection {
     }
 
     protected void addCoordinatesClassic(Dimension recordDim, List<VariableSimpleIF> coords, Map<String, Variable> varMap)
-	    throws IOException {
+	    {
 	for (VariableSimpleIF coord : coords) {
 	    tweakCoord(coord);
 	}
@@ -84,7 +85,7 @@ public class ESSIWriterCFStationCollection extends WriterCFStationCollection {
     }
 
     // added as members of the given structure
-    protected void addCoordinatesExtended(Structure parent, List<VariableSimpleIF> coords) throws IOException {
+    protected void addCoordinatesExtended(Structure parent, List<VariableSimpleIF> coords)  {
 	for (VariableSimpleIF coord : coords) {
 	    tweakCoord(coord);
 	}

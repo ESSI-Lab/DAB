@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.csw.handler.discover;
 
+import java.util.AbstractMap.SimpleEntry;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -36,6 +38,7 @@ import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -44,6 +47,7 @@ import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -110,8 +114,7 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (CSWSearchAfterManager.isEnabled(setting, message.getWebRequest())) {
 
-	    refinedMessage.setSortOrder(SortOrder.ASCENDING);
-	    refinedMessage.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
+	    refinedMessage.setSortedFields(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING));
 
 	    Optional<SearchAfter> searchAfter = CSWSearchAfterManager.get(message.getView().map(v -> v.getId()), page, setting);
 
@@ -281,7 +284,7 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (webRequest.isGetRequest()) {
 
-	    KeyValueParser parser = new KeyValueParser(webRequest.getURLDecodedQueryString());
+	    KeyValueParser parser = new KeyValueParser(webRequest.getURLDecodedQueryString().get());
 	    String ids = parser.getValue("id", true);
 	    return Arrays.asList(ids.split(","));
 	}

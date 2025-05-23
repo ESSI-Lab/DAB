@@ -24,6 +24,7 @@ package eu.essi_lab.gssrv.conf.task.bluecloud;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -37,19 +38,30 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import org.w3c.dom.Node;
 
-import eu.essi_lab.jaxb.common.ISO2014NameSpaceContext;
+import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.DatabaseFinder;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
-import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.lib.xml.XMLDocumentWriter;
+import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.SimpleValueBond;
+import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.count.DiscoveryCountResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
+import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 
 public abstract class MetadataReport {
 
@@ -83,83 +95,60 @@ public abstract class MetadataReport {
 
 	    HashMap<String, List<String[]>> tables = new HashMap<>();
 
-	    String host = getProtocol() + "://" + getHostname();
-
 	    ReportManager reportManager = new ReportManager();
 
 	    String viewId = view.getId();
 	    String label = view.getLabel();
 
-	    String postUrl = host + "/gs-service/services/essi/view/" + viewId + "/csw";
+	    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
 
-	    InputStream stream = MetadataReport.class.getClassLoader().getResourceAsStream(getPostRequest());
+	    DatabaseFinder finder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
+	    DiscoveryMessage message = new DiscoveryMessage();
+	    Optional<View> v = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+	    message.setView(v.get());
+	    message.setUserBond(v.get().getBond());
+	    message.setPermittedBond(v.get().getBond());
+	    DiscoveryCountResponse total = finder.count(message);
 
-	    ClonableInputStream cis = new ClonableInputStream(stream);
-
-	    XMLDocumentReader xmlRequest = new XMLDocumentReader(cis.clone());
-	    System.out.println("POST REQUEST: " + xmlRequest.asString());
-	    XMLDocumentWriter writer = new XMLDocumentWriter(xmlRequest);
-
-	    List<Node> recordsList = new ArrayList<>();
-	    Node[] metadatas = new Node[] {};
-	    XMLDocumentReader xdoc = executeRequestPOST(postUrl, cis.clone());
-	    String countString = xdoc.evaluateString("//*:SearchResults/@numberOfRecordsMatched");
-	    String returnedString = xdoc.evaluateString("//*:SearchResults/@numberOfRecordsReturned");
-	    String nextIndexString = xdoc.evaluateString("//*:SearchResults/@nextRecord");
-	    int count = Integer.parseInt(countString);
-	    int returned = Integer.parseInt(returnedString);
-	    int nextIndex = Integer.parseInt(nextIndexString);
 	    ViewReport viewReport = new ViewReport();
-	    viewReport.setCount(count);
-	    viewReport.setReturned(returned);
+	    viewReport.setCount(total.getCount());
+	    viewReport.setReturned(total.getCount());
 	    viewReport.setLabel(label);
 	    viewReports.put(viewId, viewReport);
-	    metadatas = xdoc.evaluateNodes("//*:MI_Metadata");
 
-	    List<Node> tmpList = Arrays.asList(metadatas);
-	    recordsList.addAll(tmpList);
-	    while (nextIndex > 0 && (maxRecords == null || recordsList.size() < maxRecords)) {// while nextIndex > 0
+	    DocumentReport documentReport = new DocumentReport();
 
-		writer.setText("//*:GetRecords/@startPosition", nextIndexString);
-		xdoc = executeRequestPOST(postUrl, xmlRequest.asStream());
-		returnedString = xdoc.evaluateString("//*:SearchResults/@numberOfRecordsReturned");
-		nextIndexString = xdoc.evaluateString("//*:SearchResults/@nextRecord");
-		metadatas = xdoc.evaluateNodes("//*:MI_Metadata");
-		returned = returned + Integer.parseInt(returnedString);
-		nextIndex = Integer.parseInt(nextIndexString);
-		viewReports.get(viewId).setReturned(returned);
-		tmpList = Arrays.asList(metadatas);
-		recordsList.addAll(tmpList);
-		if (stream != null)
-		    stream.close();
-	    }
+	    List<BlueCloudMetadataElement> toTest = new ArrayList<>();
+	    toTest.addAll(Arrays.asList(getCoreMetadataElements()));
+	    toTest.addAll(Arrays.asList(getOptionalMetadataElements()));
 
-	    if (stream != null)
-		stream.close();
-	    for (Node n : recordsList) {
+	    HashMap<BlueCloudMetadataElement, ReportResult> results = new HashMap<BlueCloudMetadataElement, ReportResult>();
 
-		XMLDocumentReader document = new XMLDocumentReader(XMLDocumentReader.asString(n));
-		document.setNamespaceContext(new ISO2014NameSpaceContext());
-		DocumentReport documentReport = new DocumentReport(document);
-
-		List<BlueCloudMetadataElement> toTest = new ArrayList<>();
-		toTest.addAll(Arrays.asList(getCoreMetadataElements()));
-		toTest.addAll(Arrays.asList(getOptionalMetadataElements()));
-		for (BlueCloudMetadataElement element : toTest) {
-		    documentReport.addValues(element);
+	    Bond sourceBond = message.getUserBond().get().clone();
+	    for (BlueCloudMetadataElement element : toTest) {
+		ReportResult report = new ReportResult();
+		report.setTotal(total.getCount());
+		SimpleValueBond bond = BondFactory.createExistsSimpleValueBond(element.getQueryable());
+		message.setUserBond(BondFactory.createAndBond(bond, sourceBond));
+		message.setPermittedBond(BondFactory.createAndBond(bond, sourceBond));
+		DiscoveryCountResponse c2 = finder.count(message);
+		report.setCount(c2.getCount());
+		ResultSet<TermFrequencyItem> valuesResponse = executor.getIndexValues(message, element.getQueryable(), 0, null);
+		if (valuesResponse != null) {
+		    List<TermFrequencyItem> frequencies = valuesResponse.getResultsList();
+		    List<String> vvs = new ArrayList<String>();
+		    for (TermFrequencyItem frequency : frequencies) {
+			vvs.add(frequency.getTerm());
+		    }
+		    report.addValue(vvs);
 		}
-
-		String id = document.evaluateString("//gmd:fileIdentifier/gco:CharacterString");
-		reportManager.addDocumentReport(id, documentReport);
-
+		results.put(element, report);
 	    }
 
-	    reportManager.printStatistics();
-	    HashMap<BlueCloudMetadataElement, ReportResult> results = reportManager.getReportResults();
 	    List<String[]> table = createTable(results);
 	    tables.put(viewId, table);
 
-	    String htmlTable = createHTMLTable(tables);
+	    String htmlTable = createHTMLTable(tables, getProjectName(), viewReports, getHostname(),null);
 	    String pathName = view.getId();
 	    File tmpFile = File.createTempFile(MetadataReport.class.getClass().getSimpleName(), pathName + ".html");
 	    System.out.println("Writing table to: " + tmpFile.getAbsolutePath());
@@ -221,7 +210,7 @@ public abstract class MetadataReport {
 	return table;
     }
 
-    private String[] getRow(HashMap<BlueCloudMetadataElement, ReportResult> map, BlueCloudMetadataElement reportElement) {
+    public static String[] getRow(HashMap<BlueCloudMetadataElement, ReportResult> map, BlueCloudMetadataElement reportElement) {
 	String metadata = reportElement.toString();
 	String path = reportElement.getPathHtml();
 	boolean isVocabulary = false;
@@ -233,7 +222,7 @@ public abstract class MetadataReport {
 	    ReportResult result = map.get(reportElement);
 	    int count = result.getCount();
 	    int total = result.getTotal();
-	    int percent = (int) (((double) count / (double) total) * 100.0);
+	    BigDecimal percent = calculatePercentage(count, total);
 	    Set<String> values = result.getCache().keySet();
 	    String terms = "";
 
@@ -255,9 +244,9 @@ public abstract class MetadataReport {
 	    }
 	    if (isVocabulary) {
 		String vocabularies = checkVocabulary(metadata, values);
-		return new String[] { metadata, path, terms, vocabularies, Integer.toString(percent) };
+		return new String[] { metadata, path, terms, vocabularies, percent.toString() };
 	    } else {
-		return new String[] { metadata, path, terms, "", Integer.toString(percent) };
+		return new String[] { metadata, path, terms, "", percent.toString() };
 	    }
 
 	} else {
@@ -265,7 +254,7 @@ public abstract class MetadataReport {
 	}
     }
 
-    private String checkVocabulary(String metadata, Set<String> values) {
+    public static String checkVocabulary(String metadata, Set<String> values) {
 	String vocs = "Vocabularies found:<br/>";
 	Set<String> set = new HashSet<>();
 	int vocNumber = 0;
@@ -345,7 +334,8 @@ public abstract class MetadataReport {
 
     public abstract BlueCloudMetadataElement[] getOptionalMetadataElements();
 
-    private String createHTMLTable(HashMap<String, List<String[]>> tableMap) {
+    public static String createHTMLTable(HashMap<String, List<String[]>> tableMap, String projectName,
+	    HashMap<String, ViewReport> viewReports, String hostname, String lastHarvesting) {
 
 	StringBuilder builder = new StringBuilder();
 
@@ -374,9 +364,8 @@ public abstract class MetadataReport {
 
 	builder.append("<body>");
 
-	builder.append("<h1>" + getProjectName() + " metadata completeness report (last update on: "
-		+ ISO8601DateTimeUtils.getISO8601DateTime() + ")</h1><p>The following tables show individual reports for each "
-		+ getProjectName()
+	builder.append("<h1>" + projectName + " metadata completeness report</h1><p>Generated on: " + ISO8601DateTimeUtils.getISO8601DateTime()
+		+ "</p><p>Last metadat aharvesting of the source: " + lastHarvesting + "</p><p>The following tables show individual reports for each " + projectName
 		+ " service harvested by the DAB (first level metadata only). The main metadata elements are reported, along with their completeness score.</p>");
 
 	for (Entry<String, List<String[]>> entry : tableMap.entrySet()) {
@@ -389,7 +378,7 @@ public abstract class MetadataReport {
 	    String label = viewReport.getLabel();
 	    int count = viewReport.getCount();
 	    int returned = viewReport.getReturned();
-	    double percent = (((double) returned / (double) count) * 100.00);
+	    BigDecimal percent = calculatePercentage(returned, count);
 	    DecimalFormatSymbols sym = DecimalFormatSymbols.getInstance();
 	    sym.setDecimalSeparator('.');
 	    DecimalFormat df2 = new DecimalFormat("#.##");
@@ -399,8 +388,8 @@ public abstract class MetadataReport {
 	    int rows = table.size();
 	    int cols = table.get(0).length;
 
-	    String testPortal = "https://" + getHostname() + "/gs-service/search?view=" + viewId;
-	    builder.append("<div><strong>" + label + "</strong> available service at: <strong>https://" + getHostname()
+	    String testPortal = "https://" + hostname + "/gs-service/search?view=" + viewId;
+	    builder.append("<div><strong>" + label + "</strong> available service at: <strong>https://" + hostname
 		    + "/gs-service/services/essi/view/" + viewId + "/csw</strong><br/>" + "<strong>" + label
 		    + "</strong> available test portal at: <a href=\"" + testPortal + "\">" + testPortal + "</a><br/>"
 		    + "Total number of records: <strong>" + count + "</strong> Number of records analyzed: <strong>" + returned
@@ -466,6 +455,18 @@ public abstract class MetadataReport {
 
 	return builder.toString();
 
+    }
+
+    public static BigDecimal calculatePercentage(int good, int total) {
+	if (total == 0) {
+	    return BigDecimal.ZERO;
+	}
+
+	BigDecimal goodDecimal = new BigDecimal(good);
+	BigDecimal totalDecimal = new BigDecimal(total);
+
+	return goodDecimal.divide(totalDecimal, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).setScale(2,
+		RoundingMode.HALF_UP);
     }
 
     private void uploadToS3(S3TransferWrapper manager, File f, String name) throws Exception {

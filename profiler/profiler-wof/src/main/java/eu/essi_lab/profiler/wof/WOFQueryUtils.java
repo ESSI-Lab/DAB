@@ -100,6 +100,8 @@ public class WOFQueryUtils {
 		return null;
 	    }
 	});
+	
+	view.ifPresent(v -> discoveryMessage.setView(v));
 
 	discoveryMessage.setSources(view.isPresent() //
 		? ConfigurationWrapper.getViewSources(view.get()) //

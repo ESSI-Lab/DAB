@@ -1,5 +1,6 @@
 package eu.essi_lab.worflow.execution.hydro.test;
 
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.workflow.processor.DataProcessor;
 import eu.essi_lab.workflow.processor.TargetHandler;
@@ -15,7 +16,7 @@ public class HydroTestProcess extends DataProcessor {
     }
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
 
 	return null;
     }

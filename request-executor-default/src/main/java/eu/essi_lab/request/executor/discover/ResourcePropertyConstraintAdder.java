@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.LogicalBond;
@@ -40,8 +41,8 @@ import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.ResultsPriority;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -178,7 +179,7 @@ public class ResourcePropertyConstraintAdder {
 				List<String> identifiers = getIds(userBond);
 				//
 				// If the discovery message contains some bonds with
-				// MetadataElement.PARENT_IDENTIFIER, 
+				// MetadataElement.PARENT_IDENTIFIER,
 				// MetadataElement.ONLINE_ID or
 				// MetadataElement.IDENTIFIER
 				// as property (in this case the query is probably a GetRecordsById),
@@ -203,8 +204,8 @@ public class ResourcePropertyConstraintAdder {
 
 					SortOrder direction = gsSource.getSortOrder();
 
-					message.setSortProperty(property);
-					message.setSortOrder(direction);
+					message.setSortedFields( SortedFields.of(property, direction));
+
 				    }
 
 				    //
@@ -346,8 +347,8 @@ public class ResourcePropertyConstraintAdder {
 	    public void simpleValueBond(SimpleValueBond bond) {
 
 		if (bond.getProperty() == MetadataElement.PARENT_IDENTIFIER || //
-		bond.getProperty() == MetadataElement.IDENTIFIER || //
-		bond.getProperty() == MetadataElement.ONLINE_ID) {
+			bond.getProperty() == MetadataElement.IDENTIFIER || //
+			bond.getProperty() == MetadataElement.ONLINE_ID) {
 
 		    ids.add(bond.getPropertyValue());
 		}

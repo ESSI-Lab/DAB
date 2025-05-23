@@ -51,7 +51,7 @@ public class TermFrequencyItem {
 
 	    this.decodedTerm = URLDecoder.decode(term, "UTF-8");
 
-	} catch (UnsupportedEncodingException e) {
+	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).warn("Can't decode {}", term, e);
 	}

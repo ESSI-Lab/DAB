@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -105,12 +106,21 @@ public class CSWRequestValidator implements WebRequestValidator {
     /**
      * Validates GetCapabilities, DescribeRecord, GetRecordsById
      */
-    protected ValidationMessage doGetRequestValidation(WebRequest webRequest, String queryString) throws GSException {
+    protected ValidationMessage doGetRequestValidation(WebRequest webRequest, Optional<String> queryString) throws GSException {
 
 	ValidationMessage message = new ValidationMessage();
 	message.setResult(ValidationResult.VALIDATION_FAILED);
 
-	KeyValueParser parser = new KeyValueParser(queryString);
+	if (!queryString.isPresent()) {
+
+	    message.setErrorCode(ExceptionCode.MISSING_PARAMETER.getCode());
+	    message.setError("Missing query string");
+	    message.setLocator("request");
+
+	    return message;
+	}
+
+	KeyValueParser parser = new KeyValueParser(queryString.get());
 
 	// ----------------------------------------
 	//
@@ -427,7 +437,7 @@ public class CSWRequestValidator implements WebRequestValidator {
 
 	    if (queryPart != null) {
 
-		return doGetRequestValidation(request, queryPart);
+		return doGetRequestValidation(request, Optional.of(queryPart));
 	    }
 
 	} catch (SAXParseException spe) {

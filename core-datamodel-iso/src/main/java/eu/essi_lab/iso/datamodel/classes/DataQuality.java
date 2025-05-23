@@ -22,35 +22,18 @@ package eu.essi_lab.iso.datamodel.classes;
  */
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-
-import org.hisrc.w3c.xlink.v_1_0.TypeType;
-import org.opengis.metadata.quality.QuantitativeAttributeAccuracy;
 
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.jaxb.common.ObjectFactories;
-import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.MIMetadataType;
-import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
-import net.opengis.iso19139.gco.v_20060504.DateTimePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.AbstractDQElementType;
 import net.opengis.iso19139.gmd.v_20060504.DQAccuracyOfATimeMeasurementType;
 import net.opengis.iso19139.gmd.v_20060504.DQDataQualityType;
 import net.opengis.iso19139.gmd.v_20060504.DQElementPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.DQQuantitativeAttributeAccuracyType;
-import net.opengis.iso19139.gmd.v_20060504.DQResultPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.DQScopePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.LILineagePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.LILineageType;
-import net.opengis.iso19139.gmd.v_20060504.ObjectFactory;
 
 public class DataQuality extends ISOMetadata<DQDataQualityType> {
     public DataQuality(InputStream stream) throws JAXBException {

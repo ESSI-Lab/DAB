@@ -43,17 +43,22 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialEntity;
 import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.terms.TermsRequest.APIParameters;
@@ -153,6 +158,7 @@ public class TermsHandler extends StreamingRequestHandler {
 		if (type == null) {
 		    type = "";
 		}
+
 		switch (type) {
 		case "parameter":
 		case "observed_property":
@@ -220,24 +226,42 @@ public class TermsHandler extends StreamingRequestHandler {
 		    break;
 		}
 
+		discoveryMessage.setDistinctValuesElement(metadata);
+		SortedFields fields = new SortedFields(ResourceProperty.PUBLIC_ID, SortOrder.ASCENDING);
+		discoveryMessage.setSortedFields(fields);
+		discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
+		discoveryMessage.getResourceSelector().addIndex(metadata);
 		try {
 
-		    Page page = discoveryMessage.getPage();
-
+		    
 		    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
-
-		    List<String> results = executor.getIndexValues(discoveryMessage, metadata, page.getStart(), page.getSize());
+		    String resumption = request.getParameterValue(APIParameters.RESUMPTION_TOKEN);
+		    ResultSet<TermFrequencyItem> results = executor.getIndexValues(discoveryMessage, metadata, 0, resumption);
 
 		    OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
 
 		    JSONObject ret = new JSONObject();
 		    ret.put("type", type);
 		    // ret.put("expected", resultSet.getCountResponse().getCount());
-		    ret.put("requestOffset", page.getStart());
-		    ret.put("requestSize", page.getSize());
-		    ret.put("responseSize", results.size());
+		    if (results.getSearchAfter().isPresent()) {
+			ret.put("completed", false);
+			ret.put("resumptionToken", results.getSearchAfter().get().getValues().get().get(0).toString());
+
+		    } else {
+			ret.put("completed", true);
+		    }
+
+		    ret.put("responseSize", results.getResultsList().size());
 		    JSONArray terms = new JSONArray();
-		    terms.putAll(results);
+		    for (TermFrequencyItem result : results.getResultsList()) {
+			String term = result.getTerm();
+			int occurrences = result.getFreq();
+			JSONObject termObject = new JSONObject();
+			termObject.put("value", term);
+			termObject.put("count", occurrences);
+			terms.put(termObject);
+
+		    }
 		    ret.put("terms", terms);
 
 		    writer.write(ret.toString());

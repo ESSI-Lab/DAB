@@ -44,22 +44,96 @@ import eu.essi_lab.lib.utils.LabeledEnum;
 public class SystemSetting extends ConfigurableSetting implements EditableSetting, KeyValueOptionDecorator {
 
     private static final String DATABASE_STATISTICS_SETTING_KEY = "databaseStatistics";
-
     private static final String PROXY_ENDPOINT_OPTION_KEY = "proxyEndpoint";
-
     private static final String ENABLE_HARVESTING_MAIL_REPORTS_OPTION_KEY = "enableMailHarvestingReport";
-
     private static final String ENABLE_AUGMENTION_MAIL_REPORTS_OPTION_KEY = "enableMailAugmentationReport";
-
     private static final String ENABLE_DOWNLOAD_MAIL_REPORTS_OPTION_KEY = "enableMailDownloadReport";
-
     private static final String ENABLE_ERROR_LOGS_MAIL_REPORTS_OPTION_KEY = "enableErrorLogsReport";
-
     private static final String EMAIL_SETTING_ID = "emailSetting";
 
     /**
-    * 
-    */
+     * @author Fabrizio
+     */
+    public enum KeyValueOptionKeys implements LabeledEnum {
+
+	/**
+	 * MarkLogic option
+	 */
+	COVERING_MODE("coveringMode"), //
+	ENABLE_FILTERED_TRAILING_WILDCARD_QUERIES("enableFilteredTrailingWildcardQueries"),
+
+	/**
+	 * MQTT broker
+	 */
+	MQTT_BROKER_HOST("mqttBrokerHost"), //
+	MQTT_BROKER_PORT("mqttBrokerPort"), //
+	MQTT_BROKER_USER("mqttBrokerUser"), //
+	MQTT_BROKER_PWD("mqttBrokerPwd"), //
+
+	/**
+	 * HealthCheck options
+	 */
+	TASK_AGE_HEALTH_CHECK_METHOD_TRESHOLD("taskAgeHealthCheckMethodTreshold"), //
+	FREE_MEMORY_HEALTH_CHECK_METHOD_TRESHOLD("freeMemoryHealthCheckMethodTreshold"), //
+	SEND_HEALTH_CHECK_REPORT("sendHealthCheckReport"), //
+	PROFILER_HEALTH_CHECK_METHOD_ENABLED("profilerHealthCheckMethodEnabled"),
+
+	/**
+	 * DABStarter option
+	 */
+	SCHEDULER_START_DELAY("schedulerStartDelay"),
+
+	/**
+	 * SOSConnector option
+	 */
+	SOS_100_PARALLEL_TASKS("sos100ParallelTasks"),
+
+	/**
+	 * Configurator option
+	 */
+	MULTIPLE_CONFIGURATION_TABS("multipleConfigurationTabs"),
+
+	/**
+	 * ConfigService option
+	 */
+	CONFIG_SERVICE_AUTHTOKEN("configServiceAuthToken"),
+
+	/**
+	 * XACMLAutorizer option
+	 */
+	DEV_MACHINE_AUTH("devMachineAuth");
+
+	/**
+	 * MirrorSiteTokenGeneratorHandler option prefix
+	 */
+	public static final String MIRROR_SITE_HEADER_NAME_PREFIX = "mirrorsiteclient";
+
+	private String name;
+
+	/**
+	 * @param name
+	 */
+	private KeyValueOptionKeys(String name) {
+
+	    this.name = name;
+	}
+
+	@Override
+	public String toString() {
+
+	    return getLabel();
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return name;
+	}
+    }
+
+    /**
+     * 
+     */
     public SystemSetting() {
 
 	setName("System settings");
@@ -256,7 +330,7 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
 	return BooleanChoice.toBoolean(//
 		getOption(ENABLE_AUGMENTION_MAIL_REPORTS_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
     }
-    
+
     /**
      * @param enable
      */

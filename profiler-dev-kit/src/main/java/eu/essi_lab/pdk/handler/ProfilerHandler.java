@@ -22,8 +22,10 @@ package eu.essi_lab.pdk.handler;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.AbstractMap.SimpleEntry;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -35,6 +37,7 @@ import eu.essi_lab.messages.MessageResponse;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.UserBondMessage;
 import eu.essi_lab.messages.bond.Bond;
@@ -333,15 +336,15 @@ public abstract class ProfilerHandler//
 	//
 	// sorting is necessary to use the OpenSearch search after feature
 	//
-	message.setSortOrder(SortOrder.ASCENDING);
-	message.setSortProperty(ResourceProperty.RESOURCE_TIME_STAMP);
+
+	message.setSortedFields(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING));
 
 	do {
 
 	    //
 	    // set the search after to the message according to the executor response
 	    //
-	    if (executorResponse!=null) {
+	    if (executorResponse != null) {
 		executorResponse.getSearchAfter().ifPresent(sa -> message.setSearchAfter(sa));
 	    }
 

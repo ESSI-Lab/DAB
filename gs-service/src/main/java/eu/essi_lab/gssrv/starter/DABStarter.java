@@ -53,9 +53,11 @@ import eu.essi_lab.cfga.gs.SimilarityCheckMethod;
 import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
+import eu.essi_lab.cfga.gs.task.CustomTaskRunner;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.SettingUtils;
@@ -65,6 +67,7 @@ import eu.essi_lab.cfga.source.S3Source;
 import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask;
+import eu.essi_lab.gssrv.conf.task.bluecloud.BlueCloudReportTask;
 import eu.essi_lab.gssrv.health.HealthCheck;
 import eu.essi_lab.gssrv.servlet.ServletListener;
 import eu.essi_lab.harvester.HarvestingReportsHandler;
@@ -195,8 +198,9 @@ public class DABStarter {
 	case INTENSIVE:
 	    break;
 	}
-
 	initCaches();
+	
+	
     }
 
     /**
@@ -263,7 +267,7 @@ public class DABStarter {
 
 	    } else if (S3Source.check(configURL)) {
 		GSLoggerFactory.getLogger(getClass()).info("Found S3 URL");
-		
+
 		//
 		// -Dconfiguration.url=s3://awsaccesskey:awssecretkey@bucket/config.json
 		//
@@ -272,12 +276,12 @@ public class DABStarter {
 
 		source = S3Source.of(startupUri);
 
-	    } else {		
-		
+	    } else {
+
 		String configFileName = "gs-configuration";
 
 		if (configURL.startsWith("file:temp")) {
-		    
+
 		    GSLoggerFactory.getLogger(getClass()).info("Found local temp file");
 
 		    //
@@ -292,7 +296,7 @@ public class DABStarter {
 		} else if (configURL.startsWith("file://")) {
 
 		    GSLoggerFactory.getLogger(getClass()).info("Found local file");
-		    
+
 		    //
 		    // -Dconfiguration.url=file://path/preprodenvconf/
 		    // -Dconfiguration.url=file://path/preprodenvconf!demo
@@ -304,7 +308,7 @@ public class DABStarter {
 
 		    source = new FileSource(new File(path));
 		} else {
-		    GSLoggerFactory.getLogger(DABStarter.class).error("Unrecognized config URL: {}",configURL);
+		    GSLoggerFactory.getLogger(DABStarter.class).error("Unrecognized config URL: {}", configURL);
 		}
 	    }
 
@@ -788,8 +792,8 @@ public class DABStarter {
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_PHYSICS);
 	    break;
 	case ACCESS:
-	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
 	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
 		    new FeatureLayer1StationsArctic());
 	    break;
@@ -815,7 +819,7 @@ public class DABStarter {
 	if (keyValueOptions.isPresent()) {
 
 	    schedulerStartDelay = Integer
-		    .valueOf(keyValueOptions.get().getProperty("schedulerStartDelay", String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
+		    .valueOf(keyValueOptions.get().getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(), String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
 	}
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("Scheduler will start in {} minutes", schedulerStartDelay);

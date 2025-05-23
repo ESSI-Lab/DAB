@@ -36,8 +36,8 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
- * This component is notified when an the harvesting of a {@link GSSource} begins and ends in order to prepare the
- * underlying storage
+ * This component is notified when an the harvesting of a {@link GSSource}
+ * begins and ends in order to prepare the underlying storage
  *
  * @author Fabrizio
  */
@@ -175,11 +175,12 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
     }
 
     /**
-     * Retrieve a properties file which provide information about the harvesting of the supplied <code>source</code>
+     * Retrieve a properties file which provide information about the harvesting of
+     * the supplied <code>source</code>
      *
      * @param source the harvested source
-     * @return a {@link HarvestingProperties} with information about the harvesting of the supplied
-     *         <code>source</code>
+     * @return a {@link HarvestingProperties} with information about the harvesting
+     *         of the supplied <code>source</code>
      */
     public HarvestingProperties retrieveHarvestingProperties(GSSource source) throws GSException {
 
@@ -262,7 +263,8 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
     }
 
     /**
-     * Returns the data folder for the source with the given <code>sourceIdentifier</code>.
+     * Returns the data folder for the source with the given
+     * <code>sourceIdentifier</code>.
      * 
      * @param sourceIdentifier it <code>true</code>, returns the
      * @return

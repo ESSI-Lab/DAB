@@ -44,7 +44,7 @@ public class GDAL_To_NetCDF_Processor extends GDALFormatConverterProcessor {
 
     @Override
     public DataObject postProcessCorrections(DataObject inputData, DataObject outputData) throws GSException {
-	outputData = GDALNetCDFPostConversionUtils.doBandCorrections(outputData);
+	outputData = GDALNetCDFPostConversionUtils.doBandCorrections(inputData, outputData);
 	// add min and max values
 	DataDescriptor inputDescriptor = inputData == null ? null : inputData.getDataDescriptor();
 	outputData = GDALNetCDFPostConversionUtils.addMinMax(inputDescriptor, outputData);

@@ -30,6 +30,7 @@ import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.profiler.os.OSProfilerSetting;
 import eu.essi_lab.profiler.os.handler.discover.OSRequestTransformer;
 
 /**
@@ -37,10 +38,18 @@ import eu.essi_lab.profiler.os.handler.discover.OSRequestTransformer;
  */
 public class EiffelRequestTransformer extends OSRequestTransformer {
 
+    /**
+     * @param setting
+     */
+    public EiffelRequestTransformer(OSProfilerSetting setting) {
+
+	super(setting);
+    }
+
     @Override
     protected void handleView(WebRequest request, StorageInfo storageUri, RequestMessage message) throws GSException {
 
-	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(message.getWebRequest());
+	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(message.getWebRequest(), setting);
 
 	GSLoggerFactory.getLogger(getClass()).debug("Enabling EIFFEL API discovery option: " + eiffelOption.get());
 

@@ -34,44 +34,46 @@ public class OptionTest {
     @Test
     public void test() {
 
-	Option<String> configurationOption = new Option<>(String.class);
+	Option<String> option = new Option<>(String.class);
 
-	Class<?> valueClass = configurationOption.getValueClass();
+	Class<?> valueClass = option.getValueClass();
 	Assert.assertEquals(String.class, valueClass);
 
-	Assert.assertTrue(configurationOption.isValueOf(String.class));
-	Assert.assertFalse(configurationOption.isValueOf(Integer.class));
+	Assert.assertTrue(option.isValueOf(String.class));
+	Assert.assertFalse(option.isValueOf(Integer.class));
 
 	StringOptionBuilder builder = StringOptionBuilder.get();
 
 	test1(builder.build());
-	test1(configurationOption);
-	test1(new Option<>(configurationOption.getObject()));
-	test1(new Option<>(configurationOption.getObject().toString()));
+	test1(option);
+	test1(new Option<>(option.getObject()));
+	test1(new Option<>(option.getObject().toString()));
 
-	configurationOption.setValues(Arrays.asList("a", "b", "c"));
-	configurationOption.setKey("lettersOption");
-	configurationOption.setLabel("Choose the letter");
-	configurationOption.setSelectionMode(SelectionMode.SINGLE);
-	configurationOption.select(v -> v.equals("a"));
+	option.setValues(Arrays.asList("a", "b", "c"));
+	option.setKey("lettersOption");
+	option.setLabel("Choose the letter");
+	option.setSelectionMode(SelectionMode.SINGLE);
+	option.select(v -> v.equals("a"));
 
-	configurationOption.setRequired(true);
-	configurationOption.setSelectionMode(SelectionMode.SINGLE);
+	option.setRequired(true);
+	option.setSelectionMode(SelectionMode.SINGLE);
 
-	configurationOption.setVisible(false);
-	configurationOption.setEditable(false);
+	option.setVisible(false);
+	option.setEditable(false);
 
-	configurationOption.setEnabled(false);
+	option.setEnabled(false);
 
-	configurationOption.setDescription("desc");
+	option.setDescription("desc");
 
-	configurationOption.setAdvanced(true);
+	option.setAdvanced(true);
 
-	configurationOption.setCanBeDisabled(false);
+	option.setCanBeDisabled(false);
 
-	configurationOption.setInputPattern(InputPattern.ALPHANUMERIC);
+	option.setInputPattern(InputPattern.ALPHANUMERIC);
 
-	configurationOption.enableTextArea(true);
+	option.enableTextArea(true);
+
+	option.setMultiValue(false);
 
 	Option<String> buildedOption = builder.//
 		withKey("lettersOption").//
@@ -86,6 +88,7 @@ public class OptionTest {
 		withInputPattern(InputPattern.ALPHANUMERIC).//
 		cannotBeDisabled().//
 		withSingleSelection().//
+		singleValue().//
 		hidden().//
 		readOnly().//
 		withTextArea().//
@@ -93,11 +96,11 @@ public class OptionTest {
 
 	test2(buildedOption);
 	test2(new Option<>(buildedOption.getObject()));
-	test2(new Option<>(configurationOption.getObject().toString()));
+	test2(new Option<>(option.getObject().toString()));
 
-	test2(configurationOption);
-	test2(new Option<>(configurationOption.getObject()));
-	test2(new Option<>(configurationOption.getObject().toString()));
+	test2(option);
+	test2(new Option<>(option.getObject()));
+	test2(new Option<>(option.getObject().toString()));
 
 	//
 	//
@@ -113,32 +116,32 @@ public class OptionTest {
 		canBeDisabled().//
 		build();
 
-	configurationOption.addValue("X");
-	configurationOption.addValue("Y");
-	configurationOption.setSelectionMode(SelectionMode.MULTI);
-	configurationOption.setEditable(true);
-	configurationOption.setRequired(false);
-	configurationOption.setAdvanced(false);
-	configurationOption.setCanBeDisabled(true);
+	option.addValue("X");
+	option.addValue("Y");
+	option.setSelectionMode(SelectionMode.MULTI);
+	option.setEditable(true);
+	option.setRequired(false);
+	option.setAdvanced(false);
+	option.setCanBeDisabled(true);
 
 	test3(buildedOption);
 	test3(new Option<>(buildedOption.getObject()));
-	test3(new Option<>(configurationOption.getObject().toString()));
+	test3(new Option<>(option.getObject().toString()));
 
-	test3(configurationOption);
-	test3(new Option<>(configurationOption.getObject()));
-	test3(new Option<>(configurationOption.getObject().toString()));
+	test3(option);
+	test3(new Option<>(option.getObject()));
+	test3(new Option<>(option.getObject().toString()));
 
 	//
 	//
 	//
 
 	// nothing is expected to change
-	configurationOption.setValues(Arrays.asList("a", "b", "c", "X", "Y"));
+	option.setValues(Arrays.asList("a", "b", "c", "X", "Y"));
 
-	test3(configurationOption);
-	test3(new Option<>(configurationOption.getObject()));
-	test3(new Option<>(configurationOption.getObject().toString()));
+	test3(option);
+	test3(new Option<>(option.getObject()));
+	test3(new Option<>(option.getObject().toString()));
 
 	//
 	//
@@ -148,15 +151,15 @@ public class OptionTest {
 		withValues(Arrays.asList()).//
 		build();
 
-	configurationOption.setValues(Arrays.asList());
+	option.setValues(Arrays.asList());
 
 	test4(buildedOption);
 	test4(new Option<>(buildedOption.getObject()));
 	test4(new Option<>(buildedOption.getObject().toString()));
 
-	test4(configurationOption);
-	test4(new Option<>(configurationOption.getObject()));
-	test4(new Option<>(configurationOption.getObject().toString()));
+	test4(option);
+	test4(new Option<>(option.getObject()));
+	test4(new Option<>(option.getObject().toString()));
 
 	//
 	//
@@ -167,16 +170,16 @@ public class OptionTest {
 		withUnsetSelection().//
 		build();
 
-	configurationOption.setSelectionMode(SelectionMode.UNSET);
-	configurationOption.clearValues();
+	option.setSelectionMode(SelectionMode.UNSET);
+	option.clearValues();
 
 	test5(buildedOption);
 	test5(new Option<>(buildedOption.getObject()));
 	test5(new Option<>(buildedOption.getObject().toString()));
 
-	test5(configurationOption);
-	test5(new Option<>(configurationOption.getObject()));
-	test5(new Option<>(configurationOption.getObject().toString()));
+	test5(option);
+	test5(new Option<>(option.getObject()));
+	test5(new Option<>(option.getObject().toString()));
 
 	//
 	//
@@ -186,15 +189,15 @@ public class OptionTest {
 		withValues(Arrays.asList("a", "b", "c")).//
 		build();
 
-	configurationOption.setValues(Arrays.asList("a", "b", "c"));
+	option.setValues(Arrays.asList("a", "b", "c"));
 
 	test5_1(buildedOption);
 	test5_1(new Option<>(buildedOption.getObject()));
 	test5_1(new Option<>(buildedOption.getObject().toString()));
 
-	test5_1(configurationOption);
-	test5_1(new Option<>(configurationOption.getObject()));
-	test5_1(new Option<>(configurationOption.getObject().toString()));
+	test5_1(option);
+	test5_1(new Option<>(option.getObject()));
+	test5_1(new Option<>(option.getObject().toString()));
 
 	Option<String> clearedOption = builder.clear().build();
 
@@ -211,8 +214,8 @@ public class OptionTest {
 	// null value test
 	//
 	ex.expect(IllegalArgumentException.class);
-	configurationOption.setValue(null);
-	configurationOption.addValue(null);
+	option.setValue(null);
+	option.addValue(null);
     }
 
     @Rule
@@ -273,28 +276,30 @@ public class OptionTest {
 	Assert.assertEquals(new Integer(10), value);
     }
 
-    private void test1(Option<String> configurationOption) {
+    private void test1(Option<String> option) {
 
-	Assert.assertTrue(configurationOption.getValues().isEmpty());
-	Assert.assertTrue(configurationOption.getObject().getString("type").equals("option"));
+	Assert.assertTrue(option.getValues().isEmpty());
+	Assert.assertTrue(option.getObject().getString("type").equals("option"));
 
-	Assert.assertFalse(configurationOption.isRequired());
-	Assert.assertEquals(SelectionMode.UNSET, configurationOption.getSelectionMode());
+	Assert.assertFalse(option.isRequired());
+	Assert.assertEquals(SelectionMode.UNSET, option.getSelectionMode());
 
-	Assert.assertTrue(configurationOption.isVisible());
-	Assert.assertTrue(configurationOption.isEditable());
+	Assert.assertTrue(option.isVisible());
+	Assert.assertTrue(option.isEditable());
 
-	Assert.assertTrue(configurationOption.isEnabled());
+	Assert.assertTrue(option.isEnabled());
 
-	Assert.assertFalse(configurationOption.getDescription().isPresent());
+	Assert.assertFalse(option.getDescription().isPresent());
 
-	Assert.assertFalse(configurationOption.isAdvanced());
+	Assert.assertFalse(option.isAdvanced());
 
-	Assert.assertTrue(configurationOption.canBeDisabled());
+	Assert.assertTrue(option.canBeDisabled());
 
-	Assert.assertFalse(configurationOption.getInputPattern().isPresent());
+	Assert.assertFalse(option.getInputPattern().isPresent());
 
-	Assert.assertFalse(configurationOption.isTextAreaEnabled());
+	Assert.assertFalse(option.isTextAreaEnabled());
+
+	Assert.assertTrue(option.isMultiValue());
     }
 
     /**
@@ -348,6 +353,10 @@ public class OptionTest {
 
 	boolean textArea = option.isTextAreaEnabled();
 	Assert.assertTrue(textArea);
+
+	boolean multiValue = option.isMultiValue();
+	Assert.assertFalse(multiValue);
+
     }
 
     private void test3(Option<String> option) {

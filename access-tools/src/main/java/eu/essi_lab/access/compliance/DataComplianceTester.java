@@ -330,7 +330,7 @@ public class DataComplianceTester {
 
 	WorkflowBuilder builder = WorkflowBuilder.createLoadedBuilder();
 
-	List<Workflow> workflows = builder.build(previewDescriptor, targetDescriptor);
+	List<Workflow> workflows = builder.build(null, previewDescriptor, targetDescriptor);
 	report.getWorkflows().addAll(workflows);
 
 	if (!workflows.isEmpty()) {
@@ -581,7 +581,7 @@ public class DataComplianceTester {
 	    DataDescriptor targetDescriptor) throws GSException {
 
 	try {
-	    return preferred.execute(dataObject, targetDescriptor);
+	    return preferred.execute(null, dataObject, targetDescriptor);
 
 	} catch (Exception e) {
 

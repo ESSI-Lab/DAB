@@ -42,7 +42,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringTokenizer;
 import java.util.UUID;
 
 import javax.servlet.AsyncContext;
@@ -793,10 +792,12 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
      * {@link #getServletRequest()}getQueryString().<br>
      * The returned value can be also set calling the {@link #setQueryString(String)} method
      * 
+     * @deprecated use {@link #getOptionalQueryString()}
      * @return the query string if available, <code>null</code> otherwise
      * @see #isGetRequest()
      * @see #isPostRequest()
      */
+    @Deprecated()
     public String getQueryString() {
 
 	if (this.queryString != null) {
@@ -813,11 +814,31 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
+     * This method is a shortcut for
+     * {@link #getServletRequest()}getQueryString().<br>
+     * The returned value can be also set calling the {@link #setQueryString(String)} method
+     * 
+     * @see #isGetRequest()
+     * @see #isPostRequest()
+     */
+    public Optional<String> getOptionalQueryString() {
+
+	return Optional.ofNullable(getQueryString());
+    }
+
+    /**
      * @return
      */
-    public String getURLDecodedQueryString() {
+    public Optional<String> getURLDecodedQueryString() {
 
-	return StringUtils.URLDecodeUTF8(getQueryString());
+	Optional<String> queryString = getOptionalQueryString();
+
+	if (queryString.isPresent()) {
+
+	    return Optional.of(StringUtils.URLDecodeUTF8(queryString.get()));
+	}
+
+	return Optional.empty();
     }
 
     /**

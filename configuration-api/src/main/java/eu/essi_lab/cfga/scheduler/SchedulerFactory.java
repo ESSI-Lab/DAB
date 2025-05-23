@@ -70,25 +70,10 @@ public class SchedulerFactory {
      */
     public synchronized static Scheduler getScheduler(SchedulerSetting setting, boolean start) {
 
-	JobStoreType jobStoreType = setting.getJobStoreType();
-
-	Scheduler scheduler = null;
-
-	switch (jobStoreType) {
-	case VOLATILE:
-	    scheduler = getVolatileScheduler(setting, start);
-	    break;
-	case PERSISTENT:
-	    try {
-		scheduler = getPersistentScheduler(setting, start);
-		break;
-	    } catch (SQLException e) {
-
-		GSLoggerFactory.getLogger(SchedulerFactory.class).error(e.getMessage(), e);
-	    }
-	}
-
-	return scheduler;
+	return switch (setting.getJobStoreType()) {
+	case VOLATILE -> getVolatileScheduler(setting, start);
+	case PERSISTENT -> getPersistentScheduler(setting, start);
+	};
     }
 
     /**
@@ -167,7 +152,7 @@ public class SchedulerFactory {
      * @return
      * @throws SQLException
      */
-    public synchronized static Scheduler getPersistentScheduler(SchedulerSetting setting, boolean start) throws SQLException {
+    public synchronized static Scheduler getPersistentScheduler(SchedulerSetting setting, boolean start) {
 
 	try {
 
@@ -248,7 +233,7 @@ public class SchedulerFactory {
      * @throws SchedulerException
      * @throws SQLException
      */
-    private static PersistentJobStoreScheduler createPersistentScheduler(SchedulerSetting setting) throws SchedulerException, SQLException {
+    private static PersistentJobStoreScheduler createPersistentScheduler(SchedulerSetting setting) throws SchedulerException {
 
 	org.quartz.Scheduler quartzScheduler = createQuartzScheduler(setting);
 
@@ -312,16 +297,10 @@ public class SchedulerFactory {
      */
     private static Properties loadProperties(JobStoreType jobStoreType) {
 
-	InputStream stream = null;
-
-	switch (jobStoreType) {
-	case VOLATILE:
-	    stream = SchedulerFactory.class.getClassLoader().getResourceAsStream("ram-quartz.properties");
-	    break;
-	case PERSISTENT:
-	    stream = SchedulerFactory.class.getClassLoader().getResourceAsStream("jdbc-quartz.properties");
-	    break;
-	}
+	InputStream stream = switch (jobStoreType) {
+	case VOLATILE -> SchedulerFactory.class.getClassLoader().getResourceAsStream("ram-quartz.properties");
+	case PERSISTENT -> SchedulerFactory.class.getClassLoader().getResourceAsStream("jdbc-quartz.properties");
+	};
 
 	Properties properties = new Properties();
 	try {

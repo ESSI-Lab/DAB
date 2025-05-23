@@ -34,8 +34,13 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import org.json.JSONObject;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
+import eu.essi_lab.api.database.opensearch.index.Shape;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.geo.BBOXUtils;
 import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
@@ -144,13 +149,64 @@ public class ObservationMapper {
 	    }
 	    platform.setMultiPoints(multiPoints);
 
-	} else if (parser.west != null && !parser.west.equals("") && parser.east != null && !parser.east.equals("") && parser.north != null
-		&& !parser.north.equals("") && parser.south != null && !parser.south.equals("")//
-	) {
-	    BigDecimal bigs = new BigDecimal(parser.south);
-	    BigDecimal bigw = new BigDecimal(parser.west);
-	    BigDecimal bign = new BigDecimal(parser.north);
-	    BigDecimal bige = new BigDecimal(parser.east);
+	} else if (
+
+	(parser.west != null && !parser.west.equals("") && //
+		parser.east != null && !parser.east.equals("") && //
+		parser.north != null && !parser.north.equals("") && //
+		parser.south != null && !parser.south.equals(""))//
+
+		|| parser.geometry != null && !parser.geometry.isEmpty()) {
+
+	    String south = null;
+	    String west = null;
+	    String east = null;
+	    String north = null;
+
+	    if (parser.geometry != null && !parser.geometry.isEmpty()) {
+
+		Optional<Geometry> optGeometry = Shape.of(parser.geometry);
+
+		if (optGeometry.isPresent()) {
+
+		    Geometry geometry = optGeometry.get();
+
+		    if (geometry instanceof Point) {
+
+			Point point = (Point) geometry;
+			double x = point.getX();
+			double y = point.getY();
+
+			south = String.valueOf(y);
+			west = String.valueOf(x);
+			north = String.valueOf(y);
+			east = String.valueOf(x);
+
+		    } else if (geometry instanceof Polygon) {
+
+			String bbox = BBOXUtils.toBBOX(parser.geometry, false);
+			// south, west, north, east
+			String[] split = bbox.split(" ");
+
+			south = split[0];
+			west = split[1];
+			north = split[2];
+			east = split[3];
+		    }
+		}
+
+	    } else {
+
+		south = parser.south;
+		west = parser.west;
+		north = parser.north;
+		east = parser.east;
+	    }
+
+	    BigDecimal bigs = new BigDecimal(south);
+	    BigDecimal bigw = new BigDecimal(west);
+	    BigDecimal bign = new BigDecimal(north);
+	    BigDecimal bige = new BigDecimal(east);
 
 	    Double TOL = 0.000000001;
 	    if ((bign.doubleValue() - bigs.doubleValue() > TOL) && //
@@ -236,8 +292,8 @@ public class ObservationMapper {
 
 	// timeseries.setFeatureOfInterest(uniquePlatformCode, platformName);
 
-	if (source!=null) {
-	observation.addParameter("source", source.getLabel());
+	if (source != null) {
+	    observation.addParameter("source", source.getLabel());
 	}
 
 	observation.addParameter("observedPropertyDefinition", parser.getAttributeDescription());

@@ -54,6 +54,7 @@ import eu.essi_lab.authorization.rps.GEOSSReadRolePolicySet;
 import eu.essi_lab.authorization.rps.GEOSSWriteRolePolicySet;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.AccessMessage;
@@ -112,7 +113,7 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 		: Optional.empty();
 	
 	if (keyValueOption.isPresent()) {
-	    devMachineAuth = keyValueOption.get().getProperty("dev-machine-auth", "yes").equals("yes") ? true : false;
+	    devMachineAuth = keyValueOption.get().getProperty(KeyValueOptionKeys.DEV_MACHINE_AUTH.getLabel(), "true").equals("true") ? true : false;
 	}
 
 	if (isLocalHost(message) && devMachineAuth) {

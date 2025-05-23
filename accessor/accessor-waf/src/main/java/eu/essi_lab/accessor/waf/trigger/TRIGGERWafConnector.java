@@ -32,11 +32,20 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -87,7 +96,6 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
     private List<URL> allFiles;
     private static final String BUCKET_NAME = "trigger-json-files";
 
-
     private Downloader downloader;
 
     public enum TRIGGER_INTERPOLATIONS {
@@ -122,6 +130,48 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
 	public static TRIGGER_INTERPOLATIONS decode(String parameterCode) {
 	    for (TRIGGER_INTERPOLATIONS var : values()) {
+		if (parameterCode.equals(var.name())) {
+		    return var;
+		}
+	    }
+	    return null;
+
+	}
+    }
+
+    public enum CAMS_TRIGGER_INTERPOLATIONS {
+
+	PERCENTILE_0("perc_0", "0 Percentile", InterpolationType.STATISTICAL), PERCENTILE_10("perc_10", "10th Percentile",
+		InterpolationType.STATISTICAL), PERCENTILE_25("perc_25", "25th Percentile", InterpolationType.STATISTICAL), PERCENTILE_50(
+			"perc_50", "50th Percentile", InterpolationType.STATISTICAL), PERCENTILE_75("perc_75", "75th Percentile",
+				InterpolationType.STATISTICAL), PERCENTILE_90("perc_90", "90th Percentile",
+					InterpolationType.STATISTICAL), PERCENTILE_100("perc_100", "100th Percentile",
+						InterpolationType.STATISTICAL);
+
+	private String id;
+	private String label;
+	private InterpolationType type;
+
+	public String getLabel() {
+	    return label;
+	}
+
+	public String getId() {
+	    return id;
+	}
+
+	public InterpolationType getInterpolationType() {
+	    return type;
+	}
+
+	private CAMS_TRIGGER_INTERPOLATIONS(String id, String label, InterpolationType type) {
+	    this.id = id;
+	    this.label = label;
+	    this.type = type;
+	}
+
+	public static CAMS_TRIGGER_INTERPOLATIONS decode(String parameterCode) {
+	    for (CAMS_TRIGGER_INTERPOLATIONS var : values()) {
 		if (parameterCode.equals(var.name())) {
 		    return var;
 		}
@@ -183,7 +233,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	    }
 
 	    List<URL> filteredURLs = filterURLsByToday(allFiles, 0);
-	    if (filteredURLs == null || filteredURLs.isEmpty()) {
+	    if (filteredURLs == null || filteredURLs.isEmpty() || filteredURLs.size() < 97) {
 		filteredURLs = filterURLsByToday(allFiles, -1);
 
 	    }
@@ -210,41 +260,70 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 		String varId = null;
 		String city = null;
 		String date = null;
+		boolean isCams = false;
+		Map<String, String> interpolationMap = new HashMap<String, String>();
 
 		if (splittedName.length == 3) {
-
+		    isCams = false;
 		    varId = splittedName[0];
-		    TRIGGERWAFVariable variable = TRIGGERWAFVariable.decode(varId);
-		    if (variable == null) {
+		    TRIGGER_INTERPOLATIONS[] interpolations = TRIGGER_INTERPOLATIONS.values();
+		    for (TRIGGER_INTERPOLATIONS interpolation : interpolations) {
+			String id = interpolation.getId();
+			String label = interpolation.getLabel();
+			interpolationMap.put(id, label);
+		    }
+
+		} else {
+		    // other variables: e.g.cams_eu_ragweed_pollen_web
+		    if (!fileName.contains("extended_anomaly")) {
+			String pattern = "^(cams_eu_[a-zA-Z0-9._]+_web)_([A-Za-z]+)_\\d+\\.json$";
+			Pattern regex = Pattern.compile(pattern);
+			Matcher matcher = regex.matcher(fileName);
+
+			if (matcher.find()) {
+			    varId = matcher.group(1);
+			    city = matcher.group(2);
+
+			}
+		    } else {
 			continue;
 		    }
 
-		    String json = getDownloader().downloadOptionalString(url.toExternalForm(), username, password).orElse(null);
-		    JSONObject jsonObject = new JSONObject(json);
-		    OriginalMetadata originalMetadata = null;
-		    TRIGGER_INTERPOLATIONS[] interpolations = TRIGGER_INTERPOLATIONS.values();
-		    for (TRIGGER_INTERPOLATIONS interpolation : interpolations) {
-			Dataset dataset = mapJSONToISO(jsonObject, interpolation, variable, url);
-			String str = dataset.asString(true);
-			originalMetadata = new OriginalMetadata();
-			originalMetadata.setMetadata(str);
-			originalMetadata.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
-			response.addRecord(originalMetadata);
-
+		    isCams = true;
+		    CAMS_TRIGGER_INTERPOLATIONS[] interpolations = CAMS_TRIGGER_INTERPOLATIONS.values();
+		    for (CAMS_TRIGGER_INTERPOLATIONS interpolation : interpolations) {
+			String id = interpolation.getId();
+			String label = interpolation.getLabel();
+			interpolationMap.put(id, label);
 		    }
+		}
 
+		TRIGGERWAFVariable variable = TRIGGERWAFVariable.decode(varId);
+		if (variable == null) {
+		    continue;
+		}
+
+		String json = getDownloader().downloadOptionalString(fileURL, username, password).orElse(null);
+		JSONObject jsonObject = new JSONObject(json);
+		OriginalMetadata originalMetadata = null;
+
+		for (Map.Entry<String, String> entry : interpolationMap.entrySet()) {
+		    Dataset dataset = mapJSONToISO(jsonObject, entry, variable, url, isCams, city);
+		    String str = dataset.asString(true);
+		    originalMetadata = new OriginalMetadata();
+		    originalMetadata.setMetadata(str);
+		    originalMetadata.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
+		    response.addRecord(originalMetadata);
 		}
 
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Downloading files [{}-{}/{}] ENDED", start, end, allFiles.size());
-	    
+
 	    if (response.getResumptionToken() == null) {
 		allFiles = null;
 		filteredURLs = null;
 	    }
-
-	    
 
 	} catch (Exception e) {
 
@@ -283,39 +362,56 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
     }
 
-    private Dataset mapJSONToISO(JSONObject jsonObject, TRIGGER_INTERPOLATIONS interpolation, TRIGGERWAFVariable variable, URL fileURL) {
+    private Dataset mapJSONToISO(JSONObject jsonObject, Entry<String, String> entry, TRIGGERWAFVariable variable, URL fileURL,
+	    boolean isCams, String cityName) {
 	Dataset dataset = new Dataset();
 	GSSource source = new GSSource();
 	source.setEndpoint(getSourceURL());
 	dataset.setSource(source);
 
 	dataset.getPropertyHandler().setIsTimeseries(true);
+	BigDecimal latitude = null;
+	BigDecimal longitude = null;
 
-	BigDecimal latitude = jsonObject.optBigDecimal("lat", null);
-	BigDecimal longitude = jsonObject.optBigDecimal("lon", null);
-
-	String title = jsonObject.optString("title");
+	String title = null;
 	String date = jsonObject.optString("date");
 	String time = jsonObject.optString("time");
 
 	String dateTime = date + time;
 
-	Resolution resolution = Resolution.HOURLY;
-
-	// TEMPORAL EXTENT
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
-	TemporalExtent extent = new TemporalExtent();
 
 	Optional<Date> parsed = ISO8601DateTimeUtils.parseNotStandard2ToDate(dateTime);
 
 	String startDate = null;
 	String endDate = null;
-	if (parsed.isPresent()) {
-	    Date begin = parsed.get();
-	    Date end = addDays(begin, 10);
-	    startDate = ISO8601DateTimeUtils.getISO8601DateTime(begin);
-	    endDate = ISO8601DateTimeUtils.getISO8601DateTime(end);
+
+	if (isCams) {
+	    JSONObject locationObj = jsonObject.optJSONObject("location");
+	    latitude = locationObj.optBigDecimal("lat", null);
+	    longitude = locationObj.optBigDecimal("lon", null);
+	    title = cityName;
+	    if (parsed.isPresent()) {
+		Date begin = parsed.get();
+		Date end = addDays(begin, 4);
+		startDate = ISO8601DateTimeUtils.getISO8601DateTime(begin);
+		endDate = ISO8601DateTimeUtils.getISO8601DateTime(end);
+	    }
+	} else {
+	    latitude = jsonObject.optBigDecimal("lat", null);
+	    longitude = jsonObject.optBigDecimal("lon", null);
+	    title = jsonObject.optString("title");
+	    if (parsed.isPresent()) {
+		Date begin = parsed.get();
+		Date end = addDays(begin, 10);
+		startDate = ISO8601DateTimeUtils.getISO8601DateTime(begin);
+		endDate = ISO8601DateTimeUtils.getISO8601DateTime(end);
+	    }
 	}
+
+	Resolution resolution = Resolution.HOURLY;
+
+	TemporalExtent extent = new TemporalExtent();
 
 	if (startDate != null) {
 
@@ -363,7 +459,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	String variableDescription = variable.getDescription();
 	String variableUnit = variable.getUnit();
 
-	coreMetadata.setTitle("Forecats of " + variableName + " ( "+ interpolation.getLabel() +") through the station at:" + title);
+	coreMetadata.setTitle("Forecats of " + variableName + " ( " + entry.getValue() + ") through the station at:" + title);
 
 	coreMetadata.setAbstract("This dataset contains " + variableDescription + " timeseries from station: " + title);
 
@@ -425,7 +521,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	coverageDescription.setAttributeDescription(attributeDescription);
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
-	dataset.getExtensionHandler().setTimeInterpolation(interpolation.getLabel());
+	dataset.getExtensionHandler().setTimeInterpolation(entry.getValue());
 
 	/**
 	 * ONLINE
@@ -441,7 +537,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	//
 	// coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
 
-	String resourceIdentifier = generateCode(dataset, variableName + ":" + interpolation.getId() + ":" + noSpaceName);
+	String resourceIdentifier = generateCode(dataset, variableName + ":" + entry.getKey() + ":" + noSpaceName);
 
 	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
@@ -458,8 +554,8 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	    Online o = new Online();
 	    o.setLinkage(fileURL.toExternalForm());
 	    o.setFunctionCode("download");
-	    o.setName(variableName + ":" + variableUnit + ":" + interpolation.getId());
-	    o.setIdentifier(noSpaceName + ":" + variableDescription + ":" + interpolation.getId());
+	    o.setName(variableName + ":" + variableUnit + ":" + entry.getKey());
+	    o.setIdentifier(noSpaceName + ":" + variableDescription + ":" + entry.getKey());
 	    o.setProtocol(WAF_TRIGGER_PROTOCOL);
 	    o.setDescription("Station name: " + title);
 	    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(o);
@@ -549,4 +645,39 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
 	return new TRIGGERWafConnectorSetting();
     }
+
+    public static void main(String[] args) {
+	List<String> filenames = Arrays.asList("cams_eu_ragweed_pollen_web_Reading_2025032400.json",
+		"cams_eu_particulate_matter_2.5um_web_Bologna_2025032400.json",
+		"cams_eu_particulate_matter_10um_web_Augsburg_2025032400.json", "cams_eu_ozone_web_Paris_2025032400.json",
+		"cams_eu_nitrogen_dioxide_web_Berlin_2025032400.json", "cams_eu_mugwort_pollen_web_London_2025032400.json");
+
+	Set<String> validEnums = new HashSet<>(Arrays.asList("cams_eu_ragweed_pollen_web", "cams_eu_particulate_matter_2.5um_web",
+		"cams_eu_particulate_matter_10um_web", "cams_eu_ozone_web", "cams_eu_nitrogen_dioxide_web", "cams_eu_mugwort_pollen_web",
+		"cams_eu_grass_pollen_web", "cams_eu_birch_pollen_web"));
+
+	// Map to store ENUMs and their corresponding city names
+	Map<String, String> extractedData = new LinkedHashMap<>();
+
+	for (String filename : filenames) {
+	    // Regex to extract ENUM name and city name
+	    String pattern = "^(cams_eu_[a-zA-Z0-9._]+_web)_([A-Za-z]+)_\\d+\\.json$";
+	    Pattern regex = Pattern.compile(pattern);
+	    Matcher matcher = regex.matcher(filename);
+
+	    if (matcher.find()) {
+		String extractedEnum = matcher.group(1); // ENUM Name
+		String cityName = matcher.group(2); // City Name
+
+		if (validEnums.contains(extractedEnum)) {
+		    extractedData.put(extractedEnum, cityName);
+		}
+	    }
+	}
+
+	// Output the extracted data
+	System.out.println("Extracted ENUMs and City Names:");
+	extractedData.forEach((enumName, city) -> System.out.println(enumName + " -> " + city));
+    }
+
 }

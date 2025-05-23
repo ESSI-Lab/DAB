@@ -374,6 +374,15 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 
 	return getProtectedFolder(AUGMENTERS_FOLDER, true);
     }
+    
+    /**
+     * @return
+     * @throws GSException
+     */
+    public DatabaseFolder getCacheFolder() throws GSException {
+
+	return getProtectedFolder(CACHE_FOLDER, true);
+    }
 
     /**
      * @return

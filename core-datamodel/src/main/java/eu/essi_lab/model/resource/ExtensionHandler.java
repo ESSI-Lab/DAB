@@ -60,7 +60,11 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
     private ExtendedMetadata metadata;
 
+    /**
+     * @return
+     */
     public ExtendedMetadata getMetadata() {
+
 	return metadata;
     }
 
@@ -80,243 +84,147 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	this(resource.getHarmonizedMetadata());
     }
 
-    /**
-     * @return
-     */
-    public Boolean isNCFileCorrupted() {
-
-	try {
-
-	    String textContent = this.metadata.getTextContent(NC_FILE_CORRUPTED);
-
-	    if (textContent == null) {
-
-		return false;
-	    }
-
-	    return textContent.equals("true") ? true : false;
-
-	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-
-	return false;
-    }
-
-    /**
-     * @param info
-     */
-    public void setIsNCFileCorrupted() {
-	try {
-	    this.metadata.add(NC_FILE_CORRUPTED, "true");
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
+    // -------------------------------------------------
+    //
+    // Queryables properties
+    //
+    // -------------------------------------------------
 
     /**
      * @return
      */
-    public Optional<String> getFEDEOSecondLevelInfo() {
-
-	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(FEDEO_SECOND_LEVEL_TEMPLATE));
-	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-
-	return Optional.empty();
-    }
-
-    /**
-     * @param info
-     */
-    public void setFEDEOSecondLevelInfo(String info) {
-	try {
-	    this.metadata.add(FEDEO_SECOND_LEVEL_TEMPLATE, info);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
-    /**
-     * @return
-     */
-    public Optional<String> getSTACSecondLevelInfo() {
-
-	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(STAC_SECOND_LEVEL_TEMPLATE));
-	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-
-	return Optional.empty();
-    }
-
-    /**
-     * @param info
-     */
-    public void setSTACSecondLevelInfo(String info) {
-	try {
-	    this.metadata.add(STAC_SECOND_LEVEL_TEMPLATE, info);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
-    /**
-     * @return
-     */
-    public Optional<String> getAvailableGranules() {
-
-	try {
-	    if (this.metadata.getTextContent(AVAILABLE_GRANULES) == null) {
-		return Optional.empty();
-	    }
-	    return Optional.of(this.metadata.getTextContent(AVAILABLE_GRANULES));
-	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-
-	return Optional.empty();
-    }
-
-    /**
-     * @param info
-     */
-    public void setAvailableGranules(String condition) {
-	try {
-	    this.metadata.add(AVAILABLE_GRANULES, condition);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
-    /**
-     * @param id
-     */
-    public void setUniqueInstrumentIdentifier(String id) {
-	try {
-	    this.metadata.add(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME, id);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
     public Optional<String> getBNHSInfo() {
 
 	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.BNHS_INFO_EL_NAME));
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.BNHS_INFO.getName()));
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param info
+     */
     public void setBNHSInfo(String info) {
 	try {
-	    this.metadata.add(MetadataElement.BNHS_INFO_EL_NAME, info);
+	    this.metadata.add(MetadataElement.BNHS_INFO.getName(), info);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
-    
+
+    /**
+     * @return
+     */
     public Optional<String> getRiverBasin() {
 
-   	try {
-   	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.RIVER_BASIN_EL_NAME));
-   	} catch (XPathExpressionException e) {
-   	    e.printStackTrace();
-   	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-   	}
+	try {
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.RIVER_BASIN.getName()));
+	} catch (XPathExpressionException e) {
 
-   	return Optional.empty();
-       }
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
 
-       public void setRiverBasin(String riverBasin) {
-   	try {
-   	    this.metadata.add(MetadataElement.RIVER_BASIN_EL_NAME, riverBasin);
-   	} catch (Exception e) {
-   	    e.printStackTrace();
-   	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-   	}
-       }
+	return Optional.empty();
+    }
 
+    /**
+     * @param riverBasin
+     */
+    public void setRiverBasin(String riverBasin) {
+	try {
+	    this.metadata.add(MetadataElement.RIVER_BASIN.getName(), riverBasin);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
     public Optional<String> getRiver() {
 
 	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.RIVER_EL_NAME));
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.RIVER.getName()));
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param river
+     */
     public void setRiver(String river) {
 	try {
-	    this.metadata.add(MetadataElement.RIVER_EL_NAME, river);
+	    this.metadata.add(MetadataElement.RIVER.getName(), river);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
 
+    /**
+     * @return
+     */
     public Optional<String> getCountry() {
 
 	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.COUNTRY_EL_NAME));
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.COUNTRY.getName()));
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param country
+     */
     public void setCountry(String country) {
 	try {
-	    this.metadata.add(MetadataElement.COUNTRY_EL_NAME, country);
+	    this.metadata.add(MetadataElement.COUNTRY.getName(), country);
 	    Country c = Country.decode(country);
 	    if (c != null && !getCountryISO3().isPresent()) {
 		setCountryISO3(c.getISO3());
 	    }
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
 
+    /**
+     * @return
+     */
     public Optional<String> getCountryISO3() {
 
 	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.COUNTRY_ISO3_EL_NAME));
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.COUNTRY_ISO3.getName()));
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param country
+     */
     public void setCountryISO3(String country) {
 	try {
-	    this.metadata.add(MetadataElement.COUNTRY_ISO3_EL_NAME, country);
+	    this.metadata.add(MetadataElement.COUNTRY_ISO3.getName(), country);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
@@ -327,9 +235,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public Optional<String> getUniqueInstrumentIdentifier() {
 
 	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME));
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER.getName()));
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
@@ -337,16 +245,28 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
+     * @param id
+     */
+    public void setUniqueInstrumentIdentifier(String id) {
+	try {
+	    this.metadata.add(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER.getName(), id);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
      * The size of the dataset (it is the multiplication of the sizes along each dimension, e.g. d_s = d1_s * d2_s * ...
-     * * dn_s
+     * dn_s
      * 
      * @param size
      */
     public void setDataSize(Long size) {
 	try {
-	    this.metadata.add(MetadataElement.DATA_SIZE_EL_NAME, "" + size);
+	    this.metadata.add(MetadataElement.DATA_SIZE.getName(), "" + size);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
@@ -358,7 +278,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public Optional<Long> getDataSize() {
 
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.DATA_SIZE_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.DATA_SIZE.getName());
 	    if (str == null || str.isEmpty()) {
 		return Optional.empty();
 	    }
@@ -366,7 +286,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    long size = Long.parseLong(str);
 	    return Optional.of(size);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
@@ -378,9 +298,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public void setUniquePlatformIdentifier(String id) {
 	try {
-	    this.metadata.add(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER_EL_NAME, id);
+	    this.metadata.add(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER.getName(), id);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
@@ -391,9 +311,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public Optional<String> getUniquePlatformIdentifier() {
 
 	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER_EL_NAME));
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER.getName()));
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
@@ -405,9 +325,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public void setUniqueAttributeIdentifier(String id) {
 	try {
-	    this.metadata.add(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER_EL_NAME, id);
+	    this.metadata.add(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER.getName(), id);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
@@ -418,77 +338,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public Optional<String> getUniqueAttributeIdentifier() {
 
 	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER_EL_NAME));
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER.getName()));
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
 
-	return Optional.empty();
-    }
-
-    /**
-     * @param scene
-     */
-    public void setSatelliteScene(SatelliteScene scene) {
-
-	try {
-	    this.metadata.remove("//*:satelliteScene");
-	    this.metadata.add(scene.asDocument(true).getDocumentElement());
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
-    /**
-     * @return
-     */
-    public Optional<SatelliteScene> getSatelliteScene() {
-
-	try {
-	    List<Node> list = this.metadata.get("//*:satelliteScene");
-	    if (!list.isEmpty()) {
-
-		Node node = list.get(0);
-		return Optional.of(SatelliteScene.create(node));
-	    }
-	} catch (XPathExpressionException | JAXBException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-
-	return Optional.empty();
-    }
-
-    /**
-     * @param scene
-     */
-    public void setWorldCereal(WorldCerealMap map) {
-
-	try {
-	    this.metadata.remove("//*:worldCerealMap");
-	    this.metadata.add(map.asDocument(true).getDocumentElement());
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
-    /**
-     * @return
-     */
-    public Optional<WorldCerealMap> getWorldCereal() {
-
-	try {
-	    List<Node> list = this.metadata.get("//*:worldCerealMap");
-	    if (!list.isEmpty()) {
-
-		Node node = list.get(0);
-		return Optional.of(WorldCerealMap.create(node));
-	    }
-	} catch (XPathExpressionException | JAXBException e) {
-	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
@@ -500,50 +352,27 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getCropTypes() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.CROP_TYPES_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.CROP_TYPES.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param cropTypes
+     */
     public void setCropTypes(String cropTypes) {
 	try {
-	    this.metadata.add(MetadataElement.CROP_TYPES_EL_NAME, cropTypes);
+	    this.metadata.add(MetadataElement.CROP_TYPES.getName(), cropTypes);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
-    }
-
-    /**
-     * @return
-     */
-    public Optional<String> getMagnitudeLevel() {
-	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(MAG_LEVEL));
-	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-
-	return Optional.empty();
-    }
-
-    /**
-     * @param magLevel
-     */
-    public void setMagnitudeLevel(String magLevel) {
-	try {
-	    this.metadata.add(MAG_LEVEL, magLevel);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
     }
 
     /**
@@ -551,45 +380,56 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<InterpolationType> getTimeInterpolation() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.TIME_INTERPOLATION_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_INTERPOLATION.getName());
 	    InterpolationType interpolation = InterpolationType.decode(str);
 	    return Optional.ofNullable(interpolation);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 	return Optional.empty();
     }
 
+    /**
+     * @return
+     */
     public Optional<String> getTimeInterpolationString() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.TIME_INTERPOLATION_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_INTERPOLATION.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 	return Optional.empty();
     }
 
+    /**
+     * @param interpolationType
+     */
     public void setTimeInterpolation(InterpolationType interpolationType) {
+
 	if (interpolationType != null) {
+
 	    setTimeInterpolation(interpolationType.name());
 	}
-
     }
 
+    /**
+     * @param interpolationType
+     */
     public void setTimeInterpolation(String interpolationType) {
+
 	if (interpolationType == null) {
 	    return;
 	}
+
 	try {
-	    this.metadata.add(MetadataElement.TIME_INTERPOLATION_EL_NAME, interpolationType);
+	    this.metadata.add(MetadataElement.TIME_INTERPOLATION.getName(), interpolationType);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     /**
@@ -597,21 +437,24 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getTimeSupport() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.TIME_SUPPORT_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_SUPPORT.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param timeSupport
+     */
     public void setTimeSupport(String timeSupport) {
 	try {
-	    this.metadata.add(MetadataElement.TIME_SUPPORT_EL_NAME, timeSupport);
+	    this.metadata.add(MetadataElement.TIME_SUPPORT.getName(), timeSupport);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
@@ -622,24 +465,26 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getTimeResolution() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.TIME_RESOLUTION_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_RESOLUTION.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param timeResolution
+     */
     public void setTimeResolution(String timeResolution) {
 	try {
-	    this.metadata.add(MetadataElement.TIME_RESOLUTION_EL_NAME, timeResolution);
+	    this.metadata.add(MetadataElement.TIME_RESOLUTION.getName(), timeResolution);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     /**
@@ -647,21 +492,24 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getTimeUnits() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.TIME_UNITS_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_UNITS.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param timeUnits
+     */
     public void setTimeUnits(String timeUnits) {
 	try {
-	    this.metadata.add(MetadataElement.TIME_UNITS_EL_NAME, timeUnits);
+	    this.metadata.add(MetadataElement.TIME_UNITS.getName(), timeUnits);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
@@ -672,7 +520,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getTimeResolutionDuration8601() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.TIME_RESOLUTION_DURATION_8601_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_RESOLUTION_DURATION_8601.getName());
 	    Optional<String> ret = Optional.ofNullable(str);
 	    if (ret.isPresent()) {
 		return ret;
@@ -691,21 +539,23 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 		}
 	    }
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param resolution
+     */
     public void setTimeResolutionDuration8601(String resolution) {
 	try {
-	    this.metadata.add(MetadataElement.TIME_RESOLUTION_DURATION_8601_EL_NAME, resolution);
+	    this.metadata.add(MetadataElement.TIME_RESOLUTION_DURATION_8601.getName(), resolution);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     /**
@@ -713,7 +563,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getTimeAggregationDuration8601() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_AGGREGATION_DURATION_8601.getName());
 	    Optional<String> ret = Optional.ofNullable(str);
 	    if (ret.isPresent()) {
 		return ret;
@@ -732,21 +582,23 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 		}
 	    }
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param timeAggregation
+     */
     public void setTimeAggregationDuration8601(String timeAggregation) {
 	try {
-	    this.metadata.add(MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME, timeAggregation);
+	    this.metadata.add(MetadataElement.TIME_AGGREGATION_DURATION_8601.getName(), timeAggregation);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     /**
@@ -754,24 +606,26 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getTimeUnitsAbbreviation() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.TIME_UNITS_ABBREVIATION_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_UNITS_ABBREVIATION.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param timeUnitsAbbreviation
+     */
     public void setTimeUnitsAbbreviation(String timeUnitsAbbreviation) {
 	try {
-	    this.metadata.add(MetadataElement.TIME_UNITS_ABBREVIATION_EL_NAME, timeUnitsAbbreviation);
+	    this.metadata.add(MetadataElement.TIME_UNITS_ABBREVIATION.getName(), timeUnitsAbbreviation);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     /**
@@ -779,33 +633,37 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getAttributeUnitsURI() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.ATTRIBUTE_UNITS_URI_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.ATTRIBUTE_UNITS_URI.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 	return Optional.empty();
     }
 
+    /**
+     * @param attributeURI
+     */
     public void setAttributeUnitsURI(String attributeURI) {
 	try {
-	    this.metadata.add(MetadataElement.ATTRIBUTE_UNITS_URI_EL_NAME, attributeURI);
+	    this.metadata.add(MetadataElement.ATTRIBUTE_UNITS_URI.getName(), attributeURI);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
-    public void setObservedPropertyURI(String attributeUnitsURI) {
+    /**
+     * @param obsPropURI
+     */
+    public void setObservedPropertyURI(String obsPropURI) {
 	try {
-	    this.metadata.add(MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME, attributeUnitsURI);
+	    this.metadata.add(MetadataElement.OBSERVED_PROPERTY_URI.getName(), obsPropURI);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     /**
@@ -813,20 +671,23 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getObservedPropertyURI() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.OBSERVED_PROPERTY_URI.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 	return Optional.empty();
     }
 
+    /**
+     * @param topic
+     */
     public void setWISTopicHierarchy(String topic) {
 	try {
-	    this.metadata.add(MetadataElement.WIS_TOPIC_HIERARCHY_EL_NAME, topic);
+	    this.metadata.add(MetadataElement.WIS_TOPIC_HIERARCHY.getName(), topic);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
@@ -837,10 +698,10 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getWISTopicHierarchy() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.WIS_TOPIC_HIERARCHY_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.WIS_TOPIC_HIERARCHY.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 	return Optional.empty();
@@ -851,24 +712,26 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getAttributeUnits() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.ATTRIBUTE_UNITS_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.ATTRIBUTE_UNITS.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param attributeUnits
+     */
     public void setAttributeUnits(String attributeUnits) {
 	try {
-	    this.metadata.add(MetadataElement.ATTRIBUTE_UNITS_EL_NAME, attributeUnits);
+	    this.metadata.add(MetadataElement.ATTRIBUTE_UNITS.getName(), attributeUnits);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     /**
@@ -876,24 +739,26 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getAttributeUnitsAbbreviation() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param attributeUnitsAbbreviation
+     */
     public void setAttributeUnitsAbbreviation(String attributeUnitsAbbreviation) {
 	try {
-	    this.metadata.add(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION_EL_NAME, attributeUnitsAbbreviation);
+	    this.metadata.add(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION.getName(), attributeUnitsAbbreviation);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     /**
@@ -901,175 +766,33 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getAttributeMissingValue() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.ATTRIBUTE_MISSING_VALUE_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.ATTRIBUTE_MISSING_VALUE.getName());
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return Optional.empty();
     }
 
+    /**
+     * @param attributeMissingValue
+     */
     public void setAttributeMissingValue(String attributeMissingValue) {
 	try {
-	    this.metadata.add(MetadataElement.ATTRIBUTE_MISSING_VALUE_EL_NAME, attributeMissingValue);
+	    this.metadata.add(MetadataElement.ATTRIBUTE_MISSING_VALUE.getName(), attributeMissingValue);
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
 
-    }
-
-    /**
-     * @return
-     */
-    public List<String> getOriginatorOrganisationIdentifiers() {
-	try {
-	    return this.metadata.getTextContents(ORIGINATOR_ORGANISATION_IDENTIFIER);
-	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-
-	return new ArrayList<>();
-    }
-
-    /**
-     * @param originatorOrganisationIdentifier
-     */
-    public void addOriginatorOrganisationIdentifier(String originatorOrganisationIdentifier) {
-	try {
-	    this.metadata.add(ORIGINATOR_ORGANISATION_IDENTIFIER, originatorOrganisationIdentifier);
-	} catch (Exception e) {
-	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
 
-    /**
-     * @return
-     */
-    public List<String> getOriginatorOrganisationDescriptions() {
-	try {
-	    return this.metadata.getTextContents(ORIGINATOR_ORGANISATION_DESCRIPTION);
-	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-
-	return new ArrayList<>();
-    }
-
-    /**
-     * @param originatorOrganisationDescription
-     */
-    public void addOriginatorOrganisationDescription(String originatorOrganisationDescription) {
-	try {
-	    this.metadata.add(ORIGINATOR_ORGANISATION_DESCRIPTION, originatorOrganisationDescription);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
-    /**
-     * 
-     */
-    public void clearOriginatorOrganisationDescriptions() {
-
-	try {
-	    this.metadata.remove("//" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + ":" + ORIGINATOR_ORGANISATION_DESCRIPTION);
-	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
-    /**
-     * 
-     */
-    public void clearOriginatorOrganisationIdentifiers() {
-
-	try {
-	    this.metadata.remove("//" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + ":" + ORIGINATOR_ORGANISATION_IDENTIFIER);
-	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
-
-    public void adapt(ExtensionHandler targetHandler, AdaptPolicy policy, String... properties) {
-
-	switch (policy) {
-	case ADD:
-
-	    getOriginatorOrganisationDescriptions().forEach(d -> targetHandler.addOriginatorOrganisationDescription(d));
-	    getOriginatorOrganisationIdentifiers().forEach(d -> targetHandler.addOriginatorOrganisationIdentifier(d));
-
-	    break;
-
-	case ON_EMPTY:
-
-	    if (targetHandler.getOriginatorOrganisationDescriptions().isEmpty()) {
-
-		getOriginatorOrganisationDescriptions().forEach(d -> targetHandler.addOriginatorOrganisationDescription(d));
-	    }
-
-	    if (targetHandler.getOriginatorOrganisationIdentifiers().isEmpty()) {
-
-		getOriginatorOrganisationIdentifiers().forEach(d -> targetHandler.addOriginatorOrganisationIdentifier(d));
-	    }
-
-	    break;
-	case OVERRIDE:
-
-	    if (!getOriginatorOrganisationDescriptions().isEmpty()) {
-		clearOriginatorOrganisationDescriptions();
-		getOriginatorOrganisationDescriptions().forEach(d -> targetHandler.addOriginatorOrganisationDescription(d));
-	    }
-
-	    if (!getOriginatorOrganisationIdentifiers().isEmpty()) {
-		clearOriginatorOrganisationIdentifiers();
-		getOriginatorOrganisationIdentifiers().forEach(d -> targetHandler.addOriginatorOrganisationIdentifier(d));
-	    }
-
-	    break;
-	}
-
-	if (!this.getOriginatorOrganisationDescriptions().isEmpty() && //
-		targetHandler.getOriginatorOrganisationDescriptions().isEmpty()) {
-
-	    this.getOriginatorOrganisationDescriptions().forEach(d -> targetHandler.addOriginatorOrganisationDescription(d));
-	}
-
-	if (!this.getOriginatorOrganisationIdentifiers().isEmpty() && //
-		targetHandler.getOriginatorOrganisationIdentifiers().isEmpty()) {
-
-	    this.getOriginatorOrganisationIdentifiers().forEach(d -> targetHandler.addOriginatorOrganisationIdentifier(d));
-	}
-    }
-
-    public Optional<String> getBNHSProperty(BNHSProperty property) {
-
-	try {
-	    return Optional.ofNullable(this.metadata.getTextContent(property.getElement().getName()));
-	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-
-	return Optional.empty();
-    }
-
-    public void setBNHSProperty(BNHSProperty property, String value) {
-	try {
-	    this.metadata.add(property.getElement().getName(), value);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-    }
+    // -------------------------------------------------------
+    //
+    // Shape properties
+    //
+    // -------------------------------------------------------
 
     /**
      * @param shape
@@ -1155,6 +878,25 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	return Optional.empty();
     }
 
+    // ---------------------------------------------
+    //
+    // Non queryable properties
+    //
+    // ---------------------------------------------
+
+    /**
+     * @param property
+     * @param value
+     */
+    public void setBNHSProperty(BNHSProperty property, String value) {
+	try {
+	    this.metadata.add(property.getElement().getName(), value);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
     /**
      * @param themeCategory
      */
@@ -1162,10 +904,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	try {
 	    this.metadata.add(THEME_CATEGORY, themeCategory);
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     /**
@@ -1176,7 +917,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    String str = this.metadata.getTextContent("themeCategory");
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
@@ -1191,7 +932,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	try {
 	    this.metadata.remove("//" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + ":" + THEME_CATEGORY);
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
@@ -1203,10 +944,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	try {
 	    this.metadata.add(IN_SITU, "true");
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     /**
@@ -1225,11 +965,359 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    return textContent.equals("true") ? true : false;
 
 	} catch (XPathExpressionException e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
 	return false;
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getOriginatorOrganisationIdentifiers() {
+	try {
+	    return this.metadata.getTextContents(ORIGINATOR_ORGANISATION_IDENTIFIER);
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return new ArrayList<>();
+    }
+
+    /**
+     * @param originatorOrganisationIdentifier
+     */
+    public void addOriginatorOrganisationIdentifier(String originatorOrganisationIdentifier) {
+	try {
+	    this.metadata.add(ORIGINATOR_ORGANISATION_IDENTIFIER, originatorOrganisationIdentifier);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getOriginatorOrganisationDescriptions() {
+	try {
+	    return this.metadata.getTextContents(ORIGINATOR_ORGANISATION_DESCRIPTION);
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return new ArrayList<>();
+    }
+
+    /**
+     * @param originatorOrganisationDescription
+     */
+    public void addOriginatorOrganisationDescription(String originatorOrganisationDescription) {
+	try {
+	    this.metadata.add(ORIGINATOR_ORGANISATION_DESCRIPTION, originatorOrganisationDescription);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * 
+     */
+    public void clearOriginatorOrganisationDescriptions() {
+
+	try {
+	    this.metadata.remove("//" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + ":" + ORIGINATOR_ORGANISATION_DESCRIPTION);
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * 
+     */
+    public void clearOriginatorOrganisationIdentifiers() {
+
+	try {
+	    this.metadata.remove("//" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + ":" + ORIGINATOR_ORGANISATION_IDENTIFIER);
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getMagnitudeLevel() {
+	try {
+	    return Optional.ofNullable(this.metadata.getTextContent(MAG_LEVEL));
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param magLevel
+     */
+    public void setMagnitudeLevel(String magLevel) {
+	try {
+	    this.metadata.add(MAG_LEVEL, magLevel);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @param scene
+     */
+    public void setSatelliteScene(SatelliteScene scene) {
+
+	try {
+	    this.metadata.remove("//*:satelliteScene");
+	    this.metadata.add(scene.asDocument(true).getDocumentElement());
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<SatelliteScene> getSatelliteScene() {
+
+	try {
+	    List<Node> list = this.metadata.get("//*:satelliteScene");
+	    if (!list.isEmpty()) {
+
+		Node node = list.get(0);
+		return Optional.of(SatelliteScene.create(node));
+	    }
+	} catch (XPathExpressionException | JAXBException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param scene
+     */
+    public void setWorldCereal(WorldCerealMap map) {
+
+	try {
+	    this.metadata.remove("//*:worldCerealMap");
+	    this.metadata.add(map.asDocument(true).getDocumentElement());
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<WorldCerealMap> getWorldCereal() {
+
+	try {
+	    List<Node> list = this.metadata.get("//*:worldCerealMap");
+	    if (!list.isEmpty()) {
+
+		Node node = list.get(0);
+		return Optional.of(WorldCerealMap.create(node));
+	    }
+	} catch (XPathExpressionException | JAXBException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @return
+     */
+    public Boolean isNCFileCorrupted() {
+
+	try {
+
+	    String textContent = this.metadata.getTextContent(NC_FILE_CORRUPTED);
+
+	    if (textContent == null) {
+
+		return false;
+	    }
+
+	    return textContent.equals("true") ? true : false;
+
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return false;
+    }
+
+    /**
+     * @param info
+     */
+    public void setIsNCFileCorrupted() {
+	try {
+	    this.metadata.add(NC_FILE_CORRUPTED, "true");
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getFEDEOSecondLevelInfo() {
+
+	try {
+	    return Optional.ofNullable(this.metadata.getTextContent(FEDEO_SECOND_LEVEL_TEMPLATE));
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param info
+     */
+    public void setFEDEOSecondLevelInfo(String info) {
+	try {
+	    this.metadata.add(FEDEO_SECOND_LEVEL_TEMPLATE, info);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getSTACSecondLevelInfo() {
+
+	try {
+	    return Optional.ofNullable(this.metadata.getTextContent(STAC_SECOND_LEVEL_TEMPLATE));
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param info
+     */
+    public void setSTACSecondLevelInfo(String info) {
+	try {
+	    this.metadata.add(STAC_SECOND_LEVEL_TEMPLATE, info);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getAvailableGranules() {
+
+	try {
+	    if (this.metadata.getTextContent(AVAILABLE_GRANULES) == null) {
+		return Optional.empty();
+	    }
+	    return Optional.of(this.metadata.getTextContent(AVAILABLE_GRANULES));
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param info
+     */
+    public void setAvailableGranules(String condition) {
+	try {
+	    this.metadata.add(AVAILABLE_GRANULES, condition);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    //
+    //
+    //
+
+    @Override
+    public void adapt(ExtensionHandler targetHandler, AdaptPolicy policy, String... properties) {
+
+	switch (policy) {
+	case ADD:
+
+	    getOriginatorOrganisationDescriptions().forEach(d -> targetHandler.addOriginatorOrganisationDescription(d));
+	    getOriginatorOrganisationIdentifiers().forEach(d -> targetHandler.addOriginatorOrganisationIdentifier(d));
+
+	    break;
+
+	case ON_EMPTY:
+
+	    if (targetHandler.getOriginatorOrganisationDescriptions().isEmpty()) {
+
+		getOriginatorOrganisationDescriptions().forEach(d -> targetHandler.addOriginatorOrganisationDescription(d));
+	    }
+
+	    if (targetHandler.getOriginatorOrganisationIdentifiers().isEmpty()) {
+
+		getOriginatorOrganisationIdentifiers().forEach(d -> targetHandler.addOriginatorOrganisationIdentifier(d));
+	    }
+
+	    break;
+	case OVERRIDE:
+
+	    if (!getOriginatorOrganisationDescriptions().isEmpty()) {
+		clearOriginatorOrganisationDescriptions();
+		getOriginatorOrganisationDescriptions().forEach(d -> targetHandler.addOriginatorOrganisationDescription(d));
+	    }
+
+	    if (!getOriginatorOrganisationIdentifiers().isEmpty()) {
+		clearOriginatorOrganisationIdentifiers();
+		getOriginatorOrganisationIdentifiers().forEach(d -> targetHandler.addOriginatorOrganisationIdentifier(d));
+	    }
+
+	    break;
+	}
+
+	if (!this.getOriginatorOrganisationDescriptions().isEmpty() && //
+		targetHandler.getOriginatorOrganisationDescriptions().isEmpty()) {
+
+	    this.getOriginatorOrganisationDescriptions().forEach(d -> targetHandler.addOriginatorOrganisationDescription(d));
+	}
+
+	if (!this.getOriginatorOrganisationIdentifiers().isEmpty() && //
+		targetHandler.getOriginatorOrganisationIdentifiers().isEmpty()) {
+
+	    this.getOriginatorOrganisationIdentifiers().forEach(d -> targetHandler.addOriginatorOrganisationIdentifier(d));
+	}
     }
 
 }

@@ -66,15 +66,10 @@ public class ProfilerStateColumnRenderer extends IconColumnRenderer {
     protected Optional<String> getToolTip(HashMap<String, String> item) {
 
 	String status = item.get("State");
-	switch (status) {
-
-	case "Online":
-	case "Offline":
-
-	    return Optional.of(status);
-	}
-
-	return Optional.empty();
+	return switch (status) {
+	case "Online", "Offline" -> Optional.of(status);
+	default -> Optional.empty();
+	};
     }
 
     /**
@@ -82,7 +77,7 @@ public class ProfilerStateColumnRenderer extends IconColumnRenderer {
      * @return
      */
     private Icon createIcon(String status) {
-    
-        return status.equals("Online") ? VaadinIcon.SIGNAL.create() : VaadinIcon.BAN.create();
+
+	return status.equals("Online") ? VaadinIcon.SIGNAL.create() : VaadinIcon.BAN.create();
     }
 }

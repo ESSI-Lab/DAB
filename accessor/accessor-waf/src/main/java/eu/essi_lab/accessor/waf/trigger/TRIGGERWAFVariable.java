@@ -29,8 +29,20 @@ public enum TRIGGERWAFVariable {
     WBGT("Wet-bulb globe temperature (WBGT)", "wbgt", "The wet bulb globe temperature is a measure of environmental heat as it affects humans. It is derived from air temperature, dew point temperature, wind speed and mean radiant temperature.", "°C"),
     UTCI("Universal thermal climate index (UTCI)","utci","The Universal Thermal Climate Index (UTCI) is defined as the air temperature of a reference outdoor environment that would elicit in the human body the same physiological response (sweat production, shivering, skin wettedness,skin blood flow and rectal, mean skin and face temperatures) as the actual environment.","°C"),
     MRT("Mean radiant temperature (MRT)","mrt","The mean radiant temperature is the temperature of a uniform, black enclosure that exchanges the same amount of heat by radiation with the occupant as the actual surroundings","°C"),
-    WCT("Wind chill temperature (WCT)","wct","The wind chill factor describes the cooling sensation felt by the human body and is based on the rate of heat loss from exposed skin caused by the effects of wind and cold. It is derived from air temperature and wind speed.", "°C");
-//    TEMPERATURE_MIN("2m temperature (min)", "TERMOMETRO_MIN", "Kelvin"),
+    WCT("Wind chill temperature (WCT)","wct","The wind chill factor describes the cooling sensation felt by the human body and is based on the rate of heat loss from exposed skin caused by the effects of wind and cold. It is derived from air temperature and wind speed.", "°C"),
+      
+    RAGWEED_POLLEN("Ragweed pollen","cams_eu_ragweed_pollen_web","Ragweed is a species native to the American continent but has become an invasive species in Europe, causing allergies in many people. The blossom starts in August and its highest pollen season is in September.", "grains/m³"),
+    PM2_5("Particulate matter 2.5 (PM2.5)","cams_eu_particulate_matter_2.5um_web","These refer to airborne particles with diameters less than 2.5 micrometers (PM2.5).", "µg/m³"),
+    PM10("Particulate matter 10 (PM10)","cams_eu_particulate_matter_10um_web","These refer to airborne particles with diameters less than 10 micrometers (PM10).", "µg/m³"),
+    OZONE("Ozone","cams_eu_ozone_web","A reactive gas composed of three oxygen atoms, ozone is found in both the Earth's upper atmosphere and at ground level.", "µg/m³"),
+    NO2("Nitrogen dioxide (NO2)","cams_eu_nitrogen_dioxide_web","A significant air pollutant produced mainly from vehicle emissions and industrial processes.", "µg/m³"),
+    MUGWORT_POLLEN("Mugwort pollen","cams_eu_mugwort_pollen_web","The AUX provides forecasts for various pollen types, measured in grains per cubic meter.", "grains/m³"),
+    GRASS_POLLEN("Grass pollen","cams_eu_grass_pollen_web","The AUX provides forecasts for various pollen types, measured in grains per cubic meter.", "grains/m³"),
+    BIRCH_POLLEN("Birch pollen","cams_eu_birch_pollen_web","The AUX provides forecasts for various pollen types, measured in grains per cubic meter.", "grains/m³");
+    
+
+    
+    //    TEMPERATURE_MIN("2m temperature (min)", "TERMOMETRO_MIN", "Kelvin"),
 //    TEMPERATURE_MAX("2m temperature (max)", "TERMOMETRO_MAX", "Kelvin"),
 //    TEMPERATURE_INTERNAL("temperature (internal)", "TERMOMETRO_INTERNA", "Kelvin"),
 //    SOIL_TEMPERATURE("soil temperature", "SOIL_TEMPERATURE", "Kelvin");

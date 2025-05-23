@@ -1127,7 +1127,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    getValues().add(value);
 		}
 	    }
-
 	}
     };
 
@@ -1204,6 +1203,137 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	public void defineValues(GSResource resource) {
 
 	    Optional<String> optional = resource.getExtensionHandler().getTimeInterpolationString();
+
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement TIME_SUPPORT = new IndexedMetadataElement(MetadataElement.TIME_SUPPORT) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getTimeSupport();
+
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement TIME_RESOLUTION = new IndexedMetadataElement(MetadataElement.TIME_RESOLUTION) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getTimeResolution();
+
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement TIME_UNITS = new IndexedMetadataElement(MetadataElement.TIME_UNITS) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getTimeUnits();
+
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement ATTRIBUTE_UNITS_URI = new IndexedMetadataElement(MetadataElement.ATTRIBUTE_UNITS_URI) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getAttributeUnitsURI();
+
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement ATTRIBUTE_MISSING_VALUE = new IndexedMetadataElement(
+	    MetadataElement.ATTRIBUTE_MISSING_VALUE) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getAttributeMissingValue();
+
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement ATTRIBUTE_UNITS_ABBREVIATION = new IndexedMetadataElement(
+	    MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getAttributeUnitsAbbreviation();
+
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement ATTRIBUTE_UNITS = new IndexedMetadataElement(MetadataElement.ATTRIBUTE_UNITS) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getAttributeUnits();
+
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement TIME_UNITS_ABBREVIATION = new IndexedMetadataElement(
+	    MetadataElement.TIME_UNITS_ABBREVIATION) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getTimeUnitsAbbreviation();
 
 	    if (optional.isPresent()) {
 
@@ -1567,7 +1697,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 	    defineBNHSProperty(BNHSProperty.RIVER, resource);
-	    
+
 	    Optional<String> optional = resource.getExtensionHandler().getRiver();
 	    if (optional.isPresent()) {
 
@@ -1576,10 +1706,10 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    getValues().add(value);
 		}
 	    }
-	    
+
 	}
     };
-    
+
     public static final IndexedMetadataElement RIVER_BASIN = new IndexedMetadataElement(MetadataElement.RIVER_BASIN) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -1591,7 +1721,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    getValues().add(value);
 		}
 	    }
-	    
+
 	}
     };
 
@@ -1692,7 +1822,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    VerticalExtent vertical = miMetadata.getDataIdentification().getVerticalExtent();
 	    if (vertical != null) {
 		Double minimum = vertical.getMinimumValue();
-		if (minimum != null ) {
+		if (minimum != null) {
 		    getValues().add(minimum.toString());
 		}
 	    }
@@ -1705,7 +1835,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    VerticalExtent vertical = miMetadata.getDataIdentification().getVerticalExtent();
 	    if (vertical != null) {
 		Double maximum = vertical.getMaximumValue();
-		if (maximum != null ) {
+		if (maximum != null) {
 		    getValues().add(maximum.toString());
 		}
 	    }

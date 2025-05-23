@@ -34,11 +34,10 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.MediaType;
 
-import org.slf4j.Logger;
-
 import com.google.common.collect.Lists;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
@@ -96,7 +95,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      */
     private static final List<String> SUPPORTED_OUTPUT_FORMATS = new ArrayList<>();
     private static final String OS_PARAM_PARSING_ERROR = "OS_PARAM_PARSING_ERROR";
-    private Logger logger = GSLoggerFactory.getLogger(OSRequestTransformer.class);
+
+    protected ProfilerSetting setting;
 
     //
     //
@@ -108,6 +108,14 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	SUPPORTED_OUTPUT_FORMATS.add(NameSpace.GS_DATA_MODEL_XML_MEDIA_TYPE);
     }
 
+    /**
+     * @param setting
+     */
+    public OSRequestTransformer(ProfilerSetting setting) {
+
+	this.setting = setting;
+    }
+
     @Override
     protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
 
@@ -117,13 +125,13 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	// including weighted queries to improve ranking
 	message.setIncludeWeightedQueries(true);
-	
+
 	//
 	// covering mode: overrides the satellites sources results priority,
 	// set the covering mode view and adjusts the ranking to give a weight only to
 	// bbox
 	//
-	if (CoveringModeOptionsReader.isCoveringModeEnabled()) {
+	if (CoveringModeOptionsReader.isCoveringModeEnabled(setting)) {
 
 	    message.setResultsPriority(ResultsPriority.DATASET);
 
@@ -230,7 +238,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    String value = parser.parse(sourceParam);
 	    if (value != null) {
 
-		logger.trace("Found {} parameter, starting sources check", OSParameters.SOURCES.getName());
+		GSLoggerFactory.getLogger(getClass()).trace("Found {} parameter, starting sources check", OSParameters.SOURCES.getName());
 
 		String[] split = value.split(",");
 
@@ -245,7 +253,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		    return message;
 		}
 
-		logger.trace("Completed sources check");
+		GSLoggerFactory.getLogger(getClass()).trace("Completed sources check");
 	    }
 
 	    List<OSParameter> parameters = WebRequestParameter.findParameters(OSParameters.class);
@@ -349,7 +357,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	//
 	// search terms are NOT included in case of Eiffel SORT_AND_FILTER
 	//
-	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request);
+	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request, setting);
 
 	if (!eiffelOption.isPresent() || eiffelOption.get() == EiffelAPIDiscoveryOption.FILTER_AND_SORT) {
 
@@ -579,34 +587,35 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	    out = osParameter.asBond(value);
 
-//	} else if (view.isPresent() && view.get().getSourceDeployment() != null) {
-//
-//	    String sourceDeployment = view.get().getSourceDeployment();
-//
-//	    List<String> sourceIdsByDeployment = ConfigurationWrapper.getAllSources().//
-//		    stream().filter(s -> s.getDeployment().contains(sourceDeployment)).//
-//		    map(s -> s.getUniqueIdentifier()).//
-//		    collect(Collectors.toList());//
-//
-//	    List<String> selected = Arrays.asList(sources.split(","));
-//	    List<String> unselected = sourceIdsByDeployment.stream().//
-//		    filter(id -> !selected.contains(id)).//
-//		    collect(Collectors.toList());
-//
-//	    int selectedCount = selected.size();
-//	    int unSelectedCount = unselected.size();
-//
-//	    if (selectedCount <= unSelectedCount) {
-//
-//		out = osParameter.asBond(value);
-//
-//	    } else {
-//
-//		LogicalBond orBond = BondFactory.createOrBond();
-//		unselected.forEach(id -> orBond.getOperands().add(BondFactory.createNotBond(BondFactory.createSourceIdentifierBond(id))));
-//
-//		out = Optional.of(orBond);
-//	    }
+	    // } else if (view.isPresent() && view.get().getSourceDeployment() != null) {
+	    //
+	    // String sourceDeployment = view.get().getSourceDeployment();
+	    //
+	    // List<String> sourceIdsByDeployment = ConfigurationWrapper.getAllSources().//
+	    // stream().filter(s -> s.getDeployment().contains(sourceDeployment)).//
+	    // map(s -> s.getUniqueIdentifier()).//
+	    // collect(Collectors.toList());//
+	    //
+	    // List<String> selected = Arrays.asList(sources.split(","));
+	    // List<String> unselected = sourceIdsByDeployment.stream().//
+	    // filter(id -> !selected.contains(id)).//
+	    // collect(Collectors.toList());
+	    //
+	    // int selectedCount = selected.size();
+	    // int unSelectedCount = unselected.size();
+	    //
+	    // if (selectedCount <= unSelectedCount) {
+	    //
+	    // out = osParameter.asBond(value);
+	    //
+	    // } else {
+	    //
+	    // LogicalBond orBond = BondFactory.createOrBond();
+	    // unselected.forEach(id ->
+	    // orBond.getOperands().add(BondFactory.createNotBond(BondFactory.createSourceIdentifierBond(id))));
+	    //
+	    // out = Optional.of(orBond);
+	    // }
 
 	} else {
 
@@ -944,7 +953,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	///////////////////////////////////////////////
 
-	Optional<Integer> filterAndSortSplitTreshold = EiffelDiscoveryHelper.getFilterAndSortSplitTreshold();
+	Optional<Integer> filterAndSortSplitTreshold = EiffelDiscoveryHelper.getFilterAndSortSplitTreshold(setting);
 
 	if (eiffelOption && searchTerms != null && filterAndSortSplitTreshold.isPresent()) {
 

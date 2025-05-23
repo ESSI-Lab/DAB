@@ -40,6 +40,10 @@ public class DocumentReport {
 	private HashMap<BlueCloudMetadataElement, List<String>> map = new HashMap<>();
 	private XMLDocumentReader document;
 
+	public DocumentReport() {
+	 
+	}
+	
 	public DocumentReport(XMLDocumentReader document) {
 		this.document = document;
 	}

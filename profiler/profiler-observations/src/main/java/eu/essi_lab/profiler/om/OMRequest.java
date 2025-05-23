@@ -46,9 +46,10 @@ public class OMRequest {
 	FORMAT("format"), //
 	USE_CACHE("useCache"), //
 	INCLUDE_VALUES("includeValues", "includeData"), //
+	ASYNCH_DOWNLOAD("asynchDownload"), //
 	BEGIN_DATE("beginDate", "startDate", "beginTime", "startTime", "begin", "beginPosition"), //
 	END_DATE("endDate", "endTime", "end", "endPosition"), //
-	PLATFORM_CODE("sampledFeature", "feature", "monitoringPoint", "monitoringPointIdentifier", "platform", "platformCode", "site",
+	PLATFORM_CODE("sampledFeature", "feature","featureIdentifier","featureId", "monitoringPoint", "monitoringPointIdentifier", "platform", "platformCode", "site",
 		"location", "siteCode"), //
 	ONTOLOGY("ontology"), //
 	OBSERVED_PROPERTY("observedProperty"), //
@@ -66,7 +67,11 @@ public class OMRequest {
 	WEST("west", "xmin", "minx"), //
 	SOUTH("south", "ymin", "miny"), //
 	EAST("east", "xmax", "maxx"), //
-	NORTH("north", "ymax", "maxy");
+	NORTH("north", "ymax", "maxy"), //
+	PROPERTY("property"),//
+	RESUMPTION_TOKEN("resumptionToken")
+	
+	;
 
 	private String[] keys;
 

@@ -30,8 +30,13 @@ import org.json.JSONObject;
 
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 
@@ -47,6 +52,16 @@ public class VolatileDatabaseExecutor extends VolatileDatabaseReader implements 
     }
 
     @Override
+    public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
+	return null;
+    }
+
+    @Override
+    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws Exception {
+        return null;
+    }
+    
+    @Override
     public JSONObject executePartitionsQuery(DiscoveryMessage message, boolean temporalConstraintEnabled) throws GSException {
 
 	return null;
@@ -55,6 +70,11 @@ public class VolatileDatabaseExecutor extends VolatileDatabaseReader implements 
     @Override
     public List<String> getIndexValues(DiscoveryMessage message, MetadataElement element, int start, int count) throws GSException {
 
+	return null;
+    }
+    
+    @Override
+    public ResultSet<TermFrequencyItem> getIndexValues(DiscoveryMessage message, Queryable element, int count, String resumptionToken) throws GSException{
 	return null;
     }
 

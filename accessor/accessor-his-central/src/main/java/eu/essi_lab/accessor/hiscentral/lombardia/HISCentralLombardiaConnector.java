@@ -192,6 +192,9 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 		Dataset dataset = new Dataset();
 		dataset.setSource(source.get());
 
+		String missingValue = "-999.0";
+		dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
+
 		String platformIdentifier = NS + ":" + stationId;
 		String parameterIdentifier = NS + ":" + idTipoSensore;
 		CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();

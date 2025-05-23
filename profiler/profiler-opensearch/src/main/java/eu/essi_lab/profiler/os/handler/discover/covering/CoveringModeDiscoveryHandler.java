@@ -68,6 +68,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
+import eu.essi_lab.profiler.os.OSProfilerSetting;
 
 /**
  * @author Fabrizio
@@ -98,13 +99,19 @@ public class CoveringModeDiscoveryHandler extends DiscoveryHandler<String> {
     //
     private double globalCoveringPercentage;
     private double coveringPercentageRatio;
+
+    private OSProfilerSetting setting;
     //
     //
     //
 
-    public CoveringModeDiscoveryHandler() {
+    /**
+     * @param setting
+     */
+    public CoveringModeDiscoveryHandler(OSProfilerSetting setting) {
 
 	super();
+	this.setting = setting;
 
 	format = new DecimalFormat();
 	format.setMaximumFractionDigits(3);
@@ -132,7 +139,7 @@ public class CoveringModeDiscoveryHandler extends DiscoveryHandler<String> {
 	    return handleNotAuthorizedRequest((DiscoveryMessage) message);
 	}
 
-	if (CoveringModeOptionsReader.isViewOnlyEnabled()) {
+	if (CoveringModeOptionsReader.isViewOnlyEnabled(setting)) {
 	    return super.handleMessageRequest(message);
 	}
 
@@ -217,7 +224,7 @@ public class CoveringModeDiscoveryHandler extends DiscoveryHandler<String> {
 
 	GSLoggerFactory.getLogger(getClass()).info("[3/5] Extent partitioning STARTED");
 
-	double partitionSize = CoveringModeOptionsReader.getPartitionSize();// the size of each partition side
+	double partitionSize = CoveringModeOptionsReader.getPartitionSize(setting);// the size of each partition side
 
 	GSLoggerFactory.getLogger(getClass()).info("Initial partition size: {}", partitionSize);
 
@@ -245,7 +252,7 @@ public class CoveringModeDiscoveryHandler extends DiscoveryHandler<String> {
 	//
 	//
 
-	boolean temporalConstraintEnabled = CoveringModeOptionsReader.isTemporalConstraintEnabled();
+	boolean temporalConstraintEnabled = CoveringModeOptionsReader.isTemporalConstraintEnabled(setting);
 
 	if (temporalConstraintEnabled) {
 
@@ -256,11 +263,11 @@ public class CoveringModeDiscoveryHandler extends DiscoveryHandler<String> {
 	    GSLoggerFactory.getLogger(getClass()).info("Temporal constraint disabled");
 	}
 
-	coveringTreshold = CoveringModeOptionsReader.getCoveringThreshold();
+	coveringTreshold = CoveringModeOptionsReader.getCoveringThreshold(setting);
 
 	GSLoggerFactory.getLogger(getClass()).info("Covering threshold: {}%", coveringTreshold);
 
-	Optional<String> productType = CoveringModeOptionsReader.getProductType();
+	Optional<String> productType = CoveringModeOptionsReader.getProductType(setting);
 
 	if (productType.isPresent()) {
 
@@ -270,7 +277,7 @@ public class CoveringModeDiscoveryHandler extends DiscoveryHandler<String> {
 	    GSLoggerFactory.getLogger(getClass()).info("Product type not set");
 	}
 
-	int maxIterations = CoveringModeOptionsReader.getMaxIterations();
+	int maxIterations = CoveringModeOptionsReader.getMaxIterations(setting);
 	GSLoggerFactory.getLogger(getClass()).info("Max iterations: {}", maxIterations);
 
 	//
@@ -347,7 +354,7 @@ public class CoveringModeDiscoveryHandler extends DiscoveryHandler<String> {
 	message.setUserBond(idsBond);
 
 	message.setPage(
-		new Page(message.getPage().getStart(), CoveringModeOptionsReader.getPageSize().orElse(message.getPage().getSize())));
+		new Page(message.getPage().getStart(), CoveringModeOptionsReader.getPageSize(setting).orElse(message.getPage().getSize())));
 
 	ResultSet<GSResource> idsQueryResponse = getExecutor().retrieve(message);
 

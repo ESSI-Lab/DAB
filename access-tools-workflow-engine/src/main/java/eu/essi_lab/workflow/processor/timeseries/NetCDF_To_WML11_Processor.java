@@ -47,6 +47,7 @@ import org.cuahsi.waterml._1.essi.JAXBWML;
 
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.netcdf.NetCDFAttribute;
 import eu.essi_lab.workflow.processor.DataProcessor;
@@ -81,7 +82,7 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
     private static final String NETCDF_TO_WML_11_ERROR = "NETCDF_TO_WML_11_ERROR";
 
     @Override
-    public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
 
 	FeatureDataset dataset = FeatureDatasetFactoryManager.open(FeatureType.STATION, dataObject.getFile().getAbsolutePath(), null, null);
 
@@ -261,7 +262,7 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
 	    lat = station.getLatitude();
 	    lon = station.getLongitude();
 
-	    Date date = pf.getObservationTimeAsDate();
+	    Date date = new Date( pf.getObservationTimeAsCalendarDate().getMillis());
 
 	    Double valueDouble = featureData.getScalarDouble(mainVariable.getShortName());
 	    if (valueDouble == null || !Double.isFinite(valueDouble)) {
@@ -285,7 +286,7 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
 
 	if (lat == null || lon == null || stationName == null || stationName.equals("")) { // it could be null in case
 											   // of no values
-	    Station station = fc.getStations().get(0);
+	    Station station = fc.getStationFeatures().get(0);
 	    stationName = station.getName();
 	    lat = station.getLatitude();
 	    lon = station.getLongitude();

@@ -239,13 +239,14 @@ public class SchedulerSetting extends Setting implements EditableSetting {
     public void setJobStoreType(JobStoreType jobStoreType) {
 
 	switch (jobStoreType) {
-	case VOLATILE:
+	case VOLATILE -> {
 	    getPersistentSchedulerSetting().ifPresent(s -> s.setSelected(false));
 	    getVolatileSchedulerSetting().ifPresent(s -> s.setSelected(true));
-	    break;
-	case PERSISTENT:
+	}
+	case PERSISTENT -> {
 	    getPersistentSchedulerSetting().ifPresent(s -> s.setSelected(true));
 	    getVolatileSchedulerSetting().ifPresent(s -> s.setSelected(false));
+	}
 	}
     }
 

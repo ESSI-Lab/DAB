@@ -50,17 +50,20 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
+import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -70,6 +73,11 @@ import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
  * @author Fabrizio
  */
 public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecutor {
+
+    @Override
+    public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) {
+	return null;
+    }
 
     @Override
     public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
@@ -94,7 +102,7 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 		    collect(Collectors.joining("§", "'", "'"));
 
 	    template = template.replace("MAX_RESULTS", String.valueOf(request.getMaxResults()));
-	    
+
 	    template = template.replace("MAX_TF_ITEMS", String.valueOf(request.getMaxTermFrequencyItems()));
 
 	    template = template.replace("BBOXES", bboxes);
@@ -115,7 +123,7 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 	    if (optBond.isPresent()) {
 		bond = optBond.get();
 	    }
-	    
+
 	    DiscoveryBondParser bondParser = new DiscoveryBondParser(bond);
 	    bondParser.parse(bondHandler);
 	    String sub = bondHandler.getParsedQuery();
@@ -300,6 +308,12 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 	}
 
 	return list;
+    }
+
+    @Override
+    public ResultSet<TermFrequencyItem> getIndexValues(DiscoveryMessage message, Queryable element, int count, String resumptionToken)
+	    throws GSException {
+	return null;
     }
 
     @Override

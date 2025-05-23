@@ -280,6 +280,9 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    }
 
 	    for (List<String> k : keywordsLabelsAndURIsAndTypes) {
+		if (k.size()<3) {
+		    continue;
+		}
 		String label = k.get(0);
 		String uri = k.get(1);
 		String type = k.get(2);

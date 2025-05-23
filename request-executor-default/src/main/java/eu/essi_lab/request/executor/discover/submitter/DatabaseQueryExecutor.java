@@ -62,7 +62,7 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
 
 	StorageInfo uri = message.getDataBaseURI();
-	
+
 	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");

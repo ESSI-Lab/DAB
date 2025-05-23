@@ -190,6 +190,24 @@ public class OptionBuilder<T> {
     /**
      * @return
      */
+    public OptionBuilder<T> multiValue() {
+
+	option.setMultiValue(true);
+	return this;
+    }
+
+    /**
+     * @return
+     */
+    public OptionBuilder<T> singleValue() {
+
+	option.setMultiValue(false);
+	return this;
+    }
+
+    /**
+     * @return
+     */
     public OptionBuilder<T> enabled() {
 
 	option.setEnabled(true);
