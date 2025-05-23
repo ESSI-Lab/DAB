@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.oaipmh;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
@@ -85,7 +86,7 @@ public class OAIPMHConnectorSetting extends HarvestedConnectorSetting {
 	    } else {
 		endpoint = endpoint.endsWith("?") ? endpoint : endpoint + "?";
 	    }
-	    List<String> sets = OAIPMHConnector.getSets(endpoint);
+	    List<String> sets = OAIPMHConnector.getSets(endpoint).stream().sorted().collect(Collectors.toList());
 	    return sets;
 	}
 
