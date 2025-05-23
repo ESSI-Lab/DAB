@@ -776,9 +776,30 @@ public class SourceStorageWorker {
 
 	case SELECTIVE:
 
-	    writingFolder = getData1Folder();
+	    debug("Selective harvesting finalization STARTED", status);
 
-	    getData1Folder().remove(WRITING_FOLDER_TAG);
+	    if (isData1WritingFolder()) {
+
+		writingFolder = getData1Folder();
+
+		getData1Folder().remove(WRITING_FOLDER_TAG);
+
+		if (existsData2Folder()) {
+		    removeData2Folder();
+		}
+
+	    } else if (isData2WritingFolder()) {
+
+		writingFolder = getData2Folder();
+
+		getData2Folder().remove(WRITING_FOLDER_TAG);
+
+		if (existsData1Folder()) {
+		    removeData1Folder();
+		}
+	    }
+	    
+	    debug("Selective harvesting finalization ENDED", status);
 	}
 
 	debug("Updating harvesting properties STARTED", status);
