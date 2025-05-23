@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPathExpressionException;
@@ -141,60 +142,54 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 
 	if (token == null) {
 
-	    /**
-	     * FIX FOR GEOSS EUMETSAT DATA CATALOGUE
-	     * It seems that TIME is not supported by EUMETSAT OAI-PMH catalogue
-	     **/
+	    from = request.getFromDateStamp();
+	    until = request.getUntilDateStamp();
 
-	    if (!getSourceURL().contains("eoportal.eumetsat.int")) {
+	    if (until == null) {
+		until = ISO8601DateTimeUtils.getISO8601DateTime();
+	    }
 
-		from = request.getFromDateStamp();
-		until = request.getUntilDateStamp();
-		if (until == null) {
-		    until = ISO8601DateTimeUtils.getISO8601DateTime();
-		}
+	    //
+	    // removing milliseconds, if present (never supported)
+	    //
+	    if (from != null && from.contains(".")) {
+		from = from.substring(0, from.indexOf("."));
+	    }
 
-		//
-		// removing milliseconds, if present (never supported)
-		//
-		if (from != null && from.contains(".")) {
-		    from = from.substring(0, from.indexOf("."));
-		}
-		if (until != null && until.contains(".")) {
-		    until = from.substring(0, until.indexOf("."));
-		}
+	    if (until != null && until.contains(".")) {
+		until = from.substring(0, until.indexOf("."));
+	    }
 
-		//
-		// granularity check
-		//
-		XMLDocumentReader identifyResponse = getIdentifyResponse(getSourceURL());
-		String granularity = getGranularity(identifyResponse);
+	    //
+	    // granularity check
+	    //
+	    XMLDocumentReader identifyResponse = getIdentifyResponse(getSourceURL());
+	    String granularity = getGranularity(identifyResponse);
 
-		if (granularity != null) {
+	    if (granularity != null) {
 
-		    if (!granularity.contains("T")) {
-			if (from != null && from.contains("T")) {
-			    from = from.substring(0, from.indexOf('T'));
-			}
-			if (until != null && until.contains("T")) {
-			    until = until.substring(0, until.indexOf('T'));
-			}
+		if (!granularity.contains("T")) {
+		    if (from != null && from.contains("T")) {
+			from = from.substring(0, from.indexOf('T'));
 		    }
+		    if (until != null && until.contains("T")) {
+			until = until.substring(0, until.indexOf('T'));
+		    }
+		}
 
-		    if (granularity.endsWith("Z")) {
-			if (from != null && !from.endsWith("Z")) {
-			    from = from + "Z";
-			}
-			if (until != null && !until.endsWith("Z")) {
-			    until = until + "Z";
-			}
-		    } else {
-			if (from != null && from.endsWith("Z")) {
-			    from = from.substring(0, from.length() - 1);
-			}
-			if (until != null && until.endsWith("Z")) {
-			    until = until.substring(0, until.length() - 1);
-			}
+		if (granularity.endsWith("Z")) {
+		    if (from != null && !from.endsWith("Z")) {
+			from = from + "Z";
+		    }
+		    if (until != null && !until.endsWith("Z")) {
+			until = until + "Z";
+		    }
+		} else {
+		    if (from != null && from.endsWith("Z")) {
+			from = from.substring(0, from.length() - 1);
+		    }
+		    if (until != null && until.endsWith("Z")) {
+			until = until.substring(0, until.length() - 1);
 		    }
 		}
 	    }
