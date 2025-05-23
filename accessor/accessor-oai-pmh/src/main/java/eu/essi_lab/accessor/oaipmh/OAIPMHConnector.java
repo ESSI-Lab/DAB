@@ -125,6 +125,7 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 
 	String token = request.getResumptionToken();
+
 	//
 	// most OAI-PMH services provide a temporary resumption token, so it cannot be reused
 	//
@@ -318,9 +319,9 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 
 	if (super.getSourceURL().contains("sios.csw.met.no")) {
 	    return super.getSourceURL().endsWith("mode=oaipmh&") ? super.getSourceURL() : super.getSourceURL() + "&";
-	} else if(super.getSourceURL().contains("www.vliz.be/projects/mission-atlantic")) {
+	} else if (super.getSourceURL().contains("www.vliz.be/projects/mission-atlantic")) {
 	    return super.getSourceURL().endsWith("module=dataset&") ? super.getSourceURL() : super.getSourceURL() + "&";
-	} 
+	}
 	return super.getSourceURL().endsWith("?") ? super.getSourceURL() : super.getSourceURL() + "?";
     }
 
@@ -408,6 +409,7 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	    // set the resumption token
 	    Node tokenNode = reader.evaluateNode("//*:resumptionToken");
 	    String resToken = null;
+
 	    if (tokenNode != null) {
 
 		if (GSLoggerFactory.getLogger(getClass()).isDebugEnabled())
@@ -417,6 +419,12 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 		resToken = reader.evaluateString(tokenNode, "text()");
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).debug("No resumption token element found, connection closed");
+	    }
+
+	    if (getSourceURL().contains("bluecloud-sios")) {
+		if (resToken != null && resToken.equals("0")) {
+		    resToken = null;
+		}
 	    }
 
 	    if (resToken != null && !resToken.equals("")) {
@@ -517,7 +525,8 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 
 	if (token != null) {
 	    listRecords += "&resumptionToken=" + token;
-	    if ((listRecords.contains("sios.csw.met.no") || listRecords.contains("www.vliz.be/projects/mission-atlantic")) && !listRecords.contains("metadataPrefix")) {
+	    if ((listRecords.contains("sios.csw.met.no") || listRecords.contains("www.vliz.be/projects/mission-atlantic"))
+		    && !listRecords.contains("metadataPrefix")) {
 		listRecords += "&metadataPrefix=" + preferredPrefix;
 	    }
 	} else {
