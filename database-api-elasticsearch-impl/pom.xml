@@ -13,6 +13,12 @@
 	<name>ESSI-Lab DataBase API Elasticsearch Implementation</name>
 
 	<dependencies>
+		
+		<dependency>
+  <groupId>org.glassfish.jaxb</groupId>
+  <artifactId>jaxb-runtime</artifactId>
+  <version>4.0.3</version> <!-- or the latest -->
+</dependency>
 
 		<dependency>
 			<groupId>eu.essi_lab</groupId>

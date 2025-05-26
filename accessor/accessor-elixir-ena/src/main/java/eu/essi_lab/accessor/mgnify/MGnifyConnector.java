@@ -276,7 +276,7 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 			    coreMetadata.addBoundingBox(n, w, s, e);
 			}
 
-			keywords.add("ELIXIR-ENA");
+			keywords.add("ELIXIR-MGnify");
 			Keywords k = new Keywords();
 
 			for (String kwd : keywords) {
@@ -325,10 +325,11 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 			    coreMetadata.getMIMetadata().getDistribution().addFormat(f);
 			}
 
-			String identifier = StringUtils.hashSHA1messageDigest("ELIXIR-ENA:" + resourceId);
+			String identifier = StringUtils.hashSHA1messageDigest(resourceId);
 			dataset.getHarmonizedMetadata().getCoreMetadata().setIdentifier(identifier);
-			miMetadata.setFileIdentifier(identifier);
+			miMetadata.setFileIdentifier(identifier);			
 			coreMetadata.getDataIdentification().setResourceIdentifier(resourceId);
+			coreMetadata.setIdentifier(identifier);
 
 			String str = dataset.asString(true);
 			OriginalMetadata record = new OriginalMetadata();
