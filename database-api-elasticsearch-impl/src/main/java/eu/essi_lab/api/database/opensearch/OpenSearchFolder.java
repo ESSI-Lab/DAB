@@ -138,6 +138,25 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	return OpenSearchUtils.toNode(OpenSearchUtils.toStream(source.get()));
     }
+    
+    public Node getRaw(String key) throws Exception {
+
+	Optional<JSONObject> source = _getSource(key);
+
+	if (source.isEmpty()) {
+
+	    return null;
+	}
+
+	SourceWrapper wrapper = new SourceWrapper(source.get());
+
+	if (wrapper.getDataType() == DataType.BINARY) {
+
+	    return null;
+	}
+
+	return OpenSearchUtils.toNode(OpenSearchUtils.toStream(source.get()));
+    }
 
     @Override
     public Optional<GSResource> get(IdentifierType type, String identifier) throws Exception {
