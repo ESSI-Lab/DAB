@@ -13,6 +13,7 @@
 	<name>ESSI-Lab DataBase API Elasticsearch Implementation</name>
 
 	<dependencies>
+		
 
 		<dependency>
 			<groupId>eu.essi_lab</groupId>
