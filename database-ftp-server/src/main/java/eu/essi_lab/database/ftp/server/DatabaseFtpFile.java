@@ -252,13 +252,19 @@ public class DatabaseFtpFile implements FtpFile {
 			forEach(f -> list.add(f));
 
 		DatabaseFolder usersFolder = database.getUsersFolder();
-		list.add(new DatabaseFtpFile(database, usersFolder.getName(), user));
-
+		if (usersFolder != null) {
+		    list.add(new DatabaseFtpFile(database, usersFolder.getName(), user));
+		}
+		
 		DatabaseFolder viewFolder = database.getViewFolder(false);
-		list.add(new DatabaseFtpFile(database, viewFolder.getName(), user));
+		if (viewFolder != null) {
+		    list.add(new DatabaseFtpFile(database, viewFolder.getName(), user));
+		}
 
 		DatabaseFolder cacheFolder = database.getCacheFolder();
-		list.add(new DatabaseFtpFile(database, cacheFolder.getName(), user));
+		if (cacheFolder != null) {
+		    list.add(new DatabaseFtpFile(database, cacheFolder.getName(), user));
+		}
 
 	    } else {
 

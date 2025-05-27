@@ -164,6 +164,16 @@
 										}
 									}
 								},
+								"removeSourceData": {
+									"summary": "'RemoveSourceData' request",
+									"description": "Example of 'RemoveSourceData' request",
+									"value": {
+										"request": "RemoveSourceData",
+										"parameters": {
+											"id": "nsidcAtlasSouth"
+										}
+									}
+								},
 								"listSources1": {
 									"summary": "'ListSources' request for all the brokered sources",
 									"description": "Example of 'ListSources' request which shows all the brokered sources",
@@ -556,7 +566,7 @@
 				}
 			},
 			"RemoveSource": {
-				"description": "Removes an existing DAB source. When a source is removed, it is also unscheduled. If the harvesting of the provided source is underway, the request fails with reponse code '400'",
+				"description": "Removes an existing DAB source from the configuration along with its harvested data. If source harvesting is scheduled, it is unscheduled. If the harvesting of the provided source is underway, the request fails with reponse code '400'",
 				"type": "object",
 				"required": [
 					"request",
@@ -567,6 +577,33 @@
 						"type": "string",
 						"description": "The request name",
 						"const": "RemoveSource"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"id"
+						],
+						"properties": {
+							"id": {
+								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with reponse code be '404'",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"RemoveSourceData": {
+				"description": "Removes the harvested data of an existing DAB source. If the harvesting of the provided source is underway, the request fails with reponse code '400'",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "RemoveSourceData"
 					},
 					"parameters": {
 						"type": "object",

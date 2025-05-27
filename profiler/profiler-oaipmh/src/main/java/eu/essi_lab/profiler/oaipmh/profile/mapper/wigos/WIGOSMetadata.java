@@ -1778,6 +1778,9 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	    ObservingCapabilityPropertyType obscap = new ObservingCapabilityPropertyType();
 	    ObservingCapabilityType val = o.getObservingCapability();
 	    obscap.setObservingCapability(val);
+	    OMObservationType observationType = getInnerObservation();
+	    String href = observationType.getObservedProperty().getHref();
+	    obscap.setHref(href);
 	    // record.getRecord().getFacility().get(0).getObservingFacility().getObservation().add(obscap);
 	    facility.getObservingFacility().getObservation().add(obscap);
 
