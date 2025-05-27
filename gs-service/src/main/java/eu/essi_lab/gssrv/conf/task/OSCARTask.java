@@ -59,6 +59,7 @@ import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.SearchAfter;
+import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.SortOrder;
@@ -140,8 +141,7 @@ public class OSCARTask extends AbstractCustomTask {
 	discoveryMessage.setUserBond(bond);
 	discoveryMessage.setNormalizedBond(bond);
 
-	discoveryMessage.setSortOrder(SortOrder.ASCENDING);
-	discoveryMessage.setSortProperty(ResourceProperty.PRIVATE_ID);
+	discoveryMessage.setSortedFields(SortedFields.of(ResourceProperty.PRIVATE_ID, SortOrder.ASCENDING));
 	SearchAfter searchAfter = null;
 	int i = 0;
 	int start = 1;
