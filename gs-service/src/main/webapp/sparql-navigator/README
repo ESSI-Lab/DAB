@@ -14,7 +14,7 @@ npm install react-router-dom
 
 npm run build 
 
-mv build/* ../.
+mv the content of build/* to ../his-central and ../whos folders
 
 npm start // to instead run the app for demo
 

@@ -456,9 +456,9 @@ public class ISO8601DateTimeUtils {
 
     public static void main(String[] args) throws Exception {
 
-	TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-
-	System.out.println(toDateTime(new Date(), DateTimeZone.forID("Europe/Berlin")));
+	Date d = ISO8601DateTimeUtils.parseISO8601("2025-05-15T15:40:20.000+00:00");
+	
+	System.out.println(d);
 
     }
 
@@ -545,5 +545,6 @@ public class ISO8601DateTimeUtils {
 	}
 	return null;
     }
+
 
 }

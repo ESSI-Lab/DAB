@@ -161,8 +161,8 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		}
 	    }
 
-	    ret+="<http://id.loc.gov/vocabulary/iso639-1/en> a dct:LinguisticSystem .\n";
-	    
+	    ret += "<http://id.loc.gov/vocabulary/iso639-1/en> a dct:LinguisticSystem .\n";
+
 	    // Keywords
 	    Node[] keywords = reader.evaluateNodes(
 		    "//*:MD_Keywords[not(*:type) or not(contains('platform platform_class parameter instrument cruise project',*:type/*:MD_KeywordTypeCode/@codeListValue))]/*:keyword");
@@ -364,14 +364,23 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 
 	    // THEMEs
 	    List<SimpleEntry<String, String>> themevalueURIs = getKeywordsURIs(reader, "theme");
+	    HashSet<String> themeURIs = new HashSet<String>();
+	    HashSet<String> themeLabels = new HashSet<String>();
 	    for (SimpleEntry<String, String> valueURI : themevalueURIs) {
 		String id = valueURI.getValue();
 		String value = valueURI.getKey();
 		if (isURI(id)) {
-		    ret += "dcat:theme <" + normalizeURI(id) + "> ;\n";
+		    themeURIs.add(id);
 		} else {
-		    ret += "dcat:theme \"" + normalize(value) + "\" ;\n";
+		    themeLabels.add(value);
 		}
+	    }
+
+	    for (String label : themeLabels) {
+		ret += "dcat:theme \"" + normalize(label) + "\" ;\n";
+	    }
+	    for (String uri : themeURIs) {
+		ret += "dcat:theme <" + normalizeURI(uri) + "> ;\n";
 	    }
 
 	    String revisionDate = reader.evaluateString(
@@ -379,6 +388,9 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 	    if (revisionDate != null && !revisionDate.isEmpty()) {
 		ret += "dct:issued " + formatTime(revisionDate) + ";\n";
 	    }
+
+	    ret += "dct:relation <https://blue-cloud.geodab.eu/gs-service/services/essi/csw?service=CSW&version=2.0.2&request=GetRecordById&outputschema=http://www.isotc211.org/2005/gmi&elementSetName=full&id="
+		    + resource.getPublicId() + ">;\n";
 
 	    // #Temporal Info
 	    TemporalExtent temporalExtent = info.getTemporalExtent();
@@ -490,6 +502,9 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 			    String uri = null;
 			    if (license.contains("http")) {
 				uri = license.substring(license.indexOf("http"));
+				if (uri.contains("\n")) {
+				    uri = uri.substring(0, uri.indexOf("\n"));
+				}
 				if (uri.contains(" ")) {
 				    uri = uri.substring(0, uri.indexOf(" "));
 				}
@@ -518,6 +533,14 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		boolean download = false;
 
 		if (isURI(linkage)) {
+		    try {
+			URL url = new URL(linkage);
+			if (url.getPort() == 80) {
+			    linkage = linkage.replace(":80", "");
+			}
+		    } catch (Exception e) {
+			// TODO: handle exception
+		    }
 		    if (protocol != null && protocol.toLowerCase().contains("download")) {
 			ret += "dcat:downloadURL <" + encodeURL(linkage) + "> ;\n";
 			download = true;
@@ -526,7 +549,13 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 		    }
 		}
 		if (protocol != null && !protocol.isEmpty()) {
-		    ret += "dcat:conformsTo <" + encodeURL(protocol) + "> ;\n";
+		    String prot = encodeURL(protocol);
+		    if (isURI(prot)) {
+			ret += "dcat:conformsTo <" + prot + "> ;\n";
+		    } else {
+			ret += "dcat:conformsTo \"" + prot + "\" ;\n";
+		    }
+
 		}
 		String name = online.getName();
 		String description = online.getDescription();
@@ -540,7 +569,12 @@ public class TurtleMapper extends DiscoveryResultSetMapper<String> {
 
 		//
 		// dcat:byteSize "5120"^^xsd:nonNegativeInteger .
-		if (!download && linkage != null) {
+		if (linkage != null) {
+		    if (linkage.equals("http://") || linkage.equals("https://") || linkage.equals("http") || linkage.equals("https")) {
+			linkage = null;
+		    }
+		}
+		if (!download && linkage != null && !linkage.isEmpty()) {
 		    URL host;
 		    try {
 			if (!linkage.contains("://")) {

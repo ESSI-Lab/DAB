@@ -64,10 +64,10 @@ const fetchConcepts = async (parentURI) => {
 
   const response = await fetch(SPARQL_ENDPOINT, {
     method: 'POST',
-      headers: {
-        'Content-Type': 'application/sparql-query',
-        'Accept': 'application/sparql-results+json',
-      },
+    headers: {
+      'Content-Type': 'application/sparql-query',
+      'Accept': 'application/sparql-results+json',
+    },
     body: query,
   });
 
@@ -114,6 +114,12 @@ const ConceptNode = ({ concept, selectedLang, addLanguages }) => {
     setExpanded(!expanded);
   };
 
+  const handleUriClick = (e) => {
+    e.preventDefault();
+    	const message = { selectedConcept: concept.prefLabel,selectedConceptId: concept.uri};   
+    window.parent.postMessage(message, '*');
+  };
+
   const filterLabels = (labels) =>
     selectedLang === 'All'
       ? labels.map((l) => `${l.label} [${l.lang}]`)
@@ -131,10 +137,11 @@ const ConceptNode = ({ concept, selectedLang, addLanguages }) => {
             ({filterLabels(concept.altLabels).join(' ')})
           </span>
         )}
-        <span style={{ color: 'blue', marginLeft: '10px', fontStyle: 'italic' }}>
-          <a href={concept.uri} target="_blank" rel="noopener noreferrer">
-            {concept.uri}
-          </a>
+        <span
+          style={{ color: 'blue', marginLeft: '10px', fontStyle: 'italic', cursor: 'pointer', textDecoration: 'underline' }}
+          onClick={handleUriClick}
+        >
+          {concept.uri}
         </span>
       </span>
       {expanded && narrowerConcepts.length > 0 && (
@@ -149,7 +156,6 @@ const ConceptNode = ({ concept, selectedLang, addLanguages }) => {
 };
 
 const SPARQLOntologyNavigator = ({ endpoint, title }) => {
-	
   const [topConcepts, setTopConcepts] = useState([]);
   const [languages, setLanguages] = useState([]);
   const [selectedLang, setSelectedLang] = useState('All');
@@ -165,7 +171,7 @@ const SPARQLOntologyNavigator = ({ endpoint, title }) => {
       setEndpointReady(true);
     }
   }, [endpoint]);
-  
+
   useEffect(() => {
     const fetchTop = async () => {
       if (endpointReady) {
