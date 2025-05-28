@@ -445,6 +445,17 @@ public class S3TransferWrapper {
 	    return null;
 	}
     }
+    
+    public HeadObjectResponse getObjectMetadata(String bucketName, String objectKey) {
+   	try {
+   	    initialize();
+   	    HeadObjectRequest headRequest = HeadObjectRequest.builder().bucket(bucketName).key(objectKey).build();
+   	    HeadObjectResponse response = client.headObject(headRequest).get();
+   	    return response;
+   	} catch (Exception e) {
+   	    return null;
+   	}
+       }
 
     /**
      * @param bucketName
