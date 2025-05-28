@@ -1,5 +1,7 @@
-<%@page import="software.amazon.awssdk.services.s3.model.HeadObjectResponse"%>
-<%@page import="software.amazon.awssdk.services.s3.model.ListObjectsV2Request"%>
+<%@page
+	import="software.amazon.awssdk.services.s3.model.HeadObjectResponse"%>
+<%@page
+	import="software.amazon.awssdk.services.s3.model.ListObjectsV2Request"%>
 <%@page import="eu.essi_lab.lib.net.s3.S3TransferWrapper"%>
 <%@page import="java.util.Comparator"%>
 <%@page import="eu.essi_lab.model.GSSource"%>
@@ -9,14 +11,13 @@
 <%@page import="eu.essi_lab.pdk.wrt.WebRequestTransformer"%>
 <%@page import="eu.essi_lab.cfga.gs.ConfigurationWrapper"%>
 
-<%!
-
-public String getInfo(S3TransferWrapper wrapper, String key){
-    HeadObjectResponse metadata = wrapper.getObjectMetadata("dataset.geodab.eu", key);
-	return "Size: "+metadata.contentLength()+" Date: "+metadata.lastModified();
-}
-
-%>
+<%!public String getInfo(S3TransferWrapper wrapper, String key) {
+	HeadObjectResponse metadata = wrapper.getObjectMetadata("dataset.geodab.eu", key);
+	if (metadata == null) {
+	    return "Not available!";
+	}
+	return "Size: " + metadata.contentLength() + " bytes Last modified: " + metadata.lastModified();
+    }%>
 <%
 String viewId = request.getParameter("view");
 if (viewId == null) {
@@ -27,9 +28,11 @@ if (viewId == null) {
     return;
 }
 
-out.println("<html><head></head><body>");
-
 Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+
+out.println("<html><head></head><body><h1>"+view.get().getLabel()+" TTLs packages per data provider</h1>");
+
+
 
 List<GSSource> sources = ConfigurationWrapper.getViewSources(view.get());
 
@@ -43,17 +46,18 @@ Optional<S3TransferWrapper> optionalWrapper = ConfigurationWrapper.getS3Transfer
 
 S3TransferWrapper wrapper = optionalWrapper.get();
 
-
-
 for (GSSource source : sources) {
     out.println("<h2>" + source.getLabel() + "</h2>");
     String id = source.getUniqueIdentifier();
-    String objectKey = id + "/" + id + ".ttl";
-    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/dataset/" + objectKey+"'>Complete set (TTLs)</a> "+getInfo(wrapper, objectKey)+"<br/>\n");
-    objectKey = id + "/" + id + "-valid.ttl";
-    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/dataset/" + objectKey + "'>Valid set (TTLs)</a> "+getInfo(wrapper, objectKey)+"<br/>\n");
-    objectKey = id + "/" + id + "-report.txt";
-    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/dataset/" + objectKey + "'>Validity report</a> "+getInfo(wrapper, objectKey)+"<br/>\n");
+    String objectKey = "dataset/" + id + "/" + id + ".ttl";
+    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/dataset/" + objectKey + "'>Complete set (TTLs)</a> "
+    + getInfo(wrapper, objectKey) + "<br/>\n");
+    objectKey = "dataset/" + id + "/" + id + "-valid.ttl";
+    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/dataset/" + objectKey + "'>Valid set (TTLs)</a> "
+    + getInfo(wrapper, objectKey) + "<br/>\n");
+    objectKey = "dataset/" + id + "/" + id + "-report.txt";
+    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/dataset/" + objectKey + "'>Validity report</a> "
+    + getInfo(wrapper, objectKey) + "<br/>\n");
 }
 
 out.println("</body></html>");
