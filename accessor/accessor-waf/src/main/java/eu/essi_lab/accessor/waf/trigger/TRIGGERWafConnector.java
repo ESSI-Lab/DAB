@@ -219,6 +219,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 		GSLoggerFactory.getLogger(getClass()).debug("Download URLs from ECMWF WAF STARTED");
 		URL listURL = new URL(getSourceURL());
 		allFiles = WAFClient.listFiles(new WAF_URL(listURL), true, username, password);
+		removeTiffFiles();
 
 		if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && mr.get() < allFiles.size()) {
 
@@ -266,11 +267,15 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 		if (splittedName.length == 3) {
 		    isCams = false;
 		    varId = splittedName[0];
-		    TRIGGER_INTERPOLATIONS[] interpolations = TRIGGER_INTERPOLATIONS.values();
-		    for (TRIGGER_INTERPOLATIONS interpolation : interpolations) {
-			String id = interpolation.getId();
-			String label = interpolation.getLabel();
-			interpolationMap.put(id, label);
+		    if (!varId.contains("uvindex")) {
+			TRIGGER_INTERPOLATIONS[] interpolations = TRIGGER_INTERPOLATIONS.values();
+			for (TRIGGER_INTERPOLATIONS interpolation : interpolations) {
+			    String id = interpolation.getId();
+			    String label = interpolation.getLabel();
+			    interpolationMap.put(id, label);
+			}
+		    } else {
+			continue;
 		    }
 
 		} else {
@@ -340,6 +345,10 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	}
 
 	return response;
+    }
+
+    private void removeTiffFiles() {
+	allFiles.removeIf(url -> url.toString().toLowerCase().contains("tiff"));
     }
 
     private List<URL> filterURLsByToday(List<URL> urls, int i) {
