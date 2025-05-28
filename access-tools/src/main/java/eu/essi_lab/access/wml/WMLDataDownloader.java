@@ -217,7 +217,11 @@ public abstract class WMLDataDownloader extends DataDownloader {
 		    Duration duration = ISO8601DateTimeUtils.getDuration(aggregationPeriod.get());
 		    SimpleEntry<BigDecimal, String> unitsValue = ISO8601DateTimeUtils.getUnitsValueFromDuration(duration);
 		    aggregationTimeUnits = unitsValue.getValue();
-		    timeScale.setTimeSupport(unitsValue.getKey().floatValue());
+		    if (unitsValue.getKey() == null) {
+			GSLoggerFactory.getLogger(getClass()).error("Null units for: {} {}", duration, aggregationTimeUnits);
+		    } else {
+			timeScale.setTimeSupport(unitsValue.getKey().floatValue());
+		    }
 		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(getClass()).error(e);
 		}

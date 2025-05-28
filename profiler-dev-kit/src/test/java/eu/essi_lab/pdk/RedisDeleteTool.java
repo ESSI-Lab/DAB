@@ -7,7 +7,7 @@ public class RedisDeleteTool {
 //	RedisTool tool = new RedisTool("localhost", 6379, 0);
 //	tool.deleteDatabase();
 //	tool.deleteKey("foo", "user-session:123");
-	tool.deleteKeysWithPattern("{prod-access}*");
+	tool.deleteKeysWithPattern("{prod-frontend}*");
 	tool.close();
     }
 
