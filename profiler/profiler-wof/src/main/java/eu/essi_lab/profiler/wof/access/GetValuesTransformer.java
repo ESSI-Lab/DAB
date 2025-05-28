@@ -238,23 +238,37 @@ public class GetValuesTransformer extends AccessRequestTransformer {
     }
 
     public GSResource check(WebRequest request, Bond bond) throws GSException {
+	
 	DiscoveryMessage message = new DiscoveryMessage();
 
 	message.setRequestId(request.getRequestId());
 
 	message.setUserBond(bond);
 
-	message.setQueryRegistrationEnabled(false);
-
 	message.setSources(ConfigurationWrapper.getAllSources());
 
 	Page page = new Page(1, 1);
 	message.setPage(page);
+	
+	Optional<View> view = request.extractViewId().map(id -> {
+	    try {
+		return DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), id).get();
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(WOFQueryUtils.class).error(e);
+		return null;
+	    }
+	});
+	
+	view.ifPresent(v -> message.setView(v));
+	
+	message.setSources(view.isPresent() //
+		? ConfigurationWrapper.getViewSources(view.get()) //
+		: ConfigurationWrapper.getHarvestedSources());
 
 	message.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
 	message.getResourceSelector().setSubset(ResourceSubset.FULL);
 	message.getResourceSelector().setIncludeOriginal(false);
-	message.setSources(ConfigurationWrapper.getHarvestedSources());
 	message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
