@@ -542,7 +542,7 @@ public class ARGOMapper extends FileIdentifierMapper {
 		return null;
 	    }
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Unparsable temporal extent for ARGO float: {}", platformCode);
+	    GSLoggerFactory.getLogger(getClass()).error("Unparsable temporal extent for ARGO float {}: {}", platformCode, date);
 	}
 	return d;
     }

@@ -95,13 +95,19 @@ public class GWISDataRequestTransformer extends AccessRequestTransformer {
 
 		if (startDate != null && !startDate.equals("") && endDate != null && !endDate.equals("")) {
 
-		    Date start = ISO8601DateTimeUtils.parseISO8601ToDate(startDate).get();
+		    Optional<Date> optionalStart = ISO8601DateTimeUtils.parseISO8601ToDate(startDate);
+		    Optional<Date> optionalEnd = ISO8601DateTimeUtils.parseISO8601ToDate(endDate);
+		    if (optionalStart.isPresent() && optionalEnd.isPresent()) {
+			Date start = optionalStart.get();
 
-		    Date end = ISO8601DateTimeUtils.parseISO8601ToDate(endDate).get();
+			Date end = optionalEnd.get();
 
-		    descriptor.getTemporalDimension().getContinueDimension().setLower(start.getTime());
+			descriptor.getTemporalDimension().getContinueDimension().setLower(start.getTime());
 
-		    descriptor.getTemporalDimension().getContinueDimension().setUpper(end.getTime());
+			descriptor.getTemporalDimension().getContinueDimension().setUpper(end.getTime());
+		    } else {
+			GSLoggerFactory.getLogger(getClass()).error("Unparsable dates: {} {}", startDate, endDate);
+		    }
 
 		}
 

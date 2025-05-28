@@ -849,7 +849,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				label = 'Parameter id';
 				break;
 			case 'attributeTitle':
-				help = 'Name of the parameter described by the measurement value<br/><br/><button id="pButton">Browse and select parameters from the ontology</button>';
+				help = 'Name of the parameter described by the measurement value<br/><br/><button id="pButton">Browse and select parameters from the ontology GUI</button><br/><br/><button id="bButton">Browse and select parameters from the ontology tree</button>';
 				label = 'Parameter name';
 				break;
 			case 'riverName':
@@ -2033,26 +2033,84 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 
 		jQuery('#' + id).val('');
 	};
-	var dialogCreated = false;
+	var dialogBCreated = false;
+	var dialogPCreated = false;
 	var ontologyUrl = "";
+	var ontologyTreeUrl = "";
 	var conceptBaseUrl = "";
 	if (options !== undefined && options.ontology !== undefined) {
 		if (options.ontology === "his-central") {
 			ontologyUrl = 'https://his-central-ontology.geodab.eu/ontology-browser/his-central-ontology.html?http://his-central-ontology.geodab.eu/hydro-ontology/concept/1';
+			ontologyTreeUrl = 'https://his-central.geodab.eu/gs-service/sparql-navigator/his-central';
+			//ontologyTreeUrl = 'http://localhost:9090/gs-service/sparql-navigator/his-central';
 			conceptBaseUrl = 'http://his-central-ontology.geodab.eu/hydro-ontology/concept/';
 		}
 		if (options.ontology === "whos") {
 			ontologyUrl = 'https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1';
+			ontologyTreeUrl = 'https://whos.geodab.eu/gs-service/sparql-navigator/whos';
 			conceptBaseUrl = 'http://hydro.geodab.eu/hydro-ontology/concept/';
 		}
 	}
 	//ontologyUrl = 'http://localhost/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1';
 	//conceptBaseUrl = 'http://hydro.geodab.eu/hydro-ontology/concept/';
 
+	jQuery(document).on('click', '#bButton', (function() {
+
+		if (!dialogBCreated) {
+			// Create the dialog
+			$('<div  id="bDialog"></div>')
+				.html('<iframe src="' + ontologyTreeUrl + '" id="barameterFrame" width=800 height=600></iframe><div style="margin-top: 10px; text-align: center;"><label for="selectedBarameter"><b>Selected parameter: </b></label><span id="selectedBarameter"><b>None</b></span></div>')
+				.dialog({
+					title: "Select a parameter from the ontology",
+					width: 850,      // Width of the dialog
+					height: 700,     // Height of the dialog
+					autoOpen: true,
+					modal: true
+				});
+
+			// Listen for messages from the iframe
+			window.addEventListener('message', (event) => {
+				try {
+					const data = event.data;
+					console.log(data);
+					// Verify that data is an object and has the "name" property
+					if (typeof data === "object" && data !== null && "selectedConcept" in data&& "selectedConceptId" in data) {						
+						var conceptURI = conceptBaseUrl+data.selectedConceptId;
+						if (data.selectedConceptId.startsWith("http")){
+							conceptURI = data.selectedConceptId;
+						}
+						$("#selectedBarameter").text(data.selectedConcept +" ("+conceptURI+")"); // Update the display
+						jQuery('#attributeNameConstraint').val(conceptURI);
+
+					} else {
+						console.warn("Invalid message: 'selectedConcept' property is missing or not an object");
+					}
+				} catch (error) {
+					console.error("Failed to process message:", error);
+				}
+
+			});
+
+			// Attach 'load' event listener to the iframe
+			$("#barameterFrame").on('load', function() {
+				try {
+					// Send a message to the iframe to trigger event listening
+					this.contentWindow.postMessage('startListening', '*');
+				} catch (error) {
+					console.error("Error sending message to iframe:", error);
+				}
+			});
+			dialogBCreated = true;
+		} else {
+
+			$('#bDialog').dialog('isOpen') ? $('#bDialog').dialog('close') : $('#bDialog').dialog('open');
+
+		}
+	}));
 
 	jQuery(document).on('click', '#pButton', (function() {
 
-		if (!dialogCreated) {
+		if (!dialogPCreated) {
 			// Create the dialog
 			$('<div  id="pDialog"></div>')
 				.html('<iframe src="' + ontologyUrl + '" id="parameterFrame"></iframe><div style="margin-top: 10px; text-align: center;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
@@ -2094,7 +2152,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 					console.error("Error sending message to iframe:", error);
 				}
 			});
-			dialogCreated = true;
+			dialogPCreated = true;
 		} else {
 
 			$('#pDialog').dialog('isOpen') ? $('#pDialog').dialog('close') : $('#pDialog').dialog('open');

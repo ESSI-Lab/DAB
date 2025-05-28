@@ -85,6 +85,7 @@
 			<groupId>org.gdal</groupId>
 			<artifactId>gdal</artifactId>
 		</dependency>
+
 	</dependencies>
 
 </project>

@@ -93,6 +93,9 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
     
     private static final String TRIGGER_WAF_PASSWORD = "triggerWAFPassword";
     private static final String TRIGGER_WAF_USER = "triggerWAFUser";
+    
+    private static final String OSCAR_PASSWORD = "OscarPassword";
+    private static final String OSCAR_USER = "OscarUser";
 
     public static void main(String[] args) {
 
@@ -662,6 +665,32 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 		    addOption(password);
 
 		}
+		
+
+		// OSCAR WMO
+			{
+
+			    Option<String> user = StringOptionBuilder.//
+				    get().//
+				    withKey(OSCAR_USER).//
+				    withLabel("The username used by OSCAR task").//
+				    required().//
+				    cannotBeDisabled().//
+				    build();
+
+			    addOption(user);
+
+			    Option<String> password = StringOptionBuilder.//
+				    get().//
+				    withKey(OSCAR_PASSWORD).//
+				    withLabel("The password used by OSCAR task").//
+				    required().//
+				    cannotBeDisabled().//
+				    build();
+
+			    addOption(password);
+
+			}
 
 	//
 	// set the rendering extension
@@ -1401,6 +1430,41 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
     }
     
     
+    //OSCAR
+    
+    /**
+     * @param user
+     */
+    public void setOscarUser(String user) {
+
+	getOption(OSCAR_USER, String.class).get().setValue(user);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getOscarUser() {
+
+	return getOption(OSCAR_USER, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param password
+     */
+    public void setOscarPassword(String password) {
+
+	getOption(OSCAR_PASSWORD, String.class).get().setValue(password);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getOscarPassword() {
+
+	return getOption(OSCAR_PASSWORD, String.class).get().getOptionalValue();
+    }
+
+    
     /**
      * @param user
      */
@@ -1432,6 +1496,5 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 
 	return getOption(TRIGGER_WAF_PASSWORD, String.class).get().getOptionalValue();
     }
-
 
 }

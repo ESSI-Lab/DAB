@@ -455,10 +455,10 @@ public class ISO8601DateTimeUtils {
     }
 
     public static void main(String[] args) throws Exception {
-
-	TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-
-	System.out.println(toDateTime(new Date(), DateTimeZone.forID("Europe/Berlin")));
+	System.out.println("test");
+	Optional<Date> d = ISO8601DateTimeUtils.parseISO8601ToDate("2024-11-05T16:15:00 00Z");
+	
+	System.out.println(d.get());
 
     }
 
@@ -545,5 +545,6 @@ public class ISO8601DateTimeUtils {
 	}
 	return null;
     }
+
 
 }

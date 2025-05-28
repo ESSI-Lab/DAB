@@ -246,129 +246,136 @@ public class TurtleTask extends AbstractCustomTask {
 	    // the aggregated source file, then upload
 
 	    for (String sourceId : sources) {
+		try {
+		    GSLoggerFactory.getLogger(getClass()).info("At source {}", sourceId);
 
-		File sourceDir = null;
-		if (dataDir == null) {
-		    String tmpSourcedir = Files.createTempDirectory("turtle-task-" + sourceId).toFile().getAbsolutePath();
-		    GSLoggerFactory.getLogger(getClass()).info("Created turtle dir {}", tmpSourcedir);
-		    downloadData(sourceId, tmpSourcedir, test);
-		    sourceDir = new File(tmpSourcedir);
-		} else {
-		    sourceDir = new File(dataDir);
-		}
+		    File sourceDir = null;
+		    if (dataDir == null) {
+			String tmpSourcedir = Files.createTempDirectory("turtle-task-" + sourceId).toFile().getAbsolutePath();
+			GSLoggerFactory.getLogger(getClass()).info("Created turtle dir {}", tmpSourcedir);
+			downloadData(sourceId, tmpSourcedir, test);
+			sourceDir = new File(tmpSourcedir);
+		    } else {
+			sourceDir = new File(dataDir);
+		    }
 
-		File sourceFile = new File(sourceDir, sourceId + ".ttl");
-		File validSourceFile = new File(sourceDir, sourceId + "-valid.ttl");
-		File reportSourceFile = new File(sourceDir, sourceId + "-report.txt");
+		    File sourceFile = new File(sourceDir, sourceId + ".ttl");
+		    File validSourceFile = new File(sourceDir, sourceId + "-valid.ttl");
+		    File reportSourceFile = new File(sourceDir, sourceId + "-report.txt");
 
-		File[] turtles = sourceDir.listFiles(new FilenameFilter() {
+		    File[] turtles = sourceDir.listFiles(new FilenameFilter() {
 
-		    @Override
-		    public boolean accept(File dir, String name) {
-			if (name == null) {
+			@Override
+			public boolean accept(File dir, String name) {
+			    if (name == null) {
+				return false;
+			    }
+			    if (name.endsWith(".ttl")) {
+				return true;
+			    }
 			    return false;
 			}
-			if (name.endsWith(".ttl")) {
-			    return true;
-			}
-			return false;
-		    }
-		});
+		    });
 
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(sourceFile));
-			BufferedWriter validWriter = new BufferedWriter(new FileWriter(validSourceFile));
-			BufferedWriter reportWriter = new BufferedWriter(new FileWriter(reportSourceFile));) {
-		    long all = 0;
-		    long good = 0;
-		    List<File> toBeUploaded = new ArrayList<File>();
-		    int partial = 0;
-		    for (File turtle : turtles) {
-			all++;
-			boolean valid = false;
-			String webTurtle = path + "/" + sourceId + "/" + turtle.getName();
-			// Perform SHACL validation
-			try {
-			    ValidationReport report = TurtleValidator.validate(turtle);
+		    try (BufferedWriter writer = new BufferedWriter(new FileWriter(sourceFile));
+			    BufferedWriter validWriter = new BufferedWriter(new FileWriter(validSourceFile));
+			    BufferedWriter reportWriter = new BufferedWriter(new FileWriter(reportSourceFile));) {
+			long all = 0;
+			long good = 0;
+			List<File> toBeUploaded = new ArrayList<File>();
+			int partial = 0;
+			for (File turtle : turtles) {
+			    all++;
+			    boolean valid = false;
+			    String webTurtle = path + "/" + sourceId + "/" + turtle.getName();
+			    // Perform SHACL validation
+			    try {
+				ValidationReport report = TurtleValidator.validate(turtle);
 
-			    // Check if the data conforms to the SHACL shapes
-			    if (report.conforms()) {
-				GSLoggerFactory.getLogger(getClass()).info("conforms: {}", turtle.getName());
-				valid = true;
-				reportWriter.write("File validated fine: https://s3.amazonaws.com/" + hostname + "/" + webTurtle);
-				reportWriter.newLine();
-				good++;
-			    } else {
-				GSLoggerFactory.getLogger(getClass()).info("does not conform: {}", turtle.getName());
-				reportWriter.write("Validation error for file: https://s3.amazonaws.com/" + hostname + "/" + webTurtle);
-				reportWriter.newLine();
-				// Print the validation report (optional)
-				report.getEntries().forEach(entry -> {
-				    try {
-					reportWriter.write(entry.message());
-					reportWriter.newLine();
-					reportWriter.write("" + entry.focusNode());
-					reportWriter.newLine();
-					reportWriter.write("" + entry.resultPath());
-					reportWriter.newLine();
-					reportWriter.write("" + entry.sourceConstraintComponent());
-					reportWriter.newLine();
-					reportWriter.write("-------------");
-					reportWriter.newLine();
-				    } catch (IOException e) {
-					e.printStackTrace();
-				    }
-				});
-			    }
-
-			} catch (Exception e) {
-			    GSLoggerFactory.getLogger(getClass()).info("does not conform: {}", turtle.getName());
-			    reportWriter
-				    .write("Preliminary validation error for file: https://s3.amazonaws.com/" + hostname + "/" + webTurtle);
-			    reportWriter.newLine();
-			    reportWriter.write(e.getMessage());
-			    reportWriter.newLine();
-			}
-
-			// writing to files
-			try (BufferedReader reader = new BufferedReader(new FileReader(turtle))) {
-			    String line;
-			    while ((line = reader.readLine()) != null) {
-				writer.write(line);
-				writer.newLine();
-				if (valid) {
-				    validWriter.write(line);
-				    validWriter.newLine();
+				// Check if the data conforms to the SHACL shapes
+				if (report.conforms()) {
+				    GSLoggerFactory.getLogger(getClass()).info("conforms: {}", turtle.getName());
+				    valid = true;
+				    reportWriter.write("File validated fine: https://s3.amazonaws.com/" + hostname + "/" + webTurtle);
+				    reportWriter.newLine();
+				    good++;
+				} else {
+				    GSLoggerFactory.getLogger(getClass()).info("does not conform: {}", turtle.getName());
+				    reportWriter.write("Validation error for file: https://s3.amazonaws.com/" + hostname + "/" + webTurtle);
+				    reportWriter.newLine();
+				    // Print the validation report (optional)
+				    report.getEntries().forEach(entry -> {
+					try {
+					    reportWriter.write(entry.message());
+					    reportWriter.newLine();
+					    reportWriter.write("" + entry.focusNode());
+					    reportWriter.newLine();
+					    reportWriter.write("" + entry.resultPath());
+					    reportWriter.newLine();
+					    reportWriter.write("" + entry.sourceConstraintComponent());
+					    reportWriter.newLine();
+					    reportWriter.write("-------------");
+					    reportWriter.newLine();
+					} catch (IOException e) {
+					    e.printStackTrace();
+					}
+				    });
 				}
+
+			    } catch (Exception e) {
+				GSLoggerFactory.getLogger(getClass()).info("does not conform: {}", turtle.getName());
+				reportWriter.write(
+					"Preliminary validation error for file: https://s3.amazonaws.com/" + hostname + "/" + webTurtle);
+				reportWriter.newLine();
+				reportWriter.write(e.getMessage());
+				reportWriter.newLine();
 			    }
-			} catch (Exception e) {
-			    e.printStackTrace();
+
+			    // writing to files
+			    try (BufferedReader reader = new BufferedReader(new FileReader(turtle))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+				    writer.write(line);
+				    writer.newLine();
+				    if (valid) {
+					validWriter.write(line);
+					validWriter.newLine();
+				    }
+				}
+			    } catch (Exception e) {
+				e.printStackTrace();
+			    }
+			    toBeUploaded.add(turtle);
+			    if (toBeUploaded.size() == 100) {
+				uploadFiles(wrapper, sourceId, toBeUploaded);
+				GSLoggerFactory.getLogger(getClass()).info("Uploaded {}/{} turtles", (partial += 100), turtles.length);
+			    }
 			}
-			toBeUploaded.add(turtle);
-			if (toBeUploaded.size() == 100) {
-			    uploadFiles(wrapper, sourceId, toBeUploaded);
-			    GSLoggerFactory.getLogger(getClass()).info("Uploaded {}/{} turtles", (partial += 100), turtles.length);
-			}
+			uploadFiles(wrapper, sourceId, toBeUploaded);
+
+			reportWriter.newLine();
+			reportWriter.write("Total files: " + all);
+			reportWriter.newLine();
+			reportWriter.write("Valid files: " + good + " " + ((((double) good / (double) all)) * 100.0) + "%");
+			reportWriter.newLine();
 		    }
-		    uploadFiles(wrapper, sourceId, toBeUploaded);
+		    GSLoggerFactory.getLogger(getClass()).info("Created turtle output {}", sourceFile.getAbsolutePath());
+		    // upload outputFile
+		    if (wrapper != null) {
 
-		    reportWriter.newLine();
-		    reportWriter.write("Total files: " + all);
-		    reportWriter.newLine();
-		    reportWriter.write("Valid files: " + good + " " + ((((double) good / (double) all)) * 100.0) + "%");
-		    reportWriter.newLine();
+			wrapper.uploadFile(sourceFile.getAbsolutePath(), hostname, path + "/" + sourceId + "/" + sourceId + ".ttl");
+
+			wrapper.uploadFile(validSourceFile.getAbsolutePath(), hostname,
+				path + "/" + sourceId + "/" + sourceId + "-valid.ttl");
+
+			wrapper.uploadFile(reportSourceFile.getAbsolutePath(), hostname,
+				path + "/" + sourceId + "/" + sourceId + "-report.txt");
+		    }
+		    sourceFile.delete();
+
+		} catch (Exception e) {
+		    e.printStackTrace();
 		}
-		GSLoggerFactory.getLogger(getClass()).info("Created turtle output {}", sourceFile.getAbsolutePath());
-		// upload outputFile
-		if (wrapper != null) {
-
-		    wrapper.uploadFile(sourceFile.getAbsolutePath(), hostname, path + "/" + sourceId + "/" + sourceId + ".ttl");
-
-		    wrapper.uploadFile(validSourceFile.getAbsolutePath(), hostname, path + "/" + sourceId + "/" + sourceId + "-valid.ttl");
-
-		    wrapper.uploadFile(reportSourceFile.getAbsolutePath(), hostname,
-			    path + "/" + sourceId + "/" + sourceId + "-report.txt");
-		}
-		sourceFile.delete();
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).info("Number of sources: {}", sources.size());
@@ -400,8 +407,7 @@ public class TurtleTask extends AbstractCustomTask {
 	int file = 0;
 	TurtleMapper mapper = new TurtleMapper();
 
-	discoveryMessage
-		.setSortedFields(SortedFields.of(ResourceProperty.PRIVATE_ID, SortOrder.ASCENDING));
+	discoveryMessage.setSortedFields(SortedFields.of(ResourceProperty.PRIVATE_ID, SortOrder.ASCENDING));
 
 	SearchAfter searchAfter = null;
 	int i = 0;
@@ -434,6 +440,7 @@ public class TurtleTask extends AbstractCustomTask {
 		if (test && i > 2000) {
 		    break main;
 		}
+
 		String filename = null;
 		if (resource.getOriginalId().isPresent()) {
 		    filename = resource.getOriginalId().get();
@@ -444,6 +451,11 @@ public class TurtleTask extends AbstractCustomTask {
 		if (filename == null) {
 		    filename = resource.getPublicId();
 		}
+		File xml = new File(sourceDir, filename + ".xml");
+		InputStream stream = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().asStream();
+		FileOutputStream fos = new FileOutputStream(xml);
+		IOUtils.copy(stream, fos);
+		stream.close();
 		File temp = new File(sourceDir, filename + ".ttl");
 		BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
 		String turtle = mapper.map(discoveryMessage, resource);
