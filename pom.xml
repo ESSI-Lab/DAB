@@ -8,23 +8,146 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>ESSI-Lab DAB</name>
-	<description><![CDATA[The suite of ESSI-Lab DAB related software products.
-	
-    ESSI-Lab is the Earth &amp; Space Science Informatics Laboratory of the Institute of Atmospheric
-    Pollution Research of the National Research Council of Italy (CNR-IIA), Florence Research Unit,
-    Area della Ricerca di Firenze, Via Madonna del Piano 10, 50019 Sesto Fiorentino, Florence, Italy.
-    ]]>
-    </description>
+	<name>Discovery and Access Broker (DAB)</name>
+	<description>The DAB is a brokering software framework for the mediation and
+		harmonization of geospatial data with particular reference to Earth
+		observation data, both satellite and non-satellite. DAB makes it
+		possible to connect heterogeneous data sources and make them
+		discoverable and accessible through homogeneous and standard interfaces
+		by different data user tools and applications. The DAB is capable of
+		implementing data discovery and access functionalities by implementing
+		multiple standard interfaces (e.g. OGC, ISO, ...), and Application
+		Programming Interfaces (API)</description>
 
-	<url>http://www.essi-lab.eu/</url>
+	<url>https://github.com/ESSI-Lab/DAB</url>
 
 	<organization>
-		<name>Earth &amp; Space Science Informatics-Laboratory (ESSI-Lab)</name>
+		<name>Earth &amp; Space Science Informatics-Laboratory (ESSI-Lab) of
+			CNR-IIA</name>
 		<url>http://www.essi-lab.eu/</url>
 	</organization>
 
-	<inceptionYear>2021</inceptionYear>
+	<developers>
+		<!-- active developers, alphabetic order -->
+		<developer>
+			<name>Lorenzo Bigagli</name>
+			<email>lorenzo.bigagli@cnr.it</email>
+			<organization>ESSI-Lab of CNR-IIA</organization>
+			<organizationUrl>https://essi-lab.eu/</organizationUrl>
+			<roles>
+				<role>software design</role>
+			</roles>
+			<id>https://orcid.org/0000-0003-1734-577X</id>
+		</developer>
+		<developer>
+			<name>Enrico Boldrini</name>
+			<email>enrico.boldrini@cnr.it</email>
+			<organization>ESSI-Lab of CNR-IIA</organization>
+			<organizationUrl>https://essi-lab.eu/</organizationUrl>
+			<roles>
+				<role>software design</role>
+				<role>developer</role>
+				<role>coordinator of DAB activities with WMO</role>
+			</roles>
+			<id>https://orcid.org/0000-0003-2075-4742</id>
+		</developer>
+		<developer>
+			<name>Paolo Mazzetti</name>
+			<email>paolo.mazzetti@cnr.it</email>
+			<organization>ESSI-Lab of CNR-IIA</organization>
+			<organizationUrl>https://essi-lab.eu/</organizationUrl>
+			<roles>
+				<role>software design</role>
+			</roles>
+			<id>https://orcid.org/0000-0002-8291-1128</id>
+		</developer>
+		<developer>
+			<name>Stefano Nativi</name>
+			<email>stefano.nativi@cnr.it</email>
+			<organization>ESSI-Lab of CNR-IIA</organization>
+			<organizationUrl>https://essi-lab.eu/</organizationUrl>
+			<roles>
+				<role>DAB father</role>
+			</roles>
+			<id>https://orcid.org/0000-0003-3185-8539</id>
+		</developer>
+		<developer>
+			<name>Massimiliano Olivieri</name>
+			<email>massimiliano.olivieri@cnr.it</email>
+			<organization>ESSI-Lab of CNR-IIA</organization>
+			<organizationUrl>https://essi-lab.eu/</organizationUrl>
+			<roles>
+				<role>sysadmin</role>
+			</roles>
+			<id>https://orcid.org/0000-0001-8920-8753</id>
+		</developer>
+		<developer>
+			<name>Fabrizio Papeschi</name>
+			<email>fabrizio.papeschi@cnr.it</email>
+			<organization>ESSI-Lab of CNR-IIA</organization>
+			<organizationUrl>https://essi-lab.eu/</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<id>https://orcid.org/0000-0002-9104-7554</id>
+		</developer>
+		<developer>
+			<name>Roberto Roncella</name>
+			<email>roberto.roncella@cnr.it</email>
+			<organization>ESSI-Lab of CNR-IIA</organization>
+			<organizationUrl>https://essi-lab.eu/</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<id>https://orcid.org/0000-0002-6825-8345</id>
+		</developer>
+		<developer>
+			<name>Mattia Santoro</name>
+			<email>mattia.santoro@cnr.it</email>
+			<organization>ESSI-Lab of CNR-IIA</organization>
+			<organizationUrl>https://essi-lab.eu/</organizationUrl>
+			<roles>
+				<role>software design</role>
+				<role>developer</role>
+				<role>coordinator of DAB activities with GEO</role>
+			</roles>
+			<id>https://orcid.org/0000-0003-0401-3100</id>
+		</developer>
+		<!-- past developers -->
+		<developer>
+			<name>Francesco Pezzati</name>
+			<roles>
+				<role>past developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Alessio Baldini</name>
+			<roles>
+				<role>past developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Fabrizio Vitale</name>
+			<roles>
+				<role>past developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Ugo Mattia</name>
+			<roles>
+				<role>past developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Valerio Angelini</name>
+			<roles>
+				<role>past developer</role>
+			</roles>
+		</developer>
+
+	</developers>
+
+	<inceptionYear>2004</inceptionYear>
 	<licenses>
 		<license>
 			<name>agpl_v3</name>
@@ -253,7 +376,8 @@
 		<org.sonarsource.java-sonar-jacoco-listeners.version>3.8</org.sonarsource.java-sonar-jacoco-listeners.version>
 
 		<!-- Docker images -->
-		<mySQLDocker.registry>672812193635.dkr.ecr.us-east-1.amazonaws.com/mysql:essi-0.1.3-configured</mySQLDocker.registry>
+		<mySQLDocker.registry>
+			672812193635.dkr.ecr.us-east-1.amazonaws.com/mysql:essi-0.1.3-configured</mySQLDocker.registry>
 
 		<docker.elasticsearch>opensearchproject/opensearch:1.3.5</docker.elasticsearch>
 
@@ -974,6 +1098,11 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.corpus-tools</groupId>
+					<artifactId>cff-maven-plugin</artifactId>
+					<version>0.8.1</version>
+				</plugin>
 				<plugin>
 					<groupId>eu.floraresearch</groupId>
 					<artifactId>gather-maven-plugin</artifactId>
