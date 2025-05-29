@@ -1347,7 +1347,7 @@
 							<licenseName>agpl_v3</licenseName>
 							<inceptionYear>2021</inceptionYear>
 							<organizationName><![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
-							<projectName><![CDATA[Discovery and Access Broker (DAB) Community Edition (CE)]]></projectName>
+							<projectName><![CDATA[Discovery and Access Broker (DAB)]]></projectName>
 							<canUpdateCopyright>true</canUpdateCopyright>
 							<canUpdateDescription>true</canUpdateDescription>
 							<canUpdateLicense>true</canUpdateLicense>
@@ -1363,7 +1363,7 @@
 							<licenseName>agpl_v3</licenseName>
 							<inceptionYear>2021</inceptionYear>
 							<organizationName><![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
-							<projectName><![CDATA[Discovery and Access Broker (DAB) Community Edition (CE)]]></projectName>
+							<projectName><![CDATA[Discovery and Access Broker (DAB)]]></projectName>
 						</configuration>
 					</execution>
 					<execution>

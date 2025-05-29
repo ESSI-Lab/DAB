@@ -1,5 +1,5 @@
 {
-    "title": "Discovery and Access Broker (DAB) Community Edition (CE)",
+    "title": "Discovery and Access Broker (DAB)",
     "description": "The DAB is a brokering software framework for the mediation and harmonization of geospatial data with particular reference to Earth observation data, both satellite and non-satellite. DAB makes it possible to connect heterogeneous data sources and make them discoverable and accessible through homogeneous and standard interfaces by different data user tools and applications.",
     "creators": [
         {
