@@ -67,10 +67,7 @@
     ],
     "communities": [
         {
-            "identifier": "geospatial"
-        },
-        {
-            "identifier": "earth-observation"
+            "identifier": "essi-lab"
         }
     ],
     "related_identifiers": [
