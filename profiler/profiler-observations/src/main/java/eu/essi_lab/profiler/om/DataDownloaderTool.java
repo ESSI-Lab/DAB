@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.om;
 
+import java.io.ByteArrayOutputStream;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -38,6 +40,8 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.ws.rs.core.StreamingOutput;
+
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -45,6 +49,8 @@ import org.json.JSONObject;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.exceptions.GSException;
 
 public class DataDownloaderTool {
 
@@ -111,7 +117,27 @@ public class DataDownloaderTool {
 		listURL = listURL + "&resumptionToken=" + resumptionToken;
 		listURL = listURL.replace("?&", "?");
 	    }
-	    Optional<String> string = downloader.downloadOptionalString(listURL);
+
+	    // Optional<String> string = downloader.downloadOptionalString(listURL);
+
+	    Optional<String> string = Optional.empty();
+
+	    WebRequest get = WebRequest.createGET(listURL);
+	    OMHandler omHandler = new OMHandler();
+
+	    try {
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+		omHandler.handle(outputStream, get);
+
+		string = Optional.of(outputStream.toString(StandardCharsets.UTF_8));
+
+	    } catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+
 	    if (string.isPresent()) {
 		String str = string.get();
 		JSONObject json = new JSONObject(str);
@@ -130,15 +156,15 @@ public class DataDownloaderTool {
 		    for (int i = 0; i < members.length(); i++) {
 			JSONObject member = members.getJSONObject(i);
 			String id = member.getString("id");
-			String source = "unknown";
-
+			String sourceId = "unknown";
+ 
 			JSONArray parameters = member.getJSONArray("parameter");
 			for (int j = 0; j < parameters.length(); j++) {
 			    JSONObject parameter = parameters.getJSONObject(j);
 			    String name = parameter.getString("name");
 			    String value = parameter.getString("value");
-			    if (name.equals("source")) {
-				source = value;
+			    if (name.equals("sourceId")) {
+				sourceId = value;
 			    }
 			}
 
@@ -148,7 +174,7 @@ public class DataDownloaderTool {
 			downloadURL = addParameter(downloadURL, "includeData", "true");
 
 			// write
-			File sourceDir = new File(tempDir.toFile(), source);
+			File sourceDir = new File(tempDir.toFile(), sourceId);
 
 			if (!sourceDir.exists()) {
 			    sourceDir.mkdir();
@@ -164,30 +190,46 @@ public class DataDownloaderTool {
 			if (downloadURL.contains("csv")) {
 			    extension = ".csv";
 			}
-			Optional<HttpResponse<InputStream>> response = downloader.downloadOptionalResponse(downloadURL);
+
+			// Optional<HttpResponse<InputStream>> response =
+			// downloader.downlo>adOptionalResponse(downloadURL);
+
 			File logFile = new File(idDir, "log.txt");
 			File dataFile = new File(idDir, "data" + extension);
-			if (response.isPresent()) {
-			    HttpResponse<InputStream> r = response.get();
-			    int status = r.statusCode();
-			    write("request: " + downloadURL + "\nstatus: " + status + "\ndate: "
-				    + ISO8601DateTimeUtils.getISO8601DateTime(), logFile);
-			    InputStream body = r.body();
-			    FileOutputStream fos;
-			    try {
-				fos = new FileOutputStream(dataFile);
-				IOUtils.copy(body, fos);
-				body.close();
-				fos.close();
-			    } catch (Exception e) {
-				// TODO Auto-generated catch block
-				write("status: " + status + "\nexception " + e.getMessage(), logFile);
-				e.printStackTrace();
-			    }
 
-			} else {
-			    write("No response", logFile);
+			WebRequest get2 = WebRequest.createGET(downloadURL);
+
+			try {
+
+			    omHandler.handle(new FileOutputStream(dataFile), get2);
+
+			} catch (Exception e) {
+			    // TODO Auto-generated catch block
+			    write("status: 500 \nexception " + e.getMessage(), logFile);
+			    e.printStackTrace();
 			}
+
+			// if (response.isPresent()) {
+			// HttpResponse<InputStream> r = response.get();
+			// int status = r.statusCode();
+			// write("request: " + downloadURL + "\nstatus: " + status + "\ndate: "
+			// + ISO8601DateTimeUtils.getISO8601DateTime(), logFile);
+			// InputStream body = r.body();
+			// FileOutputStream fos;
+			// try {
+			// fos = new FileOutputStream(dataFile);
+			// IOUtils.copy(body, fos);
+			// body.close();
+			// fos.close();
+			// } catch (Exception e) {
+			// // TODO Auto-generated catch block
+			// write("status: " + status + "\nexception " + e.getMessage(), logFile);
+			// e.printStackTrace();
+			// }
+			//
+			// } else {
+			// write("No response", logFile);
+			// }
 
 		    }
 		} else {

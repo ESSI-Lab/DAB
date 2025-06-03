@@ -251,6 +251,7 @@ public class ObservationMapper {
 	if (sourceId != null && !sourceId.isEmpty()) {
 	    source = ConfigurationWrapper.getSource(sourceId);
 	    platform.addParameter("source", source.getLabel());
+	    platform.addParameter("sourceId", source.getUniqueIdentifier());
 	}
 
 	String originalPlatformCode = parser.originalPlatformCode;
@@ -294,6 +295,7 @@ public class ObservationMapper {
 
 	if (source != null) {
 	    observation.addParameter("source", source.getLabel());
+	    observation.addParameter("sourceId", source.getUniqueIdentifier());
 	}
 
 	observation.addParameter("observedPropertyDefinition", parser.getAttributeDescription());
