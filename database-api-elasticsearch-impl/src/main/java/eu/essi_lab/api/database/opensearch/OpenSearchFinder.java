@@ -251,7 +251,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			queryables.stream().map(q -> q.getName()).collect(Collectors.toList()), //
 			message.getDistinctValuesElement().get(), //
 			message.getPage().getSize(), //
-			message.isResourceBinaryExcluded()).
+			message.isResourceBinaryExcluded(), true).
 
 			stream().//
 			map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
@@ -484,11 +484,6 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    Query query = OpenSearchQueryBuilder.buildDataFolderQuery(database.getIdentifier(), sourceIds);
 
-	    if (OpenSearchDatabase.debugQueries) {
-
-		GSLoggerFactory.getLogger(OpenSearchFinder.class).debug("\n\n--- GET SOURCES DATA MAP ---\n");
-	    }
-
 	    try {
 
 		List<JSONObject> aggregateWithNestedAgg = wrapper.aggregateWithNestedAgg(//
@@ -496,7 +491,9 @@ public class OpenSearchFinder implements DatabaseFinder {
 			Arrays.asList(ResourceProperty.SOURCE_ID.getName(), MetaFolderMapping.DATA_FOLDER), //
 			ResourceProperty.SOURCE_ID, //
 			sourceIds.size(), //
-			true); // binaries excluded
+			true, // binaries excluded
+			false// no log
+		);
 
 		List<String> incrementalSourceIds = ConfigurationWrapper.//
 			getIncrementalSources().//
