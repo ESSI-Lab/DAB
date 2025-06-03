@@ -504,19 +504,19 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    String spatialRelation = "OVERLAPS"; // by default
+	    String timeRelation = "OVERLAPS"; // by default
 
 	    if (relatedValues.length > 0) {
-		spatialRelation = relatedValues[0];
+		timeRelation = relatedValues[0];
 	    }
 
-	    BondOperator operator = BondOperator.decode(spatialRelation);
+	    BondOperator operator = BondOperator.decode(timeRelation);
 
 	    switch (operator) {
 	    case BBOX: // same as not disjoint, as OGC filter encoding 09-026r2
 	    case INTERSECTS:
 		return Optional
-			.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
+			.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
 	    case CONTAINS:
 		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER, MetadataElement.TEMP_EXTENT_BEGIN, value));
 	    case DISJOINT:
@@ -568,18 +568,18 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    String spatialRelation = "OVERLAPS"; // by default
+	    String timeRelation = "OVERLAPS"; // by default
 
 	    if (relatedValues.length > 0) {
-		spatialRelation = relatedValues[0];
+		timeRelation = relatedValues[0];
 	    }
 
-	    BondOperator operator = BondOperator.decode(spatialRelation);
+	    BondOperator operator = BondOperator.decode(timeRelation);
 
 	    switch (operator) {
 	    case BBOX: // same as not disjoint, as OGC filter encoding 09-026r2
 	    case INTERSECTS:
-		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
+		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
 
 	    case CONTAINS:
 		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS, MetadataElement.TEMP_EXTENT_END, value));

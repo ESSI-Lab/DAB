@@ -443,8 +443,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		    //
 		} else if (osParameter == OSParameters.TIME_START || osParameter == OSParameters.TIME_END) {
 
-		    String spatialRelation = parser.parse(OSParameters.TIME_RELATION);
-		    bond = osParameter.asBond(value, spatialRelation);
+		    String timeRelation = parser.parse(OSParameters.TIME_RELATION);
+		    bond = osParameter.asBond(value, timeRelation);
 
 		    //
 		    // others

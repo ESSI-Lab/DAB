@@ -30,7 +30,6 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -234,7 +233,8 @@ public class OpenSearchWrapper {
 	    List<String> sourceFields, //
 	    Queryable target, //
 	    int size, //
-	    boolean excludeBinaries) throws Exception {
+	    boolean excludeBinaries,
+	    boolean logQuery) throws Exception {
 
 	String topHitsAggName = "top_hits_agg";
 	String termsAggName = "terms_agg";
@@ -278,7 +278,7 @@ public class OpenSearchWrapper {
 		aggregations(map).//
 		build();
 
-	if (OpenSearchDatabase.debugQueries) {
+	if (OpenSearchDatabase.debugQueries && logQuery) {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("\n\n--- NESTED AGGREGATION ---\n");
 	    GSLoggerFactory.getLogger(OpenSearchFinder.class).debug(OpenSearchUtils.toJSONObject(searchRequest).toString(3));
@@ -942,21 +942,29 @@ public class OpenSearchWrapper {
     private void handleSort(//
 	    org.opensearch.client.opensearch.core.SearchRequest.Builder builder, //
 	    SortedFields sortedFields) {
+	
 	List<SortOptions> sortOptions = new ArrayList<SortOptions>();
+	
 	for (SimpleEntry<Queryable, eu.essi_lab.model.SortOrder> sortedField : sortedFields.getFields()) {
+	  
 	    Queryable orderingProperty = sortedField.getKey();
 	    eu.essi_lab.model.SortOrder sortOrder = sortedField.getValue();
+	    
 	    ContentType contentType = orderingProperty.getContentType();
+	    
 	    String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
 		    : orderingProperty.getName();
+	    
 	    SortOptions sortOption = new SortOptions.Builder().//
 		    field(new FieldSort.Builder().//
 			    field(field).//
 			    order(sortOrder == eu.essi_lab.model.SortOrder.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
 		    .//
 		    build();
+	    
 	    sortOptions.add(sortOption);
 	}
+	
 	builder.sort(sortOptions);
     }
 
