@@ -344,7 +344,7 @@ public class OMHandler extends StreamingRequestHandler {
 				requestURL.append('?').append(queryString);
 			    }
 
-			    boolean implemented = true;
+			    boolean implemented = false;
 
 			    if (implemented) {
 				JSONObject json = new JSONObject();
