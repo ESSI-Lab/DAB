@@ -991,7 +991,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				values = [
 				{ 'label': 'Temporal relation: intersects', 'value': 'intersects' },
 				{ 'label': 'Temporal relation: contains', 'value': 'contains' }];
-				help = "DefinesTemporal relation between 'Start time' and 'End time'";
+				help = "Defines the temporal relation between 'Start time' and 'End time'";
 				label = "Temporal relation between 'Start time' and 'End time'";
 				break;	
 			default: throw 'Invalid constraint: ' + constraint;
