@@ -35,6 +35,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
@@ -320,8 +321,17 @@ public class OMHandler extends StreamingRequestHandler {
 
 			    if (results.size() > 1) {
 				if (asynch != null && asynch.toLowerCase().equals("true")) {
-				    printErrorMessage(output,
-					    "Asynch download is not yet implemented: coming soon.");
+
+				    DataDownloaderTool ddt = new DataDownloaderTool();
+
+				    HttpServletRequest sr = webRequest.getServletRequest();
+				    StringBuilder requestURL = new StringBuilder(sr.getRequestURL().toString());
+				    String queryString = sr.getQueryString();
+				    if (queryString != null) {
+					requestURL.append('?').append(queryString);
+				    }
+				    // ddt.download(requestURL.toString());
+				    printErrorMessage(output, "Asynch download is not yet implemented: coming soon.");
 				    return;
 				} else {
 				    String info = resultSet.getCountResponse().getExpectedLabel();
