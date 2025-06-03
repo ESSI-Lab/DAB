@@ -925,7 +925,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
 		    BondOperator.GREATER_OR_EQUAL, //
-		    MetadataElement.TEMP_EXTENT_BEGIN, //
+		    MetadataElement.TEMP_EXTENT_END, //
 		    from.get()));
 
 	}
