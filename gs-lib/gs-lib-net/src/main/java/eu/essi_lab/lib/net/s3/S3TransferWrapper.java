@@ -24,9 +24,7 @@ package eu.essi_lab.lib.net.s3;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.time.Instant;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -34,7 +32,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import com.github.jsonldjava.shaded.com.google.common.base.Optional;
 
@@ -64,7 +61,6 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.CompletedDirectoryDownload;
-import software.amazon.awssdk.transfer.s3.model.CompletedDirectoryUpload;
 import software.amazon.awssdk.transfer.s3.model.CompletedFileDownload;
 import software.amazon.awssdk.transfer.s3.model.CompletedFileUpload;
 import software.amazon.awssdk.transfer.s3.model.DirectoryDownload;
@@ -73,9 +69,7 @@ import software.amazon.awssdk.transfer.s3.model.DownloadDirectoryRequest.Builder
 import software.amazon.awssdk.transfer.s3.model.DownloadFileRequest;
 import software.amazon.awssdk.transfer.s3.model.FileDownload;
 import software.amazon.awssdk.transfer.s3.model.FileUpload;
-import software.amazon.awssdk.transfer.s3.model.UploadDirectoryRequest;
 import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
-import software.amazon.awssdk.transfer.s3.progress.LoggingTransferListener;
 
 /**
  * @author Fabrizio

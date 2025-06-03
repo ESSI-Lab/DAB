@@ -23,10 +23,14 @@ package eu.essi_lab.profiler.om;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +38,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
@@ -59,7 +64,11 @@ import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.DataRecord;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.AccessMessage;
@@ -321,6 +330,20 @@ public class OMHandler extends StreamingRequestHandler {
 
 			    if (results.size() > 1) {
 				if (asynch != null && asynch.toLowerCase().equals("true")) {
+				    String operationId = UUID.randomUUID().toString();
+				    S3TransferWrapper s3wrapper = null;
+				    if (getDownloadSetting().getDownloadStorage() == DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
+
+				    } else {
+					String accessKey = getDownloadSetting().getS3StorageSetting().getAccessKey().get();
+					String secretKey = getDownloadSetting().getS3StorageSetting().getSecretKey().get();
+
+					s3wrapper = new S3TransferWrapper();
+					s3wrapper.setAccessKey(accessKey);
+					s3wrapper.setSecretKey(secretKey);
+					s3wrapper.initialize();
+
+				    }
 
 				    DataDownloaderTool ddt = new DataDownloaderTool();
 
@@ -330,9 +353,51 @@ public class OMHandler extends StreamingRequestHandler {
 				    if (queryString != null) {
 					requestURL.append('?').append(queryString);
 				    }
-				    // ddt.download(requestURL.toString());
-				    printErrorMessage(output, "Asynch download is not yet implemented: coming soon.");
-				    return;
+
+				    boolean implemented = true;
+
+				    if (implemented) {
+					JSONObject json = new JSONObject();
+					json.put("operationId", operationId);
+					JSONObject msg = new JSONObject();
+					msg.put("operationId", operationId);
+					msg.put("status", "Submitted asynchronous download operation");
+					status(s3wrapper, operationId, "his-central", "data-downloads/" + operationId + "-status.json",
+						msg);
+					json.put("status", "Submitted asynchronous download operation");
+
+					printJSON(output, json);
+					final S3TransferWrapper fWrapper = s3wrapper;
+					Thread t = new Thread() {
+					    public void run() {
+						String fname = operationId + ".zip";
+						File downloaded = ddt.download(requestURL.toString());
+						if (fWrapper != null) {
+						    fWrapper.setACLPublicRead(true);
+						    fWrapper.uploadFile(downloaded.getAbsolutePath(), "his-central",
+							    "data-downloads/" + fname, "application/zip");
+						}
+						downloaded.delete();
+						try {
+						    JSONObject msg = new JSONObject();
+						    msg.put("operationId", operationId);
+						    msg.put("status", "Completed");
+						    msg.put("locator",
+							    "https://his-central.s3.us-east-1.amazonaws.com/data-downloads/" + fname);
+						    status(fWrapper, operationId, "his-central",
+							    "data-downloads/" + operationId + "-status.json", msg);
+						} catch (Exception e) {
+						    e.printStackTrace();
+						}
+					    };
+					};
+					t.start();
+
+				    } else {
+					printErrorMessage(output, "Asynch download is not yet implemented: coming soon.");
+					return;
+				    }
+
 				} else {
 				    String info = resultSet.getCountResponse().getExpectedLabel();
 				    if (info == null) {
@@ -540,6 +605,22 @@ public class OMHandler extends StreamingRequestHandler {
 		writer.close();
 		output.close();
 
+	    }
+
+	    private void status(S3TransferWrapper s3wrapper, String operationId, String bucket, String key, JSONObject json)
+		    throws Exception {
+		Path tmpFile = Files.createTempFile(getClass().getSimpleName(), ".txt");
+		FileOutputStream fos = new FileOutputStream(tmpFile.toFile());
+
+		fos.write(json.toString().getBytes(StandardCharsets.UTF_8));
+		fos.close();
+		s3wrapper.uploadFile(tmpFile.toFile().getAbsolutePath(), bucket, key, "application/json");
+
+		tmpFile.toFile().delete();
+	    }
+
+	    private DownloadSetting getDownloadSetting() {
+		return ConfigurationWrapper.getDownloadSetting();
 	    }
 
 	    private void addPointsFromGridNetCDF(File file, JSONObservation observation, DataDescriptor descriptor) {
@@ -981,6 +1062,14 @@ public class OMHandler extends StreamingRequestHandler {
 	CSVField(String label) {
 	    this.label = label;
 	}
+    }
+
+    protected void printJSON(OutputStream output, JSONObject json) throws IOException {
+
+	OutputStreamWriter writer = new OutputStreamWriter(output);
+
+	writer.write(json.toString());
+	writer.close();
     }
 
 }
