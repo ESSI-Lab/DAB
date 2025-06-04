@@ -616,6 +616,40 @@ export function initializePortal(config) {
 							'border': 'none',
 							'border-radius': '4px',
 							'cursor': 'pointer'
+						})
+						.on('click', function() {
+							// Create dialog content
+							var dialogContent = $('<div>')
+								.append($('<p>').text(`This will initiate the bulk download of ${resultSet.size} resources. The process may take some time, depending on the number of resources and current server load.`))
+								.append($('<p>').text('Are you sure you want to proceed? You can monitor the download status from your personal menu.'));
+
+							// Create and show dialog
+							dialogContent.dialog({
+								title: 'Confirm Bulk Download',
+								modal: true,
+								width: 400,
+								classes: {
+									"ui-dialog": "bulk-download-dialog"
+								},
+								buttons: [
+									{
+										text: "Proceed",
+										class: "login-button",
+										click: function() {
+											// TODO: Implement bulk download initiation
+											$(this).dialog("close");
+										}
+									},
+									{
+										text: "Abandon and refine the search",
+										click: function() {
+											$(this).dialog("close");
+											// Focus on the search input or open advanced search
+											$('#what-div input').focus();
+										}
+									}
+								]
+							});
 						});
 					
 					// Append the button after the results label
