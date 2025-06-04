@@ -555,11 +555,12 @@ export function initializePortal(config) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'instrumentTitle'));
 		}
 		if (config.attributeSearch !== undefined && config.attributeSearch) {
-			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle',{ id: 'attributeNameConstraint'}));
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle',
+				{ id: 'attributeNameConstraint', helpIconImage: 'fa-flask' }));
 		}
 		if (config.platformSearch !== undefined && config.platformSearch) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'platformTitle',
-				{ id: 'platformNameConstraint', helpIconImage: 'fa-wifi' }));
+				{ id: 'platformNameConstraint', helpIconImage: 'fa-circle' }));
 		}
 		if (config.validatedSearch !== undefined && config.validatedSearch) {
 			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'isValidated'));
@@ -568,6 +569,18 @@ export function initializePortal(config) {
 		if (config.riverSearch !== undefined && config.riverSearch) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'riverName', { helpIconImage: 'fa-tint' }));
 		}
+
+		if (config.timeInterpolation !== undefined && config.timeInterpolation) {
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'timeInterpolation', { helpIconImage: 'fa-line-chart' }));
+		}
+
+		if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', { helpIconImage: 'fa-arrows-h' }));
+		}
+
+		if (config.aggregationDuration !== undefined && config.aggregationDuration) {
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', { helpIconImage: 'fa-hourglass' }));
+		}		
 
 		var semanticValue = 0;
 		if (config.semanticSearchValue !== undefined) {
@@ -578,12 +591,27 @@ export function initializePortal(config) {
 			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semantics', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
 		}
 
+		// Only show advanced search if we have constraints to show
+		if (advancedConstraints.length > 0) {
+			GIAPI.search.constWidget.advancedSearch(
+				'advConstDiv',
+				'adv-search-div',
+				advancedConstraints,
+				{
+					searchButtonBckColor: '#2c3e50',
+					searchButtonLabelColor: 'white',
+					advConstDivBckColor: '#f8f9fa'
+				}
+			);
 
-		GIAPI.search.constWidget.advancedSearch(
-			'advConstDiv',
-			'adv-search-div',
-			advancedConstraints
-		);
+			// Ensure the advanced search div exists
+			if (!$('#adv-search-div').length) {
+				$('<div>').attr('id', 'adv-search-div').insertAfter('#search-button');
+			}
+			if (!$('#advConstDiv').length) {
+				$('<div>').attr('id', 'advConstDiv').appendTo('#adv-search-div');
+			}
+		}
 
 		//------------------------------------
 		// Custom PaginatorWidget
