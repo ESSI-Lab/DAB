@@ -586,14 +586,53 @@ export function initializePortal(config) {
 		);
 
 		//------------------------------------
-		// PaginatorWidget
+		// Custom PaginatorWidget
 		//
-		GIAPI.search.paginatorWidget = GIAPI.PaginatorWidget('paginator-widget',
+		var originalPaginatorWidget = GIAPI.PaginatorWidget;
+		GIAPI.PaginatorWidget = function(id, onResponse, options) {
+			var widget = originalPaginatorWidget(id, onResponse, options);
+			
+			// Store the original update function
+			var originalUpdate = widget.update;
+			
+			// Override the update function
+			widget.update = function(resultSet) {
+				// Call the original update first
+				originalUpdate.call(this, resultSet);
+				
+				// Check if user is logged in
+				var authToken = localStorage.getItem('authToken');
+				if (authToken) {
+					// Add bulk download button next to results count
+					var downloadButton = $('<button>')
+						.addClass('login-button')
+						.text('Bulk data download')
+						.css({
+							'margin-left': '10px',
+							'padding': '5px 10px',
+							'font-size': '0.9em',
+							'background-color': '#2c3e50',
+							'color': 'white',
+							'border': 'none',
+							'border-radius': '4px',
+							'cursor': 'pointer'
+						});
+					
+					// Append the button after the results label
+					$('#paginator-widget-top-label').append(downloadButton);
+				}
+			};
+			
+			return widget;
+		};
 
+		//------------------------------------
+		// PaginatorWidget instance
+		//
+		GIAPI.search.paginatorWidget = GIAPI.PaginatorWidget('paginator-widget', 
 			GIAPI.search.onDiscoverResponse,
 			{
 				'onPagination': function(action) {
-
 					GIAPI.UI_Utils.discoverDialog('open');
 				},
 				'border': 'none'
