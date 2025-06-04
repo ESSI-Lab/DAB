@@ -636,7 +636,74 @@ export function initializePortal(config) {
 										text: "Proceed",
 										class: "login-button",
 										click: function() {
-											// TODO: Implement bulk download initiation
+											// Get the current constraints
+											var constraints = GIAPI.search.constWidget.constraints();
+											var where = GIAPI.search.resultsMapWidget.where();
+											
+											// Build the download URL
+											var baseUrl = '../services/essi';
+											var token = localStorage.getItem('authToken');
+											var params = new URLSearchParams();
+											
+											// Add temporal constraints if they exist
+											if (constraints.when && constraints.when.from) {
+												params.append('beginPosition', constraints.when.from);
+											}
+											if (constraints.when && constraints.when.to) {
+												params.append('endPosition', constraints.when.to);
+											}
+											
+											// Add spatial constraints if they exist
+											if (where) {
+												params.append('west', where.west);
+												params.append('south', where.south);
+												params.append('east', where.east);
+												params.append('north', where.north);
+											}
+											
+											// Add parameter constraint if it exists
+											if (constraints.kvp && Array.isArray(constraints.kvp)) {
+												const paramKvp = constraints.kvp.find(kvp => kvp.key === 'attributeTitle');
+												if (paramKvp) {
+													params.append('observedProperty', paramKvp.value);
+												}
+											}
+											
+											// Add fixed parameters
+											params.append('ontology', config.ontology);
+											params.append('timeInterpolation', 'TOTAL');
+											params.append('intendedObservationSpacing', 'P1D');
+											params.append('aggregationDuration', 'P1D');
+											params.append('includeData', 'true');
+											params.append('asynchDownload', 'true');
+											
+											// Construct the final URL using the view from config
+											var downloadUrl = `${baseUrl}/token/${token}/view/${config.view}/om-api/observations?${params.toString()}`;
+											
+											// Make the GET request
+											fetch(downloadUrl)
+												.then(response => {
+													if (!response.ok) {
+														throw new Error('Network response was not ok');
+													}
+													return response.json();
+												})
+												.then(data => {
+													// Show success message
+													GIAPI.UI_Utils.dialog('open', {
+														title: 'Download Started',
+														message: 'Your bulk download request has been initiated. You can monitor the download status from your personal menu.'
+													});
+												})
+												.catch(error => {
+													// Show error message
+													GIAPI.UI_Utils.dialog('open', {
+														title: 'Error',
+														message: 'Failed to initiate bulk download. Please try again later.'
+													});
+													console.error('Download error:', error);
+												});
+											
 											$(this).dialog("close");
 										}
 									},
