@@ -13,10 +13,12 @@ function initializeLogin(config) {
 	loginContainer.className = 'login-container';
 	loginContainer.innerHTML = `
 		<button id="loginBtn" class="login-button">Login</button>
+		<button id="logoutBtn" class="login-button" style="display: none;">Logout</button>
 		<div id="loginModal" class="login-modal">
 			<h3>Login to ${config.title || 'Portal'}</h3>
-			<input type="email" id="email" placeholder="Email">
-			<input type="password" id="apiKey" placeholder="API Key">
+			<p class="login-info">After logging in, you will gain access to additional features, such as asynchronous bulk data download.</p>
+			<input type="email" id="email" placeholder="Email" autocomplete="off">
+			<input type="password" id="apiKey" placeholder="API Key" autocomplete="off">
 			<button id="submitLogin">Login</button>
 		</div>
 		<div id="modalOverlay" class="modal-overlay"></div>
@@ -26,6 +28,7 @@ function initializeLogin(config) {
 
 	// Setup event listeners
 	const loginBtn = document.getElementById('loginBtn');
+	const logoutBtn = document.getElementById('logoutBtn');
 	const loginModal = document.getElementById('loginModal');
 	const modalOverlay = document.getElementById('modalOverlay');
 	const submitLogin = document.getElementById('submitLogin');
@@ -36,12 +39,29 @@ function initializeLogin(config) {
 	loginBtn.addEventListener('click', function() {
 		loginModal.style.display = 'block';
 		modalOverlay.style.display = 'block';
+		// Clear inputs when opening modal
+		emailInput.value = '';
+		apiKeyInput.value = '';
+	});
+
+	// Handle logout
+	logoutBtn.addEventListener('click', function() {
+		localStorage.removeItem('authToken');
+		localStorage.removeItem('userEmail');
+		loginBtn.style.display = 'inline-block';
+		loginBtn.textContent = 'Login';
+		loginBtn.disabled = false;
+		logoutBtn.style.display = 'none';
+		window.location.reload();
 	});
 
 	// Hide modal when clicking outside
 	modalOverlay.addEventListener('click', function() {
 		loginModal.style.display = 'none';
 		modalOverlay.style.display = 'none';
+		// Clear inputs when closing modal
+		emailInput.value = '';
+		apiKeyInput.value = '';
 	});
 
 	// Handle login submission
@@ -68,12 +88,14 @@ function initializeLogin(config) {
 		.then(response => response.json())
 		.then(data => {
 			if (data.success) {
-				// Store the token
-				localStorage.setItem('authToken', data.token);
+				// Store the token and email
+				localStorage.setItem('authToken', data.apiKey);
+				localStorage.setItem('userEmail', data.email);
 				
 				// Update UI
-				loginBtn.textContent = 'Logged In';
-				loginBtn.disabled = true;
+				loginBtn.style.display = 'none';
+				logoutBtn.style.display = 'inline-block';
+				logoutBtn.textContent = `Logged in (${data.email})`;
 				
 				// Close modal
 				loginModal.style.display = 'none';
@@ -91,11 +113,13 @@ function initializeLogin(config) {
 		});
 	});
 
-	// Check for existing token
+	// Check for existing token and email
 	const existingToken = localStorage.getItem('authToken');
-	if (existingToken) {
-		loginBtn.textContent = 'Logged In';
-		loginBtn.disabled = true;
+	const existingEmail = localStorage.getItem('userEmail');
+	if (existingToken && existingEmail) {
+		loginBtn.style.display = 'none';
+		logoutBtn.style.display = 'inline-block';
+		logoutBtn.textContent = `Logged in (${existingEmail})`;
 	}
 }
 
