@@ -45,17 +45,19 @@ import eu.essi_lab.lib.xml.XMLDocumentReader;
 
 public class RIHMIClient {
 
-    public static String realtimeEndpoint = "http://ws.meteo.ru/hydro/rest/GetHydroDischargesRF/xml?";
+    public static String realtimeEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroDischargesRF/xml?";
 
-    public static String historicalEndpoint = "http://ws.meteo.ru/hydro/rest/GetHydroAveMonDischargesRF/xml/";
+    public static String historicalEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroAveMonDischargesRF/xml/";
 
-    public static String stationListendpoint = "http://ws.meteo.ru/hydro/rest/GetWHOSHydroStationsRF/whos";
-    
-    public static String aralStationListendpoint = "http://ws.meteo.ru/hydro/rest/GetWHOSHydroStationsAral/whos";
-    
-    public static String aralDischargeEndpoint = "http://ws.meteo.ru/hydro/rest/GetHydroDischargesAral/xml?";
-    
-    public static String aralWaterLevelendpoint = "http://ws.meteo.ru/hydro/rest/GetHydroWaterLevelAral/xml?";
+    public static String stationListendpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetWHOSHydroStationsRF/whos";
+
+    public static String aralStationListendpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetWHOSHydroStationsAral/whos";
+
+    public static String aralDischargeEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroDischargesAral/xml?";
+
+    public static String aralWaterLevelEndpoint = " http://hydroweb.meteo.ru/hydro-service/rest/GetHydroWaterLevelAral/xml?";
+
+    public static String aralWaterTemperatureEndpoint = " http://hydroweb.meteo.ru/hydro-service/rest/GetHydroWaterTemperatureAral/xml?";
 
     public String getEndpoint() {
 	return realtimeEndpoint;
@@ -64,11 +66,15 @@ public class RIHMIClient {
     public String getAralDischargeEndpoint() {
 	return aralDischargeEndpoint;
     }
-    
+
     public String getAralWaterLevelEndpoint() {
-	return aralWaterLevelendpoint;
+	return aralWaterLevelEndpoint;
     }
-    
+
+    public String getAralWaterTemperatureEndpoint() {
+	return aralWaterTemperatureEndpoint;
+    }
+
     public void setEndpoint(String endpoint) {
 	this.realtimeEndpoint = endpoint;
     }
@@ -109,13 +115,15 @@ public class RIHMIClient {
 	return downloadStream(url);
 
     }
-    
-    public InputStream getAralWaterML(String stationId, Date start, Date end, boolean isDischarge) throws IOException, InterruptedException, URISyntaxException {
+
+    public InputStream getAralWaterML(String stationId, Date start, Date end, boolean isDischarge)
+	    throws IOException, InterruptedException, URISyntaxException {
 
 	String from = sdf.format(start);
 	String to = sdf.format(end);
 
-	String url = isDischarge ? aralDischargeEndpoint + "dateFrom=" + from + "&dateTo=" + to + "&index=" + stationId : aralWaterLevelendpoint + "dateFrom=" + from + "&dateTo=" + to + "&index=" + stationId;
+	String url = isDischarge ? aralDischargeEndpoint + "dateFrom=" + from + "&dateTo=" + to + "&index=" + stationId
+		: aralWaterLevelEndpoint + "dateFrom=" + from + "&dateTo=" + to + "&index=" + stationId;
 
 	return downloadStream(url);
 
@@ -143,7 +151,11 @@ public class RIHMIClient {
     }
 
     public HttpResponse<InputStream> getDownloadResponse(String url) throws IOException, InterruptedException, URISyntaxException {
-	url = getProxiedURL(url);
+	if (url.contains("ws.meteo.ru")) {
+	    url = getProxiedURL(url);
+	} else {
+	    url = url.trim();
+	}
 	logger.info("Request url:" + url);
 	HttpResponse<InputStream> response = new Downloader().downloadResponse(HttpRequestUtils.build(MethodNoBody.GET, url));
 
