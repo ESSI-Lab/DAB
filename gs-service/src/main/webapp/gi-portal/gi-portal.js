@@ -1,22 +1,116 @@
 import { GIAPI } from '../giapi/core/GIAPI.js';
 
 var view = '';
-
 var token = '';
 
+function initializeLogin(config) {
+	if (!config.login) {
+		return;
+	}
+
+	// Create and append login elements
+	const loginContainer = document.createElement('div');
+	loginContainer.className = 'login-container';
+	loginContainer.innerHTML = `
+		<button id="loginBtn" class="login-button">Login</button>
+		<div id="loginModal" class="login-modal">
+			<h3>Login to ${config.title || 'Portal'}</h3>
+			<input type="email" id="email" placeholder="Email">
+			<input type="password" id="apiKey" placeholder="API Key">
+			<button id="submitLogin">Login</button>
+		</div>
+		<div id="modalOverlay" class="modal-overlay"></div>
+	`;
+
+	document.body.insertBefore(loginContainer, document.body.firstChild);
+
+	// Setup event listeners
+	const loginBtn = document.getElementById('loginBtn');
+	const loginModal = document.getElementById('loginModal');
+	const modalOverlay = document.getElementById('modalOverlay');
+	const submitLogin = document.getElementById('submitLogin');
+	const emailInput = document.getElementById('email');
+	const apiKeyInput = document.getElementById('apiKey');
+
+	// Show modal
+	loginBtn.addEventListener('click', function() {
+		loginModal.style.display = 'block';
+		modalOverlay.style.display = 'block';
+	});
+
+	// Hide modal when clicking outside
+	modalOverlay.addEventListener('click', function() {
+		loginModal.style.display = 'none';
+		modalOverlay.style.display = 'none';
+	});
+
+	// Handle login submission
+	submitLogin.addEventListener('click', function() {
+		const email = emailInput.value;
+		const apiKey = apiKeyInput.value;
+
+		if (!email || !apiKey) {
+			alert('Please enter both email and API key');
+			return;
+		}
+
+		// Call the authentication endpoint
+		fetch('../services/support/auth/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				email: email,
+				apiKey: apiKey
+			})
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.success) {
+				// Store the token
+				localStorage.setItem('authToken', data.token);
+				
+				// Update UI
+				loginBtn.textContent = 'Logged In';
+				loginBtn.disabled = true;
+				
+				// Close modal
+				loginModal.style.display = 'none';
+				modalOverlay.style.display = 'none';
+
+				// Refresh the portal with authentication
+				window.location.reload();
+			} else {
+				alert('Login failed: ' + (data.message || 'Invalid credentials'));
+			}
+		})
+		.catch(error => {
+			console.error('Login error:', error);
+			alert('Login failed. Please try again.');
+		});
+	});
+
+	// Check for existing token
+	const existingToken = localStorage.getItem('authToken');
+	if (existingToken) {
+		loginBtn.textContent = 'Logged In';
+		loginBtn.disabled = true;
+	}
+}
 
 export function initializePortal(config) {
 	view = config.view;
 	token = config.token;
 	document.title = config.title;
 
+	// Initialize login if enabled
+	initializeLogin(config);
 
 	var centerLat = config.centerLat;
 	var centerLon = config.centerLon;
 	var zoom = config.zoom;
 	var minZoom = config.minZoom;
-
-
 
 	$.extend(true, $.hik.jtable.prototype.options, {
 		jqueryuiTheme: true
@@ -36,14 +130,9 @@ export function initializePortal(config) {
 		}
 	};
 
- 
-
-
-
 	GIAPI.logger.enabled = true;
 
 	GIAPI.search = {};
-
 
 	// GIAPI.search.dab = GIAPI.DAB('http://localhost:9090/gs-service', view, 'services/essi','csw');
 	// GIAPI.search.dab = GIAPI.DAB('https://gs-service-preproduction.geodab.eu/gs-service', view, 'services/essi','csw');

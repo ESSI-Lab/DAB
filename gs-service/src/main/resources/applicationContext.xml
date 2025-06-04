@@ -42,6 +42,9 @@
 		<jaxrs:serviceBeans>
 			<ref bean="support" />
 		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="jsonProvider" />
+		</jaxrs:providers>
 	</jaxrs:server>
 
 	<bean id="support" class="eu.essi_lab.gssrv.rest.SupportService" />
