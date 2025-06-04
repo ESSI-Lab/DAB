@@ -179,7 +179,7 @@ public class BNHSConnector extends HarvestedQueryConnector<BNHSConnectorSetting>
 		    mapper = new CANADAMSCMapper();
 
 		    // RUSSIA
-		} else if (realtimeLink.contains("http://ws.meteo.ru/hydro/rest/GetHydroDischargesRF/xml")) {
+		} else if (realtimeLink.contains("http://ws.meteo.ru/hydro/rest/GetHydroDischargesRF/xml") || realtimeLink.contains("http://hydroweb.meteo.ru/hydro-service/rest/GetHydroDischargesRF/xml")) {
 		    connector = new RIHMIConnector();
 		    mapper = new RIHMIMapper();
 

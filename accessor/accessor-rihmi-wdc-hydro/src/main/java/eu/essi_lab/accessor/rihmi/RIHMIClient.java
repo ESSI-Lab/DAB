@@ -45,11 +45,11 @@ import eu.essi_lab.lib.xml.XMLDocumentReader;
 
 public class RIHMIClient {
 
-    public static String realtimeEndpoint = "http://ws.meteo.ru/hydro/rest/GetHydroDischargesRF/xml?";
+    public static String realtimeEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroDischargesRF/xml?";
 
-    public static String historicalEndpoint = "http://ws.meteo.ru/hydro/rest/GetHydroAveMonDischargesRF/xml/";
+    public static String historicalEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroAveMonDischargesRF/xml/";
 
-    public static String stationListendpoint = "http://ws.meteo.ru/hydro/rest/GetWHOSHydroStationsRF/whos";
+    public static String stationListendpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetWHOSHydroStationsRF/whos";
 
     public static String aralStationListendpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetWHOSHydroStationsAral/whos";
 
