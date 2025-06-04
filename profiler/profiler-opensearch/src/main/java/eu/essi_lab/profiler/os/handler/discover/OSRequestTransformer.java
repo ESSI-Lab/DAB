@@ -2,7 +2,7 @@ package eu.essi_lab.profiler.os.handler.discover;
 
 /*-
  * #%L
- * Discovery and Access Broker (DAB) Community Edition (CE)
+ * Discovery and Access Broker (DAB)
  * %%
  * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
@@ -443,8 +443,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		    //
 		} else if (osParameter == OSParameters.TIME_START || osParameter == OSParameters.TIME_END) {
 
-		    String spatialRelation = parser.parse(OSParameters.TIME_RELATION);
-		    bond = osParameter.asBond(value, spatialRelation);
+		    String timeRelation = parser.parse(OSParameters.TIME_RELATION);
+		    bond = osParameter.asBond(value, timeRelation);
 
 		    //
 		    // others

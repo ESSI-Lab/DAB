@@ -1,0 +1,179 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+title: "Discovery and Access Broker (DAB)"
+abstract: "The DAB is a brokering software framework for the mediation and harmonization of geospatial data with particular reference to Earth observation data, both satellite and non-satellite. DAB makes it possible to connect heterogeneous data sources and make them discoverable and accessible through homogeneous and standard interfaces by different data user tools and applications."
+type: software
+authors:
+  - family-names: Bigagli
+    given-names: Lorenzo
+    email: lorenzo.bigagli@cnr.it
+    affiliation: ESSI-Lab of CNR-IIA
+    orcid: https://orcid.org/0000-0003-1734-577X
+    roles:
+      - software design
+  - family-names: Boldrini
+    given-names: Enrico
+    email: enrico.boldrini@cnr.it
+    affiliation: ESSI-Lab of CNR-IIA
+    orcid: https://orcid.org/0000-0003-2075-4742
+    roles:
+      - software design
+      - developer
+      - coordinator of DAB activities with WMO
+  - family-names: Mazzetti
+    given-names: Paolo
+    email: paolo.mazzetti@cnr.it
+    affiliation: ESSI-Lab of CNR-IIA
+    orcid: https://orcid.org/0000-0002-8291-1128
+    roles:
+      - software design
+  - family-names: Nativi
+    given-names: Stefano
+    email: stefano.nativi@cnr.it
+    affiliation: ESSI-Lab of CNR-IIA
+    orcid: https://orcid.org/0000-0003-3185-8539
+    roles:
+      - DAB father
+  - family-names: Olivieri
+    given-names: Massimiliano
+    email: massimiliano.olivieri@cnr.it
+    affiliation: ESSI-Lab of CNR-IIA
+    orcid: https://orcid.org/0000-0001-8920-8753
+    roles:
+      - sysadmin
+  - family-names: Papeschi
+    given-names: Fabrizio
+    email: fabrizio.papeschi@cnr.it
+    affiliation: ESSI-Lab of CNR-IIA
+    orcid: https://orcid.org/0000-0002-9104-7554
+    roles:
+      - developer
+  - family-names: Roncella
+    given-names: Roberto
+    email: roberto.roncella@cnr.it
+    affiliation: ESSI-Lab of CNR-IIA
+    orcid: https://orcid.org/0000-0002-6825-8345
+    roles:
+      - developer
+  - family-names: Santoro
+    given-names: Mattia
+    email: mattia.santoro@cnr.it
+    affiliation: ESSI-Lab of CNR-IIA
+    orcid: https://orcid.org/0000-0003-0401-3100
+    roles:
+      - software design
+      - developer
+      - coordinator of DAB activities with GEO
+version: "1.0-SNAPSHOT"
+date-released: "2004"
+url: "https://github.com/ESSI-Lab/DAB"
+repository-code: "https://github.com/ESSI-Lab/DAB"
+license: AGPL-3.0
+keywords:
+  - geospatial data
+  - earth observation
+  - data brokering
+  - data harmonization
+  - data mediation
+references:
+  - type: article
+    authors:
+      - family-names: Nativi
+        given-names: Stefano
+      - family-names: Mazzetti
+        given-names: Paolo
+      - family-names: Santoro
+        given-names: Mattia
+      - family-names: Papeschi
+        given-names: Fabrizio
+      - family-names: Craglia
+        given-names: Max
+      - family-names: Ochiai
+        given-names: Osamu
+    title: "Big Data challenges in building the Global Earth Observation System of Systems"
+    journal: "Environmental Modelling & Software"
+    volume: 68
+    year: 2015
+    pages: "1-26"
+    doi: "10.1016/j.envsoft.2015.01.017"
+  - type: article
+    authors:
+      - family-names: Nativi
+        given-names: Stefano
+      - family-names: Craglia
+        given-names: Max
+      - family-names: Pearlman
+        given-names: Jay
+    title: "Earth Science Infrastructures Interoperability: The Brokering Approach"
+    journal: "IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing"
+    volume: 6
+    issue: 3
+    year: 2013
+    pages: "1118-1129"
+    doi: "10.1109/JSTARS.2013.2243113"
+  - type: book-chapter
+    authors:
+      - family-names: Boldrini
+        given-names: Enrico
+      - family-names: et al.
+        given-names: 
+    title: "The Brokering Approach for Enabling Collaborative Scientific Research"
+    collection-title: "Collaborative Knowledge in Scientific Research Networks"
+    editors:
+      - family-names: Diviacco
+        given-names: Paolo
+      - family-names: et al.
+        given-names: 
+    publisher: IGI Global
+    year: 2015
+    pages: "283-304"
+  - type: conference-paper
+    authors:
+      - family-names: Nativi
+        given-names: Stefano
+      - family-names: Bigagli
+        given-names: Lorenzo
+      - family-names: Mazzetti
+        given-names: Paolo
+      - family-names: Boldrini
+        given-names: Enrico
+      - family-names: Papeschi
+        given-names: Fabrizio
+    title: "GI-Cat: A Mediation Solution for Building a Clearinghouse Catalog Service"
+    conference:
+      name: "International Conference on Advanced Geographic Information Systems & Web Services"
+    year: 2009
+    pages: "68-74"
+    doi: "10.1109/GEOWS.2009.34"
+  - type: article
+    authors:
+      - family-names: Nativi
+        given-names: Stefano
+      - family-names: Bigagli
+        given-names: Lorenzo
+    title: "Discovery, Mediation, and Access Services for Earth Observation Data"
+    journal: "IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing"
+    volume: 2
+    issue: 4
+    year: 2009
+    month: 12
+    pages: "233-240"
+    doi: "10.1109/JSTARS.2009.2028584"
+  - type: conference-paper
+    authors:
+      - family-names: Nativi
+        given-names: Stefano
+      - family-names: Bigagli
+        given-names: Lorenzo
+      - family-names: Mazzetti
+        given-names: Paolo
+      - family-names: Mattia
+        given-names: U.
+      - family-names: Boldrini
+        given-names: Enrico
+    title: "Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution"
+    conference:
+      name: "IEEE International Geoscience and Remote Sensing Symposium"
+    year: 2007
+    pages: "4021-4024"
+    doi: "10.1109/IGARSS.2007.4423731" 

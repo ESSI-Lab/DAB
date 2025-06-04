@@ -370,6 +370,9 @@
             			GIAPI.search.constWidget.textConstraint('get','instrumentTitle'),
             			GIAPI.search.constWidget.textConstraint('get','attributeTitle'),
             			GIAPI.search.constWidget.textConstraint('get','platformTitle'),
+            			
+            			GIAPI.search.constWidget.booleanConstraint('get','timeRel'),
+            			
             			GIAPI.search.constWidget.hlConstraint ('get'),
             			GIAPI.search.constWidget.booleanConstraint('get','gdc'),
             			GIAPI.search.constWidget.evtOrdConstraint('get'),

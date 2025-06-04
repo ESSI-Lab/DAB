@@ -2,7 +2,7 @@ package eu.essi_lab.lib.utils;
 
 /*-
  * #%L
- * Discovery and Access Broker (DAB) Community Edition (CE)
+ * Discovery and Access Broker (DAB)
  * %%
  * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
@@ -455,10 +455,10 @@ public class ISO8601DateTimeUtils {
     }
 
     public static void main(String[] args) throws Exception {
-
-	Date d = ISO8601DateTimeUtils.parseISO8601("2025-05-15T15:40:20.000+00:00");
+	System.out.println("test");
+	Optional<Date> d = ISO8601DateTimeUtils.parseISO8601ToDate("2024-11-05T16:15:00 00Z");
 	
-	System.out.println(d);
+	System.out.println(d.get());
 
     }
 

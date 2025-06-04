@@ -10,7 +10,7 @@ package org.cuahsi.waterml._1;
 
 /*-
  * #%L
- * Discovery and Access Broker (DAB) Community Edition (CE)
+ * Discovery and Access Broker (DAB)
  * %%
  * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%

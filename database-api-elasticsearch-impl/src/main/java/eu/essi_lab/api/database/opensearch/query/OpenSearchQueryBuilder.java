@@ -5,7 +5,7 @@ package eu.essi_lab.api.database.opensearch.query;
 
 /*-
  * #%L
- * Discovery and Access Broker (DAB) Community Edition (CE)
+ * Discovery and Access Broker (DAB)
  * %%
  * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
@@ -415,8 +415,8 @@ public class OpenSearchQueryBuilder {
      */
     public Query build(boolean count) {
 	String str = builder.toString().trim();
-	
-	Query searchQuery = str.isEmpty()?null: OpenSearchUtils.toQuery(new JSONObject(str));
+
+	Query searchQuery = str.isEmpty() ? null : OpenSearchUtils.toQuery(new JSONObject(str));
 
 	Optional<Query> basicQuery = buildBasicQuery(count);
 
@@ -553,7 +553,9 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildFolderEntriesQuery(OpenSearchFolder folder) {
 
-	return buildFilterQuery(buildDatabaseIdQuery(folder.getDatabase().getIdentifier()), buildFolderNameQuery(folder));
+	return buildFilterQuery(//
+		buildDatabaseIdQuery(folder.getDatabase().getIdentifier()), //
+		buildFolderNameQuery(folder));
     }
 
     /**
@@ -955,13 +957,13 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildMustQuery(List<Query> operands) {
 
-	List<Query>notNulls = new ArrayList<Query>();
-	for (Query operand: operands) {
-	    if (operand!=null) {
+	List<Query> notNulls = new ArrayList<Query>();
+	for (Query operand : operands) {
+	    if (operand != null) {
 		notNulls.add(operand);
 	    }
 	}
-	
+
 	return new BoolQuery.Builder().//
 		must(notNulls).//
 		build().//

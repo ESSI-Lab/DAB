@@ -1,0 +1,395 @@
+{
+    "@context": "https://w3id.org/codemeta/3.0",
+    "type": "SoftwareSourceCode",
+    "applicationCategory": "Earth Observation",
+    "author": [
+        {
+            "id": "_:author_1",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR-IIA"
+            },
+            "email": "lorenzo.bigagli@cnr.it",
+            "familyName": "Bigagli",
+            "givenName": "Lorenzo"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_1",
+            "roleName": "software design"
+        },
+        {
+            "id": "_:author_2",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR-IIA"
+            },
+            "email": "enrico.boldrini@cnr.it",
+            "familyName": "Boldrini",
+            "givenName": "Enrico"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_2",
+            "roleName": "software design"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_2",
+            "roleName": "developer"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_2",
+            "roleName": "coordinator of DAB activities with WMO"
+        },
+        {
+            "id": "_:author_3",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR-IIA"
+            },
+            "email": "paolo.mazzetti@cnr.it",
+            "familyName": "Mazzetti",
+            "givenName": "Paolo"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_3",
+            "roleName": "responsible"
+        },
+        {
+            "id": "_:author_4",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR-IIA"
+            },
+            "email": "stefano.nativi@cnr.it",
+            "familyName": "Nativi",
+            "givenName": "Stefano"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_4",
+            "roleName": "DAB father"
+        },
+        {
+            "id": "_:author_5",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR-IIA"
+            },
+            "email": "massimiliano.olivieri@cnr.it",
+            "familyName": "Olivieri",
+            "givenName": "Massimiliano"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_5",
+            "roleName": "sysadmin"
+        },
+        {
+            "id": "_:author_6",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR-IIA"
+            },
+            "email": "fabrizio.papeschi@cnr.it",
+            "familyName": "Papeschi",
+            "givenName": "Fabrizio"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_6",
+            "roleName": "developer"
+        },
+        {
+            "id": "_:author_7",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR-IIA"
+            },
+            "email": "roberto.roncella@cnr.it",
+            "familyName": "Roncella",
+            "givenName": "Roberto"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_7",
+            "roleName": "developer"
+        },
+        {
+            "id": "_:author_8",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR-IIA"
+            },
+            "email": "mattia.santoro@cnr.it",
+            "familyName": "Santoro",
+            "givenName": "Mattia"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_8",
+            "roleName": "software design"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_8",
+            "roleName": "developer"
+        },
+        {
+            "type": "Role",
+            "schema:author": "_:author_8",
+            "roleName": "coordinator of DAB activities with GEO"
+        }
+    ],
+    "codeRepository": "https://github.com/ESSI-Lab/DAB",
+    "contributor": [
+        {
+            "id": "_:contributor_1",
+            "type": "Person",
+            "familyName": "Annoni",
+            "givenName": "Alessandro"
+        },
+        {
+            "id": "_:contributor_2",
+            "type": "Person",
+            "familyName": "Chernov",
+            "givenName": "Igor"
+        },
+        {
+            "id": "_:contributor_3",
+            "type": "Person",
+            "familyName": "Colangeli",
+            "givenName": "Guido"
+        },
+        {
+            "id": "_:contributor_4",
+            "type": "Person",
+            "familyName": "Craglia",
+            "givenName": "Max"
+        },
+        {
+            "id": "_:contributor_5",
+            "type": "Person",
+            "familyName": "De Salvo",
+            "givenName": "Paola"
+        },
+        {
+            "id": "_:contributor_6",
+            "type": "Person",
+            "familyName": "Domenico",
+            "givenName": "Ben"
+        },
+        {
+            "id": "_:contributor_7",
+            "type": "Person",
+            "familyName": "Giuliani",
+            "givenName": "Gregory"
+        },
+        {
+            "id": "_:contributor_8",
+            "type": "Person",
+            "familyName": "Hugo",
+            "givenName": "Wim"
+        },
+        {
+            "id": "_:contributor_9",
+            "type": "Person",
+            "familyName": "Khalsa",
+            "givenName": "Siri Joda"
+        },
+        {
+            "id": "_:contributor_10",
+            "type": "Person",
+            "familyName": "Ochiai",
+            "givenName": "Osamu"
+        },
+        {
+            "id": "_:contributor_11",
+            "type": "Person",
+            "familyName": "Otieno",
+            "givenName": "Washington"
+        },
+        {
+            "id": "_:contributor_12",
+            "type": "Person",
+            "familyName": "Lehmann",
+            "givenName": "Anthony"
+        },
+        {
+            "id": "_:contributor_13",
+            "type": "Person",
+            "familyName": "Masó",
+            "givenName": "Joan"
+        },
+        {
+            "id": "_:contributor_14",
+            "type": "Person",
+            "familyName": "Pearlman",
+            "givenName": "Francoise"
+        },
+        {
+            "id": "_:contributor_15",
+            "type": "Person",
+            "familyName": "Pearlman",
+            "givenName": "Jay"
+        },
+        {
+            "id": "_:contributor_16",
+            "type": "Person",
+            "familyName": "Pecora",
+            "givenName": "Silvano"
+        },
+        {
+            "id": "_:contributor_17",
+            "type": "Person",
+            "familyName": "Pirrone",
+            "givenName": "Nicola"
+        },
+        {
+            "id": "_:contributor_18",
+            "type": "Person",
+            "familyName": "Provenzale",
+            "givenName": "Antonello"
+        },
+        {
+            "id": "_:contributor_19",
+            "type": "Person",
+            "familyName": "Ryan",
+            "givenName": "Barbara"
+        },
+        {
+            "id": "_:contributor_20",
+            "type": "Person",
+            "familyName": "Schaap",
+            "givenName": "Dick"
+        },
+        {
+            "id": "_:contributor_21",
+            "type": "Person",
+            "familyName": "Signell",
+            "givenName": "Richard"
+        },
+        {
+            "id": "_:contributor_22",
+            "type": "Person",
+            "familyName": "Van Bemmelen",
+            "givenName": "Joost"
+        },
+        {
+            "id": "_:contributor_23",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR"
+            },
+            "familyName": "Pezzati",
+            "givenName": "Francesco"
+        },
+        {
+            "type": "Role",
+            "contributor": "_:contributor_23",
+            "roleName": "Past developer"
+        },
+        {
+            "id": "_:contributor_24",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR"
+            },
+            "familyName": "Baldini",
+            "givenName": "Alessio"
+        },
+        {
+            "type": "Role",
+            "contributor": "_:contributor_24",
+            "roleName": "Past developer"
+        },
+        {
+            "id": "_:contributor_25",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR"
+            },
+            "familyName": "Vitale",
+            "givenName": "Fabrizio"
+        },
+        {
+            "type": "Role",
+            "contributor": "_:contributor_25",
+            "roleName": "Past developer"
+        },
+        {
+            "id": "_:contributor_26",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR"
+            },
+            "familyName": "Mattia",
+            "givenName": "Ugo"
+        },
+        {
+            "type": "Role",
+            "contributor": "_:contributor_26",
+            "roleName": "Past developer"
+        },
+        {
+            "id": "_:contributor_27",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "CNR"
+            },
+            "familyName": "Angelini",
+            "givenName": "Valerio"
+        },
+        {
+            "type": "Role",
+            "contributor": "_:contributor_27",
+            "roleName": "Past developer"
+        }
+    ],
+    "dateCreated": "2004-01-01",
+    "description": "The Discovery and Access Broker (DAB) is a brokering framework for Earth Observation applications. It mediates, harmonizes, and federates access to heterogeneous data and service infrastructures through standard interfaces.",
+    "funder": {
+        "type": "Organization",
+        "name": "WMO, EU Horizon Europe, EU Horizon 2020, EU EASME, EU FP7, ESA, USA NSF, Italy MIUR, Italy ARPA-ER, Italy ISPRA"
+    },
+    "identifier": "https://github.com/ESSI-Lab/DAB",
+    "keywords": [
+        "Earth Observation",
+        "Broker",
+        "DAB",
+        "OGC",
+        "GEOSS",
+        "Web Services",
+        "Service Mediation",
+        "Interoperability",
+        "Metadata harmonization"
+    ],
+    "license": "https://spdx.org/licenses/AGPL-3.0",
+    "name": "Discovery and Access Broker (DAB)",
+    "operatingSystem": [
+        "Linux",
+        "Windows",
+        "macOS"
+    ],
+    "programmingLanguage": "Java",
+    "relatedLink": "http://essi-lab.eu/",
+    "runtimePlatform": "JVM",
+    "developmentStatus": "active",
+    "funding": "WMO WHOS-Plata (2019/2020), WMO WHOS-Dominican Republic\" (2020/2022), WMO WHOS\" (2021/2024), EU Horizon Europe FAIR-EASE (2022/2025), EU Horizon Europe Blue-Cloud 2026 (2023/2026), EU Horizon Europe TRIGGER (2022/2027), EU Horizon 2020 ODIP 2 (2015/2018), EU Horizon 2020 ERA-PLANET (2016/2022), EU Horizon 2020 SeaDataCloud (2016/2021), EU Horizon 2020 Blue-Cloud (2019/2023), EU Horizon 2020 I-CHANGE (2021/2025), EU EASME EMODNet Ingestion (2016/2019), EU EASME EMODNet Ingestion II (2019/2021), EU EASME EMODNet Ingestion III (2022/2024), EU FP7 EuroGEOSS (2009/2012), EU FP7 SeaDataNet II (2011/2015), EU FP7 GEOWOW (2011/2014), EU FP7 ODIP (2011/2015), ESA HMA-T (2008/2009), ESA Prod-Trees (2012/2015), ESA DAB4EDGE (2018/2020), ESA DAB4GPP (2022/2025), USA National Science Foundation BCube (2013/2016), Italy MIUR ND-SoS-Ina (2012/2015), Italy ARPA-ER P107009S (2016), Italy ARPA-ER PGSIM/2017/771 (2017), Italy ARPA-ER PGSIM/2018/0000563 (2018), Italy ARPA-ER SIMC/CNR-IIA (2019), Italy ISPRA HIS-Central (2021-2025)"
+}
