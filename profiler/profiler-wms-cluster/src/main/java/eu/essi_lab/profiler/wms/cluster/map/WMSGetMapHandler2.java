@@ -207,6 +207,14 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	}
 	int transparency = 200;
 	String hexacode = null;
+	switch (sourceId) {
+	case "argentina-ina":
+	    hexacode = "#cc2233";
+	    break;
+	case "uruguay-inumet":
+	    hexacode = "#2222cc";
+	    break;
+	}
 	// switch (sourceId) {
 	// case "ita-sir-toscana":
 	// hexacode = "#e30613";
@@ -254,11 +262,11 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	// default:
 	// break;
 	// }
-	// if (hexacode != null) {
-	// Color color = Color.decode(hexacode);
-	// Color transparentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), transparency);
-	// return transparentColor;
-	// }
+	if (hexacode != null) {
+	    Color color = Color.decode(hexacode);
+	    Color transparentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), transparency);
+	    return transparentColor;
+	}
 	int hash = sourceId.hashCode();
 	// int r = (hash & 0xFF0000) >> 16;
 	// int g = (hash & 0x00FF00) >> 8;
@@ -514,7 +522,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 				TermFrequencyMap tfm = response.getMap().get();
 
-//				int totalCount = response.getTotalCount().get();
+				// int totalCount = response.getTotalCount().get();
 				int totalCount = response.getStationsCount().get();
 
 				List<TermFrequencyItem> items = tfm.getItems(TermFrequencyTarget.SOURCE);
@@ -867,7 +875,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	if (what.isPresent() && !what.get().equals(KeyValueParser.UNDEFINED)) {
 
-	    String w = URLDecoder.decode(what.get(),StandardCharsets.UTF_8);
+	    String w = URLDecoder.decode(what.get(), StandardCharsets.UTF_8);
 	    LogicalBond orBond = BondFactory.createOrBond();
 
 	    orBond.getOperands().add(BondFactory.createSimpleValueBond(//
@@ -891,9 +899,8 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	    if (csSources != null && !csSources.isEmpty()) {
 
-		csSources= URLDecoder.decode(csSources,StandardCharsets.UTF_8);
+		csSources = URLDecoder.decode(csSources, StandardCharsets.UTF_8);
 
-		
 		if (csSources.contains(",")) {
 
 		    String[] split = csSources.split(",");
@@ -984,6 +991,33 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    MetadataElement.OBSERVED_PROPERTY_URI, //
 		    observedPropertyURI.get()));
 	}
+	
+	Optional<String> intendedObservationSpacing = parser.getOptionalValue("intendedObservationSpacing");
+	if (intendedObservationSpacing.isPresent() && !intendedObservationSpacing.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.TIME_RESOLUTION_DURATION_8601, //
+		    intendedObservationSpacing.get()));
+	}
+	
+	Optional<String> timeInterpolation = parser.getOptionalValue("timeInterpolation");
+	if (timeInterpolation.isPresent() && !timeInterpolation.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.TIME_INTERPOLATION, //
+		    timeInterpolation.get()));
+	}
+	
+	Optional<String> aggregationDuration = parser.getOptionalValue("aggregationDuration");
+	if (aggregationDuration.isPresent() && !aggregationDuration.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.TIME_AGGREGATION_DURATION_8601, //
+		    aggregationDuration.get()));
+	}
 
 	Optional<String> isValidated = parser.getOptionalValue("isValidated");
 	if (isValidated.isPresent() && !isValidated.get().equals(KeyValueParser.UNDEFINED)) {
@@ -994,12 +1028,12 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    isValidated.get()));
 	}
 
-	 if (andBond.getOperands().isEmpty()) {
-	 return null;
-	 }
-	 if (andBond.getOperands().size() == 1) {
-	 return andBond.getOperands().get(0);
-	 }
+	if (andBond.getOperands().isEmpty()) {
+	    return null;
+	}
+	if (andBond.getOperands().size() == 1) {
+	    return andBond.getOperands().get(0);
+	}
 	return andBond;
     }
 

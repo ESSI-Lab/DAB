@@ -172,7 +172,9 @@ GIAPI.OL_Map = function(options) {
 			//maxZoom: options.maxZoom,
 			zoom: options.zoom
 
-		})
+		}),
+
+		title: 'Geographic area'
 	});
 
 	//

@@ -375,6 +375,9 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 				case 'organisationName': label = 'Organization'; break;
 				case 'platformTitle': label = 'Platform'; break;
 				case 'attributeTitle': label = 'Attribute'; break;
+				case 'intendedObservationSpacing': label = 'Intended observation spacing'; break;
+				case 'timeInterpolation': label = 'Time interpolation'; break;
+				case 'aggregationDuration': label = 'Aggregation duration'; break;
 				case 'observedPropertyURI': label = 'Attribute URI'; break;
 
 				case 'attributeId': label = 'Attribute identifier'; break;

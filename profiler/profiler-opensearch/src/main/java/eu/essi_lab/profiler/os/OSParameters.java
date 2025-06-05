@@ -340,6 +340,42 @@ public abstract class OSParameters {
 	    return createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.PLATFORM_TITLE);
 	}
     };
+    
+    public static final OSParameter INTENDED_OBSERVATION_SPACING = new OSParameter("intendedObservationSpacing", "string", null, "{gs:intendedObservationSpacing}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return createBond(value, MetadataElement.TIME_RESOLUTION_DURATION_8601);
+	}
+    };
+    
+    public static final OSParameter AGGREGATION_DURATION = new OSParameter("aggregationDuration", "string", null, "{gs:aggregationDuration}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return createBond(value, MetadataElement.TIME_AGGREGATION_DURATION_8601);
+	}
+    };
+    
+    public static final OSParameter TIME_INTERPOLATION = new OSParameter("timeInterpolation", "string", null, "{gs:timeInterpolation}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return createBond(value, MetadataElement.TIME_INTERPOLATION);
+	}
+    };
 
     /**
     *

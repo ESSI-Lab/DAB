@@ -28,7 +28,7 @@ function initializeLogin(config) {
 
 	// Setup event listeners
 	const loginBtn = document.getElementById('loginBtn');
-	const logoutBtn = document.getElementById('logoutBtn');
+	let logoutBtn = document.getElementById('logoutBtn');
 	const loginModal = document.getElementById('loginModal');
 	const modalOverlay = document.getElementById('modalOverlay');
 	const submitLogin = document.getElementById('submitLogin');
@@ -85,32 +85,32 @@ function initializeLogin(config) {
 				apiKey: apiKey
 			})
 		})
-		.then(response => response.json())
-		.then(data => {
-			if (data.success) {
-				// Store the token and email
-				localStorage.setItem('authToken', data.apiKey);
-				localStorage.setItem('userEmail', data.email);
-				
-				// Update UI
-				loginBtn.style.display = 'none';
-				logoutBtn.style.display = 'inline-block';
-				logoutBtn.textContent = `Logged in (${data.email})`;
-				
-				// Close modal
-				loginModal.style.display = 'none';
-				modalOverlay.style.display = 'none';
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					// Store the token and email
+					localStorage.setItem('authToken', data.apiKey);
+					localStorage.setItem('userEmail', data.email);
 
-				// Refresh the portal with authentication
-				window.location.reload();
-			} else {
-				alert('Login failed: ' + (data.message || 'Invalid credentials'));
-			}
-		})
-		.catch(error => {
-			console.error('Login error:', error);
-			alert('Login failed. Please try again.');
-		});
+					// Update UI
+					loginBtn.style.display = 'none';
+					logoutBtn.style.display = 'inline-block';
+					logoutBtn.textContent = `Logged in (${data.email})`;
+
+					// Close modal
+					loginModal.style.display = 'none';
+					modalOverlay.style.display = 'none';
+
+					// Refresh the portal with authentication
+					window.location.reload();
+				} else {
+					alert('Login failed: ' + (data.message || 'Invalid credentials'));
+				}
+			})
+			.catch(error => {
+				console.error('Login error:', error);
+				alert('Login failed. Please try again.');
+			});
 	});
 
 	// Check for existing token and email
@@ -120,6 +120,146 @@ function initializeLogin(config) {
 		loginBtn.style.display = 'none';
 		logoutBtn.style.display = 'inline-block';
 		logoutBtn.textContent = `Logged in (${existingEmail})`;
+
+		// Create user menu
+		const userMenu = document.createElement('div');
+		userMenu.id = 'userMenu';
+		userMenu.className = 'user-menu';
+		userMenu.style.display = 'none';
+		userMenu.innerHTML = `
+			<button id="statusBtn" class="menu-button">Status of bulk downloads</button>
+			<button id="logoutMenuBtn" class="menu-button">Logout</button>
+		`;
+		document.body.appendChild(userMenu);
+
+		// Remove the old logout event listener and add menu toggle
+		const oldLogout = logoutBtn.cloneNode(true);
+		logoutBtn.parentNode.replaceChild(oldLogout, logoutBtn);
+		logoutBtn = oldLogout;
+
+		// Show/hide menu on logged-in user button click
+		logoutBtn.addEventListener('click', function(e) {
+			e.stopPropagation();
+			const rect = logoutBtn.getBoundingClientRect();
+			userMenu.style.top = (rect.bottom + 5) + 'px';
+			userMenu.style.right = (window.innerWidth - rect.right) + 'px';
+			userMenu.style.display = userMenu.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Hide menu when clicking outside
+		document.addEventListener('click', function(e) {
+			if (!userMenu.contains(e.target) && e.target !== logoutBtn) {
+				userMenu.style.display = 'none';
+			}
+		});
+
+		// Status button click handler
+		document.getElementById('statusBtn').addEventListener('click', function() {
+			userMenu.style.display = 'none';  // Hide menu when status is clicked
+			
+			// Create dialog content
+			const dialogContent = $('<div>');
+			
+			// Create refresh button
+			const refreshButton = $('<button>')
+				.addClass('refresh-button')
+				.html('<i class="fa fa-refresh"></i> Refresh')
+				.css({
+					'margin-bottom': '10px',
+					'float': 'right'
+				});
+
+			dialogContent.append(refreshButton);
+			dialogContent.append($('<div>').attr('id', 'status-content'));
+
+			// Function to fetch and update status
+			const fetchAndUpdateStatus = () => {
+				const statusContent = $('#status-content');
+				statusContent.html('<p>Loading status of bulk downloads...</p>');
+				
+				// Disable refresh button while loading
+				refreshButton.prop('disabled', true);
+				refreshButton.find('i').addClass('fa-spin');
+
+				// Fetch status from API
+				const authToken = localStorage.getItem('authToken');
+				fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/status`, {
+					headers: {
+						'Accept': 'application/json'
+					}
+				})
+				.then(response => response.json())
+				.then(data => {
+					statusContent.empty();
+					if (data && data.length > 0) {
+						const table = $('<table>').addClass('status-table');
+						table.append($('<tr>')
+							.append($('<th>').text('Operation ID'))
+							.append($('<th>').text('Status'))
+							.append($('<th>').text('Download'))
+						);
+						data.forEach(item => {
+							const row = $('<tr>');
+							row.append($('<td>').text(item.operationId));
+							row.append($('<td>').text(item.status));
+							if (item.status === 'completed' && item.locator) {
+								row.append($('<td>').append(
+									$('<a>')
+										.attr('href', item.locator)
+										.attr('target', '_blank')
+										.text('Download')
+								));
+							} else {
+								row.append($('<td>').text('-'));
+							}
+							table.append(row);
+						});
+						statusContent.append(table);
+					} else {
+						statusContent.append($('<p>').text('No bulk downloads found.'));
+					}
+				})
+				.catch(error => {
+					console.error('Error fetching status:', error);
+					statusContent.empty().append(
+						$('<p>').text('Error loading bulk download status. Please try again later.')
+					);
+				})
+				.finally(() => {
+					// Re-enable refresh button and stop spinning
+					refreshButton.prop('disabled', false);
+					refreshButton.find('i').removeClass('fa-spin');
+				});
+			};
+
+			// Add click handler to refresh button
+			refreshButton.on('click', fetchAndUpdateStatus);
+
+			// Show dialog
+			dialogContent.dialog({
+				title: 'Bulk Downloads Status',
+				modal: true,
+				width: 600,
+				classes: {
+					"ui-dialog": "bulk-download-dialog"
+				}
+			});
+
+			// Initial fetch
+			fetchAndUpdateStatus();
+		});
+
+		// Logout menu button click handler
+		document.getElementById('logoutMenuBtn').addEventListener('click', function() {
+			localStorage.removeItem('authToken');
+			localStorage.removeItem('userEmail');
+			loginBtn.style.display = 'inline-block';
+			loginBtn.textContent = 'Login';
+			loginBtn.disabled = false;
+			logoutBtn.style.display = 'none';
+			userMenu.style.display = 'none';
+			window.location.reload();
+		});
 	}
 }
 
@@ -429,17 +569,18 @@ export function initializePortal(config) {
 			'keyDownAction': (function() { GIAPI.search.discover(); }),
 			'fieldsWidth': 205
 		});
+		if (config.generalTermSearch == undefined || config.generalTermSearch) {
+			GIAPI.search.constWidget.whatConstraint('add', {
+				showOptDialog: true,
+				showResultSetExtensionOpt: false,
+				optDialogPosition: 'bottom',
+				showHelpIcon: false,
+				resizable: true
+			});
 
-		GIAPI.search.constWidget.whatConstraint('add', {
-			showOptDialog: true,
-			showResultSetExtensionOpt: false,
-			optDialogPosition: 'bottom',
-			showHelpIcon: false,
-			resizable: true
-		});
-
-		GIAPI.search.constWidget.append('what-div');
-		jQuery('#' + GIAPI.search.constWidget.getId('what')).css('padding', '6px');
+			GIAPI.search.constWidget.append('what-div');
+			jQuery('#' + GIAPI.search.constWidget.getId('what')).css('padding', '6px');
+		}
 
 		GIAPI.search.constWidget.whenConstraint('add', 'from', { showHelpIcon: false });
 		GIAPI.search.constWidget.append('from-div');
@@ -571,16 +712,132 @@ export function initializePortal(config) {
 		}
 
 		if (config.timeInterpolation !== undefined && config.timeInterpolation) {
-			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'timeInterpolation', { helpIconImage: 'fa-line-chart' }));
+			const timeInterpolationId = GIAPI.search.constWidget.getId('timeInterpolation');
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'timeInterpolation', {
+				helpIconImage: 'fa-line-chart',
+				values: [
+					{ label: 'Select interpolation type', value: '' },
+					{ label: 'Continuous', value: 'CONTINUOUS' },
+					{ label: 'Average', value: 'AVERAGE' },
+					{ label: 'Minimum', value: 'MIN' },
+					{ label: 'Maximum', value: 'MAX' },
+					{ label: 'Total', value: 'TOTAL' },
+					{ label: 'Discontinuous', value: 'DISCONTINUOUS' },
+					{ label: 'Incremental', value: 'INCREMENTAL' },
+					{ label: 'Categorical', value: 'CATEGORICAL' }
+				],
+				readOnlyValues: true
+			}));
+
+			// After constraints are initialized, try to fetch and update values
+			const authToken = localStorage.getItem('authToken') || 'my-token';
+			fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=timeInterpolation&limit=50`)
+				.then(response => response.json())
+				.then(data => {
+					if (data.timeInterpolation && data.timeInterpolation.length > 0) {
+						// Find the select element using the correct ID
+						const selectElement = document.getElementById(timeInterpolationId);
+						if (selectElement) {
+							const options = [
+								{ label: 'Select interpolation type', value: '' },
+								...data.timeInterpolation.map(type => ({
+									label: `${type.value} (${type.observationCount} observations)`,
+									value: type.value
+								}))
+							];
+							
+							// Update the select options
+							selectElement.innerHTML = options.map(option => 
+								`<option value="${option.value}">${option.label}</option>`
+							).join('');
+						}
+					}
+				})
+				.catch(error => {
+					console.error('Error fetching interpolation types:', error);
+					// Keep default values if API fails
+				});
 		}
 
 		if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
-			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', { helpIconImage: 'fa-arrows-h' }));
+			const spacingId = GIAPI.search.constWidget.getId('intendedObservationSpacing');
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', {
+				helpIconImage: 'fa-arrows-h',
+				values: [
+					{ label: 'Select observation spacing', value: '' }
+				],
+				readOnlyValues: true
+			}));
+
+			// After constraints are initialized, try to fetch and update values
+			const authToken = localStorage.getItem('authToken') || 'my-token';
+			fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
+				.then(response => response.json())
+				.then(data => {
+					if (data.intendedObservationSpacing && data.intendedObservationSpacing.length > 0) {
+						// Find the select element using the correct ID
+						const selectElement = document.getElementById(spacingId);
+						if (selectElement) {
+							const options = [
+								{ label: 'Select observation spacing', value: '' },
+								...data.intendedObservationSpacing.map(type => ({
+									label: `${type.value} (${type.observationCount} observations)`,
+									value: type.value
+								}))
+							];
+							
+							// Update the select options
+							selectElement.innerHTML = options.map(option => 
+								`<option value="${option.value}">${option.label}</option>`
+							).join('');
+						}
+					}
+				})
+				.catch(error => {
+					console.error('Error fetching observation spacing types:', error);
+					// Keep default values if API fails
+				});
 		}
 
 		if (config.aggregationDuration !== undefined && config.aggregationDuration) {
-			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', { helpIconImage: 'fa-hourglass' }));
-		}		
+			const durationId = GIAPI.search.constWidget.getId('aggregationDuration');
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', {
+				helpIconImage: 'fa-hourglass',
+				values: [
+					{ label: 'Select aggregation duration', value: '' }
+				],
+				readOnlyValues: true
+			}));
+
+			// After constraints are initialized, try to fetch and update values
+			const authToken = localStorage.getItem('authToken') || 'my-token';
+			fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=aggregationDuration&limit=50`)
+				.then(response => response.json())
+				.then(data => {
+					if (data.aggregationDuration && data.aggregationDuration.length > 0) {
+						// Find the select element using the correct ID
+						const selectElement = document.getElementById(durationId);
+						if (selectElement) {
+							const options = [
+								{ label: 'Select aggregation duration', value: '' },
+								...data.aggregationDuration.map(type => ({
+									label: `${type.value} (${type.observationCount} observations)`,
+									value: type.value
+								}))
+							];
+							
+							// Update the select options
+							selectElement.innerHTML = options.map(option => 
+								`<option value="${option.value}">${option.label}</option>`
+							).join('');
+						}
+					}
+				})
+				.catch(error => {
+					console.error('Error fetching aggregation duration types:', error);
+					// Keep default values if API fails
+				});
+		}
 
 		var semanticValue = 0;
 		if (config.semanticSearchValue !== undefined) {
@@ -619,15 +876,15 @@ export function initializePortal(config) {
 		var originalPaginatorWidget = GIAPI.PaginatorWidget;
 		GIAPI.PaginatorWidget = function(id, onResponse, options) {
 			var widget = originalPaginatorWidget(id, onResponse, options);
-			
+
 			// Store the original update function
 			var originalUpdate = widget.update;
-			
+
 			// Override the update function
 			widget.update = function(resultSet) {
 				// Call the original update first
 				originalUpdate.call(this, resultSet);
-				
+
 				// Check if user is logged in
 				var authToken = localStorage.getItem('authToken');
 				if (authToken) {
@@ -667,12 +924,12 @@ export function initializePortal(config) {
 											// Get the current constraints
 											var constraints = GIAPI.search.constWidget.constraints();
 											var where = GIAPI.search.resultsMapWidget.where();
-											
+
 											// Build the download URL
 											var baseUrl = '../services/essi';
 											var token = localStorage.getItem('authToken');
 											var params = new URLSearchParams();
-											
+
 											// Add temporal constraints if they exist
 											if (constraints.when && constraints.when.from) {
 												params.append('beginPosition', constraints.when.from);
@@ -680,7 +937,7 @@ export function initializePortal(config) {
 											if (constraints.when && constraints.when.to) {
 												params.append('endPosition', constraints.when.to);
 											}
-											
+
 											// Add spatial constraints if they exist
 											if (where) {
 												params.append('west', where.west);
@@ -688,26 +945,38 @@ export function initializePortal(config) {
 												params.append('east', where.east);
 												params.append('north', where.north);
 											}
-											
+
 											// Add parameter constraint if it exists
 											if (constraints.kvp && Array.isArray(constraints.kvp)) {
-												const paramKvp = constraints.kvp.find(kvp => kvp.key === 'attributeTitle');
-												if (paramKvp) {
-													params.append('observedProperty', paramKvp.value);
+												const attributeTitleValue = constraints.kvp.find(kvp => kvp.key === 'attributeTitle');
+												if (attributeTitleValue) {
+													params.append('observedProperty', attributeTitleValue.value);
+												}
+												const intendedObservationSpacingValue = constraints.kvp.find(kvp => kvp.key === 'intendedObservationSpacing');
+												if (intendedObservationSpacingValue) {
+													params.append('intendedObservationSpacing', intendedObservationSpacingValue.value);
+												}
+												const aggregationDurationValue = constraints.kvp.find(kvp => kvp.key === 'aggregationDuration');
+												if (aggregationDurationValue) {
+													params.append('aggregationDuration', aggregationDurationValue.value);
+												}
+												const timeInterpolationValue = constraints.kvp.find(kvp => kvp.key === 'timeInterpolation');
+												if (timeInterpolationValue) {
+													params.append('timeInterpolation', timeInterpolationValue.value);
 												}
 											}
-											
+
 											// Add fixed parameters
 											params.append('ontology', config.ontology);
-											params.append('timeInterpolation', 'TOTAL');
-											params.append('intendedObservationSpacing', 'P1D');
-											params.append('aggregationDuration', 'P1D');
+
+											
+
 											params.append('includeData', 'true');
 											params.append('asynchDownload', 'true');
-											
+
 											// Construct the final URL using the view from config
 											var downloadUrl = `${baseUrl}/token/${token}/view/${config.view}/om-api/observations?${params.toString()}`;
-											
+
 											// Make the GET request
 											fetch(downloadUrl)
 												.then(response => {
@@ -731,7 +1000,7 @@ export function initializePortal(config) {
 													});
 													console.error('Download error:', error);
 												});
-											
+
 											$(this).dialog("close");
 										}
 									},
@@ -746,19 +1015,19 @@ export function initializePortal(config) {
 								]
 							});
 						});
-					
+
 					// Append the button after the results label
 					$('#paginator-widget-top-label').append(downloadButton);
 				}
 			};
-			
+
 			return widget;
 		};
 
 		//------------------------------------
 		// PaginatorWidget instance
 		//
-		GIAPI.search.paginatorWidget = GIAPI.PaginatorWidget('paginator-widget', 
+		GIAPI.search.paginatorWidget = GIAPI.PaginatorWidget('paginator-widget',
 			GIAPI.search.onDiscoverResponse,
 			{
 				'onPagination': function(action) {

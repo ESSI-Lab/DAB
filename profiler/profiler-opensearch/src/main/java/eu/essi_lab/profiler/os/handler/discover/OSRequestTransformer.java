@@ -740,6 +740,15 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    case "platformTitle":
 		list.add(MetadataElement.PLATFORM_TITLE);
 		break;
+	    case "intendedObservationSpacing":
+		list.add(MetadataElement.TIME_RESOLUTION_DURATION_8601);
+		break;
+	    case "aggregationDuration":
+		list.add(MetadataElement.TIME_AGGREGATION_DURATION_8601);
+		break;
+	    case "timeInterpolation":
+		list.add(MetadataElement.TIME_INTERPOLATION);
+		break;
 	    case "orgName":
 		list.add(MetadataElement.ORGANISATION_NAME);
 		break;
