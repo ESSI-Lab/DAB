@@ -571,7 +571,51 @@ export function initializePortal(config) {
 		}
 
 		if (config.timeInterpolation !== undefined && config.timeInterpolation) {
-			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'timeInterpolation', { helpIconImage: 'fa-line-chart' }));
+			const timeInterpolationId = GIAPI.search.constWidget.getId('timeInterpolation');
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'timeInterpolation', {
+				helpIconImage: 'fa-line-chart',
+				values: [
+					{ label: 'Select interpolation type', value: '' },
+					{ label: 'Continuous', value: 'CONTINUOUS' },
+					{ label: 'Average', value: 'AVERAGE' },
+					{ label: 'Minimum', value: 'MIN' },
+					{ label: 'Maximum', value: 'MAX' },
+					{ label: 'Total', value: 'TOTAL' },
+					{ label: 'Discontinuous', value: 'DISCONTINUOUS' },
+					{ label: 'Incremental', value: 'INCREMENTAL' },
+					{ label: 'Categorical', value: 'CATEGORICAL' }
+				],
+				readOnlyValues: true
+			}));
+
+			// After constraints are initialized, try to fetch and update values
+			const authToken = localStorage.getItem('authToken') || 'my-token';
+			fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=timeInterpolation&limit=50`)
+				.then(response => response.json())
+				.then(data => {
+					if (data.timeInterpolation && data.timeInterpolation.length > 0) {
+						// Find the select element using the correct ID
+						const selectElement = document.getElementById(timeInterpolationId);
+						if (selectElement) {
+							const options = [
+								{ label: 'Select interpolation type', value: '' },
+								...data.timeInterpolation.map(type => ({
+									label: `${type.value} (${type.observationCount} observations)`,
+									value: type.value
+								}))
+							];
+							
+							// Update the select options
+							selectElement.innerHTML = options.map(option => 
+								`<option value="${option.value}">${option.label}</option>`
+							).join('');
+						}
+					}
+				})
+				.catch(error => {
+					console.error('Error fetching interpolation types:', error);
+					// Keep default values if API fails
+				});
 		}
 
 		if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
