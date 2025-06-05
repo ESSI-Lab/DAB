@@ -86,10 +86,10 @@ public class Entity extends JSONObjectWrapper {
 
 	T newInstance = null;
 	try {
-	    newInstance = type.newInstance();
+	    newInstance = type.getDeclaredConstructor().newInstance();
 	    newInstance.setObject(entity);
 
-	} catch (InstantiationException | IllegalAccessException e) {
+	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(Entity.class).error(e);
 	}
 
@@ -238,6 +238,7 @@ public class Entity extends JSONObjectWrapper {
 		return Arrays.asList(create(entity, type));
 	    }
 	}
+	
 	//
 	// linked entities
 	//

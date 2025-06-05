@@ -426,8 +426,6 @@ public class ConfigService {
 
 	Scheduling scheduling = setting.getScheduling();
 
-	boolean reschedule = scheduling.isEnabled();
-
 	HarvestingSettingUtils.udpate(harvestSourceRequest, scheduling);
 
 	SelectionUtils.deepClean(setting);
@@ -460,16 +458,21 @@ public class ConfigService {
 	Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
 
 	try {
+	    boolean contains = scheduler.//
+		    listScheduledSettings().//
+		    stream().//
+		    map(s -> s.getIdentifier()).//
+		    collect(Collectors.toList()).//
+		    contains(settingId);
 
-	    if (reschedule) {
+	    if (contains) {
 
 		scheduler.reschedule(setting);
 
 	    } else {
-
+		
 		scheduler.schedule(setting);
 	    }
-
 	} catch (Exception ex) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(ex);
@@ -519,7 +522,7 @@ public class ConfigService {
 
 	try {
 
-	    scheduler.unschedule(setting);
+	    scheduler.pause(setting);
 
 	} catch (SchedulerException e) {
 
@@ -707,130 +710,130 @@ public class ConfigService {
      * @return
      */
     private Response handleListSourcesRequest(ListSourcesRequest request) {
-    
-        //
-        // updating scheduling support
-        //
-    
-        SchedulerSupport support = SchedulerSupport.getInstance();
-        support.update();
-    
-        //
-        // reading optional source ids
-        //
-    
-        JSONArray out = new JSONArray();
-    
-        final List<String> sourceIds = new ArrayList<String>();
-    
-        Optional<Object> optional = request.read(ListSourcesRequest.SOURCE_ID);
-    
-        if (optional.isPresent()) {
-    
-            sourceIds.addAll(Arrays.asList(optional.get().toString().split(",")).//
-        	    stream().//
-        	    map(v -> v.trim().strip()).//
-        	    collect(Collectors.toList()));
-    
-            List<String> sources = ConfigurationWrapper.getHarvestedAndMixedSources().//
-        	    stream().//
-        	    map(s -> s.getUniqueIdentifier()).//
-        	    collect(Collectors.toList());
-    
-            String missingSources = sourceIds.stream().filter(id -> !sources.contains(id)).collect(Collectors.joining(","));
-    
-            if (missingSources != null && !missingSources.isEmpty()) {
-    
-        	String message = missingSources.contains(",") ? "Sources with id '" + missingSources + "' not found"
-        		: "Source with id '" + missingSources + "' not found";
-    
-        	return buildErrorResponse(Status.NOT_FOUND, message);
-            }
-        }
-    
-        //
-        //
-        //
-    
-        List<HarvestingSetting> settings = ConfigurationWrapper.getHarvestingSettings();
-    
-        settings.forEach(setting -> {
-    
-            AccessorSetting accessorSetting = setting.getSelectedAccessorSetting();
-    
-            GSSource source = accessorSetting.getSource();
-    
-            if (sourceIds.isEmpty() || sourceIds.contains(source.getUniqueIdentifier())) {
-    
-        	JSONObject sourceObject = new JSONObject();
-        	out.put(sourceObject);
-    
-        	sourceObject.put(PutSourceRequest.SOURCE_ID, source.getUniqueIdentifier());
-        	sourceObject.put(PutSourceRequest.SOURCE_LABEL, source.getLabel());
-        	sourceObject.put(PutSourceRequest.SOURCE_ENDPOINT, source.getEndpoint());
-        	sourceObject.put(PutSourceRequest.SERVICE_TYPE, accessorSetting.getAccessorType());
-    
-        	JSONObject scheduling = new JSONObject();
-    
-        	String jobPhase = support.getJobPhase(setting);
-        	if (!jobPhase.isEmpty()) {
-    
-        	    scheduling.put("phase", jobPhase);
-        	}
-    
-        	String elapsedTime = support.getElapsedTime(setting);
-        	if (!elapsedTime.isEmpty()) {
-    
-        	    scheduling.put("elapsedTime", elapsedTime);
-        	}
-    
-        	String endTime = support.getEndTime(setting);
-        	if (!endTime.isEmpty()) {
-    
-        	    scheduling.put("endTime", endTime);
-        	}
-    
-        	String firedTime = support.getFiredTime(setting);
-        	if (!firedTime.isEmpty()) {
-    
-        	    scheduling.put("firedTime", firedTime);
-        	}
-    
-        	String nextFireTime = support.getNextFireTime(setting);
-        	if (!nextFireTime.isEmpty()) {
-    
-        	    scheduling.put("nextFireTime", nextFireTime);
-        	}
-    
-        	String repeatCount = support.getRepeatCount(setting);
-        	if (!repeatCount.isEmpty()) {
-    
-        	    scheduling.put("repeatCount", repeatCount);
-        	}
-    
-        	String repeatInterval = support.getRepeatInterval(setting);
-        	if (!repeatInterval.isEmpty()) {
-    
-        	    scheduling.put("repeatInterval", repeatInterval);
-        	}
-    
-        	String size = support.getSize(setting);
-        	if (!size.isEmpty()) {
-    
-        	    scheduling.put("size", size);
-        	}
-    
-        	if (!scheduling.keySet().isEmpty()) {
-    
-        	    sourceObject.put("scheduling", scheduling);
-        	}
-            }
-        });
-    
-        return Response.status(Status.OK).//
-        	entity(out.toString(3)).//
-        	type(MediaType.APPLICATION_JSON.toString()).//
-        	build();
+
+	//
+	// updating scheduling support
+	//
+
+	SchedulerSupport support = SchedulerSupport.getInstance();
+	support.update();
+
+	//
+	// reading optional source ids
+	//
+
+	JSONArray out = new JSONArray();
+
+	final List<String> sourceIds = new ArrayList<String>();
+
+	Optional<Object> optional = request.read(ListSourcesRequest.SOURCE_ID);
+
+	if (optional.isPresent()) {
+
+	    sourceIds.addAll(Arrays.asList(optional.get().toString().split(",")).//
+		    stream().//
+		    map(v -> v.trim().strip()).//
+		    collect(Collectors.toList()));
+
+	    List<String> sources = ConfigurationWrapper.getHarvestedAndMixedSources().//
+		    stream().//
+		    map(s -> s.getUniqueIdentifier()).//
+		    collect(Collectors.toList());
+
+	    String missingSources = sourceIds.stream().filter(id -> !sources.contains(id)).collect(Collectors.joining(","));
+
+	    if (missingSources != null && !missingSources.isEmpty()) {
+
+		String message = missingSources.contains(",") ? "Sources with id '" + missingSources + "' not found"
+			: "Source with id '" + missingSources + "' not found";
+
+		return buildErrorResponse(Status.NOT_FOUND, message);
+	    }
+	}
+
+	//
+	//
+	//
+
+	List<HarvestingSetting> settings = ConfigurationWrapper.getHarvestingSettings();
+
+	settings.forEach(setting -> {
+
+	    AccessorSetting accessorSetting = setting.getSelectedAccessorSetting();
+
+	    GSSource source = accessorSetting.getSource();
+
+	    if (sourceIds.isEmpty() || sourceIds.contains(source.getUniqueIdentifier())) {
+
+		JSONObject sourceObject = new JSONObject();
+		out.put(sourceObject);
+
+		sourceObject.put(PutSourceRequest.SOURCE_ID, source.getUniqueIdentifier());
+		sourceObject.put(PutSourceRequest.SOURCE_LABEL, source.getLabel());
+		sourceObject.put(PutSourceRequest.SOURCE_ENDPOINT, source.getEndpoint());
+		sourceObject.put(PutSourceRequest.SERVICE_TYPE, accessorSetting.getAccessorType());
+
+		JSONObject scheduling = new JSONObject();
+
+		String jobPhase = support.getJobPhase(setting);
+		if (!jobPhase.isEmpty()) {
+
+		    scheduling.put("phase", jobPhase);
+		}
+
+		String elapsedTime = support.getElapsedTime(setting);
+		if (!elapsedTime.isEmpty()) {
+
+		    scheduling.put("elapsedTime", elapsedTime);
+		}
+
+		String endTime = support.getEndTime(setting);
+		if (!endTime.isEmpty()) {
+
+		    scheduling.put("endTime", endTime);
+		}
+
+		String firedTime = support.getFiredTime(setting);
+		if (!firedTime.isEmpty()) {
+
+		    scheduling.put("firedTime", firedTime);
+		}
+
+		String nextFireTime = support.getNextFireTime(setting);
+		if (!nextFireTime.isEmpty()) {
+
+		    scheduling.put("nextFireTime", nextFireTime);
+		}
+
+		String repeatCount = support.getRepeatCount(setting);
+		if (!repeatCount.isEmpty()) {
+
+		    scheduling.put("repeatCount", repeatCount);
+		}
+
+		String repeatInterval = support.getRepeatInterval(setting);
+		if (!repeatInterval.isEmpty()) {
+
+		    scheduling.put("repeatInterval", repeatInterval);
+		}
+
+		String size = support.getSize(setting);
+		if (!size.isEmpty()) {
+
+		    scheduling.put("size", size);
+		}
+
+		if (!scheduling.keySet().isEmpty()) {
+
+		    sourceObject.put("scheduling", scheduling);
+		}
+	    }
+	});
+
+	return Response.status(Status.OK).//
+		entity(out.toString(3)).//
+		type(MediaType.APPLICATION_JSON.toString()).//
+		build();
     }
 
     /**
@@ -869,19 +872,19 @@ public class ConfigService {
      * @return
      */
     private Optional<Response> flush(Configuration configuration) {
-    
-        try {
-    
-            configuration.flush();
-    
-            return Optional.empty();
-    
-        } catch (Exception ex) {
-    
-            GSLoggerFactory.getLogger(getClass()).error(ex);
-    
-            return Optional.of(buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to save changes: " + ex.getMessage()));
-        }
+
+	try {
+
+	    configuration.flush();
+
+	    return Optional.empty();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    return Optional.of(buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to save changes: " + ex.getMessage()));
+	}
     }
 
     /**
