@@ -2,7 +2,7 @@ package eu.essi_lab.accessor.bnhs;
 
 /*-
  * #%L
- * Discovery and Access Broker (DAB) Community Edition (CE)
+ * Discovery and Access Broker (DAB)
  * %%
  * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
@@ -179,7 +179,7 @@ public class BNHSConnector extends HarvestedQueryConnector<BNHSConnectorSetting>
 		    mapper = new CANADAMSCMapper();
 
 		    // RUSSIA
-		} else if (realtimeLink.contains("http://ws.meteo.ru/hydro/rest/GetHydroDischargesRF/xml")) {
+		} else if (realtimeLink.contains("http://ws.meteo.ru/hydro/rest/GetHydroDischargesRF/xml") || realtimeLink.contains("http://hydroweb.meteo.ru/hydro-service/rest/GetHydroDischargesRF/xml")) {
 		    connector = new RIHMIConnector();
 		    mapper = new RIHMIMapper();
 

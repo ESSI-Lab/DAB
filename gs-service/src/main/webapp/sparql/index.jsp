@@ -50,13 +50,13 @@ for (GSSource source : sources) {
     out.println("<h2>" + source.getLabel() + "</h2>");
     String id = source.getUniqueIdentifier();
     String objectKey = "dataset/" + id + "/" + id + ".ttl";
-    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/dataset/" + objectKey + "'>Complete set (TTLs)</a> "
+    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/" + objectKey + "'>Complete set (TTLs)</a> "
     + getInfo(wrapper, objectKey) + "<br/>\n");
     objectKey = "dataset/" + id + "/" + id + "-valid.ttl";
-    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/dataset/" + objectKey + "'>Valid set (TTLs)</a> "
+    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/" + objectKey + "'>Valid set (TTLs)</a> "
     + getInfo(wrapper, objectKey) + "<br/>\n");
     objectKey = "dataset/" + id + "/" + id + "-report.txt";
-    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/dataset/" + objectKey + "'>Validity report</a> "
+    out.println("<a href='https://s3.us-east-1.amazonaws.com/dataset.geodab.eu/" + objectKey + "'>Validity report</a> "
     + getInfo(wrapper, objectKey) + "<br/>\n");
 }
 

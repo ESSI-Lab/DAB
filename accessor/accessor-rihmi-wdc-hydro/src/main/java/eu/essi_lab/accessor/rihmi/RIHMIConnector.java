@@ -2,7 +2,7 @@ package eu.essi_lab.accessor.rihmi;
 
 /*-
  * #%L
- * Discovery and Access Broker (DAB) Community Edition (CE)
+ * Discovery and Access Broker (DAB)
  * %%
  * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
@@ -59,7 +59,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
     @Override
     public boolean supports(GSSource source) {
 	String url = source.getEndpoint();
-	return url.contains("ws.meteo.ru");
+	return url.contains("ws.meteo.ru") || url.contains("hydroweb.meteo.ru");
     }
 
     private RIHMIClient client = null;
@@ -153,6 +153,8 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    downloadUrls.add(getRealtimeDownloadUrl(client.getAralWaterLevelEndpoint(), stationId));
 		    // discharges
 		    downloadUrls.add(getRealtimeDownloadUrl(client.getAralDischargeEndpoint(), stationId));
+		    // water temperature
+		    downloadUrls.add(getRealtimeDownloadUrl(client.getAralWaterTemperatureEndpoint(), stationId));
 
 		} else {
 		    // real time download url
@@ -205,7 +207,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 		    RIHMIMetadata rm = new RIHMIMetadata();
 		    if (from == null || from.isEmpty()) {
-			if (count == 2) {
+			if (count == 3) {
 			    ret.setResumptionToken(null);
 			    return ret;
 			} else {
@@ -236,9 +238,12 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    if (url.contains(client.getAralWaterLevelEndpoint())) {
 			rm.setParameterId("RIHMI:WaterLevel");
 			rm.setParameterName("Water Level");
-		    } else {
+		    } else if (url.contains(client.getAralDischargeEndpoint())) {
 			rm.setParameterId("RIHMI:Discharge");
 			rm.setParameterName("Discharge");
+		    } else {
+			rm.setParameterId("RIHMI:WaterTemperature");
+			rm.setParameterName("Water Temperature");
 		    }
 		    rm.setStationId(stationId);
 		    String name = reader
@@ -327,7 +332,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	}
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm");// 2020-01-02T06:06:30.000+0000
 	sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-	String dateFrom = sdf.format(new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 60l));
+	String dateFrom = sdf.format(new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 180l));
 	try {
 	    dateFrom = URLEncoder.encode(dateFrom, "UTF-8");
 	} catch (UnsupportedEncodingException e) {

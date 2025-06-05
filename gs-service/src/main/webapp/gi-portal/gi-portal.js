@@ -1,22 +1,140 @@
 import { GIAPI } from '../giapi/core/GIAPI.js';
 
 var view = '';
-
 var token = '';
 
+function initializeLogin(config) {
+	if (!config.login) {
+		return;
+	}
+
+	// Create and append login elements
+	const loginContainer = document.createElement('div');
+	loginContainer.className = 'login-container';
+	loginContainer.innerHTML = `
+		<button id="loginBtn" class="login-button">Login</button>
+		<button id="logoutBtn" class="login-button" style="display: none;">Logout</button>
+		<div id="loginModal" class="login-modal">
+			<h3>Login to ${config.title || 'Portal'}</h3>
+			<p class="login-info">After logging in, you will gain access to additional features, such as asynchronous bulk data download.</p>
+			<input type="email" id="email" placeholder="Email" autocomplete="off">
+			<input type="password" id="apiKey" placeholder="API Key" autocomplete="off">
+			<button id="submitLogin">Login</button>
+		</div>
+		<div id="modalOverlay" class="modal-overlay"></div>
+	`;
+
+	document.body.insertBefore(loginContainer, document.body.firstChild);
+
+	// Setup event listeners
+	const loginBtn = document.getElementById('loginBtn');
+	const logoutBtn = document.getElementById('logoutBtn');
+	const loginModal = document.getElementById('loginModal');
+	const modalOverlay = document.getElementById('modalOverlay');
+	const submitLogin = document.getElementById('submitLogin');
+	const emailInput = document.getElementById('email');
+	const apiKeyInput = document.getElementById('apiKey');
+
+	// Show modal
+	loginBtn.addEventListener('click', function() {
+		loginModal.style.display = 'block';
+		modalOverlay.style.display = 'block';
+		// Clear inputs when opening modal
+		emailInput.value = '';
+		apiKeyInput.value = '';
+	});
+
+	// Handle logout
+	logoutBtn.addEventListener('click', function() {
+		localStorage.removeItem('authToken');
+		localStorage.removeItem('userEmail');
+		loginBtn.style.display = 'inline-block';
+		loginBtn.textContent = 'Login';
+		loginBtn.disabled = false;
+		logoutBtn.style.display = 'none';
+		window.location.reload();
+	});
+
+	// Hide modal when clicking outside
+	modalOverlay.addEventListener('click', function() {
+		loginModal.style.display = 'none';
+		modalOverlay.style.display = 'none';
+		// Clear inputs when closing modal
+		emailInput.value = '';
+		apiKeyInput.value = '';
+	});
+
+	// Handle login submission
+	submitLogin.addEventListener('click', function() {
+		const email = emailInput.value;
+		const apiKey = apiKeyInput.value;
+
+		if (!email || !apiKey) {
+			alert('Please enter both email and API key');
+			return;
+		}
+
+		// Call the authentication endpoint
+		fetch('../services/support/auth/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				email: email,
+				apiKey: apiKey
+			})
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data.success) {
+				// Store the token and email
+				localStorage.setItem('authToken', data.apiKey);
+				localStorage.setItem('userEmail', data.email);
+				
+				// Update UI
+				loginBtn.style.display = 'none';
+				logoutBtn.style.display = 'inline-block';
+				logoutBtn.textContent = `Logged in (${data.email})`;
+				
+				// Close modal
+				loginModal.style.display = 'none';
+				modalOverlay.style.display = 'none';
+
+				// Refresh the portal with authentication
+				window.location.reload();
+			} else {
+				alert('Login failed: ' + (data.message || 'Invalid credentials'));
+			}
+		})
+		.catch(error => {
+			console.error('Login error:', error);
+			alert('Login failed. Please try again.');
+		});
+	});
+
+	// Check for existing token and email
+	const existingToken = localStorage.getItem('authToken');
+	const existingEmail = localStorage.getItem('userEmail');
+	if (existingToken && existingEmail) {
+		loginBtn.style.display = 'none';
+		logoutBtn.style.display = 'inline-block';
+		logoutBtn.textContent = `Logged in (${existingEmail})`;
+	}
+}
 
 export function initializePortal(config) {
 	view = config.view;
 	token = config.token;
 	document.title = config.title;
 
+	// Initialize login if enabled
+	initializeLogin(config);
 
 	var centerLat = config.centerLat;
 	var centerLon = config.centerLon;
 	var zoom = config.zoom;
 	var minZoom = config.minZoom;
-
-
 
 	$.extend(true, $.hik.jtable.prototype.options, {
 		jqueryuiTheme: true
@@ -36,14 +154,9 @@ export function initializePortal(config) {
 		}
 	};
 
- 
-
-
-
 	GIAPI.logger.enabled = true;
 
 	GIAPI.search = {};
-
 
 	// GIAPI.search.dab = GIAPI.DAB('http://localhost:9090/gs-service', view, 'services/essi','csw');
 	// GIAPI.search.dab = GIAPI.DAB('https://gs-service-preproduction.geodab.eu/gs-service', view, 'services/essi','csw');
@@ -442,11 +555,12 @@ export function initializePortal(config) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'instrumentTitle'));
 		}
 		if (config.attributeSearch !== undefined && config.attributeSearch) {
-			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle',{ id: 'attributeNameConstraint'}));
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle',
+				{ id: 'attributeNameConstraint', helpIconImage: 'fa-flask' }));
 		}
 		if (config.platformSearch !== undefined && config.platformSearch) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'platformTitle',
-				{ id: 'platformNameConstraint', helpIconImage: 'fa-wifi' }));
+				{ id: 'platformNameConstraint', helpIconImage: 'fa-circle' }));
 		}
 		if (config.validatedSearch !== undefined && config.validatedSearch) {
 			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'isValidated'));
@@ -455,6 +569,18 @@ export function initializePortal(config) {
 		if (config.riverSearch !== undefined && config.riverSearch) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'riverName', { helpIconImage: 'fa-tint' }));
 		}
+
+		if (config.timeInterpolation !== undefined && config.timeInterpolation) {
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'timeInterpolation', { helpIconImage: 'fa-line-chart' }));
+		}
+
+		if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', { helpIconImage: 'fa-arrows-h' }));
+		}
+
+		if (config.aggregationDuration !== undefined && config.aggregationDuration) {
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', { helpIconImage: 'fa-hourglass' }));
+		}		
 
 		var semanticValue = 0;
 		if (config.semanticSearchValue !== undefined) {
@@ -465,22 +591,177 @@ export function initializePortal(config) {
 			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semantics', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
 		}
 
+		// Only show advanced search if we have constraints to show
+		if (advancedConstraints.length > 0) {
+			GIAPI.search.constWidget.advancedSearch(
+				'advConstDiv',
+				'adv-search-div',
+				advancedConstraints,
+				{
+					searchButtonBckColor: '#2c3e50',
+					searchButtonLabelColor: 'white',
+					advConstDivBckColor: '#f8f9fa'
+				}
+			);
 
-		GIAPI.search.constWidget.advancedSearch(
-			'advConstDiv',
-			'adv-search-div',
-			advancedConstraints
-		);
+			// Ensure the advanced search div exists
+			if (!$('#adv-search-div').length) {
+				$('<div>').attr('id', 'adv-search-div').insertAfter('#search-button');
+			}
+			if (!$('#advConstDiv').length) {
+				$('<div>').attr('id', 'advConstDiv').appendTo('#adv-search-div');
+			}
+		}
 
 		//------------------------------------
-		// PaginatorWidget
+		// Custom PaginatorWidget
 		//
-		GIAPI.search.paginatorWidget = GIAPI.PaginatorWidget('paginator-widget',
+		var originalPaginatorWidget = GIAPI.PaginatorWidget;
+		GIAPI.PaginatorWidget = function(id, onResponse, options) {
+			var widget = originalPaginatorWidget(id, onResponse, options);
+			
+			// Store the original update function
+			var originalUpdate = widget.update;
+			
+			// Override the update function
+			widget.update = function(resultSet) {
+				// Call the original update first
+				originalUpdate.call(this, resultSet);
+				
+				// Check if user is logged in
+				var authToken = localStorage.getItem('authToken');
+				if (authToken) {
+					// Add bulk download button next to results count
+					var downloadButton = $('<button>')
+						.addClass('login-button')
+						.text('Bulk data download')
+						.css({
+							'margin-left': '10px',
+							'padding': '5px 10px',
+							'font-size': '0.9em',
+							'background-color': '#2c3e50',
+							'color': 'white',
+							'border': 'none',
+							'border-radius': '4px',
+							'cursor': 'pointer'
+						})
+						.on('click', function() {
+							// Create dialog content
+							var dialogContent = $('<div>')
+								.append($('<p>').text(`This will initiate the bulk download of ${resultSet.size} resources. The process may take some time, depending on the number of resources and current server load.`))
+								.append($('<p>').text('Are you sure you want to proceed? You can monitor the download status from your personal menu.'));
 
+							// Create and show dialog
+							dialogContent.dialog({
+								title: 'Confirm Bulk Download',
+								modal: true,
+								width: 400,
+								classes: {
+									"ui-dialog": "bulk-download-dialog"
+								},
+								buttons: [
+									{
+										text: "Proceed",
+										class: "login-button",
+										click: function() {
+											// Get the current constraints
+											var constraints = GIAPI.search.constWidget.constraints();
+											var where = GIAPI.search.resultsMapWidget.where();
+											
+											// Build the download URL
+											var baseUrl = '../services/essi';
+											var token = localStorage.getItem('authToken');
+											var params = new URLSearchParams();
+											
+											// Add temporal constraints if they exist
+											if (constraints.when && constraints.when.from) {
+												params.append('beginPosition', constraints.when.from);
+											}
+											if (constraints.when && constraints.when.to) {
+												params.append('endPosition', constraints.when.to);
+											}
+											
+											// Add spatial constraints if they exist
+											if (where) {
+												params.append('west', where.west);
+												params.append('south', where.south);
+												params.append('east', where.east);
+												params.append('north', where.north);
+											}
+											
+											// Add parameter constraint if it exists
+											if (constraints.kvp && Array.isArray(constraints.kvp)) {
+												const paramKvp = constraints.kvp.find(kvp => kvp.key === 'attributeTitle');
+												if (paramKvp) {
+													params.append('observedProperty', paramKvp.value);
+												}
+											}
+											
+											// Add fixed parameters
+											params.append('ontology', config.ontology);
+											params.append('timeInterpolation', 'TOTAL');
+											params.append('intendedObservationSpacing', 'P1D');
+											params.append('aggregationDuration', 'P1D');
+											params.append('includeData', 'true');
+											params.append('asynchDownload', 'true');
+											
+											// Construct the final URL using the view from config
+											var downloadUrl = `${baseUrl}/token/${token}/view/${config.view}/om-api/observations?${params.toString()}`;
+											
+											// Make the GET request
+											fetch(downloadUrl)
+												.then(response => {
+													if (!response.ok) {
+														throw new Error('Network response was not ok');
+													}
+													return response.json();
+												})
+												.then(data => {
+													// Show success message
+													GIAPI.UI_Utils.dialog('open', {
+														title: 'Download Started',
+														message: 'Your bulk download request has been initiated. You can monitor the download status from your personal menu.'
+													});
+												})
+												.catch(error => {
+													// Show error message
+													GIAPI.UI_Utils.dialog('open', {
+														title: 'Error',
+														message: 'Failed to initiate bulk download. Please try again later.'
+													});
+													console.error('Download error:', error);
+												});
+											
+											$(this).dialog("close");
+										}
+									},
+									{
+										text: "Abandon and refine the search",
+										click: function() {
+											$(this).dialog("close");
+											// Focus on the search input or open advanced search
+											$('#what-div input').focus();
+										}
+									}
+								]
+							});
+						});
+					
+					// Append the button after the results label
+					$('#paginator-widget-top-label').append(downloadButton);
+				}
+			};
+			
+			return widget;
+		};
+
+		//------------------------------------
+		// PaginatorWidget instance
+		//
+		GIAPI.search.paginatorWidget = GIAPI.PaginatorWidget('paginator-widget', 
 			GIAPI.search.onDiscoverResponse,
 			{
 				'onPagination': function(action) {
-
 					GIAPI.UI_Utils.discoverDialog('open');
 				},
 				'border': 'none'

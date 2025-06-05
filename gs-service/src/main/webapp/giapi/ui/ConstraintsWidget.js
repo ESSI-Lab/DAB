@@ -856,6 +856,18 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				help = 'Name of the river object of measurement';
 				label = 'River name';
 				break;
+			case 'timeInterpolation':
+				help = 'Time interpolation';
+				label = 'Time interpolation';
+				break;
+			case 'intendedObservationSpacing':
+help = 'Intended observation spacing';
+label = 'Intended observation spacing';
+break;
+			case 'aggregationDuration':
+help = 'Aggregation duration';
+label = 'Aggregation duration';
+break;
 			default: throw 'Invalid constraint: ' + constraint;
 		}
 
@@ -987,6 +999,13 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				help = 'Optionally limits the search to validated records only';
 				label = 'Validated records';
 				break;
+			case 'timeRel':
+				values = [
+				{ 'label': 'Temporal relation: intersects', 'value': 'intersects' },
+				{ 'label': 'Temporal relation: contains', 'value': 'contains' }];
+				help = "Defines the temporal relation between 'Start time' and 'End time'";
+				label = "Temporal relation between 'Start time' and 'End time'";
+				break;	
 			default: throw 'Invalid constraint: ' + constraint;
 		}
 
@@ -1256,7 +1275,8 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			'attributeId',
 			'attributeTitle',
 			'isValidated',
-			'riverName'
+			'riverName',
+			'timeRel'
 		];
 
 		constraints.kvp = [];

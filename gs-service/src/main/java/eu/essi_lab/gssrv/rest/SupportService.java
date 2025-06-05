@@ -1,8 +1,10 @@
 package eu.essi_lab.gssrv.rest;
 
+import java.util.List;
+
 /*-
  * #%L
- * Discovery and Access Broker (DAB) Community Edition (CE)
+ * Discovery and Access Broker (DAB)
  * %%
  * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
@@ -22,7 +24,9 @@ package eu.essi_lab.gssrv.rest;
  */
 
 import javax.jws.WebService;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -36,6 +40,11 @@ import eu.essi_lab.lib.odip.ODIPVocabularyHandler.OutputFormat;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Profile;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Target;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.auth.GSUser;
+import eu.essi_lab.authorization.userfinder.UserFinder;
+import eu.essi_lab.dab.auth.LoginRequest;
+import eu.essi_lab.dab.auth.LoginResponse;
 
 @WebService
 @Path("/")
@@ -65,7 +74,7 @@ public class SupportService {
 	    } else if (term != null) {
 		output = handler.getLabel(term);
 	    } else {
-		output = handler.listLabels(Profile.valueOf(Profile.class, profile), Target.valueOf(Target.class, target),suggestion);
+		output = handler.listLabels(Profile.valueOf(Profile.class, profile), Target.valueOf(Target.class, target), suggestion);
 	    }
 	} catch (Exception ex) {
 	    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage(), ex);
@@ -77,5 +86,46 @@ public class SupportService {
 	output = callback + "(" + output + ")";
 
 	return Response.ok(output, MediaType.APPLICATION_JSON).build();
+    }
+
+    @POST
+    @Path("/auth/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response login(LoginRequest request) {
+	try {
+
+	    UserFinder uf = UserFinder.create();
+	    List<GSUser> users = uf.getUsers(false);
+	    for (GSUser user : users) {
+		String firstName = null;
+		String email = null;
+		String lastName = null;
+		List<GSProperty> properties = user.getProperties();
+		for (GSProperty prop : properties) {
+		    if (prop.getName().equals("firstName")) {
+			firstName = prop.getValue().toString();
+		    }
+		    if (prop.getName().equals("lastName")) {
+			firstName = prop.getValue().toString();
+		    }
+		    if (prop.getName().equals("email")) {
+			email = prop.getValue().toString();
+		    }
+		}
+		if (request.getApiKey().equals(user.getUri()) && request.getEmail().equals(email)) {
+		    LoginResponse response = new LoginResponse(true, "Login successful", "Test", "User", request.getEmail(),
+			    request.getApiKey());
+		    return Response.ok(response).build();
+		}
+	    }
+	    LoginResponse response = new LoginResponse(false, "Invalid credentials", null, null, null, null);
+	    return Response.ok(response).build();
+
+	} catch (Exception ex) {
+	    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage(), ex);
+	    return Response.serverError().entity(new LoginResponse(false, "Server error: " + ex.getMessage(), null, null, null, null))
+		    .build();
+	}
     }
 }

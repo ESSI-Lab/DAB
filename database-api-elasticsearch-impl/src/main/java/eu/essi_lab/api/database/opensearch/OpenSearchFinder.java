@@ -29,7 +29,7 @@ import org.opensearch.client.opensearch.core.search.TotalHitsRelation;
 
 /*-
  * #%L
- * Discovery and Access Broker (DAB) Community Edition (CE)
+ * Discovery and Access Broker (DAB)
  * %%
  * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
@@ -251,7 +251,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			queryables.stream().map(q -> q.getName()).collect(Collectors.toList()), //
 			message.getDistinctValuesElement().get(), //
 			message.getPage().getSize(), //
-			message.isResourceBinaryExcluded()).
+			message.isResourceBinaryExcluded(), true).
 
 			stream().//
 			map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
@@ -484,11 +484,6 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    Query query = OpenSearchQueryBuilder.buildDataFolderQuery(database.getIdentifier(), sourceIds);
 
-	    if (OpenSearchDatabase.debugQueries) {
-
-		GSLoggerFactory.getLogger(OpenSearchFinder.class).debug("\n\n--- GET SOURCES DATA MAP ---\n");
-	    }
-
 	    try {
 
 		List<JSONObject> aggregateWithNestedAgg = wrapper.aggregateWithNestedAgg(//
@@ -496,7 +491,9 @@ public class OpenSearchFinder implements DatabaseFinder {
 			Arrays.asList(ResourceProperty.SOURCE_ID.getName(), MetaFolderMapping.DATA_FOLDER), //
 			ResourceProperty.SOURCE_ID, //
 			sourceIds.size(), //
-			true); // binaries excluded
+			true, // binaries excluded
+			false// no log
+		);
 
 		List<String> incrementalSourceIds = ConfigurationWrapper.//
 			getIncrementalSources().//

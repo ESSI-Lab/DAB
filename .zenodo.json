@@ -1,0 +1,80 @@
+{
+    "title": "Discovery and Access Broker (DAB)",
+    "description": "The DAB is a brokering software framework for the mediation and harmonization of geospatial data with particular reference to Earth observation data, both satellite and non-satellite. DAB makes it possible to connect heterogeneous data sources and make them discoverable and accessible through homogeneous and standard interfaces by different data user tools and applications.",
+    "creators": [
+        {
+            "name": "Bigagli, Lorenzo",
+            "affiliation": "ESSI-Lab of CNR-IIA",
+            "orcid": "0000-0003-1734-577X"
+        },
+        {
+            "name": "Boldrini, Enrico",
+            "affiliation": "ESSI-Lab of CNR-IIA",
+            "orcid": "0000-0003-2075-4742"
+        },
+        {
+            "name": "Mazzetti, Paolo",
+            "affiliation": "ESSI-Lab of CNR-IIA",
+            "orcid": "0000-0002-8291-1128"
+        },
+        {
+            "name": "Nativi, Stefano",
+            "affiliation": "ESSI-Lab of CNR-IIA",
+            "orcid": "0000-0003-3185-8539"
+        },
+        {
+            "name": "Olivieri, Massimiliano",
+            "affiliation": "ESSI-Lab of CNR-IIA",
+            "orcid": "0000-0001-8920-8753"
+        },
+        {
+            "name": "Papeschi, Fabrizio",
+            "affiliation": "ESSI-Lab of CNR-IIA",
+            "orcid": "0000-0002-9104-7554"
+        },
+        {
+            "name": "Roncella, Roberto",
+            "affiliation": "ESSI-Lab of CNR-IIA",
+            "orcid": "0000-0002-6825-8345"
+        },
+        {
+            "name": "Santoro, Mattia",
+            "affiliation": "ESSI-Lab of CNR-IIA",
+            "orcid": "0000-0003-0401-3100"
+        }
+    ],
+    "keywords": [
+        "geospatial data",
+        "earth observation",
+        "data brokering",
+        "data harmonization",
+        "data mediation"
+    ],
+    "license": {
+        "id": "AGPL-3.0"
+    },
+    "publication_date": "2004",
+    "version": "1.0-SNAPSHOT",
+    "upload_type": "software",
+    "access_right": "open",
+    "references": [
+        "Nativi, S., Mazzetti, P., Santoro, M., Papeschi, F., Craglia, M., & Ochiai, O. (2015). Big Data challenges in building the Global Earth Observation System of Systems. Environmental Modelling & Software, 68, 1-26. https://doi.org/10.1016/j.envsoft.2015.01.017",
+        "Nativi, S., Craglia, M., & Pearlman, J. (2013). Earth Science Infrastructures Interoperability: The Brokering Approach. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, 6(3), 1118-1129. https://doi.org/10.1109/JSTARS.2013.2243113",
+        "Boldrini, E., et al. (2015). The Brokering Approach for Enabling Collaborative Scientific Research. In P. Diviacco et al. (Eds.), Collaborative Knowledge in Scientific Research Networks (pp. 283-304). IGI Global.",
+        "Nativi, S., Bigagli, L., Mazzetti, P., Boldrini, E., & Papeschi, F. (2009). GI-Cat: A Mediation Solution for Building a Clearinghouse Catalog Service. International Conference on Advanced Geographic Information Systems & Web Services, 68-74. https://doi.org/10.1109/GEOWS.2009.34",
+        "Nativi, S., & Bigagli, L. (2009). Discovery, Mediation, and Access Services for Earth Observation Data. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, 2(4), 233-240. https://doi.org/10.1109/JSTARS.2009.2028584",
+        "Nativi, S., Bigagli, L., Mazzetti, P., Mattia, U., & Boldrini, E. (2007). Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution. IEEE International Geoscience and Remote Sensing Symposium, 4021-4024. https://doi.org/10.1109/IGARSS.2007.4423731"
+    ],
+    "communities": [
+        {
+            "identifier": "essi-lab"
+        }
+    ],
+    "related_identifiers": [
+        {
+            "identifier": "https://github.com/ESSI-Lab/DAB",
+            "relation": "isSupplementTo",
+            "resource_type": "software"
+        }
+    ]
+} 

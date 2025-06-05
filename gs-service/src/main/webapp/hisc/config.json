@@ -17,10 +17,14 @@
     "attributeSearch": true,
     "filters": "source,keyword,organisationName,attributeTitle,attributeURI,platformTitle",
     "platformSearch": true,
-    "validatedSearch": true,
+    "validatedSearch": false,
     "riverSearch": false,
+    "timeInterpolation": true,
+    "intendedObservationSpacing": true,
+    "aggregationDuration": true,
     "semanticSearch": true,
     "semanticSearchValue":1,
     "ontology": "his-central",
-    "wmsEndpoint": "/gs-service/services/essi/token/his_central-471d6d09-aea8-4603-9de2-9cb696e773e7/view/his-central-shapes/wms"
+    "wmsEndpoint": "/gs-service/services/essi/token/his_central-471d6d09-aea8-4603-9de2-9cb696e773e7/view/his-central-shapes/wms",
+    "login": true
 }

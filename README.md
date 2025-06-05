@@ -7,7 +7,7 @@
     <img src="DAB.png" alt="DAB Logo" />
   </a>
 
-<h3 align="center">Discovery and Access Broker (DAB) Community Edition (CE)</h3>
+<h3 align="center">Discovery and Access Broker (DAB)</h3>
 
  <p align="center"> 
     <br />
