@@ -1593,7 +1593,16 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	    @Override
 	    public String getParameter(String name) {
-		// TODO Auto-generated method stub
+
+		KeyValueParser parser = new KeyValueParser(queryString);
+
+		String value = parser.getValue(name);
+
+		if (value != null && !value.equals(KeyValueParser.UNDEFINED)) {
+
+		    return value;
+		}
+
 		return null;
 	    }
 
