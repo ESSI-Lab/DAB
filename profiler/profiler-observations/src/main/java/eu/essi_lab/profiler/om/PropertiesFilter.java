@@ -31,7 +31,7 @@ public class PropertiesFilter implements WebRequestFilter {
     public boolean accept(WebRequest request) throws GSException {
 	String path = request.getRequestPath();
 	path = path.toLowerCase();
-	return path.endsWith("status") ;
+	return path.endsWith("properties") ;
     }
 
 }

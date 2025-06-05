@@ -1,5 +1,9 @@
 package eu.essi_lab.profiler.om;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -24,30 +28,71 @@ package eu.essi_lab.profiler.om;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
-import com.google.gson.JsonObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import com.google.gson.JsonObject;
+import com.mchange.io.FileUtils;
+
+import eu.essi_lab.authorization.userfinder.UserFinder;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.profiler.om.OMRequest.APIParameters;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class StatusHandler extends StreamingRequestHandler {
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
-        ValidationMessage ret = new ValidationMessage();
-        ret.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
-        return ret;
+	ValidationMessage ret = new ValidationMessage();
+	ret.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
+	return ret;
+    }
+
+    private static DownloadSetting getDownloadSetting() {
+	return ConfigurationWrapper.getDownloadSetting();
+    }
+
+    private static S3TransferWrapper s3wrapper = null;
+
+    static {
+	if (getDownloadSetting().getDownloadStorage() == DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
+
+	} else {
+	    String accessKey = getDownloadSetting().getS3StorageSetting().getAccessKey().get();
+	    String secretKey = getDownloadSetting().getS3StorageSetting().getSecretKey().get();
+
+	    s3wrapper = new S3TransferWrapper();
+	    s3wrapper.setAccessKey(accessKey);
+	    s3wrapper.setSecretKey(secretKey);
+	    s3wrapper.initialize();
+
+	}
     }
 
     public StatusHandler() {
+
     }
 
     @Override
@@ -57,32 +102,85 @@ public class StatusHandler extends StreamingRequestHandler {
 
     @Override
     public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
-        return new StreamingOutput() {
-            @Override
-            public void write(OutputStream output) throws IOException, WebApplicationException {
-                try {
-                    handle(output, webRequest);
-                } catch (Exception e) {
-                    throw new WebApplicationException("Error handling status request", e);
-                }
-            }
-        };
+	return new StreamingOutput() {
+	    @Override
+	    public void write(OutputStream output) throws IOException, WebApplicationException {
+		try {
+		    handle(output, webRequest);
+		} catch (Exception e) {
+		    throw new WebApplicationException("Error handling status request", e);
+		}
+	    }
+	};
     }
 
     protected void handle(OutputStream output, WebRequest webRequest) throws Exception {
-        OMRequest request = new OMRequest(webRequest);
-        String operationId = request.getParameterValue(APIParameters.OPERATION_ID);
+	OMRequest request = new OMRequest(webRequest);
+	String operationId = request.getParameterValue(APIParameters.OPERATION_ID);
+	JSONObject ret = new JSONObject();
+	JSONArray array = new JSONArray();
+	
+	GSUser user = UserFinder.create().findCurrentUser(webRequest.getServletRequest());
 
-        // Create the response object
-        JsonObject response = new JsonObject();
-        response.addProperty("operationId", operationId);        
-        response.addProperty("status", "Not found");
-//        response.addProperty("locator", "http://example.com/download.zip");
+	GSProperty emailProperty = user.getProperty("email");
 
-        // Write the response
-        try (OutputStreamWriter writer = new OutputStreamWriter(output)) {
-            writer.write(response.toString());
-            writer.flush();
-        }
+	String email = null;
+	if (emailProperty != null) {
+	    email = emailProperty.getValue().toString();
+	}
+
+	List<JSONObject> statuses = getStatuses(email);
+
+	if (operationId == null) {
+	    for (JSONObject jsonObject : statuses) {
+		array.put(jsonObject);
+	    }
+	}else {
+	    for (JSONObject jsonObject : statuses) {
+		String id = jsonObject.optString("operationId");
+		if (id!=null &&id.equals(operationId)) {
+		    array.put(jsonObject);
+		    break;
+		}
+	    }
+	}
+
+	// Create the response object
+	JsonObject response = new JsonObject();
+	response.addProperty("operationId", operationId);
+	response.addProperty("status", "Not found");
+	// response.addProperty("locator", "http://example.com/download.zip");
+
+	// Write the response
+	ret.put("results", array);
+	try (OutputStreamWriter writer = new OutputStreamWriter(output)) {
+	    writer.write(ret.toString());
+	    writer.flush();
+	}
     }
-} 
+
+    private List<JSONObject> getStatuses(String email) throws Exception {
+	ListObjectsV2Response objects = s3wrapper.listObjects("his-central", "data-downloads/" + email);
+	List<JSONObject> ret = new ArrayList<JSONObject>();
+	for (S3Object content : objects.contents()) {
+	    String key = content.key();
+	    if (key.endsWith("-status.json")) {
+		File temp = File.createTempFile("status", ".json");
+		boolean good = s3wrapper.download("his-central", key, temp);
+		if (good) {
+		    String s = Files.readString(temp.toPath());
+		    JSONObject j = new JSONObject(s);
+		    ret.add(j);
+		    temp.delete();
+		} else {
+		    JSONObject s = new JSONObject();
+		    s.put("status", "Not found");
+		    s.put("operationId", key.replace("data-downloads/", ""));
+		    ret.add(s);
+		}
+
+	    }
+	}
+	return ret;
+    }
+}

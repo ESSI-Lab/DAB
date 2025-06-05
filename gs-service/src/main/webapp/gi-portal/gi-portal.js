@@ -156,9 +156,84 @@ function initializeLogin(config) {
 		// Status button click handler
 		document.getElementById('statusBtn').addEventListener('click', function() {
 			userMenu.style.display = 'none';  // Hide menu when status is clicked
+			
 			// Create dialog content
-			const dialogContent = $('<div>')
-				.append($('<p>').text('Loading status of bulk downloads...'));
+			const dialogContent = $('<div>');
+			
+			// Create refresh button
+			const refreshButton = $('<button>')
+				.addClass('refresh-button')
+				.html('<i class="fa fa-refresh"></i> Refresh')
+				.css({
+					'margin-bottom': '10px',
+					'float': 'right'
+				});
+
+			dialogContent.append(refreshButton);
+			dialogContent.append($('<div>').attr('id', 'status-content'));
+
+			// Function to fetch and update status
+			const fetchAndUpdateStatus = () => {
+				const statusContent = $('#status-content');
+				statusContent.html('<p>Loading status of bulk downloads...</p>');
+				
+				// Disable refresh button while loading
+				refreshButton.prop('disabled', true);
+				refreshButton.find('i').addClass('fa-spin');
+
+				// Fetch status from API
+				const authToken = localStorage.getItem('authToken');
+				fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/status`, {
+					headers: {
+						'Accept': 'application/json'
+					}
+				})
+				.then(response => response.json())
+				.then(data => {
+					statusContent.empty();
+					if (data && data.length > 0) {
+						const table = $('<table>').addClass('status-table');
+						table.append($('<tr>')
+							.append($('<th>').text('Operation ID'))
+							.append($('<th>').text('Status'))
+							.append($('<th>').text('Download'))
+						);
+						data.forEach(item => {
+							const row = $('<tr>');
+							row.append($('<td>').text(item.operationId));
+							row.append($('<td>').text(item.status));
+							if (item.status === 'completed' && item.locator) {
+								row.append($('<td>').append(
+									$('<a>')
+										.attr('href', item.locator)
+										.attr('target', '_blank')
+										.text('Download')
+								));
+							} else {
+								row.append($('<td>').text('-'));
+							}
+							table.append(row);
+						});
+						statusContent.append(table);
+					} else {
+						statusContent.append($('<p>').text('No bulk downloads found.'));
+					}
+				})
+				.catch(error => {
+					console.error('Error fetching status:', error);
+					statusContent.empty().append(
+						$('<p>').text('Error loading bulk download status. Please try again later.')
+					);
+				})
+				.finally(() => {
+					// Re-enable refresh button and stop spinning
+					refreshButton.prop('disabled', false);
+					refreshButton.find('i').removeClass('fa-spin');
+				});
+			};
+
+			// Add click handler to refresh button
+			refreshButton.on('click', fetchAndUpdateStatus);
 
 			// Show dialog
 			dialogContent.dialog({
@@ -170,50 +245,8 @@ function initializeLogin(config) {
 				}
 			});
 
-			// Fetch status from API
-			const authToken = localStorage.getItem('authToken');
-			fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/status`, {
-				headers: {
-					'Accept': 'application/json'
-				}
-			})
-			.then(response => response.json())
-			.then(data => {
-				dialogContent.empty();
-				if (data && data.length > 0) {
-					const table = $('<table>').addClass('status-table');
-					table.append($('<tr>')
-						.append($('<th>').text('Operation ID'))
-						.append($('<th>').text('Status'))
-						.append($('<th>').text('Download'))
-					);
-					data.forEach(item => {
-						const row = $('<tr>');
-						row.append($('<td>').text(item.operationId));
-						row.append($('<td>').text(item.status));
-						if (item.status === 'completed' && item.locator) {
-							row.append($('<td>').append(
-								$('<a>')
-									.attr('href', item.locator)
-									.attr('target', '_blank')
-									.text('Download')
-							));
-						} else {
-							row.append($('<td>').text('-'));
-						}
-						table.append(row);
-					});
-					dialogContent.append(table);
-				} else {
-					dialogContent.append($('<p>').text('No bulk downloads found.'));
-				}
-			})
-			.catch(error => {
-				console.error('Error fetching status:', error);
-				dialogContent.empty().append(
-					$('<p>').text('Error loading bulk download status. Please try again later.')
-				);
-			});
+			// Initial fetch
+			fetchAndUpdateStatus();
 		});
 
 		// Logout menu button click handler
@@ -936,10 +969,7 @@ export function initializePortal(config) {
 											// Add fixed parameters
 											params.append('ontology', config.ontology);
 
-											params.append('timeInterpolation', config.timeInterpolation);
 											
-											params.append('intendedObservationSpacing', config.intendedObservationSpacing);
-											params.append('aggregationDuration', config.aggregationDuration);
 
 											params.append('includeData', 'true');
 											params.append('asynchDownload', 'true');

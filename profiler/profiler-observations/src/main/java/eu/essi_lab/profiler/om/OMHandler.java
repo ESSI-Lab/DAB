@@ -63,6 +63,7 @@ import eu.essi_lab.access.DataValidatorErrorCode;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.DataRecord;
+import eu.essi_lab.authorization.userfinder.UserFinder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
@@ -88,6 +89,8 @@ import eu.essi_lab.messages.bond.SpatialEntity;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -320,7 +323,15 @@ public class OMHandler extends StreamingRequestHandler {
 
 		    if (results.size() > 1) {
 			if (asynch != null && asynch.toLowerCase().equals("true")) {
-			    String operationId = UUID.randomUUID().toString();
+			    GSUser user = UserFinder.create().findCurrentUser(webRequest.getServletRequest());
+
+			    GSProperty emailProperty = user.getProperty("email");
+
+			    String email = null;
+			    if (emailProperty != null) {
+				email = emailProperty.getValue().toString();
+			    }
+			    String operationId = email + ":" + UUID.randomUUID().toString();
 			    S3TransferWrapper s3wrapper = null;
 			    if (getDownloadSetting().getDownloadStorage() == DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
 

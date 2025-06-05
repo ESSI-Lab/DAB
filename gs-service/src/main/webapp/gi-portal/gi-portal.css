@@ -626,3 +626,41 @@ li[aria-controls="results-tab"] {
 .status-table a:hover {
     text-decoration: underline;
 }
+
+/* Refresh button styles */
+.refresh-button {
+    padding: 8px 15px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.refresh-button:hover {
+    background-color: #34495e;
+}
+
+.refresh-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.refresh-button i {
+    margin-right: 5px;
+}
+
+.fa-spin {
+    animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
