@@ -191,25 +191,79 @@ function initializeLogin(config) {
 				.then(response => response.json())
 				.then(data => {
 					statusContent.empty();
-					if (data && data.length > 0) {
+					if (data.results && data.results.length > 0) {
 						const table = $('<table>').addClass('status-table');
 						table.append($('<tr>')
 							.append($('<th>').text('Operation ID'))
 							.append($('<th>').text('Status'))
+							.append($('<th>').text('Timestamp'))
 							.append($('<th>').text('Download'))
+							.append($('<th>').text('URL'))
 						);
-						data.forEach(item => {
+						data.results.forEach(item => {
 							const row = $('<tr>');
-							row.append($('<td>').text(item.operationId));
+							row.append($('<td>')
+								.text(item.operationId)
+								.attr('title', item.operationId)
+							);
 							row.append($('<td>').text(item.status));
-							if (item.status === 'completed' && item.locator) {
+							
+							// Format and add timestamp
+							let formattedDate = '';
+							if (item.timestamp) {
+								try {
+									const date = new Date(item.timestamp);
+									formattedDate = date.toLocaleString(undefined, {
+										year: 'numeric',
+										month: 'short',
+										day: 'numeric',
+										hour: '2-digit',
+										minute: '2-digit',
+										second: '2-digit'
+									});
+								} catch (e) {
+									console.error('Error formatting date:', e);
+									formattedDate = item.timestamp;
+								}
+							}
+							row.append($('<td>').text(formattedDate));
+
+							if (item.status === 'Completed' && item.locator) {
 								row.append($('<td>').append(
 									$('<a>')
 										.attr('href', item.locator)
 										.attr('target', '_blank')
 										.text('Download')
 								));
+								row.append($('<td>').append(
+									$('<div>')
+										.addClass('url-container')
+										.append(
+											$('<input>')
+												.addClass('url-input')
+												.attr('type', 'text')
+												.attr('readonly', 'readonly')
+												.val(item.locator)
+										)
+										.append(
+											$('<button>')
+												.addClass('copy-button')
+												.html('<i class="fa fa-copy"></i>')
+												.attr('title', 'Copy URL')
+												.on('click', function() {
+													const urlInput = $(this).prev('.url-input');
+													urlInput.select();
+													document.execCommand('copy');
+													const originalTitle = $(this).attr('title');
+													$(this).attr('title', 'Copied!');
+													setTimeout(() => {
+														$(this).attr('title', originalTitle);
+													}, 2000);
+												})
+										)
+								));
 							} else {
+								row.append($('<td>').text('-'));
 								row.append($('<td>').text('-'));
 							}
 							table.append(row);
@@ -239,7 +293,7 @@ function initializeLogin(config) {
 			dialogContent.dialog({
 				title: 'Bulk Downloads Status',
 				modal: true,
-				width: 600,
+				width: 1200,
 				classes: {
 					"ui-dialog": "bulk-download-dialog"
 				}
@@ -991,6 +1045,19 @@ export function initializePortal(config) {
 														title: 'Download Started',
 														message: 'Your bulk download request has been initiated. You can monitor the download status from your personal menu.'
 													});
+
+													// Find any open status dialog and refresh it
+													const existingDialog = $('.bulk-download-dialog');
+													if (existingDialog.length > 0) {
+														const statusContent = $('#status-content');
+														if (statusContent.length > 0) {
+															// Trigger a refresh of the status content
+															const refreshButton = $('.refresh-button');
+															if (refreshButton.length > 0) {
+																refreshButton.click();
+															}
+														}
+													}
 												})
 												.catch(error => {
 													// Show error message

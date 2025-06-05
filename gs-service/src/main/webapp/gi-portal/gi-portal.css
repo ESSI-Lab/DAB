@@ -627,6 +627,102 @@ li[aria-controls="results-tab"] {
     text-decoration: underline;
 }
 
+/* URL container styles */
+.url-container {
+    display: flex;
+    align-items: center;
+    max-width: 400px;
+}
+
+.url-input {
+    flex: 1;
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #2c3e50;
+    background-color: #f8f9fa;
+    width: calc(100% - 35px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.copy-button {
+    margin-left: 5px;
+    padding: 4px 8px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.copy-button:hover {
+    background-color: #34495e;
+}
+
+.copy-button i {
+    font-size: 12px;
+}
+
+/* Status table column widths */
+.status-table td:nth-child(1) {
+    min-width: 300px; /* Operation ID column */
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status-table td:nth-child(2) {
+    min-width: 100px; /* Status column */
+}
+
+.status-table td:nth-child(3) {
+    min-width: 160px; /* Timestamp column */
+    white-space: nowrap;
+}
+
+.status-table td:nth-child(4) {
+    min-width: 80px; /* Download column */
+    text-align: center;
+}
+
+.status-table td:last-child {
+    min-width: 400px; /* URL column */
+}
+
+.status-table th {
+    white-space: nowrap;
+    padding: 10px 15px;
+}
+
+.status-table td {
+    padding: 10px 15px;
+}
+
+/* Add tooltips for truncated operation IDs */
+.status-table td:first-child {
+    position: relative;
+}
+
+.status-table td:first-child:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background: #2c3e50;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 1000;
+    white-space: normal;
+    max-width: 300px;
+}
+
 /* Refresh button styles */
 .refresh-button {
     padding: 8px 15px;

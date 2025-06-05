@@ -50,6 +50,7 @@ import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
@@ -176,6 +177,7 @@ public class StatusHandler extends StreamingRequestHandler {
 		    JSONObject s = new JSONObject();
 		    s.put("status", "Not found");
 		    s.put("operationId", key.replace("data-downloads/", ""));
+		    s.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
 		    ret.add(s);
 		}
 
