@@ -360,7 +360,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 	 * @param {ResultsMapWidget} [options.resultsMapWidget] when the area selection is applied, the selection is drawn also in the 
 	 * given <a href="../classes/ResultsMapWidget.html" class="crosslink">ResultsMapWidget</a> map
 	 * 
-	 * @param {String} [options.label='Bounding box']
+	 * @param {String} [options.label='Geographic area']
 	 * @param {String} [options.help='Rectangular area [...]']
 	   * @param {Boolean} [options.showHelpIcon=true]
 	 *  
@@ -397,11 +397,11 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		}
 
 		if (!options.label) {
-			options.label = 'Bounding box';
+			options.label = 'Spatial extent';
 		}
 
 		if (!options.help) {
-			options.help = 'Rectangular area (bounding box) where the searched reasults must be contained or overlapped';
+			options.help = 'Rectangular area (spatial extent) where the searched results must be contained or overlapped';
 		}
 
 		if (options.showHelpIcon === undefined) {

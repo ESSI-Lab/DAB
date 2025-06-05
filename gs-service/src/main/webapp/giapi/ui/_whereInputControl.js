@@ -1,4 +1,3 @@
- 
 import { GIAPI } from '../core/GIAPI.js';
 
 GIAPI._whereInputControl = function(resultsMapWidget, options) {
@@ -145,7 +144,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 			jQuery('.ol-viewport').append(mirrorDiv);
 
-			jQuery(mirrorDiv).append('<label id="whereTableCaption" class="cnst-widget-where-input-table-ol-caption">Bounding box</label>');
+			jQuery(mirrorDiv).append('<label id="whereTableCaption" class="cnst-widget-where-input-table-ol-caption">Spatial extent</label>');
 
 			if (options.dialogMode) {
 
@@ -754,7 +753,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 			closeButton.css('div', 'margin-bottom', '3px');
 		}
 
-		title = 'Select Bounding Box';
+		title = 'Select Spatial Extent';
 
 		if (options.dialogMode) {
 			help = 'Click CTRL-key (meta-key on Mac) and left mouse to select the desired spatial extent and click the "APPLY" button. Click the "CLEAR" button to clear the selection';

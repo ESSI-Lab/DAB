@@ -200,4 +200,30 @@ public class IOStreamUtils {
 	return true;
     }
 
+    /**
+     * Recursively deletes a directory and all its contents.
+     * If the path doesn't exist, the method returns silently.
+     *
+     * @param path The path to delete
+     * @throws IOException if there's an error during deletion
+     */
+    public static void deleteDirectory(File path) throws IOException {
+        if (!path.exists()) {
+            return;
+        }
+        
+        if (path.isDirectory()) {
+            File[] files = path.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    deleteDirectory(file);
+                }
+            }
+        }
+        
+        if (!path.delete()) {
+            throw new IOException("Failed to delete " + path);
+        }
+    }
+
 }
