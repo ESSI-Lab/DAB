@@ -472,6 +472,24 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			query += 'attributeTitle=' + value + '&';
 
 		}
+		
+		if (constraints.timeInterpolation) {
+			var value = constraints.timeInterpolation;
+			query += 'timeInterpolation=' + value + '&';
+
+		}
+		
+		if (constraints.intendedObservationSpacing) {
+			var value = constraints.intendedObservationSpacing;
+			query += 'intendedObservationSpacing=' + value + '&';
+
+		}
+		
+		if (constraints.aggregationDuration) {
+			var value = constraints.aggregationDuration;
+			query += 'aggregationDuration=' + value + '&';
+
+		}
 
 		if (constraints.where) {
 

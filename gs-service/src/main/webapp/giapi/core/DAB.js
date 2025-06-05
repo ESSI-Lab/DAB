@@ -995,7 +995,10 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
         		object.instrumentTitle || 
         		object.organisationName || 
         		object.platformTitle || 
-        		object.attributeTitle     
+        		object.intendedObservationSpacing ||
+        		object.timeInterpolation ||
+        		object.aggregationDuration ||
+        		object.attributeTitle 
         		
         )) ? object : null;
     };
@@ -1039,6 +1042,9 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
         		constraints.instrumentTitle || 
         		constraints.platformTitle || 
         		constraints.organisationName || 
+        		constraints.intendedObservationSpacing ||
+        		constraints.timeInterpolation ||
+        		constraints.aggregationDuration ||
         		constraints.attributeTitle          
         );
         

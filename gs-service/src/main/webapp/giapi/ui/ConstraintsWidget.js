@@ -861,13 +861,13 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				label = 'Time interpolation';
 				break;
 			case 'intendedObservationSpacing':
-help = 'Intended observation spacing';
-label = 'Intended observation spacing';
-break;
+				help = 'Intended observation spacing';
+				label = 'Intended observation spacing';
+				break;
 			case 'aggregationDuration':
-help = 'Aggregation duration';
-label = 'Aggregation duration';
-break;
+				help = 'Aggregation duration';
+				label = 'Aggregation duration';
+				break;
 			default: throw 'Invalid constraint: ' + constraint;
 		}
 
@@ -1274,6 +1274,9 @@ break;
 			'origOrgId',
 			'attributeId',
 			'attributeTitle',
+			'intendedObservationSpacing',
+			'aggregationDuration',
+			'timeInterpolation',
 			'isValidated',
 			'riverName',
 			'timeRel'

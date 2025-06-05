@@ -991,6 +991,33 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    MetadataElement.OBSERVED_PROPERTY_URI, //
 		    observedPropertyURI.get()));
 	}
+	
+	Optional<String> intendedObservationSpacing = parser.getOptionalValue("intendedObservationSpacing");
+	if (intendedObservationSpacing.isPresent() && !intendedObservationSpacing.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.TIME_RESOLUTION_DURATION_8601, //
+		    intendedObservationSpacing.get()));
+	}
+	
+	Optional<String> timeInterpolation = parser.getOptionalValue("timeInterpolation");
+	if (timeInterpolation.isPresent() && !timeInterpolation.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.TIME_INTERPOLATION, //
+		    timeInterpolation.get()));
+	}
+	
+	Optional<String> aggregationDuration = parser.getOptionalValue("aggregationDuration");
+	if (aggregationDuration.isPresent() && !aggregationDuration.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.TIME_AGGREGATION_DURATION_8601, //
+		    aggregationDuration.get()));
+	}
 
 	Optional<String> isValidated = parser.getOptionalValue("isValidated");
 	if (isValidated.isPresent() && !isValidated.get().equals(KeyValueParser.UNDEFINED)) {

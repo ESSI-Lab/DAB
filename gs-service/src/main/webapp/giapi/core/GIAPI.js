@@ -216,6 +216,9 @@ export const GIAPI = {
 		var instr = '';
 		var platTitle = '';
 		var attrTitle = '';
+		var intendedObservationSpacing = '';
+		var aggregationDuration = '';
+		var timeInterpolation = '';
 		var attrURI = '';
 		var orgName = '';
 		var semantics = '';
@@ -290,6 +293,21 @@ export const GIAPI = {
 					attrTitle = val;
 					continue;
 				}
+				
+				if (key === 'intendedObservationSpacing') {
+					intendedObservationSpacing = val;
+					continue;
+				}
+				
+				if (key === 'aggregationDuration') {
+					aggregationDuration = val;
+					continue;
+				}
+				
+				if (key === 'timeInterpolation') {
+					timeInterpolation = val;
+					continue;
+				}
 
 				if (key === 'semantics') {
 					semantics = val;
@@ -326,6 +344,9 @@ export const GIAPI = {
 		instr = options && options.termFrequency && GIAPI.readConstraint(constraints, 'instrumentTitle') || instr;
 		platTitle = options && options.termFrequency && GIAPI.readConstraint(constraints, 'platformTitle') || platTitle;
 		attrTitle = options && options.termFrequency && GIAPI.readConstraint(constraints, 'attributeTitle') || attrTitle;
+		intendedObservationSpacing = options && options.termFrequency && GIAPI.readConstraint(constraints, 'intendedObservationSpacing') || intendedObservationSpacing;
+		aggregationDuration = options && options.termFrequency && GIAPI.readConstraint(constraints, 'aggregationDuration') || aggregationDuration;
+		timeInterpolation = options && options.termFrequency && GIAPI.readConstraint(constraints, 'timeInterpolation') || timeInterpolation;
 		attrURI = options && options.termFrequency && GIAPI.readConstraint(constraints, 'observedPropertyURI') || attrURI;
 		orgName = options && options.termFrequency && GIAPI.readConstraint(constraints, 'organisationName') || orgName;
 
@@ -454,6 +475,9 @@ export const GIAPI = {
 		httpGet += 'instrumentTitle=' + instr + '&';
 		httpGet += 'platformTitle=' + platTitle + '&';
 		httpGet += 'attributeTitle=' + attrTitle + '&';
+		httpGet += 'intendedObservationSpacing=' + intendedObservationSpacing + '&';
+		httpGet += 'aggregationDuration=' + aggregationDuration + '&';
+		httpGet += 'timeInterpolation=' + timeInterpolation + '&';
 		httpGet += 'observedPropertyURI=' + attrURI + '&';
 		httpGet += 'organisationName=' + orgName + '&';
 

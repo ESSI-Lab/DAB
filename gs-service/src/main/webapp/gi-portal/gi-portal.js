@@ -85,32 +85,32 @@ function initializeLogin(config) {
 				apiKey: apiKey
 			})
 		})
-		.then(response => response.json())
-		.then(data => {
-			if (data.success) {
-				// Store the token and email
-				localStorage.setItem('authToken', data.apiKey);
-				localStorage.setItem('userEmail', data.email);
-				
-				// Update UI
-				loginBtn.style.display = 'none';
-				logoutBtn.style.display = 'inline-block';
-				logoutBtn.textContent = `Logged in (${data.email})`;
-				
-				// Close modal
-				loginModal.style.display = 'none';
-				modalOverlay.style.display = 'none';
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					// Store the token and email
+					localStorage.setItem('authToken', data.apiKey);
+					localStorage.setItem('userEmail', data.email);
 
-				// Refresh the portal with authentication
-				window.location.reload();
-			} else {
-				alert('Login failed: ' + (data.message || 'Invalid credentials'));
-			}
-		})
-		.catch(error => {
-			console.error('Login error:', error);
-			alert('Login failed. Please try again.');
-		});
+					// Update UI
+					loginBtn.style.display = 'none';
+					logoutBtn.style.display = 'inline-block';
+					logoutBtn.textContent = `Logged in (${data.email})`;
+
+					// Close modal
+					loginModal.style.display = 'none';
+					modalOverlay.style.display = 'none';
+
+					// Refresh the portal with authentication
+					window.location.reload();
+				} else {
+					alert('Login failed: ' + (data.message || 'Invalid credentials'));
+				}
+			})
+			.catch(error => {
+				console.error('Login error:', error);
+				alert('Login failed. Please try again.');
+			});
 	});
 
 	// Check for existing token and email
@@ -580,7 +580,7 @@ export function initializePortal(config) {
 
 		if (config.aggregationDuration !== undefined && config.aggregationDuration) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', { helpIconImage: 'fa-hourglass' }));
-		}		
+		}
 
 		var semanticValue = 0;
 		if (config.semanticSearchValue !== undefined) {
@@ -619,15 +619,15 @@ export function initializePortal(config) {
 		var originalPaginatorWidget = GIAPI.PaginatorWidget;
 		GIAPI.PaginatorWidget = function(id, onResponse, options) {
 			var widget = originalPaginatorWidget(id, onResponse, options);
-			
+
 			// Store the original update function
 			var originalUpdate = widget.update;
-			
+
 			// Override the update function
 			widget.update = function(resultSet) {
 				// Call the original update first
 				originalUpdate.call(this, resultSet);
-				
+
 				// Check if user is logged in
 				var authToken = localStorage.getItem('authToken');
 				if (authToken) {
@@ -667,12 +667,12 @@ export function initializePortal(config) {
 											// Get the current constraints
 											var constraints = GIAPI.search.constWidget.constraints();
 											var where = GIAPI.search.resultsMapWidget.where();
-											
+
 											// Build the download URL
 											var baseUrl = '../services/essi';
 											var token = localStorage.getItem('authToken');
 											var params = new URLSearchParams();
-											
+
 											// Add temporal constraints if they exist
 											if (constraints.when && constraints.when.from) {
 												params.append('beginPosition', constraints.when.from);
@@ -680,7 +680,7 @@ export function initializePortal(config) {
 											if (constraints.when && constraints.when.to) {
 												params.append('endPosition', constraints.when.to);
 											}
-											
+
 											// Add spatial constraints if they exist
 											if (where) {
 												params.append('west', where.west);
@@ -688,29 +688,41 @@ export function initializePortal(config) {
 												params.append('east', where.east);
 												params.append('north', where.north);
 											}
-											
+
 											// Add parameter constraint if it exists
 											if (constraints.kvp && Array.isArray(constraints.kvp)) {
-												const paramKvp = constraints.kvp.find(kvp => kvp.key === 'attributeTitle');
-												if (paramKvp) {
-													params.append('observedProperty', paramKvp.value);
+												const attributeTitleValue = constraints.kvp.find(kvp => kvp.key === 'attributeTitle');
+												if (attributeTitleValue) {
+													params.append('observedProperty', attributeTitleValue.value);
+												}
+												const intendedObservationSpacingValue = constraints.kvp.find(kvp => kvp.key === 'intendedObservationSpacing');
+												if (intendedObservationSpacingValue) {
+													params.append('intendedObservationSpacing', intendedObservationSpacingValue.value);
+												}
+												const aggregationDurationValue = constraints.kvp.find(kvp => kvp.key === 'aggregationDuration');
+												if (aggregationDurationValue) {
+													params.append('aggregationDuration', aggregationDurationValue.value);
+												}
+												const timeInterpolationValue = constraints.kvp.find(kvp => kvp.key === 'timeInterpolation');
+												if (timeInterpolationValue) {
+													params.append('timeInterpolation', timeInterpolationValue.value);
 												}
 											}
-											
+
 											// Add fixed parameters
 											params.append('ontology', config.ontology);
-											
+
 											params.append('timeInterpolation', config.timeInterpolation);
-											debugger;
+											
 											params.append('intendedObservationSpacing', config.intendedObservationSpacing);
 											params.append('aggregationDuration', config.aggregationDuration);
 
 											params.append('includeData', 'true');
 											params.append('asynchDownload', 'true');
-											
+
 											// Construct the final URL using the view from config
 											var downloadUrl = `${baseUrl}/token/${token}/view/${config.view}/om-api/observations?${params.toString()}`;
-											
+
 											// Make the GET request
 											fetch(downloadUrl)
 												.then(response => {
@@ -734,7 +746,7 @@ export function initializePortal(config) {
 													});
 													console.error('Download error:', error);
 												});
-											
+
 											$(this).dialog("close");
 										}
 									},
@@ -749,19 +761,19 @@ export function initializePortal(config) {
 								]
 							});
 						});
-					
+
 					// Append the button after the results label
 					$('#paginator-widget-top-label').append(downloadButton);
 				}
 			};
-			
+
 			return widget;
 		};
 
 		//------------------------------------
 		// PaginatorWidget instance
 		//
-		GIAPI.search.paginatorWidget = GIAPI.PaginatorWidget('paginator-widget', 
+		GIAPI.search.paginatorWidget = GIAPI.PaginatorWidget('paginator-widget',
 			GIAPI.search.onDiscoverResponse,
 			{
 				'onPagination': function(action) {
