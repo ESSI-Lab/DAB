@@ -1,7 +1,5 @@
 package eu.essi_lab.profiler.om;
 
-import java.io.ByteArrayOutputStream;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -28,29 +26,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.ws.rs.core.StreamingOutput;
-
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.utils.FileUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.exceptions.GSException;
 
 public class DataDownloaderTool {
 
@@ -58,7 +49,8 @@ public class DataDownloaderTool {
 	DataDownloaderTool tool = new DataDownloaderTool();
 	String token = "my-token";
 	File zip = tool.download("http://localhost:9090/gs-service/services/essi/token/" + token
-		+ "/view/his-central/om-api/observations?includeData=true&asynchDownload=true&observedProperty=precipitation&ontology=his-central&north=42.492&south=42.252&east=11.094&west=10.693");
+		+ "/view/his-central/om-api/observations?includeData=true&asynchDownload=true&observedProperty=precipitation&ontology=his-central&north=42.492&south=42.252&east=11.094&west=10.693",
+		UUID.randomUUID().toString());
 	System.out.println("Downloaded to: " + zip.getAbsolutePath());
     }
 
@@ -68,41 +60,46 @@ public class DataDownloaderTool {
 
     /**
      * @param folder
-     * @param baseURL something like
+     * @param requestURL something like
      *        "http://localhost:9090/gs-service/services/essi/token/my-token/view/his-central/om-api/observations?includeData=true&asynchDownload=true&observedProperty=precipitation&ontology=his-central&north=42.492&south=42.252&east=11.094&west=10.693&beginPosition=2024-01-01&endPosition=2025-01-01"
+     * @param operationId
      */
-    public File download(String baseURL) {
+    public File download(String requestURL, String operationId) {
 
-	GSLoggerFactory.getLogger(getClass()).info("Started asynch download of {}", baseURL);
+	GSLoggerFactory.getLogger(getClass()).info("Started asynch download of {}", requestURL);
 
 	File zipFile = null;
+	Path tempPath = null;
+
 	try {
 	    zipFile = File.createTempFile(getClass().getSimpleName(), ".zip");
+	    File tempDirFile = FileUtils.createTempDir(operationId, false);
+
+	    tempPath = tempDirFile.toPath();
+
+	    if (tempDirFile.exists()) {
+
+		FileUtils.clearFolder(tempPath.toFile(), false);
+
+	    } else {
+
+		tempDirFile.mkdirs();
+	    }
+
 	} catch (IOException e) {
-	    e.printStackTrace();
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
-	Path tempDir = null;
-	try {
-	    tempDir = Files.createTempDirectory(getClass().getSimpleName());
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+	GSLoggerFactory.getLogger(getClass()).info("Temporary directory created at: {}", tempPath.toAbsolutePath());
 
-	GSLoggerFactory.getLogger(getClass()).info("Temporary directory created at: {}", tempDir.toAbsolutePath());
-
-	// Optionally, delete on exit (not recursive!)
-	tempDir.toFile().deleteOnExit(); // Note: doesn't delete contents
-
-	File userRequestFile = new File(tempDir.toFile(), "log.txt");
+	File userRequestFile = new File(tempPath.toFile(), "log.txt");
 	Date dateStart = new Date();
 
 	// remove download parameters to find out base URL
-	baseURL = removeParameter(baseURL, "asynchDownload", "true");
-	baseURL = removeParameter(baseURL, "includeData", "true");
+	requestURL = removeParameter(requestURL, "asynchDownload", "true");
+	requestURL = removeParameter(requestURL, "includeData", "true");
 
-	Downloader downloader = new Downloader();
 	boolean firstLoop = true;
 	String resumptionToken = null;
 	int blocks = 0;
@@ -112,38 +109,24 @@ public class DataDownloaderTool {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Listing block {}", ++blocks);
 
-	    String listURL = baseURL;
+	    String listURL = requestURL;
 	    if (resumptionToken != null) {
 		listURL = listURL + "&resumptionToken=" + resumptionToken;
 		listURL = listURL.replace("?&", "?");
 	    }
 
-	    // Optional<String> string = downloader.downloadOptionalString(listURL);
-
-	    Optional<String> string = Optional.empty();
-
-	    WebRequest get = WebRequest.createGET(listURL);
 	    OMHandler omHandler = new OMHandler();
 
-	    try {
+	    Optional<JSONObject> response = omHandler.getJSONResponse(WebRequest.createGET(listURL));
 
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	    if (response.isPresent()) {
 
-		omHandler.handle(outputStream, get);
+		JSONObject json = response.get();
 
-		string = Optional.of(outputStream.toString(StandardCharsets.UTF_8));
-
-	    } catch (Exception e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
-
-	    if (string.isPresent()) {
-		String str = string.get();
-		JSONObject json = new JSONObject(str);
 		if (json.has("completed") && json.getBoolean("completed") == false && json.has("resumptionToken")) {
 		    resumptionToken = json.getString("resumptionToken");
 		}
+
 		if (json.has("member")) {
 
 		    JSONArray members = json.getJSONArray("member");
@@ -157,7 +140,7 @@ public class DataDownloaderTool {
 			JSONObject member = members.getJSONObject(i);
 			String id = member.getString("id");
 			String sourceId = "unknown";
- 
+
 			JSONArray parameters = member.getJSONArray("parameter");
 			for (int j = 0; j < parameters.length(); j++) {
 			    JSONObject parameter = parameters.getJSONObject(j);
@@ -169,12 +152,12 @@ public class DataDownloaderTool {
 			}
 
 			// download single observation URL
-			String downloadURL = baseURL;
+			String downloadURL = requestURL;
 			downloadURL = addParameter(downloadURL, "observationIdentifier", id);
 			downloadURL = addParameter(downloadURL, "includeData", "true");
 
 			// write
-			File sourceDir = new File(tempDir.toFile(), sourceId);
+			File sourceDir = new File(tempPath.toFile(), sourceId);
 
 			if (!sourceDir.exists()) {
 			    sourceDir.mkdir();
@@ -191,9 +174,6 @@ public class DataDownloaderTool {
 			    extension = ".csv";
 			}
 
-			// Optional<HttpResponse<InputStream>> response =
-			// downloader.downlo>adOptionalResponse(downloadURL);
-
 			File logFile = new File(idDir, "log.txt");
 			File dataFile = new File(idDir, "data" + extension);
 
@@ -204,85 +184,50 @@ public class DataDownloaderTool {
 			    omHandler.handle(new FileOutputStream(dataFile), get2);
 
 			} catch (Exception e) {
-			    // TODO Auto-generated catch block
+
 			    write("status: 500 \nexception " + e.getMessage(), logFile);
-			    e.printStackTrace();
+			    GSLoggerFactory.getLogger(getClass()).error(e);
 			}
-
-			// if (response.isPresent()) {
-			// HttpResponse<InputStream> r = response.get();
-			// int status = r.statusCode();
-			// write("request: " + downloadURL + "\nstatus: " + status + "\ndate: "
-			// + ISO8601DateTimeUtils.getISO8601DateTime(), logFile);
-			// InputStream body = r.body();
-			// FileOutputStream fos;
-			// try {
-			// fos = new FileOutputStream(dataFile);
-			// IOUtils.copy(body, fos);
-			// body.close();
-			// fos.close();
-			// } catch (Exception e) {
-			// // TODO Auto-generated catch block
-			// write("status: " + status + "\nexception " + e.getMessage(), logFile);
-			// e.printStackTrace();
-			// }
-			//
-			// } else {
-			// write("No response", logFile);
-			// }
-
 		    }
 		} else {
 		    break;
 		}
 	    }
-
 	}
 
-	write("request: " + baseURL + "\ndate start: " + ISO8601DateTimeUtils.getISO8601DateTime(dateStart) + "\ndate end: "
+	write("request: " + requestURL + "\ndate start: " + ISO8601DateTimeUtils.getISO8601DateTime(dateStart) + "\ndate end: "
 		+ ISO8601DateTimeUtils.getISO8601DateTime(), userRequestFile);
 
 	try {
-	    GSLoggerFactory.getLogger(getClass()).info("Zipping folder {}", tempDir);
-	    zipFolder(tempDir, zipFile.toPath());
+	    GSLoggerFactory.getLogger(getClass()).info("Zipping folder {}", tempPath);
+	    zipFolder(tempPath, zipFile.toPath());
 	} catch (IOException e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error zipping folder");
 	}
 
 	try {
+
 	    GSLoggerFactory.getLogger(getClass()).info("Removing folder");
 
-	    deleteFolder(tempDir);
+	    FileUtils.clearFolder(tempPath.toFile(), true);
+
 	} catch (IOException e) {
-	    e.printStackTrace();
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Ended asynch download of {} to file: {}", baseURL, zipFile.getAbsolutePath());
+	GSLoggerFactory.getLogger(getClass()).info("Ended asynch download of {} to file: {}", requestURL, zipFile.getAbsolutePath());
 
 	return zipFile;
 
     }
 
-    public static void deleteFolder(Path path) throws IOException {
-	if (!Files.exists(path))
-	    return;
-
-	Files.walkFileTree(path, new SimpleFileVisitor<>() {
-	    @Override
-	    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-		Files.delete(file); // Delete files
-		return FileVisitResult.CONTINUE;
-	    }
-
-	    @Override
-	    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-		Files.delete(dir); // Delete directories after files are gone
-		return FileVisitResult.CONTINUE;
-	    }
-	});
-    }
-
-    public static void zipFolder(Path sourceFolderPath, Path zipPath) throws IOException {
+    /**
+     * @param sourceFolderPath
+     * @param zipPath
+     * @throws IOException
+     */
+    private void zipFolder(Path sourceFolderPath, Path zipPath) throws IOException {
 	try (ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(zipPath.toFile()))) {
 	    Files.walk(sourceFolderPath).filter(path -> !Files.isDirectory(path)).forEach(path -> {
 		ZipEntry zipEntry = new ZipEntry(sourceFolderPath.relativize(path).toString().replace("\\", "/"));
@@ -301,6 +246,12 @@ public class DataDownloaderTool {
 	}
     }
 
+    /**
+     * @param baseURL
+     * @param parameter
+     * @param value
+     * @return
+     */
     private String removeParameter(String baseURL, String parameter, String value) {
 	baseURL = baseURL.replace("&" + parameter + "=" + value, "");
 	baseURL = baseURL.replace("?" + parameter + "=" + value, "?");
@@ -308,6 +259,12 @@ public class DataDownloaderTool {
 	return baseURL;
     }
 
+    /**
+     * @param baseURL
+     * @param parameter
+     * @param value
+     * @return
+     */
     private String addParameter(String baseURL, String parameter, String value) {
 	if (baseURL.endsWith("?") || baseURL.endsWith("&")) {
 	    return baseURL + parameter + "=" + value;
@@ -319,15 +276,19 @@ public class DataDownloaderTool {
 	}
     }
 
+    /**
+     * @param string
+     * @param logFile
+     */
     private void write(String string, File logFile) {
 	try {
 	    FileOutputStream fos = new FileOutputStream(logFile);
 	    fos.write(string.getBytes(StandardCharsets.UTF_8));
 	    fos.close();
+
 	} catch (Exception e) {
 
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
-
     }
 }

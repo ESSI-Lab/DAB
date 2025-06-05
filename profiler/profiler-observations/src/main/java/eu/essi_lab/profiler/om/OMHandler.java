@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.om;
 
+import java.io.ByteArrayOutputStream;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -64,10 +66,12 @@ import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.DataRecord;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
+import eu.essi_lab.cfga.scheduler.Scheduler;
+import eu.essi_lab.cfga.scheduler.SchedulerFactory;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -104,6 +108,7 @@ import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.om.JSONObservation.ObservationType;
 import eu.essi_lab.profiler.om.OMRequest.APIParameters;
 import eu.essi_lab.profiler.om.ObservationMapper.Property;
+import eu.essi_lab.profiler.om.scheduling.OMSchedulerSetting;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
 import ucar.ma2.StructureData;
@@ -147,6 +152,11 @@ public class OMHandler extends StreamingRequestHandler {
 
     }
 
+    /**
+     * @param output
+     * @param webRequest
+     * @throws Exception
+     */
     public void handle(OutputStream output, WebRequest webRequest) throws Exception {
 
 	OMRequest request = new OMRequest(webRequest);
@@ -319,74 +329,54 @@ public class OMHandler extends StreamingRequestHandler {
 		    String asynch = request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD);
 
 		    if (results.size() > 1) {
+
 			if (asynch != null && asynch.toLowerCase().equals("true")) {
+
 			    String operationId = UUID.randomUUID().toString();
+
 			    S3TransferWrapper s3wrapper = null;
+
 			    if (getDownloadSetting().getDownloadStorage() == DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
 
 			    } else {
-				String accessKey = getDownloadSetting().getS3StorageSetting().getAccessKey().get();
-				String secretKey = getDownloadSetting().getS3StorageSetting().getSecretKey().get();
 
-				s3wrapper = new S3TransferWrapper();
-				s3wrapper.setAccessKey(accessKey);
-				s3wrapper.setSecretKey(secretKey);
-				s3wrapper.initialize();
-
+				s3wrapper = getS3TransferWrapper();
 			    }
 
-			    DataDownloaderTool ddt = new DataDownloaderTool();
-
 			    HttpServletRequest sr = webRequest.getServletRequest();
+
 			    StringBuilder requestURL = new StringBuilder(sr.getRequestURL().toString());
 			    String queryString = sr.getQueryString();
+
 			    if (queryString != null) {
 				requestURL.append('?').append(queryString);
 			    }
 
-			    boolean implemented = false;
+			    SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+			    Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
 
-			    if (implemented) {
-				JSONObject json = new JSONObject();
-				json.put("operationId", operationId);
-				JSONObject msg = new JSONObject();
-				msg.put("operationId", operationId);
-				msg.put("status", "Submitted asynchronous download operation");
-				status(s3wrapper, operationId, "his-central", "data-downloads/" + operationId + "-status.json", msg);
-				json.put("status", "Submitted asynchronous download operation");
+			    OMSchedulerSetting setting = new OMSchedulerSetting();
+			    setting.setRequestURL(requestURL.toString());
+			    setting.setOperationId(operationId);
 
-				printJSON(output, json);
-				final S3TransferWrapper fWrapper = s3wrapper;
-				Thread t = new Thread() {
-				    public void run() {
-					String fname = operationId + ".zip";
-					File downloaded = ddt.download(requestURL.toString());
-					if (fWrapper != null) {
-					    fWrapper.setACLPublicRead(true);
-					    fWrapper.uploadFile(downloaded.getAbsolutePath(), "his-central", "data-downloads/" + fname,
-						    "application/zip");
-					}
-					downloaded.delete();
-					try {
-					    JSONObject msg = new JSONObject();
-					    msg.put("operationId", operationId);
-					    msg.put("status", "Completed");
-					    msg.put("locator", "https://his-central.s3.us-east-1.amazonaws.com/data-downloads/" + fname);
-					    status(fWrapper, operationId, "his-central", "data-downloads/" + operationId + "-status.json",
-						    msg);
-					} catch (Exception e) {
-					    e.printStackTrace();
-					}
-				    };
-				};
-				t.start();
-				return;
-			    } else {
-				printErrorMessage(output, "Asynch download is not yet implemented: coming soon.");
-				return;
-			    }
+			    scheduler.schedule(setting);
+
+			    JSONObject msg = new JSONObject();
+			    msg.put("operationId", operationId);
+			    msg.put("status", "Submitted asynchronous download operation");
+
+			    status(s3wrapper, operationId, msg);
+
+			    JSONObject json = new JSONObject();
+			    json.put("operationId", operationId);
+			    json.put("status", "Submitted asynchronous download operation");
+
+			    printJSON(output, json);
+
+			    return;
 
 			} else {
+
 			    String info = resultSet.getCountResponse().getExpectedLabel();
 			    if (info == null) {
 				info = "";
@@ -396,12 +386,7 @@ public class OMHandler extends StreamingRequestHandler {
 			    return;
 			}
 		    }
-
 		}
-		// if (results.isEmpty()) {
-		// printErrorMessage(output, "No " + getObject() + " matched");
-		// return;
-		// }
 
 		List<JSONObservation> observations = new ArrayList<>();
 		GSLoggerFactory.getLogger(getClass()).info("mapping");
@@ -592,6 +577,29 @@ public class OMHandler extends StreamingRequestHandler {
 	writer.flush();
 	writer.close();
 	output.close();
+    }
+
+    /**
+     * @param webRequest
+     * @return
+     * @throws Exception
+     */
+    public Optional<JSONObject> getJSONResponse(WebRequest webRequest) {
+
+	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+	try {
+
+	    handle(outputStream, webRequest);
+
+	    return Optional.of(new JSONObject(outputStream.toString(StandardCharsets.UTF_8)));
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
+	return Optional.empty();
     }
 
     @Override
@@ -795,8 +803,54 @@ public class OMHandler extends StreamingRequestHandler {
 	}
     }
 
-    private void status(S3TransferWrapper s3wrapper, String operationId, String bucket, String key, JSONObject json) throws Exception {
-	Path tmpFile = Files.createTempFile(getClass().getSimpleName(), ".txt");
+    /**
+     * @return
+     */
+    public static S3TransferWrapper getS3TransferWrapper() {
+
+	String accessKey = ConfigurationWrapper.getDownloadSetting().getS3StorageSetting().getAccessKey().get();
+	String secretKey = ConfigurationWrapper.getDownloadSetting().getS3StorageSetting().getSecretKey().get();
+
+	S3TransferWrapper s3wrapper = new S3TransferWrapper();
+	s3wrapper.setAccessKey(accessKey);
+	s3wrapper.setSecretKey(secretKey);
+	s3wrapper.initialize();
+	s3wrapper.setACLPublicRead(true);
+
+	return s3wrapper;
+    }
+
+    /**
+     * @param s3wrapper
+     * @param operationId
+     * @param json
+     * @throws Exception
+     */
+    public static void status(//
+	    S3TransferWrapper s3wrapper, //
+	    String operationId, //
+	    JSONObject json) throws Exception {
+
+	status(s3wrapper, operationId, "his-central", "data-downloads/" + operationId + "-status.json", json);
+    }
+
+    /**
+     * @param s3wrapper
+     * @param operationId
+     * @param bucket
+     * @param key
+     * @param json
+     * @throws Exception
+     */
+    public static void status(//
+	    S3TransferWrapper s3wrapper, //
+	    String operationId, //
+	    String bucket, //
+	    String key, //
+	    JSONObject json) throws Exception {
+
+	Path tmpFile = Files.createTempFile(OMHandler.class.getSimpleName(), ".txt");
+
 	FileOutputStream fos = new FileOutputStream(tmpFile.toFile());
 
 	fos.write(json.toString().getBytes(StandardCharsets.UTF_8));
