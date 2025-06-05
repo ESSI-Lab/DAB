@@ -52,6 +52,7 @@ public class OMRequest {
 	PLATFORM_CODE("sampledFeature", "feature","featureIdentifier","featureId", "monitoringPoint", "monitoringPointIdentifier", "platform", "platformCode", "site",
 		"location", "siteCode"), //
 	ONTOLOGY("ontology"), //
+	OPERATION_ID("operationId"), //
 	OBSERVED_PROPERTY("observedProperty"), //
 	OBSERVED_PROPERTY_URI("observedPropertyUri", "observedPropertyHref"), //
 	AGGREGATION_PERIOD("aggregationDuration", "aggregationPeriod"), //

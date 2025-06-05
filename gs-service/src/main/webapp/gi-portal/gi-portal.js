@@ -28,7 +28,7 @@ function initializeLogin(config) {
 
 	// Setup event listeners
 	const loginBtn = document.getElementById('loginBtn');
-	const logoutBtn = document.getElementById('logoutBtn');
+	let logoutBtn = document.getElementById('logoutBtn');
 	const loginModal = document.getElementById('loginModal');
 	const modalOverlay = document.getElementById('modalOverlay');
 	const submitLogin = document.getElementById('submitLogin');
@@ -120,6 +120,113 @@ function initializeLogin(config) {
 		loginBtn.style.display = 'none';
 		logoutBtn.style.display = 'inline-block';
 		logoutBtn.textContent = `Logged in (${existingEmail})`;
+
+		// Create user menu
+		const userMenu = document.createElement('div');
+		userMenu.id = 'userMenu';
+		userMenu.className = 'user-menu';
+		userMenu.style.display = 'none';
+		userMenu.innerHTML = `
+			<button id="statusBtn" class="menu-button">Status of bulk downloads</button>
+			<button id="logoutMenuBtn" class="menu-button">Logout</button>
+		`;
+		document.body.appendChild(userMenu);
+
+		// Remove the old logout event listener and add menu toggle
+		const oldLogout = logoutBtn.cloneNode(true);
+		logoutBtn.parentNode.replaceChild(oldLogout, logoutBtn);
+		logoutBtn = oldLogout;
+
+		// Show/hide menu on logged-in user button click
+		logoutBtn.addEventListener('click', function(e) {
+			e.stopPropagation();
+			const rect = logoutBtn.getBoundingClientRect();
+			userMenu.style.top = (rect.bottom + 5) + 'px';
+			userMenu.style.right = (window.innerWidth - rect.right) + 'px';
+			userMenu.style.display = userMenu.style.display === 'none' ? 'block' : 'none';
+		});
+
+		// Hide menu when clicking outside
+		document.addEventListener('click', function(e) {
+			if (!userMenu.contains(e.target) && e.target !== logoutBtn) {
+				userMenu.style.display = 'none';
+			}
+		});
+
+		// Status button click handler
+		document.getElementById('statusBtn').addEventListener('click', function() {
+			userMenu.style.display = 'none';  // Hide menu when status is clicked
+			// Create dialog content
+			const dialogContent = $('<div>')
+				.append($('<p>').text('Loading status of bulk downloads...'));
+
+			// Show dialog
+			dialogContent.dialog({
+				title: 'Bulk Downloads Status',
+				modal: true,
+				width: 600,
+				classes: {
+					"ui-dialog": "bulk-download-dialog"
+				}
+			});
+
+			// Fetch status from API
+			const authToken = localStorage.getItem('authToken');
+			fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/status`, {
+				headers: {
+					'Accept': 'application/json'
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				dialogContent.empty();
+				if (data && data.length > 0) {
+					const table = $('<table>').addClass('status-table');
+					table.append($('<tr>')
+						.append($('<th>').text('Operation ID'))
+						.append($('<th>').text('Status'))
+						.append($('<th>').text('Download'))
+					);
+					data.forEach(item => {
+						const row = $('<tr>');
+						row.append($('<td>').text(item.operationId));
+						row.append($('<td>').text(item.status));
+						if (item.status === 'completed' && item.locator) {
+							row.append($('<td>').append(
+								$('<a>')
+									.attr('href', item.locator)
+									.attr('target', '_blank')
+									.text('Download')
+							));
+						} else {
+							row.append($('<td>').text('-'));
+						}
+						table.append(row);
+					});
+					dialogContent.append(table);
+				} else {
+					dialogContent.append($('<p>').text('No bulk downloads found.'));
+				}
+			})
+			.catch(error => {
+				console.error('Error fetching status:', error);
+				dialogContent.empty().append(
+					$('<p>').text('Error loading bulk download status. Please try again later.')
+				);
+			});
+		});
+
+		// Logout menu button click handler
+		document.getElementById('logoutMenuBtn').addEventListener('click', function() {
+			localStorage.removeItem('authToken');
+			localStorage.removeItem('userEmail');
+			loginBtn.style.display = 'inline-block';
+			loginBtn.textContent = 'Login';
+			loginBtn.disabled = false;
+			logoutBtn.style.display = 'none';
+			userMenu.style.display = 'none';
+			window.location.reload();
+		});
 	}
 }
 

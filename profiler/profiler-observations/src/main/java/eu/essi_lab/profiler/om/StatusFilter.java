@@ -25,13 +25,13 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.selector.WebRequestFilter;
 
-public class PropertiesFilter implements WebRequestFilter {
+public class StatusFilter implements WebRequestFilter {
 
     @Override
     public boolean accept(WebRequest request) throws GSException {
 	String path = request.getRequestPath();
 	path = path.toLowerCase();
-	return path.endsWith("status") ;
+	return path.endsWith("properties") ;
     }
 
 }
