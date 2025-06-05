@@ -699,9 +699,12 @@ export function initializePortal(config) {
 											
 											// Add fixed parameters
 											params.append('ontology', config.ontology);
-											params.append('timeInterpolation', 'TOTAL');
-											params.append('intendedObservationSpacing', 'P1D');
-											params.append('aggregationDuration', 'P1D');
+											
+											params.append('timeInterpolation', config.timeInterpolation);
+											debugger;
+											params.append('intendedObservationSpacing', config.intendedObservationSpacing);
+											params.append('aggregationDuration', config.aggregationDuration);
+
 											params.append('includeData', 'true');
 											params.append('asynchDownload', 'true');
 											

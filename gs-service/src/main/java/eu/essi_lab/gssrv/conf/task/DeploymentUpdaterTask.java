@@ -232,8 +232,7 @@ public class DeploymentUpdaterTask extends AbstractCustomTask {
 			Arrays.asList(), // fields
 			0, // start index is ignored when using search after, no need to update it
 			requestSize, //
-			Optional.of(SortedFields
-				.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING)), // sortOrder
+			Optional.of(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING)), // sortOrder
 			searchAfter, // search after
 			false, // request cache
 			false);// exclude res binary
@@ -333,8 +332,16 @@ public class DeploymentUpdaterTask extends AbstractCustomTask {
 
 	for (JSONObject source : sources) {
 
-	    String id = OpenSearchFolder.getEntryId(folder,
-		    source.getJSONArray(ResourceProperty.PRIVATE_ID.getName()).getString(0).toString());
+	    JSONArray array = source.optJSONArray(ResourceProperty.PRIVATE_ID.getName());
+	    
+	    if (array==null) {
+		System.err.println("error for record in folder: "+folder.getName());
+		continue;
+	    }
+
+	    String first = array.getString(0).toString();
+
+	    String id = OpenSearchFolder.getEntryId(folder, first);
 
 	    payloadSize += source.toString().length();
 
