@@ -383,10 +383,14 @@ public class MySQLConnectionManager {
 	    }
 
 	    url += dbName;
-
 	}
-	
-	url += "?useSSL=" + useSSl+"&allowPublicKeyRetrieval=true";
+
+	url += "?useSSL=" + useSSl;
+
+	if (useSSl) {
+
+	    url += "&allowPublicKeyRetrieval=true";
+	}
 
 	return url;
     }
