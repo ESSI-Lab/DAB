@@ -119,15 +119,6 @@ public class DownloadsHandler extends StreamingRequestHandler {
 
 	String method = webRequest.getServletRequest().getMethod();
 
-	if (method.toLowerCase().equals("delete")) {
-
-	    if (operationId != null) {
-		putCancelFlag(operationId);
-	    }
-	    return;
-
-	}
-
 	GSUser user = UserFinder.create().findCurrentUser(webRequest.getServletRequest());
 
 	GSProperty emailProperty = user.getProperty("email");
@@ -135,6 +126,34 @@ public class DownloadsHandler extends StreamingRequestHandler {
 	String email = null;
 	if (emailProperty != null) {
 	    email = emailProperty.getValue().toString();
+	}
+
+	if (method.toLowerCase().equals("delete")) {
+
+	    if (operationId != null) {
+		List<JSONObject> statuses = getStatuses(email);
+		for (JSONObject status : statuses) {
+		    String id = status.optString("id");
+		    if (id != null && id.equals(operationId)) {
+			String stat = status.optString("status");
+			if (stat != null && stat.equals("Completed")) {
+			    // delete result
+			    s3wrapper.deleteObject("his-central", "data-downloads/" + id + "-cancel");
+			    s3wrapper.deleteObject("his-central", "data-downloads/" + id + ".zip");
+			    status.put("locator", "");
+			    status.put("status", "Removed");
+			    OMHandler.status(s3wrapper, "his-central", id, status);
+			} else {
+			    // interrupt job
+			    putCancelFlag(operationId);
+			}
+			break;
+		    }
+		}
+
+	    }
+	    return;
+
 	}
 
 	List<JSONObject> statuses = getStatuses(email);
@@ -168,6 +187,7 @@ public class DownloadsHandler extends StreamingRequestHandler {
     }
 
     private void putCancelFlag(String id) throws Exception {
+
 	File tempFile = File.createTempFile(getClass().getSimpleName(), "cancel");
 	FileOutputStream fos = new FileOutputStream(tempFile);
 	fos.write("cancel".getBytes(StandardCharsets.UTF_8));

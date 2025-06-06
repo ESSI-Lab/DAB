@@ -160,6 +160,26 @@ function initializeLogin(config) {
 			// Create dialog content
 			const dialogContent = $('<div>');
 			
+			// Add informative text
+			const infoText = $('<div>')
+				.css({
+					'margin-bottom': '20px',
+					'padding': '10px',
+					'background-color': '#f8f9fa',
+					'border-left': '4px solid #2c3e50',
+					'border-radius': '4px'
+				})
+				.append(
+					$('<p>')
+						.css({
+							'margin': '0',
+							'color': '#2c3e50'
+						})
+						.html('<strong>Note:</strong> This panel shows your initiated bulk downloads. Downloads will be automatically removed two days after completion.')
+				);
+
+			dialogContent.prepend(infoText);
+
 			// Create refresh button
 			const refreshButton = $('<button>')
 				.addClass('refresh-button')
@@ -178,6 +198,7 @@ function initializeLogin(config) {
 				title: 'Bulk Downloads Status',
 				modal: true,
 				width: 1310,
+				position: { my: "center", at: "center top+100", of: window },
 				classes: {
 					"ui-dialog": "bulk-download-dialog"
 				},
@@ -369,8 +390,8 @@ function initializeLogin(config) {
 								'white-space': 'nowrap'
 							});
 
-							// Only show cancel button if status is not 'Completed', 'Failed', or 'Canceled'
-							if (!['Completed', 'Failed', 'Canceled'].includes(item.status)) {
+							// Show cancel button for active downloads
+							if (!['Completed', 'Failed', 'Canceled', 'Removed'].includes(item.status)) {
 								const cancelButton = $('<button>')
 									.addClass('cancel-button')
 									.html('<i class="fa fa-times"></i>')
@@ -407,6 +428,45 @@ function initializeLogin(config) {
 										}
 									});
 								actionsCell.append(cancelButton);
+							}
+							// Show remove button for completed downloads
+							else if (item.status === 'Completed') {
+								const removeButton = $('<button>')
+									.addClass('remove-button')
+									.html('<i class="fa fa-trash"></i>')
+									.attr('title', 'Remove')
+									.css({
+										'padding': '2px 6px',
+										'min-width': 'unset',
+										'background-color': '#6c757d',
+										'color': 'white',
+										'border': 'none',
+										'border-radius': '4px',
+										'cursor': 'pointer'
+									})
+									.on('click', function() {
+										if (confirm('Are you sure you want to remove this completed download?')) {
+											const authToken = localStorage.getItem('authToken');
+											fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/downloads?id=${item.id}`, {
+												method: 'DELETE',
+												headers: {
+													'Accept': 'application/json'
+												}
+											})
+											.then(response => {
+												if (!response.ok) {
+													throw new Error('Failed to remove download');
+												}
+												// Refresh the status panel after successful removal
+												fetchAndUpdateStatus();
+											})
+											.catch(error => {
+												console.error('Error removing download:', error);
+												alert('Failed to remove download. Please try again.');
+											});
+										}
+									});
+								actionsCell.append(removeButton);
 							}
 							
 							row.append(actionsCell);
@@ -1303,7 +1363,7 @@ export function initializePortal(config) {
 
 											// Add download name parameter
 											const downloadName = $('#downloadName').val().trim() || defaultName;
-											debugger;
+											
 											params.append('asynchDownloadName', downloadName);
 
 											// Add format parameter based on radio selection
