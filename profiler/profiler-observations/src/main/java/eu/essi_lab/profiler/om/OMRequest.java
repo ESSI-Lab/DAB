@@ -61,6 +61,7 @@ public class OMRequest {
 	VARIABLE("variable", "varCode", "variableCode"), //
 	OBSERVATION("observationIdentifier", "observationId", "observation"), //
 	OUTPUT_PROPERTIES("outputProperties"), //
+	E_MAIL_NOTIFICATIONS("eMailNotifications"), //
 	COUNTRY("country"), //
 	PROVIDER("provider"), //
 	OFFSET("offset", "start"), //

@@ -55,7 +55,13 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
-	OMDownloadReportsHandler.sendEmail("STARTED", setting, Optional.empty());
+	String emailNotifications = getSetting().getEmailNotifications();
+	String email = null;
+	if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
+	    email = getSetting().getEmail();
+	}
+
+	OMDownloadReportsHandler.sendEmail("STARTED", setting, Optional.empty(), email);
 
 	String requestURL = getSetting().getRequestURL();
 	String operationId = getSetting().getOperationId();
@@ -89,7 +95,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    OMHandler.status(s3wrapper, operationId, msg);
 	}
 
-	OMDownloadReportsHandler.sendEmail("ENDED", setting, Optional.of(locator));
+	OMDownloadReportsHandler.sendEmail("ENDED", setting, Optional.of(locator), email);
     }
 
     @Override

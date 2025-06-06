@@ -344,7 +344,7 @@ public class OMHandler extends StreamingRequestHandler {
 				email = emailProperty.getValue().toString();
 			    }
 			    String operationId = email + ":" + UUID.randomUUID().toString();
-			    
+
 			    S3TransferWrapper s3wrapper = null;
 
 			    if (getDownloadSetting().getDownloadStorage() == DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
@@ -369,6 +369,11 @@ public class OMHandler extends StreamingRequestHandler {
 			    OMSchedulerSetting setting = new OMSchedulerSetting();
 			    setting.setRequestURL(requestURL.toString());
 			    setting.setOperationId(operationId);
+			    setting.setEmail(email);
+			    String notifications = request.getParameterValue(APIParameters.E_MAIL_NOTIFICATIONS);
+			    if (notifications != null && !notifications.isEmpty()) {
+				setting.setEmailNotifications(notifications);
+			    }
 
 			    scheduler.schedule(setting);
 

@@ -35,6 +35,8 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
 
     private static final String REQUEST_URL_OPTION_KEY = "requestURL";
     private static final String OPERATION_ID_OPTION_KEY = "operationId";
+    private static final String E_MAIL_OPTION_KEY = "eMail";
+    private static final String E_MAIL_NOTIFICATIONS_OPTION_KEY = "eMailNotifications";
 
     /**
      * 
@@ -54,6 +56,16 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
 		withKey(OPERATION_ID_OPTION_KEY).//
 		build();
 	addOption(operationIdOption);
+	
+	Option<String> eMailOption = StringOptionBuilder.get().//
+		withKey(E_MAIL_OPTION_KEY).//
+		build();
+	addOption(eMailOption);
+	
+	Option<String> notificationOption = StringOptionBuilder.get().//
+		withKey(E_MAIL_NOTIFICATIONS_OPTION_KEY).//
+		build();
+	addOption(notificationOption);
     }
 
     /**
@@ -86,5 +98,25 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
     public String getOperationId() {
 
 	return getOption(OPERATION_ID_OPTION_KEY, String.class).get().getValue();
+    }
+
+    public String getEmail() {
+
+	return getOption(E_MAIL_OPTION_KEY, String.class).get().getValue();
+    }
+
+    public String getEmailNotifications() {
+
+	return getOption(E_MAIL_NOTIFICATIONS_OPTION_KEY, String.class).get().getValue();
+    }
+
+    public void setEmail(String email) {
+
+	getOption(E_MAIL_OPTION_KEY, String.class).get().setValue(email);
+    }
+
+    public void setEmailNotifications(String notifications) {
+
+	getOption(E_MAIL_NOTIFICATIONS_OPTION_KEY, String.class).get().setValue(notifications);
     }
 }

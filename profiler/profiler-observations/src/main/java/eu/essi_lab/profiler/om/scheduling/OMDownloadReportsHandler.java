@@ -43,8 +43,9 @@ public class OMDownloadReportsHandler {
      */
     public static void sendEmail(//
 	    String status, //
-	    OMSchedulerSetting setting,//
-	    Optional<String> locator) {
+	    OMSchedulerSetting setting, //
+	    Optional<String> locator, //
+	    String userMail) {
 
 	SchedulingGroup group = setting.getGroup();
 
@@ -62,7 +63,11 @@ public class OMDownloadReportsHandler {
 
 	    builder.append("\n\nZIP file: " + locator.get());
 	}
-
+	// send to default recipients
 	ConfiguredGmailClient.sendEmail(subject, builder.toString());
+	// send as well to the user if needed
+	if (userMail != null && userMail.contains("@")) {
+	    ConfiguredGmailClient.sendEmail(subject, builder.toString(), userMail);
+	}
     }
 }

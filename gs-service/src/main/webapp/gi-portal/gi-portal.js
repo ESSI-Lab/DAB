@@ -960,7 +960,33 @@ export function initializePortal(config) {
 							// Create dialog content
 							var dialogContent = $('<div>')
 								.append($('<p>').text(`This will initiate the bulk download of ${resultSet.size} resources. The process may take some time, depending on the number of resources and current server load.`))
-								.append($('<p>').text('Are you sure you want to proceed? You can monitor the download status from your personal menu.'));
+								.append($('<p>').text('Are you sure you want to proceed? You can monitor the download status from your personal menu.'))
+								.append(
+									$('<div>')
+										.css({
+											'margin-top': '15px',
+											'display': 'flex',
+											'align-items': 'center'
+										})
+										.append(
+											$('<input>')
+												.attr({
+													'type': 'checkbox',
+													'id': 'emailNotifications',
+													'checked': true
+												})
+												.css('margin-right', '8px')
+										)
+										.append(
+											$('<label>')
+												.attr('for', 'emailNotifications')
+												.text('Send me email notifications about the download status')
+												.css({
+													'font-size': '14px',
+													'color': '#2c3e50'
+												})
+										)
+								);
 
 							// Create and show dialog
 							dialogContent.dialog({
@@ -1023,7 +1049,10 @@ export function initializePortal(config) {
 											// Add fixed parameters
 											params.append('ontology', config.ontology);
 
-											
+											// Add email notifications parameter if checkbox is checked
+											if ($('#emailNotifications').is(':checked')) {
+												params.append('eMailNotifications', 'true');
+											}
 
 											params.append('includeData', 'true');
 											params.append('asynchDownload', 'true');

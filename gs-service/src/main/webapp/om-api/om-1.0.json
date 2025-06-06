@@ -505,6 +505,14 @@
 						}
 					},
 					{
+						"name": "eMailNotifications",
+						"in": "query",
+						"description": "Send bulk download notifications (start and end) through e-mail.",
+						"schema": {
+							"type": "boolean"
+						}
+					},
+					{
 						"name": "useCache",
 						"in": "query",
 						"description": "Use the broker cache to retrieve the data, avoiding to contact the remote data providers. Normally off.",
