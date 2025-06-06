@@ -76,9 +76,9 @@ public class OMProfiler extends Profiler<OMProfilerSetting> {
 	selector.register(new PropertiesFilter(), new PropertiesHandler());
 	
 	////////////////////
-	// STATUS
+	// DOWNLOADS
 	////////////////////
-	selector.register(new StatusFilter(), new StatusHandler());
+	selector.register(new DownloadsFilter(), new DownloadsHandler());
 
 
 

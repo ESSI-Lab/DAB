@@ -25,6 +25,8 @@ package eu.essi_lab.profiler.om.scheduling;
  */
 
 import java.io.File;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -66,11 +68,20 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	String requestURL = getSetting().getRequestURL();
 	String operationId = getSetting().getOperationId();
 
+	String bucket = getSetting().getBucket();
+	String publicURL = getSetting().getPublicURL();
+
 	String fname = operationId + ".zip";
 
 	DataDownloaderTool downloader = new DataDownloaderTool();
+	String asynchDownloadName = getSetting().getAsynchDownloadName();
 
-	File downloaded = downloader.download(requestURL, operationId);
+	S3TransferWrapper s3wrapper = null;
+
+	if (ConfigurationWrapper.getDownloadSetting().getDownloadStorage() != DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
+	    s3wrapper = OMHandler.getS3TransferWrapper();
+	}
+	File downloaded = downloader.download(s3wrapper, bucket, requestURL, operationId, asynchDownloadName);
 
 	String locator = null;
 
@@ -78,24 +89,41 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 	} else {
 
-	    S3TransferWrapper s3wrapper = OMHandler.getS3TransferWrapper();
+	    if (downloaded == null) {
+		JSONObject msg = new JSONObject();
+		msg.put("id", operationId);
+		msg.put("status", "Canceled");
+		msg.put("downloadName", asynchDownloadName);
+		msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
 
-	    s3wrapper.uploadFile(downloaded.getAbsolutePath(), "his-central", "data-downloads/" + fname, "application/zip");
+		OMHandler.status(s3wrapper, bucket, operationId, msg);
 
-	    downloaded.delete();
+		OMDownloadReportsHandler.sendEmail("CANCELED", setting, Optional.empty(), email);
 
-	    locator = "https://his-central.s3.us-east-1.amazonaws.com/data-downloads/" + fname;
+	    } else {
+		s3wrapper.uploadFile(downloaded.getAbsolutePath(), bucket, "data-downloads/" + fname, "application/zip");
 
-	    JSONObject msg = new JSONObject();
-	    msg.put("operationId", operationId);
-	    msg.put("status", "Completed");
-	    msg.put("locator", locator);
-	    msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+		long sizeInBytes = downloaded.length();
+		BigDecimal sizeInMB = BigDecimal.valueOf(sizeInBytes).divide(BigDecimal.valueOf(1024 * 1024), 2, RoundingMode.HALF_UP);
 
-	    OMHandler.status(s3wrapper, operationId, msg);
+		downloaded.delete();
+
+		locator = publicURL + "/data-downloads/" + fname;
+		JSONObject msg = new JSONObject();
+		msg.put("id", operationId);
+		msg.put("status", "Completed");
+		msg.put("downloadName", asynchDownloadName);
+		msg.put("locator", locator);
+		msg.put("sizeInMB", sizeInMB);
+		msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+
+		OMHandler.status(s3wrapper, bucket, operationId, msg);
+
+		OMDownloadReportsHandler.sendEmail("ENDED", setting, Optional.of(locator), email);
+
+	    }
 	}
 
-	OMDownloadReportsHandler.sendEmail("ENDED", setting, Optional.of(locator), email);
     }
 
     @Override

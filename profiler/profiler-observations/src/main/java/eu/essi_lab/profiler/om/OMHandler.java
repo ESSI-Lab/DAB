@@ -365,8 +365,14 @@ public class OMHandler extends StreamingRequestHandler {
 
 			    SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 			    Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
-
+			    Optional<String> view = webRequest.extractViewId();
+			    String bucket = null;
+			    if (view.isPresent()) {
+				bucket = view.get();
+			    }
 			    OMSchedulerSetting setting = new OMSchedulerSetting();
+			    setting.setBucket(bucket);
+			    setting.setPublicURL("https://" + bucket + ".s3.us-east-1.amazonaws.com");
 			    setting.setRequestURL(requestURL.toString());
 			    setting.setOperationId(operationId);
 			    setting.setEmail(email);
@@ -375,21 +381,21 @@ public class OMHandler extends StreamingRequestHandler {
 				setting.setEmailNotifications(notifications);
 			    }
 
+			    String asynchDownloadName = request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD_NAME);
+
+			    setting.setAsynchDownloadName(asynchDownloadName);
+
 			    scheduler.schedule(setting);
 
 			    JSONObject msg = new JSONObject();
-			    msg.put("operationId", operationId);
-			    msg.put("status", "Submitted asynchronous download operation");
+			    msg.put("id", operationId);
+			    msg.put("status", "Submitted");
+			    msg.put("downloadName", asynchDownloadName);
 			    msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
 
-			    status(s3wrapper, operationId, msg);
+			    status(s3wrapper, bucket, operationId, msg);
 
-			    JSONObject json = new JSONObject();
-			    json.put("operationId", operationId);
-			    json.put("status", "Submitted asynchronous download operation");
-			    json.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
-
-			    printJSON(output, json);
+			    printJSON(output, msg);
 
 			    return;
 
@@ -846,10 +852,9 @@ public class OMHandler extends StreamingRequestHandler {
      */
     public static void status(//
 	    S3TransferWrapper s3wrapper, //
-	    String operationId, //
+	    String bucket, String operationId, //
 	    JSONObject json) throws Exception {
-
-	status(s3wrapper, operationId, "his-central", "data-downloads/" + operationId + "-status.json", json);
+	status(s3wrapper, operationId, bucket, "data-downloads/" + operationId + "-status.json", json);
     }
 
     /**
@@ -867,6 +872,7 @@ public class OMHandler extends StreamingRequestHandler {
 	    String key, //
 	    JSONObject json) throws Exception {
 
+	
 	Path tmpFile = Files.createTempFile(OMHandler.class.getSimpleName(), ".txt");
 
 	FileOutputStream fos = new FileOutputStream(tmpFile.toFile());

@@ -166,11 +166,32 @@ function initializeLogin(config) {
 				.html('<i class="fa fa-refresh"></i> Refresh')
 				.css({
 					'margin-bottom': '10px',
+					'margin-top': '15px',
 					'float': 'right'
 				});
 
 			dialogContent.append(refreshButton);
 			dialogContent.append($('<div>').attr('id', 'status-content'));
+
+			// Show dialog first
+			const dialog = dialogContent.dialog({
+				title: 'Bulk Downloads Status',
+				modal: true,
+				width: 1310,
+				classes: {
+					"ui-dialog": "bulk-download-dialog"
+				},
+				close: function() {
+					// Cleanup when dialog is closed
+					$(this).dialog('destroy').remove();
+				}
+			});
+
+			// Add CSS to ensure table fits in dialog
+			dialogContent.css({
+				'overflow-x': 'hidden',
+				'padding': '0 15px'
+			});
 
 			// Function to fetch and update status
 			const fetchAndUpdateStatus = () => {
@@ -183,7 +204,7 @@ function initializeLogin(config) {
 
 				// Fetch status from API
 				const authToken = localStorage.getItem('authToken');
-				fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/status`, {
+				fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/downloads`, {
 					headers: {
 						'Accept': 'application/json'
 					}
@@ -192,82 +213,207 @@ function initializeLogin(config) {
 				.then(data => {
 					statusContent.empty();
 					if (data.results && data.results.length > 0) {
-						const table = $('<table>').addClass('status-table');
-						table.append($('<tr>')
-							.append($('<th>').text('Operation ID'))
-							.append($('<th>').text('Status'))
-							.append($('<th>').text('Timestamp'))
-							.append($('<th>').text('Download'))
-							.append($('<th>').text('URL'))
-						);
-						data.results.forEach(item => {
+						// Sort results by timestamp in descending order
+						const sortedResults = data.results.sort((a, b) => {
+							const dateA = new Date(a.timestamp || 0);
+							const dateB = new Date(b.timestamp || 0);
+							return dateB - dateA;
+						});
+
+						const table = $('<table>').addClass('status-table').css({
+							'width': '100%',
+							'table-layout': 'fixed',
+							'border-collapse': 'collapse'
+						});
+						
+						const headerRow = $('<tr>')
+							.append($('<th>').text('Timestamp').css('width', '160px'))
+							.append($('<th>').text('Task ID').css('width', '250px'))
+							.append($('<th>').text('Name').css('width', '200px'))
+							.append($('<th>').text('Status').css('width', '200px'))
+							.append($('<th>').text('Size (MB)').css('width', '100px'))
+							.append($('<th>').text('Download').css('width', '100px'))
+							.append($('<th>').text('Actions').css('width', '100px'));
+						table.append(headerRow);
+
+						sortedResults.forEach((item, index) => {
 							const row = $('<tr>');
-							row.append($('<td>')
-								.text(item.operationId)
-								.attr('title', item.operationId)
-							);
-							row.append($('<td>').text(item.status));
 							
-							// Format and add timestamp
+							// Timestamp column
 							let formattedDate = '';
 							if (item.timestamp) {
 								try {
 									const date = new Date(item.timestamp);
-									formattedDate = date.toLocaleString(undefined, {
-										year: 'numeric',
-										month: 'short',
-										day: 'numeric',
-										hour: '2-digit',
-										minute: '2-digit',
-										second: '2-digit'
-									});
+									const year = date.getFullYear();
+									const month = String(date.getMonth() + 1).padStart(2, '0');
+									const day = String(date.getDate()).padStart(2, '0');
+									const hours = String(date.getHours()).padStart(2, '0');
+									const minutes = String(date.getMinutes()).padStart(2, '0');
+									const seconds = String(date.getSeconds()).padStart(2, '0');
+									formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 								} catch (e) {
 									console.error('Error formatting date:', e);
 									formattedDate = item.timestamp;
 								}
 							}
-							row.append($('<td>').text(formattedDate));
+							row.append($('<td>')
+								.text(formattedDate)
+								.css({
+									'width': '160px',
+									'white-space': 'nowrap',
+									'overflow': 'hidden',
+									'text-overflow': 'ellipsis'
+								})
+							);
+							
+							// Task ID column
+							row.append($('<td>')
+								.css({
+									'width': '250px',
+									'display': 'flex',
+									'align-items': 'center',
+									'gap': '8px'
+								})
+								.append(
+									$('<span>')
+										.text(item.id)
+										.attr('title', item.id)
+										.css({
+											'overflow': 'hidden',
+											'text-overflow': 'ellipsis'
+										})
+								)
+								.append(
+									$('<button>')
+										.addClass('copy-button')
+										.html('<i class="fa fa-copy"></i>')
+										.attr('title', 'Copy Task ID')
+										.css({
+											'padding': '2px 6px',
+											'min-width': 'unset',
+											'flex-shrink': '0'
+										})
+										.on('click', function() {
+											const tempInput = $('<input>');
+											$('body').append(tempInput);
+											tempInput.val(item.id).select();
+											document.execCommand('copy');
+											tempInput.remove();
+											
+											const button = $(this);
+											const originalTitle = button.attr('title');
+											button.attr('title', 'Copied!');
+											setTimeout(() => {
+												button.attr('title', originalTitle);
+											}, 2000);
+										})
+								)
+							);
+							
+							// Name column
+							row.append($('<td>')
+								.text(item.downloadName || '-')
+								.attr('title', item.downloadName)
+								.css({
+									'width': '200px',
+									'white-space': 'nowrap',
+									'overflow': 'hidden',
+									'text-overflow': 'ellipsis'
+								})
+							);
+							
+							// Status column
+							row.append($('<td>')
+								.text(item.status)
+								.css({
+									'width': '200px'
+								})
+							);
 
+							// Size column
+							row.append($('<td>')
+								.text(item.sizeInMB ? item.sizeInMB.toLocaleString(undefined, {
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 2
+								}) : '-')
+								.css({
+									'width': '100px',
+									'white-space': 'nowrap',
+									'overflow': 'hidden',
+									'text-overflow': 'ellipsis'
+								})
+							);
+							
+							// Download column
+							const downloadCell = $('<td>').css({
+								'width': '100px',
+								'white-space': 'nowrap',
+								'overflow': 'hidden',
+								'text-overflow': 'ellipsis'
+							});
 							if (item.status === 'Completed' && item.locator) {
-								row.append($('<td>').append(
+								downloadCell.append(
 									$('<a>')
 										.attr('href', item.locator)
 										.attr('target', '_blank')
 										.text('Download')
-								));
-								row.append($('<td>').append(
-									$('<div>')
-										.addClass('url-container')
-										.append(
-											$('<input>')
-												.addClass('url-input')
-												.attr('type', 'text')
-												.attr('readonly', 'readonly')
-												.val(item.locator)
-										)
-										.append(
-											$('<button>')
-												.addClass('copy-button')
-												.html('<i class="fa fa-copy"></i>')
-												.attr('title', 'Copy URL')
-												.on('click', function() {
-													const urlInput = $(this).prev('.url-input');
-													urlInput.select();
-													document.execCommand('copy');
-													const originalTitle = $(this).attr('title');
-													$(this).attr('title', 'Copied!');
-													setTimeout(() => {
-														$(this).attr('title', originalTitle);
-													}, 2000);
-												})
-										)
-								));
+								);
 							} else {
-								row.append($('<td>').text('-'));
-								row.append($('<td>').text('-'));
+								downloadCell.text('-');
 							}
+							row.append(downloadCell);
+
+							// Actions column
+							const actionsCell = $('<td>').css({
+								'width': '100px',
+								'white-space': 'nowrap'
+							});
+
+							// Only show cancel button if status is not 'Completed', 'Failed', or 'Canceled'
+							if (!['Completed', 'Failed', 'Canceled'].includes(item.status)) {
+								const cancelButton = $('<button>')
+									.addClass('cancel-button')
+									.html('<i class="fa fa-times"></i>')
+									.attr('title', 'Cancel download')
+									.css({
+										'padding': '2px 6px',
+										'min-width': 'unset',
+										'background-color': '#dc3545',
+										'color': 'white',
+										'border': 'none',
+										'border-radius': '4px',
+										'cursor': 'pointer'
+									})
+									.on('click', function() {
+										if (confirm('Are you sure you want to cancel this download?')) {
+											const authToken = localStorage.getItem('authToken');
+											fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/downloads?id=${item.id}`, {
+												method: 'DELETE',
+												headers: {
+													'Accept': 'application/json'
+												}
+											})
+											.then(response => {
+												if (!response.ok) {
+													throw new Error('Failed to cancel download');
+												}
+												// Refresh the status panel after successful cancellation
+												fetchAndUpdateStatus();
+											})
+											.catch(error => {
+												console.error('Error canceling download:', error);
+												alert('Failed to cancel download. Please try again.');
+											});
+										}
+									});
+								actionsCell.append(cancelButton);
+							}
+							
+							row.append(actionsCell);
+							
 							table.append(row);
 						});
+						
 						statusContent.append(table);
 					} else {
 						statusContent.append($('<p>').text('No bulk downloads found.'));
@@ -289,18 +435,8 @@ function initializeLogin(config) {
 			// Add click handler to refresh button
 			refreshButton.on('click', fetchAndUpdateStatus);
 
-			// Show dialog
-			dialogContent.dialog({
-				title: 'Bulk Downloads Status',
-				modal: true,
-				width: 1200,
-				classes: {
-					"ui-dialog": "bulk-download-dialog"
-				}
-			});
-
-			// Initial fetch
-			fetchAndUpdateStatus();
+			// Initial fetch after dialog is shown
+			setTimeout(fetchAndUpdateStatus, 100);
 		});
 
 		// Logout menu button click handler
@@ -958,35 +1094,151 @@ export function initializePortal(config) {
 						})
 						.on('click', function() {
 							// Create dialog content
-							var dialogContent = $('<div>')
-								.append($('<p>').text(`This will initiate the bulk download of ${resultSet.size} resources. The process may take some time, depending on the number of resources and current server load.`))
-								.append($('<p>').text('Are you sure you want to proceed? You can monitor the download status from your personal menu.'))
-								.append(
-									$('<div>')
-										.css({
-											'margin-top': '15px',
-											'display': 'flex',
-											'align-items': 'center'
-										})
-										.append(
-											$('<input>')
-												.attr({
-													'type': 'checkbox',
-													'id': 'emailNotifications',
-													'checked': true
-												})
-												.css('margin-right', '8px')
-										)
-										.append(
-											$('<label>')
-												.attr('for', 'emailNotifications')
-												.text('Send me email notifications about the download status')
-												.css({
-													'font-size': '14px',
-													'color': '#2c3e50'
-												})
-										)
-								);
+							const dialogContent = $('<div>');
+							
+							// Add description paragraphs
+							dialogContent.append($('<p>').text(`This will initiate the bulk download of ${resultSet.size} resources. The process may take some time, depending on the number of resources and current server load.`));
+							dialogContent.append($('<p>').text('You can monitor the download status from your personal menu.'));
+							
+							// Add download name input
+							const nameDiv = $('<div>').css({
+								'margin-top': '15px',
+								'margin-bottom': '15px',
+								'padding': '10px',
+								'background-color': '#f8f9fa',
+								'border-radius': '4px'
+							});
+							
+							nameDiv.append(
+								$('<label>')
+									.text('Download name:')
+									.css({
+										'display': 'block',
+										'margin-bottom': '10px',
+										'font-weight': 'bold',
+										'color': '#2c3e50'
+									})
+							);
+							
+							const defaultName = new Date().toISOString().slice(0,16).replace('T', '_').replace(':', '-');
+							
+							nameDiv.append(
+								$('<input>')
+									.attr({
+										'type': 'text',
+										'id': 'downloadName',
+										'placeholder': 'Enter a name for this download',
+										'value': defaultName
+									})
+									.css({
+										'width': '80%',
+										'padding': '8px',
+										'border': '1px solid #bdc3c7',
+										'border-radius': '4px',
+										'font-size': '14px',
+										'color': '#2c3e50'
+									})
+							);
+							
+							dialogContent.append(nameDiv);
+							
+							// Add format selection
+							const formatDiv = $('<div>').css({
+								'margin-top': '15px',
+								'margin-bottom': '15px',
+								'padding': '10px',
+								'background-color': '#f8f9fa',
+								'border-radius': '4px'
+							});
+							
+							formatDiv.append(
+								$('<label>')
+									.text('Select data format:')
+									.css({
+										'display': 'block',
+										'margin-bottom': '10px',
+										'font-weight': 'bold',
+										'color': '#2c3e50'
+									})
+							);
+							
+							const formatOptions = $('<div>').css({
+								'display': 'flex',
+								'gap': '20px'
+							});
+							
+							// CSV option
+							const csvOption = $('<div>').css({
+								'display': 'flex',
+								'align-items': 'center'
+							});
+							csvOption.append(
+								$('<input>').attr({
+									'type': 'radio',
+									'name': 'downloadFormat',
+									'id': 'formatCSV',
+									'value': 'CSV',
+									'checked': true
+								}).css('margin-right', '8px')
+							);
+							csvOption.append(
+								$('<label>')
+									.attr('for', 'formatCSV')
+									.text('CSV')
+									.css('color', '#2c3e50')
+							);
+							
+							// JSON option
+							const jsonOption = $('<div>').css({
+								'display': 'flex',
+								'align-items': 'center'
+							});
+							jsonOption.append(
+								$('<input>').attr({
+									'type': 'radio',
+									'name': 'downloadFormat',
+									'id': 'formatJSON',
+									'value': 'JSON'
+								}).css('margin-right', '8px')
+							);
+							jsonOption.append(
+								$('<label>')
+									.attr('for', 'formatJSON')
+									.text('JSON')
+									.css('color', '#2c3e50')
+							);
+							
+							formatOptions.append(csvOption);
+							formatOptions.append(jsonOption);
+							formatDiv.append(formatOptions);
+							dialogContent.append(formatDiv);
+							
+							// Add email notifications checkbox
+							const notificationsDiv = $('<div>').css({
+								'margin-top': '15px',
+								'display': 'flex',
+								'align-items': 'center'
+							});
+							
+							notificationsDiv.append(
+								$('<input>').attr({
+									'type': 'checkbox',
+									'id': 'emailNotifications',
+									'checked': true
+								}).css('margin-right', '8px')
+							);
+							
+							notificationsDiv.append(
+								$('<label>')
+									.attr('for', 'emailNotifications')
+									.text('Send me email notifications about the download status')
+									.css({
+										'font-size': '14px',
+										'color': '#2c3e50'
+									})
+							);
+							
+							dialogContent.append(notificationsDiv);
 
 							// Create and show dialog
 							dialogContent.dialog({
@@ -998,7 +1250,7 @@ export function initializePortal(config) {
 								},
 								buttons: [
 									{
-										text: "Proceed",
+										text: "Proceed to download",
 										class: "login-button",
 										click: function() {
 											// Get the current constraints
@@ -1049,6 +1301,15 @@ export function initializePortal(config) {
 											// Add fixed parameters
 											params.append('ontology', config.ontology);
 
+											// Add download name parameter
+											const downloadName = $('#downloadName').val().trim() || defaultName;
+											debugger;
+											params.append('asynchDownloadName', downloadName);
+
+											// Add format parameter based on radio selection
+											const selectedFormat = $('input[name="downloadFormat"]:checked').val();
+											params.append('format', selectedFormat);
+
 											// Add email notifications parameter if checkbox is checked
 											if ($('#emailNotifications').is(':checked')) {
 												params.append('eMailNotifications', 'true');
@@ -1072,20 +1333,14 @@ export function initializePortal(config) {
 													// Show success message
 													GIAPI.UI_Utils.dialog('open', {
 														title: 'Download Started',
-														message: 'Your bulk download request has been initiated. You can monitor the download status from your personal menu.'
+														message: 'Your bulk download request has been initiated. You can monitor the download status from your personal menu later.'
 													});
 
 													// Find any open status dialog and refresh it
 													const existingDialog = $('.bulk-download-dialog');
 													if (existingDialog.length > 0) {
-														const statusContent = $('#status-content');
-														if (statusContent.length > 0) {
-															// Trigger a refresh of the status content
-															const refreshButton = $('.refresh-button');
-															if (refreshButton.length > 0) {
-																refreshButton.click();
-															}
-														}
+														// Trigger a refresh of the status content
+														fetchAndUpdateStatus();
 													}
 												})
 												.catch(error => {
@@ -1098,14 +1353,6 @@ export function initializePortal(config) {
 												});
 
 											$(this).dialog("close");
-										}
-									},
-									{
-										text: "Abandon and refine the search",
-										click: function() {
-											$(this).dialog("close");
-											// Focus on the search input or open advanced search
-											$('#what-div input').focus();
 										}
 									}
 								]

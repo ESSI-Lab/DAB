@@ -1,7 +1,6 @@
 package eu.essi_lab.profiler.om;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 /*-
@@ -30,7 +29,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,13 +40,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.gson.JsonObject;
-import com.mchange.io.FileUtils;
 
 import eu.essi_lab.authorization.userfinder.UserFinder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
-import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.ValidationMessage;
@@ -62,7 +58,7 @@ import eu.essi_lab.profiler.om.OMRequest.APIParameters;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
-public class StatusHandler extends StreamingRequestHandler {
+public class DownloadsHandler extends StreamingRequestHandler {
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -92,7 +88,7 @@ public class StatusHandler extends StreamingRequestHandler {
 	}
     }
 
-    public StatusHandler() {
+    public DownloadsHandler() {
 
     }
 
@@ -117,10 +113,21 @@ public class StatusHandler extends StreamingRequestHandler {
 
     protected void handle(OutputStream output, WebRequest webRequest) throws Exception {
 	OMRequest request = new OMRequest(webRequest);
-	String operationId = request.getParameterValue(APIParameters.OPERATION_ID);
+	String operationId = request.getParameterValue(APIParameters.ID);
 	JSONObject ret = new JSONObject();
 	JSONArray array = new JSONArray();
-	
+
+	String method = webRequest.getServletRequest().getMethod();
+
+	if (method.toLowerCase().equals("delete")) {
+
+	    if (operationId != null) {
+		putCancelFlag(operationId);
+	    }
+	    return;
+
+	}
+
 	GSUser user = UserFinder.create().findCurrentUser(webRequest.getServletRequest());
 
 	GSProperty emailProperty = user.getProperty("email");
@@ -136,10 +143,10 @@ public class StatusHandler extends StreamingRequestHandler {
 	    for (JSONObject jsonObject : statuses) {
 		array.put(jsonObject);
 	    }
-	}else {
+	} else {
 	    for (JSONObject jsonObject : statuses) {
-		String id = jsonObject.optString("operationId");
-		if (id!=null &&id.equals(operationId)) {
+		String id = jsonObject.optString("id");
+		if (id != null && id.equals(operationId)) {
 		    array.put(jsonObject);
 		    break;
 		}
@@ -148,7 +155,7 @@ public class StatusHandler extends StreamingRequestHandler {
 
 	// Create the response object
 	JsonObject response = new JsonObject();
-	response.addProperty("operationId", operationId);
+	response.addProperty("id", operationId);
 	response.addProperty("status", "Not found");
 	// response.addProperty("locator", "http://example.com/download.zip");
 
@@ -158,6 +165,16 @@ public class StatusHandler extends StreamingRequestHandler {
 	    writer.write(ret.toString());
 	    writer.flush();
 	}
+    }
+
+    private void putCancelFlag(String id) throws Exception {
+	File tempFile = File.createTempFile(getClass().getSimpleName(), "cancel");
+	FileOutputStream fos = new FileOutputStream(tempFile);
+	fos.write("cancel".getBytes(StandardCharsets.UTF_8));
+	fos.close();
+	s3wrapper.uploadFile(tempFile.getAbsolutePath(), "his-central", "data-downloads/" + id + "-cancel");
+	tempFile.delete();
+
     }
 
     private List<JSONObject> getStatuses(String email) throws Exception {
@@ -175,8 +192,8 @@ public class StatusHandler extends StreamingRequestHandler {
 		    temp.delete();
 		} else {
 		    JSONObject s = new JSONObject();
-		    s.put("status", "Not found");
-		    s.put("operationId", key.replace("data-downloads/", ""));
+		    s.put("status", "Error downloading status");
+		    s.put("id", key.replace("data-downloads/", ""));
 		    s.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
 		    ret.add(s);
 		}

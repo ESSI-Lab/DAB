@@ -26,6 +26,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,38 +40,46 @@ import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.FileUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.web.WebRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 
 public class DataDownloaderTool {
-
-    public static void main(String[] args) {
-	DataDownloaderTool tool = new DataDownloaderTool();
-	String token = "my-token";
-	File zip = tool.download("http://localhost:9090/gs-service/services/essi/token/" + token
-		+ "/view/his-central/om-api/observations?includeData=true&asynchDownload=true&observedProperty=precipitation&ontology=his-central&north=42.492&south=42.252&east=11.094&west=10.693",
-		UUID.randomUUID().toString());
-	System.out.println("Downloaded to: " + zip.getAbsolutePath());
-    }
 
     public DataDownloaderTool() {
 
     }
 
     /**
+     * @param s3wrapper
      * @param folder
      * @param requestURL something like
      *        "http://localhost:9090/gs-service/services/essi/token/my-token/view/his-central/om-api/observations?includeData=true&asynchDownload=true&observedProperty=precipitation&ontology=his-central&north=42.492&south=42.252&east=11.094&west=10.693&beginPosition=2024-01-01&endPosition=2025-01-01"
      * @param operationId
+     * @param asynchDownloadName
      */
-    public File download(String requestURL, String operationId) {
+    public File download(S3TransferWrapper s3wrapper, String bucket, String requestURL, String operationId, String downloadName) {
 
 	GSLoggerFactory.getLogger(getClass()).info("Started asynch download of {}", requestURL);
+
+	try {
+	    JSONObject msg = new JSONObject();
+	    msg.put("id", operationId);
+	    msg.put("status", "Started");
+	    msg.put("downloadName", downloadName);
+	    msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+	    OMHandler.status(s3wrapper, bucket, operationId, msg);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
 
 	File zipFile = null;
 	Path tempPath = null;
@@ -100,9 +113,30 @@ public class DataDownloaderTool {
 	requestURL = removeParameter(requestURL, "asynchDownload", "true");
 	requestURL = removeParameter(requestURL, "includeData", "true");
 
+	URI uri;
+	String format = null;
+	try {
+	    uri = new URI(requestURL);
+	    URIBuilder uriBuilder = new URIBuilder(uri);
+	    format = uriBuilder.getQueryParams().stream().filter(p -> p.getName().equals("format")).map(p -> p.getValue()).findFirst()
+		    .orElse(null);
+	} catch (URISyntaxException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
+	if (format != null) {
+	    requestURL = removeParameter(requestURL, "format", format);
+
+	}
+
 	boolean firstLoop = true;
 	String resumptionToken = null;
 	int blocks = 0;
+
+	int resources = 0;
+	int errors = 0;
+	BigDecimal size = BigDecimal.ZERO;
 
 	while (firstLoop || resumptionToken != null) {
 	    firstLoop = false;
@@ -118,6 +152,8 @@ public class DataDownloaderTool {
 	    OMHandler omHandler = new OMHandler();
 
 	    Optional<JSONObject> response = omHandler.getJSONResponse(WebRequest.createGET(listURL));
+
+	    long last = System.currentTimeMillis();
 
 	    if (response.isPresent()) {
 
@@ -155,6 +191,9 @@ public class DataDownloaderTool {
 			String downloadURL = requestURL;
 			downloadURL = addParameter(downloadURL, "observationIdentifier", id);
 			downloadURL = addParameter(downloadURL, "includeData", "true");
+			if (format != null) {
+			    downloadURL = addParameter(downloadURL, "format", format);
+			}
 
 			// write
 			File sourceDir = new File(tempPath.toFile(), sourceId);
@@ -170,7 +209,7 @@ public class DataDownloaderTool {
 			}
 
 			String extension = ".json";
-			if (downloadURL.contains("csv")) {
+			if (downloadURL.toLowerCase().contains("csv")) {
 			    extension = ".csv";
 			}
 
@@ -179,13 +218,57 @@ public class DataDownloaderTool {
 
 			WebRequest get2 = WebRequest.createGET(downloadURL);
 
+			resources++;
+
 			try {
 
 			    omHandler.handle(new FileOutputStream(dataFile), get2);
 
-			} catch (Exception e) {
+			    BigDecimal sizeInMB = null;
+			    if (dataFile.exists()) {
+				long sizeInBytes = dataFile.length();
+				sizeInMB = BigDecimal.valueOf(sizeInBytes).divide(BigDecimal.valueOf(1024 * 1024), 2, RoundingMode.HALF_UP);
+			    } else {
+				sizeInMB = BigDecimal.ZERO;
+			    }
+			    size = size.add(sizeInMB);
 
+			} catch (Exception e) {
+			    errors++;
 			    write("status: 500 \nexception " + e.getMessage(), logFile);
+			    GSLoggerFactory.getLogger(getClass()).error(e);
+			}
+			try {
+			    long current = System.currentTimeMillis();
+			    long elapsed = current - last;
+
+			    //
+			    
+			    String key = "data-downloads/" + operationId + "-cancel";
+			    HeadObjectResponse metadata = s3wrapper.getObjectMetadata(bucket, key);
+			    if (metadata!=null) {
+				s3wrapper.deleteObject(bucket, key);
+				return null;			
+			    }
+			    
+			    // gives status updates not before 5000 ms
+			    if (elapsed > 5000) {
+
+				last = current;
+
+				JSONObject msg = new JSONObject();
+				msg.put("id", operationId);
+				String errorInfo = "";
+				if (errors > 0) {
+				    errorInfo = " (" + errors + " of them failed)";
+				}
+				msg.put("status", resources + " downloads" + errorInfo + ", " + size+ "MB");
+				msg.put("downloadName", downloadName);
+				msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+				OMHandler.status(s3wrapper, bucket, operationId, msg);
+			    }
+			} catch (Exception e) {
+			    e.printStackTrace();
 			    GSLoggerFactory.getLogger(getClass()).error(e);
 			}
 		    }

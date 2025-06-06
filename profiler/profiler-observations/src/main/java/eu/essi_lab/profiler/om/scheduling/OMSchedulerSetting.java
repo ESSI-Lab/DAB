@@ -37,6 +37,9 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
     private static final String OPERATION_ID_OPTION_KEY = "operationId";
     private static final String E_MAIL_OPTION_KEY = "eMail";
     private static final String E_MAIL_NOTIFICATIONS_OPTION_KEY = "eMailNotifications";
+    private static final String ASYNCH_DOWNLOAD_NAME_OPTION_KEY = "asynchDownloadName";
+    private static final String BUCKET_OPTION_KEY = "bucket";
+    private static final String PUBLIC_URL_OPTION_KEY = "publicURL";
 
     /**
      * 
@@ -56,16 +59,31 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
 		withKey(OPERATION_ID_OPTION_KEY).//
 		build();
 	addOption(operationIdOption);
-	
+
 	Option<String> eMailOption = StringOptionBuilder.get().//
 		withKey(E_MAIL_OPTION_KEY).//
 		build();
 	addOption(eMailOption);
-	
+
 	Option<String> notificationOption = StringOptionBuilder.get().//
 		withKey(E_MAIL_NOTIFICATIONS_OPTION_KEY).//
 		build();
 	addOption(notificationOption);
+
+	Option<String> asynchDownloadNameOption = StringOptionBuilder.get().//
+		withKey(ASYNCH_DOWNLOAD_NAME_OPTION_KEY).//
+		build();
+	addOption(asynchDownloadNameOption);
+
+	Option<String> bucketOption = StringOptionBuilder.get().//
+		withKey(BUCKET_OPTION_KEY).//
+		build();
+	addOption(bucketOption);
+	
+	Option<String> publicURLOption = StringOptionBuilder.get().//
+		withKey(PUBLIC_URL_OPTION_KEY).//
+		build();
+	addOption(publicURLOption);
     }
 
     /**
@@ -105,18 +123,48 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
 	return getOption(E_MAIL_OPTION_KEY, String.class).get().getValue();
     }
 
-    public String getEmailNotifications() {
-
-	return getOption(E_MAIL_NOTIFICATIONS_OPTION_KEY, String.class).get().getValue();
-    }
-
     public void setEmail(String email) {
 
 	getOption(E_MAIL_OPTION_KEY, String.class).get().setValue(email);
     }
 
+    public String getEmailNotifications() {
+
+	return getOption(E_MAIL_NOTIFICATIONS_OPTION_KEY, String.class).get().getValue();
+    }
+
     public void setEmailNotifications(String notifications) {
 
 	getOption(E_MAIL_NOTIFICATIONS_OPTION_KEY, String.class).get().setValue(notifications);
+    }
+
+    public String getAsynchDownloadName() {
+
+	return getOption(ASYNCH_DOWNLOAD_NAME_OPTION_KEY, String.class).get().getValue();
+    }
+
+    public void setAsynchDownloadName(String name) {
+
+	getOption(ASYNCH_DOWNLOAD_NAME_OPTION_KEY, String.class).get().setValue(name);
+    }
+
+    public String getBucket() {
+
+	return getOption(BUCKET_OPTION_KEY, String.class).get().getValue();
+    }
+
+    public void setBucket(String name) {
+
+	getOption(BUCKET_OPTION_KEY, String.class).get().setValue(name);
+    }
+    
+    public String getPublicURL() {
+
+	return getOption(PUBLIC_URL_OPTION_KEY, String.class).get().getValue();
+    }
+
+    public void setPublicURL(String name) {
+
+	getOption(PUBLIC_URL_OPTION_KEY, String.class).get().setValue(name);
     }
 }

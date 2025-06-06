@@ -505,6 +505,14 @@
 						}
 					},
 					{
+						"name": "aynchDownloadName",
+						"in": "query",
+						"description": "Gives a name to the asynch download, to ease its identification.",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "eMailNotifications",
 						"in": "query",
 						"description": "Send bulk download notifications (start and end) through e-mail.",
@@ -562,7 +570,7 @@
 				}
 			}
 		},
-		"/gs-service/services/essi/token/{token}/view/{view}/om-api/status": {
+		"/gs-service/services/essi/token/{token}/view/{view}/om-api/downloads": {
 			"get": {
 				"description": "Used to retrieve the status of asynchronous operations (i.e., data download)",
 				"parameters": [
@@ -576,18 +584,46 @@
 						}
 					},
 					{
-						"name": "view",
+						"name": "id",
+						"in": "query",
+						"description": "Identifier of the asynchronous download task",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Status",
+						"content": {
+							"application/json": {
+								"examples": {
+									"0": {
+										"value": "{\n    \"operationId\": \"operationId\",\n    \"status\": \"completed\",\n    \"locator\": \"http://my.host/link.to.download.package.zip\"\n}"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"description": "Used to delete a download task",
+				"parameters": [
+					{
+						"name": "token",
 						"in": "path",
 						"required": true,
-						"description": "Identifier of the data subset interesting for the user",
+						"description": "Token identifying the user",
 						"schema": {
 							"type": "string"
 						}
 					},
 					{
-						"name": "operationId",
+						"name": "id",
 						"in": "query",
-						"description": "Identifier of the asynchronous operation",
+								"required": true,
+						"description": "Identifier of the asynchronous download task",
 						"schema": {
 							"type": "string"
 						}
@@ -608,6 +644,7 @@
 					}
 				}
 			}
+		
 		}
 	}
 }
