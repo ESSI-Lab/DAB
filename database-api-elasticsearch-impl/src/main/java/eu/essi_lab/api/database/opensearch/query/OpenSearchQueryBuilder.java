@@ -37,8 +37,8 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.json.JSONArray;
 import org.json.JSONObject;
+import org.locationtech.jts.io.ParseException;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.GeoShapeRelation;
@@ -71,7 +71,6 @@ import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.indexes.SpatialIndexHelper;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent.FrameValue;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.BondOperator;
@@ -79,6 +78,7 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
+import eu.essi_lab.messages.bond.WKT;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
@@ -427,32 +427,23 @@ public class OpenSearchQueryBuilder {
      * @param bond
      * @param count
      * @return
+     * @throws ParseException
      */
     @SuppressWarnings("incomplete-switch")
-    public Query buildGeoShapeQuery(SpatialBond bond, boolean count) {
+    public Query buildGeoShapeQuery(SpatialBond bond, boolean count) throws ParseException {
 
-	JSONObject shape = buildEnvelope(bond);
+	JSONObject shape = buildShapeObject(bond);
 
 	org.opensearch.client.opensearch._types.query_dsl.GeoShapeFieldQuery.Builder shapeBuilder = new GeoShapeFieldQuery.Builder().//
 		shape(JsonData.of(shape.toMap()));
 
 	Query weightedQuery = null;
 
-	SpatialExtent extent = (SpatialExtent) bond.getPropertyValue();
-
-	double w = extent.getWest();
-	double e = extent.getEast();
-
-	String north = String.valueOf(extent.getNorth());
-	String south = String.valueOf(extent.getSouth());
-	String east = String.valueOf(e);
-	String west = String.valueOf(w);
-
-	double area = SpatialIndexHelper.computeArea(//
-		Double.valueOf(west), //
-		Double.valueOf(east), //
-		Double.valueOf(south), //
-		Double.valueOf(north));
+	double area = switch (bond.getPropertyValue()) {
+	case SpatialExtent extent -> GeoShapeUtils.getArea(extent);
+	case WKT wkt -> GeoShapeUtils.getArea(wkt);
+	default -> throw new IllegalArgumentException("Unsupported entity: " + bond.getPropertyValue().getClass().getSimpleName());
+	};
 
 	BondOperator operator = bond.getOperator();
 	switch (operator) {
@@ -1355,30 +1346,18 @@ public class OpenSearchQueryBuilder {
     /**
      * @param bond
      * @return
+     * @throws ParseException
      */
-    private static JSONObject buildEnvelope(SpatialBond bond) {
+    private static JSONObject buildShapeObject(SpatialBond bond) throws ParseException {
 
-	SpatialExtent extent = (SpatialExtent) bond.getPropertyValue();
+	return switch (bond.getPropertyValue()) {
 
-	JSONObject object = new JSONObject();
-	object.put("type", "envelope");
+	case SpatialExtent extent -> GeoShapeUtils.convert(extent);
+	case WKT wkt -> GeoShapeUtils.convert(wkt);
 
-	JSONArray coord = new JSONArray();
+	default -> throw new IllegalArgumentException("Unsupported spatial bond: " + bond.getPropertyValue());
 
-	object.put("coordinates", coord);
-
-	JSONArray nw = new JSONArray();
-	nw.put(extent.getWest());
-	nw.put(extent.getNorth());
-
-	JSONArray se = new JSONArray();
-	se.put(extent.getEast());
-	se.put(extent.getSouth());
-
-	coord.put(nw);
-	coord.put(se);
-
-	return object;
+	};
     }
 
     /**

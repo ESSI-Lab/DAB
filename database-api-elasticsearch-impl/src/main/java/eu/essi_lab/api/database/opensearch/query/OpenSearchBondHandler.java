@@ -26,9 +26,11 @@ package eu.essi_lab.api.database.opensearch.query;
 
 import java.util.HashMap;
 
+import org.locationtech.jts.io.ParseException;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.LogicalBond;
@@ -126,7 +128,14 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     @Override
     public void spatialBond(SpatialBond bond) {
 
-	queryBuilder.append(queryBuilder.buildGeoShapeQuery(bond, count));
+	try {
+	    queryBuilder.append(queryBuilder.buildGeoShapeQuery(bond, count));
+
+	} catch (ParseException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unparsable spatial bond: {}", bond.getPropertyValue());
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
     }
 
     @Override
