@@ -25,10 +25,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.locationtech.jts.io.ParseException;
+
+import eu.essi_lab.lib.geo.BBOXUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
@@ -44,6 +48,7 @@ import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.ViewBond;
+import eu.essi_lab.messages.bond.WKT;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.stats.StatisticsMessage;
@@ -271,13 +276,11 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 		Arrays.asList(String.valueOf(maxFrequencyMapItems)));
 
 	Optional<SortedFields> sortedFields = getSortedFields();
-	sortedFields
-		.ifPresent(d -> 
-		map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_DIRECTION.getName(), Arrays.asList(d.getFields().get(0).getValue().getLabel())));
-	sortedFields
-	.ifPresent(d -> 
-	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_PROPERTY.getName(), Arrays.asList(d.getFields().get(0).getKey().getName())));
-	
+	sortedFields.ifPresent(d -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_DIRECTION.getName(),
+		Arrays.asList(d.getFields().get(0).getValue().getLabel())));
+	sortedFields.ifPresent(d -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_PROPERTY.getName(),
+		Arrays.asList(d.getFields().get(0).getKey().getName())));
+
 	int size = getPage().getSize();
 	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_PAGE_SIZE.getName(), Arrays.asList(String.valueOf(size)));
 
@@ -533,31 +536,55 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
 		    if (b.getProperty() == MetadataElement.BOUNDING_BOX) {
 
-			SpatialExtent extent = (SpatialExtent) b.getPropertyValue();
+			double east = 0;
+			double west = 0;
+			double north = 0;
+			double south = 0;
 
-			double e = extent.getEast();
-			double w = extent.getWest();
-			double n = extent.getNorth();
-			double s = extent.getSouth();
+			switch (b.getPropertyValue()) {
+			case SpatialExtent bbox -> {
 
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_EAST.getName(), Arrays.asList(String.valueOf(extent.getEast())));
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_WEST.getName(), Arrays.asList(String.valueOf(extent.getWest())));
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_SOUTH.getName(),
-				Arrays.asList(String.valueOf(extent.getSouth())));
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_NORTH.getName(),
-				Arrays.asList(String.valueOf(extent.getNorth())));
+			    east = bbox.getEast();
+			    west = bbox.getWest();
+			    north = bbox.getNorth();
+			    south = bbox.getSouth();
+			}
 
-			String se = extent.getSouth() + " " + extent.getEast();
-			String sw = extent.getSouth() + " " + extent.getWest();
-			String ne = extent.getNorth() + " " + extent.getEast();
-			String nw = extent.getNorth() + " " + extent.getWest();
+			case WKT wkt -> {
+
+			    try {
+
+				Map<String, Double> envelope = BBOXUtils.getEnvelope(wkt.getValue());
+
+				east = envelope.get("east");
+				west = envelope.get("west");
+				north = envelope.get("north");
+				south = envelope.get("south");
+
+			    } catch (ParseException e) {
+
+				GSLoggerFactory.getLogger(getClass()).error(e);
+			    }
+			}
+			default -> GSLoggerFactory.getLogger(getClass()).error("Unsupported spatial entity: " + b.getPropertyValue());
+			}
+
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_EAST.getName(), Arrays.asList(String.valueOf(east)));
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_WEST.getName(), Arrays.asList(String.valueOf(west)));
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_SOUTH.getName(), Arrays.asList(String.valueOf(south)));
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_NORTH.getName(), Arrays.asList(String.valueOf(north)));
+
+			String se = south + " " + east;
+			String sw = south + " " + west;
+			String ne = north + " " + east;
+			String nw = north + " " + west;
 
 			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_SW.getName(), Arrays.asList(sw));
 			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_SE.getName(), Arrays.asList(se));
 			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_NE.getName(), Arrays.asList(ne));
 			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_NW.getName(), Arrays.asList(nw));
 
-			String shape = getShape("" + s, "" + e, "" + w, "" + n);
+			String shape = getShape("" + south, "" + east, "" + west, "" + north);
 			if (shape != null) {
 			    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SHAPE.getName(), Arrays.asList(shape));
 			}

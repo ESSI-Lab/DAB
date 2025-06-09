@@ -25,10 +25,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 
+import org.locationtech.jts.io.ParseException;
 import org.slf4j.Logger;
 
+import eu.essi_lab.lib.geo.BBOXUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.bond.Bond;
@@ -40,6 +43,7 @@ import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.ViewBond;
+import eu.essi_lab.messages.bond.WKT;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.model.resource.MetadataElement;
 
@@ -106,7 +110,7 @@ public class GBIFQueryHandler implements DiscoveryBondHandler {
 	case PARENT_IDENTIFIER:
 	    unsupported = false;
 	    break;
-	
+
 	case TITLE:
 	case ABSTRACT:
 	case KEYWORD:
@@ -145,17 +149,38 @@ public class GBIFQueryHandler implements DiscoveryBondHandler {
 
 	if (!bboxFound) {
 
-	    SpatialExtent bbox = (SpatialExtent) b.getPropertyValue();
+	    switch (b.getPropertyValue()) {
+	    case SpatialExtent bbox -> {
 
-	    double east = bbox.getEast();
+		double east = bbox.getEast();
+		double west = bbox.getWest();
+		double north = bbox.getNorth();
+		double south = bbox.getSouth();
 
-	    double west = bbox.getWest();
+		appendToQuery(createBboxKVP(west, east, south, north));
 
-	    double north = bbox.getNorth();
+	    }
+	    case WKT wkt -> {
 
-	    double south = bbox.getSouth();
+		try {
 
-	    appendToQuery(createBboxKVP(west, east, south, north));
+		    Map<String, Double> envelope = BBOXUtils.getEnvelope(wkt.getValue());
+
+		    double east = envelope.get("east");
+		    double west = envelope.get("west");
+		    double north = envelope.get("north");
+		    double south = envelope.get("south");
+
+		    appendToQuery(createBboxKVP(west, east, south, north));
+
+		} catch (ParseException e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+	    }
+	    default -> throw new IllegalArgumentException("Unsupported spatial entity: " + b.getPropertyValue());
+
+	    }
 	}
 
 	bboxFound = true;
