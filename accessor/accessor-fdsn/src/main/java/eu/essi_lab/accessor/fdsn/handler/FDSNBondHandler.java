@@ -1,5 +1,12 @@
 package eu.essi_lab.accessor.fdsn.handler;
 
+import java.util.Map;
+
+import org.locationtech.jts.io.ParseException;
+
+import eu.essi_lab.lib.geo.BBOXUtils;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -33,6 +40,7 @@ import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.ViewBond;
+import eu.essi_lab.messages.bond.WKT;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -107,13 +115,38 @@ public class FDSNBondHandler implements DiscoveryBondHandler {
     @Override
     public void spatialBond(SpatialBond b) {
 
-	SpatialExtent bbox = (SpatialExtent) b.getPropertyValue();
-
 	if (!bboxFound) {
-	    queryString += "minlon=" + bbox.getWest() + "&minlat=" + bbox.getSouth() + "&maxlon=" + bbox.getEast() + "&maxlat="
-		    + bbox.getNorth() + "&";
 
+	    switch (b.getPropertyValue()) {
+	    case SpatialExtent bbox -> {
+
+		queryString += "minlon=" + bbox.getWest() + "&minlat=" + bbox.getSouth() + "&maxlon=" + bbox.getEast() + "&maxlat="
+			+ bbox.getNorth() + "&";
+	    }
+	    case WKT wkt -> {
+
+		try {
+
+		    Map<String, Double> envelope = BBOXUtils.getEnvelope(wkt.getValue());
+
+		    double east = envelope.get("east");
+		    double west = envelope.get("west");
+		    double north = envelope.get("north");
+		    double south = envelope.get("south");
+
+		    queryString += "minlon=" + west + "&minlat=" + south + "&maxlon=" + east + "&maxlat=" + north + "&";
+
+		} catch (ParseException e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+
+	    }
+	    default -> throw new IllegalArgumentException("Unsupported spatial entity: " + b.getPropertyValue());
+
+	    }
 	}
+
 	bboxFound = true;
     }
 
