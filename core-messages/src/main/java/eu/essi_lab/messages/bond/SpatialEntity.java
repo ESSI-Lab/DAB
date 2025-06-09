@@ -29,4 +29,25 @@ package eu.essi_lab.messages.bond;
 public interface SpatialEntity extends Cloneable {
 
     SpatialEntity clone();
+
+    /**
+     * @param wkt
+     * @return
+     */
+    public static WKT of(String wkt) {
+
+	return new WKT(wkt);
+    }
+
+    /**
+     * @param south
+     * @param west
+     * @param north
+     * @param east
+     * @return
+     */
+    public static SpatialExtent of(double south, double west, double north, double east) {
+
+	return new SpatialExtent(south, west, north, east);
+    }
 }
