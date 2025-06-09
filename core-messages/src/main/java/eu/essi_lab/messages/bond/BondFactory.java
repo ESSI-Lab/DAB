@@ -616,7 +616,7 @@ public class BondFactory {
      * @param extent
      * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      */
-    public static SpatialBond createSpatialExtentBond(BondOperator operator, SpatialExtent extent) {
+    public static SpatialBond createSpatialEntityBond(BondOperator operator, SpatialEntity extent) {
 
 	if (operator != BondOperator.BBOX && operator != BondOperator.CONTAINS && operator != BondOperator.INTERSECTS
 		&& operator != BondOperator.DISJOINT) {

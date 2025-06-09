@@ -143,7 +143,7 @@ public class PubSubRequestTransformer extends DiscoveryRequestTransformer {
 		    Double.valueOf(north), //
 		    Double.valueOf(east));//
 
-	    andBond.getOperands().add(BondFactory.createSpatialExtentBond(BondOperator.CONTAINS, extent));
+	    andBond.getOperands().add(BondFactory.createSpatialEntityBond(BondOperator.CONTAINS, extent));
 	}
 
 	if (!kwd.equals("")) {

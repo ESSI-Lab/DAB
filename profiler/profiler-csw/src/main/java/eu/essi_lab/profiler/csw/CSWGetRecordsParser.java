@@ -569,7 +569,7 @@ public class CSWGetRecordsParser {
 	}
 
 	SpatialExtent spatialExtent = new SpatialExtent(s, w, n, e);
-	return BondFactory.createSpatialExtentBond(areaOperator, spatialExtent);
+	return BondFactory.createSpatialEntityBond(areaOperator, spatialExtent);
     }
 
     /**

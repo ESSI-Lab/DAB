@@ -219,7 +219,7 @@ public abstract class WOFRequest {
 	    SpatialExtent extent = new SpatialExtent(s, w, n, e);
 
 	    // we are interested on a specific area
-	    SpatialBond areaBond = BondFactory.createSpatialExtentBond(BondOperator.CONTAINS, extent);
+	    SpatialBond areaBond = BondFactory.createSpatialEntityBond(BondOperator.CONTAINS, extent);
 	    return Optional.of(areaBond);
 
 	} catch (Exception e) {

@@ -41,7 +41,7 @@ public class IdentifierBondParserTest {
      */
     @Test
     public void test3() {
-	Bond bond = BondFactory.createSpatialExtentBond(BondOperator.BBOX, new SpatialExtent(-90, -180, 90, 180));
+	Bond bond = BondFactory.createSpatialEntityBond(BondOperator.BBOX, new SpatialExtent(-90, -180, 90, 180));
 	IdentifierBondHandler parser = new IdentifierBondHandler(bond);
 	Assert.assertFalse(parser.isCanonicalQueryByIdentifiers());
 	Assert.assertTrue(parser.getIdentifiers().isEmpty());
@@ -105,7 +105,7 @@ public class IdentifierBondParserTest {
     public void test8() {
 	Bond bond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, "id1");
 	Bond bond2 = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, "id2");
-	Bond bond3 = BondFactory.createSpatialExtentBond(BondOperator.BBOX, new SpatialExtent(-90, -180, 90, 180));
+	Bond bond3 = BondFactory.createSpatialEntityBond(BondOperator.BBOX, new SpatialExtent(-90, -180, 90, 180));
 	Bond logicalBond = BondFactory.createOrBond(bond, bond2, bond3);
 	IdentifierBondHandler parser = new IdentifierBondHandler(logicalBond);
 	Assert.assertFalse(parser.isCanonicalQueryByIdentifiers());

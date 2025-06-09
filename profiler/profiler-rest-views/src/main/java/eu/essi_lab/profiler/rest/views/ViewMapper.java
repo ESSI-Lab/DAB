@@ -303,7 +303,7 @@ public class ViewMapper {
 		Double east = where.getDouble("east");
 
 		SpatialExtent extent = new SpatialExtent(south, west, north, east);
-		SpatialBond whereBond = BondFactory.createSpatialExtentBond(BondOperator.CONTAINS, extent);
+		SpatialBond whereBond = BondFactory.createSpatialEntityBond(BondOperator.CONTAINS, extent);
 
 		constraints = addInAnd(constraints, whereBond);
 	    }

@@ -962,7 +962,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    Optional<String> spatialOp = parser.getOptionalValue("spatialOp");
 
 	    andBond.getOperands().add(//
-		    BondFactory.createSpatialExtentBond(BondOperator.decode(spatialOp.get()), extent));
+		    BondFactory.createSpatialEntityBond(BondOperator.decode(spatialOp.get()), extent));
 	}
 
 	Optional<String> instrumentTitle = parser.getOptionalValue("instrumentTitle");

@@ -388,7 +388,7 @@ public class FeatureQueryRequestTransformer extends DiscoveryRequestTransformer 
 		    }
 		}
 		if (extent != null) {
-		    operands.add(BondFactory.createSpatialExtentBond(BondOperator.CONTAINS, extent));
+		    operands.add(BondFactory.createSpatialEntityBond(BondOperator.CONTAINS, extent));
 		}
 
 	    } catch (UnsupportedEncodingException e) {

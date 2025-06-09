@@ -138,7 +138,7 @@ public class PostViewWorker extends ViewWorker {
 		    Double north = Double.parseDouble(where.getString("north"));
 		    Double east = Double.parseDouble(where.getString("east"));
 		    SpatialExtent extent = new SpatialExtent(south, west, north, east);
-		    SpatialBond whereBond = BondFactory.createSpatialExtentBond(BondOperator.CONTAINS, extent);
+		    SpatialBond whereBond = BondFactory.createSpatialEntityBond(BondOperator.CONTAINS, extent);
 		    constraints = addInAnd(constraints, whereBond);
 		}
 	    }

@@ -148,7 +148,7 @@ public class ViewTest {
 		"1990-01-01T00:00:00Z"));
 
 	// spatial bond
-	testJAXB(BondFactory.createSpatialExtentBond(BondOperator.CONTAINS, new SpatialExtent(-90, -180, 90, 180)));
+	testJAXB(BondFactory.createSpatialEntityBond(BondOperator.CONTAINS, new SpatialExtent(-90, -180, 90, 180)));
 
 	// logical bond
 	testJAXB(BondFactory.createAndBond());
