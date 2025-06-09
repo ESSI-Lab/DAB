@@ -24,6 +24,8 @@ package eu.essi_lab.profiler.os;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.h2.util.StringUtils;
+
 import eu.essi_lab.lib.what3words.What3Words;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -32,7 +34,7 @@ import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.bond.SpatialEntity;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
 import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
@@ -340,8 +342,9 @@ public abstract class OSParameters {
 	    return createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.PLATFORM_TITLE);
 	}
     };
-    
-    public static final OSParameter INTENDED_OBSERVATION_SPACING = new OSParameter("intendedObservationSpacing", "string", null, "{gs:intendedObservationSpacing}") {
+
+    public static final OSParameter INTENDED_OBSERVATION_SPACING = new OSParameter("intendedObservationSpacing", "string", null,
+	    "{gs:intendedObservationSpacing}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -352,8 +355,9 @@ public abstract class OSParameters {
 	    return createBond(value, MetadataElement.TIME_RESOLUTION_DURATION_8601);
 	}
     };
-    
-    public static final OSParameter AGGREGATION_DURATION = new OSParameter("aggregationDuration", "string", null, "{gs:aggregationDuration}") {
+
+    public static final OSParameter AGGREGATION_DURATION = new OSParameter("aggregationDuration", "string", null,
+	    "{gs:aggregationDuration}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -364,7 +368,7 @@ public abstract class OSParameters {
 	    return createBond(value, MetadataElement.TIME_AGGREGATION_DURATION_8601);
 	}
     };
-    
+
     public static final OSParameter TIME_INTERPOLATION = new OSParameter("timeInterpolation", "string", null, "{gs:timeInterpolation}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -458,7 +462,7 @@ public abstract class OSParameters {
     *
     */
     public static final OSParameter ROSETTA = new OSParameter("rosetta", "string", null, "{gs:rosetta}");
-    
+
     /**
     *
     */
@@ -468,7 +472,7 @@ public abstract class OSParameters {
     *
     */
     public static final OSParameter ONTOLOGY = new OSParameter("ontology", "string", null, "{gs:ontology}");
-    
+
     /**
     *
     */
@@ -513,11 +517,12 @@ public abstract class OSParameters {
 	    return createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.ATTRIBUTE_TITLE);
 	}
     };
-    
+
     /**
     *
     */
-    public static final OSParameter OBSERVED_PROPERTY_URI = new OSParameter("observedPropertyURI", "string", null, "{gs:observedPropertyURI}") {
+    public static final OSParameter OBSERVED_PROPERTY_URI = new OSParameter("observedPropertyURI", "string", null,
+	    "{gs:observedPropertyURI}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -1018,6 +1023,25 @@ public abstract class OSParameters {
     /**
     *
     */
+    public static final OSParameter WKT = new OSParameter("wkt", "wkt", null, "{wkt}") {
+
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+
+		return Optional.empty();
+	    }
+
+	    SpatialBond spatialBond = create(StringUtils.urlDecode(value), relatedValues);
+
+	    return Optional.of(spatialBond);
+	}
+    };
+
+    /**
+    *
+    */
     public static final OSParameter W3W = new OSParameter("w3w", "string", null, "{gs:w3w}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) throws Exception {
@@ -1059,7 +1083,7 @@ public abstract class OSParameters {
 	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.CROP_TYPES, value));
 	}
     };
-    
+
     public static final OSParameter QUANTITY_TYPES = new OSParameter("quantityTypes", "string", null, "{gs:quantityTypes}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -1230,16 +1254,30 @@ public abstract class OSParameters {
      */
     private static SpatialBond create(double south, double west, double north, double east, String... relatedValues) {
 
-	SpatialExtent spatialExtent = new SpatialExtent( //
-		south, //
-		west, //
-		north, //
-		east); //
+	SpatialEntity entity = SpatialEntity.of(south, west, north, east);
 
 	String spatialRelation = relatedValues[0];
 	BondOperator operator = BondOperator.decode(spatialRelation);
 
-	return BondFactory.createSpatialExtentBond(operator, spatialExtent);
+	return BondFactory.createSpatialEntityBond(operator, entity);
+    }
+
+    /**
+     * @param south
+     * @param west
+     * @param north
+     * @param east
+     * @param relatedValues
+     * @return
+     */
+    private static SpatialBond create(String wkt, String... relatedValues) {
+
+	SpatialEntity entity = SpatialEntity.of(wkt);
+
+	String spatialRelation = relatedValues[0];
+	BondOperator operator = BondOperator.decode(spatialRelation);
+
+	return BondFactory.createSpatialEntityBond(operator, entity);
     }
 
     /**
@@ -1296,7 +1334,7 @@ public abstract class OSParameters {
     private static Optional<Bond> createBond(String value, MetadataElement element) {
 	return createBond(BondOperator.EQUAL, value, element);
     }
-    
+
     /**
      * @param value
      * @param element

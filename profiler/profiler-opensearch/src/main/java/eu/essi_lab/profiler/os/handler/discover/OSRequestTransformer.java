@@ -433,7 +433,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		//
 		// spatial
 		//
-		if (osParameter == OSParameters.BBOX || osParameter == OSParameters.W3W) {
+		if (osParameter == OSParameters.BBOX || osParameter == OSParameters.W3W || osParameter == OSParameters.WKT) {
 
 		    String spatialRelation = parser.parse(OSParameters.SPATIAL_RELATION);
 		    bond = osParameter.asBond(value, spatialRelation);
