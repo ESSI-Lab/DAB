@@ -27,16 +27,7 @@ public class SpatialExtent implements SpatialEntity {
     private double south;
     private double east;
     private double north;
-    
     private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     /**
      * No-arg constructor only to be used by JAXB
@@ -45,6 +36,12 @@ public class SpatialExtent implements SpatialEntity {
 
     }
 
+    /**
+     * @param south
+     * @param west
+     * @param north
+     * @param east
+     */
     public SpatialExtent(double south, double west, double north, double east) {
 	this.west = west;
 	this.south = south;
@@ -52,35 +49,83 @@ public class SpatialExtent implements SpatialEntity {
 	this.north = north;
     }
 
+    /**
+     * @return
+     */
+    public String getName() {
+
+	return name;
+    }
+
+    /**
+     * @param name
+     */
+    public void setName(String name) {
+
+	this.name = name;
+    }
+
+    /**
+     * @return
+     */
     public double getWest() {
+
 	return west;
     }
 
+    /**
+     * @param west
+     */
     public void setWest(double west) {
+
 	this.west = west;
     }
 
+    /**
+     * @return
+     */
     public double getSouth() {
+
 	return south;
     }
 
+    /**
+     * @param south
+     */
     public void setSouth(double south) {
+
 	this.south = south;
     }
 
+    /**
+     * @return
+     */
     public double getEast() {
+
 	return east;
     }
 
+    /**
+     * @param east
+     */
     public void setEast(double east) {
+
 	this.east = east;
     }
 
+    /**
+     * @return
+     */
     public double getNorth() {
+
 	return north;
     }
 
+    /**
+     * @param north
+     */
     public void setNorth(double north) {
+
 	this.north = north;
     }
 
@@ -101,14 +146,11 @@ public class SpatialExtent implements SpatialEntity {
     public SpatialExtent clone() {
 
 	return new SpatialExtent(getSouth(), getWest(), getNorth(), getEast());
-
     }
 
     @Override
     public String toString() {
 
 	return "south(" + getSouth() + ")," + "west(" + getWest() + ")," + "north(" + getNorth() + ")," + "east(" + getEast() + ")";
-
     }
-
 }

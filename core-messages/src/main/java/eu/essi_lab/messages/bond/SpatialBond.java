@@ -32,6 +32,7 @@ import eu.essi_lab.model.resource.MetadataElement;
  * @see SpatialEntity
  * @author Fabrizio
  */
+@SuppressWarnings("serial")
 @XmlRootElement
 @XmlSeeAlso(SpatialExtent.class)
 public class SpatialBond extends MetadataElementBond<SpatialEntity> {
