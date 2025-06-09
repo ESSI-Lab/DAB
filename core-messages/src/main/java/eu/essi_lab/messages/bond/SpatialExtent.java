@@ -20,7 +20,9 @@ package eu.essi_lab.messages.bond;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
+/**
+ * @author Fabrizio
+ */
 public class SpatialExtent implements SpatialEntity {
 
     private double west;
@@ -30,10 +32,9 @@ public class SpatialExtent implements SpatialEntity {
     private String name;
 
     /**
-     * No-arg constructor only to be used by JAXB
+     * 
      */
     public SpatialExtent() {
-
     }
 
     /**
@@ -131,15 +132,20 @@ public class SpatialExtent implements SpatialEntity {
 
     @Override
     public boolean equals(Object obj) {
+
 	if (obj instanceof SpatialExtent) {
+
 	    SpatialExtent spatialExtent = (SpatialExtent) obj;
+
 	    double tol = 0.000000001;
+
 	    return Math.abs(getEast() - spatialExtent.getEast()) < tol && //
 		    Math.abs(getNorth() - spatialExtent.getNorth()) < tol && //
 		    Math.abs(getSouth() - spatialExtent.getSouth()) < tol && //
 		    Math.abs(getWest() - spatialExtent.getWest()) < tol;
 	}
-	return super.equals(obj);
+
+	return false;
     }
 
     @Override
