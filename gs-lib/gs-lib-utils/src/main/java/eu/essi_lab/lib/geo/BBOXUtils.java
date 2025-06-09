@@ -1,5 +1,7 @@
 package eu.essi_lab.lib.geo;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -22,14 +24,47 @@ package eu.essi_lab.lib.geo;
  */
 
 import java.util.AbstractMap.SimpleEntry;
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
 public class BBOXUtils {
 
+    /**
+     * @param wkt
+     * @return
+     * @throws ParseException 
+     * @throws Exception
+     */
+    public static Map<String, Double> getEnvelope(String wkt) throws ParseException   {
+	
+	WKTReader reader = new WKTReader();
+	Geometry geometry = reader.read(wkt);
+	Envelope envelope = geometry.getEnvelopeInternal();
+
+	Map<String, Double> bounds = new HashMap<>();
+	
+	bounds.put("west", envelope.getMinX());
+	bounds.put("south", envelope.getMinY());
+	bounds.put("east", envelope.getMaxX());
+	bounds.put("north", envelope.getMaxY());
+	
+	return bounds;
+    }
+
+    /**
+     * @param latLongs
+     * @return
+     */
     public static SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> getBBOX(
 	    List<SimpleEntry<Double, Double>> latLongs) {
+
 	Double south = null;
 	Double north = null;
 	Double minWest = null;
@@ -89,6 +124,10 @@ public class BBOXUtils {
 	return ret;
     }
 
+    /**
+     * @param latLongs
+     * @return
+     */
     public static SimpleEntry<SimpleEntry<BigDecimal, BigDecimal>, SimpleEntry<BigDecimal, BigDecimal>> getBigDecimalBBOX(
 	    List<SimpleEntry<BigDecimal, BigDecimal>> latLongs) {
 	BigDecimal south = null;
