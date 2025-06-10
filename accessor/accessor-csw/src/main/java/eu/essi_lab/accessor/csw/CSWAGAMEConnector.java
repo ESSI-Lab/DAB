@@ -24,53 +24,22 @@ package eu.essi_lab.accessor.csw;
  * #L%
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-
-import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Node;
 
-import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.MDMetadata;
-import eu.essi_lab.iso.datamodel.classes.MIMetadata;
-import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.jaxb.csw._2_0_2.ElementSetName;
 import eu.essi_lab.jaxb.csw._2_0_2.GetRecords;
-import eu.essi_lab.jaxb.csw._2_0_2.QueryType;
-import eu.essi_lab.jaxb.filter._1_1_0.PropertyNameType;
-import eu.essi_lab.jaxb.filter._1_1_0.SortByType;
-import eu.essi_lab.jaxb.filter._1_1_0.SortOrderType;
-import eu.essi_lab.jaxb.filter._1_1_0.SortPropertyType;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
-import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourcePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourceType;
-import net.opengis.iso19139.gmd.v_20060504.MDDigitalTransferOptionsPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDDistributionPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDDistributionType;
-import net.opengis.iso19139.gmd.v_20060504.MDMetadataType;
-import net.opengis.iso19139.gmd.v_20060504.URLPropertyType;
 
 /**
  * @author Roberto
@@ -101,7 +70,7 @@ public class CSWAGAMEConnector extends CSWConnector {
 		//
 		// instead of http://sdi.eea.europa.eu/catalogue/srv/eng/csw-geoss
 		//
-		return "https://catalog.elter.cerit-sc.cz/csw/csw";
+		return "https://dar.elter-ri.eu/csw/csw";
 	    }
 	};
     }
@@ -310,7 +279,7 @@ public class CSWAGAMEConnector extends CSWConnector {
     @Override
     public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
-	if (endpoint.contains("catalog.elter.cerit-sc.cz")) {
+	if (endpoint.contains("catalog.elter.cerit-sc.cz") || endpoint.contains("dar.elter-ri.eu/csw")) {
 	    return super.supports(source);
 	} else {
 	    return false;
