@@ -30,6 +30,7 @@ import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.Optional;
 
+import org.h2.util.StringUtils;
 import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 
@@ -67,6 +68,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 	String requestURL = getSetting().getRequestURL();
 	String operationId = getSetting().getOperationId();
+	operationId = StringUtils.urlEncode(operationId);
 
 	String bucket = getSetting().getBucket();
 	String publicURL = getSetting().getPublicURL();
