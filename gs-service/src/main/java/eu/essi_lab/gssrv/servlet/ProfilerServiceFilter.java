@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+import eu.essi_lab.messages.web.WebRequest;
 
 /**
  * A filter which blocks the request and returns a 404 error code in case the request path owns to a offline profiler
@@ -48,22 +49,38 @@ public class ProfilerServiceFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
 	HttpServletRequest httpRequest = (HttpServletRequest) request;
-	String pathInfo = httpRequest.getPathInfo(); // e.g: /essi/oaipmh
 
-//	boolean isProfilerPath = ConfigurationWrapper.getProfilerSettings().//
-//		stream().//
-//		anyMatch(s -> pathInfo!= null && pathInfo.contains(s.getServicePath()));
+	WebRequest webRequest = new WebRequest(httpRequest, false);
 
-//	if (isProfilerPath && isOffline(pathInfo)) {
-//
-//	    HttpServletResponse httpResponse = (HttpServletResponse) response;
-//	    httpResponse.setStatus(404);
-//
-//	} else {
+	boolean fromPresent = webRequest.readFromHeader().//
+		filter(header -> header.toLowerCase().contains("bingbot") || header.toLowerCase().contains("microsoft")).//
+		isPresent();
 
-	    filterChain.doFilter(request, response);
+	boolean agentPresent = webRequest.readUserAgentHeader().//
+		filter(header -> header.toLowerCase().contains("microsoftpreview")).//
+		isPresent();
+
+	if (fromPresent || agentPresent) {
+
 	    return;
-//	}
+	}
+
+	// String pathInfo = httpRequest.getPathInfo(); // e.g: /essi/oaipmh
+
+	// boolean isProfilerPath = ConfigurationWrapper.getProfilerSettings().//
+	// stream().//
+	// anyMatch(s -> pathInfo!= null && pathInfo.contains(s.getServicePath()));
+
+	// if (isProfilerPath && isOffline(pathInfo)) {
+	//
+	// HttpServletResponse httpResponse = (HttpServletResponse) response;
+	// httpResponse.setStatus(404);
+	//
+	// } else {
+
+	filterChain.doFilter(request, response);
+	return;
+	// }
     }
 
     /**
