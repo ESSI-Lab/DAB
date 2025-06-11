@@ -646,6 +646,22 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	return readHeader("origin");
     }
+    
+    /**
+     * @return
+     */
+    public Optional<String> readUserAgentHeader() {
+
+	return readHeader("user-agent");
+    }
+    
+    /**
+     * @return
+     */
+    public Optional<String> readFromHeader() {
+
+	return readHeader("from");
+    }
 
     /**
      * @return
