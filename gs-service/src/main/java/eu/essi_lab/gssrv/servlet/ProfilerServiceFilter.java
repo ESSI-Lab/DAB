@@ -31,6 +31,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
@@ -61,6 +62,9 @@ public class ProfilerServiceFilter implements Filter {
 		isPresent();
 
 	if (fromPresent || agentPresent) {
+
+	    HttpServletResponse httpResponse = (HttpServletResponse) response;
+	    httpResponse.setStatus(403);
 
 	    return;
 	}
