@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
@@ -220,7 +221,7 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 			    BigDecimal dataValue = new BigDecimal(valueString);
 			    variable.setValue(dataValue);
 
-			    if (quality!=null) {
+			    if (quality != null) {
 				variable.setQualityControlLevelCode(quality.getUri());
 			    }
 			    //
@@ -263,6 +264,7 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 	} catch (Exception e) {
 
 	    ex = e;
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
 	throw GSException.createException(//

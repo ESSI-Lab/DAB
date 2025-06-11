@@ -565,9 +565,8 @@ public class OMHandler extends StreamingRequestHandler {
 
 		}
 	    } catch (Exception ee) {
-		ee.printStackTrace();
-		throw new RuntimeException("Exception writing response");
-
+		GSLoggerFactory.getLogger(getClass()).error(ee);
+		throw new RuntimeException("Exception writing response: {}" + ee.getMessage());
 	    }
 	    // int rest = userSize - tempSize;
 	    // if (rest > 0 && rest < pageSize) {
@@ -872,7 +871,6 @@ public class OMHandler extends StreamingRequestHandler {
 	    String key, //
 	    JSONObject json) throws Exception {
 
-	
 	Path tmpFile = Files.createTempFile(OMHandler.class.getSimpleName(), ".txt");
 
 	FileOutputStream fos = new FileOutputStream(tmpFile.toFile());
