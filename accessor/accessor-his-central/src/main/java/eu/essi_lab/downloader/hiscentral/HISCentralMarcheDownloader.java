@@ -204,16 +204,10 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 			String qualityString = data.optString("quality", "unknown");
 			WML2QualityCategory quality = null;
 			switch (qualityString) {
-			case "unknown":
-			    quality = WML2QualityCategory.UNCHECKED;
-			    break;
-			case "good":
-			    quality = WML2QualityCategory.GOOD;
-			    break;
-			default:
-			    GSLoggerFactory.getLogger(getClass()).error("Unexpected quality flag, the mapping should be updated: {}",
-				    qualityString);
-			    break;
+			case "unknown" -> quality = WML2QualityCategory.UNCHECKED;
+			case "good", "valid" -> quality = WML2QualityCategory.GOOD;
+			default -> GSLoggerFactory.getLogger(getClass()).error("Unexpected quality flag, the mapping should be updated: {}",
+				qualityString);
 			}
 			ValueSingleVariable variable = new ValueSingleVariable();
 
