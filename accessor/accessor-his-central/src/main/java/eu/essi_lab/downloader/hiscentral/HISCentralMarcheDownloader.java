@@ -83,6 +83,7 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 
 	connector = new HISCentralMarcheConnector();
 	downloader = new Downloader();
+	downloader.setRetryPolicy(3, TimeUnit.SECONDS, 30);
     }
 
     @Override
