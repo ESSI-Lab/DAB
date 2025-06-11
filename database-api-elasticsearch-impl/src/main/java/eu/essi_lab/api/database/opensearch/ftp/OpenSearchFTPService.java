@@ -49,10 +49,10 @@ public class OpenSearchFTPService {
 	osStorageInfo.setIdentifier(System.getProperty("dbIdentifier"));
 	osStorageInfo.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol());
 
-	// OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
-	OpenSearchDatabase database = new OpenSearchDatabase();
-	database.initialize(osStorageInfo);
+//	OpenSearchDatabase database = new OpenSearchDatabase();
+//	database.initialize(osStorageInfo);
 
 	DatabaseFTPService service = DatabaseFTPService.get(database, "D:\\Desktop\\FTP\\");
 
