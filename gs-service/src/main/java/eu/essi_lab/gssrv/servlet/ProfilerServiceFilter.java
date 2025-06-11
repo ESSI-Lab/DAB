@@ -58,7 +58,7 @@ public class ProfilerServiceFilter implements Filter {
 		isPresent();
 
 	boolean agentPresent = webRequest.readUserAgentHeader().//
-		filter(header -> header.toLowerCase().contains("microsoftpreview")).//
+		filter(header -> header.toLowerCase().contains("microsoftpreview") || header.toLowerCase().contains("skypeuripreview")).//
 		isPresent();
 
 	if (fromPresent || agentPresent) {
