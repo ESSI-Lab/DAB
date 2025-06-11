@@ -64,7 +64,7 @@ public class ProfilerServiceFilter implements Filter {
 	if (fromPresent || agentPresent) {
 
 	    HttpServletResponse httpResponse = (HttpServletResponse) response;
-	    httpResponse.setStatus(403);
+	    httpResponse.setStatus(404);
 
 	    return;
 	}
