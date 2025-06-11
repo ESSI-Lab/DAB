@@ -139,11 +139,13 @@ public class DataDownloaderTool {
 	BigDecimal size = BigDecimal.ZERO;
 
 	while (firstLoop || resumptionToken != null) {
+
 	    firstLoop = false;
 
 	    GSLoggerFactory.getLogger(getClass()).info("Listing block {}", ++blocks);
 
 	    String listURL = requestURL;
+
 	    if (resumptionToken != null) {
 		listURL = listURL + "&resumptionToken=" + resumptionToken;
 		listURL = listURL.replace("?&", "?");
@@ -161,6 +163,8 @@ public class DataDownloaderTool {
 
 		if (json.has("completed") && json.getBoolean("completed") == false && json.has("resumptionToken")) {
 		    resumptionToken = json.getString("resumptionToken");
+		} else {
+		    resumptionToken = null;
 		}
 
 		if (json.has("member")) {
@@ -243,14 +247,14 @@ public class DataDownloaderTool {
 			    long elapsed = current - last;
 
 			    //
-			    
+
 			    String key = "data-downloads/" + operationId + "-cancel";
 			    HeadObjectResponse metadata = s3wrapper.getObjectMetadata(bucket, key);
-			    if (metadata!=null) {
+			    if (metadata != null) {
 				s3wrapper.deleteObject(bucket, key);
-				return null;			
+				return null;
 			    }
-			    
+
 			    // gives status updates not before 5000 ms
 			    if (elapsed > 5000) {
 
@@ -262,7 +266,7 @@ public class DataDownloaderTool {
 				if (errors > 0) {
 				    errorInfo = " (" + errors + " of them failed)";
 				}
-				msg.put("status", resources + " downloads" + errorInfo + ", " + size+ "MB");
+				msg.put("status", resources + " downloads" + errorInfo + ", " + size + "MB");
 				msg.put("downloadName", downloadName);
 				msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
 				OMHandler.status(s3wrapper, bucket, operationId, msg);
