@@ -29,8 +29,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -46,7 +47,9 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
@@ -56,7 +59,6 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.profiler.om.OMRequest.APIParameters;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class DownloadsHandler extends StreamingRequestHandler {
 
@@ -197,29 +199,52 @@ public class DownloadsHandler extends StreamingRequestHandler {
 
     }
 
+    /**
+     * @param email
+     * @return
+     * @throws Exception
+     */
     private List<JSONObject> getStatuses(String email) throws Exception {
-	ListObjectsV2Response objects = s3wrapper.listObjects("his-central", "data-downloads/" + email);
-	List<JSONObject> ret = new ArrayList<JSONObject>();
-	for (S3Object content : objects.contents()) {
-	    String key = content.key();
-	    if (key.endsWith("-status.json")) {
-		File temp = File.createTempFile("status", ".json");
-		boolean good = s3wrapper.download("his-central", key, temp);
-		if (good) {
-		    String s = Files.readString(temp.toPath());
-		    JSONObject j = new JSONObject(s);
-		    ret.add(j);
-		    temp.delete();
-		} else {
-		    JSONObject s = new JSONObject();
-		    s.put("status", "Error downloading status");
-		    s.put("id", key.replace("data-downloads/", ""));
-		    s.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
-		    ret.add(s);
-		}
 
-	    }
-	}
-	return ret;
+	ListObjectsV2Response objects = s3wrapper.listObjects("his-central", "data-downloads/" + StringUtils.URLEncodeUTF8(email));
+
+	return objects.contents().//
+		parallelStream().//
+		filter(c -> c.key().endsWith("-status.json")).//
+		map(c -> {
+
+		    try {
+
+			JSONObject out = null;
+
+			File temp = File.createTempFile("status", ".json");
+
+			if (s3wrapper.download("his-central", c.key(), temp)) {
+
+			    String s = Files.readString(temp.toPath());
+			    out = new JSONObject(s);
+
+			} else {
+
+			    out = new JSONObject();
+			    out.put("status", "Error downloading status");
+			    out.put("id", c.key().replace("data-downloads/", ""));
+			    out.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+			}
+
+			temp.delete();
+
+			return out;
+
+		    } catch (Exception ex) {
+
+			GSLoggerFactory.getLogger(getClass()).error(ex);
+		    }
+
+		    return null;
+
+		}).filter(Objects::nonNull).//
+
+		collect(Collectors.toList());
     }
 }
