@@ -64,7 +64,8 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    email = getSetting().getEmail();
 	}
 
-	OMDownloadReportsHandler.sendEmail("STARTED", setting, Optional.empty(), email);
+	OMDownloadReportsHandler.sendEmail("STARTED", setting, Optional.empty(), Optional.of(email));
+	OMDownloadReportsHandler.sendEmail("STARTED", setting, Optional.empty(), Optional.empty());
 
 	String requestURL = getSetting().getRequestURL();
 	String operationId = getSetting().getOperationId();
@@ -81,8 +82,10 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	S3TransferWrapper s3wrapper = null;
 
 	if (ConfigurationWrapper.getDownloadSetting().getDownloadStorage() != DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
+	    
 	    s3wrapper = OMHandler.getS3TransferWrapper();
 	}
+	
 	File downloaded = downloader.download(s3wrapper, bucket, requestURL, operationId, asynchDownloadName);
 
 	String locator = null;
@@ -92,6 +95,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	} else {
 
 	    if (downloaded == null) {
+		
 		JSONObject msg = new JSONObject();
 		msg.put("id", operationId);
 		msg.put("status", "Canceled");
@@ -100,9 +104,11 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 		OMHandler.status(s3wrapper, bucket, operationId, msg);
 
-		OMDownloadReportsHandler.sendEmail("CANCELED", setting, Optional.empty(), email);
+		OMDownloadReportsHandler.sendEmail("CANCELED", setting, Optional.empty(), Optional.of(email));
+		OMDownloadReportsHandler.sendEmail("CANCELED", setting, Optional.empty(), Optional.empty());
 
 	    } else {
+		
 		s3wrapper.uploadFile(downloaded.getAbsolutePath(), bucket, "data-downloads/" + fname, "application/zip");
 
 		long sizeInBytes = downloaded.length();
@@ -121,11 +127,10 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 		OMHandler.status(s3wrapper, bucket, operationId, msg);
 
-		OMDownloadReportsHandler.sendEmail("ENDED", setting, Optional.of(locator), email);
-
+		OMDownloadReportsHandler.sendEmail("ENDED", setting, Optional.of(locator), Optional.of(email));
+		OMDownloadReportsHandler.sendEmail("ENDED", setting, Optional.of(locator), Optional.empty());
 	    }
 	}
-
     }
 
     @Override

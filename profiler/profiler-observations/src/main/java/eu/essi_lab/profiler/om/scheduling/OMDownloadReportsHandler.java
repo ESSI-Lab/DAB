@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.om.scheduling;
 
+import java.net.URI;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -25,6 +27,8 @@ import java.util.Optional;
 
 import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting.SchedulingGroup;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.web.KeyValueParser;
 
 /**
  * @author Fabrizio
@@ -45,7 +49,7 @@ public class OMDownloadReportsHandler {
 	    String status, //
 	    OMSchedulerSetting setting, //
 	    Optional<String> locator, //
-	    String userMail) {
+	    Optional<String> userMail) {
 
 	SchedulingGroup group = setting.getGroup();
 
@@ -63,17 +67,58 @@ public class OMDownloadReportsHandler {
 	    builder.append("\n\nZIP file: " + locator.get());
 	}
 
-	// send as well to the user if needed
-	if (userMail != null && userMail.contains("@")) {
+	try {
+	    String requestURL = setting.getRequestURL();
 
-	    ConfiguredGmailClient.sendEmail(subject, builder.toString(), userMail);
+	    KeyValueParser parser = new KeyValueParser(new URI(requestURL).toURL().getQuery());
+
+	    Optional<String> obsProperty = parser.getOptionalValue("observedProperty");
+	    if (obsProperty.isPresent()) {
+
+		builder.append("\n\nObserved property: " + obsProperty.get());
+	    }
+
+	    Optional<String> west = parser.getOptionalValue("west");
+	    Optional<String> south = parser.getOptionalValue("south");
+	    Optional<String> east = parser.getOptionalValue("east");
+	    Optional<String> north = parser.getOptionalValue("north");
+
+	    if (west.isPresent() && south.isPresent() && east.isPresent() && north.isPresent()) {
+
+		builder.append("\n\nSpatial extent (south, west, north, east): ");
+		builder.append(south.get() + ", ");
+		builder.append(west.get() + ", ");
+		builder.append(north.get() + ", ");
+		builder.append(east.get());
+	    }
+
+	    Optional<String> begin = parser.getOptionalValue("beginPosition");
+	    Optional<String> end = parser.getOptionalValue("endPosition");
+
+	    if (begin.isPresent()) {
+
+		builder.append("\n\nBegin time: " + begin.get());
+	    }
+
+	    if (end.isPresent()) {
+
+		builder.append("\n\nEnd time: " + end.get());
+	    }
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(OMDownloadReportsHandler.class).error(e);
+	}
+
+	if (userMail.isPresent()) {
+
+	    ConfiguredGmailClient.sendEmail(subject, builder.toString(), userMail.get());
 
 	} else {
 
 	    builder.append("\n\nRequest URL: " + setting.getRequestURL().replace("http://", "").replace("https://", "") + "\n\n");
-	}
 
-	// send to default recipients
-	ConfiguredGmailClient.sendEmail(subject, builder.toString());
+	    ConfiguredGmailClient.sendEmail(subject, builder.toString());
+	}
     }
 }
