@@ -53,21 +53,27 @@ public class OMDownloadReportsHandler {
 
 	StringBuilder builder = new StringBuilder();
 
-	builder.append("OM asynch download ");
+	builder.append("Bulk download ");
 	builder.append(status.toLowerCase() + "\n\n");
 
-	builder.append("Request URL: " + setting.getRequestURL() + "\n\n");
 	builder.append("Operation ID: " + setting.getOperationId());
 
 	if (locator.isPresent()) {
 
 	    builder.append("\n\nZIP file: " + locator.get());
 	}
-	// send to default recipients
-	ConfiguredGmailClient.sendEmail(subject, builder.toString());
+
 	// send as well to the user if needed
 	if (userMail != null && userMail.contains("@")) {
+
 	    ConfiguredGmailClient.sendEmail(subject, builder.toString(), userMail);
+
+	} else {
+
+	    builder.append("\n\nRequest URL: " + setting.getRequestURL().replace("http://", "").replace("https://", "") + "\n\n");
 	}
+
+	// send to default recipients
+	ConfiguredGmailClient.sendEmail(subject, builder.toString());
     }
 }
