@@ -9,17 +9,15 @@
 	<packaging>pom</packaging>
 
 	<name>Discovery and Access Broker (DAB)</name>
-	<description>The DAB is a brokering software framework for the mediation and
-		harmonization of geospatial data with particular reference to Earth
-		observation data, both satellite and non-satellite. DAB makes it
-		possible to connect heterogeneous data sources and make them
-		discoverable and accessible through homogeneous and standard interfaces
-		by different data user tools and applications. The DAB is capable of
-		implementing data discovery and access functionalities by implementing
-		multiple standard interfaces (e.g. OGC, ISO, ...), and Application
-		Programming Interfaces (API)</description>
+	<description><![CDATA[The DAB is a brokering software framework for the mediation and harmonization of geospatial data with particular reference to Earth observation data, both satellite and non-satellite. DAB makes it possible to connect heterogeneous data sources and make them discoverable and accessible through homogeneous and standard interfaces by different data user tools and applications. The DAB is capable of implementing data discovery and access functionalities by implementing multiple standard interfaces (e.g. OGC, ISO, ...), and Application Programming Interfaces (API)]]></description>
 
 	<url>https://github.com/ESSI-Lab/DAB</url>
+
+	<scm>
+	  <connection>scm:git:git://github.com/ESSI-Lab/DAB.git</connection>
+	  <url>https://github.com/ESSI-Lab/DAB</url>
+	  <tag>HEAD</tag>
+	</scm>
 
 	<organization>
 		<name>Earth &amp; Space Science Informatics-Laboratory (ESSI-Lab) of
@@ -385,6 +383,8 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+		
 
 			<dependency>
 				<groupId>org.apache.parquet</groupId>
@@ -1098,6 +1098,11 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+			      <groupId>org.codehaus.mojo</groupId>
+			      <artifactId>buildnumber-maven-plugin</artifactId>
+			      <version>3.0.0</version>
+			    </plugin>				
 				<plugin>
 					<groupId>org.corpus-tools</groupId>
 					<artifactId>cff-maven-plugin</artifactId>
