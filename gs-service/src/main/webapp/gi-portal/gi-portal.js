@@ -198,7 +198,7 @@ function initializeLogin(config) {
 				title: 'Bulk Downloads Status',
 				modal: true,
 				width: 1310,
-				position: { my: "center", at: "center top+100", of: window },
+				position: { my: "center", at: "center top+150", of: window },
 				classes: {
 					"ui-dialog": "bulk-download-dialog"
 				},
@@ -1125,7 +1125,21 @@ export function initializePortal(config) {
 		//
 		var originalPaginatorWidget = GIAPI.PaginatorWidget;
 		GIAPI.PaginatorWidget = function(id, onResponse, options) {
-			var widget = originalPaginatorWidget(id, onResponse, options);
+			// Create a wrapper for the onResponse callback
+			var wrappedOnResponse = function(response) {
+				// Ensure response is an object before setting _origin
+				if (response && typeof response === 'object') {
+					response._origin = 'paginator';
+				}
+				// Call the original onResponse if it's a function
+				if (typeof onResponse === 'function') {
+					return onResponse(response);
+				}
+				return response;
+			};
+
+			// Create the original widget with our wrapped callback
+			var widget = originalPaginatorWidget(id, wrappedOnResponse, options);
 
 			// Store the original update function
 			var originalUpdate = widget.update;
@@ -1138,6 +1152,9 @@ export function initializePortal(config) {
 				// Check if user is logged in
 				var authToken = localStorage.getItem('authToken');
 				if (authToken) {
+					// Remove any existing download button
+					$('#paginator-widget-top-label .login-button').remove();
+					
 					// Add bulk download button next to results count
 					var downloadButton = $('<button>')
 						.addClass('login-button')
@@ -1434,7 +1451,17 @@ export function initializePortal(config) {
 		// PaginatorWidget instance
 		//
 		GIAPI.search.paginatorWidget = GIAPI.PaginatorWidget('paginator-widget',
-			GIAPI.search.onDiscoverResponse,
+			function(response) {
+				// Ensure response is an object before setting _origin
+				if (response && typeof response === 'object') {
+					response._origin = 'paginator';
+				}
+				// Call the original onDiscoverResponse if it exists
+				if (typeof GIAPI.search.onDiscoverResponse === 'function') {
+					return GIAPI.search.onDiscoverResponse(response);
+				}
+				return response;
+			},
 			{
 				'onPagination': function(action) {
 					GIAPI.UI_Utils.discoverDialog('open');

@@ -60,12 +60,11 @@ public class OMDownloadReportsHandler {
 	builder.append("Bulk download ");
 	builder.append(status.toLowerCase() + "\n\n");
 
+	builder.append("Download name: " + setting.getAsynchDownloadName()+"\n\n");
+
 	builder.append("Operation ID: " + setting.getOperationId());
 
-	if (locator.isPresent()) {
 
-	    builder.append("\n\nZIP file: " + locator.get());
-	}
 
 	try {
 	    String requestURL = setting.getRequestURL();
@@ -108,6 +107,11 @@ public class OMDownloadReportsHandler {
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(OMDownloadReportsHandler.class).error(e);
+	}
+	
+	if (locator.isPresent()) {
+
+	    builder.append("\n\nZIP file: " + locator.get());
 	}
 
 	if (userMail.isPresent()) {

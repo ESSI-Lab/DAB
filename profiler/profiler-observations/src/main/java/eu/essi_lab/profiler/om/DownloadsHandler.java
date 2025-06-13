@@ -206,7 +206,7 @@ public class DownloadsHandler extends StreamingRequestHandler {
      */
     private List<JSONObject> getStatuses(String email) throws Exception {
 
-	ListObjectsV2Response objects = s3wrapper.listObjects("his-central", "data-downloads/" + StringUtils.URLEncodeUTF8(email));
+	ListObjectsV2Response objects = s3wrapper.listObjects("his-central", "data-downloads/" + email);
 
 	return objects.contents().//
 		parallelStream().//
