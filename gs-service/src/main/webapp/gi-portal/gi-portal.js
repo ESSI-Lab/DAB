@@ -1182,6 +1182,9 @@ export function initializePortal(config) {
 							
 							const defaultName = new Date().toISOString().slice(0,16).replace('T', '_').replace(':', '-');
 							
+							// Remove any existing download name input
+							$('#downloadName').remove();
+							
 							nameDiv.append(
 								$('<input>')
 									.attr({
