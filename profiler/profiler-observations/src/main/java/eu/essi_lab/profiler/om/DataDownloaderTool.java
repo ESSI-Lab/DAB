@@ -41,6 +41,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.h2.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -86,7 +87,8 @@ public class DataDownloaderTool {
 
 	try {
 	    zipFile = File.createTempFile(getClass().getSimpleName(), ".zip");
-	    File tempDirFile = FileUtils.createTempDir(operationId, false);
+
+	    File tempDirFile = FileUtils.createTempDir(StringUtils.urlEncode(operationId), false);
 
 	    tempPath = tempDirFile.toPath();
 
