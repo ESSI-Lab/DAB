@@ -69,8 +69,6 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 	String requestURL = getSetting().getRequestURL();
 	String operationId = getSetting().getOperationId();
-	operationId = StringUtils.urlEncode(operationId);
-
 	String bucket = getSetting().getBucket();
 	String publicURL = getSetting().getPublicURL();
 
