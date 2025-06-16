@@ -1352,10 +1352,17 @@ export function initializePortal(config) {
 
 											// Add spatial constraints if they exist
 											if (where) {
-												params.append('west', where.west);
-												params.append('south', where.south);
-												params.append('east', where.east);
-												params.append('north', where.north);
+												if (where.predefinedLayer) {
+													params.append('predefinedLayer', where.predefinedLayer);
+												} 
+												
+												if (where.south && where.west && where.north && where.east)
+												{
+													params.append('west', where.west);
+													params.append('south', where.south);
+													params.append('east', where.east);
+													params.append('north', where.north);
+												}
 											}
 
 											// Add parameter constraint if it exists

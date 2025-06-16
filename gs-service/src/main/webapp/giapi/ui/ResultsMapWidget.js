@@ -492,12 +492,16 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		}
 
 		if (constraints.where) {
-
-			var where = constraints.where;
-			query += 'where=' + where.south + ',' + where.west + ',' + where.north + ',' + where.east + '&';
-
-			var spatialOp = constraints.spatialOp;
-			query += 'spatialOp=' + spatialOp + '&';
+			if (constraints.where.predefinedLayer) {
+				query += 'predefinedLayer=' + constraints.where.predefinedLayer + '&';
+			} 
+			if (constraints.where.south && constraints.where.west && constraints.where.north && constraints.where.east) {
+				var where = constraints.where;
+				query += 'where=' + where.south + ',' + where.west + ',' + where.north + ',' + where.east + '&';
+			}
+				var spatialOp = constraints.spatialOp;
+				query += 'spatialOp=' + spatialOp + '&';
+			
 		}
 
 		if (constraints.ontology) {
