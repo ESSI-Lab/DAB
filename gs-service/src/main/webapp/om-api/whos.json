@@ -113,6 +113,20 @@
 						}
 					},
 					{
+						"name": "spatialRelation",
+						"in": "query",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "predefinedLayer",
+						"in": "query",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "observedProperty",
 						"in": "query",
 						"description": "observed property name or URI",
@@ -274,6 +288,20 @@
 						"in": "query",
 						"schema": {
 							"type": "number"
+						}
+					},
+					{
+						"name": "spatialRelation",
+						"in": "query",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "predefinedLayer",
+						"in": "query",
+						"schema": {
+							"type": "string"
 						}
 					},
 					{

@@ -37,8 +37,8 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialEntity;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
+import eu.essi_lab.pdk.LayerFeatureRetrieval;
 import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
-import eu.essi_lab.profiler.os.OSLayerFeatureRetrieval;
 
 public abstract class OSParameters {
 
@@ -140,7 +140,7 @@ public abstract class OSParameters {
 	    }
 
 	    // Get WKT from layer
-	    String wkt = OSLayerFeatureRetrieval.getInstance().getFeature(value);
+	    String wkt = LayerFeatureRetrieval.getInstance().getFeature(value);
 	    if (wkt != null) {
 		return Optional.of(create(wkt, relatedValues));
 	    }

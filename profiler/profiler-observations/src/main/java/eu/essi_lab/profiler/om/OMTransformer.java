@@ -83,8 +83,9 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 	    message.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	}
 
-	message
-		.setSortedFields(new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER,SortOrder.ASCENDING),new SimpleEntry(MetadataElement.ONLINE_ID,SortOrder.ASCENDING ))));
+	message.setSortedFields(
+		new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING),
+			new SimpleEntry(MetadataElement.ONLINE_ID, SortOrder.ASCENDING))));
 
 	return message;
     }
@@ -142,10 +143,21 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 
 	OMRequest request = new OMRequest(webRequest);
 
+	BondOperator spatialRelation = request.getSpatialRelation();
+	if (spatialRelation == null) {
+	    spatialRelation = BondOperator.INTERSECTS;
+	}
+
 	Optional<SpatialBond> areaBond = request.getSpatialBond();
 	if (areaBond.isPresent()) {
-	    areaBond.get().setOperator(BondOperator.INTERSECTS);
+	    areaBond.get().setOperator(spatialRelation);
 	    operands.add(areaBond.get());
+	}
+	
+	Optional<String> wkt = request.getPredefinedLayer();
+	if (wkt.isPresent()) {
+	    eu.essi_lab.messages.bond.SpatialEntity entity = eu.essi_lab.messages.bond.SpatialEntity.of(wkt.get());
+	    operands.add(BondFactory.createSpatialEntityBond(spatialRelation, entity));
 	}
 
 	Optional<SimpleValueBond> beginBond = request.getBeginBond();
@@ -248,7 +260,7 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 	    String[] split = providerCode.split(",");
 	    for (String s : split) {
 		operands.add(BondFactory.createSourceIdentifierBond(s));
-	    }	    
+	    }
 	}
 
 	switch (operands.size()) {

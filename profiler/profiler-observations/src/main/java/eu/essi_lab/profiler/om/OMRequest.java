@@ -36,6 +36,7 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.pdk.LayerFeatureRetrieval;
 
 /**
  * @author boldrini
@@ -50,8 +51,8 @@ public class OMRequest {
 	ASYNCH_DOWNLOAD_NAME("asynchDownloadName"), //
 	BEGIN_DATE("beginDate", "startDate", "beginTime", "startTime", "begin", "beginPosition"), //
 	END_DATE("endDate", "endTime", "end", "endPosition"), //
-	PLATFORM_CODE("sampledFeature", "feature","featureIdentifier","featureId", "monitoringPoint", "monitoringPointIdentifier", "platform", "platformCode", "site",
-		"location", "siteCode"), //
+	PLATFORM_CODE("sampledFeature", "feature", "featureIdentifier", "featureId", "monitoringPoint", "monitoringPointIdentifier",
+		"platform", "platformCode", "site", "location", "siteCode"), //
 	ONTOLOGY("ontology"), //
 	ID("id"), //
 	OBSERVED_PROPERTY("observedProperty"), //
@@ -60,6 +61,8 @@ public class OMRequest {
 	INTENDED_OBSERVATION_SPACING("intendedObservationSpacing", "timeResolution"), //
 	TIME_INTERPOLATION("timeInterpolation"), //
 	VARIABLE("variable", "varCode", "variableCode"), //
+	SPATIAL_RELATION("spatialRelation"), //
+	PREDEFINED_LAYER("predefinedLayer"), //
 	OBSERVATION("observationIdentifier", "observationId", "observation"), //
 	OUTPUT_PROPERTIES("outputProperties"), //
 	E_MAIL_NOTIFICATIONS("eMailNotifications"), //
@@ -71,9 +74,9 @@ public class OMRequest {
 	SOUTH("south", "ymin", "miny"), //
 	EAST("east", "xmax", "maxx"), //
 	NORTH("north", "ymax", "maxy"), //
-	PROPERTY("property"),//
+	PROPERTY("property"), //
 	RESUMPTION_TOKEN("resumptionToken")
-	
+
 	;
 
 	private String[] keys;
@@ -144,6 +147,36 @@ public class OMRequest {
 	    } catch (Exception e) {
 		throw new IllegalArgumentException("Error reading XML POST body");
 	    }
+	}
+    }
+
+    public BondOperator getSpatialRelation() {
+	String relation = getParameterValue(APIParameters.SPATIAL_RELATION);
+	if (relation==null) {
+	    return null;
+	}
+	switch (relation.toLowerCase()) {
+	case "contain":
+	case "contains":
+	    return BondOperator.CONTAINS;
+	case "intersect":
+	case "intersects":
+	    return BondOperator.INTERSECTS;
+	default:
+	    return null;
+	}
+    }
+
+    public Optional<String> getPredefinedLayer() {
+	String pred = getParameterValue(APIParameters.PREDEFINED_LAYER);
+	if (pred == null || pred.isEmpty()) {
+	    return Optional.empty();
+	}
+	String wkt = LayerFeatureRetrieval.getInstance().getFeature(pred);
+	if (wkt != null) {
+	    return Optional.of(wkt);
+	}else {
+	    return Optional.empty();
 	}
     }
 
