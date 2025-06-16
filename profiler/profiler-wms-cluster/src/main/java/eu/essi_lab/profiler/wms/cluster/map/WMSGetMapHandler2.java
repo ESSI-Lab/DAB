@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -94,6 +93,7 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.CRSUtils;
+import eu.essi_lab.pdk.LayerFeatureRetrieval;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
@@ -991,7 +991,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    MetadataElement.OBSERVED_PROPERTY_URI, //
 		    observedPropertyURI.get()));
 	}
-	
+
 	Optional<String> intendedObservationSpacing = parser.getOptionalValue("intendedObservationSpacing");
 	if (intendedObservationSpacing.isPresent() && !intendedObservationSpacing.get().equals(KeyValueParser.UNDEFINED)) {
 
@@ -1000,7 +1000,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    MetadataElement.TIME_RESOLUTION_DURATION_8601, //
 		    intendedObservationSpacing.get()));
 	}
-	
+
 	Optional<String> timeInterpolation = parser.getOptionalValue("timeInterpolation");
 	if (timeInterpolation.isPresent() && !timeInterpolation.get().equals(KeyValueParser.UNDEFINED)) {
 
@@ -1009,7 +1009,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    MetadataElement.TIME_INTERPOLATION, //
 		    timeInterpolation.get()));
 	}
-	
+
 	Optional<String> aggregationDuration = parser.getOptionalValue("aggregationDuration");
 	if (aggregationDuration.isPresent() && !aggregationDuration.get().equals(KeyValueParser.UNDEFINED)) {
 
@@ -1017,6 +1017,17 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    BondOperator.EQUAL, //
 		    MetadataElement.TIME_AGGREGATION_DURATION_8601, //
 		    aggregationDuration.get()));
+	}
+
+	Optional<String> predefinedLayer = parser.getOptionalValue("predefinedLayer");
+	if (predefinedLayer.isPresent() && !predefinedLayer.get().equals(KeyValueParser.UNDEFINED)) {
+	    // Get WKT from layer
+	    String wkt = LayerFeatureRetrieval.getInstance().getFeature(predefinedLayer.get());
+	    if (wkt != null) {
+		Optional<String> spatialOp = parser.getOptionalValue("spatialOp");
+		eu.essi_lab.messages.bond.SpatialEntity entity = eu.essi_lab.messages.bond.SpatialEntity.of(wkt);
+		andBond.getOperands().add(BondFactory.createSpatialEntityBond(BondOperator.decode(spatialOp.get()), entity));
+	    }
 	}
 
 	Optional<String> isValidated = parser.getOptionalValue("isValidated");
