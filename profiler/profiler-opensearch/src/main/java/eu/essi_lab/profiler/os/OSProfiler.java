@@ -98,7 +98,9 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 	EIFFEL_USEFILTER_API_CACHE("eiffelUseFilterAPICache"), //
 	EIFFEL_USE_MERGED_IDS_CACHE("eiffelUseMergedIdsCache"), //
 	EIFFEL_API_MAX_SORT_IDENTIFIERS("eiffelAPIMaxSortIdentifiers"), //
-	EIFFEL_FILTER_AND_SORT_SPLIT_TRESHOLD("eiffelFilterAndSortSplitTreshold"); //
+	EIFFEL_FILTER_AND_SORT_SPLIT_TRESHOLD("eiffelFilterAndSortSplitTreshold"), //
+
+	PREDEFINED_LAYER("predefinedLayer"); //
 
 	private String name;
 

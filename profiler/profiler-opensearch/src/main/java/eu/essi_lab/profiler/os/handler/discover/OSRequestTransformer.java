@@ -453,7 +453,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			osParameter != OSParameters.ATTRIBUTE_TITLE && //
 			osParameter != OSParameters.SOURCES) {
 
-		    bond = osParameter.asBond(value);
+		    String spatialRelation = parser.parse(OSParameters.SPATIAL_RELATION);
+		    bond = osParameter.asBond(value,spatialRelation);
 		}
 
 	    } catch (Exception ex) {

@@ -94,6 +94,10 @@ public class DataFormat implements Serializable {
     public static DataFormat DAS() {
 	return new DataFormat(FormatType.DAS);
     }
+    
+    public static DataFormat WKT() {
+	return new DataFormat(FormatType.WKT);
+    }
 
     public enum FormatType {
 	WATERML, //
@@ -112,6 +116,7 @@ public class DataFormat implements Serializable {
 	RDB, //
 	DDS, //
 	DAS, //
+	WKT, //
 	O_M;
 
 	private FormatType parent = null;
@@ -216,6 +221,8 @@ public class DataFormat implements Serializable {
 	    ret.setType(FormatType.IMAGE_TIFF);
 	} else if (identifier.toLowerCase().contains("dds")) {
 	    ret.setType(FormatType.DDS);
+	} else if (identifier.toLowerCase().contains("wkt")) {
+	    ret.setType(FormatType.WKT);
 	} else if (identifier.toLowerCase().contains("das")) {
 	    ret.setType(FormatType.DAS);
 	}
@@ -271,4 +278,6 @@ public class DataFormat implements Serializable {
 
 	return getIdentifier();
     }
+
+
 }

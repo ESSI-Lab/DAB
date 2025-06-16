@@ -172,7 +172,28 @@ public class ShapeMapper extends FileIdentifierMapper {
 
 	    handler.addReport(report);
 
-	    handler.addReport(report);
+	    DataComplianceReport report2 = new DataComplianceReport(metadataId, null);
+	    DataDescriptor desc2 = new DataDescriptor();
+	    desc2.setCRS(CRS.EPSG_4326());
+	    desc2.setDataFormat(DataFormat.WKT());
+	    desc2.setDataType(DataType.VECTOR);
+	    desc2.setEPSG4326SpatialDimensions(north.doubleValue(), east.doubleValue(), south.doubleValue(), west.doubleValue());
+	    report2.setDescriptors(desc2 , desc2);
+
+	    report2.setTargetComplianceLevel(DataComplianceLevel.VECTOR_BASIC_DATA_COMPLIANCE);
+	    report2.setLastSucceededTest(DataComplianceTest.EXECUTION);
+	    report2.setTargetTest(DataComplianceTest.EXECUTION);
+
+	    report2.setDownloadable(true);
+	    report2.setDownloadTime(1000);
+
+	    ValidationMessage validationMessage2 = new ValidationMessage();
+	    validationMessage2.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
+
+	    report2.setExecutionResult(validationMessage2);
+	    report2.setExecutionTime(1000);
+	    
+	    handler.addReport(report2);
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}

@@ -38,6 +38,7 @@ import eu.essi_lab.messages.bond.SpatialEntity;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
 import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
+import eu.essi_lab.profiler.os.OSLayerFeatureRetrieval;
 
 public abstract class OSParameters {
 
@@ -127,6 +128,24 @@ public abstract class OSParameters {
 	    }
 
 	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, value));
+	}
+    };
+    
+    public static final OSParameter PREDEFINED_LAYER = new OSParameter("predefinedLayer", "string", null, "{gs:predefinedLayer}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    // Get WKT from layer
+	    String wkt = OSLayerFeatureRetrieval.getInstance().getFeature(value);
+	    if (wkt != null) {
+		return Optional.of(create(wkt, relatedValues));
+	    }
+
+	    return Optional.empty();
 	}
     };
 
@@ -1270,7 +1289,7 @@ public abstract class OSParameters {
      * @param relatedValues
      * @return
      */
-    private static SpatialBond create(String wkt, String... relatedValues) {
+    public static SpatialBond create(String wkt, String... relatedValues) {
 
 	SpatialEntity entity = SpatialEntity.of(wkt);
 

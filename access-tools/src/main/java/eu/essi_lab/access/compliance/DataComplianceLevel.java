@@ -65,6 +65,22 @@ public enum DataComplianceLevel {
 		    new BooleanCapabilityElement(PresenceType.ANY), //
 		    new BooleanCapabilityElement(PresenceType.ANY))),
 	    "GRID-B"),
+    
+    
+    VECTOR_BASIC_DATA_COMPLIANCE(ProcessorCapabilities.create(//
+	    CapabilityElement.anyFromDataType(DataType.VECTOR), //
+	    CapabilityElement.anyFromCRS(CRS.EPSG_4326()), //
+	    CapabilityElement.anyFromDataFormat(DataFormat.WKT()), //
+	    new SubsettingCapability(//
+		    new BooleanCapabilityElement(PresenceType.ANY), //
+		    new BooleanCapabilityElement(PresenceType.ANY), //
+		    new BooleanCapabilityElement(PresenceType.ANY)), //
+
+	    new ResamplingCapability(//
+		    new BooleanCapabilityElement(PresenceType.ANY), //
+		    new BooleanCapabilityElement(PresenceType.ANY), //
+		    new BooleanCapabilityElement(PresenceType.ANY))),
+	    "VECTOR-A"),
     /**
      * Data compliance level properties and operations:
      * <ul>
@@ -240,6 +256,11 @@ public enum DataComplianceLevel {
 	    return Arrays.asList(//
 		    DataComplianceLevel.TIME_SERIES_BASIC_DATA_COMPLIANCE, //
 		    DataComplianceLevel.TIME_SERIES_DATA_COMPLIANCE_1);
+	    
+	case VECTOR:
+
+	    return Arrays.asList(//
+		    DataComplianceLevel.VECTOR_BASIC_DATA_COMPLIANCE);
 
 	default:
 	    throw new IllegalArgumentException("Data type " + type + " not supported yet");
@@ -261,6 +282,8 @@ public enum DataComplianceLevel {
     public static DataComplianceLevel fromLabel(String complianceLevel) {
 
 	switch (complianceLevel) {
+	case "VECTOR-A":
+	    return DataComplianceLevel.VECTOR_BASIC_DATA_COMPLIANCE;
 	case "GRID-B":
 	    return DataComplianceLevel.GRID_BASIC_DATA_COMPLIANCE;
 	case "GRID-1":
