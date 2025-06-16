@@ -673,13 +673,15 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	 * @return {BBox}
 	 */
 	widget.where = function() {
-
 		if (!olMap.selectionVisible()) {
-
 			return null;
 		}
 
-		return _inputControl.where(true);
+		var where = _inputControl.where(true);
+		if (options.value && options.value.predefinedLayer) {
+			where.predefinedLayer = options.value.predefinedLayer;
+		}
+		return where;
 	};
 
 

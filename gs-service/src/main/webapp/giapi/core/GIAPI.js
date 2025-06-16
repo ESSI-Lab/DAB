@@ -131,16 +131,32 @@ export const GIAPI = {
 
 		var where = !constraints ? '' : constraints.where || '';
 
+
+		var bbox = "";
+		var predefinedLayer = "";
 		// bounding box
 		// (this API likes lat,lon while the OpenSearch service returns lon,lat)
-		if (Array.prototype.isArray(where)) {
-			var tmp = '';
-			for (var i = 0; i < where.length; i++) {
-				tmp += where[i].west + ',' + where[i].south + ',' + where[i].east + ',' + where[i].north + '_';
+
+		if (where) {
+			if (where.predefinedLayer) {
+				predefinedLayer = where.predefinedLayer;
 			}
-			where = tmp.substring(0, tmp.length - 1);
-		} else if (where) {
-			where = where.west + ',' + where.south + ',' + where.east + ',' + where.north;
+			
+			if (Array.prototype.isArray(where)) {
+				if (typeof where[0].west !== 'undefined' && !Number.isNaN(where[0].west) &&
+				 typeof where[0].south !== 'undefined' && !Number.isNaN(where[0].south) && 
+				 typeof where[0].east !== 'undefined' && !Number.isNaN(where[0].east) && 
+				 typeof where[0].north !== 'undefined' && !Number.isNaN(where[0].north)) {
+					bbox = where.west + ',' + where.south + ',' + where.east + ',' + where.north;
+				}
+			} else {
+				if (typeof where.west !== 'undefined' && !Number.isNaN(where.west) &&
+				 typeof where.south !== 'undefined' && !Number.isNaN(where.south) && 
+				 typeof where.east !== 'undefined' && !Number.isNaN(where.east) && 
+				 typeof where.north !== 'undefined' && !Number.isNaN(where.north)) {
+					bbox = where.west + ',' + where.south + ',' + where.east + ',' + where.north;
+				}
+			}
 		}
 
 		// time start and time end
@@ -484,7 +500,8 @@ export const GIAPI = {
 
 
 		httpGet += 'searchFields=' + sf + '&';
-		httpGet += 'bbox=' + where + '&';
+		httpGet += 'bbox=' + bbox + '&';
+		httpGet += 'predefinedLayer=' + predefinedLayer + '&';
 		httpGet += 'rel=' + spatialRel + '&';
 		httpGet += 'tf=' + termFrequency + '&';
 		httpGet += 'ts=' + when_from + '&';

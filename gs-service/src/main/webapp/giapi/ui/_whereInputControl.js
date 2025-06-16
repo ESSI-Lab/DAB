@@ -372,9 +372,12 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 					if (shapeLayer!=null){
 							resultsMapWidget.removeLayers(shapeLayer);
 						}
+						options.value.predefinedLayer = null;
 						shapeLayer = null;
+						
 					return;
 				}
+				options.value.predefinedLayer = layer.name;
 				$('#layerSelectorTable td').removeClass('highlighted');
         
 				$('#' + rowId + ' > td').addClass('highlighted');
