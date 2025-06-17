@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -269,8 +270,11 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 			rootLayer.setTitle("GI-suite root layer");
 			cap.setLayer(rootLayer);
 			rootLayer.getCRS().add(CRS.EPSG_4326().getIdentifier());
-
-			List<GSResource> resources = response.getResultsList();
+			
+			List<GSResource> resources = response.getResultsList().stream().
+			sorted((r1,r2) -> r1.getHarmonizedMetadata().getCoreMetadata().getTitle().compareTo(r2.getHarmonizedMetadata().getCoreMetadata().getTitle())).
+			collect(Collectors.toList());
+			
 			for (GSResource resource : resources) {
 				ReportsMetadataHandler handler = new ReportsMetadataHandler(resource);
 				List<DataComplianceReport> reports = handler.getReports();
