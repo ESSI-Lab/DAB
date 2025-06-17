@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import eu.essi_lab.access.DataValidatorErrorCode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -60,6 +61,8 @@ public class LayerFeatureRetrieval {
     public String getFeature(String layerName) {
 	try {
 
+	    layerName = StringUtils.URLDecodeUTF8(layerName);
+	    
 	    DataDescriptor targetDescriptor = new DataDescriptor();	    
 	    targetDescriptor.setDataType(DataType.VECTOR);
 	    targetDescriptor.setCRS(CRS.EPSG_4326());
@@ -78,7 +81,7 @@ public class LayerFeatureRetrieval {
 		throw new IllegalArgumentException(DataValidatorErrorCode.DECODING_ERROR.toString());
 	    }
 
-	} catch (GSException e) {
+	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error retrieving WKT for layer {}: {}", layerName, e.getMessage());
 	    return null;
 	}
