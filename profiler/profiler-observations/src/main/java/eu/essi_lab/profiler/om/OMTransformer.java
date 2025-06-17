@@ -145,7 +145,7 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 
 	BondOperator spatialRelation = request.getSpatialRelation();
 	if (spatialRelation == null) {
-	    spatialRelation = BondOperator.INTERSECTS;
+	    spatialRelation = BondOperator.CONTAINS;
 	}
 
 	Optional<SpatialBond> areaBond = request.getSpatialBond();
