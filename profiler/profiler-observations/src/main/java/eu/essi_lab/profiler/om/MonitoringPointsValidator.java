@@ -31,7 +31,6 @@ public class MonitoringPointsValidator implements WebRequestValidator {
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
-	String path = request.getRequestPath();
 	ValidationMessage message = new ValidationMessage();
 	message.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
 	return message ;
