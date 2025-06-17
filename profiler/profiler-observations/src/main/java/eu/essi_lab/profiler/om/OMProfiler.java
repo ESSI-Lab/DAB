@@ -74,13 +74,11 @@ public class OMProfiler extends Profiler<OMProfilerSetting> {
 	// PROPERTIES
 	////////////////////
 	selector.register(new PropertiesFilter(), new PropertiesHandler());
-	
+
 	////////////////////
 	// DOWNLOADS
 	////////////////////
 	selector.register(new DownloadsFilter(), new DownloadsHandler());
-
-
 
 	return selector;
     }
@@ -96,16 +94,14 @@ public class OMProfiler extends Profiler<OMProfilerSetting> {
     @Override
     protected Response onValidationFailed(WebRequest request, ValidationMessage validationMessage) {
 
-	String errorCode = validationMessage.getErrorCode();
-
-	return error(errorCode);
-
-    }
-
-    private Response error(String message) {
 	JSONObject json = new JSONObject();
-	json.put("message", message);
-	return Response.status(500).type(MediaType.APPLICATION_JSON).entity(json.toString()).build();
+
+	json.put("message", validationMessage.getError());
+	json.put("error", validationMessage.getErrorCode());
+
+	return Response.status(Integer.valueOf(validationMessage.getErrorCode())).//
+		type(MediaType.APPLICATION_JSON).//
+		entity(json.toString()).build();
     }
 
     @Override

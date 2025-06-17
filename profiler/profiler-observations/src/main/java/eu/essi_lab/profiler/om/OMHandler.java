@@ -159,6 +159,7 @@ public class OMHandler extends StreamingRequestHandler {
 
 	    message.setResult(ValidationResult.VALIDATION_FAILED);
 	    message.setError("Result window is too large, offset + limit must be less than or equal to: 10000 but was " + (limit + offset));
+	    message.setErrorCode("400");
 	}
 
 	return message;
