@@ -35,6 +35,7 @@ import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ReducedDiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.bond.parser.ParentIdBondHandler;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -65,15 +66,15 @@ public class CWICCMRGranulesConnector extends CMRIDNGranulesConnector<CWICCMRGra
 
 	DiscoveryCountResponse countResponse = new DiscoveryCountResponse();
 
-	String parentid = getParentId(message);
+	Optional<String> parentid = ParentIdBondHandler.readParentId(message);
 
-	logger.trace("CWIC Parent id {}", parentid);
-
-	Optional<GSResource> parent = message.getParentGSResource(parentid);
+	Optional<GSResource> parent = parentid.isPresent() ? message.getParentGSResource(parentid.get()) : Optional.empty();
 
 	Integer matches = 0;
 
 	if (parent.isPresent()) {
+
+	    logger.trace("CWIC Parent id {}", parentid);
 
 	    GSResource parentGSResource = parent.get();
 
@@ -160,15 +161,15 @@ public class CWICCMRGranulesConnector extends CMRIDNGranulesConnector<CWICCMRGra
 
 	logger.trace("Received second-level query for CWIC");
 
-	String parentid = getParentId(message);
+	Optional<String> parentid = ParentIdBondHandler.readParentId(message);
 
-	logger.trace("CWIC Parent id {}", parentid);
-
-	Optional<GSResource> parent = message.getParentGSResource(parentid);
+	Optional<GSResource> parent = parentid.isPresent() ? message.getParentGSResource(parentid.get()) : Optional.empty();
 
 	List<OriginalMetadata> omList = new ArrayList<>();
 
 	if (parent.isPresent()) {
+
+	    logger.trace("CWIC Parent id {}", parentid);
 
 	    GSResource parentGSResource = parent.get();
 

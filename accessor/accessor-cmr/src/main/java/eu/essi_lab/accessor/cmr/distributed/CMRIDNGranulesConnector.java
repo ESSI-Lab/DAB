@@ -78,21 +78,6 @@ public class CMRIDNGranulesConnector<S extends CMRIDNGranulesConnectorSetting> e
     public CMRIDNGranulesConnector() {
     }
 
-    protected String getParentId(ReducedDiscoveryMessage message) throws GSException {
-
-	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getReducedBond());
-
-	ParentIdBondHandler parentIdBondHandler = new ParentIdBondHandler();
-
-	bondParser.parse(parentIdBondHandler);
-
-	if (!parentIdBondHandler.isParentIdFound())
-	    throw GSException.createException(getClass(), "No Parent Identifier specified to cmr second-level search", null,
-		    ErrorInfo.ERRORTYPE_CLIENT, ErrorInfo.SEVERITY_ERROR, CMRIDN_GRANULES_NO_PARENT_ERR_ID);
-
-	return parentIdBondHandler.getParentValue();
-    }
-
     // Optional<String> readSearchUrlFromParent(GSResource parentGSResource) {
     //
     // try {
@@ -165,15 +150,15 @@ public class CMRIDNGranulesConnector<S extends CMRIDNGranulesConnectorSetting> e
 
 	DiscoveryCountResponse countResponse = new DiscoveryCountResponse();
 
-	String parentid = getParentId(message);
+	Optional<String> parentid = ParentIdBondHandler.readParentId(message);
 
-	GSLoggerFactory.getLogger(getClass()).trace("CWIC Parent id {}", parentid);
-
-	Optional<GSResource> parent = message.getParentGSResource(parentid);
+	Optional<GSResource> parent = parentid.isPresent() ? message.getParentGSResource(parentid.get()) : Optional.empty();
 
 	Integer matches = 0;
 
 	if (parent.isPresent()) {
+
+	    GSLoggerFactory.getLogger(getClass()).trace("CWIC Parent id {}", parentid);
 
 	    GSResource parentGSResource = parent.get();
 
@@ -346,7 +331,7 @@ public class CMRIDNGranulesConnector<S extends CMRIDNGranulesConnectorSetting> e
 
     }
 
-    protected Integer count(HttpResponse response) throws GSException {
+    protected Integer count(HttpResponse<InputStream> response) throws GSException {
 
 	XMLDocumentReader reader = createResponseReader(response);
 
@@ -438,15 +423,15 @@ public class CMRIDNGranulesConnector<S extends CMRIDNGranulesConnectorSetting> e
 
 	GSLoggerFactory.getLogger(getClass()).trace("Received second-level query for cmr");
 
-	String parentid = getParentId(message);
+	Optional<String> parentid = ParentIdBondHandler.readParentId(message);
 
-	GSLoggerFactory.getLogger(getClass()).trace("CMRIDN Parent id {}", parentid);
-
-	Optional<GSResource> parent = message.getParentGSResource(parentid);
+	Optional<GSResource> parent = parentid.isPresent() ? message.getParentGSResource(parentid.get()) : Optional.empty();
 
 	List<OriginalMetadata> omList = new ArrayList<>();
 
 	if (parent.isPresent()) {
+
+	    GSLoggerFactory.getLogger(getClass()).trace("CMRIDN Parent id {}", parentid);
 
 	    GSResource parentGSResource = parent.get();
 
@@ -485,7 +470,7 @@ public class CMRIDNGranulesConnector<S extends CMRIDNGranulesConnectorSetting> e
 
 		// return Optional.ofNullable(template.getRequestURL());
 
-		HttpResponse response = retrieve(message, page, dataCenter, shortName, url);
+		HttpResponse<InputStream> response = retrieve(message, page, dataCenter, shortName, url);
 
 		GSLoggerFactory.getLogger(getClass()).trace("Extracting CMRIDN original metadata");
 

@@ -86,17 +86,6 @@ public class FEDEOGranulesConnector extends DistributedQueryConnector<FEDEOGranu
 
     }
 
-    String readParentId(ReducedDiscoveryMessage message) throws GSException {
-
-	return ParentIdBondHandler.readParentId(message).orElseThrow(() -> GSException.createException(//
-		getClass(), //
-		"No parent id found", //
-		null, //
-		ErrorInfo.ERRORTYPE_INTERNAL, //
-		ErrorInfo.SEVERITY_ERROR, //
-		"FEDEO_GRANULES_CONNECTOR_PARENT_ID_NOT_FOUND"));
-    }
-
     Optional<String> readSearchUrlFromParent(GSResource parentGSResource) {
 
 	return parentGSResource.getExtensionHandler().getFEDEOSecondLevelInfo();
@@ -114,15 +103,15 @@ public class FEDEOGranulesConnector extends DistributedQueryConnector<FEDEOGranu
 
 	DiscoveryCountResponse countResponse = new DiscoveryCountResponse();
 
-	String parentid = readParentId(message);
+	Optional<String> parentid = ParentIdBondHandler.readParentId(message);
 
-	GSLoggerFactory.getLogger(getClass()).trace("FEDEO Parent id {}", parentid);
-
-	Optional<GSResource> parent = message.getParentGSResource(parentid);
+	Optional<GSResource> parent = parentid.isPresent() ? message.getParentGSResource(parentid.get()) : Optional.empty();
 
 	Integer matches = 0;
 
 	if (parent.isPresent()) {
+
+	    GSLoggerFactory.getLogger(getClass()).trace("FEDEO Parent id {}", parentid);
 
 	    GSResource parentGSResource = parent.get();
 
@@ -331,15 +320,15 @@ public class FEDEOGranulesConnector extends DistributedQueryConnector<FEDEOGranu
 
 	GSLoggerFactory.getLogger(getClass()).trace("Received second-level query for FEDEO");
 
-	String parentid = readParentId(message);
+	Optional<String> parentid = ParentIdBondHandler.readParentId(message);
 
-	GSLoggerFactory.getLogger(getClass()).trace("FEDEO Parent id {}", parentid);
-
-	Optional<GSResource> parent = message.getParentGSResource(parentid);
+	Optional<GSResource> parent = parentid.isPresent() ? message.getParentGSResource(parentid.get()) : Optional.empty();
 
 	List<OriginalMetadata> omList = new ArrayList<>();
 
 	if (parent.isPresent()) {
+
+	    GSLoggerFactory.getLogger(getClass()).trace("FEDEO Parent id {}", parentid);
 
 	    GSResource parentGSResource = parent.get();
 

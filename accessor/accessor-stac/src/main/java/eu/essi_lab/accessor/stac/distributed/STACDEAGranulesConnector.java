@@ -87,15 +87,15 @@ public class STACDEAGranulesConnector extends DistributedQueryConnector<STACGran
 
 	DiscoveryCountResponse countResponse = new DiscoveryCountResponse();
 
-	String parentid = getParentId(message);
+	Optional<String> parentid = ParentIdBondHandler.readParentId(message);
 
-	logger.trace("STAC Parent id {}", parentid);
-
-	Optional<GSResource> parent = message.getParentGSResource(parentid);
+	Optional<GSResource> parent = parentid.isPresent() ? message.getParentGSResource(parentid.get()) : Optional.empty();
 
 	Integer matches = 0;
 
 	if (parent.isPresent()) {
+
+	    logger.trace("STAC Parent id {}", parentid);
 
 	    GSResource parentGSResource = parent.get();
 
@@ -112,7 +112,7 @@ public class STACDEAGranulesConnector extends DistributedQueryConnector<STACGran
 
 	    logger.trace("STAC Parent Node id {}", collectionID);
 
-	    HttpResponse response = retrieve(message, countPage(), collectionID);
+	    HttpResponse<InputStream> response = retrieve(message, countPage(), collectionID);
 
 	    logger.trace("Extracting count of node {}", collectionID);
 
@@ -136,13 +136,13 @@ public class STACDEAGranulesConnector extends DistributedQueryConnector<STACGran
 
 	logger.trace("Received second-level query for STAC");
 
-	String parentid = getParentId(message);
+	Optional<String> parentid = ParentIdBondHandler.readParentId(message);
 
-	logger.trace("STAC Parent id {}", parentid);
-
-	Optional<GSResource> parent = message.getParentGSResource(parentid);
+	Optional<GSResource> parent = parentid.isPresent() ? message.getParentGSResource(parentid.get()) : Optional.empty();
 
 	if (parent.isPresent()) {
+
+	    logger.trace("STAC Parent id {}", parentid);
 
 	    GSResource parentGSResource = parent.get();
 
@@ -159,7 +159,7 @@ public class STACDEAGranulesConnector extends DistributedQueryConnector<STACGran
 
 	    logger.trace("STAC Parent Node id {}", collectionID);
 
-	    HttpResponse response = retrieve(message, page, collectionID);
+	    HttpResponse<InputStream> response = retrieve(message, page, collectionID);
 
 	    logger.trace("Extracting STAC original metadata");
 
@@ -179,21 +179,6 @@ public class STACDEAGranulesConnector extends DistributedQueryConnector<STACGran
 	logger.info("STAC Result set created (size: {})", omList.size());
 
 	return rSet;
-    }
-
-    String getParentId(ReducedDiscoveryMessage message) throws GSException {
-
-	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getReducedBond());
-
-	ParentIdBondHandler parentIdBondHandler = new ParentIdBondHandler();
-
-	bondParser.parse(parentIdBondHandler);
-
-	if (!parentIdBondHandler.isParentIdFound())
-	    throw GSException.createException(getClass(), "No Parent Identifier specified to cmr second-level search", null,
-		    ErrorInfo.ERRORTYPE_CLIENT, ErrorInfo.SEVERITY_ERROR, STAC_GRANULES_NO_PARENT_ERR_ID);
-
-	return parentIdBondHandler.getParentValue();
     }
 
     Integer count(HttpResponse response) throws GSException {
@@ -277,7 +262,7 @@ public class STACDEAGranulesConnector extends DistributedQueryConnector<STACGran
 	return bondHandler;
     }
 
-    HttpResponse retrieve(ReducedDiscoveryMessage message, Page page, String datasetId) throws GSException {
+    HttpResponse<InputStream> retrieve(ReducedDiscoveryMessage message, Page page, String datasetId) throws GSException {
 
 	logger.info("Retrieving Original Metadata");
 
@@ -306,7 +291,7 @@ public class STACDEAGranulesConnector extends DistributedQueryConnector<STACGran
 	}
     }
 
-    List<OriginalMetadata> convertResponseToOriginalMD(HttpResponse response) throws GSException {
+    List<OriginalMetadata> convertResponseToOriginalMD(HttpResponse<InputStream> response) throws GSException {
 
 	List<OriginalMetadata> list = new ArrayList<>();
 

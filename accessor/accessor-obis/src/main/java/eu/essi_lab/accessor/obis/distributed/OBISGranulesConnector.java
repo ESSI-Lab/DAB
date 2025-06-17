@@ -87,15 +87,15 @@ public class OBISGranulesConnector extends DistributedQueryConnector<OBISGranule
 
 	DiscoveryCountResponse countResponse = new DiscoveryCountResponse();
 
-	String parentid = getParentId(message);
+	Optional<String> parentid = ParentIdBondHandler.readParentId(message);
 
-	logger.trace("OBIS Parent id {}", parentid);
-
-	Optional<GSResource> parent = message.getParentGSResource(parentid);
+	Optional<GSResource> parent = parentid.isPresent() ? message.getParentGSResource(parentid.get()) : Optional.empty();
 
 	Integer matches = 0;
 
 	if (parent.isPresent()) {
+
+	    logger.trace("OBIS Parent id {}", parentid);
 
 	    GSResource parentGSResource = parent.get();
 
@@ -103,7 +103,7 @@ public class OBISGranulesConnector extends DistributedQueryConnector<OBISGranule
 
 	    logger.trace("OBIS Parent Node id {}", datasetId);
 
-	    HttpResponse response = retrieve(message, countPage(), datasetId);
+	    HttpResponse<InputStream> response = retrieve(message, countPage(), datasetId);
 
 	    logger.trace("Extracting count of node {}", datasetId);
 
@@ -111,8 +111,10 @@ public class OBISGranulesConnector extends DistributedQueryConnector<OBISGranule
 
 	    logger.info("Found {} matches", matches);
 
-	} else
+	} else {
+
 	    logger.warn("Unable to find parent resource in message for OBIS collection {}, returning zero matches", parentid);
+	}
 
 	countResponse.setCount(matches);
 
@@ -127,13 +129,13 @@ public class OBISGranulesConnector extends DistributedQueryConnector<OBISGranule
 
 	logger.trace("Received second-level query for OBIS");
 
-	String parentid = getParentId(message);
+	Optional<String> parentid = ParentIdBondHandler.readParentId(message);
 
-	logger.trace("OBIS Parent id {}", parentid);
-
-	Optional<GSResource> parent = message.getParentGSResource(parentid);
+	Optional<GSResource> parent = parentid.isPresent() ? message.getParentGSResource(parentid.get()) : Optional.empty();
 
 	if (parent.isPresent()) {
+
+	    logger.trace("OBIS Parent id {}", parentid);
 
 	    GSResource parentGSResource = parent.get();
 
@@ -141,7 +143,7 @@ public class OBISGranulesConnector extends DistributedQueryConnector<OBISGranule
 
 	    logger.trace("OBIS Parent Node id {}", datasetId);
 
-	    HttpResponse response = retrieve(message, page, datasetId);
+	    HttpResponse<InputStream> response = retrieve(message, page, datasetId);
 
 	    logger.trace("Extracting OBIS original metadata");
 
@@ -163,21 +165,7 @@ public class OBISGranulesConnector extends DistributedQueryConnector<OBISGranule
 	return rSet;
     }
 
-    String getParentId(ReducedDiscoveryMessage message) throws GSException {
-
-	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getReducedBond());
-
-	ParentIdBondHandler parentIdBondHandler = new ParentIdBondHandler();
-
-	bondParser.parse(parentIdBondHandler);
-
-	if (!parentIdBondHandler.isParentIdFound())
-	    throw GSException.createException(getClass(), "No Parent Identifier specified to cmr second-level search", null,
-		    ErrorInfo.ERRORTYPE_CLIENT, ErrorInfo.SEVERITY_ERROR, OBIS_GRANULES_NO_PARENT_ERR_ID);
-
-	return parentIdBondHandler.getParentValue();
-    }
-
+    
     Integer count(HttpResponse<InputStream> response) throws GSException {
 
 	JSONObject json = toJson(response);
@@ -283,7 +271,7 @@ public class OBISGranulesConnector extends DistributedQueryConnector<OBISGranule
 	}
     }
 
-    List<OriginalMetadata> convertResponseToOriginalMD(HttpResponse response) throws GSException {
+    List<OriginalMetadata> convertResponseToOriginalMD(HttpResponse<InputStream> response) throws GSException {
 
 	List<OriginalMetadata> list = new ArrayList<>();
 
