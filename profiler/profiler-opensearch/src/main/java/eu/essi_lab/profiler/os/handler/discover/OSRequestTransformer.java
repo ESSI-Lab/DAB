@@ -36,6 +36,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.google.common.collect.Lists;
 
+import eu.essi_lab.api.database.Database;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
@@ -232,10 +233,24 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	OSRequestParser parser = new OSRequestParser(keyValueParser);
 
 	try {
+
+	    // checks result window size
+	    Page page = getPage(request);
+	    int winSize = page.getStart() + page.getSize();
+	    if (winSize > Database.MAX_RESULT_WINDOW_SIZE) {
+
+		message.setResult(ValidationResult.VALIDATION_FAILED);
+		message.setError("Result window is too large, start index + count must be less than or equal to: "
+			+ Database.MAX_RESULT_WINDOW_SIZE + " but was " + winSize);
+
+		return message;
+	    }
+
 	    // checks the sources param
 	    OSParameter sourceParam = WebRequestParameter.findParameter(OSParameters.SOURCES.getName(), OSParameters.class);
 
 	    String value = parser.parse(sourceParam);
+
 	    if (value != null) {
 
 		GSLoggerFactory.getLogger(getClass()).trace("Found {} parameter, starting sources check", OSParameters.SOURCES.getName());
@@ -454,7 +469,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			osParameter != OSParameters.SOURCES) {
 
 		    String spatialRelation = parser.parse(OSParameters.SPATIAL_RELATION);
-		    bond = osParameter.asBond(value,spatialRelation);
+		    bond = osParameter.asBond(value, spatialRelation);
 		}
 
 	    } catch (Exception ex) {

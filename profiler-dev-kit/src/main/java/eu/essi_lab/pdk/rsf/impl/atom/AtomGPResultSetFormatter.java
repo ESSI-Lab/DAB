@@ -3,28 +3,6 @@
  */
 package eu.essi_lab.pdk.rsf.impl.atom;
 
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,8 +11,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import javax.xml.bind.JAXBException;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.XML;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -187,7 +165,7 @@ public class AtomGPResultSetFormatter extends DiscoveryResultSetFormatter<String
 	return "<feed xmlns='http://www.w3.org/2005/Atom' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.w3.org/2005/Atom http://essi-lab.eu/schemas/geo-rss/atom_1.0_specification.xsd http://www.georss.org/georss http://essi-lab.eu/schemas/geo-rss/geo_rss_1.1_specification.xsd http://www.opengis.net/gml http://schemas.opengis.net/gml/3.1.1/base/gml.xsd'>\n"+
 	"<title>Search results</title>\n"+
 	"<id>a4a4e2d9-c81d-4167-8556-b40464d638b6</id>\n"+
-	"<link href='"+query+"' rel='search' title='Content Search' type='application/atom+xml'/>\n"+
+	"<link href='"+StringEscapeUtils.escapeXml10(query)+"' rel='search' title='Content Search' type='application/atom+xml'/>\n"+
 	"<totalResults xmlns='http://a9.com/-/spec/opensearch/1.1/'>0</totalResults>\n"+
 	"<startIndex xmlns='http://a9.com/-/spec/opensearch/1.1/'>1</startIndex>\n"+
 	"<itemsPerPage xmlns='http://a9.com/-/spec/opensearch/1.1/'>10</itemsPerPage>\n"+
