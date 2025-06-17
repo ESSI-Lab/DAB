@@ -65,6 +65,7 @@ import eu.essi_lab.access.DataValidatorErrorCode;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.DataRecord;
+import eu.essi_lab.api.database.Database;
 import eu.essi_lab.authorization.userfinder.UserFinder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
@@ -155,10 +156,10 @@ public class OMHandler extends StreamingRequestHandler {
 	ValidationMessage message = new ValidationMessage();
 	message.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
 
-	if (limit + offset > 10000) {
+	if (limit + offset > Database.MAX_RESULT_WINDOW_SIZE) {
 
 	    message.setResult(ValidationResult.VALIDATION_FAILED);
-	    message.setError("Result window is too large, offset + limit must be less than or equal to: 10000 but was " + (limit + offset));
+	    message.setError("Result window is too large, offset + limit must be less than or equal to: "+Database.MAX_RESULT_WINDOW_SIZE+" but was " + (limit + offset));
 	    message.setErrorCode("400");
 	}
 
