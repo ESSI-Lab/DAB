@@ -299,7 +299,7 @@ public class S3ShapeDownloader extends DataDownloader {
 			// Create a style for rendering
 			MapContent map = new MapContent();
 			// Style style = SLD.createSimpleStyle(featureSource.getSchema());
-			Style style = createCustomLineStyle(java.awt.Color.YELLOW, 3);
+			Style style = createCustomLineStyle(java.awt.Color.BLUE, 4);
 			FeatureLayer layer = new FeatureLayer(featureCollection, style);
 			map.addLayer(layer);
 
