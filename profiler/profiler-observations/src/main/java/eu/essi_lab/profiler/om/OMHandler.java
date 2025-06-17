@@ -145,10 +145,23 @@ public class OMHandler extends StreamingRequestHandler {
     }
 
     @Override
-    public ValidationMessage validate(WebRequest request) throws GSException {
-	ValidationMessage ret = new ValidationMessage();
-	ret.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
-	return ret;
+    public ValidationMessage validate(WebRequest webRequest) throws GSException {
+
+	OMRequest request = new OMRequest(webRequest);
+
+	int limit = Integer.valueOf(request.getParameterValue(APIParameters.LIMIT));
+	int offset = Integer.valueOf(request.getParameterValue(APIParameters.OFFSET));
+
+	ValidationMessage message = new ValidationMessage();
+	message.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
+
+	if (limit + offset > 10000) {
+
+	    message.setResult(ValidationResult.VALIDATION_FAILED);
+	    message.setError("Result window is too large, offset + limit must be less than or equal to: 10000 but was " + (limit + offset));
+	}
+
+	return message;
     }
 
     public OMHandler() {
