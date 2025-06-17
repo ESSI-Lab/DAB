@@ -45,11 +45,9 @@ import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
-import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.netcdf.NetCDFAttribute;
@@ -95,7 +93,8 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 	    // TO REMOVE
 	    //
 
-//	    listDataFolders = listDataFolders.stream().filter(f -> f.contains("2021")).collect(Collectors.toList()).subList(0, 5);
+	    // listDataFolders = listDataFolders.stream().filter(f ->
+	    // f.contains("2021")).collect(Collectors.toList()).subList(0, 5);
 
 	    //
 	    // TO REMOVE
@@ -289,10 +288,10 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 
 	coreMetadata.addDistributionOnlineResource(//
 		ncFile.getName(), //
-		"https://thredds-data.s3.amazonaws.com/onametStations/"+ ncFile.getName(), //
+		"https://thredds-data.s3.amazonaws.com/onametStations/" + ncFile.getName(), //
 		NetProtocols.HTTP.getCommonURN(), //
 		"download");
-	    
+
 	//
 	// uploads to S3
 	//
@@ -301,14 +300,14 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 
 	    uploadToS3(ncFile, getSetting());
 	}
-	
+
 	//
 	//
 	//
-	
+
 	EasyAccessAugmenter easyAccessAugmenter = new EasyAccessAugmenter();
-	
-	return easyAccessAugmenter.augment(resource);	 
+
+	return easyAccessAugmenter.augment(resource);
     }
 
     /**
@@ -409,8 +408,22 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 	S3TransferWrapper manager = new S3TransferWrapper();
 	manager.setAccessKey(setting.getS3AccessKey().get());
 	manager.setSecretKey(setting.getS3SecretKey().get());
-	
+
 	manager.setACLPublicRead(true);
+
+	String bucketName = setting.getS3BucketName().get();
+
+	if (bucketName.contains("/")) {
+
+	    String bucket = bucketName.substring(0, bucketName.indexOf("/"));
+	    String folder = bucketName.substring(bucketName.indexOf("/") + 1, bucketName.length());
+
+	    manager.uploadFile(file.getAbsolutePath(), bucket, folder + "/" + file.getName());
+
+	} else {
+
+	    manager.uploadFile(file.getAbsolutePath(), bucketName);
+	}
 
 	manager.uploadFile(file.getAbsolutePath(), setting.getS3BucketName().get());
 
@@ -617,17 +630,5 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
     protected String initName() {
 
 	return "ONAMET Stations Augmenter";
-    }
-
-    public static void main(String[] args) throws MalformedURLException, GSException {
-
-	ONAMETStationsAugmenter augmenter = new ONAMETStationsAugmenter();
-
-	Dataset dataset = new Dataset();
-	GSSource source = new GSSource();
-	source.setEndpoint("https://onamet.gov.do/");
-	dataset.setSource(source);
-
-	augmenter.augment(dataset);
     }
 }
