@@ -116,7 +116,7 @@ public class CSWRequestConverter {
 	//
 	//
 
-	String queryString = StringUtils.URLDecodeUTF8(request.getURLDecodedQueryString().get());
+	String queryString = request.getURLDecodedQueryString().get();
 
 	KeyValueParser parser = new KeyValueParser(queryString);
 
