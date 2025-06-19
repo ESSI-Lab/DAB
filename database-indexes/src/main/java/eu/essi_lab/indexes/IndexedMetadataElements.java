@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -58,6 +59,7 @@ import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.SatelliteScene;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
@@ -2278,6 +2280,26 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    boolean found = resource.getExtensionHandler().isInSitu();
 	    getValues().add(String.valueOf(found));
+	}
+    };
+
+    //
+    // composed elements
+    //
+
+    public static final IndexedMetadataElement KEYWORD_SA = new IndexedMetadataElement(MetadataElement.KEYWORD_SA) {
+
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    ComposedElement composedElement = MetadataElement.KEYWORD_SA.getComposeElement().get();
+
+	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
+	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
+	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
+	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
+
+	    setComposedElement(composedElement);
 	}
     };
 

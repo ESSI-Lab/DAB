@@ -81,7 +81,7 @@ public class IndexedElementsWriter {
 
 	// all default indexed elements
 	List<IndexedMetadataElement> indexes = IndexedMetadataElements.getIndexes();
-	indexMetadataElements(resource, indexes);
+	index(resource, indexes);
 
 	// ---------------------------------------
 	//
@@ -106,11 +106,12 @@ public class IndexedElementsWriter {
 	}
     }
 
-    public synchronized static void indexMetadataElements(GSResource resource, List<IndexedMetadataElement> indexes) {
-	// -------------------------------------
-	//
-	// indexed metadata elements
-	//
+    /**
+     * @param resource
+     * @param indexes
+     */
+    public synchronized static void index(GSResource resource, List<IndexedMetadataElement> indexes) {
+
 	indexes.//
 		stream().//
 		forEach(index -> { //
@@ -122,17 +123,22 @@ public class IndexedElementsWriter {
 		    //
 		    index.getValues().clear();
 		    index.setBoundingBox(null);
+		    index.setComposedElement(null);
 		    //
 		    // ----------------------------
 
 		    try {
 			index.defineValues(resource);
 
-			if (index.getBoundingBox() != null || !index.getValues().isEmpty()) {
+			if (index.getBoundingBox() != null || index.getComposedElement().isPresent() || !index.getValues().isEmpty()) {
+
 			    String elementName = index.getElementName();
+
 			    if (elementName != null) {
+
 				resource.getIndexesMetadata().remove(elementName);
 			    }
+
 			    resource.getIndexesMetadata().write(index);
 			}
 		    } catch (Exception e) {
