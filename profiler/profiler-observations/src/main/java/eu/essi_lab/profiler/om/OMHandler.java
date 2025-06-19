@@ -150,20 +150,34 @@ public class OMHandler extends StreamingRequestHandler {
 
 	OMRequest request = new OMRequest(webRequest);
 
-	int limit = Integer.valueOf(request.getParameterValue(APIParameters.LIMIT));
-	int offset = Integer.valueOf(request.getParameterValue(APIParameters.OFFSET));
+	Integer limit = parseInt(request, APIParameters.LIMIT);
+	Integer offset = parseInt(request, APIParameters.OFFSET);
 
 	ValidationMessage message = new ValidationMessage();
 	message.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
 
-	if (limit + offset > Database.MAX_RESULT_WINDOW_SIZE) {
+	if (limit != null && offset != null && (limit + offset > Database.MAX_RESULT_WINDOW_SIZE)) {
 
 	    message.setResult(ValidationResult.VALIDATION_FAILED);
-	    message.setError("Result window is too large, offset + limit must be less than or equal to: "+Database.MAX_RESULT_WINDOW_SIZE+" but was " + (limit + offset));
+	    message.setError("Result window is too large, offset + limit must be less than or equal to: " + Database.MAX_RESULT_WINDOW_SIZE
+		    + " but was " + (limit + offset));
 	    message.setErrorCode("400");
 	}
 
 	return message;
+    }
+
+    private Integer parseInt(OMRequest request, APIParameters limit) {
+	String value = request.getParameterValue(limit);
+	if (value == null) {
+	    return null;
+	}
+	try {
+	    return Integer.valueOf(value);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+	return null;
     }
 
     public OMHandler() {

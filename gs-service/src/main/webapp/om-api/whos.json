@@ -533,7 +533,7 @@
 						}
 					},
 					{
-						"name": "aynchDownloadName",
+						"name": "asynchDownloadName",
 						"in": "query",
 						"description": "Gives a name to the asynch download, to ease its identification.",
 						"schema": {
