@@ -667,6 +667,13 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
 
+	    Iterator<ResponsibleParty> contactIterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getContacts();
+	    while (contactIterator!=null && contactIterator.hasNext()) {
+		ResponsibleParty responsibleParty = (ResponsibleParty) contactIterator.next();
+		parties.add(responsibleParty);		
+	    }
+	    
+	    
 	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
 
 	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
