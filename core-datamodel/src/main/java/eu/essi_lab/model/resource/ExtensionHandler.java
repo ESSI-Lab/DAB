@@ -35,6 +35,7 @@ import org.w3c.dom.Node;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.NameSpace;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 
 /**
@@ -82,6 +83,33 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     ExtensionHandler(GSResource resource) {
 
 	this(resource.getHarmonizedMetadata());
+    }
+
+    /**
+     * @param element
+     */
+    public void addComposedElement(ComposedElement element) {
+
+	try {
+	    this.metadata.add(element.asDocument(true));
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public Optional<ComposedElement> getComposedElement(String name) {
+
+	//
+	// TODO
+	//
+
+	return Optional.empty();
     }
 
     // -------------------------------------------------
