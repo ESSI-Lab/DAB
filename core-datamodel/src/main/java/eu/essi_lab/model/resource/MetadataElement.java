@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedElement;
+import eu.essi_lab.model.resource.composed.ComposedElement;
+import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
 
 /**
  * Enumeration of queryable {@link HarmonizedMetadata} element names
@@ -38,6 +40,23 @@ import eu.essi_lab.model.index.IndexedElement;
  */
 public enum MetadataElement implements Queryable {
 
+    // keyword, parameter, instrument, platform, responsible organization, cruise, and project
+
+    KEYWORD_SA(ComposedElementBuilder.get("keyword_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
+
+    PARAMETER_SA(ComposedElementBuilder.get("parameter_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
     /**
      *
      */
@@ -382,18 +401,17 @@ public enum MetadataElement implements Queryable {
      *
      */
     TEMP_EXTENT_BEGIN("tmpExtentBegin", ContentType.ISO8601_DATE_TIME),
-    
+
     /**
      * 
      */
     TEMP_EXTENT_BEGIN_NOW("tmpExtentBegin_Now", ContentType.BOOLEAN),
-    
 
     /**
      *
      */
     TEMP_EXTENT_END("tmpExtentEnd", ContentType.ISO8601_DATE_TIME),
-    
+
     /**
      * 
      */
@@ -715,6 +733,7 @@ public enum MetadataElement implements Queryable {
     private boolean extendedElement;
     private ContentType type;
     private boolean isEnabled;
+    private ComposedElement element;
 
     /**
      * @param name
@@ -739,6 +758,19 @@ public enum MetadataElement implements Queryable {
     private MetadataElement(String name, ContentType type) {
 
 	this(name, false, false, type, true);
+    }
+
+    /**
+     * @param element
+     */
+    private MetadataElement(ComposedElement element) {
+
+	this.name = element.getName();
+	this.element = element;
+	this.volatileElement = false;
+	this.type = ContentType.COMPOSED;
+	this.isEnabled = true;
+	this.extendedElement = true;
     }
 
     /**
@@ -820,6 +852,31 @@ public enum MetadataElement implements Queryable {
     }
 
     /**
+     * @param name
+     * @return
+     */
+    public static boolean hasComposedElement(String name) {
+
+	return listValues().//
+		stream().//
+		filter(e -> e.getComposeElement().isPresent() && e.getName().equals(name)).//
+		findFirst().//
+		isPresent();
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public static List<MetadataElement> withComposedElement() {
+
+	return listValues().//
+		stream().//
+		filter(e -> e.getComposeElement().isPresent()).//
+		collect(Collectors.toList());
+    }
+
+    /**
      * @return
      */
     public static List<MetadataElement> listValues() {
@@ -848,6 +905,15 @@ public enum MetadataElement implements Queryable {
     }
 
     public boolean isExtendedElement() {
+
 	return extendedElement;
+    }
+
+    /**
+     * @return the element
+     */
+    public Optional<ComposedElement> getComposeElement() {
+
+	return Optional.ofNullable(element);
     }
 }
