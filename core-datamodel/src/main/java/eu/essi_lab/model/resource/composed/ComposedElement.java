@@ -215,6 +215,14 @@ public class ComposedElement extends DOMSerializer {
 	return name;
     }
 
+    @Override
+    public boolean equals(Object object) {
+
+	return object instanceof ComposedElement &&
+
+		((ComposedElement) object).asJSON().similar(this.asJSON());
+    }
+
     /**
      * @return
      */
@@ -225,7 +233,7 @@ public class ComposedElement extends DOMSerializer {
 	JSONObject inner = new JSONObject();
 	out.put(name, inner);
 
-	properties.forEach(item -> inner.put(item.getName(), item.getObjectValue()));
+	properties.forEach(item -> inner.put(item.getName(), item.getValue()));
 
 	return out;
     }

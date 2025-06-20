@@ -3,6 +3,15 @@
  */
 package eu.essi_lab.model.resource.composed;
 
+import java.util.Date;
+import java.util.Optional;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.xml.NameSpace;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -31,9 +40,14 @@ import eu.essi_lab.model.Queryable.ContentType;
  */
 public class ComposedElementItem {
 
+    @XmlElement(name = "name", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private String name;
+    @XmlElement(name = "type", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private ContentType type;
+    @XmlElement(name = "value", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private Object value;
+
+    static final String NO_VALUE = "novalue";
 
     /**
      * 
@@ -45,12 +59,38 @@ public class ComposedElementItem {
     /**
      * @param name
      * @param type
-     * @param value
      */
     public ComposedElementItem(String name, ContentType type) {
 
 	this.name = name;
 	this.type = type;
+
+	this.value = switch (type) {
+	case BOOLEAN -> {
+	    yield false;
+	}
+	case DOUBLE -> {
+	    yield 0.0;
+	}
+	case INTEGER -> {
+	    yield 0;
+	}
+	case TEXTUAL -> {
+	    yield NO_VALUE;
+	}
+	case ISO8601_DATE -> {
+	    yield ISO8601DateTimeUtils.getISO8601Date(new Date(ISO8601DateTimeUtils.EPOCH));
+	}
+	case ISO8601_DATE_TIME -> {
+	    yield ISO8601DateTimeUtils.getISO8601DateTime(new Date(ISO8601DateTimeUtils.EPOCH));
+	}
+	case LONG -> {
+	    yield Long.valueOf(0);
+	}
+
+	case COMPOSED -> throw new UnsupportedOperationException("Unimplemented case: " + type);
+	case SPATIAL -> throw new UnsupportedOperationException("Unimplemented case: " + type);
+	};
     }
 
     /**
@@ -64,6 +104,7 @@ public class ComposedElementItem {
     /**
      * @return the name
      */
+    @XmlTransient
     public String getName() {
 
 	return name;
@@ -80,6 +121,7 @@ public class ComposedElementItem {
     /**
      * @return the type
      */
+    @XmlTransient
     public ContentType getType() {
 
 	return type;
@@ -96,31 +138,32 @@ public class ComposedElementItem {
     /**
      * @return
      */
-    public String getValue() {
+    public String getStringValue() {
 
-	return value.toString();
+	return value != null ? value.toString() : null;
     }
 
     /**
      * @return
      */
-    public Object getObjectValue() {
+    @XmlTransient
+    public Object getValue() {
 
 	return switch (type) {
 	case BOOLEAN -> {
-	    yield Boolean.valueOf(getValue());
+	    yield Boolean.valueOf(getStringValue());
 	}
 	case DOUBLE -> {
-	    yield Double.valueOf(getValue());
+	    yield Double.valueOf(getStringValue());
 	}
 	case INTEGER -> {
-	    yield Integer.valueOf(getValue());
+	    yield Integer.valueOf(getStringValue());
 	}
 	case TEXTUAL, ISO8601_DATE, ISO8601_DATE_TIME -> {
-	    yield getValue();
+	    yield getStringValue();
 	}
 	case LONG -> {
-	    yield Long.valueOf(getValue());
+	    yield Long.valueOf(getStringValue());
 	}
 
 	case COMPOSED -> throw new UnsupportedOperationException("Unimplemented case: " + type);

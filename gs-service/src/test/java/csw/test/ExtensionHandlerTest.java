@@ -52,14 +52,14 @@ public class ExtensionHandlerTest {
 	map.setIrrigationTypeConfidence(92.0);
 	map.setLcTypeConfidence(10.0);
 
-	ComposedElement composedElement1 = MetadataElement.KEYWORD_SA.getComposeElement().get();
+	ComposedElement composedElement1 = MetadataElement.KEYWORD_SA.createComposedElement().get();
 
 	composedElement1.getProperty("value").get().setValue("erggvb");
 	composedElement1.getProperty("uri").get().setValue("xvfhg");
 	composedElement1.getProperty("SA_uri").get().setValue("4566g");
 	composedElement1.getProperty("SA_matchType").get().setValue("xzcx");
 
-	ComposedElement composedElement2 = MetadataElement.PARAMETER_SA.getComposeElement().get();
+	ComposedElement composedElement2 = MetadataElement.PARAMETER_SA.createComposedElement().get();
 
 	composedElement2.getProperty("value").get().setValue("dsad");
 	composedElement2.getProperty("uri").get().setValue("czxczxcz");
