@@ -2378,7 +2378,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    ComposedElement composedElement = MetadataElement.KEYWORD_SA.createComposeElement().get();
+	    ComposedElement composedElement = MetadataElement.KEYWORD_SA.createComposedElement().get();
 
 //	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
 //	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());

@@ -972,12 +972,12 @@ public enum MetadataElement implements Queryable {
      *         {@link MetadataElement#hasComposedElement()}
      *         is <code>true</code>, otherwise returns {@link Optional#empty()}
      */
-    public Optional<ComposedElement> createComposeElement() {
+    public Optional<ComposedElement> createComposedElement() {
 
 	if (element != null) {
 
 	    try {
-		return Optional.ofNullable(ComposedElement.create(element.asJSON()));
+		return Optional.ofNullable(ComposedElement.create(element.asDocument(false)));
 	    } catch (Exception ex) {
 
 		GSLoggerFactory.getLogger(MetadataElement.class).error(ex);
