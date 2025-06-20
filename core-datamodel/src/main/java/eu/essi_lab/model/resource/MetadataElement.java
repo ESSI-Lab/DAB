@@ -27,6 +27,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.resource.composed.ComposedElement;
@@ -40,8 +41,9 @@ import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
  */
 public enum MetadataElement implements Queryable {
 
-    // keyword, parameter, instrument, platform, responsible organization, cruise, and project
-
+    /**
+     * 
+     */
     KEYWORD_SA(ComposedElementBuilder.get("keyword_SA").//
 
 	    addItem("value", ContentType.TEXTUAL).//
@@ -50,6 +52,9 @@ public enum MetadataElement implements Queryable {
 	    addItem("SA_matchType", ContentType.TEXTUAL).//
 	    build()), //
 
+    /**
+     * 
+     */
     PARAMETER_SA(ComposedElementBuilder.get("parameter_SA").//
 
 	    addItem("value", ContentType.TEXTUAL).//
@@ -57,6 +62,51 @@ public enum MetadataElement implements Queryable {
 	    addItem("SA_uri", ContentType.TEXTUAL).//
 	    addItem("SA_matchType", ContentType.TEXTUAL).//
 	    build()), //
+
+    /**
+     * 
+     */
+    INSTRUMENT_SA(ComposedElementBuilder.get("instrument_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
+
+    /**
+     * 
+     */
+    RESPONSIBLE_ORG_SA(ComposedElementBuilder.get("responsibleOrg_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
+
+    /**
+     * 
+     */
+    CRUISE_SA(ComposedElementBuilder.get("cruise_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
+
+    /**
+     * 
+     */
+    PROJECT_SA(ComposedElementBuilder.get("project_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
+
     /**
      *
      */
@@ -859,7 +909,7 @@ public enum MetadataElement implements Queryable {
 
 	return listValues().//
 		stream().//
-		filter(e -> e.getComposeElement().isPresent() && e.getName().equals(name)).//
+		filter(e -> e.hasComposedElement() && e.getName().equals(name)).//
 		findFirst().//
 		isPresent();
     }
@@ -872,7 +922,7 @@ public enum MetadataElement implements Queryable {
 
 	return listValues().//
 		stream().//
-		filter(e -> e.getComposeElement().isPresent()).//
+		filter(e -> e.hasComposedElement()).//
 		collect(Collectors.toList());
     }
 
@@ -910,10 +960,30 @@ public enum MetadataElement implements Queryable {
     }
 
     /**
-     * @return the element
+     * @return <code>true</code> if {@link MetadataElement#getContentType()} is {@link ContentType#COMPOSED}
      */
-    public Optional<ComposedElement> getComposeElement() {
+    public boolean hasComposedElement() {
 
-	return Optional.ofNullable(element);
+	return element != null;
+    }
+
+    /**
+     * @return an {@link Optional} with a new instance of {@link ComposedElement} if
+     *         {@link MetadataElement#hasComposedElement()}
+     *         is <code>true</code>, otherwise returns {@link Optional#empty()}
+     */
+    public Optional<ComposedElement> createComposeElement() {
+
+	if (element != null) {
+
+	    try {
+		return Optional.ofNullable(ComposedElement.create(element.asJSON()));
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(MetadataElement.class).error(ex);
+	    }
+	}
+
+	return Optional.empty();
     }
 }
