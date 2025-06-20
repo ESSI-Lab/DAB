@@ -84,6 +84,19 @@ public class CoverageDescription extends ISOMetadata<MDCoverageDescriptionType> 
 
 	return null;
     }
+    
+    public RecordTypeType getAttributeDescriptionRecord() {
+
+ 	RecordTypePropertyType attributeDescription = type.getAttributeDescription();
+ 	if (attributeDescription != null) {
+
+ 	    RecordTypeType recordType = attributeDescription.getRecordType();
+ 	    return recordType;
+
+ 	}
+
+ 	return null;
+     }
 
     /**
      * @XPathDirective(target = "gmd:attributeDescription/gco:RecordType")

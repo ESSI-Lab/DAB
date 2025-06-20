@@ -27,6 +27,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -49,27 +51,73 @@ public class SAClient {
 	this.objectMapper = new ObjectMapper();
     }
 
-    public SemanticAnalysisResponse analyzeTerms(List<String> terms, List<String> matchTypes, List<String> matchProperties)
-	    throws IOException, InterruptedException {
-	SemanticAnalysisRequest request = new SemanticAnalysisRequest(terms, matchTypes, matchProperties);
-	String requestBody = objectMapper.writeValueAsString(request);
+    public List<SemanticAnalysisResponse> analyzeTerms(Collection<String> terms, List<String> matchTypes, List<String> matchProperties)
+	    throws Exception {
+	int max = 100;
+	List<String> toAnalyze = new ArrayList<String>();
+	List<SemanticAnalysisResponse> ret = new ArrayList<SAClient.SemanticAnalysisResponse>();
+	System.out.println("Total terms: " + terms.size());
+	int analyzed = 0;
+	int errors = 0;
+	for (String term : terms) {
+	    toAnalyze.add(term);
+	    if (toAnalyze.size() > max) {
+		try {
+		    SemanticAnalysisResponse response = getSimpleResponse(toAnalyze, matchTypes, matchProperties);
+		    ret.add(response);
+		    analyzed += toAnalyze.size();
+		    System.out.println("Analyzed: " + analyzed);
 
+		} catch (Exception e) {
+		    e.printStackTrace();
+		    errors++;
+		}
+		toAnalyze.clear();
+	    }
+	}
+	if (!toAnalyze.isEmpty()) {
+	    try {
+		SemanticAnalysisResponse response = getSimpleResponse(toAnalyze, matchTypes, matchProperties);
+		ret.add(response);
+	    } catch (Exception e) {
+		e.printStackTrace();
+		errors++;
+	    }
+	}
+	System.out.println("Analyzed all terms. Error response: " + errors);
+	return ret;
+    }
+
+    private SemanticAnalysisResponse getSimpleResponse(List<String> terms, List<String> matchTypes, List<String> matchProperties)
+	    throws Exception {
+	terms.remove("LAO");
+
+	SemanticAnalysisRequest request = new SemanticAnalysisRequest(terms , matchTypes, matchProperties);
+	String requestBody = objectMapper.writeValueAsString(request);
+//	System.out.println(requestBody);
 	HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(endpoint)).header("Content-Type", "application/json")
 		.POST(HttpRequest.BodyPublishers.ofString(requestBody)).build();
 
 	HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
 	if (response.statusCode() != 200) {
+	    for (String term : terms) {
+		System.out.println(term);
+	    }
+	    System.out.println(response.body());
 	    throw new IOException("API request failed with status code: " + response.statusCode());
 	}
+	System.out.println("Response obtained");
 
-	return objectMapper.readValue(response.body(), SemanticAnalysisResponse.class);
+	SemanticAnalysisResponse ret = objectMapper.readValue(response.body(), SemanticAnalysisResponse.class);
+
+	return ret;
     }
 
     // Request and Response classes
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SemanticAnalysisRequest {
-	private List<String> terms;
+	private Collection<String> terms;
 	@JsonProperty("matchType")
 	private List<String> matchTypes;
 	@JsonProperty("matchProperties")
@@ -78,14 +126,14 @@ public class SAClient {
 	public SemanticAnalysisRequest() {
 	}
 
-	public SemanticAnalysisRequest(List<String> terms, List<String> matchTypes, List<String> matchProperties) {
+	public SemanticAnalysisRequest(Collection<String> terms, List<String> matchTypes, List<String> matchProperties) {
 	    this.terms = terms;
 	    this.matchTypes = matchTypes;
 	    this.matchProperties = matchProperties;
 	}
 
 	// Getters and setters
-	public List<String> getTerms() {
+	public Collection<String> getTerms() {
 	    return terms;
 	}
 
@@ -121,20 +169,41 @@ public class SAClient {
 	private Stats stats;
 
 	/**
-	 * Finds the URI for a specific term in the semantic analysis results.
-	 * @param term The term to search for
-	 * @return The URI of the term if found, null otherwise
+	 * Holds URI and additionalType for a matched term.
 	 */
-	public String findTermUri(String term) {
+	public static class TermMatchInfo {
+	    private final String uri;
+	    private final String additionalType;
+
+	    public TermMatchInfo(String uri, String additionalType) {
+		this.uri = uri;
+		this.additionalType = additionalType;
+	    }
+
+	    public String getUri() {
+		return uri;
+	    }
+
+	    public String getAdditionalType() {
+		return additionalType;
+	    }
+	}
+
+	/**
+	 * Finds the URI and additionalType for a specific term in the semantic analysis results.
+	 * 
+	 * @param term The term to search for
+	 * @return TermMatchInfo if found, null otherwise
+	 */
+	public TermMatchInfo findTermMatchInfo(String term) {
 	    if (graph == null || term == null) {
 		return null;
 	    }
-
 	    for (SearchAction action : graph) {
 		if (action.getResult() != null) {
 		    for (SearchResult result : action.getResult()) {
 			if (term.equalsIgnoreCase(result.getName())) {
-			    return result.getId();
+			    return new TermMatchInfo(result.getId(), result.getAdditionalType());
 			}
 		    }
 		}

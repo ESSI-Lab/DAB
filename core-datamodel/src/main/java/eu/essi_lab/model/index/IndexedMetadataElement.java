@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import javax.xml.bind.JAXBElement;
-
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.model.Queryable;
