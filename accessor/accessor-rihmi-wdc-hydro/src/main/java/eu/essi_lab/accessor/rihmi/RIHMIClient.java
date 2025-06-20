@@ -30,7 +30,9 @@ import java.net.http.HttpResponse;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -129,12 +131,12 @@ public class RIHMIClient {
 
     }
 
-    public List<String> getStationIdentifiers(boolean isAral) throws Exception {
+    public Set<String> getStationIdentifiers(boolean isAral) throws Exception {
 	String identifierEndpoint = isAral ? aralStationListendpoint : stationListendpoint;
 	InputStream stream = downloadStream(identifierEndpoint);
 	XMLDocumentReader reader = new XMLDocumentReader(stream);
 	Node[] nodes = reader.evaluateNodes("//*:MonitoringPoint/*:identifier");
-	List<String> ret = new ArrayList<>();
+	Set<String> ret = new HashSet<>();
 	for (Node node : nodes) {
 	    String id = reader.evaluateString(node, ".");
 	    if (id != null) {
