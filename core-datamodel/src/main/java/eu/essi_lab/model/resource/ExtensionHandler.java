@@ -91,7 +91,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public void addComposedElement(ComposedElement element) {
 
 	try {
-	    this.metadata.add(element.asDocument(true));
+	    this.metadata.add(element.asDocument(true).getDocumentElement());
 
 	} catch (Exception e) {
 
@@ -105,9 +105,17 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<ComposedElement> getComposedElement(String name) {
 
-	//
-	// TODO
-	//
+	try {
+	    List<Node> list = this.metadata.get("//*:composedElement[*:name='" + name + "']");
+	    if (!list.isEmpty()) {
+
+		Node node = list.get(0);
+		return Optional.of(ComposedElement.create(node));
+	    }
+	} catch (XPathExpressionException | JAXBException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
 
 	return Optional.empty();
     }
