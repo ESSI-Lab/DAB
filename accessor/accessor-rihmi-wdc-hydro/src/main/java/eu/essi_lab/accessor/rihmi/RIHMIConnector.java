@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import eu.essi_lab.adk.timeseries.StationConnector;
@@ -78,7 +79,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	isAral = getSetting().isAral();
 
 	try {
-	    stationIdentifiers = getStationIdentifiers(isAral);
+	    stationIdentifiers = new ArrayList<>(getStationIdentifiers(isAral));
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
@@ -115,9 +116,9 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
     }
 
-    private static List<String> stationIdentifiers = null;
+    private static Set<String> stationIdentifiers = null;
 
-    private List<String> getStationIdentifiers(boolean isAral) throws Exception {
+    private Set<String> getStationIdentifiers(boolean isAral) throws Exception {
 
 	if (client == null) {
 	    client = new RIHMIClient();
