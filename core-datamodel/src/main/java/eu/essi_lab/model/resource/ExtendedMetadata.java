@@ -116,18 +116,10 @@ public class ExtendedMetadata {
 
 	init();
 
-	if (node instanceof Document) {
+	document.adoptNode(node);
+	document.getDocumentElement().appendChild(node);
 
-	    document = (Document)node;
-	    extension = document.getDocumentElement();
-
-	} else {
-
-	    document.adoptNode(node);
-	    document.getDocumentElement().appendChild(node);
-
-	    extension = document.getDocumentElement();
-	}
+	extension = document.getDocumentElement();
     }
 
     /**
