@@ -20,6 +20,7 @@
 		<module>profiler-openmetrics</module>
 		<module>profiler-esri</module>
 		<module>profiler-bnhs</module>
+		<module>profiler-ckan</module>
 		<module>profiler-csw</module>
 		<module>profiler-semantic</module>
 		<module>profiler-cdi</module>
