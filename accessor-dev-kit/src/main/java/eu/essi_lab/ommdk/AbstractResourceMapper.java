@@ -234,7 +234,7 @@ public abstract class AbstractResourceMapper implements IResourceMapper {
 	String out = gsResource.getSource().getUniqueIdentifier() + identifier;
 
 	try {
-	    out = StringUtils.hashSHA1messageDigest(identifier);
+	    out = StringUtils.hashSHA1messageDigest(out);
 	} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 	   GSLoggerFactory.getLogger(AbstractResourceMapper.class).error(e);
 	}
