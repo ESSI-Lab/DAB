@@ -61,11 +61,6 @@ public class ExtensionHandlerTest {
 
 	ComposedElement composedElement2 = MetadataElement.PARAMETER_SA.createComposedElement().get();
 
-	composedElement2.getProperty("value").get().setValue("dsad");
-	composedElement2.getProperty("uri").get().setValue("czxczxcz");
-	composedElement2.getProperty("SA_uri").get().setValue("asdasdasd");
-	composedElement2.getProperty("SA_matchType").get().setValue("vxcxxvc");
-
 	Dataset dataset = new Dataset();
 	ExtensionHandler handler = dataset.getExtensionHandler();
 
@@ -95,11 +90,11 @@ public class ExtensionHandlerTest {
 	Assert.assertTrue(param_SA.isPresent());
 
 	Assert.assertTrue(param_SA.get().getName().equals(MetadataElement.PARAMETER_SA.getName()));
-	
+
 	//
 	//
 	//
-	
+
 	Assert.assertTrue(handler.getWorldCereal().isPresent());
 	Assert.assertTrue(handler.getSatelliteScene().isPresent());
     }

@@ -27,7 +27,6 @@ package eu.essi_lab.model.resource.composed;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -131,6 +130,10 @@ public class ComposedElement extends DOMSerializer {
 	    }
 	    case Integer i -> {
 		item.setType(ContentType.INTEGER);
+		item.setValue(i);
+	    }
+	    case Boolean i -> {
+		item.setType(ContentType.BOOLEAN);
 		item.setValue(i);
 	    }
 

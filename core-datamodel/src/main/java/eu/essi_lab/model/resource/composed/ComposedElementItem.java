@@ -4,7 +4,6 @@
 package eu.essi_lab.model.resource.composed;
 
 import java.util.Date;
-import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -47,7 +46,14 @@ public class ComposedElementItem {
     @XmlElement(name = "value", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private Object value;
 
-    static final String NO_VALUE = "novalue";
+    public static final String DEFAULT_STRING_VALUE = "novalue";
+    public static final double DEFAULT_DOUBLE_VALUE = 0.0;
+    public static final boolean DEFAULT_BOOLEAN_VALUE = false;
+    public static final int DEFAULT_INT_VALUE = 0;
+    public static final long DEFAULT_LONG_VALUE = 0l;
+    public static final String DEFAULT_ISO8601_DATE_VALUE = ISO8601DateTimeUtils.getISO8601Date(new Date(ISO8601DateTimeUtils.EPOCH));
+    public static final String DEFAULT_SO8601_DATE_TIME_VALUE = ISO8601DateTimeUtils
+	    .getISO8601DateTime(new Date(ISO8601DateTimeUtils.EPOCH));
 
     /**
      * 
@@ -67,22 +73,22 @@ public class ComposedElementItem {
 
 	this.value = switch (type) {
 	case BOOLEAN -> {
-	    yield false;
+	    yield DEFAULT_BOOLEAN_VALUE;
 	}
 	case DOUBLE -> {
-	    yield 0.0;
+	    yield DEFAULT_DOUBLE_VALUE;
 	}
 	case INTEGER -> {
-	    yield 0;
+	    yield DEFAULT_INT_VALUE;
 	}
 	case TEXTUAL -> {
-	    yield NO_VALUE;
+	    yield DEFAULT_STRING_VALUE;
 	}
 	case ISO8601_DATE -> {
-	    yield ISO8601DateTimeUtils.getISO8601Date(new Date(ISO8601DateTimeUtils.EPOCH));
+	    yield DEFAULT_ISO8601_DATE_VALUE;
 	}
 	case ISO8601_DATE_TIME -> {
-	    yield ISO8601DateTimeUtils.getISO8601DateTime(new Date(ISO8601DateTimeUtils.EPOCH));
+	    yield DEFAULT_SO8601_DATE_TIME_VALUE;
 	}
 	case LONG -> {
 	    yield Long.valueOf(0);
@@ -182,9 +188,14 @@ public class ComposedElementItem {
     /**
      * @param value
      */
+    @SuppressWarnings("incomplete-switch")
     public void setValue(Integer value) {
 
-	this.value = value;
+	switch (getType()) {
+	case INTEGER -> this.value = value;
+	case DOUBLE -> this.value = Double.valueOf(value);
+	case LONG -> this.value = Long.valueOf(value);
+	}
     }
 
     /**
