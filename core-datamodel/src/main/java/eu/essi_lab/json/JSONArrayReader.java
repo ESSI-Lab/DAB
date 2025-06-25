@@ -1,0 +1,49 @@
+package eu.essi_lab.json;
+
+import java.io.File;
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class JSONArrayReader {
+
+    private JsonParser parser;
+    private ObjectMapper mapper;
+
+    public JSONArrayReader(File jsonFile) throws JsonParseException, IOException {
+	JsonFactory jsonFactory = new JsonFactory();
+	this.parser = jsonFactory.createParser(jsonFile);
+	this.mapper = new ObjectMapper();
+	if (parser.nextToken() != JsonToken.START_ARRAY) {
+	    throw new IllegalStateException("Expected start of top-level array");
+	}
+
+    }
+
+    /**
+     * @return next item as string or null
+     * @throws Exception
+     * @throws JsonProcessingException
+     */
+    public String readNextItem() throws Exception {
+	if (parser.isClosed()) {
+	    return null;
+	}
+	if (parser.nextToken() != JsonToken.END_ARRAY) {
+	    JsonNode subArray = mapper.readTree(parser);
+	    String rawJson = mapper.writeValueAsString(subArray);
+	    return rawJson;
+	} else {
+	    parser.close();
+	    return null;
+	}
+
+    }
+
+}

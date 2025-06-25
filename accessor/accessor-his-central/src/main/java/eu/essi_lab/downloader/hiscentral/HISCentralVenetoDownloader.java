@@ -33,14 +33,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
