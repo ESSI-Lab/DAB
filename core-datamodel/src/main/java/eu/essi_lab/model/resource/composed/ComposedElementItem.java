@@ -66,7 +66,7 @@ public class ComposedElementItem {
      * @param name
      * @param type
      */
-    public ComposedElementItem(String name, ContentType type) {
+    ComposedElementItem(String name, ContentType type) {
 
 	this.name = name;
 	this.type = type;
@@ -102,7 +102,7 @@ public class ComposedElementItem {
     /**
      * @param name
      */
-    public ComposedElementItem(String name) {
+    ComposedElementItem(String name) {
 
 	this.name = name;
     }
@@ -180,45 +180,16 @@ public class ComposedElementItem {
     /**
      * @param value
      */
-    public void setValue(String value) {
-
-	this.value = value;
-    }
-
-    /**
-     * @param value
-     */
-    @SuppressWarnings("incomplete-switch")
-    public void setValue(Integer value) {
+    public void setValue(Object value) {
 
 	switch (getType()) {
-	case INTEGER -> this.value = value;
-	case DOUBLE -> this.value = Double.valueOf(value);
-	case LONG -> this.value = Long.valueOf(value);
+	case INTEGER -> this.value = Integer.valueOf(value.toString());
+	case DOUBLE -> this.value = Double.valueOf(value.toString());
+	case LONG -> this.value = Long.valueOf(value.toString());
+	case BOOLEAN -> this.value = Boolean.valueOf(value.toString());
+	case TEXTUAL, ISO8601_DATE, ISO8601_DATE_TIME -> this.value = value.toString();
+	case SPATIAL -> throw new UnsupportedOperationException("Unimplemented case: " + getType());
+	case COMPOSED -> throw new UnsupportedOperationException("Unimplemented case: " + getType());
 	}
-    }
-
-    /**
-     * @param value
-     */
-    public void setValue(Boolean value) {
-
-	this.value = value;
-    }
-
-    /**
-     * @param value
-     */
-    public void setValue(Long value) {
-
-	this.value = value;
-    }
-
-    /**
-     * @param value
-     */
-    public void setValue(Double value) {
-
-	this.value = value;
     }
 }

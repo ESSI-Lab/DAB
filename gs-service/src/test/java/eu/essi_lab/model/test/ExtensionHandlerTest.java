@@ -1,4 +1,4 @@
-package csw.test;
+package eu.essi_lab.model.test;
 
 import java.io.IOException;
 import java.io.InputStream;

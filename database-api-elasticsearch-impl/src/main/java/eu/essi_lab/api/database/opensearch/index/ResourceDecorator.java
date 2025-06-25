@@ -156,7 +156,15 @@ public class ResourceDecorator {
 		    JSONObject obj = new JSONObject();
 		    obj.put(name, source.getJSONObject(name));
 
-		    ComposedElement element = ComposedElement.create(obj);
+		    ComposedElement model = MetadataElement.withComposedElement().//
+			    stream().//
+			    filter(el -> el.getName().equals(name)).//
+			    findFirst().//
+			    get().//
+			    createComposedElement().//
+			    get();
+
+		    ComposedElement element = ComposedElement.create(obj, model);
 		    res.getExtensionHandler().addComposedElement(element);
 
 		} catch (Exception ex) {

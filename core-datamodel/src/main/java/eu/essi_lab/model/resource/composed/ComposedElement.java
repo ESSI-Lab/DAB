@@ -25,7 +25,6 @@ package eu.essi_lab.model.resource.composed;
  */
 
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,9 +46,7 @@ import org.w3c.dom.Node;
 import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.NameSpace;
-import eu.essi_lab.model.Queryable.ContentType;
 
 /**
  * @author Fabrizio
@@ -79,10 +76,11 @@ public class ComposedElement extends DOMSerializer {
 
     /**
      * @param object
+     * @param model
      * @return
      * @throws Exception
      */
-    public static ComposedElement create(JSONObject object) throws Exception {
+    public static ComposedElement create(JSONObject object, ComposedElement model) throws Exception {
 
 	ComposedElement out = new ComposedElement(object.keys().next());
 
@@ -94,52 +92,11 @@ public class ComposedElement extends DOMSerializer {
 
 	    out.addItem(item);
 
+	    item.setType(model.getProperty(key).get().getType());
+
 	    Object obj = properties.get(key);
 
-	    switch (obj) {
-	    case String s -> {
-
-		if (ISO8601DateTimeUtils.parseISO8601ToDate(s).isPresent()) {
-
-		    if (s.contains("T")) {
-
-			item.setType(ContentType.ISO8601_DATE_TIME);
-
-		    } else {
-
-			item.setType(ContentType.ISO8601_DATE);
-		    }
-		} else {
-
-		    item.setType(ContentType.TEXTUAL);
-		}
-
-		item.setValue(s);
-	    }
-	    case Double d -> {
-		item.setType(ContentType.DOUBLE);
-		item.setValue(d);
-	    }
-	    case BigDecimal d -> {
-		item.setType(ContentType.DOUBLE);
-		item.setValue(d.doubleValue());
-	    }
-	    case Long l -> {
-		item.setType(ContentType.LONG);
-		item.setValue(l);
-	    }
-	    case Integer i -> {
-		item.setType(ContentType.INTEGER);
-		item.setValue(i);
-	    }
-	    case Boolean i -> {
-		item.setType(ContentType.BOOLEAN);
-		item.setValue(i);
-	    }
-
-	    default -> throw new IllegalArgumentException("Unexpected value: " + obj);
-
-	    }
+	    item.setValue(obj);
 	});
 
 	return out;

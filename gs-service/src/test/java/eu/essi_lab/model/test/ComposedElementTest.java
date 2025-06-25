@@ -1,7 +1,7 @@
 /**
  * 
  */
-package csw.test;
+package eu.essi_lab.model.test;
 
 import java.util.List;
 
@@ -32,11 +32,15 @@ public class ComposedElementTest {
 	Assert.assertEquals(ComposedElementItem.DEFAULT_STRING_VALUE, composedElement.getProperty("SA_uri").get().getValue());
 	Assert.assertEquals(ComposedElementItem.DEFAULT_STRING_VALUE, composedElement.getProperty("SA_matchType").get().getValue());
 
-	ComposedElement composedElement1 = ComposedElement.create(new JSONObject(composedElement.asJSON().toString()));
+	ComposedElement composedElement1 = ComposedElement.create(//
+		new JSONObject(composedElement.asJSON().toString()),//
+		MetadataElement.KEYWORD_SA.createComposedElement().get());
 
 	Assert.assertEquals(composedElement, composedElement1);
 
-	ComposedElement composedElement2 = ComposedElement.create(composedElement.asJSON());
+	ComposedElement composedElement2 = ComposedElement.create(//
+		composedElement.asJSON(),//
+		MetadataElement.KEYWORD_SA.createComposedElement().get());
 
 	Assert.assertEquals(composedElement, composedElement2);
 
@@ -143,7 +147,7 @@ public class ComposedElementTest {
 	//
 	//
 
-	ComposedElement fromJSON = ComposedElement.create(composedElement.asJSON());
+	ComposedElement fromJSON = ComposedElement.create(composedElement.asJSON(), composedElement);
 
 	Assert.assertEquals(composedElement, fromJSON);
 
@@ -204,7 +208,7 @@ public class ComposedElementTest {
 
 	JSONObject asJSON = composedElement.asJSON();
 
-	ComposedElement fromJSON = ComposedElement.create(asJSON);
+	ComposedElement fromJSON = ComposedElement.create(asJSON, composedElement);
 
 	Assert.assertEquals(composedElement, fromJSON);
 
@@ -224,6 +228,52 @@ public class ComposedElementTest {
 	Assert.assertEquals(10, properties.stream().filter(p -> p.getName().equals("integer")).findFirst().get().getValue());
 	Assert.assertEquals(10.0, properties.stream().filter(p -> p.getName().equals("double")).findFirst().get().getValue());
 	Assert.assertEquals(10l, properties.stream().filter(p -> p.getName().equals("long")).findFirst().get().getValue());
+
+	Assert.assertEquals(ContentType.INTEGER,
+		properties.stream().filter(p -> p.getName().equals("integer")).findFirst().get().getType());
+	Assert.assertEquals(ContentType.DOUBLE, properties.stream().filter(p -> p.getName().equals("double")).findFirst().get().getType());
+	Assert.assertEquals(ContentType.LONG, properties.stream().filter(p -> p.getName().equals("long")).findFirst().get().getType());
+    }
+
+    
+
+    @Test
+    public void fromJSONtoXMLTestWithModelTest() throws Exception {
+
+	ComposedElement model = ComposedElementBuilder.get("test").//
+		addItem("integer", ContentType.INTEGER).//
+		addItem("double", ContentType.DOUBLE).//
+		addItem("long", ContentType.LONG).//
+		build();//
+
+	model.getProperty("integer").get().setValue(10);
+	model.getProperty("double").get().setValue(10);
+	model.getProperty("long").get().setValue(10);
+
+	Assert.assertEquals(10, model.getProperty("integer").get().getValue());
+	Assert.assertEquals(10.0, model.getProperty("double").get().getValue());
+	Assert.assertEquals(10l, model.getProperty("long").get().getValue());
+
+	JSONObject asJSON = new JSONObject("{\"test\":{\"double\":0,\"integer\":0,\"long\":0}}");
+
+	ComposedElement fromJSON = ComposedElement.create(asJSON, model);
+
+	String name = fromJSON.getName();
+	Assert.assertEquals("test", name);
+
+	List<ComposedElementItem> properties = fromJSON.getProperties();
+
+	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("integer")).findFirst().isPresent());
+	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("double")).findFirst().isPresent());
+	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("long")).findFirst().isPresent());
+
+	Assert.assertEquals(0, fromJSON.getProperty("integer").get().getValue());
+	Assert.assertEquals(0.0, fromJSON.getProperty("double").get().getValue());
+	Assert.assertEquals(0l, fromJSON.getProperty("long").get().getValue());
+
+	Assert.assertEquals(0, properties.stream().filter(p -> p.getName().equals("integer")).findFirst().get().getValue());
+	Assert.assertEquals(0.0, properties.stream().filter(p -> p.getName().equals("double")).findFirst().get().getValue());
+	Assert.assertEquals(0l, properties.stream().filter(p -> p.getName().equals("long")).findFirst().get().getValue());
 
 	Assert.assertEquals(ContentType.INTEGER,
 		properties.stream().filter(p -> p.getName().equals("integer")).findFirst().get().getType());
@@ -255,11 +305,11 @@ public class ComposedElementTest {
 	composedElement.getProperty("date").get().setValue(iso8601Date);
 	composedElement.getProperty("dateTime").get().setValue(iso8601DateTime);
 
-	ComposedElement composedElement1 = ComposedElement.create(new JSONObject(composedElement.asJSON().toString()));
+	ComposedElement composedElement1 = ComposedElement.create(new JSONObject(composedElement.asJSON().toString()), composedElement);
 
 	Assert.assertEquals(composedElement, composedElement1);
 
-	ComposedElement composedElement2 = ComposedElement.create(composedElement.asJSON());
+	ComposedElement composedElement2 = ComposedElement.create(composedElement.asJSON(), composedElement);
 
 	Assert.assertEquals(composedElement, composedElement2);
 
@@ -293,11 +343,11 @@ public class ComposedElementTest {
 	composedElement.getProperty("double").get().setValue(10.5);
 	composedElement.getProperty("long").get().setValue(Long.MAX_VALUE);
 
-	ComposedElement composedElement1 = ComposedElement.create(new JSONObject(composedElement.asJSON().toString()));
+	ComposedElement composedElement1 = ComposedElement.create(new JSONObject(composedElement.asJSON().toString()), composedElement);
 
 	Assert.assertEquals(composedElement, composedElement1);
 
-	ComposedElement composedElement2 = ComposedElement.create(composedElement.asJSON());
+	ComposedElement composedElement2 = ComposedElement.create(composedElement.asJSON(), composedElement);
 
 	Assert.assertEquals(composedElement, composedElement2);
 
