@@ -45,6 +45,7 @@ import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.toscana.HISCentralToscanaConnector;
 import eu.essi_lab.accessor.hiscentral.toscana.HISCentralToscanaIdentifierMangler;
@@ -264,9 +265,10 @@ public class HISCentralToscanaDownloader extends WMLDataDownloader {
 		    // end = new Date(upper.longValue());
 		    // }
 
-		    ObjectFactory factory = new ObjectFactory();
-		    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-		    tsrt.getTimeSeries().get(0).getVariable().setNoDataValue(NO_DATA_VALUE.doubleValue());
+		    TimeSeriesResponseType jtst = getJaxbTimeSeriesTemplate();
+		    jtst.getTimeSeries().get(0).getVariable().setNoDataValue(NO_DATA_VALUE.doubleValue());
+		    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(jtst, getClass().getSimpleName(), ".wml");
+
 		    // DataDimension dimension = descriptor.getTemporalDimension();
 		    // Date begin = null;
 		    // Date end = null;
@@ -336,7 +338,7 @@ public class HISCentralToscanaDownloader extends WMLDataDownloader {
 				    if (!valueString.isEmpty()) {
 					dataValue = new BigDecimal(valueString);
 					v.setValue(dataValue);
-				    }else {
+				    } else {
 					v.setValue(NO_DATA_VALUE);
 				    }
 				    GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
@@ -345,7 +347,7 @@ public class HISCentralToscanaDownloader extends WMLDataDownloader {
 				    v.setDateTimeUTC(date2);
 				    if (wml2Quality != null) {
 					v.setQualityControlLevelCode(wml2Quality.getUri());
-				    }else {
+				    } else {
 					v.setQualityControlLevelCode(tipoString);
 				    }
 				    addValue(tsrt, v);
@@ -353,12 +355,7 @@ public class HISCentralToscanaDownloader extends WMLDataDownloader {
 			    }
 			}
 
-			JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-			File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-			tmpFile.deleteOnExit();
-			JAXBWML.getInstance().marshal(response, tmpFile);
-
-			return tmpFile;
+			return tsrt.getDataFile();
 		    }
 
 		    // TimeSeriesResponseDocument values;

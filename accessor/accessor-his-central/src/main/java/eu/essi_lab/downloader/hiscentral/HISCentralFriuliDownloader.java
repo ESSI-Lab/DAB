@@ -37,17 +37,15 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.friuli.HISCentralFriuliConnector;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
@@ -196,7 +194,7 @@ public class HISCentralFriuliDownloader extends WMLDataDownloader {
 		dates = buildDates(startDate.get(), endDate.get());
 	    }
 
-	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 	    for (Date[] d : dates) {
@@ -264,13 +262,7 @@ public class HISCentralFriuliDownloader extends WMLDataDownloader {
 
 	    }
 
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-	    tmpFile.deleteOnExit();
-	    JAXBWML.getInstance().marshal(response, tmpFile);
-
-	    return tmpFile;
+	    return tsrt.getDataFile();
 
 	} catch (Exception e) {
 

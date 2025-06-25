@@ -48,6 +48,7 @@ import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.valdaosta.HISCentralValdaostaConnector;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
@@ -203,10 +204,12 @@ public class HISCentralValdaostaDownloader extends WMLDataDownloader {
 
 		JSONArray valuesData = jsonObj.optJSONArray("data");
 
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
 		BigDecimal missingValue = new BigDecimal(MISSING_VALUE);
 
-		tsrt.getTimeSeries().get(0).getVariable().setNoDataValue(missingValue.doubleValue());
+		TimeSeriesResponseType jtst = getJaxbTimeSeriesTemplate();
+		jtst.getTimeSeries().get(0).getVariable().setNoDataValue(missingValue.doubleValue());
+		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(jtst, getClass().getSimpleName(), ".wml");
+
 		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 		DateFormat iso8601OutputFormat = null;
@@ -269,13 +272,7 @@ public class HISCentralValdaostaDownloader extends WMLDataDownloader {
 
 		}
 
-		JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-		tmpFile.deleteOnExit();
-		JAXBWML.getInstance().marshal(response, tmpFile);
-
-		return tmpFile;
+		return tsrt.getDataFile();
 	    }
 
 	} catch (Exception e) {

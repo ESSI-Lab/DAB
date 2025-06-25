@@ -79,13 +79,24 @@ import eu.essi_lab.model.resource.GSResource;
  */
 public abstract class WMLDataDownloader extends DataDownloader {
 
-    public TimeSeriesTemplate getTimeSeriesTemplate(File templateFile) throws Exception {
-	TimeSeriesTemplate template = new TimeSeriesTemplate(templateFile, getTimeSeriesTemplate());
+    public TimeSeriesTemplate getTimeSeriesTemplate(String prefix, String suffix) throws Exception {
+	return getTimeSeriesTemplate(getJaxbTimeSeriesTemplate(), prefix, suffix);
+
+    }
+
+    public TimeSeriesTemplate getTimeSeriesTemplate(TimeSeriesResponseType tsrt, String prefix, String suffix) throws Exception {
+	File templateFile = File.createTempFile(prefix, suffix);
+	TimeSeriesTemplate template = new TimeSeriesTemplate(templateFile, tsrt);
 	return template;
 
     }
 
+    @Deprecated
     public TimeSeriesResponseType getTimeSeriesTemplate() {
+	return getJaxbTimeSeriesTemplate();
+    }
+
+    public TimeSeriesResponseType getJaxbTimeSeriesTemplate() {
 	TimeSeriesResponseType ret = new TimeSeriesResponseType();
 
 	TimeSeriesType timeSeries = new TimeSeriesType();
@@ -398,13 +409,13 @@ public abstract class WMLDataDownloader extends DataDownloader {
 	}
 
     }
-    
 
     public void addValue(TimeSeriesTemplate template, ValueSingleVariable value) throws JAXBException {
 	template.addValue(value);
 
     }
 
+    @Deprecated
     public void addValue(TimeSeriesResponseType tsrt, ValueSingleVariable v) {
 	List<SourceType> sources = tsrt.getTimeSeries().get(0).getValues().get(0).getSource();
 	if (!sources.isEmpty()) {

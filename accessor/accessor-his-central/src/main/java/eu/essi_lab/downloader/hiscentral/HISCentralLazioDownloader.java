@@ -204,9 +204,7 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 
 		// JSONArray valuesData = jsonArray.optJSONArray("data");
 
-		File outputFile = File.createTempFile(getClass().getSimpleName(), ".xml");
-
-		TimeSeriesTemplate template = getTimeSeriesTemplate(outputFile);
+		TimeSeriesTemplate template = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
 		GSLoggerFactory.getLogger(getClass()).info("Total size: {}", tmpDataFile.length());
 		int i = 0;

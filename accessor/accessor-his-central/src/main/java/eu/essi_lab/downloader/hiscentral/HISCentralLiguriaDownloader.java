@@ -42,6 +42,7 @@ import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.liguria.HISCentralLiguriaConnector;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
@@ -214,8 +215,8 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 	    }
 
 	    String var = online.getName().split("_")[2];
-
-	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+	    
+	    TimeSeriesTemplate template = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 	    
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 	    
@@ -272,19 +273,13 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 			    //
 			    //
 
-			    addValue(tsrt, variable);
+			    addValue(template, variable);
 			}
 		    }
 		}
 	    }
 
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-	    tmpFile.deleteOnExit();
-	    JAXBWML.getInstance().marshal(response, tmpFile);
-
-	    return tmpFile;
+	    return template.getDataFile();
 
 	} catch (
 
