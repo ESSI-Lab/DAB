@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +51,7 @@ public class RIHMIClientExternalTestIT {
     @Test
     public void testStationIdentifiers() throws Exception {
 	RIHMIClient client = new RIHMIClient();
-	List<String> ids = client.getStationIdentifiers(false);
+	Set<String> ids = client.getStationIdentifiers(false);
 	System.out.println(ids.size() + " values retrieved");
 	assertTrue(ids.size() > 60);
     }
