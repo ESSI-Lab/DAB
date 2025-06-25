@@ -48,10 +48,6 @@ import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.json.JSONArray;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
@@ -59,6 +55,7 @@ import eu.essi_lab.accessor.hiscentral.lazio.HISCentralLazioConnector;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.json.JSONArrayReader;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
@@ -212,17 +209,12 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 		JsonFactory jsonFactory = new JsonFactory();
-		JsonParser parser = jsonFactory.createParser(tmpDataFile);
-		ObjectMapper mapper = new ObjectMapper();
 
-		if (parser.nextToken() != JsonToken.START_ARRAY) {
-		    throw new IllegalStateException("Expected start of top-level array");
-		}
+		JSONArrayReader parser = new JSONArrayReader(tmpDataFile);
 
-		while (parser.nextToken() != JsonToken.END_ARRAY) {
+		String rawJson = null;
+		while ( (rawJson=parser.readNextItem()) != null) {
 		    // Read current token (which is START_ARRAY for each sub-array)
-		    JsonNode subArray = mapper.readTree(parser);
-		    String rawJson = mapper.writeValueAsString(subArray);
 
 		    if (i++ % 100000 == 0) {
 			GSLoggerFactory.getLogger(getClass()).info("Partial size: {}", i);
@@ -274,7 +266,6 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 
 		}
 
-		parser.close();
 		tmpDataFile.delete();
 
 		return template.getDataFile();
