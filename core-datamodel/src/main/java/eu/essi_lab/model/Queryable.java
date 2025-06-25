@@ -82,7 +82,11 @@ public interface Queryable {
 	/**
 	 * 
 	 */
-	BOOLEAN
+	BOOLEAN,
+	/**
+	 * 
+	 */
+	COMPOSED
     }
 
     /**

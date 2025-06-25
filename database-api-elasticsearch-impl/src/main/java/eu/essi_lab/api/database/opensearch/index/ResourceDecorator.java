@@ -25,7 +25,9 @@ package eu.essi_lab.api.database.opensearch.index;
  */
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,6 +35,7 @@ import org.json.JSONObject;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.indexes.IndexedElements;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.index.IndexedElement;
@@ -40,6 +43,7 @@ import eu.essi_lab.model.index.jaxb.IndexesMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 
 /**
  * @author Fabrizio
@@ -105,10 +109,7 @@ public class ResourceDecorator {
 
 	    if (source.has(el.getName())) {
 
-		// if the resource binary is present, bbox is already in,
-		// since the IndexesMetadata.clear(false) do not remove it
-		// @see IndexData
-		if (!el.getName().equals(MetadataElement.BOUNDING_BOX.getName())) {
+		if (!el.getName().equals(MetadataElement.BOUNDING_BOX.getName()) && !MetadataElement.hasComposedElement(el.getName())) {
 
 		    IndexedElement element = new IndexedElement(el.getName());
 
@@ -135,6 +136,43 @@ public class ResourceDecorator {
 		}
 	    }
 	});
+
+	//
+	// if the source has a composed element, it is converted to XML and added as extension
+	//
+
+	List<String> composed = source.//
+		keySet().//
+		stream().//
+		filter(key -> MetadataElement.withComposedElement().stream().map(el -> el.getName()).anyMatch(v -> v.equals(key))).//
+		collect(Collectors.toList());
+
+	if (!composed.isEmpty()) {
+
+	    composed.forEach(name -> {
+
+		try {
+
+		    JSONObject obj = new JSONObject();
+		    obj.put(name, source.getJSONObject(name));
+
+		    ComposedElement model = MetadataElement.withComposedElement().//
+			    stream().//
+			    filter(el -> el.getName().equals(name)).//
+			    findFirst().//
+			    get().//
+			    createComposedElement().//
+			    get();
+
+		    ComposedElement element = ComposedElement.create(obj, model);
+		    res.getExtensionHandler().addComposedElement(element);
+
+		} catch (Exception ex) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(ex);
+		}
+	    });
+	}
 
 	//
 	// adds the shape to the extension handler; it can be used in case the resource binary

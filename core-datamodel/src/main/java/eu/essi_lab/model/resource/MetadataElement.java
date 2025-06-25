@@ -27,8 +27,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedElement;
+import eu.essi_lab.model.resource.composed.ComposedElement;
+import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
 
 /**
  * Enumeration of queryable {@link HarmonizedMetadata} element names
@@ -37,6 +40,72 @@ import eu.essi_lab.model.index.IndexedElement;
  * @see ResourceProperty
  */
 public enum MetadataElement implements Queryable {
+
+    /**
+     * 
+     */
+    KEYWORD_SA(ComposedElementBuilder.get("keyword_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
+
+    /**
+     * 
+     */
+    PARAMETER_SA(ComposedElementBuilder.get("parameter_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
+
+    /**
+     * 
+     */
+    INSTRUMENT_SA(ComposedElementBuilder.get("instrument_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
+
+    /**
+     * 
+     */
+    RESPONSIBLE_ORG_SA(ComposedElementBuilder.get("responsibleOrg_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
+
+    /**
+     * 
+     */
+    CRUISE_SA(ComposedElementBuilder.get("cruise_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
+
+    /**
+     * 
+     */
+    PROJECT_SA(ComposedElementBuilder.get("project_SA").//
+
+	    addItem("value", ContentType.TEXTUAL).//
+	    addItem("uri", ContentType.TEXTUAL).//
+	    addItem("SA_uri", ContentType.TEXTUAL).//
+	    addItem("SA_matchType", ContentType.TEXTUAL).//
+	    build()), //
 
     /**
      *
@@ -382,18 +451,17 @@ public enum MetadataElement implements Queryable {
      *
      */
     TEMP_EXTENT_BEGIN("tmpExtentBegin", ContentType.ISO8601_DATE_TIME),
-    
+
     /**
      * 
      */
     TEMP_EXTENT_BEGIN_NOW("tmpExtentBegin_Now", ContentType.BOOLEAN),
-    
 
     /**
      *
      */
     TEMP_EXTENT_END("tmpExtentEnd", ContentType.ISO8601_DATE_TIME),
-    
+
     /**
      * 
      */
@@ -715,6 +783,7 @@ public enum MetadataElement implements Queryable {
     private boolean extendedElement;
     private ContentType type;
     private boolean isEnabled;
+    private ComposedElement element;
 
     /**
      * @param name
@@ -739,6 +808,19 @@ public enum MetadataElement implements Queryable {
     private MetadataElement(String name, ContentType type) {
 
 	this(name, false, false, type, true);
+    }
+
+    /**
+     * @param element
+     */
+    private MetadataElement(ComposedElement element) {
+
+	this.name = element.getName();
+	this.element = element;
+	this.volatileElement = false;
+	this.type = ContentType.COMPOSED;
+	this.isEnabled = true;
+	this.extendedElement = true;
     }
 
     /**
@@ -820,6 +902,31 @@ public enum MetadataElement implements Queryable {
     }
 
     /**
+     * @param name
+     * @return
+     */
+    public static boolean hasComposedElement(String name) {
+
+	return listValues().//
+		stream().//
+		filter(e -> e.hasComposedElement() && e.getName().equals(name)).//
+		findFirst().//
+		isPresent();
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public static List<MetadataElement> withComposedElement() {
+
+	return listValues().//
+		stream().//
+		filter(e -> e.hasComposedElement()).//
+		collect(Collectors.toList());
+    }
+
+    /**
      * @return
      */
     public static List<MetadataElement> listValues() {
@@ -848,6 +955,35 @@ public enum MetadataElement implements Queryable {
     }
 
     public boolean isExtendedElement() {
+
 	return extendedElement;
+    }
+
+    /**
+     * @return <code>true</code> if {@link MetadataElement#getContentType()} is {@link ContentType#COMPOSED}
+     */
+    public boolean hasComposedElement() {
+
+	return element != null;
+    }
+
+    /**
+     * @return an {@link Optional} with a new instance of {@link ComposedElement} if
+     *         {@link MetadataElement#hasComposedElement()}
+     *         is <code>true</code>, otherwise returns {@link Optional#empty()}
+     */
+    public Optional<ComposedElement> createComposedElement() {
+
+	if (element != null) {
+
+	    try {
+		return Optional.ofNullable(ComposedElement.create(element.asDocument(false)));
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(MetadataElement.class).error(ex);
+	    }
+	}
+
+	return Optional.empty();
     }
 }

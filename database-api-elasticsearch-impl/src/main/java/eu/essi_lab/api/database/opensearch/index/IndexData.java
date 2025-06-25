@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -77,6 +78,7 @@ import eu.essi_lab.model.index.jaxb.IndexesMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 
 /**
  * @author Fabrizio
@@ -712,6 +714,21 @@ public class IndexData {
 	}
 
 	//
+	// composed elements
+	//
+
+	List<Node> composedElements = handler.evaluateNodes("//*:indexesMetadata/*:composedElement");
+
+	if (!composedElements.isEmpty()) {
+
+	    composedElements.//
+		    stream().//
+		    map(el -> create(el)).//
+		    filter(Objects::nonNull).//
+		    forEach(el -> indexData.put(el.getName(), el.asJSON().getJSONObject(el.getName())));
+	}
+
+	//
 	// temp extent begin
 	//
 
@@ -783,6 +800,22 @@ public class IndexData {
 
 	// clear the indexes (all but the bbox) before storing the binary property
 	handler.remove("//*:indexesMetadata");
+    }
+
+    /**
+     * @param node
+     * @return
+     */
+    private static ComposedElement create(Node node) {
+
+	try {
+	    return ComposedElement.create(node);
+	} catch (JAXBException e) {
+
+	    GSLoggerFactory.getLogger(IndexData.class).error(e);
+	}
+
+	return null;
     }
 
     /**

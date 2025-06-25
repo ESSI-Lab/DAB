@@ -271,7 +271,7 @@ public class AggregationIdentifiersTask extends AbstractEmbeddedTask  {
 			findFirst().//
 			get();
 
-		IndexedElementsWriter.indexMetadataElements(dataset, Arrays.asList(element));
+		IndexedElementsWriter.index(dataset, Arrays.asList(element));
 
 		//
 		//
