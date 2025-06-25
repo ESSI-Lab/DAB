@@ -1,5 +1,7 @@
 package eu.essi_lab.access.wml;
 
+import java.io.File;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -29,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.Duration;
 
 import org.cuahsi.waterml._1.ContactInformationType;
@@ -75,6 +78,12 @@ import eu.essi_lab.model.resource.GSResource;
  * @author Boldrini
  */
 public abstract class WMLDataDownloader extends DataDownloader {
+
+    public TimeSeriesTemplate getTimeSeriesTemplate(File templateFile) throws Exception {
+	TimeSeriesTemplate template = new TimeSeriesTemplate(templateFile, getTimeSeriesTemplate());
+	return template;
+
+    }
 
     public TimeSeriesResponseType getTimeSeriesTemplate() {
 	TimeSeriesResponseType ret = new TimeSeriesResponseType();
@@ -387,6 +396,12 @@ public abstract class WMLDataDownloader extends DataDownloader {
 
 	    value.getSource().add(source);
 	}
+
+    }
+    
+
+    public void addValue(TimeSeriesTemplate template, ValueSingleVariable value) throws JAXBException {
+	template.addValue(value);
 
     }
 

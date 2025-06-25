@@ -40,15 +40,11 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.io.IOUtils;
-import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -57,6 +53,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.lazio.HISCentralLazioConnector;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
@@ -173,8 +170,6 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 	    Date begin = null;
 	    Date end = null;
 
-	    ObjectFactory jaxbFactory = new ObjectFactory();
-
 	    String startString = null;
 	    String endString = null;
 
@@ -209,7 +204,10 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 
 		// JSONArray valuesData = jsonArray.optJSONArray("data");
 
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		File outputFile = File.createTempFile(getClass().getSimpleName(), ".xml");
+
+		TimeSeriesTemplate template = getTimeSeriesTemplate(outputFile);
+
 		GSLoggerFactory.getLogger(getClass()).info("Total size: {}", tmpDataFile.length());
 		int i = 0;
 		DateFormat iso8601OutputFormat = null;
@@ -274,24 +272,18 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 		    //
 		    //
 
-		    addValue(tsrt, variable);
+		    addValue(template, variable);
 
 		}
 
 		parser.close();
 		tmpDataFile.delete();
 
-		JAXBElement<TimeSeriesResponseType> response = jaxbFactory.createTimeSeriesResponse(tsrt);
-		File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-		tmpFile.deleteOnExit();
-		JAXBWML.getInstance().marshal(response, tmpFile);
-
-		return tmpFile;
+		return template.getDataFile();
 	    }
 
 	} catch (Exception e) {
-
+	    e.printStackTrace();
 	    ex = e;
 	}
 
