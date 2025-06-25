@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -58,6 +59,7 @@ import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.SatelliteScene;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
@@ -666,12 +668,11 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
 
 	    Iterator<ResponsibleParty> contactIterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getContacts();
-	    while (contactIterator!=null && contactIterator.hasNext()) {
+	    while (contactIterator != null && contactIterator.hasNext()) {
 		ResponsibleParty responsibleParty = (ResponsibleParty) contactIterator.next();
-		parties.add(responsibleParty);		
+		parties.add(responsibleParty);
 	    }
-	    
-	    
+
 	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
 
 	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
@@ -2285,6 +2286,106 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    boolean found = resource.getExtensionHandler().isInSitu();
 	    getValues().add(String.valueOf(found));
+	}
+    };
+
+    //
+    // composed elements: TO BE DEFINED
+    //
+
+    public static final IndexedMetadataElement KEYWORD_SA = new IndexedMetadataElement(MetadataElement.KEYWORD_SA) {
+
+	@Override
+	public void defineValues(GSResource resource) {
+
+//	    ComposedElement composedElement = MetadataElement.KEYWORD_SA.createComposedElement().get();
+//
+//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
+//
+//	    setComposedElement(composedElement);
+	}
+    };
+
+    public static final IndexedMetadataElement PARAMETER_SA = new IndexedMetadataElement(MetadataElement.PARAMETER_SA) {
+
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    ComposedElement composedElement = MetadataElement.PARAMETER_SA.createComposedElement().get();
+//
+//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
+//
+//	    setComposedElement(composedElement);
+	}
+    };
+
+    public static final IndexedMetadataElement INSTRUMENT_SA = new IndexedMetadataElement(MetadataElement.INSTRUMENT_SA) {
+
+	@Override
+	public void defineValues(GSResource resource) {
+
+//	    ComposedElement composedElement = MetadataElement.INSTRUMENT_SA.createComposeElement().get();
+//
+//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
+//
+//	    setComposedElement(composedElement);
+	}
+    };
+
+    public static final IndexedMetadataElement RESPONSIBLE_ORG_SA = new IndexedMetadataElement(MetadataElement.RESPONSIBLE_ORG_SA) {
+
+	@Override
+	public void defineValues(GSResource resource) {
+
+//	    ComposedElement composedElement = MetadataElement.RESPONSIBLE_ORG_SA.createComposedElement().get();
+//
+//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
+//
+//	    setComposedElement(composedElement);
+	}
+    };
+
+    public static final IndexedMetadataElement CRUISE_SA = new IndexedMetadataElement(MetadataElement.CRUISE_SA) {
+
+	@Override
+	public void defineValues(GSResource resource) {
+
+//	    ComposedElement composedElement = MetadataElement.CRUISE_SA.createComposedElement().get();
+
+//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
+
+//	    setComposedElement(composedElement);
+	}
+    };
+
+    public static final IndexedMetadataElement PROJECT_SA = new IndexedMetadataElement(MetadataElement.PROJECT_SA) {
+
+	@Override
+	public void defineValues(GSResource resource) {
+
+//	    ComposedElement composedElement = MetadataElement.PROJECT_SA.createComposedElement().get();
+
+//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
+//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
+
+//	    setComposedElement(composedElement);
 	}
     };
 

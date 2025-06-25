@@ -860,7 +860,7 @@ public class SatelliteScene extends DOMSerializer {
     protected Marshaller createMarshaller() throws JAXBException {
 
 	Marshaller marshaller = context.createMarshaller();
-	marshaller.setProperty("jaxb.formatted.output", true);
+	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 	marshaller.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
 	return marshaller;
     }

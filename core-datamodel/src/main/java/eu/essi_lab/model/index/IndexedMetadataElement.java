@@ -34,6 +34,7 @@ import eu.essi_lab.model.resource.BNHSPropertyReader;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
 import net.opengis.iso19139.gmx.v_20060504.AnchorType;
@@ -84,118 +85,9 @@ public abstract class IndexedMetadataElement extends IndexedElement {
      * @param element
      */
     public IndexedMetadataElement(MetadataElement element) {
+	
 	super(element.getName());
 	this.element = element;
-    }
-
-    public void addKeywords(GSResource resource, String type) {
-	addKeywords(resource, type, new String[] {});
-    }
-
-    public void addKeywords(GSResource resource, String typeToInclude, String... typesToExclude) {
-	Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		.getDataIdentifications();
-	while (identifications.hasNext()) {
-	    DataIdentification dataId = identifications.next();
-	    Iterator<Keywords> keywords = dataId.getKeywords();
-	    k: while (keywords.hasNext()) {
-		Keywords keyword = (Keywords) keywords.next();
-		String t = keyword.getTypeCode();
-		if (typeToInclude != null) {
-		    if (t == null || !t.equals(typeToInclude)) {
-			continue;
-		    }
-		}
-		if (typesToExclude.length > 0) {
-		    for (String typeToExclude : typesToExclude) {
-			if (typeToExclude == null) {
-			    if (t == null) {
-				continue k;
-			    }
-			} else {
-			    if (t != null && t.equals(typeToExclude)) {
-				continue k;
-			    }
-			}
-		    }
-		}
-		List<CharacterStringPropertyType> ks = keyword.getElementType().getKeyword();
-		for (CharacterStringPropertyType k : ks) {
-		    if (k == null || k.getCharacterString() == null || k.getCharacterString().getValue() == null) {
-			continue;
-		    }
-		    Object obj = k.getCharacterString().getValue();
-		    if (obj instanceof AnchorType) {
-			AnchorType anchor = (AnchorType) obj;
-			String title = anchor.getValue();
-			if (checkStringValue(title)) {
-			    getValues().add(title);
-			}
-		    } else if (obj instanceof CodeListValueType) {
-			CodeListValueType cvt = (CodeListValueType) ks;
-			String title = cvt.getCodeListValue();
-			if (checkStringValue(title)) {
-			    getValues().add(title);
-			}
-		    } else if (obj instanceof String) {
-			String title = (String) obj;
-			if (checkStringValue(title)) {
-			    getValues().add(title);
-			}
-		    }
-		}
-	    }
-	}
-    }
-
-    public void addKeywordsURI(GSResource resource, String type) {
-	addKeywordsURI(resource, type, new String[] {});
-    }
-
-    public void addKeywordsURI(GSResource resource, String typeToInclude, String... typesToExclude) {
-	Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		.getDataIdentifications();
-	while (identifications.hasNext()) {
-	    DataIdentification dataId = identifications.next();
-	    Iterator<Keywords> keywords = dataId.getKeywords();
-	    k: while (keywords.hasNext()) {
-		Keywords keyword = (Keywords) keywords.next();
-		String t = keyword.getTypeCode();
-		if (typeToInclude != null) {
-		    if (t == null || !t.equals(typeToInclude)) {
-			continue;
-		    }
-		}
-		if (typesToExclude.length > 0) {
-		    for (String typeToExclude : typesToExclude) {
-			if (typeToExclude == null) {
-			    if (t == null) {
-				continue k;
-			    }
-			} else {
-			    if (t != null && t.equals(typeToExclude)) {
-
-				continue k;
-			    }
-			}
-		    }
-		}
-		List<CharacterStringPropertyType> ks = keyword.getElementType().getKeyword();
-		for (CharacterStringPropertyType k : ks) {
-		    if (k == null || k.getCharacterString() == null || k.getCharacterString().getValue() == null) {
-			continue;
-		    }
-		    Object obj = k.getCharacterString().getValue();
-		    if (obj instanceof AnchorType) {
-			AnchorType anchor = (AnchorType) obj;
-			String href = anchor.getHref();
-			if (checkStringValue(href)) {
-			    getValues().add(href);
-			}
-		    }
-		}
-	    }
-	}
     }
 
     /**
@@ -205,8 +97,177 @@ public abstract class IndexedMetadataElement extends IndexedElement {
      * @param bbox
      */
     public IndexedMetadataElement(BoundingBox bbox) {
+	
 	super(MetadataElement.BOUNDING_BOX.getName());
 	this.boundingBox = bbox;
+    }
+
+    /**
+     * 
+     */
+    public void addKeywords(GSResource resource, String type) {
+        
+        addKeywords(resource, type, new String[] {});
+    }
+
+    /**
+     * 
+     * @param resource
+     * @param typeToInclude
+     * @param typesToExclude
+     */
+    public void addKeywords(GSResource resource, String typeToInclude, String... typesToExclude) {
+        
+        Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+        	.getDataIdentifications();
+        
+        while (identifications.hasNext()) {
+          
+            DataIdentification dataId = identifications.next();
+            Iterator<Keywords> keywords = dataId.getKeywords();
+          
+            k: while (keywords.hasNext()) {
+        	
+        	Keywords keyword = (Keywords) keywords.next();
+        	String t = keyword.getTypeCode();
+        	
+        	if (typeToInclude != null) {
+        	    if (t == null || !t.equals(typeToInclude)) {
+        		continue;
+        	    }
+        	}
+        	
+        	if (typesToExclude.length > 0) {
+        	    for (String typeToExclude : typesToExclude) {
+        		if (typeToExclude == null) {
+        		    if (t == null) {
+        			continue k;
+        		    }
+        		} else {
+        		    if (t != null && t.equals(typeToExclude)) {
+        			continue k;
+        		    }
+        		}
+        	    }
+        	}
+        	
+        	List<CharacterStringPropertyType> ks = keyword.getElementType().getKeyword();
+        	
+        	for (CharacterStringPropertyType k : ks) {
+        	  
+        	    if (k == null || k.getCharacterString() == null || k.getCharacterString().getValue() == null) {
+        		continue;
+        	    }
+        	    
+        	    Object obj = k.getCharacterString().getValue();
+        	    
+        	    if (obj instanceof AnchorType) {
+        		
+        		AnchorType anchor = (AnchorType) obj;
+        		String title = anchor.getValue();
+        		
+        		if (checkStringValue(title)) {
+        		    getValues().add(title);
+        		}
+        	    } else if (obj instanceof CodeListValueType) {
+        		
+        		CodeListValueType cvt = (CodeListValueType) ks;
+        		String title = cvt.getCodeListValue();
+        		
+        		if (checkStringValue(title)) {
+        		    getValues().add(title);
+        		}
+        	    } else if (obj instanceof String) {
+        		
+        		String title = (String) obj;
+        		if (checkStringValue(title)) {
+        		    getValues().add(title);
+        		}
+        	    }
+        	}
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param resource
+     * @param type
+     */
+    public void addKeywordsURI(GSResource resource, String type) {
+        
+        addKeywordsURI(resource, type, new String[] {});
+    }
+
+    /**
+     * 
+     * @param resource
+     * @param typeToInclude
+     * @param typesToExclude
+     */
+    public void addKeywordsURI(GSResource resource, String typeToInclude, String... typesToExclude) {
+        
+        Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+        	.getDataIdentifications();
+        
+        while (identifications.hasNext()) {
+           
+            DataIdentification dataId = identifications.next();
+            Iterator<Keywords> keywords = dataId.getKeywords();
+            
+            k: while (keywords.hasNext()) {
+        	
+        	Keywords keyword = (Keywords) keywords.next();
+        	String t = keyword.getTypeCode();
+        	
+        	if (typeToInclude != null) {
+        	  
+        	    if (t == null || !t.equals(typeToInclude)) {
+        		continue;
+        	    }
+        	}
+        	
+        	if (typesToExclude.length > 0) {
+        	    
+        	    for (String typeToExclude : typesToExclude) {
+        		
+        		if (typeToExclude == null) {
+        		
+        		    if (t == null) {
+        			continue k;
+        		    }
+        		    
+        		} else {
+        		    if (t != null && t.equals(typeToExclude)) {
+    
+        			continue k;
+        		    }
+        		}
+        	    }
+        	}
+        	
+        	List<CharacterStringPropertyType> ks = keyword.getElementType().getKeyword();
+        	
+        	for (CharacterStringPropertyType k : ks) {
+        	    
+        	    if (k == null || k.getCharacterString() == null || k.getCharacterString().getValue() == null) {
+        		continue;
+        	    }
+        	    
+        	    Object obj = k.getCharacterString().getValue();
+        	    
+        	    if (obj instanceof AnchorType) {
+        		
+        		AnchorType anchor = (AnchorType) obj;
+        		String href = anchor.getHref();
+        		
+        		if (checkStringValue(href)) {
+        		    getValues().add(href);
+        		}
+        	    }
+        	}
+            }
+        }
     }
 
     /**
@@ -244,9 +305,12 @@ public abstract class IndexedMetadataElement extends IndexedElement {
 
     /**
      * Defines the value/s of this indexed element by retrieving it/them from the
-     * {@link CoreMetadata} and adding such value/s to the {@link #getValues()} list. If this element
-     * is related to {@link MetadataElement#BOUNDING_BOX}, this method set a {@link BoundingBox} with
-     * the proper values using the {@link #setBoundingBox(BoundingBox)} method
+     * {@link CoreMetadata} and adding such value/s to the {@link #getValues()} list.<br><br>
+     * 
+     * If this element is related to {@link MetadataElement#BOUNDING_BOX}, this method set a {@link BoundingBox} with
+     * the proper values using the {@link #setBoundingBox(BoundingBox)} method.<br><br>
+     * 
+     * If this element has a {@link ComposedElement}, this method set it using the {@link #setComposedElement(ComposedElement)} method
      * 
      * @implnote
      *           Following example shows the implementation for the {@link IndexedMetadataElement} related to
@@ -266,9 +330,17 @@ public abstract class IndexedMetadataElement extends IndexedElement {
      */
     public abstract void defineValues(GSResource resource);
 
+    /**
+     * 
+     * @param property
+     * @param resource
+     */
     protected void defineBNHSProperty(BNHSProperty property, GSResource resource) {
+	
 	Optional<String> value = BNHSPropertyReader.readProperty(resource, property);
+	
 	if (value.isPresent()) {
+	    
 	    if (checkStringValue(value.get())) {
 		getValues().add(value.get());
 	    }
