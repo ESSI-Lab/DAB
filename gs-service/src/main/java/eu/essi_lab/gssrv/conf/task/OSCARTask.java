@@ -171,7 +171,7 @@ public class OSCARTask extends AbstractCustomTask {
 
 	    for (GSResource resource : resources) {
 		i++;
-		if (i > 100) {
+		if (i > 1000) {
 		    break main;
 		}
 		Element res = wigosMapper.map(discoveryMessage, resource);
