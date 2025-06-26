@@ -86,6 +86,7 @@ public class S3ShapeDownloader extends DataDownloader {
 
     private S3ShapeFileClient client;
     private String name;
+    public static final String COMPLETED = "reallyCompleted";
 
     @Override
     public boolean canConnect() {
@@ -194,7 +195,7 @@ public class S3ShapeDownloader extends DataDownloader {
 	String[] files = directory.list();
 
 	// Check if the directory is not empty
-	if (files != null && files.length > 0 && Arrays.asList(files).stream().anyMatch(f -> f.contains("completed"))) {
+	if (files != null && files.length > 0 && Arrays.asList(files).stream().anyMatch(f -> f.contains(COMPLETED))) {
 
 	    return false;
 	} else {
@@ -380,8 +381,8 @@ public class S3ShapeDownloader extends DataDownloader {
 
 		client.downloadTo(persistentTempFolder);
 
-		ByteArrayInputStream stream = new ByteArrayInputStream("reallyCompleted".getBytes());
-		File completedFile = new File(persistentTempFolder, "reallyCompleted");
+		ByteArrayInputStream stream = new ByteArrayInputStream(COMPLETED.getBytes());
+		File completedFile = new File(persistentTempFolder, COMPLETED);
 
 		IOUtils.copy(stream, new FileOutputStream(completedFile));
 	    }
@@ -405,8 +406,8 @@ public class S3ShapeDownloader extends DataDownloader {
 
 		unzipShapefile(new File(persistentTempFolder, list[0]), persistentUnzipFolder);
 
-		ByteArrayInputStream stream = new ByteArrayInputStream("reallyCompleted".getBytes());
-		File completedFile = new File(persistentUnzipFolder, "reallyCompleted");
+		ByteArrayInputStream stream = new ByteArrayInputStream(COMPLETED.getBytes());
+		File completedFile = new File(persistentUnzipFolder, COMPLETED);
 
 		IOUtils.copy(stream, new FileOutputStream(completedFile));
 	    }
