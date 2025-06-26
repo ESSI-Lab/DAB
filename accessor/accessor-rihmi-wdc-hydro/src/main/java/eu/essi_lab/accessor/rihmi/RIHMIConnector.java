@@ -208,11 +208,71 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 		    RIHMIMetadata rm = new RIHMIMetadata();
 		    if (from == null || from.isEmpty()) {
-			if (count == 3) {
-			    ret.setResumptionToken(null);
-			    return ret;
-			} else {
+			GSLoggerFactory.getLogger(getClass()).info("No data while downloading from station {} Reference URL: {}",
+				stationId, url);
+			GSLoggerFactory.getLogger(getClass()).info("Try again with larger date range");
+			String[] splittedURL = url.split("\\?");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+			String dateFromStr = "2020-01-01 00:00";
+			String dateFrom = "";
+			String dateTo = URLEncoder.encode(sdf.format(new Date()), "UTF-8");
+			try {
+			    // Parse the string to Date
+			    Date fixedDate = sdf.parse(dateFromStr);
+
+			    // Format it back (ensures correct timezone formatting)
+			    String formattedDate = sdf.format(fixedDate);
+
+			    // URL encode the formatted date
+			    dateFrom = URLEncoder.encode(formattedDate, "UTF-8");
+			} catch (Exception e) {
+			    e.printStackTrace();
+			}
+			String newURL = splittedURL[0] + "?dateFrom=" + dateFrom + "&dateTo=" + dateTo + "&index=" + stationId;
+
+			try {
+			    response = client.getDownloadResponse(newURL);
+			} catch (Exception e) {
+			    GSLoggerFactory.getLogger(getClass()).error("Error ({}) while downloading from station {} Reference URL: {}",
+				    e.getMessage(), stationId, url);
 			    continue;
+			}
+
+			status = response.statusCode();
+
+			if (status != 200) {
+			    GSLoggerFactory.getLogger(getClass()).error(
+				    "Error (HTTP code {}) while downloading from station {} Reference URL: {}", status, stationId, url);
+			    continue;
+			}
+
+			reader = new XMLDocumentReader(response.body());
+
+			if (reader.asString().contains("Internal Server Error")) {
+			    GSLoggerFactory.getLogger(getClass()).error(
+				    "Error (HTTP code {}) while downloading from station {} Reference URL: {}", status, stationId, url);
+			    continue;
+			}
+
+			from = normalizeTime(reader.evaluateString("//*:TimePeriod/*:beginPosition"));
+			if (from == null || from.isEmpty()) {
+			    from = reader.evaluateString("//*:MeasurementTVP[1]/*:time[1]");
+			}
+
+			to = normalizeTime(reader.evaluateString("//*:TimePeriod/*:endPosition"));
+			if (to == null || to.isEmpty()) {
+			    to = ISO8601DateTimeUtils.getISO8601DateTime();
+			}
+
+			if (from == null || from.isEmpty()) {
+			    if (count == 3) {
+				ret.setResumptionToken(null);
+				return ret;
+			    } else {
+				continue;
+			    }
 			}
 
 		    }
