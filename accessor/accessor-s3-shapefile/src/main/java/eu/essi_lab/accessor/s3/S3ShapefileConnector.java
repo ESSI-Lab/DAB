@@ -34,6 +34,10 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.geotools.api.data.FileDataStore;
+import org.geotools.api.data.FileDataStoreFinder;
+import org.geotools.api.data.SimpleFeatureSource;
+
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -100,8 +104,9 @@ public class S3ShapefileConnector extends HarvestedQueryConnector<S3ShapefileCon
 		    url = url + "/";
 		}
 		url = url + zipFile.getName();
-
-		ShapeFileMetadata metadata = new ShapeFileMetadata(shapeFile);
+		FileDataStore store = FileDataStoreFinder.getDataStore(shapeFile);
+		SimpleFeatureSource featureSource = store.getFeatureSource();
+		ShapeFileMetadata metadata = new ShapeFileMetadata(featureSource);
 		List<FeatureMetadata> features = metadata.getFeatures();
 		for (FeatureMetadata feature : features) {
 		    feature.setUrl(url);

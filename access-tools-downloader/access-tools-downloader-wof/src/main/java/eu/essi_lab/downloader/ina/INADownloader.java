@@ -34,6 +34,7 @@ import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.cuahsi.waterml._1.essi.JAXBWML;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.ina.INAConnector;
 import eu.essi_lab.accessor.wof.client.datamodel.SiteInfo;
@@ -299,23 +300,15 @@ public class INADownloader extends WMLDataDownloader {
 			if (obj instanceof TimeSeriesResponseType) {
 			    tsrtINA = (TimeSeriesResponseType) obj;			    
 			}
-			TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+			TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 			if (tsrtINA!=null) {
 			    List<ValueSingleVariable> inaValues = tsrtINA.getTimeSeries().get(0).getValues().get(0).getValue();
 			    for (ValueSingleVariable inaValue : inaValues) {
 				addValue(tsrt, inaValue);
 			    }			    
 			}
-			
-			
-			ObjectFactory factory = new ObjectFactory();
 
-			JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-			File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-			tmpFile.deleteOnExit();
-			JAXBWML.getInstance().marshal(response, tmpFile);
-
-			return tmpFile;
+			return tsrt.getDataFile();
 		    }
 
 		} catch (Exception e) {

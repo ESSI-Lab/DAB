@@ -32,16 +32,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.odatahidro.ODataHidrologyMapper;
 import eu.essi_lab.accessor.odatahidro.client.ClientResponseWrapper;
@@ -163,27 +160,6 @@ public class ODataDataDownloader extends WMLDataDownloader {
 			    if (beginDate.isPresent() && endDate.isPresent()) {
 
 				descriptor.setTemporalDimension(beginDate.get(), endDate.get());
-				DataDimension temporalDimension = descriptor.getTemporalDimension();
-
-				// int count = ascWrapper.getResponseSize();
-				// if (count > 1) {
-				// Optional<String> date1 = ascWrapper.getDate(1);
-				// String date1String = date1.get();
-				// Optional<Date> date1Date = ISO8601DateTimeUtils.parseISO8601ToDate(date1String);
-				// if (date1Date.isPresent()) {
-				// Date d1 = date1Date.get();
-				//
-				// long l1 = beginDate.get().getTime();
-				// long l2 = d1.getTime();
-				// long resolution = l2 - l1;
-				//
-				// long size = ((l2 - l1) / resolution) + 1;
-				//
-				// temporalDimension.getContinueDimension().setResolution(resolution);
-				// temporalDimension.getContinueDimension().setSize(size);
-				//
-				// }
-				// }
 
 				ret.add(descriptor);
 			    }
@@ -276,15 +252,7 @@ public class ODataDataDownloader extends WMLDataDownloader {
 
 		    int size = wrapper.getResponseSize();
 
-		    ObjectFactory factory = new ObjectFactory();
-		    TimeSeriesResponseType tsrs = getTimeSeriesTemplate();
-
-		    
-		    // CensorCodeType censorCode = new CensorCodeType();
-		    // censorCode.setCensorCode("nc");
-		    // censorCode.setCensorCodeDescription("not censored");
-		    // values.getCensorCode().add(censorCode);
-		    JAXBElement<TimeSeriesResponseType> jaxb = factory.createTimeSeriesResponse(tsrs);
+		    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
 		    for (int i = 0; i < size; i++) {
 			Optional<String> value = wrapper.getValue(i);
@@ -299,14 +267,11 @@ public class ODataDataDownloader extends WMLDataDownloader {
 			    XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 
 			    myValue.setDateTimeUTC(date2);
-			    addValue(tsrs, myValue);
+			    addValue(tsrt, myValue);
 			}
 		    }
 
-		    File ret = File.createTempFile(getClass().getSimpleName(), ".wml");
-		    JAXBWML.getInstance().marshal(jaxb, ret);
-		    ret.deleteOnExit();
-		    return ret;
+		    return tsrt.getDataFile();
 
 		} catch (Exception e) {
 		    throw GSException.createException(//

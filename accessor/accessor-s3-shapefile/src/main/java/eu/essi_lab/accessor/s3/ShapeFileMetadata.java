@@ -24,18 +24,17 @@ package eu.essi_lab.accessor.s3;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.geotools.api.data.DataStore;
-import org.geotools.api.data.DataStoreFinder;
 import org.geotools.api.data.FeatureSource;
+import org.geotools.api.data.FileDataStore;
+import org.geotools.api.data.FileDataStoreFinder;
+import org.geotools.api.data.SimpleFeatureSource;
 import org.geotools.api.feature.GeometryAttribute;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.feature.simple.SimpleFeatureType;
@@ -52,16 +51,7 @@ public class ShapeFileMetadata {
     @XmlElement
     private String url;
 
-    public ShapeFileMetadata(File shpFile) throws Exception {
-	// Prepare a map to point to the .shp file
-	Map<String, Object> map = new HashMap<>();
-	map.put("url", shpFile.toURI().toURL());
-
-	// Open the Shapefile using DataStore
-	DataStore dataStore = DataStoreFinder.getDataStore(map);
-	String typeName = dataStore.getTypeNames()[0];
-
-	FeatureSource<SimpleFeatureType, SimpleFeature> featureSource = dataStore.getFeatureSource(typeName);
+    public ShapeFileMetadata(FeatureSource<SimpleFeatureType, SimpleFeature> featureSource) throws Exception {
 	SimpleFeatureCollection featureCollection = (SimpleFeatureCollection) featureSource.getFeatures();
 
 	try (SimpleFeatureIterator features = featureCollection.features()) {
@@ -97,9 +87,6 @@ public class ShapeFileMetadata {
 
 	    }
 	}
-
-	// Close the data store
-	dataStore.dispose();
 
     }
 

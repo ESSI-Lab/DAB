@@ -23,6 +23,9 @@ package eu.essi_lab.accessor.rihmi;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 
 import eu.essi_lab.iso.datamodel.classes.Address;
@@ -116,15 +119,53 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
+	/**
+	 * ONLINE
+	 */
+
+	Online onlineValues = new Online();
+
+	onlineValues.setName(id);
+	boolean isAral = false;
+	GSPropertyHandler additionalInfo = originalMD.getAdditionalInfo();
+	if (additionalInfo != null) {
+	    isAral = originalMD.getAdditionalInfo().get("isAral", Boolean.class);
+	    // aral basin case
+	    if (isAral) {
+		String linkage = originalMD.getAdditionalInfo().get("downloadLink", String.class);
+		onlineValues.setProtocol(CommonNameSpaceContext.ARAL_BASIN_URI);
+		onlineValues.setLinkage(linkage);
+
+	    } else {
+		// russian case
+		if (interpolation != null) {
+		    onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_HISTORICAL_URI);
+		    onlineValues.setLinkage(RIHMIClient.historicalEndpoint + stationId);
+		} else {
+		    onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_URI);
+		    onlineValues.setLinkage(endpoint);
+		}
+	    }
+	}
+	onlineValues.setFunctionCode("download");
+
+	coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(onlineValues);
+
 	if (begin != null && end != null) {
 	    TemporalExtent extent = new TemporalExtent();
-	    if (interpolation == null) {
+	    if (interpolation == null && !isAral) {
 		TimeIndeterminateValueType endTimeInderminate = TimeIndeterminateValueType.NOW;
 		extent.setIndeterminateEndPosition(endTimeInderminate);
 		extent.setBeforeNowBeginPosition(FrameValue.P1Y);
 	    } else {
 		extent.setBeginPosition(ISO8601DateTimeUtils.getISO8601DateTime(begin));
 		extent.setEndPosition(ISO8601DateTimeUtils.getISO8601DateTime(end));
+		LocalDate dateToCheck = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		LocalDate today = LocalDate.now();
+		if (today.isEqual(dateToCheck) || !dateToCheck.isBefore(today.minusDays(30))) {
+		    TimeIndeterminateValueType endTimeInderminate = TimeIndeterminateValueType.NOW;
+		    extent.setIndeterminateEndPosition(endTimeInderminate);
+		}
 	    }
 	    coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(extent);
 
@@ -161,8 +202,8 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	coreMetadata.getMIMetadata().getDataIdentification().addKeyword(stationName);
 
 	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
-	if(lat != null && lon != null) {
-	coreMetadata.addBoundingBox(lat, lon, lat, lon);
+	if (lat != null && lon != null) {
+	    coreMetadata.addBoundingBox(lat, lon, lat, lon);
 	}
 
 	ResponsibleParty creatorContact = new ResponsibleParty();
@@ -206,41 +247,10 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	coverageDescription.setAttributeDescription(attributeDescription);
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
-	/**
-	 * ONLINE
-	 */
-
-	Online onlineValues = new Online();
-
-	onlineValues.setName(id);
-
-	 boolean isAral = false;
-	GSPropertyHandler additionalInfo = originalMD.getAdditionalInfo();
-	if (additionalInfo != null) {
-	    isAral = originalMD.getAdditionalInfo().get("isAral", Boolean.class);
-	    //aral basin case
-	    if (isAral) {
-		String linkage = originalMD.getAdditionalInfo().get("downloadLink", String.class);
-		    onlineValues.setProtocol(CommonNameSpaceContext.ARAL_BASIN_URI);
-		    onlineValues.setLinkage(linkage);
-
-	    } else {
-		//russian case
-		if (interpolation != null) {
-		    onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_HISTORICAL_URI);
-		    onlineValues.setLinkage(RIHMIClient.historicalEndpoint + stationId);
-		} else {
-		    onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_URI);
-		    onlineValues.setLinkage(endpoint);
-		}
-	    }
-	}
-	onlineValues.setFunctionCode("download");
-
-	coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(onlineValues);
-
 	if (interpolation != null) {
 	    dataset.getExtensionHandler().setTimeInterpolation(interpolation);
+	} else if (isAral) {
+	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.DISCONTINUOUS);
 	}
 	if (aggregationDuration != null && !aggregationDuration.isEmpty()) {
 	    if (aggregationDuration.equals("P1M")) {
@@ -257,7 +267,7 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	dataset.getExtensionHandler().setAttributeUnits(units);
 	dataset.getExtensionHandler().setAttributeUnitsAbbreviation(units);
 
-	if(!isAral)
+	if (!isAral)
 	    dataset.getExtensionHandler().setCountry(Country.RUSSIAN_FEDERATION.getShortName());
 
 	// LegalConstraints lc = new LegalConstraints();
