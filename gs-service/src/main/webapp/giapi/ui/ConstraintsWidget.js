@@ -960,6 +960,10 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			if (options.ontology === "whos") {
 				correctHelp += '<a href="https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1">WHOS ontology</a><br/>';
 			}
+			if (options.ontology === "gemet") {
+//				correctHelp += '<a href="./../ontology-browser/his-central-ontology.html?http://his-central-ontology.geodab.eu/hydro-ontology/concept/1">GEMET</a><br/>';
+				correctHelp += '<a href="https://his-central-ontology.geodab.eu/ontology-browser/his-central-ontology.html?http://his-central-ontology.geodab.eu/hydro-ontology/concept/1">HIS-Central ontology</a><br/>';
+			}
 		}
 
 		switch (constraint) {
@@ -1663,6 +1667,61 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		var anyText = '<td style="padding-left: 5px;padding-top:5px"><label>Any text</label></td><td style="padding-right: 5px;padding-bottom:15px"><input id="' + _getId('anyTextCheck') + '" type="checkbox"/></td>';
 		table += '<tr>' + anyText + '</tr>';
 
+
+		// --- Semantic Search Subsection ---
+		if (whatOpt.enableBrowseGEMET) {
+			table += '<tr><td colspan="2"><div style="margin-top:15px; margin-bottom:5px; font-weight:bold; font-size:1.1em; border-bottom:1px solid #ccc;">Semantic Search</div></td></tr>';
+			var browseGEMETButton = GIAPI.FontAwesomeButton({
+				'label': 'Browse GEMET',
+				'icon': 'fa-magic',
+				'handler': function() {
+					// Same logic as #pButton click, but set search term input instead of parameter name
+					if (!dialogPCreated) {
+						$('<div  id="pDialog"></div>')
+							.html('<iframe src="' + ontologyUrl + '" id="parameterFrame"></iframe><div style="margin-top: 10px; text-align: center;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
+							.dialog({
+								title: "Select a parameter from the ontology",
+								width: 850,
+								height: 700,
+								autoOpen: true,
+								modal: true
+							});
+
+						window.addEventListener('message', (event) => {
+							try {
+								const data = event.data;
+								console.log(data);
+								if (typeof data === "object" && data !== null && "selectedConcept" in data && "selectedConceptId" in data) {
+									var conceptURI = conceptBaseUrl + data.selectedConceptId;
+									$("#selectedParameter").text(data.selectedConcept + " (" + conceptURI + ")");
+									// Set the search term input field instead of parameter name
+									jQuery('#' + _getId('what')).val(conceptURI);
+								} else {
+									console.warn("Invalid message: 'selectedConcept' property is missing or not an object");
+								}
+							} catch (error) {
+								console.error("Failed to process message:", error);
+							}
+						});
+
+						$("#parameterFrame").on('load', function() {
+							try {
+								this.contentWindow.postMessage('startListening', '*');
+							} catch (error) {
+								console.error("Error sending message to iframe:", error);
+							}
+						});
+						dialogPCreated = true;
+					} else {
+						$('#pDialog').dialog('isOpen') ? $('#pDialog').dialog('close') : $('#pDialog').dialog('open');
+					}
+				}
+			});
+			browseGEMETButton.css('div', 'margin', '10px 0 10px 0');
+			table += '<tr><td colspan="2">' + browseGEMETButton.div() + '</td></tr>';
+		}
+		// --- End Semantic Search Subsection ---
+
 		table += '</table>';
 
 		var preventEmptySelection = function(check) {
@@ -2073,7 +2132,15 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			ontologyTreeUrl = 'https://whos.geodab.eu/gs-service/sparql-navigator/whos';
 			conceptBaseUrl = 'http://hydro.geodab.eu/hydro-ontology/concept/';
 		}
+
+		if (options.ontology === "gemet") {
+            ontologyUrl = '../ontology-browser/gemet-ontology.html?http://www.eionet.europa.eu/gemet/concept/4612';
+//			ontologyTreeUrl = 'https://his-central.geodab.eu/gs-service/sparql-navigator/his-central';
+			//ontologyTreeUrl = 'http://localhost:9090/gs-service/sparql-navigator/his-central';
+			conceptBaseUrl = '';
+		}
 	}
+
 	//ontologyUrl = 'http://localhost/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1';
 	//conceptBaseUrl = 'http://hydro.geodab.eu/hydro-ontology/concept/';
 

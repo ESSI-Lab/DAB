@@ -817,7 +817,8 @@ export function initializePortal(config) {
 		GIAPI.search.constWidget = GIAPI.ConstraintsWidget(GIAPI.search.dab, {
 			'ontology': config.ontology,
 			'keyDownAction': (function() { GIAPI.search.discover(); }),
-			'fieldsWidth': 205
+			'fieldsWidth': 205,
+			'enableBrowseGEMET': config.enableBrowseGEMET
 		});
 		if (config.generalTermSearch == undefined || config.generalTermSearch) {
 			GIAPI.search.constWidget.whatConstraint('add', {
@@ -825,7 +826,8 @@ export function initializePortal(config) {
 				showResultSetExtensionOpt: false,
 				optDialogPosition: 'bottom',
 				showHelpIcon: false,
-				resizable: true
+				resizable: true,
+				enableBrowseGEMET: config.enableBrowseGEMET
 			});
 
 			GIAPI.search.constWidget.append('what-div');

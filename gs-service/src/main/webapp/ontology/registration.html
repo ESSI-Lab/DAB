@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>Registrazione utente a HIS-Central</title>
+		<style>
+			form { 
+			  display: block;
+			  margin-top: 30px;
+			  margin-left: 12px;
+			}
+
+			#otherInstitutionDiv {
+ 				display: none;
+			}
+			label{
+				font-size: x-large;
+				font-weight: bold;
+			}
+			
+			label2{
+				font-size: x-large;
+
+			}
+			
+			
+			/** 
+			 *  Colors	 
+			 */
+			 
+			:root {
+			  --color1: #00529c;
+			  --color2: #00abd0; 
+			  --color3: lightgray;
+		  	  --color4: white;			 
+			}
+									
+		    body{
+		      font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+		    }
+		    
+		    /** 
+			 *  Put the loading GIF	 
+			 */
+			 
+		    .loading_div{
+				  position: fixed;
+				  top: 50%;
+				  left: 50%;
+				  transform: translate(-50%, -50%);
+		    	  content: url("../../../../bnhs/station/gwis-loading.gif");		    	
+		    }
+
+		 	/** 
+			 *  Header and logos	 
+			 */
+			 
+		 	.page_header{	
+				  padding: 10px;
+			      background-color: var(--color1);
+			      margin-left: 12px;
+		          margin-right: 12px;
+			      font-size: 30px;
+			      color: var(--color4);
+			}
+							
+   			.main_title{
+   			    margin-left: 50px;   			
+   				font-weight:bold;
+   			}
+   			
+   			.sub_title{
+   			    margin-left: 50px;
+   			    margin-top: 10px;  		
+   				font-size:80%;
+   			}
+   			  					
+			.page_info{
+				line-height: 1.6;
+			 	padding: 10px;
+				margin-left: 12px;
+		        margin-right: 12px;
+		        border: 1px solid var(--color3);
+		        color: var(--color1);
+			}
+			
+			.page_info_text{
+				margin-left: 50px;
+			}
+   			  			
+   			.wmo_logo{
+				float:right; 
+				margin-right: 50px;
+				display:inline-block; 
+				margin-top: -70px;
+				width: 190px;
+				content: url("../bnhs/station/WMO_logo_white_ENG.png");
+			}
+			
+			.wmo_logo_below{
+				float:right; 
+				margin-right: 40px;
+				display:inline-block; 
+				margin-top: 12px;
+				width: 200px;
+				content: url("../bnhs/station/wmo-bar2.PNG");
+			}
+								
+			#hidden-div{
+				visibility: hidden;
+			}
+		 	
+		 	#dialog-download{
+		 	
+		 	}
+		 	#format-fieldset{
+		 		border: none;
+		 	}
+		 	
+		 	.custom_button {
+			  background-color: #4CAF50; /* Green */
+			  border: none;
+			  color: white;
+			  padding: 15px 32px;
+			  text-align: center;
+			  text-decoration: none;
+			  display: inline-block;
+			  font-size: 16px;
+			}
+			
+			.registerbtn {
+			  background-color: #04AA6D;
+			  color: white;
+			  padding: 16px 20px;
+			  margin: 8px 0;
+			  border: none;
+			  cursor: pointer;
+			  width: 100%;
+			  opacity: 0.9;
+			  font-size: xx-large;
+			}
+			
+			input[type=submit] {
+			  font-size: x-large;
+			  width: 100%;
+			  background-color: #4CAF50;
+			  color: white;
+			  padding: 14px 20px;
+			  margin: 8px 0;
+			  border: none;
+			  border-radius: 4px;
+			  cursor: pointer;
+			}
+			
+			input[type=submit]:hover {
+			  background-color: #45a049;
+			}
+			
+			input[type=text], select {
+			  width: 40%;
+			  padding: 12px 20px;
+			  margin: 8px 0;
+			  display: inline-block;
+			  border: 1px solid #ccc;
+			  border-radius: 4px;
+			  box-sizing: border-box;
+			}
+			
+		</style>
+	</head>
+	<body>
+
+		<div class="page_header">
+		
+			<div class="main_title">HIS-Central</div>
+			<div class="sub_title">Registrazione utente</div>
+							 									
+ 		</div> 
+
+			<form action="registration-listener.jsp">
+			  
+				  <label for="fname">Nome:</label><br/>
+				  <input type="text" id="fname" name="fname" value=""><br/><br/>
+				  
+				  <label for="lname">Cognome:</label><br/>
+				  <input type="text" id="lname" name="lname" value=""><br/><br/>
+				    
+				  <label for="email">Indirizzo E-mail:</label><br/>
+				  <input type="text" id="email" name="email" value=""><br/><br/>
+				  			  
+				  <label for="institution">Ente:</label><br/>
+				  <input type="text" id="institution" name="institution" value=""><br/><br/>
+				  
+				  <label for="institutionType">Tipologia di ente:</label><br/>
+				  
+				  <input type="radio" id="meteo" name="institutionType" value="meteo">
+				  <label2 for="nmhs">Servizi Meteorologici o Idrologici nazionali o locali / Protezione civile</label2><br/>
+				  
+				  <input type="radio" id="public" name="institutionType" value="public">
+				  <label2 for="defense">Enti pubblici di ricerca / Università</label2><br/>
+				  
+				  <input type="radio" id="international" name="institutionType" value="international">
+				  <label2 for="private">Istituzioni internazionali o comunitarie</label2><br/>
+				  
+				  <input type="radio" id="otherpublic" name="institutionType" value="otherpublic">
+				  <label2 for="academia">Altri Enti Pubblici</label2><br/>
+				  
+				  <input type="radio" id="private" name="institutionType" value="private">
+				  <label2 for="international">Settore Privato</label2><br/>
+				  
+				  <input type="radio" id="amateur" name="institutionType" value="amateur">
+				  <label2 for="international">Amatoriale / Terzo settore</label2><br/>
+							  
+				  <input onclick="showOtherDiv()" type="radio" id="other" name="institutionType" value="other">
+				  <label2 for="other">Altro</label2><br/><br/>
+				  
+				  <div id='otherInstitutionDiv'>
+					  <label for="otherInstitutionType">Altro tipo di ente (si prega di specificare):</label><br/>
+					  <input type="text" id="otherInstitutionType" name="otherInstitutionType" value=""><br/><br/>
+				  </div>
+				  					  
+				  <label></label>
+				  				  
+				  <div style="border: solid lightgray 1px; padding: 5px">
+				  
+				  	  <label for="humanTest">Si prega di selezionare <i>l'unica risposta corretta</i> per procedere con la registrazione:</label><br/>
+				  
+					  <input type="checkbox" id="human" name="humanTest" value="human">
+					  <label2 for="human">Sono umano</label2><br/>
+					  
+					  <input type="checkbox" id="robot" name="humanTest" value="robot">
+					  <label2 for="robot">Sono un robot</label2><br/>
+					  
+					  <input type="checkbox" id="notsure" name="humanTest" value="notsure">
+					  <label2 for="notsure">Non ne sono sicuro...</label2><br/>
+					  
+				  </div>
+				
+				<h2>HIS Central data</h2> 
+				 			 
+				<p>Policy qui?</p> 
+				 			 			 
+				<h2>Terms of Use qui?</h2> 
+				 				
+				<input class="registerbtn" type="submit" value="Accept and Register">
+			
+			</form>  
+			
+			<script>		
+				function showOtherDiv() {
+				  var x = document.getElementById("otherInstitutionDiv");
+				    x.style.display = "block";  
+				}
+			</script>
+
+	</body>
+	
+</html>
