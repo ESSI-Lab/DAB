@@ -115,7 +115,7 @@ public class S3ShapeDownloader extends DataDownloader {
 
     }
 
-    public static void unzipShapefile(File zipFilePath, File outputDir) throws Exception {
+    public synchronized static void unzipShapefile(File zipFilePath, File outputDir) throws Exception {
 	try (InputStream fis = new FileInputStream(zipFilePath); ZipInputStream zis = new ZipInputStream(fis)) {
 	    ZipEntry entry;
 	    while ((entry = zis.getNextEntry()) != null) {
@@ -359,79 +359,87 @@ public class S3ShapeDownloader extends DataDownloader {
 	return image;
     }
 
+    public static final Object SYNCH = new Object();
+
     private SimpleEntry<File, FeatureMetadata> getFeature(Online online) throws Exception {
-	DataDescriptor descriptor = new DataDescriptor();
-	descriptor.setDataType(DataType.GRID);
-	descriptor.setDataFormat(DataFormat.IMAGE_PNG());
 
-	String zipName = online.getLinkage().substring(online.getLinkage().lastIndexOf("/") + 1);
-	String folderName = "S3-ZIP-" + zipName;
+	File shapeFile = null;
 
-	File persistentTempFolder = getPersistentTempFolder(folderName);
-	
-	if (isEmpty(persistentTempFolder)) {
+	synchronized (SYNCH) {
 
-	    client.downloadTo(persistentTempFolder);
-	    
-	    ByteArrayInputStream stream = new ByteArrayInputStream("completed".getBytes());
-	    File file = new File(persistentTempFolder, "completed");
-	    	    
-	    IOUtils.copy(stream, new FileOutputStream(file));
-	}
+	    DataDescriptor descriptor = new DataDescriptor();
+	    descriptor.setDataType(DataType.GRID);
+	    descriptor.setDataFormat(DataFormat.IMAGE_PNG());
 
-	String unzipFolderName = "S3-UNZIP-" + online.getLinkage().substring(online.getLinkage().lastIndexOf("/") + 1);
+	    String zipName = online.getLinkage().substring(online.getLinkage().lastIndexOf("/") + 1);
+	    String folderName = "S3-ZIP-" + zipName;
 
-	File persistentUnzipFolder = getPersistentTempFolder(unzipFolderName);
+	    File persistentTempFolder = getPersistentTempFolder(folderName);
 
-	if (isEmpty(persistentUnzipFolder)) {
+	    if (isEmpty(persistentTempFolder)) {
 
-	    String[] list = persistentTempFolder.list(new FilenameFilter() {
+		client.downloadTo(persistentTempFolder);
+
+		ByteArrayInputStream stream = new ByteArrayInputStream("reallyCompleted".getBytes());
+		File completedFile = new File(persistentTempFolder, "reallyCompleted");
+
+		IOUtils.copy(stream, new FileOutputStream(completedFile));
+	    }
+
+	    String unzipFolderName = "S3-UNZIP-" + online.getLinkage().substring(online.getLinkage().lastIndexOf("/") + 1);
+
+	    File persistentUnzipFolder = getPersistentTempFolder(unzipFolderName);
+
+	    if (isEmpty(persistentUnzipFolder)) {
+
+		String[] list = persistentTempFolder.list(new FilenameFilter() {
+
+		    @Override
+		    public boolean accept(File dir, String name) {
+			if (name.endsWith(zipName)) {
+			    return true;
+			}
+			return false;
+		    }
+		});
+
+		unzipShapefile(new File(persistentTempFolder, list[0]), persistentUnzipFolder);
+
+		ByteArrayInputStream stream = new ByteArrayInputStream("reallyCompleted".getBytes());
+		File completedFile = new File(persistentUnzipFolder, "reallyCompleted");
+
+		IOUtils.copy(stream, new FileOutputStream(completedFile));
+	    }
+
+	    String[] shapes = persistentUnzipFolder.list(new FilenameFilter() {
 
 		@Override
 		public boolean accept(File dir, String name) {
-		    if (name.endsWith(zipName)) {
+		    if (name.endsWith(".shp")) {
 			return true;
 		    }
 		    return false;
 		}
 	    });
 
-	    unzipShapefile(new File(persistentTempFolder, list[0]), persistentUnzipFolder);
-
-	    ByteArrayInputStream stream = new ByteArrayInputStream("completed".getBytes());
-	    File file = new File(persistentUnzipFolder, "completed");
-	    	    
-	    IOUtils.copy(stream, new FileOutputStream(file));
+	    shapeFile = new File(persistentUnzipFolder, shapes[0]);
 	}
 
-	String[] shapes = persistentUnzipFolder.list(new FilenameFilter() {
-
-	    @Override
-	    public boolean accept(File dir, String name) {
-		if (name.endsWith(".shp")) {
-		    return true;
-		}
-		return false;
-	    }
-	});
-
-	String name = online.getName();
-
-	File file = new File(persistentUnzipFolder, shapes[0]);
-	ShapeFileMetadata metadata = new ShapeFileMetadata(file);
+	ShapeFileMetadata metadata = new ShapeFileMetadata(shapeFile);
 	List<FeatureMetadata> features = metadata.getFeatures();
 
 	for (FeatureMetadata feature : features) {
-	    if (!feature.getId().equals(name)) {
+	    if (!feature.getId().equals(online.getName())) {
 		continue;
 	    }
 
-	    GSLoggerFactory.getLogger(getClass()).info("Found {}", name);
-	    SimpleEntry<File, FeatureMetadata> ret = new SimpleEntry<File, FeatureMetadata>(file, feature);
+	    GSLoggerFactory.getLogger(getClass()).info("Found {}", online.getName());
+	    SimpleEntry<File, FeatureMetadata> ret = new SimpleEntry<File, FeatureMetadata>(shapeFile, feature);
 	    return ret;
 
 	}
 	return null;
+
     }
 
 }
