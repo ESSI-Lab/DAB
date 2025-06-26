@@ -22,13 +22,8 @@ package eu.essi_lab.accessor.polytope.metadata;
  */
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -43,25 +38,19 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.collect.Lists;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
-import eu.essi_lab.accessor.polytope.PolytopeMapper;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
@@ -69,9 +58,7 @@ import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
-import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -82,12 +69,6 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
-import eu.essi_lab.netcdf.timeseries.NetCDFVariable;
-import eu.essi_lab.netcdf.trajectory.H13SingleTrajectoryWriter;
-import eu.essi_lab.netcdf.trajectory.SimpleTrajectory;
-import ucar.nc2.constants.FeatureType;
-import ucar.nc2.ft.FeatureDataset;
-import ucar.nc2.ft.FeatureDatasetFactoryManager;
 
 public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 
@@ -240,7 +221,6 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 		toMatch = smartVar.getKey();
 	    }
 
-	    
 	    File tempFile;
 
 	    // List<Date[]> dates = new ArrayList<Date[]>();
@@ -248,7 +228,7 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	    // dates = checkDates(optStart.get(), optEnd.get());
 	    // }
 
-	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 	    boolean isTemperature = false;
@@ -265,15 +245,16 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	    // ret = getData(online.getLinkage(), startString, endString);
 
 	    ret = PolytopeIonBeamMetadataConnector.getCSVData(online.getLinkage(), startString, endString, stationId, platformName);
-	    
-	    if(ret == null) {
-		//multiple requests needed
+
+	    if (ret == null) {
+		// multiple requests needed
 		Iterable<CSVRecord> out = null;
 		ret = new ArrayList<CSVRecord>();
 		List<Date[]> dates = checkDates(startString, endString);
 		for (Date[] d : dates) {
-		    out = PolytopeIonBeamMetadataConnector.getCSVData(online.getLinkage(), ISO8601DateTimeUtils.getISO8601DateTime(d[0]), ISO8601DateTimeUtils.getISO8601DateTime(d[1]), stationId, platformName);
-		    for(CSVRecord r: out) {
+		    out = PolytopeIonBeamMetadataConnector.getCSVData(online.getLinkage(), ISO8601DateTimeUtils.getISO8601DateTime(d[0]),
+			    ISO8601DateTimeUtils.getISO8601DateTime(d[1]), stationId, platformName);
+		    for (CSVRecord r : out) {
 			ret.add(r);
 		    }
 		}
@@ -287,7 +268,8 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 		    String date = obj.get("datetime");
 		    String varValue = obj.get(toMatch);
 		    Optional<Date> valueDate = simpleDateTransform(date);
-		    if (date != null && optStart.isPresent() && optEnd.isPresent() && valueDate.isPresent() && varValue != null && !varValue.isEmpty()) {
+		    if (date != null && optStart.isPresent() && optEnd.isPresent() && valueDate.isPresent() && varValue != null
+			    && !varValue.isEmpty()) {
 			if (!isValid(optStart.get(), optEnd.get(), valueDate.get()))
 			    continue;
 
@@ -347,17 +329,8 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 		}
 
 	    }
-	    // if (count > 0)
-	    // break;
-	    // // }
 
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-	    tempFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-	    tempFile.deleteOnExit();
-	    JAXBWML.getInstance().marshal(response, tempFile);
-
-	    return tempFile;
+	    return tsrt.getDataFile();
 
 	} catch (Exception e) {
 
@@ -396,7 +369,6 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	try {
 	    // Define a SimpleDateFormat with the combined pattern
 	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssXXX");
-	   
 
 	    // Parse the combined string into a Date object
 	    Date d = inputFormat.parse(date);
@@ -476,18 +448,16 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	headers.put("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN);
 
 	Optional<String> response = downloader.downloadOptionalString(updatedUrl.trim(), HttpHeaderUtils.build(headers));
-//
-//	HttpResponse<InputStream> stationResponse = downloader.downloadResponse(//
-//		updatedUrl.trim(), //
-//		HttpHeaderUtils.build("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN));
-//
-//	InputStream stream = stationResponse.body();
-	
+	//
+	// HttpResponse<InputStream> stationResponse = downloader.downloadResponse(//
+	// updatedUrl.trim(), //
+	// HttpHeaderUtils.build("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN));
+	//
+	// InputStream stream = stationResponse.body();
 
 	GSLoggerFactory.getLogger(getClass()).info("Got " + updatedUrl);
 
 	if (response.isPresent()) {
-
 
 	    // String res = IOStreamUtils.asUTF8String(clone.clone());
 	    //
@@ -503,73 +473,76 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 		JSONObject object = array.getJSONObject(i);
 		out.add(object);
 	    }
-	   
+
 	}
 
 	return out;
     }
-    
-//    private List<CSVRecord> getCSVData(String linkage, String startTime, String endTime, String stationId, String platform)
-//	    throws Exception {
-//
-//	List<CSVRecord> ret = new ArrayList<CSVRecord>();
-//	
-//	Iterable<CSVRecord> out = null;
-//
-//	if (PolytopeIonBeamMetadataConnector.BEARER_TOKEN == null) {
-//	    PolytopeIonBeamMetadataConnector.BEARER_TOKEN = PolytopeIonBeamMetadataConnector.getBearerToken();
-//	}
-//
-//	// Create the new parameters for the request
-//	// ?format=csv&start_time=2025-01-31T00%3A00%3A00Z&end_time=2025-01-31T23%3A59%3A59Z&station_id=246ede0dd7e9d4c8
-//	String updatedParameters = "format=csv&platform=" + platform + "&start_time=" + startTime + "&end_time=" + endTime + "&station_id="
-//		+ stationId;
-//	String updatedUrl = linkage.split("\\?")[0] + "?" + updatedParameters;
-//
-//	GSLoggerFactory.getLogger(getClass()).info("Getting " + updatedUrl);
-//
-//	HashMap<String, String> headers = new HashMap<>();
-//	headers.put("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN);
-//
-//	Optional<String> response = downloader.downloadOptionalString(updatedUrl.trim(), HttpHeaderUtils.build(headers));
-//
-//	if (response.isPresent()) {
-//
-//	    String responseString = response.get();
-//	    //*no data use-case
-//	    if(responseString.toLowerCase().contains("no data found")) {
-//		return ret;
-//	    }
-//	    //*multiple requests needed
-//	    if(responseString.toLowerCase().contains("200 data granules")) {
-//		return null;
-//	    }
-//	    try {
-//		// delimiter seems to be ; by default
-//		Reader in = new StringReader(responseString);
-//		out = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
-//		    for(CSVRecord r: out) {
-//			ret.add(r);
-//		    }
-//
-//	    } catch (Exception e) {
-//		//multiple requests needeed
-//		GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
-//		//try 
-////		List<Date[]> dates = checkDates(startTime, endTime);
-////		for (Date[] d : dates) {
-////		    out = getCSVData(linkage, ISO8601DateTimeUtils.getISO8601DateTime(d[0]), ISO8601DateTimeUtils.getISO8601DateTime(d[1]), stationId, platform);
-////		    for(CSVRecord r: out) {
-////			ret.add(r);
-////		    }
-////		}
-////		return ret;   
-//	    }
-//
-//	}
-//
-//	return ret;
-//    }
+
+    // private List<CSVRecord> getCSVData(String linkage, String startTime, String endTime, String stationId, String
+    // platform)
+    // throws Exception {
+    //
+    // List<CSVRecord> ret = new ArrayList<CSVRecord>();
+    //
+    // Iterable<CSVRecord> out = null;
+    //
+    // if (PolytopeIonBeamMetadataConnector.BEARER_TOKEN == null) {
+    // PolytopeIonBeamMetadataConnector.BEARER_TOKEN = PolytopeIonBeamMetadataConnector.getBearerToken();
+    // }
+    //
+    // // Create the new parameters for the request
+    // // ?format=csv&start_time=2025-01-31T00%3A00%3A00Z&end_time=2025-01-31T23%3A59%3A59Z&station_id=246ede0dd7e9d4c8
+    // String updatedParameters = "format=csv&platform=" + platform + "&start_time=" + startTime + "&end_time=" +
+    // endTime + "&station_id="
+    // + stationId;
+    // String updatedUrl = linkage.split("\\?")[0] + "?" + updatedParameters;
+    //
+    // GSLoggerFactory.getLogger(getClass()).info("Getting " + updatedUrl);
+    //
+    // HashMap<String, String> headers = new HashMap<>();
+    // headers.put("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN);
+    //
+    // Optional<String> response = downloader.downloadOptionalString(updatedUrl.trim(), HttpHeaderUtils.build(headers));
+    //
+    // if (response.isPresent()) {
+    //
+    // String responseString = response.get();
+    // //*no data use-case
+    // if(responseString.toLowerCase().contains("no data found")) {
+    // return ret;
+    // }
+    // //*multiple requests needed
+    // if(responseString.toLowerCase().contains("200 data granules")) {
+    // return null;
+    // }
+    // try {
+    // // delimiter seems to be ; by default
+    // Reader in = new StringReader(responseString);
+    // out = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
+    // for(CSVRecord r: out) {
+    // ret.add(r);
+    // }
+    //
+    // } catch (Exception e) {
+    // //multiple requests needeed
+    // GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
+    // //try
+    //// List<Date[]> dates = checkDates(startTime, endTime);
+    //// for (Date[] d : dates) {
+    //// out = getCSVData(linkage, ISO8601DateTimeUtils.getISO8601DateTime(d[0]),
+    // ISO8601DateTimeUtils.getISO8601DateTime(d[1]), stationId, platform);
+    //// for(CSVRecord r: out) {
+    //// ret.add(r);
+    //// }
+    //// }
+    //// return ret;
+    // }
+    //
+    // }
+    //
+    // return ret;
+    // }
 
     private boolean isValid(Date startDate, Date endDate, Date date) {
 
@@ -615,22 +588,20 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	System.out.println("Updated URL: " + updatedUrl);
 
 	String d = "2025-02-03 12:00:00+00:00";
-		   //"2025-01-31 05:28:29.011000+00:00"
+	// "2025-01-31 05:28:29.011000+00:00"
 	// Define a SimpleDateFormat with the combined pattern
 	SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
 
 	// Parse the combined string into a Date object
 	Date d1;
 	try {
-	 d1 = inputFormat.parse(d);
-	 inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-	}catch (Exception e) {
-	 inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssXXX");
-	 d1= inputFormat.parse(d);
-	 System.out.println(d1.getTime());
+	    d1 = inputFormat.parse(d);
+	    inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+	} catch (Exception e) {
+	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssXXX");
+	    d1 = inputFormat.parse(d);
+	    System.out.println(d1.getTime());
 	}
-	
-	
 
     }
 

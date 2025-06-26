@@ -38,6 +38,7 @@ import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.cuahsi.waterml._1.essi.JAXBWML;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -152,9 +153,7 @@ public class MWRIDownloader extends WMLDataDownloader {
 	    }
 
 	    ObjectFactory factory = new ObjectFactory();
-	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-
-	    // for (MWRIObservation observation : observations) {
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
 	    ValueSingleVariable v = new ValueSingleVariable();
 
@@ -167,14 +166,9 @@ public class MWRIDownloader extends WMLDataDownloader {
 	    XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 	    v.setDateTimeUTC(date2);
 	    addValue(tsrt, v);
-	    // }
 
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-	    tmpFile.deleteOnExit();
-	    JAXBWML.getInstance().marshal(response, tmpFile);
-
-	    return tmpFile;
+	    return tsrt.getDataFile();
+	    
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);

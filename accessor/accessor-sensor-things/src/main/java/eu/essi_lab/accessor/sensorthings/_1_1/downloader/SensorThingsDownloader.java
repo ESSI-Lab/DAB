@@ -33,16 +33,13 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.sensorthings._1_1.SensorThingsConnector;
 import eu.essi_lab.accessor.sensorthings._1_1.SensorThingsMangler;
@@ -214,65 +211,51 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 		get().//
 		getResultItems();
 
-	// if (resultItems.isEmpty()) {
-	//
-	// GSLoggerFactory.getLogger(getClass()).warn("No results found between [{}/{}]", begin, end);
-	// return null;
-	// }
-
-	TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-	ObjectFactory factory = new ObjectFactory();
-
-	if (!resultItems.isEmpty()) {
-
-	    DataArrayResultItem resultItem = resultItems.//
-		    get(0);
-
-	    JSONArray dataArray = resultItem.getDataArray();
-	    JSONArray components = resultItem.getComponents();
-
-	    int phenomenonTimeIndex = getPhenomenonTimeIndex(components);
-	    int resultIndex = getResultIndex(components);
-
-	    dataArray.forEach(dataElement -> {
-
-		JSONArray arrayElement = (JSONArray) dataElement;
-
-		String phenomenonTime = getPhenomenonTime(arrayElement, phenomenonTimeIndex);
-		double result = arrayElement.getDouble(resultIndex);
-
-		ValueSingleVariable v = new ValueSingleVariable();
-
-		try {
-		    v.setValue(new BigDecimal(result));
-
-		    GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-		    c.setTime(ISO8601DateTimeUtils.parseISO8601ToDate(phenomenonTime).get());
-
-		    XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-
-		    v.setDateTimeUTC(date2);
-		    addValue(tsrt, v);
-
-		} catch (Exception e) {
-
-		    GSLoggerFactory.getLogger(getClass()).error(e);
-		}
-	    });
-	} else {
-
-	    GSLoggerFactory.getLogger(getClass()).warn("No results found between [{}/{}]", begin, end);
-	}
-
 	try {
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
+	    if (!resultItems.isEmpty()) {
 
-	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-	    tmpFile.deleteOnExit();
+		DataArrayResultItem resultItem = resultItems.//
+			get(0);
 
-	    JAXBWML.getInstance().marshal(response, tmpFile);
-	    return tmpFile;
+		JSONArray dataArray = resultItem.getDataArray();
+		JSONArray components = resultItem.getComponents();
+
+		int phenomenonTimeIndex = getPhenomenonTimeIndex(components);
+		int resultIndex = getResultIndex(components);
+
+		dataArray.forEach(dataElement -> {
+
+		    JSONArray arrayElement = (JSONArray) dataElement;
+
+		    String phenomenonTime = getPhenomenonTime(arrayElement, phenomenonTimeIndex);
+		    double result = arrayElement.getDouble(resultIndex);
+
+		    ValueSingleVariable v = new ValueSingleVariable();
+
+		    try {
+			v.setValue(new BigDecimal(result));
+
+			GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+			c.setTime(ISO8601DateTimeUtils.parseISO8601ToDate(phenomenonTime).get());
+
+			XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+
+			v.setDateTimeUTC(date2);
+			addValue(tsrt, v);
+
+		    } catch (Exception e) {
+
+			GSLoggerFactory.getLogger(getClass()).error(e);
+		    }
+		});
+	    } else {
+
+		GSLoggerFactory.getLogger(getClass()).warn("No results found between [{}/{}]", begin, end);
+	    }
+
+	    return tsrt.getDataFile();
 
 	} catch (Exception ex) {
 
