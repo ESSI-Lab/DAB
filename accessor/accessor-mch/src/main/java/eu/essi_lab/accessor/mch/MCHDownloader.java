@@ -29,15 +29,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.mch.MCHConnector.Resolution;
 import eu.essi_lab.accessor.mch.datamodel.MCHAvailability;
@@ -86,7 +83,6 @@ public class MCHDownloader extends WMLDataDownloader {
 	    mangler.setMangling(name);
 	    String stationCode = mangler.getStationId();
 	    String parameterCode = mangler.getVariableName();
-	    String resolution = mangler.getResolution();
 
 	    MCHClient client = new MCHClient(online.getLinkage());
 
@@ -198,8 +194,7 @@ public class MCHDownloader extends WMLDataDownloader {
 		end = availability.getEndDate();
 	    }
 
-	    ObjectFactory factory = new ObjectFactory();
-	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
 	    List<MCHValue> datas;
 	    if (resolution.equals(Resolution.DAILY)) {
@@ -224,12 +219,8 @@ public class MCHDownloader extends WMLDataDownloader {
 		}
 	    }
 
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-	    tmpFile.deleteOnExit();
-	    JAXBWML.getInstance().marshal(response, tmpFile);
-
-	    return tmpFile;
+	    return tsrt.getDataFile();
+	    
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);

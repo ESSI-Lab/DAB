@@ -34,16 +34,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -259,9 +257,10 @@ public class ANASARDownloader extends WMLDataDownloader {
 		    ContinueDimension sizedDimension = dimension.getContinueDimension();
 		    begin = new Date(sizedDimension.getLower().longValue());
 		    end = new Date(sizedDimension.getUpper().longValue());
-		}
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		}		
 		try {
+		    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
+		    
 		    List<SimpleEntry<Date, BigDecimal>> data = client.getData(reservoirId, variable, begin, end);
 
 		    for (SimpleEntry<Date, BigDecimal> entry : data) {
@@ -283,12 +282,7 @@ public class ANASARDownloader extends WMLDataDownloader {
 
 		    ObjectFactory factory = new ObjectFactory();
 
-		    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-		    tmpFile.deleteOnExit();
-		    JAXBWML.getInstance().marshal(response, tmpFile);
-
-		    return tmpFile;
+		    return tsrt.getDataFile();
 
 		} catch (Exception e) {
 
