@@ -29,15 +29,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.lib.net.protocols.NetProtocols;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -120,53 +117,48 @@ public class KISTERSDownloader extends WMLDataDownloader {
 	KISTERSClient client = new KISTERSClient(online.getLinkage());
 	List<KISTERSEntity> values = client.retrieveTimeSeriesValues(name, begin, end);
 
-	TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-	ObjectFactory factory = new ObjectFactory();
+	try {
 
-	if (!values.isEmpty()) {
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
-	    values.forEach(entity -> {
+	    if (!values.isEmpty()) {
 
-		String phenomenonTime = entity.getObject().getString("Timestamp");
-		double result = entity.getObject().getDouble("Value");
+		values.forEach(entity -> {
 
-		ValueSingleVariable v = new ValueSingleVariable();
+		    String phenomenonTime = entity.getObject().getString("Timestamp");
+		    double result = entity.getObject().getDouble("Value");
 
-		try {
+		    ValueSingleVariable v = new ValueSingleVariable();
+
 		    v.setValue(new BigDecimal(result));
 
 		    GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 		    c.setTime(ISO8601DateTimeUtils.parseISO8601ToDate(phenomenonTime).get());
+		    try {
+			XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 
-		    XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+			v.setDateTimeUTC(date2);
 
-		    v.setDateTimeUTC(date2);
-		    addValue(tsrt, v);
+			addValue(tsrt, v);
+		    } catch (Exception e) {
+			e.printStackTrace();
+			GSLoggerFactory.getLogger(getClass()).error(e);
+		    }
 
-		} catch (Exception e) {
+		});
 
-		    GSLoggerFactory.getLogger(getClass()).error(e);
-		}
-	    });
+		return tsrt.getDataFile();
 
-	} else {
-	    GSLoggerFactory.getLogger(getClass()).warn("No results found between [{}/{}]", begin, end);
+	    } else {
+		GSLoggerFactory.getLogger(getClass()).warn("No results found between [{}/{}]", begin, end);
+	    }
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
+	
+	return null;
 
-	try {
-
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-
-	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-	    tmpFile.deleteOnExit();
-
-	    JAXBWML.getInstance().marshal(response, tmpFile);
-	    return tmpFile;
-
-	} catch (Exception ex) {
-
-	    throw GSException.createException(getClass(), getClass().getSimpleName() + "_FileCreationError", ex);
-	}
     }
 
     @Override

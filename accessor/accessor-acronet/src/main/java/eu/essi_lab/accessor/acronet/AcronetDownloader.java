@@ -22,41 +22,27 @@ package eu.essi_lab.accessor.acronet;
  */
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
-
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
@@ -74,12 +60,6 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
-import eu.essi_lab.netcdf.timeseries.NetCDFVariable;
-import eu.essi_lab.netcdf.trajectory.H13SingleTrajectoryWriter;
-import eu.essi_lab.netcdf.trajectory.SimpleTrajectory;
-import ucar.nc2.constants.FeatureType;
-import ucar.nc2.ft.FeatureDataset;
-import ucar.nc2.ft.FeatureDatasetFactoryManager;
 
 public class AcronetDownloader extends WMLDataDownloader {
 
@@ -226,7 +206,7 @@ public class AcronetDownloader extends WMLDataDownloader {
 		dates = checkDates(startDate.get(), endDate.get());
 	    }
 
-	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 	    File tempFile;
@@ -311,13 +291,7 @@ public class AcronetDownloader extends WMLDataDownloader {
 		    break;
 	    }
 
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-	    tempFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-	    tempFile.deleteOnExit();
-	    JAXBWML.getInstance().marshal(response, tempFile);
-
-	    return tempFile;
+	   return tsrt.getDataFile();
 
 	} catch (
 

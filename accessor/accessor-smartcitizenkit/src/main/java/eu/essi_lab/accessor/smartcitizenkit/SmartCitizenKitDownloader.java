@@ -54,6 +54,7 @@ import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
@@ -105,7 +106,7 @@ public class SmartCitizenKitDownloader extends WMLDataDownloader {
 	descriptor.setDataType(DataType.TIME_SERIES);
 	descriptor.setDataFormat(DataFormat.WATERML_1_1());
 	descriptor.setCRS(CRS.EPSG_4326());
-	
+
 	GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
 	if (bbox != null) {
 	    Double lat = bbox.getNorth();
@@ -139,7 +140,6 @@ public class SmartCitizenKitDownloader extends WMLDataDownloader {
 		}
 	    }
 	}
-
 
 	//
 	// temp extent
@@ -246,7 +246,6 @@ public class SmartCitizenKitDownloader extends WMLDataDownloader {
 
 	    GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
 
-	    File tempFile;
 	    boolean isTemperature = false;
 
 	    if (units.contains("°C") || units.contains("ºC")) {
@@ -257,7 +256,8 @@ public class SmartCitizenKitDownloader extends WMLDataDownloader {
 	    Set<Long> timeSet = new HashSet<>();
 
 	    if (ret != null) {
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
+
 		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 		JSONArray data = ret.optJSONArray("readings");
 		for (int j = 0; j < data.length(); j++) {
@@ -281,10 +281,10 @@ public class SmartCitizenKitDownloader extends WMLDataDownloader {
 			    BigDecimal kelvin = new BigDecimal("273.15");
 			    value = value.add(kelvin);
 			}
-			
+
 			value = value.setScale(2, BigDecimal.ROUND_FLOOR);
-			//int valueInteger = value.multiply(new BigDecimal(100)).intValue();
-			
+			// int valueInteger = value.multiply(new BigDecimal(100)).intValue();
+
 			variable.setValue(value);
 
 			String date = dataTime.optString(0, null);
@@ -315,13 +315,7 @@ public class SmartCitizenKitDownloader extends WMLDataDownloader {
 		    }
 		}
 
-		JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		tempFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-		tempFile.deleteOnExit();
-		JAXBWML.getInstance().marshal(response, tempFile);
-
-		return tempFile;
+		return tsrt.getDataFile();
 
 	    }
 

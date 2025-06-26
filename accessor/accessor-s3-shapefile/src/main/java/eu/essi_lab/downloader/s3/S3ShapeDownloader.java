@@ -23,11 +23,9 @@ package eu.essi_lab.downloader.s3;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
@@ -37,13 +35,11 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.geotools.api.data.FileDataStore;
 import org.geotools.api.data.FileDataStoreFinder;
 import org.geotools.api.data.Query;
@@ -69,8 +65,6 @@ import org.locationtech.jts.io.WKTWriter;
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.accessor.s3.FeatureMetadata;
 import eu.essi_lab.accessor.s3.S3ShapeFileClient;
-import eu.essi_lab.accessor.s3.ShapeFileMetadata;
-import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.GSException;
@@ -84,8 +78,7 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
 public class S3ShapeDownloader extends DataDownloader {
 
-    private S3ShapeFileClient client;
-    private String name;
+    FilterFactory ff = org.geotools.factory.CommonFactoryFinder.getFilterFactory(null);
 
     @Override
     public boolean canConnect() {
@@ -102,10 +95,7 @@ public class S3ShapeDownloader extends DataDownloader {
     @Override
     public void setOnlineResource(GSResource resource, String onlineResourceId) throws GSException {
 	super.setOnlineResource(resource, onlineResourceId);
-	String linkage = online.getLinkage();
-	this.client = new S3ShapeFileClient(linkage);
 
-	this.name = online.getName();
     }
 
     @Override
@@ -113,16 +103,6 @@ public class S3ShapeDownloader extends DataDownloader {
 
 	return (online.getProtocol() != null && online.getProtocol().equals("HTTP-SHAPE"));
 
-    }
-
-    public static void unzipShapefile(File zipFilePath, File outputDir) throws Exception {
-	try (InputStream fis = new FileInputStream(zipFilePath); ZipInputStream zis = new ZipInputStream(fis)) {
-	    ZipEntry entry;
-	    while ((entry = zis.getNextEntry()) != null) {
-		Path outputFile = outputDir.toPath().resolve(entry.getName());
-		Files.copy(zis, outputFile, StandardCopyOption.REPLACE_EXISTING);
-	    }
-	}
     }
 
     @Override
@@ -136,9 +116,9 @@ public class S3ShapeDownloader extends DataDownloader {
 	try {
 	    List<DataDescriptor> ret = new ArrayList<>();
 
-	    SimpleEntry<File, FeatureMetadata> feature = getFeature(online);
+	    Feature feature = FeatureManager.getInstance().getFeature(online.getLinkage(), online.getName());
 
-	    FeatureMetadata metadata = feature.getValue();
+	    FeatureMetadata metadata = feature.getFeatureMetadata();
 	    BigDecimal south = metadata.getSouth();
 	    BigDecimal east = metadata.getEast();
 	    BigDecimal west = metadata.getWest();
@@ -189,57 +169,15 @@ public class S3ShapeDownloader extends DataDownloader {
 	}
     }
 
-    private boolean isEmpty(File directory) {
-	// Get the list of files in the directory
-	String[] files = directory.list();
-
-	// Check if the directory is not empty
-	if (files != null && files.length > 0 && Arrays.asList(files).stream().anyMatch(f -> f.contains("completed"))) {
-
-	    return false;
-	} else {
-	    return true;
-	}
-    }
-
-    private File getPersistentTempFolder(String newDirName) {
-	String tempDirPath = System.getProperty("java.io.tmpdir");
-
-	// Create the full path for the new directory
-	File newDir = new File(tempDirPath, newDirName);
-
-	// Check if the directory doesn't exist
-	if (!newDir.exists()) {
-	    // Attempt to create the directory
-	    if (newDir.mkdirs()) {
-		System.out.println("Directory created successfully in the temp folder: " + newDir.getAbsolutePath());
-	    } else {
-		System.out.println("Failed to create the directory in the temp folder.");
-	    }
-	} else {
-	    System.out.println("Directory already exists in the temp folder.");
-	}
-	return newDir;
-    }
-
-    private Long getUpdatedResolution(Number resolution, Number i) {
-	if (resolution instanceof Long && i instanceof Long) {
-	    return (Long) resolution * (Long) i;
-	}
-	return Math.round(resolution.doubleValue() * i.doubleValue());
-    }
-
     @Override
     public File download(DataDescriptor targetDescriptor) throws GSException {
 	try {
-	    SimpleEntry<File, FeatureMetadata> feature = getFeature(online);
-	    File file = feature.getKey();
+	    Feature feature = FeatureManager.getInstance().getFeature(online.getLinkage(), online.getName());
 
 	    DataFormat format = targetDescriptor.getDataFormat();
 	    if (format != null && format.equals(DataFormat.WKT())) {
-		FileDataStore store = FileDataStoreFinder.getDataStore(file);
-		SimpleFeatureSource featureSource = store.getFeatureSource();
-		FilterFactory ff = org.geotools.factory.CommonFactoryFinder.getFilterFactory(null);
+
+		SimpleFeatureSource featureSource = feature.getFeatureSource();
 		Filter filter = ff.id(Collections.singleton(ff.featureId(online.getName())));
 		Query query = new Query(featureSource.getSchema().getTypeName(), filter);
 		SimpleFeatureCollection featureCollection = featureSource.getFeatures(query);
@@ -261,7 +199,7 @@ public class S3ShapeDownloader extends DataDownloader {
 		}
 	    }
 
-	    FeatureMetadata metadata = feature.getValue();
+	    FeatureMetadata metadata = feature.getFeatureMetadata();
 	    BigDecimal south = metadata.getSouth();
 	    BigDecimal east = metadata.getEast();
 	    BigDecimal west = metadata.getWest();
@@ -280,10 +218,8 @@ public class S3ShapeDownloader extends DataDownloader {
 		    CRS crs = targetDescriptor.getCRS();
 		    if (crs != null) {
 
-			FileDataStore store = FileDataStoreFinder.getDataStore(file);
-			SimpleFeatureSource featureSource = store.getFeatureSource();
+			SimpleFeatureSource featureSource = feature.getFeatureSource();
 
-			FilterFactory ff = org.geotools.factory.CommonFactoryFinder.getFilterFactory(null);
 			Filter filter = ff.id(Collections.singleton(ff.featureId(online.getName())));
 
 			// Define the target CRS (e.g., EPSG:3857)
@@ -357,81 +293,6 @@ public class S3ShapeDownloader extends DataDownloader {
 
 	g2d.dispose();
 	return image;
-    }
-
-    private SimpleEntry<File, FeatureMetadata> getFeature(Online online) throws Exception {
-	DataDescriptor descriptor = new DataDescriptor();
-	descriptor.setDataType(DataType.GRID);
-	descriptor.setDataFormat(DataFormat.IMAGE_PNG());
-
-	String zipName = online.getLinkage().substring(online.getLinkage().lastIndexOf("/") + 1);
-	String folderName = "S3-ZIP-" + zipName;
-
-	File persistentTempFolder = getPersistentTempFolder(folderName);
-	
-	if (isEmpty(persistentTempFolder)) {
-
-	    client.downloadTo(persistentTempFolder);
-	    
-	    ByteArrayInputStream stream = new ByteArrayInputStream("completed".getBytes());
-	    File file = new File(persistentTempFolder, "completed");
-	    	    
-	    IOUtils.copy(stream, new FileOutputStream(file));
-	}
-
-	String unzipFolderName = "S3-UNZIP-" + online.getLinkage().substring(online.getLinkage().lastIndexOf("/") + 1);
-
-	File persistentUnzipFolder = getPersistentTempFolder(unzipFolderName);
-
-	if (isEmpty(persistentUnzipFolder)) {
-
-	    String[] list = persistentTempFolder.list(new FilenameFilter() {
-
-		@Override
-		public boolean accept(File dir, String name) {
-		    if (name.endsWith(zipName)) {
-			return true;
-		    }
-		    return false;
-		}
-	    });
-
-	    unzipShapefile(new File(persistentTempFolder, list[0]), persistentUnzipFolder);
-
-	    ByteArrayInputStream stream = new ByteArrayInputStream("completed".getBytes());
-	    File file = new File(persistentUnzipFolder, "completed");
-	    	    
-	    IOUtils.copy(stream, new FileOutputStream(file));
-	}
-
-	String[] shapes = persistentUnzipFolder.list(new FilenameFilter() {
-
-	    @Override
-	    public boolean accept(File dir, String name) {
-		if (name.endsWith(".shp")) {
-		    return true;
-		}
-		return false;
-	    }
-	});
-
-	String name = online.getName();
-
-	File file = new File(persistentUnzipFolder, shapes[0]);
-	ShapeFileMetadata metadata = new ShapeFileMetadata(file);
-	List<FeatureMetadata> features = metadata.getFeatures();
-
-	for (FeatureMetadata feature : features) {
-	    if (!feature.getId().equals(name)) {
-		continue;
-	    }
-
-	    GSLoggerFactory.getLogger(getClass()).info("Found {}", name);
-	    SimpleEntry<File, FeatureMetadata> ret = new SimpleEntry<File, FeatureMetadata>(file, feature);
-	    return ret;
-
-	}
-	return null;
     }
 
 }

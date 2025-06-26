@@ -39,19 +39,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.collect.Lists;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.trigger.TRIGGERConnector.TRIGGER_VARIABLES;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
@@ -314,7 +312,8 @@ public class TRIGGERDownloader extends WMLDataDownloader {
 	    Set<Long> timeSet = new HashSet<>();
 
 	    if (bbox == null) {
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
+
 		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 		for (JSONObject obj : ret) {
@@ -382,11 +381,7 @@ public class TRIGGERDownloader extends WMLDataDownloader {
 		    }
 		}
 
-		JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		tempFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-		tempFile.deleteOnExit();
-		JAXBWML.getInstance().marshal(response, tempFile);
+		tempFile = tsrt.getDataFile();
 
 	    } else {
 

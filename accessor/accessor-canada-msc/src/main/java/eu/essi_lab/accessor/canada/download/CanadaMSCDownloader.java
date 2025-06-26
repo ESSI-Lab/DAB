@@ -45,6 +45,7 @@ import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.cuahsi.waterml._1.essi.JAXBWML;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.canada.CANADAMSCConnector;
 import eu.essi_lab.accessor.canada.CANADAMSCMapper.Resolution;
@@ -295,7 +296,7 @@ public class CanadaMSCDownloader extends WMLDataDownloader {
 
 		ObjectFactory factory = new ObjectFactory();
 
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
 		InputStream is = getData();
 
@@ -353,17 +354,13 @@ public class CanadaMSCDownloader extends WMLDataDownloader {
 			j++;
 		    }
 
-		    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		    File tmpFile = File.createTempFile("CanadaMSCDownloader", ".wml");
-		    tmpFile.deleteOnExit();
-		    JAXBWML.getInstance().marshal(response, tmpFile);
 
 		    bfReader.close();
 		    is.close();
 
 		    GSLoggerFactory.getLogger(getClass()).debug("Downloading of descriptor {} ENDED", descriptor);
 
-		    return tmpFile;
+		    return tsrt.getDataFile();
 		}
 
 	    } catch (Exception e) {

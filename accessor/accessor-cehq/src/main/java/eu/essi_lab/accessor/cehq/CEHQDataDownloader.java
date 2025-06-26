@@ -41,6 +41,7 @@ import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.cuahsi.waterml._1.essi.JAXBWML;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.cehq.CEHQClient.CEHQProperty;
 import eu.essi_lab.accessor.cehq.CEHQClient.CEHQVariable;
@@ -213,7 +214,7 @@ public class CEHQDataDownloader extends WMLDataDownloader {
 	    String stationOrganization = "Centre d'expertise hydrique du Québec (CEHQ)";
 
 	    ObjectFactory factory = new ObjectFactory();
-	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
 	    DataDimension dimension = descriptor.getTemporalDimension();
 	    Date begin = null;
@@ -251,12 +252,8 @@ public class CEHQDataDownloader extends WMLDataDownloader {
 		}
 	    }
 
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-	    tmpFile.deleteOnExit();
-	    JAXBWML.getInstance().marshal(response, tmpFile);
-
-	    return tmpFile;
+	    return tsrt.getDataFile();
+	    
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
