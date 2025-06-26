@@ -77,7 +77,7 @@ public class ResourceReindexer extends ResourceAugmenter<ResourceReindexerSettin
 	    GSLoggerFactory.getLogger(getClass()).info("Index name: " + toReindex.get(0).getElementName());
 	}
 
-	IndexedElementsWriter.indexMetadataElements(resource, toReindex);
+	IndexedElementsWriter.index(resource, toReindex);
 
 	GSLoggerFactory.getLogger(getClass()).warn("Metadata reindexing of current resource ENDED");
 

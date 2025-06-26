@@ -23,7 +23,6 @@ package eu.essi_lab.model.index.jaxb;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +54,7 @@ import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 
 /**
  * @author Fabrizio
@@ -77,6 +77,9 @@ public class IndexesMetadata extends DOMSerializer {
 
     @XmlElement(name = "bbox", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private BoundingBox bbox;
+
+    @XmlElement(name = "composedElement", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    private ComposedElement composedElement;
 
     /**
      * Creates a new <code>IndexesMetadata</code> with the supplied list of indexes
@@ -128,6 +131,13 @@ public class IndexesMetadata extends DOMSerializer {
 	    if (el.getBoundingBox() != null) {
 
 		this.bbox = el.getBoundingBox();
+
+		return;
+	    }
+
+	    if (el.getComposedElement().isPresent()) {
+
+		this.composedElement = el.getComposedElement().get();
 
 		return;
 	    }
@@ -250,9 +260,25 @@ public class IndexesMetadata extends DOMSerializer {
     /**
      * @return
      */
+    public Optional<ComposedElement> readComposedElement() {
+
+	return Optional.ofNullable(composedElement);
+    }
+
+    /**
+     * @return
+     */
     public boolean hasBoundingBox() {
 
 	return readBoundingBox().isPresent();
+    }
+
+    /**
+     * @return
+     */
+    public boolean hasComposedElement() {
+
+	return readComposedElement().isPresent();
     }
 
     /**
@@ -265,6 +291,12 @@ public class IndexesMetadata extends DOMSerializer {
 	if (elementName.equals(MetadataElement.BOUNDING_BOX.getName())) {
 
 	    this.bbox = null;
+	    return;
+	}
+
+	if (MetadataElement.hasComposedElement(elementName)) {
+
+	    this.composedElement = null;
 	    return;
 	}
 

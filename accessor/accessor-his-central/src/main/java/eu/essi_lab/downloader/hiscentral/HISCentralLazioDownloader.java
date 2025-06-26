@@ -22,10 +22,13 @@ package eu.essi_lab.downloader.hiscentral;
  */
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,26 +40,26 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
+import org.apache.commons.io.IOUtils;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 
+import com.fasterxml.jackson.core.JsonFactory;
+
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.lazio.HISCentralLazioConnector;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.json.JSONArrayReader;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -164,8 +167,6 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 	    Date begin = null;
 	    Date end = null;
 
-	    ObjectFactory factory = new ObjectFactory();
-
 	    String startString = null;
 	    String endString = null;
 
@@ -194,22 +195,31 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 	    String linkage = link + "?from=" + startString + "&to=" + endString
 		    + "&type=Plausible&part=IsoTime&part=Value&part=Quality&part=QualityDescr&timing=Original&elab=None";
 
-	    JSONArray jsonArray = getData(linkage);
+	    File tmpDataFile = getData(linkage);
 
-	    if (jsonArray != null) {
+	    if (tmpDataFile != null) {
 
 		// JSONArray valuesData = jsonArray.optJSONArray("data");
 
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-		GSLoggerFactory.getLogger(getClass()).info("Total size: {}", jsonArray.length());
+		TimeSeriesTemplate template = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
+
+		GSLoggerFactory.getLogger(getClass()).info("Total size: {}", tmpDataFile.length());
 		int i = 0;
 		DateFormat iso8601OutputFormat = null;
 		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
-		for (Object arr : jsonArray) {
+
+		JsonFactory jsonFactory = new JsonFactory();
+
+		JSONArrayReader parser = new JSONArrayReader(tmpDataFile);
+
+		String rawJson = null;
+		while ( (rawJson=parser.readNextItem()) != null) {
+		    // Read current token (which is START_ARRAY for each sub-array)
+
 		    if (i++ % 100000 == 0) {
 			GSLoggerFactory.getLogger(getClass()).info("Partial size: {}", i);
 		    }
-		    JSONArray data = (JSONArray) arr;
+		    JSONArray data = new JSONArray(rawJson);
 
 		    ValueSingleVariable variable = new ValueSingleVariable();
 
@@ -234,6 +244,14 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 
 		    Date parsed = iso8601OutputFormat.parse(date);
 
+		    if (begin != null && parsed.before(begin)) {
+			continue;
+		    }
+
+		    if (end != null && parsed.after(end)) {
+			continue;
+		    }
+
 		    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 		    gregCal.setTime(parsed);
 
@@ -244,21 +262,17 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 		    //
 		    //
 
-		    addValue(tsrt, variable);
+		    addValue(template, variable);
 
 		}
 
-		JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
+		tmpDataFile.delete();
 
-		tmpFile.deleteOnExit();
-		JAXBWML.getInstance().marshal(response, tmpFile);
-
-		return tmpFile;
+		return template.getDataFile();
 	    }
 
 	} catch (Exception e) {
-
+	    e.printStackTrace();
 	    ex = e;
 	}
 
@@ -272,7 +286,7 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 
     }
 
-    private JSONArray getData(String linkage) throws GSException {
+    private File getData(String linkage) throws GSException {
 	GSLoggerFactory.getLogger(getClass()).info("Getting BEARER TOKEN from Lazio Datascape service");
 
 	String result = null;
@@ -293,32 +307,34 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 	    downloader.setConnectionTimeout(TimeUnit.SECONDS, timeout);
 	    downloader.setResponseTimeout(TimeUnit.SECONDS, responseTimeout);
 
-	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
+	    HttpResponse<InputStream> streamResponse = downloader.downloadResponse(//
 		    linkage.trim(), //
 		    HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralLazioConnector.BEARER_TOKEN));
 
-	    stream = getStationResponse.body();
+	    stream = streamResponse.body();
 
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
 
-	    int responseCode = getStationResponse.statusCode();
+	    int responseCode = streamResponse.statusCode();
 	    if (responseCode > 400) {
 		// repeat again
 		HISCentralLazioConnector.BEARER_TOKEN = HISCentralLazioConnector.getBearerToken(connector.getSourceURL());
 
-		getStationResponse = downloader.downloadResponse(//
+		streamResponse = downloader.downloadResponse(//
 			linkage.trim(), //
 			HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralLazioConnector.BEARER_TOKEN));
 
-		stream = getStationResponse.body();
+		stream = streamResponse.body();
 
 		GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
 	    }
 
 	    if (stream != null) {
-		JSONArray obj = new JSONArray(IOStreamUtils.asUTF8String(stream));
+		Path tmpFile = Files.createTempFile(getClass().getSimpleName(), ".json");
+		FileOutputStream fos = new FileOutputStream(tmpFile.toFile());
+		IOUtils.copy(stream, fos);
 		stream.close();
-		return obj;
+		return tmpFile.toFile();
 	    }
 
 	} catch (Exception e) {

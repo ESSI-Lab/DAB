@@ -31,15 +31,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.cuahsi.waterml._1.ObjectFactory;
 import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.lombardia.Dato;
 import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaClient;
@@ -172,10 +170,11 @@ public class HISCentralLombardiaDownloader extends WMLDataDownloader {
 
 	    String name = online.getName();
 
-	    ObjectFactory factory = new ObjectFactory();
-	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+	    TimeSeriesResponseType jtst = getJaxbTimeSeriesTemplate();
 	    BigDecimal nd = new BigDecimal("-999.0");
-	    tsrt.getTimeSeries().get(0).getVariable().setNoDataValue(nd.doubleValue());
+	    jtst.getTimeSeries().get(0).getVariable().setNoDataValue(nd.doubleValue());
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(jtst, getClass().getSimpleName(), ".wml");
+
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 	    if (name != null) {
@@ -213,32 +212,27 @@ public class HISCentralLombardiaDownloader extends WMLDataDownloader {
 		    c.setTime(d);
 		    XMLGregorianCalendar date2 = xmlFactory.newXMLGregorianCalendar(c);
 		    vsv.setDateTimeUTC(date2);
-		    WML2QualityCategory quality = null;		    
-		    if (v.compareTo(nd)==0) {
+		    WML2QualityCategory quality = null;
+		    if (v.compareTo(nd) == 0) {
 			quality = WML2QualityCategory.MISSING;
 		    }
 		    ID_VALIDITY_FLAG validityFlag = dato.getValidityFlag();
-		    if (validityFlag!=null) {
+		    if (validityFlag != null) {
 			switch (validityFlag) {
 			case V0:
-			    quality= WML2QualityCategory.GOOD;
+			    quality = WML2QualityCategory.GOOD;
 			    break;
 			default:
 			    break;
 			}
-		    }		    
+		    }
 		    if (quality != null) {
 			vsv.setQualityControlLevelCode(quality.getUri());
 		    }
 		    addValue(tsrt, vsv);
 		}
 	    }
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-	    tmpFile.deleteOnExit();
-	    JAXBWML.getInstance().marshal(response, tmpFile);
-
-	    return tmpFile;
+	    return tsrt.getDataFile();
 
 	} catch (
 

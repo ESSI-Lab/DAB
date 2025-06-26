@@ -39,6 +39,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -51,9 +52,9 @@ public class TermFrequencyMap extends DOMSerializer {
 	try {
 	    context = JAXBContext.newInstance(TermFrequencyMapType.class);
 
-	} catch (JAXBException e) {
+	} catch (JAXBException ex) {
 
-	    e.printStackTrace();
+	   GSLoggerFactory.getLogger(TermFrequencyMap.class).error(ex);
 	}
     }
 

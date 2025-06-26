@@ -23,11 +23,13 @@ package eu.essi_lab.model.index;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.QualifiedName;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.HarmonizedMetadata;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 
 /**
  * In the GI-suite, "indexed elements" are simple XML elements with a textual content. Each indexed element is related
@@ -61,6 +63,7 @@ public class IndexedElement {
     private String elementName;
     private List<IndexedElementInfo> indexInfoList;
     private List<String> values;
+    private ComposedElement element;
 
     /**
      * Creates a new <code>IndexedElement</code> with the supplied <code>elementName</code>
@@ -70,6 +73,17 @@ public class IndexedElement {
     public IndexedElement(String elementName) {
 
 	this(elementName, new ArrayList<>());
+    }
+    
+    /**
+     * Creates a new <code>IndexedElement</code> with the supplied {@link ComposedElement} <code>element</code>
+     * 
+     * @param element a non <code>null</code> element
+     */
+    public IndexedElement(ComposedElement element) {
+
+	this(element.getName(), new ArrayList<>());
+	this.element = element;
     }
 
     /**
@@ -90,7 +104,7 @@ public class IndexedElement {
      * @param elementName a non <code>null</code> string containing only alphabetical characters and "_" character
      * @param values a non <code>null</code> list of string, empty string is admitted
      */
-    public IndexedElement(String elementName, List<String> values) {
+    private IndexedElement(String elementName, List<String> values) {
 
 	this.elementName = elementName;
 	this.values = values;
@@ -116,6 +130,22 @@ public class IndexedElement {
     public List<String> getValues() {
 
 	return values;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<ComposedElement> getComposedElement() {
+
+	return Optional.ofNullable(element);
+    }
+
+    /**
+     * @param element
+     */
+    public void setComposedElement(ComposedElement element) {
+
+	this.element = element;
     }
 
     /**

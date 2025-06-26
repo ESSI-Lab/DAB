@@ -48,6 +48,7 @@ import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.umbria.HISCentralUmbriaConnector.UMBRIA_Variable;
 import eu.essi_lab.accessor.hiscentral.umbria.HISCentralUmbriaIdentifierMangler;
@@ -358,7 +359,7 @@ public class HISCentralUmbriaDownloader extends WMLDataDownloader {
 		    // }
 
 		    ObjectFactory factory = new ObjectFactory();
-		    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
 		    // DataDimension dimension = descriptor.getTemporalDimension();
 		    // Date begin = null;
@@ -469,12 +470,7 @@ public class HISCentralUmbriaDownloader extends WMLDataDownloader {
 				}
 			    }
 
-			    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-			    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-			    tmpFile.deleteOnExit();
-			    JAXBWML.getInstance().marshal(response, tmpFile);
-
-			    return tmpFile;
+			    return tsrt.getDataFile();
 			}
 		    }
 		}

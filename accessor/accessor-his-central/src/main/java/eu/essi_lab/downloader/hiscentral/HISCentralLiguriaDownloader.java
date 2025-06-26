@@ -22,6 +22,8 @@ package eu.essi_lab.downloader.hiscentral;
  */
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -31,22 +33,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.apache.commons.io.IOUtils;
 import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.liguria.HISCentralLiguriaConnector;
+import eu.essi_lab.downloader.hiscentral.HISCentralLiguriaJSONPagedArrayReader.Link;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.json.JSONArrayReader;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -181,28 +184,87 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 	    // linkage = linkage.replaceAll("Z", "");
 
 	    boolean finished = false;
+	    String var = online.getName().split("_")[2];
 
-	    List<JSONArray> arrayList = new ArrayList<JSONArray>();
+	    TimeSeriesTemplate template = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
+	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
+
 	    while (!finished) {
-		Optional<String> dataResponse = downloader.downloadOptionalString(linkage);
+		Optional<InputStream> dataResponse = downloader.downloadOptionalStream(linkage);
 		if (dataResponse.isPresent()) {
-		    JSONObject jsonObj = new JSONObject(dataResponse.get());
-		    JSONArray valuesData = jsonObj.optJSONArray("items");
-		    boolean hasMore = jsonObj.optBoolean("hasMore");
-		    if (valuesData != null) {
-			arrayList.add(valuesData);
+		    File tmpDataFile = File.createTempFile(getClass().getSimpleName(), ".json");
+
+		    FileOutputStream fos = new FileOutputStream(tmpDataFile);
+		    InputStream stream = dataResponse.get();
+		    IOUtils.copy(stream, fos);
+		    stream.close();
+		    HISCentralLiguriaJSONPagedArrayReader parser = new HISCentralLiguriaJSONPagedArrayReader(tmpDataFile);
+
+		    
+		    while (parser.hasNextValue()) {
+			String tmpJSON = parser.nextValue();
+			JSONObject data = new JSONObject(tmpJSON);
+
+			ValueSingleVariable variable = new ValueSingleVariable();
+
+			// TODO: get variable of interest -- see HISCentralLiguriaConnector class
+			String valueString = data.optString(var);
+
+			if (valueString != null && !valueString.isEmpty()) {
+
+			    //
+			    // value
+			    //
+			    // temperature and wind values need to be divided by 10
+			    if (var.toLowerCase().contains("temp") || var.toLowerCase().contains("wspd")) {
+				double d = Double.valueOf(valueString) / 10;
+				valueString = String.valueOf(d);
+			    }
+			    // creek level values need to be divided by 100
+			    if (var.toLowerCase().contains("crlvm")) {
+				double d = Double.valueOf(valueString) / 100;
+				valueString = String.valueOf(d);
+			    }
+
+			    BigDecimal dataValue = new BigDecimal(valueString);
+			    variable.setValue(dataValue);
+
+			    //
+			    // date
+			    //
+
+			    String date = data.optString("dtrf");
+			    Optional<Date> optionalDate = ISO8601DateTimeUtils.parseNotStandard2ToDate(date);
+			    // DateFormat iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+			    // iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+			    if (optionalDate.isPresent()) {
+				Date parsed = optionalDate.get();// iso8601OutputFormat.parse(date);
+
+				GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+				gregCal.setTime(parsed);
+
+				XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+				variable.setDateTimeUTC(xmlGregCal);
+
+				//
+				//
+				//
+
+				addValue(template, variable);
+			    }
+			}
 		    }
 
-		    if (!hasMore) {
+		    if (!parser.hasMore()) {
 			finished = true;
 		    } else {
-			JSONArray linksArray = jsonObj.optJSONArray("links");
-			if (linksArray != null) {
-			    for (Object o : linksArray) {
-				JSONObject objLink = (JSONObject) o;
-				String rel = objLink.optString("rel");
+			List<Link> links = parser.getLinks();
+			if (links != null) {
+			    for (Link l : links) {
+				String rel = l.rel;
 				if (rel.contains("next")) {
-				    linkage = objLink.optString("href");
+				    linkage = l.href;
 				    break;
 				}
 			    }
@@ -210,81 +272,13 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 			    finished = true;
 			}
 		    }
+		    parser.close();
+		    tmpDataFile.delete();
 		}
+
 	    }
 
-	    String var = online.getName().split("_")[2];
-
-	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-	    
-	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
-	    
-
-	    for (JSONArray jArray : arrayList) {
-
-		for (Object arr : jArray) {
-
-		    JSONObject data = (JSONObject) arr;
-		    
-		    ValueSingleVariable variable = new ValueSingleVariable();
-
-		    // TODO: get variable of interest -- see HISCentralLiguriaConnector class
-		    String valueString = data.optString(var);
-
-		    if (valueString != null && !valueString.isEmpty()) {
-
-			//
-			// value
-			//
-			// temperature and wind values need to be divided by 10
-			if (var.toLowerCase().contains("temp") || var.toLowerCase().contains("wspd") ) {
-			    double d = Double.valueOf(valueString) / 10;
-			    valueString = String.valueOf(d);
-			}
-			// creek level values need to be divided by 100
-			if (var.toLowerCase().contains("crlvm")) {
-			    double d = Double.valueOf(valueString) / 100;
-			    valueString = String.valueOf(d);
-			}
-
-			BigDecimal dataValue = new BigDecimal(valueString);
-			variable.setValue(dataValue);
-
-			//
-			// date
-			//
-
-			String date = data.optString("dtrf");
-			Optional<Date> optionalDate = ISO8601DateTimeUtils.parseNotStandard2ToDate(date);
-			// DateFormat iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-			// iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-			if (optionalDate.isPresent()) {
-			    Date parsed = optionalDate.get();// iso8601OutputFormat.parse(date);
-
-			    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-			    gregCal.setTime(parsed);
-
-		            XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
-			    variable.setDateTimeUTC(xmlGregCal);
-
-			    //
-			    //
-			    //
-
-			    addValue(tsrt, variable);
-			}
-		    }
-		}
-	    }
-
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-	    tmpFile.deleteOnExit();
-	    JAXBWML.getInstance().marshal(response, tmpFile);
-
-	    return tmpFile;
+	    return template.getDataFile();
 
 	} catch (
 

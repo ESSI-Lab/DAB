@@ -1,5 +1,7 @@
 package eu.essi_lab.access.wml;
 
+import java.io.File;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -29,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.Duration;
 
 import org.cuahsi.waterml._1.ContactInformationType;
@@ -76,7 +79,24 @@ import eu.essi_lab.model.resource.GSResource;
  */
 public abstract class WMLDataDownloader extends DataDownloader {
 
+    public TimeSeriesTemplate getTimeSeriesTemplate(String prefix, String suffix) throws Exception {
+	return getTimeSeriesTemplate(getJaxbTimeSeriesTemplate(), prefix, suffix);
+
+    }
+
+    public TimeSeriesTemplate getTimeSeriesTemplate(TimeSeriesResponseType tsrt, String prefix, String suffix) throws Exception {
+	File templateFile = File.createTempFile(prefix, suffix);
+	TimeSeriesTemplate template = new TimeSeriesTemplate(templateFile, tsrt);
+	return template;
+
+    }
+
+    @Deprecated
     public TimeSeriesResponseType getTimeSeriesTemplate() {
+	return getJaxbTimeSeriesTemplate();
+    }
+
+    public TimeSeriesResponseType getJaxbTimeSeriesTemplate() {
 	TimeSeriesResponseType ret = new TimeSeriesResponseType();
 
 	TimeSeriesType timeSeries = new TimeSeriesType();
@@ -390,6 +410,12 @@ public abstract class WMLDataDownloader extends DataDownloader {
 
     }
 
+    public void addValue(TimeSeriesTemplate template, ValueSingleVariable value) throws JAXBException {
+	template.addValue(value);
+
+    }
+
+    @Deprecated
     public void addValue(TimeSeriesResponseType tsrt, ValueSingleVariable v) {
 	List<SourceType> sources = tsrt.getTimeSeries().get(0).getValues().get(0).getSource();
 	if (!sources.isEmpty()) {

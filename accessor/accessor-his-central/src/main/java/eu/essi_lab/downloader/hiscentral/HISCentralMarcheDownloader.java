@@ -46,6 +46,7 @@ import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.marche.HISCentralMarcheConnector;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
@@ -191,7 +192,7 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 		JSONObject jsonObj = new JSONObject(dataResponse.get());
 		JSONArray valuesData = jsonObj.optJSONArray("values");
 
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 		DateFormat iso8601OutputFormat = null;
 		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
@@ -252,13 +253,7 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 		    }
 		}
 
-		JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-		tmpFile.deleteOnExit();
-		JAXBWML.getInstance().marshal(response, tmpFile);
-
-		return tmpFile;
+		return tsrt.getDataFile();
 	    }
 
 	} catch (Exception e) {

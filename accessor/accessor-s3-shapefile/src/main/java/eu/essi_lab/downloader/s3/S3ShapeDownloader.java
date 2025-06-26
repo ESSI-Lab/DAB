@@ -23,6 +23,7 @@ package eu.essi_lab.downloader.s3;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -36,11 +37,13 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.geotools.api.data.FileDataStore;
 import org.geotools.api.data.FileDataStoreFinder;
 import org.geotools.api.data.Query;
@@ -190,8 +193,9 @@ public class S3ShapeDownloader extends DataDownloader {
 	// Get the list of files in the directory
 	String[] files = directory.list();
 
-	// Check if the directory is empty
-	if (files != null && files.length > 0) {
+	// Check if the directory is not empty
+	if (files != null && files.length > 0 && Arrays.asList(files).stream().anyMatch(f -> f.contains("completed"))) {
+
 	    return false;
 	} else {
 	    return true;
@@ -364,11 +368,15 @@ public class S3ShapeDownloader extends DataDownloader {
 	String folderName = "S3-ZIP-" + zipName;
 
 	File persistentTempFolder = getPersistentTempFolder(folderName);
-
+	
 	if (isEmpty(persistentTempFolder)) {
 
 	    client.downloadTo(persistentTempFolder);
-
+	    
+	    ByteArrayInputStream stream = new ByteArrayInputStream("completed".getBytes());
+	    File file = new File(persistentTempFolder, "completed");
+	    	    
+	    IOUtils.copy(stream, new FileOutputStream(file));
 	}
 
 	String unzipFolderName = "S3-UNZIP-" + online.getLinkage().substring(online.getLinkage().lastIndexOf("/") + 1);
@@ -390,6 +398,10 @@ public class S3ShapeDownloader extends DataDownloader {
 
 	    unzipShapefile(new File(persistentTempFolder, list[0]), persistentUnzipFolder);
 
+	    ByteArrayInputStream stream = new ByteArrayInputStream("completed".getBytes());
+	    File file = new File(persistentUnzipFolder, "completed");
+	    	    
+	    IOUtils.copy(stream, new FileOutputStream(file));
 	}
 
 	String[] shapes = persistentUnzipFolder.list(new FilenameFilter() {

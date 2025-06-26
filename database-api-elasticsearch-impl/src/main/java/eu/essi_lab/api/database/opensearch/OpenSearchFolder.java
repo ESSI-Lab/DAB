@@ -301,22 +301,12 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    return out;
 	}
 
-	String field = null;
-
-	switch (identifierType) {
-	case OAI_HEADER:
-	    field = DataFolderMapping.toKeywordField(ResourceProperty.OAI_PMH_HEADER_ID.getName());
-	    break;
-	case ORIGINAL:
-	    field = DataFolderMapping.toKeywordField(ResourceProperty.ORIGINAL_ID.getName());
-	    break;
-	case PRIVATE:
-	    field = DataFolderMapping.toKeywordField(ResourceProperty.PRIVATE_ID.getName());
-	    break;
-	case PUBLIC:
-	    field = DataFolderMapping.toKeywordField(MetadataElement.IDENTIFIER.getName());
-	    break;
-	}
+	String field = switch (identifierType) {
+	case OAI_HEADER ->  DataFolderMapping.toKeywordField(ResourceProperty.OAI_PMH_HEADER_ID.getName());	  
+	case ORIGINAL ->  DataFolderMapping.toKeywordField(ResourceProperty.ORIGINAL_ID.getName());	   
+	case PRIVATE -> DataFolderMapping.toKeywordField(ResourceProperty.PRIVATE_ID.getName());	  
+	case PUBLIC ->  DataFolderMapping.toKeywordField(MetadataElement.IDENTIFIER.getName());	     
+	};
 
 	Query searchQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
 

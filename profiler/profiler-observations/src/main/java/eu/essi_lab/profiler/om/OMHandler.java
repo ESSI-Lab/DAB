@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -496,6 +497,17 @@ public class OMHandler extends StreamingRequestHandler {
 		}
 
 		for (JSONObservation observation : observations) {
+		    List<Double> coord = observation.getFeatureOfInterest().getCoordinates();
+
+		    if (format.equals("JSON")) {
+			if (!first) {
+			    writer.write(",\n");
+			}
+			writeJSONHeader(writer, observation.getJSONObject());
+
+		    }
+
+		    first = false;
 
 		    ObservationType type = observation.getType();
 		    String dataId = observation.getId();
@@ -565,13 +577,13 @@ public class OMHandler extends StreamingRequestHandler {
 
 			    switch (type) {
 			    case TimeSeriesObservation:
-				addPointsFromWML(dataObject.getFile(), observation);
+				addPointsFromWML(dataObject.getFile(), writer, observation, format, fields,coord);
 				break;
 			    case TrajectoryObservation:
-				addPointsFromTrajectoryNetCDF(dataObject.getFile(), observation, viewId);
+				addPointsFromTrajectoryNetCDF(dataObject.getFile(), observation, viewId,writer);
 				break;
 			    case SamplingSurfaceObservation:
-				addPointsFromGridNetCDF(dataObject.getFile(), observation, descriptor);
+				addPointsFromGridNetCDF(dataObject.getFile(), observation, descriptor,writer);
 				break;
 			    default:
 				break;
@@ -582,20 +594,18 @@ public class OMHandler extends StreamingRequestHandler {
 		    }
 
 		    if (format.equals("JSON")) {
-			if (!first) {
-			    writer.write(",");
-			}
-			writeFeature(writer, observation.getJSONObject());
+			writeJSONFooter(writer);
 		    }
-		    if (format.equals("CSV")) {
-			writeCSVobservation(writer, observation, fields);
-		    }
-		    first = false;
 
 		}
 	    } catch (Exception ee) {
 		GSLoggerFactory.getLogger(getClass()).error(ee);
-		throw new RuntimeException("Exception writing response: {}" + ee.getMessage());
+		JSONObject err = new JSONObject();
+		err.put("status", "error");
+		err.put("message", ee.getMessage());
+		writer.write(err.toString());
+		writer.flush();
+		return;
 	    }
 	    // int rest = userSize - tempSize;
 	    // if (rest > 0 && rest < pageSize) {
@@ -623,8 +633,8 @@ public class OMHandler extends StreamingRequestHandler {
 		completed = false;
 	    }
 
-	    writer.write("],\"completed\":" + completed + "" + resumptionToken + " }"); // result array closed,
-											// main JSON closed
+	    writer.write(",\"completed\":" + completed + "" + resumptionToken + " }"); // result array closed,
+	    // main JSON closed
 	}
 	writer.flush();
 	writer.close();
@@ -670,6 +680,7 @@ public class OMHandler extends StreamingRequestHandler {
 		} catch (Exception e) {
 
 		    e.printStackTrace();
+
 		}
 	    }
 	};
@@ -728,6 +739,92 @@ public class OMHandler extends StreamingRequestHandler {
 	return new OMTransformer();
     }
 
+    public void writeJSONFooter(OutputStreamWriter writer) throws IOException {
+
+	// for the footer
+	writer.write("]\n");
+	writer.write("}\n");
+	writer.write("}\n");
+	writer.write("]\n");
+
+    }
+
+    public void writeJSONHeader(OutputStreamWriter writer, JSONObject feature) throws IOException {
+
+	JSONObject jsonFoi = new JSONObject();
+	JSONObject foi = feature.getJSONObject("featureOfInterest");
+	if (!foi.has("id")) {
+	    System.err.println(feature);
+	    System.err.println("feature without id: this should not happen");
+	} else {
+	    String href = foi.getString("id");
+	    jsonFoi.put("href", href);
+	}
+
+	feature.put("featureOfInterest", jsonFoi);
+
+	writer.flush();
+	writer.write("{\n");
+
+	Iterator<String> keys = feature.keys();
+	boolean first = true;
+	while (keys.hasNext()) {
+	    String key = keys.next();
+	    if (key.equals("result")) {
+		// Stop before writing the array
+		continue;
+	    }
+	    if (!first) {
+		writer.write(",\n");
+	    }
+	    first = false;
+	    writer.write(JSONObject.quote(key));
+	    writer.write(": ");
+	    Object optObj = feature.opt(key);
+	    if (optObj != null) {
+		if (optObj instanceof String) {
+
+		    writer.write(JSONObject.quote(feature.get(key).toString()));
+
+		} else {
+		    writer.write(feature.get(key).toString());
+
+		}
+	    }
+	}
+	if (!first) {
+	    writer.write(",\n");
+	}
+
+	writer.write(JSONObject.quote("result"));
+	writer.write(": {");
+
+	JSONObject result = feature.optJSONObject("result");
+	keys = result.keys();
+	first = true;
+	while (keys.hasNext()) {
+	    String key = keys.next();
+	    if (key.equals("points")) {
+		// Stop before writing the array
+		continue;
+	    }
+	    if (!first) {
+		writer.write(",\n");
+	    }
+	    first = false;
+	    writer.write(JSONObject.quote(key));
+	    writer.write(": ");
+	    writer.write(result.get(key).toString());
+	}
+	if (!first) {
+	    writer.write(",\n");
+	}
+
+	writer.write(JSONObject.quote("points"));
+	writer.write(": [");
+
+    }
+
     public void writeFeature(OutputStreamWriter writer, JSONObject feature) throws IOException {
 
 	JSONObject jsonFoi = new JSONObject();
@@ -748,8 +845,9 @@ public class OMHandler extends StreamingRequestHandler {
 
     }
 
-    private void writeCSVobservation(OutputStreamWriter writer, JSONObservation observation, CSVField... fields) throws IOException {
-	JSONArray points = observation.points;
+    private void writeCSVobservation(OutputStreamWriter writer, JSONObservation observation, JSONObject point, CSVField... fields)
+	    throws IOException {
+
 	SimpleEntry<BigDecimal, BigDecimal> latLon = observation.getFeatureOfInterest().getLatLonPoint();
 	String lat = "";
 	String lon = "";
@@ -773,70 +871,68 @@ public class OMHandler extends StreamingRequestHandler {
 	if (uom == null) {
 	    uom = "";
 	}
-	for (int i = 0; i < points.length(); i++) {
-	    JSONObject point = points.getJSONObject(i);
-	    JSONObject timeObject = point.getJSONObject("time");
-	    String time = timeObject.getString("instant");
-	    String quality = null;
-	    if (point.has("metadata")) {
-		JSONObject metadataObject = point.getJSONObject("metadata");
-		if (metadataObject.has("quality")) {
-		    JSONObject qualityObject = metadataObject.getJSONObject("quality");
-		    String term = qualityObject.getString("term");
-		    String vocab = qualityObject.getString("vocabulary");
-		    String separator = "";
-		    if (!vocab.endsWith("/") && !term.startsWith("/")) {
-			separator = "/";
-		    }
-		    quality = vocab + separator + term;
+
+	JSONObject timeObject = point.getJSONObject("time");
+	String time = timeObject.getString("instant");
+	String quality = null;
+	if (point.has("metadata")) {
+	    JSONObject metadataObject = point.getJSONObject("metadata");
+	    if (metadataObject.has("quality")) {
+		JSONObject qualityObject = metadataObject.getJSONObject("quality");
+		String term = qualityObject.getString("term");
+		String vocab = qualityObject.getString("vocabulary");
+		String separator = "";
+		if (!vocab.endsWith("/") && !term.startsWith("/")) {
+		    separator = "/";
 		}
+		quality = vocab + separator + term;
 	    }
-	    BigDecimal value = null;
-	    if (point.has("value")) {
-		value = point.getBigDecimal("value");
+	}
+	BigDecimal value = null;
+	if (point.has("value")) {
+	    value = point.getBigDecimal("value");
+	}
+	int j = 0;
+	for (CSVField field : fields) {
+	    switch (field) {
+	    case TIMESERIES_ID:
+		writer.write(timeseriesId);
+		break;
+	    case UOM:
+		writer.write(uom);
+		break;
+	    case OBSERVED_PROPERTY:
+		writer.write(observedPropertyTitle);
+		break;
+	    case MONITORING_POINT:
+		writer.write(platformTitle);
+		break;
+	    case DATE_TIME:
+		writer.write(time);
+		break;
+	    case VALUE:
+		if (value != null) {
+		    writer.write(value.toString());
+		}
+		break;
+	    case LATITUDE:
+		writer.write(lat);
+		break;
+	    case LONGITUDE:
+		writer.write(lon);
+		break;
+	    case QUALITY:
+		if (quality != null) {
+		    writer.write(quality);
+		}
+		break;
+	    default:
+		break;
 	    }
-	    int j = 0;
-	    for (CSVField field : fields) {
-		switch (field) {
-		case TIMESERIES_ID:
-		    writer.write(timeseriesId);
-		    break;
-		case UOM:
-		    writer.write(uom);
-		    break;
-		case OBSERVED_PROPERTY:
-		    writer.write(observedPropertyTitle);
-		    break;
-		case MONITORING_POINT:
-		    writer.write(platformTitle);
-		    break;
-		case DATE_TIME:
-		    writer.write(time);
-		    break;
-		case VALUE:
-		    if (value != null) {
-			writer.write(value.toString());
-		    }
-		    break;
-		case LATITUDE:
-		    writer.write(lat);
-		    break;
-		case LONGITUDE:
-		    writer.write(lon);
-		    break;
-		case QUALITY:
-		    if (quality != null) {
-			writer.write(quality);
-		    }
-		    break;
-		default:
-		    break;
-		}
-		if (j++ == fields.length - 1) {
-		    writer.write("\n");
-		} else {
-		    writer.write("\t");
-		}
+	    if (j++ == fields.length - 1) {
+		writer.write("\n");
+	    } else {
+		writer.write("\t");
 	    }
 	}
 
@@ -915,7 +1011,7 @@ public class OMHandler extends StreamingRequestHandler {
 	return ConfigurationWrapper.getDownloadSetting();
     }
 
-    private void addPointsFromGridNetCDF(File file, JSONObservation observation, DataDescriptor descriptor) {
+    private void addPointsFromGridNetCDF(File file, JSONObservation observation, DataDescriptor descriptor, OutputStreamWriter writer) {
 	NetcdfDataset dataset = null;
 	try {
 
@@ -948,6 +1044,7 @@ public class OMHandler extends StreamingRequestHandler {
 	    int timePosition = -1;
 	    int xPosition = -1;
 	    int yPosition = -1;
+	    boolean first = true;
 	    for (int i = 0; i < axes.size(); i++) {
 		CoordinateAxis axe = axes.get(i);
 		AxisType axisType = axe.getAxisType();
@@ -1025,7 +1122,12 @@ public class OMHandler extends StreamingRequestHandler {
 			coords.add(y);
 			if (time >= begin && time <= end) {
 			    if (south <= y + TOLY && north >= y - TOLY && east >= x - TOLX && west <= x + TOLX) {
-				observation.addPointAndLocation(new Date(time), new BigDecimal(v), coords);
+				JSONObject point = observation.getPointAndLocation(new Date(time), new BigDecimal(v), coords);
+				if (!first) {
+				    writer.write(",");
+				}
+				writer.write(point.toString());
+				first = false;
 			    }
 			}
 		    }
@@ -1039,7 +1141,7 @@ public class OMHandler extends StreamingRequestHandler {
 
     }
 
-    private void addPointsFromTrajectoryNetCDF(File file, JSONObservation observation, String viewId) {
+    private void addPointsFromTrajectoryNetCDF(File file, JSONObservation observation, String viewId,OutputStreamWriter writer) {
 	FeatureDataset dataset = null;
 	NetcdfDataset.setDefaultEnhanceMode(
 		Collections.unmodifiableSet(EnumSet.of(Enhance.ApplyScaleOffset, Enhance.CoordSystems, Enhance.ConvertEnums)));
@@ -1061,7 +1163,7 @@ public class OMHandler extends StreamingRequestHandler {
 		StandardTrajectoryCollectionImpl collection = (StandardTrajectoryCollectionImpl) collections.get(0);
 
 		PointFeatureCollectionIterator iterator = collection.getPointFeatureCollectionIterator();
-
+		boolean first = true;
 		while (iterator.hasNext()) {
 		    PointFeatureCollection pfc = iterator.next();
 		    while (pfc.hasNext()) {
@@ -1083,7 +1185,13 @@ public class OMHandler extends StreamingRequestHandler {
 			if (viewId == null || !(viewId.equals("i-change") || viewId.equals("trigger"))) {
 			    coords.add(alt);
 			}
-			observation.addPointAndLocation(new Date(time), bigDecValue, coords);
+			JSONObject point = observation.getPointAndLocation(new Date(time), bigDecValue, coords);
+			if (!first) {
+			    writer.write(",");
+			}
+			writer.write(point.toString());
+			first = false;
+			
 		    }
 		}
 	    }
@@ -1096,7 +1204,7 @@ public class OMHandler extends StreamingRequestHandler {
 
     }
 
-    private void addPointsFromWML(File file, JSONObservation observation) {
+    private void addPointsFromWML(File file, OutputStreamWriter writer, JSONObservation observation, String format, CSVField[] fields,List<Double> coord) {
 	try {
 	    FileInputStream stream = new FileInputStream(file);
 
@@ -1104,7 +1212,7 @@ public class OMHandler extends StreamingRequestHandler {
 	    XMLEventReader reader = factory.createXMLEventReader(source);
 
 	    String nodataValue = null;
-
+	    boolean first = true;
 	    while (reader.hasNext()) {
 
 		XMLEvent event = reader.nextEvent();
@@ -1142,12 +1250,22 @@ public class OMHandler extends StreamingRequestHandler {
 			    try {
 				if (d.isPresent()) {
 
-				    List<Double> coord = observation.getFeatureOfInterest().getCoordinates();
+				    JSONObject point = null;
 				    if (coord != null) {
-					observation.addPointAndLocationAndQuality(d.get(), v, coord, quality);
+					point = observation.getPointAndLocationAndQuality(d.get(), v, coord, quality);
 				    } else {
-					observation.addPointAndQuality(d.get(), v, quality);
+					point = observation.getPointAndQuality(d.get(), v, quality);
 				    }
+				    if (format.toLowerCase().contains("json")) {
+					if (!first) {
+					    writer.write(",");
+					}
+					writer.write(point.toString());
+					first = false;
+				    } else {
+					writeCSVobservation(writer, observation, point, fields);
+				    }
+
 				}
 			    } catch (Exception e) {
 			    }

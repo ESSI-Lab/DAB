@@ -42,6 +42,7 @@ import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.emilia.HISCentralEmiliaConnector;
 import eu.essi_lab.accessor.hiscentral.emilia.HISCentralEmiliaConnector.EMILIA_TIMERANGE;
@@ -203,9 +204,9 @@ public class HISCentralEmiliaDownloader extends WMLDataDownloader {
 
 		Optional<String> dataResponse = downloader.downloadOptionalString(linkage);
 
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-		
-	        DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
+		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
+
+		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 		if (dataResponse.isPresent()) {
 
@@ -258,7 +259,7 @@ public class HISCentralEmiliaDownloader extends WMLDataDownloader {
 				GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 				gregCal.setTime(d);
 
-			        XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+				XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
 				variable.setDateTimeUTC(xmlGregCal);
 
 				addValue(tsrt, variable);
@@ -268,13 +269,7 @@ public class HISCentralEmiliaDownloader extends WMLDataDownloader {
 
 		    }
 		}
-		JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-		tmpFile.deleteOnExit();
-		JAXBWML.getInstance().marshal(response, tmpFile);
-
-		return tmpFile;
+		return tsrt.getDataFile();
 	    }
 
 	} catch (Exception e) {

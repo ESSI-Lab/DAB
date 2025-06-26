@@ -46,6 +46,7 @@ import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.basilicata.HISCentralBasilicataConnector;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
@@ -67,7 +68,6 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
-import eu.essi_lab.wml._2.WML2QualityCategory;
 
 /**
  * @author Roberto
@@ -202,7 +202,7 @@ public class HISCentralBasilicataDownloader extends WMLDataDownloader {
 
 		// JSONArray valuesData = jsonArray.optJSONArray("data");
 
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 		DateFormat iso8601OutputFormat = null;
 		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
@@ -219,22 +219,21 @@ public class HISCentralBasilicataDownloader extends WMLDataDownloader {
 		    BigDecimal dataValue = data.optBigDecimal(1, new BigDecimal(MISSING_VALUE));
 		    variable.setValue(dataValue);
 
-		    
-//		    if (qualityCode != null) {
-//			WML2QualityCategory quality = null;
-//			switch (qualityCode) {
-//			case 2:
-//			    // quality = WML2QualityCategory.GOOD;
-//			    break;
-//			case 3:
-//			    break;
-//			default:
-//			    break;
-//			}
-//			if (quality != null) {
-//			    variable.setQualityControlLevelCode(quality.getUri());
-//			}
-//		    }
+		    // if (qualityCode != null) {
+		    // WML2QualityCategory quality = null;
+		    // switch (qualityCode) {
+		    // case 2:
+		    // // quality = WML2QualityCategory.GOOD;
+		    // break;
+		    // case 3:
+		    // break;
+		    // default:
+		    // break;
+		    // }
+		    // if (quality != null) {
+		    // variable.setQualityControlLevelCode(quality.getUri());
+		    // }
+		    // }
 		    //
 		    // date
 		    //
@@ -262,13 +261,7 @@ public class HISCentralBasilicataDownloader extends WMLDataDownloader {
 		    addValue(tsrt, variable);
 		}
 
-		JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-		tmpFile.deleteOnExit();
-		JAXBWML.getInstance().marshal(response, tmpFile);
-
-		return tmpFile;
+		return tsrt.getDataFile();
 	    }
 
 	} catch (Exception e) {
@@ -295,6 +288,18 @@ public class HISCentralBasilicataDownloader extends WMLDataDownloader {
 	    if (HISCentralBasilicataConnector.BEARER_TOKEN == null) {
 		HISCentralBasilicataConnector.getBearerToken();
 	    }
+
+	    if (HISCentralBasilicataConnector.BEARER_TOKEN == null) {
+		GSLoggerFactory.getLogger(getClass()).error("Unable to retrieve bearer token");
+		throw GSException.createException(//
+			getClass(), //
+			"Unable to retrieve bearer token", //
+			null, //
+			ErrorInfo.ERRORTYPE_SERVICE, //
+			ErrorInfo.SEVERITY_ERROR, //
+			HISCENTRAL_BASILICATA_DOWNLOAD_ERROR);
+	    }
+
 	    GSLoggerFactory.getLogger(getClass()).info("Getting " + linkage);
 
 	    InputStream stream = null;
@@ -328,7 +333,8 @@ public class HISCentralBasilicataDownloader extends WMLDataDownloader {
 		HISCentralBasilicataConnector.refreshBearerToken();
 		do {
 		    // HttpGet newGet = new HttpGet(linkage.trim());
-		    // newGet.addHeader("Authorization", "Bearer " + HISCentralBasilicataConnector.BEARER_TOKEN);
+		    // newGet.addHeader("Authorization", "Bearer " +
+		    // HISCentralBasilicataConnector.BEARER_TOKEN);
 		    // getStationResponse = httpClient.execute(newGet);
 		    // statusCode = getStationResponse.getStatusLine().getStatusCode();
 		    //

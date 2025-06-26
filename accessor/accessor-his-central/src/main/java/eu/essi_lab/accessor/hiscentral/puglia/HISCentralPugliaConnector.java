@@ -126,8 +126,8 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 	    originalMetadata = getMetadataList();
 	}
 
-	JSONArray metadataArray = originalMetadata.optJSONArray("user_permissions");
-
+	JSONArray metadataArray = originalMetadata.optJSONArray("data");
+	
 	if (page < metadataArray.length() && !maxNumberReached) {
 
 	    JSONObject datasetMetadata = metadataArray.getJSONObject(page);

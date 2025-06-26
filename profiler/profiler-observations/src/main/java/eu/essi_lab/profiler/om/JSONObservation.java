@@ -177,29 +177,44 @@ public class JSONObservation {
     }
     
     public void addPointAndQuality(Date date, BigDecimal value,String quality) {
-	PointBuilder builder = new PointBuilder();
-	builder.setDateValue(date,value);
-	builder.setQuality(quality);
-	JSONObject point = builder.build();
-	points.put(point);
-    }
-
-    public void addPointAndLocation(Date date, BigDecimal value, List<Double> coordinates) {
-	PointBuilder builder = new PointBuilder();
-	builder.setDateValue(date,value);
-	builder.setLocation(getGeometryName(),coordinates);
-	JSONObject point = builder.build();
+	JSONObject point = getPointAndQuality(date,value,quality);
 	points.put(point);
     }
     
-    public void addPointAndLocationAndQuality(Date date, BigDecimal value, List<Double> coordinates,String quality) {
+    public JSONObject getPointAndQuality(Date date, BigDecimal value,String quality) {
+   	PointBuilder builder = new PointBuilder();
+   	builder.setDateValue(date,value);
+   	builder.setQuality(quality);
+   	JSONObject point = builder.build();
+   	return point;
+       }
+
+    public void addPointAndLocation(Date date, BigDecimal value, List<Double> coordinates) {
+	JSONObject point = getPointAndLocation (date,value,coordinates);
+	points.put(point);
+    }
+    
+    public JSONObject getPointAndLocation(Date date, BigDecimal value, List<Double> coordinates) {
 	PointBuilder builder = new PointBuilder();
 	builder.setDateValue(date,value);
 	builder.setLocation(getGeometryName(),coordinates);
-	builder.setQuality(quality);
 	JSONObject point = builder.build();
+	return point;
+    }
+    
+    public void addPointAndLocationAndQuality(Date date, BigDecimal value, List<Double> coordinates,String quality) {
+	JSONObject point = getPointAndLocationAndQuality(date,value, coordinates, quality);
 	points.put(point);
     }
+    
+    public JSONObject getPointAndLocationAndQuality(Date date, BigDecimal value, List<Double> coordinates,String quality) {
+   	PointBuilder builder = new PointBuilder();
+   	builder.setDateValue(date,value);
+   	builder.setLocation(getGeometryName(),coordinates);
+   	builder.setQuality(quality);
+   	JSONObject point = builder.build();
+   	return point;
+       }
 
     public String getGeometryName() {
 	return "shape";
