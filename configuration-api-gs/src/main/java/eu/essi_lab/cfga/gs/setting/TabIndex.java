@@ -86,7 +86,7 @@ public enum TabIndex {
     /**
      * 
      */
-    DATA_CACHE_CONNECTOR_SETTING(14),	
+    DATA_CACHE_CONNECTOR_SETTING(14),
     /**
      * 
      */
@@ -94,7 +94,11 @@ public enum TabIndex {
     /**
      * 
      */
-    SYSTEM_SETTING(16);
+    SYSTEM_SETTING(16),
+    /**
+     * 
+     */
+    ABOUT(17);
 
     private int index;
 
