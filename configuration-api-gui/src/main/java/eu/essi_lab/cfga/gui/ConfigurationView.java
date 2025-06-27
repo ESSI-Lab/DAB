@@ -520,15 +520,19 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * By design {@link ComponentInfo} instances and the related {@link TabInfo} are tightly coupled with at least one
-     * {@link Setting}. If the {@link RemoveDirective} of the {@link TabInfo} allows the removal of
+     * {@link ComponentInfo} instances and the related {@link TabInfo}, can be defined to manage one or more
+     * {@link Setting}s.<br>
+     * If the {@link RemoveDirective} of the {@link TabInfo} allows the removal of
      * all settings, when the view is initialized and there is no settings coupled with the {@link ComponentInfo},
      * the {@link ComponentInfo} and its {@link TabInfo} cannot be found and as consequence, the related tab cannot be
-     * rendered. In this case, it will no longer be possible to add or remove that kind of settings just because there
+     * rendered.<br>
+     * In this case, it will no longer be possible to add or remove that kind of settings just because there
      * is no tab with the required {@link AddDirective}.<br>
      * To avoid this issue, this method can be used to register a list of {@link ComponentInfo} that must be
      * <i>always rendered</i> (typically tabs with {@link RemoveDirective}s and {@link AddDirective}), even if the
-     * related settings are missing
+     * related settings are missing.<br>
+     * <br>
+     * This method can also be used to add {@link ComponentInfo} instances that have no related {@link Setting}
      * 
      * @return
      */
@@ -933,9 +937,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 			orientation, //
 			tabName, //
 			addDirective, //
-			removeDirective,//
+			removeDirective, //
 			editDirective);
-			
+
 		container.getElement().getStyle().set("margin-left", "auto");
 		container.getElement().getStyle().set("margin-right", "auto");
 
