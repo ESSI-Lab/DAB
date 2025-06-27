@@ -21,9 +21,9 @@ package eu.essi_lab.messages.bond;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.model.GSSource;
@@ -310,23 +310,23 @@ public class BondFactory {
 	return new SimpleValueBond(operator, element, value);
     }
 
-    public static Bond getKeywordListBond(List<String> keywords, LogicalOperator op) {
+    /**
+     * @param keywords
+     * @param op
+     * @return
+     */
+    public static Bond createKeywordListBond(List<String> keywords, LogicalOperator op) {
 
-	List<Bond> resList = new ArrayList<>();
-	for (String s : keywords) {
-	    Bond b = BondFactory.createOrBond(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, s),
-		    BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, s));
-	    resList.add(b);
-	}
+	List<Bond> resList = keywords.stream().//
+		map(kwd -> BondFactory.createOrBond(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, kwd), //
+			BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, kwd)))
+		.collect(Collectors.toList());
 
-	if (resList.size() == 1) {
-	    return resList.get(0);
-	}
-
-	if (op.equals(LogicalOperator.AND))
-	    return BondFactory.createAndBond(resList);
-
-	return BondFactory.createOrBond(resList);
+	return resList.size() == 1 ? resList.get(0) : switch (op) {
+	case OR -> BondFactory.createOrBond(resList);
+	case AND -> BondFactory.createAndBond(resList);
+	case NOT -> throw new UnsupportedOperationException("Unimplemented case: " + op);
+	};
     }
 
     /**

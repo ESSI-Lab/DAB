@@ -107,6 +107,13 @@ public class TabContainer extends VerticalLayout {
 
 	removeAllButHeader();
 
+	if (tabInfo.getComponent().isPresent()) {
+
+	    add(tabInfo.getComponent().get());
+
+	    return;
+	}
+
 	List<Setting> settings = view.retrieveTabSettings(tabInfo);
 
 	DirectiveManager directiveManager = tabInfo.getDirectiveManager();
@@ -254,7 +261,7 @@ public class TabContainer extends VerticalLayout {
      */
     public void addLegend(Component legend) {
 
-	if (!legends.stream().map(lg -> lg.getId().get()).anyMatch(id -> id.equals(legend.getId().get())) ) {
+	if (!legends.stream().map(lg -> lg.getId().get()).anyMatch(id -> id.equals(legend.getId().get()))) {
 
 	    legends.add(legend);
 	}

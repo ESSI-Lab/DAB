@@ -23,6 +23,8 @@ package eu.essi_lab.cfga.gui.extension;
 
 import java.util.Optional;
 
+import com.vaadin.flow.component.Component;
+
 import eu.essi_lab.cfga.gui.components.grid.GridInfo;
 import eu.essi_lab.cfga.gui.extension.directive.DirectiveManager;
 
@@ -36,6 +38,7 @@ public class TabInfo {
     private GridInfo gridInfo;
     private boolean reloadable;
     private Runnable tabReloadHandler;
+    private Component component;
 
     /**
      * 
@@ -126,6 +129,24 @@ public class TabInfo {
     public Optional<Runnable> getTabReloader() {
 
 	return Optional.ofNullable(tabReloadHandler);
+    }
+
+    
+    
+    /**
+     * @return the component
+     */
+    public Optional<Component> getComponent() {
+	
+        return Optional.ofNullable(component);
+    }
+
+    /**
+     * @param component 
+     */
+    public void setComponent(Component component) {
+	
+        this.component = component;
     }
 
     /**

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.data.provider.SortDirection;
 
@@ -175,6 +176,17 @@ public class TabInfoBuilder {
     public TabInfoBuilder withShowDirective(String name) {
 
 	tabInfo.getDirectiveManager().addShowDirective(new ShowDirective(name));
+
+	return this;
+    }
+
+    /**
+     * @param Component
+     * @return
+     */
+    public TabInfoBuilder withComponent(Component Component) {
+
+	tabInfo.setComponent(Component);
 
 	return this;
     }
@@ -355,7 +367,7 @@ public class TabInfoBuilder {
 	    int pageSize, //
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
-	    SelectionMode selectionMode,//
+	    SelectionMode selectionMode, //
 	    boolean showColumnsHider) {
 
 	GridInfo gridInfo = new GridInfo();
