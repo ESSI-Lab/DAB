@@ -330,7 +330,7 @@ public class ConfigService {
 	// finding setting id from the given source id
 	//
 
-	SettingIdFinder finder = getFinder(editSourceRequest);
+	SettingFinder finder = getFinder(editSourceRequest);
 
 	if (finder.getErrorResponse().isPresent()) {
 
@@ -341,9 +341,9 @@ public class ConfigService {
 	// building harvesting setting
 	//
 
-	String settingId = finder.getSettingId().get();
+	String settingId = finder.getSetting().get().getIdentifier();
 
-	HarvestingSetting setting = HarvestingSettingUtils.build(editSourceRequest);
+	HarvestingSetting setting = HarvestingSettingUtils.build(editSourceRequest, finder.getSetting().get());
 	setting.setIdentifier(settingId);
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
@@ -376,7 +376,7 @@ public class ConfigService {
 	// finding setting id from the given source id
 	//
 
-	SettingIdFinder finder = getFinder(harvestSourceRequest);
+	SettingFinder finder = getFinder(harvestSourceRequest);
 
 	if (finder.getErrorResponse().isPresent()) {
 
@@ -415,7 +415,7 @@ public class ConfigService {
 	// updating harvesting setting scheduling
 	//
 
-	String settingId = finder.getSettingId().get();
+	String settingId = finder.getSetting().get().getIdentifier();
 
 	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
 		stream().//
@@ -470,7 +470,7 @@ public class ConfigService {
 		scheduler.reschedule(setting);
 
 	    } else {
-		
+
 		scheduler.schedule(setting);
 	    }
 	} catch (Exception ex) {
@@ -497,7 +497,7 @@ public class ConfigService {
 	// finding setting id from the given source id
 	//
 
-	SettingIdFinder finder = getFinder(harvestUnschedulingRequest);
+	SettingFinder finder = getFinder(harvestUnschedulingRequest);
 
 	if (finder.getErrorResponse().isPresent()) {
 
@@ -512,7 +512,7 @@ public class ConfigService {
 
 	Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
 
-	String settingId = finder.getSettingId().get();
+	String settingId = finder.getSetting().get().getIdentifier();
 
 	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
 		stream().//
@@ -568,7 +568,7 @@ public class ConfigService {
 	// finding setting id from the given source id
 	//
 
-	SettingIdFinder finder = getFinder(removeSourceRequest);
+	SettingFinder finder = getFinder(removeSourceRequest);
 
 	if (finder.getErrorResponse().isPresent()) {
 
@@ -587,7 +587,7 @@ public class ConfigService {
 		    "The requested source is currently being harvested and cannot be removed until harvesting is complete");
 	}
 
-	String settingId = finder.getSettingId().get();
+	String settingId = finder.getSetting().get().getIdentifier();
 
 	//
 	// unscheduling job
@@ -666,7 +666,7 @@ public class ConfigService {
 	// finding setting id from the given source id
 	//
 
-	SettingIdFinder finder = getFinder(request);
+	SettingFinder finder = getFinder(request);
 
 	if (finder.getErrorResponse().isPresent()) {
 
@@ -950,23 +950,23 @@ public class ConfigService {
     /**
      * @author Fabrizio
      */
-    private class SettingIdFinder {
+    private class SettingFinder {
 
-	private String settingId;
+	private HarvestingSetting setting;
 	private Response errorResponse;
 
 	/**
-	 * @param settingId
+	 * @param setting
 	 */
-	private SettingIdFinder(String settingId) {
+	private SettingFinder(HarvestingSetting setting) {
 
-	    this.settingId = settingId;
+	    this.setting = setting;
 	}
 
 	/**
 	 * @param response
 	 */
-	private SettingIdFinder(Response response) {
+	private SettingFinder(Response response) {
 
 	    errorResponse = response;
 	}
@@ -974,9 +974,9 @@ public class ConfigService {
 	/**
 	 * @return
 	 */
-	public Optional<String> getSettingId() {
+	public Optional<HarvestingSetting> getSetting() {
 
-	    return Optional.ofNullable(settingId);
+	    return Optional.ofNullable(setting);
 	}
 
 	/**
@@ -992,15 +992,15 @@ public class ConfigService {
      * @param request
      * @return
      */
-    private SettingIdFinder getFinder(ConfigRequest request) {
+    private SettingFinder getFinder(ConfigRequest request) {
 
 	Optional<String> optSourceId = request.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
 
-	String settingId = null;
+	HarvestingSetting setting = null;
 
 	if (!optSourceId.isPresent()) {
 
-	    return new SettingIdFinder(buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing source identifier"));
+	    return new SettingFinder(buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing source identifier"));
 
 	} else {
 
@@ -1012,17 +1012,16 @@ public class ConfigService {
 		    findFirst().//
 		    isPresent()) {
 
-		return new SettingIdFinder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' not found"));
+		return new SettingFinder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' not found"));
 	    }
 
-	    settingId = ConfigurationWrapper.getHarvestingSettings().//
+	    setting = ConfigurationWrapper.getHarvestingSettings().//
 		    stream().//
 		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).//
 		    findFirst().//
-		    get().//
-		    getIdentifier();
+		    get();
 	}
 
-	return new SettingIdFinder(settingId);
+	return new SettingFinder(setting);
     }
 }

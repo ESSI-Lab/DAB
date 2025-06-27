@@ -256,7 +256,7 @@ public abstract class ConfigRequest {
 	mandatoryParams.removeAll(readParameters());
 	if (!mandatoryParams.isEmpty()) {
 
-	    throw new IllegalArgumentException("Missing mandatory parameters: " + mandatoryParams.//
+	    throw new IllegalArgumentException("Missing mandatory parameter/s: " + mandatoryParams.//
 		    stream().//
 		    map(p -> "'" + p + "'").//
 		    collect(Collectors.joining(", ")));
@@ -276,7 +276,7 @@ public abstract class ConfigRequest {
 
 	if (!mandatoryCompositeNames.isEmpty()) {
 
-	    throw new IllegalArgumentException("Missing mandatory composite parameters: " + mandatoryCompositeNames.//
+	    throw new IllegalArgumentException("Missing mandatory composite parameter/s: " + mandatoryCompositeNames.//
 		    stream().//
 		    map(p -> "'" + p + "'").//
 		    collect(Collectors.joining(", ")));
@@ -302,7 +302,7 @@ public abstract class ConfigRequest {
 
 	if (!mandatoryNestedParamsNames.isEmpty()) {
 
-	    throw new IllegalArgumentException("Missing mandatory nested parameters: " + mandatoryCompositeParams.//
+	    throw new IllegalArgumentException("Missing mandatory nested parameter/s: " + mandatoryCompositeParams.//
 		    stream().//
 		    map(p -> "'" + p.getCompositeName().get() + "." + p.getName() + "'").//
 		    collect(Collectors.joining(", ")));

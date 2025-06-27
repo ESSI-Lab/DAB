@@ -22,6 +22,7 @@ package eu.essi_lab.api.database.marklogic;
  */
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,8 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -117,9 +120,35 @@ public class MarkLogicFolder implements DatabaseFolder {
     }
 
     @Override
-    public Optional<GSResource> get(IdentifierType type, String identifier) {
+    public Optional<GSResource> get(IdentifierType identifierType, String identifier) throws Exception {
 
-	return Optional.empty();
+	String index = switch (identifierType) {
+	case OAI_HEADER -> ResourceProperty.OAI_PMH_HEADER_ID.getName();
+	case ORIGINAL -> ResourceProperty.ORIGINAL_ID.getName();
+	case PUBLIC -> MetadataElement.IDENTIFIER.getName();
+	case PRIVATE -> throw new UnsupportedOperationException("Unimplemented case: " + identifierType);
+	};
+
+	String xQuery = "xquery version \"1.0-ml\";\n";
+	xQuery += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\";\n";
+	xQuery += "let $query as cts:query := \n";
+	xQuery += "gs:andq(( \n";
+	xQuery += "cts:directory-query('"+uri+"', '1'),\n";
+	xQuery += "cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','" + index + "'),'=','" + identifier
+		+ "',(\"score-function=linear\"),0.0)";
+	xQuery += "))\n";
+	xQuery += "return cts:search(doc()[gs:Dataset or gs:DatasetCollection], $query,(\"unfiltered\",\"score-simple\"),0)";
+
+	ResultSequence response = mlDataBase.execXQuery(xQuery);
+
+	if (response.isEmpty()) {
+
+	    return Optional.empty();
+	}
+
+	InputStream stream = response.next().asInputStream();
+
+	return Optional.of(GSResource.create(stream));
     }
 
     /**
@@ -165,7 +194,19 @@ public class MarkLogicFolder implements DatabaseFolder {
     @Override
     public List<String> listIdentifiers(IdentifierType identifierType) throws Exception {
 
-        return null;
+	String index = switch (identifierType) {
+	case OAI_HEADER -> ResourceProperty.OAI_PMH_HEADER_ID.getName();
+	case ORIGINAL -> ResourceProperty.ORIGINAL_ID.getName();
+	case PUBLIC -> MetadataElement.IDENTIFIER.getName();
+	case PRIVATE -> throw new UnsupportedOperationException("Unimplemented case: " + identifierType);
+	};
+
+	String xQuery = "cts:element-values(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', '" + index + "'),(),(), "
+		+ "cts:directory-query('" + uri + "', '1'))";
+
+	String[] rs = mlDataBase.execXQuery(xQuery).asStrings();
+
+	return Arrays.asList(rs);
     }
 
     @Override
