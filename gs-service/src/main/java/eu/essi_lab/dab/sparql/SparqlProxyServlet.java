@@ -35,8 +35,17 @@ import javax.servlet.http.HttpServletResponse;
 
 public class SparqlProxyServlet extends HttpServlet {
 
+<<<<<<< HEAD
     // Configure your remote SPARQL endpoint here
     private static final String REMOTE_SPARQL_ENDPOINT = "http://localhost:3030/test/sparql";
+=======
+	// Configure your remote SPARQL endpoint here
+	private static String REMOTE_SPARQL_ENDPOINT = "https://dbpedia.org/sparql";
+
+	public static void setREMOTE_SPARQL_ENDPOINT(String REMOTE_SPARQL_ENDPOINT) {
+		SparqlProxyServlet.REMOTE_SPARQL_ENDPOINT = REMOTE_SPARQL_ENDPOINT;
+	}
+>>>>>>> refs/heads/main
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
