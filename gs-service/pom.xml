@@ -311,13 +311,6 @@
 			<artifactId>cloudwatchlogs</artifactId>
 		</dependency>
 
-	
-		
-		<dependency>
-    <groupId>org.apache.jena</groupId>
-    <artifactId>jena-fuseki-server</artifactId>
-</dependency>
-		
 		<dependency>
 		    <groupId>org.apache.jena</groupId>
 		    <artifactId>jena-shacl</artifactId>
