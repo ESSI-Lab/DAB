@@ -65,4 +65,19 @@ public class EditSourceRequest extends PutSourceRequest {
 
 	return list;
     }
+
+    /**
+     * 
+     */
+    @Override
+    protected void mandatoryCheck() {
+
+	super.mandatoryCheck();
+
+	if (readParameters().size() == 1) {
+
+	    throw new IllegalArgumentException("At least one of the parameters '" + SOURCE_LABEL + "', '" + SOURCE_ENDPOINT + "', '"
+		    + SERVICE_TYPE + "' must be provided'");
+	}
+    }
 }

@@ -37,6 +37,7 @@ import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.cuahsi.waterml._1.essi.JAXBWML;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.dinaguaws.client.DinaguaClient;
 import eu.essi_lab.accessor.dinaguaws.client.DinaguaData;
@@ -165,8 +166,7 @@ public class DinaguaDownloader extends WMLDataDownloader {
 
 	    DinaguaData observations = client.getData(stationCode, seriesCode, begin, end,InterpolationType.decode(interpolation));
 
-	    ObjectFactory factory = new ObjectFactory();
-	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
 	    for (DinaguaValue value : observations.getSet()) {
 
@@ -185,12 +185,8 @@ public class DinaguaDownloader extends WMLDataDownloader {
 		}
 	    }
 
-	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-	    tmpFile.deleteOnExit();
-	    JAXBWML.getInstance().marshal(response, tmpFile);
-
-	    return tmpFile;
+	    return tsrt.getDataFile();
+	    
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);

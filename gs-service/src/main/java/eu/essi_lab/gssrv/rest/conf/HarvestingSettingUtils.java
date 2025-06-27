@@ -47,6 +47,45 @@ import eu.essi_lab.lib.utils.LabeledEnum;
 public class HarvestingSettingUtils {
 
     /**
+     * @param request
+     * @param model
+     * @return
+     */
+    public static HarvestingSetting build(PutSourceRequest request, HarvestingSetting model) {
+
+	HarvestedConnectorSetting modelConnectorSetting = model.getSelectedAccessorSetting().getHarvestedConnectorSetting();
+
+	String modelType = model.getSelectedAccessorSetting().getAccessorType().replace(" Connector", "");
+
+	if (modelConnectorSetting instanceof ConnectorWrapperSetting) {
+
+	    ConnectorWrapperSetting<?> wrapped = (ConnectorWrapperSetting<?>) modelConnectorSetting;
+	    modelType = wrapped.getSelectedConnector().getType().//
+		    replace("Connector ", "").// for connectors with a version, like "WCS Connector 1.1.0"
+		    replace(" Connector", "");// for connectors with no version, like "CSW Connector"
+	}
+
+	String modelLabel = model.getSelectedAccessorSetting().getSource().getLabel();
+
+	String modelEndpoint = model.getSelectedAccessorSetting().getSource().getEndpoint();
+
+	String sourceID = request.read(PutSourceRequest.SOURCE_ID).get().toString();
+
+	String type = request.read(PutSourceRequest.SERVICE_TYPE).isEmpty() ? modelType
+		: request.read(PutSourceRequest.SERVICE_TYPE).get().toString();
+
+	String sourceEndpoint = request.read(PutSourceRequest.SOURCE_ENDPOINT).isEmpty() ? modelEndpoint
+		: request.read(PutSourceRequest.SOURCE_ENDPOINT).get().toString();
+
+	String label = request.read(PutSourceRequest.SOURCE_LABEL).isEmpty() ? modelLabel
+		: request.read(PutSourceRequest.SOURCE_LABEL).get().toString();
+
+	SourceType sourceType = LabeledEnum.valueOf(SourceType.class, type).get();
+
+	return build(sourceType, sourceID, label, sourceEndpoint);
+    }
+
+    /**
      * @param service
      * @return
      */
@@ -61,106 +100,141 @@ public class HarvestingSettingUtils {
 
 	String label = request.read(PutSourceRequest.SOURCE_LABEL).get().toString();
 
-	HarvestingSetting harvSetting = null;
+	return build(sourceType, sourceID, label, sourceEndpoint);
+    }
 
-	switch (sourceType) {
-	case CSW:
+    /**
+     * @param request
+     * @param scheduling
+     * @return
+     */
+    public static void udpate(HarvestSchedulingRequest request, Scheduling scheduling) {
 
-	    harvSetting = createSetting(//
-		    "CSW", //
-		    Optional.empty(), //
-		    sourceID, //
-		    label, //
-		    sourceEndpoint);
+	Optional<String> startTime = request.read(HarvestSchedulingRequest.START_TIME).map(v -> v.toString());
 
-	    break;
+	Optional<String> interval = request.read(HarvestSchedulingRequest.REPEAT_INTERVAL).map(v -> v.toString());
+	Optional<String> unit = request.read(HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT).map(v -> v.toString());
 
-	case WCS_100: {
+	scheduling.setEnabled(true);
 
-	    String wrappedConnectorType = "WCS Connector 1.0.0";
+	if (interval.isPresent()) {
 
-	    harvSetting = createSetting(//
-		    "WCS", //
-		    Optional.of(wrappedConnectorType), //
-		    sourceID, //
-		    label, //
-		    sourceEndpoint);
+	    scheduling.setRunIndefinitely();
 
-	    break;
+	    RepeatIntervalUnit intUnit = LabeledEnum.valueOf(RepeatIntervalUnit.class, unit.get()).get();
+	    switch (intUnit) {
+	    case MINUTES:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.MINUTES);
+		break;
+	    case DAYS:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.DAYS);
+		break;
+	    case HOURS:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.HOURS);
+		break;
+	    case MONTHS:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()) * 30, TimeUnit.DAYS);
+		break;
+	    case WEEKS:
+		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()) * 7, TimeUnit.DAYS);
+		break;
+	    }
+
+	} else {
+
+	    scheduling.setRunOnce();
 	}
 
-	case WCS_110: {
+	if (startTime.isPresent()) {
 
-	    String wrappedConnectorType = "WCS Connector 1.1.0";
+	    scheduling.setStartTime(startTime.get());
 
-	    harvSetting = createSetting(//
-		    "WCS", //
-		    Optional.of(wrappedConnectorType), //
-		    sourceID, //
-		    label, //
-		    sourceEndpoint);
+	} else {
 
-	    break;
+	    scheduling.setStartNow();
 	}
+    }
 
-	case WCS_111: {
+    /**
+     * @param sourceType
+     * @param sourceID
+     * @param label
+     * @param sourceEndpoint
+     * @return
+     */
+    private static HarvestingSetting build(//
+	    SourceType sourceType, //
+	    String sourceID, //
+	    String label, //
+	    String sourceEndpoint) {
 
-	    String wrappedConnectorType = "WCS Connector 1.1.1";
+	return switch (sourceType) {
+	case CSW ->
 
-	    harvSetting = createSetting(//
-		    "WCS", //
-		    Optional.of(wrappedConnectorType), //
-		    sourceID, //
-		    label, //
-		    sourceEndpoint);
+		build(//
+			"CSW", //
+			Optional.empty(), //
+			sourceID, //
+			label, //
+			sourceEndpoint);
 
-	    break;
-	}
+	case WCS_100 ->
 
-	case WFS_110: {
+		build(//
+			"WCS", //
+			Optional.of("WCS Connector 1.0.0"), //
+			sourceID, //
+			label, //
+			sourceEndpoint);
 
-	    String wrappedConnectorType = "WFS Connector 1.1.0";
+	case WCS_110 ->
 
-	    harvSetting = createSetting(//
-		    "WFS", //
-		    Optional.of(wrappedConnectorType), //
-		    sourceID, //
-		    label, //
-		    sourceEndpoint);
+		build(//
+			"WCS", //
+			Optional.of("WCS Connector 1.1.0"), //
+			sourceID, //
+			label, //
+			sourceEndpoint);
 
-	    break;
-	}
+	case WCS_111 ->
 
-	case WMS_111: {
+		build(//
+			"WCS", //
+			Optional.of("WCS Connector 1.1.1"), //
+			sourceID, //
+			label, //
+			sourceEndpoint);
 
-	    String wrappedConnectorType = "WMS Connector 1.1.1";
+	case WFS_110 ->
 
-	    harvSetting = createSetting(//
-		    "WMS", //
-		    Optional.of(wrappedConnectorType), //
-		    sourceID, //
-		    label, //
-		    sourceEndpoint);
+		build(//
+			"WFS", //
+			Optional.of("WFS Connector 1.1.0"), //
+			sourceID, //
+			label, //
+			sourceEndpoint);
 
-	    break;
-	}
+	case WMS_111 ->
 
-	case WMS_130: {
+		build(//
+			"WMS", //
+			Optional.of("WMS Connector 1.1.1"), //
+			sourceID, //
+			label, //
+			sourceEndpoint);
 
-	    String wrappedConnectorType = "WMS Connector 1.3.0";
+	case WMS_130 ->
 
-	    harvSetting = createSetting(//
-		    "WMS", //
-		    Optional.of(wrappedConnectorType), //
-		    sourceID, //
-		    label, //
-		    sourceEndpoint);
+		build(//
+			"WMS", //
+			Optional.of("WMS Connector 1.3.0"), //
+			sourceID, //
+			label, //
+			sourceEndpoint);
 
-	    break;
-	}
-	}
+	default -> throw new IllegalArgumentException("Unexpected value: " + sourceType);
 
-	return harvSetting;
+	};
     }
 
     /**
@@ -172,7 +246,7 @@ public class HarvestingSettingUtils {
      * @param schedulerDelay
      * @return
      */
-    private static HarvestingSetting createSetting(//
+    private static HarvestingSetting build(//
 	    String accessorType, //
 	    Optional<String> wrappedConnectorType, //
 	    String sourceId, //
@@ -231,57 +305,5 @@ public class HarvestingSettingUtils {
 	//
 
 	return harvSetting;
-    }
-
-    /**
-     * @param request
-     * @param scheduling
-     * @return
-     */
-    public static void udpate(HarvestSchedulingRequest request, Scheduling scheduling) {
-
-	Optional<String> startTime = request.read(HarvestSchedulingRequest.START_TIME).map(v -> v.toString());
-
-	Optional<String> interval = request.read(HarvestSchedulingRequest.REPEAT_INTERVAL).map(v -> v.toString());
-	Optional<String> unit = request.read(HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT).map(v -> v.toString());
-
-	scheduling.setEnabled(true);
-
-	if (interval.isPresent()) {
-
-	    scheduling.setRunIndefinitely();
-
-	    RepeatIntervalUnit intUnit = LabeledEnum.valueOf(RepeatIntervalUnit.class, unit.get()).get();
-	    switch (intUnit) {
-	    case MINUTES:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.MINUTES);
-		break;
-	    case DAYS:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.DAYS);
-		break;
-	    case HOURS:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.HOURS);
-		break;
-	    case MONTHS:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()) * 30, TimeUnit.DAYS);
-		break;
-	    case WEEKS:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()) * 7, TimeUnit.DAYS);
-		break;
-	    }
-
-	} else {
-
-	    scheduling.setRunOnce();
-	}
-
-	if (startTime.isPresent()) {
-
-	    scheduling.setStartTime(startTime.get());
-
-	} else {
-
-	    scheduling.setStartNow();
-	}
     }
 }

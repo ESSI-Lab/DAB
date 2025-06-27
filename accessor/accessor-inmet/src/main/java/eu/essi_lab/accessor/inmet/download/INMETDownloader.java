@@ -35,15 +35,13 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 
+import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.inmet.INMETConnector;
 import eu.essi_lab.accessor.inmet.INMETVariable;
@@ -274,8 +272,7 @@ public class INMETDownloader extends WMLDataDownloader {
 		String variableName = variableId.split("_")[0];
 		INMETVariable inmetVariable = INMETVariable.decode(variableName);
 
-		ObjectFactory factory = new ObjectFactory();
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
 		File file = connector.getDownloader().downloadStream(linkage, fileName);
 
@@ -337,13 +334,7 @@ public class INMETDownloader extends WMLDataDownloader {
 		    if (file.exists())
 			file.delete();
 
-		    // timeSeries.getVariable().setTimeScale(factory.createVariableInfoTypeTimeScale(ts));
-		    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		    File tmpFile = File.createTempFile("INMETDownloader", ".wml");
-		    tmpFile.deleteOnExit();
-		    JAXBWML.getInstance().marshal(response, tmpFile);
-
-		    return tmpFile;
+		    return tsrt.getDataFile();
 
 		}
 

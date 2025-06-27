@@ -496,6 +496,7 @@ public class OMHandler extends StreamingRequestHandler {
 		    }
 		}
 
+		
 		for (JSONObservation observation : observations) {
 		    List<Double> coord = observation.getFeatureOfInterest().getCoordinates();
 
@@ -598,6 +599,8 @@ public class OMHandler extends StreamingRequestHandler {
 		    }
 
 		}
+
+		
 	    } catch (Exception ee) {
 		GSLoggerFactory.getLogger(getClass()).error(ee);
 		JSONObject err = new JSONObject();
@@ -618,6 +621,9 @@ public class OMHandler extends StreamingRequestHandler {
 	} while (tempSize < userSize && searchAfter != null);
 
 	if (format.equals("JSON")) {
+
+	    // close the member array
+	    writer.write("]\n");
 
 	    String resumptionToken = "";
 	    boolean completed = true;
@@ -745,7 +751,7 @@ public class OMHandler extends StreamingRequestHandler {
 	writer.write("]\n");
 	writer.write("}\n");
 	writer.write("}\n");
-	writer.write("]\n");
+	
 
     }
 

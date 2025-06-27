@@ -87,7 +87,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     private DatabaseFolder data2Folder;
 
     private static final List<Queryable> COMPARISON_PROPERTIES = Lists.newArrayList();
-    {
+    static {
 	COMPARISON_PROPERTIES.add(MetadataElement.TITLE);
 	COMPARISON_PROPERTIES.add(MetadataElement.ABSTRACT);
 	COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_BEGIN);
@@ -350,34 +350,37 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	log(status, "Modified records: " + modifiedRecords.values().stream().flatMap(l -> l.stream()).distinct().count());
 	log(status, "Deleted records: " + deletedRecords.size());
 
-	MQTTPublisherHive client = createClient();
+	Optional<MQTTPublisherHive> client = createClient();
 
-	if (!newRecords.isEmpty()) {
+	if (client.isPresent()) {
 
-	    String topic = buildTopic(gsSource, "added");
-	    String message = buildMessage(newRecords);
+	    if (!newRecords.isEmpty()) {
 
-	    client.publish(topic, message);
-	}
+		String topic = buildTopic(gsSource, "added");
+		String message = buildMessage(newRecords);
 
-	if (!deletedRecords.isEmpty()) {
+		client.get().publish(topic, message);
+	    }
 
-	    String topic = buildTopic(gsSource, "deleted");
-	    String message = buildMessage(deletedRecords);
+	    if (!deletedRecords.isEmpty()) {
 
-	    client.publish(topic, message);
-	}
+		String topic = buildTopic(gsSource, "deleted");
+		String message = buildMessage(deletedRecords);
 
-	if (!modifiedRecords.isEmpty()) {
+		client.get().publish(topic, message);
+	    }
 
-	    for (String property : modifiedRecords.keySet()) {
+	    if (!modifiedRecords.isEmpty()) {
 
-		List<String> idsList = modifiedRecords.get(property);
+		for (String property : modifiedRecords.keySet()) {
 
-		String topic = buildTopic(gsSource, "modified/" + property);
-		String message = buildMessage(idsList);
+		    List<String> idsList = modifiedRecords.get(property);
 
-		client.publish(topic, message);
+		    String topic = buildTopic(gsSource, "modified/" + property);
+		    String message = buildMessage(idsList);
+
+		    client.get().publish(topic, message);
+		}
 	    }
 	}
 
@@ -413,7 +416,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
      * @return
      * @throws Exception
      */
-    private MQTTPublisherHive createClient() throws Exception {
+    private Optional<MQTTPublisherHive> createClient() throws Exception {
 
 	try {
 
@@ -430,17 +433,15 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		if (host == null || port == null || user == null || pwd == null) {
 
-		    GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
-		    throw new Exception("Key-value pair options not found!");
+		    GSLoggerFactory.getLogger(getClass()).warn("MQTT options not found!");
 
 		} else {
 
-		    return new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
+		    return Optional.of(new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd));
 		}
 	    } else {
 
-		GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
-		throw new Exception("Key-value pair options not found!");
+		GSLoggerFactory.getLogger(getClass()).warn("Key-value pair options not found!");
 	    }
 
 	} catch (Exception e) {
@@ -449,6 +450,8 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    throw e;
 	}
+
+	return Optional.empty();
     }
 
     @Override

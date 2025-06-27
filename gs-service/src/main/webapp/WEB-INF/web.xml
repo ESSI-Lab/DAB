@@ -30,20 +30,16 @@
 		<listener-class>eu.essi_lab.gssrv.servlet.ServletListener</listener-class>
 	</listener>
 
+	<!-- Context Listener to setup the dataset -->
+	<listener>
+		<listener-class>eu.essi_lab.dab.sparql.DatasetContextListener</listener-class>
+	</listener>
 	<!-- ================================================ -->
 	<!-- Default servlet with disabled file mapper buffer -->
-	<!-- ================================================ 
-
-		<servlet>
-			<servlet-name>default</servlet-name>
-			<servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
-			<init-param>
-				<param-name>useFileMappedBuffer</param-name>
-				<param-value>false</param-value>
-			</init-param>
-		</servlet>
-	
-	-->
+	<!-- ================================================ <servlet> <servlet-name>default</servlet-name> 
+		<servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class> <init-param> 
+		<param-name>useFileMappedBuffer</param-name> <param-value>false</param-value> 
+		</init-param> </servlet> -->
 
 	<!-- ===================== -->
 	<!-- Authenticator servlet -->
@@ -93,6 +89,22 @@
 		<servlet-name>PubSubService</servlet-name>
 		<url-pattern>/services/essi/pubsub/*</url-pattern>
 	</servlet-mapping>
+
+
+
+	<!-- SPARQL query servlet -->
+	<servlet>
+		<servlet-name>SPARQL</servlet-name>
+        <servlet-class>org.apache.jena.fuseki.servlets.SPARQL_QueryGeneral</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>SPARQL</servlet-name>
+		<url-pattern>/sparql/*</url-pattern>
+	</servlet-mapping>
+
+
+
 
 	<!-- ===================== -->
 	<!-- Vaadin servlet -->

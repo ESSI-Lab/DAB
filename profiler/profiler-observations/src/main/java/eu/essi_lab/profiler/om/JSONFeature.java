@@ -152,8 +152,12 @@ public class JSONFeature {
 	if (coordObj != null && !coordObj.isEmpty()) {
 	    JSONArray coordinates = coordObj.optJSONArray("coordinates");
 	    for (int i = 0; i < coordinates.length(); i++) {
-		BigDecimal coord = coordinates.getBigDecimal(i);
-		ret.add(coord.doubleValue());
+		Object obj = coordinates.get(i);
+		if (obj instanceof BigDecimal) {
+		    BigDecimal bd = (BigDecimal) obj;
+			ret.add(bd.doubleValue());    
+		}
+		
 	    }
 	    return ret;
 	}

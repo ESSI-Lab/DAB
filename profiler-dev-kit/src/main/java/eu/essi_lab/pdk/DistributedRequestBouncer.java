@@ -339,13 +339,12 @@ public class DistributedRequestBouncer extends AbstractRequestBouncer {
 			    if (ret == null) {
 				errorsRemovingRequest++;
 				if (errorsRemovingRequest > 10) {
-				    GSLoggerFactory.getLogger(getClass()).error(
-					    "[BOUNCER] error removing request - for execution: {} ({})", requestId,
-					    errorsRemovingRequest);
+				    GSLoggerFactory.getLogger(getClass()).error("[BOUNCER] error removing request - for execution: {} ({})",
+					    requestId, errorsRemovingRequest);
 				}
 				Thread.sleep(1000);
-			    }else {
-				GSLoggerFactory.getLogger(getClass()).info("[BOUNCER] removed request {}",requestId);
+			    } else {
+				GSLoggerFactory.getLogger(getClass()).info("[BOUNCER] removed request {}", requestId);
 			    }
 			}
 
@@ -373,11 +372,11 @@ public class DistributedRequestBouncer extends AbstractRequestBouncer {
 
 			if (exec == null) {
 			    errorsRemovingRequest++;
-				if (errorsRemovingRequest > 10) {
-				    GSLoggerFactory.getLogger(getClass()).error(
-					    "[BOUNCER] error removing request - for too much requests: {} ({})", requestId,
-					    errorsRemovingRequest);
-				}
+			    if (errorsRemovingRequest > 10) {
+				GSLoggerFactory.getLogger(getClass()).error(
+					"[BOUNCER] error removing request - for too much requests: {} ({})", requestId,
+					errorsRemovingRequest);
+			    }
 			    Thread.sleep(1000);
 			    continue;
 			} else {
@@ -411,7 +410,7 @@ public class DistributedRequestBouncer extends AbstractRequestBouncer {
 			}
 			// if no other is waiting, no need to facilitate
 			if (otherWaiting) {
-			    System.out.println("facilitating other than " + ipAddress);
+			    // System.out.println("facilitating other than " + ipAddress);
 			    Thread.sleep(pollTimeMs * executingOnIp.size());
 			}
 		    }

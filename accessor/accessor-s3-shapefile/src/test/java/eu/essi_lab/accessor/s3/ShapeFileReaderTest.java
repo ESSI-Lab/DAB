@@ -13,6 +13,9 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.geotools.api.data.FileDataStore;
+import org.geotools.api.data.FileDataStoreFinder;
+import org.geotools.api.data.SimpleFeatureSource;
 import org.junit.Test;
 
 public class ShapeFileReaderTest {
@@ -41,7 +44,9 @@ public class ShapeFileReaderTest {
 	});
 	// Read the Shapefile
 	File shpFile = new File(tempDir.toFile(), list[0]); // Adjust the name if necessary
-	ShapeFileMetadata metadata = new ShapeFileMetadata(shpFile);
+	FileDataStore store = FileDataStoreFinder.getDataStore(shpFile);
+	SimpleFeatureSource featureSource = store.getFeatureSource();
+	ShapeFileMetadata metadata = new ShapeFileMetadata(featureSource);
 	List<FeatureMetadata> features = metadata.getFeatures();
 	for (FeatureMetadata feature : features) {
 	    System.out.println(feature.getId());

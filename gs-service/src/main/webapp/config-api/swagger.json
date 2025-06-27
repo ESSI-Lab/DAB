@@ -102,9 +102,7 @@
 										"request": "EditSource",
 										"parameters": {
 											"id": "nsidcAtlasSouth",
-											"label": "Atlas of the Cryosphere: Southern Hemisphere (WCS)",
-											"serviceType": "WCS 1.0.0",
-											"endpoint": "http://nsidc.org/cgi-bin/atlas_south?"
+											"label": "Atlas of the Cryosphere: Southern Hemisphere (WCS)"
 										}
 									}
 								},
@@ -351,6 +349,16 @@
 						"content": {
 							"application/json": {
 								"examples": {
+									"missingEditParams": {
+										"summary": "'EditSource' request failed due to missing parameters",
+										"value": {
+											"error": {
+												"reasonPrase": "Method Not Allowed",
+												"message": "At least one of the parameters 'label', 'endpoint', 'serviceType' must be provided'",
+												"statusCode": 405
+											}
+										}
+									},
 									"invalidId": {
 										"summary": "'PutSource' request failed due to invalid 'id' parameter",
 										"value": {
@@ -528,7 +536,7 @@
 				}
 			},
 			"EditSource": {
-				"description": "Edits an existing DAB source. If the request content does not involve any modification to the given source, the requeste execution fails with response code '400'",
+				"description": "Edits an existing DAB source. If the request content does not involve any modification to the given source, the request execution fails with response code '400'. If at least one of the parameter 'label', 'endpoint', 'serviceType' is not provied, the request fails with response code '405'",
 				"type": "object",
 				"required": [
 					"request",
