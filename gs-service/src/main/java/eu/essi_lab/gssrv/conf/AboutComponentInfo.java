@@ -44,104 +44,104 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class AboutComponentInfo extends ComponentInfo {
 
-    /**
-     * 
-     */
-    public AboutComponentInfo() {
+	/**
+	 * 
+	 */
+	public AboutComponentInfo() {
 
-	setComponentName("About");
+		setComponentName("About");
 
-	VerticalLayout verticalLayout = new VerticalLayout();
-	verticalLayout.getStyle().set("margin-top", "15px");
+		VerticalLayout verticalLayout = new VerticalLayout();
+		verticalLayout.getStyle().set("margin-top", "15px");
 
-	verticalLayout.setWidthFull();
-	verticalLayout.setHeightFull();
+		verticalLayout.setWidthFull();
+		verticalLayout.setHeightFull();
 
-	Properties buildProps = new Properties();
-	try (InputStream is = getClass().getClassLoader().getResourceAsStream("META-INF/build.properties")) {
-	    if (is != null) {
-		buildProps.load(is);
-	    }
-	} catch (Exception e) {
+		Properties buildProps = new Properties();
+		try (InputStream is = getClass().getClassLoader().getResourceAsStream("META-INF/build.properties")) {
+			if (is != null) {
+				buildProps.load(is);
+			}
+		} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+			GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+
+		String desc = buildProps.getProperty("project.description", "N/A");
+		String name = buildProps.getProperty("project.name", "N/A");
+		String groupId = buildProps.getProperty("project.groupId", "N/A");
+		String artifactId = buildProps.getProperty("project.artifactId", "N/A");
+		String version = buildProps.getProperty("project.version", "N/A");
+		String timeStamp = buildProps.getProperty("build.timestamp", "N/A");
+		String commit = buildProps.getProperty("git.commit.id", "N/A");
+
+		verticalLayout.add(build("Description", desc, true));
+		verticalLayout.add(build("Project Name", name));
+		verticalLayout.add(build("Group Id", groupId));
+		verticalLayout.add(build("Artifact Id", artifactId));
+		verticalLayout.add(build("Version", version));
+		verticalLayout.add(build("Build Timestamp", timeStamp));
+		verticalLayout.add(build("Commit", commit));
+
+		TabInfo tabInfo = TabInfoBuilder.get().//
+				withIndex(TabIndex.ABOUT.getIndex()).//
+				withShowDirective(getComponentName()).//
+				withComponent(verticalLayout).//
+				build();
+
+		setTabInfo(tabInfo);
 	}
 
-	String desc = buildProps.getProperty("project.description", "N/A");
-	String name = buildProps.getProperty("project.name", "N/A");
-	String groupId = buildProps.getProperty("project.groupId", "N/A");
-	String artifactId = buildProps.getProperty("project.artifactId", "N/A");
-	String version = buildProps.getProperty("project.version", "N/A");
-	String timeStamp = buildProps.getProperty("build.timestamp", "N/A");
-	String commit = buildProps.getProperty("git.commit.id", "N/A");
+	/**
+	 * @param title
+	 * @param content
+	 * @return
+	 */
+	private HorizontalLayout build(String title, String content) {
 
-	verticalLayout.add(build("Description", desc, true));
-	verticalLayout.add(build("Project Name", name));
-	verticalLayout.add(build("Group Id", groupId));
-	verticalLayout.add(build("Artifact Id", artifactId));
-	verticalLayout.add(build("Version", version));
-	verticalLayout.add(build("Build Timestamp", timeStamp));
-	verticalLayout.add(build("Commit", commit));
-
-	TabInfo tabInfo = TabInfoBuilder.get().//
-		withIndex(TabIndex.ABOUT.getIndex()).//
-		withShowDirective(getComponentName()).//
-		withComponent(verticalLayout).//
-		build();
-
-	setTabInfo(tabInfo);
-    }
-
-    /**
-     * @param title
-     * @param content
-     * @return
-     */
-    private HorizontalLayout build(String title, String content) {
-
-	return build(title, content, false);
-    }
-
-    /**
-     * @param title
-     * @param content
-     * @return
-     */
-    private HorizontalLayout build(String title, String content, boolean withTextArea) {
-
-	HorizontalLayout layout = new HorizontalLayout();
-	layout.setWidthFull();
-
-	TextField titleField = new TextField();
-	titleField.setReadOnly(true);
-	titleField.setValue("- " + title + ": ");
-	titleField.addClassName("text-field-no-border");
-	titleField.setWidth("165px");
-
-	layout.add(titleField);
-
-	if (withTextArea) {
-
-	    TextArea textArea = new TextArea();
-	    textArea.setReadOnly(true);
-	    textArea.setValue(content);
-	    textArea.setWidthFull();
-	    textArea.addClassName("text-area-no-border");
-	    textArea.addClassName("text-area-no-margin-top");
-
-	    layout.add(textArea);
-
-	} else {
-
-	    TextField contentField = new TextField();
-	    contentField.setReadOnly(true);
-	    contentField.setValue(content);
-	    contentField.setWidthFull();
-	    contentField.addClassName("text-field-no-border");
-
-	    layout.add(contentField);
+		return build(title, content, false);
 	}
 
-	return layout;
-    }
+	/**
+	 * @param title
+	 * @param content
+	 * @return
+	 */
+	private HorizontalLayout build(String title, String content, boolean withTextArea) {
+
+		HorizontalLayout layout = new HorizontalLayout();
+		layout.setWidthFull();
+
+		TextField titleField = new TextField();
+		titleField.setReadOnly(true);
+		titleField.setValue("- " + title + ": ");
+		titleField.addClassName("text-field-no-border");
+		titleField.setWidth("165px");
+
+		layout.add(titleField);
+
+		if (withTextArea) {
+
+			TextArea textArea = new TextArea();
+			textArea.setReadOnly(true);
+			textArea.setValue(content);
+			textArea.setWidthFull();
+			textArea.addClassName("text-area-no-border");
+			textArea.addClassName("text-area-no-margin-top");
+
+			layout.add(textArea);
+
+		} else {
+
+			TextField contentField = new TextField();
+			contentField.setReadOnly(true);
+			contentField.setValue(content);
+			contentField.setWidthFull();
+			contentField.addClassName("text-field-no-border");
+
+			layout.add(contentField);
+		}
+
+		return layout;
+	}
 }
