@@ -780,6 +780,30 @@
 			</dependency>
 
 			<dependency>
+			  <groupId>org.apache.jena</groupId>
+			  <artifactId>jena-fuseki-servlet</artifactId>
+							<version>${org.apache.jena.version}</version>
+			</dependency>
+			<dependency>
+			  <groupId>org.apache.jena</groupId>
+			  <artifactId>apache-jena-libs</artifactId>
+							<version>${org.apache.jena.version}</version>
+			  <type>pom</type>
+			</dependency>
+			
+			<dependency>
+  <groupId>org.apache.jena</groupId>
+  <artifactId>jena-fuseki-main</artifactId>
+  				<version>${org.apache.jena.version}</version>
+</dependency>
+
+<dependency>
+    <groupId>org.apache.jena</groupId>
+    <artifactId>jena-fuseki-server</artifactId>
+  				<version>${org.apache.jena.version}</version>
+</dependency>
+
+			<dependency>
 				<groupId>org.apache.jena</groupId>
 				<artifactId>jena-tdb</artifactId>
 				<version>${org.apache.jena.version}</version>
