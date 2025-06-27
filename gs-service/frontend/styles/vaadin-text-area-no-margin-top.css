@@ -1,0 +1,3 @@
+:host(.text-area-no-margin-top) [part="input-field"] {
+    margin-top: -20px !important;
+}

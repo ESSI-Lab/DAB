@@ -1,0 +1,3 @@
+:host(.text-field-no-border) [part="input-field"]::after {
+    border: none
+}

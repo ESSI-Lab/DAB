@@ -52,6 +52,7 @@ import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
 import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting.DistributionSettingComponentInfo;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
+import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting.HarvestingSettingComponentInfo;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
 import eu.essi_lab.cfga.gui.ConfigurationView;
 import eu.essi_lab.cfga.gui.LogOutButtonListener;
@@ -87,6 +88,8 @@ import eu.essi_lab.model.exceptions.GSException;
 @CssImport(value = "./styles/vaadin-app-layout.css", themeFor = "vaadin-app-layout")
 @CssImport(value = "./styles/vaadin-grid.css", themeFor = "vaadin-grid")
 @CssImport(value = "./styles/vaadin-text-area-no-border.css", themeFor = "vaadin-text-area")
+@CssImport(value = "./styles/vaadin-text-area-no-margin-top.css", themeFor = "vaadin-text-area")
+@CssImport(value = "./styles/vaadin-text-field-no-border.css", themeFor = "vaadin-text-field")
 
 @SuppressWarnings("serial")
 public class GSConfigurationView extends ConfigurationView {
@@ -511,7 +514,8 @@ public class GSConfigurationView extends ConfigurationView {
 
 	return Arrays.asList(//
 		new DistributionSettingComponentInfo(), //
-		new HarvestingSetting.HarvestingSettingComponentInfo());
+		new HarvestingSettingComponentInfo(),//
+		new AboutComponentInfo());
     }
 
     /**
