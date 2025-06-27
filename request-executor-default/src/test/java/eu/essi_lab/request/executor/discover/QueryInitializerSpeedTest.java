@@ -54,7 +54,7 @@ public class QueryInitializerSpeedTest {
 	for (int j = 0; j < i; j++) {
 	    keywords.add("k" + prefix + "-" + j + "-" + i);
 	}
-	return BondFactory.getKeywordListBond(keywords, LogicalOperator.AND);
+	return BondFactory.createKeywordListBond(keywords, LogicalOperator.AND);
     }
 
     public void speedTest(Bond bond) throws Exception {

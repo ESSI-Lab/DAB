@@ -1,29 +1,8 @@
 package eu.essi_lab.messages.bond;
 
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.model.GSSource;
@@ -310,23 +289,23 @@ public class BondFactory {
 	return new SimpleValueBond(operator, element, value);
     }
 
-    public static Bond getKeywordListBond(List<String> keywords, LogicalOperator op) {
+    /**
+     * @param keywords
+     * @param op
+     * @return
+     */
+    public static Bond createKeywordListBond(List<String> keywords, LogicalOperator op) {
 
-	List<Bond> resList = new ArrayList<>();
-	for (String s : keywords) {
-	    Bond b = BondFactory.createOrBond(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, s),
-		    BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, s));
-	    resList.add(b);
-	}
+	List<Bond> resList = keywords.stream().//
+		map(kwd -> BondFactory.createOrBond(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, kwd), //
+			BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, kwd)))
+		.collect(Collectors.toList());
 
-	if (resList.size() == 1) {
-	    return resList.get(0);
-	}
-
-	if (op.equals(LogicalOperator.AND))
-	    return BondFactory.createAndBond(resList);
-
-	return BondFactory.createOrBond(resList);
+	return resList.size() == 1 ? resList.get(0) : switch (op) {
+	case OR -> BondFactory.createOrBond(resList);
+	case AND -> BondFactory.createAndBond(resList);
+	case NOT -> throw new UnsupportedOperationException("Unimplemented case: " + op);
+	};
     }
 
     /**
