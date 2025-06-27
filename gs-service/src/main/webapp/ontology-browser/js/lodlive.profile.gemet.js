@@ -63,7 +63,8 @@ $.jStorage
                         //endpoint : 'http://localhost:9090/gs-service/services/essi/view/whos-arctic/semantic/sparql',
                         //endpoint : 'https://codes.wmo.int/system/query',                    
 //                        endpoint : 'http://localhost:9099/rdf4j-server/repositories/gemet',
-                        endpoint : 'http://localhost:3030/test/sparql',
+//                        endpoint : 'http://localhost:3030/test/sparql',
+                        endpoint : '../sparql-proxy',
 
                         document : {
                             className : 'standard',

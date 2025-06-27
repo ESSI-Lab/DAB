@@ -21,21 +21,7 @@ package eu.essi_lab.profiler.os.handler.discover;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.ws.rs.core.MediaType;
-
 import com.google.common.collect.Lists;
-
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
@@ -84,7 +70,21 @@ import eu.essi_lab.profiler.os.OSRequestParser;
 import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeDiscoveryHandler;
 import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeOptionsReader;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHelper;
+import eu.essi_lab.profiler.os.handler.discover.semantics.connectors.GemetWebApiConnector;
+import eu.essi_lab.profiler.os.handler.discover.semantics.expander.SemanticExpansion;
+import eu.essi_lab.profiler.os.handler.discover.semantics.expander.SemanticsExpander;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.ws.rs.core.MediaType;
 
 /**
  * @author Fabrizio
@@ -318,7 +318,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 			DiscoveryMessage.EiffelAPIDiscoveryOption.FILTER_AND_SORT.name())
 			|| eiffelDiscoveryOption.equals(//
-				DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
+			DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
 
 		if (!supported) {
 
@@ -369,6 +369,10 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	// creates the bond list
 	ArrayList<Bond> bondList = new ArrayList<>();
 
+	String rosetta = parser.parse(OSParameters.ROSETTA);
+	String semantics = parser.parse(OSParameters.SEMANTICS);
+	String ontology = parser.parse(OSParameters.ONTOLOGY);
+
 	//
 	// search terms are NOT included in case of Eiffel SORT_AND_FILTER
 	//
@@ -379,17 +383,13 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    //
 	    // creates the search terms bond
 	    //
-	    Bond searchTermsBond = createSearchTermsBond(request, parser, eiffelOption.isPresent());
+	    Bond searchTermsBond = createSearchTermsBond(request, parser, eiffelOption.isPresent(), semantics, ontology);
 
 	    if (searchTermsBond != null) {
 
 		bondList.add(searchTermsBond);
 	    }
 	}
-
-	String rosetta = parser.parse(OSParameters.ROSETTA);
-	String semantics = parser.parse(OSParameters.SEMANTICS);
-	String ontology = parser.parse(OSParameters.ONTOLOGY);
 
 	//
 	// the portal set no sources if all are selected, here we add them in order to be in synch with
@@ -440,7 +440,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			osParameter.equals(OSParameters.PLATFORM_IDENTIFIER) || //
 			osParameter.equals(OSParameters.ORIGINATOR_ORGANISATION_IDENTIFIER) || //
 			osParameter.equals(OSParameters.ATTRIBUTE_IDENTIFIER)) && ( //
-		rosetta != null && !rosetta.equals("false") && value != null)) {
+			rosetta != null && !rosetta.equals("false") && value != null)) {
 
 		    value = handleRosetta(rosetta, value);
 		}
@@ -865,8 +865,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
      * <html> <head> <style> table { font-family: arial, sans-serif;
-     * border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd;
-     * text-align: left; padding: 8px; } </style> </head> <body>
+     * border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd; text-align: left; padding: 8px; } </style> </head>
+     * <body>
      * <table>
      * <tr>
      * <td style="background-color: #ffd699"><b>#</b></td>
@@ -931,11 +931,12 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      * </tr>
      * </table>
      * </body> </html>
-     * 
+     *
      * @param request
      * @param eiffelOption
      */
-    private Bond createSearchTermsBond(WebRequest request, OSRequestParser parser, boolean eiffelOption) {
+    private Bond createSearchTermsBond(WebRequest request, OSRequestParser parser, boolean eiffelOption, String semantics,
+	    String ontology) {
 
 	String searchTerms = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_TERMS.getName(), OSParameters.class));
 	String searchFields = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_FIELDS.getName(), OSParameters.class));
@@ -1037,38 +1038,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	    for (String searchTerm : terms) {
 
-		ArrayList<Bond> operands = new ArrayList<>();
-
-		if (searchFields.toLowerCase().contains("anytext")) {
-		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ANY_TEXT, searchTerm));
-		}
-
-		if (searchFields.toLowerCase().contains("title")) {
-		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, searchTerm));
-		}
-
-		if (searchFields.toLowerCase().contains("subject")) {
-		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.SUBJECT, searchTerm));
-		}
-
-		if (searchFields.toLowerCase().contains("abstract") || searchFields.toLowerCase().contains("description")) {
-		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ABSTRACT, searchTerm));
-		}
-
-		if (searchFields.toLowerCase().contains("keyword")) {
-		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, searchTerm));
-		}
-
-		switch (operands.size()) {
-		case 0:
-		    break;
-		case 1:
-		    innerBonds.add(operands.get(0));
-		    break;
-		default:
-		    innerBonds.add(BondFactory.createOrBond(operands));
-		    break;
-		}
+		createFieldsBond(innerBonds, searchFields, searchTerm, semantics, ontology);
 
 	    }
 
@@ -1083,6 +1053,70 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	}
 
 	return null;
+    }
+
+    private void createFieldsBond(List<Bond> innerBonds, String searchFields, String searchTerm, String semantics,
+	    String ontology) {
+
+	if (semantics != null && !semantics.isEmpty() && ontology != null && !ontology.isEmpty()) {
+
+	    GemetWebApiConnector gemetConnector = new GemetWebApiConnector();
+	    SemanticsExpander expander = new SemanticsExpander(gemetConnector);
+	    SemanticExpansion expansion = SemanticExpansion.NARROWER;
+
+	    if (semantics.equalsIgnoreCase("sameas-narrow"))
+		expansion = SemanticExpansion.NARROWER_CLOSE_MATCH;
+	    List<String> expandedTerms = expander.expandSearchTerm(searchTerm, expansion, Arrays.asList("it"));
+	    List<Bond> expandedBonds = new ArrayList<>();
+	    expandedTerms.forEach(term -> {
+		createFieldsBond(expandedBonds, searchFields, term, null, null);
+	    });
+
+	    switch (expandedBonds.size()) {
+	    case 0:
+		//This should never happen, in any I put break to keep going with the usual creating (no semantic expansion)
+		break;
+	    case 1:
+		innerBonds.add(expandedBonds.get(0));
+	    default:
+		innerBonds.add(BondFactory.createOrBond(expandedBonds));
+	    }
+
+	    return;
+	}
+
+	ArrayList<Bond> operands = new ArrayList<>();
+
+	if (searchFields.toLowerCase().contains("anytext")) {
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ANY_TEXT, searchTerm));
+	}
+
+	if (searchFields.toLowerCase().contains("title")) {
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, searchTerm));
+	}
+
+	if (searchFields.toLowerCase().contains("subject")) {
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.SUBJECT, searchTerm));
+	}
+
+	if (searchFields.toLowerCase().contains("abstract") || searchFields.toLowerCase().contains("description")) {
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ABSTRACT, searchTerm));
+	}
+
+	if (searchFields.toLowerCase().contains("keyword")) {
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, searchTerm));
+	}
+
+	switch (operands.size()) {
+	case 0:
+	    break;
+	case 1:
+	    innerBonds.add(operands.get(0));
+	    break;
+	default:
+	    innerBonds.add(BondFactory.createOrBond(operands));
+	    break;
+	}
     }
 
 }

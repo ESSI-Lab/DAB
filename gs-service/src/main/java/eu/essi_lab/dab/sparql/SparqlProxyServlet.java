@@ -35,67 +35,67 @@ import javax.servlet.http.HttpServletResponse;
 
 public class SparqlProxyServlet extends HttpServlet {
 
-	// Configure your remote SPARQL endpoint here
-	private static final String REMOTE_SPARQL_ENDPOINT = "https://dbpedia.org/sparql";
+    // Configure your remote SPARQL endpoint here
+    private static final String REMOTE_SPARQL_ENDPOINT = "http://localhost:3030/test/sparql";
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		forwardRequest("GET", request, response);
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
+	forwardRequest("GET", request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
+	forwardRequest("POST", request, response);
+    }
+
+    private void forwardRequest(String method, HttpServletRequest request, HttpServletResponse response)
+	    throws IOException {
+
+	String urlWithParams = REMOTE_SPARQL_ENDPOINT;
+	if ("GET".equalsIgnoreCase(method)) {
+	    String queryString = request.getQueryString();
+	    if (queryString != null) {
+		urlWithParams += "?" + queryString;
+	    }
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		forwardRequest("POST", request, response);
+	URL url = new URL(urlWithParams);
+	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	conn.setRequestMethod(method);
+	conn.setDoInput(true);
+	conn.setDoOutput("POST".equalsIgnoreCase(method));
+
+	// Copy headers
+	Enumeration<String> headerNames = request.getHeaderNames();
+	while (headerNames.hasMoreElements()) {
+	    String headerName = headerNames.nextElement();
+	    if (!headerName.equalsIgnoreCase("host") && !headerName.equalsIgnoreCase("content-length")) {
+		conn.setRequestProperty(headerName, request.getHeader(headerName));
+	    }
 	}
 
-	private void forwardRequest(String method, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
-
-		String urlWithParams = REMOTE_SPARQL_ENDPOINT;
-		if ("GET".equalsIgnoreCase(method)) {
-			String queryString = request.getQueryString();
-			if (queryString != null) {
-				urlWithParams += "?" + queryString;
-			}
-		}
-
-		URL url = new URL(urlWithParams);
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		conn.setRequestMethod(method);
-		conn.setDoInput(true);
-		conn.setDoOutput("POST".equalsIgnoreCase(method));
-
-		// Copy headers
-		Enumeration<String> headerNames = request.getHeaderNames();
-		while (headerNames.hasMoreElements()) {
-			String headerName = headerNames.nextElement();
-			if (!headerName.equalsIgnoreCase("host") && !headerName.equalsIgnoreCase("content-length")) {
-				conn.setRequestProperty(headerName, request.getHeader(headerName));
-			}
-		}
-
-		// For POST, forward body
-		if ("POST".equalsIgnoreCase(method)) {
-			conn.setRequestProperty("Content-Type", request.getContentType());
-			try (OutputStream os = conn.getOutputStream(); InputStream is = request.getInputStream()) {
-				is.transferTo(os);
-			}
-		}
-
-		// Relay response
-		int status = conn.getResponseCode();
-		response.setStatus(status);
-		response.setContentType(conn.getContentType());
-
-		try (InputStream input = (status < 400 ? conn.getInputStream() : conn.getErrorStream());
-				OutputStream out = response.getOutputStream()) {
-			if (input != null) {
-				input.transferTo(out);
-			}
-		} finally {
-			conn.disconnect();
-		}
+	// For POST, forward body
+	if ("POST".equalsIgnoreCase(method)) {
+	    conn.setRequestProperty("Content-Type", request.getContentType());
+	    try (OutputStream os = conn.getOutputStream(); InputStream is = request.getInputStream()) {
+		is.transferTo(os);
+	    }
 	}
+
+	// Relay response
+	int status = conn.getResponseCode();
+	response.setStatus(status);
+	response.setContentType(conn.getContentType());
+
+	try (InputStream input = (status < 400 ? conn.getInputStream() : conn.getErrorStream());
+		OutputStream out = response.getOutputStream()) {
+	    if (input != null) {
+		input.transferTo(out);
+	    }
+	} finally {
+	    conn.disconnect();
+	}
+    }
 }
