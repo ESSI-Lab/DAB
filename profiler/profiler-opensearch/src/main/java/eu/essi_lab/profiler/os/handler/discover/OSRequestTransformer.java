@@ -1066,6 +1066,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	    if (semantics.equalsIgnoreCase("sameas-narrow"))
 		expansion = SemanticExpansion.NARROWER_CLOSE_MATCH;
+	    // languages of matched concepts
 	    List<String> expandedTerms = expander.expandSearchTerm(searchTerm, expansion, Arrays.asList("it"));
 	    List<Bond> expandedBonds = new ArrayList<>();
 	    expandedTerms.forEach(term -> {
