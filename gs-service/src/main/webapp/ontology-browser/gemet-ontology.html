@@ -100,6 +100,7 @@
 
 
         		var conceptText = e.target.textContent.trim();
+        		
         		if (conceptText){
         			var c_uri = ""
         			var p1 = e.target.parentNode;
@@ -110,7 +111,12 @@
         				if (p2.attributes.rel !== undefined && p2.attributes.rel.nodeValue !== undefined &&  p2.attributes.rel.nodeValue !== "") {
         					c_uri = p2.attributes.rel.nodeValue;
         				} else {
-        					return;
+        					var p3 = p2.parentNode;
+            				if (p3.attributes.rel !== undefined && p3.attributes.rel.nodeValue !== undefined &&  p3.attributes.rel.nodeValue !== "") {
+            					c_uri = p3.attributes.rel.nodeValue;
+            				} else {
+            					return;
+            				}
         				}
         			}
 

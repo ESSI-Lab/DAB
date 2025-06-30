@@ -1586,8 +1586,9 @@ export function initializePortal(config) {
 
 		constraints.ontology = config.ontology;
 
+		if (config.wmsEndpoint!==undefined){
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
-
+}
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
 

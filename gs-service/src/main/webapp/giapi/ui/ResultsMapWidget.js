@@ -344,6 +344,10 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 				return;
 			}
 
+			if (wmsLayer === undefined) {
+				return;
+			}
+
 			const data = wmsLayer.getData(evt.pixel);
 			const hit = data && data[3] > 0; // transparent pixels have zero for data[3]
 			//const hit = data && data[3] == 255; // transparent pixels have zero for data[3]
@@ -550,42 +554,46 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			};
 
 			onlineArray.push(online);
+
+			var array = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:', options);
+			var wmsLayer = array[0];
+
+			if (options.availability === undefined || !options.availability) {
+				//
+				// set the pointer cursor when over a tile
+				//
+				if (mouseMoveHandler != null) {
+					widget.map.un('pointermove', mouseMoveHandler);
+				}
+
+				var mmf = createMouseMoveHandler(wmsLayer);
+				widget.map.on('pointermove', mmf);
+				mouseMoveHandler = mmf;
+
+
+				//
+				// creates an overlay to anchor the popup to the map
+				//		 
+				const overlay = new ol.Overlay({
+					element: document.getElementById(options.stationInfoId)
+				});
+
+				widget.map.addOverlay(overlay);
+
+				if (mouseClickHandler != null) {
+					widget.map.un('singleclick', mouseClickHandler);
+				}
+				var mcf = createMouseClickHandler(wmsLayer, overlay);
+				widget.map.on('singleclick', mcf);
+				mouseClickHandler = mcf;
+
+
+			}
+
 		}
 
 
-		var array = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:', options);
-		var wmsLayer = array[0];
 
-		if (options.availability === undefined || !options.availability) {
-			//
-			// set the pointer cursor when over a tile
-			//
-			if (mouseMoveHandler != null) {
-				widget.map.un('pointermove', mouseMoveHandler);
-			}
-			var mmf = createMouseMoveHandler(wmsLayer);
-			widget.map.on('pointermove', mmf);
-			mouseMoveHandler = mmf;
-
-
-			//
-			// creates an overlay to anchor the popup to the map
-			//		 
-			const overlay = new ol.Overlay({
-				element: document.getElementById(options.stationInfoId)
-			});
-
-			widget.map.addOverlay(overlay);
-
-			if (mouseClickHandler != null) {
-				widget.map.un('singleclick', mouseClickHandler);
-			}
-			var mcf = createMouseClickHandler(wmsLayer, overlay);
-			widget.map.on('singleclick', mcf);
-			mouseClickHandler = mcf;
-
-
-		}
 
 		return array;
 	};
