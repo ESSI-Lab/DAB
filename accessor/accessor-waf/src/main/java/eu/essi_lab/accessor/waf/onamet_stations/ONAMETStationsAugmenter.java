@@ -425,9 +425,7 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 	    manager.uploadFile(file.getAbsolutePath(), bucketName);
 	}
 
-	manager.uploadFile(file.getAbsolutePath(), setting.getS3BucketName().get());
-
-	GSLoggerFactory.getLogger(getClass()).debug("Uploading nc file {} to the S3 bucket {} STARTED", file,
+	GSLoggerFactory.getLogger(getClass()).debug("Uploading nc file {} to the S3 bucket {} ENDED", file,
 		setting.getS3BucketName().get());
     }
 
