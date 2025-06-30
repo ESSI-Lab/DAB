@@ -6,6 +6,7 @@ package eu.essi_lab.gssrv.conf;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 /*-
@@ -30,8 +31,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
  */
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.component.textfield.TextField;
 
 import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
@@ -44,104 +43,76 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class AboutComponentInfo extends ComponentInfo {
 
-	/**
-	 * 
-	 */
-	public AboutComponentInfo() {
+    /**
+     * 
+     */
+    public AboutComponentInfo() {
 
-		setComponentName("About");
+	setComponentName("About");
 
-		VerticalLayout verticalLayout = new VerticalLayout();
-		verticalLayout.getStyle().set("margin-top", "15px");
+	VerticalLayout verticalLayout = new VerticalLayout();
+	verticalLayout.getStyle().set("margin-top", "15px");
 
-		verticalLayout.setWidthFull();
-		verticalLayout.setHeightFull();
+	verticalLayout.setWidthFull();
+	verticalLayout.setHeightFull();
 
-		Properties buildProps = new Properties();
-		try (InputStream is = getClass().getClassLoader().getResourceAsStream("META-INF/build.properties")) {
-			if (is != null) {
-				buildProps.load(is);
-			}
-		} catch (Exception e) {
+	Properties buildProps = new Properties();
+	try (InputStream is = getClass().getClassLoader().getResourceAsStream("META-INF/build.properties")) {
+	    if (is != null) {
+		buildProps.load(is);
+	    }
+	} catch (Exception e) {
 
-			GSLoggerFactory.getLogger(getClass()).error(e);
-		}
-
-		String desc = buildProps.getProperty("project.description", "N/A");
-		String name = buildProps.getProperty("project.name", "N/A");
-		String groupId = buildProps.getProperty("project.groupId", "N/A");
-		String artifactId = buildProps.getProperty("project.artifactId", "N/A");
-		String version = buildProps.getProperty("project.version", "N/A");
-		String timeStamp = buildProps.getProperty("build.timestamp", "N/A");
-		String commit = buildProps.getProperty("git.commit.id", "N/A");
-
-		verticalLayout.add(build("Description", desc, true));
-		verticalLayout.add(build("Project Name", name));
-		verticalLayout.add(build("Group Id", groupId));
-		verticalLayout.add(build("Artifact Id", artifactId));
-		verticalLayout.add(build("Version", version));
-		verticalLayout.add(build("Build Timestamp", timeStamp));
-		verticalLayout.add(build("Commit", commit));
-
-		TabInfo tabInfo = TabInfoBuilder.get().//
-				withIndex(TabIndex.ABOUT.getIndex()).//
-				withShowDirective(getComponentName()).//
-				withComponent(verticalLayout).//
-				build();
-
-		setTabInfo(tabInfo);
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
-	/**
-	 * @param title
-	 * @param content
-	 * @return
-	 */
-	private HorizontalLayout build(String title, String content) {
+	String desc = buildProps.getProperty("project.description", "N/A");
+	String name = buildProps.getProperty("project.name", "N/A");
+	String groupId = buildProps.getProperty("project.groupId", "N/A");
+	String artifactId = buildProps.getProperty("project.artifactId", "N/A");
+	String version = buildProps.getProperty("project.version", "N/A");
+	String timeStamp = buildProps.getProperty("build.timestamp", "N/A");
+	String commit = buildProps.getProperty("git.commit.id", "N/A");
 
-		return build(title, content, false);
-	}
+	verticalLayout.add(build("Description", desc));
+	verticalLayout.add(build("Project Name", name));
+	verticalLayout.add(build("Group Id", groupId));
+	verticalLayout.add(build("Artifact Id", artifactId));
+	verticalLayout.add(build("Version", version));
+	verticalLayout.add(build("Build Timestamp", timeStamp));
+	verticalLayout.add(build("Commit", commit));
 
-	/**
-	 * @param title
-	 * @param content
-	 * @return
-	 */
-	private HorizontalLayout build(String title, String content, boolean withTextArea) {
+	TabInfo tabInfo = TabInfoBuilder.get().//
+		withIndex(TabIndex.ABOUT.getIndex()).//
+		withShowDirective(getComponentName()).//
+		withComponent(verticalLayout).//
+		build();
 
-		HorizontalLayout layout = new HorizontalLayout();
-		layout.setWidthFull();
+	setTabInfo(tabInfo);
+    }
 
-		TextField titleField = new TextField();
-		titleField.setReadOnly(true);
-		titleField.setValue("- " + title + ": ");
-		titleField.addClassName("text-field-no-border");
-		titleField.setWidth("165px");
+    /**
+     * @param title
+     * @param content
+     * @return
+     */
+    private HorizontalLayout build(String title, String content) {
 
-		layout.add(titleField);
+	HorizontalLayout layout = new HorizontalLayout();
+	layout.setWidthFull();
 
-		if (withTextArea) {
+	Label titleField = new Label();
+	titleField.setText("• " + title + ": ");
+	titleField.setWidth("165px");
+	titleField.getStyle().set("font-weight", "bold");
 
-			TextArea textArea = new TextArea();
-			textArea.setReadOnly(true);
-			textArea.setValue(content);
-			textArea.setWidthFull();
-			textArea.addClassName("text-area-no-border");
-			textArea.addClassName("text-area-no-margin-top");
+	layout.add(titleField);
 
-			layout.add(textArea);
+	Label contentField = new Label();
+	contentField.setText(content);
+	contentField.setWidthFull();
+	layout.add(contentField);
 
-		} else {
-
-			TextField contentField = new TextField();
-			contentField.setReadOnly(true);
-			contentField.setValue(content);
-			contentField.setWidthFull();
-			contentField.addClassName("text-field-no-border");
-
-			layout.add(contentField);
-		}
-
-		return layout;
-	}
+	return layout;
+    }
 }
