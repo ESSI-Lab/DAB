@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.messages.bond;
+package eu.essi_lab.messages.bond.spatial;
 
 /*-
  * #%L
@@ -53,28 +53,20 @@ public class WKT implements SpatialEntity {
 	return value;
     }
 
-    /**
-     * @param value
-     */
-    public void setValue(String value) {
-
-	this.value = value;
-    }
-
     @Override
     public String toString() {
 
 	return value;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
-	
+
 	if (obj instanceof WKT) {
-	    
+
 	    return this.toString().equals(obj.toString());
 	}
-	
+
 	return false;
     }
 

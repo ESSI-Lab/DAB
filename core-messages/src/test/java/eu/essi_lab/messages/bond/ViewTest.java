@@ -15,6 +15,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.messages.bond.jaxb.ViewFactory;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.resource.MetadataElement;
 

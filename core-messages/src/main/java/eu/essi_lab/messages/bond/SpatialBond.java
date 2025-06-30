@@ -24,6 +24,8 @@ package eu.essi_lab.messages.bond;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
+import eu.essi_lab.messages.bond.spatial.SpatialEntity;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**

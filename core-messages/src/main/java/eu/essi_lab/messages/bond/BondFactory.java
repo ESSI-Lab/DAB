@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
+import eu.essi_lab.messages.bond.spatial.SpatialEntity;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;

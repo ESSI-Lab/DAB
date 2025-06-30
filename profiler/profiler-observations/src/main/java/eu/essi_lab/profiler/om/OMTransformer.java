@@ -156,7 +156,7 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 	
 	Optional<String> wkt = request.getPredefinedLayer();
 	if (wkt.isPresent()) {
-	    eu.essi_lab.messages.bond.SpatialEntity entity = eu.essi_lab.messages.bond.SpatialEntity.of(wkt.get());
+	    eu.essi_lab.messages.bond.spatial.SpatialEntity entity = eu.essi_lab.messages.bond.spatial.SpatialEntity.of(wkt.get());
 	    operands.add(BondFactory.createSpatialEntityBond(spatialRelation, entity));
 	}
 

@@ -21,7 +21,7 @@ package eu.essi_lab.profiler.wof.info.datamodel;
  * #L%
  */
 
-import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 
 /**
  * POJO describing a CUAHSI source 

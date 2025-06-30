@@ -38,7 +38,7 @@ import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.MetadataElement;

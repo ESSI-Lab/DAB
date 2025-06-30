@@ -13,8 +13,8 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**

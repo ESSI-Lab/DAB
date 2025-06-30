@@ -25,10 +25,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
 
 import eu.essi_lab.lib.geo.BBOXUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -41,10 +38,10 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.ViewBond;
-import eu.essi_lab.messages.bond.WKT;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
+import eu.essi_lab.messages.bond.spatial.WKT;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**

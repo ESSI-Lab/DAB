@@ -29,7 +29,7 @@ import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.QualifiedName;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.resource.RankingStrategy;
 

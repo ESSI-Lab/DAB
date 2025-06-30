@@ -35,7 +35,7 @@ import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSpatialQuer
 import eu.essi_lab.indexes.SpatialIndexHelper;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 
 /**
  * @author Fabrizio

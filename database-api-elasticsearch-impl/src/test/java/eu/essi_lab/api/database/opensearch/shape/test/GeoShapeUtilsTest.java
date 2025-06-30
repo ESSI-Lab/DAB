@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.locationtech.jts.io.ParseException;
 
 import eu.essi_lab.api.database.opensearch.query.GeoShapeUtils;
-import eu.essi_lab.messages.bond.SpatialEntity;
+import eu.essi_lab.messages.bond.spatial.SpatialEntity;
 
 /**
  * @author Fabrizio

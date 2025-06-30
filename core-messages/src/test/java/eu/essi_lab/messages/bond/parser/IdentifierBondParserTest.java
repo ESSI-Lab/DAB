@@ -7,7 +7,7 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.CustomBondFactory;
-import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.resource.MetadataElement;
 

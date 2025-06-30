@@ -1,7 +1,5 @@
 package eu.essi_lab.profiler.worldcereal.handler.discover;
 
-import eu.essi_lab.accessor.agrostac.harvested.AgrostacCache;
-import eu.essi_lab.accessor.agrostac.harvested.AgrostacCollectionMapper;
 import java.util.ArrayList;
 /*-
  * #%L
@@ -32,6 +30,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import eu.essi_lab.accessor.agrostac.harvested.AgrostacCache;
+import eu.essi_lab.accessor.agrostac.harvested.AgrostacCollectionMapper;
 import eu.essi_lab.accessor.agrostac.harvested.AgrostacCollectionMapper.CROP_CODES;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -44,9 +44,9 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**

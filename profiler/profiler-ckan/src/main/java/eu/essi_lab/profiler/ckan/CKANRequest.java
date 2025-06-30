@@ -24,19 +24,10 @@ package eu.essi_lab.profiler.ckan;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.pdk.LayerFeatureRetrieval;
 
 /**
  * @author boldrini

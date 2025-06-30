@@ -1,4 +1,6 @@
-package eu.essi_lab.messages.bond;
+package eu.essi_lab.messages.bond.spatial;
+
+import eu.essi_lab.messages.bond.SpatialBond;
 
 /*-
  * #%L
@@ -29,6 +31,15 @@ package eu.essi_lab.messages.bond;
 public interface SpatialEntity extends Cloneable {
 
     SpatialEntity clone();
+
+    /**
+     * @param shapeId
+     * @return
+     */
+    public static IndexedShape ofIndexedShape(String shapeId) {
+
+	return new IndexedShape(shapeId);
+    }
 
     /**
      * @param wkt

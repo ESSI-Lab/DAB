@@ -38,8 +38,8 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
 import eu.essi_lab.indexes.SpatialIndexHelper;
-import eu.essi_lab.messages.bond.SpatialExtent;
-import eu.essi_lab.messages.bond.WKT;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
+import eu.essi_lab.messages.bond.spatial.WKT;
 
 /**
  * @author Fabrizio

@@ -1,4 +1,4 @@
-package eu.essi_lab.messages.bond;
+package eu.essi_lab.messages.bond.spatial;
 
 /*-
  * #%L

@@ -79,8 +79,8 @@ import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
@@ -1025,7 +1025,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    String wkt = LayerFeatureRetrieval.getInstance().getFeature(predefinedLayer.get());
 	    if (wkt != null) {
 		Optional<String> spatialOp = parser.getOptionalValue("spatialOp");
-		eu.essi_lab.messages.bond.SpatialEntity entity = eu.essi_lab.messages.bond.SpatialEntity.of(wkt);
+		eu.essi_lab.messages.bond.spatial.SpatialEntity entity = eu.essi_lab.messages.bond.spatial.SpatialEntity.of(wkt);
 		andBond.getOperands().add(BondFactory.createSpatialEntityBond(BondOperator.decode(spatialOp.get()), entity));
 	    }
 	}
