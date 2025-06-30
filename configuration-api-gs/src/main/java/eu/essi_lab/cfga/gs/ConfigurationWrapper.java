@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,7 @@ import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
@@ -102,6 +104,16 @@ public class ConfigurationWrapper {
      */
     private static List<HarvestingSetting> harvestingSettingsCache;
 
+    private static String cachedSparqlProxyEndpoint = null;
+
+    public static String getCachedSparqlProxyEndpoint() {
+	return cachedSparqlProxyEndpoint;
+    }
+
+    public static void setCachedSparqlProxyEndpoint(String cachedSparqlProxyEndpoint) {
+	ConfigurationWrapper.cachedSparqlProxyEndpoint = cachedSparqlProxyEndpoint;
+    }
+
     /**
      * 
      */
@@ -122,6 +134,15 @@ public class ConfigurationWrapper {
 	    public void configurationChanged(ConfigurationChangeEvent event) {
 		allSourcesCache = getSources(null, false);
 		harvestingSettingsCache = _getHarvestingSettings();
+
+		Optional<Properties> kvo = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+		if (kvo.isPresent()) {
+		    String prop = kvo.get().getProperty(KeyValueOptionKeys.SPARQL_PROXY_ENDPOINT.getLabel());
+		    if (prop != null) {
+			cachedSparqlProxyEndpoint = prop;
+		    }
+		}
+
 	    }
 	});
 

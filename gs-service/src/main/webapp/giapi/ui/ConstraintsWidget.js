@@ -2134,7 +2134,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		}
 
 		if (options.ontology === "gemet") {
-            ontologyUrl = '../ontology-browser/gemet-ontology.html?http://www.eionet.europa.eu/gemet/concept/4612';
+            ontologyUrl = '../ontology-browser/gemet-ontology.html?http://www.eionet.europa.eu/gemet/gemetThesaurus';
 //			ontologyTreeUrl = 'https://his-central.geodab.eu/gs-service/sparql-navigator/his-central';
 			//ontologyTreeUrl = 'http://localhost:9090/gs-service/sparql-navigator/his-central';
 			conceptBaseUrl = '';

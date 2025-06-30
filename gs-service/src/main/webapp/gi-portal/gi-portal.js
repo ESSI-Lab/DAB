@@ -707,7 +707,8 @@ export function initializePortal(config) {
 
 			'wmsEndpoint': config.wmsEndpoint,
 
-			'clusterWMS': true,
+
+			'clusterWMS': (config.wmsEndpoint!==undefined),
 			'clusterWMSToken': token,
 			'clusterWMSView': view,
 			'clusterWMSLayerName': view,

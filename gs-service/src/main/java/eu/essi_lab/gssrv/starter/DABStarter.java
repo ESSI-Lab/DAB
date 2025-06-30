@@ -483,25 +483,6 @@ public class DABStarter {
 
 			ConfigurationWrapper.setConfiguration(configuration);
 
-			ConfigurationWrapper.getConfiguration().get().addChangeEventListener(l -> {
-
-				new ConfigurationChangeListener() {
-
-					@Override
-					public void configurationChanged(ConfigurationChangeEvent event) {
-						Optional<Properties> kvo = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
-						if (kvo.isPresent()) {
-							String prop = kvo.get()
-									.getProperty(KeyValueOptionKeys.SPARQL_PROXY_ENDPOINT.name());
-							if (prop != null) {
-								SparqlProxyServlet.setREMOTE_SPARQL_ENDPOINT(prop);
-							}
-						}
-
-					}
-				};
-			});
-
 			GSLoggerFactory.getLogger(DABStarter.class).info("Initializing configuration ENDED");
 
 		} catch (

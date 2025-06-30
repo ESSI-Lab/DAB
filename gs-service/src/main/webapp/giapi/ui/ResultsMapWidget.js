@@ -336,7 +336,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	function createMouseMoveHandler(wmsLayer) {
 		return function mouseMoveFunction(evt) {
 
-			if (evt===undefined){
+			if (evt === undefined) {
 				return;
 			}
 
@@ -356,7 +356,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		};
 	}
 
-	function createMouseClickHandler(wmsLayer,overlay) {
+	function createMouseClickHandler(wmsLayer, overlay) {
 		return function mouseClickFunction(evt) {
 
 			const data = wmsLayer.getData(evt.pixel);
@@ -472,19 +472,19 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			query += 'attributeTitle=' + value + '&';
 
 		}
-		
+
 		if (constraints.timeInterpolation) {
 			var value = constraints.timeInterpolation;
 			query += 'timeInterpolation=' + value + '&';
 
 		}
-		
+
 		if (constraints.intendedObservationSpacing) {
 			var value = constraints.intendedObservationSpacing;
 			query += 'intendedObservationSpacing=' + value + '&';
 
 		}
-		
+
 		if (constraints.aggregationDuration) {
 			var value = constraints.aggregationDuration;
 			query += 'aggregationDuration=' + value + '&';
@@ -494,14 +494,14 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		if (constraints.where) {
 			if (constraints.where.predefinedLayer) {
 				query += 'predefinedLayer=' + constraints.where.predefinedLayer + '&';
-			} 
+			}
 			if (constraints.where.south && constraints.where.west && constraints.where.north && constraints.where.east) {
 				var where = constraints.where;
 				query += 'where=' + where.south + ',' + where.west + ',' + where.north + ',' + where.east + '&';
 			}
-				var spatialOp = constraints.spatialOp;
-				query += 'spatialOp=' + spatialOp + '&';
-			
+			var spatialOp = constraints.spatialOp;
+			query += 'spatialOp=' + spatialOp + '&';
+
 		}
 
 		if (constraints.ontology) {
@@ -537,19 +537,20 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		var servicePath = options.dabNode.servicePath();
 
-		var url = endpoint + servicePath + '/token/' + options.clusterWMSToken + '/view/' + options.clusterWMSView + '/wms-cluster?' + query;
+		if (options.wmsEndpoint !== undefined) {
+			var url = endpoint + servicePath + '/token/' + options.clusterWMSToken + '/view/' + options.clusterWMSView + '/wms-cluster?' + query;
 
-		var online = {
+			var online = {
 
-			'function': 'download',
-			'name': layerName,
-			'title': layerTitle,
-			'protocol': protocol,
-			'url': url
-		};
+				'function': 'download',
+				'name': layerName,
+				'title': layerTitle,
+				'protocol': protocol,
+				'url': url
+			};
 
-		onlineArray.push(online);
-
+			onlineArray.push(online);
+		}
 
 
 		var array = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:', options);
@@ -559,10 +560,10 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			//
 			// set the pointer cursor when over a tile
 			//
-			if (mouseMoveHandler!=null) {
-				widget.map.un('pointermove',mouseMoveHandler);
-			}			
-			var mmf = createMouseMoveHandler(wmsLayer);			
+			if (mouseMoveHandler != null) {
+				widget.map.un('pointermove', mouseMoveHandler);
+			}
+			var mmf = createMouseMoveHandler(wmsLayer);
 			widget.map.on('pointermove', mmf);
 			mouseMoveHandler = mmf;
 
@@ -576,10 +577,10 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 			widget.map.addOverlay(overlay);
 
-			if (mouseClickHandler!=null) {
-				widget.map.un('singleclick',mouseClickHandler);
+			if (mouseClickHandler != null) {
+				widget.map.un('singleclick', mouseClickHandler);
 			}
-			var mcf = createMouseClickHandler(wmsLayer,overlay);
+			var mcf = createMouseClickHandler(wmsLayer, overlay);
 			widget.map.on('singleclick', mcf);
 			mouseClickHandler = mcf;
 
@@ -774,7 +775,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	 * 
 	 */
 	widget.addLayers = function(layers) {
-		
+
 		addLayers(layers);
 	};
 
@@ -782,12 +783,12 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		olMap.addLayers(layers);
 	};
-	
+
 	widget.removeLayers = function(layers) {
-		
+
 		removeLayers(layers);
 	};
-	
+
 	var removeLayers = function(layers) {
 
 		olMap.removeLayers(layers);

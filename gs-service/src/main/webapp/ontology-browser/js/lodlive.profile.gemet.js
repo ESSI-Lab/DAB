@@ -6,7 +6,7 @@ $.jStorage
                     'connection' : {                       
                         'Hydro-ontology' : {
                             description : {
-                                en : 'Hydro-ontology'
+                                en : 'GEMET thesaurus'
                             },
                             useForInverseSameAs : false,
                             sparql : {
@@ -18,15 +18,8 @@ $.jStorage
                                 inverse : 'SELECT DISTINCT * WHERE {?object ?property <{URI}>} LIMIT 100',
                                 inverseSameAs : 'SELECT DISTINCT * WHERE {?object <http://www.w3.org/2002/07/owl#sameAs> <{URI}>}'
                             },
-                            endpoint : 'http://localhost:3030/test/sparql',
-//                            examples : [ {
-//                                uri : 'http://his-central-ontology.geodab.eu/hydro-ontology/concept/1',
-//                                label : 'Hydrosphere'
-//                            },
-//                            {
-//                                uri : 'http://his-central-ontology.geodab.eu/hydro-ontology/concept/scheme',
-//                                label : 'Hydro-ontology concept scheme'
-//                            }]
+                        endpoint : '../sparql-proxy',
+
                         }
                
 
@@ -54,16 +47,13 @@ $.jStorage
                         sparql : {
                             allClasses : 'SELECT DISTINCT ?object WHERE {[] a ?object}',
                             findSubject : 'SELECT DISTINCT ?subject WHERE { {?subject a <{CLASS}>;<http://purl.org/dc/elements/1.1/title> ?object. FILTER(regex(str(?object),\'{VALUE}\',\'i\'))} UNION {?subject a <{CLASS}>;<http://www.w3.org/2000/01/rdf-schema#label> ?object. FILTER(regex(str(?object),\'{VALUE}\',\'i\'))} UNION {?subject a <{CLASS}>;<http://www.w3.org/2004/02/skos/core#prefLabel> ?object. FILTER(regex(str(?object),\'{VALUE}\',\'i\'))} }  LIMIT 1  ',
-                            documentUri : 'SELECT DISTINCT * WHERE {<{URI}> ?property ?object. FILTER(lang(?object) ="it" || !isLiteral(?object))} ORDER BY ?property',
+                            documentUri : 'SELECT DISTINCT * WHERE {<{URI}> ?property ?object. FILTER(lang(?object) ="" || lang(?object) ="it" || !isLiteral(?object))} ORDER BY ?property',
                             document : 'SELECT DISTINCT * WHERE {<{URI}> ?property ?object}',
                             bnode : 'SELECT DISTINCT *  WHERE {<{URI}> ?property ?object}',
                             inverse : 'SELECT DISTINCT * WHERE {?object ?property <{URI}>.} LIMIT 100',
                             inverseSameAs : 'SELECT DISTINCT * WHERE {?object ?t <{URI}> } '
                         },
-                        //endpoint : 'http://localhost:9090/gs-service/services/essi/view/whos-arctic/semantic/sparql',
-                        //endpoint : 'https://codes.wmo.int/system/query',                    
-//                        endpoint : 'http://localhost:9099/rdf4j-server/repositories/gemet',
-//                        endpoint : 'http://localhost:3030/test/sparql',
+
                         endpoint : '../sparql-proxy',
 
                         document : {

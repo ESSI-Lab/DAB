@@ -178,6 +178,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 		map.addControl(myControl);
 
+
 		if (options.wmsEndpoint) {
 
 			//

@@ -6,8 +6,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.Optional;
-import java.util.Properties;
 
 /*-
  * #%L
@@ -36,97 +34,77 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 
 public class SparqlProxyServlet extends HttpServlet {
 
-	// Configure your remote SPARQL endpoint here
-	private static String REMOTE_SPARQL_ENDPOINT = null;
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	forwardRequest("GET", request, response);
+    }
 
-	public static void setREMOTE_SPARQL_ENDPOINT(String REMOTE_SPARQL_ENDPOINT) {
-		SparqlProxyServlet.REMOTE_SPARQL_ENDPOINT = REMOTE_SPARQL_ENDPOINT;
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	forwardRequest("POST", request, response);
+    }
+
+    private void forwardRequest(String method, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+	String urlWithParams = getEndpoint();
+	if ("GET".equalsIgnoreCase(method)) {
+	    String queryString = request.getQueryString();
+	    if (queryString != null) {
+		urlWithParams += "?" + queryString;
+	    }
 	}
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		forwardRequest("GET", request, response);
+	URL url = new URL(urlWithParams);
+	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	conn.setRequestMethod(method);
+	conn.setDoInput(true);
+	conn.setDoOutput("POST".equalsIgnoreCase(method));
+
+	// Copy headers
+	Enumeration<String> headerNames = request.getHeaderNames();
+	while (headerNames.hasMoreElements()) {
+	    String headerName = headerNames.nextElement();
+	    if (!headerName.equalsIgnoreCase("host") && !headerName.equalsIgnoreCase("content-length")) {
+		conn.setRequestProperty(headerName, request.getHeader(headerName));
+	    }
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		forwardRequest("POST", request, response);
+	// For POST, forward body
+	if ("POST".equalsIgnoreCase(method)) {
+	    conn.setRequestProperty("Content-Type", request.getContentType());
+	    try (OutputStream os = conn.getOutputStream(); InputStream is = request.getInputStream()) {
+		is.transferTo(os);
+	    }
 	}
 
-	private void forwardRequest(String method, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	// Relay response
+	int status = conn.getResponseCode();
+	response.setStatus(status);
+	for (int i = 0;; i++) {
+	    String headerName = conn.getHeaderFieldKey(i);
+	    String headerValue = conn.getHeaderField(i);
+	    if (headerName == null && headerValue == null)
+		break;
 
-		String urlWithParams = getEndpoint();
-		if ("GET".equalsIgnoreCase(method)) {
-			String queryString = request.getQueryString();
-			if (queryString != null) {
-				urlWithParams += "?" + queryString;
-			}
-		}
-
-		URL url = new URL(urlWithParams);
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		conn.setRequestMethod(method);
-		conn.setDoInput(true);
-		conn.setDoOutput("POST".equalsIgnoreCase(method));
-
-		// Copy headers
-		Enumeration<String> headerNames = request.getHeaderNames();
-		while (headerNames.hasMoreElements()) {
-			String headerName = headerNames.nextElement();
-			if (!headerName.equalsIgnoreCase("host") && !headerName.equalsIgnoreCase("content-length")) {
-				conn.setRequestProperty(headerName, request.getHeader(headerName));
-			}
-		}
-
-		// For POST, forward body
-		if ("POST".equalsIgnoreCase(method)) {
-			conn.setRequestProperty("Content-Type", request.getContentType());
-			try (OutputStream os = conn.getOutputStream(); InputStream is = request.getInputStream()) {
-				is.transferTo(os);
-			}
-		}
-
-		// Relay response
-		int status = conn.getResponseCode();
-		response.setStatus(status);
-		for (int i = 0;; i++) {
-			String headerName = conn.getHeaderFieldKey(i);
-			String headerValue = conn.getHeaderField(i);
-			if (headerName == null && headerValue == null)
-				break;
-
-			// Skip null header names (e.g., status line)
-			if (headerName != null && headerValue != null) {
-				response.setHeader(headerName, headerValue);
-			}
-		}
-		try (InputStream input = (status < 400 ? conn.getInputStream() : conn.getErrorStream());
-				OutputStream out = response.getOutputStream()) {
-			if (input != null) {
-				input.transferTo(out);
-			}
-		} finally {
-			conn.disconnect();
-		}
+	    // Skip null header names (e.g., status line)
+	    if (headerName != null && headerValue != null) {
+		response.setHeader(headerName, headerValue);
+	    }
 	}
-
-	private String getEndpoint() {
-		if (REMOTE_SPARQL_ENDPOINT == null) {
-			Optional<Properties> kvo = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
-			if (kvo.isPresent()) {
-				String prop = kvo.get().getProperty(KeyValueOptionKeys.SPARQL_PROXY_ENDPOINT.name());
-				if (prop != null) {
-					SparqlProxyServlet.setREMOTE_SPARQL_ENDPOINT(prop);
-				}
-			}
-		}
-		return REMOTE_SPARQL_ENDPOINT;
+	try (InputStream input = (status < 400 ? conn.getInputStream() : conn.getErrorStream());
+		OutputStream out = response.getOutputStream()) {
+	    if (input != null) {
+		input.transferTo(out);
+	    }
+	} finally {
+	    conn.disconnect();
 	}
+    }
+
+    private String getEndpoint() {
+	return ConfigurationWrapper.getCachedSparqlProxyEndpoint();
+    }
 }
