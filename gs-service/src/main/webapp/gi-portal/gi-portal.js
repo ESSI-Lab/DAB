@@ -707,7 +707,8 @@ export function initializePortal(config) {
 
 			'wmsEndpoint': config.wmsEndpoint,
 
-			'clusterWMS': true,
+
+			'clusterWMS': (config.wmsEndpoint!==undefined),
 			'clusterWMSToken': token,
 			'clusterWMSView': view,
 			'clusterWMSLayerName': view,
@@ -817,7 +818,8 @@ export function initializePortal(config) {
 		GIAPI.search.constWidget = GIAPI.ConstraintsWidget(GIAPI.search.dab, {
 			'ontology': config.ontology,
 			'keyDownAction': (function() { GIAPI.search.discover(); }),
-			'fieldsWidth': 205
+			'fieldsWidth': 205,
+			'enableBrowseGEMET': config.enableBrowseGEMET
 		});
 		if (config.generalTermSearch == undefined || config.generalTermSearch) {
 			GIAPI.search.constWidget.whatConstraint('add', {
@@ -825,7 +827,8 @@ export function initializePortal(config) {
 				showResultSetExtensionOpt: false,
 				optDialogPosition: 'bottom',
 				showHelpIcon: false,
-				resizable: true
+				resizable: true,
+				enableBrowseGEMET: config.enableBrowseGEMET
 			});
 
 			GIAPI.search.constWidget.append('what-div');
@@ -1583,8 +1586,9 @@ export function initializePortal(config) {
 
 		constraints.ontology = config.ontology;
 
+		if (config.wmsEndpoint!==undefined){
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
-
+}
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
 

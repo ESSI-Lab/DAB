@@ -23,6 +23,7 @@ package eu.essi_lab.profiler.om;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Iterator;
 
 import org.json.JSONObject;
 
@@ -81,10 +82,10 @@ public class FeaturesHandler extends OMHandler {
 	return "results";
     }
 
-    public void writeFeature(OutputStreamWriter writer, JSONObject feature) throws IOException {
+    
+    public void writeJSONHeader(OutputStreamWriter writer, JSONObject feature) throws IOException {
 
-	// JSONObject properties = feature.getJSONObject("properties");
-
+	
 	JSONObject monitoringPoint = feature.getJSONObject("featureOfInterest");
 	monitoringPoint.remove("type");
 
@@ -94,9 +95,46 @@ public class FeaturesHandler extends OMHandler {
 	    monitoringPoint.put(getGeometryName(), shape);
 	}
 
-	writer.write(monitoringPoint.toString());
 
-	writer.flush();
+   	writer.write("{\n");
+
+   	Iterator<String> keys = monitoringPoint.keys();
+   	boolean first = true;
+   	while (keys.hasNext()) {
+   	    String key = keys.next();
+   	    if (key.equals("result")) {
+   		// Stop before writing the array
+   		continue;
+   	    }
+   	    if (!first) {
+   		writer.write(",\n");
+   	    }
+   	    first = false;
+   	    writer.write(JSONObject.quote(key));
+   	    writer.write(": ");
+   	    Object optObj = monitoringPoint.opt(key);
+   	    if (optObj != null) {
+   		if (optObj instanceof String) {
+
+   		    writer.write(JSONObject.quote(monitoringPoint.get(key).toString()));
+
+   		} else {
+   		    writer.write(monitoringPoint.get(key).toString());
+
+   		}
+   	    }
+   	}
+   	
+
+
+
+       }
+    
+    public void writeJSONFooter(OutputStreamWriter writer) throws IOException {
+
+	// for the footer
+	writer.write("}\n");
+	
 
     }
 

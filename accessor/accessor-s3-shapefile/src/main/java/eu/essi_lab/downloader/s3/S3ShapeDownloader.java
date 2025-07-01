@@ -48,7 +48,9 @@ import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.filter.Filter;
 import org.geotools.api.filter.FilterFactory;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.style.Fill;
 import org.geotools.api.style.LineSymbolizer;
+import org.geotools.api.style.PolygonSymbolizer;
 import org.geotools.api.style.Stroke;
 import org.geotools.api.style.Style;
 import org.geotools.data.simple.SimpleFeatureCollection;
@@ -273,9 +275,9 @@ public class S3ShapeDownloader extends DataDownloader {
 
 	// Create stroke with custom color and width
 	Stroke stroke = builder.createStroke(color, lineWidth);
-
+	Fill fill = builder.createFill(color, 0.3);
 	// Create a LineSymbolizer using the stroke
-	LineSymbolizer lineSymbolizer = builder.createLineSymbolizer(stroke);
+	PolygonSymbolizer lineSymbolizer = builder.createPolygonSymbolizer(stroke,fill);
 
 	// Return the style based on the symbolizer
 	return builder.createStyle(lineSymbolizer);

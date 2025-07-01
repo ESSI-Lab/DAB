@@ -754,6 +754,26 @@ public class OMHandler extends StreamingRequestHandler {
 	
 
     }
+    
+    public void writeFeature(OutputStreamWriter writer, JSONObject feature) throws IOException {
+
+	JSONObject jsonFoi = new JSONObject();
+	JSONObject foi = feature.getJSONObject("featureOfInterest");
+	if (!foi.has("id")) {
+	    System.err.println(feature);
+	    System.err.println("feature without id: this should not happen");
+	} else {
+	    String href = foi.getString("id");
+	    jsonFoi.put("href", href);
+	}
+
+	feature.put("featureOfInterest", jsonFoi);
+
+	writer.write(feature.toString());
+
+	writer.flush();
+
+    }
 
     public void writeJSONHeader(OutputStreamWriter writer, JSONObject feature) throws IOException {
 
@@ -831,25 +851,7 @@ public class OMHandler extends StreamingRequestHandler {
 
     }
 
-    public void writeFeature(OutputStreamWriter writer, JSONObject feature) throws IOException {
-
-	JSONObject jsonFoi = new JSONObject();
-	JSONObject foi = feature.getJSONObject("featureOfInterest");
-	if (!foi.has("id")) {
-	    System.err.println(feature);
-	    System.err.println("feature without id: this should not happen");
-	} else {
-	    String href = foi.getString("id");
-	    jsonFoi.put("href", href);
-	}
-
-	feature.put("featureOfInterest", jsonFoi);
-
-	writer.write(feature.toString());
-
-	writer.flush();
-
-    }
+    
 
     private void writeCSVobservation(OutputStreamWriter writer, JSONObservation observation, JSONObject point, CSVField... fields)
 	    throws IOException {
