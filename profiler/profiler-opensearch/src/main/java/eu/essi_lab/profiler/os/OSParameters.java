@@ -37,7 +37,6 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.spatial.SpatialEntity;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
-import eu.essi_lab.pdk.LayerFeatureRetrieval;
 import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
 
 public abstract class OSParameters {
@@ -130,7 +129,7 @@ public abstract class OSParameters {
 	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, value));
 	}
     };
-    
+
     public static final OSParameter PREDEFINED_LAYER = new OSParameter("predefinedLayer", "string", null, "{gs:predefinedLayer}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -138,14 +137,10 @@ public abstract class OSParameters {
 	    if (value == null || value.equals("")) {
 		return Optional.empty();
 	    }
-
-	    // Get WKT from layer
-	    String wkt = LayerFeatureRetrieval.getInstance().getFeature(value);
-	    if (wkt != null) {
-		return Optional.of(create(wkt, relatedValues));
-	    }
-
-	    return Optional.empty();
+	    
+	    String id = "UOMIT20181025_" + value.substring(value.lastIndexOf(":") + 1, value.length());
+	    
+	    return Optional.of(fromIndexedShape(id, relatedValues));
 	}
     };
 
@@ -1052,7 +1047,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    SpatialBond spatialBond = create(StringUtils.urlDecode(value), relatedValues);
+	    SpatialBond spatialBond = fromWKT(StringUtils.urlDecode(value), relatedValues);
 
 	    return Optional.of(spatialBond);
 	}
@@ -1282,16 +1277,28 @@ public abstract class OSParameters {
     }
 
     /**
-     * @param south
-     * @param west
-     * @param north
-     * @param east
+     * @param wkt
      * @param relatedValues
      * @return
      */
-    public static SpatialBond create(String wkt, String... relatedValues) {
+    private static SpatialBond fromWKT(String wkt, String... relatedValues) {
 
 	SpatialEntity entity = SpatialEntity.of(wkt);
+
+	String spatialRelation = relatedValues[0];
+	BondOperator operator = BondOperator.decode(spatialRelation);
+
+	return BondFactory.createSpatialEntityBond(operator, entity);
+    }
+
+    /**
+     * @param id
+     * @param relatedValues
+     * @return
+     */
+    private static SpatialBond fromIndexedShape(String id, String... relatedValues) {
+
+	SpatialEntity entity = SpatialEntity.ofIndexedShape(id);
 
 	String spatialRelation = relatedValues[0];
 	BondOperator operator = BondOperator.decode(spatialRelation);
