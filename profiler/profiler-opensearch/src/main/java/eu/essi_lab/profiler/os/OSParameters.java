@@ -142,7 +142,7 @@ public abstract class OSParameters {
 	    // Get WKT from layer
 	    String wkt = LayerFeatureRetrieval.getInstance().getFeature(value);
 	    if (wkt != null) {
-		return Optional.of(create("arno", relatedValues));
+		return Optional.of(create(wkt, relatedValues));
 	    }
 
 	    return Optional.empty();
