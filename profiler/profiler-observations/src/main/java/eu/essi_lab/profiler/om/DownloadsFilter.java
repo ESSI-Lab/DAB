@@ -28,8 +28,12 @@ import eu.essi_lab.pdk.handler.selector.WebRequestFilter;
 public class DownloadsFilter implements WebRequestFilter {
 
     @Override
-    public boolean accept(WebRequest request) throws GSException {
+    public boolean accept(WebRequest request) throws GSException {	
 	String path = request.getRequestPath();
+	String method = request.getServletRequest().getMethod();
+	if (method.toLowerCase().equals("put")) {
+	    return false;
+	}
 	path = path.toLowerCase();
 	return path.endsWith("downloads") ;
     }

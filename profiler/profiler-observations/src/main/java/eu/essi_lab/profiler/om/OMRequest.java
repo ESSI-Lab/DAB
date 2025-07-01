@@ -47,7 +47,6 @@ public class OMRequest {
 	FORMAT("format"), //
 	USE_CACHE("useCache"), //
 	INCLUDE_VALUES("includeValues", "includeData"), //
-	ASYNCH_DOWNLOAD("asynchDownload"), //
 	ASYNCH_DOWNLOAD_NAME("asynchDownloadName"), //
 	BEGIN_DATE("beginDate", "startDate", "beginTime", "startTime", "begin", "beginPosition"), //
 	END_DATE("endDate", "endTime", "end", "endPosition"), //
@@ -102,9 +101,16 @@ public class OMRequest {
     public Set<Entry<String, String>> getActualParameters() {
 	return actualParametersMap.entrySet();
     }
+    
+    private boolean asynchDownloadRequest = false;
 
     public OMRequest(WebRequest request) {
 
+	String method = request.getServletRequest().getMethod();
+	if (method.toLowerCase().equals("put")) {
+	    asynchDownloadRequest = true;
+	}
+	
 	if (timeFormatConverter == null) {
 	    timeFormatConverter = new TimeFormatConverter();
 	}
@@ -272,5 +278,11 @@ public class OMRequest {
 
 	return Optional.empty();
     }
+
+    public boolean isAsynchDownloadRequest() {
+	return asynchDownloadRequest;
+    }
+
+
 
 }

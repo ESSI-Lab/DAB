@@ -30,6 +30,10 @@ public class OMFilter implements WebRequestFilter {
     @Override
     public boolean accept(WebRequest request) throws GSException {
 	String path = request.getRequestPath();
+	String method = request.getServletRequest().getMethod();
+	if (method.toLowerCase().equals("put") && path.endsWith("downloads")) {
+	    return true;
+	}
 	return path.endsWith("observations");
     }
 

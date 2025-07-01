@@ -1405,14 +1405,11 @@ export function initializePortal(config) {
 												params.append('eMailNotifications', 'true');
 											}
 
-											params.append('includeData', 'true');
-											params.append('asynchDownload', 'true');
-
 											// Construct the final URL using the view from config
-											var downloadUrl = `${baseUrl}/token/${token}/view/${config.view}/om-api/observations?${params.toString()}`;
+											var downloadUrl = `${baseUrl}/token/${token}/view/${config.view}/om-api/downloads?${params.toString()}`;
 
 											// Make the GET request
-											fetch(downloadUrl)
+											fetch(downloadUrl, { method: 'PUT', body: '' })
 												.then(response => {
 													if (!response.ok) {
 														throw new Error('Network response was not ok');

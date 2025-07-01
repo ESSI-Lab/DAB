@@ -393,7 +393,7 @@
 					}
 				}
 			}
-		},
+		},		
 		"/gs-service/services/essi/token/{token}/view/{view}/om-api/observations": {
 			"get": {
 				"description": "Used to retrieve metadata and data about observations",
@@ -517,33 +517,25 @@
 						}
 					},
 					{
-						"name": "includeData",
+						"name": "country",
 						"in": "query",
-						"description": "Include data in the response. Requests for downloading more than one dataset at the time will be rejected if not executed asynchronously.",
-						"schema": {
-							"type": "boolean"
-						}
-					},
-					{
-						"name": "asynchDownload",
-						"in": "query",
-						"description": "Asynchronous data download is false by default.",
-						"schema": {
-							"type": "boolean"
-						}
-					},
-					{
-						"name": "asynchDownloadName",
-						"in": "query",
-						"description": "Gives a name to the asynch download, to ease its identification.",
+						"description": "Country code (ISO3)",
 						"schema": {
 							"type": "string"
 						}
 					},
 					{
-						"name": "eMailNotifications",
+						"name": "provider",
 						"in": "query",
-						"description": "Send bulk download notifications (start and end) through e-mail.",
+						"description": "Data provider identifier",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "includeData",
+						"in": "query",
+						"description": "Include data in the response. Requests for downloading more than one dataset at the time will be rejected: use the asynch download operation.",
 						"schema": {
 							"type": "boolean"
 						}
@@ -599,6 +591,200 @@
 			}
 		},
 		"/gs-service/services/essi/token/{token}/view/{view}/om-api/downloads": {
+			"put": {
+				"description": "Used to start an asynchronous download operation",
+				"parameters": [
+					{
+						"name": "token",
+						"in": "path",
+						"required": true,
+						"description": "Token identifying the user",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "view",
+						"in": "path",
+						"required": true,
+						"description": "Identifier of the data subset interesting for the user",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "feature",
+						"in": "query",
+						"description": "Identifier of the feature",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "observationIdentifier",
+						"in": "query",
+						"description": "Identifier of the observation",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "beginPosition",
+						"in": "query",
+						"description": "Temporal interval begin position",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "endPosition",
+						"in": "query",
+						"description": "Temporal interval end position",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "west",
+						"in": "query",
+						"schema": {
+							"type": "number"
+						}
+					},
+					{
+						"name": "south",
+						"in": "query",
+						"schema": {
+							"type": "number"
+						}
+					},
+					{
+						"name": "east",
+						"in": "query",
+						"schema": {
+							"type": "number"
+						}
+					},
+					{
+						"name": "north",
+						"in": "query",
+						"schema": {
+							"type": "number"
+						}
+					},
+					{
+						"name": "observedProperty",
+						"in": "query",
+						"description": "observed property name or URI",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "ontology",
+						"in": "query",
+						"description": "The ontology to be used to expand the observed property search term (or URI) with additional terms from the ontology that are synonyms and associated to narrower concepts. Two ontologies are available: whos or his-central",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "timeInterpolation",
+						"in": "query",
+						"description": "The interpolation used on the time axis (for example, MAX, MIN, TOTAL, AVERAGE, MAX_PREC, MAX_SUCC, CONTINUOUS, ...)",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "intendedObservationSpacing",
+						"in": "query",
+						"description": "The expected duration between individual observations, expressed as ISO8601 duration (e.g., P1D)",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "aggregationDuration",
+						"in": "query",
+						"description": "Time aggregation that has occurred to the value in the timeseries, expressed as ISO8601 duration (e.g., P1D)",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "country",
+						"in": "query",
+						"description": "Country code (ISO3)",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "provider",
+						"in": "query",
+						"description": "Data provider identifier",
+						"schema": {
+							"type": "string"
+						}
+					},				
+					{
+						"name": "asynchDownloadName",
+						"in": "query",
+						"description": "Gives a name to the asynch download, to ease its identification.",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "eMailNotifications",
+						"in": "query",
+						"description": "Send bulk download notifications (start and end) through e-mail.",
+						"schema": {
+							"type": "boolean"
+						}
+					},
+					{
+						"name": "useCache",
+						"in": "query",
+						"description": "Use the broker cache to retrieve the data, avoiding to contact the remote data providers. Normally off.",
+						"schema": {
+							"type": "boolean"
+						}
+					},					
+					{
+						"name": "limit",
+						"in": "query",
+						"description": "Maximum number of matched records",
+						"schema": {
+							"type": "number"
+						},
+						"example": 10
+					},
+					{
+						"name": "format",
+						"in": "query",
+						"description": "Response format (e.g. JSON or CSV)",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Status",
+						"content": {
+							"application/json": {
+								"examples": {
+									"0": {
+										"value": "{\n    \"operationId\": \"operationId\",\n    \"status\": \"completed\",\n    \"locator\": \"http://my.host/link.to.download.package.zip\"\n}"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
 			"get": {
 				"description": "Used to retrieve the status of asynchronous operations (i.e., data download)",
 				"parameters": [

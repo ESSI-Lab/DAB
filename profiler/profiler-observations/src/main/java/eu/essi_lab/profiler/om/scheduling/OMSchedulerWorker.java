@@ -114,7 +114,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 		s3wrapper.uploadFile(downloaded.getAbsolutePath(), bucket, "data-downloads/" + fname, "application/zip");
 
 		long sizeInBytes = downloaded.length();
-		BigDecimal sizeInMB = BigDecimal.valueOf(sizeInBytes).divide(BigDecimal.valueOf(1024 * 1024), 2, RoundingMode.HALF_UP);
+		BigDecimal sizeInMB = BigDecimal.valueOf(sizeInBytes).divide(BigDecimal.valueOf(1024 * 1024), 2, RoundingMode.UP);
 
 		downloaded.delete();
 

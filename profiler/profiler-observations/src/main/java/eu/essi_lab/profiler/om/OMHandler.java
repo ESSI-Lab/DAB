@@ -194,6 +194,8 @@ public class OMHandler extends StreamingRequestHandler {
 
 	OMRequest request = new OMRequest(webRequest);
 
+	boolean asynchDownloadRequest = request.isAsynchDownloadRequest();
+
 	String properties = request.getParameterValue(APIParameters.OUTPUT_PROPERTIES);
 	List<Property> propertySet = new ArrayList<ObservationMapper.Property>();
 	if (properties != null && !properties.isEmpty()) {
@@ -357,13 +359,11 @@ public class OMHandler extends StreamingRequestHandler {
 
 		String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
 
-		if ((includeValues != null && (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
+		if (asynchDownloadRequest||(includeValues != null && (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
 
-		    String asynch = request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD);
+		     if (results.size() > 1) {
 
-		    if (results.size() > 1) {
-
-			if (asynch != null && asynch.toLowerCase().equals("true")) {
+			if (asynchDownloadRequest) {
 
 			    GSUser user = UserFinder.create().findCurrentUser(webRequest.getServletRequest());
 
@@ -436,7 +436,7 @@ public class OMHandler extends StreamingRequestHandler {
 				info = "";
 			    }
 			    printErrorMessage(output,
-				    "Requests to download more than one dataset should be handled asynchronously. " + info);
+				    "Requests to download more than one dataset should be handled through the asynchronous API methods. " + info);
 			    return;
 			}
 		    }
@@ -496,7 +496,6 @@ public class OMHandler extends StreamingRequestHandler {
 		    }
 		}
 
-		
 		for (JSONObservation observation : observations) {
 		    List<Double> coord = observation.getFeatureOfInterest().getCoordinates();
 
@@ -578,13 +577,13 @@ public class OMHandler extends StreamingRequestHandler {
 
 			    switch (type) {
 			    case TimeSeriesObservation:
-				addPointsFromWML(dataObject.getFile(), writer, observation, format, fields,coord);
+				addPointsFromWML(dataObject.getFile(), writer, observation, format, fields, coord);
 				break;
 			    case TrajectoryObservation:
-				addPointsFromTrajectoryNetCDF(dataObject.getFile(), observation, viewId,writer);
+				addPointsFromTrajectoryNetCDF(dataObject.getFile(), observation, viewId, writer);
 				break;
 			    case SamplingSurfaceObservation:
-				addPointsFromGridNetCDF(dataObject.getFile(), observation, descriptor,writer);
+				addPointsFromGridNetCDF(dataObject.getFile(), observation, descriptor, writer);
 				break;
 			    default:
 				break;
@@ -600,7 +599,6 @@ public class OMHandler extends StreamingRequestHandler {
 
 		}
 
-		
 	    } catch (Exception ee) {
 		GSLoggerFactory.getLogger(getClass()).error(ee);
 		JSONObject err = new JSONObject();
@@ -751,10 +749,9 @@ public class OMHandler extends StreamingRequestHandler {
 	writer.write("]\n");
 	writer.write("}\n");
 	writer.write("}\n");
-	
 
     }
-    
+
     public void writeFeature(OutputStreamWriter writer, JSONObject feature) throws IOException {
 
 	JSONObject jsonFoi = new JSONObject();
@@ -850,8 +847,6 @@ public class OMHandler extends StreamingRequestHandler {
 	writer.write(": [");
 
     }
-
-    
 
     private void writeCSVobservation(OutputStreamWriter writer, JSONObservation observation, JSONObject point, CSVField... fields)
 	    throws IOException {
@@ -1149,7 +1144,7 @@ public class OMHandler extends StreamingRequestHandler {
 
     }
 
-    private void addPointsFromTrajectoryNetCDF(File file, JSONObservation observation, String viewId,OutputStreamWriter writer) {
+    private void addPointsFromTrajectoryNetCDF(File file, JSONObservation observation, String viewId, OutputStreamWriter writer) {
 	FeatureDataset dataset = null;
 	NetcdfDataset.setDefaultEnhanceMode(
 		Collections.unmodifiableSet(EnumSet.of(Enhance.ApplyScaleOffset, Enhance.CoordSystems, Enhance.ConvertEnums)));
@@ -1199,7 +1194,7 @@ public class OMHandler extends StreamingRequestHandler {
 			}
 			writer.write(point.toString());
 			first = false;
-			
+
 		    }
 		}
 	    }
@@ -1212,7 +1207,8 @@ public class OMHandler extends StreamingRequestHandler {
 
     }
 
-    private void addPointsFromWML(File file, OutputStreamWriter writer, JSONObservation observation, String format, CSVField[] fields,List<Double> coord) {
+    private void addPointsFromWML(File file, OutputStreamWriter writer, JSONObservation observation, String format, CSVField[] fields,
+	    List<Double> coord) {
 	try {
 	    FileInputStream stream = new FileInputStream(file);
 
