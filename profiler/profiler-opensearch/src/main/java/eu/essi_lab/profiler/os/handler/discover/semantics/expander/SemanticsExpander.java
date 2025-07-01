@@ -22,6 +22,7 @@ package eu.essi_lab.profiler.os.handler.discover.semantics.expander;
  */
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.profiler.os.handler.discover.semantics.SemanticSource;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -62,8 +63,9 @@ public class SemanticsExpander {
 		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }
 	} else {
-	    matchedUris = getConceptsMatchingKeyword(searchTerm);
+	    searchTerm = StringUtils.URLEncodeUTF8(searchTerm);
 
+	    matchedUris = getConceptsMatchingKeyword(searchTerm);
 	}
 
 	matchedUris.forEach(uri -> {

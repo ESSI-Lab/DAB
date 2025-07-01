@@ -1079,8 +1079,10 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		break;
 	    case 1:
 		innerBonds.add(expandedBonds.get(0));
+		break;
 	    default:
 		innerBonds.add(BondFactory.createOrBond(expandedBonds));
+		break;
 	    }
 
 	    return;
