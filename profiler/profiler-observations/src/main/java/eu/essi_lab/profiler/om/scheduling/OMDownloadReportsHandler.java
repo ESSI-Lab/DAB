@@ -118,7 +118,7 @@ public class OMDownloadReportsHandler {
 
 	} else {
 
-	    builder.append("\n\nRequest URL: " + setting.getRequestURL().substring(0, setting.getRequestURL().indexOf("?") + 1) + "\n\n");
+	    builder.append("\n\nRequest parameters: " + setting.getRequestURL().substring(setting.getRequestURL().indexOf("?") + 1) + "\n\n");
 
 	    ConfiguredGmailClient.sendEmail(subject, builder.toString());
 	}
