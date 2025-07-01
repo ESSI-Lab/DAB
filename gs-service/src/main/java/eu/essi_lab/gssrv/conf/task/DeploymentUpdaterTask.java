@@ -176,7 +176,7 @@ public class DeploymentUpdaterTask extends AbstractCustomTask {
 
 	OpenSearchClient client = db.getClient();
 
-	OpenSearchWrapper wrapper = new OpenSearchWrapper(client);
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(db);
 
 	for (String sourceId : sources) {
 

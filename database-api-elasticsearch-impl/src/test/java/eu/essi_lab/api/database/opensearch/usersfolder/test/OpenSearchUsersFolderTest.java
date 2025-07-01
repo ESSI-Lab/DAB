@@ -213,7 +213,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	//
 	//
 
-	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database);
 
 
 	//

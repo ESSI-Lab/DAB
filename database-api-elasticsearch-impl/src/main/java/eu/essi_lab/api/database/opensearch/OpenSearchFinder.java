@@ -161,7 +161,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     public void setDatabase(Database database) {
 
 	this.database = (OpenSearchDatabase) database;
-	this.wrapper = new OpenSearchWrapper(this.database.getClient());
+	this.wrapper = new OpenSearchWrapper(this.database);
 
 	if (MAP_UPDATER_TASK == null) {
 

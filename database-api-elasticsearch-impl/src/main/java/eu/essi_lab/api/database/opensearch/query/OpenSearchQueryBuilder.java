@@ -62,6 +62,8 @@ import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
 import org.opensearch.client.opensearch.core.msearch.MultisearchHeader;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
+import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
@@ -84,6 +86,7 @@ import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.messages.bond.spatial.WKT;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
+import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
@@ -1346,6 +1349,22 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
+     * @return
+     */
+    private DatabaseFolder getShapeFilesFolder() {
+
+	try {
+	    return wrapper.getDatabase().getFolder(Database.SHAPE_FILES_FOLDER);
+
+	} catch (GSException ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+	}
+
+	return null;
+    }
+
+    /**
      * @param bond
      * @param shape
      * @return
@@ -1357,11 +1376,18 @@ public class OpenSearchQueryBuilder {
 
 	case SpatialExtent extent -> new GeoShapeFieldQuery.Builder().shape(JsonData.of(GeoShapeUtils.convert(extent).toMap()));
 	case WKT wkt -> new GeoShapeFieldQuery.Builder().shape(JsonData.of(GeoShapeUtils.convert(wkt).toMap()));
-	case IndexedShape is -> new GeoShapeFieldQuery.Builder().//
-		indexedShape(new FieldLookup.Builder().//
-			id(is.getId()).//
-			index(ShapeFileMapping.get().getIndex()).//
-			build());
+	case IndexedShape is -> {
+
+	    DatabaseFolder folder = getShapeFilesFolder();
+	    String shapeFileId = ShapeFileMapping.getShapeFileId(folder, is);
+
+	    yield new GeoShapeFieldQuery.Builder().//
+		    indexedShape(new FieldLookup.Builder().//
+			    id(shapeFileId).//
+			    index(ShapeFileMapping.get().getIndex()).//
+			    build());
+
+	}
 	default -> throw new IllegalArgumentException("Unsupported spatial bond: " + bond.getPropertyValue());
 	};
     }

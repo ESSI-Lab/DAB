@@ -536,7 +536,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	//
 	//
 
-	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database);
 	//
 	//
 	//
@@ -693,7 +693,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 
 	storeResources(folder, "resourceD", "titleD", "abstractD", RESOURCE_D);
 
-	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database);
 
 	int folderSize = folder.size();
 	Assert.assertEquals(TOTAL, folderSize);

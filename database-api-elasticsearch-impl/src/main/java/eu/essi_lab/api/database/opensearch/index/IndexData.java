@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -565,7 +566,7 @@ public class IndexData {
 	    //
 
 	    indexData.put(BINARY_PROPERTY, ShapeFileMapping.SHAPE_FILE);
-	    indexData.put(ShapeFileMapping.SHAPE_FILE, OpenSearchUtils.encode(inputStream.clone()));
+	    indexData.put(ShapeFileMapping.SHAPE_FILE, Base64.getEncoder().encodeToString(object.toString().getBytes("UTF-8")));
 
 	    indexData.put(ShapeFileMapping.SHAPE, shape);
 

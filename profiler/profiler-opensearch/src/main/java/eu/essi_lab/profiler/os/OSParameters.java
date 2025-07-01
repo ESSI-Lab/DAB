@@ -1289,9 +1289,9 @@ public abstract class OSParameters {
      * @param relatedValues
      * @return
      */
-    public static SpatialBond create(String shapeId, String... relatedValues) {
+    public static SpatialBond create(String wkt, String... relatedValues) {
 
-	SpatialEntity entity = SpatialEntity.ofIndexedShape(shapeId);
+	SpatialEntity entity = SpatialEntity.of(wkt);
 
 	String spatialRelation = relatedValues[0];
 	BondOperator operator = BondOperator.decode(spatialRelation);

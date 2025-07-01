@@ -123,7 +123,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	if (database instanceof OpenSearchDatabase) {
 	    OpenSearchDatabase osd = (OpenSearchDatabase) database;
 	    this.client = osd.getClient();
-	    this.wrapper = new OpenSearchWrapper(client);
+	    this.wrapper = new OpenSearchWrapper(osd);
 	    this.finder = new OpenSearchFinder();
 	    finder.setDatabase(database);
 	}

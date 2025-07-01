@@ -108,12 +108,23 @@ public class OpenSearchWrapper {
 
     private OpenSearchClient client;
 
-    /**
-     * @param client
-     */
-    public OpenSearchWrapper(OpenSearchClient client) {
+    private OpenSearchDatabase database;
 
-	this.client = client;
+    /**
+     * @param database
+     */
+    public OpenSearchWrapper(OpenSearchDatabase database) {
+
+	this.database = database;
+	this.client = database.getClient();
+    }
+
+    /**
+     * @return the database
+     */
+    public OpenSearchDatabase getDatabase() {
+
+	return database;
     }
 
     /**
@@ -233,8 +244,7 @@ public class OpenSearchWrapper {
 	    List<String> sourceFields, //
 	    Queryable target, //
 	    int size, //
-	    boolean excludeBinaries,
-	    boolean logQuery) throws Exception {
+	    boolean excludeBinaries, boolean logQuery) throws Exception {
 
 	String topHitsAggName = "top_hits_agg";
 	String termsAggName = "terms_agg";
@@ -942,29 +952,29 @@ public class OpenSearchWrapper {
     private void handleSort(//
 	    org.opensearch.client.opensearch.core.SearchRequest.Builder builder, //
 	    SortedFields sortedFields) {
-	
+
 	List<SortOptions> sortOptions = new ArrayList<SortOptions>();
-	
+
 	for (SimpleEntry<Queryable, eu.essi_lab.model.SortOrder> sortedField : sortedFields.getFields()) {
-	  
+
 	    Queryable orderingProperty = sortedField.getKey();
 	    eu.essi_lab.model.SortOrder sortOrder = sortedField.getValue();
-	    
+
 	    ContentType contentType = orderingProperty.getContentType();
-	    
+
 	    String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
 		    : orderingProperty.getName();
-	    
+
 	    SortOptions sortOption = new SortOptions.Builder().//
 		    field(new FieldSort.Builder().//
 			    field(field).//
 			    order(sortOrder == eu.essi_lab.model.SortOrder.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
 		    .//
 		    build();
-	    
+
 	    sortOptions.add(sortOption);
 	}
-	
+
 	builder.sort(sortOptions);
     }
 

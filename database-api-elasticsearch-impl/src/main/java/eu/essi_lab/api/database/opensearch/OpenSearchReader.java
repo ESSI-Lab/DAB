@@ -65,7 +65,7 @@ public class OpenSearchReader implements DatabaseReader {
     public void setDatabase(Database database) {
 
 	this.database = (OpenSearchDatabase) database;
-	this.wrapper = new OpenSearchWrapper(this.database.getClient());
+	this.wrapper = new OpenSearchWrapper(this.database);
     }
 
     @Override

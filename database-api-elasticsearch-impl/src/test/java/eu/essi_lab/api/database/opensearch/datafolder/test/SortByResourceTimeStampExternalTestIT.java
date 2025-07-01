@@ -44,7 +44,7 @@ public class SortByResourceTimeStampExternalTestIT {
 	OpenSearchDatabase db = new OpenSearchDatabase();
 	db.initialize(osStorageInfo);
 
-	OpenSearchWrapper wrapper = new OpenSearchWrapper(db.getClient());
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(db);
 
 	HashMap<String, String> map = new HashMap<String, String>();
 	map.put("UUID-2dc3a01b-934e-4c3d-9311-527ac93ec058", "data-1");

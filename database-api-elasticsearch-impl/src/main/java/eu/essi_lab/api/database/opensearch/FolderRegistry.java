@@ -58,7 +58,7 @@ public class FolderRegistry {
     private FolderRegistry(OpenSearchDatabase database) {
 
 	this.database = database;
-	this.wrapper = new OpenSearchWrapper(database.getClient());
+	this.wrapper = new OpenSearchWrapper(database);
     }
 
     /**

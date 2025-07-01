@@ -214,7 +214,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	//
 	//
 
-	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database);
 
 	//
 	//
@@ -341,7 +341,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	//
 	//
 
-	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database);
 
 	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
@@ -489,7 +489,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	//
 	//
 
-	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database);
 
 	//
 	// all
