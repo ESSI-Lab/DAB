@@ -60,11 +60,9 @@ public class OMDownloadReportsHandler {
 	builder.append("Bulk download ");
 	builder.append(status.toLowerCase() + "\n\n");
 
-	builder.append("Download name: " + setting.getAsynchDownloadName()+"\n\n");
+	builder.append("Download name: " + setting.getAsynchDownloadName() + "\n\n");
 
 	builder.append("Operation ID: " + setting.getOperationId());
-
-
 
 	try {
 	    String requestURL = setting.getRequestURL();
@@ -108,7 +106,7 @@ public class OMDownloadReportsHandler {
 
 	    GSLoggerFactory.getLogger(OMDownloadReportsHandler.class).error(e);
 	}
-	
+
 	if (locator.isPresent()) {
 
 	    builder.append("\n\nZIP file: " + locator.get());
@@ -120,7 +118,7 @@ public class OMDownloadReportsHandler {
 
 	} else {
 
-	    builder.append("\n\nRequest URL: " + setting.getRequestURL().replace("http://", "").replace("https://", "") + "\n\n");
+	    builder.append("\n\nRequest URL: " + setting.getRequestURL().substring(0, setting.getRequestURL().indexOf("?") + 1) + "\n\n");
 
 	    ConfiguredGmailClient.sendEmail(subject, builder.toString());
 	}
