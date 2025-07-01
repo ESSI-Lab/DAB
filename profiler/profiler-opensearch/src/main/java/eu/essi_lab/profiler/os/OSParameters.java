@@ -34,7 +34,7 @@ import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.SpatialEntity;
+import eu.essi_lab.messages.bond.spatial.SpatialEntity;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
 import eu.essi_lab.pdk.LayerFeatureRetrieval;
@@ -142,7 +142,7 @@ public abstract class OSParameters {
 	    // Get WKT from layer
 	    String wkt = LayerFeatureRetrieval.getInstance().getFeature(value);
 	    if (wkt != null) {
-		return Optional.of(create(wkt, relatedValues));
+		return Optional.of(create("arno", relatedValues));
 	    }
 
 	    return Optional.empty();
@@ -1289,9 +1289,9 @@ public abstract class OSParameters {
      * @param relatedValues
      * @return
      */
-    public static SpatialBond create(String wkt, String... relatedValues) {
+    public static SpatialBond create(String shapeId, String... relatedValues) {
 
-	SpatialEntity entity = SpatialEntity.of(wkt);
+	SpatialEntity entity = SpatialEntity.ofIndexedShape(shapeId);
 
 	String spatialRelation = relatedValues[0];
 	BondOperator operator = BondOperator.decode(spatialRelation);

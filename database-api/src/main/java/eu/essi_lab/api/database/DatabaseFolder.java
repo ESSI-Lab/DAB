@@ -149,8 +149,13 @@ public interface DatabaseFolder {
 	// cache-index entry
 	//
 
-	CACHE_ENTRY;
-
+	CACHE_ENTRY,
+	
+	//
+	// shapes-index entry
+	//
+	
+	SHAPE_FILE;
     }
 
     /**

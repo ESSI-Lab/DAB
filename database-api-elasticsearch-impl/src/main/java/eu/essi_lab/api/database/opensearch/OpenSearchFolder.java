@@ -93,11 +93,27 @@ public class OpenSearchFolder implements DatabaseFolder {
     @Override
     public boolean store(String key, FolderEntry entry, EntryType type) throws Exception {
 
-	IndexData indexData = IndexData.of(this, key, entry, type);
+	boolean stored = true;
 
-	boolean stored = wrapper.storeWithOpenSearchClient(indexData);
+	if (type == EntryType.SHAPE_FILE) {
 
-	wrapper.synch();
+	    List<IndexData> list = IndexData.ofShapeFile(this, key, entry);
+
+	    for (IndexData indexData : list) {
+
+		stored &= wrapper.storeWithOpenSearchClient(indexData);
+
+		wrapper.synch();
+	    }
+
+	} else {
+
+	    IndexData indexData = IndexData.of(this, key, entry, type);
+
+	    stored = wrapper.storeWithOpenSearchClient(indexData);
+
+	    wrapper.synch();
+	}
 
 	return stored;
     }
@@ -136,7 +152,12 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	return OpenSearchUtils.toNode(OpenSearchUtils.toStream(source.get()));
     }
-    
+
+    /**
+     * @param key
+     * @return
+     * @throws Exception
+     */
     public Node getRaw(String key) throws Exception {
 
 	Optional<JSONObject> source = _getSource(key);
@@ -302,10 +323,10 @@ public class OpenSearchFolder implements DatabaseFolder {
 	}
 
 	String field = switch (identifierType) {
-	case OAI_HEADER ->  DataFolderMapping.toKeywordField(ResourceProperty.OAI_PMH_HEADER_ID.getName());	  
-	case ORIGINAL ->  DataFolderMapping.toKeywordField(ResourceProperty.ORIGINAL_ID.getName());	   
-	case PRIVATE -> DataFolderMapping.toKeywordField(ResourceProperty.PRIVATE_ID.getName());	  
-	case PUBLIC ->  DataFolderMapping.toKeywordField(MetadataElement.IDENTIFIER.getName());	     
+	case OAI_HEADER -> DataFolderMapping.toKeywordField(ResourceProperty.OAI_PMH_HEADER_ID.getName());
+	case ORIGINAL -> DataFolderMapping.toKeywordField(ResourceProperty.ORIGINAL_ID.getName());
+	case PRIVATE -> DataFolderMapping.toKeywordField(ResourceProperty.PRIVATE_ID.getName());
+	case PUBLIC -> DataFolderMapping.toKeywordField(MetadataElement.IDENTIFIER.getName());
 	};
 
 	Query searchQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);

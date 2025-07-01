@@ -65,6 +65,7 @@ public abstract class IndexMapping {
 	MAPPINGS.add(ViewsMapping.get());
 	MAPPINGS.add(FolderRegistryMapping.get());
 	MAPPINGS.add(CacheMapping.get());
+	MAPPINGS.add(ShapeFileMapping.get());
     }
 
     /**

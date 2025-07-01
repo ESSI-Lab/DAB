@@ -107,7 +107,7 @@ public class Unzipper extends GZIPUnzipper {
      */
     public List<File> unzipAll() throws IOException {
 
-	return unzipAll(UUID.randomUUID().toString());
+	return unzipAll("");
     }
 
     /**

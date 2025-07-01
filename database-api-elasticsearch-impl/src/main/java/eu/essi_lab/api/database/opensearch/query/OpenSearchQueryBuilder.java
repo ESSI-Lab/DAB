@@ -44,6 +44,7 @@ import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.GeoShapeRelation;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.ExistsQuery;
+import org.opensearch.client.opensearch._types.query_dsl.FieldLookup;
 import org.opensearch.client.opensearch._types.query_dsl.GeoShapeFieldQuery;
 import org.opensearch.client.opensearch._types.query_dsl.GeoShapeQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchAllQuery;
@@ -69,6 +70,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent.FrameValue;
@@ -76,9 +78,10 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
-import eu.essi_lab.messages.bond.WKT;
+import eu.essi_lab.messages.bond.spatial.IndexedShape;
+import eu.essi_lab.messages.bond.spatial.SpatialExtent;
+import eu.essi_lab.messages.bond.spatial.WKT;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
@@ -414,6 +417,7 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public Query build(boolean count) {
+
 	String str = builder.toString().trim();
 
 	Query searchQuery = str.isEmpty() ? null : OpenSearchUtils.toQuery(new JSONObject(str));
@@ -432,18 +436,16 @@ public class OpenSearchQueryBuilder {
     @SuppressWarnings("incomplete-switch")
     public Query buildGeoShapeQuery(SpatialBond bond, boolean count) throws ParseException {
 
-	JSONObject shape = buildShapeObject(bond);
-
-	org.opensearch.client.opensearch._types.query_dsl.GeoShapeFieldQuery.Builder shapeBuilder = new GeoShapeFieldQuery.Builder().//
-		shape(JsonData.of(shape.toMap()));
-
-	Query weightedQuery = null;
+	org.opensearch.client.opensearch._types.query_dsl.GeoShapeFieldQuery.Builder shapeBuilder = buildShapeBuilder(bond);
 
 	double area = switch (bond.getPropertyValue()) {
 	case SpatialExtent extent -> GeoShapeUtils.getArea(extent);
 	case WKT wkt -> GeoShapeUtils.getArea(wkt);
+	case IndexedShape is -> 0; // no way to calculate it
 	default -> throw new IllegalArgumentException("Unsupported entity: " + bond.getPropertyValue().getClass().getSimpleName());
 	};
+
+	Query weightedQuery = null;
 
 	BondOperator operator = bond.getOperator();
 	switch (operator) {
@@ -458,7 +460,7 @@ public class OpenSearchQueryBuilder {
 
 	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Contains);
 
-	    weightedQuery = weightedQueriesInclued ? buildContainedWeightQuery(area, 500) : null;
+	    weightedQuery = weightedQueriesInclued && area > 0 ? buildContainedWeightQuery(area, 500) : null;
 
 	    break;
 
@@ -473,7 +475,7 @@ public class OpenSearchQueryBuilder {
 		operands.add(buildAreaWeightedQuery(min, area));
 	    }
 
-	    weightedQuery = weightedQueriesInclued ? buildShouldQuery(operands) : null;
+	    weightedQuery = weightedQueriesInclued && area > 0 ? buildShouldQuery(operands) : null;
 
 	    break;
 	case DISJOINT:
@@ -1345,18 +1347,22 @@ public class OpenSearchQueryBuilder {
 
     /**
      * @param bond
+     * @param shape
      * @return
      * @throws ParseException
      */
-    private static JSONObject buildShapeObject(SpatialBond bond) throws ParseException {
+    private GeoShapeFieldQuery.Builder buildShapeBuilder(SpatialBond bond) throws ParseException {
 
 	return switch (bond.getPropertyValue()) {
 
-	case SpatialExtent extent -> GeoShapeUtils.convert(extent);
-	case WKT wkt -> GeoShapeUtils.convert(wkt);
-
+	case SpatialExtent extent -> new GeoShapeFieldQuery.Builder().shape(JsonData.of(GeoShapeUtils.convert(extent).toMap()));
+	case WKT wkt -> new GeoShapeFieldQuery.Builder().shape(JsonData.of(GeoShapeUtils.convert(wkt).toMap()));
+	case IndexedShape is -> new GeoShapeFieldQuery.Builder().//
+		indexedShape(new FieldLookup.Builder().//
+			id(is.getId()).//
+			index(ShapeFileMapping.get().getIndex()).//
+			build());
 	default -> throw new IllegalArgumentException("Unsupported spatial bond: " + bond.getPropertyValue());
-
 	};
     }
 

@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +50,8 @@ import org.opensearch.client.opensearch.core.IndexRequest;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import com.google.common.io.Files;
+
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
@@ -64,12 +67,14 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.zip.Unzipper;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.auth.GSUser;
@@ -185,34 +190,6 @@ public class IndexData {
 	indexData.index = FolderRegistryMapping.get().getIndex();
 
 	return indexData;
-    }
-
-    /**
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-
-	// URL resource = IndexData.class.getClassLoader().getResource("test.xml");
-	//
-	// File file = new File(resource.toURI());
-	//
-	// OpenSearchDatabase localService = OpenSearchDatabase.createLocalService();
-	//
-	// OpenSearchFolder folder = new OpenSearchFolder(localService, "testFolder");
-	//
-	// IndexData indexData = IndexData.of(folder, file);
-	//
-	// System.out.println(indexData);
-	//
-	// Optional<Long> toLong = ConversionUtils.parseToLong("2025-01-01");
-
-	Optional<Long> toLong = OpenSearchUtils.parseToLong("19841231-01-01T00:00:00Z");
-
-	// Optional<Date> notStandardToDate = ISO8601DateTimeUtils.parseNotStandard3ToDate("2023");
-	System.out.println(toLong);
-
-	// System.out.println(toLong);
     }
 
     /**
@@ -534,6 +511,74 @@ public class IndexData {
     }
 
     /**
+     * @param key
+     * @param entry
+     * @return
+     */
+    public static List<IndexData> ofShapeFile(OpenSearchFolder folder, String key, FolderEntry entry) throws Exception {
+
+	ClonableInputStream inputStream = new ClonableInputStream(entry.getStream().get());
+
+	Unzipper unzipper = new Unzipper(inputStream.clone());
+
+	File shapeFile = unzipper.unzipAll().stream().filter(f -> f.getName().endsWith(".shp")).findFirst().get();
+
+	List<JSONObject> objects = ShapeFileMapper.map(shapeFile);
+
+	ArrayList<IndexData> out = new ArrayList<IndexData>();
+
+	for (JSONObject object : objects) {
+
+	    IndexData indexData = new IndexData();
+
+	    indexData.mapping = ShapeFileMapping.get();
+
+	    indexData.index = indexData.mapping.getIndex();
+
+	    indexData.mapping.setEntryType(EntryType.SHAPE_FILE);
+
+	    //
+	    //
+	    //
+
+	    String entryName = key + "_" + object.getString(IndexData.ENTRY_NAME);
+
+	    String userId = object.optString(ShapeFileMapping.USER_ID);
+
+	    JSONObject shape = object.getJSONObject(ShapeFileMapping.SHAPE);
+
+	    //
+	    // put the base properties
+	    //
+
+	    indexData.put(ENTRY_NAME, entryName);
+	    indexData.put(DATABASE_ID, folder.getDatabase().getIdentifier());
+	    indexData.put(FOLDER_NAME, folder.getName());
+	    indexData.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
+
+	    indexData.put(DATA_TYPE, entry.getDataType());
+
+	    indexData.entryId = OpenSearchFolder.getEntryId(folder, entryName);
+
+	    //
+	    //
+	    //
+
+	    indexData.put(BINARY_PROPERTY, ShapeFileMapping.SHAPE_FILE);
+	    indexData.put(ShapeFileMapping.SHAPE_FILE, OpenSearchUtils.encode(inputStream.clone()));
+
+	    indexData.put(ShapeFileMapping.SHAPE, shape);
+
+	    out.add(indexData);
+	}
+
+	// clears the temp folder
+	Arrays.asList(unzipper.getOutputFolder().listFiles()).forEach(f -> f.delete());
+
+	return out;
+    }
+
+    /**
      * @param folder
      */
     public static String detectIndex(OpenSearchFolder folder) {
@@ -573,6 +618,10 @@ public class IndexData {
 	else if (name.contains(Database.CACHE_FOLDER)) {
 
 	    return CacheMapping.get().getIndex();
+
+	} else if (name.contains(Database.SHAPE_FILES_FOLDER)) {
+
+	    return ShapeFileMapping.get().getIndex();
 
 	} else {// name.contains(Database.CONFIGURATION_FOLDER
 

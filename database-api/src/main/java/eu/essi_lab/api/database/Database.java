@@ -197,6 +197,10 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
      * 
      */
     public static final String CACHE_FOLDER = "cache";
+    /*
+    * 
+    */
+    public static final String SHAPE_FILES_FOLDER = "shapeFiles";
 
     /**
      * 
