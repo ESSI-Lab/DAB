@@ -1354,7 +1354,7 @@ public class OpenSearchQueryBuilder {
     private DatabaseFolder getShapeFilesFolder() {
 
 	try {
-	    return wrapper.getDatabase().getFolder(Database.SHAPE_FILES_FOLDER);
+	    return wrapper.getDatabase().getFolder(Database.SHAPE_FILES_FOLDER, true).get();
 
 	} catch (GSException ex) {
 
