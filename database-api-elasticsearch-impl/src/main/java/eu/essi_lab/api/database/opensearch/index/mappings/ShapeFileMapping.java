@@ -49,10 +49,10 @@ public class ShapeFileMapping extends IndexMapping {
      * 
      * @param is
      */
-    public static String getShapeFileId(IndexedShape is) {
-	
-	return OpenSearchFolder.getEntryId(folder, is.getId());
-    }
+//    public static String getShapeFileId(IndexedShape is) {
+//	
+//	return OpenSearchFolder.getEntryId(folder, is.getId());
+//    }
 
     /**
      *  
