@@ -29,6 +29,7 @@ import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting.SchedulingGroup;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.KeyValueParser;
+import eu.essi_lab.profiler.om.scheduling.OMSchedulerWorker.DownloadStatus;
 
 /**
  * @author Fabrizio
@@ -46,19 +47,27 @@ public class OMDownloadReportsHandler {
      * @param setting
      */
     public static void sendEmail(//
-	    String status, //
+	    DownloadStatus status, //
 	    OMSchedulerSetting setting, //
 	    Optional<String> locator, //
 	    Optional<String> userMail) {
 
+	boolean toUser = userMail.isPresent();
+
 	SchedulingGroup group = setting.getGroup();
 
-	String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + "[" + group.name() + "]" + "[" + status + "]";
+	String subject;
+	if (toUser) {
+	    subject = "[HIS-Central][Download " + status.name().toLowerCase() + "] " + setting.getAsynchDownloadName();
+	} else {
+	    subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + "[" + group.name() + "]" + "[" + status + "] "
+		    + setting.getAsynchDownloadName();
+	}
 
 	StringBuilder builder = new StringBuilder();
 
 	builder.append("Bulk download ");
-	builder.append(status.toLowerCase() + "\n\n");
+	builder.append(status.name().toLowerCase() + "\n\n");
 
 	builder.append("Download name: " + setting.getAsynchDownloadName() + "\n\n");
 
@@ -112,13 +121,14 @@ public class OMDownloadReportsHandler {
 	    builder.append("\n\nZIP file: " + locator.get());
 	}
 
-	if (userMail.isPresent()) {
+	if (toUser) {
 
 	    ConfiguredGmailClient.sendEmail(subject, builder.toString(), userMail.get());
 
 	} else {
 
-	    builder.append("\n\nRequest parameters: " + setting.getRequestURL().substring(setting.getRequestURL().indexOf("?") + 1) + "\n\n");
+	    builder.append(
+		    "\n\nRequest parameters: " + setting.getRequestURL().substring(setting.getRequestURL().indexOf("?") + 1) + "\n\n");
 
 	    ConfiguredGmailClient.sendEmail(subject, builder.toString());
 	}
