@@ -318,6 +318,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	// creates the ol map
 	olMap = GIAPI.OL_Map(options);
 
+	widget.olMap = olMap;
 	widget.map = olMap.map();
 
 	options.widgetMap = widget.map;

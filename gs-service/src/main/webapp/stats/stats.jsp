@@ -256,20 +256,53 @@ if (sourceId == null || sourceId.isEmpty()) {
 	if (stats != null) {
     out.println("<ul>");
     out.println("<li><b># Platforms:</b> " + stats.getSiteCount() + "</li>");
-    out.println("<li><b># Variables:</b> " + stats.getAttributeCount() + "</li>");
-    out.println("<li><b># Unique Variables:</b> " + stats.getUniqueAttributeCount() + "</li>");
-    out.println("<li><b># Timeseries:</b> " + stats.getTimeSeriesCount() + "</li>");
-    out.println("<li><b>Begin:</b> " + stats.getBegin() + "</li>");
-    out.println("<li><b>End:</b> " + stats.getEnd() + "</li>");
-    out.println("<li><b>BBOX (W,S,E,N):</b> " + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", "
-		    + stats.getNorth() + "</li>");
+    out.println("<li><b># Observed properties:</b> " + stats.getAttributeCount() + "</li>");
+    out.println("<li><b># Datasets:</b> " + stats.getTimeSeriesCount() + "</li>");
+    out.println("<li><b>Begin temporal extent:</b> " + stats.getBegin() + "</li>");
+    out.println("<li><b>End temporal extent:</b> " + stats.getEnd() + "</li>");
+    out.println("<li><b>Bounding box (W,S,E,N):</b> " + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", " + stats.getNorth() + "</li>");
     out.println("<li><b>Altitude (min/max):</b> " + stats.getMinimumAltitude() + " / " + stats.getMaximumAltitude() + "</li>");
     out.println("</ul>");
+    // Add OpenLayers map focused on the bounding box
+    out.println("<div id='provider-map' style='width: 100%; max-width: 600px; height: 320px; margin: 24px auto 32px auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'></div>");
+    out.println("<link rel='stylesheet' href='../giapi/ol/ol.css'>");
+    out.println("<script src='../giapi/ol/ol.js'></script>");
+    out.println("<script>\n" +
+        "document.addEventListener('DOMContentLoaded', function() {\n" +
+        "  if (!window.ol) {\n" +
+        "    alert('OpenLayers failed to load.');\n" +
+        "    return;\n" +
+        "  }\n" +
+        "  var bbox = [" + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", " + stats.getNorth() + "];\n" +
+        "  var center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];\n" +
+        "  var map = new ol.Map({\n" +
+        "    target: 'provider-map',\n" +
+        "    layers: [\n" +
+        "      new ol.layer.Tile({\n" +
+        "        source: new ol.source.OSM()\n" +
+        "      })\n" +
+        "    ],\n" +
+        "    view: new ol.View({\n" +
+        "      center: ol.proj.fromLonLat(center),\n" +
+        "      zoom: 6\n" +
+        "    })\n" +
+        "  });\n" +
+        "  var extent = ol.proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');\n" +
+        "  map.getView().fit(extent, { padding: [20, 20, 20, 20], maxZoom: 12 });\n" +
+        "  var marker = new ol.Feature({ geometry: new ol.geom.Point(ol.proj.fromLonLat(center)) });\n" +
+        "  var vectorSource = new ol.source.Vector({ features: [marker] });\n" +
+        "  var markerStyle = new ol.style.Style({\n" +
+        "    image: new ol.style.Circle({ radius: 7, fill: new ol.style.Fill({ color: '#005aef' }), stroke: new ol.style.Stroke({ color: '#fff', width: 2 }) })\n" +
+        "  });\n" +
+        "  var markerLayer = new ol.layer.Vector({ source: vectorSource, style: markerStyle });\n" +
+        "  map.addLayer(markerLayer);\n" +
+        "});\n" +
+        "</script>");
 	} else {
     out.println("<p>No statistics available for this provider.</p>");
 	}
 	
-	out.println("<h1>Sample stations</h1>");
+	out.println("<h1>Sample platforms</h1>");
 	out.println("<table>");
 	out.println("<tr><th>Monitoring point</th><th>Latitude</th><th>Longitude</th><th>Elevation</th></tr>");
     }

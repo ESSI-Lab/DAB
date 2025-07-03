@@ -305,7 +305,6 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 	};
 
 	var fitMapToBounds = function() {
-
 		options.olMap.fitBounds(inControl.where());
 	};
 

@@ -1645,18 +1645,22 @@ export function initializePortal(config) {
 	window.GIAPI.zoomToBoundingBox = function(bbox) {
 		var mapWidget = GIAPI.search && GIAPI.search.resultsMapWidget;
 		var olMap = null;
-		debugger
 		if (mapWidget) {
-			if (mapWidget.mapWidget && mapWidget.mapWidget.options && mapWidget.mapWidget.options.olMap) {
-				olMap = mapWidget.mapWidget.options.olMap;
-			} else if (mapWidget.options && mapWidget.options.olMap) {
-				olMap = mapWidget.options.olMap;
-			} else if (mapWidget.olMap) {
+			if (mapWidget.olMap) {
 				olMap = mapWidget.olMap;
-			}
+			} 
 		}
 		if (olMap && typeof olMap.fitBounds === 'function') {
-			olMap.fitBounds(bbox);
+			
+			
+		var minlatLon = ol.proj.transform([bbox.west, bbox.south], 'EPSG:4326', 'EPSG:3857');
+		var maxlatLon = ol.proj.transform([bbox.east, bbox.north], 'EPSG:4326', 'EPSG:3857');
+
+		
+
+		var tbbox = { 'south': minlatLon[1], 'west': minlatLon[0], 'north': maxlatLon[1], 'east': maxlatLon[0] };
+			
+			   olMap.fitBounds(tbbox);
 		} else {
 			alert('Map zoom function not available.');
 		}
