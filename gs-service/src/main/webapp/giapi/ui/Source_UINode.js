@@ -31,8 +31,19 @@ GIAPI.Source_UINode = function(source, id) {
 	//	
 	mainDiv += '<tr>';
 	mainDiv += '<td colspan=2>';
-	mainDiv += '<div style="margin-top:2px; font-size: 11px"><label>Service URL: </label>';
-	mainDiv += '<a target="_blank" class="dont-break-out common-ui-node-report-content-table-right" style="color:blue;text-decoration: none;" href="' + report.online[0].url + '">' + report.online[0].url + '</a>';
+	mainDiv += '<div style="margin-top:2px; font-size: 11px">';
+	// Add Provider Page link first
+
+	var providerId = report.id ? report.id : source.uiId;
+	var view = (typeof config !== 'undefined' && config.view) ? config.view : '';
+	var providerPageUrl = '/gs-service/stats/stats.jsp?view='+view+'&source=' + encodeURIComponent(providerId);
+	mainDiv += '<a target="_blank" style="color:blue;text-decoration: none;" href="' + providerPageUrl + '">Provider Page</a>';
+	mainDiv += ' &nbsp;|&nbsp; ';
+	mainDiv += '<a href="#" id="zoom-to-area-' + id + '">Zoom to Area</a>';
+	mainDiv += ' &nbsp;|&nbsp; ';
+	mainDiv += '<a target="_blank" class="dont-break-out common-ui-node-report-content-table-right" style="color:blue;text-decoration: none;" href="' + report.online[0].url + '">Service URL</a>';
+	mainDiv += ' <button id="copy-service-url-' + id + '" title="Copy Service URL" style="border:none;background:transparent;cursor:pointer;padding:0 4px;vertical-align:middle;"><i class="fa fa-copy"></i></button>';
+	mainDiv += '</div>';
 	mainDiv += '</td>';
 	mainDiv += '</tr>';
 
@@ -117,6 +128,53 @@ GIAPI.Source_UINode = function(source, id) {
 
 		return mainDiv;
 	};
+
+	// After jQuery('#' + id).append(mainDiv);
+	jQuery(document).on('click', '#copy-service-url-' + id, function() {
+		const url = report.online[0].url;
+		if (navigator.clipboard) {
+			navigator.clipboard.writeText(url).then(function() {
+				const btn = jQuery('#copy-service-url-' + id + '');
+				const originalTitle = btn.attr('title');
+				btn.attr('title', 'Copied!');
+				btn.find('i').removeClass('fa-copy').addClass('fa-check');
+				setTimeout(function() {
+					btn.attr('title', originalTitle);
+					btn.find('i').removeClass('fa-check').addClass('fa-copy');
+				}, 1500);
+			});
+		} else {
+			// fallback for older browsers
+			const tempInput = $('<input>');
+			$('body').append(tempInput);
+			tempInput.val(url).select();
+			document.execCommand('copy');
+			tempInput.remove();
+			const btn = jQuery('#copy-service-url-' + id + '');
+			const originalTitle = btn.attr('title');
+			btn.attr('title', 'Copied!');
+			btn.find('i').removeClass('fa-copy').addClass('fa-check');
+			setTimeout(function() {
+				btn.attr('title', originalTitle);
+				btn.find('i').removeClass('fa-check').addClass('fa-copy');
+			}, 1500);
+		}
+	});
+
+	jQuery(document).on('click', '#zoom-to-area-' + id, function(e) {
+		e.preventDefault();
+		var bboxUrl = '/gs-service/stats/bbox.jsp?view=' + encodeURIComponent(view) + '&source=' + encodeURIComponent(providerId);
+		fetch(bboxUrl)
+			.then(function(response) { return response.json(); })
+			.then(function(bbox) {
+				
+				// bbox should be {west, south, east, north}
+					window.GIAPI.zoomToBoundingBox(bbox);
+			})
+			.catch(function() {
+				alert('Could not retrieve bounding box for this provider.');
+			});
+	});
 
 	return widget;
 

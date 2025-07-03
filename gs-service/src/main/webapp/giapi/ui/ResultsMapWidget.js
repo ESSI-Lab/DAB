@@ -157,7 +157,6 @@ import { GIAPI } from '../core/GIAPI.js';
  * @param {Boolean} [options.layersControlHeight=100]
  * @param {Boolean} [options.layersControlOpacity=0.8]
  * 
- * @param {String} [options.wmsEndpoint]
  * @param {String} [options.wmsVersion='1.3.0']
  * 
  * @param {Boolean} [options.clusterWMS=false]
@@ -426,6 +425,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 	var createWMSCLusterLayer = function(options, constraints) {
 
+
 		if (!constraints) {
 			constraints = {};
 		}
@@ -541,7 +541,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		var servicePath = options.dabNode.servicePath();
 
-		if (options.wmsEndpoint !== undefined) {
+		if (options.clusterWMS !== undefined && options.clusterWMS) {
 			var url = endpoint + servicePath + '/token/' + options.clusterWMSToken + '/view/' + options.clusterWMSView + '/wms-cluster?' + query;
 
 			var online = {
@@ -604,20 +604,24 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	 */
 	widget.updateWMSClusterLayers = function(constraints) {
 
-		options.availability = false;
-		options.visible = true;
-		var layerArray = createWMSCLusterLayer(options, constraints);
-		options.availability = true;
-		options.visible = false;
-		var layerArray2 = createWMSCLusterLayer(options, constraints);
 
-		olMap.removeLayers(layerArray);
-		olMap.addLayers(layerArray);
+		if (config.clusterWMS!==undefined && config.clusterWMS){
 
-		olMap.removeLayers(layerArray2);
-		olMap.addLayers(layerArray2);
-
-		layerSwitcher.renderPanel();
+			options.availability = false;
+			options.visible = true;
+			var layerArray = createWMSCLusterLayer(options, constraints);
+			options.availability = true;
+			options.visible = false;
+			var layerArray2 = createWMSCLusterLayer(options, constraints);
+	
+			olMap.removeLayers(layerArray);
+			olMap.addLayers(layerArray);
+	
+			olMap.removeLayers(layerArray2);
+			olMap.addLayers(layerArray2);
+	
+			layerSwitcher.renderPanel();
+		}
 
 	}
 

@@ -239,9 +239,8 @@ GIAPI.TermFrequency = function(dabNode, cnstr, options, onStatus, onResponse, te
 
 		dabNode.discover(_onResponse, tf._cnstr, options, onStatus);
 		tf._cnstr.sources = tf._cnstr.source;
-		
-		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(tf._cnstr);
 
+		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(tf._cnstr);
 
 	};
 
