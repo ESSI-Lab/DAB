@@ -18,15 +18,15 @@
 			<artifactId>s3-transfer-manager</artifactId>
 		</dependency>
 		<dependency>
-  <groupId>software.amazon.awssdk</groupId>
-  <artifactId>auth</artifactId>
-  <version>${aws-java-sdk-bom.version}</version>
-</dependency>
-<dependency>
-  <groupId>software.amazon.awssdk</groupId>
-  <artifactId>apache-client</artifactId>
-  <version>${aws-java-sdk-bom.version}</version>
-</dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>auth</artifactId>
+			<version>${aws-java-sdk-bom.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>apache-client</artifactId>
+			<version>${aws-java-sdk-bom.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>software.amazon.awssdk.crt</groupId>

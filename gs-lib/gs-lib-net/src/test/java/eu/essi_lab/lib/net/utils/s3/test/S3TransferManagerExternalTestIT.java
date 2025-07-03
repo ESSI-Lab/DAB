@@ -514,18 +514,21 @@ public class S3TransferManagerExternalTestIT {
 
 	String accessKey = System.getProperty("accessKey");
 	String secretKey = System.getProperty("secretKey");
+	String endpoint = System.getProperty("endpoint");
 
 	GSLoggerFactory.getLogger(getClass()).info("Access key: "+accessKey);
 	GSLoggerFactory.getLogger(getClass()).info("Secret key: "+secretKey);
+	GSLoggerFactory.getLogger(getClass()).info("Endpoint: "+endpoint);
 
 	S3TransferWrapper manager = new S3TransferWrapper();
 	manager.setAccessKey(accessKey);
 	manager.setSecretKey(secretKey);
-
+	if (endpoint!=null && !endpoint.isEmpty()) {
+	    manager.setEndpoint(endpoint);
+	}
+	
 	Assert.assertEquals(accessKey, manager.getAccessKey());
 	Assert.assertEquals(secretKey, manager.getSecretKey());
-
-	Assert.assertFalse(manager.getEndpoint().isPresent());
 
 	return manager;
     }

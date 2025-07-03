@@ -568,7 +568,6 @@
 				<artifactId>s3-transfer-manager</artifactId>
 				<version>${aws-java-sdk-bom.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>software.amazon.awssdk.crt</groupId>
 				<artifactId>aws-crt</artifactId>
