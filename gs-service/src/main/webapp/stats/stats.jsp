@@ -48,6 +48,7 @@
 <%@page import="eu.essi_lab.model.resource.MetadataElement"%>
 <%@page import="eu.essi_lab.pdk.wrt.WebRequestTransformer"%>
 <%
+String token = request.getParameter("token");
 String viewId = request.getParameter("view");
 String sourceId = request.getParameter("source");
 if (viewId == null || viewId.isEmpty()) {
@@ -203,7 +204,7 @@ if (sourceId == null || sourceId.isEmpty()) {
     DiscoveryMessage discoveryMessage = new DiscoveryMessage();
     List<SimpleEntry<Queryable, SortOrder>> array = new ArrayList<>();
     // 	    array.add(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING));
-    array.add(new SimpleEntry(MetadataElement.PLATFORM_TITLE_EL_NAME, SortOrder.ASCENDING));
+    array.add(new SimpleEntry(MetadataElement.PLATFORM_TITLE, SortOrder.ASCENDING));
 
     discoveryMessage.setSortedFields(new SortedFields(array));
 
@@ -215,6 +216,7 @@ if (sourceId == null || sourceId.isEmpty()) {
     StorageInfo uri = ConfigurationWrapper.getStorageInfo();
     discoveryMessage.setDataBaseURI(uri);
     WebRequestTransformer.setView(view.getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
+    discoveryMessage.setUserBond(BondFactory.createSourceIdentifierBond(sourceId));
     discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
     ResultSet<GSResource> resultSet = discExecutor.retrieve(discoveryMessage);
     List<GSResource> resources = resultSet.getResultsList();
@@ -292,7 +294,15 @@ if (sourceId == null || sourceId.isEmpty()) {
     out.println("    target: 'provider-map',");
     out.println("    layers: [");
     out.println("      new ol.layer.Tile({");
-    out.println("        source: new ol.source.OSM()");
+    out.println("        source: new ol.source.OSM()") ;
+    out.println("      }),");
+    // Add WMS layer for stations (template, please update URL and LAYERS as needed)
+    out.println("      new ol.layer.Tile({");
+    out.println("        source: new ol.source.TileWMS({");
+    out.println("          url: '/gs-service/services/essi/token/"+token+"/view/"+viewId+"/wms-cluster?sources="+sourceId+"&',");
+    out.println("          params: { LAYERS: '"+viewId+"', TILED: true }, ");
+    out.println("          transition: 0");
+    out.println("        })");
     out.println("      })");
     out.println("    ],");
     out.println("    view: new ol.View({");

@@ -36,7 +36,7 @@ GIAPI.Source_UINode = function(source, id) {
 
 	var providerId = report.id ? report.id : source.uiId;
 	var view = (typeof config !== 'undefined' && config.view) ? config.view : '';
-	var providerPageUrl = '/gs-service/stats/stats.jsp?view='+view+'&source=' + encodeURIComponent(providerId);
+	var providerPageUrl = '/gs-service/stats/stats.jsp?view='+view+'&source=' + encodeURIComponent(providerId)+'&token='+config.token;
 	mainDiv += '<a target="_blank" style="color:blue;text-decoration: none;" href="' + providerPageUrl + '">Provider Page</a>';
 	mainDiv += ' &nbsp;|&nbsp; ';
 	mainDiv += '<a href="#" id="zoom-to-area-' + id + '">Zoom to Area</a>';

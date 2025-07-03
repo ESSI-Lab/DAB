@@ -53,7 +53,6 @@ import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
-import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.om.OMRequest.APIParameters;
 
 public class PropertiesHandler extends StreamingRequestHandler {
