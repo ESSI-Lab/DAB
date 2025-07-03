@@ -96,7 +96,10 @@ List<Queryable> maxArray = new ArrayList<>();
 maxArray.add(MetadataElement.ELEVATION_MAX);
 statisticsMessage.computeMax(maxArray);
 statisticsMessage.computeTempExtentUnion();
-
+List<Queryable> freqs = new ArrayList<>();
+freqs.add(MetadataElement.ORGANISATION_NAME);
+freqs.add(MetadataElement.ATTRIBUTE_TITLE);
+statisticsMessage.computeFrequency(freqs,1000);
 List<Queryable> distArray = new ArrayList<>();
 distArray.add(MetadataElement.ATTRIBUTE_TITLE);
 distArray.add(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
@@ -115,6 +118,18 @@ List<ResponseItem> items = statResponse.getItems();
 HashMap<String, Stats> smap = new HashMap<>();
 for (ResponseItem responseItem : items) {
     Stats stats = new Stats();
+    Optional<ComputationResult> orgFreq = responseItem.getFrequency(MetadataElement.ORGANISATION_NAME);
+    if (orgFreq.isPresent()) {
+	ComputationResult of = orgFreq.get();
+	List<TermFrequencyItem> fitems = of.getFrequencyItems();
+	stats.addFrequencyResult(MetadataElement.ORGANISATION_NAME, fitems);
+    }
+    Optional<ComputationResult> propFreq = responseItem.getFrequency(MetadataElement.ATTRIBUTE_TITLE);
+    if (propFreq.isPresent()) {
+	ComputationResult of = propFreq.get();
+	List<TermFrequencyItem> fitems = of.getFrequencyItems();
+	stats.addFrequencyResult(MetadataElement.ATTRIBUTE_TITLE, fitems);
+    }
     stats.setSiteCount(responseItem.getCountDistinct(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER).get().getValue());
     stats.setUniqueAttributeCount(responseItem.getCountDistinct(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER).get().getValue());
     stats.setAttributeCount(responseItem.getCountDistinct(MetadataElement.ATTRIBUTE_TITLE).get().getValue());
@@ -147,63 +162,20 @@ if (format != null && format.equals("CSV")) {
 if (!csv) {
     response.setContentType("text/html");
     out.println("<html><head><title>Data provider information</title>");
-    out.println("<style>\n"
-        + "body {\n"
-        + "    font-family: 'Segoe UI', Arial, sans-serif;\n"
-        + "    background: #f8f9fa;\n"
-        + "    color: #222;\n"
-        + "    margin: 0;\n"
-        + "    padding: 0 0 40px 0;\n"
-        + "}\n"
-        + "h1, h2 {\n"
-        + "    color: #005aef;\n"
-        + "    margin-top: 30px;\n"
-        + "}\n"
-        + "ul {\n"
-        + "    background: #fff;\n"
-        + "    border-radius: 6px;\n"
-        + "    box-shadow: 0 2px 8px rgba(0,0,0,0.04);\n"
-        + "    padding: 18px 28px 18px 28px;\n"
-        + "    margin-bottom: 30px;\n"
-        + "    max-width: 500px;\n"
-        + "}\n"
-        + "ul li {\n"
-        + "    margin-bottom: 8px;\n"
-        + "    font-size: 1.08em;\n"
-        + "}\n"
-        + "table {\n"
-        + "    border-collapse: collapse;\n"
-        + "    background: #fff;\n"
-        + "    margin-top: 18px;\n"
-        + "    margin-bottom: 30px;\n"
-        + "    box-shadow: 0 2px 8px rgba(0,0,0,0.04);\n"
-        + "    border-radius: 6px;\n"
-        + "    overflow: hidden;\n"
-        + "    min-width: 400px;\n"
-        + "}\n"
-        + "th, td {\n"
-        + "    border: 1px solid #e0e0e0;\n"
-        + "    padding: 10px 16px;\n"
-        + "    text-align: left;\n"
-        + "}\n"
-        + "th {\n"
-        + "    background: #005aef;\n"
-        + "    color: #fff;\n"
-        + "    font-weight: 600;\n"
-        + "}\n"
-        + "tr:nth-child(even) td {\n"
-        + "    background: #f3f6fa;\n"
-        + "}\n"
-        + "a {\n"
-        + "    color: #005aef;\n"
-        + "    text-decoration: none;\n"
-        + "}\n"
-        + "a:hover {\n"
-        + "    text-decoration: underline;\n"
-        + "}\n"
-        + "</style>");
+    out.println("<style>\n" + "body {\n" + "    font-family: 'Segoe UI', Arial, sans-serif;\n" + "    background: #f8f9fa;\n"
+    + "    color: #222;\n" + "    margin: 0;\n" + "    padding: 0 0 40px 0;\n" + "}\n" + "h1, h2 {\n" + "    color: #005aef;\n"
+    + "    margin-top: 30px;\n" + "}\n" + "ul {\n" + "    background: #fff;\n" + "    border-radius: 6px;\n"
+    + "    box-shadow: 0 2px 8px rgba(0,0,0,0.04);\n" + "    padding: 18px 28px 18px 28px;\n" + "    margin-bottom: 30px;\n"
+
+    + "}\n" + "ul li {\n" + "    margin-bottom: 8px;\n" + "    font-size: 1.08em;\n" + "}\n" + "table {\n"
+    + "    border-collapse: collapse;\n" + "    background: #fff;\n" + "    margin-top: 18px;\n" + "    margin-bottom: 30px;\n"
+    + "    box-shadow: 0 2px 8px rgba(0,0,0,0.04);\n" + "    border-radius: 6px;\n" + "    overflow: hidden;\n"
+    + "    min-width: 400px;\n" + "}\n" + "th, td {\n" + "    border: 1px solid #e0e0e0;\n" + "    padding: 10px 16px;\n"
+    + "    text-align: left;\n" + "}\n" + "th {\n" + "    background: #005aef;\n" + "    color: #fff;\n" + "    font-weight: 600;\n"
+    + "}\n" + "tr:nth-child(even) td {\n" + "    background: #f3f6fa;\n" + "}\n" + "a {\n" + "    color: #005aef;\n"
+    + "    text-decoration: none;\n" + "}\n" + "a:hover {\n" + "    text-decoration: underline;\n" + "}\n" + "</style>");
     out.println("</head><body>");
-    out.println("<div style='max-width: 900px; margin: 0 auto;'>");
+    out.println("<div style='max-width: 60%; margin: 0 auto;'>");
     out.println("<h1>Data Provider Information</h1>");
 }
 
@@ -252,56 +224,94 @@ if (sourceId == null || sourceId.isEmpty()) {
     } else {
 	out.println("<h1>" + source.getLabel() + "</h1>");
 	Stats stats = smap.get(sourceId);
-	out.println("<h2>Provider statistics</h2>");
+
 	if (stats != null) {
+    // Start a container for stats and map
+
+    out.println("<div >");
+    out.println("<h2>Provider statistics</h2>");
+    out.println(
+		    "<table style='width: 100%; max-width: 100%; margin-bottom: 30px; border-collapse: separate; border-spacing: 0; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 6px; overflow: hidden;'>");
+    out.println("<tr>");
+    out.println("<td style='vertical-align: top; padding: 18px 28px 18px 28px; width: 50%;'>");
     out.println("<ul>");
     out.println("<li><b># Platforms:</b> " + stats.getSiteCount() + "</li>");
     out.println("<li><b># Observed properties:</b> " + stats.getAttributeCount() + "</li>");
     out.println("<li><b># Datasets:</b> " + stats.getTimeSeriesCount() + "</li>");
-    out.println("<li><b>Begin temporal extent:</b> " + stats.getBegin() + "</li>");
-    out.println("<li><b>End temporal extent:</b> " + stats.getEnd() + "</li>");
-    out.println("<li><b>Bounding box (W,S,E,N):</b> " + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", " + stats.getNorth() + "</li>");
+    out.println("<li><b>Minimum temporal extent:</b> " + stats.getBegin() + "</li>");
+    out.println("<li><b>Maximum temporal extent:</b> " + stats.getEnd() + "</li>");
+    out.println("<li><b>Bounding box (W,S,E,N):</b> " + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", "
+		    + stats.getNorth() + "</li>");
     out.println("<li><b>Altitude (min/max):</b> " + stats.getMinimumAltitude() + " / " + stats.getMaximumAltitude() + "</li>");
+    
+    // Add organizations
+    List<TermFrequencyItem> orgs = stats.getFrequencyResult(MetadataElement.ORGANISATION_NAME);
+    if (orgs != null && !orgs.isEmpty()) {
+        StringBuilder orgList = new StringBuilder();
+        orgList.append("<ul>");
+        for (int i = 0; i < orgs.size(); i++) {
+            TermFrequencyItem item = orgs.get(i);
+            orgList.append("<li>"+item.getTerm() + " (" + item.getFreq() + ")</li>");
+            
+        }
+        orgList.append("</ul>");
+        out.println("<li><b>Involved organizations:</b> " + orgList.toString() + "</li>");
+    }
+
+    // Add observed properties
+    List<TermFrequencyItem> props = stats.getFrequencyResult(MetadataElement.ATTRIBUTE_TITLE);
+    if (props != null && !props.isEmpty()) {
+        StringBuilder propList = new StringBuilder();
+        propList.append("<ul>");
+        for (int i = 0; i < props.size(); i++) {
+            TermFrequencyItem item = props.get(i);
+            propList.append("<li>"+item.getTerm() + " (" + item.getFreq() + ")</li>");      
+        }
+        propList.append("</ul>");
+        out.println("<li><b>Observed properties:</b> " + propList.toString() + "</li>");
+    }
+    
     out.println("</ul>");
-    // Add OpenLayers map focused on the bounding box
-    out.println("<div id='provider-map' style='width: 100%; max-width: 600px; height: 320px; margin: 24px auto 32px auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'></div>");
+    out.println("</td>");
+    out.println("<td style='vertical-align: top; padding: 18px 28px 18px 28px; width: 50%;'>");
     out.println("<link rel='stylesheet' href='../giapi/ol/ol.css'>");
     out.println("<script src='../giapi/ol/ol.js'></script>");
-    out.println("<script>\n" +
-        "document.addEventListener('DOMContentLoaded', function() {\n" +
-        "  if (!window.ol) {\n" +
-        "    alert('OpenLayers failed to load.');\n" +
-        "    return;\n" +
-        "  }\n" +
-        "  var bbox = [" + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", " + stats.getNorth() + "];\n" +
-        "  var center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];\n" +
-        "  var map = new ol.Map({\n" +
-        "    target: 'provider-map',\n" +
-        "    layers: [\n" +
-        "      new ol.layer.Tile({\n" +
-        "        source: new ol.source.OSM()\n" +
-        "      })\n" +
-        "    ],\n" +
-        "    view: new ol.View({\n" +
-        "      center: ol.proj.fromLonLat(center),\n" +
-        "      zoom: 6\n" +
-        "    })\n" +
-        "  });\n" +
-        "  var extent = ol.proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');\n" +
-        "  map.getView().fit(extent, { padding: [20, 20, 20, 20], maxZoom: 12 });\n" +
-        "  var marker = new ol.Feature({ geometry: new ol.geom.Point(ol.proj.fromLonLat(center)) });\n" +
-        "  var vectorSource = new ol.source.Vector({ features: [marker] });\n" +
-        "  var markerStyle = new ol.style.Style({\n" +
-        "    image: new ol.style.Circle({ radius: 7, fill: new ol.style.Fill({ color: '#005aef' }), stroke: new ol.style.Stroke({ color: '#fff', width: 2 }) })\n" +
-        "  });\n" +
-        "  var markerLayer = new ol.layer.Vector({ source: vectorSource, style: markerStyle });\n" +
-        "  map.addLayer(markerLayer);\n" +
-        "});\n" +
-        "</script>");
+    out.println("<div id='provider-map' style='width: 100%; height: 320px;'></div>");
+    out.println(
+		    "<div style='font-size: 0.95em; color: #666; margin: 4px 0 16px 4px;'>© <a href='https://www.openstreetmap.org/copyright' target='_blank' style='color: #666; text-decoration: underline;'>OpenStreetMap contributors</a></div>");
+    out.println("<script>");
+    out.println("document.addEventListener('DOMContentLoaded', function() {");
+    out.println("  if (!window.ol) {");
+    out.println("    alert('OpenLayers failed to load.');");
+    out.println("    return;");
+    out.println("  }");
+    out.println(
+		    "  var bbox = [" + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", " + stats.getNorth() + "];");
+    out.println("  var center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];");
+    out.println("  var map = new ol.Map({");
+    out.println("    target: 'provider-map',");
+    out.println("    layers: [");
+    out.println("      new ol.layer.Tile({");
+    out.println("        source: new ol.source.OSM()");
+    out.println("      })");
+    out.println("    ],");
+    out.println("    view: new ol.View({");
+    out.println("      center: ol.proj.fromLonLat(center),");
+    out.println("      zoom: 6");
+    out.println("    }),");
+    out.println("    controls: []");
+    out.println("  });");
+    out.println("  var extent = ol.proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');");
+    out.println("  map.getView().fit(extent, { padding: [20, 20, 20, 20], maxZoom: 12 });");
+
+    out.println("});");
+    out.println("</script>");
+    out.println("</td>");
+    out.println("</tr></table>");
 	} else {
     out.println("<p>No statistics available for this provider.</p>");
 	}
-	
+
 	out.println("<h1>Sample platforms</h1>");
 	out.println("<table>");
 	out.println("<tr><th>Monitoring point</th><th>Latitude</th><th>Longitude</th><th>Elevation</th></tr>");

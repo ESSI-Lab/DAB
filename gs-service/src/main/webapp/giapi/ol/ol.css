@@ -1,0 +1,18 @@
+/* Remove padding/margin from OpenLayers controls */
+.ol-control {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure it's positioned absolutely at the corner */
+.ol-attribution {
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  top: auto !important;
+  left: auto !important;
+
+ 
+  font-size: 11px;
+  z-index: 1000;
+}
