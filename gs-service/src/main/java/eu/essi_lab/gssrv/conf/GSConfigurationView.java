@@ -113,7 +113,7 @@ public class GSConfigurationView extends ConfigurationView {
 	setHeaderImageUrl("https://raw.githubusercontent.com/ESSI-Lab/DAB/main/DAB.png", 44);
 
 	getHeaderImage().getStyle().set("margin-top", "15px");
-	
+
 	// removeDrawerToggle();
 
 	if (!tabAlreadyOpen) {
@@ -260,7 +260,8 @@ public class GSConfigurationView extends ConfigurationView {
 
 	if (keyValueOption.isPresent()) {
 
-	    String multipleTabs = keyValueOption.get().getOrDefault(KeyValueOptionKeys.MULTIPLE_CONFIGURATION_TABS.getLabel(), "false").toString();
+	    String multipleTabs = keyValueOption.get().getOrDefault(KeyValueOptionKeys.MULTIPLE_CONFIGURATION_TABS.getLabel(), "false")
+		    .toString();
 	    return Boolean.parseBoolean(multipleTabs);
 	}
 
@@ -514,8 +515,10 @@ public class GSConfigurationView extends ConfigurationView {
 
 	return Arrays.asList(//
 		new DistributionSettingComponentInfo(), //
-		new HarvestingSettingComponentInfo(),//
-		new AboutComponentInfo());
+		new HarvestingSettingComponentInfo(), //
+		new SourcesInspectionComponentInfo(), //
+		new AboutComponentInfo() //
+	);
     }
 
     /**

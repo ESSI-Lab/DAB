@@ -29,76 +29,81 @@ public enum TabIndex {
     /**
      * 
      */
-    PROFILER_SETTING(2),
-    /**
-     * 
-     */
-    DISTRIBUTION_SETTING(1),
-    /**
-     * 
-     */
     HARVESTING_SETTING(0),
-    /**
+    /***
      * 
      */
-    DATABASE_SETTING(3),
-    /**
-     * 
-     */
-    SCHEDULER_VIEW_SETTING(4),
-    /**
-     * 
-     */
-    AUGMENTER_WORKER_SETTING(5),
-    /**
-     * 
-     */
-    DRIVER_SETTING(6),
-    /**
-     * 
-     */
-    OAUTH_SETTING(7),
-    /**
-     * 
-     */
-    CREDENTIALS_SETTING(8),
-    /**
-     * 
-     */
-    DOWNLOAD_SETTING(9),
-    /**
-     * 
-     */
-    SOURCE_STORAGE_SETTING(10),
+    SOURCES_INSPECTION(1),
 
     /**
      * 
      */
-    SOURCE_PRIORITY_SETTING(11),
+    DISTRIBUTION_SETTING(2),
+   /**
+     * 
+     */
+    PROFILER_SETTING(3),
+     /**
+     * 
+     */
+    DATABASE_SETTING(4),
     /**
      * 
      */
-    GDC_SOURCES_SETTING(12),
+    SCHEDULER_VIEW_SETTING(5),
     /**
      * 
      */
-    CUSTOM_TASKS_SETTING(13),
+    AUGMENTER_WORKER_SETTING(6),
     /**
      * 
      */
-    DATA_CACHE_CONNECTOR_SETTING(14),
+    DRIVER_SETTING(7),
     /**
      * 
      */
-    RATE_LIMITER_SETTING(15),
+    OAUTH_SETTING(8),
     /**
      * 
      */
-    SYSTEM_SETTING(16),
+    CREDENTIALS_SETTING(9),
     /**
      * 
      */
-    ABOUT(17);
+    DOWNLOAD_SETTING(10),
+    /**
+     * 
+     */
+    SOURCE_STORAGE_SETTING(11),
+
+    /**
+     * 
+     */
+    SOURCE_PRIORITY_SETTING(12),
+    /**
+     * 
+     */
+    GDC_SOURCES_SETTING(13),
+    /**
+     * 
+     */
+    CUSTOM_TASKS_SETTING(14),
+    /**
+     * 
+     */
+    DATA_CACHE_CONNECTOR_SETTING(15),
+    /**
+     * 
+     */
+    RATE_LIMITER_SETTING(16),
+    /**
+     * 
+     */
+    SYSTEM_SETTING(17),
+    /**
+     * 
+     */
+    ABOUT(18);
 
     private int index;
 
