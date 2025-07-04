@@ -68,8 +68,8 @@ public class StringUtils {
 	decimalFormat.setMaximumFractionDigits(3);
 
 	DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-	symbols.setGroupingSeparator(','); // grouping separator is , for English countries
-	symbols.setDecimalSeparator('.'); // decimal separator is . for English countries
+	symbols.setGroupingSeparator('.'); // grouping separator is , for English countries
+	symbols.setDecimalSeparator(','); // decimal separator is . for English countries
 	decimalFormat.setDecimalFormatSymbols(symbols);
 
 	return decimalFormat.format(value);
