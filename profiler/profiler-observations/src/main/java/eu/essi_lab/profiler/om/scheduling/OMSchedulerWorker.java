@@ -30,7 +30,6 @@ import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import org.h2.util.StringUtils;
 import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 
@@ -55,6 +54,10 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
     static final String CONFIGURABLE_TYPE = "OMSchedulerWorker";
 
+    public enum DownloadStatus {
+	STARTED, CANCELED, ENDED
+    }
+
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
@@ -62,10 +65,10 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	String email = null;
 	if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
 	    email = getSetting().getEmail();
-	    OMDownloadReportsHandler.sendEmail("STARTED", setting, Optional.empty(), Optional.of(email));
+	    OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.of(email));
 	}
 
-	OMDownloadReportsHandler.sendEmail("STARTED", setting, Optional.empty(), Optional.empty());
+	OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty());
 
 	String requestURL = getSetting().getRequestURL();
 	String operationId = getSetting().getOperationId();
@@ -104,10 +107,10 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 		if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
 		    email = getSetting().getEmail();
-		    OMDownloadReportsHandler.sendEmail("CANCELED", setting, Optional.empty(), Optional.of(email));
+		    OMDownloadReportsHandler.sendEmail(DownloadStatus.CANCELED, setting, Optional.empty(), Optional.of(email));
 		}
-		
-		OMDownloadReportsHandler.sendEmail("CANCELED", setting, Optional.empty(), Optional.empty());
+
+		OMDownloadReportsHandler.sendEmail(DownloadStatus.CANCELED, setting, Optional.empty(), Optional.empty());
 
 	    } else {
 
@@ -131,10 +134,10 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 		if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
 		    email = getSetting().getEmail();
-		    OMDownloadReportsHandler.sendEmail("ENDED", setting, Optional.of(locator), Optional.of(email));
+		    OMDownloadReportsHandler.sendEmail(DownloadStatus.ENDED, setting, Optional.of(locator), Optional.of(email));
 		}
-		
-		OMDownloadReportsHandler.sendEmail("ENDED", setting, Optional.of(locator), Optional.empty());
+
+		OMDownloadReportsHandler.sendEmail(DownloadStatus.ENDED, setting, Optional.of(locator), Optional.empty());
 	    }
 	}
     }

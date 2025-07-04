@@ -514,6 +514,7 @@ function initializeLogin(config) {
 }
 
 export function initializePortal(config) {
+	window.config = config;
 	view = config.view;
 	token = config.token;
 	document.title = config.title;
@@ -708,7 +709,7 @@ export function initializePortal(config) {
 			'wmsEndpoint': config.wmsEndpoint,
 
 
-			'clusterWMS': (config.wmsEndpoint!==undefined),
+			'clusterWMS': (config.clusterWMS!==undefined),
 			'clusterWMSToken': token,
 			'clusterWMSView': view,
 			'clusterWMSLayerName': view,
@@ -1583,9 +1584,7 @@ export function initializePortal(config) {
 
 		constraints.ontology = config.ontology;
 
-		if (config.wmsEndpoint!==undefined){
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
-}
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
 
@@ -1641,9 +1640,31 @@ export function initializePortal(config) {
 		$('#hideMapInputControl').click();
 	}
 
+	// Expose a global function to zoom the map to a bounding box
+	if (!window.GIAPI) window.GIAPI = {};
+	window.GIAPI.zoomToBoundingBox = function(bbox) {
+		var mapWidget = GIAPI.search && GIAPI.search.resultsMapWidget;
+		var olMap = null;
+		if (mapWidget) {
+			if (mapWidget.olMap) {
+				olMap = mapWidget.olMap;
+			} 
+		}
+		if (olMap && typeof olMap.fitBounds === 'function') {
+			
+			
+		var minlatLon = ol.proj.transform([bbox.west, bbox.south], 'EPSG:4326', 'EPSG:3857');
+		var maxlatLon = ol.proj.transform([bbox.east, bbox.north], 'EPSG:4326', 'EPSG:3857');
 
+		
 
-
+		var tbbox = { 'south': minlatLon[1], 'west': minlatLon[0], 'north': maxlatLon[1], 'east': maxlatLon[0] };
+			
+			   olMap.fitBounds(tbbox);
+		} else {
+			alert('Map zoom function not available.');
+		}
+	};
 }
 
 

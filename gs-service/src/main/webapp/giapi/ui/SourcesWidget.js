@@ -157,7 +157,7 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
    }
 	
    var createTable = function(sources){
-					 	
+
 		var tableContent = '';
 
 		if (!options.groups) {

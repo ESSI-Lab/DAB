@@ -37,6 +37,7 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.jaxb.CardinalValues;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.request.executor.IStatisticsExecutor;
 
@@ -70,16 +71,14 @@ public class SourceStatistics {
 	}
 
 	// groups by source id
-	if (groupBy != null) {
-	    statisticsMessage.groupBy(groupBy);
-	}
+	    statisticsMessage.groupBy(ResourceProperty.SOURCE_ID);
 
 	// pagination works with grouped results. in this case there is one result item for each source.
 	// in order to be sure to get all the items in the same statistics response,
 	// we set the count equals to number of sources
 	Page page = new Page();
 	page.setStart(1);
-	page.setSize(1000);
+	page.setSize(100);
 
 	statisticsMessage.setPage(page);
 

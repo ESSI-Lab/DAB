@@ -23,6 +23,7 @@ package eu.essi_lab.lib.net.s3;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -40,6 +41,8 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.S3AsyncClientBuilder;
+import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.S3CrtAsyncClientBuilder;
 import software.amazon.awssdk.services.s3.S3Utilities;
 import software.amazon.awssdk.services.s3.model.Bucket;
@@ -439,17 +442,17 @@ public class S3TransferWrapper {
 	    return null;
 	}
     }
-    
+
     public HeadObjectResponse getObjectMetadata(String bucketName, String objectKey) {
-   	try {
-   	    initialize();
-   	    HeadObjectRequest headRequest = HeadObjectRequest.builder().bucket(bucketName).key(objectKey).build();
-   	    HeadObjectResponse response = client.headObject(headRequest).get();
-   	    return response;
-   	} catch (Exception e) {
-   	    return null;
-   	}
-       }
+	try {
+	    initialize();
+	    HeadObjectRequest headRequest = HeadObjectRequest.builder().bucket(bucketName).key(objectKey).build();
+	    HeadObjectResponse response = client.headObject(headRequest).get();
+	    return response;
+	} catch (Exception e) {
+	    return null;
+	}
+    }
 
     /**
      * @param bucketName
@@ -675,37 +678,63 @@ public class S3TransferWrapper {
 
 	String mySecretKey = getSecretKey();
 
+	StaticCredentialsProvider staticCredentials = null;
+
 	if (myAccessKey != null && mySecretKey != null) {
 	    awsCreds = AwsBasicCredentials.create(//
 		    myAccessKey, mySecretKey);
+
+	    if (awsCreds != null) {
+		GSLoggerFactory.getLogger(getClass()).debug("Creating credentials provider STARTED");
+
+		staticCredentials = StaticCredentialsProvider.create(awsCreds);
+
+		GSLoggerFactory.getLogger(getClass()).debug("Creating credentials provider ENDED");
+
+	    }
+
 	    GSLoggerFactory.getLogger(getClass()).debug("Creating AWS credentials ENDED");
 	} else {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Creating AWS credentials not needed");
 	}
 
-	S3CrtAsyncClientBuilder builder = S3AsyncClient.//
-		crtBuilder().//
-		region(Region.US_EAST_1).//
-		targetThroughputInGbps(20.0).//
-		minimumPartSizeInBytes(8L * 1048576l);
+	if (getEndpoint().isPresent()) {
+	    S3AsyncClientBuilder builder = S3AsyncClient.//
+		    builder().//
+		    region(Region.US_EAST_1);
+	    // options required in case of minio
+	    builder = builder.endpointOverride(URI.create(getEndpoint().get()))//
+		    .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build());
 
-	if (awsCreds != null) {
-	    GSLoggerFactory.getLogger(getClass()).debug("Creating credentials provider STARTED");
+	    if (staticCredentials != null) {
+		builder = builder.credentialsProvider(staticCredentials);
+	    }
 
-	    StaticCredentialsProvider staticCredentials = StaticCredentialsProvider.create(awsCreds);
+	    GSLoggerFactory.getLogger(getClass()).debug("Creating client STARTED");
 
-	    builder = builder.credentialsProvider(staticCredentials);
+	    S3AsyncClient s3AsyncClient = builder.build();
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Creating credentials provider ENDED");
+	    return s3AsyncClient;
 
+	} else {
+	    S3CrtAsyncClientBuilder builder = S3AsyncClient.//
+		    crtBuilder().//
+		    region(Region.US_EAST_1).//
+		    targetThroughputInGbps(20.0).//
+		    minimumPartSizeInBytes(8L * 1048576l);
+
+	    if (staticCredentials != null) {
+		builder = builder.credentialsProvider(staticCredentials);
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Creating client STARTED");
+
+	    S3AsyncClient s3AsyncClient = builder.build();
+
+	    return s3AsyncClient;
 	}
 
-	GSLoggerFactory.getLogger(getClass()).debug("Creating client STARTED");
-
-	S3AsyncClient s3AsyncClient = builder.build();
-
-	return s3AsyncClient;
     }
 
     public synchronized void initialize() {

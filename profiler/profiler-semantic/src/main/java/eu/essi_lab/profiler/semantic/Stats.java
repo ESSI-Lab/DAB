@@ -1,5 +1,11 @@
 package eu.essi_lab.profiler.semantic;
 
+import java.util.HashMap;
+import java.util.List;
+
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
+import eu.essi_lab.model.Queryable;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -24,52 +30,66 @@ package eu.essi_lab.profiler.semantic;
 public class Stats {
     private String siteCount;
 
+    private HashMap<Queryable, List<TermFrequencyItem>> frequencyStats = new HashMap<>();
+
+    private HashMap<Queryable, List<TermFrequencyItem>> getFrequencyStats() {
+	return frequencyStats;
+    }
+
+    public void addFrequencyResult(Queryable q, List<TermFrequencyItem> list) {
+	frequencyStats.put(q, list);
+    }
+
+    public List<TermFrequencyItem> getFrequencyResult(Queryable q) {
+	return frequencyStats.get(q);
+    }
+
     public void setSiteCount(String siteCount) {
-        this.siteCount = siteCount;
+	this.siteCount = siteCount;
     }
 
     public void setUniqueAttributeCount(String uniqueAttributeCount) {
-        this.uniqueAttributeCount = uniqueAttributeCount;
+	this.uniqueAttributeCount = uniqueAttributeCount;
     }
 
     public void setAttributeCount(String attributeCount) {
-        this.attributeCount = attributeCount;
+	this.attributeCount = attributeCount;
     }
 
     public void setTimeSeriesCount(String timeSeriesCount) {
-        this.timeSeriesCount = timeSeriesCount;
+	this.timeSeriesCount = timeSeriesCount;
     }
 
     public void setEast(double east) {
-        this.east = east;
+	this.east = east;
     }
 
     public void setNorth(double north) {
-        this.north = north;
+	this.north = north;
     }
 
     public void setWest(double west) {
-        this.west = west;
+	this.west = west;
     }
 
     public void setSouth(double south) {
-        this.south = south;
+	this.south = south;
     }
 
     public void setBegin(String begin) {
-        this.begin = begin;
+	this.begin = begin;
     }
 
     public void setEnd(String end) {
-        this.end = end;
+	this.end = end;
     }
-    
+
     public void setMinimumAltitude(String altitude) {
-        this.minimumAltitude= altitude;
+	this.minimumAltitude = altitude;
     }
 
     public void setMaximumAltitude(String altitude) {
-        this.maximumAltitude = altitude;
+	this.maximumAltitude = altitude;
     }
 
     public String getSiteCount() {
@@ -125,10 +145,10 @@ public class Stats {
     private String maximumAltitude;
 
     public String getMinimumAltitude() {
-        return minimumAltitude;
+	return minimumAltitude;
     }
 
     public String getMaximumAltitude() {
-        return maximumAltitude;
+	return maximumAltitude;
     }
 }
