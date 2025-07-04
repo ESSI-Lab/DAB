@@ -402,6 +402,12 @@ public class DABStarter {
 		systemSetting.enableAugmentationReportMail(false);
 		systemSetting.enableDownloadReportMail(false);
 
+		//
+		// enables multiple tabs
+		//
+
+		systemSetting.putKeyValue(SystemSetting.KeyValueOptionKeys.MULTIPLE_CONFIGURATION_TABS.getLabel(), "true");
+
 		SelectionUtils.deepClean(systemSetting);
 
 		boolean replaced = configuration.replace(systemSetting);
