@@ -47,7 +47,6 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
-import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
@@ -216,7 +215,7 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
 
 	    sdList.addAll(getDataFolders(db).//
 		    filter(f -> DatabaseFolder.computeSourceId(db, f).equals(s.getUniqueIdentifier())).//
-		    map(f -> new GridData((OpenSearchFolder) f, s)).//
+		    map(f -> new GridData(f, s)).//
 		    collect(Collectors.toList()));
 	});
 
@@ -290,7 +289,7 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
 	 * @param folder
 	 * @param source
 	 */
-	private GridData(OpenSearchFolder folder, GSSource source) {
+	private GridData(DatabaseFolder folder, GSSource source) {
 
 	    this.sourceLabel = source.getLabel();
 	    this.sourceId = source.getUniqueIdentifier();
