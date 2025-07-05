@@ -104,15 +104,7 @@ public class ConfigurationWrapper {
      */
     private static List<HarvestingSetting> harvestingSettingsCache;
 
-    private static String cachedSparqlProxyEndpoint = null;
-
-    public static String getCachedSparqlProxyEndpoint() {
-	return cachedSparqlProxyEndpoint;
-    }
-
-    public static void setCachedSparqlProxyEndpoint(String cachedSparqlProxyEndpoint) {
-	ConfigurationWrapper.cachedSparqlProxyEndpoint = cachedSparqlProxyEndpoint;
-    }
+    private static String cachedSparqlProxyEndpoint;
 
     /**
      * 
@@ -779,6 +771,22 @@ public class ConfigurationWrapper {
 		false).get();
 
 	return setting;
+    }
+
+    /**
+     * @return
+     */
+    public static String getCachedSparqlProxyEndpoint() {
+
+	return cachedSparqlProxyEndpoint;
+    }
+
+    /**
+     * @param cachedSparqlProxyEndpoint
+     */
+    public static void setCachedSparqlProxyEndpoint(String cachedSparqlProxyEndpoint) {
+
+	ConfigurationWrapper.cachedSparqlProxyEndpoint = cachedSparqlProxyEndpoint;
     }
 
     /**
