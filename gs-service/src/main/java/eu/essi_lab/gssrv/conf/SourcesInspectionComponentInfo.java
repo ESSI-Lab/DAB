@@ -4,6 +4,7 @@
 package eu.essi_lab.gssrv.conf;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /*-
  * #%L
@@ -180,28 +181,6 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
     }
 
     /**
-     * @param filterRow
-     * @param column
-     */
-    private void addFilterField(HeaderRow filterRow, Column<GridData> column) {
-
-	TextField filterField = new TextField();
-
-	filterField.addValueChangeListener(event -> {
-
-	    gridFilter.filter(column.getKey(), event.getValue());
-	    grid.getDataProvider().refreshAll();
-	});
-
-	filterField.setValueChangeMode(ValueChangeMode.EAGER);
-	filterField.setSizeFull();
-	filterField.setPlaceholder("Filter");
-	filterField.getElement().setAttribute("focus-target", "");
-
-	filterRow.getCell(column).setComponent(filterField);
-    }
-
-    /**
      * @param verticalLayout
      * @return
      */
@@ -211,13 +190,16 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
 
 	Database db = getDatabase();
 
-	ConfigurationWrapper.getHarvestedAndMixedSources().parallelStream().forEach(s -> {
+	ConfigurationWrapper.getHarvestedAndMixedSources().//
+		parallelStream().//
+		// filter(sourceFilter).//
+		forEach(s -> {//
 
-	    sdList.addAll(getDataFolders(db).//
-		    filter(f -> DatabaseFolder.computeSourceId(db, f).equals(s.getUniqueIdentifier())).//
-		    map(f -> new GridData(f, s)).//
-		    collect(Collectors.toList()));
-	});
+		    sdList.addAll(getDataFolders(db).//
+			    filter(f -> DatabaseFolder.computeSourceId(db, f).equals(s.getUniqueIdentifier())).//
+			    map(f -> new GridData(f, s)).//
+			    collect(Collectors.toList()));
+		});
 
 	double total = sdList.parallelStream().mapToInt(sd -> sd.getSize().intValue()).sum();
 
@@ -241,12 +223,86 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
     }
 
     /**
+     * @param filterRow
+     * @param column
+     */
+    private void addFilterField(HeaderRow filterRow, Column<GridData> column) {
+
+	TextField filterField = new TextField();
+
+	filterField.addValueChangeListener(event -> {
+
+	    gridFilter.filter(column.getKey(), event.getValue());
+	    grid.getDataProvider().refreshAll();
+	});
+
+	filterField.setValueChangeMode(ValueChangeMode.EAGER);
+	filterField.setSizeFull();
+	filterField.setPlaceholder("Filter");
+	filterField.getElement().setAttribute("focus-target", "");
+
+	filterRow.getCell(column).setComponent(filterField);
+    }
+
+    /**
+     * @param db
+     * @return
+     */
+    private Stream<DatabaseFolder> getDataFolders(Database db) {
+
+	try {
+	    return db.getDataFolders().stream();
+
+	} catch (GSException e) {
+	    GSLoggerFactory.getLogger(SourcesInspectionComponentInfo.class).error(e);
+	}
+
+	return null;
+    }
+
+    /**
+     * @param f
+     * @return
+     */
+    private static int getFolderSize(DatabaseFolder f) {
+
+	try {
+	    return f.size();
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(SourcesInspectionComponentInfo.class).error(e);
+	}
+
+	return 0;
+    }
+
+    /**
+     * @return
+     */
+    private Database getDatabase() {
+
+	try {
+	    return DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
+	} catch (GSException e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
+	return null;
+    }
+
+    /**
      * @author Fabrizio
      */
     private class GridFilter {
 
-	private String value;
-	private String columnKey;
+	private HashMap<String, String> valuesMap;
+
+	/**
+	 * 
+	 */
+	private GridFilter() {
+
+	    valuesMap = new HashMap<>();
+	}
 
 	/**
 	 * @param gridData
@@ -254,12 +310,28 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
 	 */
 	public boolean test(GridData gridData) {
 
-	    return switch (columnKey) {
-	    case null -> true;
-	    case NAME_COLUMN -> this.value == null || gridData.getSourceName().toLowerCase().contains(this.value);
-	    case ID_COLUMN -> this.value == null || gridData.getSourceId().toLowerCase().contains(this.value);
-	    default -> throw new IllegalArgumentException("Unexpected value: " + columnKey);
-	    };
+	    String sourceName = valuesMap.get(NAME_COLUMN);
+	    String sourceId = valuesMap.get(ID_COLUMN);
+
+	    boolean nameMatch = sourceName != null && gridData.getSourceName().toLowerCase().contains(sourceName);
+	    boolean idMatch = sourceId != null && gridData.getSourceId().toLowerCase().contains(sourceId);
+
+	    if (sourceName != null && sourceId != null) { // both selected
+
+		return nameMatch && idMatch;
+	    }
+
+	    if (sourceName != null && sourceId == null) { // only name
+
+		return nameMatch;
+	    }
+
+	    if (sourceName == null && sourceId != null) { // only id
+
+		return idMatch;
+	    }
+
+	    return true; // none
 	}
 
 	/**
@@ -268,8 +340,7 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
 	 */
 	public void filter(String columnKey, String value) {
 
-	    this.columnKey = columnKey;
-	    this.value = value;
+	    valuesMap.put(columnKey, value.isEmpty() ? null : value);
 	}
     }
 
@@ -392,50 +463,5 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
 		    ((GridData) o).getSize().equals(this.getSize()) && //
 		    ((GridData) o).getDataFolder().equals(this.getDataFolder());
 	}
-    }
-
-    /**
-     * @param db
-     * @return
-     */
-    private Stream<DatabaseFolder> getDataFolders(Database db) {
-
-	try {
-	    return db.getDataFolders().stream();
-
-	} catch (GSException e) {
-	    GSLoggerFactory.getLogger(SourcesInspectionComponentInfo.class).error(e);
-	}
-
-	return null;
-    }
-
-    /**
-     * @param f
-     * @return
-     */
-    private static int getFolderSize(DatabaseFolder f) {
-
-	try {
-	    return f.size();
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(SourcesInspectionComponentInfo.class).error(e);
-	}
-
-	return 0;
-    }
-
-    /**
-     * @return
-     */
-    private Database getDatabase() {
-
-	try {
-	    return DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
-	} catch (GSException e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	}
-
-	return null;
     }
 }
