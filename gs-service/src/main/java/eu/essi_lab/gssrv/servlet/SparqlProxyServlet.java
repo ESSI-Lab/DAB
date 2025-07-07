@@ -1,4 +1,4 @@
-package eu.essi_lab.dab.sparql;
+package eu.essi_lab.gssrv.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 
+@SuppressWarnings("serial")
 public class SparqlProxyServlet extends HttpServlet {
 
     @Override

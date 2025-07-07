@@ -32,7 +32,7 @@
 
 	<servlet>
 		<servlet-name>SparqlProxy</servlet-name>
-		<servlet-class>eu.essi_lab.dab.sparql.SparqlProxyServlet</servlet-class>
+		<servlet-class>eu.essi_lab.gssrv.servlet.SparqlProxyServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
