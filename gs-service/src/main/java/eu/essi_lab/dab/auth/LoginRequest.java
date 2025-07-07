@@ -20,32 +20,33 @@ package eu.essi_lab.dab.auth;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
+@Deprecated
 public class LoginRequest {
     private String email;
     private String apiKey;
 
     // Default constructor for JSON deserialization
-    public LoginRequest() {}
+    public LoginRequest() {
+    }
 
     public LoginRequest(String email, String apiKey) {
-        this.email = email;
-        this.apiKey = apiKey;
+	this.email = email;
+	this.apiKey = apiKey;
     }
 
     public String getEmail() {
-        return email;
+	return email;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+	this.email = email;
     }
 
     public String getApiKey() {
-        return apiKey;
+	return apiKey;
     }
 
     public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
+	this.apiKey = apiKey;
     }
-} 
+}

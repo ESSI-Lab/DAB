@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.authorization.userfinder.UserFinder;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.OutputFormat;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Profile;
@@ -42,9 +43,6 @@ import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Target;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.authorization.userfinder.UserFinder;
-import eu.essi_lab.dab.auth.LoginRequest;
-import eu.essi_lab.dab.auth.LoginResponse;
 
 @WebService
 @Path("/")
@@ -52,6 +50,24 @@ import eu.essi_lab.dab.auth.LoginResponse;
  * @author Fabrizio
  */
 public class SupportService {
+
+    /**
+     * @author Fabrizio
+     */
+    private record LoginRequest(String email, String apiKey) {
+	private LoginRequest() {// default constructor for JSON deserialization
+	    this(null, null);
+	}
+    };
+
+    /**
+     * @author Fabrizio
+     */
+    private record LoginResponse(boolean success, String message, String firstName, String lastName, String email, String apiKey) {
+	private LoginResponse() {// default constructor for JSON deserialization
+	    this(false, null, null, null, null, null);
+	}
+    };
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
@@ -88,6 +104,7 @@ public class SupportService {
 	return Response.ok(output, MediaType.APPLICATION_JSON).build();
     }
 
+    @SuppressWarnings("rawtypes")
     @POST
     @Path("/auth/login")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -97,12 +114,16 @@ public class SupportService {
 
 	    UserFinder uf = UserFinder.create();
 	    List<GSUser> users = uf.getUsers(false);
+
 	    for (GSUser user : users) {
+
 		String firstName = null;
 		String email = null;
 		String lastName = null;
+
 		List<GSProperty> properties = user.getProperties();
-		for (GSProperty prop : properties) {
+
+		for (GSProperty<?> prop : properties) {
 		    if (prop.getName().equals("firstName")) {
 			firstName = prop.getValue().toString();
 		    }
@@ -113,12 +134,13 @@ public class SupportService {
 			email = prop.getValue().toString();
 		    }
 		}
-		if (request.getApiKey().equals(user.getUri()) && request.getEmail().equals(email)) {
-		    LoginResponse response = new LoginResponse(true, "Login successful", "Test", "User", request.getEmail(),
-			    request.getApiKey());
+
+		if (request.apiKey().equals(user.getUri()) && request.email().equals(email)) {
+		    LoginResponse response = new LoginResponse(true, "Login successful", "Test", "User", request.email(), request.apiKey());
 		    return Response.ok(response).build();
 		}
 	    }
+
 	    LoginResponse response = new LoginResponse(false, "Invalid credentials", null, null, null, null);
 	    return Response.ok(response).build();
 

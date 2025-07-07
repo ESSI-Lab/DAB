@@ -20,7 +20,7 @@ package eu.essi_lab.dab.auth;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
+@Deprecated
 public class LoginResponse {
     private boolean success;
     private String message;
