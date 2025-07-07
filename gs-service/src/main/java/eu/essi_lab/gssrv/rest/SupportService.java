@@ -54,8 +54,8 @@ public class SupportService {
     /**
      * @author Fabrizio
      */
-    private record LoginRequest(String email, String apiKey) {
-	private LoginRequest() {// default constructor for JSON deserialization
+    public record LoginRequest(String email, String apiKey) {
+	public LoginRequest() {// default constructor for JSON deserialization
 	    this(null, null);
 	}
     };
@@ -63,8 +63,8 @@ public class SupportService {
     /**
      * @author Fabrizio
      */
-    private record LoginResponse(boolean success, String message, String firstName, String lastName, String email, String apiKey) {
-	private LoginResponse() {// default constructor for JSON deserialization
+    public record LoginResponse(boolean success, String message, String firstName, String lastName, String email, String apiKey) {
+	public LoginResponse() {// default constructor for JSON deserialization
 	    this(false, null, null, null, null, null);
 	}
     };
