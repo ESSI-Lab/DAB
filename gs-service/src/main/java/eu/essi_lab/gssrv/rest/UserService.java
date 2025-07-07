@@ -82,7 +82,7 @@ public class UserService {
     private static final String USER_SERVICE_LOGIN_ERROR = "USER_SERVICE_LOGIN_ERROR";
     private static final String USER_SERVICE_CALLBACK_ERROR = "USER_SERVICE_CALLBACK_ERROR";
     private static final String USER_SERVICE_LOGOUT_ERROR = "USER_SERVICE_LOGOUT_ERROR";
-
+    
     /**
      * 
      */
