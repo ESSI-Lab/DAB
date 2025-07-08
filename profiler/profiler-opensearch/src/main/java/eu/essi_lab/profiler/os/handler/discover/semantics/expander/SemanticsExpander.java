@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.apache.jena.util.FileUtils.isURI;
@@ -89,7 +90,7 @@ public class SemanticsExpander {
 	    });
 	});
 	
-        List<String> distinct = results.stream().distinct().collect(Collectors.toList());
+        List<String> distinct = results.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
 
 	GSLoggerFactory.getLogger(getClass()).debug("Results: {}", distinct);
 	
