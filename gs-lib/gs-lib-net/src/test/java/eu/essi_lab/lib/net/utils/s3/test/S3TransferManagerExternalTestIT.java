@@ -46,9 +46,11 @@ public class S3TransferManagerExternalTestIT {
     @Test
     public void uploadAndDeleteFileTest() throws Exception {
 
+	uploadAndDeleteFileTest(true);
+	
 	uploadAndDeleteFileTest(false);
 
-	uploadAndDeleteFileTest(true);
+	
     }
 
     /**
