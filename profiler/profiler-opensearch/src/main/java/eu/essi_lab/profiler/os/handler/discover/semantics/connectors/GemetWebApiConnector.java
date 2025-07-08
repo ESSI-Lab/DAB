@@ -1,5 +1,19 @@
 package eu.essi_lab.profiler.os.handler.discover.semantics.connectors;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -25,21 +39,6 @@ import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.profiler.os.handler.discover.semantics.SemanticSource;
 import eu.essi_lab.profiler.os.handler.discover.semantics.expander.SemanticExpansion;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * @author Mattia Santoro
@@ -56,6 +55,7 @@ public class GemetWebApiConnector implements SemanticSource {
 
     @Override
     public List<URI> expandURI(URI uri, SemanticExpansion expansion) {
+
 	String url = base_url + "getRelatedConcepts?";
 
 	if (expansion == null)
@@ -72,37 +72,38 @@ public class GemetWebApiConnector implements SemanticSource {
 	case NARROWER_CLOSE_MATCH -> {
 	    try {
 		List<URI> uris = expandURI(uri, new URI("http://www.w3.org/2004/02/skos/core#narrower"));
-		List<URI> closeuris = expandURI(uri, new URI("http://www.w3.org/2004/02/skos/core#closeMatch"));
+		uris.addAll(expandURI(uri, new URI("http://www.w3.org/2004/02/skos/core#closeMatch")));
 
-		closeuris.forEach(curi -> {
-		    if (!uris.contains(curi))
-			uris.add(curi);
-		});
+		return uris.stream().distinct().collect(Collectors.toList());
 
-		return uris;
 	    } catch (URISyntaxException e) {
 		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }
-
 	}
 	default -> {
 
 	    GSLoggerFactory.getLogger(getClass()).error("Unknown expansion " + expansion.toString());
-
 	}
 	}
 
 	return new ArrayList<>();
     }
 
+    /**
+     * 
+     * @param uri
+     * @param relation
+     * @return
+     */
     public List<URI> expandURI(URI uri, URI relation) {
+
 	List<URI> uris = new ArrayList<>();
 
 	String url = base_url + "getRelatedConcepts?";
 
 	try {
-	    String query = "concept_uri=" + URLEncoder.encode(uri.toString(), "UTF-8") + "&relation_uri=" + URLEncoder.encode(
-		    relation.toString(), "UTF-8");
+	    String query = "concept_uri=" + URLEncoder.encode(uri.toString(), "UTF-8") + "&relation_uri="
+		    + URLEncoder.encode(relation.toString(), "UTF-8");
 
 	    String str = executeRequest(url, query);
 	    JSONArray array = new JSONArray(str);
@@ -112,14 +113,10 @@ public class GemetWebApiConnector implements SemanticSource {
 	    while (it.hasNext()) {
 		JSONObject obj = (JSONObject) it.next();
 		uris.add(new URI(obj.getString("uri")));
-
 	    }
 
-	} catch (UnsupportedEncodingException e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	} catch (IOException e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	} catch (URISyntaxException e) {
+	} catch (Exception e) {
+
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
@@ -134,9 +131,9 @@ public class GemetWebApiConnector implements SemanticSource {
 	String url = base_url + "getAllTranslationsForConcept?";
 
 	try {
-	    String query = "concept_uri=" + URLEncoder.encode(uri.toString(), "UTF-8") + "&property_uri=" + URLEncoder.encode(
-		    "http://www.w3.org/2004/02/skos/core#prefLabel",
-		    "UTF-8");
+
+	    String query = "concept_uri=" + URLEncoder.encode(uri.toString(), "UTF-8") + "&property_uri="
+		    + URLEncoder.encode("http://www.w3.org/2004/02/skos/core#prefLabel", "UTF-8");
 	    String str = executeRequest(url, query);
 	    JSONArray array = new JSONArray(str);
 
@@ -149,15 +146,20 @@ public class GemetWebApiConnector implements SemanticSource {
 		    translations.add(obj.getString("string"));
 	    }
 
-	} catch (UnsupportedEncodingException e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	} catch (IOException e) {
+	} catch (Exception e) {
+
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
 	return translations;
     }
 
+    /**
+     * 
+     * @param searchTerm
+     * @param lang
+     * @return
+     */
     private List<URI> getConceptsMatchingKeyword(String searchTerm, String lang) {
 
 	List<URI> uris = new ArrayList<>();
@@ -165,6 +167,7 @@ public class GemetWebApiConnector implements SemanticSource {
 	String url = base_url + "getConceptsMatchingKeyword?";
 
 	String query = "keyword=" + searchTerm + "&search_mode=4&language=" + lang;
+
 	try {
 
 	    String str = executeRequest(url, query);
@@ -177,17 +180,12 @@ public class GemetWebApiConnector implements SemanticSource {
 		uris.add(new URI(obj.getString("uri")));
 	    }
 
-	} catch (UnsupportedEncodingException e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	} catch (IOException e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	} catch (URISyntaxException e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+	} catch (Exception e) {
 
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
 	return uris;
-
     }
 
     @Override
@@ -198,14 +196,20 @@ public class GemetWebApiConnector implements SemanticSource {
 	for (String l : languages) {
 	    List<URI> concepts = getConceptsMatchingKeyword(searchTerm, l);
 
-	    if (concepts.size() > 0)
+	    if (!concepts.isEmpty()) {
 		return concepts;
+	    }
 	}
 
 	return new ArrayList<>();
-
     }
 
+    /**
+     * @param url
+     * @param query
+     * @return
+     * @throws IOException
+     */
     private String executeRequest(String url, String query) throws IOException {
 
 	Downloader d = new Downloader();
@@ -213,15 +217,6 @@ public class GemetWebApiConnector implements SemanticSource {
 
 	String request_url = url + query;
 
-	InputStream stream = d.downloadOptionalStream(request_url).get();
-
-	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	IOUtils.copy(stream, baos);
-	stream.close();
-	baos.close();
-	String str = new String(baos.toByteArray());
-
-	return str;
-
+	return d.downloadOptionalString(request_url).get();
     }
 }

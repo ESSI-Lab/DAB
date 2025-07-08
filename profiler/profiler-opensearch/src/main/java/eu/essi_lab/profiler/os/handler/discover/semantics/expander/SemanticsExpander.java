@@ -29,6 +29,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.apache.jena.util.FileUtils.isURI;
 
 /**
@@ -52,6 +54,7 @@ public class SemanticsExpander {
 
 	List<String> results = new ArrayList<>();
 	results.add(searchTerm);
+
 	List<URI> matchedUris = new ArrayList<>();
 
 	if (isURI(searchTerm)) {
@@ -60,37 +63,37 @@ public class SemanticsExpander {
 		matchedUris.add(new URI(searchTerm));
 
 	    } catch (URISyntaxException e) {
+
 		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }
 	} else {
+
 	    searchTerm = StringUtils.URLEncodeUTF8(searchTerm);
 
 	    matchedUris = getConceptsMatchingKeyword(searchTerm);
 	}
 
-	matchedUris.forEach(uri -> {
+	GSLoggerFactory.getLogger(getClass()).debug("Matched uris: {}", matchedUris.size());
+
+	matchedUris.parallelStream().forEach(uri -> {
+
 	    results.addAll(translateURI(uri, tr_langs));
+
 	    List<URI> expanded = expandURI(uri, expansion);
 
-	    expanded.forEach(euri -> {
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanded uris: {}", expanded.size());
+
+	    expanded.parallelStream().forEach(euri -> {
+
 		results.addAll(translateURI(euri, tr_langs));
 	    });
 	});
+	
+        List<String> distinct = results.stream().distinct().collect(Collectors.toList());
 
-	return removeDuplicates(results);
-
-    }
-
-    private List<String> removeDuplicates(List<String> results) {
-	List<String> noduplicates = new ArrayList<>();
-
-	results.forEach(r -> {
-	    if (!noduplicates.contains(r)) {
-		noduplicates.add(r);
-	    }
-	});
-
-	return noduplicates;
+	GSLoggerFactory.getLogger(getClass()).debug("Results: {}", distinct);
+	
+	return distinct;
     }
 
     private List<URI> expandURI(URI uri, SemanticExpansion expansion) {
