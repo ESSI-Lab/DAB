@@ -68,7 +68,7 @@ public class IndexesMetadata extends DOMSerializer {
 	try {
 	    context = JAXBContext.newInstance(IndexesMetadata.class);
 	} catch (JAXBException e) {
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(IndexesMetadata.class).error(e);
 	}
     }
 
@@ -79,7 +79,7 @@ public class IndexesMetadata extends DOMSerializer {
     private BoundingBox bbox;
 
     @XmlElement(name = "composedElement", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ComposedElement composedElement;
+    private List<ComposedElement> composedElement;
 
     /**
      * Creates a new <code>IndexesMetadata</code> with the supplied list of indexes
@@ -89,6 +89,7 @@ public class IndexesMetadata extends DOMSerializer {
     public IndexesMetadata() {
 
 	properties = new ArrayList<>();
+	composedElement = new ArrayList<>();
     }
 
     @Override
@@ -135,9 +136,9 @@ public class IndexesMetadata extends DOMSerializer {
 		return;
 	    }
 
-	    if (el.getComposedElement().isPresent()) {
+	    if (!el.getComposedElements().isEmpty()) {
 
-		this.composedElement = el.getComposedElement().get();
+		this.composedElement.addAll(el.getComposedElements());
 
 		return;
 	    }
@@ -260,9 +261,9 @@ public class IndexesMetadata extends DOMSerializer {
     /**
      * @return
      */
-    public Optional<ComposedElement> readComposedElement() {
+    public List<ComposedElement> readComposedElement() {
 
-	return Optional.ofNullable(composedElement);
+	return composedElement;
     }
 
     /**
@@ -278,7 +279,7 @@ public class IndexesMetadata extends DOMSerializer {
      */
     public boolean hasComposedElement() {
 
-	return readComposedElement().isPresent();
+	return !readComposedElement().isEmpty();
     }
 
     /**
@@ -296,7 +297,10 @@ public class IndexesMetadata extends DOMSerializer {
 
 	if (MetadataElement.hasComposedElement(elementName)) {
 
-	    this.composedElement = null;
+	    composedElement = composedElement.//
+		    stream().//
+		    filter(el -> !el.getName().equals(elementName)).//
+		    collect(Collectors.toList());
 	    return;
 	}
 
