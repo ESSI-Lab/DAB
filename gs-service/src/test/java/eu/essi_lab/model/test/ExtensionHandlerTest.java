@@ -52,22 +52,32 @@ public class ExtensionHandlerTest {
 	map.setIrrigationTypeConfidence(92.0);
 	map.setLcTypeConfidence(10.0);
 
-	ComposedElement composedElement1 = MetadataElement.KEYWORD_SA.createComposedElement().get();
+	ComposedElement keywordSA_1 = MetadataElement.KEYWORD_SA.createComposedElement().get();
 
-	composedElement1.getProperty("value").get().setValue("erggvb");
-	composedElement1.getProperty("uri").get().setValue("xvfhg");
-	composedElement1.getProperty("SA_uri").get().setValue("4566g");
-	composedElement1.getProperty("SA_matchType").get().setValue("xzcx");
+	keywordSA_1.getProperty("value").get().setValue("kwd_SA1");
+	keywordSA_1.getProperty("uri").get().setValue("kwd_SA1_uri_1");
+	keywordSA_1.getProperty("SA_uri").get().setValue("kwd_SA1_SA_uri_1");
+	keywordSA_1.getProperty("SA_matchType").get().setValue("kwd_SA1_SA_matchType_1");
 
-	ComposedElement composedElement2 = MetadataElement.PARAMETER_SA.createComposedElement().get();
+	ComposedElement keywordSA_2 = MetadataElement.KEYWORD_SA.createComposedElement().get();
+
+	keywordSA_2.getProperty("value").get().setValue("kwd_SA2");
+	keywordSA_2.getProperty("uri").get().setValue("kwd_SA1_uri_2");
+	keywordSA_2.getProperty("SA_uri").get().setValue("kwd_SA1_SA_uri_2");
+	keywordSA_2.getProperty("SA_matchType").get().setValue("kwd_SA1_SA_matchType_2");
+
+	ComposedElement parameterSA = MetadataElement.PARAMETER_SA.createComposedElement().get();
 
 	Dataset dataset = new Dataset();
 	ExtensionHandler handler = dataset.getExtensionHandler();
 
 	handler.setSatelliteScene(scene);
 	handler.setWorldCereal(map);
-	handler.addComposedElement(composedElement1);
-	handler.addComposedElement(composedElement2);
+
+	handler.addComposedElement(keywordSA_1);
+	handler.addComposedElement(keywordSA_2);
+
+	handler.addComposedElement(parameterSA);
 
 	System.out.println(dataset.asString(true));
 
@@ -75,21 +85,39 @@ public class ExtensionHandlerTest {
 	//
 	//
 
-	Optional<ComposedElement> kwd_SA = handler.getComposedElement(MetadataElement.KEYWORD_SA.getName());
+	List<ComposedElement> kwd_SA1 = handler.getComposedElements(MetadataElement.KEYWORD_SA.getName());
 
-	Assert.assertTrue(kwd_SA.isPresent());
+	Assert.assertFalse(kwd_SA1.isEmpty());
 
-	Assert.assertTrue(kwd_SA.get().getName().equals(MetadataElement.KEYWORD_SA.getName()));
+	ComposedElement composedElement_0 = kwd_SA1.get(0);
+
+	Assert.assertTrue(composedElement_0.getName().equals(MetadataElement.KEYWORD_SA.getName()));
+	Assert.assertEquals("kwd_SA1", composedElement_0.getElement().getProperty("value").get().getValue());
+	Assert.assertEquals("kwd_SA1_uri_1", composedElement_0.getElement().getProperty("uri").get().getValue());
 
 	//
 	//
 	//
 
-	Optional<ComposedElement> param_SA = handler.getComposedElement(MetadataElement.PARAMETER_SA.getName());
+	List<ComposedElement> kwd_SA2 = handler.getComposedElements(MetadataElement.KEYWORD_SA.getName());
 
-	Assert.assertTrue(param_SA.isPresent());
+	Assert.assertFalse(kwd_SA2.isEmpty());
 
-	Assert.assertTrue(param_SA.get().getName().equals(MetadataElement.PARAMETER_SA.getName()));
+	ComposedElement composedElement_1 = kwd_SA1.get(1);
+
+	Assert.assertTrue(composedElement_1.getName().equals(MetadataElement.KEYWORD_SA.getName()));
+	Assert.assertEquals("kwd_SA2", composedElement_1.getElement().getProperty("value").get().getValue());
+	Assert.assertEquals("kwd_SA1_uri_2", composedElement_1.getElement().getProperty("uri").get().getValue());
+
+	//
+	//
+	//
+
+	List<ComposedElement> param_SA = handler.getComposedElements(MetadataElement.PARAMETER_SA.getName());
+
+	Assert.assertFalse(param_SA.isEmpty());
+
+	Assert.assertTrue(param_SA.get(0).getName().equals(MetadataElement.PARAMETER_SA.getName()));
 
 	//
 	//
