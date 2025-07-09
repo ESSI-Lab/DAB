@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,6 +18,7 @@ import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.SA_ElementWrapper;
 import eu.essi_lab.model.resource.SatelliteScene;
 import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
@@ -52,21 +52,33 @@ public class ExtensionHandlerTest {
 	map.setIrrigationTypeConfidence(92.0);
 	map.setLcTypeConfidence(10.0);
 
-	ComposedElement keywordSA_1 = MetadataElement.KEYWORD_SA.createComposedElement().get();
+	SA_ElementWrapper wrapper1 = SA_ElementWrapper.of(MetadataElement.KEYWORD_SA);
 
-	keywordSA_1.getProperty("value").get().setValue("kwd_SA1");
-	keywordSA_1.getProperty("uri").get().setValue("kwd_SA1_uri_1");
-	keywordSA_1.getProperty("SA_uri").get().setValue("kwd_SA1_SA_uri_1");
-	keywordSA_1.getProperty("SA_matchType").get().setValue("kwd_SA1_SA_matchType_1");
+	wrapper1.setValue("value1");
+	wrapper1.setUri("uri1");
+	wrapper1.setUriTitle("uri_title1");
+	wrapper1.setSA_MatchType("SA_match_type1");
+	wrapper1.setSA_Uri("SA_uri1");
+	wrapper1.setSA_UriTitle("SA_uri_title1");
 
-	ComposedElement keywordSA_2 = MetadataElement.KEYWORD_SA.createComposedElement().get();
+	SA_ElementWrapper wrapper2 = SA_ElementWrapper.of(MetadataElement.KEYWORD_SA);
 
-	keywordSA_2.getProperty("value").get().setValue("kwd_SA2");
-	keywordSA_2.getProperty("uri").get().setValue("kwd_SA1_uri_2");
-	keywordSA_2.getProperty("SA_uri").get().setValue("kwd_SA1_SA_uri_2");
-	keywordSA_2.getProperty("SA_matchType").get().setValue("kwd_SA1_SA_matchType_2");
+	wrapper2.setValue("value2");
+	wrapper2.setUri("uri2");
+	wrapper2.setUriTitle("uri_title2");
+	wrapper2.setSA_MatchType("SA_match_type2");
+	wrapper2.setSA_Uri("SA_uri2");
+	wrapper2.setSA_UriTitle("SA_uri_title2");
 
-	ComposedElement parameterSA = MetadataElement.PARAMETER_SA.createComposedElement().get();
+	
+	SA_ElementWrapper wrapper3 = SA_ElementWrapper.of(MetadataElement.PARAMETER_SA);
+
+	wrapper3.setValue("value3");
+	wrapper3.setUri("uri3");
+	wrapper3.setUriTitle("uri_title3");
+	wrapper3.setSA_MatchType("SA_match_type3");
+	wrapper3.setSA_Uri("SA_uri3");
+	wrapper3.setSA_UriTitle("SA_uri_title3");
 
 	Dataset dataset = new Dataset();
 	ExtensionHandler handler = dataset.getExtensionHandler();
@@ -74,10 +86,10 @@ public class ExtensionHandlerTest {
 	handler.setSatelliteScene(scene);
 	handler.setWorldCereal(map);
 
-	handler.addComposedElement(keywordSA_1);
-	handler.addComposedElement(keywordSA_2);
+	handler.addComposedElement(wrapper1.getElement());
+	handler.addComposedElement(wrapper2.getElement());
 
-	handler.addComposedElement(parameterSA);
+	handler.addComposedElement(wrapper3.getElement());
 
 	System.out.println(dataset.asString(true));
 
@@ -92,8 +104,8 @@ public class ExtensionHandlerTest {
 	ComposedElement composedElement_0 = kwd_SA1.get(0);
 
 	Assert.assertTrue(composedElement_0.getName().equals(MetadataElement.KEYWORD_SA.getName()));
-	Assert.assertEquals("kwd_SA1", composedElement_0.getElement().getProperty("value").get().getValue());
-	Assert.assertEquals("kwd_SA1_uri_1", composedElement_0.getElement().getProperty("uri").get().getValue());
+	Assert.assertEquals("value1", composedElement_0.getElement().getProperty("value").get().getValue());
+	Assert.assertEquals("uri1", composedElement_0.getElement().getProperty("uri").get().getValue());
 
 	//
 	//
@@ -106,18 +118,19 @@ public class ExtensionHandlerTest {
 	ComposedElement composedElement_1 = kwd_SA1.get(1);
 
 	Assert.assertTrue(composedElement_1.getName().equals(MetadataElement.KEYWORD_SA.getName()));
-	Assert.assertEquals("kwd_SA2", composedElement_1.getElement().getProperty("value").get().getValue());
-	Assert.assertEquals("kwd_SA1_uri_2", composedElement_1.getElement().getProperty("uri").get().getValue());
+	Assert.assertEquals("value2", composedElement_1.getElement().getProperty("value").get().getValue());
+	Assert.assertEquals("uri2", composedElement_1.getElement().getProperty("uri").get().getValue());
 
 	//
 	//
 	//
 
-	List<ComposedElement> param_SA = handler.getComposedElements(MetadataElement.PARAMETER_SA.getName());
+	ComposedElement param_SA = handler.getComposedElements(MetadataElement.PARAMETER_SA.getName()).get(0);
 
-	Assert.assertFalse(param_SA.isEmpty());
-
-	Assert.assertTrue(param_SA.get(0).getName().equals(MetadataElement.PARAMETER_SA.getName()));
+ 
+	Assert.assertTrue(param_SA.getName().equals(MetadataElement.PARAMETER_SA.getName()));
+	Assert.assertEquals("value3", param_SA.getElement().getProperty("value").get().getValue());
+	Assert.assertEquals("uri3", param_SA.getElement().getProperty("uri").get().getValue());
 
 	//
 	//
