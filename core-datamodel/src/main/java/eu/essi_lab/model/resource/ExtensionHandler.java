@@ -24,7 +24,9 @@ package eu.essi_lab.model.resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.Duration;
@@ -103,21 +105,29 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      * @param name
      * @return
      */
-    public Optional<ComposedElement> getComposedElement(String name) {
+    public List<ComposedElement> getComposedElements(String name) {
 
 	try {
 	    List<Node> list = this.metadata.get("//*:composedElement[*:name='" + name + "']");
-	    if (!list.isEmpty()) {
 
-		Node node = list.get(0);
-		return Optional.of(ComposedElement.create(node));
-	    }
-	} catch (XPathExpressionException | JAXBException e) {
+	    return list.stream().map(node -> {
+		try {
+		    return ComposedElement.create(node);
+		} catch (JAXBException e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+		    return null;
+		}
+	    }).filter(Objects::nonNull).//
+
+		    collect(Collectors.toList());
+
+	} catch (XPathExpressionException e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
-	return Optional.empty();
+	return new ArrayList<>();
     }
 
     // -------------------------------------------------

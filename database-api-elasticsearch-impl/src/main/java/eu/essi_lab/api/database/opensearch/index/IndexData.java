@@ -51,8 +51,6 @@ import org.opensearch.client.opensearch.core.IndexRequest;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.google.common.io.Files;
-
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
@@ -767,15 +765,35 @@ public class IndexData {
 	// composed elements
 	//
 
-	List<Node> composedElements = handler.evaluateNodes("//*:indexesMetadata/*:composedElement");
+	List<Node> composedNodes = handler.evaluateNodes("//*:indexesMetadata/*:composedElement");
 
-	if (!composedElements.isEmpty()) {
+	if (!composedNodes.isEmpty()) {
 
-	    composedElements.//
+	    List<ComposedElement> composedList = composedNodes.//
 		    stream().//
 		    map(el -> create(el)).//
 		    filter(Objects::nonNull).//
-		    forEach(el -> indexData.put(el.getName(), el.asJSON().getJSONObject(el.getName())));
+		    distinct().//
+		    collect(Collectors.toList());
+
+	    composedList.stream().map(el -> el.getName()).distinct().forEach(elName -> {
+
+		JSONArray nested = new JSONArray();
+
+		composedList.//
+			stream().//
+			filter(el -> el.getName().equals(elName)).//
+			forEach(composed -> {
+
+			    JSONObject item = new JSONObject();
+			    nested.put(item);
+
+			    composed.getProperties().//
+				    forEach(prop -> item.put(prop.getName(), prop.getValue()));
+			});
+
+		indexData.put(elName, nested);
+	    });
 	}
 
 	//

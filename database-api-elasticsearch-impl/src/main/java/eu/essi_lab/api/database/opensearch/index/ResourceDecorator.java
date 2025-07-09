@@ -151,10 +151,11 @@ public class ResourceDecorator {
 
 	    composed.forEach(name -> {
 
-		try {
+		JSONArray jsonArray = source.getJSONArray(name);
+		jsonArray.forEach(item -> {
 
 		    JSONObject obj = new JSONObject();
-		    obj.put(name, source.getJSONObject(name));
+		    obj.put(name, (JSONObject) item);
 
 		    ComposedElement model = MetadataElement.withComposedElement().//
 			    stream().//
@@ -164,13 +165,16 @@ public class ResourceDecorator {
 			    createComposedElement().//
 			    get();
 
-		    ComposedElement element = ComposedElement.create(obj, model);
-		    res.getExtensionHandler().addComposedElement(element);
+		    try {
+			ComposedElement element = ComposedElement.create(obj, model);
+			res.getExtensionHandler().addComposedElement(element);
 
-		} catch (Exception ex) {
+		    } catch (Exception e) {
 
-		    GSLoggerFactory.getLogger(getClass()).error(ex);
-		}
+			GSLoggerFactory.getLogger(getClass()).error(e);
+		    }
+		});
+
 	    });
 	}
 

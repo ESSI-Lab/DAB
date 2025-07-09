@@ -44,68 +44,32 @@ public enum MetadataElement implements Queryable {
     /**
      * 
      */
-    KEYWORD_SA(ComposedElementBuilder.get("keyword_SA").//
-
-	    addItem("value", ContentType.TEXTUAL).//
-	    addItem("uri", ContentType.TEXTUAL).//
-	    addItem("SA_uri", ContentType.TEXTUAL).//
-	    addItem("SA_matchType", ContentType.TEXTUAL).//
-	    build()), //
+    KEYWORD_SA(SA_ElementWrapper.of("keyword_SA")), //
 
     /**
      * 
      */
-    PARAMETER_SA(ComposedElementBuilder.get("parameter_SA").//
-
-	    addItem("value", ContentType.TEXTUAL).//
-	    addItem("uri", ContentType.TEXTUAL).//
-	    addItem("SA_uri", ContentType.TEXTUAL).//
-	    addItem("SA_matchType", ContentType.TEXTUAL).//
-	    build()), //
+    PARAMETER_SA(SA_ElementWrapper.of("parameter_SA")), //
 
     /**
      * 
      */
-    INSTRUMENT_SA(ComposedElementBuilder.get("instrument_SA").//
-
-	    addItem("value", ContentType.TEXTUAL).//
-	    addItem("uri", ContentType.TEXTUAL).//
-	    addItem("SA_uri", ContentType.TEXTUAL).//
-	    addItem("SA_matchType", ContentType.TEXTUAL).//
-	    build()), //
+    INSTRUMENT_SA(SA_ElementWrapper.of("instrument_SA")), //
 
     /**
      * 
      */
-    RESPONSIBLE_ORG_SA(ComposedElementBuilder.get("responsibleOrg_SA").//
-
-	    addItem("value", ContentType.TEXTUAL).//
-	    addItem("uri", ContentType.TEXTUAL).//
-	    addItem("SA_uri", ContentType.TEXTUAL).//
-	    addItem("SA_matchType", ContentType.TEXTUAL).//
-	    build()), //
+    RESPONSIBLE_ORG_SA(SA_ElementWrapper.of("responsibleOrg_SA")), //
 
     /**
      * 
      */
-    CRUISE_SA(ComposedElementBuilder.get("cruise_SA").//
-
-	    addItem("value", ContentType.TEXTUAL).//
-	    addItem("uri", ContentType.TEXTUAL).//
-	    addItem("SA_uri", ContentType.TEXTUAL).//
-	    addItem("SA_matchType", ContentType.TEXTUAL).//
-	    build()), //
+    CRUISE_SA(SA_ElementWrapper.of("cruise_SA")), //
 
     /**
      * 
      */
-    PROJECT_SA(ComposedElementBuilder.get("project_SA").//
-
-	    addItem("value", ContentType.TEXTUAL).//
-	    addItem("uri", ContentType.TEXTUAL).//
-	    addItem("SA_uri", ContentType.TEXTUAL).//
-	    addItem("SA_matchType", ContentType.TEXTUAL).//
-	    build()), //
+    PROJECT_SA(SA_ElementWrapper.of("project_SA")), //
 
     /**
      *

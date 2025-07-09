@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,6 +18,7 @@ import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.SA_ElementWrapper;
 import eu.essi_lab.model.resource.SatelliteScene;
 import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
@@ -52,22 +52,44 @@ public class ExtensionHandlerTest {
 	map.setIrrigationTypeConfidence(92.0);
 	map.setLcTypeConfidence(10.0);
 
-	ComposedElement composedElement1 = MetadataElement.KEYWORD_SA.createComposedElement().get();
+	SA_ElementWrapper wrapper1 = SA_ElementWrapper.of(MetadataElement.KEYWORD_SA);
 
-	composedElement1.getProperty("value").get().setValue("erggvb");
-	composedElement1.getProperty("uri").get().setValue("xvfhg");
-	composedElement1.getProperty("SA_uri").get().setValue("4566g");
-	composedElement1.getProperty("SA_matchType").get().setValue("xzcx");
+	wrapper1.setValue("value1");
+	wrapper1.setUri("uri1");
+	wrapper1.setUriTitle("uri_title1");
+	wrapper1.setSA_MatchType("SA_match_type1");
+	wrapper1.setSA_Uri("SA_uri1");
+	wrapper1.setSA_UriTitle("SA_uri_title1");
 
-	ComposedElement composedElement2 = MetadataElement.PARAMETER_SA.createComposedElement().get();
+	SA_ElementWrapper wrapper2 = SA_ElementWrapper.of(MetadataElement.KEYWORD_SA);
+
+	wrapper2.setValue("value2");
+	wrapper2.setUri("uri2");
+	wrapper2.setUriTitle("uri_title2");
+	wrapper2.setSA_MatchType("SA_match_type2");
+	wrapper2.setSA_Uri("SA_uri2");
+	wrapper2.setSA_UriTitle("SA_uri_title2");
+
+	
+	SA_ElementWrapper wrapper3 = SA_ElementWrapper.of(MetadataElement.PARAMETER_SA);
+
+	wrapper3.setValue("value3");
+	wrapper3.setUri("uri3");
+	wrapper3.setUriTitle("uri_title3");
+	wrapper3.setSA_MatchType("SA_match_type3");
+	wrapper3.setSA_Uri("SA_uri3");
+	wrapper3.setSA_UriTitle("SA_uri_title3");
 
 	Dataset dataset = new Dataset();
 	ExtensionHandler handler = dataset.getExtensionHandler();
 
 	handler.setSatelliteScene(scene);
 	handler.setWorldCereal(map);
-	handler.addComposedElement(composedElement1);
-	handler.addComposedElement(composedElement2);
+
+	handler.addComposedElement(wrapper1.getElement());
+	handler.addComposedElement(wrapper2.getElement());
+
+	handler.addComposedElement(wrapper3.getElement());
 
 	System.out.println(dataset.asString(true));
 
@@ -75,21 +97,40 @@ public class ExtensionHandlerTest {
 	//
 	//
 
-	Optional<ComposedElement> kwd_SA = handler.getComposedElement(MetadataElement.KEYWORD_SA.getName());
+	List<ComposedElement> kwd_SA1 = handler.getComposedElements(MetadataElement.KEYWORD_SA.getName());
 
-	Assert.assertTrue(kwd_SA.isPresent());
+	Assert.assertFalse(kwd_SA1.isEmpty());
 
-	Assert.assertTrue(kwd_SA.get().getName().equals(MetadataElement.KEYWORD_SA.getName()));
+	ComposedElement composedElement_0 = kwd_SA1.get(0);
+
+	Assert.assertTrue(composedElement_0.getName().equals(MetadataElement.KEYWORD_SA.getName()));
+	Assert.assertEquals("value1", composedElement_0.getElement().getProperty("value").get().getValue());
+	Assert.assertEquals("uri1", composedElement_0.getElement().getProperty("uri").get().getValue());
 
 	//
 	//
 	//
 
-	Optional<ComposedElement> param_SA = handler.getComposedElement(MetadataElement.PARAMETER_SA.getName());
+	List<ComposedElement> kwd_SA2 = handler.getComposedElements(MetadataElement.KEYWORD_SA.getName());
 
-	Assert.assertTrue(param_SA.isPresent());
+	Assert.assertFalse(kwd_SA2.isEmpty());
 
-	Assert.assertTrue(param_SA.get().getName().equals(MetadataElement.PARAMETER_SA.getName()));
+	ComposedElement composedElement_1 = kwd_SA1.get(1);
+
+	Assert.assertTrue(composedElement_1.getName().equals(MetadataElement.KEYWORD_SA.getName()));
+	Assert.assertEquals("value2", composedElement_1.getElement().getProperty("value").get().getValue());
+	Assert.assertEquals("uri2", composedElement_1.getElement().getProperty("uri").get().getValue());
+
+	//
+	//
+	//
+
+	ComposedElement param_SA = handler.getComposedElements(MetadataElement.PARAMETER_SA.getName()).get(0);
+
+ 
+	Assert.assertTrue(param_SA.getName().equals(MetadataElement.PARAMETER_SA.getName()));
+	Assert.assertEquals("value3", param_SA.getElement().getProperty("value").get().getValue());
+	Assert.assertEquals("uri3", param_SA.getElement().getProperty("uri").get().getValue());
 
 	//
 	//
