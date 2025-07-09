@@ -35,7 +35,7 @@ import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 public class DatasetFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
     @Override
-    public InputStream getInfoPage(String viewId, List<StationRecord> stations,int total, String contentType, WMSGetFeatureInfoRequest request) {
+    public InputStream getInfoPage(String hostname, String viewId, List<StationRecord> stations,int total, String contentType, WMSGetFeatureInfoRequest request) {
 	String html = "<html>\n" + "  <head>\n" + "    <title>DAB GetFeatureInfo output</title>\n" + "  </head>\n"
 		+ "  <style type=\"text/css\">\n" + "	table.featureInfo, table.featureInfo td, table.featureInfo th {\n"
 		+ "		border:1px solid #ddd;\n" + "		border-collapse:collapse;\n" + "		margin:0;\n"

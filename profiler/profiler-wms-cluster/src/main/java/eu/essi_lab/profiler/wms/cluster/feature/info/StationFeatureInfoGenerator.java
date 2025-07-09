@@ -36,7 +36,7 @@ import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
     @Override
-    public InputStream getInfoPage(String viewId, List<StationRecord> stations, int total, String contentType,
+    public InputStream getInfoPage(String hostname, String viewId, List<StationRecord> stations, int total, String contentType,
 	    WMSGetFeatureInfoRequest request) {
 
 	StringBuilder htmlBuilder = new StringBuilder();
@@ -118,7 +118,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    // HTML
 	    //
 
-	    htmlBuilder = append(htmlBuilder, station, viewId);
+	    htmlBuilder = append(hostname, htmlBuilder, station, viewId);
 	}
 
 	if (stations.isEmpty()) {
@@ -155,7 +155,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
      */
     private StringBuilder close(StringBuilder builder) {
 
-	builder.append("</table></div>\n" + "<br/>\n" + "\n" + "  </body>\n" + "</html>");
+	builder.append("</table>\n\n</div>\n" + "<br/>\n" + "\n" + "  </body>\n" + "</html>");
 	return builder;
     }
 
@@ -165,21 +165,23 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
      * @param viewId
      * @return
      */
-    private StringBuilder append(StringBuilder builder, StationRecord station, String viewId) {
+    private StringBuilder append(String hostname, StringBuilder builder, StationRecord station, String viewId) {
 
-	String url = "../services/view/" + viewId + "/bnhs/station/" + station.getPlatformIdentifier() + "/";
+	String url = hostname + "/gs-service/services/view/" + viewId + "/bnhs/station/" + station.getPlatformIdentifier() + "/";
 
-	String image = "<a href='" + url
-		+ "' target='_blank'><i class=\"font-awesome-button-icon fa fa-info-circle\" style=\"color:blue; font-size:15px;\" aria-hidden=\"true\"></i></a>";
+	String stationLink = "<a class=\"relative-to-absolute\" href=\"" + url + "\" target=\"_blank\">\n" //
+		+ "  <i class=\"font-awesome-button-icon fa fa-info-circle\" style=\"color:blue; font-size:15px;\" aria-hidden=\"true\"></i>\n" //
+		+ "</a>";
+
+	// String stationLink = "<a href='" + url
+	// + "' target='_blank'><i class=\"font-awesome-button-icon fa fa-info-circle\" style=\"color:blue;
+	// font-size:15px;\" aria-hidden=\"true\"></i></a>";
 
 	builder.append("<tr>\n");
 	builder.append("  <td style='vertical-align: middle;'>" + station.getDatasetName() + "</td>    \n");
 	builder.append("  <td style='vertical-align: middle;'>" + station.getSourceLabel() + "</td>    \n");
-	builder.append("  <td style='text-align: center;'>" + image + "</td>\n");
-//	builder.append("  <td style='text-align: center; cursor:pointer' id='addToSearch_" + station.getDatasetName()
-//		+ "'><i class=\"font-awesome-button-icon fa fa-plus-circle\" style=\"color:darkred; font-size:15px;\" aria-hidden=\"true\"></i></td>\n");
+	builder.append("  <td style='text-align: center;'>" + stationLink + "</td>\n");
 	builder.append("  <td style='border: 1px solid transparent; background: transparent;'></td>\n");
-
 	builder.append("</tr>\n");
 
 	return builder;
@@ -194,6 +196,8 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	builder.append("<html>\n");
 	builder.append("  <head>\n");
 	builder.append("    <title>DAB GetFeatureInfo output</title>\n");
+	builder.append(
+		"    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css\">\n");
 	builder.append("  </head>\n");
 
 	builder.append(" <style type='text/css'>\n");
@@ -231,18 +235,17 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
 	if (!empty) {
 	    String info = "";
-	    if (returned!=total) {
-		info =" (" + returned + " of " + total + ")";
+	    if (returned != total) {
+		info = " (" + returned + " of " + total + ")";
 	    }
-	    builder.append("<div style='max-height: 400px; overflow-y: auto'><table class='featureInfo'>\n");
+	    builder.append("<div style='max-height: 400px; overflow-y: auto'>\n<table class='featureInfo'>\n");
 	    builder.append("<tr>\n");
 	    builder.append(" <th >Station" + info + "</th>\n");
 	    builder.append(" <th >Source</th>\n");
 	    builder.append(" <th >Station info</th>\n");
-//	    builder.append(" <th >Add to search</th>\n");
 	    builder.append(
 		    " <th title='Close' id='closePopup' style='background: white; cursor: pointer; background:'><i class=\"font-awesome-button-icon fa fa-times\" style=\"font-size:15px;\" aria-hidden=\"true\"></i></th>\n");
-	    builder.append(" </tr>\n");
+	    builder.append("</tr>\n");
 
 	} else {
 

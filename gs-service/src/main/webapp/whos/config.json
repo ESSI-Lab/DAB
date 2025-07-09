@@ -23,5 +23,6 @@
     "semanticSearchValue":1,
     "ontology": "whos",
     "riverSearch": true,
-    "clusterWMS": true
+    "clusterWMS": true,
+    "showSourceEndpoint": false
 }

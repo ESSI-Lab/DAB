@@ -267,6 +267,7 @@ public class DABStarter {
 
 		//
 		// -Dconfiguration.url=s3://awsaccesskey:awssecretkey@bucket/config.json
+		// -Dconfiguration.url=s3://minioaccesskey:miniosecretkey@hostname:9000/bucket/config.json
 		//
 
 		String startupUri = split[0];

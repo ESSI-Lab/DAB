@@ -443,6 +443,16 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	return host;
     }
 
+    public String getBaseUrl() {
+	HttpServletRequest request = getServletRequest();
+	String scheme = request.getScheme(); // http
+	String serverName = request.getServerName(); // localhost
+	int serverPort = request.getServerPort(); // 8080
+
+	return scheme + "://" + serverName
+		+ ((serverPort == 80 && "http".equals(scheme)) || (serverPort == 443 && "https".equals(scheme)) ? "" : ":" + serverPort);
+    }
+
     /**
      * @param servletRequest
      * @return
@@ -646,7 +656,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	return readHeader("origin");
     }
-    
+
     /**
      * @return
      */
@@ -654,7 +664,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	return readHeader("user-agent");
     }
-    
+
     /**
      * @return
      */
