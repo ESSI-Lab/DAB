@@ -23,7 +23,6 @@ package eu.essi_lab.model.index;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.QualifiedName;
@@ -63,7 +62,7 @@ public class IndexedElement {
     private String elementName;
     private List<IndexedElementInfo> indexInfoList;
     private List<String> values;
-    private ComposedElement element;
+    private List<ComposedElement> elements;
 
     /**
      * Creates a new <code>IndexedElement</code> with the supplied <code>elementName</code>
@@ -74,7 +73,7 @@ public class IndexedElement {
 
 	this(elementName, new ArrayList<>());
     }
-    
+
     /**
      * Creates a new <code>IndexedElement</code> with the supplied {@link ComposedElement} <code>element</code>
      * 
@@ -83,7 +82,7 @@ public class IndexedElement {
     public IndexedElement(ComposedElement element) {
 
 	this(element.getName(), new ArrayList<>());
-	this.element = element;
+	this.elements.add(element);
     }
 
     /**
@@ -106,6 +105,7 @@ public class IndexedElement {
      */
     private IndexedElement(String elementName, List<String> values) {
 
+	this.elements = new ArrayList<>();
 	this.elementName = elementName;
 	this.values = values;
 	this.indexInfoList = new ArrayList<IndexedElementInfo>();
@@ -135,17 +135,25 @@ public class IndexedElement {
     /**
      * @return
      */
-    public Optional<ComposedElement> getComposedElement() {
+    public List<ComposedElement> getComposedElements() {
 
-	return Optional.ofNullable(element);
+	return elements;
     }
 
     /**
      * @param element
      */
-    public void setComposedElement(ComposedElement element) {
+    public void addComposedElement(ComposedElement element) {
 
-	this.element = element;
+	elements.add(element);
+    }
+
+    /**
+     *  
+     */
+    public void clearComposedElements() {
+
+	this.elements.clear();
     }
 
     /**
