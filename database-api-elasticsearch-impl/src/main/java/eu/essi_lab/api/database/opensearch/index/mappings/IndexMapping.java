@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.opensearch.client.opensearch._types.mapping.BinaryProperty;
+import org.opensearch.client.opensearch._types.mapping.FieldType;
 import org.opensearch.client.opensearch._types.mapping.Property;
 import org.opensearch.client.opensearch.indices.ExistsAliasRequest;
 import org.opensearch.client.opensearch.indices.PutAliasRequest;
@@ -213,6 +214,7 @@ public abstract class IndexMapping {
 
 	JSONObject property = new JSONObject();
 	property.put("type", type);
+
 	if (ignoreMalformed) {
 	    property.put("ignore_malformed", true);
 	}
@@ -220,6 +222,34 @@ public abstract class IndexMapping {
 	mapping.getJSONObject("mappings").//
 		getJSONObject("properties").//
 		put(key, property);
+    }
+
+    /**
+     * @param key
+     * @param properties
+     */
+    protected void addNested(String key, JSONObject properties) {
+
+	JSONObject nested = new JSONObject();
+	nested.put("type", "nested");
+
+	nested.put("properties", properties);
+
+	mapping.getJSONObject("mappings").//
+		getJSONObject("properties").//
+		put(key, nested);
+    }
+
+    /**
+     * @param type
+     * @return
+     */
+    protected JSONObject createTypeObject(FieldType type) {
+
+	JSONObject out = new JSONObject();
+	out.put("type", type.jsonValue());
+
+	return out;
     }
 
     /**

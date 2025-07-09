@@ -123,14 +123,16 @@ public class IndexedElementsWriter {
 		    //
 		    index.getValues().clear();
 		    index.setBoundingBox(null);
-		    index.setComposedElement(null);
+		    index.clearComposedElements();
 		    //
 		    // ----------------------------
 
 		    try {
 			index.defineValues(resource);
 
-			if (index.getBoundingBox() != null || index.getComposedElement().isPresent() || !index.getValues().isEmpty()) {
+			if (index.getBoundingBox() != null || //
+				!index.getComposedElements().isEmpty() || //
+				!index.getValues().isEmpty()) {
 
 			    String elementName = index.getElementName();
 

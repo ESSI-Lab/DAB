@@ -58,8 +58,8 @@ import eu.essi_lab.model.resource.BNHSProperty;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.SA_ElementWrapper;
 import eu.essi_lab.model.resource.SatelliteScene;
-import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
@@ -2298,14 +2298,27 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-//	    ComposedElement composedElement = MetadataElement.KEYWORD_SA.createComposedElement().get();
-//
-//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
-//
-//	    setComposedElement(composedElement);
+	    SA_ElementWrapper wrapper1 = SA_ElementWrapper.of(MetadataElement.KEYWORD_SA);
+
+	    wrapper1.setValue(UUID.randomUUID().toString());
+	    wrapper1.setUri(UUID.randomUUID().toString());
+	    wrapper1.setUriTitle(UUID.randomUUID().toString());
+	    wrapper1.setSA_MatchType(UUID.randomUUID().toString());
+	    wrapper1.setSA_Uri(UUID.randomUUID().toString());
+	    wrapper1.setSA_UriTitle(UUID.randomUUID().toString());
+
+//	    addComposedElement(wrapper1.getElement());
+
+	    SA_ElementWrapper wrapper2 = SA_ElementWrapper.of(MetadataElement.KEYWORD_SA);
+
+	    wrapper2.setValue(UUID.randomUUID().toString());
+	    wrapper2.setUri(UUID.randomUUID().toString());
+	    wrapper2.setUriTitle(UUID.randomUUID().toString());
+	    wrapper2.setSA_MatchType(UUID.randomUUID().toString());
+	    wrapper2.setSA_Uri(UUID.randomUUID().toString());
+	    wrapper2.setSA_UriTitle(UUID.randomUUID().toString());
+
+//	    addComposedElement(wrapper2.getElement());
 	}
     };
 
@@ -2314,14 +2327,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    ComposedElement composedElement = MetadataElement.PARAMETER_SA.createComposedElement().get();
-//
-//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
-//
-//	    setComposedElement(composedElement);
 	}
     };
 
@@ -2330,14 +2335,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-//	    ComposedElement composedElement = MetadataElement.INSTRUMENT_SA.createComposeElement().get();
-//
-//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
-//
-//	    setComposedElement(composedElement);
 	}
     };
 
@@ -2346,14 +2343,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-//	    ComposedElement composedElement = MetadataElement.RESPONSIBLE_ORG_SA.createComposedElement().get();
-//
-//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
-//
-//	    setComposedElement(composedElement);
 	}
     };
 
@@ -2362,14 +2351,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-//	    ComposedElement composedElement = MetadataElement.CRUISE_SA.createComposedElement().get();
-
-//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
-
-//	    setComposedElement(composedElement);
 	}
     };
 
@@ -2378,14 +2359,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-//	    ComposedElement composedElement = MetadataElement.PROJECT_SA.createComposedElement().get();
-
-//	    composedElement.getProperty("value").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_uri").get().setValue(UUID.randomUUID().toString());
-//	    composedElement.getProperty("SA_matchType").get().setValue(UUID.randomUUID().toString());
-
-//	    setComposedElement(composedElement);
 	}
     };
 
