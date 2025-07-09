@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch.index.mappings;
 
+import org.json.JSONObject;
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 
 import eu.essi_lab.api.database.SourceStorageWorker;
@@ -102,6 +103,34 @@ public class DataFolderMapping extends IndexMapping {
 		// since 'text' fields are not optimised for aggregations
 		addProperty(toKeywordField(el.getName()), FieldType.Keyword.jsonValue());
 	    }
+	    }
+
+	    //
+	    // composed elements mapping
+	    //
+	    if (el.hasComposedElement()) {
+
+		JSONObject nestedProperties = new JSONObject();
+
+		el.createComposedElement().get().getProperties().forEach(prop -> {
+		    
+	 	    switch (prop.getType()) {
+		    case BOOLEAN -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Boolean));
+		    case DOUBLE -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Double));
+		    case INTEGER -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Integer));
+		    case LONG -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Long));
+		    case ISO8601_DATE, ISO8601_DATE_TIME -> {
+			nestedProperties.put(prop.getName(), createTypeObject(FieldType.Long));
+			nestedProperties.put(toDateField(prop.getName()), createTypeObject(FieldType.Date));
+		    }
+		    case TEXTUAL -> {
+			nestedProperties.put(prop.getName(), createTypeObject(FieldType.Text));
+			nestedProperties.put(toKeywordField(prop.getName()), createTypeObject(FieldType.Keyword));
+		    }
+		    }
+ 		});
+		
+		addNested(el.getName(), nestedProperties);
 	    }
 	});
 
