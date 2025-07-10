@@ -267,11 +267,17 @@ public class DABStarter {
 
 		//
 		// -Dconfiguration.url=s3://awsaccesskey:awssecretkey@bucket/config.json
+		// Note! For MINIO the s3Endpoint parameter must be specified
+		// E.g. -Ds3Endpoint=http://my-minio-hostname:9000
 		//
-
 		String startupUri = split[0];
 
-		source = S3Source.of(startupUri);
+		String s3Endpoint = System.getProperty("s3Endpoint");
+		if (s3Endpoint != null) {
+		    source = S3Source.of(startupUri, s3Endpoint);
+		} else {
+		    source = S3Source.of(startupUri);
+		}
 
 	    } else {
 

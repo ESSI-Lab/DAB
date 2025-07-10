@@ -51,16 +51,37 @@ public class S3Source implements ConfigurationSource {
 
     private S3TransferWrapper wrapper;
     private String bucketName;
+
+    public String getBucketName() {
+	return bucketName;
+    }
+
     private String configName;
 
+    public String getConfigName() {
+	return configName;
+    }
+
     /**
-     * s3://awsaccesskey:awssecretkey@bucket/config.json
+     * Used to initialize an AWS S3 source
      * 
-     * @param configURL
+     * @param configURL s3://awsUser:awsPassword@bucket/config.json
      * @return
      * @throws URISyntaxException
      */
     public static S3Source of(String configURL) throws URISyntaxException {
+	return of(configURL, null);
+    }
+
+    /**
+     * Used to initialize a Minio S3 source
+     * 
+     * @param configURL s3://user:password@bucket/config.json
+     * @param endpoint http://my-hostname:9000
+     * @return
+     * @throws URISyntaxException
+     */
+    public static S3Source of(String configURL, String endpoint) throws URISyntaxException {
 
 	URI uri = new URI(configURL);
 
@@ -74,6 +95,7 @@ public class S3Source implements ConfigurationSource {
 	S3TransferWrapper wrapper = new S3TransferWrapper();
 	wrapper.setAccessKey(accessKey);
 	wrapper.setSecretKey(secretKey);
+	wrapper.setEndpoint(endpoint);
 
 	return new S3Source(wrapper, bucketName, configName);
     }
@@ -189,7 +211,7 @@ public class S3Source implements ConfigurationSource {
 
 	stream.close();
 	binaryConfig.get().getValue().delete();
-	
+
 	return out;
     }
 

@@ -40,9 +40,11 @@ GIAPI.Source_UINode = function(source, id) {
 	mainDiv += '<a target="_blank" style="color:blue;text-decoration: none;" href="' + providerPageUrl + '">Provider Page</a>';
 	mainDiv += ' &nbsp;|&nbsp; ';
 	mainDiv += '<a href="#" id="zoom-to-area-' + id + '">Zoom to Area</a>';
-	mainDiv += ' &nbsp;|&nbsp; ';
-	mainDiv += '<a target="_blank" class="dont-break-out common-ui-node-report-content-table-right" style="color:blue;text-decoration: none;" href="' + report.online[0].url + '">Service URL</a>';
-	mainDiv += ' <button id="copy-service-url-' + id + '" title="Copy Service URL" style="border:none;background:transparent;cursor:pointer;padding:0 4px;vertical-align:middle;"><i class="fa fa-copy"></i></button>';
+	if (typeof config !== 'undefined' && config.showSourceEndpoint === true) {
+		mainDiv += ' &nbsp;|&nbsp; ';
+		mainDiv += '<a target="_blank" class="dont-break-out common-ui-node-report-content-table-right" style="color:blue;text-decoration: none;" href="' + report.online[0].url + '">Service URL</a>';
+		mainDiv += ' <button id="copy-service-url-' + id + '" title="Copy Service URL" style="border:none;background:transparent;cursor:pointer;padding:0 4px;vertical-align:middle;"><i class="fa fa-copy"></i></button>';
+	}
 	mainDiv += '</div>';
 	mainDiv += '</td>';
 	mainDiv += '</tr>';

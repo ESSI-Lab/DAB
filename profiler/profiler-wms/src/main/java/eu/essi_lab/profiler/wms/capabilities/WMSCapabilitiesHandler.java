@@ -327,6 +327,8 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 					}
 
 					layer.setEXGeographicBoundingBox(bbox);
+					layer.setMinScaleDenominator(1.);
+					layer.setMaxScaleDenominator(100000000.);
 					rootLayer.getLayers().add(layer);
 				}
 
