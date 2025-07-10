@@ -72,30 +72,14 @@ public class ComposedElementItem {
 	this.type = type;
 
 	this.value = switch (type) {
-	case BOOLEAN -> {
-	    yield DEFAULT_BOOLEAN_VALUE;
-	}
-	case DOUBLE -> {
-	    yield DEFAULT_DOUBLE_VALUE;
-	}
-	case INTEGER -> {
-	    yield DEFAULT_INT_VALUE;
-	}
-	case TEXTUAL -> {
-	    yield DEFAULT_STRING_VALUE;
-	}
-	case ISO8601_DATE -> {
-	    yield DEFAULT_ISO8601_DATE_VALUE;
-	}
-	case ISO8601_DATE_TIME -> {
-	    yield DEFAULT_SO8601_DATE_TIME_VALUE;
-	}
-	case LONG -> {
-	    yield Long.valueOf(0);
-	}
-
-	case COMPOSED -> throw new UnsupportedOperationException("Unimplemented case: " + type);
-	case SPATIAL -> throw new UnsupportedOperationException("Unimplemented case: " + type);
+	case BOOLEAN -> DEFAULT_BOOLEAN_VALUE;
+	case DOUBLE -> DEFAULT_DOUBLE_VALUE;
+	case INTEGER -> DEFAULT_INT_VALUE;
+	case TEXTUAL -> DEFAULT_STRING_VALUE;
+	case ISO8601_DATE -> DEFAULT_ISO8601_DATE_VALUE;
+	case ISO8601_DATE_TIME -> DEFAULT_SO8601_DATE_TIME_VALUE;
+	case LONG -> Long.valueOf(0);
+	case COMPOSED, SPATIAL -> throw new UnsupportedOperationException("Unimplemented case: " + type);
 	};
     }
 
