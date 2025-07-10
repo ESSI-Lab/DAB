@@ -144,7 +144,7 @@ public class Layer {
 	    targetLines = targetLines.subCollection(timeFilter);
 	}
 	if (bbox != null) {
-	    
+
 	    org.geotools.api.filter.spatial.BBOX bboxFilter;
 	    switch (bbox.getCrs()) {
 	    case "CRS:84":
@@ -370,7 +370,8 @@ public class Layer {
 	if (dataCacheConnector == null) {
 	    DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
 	    try {
-		dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
+		if (setting != null && setting.getDatabaseUri() != null && !setting.getDatabaseUri().isEmpty())
+		    dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
 		String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
 		String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
 		String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
@@ -388,7 +389,7 @@ public class Layer {
 
     public void prepare() {
 	GSLoggerFactory.getLogger(getClass()).info("Preparing cached layer {}", name);
-	
+
 	GSLoggerFactory.getLogger(getClass()).info("Sleeping a bit");
 	try {
 	    Thread.sleep(TimeUnit.MILLISECONDS.toMinutes(15));
@@ -540,8 +541,8 @@ public class Layer {
 						collectionLines.add(feature);
 					    }
 					    Date tmpHarvesting = record.getLastHarvesting();
-					    if (lastHarvesting == null || (tmpHarvesting!=null && lastHarvesting.before(tmpHarvesting))) {
-//					    if (lastHarvesting == null || lastHarvesting.before(tmpHarvesting)) {
+					    if (lastHarvesting == null || (tmpHarvesting != null && lastHarvesting.before(tmpHarvesting))) {
+						// if (lastHarvesting == null || lastHarvesting.before(tmpHarvesting)) {
 						lastHarvesting = tmpHarvesting;
 					    }
 					}
