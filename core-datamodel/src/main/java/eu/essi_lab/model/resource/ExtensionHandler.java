@@ -112,7 +112,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
 	    return list.stream().map(node -> {
 		try {
-		    return ComposedElement.create(node);
+		    return ComposedElement.of(node);
 		} catch (JAXBException e) {
 
 		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);

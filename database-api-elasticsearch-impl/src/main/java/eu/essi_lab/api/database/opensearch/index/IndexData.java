@@ -877,7 +877,7 @@ public class IndexData {
     private static ComposedElement create(Node node) {
 
 	try {
-	    return ComposedElement.create(node);
+	    return ComposedElement.of(node);
 	} catch (JAXBException e) {
 
 	    GSLoggerFactory.getLogger(IndexData.class).error(e);
