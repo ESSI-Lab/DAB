@@ -87,6 +87,10 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  */
 public class DABStarter {
 
+    public static final String JAVA_OPT_INIT_CACHES = "initCaches";
+
+    public static final String JAVA_OPT_CHECK_CONFIG = "checkConfig";
+
     /**
     * 
     */
@@ -196,7 +200,10 @@ public class DABStarter {
 	case INTENSIVE:
 	    break;
 	}
-	initCaches();
+
+	if (initCachesEnabled()) {
+	    initCaches();
+	}
 
     }
 
@@ -204,10 +211,18 @@ public class DABStarter {
      * @return
      */
     private static boolean configCheckEnabled() {
+	return propertyEnabled(JAVA_OPT_CHECK_CONFIG);
+    }
 
-	String check = System.getProperty("checkConfig");
+    private static boolean initCachesEnabled() {
+	return propertyEnabled(JAVA_OPT_INIT_CACHES);
+    }
+
+    private static boolean propertyEnabled(String property) {
+
+	String check = System.getProperty(property);
 	if (check == null) {
-	    check = System.getenv("checkConfig");
+	    check = System.getenv(property);
 	}
 
 	return check != null ? Boolean.valueOf(check) : true;

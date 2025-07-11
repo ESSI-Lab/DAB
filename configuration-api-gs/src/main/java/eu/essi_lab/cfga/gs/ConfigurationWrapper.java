@@ -905,10 +905,14 @@ public class ConfigurationWrapper {
 
 	String accessKey = getDownloadSetting().getS3StorageSetting().getAccessKey().get();
 	String secretKey = getDownloadSetting().getS3StorageSetting().getSecretKey().get();
-
+	Optional<String> endpoint = getDownloadSetting().getS3StorageSetting().getEndpoint();
+	
 	S3TransferWrapper manager = new S3TransferWrapper();
 	manager.setAccessKey(accessKey);
 	manager.setSecretKey(secretKey);
+	if (endpoint.isPresent()) {
+	    manager.setEndpoint(endpoint.get());
+	}
 	manager.initialize();
 	return Optional.of(manager);
     }
