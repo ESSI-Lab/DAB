@@ -44,12 +44,9 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.ResultsPriority;
-import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CollectionType;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.request.executor.discover.ResourcePropertyConstraintAdder;
 
 public class HISCentralStatisticsTask extends AbstractCustomTask {
 

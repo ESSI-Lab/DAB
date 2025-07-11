@@ -27,3 +27,4 @@ eu.essi_lab.gssrv.conf.task.views.ViewManagerTask
 eu.essi_lab.gssrv.conf.task.OSCARTask
 eu.essi_lab.gssrv.conf.task.StationsCreatorTask
 eu.essi_lab.gssrv.conf.task.DuplicatedOnlineIdentifiersTask
+eu.essi_lab.gssrv.conf.task.HISCentralShapefileInitializer
