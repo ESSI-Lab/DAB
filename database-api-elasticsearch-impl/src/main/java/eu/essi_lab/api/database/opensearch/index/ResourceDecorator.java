@@ -166,7 +166,7 @@ public class ResourceDecorator {
 			    get();
 
 		    try {
-			ComposedElement element = ComposedElement.create(obj, model);
+			ComposedElement element = ComposedElement.of(obj, model);
 			res.getExtensionHandler().addComposedElement(element);
 
 		    } catch (Exception e) {

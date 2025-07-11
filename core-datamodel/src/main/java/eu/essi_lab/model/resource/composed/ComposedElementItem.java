@@ -3,12 +3,9 @@
  */
 package eu.essi_lab.model.resource.composed;
 
-import java.util.Date;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.NameSpace;
 
 /*-
@@ -46,15 +43,6 @@ public class ComposedElementItem {
     @XmlElement(name = "value", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private Object value;
 
-    public static final String DEFAULT_STRING_VALUE = "novalue";
-    public static final double DEFAULT_DOUBLE_VALUE = 0.0;
-    public static final boolean DEFAULT_BOOLEAN_VALUE = false;
-    public static final int DEFAULT_INT_VALUE = 0;
-    public static final long DEFAULT_LONG_VALUE = 0l;
-    public static final String DEFAULT_ISO8601_DATE_VALUE = ISO8601DateTimeUtils.getISO8601Date(new Date(ISO8601DateTimeUtils.EPOCH));
-    public static final String DEFAULT_SO8601_DATE_TIME_VALUE = ISO8601DateTimeUtils
-	    .getISO8601DateTime(new Date(ISO8601DateTimeUtils.EPOCH));
-
     /**
      * 
      */
@@ -70,17 +58,6 @@ public class ComposedElementItem {
 
 	this.name = name;
 	this.type = type;
-
-	this.value = switch (type) {
-	case BOOLEAN -> DEFAULT_BOOLEAN_VALUE;
-	case DOUBLE -> DEFAULT_DOUBLE_VALUE;
-	case INTEGER -> DEFAULT_INT_VALUE;
-	case TEXTUAL -> DEFAULT_STRING_VALUE;
-	case ISO8601_DATE -> DEFAULT_ISO8601_DATE_VALUE;
-	case ISO8601_DATE_TIME -> DEFAULT_SO8601_DATE_TIME_VALUE;
-	case LONG -> Long.valueOf(0);
-	case COMPOSED, SPATIAL -> throw new UnsupportedOperationException("Unimplemented case: " + type);
-	};
     }
 
     /**
@@ -140,22 +117,11 @@ public class ComposedElementItem {
     public Object getValue() {
 
 	return switch (type) {
-	case BOOLEAN -> {
-	    yield Boolean.valueOf(getStringValue());
-	}
-	case DOUBLE -> {
-	    yield Double.valueOf(getStringValue());
-	}
-	case INTEGER -> {
-	    yield Integer.valueOf(getStringValue());
-	}
-	case TEXTUAL, ISO8601_DATE, ISO8601_DATE_TIME -> {
-	    yield getStringValue();
-	}
-	case LONG -> {
-	    yield Long.valueOf(getStringValue());
-	}
-
+	case BOOLEAN -> value != null ? Boolean.valueOf(getStringValue()) : null;
+	case DOUBLE -> value != null ? Double.valueOf(getStringValue()) : null;
+	case INTEGER -> value != null ? Integer.valueOf(getStringValue()) : null;
+	case LONG -> value != null ? Long.valueOf(getStringValue()) : null;
+	case TEXTUAL, ISO8601_DATE, ISO8601_DATE_TIME -> getStringValue();
 	case COMPOSED -> throw new UnsupportedOperationException("Unimplemented case: " + type);
 	case SPATIAL -> throw new UnsupportedOperationException("Unimplemented case: " + type);
 	};

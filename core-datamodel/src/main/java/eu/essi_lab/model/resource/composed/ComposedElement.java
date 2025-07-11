@@ -80,19 +80,20 @@ public class ComposedElement extends DOMSerializer {
      * @return
      * @throws Exception
      */
-    public static ComposedElement create(JSONObject object, ComposedElement model) throws Exception {
+    public static ComposedElement of(JSONObject object, ComposedElement model) throws Exception {
 
-	ComposedElement out = new ComposedElement(object.keys().next());
+	ComposedElement out = ComposedElement.of(model.asStream());
 
 	JSONObject properties = object.getJSONObject(object.keys().next());
 
 	properties.keySet().forEach(key -> {
 
-	    ComposedElementItem item = new ComposedElementItem(key);
-
-	    out.addItem(item);
-
-	    item.setType(model.getProperty(key).get().getType());
+	    ComposedElementItem item = out.//
+		    getProperties().//
+		    stream().//
+		    filter(i -> i.getName().equals(key)).//
+		    findFirst().//
+		    get();
 
 	    Object obj = properties.get(key);
 
@@ -107,7 +108,7 @@ public class ComposedElement extends DOMSerializer {
      * @return
      * @throws JAXBException
      */
-    public static ComposedElement create(InputStream stream) throws JAXBException {
+    public static ComposedElement of(InputStream stream) throws JAXBException {
 
 	return new ComposedElement() {
 	}.fromStream(stream);
@@ -118,7 +119,7 @@ public class ComposedElement extends DOMSerializer {
      * @return
      * @throws JAXBException
      */
-    public static ComposedElement create(Node node) throws JAXBException {
+    public static ComposedElement of(Node node) throws JAXBException {
 
 	return new ComposedElement() {
 	}.fromNode(node);

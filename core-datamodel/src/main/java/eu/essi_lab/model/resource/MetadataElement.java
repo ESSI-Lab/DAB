@@ -941,7 +941,7 @@ public enum MetadataElement implements Queryable {
 	if (element != null) {
 
 	    try {
-		return Optional.ofNullable(ComposedElement.create(element.asDocument(false)));
+		return Optional.ofNullable(ComposedElement.of(element.asDocument(false)));
 	    } catch (Exception ex) {
 
 		GSLoggerFactory.getLogger(MetadataElement.class).error(ex);

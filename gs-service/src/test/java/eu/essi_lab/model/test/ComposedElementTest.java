@@ -27,28 +27,28 @@ public class ComposedElementTest {
 
 	ComposedElement composedElement = MetadataElement.KEYWORD_SA.createComposedElement().get();
 
-	Assert.assertEquals(ComposedElementItem.DEFAULT_STRING_VALUE, composedElement.getProperty("value").get().getValue());
-	Assert.assertEquals(ComposedElementItem.DEFAULT_STRING_VALUE, composedElement.getProperty("uri").get().getValue());
-	Assert.assertEquals(ComposedElementItem.DEFAULT_STRING_VALUE, composedElement.getProperty("SA_uri").get().getValue());
-	Assert.assertEquals(ComposedElementItem.DEFAULT_STRING_VALUE, composedElement.getProperty("SA_matchType").get().getValue());
+	Assert.assertNull(composedElement.getProperty("value").get().getValue());
+	Assert.assertNull(composedElement.getProperty("uri").get().getValue());
+	Assert.assertNull(composedElement.getProperty("SA_uri").get().getValue());
+	Assert.assertNull(composedElement.getProperty("SA_match_type").get().getValue());
 
-	ComposedElement composedElement1 = ComposedElement.create(//
-		new JSONObject(composedElement.asJSON().toString()),//
+	ComposedElement composedElement1 = ComposedElement.of(//
+		new JSONObject(composedElement.asJSON().toString()), //
 		MetadataElement.KEYWORD_SA.createComposedElement().get());
 
 	Assert.assertEquals(composedElement, composedElement1);
 
-	ComposedElement composedElement2 = ComposedElement.create(//
-		composedElement.asJSON(),//
+	ComposedElement composedElement2 = ComposedElement.of(//
+		composedElement.asJSON(), //
 		MetadataElement.KEYWORD_SA.createComposedElement().get());
 
 	Assert.assertEquals(composedElement, composedElement2);
 
-	ComposedElement composedElement3 = ComposedElement.create(composedElement.asStream());
+	ComposedElement composedElement3 = ComposedElement.of(composedElement.asStream());
 
 	Assert.assertEquals(composedElement, composedElement3);
 
-	ComposedElement composedElement4 = ComposedElement.create(composedElement.asDocument(false));
+	ComposedElement composedElement4 = ComposedElement.of(composedElement.asDocument(false));
 
 	Assert.assertEquals(composedElement, composedElement4);
 
@@ -59,12 +59,12 @@ public class ComposedElementTest {
 	composedElement.getProperty("value").get().setValue("erggvb");
 	composedElement.getProperty("uri").get().setValue("xvfhg");
 	composedElement.getProperty("SA_uri").get().setValue("4566g");
-	composedElement.getProperty("SA_matchType").get().setValue("xzcx");
+	composedElement.getProperty("SA_match_type").get().setValue("xzcx");
 
 	Assert.assertEquals("erggvb", composedElement.getProperty("value").get().getValue());
 	Assert.assertEquals("xvfhg", composedElement.getProperty("uri").get().getValue());
 	Assert.assertEquals("4566g", composedElement.getProperty("SA_uri").get().getValue());
-	Assert.assertEquals("xzcx", composedElement.getProperty("SA_matchType").get().getValue());
+	Assert.assertEquals("xzcx", composedElement.getProperty("SA_match_type").get().getValue());
     }
 
     @Test
@@ -83,13 +83,13 @@ public class ComposedElementTest {
 	String name = composedElement.getName();
 	Assert.assertEquals("test", name);
 
-	Assert.assertEquals(ComposedElementItem.DEFAULT_INT_VALUE, composedElement.getProperty("integer").get().getValue());
-	Assert.assertEquals(ComposedElementItem.DEFAULT_DOUBLE_VALUE, composedElement.getProperty("double").get().getValue());
-	Assert.assertEquals(ComposedElementItem.DEFAULT_LONG_VALUE, composedElement.getProperty("long").get().getValue());
-	Assert.assertEquals(ComposedElementItem.DEFAULT_BOOLEAN_VALUE, composedElement.getProperty("boolean").get().getValue());
-	Assert.assertEquals(ComposedElementItem.DEFAULT_STRING_VALUE, composedElement.getProperty("text").get().getValue());
-	Assert.assertEquals(ComposedElementItem.DEFAULT_ISO8601_DATE_VALUE, composedElement.getProperty("date").get().getValue());
-	Assert.assertEquals(ComposedElementItem.DEFAULT_SO8601_DATE_TIME_VALUE, composedElement.getProperty("dateTime").get().getValue());
+	Assert.assertNull(composedElement.getProperty("integer").get().getValue());
+	Assert.assertNull(composedElement.getProperty("double").get().getValue());
+	Assert.assertNull(composedElement.getProperty("long").get().getValue());
+	Assert.assertNull(composedElement.getProperty("boolean").get().getValue());
+	Assert.assertNull(composedElement.getProperty("text").get().getValue());
+	Assert.assertNull(composedElement.getProperty("date").get().getValue());
+	Assert.assertNull(composedElement.getProperty("dateTime").get().getValue());
 
 	String iso8601Date = ISO8601DateTimeUtils.getISO8601Date();
 	String iso8601DateTime = ISO8601DateTimeUtils.getISO8601DateTime();
@@ -124,6 +124,14 @@ public class ComposedElementTest {
 		addItem("dateTime", ContentType.ISO8601_DATE_TIME).//
 		build();//
 
+	Assert.assertNull(composedElement.getProperty("integer").get().getValue());
+	Assert.assertNull(composedElement.getProperty("double").get().getValue());
+	Assert.assertNull(composedElement.getProperty("long").get().getValue());
+	Assert.assertNull(composedElement.getProperty("boolean").get().getValue());
+	Assert.assertNull(composedElement.getProperty("text").get().getValue());
+	Assert.assertNull(composedElement.getProperty("date").get().getValue());
+	Assert.assertNull(composedElement.getProperty("dateTime").get().getValue());
+
 	String iso8601Date = ISO8601DateTimeUtils.getISO8601Date();
 	String iso8601DateTime = ISO8601DateTimeUtils.getISO8601DateTime();
 
@@ -147,7 +155,7 @@ public class ComposedElementTest {
 	//
 	//
 
-	ComposedElement fromJSON = ComposedElement.create(composedElement.asJSON(), composedElement);
+	ComposedElement fromJSON = ComposedElement.of(composedElement.asJSON(), composedElement);
 
 	Assert.assertEquals(composedElement, fromJSON);
 
@@ -208,7 +216,7 @@ public class ComposedElementTest {
 
 	JSONObject asJSON = composedElement.asJSON();
 
-	ComposedElement fromJSON = ComposedElement.create(asJSON, composedElement);
+	ComposedElement fromJSON = ComposedElement.of(asJSON, composedElement);
 
 	Assert.assertEquals(composedElement, fromJSON);
 
@@ -235,8 +243,6 @@ public class ComposedElementTest {
 	Assert.assertEquals(ContentType.LONG, properties.stream().filter(p -> p.getName().equals("long")).findFirst().get().getType());
     }
 
-    
-
     @Test
     public void fromJSONtoXMLTestWithModelTest() throws Exception {
 
@@ -256,7 +262,7 @@ public class ComposedElementTest {
 
 	JSONObject asJSON = new JSONObject("{\"test\":{\"double\":0,\"integer\":0,\"long\":0}}");
 
-	ComposedElement fromJSON = ComposedElement.create(asJSON, model);
+	ComposedElement fromJSON = ComposedElement.of(asJSON, model);
 
 	String name = fromJSON.getName();
 	Assert.assertEquals("test", name);
@@ -305,19 +311,19 @@ public class ComposedElementTest {
 	composedElement.getProperty("date").get().setValue(iso8601Date);
 	composedElement.getProperty("dateTime").get().setValue(iso8601DateTime);
 
-	ComposedElement composedElement1 = ComposedElement.create(new JSONObject(composedElement.asJSON().toString()), composedElement);
+	ComposedElement composedElement1 = ComposedElement.of(new JSONObject(composedElement.asJSON().toString()), composedElement);
 
 	Assert.assertEquals(composedElement, composedElement1);
 
-	ComposedElement composedElement2 = ComposedElement.create(composedElement.asJSON(), composedElement);
+	ComposedElement composedElement2 = ComposedElement.of(composedElement.asJSON(), composedElement);
 
 	Assert.assertEquals(composedElement, composedElement2);
 
-	ComposedElement composedElement3 = ComposedElement.create(composedElement.asStream());
+	ComposedElement composedElement3 = ComposedElement.of(composedElement.asStream());
 
 	Assert.assertEquals(composedElement, composedElement3);
 
-	ComposedElement composedElement4 = ComposedElement.create(composedElement.asDocument(false));
+	ComposedElement composedElement4 = ComposedElement.of(composedElement.asDocument(false));
 
 	Assert.assertEquals(composedElement, composedElement4);
     }
@@ -343,19 +349,19 @@ public class ComposedElementTest {
 	composedElement.getProperty("double").get().setValue(10.5);
 	composedElement.getProperty("long").get().setValue(Long.MAX_VALUE);
 
-	ComposedElement composedElement1 = ComposedElement.create(new JSONObject(composedElement.asJSON().toString()), composedElement);
+	ComposedElement composedElement1 = ComposedElement.of(new JSONObject(composedElement.asJSON().toString()), composedElement);
 
 	Assert.assertEquals(composedElement, composedElement1);
 
-	ComposedElement composedElement2 = ComposedElement.create(composedElement.asJSON(), composedElement);
+	ComposedElement composedElement2 = ComposedElement.of(composedElement.asJSON(), composedElement);
 
 	Assert.assertEquals(composedElement, composedElement2);
 
-	ComposedElement composedElement3 = ComposedElement.create(composedElement.asStream());
+	ComposedElement composedElement3 = ComposedElement.of(composedElement.asStream());
 
 	Assert.assertEquals(composedElement, composedElement3);
 
-	ComposedElement composedElement4 = ComposedElement.create(composedElement.asDocument(false));
+	ComposedElement composedElement4 = ComposedElement.of(composedElement.asDocument(false));
 
 	Assert.assertEquals(composedElement, composedElement4);
     }

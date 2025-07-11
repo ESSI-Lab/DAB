@@ -48,7 +48,7 @@ public class SA_ElementWrapper {
 		addItem("uri_title", ContentType.TEXTUAL).//
 		addItem("SA_uri", ContentType.TEXTUAL).//
 		addItem("SA_uri_title", ContentType.TEXTUAL).//
-		addItem("SA_matchType", ContentType.TEXTUAL).//
+		addItem("SA_match_type", ContentType.TEXTUAL).//
 		build();
     }
 
@@ -114,7 +114,7 @@ public class SA_ElementWrapper {
      */
     public String getSA_MatchType() {
 
-	return element.getProperty("SA_matchType").get().getStringValue();
+	return element.getProperty("SA_match_type").get().getStringValue();
     }
 
     /**
@@ -162,7 +162,7 @@ public class SA_ElementWrapper {
      */
     public void setSA_MatchType(String matchType) {
 
-	element.getProperty("SA_matchType").get().setValue(matchType);
+	element.getProperty("SA_match_type").get().setValue(matchType);
     }
 
     /**
