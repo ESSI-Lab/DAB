@@ -202,7 +202,7 @@ public class UserService {
     @Path("/callback/{provider}/{param1}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response callback(//
+    public Response callbackProviderParam(//
 	    @Context HttpServletRequest httpRequest, //
 	    @Context HttpServletResponse httpResponse, //
 	    @PathParam("provider") String oAuthProvider, // this param is ignored, it must be consistent with the
@@ -289,7 +289,7 @@ public class UserService {
     @Path("/callback/{provider}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response callback(//
+    public Response callbackProvider(//
 	    @Context HttpServletRequest httpRequest, //
 	    @Context HttpServletResponse httpResponse, //
 	    @PathParam("provider") String oAuthProvider) { // this param is ignored, it must be consistent with the

@@ -170,7 +170,7 @@
 		<docker.plugin.version>0.44.0</docker.plugin.version>
 
 		<!-- Apache CXF (J11 UPDATED) -->
-		<cxf.version>3.3.13</cxf.version>
+		<cxf.version>3.5.11</cxf.version>
 
 		<!-- JAX WS RS API-->
 		<jax-ws-rs-api.version>2.1.1</jax-ws-rs-api.version>
@@ -389,13 +389,13 @@
 			<dependency>
 				<groupId>org.apache.parquet</groupId>
 				<artifactId>parquet-avro</artifactId>
-				<version>1.15.0</version> <!-- or latest version -->
+				<version>1.15.1</version> <!-- or latest version -->
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.parquet</groupId>
 				<artifactId>parquet-hadoop</artifactId>
-				<version>1.15.0</version>
+				<version>1.15.1</version>
 			</dependency>
 
 			<dependency>
