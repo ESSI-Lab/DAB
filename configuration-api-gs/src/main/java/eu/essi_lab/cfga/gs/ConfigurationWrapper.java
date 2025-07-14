@@ -104,7 +104,20 @@ public class ConfigurationWrapper {
      */
     private static List<HarvestingSetting> harvestingSettingsCache;
 
-    private static String cachedSparqlProxyEndpoint;
+    /**
+     * 
+     */
+    private static SystemSetting systemSetting;
+
+    /**
+     * 
+     */
+    private static String sparqlProxyEndpoint;
+
+    /**
+     * 
+     */
+    private static DatabaseSetting databaseSetting;
 
     /**
      * 
@@ -124,22 +137,18 @@ public class ConfigurationWrapper {
 
 	    @Override
 	    public void configurationChanged(ConfigurationChangeEvent event) {
+
 		allSourcesCache = getSources(null, false);
 		harvestingSettingsCache = _getHarvestingSettings();
-
-		Optional<Properties> kvo = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
-		if (kvo.isPresent()) {
-		    String prop = kvo.get().getProperty(KeyValueOptionKeys.SPARQL_PROXY_ENDPOINT.getLabel());
-		    if (prop != null) {
-			cachedSparqlProxyEndpoint = prop;
-		    }
-		}
-
+		systemSetting = getSystemSetting_();
+		databaseSetting = getDatabaseSetting_();
 	    }
 	});
 
 	allSourcesCache = getSources(null, false);
 	harvestingSettingsCache = _getHarvestingSettings();
+	systemSetting = getSystemSetting_();
+	databaseSetting = getDatabaseSetting_();
     }
 
     /**
@@ -163,12 +172,24 @@ public class ConfigurationWrapper {
      */
     public static DatabaseSetting getDatabaseSetting() {
 
+	if (databaseSetting == null) {
+
+	    databaseSetting = getDatabaseSetting_();
+	}
+
+	return databaseSetting;
+    }
+
+    /**
+     * @return
+     */
+    private static DatabaseSetting getDatabaseSetting_() {
+
 	return configuration.get(//
 		MainSettingsIdentifier.DATABASE.getLabel(), //
 		DatabaseSetting.class //
 	).//
 		get();
-
     }
 
     /**
@@ -692,6 +713,28 @@ public class ConfigurationWrapper {
      */
     public static SystemSetting getSystemSettings() {
 
+	if (systemSetting == null) {
+
+	    systemSetting = getSystemSetting_();
+	}
+
+	return systemSetting;
+    }
+
+    /**
+     * @return
+     */
+    public static Optional<StorageInfo> getUsersStorageInfo() {
+
+	return getSystemSettings().getUsersDatabaseSetting().map(s -> s.asStorageInfo());
+    }
+
+    /**
+     * @param settingClass
+     * @return
+     */
+    private static SystemSetting getSystemSetting_() {
+
 	return configuration.get(//
 		MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel(), //
 		SystemSetting.class //
@@ -776,17 +819,29 @@ public class ConfigurationWrapper {
     /**
      * @return
      */
-    public static String getCachedSparqlProxyEndpoint() {
+    public static String getSparqlProxyEndpoint() {
 
-	return cachedSparqlProxyEndpoint;
+	Optional<Properties> kvo = getSystemSettings().getKeyValueOptions();
+
+	if (kvo.isPresent()) {
+
+	    String prop = kvo.get().getProperty(KeyValueOptionKeys.SPARQL_PROXY_ENDPOINT.getLabel());
+
+	    if (prop != null) {
+
+		sparqlProxyEndpoint = prop;
+	    }
+	}
+
+	return sparqlProxyEndpoint;
     }
 
     /**
-     * @param cachedSparqlProxyEndpoint
+     * @param sparqlProxyEndpoint
      */
-    public static void setCachedSparqlProxyEndpoint(String cachedSparqlProxyEndpoint) {
+    public static void setSparqlProxyEndpoint(String sparqlProxyEndpoint) {
 
-	ConfigurationWrapper.cachedSparqlProxyEndpoint = cachedSparqlProxyEndpoint;
+	ConfigurationWrapper.sparqlProxyEndpoint = sparqlProxyEndpoint;
     }
 
     /**
@@ -906,7 +961,7 @@ public class ConfigurationWrapper {
 	String accessKey = getDownloadSetting().getS3StorageSetting().getAccessKey().get();
 	String secretKey = getDownloadSetting().getS3StorageSetting().getSecretKey().get();
 	Optional<String> endpoint = getDownloadSetting().getS3StorageSetting().getEndpoint();
-	
+
 	S3TransferWrapper manager = new S3TransferWrapper();
 	manager.setAccessKey(accessKey);
 	manager.setSecretKey(secretKey);

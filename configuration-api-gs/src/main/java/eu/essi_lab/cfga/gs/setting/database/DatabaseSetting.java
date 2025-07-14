@@ -37,7 +37,7 @@ import eu.essi_lab.model.StorageInfo;
 /**
  * @author Fabrizio
  */
-public final class DatabaseSetting extends Setting implements EditableSetting {
+public class DatabaseSetting extends Setting implements EditableSetting {
 
     /**
      *  
@@ -75,7 +75,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 	{
 	    Setting volatileDb = new Setting();
 	    volatileDb.setName("Volatile database");
-	    volatileDb.setIdentifier(VOLATILE_DB_SETTING_ID);
+	    volatileDb.setIdentifier(getVolatileDbSettingId());
 	    String desc = "This configuration is not editable and " + //
 		    "the underlyind database implementation is not persistent " + //
 		    "and it is supposed to be used only for test purpose";
@@ -108,7 +108,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 	{
 	    Setting dbSettings = new Setting();
 	    dbSettings.setName("Database");
-	    dbSettings.setIdentifier(DATABASE_SETTING_ID);
+	    dbSettings.setIdentifier(getDbSettingId());
 	    dbSettings.setCanBeDisabled(false);
 	    dbSettings.setSelected(true); // default
 	    dbSettings.enableCompactMode(false);
@@ -491,11 +491,21 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 
     private Setting getDbSetting() {
 
-	return getSetting(DATABASE_SETTING_ID).get();
+	return getSetting(getDbSettingId()).get();
     }
 
     private Optional<Setting> getVolatileDbSetting() {
 
-	return getSetting(VOLATILE_DB_SETTING_ID);
+	return getSetting(getVolatileDbSettingId());
+    }
+
+    protected String getDbSettingId() {
+
+	return DATABASE_SETTING_ID;
+    }
+
+    protected String getVolatileDbSettingId() {
+
+	return VOLATILE_DB_SETTING_ID;
     }
 }

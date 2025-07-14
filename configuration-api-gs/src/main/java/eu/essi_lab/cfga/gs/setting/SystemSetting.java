@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
+import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -50,6 +51,7 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
     private static final String ENABLE_DOWNLOAD_MAIL_REPORTS_OPTION_KEY = "enableMailDownloadReport";
     private static final String ENABLE_ERROR_LOGS_MAIL_REPORTS_OPTION_KEY = "enableErrorLogsReport";
     private static final String EMAIL_SETTING_ID = "emailSetting";
+    private static final String USERS_DATABASE_SETTING_KEY = "usersDatabase";
 
     /**
      * @author Fabrizio
@@ -260,6 +262,28 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
 	addSetting(statsSetting);
 
 	//
+	// User database
+	//
+	UsersDatabaseSetting userdbSetting = new UsersDatabaseSetting();
+
+	userdbSetting.setCanBeDisabled(true);
+	userdbSetting.setEditable(false);
+	userdbSetting.setEnabled(false);
+
+	userdbSetting.enableCompactMode(false);
+	userdbSetting.setName("User database setting");
+	userdbSetting.setIdentifier(USERS_DATABASE_SETTING_KEY);
+	userdbSetting
+		.setDescription("If enabled and configured, this setting allows to retrieve users information from a specific database");
+	userdbSetting.removeVolatileSettings();
+	userdbSetting.setSelectionMode(SelectionMode.UNSET);
+
+	userdbSetting.hideDatabaseConfigurationName();
+	userdbSetting.hideDatabaseConfigurationFolderOption();
+
+	addSetting(userdbSetting);
+
+	//
 	// set the rendering extension
 	//
 	setExtension(new SystemSettingComponentInfo());
@@ -428,6 +452,21 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
     public Optional<DatabaseSetting> getStatisticsSetting() {
 
 	DatabaseSetting setting = getSetting(DATABASE_STATISTICS_SETTING_KEY, DatabaseSetting.class).get();
+
+	if (setting.isEnabled()) {
+
+	    return Optional.of(setting);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @return
+     */
+    public Optional<UsersDatabaseSetting> getUsersDatabaseSetting() {
+
+	UsersDatabaseSetting setting = getSetting(USERS_DATABASE_SETTING_KEY, UsersDatabaseSetting.class).get();
 
 	if (setting.isEnabled()) {
 

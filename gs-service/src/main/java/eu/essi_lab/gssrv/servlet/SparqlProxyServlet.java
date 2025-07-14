@@ -106,6 +106,7 @@ public class SparqlProxyServlet extends HttpServlet {
     }
 
     private String getEndpoint() {
-	return ConfigurationWrapper.getCachedSparqlProxyEndpoint();
+	
+	return ConfigurationWrapper.getSparqlProxyEndpoint();
     }
 }
