@@ -53,10 +53,19 @@ public abstract class IndexMapping {
     /**
      * 
      */
-    public static final List<IndexMapping> MAPPINGS = new ArrayList<>();
+    private static List<IndexMapping> MAPPINGS = null;
+
     protected EntryType entryType;
 
-    static {
+    /**
+     * @return
+     */
+    public static List<IndexMapping> getMappings() {
+
+	if (MAPPINGS == null) {
+
+	    MAPPINGS = new ArrayList<>();
+	}
 
 	MAPPINGS.add(AugmentersMapping.get());
 	MAPPINGS.add(ConfigurationMapping.get());
@@ -67,6 +76,8 @@ public abstract class IndexMapping {
 	MAPPINGS.add(FolderRegistryMapping.get());
 	MAPPINGS.add(CacheMapping.get());
 	MAPPINGS.add(ShapeFileMapping.get());
+
+	return MAPPINGS;
     }
 
     /**
