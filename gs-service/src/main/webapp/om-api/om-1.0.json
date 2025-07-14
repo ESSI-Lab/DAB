@@ -568,7 +568,7 @@
 					{
 						"name": "format",
 						"in": "query",
-						"description": "Response format (e.g. JSON or CSV)",
+						"description": "Response format (e.g. JSON, CSV, WaterML 1.0, WaterML 2.0, NetCDF)",
 						"schema": {
 							"type": "string"
 						}
@@ -764,7 +764,7 @@
 					{
 						"name": "format",
 						"in": "query",
-						"description": "Response format (e.g. JSON or CSV)",
+						"description": "Response format (e.g. JSON, CSV, WaterML 1.0, WaterML 2.0, NetCDF)",
 						"schema": {
 							"type": "string"
 						}

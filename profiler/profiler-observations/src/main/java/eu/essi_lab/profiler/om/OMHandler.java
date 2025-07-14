@@ -280,6 +280,9 @@ public class OMHandler extends StreamingRequestHandler {
 		    CSVField.VALUE, CSVField.UOM, CSVField.LATITUDE, CSVField.LONGITUDE, CSVField.QUALITY };
 	    break;
 	case JSON:
+	case NETCDF:
+	case WATERML_1:
+	case WATERML_2:
 	    break;
 	default:
 	    throw new IllegalArgumentException("Unrecognized format. Choose between: " + OMFormat.stringOptions());

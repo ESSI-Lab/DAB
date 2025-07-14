@@ -45,6 +45,9 @@ public enum OMFormat {
     }
 
     public static OMFormat decode(String format) {
+	if (format==null) {
+	    return null;
+	}
 	format = format.toLowerCase();
 	if (format.contains("csv")) {
 	    return CSV;

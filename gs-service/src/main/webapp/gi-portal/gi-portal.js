@@ -434,7 +434,7 @@ function initializeLogin(config) {
 								const removeButton = $('<button>')
 									.addClass('remove-button')
 									.html('<i class="fa fa-trash"></i>')
-									.attr('title', 'Remove')
+								.attr('title', 'Remove')
 									.css({
 										'padding': '2px 6px',
 										'min-width': 'unset',
@@ -1246,54 +1246,31 @@ export function initializePortal(config) {
 									})
 							);
 							
+							// Format selection
 							const formatOptions = $('<div>').css({
 								'display': 'flex',
-								'gap': '20px'
+								'flex-direction': 'column',
+								'gap': '10px'
 							});
-							
-							// CSV option
-							const csvOption = $('<div>').css({
+							// First row: CSV, JSON, WaterML 1.0
+							const formatRow1 = $('<div>').css({
 								'display': 'flex',
-								'align-items': 'center'
+								'gap': '20px',
+								'margin-bottom': '0px'
 							});
-							csvOption.append(
-								$('<input>').attr({
-									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatCSV',
-									'value': 'CSV',
-									'checked': true
-								}).css('margin-right', '8px')
-							);
-							csvOption.append(
-								$('<label>')
-									.attr('for', 'formatCSV')
-									.text('CSV')
-									.css('color', '#2c3e50')
-							);
-							
-							// JSON option
-							const jsonOption = $('<div>').css({
+							formatRow1.append(csvOption);
+							formatRow1.append(jsonOption);
+							formatRow1.append(waterml10Option);
+							// Second row: WaterML 2.0, NetCDF
+							const formatRow2 = $('<div>').css({
 								'display': 'flex',
-								'align-items': 'center'
+								'gap': '20px',
+								'margin-top': '0px'
 							});
-							jsonOption.append(
-								$('<input>').attr({
-									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatJSON',
-									'value': 'JSON'
-								}).css('margin-right', '8px')
-							);
-							jsonOption.append(
-								$('<label>')
-									.attr('for', 'formatJSON')
-									.text('JSON')
-									.css('color', '#2c3e50')
-							);
-							
-							formatOptions.append(csvOption);
-							formatOptions.append(jsonOption);
+							formatRow2.append(waterml20Option);
+							formatRow2.append(netcdfOption);
+							formatOptions.append(formatRow1);
+							formatOptions.append(formatRow2);
 							formatDiv.append(formatOptions);
 							dialogContent.append(formatDiv);
 							
