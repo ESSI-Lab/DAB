@@ -1,4 +1,4 @@
-package eu.essi_lab.dab.auth;
+package eu.essi_lab.gssrv.rest;
 
 /*-
  * #%L
@@ -20,18 +20,56 @@ package eu.essi_lab.dab.auth;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-@Deprecated
-public class LoginRequest {
+public class LoginResponse {
+    private boolean success;
+    private String message;
+    private String firstName;
+    private String lastName;
     private String email;
     private String apiKey;
 
-    // Default constructor for JSON deserialization
-    public LoginRequest() {
+    public LoginResponse() {
     }
 
-    public LoginRequest(String email, String apiKey) {
+    public LoginResponse(boolean success, String message, String firstName, String lastName, String email, String apiKey) {
+	this.success = success;
+	this.message = message;
+	this.firstName = firstName;
+	this.lastName = lastName;
 	this.email = email;
 	this.apiKey = apiKey;
+    }
+
+    public boolean isSuccess() {
+	return success;
+    }
+
+    public void setSuccess(boolean success) {
+	this.success = success;
+    }
+
+    public String getMessage() {
+	return message;
+    }
+
+    public void setMessage(String message) {
+	this.message = message;
+    }
+
+    public String getFirstName() {
+	return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
+
+    public String getLastName() {
+	return lastName;
+    }
+
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
     }
 
     public String getEmail() {

@@ -51,24 +51,6 @@ import eu.essi_lab.model.auth.GSUser;
  */
 public class SupportService {
 
-    /**
-     * @author Fabrizio
-     */
-    public record LoginRequest(String email, String apiKey) {
-	public LoginRequest() {// default constructor for JSON deserialization
-	    this(null, null);
-	}
-    };
-
-    /**
-     * @author Fabrizio
-     */
-    public record LoginResponse(boolean success, String message, String firstName, String lastName, String email, String apiKey) {
-	public LoginResponse() {// default constructor for JSON deserialization
-	    this(false, null, null, null, null, null);
-	}
-    };
-
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("/odip")
@@ -135,8 +117,8 @@ public class SupportService {
 		    }
 		}
 
-		if (request.apiKey().equals(user.getUri()) && request.email().equals(email)) {
-		    LoginResponse response = new LoginResponse(true, "Login successful", "Test", "User", request.email(), request.apiKey());
+		if (request.getApiKey().equals(user.getUri()) && request.getEmail().equals(email)) {
+		    LoginResponse response = new LoginResponse(true, "Login successful", "Test", "User", request.getEmail(), request.getApiKey());
 		    return Response.ok(response).build();
 		}
 	    }
