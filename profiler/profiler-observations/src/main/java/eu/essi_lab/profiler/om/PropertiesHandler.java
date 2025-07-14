@@ -178,7 +178,7 @@ public class PropertiesHandler extends StreamingRequestHandler {
 
 		}
 		case FORMAT: {
-		    results = getResult("CSV", "JSON");
+		    results = getResult(OMFormat.stringValues());
 		    break;
 
 		}

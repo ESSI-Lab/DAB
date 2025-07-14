@@ -57,7 +57,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
-import org.json.JSONArray;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import com.google.common.base.Charsets;
@@ -268,22 +268,21 @@ public class OMHandler extends StreamingRequestHandler {
 	    }
 	}
 
-	String format = request.getParameterValue(APIParameters.FORMAT);
+	OMFormat format = OMFormat.decode(request.getParameterValue(APIParameters.FORMAT));
 	if (format == null) {
-	    format = "JSON";
+	    format = OMFormat.JSON;
 	}
 
-	format = format.toUpperCase();
 	CSVField[] fields = null;
 	switch (format) {
-	case "CSV":
+	case CSV:
 	    fields = new CSVField[] { CSVField.MONITORING_POINT, CSVField.OBSERVED_PROPERTY, CSVField.TIMESERIES_ID, CSVField.DATE_TIME,
 		    CSVField.VALUE, CSVField.UOM, CSVField.LATITUDE, CSVField.LONGITUDE, CSVField.QUALITY };
 	    break;
-	case "JSON":
+	case JSON:
 	    break;
 	default:
-	    throw new IllegalArgumentException("Unrecognized format. Choose between: CSV, JSON");
+	    throw new IllegalArgumentException("Unrecognized format. Choose between: " + OMFormat.stringOptions());
 	}
 
 	DiscoveryRequestTransformer transformer = getTransformer();
@@ -359,9 +358,10 @@ public class OMHandler extends StreamingRequestHandler {
 
 		String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
 
-		if (asynchDownloadRequest||(includeValues != null && (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
+		if (asynchDownloadRequest || (includeValues != null
+			&& (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
 
-		     if (results.size() > 1) {
+		    if (results.size() > 1) {
 
 			if (asynchDownloadRequest) {
 
@@ -436,7 +436,8 @@ public class OMHandler extends StreamingRequestHandler {
 				info = "";
 			    }
 			    printErrorMessage(output,
-				    "Requests to download more than one dataset should be handled through the asynchronous API methods. " + info);
+				    "Requests to download more than one dataset should be handled through the asynchronous API methods. "
+					    + info);
 			    return;
 			}
 		    }
@@ -474,14 +475,14 @@ public class OMHandler extends StreamingRequestHandler {
 		tempSize += observations.size();
 		GSLoggerFactory.getLogger(getClass()).info("formatting");
 
-		if (format.equals("JSON")) {
+		if (format.equals(OMFormat.JSON)) {
 		    if (first) {
 			writer.write("{");
 			addIdentifier(writer);
 			writer.write("\"" + getSetName() + "\":[");
 		    }
 		}
-		if (format.equals("CSV")) {
+		if (format.equals(OMFormat.CSV)) {
 		    if (first) {
 			int i = 0;
 			for (CSVField field : fields) {
@@ -499,7 +500,7 @@ public class OMHandler extends StreamingRequestHandler {
 		for (JSONObservation observation : observations) {
 		    List<Double> coord = observation.getFeatureOfInterest().getCoordinates();
 
-		    if (format.equals("JSON")) {
+		    if (format.equals(OMFormat.JSON)) {
 			if (!first) {
 			    writer.write(",\n");
 			}
@@ -545,7 +546,23 @@ public class OMHandler extends StreamingRequestHandler {
 
 			    switch (type) {
 			    case TimeSeriesObservation:
-				descriptor.setDataFormat(DataFormat.WATERML_1_1());
+				switch (format) {
+				case CSV:
+				case JSON:
+				case WATERML_1:
+				    descriptor.setDataFormat(DataFormat.WATERML_1_1());
+				    break;
+				case WATERML_2:
+				    descriptor.setDataFormat(DataFormat.WATERML_2_0());
+				    break;
+				case NETCDF:
+				    descriptor.setDataFormat(DataFormat.NETCDF());
+				    break;
+
+				default:
+				    throw new IllegalArgumentException("Unexpected value: " + format);
+				}
+
 				descriptor.setDataType(DataType.TIME_SERIES);
 				break;
 			    case TrajectoryObservation:
@@ -577,7 +594,22 @@ public class OMHandler extends StreamingRequestHandler {
 
 			    switch (type) {
 			    case TimeSeriesObservation:
-				addPointsFromWML(dataObject.getFile(), writer, observation, format, fields, coord);
+				switch (format) {
+				case CSV:
+				case JSON:
+				    addPointsFromWML(dataObject.getFile(), writer, observation, format, fields, coord);
+				    break;
+				case WATERML_1:
+				case WATERML_2:
+				case NETCDF:
+				    FileInputStream stream = new FileInputStream(dataObject.getFile());
+				    IOUtils.copy(stream, output);
+				    stream.close();
+				    output.close();
+				    return;
+				default:
+				    throw new IllegalArgumentException("Unexpected value: " + format);
+				}
 				break;
 			    case TrajectoryObservation:
 				addPointsFromTrajectoryNetCDF(dataObject.getFile(), observation, viewId, writer);
@@ -593,7 +625,7 @@ public class OMHandler extends StreamingRequestHandler {
 
 		    }
 
-		    if (format.equals("JSON")) {
+		    if (format.equals(OMFormat.JSON)) {
 			writeJSONFooter(writer);
 		    }
 
@@ -618,7 +650,7 @@ public class OMHandler extends StreamingRequestHandler {
 
 	} while (tempSize < userSize && searchAfter != null);
 
-	if (format.equals("JSON")) {
+	if (format.equals(OMFormat.JSON)) {
 
 	    // close the member array
 	    writer.write("]\n");
@@ -1207,7 +1239,7 @@ public class OMHandler extends StreamingRequestHandler {
 
     }
 
-    private void addPointsFromWML(File file, OutputStreamWriter writer, JSONObservation observation, String format, CSVField[] fields,
+    private void addPointsFromWML(File file, OutputStreamWriter writer, JSONObservation observation, OMFormat format, CSVField[] fields,
 	    List<Double> coord) {
 	try {
 	    FileInputStream stream = new FileInputStream(file);
@@ -1260,7 +1292,7 @@ public class OMHandler extends StreamingRequestHandler {
 				    } else {
 					point = observation.getPointAndQuality(d.get(), v, quality);
 				    }
-				    if (format.toLowerCase().contains("json")) {
+				    if (format.equals(OMFormat.JSON)) {
 					if (!first) {
 					    writer.write(",");
 					}
