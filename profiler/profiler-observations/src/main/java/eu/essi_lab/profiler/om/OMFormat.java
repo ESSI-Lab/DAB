@@ -22,7 +22,13 @@ package eu.essi_lab.profiler.om;
  */
 
 public enum OMFormat {
-    CSV, JSON, NETCDF, WATERML_1, WATERML_2;
+    CSV(".csv"), JSON(".json"), NETCDF(".nc"), WATERML_1(".xml"), WATERML_2(".xml");
+
+    private String extension;
+
+    private OMFormat(String extension) {
+	this.extension = extension;
+    }
 
     public static String stringOptions() {
 	String ret = "";
@@ -45,7 +51,7 @@ public enum OMFormat {
     }
 
     public static OMFormat decode(String format) {
-	if (format==null) {
+	if (format == null) {
 	    return null;
 	}
 	format = format.toLowerCase();
@@ -62,6 +68,13 @@ public enum OMFormat {
 		return WATERML_1;
 	    }
 	}
+	if (format.contains("nc") || format.contains("cdf")) {
+	    return NETCDF;
+	}
 	return null;
+    }
+
+    public String getExtension() {
+	return extension;
     }
 }

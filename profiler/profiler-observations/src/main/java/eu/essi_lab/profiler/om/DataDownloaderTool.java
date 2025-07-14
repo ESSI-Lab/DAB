@@ -200,6 +200,10 @@ public class DataDownloaderTool {
 			if (format != null) {
 			    downloadURL = addParameter(downloadURL, "format", format);
 			}
+			downloadURL = removeParameter(downloadURL, "asynchDownloadName", format);
+			downloadURL = removeParameter(downloadURL, "eMailNotifications", format);
+
+			downloadURL = downloadURL.replace("downloads?", "observations?");
 
 			// write
 			File sourceDir = new File(tempPath.toFile(), sourceId);
@@ -214,10 +218,11 @@ public class DataDownloaderTool {
 			    idDir.mkdir();
 			}
 
-			String extension = ".json";
-			if (downloadURL.toLowerCase().contains("csv")) {
-			    extension = ".csv";
+			OMFormat oFormat = OMFormat.decode(format);
+			if (oFormat == null) {
+			    oFormat = OMFormat.JSON;
 			}
+			String extension = oFormat.getExtension();
 
 			File logFile = new File(idDir, "log.txt");
 			File dataFile = new File(idDir, "data" + extension);
