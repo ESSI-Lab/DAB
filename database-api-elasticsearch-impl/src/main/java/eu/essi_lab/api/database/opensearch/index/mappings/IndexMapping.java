@@ -286,9 +286,10 @@ public abstract class IndexMapping {
     private String getBaseMapping() {
 
 	try {
-	    return IOStreamUtils.asUTF8String(
-
-		    getClass().getClassLoader().getResourceAsStream("mappings/base-mapping.json"));
+	    InputStream stream = getClass().getClassLoader().getResourceAsStream("mappings/base-mapping.json");
+	    String ret = IOStreamUtils.asUTF8String(stream);
+	    stream.close();
+	    return ret;
 	} catch (IOException e) {
 	}
 
