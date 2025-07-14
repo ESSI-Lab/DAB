@@ -479,7 +479,7 @@ public class OpenSearchWrapper {
      * @throws Exception
      */
     public List<InputStream> searchBinaries(String index, Query searchQuery) throws Exception {
-	System.out.println("searching");
+
 	SearchResponse<Object> searchResponse = search(//
 		index, //
 		searchQuery, //
@@ -490,7 +490,6 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		false, //
 		false);
-	System.out.println("searched");
 
 	return OpenSearchUtils.toBinaryList(searchResponse);
     }

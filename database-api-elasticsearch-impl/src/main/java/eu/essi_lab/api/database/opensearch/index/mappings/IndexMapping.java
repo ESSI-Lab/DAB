@@ -124,13 +124,10 @@ public abstract class IndexMapping {
      * @param indexAlias <code>true</code> to use an index alias
      */
     protected IndexMapping(String index, boolean indexAlias) {
-	System.out.println("const1");
+
 	this.index = index;
 	this.indexAlias = indexAlias;
-	System.out.println("const2");
-	String baseMapping = getBaseMapping();
-	this.mapping = new JSONObject(baseMapping);
-	System.out.println("const3");
+	this.mapping = new JSONObject(getBaseMapping());
     }
 
     /**
@@ -289,10 +286,9 @@ public abstract class IndexMapping {
     private String getBaseMapping() {
 
 	try {
-	    InputStream stream = getClass().getClassLoader().getResourceAsStream("mappings/base-mapping.json");
-	    String ret = IOStreamUtils.asUTF8String(stream);
-	    stream.close();
-	    return ret;
+	    return IOStreamUtils.asUTF8String(
+
+		    getClass().getClassLoader().getResourceAsStream("mappings/base-mapping.json"));
 	} catch (IOException e) {
 	}
 

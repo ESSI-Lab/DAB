@@ -54,15 +54,12 @@ public class UsersMapping extends IndexMapping {
      * @return
      */
     public static final UsersMapping get() {
-	System.out.println("um1");
+
 	if (instance == null) {
-	    System.out.println("um2");
+
 	    instance = new UsersMapping();
-	    System.out.println("um3");
 	}
 
-	System.out.println("um4");
-	
 	return instance;
     }
 
@@ -70,10 +67,9 @@ public class UsersMapping extends IndexMapping {
      *  
      */
     private UsersMapping() {
-	
+
 	super(USERS_INDEX);
 
-	System.out.println("ind0");
 	// mandatory
 	addProperty(USER_ID, FieldType.Text.jsonValue());
 	addProperty(USER_ROLE, FieldType.Text.jsonValue());
@@ -84,7 +80,5 @@ public class UsersMapping extends IndexMapping {
 	addProperty(toKeywordField(USER_ID), FieldType.Keyword.jsonValue());
 	addProperty(toKeywordField(USER_ROLE), FieldType.Keyword.jsonValue());
 	addProperty(toKeywordField(USER_ID_TYPE), FieldType.Keyword.jsonValue());
-	
-	System.out.println("ind1");
     }
 }
