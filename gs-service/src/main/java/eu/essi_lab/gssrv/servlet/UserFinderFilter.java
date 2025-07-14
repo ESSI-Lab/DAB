@@ -53,9 +53,9 @@ public class UserFinderFilter implements Filter {
 	GSUser user = null;
 
 	try {
-
+	    System.out.println("finding user");
 	    user = UserFinder.findCurrentUser((HttpServletRequest) request);
-
+	    System.out.println("found");
 	} catch (GSException e) {
 
 	    user = BasicRole.createAnonymousUser();

@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
+import java.io.InputStream;
 import java.util.Arrays;
 
 /*-
@@ -82,18 +83,23 @@ public class OpenSearchReader implements DatabaseReader {
 
     @Override
     public List<GSUser> getUsers() throws GSException {
-
+	System.out.println("gu1");
 	Query query = OpenSearchQueryBuilder.buildSearchQuery(getDatabase().getIdentifier());
-
+	System.out.println("gu2");
 	try {
-	    return wrapper.searchBinaries(UsersMapping.get().getIndex(), query).//
-		    stream().//
+	    UsersMapping userMapping = UsersMapping.get();
+	    System.out.println("gu2.5");
+	    String index = userMapping.getIndex();
+	    System.out.println("gu3");
+	    List<InputStream> binaries = wrapper.searchBinaries(index, query);//
+	    System.out.println("gu4");
+	    return binaries.stream().//
 		    map(binary -> GSUser.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
 
 	} catch (Exception ex) {
-
+	    System.out.println("ex");
 	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
 
 	    throw GSException.createException(getClass(), "OpenSearchReaderGetUsersError", ex);

@@ -286,8 +286,9 @@ public class UserFinder {
 	synchronized (USERS_UPDATER_TASK) {
 
 	    if (client != null) {
-
+		System.out.println("get user cache");
 		users = client.getUsers();
+		System.out.println("got user cache");
 	    }
 	}
     }
@@ -303,6 +304,7 @@ public class UserFinder {
      */
     public List<GSUser> getUsers(boolean useCache) throws Exception {
 
+	System.out.println("get users");
 	synchronized (USERS_UPDATER_TASK) {
 
 	    if (users == null && client != null || !useCache) {
@@ -314,8 +316,9 @@ public class UserFinder {
 		// GSLoggerFactory.getLogger(getClass()).debug("Reading users from cache");
 	    }
 
+	    System.out.println("got users");
 	    return users;
-	}
+	}	
     }
 
     /**
