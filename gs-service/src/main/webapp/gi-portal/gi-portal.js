@@ -1226,6 +1226,99 @@ export function initializePortal(config) {
 							
 							dialogContent.append(nameDiv);
 							
+							// Define format options before using them in rows
+							const csvOption = $('<div>').css({
+								'display': 'flex',
+								'align-items': 'center'
+							});
+							csvOption.append(
+								$('<input>').attr({
+									'type': 'radio',
+									'name': 'downloadFormat',
+									'id': 'formatCSV',
+									'value': 'CSV',
+									'checked': true
+								}).css('margin-right', '8px')
+							);
+							csvOption.append(
+								$('<label>')
+									.attr('for', 'formatCSV')
+									.text('CSV')
+									.css('color', '#2c3e50')
+							);
+							const jsonOption = $('<div>').css({
+								'display': 'flex',
+								'align-items': 'center'
+							});
+							jsonOption.append(
+								$('<input>').attr({
+									'type': 'radio',
+									'name': 'downloadFormat',
+									'id': 'formatJSON',
+									'value': 'JSON'
+								}).css('margin-right', '8px')
+							);
+							jsonOption.append(
+								$('<label>')
+									.attr('for', 'formatJSON')
+									.text('JSON')
+									.css('color', '#2c3e50')
+							);
+							const waterml10Option = $('<div>').css({
+								'display': 'flex',
+								'align-items': 'center'
+							});
+							waterml10Option.append(
+								$('<input>').attr({
+									'type': 'radio',
+									'name': 'downloadFormat',
+									'id': 'formatWaterML10',
+									'value': 'WATERML_1_0'
+								}).css('margin-right', '8px')
+							);
+							waterml10Option.append(
+								$('<label>')
+									.attr('for', 'formatWaterML10')
+									.text('WaterML 1.0')
+									.css('color', '#2c3e50')
+							);
+							const waterml20Option = $('<div>').css({
+								'display': 'flex',
+								'align-items': 'center'
+							});
+							waterml20Option.append(
+								$('<input>').attr({
+									'type': 'radio',
+									'name': 'downloadFormat',
+									'id': 'formatWaterML20',
+									'value': 'WATERML_2_0'
+								}).css('margin-right', '8px')
+							);
+							waterml20Option.append(
+								$('<label>')
+									.attr('for', 'formatWaterML20')
+									.text('WaterML 2.0')
+									.css('color', '#2c3e50')
+							);
+							const netcdfOption = $('<div>').css({
+								'display': 'flex',
+								'align-items': 'center'
+							});
+							netcdfOption.append(
+								$('<input>').attr({
+									'type': 'radio',
+									'name': 'downloadFormat',
+									'id': 'formatNetCDF',
+									'value': 'NETCDF'
+								}).css('margin-right', '8px')
+							);
+							netcdfOption.append(
+								$('<label>')
+									.attr('for', 'formatNetCDF')
+									.text('NetCDF')
+									.css('color', '#2c3e50')
+							);
+							
 							// Add format selection
 							const formatDiv = $('<div>').css({
 								'margin-top': '15px',
