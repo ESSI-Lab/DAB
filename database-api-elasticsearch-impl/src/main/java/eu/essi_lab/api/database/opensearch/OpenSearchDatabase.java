@@ -213,7 +213,7 @@ public class OpenSearchDatabase extends Database {
 
 	GSLoggerFactory.getLogger(getClass()).info("Indexes init STARTED");
 
-	for (IndexMapping mapping : IndexMapping.MAPPINGS) {
+	for (IndexMapping mapping : IndexMapping.getMappings()) {
 
 	    boolean exists = checkIndex(getClient(), mapping.getIndex(false));
 

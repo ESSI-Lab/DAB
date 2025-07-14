@@ -48,7 +48,7 @@ public class OpenSearchDatabaseInitTest {
 	//
 	//
 
-	for (IndexMapping mapping : IndexMapping.MAPPINGS) {
+	for (IndexMapping mapping : IndexMapping.getMappings()) {
 
 	    ExistsRequest existsIndexRequest = new ExistsRequest.Builder().index(mapping.getIndex()).build();
 
