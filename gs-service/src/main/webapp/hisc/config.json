@@ -13,7 +13,7 @@
     "layersSelectorButtonVisibility": true,
     "zoomSlider":false,
     "defaultLayer": "OpenStreetMap",
-    "filters": "source,keyword,organisationName,attributeTitle,attributeURI,platformTitle",    
+    "filters": "source,keyword,organisationName,attributeTitle,attributeURI,platformTitle,instrumentTitle",    
     "instrumentSearch": true,
     "attributeSearch": true,
     "platformSearch": true,
