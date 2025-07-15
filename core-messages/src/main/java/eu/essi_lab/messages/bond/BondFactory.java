@@ -631,9 +631,10 @@ public class BondFactory {
 		operator != BondOperator.LESS && //
 		operator != BondOperator.LESS_OR_EQUAL && //
 		operator != BondOperator.GREATER && //
-		operator != BondOperator.GREATER_OR_EQUAL) {
+		operator != BondOperator.GREATER_OR_EQUAL && //
+		operator != BondOperator.TEXT_SEARCH) {
 
-	    throw new IllegalArgumentException("Unsupported binary operator: " + operator);
+	    throw new IllegalArgumentException("Unsupported operator: " + operator);
 	}
 
 	return new ComposedElementBond(operator, logicalOp, element, value.toArray(new ComposedElementItem[] {}));
