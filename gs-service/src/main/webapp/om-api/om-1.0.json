@@ -798,6 +798,15 @@
 						}
 					},
 					{
+						"name": "view",
+						"in": "path",
+						"required": true,
+						"description": "Identifier of the data subset interesting for the user",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "id",
 						"in": "query",
 						"description": "Identifier of the asynchronous download task",
@@ -829,6 +838,15 @@
 						"in": "path",
 						"required": true,
 						"description": "Token identifying the user",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "view",
+						"in": "path",
+						"required": true,
+						"description": "Identifier of the data subset interesting for the user",
 						"schema": {
 							"type": "string"
 						}

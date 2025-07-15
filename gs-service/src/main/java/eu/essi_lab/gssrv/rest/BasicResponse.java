@@ -1,5 +1,10 @@
 package eu.essi_lab.gssrv.rest;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import eu.essi_lab.model.auth.GSUser;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -20,14 +25,20 @@ package eu.essi_lab.gssrv.rest;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-public class ListUserResponse {
+public class BasicResponse {
     private boolean success;
     private String message;
 
-    public ListUserResponse() {
+    private List<GSUser> users = new ArrayList<>();
+
+    public List<GSUser> getUsers() {
+        return users;
     }
 
-    public ListUserResponse(boolean success, String message) {
+    public BasicResponse() {
+    }
+
+    public BasicResponse(boolean success, String message) {
 	this.success = success;
 	this.message = message;
 

@@ -136,7 +136,7 @@ function initializeLogin(config) {
 		let menuHtml = `
 			<button id="statusBtn" class="menu-button">Status of bulk downloads</button>\n`;
 		if (isAdmin) {
-			menuHtml += `<button id="listUsersBtn" class="menu-button">List Users</button>\n`;
+			menuHtml += `<button id="listUsersBtn" class="menu-button">Manage Users</button>\n`;
 		}
 		menuHtml += `<button id="logoutMenuBtn" class="menu-button">Logout</button>`;
 		userMenu.innerHTML = menuHtml;
@@ -513,8 +513,248 @@ function initializeLogin(config) {
 		if (isAdmin) {
 			document.getElementById('listUsersBtn').addEventListener('click', function() {
 				userMenu.style.display = 'none';
-				// Placeholder: show a dialog or perform an action to list users
-				alert('List Users (admin only) - implement user listing here.');
+				// Create dialog content
+				const dialogContent = $('<div>');
+				dialogContent.append($('<h3>').text('Manage Users'));
+				dialogContent.append($('<p>').text('Below is the list of users.'));
+				// Results area
+				const resultsDiv = $('<div>').attr('id', 'listUsersResults').css({'margin-top': '15px'});
+				dialogContent.append(resultsDiv);
+				// --- Move function definitions here so they are in scope for both dialog and fetch ---
+				function renderTable(users) {
+					let table = '<table id="usersTable" style="width:100%;border-collapse:collapse;margin-top:10px;cursor:pointer">';
+					table += '<tr>' +
+						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Email</th>' +
+						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">First Name</th>' +
+						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Last Name</th>' +
+						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Institution</th>' +
+						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Permissions</th>' +
+					'</tr>';
+					users.forEach((u, idx) => {
+						const propMap = {};
+						if (Array.isArray(u.properties)) {
+							u.properties.forEach(p => { propMap[p.name] = p.value; });
+						}
+						table += `<tr class='user-row' data-user-idx='${idx}' style='cursor:pointer'>` +
+							`<td style='padding:4px'>${propMap['email'] || ''}</td>` +
+							`<td style='padding:4px'>${propMap['firstName'] || ''}</td>` +
+							`<td style='padding:4px'>${propMap['lastName'] || ''}</td>` +
+							`<td style='padding:4px'>${propMap['institution'] || ''}</td>` +
+							`<td style='padding:4px'>${propMap['permissions'] || ''}</td>` +
+							'</tr>';
+					});
+					table += '</table>';
+					// Wrap table in a scrollable div
+					return `<div style='max-height:400px;overflow-y:auto'>${table}</div>`;
+				}
+				function bindRowClicks(users) {
+					$('#usersTable .user-row').off('click').on('click', function() {
+						const userIdx = $(this).data('user-idx');
+						const user = users[userIdx];
+						const propMap = {};
+						if (Array.isArray(user.properties)) {
+							user.properties.forEach(p => { propMap[p.name] = p.value; });
+						}
+						let details = '<table style="width:100%;border-collapse:collapse">';
+						details += `<tr><th style='text-align:left;padding:4px'>Field</th><th style='text-align:left;padding:4px'>Value</th></tr>`;
+						details += `<tr><td style='padding:4px'>Identifier</td><td style='padding:4px'>${user.identifier || ''}</td></tr>`;
+						details += `<tr><td style='padding:4px'>Role</td><td style='padding:4px'>${user.role || ''}</td></tr>`;
+						details += `<tr><td style='padding:4px'>Enabled</td><td style='padding:4px'>${user.enabled === false ? 'No' : 'Yes'}</td></tr>`;
+						Object.keys(propMap).forEach(name => {
+							const value = propMap[name];
+							if (name === 'permissions') {
+								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-permissions-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> Edit</button></td></tr>`;
+							} else {
+								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-prop-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i></button></td></tr>`;
+							}
+						});
+						details += '</table>';
+						// Add 'Add Permissions' button if permissions property is missing
+						if (!('permissions' in propMap)) {
+							details += `<div style='margin-top:12px'><button id='add-permissions-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> Add Permissions</button></div>`;
+						}
+						const detailsDialog = $('<div>').html(details).dialog({
+							title: 'User Details',
+							modal: true,
+							width: 600,
+							buttons: [
+								{
+									text: 'Remove User',
+									class: 'remove-user-button',
+									click: function() {
+										if (!confirm('Are you sure you want to remove this user?')) return;
+										const email = localStorage.getItem('userEmail');
+										const apiKey = localStorage.getItem('authToken');
+										const userIdentifier = user.identifier;
+										if (!email || !apiKey || !userIdentifier) {
+											alert('Missing credentials or user identifier.');
+											return;
+										}
+										fetch('../services/support/deleteUser', {
+											method: 'DELETE',
+											headers: { 'Content-Type': 'application/json' },
+											body: JSON.stringify({ email, apiKey, userIdentifier })
+										})
+										.then(response => response.json())
+										.then(result => {
+											if (result.success) {
+												alert('User removed successfully.');
+												detailsDialog.dialog('close');
+												dialogContent.dialog('close');
+												document.getElementById('listUsersBtn').click();
+											} else {
+												alert('Failed to remove user: ' + (result.message || 'Unknown error'));
+											}
+										})
+										.catch(err => {
+											alert('Error removing user: ' + err);
+										});
+									}
+								},
+								{ text: 'Close', click: function() { $(this).dialog('close'); } }
+							]
+						});
+						// Add handler for Add Permissions button
+						detailsDialog.on('click', '#add-permissions-btn', function() {
+							showPermissionsDialog('', function(permissions) {
+								if (permissions === null) return;
+								const email = localStorage.getItem('userEmail');
+								const apiKey = localStorage.getItem('authToken');
+								const userIdentifier = user.identifier;
+								if (!email || !apiKey || !userIdentifier) {
+									alert('Missing credentials or user identifier.');
+									return;
+								}
+								fetch('../services/support/updateUser', {
+									method: 'POST',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'permissions', propertyValue: permissions })
+								})
+								.then(response => response.json())
+								.then(result => {
+									if (result.success) {
+										alert('Permissions added.');
+										detailsDialog.dialog('close');
+										// Reopen details to show new property
+										$(`#usersTable .user-row[data-user-idx='${userIdx}']`).click();
+									} else {
+										alert('Failed to add permissions: ' + (result.message || 'Unknown error'));
+									}
+								})
+								.catch(err => {
+									alert('Error adding permissions: ' + err);
+								});
+							});
+						});
+						// Edit permissions handler
+						detailsDialog.on('click', '.edit-permissions-btn', function(e) {
+							e.preventDefault();
+							const propName = $(this).data('prop-name');
+							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
+							const oldValue = valueSpan.text();
+							showPermissionsDialog(oldValue, function(newPermissions) {
+								if (newPermissions === oldValue) return;
+								const email = localStorage.getItem('userEmail');
+								const apiKey = localStorage.getItem('authToken');
+								const userIdentifier = user.identifier;
+								if (!email || !apiKey || !userIdentifier) {
+									alert('Missing credentials or user identifier.');
+									return;
+								}
+								fetch('../services/support/updateUser', {
+									method: 'POST',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'permissions', propertyValue: newPermissions })
+								})
+								.then(response => response.json())
+								.then(result => {
+									if (result.success) {
+										alert('Permissions updated.');
+										detailsDialog.dialog('close');
+										$(`#usersTable .user-row[data-user-idx='${userIdx}']`).click();
+									} else {
+										alert('Failed to update permissions: ' + (result.message || 'Unknown error'));
+									}
+								})
+								.catch(err => {
+									alert('Error updating permissions: ' + err);
+								});
+							});
+						});
+					});
+				}
+				// --- End function definitions ---
+				dialogContent.dialog({
+					title: 'Manage Users',
+					modal: true,
+					width: 800,
+					position: { my: 'center', at: 'center top+80', of: window },
+					buttons: [
+						{
+							text: 'Refresh',
+							click: function() {
+								const resultsDiv = dialogContent.find('#listUsersResults');
+								resultsDiv.html('Refreshing...');
+								const email = localStorage.getItem('userEmail');
+								const apiKey = localStorage.getItem('authToken');
+								if (!email || !apiKey) {
+									resultsDiv.html('<span style="color:red">Missing credentials. Please log in again.</span>');
+									return;
+								}
+								fetch('../services/support/listUsers', {
+									method: 'POST',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify({ email: email, apiKey: apiKey })
+								})
+								.then(response => response.json())
+								.then(newData => {
+									if (newData.success && Array.isArray(newData.users)) {
+										resultsDiv.html(renderTable(newData.users));
+										bindRowClicks(newData.users);
+									} else {
+										resultsDiv.html('<span style="color:red">' + (newData.message || 'Failed to fetch users.') + '</span>');
+									}
+								})
+								.catch(err => {
+									resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
+								});
+							}
+						},
+						{
+							text: 'Close',
+							click: function() { $(this).dialog('close'); }
+						}
+					]
+				});
+				// Fetch users immediately using stored credentials
+				const email = localStorage.getItem('userEmail');
+				const apiKey = localStorage.getItem('authToken');
+				if (!email || !apiKey) {
+					resultsDiv.html('<span style="color:red">Missing credentials. Please log in again.</span>');
+					return;
+				}
+				resultsDiv.html('Loading...');
+				fetch('../services/support/listUsers', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ email: email, apiKey: apiKey })
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data.success && Array.isArray(data.users)) {
+						if (data.users.length === 0) {
+							resultsDiv.html('<span>No users found.</span>');
+						} else {
+							resultsDiv.html(renderTable(data.users));
+							bindRowClicks(data.users);
+						}
+					} else {
+						resultsDiv.html('<span style="color:red">' + (data.message || 'Failed to fetch users.') + '</span>');
+					}
+				})
+				.catch(err => {
+					resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
+				});
 			});
 		}
 
@@ -1755,6 +1995,42 @@ export function initializePortal(config) {
 			alert('Map zoom function not available.');
 		}
 	};
+}
+
+function showPermissionsDialog(currentPermissions, onSave) {
+    // Read permissions from config, fallback to default if not present
+    let allPermissions = ['downloads', 'api', 'admin'];
+    if (window.config && typeof window.config.permissions === 'string') {
+        allPermissions = window.config.permissions.split(',').map(p => p.trim()).filter(Boolean);
+    }
+    const selected = (currentPermissions || '').split(',').map(p => p.trim()).filter(Boolean);
+    const dialogDiv = $('<div>').css({'padding':'10px'});
+    dialogDiv.append($('<div>').text('Select permissions:').css({'margin-bottom':'10px'}));
+    allPermissions.forEach(perm => {
+        const checkbox = $('<input type="checkbox">').attr('id', 'perm_' + perm).val(perm);
+        if (selected.includes(perm)) checkbox.prop('checked', true);
+        const label = $('<label>').attr('for', 'perm_' + perm).text(perm).css({'margin-right':'20px'});
+        dialogDiv.append(checkbox).append(label);
+    });
+    dialogDiv.dialog({
+        title: 'Set Permissions',
+        modal: true,
+        width: 400,
+        buttons: [
+            {
+                text: 'Save',
+                click: function() {
+                    const checked = dialogDiv.find('input[type=checkbox]:checked').map(function(){return this.value;}).get();
+                    onSave(checked.join(','));
+                    $(this).dialog('close');
+                }
+            },
+            {
+                text: 'Cancel',
+                click: function() { $(this).dialog('close'); }
+            }
+        ]
+    });
 }
 
 
