@@ -76,6 +76,7 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.zip.Unzipper;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.Queryable;
+import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
@@ -789,7 +790,15 @@ public class IndexData {
 			    nested.put(item);
 
 			    composed.getProperties().//
-				    forEach(prop -> item.put(prop.getName(), prop.getValue()));
+				    forEach(prop -> {
+
+					item.put(prop.getName(), prop.getValue());
+
+					if (prop.getType() == ContentType.TEXTUAL) {
+
+					    item.put(IndexMapping.toKeywordField(prop.getName()), prop.getValue());
+					}
+				    });
 			});
 
 		indexData.put(elName, nested);
