@@ -6,7 +6,9 @@ package eu.essi_lab.api.database.opensearch.shapefilesfolder.test;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,8 +16,9 @@ import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
-  
+
 /**
  * @author Fabrizio
  */
@@ -35,15 +38,22 @@ public class ShapeFilesFolderTest extends OpenSearchTest {
 	//
 	//
 	//
-	
+
 	Assert.assertTrue(stored);
-	
+
 	Assert.assertEquals(47, folder.size());
-	
-	List<String> asList = Arrays.asList(folder.listKeys());
-	
-	System.out.println(asList);
-	
+
+	//
+	//
+	//
+
+	List<String> keys = Arrays.asList(folder.listKeys());
+
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database);
+
+	Optional<JSONArray> shapeCoordinates = wrapper.getShapeFeatureCoordinates(keys.get(0));
+
+	Assert.assertTrue(shapeCoordinates.isPresent());
     }
 
 }

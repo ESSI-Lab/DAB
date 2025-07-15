@@ -53,7 +53,7 @@ public abstract class IndexMapping {
     /**
      * 
      */
-    private static List<IndexMapping> MAPPINGS = null;
+    private static List<IndexMapping> MAPPINGS;
 
     protected EntryType entryType;
 
@@ -106,7 +106,7 @@ public abstract class IndexMapping {
      */
     public static List<String> getIndexes(boolean indexAlias) {
 
-	return MAPPINGS.stream().//
+	return getMappings().stream().//
 		map(i -> i.getIndex(indexAlias)).//
 		collect(Collectors.toList());
     }

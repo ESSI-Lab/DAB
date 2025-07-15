@@ -27,6 +27,7 @@ package eu.essi_lab.model.resource;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
+import eu.essi_lab.model.resource.composed.ComposedElementItem;
 
 /**
  * @author Fabrizio
@@ -82,7 +83,7 @@ public class SA_ElementWrapper {
      */
     public String getUri() {
 
-	return element.getProperty("uri").get().getStringValue();
+	return getUriItem().getStringValue();
     }
 
     /**
@@ -90,7 +91,7 @@ public class SA_ElementWrapper {
      */
     public String getUriTitle() {
 
-	return element.getProperty("uri_title").get().getStringValue();
+	return getUriTitleItem().getStringValue();
     }
 
     /**
@@ -98,7 +99,7 @@ public class SA_ElementWrapper {
      */
     public String getSA_Uri() {
 
-	return element.getProperty("SA_uri").get().getStringValue();
+	return getSA_UriItem().getStringValue();
     }
 
     /**
@@ -106,7 +107,7 @@ public class SA_ElementWrapper {
      */
     public String getSA_UriTitle() {
 
-	return element.getProperty("SA_uri_title").get().getStringValue();
+	return getSA_UriTitleItem().getStringValue();
     }
 
     /**
@@ -114,7 +115,55 @@ public class SA_ElementWrapper {
      */
     public String getSA_MatchType() {
 
-	return element.getProperty("SA_match_type").get().getStringValue();
+	return getSA_MatchTypeItem().getStringValue();
+    }
+
+    /**
+     * @return
+     */
+    public ComposedElementItem getValueItem() {
+
+	return element.getProperty("value").get();
+    }
+
+    /**
+     * @return
+     */
+    public ComposedElementItem getUriItem() {
+
+	return element.getProperty("uri").get();
+    }
+
+    /**
+     * @return
+     */
+    public ComposedElementItem getUriTitleItem() {
+
+	return element.getProperty("uri_title").get();
+    }
+
+    /**
+     * @return
+     */
+    public ComposedElementItem getSA_UriItem() {
+
+	return element.getProperty("SA_uri").get();
+    }
+
+    /**
+     * @return
+     */
+    public ComposedElementItem getSA_UriTitleItem() {
+
+	return element.getProperty("SA_uri_title").get();
+    }
+
+    /**
+     * @return
+     */
+    public ComposedElementItem getSA_MatchTypeItem() {
+
+	return element.getProperty("SA_match_type").get();
     }
 
     /**

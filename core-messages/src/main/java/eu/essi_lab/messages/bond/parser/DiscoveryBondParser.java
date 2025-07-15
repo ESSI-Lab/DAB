@@ -25,6 +25,7 @@ import java.util.List;
 
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.ComposedElementBond;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.QueryableBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
@@ -107,44 +108,18 @@ public class DiscoveryBondParser implements BondParser<DiscoveryBondHandler> {
 	}
     }
 
+    @SuppressWarnings("unchecked")
     private void parseNonLogicalBond(Bond bond) {
 
-	if (bond instanceof SpatialBond) {
-
-	    SpatialBond b = (SpatialBond) bond;
-
-	    handler.spatialBond(b);
-
-	} else if (bond instanceof SimpleValueBond) {
-
-	    SimpleValueBond b = (SimpleValueBond) bond;
-
-	    handler.simpleValueBond(b);
-
-	} else if (bond instanceof ResourcePropertyBond) {
-
-	    ResourcePropertyBond b = (ResourcePropertyBond) bond;
-
-	    handler.resourcePropertyBond(b);
-
-	} else if (bond instanceof RuntimeInfoElementBond) {
-
-	    RuntimeInfoElementBond b = (RuntimeInfoElementBond) bond;
-
-	    handler.runtimeInfoElementBond(b);
-
-	} else if (bond instanceof QueryableBond<?>) {
-
-	    @SuppressWarnings("unchecked")
-	    QueryableBond<String> b = (QueryableBond<String>) bond;
-
-	    handler.customBond(b);
-
-	} else if (bond instanceof ViewBond) {
-
-	    ViewBond viewBond = (ViewBond) bond;
-
-	    handler.viewBond(viewBond);
+	switch (bond) {
+	case SpatialBond sb -> handler.spatialBond(sb);
+	case SimpleValueBond svb -> handler.simpleValueBond(svb);
+	case ComposedElementBond ceb -> handler.composedElementBond(ceb);
+	case ResourcePropertyBond rpb -> handler.resourcePropertyBond(rpb);
+	case RuntimeInfoElementBond rib -> handler.runtimeInfoElementBond(rib);
+	case QueryableBond<?> qb -> handler.customBond((QueryableBond<String>) qb);
+	case ViewBond wb -> handler.viewBond(wb);
+	default -> throw new IllegalArgumentException("Unexpected value: " + bond);
 	}
     }
 }

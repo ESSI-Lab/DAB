@@ -43,6 +43,7 @@ import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.GeoShapeRelation;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
+import org.opensearch.client.opensearch._types.query_dsl.ChildScoreMode;
 import org.opensearch.client.opensearch._types.query_dsl.ExistsQuery;
 import org.opensearch.client.opensearch._types.query_dsl.FieldLookup;
 import org.opensearch.client.opensearch._types.query_dsl.GeoShapeFieldQuery;
@@ -78,6 +79,8 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent.FrameValue;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.ComposedElementBond;
+import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
@@ -91,6 +94,8 @@ import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.model.resource.composed.ComposedElement;
+import eu.essi_lab.model.resource.composed.ComposedElementItem;
 
 /**
  * @author Fabrizio
@@ -402,6 +407,38 @@ public class OpenSearchQueryBuilder {
 	}
 	default -> throw new IllegalArgumentException("Operator " + operator + " not supported for field " + el.getName());
 	};
+    }
+
+    /**
+     * @param metadataElement
+     * @param operator
+     * @param items
+     * @return
+     */
+    public Query buildComposedElementQuery(ComposedElementBond bond) {
+
+	ComposedElement composed = bond.getProperty().createComposedElement().get();
+
+	if (bond.getPropertyValue().size() == 1) {
+
+	    ComposedElementItem item = bond.getPropertyValue().get(0);
+
+	    return Query.of(//
+		    q -> q.nested(n -> n.path(composed.getName()).//
+			    query(buildNestedQuery(composed.getName(), item, bond.getOperator())).//
+			    scoreMode(ChildScoreMode.Sum)));
+
+	}
+
+	List<Query> operands = bond.getPropertyValue().//
+		stream().//
+		map(item -> buildNestedQuery(composed.getName(), item, bond.getOperator())).//
+		collect(Collectors.toList());
+
+	return Query.of(//
+		q -> q.nested(n -> n.path(composed.getName()).//
+			query(bond.getLogicalOp() == LogicalOperator.AND ? buildMustQuery(operands) : buildShouldQuery(operands)).//
+			scoreMode(ChildScoreMode.Sum)));
     }
 
     /**
@@ -1056,6 +1093,65 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
+     * @param parent
+     * @param item
+     * @param operator
+     * @return
+     */
+    private Query buildNestedQuery(String parent, ComposedElementItem item, BondOperator operator) {
+
+	String targetName = parent + "." + item.getName();
+
+	return switch (operator) {
+
+	case EXISTS -> buildExistsFieldQuery(targetName);
+	case NOT_EXISTS -> buildNotExistsFieldQuery(targetName);
+	case NOT_EQUAL, EQUAL, GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EQUAL -> {
+
+	    String value = item.getStringValue();
+
+	    if (item.getType() == ContentType.ISO8601_DATE || item.getType() == ContentType.ISO8601_DATE_TIME) {
+
+		value = OpenSearchUtils.parseToLongString(item.getStringValue());
+	    }
+
+	    yield buildRangeQuery(//
+		    targetName, //
+		    operator, //
+		    value, //
+		    ranking.computePropertyWeight(targetName));
+	}
+
+	case TEXT_SEARCH -> {
+
+	    List<String> terms = Arrays.asList(item.getStringValue().split(" "));
+
+	    if (terms.size() == 1 || !isWildcardQuery(item.getStringValue())) {
+
+		if (isWildcardQuery(item.getStringValue())) {
+
+		    yield buildWildCardQuery( //
+			    targetName, //
+			    item.getStringValue(), //
+			    ranking.computePropertyWeight(targetName)); //
+		}
+
+		yield buildMatchPhraseQuery(//
+			targetName, //
+			item.getStringValue(), //
+			ranking.computePropertyWeight(targetName));
+	    }
+
+	    yield buildWildCardQuery(//
+		    targetName, //
+		    "*" + item.getValue() + "*", //
+		    ranking.computePropertyWeight(targetName));
+	}
+	default -> throw new IllegalArgumentException("Operator " + operator + " not supported for field " + targetName);
+	};
+    }
+
+    /**
      * In the data migration from MarkLogic to OpenSearch, the <code>sourceDeployment</code> has been indexed
      * only as <i>text</i> field,
      * and not as <i>keyword</i> field. As consequence, a term query on this <i>text</i> field works only if the
@@ -1707,4 +1803,5 @@ public class OpenSearchQueryBuilder {
 
 	return buildMatchPhraseQuery(field, value, 1);
     }
+
 }

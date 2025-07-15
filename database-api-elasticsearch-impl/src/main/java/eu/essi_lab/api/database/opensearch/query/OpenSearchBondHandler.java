@@ -33,6 +33,7 @@ import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.ComposedElementBond;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.QueryableBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
@@ -42,6 +43,7 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 
 /**
  * @author Fabrizio
@@ -115,6 +117,14 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
 		    bond.getOperator(), //
 		    bond.getPropertyValue());
 	}
+
+	queryBuilder.append(query);
+    }
+
+    @Override
+    public void composedElementBond(ComposedElementBond bond) {
+
+	Query query = queryBuilder.buildComposedElementQuery(bond);
 
 	queryBuilder.append(query);
     }
