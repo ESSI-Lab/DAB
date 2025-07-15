@@ -20,34 +20,17 @@ package eu.essi_lab.gssrv.rest;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-public class LoginResponse {
+public class ListUserResponse {
     private boolean success;
-    private boolean admin;
-
-    public boolean isAdmin() {
-	return admin;
-    }
-
-    public void setAdmin(boolean admin) {
-	this.admin = admin;
-    }
-
     private String message;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String apiKey;
 
-    public LoginResponse() {
+    public ListUserResponse() {
     }
 
-    public LoginResponse(boolean success, String message, String firstName, String lastName, String email, String apiKey) {
+    public ListUserResponse(boolean success, String message) {
 	this.success = success;
 	this.message = message;
-	this.firstName = firstName;
-	this.lastName = lastName;
-	this.email = email;
-	this.apiKey = apiKey;
+
     }
 
     public boolean isSuccess() {
@@ -66,35 +49,4 @@ public class LoginResponse {
 	this.message = message;
     }
 
-    public String getFirstName() {
-	return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-	this.firstName = firstName;
-    }
-
-    public String getLastName() {
-	return lastName;
-    }
-
-    public void setLastName(String lastName) {
-	this.lastName = lastName;
-    }
-
-    public String getEmail() {
-	return email;
-    }
-
-    public void setEmail(String email) {
-	this.email = email;
-    }
-
-    public String getApiKey() {
-	return apiKey;
-    }
-
-    public void setApiKey(String apiKey) {
-	this.apiKey = apiKey;
-    }
 }

@@ -113,6 +113,8 @@ public class ConfigurationWrapper {
      * 
      */
     private static String sparqlProxyEndpoint;
+    
+    
 
     /**
      * 
@@ -834,6 +836,27 @@ public class ConfigurationWrapper {
 	}
 
 	return sparqlProxyEndpoint;
+    }
+    
+    public static List<String> getAdminUsers() {
+
+	Optional<Properties> kvo = getSystemSettings().getKeyValueOptions();
+	List<String>adminUsers = new ArrayList<String>();
+	if (kvo.isPresent()) {
+
+	    String prop = kvo.get().getProperty(KeyValueOptionKeys.ADMIN_USERS.getLabel());
+
+	    if (prop != null) {
+
+		String[] s = prop.split(",");
+		adminUsers = new ArrayList<String>();
+		for (String user : s) {
+		    adminUsers.add(user);
+		}
+	    }
+	}
+
+	return adminUsers;
     }
 
     /**

@@ -91,6 +91,12 @@ function initializeLogin(config) {
 					// Store the token and email
 					localStorage.setItem('authToken', data.apiKey);
 					localStorage.setItem('userEmail', data.email);
+					// Store admin flag if present
+					if (typeof data.admin !== 'undefined') {
+						localStorage.setItem('isAdmin', data.admin ? 'true' : 'false');
+					} else {
+						localStorage.removeItem('isAdmin');
+					}
 
 					// Update UI
 					loginBtn.style.display = 'none';
@@ -116,6 +122,7 @@ function initializeLogin(config) {
 	// Check for existing token and email
 	const existingToken = localStorage.getItem('authToken');
 	const existingEmail = localStorage.getItem('userEmail');
+	const isAdmin = localStorage.getItem('isAdmin') === 'true';
 	if (existingToken && existingEmail) {
 		loginBtn.style.display = 'none';
 		logoutBtn.style.display = 'inline-block';
@@ -126,10 +133,13 @@ function initializeLogin(config) {
 		userMenu.id = 'userMenu';
 		userMenu.className = 'user-menu';
 		userMenu.style.display = 'none';
-		userMenu.innerHTML = `
-			<button id="statusBtn" class="menu-button">Status of bulk downloads</button>
-			<button id="logoutMenuBtn" class="menu-button">Logout</button>
-		`;
+		let menuHtml = `
+			<button id="statusBtn" class="menu-button">Status of bulk downloads</button>\n`;
+		if (isAdmin) {
+			menuHtml += `<button id="listUsersBtn" class="menu-button">List Users</button>\n`;
+		}
+		menuHtml += `<button id="logoutMenuBtn" class="menu-button">Logout</button>`;
+		userMenu.innerHTML = menuHtml;
 		document.body.appendChild(userMenu);
 
 		// Remove the old logout event listener and add menu toggle
@@ -499,10 +509,20 @@ function initializeLogin(config) {
 			setTimeout(fetchAndUpdateStatus, 100);
 		});
 
+		// List Users button click handler (admin only)
+		if (isAdmin) {
+			document.getElementById('listUsersBtn').addEventListener('click', function() {
+				userMenu.style.display = 'none';
+				// Placeholder: show a dialog or perform an action to list users
+				alert('List Users (admin only) - implement user listing here.');
+			});
+		}
+
 		// Logout menu button click handler
 		document.getElementById('logoutMenuBtn').addEventListener('click', function() {
 			localStorage.removeItem('authToken');
 			localStorage.removeItem('userEmail');
+			localStorage.removeItem('isAdmin');
 			loginBtn.style.display = 'inline-block';
 			loginBtn.textContent = 'Login';
 			loginBtn.disabled = false;

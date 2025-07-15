@@ -36,6 +36,7 @@ import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 
 import eu.essi_lab.authorization.userfinder.UserFinder;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.OutputFormat;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Profile;
@@ -92,6 +93,19 @@ public class SupportService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response login(LoginRequest request) {
+	LoginResponse loginResponse = getLoginResponse(request);
+
+	if (loginResponse.isSuccess()) {
+
+	    return Response.ok(loginResponse).build();
+
+	} else {
+
+	    return Response.serverError().entity(loginResponse).build();
+	}
+    }
+
+    private LoginResponse getLoginResponse(LoginRequest request) {
 	try {
 
 	    UserFinder uf = UserFinder.create();
@@ -118,18 +132,50 @@ public class SupportService {
 		}
 
 		if (request.getApiKey().equals(user.getUri()) && request.getEmail().equals(email)) {
-		    LoginResponse response = new LoginResponse(true, "Login successful", "Test", "User", request.getEmail(), request.getApiKey());
-		    return Response.ok(response).build();
+		    LoginResponse response = new LoginResponse(true, "Login successful", "Test", "User", request.getEmail(),
+			    request.getApiKey());
+		    List<String> adminUsers = ConfigurationWrapper.getAdminUsers();
+		    if (adminUsers != null) {
+			for (String adminUser : adminUsers) {
+			    if (user.getUri().equals(adminUser) || request.getEmail().equals(adminUser)) {
+				response.setAdmin(true);
+			    }
+			}
+		    }
+		    return response;
 		}
 	    }
-
 	    LoginResponse response = new LoginResponse(false, "Invalid credentials", null, null, null, null);
-	    return Response.ok(response).build();
+	    return response;
 
 	} catch (Exception ex) {
 	    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage(), ex);
-	    return Response.serverError().entity(new LoginResponse(false, "Server error: " + ex.getMessage(), null, null, null, null))
-		    .build();
+	    LoginResponse resp = new LoginResponse(false, "Server error: " + ex.getMessage(), null, null, null, null);
+	    return resp;
+	}
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/listUsers")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listUsers(LoginRequest request) {
+	LoginResponse loginResponse = getLoginResponse(request);
+	ListUserResponse listResponse = new ListUserResponse();
+	if (loginResponse.isSuccess()) {
+	    if (loginResponse.isAdmin()) {
+		listResponse.setSuccess(true);
+		return Response.ok(listResponse).build();
+	    } else {
+		listResponse.setSuccess(false);
+		listResponse.setMessage("not authorized");
+		return Response.serverError().entity(listResponse).build();
+	    }
+	} else {
+	    listResponse.setSuccess(false);
+	    listResponse.setMessage("not authenticated");
+	    return Response.serverError().entity(listResponse).build();
 	}
     }
 }

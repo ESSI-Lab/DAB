@@ -68,6 +68,11 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
 	 * SPARQL proxy endpoint
 	 */
 	SPARQL_PROXY_ENDPOINT("sparqlProxyEndpoint"), //
+	
+	/**
+	 * ADMIN users
+	 */
+	ADMIN_USERS("adminUsers"), //
 
 	/**
 	 * MQTT broker
