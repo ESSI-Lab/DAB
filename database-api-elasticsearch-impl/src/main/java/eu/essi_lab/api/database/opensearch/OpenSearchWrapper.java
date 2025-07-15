@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
@@ -86,9 +87,12 @@ import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
 import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 
+import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -96,6 +100,7 @@ import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
+import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 
@@ -125,6 +130,29 @@ public class OpenSearchWrapper {
     public OpenSearchDatabase getDatabase() {
 
 	return database;
+    }
+
+    /**
+     * @param featureId
+     * @return
+     * @throws OpenSearchException
+     * @throws IOException
+     * @throws GSException
+     */
+    public Optional<JSONArray> getShapeFeatureCoordinates(String featureId) throws OpenSearchException, IOException, GSException {
+
+	DatabaseFolder folder = database.getFolder(Database.SHAPE_FILES_FOLDER, true).get();
+
+	String id = OpenSearchFolder.getEntryId(folder, featureId);
+
+	Optional<JSONObject> source = getSource(ShapeFileMapping.get().getIndex(), id);
+
+	if (source.isPresent()) {
+
+	    return Optional.of(source.get().getJSONObject("shape").getJSONArray("coordinates"));
+	}
+
+	return Optional.empty();
     }
 
     /**
