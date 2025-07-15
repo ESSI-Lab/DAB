@@ -31,7 +31,6 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.resource.composed.ComposedElement;
-import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
 
 /**
  * Enumeration of queryable {@link HarmonizedMetadata} element names
