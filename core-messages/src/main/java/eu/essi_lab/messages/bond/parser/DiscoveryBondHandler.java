@@ -22,6 +22,7 @@ package eu.essi_lab.messages.bond.parser;
  */
 
 import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.ComposedElementBond;
 import eu.essi_lab.messages.bond.QueryableBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
@@ -64,6 +65,15 @@ public interface DiscoveryBondHandler extends LogicalBondHandler {
      * @param bond
      */
     public void simpleValueBond(SimpleValueBond bond);
+
+    /**
+     * Receives notification of a {@link ComposedElementBond}
+     *
+     * @param bond
+     */
+    public default void composedElementBond(ComposedElementBond bond) {
+
+    }
 
     /**
      * Receives notification of a {@link SpatialBond}
