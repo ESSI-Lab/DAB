@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -88,16 +89,10 @@ public class ComposedElement extends DOMSerializer {
 
 	properties.keySet().forEach(key -> {
 
-	    ComposedElementItem item = out.//
-		    getProperties().//
+	    out.getProperties().//
 		    stream().//
 		    filter(i -> i.getName().equals(key)).//
-		    findFirst().//
-		    get();
-
-	    Object obj = properties.get(key);
-
-	    item.setValue(obj);
+		    findFirst().ifPresent(item -> item.setValue(properties.get(key)));
 	});
 
 	return out;
@@ -156,6 +151,17 @@ public class ComposedElement extends DOMSerializer {
     public List<ComposedElementItem> getProperties() {
 
 	return properties;
+    }
+
+    /**
+     * @return
+     */
+    public List<ComposedElementItem> getNonNullProperties() {
+
+	return properties.//
+		stream().//
+		filter(prop -> prop.getValue() != null).//
+		collect(Collectors.toList());
     }
 
     /**
