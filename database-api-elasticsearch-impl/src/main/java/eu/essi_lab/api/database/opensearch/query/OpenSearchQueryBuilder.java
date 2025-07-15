@@ -410,6 +410,67 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
+     * @param parent
+     * @param item
+     * @param operator
+     * @return
+     */
+    private Query buildNestedQuery(String parent, ComposedElementItem item, BondOperator operator) {
+
+	String targetName = parent + "." + item.getName();
+
+	return switch (operator) {
+
+	case EXISTS -> buildExistsFieldQuery(targetName);
+	case NOT_EXISTS -> buildNotExistsFieldQuery(targetName);
+	case NOT_EQUAL, EQUAL, GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EQUAL -> {
+
+	    String value = item.getStringValue();
+
+	    if (item.getType() == ContentType.ISO8601_DATE || item.getType() == ContentType.ISO8601_DATE_TIME) {
+
+		value = OpenSearchUtils.parseToLongString(item.getStringValue());
+	    }
+
+	    String field = item.getType() == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(targetName) : targetName;
+
+	    yield buildRangeQuery(//
+		    field, //
+		    operator, //
+		    value, //
+		    ranking.computePropertyWeight(targetName));
+	}
+
+	case TEXT_SEARCH -> {
+
+	    List<String> terms = Arrays.asList(item.getStringValue().split(" "));
+
+	    if (terms.size() == 1 || !isWildcardQuery(item.getStringValue())) {
+
+		if (isWildcardQuery(item.getStringValue())) {
+
+		    yield buildWildCardQuery( //
+			    DataFolderMapping.toKeywordField(targetName), //
+			    item.getStringValue(), //
+			    ranking.computePropertyWeight(targetName)); //
+		}
+
+		yield buildMatchPhraseQuery(//
+			targetName, //
+			item.getStringValue(), //
+			ranking.computePropertyWeight(targetName));
+	    }
+
+	    yield buildWildCardQuery(//
+		    DataFolderMapping.toKeywordField(targetName), //
+		    "*" + item.getValue() + "*", //
+		    ranking.computePropertyWeight(targetName));
+	}
+	default -> throw new IllegalArgumentException("Operator " + operator + " not supported for field " + targetName);
+	};
+    }
+
+    /**
      * @param metadataElement
      * @param operator
      * @param items
@@ -1090,65 +1151,6 @@ public class OpenSearchQueryBuilder {
 		build().//
 		toQuery();
 
-    }
-
-    /**
-     * @param parent
-     * @param item
-     * @param operator
-     * @return
-     */
-    private Query buildNestedQuery(String parent, ComposedElementItem item, BondOperator operator) {
-
-	String targetName = parent + "." + item.getName();
-
-	return switch (operator) {
-
-	case EXISTS -> buildExistsFieldQuery(targetName);
-	case NOT_EXISTS -> buildNotExistsFieldQuery(targetName);
-	case NOT_EQUAL, EQUAL, GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EQUAL -> {
-
-	    String value = item.getStringValue();
-
-	    if (item.getType() == ContentType.ISO8601_DATE || item.getType() == ContentType.ISO8601_DATE_TIME) {
-
-		value = OpenSearchUtils.parseToLongString(item.getStringValue());
-	    }
-
-	    yield buildRangeQuery(//
-		    targetName, //
-		    operator, //
-		    value, //
-		    ranking.computePropertyWeight(targetName));
-	}
-
-	case TEXT_SEARCH -> {
-
-	    List<String> terms = Arrays.asList(item.getStringValue().split(" "));
-
-	    if (terms.size() == 1 || !isWildcardQuery(item.getStringValue())) {
-
-		if (isWildcardQuery(item.getStringValue())) {
-
-		    yield buildWildCardQuery( //
-			    targetName, //
-			    item.getStringValue(), //
-			    ranking.computePropertyWeight(targetName)); //
-		}
-
-		yield buildMatchPhraseQuery(//
-			targetName, //
-			item.getStringValue(), //
-			ranking.computePropertyWeight(targetName));
-	    }
-
-	    yield buildWildCardQuery(//
-		    targetName, //
-		    "*" + item.getValue() + "*", //
-		    ranking.computePropertyWeight(targetName));
-	}
-	default -> throw new IllegalArgumentException("Operator " + operator + " not supported for field " + targetName);
-	};
     }
 
     /**
