@@ -230,7 +230,7 @@ public class RankingStrategy implements Serializable {
      * @param propertyName
      * @return
      */
-    private int computePropertyWeight(String propertyName) {
+    public int computePropertyWeight(String propertyName) {
 
 	String value = getPropertyValue(propertyName);
 	if (value == null) {

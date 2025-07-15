@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * @author Boldrini
  */
+@SuppressWarnings("serial")
 @XmlRootElement
 public class LogicalBond implements Bond {
 
