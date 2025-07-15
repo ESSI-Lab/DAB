@@ -1137,7 +1137,7 @@ public class OpenSearchQueryBuilder {
 		}
 
 		yield buildMatchPhraseQuery(//
-			item.getName(), //
+			targetName, //
 			item.getStringValue(), //
 			ranking.computePropertyWeight(targetName));
 	    }
