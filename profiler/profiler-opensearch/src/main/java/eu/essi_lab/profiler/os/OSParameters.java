@@ -189,7 +189,7 @@ public abstract class OSParameters {
 	    }
 
 	    return Optional.of(BondFactory.createComposedElementBond(//
-		    BondOperator.EQUAL, //
+		    BondOperator.TEXT_SEARCH, //
 		    LogicalOperator.AND, //
 		    MetadataElement.KEYWORD_SA, //
 		    items));
