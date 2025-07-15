@@ -46,7 +46,6 @@ import org.w3c.dom.Node;
 import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.model.GSProperty;
 
@@ -129,7 +128,7 @@ public class GSUser extends DOMSerializer implements Serializable {
 
 	return null;
     }
-    
+
     /**
      * @param stream
      * @return
@@ -263,6 +262,23 @@ public class GSUser extends DOMSerializer implements Serializable {
     @SuppressWarnings("rawtypes")
     public void setAttributes(List<GSProperty> attributes) {
 	this.properties = attributes;
+    }
+
+    public void setPropertyValue(String name, String value) {
+	GSProperty<String> target = null;
+	for (GSProperty property : properties) {
+	    if (property.getName().equals(name)) {
+		if (property.getValue() instanceof String) {
+		    target = property;
+		}
+	    }
+	}
+	if (target != null) {
+	    target.setValue(value);
+	} else {
+	    GSProperty<String> prop = new GSProperty<String>(name, value);
+	    properties.add(prop);
+	}
     }
 
     @Override

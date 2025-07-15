@@ -20,7 +20,6 @@ package eu.essi_lab.gssrv.rest;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-@Deprecated
 public class LoginRequest {
     private String email;
     private String apiKey;

@@ -1,5 +1,7 @@
 package eu.essi_lab.gssrv.rest;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /*-
@@ -25,6 +27,7 @@ import java.util.List;
 
 import javax.jws.WebService;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -44,6 +47,7 @@ import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Target;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.auth.GSUser;
+import eu.essi_lab.model.exceptions.GSException;
 
 @WebService
 @Path("/")
@@ -162,11 +166,202 @@ public class SupportService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response listUsers(LoginRequest request) {
 	LoginResponse loginResponse = getLoginResponse(request);
-	ListUserResponse listResponse = new ListUserResponse();
+	BasicResponse listResponse = new BasicResponse();
 	if (loginResponse.isSuccess()) {
 	    if (loginResponse.isAdmin()) {
 		listResponse.setSuccess(true);
-		return Response.ok(listResponse).build();
+
+		try {
+		    UserFinder uf = UserFinder.create();
+		    List<GSUser> users = uf.getUsers(false);
+		    HashMap<String, List<GSUser>> usersByRole = new HashMap<String, List<GSUser>>();
+		    GSUser adminUser = null;
+		    for (GSUser user : users) {
+			if (request.getApiKey().equals(user.getUri())) {
+			    adminUser = user;
+			}
+			String role = user.getRole();
+			List<GSUser> list = usersByRole.get(role);
+			if (list == null) {
+			    list = new ArrayList<GSUser>();
+			    usersByRole.put(role, list);
+			}
+			list.add(user);
+		    }
+		    if (adminUser == null) {
+			listResponse.setSuccess(false);
+			listResponse.setMessage("admin user not found");
+			return Response.serverError().entity(listResponse).build();
+		    }
+		    List<GSUser> userList = usersByRole.get(adminUser.getRole());
+		    for (GSUser user : userList) {
+			listResponse.getUsers().add(user);
+		    }
+		    return Response.ok(listResponse).build();
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		    listResponse.setSuccess(false);
+		    listResponse.setMessage("error retrieving users");
+		    return Response.serverError().entity(listResponse).build();
+		}
+
+	    } else {
+		listResponse.setSuccess(false);
+		listResponse.setMessage("not authorized");
+		return Response.serverError().entity(listResponse).build();
+	    }
+	} else {
+	    listResponse.setSuccess(false);
+	    listResponse.setMessage("not authenticated");
+	    return Response.serverError().entity(listResponse).build();
+	}
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/updateUser")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUser(UpdateUserRequest request) {
+	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
+	LoginResponse loginResponse = getLoginResponse(loginRequest);
+	BasicResponse basicResponse = new BasicResponse();
+	if (loginResponse.isSuccess()) {
+	    if (loginResponse.isAdmin()) {
+		basicResponse.setSuccess(true);
+
+		try {
+		    UserFinder uf = UserFinder.create();
+		    List<GSUser> users = uf.getUsers(false);
+		    GSUser targetUser = null;
+		    for (GSUser user : users) {
+			if (request.getUserIdentifier().equals(user.getUri())) {
+			    targetUser = user;
+			}
+		    }
+		    if (targetUser == null) {
+			basicResponse.setSuccess(false);
+			basicResponse.setMessage("target user not found");
+			return Response.serverError().entity(basicResponse).build();
+		    }
+		    targetUser.setPropertyValue(request.getPropertyName(), request.getPropertyValue());
+		    uf.getWriter().store(targetUser);
+
+		    return Response.ok(basicResponse).build();
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		    basicResponse.setSuccess(false);
+		    basicResponse.setMessage("error retrieving users");
+		    return Response.serverError().entity(basicResponse).build();
+		}
+
+	    } else {
+		basicResponse.setSuccess(false);
+		basicResponse.setMessage("not authorized");
+		return Response.serverError().entity(basicResponse).build();
+	    }
+	} else {
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("not authenticated");
+	    return Response.serverError().entity(basicResponse).build();
+	}
+    }
+    
+    @SuppressWarnings("rawtypes")
+    @DELETE
+    @Path("/deleteUser")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteUser(UpdateUserRequest request) {
+	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
+	LoginResponse loginResponse = getLoginResponse(loginRequest);
+	BasicResponse basicResponse = new BasicResponse();
+	if (loginResponse.isSuccess()) {
+	    if (loginResponse.isAdmin()) {
+		basicResponse.setSuccess(true);
+
+		try {
+		    UserFinder uf = UserFinder.create();
+		    List<GSUser> users = uf.getUsers(false);
+		    GSUser targetUser = null;
+		    for (GSUser user : users) {
+			if (request.getUserIdentifier().equals(user.getUri())) {
+			    targetUser = user;
+			}
+		    }
+		    if (targetUser == null) {
+			basicResponse.setSuccess(false);
+			basicResponse.setMessage("target user not found");
+			return Response.serverError().entity(basicResponse).build();
+		    }		   
+		    uf.getWriter().removeUser(request.getUserIdentifier());
+
+		    return Response.ok(basicResponse).build();
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		    basicResponse.setSuccess(false);
+		    basicResponse.setMessage("error retrieving users");
+		    return Response.serverError().entity(basicResponse).build();
+		}
+
+	    } else {
+		basicResponse.setSuccess(false);
+		basicResponse.setMessage("not authorized");
+		return Response.serverError().entity(basicResponse).build();
+	    }
+	} else {
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("not authenticated");
+	    return Response.serverError().entity(basicResponse).build();
+	}
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/modifyUser")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response modifyUser(LoginRequest request) {
+	LoginResponse loginResponse = getLoginResponse(request);
+	BasicResponse listResponse = new BasicResponse();
+	if (loginResponse.isSuccess()) {
+	    if (loginResponse.isAdmin()) {
+		listResponse.setSuccess(true);
+
+		try {
+		    UserFinder uf = UserFinder.create();
+		    List<GSUser> users = uf.getUsers(false);
+		    HashMap<String, List<GSUser>> usersByRole = new HashMap<String, List<GSUser>>();
+		    GSUser adminUser = null;
+		    for (GSUser user : users) {
+			if (request.getApiKey().equals(user.getUri())) {
+			    adminUser = user;
+			}
+			String role = user.getRole();
+			List<GSUser> list = usersByRole.get(role);
+			if (list == null) {
+			    list = new ArrayList<GSUser>();
+			    usersByRole.put(role, list);
+			}
+			list.add(user);
+		    }
+		    if (adminUser == null) {
+			listResponse.setSuccess(false);
+			listResponse.setMessage("admin user not found");
+			return Response.serverError().entity(listResponse).build();
+		    }
+		    List<GSUser> userList = usersByRole.get(adminUser.getRole());
+		    for (GSUser user : userList) {
+			listResponse.getUsers().add(user);
+		    }
+		    return Response.ok(listResponse).build();
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		    listResponse.setSuccess(false);
+		    listResponse.setMessage("error retrieving users");
+		    return Response.serverError().entity(listResponse).build();
+		}
+
 	    } else {
 		listResponse.setSuccess(false);
 		listResponse.setMessage("not authorized");

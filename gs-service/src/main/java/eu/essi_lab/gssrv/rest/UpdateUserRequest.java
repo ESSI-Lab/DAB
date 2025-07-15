@@ -20,65 +20,44 @@ package eu.essi_lab.gssrv.rest;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-public class LoginResponse {
-    private boolean success;
-    private boolean admin;
-    private String message;
-    private String firstName;
-    private String lastName;
+public class UpdateUserRequest {
     private String email;
     private String apiKey;
+    private String userIdentifier;
+    private String propertyName;
+    private String propertyValue;
 
-    public boolean isAdmin() {
-	return admin;
+    public String getUserIdentifier() {
+	return userIdentifier;
     }
 
-    public void setAdmin(boolean admin) {
-	this.admin = admin;
+    public void setUserIdentifier(String userIdentifier) {
+	this.userIdentifier = userIdentifier;
     }
 
-    public LoginResponse() {
+    public String getPropertyName() {
+	return propertyName;
     }
 
-    public LoginResponse(boolean success, String message, String firstName, String lastName, String email, String apiKey) {
-	this.success = success;
-	this.message = message;
-	this.firstName = firstName;
-	this.lastName = lastName;
+    public void setPropertyName(String propertyName) {
+	this.propertyName = propertyName;
+    }
+
+    public String getPropertyValue() {
+	return propertyValue;
+    }
+
+    public void setPropertyValue(String propertyValue) {
+	this.propertyValue = propertyValue;
+    }
+
+    // Default constructor for JSON deserialization
+    public UpdateUserRequest() {
+    }
+
+    public UpdateUserRequest(String email, String apiKey) {
 	this.email = email;
 	this.apiKey = apiKey;
-    }
-
-    public boolean isSuccess() {
-	return success;
-    }
-
-    public void setSuccess(boolean success) {
-	this.success = success;
-    }
-
-    public String getMessage() {
-	return message;
-    }
-
-    public void setMessage(String message) {
-	this.message = message;
-    }
-
-    public String getFirstName() {
-	return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-	this.firstName = firstName;
-    }
-
-    public String getLastName() {
-	return lastName;
-    }
-
-    public void setLastName(String lastName) {
-	this.lastName = lastName;
     }
 
     public String getEmail() {
