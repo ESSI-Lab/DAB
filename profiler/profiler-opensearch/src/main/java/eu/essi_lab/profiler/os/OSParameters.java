@@ -31,12 +31,15 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
+import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.spatial.SpatialEntity;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
+import eu.essi_lab.model.resource.SA_ElementWrapper;
+import eu.essi_lab.model.resource.composed.ComposedElementItem;
 import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
 
 public abstract class OSParameters {
@@ -137,10 +140,59 @@ public abstract class OSParameters {
 	    if (value == null || value.equals("")) {
 		return Optional.empty();
 	    }
-	    
+
 	    String id = "UOMIT20181025_" + value.substring(value.lastIndexOf(":") + 1, value.length());
-	    
+
 	    return Optional.of(fromIndexedShape(id, relatedValues));
+	}
+    };
+
+    public static final OSParameter KEYWORD_SA = new OSParameter("kwdSA", "string", null, "{gs:kwdSA}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    SA_ElementWrapper wrapper = SA_ElementWrapper.of(MetadataElement.KEYWORD_SA);
+
+	    ArrayList<ComposedElementItem> items = new ArrayList<>();
+
+	    String[] split = value.split(",");
+	    wrapper.setValue(split[0]);
+	    items.add(wrapper.getValueItem());
+
+	    if (split.length > 1) {
+		wrapper.setUri(split[1]);
+		items.add(wrapper.getUriItem());
+	    }
+
+	    if (split.length > 2) {
+		wrapper.setUriTitle(split[2]);
+		items.add(wrapper.getUriTitleItem());
+	    }
+
+	    if (split.length > 3) {
+		wrapper.setSA_Uri(split[3]);
+		items.add(wrapper.getSA_UriItem());
+	    }
+
+	    if (split.length > 4) {
+		wrapper.setSA_UriTitle(split[4]);
+		items.add(wrapper.getSA_UriTitleItem());
+	    }
+
+	    if (split.length > 5) {
+		wrapper.setSA_MatchType(split[5]);
+		items.add(wrapper.getSA_MatchTypeItem());
+	    }
+
+	    return Optional.of(BondFactory.createComposedElementBond(//
+		    BondOperator.EQUAL, //
+		    LogicalOperator.AND, //
+		    MetadataElement.KEYWORD_SA, //
+		    items));
 	}
     };
 

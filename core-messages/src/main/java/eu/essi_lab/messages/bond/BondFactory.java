@@ -1,5 +1,7 @@
 package eu.essi_lab.messages.bond;
 
+import java.util.Arrays;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -35,6 +37,7 @@ import eu.essi_lab.model.ontology.OntologyObjectProperty;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.ResourceType;
+import eu.essi_lab.model.resource.composed.ComposedElementItem;
 
 /**
  * A factory to create all types of {@link Bond}s provide by the GI-suite
@@ -582,6 +585,58 @@ public class BondFactory {
 	}
 
 	return new SimpleValueBond(operator, element, value);
+    }
+
+    /**
+     * @param operator
+     * @param element
+     * @param item
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public static ComposedElementBond createComposedElementBond(//
+	    BondOperator operator, //
+	    MetadataElement element, //
+	    ComposedElementItem item) throws IllegalArgumentException {
+
+	return createComposedElementBond(operator, LogicalOperator.AND, element, Arrays.asList(item));
+    }
+
+    /**
+     * @param operator
+     * @param logicalOp
+     * @param element
+     * @param value
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public static ComposedElementBond createComposedElementBond(//
+	    BondOperator operator, //
+	    LogicalOperator logicalOp, //
+	    MetadataElement element, //
+	    List<ComposedElementItem> value) throws IllegalArgumentException {
+
+	if (!element.hasComposedElement()) {
+
+	    throw new IllegalArgumentException("Composed element missing");
+	}
+
+	if (logicalOp == LogicalOperator.NOT) {
+
+	    throw new IllegalArgumentException("NOT logical operator not suported");
+	}
+
+	if (operator != BondOperator.EQUAL && //
+		operator != BondOperator.NOT_EQUAL && //
+		operator != BondOperator.LESS && //
+		operator != BondOperator.LESS_OR_EQUAL && //
+		operator != BondOperator.GREATER && //
+		operator != BondOperator.GREATER_OR_EQUAL) {
+
+	    throw new IllegalArgumentException("Unsupported binary operator: " + operator);
+	}
+
+	return new ComposedElementBond(operator, logicalOp, element, value.toArray(new ComposedElementItem[] {}));
     }
 
     /**
