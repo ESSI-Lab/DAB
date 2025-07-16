@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.wms.cluster.feature.info;
 
+import java.util.Map;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -34,5 +36,7 @@ public class WMSGetFeatureInfoRequest extends WMSRequest {
     public String[] getRequestNames() {
 	return new String[] { "GetFeatureInfo" };
     }
+
+   
 
 }

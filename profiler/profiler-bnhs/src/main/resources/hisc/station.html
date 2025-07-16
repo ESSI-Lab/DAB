@@ -16,9 +16,9 @@
 		
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 		
-		<link rel="stylesheet" href="../../../gwis?request=getCode&code=gwis-plot-utils.css" />
+		<link rel="stylesheet" href="../../gwis?request=getCode&code=gwis-plot-utils.css" />
 		
-		<script src="../../../gwis?request=getCode&code=gwis-plot-utils.js"></script>
+		<script src="../../gwis?request=getCode&code=gwis-plot-utils.js"></script>
 		
 		<script src="https://kit.fontawesome.com/2ec30275d7.js" crossorigin="anonymous"></script>
 		
@@ -51,7 +51,7 @@
 				  top: 50%;
 				  left: 50%;
 				  transform: translate(-50%, -50%);
-		    	  content: url("../../../../bnhs/station/gwis-loading.gif");		    	
+		    	  content: url("/gs-service/bnhs/station/gwis-loading.gif");		    	
 		    }
 		 	
 		 	/** 
@@ -97,7 +97,7 @@
 				display:inline-block; 
 				margin-top: -70px;
 				width: 190px;
-				content: url("../../../../bnhs/station/WMO_logo_white_ENG.png");
+			
 			}
 			
 			.wmo_logo_below{
@@ -106,7 +106,7 @@
 				display:inline-block; 
 				margin-top: 12px;
 				width: 200px;
-				content: url("../../../../bnhs/station/wmo-bar2.PNG");
+				
 			}
 								
 			#hidden-div{
@@ -308,7 +308,7 @@
    				float: left;
 			    margin-left: 165px;
 			    width: 60px;
-			    content: url(../../../../bnhs/station/IIA_new_logo.png);
+			    
 			    margin-top: -55px		
    			}
    			
@@ -328,6 +328,17 @@
 		</style>
 		
 		<script type="text/javascript">
+		
+		(function () {
+		    if (location.pathname.match(/\/$/)) {
+		      // Preserve query string & hash
+		      const clean = location.pathname.replace(/\/$/, '') +
+		                    location.search + location.hash;
+		      //  Replace = don’t keep the bad URL in history
+		      location.replace(clean);
+		    }
+		  }());
+		
 		var agreed = false;
 		$(document).ready(function(){
 	        $("#dialog").dialog({
@@ -359,6 +370,12 @@
 	            }
 	        	});
 	    });
+	  	
+		const url = new URL(window.location.href);       
+	    const segments = url.pathname.split('/').filter(Boolean);
+	    const query   = window.location.search;
+	    const stationCode = segments[segments.length - 1];
+		
 		</script>
 	
 	</head>
@@ -435,7 +452,9 @@
 		
 		<script>
 		
-	 		GWIS._nwisRootUrl = "../../../gwis"; // this is the URL of the profiler. E.g. https://gs-service-production.geodab.eu/gs-service/services/bnhs
+		
+		
+	 		GWIS._nwisRootUrl = "../../gwis"; // this is the URL of the profiler. E.g. https://gs-service-production.geodab.eu/gs-service/services/bnhs
 							
 			//
 			//
@@ -846,7 +865,7 @@
 				        	
 				        	var dataId = button.id.substring(button.id.indexOf('_') + 1, button.id.length);
 							
-							var query = "../../../cuahsi_1_1.asmx?"; 
+							var query = "../../cuahsi_1_1.asmx?"; 
 							
 							query += "request=GetValuesObject&site="+data[dataId].platform_id.value+"&variable="+data[dataId].attribute_id.value;
 							
@@ -868,7 +887,7 @@
 				
 			}
 							
-			$.getJSON("timeseries", function(data) {
+			$.getJSON(stationCode+"/timeseries"+query, function(data) {
 				
 				$("#timeseries").removeAttr("class");
 				

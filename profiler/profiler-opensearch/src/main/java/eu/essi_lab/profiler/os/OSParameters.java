@@ -39,6 +39,7 @@ import eu.essi_lab.messages.bond.spatial.SpatialEntity;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
 import eu.essi_lab.model.resource.SA_ElementWrapper;
+import eu.essi_lab.pdk.BondUtils;
 import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
 
 public abstract class OSParameters {
@@ -366,7 +367,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.INSTRUMENT_TITLE);
+	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.INSTRUMENT_TITLE);
 	}
     };
 
@@ -396,7 +397,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.PLATFORM_TITLE);
+	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.PLATFORM_TITLE);
 	}
     };
 
@@ -511,7 +512,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.ORGANISATION_NAME);
+	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.ORGANISATION_NAME);
 	}
     };
 
@@ -571,7 +572,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.ATTRIBUTE_TITLE);
+	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.ATTRIBUTE_TITLE);
 	}
     };
 
@@ -1401,39 +1402,7 @@ public abstract class OSParameters {
     }
 
     private static Optional<Bond> createBond(String value, MetadataElement element) {
-	return createBond(BondOperator.EQUAL, value, element);
-    }
-
-    /**
-     * @param value
-     * @param element
-     * @return
-     */
-    public static Optional<Bond> createBond(BondOperator operator, String value, MetadataElement element) {
-
-	if (value == null || value.equals("")) {
-	    return Optional.empty();
-	}
-
-	if (value.contains(" AND ")) {
-	    String[] split = value.split(" AND ");
-	    LogicalBond bond = BondFactory.createAndBond();
-	    for (String s : split) {
-		bond.getOperands().add(BondFactory.createSimpleValueBond(operator, element, s.trim()));
-	    }
-	    return Optional.of(bond);
-	}
-
-	if (value.contains(" OR ")) {
-	    String[] split = value.split(" OR ");
-	    LogicalBond bond = BondFactory.createOrBond();
-	    for (String s : split) {
-		bond.getOperands().add(BondFactory.createSimpleValueBond(operator, element, s.trim()));
-	    }
-	    return Optional.of(bond);
-	}
-
-	return Optional.of(BondFactory.createSimpleValueBond(operator, element, value.trim()));
+	return BondUtils.createBond(BondOperator.EQUAL, value, element);
     }
 
 }

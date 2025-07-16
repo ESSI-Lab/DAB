@@ -27,6 +27,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
@@ -75,6 +76,8 @@ import eu.essi_lab.model.resource.BNHSProperty;
 import eu.essi_lab.model.resource.BNHSPropertyReader;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.pdk.BondUtils;
+import eu.essi_lab.pdk.Semantics;
 import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
@@ -132,7 +135,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    return builder.build();
 
-	} else if (request.endsWith("timeseries")) {
+	} else if (request.contains("timeseries")) {
 
 	    // time series information
 
@@ -172,6 +175,68 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		    MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, //
 		    stationId);
 	    operands.add(platformBond);
+
+	    Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
+	    String ont = getParam(parameterMap, "ontology");
+	    String attributeTitle = getParam(parameterMap, "attributeTitle");
+	    String semantics = getParam(parameterMap, "semantics");
+
+	    if (ont != null && attributeTitle != null) {
+		Bond bond = Semantics.getSemanticBond(attributeTitle, semantics, ont);
+		operands.add(bond);
+	    }
+
+	    String instrumentTitle = getParam(parameterMap, "instrumentTitle");
+	    if (instrumentTitle != null) {
+		Optional<Bond> optBond = BondUtils.createBond(BondOperator.TEXT_SEARCH, instrumentTitle, MetadataElement.INSTRUMENT_TITLE);
+		if (optBond.isPresent()) {
+		    operands.add(optBond.get());
+		}
+	    }
+
+	    String intendedObservationSpacing = getParam(parameterMap, "intendedObservationSpacing");
+	    if (intendedObservationSpacing != null) {
+		Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, intendedObservationSpacing,
+			MetadataElement.TIME_RESOLUTION_DURATION_8601);
+		if (optBond.isPresent()) {
+		    operands.add(optBond.get());
+		}
+	    }
+
+	    String aggregationDuration = getParam(parameterMap, "aggregationDuration");
+	    if (aggregationDuration != null) {
+		Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, aggregationDuration,
+			MetadataElement.TIME_AGGREGATION_DURATION_8601);
+		if (optBond.isPresent()) {
+		    operands.add(optBond.get());
+		}
+	    }
+
+	    String timeInterpolation = getParam(parameterMap, "timeInterpolation");
+	    if (timeInterpolation != null) {
+		Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, timeInterpolation, MetadataElement.TIME_INTERPOLATION);
+		if (optBond.isPresent()) {
+		    operands.add(optBond.get());
+		}
+	    }
+
+	    String observedPropertyURI = getParam(parameterMap, "observedPropertyURI");
+	    if (observedPropertyURI != null) {
+		Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, observedPropertyURI,
+			MetadataElement.OBSERVED_PROPERTY_URI);
+		if (optBond.isPresent()) {
+		    operands.add(optBond.get());
+		}
+	    }
+
+	    String organisationName = getParam(parameterMap, "organisationName");
+	    if (organisationName != null) {
+		Optional<Bond> optBond = BondUtils.createBond(BondOperator.TEXT_SEARCH, organisationName,
+			MetadataElement.ORGANISATION_NAME);
+		if (optBond.isPresent()) {
+		    operands.add(optBond.get());
+		}
+	    }
 
 	    LogicalBond bond = BondFactory.createAndBond(operands);
 
@@ -280,7 +345,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		}
 		String country = resource.getExtensionHandler().getCountry().isPresent() ? //
 			resource.getExtensionHandler().getCountry().get().toString() : null;
-		String timeInterpolation = resource.getExtensionHandler().getTimeInterpolation().isPresent() ? //
+		String timeInter = resource.getExtensionHandler().getTimeInterpolation().isPresent() ? //
 			resource.getExtensionHandler().getTimeInterpolation().get().toString() : "";
 		String timeSupport = resource.getExtensionHandler().getTimeSupport().isPresent() ? //
 			resource.getExtensionHandler().getTimeSupport().get().toString() : "";
@@ -373,7 +438,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		//
 		// time
 		//
-		object = create(object, "time_interpolation", timeInterpolation, "Time interpolation");
+		object = create(object, "time_interpolation", timeInter, "Time interpolation");
 
 		object = create(object, "time_support", timeSupport, "Time support");
 
@@ -460,6 +525,15 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    return builder.build();
 	}
+    }
+
+    private String getParam(Map<String, String[]> parameterMap, String string) {
+	String[] param = parameterMap.get(string);
+	if (param == null || param.length == 0) {
+	    return null;
+	}
+	return param[0];
+
     }
 
     /**

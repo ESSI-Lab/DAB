@@ -36,12 +36,12 @@ public abstract class WMSRequest {
 	SERVICE("SERVICE"), //
 	REQUEST("REQUEST"), //
 	VERSION("VERSION"), //
-	LAYERS("LAYERS","LAYER"), //
+	LAYERS("LAYERS", "LAYER"), //
 	STYLES("STYLES"), //
 	TRANSPARENT("TRANSPARENT"), //
 	BGCOLOR("BGCOLOR"), //
 	EXCEPTIONS("EXCEPTIONS"), //
-	ELEVATION("ELEVATION"), //	
+	ELEVATION("ELEVATION"), //
 	FORMAT("FORMAT"), //
 	INFO_FORMAT("INFO_FORMAT"), //
 	TIME("TIME"), //
@@ -51,8 +51,8 @@ public abstract class WMSRequest {
 	HEIGHT("HEIGHT"), //
 	FEATURE_COUNT("FEATURE_COUNT"), //
 	FILE("FILE"), //
-	I("I","X"), //
-	J("J","Y"),//
+	I("I", "X"), //
+	J("J", "Y"),//
 	;
 
 	private String[] keys;
@@ -68,15 +68,26 @@ public abstract class WMSRequest {
     }
 
     private HashMap<Parameter, String> map = new HashMap<>();
+    private WebRequest servletRequest;
 
     public String getParameterValue(Parameter parameter) {
 	return map.get(parameter);
     }
+
     public abstract String[] getRequestNames();
-    
+
+    public String getServletParameter(String key) {
+	String[] ret = servletRequest.getServletRequest().getParameterMap().get(key);
+	if (ret != null && ret.length > 0) {
+	    return ret[0];
+	}
+	return null;
+
+    }
 
     public WMSRequest(WebRequest request) {
 
+	this.servletRequest = request;
 	String[] names = getRequestNames();
 
 	if (request.isGetRequest()) {

@@ -118,7 +118,24 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    // HTML
 	    //
 
-	    htmlBuilder = append(hostname, htmlBuilder, station, viewId);
+	    String queryParams = "";
+
+	    String ontology = request.getServletParameter("ontology");
+	    String attributeTitle = request.getServletParameter("attributeTitle");
+	    String semantics = request.getServletParameter("semantics");
+
+	    if (ontology != null && attributeTitle != null && semantics != null) {
+		queryParams += "ontology=" + ontology + "&attributeTitle=" + attributeTitle + "&semantics=" + semantics + "&";
+	    }
+
+	    queryParams += getParamIfPresent(request, "instrumentTitle");
+	    queryParams += getParamIfPresent(request, "intendedObservationSpacing");
+	    queryParams += getParamIfPresent(request, "aggregationDuration");
+	    queryParams += getParamIfPresent(request, "timeInterpolation");
+	    queryParams += getParamIfPresent(request, "observedPropertyURI");
+	    queryParams += getParamIfPresent(request, "organisationName");
+
+	    htmlBuilder = append(hostname, htmlBuilder, station, viewId, queryParams);
 	}
 
 	if (stations.isEmpty()) {
@@ -149,6 +166,16 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	return bis;
     }
 
+    private String getParamIfPresent(WMSGetFeatureInfoRequest request, String key) {
+	String value = request.getServletParameter(key);
+	if (value == null || value.isEmpty()) {
+	    return "";
+	} else {
+	    return key + "=" + value + "&";
+	}
+
+    }
+
     /**
      * @param builder
      * @return
@@ -165,9 +192,10 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
      * @param viewId
      * @return
      */
-    private StringBuilder append(String hostname, StringBuilder builder, StationRecord station, String viewId) {
+    private StringBuilder append(String hostname, StringBuilder builder, StationRecord station, String viewId, String queryParams) {
 
-	String url = hostname + "/gs-service/services/view/" + viewId + "/bnhs/station/" + station.getPlatformIdentifier() + "/";
+	String url = hostname + "/gs-service/services/view/" + viewId + "/bnhs/station/" + station.getPlatformIdentifier() + "?"
+		+ queryParams;
 
 	String stationLink = "<a class=\"relative-to-absolute\" href=\"" + url + "\" target=\"_blank\">\n" //
 		+ "  <i class=\"font-awesome-button-icon fa fa-info-circle\" style=\"color:blue; font-size:15px;\" aria-hidden=\"true\"></i>\n" //

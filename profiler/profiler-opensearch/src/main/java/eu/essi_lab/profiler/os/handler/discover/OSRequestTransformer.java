@@ -60,6 +60,7 @@ import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.pdk.Semantics;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.pdk.wrt.WebRequestParameter;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
@@ -651,43 +652,9 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      */
     private void handleSemanticsAndOntology(List<Bond> bondList, String value, String semantics, String ontology) {
 
-	Set<Bond> operands = new HashSet<>();
-
-	HydroOntology ho = null;
-
-	if (semantics != null && !semantics.isEmpty() && ontology != null && !ontology.isEmpty()) {
-	    switch (ontology.toLowerCase()) {
-	    case "whos":
-		ho = new WHOSOntology();
-		break;
-	    case "his-central":
-		ho = new HISCentralOntology();
-		break;
-	    default:
-		break;
-	    }
-	}
-	SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ATTRIBUTE_TITLE, value);
-	operands.add(bond);
-	if (ho != null) {
-	    List<SKOSConcept> concepts = ho.findConcepts(value, true, false);
-	    HashSet<String> uris = new HashSet<String>();
-	    for (SKOSConcept concept : concepts) {
-		uris.add(concept.getURI());
-	    }
-	    for (String uri : uris) {
-		SimpleValueBond b = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, uri);
-		operands.add(b);
-	    }
-	}
-	switch (operands.size()) {
-	case 0:
-	    break;
-	case 1:
-	    bondList.add(operands.iterator().next());
-	    break;
-	default:
-	    bondList.add(BondFactory.createOrBond(operands));
+	Bond semantic = Semantics.getSemanticBond(value,semantics,ontology);
+	if (semantic!=null) {
+	    bondList.add(semantic);
 	}
     }
 

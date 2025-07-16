@@ -6,15 +6,19 @@
 		
 		<title>WHOS-broker: Station page</title>
 		
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.0.0/ol.css">
+  
+  		<script src="/gs-service/giapi/ol/ol.js"></script>
+		
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 		
-		<link rel="stylesheet" href="../../../gwis?request=getCode&code=gwis-plot-utils.css" />
+		<link rel="stylesheet" href="../../gwis?request=getCode&code=gwis-plot-utils.css" />
 		
-		<script src="../../../gwis?request=getCode&code=gwis-plot-utils.js"></script>
+		<script src="../../gwis?request=getCode&code=gwis-plot-utils.js"></script>
 		
 		<script src="https://kit.fontawesome.com/2ec30275d7.js" crossorigin="anonymous"></script>
 		
@@ -44,7 +48,7 @@
 				  top: 50%;
 				  left: 50%;
 				  transform: translate(-50%, -50%);
-		    	  content: url("../../../../bnhs/station/gwis-loading.gif");		    	
+		    	  content: url("/gs-service/bnhs/station/gwis-loading.gif");		    	
 		    }
 		 	
 		 	/** 
@@ -313,6 +317,17 @@
 		</style>
 		
 		<script type="text/javascript">
+		
+		(function () {
+		    if (location.pathname.match(/\/$/)) {
+		      // Preserve query string & hash
+		      const clean = location.pathname.replace(/\/$/, '') +
+		                    location.search + location.hash;
+		      //  Replace = don’t keep the bad URL in history
+		      location.replace(clean);
+		    }
+		  }());
+		
 		var agreed = false;
 		$(document).ready(function(){
 	        $("#dialog").dialog({
@@ -344,6 +359,11 @@
 	            }
 	        	});
 	    });
+	  	
+		const url = new URL(window.location.href);       
+	    const segments = url.pathname.split('/').filter(Boolean);
+	    const stationCode = segments[segments.length - 1];
+		
 		</script>
 	
 	</head>
@@ -365,6 +385,7 @@ World Meteorological Organization (hereinafter: WMO) shall not be held liable fo
 WMO reserves the right to change or amend the Terms of Use for using WHOS and shall not be responsible for any harm that may result from such changes.<br><br>
 <div class="footer_dialog"><span><sup id="footnote-1">1</sup> “Free and unrestricted” means the data is provided on a non-discriminatory basis and without charge.</span></div><br><br>
 		</div>
+		
 	
 		<div class="page_header">
 		
@@ -403,7 +424,7 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 		
 		<script>
 		
-	 		GWIS._nwisRootUrl = "../../../gwis"; // this is the URL of the profiler. E.g. https://gs-service-production.geodab.eu/gs-service/services/bnhs
+	 		GWIS._nwisRootUrl = "../../gwis"; // this is the URL of the profiler. E.g. https://gs-service-production.geodab.eu/gs-service/services/bnhs
 							
 			//
 			//
@@ -870,7 +891,7 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 				        	
 				        	var dataId = button.id.substring(button.id.indexOf('_') + 1, button.id.length);
 							
-							var query = "../../../essi/view/whos-arctic/cuahsi_1_1.asmx?"; 
+							var query = "../../essi/view/whos-arctic/cuahsi_1_1.asmx?"; 
 							
 							query += "request=GetValuesObject&site="+data[dataId].platform_id.value+"&variable="+data[dataId].attribute_id.value;
 							
@@ -892,7 +913,7 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 				
 			}
 							
-			$.getJSON("timeseries", function(data) {
+			$.getJSON(stationCode+"/timeseries", function(data) {
 				
 				$("#timeseries").removeAttr("class");
 				
