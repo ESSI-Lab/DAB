@@ -259,6 +259,15 @@ public class GSUser extends DOMSerializer implements Serializable {
 	return null;
     }
 
+    public String getStringPropertyValue(String name) {
+	for (GSProperty property : properties) {
+	    if (property.getName() != null && property.getName().equals(name)) {
+		return property.getValue().toString();
+	    }
+	}
+	return null;
+    }
+
     @SuppressWarnings("rawtypes")
     public void setAttributes(List<GSProperty> attributes) {
 	this.properties = attributes;
@@ -375,5 +384,22 @@ public class GSUser extends DOMSerializer implements Serializable {
     protected Object getElement() throws JAXBException {
 
 	return this;
+    }
+
+    public boolean hasPermission(String permission) {
+	String permissions = getStringPropertyValue("permissions");
+	if (permissions != null) {
+	    permissions = permissions.trim();
+	    String[] perms = permissions.split(",");
+	    for (String perm : perms) {
+		perm = perm.trim();
+		if (perm.equalsIgnoreCase(permission)) {
+		    return true;
+		}
+	    }
+
+	}
+	return false;
+
     }
 }

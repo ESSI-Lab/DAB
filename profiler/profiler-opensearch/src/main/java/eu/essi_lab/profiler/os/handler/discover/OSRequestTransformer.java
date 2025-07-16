@@ -291,9 +291,11 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		return message;
 	    }
 
-	    String outputFormat = parser.parse(OSParameters.OUTPUT_FORMAT);
-
+	    String outputFormat = parser.parse(OSParameters.OUTPUT_FORMAT);	    
 	    if (outputFormat != null && !outputFormat.equals("")) {
+		if (outputFormat.equals("application/atom xml")) {
+		    outputFormat = MediaType.APPLICATION_ATOM_XML;
+		}
 		boolean supported = false;
 		for (String format : SUPPORTED_OUTPUT_FORMATS) {
 		    supported |= outputFormat.equals(format);

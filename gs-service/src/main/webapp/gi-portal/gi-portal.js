@@ -97,6 +97,12 @@ function initializeLogin(config) {
 					} else {
 						localStorage.removeItem('isAdmin');
 					}
+					// In the login response handler, after storing email and admin flag:
+					if (typeof data.permissions !== 'undefined') {
+						localStorage.setItem('userPermissions', data.permissions);
+					} else {
+						localStorage.removeItem('userPermissions');
+					}
 
 					// Update UI
 					loginBtn.style.display = 'none';
@@ -522,6 +528,26 @@ function initializeLogin(config) {
 				dialogContent.append(resultsDiv);
 				// --- Move function definitions here so they are in scope for both dialog and fetch ---
 				function renderTable(users) {
+					// Sort users: first by having permissions, then by email
+					const sortedUsers = users.slice().sort((a, b) => {
+						// Extract email and permissions for both users
+						const getProp = (u, name) => {
+							if (!Array.isArray(u.properties)) return '';
+							const p = u.properties.find(p => p.name === name);
+							return p ? p.value : '';
+						};
+						const aPerm = getProp(a, 'permissions');
+						const bPerm = getProp(b, 'permissions');
+						const aEmail = getProp(a, 'email').toLowerCase();
+						const bEmail = getProp(b, 'email').toLowerCase();
+						// Users with permissions come first
+						if (!!aPerm && !bPerm) return -1;
+						if (!aPerm && !!bPerm) return 1;
+						// If both have (or both don't have) permissions, sort by email
+						if (aEmail < bEmail) return -1;
+						if (aEmail > bEmail) return 1;
+						return 0;
+					});
 					let table = '<table id="usersTable" style="width:100%;border-collapse:collapse;margin-top:10px;cursor:pointer">';
 					table += '<tr>' +
 						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Email</th>' +
@@ -530,7 +556,7 @@ function initializeLogin(config) {
 						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Institution</th>' +
 						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Permissions</th>' +
 					'</tr>';
-					users.forEach((u, idx) => {
+					sortedUsers.forEach((u, idx) => {
 						const propMap = {};
 						if (Array.isArray(u.properties)) {
 							u.properties.forEach(p => { propMap[p.name] = p.value; });
@@ -545,6 +571,8 @@ function initializeLogin(config) {
 					});
 					table += '</table>';
 					// Wrap table in a scrollable div
+					// Pass sortedUsers to bindRowClicks for correct details
+					setTimeout(() => { bindRowClicks(sortedUsers); }, 0);
 					return `<div style='max-height:400px;overflow-y:auto'>${table}</div>`;
 				}
 				function bindRowClicks(users) {
@@ -635,8 +663,9 @@ function initializeLogin(config) {
 									if (result.success) {
 										alert('Permissions added.');
 										detailsDialog.dialog('close');
-										// Reopen details to show new property
-										$(`#usersTable .user-row[data-user-idx='${userIdx}']`).click();
+										// Refresh the main user list panel
+										dialogContent.dialog('close');
+										document.getElementById('listUsersBtn').click();
 									} else {
 										alert('Failed to add permissions: ' + (result.message || 'Unknown error'));
 									}
@@ -671,7 +700,9 @@ function initializeLogin(config) {
 									if (result.success) {
 										alert('Permissions updated.');
 										detailsDialog.dialog('close');
-										$(`#usersTable .user-row[data-user-idx='${userIdx}']`).click();
+										// Refresh the main user list panel
+										dialogContent.dialog('close');
+										document.getElementById('listUsersBtn').click();
 									} else {
 										alert('Failed to update permissions: ' + (result.message || 'Unknown error'));
 									}
@@ -679,6 +710,41 @@ function initializeLogin(config) {
 								.catch(err => {
 									alert('Error updating permissions: ' + err);
 								});
+							});
+						});
+						// Add handler for editing other properties
+						detailsDialog.on('click', '.edit-prop-btn', function(e) {
+							e.preventDefault();
+							const propName = $(this).data('prop-name');
+							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
+							const oldValue = valueSpan.text();
+							const newValue = prompt(`Edit value for ${propName}:`, oldValue);
+							if (newValue === null || newValue === oldValue) return;
+							const email = localStorage.getItem('userEmail');
+							const apiKey = localStorage.getItem('authToken');
+							const userIdentifier = user.identifier;
+							if (!email || !apiKey || !userIdentifier) {
+								alert('Missing credentials or user identifier.');
+								return;
+							}
+							fetch('../services/support/updateUser', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: propName, propertyValue: newValue })
+							})
+							.then(response => response.json())
+							.then(result => {
+								if (result.success) {
+									alert('Property updated.');
+									detailsDialog.dialog('close');
+									dialogContent.dialog('close');
+									document.getElementById('listUsersBtn').click();
+								} else {
+									alert('Failed to update property: ' + (result.message || 'Unknown error'));
+								}
+							})
+							.catch(err => {
+								alert('Error updating property: ' + err);
 							});
 						});
 					});
@@ -1413,9 +1479,10 @@ export function initializePortal(config) {
 				// Call the original update first
 				originalUpdate.call(this, resultSet);
 
-				// Check if user is logged in
+				// Check if user is logged in and has 'downloads' permission
 				var authToken = localStorage.getItem('authToken');
-				if (authToken) {
+				var userPermissions = (localStorage.getItem('userPermissions') || '').split(',').map(p => p.trim()).filter(Boolean);
+				if (authToken && userPermissions.includes('downloads')) {
 					// Remove any existing download button
 					$('#paginator-widget-top-label .login-button').remove();
 					

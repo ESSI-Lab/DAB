@@ -136,8 +136,10 @@ public class SupportService {
 		}
 
 		if (request.getApiKey().equals(user.getUri()) && request.getEmail().equals(email)) {
-		    LoginResponse response = new LoginResponse(true, "Login successful", "Test", "User", request.getEmail(),
-			    request.getApiKey());
+		    LoginResponse response = new LoginResponse(true, "Login successful", user.getStringPropertyValue("firstName"),
+			    user.getStringPropertyValue("lastName"), request.getEmail(), request.getApiKey());
+		    response.setPermissions(user.getStringPropertyValue("permissions"));
+		    response.setUser(user);
 		    List<String> adminUsers = ConfigurationWrapper.getAdminUsers();
 		    if (adminUsers != null) {
 			for (String adminUser : adminUsers) {
@@ -266,7 +268,7 @@ public class SupportService {
 	    return Response.serverError().entity(basicResponse).build();
 	}
     }
-    
+
     @SuppressWarnings("rawtypes")
     @DELETE
     @Path("/deleteUser")
@@ -293,7 +295,7 @@ public class SupportService {
 			basicResponse.setSuccess(false);
 			basicResponse.setMessage("target user not found");
 			return Response.serverError().entity(basicResponse).build();
-		    }		   
+		    }
 		    uf.getWriter().removeUser(request.getUserIdentifier());
 
 		    return Response.ok(basicResponse).build();

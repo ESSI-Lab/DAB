@@ -192,6 +192,17 @@ public class OMHandler extends StreamingRequestHandler {
      */
     public void handle(OutputStream output, WebRequest webRequest) throws Exception {
 
+	GSUser user = UserFinder.findCurrentUser(webRequest.getServletRequest());
+
+	// check permissions
+	Optional<String> optView = webRequest.extractViewId();
+	if (optView.isPresent() && optView.get().equals("his-central")) {
+	    if (!user.hasPermission("api")) {
+		printErrorMessage(output, "The user has not correct permissions");
+		return;
+	    }
+	}
+
 	OMRequest request = new OMRequest(webRequest);
 
 	boolean asynchDownloadRequest = request.isAsynchDownloadRequest();
@@ -367,8 +378,6 @@ public class OMHandler extends StreamingRequestHandler {
 		    if (results.size() > 1) {
 
 			if (asynchDownloadRequest) {
-
-			    GSUser user = UserFinder.create().findCurrentUser(webRequest.getServletRequest());
 
 			    GSProperty emailProperty = user.getProperty("email");
 

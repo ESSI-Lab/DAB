@@ -404,6 +404,7 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 	    break;
 
 	case MediaType.APPLICATION_ATOM_XML:
+	case "application/atom xml":
 
 	    out = AtomGPResultSetFormatter.getEmptyFeed(request.getOptionalQueryString().get(), error);
 	    outputFormat = MediaType.APPLICATION_XML.toString();

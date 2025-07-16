@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
@@ -49,7 +50,6 @@ import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
@@ -114,6 +114,7 @@ public class DownloadsHandler extends StreamingRequestHandler {
     }
 
     protected void handle(OutputStream output, WebRequest webRequest) throws Exception {
+
 	OMRequest request = new OMRequest(webRequest);
 	String operationId = request.getParameterValue(APIParameters.ID);
 	JSONObject ret = new JSONObject();
@@ -121,7 +122,18 @@ public class DownloadsHandler extends StreamingRequestHandler {
 
 	String method = webRequest.getServletRequest().getMethod();
 
-	GSUser user = UserFinder.create().findCurrentUser(webRequest.getServletRequest());
+	GSUser user = UserFinder.findCurrentUser(webRequest.getServletRequest());
+
+	// check permissions
+	Optional<String> optView = webRequest.extractViewId();
+	if (optView.isPresent() && optView.get().equals("his-central")) {
+	    if (!user.hasPermission("downloads") || !user.hasPermission("api")) {
+		printErrorMessage(output, "The user has not correct permissions");
+		return;
+	    }
+	}
+
+	//
 
 	GSProperty emailProperty = user.getProperty("email");
 
@@ -246,5 +258,16 @@ public class DownloadsHandler extends StreamingRequestHandler {
 		}).filter(Objects::nonNull).//
 
 		collect(Collectors.toList());
+    }
+
+    protected void printErrorMessage(OutputStream output, String message) throws IOException {
+
+	OutputStreamWriter writer = new OutputStreamWriter(output);
+
+	JSONObject error = new JSONObject();
+	error.put("message", message);
+
+	writer.write(error.toString());
+	writer.close();
     }
 }

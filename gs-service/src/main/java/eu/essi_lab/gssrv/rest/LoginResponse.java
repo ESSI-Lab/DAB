@@ -1,5 +1,7 @@
 package eu.essi_lab.gssrv.rest;
 
+import eu.essi_lab.model.auth.GSUser;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -26,8 +28,26 @@ public class LoginResponse {
     private String message;
     private String firstName;
     private String lastName;
+    private String permissions;
+    public String getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(String permissions) {
+        this.permissions = permissions;
+    }
+
     private String email;
     private String apiKey;
+    private GSUser user;
+
+    public GSUser getUser() {
+        return user;
+    }
+
+    public void setUser(GSUser user) {
+        this.user = user;
+    }
 
     public boolean isAdmin() {
 	return admin;
