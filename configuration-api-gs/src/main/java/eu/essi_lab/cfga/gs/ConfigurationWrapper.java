@@ -848,7 +848,7 @@ public class ConfigurationWrapper {
 
 	    if (prop != null) {
 
-		String[] s = prop.split(",");
+		String[] s = prop.split(";");
 		adminUsers = new ArrayList<String>();
 		for (String user : s) {
 		    adminUsers.add(user);
