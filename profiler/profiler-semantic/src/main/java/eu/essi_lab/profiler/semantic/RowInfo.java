@@ -116,7 +116,6 @@ public class RowInfo {
     private String interval = null;
     private String intendedObservationSpacing = null;
     private String interpolationSupportUnits = null;
-    private String realtime = null;
 
     public String getUniqueVariableCode() {
 	return uniqueVariableCode;
@@ -220,14 +219,6 @@ public class RowInfo {
 
     public void setInterpolationSupportUnits(String interpolationSupportUnits) {
 	this.interpolationSupportUnits = interpolationSupportUnits;
-    }
-
-    public String getRealtime() {
-	return realtime;
-    }
-
-    public void setRealtime(String realtime) {
-	this.realtime = realtime;
     }
 
     public String getCountry() {

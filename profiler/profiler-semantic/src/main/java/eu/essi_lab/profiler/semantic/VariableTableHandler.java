@@ -63,7 +63,6 @@ import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.views.DefaultViewManager;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 
 public class VariableTableHandler implements WebRequestHandler, WebRequestValidator {
@@ -206,7 +205,6 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		info.setInterval(interval);
 		info.setIntendedObservationSpacing(intendedObservationSpacing);
 		info.setInterpolationSupportUnits(interpolationSupportUnits);
-		info.setRealtime(realtime);
 		info.setCountry(country);
 		info.setCountryISO3(countryISO3);
 
@@ -241,7 +239,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    } catch (Exception e1) {
 		e1.printStackTrace();
 	    }
-	    Stats stats = sourceStats.getStatistics().get(null);
+	    Stats stats = sourceStats.getStatistics().get(s.getUniqueIdentifier());
 
 	    content += "<tr><td colspan='15'><br/>"//
 		    + "Data provider: <b>" + s.getLabel() + "</b><br/>"//
@@ -255,12 +253,12 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    + "Altitude:" + stats.getMinimumAltitude() + "/" + stats.getMaximumAltitude() + "<br/>"//
 		    + "</td></tr>" + "" //
 		    + "<tr>" + //
-		    getHeader("#Platforms") + //
-		    getHeader("#Variables") + // 1
-		    getHeader("#Timeseries") + // 1
-		    getHeader("Begin") + //
-		    getHeader("End") + //
-		    getHeader("BBOX(w,s,e,n)") + // 1
+//		    getHeader("#Platforms") + //
+//		    getHeader("#Variables") + // 1
+//		    getHeader("#Timeseries") + // 1
+//		    getHeader("Begin") + //
+//		    getHeader("End") + //
+//		    getHeader("BBOX(w,s,e,n)") + // 1
 		    getHeader("DAB generated variable identifier") + //
 		    getHeader("Data provider variable identifier") + //
 		    getHeader("Variable name") + //
@@ -274,7 +272,6 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    getHeader("Time interval") + //
 		    getHeader("Intended observation spacing") + //
 		    getHeader("Time units") + //
-		    getHeader("Real time") + //
 		    getHeader("Country") + //
 		    getHeader("Country ISO3") + //
 		    "</tr>";
@@ -285,7 +282,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    }
 	    for (SimpleEntry<RowInfo, String> row : rows) {
 		RowInfo ri = row.getKey();
-		Stats vs = sourceStats.getStatistics().get(ri.getUniqueVariableCode());
+		Stats vs = sourceStats.getStatistics().get(s.getUniqueIdentifier());
 		ri.setSiteCount(vs.getSiteCount());
 		ri.setAttributeCount(vs.getAttributeCount());
 		ri.setTimeseriesCount(vs.getTimeSeriesCount());
@@ -309,12 +306,12 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    for (SimpleEntry<RowInfo, String> row : rows) {
 		RowInfo ri = row.getKey();
 		content += "<tr>" + //
-			getRow(ri.getSiteCount()) + //
-			getRow(ri.getAttributeCount()) + // 1
-			getRow(ri.getTimeseriesCount()) + // 1
-			getRow(ri.getBegin()) + //
-			getRow(ri.getEnd()) + //
-			getRow(ri.getWest() + "," + ri.getSouth() + "," + ri.getEast() + "," + ri.getNorth()) + // 1
+//			getRow(ri.getSiteCount()) + //
+//			getRow(ri.getAttributeCount()) + // 1
+//			getRow(ri.getTimeseriesCount()) + // 1
+//			getRow(ri.getBegin()) + //
+//			getRow(ri.getEnd()) + //
+//			getRow(ri.getWest() + "," + ri.getSouth() + "," + ri.getEast() + "," + ri.getNorth()) + // 1
 			getRow(ri.getUniqueVariableCode()) + //
 			getRow(ri.getVariableCode()) + //
 			getRow(ri.getVariableName()) + //
@@ -328,7 +325,6 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 			getRow(ri.getInterval()) + //
 			getRow(ri.getIntendedObservationSpacing()) + //
 			getRow(ri.getInterpolationSupportUnits()) + //
-			getRow(ri.getRealtime()) + //
 			getRow(ri.getCountry()) + //
 			getRow(ri.getCountryISO3()) + //
 			"</tr>";
@@ -356,20 +352,6 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	return Response.status(Status.OK).type(MediaType.TEXT_HTML).entity(stream).build();
 
     }
-
-    // private String date(String string) {
-    // if (string == null) {
-    // return "";
-    // }
-    // try {
-    // double d = Double.parseDouble(string);
-    // Date date = new Date((long)d);
-    // return ISO8601DateTimeUtils.getISO8601DateTime(date);
-    // } catch (Exception e) {
-    // // TODO: handle exception
-    // }
-    // return "";
-    // }
 
     private String getHeader(String header) {
 	return "<th>" + header + "</th>";
