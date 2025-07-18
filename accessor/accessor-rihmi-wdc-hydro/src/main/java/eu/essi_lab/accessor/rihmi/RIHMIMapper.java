@@ -159,12 +159,13 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 		extent.setBeforeNowBeginPosition(FrameValue.P1Y);
 	    } else {
 		extent.setBeginPosition(ISO8601DateTimeUtils.getISO8601DateTime(begin));
-		extent.setEndPosition(ISO8601DateTimeUtils.getISO8601DateTime(end));
 		LocalDate dateToCheck = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		LocalDate today = LocalDate.now();
 		if (today.isEqual(dateToCheck) || !dateToCheck.isBefore(today.minusDays(30))) {
 		    TimeIndeterminateValueType endTimeInderminate = TimeIndeterminateValueType.NOW;
 		    extent.setIndeterminateEndPosition(endTimeInderminate);
+		} else {
+		    extent.setEndPosition(ISO8601DateTimeUtils.getISO8601DateTime(end));
 		}
 	    }
 	    coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(extent);
@@ -249,8 +250,6 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 
 	if (interpolation != null) {
 	    dataset.getExtensionHandler().setTimeInterpolation(interpolation);
-	} else if (isAral) {
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.DISCONTINUOUS);
 	}
 	if (aggregationDuration != null && !aggregationDuration.isEmpty()) {
 	    if (aggregationDuration.equals("P1M")) {
