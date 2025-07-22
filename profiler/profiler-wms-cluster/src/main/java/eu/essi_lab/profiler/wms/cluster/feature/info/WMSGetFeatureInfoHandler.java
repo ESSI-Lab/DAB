@@ -31,9 +31,12 @@ import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -52,9 +55,11 @@ import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
+import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.messages.web.WebRequest;
@@ -65,6 +70,8 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.CRSUtils;
+import eu.essi_lab.pdk.BondUtils;
+import eu.essi_lab.pdk.Semantics;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
@@ -243,11 +250,106 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			String viewId = webRequest.extractViewId().get();
 			Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 			WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
-			discoveryMessage.setUserBond(BondFactory.createSpatialEntityBond(BondOperator.INTERSECTS, extent));
+
+			Set<Bond> operands = new HashSet<>();
+
+			// we are interested only on downloadable datasets
+			ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
+			operands.add(accessBond);
+
+			// we are interested only on downloadable datasets
+			ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
+			operands.add(downBond);
+
+			// we are interested only on TIME SERIES datasets
+			ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
+			operands.add(timeSeriesBond);
+
+			Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
+			String ont = getParam(parameterMap, "ontology");
+			String attributeTitle = getParam(parameterMap, "attributeTitle");
+			String semantics = getParam(parameterMap, "semantics");
+
+			if (ont != null && attributeTitle != null) {
+			    Bond bond = Semantics.getSemanticBond(attributeTitle, semantics, ont);
+			    operands.add(bond);
+			}
+
+			String instrumentTitle = getParam(parameterMap, "instrumentTitle");
+			if (instrumentTitle != null) {
+			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.TEXT_SEARCH, instrumentTitle,
+				    MetadataElement.INSTRUMENT_TITLE);
+			    if (optBond.isPresent()) {
+				operands.add(optBond.get());
+			    }
+			}
+
+			String sources = getParam(parameterMap, "sources");
+			if (sources != null && !sources.isEmpty()) {
+			    String[] splitSources = sources.split(",");
+			    List<Bond> orBonds = new ArrayList<Bond>();
+			    for (String s : splitSources) {
+				orBonds.add(BondFactory.createSourceIdentifierBond(s));
+			    }
+			    if (orBonds.size() == 1) {
+				operands.add(orBonds.get(0));
+			    } else {
+				operands.add(BondFactory.createOrBond(orBonds));
+			    }
+
+			}
+
+			String intendedObservationSpacing = getParam(parameterMap, "intendedObservationSpacing");
+			if (intendedObservationSpacing != null) {
+			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, intendedObservationSpacing,
+				    MetadataElement.TIME_RESOLUTION_DURATION_8601);
+			    if (optBond.isPresent()) {
+				operands.add(optBond.get());
+			    }
+			}
+
+			String aggregationDuration = getParam(parameterMap, "aggregationDuration");
+			if (aggregationDuration != null) {
+			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, aggregationDuration,
+				    MetadataElement.TIME_AGGREGATION_DURATION_8601);
+			    if (optBond.isPresent()) {
+				operands.add(optBond.get());
+			    }
+			}
+
+			String timeInterpolation = getParam(parameterMap, "timeInterpolation");
+			if (timeInterpolation != null) {
+			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, timeInterpolation,
+				    MetadataElement.TIME_INTERPOLATION);
+			    if (optBond.isPresent()) {
+				operands.add(optBond.get());
+			    }
+			}
+
+			String observedPropertyURI = getParam(parameterMap, "observedPropertyURI");
+			if (observedPropertyURI != null) {
+			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, observedPropertyURI,
+				    MetadataElement.OBSERVED_PROPERTY_URI);
+			    if (optBond.isPresent()) {
+				operands.add(optBond.get());
+			    }
+			}
+
+			String organisationName = getParam(parameterMap, "organisationName");
+			if (organisationName != null) {
+			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.TEXT_SEARCH, organisationName,
+				    MetadataElement.ORGANISATION_NAME);
+			    if (optBond.isPresent()) {
+				operands.add(optBond.get());
+			    }
+			}
+
+			operands.add(BondFactory.createSpatialEntityBond(BondOperator.INTERSECTS, extent));
+
+			discoveryMessage.setUserBond(BondFactory.createAndBond(operands));
 
 			discoveryMessage.setSources(ConfigurationWrapper.getViewSources(view.get()));
 			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-			
 
 			Page userPage = discoveryMessage.getPage();
 			userPage.setStart(1);
@@ -260,12 +362,13 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			ResultSet<GSResource> resultSet = discoveryExecutor.retrieve(discoveryMessage);
 			List<GSResource> results = resultSet.getResultsList();
 			for (GSResource result : results) {
-				String id = result.getExtensionHandler().getUniquePlatformIdentifier().get();
-				String platformTitle = result.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform().getCitation().getTitle();
-			    String sourceId = result.getSource().getUniqueIdentifier();			    
+			    String id = result.getExtensionHandler().getUniquePlatformIdentifier().get();
+			    String platformTitle = result.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform()
+				    .getCitation().getTitle();
+			    String sourceId = result.getSource().getUniqueIdentifier();
 			    GSSource source = ConfigurationWrapper.getSource(sourceId);
 			    String sourceLabel = "unknown";
-			    if (source!=null) {
+			    if (source != null) {
 				sourceLabel = source.getLabel();
 			    }
 			    StationRecord station = new StationRecord();
@@ -276,8 +379,8 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			    stations.add(station);
 			}
 
-			InputStream stream = generator.getInfoPage(webRequest.getBaseUrl(), viewId, stations, resultSet.getCountResponse().getCount(), format,
-				request);
+			InputStream stream = generator.getInfoPage(webRequest.getBaseUrl(), viewId, stations,
+				resultSet.getCountResponse().getCount(), format, request);
 
 			IOUtils.copy(stream, output);
 
@@ -307,6 +410,15 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		return lon;
 	    }
 	};
+    }
+
+    private String getParam(Map<String, String[]> parameterMap, String string) {
+	String[] param = parameterMap.get(string);
+	if (param == null || param.length == 0) {
+	    return null;
+	}
+	return param[0];
+
     }
 
     @Override
