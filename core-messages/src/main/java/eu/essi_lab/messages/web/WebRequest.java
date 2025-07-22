@@ -1812,8 +1812,15 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	    @Override
 	    public String getServletPath() {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+	            URL url = new URL(requestURL);
+	            String path = url.getPath(); // e.g. "/gs-service/services/essi/token/..."
+	            String[] segments = path.split("/");
+	            return "/" + segments[2];
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        return null; // or throw exception if you prefer
 	    }
 
 	    @Override
@@ -1868,8 +1875,18 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	    @Override
 	    public String getPathInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+	            URL url = new URL(requestURL);
+	            String fullPath = url.getPath(); // e.g. /gs-service/services/essi/token/...
+	            String marker = "/services";
+	            int index = fullPath.indexOf(marker);
+	            if (index != -1) {
+	                return fullPath.substring(index + marker.length()); // keep everything after "/services"
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        return null;
 	    }
 
 	    @Override

@@ -112,6 +112,7 @@ public class DataDownloaderTool {
 	Date dateStart = new Date();
 
 	// remove download parameters to find out base URL
+	requestURL = requestURL.replace("downloads?", "observations?");
 	requestURL = removeParameter(requestURL, "asynchDownload", "true");
 	requestURL = removeParameter(requestURL, "includeData", "true");
 
@@ -202,8 +203,6 @@ public class DataDownloaderTool {
 			}
 			downloadURL = removeParameter(downloadURL, "asynchDownloadName", format);
 			downloadURL = removeParameter(downloadURL, "eMailNotifications", format);
-
-			downloadURL = downloadURL.replace("downloads?", "observations?");
 
 			// write
 			File sourceDir = new File(tempPath.toFile(), sourceId);
