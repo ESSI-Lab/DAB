@@ -12,3 +12,4 @@ eu.essi_lab.accessor.hiscentral.sardegna.HISCentralSardegnaMapper
 eu.essi_lab.accessor.hiscentral.basilicata.HISCentralBasilicataMapper
 eu.essi_lab.accessor.hiscentral.umbria.HISCentralUmbriaMapper
 eu.essi_lab.accessor.hiscentral.puglia.HISCentralPugliaMapper
+eu.essi_lab.accessor.hiscentral.puglia.arpa.HISCentralARPAPugliaMapper
