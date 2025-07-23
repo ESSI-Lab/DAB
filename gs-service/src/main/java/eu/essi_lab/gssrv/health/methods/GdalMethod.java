@@ -23,6 +23,7 @@ package eu.essi_lab.gssrv.health.methods;
 
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
+import eu.essi_lab.gssrv.starter.DABStarter;
 import eu.essi_lab.workflow.processor.grid.GDALConstants;
 
 /**
@@ -32,6 +33,10 @@ public class GdalMethod implements GSPingMethod {
 
     @Override
     public void ping() throws Exception {
+    	
+    if (DABStarter.skipGDALTests()) {
+    	return;
+    }
 
 	GDALConstants.IMPLEMENTATION = GDALConstants.Implementation.RUNTIME;
 	boolean healthy = GDALConstants.isGDALAvailable();

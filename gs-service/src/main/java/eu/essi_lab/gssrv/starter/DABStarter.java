@@ -90,6 +90,8 @@ public class DABStarter {
     public static final String JAVA_OPT_INIT_CACHES = "initCaches";
 
     public static final String JAVA_OPT_CHECK_CONFIG = "checkConfig";
+    
+    public static final String TEST_SKIP_GDAL = "testSkipGDAL";
 
     /**
     * 
@@ -210,15 +212,19 @@ public class DABStarter {
     /**
      * @return
      */
-    private static boolean configCheckEnabled() {
+    public static boolean configCheckEnabled() {
 	return propertyEnabled(JAVA_OPT_CHECK_CONFIG);
     }
 
-    private static boolean initCachesEnabled() {
+    public static boolean initCachesEnabled() {
 	return propertyEnabled(JAVA_OPT_INIT_CACHES);
     }
+    
+    public static boolean skipGDALTests() {
+	return propertyEnabled(TEST_SKIP_GDAL);
+    }
 
-    private static boolean propertyEnabled(String property) {
+    public static boolean propertyEnabled(String property) {
 
 	String check = System.getProperty(property);
 	if (check == null) {

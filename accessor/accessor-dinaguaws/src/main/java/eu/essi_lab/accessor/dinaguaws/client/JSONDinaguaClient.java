@@ -245,7 +245,7 @@ public class JSONDinaguaClient extends DinaguaClient {
 	HashMap<String, String> headers = new HashMap<>();
 	headers.put("Authorization", "Bearer " + token);
 
-	return downloader.downloadOptionalString(token, HttpHeaderUtils.build(headers));
+	return downloader.downloadOptionalString(request, HttpHeaderUtils.build(headers));
     }
 
     @Override
