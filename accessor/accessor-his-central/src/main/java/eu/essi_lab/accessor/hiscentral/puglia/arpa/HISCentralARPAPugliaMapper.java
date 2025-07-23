@@ -66,7 +66,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
     @Override
     public String getSupportedOriginalMetadataSchema() {
-	return CommonNameSpaceContext.HISCENTRAL_PUGLIA_NS_URI;
+	return CommonNameSpaceContext.HISCENTRAL_ARPA_PUGLIA_NS_URI;
     }
 
     public HISCentralARPAPugliaMapper() {
@@ -89,7 +89,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
-	originalMetadata.setSchemeURI(CommonNameSpaceContext.HISCENTRAL_PUGLIA_NS_URI);
+	originalMetadata.setSchemeURI(CommonNameSpaceContext.HISCENTRAL_ARPA_PUGLIA_NS_URI);
 
 	JSONObject jsonObject = new JSONObject();
 	jsonObject.put("dataset-info", datasetInfo);
@@ -514,7 +514,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	online.setFunctionCode("download");
 	online.setName(stationId + "_" + measureId + "_" + aggregationId);
 	online.setIdentifier(resourceIdentifier);
-	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_PUGLIA_NS_URI);
+	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_ARPA_PUGLIA_NS_URI);
 
 	distribution.addDistributionOnline(online);
 

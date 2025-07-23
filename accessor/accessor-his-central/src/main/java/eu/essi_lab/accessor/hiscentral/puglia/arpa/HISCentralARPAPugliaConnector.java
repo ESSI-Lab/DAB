@@ -303,7 +303,7 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
     @Override
     public List<String> listMetadataFormats() throws GSException {
 	List<String> ret = new ArrayList<>();
-	ret.add(CommonNameSpaceContext.HISCENTRAL_PUGLIA_NS_URI);
+	ret.add(CommonNameSpaceContext.HISCENTRAL_ARPA_PUGLIA_NS_URI);
 	return ret;
     }
 
