@@ -31,12 +31,12 @@ public class HISCentralARPAPugliaAccessor extends HarvestedAccessor<HISCentralAR
     /**
      * 
      */
-    public static final String TYPE = "SIR_PUGLIA";
+    public static final String TYPE = "SIR_ARPA_PUGLIA";
 
     @Override
     protected String initSettingName() {
 
-	return "HIS-Central Puglia Accessor";
+	return "HIS-Central ARPA Puglia Accessor";
     }
 
     @Override
