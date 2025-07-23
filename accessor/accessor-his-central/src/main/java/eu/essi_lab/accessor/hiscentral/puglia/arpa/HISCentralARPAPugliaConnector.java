@@ -22,6 +22,8 @@ package eu.essi_lab.accessor.hiscentral.puglia.arpa;
  */
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
@@ -30,9 +32,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
+
+import com.github.jsonldjava.shaded.com.google.common.base.Charsets;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -59,12 +66,14 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
      * 
      */
     static final String TYPE = "HISCentralARPAPugliaConnector";
+    private Downloader downloader;
+    private List<CSVRecord> csvParameters;
 
     /**
      * 
      */
     public HISCentralARPAPugliaConnector() {
-
+	downloader = new Downloader();
 	originalMetadata = new JSONObject();
     }
 
@@ -72,17 +81,20 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
      * 
      */
 
-    static final String STATIONS_URL = "user-permissions";
+    static final String STATIONS_URL = "Stations";
 
-    public static final String BASE_URL = "http://93.57.89.5:9000/api/";
+    public static final String BASE_URL = "https://cloud.arpa.puglia.it/QualitaAria/";
 
-    static final String ORGANIZATION_URL = "organization";
+    private static final int STEP = 10;
 
-    static final String PARAMETERS = "parameters";
+    private JSONObject allStation;
+
+    private JSONObject stationsParameter;
+
     /**
      * 
      */
-    static final String SENSOR_URL = "elements?";
+    static final String SENSOR_URL = "Pollutants";
 
     private static final String HIS_CENTRAL_ARPA_PUGLIA_CONNECTOR_DOWNLOAD_ERROR = "HIS_CENTRAL_ARPA_PUGLIA_CONNECTOR_DOWNLOAD_ERROR";
 
@@ -95,8 +107,6 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
     private int maxRecords;
 
     private Logger logger = GSLoggerFactory.getLogger(this.getClass());
-
-    public static String BEARER_TOKEN = null;
 
     private int partialNumbers;
 
@@ -112,25 +122,41 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 	    page = Integer.valueOf(request.getResumptionToken());
 	}
 
-	if (BEARER_TOKEN == null) {
-	    BEARER_TOKEN = ConfigurationWrapper.getCredentialsSetting().getPugliaToken().orElse(null);
-	}
-
 	Optional<Integer> mr = getSetting().getMaxRecords();
 	boolean maxNumberReached = false;
 	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && page > mr.get() - 1) {
 	    // max record set
 	    maxNumberReached = true;
 	}
-	if (originalMetadata.isEmpty()) {
-	    originalMetadata = getMetadataList();
+	if (allStation == null) {
+	    allStation = getMetadataList(STATIONS_URL);
 	}
 
-	JSONArray metadataArray = originalMetadata.optJSONArray("data");
-	
+	if (stationsParameter == null) {
+	    stationsParameter = getMetadataList("");
+	}
+
+	if (csvParameters == null) {
+	    getCSVRecords();
+	}
+
+	JSONArray metadataArray = allStation.optJSONArray("features");
+
 	if (page < metadataArray.length() && !maxNumberReached) {
 
 	    JSONObject datasetMetadata = metadataArray.getJSONObject(page);
+	    JSONObject stationProperty = datasetMetadata.optJSONObject("properties");
+	    String stationId = stationProperty.optString("id_station");
+	    JSONArray checkArray = allStation.optJSONArray("features");
+	    for (int i = 0; i < checkArray.length(); i++) {
+		JSONObject feature = checkArray.getJSONObject(i);
+		JSONObject properties = feature.getJSONObject("properties");
+		String targetId = properties.getString("id_station");
+		String variable = properties.getString("inquinante_misurato");
+		if (stationId.equals(targetId)) {
+
+		}
+	    }
 	    JSONArray stationsArray = datasetMetadata.optJSONArray("station");
 	    JSONArray aggregationArray = datasetMetadata.optJSONArray("aggregation");
 	    List<JSONObject> stationList = new ArrayList<JSONObject>();
@@ -150,7 +176,7 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 		}
 	    }
 
-	    if(page == (metadataArray.length()-1)) {
+	    if (page == (metadataArray.length() - 1)) {
 		ret.setResumptionToken(null);
 	    } else {
 		ret.setResumptionToken(String.valueOf(page + 1));
@@ -162,14 +188,34 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 
 	    logger.debug("Added Collection records: {} . TOTAL STATION SIZE: {}", partialNumbers, metadataArray.length());
 	    partialNumbers = 0;
-	    BEARER_TOKEN = null;
 	    return ret;
 	}
 
 	return ret;
     }
 
-   
+    private void getCSVRecords() {
+
+	Optional<InputStream> stream = downloader.downloadOptionalStream(getSourceURL() + SENSOR_URL);
+
+	try {
+	    if (stream.isPresent()) {
+		CSVFormat format = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build();
+		try (CSVParser parser = new CSVParser(new InputStreamReader(stream.get(), Charsets.ISO_8859_1), format)) {
+
+		    for (CSVRecord record : parser) {
+			csvParameters.add(record);
+
+		    }
+
+		}
+
+	    }
+	} catch (Exception e) {
+	    logger.error(HIS_CENTRAL_ARPA_PUGLIA_CONNECTOR_DOWNLOAD_ERROR + ": Error to read CSV file");
+	}
+
+    }
 
     private JSONObject getInfo(String param) throws GSException {
 
@@ -182,13 +228,11 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 	InputStream stream = null;
 	try {
 
-	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
 	    downloader.setResponseTimeout(TimeUnit.MILLISECONDS, responseTimeout * 1000);
 
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
-		    url.trim(), //
-		    HttpHeaderUtils.build("Authorization", "Bearer " + BEARER_TOKEN));
+		    url.trim());
 
 	    stream = getStationResponse.body();
 
@@ -202,7 +246,6 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Unable to retrieve " + url);
-	    BEARER_TOKEN = null;
 	    throw GSException.createException(//
 		    getClass(), //
 		    "Unable to retrieve " + url + " after several tries", //
@@ -225,13 +268,11 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 	InputStream stream = null;
 	try {
 
-	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
 	    downloader.setResponseTimeout(TimeUnit.MILLISECONDS, responseTimeout * 1000);
 
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
-		    url.trim(), //
-		    HttpHeaderUtils.build("Authorization", "Bearer " + BEARER_TOKEN));
+		    url.trim());
 
 	    stream = getStationResponse.body();
 
@@ -245,7 +286,6 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Unable to retrieve " + url);
-	    BEARER_TOKEN = null;
 	    throw GSException.createException(//
 		    getClass(), //
 		    "Unable to retrieve " + url + " after several tries", //
@@ -257,9 +297,9 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 	return null;
     }
 
-    private JSONObject getMetadataList() throws GSException {
+    private JSONObject getMetadataList(String path) throws GSException {
 
-	String url = getSourceURL() + STATIONS_URL;
+	String url = getSourceURL() + path + "?format=GeoJSON";
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 
@@ -268,13 +308,12 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 	InputStream stream = null;
 	try {
 
-	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
 	    downloader.setResponseTimeout(TimeUnit.MILLISECONDS, responseTimeout * 1000);
 
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
-		    url.trim(), //
-		    HttpHeaderUtils.build("Authorization", "Bearer " + BEARER_TOKEN));
+		    url.trim() //
+	    );
 
 	    stream = getStationResponse.body();
 
@@ -288,7 +327,6 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Unable to retrieve " + url);
-	    BEARER_TOKEN = null;
 	    throw GSException.createException(//
 		    getClass(), //
 		    "Unable to retrieve " + url + " after several tries", //
