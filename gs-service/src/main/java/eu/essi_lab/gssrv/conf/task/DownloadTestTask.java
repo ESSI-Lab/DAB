@@ -33,6 +33,7 @@ import java.util.UUID;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.access.augmenter.AccessAugmenter;
+import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.augmenter.ResourceAugmenter;
@@ -134,7 +135,7 @@ public class DownloadTestTask extends AbstractCustomTask {
 	    GSLoggerFactory.getLogger(getClass()).info("At source {} ({})of {} sources. Resource id: {}", (i + 1),
 		    resource.getSource().getLabel(), resources.size(), resource.getPublicId());
 	    Optional<GSResource> augmented = augmenter.augment(resource);
-	    String result = "bad";
+	    boolean result = false;
 	    if (augmented.isEmpty()) {
 		GSLoggerFactory.getLogger(getClass()).error("Was not able to augment");
 	    } else {
@@ -150,7 +151,7 @@ public class DownloadTestTask extends AbstractCustomTask {
 			failedDate = ISO8601DateTimeUtils.parseISO8601ToDate(lastFailedDownload.get()).get();
 		    }
 		    if (failedDate == null || failedDate.before(downloadDate)) {
-			result = "good";
+			result = true;
 			GSLoggerFactory.getLogger(getClass()).info("Was able to download resource from source {}",
 				a.getSource().getUniqueIdentifier());
 		    }
@@ -159,33 +160,13 @@ public class DownloadTestTask extends AbstractCustomTask {
 		writer.update(augmented.get());
 	    }
 
-	    if (optS3TransferManager.isPresent()) {
+	    String platformId = null;
 
-		GSLoggerFactory.getLogger(getClass()).info("Transfer download stats to s3 STARTED");
-
-		S3TransferWrapper manager = optS3TransferManager.get();
-		manager.setACLPublicRead(true);
-
-		File tempFile = File.createTempFile(getClass().getSimpleName() + sourceId + result, ".txt");
-
-		String platformId = "unknown";
-		if (resource.getExtensionHandler().getUniquePlatformIdentifier().isPresent()) {
-		    platformId = resource.getExtensionHandler().getUniquePlatformIdentifier().get();
-		}
-
-		String text = ISO8601DateTimeUtils.getISO8601DateTime() + "\n" + platformId;
-
-		Files.copy(IOStreamUtils.asStream(text), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-		manager.uploadFile(
-			tempFile.getAbsolutePath(), 
-			"dabreporting", 
-			"download-availability/" + sourceId + "-" + result + ".txt");
-
-		tempFile.delete();
-
-		GSLoggerFactory.getLogger(getClass()).info("Transfer of data availability test to s3 ENDED");
+	    if (resource.getExtensionHandler().getUniquePlatformIdentifier().isPresent()) {
+		platformId = resource.getExtensionHandler().getUniquePlatformIdentifier().get();
 	    }
+
+	    AvailabilityMonitor.getInstance().putLastDownloadInformation(result, sourceId, platformId);
 
 	    // CHECKING CANCELED JOB
 

@@ -25,12 +25,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.Optional;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 public class AvailabilityMonitor {
@@ -90,6 +93,64 @@ public class AvailabilityMonitor {
 
     public DownloadInformation getLastFailedDownloadDate(String sourceId) {
 	return getLastDownloadDate(false, sourceId);
+    }
+
+    public void putLastDownloadInformation(boolean result, String sourceId, String platformId) {
+
+	
+	Thread thread = new Thread() {
+	    @Override
+	    public void run() {
+		String quality = "bad";
+		if (result) {
+		    quality = "good";
+		}
+		
+		getS3TransferManager();
+
+		if (manager.isPresent()) {
+
+		    GSLoggerFactory.getLogger(getClass()).info("Transfer download stats to s3 STARTED");
+
+		    manager.get().setACLPublicRead(true);
+
+		    File tempFile = null;
+		    try {
+
+			tempFile = File.createTempFile(getClass().getSimpleName() + sourceId + quality, ".txt");
+		    } catch (IOException e) {
+			e.printStackTrace();
+			GSLoggerFactory.getLogger(getClass()).error(e);
+		    }
+
+		    String p = platformId;
+		    if (p == null) {
+			p = "unknown";
+		    }
+
+		    String text = ISO8601DateTimeUtils.getISO8601DateTime() + "\n" + p;
+
+		    try {
+			Files.copy(IOStreamUtils.asStream(text), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		    } catch (IOException e) {
+			e.printStackTrace();
+			GSLoggerFactory.getLogger(getClass()).error(e);
+		    }
+
+		    manager.get().uploadFile(tempFile.getAbsolutePath(), "dabreporting",
+			    "download-availability/" + sourceId + "-" + quality + ".txt");
+
+		    tempFile.delete();
+
+		    GSLoggerFactory.getLogger(getClass()).info("Transfer of data availability test to s3 ENDED");
+		} else {
+		    GSLoggerFactory.getLogger(getClass()).error("S3 manager is needed");
+
+		}
+	    }
+	};
+	thread.start();
+
     }
 
     public DownloadInformation getLastDownloadInformation(boolean good, String sourceId) {

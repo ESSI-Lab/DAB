@@ -34,6 +34,7 @@ import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.access.DataDownloaderFactory;
 import eu.essi_lab.access.DataValidator;
 import eu.essi_lab.access.DataValidatorFactory;
+import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -389,7 +390,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	} else {
 
 	    if (targetDescriptor.getDataFormat().equals(DataFormat.WKT())) {
-		// TODO WKT validator 
+		// TODO WKT validator
 	    } else {
 
 		String msg = "The downloaded file is not in expected format. Remote service error?";
@@ -460,6 +461,10 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 		DataObject result = workflow.execute(resource, dataObject, targetDescriptor);
 
+		if (resource.getExtensionHandler().getUniquePlatformIdentifier().isPresent()) {
+		    AvailabilityMonitor.getInstance().putLastDownloadInformation(true, resource.getSource().getUniqueIdentifier(),
+			    resource.getExtensionHandler().getUniquePlatformIdentifier().get());
+		}
 		// GSLoggerFactory.getLogger(getClass()).info("Workflow execution ENDED");
 
 		return result;
