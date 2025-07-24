@@ -1,3 +1,4 @@
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@page import="net.sf.saxon.expr.instruct.ForEach"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Enumeration"%>
@@ -129,6 +130,8 @@
 													 									
  	</div> 
 	<%
+	response.setContentType("text/html; charset=UTF-8");
+	
 	String verify = request.getParameter("verify");
 
 	if (verify != null && !verify.trim().isEmpty()) {
@@ -138,13 +141,13 @@
 	    try {
 			HISUserRegistration.activateUser(verify);
 			out.println("<div class=\"page-form\">");
-			out.println("<h2>La registrazione è stata effettuata con successo.</h2>");
+			out.println("<h2>La registrazione Ã¨ stata effettuata con successo.</h2>");
 			out.println("<h2>Il tuo token personale di identificazione: " + verify + "</h2>");
 			out.println("</div>");
 			
 	    } catch (Exception e) {
 		
-	   		 out.println("<p>Si è verificato un problema con la registrazione utente a HIS-Central. Si prega di contattare ISPRA per procedere.</p>\n");
+	   		 out.println("<p>Si Ã¨ verificato un problema con la registrazione utente a HIS-Central. Si prega di contattare ISPRA per procedere.</p>\n");
 	    }
 
 	} else {
@@ -195,7 +198,7 @@
 	    
 	    if(!humanTestValid){
 		
-			out.println("<h2>Registrazione fallita: la risposta al test non è corretta</h2>\n");
+			out.println("<h2>Registrazione fallita: la risposta al test non Ã¨ corretta</h2>\n");
 	    
 	    }else if (!isValid) {
 			
@@ -213,10 +216,10 @@
 			boolean sent = registration.addUserAndSendMail();
 			if (sent) {
 		    	out.println(
-				    "<p>Riceverai al più presto una E-mail per confermare la tua registrazione.</p>\n");
+				    "<p>Riceverai al piÃ¹ presto una E-mail per confermare la tua registrazione.</p>\n");
 			} else {
 		   	    out.println(
-				    "<p>Si è verificato un problema nell'invio della E-mail. Si prega di contattare ISPRA.</p>\n");
+				    "<p>Si Ã¨ verificato un problema nell'invio della E-mail. Si prega di contattare ISPRA.</p>\n");
 			}
 			out.println("</div>");
 	    }

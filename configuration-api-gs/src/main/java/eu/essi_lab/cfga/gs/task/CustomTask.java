@@ -1,5 +1,6 @@
 package eu.essi_lab.cfga.gs.task;
 
+import java.util.EnumMap;
 import java.util.Optional;
 
 /*-
@@ -78,6 +79,15 @@ public interface CustomTask extends Task {
 
 	return setting.getTaskOptions();
     }
+
+    default <E extends Enum<E> & OptionsKey> Optional<EnumMap<E, String>> readTaskOptions(
+	        JobExecutionContext context, Class<E> settingsEnumClass) {
+
+	    CustomTaskSetting setting = retrieveSetting(context);
+
+	    return setting.getTaskOptions()
+	        .map(raw -> OptionsParser.parseOptions(raw, settingsEnumClass));
+	}
 
     /**
      * @return

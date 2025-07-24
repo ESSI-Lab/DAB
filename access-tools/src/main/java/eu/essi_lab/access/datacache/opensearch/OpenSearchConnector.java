@@ -140,17 +140,17 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    this.suffix = suffix;
 	}
 
-	public Class getRecordType() {
+	public Class<?> getRecordType() {
 	    return clazz;
 	}
 
-	public void setRecordType(Class clazz) {
+	public void setRecordType(Class<?> clazz) {
 	    this.clazz = clazz;
 	}
 
-	private Class clazz;
+	private Class<?> clazz;
 
-	private DataCacheIndex(String suffix, Class clazz) {
+	private DataCacheIndex(String suffix, Class<?> clazz) {
 	    this.suffix = suffix;
 	    this.clazz = clazz;
 	}
@@ -342,7 +342,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 
     }
 
-    public JSONObject getOSMapping(Class clazz) {
+    public JSONObject getOSMapping(Class<?> clazz) {
 	JSONObject ret = new JSONObject();
 	JSONObject properties = new JSONObject();
 
@@ -405,7 +405,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 	Map<String, Object> map = objectMapper.convertValue(hit.source().to(Map.class), Map.class);
 
 	Field[] allFields = class1.getDeclaredFields();
-	T record = class1.newInstance();
+	T record = class1.getDeclaredConstructor().newInstance();
 	for (Field field : allFields) {
 	    try {
 		field.setAccessible(true);
@@ -1150,7 +1150,6 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	List<Hit<JsonData>> hits = searchResponse.hits().hits();
 	List<DataRecord> records = parseRecords(hits, DataRecord.class);
-	List<SimpleEntry<String, Date>> ret = new ArrayList<>();
 	if (records.isEmpty()) {
 	    return null;
 	}

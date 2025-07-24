@@ -90,8 +90,14 @@ public class DABStarter {
     public static final String JAVA_OPT_INIT_CACHES = "initCaches";
 
     public static final String JAVA_OPT_CHECK_CONFIG = "checkConfig";
+
+    public static final String JAVA_OPT_TEST_SKIP_GDAL = "testSkipGDAL";
+
+    private static final String JAVA_OPT_SKIP_HEALTH_CHECK = "skip.healthcheck";
     
-    public static final String TEST_SKIP_GDAL = "testSkipGDAL";
+    public static final String JAVA_OPT_CONFIGURATION_URL = "configuration.url";
+
+    private static final String JAVA_OPT_S3_ENDPOINT = "s3Endpoint";
 
     /**
     * 
@@ -107,6 +113,8 @@ public class DABStarter {
      * In minutes
      */
     private static final int DEFAULT_SCHEDULER_START_DELAY = 15;
+
+    
 
     /**
      * 
@@ -213,25 +221,31 @@ public class DABStarter {
      * @return
      */
     public static boolean configCheckEnabled() {
-	return propertyEnabled(JAVA_OPT_CHECK_CONFIG);
+	return isPropertyEnabled(JAVA_OPT_CHECK_CONFIG);
     }
 
     public static boolean initCachesEnabled() {
-	return propertyEnabled(JAVA_OPT_INIT_CACHES);
+	return isPropertyEnabled(JAVA_OPT_INIT_CACHES);
     }
-    
+
     public static boolean skipGDALTests() {
-	return propertyEnabled(TEST_SKIP_GDAL);
+	return isPropertyEnabled(JAVA_OPT_TEST_SKIP_GDAL);
     }
 
-    public static boolean propertyEnabled(String property) {
-
-	String check = System.getProperty(property);
-	if (check == null) {
-	    check = System.getenv(property);
+    public static String getPropertyValue(String property) {
+	String ret = System.getProperty(property);
+	if (ret == null) {
+	    ret = System.getenv(property);
 	}
+	return ret;
+    }
 
-	return check != null ? Boolean.valueOf(check) : true;
+    public static boolean isPropertyEnabled(String property) {
+	String check = getPropertyValue(property);
+	if (check == null) {
+	    return false;
+	}
+	return Boolean.valueOf(check);
     }
 
     /**
@@ -247,10 +261,7 @@ public class DABStarter {
 	    // 1) Retrieves the configuration.url parameter
 	    //
 
-	    String configURL = System.getProperty("configuration.url");
-	    if (configURL == null) {
-		configURL = System.getenv("configuration.url");
-	    }
+	    String configURL = getPropertyValue(JAVA_OPT_CONFIGURATION_URL);
 
 	    if (configURL == null || configURL.isEmpty()) {
 
@@ -293,7 +304,7 @@ public class DABStarter {
 		//
 		String startupUri = split[0];
 
-		String s3Endpoint = System.getProperty("s3Endpoint");
+		String s3Endpoint = getPropertyValue(JAVA_OPT_S3_ENDPOINT);
 		if (s3Endpoint != null) {
 		    source = S3Source.of(startupUri, s3Endpoint);
 		} else {
@@ -787,12 +798,7 @@ public class DABStarter {
      */
     private void healthCheckTest() throws GSException {
 
-	String skipHealthCheck = System.getProperty("skip.healthcheck");
-	if (skipHealthCheck == null) {
-	    skipHealthCheck = System.getenv("skip.healthcheck");
-	}
-
-	if (skipHealthCheck != null && skipHealthCheck.equals("true")) {
+	if (isPropertyEnabled(JAVA_OPT_SKIP_HEALTH_CHECK)) {
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Skipping health check according to system variable 'skip.healthcheck'");
 	    return;

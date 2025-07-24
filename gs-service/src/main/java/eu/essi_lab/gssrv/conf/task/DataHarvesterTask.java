@@ -24,6 +24,7 @@ package eu.essi_lab.gssrv.conf.task;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -40,13 +41,12 @@ import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
+import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.TaskListExecutor;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
 
@@ -55,33 +55,62 @@ import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
  */
 public class DataHarvesterTask extends AbstractCustomTask {
 
+    public enum DataHarvesterTaskOptions implements OptionsKey {
+	SOURCE_ID, THREADS_COUNT, MAX_RECORDS;
+    }
+
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
 	log(status, "Data harvester task STARTED");
 
-	while (true) {
+	// INIT CACHE CONNECTOR
 
-	    // SETTINGS RETRIEVAL
+	DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
 
-	    Optional<String> taskOptions = readTaskOptions(context);
-
-	    String sourceId = null;
-	    Integer threadsCount = 1;
-	    if (taskOptions.isPresent()) {
-		String options = taskOptions.get();
-		if (options != null) {
-		    if (options.contains("\n")) {
-			String[] split = options.split("\n");
-			// sourceId\nthreadsCount
-			sourceId = split[0];
-			threadsCount = Integer.parseInt(split[1].trim());
-		    } else {
-			// only sourceId
-			sourceId = options;
-		    }
-		}
+	if (dataCacheConnector == null) {
+	    DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
+	    dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
+	    if (dataCacheConnector == null) {
+		GSLoggerFactory.getLogger(getClass()).error("Issues initializing the data cache connector");
+		return;
 	    }
+	    String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
+	    String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
+	    String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
+	    dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
+	    dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
+	    dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
+	    DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
+	}
+
+	// SETTINGS RETRIEVAL
+
+	Optional<EnumMap<DataHarvesterTaskOptions, String>> taskOptions = readTaskOptions(context, DataHarvesterTaskOptions.class);
+	if (taskOptions.isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass()).error("No options specified");
+	    return;
+	}
+	String sourceId = taskOptions.get().get(DataHarvesterTaskOptions.SOURCE_ID);
+	if (sourceId == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("No source id option specified");
+	    return;
+	}
+	String threadsCountString = taskOptions.get().get(DataHarvesterTaskOptions.THREADS_COUNT);
+	Integer threadsCount = 1;
+	if (threadsCountString != null) {
+	    threadsCount = Integer.parseInt(threadsCountString);
+	}
+
+	String maxRecordsString = taskOptions.get().get(DataHarvesterTaskOptions.MAX_RECORDS);
+	Integer maxRecords = null;
+	if (maxRecordsString != null) {
+	    maxRecords = Integer.parseInt(maxRecordsString);
+	}
+	
+	int recordsDone = 0;
+
+	while (true) {
 
 	    // CHECKING CANCELED JOB
 
@@ -92,29 +121,10 @@ public class DataHarvesterTask extends AbstractCustomTask {
 		break;
 	    }
 
-	    // INIT CACHE CONNECTOR
-	    StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
-
-	    DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
-
-	    if (dataCacheConnector == null) {
-		DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
-		dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
-		String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
-		String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
-		String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
-		dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
-		dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
-		dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
-		DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
-	    }
-
 	    List<SimpleEntry<String, Date>> nextExpectedRecords = dataCacheConnector.getExpectedAvailableRecords(sourceId);
 
 	    GSLoggerFactory.getLogger(getClass()).info("Data harvester task STARTED source id {} threads {} expected available records {}",
 		    sourceId, threadsCount, nextExpectedRecords.size());
-
-	    List<GSSource> sources = ConfigurationWrapper.getHarvestedSources();
 
 	    TaskListExecutor<Boolean> taskList = new TaskListExecutor<>(threadsCount);
 
@@ -139,6 +149,7 @@ public class DataHarvesterTask extends AbstractCustomTask {
 
 	    for (int i = 0; i < nextExpectedRecords.size(); i++) {
 
+		
 		final int f = i;
 		final DataCacheConnector dcc = dataCacheConnector;
 		final String fid = sourceId;
@@ -167,9 +178,9 @@ public class DataHarvesterTask extends AbstractCustomTask {
 				    GSLoggerFactory.getLogger(getClass())
 					    .warn("[DATA-CACHE] More than one resource for the same online identifier {}", onlineId);
 				}
-				DataCacheAugmenter dca = new DataCacheAugmenter();
-
+				DataCacheAugmenter dca = new DataCacheAugmenter();				
 				dca.augment(resultSet.getResultsList().get(0));
+				
 			    }
 			} catch (Exception e) {
 			    e.printStackTrace();
@@ -186,6 +197,10 @@ public class DataHarvesterTask extends AbstractCustomTask {
 			return true;
 		    }
 		});
+		recordsDone++;
+		if (maxRecords!=null && recordsDone>=maxRecords) {
+		    break;
+		}
 
 	    }
 
