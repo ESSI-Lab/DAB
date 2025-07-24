@@ -32,8 +32,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.csv.CSVFormat;
@@ -73,7 +76,7 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
     static final String TYPE = "HISCentralARPAPugliaConnector";
     private Downloader downloader;
     //// id_pollutant;sigla;descrizione;periodo_di_misurazione;valore_limite;soglia_di_allarme;unita_misura;eionet_concept_uri
-    
+
     private List<CSVRecord> csvParameters = new ArrayList<>();
 
     /**
@@ -157,9 +160,9 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 	    } else {
 		ret.setResumptionToken(String.valueOf(end));
 	    }
-
+	    Map<String, Set<String>> stationMap = new HashMap<String, Set<String>>();
 	    for (int j = start; j < end; j++) {
-		JSONObject datasetMetadata = metadataArray.getJSONObject(start);
+		JSONObject datasetMetadata = metadataArray.getJSONObject(j);
 		JSONObject stationProperty = datasetMetadata.optJSONObject("properties");
 		String stationId = stationProperty.optString("id_station");
 		JSONArray checkArray = stationsParameter.optJSONArray("features");
@@ -174,11 +177,13 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 			    String variableId = rec.get("sigla");
 			    rec.get("sigla");
 			    if (variableId.equals(variable)) {
-
-				JSONObject variableInfo = createJSONFromCSV(rec);
-				ret.addRecord(HISCentralARPAPugliaMapper.create(datasetMetadata, variableInfo));
-				partialNumbers++;
-				break;
+				Set<String> variables = stationMap.computeIfAbsent(targetId, k -> new HashSet<>());
+				if (variables.add(variableId)) {
+				    JSONObject variableInfo = createJSONFromCSV(rec);
+				    ret.addRecord(HISCentralARPAPugliaMapper.create(datasetMetadata, variableInfo));
+				    partialNumbers++;
+				    break;
+				}
 			    }
 
 			}
@@ -204,11 +209,11 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 		// }
 		// }
 
-//		if (start == (metadataArray.length() - 1)) {
-//		    ret.setResumptionToken(null);
-//		} else {
-//		    ret.setResumptionToken(String.valueOf(start + 1));
-//		}
+		// if (start == (metadataArray.length() - 1)) {
+		// ret.setResumptionToken(null);
+		// } else {
+		// ret.setResumptionToken(String.valueOf(start + 1));
+		// }
 		logger.debug("ADDED {} records for ARPA Puglia {}", partialNumbers);
 	    }
 
@@ -225,7 +230,7 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
     private JSONObject createJSONFromCSV(CSVRecord record) {
 	//// id_pollutant;sigla;descrizione;periodo_di_misurazione;valore_limite;soglia_di_allarme;unita_misura;eionet_concept_uri
 	JSONObject ret = new JSONObject();
-	
+
 	String pollutantId = record.get("id_pollutant");
 	String pollutantName = record.get("sigla");
 	String pollutantDescription = record.get("descrizione");
@@ -234,8 +239,7 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 	String errorValue = record.get("soglia_di_allarme");
 	String units = record.get("unita_misura");
 	String uri = record.get("eionet_concept_uri");
-	
-	
+
 	ret.put("pollutantId", pollutantId);
 	ret.put("pollutantName", pollutantName);
 	ret.put("pollutantDescription", pollutantDescription);
@@ -254,10 +258,10 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 
 	try {
 	    if (stringCSV.isPresent()) {
-		Reader reader = new StringReader(stringCSV.get());	
+		Reader reader = new StringReader(stringCSV.get());
 		// CSVFormat format = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build();
 		Iterable<CSVRecord> csvRecords = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
-		for(CSVRecord rec: csvRecords) {
+		for (CSVRecord rec : csvRecords) {
 		    csvParameters.add(rec);
 		}
 	    }
