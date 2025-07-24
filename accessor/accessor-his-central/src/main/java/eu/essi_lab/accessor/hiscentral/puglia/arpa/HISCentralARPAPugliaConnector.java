@@ -171,21 +171,24 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 		    JSONObject properties = feature.getJSONObject("properties");
 		    String targetId = properties.getString("id_station");
 		    String variable = properties.getString("inquinante_misurato");
-		    if (stationId.equals(targetId)) {
+		    String networkType = properties.getString("interesse_rete");
+		    if (networkType.toLowerCase().contains("pubblico")) {
+			if (stationId.equals(targetId)) {
 
-			for (CSVRecord rec : csvParameters) {
-			    String variableId = rec.get("sigla");
-			    rec.get("sigla");
-			    if (variableId.equals(variable)) {
-				Set<String> variables = stationMap.computeIfAbsent(targetId, k -> new HashSet<>());
-				if (variables.add(variableId)) {
-				    JSONObject variableInfo = createJSONFromCSV(rec);
-				    ret.addRecord(HISCentralARPAPugliaMapper.create(datasetMetadata, variableInfo));
-				    partialNumbers++;
-				    break;
+			    for (CSVRecord rec : csvParameters) {
+				String variableId = rec.get("sigla");
+				rec.get("sigla");
+				if (variableId.equals(variable)) {
+				    Set<String> variables = stationMap.computeIfAbsent(targetId, k -> new HashSet<>());
+				    if (variables.add(variableId)) {
+					JSONObject variableInfo = createJSONFromCSV(rec);
+					ret.addRecord(HISCentralARPAPugliaMapper.create(datasetMetadata, variableInfo));
+					partialNumbers++;
+					break;
+				    }
 				}
-			    }
 
+			    }
 			}
 		    }
 		}
