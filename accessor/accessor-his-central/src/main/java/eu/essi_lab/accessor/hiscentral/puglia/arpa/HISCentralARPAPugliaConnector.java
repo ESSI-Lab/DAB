@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.puglia.arpa;
 
+import java.io.IOException;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -23,6 +25,8 @@ package eu.essi_lab.accessor.hiscentral.puglia.arpa;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -35,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.jena.atlas.json.JSON;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -67,7 +72,9 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
      */
     static final String TYPE = "HISCentralARPAPugliaConnector";
     private Downloader downloader;
-    private List<CSVRecord> csvParameters;
+    //// id_pollutant;sigla;descrizione;periodo_di_misurazione;valore_limite;soglia_di_allarme;unita_misura;eionet_concept_uri
+    
+    private List<CSVRecord> csvParameters = new ArrayList<>();
 
     /**
      * 
@@ -115,16 +122,16 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 
-	int page = 0;
+	int start = 0;
 
 	if (request.getResumptionToken() != null) {
 
-	    page = Integer.valueOf(request.getResumptionToken());
+	    start = Integer.valueOf(request.getResumptionToken());
 	}
 
 	Optional<Integer> mr = getSetting().getMaxRecords();
 	boolean maxNumberReached = false;
-	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && page > mr.get() - 1) {
+	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && start > mr.get() - 1) {
 	    // max record set
 	    maxNumberReached = true;
 	}
@@ -136,56 +143,77 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 	    stationsParameter = getMetadataList("");
 	}
 
-	if (csvParameters == null) {
+	if (csvParameters.isEmpty()) {
 	    getCSVRecords();
 	}
 
 	JSONArray metadataArray = allStation.optJSONArray("features");
 
-	if (page < metadataArray.length() && !maxNumberReached) {
+	if (start < metadataArray.length() && !maxNumberReached) {
 
-	    JSONObject datasetMetadata = metadataArray.getJSONObject(page);
-	    JSONObject stationProperty = datasetMetadata.optJSONObject("properties");
-	    String stationId = stationProperty.optString("id_station");
-	    JSONArray checkArray = allStation.optJSONArray("features");
-	    for (int i = 0; i < checkArray.length(); i++) {
-		JSONObject feature = checkArray.getJSONObject(i);
-		JSONObject properties = feature.getJSONObject("properties");
-		String targetId = properties.getString("id_station");
-		String variable = properties.getString("inquinante_misurato");
-		if (stationId.equals(targetId)) {
-
-		}
-	    }
-	    JSONArray stationsArray = datasetMetadata.optJSONArray("station");
-	    JSONArray aggregationArray = datasetMetadata.optJSONArray("aggregation");
-	    List<JSONObject> stationList = new ArrayList<JSONObject>();
-	    List<JSONObject> aggregationList = new ArrayList<JSONObject>();
-	    for (int j = 0; j < stationsArray.length(); j++) {
-		stationList.add(stationsArray.optJSONObject(j));
-	    }
-	    for (int k = 0; k < aggregationArray.length(); k++) {
-		aggregationList.add(aggregationArray.optJSONObject(k));
-	    }
-	    datasetMetadata.remove("station");
-	    datasetMetadata.remove("aggregation");
-	    for (JSONObject stationInfo : stationList) {
-		for (JSONObject aggregationInfo : aggregationList) {
-		    ret.addRecord(HISCentralARPAPugliaMapper.create(datasetMetadata, stationInfo, aggregationInfo));
-		    partialNumbers++;
-		}
-	    }
-
-	    if (page == (metadataArray.length() - 1)) {
-		ret.setResumptionToken(null);
+	    int end = start + STEP;
+	    if (end > metadataArray.length()) {
+		end = metadataArray.length();
 	    } else {
-		ret.setResumptionToken(String.valueOf(page + 1));
+		ret.setResumptionToken(String.valueOf(end));
 	    }
-	    logger.debug("ADDED {} records for variable {}", partialNumbers, datasetMetadata.optString("description"));
+
+	    for (int j = start; j < end; j++) {
+		JSONObject datasetMetadata = metadataArray.getJSONObject(start);
+		JSONObject stationProperty = datasetMetadata.optJSONObject("properties");
+		String stationId = stationProperty.optString("id_station");
+		JSONArray checkArray = stationsParameter.optJSONArray("features");
+		for (int i = 0; i < checkArray.length(); i++) {
+		    JSONObject feature = checkArray.getJSONObject(i);
+		    JSONObject properties = feature.getJSONObject("properties");
+		    String targetId = properties.getString("id_station");
+		    String variable = properties.getString("inquinante_misurato");
+		    if (stationId.equals(targetId)) {
+
+			for (CSVRecord rec : csvParameters) {
+			    String variableId = rec.get("sigla");
+			    rec.get("sigla");
+			    if (variableId.equals(variable)) {
+
+				JSONObject variableInfo = createJSONFromCSV(rec);
+				ret.addRecord(HISCentralARPAPugliaMapper.create(datasetMetadata, variableInfo));
+				partialNumbers++;
+				break;
+			    }
+
+			}
+		    }
+		}
+
+		// JSONArray stationsArray = datasetMetadata.optJSONArray("station");
+		// JSONArray aggregationArray = datasetMetadata.optJSONArray("aggregation");
+		// List<JSONObject> stationList = new ArrayList<JSONObject>();
+		// List<JSONObject> aggregationList = new ArrayList<JSONObject>();
+		// for (int j = 0; j < stationsArray.length(); j++) {
+		// stationList.add(stationsArray.optJSONObject(j));
+		// }
+		// for (int k = 0; k < aggregationArray.length(); k++) {
+		// aggregationList.add(aggregationArray.optJSONObject(k));
+		// }
+		// datasetMetadata.remove("station");
+		// datasetMetadata.remove("aggregation");
+		// for (JSONObject stationInfo : stationList) {
+		// for (JSONObject aggregationInfo : aggregationList) {
+		// ret.addRecord(HISCentralARPAPugliaMapper.create(datasetMetadata, stationInfo, aggregationInfo));
+		// partialNumbers++;
+		// }
+		// }
+
+//		if (start == (metadataArray.length() - 1)) {
+//		    ret.setResumptionToken(null);
+//		} else {
+//		    ret.setResumptionToken(String.valueOf(start + 1));
+//		}
+		logger.debug("ADDED {} records for ARPA Puglia {}", partialNumbers);
+	    }
 
 	} else {
 	    ret.setResumptionToken(null);
-
 	    logger.debug("Added Collection records: {} . TOTAL STATION SIZE: {}", partialNumbers, metadataArray.length());
 	    partialNumbers = 0;
 	    return ret;
@@ -194,23 +222,46 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 	return ret;
     }
 
+    private JSONObject createJSONFromCSV(CSVRecord record) {
+	//// id_pollutant;sigla;descrizione;periodo_di_misurazione;valore_limite;soglia_di_allarme;unita_misura;eionet_concept_uri
+	JSONObject ret = new JSONObject();
+	
+	String pollutantId = record.get("id_pollutant");
+	String pollutantName = record.get("sigla");
+	String pollutantDescription = record.get("descrizione");
+	String interpolation = record.get("periodo_di_misurazione");
+	String limitValue = record.get("valore_limite");
+	String errorValue = record.get("soglia_di_allarme");
+	String units = record.get("unita_misura");
+	String uri = record.get("eionet_concept_uri");
+	
+	
+	ret.put("pollutantId", pollutantId);
+	ret.put("pollutantName", pollutantName);
+	ret.put("pollutantDescription", pollutantDescription);
+	ret.put("pollutantInterpolation", interpolation);
+	ret.put("pollutantLimitValue", limitValue);
+	ret.put("pollutantErrorValue", errorValue);
+	ret.put("pollutantUnits", units);
+	ret.put("pollutantUri", uri);
+
+	return ret;
+    }
+
     private void getCSVRecords() {
 
-	Optional<InputStream> stream = downloader.downloadOptionalStream(getSourceURL() + SENSOR_URL);
+	Optional<String> stringCSV = downloader.downloadOptionalString(getSourceURL() + SENSOR_URL);
 
 	try {
-	    if (stream.isPresent()) {
-		CSVFormat format = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build();
-		try (CSVParser parser = new CSVParser(new InputStreamReader(stream.get(), Charsets.ISO_8859_1), format)) {
-
-		    for (CSVRecord record : parser) {
-			csvParameters.add(record);
-
-		    }
-
+	    if (stringCSV.isPresent()) {
+		Reader reader = new StringReader(stringCSV.get());	
+		// CSVFormat format = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build();
+		Iterable<CSVRecord> csvRecords = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
+		for(CSVRecord rec: csvRecords) {
+		    csvParameters.add(rec);
 		}
-
 	    }
+
 	} catch (Exception e) {
 	    logger.error(HIS_CENTRAL_ARPA_PUGLIA_CONNECTOR_DOWNLOAD_ERROR + ": Error to read CSV file");
 	}
@@ -299,7 +350,13 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 
     private JSONObject getMetadataList(String path) throws GSException {
 
-	String url = getSourceURL() + path + "?format=GeoJSON";
+	String url = getSourceURL();
+
+	if (path.isEmpty()) {
+	    url = url.endsWith("/") ? url.substring(0, url.length() - 1) + "?format=GeoJSON" : url + "?format=GeoJSON";
+	} else {
+	    url += path + "?format=GeoJSON";
+	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 

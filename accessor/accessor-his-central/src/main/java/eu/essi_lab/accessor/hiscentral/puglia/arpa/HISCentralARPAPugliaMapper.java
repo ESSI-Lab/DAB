@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.csv.CSVRecord;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -85,7 +86,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
      * @param sensorInfo
      * @return
      */
-    static OriginalMetadata create(JSONObject datasetInfo, JSONObject stationInfo, JSONObject aggregationInfo) {
+    static OriginalMetadata create(JSONObject datasetInfo, JSONObject variableInfo) {
 
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
@@ -93,9 +94,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
 	JSONObject jsonObject = new JSONObject();
 	jsonObject.put("dataset-info", datasetInfo);
-	jsonObject.put("station-info", stationInfo);
-	jsonObject.put("aggregation-info", aggregationInfo);
-
+	jsonObject.put("variable-info", variableInfo);
 	originalMetadata.setMetadata(jsonObject.toString(4));
 
 	return originalMetadata;
@@ -114,18 +113,9 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
      * @param metadata
      * @return
      */
-    private JSONObject retrieveStationInfo(OriginalMetadata metadata) {
+    private JSONObject retrieveVariableInfo(OriginalMetadata metadata) {
 
-	return new JSONObject(metadata.getMetadata()).getJSONObject("station-info");
-    }
-
-    /**
-     * @param metadata
-     * @return
-     */
-    private JSONObject retrieveAggregationInfo(OriginalMetadata metadata) {
-
-	return new JSONObject(metadata.getMetadata()).getJSONObject("aggregation-info");
+	return new JSONObject(metadata.getMetadata()).getJSONObject("variable-info");
     }
 
     @Override
@@ -143,13 +133,12 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
 	JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
 
-	JSONObject stationInfo = retrieveStationInfo(originalMD);
+	JSONObject stationInfo = retrieveVariableInfo(originalMD);
 
-	JSONObject aggregationInfo = retrieveAggregationInfo(originalMD);
-
-	String aggregationId = aggregationInfo.optString("id_aggregation");
-	String aggregationName = aggregationInfo.optString("name");
-	String aggregationAggregation = aggregationInfo.optString("aggregation");
+	
+	String aggregationId = ""; // aggregationInfo.optString("id_aggregation");
+	String aggregationName = "";//aggregationInfo.optString("name");
+	String aggregationAggregation = "";//aggregationInfo.optString("aggregation");
 
 	String resourceTitle = stationInfo.optString("station_name");
 	String resourceAbstract = datasetInfo.optString("description"); // always null
