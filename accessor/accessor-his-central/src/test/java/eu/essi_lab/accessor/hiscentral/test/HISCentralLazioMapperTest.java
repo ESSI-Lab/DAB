@@ -111,7 +111,7 @@ public class HISCentralLazioMapperTest {
 	TestCase.assertEquals(220.0, verticalExtent.getMaximumValue());
 
 	// id
-	TestCase.assertEquals("E44A0A417529DF4A72B473B8D840E46FA33340FD", resource.getOriginalId().get());
+	TestCase.assertEquals("C3A979051C282A19F8F4DA59D755030663FED85D", resource.getOriginalId().get());
 
 	// responsible party
 	ResponsibleParty originator = dataIdentification.getPointOfContact("publisher");

@@ -146,7 +146,7 @@ public class HISCentralVenetoMapperTest {
 	TestCase.assertEquals(-1.0, verticalExtent.getMaximumValue());
 	
 	// id
-	TestCase.assertEquals("EBE24EC6D3EB7EB16E8106DF99A70B8C81B27FF4", resource.getOriginalId().get());
+	TestCase.assertEquals("553512433DB9C6E766DC0F73413837B14D871C39", resource.getOriginalId().get());
 
 	// responsible party
 	ResponsibleParty originator = dataIdentification.getPointOfContact("publisher");
