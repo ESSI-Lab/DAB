@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.csv.CSVRecord;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import eu.essi_lab.accessor.hiscentral.utils.HISCentralUtils;
 import eu.essi_lab.downloader.hiscentral.HISCentralPugliaDownloader;
@@ -47,6 +48,7 @@ import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -64,6 +66,8 @@ import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodeType;
 public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
     private SimpleDateFormat iso8601Format;
+
+    private Logger logger = GSLoggerFactory.getLogger(this.getClass());
 
     @Override
     public String getSupportedOriginalMetadataSchema() {
@@ -135,81 +139,50 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
 	JSONObject stationInfo = retrieveVariableInfo(originalMD);
 
-	
-	String aggregationId = ""; // aggregationInfo.optString("id_aggregation");
-	String aggregationName = "";//aggregationInfo.optString("name");
-	String aggregationAggregation = "";//aggregationInfo.optString("aggregation");
-
-	String resourceTitle = stationInfo.optString("station_name");
-	String resourceAbstract = datasetInfo.optString("description"); // always null
-
-	// locality repeat the name of station
-	String locality = datasetInfo.optString("site-information");
-	String[] splittedLocality = locality.split(",");
-	String additionalInfo = "";
-	if (splittedLocality.length > 1) {
-	    for (int i = 1; i < splittedLocality.length; i++) {
-		additionalInfo = additionalInfo + splittedLocality[i] + ", ";
-	    }
-	    additionalInfo = additionalInfo.substring(0, additionalInfo.length() - 2);
-	}
-	String stationId = stationInfo.optString("id_stz");
+	String measureId = stationInfo.optString("pollutantId");
+	String measureName = stationInfo.optString("pollutantName");
+	String pollutantDescription = stationInfo.optString("pollutantDescription");
+	String measureInterpolation = stationInfo.optString("pollutantInterpolation");
+	String pollutantLimitValue = stationInfo.optString("pollutantLimitValue");
+	String pollutantErrorValue = stationInfo.optString("pollutantErrorValue");
+	String measureUnits = stationInfo.optString("pollutantUnits");
+	String pollutantUri = stationInfo.optString("pollutantUri");
 
 	// BBOX
-	// "altitude": 60,
-	// "long": "16.48389",
-	// "lat": "41.23361"
-	//
-	BigDecimal pointLon = stationInfo.optBigDecimal("longitude", null);
-	BigDecimal pointLat = stationInfo.optBigDecimal("latitude", null);
-	Double altitude = stationInfo.optDouble("altitude");
-
-	// temporal
-	String tempExtenBegin = null;
-	String tempExtenEnd = null;
-	String temporalExtentInterval = datasetInfo.optString("date_range");
-	if (temporalExtentInterval != null) {
-	    temporalExtentInterval = temporalExtentInterval.replaceFirst(" ", "T").trim();
-	    String[] splittedTime = temporalExtentInterval.split("\\|");
-
-	    if (splittedTime.length > 0) {
-		if (splittedTime.length > 1) {
-		    tempExtenBegin = splittedTime[0].trim();
-		    tempExtenEnd = splittedTime[1].trim();
-		} else {
-		    tempExtenBegin = splittedTime[0].trim();
-		}
-
+	// "geometry": {
+	// "type": "Point",
+	// "coordinates": [
+	// 16.787777,
+	// 41.114445
+	// ]
+	// }
+	BigDecimal pointLon = null;
+	BigDecimal pointLat = null;
+	JSONObject geometryObj = datasetInfo.optJSONObject("geometry");
+	if (geometryObj != null) {
+	    JSONArray coordinates = geometryObj.optJSONArray("coordinates");
+	    if (coordinates.length() == 2) {
+		pointLon = coordinates.optBigDecimal(0, null);
+		pointLat = coordinates.optBigDecimal(1, null);
+	    } else {
+		logger.error("NO VALID COORDINATES");
 	    }
 	}
 
-	String city = datasetInfo.optString("city");
-	String province = datasetInfo.optString("prov");
+	// properties
+	JSONObject propObj = datasetInfo.optJSONObject("properties");
+	String stationId = propObj.optString("id_station");
 
-	String country = datasetInfo.optString("country");
+	String city = propObj.optString("comune");
+	String province = propObj.optString("provincia");
+	String streetAddress = propObj.optString("indirizzo");
+	String country = propObj.optString("paese_esteso");
+	String resourceTitle = propObj.optString("denominazione");
+	String resourceAbstract = propObj.optString("description"); // always null
 
-	String alertZone = datasetInfo.optString("alertZone");
-
-	//
-	// MEASURE INFO
-	// "measure": [
-	// {
-	// "id_measure": 21,
-	// "measure_name": "Livello",
-	// "measure_unit": "m"
-	// },
-	// {
-	// "id_measure": 1021,
-	// "measure_name": "Livello2",
-	// "measure_unit": null
-	// }
-	// ]
-
-	JSONArray measureInfo = datasetInfo.optJSONArray("measure");
-	JSONObject measure = measureInfo.optJSONObject(0);
-	String measureId = measure.optString("id_measure");
-	String measureName = measure.optString("measure_name");
-	String measureUnits = measure.optString("measure_unit");
+	String aggregationId = ""; // aggregationInfo.optString("id_aggregation");
+	String aggregationName = "";// aggregationInfo.optString("name");
+	String aggregationAggregation = "";// aggregationInfo.optString("aggregation");
 
 	String varName = measureName;
 
@@ -221,75 +194,11 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	    varName = "Temperatura aria";
 	}
 
-	String timeSeriesId = stationInfo.optString("time-series-id");
-
-	// String tempExtenBegin = sensorInfo.optString("startDate");
-	// String tempExtenEnd = sensorInfo.optString("endDate");
-
 	// JSONObject organizationObject = organizationInfo.optJSONObject("organization");
 	String legalConstraint = null;
 	String creatorOrg = null;
 	String legalLimitations = null;
 	String pointOfContact = null;
-	// if (organizationObject != null) {
-	// legalConstraint = organizationObject.optString("conditions-for-access-and-use");
-	// creatorOrg = organizationObject.optString("creator-organization");
-	// legalLimitations = organizationObject.optString("limitations-on-public-access");
-	// pointOfContact = organizationObject.optString("point-of-contact-organization");
-	// }
-
-	// JSONArray parametersArr = parameterInfo.optJSONArray("parameters");
-	// String uriCode = null;
-	// for (int i = 0; i < parametersArr.length(); i++) {
-	// JSONObject jsonParameter = parametersArr.getJSONObject(i);
-	// if (jsonParameter != null) {
-	// String obsProp = jsonParameter.optString("observed-property");
-	// if (obsProp.toLowerCase().equals(measureName.toLowerCase())) {
-	// uriCode = jsonParameter.optString("keywords");
-	// break;
-	// }
-	//
-	// }
-	// }
-
-	// String statisticalFunction = "";
-	// if (sensorInfo.getJSONObject("observedProperty").has("statisticalFunction")) {
-	//
-	// statisticalFunction = sensorInfo.getJSONObject("observedProperty").getString("statisticalFunction");
-	//
-	// if (statisticalFunction.equals("sum")) {
-	// dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
-	// } else {
-	// dataset.getExtensionHandler().setTimeInterpolation(statisticalFunction);
-	// }
-	// }
-
-	// String uom = sensorInfo.getJSONObject("observedProperty").getString("uom");
-	// String basePhenomenon = sensorInfo.getJSONObject("observedProperty").getString("basePhenomenon");
-
-	// String intendedObservationSpacing = sensorInfo.getString("intendedObservationSpacing");
-	//
-	// String aggregationTimePeriod = sensorInfo.get("aggregationTimePeriod").toString();
-
-	//
-	// intendedObservationSpacing = "P15M"
-	//
-	// 15 -> timeResolution
-	// M -> timeUnits
-	//
-	// String timeUnits = intendedObservationSpacing.substring(1, intendedObservationSpacing.length() - 1);
-	// String timeResolution = intendedObservationSpacing.substring(intendedObservationSpacing.length() - 1);
-	//
-	// dataset.getExtensionHandler().setTimeUnits(timeUnits);
-	// dataset.getExtensionHandler().setTimeResolution(timeResolution);
-	//
-	// if (aggregationTimePeriod != null && aggregationTimePeriod.equals("0")) {
-	// dataset.getExtensionHandler().setTimeSupport(timeUnits);
-	// }
-
-	//
-	//
-	//
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
@@ -298,14 +207,16 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 	coreMetadata.addDistributionFormat("WaterML 1.1");
 
-	coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(resourceTitle + " - " + aggregationName);
-	coreMetadata.getMIMetadata().getDataIdentification().setAbstract(resourceTitle + " - " + aggregationName);
+	coreMetadata.getMIMetadata().getDataIdentification()
+		.setCitationTitle(resourceTitle + " - " + measureName + " - " + measureInterpolation);
+	coreMetadata.getMIMetadata().getDataIdentification()
+		.setAbstract(resourceTitle + " - " + measureName + " - " + measureInterpolation);
 
 	//
 	// id
 	//
 
-	String resourceIdentifier = generateCode(dataset, stationId + "-" + aggregationName);
+	String resourceIdentifier = generateCode(dataset, stationId + "-" + measureId);
 
 	coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
 
@@ -408,7 +319,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
 	Keywords general = new Keywords();
 	general.setTypeCode("general");
-	general.addKeyword("Puglia");
+	general.addKeyword("ARPA Puglia");
 	general.addKeyword(measureName);
 	coreMetadata.getMIMetadata().getDataIdentification().addKeywords(general);
 
@@ -433,10 +344,6 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 		    pointLon);
 	}
 
-	// vertical extent
-	if (altitude != null)
-	    coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(altitude, altitude);
-
 	//
 	// platform
 	//
@@ -456,22 +363,15 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	coreMetadata.getMIMetadata().addMIPlatform(platform);
 
 	//
-	// temp extent
+	// temp extent - HARD CODED: temporal extent from 2021 to now
 	//
 
-	String beginPosition = normalizeUTCPosition(tempExtenBegin);
+	String beginPosition = "2021-01-01";
 
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setBeginPosition(beginPosition);
-	// end time to be reviewed
-	if (tempExtenEnd == null || tempExtenEnd.isEmpty()) {
-	    temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
-	} else {
-	    temporalExtent.setEndPosition(normalizeUTCPosition(tempExtenEnd));
-	}
-
+	temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
 	coreMetadata.getDataIdentification().addTemporalExtent(temporalExtent);
-
 	setIndeterminatePosition(dataset);
 
 	Distribution distribution = coreMetadata.getMIMetadata().getDistribution();
@@ -493,10 +393,9 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
 	// data linkage (last 24 hours)
 	String linkage = HISCentralARPAPugliaConnector.BASE_URL.endsWith("/")
-		? HISCentralARPAPugliaConnector.BASE_URL + "data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/"
-			+ measureId
-		: HISCentralARPAPugliaConnector.BASE_URL + "/data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/"
-			+ measureId;
+		? HISCentralARPAPugliaConnector.BASE_URL.substring(0, HISCentralARPAPugliaConnector.BASE_URL.length() - 1) + "?id_station="
+			+ measureId + "&label_pollutant=" + measureName
+		: HISCentralARPAPugliaConnector.BASE_URL + "?id_station=" + measureId + "&label_pollutant=" + measureName;
 
 	Online online = new Online();
 	online.setLinkage(linkage);
@@ -512,69 +411,55 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	//
 
 	CoverageDescription coverageDescription = new CoverageDescription();
-
-	String[] splitAggregation = aggregationAggregation.split("_"); // p_sum_1y
-	String aggParameter = null;
 	String aggProcedure = null;
-	String aggPeriod = null;
-	if (splitAggregation.length == 3) {
-	    aggParameter = splitAggregation[0];// p
-	    aggProcedure = splitAggregation[1]; // sum
-	    aggPeriod = splitAggregation[2]; // 1y
-	} else if (splitAggregation.length == 2) {
-	    aggParameter = splitAggregation[0];// p
-	    aggProcedure = splitAggregation[1]; //
-	    aggPeriod = splitAggregation[1]; // rt
-	} else {
-	    System.out.println();
-	}
-
-	String aggPeriodNumbers = aggPeriod.replaceAll("\\D+", ""); // 1
-	String aggPeriodString = aggPeriod.replaceAll("\\d+", ""); // y
-
 	String duration = null;
-	switch (aggPeriodString) {
-	case "d":
-	    duration = "P" + aggPeriodNumbers + "D";
-	    break;
-	case "m":
-	    duration = "P" + aggPeriodNumbers + "M";
-	    break;
-	case "y":
-	    duration = "P" + aggPeriodNumbers + "Y";
-	    break;
-	case "min":
-	    duration = "PT" + aggPeriodNumbers + "M";
-	    break;
-	case "rt":
-	default:
-	    break;
+	if (measureInterpolation != null && !measureInterpolation.isEmpty() && !measureInterpolation.contains("null")) {
+	    //
+	    if (measureInterpolation.toLowerCase().contains("max") || measureInterpolation.toLowerCase().contains("massimo")) {
+		aggProcedure = "max";
+	    } else if (measureInterpolation.toLowerCase().contains("medio") || measureInterpolation.toLowerCase().contains("media")) {
+		aggProcedure = "avg";
+	    } else if (measureInterpolation.toLowerCase().contains("min") || measureInterpolation.toLowerCase().contains("minimo")) {
+		aggProcedure = "min";
+	    }
+
+	    // period
+	    if (measureInterpolation.toLowerCase().contains("annua") || measureInterpolation.toLowerCase().contains("annuo")) {
+		duration = "P1Y";
+	    } else if (measureInterpolation.toLowerCase().contains("giornaliera")
+		    || measureInterpolation.toLowerCase().contains("giornaliero")) {
+		duration = "P1D";
+	    } else if (measureInterpolation.toLowerCase().contains("orario") || measureInterpolation.toLowerCase().contains("orario")) {
+		duration = "P1H";
+	    }
 	}
+
 	if (duration != null) {
 	    dataset.getExtensionHandler().setTimeAggregationDuration8601(duration);
 	    dataset.getExtensionHandler().setTimeResolutionDuration8601(duration);
 	}
-	switch (aggProcedure) {
-	case "max":
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MAX);
-	    break;
-	case "min":
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MIN);
-	    break;
-	case "avg":
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.AVERAGE);
-	    break;
-	case "sum":
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
-	    break;
-	case "real-time":
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
-	    break;
-	default:
-	    dataset.getExtensionHandler().setTimeInterpolation(aggProcedure);
-	    break;
+	if (aggProcedure != null) {
+	    switch (aggProcedure) {
+	    case "max":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MAX);
+		break;
+	    case "min":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MIN);
+		break;
+	    case "avg":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.AVERAGE);
+		break;
+	    case "sum":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
+		break;
+	    case "real-time":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
+		break;
+	    default:
+		dataset.getExtensionHandler().setTimeInterpolation(aggProcedure);
+		break;
+	    }
 	}
-
 	coverageDescription.setAttributeIdentifier(aggregationAggregation);
 	coverageDescription.setAttributeTitle(varName);
 
@@ -586,9 +471,9 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setAttributeUnits(measureUnits);
 	}
 
-	// if (uriCode != null && !uriCode.isEmpty()) {
-	// dataset.getExtensionHandler().setObservedPropertyURI(uriCode);
-	// }
+	if (pollutantUri != null && !pollutantUri.isEmpty()) {
+	    dataset.getExtensionHandler().setObservedPropertyURI(pollutantUri);
+	}
 
 	// as no description is given this field is calculated
 	HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);

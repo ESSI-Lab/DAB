@@ -84,7 +84,6 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
      */
     public HISCentralARPAPugliaConnector() {
 	downloader = new Downloader();
-	originalMetadata = new JSONObject();
     }
 
     /**
@@ -93,7 +92,7 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 
     static final String STATIONS_URL = "Stations";
 
-    public static final String BASE_URL = "https://cloud.arpa.puglia.it/QualitaAria/";
+    public static final String BASE_URL = "https://cloud.arpa.puglia.it/QualitaAria";
 
     private static final int STEP = 10;
 
@@ -111,8 +110,6 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
     /**
      * 
      */
-
-    JSONObject originalMetadata;
 
     private int maxRecords;
 
@@ -164,15 +161,16 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 	    for (int j = start; j < end; j++) {
 		JSONObject datasetMetadata = metadataArray.getJSONObject(j);
 		JSONObject stationProperty = datasetMetadata.optJSONObject("properties");
-		String stationId = stationProperty.optString("id_station");
-		JSONArray checkArray = stationsParameter.optJSONArray("features");
-		for (int i = 0; i < checkArray.length(); i++) {
-		    JSONObject feature = checkArray.getJSONObject(i);
-		    JSONObject properties = feature.getJSONObject("properties");
-		    String targetId = properties.getString("id_station");
-		    String variable = properties.getString("inquinante_misurato");
-		    String networkType = properties.getString("interesse_rete");
-		    if (networkType.toLowerCase().contains("pubblico")) {
+		String networkType = stationProperty.getString("interesse_rete");
+		if (networkType.toLowerCase().contains("pubblico")) {
+		    String stationId = stationProperty.optString("id_station");
+		    JSONArray checkArray = stationsParameter.optJSONArray("features");
+		    for (int i = 0; i < checkArray.length(); i++) {
+			JSONObject feature = checkArray.getJSONObject(i);
+			JSONObject properties = feature.getJSONObject("properties");
+			String targetId = properties.getString("id_station");
+			String variable = properties.getString("inquinante_misurato");
+
 			if (stationId.equals(targetId)) {
 
 			    for (CSVRecord rec : csvParameters) {
