@@ -81,7 +81,7 @@ import eu.essi_lab.wml._2.WML2QualityCategory;
 
 /**
  * GET DATA REQUEST EXMPLE:
- * http://93.57.89.5:9000/api/data/aggregation/101/station/6/measure/3/date-from/2024-01-01%2000%3A00/date-to/2024-01-21%2000%3A00
+ *
  */
 
 public class HISCentralARPAPugliaDownloader extends WMLDataDownloader {
@@ -223,7 +223,7 @@ public class HISCentralARPAPugliaDownloader extends WMLDataDownloader {
 
 			    BigDecimal missingValue = new BigDecimal(MISSING_VALUE);
 
-			    BigDecimal dataValue = data.optBigDecimal("valore_inquinante_misurato", missingValue);
+			    BigDecimal dataValue = dataProperties.optBigDecimal("valore_inquinante_misurato", missingValue);
 
 			    //
 			    // value
@@ -253,7 +253,7 @@ public class HISCentralARPAPugliaDownloader extends WMLDataDownloader {
 			    // date
 			    //
 
-			    String date = data.optString("data_di_misurazione");// data.optString("datetime");
+			    String date = dataProperties.optString("data_di_misurazione");// data.optString("datetime");
 
 			    if (iso8601OutputFormat == null) {
 				if (date.contains("T")) {
@@ -406,7 +406,7 @@ public class HISCentralARPAPugliaDownloader extends WMLDataDownloader {
 	return (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralPugliaConnector.BASE_URL) && //
+		online.getLinkage().contains(HISCentralARPAPugliaConnector.BASE_URL) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_ARPA_PUGLIA_NS_URI));
     }

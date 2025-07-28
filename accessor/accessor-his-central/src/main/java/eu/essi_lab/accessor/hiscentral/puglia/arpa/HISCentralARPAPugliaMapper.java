@@ -395,7 +395,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	String linkage = HISCentralARPAPugliaConnector.BASE_URL.endsWith("/")
 		? HISCentralARPAPugliaConnector.BASE_URL.substring(0, HISCentralARPAPugliaConnector.BASE_URL.length() - 1) + "?id_station="
 			+ stationId + "&label_pollutant=" + measureName
-		: HISCentralARPAPugliaConnector.BASE_URL + "?id_station=" + measureId + "&label_pollutant=" + measureName;
+		: HISCentralARPAPugliaConnector.BASE_URL + "?id_station=" + stationId + "&label_pollutant=" + measureName;
 
 	Online online = new Online();
 	online.setLinkage(linkage);
@@ -460,7 +460,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 		break;
 	    }
 	}
-	coverageDescription.setAttributeIdentifier(aggregationAggregation);
+	    coverageDescription.setAttributeIdentifier(varName + "_" +measureId);
 	coverageDescription.setAttributeTitle(varName);
 
 	coverageDescription.setAttributeDescription(aggregationName);
