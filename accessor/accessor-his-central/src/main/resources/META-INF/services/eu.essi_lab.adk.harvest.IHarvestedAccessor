@@ -13,4 +13,5 @@ eu.essi_lab.accessor.hiscentral.sardegna.HISCentralSardegnaAccessor
 eu.essi_lab.accessor.hiscentral.basilicata.HISCentralBasilicataAccessor
 eu.essi_lab.accessor.hiscentral.umbria.HISCentralUmbriaAccessor
 eu.essi_lab.accessor.hiscentral.puglia.HISCentralPugliaAccessor
+eu.essi_lab.accessor.hiscentral.puglia.arpa.HISCentralARPAPugliaAccessor
 

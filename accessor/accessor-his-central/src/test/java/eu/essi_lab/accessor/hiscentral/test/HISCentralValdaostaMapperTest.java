@@ -135,7 +135,7 @@ public class HISCentralValdaostaMapperTest {
 	TestCase.assertEquals(1238.0, verticalExtent.getMaximumValue());
 
 	// id
-	TestCase.assertEquals("E62167849FD2CF545A9A0CDA3A81CE49EBA492BC", resource.getOriginalId().get());
+	TestCase.assertEquals("3ECB336E2EB54585FD3F974C224EE21106642D9C", resource.getOriginalId().get());
 
 	// responsible party
 	ResponsibleParty originator = dataIdentification.getPointOfContact("publisher");

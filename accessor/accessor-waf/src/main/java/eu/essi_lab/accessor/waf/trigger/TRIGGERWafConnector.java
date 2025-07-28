@@ -603,30 +603,6 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	return calendar.getTime();
     }
 
-    public static File getLocalCopy(String url, String filename) throws Exception {
-	String u = url + filename;
-	Downloader down = new Downloader();
-	Optional<InputStream> netCDF = down.downloadOptionalStream(u);
-
-	if (netCDF.isPresent()) {
-
-	    // coverageDescription.setAttributeIdentifier("urn:ca:qc:gouv:cehq:depot:variable:" +
-	    // var.name());
-	    // coverageDescription.setAttributeTitle(var.getLabel());
-	    String tmpDirsLocation = System.getProperty("java.io.tmpdir");
-	    File tmpFile = new File(tmpDirsLocation, "netcdf-connector-" + filename);
-	    if (tmpFile.exists()) {
-		// already downloaded
-		return tmpFile;
-	    }
-	    FileOutputStream fos = new FileOutputStream(tmpFile);
-	    IOUtils.copy(netCDF.get(), fos);
-	    fos.close();
-	    return tmpFile;
-	}
-	return null;
-
-    }
 
     @Override
     public boolean supports(GSSource source) {

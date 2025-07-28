@@ -150,6 +150,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String HISCENTRAL_LIGURIA_NS_URI = "http://essi-lab.eu/his-central/liguria";
     public static final String HISCENTRAL_BOLZANO_NS_URI = "http://essi-lab.eu/his-central/bolzano";
     public static final String HISCENTRAL_PUGLIA_NS_URI = "http://essi-lab.eu/his-central/puglia";
+    public static final String HISCENTRAL_ARPA_PUGLIA_NS_URI = "http://essi-lab.eu/his-central/arpa/puglia";
     public static final String WMS_1_3_0_QWeMS_NS_URI = "urn:ogc:serviceType:WebMapService:QWeMS:1.3.0";
     public static final String POLYTOPE = "http://essi-lab.eu/Polytope";
     public static final String POLYTOPE_METEOTRACKER = "http://essi-lab.eu/Polytope/Meteotracker";
@@ -240,6 +241,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("hiscentralsardegna", HISCENTRAL_SARDEGNA_NS_URI);
 	map.put("hiscentralbasilicata", HISCENTRAL_BASILICATA_NS_URI);
 	map.put("hiscentralpuglia", HISCENTRAL_PUGLIA_NS_URI);
+	map.put("hiscentralarpapuglia", HISCENTRAL_ARPA_PUGLIA_NS_URI);
 
 	map.put("polytopemeteotracker", POLYTOPE_METEOTRACKER);
 	map.put("bluecloudapi", BLUECLOUD_API);

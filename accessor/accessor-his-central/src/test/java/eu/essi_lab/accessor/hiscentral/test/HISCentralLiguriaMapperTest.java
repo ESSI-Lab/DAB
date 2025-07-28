@@ -112,7 +112,7 @@ public class HISCentralLiguriaMapperTest {
 	TestCase.assertEquals(70.0, verticalExtent.getMaximumValue());
 	
 	// id
-	TestCase.assertEquals("39ACD929AF247F25C38F11757178F39CEC0B5294", resource.getOriginalId().get());
+	TestCase.assertEquals("FC02E8D1F843D0325FF5C36783FB80050551DCC2", resource.getOriginalId().get());
 
 	// responsible party
 	ResponsibleParty originator = dataIdentification.getPointOfContact("owner");

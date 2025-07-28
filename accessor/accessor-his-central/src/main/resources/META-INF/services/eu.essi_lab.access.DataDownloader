@@ -13,3 +13,4 @@ eu.essi_lab.downloader.hiscentral.HISCentralSardegnaDownloader
 eu.essi_lab.downloader.hiscentral.HISCentralBasilicataDownloader
 eu.essi_lab.downloader.hiscentral.HISCentralUmbriaDownloader
 eu.essi_lab.downloader.hiscentral.HISCentralPugliaDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralARPAPugliaDownloader

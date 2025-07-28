@@ -28,3 +28,5 @@ eu.essi_lab.accessor.hiscentral.umbria.HISCentralUmbriaAccessor
 eu.essi_lab.accessor.hiscentral.umbria.HISCentralUmbriaConnector
 eu.essi_lab.accessor.hiscentral.puglia.HISCentralPugliaAccessor
 eu.essi_lab.accessor.hiscentral.puglia.HISCentralPugliaConnector
+eu.essi_lab.accessor.hiscentral.puglia.arpa.HISCentralARPAPugliaAccessor
+eu.essi_lab.accessor.hiscentral.puglia.arpa.HISCentralARPAPugliaConnector
