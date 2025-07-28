@@ -394,7 +394,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	// data linkage (last 24 hours)
 	String linkage = HISCentralARPAPugliaConnector.BASE_URL.endsWith("/")
 		? HISCentralARPAPugliaConnector.BASE_URL.substring(0, HISCentralARPAPugliaConnector.BASE_URL.length() - 1) + "?id_station="
-			+ measureId + "&label_pollutant=" + measureName
+			+ stationId + "&label_pollutant=" + measureName
 		: HISCentralARPAPugliaConnector.BASE_URL + "?id_station=" + measureId + "&label_pollutant=" + measureName;
 
 	Online online = new Online();
