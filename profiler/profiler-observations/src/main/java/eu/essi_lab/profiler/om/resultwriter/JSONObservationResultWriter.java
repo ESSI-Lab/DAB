@@ -36,8 +36,11 @@ import eu.essi_lab.profiler.om.JSONObservation;
 
 public class JSONObservationResultWriter extends ResultWriter {
 
-	public JSONObservationResultWriter(OutputStreamWriter writer) {
+	private boolean expandFeatures;
+
+	public JSONObservationResultWriter(OutputStreamWriter writer, boolean expandFeatures) {
 		super(writer);
+		this.expandFeatures = expandFeatures;
 	}
 
 	@Override
@@ -102,7 +105,9 @@ public class JSONObservationResultWriter extends ResultWriter {
 			jsonFoi.put("href", href);
 		}
 
-		feature.put("featureOfInterest", jsonFoi);
+		if (!expandFeatures) {
+			feature.put("featureOfInterest", jsonFoi);
+		}
 
 		writer.flush();
 		writer.write("{\n");

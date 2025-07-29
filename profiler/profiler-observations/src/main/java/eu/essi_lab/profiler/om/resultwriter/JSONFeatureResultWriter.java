@@ -36,7 +36,7 @@ public class JSONFeatureResultWriter extends JSONObservationResultWriter {
 	}
 
 	public JSONFeatureResultWriter(OutputStreamWriter writer, String viewId) {
-		super(writer);
+		super(writer, true);
 		this.viewId = viewId;
 	}
 
@@ -95,7 +95,5 @@ public class JSONFeatureResultWriter extends JSONObservationResultWriter {
 	public void writeMetadataFooter() throws IOException {
 		writer.write("}\n");
 	}
-	
-	
 
 }

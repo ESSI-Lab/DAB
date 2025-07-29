@@ -285,7 +285,12 @@ public class OMHandler extends StreamingRequestHandler {
 			resultWriter = new CSVResultWriter(writer);
 			break;
 		case JSON:
-			resultWriter = getJSONResultWriter(writer, viewId);
+			String expandFeaturesString = request.getParameterValue(APIParameters.EXPAND_FEATURES);
+			boolean expandFeatures = false;
+			if (expandFeaturesString != null && expandFeaturesString.equals("true")) {
+				expandFeatures = true;
+			}
+			resultWriter = getJSONResultWriter(writer, viewId, expandFeatures);
 			break;
 		case NETCDF:
 		case WATERML_1:
@@ -664,8 +669,8 @@ public class OMHandler extends StreamingRequestHandler {
 		output.close();
 	}
 
-	public ResultWriter getJSONResultWriter(OutputStreamWriter writer, String viewId) {
-		return new JSONObservationResultWriter(writer);
+	public ResultWriter getJSONResultWriter(OutputStreamWriter writer, String viewId, boolean expandFeatures) {
+		return new JSONObservationResultWriter(writer, expandFeatures);
 	}
 
 	/**
