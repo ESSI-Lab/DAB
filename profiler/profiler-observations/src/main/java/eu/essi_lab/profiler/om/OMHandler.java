@@ -114,11 +114,9 @@ import eu.essi_lab.profiler.om.JSONObservation.ObservationType;
 import eu.essi_lab.profiler.om.OMRequest.APIParameters;
 import eu.essi_lab.profiler.om.ObservationMapper.Property;
 import eu.essi_lab.profiler.om.resultwriter.CSVResultWriter;
+import eu.essi_lab.profiler.om.resultwriter.EmptyResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.JSONObservationResultWriter;
-import eu.essi_lab.profiler.om.resultwriter.NetCDFResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.ResultWriter;
-import eu.essi_lab.profiler.om.resultwriter.WML1ResultWriter;
-import eu.essi_lab.profiler.om.resultwriter.WML2ResultWriter;
 import eu.essi_lab.profiler.om.scheduling.OMSchedulerSetting;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
@@ -282,7 +280,6 @@ public class OMHandler extends StreamingRequestHandler {
 		ResultWriter resultWriter = null;
 		OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
 
-//		CSVField[] fields = null;
 		switch (userOutputFormat) {
 		case CSV:
 			resultWriter = new CSVResultWriter(writer);
@@ -291,13 +288,9 @@ public class OMHandler extends StreamingRequestHandler {
 			resultWriter = getJSONResultWriter(writer, viewId);
 			break;
 		case NETCDF:
-			resultWriter = new NetCDFResultWriter(writer);
-			break;
 		case WATERML_1:
-			resultWriter = new WML1ResultWriter(writer);
-			break;
 		case WATERML_2:
-			resultWriter = new WML2ResultWriter(writer);
+			resultWriter = new EmptyResultWriter(writer);
 			break;
 		default:
 			throw new IllegalArgumentException("Unrecognized format. Choose between: " + OMFormat.stringOptions());
@@ -665,7 +658,6 @@ public class OMHandler extends StreamingRequestHandler {
 			}
 		}
 		resultWriter.writeFooter(resumptionToken);
-		
 
 		writer.flush();
 		writer.close();
@@ -1038,7 +1030,7 @@ public class OMHandler extends StreamingRequestHandler {
 
 			for (DataRecord data : datas) {
 
-				String date = ISO8601DateTimeUtils.getISO8601DateTime(data.getTimestamp());
+				String date = ISO8601DateTimeUtils.getISO8601DateTime(data.getDate());
 				BigDecimal v = data.getValue();
 				String quality = data.getQuality();
 

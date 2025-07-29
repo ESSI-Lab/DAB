@@ -28,9 +28,9 @@ import java.util.List;
 
 import eu.essi_lab.profiler.om.JSONObservation;
 
-public class WML1ResultWriter extends ResultWriter {
+public class EmptyResultWriter extends ResultWriter {
 
-	public WML1ResultWriter(OutputStreamWriter writer) {
+	public EmptyResultWriter(OutputStreamWriter writer) {
 		super(writer);
 		// TODO Auto-generated constructor stub
 	}
