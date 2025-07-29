@@ -170,6 +170,8 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 			JSONObject properties = feature.getJSONObject("properties");
 			String targetId = properties.getString("id_station");
 			String variable = properties.getString("inquinante_misurato");
+			String originator = properties.getString("responsabile_dato");
+			String contactPoint = properties.getString("punto_di_contatto");
 
 			if (stationId.equals(targetId)) {
 
@@ -180,7 +182,7 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 				    Set<String> variables = stationMap.computeIfAbsent(targetId, k -> new HashSet<>());
 				    if (variables.add(variableId)) {
 					JSONObject variableInfo = createJSONFromCSV(rec);
-					ret.addRecord(HISCentralARPAPugliaMapper.create(datasetMetadata, variableInfo));
+					ret.addRecord(HISCentralARPAPugliaMapper.create(datasetMetadata, variableInfo, originator, contactPoint));
 					partialNumbers++;
 					break;
 				    }

@@ -90,7 +90,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
      * @param sensorInfo
      * @return
      */
-    static OriginalMetadata create(JSONObject datasetInfo, JSONObject variableInfo) {
+    static OriginalMetadata create(JSONObject datasetInfo, JSONObject variableInfo, String originator, String contactPoint) {
 
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
@@ -99,6 +99,8 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	JSONObject jsonObject = new JSONObject();
 	jsonObject.put("dataset-info", datasetInfo);
 	jsonObject.put("variable-info", variableInfo);
+	jsonObject.put("originator", originator);
+	jsonObject.put("contact-point", contactPoint);
 	originalMetadata.setMetadata(jsonObject.toString(4));
 
 	return originalMetadata;
@@ -121,6 +123,25 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
 	return new JSONObject(metadata.getMetadata()).getJSONObject("variable-info");
     }
+    
+    
+    /**
+     * @param metadata
+     * @return
+     */
+    private String retrieveOriginator(OriginalMetadata metadata) {
+
+	return new JSONObject(metadata.getMetadata()).optString("originator");
+    }
+    
+    /**
+     * @param metadata
+     * @return
+     */
+    private String retrieveContactPoint(OriginalMetadata metadata) {
+
+	return new JSONObject(metadata.getMetadata()).optString("contact-point");
+    }
 
     @Override
     protected GSResource execMapping(OriginalMetadata originalMD, GSSource source) throws GSException {
@@ -138,6 +159,9 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
 
 	JSONObject stationInfo = retrieveVariableInfo(originalMD);
+	
+	String originator = retrieveOriginator(originalMD);
+	String contactPoint = retrieveContactPoint(originalMD);
 
 	String measureId = stationInfo.optString("pollutantId");
 	String measureName = stationInfo.optString("pollutantName");
@@ -180,10 +204,6 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	String resourceTitle = propObj.optString("denominazione");
 	String resourceAbstract = propObj.optString("description"); // always null
 
-	String aggregationId = ""; // aggregationInfo.optString("id_aggregation");
-	String aggregationName = "";// aggregationInfo.optString("name");
-	String aggregationAggregation = "";// aggregationInfo.optString("aggregation");
-
 	String varName = measureName;
 
 	if (measureName.toLowerCase().contains("precipitazione")) {
@@ -196,7 +216,6 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
 	// JSONObject organizationObject = organizationInfo.optJSONObject("organization");
 	String legalConstraint = null;
-	String creatorOrg = null;
 	String legalLimitations = null;
 	String pointOfContact = null;
 
@@ -274,40 +293,15 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	//
 	// responsible party
 	//
-	if (creatorOrg != null && !creatorOrg.isEmpty()) {
+	if (originator != null && !originator.isEmpty()) {
 
 	    ResponsibleParty publisherContact = new ResponsibleParty();
-
-	    if (creatorOrg.toLowerCase().contains("email:")) {
-		String[] splittedOrg = creatorOrg.toLowerCase().split("email:");
-		String emailOrg = splittedOrg[1].trim();
-		String nameOrg = splittedOrg[0];
-		publisherContact.setOrganisationName(nameOrg);
-		Contact contact = new Contact();
-
-		Address address = new Address();
-		address.addElectronicMailAddress(emailOrg);
-		contact.setAddress(address);
-
-		publisherContact.setContactInfo(contact);
-
-	    } else {
-		publisherContact.setOrganisationName(creatorOrg);
-	    }
+	    publisherContact.setOrganisationName(originator);
 	    publisherContact.setRoleCode("publisher");
-
-	    // Contact contact = new Contact();
-	    //
-	    // Address address = new Address();
-	    // address.addElectronicMailAddress(contactInfo);
-	    // contact.setAddress(address);
-	    //
-	    // publisherContact.setContactInfo(contact);
-
 	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(publisherContact);
 	}
 
-	if (pointOfContact != null && !pointOfContact.isEmpty()) {
+	if (contactPoint != null && !contactPoint.isEmpty()) {
 	    ResponsibleParty pointOfContactResp = new ResponsibleParty();
 	    pointOfContactResp.setOrganisationName(pointOfContact);
 	    pointOfContactResp.setRoleCode("pointOfContact");
@@ -400,7 +394,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	Online online = new Online();
 	online.setLinkage(linkage);
 	online.setFunctionCode("download");
-	online.setName(stationId + "_" + measureId + "_" + aggregationId);
+	online.setName(stationId + "_" + measureId);
 	online.setIdentifier(resourceIdentifier);
 	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_ARPA_PUGLIA_NS_URI);
 
@@ -460,15 +454,15 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 		break;
 	    }
 	}
-	    coverageDescription.setAttributeIdentifier(varName + "_" +measureId);
+	    coverageDescription.setAttributeIdentifier(varName + "_" + measureId);
 	coverageDescription.setAttributeTitle(varName);
 
-	coverageDescription.setAttributeDescription(aggregationName);
+	coverageDescription.setAttributeDescription(pollutantDescription);
 
 	dataset.getExtensionHandler().setAttributeMissingValue(HISCentralPugliaDownloader.MISSING_VALUE);
 
 	if (measureUnits != null) {
-	    dataset.getExtensionHandler().setAttributeUnits(measureUnits);
+	    dataset.getExtensionHandler().setAttributeUnitsAbbreviation(measureUnits);
 	}
 
 	if (pollutantUri != null && !pollutantUri.isEmpty()) {
