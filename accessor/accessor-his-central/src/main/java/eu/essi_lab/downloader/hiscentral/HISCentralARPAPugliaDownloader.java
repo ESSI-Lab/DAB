@@ -286,9 +286,11 @@ public class HISCentralARPAPugliaDownloader extends WMLDataDownloader {
 			}
 		    }
 		}
+		
+	    }
 
 		return tsrt.getDataFile();
-	    }
+	   
 
 	} catch (Exception e) {
 
