@@ -114,7 +114,7 @@ import eu.essi_lab.profiler.om.JSONObservation.ObservationType;
 import eu.essi_lab.profiler.om.OMRequest.APIParameters;
 import eu.essi_lab.profiler.om.ObservationMapper.Property;
 import eu.essi_lab.profiler.om.resultwriter.CSVResultWriter;
-import eu.essi_lab.profiler.om.resultwriter.JSONResultWriter;
+import eu.essi_lab.profiler.om.resultwriter.JSONObservationResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.NetCDFResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.ResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.WML1ResultWriter;
@@ -143,14 +143,6 @@ import ucar.nc2.ft.point.standard.StandardTrajectoryCollectionImpl;
 public class OMHandler extends StreamingRequestHandler {
 
 	protected String viewId;
-
-	public String getGeometryName() {
-		if (viewId == null || !(viewId.equals("i-change") || viewId.equals("trigger"))) {
-			return "shape";
-		} else {
-			return "geometry";
-		}
-	}
 
 	@Override
 	public ValidationMessage validate(WebRequest webRequest) throws GSException {
@@ -296,7 +288,7 @@ public class OMHandler extends StreamingRequestHandler {
 			resultWriter = new CSVResultWriter(writer);
 			break;
 		case JSON:
-			resultWriter = new JSONResultWriter(writer, getSetName());
+			resultWriter = getJSONResultWriter(writer, viewId);
 			break;
 		case NETCDF:
 			resultWriter = new NetCDFResultWriter(writer);
@@ -662,20 +654,26 @@ public class OMHandler extends StreamingRequestHandler {
 
 		} while (tempSize < userSize && searchAfter != null);
 
+		String resumptionToken = "";
+
 		if (searchAfter != null && searchAfter.getValues().isPresent() && !searchAfter.getValues().get().isEmpty()) {
-			String resumptionToken = "";
 			for (Object v : searchAfter.getValues().get()) {
 				resumptionToken += v.toString() + ",";
 			}
 			if (resumptionToken.endsWith(",")) {
 				resumptionToken = resumptionToken.substring(0, resumptionToken.length() - 1);
 			}
-			resultWriter.writeFooter(resumptionToken);
 		}
+		resultWriter.writeFooter(resumptionToken);
+		
 
 		writer.flush();
 		writer.close();
 		output.close();
+	}
+
+	public ResultWriter getJSONResultWriter(OutputStreamWriter writer, String viewId) {
+		return new JSONObservationResultWriter(writer);
 	}
 
 	/**
@@ -727,10 +725,6 @@ public class OMHandler extends StreamingRequestHandler {
 		return false;
 	}
 
-	protected String getSetName() {
-		return "member";
-	}
-
 	private static String readValue(XMLEventReader reader) {
 
 		String ret = "";
@@ -752,10 +746,6 @@ public class OMHandler extends StreamingRequestHandler {
 	}
 
 	static XMLInputFactory factory = XMLInputFactory.newInstance();
-
-	public String getObject() {
-		return "timeseries";
-	}
 
 	@Override
 	public MediaType getMediaType(WebRequest webRequest) {

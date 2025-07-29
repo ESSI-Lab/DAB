@@ -34,13 +34,10 @@ import eu.essi_lab.profiler.om.JSONObservation;
  * #L%
  */
 
-public class JSONResultWriter extends ResultWriter {
+public class JSONObservationResultWriter extends ResultWriter {
 
-	private String setName;
-
-	public JSONResultWriter(OutputStreamWriter writer, String setName) {
+	public JSONObservationResultWriter(OutputStreamWriter writer) {
 		super(writer);
-		this.setName = setName;
 	}
 
 	@Override
@@ -75,7 +72,11 @@ public class JSONResultWriter extends ResultWriter {
 	public void writeHeader() throws IOException {
 		writer.write("{");
 		addIdentifier(writer);
-		writer.write("\"" + setName + "\":[");
+		writer.write("\"" + getSetName() + "\":[");
+	}
+
+	protected String getSetName() {
+		return "member";
 	}
 
 	protected void addIdentifier(OutputStreamWriter writer) throws IOException {
@@ -166,6 +167,11 @@ public class JSONResultWriter extends ResultWriter {
 	}
 
 	@Override
+	public void writeMetadataSeparator() throws IOException {
+		writer.write(",");
+	}
+
+	@Override
 	public void writeMetadataFooter() throws IOException {
 
 		// for the footer
@@ -180,7 +186,7 @@ public class JSONResultWriter extends ResultWriter {
 		// close the member array
 		writer.write("]\n");
 
-		boolean completed = resumptionToken == null;
+		boolean completed = resumptionToken == null || resumptionToken.isEmpty();
 		if (resumptionToken == null) {
 			resumptionToken = "";
 		}

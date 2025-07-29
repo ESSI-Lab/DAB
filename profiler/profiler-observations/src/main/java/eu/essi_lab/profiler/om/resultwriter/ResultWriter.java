@@ -41,10 +41,10 @@ public abstract class ResultWriter {
 
 	public void writeDataObject(String date, BigDecimal v, String quality, JSONObservation observation, List<Double> coord)
 			throws IOException {
-		writeDataContent(date, v, quality, observation, coord);
 		if (!first) {
 			writeDataSeparator();
 		}
+		writeDataContent(date, v, quality, observation, coord);
 		first = false;
 	}
 
@@ -67,7 +67,7 @@ public abstract class ResultWriter {
 		
 	}
 	
-	public void writeMetadataSeparator() {
+	public void writeMetadataSeparator() throws IOException {
 		
 	}
 
