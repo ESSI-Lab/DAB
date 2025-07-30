@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
 
@@ -98,6 +99,8 @@ public abstract class DataCacheConnector {
      * @throws Exception
      */
     public abstract Long count() throws Exception;
+    
+    public abstract Map<String,Long> countDatasets(List<String>sourceIdentifiers) throws Exception;
 
     public abstract Date getFirstDate(String dataIdentifier) throws Exception;
 
@@ -239,6 +242,8 @@ public abstract class DataCacheConnector {
 
     public abstract void writeStation(StationRecord record) throws Exception;
 
-    protected abstract void clearStations() throws Exception;
+    public abstract void clearStations() throws Exception;
+
+	public abstract int countRecordsInBuffer();
 
 }

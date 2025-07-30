@@ -78,23 +78,17 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 
 		// INIT CACHE CONNECTOR
 
-		DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
+		DataCacheConnector dataCacheConnector = null;
 
+		DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
+		dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
 		if (dataCacheConnector == null) {
-			DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
-			dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
-			if (dataCacheConnector == null) {
-				GSLoggerFactory.getLogger(getClass()).error("Issues initializing the data cache connector");
-				return;
-			}
-			String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
-			String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
-			String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
-			dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
-			dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
-			dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
-			DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
+			GSLoggerFactory.getLogger(getClass()).error("Issues initializing the data cache connector");
+			return;
 		}
+		dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, "10000");
+		dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, "2000");
+		dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, "60");
 
 		// SETTINGS RETRIEVAL
 
@@ -170,7 +164,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 				currentListURL = currentListURL + "resumptionToken=" + resumptionToken;
 			}
 
-			Optional<JSONObject> response = omHandler.getJSONResponse(WebRequest.createGET(listURL));
+			Optional<JSONObject> response = omHandler.getJSONResponse(WebRequest.createGET(currentListURL));
 
 			if (response.isPresent()) {
 
@@ -266,6 +260,8 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 							dataFile.delete();
 
 							recordsDone++;
+							GSLoggerFactory.getLogger(getClass()).info("Basic data augmented records: {}", recordsDone);
+
 							if (maxRecords != null && recordsDone >= maxRecords) {
 								break base;
 							}
@@ -274,7 +270,16 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 							GSLoggerFactory.getLogger(getClass()).error(e);
 						}
 
+						int bufferSize;
+						while ((bufferSize = dataCacheConnector.countRecordsInBuffer()) > 100000) {
+							GSLoggerFactory.getLogger(getClass()).info("Waiting writing data, buffer size: {}",
+									bufferSize);
+
+							Thread.sleep(1000);
+						}
+
 					}
+
 				} else {
 					GSLoggerFactory.getLogger(getClass()).error("Member not present");
 

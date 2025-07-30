@@ -57,9 +57,11 @@ import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Time;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
@@ -67,6 +69,7 @@ import org.opensearch.client.opensearch._types.query_dsl.Query.Builder;
 import org.opensearch.client.opensearch.core.DeleteByQueryResponse;
 import org.opensearch.client.opensearch.core.ScrollRequest;
 import org.opensearch.client.opensearch.core.ScrollResponse;
+import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.bulk.BulkOperation;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
@@ -853,6 +856,54 @@ public class OpenSearchConnector extends DataCacheConnector {
 	}
 
 	@Override
+	public Map<String,Long> countDatasets(List<String> selectedSourceIds) throws Exception {
+		SearchResponse<Void> response = client.search(s -> s
+			    .index(DataCacheIndex.VALUES.getIndex(databaseName))
+			    .size(0)
+			    .query(q -> q
+			        .terms(t -> t
+			            .field("sourceIdentifier.keyword")
+			            .terms(tq -> tq.value(
+			                selectedSourceIds.stream()
+			                    .map(FieldValue::of)
+			                    .toList()
+			            ))
+			        )
+			    )
+			    .aggregations("sources", a -> a
+			        .terms(t -> t
+			            .field("sourceIdentifier.keyword")
+			            .size(selectedSourceIds.size())
+			        )
+			        .aggregations("unique_datasets", sa -> sa
+			            .cardinality(ca -> ca
+			                .field("dataIdentifier.keyword")
+			            )
+			        )
+			    ),
+			    Void.class
+			);
+
+			// Extract the results
+			Map<String, Long> datasetsPerSource = new HashMap<>();
+			Aggregate sourcesAgg = response.aggregations().get("sources");
+
+			if (sourcesAgg.isSterms()) {
+			    List<StringTermsBucket> buckets = sourcesAgg.sterms().buckets().array();
+			    for (StringTermsBucket bucket : buckets) {
+			        String sourceId = bucket.key();
+			        long uniqueDatasetCount = bucket.aggregations()
+			            .get("unique_datasets")
+			            .cardinality()
+			            .value();
+			        datasetsPerSource.put(sourceId, uniqueDatasetCount);
+			    }
+			}
+			
+			return datasetsPerSource;
+	}
+
+	@Override
 	public Date getFirstDate(String dataIdentifier) throws Exception {
 		org.opensearch.client.opensearch.core.SearchRequest.Builder srb = new org.opensearch.client.opensearch.core.SearchRequest.Builder();
 		srb = srb.index(DataCacheIndex.VALUES.getIndex(databaseName));
@@ -1478,6 +1529,13 @@ public class OpenSearchConnector extends DataCacheConnector {
 		}
 
 	}
+	
+	@Override
+	public int countRecordsInBuffer() {
+		synchronized (buffer) {
+			return buffer.size();
+		}
+	}
 
 	@Override
 	public void writeStation(StationRecord record) throws Exception {
@@ -1492,7 +1550,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 	}
 
 	@Override
-	protected void clearStations() throws Exception {
+	public void clearStations() throws Exception {
 
 		client.indices().delete(d -> d.index(DataCacheIndex.STATIONS.getIndex(databaseName)));
 		indexInitialization();

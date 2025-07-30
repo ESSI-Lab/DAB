@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dataset Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+        #chartContainer, #pieContainer {
+            margin-top: 40px;
+        }
+        canvas {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Database composition</h2>
+<div id="pieContainer">
+    <canvas id="pieChart"></canvas>
+</div>
+<h2>Cache composition</h2>
+
+<div id="chartContainer">
+    <canvas id="cacheChart"></canvas>
+</div>
+
+<script>
+    let cacheChart;
+    let pieChart;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewId = urlParams.get('viewId') || 'default-view-id';
+
+    fetch(`/gs-service/services/support/data-stats?view=${encodeURIComponent(viewId)}`)
+        .then(res => res.json())
+        .then(response => {
+            const sources = response.sources.sort((a, b) => a.name.localeCompare(b.name));
+
+            const labels = sources.map(s => s.name);
+            const data = sources.map(s => s.datasetsInDatabase > 0 ? (s.datasetsInCache / s.datasetsInDatabase) * 100 : 0);
+            const absoluteCounts = sources.map(s => `${s.datasetsInCache} of ${s.datasetsInDatabase}`);
+            const pieData = sources.map(s => s.datasetsInDatabase);
+            const pieColors = labels.map((_, i) => `hsl(${i * 360 / labels.length}, 70%, 60%)`);
+
+            const canvas = document.getElementById('cacheChart');
+            const rowHeight = 40;
+            const padding = 50;
+            canvas.height = sources.length * rowHeight + padding;
+
+            const ctx = canvas.getContext('2d');
+            if (cacheChart) cacheChart.destroy();
+
+            cacheChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '% Datasets in Cache',
+                        data: data,
+                        backgroundColor: pieColors,
+                        borderColor: pieColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: value => `${value}%`
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const index = ctx.dataIndex;
+                                    const percent = ctx.parsed.x.toFixed(2);
+                                    const absolute = absoluteCounts[index];
+                                    return `${percent}% (${absolute})`;
+                                }
+                            }
+                        },
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // PIE CHART
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            if (pieChart) pieChart.destroy();
+
+            pieChart = new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: pieData,
+                        backgroundColor: pieColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.label}: ${ctx.parsed}`
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching cache status:", error);
+            alert("Failed to load cache data.");
+        });
+</script>
+
+</body>
+</html>
