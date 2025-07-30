@@ -80,7 +80,8 @@ public class FeaturesHandler extends OMHandler {
 
 	}
 
-	public ResultWriter getJSONResultWriter(OutputStreamWriter writer, String viewId) {
+	
+	public ResultWriter getJSONResultWriter(OutputStreamWriter writer, String viewId, boolean expandFeatures) {
 		return new JSONFeatureResultWriter(writer, viewId);
 	}
 
