@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -57,8 +58,6 @@ import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
-import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.Time;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
 import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
@@ -91,6 +90,7 @@ import eu.essi_lab.access.datacache.DataRecord;
 import eu.essi_lab.access.datacache.Polygon4326;
 import eu.essi_lab.access.datacache.Response;
 import eu.essi_lab.access.datacache.ResponseListener;
+import eu.essi_lab.access.datacache.SourceCacheStats;
 import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.StationsStatistics;
 import eu.essi_lab.access.datacache.StatisticsRecord;
@@ -856,52 +856,77 @@ public class OpenSearchConnector extends DataCacheConnector {
 	}
 
 	@Override
-	public Map<String,Long> countDatasets(List<String> selectedSourceIds) throws Exception {
-		SearchResponse<Void> response = client.search(s -> s
-			    .index(DataCacheIndex.VALUES.getIndex(databaseName))
-			    .size(0)
-			    .query(q -> q
-			        .terms(t -> t
-			            .field("sourceIdentifier.keyword")
-			            .terms(tq -> tq.value(
-			                selectedSourceIds.stream()
-			                    .map(FieldValue::of)
-			                    .toList()
-			            ))
-			        )
-			    )
-			    .aggregations("sources", a -> a
-			        .terms(t -> t
-			            .field("sourceIdentifier.keyword")
-			            .size(selectedSourceIds.size())
-			        )
-			        .aggregations("unique_datasets", sa -> sa
-			            .cardinality(ca -> ca
-			                .field("dataIdentifier.keyword")
-			            )
-			        )
-			    ),
-			    Void.class
-			);
+	public Map<String, SourceCacheStats> getCacheStatsPerSource(List<String> selectedSourceIds) throws IOException {
+	    SearchResponse<Void> response = client.search(s -> s
+	        .index(DataCacheIndex.VALUES.getIndex(databaseName))
+	        .size(0)
+	        .query(q -> q
+	            .terms(t -> t
+	                .field("sourceIdentifier.keyword")
+	                .terms(tq -> tq.value(
+	                    selectedSourceIds.stream()
+	                        .map(FieldValue::of)
+	                        .toList()
+	                ))
+	            )
+	        )
+	        .aggregations("sources", a -> a
+	            .terms(t -> t
+	                .field("sourceIdentifier.keyword")
+	                .size(selectedSourceIds.size())
+	            )
+	            .aggregations("unique_datasets", sa -> sa
+	                .cardinality(ca -> ca
+	                    .field("dataIdentifier.keyword")
+	                )
+	            )
+	            .aggregations("oldest_insert", sa -> sa
+	                .min(m -> m
+	                    .field("timestamp")
+	                )
+	            )
+	            .aggregations("newest_insert", sa -> sa
+	                .max(m -> m
+	                    .field("timestamp")
+	                )
+	            )
+	            .aggregations("avg_insert", sa -> sa
+	                .avg(a2 -> a2
+	                    .field("timestamp")
+	                )
+	            )
+	        ),
+	        Void.class
+	    );
 
-			// Extract the results
-			Map<String, Long> datasetsPerSource = new HashMap<>();
-			Aggregate sourcesAgg = response.aggregations().get("sources");
+	    Map<String, SourceCacheStats> statsMap = new HashMap<>();
+	    Aggregate sourcesAgg = response.aggregations().get("sources");
 
-			if (sourcesAgg.isSterms()) {
-			    List<StringTermsBucket> buckets = sourcesAgg.sterms().buckets().array();
-			    for (StringTermsBucket bucket : buckets) {
-			        String sourceId = bucket.key();
-			        long uniqueDatasetCount = bucket.aggregations()
-			            .get("unique_datasets")
-			            .cardinality()
-			            .value();
-			        datasetsPerSource.put(sourceId, uniqueDatasetCount);
-			    }
-			}
-			
-			return datasetsPerSource;
+	    if (sourcesAgg.isSterms()) {
+	        for (StringTermsBucket bucket : sourcesAgg.sterms().buckets().array()) {
+	            String sourceId = bucket.key();
+
+	            Long datasetCount = bucket.aggregations().get("unique_datasets").cardinality().value();
+	            double oldest = bucket.aggregations().get("oldest_insert").min().value(); // epoch millis
+	            double newest = bucket.aggregations().get("newest_insert").max().value();
+	            double avg = bucket.aggregations().get("avg_insert").avg().value();
+
+	            SourceCacheStats stats = new SourceCacheStats();
+	            stats.setSourceId(sourceId);
+	            stats.setUniqueDatasetCount(datasetCount);
+	            stats.setOldestInsert(new Date((long) oldest));
+	            stats.setNewestInsert(new Date((long) newest));
+	            stats.setAverageAgeHours(java.time.Duration.between(
+	                Instant.ofEpochMilli((long) avg), Instant.now()
+	            ).toHours());
+
+	            statsMap.put(sourceId, stats);
+	        }
+	    }
+
+	    return statsMap;
 	}
+
 
 	@Override
 	public Date getFirstDate(String dataIdentifier) throws Exception {

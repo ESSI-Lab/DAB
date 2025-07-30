@@ -44,14 +44,15 @@ import org.json.JSONObject;
 
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
+import eu.essi_lab.access.datacache.SourceCacheStats;
 import eu.essi_lab.authorization.userfinder.UserFinder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.OutputFormat;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Profile;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Target;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.stats.ResponseItem;
@@ -146,36 +147,45 @@ public class SupportService {
 		}
 		Map<String, Long> datasetsInDatabase = null;
 		try {
-			datasetsInDatabase = getDatasetsInDatabase(sources,view);
+			datasetsInDatabase = getDatasetsInDatabase(sources, view);
 		} catch (Exception e) {
 			GSLoggerFactory.getLogger(getClass()).error(e);
 			return Response.serverError().entity(getErrorResponse("error counting datasets").toString()).build();
 		}
 
-		Map<String, Long> datasetsInCache;
+		Map<String, SourceCacheStats> stats = null;
 		try {
-			datasetsInCache = dataCacheConnector.countDatasets(sourceIdentifiers);
+			stats = dataCacheConnector.getCacheStatsPerSource(sourceIdentifiers);
 		} catch (Exception e) {
 			GSLoggerFactory.getLogger(getClass()).error(e);
 			return Response.serverError().entity(getErrorResponse("error counting cached datasets").toString()).build();
 		}
 
 		JSONArray sourcesArray = new JSONArray();
-		
+
 		for (GSSource source : sources) {
 			JSONObject jsonSource = new JSONObject();
 			jsonSource.put("name", source.getLabel());
 			jsonSource.put("id", source.getUniqueIdentifier());
-			Long cacheCount = datasetsInCache.get(source.getUniqueIdentifier());
-			if (cacheCount == null) {
-				cacheCount = 0l;
-			}
-			jsonSource.put("datasetsInCache", cacheCount);
 			Long dbCount = datasetsInDatabase.get(source.getUniqueIdentifier());
 			if (dbCount == null) {
 				dbCount = 0l;
 			}
 			jsonSource.put("datasetsInDatabase", dbCount);
+			SourceCacheStats sourceStats = stats.get(source.getUniqueIdentifier());
+			if (sourceStats!=null) {
+				Long cacheCount = sourceStats.getUniqueDatasetCount();
+				if (cacheCount==null) {
+					cacheCount = 0l;
+				}
+				jsonSource.put("datasetsInCache", cacheCount);
+				
+				if (cacheCount>0) {
+					jsonSource.put("oldestInsert", ISO8601DateTimeUtils.getISO8601DateTime(sourceStats.getOldestInsert()));
+					jsonSource.put("newestInsert", ISO8601DateTimeUtils.getISO8601DateTime(sourceStats.getNewestInsert()));
+					jsonSource.put("avgAgeHours", sourceStats.getAverageAgeHours());
+				}
+			}
 
 			sourcesArray.put(jsonSource);
 		}
@@ -184,38 +194,38 @@ public class SupportService {
 		return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
 	}
 
-	private Map<String, Long> getDatasetsInDatabase(List<GSSource> sources,String view) throws Exception {
-	    Map<String, Long> ret = new HashMap<String, Long>();
+	private Map<String, Long> getDatasetsInDatabase(List<GSSource> sources, String view) throws Exception {
+		Map<String, Long> ret = new HashMap<String, Long>();
 
 		StatisticsMessage statisticsMessage = new StatisticsMessage();
 		statisticsMessage.setSources(sources);
 		statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-	
-		    WebRequestTransformer.setView(//
-			   view, //
-			    statisticsMessage.getDataBaseURI(), //
-			    statisticsMessage);
-		    statisticsMessage.groupBy(ResourceProperty.SOURCE_ID);
-		    Page page = new Page();
-			page.setStart(1);
-			page.setSize(1000);
-			statisticsMessage.setPage(page);
-			statisticsMessage.countDistinct(//
-					Arrays.asList(//
-						MetadataElement.ONLINE_ID//
-					));
-			ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-			IStatisticsExecutor executor = loader.iterator().next();
 
-			StatisticsResponse response = executor.compute(statisticsMessage);
-			List<ResponseItem> items = response.getItems();
-			for (ResponseItem responseItem : items) {
-			    String id = responseItem.getGroupedBy().isPresent() ? responseItem.getGroupedBy().get() : null;
-			    String countString = responseItem.getCountDistinct(MetadataElement.ONLINE_ID).get().getValue();
-			    Long count = Long.parseLong(countString);
-			    ret.put(id, count); 
-			}
-			return ret ;
+		WebRequestTransformer.setView(//
+				view, //
+				statisticsMessage.getDataBaseURI(), //
+				statisticsMessage);
+		statisticsMessage.groupBy(ResourceProperty.SOURCE_ID);
+		Page page = new Page();
+		page.setStart(1);
+		page.setSize(1000);
+		statisticsMessage.setPage(page);
+		statisticsMessage.countDistinct(//
+				Arrays.asList(//
+						MetadataElement.ONLINE_ID//
+				));
+		ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
+		IStatisticsExecutor executor = loader.iterator().next();
+
+		StatisticsResponse response = executor.compute(statisticsMessage);
+		List<ResponseItem> items = response.getItems();
+		for (ResponseItem responseItem : items) {
+			String id = responseItem.getGroupedBy().isPresent() ? responseItem.getGroupedBy().get() : null;
+			String countString = responseItem.getCountDistinct(MetadataElement.ONLINE_ID).get().getValue();
+			Long count = Long.parseLong(countString);
+			ret.put(id, count);
+		}
+		return ret;
 	}
 
 	private JSONObject getErrorResponse(String error) {

@@ -10,24 +10,54 @@
             max-width: 900px;
             margin: 40px auto;
         }
-        #chartContainer, #pieContainer {
+        #chartContainer, #pieContainer, #tableContainer {
             margin-top: 40px;
         }
         canvas {
             width: 100% !important;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
     </style>
 </head>
 <body>
 
-<h2>Database composition</h2>
+<h2>Metadata composition</h2>
+<p>This chart illustrates the distribution of datasets among different sources.</p>
 <div id="pieContainer">
     <canvas id="pieChart"></canvas>
 </div>
-<h2>Cache composition</h2>
 
+<h2>Data cache composition</h2>
+<p>This bar chart shows the percentage of datasets currently available in the data cache, compared to the total available in the metadata database, grouped by data source.</p>
 <div id="chartContainer">
     <canvas id="cacheChart"></canvas>
+</div>
+
+<h2>Data cache Insertion Time Statistics</h2>
+<p>The table below summarizes the freshness of cached datasets per source, reporting the oldest and newest insertion dates and the average age in hours.</p>
+<div id="tableContainer">
+    <table id="timestampTable">
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Oldest Insert</th>
+                <th>Newest Insert</th>
+                <th>Average Age (hours)</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 </div>
 
 <script>
@@ -124,6 +154,23 @@
                         }
                     }
                 }
+            });
+
+            // TABLE: Insertion Times
+            const tableBody = document.querySelector('#timestampTable tbody');
+            sources.forEach(source => {
+                const tr = document.createElement('tr');
+                const oldest = new Date(source.oldestInsert);
+                const newest = new Date(source.newestInsert);
+                const avgAge = Math.round(source.avgAgeHours);
+
+                tr.innerHTML = `
+                    <td>${source.name}</td>
+                    <td>${isNaN(oldest) ? '-' : oldest.toISOString().split('T')[0]}</td>
+                    <td>${isNaN(newest) ? '-' : newest.toISOString().split('T')[0]}</td>
+                    <td>${isNaN(avgAge) ? '-' : avgAge}</td>
+                `;
+                tableBody.appendChild(tr);
             });
         })
         .catch(error => {

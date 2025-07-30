@@ -1,5 +1,7 @@
 package eu.essi_lab.access.datacache;
 
+import java.io.IOException;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -100,7 +102,7 @@ public abstract class DataCacheConnector {
      */
     public abstract Long count() throws Exception;
     
-    public abstract Map<String,Long> countDatasets(List<String>sourceIdentifiers) throws Exception;
+	public abstract Map<String, SourceCacheStats> getCacheStatsPerSource(List<String> selectedSourceIds) throws IOException;
 
     public abstract Date getFirstDate(String dataIdentifier) throws Exception;
 
