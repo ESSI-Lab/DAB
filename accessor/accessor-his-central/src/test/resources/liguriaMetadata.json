@@ -3,85 +3,79 @@
     "startTime": "200401020000",
     "linkage": "https://aws.arpal.liguria.it/ords/ws/HIS_CENTRAL/ANAGRAFICA?code=AMERE",
     "sensor-info": {
-        "code": "AMERE",
-        "name": "Merelli",
-        "lat": 4388137,
-        "lon": 784759,
-        "elev": 70,
-        "muni": "Taggia",
-        "prov": "IM",
-        "region": "LIGURIA",
-        "nation": "ITALIA"
+        "CODE": "AMERE",
+        "NAME": "Merelli",
+        "LAT": 4388137,
+        "LON": 784759,
+        "ELEV": 70,
+        "MUNI": "Taggia",
+        "PROV": "IM",
+        "REGION": "LIGURIA",
+        "NATION": "ITALIA"
     },
-    "var-info": {
-        "offset": 0,
-        "hasMore": false,
-        "limit": 1000,
-        "count": 7,
-        "links": [
-            {
-                "rel": "self",
-                "href": "https://aws.arpal.liguria.it/ords/ws/HIS_CENTRAL/DESCRIZIONE"
-            },
-            {
-                "rel": "describedby",
-                "href": "https://aws.arpal.liguria.it/ords/ws/metadata-catalog/HIS_CENTRAL/item"
-            },
-            {
-                "rel": "first",
-                "href": "https://aws.arpal.liguria.it/ords/ws/HIS_CENTRAL/DESCRIZIONE"
-            }
-        ],
-        "items": [
-            {
-                "unit": "°C/10",
-                "obs_interval": "PT1H",
-                "measure": "Air temperature (near surface)",
-                "type": "AVERAGE",
-                "field_name": "TEMPM"
-            },
-            {
-                "unit": "°C/10",
-                "obs_interval": "PT1H",
-                "measure": "Air temperature (near surface)",
-                "type": "MINIMUM",
-                "field_name": "TEMPN"
-            },
-            {
-                "unit": "°C/10",
-                "obs_interval": "PT1H",
-                "measure": "Air temperature (near surface)",
-                "type": "MAXIMUM",
-                "field_name": "TEMPX"
-            },
-            {
-                "unit": "%",
-                "obs_interval": "PT1H",
-                "measure": "Relative Humidity (near surface)",
-                "type": "AVERAGE",
-                "field_name": "REHUM"
-            },
-            {
-                "unit": "m/100",
-                "obs_interval": "PT1H",
-                "measure": "Creek level",
-                "type": "AVERAGE",
-                "field_name": "CRLVM"
-            },
-            {
-                "unit": "m/s/10",
-                "obs_interval": "PT1H",
-                "measure": "Wind Speed (near surface)",
-                "type": "AVERAGE",
-                "field_name": "WSPDM"
-            },
-            {
-                "unit": "m/s/10",
-                "obs_interval": "PT1H",
-                "measure": "Wind Speed (near surface)",
-                "type": "MAXIMUM",
-                "field_name": "WSPDX"
-            }
-        ]
+    "var-info": [
+    {
+        "FIELD_NAME": "TEMPM",
+        "MEASURE": "Air temperature (near surface)",
+        "UNIT": "°C/10",
+        "TYPE": "AVERAGE",
+        "OBS_INTERVAL": "PT1H"
+    },
+    {
+        "FIELD_NAME": "TEMPN",
+        "MEASURE": "Air temperature (near surface)",
+        "UNIT": "°C/10",
+        "TYPE": "MINIMUM",
+        "OBS_INTERVAL": "PT1H"
+    },
+    {
+        "FIELD_NAME": "TEMPX",
+        "MEASURE": "Air temperature (near surface)",
+        "UNIT": "°C/10",
+        "TYPE": "MAXIMUM",
+        "OBS_INTERVAL": "PT1H"
+    },
+    {
+        "FIELD_NAME": "REHUM",
+        "MEASURE": "Relative Humidity (near surface)",
+        "UNIT": "%",
+        "TYPE": "AVERAGE",
+        "OBS_INTERVAL": "PT1H"
+    },
+    {
+        "FIELD_NAME": "CRLVM",
+        "MEASURE": "Creek level",
+        "UNIT": "m/100",
+        "TYPE": "AVERAGE",
+        "OBS_INTERVAL": "PT1H"
+    },
+    {
+        "FIELD_NAME": "WSPDM",
+        "MEASURE": "Wind Speed (near surface)",
+        "UNIT": "m/s/10",
+        "TYPE": "AVERAGE",
+        "OBS_INTERVAL": "PT1H"
+    },
+    {
+        "FIELD_NAME": "WSPDX",
+        "MEASURE": "Wind Speed (near surface)",
+        "UNIT": "m/s/10",
+        "TYPE": "MAXIMUM",
+        "OBS_INTERVAL": "PT1H"
+    },
+    {
+        "FIELD_NAME": "RAINC",
+        "MEASURE": "Rain Amount",
+        "UNIT": "mm/10",
+        "TYPE": "TOTAL",
+        "OBS_INTERVAL": "PT1H"
+    },
+    {
+        "FIELD_NAME": "DISCM",
+        "MEASURE": "Mean river discharge",
+        "UNIT": "m3/s/100",
+        "TYPE": "AVERAGE",
+        "OBS_INTERVAL": "PT1H"
     }
+]
 }
