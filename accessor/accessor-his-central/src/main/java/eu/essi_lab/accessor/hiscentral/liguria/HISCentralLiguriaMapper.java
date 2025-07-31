@@ -80,7 +80,7 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
      * @param sensorInfo
      * @return
      */
-    static OriginalMetadata create(String variable, String startTime, String linkage, JSONObject sensorInfo, JSONObject descritpionVarObj) {
+    static OriginalMetadata create(String variable, String startTime, String linkage, JSONObject sensorInfo, JSONArray descritpionVarObj) {
 
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
@@ -137,8 +137,8 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	return new JSONObject(metadata.getMetadata()).optString("variable");
     }
 
-    private JSONObject retrieveVariableDescription(OriginalMetadata metadata) {
-	return new JSONObject(metadata.getMetadata()).optJSONObject("var-info");
+    private JSONArray retrieveVariableDescription(OriginalMetadata metadata) {
+	return new JSONObject(metadata.getMetadata()).optJSONArray("var-info");
     }
 
     @Override
@@ -162,16 +162,16 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 
 	JSONObject sensorInfo = retrieveSensorInfo(originalMD);
 
-	JSONObject varDescription = retrieveVariableDescription(originalMD);
+	JSONArray varDescription = retrieveVariableDescription(originalMD);
 
 	String varName = null;
 	String unit = null;
 	String interpolationType = null;
 	String intervalTime = null;
 
-	if (varDescription != null && varDescription.length() > 0) {
-	    JSONArray dataItems = varDescription.getJSONArray("items");
-	    for (Object arr : dataItems) {
+	if (varDescription != null && !varDescription.isEmpty()) {
+	    // JSONArray dataItems = varDescription.getJSONArray("items");
+	    for (Object arr : varDescription) {
 
 		/**
 		 * {
@@ -183,13 +183,13 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 		 * }
 		 */
 		JSONObject varDescr = (JSONObject) arr;
-		String vName = varDescr.optString("field_name");
+		String vName = varDescr.optString("FIELD_NAME");
 		if (vName.toLowerCase().equals(varId.toLowerCase())) {
 		    // this is the matching case
-		    varName = varDescr.optString("measure");
-		    unit = varDescr.optString("unit");
-		    interpolationType = varDescr.optString("type");
-		    intervalTime = varDescr.optString("obs_interval");
+		    varName = varDescr.optString("MEASURE");
+		    unit = varDescr.optString("UNIT");
+		    interpolationType = varDescr.optString("TYPE");
+		    intervalTime = varDescr.optString("OBS_INTERVAL");
 		    break;
 		}
 
@@ -220,24 +220,24 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 
 	String tempExtenBegin = retrieveStartTime(originalMD);
 
-	String stationName = sensorInfo.optString("name");
+	String stationName = sensorInfo.optString("NAME");
 
-	String stationCode = sensorInfo.optString("code");
+	String stationCode = sensorInfo.optString("CODE");
 
-	double elevation = sensorInfo.optDouble("elev");
+	double elevation = sensorInfo.optDouble("ELEV");
 
-	String province = sensorInfo.optString("prov");
+	String province = sensorInfo.optString("PROV");
 
-	String country = sensorInfo.optString("muni");
+	String country = sensorInfo.optString("MUNI");
 
-	String region = sensorInfo.optString("region");
+	String region = sensorInfo.optString("REGION");
 
-	String nation = sensorInfo.optString("nation");
+	String nation = sensorInfo.optString("NATION");
 
 	// proprietario stazione
-	String owner = sensorInfo.optString("owner");
+	String owner = sensorInfo.optString("OWNER");
 	// manutentore stazione
-	String admin = sensorInfo.optString("admin");
+	String admin = sensorInfo.optString("ADMIN");
 
 	// String statisticalFunction = "";
 	// if (sensorInfo.getJSONObject("observedProperty").has("statisticalFunction")) {
@@ -292,8 +292,8 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setTimeSupport(timeResolution);
 	}
 
-	double pointLon = sensorInfo.optDouble("lon");// sensorInfo.optString("lon");
-	double pointLat = sensorInfo.optDouble("lat");
+	double pointLon = sensorInfo.optDouble("LON");// sensorInfo.optString("lon");
+	double pointLat = sensorInfo.optDouble("LAT");
 
 	double div = 100000;
 
@@ -494,7 +494,7 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	// tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
 	// }
 	Date d = new Date();
-	String linkage = HISCentralLiguriaConnector.BASE_URL + HISCentralLiguriaConnector.DATI_URL + "?code=" + stationCode;
+	String linkage = HISCentralLiguriaConnector.BASE_URL + HISCentralLiguriaConnector.DATI_URL;
 
 	online = new Online();
 	online.setLinkage(linkage);
@@ -511,7 +511,7 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	CoverageDescription coverageDescription = new CoverageDescription();
 
 	coverageDescription.setAttributeIdentifier(varId);
-	if(varName.equals("Mean river discharge")) {
+	if (varName.equals("Mean river discharge")) {
 	    varName = "river discharge";
 	}
 	coverageDescription.setAttributeTitle(varName);
