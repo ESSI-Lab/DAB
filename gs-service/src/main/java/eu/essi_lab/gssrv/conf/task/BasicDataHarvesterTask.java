@@ -123,7 +123,10 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 			maxRecords = Integer.parseInt(maxRecordsString);
 		}
 
+		int totalRecords = 0;
 		int recordsDone = 0;
+		int errors = 0;
+int majorErrors = 0;
 
 		OMHandler omHandler = new OMHandler();
 
@@ -186,6 +189,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 					}
 					// for each observation
 					for (int i = 0; i < members.length(); i++) {
+						totalRecords++;
 						JSONObject member = members.getJSONObject(i);
 						String id = member.getString("id");
 
@@ -252,15 +256,19 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 							} else {
 								sizeInMB = BigDecimal.ZERO;
 							}
+
 							GSLoggerFactory.getLogger(getClass()).info("Downloaded file. Size: {} MB", sizeInMB);
 
-							addPointsFromWML(dataFile, dataCacheConnector, uom, observedProperty, latitudeLongitude, id,
-									mySourceId);
+							if (sizeInMB.equals(BigDecimal.ZERO)) {
+								errors++;
+							} else {
+								addPointsFromWML(dataFile, dataCacheConnector, uom, observedProperty, latitudeLongitude,
+										id, mySourceId);
 
-							dataFile.delete();
+								dataFile.delete();
+								recordsDone++;
 
-							recordsDone++;
-							GSLoggerFactory.getLogger(getClass()).info("Basic data augmented records: {}", recordsDone);
+							}
 
 							if (maxRecords != null && recordsDone >= maxRecords) {
 								break base;
@@ -268,6 +276,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 
 						} catch (Exception e) {
 							GSLoggerFactory.getLogger(getClass()).error(e);
+							errors++;
 						}
 
 						int bufferSize;
@@ -278,13 +287,19 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 							Thread.sleep(1000);
 						}
 
+						GSLoggerFactory.getLogger(getClass()).info(
+								"Basic data augmenter stats. Records seen: {} Records inserted: {} Errors: {} Major errors: {}",
+								totalRecords, recordsDone, errors,majorErrors);
+
 					}
 
 				} else {
+					majorErrors++;
 					GSLoggerFactory.getLogger(getClass()).error("Member not present");
 
 				}
 			} else {
+				majorErrors++;
 				GSLoggerFactory.getLogger(getClass()).error("Response not present");
 			}
 
