@@ -48,6 +48,7 @@ import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.JSONArrayStreamParser;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;
@@ -173,7 +174,7 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 		    Date d = new Date();
 		    String date = HISCentralLiguriaMapper.getDate(d);
 		    String initialDate = "197001010000";
-		    
+
 		    String dataUrl = getSourceURL().endsWith("/") ? getSourceURL() + DATI_URL // + "?dtrf_beg=" +
 											      // initialDate +
 											      // "&dtrf_end=" + date +
@@ -181,27 +182,34 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 			    : getSourceURL() + "/" + DATI_URL;// + "?dtrf_beg=" + initialDate + "&dtrf_end=" + date +
 							      // "&code=" + code;
 
-		    JSONArray dataResp = getData(dataUrl, code, initialDate, date);// downloader.downloadOptionalString(dataUrl);
-		    if (dataResp != null && !dataResp.isEmpty()) {
-
-			String startTime = null;
-
-			JSONObject varObject = dataResp.optJSONObject(0);
-			startTime = varObject.optString("DTRF");
-			Iterator<String> iterator = varObject.keys();
-			while (iterator.hasNext()) {
-			    String s = iterator.next();
-			    if (s.contains("CODE") || s.contains("DTRF")) {
-				continue;
+		    InputStream streamResp = getData(dataUrl, code, initialDate, date);// downloader.downloadOptionalString(dataUrl);
+		    if (streamResp != null) {
+			try {
+			
+			    JSONArrayStreamParser parser = new JSONArrayStreamParser();
+			    String startTime = null;
+			    JSONObject varObject = parser.parseFirstObject(streamResp);
+			    //JSONObject varObject = new JSONObject(tmpJSON);
+			    // JSONObject varObject = dataResp.optJSONObject(0);
+			    startTime = varObject.optString("DTRF");
+			    Iterator<String> iterator = varObject.keys();
+			    while (iterator.hasNext()) {
+				String s = iterator.next();
+				if (s.contains("CODE") || s.contains("DTRF")) {
+				    continue;
+				}
+				partialNumbers++;
+				ret.addRecord(HISCentralLiguriaMapper.create(s, startTime, dataUrl, sensorInfo, stationsParameter));
 			    }
-			    partialNumbers++;
-			    ret.addRecord(HISCentralLiguriaMapper.create(s, startTime, dataUrl, sensorInfo, stationsParameter));
+			} catch (Exception e) {
+			    // TODO: handle exception
 			}
+
 		    }
 		}
 
 	    }
-	    
+
 	    logger.debug("ADDED {} records for ARPAL Liguria {}", partialNumbers);
 
 	} else {
@@ -217,8 +225,13 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 
     }
 
-    public static JSONArray getData(String dataUrl, String stationCode, String startTime, String endTime) throws GSException {
+    public static InputStream getData(String dataUrl, String stationCode, String startTime, String endTime) throws GSException {
 	InputStream stream = null;
+	
+	
+	if (BEARER_TOKEN == null) {
+	    BEARER_TOKEN = getBearerToken();
+	}
 
 	// {
 	// "parametri": [
@@ -257,7 +270,7 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 	    int statusCode = response.statusCode();
 	    if (statusCode > 400) {
 		// refresh token and try again
-		getBearerToken();
+		BEARER_TOKEN = getBearerToken();
 		map = new HashMap<String, String>();
 		map.put("accept", "text/plain");
 		map.put("Content-Type", "application/json");
@@ -271,10 +284,7 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 	    GSLoggerFactory.getLogger(HISCentralLiguriaConnector.class).info("Got data from station:" + stationCode);
 
 	    if (stream != null) {
-		JSONArray result = new JSONArray(IOStreamUtils.asUTF8String(stream));
-		// JSONObject jsonResult = new JSONObject(IOStreamUtils.asUTF8String(stream));
-		stream.close();
-		return result;
+		return stream;
 	    }
 
 	} catch (Exception e) {
