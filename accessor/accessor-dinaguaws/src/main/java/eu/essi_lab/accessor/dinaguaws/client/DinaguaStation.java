@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.dinaguaws.client;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -49,47 +51,57 @@ public class DinaguaStation {
 
     public String getVar_corto() {
 
-	return json.get("var_corto").toString();
+	return json.optString("var_corto");
 
     }
 
-    public String getBasinArea() {
-	return json.get("area_cuenca_km2").toString();
+    public BigDecimal getBasinArea() {
+	return json.optBigDecimal("area_cuenca_km2",null);
 
     }
 
     public String getBasinLevel() {
-	return json.get("cuenca_nivel_5").toString();
+	return json.optString("cuenca_nivel_5");
 
     }
 
     public String getRiver() {
-	return json.get("nombre_curso_observado").toString();
+	return json.optString("nombre_curso_observado");
 
     }
 
     public String getId() {
-	return json.get("id_estacion").toString();
+	return json.optString("id_estacion");
 
     }
 
     public String getDepartmentId() {
-	return json.get("departamento").toString();
+	return json.optString("departamento");
+
+    }
+    
+    public String getEntity() {
+	return json.optString("entitad");
 
     }
 
-    public String getLatitude() {
-	return json.get("latitud").toString();
+    public BigDecimal getLatitude() {
+	return json.optBigDecimal("latitud",null);
 
     }
 
-    public String getLongitude() {
-	return json.get("longitud").toString();
+    public BigDecimal getLongitude() {
+	return json.optBigDecimal("longitud",null);
 
     }
 
     public String getName() {
-	return json.get("apodo").toString();
+	return json.optString("apodo");
+
+    }
+    
+    public String getCountry() {
+	return json.optString("pais");
 
     }
 

@@ -29,6 +29,7 @@ public class SourceCacheStats {
 	private Date oldestInsert;
 	private Date newestInsert;
 	private Long averageAgeHours;
+	private Long recordCount;
 
 	public String getSourceId() {
 		return sourceId;
@@ -68,6 +69,14 @@ public class SourceCacheStats {
 
 	public void setAverageAgeHours(Long averageAgeHours) {
 		this.averageAgeHours = averageAgeHours;
+	}
+
+	public Long getRecordCount() {
+	    return this.recordCount;
+	}
+	public void setRecordCount(long recordCount) {
+	  this.recordCount=recordCount;
+	    
 	}
 
 }

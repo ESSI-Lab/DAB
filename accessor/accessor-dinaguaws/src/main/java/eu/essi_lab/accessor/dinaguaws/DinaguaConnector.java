@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.dinaguaws;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -152,13 +154,13 @@ public class DinaguaConnector extends HarvestedQueryConnector<DinaguaConnectorSe
 			miMetadata.addMIPlatform(platform);
 
 			try {
-			    Double north = Double.parseDouble(station.getLatitude());
-			    Double east = Double.parseDouble(station.getLongitude());
-			    if (north > 90 || north < -90) {
+			    BigDecimal north = station.getLatitude();
+			    BigDecimal east = station.getLongitude();
+			    if (north.compareTo(new BigDecimal("90")) > 1 || north .compareTo(new BigDecimal("-90")) <1) {
 				String warn = "Invalid latitude for station: " + platformIdentifier;
 				GSLoggerFactory.getLogger(getClass()).warn(warn);
 			    }
-			    if (east > 180 || east < -180) {
+			    if (east.compareTo(new BigDecimal("180")) > 1 || east .compareTo(new BigDecimal("-180")) <1) {
 				String warn = "Invalid longitude for station: " + platformIdentifier;
 				GSLoggerFactory.getLogger(getClass()).warn(warn);
 			    }
@@ -289,7 +291,7 @@ public class DinaguaConnector extends HarvestedQueryConnector<DinaguaConnectorSe
 
 			downloadOnline.setIdentifier(onlineId);
 
-			dataset.getExtensionHandler().setCountry(Country.URUGUAY.getShortName());
+			dataset.getExtensionHandler().setCountry(station.getCountry());
 
 			//
 			//

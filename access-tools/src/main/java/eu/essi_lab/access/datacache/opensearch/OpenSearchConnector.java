@@ -87,6 +87,7 @@ import eu.essi_lab.access.datacache.BBOX4326;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
 import eu.essi_lab.access.datacache.DataRecord;
+import eu.essi_lab.access.datacache.LatitudeLongitude;
 import eu.essi_lab.access.datacache.Polygon4326;
 import eu.essi_lab.access.datacache.Response;
 import eu.essi_lab.access.datacache.ResponseListener;
@@ -97,6 +98,7 @@ import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.access.datacache.WKT;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.JsonFileBuffer;
 import jakarta.json.JsonValue;
 import jakarta.json.stream.JsonParser;
 
@@ -254,6 +256,9 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	    }
 	}, 0, 1, TimeUnit.HOURS);
+	dataRecordbuffer = new JsonFileBuffer<DataRecord>(DataRecord.class);
+	statisticsRecordbuffer = new JsonFileBuffer<StatisticsRecord>(StatisticsRecord.class);
+	stationRecordbuffer = new JsonFileBuffer<StationRecord>(StationRecord.class);
 
 	GSLoggerFactory.getLogger(getClass()).info("OS connector initialized: {}", databaseName);
 
@@ -356,7 +361,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    String osType = null;
 	    if (javaType.equals(Date.class)) {
 		osType = "date";
-	    } else if (javaType.equals(SimpleEntry.class)) {
+	    } else if (javaType.equals(LatitudeLongitude.class)) {
 		osType = "geo_point";
 	    } else if (javaType.equals(BBOX4326.class)) {
 		osType = "geo_shape";
@@ -436,7 +441,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 		    String wkt = value.toString();
 		    WKT w = new WKT(wkt);
 		    if (w.getObjectName().equals("POINT")) {
-			SimpleEntry<BigDecimal, BigDecimal> latLon = new SimpleEntry<>(w.getNumbers().get(1), w.getNumbers().get(0));
+			LatitudeLongitude latLon = new LatitudeLongitude(w.getNumbers().get(1), w.getNumbers().get(0));
 			field.set(record, latLon);
 		    } else {
 			throw new RuntimeException("ERROR MAPPING OS");
@@ -515,10 +520,10 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    if (javaType.equals(Date.class)) {
 		Date date = (Date) value;
 		ret.put(javaName, date.getTime());
-	    } else if (javaType.equals(SimpleEntry.class)) {
-		SimpleEntry date = (SimpleEntry) value;
-		Object lat = date.getKey();
-		Object lon = date.getKey();
+	    } else if (javaType.equals(LatitudeLongitude.class)) {
+		LatitudeLongitude date = (LatitudeLongitude) value;
+		BigDecimal lat = date.getLatitude();
+		BigDecimal lon = date.getLongitude();
 		ret.put(javaName, "POINT (" + lon.toString() + " " + lat.toString() + ")");
 	    } else if (javaType.equals(BBOX4326.class)) {
 		BBOX4326 bbox = (BBOX4326) value;
@@ -555,7 +560,10 @@ public class OpenSearchConnector extends DataCacheConnector {
 	return client.indices().exists(erb.index(index).build()).value();
     }
 
-    private List<Object> buffer = new ArrayList<>();
+    private JsonFileBuffer<DataRecord> dataRecordbuffer;
+    private JsonFileBuffer<StatisticsRecord> statisticsRecordbuffer;
+    private JsonFileBuffer<StationRecord> stationRecordbuffer;
+
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> futureTask = null;
     private boolean flushInProgress = false;
@@ -569,118 +577,115 @@ public class OpenSearchConnector extends DataCacheConnector {
 		    return;
 		}
 
-		List<Object> tmp = new ArrayList<>();
+		writeRecords(dataRecordbuffer, new OperationCreator() {
 
-		synchronized (buffer) {
-
-		    if (buffer.size() < maxBulkSize) {
-			tmp.addAll(buffer);
-			buffer.clear();
-		    } else {
-			List<Object> staged = buffer.subList(0, maxBulkSize);
-			List<Object> posponed = buffer.subList(maxBulkSize, buffer.size());
-			tmp.addAll(staged);
-			buffer = posponed;
+		    @Override
+		    public BulkOperation createOperation(Object object) {
+			DataRecord dataRecord = (DataRecord) object;
+			JSONObject json = getJSONObject(dataRecord);
+			String id = "ID" + UUID.randomUUID().toString();
+			String dataId = dataRecord.getDataIdentifier();
+			if (dataId != null) {
+			    id = dataId + "-" + dataRecord.getDate().getTime();
+			}
+			String finalId = id;
+			BulkOperation.Builder bob = new BulkOperation.Builder();
+			bob.index(idx -> idx.index(DataCacheIndex.VALUES.getIndex(databaseName)).id(finalId).document(json.toMap()));
+			return bob.build();
 		    }
-		}
+		});
 
-		if (!tmp.isEmpty()) {
-		    flushInProgress = true;
-		    org.opensearch.client.opensearch.core.BulkRequest.Builder request = new org.opensearch.client.opensearch.core.BulkRequest.Builder();
-		    List<BulkOperation> operations = new ArrayList<>();
-		    for (Object record : tmp) {
-			if (record instanceof DataRecord) {
-			    DataRecord dataRecord = (DataRecord) record;
-			    JSONObject json = getJSONObject(dataRecord);
-			    String id = "ID" + UUID.randomUUID().toString();
-			    String dataId = dataRecord.getDataIdentifier();
-			    if (dataId != null) {
-				id = dataId + "-" + dataRecord.getDate().getTime();
-			    }
+		writeRecords(statisticsRecordbuffer, new OperationCreator() {
 
-			    String finalId = id;
-
-			    BulkOperation.Builder bob = new BulkOperation.Builder();
-			    bob.index(idx -> idx.index(DataCacheIndex.VALUES.getIndex(databaseName)).id(finalId).document(json.toMap()));
-			    operations.add(bob.build());
-
-			} else if (record instanceof StatisticsRecord) {
-			    StatisticsRecord statisticsRecord = (StatisticsRecord) record;
-			    JSONObject json = getJSONObject(statisticsRecord);
-			    String id = "ID" + UUID.randomUUID().toString();
-			    String dataId = statisticsRecord.getDataIdentifier();
-			    if (dataId != null) {
-				id = dataId + "-STAT-" + statisticsRecord.getDate().getTime();
-			    }
-
-			    String finalId = id;
-
-			    BulkOperation.Builder bob = new BulkOperation.Builder();
-			    bob.index(
-				    idx -> idx.index(DataCacheIndex.STATISTICS.getIndex(databaseName)).id(finalId).document(json.toMap()));
-			    operations.add(bob.build());
-
-			} else if (record instanceof StationRecord) {
-			    StationRecord stationRecord = (StationRecord) record;
-			    JSONObject json = getJSONObject(stationRecord);
-			    String id = "ID" + UUID.randomUUID().toString();
-			    String metadataId = stationRecord.getMetadataIdentifier();
-			    if (metadataId != null) {
-				id = metadataId + "-STATION";
-			    }
-
-			    String finalId = id;
-
-			    BulkOperation.Builder bob = new BulkOperation.Builder();
-			    bob.index(idx -> idx.index(DataCacheIndex.STATIONS.getIndex(databaseName)).id(finalId).document(json.toMap()));
-			    operations.add(bob.build());
-
+		    @Override
+		    public BulkOperation createOperation(Object object) {
+			StatisticsRecord statisticsRecord = (StatisticsRecord) object;
+			JSONObject json = getJSONObject(statisticsRecord);
+			String id = "ID" + UUID.randomUUID().toString();
+			String dataId = statisticsRecord.getDataIdentifier();
+			if (dataId != null) {
+			    id = dataId + "-STAT-" + statisticsRecord.getDate().getTime();
 			}
 
+			String finalId = id;
+
+			BulkOperation.Builder bob = new BulkOperation.Builder();
+			bob.index(idx -> idx.index(DataCacheIndex.STATISTICS.getIndex(databaseName)).id(finalId).document(json.toMap()));
+			return bob.build();
 		    }
-		    request = request.operations(operations);
-		    flush(request.build());
-		    flushInProgress = false;
-		}
+		});
+
+		writeRecords(stationRecordbuffer, new OperationCreator() {
+
+		    @Override
+		    public BulkOperation createOperation(Object object) {
+			StationRecord stationRecord = (StationRecord) object;
+			JSONObject json = getJSONObject(stationRecord);
+			String id = "ID" + UUID.randomUUID().toString();
+			String metadataId = stationRecord.getMetadataIdentifier();
+			if (metadataId != null) {
+			    id = metadataId + "-STATION";
+			}
+
+			String finalId = id;
+
+			BulkOperation.Builder bob = new BulkOperation.Builder();
+			bob.index(idx -> idx.index(DataCacheIndex.STATIONS.getIndex(databaseName)).id(finalId).document(json.toMap()));
+			return bob.build();
+		    }
+		});
+
 	    } catch (Exception e) {
 		e.printStackTrace();
 		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }
 
 	}
+
+	private void writeRecords(JsonFileBuffer<?> dataRecordbuffer, OperationCreator operationCreator) throws IOException {
+	    List<?> tmp = dataRecordbuffer.poll(maxBulkSize);
+
+	    if (!tmp.isEmpty()) {
+		flushInProgress = true;
+		org.opensearch.client.opensearch.core.BulkRequest.Builder request = new org.opensearch.client.opensearch.core.BulkRequest.Builder();
+		List<BulkOperation> operations = new ArrayList<>();
+		for (Object record : tmp) {
+		    BulkOperation operation = operationCreator.createOperation(record);
+		    operations.add(operation);
+		}
+		request = request.operations(operations);
+		flush(request.build());
+		flushInProgress = false;
+	    }
+
+	}
     };
 
     @Override
-    public void write(DataRecord record) {
-	synchronized (buffer) {
-	    buffer.add(record);
-	    if (buffer.size() > maxBulkSize && buffer.size() % 10000 == 0) {
-		GSLoggerFactory.getLogger(getClass()).warn("Quite a lot data records are being ingested at the same time {}",
-			buffer.size());
-	    }
+    public void write(List<DataRecord> records) throws IOException {
+
+	for (DataRecord record : records) {
+	    write(record);
 	}
+
+    }
+
+    @Override
+    public void write(DataRecord record) throws IOException {
+	dataRecordbuffer.add(record);
     }
 
     @Override
     public void writeStatistics(StatisticsRecord record) throws Exception {
-	synchronized (buffer) {
-	    buffer.add(record);
-	    if (buffer.size() > maxBulkSize && buffer.size() % 100 == 0) {
-		GSLoggerFactory.getLogger(getClass()).warn("Quite a lot statistics records are being ingested at the same time {}",
-			buffer.size());
-	    }
-	}
+
+	statisticsRecordbuffer.add(record);
+
     }
 
     @Override
-    public void write(List<DataRecord> records) {
-	synchronized (this.buffer) {
-	    this.buffer.addAll(records);
-	    if (this.buffer.size() > maxBulkSize) {
-		GSLoggerFactory.getLogger(getClass()).warn("Quite a lot data records are being ingested at the same time {}",
-			records.size());
-	    }
-	}
+    public void writeStation(StationRecord record) throws Exception {
+	stationRecordbuffer.add(record);
+
     }
 
     public boolean flush(org.opensearch.client.opensearch.core.BulkRequest request) {
@@ -770,18 +775,6 @@ public class OpenSearchConnector extends DataCacheConnector {
     }
 
     @Override
-    public void waitForFlush() {
-	while (!buffer.isEmpty() || flushInProgress) {
-	    try {
-		Thread.sleep(1000);
-	    } catch (InterruptedException e) {
-		e.printStackTrace();
-	    }
-	}
-
-    }
-
-    @Override
     public void deleteFromActiveStationsBefore(Date date, String sourceIdentifier) throws Exception {
 	org.opensearch.client.opensearch.core.DeleteByQueryRequest.Builder dbqrb = new org.opensearch.client.opensearch.core.DeleteByQueryRequest.Builder();
 	dbqrb.index(DataCacheIndex.VALUES.getIndex(databaseName));
@@ -853,6 +846,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 		.aggregations("sources",
 			a -> a.terms(t -> t.field("sourceIdentifier.keyword").size(selectedSourceIds.size()))
 				.aggregations("unique_datasets", sa -> sa.cardinality(ca -> ca.field("dataIdentifier.keyword")))
+				.aggregations("record_count", sa -> sa.valueCount(vc -> vc.field("sourceIdentifier.keyword")))
 				.aggregations("oldest_insert", sa -> sa.min(m -> m.field("timestamp")))
 				.aggregations("newest_insert", sa -> sa.max(m -> m.field("timestamp")))
 				.aggregations("avg_insert", sa -> sa.avg(a2 -> a2.field("timestamp")))),
@@ -866,13 +860,15 @@ public class OpenSearchConnector extends DataCacheConnector {
 		String sourceId = bucket.key();
 
 		Long datasetCount = bucket.aggregations().get("unique_datasets").cardinality().value();
-		double oldest = bucket.aggregations().get("oldest_insert").min().value(); // epoch millis
+		long recordCount = (long) bucket.aggregations().get("record_count").valueCount().value();
+		double oldest = bucket.aggregations().get("oldest_insert").min().value();
 		double newest = bucket.aggregations().get("newest_insert").max().value();
 		double avg = bucket.aggregations().get("avg_insert").avg().value();
 
 		SourceCacheStats stats = new SourceCacheStats();
 		stats.setSourceId(sourceId);
 		stats.setUniqueDatasetCount(datasetCount);
+		stats.setRecordCount(recordCount);
 		stats.setOldestInsert(new Date((long) oldest));
 		stats.setNewestInsert(new Date((long) newest));
 		stats.setAverageAgeHours(java.time.Duration.between(Instant.ofEpochMilli((long) avg), Instant.now()).toHours());
@@ -1487,21 +1483,14 @@ public class OpenSearchConnector extends DataCacheConnector {
     }
 
     @Override
-    public int countRecordsInBuffer() {
-	synchronized (buffer) {
-	    return buffer.size();
+    public int countRecordsInDataBuffer() {
+	try {
+	    return dataRecordbuffer.sizeEstimate();
+	} catch (IOException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return -1;
 	}
-    }
-
-    @Override
-    public void writeStation(StationRecord record) throws Exception {
-	synchronized (buffer) {
-	    buffer.add(record);
-	    if (buffer.size() > maxBulkSize && buffer.size() % 100 == 0) {
-		GSLoggerFactory.getLogger(getClass()).warn("Quite a lot records are being ingested at the same time {}", buffer.size());
-	    }
-	}
-
     }
 
     @Override

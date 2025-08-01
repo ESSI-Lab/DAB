@@ -53,17 +53,15 @@ public abstract class DataCacheConnector {
      */
     public abstract void configure(String key, String value);
 
-    public abstract void write(DataRecord record);
+    public abstract void write(DataRecord record) throws IOException;
 
-    public void write(List<DataRecord> records) {
+    public void write(List<DataRecord> records) throws IOException {
 	for (DataRecord record : records) {
 	    if (record != null) {
 		write(record);
 	    }
 	}
     }
-
-    public abstract void waitForFlush();
 
     /**
      * Releases resources
@@ -246,6 +244,6 @@ public abstract class DataCacheConnector {
 
     public abstract void clearStations() throws Exception;
 
-	public abstract int countRecordsInBuffer();
+    public abstract int countRecordsInDataBuffer();
 
 }

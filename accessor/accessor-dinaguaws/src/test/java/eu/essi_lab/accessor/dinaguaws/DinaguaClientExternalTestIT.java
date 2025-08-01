@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.dinaguaws;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -91,6 +93,7 @@ public class DinaguaClientExternalTestIT {
 	for (DinaguaStation station : stations) {
 
 	    String id = station.getId();
+	    System.out.println(id+ " "+station.getCountry());
 	    Assert.assertNotNull(id);
 	}
     }
@@ -106,6 +109,21 @@ public class DinaguaClientExternalTestIT {
 	Assert.assertEquals("1590", id);
     }
 
+    @Test
+    public void getStatusStationsTest() throws Exception {
+
+	DinaguaClient client = createClient();
+
+	Set<DinaguaStation> stations = client.getStatusStations();
+	
+	assertTrue(!stations.isEmpty());
+	
+	for (DinaguaStation station : stations) {
+	    System.out.println(station.getId());
+	    System.out.println(station.getCountry());
+	}
+    }
+    
     @Test
     public void getTokenTest() throws Exception {
 

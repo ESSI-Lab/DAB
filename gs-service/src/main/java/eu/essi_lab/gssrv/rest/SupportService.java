@@ -194,8 +194,14 @@ public class SupportService {
 					cacheCount = 0l;
 				}
 				jsonSource.put("datasetsInCache", cacheCount);
+				
+				Long valuesCount = sourceStats.getRecordCount();
+				if (valuesCount == null) {
+					valuesCount = 0l;
+				}
+				jsonSource.put("valuesInCache", valuesCount);
 
-				if (cacheCount > 0) {
+				if (valuesCount > 0) {
 					jsonSource.put("oldestInsert",
 							ISO8601DateTimeUtils.getISO8601DateTime(sourceStats.getOldestInsert()));
 					jsonSource.put("newestInsert",

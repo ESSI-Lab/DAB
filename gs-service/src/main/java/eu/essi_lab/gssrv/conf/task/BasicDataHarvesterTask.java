@@ -51,6 +51,7 @@ import eu.essi_lab.access.DataValidatorErrorCode;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.DataRecord;
+import eu.essi_lab.access.datacache.LatitudeLongitude;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
@@ -67,355 +68,347 @@ import eu.essi_lab.profiler.om.OMHandler;
  */
 public class BasicDataHarvesterTask extends AbstractCustomTask {
 
-	public enum DataHarvesterTaskOptions implements OptionsKey {
-		SOURCE_ID, THREADS_COUNT, MAX_RECORDS, VIEW_ID, TOKEN;
+    public enum DataHarvesterTaskOptions implements OptionsKey {
+	SOURCE_ID, THREADS_COUNT, MAX_RECORDS, VIEW_ID, TOKEN;
+    }
+
+    private static final int WAITING_BUFFER_SIZE = 20000;
+
+    @Override
+    public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
+
+	log(status, "Basic Data harvester task STARTED");
+
+	// INIT CACHE CONNECTOR
+
+	DataCacheConnector dataCacheConnector = null;
+
+	DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
+	dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
+	if (dataCacheConnector == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("Issues initializing the data cache connector");
+	    return;
+	}
+	dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, "10000"); // note: 100000 is too much, it returns
+										 // 413
+	dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, "2000");
+	dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, "60");
+
+	// SETTINGS RETRIEVAL
+
+	Optional<EnumMap<DataHarvesterTaskOptions, String>> taskOptions = readTaskOptions(context, DataHarvesterTaskOptions.class);
+	if (taskOptions.isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass()).error("No options specified");
+	    return;
+	}
+	String sourceId = taskOptions.get().get(DataHarvesterTaskOptions.SOURCE_ID);
+
+	String viewId = taskOptions.get().get(DataHarvesterTaskOptions.VIEW_ID);
+	if (viewId == null && sourceId == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("No view id option specified");
+	    return;
 	}
 
-	private static final int WAITING_BUFFER_SIZE = 20000;
-	
-	
+	String token = taskOptions.get().get(DataHarvesterTaskOptions.TOKEN);
+	if (token == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("No token option specified");
+	    return;
+	}
+	String threadsCountString = taskOptions.get().get(DataHarvesterTaskOptions.THREADS_COUNT);
+	Integer threadsCount = 1;
+	if (threadsCountString != null) {
+	    threadsCount = Integer.parseInt(threadsCountString);
+	}
 
-	@Override
-	public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
+	String maxRecordsString = taskOptions.get().get(DataHarvesterTaskOptions.MAX_RECORDS);
+	Integer maxRecords = null;
+	if (maxRecordsString != null) {
+	    maxRecords = Integer.parseInt(maxRecordsString);
+	}
 
-		log(status, "Basic Data harvester task STARTED");
+	int totalRecords = 0;
+	int recordsDone = 0;
+	int errors = 0;
+	int majorErrors = 0;
 
-		// INIT CACHE CONNECTOR
+	OMHandler omHandler = new OMHandler();
 
-		DataCacheConnector dataCacheConnector = null;
+	String listURL = "http://localhost:9090/gs-service/services/essi/token/" + token + "/view/" + viewId
+		+ "/om-api/observations?expandFeatures=true&";
 
-		DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
-		dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
-		if (dataCacheConnector == null) {
-			GSLoggerFactory.getLogger(getClass()).error("Issues initializing the data cache connector");
-			return;
+	if (sourceId != null) {
+	    listURL = listURL + "provider=" + sourceId + "&";
+	}
+
+	boolean firstLoop = true;
+	String resumptionToken = null;
+	int blocks = 0;
+
+	Path tempPath = null;
+
+	File tempDirFile = FileUtils.createTempDir("basic-data-harvester", false);
+
+	tempPath = tempDirFile.toPath();
+
+	if (tempDirFile.exists()) {
+
+	    FileUtils.clearFolder(tempPath.toFile(), false);
+
+	} else {
+
+	    tempDirFile.mkdirs();
+	}
+
+	base: while (firstLoop || resumptionToken != null) {
+
+	    firstLoop = false;
+
+	    GSLoggerFactory.getLogger(getClass()).info("Listing block {}", ++blocks);
+
+	    String currentListURL = listURL;
+	    if (resumptionToken != null) {
+		currentListURL = currentListURL + "resumptionToken=" + resumptionToken;
+	    }
+
+	    Optional<JSONObject> response = omHandler.getJSONResponse(WebRequest.createGET(currentListURL));
+
+	    if (response.isPresent()) {
+
+		JSONObject json = response.get();
+
+		if (json.has("completed") && json.getBoolean("completed") == false && json.has("resumptionToken")) {
+		    resumptionToken = json.getString("resumptionToken");
+		} else {
+		    resumptionToken = null;
 		}
-		dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, "10000"); // note: 100000 is too much, it returns 413
-		dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, "2000");
-		dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, "60");
 
-		// SETTINGS RETRIEVAL
+		if (json.has("member")) {
 
-		Optional<EnumMap<DataHarvesterTaskOptions, String>> taskOptions = readTaskOptions(context,
-				DataHarvesterTaskOptions.class);
-		if (taskOptions.isEmpty()) {
-			GSLoggerFactory.getLogger(getClass()).error("No options specified");
-			return;
-		}
-		String sourceId = taskOptions.get().get(DataHarvesterTaskOptions.SOURCE_ID);
+		    JSONArray members = json.getJSONArray("member");
+		    GSLoggerFactory.getLogger(getClass()).info("Retrieved block of size {}, resumption token {}", members.length(),
+			    resumptionToken);
+		    if (members.length() == 0) {
+			break;
+		    }
+		    // for each observation
+		    for (int i = 0; i < members.length(); i++) {
+			totalRecords++;
+			JSONObject member = members.getJSONObject(i);
+			String id = member.getString("id");
 
-		String viewId = taskOptions.get().get(DataHarvesterTaskOptions.VIEW_ID);
-		if (viewId == null && sourceId == null) {
-			GSLoggerFactory.getLogger(getClass()).error("No view id option specified");
-			return;
-		}
+			String uom = null;
+			String observedProperty = null;
+			String mySourceId = null;
+			LatitudeLongitude latitudeLongitude = null;
 
-		String token = taskOptions.get().get(DataHarvesterTaskOptions.TOKEN);
-		if (token == null) {
-			GSLoggerFactory.getLogger(getClass()).error("No token option specified");
-			return;
-		}
-		String threadsCountString = taskOptions.get().get(DataHarvesterTaskOptions.THREADS_COUNT);
-		Integer threadsCount = 1;
-		if (threadsCountString != null) {
-			threadsCount = Integer.parseInt(threadsCountString);
-		}
+			JSONObject result = member.optJSONObject("result");
+			if (result != null) {
+			    JSONObject dpm = result.optJSONObject("defaultPointMetadata");
+			    if (dpm != null) {
+				uom = dpm.optString("uom");
+			    }
+			}
+			JSONArray parameter = member.optJSONArray("parameter");
+			if (parameter != null) {
+			    for (int j = 0; j < parameter.length(); j++) {
+				JSONObject p = parameter.optJSONObject(j);
+				if (p != null) {
+				    String name = p.optString("name");
+				    if (name != null && name.equals("sourceId")) {
+					mySourceId = p.optString("value");
+				    }
+				}
+			    }
+			}
+			JSONObject observedPropertyObject = member.optJSONObject("observedProperty");
+			if (observedPropertyObject != null) {
+			    observedProperty = observedPropertyObject.optString("title");
+			}
+			JSONObject feature = member.optJSONObject("featureOfInterest");
+			if (feature != null) {
+			    JSONObject shape = feature.optJSONObject("shape");
+			    if (shape != null) {
+				JSONArray coords = shape.optJSONArray("coordinates");
+				if (coords != null) {
+				    BigDecimal lon = coords.optBigDecimal(0, null);
+				    BigDecimal lat = coords.optBigDecimal(1, null);
+				    if (lon != null && lat != null) {
+					latitudeLongitude = new LatitudeLongitude(lat, lon);
+				    }
+				}
+			    }
+			}
+			// download single observation URL
+			String downloadURL = "http://localhost:9090/gs-service/services/essi/token/" + token + "/view/" + viewId
+				+ "/om-api/observations?includeData=true&format=WML1&observationIdentifier=" + id;
 
-		String maxRecordsString = taskOptions.get().get(DataHarvesterTaskOptions.MAX_RECORDS);
-		Integer maxRecords = null;
-		if (maxRecordsString != null) {
-			maxRecords = Integer.parseInt(maxRecordsString);
-		}
+			WebRequest get2 = WebRequest.createGET(downloadURL);
 
-		int totalRecords = 0;
-		int recordsDone = 0;
-		int errors = 0;
-int majorErrors = 0;
+			try {
 
-		OMHandler omHandler = new OMHandler();
+			    File dataFile = new File(tempDirFile, "FILE-" + id.hashCode());
 
-		String listURL = "http://localhost:9090/gs-service/services/essi/token/" + token + "/view/" + viewId
-				+ "/om-api/observations?expandFeatures=true&";
+			    omHandler.handle(new FileOutputStream(dataFile), get2);
 
-		if (sourceId != null) {
-			listURL = listURL + "provider=" + sourceId + "&";
-		}
+			    BigDecimal sizeInMB = null;
+			    if (dataFile.exists()) {
+				long sizeInBytes = dataFile.length();
+				sizeInMB = BigDecimal.valueOf(sizeInBytes).divide(BigDecimal.valueOf(1024 * 1024), 2, RoundingMode.HALF_UP);
+			    } else {
+				sizeInMB = BigDecimal.ZERO;
+			    }
 
-		boolean firstLoop = true;
-		String resumptionToken = null;
-		int blocks = 0;
+			    GSLoggerFactory.getLogger(getClass()).info("Downloaded file. Size: {} MB", sizeInMB);
 
-		Path tempPath = null;
+			    if (sizeInMB.equals(BigDecimal.ZERO)) {
+				errors++;
+			    } else {
+				addPointsFromWML(dataFile, dataCacheConnector, uom, observedProperty, latitudeLongitude, id, mySourceId);
 
-		File tempDirFile = FileUtils.createTempDir("basic-data-harvester", false);
+				dataFile.delete();
+				recordsDone++;
 
-		tempPath = tempDirFile.toPath();
+			    }
 
-		if (tempDirFile.exists()) {
+			    if (maxRecords != null && recordsDone >= maxRecords) {
+				break base;
+			    }
 
-			FileUtils.clearFolder(tempPath.toFile(), false);
+			} catch (Exception e) {
+			    GSLoggerFactory.getLogger(getClass()).error(e);
+			    errors++;
+			}
+
+			int bufferSize;
+			while ((bufferSize = dataCacheConnector.countRecordsInDataBuffer()) > WAITING_BUFFER_SIZE) {
+			    GSLoggerFactory.getLogger(getClass()).info("Waiting writing data, buffer size: {}", bufferSize);
+
+			    Thread.sleep(1000);
+			}
+
+			GSLoggerFactory.getLogger(getClass()).info(
+				"Basic data augmenter stats. Records seen: {} Records inserted: {} Errors: {} Major errors: {}",
+				totalRecords, recordsDone, errors, majorErrors);
+
+		    }
 
 		} else {
-
-			tempDirFile.mkdirs();
-		}
-
-		base: while (firstLoop || resumptionToken != null) {
-
-			firstLoop = false;
-
-			GSLoggerFactory.getLogger(getClass()).info("Listing block {}", ++blocks);
-
-			String currentListURL = listURL;
-			if (resumptionToken != null) {
-				currentListURL = currentListURL + "resumptionToken=" + resumptionToken;
-			}
-
-			Optional<JSONObject> response = omHandler.getJSONResponse(WebRequest.createGET(currentListURL));
-
-			if (response.isPresent()) {
-
-				JSONObject json = response.get();
-
-				if (json.has("completed") && json.getBoolean("completed") == false && json.has("resumptionToken")) {
-					resumptionToken = json.getString("resumptionToken");
-				} else {
-					resumptionToken = null;
-				}
-
-				if (json.has("member")) {
-
-					JSONArray members = json.getJSONArray("member");
-					GSLoggerFactory.getLogger(getClass()).info("Retrieved block of size {}, resumption token {}",
-							members.length(), resumptionToken);
-					if (members.length() == 0) {
-						break;
-					}
-					// for each observation
-					for (int i = 0; i < members.length(); i++) {
-						totalRecords++;
-						JSONObject member = members.getJSONObject(i);
-						String id = member.getString("id");
-
-						String uom = null;
-						String observedProperty = null;
-						String mySourceId = null;
-						SimpleEntry<BigDecimal, BigDecimal> latitudeLongitude = null;
-
-						JSONObject result = member.optJSONObject("result");
-						if (result != null) {
-							JSONObject dpm = result.optJSONObject("defaultPointMetadata");
-							if (dpm != null) {
-								uom = dpm.optString("uom");
-							}
-						}
-						JSONArray parameter = member.optJSONArray("parameter");
-						if (parameter != null) {
-							for (int j = 0; j < parameter.length(); j++) {
-								JSONObject p = parameter.optJSONObject(j);
-								if (p != null) {
-									String name = p.optString("name");
-									if (name != null && name.equals("sourceId")) {
-										mySourceId = p.optString("value");
-									}
-								}
-							}
-						}
-						JSONObject observedPropertyObject = member.optJSONObject("observedProperty");
-						if (observedPropertyObject != null) {
-							observedProperty = observedPropertyObject.optString("title");
-						}
-						JSONObject feature = member.optJSONObject("featureOfInterest");
-						if (feature != null) {
-							JSONObject shape = feature.optJSONObject("shape");
-							if (shape != null) {
-								JSONArray coords = shape.optJSONArray("coordinates");
-								if (coords != null) {
-									BigDecimal lon = coords.optBigDecimal(0, null);
-									BigDecimal lat = coords.optBigDecimal(1, null);
-									if (lon != null && lat != null) {
-										latitudeLongitude = new SimpleEntry<BigDecimal, BigDecimal>(lat, lon);
-									}
-								}
-							}
-						}
-						// download single observation URL
-						String downloadURL = "http://localhost:9090/gs-service/services/essi/token/" + token + "/view/"
-								+ viewId + "/om-api/observations?includeData=true&format=WML1&observationIdentifier="
-								+ id;
-
-						WebRequest get2 = WebRequest.createGET(downloadURL);
-
-						try {
-
-							File dataFile = new File(tempDirFile, "FILE-" + id.hashCode());
-
-							omHandler.handle(new FileOutputStream(dataFile), get2);
-
-							BigDecimal sizeInMB = null;
-							if (dataFile.exists()) {
-								long sizeInBytes = dataFile.length();
-								sizeInMB = BigDecimal.valueOf(sizeInBytes).divide(BigDecimal.valueOf(1024 * 1024), 2,
-										RoundingMode.HALF_UP);
-							} else {
-								sizeInMB = BigDecimal.ZERO;
-							}
-
-							GSLoggerFactory.getLogger(getClass()).info("Downloaded file. Size: {} MB", sizeInMB);
-
-							if (sizeInMB.equals(BigDecimal.ZERO)) {
-								errors++;
-							} else {
-								addPointsFromWML(dataFile, dataCacheConnector, uom, observedProperty, latitudeLongitude,
-										id, mySourceId);
-
-								dataFile.delete();
-								recordsDone++;
-
-							}
-
-							if (maxRecords != null && recordsDone >= maxRecords) {
-								break base;
-							}
-
-						} catch (Exception e) {
-							GSLoggerFactory.getLogger(getClass()).error(e);
-							errors++;
-						}
-
-						int bufferSize;
-						while ((bufferSize = dataCacheConnector.countRecordsInBuffer()) > WAITING_BUFFER_SIZE) {
-							GSLoggerFactory.getLogger(getClass()).info("Waiting writing data, buffer size: {}",
-									bufferSize);
-
-							Thread.sleep(1000);
-						}
-
-						GSLoggerFactory.getLogger(getClass()).info(
-								"Basic data augmenter stats. Records seen: {} Records inserted: {} Errors: {} Major errors: {}",
-								totalRecords, recordsDone, errors,majorErrors);
-
-					}
-
-				} else {
-					majorErrors++;
-					GSLoggerFactory.getLogger(getClass()).error("Member not present");
-
-				}
-			} else {
-				majorErrors++;
-				GSLoggerFactory.getLogger(getClass()).error("Response not present");
-			}
+		    majorErrors++;
+		    GSLoggerFactory.getLogger(getClass()).error("Member not present");
 
 		}
+	    } else {
+		majorErrors++;
+		GSLoggerFactory.getLogger(getClass()).error("Response not present");
+	    }
 
-		log(status, "Basic Data harvester task ENDED");
 	}
 
-	@Override
-	public String getName() {
+	log(status, "Basic Data harvester task ENDED");
+    }
 
-		return "Basic Data harvester task";
-	}
+    @Override
+    public String getName() {
 
-	static XMLInputFactory factory = XMLInputFactory.newInstance();
+	return "Basic Data harvester task";
+    }
 
-	private static String readValue(XMLEventReader reader) {
+    static XMLInputFactory factory = XMLInputFactory.newInstance();
 
-		String ret = "";
-		XMLEvent event = null;
-		do {
-			try {
-				event = reader.nextEvent();
-				if (event instanceof Characters) {
-					Characters cei = (Characters) event;
-					ret += cei.getData();
-				}
-			} catch (XMLStreamException e) {
-				e.printStackTrace();
-			}
+    private static String readValue(XMLEventReader reader) {
 
-		} while (event != null && !event.isEndElement());
-
-		return ret.trim();
-	}
-
-	private void addPointsFromWML(File file, DataCacheConnector cache, String uom, String observedProperty,
-			SimpleEntry<BigDecimal, BigDecimal> latitudeLongitude, String dataIdentifier, String sourceId) {
-		GSLoggerFactory.getLogger(getClass()).info("Sending file {} to OS, identifier: {}", file.getAbsolutePath(),
-				dataIdentifier);
-		try {
-			FileInputStream stream = new FileInputStream(file);
-
-			StreamSource source = new StreamSource(stream);
-			XMLEventReader reader = factory.createXMLEventReader(source);
-
-			String nodataValue = null;
-			while (reader.hasNext()) {
-
-				XMLEvent event = reader.nextEvent();
-
-				if (event.isStartElement()) {
-
-					StartElement startElement = event.asStartElement();
-
-					String startName = startElement.getName().getLocalPart();
-
-					switch (startName) {
-					case "noDataValue":
-						nodataValue = readValue(reader);
-						break;
-					case "value":
-
-						Attribute dateTimeAttribute = startElement.getAttributeByName(new QName("dateTimeUTC"));
-						if (dateTimeAttribute == null) {
-							dateTimeAttribute = startElement.getAttributeByName(new QName("dateTime"));
-						}
-						if (dateTimeAttribute != null) {
-							String date = dateTimeAttribute.getValue();
-							String value = readValue(reader);
-							BigDecimal v = null;
-							if (nodataValue == null || !nodataValue.equals(value)) {
-								v = new BigDecimal(value);
-							}
-							Attribute qualityAttribute = startElement
-									.getAttributeByName(new QName("qualityControlLevelCode"));
-							String quality = null;
-							if (qualityAttribute != null) {
-								quality = qualityAttribute.getValue();
-							}
-
-							Optional<Date> d = ISO8601DateTimeUtils.parseISO8601ToDate(date);
-							try {
-								if (d.isPresent()) {
-
-									DataRecord dataRecord = new DataRecord(d.get(), v, uom, observedProperty,
-											latitudeLongitude, dataIdentifier);
-									dataRecord.setQuality(quality);
-									dataRecord.setSourceIdentifier(sourceId);
-									cache.write(dataRecord);
-
-								}
-							} catch (Exception e) {
-							}
-
-						}
-						break;
-					default:
-						break;
-					}
-
-				}
-			}
-
-			reader.close();
-			stream.close();
-
-			file.delete();
-
-		} catch (Exception e) {
-			throw new IllegalArgumentException(DataValidatorErrorCode.DECODING_ERROR.toString());
+	String ret = "";
+	XMLEvent event = null;
+	do {
+	    try {
+		event = reader.nextEvent();
+		if (event instanceof Characters) {
+		    Characters cei = (Characters) event;
+		    ret += cei.getData();
 		}
+	    } catch (XMLStreamException e) {
+		e.printStackTrace();
+	    }
 
+	} while (event != null && !event.isEndElement());
+
+	return ret.trim();
+    }
+
+    private void addPointsFromWML(File file, DataCacheConnector cache, String uom, String observedProperty,
+	    LatitudeLongitude latitudeLongitude, String dataIdentifier, String sourceId) {
+	GSLoggerFactory.getLogger(getClass()).info("Sending file {} to OS, identifier: {}", file.getAbsolutePath(), dataIdentifier);
+	try {
+	    FileInputStream stream = new FileInputStream(file);
+
+	    StreamSource source = new StreamSource(stream);
+	    XMLEventReader reader = factory.createXMLEventReader(source);
+
+	    String nodataValue = null;
+	    while (reader.hasNext()) {
+
+		XMLEvent event = reader.nextEvent();
+
+		if (event.isStartElement()) {
+
+		    StartElement startElement = event.asStartElement();
+
+		    String startName = startElement.getName().getLocalPart();
+
+		    switch (startName) {
+		    case "noDataValue":
+			nodataValue = readValue(reader);
+			break;
+		    case "value":
+
+			Attribute dateTimeAttribute = startElement.getAttributeByName(new QName("dateTimeUTC"));
+			if (dateTimeAttribute == null) {
+			    dateTimeAttribute = startElement.getAttributeByName(new QName("dateTime"));
+			}
+			if (dateTimeAttribute != null) {
+			    String date = dateTimeAttribute.getValue();
+			    String value = readValue(reader);
+			    BigDecimal v = null;
+			    if (nodataValue == null || !nodataValue.equals(value)) {
+				v = new BigDecimal(value);
+			    }
+			    Attribute qualityAttribute = startElement.getAttributeByName(new QName("qualityControlLevelCode"));
+			    String quality = null;
+			    if (qualityAttribute != null) {
+				quality = qualityAttribute.getValue();
+			    }
+
+			    Optional<Date> d = ISO8601DateTimeUtils.parseISO8601ToDate(date);
+			    try {
+				if (d.isPresent()) {
+
+				    DataRecord dataRecord = new DataRecord(d.get(), v, uom, observedProperty, latitudeLongitude,
+					    dataIdentifier);
+				    dataRecord.setQuality(quality);
+				    dataRecord.setSourceIdentifier(sourceId);
+				    cache.write(dataRecord);
+
+				}
+			    } catch (Exception e) {
+			    }
+
+			}
+			break;
+		    default:
+			break;
+		    }
+
+		}
+	    }
+
+	    reader.close();
+	    stream.close();
+
+	    file.delete();
+
+	} catch (Exception e) {
+	    throw new IllegalArgumentException(DataValidatorErrorCode.DECODING_ERROR.toString());
 	}
+
+    }
 }
