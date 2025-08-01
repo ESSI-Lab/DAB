@@ -130,6 +130,12 @@ public class HMFSClient {
 		HMFSStation station = new HMFSStation(json);
 		stationCache.put("" + station.getId(), station);
 	    }
+	    
+	    @Override
+	    public void notifyJSONArray(JSONArray object) {
+	    	
+	    	
+	    }
 
 	    @Override
 	    public void finished() {
@@ -164,6 +170,12 @@ public class HMFSClient {
 		    cachedSeries.add(series);
 		    seriesCache.put(stationCode, cachedSeries);
 		}
+		
+		@Override
+			public void notifyJSONArray(JSONArray object) {
+				
+				
+			}
 
 		@Override
 		public void finished() {
@@ -188,6 +200,12 @@ public class HMFSClient {
 		    cachedSeries.add(series);
 		    arealSeriesCache.put(stationCode, cachedSeries);
 		}
+		
+		@Override
+			public void notifyJSONArray(JSONArray object) {
+				
+				
+			}
 
 		@Override
 		public void finished() {

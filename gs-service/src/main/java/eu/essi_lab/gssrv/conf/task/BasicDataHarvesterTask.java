@@ -71,6 +71,10 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 		SOURCE_ID, THREADS_COUNT, MAX_RECORDS, VIEW_ID, TOKEN;
 	}
 
+	private static final int WAITING_BUFFER_SIZE = 20000;
+	
+	
+
 	@Override
 	public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
@@ -86,7 +90,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 			GSLoggerFactory.getLogger(getClass()).error("Issues initializing the data cache connector");
 			return;
 		}
-		dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, "10000");
+		dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, "10000"); // note: 100000 is too much, it returns 413
 		dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, "2000");
 		dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, "60");
 
@@ -280,7 +284,7 @@ int majorErrors = 0;
 						}
 
 						int bufferSize;
-						while ((bufferSize = dataCacheConnector.countRecordsInBuffer()) > 100000) {
+						while ((bufferSize = dataCacheConnector.countRecordsInBuffer()) > WAITING_BUFFER_SIZE) {
 							GSLoggerFactory.getLogger(getClass()).info("Waiting writing data, buffer size: {}",
 									bufferSize);
 

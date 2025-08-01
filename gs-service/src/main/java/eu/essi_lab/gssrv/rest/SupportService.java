@@ -45,6 +45,9 @@ import org.json.JSONObject;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.SourceCacheStats;
+import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.authorization.userfinder.UserFinder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler;
@@ -53,6 +56,7 @@ import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Profile;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Target;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.stats.ResponseItem;
@@ -173,16 +177,29 @@ public class SupportService {
 			}
 			jsonSource.put("datasetsInDatabase", dbCount);
 			SourceCacheStats sourceStats = stats.get(source.getUniqueIdentifier());
-			if (sourceStats!=null) {
+
+			try {
+				Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
+				SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
+				HarvestingProperties harvestingProperties = worker.getHarvestingProperties();
+				String lastHarvesting = harvestingProperties.getEndHarvestingTimestamp();
+				jsonSource.put("lastHarvesting", lastHarvesting);
+			} catch (Exception e) {
+				GSLoggerFactory.getLogger(getClass()).error(e);
+			}
+
+			if (sourceStats != null) {
 				Long cacheCount = sourceStats.getUniqueDatasetCount();
-				if (cacheCount==null) {
+				if (cacheCount == null) {
 					cacheCount = 0l;
 				}
 				jsonSource.put("datasetsInCache", cacheCount);
-				
-				if (cacheCount>0) {
-					jsonSource.put("oldestInsert", ISO8601DateTimeUtils.getISO8601DateTime(sourceStats.getOldestInsert()));
-					jsonSource.put("newestInsert", ISO8601DateTimeUtils.getISO8601DateTime(sourceStats.getNewestInsert()));
+
+				if (cacheCount > 0) {
+					jsonSource.put("oldestInsert",
+							ISO8601DateTimeUtils.getISO8601DateTime(sourceStats.getOldestInsert()));
+					jsonSource.put("newestInsert",
+							ISO8601DateTimeUtils.getISO8601DateTime(sourceStats.getNewestInsert()));
 					jsonSource.put("avgAgeHours", sourceStats.getAverageAgeHours());
 				}
 			}

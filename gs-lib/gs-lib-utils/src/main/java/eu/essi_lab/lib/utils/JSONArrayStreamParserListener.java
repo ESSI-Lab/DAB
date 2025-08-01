@@ -1,5 +1,7 @@
 package eu.essi_lab.lib.utils;
 
+import org.json.JSONArray;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -25,8 +27,10 @@ import org.json.JSONObject;
 
 public interface JSONArrayStreamParserListener {
 
-    public void finished();
+	public void finished();
 
-    public void notifyJSONObject(JSONObject object);
+	public void notifyJSONObject(JSONObject object);
+
+	public void notifyJSONArray(JSONArray object);
 
 }

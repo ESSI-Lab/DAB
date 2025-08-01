@@ -10,7 +10,7 @@
             max-width: 900px;
             margin: 40px auto;
         }
-        #chartContainer, #pieContainer, #tableContainer {
+        #chartContainer, #pieContainer, #tableContainer, #harvestingTableContainer {
             margin-top: 40px;
         }
         canvas {
@@ -34,12 +34,28 @@
 
 <h2>Metadata composition</h2>
 <p>This chart illustrates the distribution of datasets among different sources.</p>
+<p id="overallMetadata"></p>
 <div id="pieContainer">
     <canvas id="pieChart"></canvas>
 </div>
 
+<h2>Last Metadata Harvesting</h2>
+<p>The table below shows the date of the last harvesting per source, as recorded in the metadata database.</p>
+<div id="harvestingTableContainer">
+    <table id="harvestingTable">
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Last Harvesting Date</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
 <h2>Data cache composition</h2>
 <p>This bar chart shows the percentage of datasets currently available in the data cache, compared to the total available in the metadata database, grouped by data source.</p>
+<p id="overallCoverage"></p>
 <div id="chartContainer">
     <canvas id="cacheChart"></canvas>
 </div>
@@ -60,6 +76,8 @@
     </table>
 </div>
 
+
+
 <script>
     let cacheChart;
     let pieChart;
@@ -74,7 +92,16 @@
 
             const labels = sources.map(s => s.name);
             const data = sources.map(s => s.datasetsInDatabase > 0 ? (s.datasetsInCache / s.datasetsInDatabase) * 100 : 0);
-            const absoluteCounts = sources.map(s => `${s.datasetsInCache} of ${s.datasetsInDatabase}`);
+            const absoluteCounts = sources.map(s => `${s.datasetsInCache} of ${s.datasetsInDatabase}`);         
+            const totalDatasetsInDatabase = sources.reduce((sum, s) => sum + s.datasetsInDatabase, 0);
+            document.getElementById("overallMetadata").innerHTML  = "Number of datasets: <strong>"+totalDatasetsInDatabase+"</strong>";
+
+            const totalDatasetsInCache = sources.reduce(
+            		  (sum, s) => Number.isFinite(s.datasetsInCache) ? sum + s.datasetsInCache : sum,
+            		  0
+            		);            const cacheCoverage = totalDatasetsInDatabase > 0 ? (totalDatasetsInCache / totalDatasetsInDatabase) * 100 : 0;
+            document.getElementById("overallCoverage").innerHTML  = "Overall cache coverage: <strong>"+cacheCoverage.toFixed(2)+"%</strong>";
+
             const pieData = sources.map(s => s.datasetsInDatabase);
             const pieColors = labels.map((_, i) => `hsl(${i * 360 / labels.length}, 70%, 60%)`);
 
@@ -171,6 +198,19 @@
                     <td>${isNaN(avgAge) ? '-' : avgAge}</td>
                 `;
                 tableBody.appendChild(tr);
+            });
+
+            // TABLE: Last Harvesting
+            const harvestingBody = document.querySelector('#harvestingTable tbody');
+            sources.forEach(source => {
+                const tr = document.createElement('tr');
+                const lastHarvest = new Date(source.lastHarvesting);
+
+                tr.innerHTML = `
+                    <td>${source.name}</td>
+                    <td>${isNaN(lastHarvest) ? '-' : lastHarvest.toISOString().split('T')[0]}</td>
+                `;
+                harvestingBody.appendChild(tr);
             });
         })
         .catch(error => {
