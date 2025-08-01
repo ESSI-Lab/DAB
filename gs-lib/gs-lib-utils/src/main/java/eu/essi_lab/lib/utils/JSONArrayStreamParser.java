@@ -48,7 +48,8 @@ public class JSONArrayStreamParser {
 
     public static void main(String[] args) throws Exception {
 
-	String jsonString = "[\n" + "    {\"name\": {\"name\": {\"first\": \"Bob\", \"last\": [\"Smith\",[]]}, \"age\": 25}},{ \"age\": [23, 39]},\n"
+	String jsonString = "[\n"
+		+ "    {\"name\": {\"name\": {\"first\": \"Bob\", \"last\": [\"Smith\",[]]}, \"age\": 25}},{ \"age\": [23, 39]},\n"
 		+ "    {\"name\": {\"first\": \"Bob\", \"last\": [\"Smith\",[]]}, \"age\": 25},\n"
 		+ "    {\"name\": \"Charlie\", \"age\": 40}\n" + "]";
 
@@ -73,6 +74,24 @@ public class JSONArrayStreamParser {
 	};
 	parser.parse(bis, listener);
 
+    }
+
+    public JSONObject parseFirstObject(InputStream inputStream) throws IOException {
+	JsonFactory jsonFactory = new JsonFactory();
+	JsonParser jsonParser = jsonFactory.createParser(inputStream);
+
+	if (jsonParser.nextToken() != JsonToken.START_ARRAY) {
+	    throw new IOException("Expected JSON array");
+	}
+
+	while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
+	    if (jsonParser.getCurrentToken() == JsonToken.START_OBJECT) {
+		String jsonObjectString = extractJsonObjectAsString(jsonParser);
+		return new JSONObject(jsonObjectString);
+	    }
+	}
+
+	throw new IOException("No JSON object found in array");
     }
 
     public void parse(InputStream bis, JSONArrayStreamParserListener listener) throws Exception {
