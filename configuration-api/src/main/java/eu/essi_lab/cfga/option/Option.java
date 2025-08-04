@@ -410,23 +410,23 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     /**
-     * Default: true
+     * Default: false
      * 
      * @return
      */
     public boolean isMultiValue() {
 
-	return isPropertySet("multiValue", true);
+	return isPropertySet("multiValue", false);
     }
 
     /**
      * Default: false
      * 
-     * @param required
+     * @param multiValue
      */
     public void setMultiValue(boolean multiValue) {
 
-	setProperty("multiValue", multiValue, true);
+	setProperty("multiValue", multiValue, false);
     }
 
     /**
