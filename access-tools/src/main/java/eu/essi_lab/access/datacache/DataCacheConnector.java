@@ -1,5 +1,7 @@
 package eu.essi_lab.access.datacache;
 
+import java.io.IOException;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -25,6 +27,7 @@ import java.net.URL;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
 
@@ -50,17 +53,15 @@ public abstract class DataCacheConnector {
      */
     public abstract void configure(String key, String value);
 
-    public abstract void write(DataRecord record);
+    public abstract void write(DataRecord record) throws IOException;
 
-    public void write(List<DataRecord> records) {
+    public void write(List<DataRecord> records) throws IOException {
 	for (DataRecord record : records) {
 	    if (record != null) {
 		write(record);
 	    }
 	}
     }
-
-    public abstract void waitForFlush();
 
     /**
      * Releases resources
@@ -98,6 +99,8 @@ public abstract class DataCacheConnector {
      * @throws Exception
      */
     public abstract Long count() throws Exception;
+    
+	public abstract Map<String, SourceCacheStats> getCacheStatsPerSource(List<String> selectedSourceIds) throws IOException;
 
     public abstract Date getFirstDate(String dataIdentifier) throws Exception;
 
@@ -239,6 +242,8 @@ public abstract class DataCacheConnector {
 
     public abstract void writeStation(StationRecord record) throws Exception;
 
-    protected abstract void clearStations() throws Exception;
+    public abstract void clearStations() throws Exception;
+
+    public abstract int countRecordsInDataBuffer();
 
 }

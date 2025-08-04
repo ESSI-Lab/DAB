@@ -298,4 +298,55 @@ public class JSONDinaguaClient extends DinaguaClient {
 	    }
 	}
     }
+    
+    @Override
+    protected void retrieveStatusStations() throws Exception {
+
+	if (statusStations.size() == 0) {
+
+	    String response = downloadString(getEndpoint() + "/estadohidro/estaciones").get();
+
+	    JSONArray stationsArray = new JSONArray(response);
+
+	    for (int i = 0; i < stationsArray.length(); i++) {
+
+		JSONObject jsonStation = (JSONObject) stationsArray.get(i);
+
+		//
+		// MISSING
+		//
+
+		// String xCoordinate = jsonStation.get("coordenada_x").toString();
+		// String yCoordinate = jsonStation.get("coordenada_y").toString();
+		// String river = jsonStation.get("curso_observado").toString();
+		// String details = jsonStation.get("observaciones").toString();
+		// String regime = jsonStation.get("regimen").toString();
+
+		//
+		// CHANGED
+		//
+
+		// String basinArea = jsonStation.get("area_cuenca").toString();
+		// String id = jsonStation.get("id").toString();
+		// String departmentId = jsonStation.get("id_departamento").toString();
+		// String name = jsonStation.get("nombre").toString();
+
+		//
+		// NEW
+		//
+
+		// "fecha_inicio": "1989-01-12",
+		// "entidad": "Servicio hidrológico",
+		// "pais": "Uruguay",
+		// "tipo": "Auxiliar",
+		// "var_corto": "H, Q",
+		// "variables": "Nivel, Caudal",
+		// "zona_horaria": "GMT-3"
+
+		DinaguaStation station = new DinaguaStation(jsonStation);
+
+		statusStations.put(station.getId(), station);
+	    }
+	}
+    }
 }

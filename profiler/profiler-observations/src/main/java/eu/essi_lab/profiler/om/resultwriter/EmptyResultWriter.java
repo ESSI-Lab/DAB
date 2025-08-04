@@ -1,6 +1,4 @@
-package eu.essi_lab.lib.utils;
-
-import org.json.JSONArray;
+package eu.essi_lab.profiler.om.resultwriter;
 
 /*-
  * #%L
@@ -23,14 +21,25 @@ import org.json.JSONArray;
  * #L%
  */
 
-import org.json.JSONObject;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
+import java.util.List;
 
-public interface JSONArrayStreamParserListener {
+import eu.essi_lab.profiler.om.JSONObservation;
 
-	public void finished();
+public class EmptyResultWriter extends ResultWriter {
 
-	public void notifyJSONObject(JSONObject object);
+	public EmptyResultWriter(OutputStreamWriter writer) {
+		super(writer);
+		// TODO Auto-generated constructor stub
+	}
 
-	public void notifyJSONArray(JSONArray object);
+	@Override
+	public void writeDataContent(String date, BigDecimal v, String quality, JSONObservation observation, List<Double> coord)
+			throws IOException {
+		// TODO Auto-generated method stub
+
+	}
 
 }

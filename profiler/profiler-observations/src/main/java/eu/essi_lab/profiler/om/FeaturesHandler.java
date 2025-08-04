@@ -38,112 +38,55 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
+import eu.essi_lab.profiler.om.resultwriter.JSONFeatureResultWriter;
+import eu.essi_lab.profiler.om.resultwriter.JSONObservationResultWriter;
+import eu.essi_lab.profiler.om.resultwriter.ResultWriter;
 
 public class FeaturesHandler extends OMHandler {
 
-    private DatabaseExecutor executor;
+	private DatabaseExecutor executor;
 
-    public FeaturesHandler()  {
-	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
-	try {
-	    this.executor = DatabaseProviderFactory.getExecutor(uri);
-	} catch (GSException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
-    }
-
-    @Override
-    public ValidationMessage validate(WebRequest request) throws GSException {
-	ValidationMessage ret = new ValidationMessage();
-	ret.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
-	return ret;
-    }
-
-    public DiscoveryRequestTransformer getTransformer() {
-	return new FeaturesTransformer();
-    }
-
-    protected void addIdentifier(OutputStreamWriter writer) throws IOException {
-
-    }
-
-    protected ResultSet<String> exec(DiscoveryMessage message) throws GSException {
-	try {
-	    return executor.discoverDistinctStrings(message);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    throw GSException.createException();
+	public FeaturesHandler() {
+		StorageInfo uri = ConfigurationWrapper.getStorageInfo();
+		try {
+			this.executor = DatabaseProviderFactory.getExecutor(uri);
+		} catch (GSException e) {
+			e.printStackTrace();
+		}
 	}
 
-    }
+	@Override
+	public ValidationMessage validate(WebRequest request) throws GSException {
+		ValidationMessage ret = new ValidationMessage();
+		ret.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
+		return ret;
+	}
 
-    protected String getSetName() {
-	return "results";
-    }
+	public DiscoveryRequestTransformer getTransformer() {
+		return new FeaturesTransformer();
+	}
 
-    
-    public void writeJSONHeader(OutputStreamWriter writer, JSONObject feature) throws IOException {
+	protected void addIdentifier(OutputStreamWriter writer) throws IOException {
+
+	}
+
+	protected ResultSet<String> exec(DiscoveryMessage message) throws GSException {
+		try {
+			return executor.discoverDistinctStrings(message);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw GSException.createException();
+		}
+
+	}
 
 	
-	JSONObject monitoringPoint = feature.getJSONObject("featureOfInterest");
-	monitoringPoint.remove("type");
-
-	String geometryName = getGeometryName();
-	if (monitoringPoint.has(geometryName)) {
-	    JSONObject shape = monitoringPoint.getJSONObject(geometryName);
-	    monitoringPoint.put(getGeometryName(), shape);
+	public ResultWriter getJSONResultWriter(OutputStreamWriter writer, String viewId, boolean expandFeatures) {
+		return new JSONFeatureResultWriter(writer, viewId);
 	}
 
-
-   	writer.write("{\n");
-
-   	Iterator<String> keys = monitoringPoint.keys();
-   	boolean first = true;
-   	while (keys.hasNext()) {
-   	    String key = keys.next();
-   	    if (key.equals("result")) {
-   		// Stop before writing the array
-   		continue;
-   	    }
-   	    if (!first) {
-   		writer.write(",\n");
-   	    }
-   	    first = false;
-   	    writer.write(JSONObject.quote(key));
-   	    writer.write(": ");
-   	    Object optObj = monitoringPoint.opt(key);
-   	    if (optObj != null) {
-   		if (optObj instanceof String) {
-
-   		    writer.write(JSONObject.quote(monitoringPoint.get(key).toString()));
-
-   		} else {
-   		    writer.write(monitoringPoint.get(key).toString());
-
-   		}
-   	    }
-   	}
-   	
-
-
-
-       }
-    
-    public void writeJSONFooter(OutputStreamWriter writer) throws IOException {
-
-	// for the footer
-	writer.write("}\n");
-	
-
-    }
-
-    protected boolean getDistinctStations() {
-	return true;
-    }
-
-    public String getObject() {
-	return "feature";
-    }
+	protected boolean getDistinctStations() {
+		return true;
+	}
 
 }

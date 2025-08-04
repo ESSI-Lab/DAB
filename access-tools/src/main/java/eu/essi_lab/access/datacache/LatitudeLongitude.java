@@ -1,6 +1,4 @@
-package eu.essi_lab.lib.utils;
-
-import org.json.JSONArray;
+package eu.essi_lab.access.datacache;
 
 /*-
  * #%L
@@ -23,14 +21,35 @@ import org.json.JSONArray;
  * #L%
  */
 
-import org.json.JSONObject;
+import java.math.BigDecimal;
 
-public interface JSONArrayStreamParserListener {
+public class LatitudeLongitude {
+    private BigDecimal latitude;
+    private BigDecimal longitude;
 
-	public void finished();
+    public LatitudeLongitude() {
+    }
+    
+    public LatitudeLongitude(BigDecimal latitude, BigDecimal longitude) {
+	this.latitude = latitude;
+	this.longitude = longitude;
+    }
 
-	public void notifyJSONObject(JSONObject object);
+    public BigDecimal getLatitude() {
+	return latitude;
+    }
 
-	public void notifyJSONArray(JSONArray object);
+    public void setLatitude(BigDecimal latitude) {
+	this.latitude = latitude;
+    }
+
+    public BigDecimal getLongitude() {
+	return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+	this.longitude = longitude;
+    }
+
 
 }

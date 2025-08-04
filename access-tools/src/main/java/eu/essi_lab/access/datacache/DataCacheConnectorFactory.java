@@ -26,7 +26,9 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 public class DataCacheConnectorFactory {
@@ -119,4 +121,17 @@ public class DataCacheConnectorFactory {
     public static DataCacheConnector getDataCacheConnector() {
 	return dataCacheConnector;
     }
+
+	public static DataCacheConnector newDefaultDataCacheConnector() throws Exception {
+		DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
+		DataCacheConnector tmpDataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
+		String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
+		String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
+		String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
+		tmpDataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
+		tmpDataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
+		tmpDataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
+		DataCacheConnectorFactory.setDataCacheConnector(tmpDataCacheConnector);
+		return tmpDataCacheConnector;
+	}
 }

@@ -1,6 +1,4 @@
-package eu.essi_lab.lib.utils;
-
-import org.json.JSONArray;
+package eu.essi_lab.access.datacache.opensearch;
 
 /*-
  * #%L
@@ -23,14 +21,8 @@ import org.json.JSONArray;
  * #L%
  */
 
-import org.json.JSONObject;
+import org.opensearch.client.opensearch.core.bulk.BulkOperation;
 
-public interface JSONArrayStreamParserListener {
-
-	public void finished();
-
-	public void notifyJSONObject(JSONObject object);
-
-	public void notifyJSONArray(JSONArray object);
-
+public interface OperationCreator {
+    public BulkOperation createOperation(Object object);
 }

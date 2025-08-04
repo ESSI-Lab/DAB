@@ -42,7 +42,7 @@ public class DataRecord {
     //
     private String uom;
     private String observedProperty;
-    private SimpleEntry<BigDecimal, BigDecimal> latitudeLongitude;
+    private LatitudeLongitude latitudeLongitude;
 
     private Date timestamp; // the time the record was inserted in the cache
     private Date nextRecordExpectedTime; // the time next record is expected to be available
@@ -63,7 +63,7 @@ public class DataRecord {
     private String status;
 
     public DataRecord(Date date, BigDecimal value, String uom, String observedProperty,
-	    SimpleEntry<BigDecimal, BigDecimal> latitudeLongitude, String dataIdentifier) {
+	    LatitudeLongitude latitudeLongitude, String dataIdentifier) {
 	this();
 	this.date = date;
 	this.value = value;
@@ -125,11 +125,11 @@ public class DataRecord {
 	this.observedProperty = observedProperty;
     }
 
-    public SimpleEntry<BigDecimal, BigDecimal> getLatitudeLongitude() {
+    public LatitudeLongitude getLatitudeLongitude() {
 	return latitudeLongitude;
     }
 
-    public void setLatitudeLongitude(SimpleEntry<BigDecimal, BigDecimal> latitudeLongitude) {
+    public void setLatitudeLongitude(LatitudeLongitude latitudeLongitude) {
 	this.latitudeLongitude = latitudeLongitude;
     }
 
@@ -205,7 +205,7 @@ public class DataRecord {
 	this.status = status;
     }
 
-    public boolean isActive() {
+    public Boolean isActive() {
 	return active;
     }
 

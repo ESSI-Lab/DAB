@@ -100,7 +100,8 @@ public class GSSourceSetting extends Setting {
 	    Option<String> option = StringOptionBuilder.get().//
 		    withKey(DEPLOYMENT_OPTION_KEY).//
 		    withLabel("Source deployment").//
-		    required().//
+		    optional().//
+		    multiValue().//
 		    cannotBeDisabled().//
 		    build();
 

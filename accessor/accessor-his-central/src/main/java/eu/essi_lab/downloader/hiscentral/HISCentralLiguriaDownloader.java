@@ -42,6 +42,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.ObjectFactory;
 import org.cuahsi.waterml._1.ValueSingleVariable;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
@@ -271,6 +272,12 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 			GSLoggerFactory.getLogger(getClass()).info("Completed download for station code: " + code + ".");
 
 			// finished = true;
+		    }
+
+		    @Override
+		    public void notifyJSONArray(JSONArray object) {
+			// TODO Auto-generated method stub
+			
 		    }
 		});
 

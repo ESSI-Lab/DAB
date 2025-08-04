@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dataset Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+        #chartContainer, #pieContainer, #tableContainer, #harvestingTableContainer {
+            margin-top: 40px;
+        }
+        canvas {
+            width: 100% !important;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Metadata composition</h2>
+<p>This chart illustrates the distribution of datasets among different sources.</p>
+<p id="overallMetadata"></p>
+<div id="pieContainer">
+    <canvas id="pieChart"></canvas>
+</div>
+
+<h2>Last Metadata Harvesting</h2>
+<p>The table below shows the date of the last harvesting per source, as recorded in the metadata database.</p>
+<div id="harvestingTableContainer">
+    <table id="harvestingTable">
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Last Harvesting Date</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<h2>Data cache composition</h2>
+<p>This chart illustrates the distribution of values in the cache among different sources.</p>
+<p id="overallData"></p>
+
+<div id="cachePieContainer">
+    <canvas id="cachePieChart"></canvas>
+</div>
+<p>This bar chart shows the percentage of datasets currently available in the data cache, compared to the total available in the metadata database, grouped by data source.</p>
+<p id="overallCoverage"></p>
+<div id="chartContainer">
+    <canvas id="cacheChart"></canvas>
+</div>
+
+<h2>Data cache Insertion Time Statistics</h2>
+<p>The table below summarizes the freshness of cached datasets per source, reporting the oldest and newest insertion dates and the average age in hours.</p>
+<div id="tableContainer">
+    <table id="timestampTable">
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Oldest Insert</th>
+                <th>Newest Insert</th>
+                <th>Average Age (hours)</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+
+
+<script>
+    let cacheChart;
+    let pieChart;
+    let cachePieChart;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewId = urlParams.get('viewId') || 'default-view-id';
+
+    fetch(`/gs-service/services/support/data-stats?view=${encodeURIComponent(viewId)}`)
+        .then(res => res.json())
+        .then(response => {
+            const sources = response.sources.sort((a, b) => a.name.localeCompare(b.name));
+
+            const labels = sources.map(s => s.name);
+            const data = sources.map(s => s.datasetsInDatabase > 0 ? (s.datasetsInCache / s.datasetsInDatabase) * 100 : 0);
+            const absoluteCounts = sources.map(s => `${s.datasetsInCache} of ${s.datasetsInDatabase}`);         
+            const totalDatasetsInDatabase = sources.reduce((sum, s) => sum + s.datasetsInDatabase, 0);
+            const totalValuesInCache = sources.reduce(
+            		  (sum, s) => sum + (typeof s.valuesInCache === 'number' ? s.valuesInCache : 0),
+            		  0
+            		);
+            document.getElementById("overallMetadata").innerHTML  = "Number of datasets: <strong>"+totalDatasetsInDatabase+"</strong>";
+            document.getElementById("overallData").innerHTML  = "Number of data values in the cache: <strong>"+totalValuesInCache+"</strong>";
+
+            const totalDatasetsInCache = sources.reduce(
+            		  (sum, s) => Number.isFinite(s.datasetsInCache) ? sum + s.datasetsInCache : sum,
+            		  0
+            		);            const cacheCoverage = totalDatasetsInDatabase > 0 ? (totalDatasetsInCache / totalDatasetsInDatabase) * 100 : 0;
+            document.getElementById("overallCoverage").innerHTML  = "Overall data cache coverage: <strong>"+cacheCoverage.toFixed(2)+"%</strong>";
+
+            const pieData = sources.map(s => s.datasetsInDatabase);
+            const cachePieData = sources.map(s => s.valuesInCache);
+
+            const pieColors = labels.map((_, i) => `hsl(${i * 360 / labels.length}, 70%, 60%)`);
+
+            const canvas = document.getElementById('cacheChart');
+            const rowHeight = 40;
+            const padding = 50;
+            canvas.height = sources.length * rowHeight + padding;
+
+            const ctx = canvas.getContext('2d');
+            if (cacheChart) cacheChart.destroy();
+
+            cacheChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '% Datasets in Cache',
+                        data: data,
+                        backgroundColor: pieColors,
+                        borderColor: pieColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: value => `${value}%`
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const index = ctx.dataIndex;
+                                    const percent = ctx.parsed.x.toFixed(2);
+                                    const absolute = absoluteCounts[index];
+                                    return `${percent}% (${absolute})`;
+                                }
+                            }
+                        },
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // PIE CHART
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            if (pieChart) pieChart.destroy();
+
+            pieChart = new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: pieData,
+                        backgroundColor: pieColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.label}: ${ctx.parsed}`
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // PIE CHART
+            const cachePieCtx = document.getElementById('cachePieChart').getContext('2d');
+            if (cachePieChart) cachePieChart.destroy();
+
+            cachePieChart = new Chart(cachePieCtx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: cachePieData,
+                        backgroundColor: pieColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.label}: ${ctx.parsed}`
+                            }
+                        }
+                    }
+                }
+            });
+
+            // TABLE: Insertion Times
+            const tableBody = document.querySelector('#timestampTable tbody');
+            sources.forEach(source => {
+                const tr = document.createElement('tr');
+                const oldest = new Date(source.oldestInsert);
+                const newest = new Date(source.newestInsert);
+                const avgAge = Math.round(source.avgAgeHours);
+
+                tr.innerHTML = `
+                    <td>${source.name}</td>
+                    <td>${isNaN(oldest) ? '-' : oldest.toISOString().split('T')[0]}</td>
+                    <td>${isNaN(newest) ? '-' : newest.toISOString().split('T')[0]}</td>
+                    <td>${isNaN(avgAge) ? '-' : avgAge}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // TABLE: Last Harvesting
+            const harvestingBody = document.querySelector('#harvestingTable tbody');
+            sources.forEach(source => {
+                const tr = document.createElement('tr');
+                const lastHarvest = new Date(source.lastHarvesting);
+
+                tr.innerHTML = `
+                    <td>${source.name}</td>
+                    <td>${isNaN(lastHarvest) ? '-' : lastHarvest.toISOString().split('T')[0]}</td>
+                `;
+                harvestingBody.appendChild(tr);
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching cache status:", error);
+            alert("Failed to load cache data.");
+        });
+</script>
+
+</body>
+</html>

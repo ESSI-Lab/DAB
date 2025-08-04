@@ -143,6 +143,7 @@ function initializeLogin(config) {
 			<button id="statusBtn" class="menu-button">Status of bulk downloads</button>\n`;
 		if (isAdmin) {
 			menuHtml += `<button id="listUsersBtn" class="menu-button">Manage Users</button>\n`;
+			menuHtml += `<button id="dataReportBtn" class="menu-button">Data report</button>\n`;
 		}
 		menuHtml += `<button id="logoutMenuBtn" class="menu-button">Logout</button>`;
 		userMenu.innerHTML = menuHtml;

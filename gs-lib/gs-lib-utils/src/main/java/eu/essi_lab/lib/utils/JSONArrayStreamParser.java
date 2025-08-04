@@ -28,6 +28,7 @@ import java.io.StringWriter;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -36,11 +37,10 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 /**
- * This class is useful to stream parse arrays of JSON objects such as "[\n" +
- * " {\"name\": \"Alice\", \"age\": [23, 39]},\n" +
- * " {\"name\": {\"first\": \"Bob\", \"last\": [\"Smith\",[]]}, \"age\": 25},\n" +
- * " {\"name\": \"Charlie\", \"age\": 40}\n" +
- * "]"
+ * This class is useful to stream parse arrays of JSON objects such as "[\n" + "
+ * {\"name\": \"Alice\", \"age\": [23, 39]},\n" + " {\"name\": {\"first\":
+ * \"Bob\", \"last\": [\"Smith\",[]]}, \"age\": 25},\n" + " {\"name\":
+ * \"Charlie\", \"age\": 40}\n" + "]"
  * 
  * @author boldrini
  */
@@ -71,12 +71,17 @@ public class JSONArrayStreamParser {
 
 	    }
 
+	    @Override
+	    public void notifyJSONArray(JSONArray object) {
+
+	    }
+
 	};
 	parser.parse(bis, listener);
 
     }
 
-    public JSONObject parseFirstObject(InputStream inputStream) throws IOException {
+    private JSONObject parseFirstObject(InputStream inputStream) throws IOException {
 	JsonFactory jsonFactory = new JsonFactory();
 	JsonParser jsonParser = jsonFactory.createParser(inputStream);
 
@@ -98,18 +103,30 @@ public class JSONArrayStreamParser {
 	JsonFactory jsonFactory = new JsonFactory();
 	JsonParser jsonParser = jsonFactory.createParser(bis);
 
+	// Move to the outer START_ARRAY
+	if (jsonParser.nextToken() != JsonToken.START_ARRAY) {
+	    throw new IOException("Expected START_ARRAY");
+	}
+
+	// Read each element inside the array
 	while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
-	    // Check if the token is the start of an object
-	    if (jsonParser.getCurrentToken() == JsonToken.START_OBJECT) {
-		// Extract the JSON object as a string and process it
+	    JsonToken currentToken = jsonParser.getCurrentToken();
+	    if (currentToken == JsonToken.START_OBJECT) {
 		String jsonObjectString = extractJsonObjectAsString(jsonParser);
 		JSONObject json = new JSONObject(jsonObjectString);
 		listener.notifyJSONObject(json);
+	    } else if (currentToken == JsonToken.START_ARRAY) {
+		String jsonArrayString = extractJsonArrayAsString(jsonParser);
+		JSONArray array = new JSONArray(jsonArrayString);
+		listener.notifyJSONArray(array);
+	    } else {
+		// handle primitives if needed (e.g., numbers, strings in array)
+		// skip or wrap as JSONArray if required
 	    }
 	}
+
 	listener.finished();
 	jsonParser.close();
-
     }
 
     private static String extractJsonObjectAsString(JsonParser jsonParser) throws IOException {
@@ -150,4 +167,41 @@ public class JSONArrayStreamParser {
 
 	return stringWriter.toString();
     }
+
+    private static String extractJsonArrayAsString(JsonParser jsonParser) throws IOException {
+	StringWriter stringWriter = new StringWriter();
+	JsonGenerator jsonGenerator = new JsonFactory().createGenerator(stringWriter);
+
+	int depth = 0;
+	JsonToken token = jsonParser.getCurrentToken();
+
+	if (token != JsonToken.START_ARRAY) {
+	    throw new IOException("Expected START_ARRAY but found: " + token);
+	}
+
+	// Start copying events
+	do {
+	    if (token == JsonToken.START_ARRAY || token == JsonToken.START_OBJECT) {
+		depth++;
+	    } else if (token == JsonToken.END_ARRAY || token == JsonToken.END_OBJECT) {
+		depth--;
+	    }
+
+	    jsonGenerator.copyCurrentEvent(jsonParser);
+
+	    if (depth == 0) {
+		break; // we’ve reached the end of this array
+	    }
+
+	    token = jsonParser.nextToken();
+	    if (token == null) {
+		throw new IOException("Unexpected end of JSON while parsing array");
+	    }
+
+	} while (true);
+
+	jsonGenerator.flush();
+	return stringWriter.toString();
+    }
+
 }

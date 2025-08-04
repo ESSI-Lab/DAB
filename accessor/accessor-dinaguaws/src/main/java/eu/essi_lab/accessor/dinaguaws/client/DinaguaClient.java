@@ -56,6 +56,11 @@ public abstract class DinaguaClient {
     static {
 	stations.setDuration(TimeUnit.DAYS.toMillis(1));
     }
+    
+    protected static ExpiringCache<DinaguaStation> statusStations = new ExpiringCache<>();
+    static {
+	statusStations.setDuration(TimeUnit.DAYS.toMillis(1));
+    }
 
     public InterpolationType[] interpolations = new InterpolationType[] { InterpolationType.CONTINUOUS, InterpolationType.AVERAGE,
 	    InterpolationType.MAX, InterpolationType.MIN };
@@ -149,6 +154,16 @@ public abstract class DinaguaClient {
 	}
 	return ret;
     }
+    
+    public Set<DinaguaStation> getStatusStations() throws Exception {
+	retrieveStatusStations();
+	Set<Entry<String, DinaguaStation>> entries = statusStations.entrySet();
+	Set<DinaguaStation> ret = new HashSet<DinaguaStation>();
+	for (Entry<String, DinaguaStation> entry : entries) {
+	    ret.add(entry.getValue());
+	}
+	return ret;
+    }
 
     /**
      * @param stationId
@@ -164,5 +179,8 @@ public abstract class DinaguaClient {
      * @throws Exception
      */
     protected abstract void retrieveStations() throws Exception;
+    
+    protected abstract void retrieveStatusStations() throws Exception;
+
 
 }

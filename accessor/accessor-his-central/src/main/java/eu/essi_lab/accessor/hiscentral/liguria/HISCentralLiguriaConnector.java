@@ -264,6 +264,12 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 			    public void finished() {
 				map.put(code, vars2);
 			    }
+
+			    @Override
+			    public void notifyJSONArray(JSONArray object) {
+				// TODO Auto-generated method stub
+				
+			    }
 			});
 
 			Set<String> toAdd = map.get(code);

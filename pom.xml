@@ -14,9 +14,9 @@
 	<url>https://github.com/ESSI-Lab/DAB</url>
 
 	<scm>
-	  <connection>scm:git:git://github.com/ESSI-Lab/DAB.git</connection>
-	  <url>https://github.com/ESSI-Lab/DAB</url>
-	  <tag>HEAD</tag>
+		<connection>scm:git:git://github.com/ESSI-Lab/DAB.git</connection>
+		<url>https://github.com/ESSI-Lab/DAB</url>
+		<tag>HEAD</tag>
 	</scm>
 
 	<organization>
@@ -384,7 +384,6 @@
 	<dependencyManagement>
 		<dependencies>
 
-		
 
 			<dependency>
 				<groupId>org.apache.parquet</groupId>
@@ -779,35 +778,35 @@
 			</dependency>
 
 			<dependency>
-			  <groupId>org.apache.jena</groupId>
-			  <artifactId>jena-fuseki-servlet</artifactId>
-							<version>${org.apache.jena.version}</version>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-fuseki-servlet</artifactId>
+				<version>${org.apache.jena.version}</version>
 			</dependency>
-			
-			<dependency>
-			  <groupId>org.apache.jena</groupId>
-			  <artifactId>jena-fuseki-war</artifactId>
-			  <version>${org.apache.jena.version}</version>
-			</dependency>
-			
-			<dependency>
-			  <groupId>org.apache.jena</groupId>
-			  <artifactId>apache-jena-libs</artifactId>
-							<version>${org.apache.jena.version}</version>
-			  <type>pom</type>
-			</dependency>
-			
-			<dependency>
-  <groupId>org.apache.jena</groupId>
-  <artifactId>jena-fuseki-main</artifactId>
-  				<version>${org.apache.jena.version}</version>
-</dependency>
 
-<dependency>
-    <groupId>org.apache.jena</groupId>
-    <artifactId>jena-fuseki-server</artifactId>
-  				<version>${org.apache.jena.version}</version>
-</dependency>
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-fuseki-war</artifactId>
+				<version>${org.apache.jena.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>apache-jena-libs</artifactId>
+				<version>${org.apache.jena.version}</version>
+				<type>pom</type>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-fuseki-main</artifactId>
+				<version>${org.apache.jena.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-fuseki-server</artifactId>
+				<version>${org.apache.jena.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.apache.jena</groupId>
@@ -1042,6 +1041,17 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+ 		    <artifactId>jackson-databind</artifactId>
+			<version>${jackson-core.version}</version>
+		</dependency>
+		<dependency>
+  <groupId>com.fasterxml.jackson.core</groupId>
+  <artifactId>jackson-annotations</artifactId>
+			<version>${jackson-core.version}</version>
+</dependency>
+
+		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
 		</dependency>
@@ -1129,10 +1139,10 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-			      <groupId>org.codehaus.mojo</groupId>
-			      <artifactId>buildnumber-maven-plugin</artifactId>
-			      <version>3.0.0</version>
-			    </plugin>				
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>buildnumber-maven-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
 				<plugin>
 					<groupId>org.corpus-tools</groupId>
 					<artifactId>cff-maven-plugin</artifactId>

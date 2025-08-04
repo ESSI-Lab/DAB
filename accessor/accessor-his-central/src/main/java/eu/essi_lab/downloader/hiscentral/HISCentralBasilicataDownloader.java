@@ -22,6 +22,8 @@ package eu.essi_lab.downloader.hiscentral;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
@@ -36,15 +38,13 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
@@ -56,8 +56,9 @@ import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.JSONArrayStreamParser;
+import eu.essi_lab.lib.utils.JSONArrayStreamParserListener;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -80,353 +81,360 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
 public class HISCentralBasilicataDownloader extends WMLDataDownloader {
 
-    private static final String HISCENTRAL_BASILICATA_DOWNLOAD_ERROR = "HISCENTRAL_BASILICATA_DOWNLOAD_ERROR";
+	private static final String HISCENTRAL_BASILICATA_DOWNLOAD_ERROR = "HISCENTRAL_BASILICATA_DOWNLOAD_ERROR";
 
-    public static final String MISSING_VALUE = "-9999.0";
+	public static final String MISSING_VALUE = "-9999.0";
 
-    private HISCentralBasilicataConnector connector;
-    private Downloader downloader;
+	private HISCentralBasilicataConnector connector;
+	private Downloader downloader;
 
-    /**
-     * 
-     */
-    public HISCentralBasilicataDownloader() {
+	/**
+	 * 
+	 */
+	public HISCentralBasilicataDownloader() {
 
-	connector = new HISCentralBasilicataConnector();
-	downloader = new Downloader();
-    }
-
-    @Override
-    public List<DataDescriptor> getRemoteDescriptors() throws GSException {
-
-	List<DataDescriptor> ret = new ArrayList<>();
-
-	DataDescriptor descriptor = new DataDescriptor();
-	descriptor.setDataType(DataType.TIME_SERIES);
-	descriptor.setDataFormat(DataFormat.WATERML_1_1());
-	descriptor.setCRS(CRS.EPSG_4326());
-
-	//
-	// spatial extent
-	//
-	GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
-
-	Double lat = bbox.getNorth();
-	Double lon = bbox.getEast();
-
-	descriptor.setEPSG4326SpatialDimensions(lat, lon);
-	descriptor.getFirstSpatialDimension().getContinueDimension().setSize(1l);
-	descriptor.getSecondSpatialDimension().getContinueDimension().setSize(1l);
-	descriptor.getFirstSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
-	descriptor.getFirstSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
-	descriptor.getSecondSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
-	descriptor.getSecondSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
-
-	//
-	// temp extent
-	//
-	TemporalExtent extent = resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent();
-
-	String startDate = extent.getBeginPosition();
-	String endDate = extent.getEndPosition();
-
-	if (extent.isEndPositionIndeterminate()) {
-	    endDate = ISO8601DateTimeUtils.getISO8601DateTime();
+		connector = new HISCentralBasilicataConnector();
+		downloader = new Downloader();
 	}
 
-	Optional<Date> optionalBegin = ISO8601DateTimeUtils.parseISO8601ToDate(startDate);
-	Optional<Date> optionalEnd = ISO8601DateTimeUtils.parseISO8601ToDate(endDate);
+	@Override
+	public List<DataDescriptor> getRemoteDescriptors() throws GSException {
 
-	if (optionalBegin.isPresent() && optionalEnd.isPresent()) {
+		List<DataDescriptor> ret = new ArrayList<>();
 
-	    Date begin = optionalBegin.get();
-	    Date end = optionalEnd.get();
+		DataDescriptor descriptor = new DataDescriptor();
+		descriptor.setDataType(DataType.TIME_SERIES);
+		descriptor.setDataFormat(DataFormat.WATERML_1_1());
+		descriptor.setCRS(CRS.EPSG_4326());
 
-	    descriptor.setTemporalDimension(begin, end);
+		//
+		// spatial extent
+		//
+		GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
 
-	    DataDimension temporalDimension = descriptor.getTemporalDimension();
-	    Long oneDayInMilliseconds = 1000 * 60 * 60 * 24l;
+		Double lat = bbox.getNorth();
+		Double lon = bbox.getEast();
 
-	    temporalDimension.getContinueDimension().setLowerTolerance(oneDayInMilliseconds);
-	    temporalDimension.getContinueDimension().setUpperTolerance(oneDayInMilliseconds);
-	}
+		descriptor.setEPSG4326SpatialDimensions(lat, lon);
+		descriptor.getFirstSpatialDimension().getContinueDimension().setSize(1l);
+		descriptor.getSecondSpatialDimension().getContinueDimension().setSize(1l);
+		descriptor.getFirstSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
+		descriptor.getFirstSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
+		descriptor.getSecondSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
+		descriptor.getSecondSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
 
-	ret.add(descriptor);
+		//
+		// temp extent
+		//
+		TemporalExtent extent = resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent();
 
-	return ret;
-    }
+		String startDate = extent.getBeginPosition();
+		String endDate = extent.getEndPosition();
 
-    @Override
-    public File download(DataDescriptor targetDescriptor) throws GSException {
-
-	Exception ex = null;
-
-	try {
-
-	    Date begin = null;
-	    Date end = null;
-
-	    ObjectFactory factory = new ObjectFactory();
-
-	    String startString = null;
-	    String endString = null;
-
-	    DataDimension dimension = targetDescriptor.getTemporalDimension();
-
-	    if (dimension != null && dimension.getContinueDimension().getUom().equals(Unit.MILLI_SECOND)) {
-
-		ContinueDimension sizedDimension = dimension.getContinueDimension();
-
-		begin = new Date(sizedDimension.getLower().longValue());
-		end = new Date(sizedDimension.getUpper().longValue());
-
-		startString = ISO8601DateTimeUtils.getISO8601DateTime(begin);
-		endString = ISO8601DateTimeUtils.getISO8601DateTime(end);
-	    }
-
-	    if (startString == null || endString == null) {
-
-		startString = ISO8601DateTimeUtils.getISO8601Date(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L));
-		endString = ISO8601DateTimeUtils.getISO8601Date(new Date());
-	    }
-
-	    startString = convertDate(startString);
-	    endString = convertDate(endString);
-	    String link = online.getLinkage().contains("?") ? online.getLinkage().split("\\?")[0] : online.getLinkage();
-	    String linkage = link + "?from=" + startString + "&to=" + endString
-		    + "&type=Plausible&part=IsoTime&part=Value&part=Quality&part=QualityDescr&timing=Original&elab=None";
-
-	    JSONArray jsonArray = getData(linkage);
-
-	    if (jsonArray != null) {
-
-		// JSONArray valuesData = jsonArray.optJSONArray("data");
-
-		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
-		DateFormat iso8601OutputFormat = null;
-		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
-
-		for (Object arr : jsonArray) {
-
-		    JSONArray data = (JSONArray) arr;
-
-		    ValueSingleVariable variable = new ValueSingleVariable();
-
-		    //
-		    // value
-		    //
-
-		    BigDecimal dataValue = data.optBigDecimal(1, new BigDecimal(MISSING_VALUE));
-		    variable.setValue(dataValue);
-
-		    // if (qualityCode != null) {
-		    // WML2QualityCategory quality = null;
-		    // switch (qualityCode) {
-		    // case 2:
-		    // // quality = WML2QualityCategory.GOOD;
-		    // break;
-		    // case 3:
-		    // break;
-		    // default:
-		    // break;
-		    // }
-		    // if (quality != null) {
-		    // variable.setQualityControlLevelCode(quality.getUri());
-		    // }
-		    // }
-		    //
-		    // date
-		    //
-
-		    String date = data.optString(0);// data.optString("datetime");
-
-		    if (iso8601OutputFormat == null) {
-			iso8601OutputFormat = date.contains(" ") ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN)
-				: new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ITALIAN);
-			iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-		    }
-
-		    Date parsed = iso8601OutputFormat.parse(date);
-
-		    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-		    gregCal.setTime(parsed);
-
-		    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
-		    variable.setDateTimeUTC(xmlGregCal);
-
-		    //
-		    //
-		    //
-
-		    addValue(tsrt, variable);
+		if (extent.isEndPositionIndeterminate()) {
+			endDate = ISO8601DateTimeUtils.getISO8601DateTime();
 		}
 
-		return tsrt.getDataFile();
-	    }
+		Optional<Date> optionalBegin = ISO8601DateTimeUtils.parseISO8601ToDate(startDate);
+		Optional<Date> optionalEnd = ISO8601DateTimeUtils.parseISO8601ToDate(endDate);
 
-	} catch (Exception e) {
+		if (optionalBegin.isPresent() && optionalEnd.isPresent()) {
 
-	    ex = e;
+			Date begin = optionalBegin.get();
+			Date end = optionalEnd.get();
+
+			descriptor.setTemporalDimension(begin, end);
+
+			DataDimension temporalDimension = descriptor.getTemporalDimension();
+			Long oneDayInMilliseconds = 1000 * 60 * 60 * 24l;
+
+			temporalDimension.getContinueDimension().setLowerTolerance(oneDayInMilliseconds);
+			temporalDimension.getContinueDimension().setUpperTolerance(oneDayInMilliseconds);
+		}
+
+		ret.add(descriptor);
+
+		return ret;
 	}
 
-	throw GSException.createException(//
-		getClass(), //
-		ex.getMessage(), //
-		null, //
-		ErrorInfo.ERRORTYPE_INTERNAL, //
-		ErrorInfo.SEVERITY_ERROR, //
-		HISCENTRAL_BASILICATA_DOWNLOAD_ERROR);
+	@Override
+	public File download(DataDescriptor targetDescriptor) throws GSException {
 
-    }
+		Exception ex = null;
 
-    private JSONArray getData(String linkage) throws GSException {
-	GSLoggerFactory.getLogger(getClass()).info("Getting BEARER TOKEN from Basilicata Datascape service");
-	JSONArray arr = new JSONArray();
+		try {
 
-	try {
+			Date begin = null;
+			Date end = null;
 
-	    if (HISCentralBasilicataConnector.BEARER_TOKEN == null) {
-		HISCentralBasilicataConnector.getBearerToken();
-	    }
+			ObjectFactory factory = new ObjectFactory();
 
-	    if (HISCentralBasilicataConnector.BEARER_TOKEN == null) {
-		GSLoggerFactory.getLogger(getClass()).error("Unable to retrieve bearer token");
+			String startString = null;
+			String endString = null;
+
+			DataDimension dimension = targetDescriptor.getTemporalDimension();
+
+			if (dimension != null && dimension.getContinueDimension().getUom().equals(Unit.MILLI_SECOND)) {
+
+				ContinueDimension sizedDimension = dimension.getContinueDimension();
+
+				begin = new Date(sizedDimension.getLower().longValue());
+				end = new Date(sizedDimension.getUpper().longValue());
+
+				startString = ISO8601DateTimeUtils.getISO8601DateTime(begin);
+				endString = ISO8601DateTimeUtils.getISO8601DateTime(end);
+			}
+
+			if (startString == null || endString == null) {
+
+				startString = ISO8601DateTimeUtils
+						.getISO8601Date(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L));
+				endString = ISO8601DateTimeUtils.getISO8601Date(new Date());
+			}
+
+			startString = convertDate(startString);
+			endString = convertDate(endString);
+			String link = online.getLinkage().contains("?") ? online.getLinkage().split("\\?")[0] : online.getLinkage();
+			String linkage = link + "?from=" + startString + "&to=" + endString
+					+ "&type=Plausible&part=IsoTime&part=Value&part=Quality&part=QualityDescr&timing=Original&elab=None";
+
+			File jsonArrayFile = getData(linkage);
+
+			if (jsonArrayFile != null) {
+
+				// JSONArray valuesData = jsonArray.optJSONArray("data");
+
+				TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
+
+				DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
+
+				FileInputStream fis = new FileInputStream(jsonArrayFile);
+
+				JSONArrayStreamParser parser = new JSONArrayStreamParser();
+
+				JSONArrayStreamParserListener listener = new JSONArrayStreamParserListener() {
+					static DateFormat iso8601OutputFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+							Locale.ITALIAN);
+					static DateFormat iso8601OutputFormat2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss",
+							Locale.ITALIAN);
+
+					static {
+						iso8601OutputFormat1.setTimeZone(TimeZone.getTimeZone("GMT"));
+						iso8601OutputFormat2.setTimeZone(TimeZone.getTimeZone("GMT"));
+					}
+
+					@Override
+					public void finished() {
+						GSLoggerFactory.getLogger(getClass()).info("Finished json data parsing");
+
+					}
+
+					@Override
+					public void notifyJSONArray(JSONArray data) {
+
+						ValueSingleVariable variable = new ValueSingleVariable();
+
+						//
+						// value
+						//
+
+						BigDecimal dataValue = data.optBigDecimal(1, new BigDecimal(MISSING_VALUE));
+						variable.setValue(dataValue);
+
+						String date = data.optString(0);// data.optString("datetime");
+
+						DateFormat iso8601OutputFormat = date.contains(" ") ? iso8601OutputFormat1
+								: iso8601OutputFormat2;
+
+						Date parsed;
+						try {
+							parsed = iso8601OutputFormat.parse(date);
+							GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+							gregCal.setTime(parsed);
+
+							XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+							variable.setDateTimeUTC(xmlGregCal);
+
+							addValue(tsrt, variable);
+
+						} catch (Exception e) {
+							GSLoggerFactory.getLogger(getClass()).error(e);
+						}
+
+					}
+
+					@Override
+					public void notifyJSONObject(JSONObject object) {
+					}
+
+				};
+				parser.parse(fis, listener);
+				jsonArrayFile.delete();
+				return tsrt.getDataFile();
+			}
+
+		} catch (Exception e) {
+
+			ex = e;
+		}
+
 		throw GSException.createException(//
-			getClass(), //
-			"Unable to retrieve bearer token", //
-			null, //
-			ErrorInfo.ERRORTYPE_SERVICE, //
-			ErrorInfo.SEVERITY_ERROR, //
-			HISCENTRAL_BASILICATA_DOWNLOAD_ERROR);
-	    }
+				getClass(), //
+				ex.getMessage(), //
+				null, //
+				ErrorInfo.ERRORTYPE_INTERNAL, //
+				ErrorInfo.SEVERITY_ERROR, //
+				HISCENTRAL_BASILICATA_DOWNLOAD_ERROR);
 
-	    GSLoggerFactory.getLogger(getClass()).info("Getting " + linkage);
+	}
 
-	    InputStream stream = null;
+	private File getData(String linkage) throws GSException {
+		GSLoggerFactory.getLogger(getClass()).info("Getting BEARER TOKEN from Basilicata Datascape service");
+		JSONArray arr = new JSONArray();
 
-	    HttpResponse<InputStream> getStationResponse = null;
+		try {
 
-	    Downloader downloader = new Downloader();
+			if (HISCentralBasilicataConnector.BEARER_TOKEN == null) {
+				HISCentralBasilicataConnector.getBearerToken();
+			}
 
-	    int statusCode = -1;
-	    int tries = 0;
+			if (HISCentralBasilicataConnector.BEARER_TOKEN == null) {
+				GSLoggerFactory.getLogger(getClass()).error("Unable to retrieve bearer token");
+				throw GSException.createException(//
+						getClass(), //
+						"Unable to retrieve bearer token", //
+						null, //
+						ErrorInfo.ERRORTYPE_SERVICE, //
+						ErrorInfo.SEVERITY_ERROR, //
+						HISCENTRAL_BASILICATA_DOWNLOAD_ERROR);
+			}
 
-	    do {
-		getStationResponse = downloader.downloadResponse(//
-			linkage.trim(), //
-			HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralBasilicataConnector.BEARER_TOKEN));
+			GSLoggerFactory.getLogger(getClass()).info("Getting " + linkage);
 
-		statusCode = getStationResponse.statusCode();
+			InputStream stream = null;
 
-		if (statusCode != 200) {
-		    // error try again with same token
-		    Thread.sleep(2000);
-		    tries++;
+			HttpResponse<InputStream> getStationResponse = null;
+
+			Downloader downloader = new Downloader();
+
+			int statusCode = -1;
+			int tries = 0;
+
+			do {
+				getStationResponse = downloader.downloadResponse(//
+						linkage.trim(), //
+						HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralBasilicataConnector.BEARER_TOKEN));
+
+				statusCode = getStationResponse.statusCode();
+
+				if (statusCode != 200) {
+					// error try again with same token
+					Thread.sleep(2000);
+					tries++;
+				}
+				if (tries > 5)
+					break;
+			} while (statusCode != 200);
+
+			tries = 0;
+			if (statusCode != 200) {
+				// token expired - refresh token
+				HISCentralBasilicataConnector.refreshBearerToken();
+				do {
+					// HttpGet newGet = new HttpGet(linkage.trim());
+					// newGet.addHeader("Authorization", "Bearer " +
+					// HISCentralBasilicataConnector.BEARER_TOKEN);
+					// getStationResponse = httpClient.execute(newGet);
+					// statusCode = getStationResponse.getStatusLine().getStatusCode();
+					//
+					getStationResponse = downloader.downloadResponse(//
+							linkage.trim(), //
+							HttpHeaderUtils.build("Authorization",
+									"Bearer " + HISCentralBasilicataConnector.BEARER_TOKEN));
+
+					statusCode = getStationResponse.statusCode();
+
+					if (statusCode != 200) {
+						Thread.sleep(2000);
+						tries++;
+					}
+					if (tries > 5)
+						break;
+				} while (statusCode != 200);
+			}
+
+			File jsonFile = File.createTempFile(getClass().getSimpleName(), ".json");
+			FileOutputStream fos = new FileOutputStream(jsonFile);
+			stream = getStationResponse.body();
+			org.apache.commons.io.IOUtils.copy(stream, fos);
+			stream.close();
+			fos.close();
+			GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
+
+			return jsonFile;
+
+		} catch (Exception e) {
+			GSLoggerFactory.getLogger(getClass()).error("Unable to retrieve " + linkage);
+			throw GSException.createException(//
+					getClass(), //
+					"Unable to retrieve " + linkage + " after several tries", //
+					null, //
+					ErrorInfo.ERRORTYPE_SERVICE, //
+					ErrorInfo.SEVERITY_ERROR, //
+					HISCENTRAL_BASILICATA_DOWNLOAD_ERROR);
+
 		}
-		if (tries > 5)
-		    break;
-	    } while (statusCode != 200);
-
-	    tries = 0;
-	    if (statusCode != 200) {
-		// token expired - refresh token
-		HISCentralBasilicataConnector.refreshBearerToken();
-		do {
-		    // HttpGet newGet = new HttpGet(linkage.trim());
-		    // newGet.addHeader("Authorization", "Bearer " +
-		    // HISCentralBasilicataConnector.BEARER_TOKEN);
-		    // getStationResponse = httpClient.execute(newGet);
-		    // statusCode = getStationResponse.getStatusLine().getStatusCode();
-		    //
-		    getStationResponse = downloader.downloadResponse(//
-			    linkage.trim(), //
-			    HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralBasilicataConnector.BEARER_TOKEN));
-
-		    statusCode = getStationResponse.statusCode();
-
-		    if (statusCode != 200) {
-			Thread.sleep(2000);
-			tries++;
-		    }
-		    if (tries > 5)
-			break;
-		} while (statusCode != 200);
-	    }
-	    if (statusCode != 200)
-		return arr;
-
-	    stream = getStationResponse.body();
-	    GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
-
-	    if (stream != null) {
-		arr = new JSONArray(IOStreamUtils.asUTF8String(stream));
-		stream.close();
-		return arr;
-	    }
-
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Unable to retrieve " + linkage);
-	    throw GSException.createException(//
-		    getClass(), //
-		    "Unable to retrieve " + linkage + " after several tries", //
-		    null, //
-		    ErrorInfo.ERRORTYPE_SERVICE, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    HISCENTRAL_BASILICATA_DOWNLOAD_ERROR);
 	}
 
-	return arr;
-    }
-
-    /**
-     * CONVERT DATE FROM ISO TO CAE BASILICATA SERVICE PARAMETER (YYYYMMDDHHmm)
-     **/
-    private String convertDate(String date) {
-	// TODO Auto-generated method stub
-	// 2022-09-12T09:36:00Z -> 2022-09-12T09:36:00
-	// 2022-09-19T09:36:00Z -> 2022-09-19T09:36:00
-	String result;
-	result = date.substring(0, date.length() - 1);
-	return result;
-    }
-
-    @Override
-    public boolean canSubset(String dimensionName) {
-
-	if (dimensionName == null) {
-	    return false;
+	/**
+	 * CONVERT DATE FROM ISO TO CAE BASILICATA SERVICE PARAMETER (YYYYMMDDHHmm)
+	 **/
+	private String convertDate(String date) {
+		// TODO Auto-generated method stub
+		// 2022-09-12T09:36:00Z -> 2022-09-12T09:36:00
+		// 2022-09-19T09:36:00Z -> 2022-09-19T09:36:00
+		String result;
+		result = date.substring(0, date.length() - 1);
+		return result;
 	}
 
-	return DataDescriptor.TIME_DIMENSION_NAME.equalsIgnoreCase(dimensionName);
-    }
+	@Override
+	public boolean canSubset(String dimensionName) {
 
-    @Override
-    public boolean canDownload() {
+		if (dimensionName == null) {
+			return false;
+		}
 
-	return (online.getFunctionCode() != null && //
-		online.getFunctionCode().equals("download") && //
-		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralBasilicataConnector.BASE_URL) && //
-		online.getProtocol() != null && //
-		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_BASILICATA_NS_URI));
-    }
-
-    @Override
-    public boolean canConnect() throws GSException {
-
-	try {
-	    return HttpConnectionUtils.checkConnectivity(online.getLinkage());
-	} catch (URISyntaxException e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+		return DataDescriptor.TIME_DIMENSION_NAME.equalsIgnoreCase(dimensionName);
 	}
 
-	return false;
-    }
+	@Override
+	public boolean canDownload() {
 
-    @Override
-    public void setOnlineResource(GSResource resource, String onlineResourceId) throws GSException {
-	super.setOnlineResource(resource, onlineResourceId);
-	this.connector.setSourceURL(resource.getSource().getEndpoint());
-    }
+		return (online.getFunctionCode() != null && //
+				online.getFunctionCode().equals("download") && //
+				online.getLinkage() != null && //
+				online.getLinkage().contains(HISCentralBasilicataConnector.BASE_URL) && //
+				online.getProtocol() != null && //
+				online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_BASILICATA_NS_URI));
+	}
+
+	@Override
+	public boolean canConnect() throws GSException {
+
+		try {
+			return HttpConnectionUtils.checkConnectivity(online.getLinkage());
+		} catch (URISyntaxException e) {
+
+			GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+
+		return false;
+	}
+
+	@Override
+	public void setOnlineResource(GSResource resource, String onlineResourceId) throws GSException {
+		super.setOnlineResource(resource, onlineResourceId);
+		this.connector.setSourceURL(resource.getSource().getEndpoint());
+	}
 }
