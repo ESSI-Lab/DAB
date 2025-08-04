@@ -60,6 +60,7 @@ import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.FileUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.profiler.om.OMHandler;
 
@@ -287,8 +288,17 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 			}
 
 			GSLoggerFactory.getLogger(getClass()).info(
-				"Basic data augmenter stats. Records seen: {} Records inserted: {} Errors: {} Major errors: {}",
-				totalRecords, recordsDone, errors, majorErrors);
+				"Basic data augmenter stats. Source id {}. Records seen: {} Records inserted: {} Errors: {} Major errors: {}",
+				sourceId, totalRecords, recordsDone, errors, majorErrors);
+
+			// CHECKING CANCELED JOB
+
+			if (ConfigurationWrapper.isJobCanceled(context)) {
+			    GSLoggerFactory.getLogger(getClass()).info("Basic data harvester task CANCELED source id {} ", sourceId);
+
+			    status.setPhase(JobPhase.CANCELED);
+			    break base;
+			}
 
 		    }
 
