@@ -22,8 +22,11 @@ package eu.essi_lab.downloader.hiscentral;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -33,27 +36,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.apache.commons.io.IOUtils;
 import org.cuahsi.waterml._1.ObjectFactory;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.liguria.HISCentralLiguriaConnector;
-import eu.essi_lab.downloader.hiscentral.HISCentralLiguriaJSONPagedArrayReader.Link;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.json.JSONArrayReader;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.JSONArrayStreamParser;
+import eu.essi_lab.lib.utils.JSONArrayStreamParserListener;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -183,32 +185,38 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 	    String linkage = online.getLinkage() + "&dtrf_beg=" + startString + "&dtrf_end=" + endString;
 	    // linkage = linkage.replaceAll("Z", "");
 
-	    boolean finished = false;
 	    String var = online.getName().split("_")[2];
+	    String code = online.getName().split("_")[1];
 
 	    TimeSeriesTemplate template = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
-	    while (!finished) {
-		Optional<InputStream> dataResponse = downloader.downloadOptionalStream(linkage);
-		if (dataResponse.isPresent()) {
-		    File tmpDataFile = File.createTempFile(getClass().getSimpleName(), ".json");
+	    File tempFile = null;
+	    try {
 
-		    FileOutputStream fos = new FileOutputStream(tmpDataFile);
-		    InputStream stream = dataResponse.get();
-		    IOUtils.copy(stream, fos);
-		    stream.close();
-		    HISCentralLiguriaJSONPagedArrayReader parser = new HISCentralLiguriaJSONPagedArrayReader(tmpDataFile);
+		tempFile = File.createTempFile(getClass().getSimpleName(), ".json");
+		tempFile.deleteOnExit();
+		try (InputStream is = HISCentralLiguriaConnector.getData(online.getLinkage(), code, startString, endString);
+			OutputStream fileOut = new FileOutputStream(tempFile)) {
+		    is.transferTo(fileOut);
+		}
+	    } catch (IOException e) {
+		GSLoggerFactory.getLogger(getClass()).error("Failed to download or write HTTP response: " + e.getMessage());
 
-		    
-		    while (parser.hasNextValue()) {
-			String tmpJSON = parser.nextValue();
-			JSONObject data = new JSONObject(tmpJSON);
+	    }
+	    // if (streamResp != null) {
+	    try (InputStream cachedStream = new FileInputStream(tempFile)) {
+
+		JSONArrayStreamParser parser = new JSONArrayStreamParser();
+
+		parser.parse(cachedStream, new JSONArrayStreamParserListener() {
+		    @Override
+		    public void notifyJSONObject(JSONObject object) {
 
 			ValueSingleVariable variable = new ValueSingleVariable();
 
 			// TODO: get variable of interest -- see HISCentralLiguriaConnector class
-			String valueString = data.optString(var);
+			String valueString = object.optString(var);
 
 			if (valueString != null && !valueString.isEmpty()) {
 
@@ -233,7 +241,7 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 			    // date
 			    //
 
-			    String date = data.optString("dtrf");
+			    String date = object.optString("DTRF");
 			    Optional<Date> optionalDate = ISO8601DateTimeUtils.parseNotStandard2ToDate(date);
 			    // DateFormat iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
 			    // iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -247,35 +255,33 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 				XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
 				variable.setDateTimeUTC(xmlGregCal);
 
-				//
-				//
-				//
-
-				addValue(template, variable);
-			    }
-			}
-		    }
-
-		    if (!parser.hasMore()) {
-			finished = true;
-		    } else {
-			List<Link> links = parser.getLinks();
-			if (links != null) {
-			    for (Link l : links) {
-				String rel = l.rel;
-				if (rel.contains("next")) {
-				    linkage = l.href;
-				    break;
+				try {
+				    addValue(template, variable);
+				} catch (JAXBException e) {
+				    // TODO Auto-generated catch block
+				    e.printStackTrace();
 				}
 			    }
-			} else {
-			    finished = true;
 			}
-		    }
-		    parser.close();
-		    tmpDataFile.delete();
-		}
 
+		    }
+
+		    @Override
+		    public void finished() {
+			GSLoggerFactory.getLogger(getClass()).info("Completed download for station code: " + code + ".");
+
+			// finished = true;
+		    }
+		});
+
+	    }
+
+	    // Now it is safe to delete the file
+	    if (tempFile != null && tempFile.exists()) {
+		boolean deleted = tempFile.delete();
+		if (!deleted) {
+		    GSLoggerFactory.getLogger(getClass()).debug("Could not delete temp file: " + tempFile.getAbsolutePath());
+		}
 	    }
 
 	    return template.getDataFile();
