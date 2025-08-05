@@ -51,17 +51,17 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
 	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
 
+	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");
+
 	StorageInfo uri = message.getDataBaseURI();
 
 	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
-	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");
-
 	DiscoveryCountResponse countResult = finder.count(message);
 
-	GSLoggerFactory.getLogger(getClass()).info("Count ENDED");
-
 	SimpleEntry<String, DiscoveryCountResponse> countPair = new SimpleEntry<>(getSourceIdentifier(), countResult);
+
+	GSLoggerFactory.getLogger(getClass()).info("Count ENDED");
 
 	return countPair;
     }
@@ -69,9 +69,9 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
     @Override
     public ResultSet<GSResource> retrieve(DiscoveryMessage message, Page page) throws GSException {
 
-	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
-
 	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
+
+	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
 
 	StorageInfo uri = message.getDataBaseURI();
 
@@ -89,9 +89,9 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
     @Override
     public ResultSet<Node> retrieveNodes(DiscoveryMessage message, Page page) throws GSException {
 
-	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
-
 	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
+
+	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
 
 	StorageInfo uri = message.getDataBaseURI();
 
@@ -109,9 +109,9 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
     @Override
     public ResultSet<String> retrieveStrings(DiscoveryMessage message, Page page) throws GSException {
 
-	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
-
 	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
+
+	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
 
 	StorageInfo uri = message.getDataBaseURI();
 
@@ -131,10 +131,10 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
 	return Type.DATABASE;
     }
-    
+
     @Override
     public String getSourceIdentifier() {
-	
+
 	return getType().toString();
     }
 }
