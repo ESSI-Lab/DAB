@@ -4,6 +4,7 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,6 +69,7 @@ import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
+import eu.essi_lab.messages.count.CountResponse;
 import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
@@ -79,6 +81,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
 
 /**
  * @author Fabrizio
@@ -271,24 +274,10 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
+		//
 		// set the search after, if present
+		//
 		OpenSearchUtils.getSearchAfter(response).ifPresent(sa -> resultSet.setSearchAfter(sa));
-
-		TotalHitsRelation relation = response.hits().total().relation();
-		String expected = "";
-		switch (relation) {
-		case Gte:
-		    expected = "More than " + response.hits().total().value();
-		    break;
-		case Eq:
-		default:
-		    expected = "Exactly " + response.hits().total().value();
-		    break;
-		}
-
-		CountSet count = new CountSet();
-		count.setExpectedLabel(expected);
-		resultSet.setCountResponse(count);
 	    }
 
 	    //
