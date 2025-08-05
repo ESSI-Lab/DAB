@@ -80,6 +80,9 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
     private static final String HIS_CENTRAL_AOSTA_CLIENT_PASSWORD = "aostaPassword";
     private static final String HIS_CENTRAL_AOSTA_CLIENT_ID = "aostaId";
 
+    private static final String HIS_CENTRAL_LIGURIA_CLIENT_PASSWORD = "liguriaPassword";
+    private static final String HIS_CENTRAL_LIGURIA_API_KEY = "liguriaApiKey";
+
     // i-change-trigger
     private static final String METEOTRACKER_PASSWORD = "meteotrackerPassword";
     private static final String METEOTRACKER_USER = "meteotrackerUser";
@@ -90,10 +93,10 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 
     private static final String TRIGGER_PASSWORD = "triggerPassword";
     private static final String TRIGGER_USER = "triggerUser";
-    
+
     private static final String TRIGGER_WAF_PASSWORD = "triggerWAFPassword";
     private static final String TRIGGER_WAF_USER = "triggerWAFUser";
-    
+
     private static final String OSCAR_PASSWORD = "OscarPassword";
     private static final String OSCAR_USER = "OscarUser";
 
@@ -566,6 +569,31 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 
 	}
 
+	// HIS-Central Liguria
+	{
+
+	    Option<String> user = StringOptionBuilder.//
+		    get().//
+		    withKey(HIS_CENTRAL_LIGURIA_API_KEY).//
+		    withLabel("The username used by HIS-Central Liguria connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(user);
+
+	    Option<String> password = StringOptionBuilder.//
+		    get().//
+		    withKey(HIS_CENTRAL_LIGURIA_CLIENT_PASSWORD).//
+		    withLabel("The password used by HIS-Central Liguria connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(password);
+
+	}
+
 	// Meteotracker
 	{
 
@@ -640,57 +668,56 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 	    addOption(password);
 
 	}
-	
+
 	// Trigger WAF ECMWF
-		{
+	{
 
-		    Option<String> user = StringOptionBuilder.//
-			    get().//
-			    withKey(TRIGGER_WAF_USER).//
-			    withLabel("The username used by TRIGGER WAF  connector").//
-			    required().//
-			    cannotBeDisabled().//
-			    build();
+	    Option<String> user = StringOptionBuilder.//
+		    get().//
+		    withKey(TRIGGER_WAF_USER).//
+		    withLabel("The username used by TRIGGER WAF  connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
 
-		    addOption(user);
+	    addOption(user);
 
-		    Option<String> password = StringOptionBuilder.//
-			    get().//
-			    withKey(TRIGGER_WAF_PASSWORD).//
-			    withLabel("The password used by TRIGGER WAF connector").//
-			    required().//
-			    cannotBeDisabled().//
-			    build();
+	    Option<String> password = StringOptionBuilder.//
+		    get().//
+		    withKey(TRIGGER_WAF_PASSWORD).//
+		    withLabel("The password used by TRIGGER WAF connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
 
-		    addOption(password);
+	    addOption(password);
 
-		}
-		
+	}
 
-		// OSCAR WMO
-			{
+	// OSCAR WMO
+	{
 
-			    Option<String> user = StringOptionBuilder.//
-				    get().//
-				    withKey(OSCAR_USER).//
-				    withLabel("The username used by OSCAR task").//
-				    required().//
-				    cannotBeDisabled().//
-				    build();
+	    Option<String> user = StringOptionBuilder.//
+		    get().//
+		    withKey(OSCAR_USER).//
+		    withLabel("The username used by OSCAR task").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
 
-			    addOption(user);
+	    addOption(user);
 
-			    Option<String> password = StringOptionBuilder.//
-				    get().//
-				    withKey(OSCAR_PASSWORD).//
-				    withLabel("The password used by OSCAR task").//
-				    required().//
-				    cannotBeDisabled().//
-				    build();
+	    Option<String> password = StringOptionBuilder.//
+		    get().//
+		    withKey(OSCAR_PASSWORD).//
+		    withLabel("The password used by OSCAR task").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
 
-			    addOption(password);
+	    addOption(password);
 
-			}
+	}
 
 	//
 	// set the rendering extension
@@ -1286,6 +1313,38 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
     }
 
     /**
+     * @param user
+     */
+    public void setLiguriaApiKey(String user) {
+
+	getOption(HIS_CENTRAL_LIGURIA_API_KEY, String.class).get().setValue(user);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getLiguriaApiKey() {
+
+	return getOption(HIS_CENTRAL_LIGURIA_API_KEY, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param password
+     */
+    public void setLiguriaClientPassword(String password) {
+
+	getOption(HIS_CENTRAL_LIGURIA_CLIENT_PASSWORD, String.class).get().setValue(password);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getLiguriaClientPassword() {
+
+	return getOption(HIS_CENTRAL_LIGURIA_CLIENT_PASSWORD, String.class).get().getOptionalValue();
+    }
+
+    /**
      * @param password
      */
     public void setSardegnaApiKey(String password) {
@@ -1428,10 +1487,9 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 
 	return getOption(TRIGGER_PASSWORD, String.class).get().getOptionalValue();
     }
-    
-    
-    //OSCAR
-    
+
+    // OSCAR
+
     /**
      * @param user
      */
@@ -1464,7 +1522,6 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 	return getOption(OSCAR_PASSWORD, String.class).get().getOptionalValue();
     }
 
-    
     /**
      * @param user
      */

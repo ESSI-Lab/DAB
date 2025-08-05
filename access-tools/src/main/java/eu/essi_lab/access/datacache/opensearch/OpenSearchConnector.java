@@ -237,6 +237,10 @@ public class OpenSearchConnector extends DataCacheConnector {
 	configure(FLUSH_INTERVAL_MS, DEFAULT_FLUSH_INTERVAL_MS.toString());
 
 	configure(CACHED_DAYS, DEFAULT_CACHED_DAYS.toString());
+	
+	dataRecordbuffer = new JsonFileBuffer<DataRecord>(DataRecord.class);
+	statisticsRecordbuffer = new JsonFileBuffer<StatisticsRecord>(StatisticsRecord.class);
+	stationRecordbuffer = new JsonFileBuffer<StationRecord>(StationRecord.class);
 
 	scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
@@ -256,9 +260,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	    }
 	}, 0, 1, TimeUnit.HOURS);
-	dataRecordbuffer = new JsonFileBuffer<DataRecord>(DataRecord.class);
-	statisticsRecordbuffer = new JsonFileBuffer<StatisticsRecord>(StatisticsRecord.class);
-	stationRecordbuffer = new JsonFileBuffer<StationRecord>(StationRecord.class);
+	
 
 	GSLoggerFactory.getLogger(getClass()).info("OS connector initialized: {}", databaseName);
 
