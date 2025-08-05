@@ -40,7 +40,6 @@ import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.stax.StAXDocumentParser;
 import eu.essi_lab.messages.DataDescriptorRuntimeInfo.TargetProvider;
 import eu.essi_lab.messages.count.CountSet;
-import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.exceptions.GSException;
