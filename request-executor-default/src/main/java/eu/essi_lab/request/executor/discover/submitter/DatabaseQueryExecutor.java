@@ -22,8 +22,6 @@ package eu.essi_lab.request.executor.discover.submitter;
  */
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.w3c.dom.Node;
 
@@ -35,7 +33,6 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
-import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -46,14 +43,7 @@ import eu.essi_lab.request.executor.query.IDatabaseQueryExecutor;
  */
 public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
-    List<GSSource> sources = new ArrayList<>();
-
     public DatabaseQueryExecutor() {
-    }
-
-    @Override
-    public String getSourceIdentifier() {
-	return "TheDatabase";
     }
 
     @Override
@@ -138,16 +128,13 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
     @Override
     public Type getType() {
+
 	return Type.DATABASE;
     }
-
-    public List<GSSource> getHarvestedSources() {
-	return sources;
+    
+    @Override
+    public String getSourceIdentifier() {
+	
+	return getType().toString();
     }
-
-    public void addHarvestedSource(GSSource source) {
-	sources.add(source);
-
-    }
-
 }
