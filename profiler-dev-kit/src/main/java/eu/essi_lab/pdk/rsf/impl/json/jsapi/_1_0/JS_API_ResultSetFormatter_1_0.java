@@ -156,11 +156,16 @@ public class JS_API_ResultSetFormatter_1_0 extends DiscoveryResultSetFormatter<S
 
 	// result set
 	JSONObject resultSet = new JSONObject();
-	resultSet.put("size", mappedResultSet.getCountResponse().getCount());
+
+	int count = mappedResultSet.getCountResponse() != null ? mappedResultSet.getCountResponse().getCount() : 0;
+	int pageCount = mappedResultSet.getCountResponse() != null ? mappedResultSet.getCountResponse().getPageCount() : 0;
+	int pageIndex = mappedResultSet.getCountResponse() != null ? mappedResultSet.getCountResponse().getPageIndex() : 0;
+
+	resultSet.put("size", count);
 	resultSet.put("start", message.getPage().getStart());
 	resultSet.put("pageSize", message.getPage().getSize());
-	resultSet.put("pageCount", mappedResultSet.getCountResponse().getPageCount());
-	resultSet.put("pageIndex", mappedResultSet.getCountResponse().getPageIndex());
+	resultSet.put("pageCount", pageCount);
+	resultSet.put("pageIndex", pageIndex);
 	out.put("resultSet", resultSet);
 
 	// reports
@@ -172,15 +177,17 @@ public class JS_API_ResultSetFormatter_1_0 extends DiscoveryResultSetFormatter<S
 	out.put("reports", reports);
 
 	try {
-	    Optional<TermFrequencyMap> map = mappedResultSet.getCountResponse().mergeTermFrequencyMaps(message.getMaxFrequencyMapItems());
+	    Optional<TermFrequencyMap> map = mappedResultSet.getCountResponse() == null ? Optional.empty()
+		    : mappedResultSet.getCountResponse().mergeTermFrequencyMaps(message.getMaxFrequencyMapItems());
+	  
 	    if (map.isPresent()) {
 
 		JSONObject termFrequency = mapTermFrequencyMap(map.get().getElement(), message.getSources());
 		out.put("termFrequency", termFrequency);
 	    }
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).warn(e.getMessage(), e);
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
 	return out;
