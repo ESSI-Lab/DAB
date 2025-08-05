@@ -213,6 +213,7 @@ public class SupportService {
 			sourcesArray.put(jsonSource);
 		}
 		output.put("sources", sourcesArray);
+		
 		output.put("status", "success");
 		return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
 	}

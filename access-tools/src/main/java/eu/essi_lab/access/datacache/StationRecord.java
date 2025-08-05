@@ -34,7 +34,7 @@ public class StationRecord {
 
     private Date lastObservation;
 
-    private SimpleEntry<BigDecimal, BigDecimal> latitudeLongitude = null;
+    private LatitudeLongitude latitudeLongitude = null;
 
     private String shape;
 
@@ -118,11 +118,11 @@ public class StationRecord {
 	this.lastObservation = lastObservation;
     }
 
-    public SimpleEntry<BigDecimal, BigDecimal> getLatitudeLongitude() {
+    public LatitudeLongitude getLatitudeLongitude() {
 	return latitudeLongitude;
     }
 
-    public void setLatitudeLongitude(SimpleEntry<BigDecimal, BigDecimal> latitudeLongitude) {
+    public void setLatitudeLongitude(LatitudeLongitude latitudeLongitude) {
 	this.latitudeLongitude = latitudeLongitude;
     }
 
