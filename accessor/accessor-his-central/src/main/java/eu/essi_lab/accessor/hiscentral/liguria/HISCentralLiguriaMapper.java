@@ -479,11 +479,11 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	//
 
 	Online online = new Online();
-	online.setLinkage(link);
-	online.setFunctionCode("information");
-	online.setName("Rete Meteo-Idro-Pluviometrica");
-
-	distribution.addDistributionOnline(online);
+//	online.setLinkage(link);
+//	online.setFunctionCode("information");
+//	online.setName("Rete Meteo-Idro-Pluviometrica");
+//
+//	distribution.addDistributionOnline(online);
 
 	//
 	// distribution info, download
@@ -493,7 +493,7 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	//
 	// tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
 	// }
-	Date d = new Date();
+	//Date d = new Date();
 	String linkage = HISCentralLiguriaConnector.BASE_URL + HISCentralLiguriaConnector.DATI_URL;
 
 	online = new Online();
