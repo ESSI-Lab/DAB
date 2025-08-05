@@ -22,16 +22,14 @@ package eu.essi_lab.access.datacache;
  */
 
 import java.math.BigDecimal;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Polygon4326 {
 
-    private List<SimpleEntry<BigDecimal, BigDecimal>> coordinates = new ArrayList<>();
+    private List<LatitudeLongitude> coordinates = new ArrayList<>();
 
-    public Polygon4326(List<SimpleEntry<BigDecimal, BigDecimal>> coordinates) {
+    public Polygon4326(List<LatitudeLongitude> coordinates) {
 	super();
 	this.coordinates = coordinates;
     }
@@ -45,22 +43,22 @@ public class Polygon4326 {
 	    String[] inner = s.split(" ");
 	    BigDecimal x = new BigDecimal(inner[0]);
 	    BigDecimal y = new BigDecimal(inner[1]);
-	    coordinates.add(new SimpleEntry<>(x, y));
+	    coordinates.add(new LatitudeLongitude(y, x));
 	}
     }
 
-    public List<SimpleEntry<BigDecimal, BigDecimal>> getCoordinates() {
+    public List<LatitudeLongitude> getCoordinates() {
 	return coordinates;
     }
 
-    public void setCoordinates(List<SimpleEntry<BigDecimal, BigDecimal>> coordinates) {
+    public void setCoordinates(List<LatitudeLongitude> coordinates) {
 	this.coordinates = coordinates;
     }
 
     public String getWkt() {
 	String tmp = "";
-	for (SimpleEntry<BigDecimal, BigDecimal> coordinate : coordinates) {
-	    tmp += coordinate.getKey() + " " + coordinate.getValue() + ", ";
+	for (LatitudeLongitude coordinate : coordinates) {
+	    tmp += coordinate.getLongitude() + " " + coordinate.getLatitude() + ", ";
 	}
 	tmp = tmp.trim();
 	if (tmp.endsWith(",")) {

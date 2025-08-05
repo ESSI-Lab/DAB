@@ -23,6 +23,8 @@ package eu.essi_lab.access.datacache;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * In this calss x is considered the easting, y the northing
  * 
@@ -44,6 +46,10 @@ public class BBOX {
     private BigDecimal maxx;
     private BigDecimal maxy;
 
+    public BBOX() {
+
+    }
+    
     public BBOX(String crs, double minx, double miny, double maxx, double maxy) {
 	this(crs, new BigDecimal(minx), new BigDecimal(miny), new BigDecimal(maxx), new BigDecimal(maxy));
     }
@@ -142,6 +148,7 @@ public class BBOX {
 	}
     }
 
+    @JsonIgnore
     public String getWkt() {
 	BigDecimal minx = this.minx;
 	BigDecimal maxx = this.maxx;

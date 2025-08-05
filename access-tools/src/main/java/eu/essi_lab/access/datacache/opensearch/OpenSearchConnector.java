@@ -198,6 +198,10 @@ public class OpenSearchConnector extends DataCacheConnector {
 	if (client != null) {
 	    throw new Exception("Already initialized");
 	}
+	
+	dataRecordbuffer = new JsonFileBuffer<DataRecord>(DataRecord.class);
+	statisticsRecordbuffer = new JsonFileBuffer<StatisticsRecord>(StatisticsRecord.class);
+	stationRecordbuffer = new JsonFileBuffer<StationRecord>(StationRecord.class);
 
 	for (int i = 0; i < databaseName.length(); i++) {
 	    char c = databaseName.charAt(i);
@@ -238,9 +242,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	configure(CACHED_DAYS, DEFAULT_CACHED_DAYS.toString());
 	
-	dataRecordbuffer = new JsonFileBuffer<DataRecord>(DataRecord.class);
-	statisticsRecordbuffer = new JsonFileBuffer<StatisticsRecord>(StatisticsRecord.class);
-	stationRecordbuffer = new JsonFileBuffer<StationRecord>(StationRecord.class);
+
 
 	scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
