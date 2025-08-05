@@ -95,7 +95,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, "10000"); // note: 100000 is too much, it returns
 										 // 413
 	dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, "2000");
-	dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, "60");
+	dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, "0");
 
 	// SETTINGS RETRIEVAL
 
