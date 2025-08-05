@@ -139,7 +139,7 @@ public class QueryExecutorInitializer {
 		    dbQuerySubmitter = createDatabaseQueryExecutor();
 		    ret.add(0, dbQuerySubmitter);
 		}
-		dbQuerySubmitter.addHarvestedSource(source);
+
 
 		break;
 	    default:
