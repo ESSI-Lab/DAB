@@ -25,6 +25,10 @@ import java.math.BigDecimal;
 
 public class BBOX3857 extends BBOX {
 
+    public BBOX3857() {
+	super();
+    }
+    
     public BBOX3857(double minx, double miny, double maxx, double maxy) {
 	this(new BigDecimal(minx), new BigDecimal(miny), new BigDecimal(maxx), new BigDecimal(maxy));
     }

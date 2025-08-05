@@ -25,10 +25,15 @@ import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.CRSUtils;
 
 public class StationRecord {
+    private Date begin;
+
+    private Date end;
 
     private Date lastHarvesting;
 
@@ -36,9 +41,9 @@ public class StationRecord {
 
     private LatitudeLongitude latitudeLongitude = null;
 
-    private String shape;
+    private Integer lastDayObservations;
 
-    private Polygon4326 polygon;
+    private String shape;
 
     private BigDecimal south;
 
@@ -85,22 +90,84 @@ public class StationRecord {
     private String whosCategory;
 
     private String sourceIdentifier;
-    
+
     private String sourceLabel;
 
+    public StationRecord() {
+
+    }
+    
+    public BigDecimal getSouth() {
+        return south;
+    }
+
+    public void setSouth(BigDecimal south) {
+        this.south = south;
+    }
+
+    public BigDecimal getWest() {
+        return west;
+    }
+
+    public void setWest(BigDecimal west) {
+        this.west = west;
+    }
+
+    public BigDecimal getEast() {
+        return east;
+    }
+
+    public void setEast(BigDecimal east) {
+        this.east = east;
+    }
+
+    public BigDecimal getNorth() {
+        return north;
+    }
+
+    public void setNorth(BigDecimal north) {
+        this.north = north;
+    }
+
+    public BigDecimal getMinx3857() {
+        return minx3857;
+    }
+
+    public void setMinx3857(BigDecimal minx3857) {
+        this.minx3857 = minx3857;
+    }
+
+    public BigDecimal getMiny3857() {
+        return miny3857;
+    }
+
+    public void setMiny3857(BigDecimal miny3857) {
+        this.miny3857 = miny3857;
+    }
+
+    public BigDecimal getMaxx3857() {
+        return maxx3857;
+    }
+
+    public void setMaxx3857(BigDecimal maxx3857) {
+        this.maxx3857 = maxx3857;
+    }
+
+    public BigDecimal getMaxy3857() {
+        return maxy3857;
+    }
+
+    public void setMaxy3857(BigDecimal maxy3857) {
+        this.maxy3857 = maxy3857;
+    }
+
     public String getSourceLabel() {
-        return sourceLabel;
+	return sourceLabel;
     }
 
     public void setSourceLabel(String sourceLabel) {
-        this.sourceLabel = sourceLabel;
+	this.sourceLabel = sourceLabel;
     }
-
-    private Integer lastDayObservations;
-
-    private Date begin;
-
-    private Date end;
 
     public Date getLastHarvesting() {
 	return lastHarvesting;
@@ -132,14 +199,6 @@ public class StationRecord {
 
     public void setShape(String shape) {
 	this.shape = shape;
-    }
-
-    public Polygon4326 getPolygon() {
-	return polygon;
-    }
-
-    public void setPolygon(Polygon4326 polygon) {
-	this.polygon = polygon;
     }
 
     public String getObservedProperty() {
@@ -218,10 +277,7 @@ public class StationRecord {
 	this.lastDayObservations = lastDayObservations;
     }
 
-    public StationRecord() {
-
-    }
-
+    @JsonIgnore
     public BBOX4326 getBbox4326() {
 	return new BBOX4326(south, north, west, east);
     }
@@ -247,8 +303,14 @@ public class StationRecord {
 	    setBbox3857(bbox3857);
 	}
 
+	if (areEquals(south, north) && areEquals(west, east)) {
+	    setLatitudeLongitude(new LatitudeLongitude(south, west));
+	    setShape("POINT(" + west + " " + south + ")");
+	}
+
     }
 
+    @JsonIgnore
     public BBOX3857 getBbox3857() {
 	return new BBOX3857(minx3857, miny3857, maxx3857, maxy3857);
     }
@@ -342,18 +404,22 @@ public class StationRecord {
     }
 
     private BBOX3857 calculateBBOX3857(BBOX4326 bbox4326) throws Exception {
-        if (bbox4326 == null) {
-            return null;
-        }
-        SimpleEntry<Double, Double> lower = new SimpleEntry<>(bbox4326.getSouth().doubleValue(), bbox4326.getWest().doubleValue());
-        SimpleEntry<Double, Double> upper = new SimpleEntry<>(bbox4326.getNorth().doubleValue(), bbox4326.getEast().doubleValue());
-        SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> sourceCorners = new SimpleEntry<>(lower, upper);
-        SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox = CRSUtils.translateBBOX(sourceCorners, CRS.EPSG_4326(),
-        	CRS.EPSG_3857());
-        SimpleEntry<Double, Double> lower2 = bbox.getKey();
-        SimpleEntry<Double, Double> upper2 = bbox.getValue();
-        return new BBOX3857(new BigDecimal(lower2.getKey()), new BigDecimal(lower2.getValue()), new BigDecimal(upper2.getKey()),
-        	new BigDecimal(upper2.getValue()));
+	if (bbox4326 == null) {
+	    return null;
+	}
+	SimpleEntry<Double, Double> lower = new SimpleEntry<>(bbox4326.getSouth().doubleValue(), bbox4326.getWest().doubleValue());
+	SimpleEntry<Double, Double> upper = new SimpleEntry<>(bbox4326.getNorth().doubleValue(), bbox4326.getEast().doubleValue());
+	SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> sourceCorners = new SimpleEntry<>(lower, upper);
+	SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox = CRSUtils.translateBBOX(sourceCorners, CRS.EPSG_4326(),
+		CRS.EPSG_3857());
+	SimpleEntry<Double, Double> lower2 = bbox.getKey();
+	SimpleEntry<Double, Double> upper2 = bbox.getValue();
+	return new BBOX3857(new BigDecimal(lower2.getKey()), new BigDecimal(lower2.getValue()), new BigDecimal(upper2.getKey()),
+		new BigDecimal(upper2.getValue()));
+    }
+
+    private boolean areEquals(BigDecimal s, BigDecimal n) {
+	return Math.abs(s.doubleValue() - n.doubleValue()) < 0.0000001d;
     }
 
 }
