@@ -1473,10 +1473,7 @@
 				<configuration>
 					<source>21</source>
 					<target>21</target>
-					<useIncrementalCompilation>false</useIncrementalCompilation>
-					<compilerArgs>
-						<arg>--enable-preview</arg>
-					</compilerArgs>
+					<useIncrementalCompilation>false</useIncrementalCompilation>					
 				</configuration>
 			</plugin>
 

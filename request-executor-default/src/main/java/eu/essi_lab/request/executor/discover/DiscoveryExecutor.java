@@ -1,6 +1,7 @@
 package eu.essi_lab.request.executor.discover;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
 
 /*-
  * #%L
@@ -24,9 +25,11 @@ import java.util.AbstractMap.SimpleEntry;
  */
 
 import java.util.List;
-import java.util.concurrent.StructuredTaskScope;
-import java.util.concurrent.StructuredTaskScope.ShutdownOnFailure;
-import java.util.concurrent.StructuredTaskScope.Subtask;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.w3c.dom.Node;
 
@@ -108,7 +111,7 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
      * @return
      * @throws Exception
      */
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private <R> ResultSet<R> retrieve(DiscoveryMessage message, Class<R> clazz) throws GSException {
 
 	new QueryInitializer().initializeQuery(message);
@@ -164,62 +167,65 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 		// - the DB impl. is MarkLogic and term frequency targets and/or the count in retrieval are required
 		//
 
-		try (@SuppressWarnings("preview")
-		ShutdownOnFailure scope = new StructuredTaskScope.ShutdownOnFailure()) {
+		ExecutorService executor = Executors.newFixedThreadPool(2);
 
-		    Subtask<CountSet> countTask = scope.fork(() -> {
+		Callable<FutureContainer> countTask = () -> {
 
-			DiscoveryCountResponse count = finder.count(message);
+		    DiscoveryCountResponse count = finder.count(message);
 
-			CountSet countSet = new CountSet();
-			countSet.addCountPair(new SimpleEntry<String, DiscoveryCountResponse>(Type.DATABASE.toString(), count));
+		    CountSet countSet = new CountSet();
+		    countSet.addCountPair(new SimpleEntry<String, DiscoveryCountResponse>(Type.DATABASE.toString(), count));
 
-			int pageCount = (int) (countSet.getCount() < message.getPage().getSize() ? 1
-				: Math.ceil(((double) countSet.getCount() / message.getPage().getSize())));
+		    int pageCount = (int) (countSet.getCount() < message.getPage().getSize() ? 1
+			    : Math.ceil(((double) countSet.getCount() / message.getPage().getSize())));
 
-			countSet.setPageCount(countSet.getCount() == 0 || message.getPage().getSize() == 0 ? 0 : pageCount);
+		    countSet.setPageCount(countSet.getCount() == 0 || message.getPage().getSize() == 0 ? 0 : pageCount);
 
-			int pageIndex = message.getPage().getSize() == 0 ? 0
-				: message.getPage().getStart() <= message.getPage().getSize() ? 1
-					: (message.getPage().getStart() / message.getPage().getSize()) + 1;
+		    int pageIndex = message.getPage().getSize() == 0 ? 0
+			    : message.getPage().getStart() <= message.getPage().getSize() ? 1
+				    : (message.getPage().getStart() / message.getPage().getSize()) + 1;
 
-			countSet.setPageIndex(pageIndex);
+		    countSet.setPageIndex(pageIndex);
 
-			return countSet;
-		    });
+		    return new FutureContainer(countSet);
+		};
 
-		    var retrieveTask = scope.fork(() -> {
+		Callable<FutureContainer> retrieveTask = () -> {
 
-			if (clazz.equals(GSResource.class)) {
+		    if (clazz.equals(GSResource.class)) {
 
-			    return finder.discover(message);
-			}
-
-			if (clazz.equals(String.class)) {
-
-			    return finder.discoverStrings(message);
-			}
-
-			return finder.discoverNodes(message);
-		    });
-
-		    try {
-			scope.join();
-			scope.throwIfFailed();
-
-		    } catch (Exception ex) {
-
-			throw GSException.createException(getClass(), "DiscoveryExecutorStructuredTaskScopeError", ex);
+			return new FutureContainer(finder.discover(message));
 		    }
 
-		    CountSet countSet = countTask.get();
+		    if (clazz.equals(String.class)) {
 
-		    result = (ResultSet<R>) retrieveTask.get();
+			return new FutureContainer(finder.discoverStrings(message));
+		    }
+
+		    return new FutureContainer(finder.discoverNodes(message));
+		};
+
+		try {
+
+		    List<Future<FutureContainer>> futures = executor.invokeAll(Arrays.asList(countTask, retrieveTask));
+
+		    Optional<CountSet> optCountSet = futures.get(0).get().getCountSet();
+		    Optional<ResultSet<R>> optResultSet = futures.get(1).get().getResultSet();
+
+		    CountSet countSet = optCountSet.get();
+		    result = optResultSet.get();
+
 		    result.setCountResponse(countSet);
+
+		} catch (Exception e) {
+
+		    throw GSException.createException(getClass(), "DiscoveryExecutorStructuredTaskScopeError", e);
 		}
 	    }
 
-	} else {
+	} else
+
+	{
 
 	    //
 	    // the Distributor is necessary if distributed sources are included
@@ -242,6 +248,47 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 	}
 
 	return result;
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    private static class FutureContainer<R> {
+
+	private CountSet countSet;
+	private ResultSet<R> resultSet;
+
+	/**
+	 * 
+	 */
+	public FutureContainer(CountSet countSet) {
+
+	    this.countSet = countSet;
+	}
+
+	/**
+	 * @param resultSet
+	 */
+	public FutureContainer(ResultSet<R> resultSet) {
+
+	    this.resultSet = resultSet;
+	}
+
+	/**
+	 * @return the countSet
+	 */
+	public Optional<CountSet> getCountSet() {
+
+	    return Optional.ofNullable(countSet);
+	}
+
+	/**
+	 * @return the resultSet
+	 */
+	public Optional<ResultSet<R>> getResultSet() {
+
+	    return Optional.ofNullable(resultSet);
+	}
     }
 
     /**
