@@ -159,9 +159,9 @@
 					<scanIntervalSeconds>0</scanIntervalSeconds>
 					<jettyXml>
 						${project.basedir}/src/main/webapp/WEB-INF/jetty.xml,
-						${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml</jettyXml>
-    <useFileMappedBuffer>false</useFileMappedBuffer>
-
+						${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml
+					</jettyXml>
+     
 				</configuration>
 			</plugin>
 
