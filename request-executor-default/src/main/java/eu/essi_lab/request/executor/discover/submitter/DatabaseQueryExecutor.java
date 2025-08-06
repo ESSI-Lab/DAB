@@ -22,8 +22,6 @@ package eu.essi_lab.request.executor.discover.submitter;
  */
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.w3c.dom.Node;
 
@@ -35,7 +33,6 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
-import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -46,14 +43,7 @@ import eu.essi_lab.request.executor.query.IDatabaseQueryExecutor;
  */
 public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
-    List<GSSource> sources = new ArrayList<>();
-
     public DatabaseQueryExecutor() {
-    }
-
-    @Override
-    public String getSourceIdentifier() {
-	return "TheDatabase";
     }
 
     @Override
@@ -61,17 +51,17 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
 	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
 
+	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");
+
 	StorageInfo uri = message.getDataBaseURI();
 
 	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
-	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");
-
 	DiscoveryCountResponse countResult = finder.count(message);
 
-	GSLoggerFactory.getLogger(getClass()).info("Count ENDED");
-
 	SimpleEntry<String, DiscoveryCountResponse> countPair = new SimpleEntry<>(getSourceIdentifier(), countResult);
+
+	GSLoggerFactory.getLogger(getClass()).info("Count ENDED");
 
 	return countPair;
     }
@@ -79,9 +69,9 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
     @Override
     public ResultSet<GSResource> retrieve(DiscoveryMessage message, Page page) throws GSException {
 
-	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
-
 	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
+
+	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
 
 	StorageInfo uri = message.getDataBaseURI();
 
@@ -99,9 +89,9 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
     @Override
     public ResultSet<Node> retrieveNodes(DiscoveryMessage message, Page page) throws GSException {
 
-	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
-
 	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
+
+	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
 
 	StorageInfo uri = message.getDataBaseURI();
 
@@ -119,9 +109,9 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
     @Override
     public ResultSet<String> retrieveStrings(DiscoveryMessage message, Page page) throws GSException {
 
-	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
-
 	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
+
+	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
 
 	StorageInfo uri = message.getDataBaseURI();
 
@@ -138,16 +128,13 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
     @Override
     public Type getType() {
+
 	return Type.DATABASE;
     }
 
-    public List<GSSource> getHarvestedSources() {
-	return sources;
+    @Override
+    public String getSourceIdentifier() {
+
+	return getType().toString();
     }
-
-    public void addHarvestedSource(GSSource source) {
-	sources.add(source);
-
-    }
-
 }

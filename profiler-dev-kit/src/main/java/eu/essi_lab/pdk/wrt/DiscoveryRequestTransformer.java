@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
-import org.slf4j.Logger;
-
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -50,7 +48,6 @@ import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.Pluggable;
@@ -108,14 +105,13 @@ import eu.essi_lab.pdk.handler.DiscoveryHandler;
  */
 public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<DiscoveryMessage> {
 
-    private static final String UNIDENTIFIED_SOURCE_ERROR = "NON_EXISTENT_SOURCE_ERROR";
     private static final String EXCLUDED = "EXCLUDED";
-    private Logger logger = GSLoggerFactory.getLogger(DiscoveryRequestTransformer.class);
 
     /**
      * Refines the <code>message</code> by setting the {@link Bond}, the distinct queryables, {@link GSSource}s and
      * {@link ResourceSelector}
      *
+     * @see DiscoveryMessage#setIncludeCountInRetrieval(boolean)
      * @see DiscoveryMessage#setUserBond(Bond)
      * @see RequestMessage#setSources(List)
      * @see DiscoveryMessage#setResourceSelector(ResourceSelector)
@@ -124,6 +120,8 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
      * @see #getSelector(WebRequest)
      */
     protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
+
+	message.setIncludeCountInRetrieval(true);
 
 	message.setUserBond(getUserBond(message.getWebRequest()));
 
@@ -207,7 +205,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
      */
     protected List<GSSource> getSources(Bond bond, Optional<View> optionalView) throws GSException {
 
-	logger.trace("Getting sources STARTED");
+	GSLoggerFactory.getLogger(DiscoveryRequestTransformer.class).trace("Getting sources STARTED");
 
 	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
 
@@ -327,7 +325,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	    }
 	}
 
-	logger.trace("Getting sources ENDED");
+	GSLoggerFactory.getLogger(DiscoveryRequestTransformer.class).trace("Getting sources ENDED");
 
 	return sources;
 

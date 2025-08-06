@@ -4,6 +4,7 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
-import org.opensearch.client.opensearch.core.search.TotalHitsRelation;
+import org.opensearch.client.opensearch.core.search.SearchResult;
 
 /*-
  * #%L
@@ -79,6 +80,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
 
 /**
  * @author Fabrizio
@@ -219,11 +221,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	if (element.isEmpty()) {
 
-	    TermFrequencyMapType mapType = OpenSearchUtils.fromAgg(aggregations);
-
-	    TermFrequencyMap tfMap = new TermFrequencyMap(mapType);
-
-	    response.setTermFrequencyMap(tfMap);
+	    setTermFrequencyMap(searchResponse, response);
 	}
 
 	return response;
@@ -271,24 +269,48 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
+		//
 		// set the search after, if present
+		//
+
 		OpenSearchUtils.getSearchAfter(response).ifPresent(sa -> resultSet.setSearchAfter(sa));
 
-		TotalHitsRelation relation = response.hits().total().relation();
-		String expected = "";
-		switch (relation) {
-		case Gte:
-		    expected = "More than " + response.hits().total().value();
-		    break;
-		case Eq:
-		default:
-		    expected = "Exactly " + response.hits().total().value();
-		    break;
-		}
+		//
+		// handles the tf targets and the count
+		//
 
-		CountSet count = new CountSet();
-		count.setExpectedLabel(expected);
-		resultSet.setCountResponse(count);
+		if (!message.getTermFrequencyTargets().isEmpty() || message.isCountInRetrievalIncluded()) {
+
+		    CountSet countSet = new CountSet();
+
+		    DiscoveryCountResponse countResponse = new DiscoveryCountResponse();
+
+		    if (message.isCountInRetrievalIncluded()) {
+
+			countResponse.setCount((int) response.hits().total().value());
+
+			int pageCount = (int) (countResponse.getCount() < message.getPage().getSize() ? 1
+				: Math.ceil(((double) countResponse.getCount() / message.getPage().getSize())));
+
+			countSet.setPageCount(countResponse.getCount() == 0 || message.getPage().getSize() == 0 ? 0 : pageCount);
+
+			int pageIndex = message.getPage().getSize() == 0 ? 0
+				: message.getPage().getStart() <= message.getPage().getSize() ? 1
+					: (message.getPage().getStart() / message.getPage().getSize()) + 1;
+
+			countSet.setPageIndex(pageIndex);
+		    }
+
+		    if (!message.getTermFrequencyTargets().isEmpty()) {
+
+			setTermFrequencyMap(response, countResponse);
+		    }
+
+		    countSet.addCountPair(
+			    new SimpleEntry<String, DiscoveryCountResponse>(Type.DATABASE.toString(), countResponse));
+
+		    resultSet.setCountResponse(countSet);
+		}
 	    }
 
 	    //
@@ -321,6 +343,20 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    throw GSException.createException(getClass(), "OpenSearchFinderDiscoverError", ex);
 	}
+    }
+
+    /*
+     * +
+     */
+    private void setTermFrequencyMap(SearchResult<Object> response, DiscoveryCountResponse discoveryCountResponse) {
+
+	Map<String, Aggregate> aggregations = response.aggregations();
+
+	TermFrequencyMapType mapType = OpenSearchUtils.fromAgg(aggregations);
+
+	TermFrequencyMap tfMap = new TermFrequencyMap(mapType);
+
+	discoveryCountResponse.setTermFrequencyMap(tfMap);
     }
 
     @Override
@@ -606,17 +642,11 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    } else {
 
-		int start = message.getPage().getStart() - 1;
-		int size = message.getPage().getSize();
-
-		response = wrapper.search(DataFolderMapping.get().getIndex(), // index
+		response = wrapper.search(//
+			DataFolderMapping.get().getIndex(), // index
 			query, // search query
-			message.getResourceSelector().getIndexes(), // fields
-			start, //
-			size, //
-			message.getSortedFields(), message.getSearchAfter(), //
-			false, // request cache
-			message.isResourceBinaryExcluded());//
+			message, false // request cache
+		);
 	    }
 
 	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));

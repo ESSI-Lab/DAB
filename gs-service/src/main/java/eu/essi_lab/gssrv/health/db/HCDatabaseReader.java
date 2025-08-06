@@ -270,4 +270,10 @@ public class HCDatabaseReader extends Database implements DatabaseReader, Databa
 
 	return null;
     }
+
+    @Override
+    public DatabaseImpl getImplementation() {
+
+	return DatabaseImpl.HEALTH_CHECK;
+    }
 }

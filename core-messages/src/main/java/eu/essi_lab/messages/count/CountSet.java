@@ -42,7 +42,6 @@ public class CountSet extends AbstractCountResponse {
     private TermFrequencyMap mergedMap;
     private int pageCount;
     private int pageIndex;
-    private String expected;
 
     public CountSet() {
 	countPairs = new HashMap<>();
@@ -160,13 +159,5 @@ public class CountSet extends AbstractCountResponse {
 	    }
 	}
 	return totalCount;
-    }
-
-    public void setExpectedLabel(String expected) {
-	this.expected = expected;
-    }
-
-    public String getExpectedLabel() {
-	return expected;
     }
 }

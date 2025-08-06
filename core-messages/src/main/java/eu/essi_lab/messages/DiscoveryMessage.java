@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,7 +53,6 @@ import eu.essi_lab.messages.bond.spatial.WKT;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.RuntimeInfoElement;
@@ -136,6 +134,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     private static final String RESULTS_PRIORITY = "RESULTS_PRIORITY"; // UNSET, DATASET, COLLECTION,
     private static final String TF_TARGETS = "TF_TARGETS";
     private static final String EIFFEL_DISCOVERY_OPTION = "EIFFEL_DISCOVERY_OPTION";
+    private static final String INLCUDE_COUNT_IN_RETRIEVAL = "INLCUDE_COUNT_IN_RETRIEVAL";
 
     /**
      * 
@@ -162,6 +161,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	setResourceSelector(new ResourceSelector());
 	setQueryRegistrationEnabled(false);
 	setTermFrequencyTargets(Arrays.asList());
+	setIncludeCountInRetrieval(false);
 
 	getPayload().add(new GSProperty<>(PARENTS_GSRESOURCE, parents));
     }
@@ -367,11 +367,17 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	return getHeader().get(INLCUDE_DELETED, Boolean.class);
     }
 
+    /**
+     * @param include
+     */
     public void setIncludeDeleted(boolean include) {
 
 	getHeader().add(new GSProperty<Boolean>(INLCUDE_DELETED, include));
     }
 
+    /**
+     * @param strategy
+     */
     public void setRankingStrategy(RankingStrategy strategy) {
 
 	getHeader().add(new GSProperty<RankingStrategy>(RANKING, strategy));
@@ -446,6 +452,24 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     public List<Queryable> getTermFrequencyTargets() {
 
 	return getHeader().get(TF_TARGETS, List.class);
+    }
+
+    /**
+     * Default value: false
+     *
+     * @return
+     */
+    public boolean isCountInRetrievalIncluded() {
+
+	return getHeader().get(INLCUDE_COUNT_IN_RETRIEVAL, Boolean.class);
+    }
+
+    /**
+     * @param include
+     */
+    public void setIncludeCountInRetrieval(boolean include) {
+
+	getHeader().add(new GSProperty<Boolean>(INLCUDE_COUNT_IN_RETRIEVAL, include));
     }
 
     // ----------------------------------------

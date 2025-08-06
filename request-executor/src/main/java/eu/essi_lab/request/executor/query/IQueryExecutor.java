@@ -23,16 +23,35 @@ package eu.essi_lab.request.executor.query;
 
 public interface IQueryExecutor {
 
+    /**
+     * 
+     * @author Fabrizio
+     */
     public enum Type {
-	DISTRIBUTED, DATABASE
+	/**
+	 * 
+	 */
+	DISTRIBUTED, 
+	/**
+	 * 
+	 */
+	DATABASE
     }
 
     public static final String QUERY_SUBMITTER_CONNECTION_PROBLEM = "QUERY_SUBMITTER_CONNECTION_PROBLEM";
     public static final String QUERY_SUBMITTER_REMOTE_SERVICE_ERROR = "QUERY_SUBMITTER_REMOTE_SERVICE_ERROR";
     public static final String QUERY_SUBMITTER_DB_ERROR = "QUERY_SUBMITTER_DB_ERROR";
 
+    /**
+     * 
+     * @return
+     */
     public Type getType();
 
+    /**
+     * 
+     * @return
+     */
     public String getSourceIdentifier();
 
 }

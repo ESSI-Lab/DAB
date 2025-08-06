@@ -192,8 +192,8 @@ public class OpenSearchQueryBuilder {
 	String dataFolder = dfMap.get(bond.getPropertyValue());
 
 	if (dataFolder == null) {
-	    // it is null in case of distributed source
-	    return buildSourceIdQuery(bond.getPropertyValue());
+
+	    return buildFilterQuery(buildSourceIdQuery(bond.getPropertyValue()));
 	}
 
 	return buildFilterQuery(buildSourceIdQuery(bond.getPropertyValue()), //
@@ -1178,7 +1178,7 @@ public class OpenSearchQueryBuilder {
 
 	Query mustQuery = buildMustQuery(tokenQueries);
 
-	return buildShouldQuery(termQuery, mustQuery);
+	return buildFilterQuery(buildShouldQuery(termQuery, mustQuery));
     }
 
     /**
@@ -1617,9 +1617,9 @@ public class OpenSearchQueryBuilder {
 
 	Query missingField = createNotQuery(buildExistsFieldQuery(ResourceProperty.IS_DELETED.getName()));
 
-	return buildShouldQuery(//
+	return buildFilterQuery(buildShouldQuery(//
 		missingField, //
-		buildMatchPhraseQuery(ResourceProperty.IS_DELETED.getName(), "false"));
+		buildMatchPhraseQuery(ResourceProperty.IS_DELETED.getName(), "false")));
     }
 
     /**
