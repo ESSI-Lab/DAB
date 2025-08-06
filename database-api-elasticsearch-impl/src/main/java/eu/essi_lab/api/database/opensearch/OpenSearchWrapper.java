@@ -393,11 +393,13 @@ public class OpenSearchWrapper {
      * @param fields
      * @param start
      * @param size
-     * @param orderingProperty
-     * @param sortOrder
+     * @param sortedFields
      * @param searchAfter
      * @param requestCache
      * @param excludeResourceBinary
+     * @param trackTotalHits
+     * @param termFrequencyTargets
+     * @param maxFrequencyMapItems
      * @return
      * @throws Exception
      */
@@ -410,11 +412,38 @@ public class OpenSearchWrapper {
 	    Optional<SortedFields> sortedFields, //
 	    Optional<SearchAfter> searchAfter, //
 	    boolean requestCache, //
-	    boolean excludeResourceBinary)
+	    boolean excludeResourceBinary,
 
-	    throws Exception {
+	    boolean trackTotalHits, //
+	    List<Queryable> termFrequencyTargets, //
+	    Optional<Integer> maxFrequencyMapItems//
+
+    ) throws Exception {
 
 	SearchResponse<Object> response = client.search(builder -> {
+
+	    //
+	    // optional term frequency
+	    //
+
+	    if (!termFrequencyTargets.isEmpty()) {
+
+		termFrequencyTargets.forEach(trg -> {
+
+		    builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
+
+			    DataFolderMapping.toKeywordField(trg.getName())).size(maxFrequencyMapItems.get())));
+		});
+	    }
+
+	    //
+	    // optional track total hits (message.countInRetrievalIncluded())
+	    //
+
+	    if (trackTotalHits) {
+
+		builder.trackTotalHits(new TrackHits.Builder().enabled(true).build());//
+	    }
 
 	    builder.query(searchQuery).//
 		    index(index);
@@ -460,7 +489,10 @@ public class OpenSearchWrapper {
 			sortedFields, //
 			fields, //
 			excludeResourceBinary, //
-			requestCache);//
+			requestCache, //
+			trackTotalHits, //
+			termFrequencyTargets,
+			maxFrequencyMapItems);//
 	    }
 
 	    return builder;
@@ -472,27 +504,83 @@ public class OpenSearchWrapper {
 	return response;
     }
 
-    private List<FieldValue> getFieldValues(Optional<List<Object>> values) {
-	ArrayList<FieldValue> ret = new ArrayList<FieldValue>();
-	if (values.isEmpty()) {
-	    return ret;
-	}
-	for (Object obj : values.get()) {
-	    if (obj instanceof String) {
-		String str = (String) obj;
-		FieldValue fv = FieldValue.of(str);
-		ret.add(fv);
-	    } else if (obj instanceof Long) {
-		Long l = (Long) obj;
-		FieldValue fv = FieldValue.of(l);
-		ret.add(fv);
-	    } else if (obj instanceof Double) {
-		Double d = (Double) obj;
-		FieldValue fv = FieldValue.of(d);
-		ret.add(fv);
-	    }
-	}
-	return ret;
+    /**
+     * <b>NOTE</b>: if <code>size</code> is greater than {@link #MAX_DEFAULT_HITS}, the request will fail and an
+     * {@link OpenSearchException} will be thrown
+     * 
+     * @param index
+     * @param searchQuery
+     * @param fields
+     * @param start
+     * @param size
+     * @param sortedFields
+     * @param searchAfter
+     * @param requestCache
+     * @param excludeResourceBinary
+     * @return
+     * @throws Exception
+     */
+    public SearchResponse<Object> search(//
+	    String index, //
+	    Query searchQuery, //
+	    List<String> fields, //
+	    int start, //
+	    int size, //
+	    Optional<SortedFields> sortedFields, //
+	    Optional<SearchAfter> searchAfter, //
+	    boolean requestCache, //
+	    boolean excludeResourceBinary
+
+    ) throws Exception {
+
+	return search(index, //
+		searchQuery, //
+		fields, //
+		start, //
+		size, //
+		sortedFields, //
+		searchAfter, //
+		requestCache, //
+		excludeResourceBinary, //
+		false, //
+		new ArrayList<>(), //
+		Optional.empty());
+
+    }
+
+    /**
+     * <b>NOTE</b>: if <code>size</code> is greater than {@link #MAX_DEFAULT_HITS}, the request will fail and an
+     * {@link OpenSearchException} will be thrown
+     * 
+     * @param index
+     * @param searchQuery
+     * @param message
+     * @param requestCache
+     * @return
+     * @throws Exception
+     */
+    public SearchResponse<Object> search(//
+	    String index, //
+	    Query searchQuery, //
+	    DiscoveryMessage message, //
+	    boolean requestCache)
+
+	    throws Exception {
+
+	return search(//
+		index, //
+		searchQuery, //
+		message.getResourceSelector().getIndexes(), //
+		message.getPage().getStart() - 1, //
+		message.getPage().getSize(), //
+		message.getSortedFields(), //
+		message.getSearchAfter(), //
+		requestCache, //
+		message.isResourceBinaryExcluded(), //
+		message.isCountInRetrievalIncluded(), // track total hits
+		message.getTermFrequencyTargets(), //
+		Optional.of(message.getMaxFrequencyMapItems()));
+
     }
 
     /**
@@ -517,7 +605,13 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		Optional.empty(), //
 		false, //
-		false);
+		false, //
+
+		false, //
+		new ArrayList<>(), //
+		Optional.empty()//
+
+	);
 
 	return OpenSearchUtils.toBinaryList(searchResponse);
     }
@@ -629,7 +723,8 @@ public class OpenSearchWrapper {
 		Optional.empty(), // sorted properties
 		Optional.empty(), // search after
 		false, // request cache
-		true); // exclude binary
+		true // exclude binary
+	);
 
 	return OpenSearchUtils.toFieldsList(response, field);
     }
@@ -843,6 +938,43 @@ public class OpenSearchWrapper {
     }
 
     /**
+     * @param values
+     * @return
+     */
+    private List<FieldValue> getFieldValues(Optional<List<Object>> values) {
+
+	ArrayList<FieldValue> ret = new ArrayList<FieldValue>();
+
+	if (values.isEmpty()) {
+	    return ret;
+	}
+
+	for (Object obj : values.get()) {
+
+	    if (obj instanceof String) {
+
+		String str = (String) obj;
+		FieldValue fv = FieldValue.of(str);
+		ret.add(fv);
+
+	    } else if (obj instanceof Long) {
+
+		Long l = (Long) obj;
+		FieldValue fv = FieldValue.of(l);
+		ret.add(fv);
+
+	    } else if (obj instanceof Double) {
+
+		Double d = (Double) obj;
+		FieldValue fv = FieldValue.of(d);
+		ret.add(fv);
+	    }
+	}
+
+	return ret;
+    }
+
+    /**
      * @param searchQuery
      * @param field
      * @param aggregation
@@ -925,6 +1057,9 @@ public class OpenSearchWrapper {
      * @param fields
      * @param excludeResourceBinary
      * @param requestCache
+     * @param trackTotalHits
+     * @param termFrequencyTargets
+     * @param maxFrequencyMapItems 
      */
     private void debugSearchRequest(//
 	    Query searchQuery, //
@@ -935,9 +1070,27 @@ public class OpenSearchWrapper {
 	    Optional<SortedFields> sortedFields, //
 	    List<String> fields, //
 	    boolean excludeResourceBinary, //
-	    boolean requestCache) {
+	    boolean requestCache, //
+	    boolean trackTotalHits, //
+	    List<Queryable> termFrequencyTargets,//
+	    Optional<Integer> maxFrequencyMapItems) {
 
 	org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
+
+	if (!termFrequencyTargets.isEmpty()) {
+
+	    termFrequencyTargets.forEach(trg -> {
+
+		clone.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
+
+			DataFolderMapping.toKeywordField(trg.getName())).size(maxFrequencyMapItems.get())));
+	    });
+	}
+
+	if (trackTotalHits) {
+
+	    clone.trackTotalHits(new TrackHits.Builder().enabled(true).build());//
+	}
 
 	clone.query(searchQuery).//
 		index(index);
