@@ -38,7 +38,7 @@ public class HCDataBase extends Database {
 
     @Override
     public boolean supports(StorageInfo dbUri) {
- 
+
 	return dbUri instanceof HCStorageInfo;
     }
 
@@ -133,5 +133,11 @@ public class HCDataBase extends Database {
     public String getIdentifier() {
 
 	return null;
+    }
+
+    @Override
+    public DatabaseImpl getImplementation() {
+
+	return DatabaseImpl.HEALTH_CHECK;
     }
 }

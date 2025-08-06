@@ -1136,4 +1136,10 @@ public class MarkLogicDatabase extends Database {
 
 	return "MarkLogicDatabase";
     }
+
+    @Override
+    public DatabaseImpl getImplementation() {
+
+	return DatabaseImpl.MARK_LOGIC;
+    }
 }

@@ -80,7 +80,15 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 	/**
 	 * 
 	 */
-	OPENSEARCH("OpenSearch");
+	OPENSEARCH("OpenSearch"),
+	/**
+	 * 
+	 */
+	VOLATILE("Volatile"),
+	/**
+	 * 
+	 */
+	HEALTH_CHECK("HealthCheck");
 
 	private String name;
 
@@ -473,5 +481,10 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 
 	return getFolder(dirURI, createIfNotExist).orElse(null);
     }
+
+    /**
+     * @return
+     */
+    public abstract DatabaseImpl getImplementation();
 
 }

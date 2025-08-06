@@ -61,6 +61,7 @@ import com.fasterxml.jackson.core.StreamReadConstraints;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.Database.DatabaseImpl;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -608,5 +609,11 @@ public class OpenSearchDatabase extends Database {
 
 	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + mapping.getIndex() + "Error", ex);
 	}
+    }
+
+    @Override
+    public DatabaseImpl getImplementation() {
+
+	return DatabaseImpl.OPENSEARCH;
     }
 }
