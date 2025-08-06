@@ -31,7 +31,9 @@ import java.util.concurrent.StructuredTaskScope.Subtask;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database.DatabaseImpl;
+import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
@@ -45,24 +47,11 @@ import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.request.executor.IDiscoveryNodeExecutor;
 import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 import eu.essi_lab.request.executor.IDistributor;
-import eu.essi_lab.request.executor.discover.submitter.DatabaseQueryExecutor;
 import eu.essi_lab.request.executor.query.IQueryExecutor;
+import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
 
 /**
- * The default implementation of IDiscoverExecutor uses two subcomponents to enable discovery of the resources matching
- * the user discovery
- * queries (both count and retrieval): the query initializer and the Distributor. The steps to be done are as in the
- * following:
- * <ol>
- * <li>Query Initializer is called to initialize the query (e.g. to get a query in normal form)</li>
- * <li>The Distributor is initialized with an ordered list of query submitters. These are initialized by the discovery
- * executor from the ordered list of sources, found as a field of the discovery message. In general, there will be (at
- * most) one database
- * query submitter and (zero or more) distributed query submitters.</li>
- * <li>Distributor: to execute the normalized query</li>
- * </ol>
- *
- * @author boldrini
+ * @author Fabrizio
  */
 public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 	implements IDiscoveryExecutor, IDiscoveryNodeExecutor, IDiscoveryStringExecutor {
@@ -99,7 +88,6 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
     public ResultSet<Node> retrieveNodes(DiscoveryMessage message) throws GSException {
 
 	return retrieve(message, Node.class);
-
     }
 
     @Override
@@ -121,7 +109,7 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
      * @return
      * @throws Exception
      */
-    @SuppressWarnings({ "unchecked", "incomplete-switch" })
+    @SuppressWarnings({ "unchecked" })
     private <R> ResultSet<R> retrieve(DiscoveryMessage message, Class<R> clazz) throws GSException {
 
 	new QueryInitializer().initializeQuery(message);
@@ -130,11 +118,9 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 
 	//
 	// if the request do not include distributed sources, the Distributor is bypassed and the request
-	// is directly handled by the DatabaseQueryExecutor
+	// is directly handled by the DatabaseFinder
 	//
 	if (!hasDistributedSources(message)) {
-
-	    DatabaseQueryExecutor executor = new DatabaseQueryExecutor();
 
 	    //
 	    // - if the request do not require term frequency targets, and the count value in retrieval is not
@@ -148,21 +134,23 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 	    // - the DB impl. is MarkLogic and term frequency targets and count in retrieval are not required
 	    //
 
+	    DatabaseFinder finder = DatabaseProviderFactory.getFinder(message.getDataBaseURI());
+
 	    if ((message.getTermFrequencyTargets().isEmpty() && !message.isCountInRetrievalIncluded()) ||
 
 		    DatabaseFactory.get(message.getDataBaseURI()).getImplementation() == DatabaseImpl.OPENSEARCH) {
 
 		if (clazz.equals(GSResource.class)) {
 
-		    result = (ResultSet<R>) executor.retrieve(message, message.getPage());
+		    result = (ResultSet<R>) finder.discover(message);
 
 		} else if (clazz.equals(String.class)) {
 
-		    result = (ResultSet<R>) executor.retrieveStrings(message, message.getPage());
+		    result = (ResultSet<R>) finder.discoverStrings(message);
 
 		} else {
 
-		    result = (ResultSet<R>) executor.retrieveNodes(message, message.getPage());
+		    result = (ResultSet<R>) finder.discoverNodes(message);
 		}
 
 	    } else {
@@ -182,10 +170,10 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 
 		    Subtask<CountSet> countTask = scope.fork(() -> {
 
-			SimpleEntry<String, DiscoveryCountResponse> count = executor.count(message);
+			DiscoveryCountResponse count = finder.count(message);
 
 			CountSet countSet = new CountSet();
-			countSet.addCountPair(count);
+			countSet.addCountPair(new SimpleEntry<String, DiscoveryCountResponse>(Type.DATABASE.toString(), count));
 
 			int pageCount = (int) (countSet.getCount() < message.getPage().getSize() ? 1
 				: Math.ceil(((double) countSet.getCount() / message.getPage().getSize())));
@@ -205,15 +193,15 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 
 			if (clazz.equals(GSResource.class)) {
 
-			    return executor.retrieve(message, message.getPage());
+			    return finder.discover(message);
 			}
 
 			if (clazz.equals(String.class)) {
 
-			    return executor.retrieveStrings(message, message.getPage());
+			    return finder.discoverStrings(message);
 			}
 
-			return executor.retrieveNodes(message, message.getPage());
+			return finder.discoverNodes(message);
 		    });
 
 		    try {
@@ -235,7 +223,7 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 	} else {
 
 	    //
-	    // the Distributor is necessary if distributed sources are included 
+	    // the Distributor is necessary if distributed sources are included
 	    //
 
 	    IDistributor distributor = initDistributor(message);
