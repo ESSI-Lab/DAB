@@ -67,6 +67,7 @@ import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.Chronometer;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
@@ -97,12 +98,17 @@ public class ConfigurationWrapper {
     /**
      * 
      */
-    private static List<GSSource> allSourcesCache;
+    private static List<GSSource> allSources;
 
     /**
      * 
      */
-    private static List<HarvestingSetting> harvestingSettingsCache;
+    private static List<GSSource> distributedSources;
+
+    /**
+     * 
+     */
+    private static List<HarvestingSetting> harvestingSettings;
 
     /**
      * 
@@ -113,8 +119,6 @@ public class ConfigurationWrapper {
      * 
      */
     private static String sparqlProxyEndpoint;
-    
-    
 
     /**
      * 
@@ -140,17 +144,19 @@ public class ConfigurationWrapper {
 	    @Override
 	    public void configurationChanged(ConfigurationChangeEvent event) {
 
-		allSourcesCache = getSources(null, false);
-		harvestingSettingsCache = _getHarvestingSettings();
-		systemSetting = getSystemSetting_();
-		databaseSetting = getDatabaseSetting_();
+		allSources = getSources(null, false);
+		harvestingSettings = _getHarvestingSettings();
+		systemSetting = _getSystemSetting();
+		databaseSetting = _getDatabaseSetting();
+		distributedSources = _getDistributedSources();
 	    }
 	});
 
-	allSourcesCache = getSources(null, false);
-	harvestingSettingsCache = _getHarvestingSettings();
-	systemSetting = getSystemSetting_();
-	databaseSetting = getDatabaseSetting_();
+	allSources = getSources(null, false);
+	harvestingSettings = _getHarvestingSettings();
+	systemSetting = _getSystemSetting();
+	databaseSetting = _getDatabaseSetting();
+	distributedSources = _getDistributedSources();
     }
 
     /**
@@ -176,7 +182,7 @@ public class ConfigurationWrapper {
 
 	if (databaseSetting == null) {
 
-	    databaseSetting = getDatabaseSetting_();
+	    databaseSetting = _getDatabaseSetting();
 	}
 
 	return databaseSetting;
@@ -185,7 +191,7 @@ public class ConfigurationWrapper {
     /**
      * @return
      */
-    private static DatabaseSetting getDatabaseSetting_() {
+    private static DatabaseSetting _getDatabaseSetting() {
 
 	return configuration.get(//
 		MainSettingsIdentifier.DATABASE.getLabel(), //
@@ -332,7 +338,7 @@ public class ConfigurationWrapper {
      */
     public static List<HarvestingSetting> getHarvestingSettings() {
 
-	return harvestingSettingsCache;
+	return harvestingSettings;
     }
 
     /**
@@ -498,7 +504,7 @@ public class ConfigurationWrapper {
      */
     public static List<GSSource> getAllSources() {
 
-	return allSourcesCache;
+	return allSources;
     }
 
     /**
@@ -600,10 +606,27 @@ public class ConfigurationWrapper {
      */
     public static List<GSSource> getDistributedSources() {
 
+	return distributedSources;
+    }
+
+    /**
+     * @return
+     */
+    private static List<GSSource> _getDistributedSources() {
+
 	return getAllSources().//
 		stream().//
 		filter(s -> s.getBrokeringStrategy() == BrokeringStrategy.DISTRIBUTED).//
 		collect(Collectors.toList());
+    }
+
+    /**
+     * @param message
+     * @return
+     */
+    public static boolean hasDistributedSources(DiscoveryMessage message) {
+
+	return message.getSources().stream().anyMatch(distributedSources::contains);
     }
 
     /**
@@ -717,7 +740,7 @@ public class ConfigurationWrapper {
 
 	if (systemSetting == null) {
 
-	    systemSetting = getSystemSetting_();
+	    systemSetting = _getSystemSetting();
 	}
 
 	return systemSetting;
@@ -735,7 +758,7 @@ public class ConfigurationWrapper {
      * @param settingClass
      * @return
      */
-    private static SystemSetting getSystemSetting_() {
+    private static SystemSetting _getSystemSetting() {
 
 	return configuration.get(//
 		MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel(), //
@@ -837,11 +860,11 @@ public class ConfigurationWrapper {
 
 	return sparqlProxyEndpoint;
     }
-    
+
     public static List<String> getAdminUsers() {
 
 	Optional<Properties> kvo = getSystemSettings().getKeyValueOptions();
-	List<String>adminUsers = new ArrayList<String>();
+	List<String> adminUsers = new ArrayList<String>();
 	if (kvo.isPresent()) {
 
 	    String prop = kvo.get().getProperty(KeyValueOptionKeys.ADMIN_USERS.getLabel());

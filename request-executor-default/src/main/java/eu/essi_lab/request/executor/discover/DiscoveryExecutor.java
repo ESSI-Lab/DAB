@@ -39,7 +39,6 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
-import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.request.executor.AbstractAuthorizedExecutor;
@@ -120,7 +119,7 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 	// if the request do not include distributed sources, the Distributor is bypassed and the request
 	// is directly handled by the DatabaseFinder
 	//
-	if (!hasDistributedSources(message)) {
+	if (!ConfigurationWrapper.hasDistributedSources(message)) {
 
 	    //
 	    // - if the request do not require term frequency targets, and the count value in retrieval is not
@@ -258,17 +257,5 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 
 	distributor.setQuerySubmitters(querySubmitters);
 	return distributor;
-    }
-
-    /**
-     * @param message
-     * @return
-     */
-    private boolean hasDistributedSources(DiscoveryMessage message) {
-
-	List<GSSource> distributedSources = ConfigurationWrapper.getDistributedSources();
-	List<GSSource> sources = message.getSources();
-
-	return sources.stream().anyMatch(distributedSources::contains);
     }
 }
