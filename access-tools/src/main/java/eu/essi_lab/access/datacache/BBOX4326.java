@@ -25,6 +25,10 @@ import java.math.BigDecimal;
 
 public class BBOX4326 extends BBOX {
 
+    public BBOX4326() {
+	
+    }
+    
     public BigDecimal getSouth() {
 	return getMiny();
     }

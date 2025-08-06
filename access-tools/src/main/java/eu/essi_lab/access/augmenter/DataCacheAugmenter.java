@@ -57,6 +57,7 @@ import eu.essi_lab.access.datacache.BBOX4326;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.DataRecord;
+import eu.essi_lab.access.datacache.LatitudeLongitude;
 import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.augmenter.ResourceAugmenter;
@@ -625,9 +626,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 			BigDecimal west = new BigDecimal(w);
 			BigDecimal east = new BigDecimal(e);
 			station.setBbox4326(new BBOX4326(south, north, west, east));
-			if (areEquals(s, n) && areEquals(w, e)) {
-			    station.setLatitudeLongitude(new SimpleEntry<BigDecimal, BigDecimal>(south, west));
-			}
+			
 		    }
 		}
 		Optional<String> platformIdentifier = resource.getExtensionHandler().getUniquePlatformIdentifier();
@@ -742,9 +741,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 	return Optional.empty();
     }
 
-    private boolean areEquals(double s, double n) {
-	return Math.abs(s - n) < 0.0000001d;
-    }
+    
 
     /**
      * @param accessExecutor

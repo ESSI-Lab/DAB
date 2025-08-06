@@ -46,147 +46,162 @@ import com.fasterxml.jackson.core.JsonToken;
  */
 public class JSONArrayStreamParser {
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-		String jsonString = "[\n"
-				+ "    {\"name\": {\"name\": {\"first\": \"Bob\", \"last\": [\"Smith\",[]]}, \"age\": 25}},{ \"age\": [23, 39]},\n"
-				+ "    {\"name\": {\"first\": \"Bob\", \"last\": [\"Smith\",[]]}, \"age\": 25},\n"
-				+ "    {\"name\": \"Charlie\", \"age\": 40}\n" + "]";
+	String jsonString = "[\n"
+		+ "    {\"name\": {\"name\": {\"first\": \"Bob\", \"last\": [\"Smith\",[]]}, \"age\": 25}},{ \"age\": [23, 39]},\n"
+		+ "    {\"name\": {\"first\": \"Bob\", \"last\": [\"Smith\",[]]}, \"age\": 25},\n"
+		+ "    {\"name\": \"Charlie\", \"age\": 40}\n" + "]";
 
-		ByteArrayInputStream bis = new ByteArrayInputStream(jsonString.getBytes());
+	ByteArrayInputStream bis = new ByteArrayInputStream(jsonString.getBytes());
 
-		JSONArrayStreamParser parser = new JSONArrayStreamParser();
+	JSONArrayStreamParser parser = new JSONArrayStreamParser();
 
-		JSONArrayStreamParserListener listener = new JSONArrayStreamParserListener() {
+	JSONArrayStreamParserListener listener = new JSONArrayStreamParserListener() {
 
-			@Override
-			public void finished() {
-				System.out.println("finished");
+	    @Override
+	    public void finished() {
+		System.out.println("finished");
 
-			}
+	    }
 
-			@Override
-			public void notifyJSONObject(JSONObject object) {
-				System.out.println(object.toString());
+	    @Override
+	    public void notifyJSONObject(JSONObject object) {
+		System.out.println(object.toString());
 
-			}
+	    }
 
-			@Override
-			public void notifyJSONArray(JSONArray object) {
+	    @Override
+	    public void notifyJSONArray(JSONArray object) {
 
-			}
+	    }
 
-		};
-		parser.parse(bis, listener);
+	};
+	parser.parse(bis, listener);
 
+    }
+
+    private JSONObject parseFirstObject(InputStream inputStream) throws IOException {
+	JsonFactory jsonFactory = new JsonFactory();
+	JsonParser jsonParser = jsonFactory.createParser(inputStream);
+
+	if (jsonParser.nextToken() != JsonToken.START_ARRAY) {
+	    throw new IOException("Expected JSON array");
 	}
 
-	public void parse(InputStream bis, JSONArrayStreamParserListener listener) throws Exception {
-		JsonFactory jsonFactory = new JsonFactory();
-		JsonParser jsonParser = jsonFactory.createParser(bis);
-
-		// Move to the outer START_ARRAY
-		if (jsonParser.nextToken() != JsonToken.START_ARRAY) {
-			throw new IOException("Expected START_ARRAY");
-		}
-
-		// Read each element inside the array
-		while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
-			JsonToken currentToken = jsonParser.getCurrentToken();
-			if (currentToken == JsonToken.START_OBJECT) {
-				String jsonObjectString = extractJsonObjectAsString(jsonParser);
-				JSONObject json = new JSONObject(jsonObjectString);
-				listener.notifyJSONObject(json);
-			} else if (currentToken == JsonToken.START_ARRAY) {
-				String jsonArrayString = extractJsonArrayAsString(jsonParser);
-				JSONArray array = new JSONArray(jsonArrayString);
-				listener.notifyJSONArray(array);
-			} else {
-				// handle primitives if needed (e.g., numbers, strings in array)
-				// skip or wrap as JSONArray if required
-			}
-		}
-
-		listener.finished();
-		jsonParser.close();
+	while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
+	    if (jsonParser.getCurrentToken() == JsonToken.START_OBJECT) {
+		String jsonObjectString = extractJsonObjectAsString(jsonParser);
+		return new JSONObject(jsonObjectString);
+	    }
 	}
 
-	private static String extractJsonObjectAsString(JsonParser jsonParser) throws IOException {
-		StringWriter stringWriter = new StringWriter();
-		JsonGenerator jsonGenerator = new JsonFactory().createGenerator(stringWriter);
+	throw new IOException("No JSON object found in array");
+    }
 
-		Deque<JsonToken> stack = new ArrayDeque<>();
-		int openBraces = 1; // Count opening braces to ensure the object is complete
+    public void parse(InputStream bis, JSONArrayStreamParserListener listener) throws Exception {
+	JsonFactory jsonFactory = new JsonFactory();
+	JsonParser jsonParser = jsonFactory.createParser(bis);
 
-		// We are at the START_OBJECT token, so let's write the initial '{'
-		jsonGenerator.writeStartObject();
-		stack.push(JsonToken.START_OBJECT);
-
-		while (openBraces > 0) {
-			JsonToken token = jsonParser.nextToken();
-			if (token == null) {
-				throw new IOException("Incomplete JSON object");
-			}
-
-			if (token == JsonToken.START_ARRAY || token == JsonToken.START_OBJECT) {
-				openBraces++;
-				stack.push(token);
-			} else if (token == JsonToken.END_ARRAY || token == JsonToken.END_OBJECT) {
-				openBraces--;
-				stack.pop();
-			}
-
-			// We only copy tokens when inside an object or array context
-			if (!stack.isEmpty() && (stack.peek() == JsonToken.START_OBJECT || stack.peek() == JsonToken.START_ARRAY)) {
-				jsonGenerator.copyCurrentEvent(jsonParser);
-			}
-		}
-		if (stack.isEmpty()) {
-			jsonGenerator.writeEndObject();
-		}
-
-		jsonGenerator.flush();
-
-		return stringWriter.toString();
-	}
-	
-	private static String extractJsonArrayAsString(JsonParser jsonParser) throws IOException {
-		StringWriter stringWriter = new StringWriter();
-		JsonGenerator jsonGenerator = new JsonFactory().createGenerator(stringWriter);
-
-		int depth = 0;
-		JsonToken token = jsonParser.getCurrentToken();
-
-		if (token != JsonToken.START_ARRAY) {
-			throw new IOException("Expected START_ARRAY but found: " + token);
-		}
-
-		// Start copying events
-		do {
-			if (token == JsonToken.START_ARRAY || token == JsonToken.START_OBJECT) {
-				depth++;
-			} else if (token == JsonToken.END_ARRAY || token == JsonToken.END_OBJECT) {
-				depth--;
-			}
-
-			jsonGenerator.copyCurrentEvent(jsonParser);
-
-			if (depth == 0) {
-				break; // we’ve reached the end of this array
-			}
-
-			token = jsonParser.nextToken();
-			if (token == null) {
-				throw new IOException("Unexpected end of JSON while parsing array");
-			}
-
-		} while (true);
-
-		jsonGenerator.flush();
-		return stringWriter.toString();
+	// Move to the outer START_ARRAY
+	if (jsonParser.nextToken() != JsonToken.START_ARRAY) {
+	    throw new IOException("Expected START_ARRAY");
 	}
 
+	// Read each element inside the array
+	while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
+	    JsonToken currentToken = jsonParser.getCurrentToken();
+	    if (currentToken == JsonToken.START_OBJECT) {
+		String jsonObjectString = extractJsonObjectAsString(jsonParser);
+		JSONObject json = new JSONObject(jsonObjectString);
+		listener.notifyJSONObject(json);
+	    } else if (currentToken == JsonToken.START_ARRAY) {
+		String jsonArrayString = extractJsonArrayAsString(jsonParser);
+		JSONArray array = new JSONArray(jsonArrayString);
+		listener.notifyJSONArray(array);
+	    } else {
+		// handle primitives if needed (e.g., numbers, strings in array)
+		// skip or wrap as JSONArray if required
+	    }
+	}
 
-	
-	
+	listener.finished();
+	jsonParser.close();
+    }
+
+    private static String extractJsonObjectAsString(JsonParser jsonParser) throws IOException {
+	StringWriter stringWriter = new StringWriter();
+	JsonGenerator jsonGenerator = new JsonFactory().createGenerator(stringWriter);
+
+	Deque<JsonToken> stack = new ArrayDeque<>();
+	int openBraces = 1; // Count opening braces to ensure the object is complete
+
+	// We are at the START_OBJECT token, so let's write the initial '{'
+	jsonGenerator.writeStartObject();
+	stack.push(JsonToken.START_OBJECT);
+
+	while (openBraces > 0) {
+	    JsonToken token = jsonParser.nextToken();
+	    if (token == null) {
+		throw new IOException("Incomplete JSON object");
+	    }
+
+	    if (token == JsonToken.START_ARRAY || token == JsonToken.START_OBJECT) {
+		openBraces++;
+		stack.push(token);
+	    } else if (token == JsonToken.END_ARRAY || token == JsonToken.END_OBJECT) {
+		openBraces--;
+		stack.pop();
+	    }
+
+	    // We only copy tokens when inside an object or array context
+	    if (!stack.isEmpty() && (stack.peek() == JsonToken.START_OBJECT || stack.peek() == JsonToken.START_ARRAY)) {
+		jsonGenerator.copyCurrentEvent(jsonParser);
+	    }
+	}
+	if (stack.isEmpty()) {
+	    jsonGenerator.writeEndObject();
+	}
+
+	jsonGenerator.flush();
+
+	return stringWriter.toString();
+    }
+
+    private static String extractJsonArrayAsString(JsonParser jsonParser) throws IOException {
+	StringWriter stringWriter = new StringWriter();
+	JsonGenerator jsonGenerator = new JsonFactory().createGenerator(stringWriter);
+
+	int depth = 0;
+	JsonToken token = jsonParser.getCurrentToken();
+
+	if (token != JsonToken.START_ARRAY) {
+	    throw new IOException("Expected START_ARRAY but found: " + token);
+	}
+
+	// Start copying events
+	do {
+	    if (token == JsonToken.START_ARRAY || token == JsonToken.START_OBJECT) {
+		depth++;
+	    } else if (token == JsonToken.END_ARRAY || token == JsonToken.END_OBJECT) {
+		depth--;
+	    }
+
+	    jsonGenerator.copyCurrentEvent(jsonParser);
+
+	    if (depth == 0) {
+		break; // we’ve reached the end of this array
+	    }
+
+	    token = jsonParser.nextToken();
+	    if (token == null) {
+		throw new IOException("Unexpected end of JSON while parsing array");
+	    }
+
+	} while (true);
+
+	jsonGenerator.flush();
+	return stringWriter.toString();
+    }
+
 }

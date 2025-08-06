@@ -31,7 +31,9 @@ import java.nio.file.Path;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -93,7 +95,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, "10000"); // note: 100000 is too much, it returns
 										 // 413
 	dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, "2000");
-	dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, "60");
+	dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, "0");
 
 	// SETTINGS RETRIEVAL
 
@@ -355,6 +357,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	    XMLEventReader reader = factory.createXMLEventReader(source);
 
 	    String nodataValue = null;
+	    Set<String> insertedDateHours = new HashSet<String>();
 	    while (reader.hasNext()) {
 
 		XMLEvent event = reader.nextEvent();
@@ -392,6 +395,14 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 			    try {
 				if (d.isPresent()) {
 
+				    String dateTime = ISO8601DateTimeUtils.getISO8601DateTime(d.get());
+				    String dateAndHour = dateTime.substring(0, 14);
+				    if (insertedDateHours.contains(dateAndHour)) {
+					// already inserted for this hour. this is to skip sub hours data
+					continue;
+				    } else {
+					insertedDateHours.add(dateAndHour);
+				    }
 				    DataRecord dataRecord = new DataRecord(d.get(), v, uom, observedProperty, latitudeLongitude,
 					    dataIdentifier);
 				    dataRecord.setQuality(quality);

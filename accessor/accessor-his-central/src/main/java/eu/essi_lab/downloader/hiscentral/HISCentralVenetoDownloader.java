@@ -261,8 +261,10 @@ public class HISCentralVenetoDownloader extends WMLDataDownloader {
 				if (valueString.contains(",") && valueString.contains(":")) {
 				    JSONObject jsonValues = new JSONObject(valueString);
 				    String name = online.getName();
-				    String valueType = name.split("\\(")[1].split("\\)")[0];
-				    dataValue = jsonValues.getBigDecimal(valueType);
+				    //String valueType = name.split("\\(")[1].split("\\)")[0];
+				    //dataValue = jsonValues.getBigDecimal(valueType);
+				    String valueType = extractLastInParentheses(name);
+				    dataValue = valueType != null ? jsonValues.getBigDecimal(valueType) : null;
 				}else {
 				    dataValue = new BigDecimal(valueString); 
 				}
@@ -323,6 +325,17 @@ public class HISCentralVenetoDownloader extends WMLDataDownloader {
 		ErrorInfo.SEVERITY_ERROR, //
 		HISCENTRAL_VENETO_DOWNLOAD_ERROR);
 
+    }
+
+    private String extractLastInParentheses(String text) {
+	int lastOpen = text.lastIndexOf('(');
+        int lastClose = text.lastIndexOf(')');
+
+        if (lastOpen != -1 && lastClose != -1 && lastClose > lastOpen) {
+            return text.substring(lastOpen + 1, lastClose).trim();
+        }
+
+        return null;
     }
 
     private List<JSONObject> getData(List<String> linkages) throws GSException {

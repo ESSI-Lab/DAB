@@ -115,11 +115,6 @@ public class ICHANGEStationAugmenter extends ResourceAugmenter<ICHANGEStationAug
 	    		}	    		
 	    	}
 	    }
-	    
-	    if (Math.abs(south - north) < 0.0000001 && Math.abs(east - west) < 0.0000001) {		
-		record.setShape("POINT(" + west + " " + south + ")");
-	    }
-
 	    MIPlatform platform = miMetadata.getMIPlatform();
 
 	    String stationTitle = platform.getCitation().getTitle();
