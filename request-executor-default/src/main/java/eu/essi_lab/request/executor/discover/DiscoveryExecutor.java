@@ -25,7 +25,6 @@ import java.util.Arrays;
  */
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -169,7 +168,7 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 
-		Callable<FutureContainer> countTask = () -> {
+		Callable<FutureWrapper> countTask = () -> {
 
 		    DiscoveryCountResponse count = finder.count(message);
 
@@ -187,45 +186,40 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 
 		    countSet.setPageIndex(pageIndex);
 
-		    return new FutureContainer(countSet);
+		    return new FutureWrapper(countSet);
 		};
 
-		Callable<FutureContainer> retrieveTask = () -> {
+		Callable<FutureWrapper> retrieveTask = () -> {
 
 		    if (clazz.equals(GSResource.class)) {
 
-			return new FutureContainer(finder.discover(message));
+			return new FutureWrapper(finder.discover(message));
 		    }
 
 		    if (clazz.equals(String.class)) {
 
-			return new FutureContainer(finder.discoverStrings(message));
+			return new FutureWrapper(finder.discoverStrings(message));
 		    }
 
-		    return new FutureContainer(finder.discoverNodes(message));
+		    return new FutureWrapper(finder.discoverNodes(message));
 		};
 
 		try {
 
-		    List<Future<FutureContainer>> futures = executor.invokeAll(Arrays.asList(countTask, retrieveTask));
+		    List<Future<FutureWrapper>> futures = executor.invokeAll(Arrays.asList(countTask, retrieveTask));
 
-		    Optional<CountSet> optCountSet = futures.get(0).get().getCountSet();
-		    Optional<ResultSet<R>> optResultSet = futures.get(1).get().getResultSet();
-
-		    CountSet countSet = optCountSet.get();
-		    result = optResultSet.get();
+		    CountSet countSet = futures.get(0).get().getCountSet();
+		    result = futures.get(1).get().getResultSet();
 
 		    result.setCountResponse(countSet);
 
 		} catch (Exception e) {
 
-		    throw GSException.createException(getClass(), "DiscoveryExecutorStructuredTaskScopeError", e);
+		    throw GSException.createException(getClass(), "DiscoveryExecutorMarkLogicRetrievalError", e);
 		}
 	    }
 
-	} else
-
-	{
+	} else {
 
 	    //
 	    // the Distributor is necessary if distributed sources are included
@@ -253,15 +247,15 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
     /**
      * @author Fabrizio
      */
-    private static class FutureContainer<R> {
+    private static class FutureWrapper<R> {
 
 	private CountSet countSet;
 	private ResultSet<R> resultSet;
 
 	/**
-	 * 
+	 * @param countSet
 	 */
-	public FutureContainer(CountSet countSet) {
+	public FutureWrapper(CountSet countSet) {
 
 	    this.countSet = countSet;
 	}
@@ -269,25 +263,25 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 	/**
 	 * @param resultSet
 	 */
-	public FutureContainer(ResultSet<R> resultSet) {
+	public FutureWrapper(ResultSet<R> resultSet) {
 
 	    this.resultSet = resultSet;
 	}
 
 	/**
-	 * @return the countSet
+	 * @return
 	 */
-	public Optional<CountSet> getCountSet() {
+	public CountSet getCountSet() {
 
-	    return Optional.ofNullable(countSet);
+	    return countSet;
 	}
 
 	/**
-	 * @return the resultSet
+	 * @return
 	 */
-	public Optional<ResultSet<R>> getResultSet() {
+	public ResultSet<R> getResultSet() {
 
-	    return Optional.ofNullable(resultSet);
+	    return resultSet;
 	}
     }
 
