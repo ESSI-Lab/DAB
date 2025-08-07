@@ -166,7 +166,7 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor
 		// - the DB impl. is MarkLogic and term frequency targets and/or the count in retrieval are required
 		//
 
-		ExecutorService executor = Executors.newFixedThreadPool(2);
+		ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
 		Callable<FutureWrapper> countTask = () -> {
 
