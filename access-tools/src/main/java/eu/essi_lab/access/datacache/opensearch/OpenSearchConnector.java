@@ -363,8 +363,10 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    JSONObject typeObject = new JSONObject();
 	    Class<?> javaType = field.getType();
 	    String osType = null;
+	    String format = null;
 	    if (javaType.equals(Date.class)) {
 		osType = "date";
+		format = "epoch_millis||strict_date_optional_time";
 	    } else if (javaType.equals(LatitudeLongitude.class)) {
 		osType = "geo_point";
 	    } else if (javaType.equals(BBOX4326.class)) {
@@ -392,6 +394,9 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    }
 	    if (osType != null) {
 		typeObject.put("type", osType);
+		if (format!=null) {
+		    typeObject.put("format", format);
+		}
 		String javaName = field.getName();
 		properties.put(javaName, typeObject);
 	    }

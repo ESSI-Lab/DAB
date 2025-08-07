@@ -1,12 +1,5 @@
 package eu.essi_lab.gssrv.conf.task;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.nio.file.Path;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -28,7 +21,12 @@ import java.nio.file.Path;
  * #L%
  */
 
-import java.util.AbstractMap.SimpleEntry;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -72,7 +70,7 @@ import eu.essi_lab.profiler.om.OMHandler;
 public class BasicDataHarvesterTask extends AbstractCustomTask {
 
     public enum DataHarvesterTaskOptions implements OptionsKey {
-	SOURCE_ID, THREADS_COUNT, MAX_RECORDS, VIEW_ID, TOKEN;
+	SOURCE_ID, THREADS_COUNT, MAX_RECORDS, VIEW_ID, TOKEN, OBSERVATION_ID;
     }
 
     private static final int WAITING_BUFFER_SIZE = 20000;
@@ -129,6 +127,8 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	    maxRecords = Integer.parseInt(maxRecordsString);
 	}
 
+	String observationId = taskOptions.get().get(DataHarvesterTaskOptions.OBSERVATION_ID);
+
 	int totalRecords = 0;
 	int recordsDone = 0;
 	int errors = 0;
@@ -141,6 +141,10 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 
 	if (sourceId != null) {
 	    listURL = listURL + "provider=" + sourceId + "&";
+	}
+
+	if (observationId != null) {
+	    listURL = listURL + "observationIdentifier=" + observationId + "&";
 	}
 
 	boolean firstLoop = true;
@@ -431,5 +435,9 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	    throw new IllegalArgumentException(DataValidatorErrorCode.DECODING_ERROR.toString());
 	}
 
+    }
+
+    public static void main(String[] args) {
+	System.out.println(new Date(-9990000000l));
     }
 }
