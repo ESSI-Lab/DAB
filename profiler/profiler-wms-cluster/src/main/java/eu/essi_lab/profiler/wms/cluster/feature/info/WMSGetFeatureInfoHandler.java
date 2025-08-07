@@ -242,6 +242,7 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			discoveryMessage.getResourceSelector().addIndex(MetadataElement.PLATFORM_TITLE);
 			discoveryMessage.getResourceSelector().setIncludeOriginal(false);
 			discoveryMessage.setPage(new Page(1, maxRecords));
+			discoveryMessage.setIncludeCountInRetrieval(true);
 			double south = fminy;
 			double north = fmaxy;
 			double west = fminx;

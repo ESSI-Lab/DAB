@@ -198,7 +198,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 	if (client != null) {
 	    throw new Exception("Already initialized");
 	}
-	
+
 	dataRecordbuffer = new JsonFileBuffer<DataRecord>(DataRecord.class);
 	statisticsRecordbuffer = new JsonFileBuffer<StatisticsRecord>(StatisticsRecord.class);
 	stationRecordbuffer = new JsonFileBuffer<StationRecord>(StationRecord.class);
@@ -241,8 +241,6 @@ public class OpenSearchConnector extends DataCacheConnector {
 	configure(FLUSH_INTERVAL_MS, DEFAULT_FLUSH_INTERVAL_MS.toString());
 
 	configure(CACHED_DAYS, DEFAULT_CACHED_DAYS.toString());
-	
-
 
 	scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
@@ -262,7 +260,6 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	    }
 	}, 0, 1, TimeUnit.HOURS);
-	
 
 	GSLoggerFactory.getLogger(getClass()).info("OS connector initialized: {}", databaseName);
 
@@ -394,7 +391,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    }
 	    if (osType != null) {
 		typeObject.put("type", osType);
-		if (format!=null) {
+		if (format != null) {
 		    typeObject.put("format", format);
 		}
 		String javaName = field.getName();
@@ -446,8 +443,15 @@ public class OpenSearchConnector extends DataCacheConnector {
 			}
 		    }
 
-		} else if (javaType.equals(SimpleEntry.class)) {
-		    String wkt = value.toString();
+		} else if (javaType.equals(LatitudeLongitude.class)) {
+		    String wkt;
+
+		    if (value instanceof Map<?, ?>) {
+			Map<String, String> m = (Map<String, String>) value;
+			wkt = m.get("string");
+		    } else {
+			wkt = value.toString();
+		    }
 		    WKT w = new WKT(wkt);
 		    if (w.getObjectName().equals("POINT")) {
 			LatitudeLongitude latLon = new LatitudeLongitude(w.getNumbers().get(1), w.getNumbers().get(0));
@@ -502,6 +506,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 		    }
 		}
 	    } catch (Exception e) {
+		e.printStackTrace();
 		GSLoggerFactory.getLogger(getClass()).error("[DATA-CACHE] deserialization error for data record field {}", field.getName());
 	    }
 	}

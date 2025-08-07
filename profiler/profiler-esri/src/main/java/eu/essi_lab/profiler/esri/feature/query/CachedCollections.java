@@ -141,7 +141,7 @@ public class CachedCollections {
 
 		    FeatureQueryRequestTransformer transformer = new FeatureQueryRequestTransformer();
 		    DiscoveryMessage discoveryMessage = transformer.transform(req);
-		    discoveryMessage.setUserBond(null);
+		    discoveryMessage.setUserBond(null);		    
 		    Page page = discoveryMessage.getPage();
 		    int pageSize = page.getSize();
 		    do {

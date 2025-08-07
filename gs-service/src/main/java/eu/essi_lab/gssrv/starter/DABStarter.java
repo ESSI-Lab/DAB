@@ -94,7 +94,7 @@ public class DABStarter {
     public static final String JAVA_OPT_TEST_SKIP_GDAL = "testSkipGDAL";
 
     private static final String JAVA_OPT_SKIP_HEALTH_CHECK = "skip.healthcheck";
-    
+
     public static final String JAVA_OPT_CONFIGURATION_URL = "configuration.url";
 
     private static final String JAVA_OPT_S3_ENDPOINT = "s3Endpoint";
@@ -113,8 +113,6 @@ public class DABStarter {
      * In minutes
      */
     private static final int DEFAULT_SCHEDULER_START_DELAY = 15;
-
-    
 
     /**
      * 
@@ -857,7 +855,19 @@ public class DABStarter {
 	case AUGMENTER:
 	case INTENSIVE:
 	case MIXED:
+	    break;
 	case LOCAL_PRODUCTION:
+	    // all activated.. used for testing
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_BATHYMETRY);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_BIOLOGY);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_CHEMISTRY);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_METEOROLOGY);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_OCEANOGRAPHY_NRT);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_PHYSICS);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
+	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
+	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
+		    new FeatureLayer1StationsArctic());
 	default:
 	}
     }

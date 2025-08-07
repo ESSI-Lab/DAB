@@ -83,7 +83,7 @@ public class FeatureQueryRequestTransformer extends DiscoveryRequestTransformer 
 	DiscoveryMessage message = super.transform(request);
 
 	message.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
-
+	
 	return message;
     }
 

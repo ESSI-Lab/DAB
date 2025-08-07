@@ -545,7 +545,6 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 			});
 			boxes.remove(0);
 		}
-		System.out.println("Added empty: " + boxes.size());
 		emptyBoxes.put(layer, boxes);
 
 	}
