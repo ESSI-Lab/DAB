@@ -23,6 +23,7 @@ package eu.essi_lab.gssrv.conf.task;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -43,6 +44,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
@@ -432,6 +434,19 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	    file.delete();
 
 	} catch (Exception e) {
+	    if (file != null) {
+		FileInputStream fis;
+		try {
+		    fis = new FileInputStream(file);
+		    IOUtils.copy(fis, System.out);
+		    fis.close();
+		    file.delete();
+		} catch (Exception e1) {
+		    e1.printStackTrace();
+		}
+	    }
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    throw new IllegalArgumentException(DataValidatorErrorCode.DECODING_ERROR.toString());
 	}
 

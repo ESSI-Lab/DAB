@@ -129,7 +129,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 
     private Integer cachedDays = null;
 
-    private OpenSearchClient client = null;
+    public OpenSearchClient client = null;
     private String databaseName = null;
 
     public enum DataCacheIndex {
