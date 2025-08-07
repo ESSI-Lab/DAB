@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.Normalizer;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
@@ -470,7 +471,15 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 	if (variableName == null) {
 	    return null;
 	}
-	return variableName.toLowerCase().replace(" ", "_");
+
+	// Step 1: Normalize to decompose accents (e.g., à → a + `)
+	String normalized = Normalizer.normalize(variableName, Normalizer.Form.NFD);
+
+	// Step 2: Remove non-ASCII characters (e.g., remove ` from à)
+	String ascii = normalized.replaceAll("[^\\p{ASCII}]", "");
+
+	// Step 3: Replace spaces with underscores and lowercase
+	return ascii.toLowerCase().replace(" ", "_");
     }
 
     private String getNetCDFStandardName(String variableName) {
