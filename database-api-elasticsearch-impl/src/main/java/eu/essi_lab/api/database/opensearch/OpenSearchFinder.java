@@ -256,6 +256,19 @@ public class OpenSearchFinder implements DatabaseFinder {
 			filter(Objects::nonNull).//
 			collect(Collectors.toList());
 
+		if (message.isCountInRetrievalIncluded()) {
+
+		    CountSet countSet = new CountSet();
+
+		    DiscoveryCountResponse countResponse = new DiscoveryCountResponse();
+
+		    updateCountSet(countSet, countResponse, message, resources.size());
+
+		    countSet.addCountPair(new SimpleEntry<String, DiscoveryCountResponse>(Type.DATABASE.toString(), countResponse));
+
+		    resultSet.setCountResponse(countSet);
+		}
+
 	    } else {
 
 		SearchResponse<Object> response = search_(message, false);
@@ -287,18 +300,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		    if (message.isCountInRetrievalIncluded()) {
 
-			countResponse.setCount((int) response.hits().total().value());
+			updateCountSet(countSet, countResponse, message, (int) response.hits().total().value());
 
-			int pageCount = (int) (countResponse.getCount() < message.getPage().getSize() ? 1
-				: Math.ceil(((double) countResponse.getCount() / message.getPage().getSize())));
-
-			countSet.setPageCount(countResponse.getCount() == 0 || message.getPage().getSize() == 0 ? 0 : pageCount);
-
-			int pageIndex = message.getPage().getSize() == 0 ? 0
-				: message.getPage().getStart() <= message.getPage().getSize() ? 1
-					: (message.getPage().getStart() / message.getPage().getSize()) + 1;
-
-			countSet.setPageIndex(pageIndex);
 		    }
 
 		    if (!message.getTermFrequencyTargets().isEmpty()) {
@@ -306,8 +309,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			setTermFrequencyMap(response, countResponse);
 		    }
 
-		    countSet.addCountPair(
-			    new SimpleEntry<String, DiscoveryCountResponse>(Type.DATABASE.toString(), countResponse));
+		    countSet.addCountPair(new SimpleEntry<String, DiscoveryCountResponse>(Type.DATABASE.toString(), countResponse));
 
 		    resultSet.setCountResponse(countSet);
 		}
@@ -343,6 +345,28 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    throw GSException.createException(getClass(), "OpenSearchFinderDiscoverError", ex);
 	}
+    }
+
+    /**
+     * @param countSet
+     * @param countResponse
+     * @param message
+     * @param count
+     */
+    private void updateCountSet(CountSet countSet, DiscoveryCountResponse countResponse, DiscoveryMessage message, int count) {
+
+	countResponse.setCount(count);
+
+	int pageCount = (int) (countResponse.getCount() < message.getPage().getSize() ? 1
+		: Math.ceil(((double) countResponse.getCount() / message.getPage().getSize())));
+
+	countSet.setPageCount(countResponse.getCount() == 0 || message.getPage().getSize() == 0 ? 0 : pageCount);
+
+	int pageIndex = message.getPage().getSize() == 0 ? 0
+		: message.getPage().getStart() <= message.getPage().getSize() ? 1
+			: (message.getPage().getStart() / message.getPage().getSize()) + 1;
+
+	countSet.setPageIndex(pageIndex);
     }
 
     /*
