@@ -5,7 +5,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /*-
  * #%L
@@ -37,6 +44,39 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 
 @SuppressWarnings("serial")
 public class SparqlProxyServlet extends HttpServlet {
+
+    static {
+
+	try {
+	    disableCertificateValidation();
+	} catch (Exception e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+    }
+
+    public static void disableCertificateValidation() throws Exception {
+	// Create a trust manager that does not validate certificate chains
+	TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+	    public X509Certificate[] getAcceptedIssuers() {
+		return new X509Certificate[0];
+	    }
+
+	    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+	    }
+
+	    public void checkServerTrusted(X509Certificate[] certs, String authType) {
+	    }
+	} };
+
+	// Install the all-trusting trust manager
+	SSLContext sc = SSLContext.getInstance("TLS");
+	sc.init(null, trustAllCerts, new SecureRandom());
+	HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+	// Disable hostname verification
+	HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -106,7 +146,7 @@ public class SparqlProxyServlet extends HttpServlet {
     }
 
     private String getEndpoint() {
-	
+
 	return ConfigurationWrapper.getSparqlProxyEndpoint();
     }
 }
