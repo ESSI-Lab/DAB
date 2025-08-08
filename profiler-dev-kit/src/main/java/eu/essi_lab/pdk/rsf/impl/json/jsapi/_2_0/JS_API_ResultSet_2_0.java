@@ -112,7 +112,23 @@ public class JS_API_ResultSet_2_0 {
 	return resultSet;
     }
 
-    private void init(int start, int pageSize, int size, int pageCount, int pageIndex, GSException resultSetEx, GSException messageEx) {
+    /**
+     * @param start
+     * @param pageSize
+     * @param size
+     * @param pageCount
+     * @param pageIndex
+     * @param resultSetEx
+     * @param messageEx
+     */
+    private void init(//
+	    int start, //
+	    int pageSize, //
+	    int size, //
+	    int pageCount, //
+	    int pageIndex, //
+	    GSException resultSetEx, //
+	    GSException messageEx) {
 
 	resultSet = new JSONObject();
 	resultSet.put("start", start);
@@ -120,12 +136,6 @@ public class JS_API_ResultSet_2_0 {
 	resultSet.put("size", size);
 	resultSet.put("pageCount", pageCount);
 	resultSet.put("pageIndex", pageIndex);
-
-	JSONArray errors = new JSONArray();
-	resultSet.put("errors", errors);
-
-	JSONArray warnings = new JSONArray();
-	resultSet.put("warnings", errors);
 
 	List<ErrorInfo> list = resultSetEx.getErrorInfoList();
 
@@ -163,9 +173,17 @@ public class JS_API_ResultSet_2_0 {
 	    switch (errorInfo.getSeverity()) {
 	    case ErrorInfo.SEVERITY_FATAL:
 	    case ErrorInfo.SEVERITY_ERROR:
+
+		JSONArray errors = new JSONArray();
+		resultSet.put("errors", errors);
+
 		errors.put(jsonErrorInfo);
 		break;
 	    case ErrorInfo.SEVERITY_WARNING:
+
+		JSONArray warnings = new JSONArray();
+		resultSet.put("warnings", warnings);
+
 		warnings.put(jsonErrorInfo);
 		break;
 	    }

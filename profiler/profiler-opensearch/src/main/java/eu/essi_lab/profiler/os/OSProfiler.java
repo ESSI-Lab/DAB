@@ -349,45 +349,21 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 
 	String outputFormat = readOutputFormat(request);
 	String error = message.getError();
-	OSRequestParser parser = new OSRequestParser(request);
-
-	JSONObject resultSet = null;
 
 	String out = null;
 
 	switch (outputFormat) {
 	case MediaType.APPLICATION_JSON:
 
-	    String version = parser.parse(OSParameters.OUTPUT_VERSION);
-	    switch (version) {
-	    case "1.0":
+	    GSException exception = GSException.createException(//
+		    getClass(), //
+		    error, //
+		    null, //
+		    ErrorInfo.ERRORTYPE_CLIENT, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    INVALID_OS_REQUEST);
 
-		// in this version the error message is not included in the
-		// result set, it is part of the response object. so we return only the
-		// empty result set
-		resultSet = new JSONObject();
-		resultSet.put("size", 0);
-		resultSet.put("start", 1);
-		resultSet.put("pageSize", 0);
-		resultSet.put("pageCount", 0);
-		resultSet.put("pageIndex", 0);
-
-		break;
-	    case "2.0":
-	    default:
-
-		GSException exception = GSException.createException(//
-			getClass(), //
-			error, //
-			null, //
-			ErrorInfo.ERRORTYPE_CLIENT, //
-			ErrorInfo.SEVERITY_ERROR, //
-			INVALID_OS_REQUEST);
-
-		resultSet = new JS_API_ResultSet_2_0(exception).asJSONObject();
-
-		break;
-	    }
+	    JSONObject resultSet = new JS_API_ResultSet_2_0(exception).asJSONObject();
 
 	    JSONObject object = new JSONObject();
 	    object.put("resultSet", resultSet);
