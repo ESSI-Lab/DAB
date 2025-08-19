@@ -214,9 +214,12 @@ public class OpenSearchDatabase extends Database {
 
 	GSLoggerFactory.getLogger(getClass()).info("Indexes init STARTED");
 
+	boolean nothingToDo = false;
+
 	for (IndexMapping mapping : IndexMapping.getMappings()) {
 
 	    boolean exists = checkIndex(getClient(), mapping.getIndex(false));
+	    nothingToDo |= exists;
 
 	    PutAliasRequest putAliasRequest = null;
 
@@ -225,7 +228,6 @@ public class OpenSearchDatabase extends Database {
 		GSLoggerFactory.getLogger(getClass()).info("Creating index {} STARTED", mapping.getIndex());
 
 		createIndex(mapping);
-		// createIndexWithGenericCLient(mapping);
 
 		GSLoggerFactory.getLogger(getClass()).info("Creating index {} ENDED", mapping.getIndex());
 
@@ -233,20 +235,22 @@ public class OpenSearchDatabase extends Database {
 
 		    putAliasRequest = mapping.createPutAliasRequest();
 		}
-	    } else if (mapping.hasIndexAlias()) {
-
-		try {
-
-		    if (!client.indices().existsAlias(mapping.createExistsAliasRequest()).value()) {
-
-			putAliasRequest = mapping.createPutAliasRequest();
-		    }
-
-		} catch (OpenSearchException | IOException e) {
-
-		    throw GSException.createException(getClass(), "OpenSearchDatabaseExistsAliasError", e);
-		}
 	    }
+
+	    // else if (mapping.hasIndexAlias()) {
+	    //
+	    // try {
+	    //
+	    // if (!client.indices().existsAlias(mapping.createExistsAliasRequest()).value()) {
+	    //
+	    // putAliasRequest = mapping.createPutAliasRequest();
+	    // }
+	    //
+	    // } catch (OpenSearchException | IOException e) {
+	    //
+	    // throw GSException.createException(getClass(), "OpenSearchDatabaseExistsAliasError", e);
+	    // }
+	    // }
 
 	    if (putAliasRequest != null) {
 
@@ -262,6 +266,11 @@ public class OpenSearchDatabase extends Database {
 
 		GSLoggerFactory.getLogger(getClass()).info("Put alias {} ENDED", mapping.getIndex());
 	    }
+	}
+
+	if (nothingToDo) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("No new index created");
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Indexes init ENDED");
