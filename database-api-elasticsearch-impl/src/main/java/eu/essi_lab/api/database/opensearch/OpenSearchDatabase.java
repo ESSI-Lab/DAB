@@ -28,8 +28,10 @@ import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
+import org.opensearch.client.opensearch.indices.CreateIndexRequest.Builder;
 import org.opensearch.client.opensearch.indices.CreateIndexResponse;
 import org.opensearch.client.opensearch.indices.ExistsRequest;
+import org.opensearch.client.opensearch.indices.IndexSettings;
 import org.opensearch.client.opensearch.indices.PutAliasRequest;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.aws.AwsSdk2Transport;
@@ -61,7 +63,7 @@ import com.fasterxml.jackson.core.StreamReadConstraints;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.Database.DatabaseImpl;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -200,11 +202,26 @@ public class OpenSearchDatabase extends Database {
     private boolean indexesInitEnabled() {
 
 	String initIndexes = System.getProperty("initIndexes");
+
 	if (initIndexes == null) {
 	    initIndexes = System.getenv("initIndexes");
 	}
 
 	return initIndexes != null && initIndexes.equals("true");
+    }
+
+    /**
+     * @return
+     */
+    private Optional<String> numberOfShards() {
+
+	String numShards = System.getProperty("numShards");
+
+	if (numShards == null) {
+	    numShards = System.getenv("numShards");
+	}
+
+	return Optional.of(numShards);
     }
 
     /**
@@ -550,10 +567,18 @@ public class OpenSearchDatabase extends Database {
 		withJson(mapping.getMappingStream()).//
 		build();
 
-	CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().//
+	Builder createIndexBuilder = new CreateIndexRequest.Builder().//
 		index(mapping.getIndex(false)).//
-		mappings(typeMapping).//
-		build();
+		mappings(typeMapping);
+
+	if (mapping.getIndex().equals(DataFolderMapping.get().getIndex()) && numberOfShards().isPresent()) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Number of shards for data-folder index: {}", numberOfShards().get());
+
+	    createIndexBuilder.settings(new IndexSettings.Builder().numberOfShards(numberOfShards().get()).numberOfReplicas("0").build()); //
+	}
+
+	CreateIndexRequest createIndexRequest = createIndexBuilder.build();
 
 	try {
 
