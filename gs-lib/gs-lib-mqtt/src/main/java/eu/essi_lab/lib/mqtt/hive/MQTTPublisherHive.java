@@ -34,6 +34,7 @@ import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
  */
 public class MQTTPublisherHive extends AbstractMQTTClientHive {
 
+
     /**
      * @param hostName
      * @param port
@@ -57,6 +58,21 @@ public class MQTTPublisherHive extends AbstractMQTTClientHive {
     }
 
     /**
+     * @param hostName
+     * @param port
+     * @param user
+     * @param password
+     * @param defaultConfig
+     * @throws Exception
+     */
+    public MQTTPublisherHive(String hostName, int port, String user, String password, boolean defaultConfig) throws Exception {
+
+	super(hostName, port, UUID.randomUUID().toString(), user, password, defaultConfig);
+    }
+
+    /**
+     * /**
+     * 
      * @param hostname
      * @param port
      * @param clientId
@@ -74,15 +90,26 @@ public class MQTTPublisherHive extends AbstractMQTTClientHive {
      */
     protected Mqtt3Client buildClient() {
 
+	if (defaultConfig) {
+
+	    return MqttClient.builder()//
+		    .automaticReconnectWithDefaultConfig().useMqttVersion3()//
+		    .serverHost(hostName)//
+		    .serverPort(port) // Port for MQTT, adjust if needed
+		    .sslWithDefaultConfig() // Use SSL if necessary
+		    .identifier(clientId)//
+		    .build()//
+		    .toBlocking();
+	}
+
 	return MqttClient.builder()//
-		.automaticReconnectWithDefaultConfig()
-		.useMqttVersion3()//
+		.automaticReconnectWithDefaultConfig().useMqttVersion3()//
 		.serverHost(hostName)//
 		.serverPort(port) // Port for MQTT, adjust if needed
-		.sslWithDefaultConfig() // Use SSL if necessary
 		.identifier(clientId)//
 		.build()//
 		.toBlocking();
+
     }
 
     /**
@@ -128,4 +155,6 @@ public class MQTTPublisherHive extends AbstractMQTTClientHive {
 
 	return getBlockingClient();
     }
+
+   
 }

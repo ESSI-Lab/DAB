@@ -42,7 +42,7 @@ public class MQTTSubscriberHive extends AbstractMQTTClientHive {
      * @throws Exception
      */
     public MQTTSubscriberHive(String hostName, int port) throws Exception {
-	
+
 	super(hostName, port, UUID.randomUUID().toString(), null, null);
     }
 
@@ -54,8 +54,20 @@ public class MQTTSubscriberHive extends AbstractMQTTClientHive {
      * @throws Exception
      */
     public MQTTSubscriberHive(String hostName, int port, String user, String password) throws Exception {
-	
+
 	super(hostName, port, UUID.randomUUID().toString(), user, password);
+    }
+
+    /**
+     * @param hostName
+     * @param port
+     * @param user
+     * @param password
+     * @throws Exception
+     */
+    public MQTTSubscriberHive(String hostName, int port, String user, String password, boolean defaultConfig) throws Exception {
+
+	super(hostName, port, UUID.randomUUID().toString(), user, password, defaultConfig);
     }
 
     /**
@@ -77,12 +89,21 @@ public class MQTTSubscriberHive extends AbstractMQTTClientHive {
     @Override
     protected Mqtt3Client buildClient() {
 
+	if (defaultConfig) {
+
+	    return MqttClient.builder()//
+		    .automaticReconnectWithDefaultConfig().useMqttVersion3()//
+		    .serverHost(hostName)//
+		    .serverPort(port) // Port for MQTT, adjust if needed
+		    .sslWithDefaultConfig() // Use SSL if necessary
+		    .identifier(clientId)//
+		    .buildAsync();
+	}
+
 	return MqttClient.builder()//
-		.automaticReconnectWithDefaultConfig()
-		.useMqttVersion3()//
+		.automaticReconnectWithDefaultConfig().useMqttVersion3()//
 		.serverHost(hostName)//
 		.serverPort(port) // Port for MQTT, adjust if needed
-		.sslWithDefaultConfig() // Use SSL if necessary
 		.identifier(clientId)//
 		.buildAsync();
 

@@ -37,6 +37,7 @@ public abstract class AbstractMQTTClientHive {
     protected String password;
     protected String hostName;
     protected int port;
+    protected boolean defaultConfig;
 
     protected Mqtt3Client client;
 
@@ -46,7 +47,19 @@ public abstract class AbstractMQTTClientHive {
      * @throws Exception
      */
     public AbstractMQTTClientHive(String hostName, int port) throws Exception {
-	this(hostName, port, UUID.randomUUID().toString(), null, null);
+
+	this(hostName, port, UUID.randomUUID().toString(), null, null, true);
+    }
+
+    /**
+     * @param hostName
+     * @param port
+     * @param useDefaultConfig
+     * @throws Exception
+     */
+    public AbstractMQTTClientHive(String hostName, int port, boolean useDefaultConfig) throws Exception {
+
+	this(hostName, port, UUID.randomUUID().toString(), null, null, useDefaultConfig);
     }
 
     /**
@@ -57,7 +70,21 @@ public abstract class AbstractMQTTClientHive {
      * @throws Exception
      */
     public AbstractMQTTClientHive(String hostName, int port, String user, String password) throws Exception {
-	this(hostName, port, UUID.randomUUID().toString(), user, password);
+
+	this(hostName, port, UUID.randomUUID().toString(), user, password, true);
+    }
+
+    /**
+     * @param hostName
+     * @param port
+     * @param user
+     * @param password
+     * @param useDefaultConfig
+     * @throws Exception
+     */
+    public AbstractMQTTClientHive(String hostName, int port, String user, String password, boolean useDefaultConfig) throws Exception {
+
+	this(hostName, port, UUID.randomUUID().toString(), user, password, useDefaultConfig);
     }
 
     /**
@@ -70,12 +97,27 @@ public abstract class AbstractMQTTClientHive {
      */
     public AbstractMQTTClientHive(String hostName, int port, String clientId, String user, String password) throws Exception {
 
+	this(hostName, port, clientId, user, password, true);
+    }
+
+    /**
+     * @param hostName
+     * @param port
+     * @param clientId
+     * @param user
+     * @param password
+     * @param useDefaultConfig
+     * @throws Exception
+     */
+    public AbstractMQTTClientHive(String hostName, int port, String clientId, String user, String password, boolean useDefaultConfig)
+	    throws Exception {
+
 	this.hostName = hostName;
 	this.port = port;
 	this.clientId = clientId;
 	this.user = user;
 	this.password = password;
-
+	this.defaultConfig = useDefaultConfig;
 	this.client = buildClient();
 
 	connect();
@@ -88,21 +130,33 @@ public abstract class AbstractMQTTClientHive {
 
 	if (this.client instanceof Mqtt3AsyncClient) {
 
-	    getAsycnhClient().connectWith()//
-		    .simpleAuth()//
-		    .username(user)//
-		    .password(password.getBytes())//
-		    .applySimpleAuth()//
-		    .send();
+	    if (user != null && password != null) {
+
+		getAsycnhClient().connectWith()//
+			.simpleAuth()//
+			.username(user)//
+			.password(password.getBytes())//
+			.applySimpleAuth()//
+			.send();
+	    } else {
+
+		getAsycnhClient().connect();
+	    }
 
 	} else {
 
-	    getBlockingClient().connectWith()//
-		    .simpleAuth()//
-		    .username(user)//
-		    .password(password.getBytes())//
-		    .applySimpleAuth()//
-		    .send();
+	    if (user != null && password != null) {
+
+		getBlockingClient().connectWith()//
+			.simpleAuth()//
+			.username(user)//
+			.password(password.getBytes())//
+			.applySimpleAuth()//
+			.send();
+	    } else {
+
+		getBlockingClient().connect();
+	    }
 	}
     }
 

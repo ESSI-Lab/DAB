@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 
 import com.beust.jcommander.internal.Lists;
@@ -357,7 +358,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	    if (!newRecords.isEmpty()) {
 
 		String topic = buildTopic(gsSource, "added");
-		String message = buildMessage(newRecords);
+		String message = buildMessage(newRecords, gsSource.getUniqueIdentifier(), "added", Optional.empty());
 
 		client.get().publish(topic, message);
 	    }
@@ -365,7 +366,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	    if (!deletedRecords.isEmpty()) {
 
 		String topic = buildTopic(gsSource, "deleted");
-		String message = buildMessage(deletedRecords);
+		String message = buildMessage(deletedRecords, gsSource.getUniqueIdentifier(), "deleted", Optional.empty());
 
 		client.get().publish(topic, message);
 	    }
@@ -377,7 +378,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    List<String> idsList = modifiedRecords.get(property);
 
 		    String topic = buildTopic(gsSource, "modified/" + property);
-		    String message = buildMessage(idsList);
+		    String message = buildMessage(idsList, gsSource.getUniqueIdentifier(), "modified", Optional.of(property));
 
 		    client.get().publish(topic, message);
 		}
@@ -405,11 +406,24 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
     /**
      * @param list
+     * @param sourceId
+     * @param event
+     * @param property
      * @return
      */
-    private String buildMessage(List<String> list) {
+    private String buildMessage(List<String> list, String sourceId, String event, Optional<String> property) {
 
-	return list.stream().map(id -> "\"" + id + "\"").collect(Collectors.joining(",", "[", "]"));
+	return list.stream().map(id -> {
+
+	    JSONObject object = new JSONObject();
+	    object.put("metadataId", id);
+	    object.put("sourceId", sourceId);
+	    object.put("event", event); // added, modified, deleted
+	    property.ifPresent(v -> object.put("property", v)); // title, abstract, ...
+
+	    return object.toString(3);
+
+	}).collect(Collectors.joining(",", "[", "]"));
     }
 
     /**
