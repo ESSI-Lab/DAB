@@ -23,13 +23,17 @@ package eu.essi_lab.accessor.emodnet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URISyntaxException;
+import java.net.http.HttpTimeoutException;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
@@ -107,6 +111,15 @@ public class EMODNETPhysicsConnector extends HarvestedQueryConnector<EMODNETPhys
 	    GSPropertyHandler handler = GSPropertyHandler.of(new GSProperty<Boolean>("isDownloadLink", isDownloadLink));
 	    if (isDownloadLink) {
 		String downloadLink = getSourceURL() + "/tabledap/" + identifier + ".nc";
+		boolean isAvailable = false;
+		try {
+		    isAvailable = HttpConnectionUtils.checkConnectivity(downloadLink, TimeUnit.MINUTES, 2);
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+		if (!isAvailable) {
+		    downloadLink = getSourceURL() + "/griddap/" + identifier + ".nc";
+		}
 		handler.add(new GSProperty<String>("downloadLink", downloadLink));
 	    }
 	    metadataRecord.setAdditionalInfo(handler);
