@@ -860,13 +860,23 @@ public abstract class OSParameters {
 	    if (!value.equals("")) {
 
 		String[] range = value.replace("[", "").replace("]", "").split(",");
-		LogicalBond andBond = BondFactory.createAndBond();
+
 		SimpleValueBond min = BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.CLOUD_COVER_PERC,
 			Double.valueOf(range[0]));
+
+		if (range.length == 1) {
+
+		    return Optional.of(min);
+		}
+
+		LogicalBond andBond = BondFactory.createAndBond();
+
 		SimpleValueBond max = BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.CLOUD_COVER_PERC,
 			Double.valueOf(range[1]));
+	
 		andBond.getOperands().add(min);
 		andBond.getOperands().add(max);
+		
 		return Optional.of(andBond);
 	    }
 
