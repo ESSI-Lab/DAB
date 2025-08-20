@@ -18,6 +18,17 @@
 			<artifactId>gs-lib-xml</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		
+		<!--
+			
+		This dependency is not required, unless for the JAXBWMSTest because of the implementation of JAXBContextFactory
+				
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+		</dependency>
+		
+		-->	
 	</dependencies>
 
 	<!--<build>
