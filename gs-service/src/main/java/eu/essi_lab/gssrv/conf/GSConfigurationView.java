@@ -70,6 +70,7 @@ import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.starter.DABStarter;
 import eu.essi_lab.harvester.worker.HarvestingSettingImpl;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.JavaOptions;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 
@@ -136,8 +137,8 @@ public class GSConfigurationView extends ConfigurationView {
     @Override
     protected boolean isInitialized() {
 
-	if (ExecutionMode.skipAuthorization()) {
-	    GSLoggerFactory.getLogger(getClass()).info("Authorization turned off by administrator");
+	if (JavaOptions.isEnabled(JavaOptions.SKIP_AUTHORIZATION)) {
+
 	    return true;
 	}
 
@@ -179,8 +180,8 @@ public class GSConfigurationView extends ConfigurationView {
     @Override
     protected boolean isAuthorized() {
 
-	if (ExecutionMode.skipAuthorization()) {
-	    GSLoggerFactory.getLogger(getClass()).info("Authorization turned off by administrator");
+	if (JavaOptions.isEnabled(JavaOptions.SKIP_AUTHORIZATION)) {
+
 	    return true;
 	}
 

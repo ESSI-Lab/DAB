@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.quartz.SchedulerException;
 
@@ -70,8 +71,10 @@ import eu.essi_lab.gssrv.health.HealthCheck;
 import eu.essi_lab.gssrv.servlet.ServletListener;
 import eu.essi_lab.harvester.HarvestingReportsHandler;
 import eu.essi_lab.jaxb.common.CommonContext;
+import eu.essi_lab.jaxb.wms.extension.JAXBWMS;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.messages.JavaOptions;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
@@ -86,18 +89,6 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  * @author Fabrizio
  */
 public class DABStarter {
-
-    public static final String JAVA_OPT_INIT_CACHES = "initCaches";
-
-    public static final String JAVA_OPT_CHECK_CONFIG = "checkConfig";
-
-    public static final String JAVA_OPT_TEST_SKIP_GDAL = "testSkipGDAL";
-
-    private static final String JAVA_OPT_SKIP_HEALTH_CHECK = "skip.healthcheck";
-
-    public static final String JAVA_OPT_CONFIGURATION_URL = "configuration.url";
-
-    private static final String JAVA_OPT_S3_ENDPOINT = "s3Endpoint";
 
     /**
     * 
@@ -128,14 +119,7 @@ public class DABStarter {
 
 	mode = ExecutionMode.get();
 
-	GSLoggerFactory.getLogger(DABStarter.class).info("DAB is starting in execution mode {}", mode);
-
-	if (ExecutionMode.skipAuthorization()) {
-	    GSLoggerFactory.getLogger(DABStarter.class).info("Auhtorization skipped by administrator");
-	} else {
-	    GSLoggerFactory.getLogger(DABStarter.class).info("Auhtorization activated by administrator");
-	}
-
+	GSLoggerFactory.getLogger(DABStarter.class).info("DAB is starting in execution mode {}", mode);	
     }
 
     /**
@@ -157,7 +141,7 @@ public class DABStarter {
 
 	initConfig();
 
-	if (configCheckEnabled()) {
+	if (JavaOptions.isEnabled(JavaOptions.CHECK_CONFIG)) {
 
 	    CheckResponse similarityCheckResponse = checkConfig();
 
@@ -209,41 +193,11 @@ public class DABStarter {
 	    break;
 	}
 
-	if (initCachesEnabled()) {
+	if (JavaOptions.isEnabled(JavaOptions.INIT_CACHES)) {
+	    
 	    initCaches();
 	}
 
-    }
-
-    /**
-     * @return
-     */
-    public static boolean configCheckEnabled() {
-	return isPropertyEnabled(JAVA_OPT_CHECK_CONFIG);
-    }
-
-    public static boolean initCachesEnabled() {
-	return isPropertyEnabled(JAVA_OPT_INIT_CACHES);
-    }
-
-    public static boolean skipGDALTests() {
-	return isPropertyEnabled(JAVA_OPT_TEST_SKIP_GDAL);
-    }
-
-    public static String getPropertyValue(String property) {
-	String ret = System.getProperty(property);
-	if (ret == null) {
-	    ret = System.getenv(property);
-	}
-	return ret;
-    }
-
-    public static boolean isPropertyEnabled(String property) {
-	String check = getPropertyValue(property);
-	if (check == null) {
-	    return false;
-	}
-	return Boolean.valueOf(check);
     }
 
     /**
@@ -259,7 +213,7 @@ public class DABStarter {
 	    // 1) Retrieves the configuration.url parameter
 	    //
 
-	    String configURL = getPropertyValue(JAVA_OPT_CONFIGURATION_URL);
+	    String configURL = JavaOptions.getValue(JavaOptions.CONFIGURATION_URL).get();
 
 	    if (configURL == null || configURL.isEmpty()) {
 
@@ -302,9 +256,9 @@ public class DABStarter {
 		//
 		String startupUri = split[0];
 
-		String s3Endpoint = getPropertyValue(JAVA_OPT_S3_ENDPOINT);
-		if (s3Endpoint != null) {
-		    source = S3Source.of(startupUri, s3Endpoint);
+		Optional<String> s3Endpoint = JavaOptions.getValue(JavaOptions.S3_ENDPOINT);
+		if (s3Endpoint.isPresent()) {
+		    source = S3Source.of(startupUri, s3Endpoint.get());
 		} else {
 		    source = S3Source.of(startupUri);
 		}
@@ -773,6 +727,8 @@ public class DABStarter {
 	    CommonContext.createUnmarshaller();
 	    new Dataset();
 
+	    Marshaller marshaller = JAXBWMS.getInstance().getMarshaller();
+
 	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization ENDED");
 
 	} catch (JAXBException e) {
@@ -796,9 +752,8 @@ public class DABStarter {
      */
     private void healthCheckTest() throws GSException {
 
-	if (isPropertyEnabled(JAVA_OPT_SKIP_HEALTH_CHECK)) {
+	if (JavaOptions.isEnabled(JavaOptions.SKIP_HEALTH_CHECK)) {
 
-	    GSLoggerFactory.getLogger(DABStarter.class).info("Skipping health check according to system variable 'skip.healthcheck'");
 	    return;
 	}
 

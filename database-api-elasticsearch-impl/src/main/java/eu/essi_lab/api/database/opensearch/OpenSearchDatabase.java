@@ -67,6 +67,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.JavaOptions;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -83,8 +84,7 @@ public class OpenSearchDatabase extends Database {
 
     static {
 
-	String property = System.getProperty("debugOpenSearchQueries");
-	debugQueries = property != null && property.equals("true");
+	debugQueries = JavaOptions.isEnabled(JavaOptions.DEBUG_OPENSEARCH_QUERIES);
 
 	//
 	// set the Jackson StreamReadConstraints maxStringLength to 50 MB instead of the
@@ -187,41 +187,13 @@ public class OpenSearchDatabase extends Database {
 	    //
 	    //
 
-	    if (indexesInitEnabled()) {
+	    if (JavaOptions.isEnabled(JavaOptions.INIT_OPENSEARCH_INDEXES)) {
 
 		initializeIndexes();
 	    }
 
 	    initialized = true;
 	}
-    }
-
-    /**
-     * @return
-     */
-    private boolean indexesInitEnabled() {
-
-	String initIndexes = System.getProperty("initIndexes");
-
-	if (initIndexes == null) {
-	    initIndexes = System.getenv("initIndexes");
-	}
-
-	return initIndexes != null && initIndexes.equals("true");
-    }
-
-    /**
-     * @return
-     */
-    private Optional<String> numberOfShards() {
-
-	String numShards = System.getProperty("numShards");
-
-	if (numShards == null) {
-	    numShards = System.getenv("numShards");
-	}
-
-	return Optional.of(numShards);
     }
 
     /**
@@ -571,11 +543,15 @@ public class OpenSearchDatabase extends Database {
 		index(mapping.getIndex(false)).//
 		mappings(typeMapping);
 
-	if (mapping.getIndex().equals(DataFolderMapping.get().getIndex()) && numberOfShards().isPresent()) {
+	Optional<String> shards = JavaOptions.getValue(JavaOptions.NUMBER_OF_DATA_FOLDER_INDEX_SHARDS);
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Number of shards for data-folder index: {}", numberOfShards().get());
+	if (mapping.getIndex().equals(DataFolderMapping.get().getIndex()) && shards.isPresent()) {
 
-	    createIndexBuilder.settings(new IndexSettings.Builder().numberOfShards(numberOfShards().get()).numberOfReplicas("0").build()); //
+	    GSLoggerFactory.getLogger(getClass()).debug("Number of data-folder index shards: {}", shards.get());
+
+	    createIndexBuilder.settings(new IndexSettings.Builder()//
+		    .numberOfShards(shards.get()).numberOfReplicas("0")//
+		    .build()); //
 	}
 
 	CreateIndexRequest createIndexRequest = createIndexBuilder.build();

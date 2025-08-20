@@ -24,7 +24,6 @@ package eu.essi_lab.configuration;
 import java.util.Arrays;
 import java.util.Optional;
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
@@ -79,7 +78,7 @@ public enum ExecutionMode implements LabeledEnum {
      * 
      */
     public static final String GIPROJECT_EXECUTION_MODE_KEY = "EU_FLORA_ESSI_GI_PROJECT_EXECUTION";
-    
+
     public static final String SKIP_AUTHORIZATION_KEY = "DAB_SKIP_AUTHORIZATION";
 
     /**
@@ -120,27 +119,6 @@ public enum ExecutionMode implements LabeledEnum {
 	}
 
 	return execMode;
-    }
-
-    /**
-     * @return
-     */
-    public static boolean skipAuthorization() {
-
-	String skipAuthorization = String.valueOf(false);
-
-	String skipAutProperty = System.getProperty(SKIP_AUTHORIZATION_KEY);
-	String skipAuthEnv = System.getenv(SKIP_AUTHORIZATION_KEY);
-	if (skipAutProperty != null) {
-		GSLoggerFactory.getLogger(ExecutionMode.class).info("authprop");
-	    skipAuthorization = skipAutProperty;
-
-	} else if (skipAuthEnv != null) {
-		GSLoggerFactory.getLogger(ExecutionMode.class).info("authenv");
-	    skipAuthorization = skipAuthEnv;
-	}
-
-	return Boolean.valueOf(skipAuthorization);
     }
 
     /**

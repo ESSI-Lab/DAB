@@ -55,10 +55,10 @@ import eu.essi_lab.authorization.rps.GEOSSWriteRolePolicySet;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.JavaOptions;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.bond.View;
@@ -93,14 +93,12 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
     @Override
     public boolean isAuthorized(RequestMessage message) throws GSException {
 
-	if (ExecutionMode.skipAuthorization()) {
+	if (JavaOptions.isEnabled(JavaOptions.SKIP_AUTHORIZATION)) {
 
 	    return true;
 	}
 
 	logBuilder = new StringBuilder();
-
-	// GSLoggerFactory.getLogger(getClass()).debug("Authorization check STARTED");
 
 	//
 	// developer machine
@@ -111,9 +109,10 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	Optional<Properties> keyValueOption = configuration.isPresent() ? ConfigurationWrapper.getSystemSettings().getKeyValueOptions()
 		: Optional.empty();
-	
+
 	if (keyValueOption.isPresent()) {
-	    devMachineAuth = keyValueOption.get().getProperty(KeyValueOptionKeys.DEV_MACHINE_AUTH.getLabel(), "true").equals("true") ? true : false;
+	    devMachineAuth = keyValueOption.get().getProperty(KeyValueOptionKeys.DEV_MACHINE_AUTH.getLabel(), "true").equals("true") ? true
+		    : false;
 	}
 
 	if (isLocalHost(message) && devMachineAuth) {
