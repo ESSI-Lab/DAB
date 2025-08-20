@@ -119,7 +119,7 @@ public class DABStarter {
 
 	mode = ExecutionMode.get();
 
-	GSLoggerFactory.getLogger(DABStarter.class).info("DAB is starting in execution mode {}", mode);	
+	GSLoggerFactory.getLogger(DABStarter.class).info("DAB is starting in execution mode {}", mode);
     }
 
     /**
@@ -194,7 +194,7 @@ public class DABStarter {
 	}
 
 	if (JavaOptions.isEnabled(JavaOptions.INIT_CACHES)) {
-	    
+
 	    initCaches();
 	}
 
@@ -213,12 +213,18 @@ public class DABStarter {
 	    // 1) Retrieves the configuration.url parameter
 	    //
 
-	    String configURL = JavaOptions.getValue(JavaOptions.CONFIGURATION_URL).get();
+	    Optional<String> optConfigURL = JavaOptions.getValue(JavaOptions.CONFIGURATION_URL);
 
-	    if (configURL == null || configURL.isEmpty()) {
+	    String configURL = null;
+
+	    if (optConfigURL.isEmpty() || optConfigURL.get().isEmpty()) {
 
 		GSLoggerFactory.getLogger(DABStarter.class).warn("Configuration URL not found, using fallback URL: local FS temp");
 		configURL = "file:temp";
+
+	    } else {
+
+		configURL = optConfigURL.get();
 	    }
 
 	    String[] split = configURL.split("!");
@@ -236,7 +242,7 @@ public class DABStarter {
 	    ConfigurationSource source = null;
 
 	    if (DatabaseSourceUrl.check(configURL)) {
-		
+
 		GSLoggerFactory.getLogger(getClass()).info("Found XML database URL");
 		//
 		// -Dconfiguration.url=xdbc://user:password@hostname:8000,8004/dbName/folder/
@@ -248,7 +254,7 @@ public class DABStarter {
 		source = DatabaseSource.of(startupUri);
 
 	    } else if (S3Source.check(configURL)) {
-		
+
 		GSLoggerFactory.getLogger(getClass()).info("Found S3 URL");
 
 		//
@@ -259,13 +265,13 @@ public class DABStarter {
 		String startupUri = split[0];
 
 		Optional<String> s3Endpoint = JavaOptions.getValue(JavaOptions.S3_ENDPOINT);
-		
+
 		if (s3Endpoint.isPresent()) {
-		    
+
 		    source = S3Source.of(startupUri, s3Endpoint.get());
-		
+
 		} else {
-		    
+
 		    source = S3Source.of(startupUri);
 		}
 
