@@ -236,6 +236,7 @@ public class DABStarter {
 	    ConfigurationSource source = null;
 
 	    if (DatabaseSourceUrl.check(configURL)) {
+		
 		GSLoggerFactory.getLogger(getClass()).info("Found XML database URL");
 		//
 		// -Dconfiguration.url=xdbc://user:password@hostname:8000,8004/dbName/folder/
@@ -247,6 +248,7 @@ public class DABStarter {
 		source = DatabaseSource.of(startupUri);
 
 	    } else if (S3Source.check(configURL)) {
+		
 		GSLoggerFactory.getLogger(getClass()).info("Found S3 URL");
 
 		//
@@ -257,9 +259,13 @@ public class DABStarter {
 		String startupUri = split[0];
 
 		Optional<String> s3Endpoint = JavaOptions.getValue(JavaOptions.S3_ENDPOINT);
+		
 		if (s3Endpoint.isPresent()) {
+		    
 		    source = S3Source.of(startupUri, s3Endpoint.get());
+		
 		} else {
+		    
 		    source = S3Source.of(startupUri);
 		}
 
