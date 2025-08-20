@@ -4,10 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -41,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 @SuppressWarnings("serial")
 public class SparqlProxyServlet extends HttpServlet {
@@ -48,34 +54,17 @@ public class SparqlProxyServlet extends HttpServlet {
     static {
 
 	try {
+
+	    GSLoggerFactory.getLogger(SparqlProxyServlet.class).debug("Disabling certificate validation STARTED");
+
 	    disableCertificateValidation();
+
+	    GSLoggerFactory.getLogger(SparqlProxyServlet.class).debug("Disabling certificate validation ENDED");
+
 	} catch (Exception e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+
+	    GSLoggerFactory.getLogger(SparqlProxyServlet.class).error(e);
 	}
-    }
-
-    public static void disableCertificateValidation() throws Exception {
-	// Create a trust manager that does not validate certificate chains
-	TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-	    public X509Certificate[] getAcceptedIssuers() {
-		return new X509Certificate[0];
-	    }
-
-	    public void checkClientTrusted(X509Certificate[] certs, String authType) {
-	    }
-
-	    public void checkServerTrusted(X509Certificate[] certs, String authType) {
-	    }
-	} };
-
-	// Install the all-trusting trust manager
-	SSLContext sc = SSLContext.getInstance("TLS");
-	sc.init(null, trustAllCerts, new SecureRandom());
-	HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-	// Disable hostname verification
-	HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
     }
 
     @Override
@@ -90,63 +79,170 @@ public class SparqlProxyServlet extends HttpServlet {
 
     private void forwardRequest(String method, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-	String urlWithParams = getEndpoint();
+	GSLoggerFactory.getLogger(getClass()).debug("Forwarding STARTED");
+
+	String urlWithParams = ConfigurationWrapper.getSparqlProxyEndpoint();
+
 	if ("GET".equalsIgnoreCase(method)) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("GET Request handling STARTED");
+
 	    String queryString = request.getQueryString();
 	    if (queryString != null) {
 		urlWithParams += "?" + queryString;
 	    }
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Request url: {}", urlWithParams);
+
+	    GSLoggerFactory.getLogger(getClass()).debug("GET Request handling ENDED");
 	}
 
-	URL url = new URL(urlWithParams);
+	GSLoggerFactory.getLogger(getClass()).debug("Creating URL STARTED");
+
+	URL url = createURL(urlWithParams);
 	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	conn.setRequestMethod(method);
 	conn.setDoInput(true);
 	conn.setDoOutput("POST".equalsIgnoreCase(method));
 
-	// Copy headers
+	GSLoggerFactory.getLogger(getClass()).debug("Creating URL ENDED");
+
+	//
+	// copy headers from original request to the forwarded request
+	//
+
+	GSLoggerFactory.getLogger(getClass()).debug("Copy headers from original request to forwarded request STARTED");
+
 	Enumeration<String> headerNames = request.getHeaderNames();
+
 	while (headerNames.hasMoreElements()) {
+
 	    String headerName = headerNames.nextElement();
+
 	    if (!headerName.equalsIgnoreCase("host") && !headerName.equalsIgnoreCase("content-length")) {
-		conn.setRequestProperty(headerName, request.getHeader(headerName));
+
+		String headerValue = request.getHeader(headerName);
+
+		GSLoggerFactory.getLogger(getClass()).debug("Current header: {}:{}", headerName, headerValue);
+
+		conn.setRequestProperty(headerName, headerValue);
 	    }
 	}
 
-	// For POST, forward body
+	GSLoggerFactory.getLogger(getClass()).debug("Copy headers from original request to forwarded request ENDED");
+
+	//
+	// for POST, forward body
+	//
 	if ("POST".equalsIgnoreCase(method)) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Handling POST STARTED");
+
 	    conn.setRequestProperty("Content-Type", request.getContentType());
 	    try (OutputStream os = conn.getOutputStream(); InputStream is = request.getInputStream()) {
 		is.transferTo(os);
 	    }
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Handling POST ENDED");
 	}
 
-	// Relay response
+	//
+	// status code
+	//
+
+	GSLoggerFactory.getLogger(getClass()).debug("Setting status code STARTED");
+
 	int status = conn.getResponseCode();
 	response.setStatus(status);
-	for (int i = 0;; i++) {
-	    String headerName = conn.getHeaderFieldKey(i);
-	    String headerValue = conn.getHeaderField(i);
-	    if (headerName == null && headerValue == null)
-		break;
 
-	    // Skip null header names (e.g., status line)
-	    if (headerName != null && headerValue != null) {
+	GSLoggerFactory.getLogger(getClass()).debug("Status code: {}", status);
+
+	GSLoggerFactory.getLogger(getClass()).debug("Setting status code ENDED");
+
+	//
+	// headers to response
+	//
+
+	GSLoggerFactory.getLogger(getClass()).debug("Copy headers to response STARTED");
+
+	Map<String, List<String>> headerFields = conn.getHeaderFields();
+	headerFields.keySet().stream().filter(Objects::nonNull).forEach(headerName -> {
+
+	    String headerValue = headerFields.get(headerName).stream().collect(Collectors.joining(","));
+	    if (headerValue != null && !headerValue.isEmpty()) {
+
+		GSLoggerFactory.getLogger(getClass()).debug("Current header: {}:{}", headerName, headerValue);
+
 		response.setHeader(headerName, headerValue);
 	    }
-	}
+	});
+
+	GSLoggerFactory.getLogger(getClass()).debug("Copy headers to response ENDED");
+
+	//
+	// copy stream
+	//
+
+	GSLoggerFactory.getLogger(getClass()).debug("Handling connection stream STARTED");
+
 	try (InputStream input = (status < 400 ? conn.getInputStream() : conn.getErrorStream());
 		OutputStream out = response.getOutputStream()) {
+
 	    if (input != null) {
 		input.transferTo(out);
 	    }
+
 	} finally {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Disconnect STARTED");
+
 	    conn.disconnect();
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Disconnect ENDED");
 	}
+
+	GSLoggerFactory.getLogger(getClass()).debug("Handling connection stream ENDED");
+	
+	GSLoggerFactory.getLogger(getClass()).debug("Forwarding ENDED");
     }
 
-    private String getEndpoint() {
+    /**
+     * @param urlWithParams
+     * @return
+     */
+    private URL createURL(String urlWithParams) {
 
-	return ConfigurationWrapper.getSparqlProxyEndpoint();
+	try {
+	    return new URI(urlWithParams).toURL();
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
+	return null;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private static void disableCertificateValidation() throws Exception {
+
+	TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+	    public X509Certificate[] getAcceptedIssuers() {
+		return new X509Certificate[0];
+	    }
+
+	    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+	    }
+
+	    public void checkServerTrusted(X509Certificate[] certs, String authType) {
+	    }
+	} };
+
+	SSLContext sc = SSLContext.getInstance("TLS");
+	sc.init(null, trustAllCerts, new SecureRandom());
+	HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+	HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
     }
 }
