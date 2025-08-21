@@ -123,6 +123,11 @@ public class ConfigurationWrapper {
     /**
      * 
      */
+    private static HashMap<String, Boolean> profilerOnlineMap = new HashMap<>();
+
+    /**
+     * 
+     */
     private static DatabaseSetting databaseSetting;
 
     /**
@@ -149,6 +154,8 @@ public class ConfigurationWrapper {
 		systemSetting = _getSystemSetting();
 		databaseSetting = _getDatabaseSetting();
 		distributedSources = _getDistributedSources();
+
+		getProfilerSettings().forEach(ps -> profilerOnlineMap.put(ps.getServicePath(), ps.isOnline()));
 	    }
 	});
 
@@ -157,6 +164,8 @@ public class ConfigurationWrapper {
 	systemSetting = _getSystemSetting();
 	databaseSetting = _getDatabaseSetting();
 	distributedSources = _getDistributedSources();
+
+	getProfilerSettings().forEach(ps -> profilerOnlineMap.put(ps.getServicePath(), ps.isOnline()));
     }
 
     /**
@@ -305,6 +314,21 @@ public class ConfigurationWrapper {
 	List<ProfilerSetting> list = configuration.list(ProfilerSetting.class, false);
 
 	return list;
+    }
+
+    /**
+     * @param requestPath
+     * @return
+     */
+    public static Optional<Boolean> isProfilerOnline(String requestPath) {
+
+	Optional<String> path = profilerOnlineMap.//
+		keySet().//
+		parallelStream().//
+		filter(p -> requestPath.contains(p)).//
+		findFirst();
+
+	return path.isPresent() ? Optional.of(profilerOnlineMap.get(path.get())) : Optional.empty();//
     }
 
     /**

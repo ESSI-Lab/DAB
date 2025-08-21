@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.web.WebRequest;
 
 /**
@@ -51,54 +50,37 @@ public class ProfilerServiceFilter implements Filter {
 
 	HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-	WebRequest webRequest = new WebRequest(httpRequest, false);
+//	WebRequest webRequest = new WebRequest(httpRequest, false);
+//
+//	boolean fromPresent = webRequest.readFromHeader().//
+//		filter(header -> header.toLowerCase().contains("bingbot") || header.toLowerCase().contains("microsoft")).//
+//		isPresent();
+//
+//	boolean agentPresent = webRequest.readUserAgentHeader().//
+//		filter(header -> header.toLowerCase().contains("microsoftpreview") || header.toLowerCase().contains("skypeuripreview")).//
+//		isPresent();
+//
+//	if (fromPresent || agentPresent) {
+//
+//	    HttpServletResponse httpResponse = (HttpServletResponse) response;
+//	    httpResponse.setStatus(404);
+//
+//	    return;
+//	}
 
-	boolean fromPresent = webRequest.readFromHeader().//
-		filter(header -> header.toLowerCase().contains("bingbot") || header.toLowerCase().contains("microsoft")).//
-		isPresent();
+	String pathInfo = httpRequest.getPathInfo(); // e.g: /essi/oaipmh or /essi/opensearch/query
 
-	boolean agentPresent = webRequest.readUserAgentHeader().//
-		filter(header -> header.toLowerCase().contains("microsoftpreview") || header.toLowerCase().contains("skypeuripreview")).//
-		isPresent();
+	Optional<Boolean> online = pathInfo == null ? Optional.empty() : ConfigurationWrapper.isProfilerOnline(pathInfo);
 
-	if (fromPresent || agentPresent) {
+	if (online.isEmpty() || online.isPresent() && online.get()) {
+
+	    filterChain.doFilter(request, response);
+
+	} else {
 
 	    HttpServletResponse httpResponse = (HttpServletResponse) response;
 	    httpResponse.setStatus(404);
-
-	    return;
 	}
-
-	// String pathInfo = httpRequest.getPathInfo(); // e.g: /essi/oaipmh
-
-	// boolean isProfilerPath = ConfigurationWrapper.getProfilerSettings().//
-	// stream().//
-	// anyMatch(s -> pathInfo!= null && pathInfo.contains(s.getServicePath()));
-
-	// if (isProfilerPath && isOffline(pathInfo)) {
-	//
-	// HttpServletResponse httpResponse = (HttpServletResponse) response;
-	// httpResponse.setStatus(404);
-	//
-	// } else {
-
-	filterChain.doFilter(request, response);
-	return;
-	// }
-    }
-
-    /**
-     * @param pathInfo
-     * @return
-     */
-    private boolean isOffline(String pathInfo) {
-
-	Optional<ProfilerSetting> setting = ConfigurationWrapper.getProfilerSettings().//
-		stream().//
-		filter(c -> pathInfo.contains(c.getServicePath())).//
-		findFirst();
-
-	return (setting.isPresent() && !setting.get().isOnline());
     }
 
     public void destroy() {
