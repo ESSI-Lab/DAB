@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /*-
  * #%L
@@ -87,15 +88,24 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     private DatabaseFolder data1Folder;
     private DatabaseFolder data2Folder;
 
-    private static final List<Queryable> COMPARISON_PROPERTIES = Lists.newArrayList();
+    /**
+     * 
+     */
+    private static final List<Queryable> DEFAULT_COMPARISON_PROPERTIES = Lists.newArrayList();
     static {
-	COMPARISON_PROPERTIES.add(MetadataElement.TITLE);
-	COMPARISON_PROPERTIES.add(MetadataElement.ABSTRACT);
-	COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_BEGIN);
-	COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_END);
-	COMPARISON_PROPERTIES.add(MetadataElement.BOUNDING_BOX);
-	COMPARISON_PROPERTIES.add(MetadataElement.KEYWORD);
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.TITLE);
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.ABSTRACT);
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_BEGIN);
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_END);
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.BOUNDING_BOX);
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.KEYWORD);
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.ONLINE_LINKAGE);
     }
+
+    /**
+     * 
+     */
+    private List<Queryable> comparisonProperties = DEFAULT_COMPARISON_PROPERTIES;
 
     /**
      * 
@@ -113,12 +123,39 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	Optional<String> taskOptions = readTaskOptions(context);
 
+	//
+	// reading target comparison properties to override default ones
+	//
+
 	if (taskOptions.isPresent()) {
 
 	    //
-	    // reading target comparison properties to override default ones
+	    // Supported values:
 	    //
+	    // Keyword
+	    // Topic category
+	    // Online link
+	    // Spatial extent
+	    // Title
+	    // Abstract
+	    // Distribution format
+	    // Temporal extent begin
+	    // Temporal extent end
+	    // Online protocol
+	    //
+
+	    comparisonProperties = Arrays.asList(taskOptions.get().trim().strip().split("\n")).//
+		    stream().//
+		    map(v -> MetadataElement.optFromReadableName(v.trim().strip()).orElse(null)).//
+		    filter(Objects::nonNull).//
+		    collect(Collectors.toList());
+
 	}
+
+	GSLoggerFactory.getLogger(getClass()).info("Selected comparison properties: {}", //
+		comparisonProperties.stream().//
+			map(p -> p.getReadableName().orElse(p.getName())).//
+			collect(Collectors.toList()));
 
 	HashMap<String, List<String>> modifiedRecords = new HashMap<>();
 
@@ -219,7 +256,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 				throw new Exception("Resource " + id + " not found in data-2 folder");
 			    }
 
-			    ComparisonResponse response = GSResourceComparator.compare(COMPARISON_PROPERTIES, opt1.get(), opt2.get());
+			    ComparisonResponse response = GSResourceComparator.compare(comparisonProperties, opt1.get(), opt2.get());
 
 			    if (!response.getProperties().isEmpty()) {
 
@@ -322,7 +359,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    GSResource incoming = writingFolder.get(IdentifierType.PUBLIC, modified.getPublicId()).get();
 
-		    ComparisonResponse response = GSResourceComparator.compare(COMPARISON_PROPERTIES, incoming, modified);
+		    ComparisonResponse response = GSResourceComparator.compare(comparisonProperties, incoming, modified);
 
 		    // at least one change is expected!
 		    if (!response.getProperties().isEmpty()) {
