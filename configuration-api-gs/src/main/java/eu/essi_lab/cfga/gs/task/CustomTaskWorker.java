@@ -65,7 +65,7 @@ public class CustomTaskWorker extends SchedulerWorker<CustomTaskSetting> {
 	@SuppressWarnings("unchecked")
 	Class<CustomTask> taskClass = (Class<CustomTask>) Class.forName(taskClassName);
 
-	CustomTask task = taskClass.newInstance();
+	CustomTask task = taskClass.getDeclaredConstructor().newInstance();
 
 	String taskName = task.getName();
 

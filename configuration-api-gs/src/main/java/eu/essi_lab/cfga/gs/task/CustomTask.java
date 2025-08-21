@@ -80,14 +80,20 @@ public interface CustomTask extends Task {
 	return setting.getTaskOptions();
     }
 
-    default <E extends Enum<E> & OptionsKey> Optional<EnumMap<E, String>> readTaskOptions(
-	        JobExecutionContext context, Class<E> settingsEnumClass) {
+    /**
+     * @param <E>
+     * @param context
+     * @param settingsEnumClass
+     * @return
+     */
+    default <E extends Enum<E> & OptionsKey> Optional<EnumMap<E, String>> readTaskOptions(//
+	    JobExecutionContext context, //
+	    Class<E> settingsEnumClass) {//
 
-	    CustomTaskSetting setting = retrieveSetting(context);
+	CustomTaskSetting setting = retrieveSetting(context);
 
-	    return setting.getTaskOptions()
-	        .map(raw -> OptionsParser.parseOptions(raw, settingsEnumClass));
-	}
+	return setting.getTaskOptions().map(raw -> OptionsParser.parseOptions(raw, settingsEnumClass));
+    }
 
     /**
      * @return

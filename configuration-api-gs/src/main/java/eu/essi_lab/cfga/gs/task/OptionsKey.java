@@ -20,10 +20,16 @@ package eu.essi_lab.cfga.gs.task;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
+/**
+ * 
+ * @author boldrini
+ */
 public interface OptionsKey {
-    // Default implementation based on enum name
+
+    /**
+     * @return
+     */
     default String key() {
-        return ((Enum<?>) this).name();
+	return ((Enum<?>) this).name();
     }
 }

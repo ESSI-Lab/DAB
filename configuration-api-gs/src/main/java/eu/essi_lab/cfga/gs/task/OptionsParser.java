@@ -26,34 +26,53 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * @author boldrini
+ */
 public class OptionsParser {
 
+    /**
+     * @param <E>
+     * @param input
+     * @param enumClass
+     * @return
+     */
     public static <E extends Enum<E> & OptionsKey> EnumMap<E, String> parseOptions(String input, Class<E> enumClass) {
 
 	EnumMap<E, String> options = new EnumMap<>(enumClass);
 
-        // Build map from normalized enum name to enum constant
-        Map<String, E> normalizedKeyMap = Arrays.stream(enumClass.getEnumConstants())
-                .collect(Collectors.toMap(e -> normalizeKey(e.name()), e -> e));
+	// Build map from normalized enum name to enum constant
+	Map<String, E> normalizedKeyMap = Arrays.stream(enumClass.getEnumConstants())
+		.collect(Collectors.toMap(e -> normalizeKey(e.name()), e -> e));
 
-        for (String line : input.split("\\n")) {
-            String[] parts = line.trim().split("=", 2);
-            if (parts.length == 2) {
-                String rawKey = parts[0].trim();
-                String value = parts[1].trim();
+	for (String line : input.split("\\n")) {
+	    
+	    String[] parts = line.trim().split("=", 2);
+	    
+	    if (parts.length == 2) {
+		
+		String rawKey = parts[0].trim();
+		String value = parts[1].trim();
 
-                String normalized = normalizeKey(rawKey);
-                E enumKey = normalizedKeyMap.get(normalized);
-                if (enumKey != null) {
-                    options.put(enumKey, value);
-                }
-            }
-        }
+		String normalized = normalizeKey(rawKey);
+		
+		E enumKey = normalizedKeyMap.get(normalized);
+		
+		if (enumKey != null) {
+		    options.put(enumKey, value);
+		}
+	    }
+	}
 
-        return options;
+	return options;
     }
 
+    /**
+     * @param key
+     * @return
+     */
     private static String normalizeKey(String key) {
+
 	return key.replaceAll("[_\\s]", "") // remove underscores and spaces
 		.toUpperCase(); // convert to uppercase
     }
