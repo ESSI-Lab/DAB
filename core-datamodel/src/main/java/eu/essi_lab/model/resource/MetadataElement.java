@@ -85,7 +85,7 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    DATE_STAMP("dateStamp", ContentType.ISO8601_DATE_TIME),
+    DATE_STAMP("dateStamp", "Date stamp", ContentType.ISO8601_DATE_TIME),
 
     /**
      * MD_KeywordTypeCode
@@ -95,14 +95,27 @@ public enum MetadataElement implements Queryable {
     /**
      * //gmd:keyword/gco:CharacterString
      */
-    KEYWORD_BLUE_CLOUD(MetadataElement.KEYWORD_BLUE_CLOUD_EL_NAME), KEYWORD_URI_BLUE_CLOUD(
-	    MetadataElement.KEYWORD_URI_BLUE_CLOUD_EL_NAME), KEYWORD(
-		    MetadataElement.KEYWORD_EL_NAME), KEYWORD_URI(MetadataElement.KEYWORD_URI_EL_NAME),
+    KEYWORD_BLUE_CLOUD(MetadataElement.KEYWORD_BLUE_CLOUD_EL_NAME),
+
+    /**
+     * 
+     */
+    KEYWORD_URI_BLUE_CLOUD(MetadataElement.KEYWORD_URI_BLUE_CLOUD_EL_NAME),
+
+    /**
+     * 
+     */
+    KEYWORD(MetadataElement.KEYWORD_EL_NAME, "Keyword"),
+
+    /**
+     * 
+     */
+    KEYWORD_URI(MetadataElement.KEYWORD_URI_EL_NAME),
 
     /**
      * //gmd:topicCategory/gmd:MD_TopicCategoryCode"
      */
-    TOPIC_CATEGORY("topicCategory"),
+    TOPIC_CATEGORY("topicCategory", "Topic category"),
 
     /**
      *
@@ -262,7 +275,7 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    ONLINE_LINKAGE("onlineLinkage"),
+    ONLINE_LINKAGE("onlineLinkage", "Online link"),
 
     /**
      * 
@@ -272,7 +285,7 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    BOUNDING_BOX("bbox", ContentType.SPATIAL),
+    BOUNDING_BOX("bbox", "Spatial extent", ContentType.SPATIAL),
     /**
      *
      */
@@ -290,12 +303,12 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    TITLE("title"),
+    TITLE("title", "Title"),
 
     /**
      *
      */
-    ABSTRACT("abstract"),
+    ABSTRACT("abstract", "Abstract"),
 
     /**
      *
@@ -305,7 +318,7 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    DISTRIBUTION_FORMAT(MetadataElement.DISTRIBUTION_FORMAT_EL_NAME),
+    DISTRIBUTION_FORMAT(MetadataElement.DISTRIBUTION_FORMAT_EL_NAME, "Distribution format"),
 
     /**
      *
@@ -372,8 +385,17 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    ORGANISATION_NAME(MetadataElement.ORGANISATION_NAME_EL_NAME), ORGANISATION_ROLE(
-	    MetadataElement.ORGANISATION_ROLE_EL_NAME), ORGANISATION_URI(MetadataElement.ORGANISATION_URI_EL_NAME),
+    ORGANISATION_NAME(MetadataElement.ORGANISATION_NAME_EL_NAME),
+
+    /**
+     * 
+     */
+    ORGANISATION_ROLE(MetadataElement.ORGANISATION_ROLE_EL_NAME),
+
+    /**
+     * 
+     */
+    ORGANISATION_URI(MetadataElement.ORGANISATION_URI_EL_NAME),
     /**
      *
      */
@@ -413,7 +435,7 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    TEMP_EXTENT_BEGIN("tmpExtentBegin", ContentType.ISO8601_DATE_TIME),
+    TEMP_EXTENT_BEGIN("tmpExtentBegin", "Temporal extent begin", ContentType.ISO8601_DATE_TIME),
 
     /**
      * 
@@ -423,7 +445,7 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    TEMP_EXTENT_END("tmpExtentEnd", ContentType.ISO8601_DATE_TIME),
+    TEMP_EXTENT_END("tmpExtentEnd", "Temporal extent end", ContentType.ISO8601_DATE_TIME),
 
     /**
      * 
@@ -438,7 +460,7 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    ONLINE_PROTOCOL(MetadataElement.ONLINE_PROTOCOL_EL_NAME),
+    ONLINE_PROTOCOL(MetadataElement.ONLINE_PROTOCOL_EL_NAME, "Online protocol"),
 
     /**
      *
@@ -747,13 +769,23 @@ public enum MetadataElement implements Queryable {
     private ContentType type;
     private boolean isEnabled;
     private ComposedElement element;
+    private String readableName;
 
     /**
      * @param name
      */
     private MetadataElement(String name) {
 
-	this(name, false, false, ContentType.TEXTUAL, true);
+	this(name, null, false, false, ContentType.TEXTUAL, true);
+    }
+
+    /**
+     * @param name
+     * @param readableName
+     */
+    private MetadataElement(String name, String readableName) {
+
+	this(name, readableName, false, false, ContentType.TEXTUAL, true);
     }
 
     /**
@@ -761,7 +793,17 @@ public enum MetadataElement implements Queryable {
      */
     private MetadataElement(String name, boolean enabled) {
 
-	this(name, false, false, ContentType.TEXTUAL, enabled);
+	this(name, null, false, false, ContentType.TEXTUAL, enabled);
+    }
+
+    /**
+     * @param name
+     * @param readableName
+     * @param enabled
+     */
+    private MetadataElement(String name, String readableName, boolean enabled) {
+
+	this(name, readableName, false, false, ContentType.TEXTUAL, enabled);
     }
 
     /**
@@ -770,7 +812,17 @@ public enum MetadataElement implements Queryable {
      */
     private MetadataElement(String name, ContentType type) {
 
-	this(name, false, false, type, true);
+	this(name, null, false, false, type, true);
+    }
+
+    /**
+     * @param name
+     * @param readableName
+     * @param type
+     */
+    private MetadataElement(String name, String readableName, ContentType type) {
+
+	this(name, readableName, false, false, type, true);
     }
 
     /**
@@ -789,11 +841,35 @@ public enum MetadataElement implements Queryable {
     /**
      * @param name
      * @param volatileElement
+     * @param extendedElement
+     * @param type
+     * @param enabled
+     */
+    private MetadataElement(//
+	    String name, //
+	    boolean volatileElement, //
+	    boolean extendedElement, //
+	    ContentType type, //
+	    boolean enabled) {
+
+	this(name, null, volatileElement, extendedElement, type, enabled);
+    }
+
+    /**
+     * @param name
+     * @param volatileElement
      * @param type
      */
-    private MetadataElement(String name, boolean volatileElement, boolean extendedElement, ContentType type, boolean enabled) {
+    private MetadataElement(//
+	    String name, //
+	    String readableName, //
+	    boolean volatileElement, //
+	    boolean extendedElement, //
+	    ContentType type, //
+	    boolean enabled) {
 
 	this.name = name;
+	this.readableName = readableName;
 	this.volatileElement = volatileElement;
 	this.type = type;
 	this.isEnabled = enabled;
@@ -803,6 +879,15 @@ public enum MetadataElement implements Queryable {
     public String getName() {
 
 	return name;
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public Optional<String> getReadableName() {
+
+	return Optional.ofNullable(readableName);
     }
 
     @Override
@@ -846,6 +931,31 @@ public enum MetadataElement implements Queryable {
 
 	try {
 	    return Optional.of(fromName(name));
+
+	} catch (IllegalArgumentException ex) {
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param readableName
+     * @return
+     * @throws NoSuchElementException
+     */
+    public static MetadataElement fromReadableName(String readableName) throws IllegalArgumentException {
+
+	return (MetadataElement) Queryable.fromReadableName(readableName, values());
+    }
+
+    /**
+     * @param readableName
+     * @return
+     */
+    public static Optional<MetadataElement> optFromReadableName(String readableName) {
+
+	try {
+	    return Optional.of(fromReadableName(readableName));
 
 	} catch (IllegalArgumentException ex) {
 	}

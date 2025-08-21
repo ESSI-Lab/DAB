@@ -23,6 +23,7 @@ package eu.essi_lab.model;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlSeeAlso;
 
@@ -104,9 +105,31 @@ public interface Queryable {
     }
 
     /**
+     * @param readableName
+     * @return
+     * @throws NoSuchElementException
+     */
+    public static Queryable fromReadableName(String readableName, Queryable[] values) throws IllegalArgumentException {
+
+	return Arrays.asList(values).//
+		stream().//
+		filter(p -> p.getReadableName().orElse("").equals(readableName)). //
+		findFirst().//
+		orElseThrow(() -> new IllegalArgumentException("Unknown readable name: " + readableName));
+    }
+
+    /**
      * Returns this property name
      */
     public String getName();
+
+    /**
+     * @return
+     */
+    public default Optional<String> getReadableName() {
+
+	return Optional.empty();
+    }
 
     /**
      * Returns the content type of this property
