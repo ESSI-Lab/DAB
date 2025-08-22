@@ -61,7 +61,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class SourcesInspectionComponentInfo extends ComponentInfo {
+public class SourcesInspector extends ComponentInfo {
 
     private VerticalLayout verticalLayout;
     private Grid<GridData> grid;
@@ -74,7 +74,7 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
     /**
      * 
      */
-    public SourcesInspectionComponentInfo() {
+    public SourcesInspector() {
 
 	setComponentName("Sources inspection");
 
@@ -254,7 +254,7 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
 	    return db.getDataFolders().stream();
 
 	} catch (GSException e) {
-	    GSLoggerFactory.getLogger(SourcesInspectionComponentInfo.class).error(e);
+	    GSLoggerFactory.getLogger(SourcesInspector.class).error(e);
 	}
 
 	return null;
@@ -269,7 +269,7 @@ public class SourcesInspectionComponentInfo extends ComponentInfo {
 	try {
 	    return f.size();
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(SourcesInspectionComponentInfo.class).error(e);
+	    GSLoggerFactory.getLogger(SourcesInspector.class).error(e);
 	}
 
 	return 0;

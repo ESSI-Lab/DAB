@@ -517,7 +517,7 @@ public class GSConfigurationView extends ConfigurationView {
 	return Arrays.asList(//
 		new DistributionSettingComponentInfo(), //
 		new HarvestingSettingComponentInfo(), //
-		new SourcesInspectionComponentInfo(), //
+		new SourcesInspector(), //
 		new AboutComponentInfo() //
 	);
     }
