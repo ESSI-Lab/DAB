@@ -17,6 +17,7 @@ import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.gssrv.conf.task.ParentIdentifierDecoratorTask;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.LogicalBond;

@@ -1045,11 +1045,12 @@
  		    <artifactId>jackson-databind</artifactId>
 			<version>${jackson-core.version}</version>
 		</dependency>
+		
 		<dependency>
-  <groupId>com.fasterxml.jackson.core</groupId>
-  <artifactId>jackson-annotations</artifactId>
+			  <groupId>com.fasterxml.jackson.core</groupId>
+			  <artifactId>jackson-annotations</artifactId>
 			<version>${jackson-core.version}</version>
-</dependency>
+			</dependency>
 
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
@@ -1075,7 +1076,6 @@
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
 		</dependency>
-
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -1927,6 +1927,9 @@
 		<module>configuration-api-gs</module>
 		<module>configuration-api-gui</module>
 		<module>configuration-api-test</module>
+		
+		<module>custom-tasks</module>
+
 	</modules>
 
 	<repositories>

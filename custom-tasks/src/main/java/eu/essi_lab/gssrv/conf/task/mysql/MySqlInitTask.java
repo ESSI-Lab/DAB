@@ -21,8 +21,6 @@ package eu.essi_lab.gssrv.conf.task.mysql;
  * #L%
  */
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.AbstractMap.SimpleEntry;

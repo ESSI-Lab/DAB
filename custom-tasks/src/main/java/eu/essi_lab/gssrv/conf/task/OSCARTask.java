@@ -1,20 +1,13 @@
 package eu.essi_lab.gssrv.conf.task;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
-
-import javax.persistence.criteria.Join;
 
 import org.json.JSONObject;
 
@@ -45,7 +38,6 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
@@ -55,9 +47,9 @@ import eu.essi_lab.lib.utils.JSONUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
+import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -67,7 +59,6 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.profiler.oaipmh.profile.mapper.wigos.WIGOS_MAPPER;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import tech.units.indriya.AbstractSystemOfUnits;
 
 public class OSCARTask extends AbstractCustomTask {
 

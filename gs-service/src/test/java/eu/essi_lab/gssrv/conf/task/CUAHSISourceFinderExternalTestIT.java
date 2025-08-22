@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Test;
 
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
+import eu.essi_lab.gssrv.conf.task.CUAHSISourceFinder;
 
 public class CUAHSISourceFinderExternalTestIT {
 

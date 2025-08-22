@@ -39,7 +39,6 @@ import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.downloader.s3.S3ShapeDownloader;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;

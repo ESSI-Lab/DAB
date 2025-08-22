@@ -141,7 +141,7 @@ public class ParentIdentifierDecoratorTask extends AbstractEmbeddedTask  {
 
     }
 
-    int countResourcesWithParentId(DatabaseFinder finder, GSSource source) throws GSException {
+    public int countResourcesWithParentId(DatabaseFinder finder, GSSource source) throws GSException {
 
 	DiscoveryMessage message = createDiscoveryMessage(source);
 
@@ -165,7 +165,7 @@ public class ParentIdentifierDecoratorTask extends AbstractEmbeddedTask  {
 	return message;
     }
 
-    List<GSResource> getResourcesWithParentId(DatabaseFinder finder, GSSource source, Integer start, Integer count) throws GSException {
+    public List<GSResource> getResourcesWithParentId(DatabaseFinder finder, GSSource source, Integer start, Integer count) throws GSException {
 
 	DiscoveryMessage message = createDiscoveryMessage(source);
 
@@ -176,11 +176,11 @@ public class ParentIdentifierDecoratorTask extends AbstractEmbeddedTask  {
 
     }
 
-    List<GSSource> readConfiguredSources() {
+    public List<GSSource> readConfiguredSources() {
 	return ConfigurationWrapper.getAllSources();
     }
 
-    DatabaseReader getDataBaseReader() throws GSException {
+    public DatabaseReader getDataBaseReader() throws GSException {
 
 	StorageInfo dataBaseURI = ConfigurationWrapper.getStorageInfo();
 	GSLoggerFactory.getLogger(getClass()).debug("Configured Database URI: {}", dataBaseURI.getUri());
@@ -189,7 +189,7 @@ public class ParentIdentifierDecoratorTask extends AbstractEmbeddedTask  {
 
     }
 
-    DatabaseFinder getDataBaseFinder() throws GSException {
+    public DatabaseFinder getDataBaseFinder() throws GSException {
 
 	StorageInfo dataBaseURI = ConfigurationWrapper.getStorageInfo();
 	GSLoggerFactory.getLogger(getClass()).debug("Configured Database URI: {}", dataBaseURI.getUri());
@@ -198,7 +198,7 @@ public class ParentIdentifierDecoratorTask extends AbstractEmbeddedTask  {
 
     }
 
-    DatabaseWriter getDataBaseWriter() throws GSException {
+    public DatabaseWriter getDataBaseWriter() throws GSException {
 
 	StorageInfo dataBaseURI = ConfigurationWrapper.getStorageInfo();
 	GSLoggerFactory.getLogger(getClass()).debug("Configured Database URI: {}", dataBaseURI.getUri());

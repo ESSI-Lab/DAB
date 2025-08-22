@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.messages.web.WebRequest;
 
 /**
  * A filter which blocks the request and returns a 404 error code in case the request path owns to a offline profiler

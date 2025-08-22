@@ -1,8 +1,6 @@
 package eu.essi_lab.gssrv.conf.task.bluecloud;
 
-import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
 
 /*-
  * #%L

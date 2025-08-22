@@ -1,308 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
  
 	<parent>
 		<groupId>eu.essi_lab</groupId>
 		<artifactId>DAB</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-
-	<name>ESSI-Lab GI-suite Service</name>
-	<artifactId>gs-service</artifactId>
-	<packaging>war</packaging>
-
-	<properties>
-		<hostname>localhost</hostname>
-
-		<!-- To override this port value when starting jetty:run: - open the
-		jetty:run 
-			Maven Build in the Eclipse "Debug Configurations" menu - in the Main tab 
-			add "Parameter name": jetty.port with the number of the desired port -->
-		<jetty.stop_port>9091</jetty.stop_port>
-		<contextPath>gs-service</contextPath>
-
-		<!-- baseAppServerURL is used in the generate profile, to hack the
-		client stubs so that the default constructors address the expected URLs -->
-		<baseAppServerURL>http://${hostname}:${jetty.port}/${contextPath}/</baseAppServerURL>
-		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
-		<build.timestamp>${maven.build.timestamp}</build.timestamp>
-    	<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
-		<jetty.version>9.4.54.v20240208</jetty.version>
-		<configuration.url />
-
-	</properties>
-	
-	<build>
-		<finalName>${contextPath}</finalName>
-
-		<resources>
-			<resource>
-				<directory>src/main/resources/</directory>
-				<filtering>false</filtering>
-				<excludes>
-					<exclude>docker/**</exclude>
-					<exclude>deploy/**</exclude>
-					<exclude>**/*.xml</exclude>
-					<exclude>**/*.jsp</exclude>
-					<exclude>**/*.properties</exclude>
-				</excludes>
-			</resource>
-
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.jsp</include>
-					<include>**/*.properties</include>
-				</includes>
-			</resource>
-		</resources>
-
-		<plugins>
-
-
-			<plugin>
-		      <groupId>org.codehaus.mojo</groupId>
-		      <artifactId>buildnumber-maven-plugin</artifactId>
-		      <executions>
-		        <execution>
-		          <phase>validate</phase>
-		          <goals><goal>create</goal></goals>
-		        </execution>
-		      </executions>
-		      <configuration>
-		        <doCheck>false</doCheck>
-		        <doUpdate>false</doUpdate>
-		      </configuration>
-		    </plugin>
-		    
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-license</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
-							<resources>
-								<resource>
-									<directory>META-INF</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-					</archive>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<inherited>true</inherited>
-				<groupId>org.codehaus.cargo</groupId>
-				<artifactId>cargo-maven2-plugin</artifactId>
-			</plugin>
-
-
-			<!-- Jetty Plugin -->
-			<plugin>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${jetty.version}</version>
-				<configuration>
-
-					<stopPort>${jetty.stop_port}</stopPort>
-					<stopKey>stop</stopKey>
-					<webAppConfig>
-						<contextPath>/${contextPath}</contextPath>
-
-						<webInfIncludeJarPattern>
-							.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$|.*/togglebutton-[^/]*\.jar$|.*/multiselect-combo-box-flow-[^/]*\.jar$</webInfIncludeJarPattern>
-						<containerIncludeJarPattern>
-							.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$|.*/togglebutton-[^/]*\.jar$|.*/multiselect-combo-box-flow-[^/]*\.jar$</containerIncludeJarPattern>
-
-						<!-- Use war output directory to get the webpack files -->
-						<allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
-
-					</webAppConfig>
-
-					<useTestClasspath>false</useTestClasspath>
-					<dumpOnStart>false</dumpOnStart>
-
-					<scanIntervalSeconds>0</scanIntervalSeconds>
-					<jettyXml>
-						${project.basedir}/src/main/webapp/WEB-INF/jetty.xml,
-						${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml
-					</jettyXml>
-     
-				</configuration>
-			</plugin>
-
-
-			<!-- War plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<attachClasses>true</attachClasses>
-					<webResources>
-						<!-- packagingExcludes>truststore.jks</packagingExcludes -->
-						<resource>
-							<directory>target/classes</directory>
-							<includes>
-								<include>**/*.xml</include>
-								<include>**/*.properties</include>
-							</includes>
-							<excludes>
-
-								<exclude>src/main/resources/truststore.jks</exclude>
-								<exclude>src/main/webapp/log.jsp</exclude>
-
-							</excludes>
-						</resource>
-
-						<resource>
-							<filtering>true</filtering>
-							<directory>${basedir}/src/main/webapp</directory>
-							<includes>
-								<include>**/*.xml</include>
-								<include>**/*.jsp</include>
-								<include>**/*.properties</include>
-							</includes>
-						</resource>
-
-						<resource>
-							<directory>target/frontend</directory>
-							<targetPath>frontend</targetPath>
-						</resource>
-				
-					</webResources>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.4</version>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${basedir}/target/filtered-sources</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Take care of synchronizing java dependencies and imports in
-			package.json and main.js files. It also creates webpack.config.js if not exists yet. -->
-			<plugin>
-				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-maven-plugin</artifactId>
-				<version>${vaadin.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>prepare-frontend</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-		</plugins>
-
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											com.samaxes.maven
-										</groupId>
-										<artifactId>
-											maven-minify-plugin
-										</artifactId>
-										<versionRange>
-											[1.2,)
-										</versionRange>
-										<goals>
-											<goal>minify</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.mojo
-										</groupId>
-										<artifactId>
-											build-helper-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.4,)
-										</versionRange>
-										<goals>
-											<goal>add-source</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-
-
-	<dependencies>
+  
+  <artifactId>custom-tasks</artifactId>
+  <name>ESSI-Lab Custom tasks</name>
+  
+  <dependencies>
 
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
@@ -423,161 +132,7 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>harvester</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>
-
-		<!-- report manager -->
-		<!--dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>report-manager</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency-->
-
-		<!-- profilers -->
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-dev-kit</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-ckan</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-wis</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-openmetrics</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-gwis</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-observations</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-terms</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>		
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-esri</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-semantic</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-thredds</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-bnhs</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-sos</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-arpa-hydrocsv</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-arpa-rest</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-oaipmh</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-wps</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-wms</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-wms-extent</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-wms-cluster</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-wfs</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-opensearch</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-csw</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-cdi</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-pub-sub</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-wof</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-rest</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-rest-views</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-ssc-feed</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-worldcereal</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>		
+		</dependency>		 
 
 		<!-- shared content -->
 		<dependency>
@@ -1118,7 +673,153 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-oai-pmh-wrapper</artifactId>
 			<version>${project.parent.version}</version>
+		</dependency>	
+		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-dev-kit</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-ckan</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wis</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-openmetrics</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-gwis</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-observations</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-terms</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-esri</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-semantic</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-thredds</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-bnhs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-sos</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-arpa-hydrocsv</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-arpa-rest</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-oaipmh</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wps</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wms</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wms-extent</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wms-cluster</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wfs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-opensearch</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-csw</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-cdi</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-pub-sub</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wof</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-rest</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-rest-views</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-ssc-feed</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-worldcereal</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>			
 					
 		<!-- odip utils -->
 		<dependency>
@@ -1158,8 +859,6 @@
 			<artifactId>access-tools-validator-geotiff</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
-
 		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
@@ -1190,11 +889,7 @@
 			<artifactId>augmenter</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
-		<!-- <dependency> <groupId>com.github.stefanbirkner</groupId>
-		<artifactId>system-rules</artifactId> 
-			<scope>test</scope> </dependency> -->
-
+ 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>gs-driver-elasticsearch</artifactId>
@@ -1226,237 +921,11 @@
 		</dependency>
 
 		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
+			<groupId>eu.essi_lab</groupId>
 			<artifactId>access-tools</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		
-		<!-- Custom tasks -->
-		
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>custom-tasks</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		
 	</dependencies>
-
-	<profiles>
-
-		<profile>
-			<id>continuous-integration</id>
-			<build>
-				<finalName>gi-cat-latest-build</finalName>
-			</build>
-		</profile>
-
-		<profile>
-			<id>internaltest</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-					</plugin>
-					<plugin>
-						<groupId>io.fabric8</groupId>
-						<artifactId>docker-maven-plugin</artifactId>
-
-						<configuration>
-							<images>
-
-								
-
-								<image>
-									<alias>gi-elasticsearch</alias>
-									<name>${docker.elasticsearch}</name>
-									<run>
-										<ports>
-											<port>gi-elasticsearch.port:9200</port>
-										</ports>
-										<wait>
-											<http>
-												<!--suppress MavenModelInspection -->
-												<url>
-													http://admin:admin@${docker.host.address}:${gi-elasticsearch.port}</url><!--/_cat/health?v -->
-											</http>
-											<time>${fabric8-timeout}</time>
-										</wait>
-										<env>
-											<discovery.type>single-node</discovery.type>
-											<bootstrap.memory_lock>true</bootstrap.memory_lock>
-											<OPENSEARCH_JAVA_OPTS>-Xms512m
-												-Xmx512m</OPENSEARCH_JAVA_OPTS>
-											<DISABLE_INSTALL_DEMO_CONFIG>true</DISABLE_INSTALL_DEMO_CONFIG>
-											<DISABLE_SECURITY_PLUGIN>true</DISABLE_SECURITY_PLUGIN>
-										</env>
-									</run>
-								</image>
-
-								<image>
-									<alias>gi-mysql</alias>
-									<name>${mySQLDocker.registry}</name>
-									<run>
-										<ports>
-											<port>mysql.port:3306</port>
-										</ports>
-										<wait>
-											<time>${fabric8-no-ping-timeout}</time>
-										</wait>
-										<env>
-											<MYSQL_ROOT_PASSWORD>pdw</MYSQL_ROOT_PASSWORD>
-										</env>
-									</run>
-								</image>
-
-							</images>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>externaltest</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-					</plugin>
-					<plugin>
-						<groupId>io.fabric8</groupId>
-						<artifactId>docker-maven-plugin</artifactId>
-
-						<configuration>
-							<images>
-
-
-
-								<image>
-									<alias>gi-elasticsearch</alias>
-									<name>${docker.elasticsearch}</name>
-									<run>
-										<ports>
-											<port>gi-elasticsearch.port:9200</port>
-										</ports>
-										<wait>
-											<http>
-												<!--suppress MavenModelInspection -->
-												<url>
-													http://admin:admin@${docker.host.address}:${gi-elasticsearch.port}</url><!--/_cat/health?v -->
-											</http>
-											<time>${fabric8-timeout}</time>
-										</wait>
-										<env>
-											<discovery.type>single-node</discovery.type>
-											<bootstrap.memory_lock>true</bootstrap.memory_lock>
-											<OPENSEARCH_JAVA_OPTS>-Xms512m
-												-Xmx512m</OPENSEARCH_JAVA_OPTS>
-											<DISABLE_INSTALL_DEMO_CONFIG>true</DISABLE_INSTALL_DEMO_CONFIG>
-											<DISABLE_SECURITY_PLUGIN>true</DISABLE_SECURITY_PLUGIN>
-										</env>
-									</run>
-								</image>
-
-								<image>
-									<alias>gi-mysql</alias>
-									<name>${mySQLDocker.registry}</name>
-									<run>
-										<ports>
-											<port>mysql.port:3306</port>
-										</ports>
-										<wait>
-											<time>${fabric8-no-ping-timeout}</time>
-										</wait>
-										<env>
-											<MYSQL_ROOT_PASSWORD>pdw</MYSQL_ROOT_PASSWORD>
-										</env>
-									</run>
-								</image>
-
-							</images>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>createdockerimage</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<!-- This plugin enables creation of a docker image of
-						gs-service calling: -->
-						<!-- mvn -Pcreatedockerimage clean package -->
-						<!-- Optionally, add a configuration file from a
-						profile, e.g. -Pwcs -->
-						<groupId>com.spotify</groupId>
-						<artifactId>dockerfile-maven-plugin</artifactId>
-						<version>1.4.10</version>
-						<executions>
-							<execution>
-								<id>default</id>
-								<goals>
-									<goal>build</goal>
-									<goal>push</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<dockerfile>
-								${project.basedir}/src/main/resources/docker/run-configured.Dockerfile</dockerfile>
-							<tag>1</tag>
-							<repository>localhost/gi-suite</repository>
-							<buildArgs>
-								<WAR_FILE>target/${project.build.finalName}.war</WAR_FILE>
-							</buildArgs>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<!-- Production mode is activated using -Pvaadin-production -->
-			<id>vaadin-production</id>
-			<properties>
-				<vaadin.productionMode>true</vaadin.productionMode>
-			</properties>
-
-			<dependencies>
-				<dependency>
-					<groupId>com.vaadin</groupId>
-					<artifactId>flow-server-production-mode</artifactId>
-				</dependency>
-			</dependencies>
-
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.vaadin</groupId>
-						<artifactId>vaadin-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>build-frontend</goal>
-								</goals>
-								<phase>compile</phase>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+  
 </project>

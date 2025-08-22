@@ -21,14 +21,10 @@ package eu.essi_lab.gssrv.conf.task.views;
  * #L%
  */
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Optional;
 
 import org.quartz.JobExecutionContext;
-
-import com.amazonaws.util.IOUtils;
 
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
@@ -38,7 +34,6 @@ import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.jaxb.ViewFactory;
 
 /**
  * This task can create views

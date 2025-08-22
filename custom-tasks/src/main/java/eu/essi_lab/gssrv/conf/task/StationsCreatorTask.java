@@ -1,7 +1,6 @@
 package eu.essi_lab.gssrv.conf.task;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 
 /*-
  * #%L
@@ -26,7 +25,6 @@ import java.util.Arrays;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.AbstractMap.SimpleEntry;
 
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -61,7 +59,6 @@ import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.CollectionType;
 import eu.essi_lab.model.resource.DatasetCollection;

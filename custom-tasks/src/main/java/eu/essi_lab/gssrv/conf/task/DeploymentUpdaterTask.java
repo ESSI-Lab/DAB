@@ -64,7 +64,6 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.SortedFields;
-import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.ResourceProperty;
 
