@@ -25,6 +25,7 @@ package eu.essi_lab.cfga.option;
  */
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.json.JSONObject;
 
@@ -343,6 +344,33 @@ public class OptionBuilder<T> {
     public OptionBuilder<T> withValue(T value) {
 
 	option.addValue(value);
+	return this;
+    }
+
+    /**
+     * @param predicate
+     * @param value
+     * @return
+     */
+    public OptionBuilder<T> withConditionalValue(boolean predicate, T value) {
+
+	if (predicate) {
+	    option.addValue(value);
+	}
+
+	return this;
+    }
+
+    /**
+     * @param predicate
+     * @param trueValue
+     * @param falseValue
+     * @return
+     */
+    public OptionBuilder<T> withConditionalValue(boolean predicate, T trueValue, T falseValue) {
+
+	option.addValue(predicate ? trueValue : falseValue);
+
 	return this;
     }
 
