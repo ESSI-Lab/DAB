@@ -122,6 +122,7 @@ public class OptionComponent extends VerticalLayout {
     private HasEnabled renderedOption;
     private Option<?> option;
     private ToggleButton toggle;
+    private VerticalLayout optionLayout;
 
     /**
      * @param configuration
@@ -150,7 +151,7 @@ public class OptionComponent extends VerticalLayout {
 	//
 	HorizontalLayout mainLayout = OptionComponentFactory.createOptionComponentMainLayout(option);
 
-	VerticalLayout optionLayout = OptionComponentFactory.createOptionComponentLayout(option);
+	optionLayout = OptionComponentFactory.createOptionComponentLayout(option);
 
 	mainLayout.add(optionLayout);
 
@@ -298,6 +299,14 @@ public class OptionComponent extends VerticalLayout {
 	    }
 	}
 
+    }
+
+    /**
+     * @return
+     */
+    public VerticalLayout getOptionLayout() {
+
+	return optionLayout;
     }
 
     /**
