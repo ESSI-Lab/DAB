@@ -24,7 +24,7 @@ package eu.essi_lab.cfga.gui.dialog;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
@@ -77,9 +77,13 @@ public class ConfirmationDialog extends EnhancedDialog {
 
 	if (text != null) {
 
-	    Label label = ComponentFactory.createLabel(text, 15);
+	    Div div = ComponentFactory.createDiv();
 
-	    setContent(label);
+	    text = text.replace("\n", "<br>");
+
+	    div.getElement().setProperty("innerHTML", text);
+
+	    setContent(div);
 	}
 
 	//
