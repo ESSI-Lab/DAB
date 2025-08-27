@@ -39,7 +39,6 @@ import org.json.JSONObject;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
-import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -51,26 +50,31 @@ public class S3Source implements ConfigurationSource {
 
     private S3TransferWrapper wrapper;
     private String bucketName;
-
-    public String getBucketName() {
-	return bucketName;
-    }
-
     private String configName;
 
-    public String getConfigName() {
-	return configName;
-    }
-
     /**
-     * Used to initialize an AWS S3 source
+     * Used to initialize an S3 source. The s3 endpoint can be omitted, and in such case the default AWS
+     * endpoint 'https://s3.amazonaws.com' is used.<br>
+     * E.g: s3://awsUser:awsPassword@bucket/config.json
+     * E.g: s3://awsUser:awsPassword@http:endpoint/bucket/config.json
+     * E.g: s3://awsUser:awsPassword@https:endpoint/bucket/config.json
      * 
-     * @param configURL s3://awsUser:awsPassword@bucket/config.json
+     * @param configURL
      * @return
      * @throws URISyntaxException
      */
     public static S3Source of(String configURL) throws URISyntaxException {
-	return of(configURL, null);
+
+	String[] split = configURL.split("@")[1].split("/");
+
+	String endpoint = split.length == 3 ? split[0] : null;
+
+	if (endpoint != null) {
+
+	    configURL = configURL.replace(endpoint + "/", "");
+	}
+
+	return of(configURL, endpoint);
     }
 
     /**
@@ -303,6 +307,22 @@ public class S3Source implements ConfigurationSource {
     public String getLocation() {
 
 	return bucketName + "/" + configName;
+    }
+
+    /**
+     * @return
+     */
+    public String getBucketName() {
+
+	return bucketName;
+    }
+
+    /**
+     * @return
+     */
+    public String getConfigName() {
+
+	return configName;
     }
 
     @Override

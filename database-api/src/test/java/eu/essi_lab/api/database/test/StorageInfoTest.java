@@ -114,7 +114,7 @@ public class StorageInfoTest {
     @Test
     public void openSearchManagedTest() throws URISyntaxException {
 
-	String uri = "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
+	String uri = "osm://awsaccesskey:awssecretkey@https:productionhost/prod/prodConfig";
 
 	StorageInfo info = DatabaseSourceUrl.build(uri);
 
@@ -133,7 +133,7 @@ public class StorageInfoTest {
     @Test
     public void openSearchServerlessTest() throws URISyntaxException {
 
-	String uri = "oss://awsaccesskey:awssecretkey@productionhost/preprod/preProdConfig";
+	String uri = "oss://awsaccesskey:awssecretkey@https:productionhost/preprod/preProdConfig";
 
 	StorageInfo info = DatabaseSourceUrl.build(uri);
 
@@ -150,9 +150,9 @@ public class StorageInfoTest {
     }
 
     @Test
-    public void openSearchLocalTest() throws URISyntaxException {
+    public void openSearchLocalTest1() throws URISyntaxException {
 
-	String uri = "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig";
+	String uri = "osl://awsaccesskey:awssecretkey@http:localhost:9200/test/testConfig";
 
 	StorageInfo info = DatabaseSourceUrl.build(uri);
 
@@ -164,6 +164,26 @@ public class StorageInfoTest {
 	Assert.assertEquals("test", info.getIdentifier());
 
 	Assert.assertEquals("testConfig", info.getName());
+
+	Assert.assertEquals(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol(), info.getType().get());
+    }
+    
+
+    @Test
+    public void openSearchLocalTest2() throws URISyntaxException {
+
+	String uri = "osl://awsaccesskey:awssecretkey@https:localhost:9200/test2/testConfig2";
+
+	StorageInfo info = DatabaseSourceUrl.build(uri);
+
+	Assert.assertEquals("awsaccesskey", info.getUser());
+	Assert.assertEquals("awssecretkey", info.getPassword());
+
+	Assert.assertEquals("https://localhost:9200", info.getUri());
+
+	Assert.assertEquals("test2", info.getIdentifier());
+
+	Assert.assertEquals("testConfig2", info.getName());
 
 	Assert.assertEquals(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol(), info.getType().get());
     }

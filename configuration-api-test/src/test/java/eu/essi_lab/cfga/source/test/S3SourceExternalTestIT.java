@@ -42,7 +42,7 @@ public class S3SourceExternalTestIT {
     }
 
     @Test
-    public void startupUrlTest() throws URISyntaxException {
+    public void startupUrlTest1() throws URISyntaxException {
 
 	S3Source source = S3Source
 		.of("s3://" + System.getProperty("accessKey") + ":" + System.getProperty("secretKey") + "@bucket/config.json");
@@ -55,6 +55,29 @@ public class S3SourceExternalTestIT {
 
 	String accessKey = wrapper.getAccessKey();
 	String secretKey = wrapper.getSecretKey();
+
+	Assert.assertEquals(System.getProperty("accessKey"), accessKey);
+	Assert.assertEquals(System.getProperty("secretKey"), secretKey);
+    }
+
+    @Test
+    public void startupUrlTest2() throws URISyntaxException {
+
+	S3Source source = S3Source.of(
+		"s3://" + System.getProperty("accessKey") + ":" + System.getProperty("secretKey") + "@https:s3endpoint/bucket/config.json");
+
+	String location = source.getLocation();
+
+	Assert.assertEquals("bucket/config.json", location);
+
+	S3TransferWrapper wrapper = source.getWrapper();
+
+	String accessKey = wrapper.getAccessKey();
+	String secretKey = wrapper.getSecretKey();
+
+	String endpoint = wrapper.getEndpoint().get();
+
+	Assert.assertEquals("https:s3endpoint", endpoint);
 
 	Assert.assertEquals(System.getProperty("accessKey"), accessKey);
 	Assert.assertEquals(System.getProperty("secretKey"), secretKey);
@@ -149,7 +172,7 @@ public class S3SourceExternalTestIT {
 	//
 
 	S3Source source = new S3Source(manager, TEST_BUCKET_NAME, TEST_CONFIG_NAME);
-	
+
 	Assert.assertFalse(source.isEmptyOrMissing());
 
 	List<Setting> list = source.list();

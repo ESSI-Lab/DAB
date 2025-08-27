@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,7 @@ import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.gui.components.option.OptionComponent;
 import eu.essi_lab.cfga.gui.components.option.OptionComponentLayout;
+import eu.essi_lab.cfga.gui.components.option.OptionTextField;
 import eu.essi_lab.cfga.gui.components.setting.group.CheckComponentsHandler;
 import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
 import eu.essi_lab.cfga.option.Option;
@@ -321,6 +323,47 @@ public class SettingComponent extends Div {
     public Optional<Details> getDetails() {
 
 	return Optional.ofNullable(details);
+    }
+
+    /**
+     * @param settingName
+     * @return
+     */
+    public List<OptionTextField> getOptionTextFields(String settingName) {
+
+	List<Component> list = settingNameToComponentsMap.get(settingName);
+
+	if (list != null && !list.isEmpty()) {
+
+	    OptionComponentLayout layout = (OptionComponentLayout) list.get(0);
+
+	    return layout.//
+		    getOptionComponents().//
+		    stream().//
+		    map(oc -> oc.getOptionLayout().getChildren().filter(c -> c instanceof OptionTextField).findFirst()
+			    .map(c -> (OptionTextField) c).orElse(null))
+		    .//
+		    filter(Objects::nonNull).//
+		    collect(Collectors.toList());
+	}
+
+	return new ArrayList<>();
+    }
+
+    /**
+     * @return
+     */
+    public Optional<RadioComponentsHandler> getRadioHandler() {
+    
+        return radioMap.values().stream().findFirst();
+    }
+
+    /**
+     * @return
+     */
+    public Optional<CheckComponentsHandler> getCheckHandler() {
+    
+        return checkMap.values().stream().findFirst();
     }
 
     /**
@@ -686,10 +729,10 @@ public class SettingComponent extends Div {
      * @param multiSelectionMode
      */
     private void handleRemoveButton(//
-	    Setting parent,//
-	    Setting setting,//
-	    TabContainer tabContainer,//
-	    HorizontalLayout headerLayout,//
+	    Setting parent, //
+	    Setting setting, //
+	    TabContainer tabContainer, //
+	    HorizontalLayout headerLayout, //
 	    SelectionMode multiSelectionMode) {
 
 	boolean canBeRemoved = setting.canBeRemoved();
@@ -747,7 +790,7 @@ public class SettingComponent extends Div {
 	    boolean checkUpdated = !isScheduling(setting) && updateCheckGroup(parent, setting, toggle, multiSelectionMode);
 
 	    if (!radioUpdated && !checkUpdated) {
-		
+
 		toggle.getStyle().set("margin-left", "5px");
 
 		headerLayout.add(toggle);
