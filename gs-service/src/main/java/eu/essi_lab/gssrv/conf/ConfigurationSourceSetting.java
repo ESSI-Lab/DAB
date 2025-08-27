@@ -25,6 +25,7 @@ package eu.essi_lab.gssrv.conf;
  */
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.DatabaseImpl;
@@ -55,10 +56,10 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
     private static final String OS_SETTING_ID = "osSetting";
     private static final String OS_URI_OPTION_KEY = "osUri";
     private static final String OS_NAME_OPTION_KEY = "osName";
+    private static final String OS_CONFIG_NAME_OPTION_KEY = "osConfigName";
     private static final String OS_TYPE_OPTION_KEY = "osType";
     private static final String OS_USER_OPTION_KEY = "osUser";
     private static final String OS_PWD_OPTION_KEY = "osPwd";
-    private static final String OS_CONFIG_NAME_OPTION_KEY = "osConfigName";
 
     private static final String S3_SETTING_ID = "s3SettingId";
     private static final String S3_URI_OPTION_KEY = "s3Uri";
@@ -78,11 +79,11 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 	/**
 	 * 
 	 */
-	OPEN_SEARCH,
+	OPENSEARCH,
 	/**
 	 * 
 	 */
-	S3;
+	S3
     }
 
     /**
@@ -93,12 +94,11 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 	setCanBeDisabled(false);
 	setEditable(false);
 	setShowHeader(false);
-
-	setDescription("Configure the storage ('MarkLogic', 'OpenSearch', 'S3'), " //
-		+ "then use the 'Upload configuration file' button to upload the selected configuration file in the configured storage");
 	setCanBeCleaned(false);
-
 	setSelectionMode(SelectionMode.SINGLE);
+	setDescription("Configure the storage ('OpenSearch' or 'S3'), " //
+		+ "then use the 'Upload configuration file' button to upload the selected configuration file into the configured storage. \n\n"
+		+ "When the upload is done, you can read in the panel above, the Java option required to start the DAB with the uploaded configuration");
 
 	DatabaseSetting dbSetting = ConfigurationWrapper.getDatabaseSetting();
 
@@ -204,6 +204,16 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 
 	    osSourceSetting.addOption(osName);
 
+	    Option<String> osConfigName = StringOptionBuilder.get().//
+		    withLabel("Configuration name").//
+		    withDescription("E.g.: 'testConfig', 'preprodConfig', 'prodConfig'").//
+		    withKey(OS_CONFIG_NAME_OPTION_KEY).//
+		    cannotBeDisabled().//
+		    required().//
+		    build();
+
+	    osSourceSetting.addOption(osConfigName);
+
 	    Option<String> userOption = StringOptionBuilder.get().//
 		    withLabel("Database user/access key").//
 		    withKey(OS_USER_OPTION_KEY).//
@@ -286,7 +296,7 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 
 	    mlSourceSetting.addOption(folderOption);
 
-	    addSetting(mlSourceSetting);
+	    // addSetting(mlSourceSetting);
 	}
     }
 
@@ -295,18 +305,97 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
      */
     public ConfigurationSource getSelectedSource() {
 
-	Setting mlSetting = getSetting(MARK_LOGIC_SETTING_ID, Setting.class).get();
-	Setting osSetting = getSetting(OS_SETTING_ID, Setting.class).get();
-	Setting s3Setting = getSetting(S3_SETTING_ID, Setting.class).get();
+	// Setting mlSetting = getSetting(MARK_LOGIC_SETTING_ID, Setting.class).get();
+	//
+	// if (mlSetting.isSelected()) {
+	//
+	// return ConfigurationSource.MARK_LOGIC;
+	// }
 
-	return null;
+	Setting osSetting = getSetting(OS_SETTING_ID, Setting.class).get();
+
+	if (osSetting.isSelected()) {
+
+	    return ConfigurationSource.OPENSEARCH;
+	}
+
+	return ConfigurationSource.S3;
     }
 
-    public StorageInfo getSelectedStorageInfo() {
+    /**
+     * @return
+     */
+    public Optional<StorageInfo> getSelectedStorageInfo() {
 
-	StorageInfo storageInfo = new StorageInfo();
+	// Setting mlSetting = getSetting(MARK_LOGIC_SETTING_ID, Setting.class).get();
+	//
+	// if (mlSetting.isSelected()) {
+	//
+	// Optional<String> mlName = mlSetting.getOption(MARK_LOGIC_NAME_OPTION_KEY,
+	// String.class).get().getOptionalValue();
+	// Optional<String> mlPwd = mlSetting.getOption(MARK_LOGIC_PWD_OPTION_KEY,
+	// String.class).get().getOptionalValue();
+	// Optional<String> mlUser = mlSetting.getOption(MARK_LOGIC_USER_OPTION_KEY,
+	// String.class).get().getOptionalValue();
+	// Optional<String> mlUri = mlSetting.getOption(MARK_LOGIC_URI_OPTION_KEY,
+	// String.class).get().getOptionalValue();
+	// Optional<String> mlFolder = mlSetting.getOption(MARK_LOGIC_FOLDER_OPTION_KEY,
+	// String.class).get().getOptionalValue();
+	//
+	// if (mlName.isEmpty() || mlPwd.isEmpty() || mlUser.isEmpty() || mlUri.isEmpty() || mlFolder.isEmpty()) {
+	//
+	// return Optional.empty();
+	// }
+	//
+	// }
 
-	return null;
+	Setting osSetting = getSetting(OS_SETTING_ID, Setting.class).get();
+
+	if (osSetting.isSelected()) {
+
+	    Optional<String> osName = osSetting.getOption(OS_NAME_OPTION_KEY, String.class).get().getOptionalValue();
+	    Optional<String> osConfigName = osSetting.getOption(OS_CONFIG_NAME_OPTION_KEY, String.class).get().getOptionalValue();
+
+	    Optional<String> osUri = osSetting.getOption(OS_URI_OPTION_KEY, String.class).get().getOptionalValue();
+	    Optional<String> osPwd = osSetting.getOption(OS_PWD_OPTION_KEY, String.class).get().getOptionalValue();
+	    Optional<String> osUser = osSetting.getOption(OS_USER_OPTION_KEY, String.class).get().getOptionalValue();
+	    Optional<String> osType = osSetting.getOption(OS_TYPE_OPTION_KEY, String.class).get().getOptionalValue();
+
+	    if (osName.isEmpty() || osUri.isEmpty() || osPwd.isEmpty() || osUser.isEmpty() || osConfigName.isEmpty()) {
+
+		return Optional.empty();
+	    }
+
+	    StorageInfo info = new StorageInfo(osUri.get());
+	    info.setUser(osUser.get());
+	    info.setPassword(osPwd.get());
+
+	    info.setType(osType.get().equals("OpenSearch") ? "osl" : "osm");
+
+	    info.setName(osConfigName.get());
+	    info.setIdentifier(osName.get());
+
+	    return Optional.of(info);
+	}
+
+	Setting s3Setting = getSetting(S3_SETTING_ID, Setting.class).get();
+
+	Optional<String> s3Uri = s3Setting.getOption(S3_URI_OPTION_KEY, String.class).get().getOptionalValue();
+	Optional<String> s3Bucket = s3Setting.getOption(S3_CONFIG_BUCKET_OPTION_KEY, String.class).get().getOptionalValue();
+	Optional<String> s3AccessKey = s3Setting.getOption(S3_ACCESS_KEY_OPTION_KEY, String.class).get().getOptionalValue();
+	Optional<String> s3SecretKey = s3Setting.getOption(S3_SECRET_KEY_OPTION_KEY, String.class).get().getOptionalValue();
+
+	if (s3Uri.isEmpty() || s3Bucket.isEmpty() || s3AccessKey.isEmpty() || s3SecretKey.isEmpty()) {
+
+	    return Optional.empty();
+	}
+
+	StorageInfo info = new StorageInfo(s3Uri.get());
+	info.setUser(s3AccessKey.get());
+	info.setPassword(s3SecretKey.get());
+	info.setName(s3Bucket.get());
+
+	return Optional.of(info);
     }
 
     /**
