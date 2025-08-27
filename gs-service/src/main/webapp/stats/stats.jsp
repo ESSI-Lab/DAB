@@ -1,3 +1,4 @@
+<%@page import="eu.essi_lab.gssrv.portal.PortalTranslator"%>
 <%@page
 	import="ucar.nc2.ft2.coverage.remote.CdmrFeatureProto.CoordSysOrBuilder"%>
 <%@page import="java.util.HashMap"%>
@@ -57,7 +58,12 @@ if (viewId == null || viewId.isEmpty()) {
 }
 String format = request.getParameter("format");
 boolean csv = false;
+String language = request.getParameter("language");
 
+if (language==null||language.isEmpty()){
+    language="en";
+}
+PortalTranslator translator = new PortalTranslator(language);
 StatisticsMessage statisticsMessage = new StatisticsMessage();
 View view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId).get();
 
@@ -162,7 +168,7 @@ if (format != null && format.equals("CSV")) {
 }
 if (!csv) {
     response.setContentType("text/html");
-    out.println("<html><head><title>Data provider information</title>");
+    out.println("<html><head><title>"+translator.getTranslation("data_provider_information")+"</title>");
     out.println("<style>\n" + "body {\n" + "    font-family: 'Segoe UI', Arial, sans-serif;\n" + "    background: #f8f9fa;\n"
     + "    color: #222;\n" + "    margin: 0;\n" + "    padding: 0 0 40px 0;\n" + "}\n" + "h1, h2 {\n" + "    color: #005aef;\n"
     + "    margin-top: 30px;\n" + "}\n" + "ul {\n" + "    background: #fff;\n" + "    border-radius: 6px;\n"
@@ -177,7 +183,7 @@ if (!csv) {
     + "    text-decoration: none;\n" + "}\n" + "a:hover {\n" + "    text-decoration: underline;\n" + "}\n" + "</style>");
     out.println("</head><body>");
     out.println("<div style='max-width: 60%; margin: 0 auto;'>");
-    out.println("<h1>Data Provider Information</h1>");
+    out.println("<h1>"+translator.getTranslation("data_provider_information")+"</h1>");
 }
 
 if (sourceId == null || sourceId.isEmpty()) {
@@ -231,20 +237,20 @@ if (sourceId == null || sourceId.isEmpty()) {
     // Start a container for stats and map
 
     out.println("<div >");
-    out.println("<h2>Provider statistics</h2>");
+    out.println("<h2>"+translator.getTranslation("provider_statistics")+"</h2>");
     out.println(
 		    "<table style='width: 100%; max-width: 100%; margin-bottom: 30px; border-collapse: separate; border-spacing: 0; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 6px; overflow: hidden;'>");
     out.println("<tr>");
     out.println("<td style='vertical-align: top; padding: 18px 28px 18px 28px; width: 50%;'>");
     out.println("<ul>");
-    out.println("<li><b># Platforms:</b> " + stats.getSiteCount() + "</li>");
-    out.println("<li><b># Observed properties:</b> " + stats.getAttributeCount() + "</li>");
-    out.println("<li><b># Datasets:</b> " + stats.getTimeSeriesCount() + "</li>");
-    out.println("<li><b>Minimum temporal extent:</b> " + stats.getBegin() + "</li>");
-    out.println("<li><b>Maximum temporal extent:</b> " + stats.getEnd() + "</li>");
-    out.println("<li><b>Bounding box (W,S,E,N):</b> " + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", "
+    out.println("<li><b># "+translator.getTranslation("platforms")+":</b> " + stats.getSiteCount() + "</li>");
+    out.println("<li><b># "+translator.getTranslation("observed_properties")+":</b> " + stats.getAttributeCount() + "</li>");
+    out.println("<li><b># "+translator.getTranslation("datasets")+":</b> " + stats.getTimeSeriesCount() + "</li>");
+    out.println("<li><b>"+translator.getTranslation("minimum_temporal_extent")+":</b> " + stats.getBegin() + "</li>");
+    out.println("<li><b>"+translator.getTranslation("maximum_temporal_extent")+":</b> " + stats.getEnd() + "</li>");
+    out.println("<li><b>"+translator.getTranslation("bbox")+":</b> " + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", "
 		    + stats.getNorth() + "</li>");
-    out.println("<li><b>Altitude (min/max):</b> " + stats.getMinimumAltitude() + " / " + stats.getMaximumAltitude() + "</li>");
+    out.println("<li><b>"+translator.getTranslation("altitude")+":</b> " + stats.getMinimumAltitude() + " / " + stats.getMaximumAltitude() + "</li>");
     
     // Add organizations
     List<TermFrequencyItem> orgs = stats.getFrequencyResult(MetadataElement.ORGANISATION_NAME);
@@ -257,7 +263,7 @@ if (sourceId == null || sourceId.isEmpty()) {
             
         }
         orgList.append("</ul>");
-        out.println("<li><b>Involved organizations:</b> " + orgList.toString() + "</li>");
+        out.println("<li><b>"+translator.getTranslation("involved_organizations")+":</b> " + orgList.toString() + "</li>");
     }
 
     // Add observed properties
@@ -270,7 +276,7 @@ if (sourceId == null || sourceId.isEmpty()) {
             propList.append("<li>"+item.getTerm() + " (" + item.getFreq() + ")</li>");      
         }
         propList.append("</ul>");
-        out.println("<li><b>Observed properties:</b> " + propList.toString() + "</li>");
+        out.println("<li><b>"+translator.getTranslation("observed_properties")+":</b> " + propList.toString() + "</li>");
     }
     
     out.println("</ul>");
@@ -322,9 +328,9 @@ if (sourceId == null || sourceId.isEmpty()) {
     out.println("<p>No statistics available for this provider.</p>");
 	}
 
-	out.println("<h1>Sample platforms</h1>");
+	out.println("<h1>"+translator.getTranslation("sample_platforms")+"</h1>");
 	out.println("<table>");
-	out.println("<tr><th>Monitoring point</th><th>Latitude</th><th>Longitude</th><th>Elevation</th></tr>");
+	out.println("<tr><th>"+translator.getTranslation("monitoring_point")+"</th><th>"+translator.getTranslation("latitude")+"</th><th>"+translator.getTranslation("longitude")+"</th><th>"+translator.getTranslation("elevation")+"</th></tr>");
     }
     for (GSResource resource : resources) {
 	String title = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform().getCitation().getTitle();

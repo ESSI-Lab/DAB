@@ -9,25 +9,6 @@ function loadI18nSync(lang) {
     var desired = (localStorage.getItem('lang') || (window.config && window.config.language) || lang || 'en').toLowerCase();
     i18n.current = (desired === 'it') ? 'it' : 'en';
 
-    function resolveGiPortalBase() {
-        try {
-            var scripts = document.getElementsByTagName('script');
-            for (var i = 0; i < scripts.length; i++) {
-                var src = scripts[i].getAttribute('src') || '';
-                var idx = src.indexOf('gi-portal/gi-portal.js');
-                if (idx !== -1) {
-                    return src.substring(0, idx) + 'gi-portal/';
-                }
-            }
-        } catch (e) {}
-        // Fallbacks
-        var path = window.location.pathname || '';
-        if (path.indexOf('/gi-portal/') !== -1) {
-            return path.substring(0, path.indexOf('/gi-portal/') + '/gi-portal/'.length);
-        }
-        return './';
-    }
-
     function loadJsonSync(paths) {
         for (var j = 0; j < paths.length; j++) {
             try {
@@ -41,21 +22,12 @@ function loadI18nSync(lang) {
         }
         return {};
     }
-
-    var base = resolveGiPortalBase();
     var enCandidates = [
-//        base + 'lang/en.json',
-//        './lang/en.json',
         '../gi-portal/lang/en.json'
-//        '/gs-service/gi-portal/lang/en.json'
     ];
     var itCandidates = [
-//        base + 'lang/it.json',
-//        './lang/it.json',
         '../gi-portal/lang/it.json'
-//        '/gs-service/gi-portal/lang/it.json'
     ];
-
     i18n.en = loadJsonSync(enCandidates);
     if (i18n.current === 'it') {
         i18n.it = loadJsonSync(itCandidates);
@@ -71,8 +43,15 @@ function t(key, vars) {
     return interpolate(str, vars);
 }
 
+function lang(){
+	return i18n.current;
+}
+
 // Expose translator globally for GIAPI widgets
 try { window.__t = t; } catch (e) {}
+
+try { window.__lang = lang; } catch (e) {}
+
 
 function initializeLogin(config) {
 	if (!config.login) {
