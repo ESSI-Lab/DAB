@@ -176,9 +176,10 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		constraints.forEach((con) => advConstDiv += con);
 
 		// advanced constraints button    	    
+		var __t = window.__t || function(s){ return s; };
 		var advConstButton = GIAPI.FontAwesomeButton({
 			'width': 250,
-			'label': 'Advanced',
+			'label': __t('advanced'),
 			'icon': ' fa-bars',
 			'handler': function() {
 
@@ -397,7 +398,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		}
 
 		if (!options.label) {
-			options.label = 'Spatial extent';
+			options.label = __t('spatial_extent');
 		}
 
 		if (!options.help) {
@@ -544,7 +545,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		}
 
 		if (!options.label) {
-			options.label = property === 'from' ? 'Start time' : 'End time'
+			options.label = property === 'from' ? __t('start_time') : __t('end_time')
 		}
 
 		if (!options.help) {
@@ -772,101 +773,32 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		var help;
 		var label;
 		switch (constraint) {
-			case 'loc':
-				help = 'Name of a location where to constraint the search. E.g: "italy", "u.s.a", "africa"';
-				label = 'Location';
-				break;
 			case 'sba':
-				help = '"GEO Societal Benefit Area". E.g.:"agriculture", "climate", "disasters"';
-				label = 'GEO S.B.A.';
-				break;
 			case 'prot':
-				help = 'Protocol used to access the data linked to the searched results. E.g: "HTTP", "urn:ogc:serviceType:WebMapService:1.1.1:HTTP", "OGC:WMS-1.1.1-http-get-map"';
-				label = 'Protocol';
-				break;
 			case 'format':
-				help = 'Format of the data linked to the discovered nodes. E.g.: "image/gif", "application/zip"';
-				label = 'Format';
-				break;
 			case 'kwd':
-				help = 'Keyword which describes the searched result';
-				label = 'Keyword';
-				break;
 			case 'uselim':
-				help = 'Limitation applied on the use of the data linked to the searched results';
-				label = 'Use lim.';
-				break;
 			case 'magt':
-				help = 'The magnitude type of the searched event. This constraint affects only the "IRIS Event" source';
-				label = 'Mag. type';
-				break;
 			case 'inpe-sat-name':
-				help = 'Satellite name (string). E.g.: "AQUA"';
-				label = 'Sat. name';
-				break;
 			case 'inpe-instr-name':
-				help = 'Instrument name (string). E.g.: "MODIS"';
-				label = 'Instr. name';
-				break;
 			case 'sta':
-				help = 'Station description';
-				label = 'Station desc.';
-				break;
+			case 'loc':
 			case 'sensor':
-				help = 'Sensor description';
-				label = 'Sensor desc.';
-				break;
 			case 'sarPolCh':
-				help = 'Polarisation channels';
-				label = 'Pol. channels';
-				break;
 			case 'sarPolMd':
-				help = 'Polarisation mode';
-				label = 'Pol. mode';
-				break;
 			case 'origOrgId':
-				help = 'Organisation which created the resource';
-				label = 'Originator organisation';
-				break;
 			case 'instrumentId':
-				help = 'Identifier of the measuring instruments used to acquire the data';
-				label = 'Instrument id';
-				break;
 			case 'instrumentTitle':
-				help = 'Name of the measuring instruments used to acquire the data';
-				label = 'Instrument name';
-				break;
 			case 'platformId':
-				help = 'Identifier of the platform from which the data were taken';
-				label = 'Platform id';
-				break;
 			case 'platformTitle':
-				help = 'Name of the platform from which the data were taken';
-				label = 'Platform name';
-				break;
 			case 'attributeId':
-				help = 'Id of the parameter described by the measurement value';
-				label = 'Parameter id';
-				break;
 			case 'attributeTitle':
-				help = 'Name of the parameter described by the measurement value<br/><br/><button id="pButton">Browse and select parameters from the ontology GUI</button><br/><br/><button id="bButton">Browse and select parameters from the ontology tree</button>';
-				label = 'Parameter name';
-				break;
 			case 'riverName':
-				help = 'Name of the river object of measurement';
-				label = 'River name';
-				break;
 			case 'timeInterpolation':
-				help = 'Time interpolation';
-				label = 'Time interpolation';
-				break;
 			case 'intendedObservationSpacing':
-				help = 'Intended observation spacing';
-				label = 'Intended observation spacing';
-				break;
 			case 'aggregationDuration':
-				help = 'Aggregation duration';
-				label = 'Aggregation duration';
+				help = __t(constraint+"_help");
+				label = __t(constraint+"_label");
 				break;
 			default: throw 'Invalid constraint: ' + constraint;
 		}
@@ -950,7 +882,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		var help;
 		var label;
 		var values; // = [ {'label':'','value':''}, {'label':'Yes','value':'true'}, {'label':'No','value':'false'} ];
-		var correctHelp = 'Exact search or semantic search with ontology support for translations and narrower terms.<br/>Please check the online ontology browser for possible terms:<br/>';
+		var correctHelp = __t("ontology-search-help");
 
 
 		if (options !== undefined && options.ontology !== undefined) {
@@ -991,9 +923,8 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				label = 'Use ODIP Rosetta Stone service.';
 				break;
 			case 'semantics':
-				values = [{ 'label': 'Basic search by exact term', 'value': '' },
-				//{ 'label': 'Semantic search w/ translations', 'value': 'sameas' }, 
-				{ 'label': 'Semantic search w/ translations and narrow matches', 'value': 'sameas-narrow' }];
+				values = [{ 'label': __t("basic-text"), 'value': '' },
+				{ 'label': __t("sameas-narrow-text"), 'value': 'sameas-narrow' }];
 				help = correctHelp;
 				label = 'Semantics';
 				break;
@@ -1680,7 +1611,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 						$('<div  id="pDialog"></div>')
 							.html('<iframe src="' + ontologyUrl + '" id="parameterFrame"></iframe><div style="margin-top: 10px; text-align: center;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
 							.dialog({
-								title: "Select a parameter from the ontology",
+								title: __t("select-from-ontology"),
 								width: 850,
 								height: 700,
 								autoOpen: true,
@@ -2151,7 +2082,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			$('<div  id="bDialog"></div>')
 				.html('<iframe src="' + ontologyTreeUrl + '" id="barameterFrame" width=800 height=600></iframe><div style="margin-top: 10px; text-align: center;"><label for="selectedBarameter"><b>Selected parameter: </b></label><span id="selectedBarameter"><b>None</b></span></div>')
 				.dialog({
-					title: "Select a parameter from the ontology",
+					title: __t("select-from-ontology"),
 					width: 850,      // Width of the dialog
 					height: 700,     // Height of the dialog
 					autoOpen: true,
@@ -2205,7 +2136,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			$('<div  id="pDialog"></div>')
 				.html('<iframe src="' + ontologyUrl + '" id="parameterFrame"></iframe><div style="margin-top: 10px; text-align: center;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
 				.dialog({
-					title: "Select a parameter from the ontology",
+					title: __t("select-from-ontology"),
 					width: 850,      // Width of the dialog
 					height: 700,     // Height of the dialog
 					autoOpen: true,

@@ -30,5 +30,6 @@
     "clusterWMS": true,
     "login": true,
     "showSourceEndpoint": false,
-    "permissions":"downloads,api"
+    "permissions":"downloads,api",
+    "language": "en"
 }

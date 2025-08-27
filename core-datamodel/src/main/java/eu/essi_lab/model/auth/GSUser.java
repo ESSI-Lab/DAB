@@ -191,16 +191,20 @@ public class GSUser extends DOMSerializer implements Serializable {
     }
 
     @XmlTransient
-    public Optional<UserIdentifierType> getUserIdentifierType() {
+    public UserIdentifierType getUserIdentifierType() {
 
 	@SuppressWarnings("unchecked")
 	GSProperty<String> property = getProperty(IDENTIFIER_TYPE_ELEMENT_NAME);
 	if (property != null) {
 
-	    return UserIdentifierType.fromType(property.getValue().toString());
+	    Optional<UserIdentifierType> ret = UserIdentifierType.fromType(property.getValue().toString());
+	    if (ret.isEmpty()) {
+		return null;
+	    }
+	    return ret.get();
 	}
 
-	return Optional.empty();
+	return null;
     }
 
     @XmlTransient

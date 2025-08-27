@@ -3,6 +3,77 @@ import { GIAPI } from '../giapi/core/GIAPI.js';
 var view = '';
 var token = '';
 
+// i18n support
+var i18n = { current: 'en', en: {}, it: {} };
+function loadI18nSync(lang) {
+    var desired = (localStorage.getItem('lang') || (window.config && window.config.language) || lang || 'en').toLowerCase();
+    i18n.current = (desired === 'it') ? 'it' : 'en';
+
+    function resolveGiPortalBase() {
+        try {
+            var scripts = document.getElementsByTagName('script');
+            for (var i = 0; i < scripts.length; i++) {
+                var src = scripts[i].getAttribute('src') || '';
+                var idx = src.indexOf('gi-portal/gi-portal.js');
+                if (idx !== -1) {
+                    return src.substring(0, idx) + 'gi-portal/';
+                }
+            }
+        } catch (e) {}
+        // Fallbacks
+        var path = window.location.pathname || '';
+        if (path.indexOf('/gi-portal/') !== -1) {
+            return path.substring(0, path.indexOf('/gi-portal/') + '/gi-portal/'.length);
+        }
+        return './';
+    }
+
+    function loadJsonSync(paths) {
+        for (var j = 0; j < paths.length; j++) {
+            try {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', paths[j], false);
+                xhr.send(null);
+                if (xhr.status >= 200 && xhr.status < 300 && (xhr.responseText || '').trim().length > 0) {
+                    return JSON.parse(xhr.responseText);
+                }
+            } catch (e) {}
+        }
+        return {};
+    }
+
+    var base = resolveGiPortalBase();
+    var enCandidates = [
+//        base + 'lang/en.json',
+//        './lang/en.json',
+        '../gi-portal/lang/en.json'
+//        '/gs-service/gi-portal/lang/en.json'
+    ];
+    var itCandidates = [
+//        base + 'lang/it.json',
+//        './lang/it.json',
+        '../gi-portal/lang/it.json'
+//        '/gs-service/gi-portal/lang/it.json'
+    ];
+
+    i18n.en = loadJsonSync(enCandidates);
+    if (i18n.current === 'it') {
+        i18n.it = loadJsonSync(itCandidates);
+    }
+}
+function interpolate(template, vars) {
+    if (!template || !vars) return template;
+    return template.replace(/\$\{([^}]+)\}/g, function(_, k) { return (vars[k] != null) ? vars[k] : ''; });
+}
+function t(key, vars) {
+    var cur = (i18n[i18n.current] || {});
+    var str = cur[key] || i18n.en[key] || key;
+    return interpolate(str, vars);
+}
+
+// Expose translator globally for GIAPI widgets
+try { window.__t = t; } catch (e) {}
+
 function initializeLogin(config) {
 	if (!config.login) {
 		return;
@@ -12,16 +83,16 @@ function initializeLogin(config) {
 	const loginContainer = document.createElement('div');
 	loginContainer.className = 'login-container';
 	loginContainer.innerHTML = `
-		<button id="loginBtn" class="login-button">Login</button>
-		<button id="logoutBtn" class="login-button" style="display: none;">Logout</button>
-		<div id="loginModal" class="login-modal">
-			<h3>Login to ${config.title || 'Portal'}</h3>
-			<p class="login-info">After logging in, you will gain access to additional features, such as asynchronous bulk data download.</p>
-			<input type="email" id="email" placeholder="Email" autocomplete="off">
-			<input type="password" id="apiKey" placeholder="API Key" autocomplete="off">
-			<button id="submitLogin">Login</button>
+		<button id=\"loginBtn\" class=\"login-button\">${t('login')}</button>
+		<button id=\"logoutBtn\" class=\"login-button\" style=\"display: none;\">${t('logout')}</button>
+		<div id=\"loginModal\" class=\"login-modal\">
+			<h3>${t('login_to_portal', { title: (config.title || 'Portal') })}</h3>
+			<p class=\"login-info\">${t('login_info')}</p>
+			<input type=\"email\" id=\"email\" placeholder=\"${t('email_placeholder')}\" autocomplete=\"off\">
+			<input type=\"password\" id=\"apiKey\" placeholder=\"${t('api_key_placeholder')}\" autocomplete=\"off\">
+			<button id=\"submitLogin\">${t('login_submit')}</button>
 		</div>
-		<div id="modalOverlay" class="modal-overlay"></div>
+		<div id=\"modalOverlay\" class=\"modal-overlay\"></div>
 	`;
 
 	document.body.insertBefore(loginContainer, document.body.firstChild);
@@ -49,7 +120,7 @@ function initializeLogin(config) {
 		localStorage.removeItem('authToken');
 		localStorage.removeItem('userEmail');
 		loginBtn.style.display = 'inline-block';
-		loginBtn.textContent = 'Login';
+		loginBtn.textContent = t('login');
 		loginBtn.disabled = false;
 		logoutBtn.style.display = 'none';
 		window.location.reload();
@@ -107,7 +178,7 @@ function initializeLogin(config) {
 					// Update UI
 					loginBtn.style.display = 'none';
 					logoutBtn.style.display = 'inline-block';
-					logoutBtn.textContent = `Logged in (${data.email})`;
+					logoutBtn.textContent = t('logged_in', { email: data.email });
 
 					// Close modal
 					loginModal.style.display = 'none';
@@ -132,7 +203,7 @@ function initializeLogin(config) {
 	if (existingToken && existingEmail) {
 		loginBtn.style.display = 'none';
 		logoutBtn.style.display = 'inline-block';
-		logoutBtn.textContent = `Logged in (${existingEmail})`;
+		logoutBtn.textContent = t('logged_in', { email: existingEmail });
 
 		// Create user menu
 		const userMenu = document.createElement('div');
@@ -140,12 +211,13 @@ function initializeLogin(config) {
 		userMenu.className = 'user-menu';
 		userMenu.style.display = 'none';
 		let menuHtml = `
-			<button id="statusBtn" class="menu-button">Status of bulk downloads</button>\n`;
+			<button id=\"statusBtn\" class=\"menu-button\">${t('menu_status')}</button>\n`;
 		if (isAdmin) {
-			menuHtml += `<button id="listUsersBtn" class="menu-button">Manage Users</button>\n`;
-			menuHtml += `<button id="dataReportBtn" class="menu-button">Data report</button>\n`;
+			menuHtml += `<button id=\"listUsersBtn\" class=\"menu-button\">${t('menu_manage_users')}</button>\n`;
+			menuHtml += `<button id=\"dataReportBtn\" class=\"menu-button\">${t('menu_data_report')}</button>\n`;
 		}
-		menuHtml += `<button id="logoutMenuBtn" class="menu-button">Logout</button>`;
+		menuHtml += `<button id=\"changeLangBtn\" class=\"menu-button\">${t('menu_change_language')}</button>`;
+		menuHtml += `<button id=\"logoutMenuBtn\" class=\"menu-button\">${t('menu_logout')}</button>`;
 		userMenu.innerHTML = menuHtml;
 		document.body.appendChild(userMenu);
 
@@ -170,6 +242,35 @@ function initializeLogin(config) {
 			}
 		});
 
+		// Add change language handler
+		document.getElementById('changeLangBtn').addEventListener('click', function() {
+			userMenu.style.display = 'none';
+			const dialogDiv = $('<div>');
+			dialogDiv.append($('<div>').text(t('choose_language')).css({'margin-bottom':'10px'}));
+			const current = i18n.current || 'en';
+			const enOpt = $('<div>');
+			enOpt.append($('<input>').attr({type:'radio', name:'langSel', id:'lang_en', value:'en', checked: (current==='en')}));
+			enOpt.append($('<label>').attr('for','lang_en').text(t('language_en')).css({'margin-left':'6px'}));
+			const itOpt = $('<div>');
+			itOpt.append($('<input>').attr({type:'radio', name:'langSel', id:'lang_it', value:'it', checked: (current==='it')}));
+			itOpt.append($('<label>').attr('for','lang_it').text(t('language_it')).css({'margin-left':'6px'}));
+			dialogDiv.append(enOpt).append(itOpt);
+			dialogDiv.dialog({
+				title: t('change_language_title'),
+				modal: true,
+				width: 360,
+				buttons: [
+					{ text: 'OK', click: function() {
+						const sel = dialogDiv.find('input[name="langSel"]:checked').val() || 'en';
+						localStorage.setItem('lang', sel);
+						$(this).dialog('close');
+						window.location.reload();
+					}},
+					{ text: 'Cancel', click: function() { $(this).dialog('close'); } }
+				]
+			});
+		});
+
 		// Status button click handler
 		document.getElementById('statusBtn').addEventListener('click', function() {
 			userMenu.style.display = 'none';  // Hide menu when status is clicked
@@ -192,7 +293,7 @@ function initializeLogin(config) {
 							'margin': '0',
 							'color': '#2c3e50'
 						})
-						.html('<strong>Note:</strong> This panel shows your initiated bulk downloads. Downloads will be automatically removed two days after completion.')
+						.html(t('bulk_note_html'))
 				);
 
 			dialogContent.prepend(infoText);
@@ -200,7 +301,7 @@ function initializeLogin(config) {
 			// Create refresh button
 			const refreshButton = $('<button>')
 				.addClass('refresh-button')
-				.html('<i class="fa fa-refresh"></i> Refresh')
+				.html(`<i class="fa fa-refresh"></i> ${t('refresh')}`)
 				.css({
 					'margin-bottom': '10px',
 					'margin-top': '15px',
@@ -212,7 +313,7 @@ function initializeLogin(config) {
 
 			// Show dialog first
 			const dialog = dialogContent.dialog({
-				title: 'Bulk Downloads Status',
+				title: t('bulk_downloads_status_title'),
 				modal: true,
 				width: 1310,
 				position: { my: "center", at: "center top+150", of: window },
@@ -265,13 +366,13 @@ function initializeLogin(config) {
 						});
 						
 						const headerRow = $('<tr>')
-							.append($('<th>').text('Timestamp').css('width', '160px'))
-							.append($('<th>').text('Task ID').css('width', '250px'))
-							.append($('<th>').text('Name').css('width', '200px'))
-							.append($('<th>').text('Status').css('width', '200px'))
-							.append($('<th>').text('Size (MB)').css('width', '100px'))
-							.append($('<th>').text('Download').css('width', '100px'))
-							.append($('<th>').text('Actions').css('width', '100px'));
+							.append($('<th>').text(t('col_timestamp')).css('width', '160px'))
+							.append($('<th>').text(t('col_task_id')).css('width', '250px'))
+							.append($('<th>').text(t('col_name')).css('width', '200px'))
+							.append($('<th>').text(t('col_status')).css('width', '200px'))
+							.append($('<th>').text(t('col_size_mb')).css('width', '100px'))
+							.append($('<th>').text(t('col_download')).css('width', '100px'))
+							.append($('<th>').text(t('col_actions')).css('width', '100px'));
 						table.append(headerRow);
 
 						sortedResults.forEach((item, index) => {
@@ -493,13 +594,13 @@ function initializeLogin(config) {
 						
 						statusContent.append(table);
 					} else {
-						statusContent.append($('<p>').text('No bulk downloads found.'));
+						statusContent.append($('<p>').text(t('bulk_empty')));
 					}
 				})
 				.catch(error => {
 					console.error('Error fetching status:', error);
 					statusContent.empty().append(
-						$('<p>').text('Error loading bulk download status. Please try again later.')
+						$('<p>').text(t('bulk_error'))
 					);
 				})
 				.finally(() => {
@@ -522,8 +623,8 @@ function initializeLogin(config) {
 				userMenu.style.display = 'none';
 				// Create dialog content
 				const dialogContent = $('<div>');
-				dialogContent.append($('<h3>').text('Manage Users'));
-				dialogContent.append($('<p>').text('Below is the list of users.'));
+				dialogContent.append($('<h3>').text(t('menu_manage_users')));
+				dialogContent.append($('<p>').text(t('users_intro')));
 				// Results area
 				const resultsDiv = $('<div>').attr('id', 'listUsersResults').css({'margin-top': '15px'});
 				dialogContent.append(resultsDiv);
@@ -551,11 +652,11 @@ function initializeLogin(config) {
 					});
 					let table = '<table id="usersTable" style="width:100%;border-collapse:collapse;margin-top:10px;cursor:pointer">';
 					table += '<tr>' +
-						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Email</th>' +
-						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">First Name</th>' +
-						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Last Name</th>' +
-						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Institution</th>' +
-						'<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">Permissions</th>' +
+						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_email')}</th>` +
+						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_first_name')}</th>` +
+						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_last_name')}</th>` +
+						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_institution')}</th>` +
+						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_permissions')}</th>` +
 					'</tr>';
 					sortedUsers.forEach((u, idx) => {
 						const propMap = {};
@@ -585,38 +686,38 @@ function initializeLogin(config) {
 							user.properties.forEach(p => { propMap[p.name] = p.value; });
 						}
 						let details = '<table style="width:100%;border-collapse:collapse">';
-						details += `<tr><th style='text-align:left;padding:4px'>Field</th><th style='text-align:left;padding:4px'>Value</th></tr>`;
-						details += `<tr><td style='padding:4px'>Identifier</td><td style='padding:4px'>${user.identifier || ''}</td></tr>`;
-						details += `<tr><td style='padding:4px'>Role</td><td style='padding:4px'>${user.role || ''}</td></tr>`;
-						details += `<tr><td style='padding:4px'>Enabled</td><td style='padding:4px'>${user.enabled === false ? 'No' : 'Yes'}</td></tr>`;
+						details += `<tr><th style='text-align:left;padding:4px'>${t('details_field')}</th><th style='text-align:left;padding:4px'>${t('details_value')}</th></tr>`;
+						details += `<tr><td style='padding:4px'>${t('details_identifier')}</td><td style='padding:4px'>${user.identifier || ''}</td></tr>`;
+						details += `<tr><td style='padding:4px'>${t('details_role')}</td><td style='padding:4px'>${user.role || ''}</td></tr>`;
+						details += `<tr><td style='padding:4px'>${t('details_enabled')}</td><td style='padding:4px'>${user.enabled === false ? t('no') : t('yes')}</td></tr>`;
 						Object.keys(propMap).forEach(name => {
 							const value = propMap[name];
 							if (name === 'permissions') {
-								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-permissions-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> Edit</button></td></tr>`;
+								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-permissions-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							} else {
-								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-prop-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i></button></td></tr>`;
+								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-prop-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							}
 						});
 						details += '</table>';
 						// Add 'Add Permissions' button if permissions property is missing
 						if (!('permissions' in propMap)) {
-							details += `<div style='margin-top:12px'><button id='add-permissions-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> Add Permissions</button></div>`;
+							details += `<div style='margin-top:12px'><button id='add-permissions-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> ${t('add_permissions')}</button></div>`;
 						}
 						const detailsDialog = $('<div>').html(details).dialog({
-							title: 'User Details',
+							title: t('details_title'),
 							modal: true,
 							width: 600,
 							buttons: [
 								{
-									text: 'Remove User',
+									text: t('remove_user'),
 									class: 'remove-user-button',
 									click: function() {
-										if (!confirm('Are you sure you want to remove this user?')) return;
+										if (!confirm(t('confirm_remove_user'))) return;
 										const email = localStorage.getItem('userEmail');
 										const apiKey = localStorage.getItem('authToken');
 										const userIdentifier = user.identifier;
 										if (!email || !apiKey || !userIdentifier) {
-											alert('Missing credentials or user identifier.');
+											alert(t('missing_credentials_or_id'));
 											return;
 										}
 										fetch('../services/support/deleteUser', {
@@ -627,12 +728,12 @@ function initializeLogin(config) {
 										.then(response => response.json())
 										.then(result => {
 											if (result.success) {
-												alert('User removed successfully.');
+												alert(t('users_removed_ok'));
 												detailsDialog.dialog('close');
 												dialogContent.dialog('close');
 												document.getElementById('listUsersBtn').click();
 											} else {
-												alert('Failed to remove user: ' + (result.message || 'Unknown error'));
+												alert(t('users_removed_fail') + ' ' + (result.message || 'Unknown error'));
 											}
 										})
 										.catch(err => {
@@ -640,7 +741,7 @@ function initializeLogin(config) {
 										});
 									}
 								},
-								{ text: 'Close', click: function() { $(this).dialog('close'); } }
+								{ text: t('close'), click: function() { $(this).dialog('close'); } }
 							]
 						});
 						// Add handler for Add Permissions button
@@ -752,20 +853,20 @@ function initializeLogin(config) {
 				}
 				// --- End function definitions ---
 				dialogContent.dialog({
-					title: 'Manage Users',
+					title: t('menu_manage_users'),
 					modal: true,
 					width: 800,
 					position: { my: 'center', at: 'center top+80', of: window },
 					buttons: [
 						{
-							text: 'Refresh',
+							text: t('refresh'),
 							click: function() {
 								const resultsDiv = dialogContent.find('#listUsersResults');
-								resultsDiv.html('Refreshing...');
+								resultsDiv.html(t('refreshing'));
 								const email = localStorage.getItem('userEmail');
 								const apiKey = localStorage.getItem('authToken');
 								if (!email || !apiKey) {
-									resultsDiv.html('<span style="color:red">Missing credentials. Please log in again.</span>');
+									resultsDiv.html('<span style="color:red">' + t('missing_credentials') + '</span>');
 									return;
 								}
 								fetch('../services/support/listUsers', {
@@ -779,16 +880,16 @@ function initializeLogin(config) {
 										resultsDiv.html(renderTable(newData.users));
 										bindRowClicks(newData.users);
 									} else {
-										resultsDiv.html('<span style="color:red">' + (newData.message || 'Failed to fetch users.') + '</span>');
+										resultsDiv.html('<span style="color:red">' + (newData.message || t('failed_fetch_users')) + '</span>');
 									}
 								})
 								.catch(err => {
 									resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
 								});
-							}
+						}
 						},
 						{
-							text: 'Close',
+							text: t('close'),
 							click: function() { $(this).dialog('close'); }
 						}
 					]
@@ -810,13 +911,13 @@ function initializeLogin(config) {
 				.then(data => {
 					if (data.success && Array.isArray(data.users)) {
 						if (data.users.length === 0) {
-							resultsDiv.html('<span>No users found.</span>');
+							resultsDiv.html('<span>' + t('no_users_found') + '</span>');
 						} else {
 							resultsDiv.html(renderTable(data.users));
 							bindRowClicks(data.users);
 						}
 					} else {
-						resultsDiv.html('<span style="color:red">' + (data.message || 'Failed to fetch users.') + '</span>');
+						resultsDiv.html('<span style="color:red">' + (data.message || t('failed_fetch_users')) + '</span>');
 					}
 				})
 				.catch(err => {
@@ -831,7 +932,7 @@ function initializeLogin(config) {
 			localStorage.removeItem('userEmail');
 			localStorage.removeItem('isAdmin');
 			loginBtn.style.display = 'inline-block';
-			loginBtn.textContent = 'Login';
+			loginBtn.textContent = t('login');
 			loginBtn.disabled = false;
 			logoutBtn.style.display = 'none';
 			userMenu.style.display = 'none';
@@ -845,6 +946,9 @@ export function initializePortal(config) {
 	view = config.view;
 	token = config.token;
 	document.title = config.title;
+
+	// Initialize i18n (defaults to 'en', overridden by localStorage or config.language)
+	try { loadI18nSync(); } catch (e) {}
 
 	// Initialize login if enabled
 	initializeLogin(config);
@@ -948,6 +1052,7 @@ export function initializePortal(config) {
 		//
 		jQuery('#results-tab').css('width', (baseWidth + 31) + 'px');
 		jQuery('#results-tab').css('margin-top', '52px');
+		jQuery('#results-tab-link').text(t("results_tab"));
 
 		jQuery('li[aria-controls="results-tab"').css('margin-left', '190px');
 
@@ -970,6 +1075,7 @@ export function initializePortal(config) {
 		jQuery('#sources-tab').css('width', (baseWidth + 27) + 'px');
 		jQuery('#sources-tab').css('margin-top', '3px');
 		jQuery('#sources-tab').css('margin-left', '2px');
+		jQuery('#sources-tab-link').text(t("sources_tab"));
 
 		jQuery('.sources-widget').css('padding-right', '10px');
 		jQuery('.sources-widget').css('padding-left', '10px');
@@ -981,6 +1087,7 @@ export function initializePortal(config) {
 		jQuery('#filters-tab').css('width', (baseWidth + 29) + 'px');
 		jQuery('#filters-tab').css('height', '100%');
 		jQuery('#filters-tab').css('margin-top', '3px');
+		jQuery('#filters-tab-link').text(t("filters_tab"));
 
 		//------------------------------------------------------------------
 		// browse tab     
@@ -1081,7 +1188,7 @@ export function initializePortal(config) {
 		//
 		var searchButton = GIAPI.FontAwesomeButton({
 			'width': baseWidth - 100,
-			'label': 'SEARCH',
+			'label': t('search'),
 			'icon': 'fa-search',
 			'handler': function() {
 				if (GIAPI.search.sourcesWidget.sourcesCount() === 0) {
@@ -1106,7 +1213,7 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// hide results button
 		//           	
-		var hideResultsButton = GIAPI.ButtonsFactory.onOffSwitchButton('Show results', 'Hide results', {
+		var hideResultsButton = GIAPI.ButtonsFactory.onOffSwitchButton(t('show_results'), t('hide_results'), {
 			'id': 'hideResultsButton',
 			'checked': false,
 			'size': 'large',
@@ -1223,7 +1330,7 @@ export function initializePortal(config) {
 
 		var layerSelectorDisplay = 'none';
 
-		var hideMapInputControlButton = GIAPI.ButtonsFactory.onOffSwitchButton('Show', 'Hide', {
+		var hideMapInputControlButton = GIAPI.ButtonsFactory.onOffSwitchButton(t('spatial_panel_show'), t('spatial_panel_hide'), {
 			'id': 'hideMapInputControl',
 			'checked': false,
 			'size': 'medium',
@@ -1297,7 +1404,7 @@ export function initializePortal(config) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'timeInterpolation', {
 				helpIconImage: 'fa-line-chart',
 				values: [
-					{ label: 'Select interpolation type', value: '' },
+					{ label: t("select_interpolation_type"), value: '' },
 					{ label: 'Continuous', value: 'CONTINUOUS' },
 					{ label: 'Average', value: 'AVERAGE' },
 					{ label: 'Minimum', value: 'MIN' },
@@ -1320,7 +1427,7 @@ export function initializePortal(config) {
 						const selectElement = document.getElementById(timeInterpolationId);
 						if (selectElement) {
 							const options = [
-								{ label: 'Select interpolation type', value: '' },
+								{ label: t("select_interpolation_type"), value: '' },
 								...data.timeInterpolation.map(type => ({
 									label: `${type.value} (${type.observationCount} observations)`,
 									value: type.value
@@ -1345,7 +1452,7 @@ export function initializePortal(config) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', {
 				helpIconImage: 'fa-arrows-h',
 				values: [
-					{ label: 'Select observation spacing', value: '' }
+					{ label: t("select_observation_spacing"), value: '' }
 				],
 				readOnlyValues: true
 			}));
@@ -1360,7 +1467,7 @@ export function initializePortal(config) {
 						const selectElement = document.getElementById(spacingId);
 						if (selectElement) {
 							const options = [
-								{ label: 'Select observation spacing', value: '' },
+								{ label: t("select_observation_spacing"), value: '' },
 								...data.intendedObservationSpacing.map(type => ({
 									label: `${type.value} (${type.observationCount} observations)`,
 									value: type.value
@@ -1385,7 +1492,7 @@ export function initializePortal(config) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', {
 				helpIconImage: 'fa-hourglass',
 				values: [
-					{ label: 'Select aggregation duration', value: '' }
+					{ label: t("select_aggregation_duration"), value: '' }
 				],
 				readOnlyValues: true
 			}));
@@ -1400,7 +1507,7 @@ export function initializePortal(config) {
 						const selectElement = document.getElementById(durationId);
 						if (selectElement) {
 							const options = [
-								{ label: 'Select aggregation duration', value: '' },
+								{ label: t("select_aggregation_duration"), value: '' },
 								...data.aggregationDuration.map(type => ({
 									label: `${type.value} (${type.observationCount} observations)`,
 									value: type.value
@@ -1490,7 +1597,7 @@ export function initializePortal(config) {
 					// Add bulk download button next to results count
 					var downloadButton = $('<button>')
 						.addClass('login-button')
-						.text('Bulk data download')
+						.text(t('bulk_data_download'))
 						.css({
 							'margin-left': '10px',
 							'padding': '5px 10px',

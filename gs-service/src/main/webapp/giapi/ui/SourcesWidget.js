@@ -261,7 +261,7 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
 	       			'targetId': targetDivId,
 	       			'offLabel':'',
 	       			'onLabel':'',
-	       			'attr':[{ name:'title', value:'Source info'  }, 
+	       			'attr':[{ name:'title', value:__t("source_info")  }, 
 	       			        { name:'init', value:'false' },
 	       			        { name:'target', value:targetDivId }
 			        ],
@@ -297,7 +297,7 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
 	              toggleButton.css('icon','font-size','15px');
 	              toggleButton.css('icon','vertical-align','middle');
 	 
-	              tableContent += '<td style="width: 18px;" title="Source info">'+toggleButton.div()+'</td>';
+	              tableContent += '<td style="width: 18px;" title="'+__t("source_info")+'">'+toggleButton.div()+'</td>';
 	
 	              tableContent += '<td title="' + (source.report().title) + '" style="vertical-align: bottom;"><label class="sources-widget-src-label">' + title + '</label></br>';
 	
@@ -372,16 +372,16 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
         
         if (sourcesCount === sources.length) {
             
-             jQuery('#check_all_label').html('<b>All</b> sources selected');
+             jQuery('#check_all_label').html(__t("all_sources_selected"));
              
         } else if(sourcesCount > 0){
             
             var s = sourcesCount > 1 ? 's':'';
-            jQuery('#check_all_label').html('<b>'+sourcesCount + '</b> source'+s+' selected');
+            jQuery('#check_all_label').html(sourcesCount + ' '+__t("sources_selected"));
              
         } else {
             
-            jQuery('#check_all_label').html('<b >No</b> sources selected');
+            jQuery('#check_all_label').html(__t("no_sources_selected"));
         }
     };
 	
@@ -396,7 +396,7 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
 		
 		sourcesWidgetDiv += '<table style="width:100%" id="wrapSourcesWidgetTable">';
 
-		sourcesWidgetDiv += '<tr><td><input id="sourceNameSearchInput" style="margin-top: 5px; width: 99%;" placeholder="Enter source name"></input></td></tr>';
+		sourcesWidgetDiv += '<tr><td><input id="sourceNameSearchInput" style="margin-top: 5px; width: 99%;" placeholder="'+__t("enter_source_name")+'"></input></td></tr>';
 
 		sourcesWidgetDiv += '<tr><td><div style="overflow-y: scroll; '+options.width + options.height+'">';
 			

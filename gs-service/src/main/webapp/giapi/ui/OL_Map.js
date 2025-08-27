@@ -207,7 +207,7 @@ GIAPI.OL_Map = function(options) {
 
 	var unLayer = new ol.layer.Tile({
 
-		title: 'United Nations',
+		title: __t("united_nations"),
 		type: 'base',
 		visible: false,
 
@@ -231,7 +231,7 @@ GIAPI.OL_Map = function(options) {
 
 	var baseMapsGroup = new ol.layer.Group({
 
-		'title': 'Base maps',
+		'title': __t("base_maps"),
 
 		layers: layers
 	});
@@ -252,7 +252,7 @@ GIAPI.OL_Map = function(options) {
 	//
 
 	var overlayGroup = new ol.layer.Group({
-		title: 'Overlays',
+		title: __t("overlays"),
 		layers: []
 	});
 
@@ -261,7 +261,7 @@ GIAPI.OL_Map = function(options) {
 	//
 
 	var resultsGroup = new ol.layer.Group({
-		title: 'Results',
+		title: __t("results_layer_group"),
 		layers: []
 	});
 

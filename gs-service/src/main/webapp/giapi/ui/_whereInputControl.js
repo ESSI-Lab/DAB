@@ -55,7 +55,8 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 		var openCloseDivId = GIAPI.random();
 		jQuery(openCloseDiv).attr('id', 'openCloseDivId' + openCloseDivId);
 		jQuery(openCloseDiv).attr('state', 'open');
-		jQuery(openCloseDiv).attr('title', 'Hide control panel');
+		var __t = window.__t || function(s){ return s; };
+		jQuery(openCloseDiv).attr('title', __t('hide_control_panel'));
 
 		jQuery(controlDiv).append(openCloseDiv);
 
@@ -97,16 +98,18 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 						jQuery(openCloseDiv).addClass('fa fa-caret-right');
 
 						jQuery(openCloseDiv).attr('state', 'closed');
-						jQuery(openCloseDiv).attr('title', 'Show control panel');
+						var __t = window.__t || function(s){ return s; };
+						jQuery(openCloseDiv).attr('title', __t('show_control_panel'));
 
 						break;
 					case 'closed':
+console.log("Hello, world!");
 
 						jQuery(openCloseDiv).removeClass('fa fa-caret-right');
 						jQuery(openCloseDiv).addClass('fa fa-caret-left');
 
 						jQuery(openCloseDiv).attr('state', 'open');
-						jQuery(openCloseDiv).attr('title', 'Hide control panel');
+						jQuery(openCloseDiv).attr('title', __t('hide_control_panel'));
 
 						break;
 				}
@@ -144,7 +147,8 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 			jQuery('.ol-viewport').append(mirrorDiv);
 
-			jQuery(mirrorDiv).append('<label id="whereTableCaption" class="cnst-widget-where-input-table-ol-caption">Spatial extent</label>');
+			var __t = window.__t || function(s){ return s; };
+			jQuery(mirrorDiv).append('<label id="whereTableCaption" class="cnst-widget-where-input-table-ol-caption">'+__t('spatial_extent')+'</label>');
 
 			if (options.dialogMode) {
 
@@ -189,9 +193,9 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 			layerSelectorDiv += '<table style="width:100%" id="wrapLayerSelectorTable">';
 
-			layerSelectorDiv += '<tr><th style="background: lightgray;">Predefined selection</th></tr>';
+			layerSelectorDiv += '<tr><th style="background: lightgray;">'+ __t('predefined_selection') +'</th></tr>';
 
-			layerSelectorDiv += '<tr><td><input id="layerNameSearchInput" style="width: 376px;" placeholder="Enter search text"></input></td></tr>';
+			layerSelectorDiv += '<tr><td><input id="layerNameSearchInput" style="width: 376px;" placeholder="'+ __t('predefined_selection_search') +'"></input></td></tr>';
 
 			layerSelectorDiv += '<tr><td><div style="overflow-y: scroll;height: 210px"><table style="width:100%" id="layerSelectorTable"></table></div></td></tr>';
 
@@ -471,19 +475,17 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 		var northVal = options.value.north;
 		var eastVal = options.value.east;
 
-		var south = '<td style="padding-left: 5px;padding-top:15px"><label>South</label></td>';
+		var __t = window.__t || function(s){ return s; };
+		var south = '<td style="padding-left: 5px;padding-top:15px"><label>'+__t('south')+'</label></td>';
 		south += '<td style="padding-top:10px;padding-right: 5px;"><input value="' + southVal + '" style="font-size: 11px;width: 140px" id="' + southFieldId + '" min="-90" max="90" step="0.1" type="number"/></td>';
 		inputTable += '<tr>' + south + '</tr>';
-
-		var west = '<td style="padding-left: 5px;padding-top:5px"><label>West</label></td>';
+		var west = '<td style="padding-left: 5px;padding-top:5px"><label>'+__t('west')+'</label></td>';
 		west += '<td style="padding-right: 5px;"><input value="' + westVal + '" style="font-size: 11px;width: 140px" id="' + westFieldId + '" min="-180" max="180" step="0.1" type="number"/></td>';
 		inputTable += '<tr>' + west + '</tr>';
-
-		var north = '<td style="padding-left: 5px;padding-top:5px"><label>North</label></td>';
+		var north = '<td style="padding-left: 5px;padding-top:5px"><label>'+__t('north')+'</label></td>';
 		north += '<td style="padding-right: 5px;"><input value="' + northVal + '" style="font-size: 11px;width: 140px"  min="-90" max="90" id="' + northFieldId + '" step="0.1" type="number"/></td>';
 		inputTable += '<tr>' + north + '</tr>';
-
-		var east = '<td style="padding-left: 5px;padding-top:5px"><label>East</label></td>';
+		var east = '<td style="padding-left: 5px;padding-top:5px"><label>'+__t('east')+'</label></td>';
 		east += '<td style="padding-right: 5px; padding-bottom:10px"><input value="' + eastVal + '" style="font-size: 11px;width: 140px"  min="-180" max="180" id="' + eastFieldId + '" step="0.1" type="number"/></td>';
 		inputTable += '<tr>' + east + '</tr>';
 
@@ -491,18 +493,18 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 		// Location ---
 		//
 
-		var title = 'Location';
-		help = 'Name of a location (town, city, state, continent) such as "florence", "italy", "u.s.a", "africa", etc.<br>';
-		help += 'This is a free-form query, so you may search for "rome, italy" or you can also search for a complete address such as "via nomentana, rome, italy". Commas are optional, but improve performance by reducing the complexity of the search<br><br>';
-		help += 'Click the "Search location" button or the enter key; if the location is found, the selection is updated with the correspondent bounding box';
+		var title = __t('location');
+		var help = (__t('location_help_line1') || 'Name of a location (town, city, state, continent) such as "florence", "italy", "u.s.a", "africa", etc.<br>');
+		help += (__t('location_help_line2') || 'This is a free-form query, so you may search for "rome, italy" or you can also search for a complete address such as "via nomentana, rome, italy". Commas are optional, but improve performance by reducing the complexity of the search<br><br>');
+		help += (__t('location_help_line3') || ('Click the "'+__t('search_location')+'" button or the enter key; if the location is found, the selection is updated with the correspondent bounding box'));
 
-		var locLabel = '<td colspan="2" style="padding-left: 5px;padding-top:5px"><label>Location</label>' + GIAPI.UI_Utils.helpImage(title, help, 'vertical-align: text-bottom;margin-left: 5px;') + '</td>';
+		var locLabel = '<td colspan="2" style="padding-left: 5px;padding-top:5px"><label>'+__t('location')+'</label>' + GIAPI.UI_Utils.helpImage(title, help, 'vertical-align: text-bottom;margin-left: 5px;') + '</td>';
 		var locField = '<td colspan="2" style="padding-left:5px"><input id="' + topSearchFieldId + '" style="vertical-align: top;" class="cnst-widget-location-field"/>';
 
 		var searchLocation = function() {
 
 			jQuery('#' + locInfoLabelId).css('color', 'blue');
-			jQuery('#' + locInfoLabelId).text('Searching location...');
+			jQuery('#' + locInfoLabelId).text(__t('searching_location'));
 
 			var endpoint = options.dabNode.endpoint();
 			endpoint = endpoint.endsWith('/') ? endpoint : endpoint + '/';
@@ -523,7 +525,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 					if (data && data.response && data.response.bbox) {
 
 						jQuery('#' + locInfoLabelId).css('color', 'black');
-						jQuery('#' + locInfoLabelId).text('Location found');
+						jQuery('#' + locInfoLabelId).text(__t('location_found'));
 
 						jQuery('#' + southFieldId).val(data.response.bbox.south.toFixed(3));
 						jQuery('#' + westFieldId).val(data.response.bbox.west.toFixed(3));
@@ -539,7 +541,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 					} else {
 						jQuery('#' + locInfoLabelId).css('color', 'red');
-						jQuery('#' + locInfoLabelId).text('Location not found');
+						jQuery('#' + locInfoLabelId).text(__t('location_not_found'));
 					}
 				}
 			});
@@ -553,7 +555,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 			'label': '',
 			'icon': 'fa-search',
-			'attr': [{ name: 'title', value: 'Search location' }],
+			'attr': [{ name: 'title', value: __t('search_location') }],
 
 			'handler': searchLocation
 		});
@@ -583,7 +585,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 		if (options.wmsEndpoint!==undefined) {
 
-			var layersSelectorButton = GIAPI.ButtonsFactory.onOffSwitchButton('Select', 'Hide', {
+			var layersSelectorButton = GIAPI.ButtonsFactory.onOffSwitchButton(__t('layers_select'), __t('layers_hide'), {
 				'id': 'layersSelectorButton',
 				'checked': true,
 				'size': 'medium'
@@ -608,11 +610,11 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 			style += "padding-right: 20px;";
 
 			var help = 'help';
-			var layerSelectorLabel = '<div style="' + style + '"><label>Predefined</label></div>';
+			var layerSelectorLabel = '<div style="' + style + '"><label>'+__t('predefined')+'</label></div>';
 
 			inputTable += '<tr><td  colspan="2"><div style="margin-top:10px">' + layerSelectorLabel +
 
-				GIAPI.UI_Utils.helpImage('Predefined selection', help, 'vertical-align: top;margin-left: -15px;padding-right: 5px;') +
+				GIAPI.UI_Utils.helpImage(__t('predefined_selection'), help, 'vertical-align: top;margin-left: -15px;padding-right: 5px;') +
 
 				'<div style="display: inline-block;margin-left: 15px;">' + layersSelectorButton + '</div></div></td></tr>';
 		}
@@ -624,7 +626,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 		var containsButton = GIAPI.FontAwesomeButton({
 			'id': 'containsButton',
 			'width': 90,
-			'label': 'CONTAINS',
+			'label': __t('contains'),
 			'icon': 'fa-dot-circle-o',
 			'attr': [{ 'name': 'check', 'value': true }],
 
@@ -661,7 +663,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 		var overlapsButton = GIAPI.FontAwesomeButton({
 			'id': 'overlapsButton',
 			'width': 90,
-			'label': 'OVERLAPS',
+			'label': __t('overlaps'),
 			'icon': 'fa-circle-o',
 			'attr': [{ 'name': 'check', 'value': false }],
 
@@ -704,7 +706,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 			applyButton = GIAPI.FontAwesomeButton({
 				'id': 'applybboxbutton',
 				'width': 85,
-				'label': 'Apply',
+				'label': __t('apply'),
 				'icon': 'fa-check',
 				'handler': function() {
 					jQuery('#' + options.dialogId).attr('apply', 'true');
@@ -737,7 +739,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 			closeButton = GIAPI.FontAwesomeButton({
 				'id': GIAPI.random(),
 				'width': 85,
-				'label': 'CLEAR',
+				'label': __t('clear'),
 				'icon': 'fa-times',
 
 				'handler': function() {
@@ -756,12 +758,12 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 			closeButton.css('div', 'margin-bottom', '3px');
 		}
 
-		title = 'Select Spatial Extent';
+		var title = __t('select_spatial_extent_title');
 
 		if (options.dialogMode) {
-			help = 'Click CTRL-key (meta-key on Mac) and left mouse to select the desired spatial extent and click the "APPLY" button. Click the "CLEAR" button to clear the selection';
+			help = __t('select_spatial_extent_help');
 		} else {
-			help = 'Click CTRL-key (meta-key on Mac) and left mouse to select and apply the desired spatial extent. Click the "CLEAR" button to clear the selection';
+			help = __t('select_spatial_extent_help_apply');
 		}
 
 		var css = 'display: inherit;float: right;margin-right: 14px;'

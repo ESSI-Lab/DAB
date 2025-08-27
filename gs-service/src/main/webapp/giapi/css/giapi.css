@@ -64,7 +64,7 @@ body{
     font-weight: bold;
 }
 .ui-accordion-header{
-    background: #f6f6f6 url("images/ui-bg_glass_100_f6f6f6_1x400.png") 50% 50% repeat-x !important;
+    background: #f6f6f6 url("../../giapi/jquery/images/ui-bg_glass_100_f6f6f6_1x400.png") 50% 50% repeat-x !important;
 }
 .ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br {
     border-radius: 0px; 
