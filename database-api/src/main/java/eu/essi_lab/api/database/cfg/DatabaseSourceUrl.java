@@ -26,6 +26,7 @@ package eu.essi_lab.api.database.cfg;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.Pattern;
 
 import eu.essi_lab.api.database.Database.DatabaseImpl;
 import eu.essi_lab.api.database.Database.OpenSearchServiceType;
@@ -85,9 +86,10 @@ public class DatabaseSourceUrl {
 
     /**
      * E.g: "xdbc://user:password@hostname:8000,8004/dbName/folder/"
-     * E.g: "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig"
-     * E.g: "oss://awsaccesskey:awssecretkey@productionhost/prod/prodConfig"
-     * E.g: "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig"
+     * E.g: "osm://awsaccesskey:awssecretkey@https:productionhost/prod/prodConfig"
+     * E.g: "oss://awsaccesskey:awssecretkey@https:productionhost/prod/prodConfig"
+     * E.g: "osl://awsaccesskey:awssecretkey@http:localhost:9200/test/testConfig"
+     * E.g: "osl://awsaccesskey:awssecretkey@https:localhost:9200/test/testConfig"
      * 
      * @param url
      * @return
@@ -123,22 +125,14 @@ public class DatabaseSourceUrl {
 	    String env = uri.getPath().split("/+")[1];
 	    String configName = uri.getPath().split("/+")[2];
 
-	    String userInfo = uri.getRawUserInfo();
+	    String userInfo = uri.getAuthority().substring(0, uri.getAuthority().indexOf("@"));
 	    String accessKey = userInfo.split(":")[0];
 	    String secretKey = userInfo.split(":")[1];
 
-	    String host = uri.getHost();
-	    String port = uri.getPort() > 0 ? ":" + uri.getPort() : "";
-
 	    OpenSearchServiceType serviceType = OpenSearchServiceType.decode(uri.getScheme());
 
-	    String myURI = null;
-	    if (serviceType == OpenSearchServiceType.OPEN_SEARCH_LOCAL) {
-		myURI = "http://" + host + port;
-	    } else {
-		myURI = "https://" + host;
-	    }
-	    
+	    String myURI = url.split("@")[1].split("/")[0].replace("http:", "http://").replace("https:", "https://");
+
 	    info = new StorageInfo(myURI);
 	    info.setType(serviceType.getProtocol());
 
