@@ -77,7 +77,7 @@ public class UsersViewerTask extends AbstractCustomTask {
 	    builder.append("- URI: " + user.getUri() + "\n");
 	    builder.append("- Role: " + user.getRole() + "\n");
 	    builder.append("- Identifier: " + user.getIdentifier() + "\n");
-	    builder.append("- Identifier type: " + user.getUserIdentifierType().map(t -> t.toString()).orElse("missing") + "\n");
+	    builder.append("- Identifier type: " + (user.getUserIdentifierType()==null?"missing":user.getUserIdentifierType())  + "\n");
 	    builder.append("- Enabled: " + user.isEnabled() + "\n");
 	    builder.append("- First name: " + readProperty(user, "firstName") + "\n");
 	    builder.append("- Last name: " + readProperty(user, "lastName") + "\n");
