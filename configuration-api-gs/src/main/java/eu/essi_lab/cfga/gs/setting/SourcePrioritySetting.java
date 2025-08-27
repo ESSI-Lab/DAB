@@ -185,7 +185,7 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
 		    withIndex(TabIndex.SOURCE_PRIORITY_SETTING.getIndex()).//
-		    withShowDirective("Identifier Management").//
+		    withShowDirective("Identifier management").//
 		    build();
 
 	    setTabInfo(tabInfo);
