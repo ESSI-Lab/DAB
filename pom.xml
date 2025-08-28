@@ -5,7 +5,7 @@
 
 	<groupId>eu.essi_lab</groupId>
 	<artifactId>DAB</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0-SNAPSHOT</version> 
 	<packaging>pom</packaging>
  
 	<name>Discovery and Access Broker (DAB)</name>
