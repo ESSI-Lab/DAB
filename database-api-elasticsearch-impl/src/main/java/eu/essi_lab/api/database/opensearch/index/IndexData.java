@@ -354,15 +354,19 @@ public class IndexData {
 	    GSUser user = GSUser.createOrNull(entry.getDocument().get());
 
 	    indexData.put(UsersMapping.USER_ID, user.getIdentifier());
-	    user.getUserIdentifierType().ifPresent(t -> indexData.put(UsersMapping.USER_ID_TYPE, t.getType()));
+	    if (user.getUserIdentifierType() != null) {
+		indexData.put(UsersMapping.USER_ID_TYPE, user.getUserIdentifierType().getType());
+	    }
 
 	    indexData.put(UsersMapping.ENABLED, user.isEnabled());
 	    indexData.put(UsersMapping.USER_ROLE, user.getRole());
 
 	    indexData.put(IndexMapping.toKeywordField(UsersMapping.USER_ID), user.getIdentifier());
-	    user.getUserIdentifierType().ifPresent(t -> indexData.put(
+	    if (user.getUserIdentifierType() != null) {
+		indexData.put(
 
-		    IndexMapping.toKeywordField(UsersMapping.USER_ID_TYPE), t.getType()));
+			IndexMapping.toKeywordField(UsersMapping.USER_ID_TYPE), user.getUserIdentifierType().getType());
+	    }
 
 	    indexData.put(IndexMapping.toKeywordField(UsersMapping.USER_ROLE), user.getRole());
 

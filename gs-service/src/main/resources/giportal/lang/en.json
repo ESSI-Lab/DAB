@@ -1,0 +1,17 @@
+{
+"data_provider_information":"Data Provider Information",
+"provider_statistics":"Provider statistics",
+"platforms":"Platforms",
+"observed_properties":"Observed properties",
+"datasets": "Datasets",
+"minimum_temporal_extent":"Minimum temporal extent",
+"maximum_temporal_extent": "Maximum temporal extent",
+"bbox":"Bounding box (W,S,E,N)",
+"altitude": "Altitude (min/max)",
+"involved_organizations": "Involved organizations",
+"sample_platforms": "Sample platforms",
+"monitoring_point":"Monitoring point",
+"latitude": "Latitude",
+"longitude": "Longitude",
+"elevation": "Altitude"
+}

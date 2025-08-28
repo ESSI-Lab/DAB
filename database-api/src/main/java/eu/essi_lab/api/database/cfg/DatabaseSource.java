@@ -75,9 +75,9 @@ public class DatabaseSource implements ConfigurationSource {
 
     /**
      * E.g: "xdbc://user:password@hostname:8000,8004/dbName/folder/"
-     * E.g.: "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig"<br>
-     * E.g.: "oss://awsaccesskey:awssecretkey@preproductionhost/preprod/preProdConfig"<br>
-     * E.g.: "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig"<br>
+     * E.g.: "osm://awsaccesskey:awssecretkey@https:productionhost/prod/prodConfig"<br>
+     * E.g.: "oss://awsaccesskey:awssecretkey@https:preproductionhost/preprod/preProdConfig"<br>
+     * E.g.: "osl://awsaccesskey:awssecretkey@http:localhost:9200/test/testConfig"<br>
      * 
      * @see Database#build(String)
      * @see Database#check(String)
@@ -87,6 +87,7 @@ public class DatabaseSource implements ConfigurationSource {
      * @throws GSException
      * @throws URISyntaxException
      */
+    @SuppressWarnings("incomplete-switch")
     public static DatabaseSource of(String url) throws GSException, URISyntaxException {
 
 	StorageInfo info = DatabaseSourceUrl.build(url);
@@ -112,6 +113,7 @@ public class DatabaseSource implements ConfigurationSource {
      * @return
      * @throws GSException
      */
+    @SuppressWarnings("incomplete-switch")
     public static DatabaseSource of(DatabaseImpl impl, StorageInfo storageInfo, String configName) throws GSException {
 
 	switch (impl) {

@@ -258,7 +258,7 @@ GIAPI.UI_Utils = new function(){
 				jQuery('#status-label').text(options.statusLabelText);
 
 			}else{
-				jQuery('#status-label').text('Searching...');
+				jQuery('#status-label').text(__t("search_text"));
 			}
 			
             jQuery("#discoverDialog").dialog("open");

@@ -84,7 +84,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	//
 
 	Assert.assertEquals(user.getIdentifier(), wrapper.getUserIdentifier().get());
-	Assert.assertEquals(user.getUserIdentifierType().get(), wrapper.getUserIdentifierType().get());
+	Assert.assertEquals(user.getUserIdentifierType(), wrapper.getUserIdentifierType().get());
 	Assert.assertEquals(user.getRole(), wrapper.getUserRole().get());
 	Assert.assertEquals(user.isEnabled(), wrapper.getUserEnabled().get());
 
@@ -136,7 +136,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	Assert.assertEquals(UsersMapping.USER, wrapper.getBinaryProperty());
 
 	Assert.assertEquals(DataType.DOC, wrapper.getDataType());
-	
+
 	Assert.assertEquals(wrapper.getUser().get(), wrapper.getBinaryValue());
 
 	//
@@ -144,7 +144,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	//
 
 	Assert.assertEquals(user.getIdentifier(), wrapper.getUserIdentifier().get());
-	Assert.assertFalse(user.getUserIdentifierType().isPresent());
+	Assert.assertFalse(user.getUserIdentifierType() != null);
 	Assert.assertFalse(wrapper.getUserRole().isPresent());
 	Assert.assertEquals(user.isEnabled(), wrapper.getUserEnabled().get());
 
@@ -208,18 +208,17 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	//
 
 	storeUsers(folder, 10);
-	
+
 	//
 	//
 	//
 
 	OpenSearchWrapper wrapper = new OpenSearchWrapper(database);
 
+	//
+	//
+	//
 
-	//
-	//
-	//
-	
 	Query query = OpenSearchQueryBuilder.buildSearchQuery(database.getIdentifier(), UsersMapping.get().getIndex());
 
 	List<GSUser> users = wrapper.searchBinaries(UsersMapping.get().getIndex(), query).//
@@ -229,11 +228,11 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 		collect(Collectors.toList());
 
 	Assert.assertEquals(10, users.size());
-	
+
 	//
 	//
 	//
-	
+
 	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		UsersMapping.get().getIndex(), //
@@ -249,8 +248,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	Assert.assertEquals(1, users.size());
 
 	Assert.assertEquals("User_3", users.get(0).getIdentifier());
-	
-	
+
 	//
 	//
 	//
@@ -270,11 +268,11 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	Assert.assertEquals(1, users.size());
 
 	Assert.assertEquals("Role_5", users.get(0).getRole());
-	
+
 	//
 	// undefined value
 	//
-	
+
 	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		UsersMapping.get().getIndex(), //
@@ -288,11 +286,11 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 		collect(Collectors.toList());
 
 	Assert.assertEquals(0, users.size());
-	
+
 	//
 	// undefined property
 	//
-	
+
 	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		UsersMapping.get().getIndex(), //
@@ -306,11 +304,11 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 		collect(Collectors.toList());
 
 	Assert.assertEquals(0, users.size());
-	
+
 	//
 	// wrong index
 	//
-	
+
 	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		AugmentersMapping.get().getIndex(), //

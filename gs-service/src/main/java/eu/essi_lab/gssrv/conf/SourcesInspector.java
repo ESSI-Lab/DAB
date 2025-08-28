@@ -177,7 +177,6 @@ public class SourcesInspector extends ComponentInfo {
 		build();
 
 	setTabInfo(tabInfo);
-
     }
 
     /**

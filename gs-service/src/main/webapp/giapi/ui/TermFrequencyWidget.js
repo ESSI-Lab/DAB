@@ -363,41 +363,7 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 			var currentId = idList[i];
 			var target = tfObject.targets()[i];
 
-			var label = null;
-			switch (target) {
-
-				case 'format': label = 'Format'; break;
-				case 'source': label = 'Source'; break;
-				case 'keyword': label = 'Keywords'; break;
-				case 'protocol': label = 'Protocol'; break;
-
-				case 'instrumentTitle': label = 'Instrument'; break;
-				case 'organisationName': label = 'Organization'; break;
-				case 'platformTitle': label = 'Platform'; break;
-				case 'attributeTitle': label = 'Attribute'; break;
-				case 'intendedObservationSpacing': label = 'Intended observation spacing'; break;
-				case 'timeInterpolation': label = 'Time interpolation'; break;
-				case 'aggregationDuration': label = 'Aggregation duration'; break;
-				case 'observedPropertyURI': label = 'Attribute URI'; break;
-
-				case 'attributeId': label = 'Attribute identifier'; break;
-				case 'instrumentId': label = 'Instrument identifier'; break;
-				case 'platformId': label = 'Platform identifier'; break;
-				case 'origOrgId': label = 'Organization identifier'; break;
-				case 'instrumentDescription': label = 'Instrument description'; break;
-				case 'platformDescription': label = 'Platform description'; break;
-				case 'origOrgDescription': label = 'Origin Organization description'; break;
-
-				case 'sensorOpMode': label = 'Sensor Operation Mode'; break;
-				case 'sarPolCh': label = 'Polarisation Channels'; break;
-				case 'prodType': label = 'Product Type'; break;
-				case 'sensorSwath': label = 'Sensor Swath'; break;
-
-				case 's3Timeliness': label = 'S3 Timeliness'; break;
-				case 's3InstrumentIdx': label = 'S3 Instrument Idx'; break;
-				case 's3ProductLevel': label = 'S3 Product Level'; break;
-
-			}
+			var label = __t("tf-"+target);
 
 			if (options.accordionMode) {
 				jQuery('#' + id).append('<h3>' + label + '</h3><div style="' + options.divCSS + '" id="' + currentId + '"></div>');

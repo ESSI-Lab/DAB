@@ -364,7 +364,7 @@
 		<!-- <jakarta.xml.bind-api.version>4.0.2</jakarta.xml.bind-api.version>	-->
 
 		<!-- Jacoco -->
-		<jacoco.version>0.8.7</jacoco.version>
+		<jacoco.version>0.8.11</jacoco.version>
 		<jacoco.outputDir>${project.build.directory}/target</jacoco.outputDir>
 		<jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
 		<essi.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</essi.jacoco.reportPath>

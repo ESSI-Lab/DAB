@@ -213,11 +213,11 @@ GIAPI.Common_UINode = function(options) {
 		var label = '';
 		switch (time) {
 			case 'from':
-				label = 'Start time';
+				label = __t("start_time");
 				value = report.when[0].start || report.when[0].from;
 				break;
 			case 'to':
-				label = 'End time';
+				label = __t("end_time");
 				value = report.when[0].end || report.when[0].to;
 				break;
 		}
@@ -381,7 +381,7 @@ GIAPI.Common_UINode = function(options) {
 			'targetId': measurementDivId,
 			'offLabel': '',
 			'onLabel': '',
-			'attr': [{ name: 'title', value: 'Measurement info' }]
+			'attr': [{ name: 'title', value: __t("measurement_info") }]
 		});
 		mtoggleButton.stateIcon('on', 'fa-bar-chart');
 		mtoggleButton.stateIcon('off', 'fa-bar-chart');
@@ -404,7 +404,7 @@ GIAPI.Common_UINode = function(options) {
 			'targetId': reportDivId,
 			'offLabel': '',
 			'onLabel': '',
-			'attr': [{ name: 'title', value: 'More info' }]
+			'attr': [{ name: 'title', value: __t("more_info") }]
 		});
 		toggleButton.stateIcon('on', 'fa-info-circle');
 		toggleButton.stateIcon('off', 'fa-info-circle');
@@ -426,7 +426,7 @@ GIAPI.Common_UINode = function(options) {
 				'width': 22,
 				'label': '',
 				'icon': 'fa-file-text-o',
-				'attr': [{ 'name': 'nodeid', 'value': node.report().id }, { 'name': 'title', 'value': 'Full metadata' }],
+				'attr': [{ 'name': 'nodeid', 'value': node.report().id }, { 'name': 'title', 'value': __t("full_metadata") }],
 				'handler': function() {
 
 					GIAPI.UI_Utils.openNodeInfoPage(dabNode, jQuery(this).attr('nodeid'));
@@ -701,7 +701,7 @@ GIAPI.Common_UINode = function(options) {
 
 			content += '<tr><td colspan=2>' + line + '</td></tr>';
 
-			content += '<tr><td style="width: 10px;"><i style="background: white;margin-left: 10px; margin-right: 10px; border: 1px solid gray; padding: 5px" title="Platform from which the data were taken" class="fa fa-ship" aria-hidden="true"></i></td>';
+			content += '<tr><td style="width: 10px;"><i style="background: white;margin-left: 10px; margin-right: 10px; border: 1px solid gray; padding: 5px" title="'+__t("platform_description")+'" class="fa fa-ship" aria-hidden="true"></i></td>';
 
 			content += '<td class="common-ui-node-report-content-table-right-td">';
 			for (var i = 0; i < report.platformTitle.length; i++) {
@@ -732,7 +732,7 @@ GIAPI.Common_UINode = function(options) {
 
 			content += '<tr><td colspan=2>' + line + '</td></tr>';
 
-			content += '<tr><td style="width: 10px;"><i style="background: white;margin-left: 10px; margin-right: 10px; border: 1px solid gray; padding: 5px" title="Organisation which created the resource" class="fa fa-users" aria-hidden="true"></i></td>';
+			content += '<tr><td style="width: 10px;"><i style="background: white;margin-left: 10px; margin-right: 10px; border: 1px solid gray; padding: 5px" title="'+__t("organization_description")+'" class="fa fa-users" aria-hidden="true"></i></td>';
 
 			content += '<td class="common-ui-node-report-content-table-right-td">';
 			for (var i = 0; i < report.origOrgDesc.length; i++) {
@@ -749,7 +749,7 @@ GIAPI.Common_UINode = function(options) {
 
 			content += '<tr><td colspan=2>' + line + '</td></tr>';
 
-			content += '<tr><td style="width: 10px;"><i style="background: white;margin-left: 10px;  margin-right: 10px; border: 1px solid gray; padding: 5px" title="Attribute described by the measurement value" class="fa fa-bar-chart" aria-hidden="true"></i></td>';
+			content += '<tr><td style="width: 10px;"><i style="background: white;margin-left: 10px;  margin-right: 10px; border: 1px solid gray; padding: 5px" title="'+__t("attribute_description")+'" class="fa fa-bar-chart" aria-hidden="true"></i></td>';
 
 			content += '<td class="common-ui-node-report-content-table-right-td">';
 			for (var i = 0; i < report.attributeTitle.length; i++) {

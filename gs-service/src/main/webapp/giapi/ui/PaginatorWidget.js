@@ -102,7 +102,8 @@ GIAPI.PaginatorWidget = function(id, onResponse, options) {
         jQuery('#'+id).empty();
     	
         var style = resultSet.size ? 'font-weight:bold':'';
-    	var results = 'Matching results: <span style="'+style+'">'+GIAPI.thousandsSeparator(resultSet.size)+'</span>';
+        var __t = window.__t || function(s){ return s; };
+        var results = __t('matching_results') + ': <span style="'+style+'">'+GIAPI.thousandsSeparator(resultSet.size)+'</span>';
                  
         var first = createButton('first');
         var prev =  createButton('prev');

@@ -36,10 +36,10 @@ GIAPI.Source_UINode = function(source, id) {
 
 	var providerId = report.id ? report.id : source.uiId;
 	var view = (typeof config !== 'undefined' && config.view) ? config.view : '';
-	var providerPageUrl = '/gs-service/stats/stats.jsp?view='+view+'&source=' + encodeURIComponent(providerId)+'&token='+config.token;
-	mainDiv += '<a target="_blank" style="color:blue;text-decoration: none;" href="' + providerPageUrl + '">Provider Page</a>';
+	var providerPageUrl = '/gs-service/stats/stats.jsp?language='+__lang()+'&view='+view+'&source=' + encodeURIComponent(providerId)+'&token='+config.token;
+	mainDiv += '<a target="_blank" style="color:blue;text-decoration: none;" href="' + providerPageUrl + '">'+__t("provider_page")+'</a>';
 	mainDiv += ' &nbsp;|&nbsp; ';
-	mainDiv += '<a href="#" id="zoom-to-area-' + id + '">Zoom to Area</a>';
+	mainDiv += '<a href="#" id="zoom-to-area-' + id + '">'+__t("zoom_to_area")+'</a>';
 	if (typeof config !== 'undefined' && config.showSourceEndpoint === true) {
 		mainDiv += ' &nbsp;|&nbsp; ';
 		mainDiv += '<a target="_blank" class="dont-break-out common-ui-node-report-content-table-right" style="color:blue;text-decoration: none;" href="' + report.online[0].url + '">Service URL</a>';

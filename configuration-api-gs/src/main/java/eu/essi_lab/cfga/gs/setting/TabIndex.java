@@ -39,13 +39,13 @@ public enum TabIndex {
      * 
      */
     DISTRIBUTION_SETTING(2),
-   /**
+    /**
      * 
      */
     PROFILER_SETTING(3),
-     /**
-     * 
-     */
+    /**
+    * 
+    */
     DATABASE_SETTING(4),
     /**
      * 
@@ -99,11 +99,15 @@ public enum TabIndex {
     /**
      * 
      */
-    SYSTEM_SETTING(17),
+    CONFIG_UPLOADER(17),
     /**
      * 
      */
-    ABOUT(18);
+    SYSTEM_SETTING(18),
+    /**
+     * 
+     */
+    ABOUT(19);
 
     private int index;
 

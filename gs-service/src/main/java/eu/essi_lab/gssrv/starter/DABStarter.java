@@ -243,10 +243,10 @@ public class DABStarter {
 
 	    if (DatabaseSourceUrl.check(configURL)) {
 
-		GSLoggerFactory.getLogger(getClass()).info("Found XML database URL");
+		GSLoggerFactory.getLogger(getClass()).info("Found database URL");
 		//
 		// -Dconfiguration.url=xdbc://user:password@hostname:8000,8004/dbName/folder/
-		// -Dconfiguration.url=osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig
+		// -Dconfiguration.url=osm://awsaccesskey:awssecretkey@https:productionhost/prod/prodConfig
 		//
 
 		String startupUri = split[0];
