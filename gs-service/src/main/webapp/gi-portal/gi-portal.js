@@ -6,51 +6,51 @@ var token = '';
 // i18n support
 var i18n = { current: 'en', en: {}, it: {} };
 function loadI18nSync(lang) {
-    var desired = (localStorage.getItem('lang') || (window.config && window.config.language) || lang || 'en').toLowerCase();
-    i18n.current = (desired === 'it') ? 'it' : 'en';
+	var desired = (localStorage.getItem('lang') || (window.config && window.config.language) || lang || 'en').toLowerCase();
+	i18n.current = (desired === 'it') ? 'it' : 'en';
 
-    function loadJsonSync(paths) {
-        for (var j = 0; j < paths.length; j++) {
-            try {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', paths[j], false);
-                xhr.send(null);
-                if (xhr.status >= 200 && xhr.status < 300 && (xhr.responseText || '').trim().length > 0) {
-                    return JSON.parse(xhr.responseText);
-                }
-            } catch (e) {}
-        }
-        return {};
-    }
-    var enCandidates = [
-        '../gi-portal/lang/en.json'
-    ];
-    var itCandidates = [
-        '../gi-portal/lang/it.json'
-    ];
-    i18n.en = loadJsonSync(enCandidates);
-    if (i18n.current === 'it') {
-        i18n.it = loadJsonSync(itCandidates);
-    }
+	function loadJsonSync(paths) {
+		for (var j = 0; j < paths.length; j++) {
+			try {
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', paths[j], false);
+				xhr.send(null);
+				if (xhr.status >= 200 && xhr.status < 300 && (xhr.responseText || '').trim().length > 0) {
+					return JSON.parse(xhr.responseText);
+				}
+			} catch (e) { }
+		}
+		return {};
+	}
+	var enCandidates = [
+		'../gi-portal/lang/en.json'
+	];
+	var itCandidates = [
+		'../gi-portal/lang/it.json'
+	];
+	i18n.en = loadJsonSync(enCandidates);
+	if (i18n.current === 'it') {
+		i18n.it = loadJsonSync(itCandidates);
+	}
 }
 function interpolate(template, vars) {
-    if (!template || !vars) return template;
-    return template.replace(/\$\{([^}]+)\}/g, function(_, k) { return (vars[k] != null) ? vars[k] : ''; });
+	if (!template || !vars) return template;
+	return template.replace(/\$\{([^}]+)\}/g, function(_, k) { return (vars[k] != null) ? vars[k] : ''; });
 }
 function t(key, vars) {
-    var cur = (i18n[i18n.current] || {});
-    var str = cur[key] || i18n.en[key] || key;
-    return interpolate(str, vars);
+	var cur = (i18n[i18n.current] || {});
+	var str = cur[key] || i18n.en[key] || key;
+	return interpolate(str, vars);
 }
 
-function lang(){
+function lang() {
 	return i18n.current;
 }
 
 // Expose translator globally for GIAPI widgets
-try { window.__t = t; } catch (e) {}
+try { window.__t = t; } catch (e) { }
 
-try { window.__lang = lang; } catch (e) {}
+try { window.__lang = lang; } catch (e) { }
 
 
 function initializeLogin(config) {
@@ -98,6 +98,7 @@ function initializeLogin(config) {
 	logoutBtn.addEventListener('click', function() {
 		localStorage.removeItem('authToken');
 		localStorage.removeItem('userEmail');
+		localStorage.removeItem('lang');
 		loginBtn.style.display = 'inline-block';
 		loginBtn.textContent = t('login');
 		loginBtn.disabled = false;
@@ -225,26 +226,28 @@ function initializeLogin(config) {
 		document.getElementById('changeLangBtn').addEventListener('click', function() {
 			userMenu.style.display = 'none';
 			const dialogDiv = $('<div>');
-			dialogDiv.append($('<div>').text(t('choose_language')).css({'margin-bottom':'10px'}));
+			dialogDiv.append($('<div>').text(t('choose_language')).css({ 'margin-bottom': '10px' }));
 			const current = i18n.current || 'en';
 			const enOpt = $('<div>');
-			enOpt.append($('<input>').attr({type:'radio', name:'langSel', id:'lang_en', value:'en', checked: (current==='en')}));
-			enOpt.append($('<label>').attr('for','lang_en').text(t('language_en')).css({'margin-left':'6px'}));
+			enOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_en', value: 'en', checked: (current === 'en') }));
+			enOpt.append($('<label>').attr('for', 'lang_en').text(t('language_en')).css({ 'margin-left': '6px' }));
 			const itOpt = $('<div>');
-			itOpt.append($('<input>').attr({type:'radio', name:'langSel', id:'lang_it', value:'it', checked: (current==='it')}));
-			itOpt.append($('<label>').attr('for','lang_it').text(t('language_it')).css({'margin-left':'6px'}));
+			itOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_it', value: 'it', checked: (current === 'it') }));
+			itOpt.append($('<label>').attr('for', 'lang_it').text(t('language_it')).css({ 'margin-left': '6px' }));
 			dialogDiv.append(enOpt).append(itOpt);
 			dialogDiv.dialog({
 				title: t('change_language_title'),
 				modal: true,
 				width: 360,
 				buttons: [
-					{ text: 'OK', click: function() {
-						const sel = dialogDiv.find('input[name="langSel"]:checked').val() || 'en';
-						localStorage.setItem('lang', sel);
-						$(this).dialog('close');
-						window.location.reload();
-					}},
+					{
+						text: 'OK', click: function() {
+							const sel = dialogDiv.find('input[name="langSel"]:checked').val() || 'en';
+							localStorage.setItem('lang', sel);
+							$(this).dialog('close');
+							window.location.reload();
+						}
+					},
 					{ text: 'Cancel', click: function() { $(this).dialog('close'); } }
 				]
 			});
@@ -253,10 +256,10 @@ function initializeLogin(config) {
 		// Status button click handler
 		document.getElementById('statusBtn').addEventListener('click', function() {
 			userMenu.style.display = 'none';  // Hide menu when status is clicked
-			
+
 			// Create dialog content
 			const dialogContent = $('<div>');
-			
+
 			// Add informative text
 			const infoText = $('<div>')
 				.css({
@@ -315,7 +318,7 @@ function initializeLogin(config) {
 			const fetchAndUpdateStatus = () => {
 				const statusContent = $('#status-content');
 				statusContent.html('<p>Loading status of bulk downloads...</p>');
-				
+
 				// Disable refresh button while loading
 				refreshButton.prop('disabled', true);
 				refreshButton.find('i').addClass('fa-spin');
@@ -327,266 +330,266 @@ function initializeLogin(config) {
 						'Accept': 'application/json'
 					}
 				})
-				.then(response => response.json())
-				.then(data => {
-					statusContent.empty();
-					if (data.results && data.results.length > 0) {
-						// Sort results by timestamp in descending order
-						const sortedResults = data.results.sort((a, b) => {
-							const dateA = new Date(a.timestamp || 0);
-							const dateB = new Date(b.timestamp || 0);
-							return dateB - dateA;
-						});
+					.then(response => response.json())
+					.then(data => {
+						statusContent.empty();
+						if (data.results && data.results.length > 0) {
+							// Sort results by timestamp in descending order
+							const sortedResults = data.results.sort((a, b) => {
+								const dateA = new Date(a.timestamp || 0);
+								const dateB = new Date(b.timestamp || 0);
+								return dateB - dateA;
+							});
 
-						const table = $('<table>').addClass('status-table').css({
-							'width': '100%',
-							'table-layout': 'fixed',
-							'border-collapse': 'collapse'
-						});
-						
-						const headerRow = $('<tr>')
-							.append($('<th>').text(t('col_timestamp')).css('width', '160px'))
-							.append($('<th>').text(t('col_task_id')).css('width', '250px'))
-							.append($('<th>').text(t('col_name')).css('width', '200px'))
-							.append($('<th>').text(t('col_status')).css('width', '200px'))
-							.append($('<th>').text(t('col_size_mb')).css('width', '100px'))
-							.append($('<th>').text(t('col_download')).css('width', '100px'))
-							.append($('<th>').text(t('col_actions')).css('width', '100px'));
-						table.append(headerRow);
+							const table = $('<table>').addClass('status-table').css({
+								'width': '100%',
+								'table-layout': 'fixed',
+								'border-collapse': 'collapse'
+							});
 
-						sortedResults.forEach((item, index) => {
-							const row = $('<tr>');
-							
-							// Timestamp column
-							let formattedDate = '';
-							if (item.timestamp) {
-								try {
-									const date = new Date(item.timestamp);
-									const year = date.getFullYear();
-									const month = String(date.getMonth() + 1).padStart(2, '0');
-									const day = String(date.getDate()).padStart(2, '0');
-									const hours = String(date.getHours()).padStart(2, '0');
-									const minutes = String(date.getMinutes()).padStart(2, '0');
-									const seconds = String(date.getSeconds()).padStart(2, '0');
-									formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-								} catch (e) {
-									console.error('Error formatting date:', e);
-									formattedDate = item.timestamp;
+							const headerRow = $('<tr>')
+								.append($('<th>').text(t('col_timestamp')).css('width', '160px'))
+								.append($('<th>').text(t('col_task_id')).css('width', '250px'))
+								.append($('<th>').text(t('col_name')).css('width', '200px'))
+								.append($('<th>').text(t('col_status')).css('width', '200px'))
+								.append($('<th>').text(t('col_size_mb')).css('width', '100px'))
+								.append($('<th>').text(t('col_download')).css('width', '100px'))
+								.append($('<th>').text(t('col_actions')).css('width', '100px'));
+							table.append(headerRow);
+
+							sortedResults.forEach((item, index) => {
+								const row = $('<tr>');
+
+								// Timestamp column
+								let formattedDate = '';
+								if (item.timestamp) {
+									try {
+										const date = new Date(item.timestamp);
+										const year = date.getFullYear();
+										const month = String(date.getMonth() + 1).padStart(2, '0');
+										const day = String(date.getDate()).padStart(2, '0');
+										const hours = String(date.getHours()).padStart(2, '0');
+										const minutes = String(date.getMinutes()).padStart(2, '0');
+										const seconds = String(date.getSeconds()).padStart(2, '0');
+										formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+									} catch (e) {
+										console.error('Error formatting date:', e);
+										formattedDate = item.timestamp;
+									}
 								}
-							}
-							row.append($('<td>')
-								.text(formattedDate)
-								.css({
-									'width': '160px',
-									'white-space': 'nowrap',
-									'overflow': 'hidden',
-									'text-overflow': 'ellipsis'
-								})
-							);
-							
-							// Task ID column
-							row.append($('<td>')
-								.css({
-									'width': '250px',
-									'display': 'flex',
-									'align-items': 'center',
-									'gap': '8px'
-								})
-								.append(
-									$('<span>')
-										.text(item.id)
-										.attr('title', item.id)
-										.css({
-											'overflow': 'hidden',
-											'text-overflow': 'ellipsis'
-										})
-								)
-								.append(
-									$('<button>')
-										.addClass('copy-button')
-										.html('<i class="fa fa-copy"></i>')
-										.attr('title', 'Copy Task ID')
-										.css({
-											'padding': '2px 6px',
-											'min-width': 'unset',
-											'flex-shrink': '0'
-										})
-										.on('click', function() {
-											const tempInput = $('<input>');
-											$('body').append(tempInput);
-											tempInput.val(item.id).select();
-											document.execCommand('copy');
-											tempInput.remove();
-											
-											const button = $(this);
-											const originalTitle = button.attr('title');
-											button.attr('title', 'Copied!');
-											setTimeout(() => {
-												button.attr('title', originalTitle);
-											}, 2000);
-										})
-								)
-							);
-							
-							// Name column
-							row.append($('<td>')
-								.text(item.downloadName || '-')
-								.attr('title', item.downloadName)
-								.css({
-									'width': '200px',
-									'white-space': 'nowrap',
-									'overflow': 'hidden',
-									'text-overflow': 'ellipsis'
-								})
-							);
-							
-							// Status column
-							row.append($('<td>')
-								.text(item.status)
-								.css({
-									'width': '200px'
-								})
-							);
+								row.append($('<td>')
+									.text(formattedDate)
+									.css({
+										'width': '160px',
+										'white-space': 'nowrap',
+										'overflow': 'hidden',
+										'text-overflow': 'ellipsis'
+									})
+								);
 
-							// Size column
-							row.append($('<td>')
-								.text(item.sizeInMB ? item.sizeInMB.toLocaleString(undefined, {
-									minimumFractionDigits: 2,
-									maximumFractionDigits: 2
-								}) : '-')
-								.css({
+								// Task ID column
+								row.append($('<td>')
+									.css({
+										'width': '250px',
+										'display': 'flex',
+										'align-items': 'center',
+										'gap': '8px'
+									})
+									.append(
+										$('<span>')
+											.text(item.id)
+											.attr('title', item.id)
+											.css({
+												'overflow': 'hidden',
+												'text-overflow': 'ellipsis'
+											})
+									)
+									.append(
+										$('<button>')
+											.addClass('copy-button')
+											.html('<i class="fa fa-copy"></i>')
+											.attr('title', 'Copy Task ID')
+											.css({
+												'padding': '2px 6px',
+												'min-width': 'unset',
+												'flex-shrink': '0'
+											})
+											.on('click', function() {
+												const tempInput = $('<input>');
+												$('body').append(tempInput);
+												tempInput.val(item.id).select();
+												document.execCommand('copy');
+												tempInput.remove();
+
+												const button = $(this);
+												const originalTitle = button.attr('title');
+												button.attr('title', 'Copied!');
+												setTimeout(() => {
+													button.attr('title', originalTitle);
+												}, 2000);
+											})
+									)
+								);
+
+								// Name column
+								row.append($('<td>')
+									.text(item.downloadName || '-')
+									.attr('title', item.downloadName)
+									.css({
+										'width': '200px',
+										'white-space': 'nowrap',
+										'overflow': 'hidden',
+										'text-overflow': 'ellipsis'
+									})
+								);
+
+								// Status column
+								row.append($('<td>')
+									.text(item.status)
+									.css({
+										'width': '200px'
+									})
+								);
+
+								// Size column
+								row.append($('<td>')
+									.text(item.sizeInMB ? item.sizeInMB.toLocaleString(undefined, {
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 2
+									}) : '-')
+									.css({
+										'width': '100px',
+										'white-space': 'nowrap',
+										'overflow': 'hidden',
+										'text-overflow': 'ellipsis'
+									})
+								);
+
+								// Download column
+								const downloadCell = $('<td>').css({
 									'width': '100px',
 									'white-space': 'nowrap',
 									'overflow': 'hidden',
 									'text-overflow': 'ellipsis'
-								})
-							);
-							
-							// Download column
-							const downloadCell = $('<td>').css({
-								'width': '100px',
-								'white-space': 'nowrap',
-								'overflow': 'hidden',
-								'text-overflow': 'ellipsis'
-							});
-							if (item.status === 'Completed' && item.locator) {
-								downloadCell.append(
-									$('<a>')
-										.attr('href', item.locator)
-										.attr('target', '_blank')
-										.text('Download')
-								);
-							} else {
-								downloadCell.text('-');
-							}
-							row.append(downloadCell);
+								});
+								if (item.status === 'Completed' && item.locator) {
+									downloadCell.append(
+										$('<a>')
+											.attr('href', item.locator)
+											.attr('target', '_blank')
+											.text('Download')
+									);
+								} else {
+									downloadCell.text('-');
+								}
+								row.append(downloadCell);
 
-							// Actions column
-							const actionsCell = $('<td>').css({
-								'width': '100px',
-								'white-space': 'nowrap'
+								// Actions column
+								const actionsCell = $('<td>').css({
+									'width': '100px',
+									'white-space': 'nowrap'
+								});
+
+								// Show cancel button for active downloads
+								if (!['Completed', 'Failed', 'Canceled', 'Removed'].includes(item.status)) {
+									const cancelButton = $('<button>')
+										.addClass('cancel-button')
+										.html('<i class="fa fa-times"></i>')
+										.attr('title', 'Cancel download')
+										.css({
+											'padding': '2px 6px',
+											'min-width': 'unset',
+											'background-color': '#dc3545',
+											'color': 'white',
+											'border': 'none',
+											'border-radius': '4px',
+											'cursor': 'pointer'
+										})
+										.on('click', function() {
+											if (confirm('Are you sure you want to cancel this download?')) {
+												const authToken = localStorage.getItem('authToken');
+												fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/downloads?id=${item.id}`, {
+													method: 'DELETE',
+													headers: {
+														'Accept': 'application/json'
+													}
+												})
+													.then(response => {
+														if (!response.ok) {
+															throw new Error('Failed to cancel download');
+														}
+														// Refresh the status panel after successful cancellation
+														fetchAndUpdateStatus();
+													})
+													.catch(error => {
+														console.error('Error canceling download:', error);
+														alert('Failed to cancel download. Please try again.');
+													});
+											}
+										});
+									actionsCell.append(cancelButton);
+								}
+								// Show remove button for completed downloads
+								else if (item.status === 'Completed') {
+									const removeButton = $('<button>')
+										.addClass('remove-button')
+										.html('<i class="fa fa-trash"></i>')
+										.attr('title', 'Remove')
+										.css({
+											'padding': '2px 6px',
+											'min-width': 'unset',
+											'background-color': '#6c757d',
+											'color': 'white',
+											'border': 'none',
+											'border-radius': '4px',
+											'cursor': 'pointer'
+										})
+										.on('click', function() {
+											if (confirm('Are you sure you want to remove this completed download?')) {
+												const authToken = localStorage.getItem('authToken');
+												fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/downloads?id=${item.id}`, {
+													method: 'DELETE',
+													headers: {
+														'Accept': 'application/json'
+													}
+												})
+													.then(response => {
+														if (!response.ok) {
+															throw new Error('Failed to remove download');
+														}
+														// Refresh the status panel after successful removal
+														fetchAndUpdateStatus();
+													})
+													.catch(error => {
+														console.error('Error removing download:', error);
+														alert('Failed to remove download. Please try again.');
+													});
+											}
+										});
+									actionsCell.append(removeButton);
+								}
+
+								row.append(actionsCell);
+
+								table.append(row);
 							});
 
-							// Show cancel button for active downloads
-							if (!['Completed', 'Failed', 'Canceled', 'Removed'].includes(item.status)) {
-								const cancelButton = $('<button>')
-									.addClass('cancel-button')
-									.html('<i class="fa fa-times"></i>')
-									.attr('title', 'Cancel download')
-									.css({
-										'padding': '2px 6px',
-										'min-width': 'unset',
-										'background-color': '#dc3545',
-										'color': 'white',
-										'border': 'none',
-										'border-radius': '4px',
-										'cursor': 'pointer'
-									})
-									.on('click', function() {
-										if (confirm('Are you sure you want to cancel this download?')) {
-											const authToken = localStorage.getItem('authToken');
-											fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/downloads?id=${item.id}`, {
-												method: 'DELETE',
-												headers: {
-													'Accept': 'application/json'
-												}
-											})
-											.then(response => {
-												if (!response.ok) {
-													throw new Error('Failed to cancel download');
-												}
-												// Refresh the status panel after successful cancellation
-												fetchAndUpdateStatus();
-											})
-											.catch(error => {
-												console.error('Error canceling download:', error);
-												alert('Failed to cancel download. Please try again.');
-											});
-										}
-									});
-								actionsCell.append(cancelButton);
-							}
-							// Show remove button for completed downloads
-							else if (item.status === 'Completed') {
-								const removeButton = $('<button>')
-									.addClass('remove-button')
-									.html('<i class="fa fa-trash"></i>')
-								.attr('title', 'Remove')
-									.css({
-										'padding': '2px 6px',
-										'min-width': 'unset',
-										'background-color': '#6c757d',
-										'color': 'white',
-										'border': 'none',
-										'border-radius': '4px',
-										'cursor': 'pointer'
-									})
-									.on('click', function() {
-										if (confirm('Are you sure you want to remove this completed download?')) {
-											const authToken = localStorage.getItem('authToken');
-											fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/downloads?id=${item.id}`, {
-												method: 'DELETE',
-												headers: {
-													'Accept': 'application/json'
-												}
-											})
-											.then(response => {
-												if (!response.ok) {
-													throw new Error('Failed to remove download');
-												}
-												// Refresh the status panel after successful removal
-												fetchAndUpdateStatus();
-											})
-											.catch(error => {
-												console.error('Error removing download:', error);
-												alert('Failed to remove download. Please try again.');
-											});
-										}
-									});
-								actionsCell.append(removeButton);
-							}
-							
-							row.append(actionsCell);
-							
-							table.append(row);
-						});
-						
-						statusContent.append(table);
-					} else {
-						statusContent.append($('<p>').text(t('bulk_empty')));
-					}
-				})
-				.catch(error => {
-					console.error('Error fetching status:', error);
-					statusContent.empty().append(
-						$('<p>').text(t('bulk_error'))
-					);
-				})
-				.finally(() => {
-					// Re-enable refresh button and stop spinning
-					refreshButton.prop('disabled', false);
-					refreshButton.find('i').removeClass('fa-spin');
-				});
+							statusContent.append(table);
+						} else {
+							statusContent.append($('<p>').text(t('bulk_empty')));
+						}
+					})
+					.catch(error => {
+						console.error('Error fetching status:', error);
+						statusContent.empty().append(
+							$('<p>').text(t('bulk_error'))
+						);
+					})
+					.finally(() => {
+						// Re-enable refresh button and stop spinning
+						refreshButton.prop('disabled', false);
+						refreshButton.find('i').removeClass('fa-spin');
+					});
 			};
 
 			// Add click handler to refresh button
@@ -605,7 +608,7 @@ function initializeLogin(config) {
 				dialogContent.append($('<h3>').text(t('menu_manage_users')));
 				dialogContent.append($('<p>').text(t('users_intro')));
 				// Results area
-				const resultsDiv = $('<div>').attr('id', 'listUsersResults').css({'margin-top': '15px'});
+				const resultsDiv = $('<div>').attr('id', 'listUsersResults').css({ 'margin-top': '15px' });
 				dialogContent.append(resultsDiv);
 				// --- Move function definitions here so they are in scope for both dialog and fetch ---
 				function renderTable(users) {
@@ -636,7 +639,7 @@ function initializeLogin(config) {
 						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_last_name')}</th>` +
 						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_institution')}</th>` +
 						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_permissions')}</th>` +
-					'</tr>';
+						'</tr>';
 					sortedUsers.forEach((u, idx) => {
 						const propMap = {};
 						if (Array.isArray(u.properties)) {
@@ -704,20 +707,20 @@ function initializeLogin(config) {
 											headers: { 'Content-Type': 'application/json' },
 											body: JSON.stringify({ email, apiKey, userIdentifier })
 										})
-										.then(response => response.json())
-										.then(result => {
-											if (result.success) {
-												alert(t('users_removed_ok'));
-												detailsDialog.dialog('close');
-												dialogContent.dialog('close');
-												document.getElementById('listUsersBtn').click();
-											} else {
-												alert(t('users_removed_fail') + ' ' + (result.message || 'Unknown error'));
-											}
-										})
-										.catch(err => {
-											alert('Error removing user: ' + err);
-										});
+											.then(response => response.json())
+											.then(result => {
+												if (result.success) {
+													alert(t('users_removed_ok'));
+													detailsDialog.dialog('close');
+													dialogContent.dialog('close');
+													document.getElementById('listUsersBtn').click();
+												} else {
+													alert(t('users_removed_fail') + ' ' + (result.message || 'Unknown error'));
+												}
+											})
+											.catch(err => {
+												alert('Error removing user: ' + err);
+											});
 									}
 								},
 								{ text: t('close'), click: function() { $(this).dialog('close'); } }
@@ -739,21 +742,21 @@ function initializeLogin(config) {
 									headers: { 'Content-Type': 'application/json' },
 									body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'permissions', propertyValue: permissions })
 								})
-								.then(response => response.json())
-								.then(result => {
-									if (result.success) {
-										alert('Permissions added.');
-										detailsDialog.dialog('close');
-										// Refresh the main user list panel
-										dialogContent.dialog('close');
-										document.getElementById('listUsersBtn').click();
-									} else {
-										alert('Failed to add permissions: ' + (result.message || 'Unknown error'));
-									}
-								})
-								.catch(err => {
-									alert('Error adding permissions: ' + err);
-								});
+									.then(response => response.json())
+									.then(result => {
+										if (result.success) {
+											alert('Permissions added.');
+											detailsDialog.dialog('close');
+											// Refresh the main user list panel
+											dialogContent.dialog('close');
+											document.getElementById('listUsersBtn').click();
+										} else {
+											alert('Failed to add permissions: ' + (result.message || 'Unknown error'));
+										}
+									})
+									.catch(err => {
+										alert('Error adding permissions: ' + err);
+									});
 							});
 						});
 						// Edit permissions handler
@@ -776,21 +779,21 @@ function initializeLogin(config) {
 									headers: { 'Content-Type': 'application/json' },
 									body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'permissions', propertyValue: newPermissions })
 								})
-								.then(response => response.json())
-								.then(result => {
-									if (result.success) {
-										alert('Permissions updated.');
-										detailsDialog.dialog('close');
-										// Refresh the main user list panel
-										dialogContent.dialog('close');
-										document.getElementById('listUsersBtn').click();
-									} else {
-										alert('Failed to update permissions: ' + (result.message || 'Unknown error'));
-									}
-								})
-								.catch(err => {
-									alert('Error updating permissions: ' + err);
-								});
+									.then(response => response.json())
+									.then(result => {
+										if (result.success) {
+											alert('Permissions updated.');
+											detailsDialog.dialog('close');
+											// Refresh the main user list panel
+											dialogContent.dialog('close');
+											document.getElementById('listUsersBtn').click();
+										} else {
+											alert('Failed to update permissions: ' + (result.message || 'Unknown error'));
+										}
+									})
+									.catch(err => {
+										alert('Error updating permissions: ' + err);
+									});
 							});
 						});
 						// Add handler for editing other properties
@@ -813,20 +816,20 @@ function initializeLogin(config) {
 								headers: { 'Content-Type': 'application/json' },
 								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: propName, propertyValue: newValue })
 							})
-							.then(response => response.json())
-							.then(result => {
-								if (result.success) {
-									alert('Property updated.');
-									detailsDialog.dialog('close');
-									dialogContent.dialog('close');
-									document.getElementById('listUsersBtn').click();
-								} else {
-									alert('Failed to update property: ' + (result.message || 'Unknown error'));
-								}
-							})
-							.catch(err => {
-								alert('Error updating property: ' + err);
-							});
+								.then(response => response.json())
+								.then(result => {
+									if (result.success) {
+										alert('Property updated.');
+										detailsDialog.dialog('close');
+										dialogContent.dialog('close');
+										document.getElementById('listUsersBtn').click();
+									} else {
+										alert('Failed to update property: ' + (result.message || 'Unknown error'));
+									}
+								})
+								.catch(err => {
+									alert('Error updating property: ' + err);
+								});
 						});
 					});
 				}
@@ -853,19 +856,19 @@ function initializeLogin(config) {
 									headers: { 'Content-Type': 'application/json' },
 									body: JSON.stringify({ email: email, apiKey: apiKey })
 								})
-								.then(response => response.json())
-								.then(newData => {
-									if (newData.success && Array.isArray(newData.users)) {
-										resultsDiv.html(renderTable(newData.users));
-										bindRowClicks(newData.users);
-									} else {
-										resultsDiv.html('<span style="color:red">' + (newData.message || t('failed_fetch_users')) + '</span>');
-									}
-								})
-								.catch(err => {
-									resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
-								});
-						}
+									.then(response => response.json())
+									.then(newData => {
+										if (newData.success && Array.isArray(newData.users)) {
+											resultsDiv.html(renderTable(newData.users));
+											bindRowClicks(newData.users);
+										} else {
+											resultsDiv.html('<span style="color:red">' + (newData.message || t('failed_fetch_users')) + '</span>');
+										}
+									})
+									.catch(err => {
+										resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
+									});
+							}
 						},
 						{
 							text: t('close'),
@@ -886,22 +889,22 @@ function initializeLogin(config) {
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ email: email, apiKey: apiKey })
 				})
-				.then(response => response.json())
-				.then(data => {
-					if (data.success && Array.isArray(data.users)) {
-						if (data.users.length === 0) {
-							resultsDiv.html('<span>' + t('no_users_found') + '</span>');
+					.then(response => response.json())
+					.then(data => {
+						if (data.success && Array.isArray(data.users)) {
+							if (data.users.length === 0) {
+								resultsDiv.html('<span>' + t('no_users_found') + '</span>');
+							} else {
+								resultsDiv.html(renderTable(data.users));
+								bindRowClicks(data.users);
+							}
 						} else {
-							resultsDiv.html(renderTable(data.users));
-							bindRowClicks(data.users);
+							resultsDiv.html('<span style="color:red">' + (data.message || t('failed_fetch_users')) + '</span>');
 						}
-					} else {
-						resultsDiv.html('<span style="color:red">' + (data.message || t('failed_fetch_users')) + '</span>');
-					}
-				})
-				.catch(err => {
-					resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
-				});
+					})
+					.catch(err => {
+						resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
+					});
 			});
 		}
 
@@ -910,6 +913,7 @@ function initializeLogin(config) {
 			localStorage.removeItem('authToken');
 			localStorage.removeItem('userEmail');
 			localStorage.removeItem('isAdmin');
+			localStorage.removeItem('lang');
 			loginBtn.style.display = 'inline-block';
 			loginBtn.textContent = t('login');
 			loginBtn.disabled = false;
@@ -927,7 +931,7 @@ export function initializePortal(config) {
 	document.title = config.title;
 
 	// Initialize i18n (defaults to 'en', overridden by localStorage or config.language)
-	try { loadI18nSync(); } catch (e) {}
+	try { loadI18nSync(); } catch (e) { }
 
 	// Initialize login if enabled
 	initializeLogin(config);
@@ -1122,7 +1126,7 @@ export function initializePortal(config) {
 			'wmsEndpoint': config.wmsEndpoint,
 
 
-			'clusterWMS': (config.clusterWMS!==undefined),
+			'clusterWMS': (config.clusterWMS !== undefined),
 			'clusterWMSToken': token,
 			'clusterWMSView': view,
 			'clusterWMSLayerName': view,
@@ -1397,115 +1401,119 @@ export function initializePortal(config) {
 			}));
 
 			// After constraints are initialized, try to fetch and update values
-			const authToken = localStorage.getItem('authToken') || 'my-token';
-			fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=timeInterpolation&limit=50`)
-				.then(response => response.json())
-				.then(data => {
-					if (data.timeInterpolation && data.timeInterpolation.length > 0) {
-						// Find the select element using the correct ID
-						const selectElement = document.getElementById(timeInterpolationId);
-						if (selectElement) {
-							const options = [
-								{ label: t("select_interpolation_type"), value: '' },
-								...data.timeInterpolation.map(type => ({
-									label: `${type.value} (${type.observationCount} observations)`,
-									value: type.value
-								}))
-							];
-							
-							// Update the select options
-							selectElement.innerHTML = options.map(option => 
-								`<option value="${option.value}">${option.label}</option>`
-							).join('');
+			const authToken = localStorage.getItem('authToken') || undefined;
+			
+			if (authToken !== undefined) {
+				fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=timeInterpolation&limit=50`)
+					.then(response => response.json())
+					.then(data => {
+						if (data.timeInterpolation && data.timeInterpolation.length > 0) {
+							// Find the select element using the correct ID
+							const selectElement = document.getElementById(timeInterpolationId);
+							if (selectElement) {
+								const options = [
+									{ label: t("select_interpolation_type"), value: '' },
+									...data.timeInterpolation.map(type => ({
+										label: `${type.value} (${type.observationCount} observations)`,
+										value: type.value
+									}))
+								];
+
+								// Update the select options
+								selectElement.innerHTML = options.map(option =>
+									`<option value="${option.value}">${option.label}</option>`
+								).join('');
+							}
 						}
-					}
-				})
-				.catch(error => {
-					console.error('Error fetching interpolation types:', error);
-					// Keep default values if API fails
-				});
+					})
+					.catch(error => {
+						console.error('Error fetching interpolation types:', error);
+						// Keep default values if API fails
+					});
+
+
+				if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
+					const spacingId = GIAPI.search.constWidget.getId('intendedObservationSpacing');
+					advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', {
+						helpIconImage: 'fa-arrows-h',
+						values: [
+							{ label: t("select_observation_spacing"), value: '' }
+						],
+						readOnlyValues: true
+					}));
+
+					// After constraints are initialized, try to fetch and update values
+					const authToken = localStorage.getItem('authToken') || 'my-token';
+					fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
+						.then(response => response.json())
+						.then(data => {
+							if (data.intendedObservationSpacing && data.intendedObservationSpacing.length > 0) {
+								// Find the select element using the correct ID
+								const selectElement = document.getElementById(spacingId);
+								if (selectElement) {
+									const options = [
+										{ label: t("select_observation_spacing"), value: '' },
+										...data.intendedObservationSpacing.map(type => ({
+											label: `${type.value} (${type.observationCount} observations)`,
+											value: type.value
+										}))
+									];
+
+									// Update the select options
+									selectElement.innerHTML = options.map(option =>
+										`<option value="${option.value}">${option.label}</option>`
+									).join('');
+								}
+							}
+						})
+						.catch(error => {
+							console.error('Error fetching observation spacing types:', error);
+							// Keep default values if API fails
+						});
+				}
+
+				if (config.aggregationDuration !== undefined && config.aggregationDuration) {
+					const durationId = GIAPI.search.constWidget.getId('aggregationDuration');
+					advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', {
+						helpIconImage: 'fa-hourglass',
+						values: [
+							{ label: t("select_aggregation_duration"), value: '' }
+						],
+						readOnlyValues: true
+					}));
+
+					// After constraints are initialized, try to fetch and update values
+					const authToken = localStorage.getItem('authToken') || 'my-token';
+					fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=aggregationDuration&limit=50`)
+						.then(response => response.json())
+						.then(data => {
+							if (data.aggregationDuration && data.aggregationDuration.length > 0) {
+								// Find the select element using the correct ID
+								const selectElement = document.getElementById(durationId);
+								if (selectElement) {
+									const options = [
+										{ label: t("select_aggregation_duration"), value: '' },
+										...data.aggregationDuration.map(type => ({
+											label: `${type.value} (${type.observationCount} observations)`,
+											value: type.value
+										}))
+									];
+
+									// Update the select options
+									selectElement.innerHTML = options.map(option =>
+										`<option value="${option.value}">${option.label}</option>`
+									).join('');
+								}
+							}
+						})
+						.catch(error => {
+							console.error('Error fetching aggregation duration types:', error);
+							// Keep default values if API fails
+						});
+				}
+			}
+
 		}
-
-		if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
-			const spacingId = GIAPI.search.constWidget.getId('intendedObservationSpacing');
-			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', {
-				helpIconImage: 'fa-arrows-h',
-				values: [
-					{ label: t("select_observation_spacing"), value: '' }
-				],
-				readOnlyValues: true
-			}));
-
-			// After constraints are initialized, try to fetch and update values
-			const authToken = localStorage.getItem('authToken') || 'my-token';
-			fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
-				.then(response => response.json())
-				.then(data => {
-					if (data.intendedObservationSpacing && data.intendedObservationSpacing.length > 0) {
-						// Find the select element using the correct ID
-						const selectElement = document.getElementById(spacingId);
-						if (selectElement) {
-							const options = [
-								{ label: t("select_observation_spacing"), value: '' },
-								...data.intendedObservationSpacing.map(type => ({
-									label: `${type.value} (${type.observationCount} observations)`,
-									value: type.value
-								}))
-							];
-							
-							// Update the select options
-							selectElement.innerHTML = options.map(option => 
-								`<option value="${option.value}">${option.label}</option>`
-							).join('');
-						}
-					}
-				})
-				.catch(error => {
-					console.error('Error fetching observation spacing types:', error);
-					// Keep default values if API fails
-				});
-		}
-
-		if (config.aggregationDuration !== undefined && config.aggregationDuration) {
-			const durationId = GIAPI.search.constWidget.getId('aggregationDuration');
-			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', {
-				helpIconImage: 'fa-hourglass',
-				values: [
-					{ label: t("select_aggregation_duration"), value: '' }
-				],
-				readOnlyValues: true
-			}));
-
-			// After constraints are initialized, try to fetch and update values
-			const authToken = localStorage.getItem('authToken') || 'my-token';
-			fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=aggregationDuration&limit=50`)
-				.then(response => response.json())
-				.then(data => {
-					if (data.aggregationDuration && data.aggregationDuration.length > 0) {
-						// Find the select element using the correct ID
-						const selectElement = document.getElementById(durationId);
-						if (selectElement) {
-							const options = [
-								{ label: t("select_aggregation_duration"), value: '' },
-								...data.aggregationDuration.map(type => ({
-									label: `${type.value} (${type.observationCount} observations)`,
-									value: type.value
-								}))
-							];
-							
-							// Update the select options
-							selectElement.innerHTML = options.map(option => 
-								`<option value="${option.value}">${option.label}</option>`
-							).join('');
-						}
-					}
-				})
-				.catch(error => {
-					console.error('Error fetching aggregation duration types:', error);
-					// Keep default values if API fails
-				});
-		}
-
 		var semanticValue = 0;
 		if (config.semanticSearchValue !== undefined) {
 			semanticValue = config.semanticSearchValue;
@@ -1572,7 +1580,7 @@ export function initializePortal(config) {
 				if (authToken && userPermissions.includes('downloads')) {
 					// Remove any existing download button
 					$('#paginator-widget-top-label .login-button').remove();
-					
+
 					// Add bulk download button next to results count
 					var downloadButton = $('<button>')
 						.addClass('login-button')
@@ -1590,11 +1598,11 @@ export function initializePortal(config) {
 						.on('click', function() {
 							// Create dialog content
 							const dialogContent = $('<div>');
-							
+
 							// Add description paragraphs
 							dialogContent.append($('<p>').text(`This will initiate the bulk download of ${resultSet.size} resources. The process may take some time, depending on the number of resources and current server load.`));
 							dialogContent.append($('<p>').text('You can monitor the download status from your personal menu.'));
-							
+
 							// Add download name input
 							const nameDiv = $('<div>').css({
 								'margin-top': '15px',
@@ -1603,7 +1611,7 @@ export function initializePortal(config) {
 								'background-color': '#f8f9fa',
 								'border-radius': '4px'
 							});
-							
+
 							nameDiv.append(
 								$('<label>')
 									.text('Download name:')
@@ -1614,12 +1622,12 @@ export function initializePortal(config) {
 										'color': '#2c3e50'
 									})
 							);
-							
-							const defaultName = new Date().toISOString().slice(0,16).replace('T', '_').replace(':', '-');
-							
+
+							const defaultName = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
+
 							// Remove any existing download name input
 							$('#downloadName').remove();
-							
+
 							nameDiv.append(
 								$('<input>')
 									.attr({
@@ -1637,9 +1645,9 @@ export function initializePortal(config) {
 										'color': '#2c3e50'
 									})
 							);
-							
+
 							dialogContent.append(nameDiv);
-							
+
 							// Define format options before using them in rows
 							const csvOption = $('<div>').css({
 								'display': 'flex',
@@ -1732,7 +1740,7 @@ export function initializePortal(config) {
 									.text('NetCDF')
 									.css('color', '#2c3e50')
 							);
-							
+
 							// Add format selection
 							const formatDiv = $('<div>').css({
 								'margin-top': '15px',
@@ -1741,7 +1749,7 @@ export function initializePortal(config) {
 								'background-color': '#f8f9fa',
 								'border-radius': '4px'
 							});
-							
+
 							formatDiv.append(
 								$('<label>')
 									.text('Select data format:')
@@ -1752,7 +1760,7 @@ export function initializePortal(config) {
 										'color': '#2c3e50'
 									})
 							);
-							
+
 							// Format selection
 							const formatOptions = $('<div>').css({
 								'display': 'flex',
@@ -1780,14 +1788,14 @@ export function initializePortal(config) {
 							formatOptions.append(formatRow2);
 							formatDiv.append(formatOptions);
 							dialogContent.append(formatDiv);
-							
+
 							// Add email notifications checkbox
 							const notificationsDiv = $('<div>').css({
 								'margin-top': '15px',
 								'display': 'flex',
 								'align-items': 'center'
 							});
-							
+
 							notificationsDiv.append(
 								$('<input>').attr({
 									'type': 'checkbox',
@@ -1795,7 +1803,7 @@ export function initializePortal(config) {
 									'checked': true
 								}).css('margin-right', '8px')
 							);
-							
+
 							notificationsDiv.append(
 								$('<label>')
 									.attr('for', 'emailNotifications')
@@ -1805,7 +1813,7 @@ export function initializePortal(config) {
 										'color': '#2c3e50'
 									})
 							);
-							
+
 							dialogContent.append(notificationsDiv);
 
 							// Create and show dialog
@@ -1842,10 +1850,9 @@ export function initializePortal(config) {
 											if (where) {
 												if (where.predefinedLayer) {
 													params.append('predefinedLayer', where.predefinedLayer);
-												} 
-												
-												if (where.south && where.west && where.north && where.east)
-												{
+												}
+
+												if (where.south && where.west && where.north && where.east) {
 													params.append('west', where.west);
 													params.append('south', where.south);
 													params.append('east', where.east);
@@ -1878,7 +1885,7 @@ export function initializePortal(config) {
 
 											// Add download name parameter
 											const downloadName = $('#downloadName').val().trim() || defaultName;
-											
+
 											params.append('asynchDownloadName', downloadName);
 
 											// Add format parameter based on radio selection
@@ -2132,19 +2139,19 @@ export function initializePortal(config) {
 		if (mapWidget) {
 			if (mapWidget.olMap) {
 				olMap = mapWidget.olMap;
-			} 
+			}
 		}
 		if (olMap && typeof olMap.fitBounds === 'function') {
-			
-			
-		var minlatLon = ol.proj.transform([bbox.west, bbox.south], 'EPSG:4326', 'EPSG:3857');
-		var maxlatLon = ol.proj.transform([bbox.east, bbox.north], 'EPSG:4326', 'EPSG:3857');
 
-		
 
-		var tbbox = { 'south': minlatLon[1], 'west': minlatLon[0], 'north': maxlatLon[1], 'east': maxlatLon[0] };
-			
-			   olMap.fitBounds(tbbox);
+			var minlatLon = ol.proj.transform([bbox.west, bbox.south], 'EPSG:4326', 'EPSG:3857');
+			var maxlatLon = ol.proj.transform([bbox.east, bbox.north], 'EPSG:4326', 'EPSG:3857');
+
+
+
+			var tbbox = { 'south': minlatLon[1], 'west': minlatLon[0], 'north': maxlatLon[1], 'east': maxlatLon[0] };
+
+			olMap.fitBounds(tbbox);
 		} else {
 			alert('Map zoom function not available.');
 		}
@@ -2152,39 +2159,39 @@ export function initializePortal(config) {
 }
 
 function showPermissionsDialog(currentPermissions, onSave) {
-    // Read permissions from config, fallback to default if not present
-    let allPermissions = ['downloads', 'api', 'admin'];
-    if (window.config && typeof window.config.permissions === 'string') {
-        allPermissions = window.config.permissions.split(',').map(p => p.trim()).filter(Boolean);
-    }
-    const selected = (currentPermissions || '').split(',').map(p => p.trim()).filter(Boolean);
-    const dialogDiv = $('<div>').css({'padding':'10px'});
-    dialogDiv.append($('<div>').text('Select permissions:').css({'margin-bottom':'10px'}));
-    allPermissions.forEach(perm => {
-        const checkbox = $('<input type="checkbox">').attr('id', 'perm_' + perm).val(perm);
-        if (selected.includes(perm)) checkbox.prop('checked', true);
-        const label = $('<label>').attr('for', 'perm_' + perm).text(perm).css({'margin-right':'20px'});
-        dialogDiv.append(checkbox).append(label);
-    });
-    dialogDiv.dialog({
-        title: 'Set Permissions',
-        modal: true,
-        width: 400,
-        buttons: [
-            {
-                text: 'Save',
-                click: function() {
-                    const checked = dialogDiv.find('input[type=checkbox]:checked').map(function(){return this.value;}).get();
-                    onSave(checked.join(','));
-                    $(this).dialog('close');
-                }
-            },
-            {
-                text: 'Cancel',
-                click: function() { $(this).dialog('close'); }
-            }
-        ]
-    });
+	// Read permissions from config, fallback to default if not present
+	let allPermissions = ['downloads', 'api', 'admin'];
+	if (window.config && typeof window.config.permissions === 'string') {
+		allPermissions = window.config.permissions.split(',').map(p => p.trim()).filter(Boolean);
+	}
+	const selected = (currentPermissions || '').split(',').map(p => p.trim()).filter(Boolean);
+	const dialogDiv = $('<div>').css({ 'padding': '10px' });
+	dialogDiv.append($('<div>').text('Select permissions:').css({ 'margin-bottom': '10px' }));
+	allPermissions.forEach(perm => {
+		const checkbox = $('<input type="checkbox">').attr('id', 'perm_' + perm).val(perm);
+		if (selected.includes(perm)) checkbox.prop('checked', true);
+		const label = $('<label>').attr('for', 'perm_' + perm).text(perm).css({ 'margin-right': '20px' });
+		dialogDiv.append(checkbox).append(label);
+	});
+	dialogDiv.dialog({
+		title: 'Set Permissions',
+		modal: true,
+		width: 400,
+		buttons: [
+			{
+				text: 'Save',
+				click: function() {
+					const checked = dialogDiv.find('input[type=checkbox]:checked').map(function() { return this.value; }).get();
+					onSave(checked.join(','));
+					$(this).dialog('close');
+				}
+			},
+			{
+				text: 'Cancel',
+				click: function() { $(this).dialog('close'); }
+			}
+		]
+	});
 }
 
 
