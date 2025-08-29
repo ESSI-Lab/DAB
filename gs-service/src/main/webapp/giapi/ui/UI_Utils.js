@@ -187,16 +187,16 @@ GIAPI.UI_Utils = new function(){
     	
     	switch(color) {
         case 'red':
-            return 'https://api.geodab.eu/docs/assets/img/red-marker.png';
+            return '../giapi/ui/images/red-marker.png';
             break;
         case 'blue':
-        	return 'https://api.geodab.eu/docs/assets/img/blue-marker.png';
+        	return '../giapi/ui/images/blue-marker.png';
             break;
         case 'green':
-        	return 'https://api.geodab.eu/docs/assets/img/green-marker.png';
+        	return '../giapi/ui/images/green-marker.png';
             break;
         case 'yellow':
-        	return 'https://api.geodab.eu/docs/assets/img/yellow-marker.png';
+        	return '../giapi/ui/images/yellow-marker.png';
             break;
         }
    };
@@ -809,7 +809,7 @@ GIAPI.UI_Utils = new function(){
     obj.header = function(version){
     	
     	var header =  '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'+
-    	'<link rel="shortcut icon" type="image/png" href="https://api.geodab.eu/docs/assets/favicon.png">'+
+    	'<link rel="shortcut icon" type="image/png" href="../giapi/ui/images/favicon.png">'+
     	
     	'<div>  '+  
     	    '<div>'+

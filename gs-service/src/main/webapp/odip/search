@@ -5,7 +5,7 @@
     	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
         <title>Search portal</title>
-        <link rel="shortcut icon" type="image/png" href="https://api.geodab.eu/docs/assets/favicon.png">
+        <link rel="shortcut icon" type="image/png" href="../giapi/ui/images/favicon.png">
         
         <link rel="stylesheet" type="text/css" href="../css/fonts-min.css" />
         <link rel="stylesheet" type="text/css" href="../css/treeview.css" />    

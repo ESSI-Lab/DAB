@@ -596,7 +596,7 @@ GIAPI.GINode = function() {
         if(overview){
         	overviewLink = overview[options.index];
         }else if(options.force){
-        	overviewLink = 'https://api.geodab.eu/docs/assets/img/no_overview_576.png';
+        	overviewLink = '../giapi/ui/images/no_overview_576.png';
         }else{
         	return false;
         }
@@ -652,7 +652,7 @@ GIAPI.GINode = function() {
         	if(options.force){
 	        	// loads the no image URL
 	            try {
-	                ovrImg.src = 'https://api.geodab.eu/docs/assets/img/no_overview_576.png';
+	                ovrImg.src = '../giapi/ui/images/no_overview_576.png';
 	            } catch(e) {
 	                GIAPI.logger.log('unable to load no preview image: ' + e.message, 'error');
 	                onResponse.apply(giNode, ['error', 'Unable to load no preview image: ' + e.message],null);

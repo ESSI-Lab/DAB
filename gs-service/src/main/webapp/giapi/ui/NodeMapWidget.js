@@ -251,16 +251,16 @@ GIAPI.NodeMapWidget = function(id, node, options) {
 				} else {
 					switch (options.markerColor) {
 						case 'red':
-							return 'https://api.geodab.eu/docs/assets/img/red-marker.png';
+							return '../giapi/ui/images/red-marker.png';
 							break;
 						case 'blue':
-							return 'https://api.geodab.eu/docs/assets/img/blue-marker.png';
+							return '../giapi/ui/images/blue-marker.png';
 							break;
 						case 'green':
-							return 'https://api.geodab.eu/docs/assets/img/green-marker.png';
+							return '../giapi/ui/images/green-marker.png';
 							break;
 						case 'yellow':
-							return 'https://api.geodab.eu/docs/assets/img/yellow-marker.png';
+							return '../giapi/ui/images/yellow-marker.png';
 							break;
 					}
 				}

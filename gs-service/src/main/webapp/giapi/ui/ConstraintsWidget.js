@@ -11,7 +11,6 @@ import { GIAPI } from '../core/GIAPI.js';
  *  the <a href="../classes/DAB.html#method_discover" class="crosslink">discover</a>; it also allows to set some <a href="#method_options" class="crosslink">options</a>.<br>
  *  The following CSS is required:<pre><code>
 &lt;!-- Font Awesome CSS --&gt;        
-&lt;link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" /&gt;<br>
 &lt;!-- Google Maps --&gt;
 &lt;script type="text/javascript" src="http://maps.google.com/maps/api/js?" /&gt;<br>
 &lt;!-- Gmap.js --&gt;

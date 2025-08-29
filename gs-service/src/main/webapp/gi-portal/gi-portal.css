@@ -4,7 +4,7 @@
 
 @import url("../giapi/jtable/jtable_jqueryui.css" );
 
-@import url("https://cdn.jsdelivr.net/npm/ol@v10.3.1/ol.css" );
+@import url("../giapi/ol/10.3.1/ol.css" );
 
 @import url("../giapi/ol-layerswitcher/ol-layerswitcher.css" );
 
@@ -17,8 +17,7 @@
 @import url("../css/treeview.css" );
 
 @import
-	url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" )
-	;
+	url("../giapi/font-awesome/4.7.0/css/font-awesome.min.css" );
 
 #selectedParameter {
 	font-weight: bold;

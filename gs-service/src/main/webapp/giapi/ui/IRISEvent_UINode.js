@@ -57,7 +57,7 @@ GIAPI.IrisEvent_UINode = function(options) {
         
         jQuery(document).on('mouseover','#'+sectionDivId, function(){
         	if(options.mapWidget){
-        		options.mapWidget.markerIcon(node,{url: 'https://api.geodab.eu/docs/assets/img/circle-yellow-marker.png'});
+        		options.mapWidget.markerIcon(node,{url: '../giapi/ui/images/circle-yellow-marker.png'});
         	}
         });
         jQuery(document).on('mouseout','#'+sectionDivId, function(){

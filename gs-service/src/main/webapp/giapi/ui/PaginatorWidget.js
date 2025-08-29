@@ -7,8 +7,7 @@ import { GIAPI } from '../core/GIAPI.js';
 /**
  * A widget to control a <a href="../classes/Paginator.html" class="crosslink">Paginator</a> object. The following CSS is required:<pre><code>&lt;!-- API CSS --&gt;
  &lt;link rel="stylesheet" type="text/css" href="https://api.geodab.eu/docs/assets/css/giapi.css" /&gt;<br>
- &lt;!-- Font Awesome CSS --&gt;        
- &lt;link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" /&gt;<br>
+ &lt;!-- Font Awesome CSS --&gt;         
 </code></pre>
  * The control buttons are created using <a href="../classes/ButtonsFactory.html#method_roundCornerButton" class="crosslink">rounded corner buttons</a>.<br>
  * 

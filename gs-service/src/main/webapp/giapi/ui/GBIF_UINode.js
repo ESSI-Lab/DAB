@@ -122,7 +122,7 @@ GIAPI.GBIF_UINode = function(options) {
 
 				jQuery(document).on('mouseover', '#' + sectionDivId, function() {
 					if (options.mapWidget) {
-						options.mapWidget.markerIcon(node, { url: 'https://api.geodab.eu/docs/assets/img/circle-yellow-marker.png' });
+						options.mapWidget.markerIcon(node, { url: '../giapi/ui/images/circle-yellow-marker.png' });
 					}
 				});
 
@@ -347,7 +347,7 @@ GIAPI.GBIF_UINode = function(options) {
 								});
 						}
 					} else {
-						ovrDiv += '<img src="https://api.geodab.eu/docs/assets/img/no_overview_576.png" width="96" height="96">';
+						ovrDiv += '<img src="../giapi/ui/images/no_overview_576.png" width="96" height="96">';
 					}
 
 					headerTable += ovrDiv;
