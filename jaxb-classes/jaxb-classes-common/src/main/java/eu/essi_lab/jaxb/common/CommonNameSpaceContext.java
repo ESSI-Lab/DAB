@@ -130,6 +130,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 
     private static final String GEORSS = "http://www.georss.org/georss";
     public static final String DINAGUA_URI = "https://www.ambiente.gub.uy/axis2/services/Dinaguaws";
+    public static final String DINAGUA_STATUS_URI = "http://ambiente.gub.uy/dinaguaws/estadohidro";
     public static final String WOD = "https://data.nodc.noaa.gov/woa/WOD";
     public static final String THREDDS_NS_URI = "http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0";
     public static final String INVENIO_NS_URI = "http://essi-lab.eu/invenio";

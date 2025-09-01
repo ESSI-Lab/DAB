@@ -43,12 +43,26 @@ public class DinaguaStation {
 	this.json = json;
     }
 
+ 
+    
+    
     public String getVariablesString() {
-
-	return json.get("variables").toString();
+	Object ret = json.opt("variables");
+	if (ret == null) {
+	    return null;
+	}
+	return ret.toString();
 
     }
 
+    public void setVariableString(String variables) {
+ 	json.put("variables", variables);
+     }
+    
+    public void setVariableAbbreviationString(String variables) {
+ 	json.put("var_corto", variables);
+     }
+    
     public String getVar_corto() {
 
 	return json.optString("var_corto");
@@ -56,7 +70,7 @@ public class DinaguaStation {
     }
 
     public BigDecimal getBasinArea() {
-	return json.optBigDecimal("area_cuenca_km2",null);
+	return json.optBigDecimal("area_cuenca_km2", null);
 
     }
 
@@ -79,19 +93,19 @@ public class DinaguaStation {
 	return json.optString("departamento");
 
     }
-    
+
     public String getEntity() {
 	return json.optString("entitad");
 
     }
 
     public BigDecimal getLatitude() {
-	return json.optBigDecimal("latitud",null);
+	return json.optBigDecimal("latitud", null);
 
     }
 
     public BigDecimal getLongitude() {
-	return json.optBigDecimal("longitud",null);
+	return json.optBigDecimal("longitud", null);
 
     }
 
@@ -99,7 +113,7 @@ public class DinaguaStation {
 	return json.optString("apodo");
 
     }
-    
+
     public String getCountry() {
 	return json.optString("pais");
 
@@ -125,7 +139,11 @@ public class DinaguaStation {
     }
 
     public List<Variable> getVariables() {
-	String[] varSplit = getVariablesString().split(",");
+	String vars = getVariablesString();
+	if (vars == null) {
+	    return new ArrayList<Variable>();
+	}
+	String[] varSplit = vars.split(",");
 	String[] varCortoSplit = getVar_corto().split(",");
 	List<Variable> ret = new ArrayList<>();
 	for (int i = 0; i < varCortoSplit.length; i++) {
@@ -137,4 +155,11 @@ public class DinaguaStation {
 	return ret;
 
     }
+
+    @Override
+    public String toString() {
+	return json.toString(3);
+    }
+
+ 
 }

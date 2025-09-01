@@ -27,6 +27,11 @@ import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,7 +40,9 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -43,6 +50,7 @@ import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -177,6 +185,56 @@ public class JSONDinaguaClient extends DinaguaClient {
 	return ret;
     }
 
+    @Override
+    public DinaguaData getStatusData(String stationId, String temporalidad, Date begin, Date end) throws Exception {
+
+	DinaguaData ret = new DinaguaData();
+
+	String dataURL = getEndpoint() + "/estadohidro/datoscat?serietemporal=Estaciones&stationid=" + stationId + "&temporalidad="
+		+ temporalidad + "&monthStart=" + getMonth(begin) + "&monthEnd=" + getMonth(end);
+
+	GSLoggerFactory.getLogger(getClass()).info("Accessing URL: {}", dataURL);
+
+	Optional<HttpResponse<InputStream>> response = downloadResponse(dataURL);
+
+	if (response.isPresent()) {
+	    String res = IOUtils.toString(response.get().body(), StandardCharsets.UTF_8);
+	    if (res.contains("No se encontraron datos para la serie temporal proporcionada")) {
+		// nothing returned
+	    } else {
+		try {
+		    JSONArray arr = new JSONArray(res);
+		    for (int i = 0; i < arr.length(); i++) {
+			JSONObject v = arr.getJSONObject(i);
+			BigDecimal value = v.getBigDecimal("category");
+			JSONObject filtros = v.optJSONObject("filtros");
+			String sid = v.optString("stationID");
+			if (sid == null || !sid.equals(stationId)) {
+			    continue;
+			}
+			if (filtros != null) {
+			    String fecha = filtros.getString("fecha");
+			    Date date = YEAR_MONTH_SDF.parse(fecha);
+			    DinaguaValue dv = new DinaguaValue(value, date);
+			    ret.addValue(dv);
+			}
+		    }
+		} catch (JSONException e) {
+		    GSLoggerFactory.getLogger(getClass()).error("This should not happen, parsing error: {}", res);
+		}
+	    }
+	} else {
+	    // nothing returned
+	    GSLoggerFactory.getLogger(getClass()).error("This should not happen");
+	}
+
+	return ret;
+    }
+
+    private String getMonth(Date date) {
+	return YEAR_MONTH_SDF.format(date);
+    }
+
     /**
      * @param stationId
      * @param beginDate
@@ -244,8 +302,17 @@ public class JSONDinaguaClient extends DinaguaClient {
 
 	HashMap<String, String> headers = new HashMap<>();
 	headers.put("Authorization", "Bearer " + token);
-
 	return downloader.downloadOptionalString(request, HttpHeaderUtils.build(headers));
+    }
+
+    private Optional<HttpResponse<InputStream>> downloadResponse(String request) throws Exception {
+
+	String token = getToken();
+	Downloader downloader = new Downloader();
+
+	HashMap<String, String> headers = new HashMap<>();
+	headers.put("Authorization", "Bearer " + token);
+	return downloader.downloadOptionalResponse(request, HttpHeaderUtils.build(headers));
     }
 
     @Override
@@ -298,7 +365,7 @@ public class JSONDinaguaClient extends DinaguaClient {
 	    }
 	}
     }
-    
+
     @Override
     protected void retrieveStatusStations() throws Exception {
 
@@ -344,7 +411,8 @@ public class JSONDinaguaClient extends DinaguaClient {
 		// "zona_horaria": "GMT-3"
 
 		DinaguaStation station = new DinaguaStation(jsonStation);
-
+		station.setVariableString("1,2,3");
+		station.setVariableAbbreviationString("1,2,3");
 		statusStations.put(station.getId(), station);
 	    }
 	}

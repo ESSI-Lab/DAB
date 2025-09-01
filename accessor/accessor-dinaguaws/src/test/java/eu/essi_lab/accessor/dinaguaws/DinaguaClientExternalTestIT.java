@@ -4,7 +4,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
@@ -13,6 +16,7 @@ import org.junit.Test;
 import eu.essi_lab.accessor.dinaguaws.client.DinaguaClient;
 import eu.essi_lab.accessor.dinaguaws.client.DinaguaData;
 import eu.essi_lab.accessor.dinaguaws.client.DinaguaStation;
+import eu.essi_lab.accessor.dinaguaws.client.DinaguaValue;
 import eu.essi_lab.accessor.dinaguaws.client.JSONDinaguaClient;
 import eu.essi_lab.accessor.dinaguaws.client.Variable;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -70,7 +74,7 @@ public class DinaguaClientExternalTestIT {
 
 	nivelContinuos.getSet().forEach(d -> {
 
-	    System.out.println(d.getDate()+" "+ d.getValue());
+	    System.out.println(d.getDate() + " " + d.getValue());
 	});
 	System.out.println(nivelContinuos.getSet().size() + " values");
 
@@ -78,7 +82,7 @@ public class DinaguaClientExternalTestIT {
 
 	nivelMinimum.getSet().forEach(d -> {
 
-	    System.out.println(d.getDate()+" "+ d.getValue());
+	    System.out.println(d.getDate() + " " + d.getValue());
 	});
 	System.out.println(nivelMinimum.getSet().size() + " values");
     }
@@ -93,7 +97,7 @@ public class DinaguaClientExternalTestIT {
 	for (DinaguaStation station : stations) {
 
 	    String id = station.getId();
-	    System.out.println(id+ " "+station.getCountry());
+	    System.out.println(id + " " + station.getCountry());
 	    Assert.assertNotNull(id);
 	}
     }
@@ -115,15 +119,42 @@ public class DinaguaClientExternalTestIT {
 	DinaguaClient client = createClient();
 
 	Set<DinaguaStation> stations = client.getStatusStations();
-	
+
 	assertTrue(!stations.isEmpty());
-	
+
+	String stationId = "1170";
+
+	DinaguaStation selected = null;
+
 	for (DinaguaStation station : stations) {
-	    System.out.println(station.getId());
-	    System.out.println(station.getCountry());
+	    // System.out.println(station.toString());
+	    if (station.getId().equals(stationId)) {
+		selected = station;
+	    }
 	}
+	
+	System.out.println(selected.toString());
+
+	List<Variable> variables = selected.getVariables();
+	for (Variable variable : variables) {
+	    System.out.println(variable.getLabel()+" "+variable.getAbbreviation());
+	}
+	
+	Date start = selected.getBeginDate();
+	Date end = selected.getEndDate();
+//	 start = ISO8601DateTimeUtils.parseISO8601ToDate("2024-01").get();
+	// end= ISO8601DateTimeUtils.parseISO8601ToDate("2024-02").get();
+	DinaguaData data = client.getStatusData(stationId, "1", start, end);
+	TreeSet<DinaguaValue> treeData = data.getSet();
+	Iterator<DinaguaValue> it = treeData.iterator();
+	while (it.hasNext()) {
+	    DinaguaValue d = it.next();
+	    System.out.println(d.getDate() + ": " + d.getValue());
+
+	}
+
     }
-    
+
     @Test
     public void getTokenTest() throws Exception {
 

@@ -30,6 +30,7 @@ import eu.essi_lab.lib.net.protocols.impl.BNDMETProtocol;
 import eu.essi_lab.lib.net.protocols.impl.CEHQProtocol;
 import eu.essi_lab.lib.net.protocols.impl.CUAHSI_WaterOneFlow_1_1Protocol;
 import eu.essi_lab.lib.net.protocols.impl.DMHProtocol;
+import eu.essi_lab.lib.net.protocols.impl.DinaguaStatuswsProtocol;
 import eu.essi_lab.lib.net.protocols.impl.DinaguawsProtocol;
 import eu.essi_lab.lib.net.protocols.impl.EARTH_ENGINEProtocol;
 import eu.essi_lab.lib.net.protocols.impl.ECANADAProtocol;
@@ -118,6 +119,7 @@ public class NetProtocols {
     public static NetProtocol CUAHSI_WATER_ONE_FLOW_1_1 = new CUAHSI_WaterOneFlow_1_1Protocol();
     public static NetProtocol CEHQ = new CEHQProtocol();
     public static NetProtocol DINAGUAWS = new DinaguawsProtocol();
+    public static NetProtocol DINAGUASTATUSWS = new DinaguaStatuswsProtocol();
     public static NetProtocol NIWA = new NiwaProtocol();
     public static NetProtocol ARPA_LOMBARDIA = new ARPALombardiaProtocol();
     public static NetProtocol WIS = new WISProtocol();

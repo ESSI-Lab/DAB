@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.dinaguaws.client;
 
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -42,11 +43,14 @@ public abstract class DinaguaClient {
     public static SimpleDateFormat DATE_TIME_SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public static SimpleDateFormat DATE_SDF = new SimpleDateFormat("yyyy-MM-dd");
     public static SimpleDateFormat INVERTED_DATE_TIME_SDF = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    public static SimpleDateFormat YEAR_MONTH_SDF = new SimpleDateFormat("yyyy-MM");
 
     static {
 	DATE_TIME_SDF.setTimeZone(TimeZone.getTimeZone(ZoneOffset.ofHours(-3)));
 	DATE_SDF.setTimeZone(TimeZone.getTimeZone(ZoneOffset.ofHours(-3)));
 	INVERTED_DATE_TIME_SDF.setTimeZone(TimeZone.getTimeZone(ZoneOffset.ofHours(-3)));
+	YEAR_MONTH_SDF.setTimeZone(TimeZone.getTimeZone(ZoneOffset.ofHours(-3)));
+
     }
 
     /**
@@ -155,6 +159,18 @@ public abstract class DinaguaClient {
 	return ret;
     }
     
+    public DinaguaStation getStatusStation(String stationCode) throws Exception {
+	retrieveStatusStations();
+	Set<Entry<String, DinaguaStation>> entries = statusStations.entrySet();
+	DinaguaStation ret = null;
+	for (Entry<String, DinaguaStation> entry : entries) {
+	    if (entry.getValue().getId().equals(stationCode)) {
+		return entry.getValue();
+	    }
+	}
+	return ret;
+    }
+    
     public Set<DinaguaStation> getStatusStations() throws Exception {
 	retrieveStatusStations();
 	Set<Entry<String, DinaguaStation>> entries = statusStations.entrySet();
@@ -175,12 +191,18 @@ public abstract class DinaguaClient {
      */
     public abstract DinaguaData getData(String stationId, String seriesCode, Date begin, Date end, InterpolationType interpolation) throws Exception;
 
+    public abstract DinaguaData getStatusData(String stationId, String temporalidad, Date start, Date end) throws Exception;
+    
     /**
      * @throws Exception
      */
     protected abstract void retrieveStations() throws Exception;
     
     protected abstract void retrieveStatusStations() throws Exception;
+
+    
+
+    
 
 
 }
