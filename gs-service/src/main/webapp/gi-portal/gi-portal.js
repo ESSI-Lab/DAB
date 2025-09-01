@@ -3,6 +3,22 @@ import { GIAPI } from '../giapi/core/GIAPI.js';
 var view = '';
 var token = '';
 
+
+var getUrlParameter = function getUrlParameter(sParam) {
+		var sPageURL = window.location.search.substring(1),
+			sURLVariables = sPageURL.split('&'),
+			sParameterName,
+			i;
+
+		for (i = 0; i < sURLVariables.length; i++) {
+			sParameterName = sURLVariables[i].split('=');
+
+			if (sParameterName[0] === sParam) {
+				return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+			}
+		}
+	};
+
 // i18n support
 var i18n = { current: 'en', en: {}, it: {} };
 function loadI18nSync(lang) {
@@ -325,7 +341,7 @@ function initializeLogin(config) {
 
 				// Fetch status from API
 				const authToken = localStorage.getItem('authToken');
-				fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/downloads`, {
+				fetch(`../services/essi/token/${authToken}/view/${view}/om-api/downloads`, {
 					headers: {
 						'Accept': 'application/json'
 					}
@@ -508,7 +524,7 @@ function initializeLogin(config) {
 										.on('click', function() {
 											if (confirm('Are you sure you want to cancel this download?')) {
 												const authToken = localStorage.getItem('authToken');
-												fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/downloads?id=${item.id}`, {
+												fetch(`../services/essi/token/${authToken}/view/${view}/om-api/downloads?id=${item.id}`, {
 													method: 'DELETE',
 													headers: {
 														'Accept': 'application/json'
@@ -547,7 +563,7 @@ function initializeLogin(config) {
 										.on('click', function() {
 											if (confirm('Are you sure you want to remove this completed download?')) {
 												const authToken = localStorage.getItem('authToken');
-												fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/downloads?id=${item.id}`, {
+												fetch(`../services/essi/token/${authToken}/view/${view}/om-api/downloads?id=${item.id}`, {
 													method: 'DELETE',
 													headers: {
 														'Accept': 'application/json'
@@ -927,8 +943,14 @@ function initializeLogin(config) {
 export function initializePortal(config) {
 	window.config = config;
 	view = config.view;
+	var viewParam = getUrlParameter('view');
+	if (viewParam!==undefined && viewParam!==null&&viewParam!=="") {
+		view = viewParam;
+	}
 	token = config.token;
 	document.title = config.title;
+
+	
 
 	// Initialize i18n (defaults to 'en', overridden by localStorage or config.language)
 	try { loadI18nSync(); } catch (e) { }
@@ -944,20 +966,7 @@ export function initializePortal(config) {
 	$.extend(true, $.hik.jtable.prototype.options, {
 		jqueryuiTheme: true
 	});
-	var getUrlParameter = function getUrlParameter(sParam) {
-		var sPageURL = window.location.search.substring(1),
-			sURLVariables = sPageURL.split('&'),
-			sParameterName,
-			i;
-
-		for (i = 0; i < sURLVariables.length; i++) {
-			sParameterName = sURLVariables[i].split('=');
-
-			if (sParameterName[0] === sParam) {
-				return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-			}
-		}
-	};
+	
 
 	GIAPI.logger.enabled = true;
 
@@ -1404,7 +1413,7 @@ export function initializePortal(config) {
 			const authToken = localStorage.getItem('authToken') || undefined;
 			
 			if (authToken !== undefined) {
-				fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=timeInterpolation&limit=50`)
+				fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=timeInterpolation&limit=50`)
 					.then(response => response.json())
 					.then(data => {
 						if (data.timeInterpolation && data.timeInterpolation.length > 0) {
@@ -1444,7 +1453,7 @@ export function initializePortal(config) {
 
 					// After constraints are initialized, try to fetch and update values
 					const authToken = localStorage.getItem('authToken') || 'my-token';
-					fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
+					fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
 						.then(response => response.json())
 						.then(data => {
 							if (data.intendedObservationSpacing && data.intendedObservationSpacing.length > 0) {
@@ -1484,7 +1493,7 @@ export function initializePortal(config) {
 
 					// After constraints are initialized, try to fetch and update values
 					const authToken = localStorage.getItem('authToken') || 'my-token';
-					fetch(`../services/essi/token/${authToken}/view/${config.view}/om-api/properties?property=aggregationDuration&limit=50`)
+					fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=aggregationDuration&limit=50`)
 						.then(response => response.json())
 						.then(data => {
 							if (data.aggregationDuration && data.aggregationDuration.length > 0) {
@@ -1898,7 +1907,7 @@ export function initializePortal(config) {
 											}
 
 											// Construct the final URL using the view from config
-											var downloadUrl = `${baseUrl}/token/${token}/view/${config.view}/om-api/downloads?${params.toString()}`;
+											var downloadUrl = `${baseUrl}/token/${token}/view/${view}/om-api/downloads?${params.toString()}`;
 
 											// Make the GET request
 											fetch(downloadUrl, { method: 'PUT', body: '' })

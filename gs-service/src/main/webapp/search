@@ -2,10 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=gi-portal/search.html">
   <title>Redirecting...</title>
+  <script>
+    window.onload = function () {
+      // Get the query string (?foo=123&bar=xyz)
+      const params = window.location.search;
+
+      // Define the target base URL
+      const target = "gi-portal/search.html";
+
+      // Redirect to target + original parameters
+      window.location.href = target + params;
+    };
+  </script>
 </head>
 <body>
-  <p>You are being redirected... If not, <a href="gi-portal/search.html">click here</a>.</p>
+  <p>Redirecting... If it doesn’t work, <a id="link" href="#">click here</a>.</p>
+  <script>
+    // Update the fallback link as well
+    document.getElementById("link").href = "gi-portal/search.html" + window.location.search;
+  </script>
 </body>
 </html>
