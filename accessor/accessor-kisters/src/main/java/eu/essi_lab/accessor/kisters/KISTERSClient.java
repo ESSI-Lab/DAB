@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.kisters;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -24,6 +26,7 @@ package eu.essi_lab.accessor.kisters;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -117,7 +120,14 @@ public class KISTERSClient {
 		+ "&from=" + from + "&to=" + to;
 
 	Downloader downloader = new Downloader();
-	String response = downloader.downloadOptionalString(query).get();
+	Optional<String> optString = downloader.downloadOptionalString(query);
+	
+	if(optString.isEmpty()) {
+	    
+	    return new ArrayList<>();
+	}
+	
+	String response = optString.get();
 
 	JSONArray responseArray = new JSONArray(response);
 
@@ -211,7 +221,14 @@ public class KISTERSClient {
 	query = getEndpoint() + query;
 
 	Downloader downloader = new Downloader();
-	String response = downloader.downloadOptionalString(query).get();
+	Optional<String> optString = downloader.downloadOptionalString(query);
+	
+	if(optString.isEmpty()) {
+	    
+	    return new ArrayList<>();
+	}
+		
+	String response = optString.get();
 
 	JSONArray responseArray = new JSONArray(response);
 
