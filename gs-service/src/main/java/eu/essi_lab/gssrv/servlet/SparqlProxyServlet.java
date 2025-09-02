@@ -1,5 +1,7 @@
 package eu.essi_lab.gssrv.servlet;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,7 +48,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.utils.zip.GZIPUnzipper;
 
 @SuppressWarnings("serial")
 public class SparqlProxyServlet extends HttpServlet {
@@ -185,7 +190,24 @@ public class SparqlProxyServlet extends HttpServlet {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Handling connection stream STARTED");
 
-	try (InputStream input = (status < 400 ? conn.getInputStream() : conn.getErrorStream());
+	ClonableInputStream connStream = new ClonableInputStream(conn.getInputStream());
+
+	try {
+	    GZIPUnzipper unzipper = new GZIPUnzipper(connStream.clone());
+	    File unzip = unzipper.unzip();
+	    FileInputStream unzippedStream = new FileInputStream(unzip);
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Unzipped response stream:\n {}\n", IOStreamUtils.asUTF8String(unzippedStream));
+
+	    unzippedStream.close();
+	    unzip.delete();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+	}
+
+	try (InputStream input = (status < 400 ? connStream.clone() : conn.getErrorStream());
 		OutputStream out = response.getOutputStream()) {
 
 	    if (input != null) {
@@ -202,7 +224,7 @@ public class SparqlProxyServlet extends HttpServlet {
 	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Handling connection stream ENDED");
-	
+
 	GSLoggerFactory.getLogger(getClass()).debug("Forwarding ENDED");
     }
 
