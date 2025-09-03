@@ -58,6 +58,7 @@ import eu.essi_lab.model.resource.InterpolationType;
 
 /**
  * @author Fabrizio
+ * @author boldrini
  */
 public class JSONDinaguaClient extends DinaguaClient {
 
@@ -201,6 +202,7 @@ public class JSONDinaguaClient extends DinaguaClient {
 	    String res = IOUtils.toString(response.get().body(), StandardCharsets.UTF_8);
 	    if (res.contains("No se encontraron datos para la serie temporal proporcionada")) {
 		// nothing returned
+		GSLoggerFactory.getLogger(getClass()).info(res);
 	    } else {
 		try {
 		    JSONArray arr = new JSONArray(res);
@@ -411,8 +413,8 @@ public class JSONDinaguaClient extends DinaguaClient {
 		// "zona_horaria": "GMT-3"
 
 		DinaguaStation station = new DinaguaStation(jsonStation);
-		station.setVariableString("1,2,3");
-		station.setVariableAbbreviationString("1,2,3");
+		station.setVariableString("monthly,quarterly,yearly");
+		station.setVariableAbbreviationString("1,3,12");
 		statusStations.put(station.getId(), station);
 	    }
 	}
