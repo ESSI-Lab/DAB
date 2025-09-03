@@ -93,7 +93,9 @@ public class SparqlProxyServlet extends HttpServlet {
 	    GSLoggerFactory.getLogger(getClass()).debug("GET Request handling STARTED");
 
 	    String queryString = request.getQueryString();
+
 	    if (queryString != null) {
+
 		urlWithParams += "?" + queryString;
 	    }
 
@@ -128,6 +130,11 @@ public class SparqlProxyServlet extends HttpServlet {
 
 		String headerValue = request.getHeader(headerName);
 
+		if (ConfigurationWrapper.forceSparqlProxyAcceptHeader() && headerName.toLowerCase().equals("accept")) {
+
+		    headerValue = "application/sparql-results+json; charset=utf-8";
+		}
+
 		GSLoggerFactory.getLogger(getClass()).debug("Current header: {}:{}", headerName, headerValue);
 
 		conn.setRequestProperty(headerName, headerValue);
@@ -144,6 +151,7 @@ public class SparqlProxyServlet extends HttpServlet {
 	    GSLoggerFactory.getLogger(getClass()).debug("Handling POST STARTED");
 
 	    conn.setRequestProperty("Content-Type", request.getContentType());
+
 	    try (OutputStream os = conn.getOutputStream(); InputStream is = request.getInputStream()) {
 		is.transferTo(os);
 	    }
@@ -174,6 +182,7 @@ public class SparqlProxyServlet extends HttpServlet {
 	headerFields.keySet().stream().filter(Objects::nonNull).forEach(headerName -> {
 
 	    String headerValue = headerFields.get(headerName).stream().collect(Collectors.joining(","));
+
 	    if (headerValue != null && !headerValue.isEmpty()) {
 
 		GSLoggerFactory.getLogger(getClass()).debug("Current header: {}:{}", headerName, headerValue);

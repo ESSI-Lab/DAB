@@ -65,10 +65,11 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
 	ENABLE_FILTERED_TRAILING_WILDCARD_QUERIES("enableFilteredTrailingWildcardQueries"),
 
 	/**
-	 * SPARQL proxy endpoint
+	 * SPARQL proxy endpoint and forced accept header
 	 */
 	SPARQL_PROXY_ENDPOINT("sparqlProxyEndpoint"), //
-	
+	FORCE_SPARQL_PROXY_ACCEPT_HEADER("forceSparqlProxyAcceptHeader"), //
+
 	/**
 	 * ADMIN users
 	 */
