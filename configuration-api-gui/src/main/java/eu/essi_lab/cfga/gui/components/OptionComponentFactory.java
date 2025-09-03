@@ -54,6 +54,7 @@ import eu.essi_lab.cfga.gui.components.option.OptionTextField;
 import eu.essi_lab.cfga.gui.components.option.listener.OptionToggleButtonListener;
 import eu.essi_lab.cfga.gui.components.option.listener.OptionValueChangeListener;
 import eu.essi_lab.cfga.gui.components.option.listener.OptionValuesLoaderListener;
+import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.ISODateTime;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.Setting;
@@ -67,6 +68,11 @@ public class OptionComponentFactory {
      * 
      */
     private static int NUMERIC_FIELD_WIDTH = 200;
+    
+    /**
+     * 
+     */
+    private static int BOOLEAN_FIELD_WIDTH = 100;
 
     /**
      * @param option
@@ -356,9 +362,18 @@ public class OptionComponentFactory {
 	// GSLoggerFactory.getLogger(ComponentFactory.class).debug("Initialing select for option: " + option.getKey());
 
 	Select<String> select = new Select<>();
-	if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)) {
+
+	if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)
+		&& !option.getValueClass().equals(BooleanChoice.class)) {
+
 	    select.setWidthFull();
+
+	} else if (option.getValueClass().equals(BooleanChoice.class)) {
+
+	    select.setWidth(BOOLEAN_FIELD_WIDTH, Unit.PIXELS);
+
 	} else {
+
 	    select.setWidth(NUMERIC_FIELD_WIDTH, Unit.PIXELS);
 	}
 
