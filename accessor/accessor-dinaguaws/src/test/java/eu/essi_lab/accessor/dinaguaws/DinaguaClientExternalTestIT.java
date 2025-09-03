@@ -2,6 +2,7 @@ package eu.essi_lab.accessor.dinaguaws;
 
 import static org.junit.Assert.assertTrue;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -112,6 +113,9 @@ public class DinaguaClientExternalTestIT {
 	String id = station.getId();
 	Assert.assertEquals("1590", id);
     }
+    
+    public static SimpleDateFormat YEAR_MONTH_SDF = new SimpleDateFormat("yyyy-MM");
+
 
     @Test
     public void getStatusStationsTest() throws Exception {
@@ -132,24 +136,26 @@ public class DinaguaClientExternalTestIT {
 		selected = station;
 	    }
 	}
-	
+
 	System.out.println(selected.toString());
 
 	List<Variable> variables = selected.getVariables();
 	for (Variable variable : variables) {
-	    System.out.println(variable.getLabel()+" "+variable.getAbbreviation());
+	    System.out.println(variable.getLabel() + " " + variable.getAbbreviation());
 	}
-	
+
 	Date start = selected.getBeginDate();
 	Date end = selected.getEndDate();
-//	 start = ISO8601DateTimeUtils.parseISO8601ToDate("2024-01").get();
-	// end= ISO8601DateTimeUtils.parseISO8601ToDate("2024-02").get();
+	System.out.println("start: " + start);
+	System.out.println("end: " + end);
+	start = ISO8601DateTimeUtils.parseISO8601ToDate("1969-01").get();
+	end = ISO8601DateTimeUtils.parseISO8601ToDate("2026-08").get();
 	DinaguaData data = client.getStatusData(stationId, "1", start, end);
 	TreeSet<DinaguaValue> treeData = data.getSet();
 	Iterator<DinaguaValue> it = treeData.iterator();
 	while (it.hasNext()) {
 	    DinaguaValue d = it.next();
-	    System.out.println(d.getDate() + ": " + d.getValue());
+	    System.out.println(YEAR_MONTH_SDF.format(d.getDate()) + ": " + d.getValue());
 
 	}
 
