@@ -119,6 +119,7 @@ public class ConfigurationWrapper {
      * 
      */
     private static String sparqlProxyEndpoint;
+    private static boolean forceSparqlProxyAcceptHeader;
 
     /**
      * 
@@ -883,6 +884,26 @@ public class ConfigurationWrapper {
 	}
 
 	return sparqlProxyEndpoint;
+    }
+
+    /**
+     * @return
+     */
+    public static boolean forceSparqlProxyAcceptHeader() {
+
+	Optional<Properties> kvo = getSystemSettings().getKeyValueOptions();
+
+	if (kvo.isPresent()) {
+
+	    String prop = kvo.get().getProperty(KeyValueOptionKeys.FORCE_SPARQL_PROXY_ACCEPT_HEADER.getLabel());
+
+	    if (prop != null) {
+
+		forceSparqlProxyAcceptHeader = Boolean.valueOf(prop);
+	    }
+	}
+
+	return forceSparqlProxyAcceptHeader;
     }
 
     public static List<String> getAdminUsers() {
