@@ -18,7 +18,7 @@ $.jStorage
                                 inverse : 'SELECT DISTINCT * WHERE {?object ?property <{URI}>} LIMIT 100',
                                 inverseSameAs : 'SELECT DISTINCT * WHERE {?object <http://www.w3.org/2002/07/owl#sameAs> <{URI}>}'
                             },
-                        endpoint : '../sparql-proxy',
+                        endpoint : 'https://ontology-portal.apps.dxap-svil.ocp.mase.priv/gemet/query',
 
                         }
                
@@ -54,7 +54,7 @@ $.jStorage
                             inverseSameAs : 'SELECT DISTINCT * WHERE {?object ?t <{URI}> } '
                         },
 
-                        endpoint : '../sparql-proxy',
+                        endpoint : 'https://ontology-portal.apps.dxap-svil.ocp.mase.priv/gemet/query',
 
                         document : {
                             className : 'standard',
