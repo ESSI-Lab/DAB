@@ -306,7 +306,7 @@ $.jStorage
                                 inverse : 'SELECT DISTINCT * WHERE {?object ?property <{URI}>} LIMIT		 100',
                                 inverseSameAs : 'SELECT DISTINCT * WHERE {?object <http://www.w3.org/2004/02/skos/core#subject> <{URI}>}'
                             },
-                            endpoint : 'http://data.cnr.it/sparql-proxy/',
+                            endpoint : 'http://data.cnr.it/fuseki/',
                             examples : [ {
                                 uri : 'http://www.cnr.it/ontology/cnr/individuo/unitaDiPersonaleInterno/MATRICOLA7247',
                                 label : 'Agata Gambacorta'
