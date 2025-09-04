@@ -135,7 +135,7 @@ public class SparqlProxyServlet extends HttpServlet {
 		    headerValue = "application/sparql-results+json; charset=utf-8";
 		}
 
-		GSLoggerFactory.getLogger(getClass()).debug("Current header: {}:{}", headerName, headerValue);
+		GSLoggerFactory.getLogger(getClass()).debug("Request header: {}:{}", headerName, headerValue);
 
 		conn.setRequestProperty(headerName, headerValue);
 	    }
@@ -185,7 +185,12 @@ public class SparqlProxyServlet extends HttpServlet {
 
 	    if (headerValue != null && !headerValue.isEmpty()) {
 
-		GSLoggerFactory.getLogger(getClass()).debug("Current header: {}:{}", headerName, headerValue);
+		if (ConfigurationWrapper.forceSparqlProxyAcceptHeader() && headerName.toLowerCase().equals("content-type")) {
+
+		    headerValue = "application/sparql-results+json; charset=utf-8";
+		}
+
+		GSLoggerFactory.getLogger(getClass()).debug("Response header: {}:{}", headerName, headerValue);
 
 		response.setHeader(headerName, headerValue);
 	    }
