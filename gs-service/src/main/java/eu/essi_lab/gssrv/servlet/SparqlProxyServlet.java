@@ -196,6 +196,9 @@ public class SparqlProxyServlet extends HttpServlet {
 	    }
 	});
 
+	response.setHeader("Content-Length", null);
+
+
 	GSLoggerFactory.getLogger(getClass()).debug("Copy headers to response ENDED");
 
 	//
@@ -227,6 +230,8 @@ public class SparqlProxyServlet extends HttpServlet {
 	    if (input != null) {
 		input.transferTo(out);
 	    }
+
+	    out.flush();
 
 	} finally {
 
