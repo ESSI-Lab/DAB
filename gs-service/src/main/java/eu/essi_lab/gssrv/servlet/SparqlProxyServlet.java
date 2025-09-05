@@ -202,7 +202,7 @@ public class SparqlProxyServlet extends HttpServlet {
 		switch (headerName.toLowerCase()) {
 		// add here headers to be copied
 		case "content-type":
-		case "content-length":
+		    // case "content-length": // this shouldn't be added!
 		case "content-encoding":
 		    // case "transfer-encoding": //this is automatically added, shouldn't be added explicitly
 		case "date":
@@ -228,6 +228,8 @@ public class SparqlProxyServlet extends HttpServlet {
 
 	    }
 	}
+	
+	response.setHeader("Content-Length", null); // needed
 
 	GSLoggerFactory.getLogger(getClass()).debug("Copy headers to response ENDED");
 
