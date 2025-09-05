@@ -1,37 +1,10 @@
 package eu.essi_lab.authentication;
 
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import static eu.essi_lab.authentication.OAuth2Authenticator.ERR_WITH_TWITTER_MSG;
-import static eu.essi_lab.authentication.OAuth2Authenticator.INVALID_OAUTH_PARAM_VALUE_ERR_ID;
-import static eu.essi_lab.authentication.OAuth2Authenticator.MISSING_OATH_CONF_FILE_ERR_ID;
-import static eu.essi_lab.authentication.OAuth2Authenticator.NULL_HTTP_REQUEST_PROVIDED_ERR_ID;
-import static eu.essi_lab.authentication.OAuth2Authenticator.NULL_HTTP_RESPONSE_PROVIDED_ERR_ID;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -60,8 +33,8 @@ import org.slf4j.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.essi_lab.authentication.model.Token;
-import eu.essi_lab.authentication.util.RFC3986Encoder;
+import eu.essi_lab.authentication.token.Token;
+import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -69,11 +42,10 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class TwitterOAuthAuthenticator extends OAuthAuthenticator {
+public class TwitterOAuthAuthenticator extends OAuth2Authenticator {
 
     public static final String TWITTER = "twitter";
     private static final String HMAC_SHA1 = "HMAC-SHA1";
-    private static final String UTF8 = "UTF-8";
     private String clientId;
     private String clientSecret;
     private URI redirectUri;
@@ -92,28 +64,12 @@ public class TwitterOAuthAuthenticator extends OAuthAuthenticator {
     private static final String OAUTH_TOKEN_MISMATCH_VERIFIER_ERR_ID = "OAUTH_TOKEN_MISMATCH_VERIFIER_ERR_ID";
 
     @Override
-    public void initialize(JsonNode conf) throws GSException {
+    public void configure(OAuthSetting setting) {
 
-	if (conf == null)
-	    throw GSException.createException(this.getClass(), "Missing configuraiton file", null, null, ErrorInfo.ERRORTYPE_INTERNAL,
-		    ErrorInfo.SEVERITY_ERROR, MISSING_OATH_CONF_FILE_ERR_ID);
-
-	try {
-
-	    redirectUri = new URI(OAuthAuthenticator.getConfigurationValue("redirect-uri", conf));
-
-	} catch (URISyntaxException e) {
-
-	    log.error("Invalid redirect URI found {}", OAuthAuthenticator.getConfigurationValue("redirect-uri", conf));
-
-	    throw GSException.createException(this.getClass(), "Invalid redirect URI found", null, null, ErrorInfo.ERRORTYPE_INTERNAL,
-		    ErrorInfo.SEVERITY_ERROR, INVALID_OAUTH_PARAM_VALUE_ERR_ID, e);
-	}
-
-	requestTokenUrl = OAuthAuthenticator.getConfigurationValue("request-token-url", conf);
-	loginUrl = OAuthAuthenticator.getConfigurationValue("login-url", conf);
-	tokenUrl = OAuthAuthenticator.getConfigurationValue("token-url", conf);
-	userInfoUrl = OAuthAuthenticator.getConfigurationValue("userinfo-url", conf);
+	// requestTokenUrl = OAuthAuthenticator.getConfigurationValue("request-token-url", conf);
+	this.loginUrl = setting.getSelectedProviderSetting().getLoginURL().get();
+	this.tokenUrl = setting.getSelectedProviderSetting().getTokenURL().get();
+	this.userInfoUrl = setting.getSelectedProviderSetting().getUserInfoURL().get();
     }
 
     @Override
@@ -158,7 +114,7 @@ public class TwitterOAuthAuthenticator extends OAuthAuthenticator {
 
 	String base64Clienturl = "";
 	try {
-	    base64Clienturl = RFC3986Encoder.encode(clienturl, "UTF-8");
+	    base64Clienturl = URLEncoder.encode(clienturl, "UTF-8");
 	} catch (UnsupportedEncodingException e) {
 	    log.warn("Can't RFC3986 encode {}", clienturl, e);
 	}
@@ -246,17 +202,9 @@ public class TwitterOAuthAuthenticator extends OAuthAuthenticator {
 
 	for (String[] header : headers) {
 
-	    try {
+	    authorizationHeader.append(URLEncoder.encode(header[0], StandardCharsets.UTF_8)).append("=\"")
+		    .append(URLEncoder.encode(header[1], StandardCharsets.UTF_8)).append("\",");
 
-		authorizationHeader.append(RFC3986Encoder.encode(header[0], UTF8)).append("=\"")
-			.append(RFC3986Encoder.encode(header[1], UTF8)).append("\",");
-
-	    } catch (UnsupportedEncodingException e) {
-
-		throw GSException.createException(this.getClass(), "Error in executing RFC3986 Encoding", null, null,
-			ErrorInfo.ERRORTYPE_INTERNAL, ErrorInfo.SEVERITY_ERROR, ENCODING_EXCEPTION_ERR_ID);
-
-	    }
 	}
 
 	authorizationHeader.setLength(authorizationHeader.length() - 1);
@@ -384,11 +332,13 @@ public class TwitterOAuthAuthenticator extends OAuthAuthenticator {
 	    String[][] tosort_params = new String[oauth_params.size() + additional_params.size()][2];
 	    int count = 0;
 	    for (String[] p : oauth_params) {
-		tosort_params[count] = new String[] { RFC3986Encoder.encode(p[0], UTF8), RFC3986Encoder.encode(p[1], UTF8) };
+		tosort_params[count] = new String[] { URLEncoder.encode(p[0], StandardCharsets.UTF_8),
+			URLEncoder.encode(p[1], StandardCharsets.UTF_8) };
 		count++;
 	    }
 	    for (String[] p : additional_params) {
-		tosort_params[count] = new String[] { RFC3986Encoder.encode(p[0], UTF8), RFC3986Encoder.encode(p[1], UTF8) };
+		tosort_params[count] = new String[] { URLEncoder.encode(p[0], StandardCharsets.UTF_8),
+			URLEncoder.encode(p[1], StandardCharsets.UTF_8) };
 		count++;
 	    }
 	    List<String[]> sortedList = Arrays.asList(tosort_params);
@@ -410,15 +360,15 @@ public class TwitterOAuthAuthenticator extends OAuthAuthenticator {
 	    }
 	    String signBaseString = upperCaseMethod;
 	    signBaseString += "&";
-	    signBaseString += RFC3986Encoder.encode(nonEncodedBaseURL, UTF8);
+	    signBaseString += URLEncoder.encode(nonEncodedBaseURL, StandardCharsets.UTF_8);
 	    signBaseString += "&";
-	    signBaseString += RFC3986Encoder.encode(paramsSign, UTF8);
-	    String signingKey = RFC3986Encoder.encode(clientSecret, UTF8) + "&";
+	    signBaseString += URLEncoder.encode(paramsSign, StandardCharsets.UTF_8);
+	    String signingKey = URLEncoder.encode(clientSecret, StandardCharsets.UTF_8) + "&";
 	    if (accessTokenSecret != null)
-		signingKey += RFC3986Encoder.encode(accessTokenSecret, UTF8);
+		signingKey += URLEncoder.encode(accessTokenSecret, StandardCharsets.UTF_8);
 	    return calculateRFC2104HMAC(signBaseString, signingKey);
 
-	} catch (UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException e) {
+	} catch (InvalidKeyException | NoSuchAlgorithmException e) {
 
 	    log.error("Can't create signture");
 
@@ -426,6 +376,12 @@ public class TwitterOAuthAuthenticator extends OAuthAuthenticator {
 		    ErrorInfo.SEVERITY_ERROR, SIGNATURE_EXCEPTION_ERR_ID, e);
 
 	}
+    }
+
+    @Override
+    protected String getProvider() {
+
+	return "Twitter";
     }
 
     private static String calculateRFC2104HMAC(String data, String key) throws InvalidKeyException, NoSuchAlgorithmException {

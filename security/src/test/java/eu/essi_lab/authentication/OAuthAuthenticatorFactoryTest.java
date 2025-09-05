@@ -23,7 +23,7 @@ public class OAuthAuthenticatorFactoryTest {
 	setting.setClientId("clientId");
 	setting.setClientSecret("clientSecret");
 
-	OAuthAuthenticator oAuthAuthenticator = OAuthAuthenticatorFactory.getOAuthAuthenticator(setting);
+	OAuth2Authenticator oAuthAuthenticator = OAuth2AuthenticatorFactory.get(setting);
 
 	String clientId = oAuthAuthenticator.getClientId();
 	String clientSecret = oAuthAuthenticator.getClientSecret();
@@ -35,7 +35,7 @@ public class OAuthAuthenticatorFactoryTest {
     }
 
     @Test
-    public void twitterBookTest() throws GSException {
+    public void twitterTest() throws GSException {
 
 	OAuthSetting setting = new OAuthSetting();
 	setting.selectProvider(OAuthProvider.TWITTER);
@@ -43,7 +43,7 @@ public class OAuthAuthenticatorFactoryTest {
 	setting.setClientId("clientId");
 	setting.setClientSecret("clientSecret");
 
-	OAuthAuthenticator oAuthAuthenticator = OAuthAuthenticatorFactory.getOAuthAuthenticator(setting);
+	OAuth2Authenticator oAuthAuthenticator = OAuth2AuthenticatorFactory.get(setting);
 
 	String clientId = oAuthAuthenticator.getClientId();
 	String clientSecret = oAuthAuthenticator.getClientSecret();
@@ -55,7 +55,7 @@ public class OAuthAuthenticatorFactoryTest {
     }
 
     @Test
-    public void googleBookTest() throws GSException {
+    public void googleTest() throws GSException {
 
 	OAuthSetting setting = new OAuthSetting();
 	setting.selectProvider(OAuthProvider.GOOGLE);
@@ -63,7 +63,7 @@ public class OAuthAuthenticatorFactoryTest {
 	setting.setClientId("clientId");
 	setting.setClientSecret("clientSecret");
 
-	OAuthAuthenticator oAuthAuthenticator = OAuthAuthenticatorFactory.getOAuthAuthenticator(setting);
+	OAuth2Authenticator oAuthAuthenticator = OAuth2AuthenticatorFactory.get(setting);
 
 	String clientId = oAuthAuthenticator.getClientId();
 	String clientSecret = oAuthAuthenticator.getClientSecret();

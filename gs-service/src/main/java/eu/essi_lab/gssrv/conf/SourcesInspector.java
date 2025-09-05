@@ -29,7 +29,6 @@ import java.util.HashMap;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
@@ -189,22 +188,24 @@ public class SourcesInspector extends ComponentInfo {
 
 	Database db = getDatabase();
 
+	List<DatabaseFolder> dataFolders = getDataFolders(db);
+
 	ConfigurationWrapper.getHarvestedAndMixedSources().//
 		parallelStream().//
 		// filter(sourceFilter).//
 		forEach(s -> {//
 
-		    sdList.addAll(getDataFolders(db).//
+		    sdList.addAll(dataFolders.stream().//
 			    filter(f -> DatabaseFolder.computeSourceId(db, f).equals(s.getUniqueIdentifier())).//
 			    map(f -> new GridData(f, s)).//
 			    collect(Collectors.toList()));
 		});
 
-	double total = sdList.parallelStream().mapToInt(sd -> sd.getSize().intValue()).sum();
+	double total = sdList.stream().mapToInt(sd -> sd.getSize().intValue()).sum();
 
 	grid.getColumnByKey(SIZE_COLUMN).setFooter(StringUtils.format(total));
 
-	List<GridData> sortedList = sdList.parallelStream().//
+	List<GridData> sortedList = sdList.stream().//
 		sorted((sd1, sd2) -> sd2.getSize().compareTo(sd1.getSize())).//
 		peek(sd -> sd.setTotal(total)).//
 		collect(Collectors.toList());
@@ -247,10 +248,10 @@ public class SourcesInspector extends ComponentInfo {
      * @param db
      * @return
      */
-    private Stream<DatabaseFolder> getDataFolders(Database db) {
+    private List<DatabaseFolder> getDataFolders(Database db) {
 
 	try {
-	    return db.getDataFolders().stream();
+	    return db.getDataFolders();
 
 	} catch (GSException e) {
 	    GSLoggerFactory.getLogger(SourcesInspector.class).error(e);

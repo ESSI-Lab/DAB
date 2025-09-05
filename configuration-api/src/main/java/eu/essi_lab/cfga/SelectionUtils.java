@@ -140,7 +140,10 @@ public class SelectionUtils {
 
 	findSelectedSettings(targetSetting, selectedSettingsIds);
 
-	setSelectedSettings(resetSetting, selectedSettingsIds);
+	if (!selectedSettingsIds.isEmpty()) {
+
+	    setSelectedSettings(resetSetting, selectedSettingsIds);
+	}
 
 	//
 	// Step 4: option values
@@ -180,31 +183,33 @@ public class SelectionUtils {
 
 	resetSetting.setEnabled(targetSetting.isEnabled());
 
-//	resetSetting.setCanBeDisabled(targetSetting.canBeDisabled());
-//
-//	resetSetting.setVisible(targetSetting.isVisible());
-//
-//	resetSetting.setEditable(targetSetting.isEditable());
-//
-//	targetSetting.getDescription().ifPresent(desc -> resetSetting.setDescription(desc));
+	// resetSetting.setCanBeDisabled(targetSetting.canBeDisabled());
+	//
+	// resetSetting.setVisible(targetSetting.isVisible());
+	//
+	// resetSetting.setEditable(targetSetting.isEditable());
+	//
+	// targetSetting.getDescription().ifPresent(desc -> resetSetting.setDescription(desc));
 
 	//
 	// AbstractSetting properties
 	//
 
-//	resetSetting.enableCompactMode(targetSetting.isCompactModeEnabled());
-//
-//	resetSetting.enableFoldedMode(targetSetting.isFoldedModeEnabled());
-//
-//	resetSetting.setCanBeRemoved(targetSetting.canBeRemoved());
-//
-//	resetSetting.setCanBeCleaned(targetSetting.canBeCleaned());
-//
-//	resetSetting.setShowHeader(targetSetting.isShowHeaderSet());
-//
-//	targetSetting.getOptionalExtensionClass().ifPresent(clazz -> resetSetting.getObject().put("extensionClass", clazz.getName()));
-//
-//	targetSetting.getOptionalValidatorClass().ifPresent(clazz -> resetSetting.getObject().put("validatorClass", clazz.getName()));
+	// resetSetting.enableCompactMode(targetSetting.isCompactModeEnabled());
+	//
+	// resetSetting.enableFoldedMode(targetSetting.isFoldedModeEnabled());
+	//
+	// resetSetting.setCanBeRemoved(targetSetting.canBeRemoved());
+	//
+	// resetSetting.setCanBeCleaned(targetSetting.canBeCleaned());
+	//
+	// resetSetting.setShowHeader(targetSetting.isShowHeaderSet());
+	//
+	// targetSetting.getOptionalExtensionClass().ifPresent(clazz -> resetSetting.getObject().put("extensionClass",
+	// clazz.getName()));
+	//
+	// targetSetting.getOptionalValidatorClass().ifPresent(clazz -> resetSetting.getObject().put("validatorClass",
+	// clazz.getName()));
 
 	//
 	// Setting properties
@@ -212,16 +217,16 @@ public class SelectionUtils {
 
 	resetSetting.setIdentifier(targetSetting.getIdentifier());
 
-//	resetSetting.setName(targetSetting.getName());
-//
-//	targetSetting.getOptionalAfterCleanFunctionClass()
-//		.ifPresent(clazz -> resetSetting.getObject().put("afterCleanFunction", clazz.getName()));
+	// resetSetting.setName(targetSetting.getName());
+	//
+	// targetSetting.getOptionalAfterCleanFunctionClass()
+	// .ifPresent(clazz -> resetSetting.getObject().put("afterCleanFunction", clazz.getName()));
 
-//	try {
-//	    resetSetting.setConfigurableType(targetSetting.getConfigurableType());
-//	} catch (RuntimeException ex) {
-//	}
-	
+	// try {
+	// resetSetting.setConfigurableType(targetSetting.getConfigurableType());
+	// } catch (RuntimeException ex) {
+	// }
+
 	//
 	// this option becomes UNSET after a clean, so since target setting is clean and its original mode is SINGLE or
 	// MULTI, we would set to the reset setting a wrong value UNSET instead of SINGLE or MULTI.
@@ -385,7 +390,7 @@ public class SelectionUtils {
 		if (outOption.getSelectionMode() == SelectionMode.UNSET) {
 
 		    outOption.setObjectValues(list);
-		    
+
 		} else {
 
 		    outOption.select(v -> list.contains(v));

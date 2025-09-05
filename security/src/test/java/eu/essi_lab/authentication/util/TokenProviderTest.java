@@ -8,7 +8,8 @@ import org.junit.rules.ExpectedException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import eu.essi_lab.authentication.model.Token;
+import eu.essi_lab.authentication.token.Token;
+import eu.essi_lab.authentication.token.TokenProvider;
 import eu.essi_lab.model.exceptions.GSException;
 
 public class TokenProviderTest {
