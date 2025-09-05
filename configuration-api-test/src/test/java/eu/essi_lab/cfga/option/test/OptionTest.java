@@ -299,7 +299,7 @@ public class OptionTest {
 
 	Assert.assertFalse(option.isTextAreaEnabled());
 
-	Assert.assertTrue(option.isMultiValue());
+	Assert.assertFalse(option.isMultiValue());
     }
 
     /**

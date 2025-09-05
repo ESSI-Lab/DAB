@@ -22,6 +22,8 @@ package eu.essi_lab.authentication;
  */
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,8 +36,7 @@ import org.slf4j.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.essi_lab.authentication.model.Token;
-import eu.essi_lab.authentication.util.RFC3986Encoder;
+import eu.essi_lab.authentication.token.Token;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -71,11 +72,11 @@ public class FacebookOAuth2Authenticator extends OAuth2Authenticator {
 
 	try {
 
-	    String stateJson = "{\"" + OAuthAuthenticator.CLIENT_URL_JSON_KEY + "\":\"" + clienturl + "\"}";
+	    String stateJson = "{\"" + CLIENT_URL_JSON_KEY + "\":\"" + clienturl + "\"}";
 
-	    String state = RFC3986Encoder.encode(stateJson, "UTF-8");
+	    String state = URLEncoder.encode(stateJson, StandardCharsets.UTF_8);
 
-	    httpResponse.sendRedirect(String.format(loginUrl, getClientId(), redirectUri.toString(), state));
+	    httpResponse.sendRedirect(String.format(getLoginUrl(), getClientId(), getRedirectUri().toString(), state));
 
 	} catch (IOException e) {
 
@@ -114,7 +115,7 @@ public class FacebookOAuth2Authenticator extends OAuth2Authenticator {
 	    try {
 		JsonNode jsonNode = new ObjectMapper().readValue(stateJson, JsonNode.class);
 
-		clienturl = jsonNode.get(OAuthAuthenticator.CLIENT_URL_JSON_KEY).asText();
+		clienturl = jsonNode.get(CLIENT_URL_JSON_KEY).asText();
 
 		log.debug("Found client url {}", clienturl);
 
@@ -127,11 +128,11 @@ public class FacebookOAuth2Authenticator extends OAuth2Authenticator {
 	}
 
 	log.info("Handling callback request.");
-	String getTokenUrl = String.format(tokenUrl, getClientId(), redirectUri.toString(), getClientSecret(), code);
+	String getTokenUrl = String.format(getTokenUrl(), getClientId(), getRedirectUri().toString(), getClientSecret(), code);
 	ObjectMapper objM = new ObjectMapper();
 	JsonNode jsonTokenEntity = null;
 	try {
-	    jsonTokenEntity = getToken(getTokenUrl, httpClient, objM);
+	    jsonTokenEntity = getToken(getTokenUrl, getHttpClient(), objM);
 	} catch (IOException e) {
 	    log.error("Can't get token from Facebook");
 
@@ -141,11 +142,11 @@ public class FacebookOAuth2Authenticator extends OAuth2Authenticator {
 	String accessToken = jsonTokenEntity.get("access_token").asText();
 	String tokenType = jsonTokenEntity.get("token_type").asText();
 
-	String getUserEmailUrl = String.format(userInfoUrl, accessToken);
+	String getUserEmailUrl = String.format(getUserInfoUrl(), accessToken);
 	JsonNode jsonUserEmailEntity = null;
 	try {
 
-	    jsonUserEmailEntity = getUserEmail(getUserEmailUrl, httpClient, objM);
+	    jsonUserEmailEntity = getUserEmail(getUserEmailUrl, getHttpClient(), objM);
 
 	} catch (IOException e) {
 	    log.error("Can't get user email from Facebook");
@@ -180,4 +181,9 @@ public class FacebookOAuth2Authenticator extends OAuth2Authenticator {
 
     }
 
+    @Override
+    protected String getProvider() {
+
+	return "Facebook";
+    }
 }

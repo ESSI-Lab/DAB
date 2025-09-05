@@ -22,8 +22,11 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
+import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
@@ -232,6 +235,14 @@ public class HarvestingSettingTest {
 	setting.setIdentifier(UUID.randomUUID().toString());
 
 	configuration.put(setting);
+	
+	SystemSetting systemSetting = new SystemSetting();
+	systemSetting.setIdentifier(MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel());
+	configuration.put(systemSetting);
+	
+	DatabaseSetting databaseSetting = new DatabaseSetting();
+	databaseSetting.setIdentifier(MainSettingsIdentifier.DATABASE.getLabel());
+	configuration.put(databaseSetting);
 
 	SelectionUtils.deepClean(configuration);
 

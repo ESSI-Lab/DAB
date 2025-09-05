@@ -1,4 +1,4 @@
-package eu.essi_lab.authentication.model;
+package eu.essi_lab.authentication.token;
 
 /*-
  * #%L
@@ -32,44 +32,88 @@ public class Token {
     private String serviceProvider;
     private String clientURL;
 
+    /**
+     * @return
+     */
     public String getType() {
 	return type;
     }
 
+    /**
+     * @param type
+     */
     public void setType(String type) {
 	this.type = type;
     }
 
+    /**
+     * @return
+     */
     public String getToken() {
 	return token;
     }
 
+    /**
+     * @param token
+     */
     public void setToken(String token) {
 	this.token = token;
     }
 
+    /**
+     * @return
+     */
     public String getEmail() {
 	return email;
     }
 
+    /**
+     * @param email
+     */
     public void setEmail(String email) {
 	this.email = email;
     }
 
+    /**
+     * @return
+     */
     public String getTokenSecret() {
 	return tokenSecret;
     }
 
+    /**
+     * @param tokenSecret
+     */
     public void setTokenSecret(String tokenSecret) {
 	this.tokenSecret = tokenSecret;
     }
 
+    /**
+     * @return
+     */
     public String getServiceProvider() {
 	return serviceProvider;
     }
 
+    /**
+     * @param serviceProvider
+     */
     public void setServiceProvider(String serviceProvider) {
 	this.serviceProvider = serviceProvider;
+    }
+
+    /**
+     * @return
+     */
+    public String getClientURL() {
+	return clientURL;
+    }
+
+    /**
+     * @param clientURL
+     */
+    public void setClientURL(String clientURL) {
+	this.clientURL = clientURL;
     }
 
     @Override
@@ -95,13 +139,5 @@ public class Token {
 	if (this.serviceProvider == null ? token.serviceProvider != null : !this.serviceProvider.equals(token.serviceProvider))
 	    return false;
 	return true;
-    }
-
-    public String getClientURL() {
-	return clientURL;
-    }
-
-    public void setClientURL(String clientURL) {
-	this.clientURL = clientURL;
     }
 }

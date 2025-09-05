@@ -31,6 +31,9 @@ public class DriverSettingTest {
 
 	SharedPersistentDriverSetting setting = new SharedPersistentDriverSetting();
 
+	DatabaseSetting databaseCacheSetting = setting.getElasticSearchSetting().get();
+	databaseCacheSetting.setDatabaseUri("uri");
+
 	try {
 	    setting.getConfigurableType();
 	    fail("Not thrown");
@@ -70,7 +73,7 @@ public class DriverSettingTest {
 	Assert.assertNull(asStorageUri.getIdentifier());
 	Assert.assertNull(asStorageUri.getPassword());
 	Assert.assertNull(asStorageUri.getName());
-	Assert.assertNull(asStorageUri.getUri());
+	Assert.assertNotNull(asStorageUri.getUri());
 	Assert.assertNull(asStorageUri.getUser());
 
 	Assert.assertNotNull(setting.getName());
@@ -181,6 +184,9 @@ public class DriverSettingTest {
 
 	SharedCacheDriverSetting setting = new SharedCacheDriverSetting();
 
+	DatabaseSetting databaseCacheSetting = setting.getDatabaseCacheSetting().get();
+	databaseCacheSetting.setDatabaseUri("uri");
+	
 	try {
 	    setting.getConfigurableType();
 	    fail("Not thrown");
@@ -218,7 +224,7 @@ public class DriverSettingTest {
 	Assert.assertNull(asStorageUri.getIdentifier());
 	Assert.assertNull(asStorageUri.getPassword());
 	Assert.assertNull(asStorageUri.getName());
-	Assert.assertNull(asStorageUri.getUri());
+	Assert.assertNotNull(asStorageUri.getUri());
 	Assert.assertNull(asStorageUri.getUser());
 
 	Assert.assertEquals(DEFAULT_SELECTED_VALUE, setting.getSelectedRetentionTime());

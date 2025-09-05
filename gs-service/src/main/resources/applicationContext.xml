@@ -51,7 +51,7 @@
 	
 	<jaxrs:server id="essiUserServer" address="/user">
 		<jaxrs:serviceBeans>
-			<ref bean="essiUserService" />
+			<ref bean="essiAuthenticationService" />
 		</jaxrs:serviceBeans>
 		
 		<jaxrs:providers>
@@ -60,7 +60,7 @@
 		
 	</jaxrs:server>
 	
-	<bean id="essiUserService" class="eu.essi_lab.gssrv.rest.UserService" />
+	<bean id="essiAuthenticationService" class="eu.essi_lab.gssrv.rest.AuthenticationService" />
 
 
 	<jaxrs:server id="essiHealthServer" address="/health">

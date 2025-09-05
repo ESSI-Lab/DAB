@@ -24,52 +24,43 @@ package eu.essi_lab.authentication;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting.OAuthProvider;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
  */
-public class OAuthAuthenticatorFactory {
-
-    /**
-     * 
-     */
-    private static final String AUTHENTICATOR_FACTORY_ERROR = "AUTHENTICATOR_FACTORY_ERROR";
+public class OAuth2AuthenticatorFactory {
 
     /**
      * @param setting
      * @return
      * @throws GSException
      */
-    public static OAuthAuthenticator getOAuthAuthenticator(OAuthSetting setting) throws GSException {
+    public static OAuth2Authenticator get(OAuthSetting setting) throws GSException {
 
 	try {
 
 	    OAuthProvider provider = setting.getSelectedProvider();
-	    
-	    OAuthAuthenticator authenticator = switch (provider) {
+
+	    OAuth2Authenticator authenticator = switch (provider) {
 	    case FACEBOOK -> new FacebookOAuth2Authenticator();
 	    case GOOGLE -> new GoogleOAuth2Authenticator();
 	    case TWITTER -> new TwitterOAuthAuthenticator();
+	    case KEYCLOAK -> new KeycloackOAuthAuthenticator();
 	    };
 
 	    authenticator.configure(setting);
 
 	    return authenticator;
 
-	} catch (Exception e) {
+	} catch (Exception ex) {
 
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(OAuthAuthenticatorFactory.class).error(e.getMessage(), e);
+	    GSLoggerFactory.getLogger(OAuth2AuthenticatorFactory.class).error(ex.getMessage(), ex);
 
 	    throw GSException.createException(//
-		    OAuthAuthenticatorFactory.class, //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    AUTHENTICATOR_FACTORY_ERROR);
+		    OAuth2AuthenticatorFactory.class, //
+		    "OAuth2AuthenticatorFactoryError", //
+		    ex);
 	}
     }
 }

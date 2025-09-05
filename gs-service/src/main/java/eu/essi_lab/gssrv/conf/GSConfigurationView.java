@@ -143,6 +143,7 @@ public class GSConfigurationView extends ConfigurationView {
 	}
 
 	OAuthSetting setting = ConfigurationWrapper.getOAuthSetting();
+	
 	ValidationResponse response = setting.getValidator().get().validate(//
 		DABStarter.configuration, //
 		setting, //
@@ -166,7 +167,8 @@ public class GSConfigurationView extends ConfigurationView {
 		    //
 		    // at this point we use the original configuration, not the clone
 		    //
-		    DABStarter.configuration, oAuthSetting, //
+		    DABStarter.configuration, //
+		    oAuthSetting, //
 		    requestURL);
 
 	    editDialog.open();

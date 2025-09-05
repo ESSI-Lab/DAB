@@ -1,4 +1,4 @@
-package eu.essi_lab.authentication.util;
+package eu.essi_lab.authentication.token;
 
 /*-
  * #%L
@@ -38,7 +38,6 @@ import com.auth0.jwt.interfaces.Verification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.essi_lab.authentication.model.Token;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;

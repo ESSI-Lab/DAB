@@ -32,7 +32,6 @@ import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.OptionBuilder;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.ConfigurableSetting;
 import eu.essi_lab.cfga.setting.Setting;
@@ -48,6 +47,10 @@ import eu.essi_lab.lib.utils.LabeledEnum;
  */
 public class OAuthSetting extends ConfigurableSetting implements EditableSetting {
 
+    private static final String CLIENT_ID_OPTION_KEY = "clientId";
+    private static final String CLIENT_SECRET_OPTION_KEY = "clientSecret";
+    private static final String ADMIN_USER_ID_OPTION_KEY = "adminUserId";
+
     /**
      * @author Fabrizio
      */
@@ -55,7 +58,8 @@ public class OAuthSetting extends ConfigurableSetting implements EditableSetting
 
 	GOOGLE("Google", "google"), //
 	FACEBOOK("Facebook", "facebook"), //
-	TWITTER("Twitter", "twitter");
+	TWITTER("Twitter", "twitter"), //
+	KEYCLOAK("Keycloak", "keycloak");
 
 	private String label;
 	private String providerName;
@@ -84,11 +88,6 @@ public class OAuthSetting extends ConfigurableSetting implements EditableSetting
 	}
     }
 
-    private static final String CLIENT_ID_OPTION_KEY = "clientId";
-    private static final String CLIENT_SECRET_OPTION_KEY = "clientSecret";
-    private static final String PROVIDER_OPTION_KEY = "provider";
-    private static final String ADMIN_USER_ID_OPTION_KEY = "adminUserId";
-
     /**
      * 
      */
@@ -98,16 +97,24 @@ public class OAuthSetting extends ConfigurableSetting implements EditableSetting
 	enableCompactMode(false);
 	setCanBeDisabled(false);
 
-	Option<OAuthProvider> providerOption = OptionBuilder.get(OAuthProvider.class).//
-		withKey(PROVIDER_OPTION_KEY).//
-		withLabel("Provider").//
-		withSingleSelection().//
-		withValues(LabeledEnum.values(OAuthProvider.class)).//
-		withSelectedValue(OAuthProvider.GOOGLE).//
-		cannotBeDisabled().//
-		build();
+	setCanBeCleaned(false);
 
-	addOption(providerOption);
+	//
+	//
+	//
+
+	setSelectionMode(SelectionMode.SINGLE);
+
+	GoogleProviderSetting googleProviderSetting = new GoogleProviderSetting();
+	googleProviderSetting.setSelected(true);
+	addSetting(googleProviderSetting);
+
+	KeycloakProviderSetting keycloakProviderSetting = new KeycloakProviderSetting();
+	addSetting(keycloakProviderSetting);
+
+	//
+	//
+	//
 
 	Option<String> adminUserOption = StringOptionBuilder.get().//
 		withKey(ADMIN_USER_ID_OPTION_KEY).//
@@ -196,6 +203,29 @@ public class OAuthSetting extends ConfigurableSetting implements EditableSetting
 		validationResponse.getErrors().add("Client secret missing");
 	    }
 
+	    OAuthProviderSetting providerSetting = thisSetting.getSelectedProviderSetting();
+
+	    Optional<String> loginURL = providerSetting.getLoginURL();
+	    if (!loginURL.isPresent()) {
+
+		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
+		validationResponse.getErrors().add("Login URL missing");
+	    }
+
+	    Optional<String> tokenURL = providerSetting.getTokenURL();
+	    if (!tokenURL.isPresent()) {
+
+		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
+		validationResponse.getErrors().add("Token URL missing");
+	    }
+
+	    Optional<String> userInfoURL = providerSetting.getUserInfoURL();
+	    if (!userInfoURL.isPresent()) {
+
+		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
+		validationResponse.getErrors().add("User info URL missing");
+	    }
+
 	    return validationResponse;
 	}
     }
@@ -224,9 +254,20 @@ public class OAuthSetting extends ConfigurableSetting implements EditableSetting
     /**
      * @param provider
      */
+    @SuppressWarnings("incomplete-switch")
     public void selectProvider(OAuthProvider provider) {
 
-	getOption(PROVIDER_OPTION_KEY, OAuthProvider.class).get().select(p -> p == provider);
+	switch (provider) {
+	case GOOGLE -> {
+	    getSetting(GoogleProviderSetting.IDENTIFIER, GoogleProviderSetting.class).get().setSelected(true);
+	    getSetting(KeycloakProviderSetting.IDENTIFIER, KeycloakProviderSetting.class).get().setSelected(false);
+	}
+
+	case KEYCLOAK -> {
+	    getSetting(GoogleProviderSetting.IDENTIFIER, GoogleProviderSetting.class).get().setSelected(false);
+	    getSetting(KeycloakProviderSetting.IDENTIFIER, KeycloakProviderSetting.class).get().setSelected(true);
+	}
+	}
     }
 
     /**
@@ -234,7 +275,19 @@ public class OAuthSetting extends ConfigurableSetting implements EditableSetting
      */
     public OAuthProvider getSelectedProvider() {
 
-	return getOption(PROVIDER_OPTION_KEY, OAuthProvider.class).get().getSelectedValue();
+	return getSelectedProviderSetting().getIdentifier().equals(KeycloakProviderSetting.IDENTIFIER) ? //
+		OAuthProvider.KEYCLOAK : OAuthProvider.GOOGLE;
+    }
+
+    /**
+     * @return
+     */
+    public OAuthProviderSetting getSelectedProviderSetting() {
+
+	Optional<GoogleProviderSetting> google = getSetting(GoogleProviderSetting.IDENTIFIER, GoogleProviderSetting.class);
+	Optional<KeycloakProviderSetting> keycloak = getSetting(KeycloakProviderSetting.IDENTIFIER, KeycloakProviderSetting.class);
+
+	return google.isPresent() && google.get().isSelected() ? google.get() : keycloak.get();
     }
 
     /**

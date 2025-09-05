@@ -1,4 +1,7 @@
-package eu.essi_lab.authentication.model;
+/**
+ * 
+ */
+package eu.essi_lab.authentication;
 
 /*-
  * #%L
@@ -21,23 +24,14 @@ package eu.essi_lab.authentication.model;
  * #L%
  */
 
-public class GSOAuthProvider {
+/**
+ * @author Fabrizio
+ */
+public class KeycloackOAuthAuthenticator extends OAuth2Authenticator {
 
-    private String providerName;
+    @Override
+    protected String getProvider() {
 
-    /**
-     * @return the providerName
-     */
-    public String getProviderName() {
-	
-	return providerName;
-    }
-
-    /**
-     * @param providerName the providerName to set
-     */
-    public void setProviderName(String providerName) {
-	
-	this.providerName = providerName;
+	return "Keycloak";
     }
 }

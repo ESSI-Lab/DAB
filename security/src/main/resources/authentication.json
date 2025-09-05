@@ -1,0 +1,29 @@
+{
+	"google": {
+		"redirect-uri": "http://localhost:9090/gs-service/auth/user/callback/google",
+		"login-url": "https://accounts.google.com/o/oauth2/v2/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=openid profile email&state=%s",
+		"token-url": "https://www.googleapis.com/oauth2/v4/token?client_id=%s&client_secret=%s&redirect_uri=%s&code=%s&grant_type=authorization_code",
+		"userinfo-url": "https://people.googleapis.com/v1/people/me?",
+		"revoke-token-url": "https://accounts.google.com/o/oauth2/revoke?token=%s"
+	},
+	"keycloak": {
+		"redirect-uri": "http://localhost:9090/gs-service/auth/user/callback/keycloak",
+		"login-url": "http://localhost:8080/realms/myrealm/protocol/openid-connect/auth?client_id=%s&redirect_uri=%s&state=%s&scope=openid profile email&response_type=code",
+		"token-url": "http://localhost:8080/realms/myrealm/protocol/openid-connect/token?client_id=%s&client_secret=%s&redirect_uri=%s&code=%s&grant_type=authorization_code",
+		"userinfo-url": "http://localhost:8080/realms/myrealm/protocol/openid-connect/userinfo?",
+		"revoke-token-url": "http://localhost:8080/app/*"
+	},
+	"twitter": {
+		"redirect-uri": "http://localhost:9090/gs-service/auth/user/callback/twitter",
+		"request-token-url": "https://api.twitter.com/oauth/request_token",
+		"login-url": "https://api.twitter.com/oauth/authenticate?oauth_token=%s",
+		"token-url": "https://api.twitter.com/oauth/access_token",
+		"userinfo-url": "https://api.twitter.com/1.1/account/verify_credentials.json"
+	},
+	"facebook": {
+		"redirect-uri": "http://localhost:9090/gs-service/auth/user/callback/facebook",
+		"login-url": "https://www.facebook.com/v2.11/dialog/oauth?client_id=%s&redirect_uri=%s&scope=email&state=%s",
+		"token-url": "https://graph.facebook.com/v2.11/oauth/access_token?client_id=%s&redirect_uri=%s&client_secret=%s&code=%s",
+		"userinfo-url": "https://graph.facebook.com/v2.11/me?access_token=%s&fields=name,email"
+	}
+}

@@ -76,7 +76,7 @@ class AdminConfigurationDialog extends SettingEditDialog {
 
 	contentLayout.addComponentAtIndex(0, label);
 
-	contentLayout.setHeight(400, Unit.PIXELS);
+	contentLayout.setHeight(620, Unit.PIXELS);
     }
 
     /**
@@ -87,7 +87,9 @@ class AdminConfigurationDialog extends SettingEditDialog {
 	super.close();
 
 	OAuthSetting setting = ConfigurationWrapper.getOAuthSetting();
-	ValidationResponse response = setting.getValidator().get().validate(configuration, setting, ValidationContext.edit());
+	ValidationResponse response = setting.getValidator().//
+		get().//
+		validate(configuration, setting, ValidationContext.edit());
 
 	if (response.getResult() == ValidationResult.VALIDATION_SUCCESSFUL) {
 

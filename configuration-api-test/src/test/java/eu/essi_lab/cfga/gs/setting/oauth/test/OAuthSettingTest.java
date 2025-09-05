@@ -5,6 +5,9 @@ import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.essi_lab.cfga.gs.setting.oauth.GoogleProviderSetting;
+import eu.essi_lab.cfga.gs.setting.oauth.KeycloakProviderSetting;
+import eu.essi_lab.cfga.gs.setting.oauth.OAuthProviderSetting;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting.OAuthProvider;
 import eu.essi_lab.cfga.setting.SettingUtils;
@@ -28,7 +31,11 @@ public class OAuthSettingTest {
 	//
 	//
 
-	setting.selectProvider(OAuthProvider.FACEBOOK);
+	setting.selectProvider(OAuthProvider.KEYCLOAK);
+
+	setting.getSelectedProviderSetting().setTokenURL("token");
+	setting.getSelectedProviderSetting().setUserInfoURL("user");
+	setting.getSelectedProviderSetting().setLoginURL("login");
 
 	setting.setClientId("clientId");
 	setting.setClientSecret("clientSecret");
@@ -46,7 +53,14 @@ public class OAuthSettingTest {
     private void test(OAuthSetting setting) {
 
 	OAuthProvider selectedProvider = setting.getSelectedProvider();
-	Assert.assertEquals(OAuthProvider.FACEBOOK, selectedProvider);
+	Assert.assertEquals(OAuthProvider.KEYCLOAK, selectedProvider);
+
+	OAuthProviderSetting selectedProviderSetting = setting.getSelectedProviderSetting();
+	Assert.assertEquals(selectedProviderSetting.getSettingClass(), KeycloakProviderSetting.class);
+
+	Assert.assertEquals("login", selectedProviderSetting.getLoginURL().get());
+	Assert.assertEquals("token", selectedProviderSetting.getTokenURL().get());
+	Assert.assertEquals("user", selectedProviderSetting.getUserInfoURL().get());
 
 	Optional<String> adminId = setting.getAdminId();
 	Assert.assertEquals("adminId", adminId.get());
@@ -65,6 +79,13 @@ public class OAuthSettingTest {
 
 	OAuthProvider selectedProvider = setting.getSelectedProvider();
 	Assert.assertEquals(OAuthProvider.GOOGLE, selectedProvider);
+
+	OAuthProviderSetting selectedProviderSetting = setting.getSelectedProviderSetting();
+	Assert.assertEquals(selectedProviderSetting.getSettingClass(), GoogleProviderSetting.class);
+
+	Assert.assertTrue(selectedProviderSetting.getLoginURL().isPresent());
+	Assert.assertTrue(selectedProviderSetting.getTokenURL().isPresent());
+	Assert.assertTrue(selectedProviderSetting.getUserInfoURL().isPresent());
 
 	Optional<String> adminId = setting.getAdminId();
 	Assert.assertFalse(adminId.isPresent());

@@ -25,9 +25,11 @@ import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.server.StreamResource;
 
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.dialog.EnhancedDialog;
@@ -43,15 +45,15 @@ class LoginDialog extends EnhancedDialog {
      */
     public LoginDialog(String requestURL) {
 
-	setTitle("Login as administrator");
+	setTitle("Administrator login");
 
- 	getCloseButton().getStyle().set("display", "none");
+	getCloseButton().getStyle().set("display", "none");
 
 	VerticalLayout contentLayout = getContentLayout();
 	contentLayout.getStyle().set("padding", "20px");
 
-	Label label1 = ComponentFactory.createLabel("You must be logged in as administrator to view this page");
-	Label label2 = ComponentFactory.createLabel("Please login with one of the following providers");
+	Label label1 = ComponentFactory.createLabel("You must be logged in as administrator to view this page.");
+	Label label2 = ComponentFactory.createLabel("Please login with one of the following providers:");
 
 	contentLayout.add(label1);
 	contentLayout.add(label2);
@@ -68,52 +70,44 @@ class LoginDialog extends EnhancedDialog {
 
 	contentLayout.add(horizontalLayout);
 
-	Button googleButton = new Button("GOOGLE");
-
-	googleButton.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
-
-	    @Override
-	    public void onComponentEvent(ClickEvent<Button> event) {
-
-		String url = "../../../gs-service/auth/user/login/google?url=" + requestURL;
-
-		UI.getCurrent().getPage().open(url, "_self");
-	    }
-	});
+	Button googleButton = create("Google", "logo/Google_Logo.png", requestURL);
 
 	horizontalLayout.add(googleButton);
 
-	Button facebook = new Button("FACEBOOK");
-	facebook.getStyle().set("margin-left", "10px");
+	Button keycloakButton = create("Keycloak", "logo/Keycloak_Logo.png", requestURL);
 
-	facebook.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
+	horizontalLayout.add(keycloakButton);
+    }
+
+    /**
+     * @param provider
+     * @param logoUrl
+     * @return
+     */
+    private Button create(String provider, String logoUrl, String requestURL) {
+
+	Image image = new Image(new StreamResource(provider, () -> getClass().getClassLoader().getResourceAsStream(logoUrl)), provider);
+	image.setWidth("54px");
+	image.setHeight("54px");
+
+	Button button = new Button(image);
+	button.getStyle().set("margin-left", "10px");
+	button.getStyle().set("border", "1px solid lightgray");
+	button.getStyle().set("cursor", "pointer");
+	button.setTooltipText(provider);
+	button.setWidth("60px");
+	button.setHeight("60px");
+	button.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
 
 	    @Override
 	    public void onComponentEvent(ClickEvent<Button> event) {
 
-		String url = "../../../gs-service/auth/user/login/facebook?url=" + requestURL;
+		String url = "../../../gs-service/auth/user/login/" + provider.toLowerCase() + "?url=" + requestURL;
 
 		UI.getCurrent().getPage().open(url, "_self");
 	    }
 	});
 
-	horizontalLayout.add(facebook);
-
-	Button twitter = new Button("TWITTER");
-	twitter.getStyle().set("margin-left", "10px");
-
-	twitter.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
-
-	    @Override
-	    public void onComponentEvent(ClickEvent<Button> event) {
-
-		String url = "../../../gs-service/auth/user/login/twitter?url=" + requestURL;
-
-		UI.getCurrent().getPage().open(url, "_self");
-	    }
-	});
-
-	horizontalLayout.add(twitter);
-
+	return button;
     }
 }
