@@ -13,7 +13,8 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -126,7 +127,15 @@ public class SparqlProxyServlet extends HttpServlet {
 
 	    String headerName = headerNames.nextElement();
 
-	    if (!headerName.equalsIgnoreCase("host") && !headerName.equalsIgnoreCase("content-length")) {
+	    if (headerName != null && //
+
+		    !headerName.equalsIgnoreCase("connection") && //
+		    !headerName.equalsIgnoreCase("content-length") && //
+		    !headerName.equalsIgnoreCase("host") && //
+		    !headerName.equalsIgnoreCase("te") && //
+		    !headerName.equalsIgnoreCase("trailer") && //
+		    !headerName.equalsIgnoreCase("keep-alive") //
+	    ) {
 
 		String headerValue = request.getHeader(headerName);
 
@@ -179,25 +188,46 @@ public class SparqlProxyServlet extends HttpServlet {
 	GSLoggerFactory.getLogger(getClass()).debug("Copy headers to response STARTED");
 
 	Map<String, List<String>> headerFields = conn.getHeaderFields();
-	headerFields.keySet().stream().filter(Objects::nonNull).forEach(headerName -> {
+	Set<Entry<String, List<String>>> entrySet = headerFields.entrySet();
 
-	    String headerValue = headerFields.get(headerName).stream().collect(Collectors.joining(","));
-
-	    if (headerValue != null && !headerValue.isEmpty()) {
+	for (Entry<String, List<String>> entry : entrySet) {
+	    String headerName = entry.getKey();
+	    String headerValue = entry.getValue().stream().collect(Collectors.joining(","));
+	    if (headerName != null && headerValue != null && !headerValue.isEmpty()) {
 
 		if (ConfigurationWrapper.forceSparqlProxyAcceptHeader() && headerName.toLowerCase().equals("content-type")) {
-
 		    headerValue = "application/sparql-results+json; charset=utf-8";
 		}
 
-		GSLoggerFactory.getLogger(getClass()).debug("Response header: {}:{}", headerName, headerValue);
+		switch (headerName.toLowerCase()) {
+		// add here headers to be copied
+		case "content-type":
+		case "content-length":
+		case "content-encoding":
+		    // case "transfer-encoding": //this is automatically added, shouldn't be added explicitly
+		case "date":
+		case "server":
+		case "last-modified":
+		case "vary":
+		case "retry-after":
+		case "cache-control":
+		case "pragma":
 
-		response.setHeader(headerName, headerValue);
+		{
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Copied header: {}:{}", headerName, headerValue);
+
+		    response.setHeader(headerName, headerValue);
+
+		    break;
+		}
+		default:
+		    GSLoggerFactory.getLogger(getClass()).debug("Skipped header: {}:{}", headerName, headerValue);
+		    break;
+		}
+
 	    }
-	});
-
-	response.setHeader("Content-Length", null);
-
+	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Copy headers to response ENDED");
 

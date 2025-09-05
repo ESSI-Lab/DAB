@@ -37,7 +37,7 @@
 
 	<servlet-mapping>
 		<servlet-name>SparqlProxy</servlet-name>
-		<url-pattern>/fuseki</url-pattern>
+		<url-pattern>/yxorp</url-pattern>
 	</servlet-mapping>
 
 
