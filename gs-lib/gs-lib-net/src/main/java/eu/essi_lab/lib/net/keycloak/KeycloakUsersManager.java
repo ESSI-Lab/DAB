@@ -286,8 +286,8 @@ public class KeycloakUsersManager {
 
 	KeycloakUsersManager manager = new KeycloakUsersManager();
 	manager.setServiceUrl("http://localhost:8080");
-	manager.setAdminPassword("Sghibbione_77!");
-	manager.setAdminUser("fabriadmin");
+	manager.setAdminPassword("xxx");
+	manager.setAdminUser("xxx");
 	manager.setUsersRealm("myrealm");
 
 	String token = manager.getAdminAccessToken();
