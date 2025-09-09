@@ -3,6 +3,27 @@
  */
 package eu.essi_lab.lib.net.keycloak;
 
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB)
+ * %%
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -12,10 +33,13 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio
@@ -28,13 +52,14 @@ public class KeycloakUsersManager {
     private String clientId;
     private String adminUser;
     private String adminPassword;
-
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private HttpClient httpClient;
 
     /**
      * 
      */
     public KeycloakUsersManager() {
+
+	httpClient = HttpClient.newHttpClient();
 
 	setAdminRealm("master");
 	setClientId("admin-cli");
@@ -141,7 +166,7 @@ public class KeycloakUsersManager {
      * @throws IOException
      * @throws InterruptedException
      */
-    public String getAdminAccessToken() throws IOException, InterruptedException {
+    public String getAccessToken() throws IOException, InterruptedException {
 
 	String tokenUrl = serviceUrl + "/realms/" + adminRealm + "/protocol/openid-connect/token";
 
@@ -155,7 +180,10 @@ public class KeycloakUsersManager {
 	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
 	if (response.statusCode() != 200) {
-	    throw new RuntimeException("Errore nel login admin: " + response.body());
+
+	    GSLoggerFactory.getLogger(getClass()).error("Error occurred: {}", response.body());
+
+	    throw new IOException("Error occurred: " + response.body());
 	}
 
 	return response.body().replaceAll(".*\"access_token\"\\s*:\\s*\"([^\"]+)\".*", "$1");
@@ -166,7 +194,7 @@ public class KeycloakUsersManager {
      * @throws IOException
      * @throws InterruptedException
      */
-    public List<JSONObject> listUsers(String accessToken) throws IOException, InterruptedException {
+    public List<KeycloakUser> list(String accessToken) throws IOException, InterruptedException {
 
 	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users";
 
@@ -176,88 +204,96 @@ public class KeycloakUsersManager {
 
 	JSONArray jsonArray = new JSONArray(response.body());
 
-	return jsonArray.toList().stream().map(o -> new JSONObject((HashMap<?, ?>)o)).collect(Collectors.toList());
+	return jsonArray.toList().//
+		stream().//
+		map(o -> KeycloakUser.of(new JSONObject((HashMap<?, ?>) o))).//
+		collect(Collectors.toList());
     }
 
     /**
      * @param accessToken
-     * @param username
+     * @return
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public int count(String accessToken) throws IOException, InterruptedException {
+
+	return list(accessToken).size();
+    }
+
+    /**
+     * @param accessToken
+     * @param userName
      * @return
      * @throws IOException
      * @throws InterruptedException
      */
-    public String findUserIdByUsername(String accessToken, String username) throws IOException, InterruptedException {
-	
-	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users?username=" + URLEncoder.encode(username, StandardCharsets.UTF_8);
+    public Optional<String> findId(String accessToken, String userName) throws IOException, InterruptedException {
+
+	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users?username=" + URLEncoder.encode(userName, StandardCharsets.UTF_8);
 
 	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Authorization", "Bearer " + accessToken).GET().build();
 
 	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
 	if (response.statusCode() != 200) {
-	    
-	    throw new RuntimeException("Errore nella ricerca utente: " + response.body());
+
+	    GSLoggerFactory.getLogger(getClass()).error("Error occurred: {}", response.body());
+
+	    throw new RuntimeException("Error occurred: " + response.body());
 	}
 
 	String body = response.body();
 
-	String userId = body.replaceAll(".*\"id\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-	return userId;
+	String id = body.replaceAll(".*\"id\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+
+	return id.equals("[]") ? Optional.empty() : Optional.of(id);
     }
 
     /**
      * @param accessToken
      * @param username
      * @param email
+     * @param attributes
      * @throws IOException
      * @throws InterruptedException
      */
-    public void createUser(String accessToken, String username, String email) throws IOException, InterruptedException {
-	
+    public boolean create(String accessToken, KeycloakUser user) throws IOException, InterruptedException {
+
 	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users";
 
-	String json = """
-		{
-		  "username": "%s",
-		  "enabled": true,
-		  "email": "%s"
-		}
-		""".formatted(username, email);
-
-	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Authorization", "Bearer " + accessToken)
-		.header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(json)).build();
+	HttpRequest request = HttpRequest.newBuilder().//
+		uri(URI.create(url)).//
+		header("Authorization", "Bearer " + accessToken).//
+		header("Content-Type", "application/json").//
+		POST(HttpRequest.BodyPublishers.ofString(user.toJSON().toString())).//
+		build();
 
 	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-	
-	System.out.println(response.statusCode());
+
+	return response.statusCode() == 201;
     }
 
     /**
      * @param accessToken
-     * @param userId
-     * @param newFirstName
-     * @param newLastName
+     * @param user
      * @throws IOException
      * @throws InterruptedException
      */
-    public void updateUser(String accessToken, String userId, String newFirstName, String newLastName)
-	    throws IOException, InterruptedException {
-	
-	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users/" + userId;
+    public boolean update(String accessToken, KeycloakUser user) throws IOException, InterruptedException {
 
-	String json = """
-		{
-		  "firstName": "%s",
-		  "lastName": "%s"
-		}
-		""".formatted(newFirstName, newLastName);
+	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users/" + user.getIdentifier().get();
 
-	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Authorization", "Bearer " + accessToken)
-		.header("Content-Type", "application/json").PUT(HttpRequest.BodyPublishers.ofString(json)).build();
+	HttpRequest request = HttpRequest.newBuilder().//
+		uri(URI.create(url)).//
+		header("Authorization", "Bearer " + accessToken).//
+		header("Content-Type", "application/json").//
+		PUT(HttpRequest.BodyPublishers.ofString(user.toJSON().toString())).//
+		build();
 
 	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-	
-	System.out.println(response.statusCode());
+
+	return response.statusCode() == 204;
     }
 
     /**
@@ -266,45 +302,18 @@ public class KeycloakUsersManager {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void deleteUser(String accessToken, String userId) throws IOException, InterruptedException {
-	
+    public boolean delete(String accessToken, String userId) throws IOException, InterruptedException {
+
 	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users/" + userId;
 
-	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Authorization", "Bearer " + accessToken).DELETE()
-		.build();
+	HttpRequest request = HttpRequest.newBuilder().//
+		uri(URI.create(url)).//
+		header("Authorization", "Bearer " + accessToken).//
+		DELETE().//
+		build();
 
 	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-	
-	System.out.println(response.statusCode());
-    }
 
-    /**
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-
-	KeycloakUsersManager manager = new KeycloakUsersManager();
-	manager.setServiceUrl("http://localhost:8080");
-	manager.setAdminPassword("xxx");
-	manager.setAdminUser("xxx");
-	manager.setUsersRealm("myrealm");
-
-	String token = manager.getAdminAccessToken();
-
-	List<JSONObject> listUsers = manager.listUsers(token);
-	
-	System.out.println(listUsers.stream().map(o -> o.toString(3)).collect(Collectors.toList()));
-	
-	System.out.println(manager.findUserIdByUsername(token, "fabrizio"));
-
-	// manager.createUser(token, "mario.rossi", "mario.rossi@example.com");
-
-	// String userId = manager.findUserIdByUsername(token, "mario.rossi");
-	// System.out.println("User ID di mario.rossi: " + userId);
-	//
-	// manager.updateUser(token, userId, "Mario", "Rossi");
-	//
-	// manager.deleteUser(token, userId);
+	return response.statusCode() == 204;
     }
 }
