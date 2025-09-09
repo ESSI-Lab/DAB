@@ -90,6 +90,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String OWS_NS_URI = "http://www.opengis.net/ows";
     public static final String OWS_1_1_NS_URI = "http://www.opengis.net/ows/1.1";
     public static final String OAI_NS_URI = "http://www.openarchives.org/OAI/2.0/";
+    public static final String OAI_NS_URI_GML_32 = "http://www.openarchives.org/OAI/2.0/gml/3.2";
     public static final String OAI_DC_NS_URI = "http://www.openarchives.org/OAI/2.0/oai_dc/";
     public static final String OAI_DATACITE_NS_URI = "https://schema.datacite.org/meta/kernel-4.3/metadata.xsd";
     public static final String PUB_SUB_NS_URI = "http://www.opengis.net/pubsub/1.0";

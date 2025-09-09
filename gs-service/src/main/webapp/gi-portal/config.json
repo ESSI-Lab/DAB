@@ -18,7 +18,7 @@
     "validatedSearch": false,
     "riverSearch": false,
     "timeInterpolation": true,
-    "generalTermSearch": false,
+    "generalTermSearch": true,
     "intendedObservationSpacing": true,
     "aggregationDuration": true,
     "semanticSearch": true,

@@ -259,6 +259,10 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	    //
 	    String metadata = asString(record);
 
+	    if (metadataRecord.getSchemeURI().equals(CommonNameSpaceContext.OAI_NS_URI)
+		    && metadata.contains("http://www.opengis.net/gml/3.2")) {
+		metadataRecord.setSchemeURI(CommonNameSpaceContext.OAI_NS_URI_GML_32);
+	    }
 	    metadataRecord.setMetadata(metadata);
 
 	    ret.addRecord(metadataRecord);

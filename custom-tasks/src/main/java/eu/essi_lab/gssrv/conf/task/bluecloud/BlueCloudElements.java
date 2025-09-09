@@ -51,7 +51,7 @@ public class BlueCloudElements {
 		BlueCloudMetadataElement.ORGANIZATION_URI, //
 		BlueCloudMetadataElement.ORGANIZATION_ROLE, //
 		BlueCloudMetadataElement.DATESTAMP, //
-		BlueCloudMetadataElement.REVISION_DATE, //
+		BlueCloudMetadataElement.REFERENCE_DATE, //
 		BlueCloudMetadataElement.RESOURCE_IDENTIFIER//
 	};
     }

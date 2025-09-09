@@ -271,6 +271,8 @@ public enum MetadataElement implements Queryable {
      * 
      */
     REVISION_DATE("revisionDate", ContentType.ISO8601_DATE_TIME),
+    
+    REFERENCE_DATE("referenceDate", ContentType.ISO8601_DATE_TIME),
 
     /**
      *

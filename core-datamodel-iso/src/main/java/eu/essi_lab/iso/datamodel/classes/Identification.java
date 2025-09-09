@@ -162,6 +162,38 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
 	return out.iterator();
     }
 
+    public List<String> getKeywordsOfType(String t) {
+
+	ArrayList<String> out = new ArrayList<>();
+
+	List<MDKeywordsPropertyType> descriptiveKeywords = type.getDescriptiveKeywords();
+	for (MDKeywordsPropertyType kwd : descriptiveKeywords) {
+	    try {
+		MDKeywordsType mdKeywords = kwd.getMDKeywords();
+		String myType = null;
+		MDKeywordTypeCodePropertyType tt = mdKeywords.getType();
+		if (tt != null) {
+		    CodeListValueType code = tt.getMDKeywordTypeCode();
+		    if (code != null) {
+			myType = code.getCodeListValue();
+		    }
+		}
+		if (myType != null && myType.equals(t)) {
+		    List<CharacterStringPropertyType> keyword = mdKeywords.getKeyword();
+		    for (CharacterStringPropertyType kk : keyword) {
+			out.add(getStringFromCharacterString(kk));
+		    }
+		    break;
+		}
+
+	    } catch (NullPointerException | IndexOutOfBoundsException ex) {
+		// nothing to do here
+	    }
+	}
+
+	return out;
+    }
+
     public Iterator<String> getKeywords(String thesaurusTitle) {
 
 	ArrayList<String> out = new ArrayList<>();

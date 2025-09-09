@@ -68,6 +68,7 @@ import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.rsm.MappingSchema;
@@ -845,16 +846,23 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	List<CoverageDescription> coverageDescriptions = Lists.newArrayList(md_Metadata.getCoverageDescriptions());
 	TreeSet<String> sortedAttributeDescriptions = new TreeSet<>();
 	TreeSet<String> sortedAttributeTitles = new TreeSet<>();
-	for (CoverageDescription coverageDescription : coverageDescriptions) {
-	    String attribute = coverageDescription.getAttributeDescription();
-	    String title = coverageDescription.getAttributeTitle();
-	    if (attribute != null) {
-		sortedAttributeDescriptions.add(attribute);
-	    }
-	    if (title != null) {
-		sortedAttributeTitles.add(title);
-	    }
-	}
+//	for (CoverageDescription coverageDescription : coverageDescriptions) {
+//	    String attribute = coverageDescription.getAttributeDescription();
+//	    String title = coverageDescription.getAttributeTitle();
+//	    if (attribute != null) {
+//		sortedAttributeDescriptions.add(attribute);
+//	    }
+//	    if (title != null) {
+//		sortedAttributeTitles.add(title);
+//	    }
+//	}
+	
+	List<String> titles = resource.getIndexesMetadata().read(MetadataElement.ATTRIBUTE_TITLE);
+	sortedAttributeTitles.addAll(titles);
+	
+	List<String> descriptions = resource.getIndexesMetadata().read(MetadataElement.ATTRIBUTE_DESCRIPTION);
+	sortedAttributeDescriptions.addAll(descriptions);
+	
 	for (String sortedDescription : sortedAttributeDescriptions) {
 	    attributeDescription.put(sortedDescription);
 	}
