@@ -29,7 +29,6 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.auth.UserBaseClient;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.HarmonizedMetadata;
@@ -37,7 +36,7 @@ import eu.essi_lab.model.resource.HarmonizedMetadata;
 /**
  * @author Fabrizio
  */
-public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
+public interface DatabaseReader extends DatabaseProvider {
 
     /**
      * Gets the {@link GSUser} with the provided identifier
@@ -76,7 +75,7 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
      * @throws GSException
      */
     Optional<View> getView(String viewId) throws GSException;
-    
+
     /**
      * Get all the available views
      * 
@@ -102,8 +101,8 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
      * @return
      * @throws GSException if error occurs during the request processing
      */
-    public default boolean resourceExists(IdentifierType identifierType, String identifier) throws GSException{
-	
+    public default boolean resourceExists(IdentifierType identifierType, String identifier) throws GSException {
+
 	return !getResources(identifierType, identifier).isEmpty();
     }
 
@@ -122,10 +121,10 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
     public List<GSResource> getResources(IdentifierType identifierType, String identifier) throws GSException;
 
     /**
-     * Special method that WAS used during the tag recovering phase. Normally different resources with same original id are not
+     * Special method that WAS used during the tag recovering phase. Normally different resources with same original id
+     * are not
      * allowed, but at the end of a non-first harvesting, it is common to have 2 copies of the same resource, from the
      * previous harvesting and from the current one.<br>
-     * 
      * From GIP-423 this phase is no longer required, since resources with same original id of the same source
      * are no longer replaced (this was the reason why this phase was necessary, because the new resource with same
      * original id lacked the tags possibly present in the previous copy of the resource)
