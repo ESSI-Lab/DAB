@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+     
+    <head>
+    	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <title>Search portal</title>
+        <link rel="shortcut icon" type="image/png" href="../giapi/ui/images/favicon.png">
+     		
+		<script type="module" src="../gi-portal/libraries.js"></script>		
+ 	
+ 		<link rel="stylesheet" type="text/css" href="../gi-portal/gi-portal.css" />       
+       
+		<script type="module">
+			import {initializePortal} from '../gi-portal/gi-portal.js'
+			fetch('./config.json')
+		    .then(response => response.json())
+		    .then(config => initializePortal(config))
+		    .catch(err => console.error("Configuration load error:", err));
+		</script>
+		
+    </head>
+    
+    <body>
+    	
+        <div id="controlToggleButtonDiv"></div> 
+        
+        <div id="headerDiv">
+        
+	    		<div id="search-button"></div>
+	    		
+	    		<div id="hide-results-button"></div>    	
+	    			
+	        	<div id="what-div"></div>
+	        	<div id="from-div"></div>
+	        	<div id="to-div"></div>
+	        	
+	        	<div id="where-div"></div>
+	        	      	
+	        	<div id="adv-search-div"></div>
+	         	
+	        	<div id="logoDiv"></div>
+          	
+	   </div>
+       	    
+       <div id="resMapWidget"></div>
+       
+       <div id="stationInfo"></div>
+           
+       <div id="paginator-widget"></div>       
+       
+	   <div id="tabs-div">
+	   
+            <ul id="tabs-ul">
+                <li><a id="results-tab-link" style="margin-left: -60px;" href="#results-tab"></a></li>
+                <li><a id="filters-tab-link" href="#filters-tab"></a></li>
+                <li><a id="sources-tab-link" href="#sources-tab"></a></li>
+                
+            </ul>
+            						               
+            <div class="tabs-element" id="results-tab">                 
+            </div>
+            
+            <div class="tabs-element" id="filters-tab">	                    
+            </div>
+               
+            <div class="tabs-element" id="sources-tab">
+            </div>
+                          	                                           
+	   </div>  	
+        
+       <div id="advConstDialog"></div>
+     
+    </body>
+    
+</html>
