@@ -190,6 +190,8 @@ public class OAIPMHResourceMapper extends FileIdentifierMapper {
 
     private RecordType getRecordType(String metadata) throws GSException {
 
+	metadata = fixMetadata(metadata);
+	
 	try {
 	    return CommonContext.unmarshal(metadata, RecordType.class);
 
@@ -204,6 +206,10 @@ public class OAIPMHResourceMapper extends FileIdentifierMapper {
 		    OAI_PMH_RES_MAPPER_GET_RECORD_ERROR, //
 		    e);
 	}
+    }
+
+    public String fixMetadata(String metadata) {
+	return metadata;
     }
 
     @Override

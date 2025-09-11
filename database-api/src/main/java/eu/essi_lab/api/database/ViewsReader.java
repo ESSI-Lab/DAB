@@ -24,19 +24,40 @@ package eu.essi_lab.api.database;
  * #L%
  */
 
+import java.util.List;
+import java.util.Optional;
+
+import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.model.exceptions.GSException;
+
 /**
  * @author Fabrizio
  */
-public interface DatabaseProvider extends SupportChecker {
+public interface ViewsReader {
 
     /**
-     * @param database
+     * /**
+     * Gets the view associated with the given view identifier.
+     *
+     * @param viewId the view identifier
+     * @return the optional view
+     * @throws GSException
      */
-    public void setDatabase(Database database);
+    Optional<View> getView(String viewId) throws GSException;
 
     /**
+     * Get all the available views
+     * 
      * @return
+     * @throws GSException
      */
-    public Database getDatabase();
+    List<View> getViews() throws GSException;
 
+    /**
+     * Gets the list of view identifiers
+     *
+     * @return
+     * @throws GSException
+     */
+    List<String> getViewIdentifiers(GetViewIdentifiersRequest request) throws GSException;
 }

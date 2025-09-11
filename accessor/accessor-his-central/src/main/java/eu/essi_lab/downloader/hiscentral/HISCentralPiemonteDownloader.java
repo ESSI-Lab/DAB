@@ -252,14 +252,18 @@ public class HISCentralPiemonteDownloader extends WMLDataDownloader {
 	    ex = e;
 	}
 
-	throw GSException.createException(//
-		getClass(), //
-		ex.getMessage(), //
-		null, //
-		ErrorInfo.ERRORTYPE_INTERNAL, //
-		ErrorInfo.SEVERITY_ERROR, //
-		HISCENTRAL_PIEMONTE_DOWNLOAD_ERROR);
+	if (ex != null) {
 
+	    throw GSException.createException(//
+		    getClass(), //
+		    ex.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    HISCENTRAL_PIEMONTE_DOWNLOAD_ERROR);
+	}
+
+	return null;
     }
 
     @Override

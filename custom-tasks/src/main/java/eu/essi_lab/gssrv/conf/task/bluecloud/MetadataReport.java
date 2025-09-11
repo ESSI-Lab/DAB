@@ -148,7 +148,7 @@ public abstract class MetadataReport {
 	    List<String[]> table = createTable(results);
 	    tables.put(viewId, table);
 
-	    String htmlTable = createHTMLTable(tables, getProjectName(), viewReports, getHostname(),null);
+	    String htmlTable = createHTMLTable(tables, getProjectName(), viewReports, getHostname(), null);
 	    String pathName = view.getId();
 	    File tmpFile = File.createTempFile(MetadataReport.class.getClass().getSimpleName(), pathName + ".html");
 	    System.out.println("Writing table to: " + tmpFile.getAbsolutePath());
@@ -276,8 +276,12 @@ public abstract class MetadataReport {
 		}
 	    } else if (term.contains("https://edmo.seadatanet.org/") || term.contains("http://seadatanet.maris2.nl/v_edmo/")) {
 		set.add("EDMO");
+	    } else if (term.contains("https://vocab.nerc.ac.uk/standard_name")) {
+		set.add("CF standard names");
 	    } else if (term.contains("https://csr.seadatanet.org/")) {
 		set.add("CSR");
+	      } else if (term.contains("https://oscar.wmo.int/surface/#/search/station/stationReportDetails/")) {
+		set.add("WMO OSCAR STATION");
 	    } else if (term.contains("https://edmerp.seadatanet.org/")) {
 		set.add("EDMERP");
 	    } else if (term.contains("http://inspire.ec.europa.eu")) {
@@ -427,8 +431,9 @@ public abstract class MetadataReport {
 
 	builder.append("<body>");
 
-	builder.append("<h1>" + projectName + " metadata completeness report</h1><p>Generated on: " + ISO8601DateTimeUtils.getISO8601DateTime()
-		+ "</p><p>Last metadat aharvesting of the source: " + lastHarvesting + "</p><p>The following tables show individual reports for each " + projectName
+	builder.append("<h1>" + projectName + " metadata completeness report</h1><p>Generated on: "
+		+ ISO8601DateTimeUtils.getISO8601DateTime() + "</p><p>Last metadat aharvesting of the source: " + lastHarvesting
+		+ "</p><p>The following tables show individual reports for each " + projectName
 		+ " service harvested by the DAB (first level metadata only). The main metadata elements are reported, along with their completeness score.</p>");
 
 	for (Entry<String, List<String[]>> entry : tableMap.entrySet()) {

@@ -69,9 +69,13 @@
 	
 	JSONArray terms = json.getJSONArray("terms");
 	out.println("<p>");
+	if (terms!=null){
 	for(int i = 0;i<terms.length();i++){
-		String term = terms.getString(i);
+	    JSONObject termObject = terms.optJSONObject(i);
+	    String term = termObject.optString("value");
+	    
 		out.println(term+"<br/>");
+	}
 	}
 	out.println("</p>");
 	

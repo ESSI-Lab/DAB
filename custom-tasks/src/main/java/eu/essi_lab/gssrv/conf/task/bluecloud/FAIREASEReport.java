@@ -130,7 +130,7 @@ public class FAIREASEReport extends MetadataReport {
 		BlueCloudMetadataElement.ORGANIZATION_URI, //
 		BlueCloudMetadataElement.ORGANIZATION_ROLE, //
 		BlueCloudMetadataElement.DATESTAMP, //
-		BlueCloudMetadataElement.REVISION_DATE, //
+		BlueCloudMetadataElement.REFERENCE_DATE, //
 		BlueCloudMetadataElement.RESOURCE_IDENTIFIER, //
 		BlueCloudMetadataElement.LICENSE_ACCESS_CONSTRAINTS, //
 		BlueCloudMetadataElement.LICENSE_OTHER_CONSTRAINTS, //

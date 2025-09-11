@@ -66,6 +66,16 @@ public class GSUser extends DOMSerializer implements Serializable {
      * 
      */
     public static final String IDENTIFIER_TYPE_ELEMENT_NAME = "identifierType";
+    
+    /**
+     * 
+     */
+    public static final String AUTH_PROVIDER = "authProvider";
+    /**
+     * 
+     */
+    public static final String ROLE = "role";
+
 
     @NotNull
     @Email
@@ -194,13 +204,17 @@ public class GSUser extends DOMSerializer implements Serializable {
     public UserIdentifierType getUserIdentifierType() {
 
 	@SuppressWarnings("unchecked")
-	GSProperty<String> property = getProperty(IDENTIFIER_TYPE_ELEMENT_NAME);
-	if (property != null) {
+	Optional<String> userIdType = getStringPropertyValue(IDENTIFIER_TYPE_ELEMENT_NAME);
 
-	    Optional<UserIdentifierType> ret = UserIdentifierType.fromType(property.getValue().toString());
+	if (userIdType.isPresent()) {
+
+	    Optional<UserIdentifierType> ret = UserIdentifierType.fromType(userIdType.get());
+
 	    if (ret.isEmpty()) {
+
 		return null;
 	    }
+
 	    return ret.get();
 	}
 
@@ -254,22 +268,23 @@ public class GSUser extends DOMSerializer implements Serializable {
     }
 
     @SuppressWarnings("rawtypes")
-    public GSProperty getProperty(String name) {
+    public Optional<GSProperty> getProperty(String name) {
 	for (GSProperty property : properties) {
 	    if (property.getName() != null && property.getName().equals(name)) {
-		return property;
+		return Optional.of(property);
 	    }
 	}
-	return null;
+
+	return Optional.empty();
     }
 
-    public String getStringPropertyValue(String name) {
-	for (GSProperty property : properties) {
-	    if (property.getName() != null && property.getName().equals(name)) {
-		return property.getValue().toString();
-	    }
-	}
-	return null;
+    /**
+     * @param name
+     * @return
+     */
+    public Optional<String> getStringPropertyValue(String name) {
+
+	return getProperty(name).map(v -> v.getValue().toString());
     }
 
     @SuppressWarnings("rawtypes")
@@ -277,8 +292,15 @@ public class GSUser extends DOMSerializer implements Serializable {
 	this.properties = attributes;
     }
 
+    /**
+     * @param name
+     * @param value
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setPropertyValue(String name, String value) {
+	
 	GSProperty<String> target = null;
+	
 	for (GSProperty property : properties) {
 	    if (property.getName().equals(name)) {
 		if (property.getValue() instanceof String) {
@@ -286,9 +308,13 @@ public class GSUser extends DOMSerializer implements Serializable {
 		}
 	    }
 	}
+	
 	if (target != null) {
+	
 	    target.setValue(value);
+	
 	} else {
+	
 	    GSProperty<String> prop = new GSProperty<String>(name, value);
 	    properties.add(prop);
 	}
@@ -390,11 +416,19 @@ public class GSUser extends DOMSerializer implements Serializable {
 	return this;
     }
 
+    /**
+     * @param permission
+     * @return
+     */
     public boolean hasPermission(String permission) {
-	String permissions = getStringPropertyValue("permissions");
-	if (permissions != null) {
-	    permissions = permissions.trim();
+
+	Optional<String> optPerm = getStringPropertyValue("permissions");
+
+	if (optPerm.isPresent()) {
+
+	    String permissions = optPerm.get().trim();
 	    String[] perms = permissions.split(",");
+
 	    for (String perm : perms) {
 		perm = perm.trim();
 		if (perm.equalsIgnoreCase(permission)) {

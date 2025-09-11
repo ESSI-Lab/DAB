@@ -42,7 +42,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public abstract class DatabaseWriter implements DatabaseProvider {
+public abstract class DatabaseWriter implements DatabaseProvider, UsersWriter {
 
     /**
      * Stores the given <code>resource</code>
@@ -220,7 +220,7 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 	    InputStream stream = view.toStream();
 
 	    ClonableInputStream clone = new ClonableInputStream(stream);
-	    	    
+
 	    folder.store(id, FolderEntry.of(clone.clone()), EntryType.VIEW);
 
 	    folder.replace(id, FolderEntry.of(clone.clone()), EntryType.VIEW);

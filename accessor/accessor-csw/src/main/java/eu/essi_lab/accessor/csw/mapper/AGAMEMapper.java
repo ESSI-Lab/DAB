@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.w3c.dom.Node;
 
+import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.MDMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
@@ -114,7 +115,16 @@ public class AGAMEMapper extends FileIdentifierMapper {
 
 	    MIMetadata miMetadata = new MIMetadata(metadata.getElementType());
 
-	    Iterator<Online> onlines = miMetadata.getDistribution().getDistributionOnlines();
+	    Distribution distribution = miMetadata.getDistribution();
+
+	    if (distribution == null) {
+
+		distribution = new Distribution();
+		miMetadata.setDistribution(distribution);
+	    }
+
+	    Iterator<Online> onlines = distribution.getDistributionOnlines();
+	   
 	    while (onlines.hasNext()) {
 		Online o = onlines.next();
 		o.setLinkage(WMS_URL);
@@ -127,7 +137,8 @@ public class AGAMEMapper extends FileIdentifierMapper {
 		online.setProtocol(NetProtocols.HTTP.getCommonURN());
 		online.setFunctionCode("information");
 		online.setDescription("DATASET LINK");
-		miMetadata.getDistribution().addDistributionOnline(online);
+
+		distribution.addDistributionOnline(online);
 	    }
 
 	    coreMetadata.setMIMetadata(miMetadata);

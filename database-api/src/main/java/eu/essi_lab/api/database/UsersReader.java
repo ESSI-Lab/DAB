@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.authorization;
+package eu.essi_lab.api.database;
 
 /*-
  * #%L
@@ -24,14 +24,42 @@ package eu.essi_lab.authorization;
  * #L%
  */
 
-import java.io.Closeable;
+import java.util.List;
+import java.util.Optional;
 
-import eu.essi_lab.model.auth.UserBaseClient;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.auth.GSUser;
+import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
- *
  */
-public interface CloseableUserBaseClient extends UserBaseClient, Closeable{
+public interface UsersReader {
 
+    /**
+     * Gets the {@link GSUser} with the provided identifier
+     *
+     * @param identifier the identifier of the user
+     * @return the optional user
+     * @throws GSException
+     */
+    public default Optional<GSUser> getUser(String identifier) throws GSException {
+
+	try {
+
+	    return getUsers().stream().filter(u -> u.getIdentifier().equals(identifier)).findFirst();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    throw GSException.createException(getClass(), "DatabaseGetUserError", ex);
+	}
+    }
+
+    /**
+     * 
+     * 
+     */
+    public List<GSUser> getUsers() throws GSException;
 }

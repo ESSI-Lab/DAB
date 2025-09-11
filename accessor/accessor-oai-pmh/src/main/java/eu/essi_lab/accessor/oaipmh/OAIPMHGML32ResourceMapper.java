@@ -1,7 +1,4 @@
-/**
- * 
- */
-package eu.essi_lab.api.database;
+package eu.essi_lab.accessor.oaipmh;
 
 /*-
  * #%L
@@ -24,19 +21,18 @@ package eu.essi_lab.api.database;
  * #L%
  */
 
-/**
- * @author Fabrizio
- */
-public interface DatabaseProvider extends SupportChecker {
+import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 
-    /**
-     * @param database
-     */
-    public void setDatabase(Database database);
+public class OAIPMHGML32ResourceMapper extends OAIPMHResourceMapper {
 
-    /**
-     * @return
-     */
-    public Database getDatabase();
+    @Override
 
+    public String getSupportedOriginalMetadataSchema() {
+
+	return CommonNameSpaceContext.OAI_NS_URI_GML_32;
+    }
+
+    public String fixMetadata(String metadata) {
+	return metadata.replace("http://www.opengis.net/gml/3.2", "http://www.opengis.net/gml");
+    }
 }

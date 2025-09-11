@@ -132,6 +132,16 @@ public class IndexedElement {
 	return values;
     }
 
+    public void addValue(String value) {
+
+	if (value != null && !value.isEmpty()) {
+	    if (!values.contains(value)) {
+		values.add(value);
+	    }
+	}
+
+    }
+
     /**
      * @return
      */

@@ -36,7 +36,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.UsersManager;
+import eu.essi_lab.api.database.UsersReader;
+import eu.essi_lab.api.database.UsersWriter;
+import eu.essi_lab.api.database.ViewsReader;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.api.database.factory.UsersManagerFactory;
 import eu.essi_lab.authentication.token.TokenProvider;
 import eu.essi_lab.authorization.BasicRole;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -51,7 +56,6 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.auth.UserBaseClient;
 import eu.essi_lab.model.auth.UserIdentifierType;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -60,9 +64,6 @@ import eu.essi_lab.model.exceptions.GSException;
  * @author Fabrizio
  */
 public class UserFinder {
-
-    private Optional<String> email;
-    private Optional<String> authProvider;
 
     private static final String USER_FINDING_ERROR = "USER_FINDING_ERROR";
 
@@ -125,12 +126,19 @@ public class UserFinder {
 	};
     }
 
-    private UserBaseClient client;
-    private DatabaseReader reader;
-    protected TokenProvider tokenProvider;
-    private DatabaseWriter writer;
+    private Optional<String> email;
+    private Optional<String> authProvider;
     private StringBuilder logBuilder;
 
+    private ViewsReader viewsReader;
+    private UsersWriter usersWriter;
+    private UsersReader usersReader;
+
+    protected TokenProvider tokenProvider;
+
+    /**
+     * 
+     */
     public UserFinder() {
 
 	tokenProvider = new TokenProvider();
@@ -144,15 +152,27 @@ public class UserFinder {
 
 	UserFinder finder = new UserFinder();
 
-	StorageInfo storageUri = ConfigurationWrapper.getUsersStorageInfo().//
-		orElse(ConfigurationWrapper.getStorageInfo());
+	StorageInfo storageInfo = ConfigurationWrapper.getStorageInfo();
+	DatabaseReader reader = DatabaseProviderFactory.getReader(storageInfo);
 
-	DatabaseReader reader = DatabaseProviderFactory.getReader(storageUri);
-	DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageUri);
+	finder.setWiewsReader(reader);
 
-	finder.setClient(reader);
-	finder.setDatabaseReader(reader);
-	finder.setDatabaseWriter(writer);
+	if (ConfigurationWrapper.getUsersStorageInfo().isEmpty()) {
+
+	    DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageInfo);
+
+	    finder.setUsersReader(reader);
+	    finder.setUsersWriter(writer);
+
+	} else {
+
+	    StorageInfo usersStorageInfo = ConfigurationWrapper.getUsersStorageInfo().get();
+
+	    UsersManager usersManager = UsersManagerFactory.get(usersStorageInfo);
+
+	    finder.setUsersReader(usersManager);
+	    finder.setUsersWriter(usersManager);
+	}
 
 	return finder;
     }
@@ -188,14 +208,6 @@ public class UserFinder {
     }
 
     /**
-     * @param writer
-     */
-    public void setDatabaseWriter(DatabaseWriter writer) {
-
-	this.writer = writer;
-    }
-
-    /**
      * Finds the user who originates the supplied <code>request</code>.<br>
      * <br>
      * For the authentication mechanism which allows
@@ -224,37 +236,6 @@ public class UserFinder {
     }
 
     /**
-     * @param id
-     * @return
-     */
-    private String getViewCreator(String id) {
-	Optional<View> view = getView(id);
-	if (view.isPresent()) {
-	    // we can extract the creator of the view
-	    return view.get().getCreator();
-	} else {
-	    // we can extract the creator of the view also in case of dynamic AND bonds (e.g. gs-view-and(...))
-	    Optional<DynamicView> dynamicView = DynamicView.resolveDynamicView(id);
-	    if (dynamicView.isPresent()) {
-		if (dynamicView.get() instanceof DynamicViewAnd) {
-		    DynamicViewAnd dva = (DynamicViewAnd) dynamicView.get();
-		    List<Bond> operands = dva.getDynamicBond().getOperands();
-		    for (Bond operand : operands) {
-			if (operand instanceof ViewBond) {
-			    ViewBond viewBond = (ViewBond) operand;
-			    view = getView(viewBond.getViewIdentifier());
-			    if (view.isPresent()) {
-				return view.get().getCreator();
-			    }
-			}
-		    }
-		}
-	    }
-	}
-	return null;
-    }
-
-    /**
      * @param identifier
      * @throws Exception
      */
@@ -273,8 +254,10 @@ public class UserFinder {
 		identifier.equals(u.getIdentifier())).findFirst();
 
 	if (user.isPresent()) {
+
 	    user.get().setEnabled(true);
-	    writer.store(user.get());
+
+	    usersWriter.store(user.get());
 	}
     }
 
@@ -285,13 +268,17 @@ public class UserFinder {
 
 	synchronized (USERS_UPDATER_TASK) {
 
-	    if (client != null) {
+	    if (usersReader != null) {
 
-		users = client.getUsers();
+		users = usersReader.getUsers();
 	    }
 	}
     }
 
+    /**
+     * @return
+     * @throws Exception
+     */
     public List<GSUser> getUsers() throws Exception {
 
 	return getUsers(true);
@@ -305,7 +292,7 @@ public class UserFinder {
 
 	synchronized (USERS_UPDATER_TASK) {
 
-	    if (users == null && client != null || !useCache) {
+	    if (users == null && usersReader != null || !useCache) {
 
 		updateUsersCache();
 
@@ -319,72 +306,35 @@ public class UserFinder {
     }
 
     /**
-     * @param identifier
-     * @return
-     * @throws GSException
+     * @param reader
      */
-    protected Optional<View> getView(String identifier) {
+    public void setWiewsReader(ViewsReader reader) {
 
-	if (identifier == null) {
-	    return Optional.empty();
-	}
-	Optional<View> view = Optional.ofNullable(VIEWS.get(identifier));
-	if (!view.isPresent()) {
-
-	    try {
-		view = getDatabaseReader().getView(identifier);
-
-		if (view.isPresent()) {
-
-		    VIEWS.put(identifier, view.get());
-		}
-	    } catch (GSException e) {
-
-		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	    }
-	}
-
-	return view;
+	this.viewsReader = reader;
     }
 
     /**
-     * @param tokenProvider
+     * @param writer
      */
-    public void setTokenProvider(TokenProvider tokenProvider) {
+    public void setUsersWriter(UsersWriter writer) {
 
-	this.tokenProvider = tokenProvider;
-    }
-
-    /**
-     * @param client
-     */
-    public void setClient(UserBaseClient client) {
-
-	this.client = client;
+	this.usersWriter = writer;
     }
 
     /**
      * @param reader
      */
-    public void setDatabaseReader(DatabaseReader reader) {
+    public void setUsersReader(UsersReader reader) {
 
-	this.reader = reader;
-    }
-
-    /**
-     * @return
-     */
-    public DatabaseReader getDatabaseReader() {
-
-	return reader;
+	this.usersReader = reader;
     }
 
     /**
      * @return the writer
      */
-    public DatabaseWriter getWriter() {
+    public UsersWriter getUsersWriter() {
 
-	return writer;
+	return usersWriter;
     }
 
     protected List<GSProperty<String>> findIdentifiers(HttpServletRequest request) throws Exception {
@@ -473,12 +423,13 @@ public class UserFinder {
 		logBuilder.append("\n- View id: " + id);
 		identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_IDENTIFIER.getType(), id));
 
-		String creator = getViewCreator(id);
-		if (creator != null) {
+		Optional<String> creator = getViewCreator(id);
+
+		if (creator.isPresent()) {
 
 		    logBuilder.append("\n- View creator: " + creator);
 
-		    identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_CREATOR.getType(), creator));
+		    identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_CREATOR.getType(), creator.get()));
 		}
 	    });
 	}
@@ -561,6 +512,82 @@ public class UserFinder {
 	}
 
 	return user.get();
+    }
+
+    /**
+     * @param identifier
+     * @return
+     * @throws GSException
+     */
+    protected Optional<View> getView(String identifier) {
+
+	if (identifier == null) {
+
+	    return Optional.empty();
+	}
+
+	Optional<View> view = Optional.ofNullable(VIEWS.get(identifier));
+
+	if (!view.isPresent()) {
+
+	    try {
+		view = viewsReader.getView(identifier);
+
+		if (view.isPresent()) {
+
+		    VIEWS.put(identifier, view.get());
+		}
+	    } catch (GSException e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    }
+	}
+
+	return view;
+    }
+
+    /**
+     * @param id
+     * @return
+     */
+    private Optional<String> getViewCreator(String id) {
+
+	Optional<View> view = getView(id);
+
+	if (view.isPresent()) {
+	    // we can extract the creator of the view
+
+	    return Optional.of(view.get().getCreator());
+	} else {
+
+	    // we can extract the creator of the view also in case of dynamic AND bonds (e.g. gs-view-and(...))
+	    Optional<DynamicView> dynamicView = DynamicView.resolveDynamicView(id);
+
+	    if (dynamicView.isPresent()) {
+
+		if (dynamicView.get() instanceof DynamicViewAnd) {
+
+		    DynamicViewAnd dva = (DynamicViewAnd) dynamicView.get();
+		    List<Bond> operands = dva.getDynamicBond().getOperands();
+
+		    for (Bond operand : operands) {
+
+			if (operand instanceof ViewBond) {
+
+			    ViewBond viewBond = (ViewBond) operand;
+			    view = getView(viewBond.getViewIdentifier());
+
+			    if (view.isPresent()) {
+
+				return Optional.of(view.get().getCreator());
+			    }
+			}
+		    }
+		}
+	    }
+	}
+
+	return Optional.empty();
     }
 
     /**

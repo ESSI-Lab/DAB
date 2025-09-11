@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.model.auth;
+package eu.essi_lab.api.database;
 
 /*-
  * #%L
@@ -24,30 +24,25 @@ package eu.essi_lab.model.auth;
  * #L%
  */
 
-import java.util.List;
-import java.util.Optional;
-
+import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
  */
-public interface UserBaseClient {
+public interface UsersWriter {
 
     /**
-     * Gets the {@link GSUser} with the provided identifier
-     *
-     * @param identifier the identifier of the user
-     * @return the optional user
+     * @param user
      * @throws GSException
      */
-    Optional<GSUser> getUser(String userName) throws Exception;
+    public void store(GSUser user) throws GSException;
 
     /**
-     * Gets all the available {@link GSUser}s
+     * Removes the user associated with the given identifier
      *
-     * @return the users list, possible empty
+     * @param userIdentifier
      * @throws GSException
      */
-    List<GSUser> getUsers() throws Exception;
+    public void removeUser(String userIdentifier) throws GSException;
 }

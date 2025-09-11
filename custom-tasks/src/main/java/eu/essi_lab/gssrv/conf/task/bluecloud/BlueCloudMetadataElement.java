@@ -67,8 +67,8 @@ public enum BlueCloudMetadataElement {
     PROJECT_URI(MetadataElement.PROJECT_URI,
 	    "/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords[gmd:type/gmd:MD_KeywordTypeCode/@codeListValue='project']/gmd:keyword/*[1]/@xlink:href"), //
     DATESTAMP(MetadataElement.DATE_STAMP, "/gmi2019:MI_Metadata/gmd:dateStamp/gco:Date"), //
-    REVISION_DATE(MetadataElement.REVISION_DATE,
-	    "/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue='revision']/gmd:date/gco:Date"), //
+    REFERENCE_DATE(MetadataElement.REFERENCE_DATE,
+	    "/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date"), //
     RESOURCE_IDENTIFIER(MetadataElement.RESOURCE_IDENTIFIER,
 	    "/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gco:CharacterString"), LICENSE_USE_LIMITAION(
 		    null,

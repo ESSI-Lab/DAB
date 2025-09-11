@@ -506,9 +506,9 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("hisc/station.html");
 		break;
 	    default:
-		if (viewId.contains("whos")) {
+//		if (viewId.contains("whos")) {
 		    stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("whos/station.html");
-		}
+//		}
 		break;
 	    }
 
