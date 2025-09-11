@@ -38,7 +38,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public abstract class Database implements DatabaseCompliant, Configurable<DatabaseSetting> {
+public abstract class Database implements SupportChecker, Configurable<DatabaseSetting> {
 
     /**
      * 
@@ -224,7 +224,7 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     }
 
     /**
-     * Initializes a data base instance with the given <code>storageInfo</code>
+     * Initializes a {@link Database} instance with the given <code>storageInfo</code>
      *
      * @param storageInfo
      * @throws GSException if the initialization fails

@@ -24,19 +24,19 @@ package eu.essi_lab.api.database;
  * #L%
  */
 
+import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.exceptions.GSException;
+
 /**
  * @author Fabrizio
  */
-public interface DatabaseProvider extends SupportChecker {
+public interface UsersManager extends UsersReader, UsersWriter, SupportChecker {
 
     /**
-     * @param database
+     * Initializes a {@link UsersManager} instance with the given <code>storageInfo</code>
+     *
+     * @param storageInfo
+     * @throws GSException if the initialization fails
      */
-    public void setDatabase(Database database);
-
-    /**
-     * @return
-     */
-    public Database getDatabase();
-
+    void initialize(StorageInfo storageInfo) throws GSException;
 }

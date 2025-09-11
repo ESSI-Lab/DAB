@@ -36,7 +36,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.UsersManager;
+import eu.essi_lab.api.database.UsersReader;
+import eu.essi_lab.api.database.UsersWriter;
+import eu.essi_lab.api.database.ViewsReader;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.api.database.factory.UsersManagerFactory;
 import eu.essi_lab.authentication.token.TokenProvider;
 import eu.essi_lab.authorization.BasicRole;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -59,9 +64,6 @@ import eu.essi_lab.model.exceptions.GSException;
  * @author Fabrizio
  */
 public class UserFinder {
-
-    private Optional<String> email;
-    private Optional<String> authProvider;
 
     private static final String USER_FINDING_ERROR = "USER_FINDING_ERROR";
 
@@ -124,9 +126,14 @@ public class UserFinder {
 	};
     }
 
-    private DatabaseReader reader;
-    private DatabaseWriter writer;
+    private Optional<String> email;
+    private Optional<String> authProvider;
     private StringBuilder logBuilder;
+
+    private ViewsReader viewsReader;
+    private UsersWriter usersWriter;
+    private UsersReader usersReader;
+
     protected TokenProvider tokenProvider;
 
     /**
@@ -145,14 +152,27 @@ public class UserFinder {
 
 	UserFinder finder = new UserFinder();
 
-	StorageInfo storageUri = ConfigurationWrapper.getUsersStorageInfo().//
-		orElse(ConfigurationWrapper.getStorageInfo());
+	StorageInfo storageInfo = ConfigurationWrapper.getStorageInfo();
+	DatabaseReader reader = DatabaseProviderFactory.getReader(storageInfo);
 
-	DatabaseReader reader = DatabaseProviderFactory.getReader(storageUri);
-	DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageUri);
+	finder.setWiewsReader(reader);
 
-	finder.setDatabaseReader(reader);
-	finder.setDatabaseWriter(writer);
+	if (ConfigurationWrapper.getUsersStorageInfo().isEmpty()) {
+
+	    DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageInfo);
+
+	    finder.setUsersReader(reader);
+	    finder.setUsersWriter(writer);
+
+	} else {
+
+	    StorageInfo usersStorageInfo = ConfigurationWrapper.getUsersStorageInfo().get();
+
+	    UsersManager usersManager = UsersManagerFactory.get(usersStorageInfo);
+
+	    finder.setUsersReader(usersManager);
+	    finder.setUsersWriter(usersManager);
+	}
 
 	return finder;
     }
@@ -185,14 +205,6 @@ public class UserFinder {
 	}
 
 	return user;
-    }
-
-    /**
-     * @param writer
-     */
-    public void setDatabaseWriter(DatabaseWriter writer) {
-
-	this.writer = writer;
     }
 
     /**
@@ -242,8 +254,10 @@ public class UserFinder {
 		identifier.equals(u.getIdentifier())).findFirst();
 
 	if (user.isPresent()) {
+
 	    user.get().setEnabled(true);
-	    writer.store(user.get());
+
+	    usersWriter.store(user.get());
 	}
     }
 
@@ -254,9 +268,9 @@ public class UserFinder {
 
 	synchronized (USERS_UPDATER_TASK) {
 
-	    if (reader != null) {
+	    if (usersReader != null) {
 
-		users = reader.getUsers();
+		users = usersReader.getUsers();
 	    }
 	}
     }
@@ -278,7 +292,7 @@ public class UserFinder {
 
 	synchronized (USERS_UPDATER_TASK) {
 
-	    if (users == null && reader != null || !useCache) {
+	    if (users == null && usersReader != null || !useCache) {
 
 		updateUsersCache();
 
@@ -294,25 +308,33 @@ public class UserFinder {
     /**
      * @param reader
      */
-    public void setDatabaseReader(DatabaseReader reader) {
+    public void setWiewsReader(ViewsReader reader) {
 
-	this.reader = reader;
+	this.viewsReader = reader;
     }
 
     /**
-     * @return
+     * @param writer
      */
-    public DatabaseReader getDatabaseReader() {
+    public void setUsersWriter(UsersWriter writer) {
 
-	return reader;
+	this.usersWriter = writer;
+    }
+
+    /**
+     * @param reader
+     */
+    public void setUsersReader(UsersReader reader) {
+
+	this.usersReader = reader;
     }
 
     /**
      * @return the writer
      */
-    public DatabaseWriter getWriter() {
+    public UsersWriter getUsersWriter() {
 
-	return writer;
+	return usersWriter;
     }
 
     protected List<GSProperty<String>> findIdentifiers(HttpServletRequest request) throws Exception {
@@ -509,7 +531,7 @@ public class UserFinder {
 	if (!view.isPresent()) {
 
 	    try {
-		view = reader.getView(identifier);
+		view = viewsReader.getView(identifier);
 
 		if (view.isPresent()) {
 
@@ -529,42 +551,43 @@ public class UserFinder {
      * @return
      */
     private Optional<String> getViewCreator(String id) {
-       
+
 	Optional<View> view = getView(id);
-       
-        if (view.isPresent()) {
-            // we can extract the creator of the view
-         
-            return Optional.of(view.get().getCreator());
-        } else {
-            
-            // we can extract the creator of the view also in case of dynamic AND bonds (e.g. gs-view-and(...))
-            Optional<DynamicView> dynamicView = DynamicView.resolveDynamicView(id);
-          
-            if (dynamicView.isPresent()) {
-        	
-        	if (dynamicView.get() instanceof DynamicViewAnd) {
-        	    
-        	    DynamicViewAnd dva = (DynamicViewAnd) dynamicView.get();
-        	    List<Bond> operands = dva.getDynamicBond().getOperands();
-        	    
-        	    for (Bond operand : operands) {
-        		
-        		if (operand instanceof ViewBond) {
-        		    
-        		    ViewBond viewBond = (ViewBond) operand;
-        		    view = getView(viewBond.getViewIdentifier());
-        		   
-        		    if (view.isPresent()) {
-        			return Optional.of(view.get().getCreator());
-        		    }
-        		}
-        	    }
-        	}
-            }
-        }
-        
-        return Optional.empty();FS
+
+	if (view.isPresent()) {
+	    // we can extract the creator of the view
+
+	    return Optional.of(view.get().getCreator());
+	} else {
+
+	    // we can extract the creator of the view also in case of dynamic AND bonds (e.g. gs-view-and(...))
+	    Optional<DynamicView> dynamicView = DynamicView.resolveDynamicView(id);
+
+	    if (dynamicView.isPresent()) {
+
+		if (dynamicView.get() instanceof DynamicViewAnd) {
+
+		    DynamicViewAnd dva = (DynamicViewAnd) dynamicView.get();
+		    List<Bond> operands = dva.getDynamicBond().getOperands();
+
+		    for (Bond operand : operands) {
+
+			if (operand instanceof ViewBond) {
+
+			    ViewBond viewBond = (ViewBond) operand;
+			    view = getView(viewBond.getViewIdentifier());
+
+			    if (view.isPresent()) {
+
+				return Optional.of(view.get().getCreator());
+			    }
+			}
+		    }
+		}
+	    }
+	}
+
+	return Optional.empty();
     }
 
     /**

@@ -381,11 +381,11 @@ public class OMHandler extends StreamingRequestHandler {
 
 			if (asynchDownloadRequest) {
 
-			    GSProperty<?> emailProperty = user.getProperty("email");
+			    Optional<String> emailProperty = user.getStringPropertyValue("email");
 
 			    String email = null;
-			    if (emailProperty != null) {
-				email = emailProperty.getValue().toString();
+			    if (emailProperty.isPresent()) {
+				email = emailProperty.get();
 			    }
 			    String operationId = email + ":" + UUID.randomUUID().toString();
 
