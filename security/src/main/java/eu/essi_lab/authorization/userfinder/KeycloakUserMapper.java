@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.authorization.userfinder;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -40,65 +42,105 @@ import eu.essi_lab.model.auth.GSUser;
 public class KeycloakUserMapper {
 
     /**
-     * @param user
+     * @param keycloakUser
      * @return
      */
     @SuppressWarnings("rawtypes")
-    public static GSUser toGSUser(KeycloakUser user) {
+    public static GSUser toGSUser(KeycloakUser keycloakUser) {
 
 	GSUser gsUser = new GSUser();
-	gsUser.setEnabled(user.isEnabled());
-	gsUser.setIdentifier(user.getUserProfileAttribute(UserProfileAttribute.USERNAME).get());
 
-	List<GSProperty> properties = user.getAttributes().//
-		stream().//
-		filter(attr -> !attr.getKey().equals("role") && !attr.getKey().equals("authProvider")).//
+	gsUser.setEnabled(keycloakUser.isEnabled());
+
+	//
+	// keycloak username set as gsuser identifier
+	//
+	gsUser.setIdentifier(keycloakUser.getUserProfileAttribute(UserProfileAttribute.USERNAME).get());
+
+	//
+	// all the keycloak user attributes, except role and authProvider (they have a
+	// specific field in the GSUser so they are set separately), are mapped to the GSUser properties
+	//
+	List<GSProperty> properties = keycloakUser.getAttributes().//
+		stream().filter(attr -> !attr.getKey().equals(GSUser.ROLE) && !attr.getKey().equals(GSUser.AUTH_PROVIDER)).//
+		// keycloak attributes can have multiple values, here only the first is taken!
 		map(attr -> GSProperty.of(attr.getKey(), attr.getValue().get(0))).//
 		collect(Collectors.toList());
 
-	user.getUserProfileAttribute(UserProfileAttribute.FIRST_NAME).ifPresent(v -> properties.add(GSProperty.of("firstName", v)));
-	user.getUserProfileAttribute(UserProfileAttribute.LAST_NAME).ifPresent(v -> properties.add(GSProperty.of("lastName", v)));
-	user.getUserProfileAttribute(UserProfileAttribute.EMAIL).ifPresent(v -> properties.add(GSProperty.of("email", v)));
+	//
+	// createdTimeStamp has a specific field in the keycloak user
+	//
+	keycloakUser.getCreatedTimeStamp().ifPresent(v -> properties.add(GSProperty.of(KeycloakUser.CREATED_TIME_STAMP_FIELD, v)));
+
+	//
+	// all the keycloak user profile attributes, except username, are mapped to the GSUser properties
+	//
+	UserProfileAttribute.getAttributes().//
+		stream().//
+		filter(attr -> !attr.equals(UserProfileAttribute.USERNAME.getAttribute())).//
+		forEach(attr -> keycloakUser.getUserProfileAttribute(UserProfileAttribute.of(attr).get())
+			.ifPresent(v -> properties.add(GSProperty.of(attr, v))));
 
 	gsUser.setAttributes(properties);
 
-	user.getAttributeValue("role").ifPresent(v -> gsUser.setRole(v));
-
-	user.getAttributeValue("authProvider").ifPresent(v -> gsUser.setAuthProvider(v));
+	//
+	// role and authProvider have a specific field in the GSUser
+	//
+	keycloakUser.getAttributeValue(GSUser.ROLE).ifPresent(v -> gsUser.setRole(v));
+	keycloakUser.getAttributeValue(GSUser.AUTH_PROVIDER).ifPresent(v -> gsUser.setAuthProvider(v));
 
 	return gsUser;
     }
 
     /**
-     * @param user
+     * @param gsUser
      * @return
      */
-    public static KeycloakUser toKeycloakUser(GSUser user) {
+    public static KeycloakUser toKeycloakUser(GSUser gsUser) {
 
-	List<Entry<String, String>> attributes = user.getProperties().//
+	//
+	// all the GSUser properties, except the keycloak user profile attributes and createdTimeStamp, are mapped
+	// to the keycloak user attributes
+	//
+	List<Entry<String, String>> attributes = gsUser.getProperties().//
 		stream().//
-		filter(prop -> !prop.getName().equals("email") && !prop.getName().equals("firstName") && !prop.getName().equals("lastName"))
+		filter(prop -> !UserProfileAttribute.getAttributes().contains(prop.getName())
+			&& !prop.getName().equals(KeycloakUser.CREATED_TIME_STAMP_FIELD))
 		.//
 		map(prop -> Map.entry(prop.getName(), prop.getValue().toString())).//
 		collect(Collectors.toList());
 
-	if (user.getAuthProvider() != null) {
+	//
+	// GSUser authProvider and role are mapped to the keycloak user attributes
+	//
+	if (gsUser.getAuthProvider() != null) {
 
-	    attributes.add(Map.entry("authProvider", user.getAuthProvider()));
+	    attributes.add(Map.entry(GSUser.AUTH_PROVIDER, gsUser.getAuthProvider()));
 	}
 
-	if (user.getRole() != null) {
+	if (gsUser.getRole() != null) {
 
-	    attributes.add(Map.entry("role", user.getRole()));
+	    attributes.add(Map.entry(GSUser.ROLE, gsUser.getRole()));
 	}
 
-	return new KeycloakUser.KeycloakUserBuilder().enabled(user.isEnabled()).//
-		withUserProfileAttribute(UserProfileAttribute.USERNAME, user.getIdentifier()).//
+	ArrayList<Entry<UserProfileAttribute, String>> userProfileAttr = new ArrayList<>();
 
-		withOptionalUserProfileAttribute(UserProfileAttribute.EMAIL, user.getStringPropertyValue("email")).//
-		withOptionalUserProfileAttribute(UserProfileAttribute.FIRST_NAME, user.getStringPropertyValue("firstName")).//
-		withOptionalUserProfileAttribute(UserProfileAttribute.LAST_NAME, user.getStringPropertyValue("lastName")).//
+	// the GSUser identifier mapped to keycloak username
+	userProfileAttr.add(Map.entry(UserProfileAttribute.USERNAME, gsUser.getIdentifier()));
 
+	//
+	// all the GSUser properties which correspond to a keycloak user profile attribute are mapped
+	//
+	UserProfileAttribute.//
+		getAttributes().//
+
+		forEach(attr -> gsUser.getStringPropertyValue(attr).ifPresent(v ->
+
+		userProfileAttr.add(Map.entry(UserProfileAttribute.of(attr).get(), v))));
+
+	return new KeycloakUser.KeycloakUserBuilder().enabled(gsUser.isEnabled()).//
+		withOptionalCreatedTimeStamp(gsUser.getStringPropertyValue(KeycloakUser.CREATED_TIME_STAMP_FIELD)).//
+		withUserProfileAttributes(userProfileAttr).//
 		withAttributes(attributes).//
 		build();
     }

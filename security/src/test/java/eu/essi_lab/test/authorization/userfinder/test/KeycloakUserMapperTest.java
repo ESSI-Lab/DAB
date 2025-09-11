@@ -15,6 +15,7 @@ import eu.essi_lab.authorization.userfinder.KeycloakUserMapper;
 import eu.essi_lab.authorization.userfinder.KeycloakUsersManager;
 import eu.essi_lab.lib.net.keycloak.KeycloakUser;
 import eu.essi_lab.lib.net.keycloak.KeycloakUser.UserProfileAttribute;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.auth.GSUser;
 
 /**
@@ -26,13 +27,18 @@ public class KeycloakUserMapperTest {
     public void test() throws UnsupportedEncodingException, JAXBException {
 
 	GSUser gsUser = new GSUser();
+
 	gsUser.setAuthProvider(KeycloakUsersManager.KEYCLOAK_TYPE);
 	gsUser.setEnabled(false);
 	gsUser.setIdentifier("http://xxx");
-	gsUser.setRole("userRole");
-	gsUser.setPropertyValue("firstName", "pippo");
-	gsUser.setPropertyValue("lastName", "foo");
-	gsUser.setPropertyValue("email", "xxx@gmail.com");
+
+	gsUser.setRole(GSUser.ROLE);
+	gsUser.setPropertyValue(UserProfileAttribute.FIRST_NAME.getAttribute(), "pippo");
+	gsUser.setPropertyValue(UserProfileAttribute.LAST_NAME.getAttribute(), "foo");
+	gsUser.setPropertyValue(UserProfileAttribute.EMAIL.getAttribute(), "xxx@gmail.com");
+
+	// time stamp
+	gsUser.setPropertyValue(KeycloakUser.CREATED_TIME_STAMP_FIELD, ISO8601DateTimeUtils.getISO8601DateTime());
 
 	gsUser.setPropertyValue("registrationDate", "2024-11-26T07:56:58Z");
 	gsUser.setPropertyValue("institutionType", "nmhs");
@@ -49,21 +55,28 @@ public class KeycloakUserMapperTest {
 
 	Assert.assertEquals(gsUser.isEnabled(), keycloakUser.isEnabled());
 
+	// time stamp
+	Assert.assertEquals(gsUser.getStringPropertyValue(KeycloakUser.CREATED_TIME_STAMP_FIELD).get(),
+		keycloakUser.getCreatedTimeStamp().get());
+
 	// keycloak users id is automatically set at creation time
 	Assert.assertTrue(keycloakUser.getIdentifier().isEmpty());
 
 	// gsuser id is mapped to the keycloak user username
 	Assert.assertEquals(gsUser.getIdentifier(), keycloakUser.getUserProfileAttribute(UserProfileAttribute.USERNAME).get());
 
-	Assert.assertEquals(gsUser.getAuthProvider(), keycloakUser.getAttribute("authProvider").get().getValue().get(0));
+	Assert.assertEquals(gsUser.getAuthProvider(), keycloakUser.getAttribute(GSUser.AUTH_PROVIDER).get().getValue().get(0));
 
-	Assert.assertEquals(gsUser.getRole(), keycloakUser.getAttribute("role").get().getValue().get(0));
+	Assert.assertEquals(gsUser.getRole(), keycloakUser.getAttribute(GSUser.ROLE).get().getValue().get(0));
 
-	Assert.assertEquals(gsUser.getStringPropertyValue("firstName").get(), keycloakUser.getUserProfileAttribute(UserProfileAttribute.FIRST_NAME).get());
+	Assert.assertEquals(gsUser.getStringPropertyValue(UserProfileAttribute.FIRST_NAME.getAttribute()).get(),
+		keycloakUser.getUserProfileAttribute(UserProfileAttribute.FIRST_NAME).get());
 
-	Assert.assertEquals(gsUser.getStringPropertyValue("lastName").get(), keycloakUser.getUserProfileAttribute(UserProfileAttribute.LAST_NAME).get());
+	Assert.assertEquals(gsUser.getStringPropertyValue(UserProfileAttribute.LAST_NAME.getAttribute()).get(),
+		keycloakUser.getUserProfileAttribute(UserProfileAttribute.LAST_NAME).get());
 
-	Assert.assertEquals(gsUser.getStringPropertyValue("email").get(), keycloakUser.getUserProfileAttribute(UserProfileAttribute.EMAIL).get());
+	Assert.assertEquals(gsUser.getStringPropertyValue(UserProfileAttribute.EMAIL.getAttribute()).get(),
+		keycloakUser.getUserProfileAttribute(UserProfileAttribute.EMAIL).get());
 
 	Assert.assertEquals(gsUser.getStringPropertyValue("registrationDate").get(),
 		keycloakUser.getAttributeValue("registrationDate").get());
@@ -92,6 +105,9 @@ public class KeycloakUserMapperTest {
 	Assert.assertEquals(gsUser.getRole(), gsUser2.getRole());
 	Assert.assertEquals(gsUser.getUri(), gsUser2.getUri());
 
+	Assert.assertEquals(gsUser2.getStringPropertyValue(KeycloakUser.CREATED_TIME_STAMP_FIELD).get(),
+		gsUser.getStringPropertyValue(KeycloakUser.CREATED_TIME_STAMP_FIELD).get());
+
 	Assert.assertEquals(gsUser.getUserIdentifierType(), gsUser2.getUserIdentifierType());
 	Assert.assertEquals(//
 		gsUser.getProperties().stream().sorted((p1, p2) -> p1.getName().compareTo(p2.getName())).collect(Collectors.toList()),
@@ -101,15 +117,18 @@ public class KeycloakUserMapperTest {
 
 	Assert.assertEquals(gsUser2.getIdentifier(), keycloakUser.getUserProfileAttribute(UserProfileAttribute.USERNAME).get());
 
-	Assert.assertEquals(gsUser2.getAuthProvider(), keycloakUser.getAttribute("authProvider").get().getValue().get(0));
+	Assert.assertEquals(gsUser2.getAuthProvider(), keycloakUser.getAttribute(GSUser.AUTH_PROVIDER).get().getValue().get(0));
 
-	Assert.assertEquals(gsUser2.getRole(), keycloakUser.getAttribute("role").get().getValue().get(0));
+	Assert.assertEquals(gsUser2.getRole(), keycloakUser.getAttribute(GSUser.ROLE).get().getValue().get(0));
 
-	Assert.assertEquals(gsUser2.getStringPropertyValue("firstName").get(), keycloakUser.getUserProfileAttribute(UserProfileAttribute.FIRST_NAME).get());
+	Assert.assertEquals(gsUser2.getStringPropertyValue(UserProfileAttribute.FIRST_NAME.getAttribute()).get(),
+		keycloakUser.getUserProfileAttribute(UserProfileAttribute.FIRST_NAME).get());
 
-	Assert.assertEquals(gsUser2.getStringPropertyValue("lastName").get(), keycloakUser.getUserProfileAttribute(UserProfileAttribute.LAST_NAME).get());
+	Assert.assertEquals(gsUser2.getStringPropertyValue(UserProfileAttribute.LAST_NAME.getAttribute()).get(),
+		keycloakUser.getUserProfileAttribute(UserProfileAttribute.LAST_NAME).get());
 
-	Assert.assertEquals(gsUser2.getStringPropertyValue("email").get(), keycloakUser.getUserProfileAttribute(UserProfileAttribute.EMAIL).get());
+	Assert.assertEquals(gsUser2.getStringPropertyValue(UserProfileAttribute.EMAIL.getAttribute()).get(),
+		keycloakUser.getUserProfileAttribute(UserProfileAttribute.EMAIL).get());
 
 	Assert.assertEquals(gsUser2.getStringPropertyValue("registrationDate").get(),
 		keycloakUser.getAttributeValue("registrationDate").get());

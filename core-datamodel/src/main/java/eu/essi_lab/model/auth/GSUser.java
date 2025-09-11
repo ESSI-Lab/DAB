@@ -66,6 +66,16 @@ public class GSUser extends DOMSerializer implements Serializable {
      * 
      */
     public static final String IDENTIFIER_TYPE_ELEMENT_NAME = "identifierType";
+    
+    /**
+     * 
+     */
+    public static final String AUTH_PROVIDER = "authProvider";
+    /**
+     * 
+     */
+    public static final String ROLE = "role";
+
 
     @NotNull
     @Email

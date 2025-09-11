@@ -153,17 +153,17 @@ public class KeycloakUsersManagerTest {
 	// common elements
 	//
 
-	Assert.assertEquals(rawJSON.getBoolean("enabled"), simpleJSON.getBoolean("enabled"));
-	Assert.assertEquals(rawJSON.getString("id"), simpleJSON.getString("id"));
-	Assert.assertEquals(rawJSON.getString("email"), simpleJSON.getString("email"));
-	Assert.assertEquals(rawJSON.getString("username"), simpleJSON.getString("username"));
-	Assert.assertEquals(rawJSON.getString("lastName"), simpleJSON.getString("lastName"));
-	Assert.assertEquals(rawJSON.getString("firstName"), simpleJSON.getString("firstName"));
+	Assert.assertEquals(rawJSON.getBoolean(KeycloakUser.ENABLED_FIELD), simpleJSON.getBoolean("enabled"));
+	Assert.assertEquals(rawJSON.getString(KeycloakUser.ID_FIELD), simpleJSON.getString("id"));
+	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.EMAIL.getAttribute()), simpleJSON.getString(UserProfileAttribute.EMAIL.getAttribute()));
+	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.USERNAME.getAttribute()), simpleJSON.getString(UserProfileAttribute.USERNAME.getAttribute()));
+	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.LAST_NAME.getAttribute()), simpleJSON.getString(UserProfileAttribute.LAST_NAME.getAttribute()));
+	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.FIRST_NAME.getAttribute()), simpleJSON.getString(UserProfileAttribute.FIRST_NAME.getAttribute()));
 	Assert.assertEquals(rawJSON.getJSONObject("attributes").toString(), simpleJSON.getJSONObject("attributes").toString());
 
-	Assert.assertNotNull(rawJSON.get("createdTimestamp")); // in the raw JSON is long
-	Assert.assertNotNull(simpleJSON.get("createdTimestamp")); // in the simple JSON it is in ISO8601 format
-	Assert.assertTrue(ISO8601DateTimeUtils.parseISO8601ToDate(simpleJSON.getString("createdTimestamp")).isPresent());
+	Assert.assertNotNull(rawJSON.get(KeycloakUser.CREATED_TIME_STAMP_FIELD)); // in the raw JSON is long
+	Assert.assertNotNull(simpleJSON.get(KeycloakUser.CREATED_TIME_STAMP_FIELD)); // in the simple JSON it is in ISO8601 format
+	Assert.assertTrue(ISO8601DateTimeUtils.parseISO8601ToDate(simpleJSON.getString(KeycloakUser.CREATED_TIME_STAMP_FIELD)).isPresent());
 
 	//
 	// elements only in the raw JSON

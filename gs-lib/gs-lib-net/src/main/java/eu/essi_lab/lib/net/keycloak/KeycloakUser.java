@@ -44,6 +44,10 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
  */
 public class KeycloakUser {
 
+    public static final String ID_FIELD = "id";
+    public static final String ENABLED_FIELD = "enabled";
+    public static final String CREATED_TIME_STAMP_FIELD = "createdTimestamp";
+
     /**
      * @author Fabrizio
      */
@@ -82,7 +86,7 @@ public class KeycloakUser {
 	/***
 	 * 
 	 */
-	public String getValue() {
+	public String getAttribute() {
 
 	    return attribute;
 	}
@@ -90,9 +94,9 @@ public class KeycloakUser {
 	/**
 	 * @return
 	 */
-	public static List<String> getValues() {
+	public static List<String> getAttributes() {
 
-	    return Arrays.asList(values()).stream().map(v -> v.getValue()).collect(Collectors.toList());
+	    return Arrays.asList(values()).stream().map(v -> v.getAttribute()).collect(Collectors.toList());
 	}
 
 	/**
@@ -101,7 +105,16 @@ public class KeycloakUser {
 	 */
 	public static boolean isUserProfileAttribute(String attribute) {
 
-	    return getValues().contains(attribute);
+	    return getAttributes().contains(attribute);
+	}
+
+	/**
+	 * @param attr
+	 * @return
+	 */
+	public static Optional<UserProfileAttribute> of(String attr) {
+
+	    return Arrays.asList(values()).stream().filter(v -> v.getAttribute().equals(attr)).findFirst();
 	}
     }
 
@@ -126,7 +139,7 @@ public class KeycloakUser {
      */
     public Optional<String> getCreatedTimeStamp() {
 
-	return Optional.of(timeStamp);
+	return Optional.ofNullable(timeStamp);
     }
 
     /**
@@ -191,7 +204,7 @@ public class KeycloakUser {
      */
     public Optional<String> getUserProfileAttribute(UserProfileAttribute attr) {
 
-	return Optional.ofNullable(userProfileAttributes.get(attr.getValue()));
+	return Optional.ofNullable(userProfileAttributes.get(attr.getAttribute()));
     }
 
     /**
@@ -200,9 +213,9 @@ public class KeycloakUser {
     public JSONObject toJSON() {
 
 	JSONObject user = new JSONObject();
-	user.put("id", identifier);
-	user.put("enabled", enabled);
-	user.put("createdTimestamp", timeStamp);
+	user.put(ID_FIELD, identifier);
+	user.put(ENABLED_FIELD, enabled);
+	user.put(CREATED_TIME_STAMP_FIELD, timeStamp);
 
 	userProfileAttributes.keySet().forEach(attr -> {
 
@@ -233,11 +246,11 @@ public class KeycloakUser {
 
 	KeycloakUser out = new KeycloakUser();
 
-	out.identifier = object.getString("id");
-	out.enabled = object.getBoolean("enabled");
-	out.timeStamp = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.valueOf(object.get("createdTimestamp").toString())));
+	out.identifier = object.getString(ID_FIELD);
+	out.enabled = object.getBoolean(ENABLED_FIELD);
+	out.timeStamp = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.valueOf(object.get(CREATED_TIME_STAMP_FIELD).toString())));
 
-	UserProfileAttribute.getValues().forEach(attr -> {
+	UserProfileAttribute.getAttributes().forEach(attr -> {
 
 	    String optString = object.optString(attr, null);
 
@@ -319,6 +332,22 @@ public class KeycloakUser {
 	}
 
 	/**
+	 * @param timeStamp
+	 * @return
+	 */
+	public KeycloakUserBuilder withOptionalCreatedTimeStamp(Optional<String> timeStamp) {
+
+	    if (timeStamp == null) {
+
+		throw new IllegalArgumentException();
+	    }
+
+	    timeStamp.ifPresent(v -> user.timeStamp = timeStamp.get());
+
+	    return this;
+	}
+
+	/**
 	 * @param attr
 	 * @param value
 	 * @return
@@ -330,7 +359,7 @@ public class KeycloakUser {
 		throw new IllegalArgumentException();
 	    }
 
-	    value.ifPresent(v -> user.userProfileAttributes.put(attr.getValue(), v));
+	    value.ifPresent(v -> user.userProfileAttributes.put(attr.getAttribute(), v));
 
 	    return this;
 	}
@@ -347,7 +376,23 @@ public class KeycloakUser {
 		throw new IllegalArgumentException();
 	    }
 
-	    user.userProfileAttributes.put(attr.getValue(), value);
+	    user.userProfileAttributes.put(attr.getAttribute(), value);
+	    return this;
+	}
+
+	/**
+	 * @param attributes
+	 * @return
+	 */
+	public KeycloakUserBuilder withUserProfileAttributes(List<Map.Entry<UserProfileAttribute, String>> attributes) {
+
+	    if (attributes == null) {
+
+		throw new IllegalArgumentException();
+	    }
+
+	    attributes.forEach(entry -> user.userProfileAttributes.put(entry.getKey().getAttribute(), entry.getValue()));
+
 	    return this;
 	}
 
