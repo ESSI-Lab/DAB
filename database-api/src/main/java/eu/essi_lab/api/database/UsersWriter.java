@@ -24,19 +24,25 @@ package eu.essi_lab.api.database;
  * #L%
  */
 
+import eu.essi_lab.model.auth.GSUser;
+import eu.essi_lab.model.exceptions.GSException;
+
 /**
  * @author Fabrizio
  */
-public interface DatabaseProvider extends SupportChecker {
+public interface UsersWriter {
 
     /**
-     * @param database
+     * @param user
+     * @throws GSException
      */
-    public void setDatabase(Database database);
+    public void store(GSUser user) throws GSException;
 
     /**
-     * @return
+     * Removes the user associated with the given identifier
+     *
+     * @param userIdentifier
+     * @throws GSException
      */
-    public Database getDatabase();
-
+    public void removeUser(String userIdentifier) throws GSException;
 }

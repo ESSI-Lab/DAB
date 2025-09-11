@@ -29,15 +29,13 @@ import eu.essi_lab.model.StorageInfo;
 /**
  * @author Fabrizio
  */
-public interface DatabaseCompliant {
+public interface SupportChecker {
 
     /**
-     * Checks if this implementation supports the the {@link Database} referenced by the <code>dbUri</code>
-     * parameter.
-     * <code>dbUri</code> parameter validation is not assumed to be implemented in this method
+     * Checks if this implementation supports the the service referenced by <code>info</code>
      * 
      * @param info
-     * @return <code>true</code> if this implementation supports the {@link Database} referenced by
+     * @return <code>true</code> if this implementation supports the service referenced by
      *         the parameter, <code>false</code> otherwise
      */
     public boolean supports(StorageInfo info);

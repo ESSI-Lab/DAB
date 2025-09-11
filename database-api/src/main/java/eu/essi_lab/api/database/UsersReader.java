@@ -24,19 +24,42 @@ package eu.essi_lab.api.database;
  * #L%
  */
 
+import java.util.List;
+import java.util.Optional;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.auth.GSUser;
+import eu.essi_lab.model.exceptions.GSException;
+
 /**
  * @author Fabrizio
  */
-public interface DatabaseProvider extends SupportChecker {
+public interface UsersReader {
 
     /**
-     * @param database
+     * Gets the {@link GSUser} with the provided identifier
+     *
+     * @param identifier the identifier of the user
+     * @return the optional user
+     * @throws GSException
      */
-    public void setDatabase(Database database);
+    public default Optional<GSUser> getUser(String identifier) throws GSException {
+
+	try {
+
+	    return getUsers().stream().filter(u -> u.getIdentifier().equals(identifier)).findFirst();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    throw GSException.createException(getClass(), "DatabaseGetUserError", ex);
+	}
+    }
 
     /**
-     * @return
+     * 
+     * 
      */
-    public Database getDatabase();
-
+    public List<GSUser> getUsers() throws GSException;
 }
