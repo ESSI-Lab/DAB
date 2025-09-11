@@ -26,6 +26,8 @@ package eu.essi_lab.lib.net.keycloak;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,18 +37,79 @@ import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+
 /**
  * @author Fabrizio
  */
 public class KeycloakUser {
 
+    /**
+     * @author Fabrizio
+     */
+    public enum UserProfileAttribute {
+
+	/**
+	 * 
+	 */
+	USERNAME("username"),
+
+	/**
+	 * 
+	 */
+	EMAIL("email"),
+
+	/**
+	 * 
+	 */
+	FIRST_NAME("firstName"),
+
+	/**
+	 * 
+	 */
+	LAST_NAME("lastName");
+
+	private String attribute;
+
+	/**
+	 * @param attribute
+	 */
+	private UserProfileAttribute(String attribute) {
+
+	    this.attribute = attribute;
+	}
+
+	/***
+	 * 
+	 */
+	public String getValue() {
+
+	    return attribute;
+	}
+
+	/**
+	 * @return
+	 */
+	public static List<String> getValues() {
+
+	    return Arrays.asList(values()).stream().map(v -> v.getValue()).collect(Collectors.toList());
+	}
+
+	/**
+	 * @param attribute
+	 * @return
+	 */
+	public static boolean isUserProfileAttribute(String attribute) {
+
+	    return getValues().contains(attribute);
+	}
+    }
+
     private boolean enabled;
     private String identifier;
-    private String userName;
-    private String email;
-    private String firstName;
-    private String lastName;
     private List<Entry<String, List<String>>> attributes;
+    private HashMap<String, String> userProfileAttributes;
+    private String timeStamp;
 
     /**
      * 
@@ -54,7 +117,16 @@ public class KeycloakUser {
     private KeycloakUser() {
 
 	this.attributes = new ArrayList<>();
+	this.userProfileAttributes = new HashMap<>();
 	this.enabled = true;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getCreatedTimeStamp() {
+
+	return Optional.of(timeStamp);
     }
 
     /**
@@ -82,38 +154,6 @@ public class KeycloakUser {
     }
 
     /**
-     * @return the userName
-     */
-    public String getUserName() {
-
-	return userName;
-    }
-
-    /**
-     * @return the email
-     */
-    public Optional<String> getEmail() {
-
-	return Optional.ofNullable(email);
-    }
-
-    /**
-     * @return the firstName
-     */
-    public Optional<String> getFirstName() {
-
-	return Optional.ofNullable(firstName);
-    }
-
-    /**
-     * @return the lastName
-     */
-    public Optional<String> getLastName() {
-
-	return Optional.ofNullable(lastName);
-    }
-
-    /**
      * @return the attributes
      */
     public List<Entry<String, List<String>>> getAttributes() {
@@ -124,21 +164,55 @@ public class KeycloakUser {
     /**
      * @return
      */
+    public Optional<Entry<String, List<String>>> getAttribute(String name) {
+
+	return attributes.stream().filter(attr -> attr.getKey().equals(name)).findFirst();
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getAttributeValues(String name) {
+
+	return getAttribute(name).map(attr -> attr.getValue()).orElse(List.of());
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getAttributeValue(String name) {
+
+	return getAttribute(name).map(attr -> attr.getValue().get(0));
+    }
+
+    /**
+     * @param attr
+     * @return
+     */
+    public Optional<String> getUserProfileAttribute(UserProfileAttribute attr) {
+
+	return Optional.ofNullable(userProfileAttributes.get(attr.getValue()));
+    }
+
+    /**
+     * @return
+     */
     public JSONObject toJSON() {
 
 	JSONObject user = new JSONObject();
-	user.put("username", userName);
-	user.put("email", email);
 	user.put("id", identifier);
 	user.put("enabled", enabled);
+	user.put("createdTimestamp", timeStamp);
 
-	if (firstName != null) {
-	    user.put("firstName", firstName);
-	}
+	userProfileAttributes.keySet().forEach(attr -> {
 
-	if (lastName != null) {
-	    user.put("lastName", lastName);
-	}
+	    String attrValue = userProfileAttributes.get(attr);
+
+	    if (attrValue != null) {
+
+		user.put(attr, attrValue);
+	    }
+	});
 
 	if (!attributes.isEmpty()) {
 
@@ -160,12 +234,18 @@ public class KeycloakUser {
 	KeycloakUser out = new KeycloakUser();
 
 	out.identifier = object.getString("id");
-	out.userName = object.getString("username");
 	out.enabled = object.getBoolean("enabled");
+	out.timeStamp = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.valueOf(object.get("createdTimestamp").toString())));
 
-	out.email = optValue(object, "email");
-	out.firstName = optValue(object, "firstName");
-	out.lastName = optValue(object, "lastName");
+	UserProfileAttribute.getValues().forEach(attr -> {
+
+	    String optString = object.optString(attr, null);
+
+	    if (optString != null) {
+
+		out.userProfileAttributes.put(attr, optString);
+	    }
+	});
 
 	JSONObject attributes = object.optJSONObject("attributes");
 
@@ -180,16 +260,6 @@ public class KeycloakUser {
 	}
 
 	return out;
-    }
-
-    /**
-     * @param object
-     * @param key
-     * @return
-     */
-    private static String optValue(JSONObject object, String key) {
-
-	return Optional.ofNullable(object.optString(key)).map(v -> v.isEmpty() ? null : v).orElse(null);
     }
 
     /**
@@ -249,62 +319,35 @@ public class KeycloakUser {
 	}
 
 	/**
-	 * @param userName
+	 * @param attr
+	 * @param value
 	 * @return
 	 */
-	public KeycloakUserBuilder withUserName(String userName) {
+	public KeycloakUserBuilder withOptionalUserProfileAttribute(UserProfileAttribute attr, Optional<String> value) {
 
-	    if (userName == null || userName.isEmpty()) {
+	    if (attr == null || value == null) {
 
 		throw new IllegalArgumentException();
 	    }
 
-	    user.userName = userName;
+	    value.ifPresent(v -> user.userProfileAttributes.put(attr.getValue(), v));
+
 	    return this;
 	}
 
 	/**
-	 * @param email
+	 * @param attr
+	 * @param value
 	 * @return
 	 */
-	public KeycloakUserBuilder withEmail(String email) {
+	public KeycloakUserBuilder withUserProfileAttribute(UserProfileAttribute attr, String value) {
 
-	    if (email == null || email.isEmpty()) {
+	    if (attr == null || value == null || value.isEmpty()) {
 
 		throw new IllegalArgumentException();
 	    }
 
-	    user.email = email;
-	    return this;
-	}
-
-	/**
-	 * @param firstName
-	 * @return
-	 */
-	public KeycloakUserBuilder withFirstName(String firstName) {
-
-	    if (firstName == null || firstName.isEmpty()) {
-
-		throw new IllegalArgumentException();
-	    }
-
-	    user.firstName = firstName;
-	    return this;
-	}
-
-	/**
-	 * @param lastName
-	 * @return
-	 */
-	public KeycloakUserBuilder withLastName(String lastName) {
-
-	    if (lastName == null || lastName.isEmpty()) {
-
-		throw new IllegalArgumentException();
-	    }
-
-	    user.lastName = lastName;
+	    user.userProfileAttributes.put(attr.getValue(), value);
 	    return this;
 	}
 
@@ -323,6 +366,31 @@ public class KeycloakUser {
 	    user.attributes.add(Map.entry(key, Arrays.asList(value)));
 	    return this;
 	}
+
+	/**
+	 * @param attributes
+	 * @return
+	 */
+	public KeycloakUserBuilder withAttributes(List<Map.Entry<String, String>> attributes) {
+
+	    if (attributes == null) {
+
+		throw new IllegalArgumentException();
+	    }
+
+	    user.attributes.addAll(attributes.//
+		    stream().//
+		    map(attr -> Map.entry(attr.getKey(), Arrays.asList(attr.getValue()))).//
+		    collect(Collectors.toList()));
+
+	    return this;
+	}
+    }
+
+    @Override
+    public String toString() {
+
+	return toJSON().toString(3);
     }
 
     /**
@@ -332,10 +400,10 @@ public class KeycloakUser {
 
 	KeycloakUser user = new KeycloakUser.KeycloakUserBuilder().//
 		enabled(false).//
-		withUserName("pippo").//
-		withEmail("pippo@gmail.com").//
-		withFirstName("Pippo").//
-		withLastName("Pluto").//
+		withUserProfileAttribute(UserProfileAttribute.USERNAME, "pippo").//
+		withUserProfileAttribute(UserProfileAttribute.EMAIL, "pippo@gmail.com").//
+		withUserProfileAttribute(UserProfileAttribute.FIRST_NAME, "Pippo").//
+		withUserProfileAttribute(UserProfileAttribute.LAST_NAME, "Pluto").//
 		withAttribute("key1", "value1").//
 		withAttribute("key2", "value2").//
 		build();

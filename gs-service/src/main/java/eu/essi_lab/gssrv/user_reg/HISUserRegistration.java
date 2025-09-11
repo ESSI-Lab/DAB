@@ -280,7 +280,7 @@ public class HISUserRegistration {
 	properties.add(new GSProperty<String>("registrationDate", ISO8601DateTimeUtils.getISO8601DateTime()));
 	user.getProperties().addAll(properties);
 
-	finder.getWriter().store(user);
+	finder.getUsersWriter().store(user);
 
 	return user;
     }

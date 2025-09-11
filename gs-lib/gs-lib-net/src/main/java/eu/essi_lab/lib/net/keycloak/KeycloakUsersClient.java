@@ -39,12 +39,13 @@ import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.lib.net.keycloak.KeycloakUser.UserProfileAttribute;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio
  */
-public class KeycloakUsersManager {
+public class KeycloakUsersClient {
 
     private String serviceUrl;
     private String adminRealm;
@@ -57,7 +58,7 @@ public class KeycloakUsersManager {
     /**
      * 
      */
-    public KeycloakUsersManager() {
+    public KeycloakUsersClient() {
 
 	httpClient = HttpClient.newHttpClient();
 
@@ -196,6 +197,18 @@ public class KeycloakUsersManager {
      */
     public List<KeycloakUser> list(String accessToken) throws IOException, InterruptedException {
 
+	return listRaw(accessToken).//
+		stream().map(o -> KeycloakUser.of(o)).//
+		collect(Collectors.toList());
+    }
+
+    /**
+     * @param accessToken
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public List<JSONObject> listRaw(String accessToken) throws IOException, InterruptedException {
+
 	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users";
 
 	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Authorization", "Bearer " + accessToken).GET().build();
@@ -206,7 +219,7 @@ public class KeycloakUsersManager {
 
 	return jsonArray.toList().//
 		stream().//
-		map(o -> KeycloakUser.of(new JSONObject((HashMap<?, ?>) o))).//
+		map(o -> new JSONObject((HashMap<?, ?>) o)).//
 		collect(Collectors.toList());
     }
 
@@ -270,6 +283,12 @@ public class KeycloakUsersManager {
 		build();
 
 	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+	if (response.statusCode() != 201) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to store user {}: {}",
+		    user.getUserProfileAttribute(UserProfileAttribute.USERNAME).get(), response.body());
+	}
 
 	return response.statusCode() == 201;
     }
