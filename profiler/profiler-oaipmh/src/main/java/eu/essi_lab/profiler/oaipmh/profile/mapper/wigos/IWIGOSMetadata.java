@@ -530,6 +530,9 @@ public interface IWIGOSMetadata {
      */
     void setFacilityContact(String individualName, String organizationShort, String phone, String streetAddress,
 	    String city, String state, String zip, String isoCountry, String email);
+    
+    void setFacilityContact(String individualName, String organizationShort, String phone, String streetAddress,
+	    String city, String state, String zip, String isoCountry, String email, String begin, String end);
 
     void setPhenomenontTemporalExtent(String beginPosition, String endPosition);
 

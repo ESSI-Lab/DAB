@@ -1,5 +1,7 @@
 package eu.essi_lab.profiler.oaipmh.profile.mapper.wigos;
 
+import java.io.ByteArrayInputStream;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -22,6 +24,8 @@ package eu.essi_lab.profiler.oaipmh.profile.mapper.wigos;
  */
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,9 +42,13 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.MDMetadata;
@@ -53,6 +61,9 @@ import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.xml.XMLDocumentReader;
+import eu.essi_lab.lib.xml.XMLDocumentWriter;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -446,10 +457,13 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    HydroOntology ontology = new WHOSOntology();
 
 	    WIGOSMetadata record = new WIGOSMetadata();
-	    
 
 	    record = addHeader(record);
 
+	    String name = iso.getCoverageDescription().getAttributeTitle();
+
+	    // south africa --- > River discharge
+	    // argentina ------> ???
 	    /*
 	     * WMO FACILITY TYPE: https://codes.wmo.int/wmdr/_FacilityType
 	     */
@@ -460,13 +474,17 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    String endPosition = iso.getDataIdentification().getTemporalExtent().getEndPosition();
 
 	    Optional<String> countryCode = resource.getExtensionHandler().getCountryISO3();
+	    String isoC = null;
+	    String cCode = null;
 	    if (countryCode.isPresent()) {
+		isoC = countryCode.get();
+		cCode = isoC;
 		record.setTerritoryOfOrigin(countryCode.get(), beginPosition, endPosition);
 	    } else {
 		// TODO: IMPLEMENT: UNDERSTAND THE COUNTRY NAME
 		GSLoggerFactory.getLogger(getClass()).error("NO VALID COUNTRY NAME!!!");
 		String label = resource.getSource().getLabel().toLowerCase();
-		String cCode = null;
+
 		if (label.contains("hmfs")) {
 		    cCode = Country.ARGENTINA.getISO3();
 		} else {
@@ -489,7 +507,12 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	     * one of the following: africa, antarctica, asia, europe, inapplicable, northCentralAmericaCaribbean,
 	     * southAmerica, southWestPacific, unknown
 	     */
-	    record.setRegionOfOrigin("southAmerica");
+	    boolean isAfrica = cCode.toLowerCase().contains("zaf");
+	    if (isAfrica) {
+		record.setRegionOfOrigin("africa");
+	    } else {
+		record.setRegionOfOrigin("southAmerica");
+	    }
 
 	    // record.setSurfaceCover(null, "not applicable");
 	    // record.setTopographyOrBathymetry(null, null, "not applicable", "not applicable", "not applicable", "not
@@ -507,13 +530,25 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	     * https://codes.wmo.int/wmdr/_ObservingMethodOcean
 	     * TODO: understand which type of observingMethod is needed and then find the relative code. E.g.
 	     * Pluviograph code: 170
+	     * Volumetric method code: 375
 	     */
-	    record.setMeasurementMethod("170");
+	    record.setMeasurementMethod("unknown");
 
 	    record.setDataFormat("xml");
 	    record.setVersionOfDataFormat("WaterML 2.0");
 
 	    String description = iso.getDataIdentification().getAbstract();
+
+	    /*
+	     * SET setStationOrPlatformDescription - site information
+	     */
+	    String toSplit = "with data from station";
+	    if (description.contains(toSplit)) {
+		String splittedString = description.split(toSplit)[1];
+		description = "Station" + splittedString;
+
+	    }
+	    record.setStationOrPlatformDescription(description, beginPosition, endPosition);
 
 	    String providerId = resource.getSource().getUniqueIdentifier();
 	    String fileIdentifier = iso.getFileIdentifier();
@@ -524,11 +559,27 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).warn("Problem mapping site");
 	    }
-	    Optional<String> identifier = extensionHandler.getUniquePlatformIdentifier();
-	    if (identifier.isPresent()) {
-		System.out.println("UNIQUE_PLATFORM_IDENTIFIER: " + identifier.get());
-		record.setStationOrPlatformIdentifier(identifier.get());
+
+	    String codeId = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform().getMDIdentifierCode();
+	    String initialId = "0-21016-";
+	    if (isAfrica) {
+		String[] splittedString = codeId.split("/");
+		String stationId = splittedString[splittedString.length - 1];
+		initialId += "17100-" + stationId;
+	    } else {
+		String[] splittedString = codeId.split(":");
+		String stationId = splittedString[splittedString.length - 1];
+		initialId += "30320-" + stationId;
 	    }
+
+	    record.setStationOrPlatformIdentifier(initialId);
+
+	    // commented now for South Africa use-case
+	    // Optional<String> identifier = extensionHandler.getUniquePlatformIdentifier();
+	    // if (identifier.isPresent()) {
+	    // System.out.println("UNIQUE_PLATFORM_IDENTIFIER: " + identifier.get());
+	    // record.setStationOrPlatformIdentifier(identifier.get());
+	    // }
 
 	    String title = iso.getDataIdentification().getCitationTitle();
 
@@ -538,6 +589,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    }
 
 	    record.addProgramme("WHYCOS");
+	    // record.setStationOperatingStatus();
 	    record.setReferenceTime("unknown");
 	    record.setTimeliness(null);
 	    record.setSamplingTimePeriod(null);
@@ -546,9 +598,16 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	     * DURATION : create Duration -> e.g. PT1H, P2Y3M5D
 	     */
 	    // Obtain a DatatypeFactory instance
+	    Optional<String> timeResDuration = extensionHandler.getTimeResolutionDuration8601();
 	    DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
 	    // Create a Duration representing 1 hour
-	    Duration duration = datatypeFactory.newDuration("PT1H");
+	    Duration duration;
+	    if (timeResDuration.isPresent()) {
+		duration = datatypeFactory.newDuration(timeResDuration.get());
+	    } else {
+		// sinc it is mandatory -bet on PT1H
+		duration = datatypeFactory.newDuration("PT1H");
+	    }
 
 	    /*
 	     * WMO Meaning of time stamp: https://codes.wmo.int/wmdr/_TimeStampMeaning
@@ -560,6 +619,40 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	     * SET setDeploymentValidPeriod
 	     */
 	    record.setDeploymentValidPeriod(beginPosition, endPosition);
+
+	    /*
+	     * SET setStationOrPlatformDateEstablished
+	     */
+
+	    int startMonth = 1;
+	    int endMonth = 1;
+	    int startWeekDay = 1;
+	    int endWeekDay = 1;
+	    int startHour = 1;
+	    int endHour = 1;
+	    int startMinute = 1;
+	    int endMinute = 1;
+	    // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+	    // Date parsedDate = sdf.parse(beginPosition);
+	    Optional<Date> optDate = ISO8601DateTimeUtils.parseISO8601ToDate(beginPosition);
+	    if (optDate.isPresent()) {
+		GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTime(optDate.get());
+		DatatypeFactory df = DatatypeFactory.newInstance();
+		XMLGregorianCalendar xmlGregorianCalendar = df.newXMLGregorianCalendar(calendar);
+		record.setStationOrPlatformDateEstablished(xmlGregorianCalendar);
+
+		// Extract fields
+		startMonth = calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is 0-based
+		endMonth = startMonth; // same, unless you want a duration
+		startWeekDay = calendar.get(Calendar.DAY_OF_WEEK); // Sunday = 1 ... Saturday = 7
+		endWeekDay = startWeekDay;
+		startHour = calendar.get(Calendar.HOUR_OF_DAY);
+		endHour = startHour;
+		startMinute = calendar.get(Calendar.MINUTE);
+		endMinute = startMinute;
+	    }
+
 	    /*
 	     * SET setApplicationArea
 	     */
@@ -568,7 +661,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    /*
 	     * SET Schedule: mandatory
 	     */
-	    record.setScheduleOfObservation(1, 1, 1, 1, 1, 1, 1, 1);
+	    record.setScheduleOfObservation(startMonth, endMonth, startWeekDay, endWeekDay, startHour, endHour, startMinute, endMinute);
 	    // Duration duration = getDuration(beginPosition);
 	    // record.setTemporalReportingPeriod(duration , beginPosition);
 	    record.setPhenomenontTemporalExtent(beginPosition, endPosition);
@@ -642,7 +735,14 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		    e.printStackTrace();
 		}
 
-		record.setFacilityContact(individualName, organizationShort, phone, streetAddress, city, state, zip, isoCountry, email);
+		record.setFacilityContact(individualName, organizationShort, phone, streetAddress, city, state, zip, isoCountry, email,
+			beginPosition, endPosition);
+	    } else {
+		// other methods for responsible party
+		List<String> orgDesc = extensionHandler.getOriginatorOrganisationDescriptions();
+		List<String> orgId = extensionHandler.getOriginatorOrganisationIdentifiers();
+		if (!orgDesc.isEmpty())
+		    record.setFacilityContact(null, orgDesc.get(0), null, null, null, null, null, isoC, null, beginPosition, endPosition);
 	    }
 	    try {
 
@@ -652,17 +752,25 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		// record.setMDMetadata(convertMetadata(resource.getHarmonizedMetadata().getCoreMetadata().getReadOnlyMDMetadata()));
 
 		Optional<String> variableUnits = extensionHandler.getAttributeUnitsURI();
-		if (variableUnits.isPresent()) {
 
-		    record.setMeasurementUnit(variableUnits.get());
+		Optional<String> labelUnits = extensionHandler.getAttributeUnits();
+		Optional<String> units = extensionHandler.getAttributeUnitsAbbreviation();
+		if (units.isPresent()) {
+		    record.setMeasurementUnit(units.get());
 		} else {
 		    // TODO: decode the unit of measure
-		    //extensionHandler.getAttributeUnits()
-		    record.setMeasurementUnit("mm");
+		    // extensionHandler.getAttributeUnits()
+		    if (isAfrica) {
+			record.setMeasurementUnit("m³/s");
+		    } else {
+			record.setMeasurementUnit("mm");
+		    }
+		    // record.setMeasurementUnit("mm");
 		    GSLoggerFactory.getLogger(getClass()).error("NO VALID UNITS OF MEASURE CODE!!!");
 		}
 
-		String name = iso.getCoverageDescription().getAttributeTitle();
+		Optional<String> riverBasin = extensionHandler.getRiverBasin();
+
 		Optional<String> optionalVariableCode = extensionHandler.getObservedPropertyURI();
 		String code = null;
 		HashSet<String> uris = new HashSet<>();
@@ -696,8 +804,14 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		    record.setObservedVariable(name, code);
 		} else {
 		    // TODO found another way to add the relative code
-		    // record.setObservedVariable(name, code);
-		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213");
+		    // record.setObservedVariable(name,
+		    // code);//http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171
+		    // record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213");
+		    if (isAfrica) {
+			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
+		    } else {
+			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213");
+		    }
 		    GSLoggerFactory.getLogger(getClass()).error("NO VALID OBSERVED PROPERTIES CODE!!!");
 
 		}
@@ -720,6 +834,111 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    WIGOSMetadata.getMarshaller().marshal(of.createWIGOSMetadataRecord(record.getRecord()), doc);
 	    Element ret = doc.getDocumentElement();
 	    return ret;
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    return null;
+	}
+    }
+
+    public String mapStations(List<GSResource> resources, String identifier) throws GSException {
+
+	try {
+
+	    String[] splittedString = identifier.split("/");
+	    String stationId = splittedString[splittedString.length - 1];
+
+	    String minDate = null;
+	    String maxDate = null;
+	    Date in = null;
+	    Date end = null;
+
+	    String title = null;
+	    Set<String> setTitle = new HashSet<String>();
+	    Element wigosElem = null;
+	    List<Node> observationList = new ArrayList<Node>();
+	    int k = 0;
+	    for (GSResource resource : resources) {
+		MIMetadata iso = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+		String t = iso.getDataIdentification().getCitationTitle();
+		GSLoggerFactory.getLogger(getClass()).info("TITLE: " + t);
+		String beginPosition = iso.getDataIdentification().getTemporalExtent().getBeginPosition();
+		String endPosition = iso.getDataIdentification().getTemporalExtent().getEndPosition();
+		Optional<Date> startDate = ISO8601DateTimeUtils.parseISO8601ToDate(beginPosition);
+		Optional<Date> endDate = ISO8601DateTimeUtils.parseISO8601ToDate(endPosition);
+		if (startDate.isPresent()) {
+
+		    if (minDate == null) {
+			minDate = beginPosition;
+			in = startDate.get();
+		    } else {
+
+			if (startDate.get().before(in)) {
+			    minDate = beginPosition;
+			    in = startDate.get();
+			}
+
+		    }
+		}
+		if (endDate.isPresent()) {
+
+		    if (maxDate == null) {
+			maxDate = endPosition;
+			end = endDate.get();
+		    } else {
+
+			if (endDate.get().after(end)) {
+			    maxDate = endPosition;
+			    end = endDate.get();
+			}
+
+		    }
+		}
+		if (!setTitle.contains(t)) {
+		    setTitle.add(t);
+		    Element element = map(null, resource);
+		    if (k == 0) {
+			wigosElem = element;
+			k++;
+		    } else {
+			String doc1 = XMLDocumentReader.asString(element);
+			doc1 = doc1.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+			XMLDocumentReader xdoc = new XMLDocumentReader(doc1);
+			Node node = xdoc.evaluateNode("//*:ObservingFacility/*:observation");
+			observationList.add(node);
+		    }
+
+		} else {
+		    GSLoggerFactory.getLogger(getClass()).info("DUPLICATED FOUND!!!");
+		    continue;
+		}
+	    }
+
+	    String doc1 = XMLDocumentReader.asString(wigosElem);
+
+	    XMLDocumentReader xmlRequest = new XMLDocumentReader(doc1);
+
+	    XMLDocumentWriter writer = new XMLDocumentWriter(xmlRequest);
+
+	    writer.setText("//*:ResponsibleParty/*:validPeriod/*:TimePeriod/*:beginPosition", minDate);
+	    writer.setText("//*:GeospatialLocation/*:validPeriod/*:TimePeriod/*:beginPosition", minDate);
+	    writer.setText("//*:Territory/*:validPeriod/*:TimePeriod/*:beginPosition", minDate);
+	    writer.setText("//*:GeospatialLocation/*:validPeriod/*:TimePeriod/*:endPosition", maxDate);
+	    writer.setText("//*:Territory/*:validPeriod/*:TimePeriod/*:endPosition", maxDate);
+	    for (Node n : observationList) {
+		String xpath = "//*:ObservingFacility";
+		writer.addNode(xpath, n);
+	    }
+	    // Document doc = WIGOSMetadata.getBuilder().newDocument();
+	    // ObjectFactory of = new ObjectFactory();
+	    // WIGOSMetadata.getMarshaller().marshal(of.createWIGOSMetadataRecord(record.getRecord()), doc);
+	    // Element ret = doc.getDocumentElement();
+	    // DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	    // factory.setNamespaceAware(true);
+	    // DocumentBuilder builder = factory.newDocumentBuilder();
+	    // Document doc = builder.parse(new ByteArrayInputStream(xmlRequest.asString().getBytes("UTF-8")));
+	    return xmlRequest.asString();
+
+	    // return (Element) xmlRequest.asString()
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    return null;

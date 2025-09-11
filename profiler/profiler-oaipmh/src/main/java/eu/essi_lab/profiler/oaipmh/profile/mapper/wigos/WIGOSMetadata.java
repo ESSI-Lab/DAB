@@ -78,6 +78,7 @@ import eu.essi_lab.wigos._1_0.gml._3_2_1.TimePeriodPropertyType;
 import eu.essi_lab.wigos._1_0.gml._3_2_1.TimePeriodType;
 import eu.essi_lab.wigos._1_0.gml._3_2_1.TimePositionType;
 import eu.essi_lab.wigos._1_0.gml._3_2_1.VerticalDatumType;
+import eu.essi_lab.wigos._1_0.main.AbstractEnvironmentalMonitoringFacilityType.Description;
 import eu.essi_lab.wigos._1_0.main.AbstractEnvironmentalMonitoringFacilityType.GeospatialLocation;
 import eu.essi_lab.wigos._1_0.main.AbstractEnvironmentalMonitoringFacilityType.ResponsibleParty;
 import eu.essi_lab.wigos._1_0.main.ClimateZoneType;
@@ -88,6 +89,8 @@ import eu.essi_lab.wigos._1_0.main.DataPolicyType;
 import eu.essi_lab.wigos._1_0.main.DeploymentPropertyType;
 import eu.essi_lab.wigos._1_0.main.DeploymentType;
 import eu.essi_lab.wigos._1_0.main.DeploymentType.InstrumentOperatingStatus;
+import eu.essi_lab.wigos._1_0.main.DescriptionPropertyType;
+import eu.essi_lab.wigos._1_0.main.DescriptionType;
 import eu.essi_lab.wigos._1_0.main.EquipmentLogPropertyType;
 import eu.essi_lab.wigos._1_0.main.EquipmentLogType;
 import eu.essi_lab.wigos._1_0.main.EquipmentPropertyType;
@@ -113,7 +116,9 @@ import eu.essi_lab.wigos._1_0.main.ProcessType;
 import eu.essi_lab.wigos._1_0.main.ProcessingPropertyType;
 import eu.essi_lab.wigos._1_0.main.ProcessingType;
 import eu.essi_lab.wigos._1_0.main.ProgramAffiliationType;
+import eu.essi_lab.wigos._1_0.main.ProgramAffiliationType.ReportingStatus;
 import eu.essi_lab.wigos._1_0.main.ReportingPropertyType;
+import eu.essi_lab.wigos._1_0.main.ReportingStatusType;
 import eu.essi_lab.wigos._1_0.main.ReportingType;
 import eu.essi_lab.wigos._1_0.main.ReportingType.DataPolicy;
 import eu.essi_lab.wigos._1_0.main.ReportingType.ReferenceDatum;
@@ -456,6 +461,22 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 
     }
 
+    public void setStationOrPlatformDescription(String description, String beginPosition, String endPosition) {
+	this.setStationOrPlatformDescription(description);
+
+	DescriptionType dType = new DescriptionType();
+	DescriptionPropertyType pType = new DescriptionPropertyType();
+	dType.setDescription(description);
+	TimePeriodPropertyType tp = new TimePeriodPropertyType();
+	tp.setTimePeriod(createTimePeriodType(beginPosition, endPosition, null));
+	dType.setValidPeriod(tp);
+	pType.setDescription(dType);
+	Description desc = new Description();
+	desc.setDescription(dType);
+	getObservingFacility().getFacilityDescription().add(desc);
+
+    }
+
     /*
      * (non-Javadoc)
      * @see eu.essi_lab.oai_pmh.IWIGOSMetadata#setStationOrPlatformType(java.lang.String)
@@ -479,44 +500,55 @@ public class WIGOSMetadata implements IWIGOSMetadata {
     /*
      * (non-Javadoc)
      * @see eu.essi_lab.oai_pmh.IWIGOSMetadata#setStationOrPlatformIdentifier(java.lang.String)
+     * WIGOS IDENTIFIER:
+     * A2 scenario: 0 - ISO country code - Number allocated to NHS - Local ID i.e for Botswana 0-72-800-7024 (Boro River
+     * at Bokwi station for Botswana)
+     * where the number 800 was allocated to NHS by the OSCAR National Focal Point from Botswana Meteorological
+     * Authority
+     * B2 (allocated by WMO secretariat): 0 - 21016 - RegionCountryBasin - Local ID. Region: 1-6, country: ISO country
+     * code, Basin: Local, international or basin code otherwise default 0)
+     * i.e 0 – 21016- 172000- 7024 (Boro River from Botswana) where: For 21016 : 1-WMO Region code for Africa (RA I), 72
+     * – ISO country code for Botswana, 000-Basin code not known (default)
+     * 7024 is the local ID.
      */
     @Override
     public void setStationOrPlatformIdentifier(String id) {
+
 	// facility
-	String initialPart = "0-21016-4203-";
-	try {
-	    // oscar identifiers must be : 0-21016-4203-[16 alphanumeric chars]
-	    String alphaNumericId = null;
-	    if (id.length() > 16) {
-		alphaNumericId = id.substring(0, 16);
-	    }
+	// String initialPart = "0-21016-17100-";
+	// try {
+	// // oscar identifiers must be : 0-21016-4203-[16 alphanumeric chars]
+	// String alphaNumericId = null;
+	// if (id.length() > 16) {
+	// alphaNumericId = id.substring(0, 16);
+	// }
+	//
+	// if (alphaNumericId == null) {
+	//
+	// alphaNumericId = StringUtils.hashSHA1messageDigest(id).substring(0, 16);
+	//
+	// }
+	//
+	// String newId = initialPart + id;
 
-	    if (alphaNumericId == null) {
+	// getFacility().getObservingFacility().setId(newId);
+	getFacility().getObservingFacility().getIdentifier().setCodeSpace(id);
+	getFacility().getObservingFacility().getIdentifier().setValue(id);
 
-		alphaNumericId = StringUtils.hashSHA1messageDigest(id).substring(0, 16);
+	// observation
+	getFacilityReference().setHref("http://codes.wmo.int/" + id);
+	CodeWithAuthorityType code = new CodeWithAuthorityType();
+	code.setCodeSpace("codes.wmo.int");
+	code.setValue("http://codes.wmo.int/" + id);
+	getObservingCapability().setIdentifier(code);
 
-	    }
-
-	    String newId = initialPart + alphaNumericId;
-
-	    // getFacility().getObservingFacility().setId(newId);
-	    getFacility().getObservingFacility().getIdentifier().setCodeSpace(newId);
-	    getFacility().getObservingFacility().getIdentifier().setValue(newId);
-
-	    // observation
-	    getFacilityReference().setHref("http://codes.wmo.int/" + newId);
-	    CodeWithAuthorityType code = new CodeWithAuthorityType();
-	    code.setCodeSpace("codes.wmo.int");
-	    code.setValue("http://codes.wmo.int/" + newId);
-	    getObservingCapability().setIdentifier(code);
-
-	} catch (NoSuchAlgorithmException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (UnsupportedEncodingException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+	// } catch (NoSuchAlgorithmException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// } catch (UnsupportedEncodingException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
 
     }
 
@@ -549,6 +581,18 @@ public class WIGOSMetadata implements IWIGOSMetadata {
      */
     @Override
     public void setStationOperatingStatus() {
+	// ReportingStatus status = new ReportingStatus();
+	// ReportingStatusType value = new ReportingStatusType();
+	// ReferenceType reference = new ReferenceType();
+	// reference.setHref("http://codes.wmo.int/wmdr/ReportingStatus/" + "operational");
+	// value.setReportingStatus(reference );
+	// status.setReportingStatus(value);
+	// ProgramAffiliation pa = getObservingFacility().getProgramAffiliation().get(0);
+	// ProgramAffiliationType paType = new ProgramAffiliationType();
+	// paType.getReportingStatus().add(status);
+	// pa.setProgramAffiliation(paType);
+	// getObservingFacility().getProgramAffiliation().add(pa);
+	// getObservingCapability().getProgramAffiliation().add(paType.getProgramAffiliation());
 
     }
 
@@ -755,8 +799,10 @@ public class WIGOSMetadata implements IWIGOSMetadata {
     @Override
     public void setMeasurementMethod(String measurementMethodCode) {
 	EquipmentType equipment = getEquipment();
-	ReferenceType ref = new ReferenceType();// http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213
-	ref.setHref("https://codes.wmo.int/wmdr/ObservingMethodAtmosphere/" + measurementMethodCode);
+	ReferenceType ref = new ReferenceType();// http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213,
+						// https://codes.wmo.int/wmdr/ObservingMethodAtmosphere/170,
+						// https://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171
+	ref.setHref("http://codes.wmo.int/wmdr/ObservingMethodTerrestrial/" + measurementMethodCode);
 	equipment.setObservingMethod(ref);
 
     }
@@ -1329,7 +1375,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
      */
     @Override
     public void setFacilityContact(String individualName, String organizationShort, String phone, String streetAddress, String city,
-	    String state, String zip, String isoCountry, String email) {
+	    String state, String zip, String isoCountry, String email, String start, String end) {
 
 	// [SURNAME], [NAME], [TITLE]
 	CIResponsiblePartyType party = new CIResponsiblePartyType();
@@ -1341,38 +1387,55 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	// [ORGANIZATION_SHORT]
 	party.setOrganisationName(getCharacterStringProperty(organizationShort));
 
-	// [CONTACT_EMAIL]
 	CIContactPropertyType contactProperty = new CIContactPropertyType();
 	CIContactType ciContact = new CIContactType();
-	CITelephonePropertyType ciTelephone = new CITelephonePropertyType();
-	CITelephoneType ciphone = new CITelephoneType();
+	// [CONTACT_EMAIL]
+	if (phone != null) {
 
-	ciphone.getVoice().add(createCharacterStringProperty(phone));
-	ciTelephone.setCITelephone(ciphone);
-	ciContact.setPhone(ciTelephone);
+	    CITelephonePropertyType ciTelephone = new CITelephonePropertyType();
+	    CITelephoneType ciphone = new CITelephoneType();
+
+	    ciphone.getVoice().add(createCharacterStringProperty(phone));
+	    ciTelephone.setCITelephone(ciphone);
+	    ciContact.setPhone(ciTelephone);
+
+	}
+
 	CIAddressPropertyType address = new CIAddressPropertyType();
 	CIAddressType ciAddress = new CIAddressType();
-	ciAddress.getDeliveryPoint().add(createCharacterStringProperty(streetAddress));
-	ciAddress.setCity(createCharacterStringProperty(city));
-	ciAddress.setAdministrativeArea(createCharacterStringProperty(state));
-	ciAddress.setPostalCode(createCharacterStringProperty(zip));
-	ciAddress.setCountry(createCharacterStringProperty(isoCountry));
-	ciAddress.getElectronicMailAddress().add(getCharacterStringProperty(email));
+	if (streetAddress != null) {
+	    ciAddress.getDeliveryPoint().add(createCharacterStringProperty(streetAddress));
+	}
+	if (city != null) {
+	    ciAddress.setCity(createCharacterStringProperty(city));
+	}
+	if (state != null) {
+	    ciAddress.setAdministrativeArea(createCharacterStringProperty(state));
+	}
+	if (zip != null) {
+	    ciAddress.setPostalCode(createCharacterStringProperty(zip));
+	}
+	if (isoCountry != null) {
+	    ciAddress.setCountry(createCharacterStringProperty(isoCountry));
+	}
+	if (email != null) {
+	    ciAddress.getElectronicMailAddress().add(getCharacterStringProperty(email));
+	}
 	address.setCIAddress(ciAddress);
 	ciContact.setAddress(address);
 
 	// [ORGANIZATION_URL]
-	CIOnlineResourcePropertyType online = new CIOnlineResourcePropertyType();
-	CIOnlineResourceType ciOnline = new CIOnlineResourceType();
-	online.setCIOnlineResource(ciOnline);
-	ciContact.setOnlineResource(online);
-	contactProperty.setCIContact(ciContact);
-	party.setContactInfo(contactProperty);
+	// CIOnlineResourcePropertyType online = new CIOnlineResourcePropertyType();
+	// CIOnlineResourceType ciOnline = new CIOnlineResourceType();
+	// online.setCIOnlineResource(ciOnline);
+	// ciContact.setOnlineResource(online);
+	// contactProperty.setCIContact(ciContact);
+	// party.setContactInfo(contactProperty);
 
 	CIRoleCodePropertyType role = new CIRoleCodePropertyType();
 	CodeListValueType codeList = new CodeListValueType();
-	codeList.setCodeList("http://www.isotc211.org/2005/resources/Codelist/gmxCodelists#CI_RoleCode");
-	codeList.setCodeListValue("pointOfContact");
+	codeList.setCodeList("https://standards.iso.org/iso/19115/resources/Codelists/gml/CI_RoleCode.xml/owner");
+	codeList.setCodeListValue("owner");
 	role.setCIRoleCode(codeList);
 	party.setRole(role);
 
@@ -1382,6 +1445,12 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	rp.setCIResponsibleParty(party);
 	responsibleParty.setResponsibleParty(rp);
 	myParty.setResponsibleParty(responsibleParty);
+	if (start != null) {
+	    TimePeriodPropertyType tppt = new TimePeriodPropertyType();
+	    TimePeriodType timePeriod = createTimePeriodType(start, null, null);
+	    tppt.setTimePeriod(timePeriod);
+	    responsibleParty.setValidPeriod(tppt);
+	}
 	getObservingFacility().getResponsibleParty().add(myParty);
 
     }
@@ -1787,6 +1856,14 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	}
 
 	record.getObservation().clear();
+
+    }
+
+    @Override
+    public void setFacilityContact(String individualName, String organizationShort, String phone, String streetAddress, String city,
+	    String state, String zip, String isoCountry, String email) {
+
+	setFacilityContact(individualName, organizationShort, phone, streetAddress, city, state, zip, isoCountry, email, null, null);
 
     }
 
