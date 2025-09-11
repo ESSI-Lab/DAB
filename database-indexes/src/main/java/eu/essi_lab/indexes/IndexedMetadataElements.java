@@ -124,7 +124,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    try {
 
 		String anyText = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getTextContent();
-		getValues().add(anyText);
+		addValue(anyText);
 
 	    } catch (Exception e) {
 
@@ -141,13 +141,13 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    String dateStamp = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDateStamp();
 	    if (checkStringValue(dateStamp)) {
 
-		getValues().add(dateStamp);
+		addValue(dateStamp);
 
 	    } else {
 		XMLGregorianCalendar dateTimeStamp = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDateTimeStamp();
 		if (dateTimeStamp != null) {
 
-		    getValues().add(dateTimeStamp.toString());
+		    addValue(dateTimeStamp.toString());
 		}
 	    }
 	}
@@ -160,7 +160,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    String identifier = resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier();
 
 	    if (checkStringValue(identifier)) {
-		getValues().add(identifier);
+		addValue(identifier);
 	    }
 	}
     };
@@ -176,7 +176,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String codeListValue = codeListValues.next();
 		if (checkStringValue(codeListValue)) {
-		    getValues().add(codeListValue);
+		    addValue(codeListValue);
 		}
 	    }
 	}
@@ -191,7 +191,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		DataIdentification id = identifications.next();
 		String title = id.getCitationTitle();
 		if (checkStringValue(title)) {
-		    getValues().add(title);
+		    addValue(title);
 		}
 	    }
 	}
@@ -203,7 +203,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    String identifier = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
 	    if (checkStringValue(identifier)) {
 
-		getValues().add(identifier);
+		addValue(identifier);
 	    }
 	}
     };
@@ -218,7 +218,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		DataIdentification id = identifications.next();
 		String abs = id.getAbstract();
 		if (checkStringValue(abs)) {
-		    getValues().add(abs);
+		    addValue(abs);
 		}
 	    }
 	}
@@ -253,7 +253,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 			String beginPosition = te.getBeforeNowBeginPosition().get().name();
 
-			getValues().add(beginPosition);
+			addValue(beginPosition);
 		    }
 		}
 	    }
@@ -301,7 +301,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 			    } else {
 
-				getValues().add(beginPosition);
+				addValue(beginPosition);
 			    }
 			} else {
 
@@ -354,7 +354,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 			    } else {
 
-				getValues().add(endPosition);
+				addValue(endPosition);
 			    }
 			} else {
 
@@ -385,7 +385,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		if (checkStringValue(linkage)) {
 
-		    getValues().add(linkage);
+		    addValue(linkage);
 		}
 	    }
 	}
@@ -410,7 +410,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		if (checkStringValue(id)) {
 
-		    getValues().add(id);
+		    addValue(id);
 		}
 	    }
 	}
@@ -434,7 +434,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		if (checkStringValue(name)) {
 
-		    getValues().add(name);
+		    addValue(name);
 		}
 	    }
 	}
@@ -459,7 +459,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		if (checkStringValue(protocol)) {
 
-		    getValues().add(protocol);
+		    addValue(protocol);
 		}
 	    }
 
@@ -473,7 +473,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    String language = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getLanguage();
 
 	    if (checkStringValue(language)) {
-		getValues().add(language);
+		addValue(language);
 	    }
 	}
     };
@@ -491,11 +491,11 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		String creationDate = next.getCitationCreationDate();
 		if (checkStringValue(creationDate)) {
 
-		    getValues().add(creationDate);
+		    addValue(creationDate);
 		} else {
 		    XMLGregorianCalendar dateTime = next.getCitationCreationDateTime();
 		    if (dateTime != null) {
-			getValues().add(dateTime.toString());
+			addValue(dateTime.toString());
 		    }
 		}
 	    }
@@ -515,11 +515,11 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		String pubDate = next.getCitationPublicationDate();
 		if (checkStringValue(pubDate)) {
 
-		    getValues().add(pubDate);
+		    addValue(pubDate);
 		} else {
 		    XMLGregorianCalendar dateTime = next.getCitationPublicationDateTime();
 		    if (dateTime != null) {
-			getValues().add(dateTime.toString());
+			addValue(dateTime.toString());
 		    }
 		}
 	    }
@@ -539,13 +539,35 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		String revDate = next.getCitationRevisionDate();
 		if (checkStringValue(revDate)) {
 
-		    getValues().add(revDate);
+		    addValue(revDate);
 		} else {
 		    XMLGregorianCalendar dateTime = next.getCitationRevisionDateTime();
 		    if (dateTime != null) {
-			getValues().add(dateTime.toString());
+			addValue(dateTime.toString());
 		    }
 		}
+	    }
+	}
+    };
+
+    public static final IndexedElement REFERENCE_DATE = new IndexedMetadataElement(MetadataElement.REFERENCE_DATE) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+		    .getDataIdentifications();
+	    while (identifications.hasNext()) {
+
+		DataIdentification next = identifications.next();
+
+		Iterator<String> dates = next.getCitationDates();
+		while (dates.hasNext()) {
+		    String date = (String) dates.next();
+		    if (checkStringValue(date)) {
+			addValue(date);
+		    }
+		}
+
 	    }
 	}
     };
@@ -562,7 +584,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		while (topics.hasNext()) {
 		    String topic = topics.next();
 		    if (checkStringValue(topic)) {
-			getValues().add(topic);
+			addValue(topic);
 		    }
 		}
 	    }
@@ -579,7 +601,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String resourceIdentifier = dataId.getResourceIdentifier();
 		if (checkStringValue(resourceIdentifier)) {
-		    getValues().add(resourceIdentifier.toString());
+		    addValue(resourceIdentifier.toString());
 		}
 	    }
 	}
@@ -598,7 +620,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		while (languages.hasNext()) {
 		    String lan = languages.next();
 		    if (checkStringValue(lan)) {
-			getValues().add(lan);
+			addValue(lan);
 		    }
 		}
 	    }
@@ -654,7 +676,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		if (party != null) {
 		    String individualName = party.getIndividualName();
 		    if (checkStringValue(individualName)) {
-			getValues().add(individualName);
+			addValue(individualName);
 		    }
 		}
 	    }
@@ -681,7 +703,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		if (party != null) {
 		    String orgName = party.getOrganisationName();
 		    if (checkStringValue(orgName)) {
-			getValues().add(orgName);
+			addValue(orgName);
 		    }
 		}
 	    }
@@ -704,7 +726,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		if (party != null) {
 		    String role = party.getRoleCode();
 		    if (checkStringValue(role)) {
-			getValues().add(role);
+			addValue(role);
 		    }
 		}
 	    }
@@ -726,7 +748,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		if (party != null) {
 		    String orgURI = party.getOrganisationURI();
 		    if (checkStringValue(orgURI)) {
-			getValues().add(orgURI);
+			addValue(orgURI);
 		    }
 		}
 	    }
@@ -743,7 +765,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    List<String> identifiers = handler.getOriginatorOrganisationIdentifiers();
 	    for (String identifier : identifiers) {
 		if (checkStringValue(identifier)) {
-		    getValues().add(identifier);
+		    addValue(identifier);
 		}
 	    }
 	}
@@ -772,8 +794,9 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		}
 	    }
 
-	    getValues().addAll(names);
-
+	    for (String name : names) {
+		addValue(name);
+	    }
 	}
     };
     public static final IndexedMetadataElement TEAM_CATEGORY = new IndexedMetadataElement(MetadataElement.THEME_CATEGORY) {
@@ -784,7 +807,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    Optional<String> themeCategoryOpt = handler.getThemeCategory();
 	    if (themeCategoryOpt.isPresent()) {
 		if (checkStringValue(themeCategoryOpt.get())) {
-		    getValues().add(themeCategoryOpt.get());
+		    addValue(themeCategoryOpt.get());
 		}
 	    }
 	}
@@ -799,7 +822,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		ReferenceSystem refSys = infos.next();
 		String code = refSys.getCode();
 		if (checkStringValue(code)) {
-		    getValues().add(code);
+		    addValue(code);
 		}
 	    }
 	}
@@ -814,7 +837,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		ReferenceSystem refSys = infos.next();
 		String version = refSys.getVersion();
 		if (checkStringValue(version)) {
-		    getValues().add(version);
+		    addValue(version);
 		}
 	    }
 	}
@@ -829,7 +852,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		ReferenceSystem refSys = infos.next();
 		String authority = refSys.getCodeSpace();
 		if (checkStringValue(authority)) {
-		    getValues().add(authority);
+		    addValue(authority);
 		}
 	    }
 	}
@@ -849,7 +872,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		while (codes.hasNext()) {
 		    String code = codes.next();
 		    if (checkStringValue(code)) {
-			getValues().add(code);
+			addValue(code);
 		    }
 		}
 	    }
@@ -867,7 +890,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		DataIdentification dataId = identifications.next();
 		String alternateTitle = dataId.getCitationAlternateTitle();
 		if (checkStringValue(alternateTitle)) {
-		    getValues().add(alternateTitle);
+		    addValue(alternateTitle);
 		}
 	    }
 	}
@@ -883,7 +906,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		MIInstrument next = miInstruments.next();
 		String identifier = next.getMDIdentifierCode();
 		if (checkStringValue(identifier)) {
-		    getValues().add(identifier);
+		    addValue(identifier);
 		}
 	    }
 	}
@@ -899,7 +922,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -915,7 +938,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		MIInstrument next = miInstruments.next();
 		String description = next.getDescription();
 		if (checkStringValue(description)) {
-		    getValues().add(description);
+		    addValue(description);
 		}
 	    }
 	}
@@ -931,7 +954,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		MIInstrument next = miInstruments.next();
 		String title = next.getTitle();
 		if (checkStringValue(title)) {
-		    getValues().add(title);
+		    addValue(title);
 		}
 	    }
 
@@ -989,7 +1012,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		MIPlatform next = miPlatforms.next();
 		String identifier = next.getMDIdentifierCode();
 		if (checkStringValue(identifier)) {
-		    getValues().add(identifier);
+		    addValue(identifier);
 		}
 	    }
 	}
@@ -1015,7 +1038,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		if (citation != null) {
 		    String title = citation.getTitle();
 		    if (checkStringValue(title)) {
-			getValues().add(title);
+			addValue(title);
 		    }
 		}
 	    }
@@ -1034,7 +1057,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1050,7 +1073,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		    Long value = optional.get();
 		    if (value != null) {
-			getValues().add("" + value);
+			addValue("" + value);
 		    }
 		} else {
 		    GridSpatialRepresentation spatialRepresentation = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
@@ -1065,7 +1088,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 				dataSize = dataSize * size.longValue();
 			    }
 			}
-			getValues().add("" + dataSize);
+			addValue("" + dataSize);
 		    }
 		}
 	    } catch (Exception ex) {
@@ -1082,7 +1105,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    if (miPlatform != null) {
 		String description = miPlatform.getDescription();
 		if (checkStringValue(description)) {
-		    getValues().add(description);
+		    addValue(description);
 		}
 	    }
 	}
@@ -1099,9 +1122,13 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		CoverageDescription next = descriptions.next();
 		String description = next.getAttributeIdentifier();
 		if (checkStringValue(description)) {
-		    getValues().add(description);
+		    addValue(description);
 		}
 	    }
+
+	    addKeywordsURI(resource, "theme");
+	    addKeywordsURI(resource, "parameter"); // even if it is outside of ISO 19115..
+
 	}
     };
 
@@ -1116,10 +1143,15 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		CoverageDescription next = descriptions.next();
 		String description = next.getAttributeTitle();
 		if (checkStringValue(description)) {
-		    getValues().add(description);
+		    addValue(description);
 		}
 	    }
+
+	    addKeywords(resource, "theme");
+	    addKeywords(resource, "parameter"); // even if it is outside of ISO 19115..
+
 	}
+
     };
 
     public static final IndexedMetadataElement OBSERVED_PROPERTY_URI = new IndexedMetadataElement(MetadataElement.OBSERVED_PROPERTY_URI) {
@@ -1132,7 +1164,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1148,7 +1180,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		String duration = value.get();
 		if (duration != null) {
 		    if (checkStringValue(duration.toString())) {
-			getValues().add(duration.toString());
+			addValue(duration.toString());
 		    }
 		}
 	    }
@@ -1166,7 +1198,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		String resolution = value.get();
 		if (resolution != null) {
 		    if (checkStringValue(resolution.toString())) {
-			getValues().add(resolution.toString());
+			addValue(resolution.toString());
 		    }
 		}
 	    }
@@ -1184,7 +1216,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1200,7 +1232,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1216,7 +1248,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1232,7 +1264,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1248,7 +1280,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1264,7 +1296,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1280,7 +1312,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1297,7 +1329,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1314,7 +1346,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1330,7 +1362,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1347,7 +1379,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -1364,7 +1396,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		CoverageDescription next = descriptions.next();
 		String description = next.getAttributeDescription();
 		if (checkStringValue(description)) {
-		    getValues().add(description);
+		    addValue(description);
 		}
 	    }
 	}
@@ -1385,7 +1417,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    while (keywordTypes.hasNext()) {
 		String kwdType = keywordTypes.next();
 		if (checkStringValue(kwdType)) {
-		    getValues().add(kwdType);
+		    addValue(kwdType);
 		}
 	    }
 	}
@@ -1402,7 +1434,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    while (identifiers.hasNext()) {
 		String title = identifiers.next();
 		if (checkStringValue(title)) {
-		    getValues().add(title);
+		    addValue(title);
 		}
 	    }
 	}
@@ -1422,7 +1454,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    break;
 		}
 	    }
-	    getValues().add(String.valueOf(found));
+	    addValue(String.valueOf(found));
 	}
     };
     public static final IndexedElement HAS_USE_LEGAL_CONSTRAINTS = new IndexedMetadataElement(MetadataElement.HAS_USE_LEGAL_CONSTRAINTS) {
@@ -1439,7 +1471,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    break;
 		}
 	    }
-	    getValues().add(String.valueOf(found));
+	    addValue(String.valueOf(found));
 	}
     };
     public static final IndexedElement HAS_ACCESS_LEGAL_CONSTRAINTS = new IndexedMetadataElement(
@@ -1457,7 +1489,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    break;
 		}
 	    }
-	    getValues().add(String.valueOf(found));
+	    addValue(String.valueOf(found));
 	}
     };
     public static final IndexedElement HAS_OTHER_LEGAL_CONSTRAINTS = new IndexedMetadataElement(
@@ -1475,7 +1507,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    break;
 		}
 	    }
-	    getValues().add(String.valueOf(found));
+	    addValue(String.valueOf(found));
 	}
     };
 
@@ -1488,7 +1520,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 			.getDistanceValues();
 		while (values.hasNext()) {
 		    double value = values.next();
-		    getValues().add(String.valueOf(value));
+		    addValue(String.valueOf(value));
 		}
 	    } catch (NullPointerException e) {
 	    }
@@ -1511,7 +1543,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		Iterator<Integer> denominators = next.getDenominators();
 		while (denominators.hasNext()) {
 		    Integer den = denominators.next();
-		    getValues().add(String.valueOf(den));
+		    addValue(String.valueOf(den));
 		}
 	    }
 	}
@@ -1530,7 +1562,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		SatelliteScene scene = optional.get();
 		String prodType = scene.getProductType();
 		if (checkStringValue(prodType)) {
-		    getValues().add(prodType);
+		    addValue(prodType);
 		}
 	    }
 	}
@@ -1543,7 +1575,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		SatelliteScene scene = optional.get();
 		String sensorOpMode = scene.getSensorOpMode();
 		if (checkStringValue(sensorOpMode)) {
-		    getValues().add(sensorOpMode);
+		    addValue(sensorOpMode);
 		}
 	    }
 	}
@@ -1556,7 +1588,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		SatelliteScene scene = optional.get();
 		String sensorSwath = scene.getSensorSwath();
 		if (checkStringValue(sensorSwath)) {
-		    getValues().add(sensorSwath);
+		    addValue(sensorSwath);
 		}
 	    }
 	}
@@ -1569,7 +1601,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		SatelliteScene scene = optional.get();
 		String s3InstrumentIdx = scene.getS3InstrumentIdx();
 		if (checkStringValue(s3InstrumentIdx)) {
-		    getValues().add(s3InstrumentIdx);
+		    addValue(s3InstrumentIdx);
 		}
 	    }
 	}
@@ -1582,7 +1614,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		SatelliteScene scene = optional.get();
 		String s3ProductLevel = scene.getS3ProductLevel();
 		if (checkStringValue(s3ProductLevel)) {
-		    getValues().add(s3ProductLevel);
+		    addValue(s3ProductLevel);
 		}
 	    }
 	}
@@ -1595,7 +1627,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		SatelliteScene scene = optional.get();
 		String s3Timeless = scene.getS3Timeliness();
 		if (checkStringValue(s3Timeless)) {
-		    getValues().add(s3Timeless);
+		    addValue(s3Timeless);
 		}
 	    }
 	}
@@ -1608,7 +1640,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		SatelliteScene scene = optional.get();
 		String sarPolCh = scene.getSarPolCh();
 		if (checkStringValue(sarPolCh)) {
-		    getValues().add(sarPolCh);
+		    addValue(sarPolCh);
 		}
 	    }
 	}
@@ -1621,7 +1653,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		SatelliteScene scene = optional.get();
 		Integer orbit = scene.getRelativeOrbit();
 		if (orbit != null) {
-		    getValues().add(orbit.toString());
+		    addValue(orbit.toString());
 		}
 	    }
 	}
@@ -1634,7 +1666,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		SatelliteScene scene = optional.get();
 		Integer row = scene.getRow();
 		if (row != null) {
-		    getValues().add(row.toString());
+		    addValue(row.toString());
 		}
 	    }
 	}
@@ -1647,7 +1679,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		SatelliteScene scene = optional.get();
 		Integer path = scene.getPath();
 		if (path != null) {
-		    getValues().add(path.toString());
+		    addValue(path.toString());
 		}
 	    }
 	}
@@ -1660,7 +1692,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    List<Double> list = miMetadata.getCloudCoverPercentageList();
 	    for (Double value : list) {
 		if (value != null) {
-		    getValues().add(value.toString());
+		    addValue(value.toString());
 		}
 	    }
 	}
@@ -1685,7 +1717,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	public void defineValues(GSResource resource) {
 	    Optional<String> optional = resource.getExtensionHandler().getCountry();
 	    if (optional.isPresent()) {
-		getValues().add(optional.get());
+		addValue(optional.get());
 	    }
 	    defineBNHSProperty(BNHSProperty.COUNTRY, resource);
 	}
@@ -1696,7 +1728,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	public void defineValues(GSResource resource) {
 	    Optional<String> optional = resource.getExtensionHandler().getCountryISO3();
 	    if (optional.isPresent()) {
-		getValues().add(optional.get());
+		addValue(optional.get());
 	    }
 	}
     };
@@ -1711,7 +1743,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 
@@ -1726,7 +1758,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 
@@ -1817,7 +1849,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		Double maximum = vertical.getMaximumValue();
 		double tolerance = 1e-10; // Define your tolerance level here
 		if (maximum != null && minimum != null && Math.abs(maximum - minimum) < tolerance) {
-		    getValues().add(minimum.toString());
+		    addValue(minimum.toString());
 		}
 	    }
 	    defineBNHSProperty(BNHSProperty.DATUM_ALTITUDE, resource);
@@ -1831,7 +1863,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    if (vertical != null) {
 		Double minimum = vertical.getMinimumValue();
 		if (minimum != null) {
-		    getValues().add(minimum.toString());
+		    addValue(minimum.toString());
 		}
 	    }
 	}
@@ -1844,7 +1876,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    if (vertical != null) {
 		Double maximum = vertical.getMaximumValue();
 		if (maximum != null) {
-		    getValues().add(maximum.toString());
+		    addValue(maximum.toString());
 		}
 	    }
 	}
@@ -2030,7 +2062,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		String value = optional.get();
 		if (checkStringValue(value)) {
-		    getValues().add(value);
+		    addValue(value);
 		}
 	    }
 	}
@@ -2150,7 +2182,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    for (WorldCerealItem worldCerealItem : cropTypes) {
 
 			if (checkStringValue(worldCerealItem.getCode())) {
-			    getValues().add(worldCerealItem.getCode());
+			    addValue(worldCerealItem.getCode());
 			}
 		    }
 		}
@@ -2173,7 +2205,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    for (WorldCerealItem worldCerealItem : quantityTypes) {
 
 			if (checkStringValue(worldCerealItem.getCode())) {
-			    getValues().add(worldCerealItem.getCode());
+			    addValue(worldCerealItem.getCode());
 			}
 		    }
 		}
@@ -2197,7 +2229,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    for (WorldCerealItem worldCerealItem : lcTypes) {
 
 			if (checkStringValue(worldCerealItem.getCode())) {
-			    getValues().add(worldCerealItem.getCode());
+			    addValue(worldCerealItem.getCode());
 			}
 		    }
 		}
@@ -2221,7 +2253,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    for (WorldCerealItem worldCerealItem : irrTypes) {
 
 			if (checkStringValue(worldCerealItem.getCode())) {
-			    getValues().add(worldCerealItem.getCode());
+			    addValue(worldCerealItem.getCode());
 			}
 		    }
 		}
@@ -2239,7 +2271,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		WorldCerealMap map = optional.get();
 		Double cropConfidence = map.getCropTypeConfidence();
 		if (cropConfidence != null) {
-		    getValues().add(cropConfidence.toString());
+		    addValue(cropConfidence.toString());
 		}
 	    }
 
@@ -2256,7 +2288,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		WorldCerealMap map = optional.get();
 		Double lcConfidence = map.getLcTypeConfidence();
 		if (lcConfidence != null) {
-		    getValues().add(lcConfidence.toString());
+		    addValue(lcConfidence.toString());
 		}
 	    }
 
@@ -2273,7 +2305,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		WorldCerealMap map = optional.get();
 		Double irrConfidence = map.getIrrigationTypeConfidence();
 		if (irrConfidence != null) {
-		    getValues().add(irrConfidence.toString());
+		    addValue(irrConfidence.toString());
 		}
 	    }
 
@@ -2285,7 +2317,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	public void defineValues(GSResource resource) {
 
 	    boolean found = resource.getExtensionHandler().isInSitu();
-	    getValues().add(String.valueOf(found));
+	    addValue(String.valueOf(found));
 	}
     };
 
@@ -2307,7 +2339,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    wrapper1.setSA_Uri(UUID.randomUUID().toString());
 	    wrapper1.setSA_UriTitle(UUID.randomUUID().toString());
 
-//	    addComposedElement(wrapper1.getElement());
+	    // addComposedElement(wrapper1.getElement());
 
 	    SA_ElementWrapper wrapper2 = SA_ElementWrapper.of(MetadataElement.KEYWORD_SA);
 
@@ -2318,7 +2350,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    wrapper2.setSA_Uri(UUID.randomUUID().toString());
 	    wrapper2.setSA_UriTitle(UUID.randomUUID().toString());
 
-//	    addComposedElement(wrapper2.getElement());
+	    // addComposedElement(wrapper2.getElement());
 	}
     };
 

@@ -124,7 +124,7 @@ public class BLUECloudReport extends MetadataReport {
 				BlueCloudMetadataElement.ORGANIZATION_URI, //
 				BlueCloudMetadataElement.ORGANIZATION_ROLE, //
 				BlueCloudMetadataElement.DATESTAMP, //
-				BlueCloudMetadataElement.REVISION_DATE, //
+				BlueCloudMetadataElement.REFERENCE_DATE, //
 				BlueCloudMetadataElement.RESOURCE_IDENTIFIER//
 		};
 	}

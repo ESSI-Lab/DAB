@@ -167,7 +167,7 @@ public abstract class IndexedMetadataElement extends IndexedElement {
         		String title = anchor.getValue();
         		
         		if (checkStringValue(title)) {
-        		    getValues().add(title);
+        		    addValue(title);
         		}
         	    } else if (obj instanceof CodeListValueType) {
         		
@@ -175,13 +175,13 @@ public abstract class IndexedMetadataElement extends IndexedElement {
         		String title = cvt.getCodeListValue();
         		
         		if (checkStringValue(title)) {
-        		    getValues().add(title);
+        		    addValue(title);
         		}
         	    } else if (obj instanceof String) {
         		
         		String title = (String) obj;
         		if (checkStringValue(title)) {
-        		    getValues().add(title);
+        		    addValue(title);
         		}
         	    }
         	}
@@ -262,7 +262,7 @@ public abstract class IndexedMetadataElement extends IndexedElement {
         		String href = anchor.getHref();
         		
         		if (checkStringValue(href)) {
-        		    getValues().add(href);
+        		    addValue(href);
         		}
         	    }
         	}
@@ -323,7 +323,7 @@ public abstract class IndexedMetadataElement extends IndexedElement {
              * 	// get the value of the identifier 
              * 	String identifier = resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier();
              * 
-             * 	getValues().add(identifier);
+             * 	addValue(identifier);
              * }
              * </pre></code>
      * @param resource the {@link GSResource} to be written
@@ -342,7 +342,7 @@ public abstract class IndexedMetadataElement extends IndexedElement {
 	if (value.isPresent()) {
 	    
 	    if (checkStringValue(value.get())) {
-		getValues().add(value.get());
+		addValue(value.get());
 	    }
 	}
     }

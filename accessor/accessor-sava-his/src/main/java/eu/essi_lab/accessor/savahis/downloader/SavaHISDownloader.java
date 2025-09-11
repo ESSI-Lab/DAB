@@ -219,7 +219,9 @@ public class SavaHISDownloader extends DataDownloader {
 		writer.addAttributesNS("*:Collection/*:observationMember/*:OM_Observation/*:observedProperty",
 			CommonNameSpaceContext.XLINK_NS_URI, "xlink:href", variableCode);
 
-		return IOStreamUtils.tempFilefromStream(reader.asStream(), "SAVAHIS-downloader", ".xml");
+		File tmp = IOStreamUtils.tempFilefromStream(reader.asStream(), "SAVAHIS-downloader", ".xml");
+		
+		return tmp;
 
 	    } catch (Exception e) {
 

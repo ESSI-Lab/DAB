@@ -198,6 +198,8 @@ public class SavaHISMapper extends OriginalIdentifierMapper {
 	    keyword.addKeyword(units);
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword);
 
+	    dataset.getExtensionHandler().setAttributeUnitsAbbreviation(units);
+	    
 	    try {
 		// Attention, geographic SRS could be NAD83 (or Clarke...) instead of WGS84!
 		// TODO: use libraries to convert between the two geographical crs
@@ -236,7 +238,7 @@ public class SavaHISMapper extends OriginalIdentifierMapper {
 	    String speciation = "";
 
 	    String attributeDescription = parameterIdentifier + " Units: " + units;
-
+	    
 	    coverageDescription.setAttributeDescription(attributeDescription);
 	    coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
@@ -259,7 +261,7 @@ public class SavaHISMapper extends OriginalIdentifierMapper {
 	    coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(title);
 
 	    coreMetadata.getMIMetadata().getDataIdentification().setAbstract(title);
-
+	    
 	    GridSpatialRepresentation grid = new GridSpatialRepresentation();
 	    grid.setNumberOfDimensions(1);
 	    grid.setCellGeometryCode("point");

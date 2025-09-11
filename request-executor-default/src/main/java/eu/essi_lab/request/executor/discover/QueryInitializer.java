@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.media.jai.PropertySourceChangeEvent;
+
 import org.logicng.formulas.Formula;
 
 import eu.essi_lab.api.database.DatabaseReader;
@@ -91,9 +93,13 @@ public class QueryInitializer implements IQueryInitializer {
     @Override
     public void initializeQuery(QueryInitializerMessage message) throws GSException {
 
+	String sourceDeployment = null;
+
 	if (message.getView().isPresent()) {
 
 	    View view = message.getView().get();
+
+	    sourceDeployment = view.getSourceDeployment();
 
 	    Optional<Bond> optionalBond = message.getUserBond();
 
@@ -118,7 +124,13 @@ public class QueryInitializer implements IQueryInitializer {
 	    authorizedBond = requestAuthorizationConverter.generateAuthorizedBond(message);
 	} else {
 	    // permission given to all sources
-	    authorizedBond = generateDefaultAuthorizedBond(message);
+
+	    if (sourceDeployment != null) {
+		authorizedBond = BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.SOURCE_DEPLOYMENT, sourceDeployment);
+	    } else {
+
+		authorizedBond = generateDefaultAuthorizedBond(message);
+	    }
 	}
 
 	authorizedBond = simplifyAuthorizedBond(message.getUserBond().orElse(null), authorizedBond);
