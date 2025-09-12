@@ -810,7 +810,17 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		    if (isAfrica) {
 			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
 		    } else {
-			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213");
+			if (name.toLowerCase().contains("precipitation")) {
+			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/210");
+			} else if (name.toLowerCase().contains("height")) {
+			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/172");
+			} else if (name.toLowerCase().contains("discharge")) {
+			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
+			} 
+//			else {
+//			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/unknown");
+//			}
+
 		    }
 		    GSLoggerFactory.getLogger(getClass()).error("NO VALID OBSERVED PROPERTIES CODE!!!");
 
