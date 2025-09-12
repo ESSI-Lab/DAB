@@ -32,6 +32,7 @@ import java.util.ServiceLoader;
 import java.util.UUID;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
@@ -68,7 +69,7 @@ import eu.essi_lab.request.executor.IStatisticsExecutor;
 
 public class SourceCollectionCreator {
 
-    public List<DatasetCollection> getCollections(String sourceId) throws GSException {
+    public List<DatasetCollection> getCollections(String sourceId, String sourceDeployments) throws GSException {
 
 	GSSource source = ConfigurationWrapper.getSource(sourceId);
 
@@ -81,7 +82,7 @@ public class SourceCollectionCreator {
 	List<DatasetCollection> ret = new ArrayList<>();
 
 	for (ResponseItem response : statisticsResponse) {
-	    DatasetCollection dataset = mapDataset(source, response);
+	    DatasetCollection dataset = mapDataset(source, response, sourceDeployments);
 	    ret.add(dataset);
 	}
 
@@ -92,11 +93,15 @@ public class SourceCollectionCreator {
 	return ResourceProperty.SOURCE_ID;
     }
 
-    private DatasetCollection mapDataset(GSSource source, ResponseItem responseItem) throws GSException {
+    private DatasetCollection mapDataset(GSSource source, ResponseItem responseItem, String sourceDeployments) throws GSException {
 
 	String groupBy = responseItem.getGroupedBy().get();
 
 	DatasetCollection dataset = new DatasetCollection();
+	String[] sd = sourceDeployments.split(",");
+	for (String s : sd) {
+	    dataset.getPropertyHandler().addSourceDeployment(s.trim());
+	}
 
 	dataset.setSource(source);
 	String country = "unknown";
@@ -114,13 +119,15 @@ public class SourceCollectionCreator {
 	// GET Country!
 	String topic = "origin/a/wis2/" + //
 		country + "-" + sourceAcronym //
-		+ "/metadata/core/hydrology" + getAdditionalLevels(groupBy);
+		+ "/metadata"; // only at this level
+	// core/hydrology" + getAdditionalLevels(groupBy);
 
 	dataset.getExtensionHandler().setWISTopicHierarchy(topic);
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 	String id = getMetadataIdentifier(source.getUniqueIdentifier(), groupBy);
 	dataset.setOriginalId(id);
+	dataset.setPrivateId(id);
 	coreMetadata.setIdentifier(id);
 	MIMetadata miMetadata = dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
 	coreMetadata.getMIMetadata().setDateStampAsDate(ISO8601DateTimeUtils.getISO8601Date());
@@ -193,84 +200,82 @@ public class SourceCollectionCreator {
     }
 
     protected void addAdditionalElements(DatasetCollection dataset, String sourceId, String groupBy) throws GSException {
-	
+
 	HashSet<PropertyResult> observedProperties = getProperties(sourceId);
-	
 
 	addProperties(dataset, observedProperties);
-	
-	
+
     }
 
     public void addProperties(DatasetCollection dataset, HashSet<PropertyResult> observedProperties) {
-    	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
-    	MIMetadata miMetadata = coreMetadata.getMIMetadata();
-    	HashSet<String> propertyNames = new HashSet<>();
-    	HashSet<String> propertyURIs = new HashSet<>();
-    	String properties = "";
-    	Keywords whosKeywords = null;
+	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
+	MIMetadata miMetadata = coreMetadata.getMIMetadata();
+	HashSet<String> propertyNames = new HashSet<>();
+	HashSet<String> propertyURIs = new HashSet<>();
+	String properties = "";
+	Keywords whosKeywords = null;
 
-    	Keywords wmoKeywords = null;
-    	WHOSOntology ontology = new WHOSOntology();
-    	miMetadata.getDataIdentification().addKeyword("DAB");
+	Keywords wmoKeywords = null;
+	WHOSOntology ontology = new WHOSOntology();
+	miMetadata.getDataIdentification().addKeyword("DAB");
 
-    	
-    	for (PropertyResult property : observedProperties) {
-    	    if (property.getUri() != null) {
-    		if (!propertyURIs.contains(property.getUri())) {
-    		    List<SKOSConcept> concepts = ontology.findConcepts(property.getUri(), true, false);
-    		    if (!concepts.isEmpty()) {
-    			for (SKOSConcept concept : concepts) {
-    			    if (concept != null && concept.getURI() != null) {
-    				if (concept.getURI().contains("codes.wmo.int/wmdr")) {    					
-    				    if (wmoKeywords == null) {
-    					wmoKeywords = new Keywords();
-    					wmoKeywords.setThesaurusNameCitationTitle(concept.getURI().substring(0,concept.getURI().lastIndexOf("/")));
-    				    }
-    				    wmoKeywords.addKeyword(concept.getPreferredLabel().getKey(), concept.getURI());
-    				} else if (concept.getURI().contains("hydro.geodab.eu")) {
-    				    if (whosKeywords == null) {
-    					whosKeywords = new Keywords();
-    					whosKeywords.setThesaurusNameCitationTitle("http://hydro.geodab.eu/hydro-ontology/");
-    				    }
-    				    whosKeywords.addKeyword(concept.getPreferredLabel().getKey(), concept.getURI());
-    				}
-    				dataset.getExtensionHandler().setObservedPropertyURI(concept.getURI());
+	for (PropertyResult property : observedProperties) {
+	    if (property.getUri() != null) {
+		if (!propertyURIs.contains(property.getUri())) {
+		    List<SKOSConcept> concepts = ontology.findConcepts(property.getUri(), true, false);
+		    if (!concepts.isEmpty()) {
+			for (SKOSConcept concept : concepts) {
+			    if (concept != null && concept.getURI() != null) {
+				if (concept.getURI().contains("codes.wmo.int/wmdr")) {
+				    if (wmoKeywords == null) {
+					wmoKeywords = new Keywords();
+					wmoKeywords.setThesaurusNameCitationTitle(
+						concept.getURI().substring(0, concept.getURI().lastIndexOf("/")));
+				    }
+				    wmoKeywords.addKeyword(concept.getPreferredLabel().getKey(), concept.getURI());
+				} else if (concept.getURI().contains("hydro.geodab.eu")) {
+				    if (whosKeywords == null) {
+					whosKeywords = new Keywords();
+					whosKeywords.setThesaurusNameCitationTitle("http://hydro.geodab.eu/hydro-ontology/");
+				    }
+				    whosKeywords.addKeyword(concept.getPreferredLabel().getKey(), concept.getURI());
+				}
+				dataset.getExtensionHandler().setObservedPropertyURI(concept.getURI());
 
-    			    }
-    			}
-    		    }
-    		    propertyURIs.add(property.getUri());
+			    }
+			}
+		    }
+		    propertyURIs.add(property.getUri());
 
-    		}
-    	    }
-    	    if (property.getName() != null) {
-    		if (!propertyNames.contains(property.getName())) {
+		}
+	    }
+	    if (property.getName() != null) {
+		if (!propertyNames.contains(property.getName())) {
 
-    		    properties += property.getName() + ", ";
-    		    propertyNames.add(property.getName());
-    		    CoverageDescription coverageDescription = new CoverageDescription();
-    		    coverageDescription.setAttributeTitle(property.getName());
-    		    coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
-    		}
-    	    }
-    	}
-
-    	if (wmoKeywords != null) {
-    	    miMetadata.getDataIdentification().addKeywords(wmoKeywords);
-    	}
-    	if (whosKeywords != null) {
-    	    miMetadata.getDataIdentification().addKeywords(whosKeywords);
-    	}
-    	if (!properties.isEmpty()) {
-    	    properties = properties.substring(0, properties.length() - 2);
-    	}
-    	String abs = coreMetadata.getAbstract();
-    	coreMetadata.setAbstract(abs + " Number of observed properties: " + propertyNames.size() + " (" + properties + ")");
-		
+		    properties += property.getName() + ", ";
+		    propertyNames.add(property.getName());
+		    CoverageDescription coverageDescription = new CoverageDescription();
+		    coverageDescription.setAttributeTitle(property.getName());
+		    coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
+		}
+	    }
 	}
 
-	protected String getMetadataIdentifier(String sourceIdentifier, String groupBy) {
+	if (wmoKeywords != null) {
+	    miMetadata.getDataIdentification().addKeywords(wmoKeywords);
+	}
+	if (whosKeywords != null) {
+	    miMetadata.getDataIdentification().addKeywords(whosKeywords);
+	}
+	if (!properties.isEmpty()) {
+	    properties = properties.substring(0, properties.length() - 2);
+	}
+	String abs = coreMetadata.getAbstract();
+	coreMetadata.setAbstract(abs + " Number of observed properties: " + propertyNames.size() + " (" + properties + ")");
+
+    }
+
+    protected String getMetadataIdentifier(String sourceIdentifier, String groupBy) {
 	return "urn:wmo:md:" + sourceIdentifier + ":all";
     }
 

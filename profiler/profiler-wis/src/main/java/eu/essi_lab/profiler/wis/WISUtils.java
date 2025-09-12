@@ -367,7 +367,7 @@ public class WISUtils {
 	    contact.put("roles", roles);
 	    contacts.put(contact);
 	}
-	properties.put("wmo:dataPolicy", "core");
+	properties.put("wmo:dataPolicy", "recommended");
 	// properties.put("rights", "WHOS Terms of Use");
 	properties.put("title", resource.getHarmonizedMetadata().getCoreMetadata().getTitle());
 	properties.put("type", "dataset");

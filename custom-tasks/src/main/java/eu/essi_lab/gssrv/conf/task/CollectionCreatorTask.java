@@ -1,5 +1,7 @@
 package eu.essi_lab.gssrv.conf.task;
 
+import java.util.EnumMap;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -25,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
@@ -40,34 +43,41 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
+import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.gssrv.conf.task.collection.ParameterCollectionCreator;
 import eu.essi_lab.gssrv.conf.task.collection.SourceCollectionCreator;
+import eu.essi_lab.indexes.IndexedElementsWriter;
+import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wis.WISUtils;
 
 /**
  * @author boldrini
  */
-public class CollectionCreatorTask extends AbstractEmbeddedTask  {
+public class CollectionCreatorTask extends AbstractEmbeddedTask {
+
+    public enum CollectionCreatorTaskOptions implements OptionsKey {
+	HOSTNAME, SOURCE_ID, VIEW_ID;
+    }
 
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
 	log(status, "Collection creator task STARTED");
 
-	Optional<String> taskOptions = readTaskOptions(context);
-
-	if (!taskOptions.isPresent()) {
-
-	    log(status, "Custom task options missing, unable to perform task");
-
+	Optional<EnumMap<CollectionCreatorTaskOptions, String>> taskOptions = readTaskOptions(context, CollectionCreatorTaskOptions.class);
+	if (taskOptions.isEmpty() || taskOptions.get().isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass())
+		    .error("No options specified. Options should be new line separated and in the form key=value");
 	    return;
 	}
 
@@ -107,9 +117,32 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask  {
 	    }
 	}
 
-	String targetSourceIdentifiers = taskOptions.get().trim();
+	String hostname = taskOptions.get().get(CollectionCreatorTaskOptions.HOSTNAME);
+	if (hostname == null) {
+	    GSLoggerFactory.getLogger(getClass()).info("No hostname option specified, using default");
+	    hostname = "https://whos.geodab.eu";
+	}
 
-	String[] splits = targetSourceIdentifiers.split("\n");
+	String sourceId = taskOptions.get().get(CollectionCreatorTaskOptions.SOURCE_ID);
+	if (sourceId == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("No source id option specified");
+	    return;
+	}
+
+	String viewId = taskOptions.get().get(CollectionCreatorTaskOptions.VIEW_ID);
+	if (viewId == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("No view id option specified");
+	    return;
+	}
+
+	Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+	if (view.isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass()).error("View not found");
+	    return;
+	}
+	String[] splits = sourceId.split(";");
+
+	https: // whos.geodab.eu
 
 	for (String split : splits) {
 
@@ -125,7 +158,7 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask  {
 
 	    } else {
 
-		run(targetSource.get().getUniqueIdentifier());
+		run(hostname, targetSource.get().getUniqueIdentifier(), view.get());
 	    }
 	}
 
@@ -135,30 +168,30 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask  {
     /**
      * @param targetSourceIdentifier
      */
-    public void run(String sourceId) throws Exception {
+    public void run(String hostname, String sourceId, View view) throws Exception {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
-	run(sourceId, databaseURI);
+	run(hostname, sourceId, databaseURI, view);
     }
 
     /**
      * @param targetSourceIdentifier
      */
-    public void run(String sourceId, StorageInfo databaseURI) throws Exception {
+    public void run(String hostname, String sourceId, StorageInfo databaseURI, View view) throws Exception {
 
 	SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(databaseURI);
 
 	DatabaseFolder folder = sourceStorage.getDataFolder(sourceId, true).get();
 
-	List<DatasetCollection> datasets = new SourceCollectionCreator().getCollections(sourceId);
+	List<DatasetCollection> datasets = new SourceCollectionCreator().getCollections(sourceId, view.getSourceDeployment());
 
-	List<DatasetCollection> children = new ParameterCollectionCreator().getCollections(sourceId);
+	List<DatasetCollection> children = new ParameterCollectionCreator().getCollections(sourceId, view.getSourceDeployment());
 
 	datasets.addAll(children);
 
-	Optional<String> optionalView = Optional.of("gs-view-source(" + sourceId + ")");
+	Optional<String> optionalView = Optional.of(view.getId());
 	ResultSet<GSResource> resultSet = WISUtils.getMetadataItems(null, optionalView);
-	HashSet<String> toDelete = new HashSet();
+	HashSet<String> toDelete = new HashSet<>();
 	for (GSResource result : resultSet.getResultsList()) {
 	    toDelete.add(result.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getFileIdentifier());
 	}
@@ -168,29 +201,46 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask  {
 	    Optional<String> topic = dataset.getExtensionHandler().getWISTopicHierarchy();
 	    if (topic.isPresent()) {
 		JSONObject feature = WISUtils.mapFeature(dataset);
-		String msg = feature.toString();
+		String wmcp = feature.toString(3);
+
+		IndexedElementsWriter.write(dataset);
+		Document asDocument = dataset.asDocument(true);
+		String key = dataset.getOriginalId().get();
+		if (folder.exists(key)) {
+		    toDelete.remove(key);
+		    folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
+		} else {
+		    folder.store(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
+		}
+
+		// send WIS notification message
+		String fileIdentifier = dataset.getHarmonizedMetadata().getCoreMetadata().getIdentifier();
+		String wnmId = UUID.randomUUID().toString();
+		GeographicBoundingBox bbox = dataset.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
+		String dataId = fileIdentifier;
+
+		String url = hostname + "/gs-service/services/essi/view/" + view.getId() + "/oapi/collections/discovery-metadata/items/"
+			+ fileIdentifier;
+		// String url = hostname + "/gs-service/services/essi/view/" + view.getId() + "/wis-metadata/" +
+		// fileIdentifier;
+		Link link = new Link("canonical", "application/geo+json", url);
+		WISNotificationMessage wnm = new WISNotificationMessage(wnmId, bbox, dataId, link);
+		System.out.println(topic.get());
+		System.out.println(wnm.getJSONObject().toString(3));
+		System.out.println(wmcp);
 		if (client == null) {
 		    GSLoggerFactory.getLogger(getClass()).info("MQTT broker not configured");
 		} else {
-		    client.publish(topic.get(), msg, true);
+		    client.publish(topic.get(), wnm.getJSONObject().toString(3), true);
 		}
+
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).error("Topic not present!");
 	    }
 
-	    Document asDocument = dataset.asDocument(true);
-	    String key = dataset.getOriginalId().get();
-	    if (folder.exists(key)) {
-		toDelete.remove(key);
-		folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
-	    } else {
-		folder.store(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
-	    }
-
 	}
-
-	for (String id : toDelete) {
-	    folder.remove(id);
+	for (String tod : toDelete) {
+	    folder.remove(tod);
 	}
 
     }
