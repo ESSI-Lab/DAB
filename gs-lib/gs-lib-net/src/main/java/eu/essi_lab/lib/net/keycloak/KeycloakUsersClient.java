@@ -47,6 +47,11 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class KeycloakUsersClient {
 
+    /**
+     * 
+     */
+    private static final int MAX_USERS = 1000;
+
     private String serviceUrl;
     private String adminRealm;
     private String usersRealm;
@@ -209,7 +214,7 @@ public class KeycloakUsersClient {
      */
     public List<JSONObject> listRaw(String accessToken) throws IOException, InterruptedException {
 
-	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users";
+	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users?max=" + MAX_USERS;
 
 	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Authorization", "Bearer " + accessToken).GET().build();
 
