@@ -64,14 +64,12 @@ public class ParameterCollectionCreator extends SourceCollectionCreator {
     }
 
     protected void addAdditionalElements(DatasetCollection dataset, String sourceId, String parameterURI) throws GSException {
-    	
-    	HashSet<PropertyResult> observedProperties = new HashSet<SourceCollectionCreator.PropertyResult>();
-    	PropertyResult property = new PropertyResult();
-    	property.setUri(parameterURI);
-		observedProperties.add(property );
-		addProperties(dataset, observedProperties );
 
-    	
+	HashSet<PropertyResult> observedProperties = new HashSet<SourceCollectionCreator.PropertyResult>();
+	PropertyResult property = new PropertyResult();
+	property.setUri(parameterURI);
+	observedProperties.add(property);
+	addProperties(dataset, observedProperties);
 
     }
 
