@@ -66,7 +66,7 @@ public class GSUser extends DOMSerializer implements Serializable {
      * 
      */
     public static final String IDENTIFIER_TYPE_ELEMENT_NAME = "identifierType";
-    
+
     /**
      * 
      */
@@ -75,7 +75,6 @@ public class GSUser extends DOMSerializer implements Serializable {
      * 
      */
     public static final String ROLE = "role";
-
 
     @NotNull
     @Email
@@ -203,7 +202,6 @@ public class GSUser extends DOMSerializer implements Serializable {
     @XmlTransient
     public UserIdentifierType getUserIdentifierType() {
 
-	@SuppressWarnings("unchecked")
 	Optional<String> userIdType = getStringPropertyValue(IDENTIFIER_TYPE_ELEMENT_NAME);
 
 	if (userIdType.isPresent()) {
@@ -227,7 +225,12 @@ public class GSUser extends DOMSerializer implements Serializable {
 	return authProvider;
     }
 
+    /**
+     * 
+     * @param authProvider
+     */
     public void setAuthProvider(String authProvider) {
+	
 	this.authProvider = authProvider;
     }
 
@@ -251,6 +254,7 @@ public class GSUser extends DOMSerializer implements Serializable {
      */
     @XmlTransient
     public Boolean isEnabled() {
+	
 	return enabled;
     }
 
@@ -258,17 +262,20 @@ public class GSUser extends DOMSerializer implements Serializable {
      * @param role
      */
     public void setEnabled(boolean enabled) {
+	
 	this.enabled = enabled;
     }
 
     @SuppressWarnings("rawtypes")
     @XmlTransient
     public List<GSProperty> getProperties() {
+	
 	return properties;
     }
 
     @SuppressWarnings("rawtypes")
     public Optional<GSProperty> getProperty(String name) {
+	
 	for (GSProperty property : properties) {
 	    if (property.getName() != null && property.getName().equals(name)) {
 		return Optional.of(property);
@@ -289,6 +296,7 @@ public class GSUser extends DOMSerializer implements Serializable {
 
     @SuppressWarnings("rawtypes")
     public void setAttributes(List<GSProperty> attributes) {
+	
 	this.properties = attributes;
     }
 
@@ -298,9 +306,9 @@ public class GSUser extends DOMSerializer implements Serializable {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setPropertyValue(String name, String value) {
-	
+
 	GSProperty<String> target = null;
-	
+
 	for (GSProperty property : properties) {
 	    if (property.getName().equals(name)) {
 		if (property.getValue() instanceof String) {
@@ -308,13 +316,13 @@ public class GSUser extends DOMSerializer implements Serializable {
 		}
 	    }
 	}
-	
+
 	if (target != null) {
-	
+
 	    target.setValue(value);
-	
+
 	} else {
-	
+
 	    GSProperty<String> prop = new GSProperty<String>(name, value);
 	    properties.add(prop);
 	}
@@ -322,6 +330,7 @@ public class GSUser extends DOMSerializer implements Serializable {
 
     @Override
     public int hashCode() {
+	
 	return Objects.hash(getAuthProvider(), getIdentifier(), getProperties());
     }
 
