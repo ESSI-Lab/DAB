@@ -422,9 +422,9 @@ public class WISUtils {
 
 	    String view = WISUtils.getWHOSView(sourceId, parameterURI);
 	    String url = WISUtils.getUrl(webRequest);
-	    url = url.replace("/view/whos/", "/view/" + view + "/");
+//	    url = url.replace("/view/whos/", "/view/" + view + "/");
 	    WISUtils.addLink(links, "application/json", "canonical", id, url + "/collections/discovery-metadata/items/" + id);
-	    WISUtils.addLink(links, "application/json", "collection", id, url + "/collections/" + id);
+//	    WISUtils.addLink(links, "application/json", "collection", id, url + "/collections/" + id);
 	    feature.put("links", links);
 	}
 
