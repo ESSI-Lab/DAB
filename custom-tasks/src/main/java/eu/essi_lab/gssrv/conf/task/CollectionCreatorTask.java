@@ -188,6 +188,12 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	List<DatasetCollection> children = new ParameterCollectionCreator().getCollections(sourceId, view.getSourceDeployment());
 
 	datasets.addAll(children);
+	
+	GSLoggerFactory.getLogger(getClass()).info("Number of generated collections: {}",datasets.size());
+	
+	for (DatasetCollection dataset : datasets) {
+	    System.out.println(dataset.getHarmonizedMetadata().getCoreMetadata().getTitle());
+	}
 
 	Optional<String> optionalView = Optional.of(view.getId());
 	ResultSet<GSResource> resultSet = WISUtils.getMetadataItems(null, optionalView);

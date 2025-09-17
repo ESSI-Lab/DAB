@@ -118,7 +118,8 @@ public class SourceCollectionCreator {
 	}
 	// GET Country!
 	String topic = "origin/a/wis2/" + //
-		country + "-" + sourceAcronym //
+		"it-cnr-iia"
+		// country + "-" + sourceAcronym //
 		+ "/metadata"; // only at this level
 	// core/hydrology" + getAdditionalLevels(groupBy);
 
