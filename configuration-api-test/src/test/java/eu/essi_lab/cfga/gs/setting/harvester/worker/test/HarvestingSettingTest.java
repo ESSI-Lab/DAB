@@ -22,7 +22,7 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
@@ -100,7 +100,7 @@ public class HarvestingSettingTest {
 
 	Assert.assertEquals("SOS", accessorSetting.getAccessorType());
     }
-    
+
     @Test
     public void selectAccessorTest3() throws Exception {
 
@@ -114,7 +114,7 @@ public class HarvestingSettingTest {
 
 	Assert.assertEquals("OAIPMH", accessorSetting.getAccessorType());
     }
-    
+
     @Test
     public void selectAccessorTest4() throws Exception {
 
@@ -128,8 +128,7 @@ public class HarvestingSettingTest {
 
 	Assert.assertEquals("WCS", accessorSetting.getAccessorType());
     }
-    
-    
+
     @Test
     public void selectAccessorTest5() throws Exception {
 
@@ -235,13 +234,13 @@ public class HarvestingSettingTest {
 	setting.setIdentifier(UUID.randomUUID().toString());
 
 	configuration.put(setting);
-	
+
 	SystemSetting systemSetting = new SystemSetting();
-	systemSetting.setIdentifier(MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel());
+	systemSetting.setIdentifier(SingletonSettingsId.SYSTEM_SETTING.getLabel());
 	configuration.put(systemSetting);
-	
+
 	DatabaseSetting databaseSetting = new DatabaseSetting();
-	databaseSetting.setIdentifier(MainSettingsIdentifier.DATABASE.getLabel());
+	databaseSetting.setIdentifier(SingletonSettingsId.DATABASE_SETTING.getLabel());
 	configuration.put(databaseSetting);
 
 	SelectionUtils.deepClean(configuration);

@@ -27,7 +27,7 @@ import eu.essi_lab.cfga.ConfigurableLoader;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.SelectionUtils;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.source.FileSource;
@@ -208,7 +208,7 @@ public class DemoConfiguration extends Configuration {
 
 	DatabaseSetting databaseSetting = new DatabaseSetting();
 	databaseSetting.setVolatile(true);
-	databaseSetting.setIdentifier(MainSettingsIdentifier.DATABASE.getLabel());
+	databaseSetting.setIdentifier(SingletonSettingsId.DATABASE_SETTING.getLabel());
 
 	put(databaseSetting);
 
@@ -223,7 +223,7 @@ public class DemoConfiguration extends Configuration {
 		findFirst().//
 		get();
 
-	systemSetting.setIdentifier(MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel());
+	systemSetting.setIdentifier(SingletonSettingsId.SYSTEM_SETTING.getLabel());
 
 	put(systemSetting);
     }

@@ -63,83 +63,83 @@ public class DefaultConfiguration extends Configuration {
     /**
      * @author Fabrizio
      */
-    public enum MainSettingsIdentifier implements LabeledEnum {
+    public enum SingletonSettingsId implements LabeledEnum {
 
 	/**
 	 * 
 	 */
-	DATABASE("database"),
+	DATABASE_SETTING("database"),
 
 	/**
 	 * 
 	 */
-	SHARED_CACHE_REPO("sharedCacheRepo"),
+	SHARED_CACHE_REPO_SETTING("sharedCacheRepo"),
 
 	/**
 	 * 
 	 */
-	SHARED_PERSISTENT_REPO("sharedPersistentRepo"),
+	SHARED_PERSISTENT_REPO_SETTING("sharedPersistentRepo"),
 
 	/**
 	 * 
 	 */
-	SCHEDULER("scheduler"),
+	SCHEDULER_SETTING("scheduler"),
 
 	/**
 	 * 
 	 */
-	OAUTH_SETTINGS("oauthSettings"),
+	OAUTH_SETTING("oauthSettings"),
 
 	/**
 	 * 
 	 */
-	SYSTEM_SETTINGS("systemSettings"),
+	SYSTEM_SETTING("systemSettings"),
 
 	/**
 	 * 
 	 */
-	CUSTOM_TASK_SETTINGS("customTaskSettings"),
+	CUSTOM_TASK_SETTING("customTaskSettings"),
 
 	/**
 	 * 
 	 */
-	SOURCE_STORAGE_SETTINGS("sourceStorageSettings"),
+	SOURCE_STORAGE_SETTING("sourceStorageSettings"),
 
 	/**
 	 * 
 	 */
-	CREDENTIALS_SETTINGS("credentialsSettings"),
+	CREDENTIALS_SETTING("credentialsSettings"),
 
 	/**
 	 * 
 	 */
-	SOURCE_PRIORITY_SETTINGS("sourcePrioritySettings"),
+	SOURCE_PRIORITY_SETTING("sourcePrioritySettings"),
 	/**
 	 * 
 	 */
-	GDC_SOURCES_SETTINGS("gdcSourceSettings"), //
+	GDC_SOURCES_SETTING("gdcSourceSettings"), //
 
 	/**
 	 * 
 	 */
-	DATA_CACHE_CONNECTOR_SETTINGS("dataCacheConnectorSettings"), //
+	DATA_CACHE_CONNECTOR_SETTING("dataCacheConnectorSettings"), //
 
 	/**
 	 * 
 	 */
-	DOWNLOAD_SETTINGS("downloadSettings"),
+	DOWNLOAD_SETTING("downloadSettings"),
 
 	/**
 	 * 
 	 */
-	RATE_LIMITER_SETTINGS("rateLimiterSettings");
+	RATE_LIMITER_SETTING("rateLimiterSettings");
 
 	private String label;
 
 	/**
 	 * @param value
 	 */
-	private MainSettingsIdentifier(String value) {
+	private SingletonSettingsId(String value) {
 
 	    this.label = value;
 	}
@@ -298,7 +298,7 @@ public class DefaultConfiguration extends Configuration {
 
 	DatabaseSetting databaseSetting = new DatabaseSetting();
 	databaseSetting.setVolatile(true);
-	databaseSetting.setIdentifier(MainSettingsIdentifier.DATABASE.getLabel());
+	databaseSetting.setIdentifier(SingletonSettingsId.DATABASE_SETTING.getLabel());
 
 	put(databaseSetting);
 
@@ -307,7 +307,7 @@ public class DefaultConfiguration extends Configuration {
 	//
 
 	SchedulerViewSetting schedulerSetting = new SchedulerViewSetting();
-	schedulerSetting.setIdentifier(MainSettingsIdentifier.SCHEDULER.getLabel());
+	schedulerSetting.setIdentifier(SingletonSettingsId.SCHEDULER_SETTING.getLabel());
 
 	put(schedulerSetting);
 
@@ -323,7 +323,7 @@ public class DefaultConfiguration extends Configuration {
 		findFirst().//
 		get();
 
-	cacheSetting.setIdentifier(MainSettingsIdentifier.SHARED_CACHE_REPO.getLabel());
+	cacheSetting.setIdentifier(SingletonSettingsId.SHARED_CACHE_REPO_SETTING.getLabel());
 
 	put(cacheSetting);
 
@@ -339,7 +339,7 @@ public class DefaultConfiguration extends Configuration {
 		findFirst().//
 		get();
 
-	persistentSetting.setIdentifier(MainSettingsIdentifier.SHARED_PERSISTENT_REPO.getLabel());
+	persistentSetting.setIdentifier(SingletonSettingsId.SHARED_PERSISTENT_REPO_SETTING.getLabel());
 
 	put(persistentSetting);
 
@@ -357,7 +357,7 @@ public class DefaultConfiguration extends Configuration {
 
 	DataCacheConnectorSetting dataCacheConnectorSetting = DataCacheConnectorSettingLoader.load();
 
-	dataCacheConnectorSetting.setIdentifier(MainSettingsIdentifier.DATA_CACHE_CONNECTOR_SETTINGS.getLabel());
+	dataCacheConnectorSetting.setIdentifier(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel());
 
 	put(dataCacheConnectorSetting);
 
@@ -367,7 +367,7 @@ public class DefaultConfiguration extends Configuration {
 
 	OAuthSetting oauthSetting = new OAuthSetting();
 
-	oauthSetting.setIdentifier(MainSettingsIdentifier.OAUTH_SETTINGS.getLabel());
+	oauthSetting.setIdentifier(SingletonSettingsId.OAUTH_SETTING.getLabel());
 
 	put(oauthSetting);
 
@@ -377,7 +377,7 @@ public class DefaultConfiguration extends Configuration {
 
 	CredentialsSetting credSetting = new CredentialsSetting();
 
-	credSetting.setIdentifier(MainSettingsIdentifier.CREDENTIALS_SETTINGS.getLabel());
+	credSetting.setIdentifier(SingletonSettingsId.CREDENTIALS_SETTING.getLabel());
 
 	put(credSetting);
 
@@ -387,7 +387,7 @@ public class DefaultConfiguration extends Configuration {
 
 	DownloadSetting downloadSetting = new DownloadSetting();
 
-	downloadSetting.setIdentifier(MainSettingsIdentifier.DOWNLOAD_SETTINGS.getLabel());
+	downloadSetting.setIdentifier(SingletonSettingsId.DOWNLOAD_SETTING.getLabel());
 
 	put(downloadSetting);
 
@@ -397,7 +397,7 @@ public class DefaultConfiguration extends Configuration {
 
 	SourceStorageSetting sourceStorageSetting = new SourceStorageSetting();
 
-	sourceStorageSetting.setIdentifier(MainSettingsIdentifier.SOURCE_STORAGE_SETTINGS.getLabel());
+	sourceStorageSetting.setIdentifier(SingletonSettingsId.SOURCE_STORAGE_SETTING.getLabel());
 
 	put(sourceStorageSetting);
 
@@ -407,7 +407,7 @@ public class DefaultConfiguration extends Configuration {
 
 	SourcePrioritySetting sourcePrioritySetting = new SourcePrioritySetting();
 
-	sourcePrioritySetting.setIdentifier(MainSettingsIdentifier.SOURCE_PRIORITY_SETTINGS.getLabel());
+	sourcePrioritySetting.setIdentifier(SingletonSettingsId.SOURCE_PRIORITY_SETTING.getLabel());
 
 	put(sourcePrioritySetting);
 
@@ -417,7 +417,7 @@ public class DefaultConfiguration extends Configuration {
 
 	GDCSourcesSetting gdcSourcesSetting = new GDCSourcesSetting();
 
-	gdcSourcesSetting.setIdentifier(MainSettingsIdentifier.GDC_SOURCES_SETTINGS.getLabel());
+	gdcSourcesSetting.setIdentifier(SingletonSettingsId.GDC_SOURCES_SETTING.getLabel());
 
 	put(gdcSourcesSetting);
 
@@ -427,7 +427,7 @@ public class DefaultConfiguration extends Configuration {
 
 	SystemSetting systemSetting = new SystemSetting();
 
-	systemSetting.setIdentifier(MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel());
+	systemSetting.setIdentifier(SingletonSettingsId.SYSTEM_SETTING.getLabel());
 
 	put(systemSetting);
 
@@ -437,7 +437,7 @@ public class DefaultConfiguration extends Configuration {
 
 	CustomTaskSetting customTaskSetting = new CustomTaskSetting();
 
-	customTaskSetting.setIdentifier(MainSettingsIdentifier.CUSTOM_TASK_SETTINGS.getLabel());
+	customTaskSetting.setIdentifier(SingletonSettingsId.CUSTOM_TASK_SETTING.getLabel());
 
 	put(customTaskSetting);
 
@@ -447,7 +447,7 @@ public class DefaultConfiguration extends Configuration {
 
 	RateLimiterSetting rateLimiterSetting = new RateLimiterSetting();
 
-	rateLimiterSetting.setIdentifier(MainSettingsIdentifier.RATE_LIMITER_SETTINGS.getLabel());
+	rateLimiterSetting.setIdentifier(SingletonSettingsId.RATE_LIMITER_SETTING.getLabel());
 
 	put(rateLimiterSetting);
     }

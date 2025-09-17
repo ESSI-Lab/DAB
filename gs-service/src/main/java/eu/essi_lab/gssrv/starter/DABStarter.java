@@ -49,7 +49,7 @@ import eu.essi_lab.cfga.checker.ReferencedClassesMethod;
 import eu.essi_lab.cfga.checker.RegisteredEditableSettingMethod;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.SimilarityCheckMethod;
 import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
@@ -391,7 +391,7 @@ public class DABStarter {
 		//
 
 		SystemSetting systemSetting = configuration.get(//
-			MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel(), //
+			SingletonSettingsId.SYSTEM_SETTING.getLabel(), //
 			SystemSetting.class).get();
 
 		systemSetting = SettingUtils.downCast(//
@@ -429,7 +429,7 @@ public class DABStarter {
 		//
 
 		RateLimiterSetting rateLimiterSetting = configuration.get(//
-			MainSettingsIdentifier.RATE_LIMITER_SETTINGS.getLabel(), //
+			SingletonSettingsId.RATE_LIMITER_SETTING.getLabel(), //
 			RateLimiterSetting.class).get();
 
 		rateLimiterSetting.setComputationType(ComputationType.DISABLED);
@@ -453,7 +453,7 @@ public class DABStarter {
 		//
 
 		SchedulerViewSetting schedulerSetting = configuration.get(//
-			MainSettingsIdentifier.SCHEDULER.getLabel(), //
+			SingletonSettingsId.SCHEDULER_SETTING.getLabel(), //
 			SchedulerViewSetting.class).get();
 
 		JobStoreType jobStoreType = schedulerSetting.getJobStoreType();
@@ -739,7 +739,7 @@ public class DABStarter {
 	    CommonContext.createUnmarshaller();
 	    new Dataset();
 
-	    Marshaller marshaller = JAXBWMS.getInstance().getMarshaller();
+	    JAXBWMS.getInstance().getMarshaller();
 
 	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization ENDED");
 
