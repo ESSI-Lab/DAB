@@ -31,12 +31,12 @@ import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.setting.ConfigurableSetting;
+import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
-public class CredentialsSetting extends ConfigurableSetting implements EditableSetting {
+public class CredentialsSetting extends Setting implements EditableSetting {
 
     private static final String HIS_CENTRAL_PUGLIA_TOKEN = "pugliaToken";
     private static final String AGROSTAC_TOKEN = "agrostacToken";
@@ -1032,12 +1032,6 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
     public Optional<String> getACRONETPassword() {
 
 	return getOption(ACRONET_PASSWORD_OPTION_KEY, String.class).get().getOptionalValue();
-    }
-
-    @Override
-    public String getType() {
-
-	return "CredentialsSetting";
     }
 
     /**

@@ -28,14 +28,14 @@ import eu.essi_lab.cfga.gs.setting.driver.LocalFolderSetting;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
-import eu.essi_lab.cfga.setting.ConfigurableSetting;
+import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.StorageInfo;
 
 /**
  * @author Fabrizio
  */
-public class DownloadSetting extends ConfigurableSetting implements EditableSetting {
+public class DownloadSetting extends Setting implements EditableSetting {
 
     private static final String LOCAL_DOWNLOAD_SETTING_ID = "localDownloadSetting";
     private static final String S3_DOWNLOAD_SETTING_ID = "s3DownloadSetting";
@@ -224,11 +224,5 @@ public class DownloadSetting extends ConfigurableSetting implements EditableSett
 	storageUri.setName("localFS");
 
 	return storageUri;
-    }
-
-    @Override
-    public String getType() {
-
-	return "DownloadSetting";
     }
 }

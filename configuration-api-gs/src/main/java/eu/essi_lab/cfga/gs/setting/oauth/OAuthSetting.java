@@ -33,7 +33,6 @@ import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.setting.ConfigurableSetting;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.validation.ValidationContext;
@@ -45,7 +44,7 @@ import eu.essi_lab.lib.utils.LabeledEnum;
 /**
  * @author Fabrizio
  */
-public class OAuthSetting extends ConfigurableSetting implements EditableSetting {
+public class OAuthSetting extends Setting implements EditableSetting {
 
     private static final String CLIENT_ID_OPTION_KEY = "clientId";
     private static final String CLIENT_SECRET_OPTION_KEY = "clientSecret";
@@ -336,11 +335,5 @@ public class OAuthSetting extends ConfigurableSetting implements EditableSetting
     public Optional<String> getClientSecret() {
 
 	return getOption(CLIENT_SECRET_OPTION_KEY, String.class).get().getOptionalValue();
-    }
-
-    @Override
-    public String getType() {
-
-	return "OAuthSetting";
     }
 }

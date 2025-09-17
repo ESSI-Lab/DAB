@@ -254,19 +254,4 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 
 	return Optional.empty();
     }
-
-    public static void main(String[] args) {
-
-	DataCacheConnectorSettingImpl impl = new DataCacheConnectorSettingImpl();
-
-	System.out.println(impl);
-
-    }
-
-    @Override
-    public String getType() {
-
-	return "DataCacheConnectorSetting";
-    }
-
 }
