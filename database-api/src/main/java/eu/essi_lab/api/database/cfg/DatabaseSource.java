@@ -327,6 +327,12 @@ public class DatabaseSource implements ConfigurationSource {
 	return isLocked(optionalLockFile);
     }
 
+    @Override
+    public InputStream getStream() throws Exception {
+
+	return getBinaryConfig();
+    }
+
     /**
      * @param optionalLockFile
      * @return

@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -259,6 +260,12 @@ public class FileSource implements ConfigurationSource {
 	}
 
 	return false;
+    }
+
+    @Override
+    public InputStream getStream() throws Exception {
+
+	return new FileInputStream(source);
     }
 
     /**
