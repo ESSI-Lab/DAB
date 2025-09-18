@@ -83,38 +83,8 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	if (client == null) {
 
-	    try {
+	    initializeClient();
 
-		SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
-
-		Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
-
-		if (keyValueOption.isPresent()) {
-
-		    String host = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel());
-		    String port = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel());
-		    String user = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_USER.getLabel());
-		    String pwd = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel());
-
-		    if (host == null || port == null || user == null || pwd == null) {
-
-			GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
-
-		    } else {
-
-			client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
-		    }
-		} else {
-
-		    GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
-
-		}
-
-	    } catch (Exception e) {
-
-		GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
-		throw e;
-	    }
 	}
 
 	String hostname = taskOptions.get().get(CollectionCreatorTaskOptions.HOSTNAME);
@@ -165,6 +135,42 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	log(status, "Collection creator task ENDED");
     }
 
+    private void initializeClient() throws Exception {
+	try {
+
+	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+
+	    Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+
+	    if (keyValueOption.isPresent()) {
+
+		String host = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel());
+		String port = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel());
+		String user = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_USER.getLabel());
+		String pwd = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel());
+
+		if (host == null || port == null || user == null || pwd == null) {
+
+		    GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
+
+		} else {
+
+		    client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
+		}
+	    } else {
+
+		GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
+
+	    }
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
+	    throw e;
+	}
+
+    }
+
     /**
      * @param targetSourceIdentifier
      */
@@ -188,9 +194,9 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	List<DatasetCollection> children = new ParameterCollectionCreator().getCollections(sourceId, view.getSourceDeployment());
 
 	datasets.addAll(children);
-	
-	GSLoggerFactory.getLogger(getClass()).info("Number of generated collections: {}",datasets.size());
-	
+
+	GSLoggerFactory.getLogger(getClass()).info("Number of generated collections: {}", datasets.size());
+
 	for (DatasetCollection dataset : datasets) {
 	    System.out.println(dataset.getHarmonizedMetadata().getCoreMetadata().getTitle());
 	}
@@ -237,7 +243,26 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 		if (client == null) {
 		    GSLoggerFactory.getLogger(getClass()).info("MQTT broker not configured");
 		} else {
-		    client.publish(topic.get(), wnm.getJSONObject().toString(3), true);
+		    try {
+			client.publish(topic.get(), wnm.getJSONObject().toString(3), true);
+		    } catch (Exception e) {
+			GSLoggerFactory.getLogger(getClass()).error(e);
+			// reinitialize the client
+			if (client != null) {
+			    try {
+				client.disconnect();
+			    } catch (Exception e2) {
+				GSLoggerFactory.getLogger(getClass()).error(e2);
+			    }
+			    client = null;
+			}
+			try {
+			    initializeClient();
+			} catch (Exception e3) {
+			    GSLoggerFactory.getLogger(getClass()).error(e3);
+			}
+
+		    }
 		}
 
 	    } else {
