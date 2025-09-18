@@ -156,7 +156,7 @@ public class ConfigUploader extends ComponentInfo {
 	remoteUploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
 	TextField dbSourceTextField = new TextField();
-	dbSourceTextField.setValue("xdbc://user:password@hostname:8000,8004/dbName/folder");
+	dbSourceTextField.setValue("xdbc://user:password@hostname:8000,8004/dbName/folder/");
 	dbSourceTextField.setWidthFull();
 	dbSourceTextField.getStyle().set("margin-left", "10px");
 
