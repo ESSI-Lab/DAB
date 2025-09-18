@@ -32,6 +32,11 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  * @author Fabrizio
  */
 public enum JavaOptions {
+    
+    /**
+     * - Boolean
+     */
+    FORCE_VOLATILE_DB("forceVolatileDB", "Forced usage of volatile DB", "Usage of volatile DB not forced"),
 
     /**
      * - Boolean

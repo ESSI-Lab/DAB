@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.quartz.SchedulerException;
 
@@ -55,6 +54,7 @@ import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
@@ -374,6 +374,32 @@ public class DABStarter {
 	    if (mode == ExecutionMode.CONFIGURATION || mode == ExecutionMode.MIXED) {
 
 		configuration.pauseAutoreload();
+	    }
+
+	    //
+	    // set volatile DB according to the java option
+	    //
+	    if (JavaOptions.isEnabled(JavaOptions.FORCE_VOLATILE_DB)) {
+
+		DatabaseSetting databaseSetting = configuration.get(//
+			SingletonSettingsId.DATABASE_SETTING.getLabel(), //
+			DatabaseSetting.class).get();
+
+		databaseSetting.setVolatile(true);
+
+		boolean replaced = configuration.replace(databaseSetting);
+
+		if (!replaced && !configuration.contains(databaseSetting)) {
+
+		    throw GSException.createException(//
+			    ServletListener.class, //
+			    "Database setting not replaced", //
+			    null, //
+			    null, //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_FATAL, //
+			    "DatabaseSettingNotReplacedError");
+		}
 	    }
 
 	    //
