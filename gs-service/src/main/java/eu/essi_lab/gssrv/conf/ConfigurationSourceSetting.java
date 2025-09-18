@@ -97,7 +97,8 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 	setCanBeCleaned(false);
 	setSelectionMode(SelectionMode.SINGLE);
 	setDescription("Configure the storage ('OpenSearch' or 'S3'), " //
-		+ "then use the 'Upload configuration file' button to upload the selected configuration file into the configured storage. \n\n"
+		+ "then click the 'Upload local configuration file' or 'Upload remote configuration file' "
+		+ "button to upload the selected file into the configured storage. \n\n"
 		+ "When the upload is done, you can read in the panel above, the Java option required to start the DAB with the uploaded configuration");
 
 	DatabaseSetting dbSetting = ConfigurationWrapper.getDatabaseSetting();

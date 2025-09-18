@@ -70,7 +70,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 
 	DatabaseSetting databaseSetting = new DatabaseSetting();
 	databaseSetting.setVolatile(true);
-	databaseSetting.setIdentifier(MainSettingsIdentifier.DATABASE.getLabel());
+	databaseSetting.setIdentifier(SingletonSettingsId.DATABASE_SETTING.getLabel());
 
 	put(databaseSetting);
 
@@ -79,7 +79,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 	//
 
 	SchedulerViewSetting schedulerSetting = new SchedulerViewSetting();
-	schedulerSetting.setIdentifier(MainSettingsIdentifier.SCHEDULER.getLabel());
+	schedulerSetting.setIdentifier(SingletonSettingsId.SCHEDULER_SETTING.getLabel());
 
 	put(schedulerSetting);
 
@@ -89,7 +89,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 
 	DataCacheConnectorSetting dataCacheConnectorSetting = DataCacheConnectorSettingLoader.load();
 
-	dataCacheConnectorSetting.setIdentifier(MainSettingsIdentifier.DATA_CACHE_CONNECTOR_SETTINGS.getLabel());
+	dataCacheConnectorSetting.setIdentifier(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel());
 
 	put(dataCacheConnectorSetting);
 
@@ -99,7 +99,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 
 	OAuthSetting oauthSetting = new OAuthSetting();
 
-	oauthSetting.setIdentifier(MainSettingsIdentifier.OAUTH_SETTINGS.getLabel());
+	oauthSetting.setIdentifier(SingletonSettingsId.OAUTH_SETTING.getLabel());
 
 	put(oauthSetting);
 
@@ -109,7 +109,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 
 	CredentialsSetting credSetting = new CredentialsSetting();
 
-	credSetting.setIdentifier(MainSettingsIdentifier.CREDENTIALS_SETTINGS.getLabel());
+	credSetting.setIdentifier(SingletonSettingsId.CREDENTIALS_SETTING.getLabel());
 
 	put(credSetting);
 
@@ -119,7 +119,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 
 	DownloadSetting downloadSetting = new DownloadSetting();
 
-	downloadSetting.setIdentifier(MainSettingsIdentifier.DOWNLOAD_SETTINGS.getLabel());
+	downloadSetting.setIdentifier(SingletonSettingsId.DOWNLOAD_SETTING.getLabel());
 
 	put(downloadSetting);
 
@@ -129,7 +129,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 
 	SourceStorageSetting sourceStorageSetting = new SourceStorageSetting();
 
-	sourceStorageSetting.setIdentifier(MainSettingsIdentifier.SOURCE_STORAGE_SETTINGS.getLabel());
+	sourceStorageSetting.setIdentifier(SingletonSettingsId.SOURCE_STORAGE_SETTING.getLabel());
 
 	put(sourceStorageSetting);
 
@@ -139,7 +139,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 
 	SourcePrioritySetting sourcePrioritySetting = new SourcePrioritySetting();
 
-	sourcePrioritySetting.setIdentifier(MainSettingsIdentifier.SOURCE_PRIORITY_SETTINGS.getLabel());
+	sourcePrioritySetting.setIdentifier(SingletonSettingsId.SOURCE_PRIORITY_SETTING.getLabel());
 
 	put(sourcePrioritySetting);
 
@@ -149,7 +149,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 
 	GDCSourcesSetting gdcSourcesSetting = new GDCSourcesSetting();
 
-	gdcSourcesSetting.setIdentifier(MainSettingsIdentifier.GDC_SOURCES_SETTINGS.getLabel());
+	gdcSourcesSetting.setIdentifier(SingletonSettingsId.GDC_SOURCES_SETTING.getLabel());
 
 	put(gdcSourcesSetting);
 
@@ -159,7 +159,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 
 	SystemSetting systemSetting = new SystemSetting();
 
-	systemSetting.setIdentifier(MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel());
+	systemSetting.setIdentifier(SingletonSettingsId.SYSTEM_SETTING.getLabel());
 
 	put(systemSetting);
 
@@ -169,7 +169,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 
 	CustomTaskSetting customTaskSetting = new CustomTaskSetting();
 
-	customTaskSetting.setIdentifier(MainSettingsIdentifier.CUSTOM_TASK_SETTINGS.getLabel());
+	customTaskSetting.setIdentifier(SingletonSettingsId.CUSTOM_TASK_SETTING.getLabel());
 
 	put(customTaskSetting);
     }

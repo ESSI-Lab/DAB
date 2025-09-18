@@ -22,6 +22,7 @@ package eu.essi_lab.cfga;
  */
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,6 +51,12 @@ public interface ConfigurationSource {
 	 */
 	REJECTED
     }
+    
+    /**
+     * 
+     * @return
+     */
+    InputStream getStream() throws Exception;
 
     /**
      * @return

@@ -35,7 +35,7 @@ import org.quartz.JobExecutionContext;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationChangeListener;
 import eu.essi_lab.cfga.ConfigurationUtils;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.setting.CredentialsSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
@@ -204,7 +204,7 @@ public class ConfigurationWrapper {
     private static DatabaseSetting _getDatabaseSetting() {
 
 	return configuration.get(//
-		MainSettingsIdentifier.DATABASE.getLabel(), //
+		SingletonSettingsId.DATABASE_SETTING.getLabel(), //
 		DatabaseSetting.class //
 	).//
 		get();
@@ -240,7 +240,7 @@ public class ConfigurationWrapper {
     public static SourcePrioritySetting getSourcePrioritySetting(Configuration configuration) {
 
 	return configuration.get(//
-		MainSettingsIdentifier.SOURCE_PRIORITY_SETTINGS.getLabel(), //
+		SingletonSettingsId.SOURCE_PRIORITY_SETTING.getLabel(), //
 		SourcePrioritySetting.class //
 	).//
 		get();
@@ -253,7 +253,7 @@ public class ConfigurationWrapper {
     public static SourceStorageSetting getSourceStorageSettings(Configuration configuration) {
 
 	return configuration.get(//
-		MainSettingsIdentifier.SOURCE_STORAGE_SETTINGS.getLabel(), //
+		SingletonSettingsId.SOURCE_STORAGE_SETTING.getLabel(), //
 		SourceStorageSetting.class //
 	).get();
     }
@@ -264,7 +264,7 @@ public class ConfigurationWrapper {
     public static GDCSourcesSetting getGDCSourceSetting(Configuration configuration) {
 
 	return configuration.get(//
-		MainSettingsIdentifier.GDC_SOURCES_SETTINGS.getLabel(), //
+		SingletonSettingsId.GDC_SOURCES_SETTING.getLabel(), //
 		GDCSourcesSetting.class //
 	).//
 		get();
@@ -277,7 +277,7 @@ public class ConfigurationWrapper {
     public static SharedCacheDriverSetting getSharedCacheDriverSetting() {
 
 	SharedCacheDriverSetting setting = configuration.get(//
-		MainSettingsIdentifier.SHARED_CACHE_REPO.getLabel(), //
+		SingletonSettingsId.SHARED_CACHE_REPO_SETTING.getLabel(), //
 		SharedCacheDriverSetting.class).get();
 
 	return setting;
@@ -289,7 +289,7 @@ public class ConfigurationWrapper {
     public static SharedPersistentDriverSetting getSharedPersistentDriverSetting() {
 
 	SharedPersistentDriverSetting setting = configuration.get(//
-		MainSettingsIdentifier.SHARED_PERSISTENT_REPO.getLabel(), //
+		SingletonSettingsId.SHARED_PERSISTENT_REPO_SETTING.getLabel(), //
 		SharedPersistentDriverSetting.class).get();
 
 	return setting;
@@ -301,7 +301,7 @@ public class ConfigurationWrapper {
     public static SchedulerViewSetting getSchedulerSetting() {
 
 	SchedulerViewSetting setting = configuration.get(//
-		MainSettingsIdentifier.SCHEDULER.getLabel(), //
+		SingletonSettingsId.SCHEDULER_SETTING.getLabel(), //
 		SchedulerViewSetting.class).get();
 
 	return setting;
@@ -786,7 +786,7 @@ public class ConfigurationWrapper {
     private static SystemSetting _getSystemSetting() {
 
 	return configuration.get(//
-		MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel(), //
+		SingletonSettingsId.SYSTEM_SETTING.getLabel(), //
 		SystemSetting.class //
 	).get();
     }
@@ -798,7 +798,7 @@ public class ConfigurationWrapper {
     public static DownloadSetting getDownloadSetting() {
 
 	return configuration.get(//
-		MainSettingsIdentifier.DOWNLOAD_SETTINGS.getLabel(), //
+		SingletonSettingsId.DOWNLOAD_SETTING.getLabel(), //
 		DownloadSetting.class //
 	).get();
     }
@@ -810,7 +810,7 @@ public class ConfigurationWrapper {
     public static OAuthSetting getOAuthSetting() {
 
 	return configuration.get(//
-		MainSettingsIdentifier.OAUTH_SETTINGS.getLabel(), //
+		SingletonSettingsId.OAUTH_SETTING.getLabel(), //
 		OAuthSetting.class //
 	).get();
     }
@@ -832,7 +832,7 @@ public class ConfigurationWrapper {
     public static CredentialsSetting getCredentialsSetting() {
 
 	CredentialsSetting setting = configuration.get(//
-		MainSettingsIdentifier.CREDENTIALS_SETTINGS.getLabel(), //
+		SingletonSettingsId.CREDENTIALS_SETTING.getLabel(), //
 		CredentialsSetting.class).get();
 
 	return setting;
@@ -847,7 +847,7 @@ public class ConfigurationWrapper {
     public static RateLimiterSetting getRateLimiterSettingSettings() {
 
 	RateLimiterSetting setting = configuration.get(//
-		MainSettingsIdentifier.RATE_LIMITER_SETTINGS.getLabel(), //
+		SingletonSettingsId.RATE_LIMITER_SETTING.getLabel(), //
 		RateLimiterSetting.class).get();
 
 	return setting;
@@ -859,7 +859,7 @@ public class ConfigurationWrapper {
     public static DataCacheConnectorSetting getDataCacheConnectorSetting() {
 
 	DataCacheConnectorSetting setting = configuration.get(//
-		MainSettingsIdentifier.DATA_CACHE_CONNECTOR_SETTINGS.getLabel(), //
+		SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel(), //
 		DataCacheConnectorSetting.class, //
 		false).get();
 

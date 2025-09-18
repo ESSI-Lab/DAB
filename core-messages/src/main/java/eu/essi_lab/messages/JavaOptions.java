@@ -36,6 +36,11 @@ public enum JavaOptions {
     /**
      * - Boolean
      */
+    FORCE_VOLATILE_DB("forceVolatileDB", "Forced usage of volatile DB", "Usage of volatile DB not forced"),
+
+    /**
+     * - Boolean
+     */
     INIT_CACHES("initCaches", "Caches initialization enabled", "Caches initialization disabled"),
     /**
      * - Boolean
@@ -44,7 +49,7 @@ public enum JavaOptions {
     /**
      * - Boolean
      */
-    SKIP_GDAL_TEST("skipGDALTest", null),
+    SKIP_GDAL_TEST("skipGDALTest", "GDAL ping method disabled", "GDAL ping method enabled"),
     /**
      * - Boolean
      */

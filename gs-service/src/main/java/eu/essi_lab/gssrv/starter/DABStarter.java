@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.quartz.SchedulerException;
 
@@ -49,12 +48,13 @@ import eu.essi_lab.cfga.checker.ReferencedClassesMethod;
 import eu.essi_lab.cfga.checker.RegisteredEditableSettingMethod;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.SimilarityCheckMethod;
 import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
@@ -377,6 +377,32 @@ public class DABStarter {
 	    }
 
 	    //
+	    // set volatile DB according to the java option
+	    //
+	    if (JavaOptions.isEnabled(JavaOptions.FORCE_VOLATILE_DB)) {
+
+		DatabaseSetting databaseSetting = configuration.get(//
+			SingletonSettingsId.DATABASE_SETTING.getLabel(), //
+			DatabaseSetting.class).get();
+
+		databaseSetting.setVolatile(true);
+
+		boolean replaced = configuration.replace(databaseSetting);
+
+		if (!replaced && !configuration.contains(databaseSetting)) {
+
+		    throw GSException.createException(//
+			    ServletListener.class, //
+			    "Database setting not replaced", //
+			    null, //
+			    null, //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_FATAL, //
+			    "DatabaseSettingNotReplacedError");
+		}
+	    }
+
+	    //
 	    //
 	    //
 	    if (mode == ExecutionMode.LOCAL_PRODUCTION) {
@@ -391,7 +417,7 @@ public class DABStarter {
 		//
 
 		SystemSetting systemSetting = configuration.get(//
-			MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel(), //
+			SingletonSettingsId.SYSTEM_SETTING.getLabel(), //
 			SystemSetting.class).get();
 
 		systemSetting = SettingUtils.downCast(//
@@ -429,7 +455,7 @@ public class DABStarter {
 		//
 
 		RateLimiterSetting rateLimiterSetting = configuration.get(//
-			MainSettingsIdentifier.RATE_LIMITER_SETTINGS.getLabel(), //
+			SingletonSettingsId.RATE_LIMITER_SETTING.getLabel(), //
 			RateLimiterSetting.class).get();
 
 		rateLimiterSetting.setComputationType(ComputationType.DISABLED);
@@ -453,7 +479,7 @@ public class DABStarter {
 		//
 
 		SchedulerViewSetting schedulerSetting = configuration.get(//
-			MainSettingsIdentifier.SCHEDULER.getLabel(), //
+			SingletonSettingsId.SCHEDULER_SETTING.getLabel(), //
 			SchedulerViewSetting.class).get();
 
 		JobStoreType jobStoreType = schedulerSetting.getJobStoreType();
@@ -739,7 +765,7 @@ public class DABStarter {
 	    CommonContext.createUnmarshaller();
 	    new Dataset();
 
-	    Marshaller marshaller = JAXBWMS.getInstance().getMarshaller();
+	    JAXBWMS.getInstance().getMarshaller();
 
 	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization ENDED");
 

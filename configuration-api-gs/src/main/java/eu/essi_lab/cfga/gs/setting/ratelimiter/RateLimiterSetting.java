@@ -26,7 +26,6 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
@@ -36,14 +35,14 @@ import eu.essi_lab.cfga.option.IntegerOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.setting.ConfigurableSetting;
+import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
-public class RateLimiterSetting extends ConfigurableSetting implements EditableSetting {
+public class RateLimiterSetting extends Setting implements EditableSetting {
 
     private static final String COMPUTATION_TYPE_OPTION_KEY = "computationTypeOption";
     private static final String HOST_NAME_OPTION_KEY = "hostNameOption";
@@ -335,20 +334,5 @@ public class RateLimiterSetting extends ConfigurableSetting implements EditableS
 	case MIXED -> Optional.of(getSetting(MIXED_MODE_SETTING_ID, ExecutionModeSetting.class).get());
 	default -> Optional.empty();
 	};
-    }
-
-    @Override
-    public String getType() {
-
-	return "RateLimiterSetting";
-    }
-
-    public static void main(String[] args) {
-
-	RateLimiterSetting rateLimiterSetting = new RateLimiterSetting();
-	rateLimiterSetting.setIdentifier("rateLimiterSettings");
-	SelectionUtils.deepClean(rateLimiterSetting);
-
-	System.out.println(rateLimiterSetting);
     }
 }

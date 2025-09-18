@@ -35,14 +35,14 @@ import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.setting.ConfigurableSetting;
 import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
+import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
-public class SystemSetting extends ConfigurableSetting implements EditableSetting, KeyValueOptionDecorator {
+public class SystemSetting extends Setting implements EditableSetting, KeyValueOptionDecorator {
 
     private static final String DATABASE_STATISTICS_SETTING_KEY = "databaseStatistics";
     private static final String PROXY_ENDPOINT_OPTION_KEY = "proxyEndpoint";
@@ -480,11 +480,5 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
 	}
 
 	return Optional.empty();
-    }
-
-    @Override
-    public String getType() {
-
-	return "SystemSetting";
     }
 }

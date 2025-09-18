@@ -275,6 +275,12 @@ public class S3Source implements ConfigurationSource {
     }
 
     @Override
+    public InputStream getStream() throws Exception {
+
+	return getBinaryConfig().get().getKey();
+    }
+
+    @Override
     public S3Source backup() throws Exception {
 
 	GSLoggerFactory.getLogger(getClass()).trace("Source backup STARTED");

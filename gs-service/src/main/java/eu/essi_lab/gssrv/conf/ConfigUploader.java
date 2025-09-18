@@ -43,16 +43,19 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.cfg.DatabaseSource;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.TabIndex;
+import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
@@ -135,11 +138,62 @@ public class ConfigUploader extends ComponentInfo {
 	upload.setAcceptedFileTypes("application/json", ".json");
 	upload.setDropLabel(new Label("Drop file here"));
 
-	Button uploadButton = new Button("Upload configuration file");
-	uploadButton.setWidth("400px");
-	uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+	Button localUploadButton = new Button("Upload local configuration file");
+	localUploadButton.setWidth("400px");
+	localUploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-	upload.setUploadButton(uploadButton);
+	upload.setUploadButton(localUploadButton);
+
+	//
+	//
+	//
+
+	HorizontalLayout remoteUploadLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
+	remoteUploadLayout.setWidthFull();
+
+	Button remoteUploadButton = new Button("Upload remote configuration file");
+	remoteUploadButton.setWidth("400px");
+	remoteUploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+	TextField dbSourceTextField = new TextField();
+	dbSourceTextField.setValue("xdbc://user:password@hostname:8000,8004/dbName/folder/");
+	dbSourceTextField.setWidthFull();
+	dbSourceTextField.getStyle().set("margin-left", "10px");
+
+	remoteUploadButton.addClickListener(event -> {
+
+	    try {
+
+		DatabaseSource source = DatabaseSource.of(dbSourceTextField.getValue());
+
+		try {
+
+		    ClonableInputStream configStream = new ClonableInputStream(source.getStream());
+
+		    switch (setting.getSelectedSource()) {
+		    case MARK_LOGIC -> handleMarkLogicUpload(setting, configStream, upload, msgDiv);
+		    case OPENSEARCH -> handleOpenSearchUpload(setting, configStream, upload, msgDiv);
+		    case S3 -> handleS3Upload(setting, configStream, upload, msgDiv);
+		    }
+
+		} catch (Exception ex) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+		    NotificationDialog.getErrorDialog("Error occurred, unable to upload configuration: " + ex.getMessage()).open();
+
+		    upload.interruptUpload();
+		}
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
+
+	});
+
+	remoteUploadLayout.add(remoteUploadButton);
+	remoteUploadLayout.add(dbSourceTextField);
 
 	//
 	//
@@ -163,23 +217,28 @@ public class ConfigUploader extends ComponentInfo {
 		ConfigurationWrapper.getConfiguration().get(), setting, false);
 
 	settingComponent.getOptionTextFields("MarkLogic")
-		.forEach(tf -> tf.addValueChangeListener(event -> checkFields(msgDiv, upload, setting)));
+		.forEach(tf -> tf.addValueChangeListener(event -> checkFields(msgDiv, upload, remoteUploadButton, setting)));
+
 	settingComponent.getOptionTextFields("OpenSearch")
-		.forEach(tf -> tf.addValueChangeListener(event -> checkFields(msgDiv, upload, setting)));
-	settingComponent.getOptionTextFields("S3").forEach(tf -> tf.addValueChangeListener(event -> checkFields(msgDiv, upload, setting)));
+		.forEach(tf -> tf.addValueChangeListener(event -> checkFields(msgDiv, upload, remoteUploadButton, setting)));
+
+	settingComponent.getOptionTextFields("S3")
+		.forEach(tf -> tf.addValueChangeListener(event -> checkFields(msgDiv, upload, remoteUploadButton, setting)));
 
 	RadioComponentsHandler radioComponentsHandler = settingComponent.getRadioHandler().get();
 	RadioButtonGroup<String> radioGroup = radioComponentsHandler.getGroupComponent();
-	radioGroup.addValueChangeListener(event -> checkFields(msgDiv, upload, setting));
+	radioGroup.addValueChangeListener(event -> checkFields(msgDiv, upload, remoteUploadButton, setting));
 
 	//
 	//
 	//
 
 	verticalLayout.add(uploadLayout);
+	verticalLayout.add(remoteUploadLayout);
+
 	verticalLayout.add(settingComponent);
 
-	checkFields(msgDiv, upload, setting);
+	checkFields(msgDiv, upload, remoteUploadButton, setting);
 
 	//
 	//
@@ -471,14 +530,15 @@ public class ConfigUploader extends ComponentInfo {
     /**
      * @param label
      * @param upload
+     * @param remoteUploadButton
      * @param setting
-     * @return
      */
-    private void checkFields(Div label, Upload upload, ConfigurationSourceSetting setting) {
+    private void checkFields(Div label, Upload upload, Button remoteUploadButton, ConfigurationSourceSetting setting) {
 
 	Optional<StorageInfo> info = setting.getSelectedStorageInfo();
 
 	upload.getElement().setEnabled(info.isPresent());
+	remoteUploadButton.setEnabled(info.isPresent());
 
 	if (info.isEmpty()) {
 

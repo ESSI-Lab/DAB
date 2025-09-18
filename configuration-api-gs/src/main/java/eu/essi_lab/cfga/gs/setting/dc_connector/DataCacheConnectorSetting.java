@@ -26,12 +26,12 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.setting.ConfigurableSetting;
+import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
-public abstract class DataCacheConnectorSetting extends ConfigurableSetting implements EditableSetting {
+public abstract class DataCacheConnectorSetting extends Setting implements EditableSetting {
 
     /**
      * 
