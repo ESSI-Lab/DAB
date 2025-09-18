@@ -32,7 +32,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  * @author Fabrizio
  */
 public enum JavaOptions {
-    
+
     /**
      * - Boolean
      */
@@ -49,7 +49,7 @@ public enum JavaOptions {
     /**
      * - Boolean
      */
-    SKIP_GDAL_TEST("skipGDALTest", null),
+    SKIP_GDAL_TEST("skipGDALTest", "GDAL ping method disabled", "GDAL ping method enabled"),
     /**
      * - Boolean
      */
