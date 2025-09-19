@@ -816,10 +816,15 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/172");
 			} else if (name.toLowerCase().contains("discharge")) {
 			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
-			} 
-//			else {
-//			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/unknown");
-//			}
+			} else if (name.toLowerCase().contains("temperature")) {
+			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
+			}else if (name.toLowerCase().contains("temperature")) {
+			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
+			}else if (name.toLowerCase().contains("humidity")) {
+			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12249");
+			}else if (name.toLowerCase().contains("pressure")) {
+			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/216");
+			}
 
 		    }
 		    GSLoggerFactory.getLogger(getClass()).error("NO VALID OBSERVED PROPERTIES CODE!!!");
