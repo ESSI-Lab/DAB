@@ -400,6 +400,9 @@ public class DABStarter {
 			    ErrorInfo.SEVERITY_FATAL, //
 			    "DatabaseSettingNotReplacedError");
 		}
+		
+		// flushing config after changes is necessary to set it in SYNCH state
+		configuration.flush();
 	    }
 
 	    //
