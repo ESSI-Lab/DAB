@@ -126,7 +126,9 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		    Integer height = Integer.parseInt(request.getParameterValue(Parameter.HEIGHT));
 		    String layers = request.getParameterValue(Parameter.LAYERS);
 		    String crs = request.getParameterValue(Parameter.CRS);
-		    crs = crs.toUpperCase();
+		    if (crs != null) {
+			crs = crs.toUpperCase();
+		    }
 		    String bboxString = request.getParameterValue(Parameter.BBOX);
 		    String format = request.getParameterValue(Parameter.INFO_FORMAT);
 		    if (format == null || format.isEmpty()) {
@@ -150,6 +152,9 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		    if (jParameter != null) {
 			j = Integer.parseInt(jParameter);
 		    }
+		    
+		    Set<Bond> operands = new HashSet<>();
+
 
 		    if (bboxString != null && crs != null) {
 			String[] split = bboxString.split(",");
@@ -220,172 +225,173 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			}
 
 			BBOX bbox = new BBOX(crs, fminx, fminy, fmaxx, fmaxy);
-			List<SimpleEntry<String, String>> properties = new ArrayList();
-			String[] layerSplit = new String[] {};
-			if (layers.contains(",")) {
-			    layerSplit = layers.split(",");
-			} else {
-			    layerSplit = new String[] { layers };
-			}
 
-			WMSFeatureInfoGenerator generator = new StationFeatureInfoGenerator();
-
-			List<StationRecord> stations = new ArrayList<StationRecord>();
-
-			DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-			discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
-			discoveryMessage.setRequestId(getClass().getSimpleName() + "-" + (new Date().getTime()));
-			discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
-			discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
-			discoveryMessage.getResourceSelector().addIndex(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
-			discoveryMessage.getResourceSelector().addIndex(ResourceProperty.SOURCE_ID);
-			discoveryMessage.getResourceSelector().addIndex(MetadataElement.PLATFORM_TITLE);
-			discoveryMessage.getResourceSelector().setIncludeOriginal(false);
-			discoveryMessage.setPage(new Page(1, maxRecords));
-			discoveryMessage.setIncludeCountInRetrieval(true);
 			double south = fminy;
 			double north = fmaxy;
 			double west = fminx;
 			double east = fmaxx;
 			SpatialExtent extent = new SpatialExtent(south, west, north, east);
-			String viewId = webRequest.extractViewId().get();
-			Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
-			WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
-
-			Set<Bond> operands = new HashSet<>();
-
-			// we are interested only on downloadable datasets
-			ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
-			operands.add(accessBond);
-
-			// we are interested only on downloadable datasets
-			ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
-			operands.add(downBond);
-
-			// we are interested only on TIME SERIES datasets
-			ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
-			operands.add(timeSeriesBond);
-
-			Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
-			String ont = getParam(parameterMap, "ontology");
-			String attributeTitle = getParam(parameterMap, "attributeTitle");
-			String semantics = getParam(parameterMap, "semantics");
-
-			if (ont != null && attributeTitle != null) {
-			    Bond bond = Semantics.getSemanticBond(attributeTitle, semantics, ont);
-			    operands.add(bond);
-			}
-
-			String instrumentTitle = getParam(parameterMap, "instrumentTitle");
-			if (instrumentTitle != null) {
-			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.TEXT_SEARCH, instrumentTitle,
-				    MetadataElement.INSTRUMENT_TITLE);
-			    if (optBond.isPresent()) {
-				operands.add(optBond.get());
-			    }
-			}
-
-			String sources = getParam(parameterMap, "sources");
-			if (sources != null && !sources.isEmpty()) {
-			    String[] splitSources = sources.split(",");
-			    List<Bond> orBonds = new ArrayList<Bond>();
-			    for (String s : splitSources) {
-				orBonds.add(BondFactory.createSourceIdentifierBond(s));
-			    }
-			    if (orBonds.size() == 1) {
-				operands.add(orBonds.get(0));
-			    } else {
-				operands.add(BondFactory.createOrBond(orBonds));
-			    }
-
-			}
-
-			String intendedObservationSpacing = getParam(parameterMap, "intendedObservationSpacing");
-			if (intendedObservationSpacing != null) {
-			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, intendedObservationSpacing,
-				    MetadataElement.TIME_RESOLUTION_DURATION_8601);
-			    if (optBond.isPresent()) {
-				operands.add(optBond.get());
-			    }
-			}
-
-			String aggregationDuration = getParam(parameterMap, "aggregationDuration");
-			if (aggregationDuration != null) {
-			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, aggregationDuration,
-				    MetadataElement.TIME_AGGREGATION_DURATION_8601);
-			    if (optBond.isPresent()) {
-				operands.add(optBond.get());
-			    }
-			}
-
-			String timeInterpolation = getParam(parameterMap, "timeInterpolation");
-			if (timeInterpolation != null) {
-			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, timeInterpolation,
-				    MetadataElement.TIME_INTERPOLATION);
-			    if (optBond.isPresent()) {
-				operands.add(optBond.get());
-			    }
-			}
-
-			String observedPropertyURI = getParam(parameterMap, "observedPropertyURI");
-			if (observedPropertyURI != null) {
-			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, observedPropertyURI,
-				    MetadataElement.OBSERVED_PROPERTY_URI);
-			    if (optBond.isPresent()) {
-				operands.add(optBond.get());
-			    }
-			}
-
-			String organisationName = getParam(parameterMap, "organisationName");
-			if (organisationName != null) {
-			    Optional<Bond> optBond = BondUtils.createBond(BondOperator.TEXT_SEARCH, organisationName,
-				    MetadataElement.ORGANISATION_NAME);
-			    if (optBond.isPresent()) {
-				operands.add(optBond.get());
-			    }
-			}
 
 			operands.add(BondFactory.createSpatialEntityBond(BondOperator.INTERSECTS, extent));
 
-			discoveryMessage.setUserBond(BondFactory.createAndBond(operands));
+		    }
+		    List<SimpleEntry<String, String>> properties = new ArrayList();
+		    String[] layerSplit = new String[] {};
+		    if (layers.contains(",")) {
+			layerSplit = layers.split(",");
+		    } else {
+			layerSplit = new String[] { layers };
+		    }
 
-			discoveryMessage.setSources(ConfigurationWrapper.getViewSources(view.get()));
-			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+		    WMSFeatureInfoGenerator generator = new StationFeatureInfoGenerator();
 
-			Page userPage = discoveryMessage.getPage();
-			userPage.setStart(1);
-			userPage.setSize(maxRecords);
-			discoveryMessage.setPage(userPage);
+		    List<StationRecord> stations = new ArrayList<StationRecord>();
 
-			ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-			IDiscoveryExecutor discoveryExecutor = loader.iterator().next();
+		    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+		    discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+		    discoveryMessage.setRequestId(getClass().getSimpleName() + "-" + (new Date().getTime()));
+		    discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
+		    discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
+		    discoveryMessage.getResourceSelector().addIndex(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+		    discoveryMessage.getResourceSelector().addIndex(ResourceProperty.SOURCE_ID);
+		    discoveryMessage.getResourceSelector().addIndex(MetadataElement.PLATFORM_TITLE);
+		    discoveryMessage.getResourceSelector().setIncludeOriginal(false);
+		    discoveryMessage.setPage(new Page(1, maxRecords));
+		    discoveryMessage.setIncludeCountInRetrieval(true);
 
-			ResultSet<GSResource> resultSet = discoveryExecutor.retrieve(discoveryMessage);
-			List<GSResource> results = resultSet.getResultsList();
-			for (GSResource result : results) {
-			    String id = result.getExtensionHandler().getUniquePlatformIdentifier().get();
-			    String platformTitle = result.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform()
-				    .getCitation().getTitle();
-			    String sourceId = result.getSource().getUniqueIdentifier();
-			    GSSource source = ConfigurationWrapper.getSource(sourceId);
-			    String sourceLabel = "unknown";
-			    if (source != null) {
-				sourceLabel = source.getLabel();
-			    }
-			    StationRecord station = new StationRecord();
-			    station.setPlatformIdentifier(id);
-			    station.setPlatformName(platformTitle);
-			    station.setDatasetName(platformTitle);
-			    station.setSourceLabel(sourceLabel);
-			    stations.add(station);
+		    String viewId = webRequest.extractViewId().get();
+		    Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+		    WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
+
+		
+		    // we are interested only on downloadable datasets
+		    ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
+		    operands.add(accessBond);
+
+		    // we are interested only on downloadable datasets
+		    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
+		    operands.add(downBond);
+
+		    // we are interested only on TIME SERIES datasets
+		    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
+		    operands.add(timeSeriesBond);
+
+		    Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
+		    String ont = getParam(parameterMap, "ontology");
+		    String attributeTitle = getParam(parameterMap, "attributeTitle");
+		    String semantics = getParam(parameterMap, "semantics");
+
+		    if (ont != null && attributeTitle != null) {
+			Bond bond = Semantics.getSemanticBond(attributeTitle, semantics, ont);
+			operands.add(bond);
+		    }
+
+		    String instrumentTitle = getParam(parameterMap, "instrumentTitle");
+		    if (instrumentTitle != null) {
+			Optional<Bond> optBond = BondUtils.createBond(BondOperator.TEXT_SEARCH, instrumentTitle,
+				MetadataElement.INSTRUMENT_TITLE);
+			if (optBond.isPresent()) {
+			    operands.add(optBond.get());
+			}
+		    }
+
+		    String sources = getParam(parameterMap, "sources");
+		    if (sources != null && !sources.isEmpty()) {
+			String[] splitSources = sources.split(",");
+			List<Bond> orBonds = new ArrayList<Bond>();
+			for (String s : splitSources) {
+			    orBonds.add(BondFactory.createSourceIdentifierBond(s));
+			}
+			if (orBonds.size() == 1) {
+			    operands.add(orBonds.get(0));
+			} else {
+			    operands.add(BondFactory.createOrBond(orBonds));
 			}
 
-			InputStream stream = generator.getInfoPage(webRequest.getBaseUrl(), viewId, stations,
-				resultSet.getCountResponse().getCount(), format, request);
-
-			IOUtils.copy(stream, output);
-
 		    }
+
+		    String intendedObservationSpacing = getParam(parameterMap, "intendedObservationSpacing");
+		    if (intendedObservationSpacing != null) {
+			Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, intendedObservationSpacing,
+				MetadataElement.TIME_RESOLUTION_DURATION_8601);
+			if (optBond.isPresent()) {
+			    operands.add(optBond.get());
+			}
+		    }
+
+		    String aggregationDuration = getParam(parameterMap, "aggregationDuration");
+		    if (aggregationDuration != null) {
+			Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, aggregationDuration,
+				MetadataElement.TIME_AGGREGATION_DURATION_8601);
+			if (optBond.isPresent()) {
+			    operands.add(optBond.get());
+			}
+		    }
+
+		    String timeInterpolation = getParam(parameterMap, "timeInterpolation");
+		    if (timeInterpolation != null) {
+			Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, timeInterpolation,
+				MetadataElement.TIME_INTERPOLATION);
+			if (optBond.isPresent()) {
+			    operands.add(optBond.get());
+			}
+		    }
+
+		    String observedPropertyURI = getParam(parameterMap, "observedPropertyURI");
+		    if (observedPropertyURI != null) {
+			Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, observedPropertyURI,
+				MetadataElement.OBSERVED_PROPERTY_URI);
+			if (optBond.isPresent()) {
+			    operands.add(optBond.get());
+			}
+		    }
+
+		    String organisationName = getParam(parameterMap, "organisationName");
+		    if (organisationName != null) {
+			Optional<Bond> optBond = BondUtils.createBond(BondOperator.TEXT_SEARCH, organisationName,
+				MetadataElement.ORGANISATION_NAME);
+			if (optBond.isPresent()) {
+			    operands.add(optBond.get());
+			}
+		    }
+
+		    discoveryMessage.setUserBond(BondFactory.createAndBond(operands));
+
+		    discoveryMessage.setSources(ConfigurationWrapper.getViewSources(view.get()));
+		    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+
+		    Page userPage = discoveryMessage.getPage();
+		    userPage.setStart(1);
+		    userPage.setSize(maxRecords);
+		    discoveryMessage.setPage(userPage);
+
+		    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
+		    IDiscoveryExecutor discoveryExecutor = loader.iterator().next();
+
+		    ResultSet<GSResource> resultSet = discoveryExecutor.retrieve(discoveryMessage);
+		    List<GSResource> results = resultSet.getResultsList();
+		    for (GSResource result : results) {
+			String id = result.getExtensionHandler().getUniquePlatformIdentifier().get();
+			String platformTitle = result.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform()
+				.getCitation().getTitle();
+			String sourceId = result.getSource().getUniqueIdentifier();
+			GSSource source = ConfigurationWrapper.getSource(sourceId);
+			String sourceLabel = "unknown";
+			if (source != null) {
+			    sourceLabel = source.getLabel();
+			}
+			StationRecord station = new StationRecord();
+			station.setPlatformIdentifier(id);
+			station.setPlatformName(platformTitle);
+			station.setDatasetName(platformTitle);
+			station.setSourceLabel(sourceLabel);
+			stations.add(station);
+		    }
+
+		    InputStream stream = generator.getInfoPage(webRequest.getBaseUrl(), viewId, stations,
+			    resultSet.getCountResponse().getCount(), format, request);
+
+		    IOUtils.copy(stream, output);
 
 		    // ImageIO.write(bi, "PNG", new File("/home/boldrini/a.png"));
 
