@@ -310,6 +310,21 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 		if (paramCode.equals("LIT")) {
 		    varPath = "getDataLIT";
 		}
+		if (paramCode.equals("QIT")) {
+		    varPath = "getDataQIT";
+		}
+		if (paramCode.equals("UCI")) {
+		    varPath = "getDataUCI";
+		}
+		if (paramCode.equals("VAI")) {
+		    varPath = "getDataVAI";
+		}
+		if (paramCode.equals("DVI")) {
+		    varPath = "getDataDVI";
+		}
+		if (paramCode.equals("RGI")) {
+		    varPath = "getDataRGI";
+		}
 	    }
 
 	    String resourceTitle = datasetInfo.optString("NOME");
@@ -319,8 +334,8 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 
 	    String stationType = datasetInfo.optString("TIPO_RETE");
 
-	    BigDecimal utm32Est = datasetInfo.getBigDecimal("WGS84_UTM_32N_X");
-	    BigDecimal utm32Nord = datasetInfo.getBigDecimal("WGS84_UTM_32N_Y");
+	    BigDecimal utm32Est = new BigDecimal(datasetInfo.getString("WGS84_UTM_32N_X").replace(",", "."));
+	    BigDecimal utm32Nord = new BigDecimal(datasetInfo.getString("WGS84_UTM_32N_Y").replace(",", "."));
 	    BigDecimal alt = datasetInfo.optBigDecimal("QUOTA m slm", null);
 
 	    // temporal
@@ -708,7 +723,7 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
 		    linkage.trim(), //
-		    HttpHeaderUtils.build("api-key", HISCentralSardegnaConnector.API_KEY));
+		    HttpHeaderUtils.build("x-api-key", HISCentralSardegnaConnector.API_KEY));
 
 	    stream = getStationResponse.body();
 
@@ -721,7 +736,7 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 
 		getStationResponse = downloader.downloadResponse(//
 			linkage.trim(), //
-			HttpHeaderUtils.build("api-key", HISCentralSardegnaConnector.API_KEY));
+			HttpHeaderUtils.build("x-api-key", HISCentralSardegnaConnector.API_KEY));
 
 		stream = getStationResponse.body();
 
@@ -729,11 +744,13 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	    }
 
 	    if (stream != null) {
-		JSONArray obj = new JSONArray(IOStreamUtils.asUTF8String(stream));
+		JSONObject obj = new JSONObject(IOStreamUtils.asUTF8String(stream));
 		stream.close();
 		if (obj != null) {
-		    if (obj.length() > 0) {
-			JSONObject jsonObj = (JSONObject) obj.get(obj.length() - 1);
+		    JSONArray arr = obj.optJSONArray("data");
+		    if (arr.length() > 0) {
+		    
+			JSONObject jsonObj = (JSONObject) arr.get(arr.length() - 1);
 			if (jsonObj != null) {
 			    date = jsonObj.optString("data_mis");
 			    return date;

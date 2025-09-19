@@ -303,7 +303,7 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
 		    linkage.trim(), //
-		    HttpHeaderUtils.build("api-key", HISCentralSardegnaConnector.API_KEY));
+		    HttpHeaderUtils.build("x-api-key", HISCentralSardegnaConnector.API_KEY));
 
 	    stream = getStationResponse.body();
 
@@ -316,7 +316,7 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 
 		getStationResponse = downloader.downloadResponse(//
 			linkage.trim(), //
-			HttpHeaderUtils.build("api-key", HISCentralSardegnaConnector.API_KEY));
+			HttpHeaderUtils.build("x-api-key", HISCentralSardegnaConnector.API_KEY));
 
 		stream = getStationResponse.body();
 
