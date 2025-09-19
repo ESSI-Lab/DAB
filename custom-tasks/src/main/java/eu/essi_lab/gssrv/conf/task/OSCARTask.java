@@ -45,6 +45,7 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.gssrv.conf.task.bluecloud.BLUECloudDownloadReport;
+import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
@@ -201,18 +202,21 @@ public class OSCARTask extends AbstractCustomTask {
 
 	    for (GSResource resource : resources) {
 		i++;
-		String code = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform().getMDIdentifierCode();
-		if (platformIdentifier == null) {
-		    platformIdentifier = code;
-		}
-		if (!code.equals(platformIdentifier)) {
-		    oscarMap.put(platformIdentifier, new ArrayList<>(resList));
+		MIPlatform platform = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform();
+		if (platform != null) {
+		    String code = platform.getMDIdentifierCode();
+		    if (platformIdentifier == null) {
+			platformIdentifier = code;
+		    }
+		    if (!code.equals(platformIdentifier)) {
+			oscarMap.put(platformIdentifier, new ArrayList<>(resList));
 
-		    resList.clear();
-		    platformIdentifier = code;
-		}
+			resList.clear();
+			platformIdentifier = code;
+		    }
 
-		resList.add(resource);
+		    resList.add(resource);
+		}
 	    }
 
 	    // for (GSResource resource : resources) {
@@ -241,9 +245,9 @@ public class OSCARTask extends AbstractCustomTask {
 	    //
 	    // }
 
-	    if (i > 1000) {
-		break main;
-	    }
+	    // if (i > 1000) {
+	    // break main;
+	    // }
 	    if (resources.isEmpty()) {
 		break;
 	    }
