@@ -42,7 +42,6 @@ public class WISNotificationMessage {
 	conformsArray.put("http://wis.wmo.int/spec/wnm/1/conf/core");
 	json.put("conformsTo", conformsArray);
 	json.put("type", "Feature");
-	json.put("version", "v04");
 	setID(id);
 	setPublicationTime(new Date());
 	json.put("generated_by", "WHOS DAB");
