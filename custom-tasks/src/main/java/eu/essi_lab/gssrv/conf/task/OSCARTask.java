@@ -245,9 +245,10 @@ public class OSCARTask extends AbstractCustomTask {
 	    //
 	    // }
 
-	    // if (i > 1000) {
-	    // break main;
-	    // }
+//	    if (i > 1000) {
+//		break main;
+//	    }
+	    
 	    if (resources.isEmpty()) {
 		break;
 	    }

@@ -71,15 +71,12 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
     // getLITStations- livelli idrometrici station
     // getTCIStations - temperature
 
-    static final String ORGANIZATION_URL = "organization";
-
     static final String METADATI = "getMetadati";
     /**
      * 
      */
-    static final String SENSOR_URL = "elements?";
 
-    public static final String BASE_URL = "https://eu-central-1.aws.data.mongodb-api.com/app/hiscentral-dqluv/endpoint/";
+    public static final String BASE_URL = "https://devapi.arpasambiente.it/";
 
     private static final String HIS_CENTRAL_SARDEGNA_CONNECTOR_DOWNLOAD_ERROR = "HIS_CENTRAL_SARDEGNA_CONNECTOR_DOWNLOAD_ERROR";
 
@@ -113,13 +110,11 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
 
 	if (stations != null) {
 
-	    JSONArray metadataInfoArr = getMetadataInfo();
-	    JSONObject metadataInfo = null;
+	    JSONObject metadataInfo = getMetadataInfo();
 
 	    Map<String, HISCentralSardegnaVariable> variableMap = new HashMap<String, HISCentralSardegnaVariable>();
 
-	    if (metadataInfoArr != null && metadataInfoArr.length() > 0) {
-		metadataInfo = metadataInfoArr.getJSONObject(0);
+	    if (metadataInfo != null) {
 		JSONArray dataArray = metadataInfo.optJSONArray("Data");
 		if (dataArray != null) {
 		    for (int j = 0; j < dataArray.length(); j++) {
@@ -141,10 +136,20 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
 		// "TCI_TERMO": "SI",
 		// "P1H_PLUVIO": "SI",
 		// "LIT_IDRO": "NO"
+		// "QIT_PORTATA": "NO",
+		// "UCI_UMIDITA'_ARIA": "NO",
+		// "VAI_INTENS_VENTO_10m": "NO",
+		// "DVI_DIR_VENTO_10m": "NO",
+		// "RGI_RADIAZ_GLOBALE": "NO",
 
 		String temperature = datasetMetadata.optString("TCI_TERMO");
 		String rain = datasetMetadata.optString("P1H_PLUVIO");
 		String level = datasetMetadata.optString("LIT_IDRO");
+		String discharge = datasetMetadata.optString("QIT_PORTATA");
+		String humidity = datasetMetadata.optString("UCI_UMIDITA'_ARIA");
+		String wind_speed = datasetMetadata.optString("VAI_INTENS_VENTO_10m");
+		String wind_direction = datasetMetadata.optString("DVI_DIR_VENTO_10m");
+		String radiation = datasetMetadata.optString("RGI_RADIAZ_GLOBALE");
 
 		List<HISCentralSardegnaVariable> varList = new ArrayList<HISCentralSardegnaVariable>();
 
@@ -167,6 +172,41 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
 
 		}
 
+		if (discharge != null && !discharge.isEmpty()) {
+		    if (discharge.toLowerCase().contains("si") || discharge.toLowerCase().contains("yes")) {
+			varList.add(variableMap.get("QIT"));
+		    }
+
+		}
+
+		if (humidity != null && !humidity.isEmpty()) {
+		    if (humidity.toLowerCase().contains("si") || humidity.toLowerCase().contains("yes")) {
+			varList.add(variableMap.get("UCI"));
+		    }
+
+		}
+
+		if (wind_speed != null && !wind_speed.isEmpty()) {
+		    if (wind_speed.toLowerCase().contains("si") || wind_speed.toLowerCase().contains("yes")) {
+			varList.add(variableMap.get("VAI"));
+		    }
+
+		}
+
+		if (wind_direction != null && !wind_direction.isEmpty()) {
+		    if (wind_direction.toLowerCase().contains("si") || wind_direction.toLowerCase().contains("yes")) {
+			varList.add(variableMap.get("DVI"));
+		    }
+
+		}
+
+		if (radiation != null && !radiation.isEmpty()) {
+		    if (radiation.toLowerCase().contains("si") || radiation.toLowerCase().contains("yes")) {
+			varList.add(variableMap.get("RGI"));
+		    }
+
+		}
+
 		for (HISCentralSardegnaVariable var : varList) {
 		    ret.addRecord(HISCentralSardegnaMapper.create(datasetMetadata, var, metadataInfo));
 		}
@@ -181,7 +221,7 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
 	return ret;
     }
 
-    private JSONArray getMetadataInfo() throws GSException {
+    private JSONObject getMetadataInfo() throws GSException {
 	// e.g. https://eu-central-1.aws.data.mongodb-api.com/app/hiscentral-dqluv/endpoint/getMetadati
 	String url = getSourceURL() + METADATI;
 
@@ -198,13 +238,13 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
 
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
 		    url.trim(), //
-		    HttpHeaderUtils.build("api-key", API_KEY));
+		    HttpHeaderUtils.build("x-api-key", API_KEY));
 
 	    stream = getStationResponse.body();
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + url);
 
 	    if (stream != null) {
-		JSONArray jsonResult = new JSONArray(IOStreamUtils.asUTF8String(stream));
+		JSONObject jsonResult = new JSONObject(IOStreamUtils.asUTF8String(stream));
 		stream.close();
 		return jsonResult;
 	    }
@@ -240,7 +280,7 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
 
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
 		    url.trim(), //
-		    HttpHeaderUtils.build("api-key", API_KEY));
+		    HttpHeaderUtils.build("x-api-key", API_KEY));
 
 	    stream = getStationResponse.body();
 
@@ -282,7 +322,7 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
     @Override
     public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
-	return endpoint.contains("eu-central-1.aws.data.mongodb-api.com");
+	return endpoint.contains("eu-central-1.aws.data.mongodb-api.com") || endpoint.contains("devapi.arpasambiente.it");
     }
 
     @Override
@@ -293,8 +333,6 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
 
     public static void main(String[] args) throws Exception {
 
-	String url = "https://eu-central-1.aws.data.mongodb-api.com/app/hiscentral-dqluv/endpoint/getStations";
-
 	int timeout = 120;
 	int responseTimeout = 200;
 	InputStream stream = null;
@@ -302,17 +340,6 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
 	Downloader downloader = new Downloader();
 	downloader.setConnectionTimeout(TimeUnit.SECONDS, timeout);
 	downloader.setResponseTimeout(TimeUnit.SECONDS, responseTimeout);
-
-	HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
-		url.trim(), //
-		HttpHeaderUtils.build("api-key", "7uBFiUsEayn5fCV4creG8CLJVCygTidGejpyH08CcENPyoyD2wH2BFdnluRHZ2og"));
-
-	stream = getStationResponse.body();
-
-	if (stream != null) {
-	    JSONArray jsonResult = new JSONArray(IOStreamUtils.asUTF8String(stream));
-	    stream.close();
-	}
 
     }
 
