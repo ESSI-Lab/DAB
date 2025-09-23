@@ -625,15 +625,16 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	    temporalExtent.setBeginPosition(tempExtentBegin);
 	    // end time to be reviewed
 	    if (tempExtentEnd == null || tempExtentEnd.isEmpty()) {
-		String getDataUrl = linkage + "&data_iniziale="
-			+ ISO8601DateTimeUtils.getISO8601Date(new Date(System.currentTimeMillis() - 365 * 24 * 60 * 60 * 1000L))
-			+ "&data_finale=" + ISO8601DateTimeUtils.getISO8601Date();
-		String date = getLastDate(getDataUrl);
-		if (date != null && !date.isEmpty()) {
-		    temporalExtent.setEndPosition(date);
-		} else {
-		    temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
-		}
+		temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+//		String getDataUrl = linkage + "&data_iniziale="
+//			+ ISO8601DateTimeUtils.getISO8601Date(new Date(System.currentTimeMillis() - 365 * 24 * 60 * 60 * 1000L))
+//			+ "&data_finale=" + ISO8601DateTimeUtils.getISO8601Date();
+//		String date = getLastDate(getDataUrl);
+//		if (date != null && !date.isEmpty()) {
+//		    temporalExtent.setEndPosition(date);
+//		} else {
+//		    temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+//		}
 	    } else {
 		temporalExtent.setEndPosition(tempExtentEnd);
 	    }
