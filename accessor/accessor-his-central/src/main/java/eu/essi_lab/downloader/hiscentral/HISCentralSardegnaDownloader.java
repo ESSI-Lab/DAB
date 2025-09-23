@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.net.http.HttpResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -194,76 +195,97 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 	    String link = online.getLinkage().endsWith("?") ? online.getLinkage() + "data_iniziale=" + startTime + "&data_finale=" + endTime
 		    : online.getLinkage() + "&data_iniziale=" + startTime + "&data_finale=" + endTime;
 
-	    JSONArray jsonObj = getData(link);
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
-	    if (jsonObj != null) {
+	    boolean completed = false;
 
-		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
+	    String newLink = link;
+	    
+	    while (!completed) {
 
-		DateFormat iso8601OutputFormat = null;
-		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
+		JSONObject jsonObj = getData(newLink);
 
-		for (Object arr : jsonObj) {
-
-		    JSONObject data = (JSONObject) arr;
-
-		    ValueSingleVariable variable = new ValueSingleVariable();
-
-		    BigDecimal missingValue = new BigDecimal(MISSING_VALUE);
-
-		    BigDecimal dataValue = data.optBigDecimal("valore", missingValue);
-
-		    //
-		    // value
-		    //
-
-		    variable.setValue(dataValue);
-
-		    //
-		    // date
-		    //
-
-		    String date = data.optString("data_mis");// data.optString("datetime");
-
-		    Integer qualityCode = data.optIntegerObject("liv_validaz", null);
-		    if (qualityCode != null) {
-			WML2QualityCategory quality = null;
-			switch (qualityCode) {
-			case 2:
-			    // quality = WML2QualityCategory.GOOD;
-			    break;
-			case 3:
-			    break;
-			default:
-			    break;
-			}
-			if (quality != null) {
-			    variable.setQualityControlLevelCode(quality.getUri());
-			}
-		    }
-		    if (iso8601OutputFormat == null) {
-			iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ITALIAN);
-			iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+		if (jsonObj != null) {
+		    
+		    String nextToken = jsonObj.optString("nextToken");
+		    if(nextToken == null || nextToken.isEmpty()) {
+			completed = true;
+		    }else {
+			String queryExecutionId = jsonObj.optString("queryExecutionId");
+			newLink = link + "&queryExecutionId=" +  queryExecutionId + "&nextToken=" + URLEncoder.encode(nextToken, "UTF-8");
 		    }
 
-		    Date parsed = iso8601OutputFormat.parse(date);
+		    JSONArray jsonArray = jsonObj.optJSONArray("data");
 
-		    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-		    gregCal.setTime(parsed);
+		    DateFormat iso8601OutputFormat = null;
+		    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
-		    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
-		    variable.setDateTimeUTC(xmlGregCal);
+		    for (Object arr : jsonArray) {
 
-		    //
-		    //
-		    //
+			JSONObject data = (JSONObject) arr;
 
-		    addValue(tsrt, variable);
+			ValueSingleVariable variable = new ValueSingleVariable();
 
+			BigDecimal missingValue = new BigDecimal(MISSING_VALUE);
+
+			BigDecimal dataValue = data.optBigDecimal("valore", missingValue);
+
+			//
+			// value
+			//
+
+			variable.setValue(dataValue);
+
+			//
+			// date
+			//
+
+			String date = data.optString("data_mis");// data.optString("datetime");
+
+			Integer qualityCode = data.optIntegerObject("liv_validaz", null);
+			if (qualityCode != null) {
+			    WML2QualityCategory quality = null;
+			    switch (qualityCode) {
+			    case 2:
+				// quality = WML2QualityCategory.GOOD;
+				break;
+			    case 3:
+				break;
+			    default:
+				break;
+			    }
+			    if (quality != null) {
+				variable.setQualityControlLevelCode(quality.getUri());
+			    }
+			}
+			if (iso8601OutputFormat == null) {
+			    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ITALIAN);
+			    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+			}
+
+			Date parsed = iso8601OutputFormat.parse(date);
+
+			GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+			gregCal.setTime(parsed);
+
+			XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+			variable.setDateTimeUTC(xmlGregCal);
+
+			//
+			//
+			//
+
+			addValue(tsrt, variable);
+
+		    }
+		} else {
+		    completed = true;
 		}
 
-		return tsrt.getDataFile();
+		
 	    }
+
+	    return tsrt.getDataFile();
 
 	} catch (Exception e) {
 
@@ -280,7 +302,7 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 
     }
 
-    private JSONArray getData(String linkage) throws GSException {
+    private JSONObject getData(String linkage) throws GSException {
 	GSLoggerFactory.getLogger(getClass()).info("Getting data");
 
 	String result = null;
@@ -324,11 +346,10 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 	    }
 
 	    if (stream != null) {
-		JSONArray obj = new JSONArray(IOStreamUtils.asUTF8String(stream));
+		JSONObject obj = new JSONObject(IOStreamUtils.asUTF8String(stream));
+		// JSONArray data = obj != null ? obj.optJSONArray("data") : null;
 		stream.close();
-		if (obj != null) {
-		    return obj;
-		}
+		return obj;
 	    }
 
 	} catch (Exception e) {
