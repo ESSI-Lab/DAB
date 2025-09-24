@@ -277,7 +277,7 @@ public class SourceCollectionCreator {
     }
 
     protected String getMetadataIdentifier(String sourceIdentifier, String groupBy) {
-	return "urn:wmo:md:" + sourceIdentifier + ":all";
+	return "urn:wmo:md:it-cnr-iia:" + sourceIdentifier + ":all";
     }
 
     protected List<ResponseItem> getStatistics(String sourceId, Queryable queryable) throws GSException {
