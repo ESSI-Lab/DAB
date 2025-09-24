@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,7 @@ import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage.IterationMode;
@@ -353,7 +355,11 @@ public class WISUtils {
 	properties.put("type", "dataset");
 	String datestamp = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDateStamp();
 	if (datestamp != null) {
-	    properties.put("created", datestamp);
+	    Date date = ISO8601DateTimeUtils.parseISO8601(datestamp);
+	    if (date != null) {
+		datestamp = ISO8601DateTimeUtils.getISO8601DateTime(date);
+		properties.put("created", datestamp);
+	    }
 	}
 	List<ResponsibleParty> parties = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDataIdentification()
 		.getPointOfContactParty();
@@ -422,9 +428,9 @@ public class WISUtils {
 
 	    String view = WISUtils.getWHOSView(sourceId, parameterURI);
 	    String url = WISUtils.getUrl(webRequest);
-//	    url = url.replace("/view/whos/", "/view/" + view + "/");
+	    // url = url.replace("/view/whos/", "/view/" + view + "/");
 	    WISUtils.addLink(links, "application/json", "canonical", id, url + "/collections/discovery-metadata/items/" + id);
-//	    WISUtils.addLink(links, "application/json", "collection", id, url + "/collections/" + id);
+	    // WISUtils.addLink(links, "application/json", "collection", id, url + "/collections/" + id);
 	    feature.put("links", links);
 	}
 
