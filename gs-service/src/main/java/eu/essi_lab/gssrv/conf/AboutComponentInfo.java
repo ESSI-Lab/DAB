@@ -32,7 +32,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-import eu.essi_lab.cfga.gs.setting.TabIndex;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -83,7 +83,7 @@ public class AboutComponentInfo extends ComponentInfo {
 	verticalLayout.add(build("Commit", commit));
 
 	TabInfo tabInfo = TabInfoBuilder.get().//
-		withIndex(TabIndex.ABOUT.getIndex()).//
+		withIndex(GSTabIndex.ABOUT.getIndex()).//
 		withShowDirective(getComponentName()).//
 		withComponent(verticalLayout).//
 		build();

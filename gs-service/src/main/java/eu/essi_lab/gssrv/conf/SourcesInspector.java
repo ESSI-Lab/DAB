@@ -48,7 +48,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.TabIndex;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -169,7 +169,7 @@ public class SourcesInspector extends ComponentInfo {
 	//
 
 	TabInfo tabInfo = TabInfoBuilder.get().//
-		withIndex(TabIndex.SOURCES_INSPECTION.getIndex()).//
+		withIndex(GSTabIndex.SOURCES_INSPECTION.getIndex()).//
 		withShowDirective(getComponentName()).//
 		withComponent(verticalLayout).//
 		reloadable(() -> update(verticalLayout)).//

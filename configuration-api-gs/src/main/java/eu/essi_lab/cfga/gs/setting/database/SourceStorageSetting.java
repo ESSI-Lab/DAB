@@ -30,8 +30,8 @@ import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -201,7 +201,7 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	    setComponentName(SystemSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.SOURCE_STORAGE_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.SOURCE_STORAGE.getIndex()).//
 		    withShowDirective("Source storage").//
 		    build();
 

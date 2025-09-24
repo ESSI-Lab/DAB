@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.checker;
+package eu.essi_lab.cfga.check;
 
 /*-
  * #%L

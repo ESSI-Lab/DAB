@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
-import eu.essi_lab.cfga.checker.CheckResponse;
-import eu.essi_lab.cfga.checker.CheckResponse.CheckResult;
+import eu.essi_lab.cfga.check.CheckResponse;
+import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.SimilarityCheckMethod;

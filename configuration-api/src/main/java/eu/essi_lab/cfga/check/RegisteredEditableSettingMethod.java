@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.checker;
+package eu.essi_lab.cfga.check;
 
 /*-
  * #%L
@@ -21,61 +21,45 @@ package eu.essi_lab.cfga.checker;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ServiceLoader;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationUtils;
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.checker.CheckResponse.CheckResult;
+import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.StreamUtils;
 
 /**
- * Collects all the {@link EditableSetting}s from the given <code>configuration</code> and executes the
- * {@link EditableSetting#test(Setting)} test
+ * Loads all the registered {@link EditableSetting} and executes the {@link EditableSetting#test(Setting)} test
  * 
  * @author Fabrizio
  */
-public class ConfigEditableSettingMethod implements CheckMethod {
+public class RegisteredEditableSettingMethod implements CheckMethod {
+    
+   
 
     @Override
     public CheckResponse check(Configuration configuration) {
 
-	GSLoggerFactory.getLogger(getClass()).info("Editable setting check from configuration STARTED");
-
 	CheckResponse checkResponse = new CheckResponse(getName());
 
-	List<Setting> matches = new ArrayList<>();
+	GSLoggerFactory.getLogger(getClass()).info("Editable registered settings check STARTED");
 
-	ConfigurationUtils.deepFind(configuration, s -> {
+	ServiceLoader<EditableSetting> loader = ServiceLoader.load(EditableSetting.class);
 
-	    try {
-		return EditableSetting.class.isAssignableFrom(s.getSettingClass());
-
-	    } catch (Throwable t) {
-
-		checkResponse.setCheckResult(CheckResult.CHECK_FAILED);
-		checkResponse.getMessages()
-			.add("Editable setting isAssignableFrom check of configuration failed: " + ((Setting) s).getName());
-	    }
-
-	    return false;
-
-	}, matches);
-
-	matches.forEach(setting -> {
+	StreamUtils.iteratorToStream(loader.iterator()).forEach(setting -> {
 
 	    boolean test = EditableSetting.test((Setting) setting);
 
 	    if (!test) {
 
+		checkResponse.getMessages().add("Editable registered setting check failed:" + ((Setting) setting).getName());
 		checkResponse.setCheckResult(CheckResult.CHECK_FAILED);
-		checkResponse.getMessages().add("Editable setting check from configuration failed: " + ((Setting) setting).getName());
 	    }
 	});
 
-	GSLoggerFactory.getLogger(getClass()).info("Editable setting check from configuration ENDED");
+	GSLoggerFactory.getLogger(getClass()).info("Editable registered settings check ENDED");
 
 	return checkResponse;
     }

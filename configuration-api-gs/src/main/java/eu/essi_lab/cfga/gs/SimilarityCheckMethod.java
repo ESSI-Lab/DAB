@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
-import eu.essi_lab.cfga.checker.CheckMethod;
-import eu.essi_lab.cfga.checker.CheckResponse;
-import eu.essi_lab.cfga.checker.CheckResponse.CheckResult;
+import eu.essi_lab.cfga.check.CheckMethod;
+import eu.essi_lab.cfga.check.CheckResponse;
+import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
 import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;

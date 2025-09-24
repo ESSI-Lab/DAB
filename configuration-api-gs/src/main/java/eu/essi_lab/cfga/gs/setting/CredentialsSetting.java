@@ -26,6 +26,7 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -738,7 +739,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
 	    setComponentName(CredentialsSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.CREDENTIALS_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.CREDENTIALS.getIndex()).//
 		    withShowDirective("Credentials").//
 		    build();
 

@@ -32,8 +32,8 @@ import org.json.JSONObject;
 
 import com.vaadin.flow.data.provider.SortDirection;
 
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
-import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
@@ -190,7 +190,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	    setComponentName(HarvestingSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.HARVESTING_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.HARVESTING.getIndex()).//
 		    withShowDirective("Harvesting", SortDirection.ASCENDING).//
 
 		    withAddDirective(//

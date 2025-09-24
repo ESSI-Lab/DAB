@@ -1,4 +1,7 @@
-package eu.essi_lab.cfga.checker;
+/**
+ * 
+ */
+package eu.essi_lab.cfga.gs;
 
 /*-
  * #%L
@@ -21,33 +24,19 @@ package eu.essi_lab.cfga.checker;
  * #L%
  */
 
-import eu.essi_lab.cfga.Configuration;
+import java.util.List;
+
+import eu.essi_lab.cfga.scheme.Scheme;
+import eu.essi_lab.cfga.scheme.SchemeItem;
 
 /**
  * @author Fabrizio
  */
-@FunctionalInterface
-public interface CheckMethod {
+public class DefaultConfigurationScheme implements Scheme {
 
-    /**
-     * @return
-     */
-    public default CheckResponse check() {
+    @Override
+    public List<SchemeItem> getItems() {
 
-	return check(null);
-    }
-
-    /**
-     * @param configuration
-     * @return
-     */
-    public CheckResponse check(Configuration configuration);
-
-    /**
-     * @return
-     */
-    public default String getName() {
-
-	return getClass().getSimpleName();
+	return GSTabIndex.getItems();
     }
 }

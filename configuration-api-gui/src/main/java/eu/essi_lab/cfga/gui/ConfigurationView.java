@@ -534,6 +534,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      * <br>
      * This method can also be used to add {@link ComponentInfo} instances that have no related {@link Setting}
      * 
+     *  @see RemoveDirective#isFullRemovalAllowed()
      * @return
      */
     protected List<ComponentInfo> getAdditionalsComponentInfo() {

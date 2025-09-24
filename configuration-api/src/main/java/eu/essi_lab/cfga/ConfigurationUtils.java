@@ -27,7 +27,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import eu.essi_lab.cfga.checker.CheckResponse;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -41,12 +40,87 @@ public class ConfigurationUtils {
 
     /**
      * @param configuration
+     * @throws GSException
+     */
+    public static void flush(Configuration configuration) throws GSException {
+
+	try {
+
+	    GSLoggerFactory.getLogger(ConfigurationUtils.class).info("Configuration flush STARTED");
+
+	    configuration.flush();
+
+	    GSLoggerFactory.getLogger(ConfigurationUtils.class).info("Configuration flush ENDED");
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(ConfigurationUtils.class).error(e);
+
+	    throw GSException.createException(//
+		    ConfigurationUtils.class, //
+		    "Unable to flush configuration after fix:" + e.getMessage(), //
+		    null, //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    "ConfigurationFlushAfterFixError" //
+	    );
+	}
+
+    }
+
+    /**
+     * @param configuration
+     * @throws GSException
+     */
+    public static void backup(Configuration configuration) throws GSException {
+
+	GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration backup STARTED");
+
+	try {
+	    ConfigurationSource backupSource = configuration.getSource().backup();
+
+	    boolean emptyOrMissing = backupSource.isEmptyOrMissing();
+
+	    if (emptyOrMissing) {
+
+		throw GSException.createException(//
+			ConfigurationUtils.class, //
+			"Unable to backup configuration, backup configuration is empty or missing", //
+			null, //
+			null, //
+			ErrorInfo.ERRORTYPE_INTERNAL, //
+			ErrorInfo.SEVERITY_FATAL, //
+			"ConfigurationBackupEmptyOrMissingError");
+	    }
+
+	    GSLoggerFactory.getLogger(ConfigurationUtils.class).info("Backup to: {}", backupSource.getLocation());
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(ConfigurationUtils.class).error(e);
+
+	    throw GSException.createException(//
+		    ConfigurationUtils.class, //
+		    "Unable to backup configuration: " + e.getMessage(), //
+		    null, //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    "ConfigurationBackupError");
+	}
+
+	GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration backup ENDED");
+    }
+
+    /**
+     * @param configuration
      * @param checkResponse
      * @throws GSException
      */
-    public static void fix(Configuration configuration, CheckResponse checkResponse) throws GSException {
+    public static void fix(Configuration configuration, List<Setting> settings) throws GSException {
 
-	fix(configuration, checkResponse, true);
+	fix(configuration, settings, true);
     }
 
     /**
@@ -55,51 +129,12 @@ public class ConfigurationUtils {
      * @param backup
      * @throws GSException
      */
-    public static void fix(Configuration configuration, CheckResponse checkResponse, boolean backup) throws GSException {
-
-	GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration fix STARTED");
-
-	GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration backup STARTED");
+    public static void fix(Configuration configuration, List<Setting> settings, boolean backup, boolean flush) throws GSException {
 
 	if (backup) {
 
-	    try {
-		ConfigurationSource backupSource = configuration.getSource().backup();
-
-		boolean emptyOrMissing = backupSource.isEmptyOrMissing();
-
-		if (emptyOrMissing) {
-
-		    throw GSException.createException(//
-			    ConfigurationUtils.class, //
-			    "Unable to backup configuration, backup configuration is empty or missing", //
-			    null, //
-			    null, //
-			    ErrorInfo.ERRORTYPE_INTERNAL, //
-			    ErrorInfo.SEVERITY_FATAL, //
-			    "ConfigurationBackupEmptyOrMissingError");
-		}
-
-		GSLoggerFactory.getLogger(ConfigurationUtils.class).info("Backup to: {}", backupSource.getLocation());
-
-	    } catch (Exception e) {
-
-		GSLoggerFactory.getLogger(ConfigurationUtils.class).error(e);
-
-		throw GSException.createException(//
-			ConfigurationUtils.class, //
-			"Unable to backup configuration: " + e.getMessage(), //
-			null, //
-			null, //
-			ErrorInfo.ERRORTYPE_INTERNAL, //
-			ErrorInfo.SEVERITY_FATAL, //
-			"ConfigurationBackupError");
-	    }
+	    backup(configuration);
 	}
-
-	GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration backup ENDED");
-
-	List<Setting> settings = checkResponse.getSettings();
 
 	GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("The following settings classes have issues: {} ",
 		settings.stream().map(s -> s.getSettingClass().getSimpleName()).distinct().collect(Collectors.joining(", ")));
@@ -135,30 +170,21 @@ public class ConfigurationUtils {
 
 	GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Settings fix ENDED");
 
-	try {
+	if (flush) {
 
-	    GSLoggerFactory.getLogger(ConfigurationUtils.class).info("Configuration flush STARTED");
-
-	    configuration.flush();
-
-	    GSLoggerFactory.getLogger(ConfigurationUtils.class).info("Configuration flush ENDED");
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(ConfigurationUtils.class).error(e);
-
-	    throw GSException.createException(//
-		    ConfigurationUtils.class, //
-		    "Unable to flush configuration after fix:" + e.getMessage(), //
-		    null, //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_FATAL, //
-		    "ConfigurationFlushAfterFixError" //
-	    );
+	    flush(configuration);
 	}
+    }
 
-	GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration fix ENDED");
+    /**
+     * @param configuration
+     * @param checkResponse
+     * @param backup
+     * @throws GSException
+     */
+    public static void fix(Configuration configuration, List<Setting> settings, boolean backup) throws GSException {
+
+	fix(configuration, settings, backup, true);
     }
 
     /**

@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -120,7 +121,7 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 	    setComponentName(GDCSettingComponentInfo.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.GDC_SOURCES_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.GDC_SOURCES.getIndex()).//
 		    withShowDirective("GDC sources").//
 		    build();
 

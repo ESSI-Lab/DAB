@@ -26,8 +26,8 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -248,7 +248,7 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 	    setComponentName(SystemSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.RATE_LIMITER_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.RATE_LIMITER.getIndex()).//
 		    withShowDirective("Rate limiter").//
 		    build();
 

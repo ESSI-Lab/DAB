@@ -85,7 +85,7 @@ public class SettingRemoveButtonListener implements ButtonChangeListener {
 
 	if (tabContainer.getRemoveDirective().isPresent()) {
 
-	    boolean allowFullRemoval = tabContainer.getRemoveDirective().get().isAllowFullRemoval();
+	    boolean allowFullRemoval = tabContainer.getRemoveDirective().get().isFullRemovalAllowed();
 
 	    Class<? extends Setting> settingClass = tabContainer.getRemoveDirective().get().getSettingClass();
 

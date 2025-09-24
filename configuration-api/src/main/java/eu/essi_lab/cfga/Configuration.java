@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent;
+import eu.essi_lab.cfga.scheme.Scheme;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.source.FileSource;
@@ -69,6 +70,7 @@ public class Configuration {
     private boolean writable;
     private List<ConfigurationChangeListener> listenerList;
     private boolean autoreloadPaused;
+    private Scheme scheme;
 
     /**
      * Creates an empty, in-memory only configuration with no related source.<br>
@@ -90,8 +92,8 @@ public class Configuration {
 
 	this.list = new ArrayList<Setting>();
 	array.forEach(obj -> this.list.add(new Setting((JSONObject) obj)));
-	
- 	this.listenerList = new ArrayList<>();
+
+	this.listenerList = new ArrayList<>();
     }
 
     /**
@@ -430,6 +432,14 @@ public class Configuration {
     }
 
     /**
+     * @return
+     */
+    public synchronized int size() {
+
+	return list.size();
+    }
+
+    /**
      * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
      * <br>
      * Put the provide <code>setting</code> in the configuration only if anothe {@link Setting} with same id
@@ -674,6 +684,22 @@ public class Configuration {
     public ConfigurationSource getSource() {
 
 	return source;
+    }
+
+    /**
+     * @return 
+     */
+    public Optional<Scheme> getScheme() {
+
+	return Optional.ofNullable(scheme);
+    }
+
+    /**
+     * @param scheme 
+     */
+    public void setScheme(Scheme scheme) {
+
+	this.scheme = scheme;
     }
 
     /**

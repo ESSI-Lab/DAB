@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
-import eu.essi_lab.cfga.gs.setting.TabIndex;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
@@ -145,7 +145,7 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 	    setComponentName(DataCacheConnectorSettingImpl.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.DATA_CACHE_CONNECTOR_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.DATA_CACHE.getIndex()).//
 		    withShowDirective("Data cache").//
 		    build();
 

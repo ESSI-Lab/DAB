@@ -39,7 +39,7 @@ import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.TabIndex;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
@@ -250,7 +250,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	    setComponentName(AugmenterWorkerSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.AUGMENTER_WORKER_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.AUGMENTERS.getIndex()).//
 		    withShowDirective("Augmenters", SortDirection.ASCENDING).//
 
 		    withAddDirective(//

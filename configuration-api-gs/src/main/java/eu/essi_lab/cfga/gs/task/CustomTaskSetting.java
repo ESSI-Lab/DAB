@@ -36,7 +36,7 @@ import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.TabIndex;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
@@ -216,7 +216,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	    setComponentName(CustomTaskSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.CUSTOM_TASKS_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.CUSTOM_TASKS.getIndex()).//
 		    withShowDirective("Custom tasks", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
@@ -494,10 +494,5 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
     public CustomTaskSetting(String object) {
 
 	super(object);
-    }
-
-    public static void main(String[] args) {
-
-	System.out.println(new CustomTaskSetting());
     }
 }

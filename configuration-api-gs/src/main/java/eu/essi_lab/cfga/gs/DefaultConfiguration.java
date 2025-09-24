@@ -221,6 +221,12 @@ public class DefaultConfiguration extends Configuration {
     protected void init() {
 
 	//
+	// setting the scheme
+	//
+
+	setScheme(new DefaultConfigurationScheme());
+
+	//
 	// --- Profilers ---
 	//
 

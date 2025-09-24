@@ -27,8 +27,8 @@ import org.json.JSONObject;
 
 import com.vaadin.flow.data.provider.SortDirection;
 
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
-import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSettingLoader;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
@@ -125,7 +125,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 	    setComponentName(AccessorSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.DISTRIBUTION_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.DISTRIBUTION.getIndex()).//
 		    withShowDirective("Distribution", SortDirection.ASCENDING).//
 		    withAddDirective("Add distributed accessor", DistributionSetting.class).//
 		    withRemoveDirective("Remove accessor", true, DistributionSetting.class).//

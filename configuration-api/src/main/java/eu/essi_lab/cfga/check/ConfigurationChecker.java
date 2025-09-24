@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.checker;
+package eu.essi_lab.cfga.check;
 
 /*-
  * #%L
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.checker.CheckResponse.CheckResult;
+import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
 
 /**
  * @author Fabrizio

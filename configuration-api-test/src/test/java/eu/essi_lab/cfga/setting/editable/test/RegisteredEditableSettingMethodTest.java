@@ -6,9 +6,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.checker.CheckResponse;
-import eu.essi_lab.cfga.checker.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.checker.RegisteredEditableSettingMethod;
+import eu.essi_lab.cfga.check.CheckResponse;
+import eu.essi_lab.cfga.check.RegisteredEditableSettingMethod;
+import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
 import eu.essi_lab.lib.utils.StreamUtils;
 
 /**

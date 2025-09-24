@@ -41,14 +41,17 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.ConfigurationUtils;
 import eu.essi_lab.cfga.SelectionUtils;
-import eu.essi_lab.cfga.checker.CheckResponse;
-import eu.essi_lab.cfga.checker.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.checker.ConfigEditableSettingMethod;
-import eu.essi_lab.cfga.checker.ReferencedClassesMethod;
-import eu.essi_lab.cfga.checker.RegisteredEditableSettingMethod;
+import eu.essi_lab.cfga.check.CheckResponse;
+import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
+import eu.essi_lab.cfga.check.ConfigEditableSettingMethod;
+import eu.essi_lab.cfga.check.ReferencedClassesMethod;
+import eu.essi_lab.cfga.check.RegisteredEditableSettingMethod;
+import eu.essi_lab.cfga.check.SchemeCheckMethod;
+import eu.essi_lab.cfga.check.SchemeCheckMethod.CheckMode;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
+import eu.essi_lab.cfga.gs.DefaultConfigurationScheme;
 import eu.essi_lab.cfga.gs.SimilarityCheckMethod;
 import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
@@ -143,16 +146,78 @@ public class DABStarter {
 
 	if (JavaOptions.isEnabled(JavaOptions.CHECK_CONFIG)) {
 
+	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check STARTED");
+
+	    // ---------------------------------
+	    //
+	    // - SchemeCheckMethod
+	    //
+
+	    SchemeCheckMethod schemeCheckMethod = new SchemeCheckMethod();
+
+	    schemeCheckMethod.setScheme(new DefaultConfigurationScheme());
+
+	    schemeCheckMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
+
+	    CheckResponse missingRespone = schemeCheckMethod.check(configuration);
+
+	    missingRespone.getMessages().forEach(msg -> GSLoggerFactory.getLogger(getClass()).warn(msg));
+
+	    schemeCheckMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
+
+	    CheckResponse redundantRespone = schemeCheckMethod.check(configuration);
+
+	    redundantRespone.getMessages().forEach(msg -> GSLoggerFactory.getLogger(getClass()).warn(msg));
+
+	    // ---------------------------------
+	    //
+	    // - Other checks
+	    //
+
 	    CheckResponse similarityCheckResponse = checkConfig();
 
-	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
+	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check ENDED");
+
+	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED || //
+		    missingRespone.getCheckResult() == CheckResult.CHECK_FAILED || //
+		    redundantRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
 
 		switch (mode) {
 		case CONFIGURATION:
 		case LOCAL_PRODUCTION:
 		case MIXED:
 
-		    ConfigurationUtils.fix(configuration, similarityCheckResponse);
+		    GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration fix STARTED");
+
+		    ConfigurationUtils.backup(configuration);
+
+		    if (redundantRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
+
+			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Removing redundant settings STARTED");
+
+			redundantRespone.getSettings().forEach(setting -> configuration.remove(setting.getIdentifier()));
+
+			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Removing redundant settings ENDED");
+		    }
+
+		    if (missingRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
+
+			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Adding missing settings STARTED");
+
+			missingRespone.getSettings().forEach(setting -> configuration.put(setting));
+
+			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Adding missing settings ENDED");
+		    }
+
+		    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
+
+			ConfigurationUtils.fix(configuration, similarityCheckResponse.getSettings(), false, false);
+		    }
+
+		    ConfigurationUtils.flush(configuration);
+
+		    GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration fix ENDED");
+
 		    break;
 		default:
 		    throw GSException.createException(//
@@ -163,7 +228,6 @@ public class DABStarter {
 			    ErrorInfo.ERRORTYPE_INTERNAL, //
 			    ErrorInfo.SEVERITY_FATAL, //
 			    "NodeNotEmpoweredToFixConfiguarionError");
-
 		}
 	    }
 	}
@@ -400,7 +464,7 @@ public class DABStarter {
 			    ErrorInfo.SEVERITY_FATAL, //
 			    "DatabaseSettingNotReplacedError");
 		}
-		
+
 		// flushing config after changes is necessary to set it in SYNCH state
 		configuration.flush();
 	    }
@@ -542,8 +606,6 @@ public class DABStarter {
      */
     private CheckResponse checkConfig() throws GSException {
 
-	GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check STARTED");
-
 	// ---------------------------------
 	//
 	// - RegisteredEditableSettingMethod
@@ -602,7 +664,7 @@ public class DABStarter {
 	//
 	// if some editable settings in the configuration are not compliant with the
 	// editable definition,
-	// since the RegisteredEditableSettingMethod is successfull (so they are
+	// since the RegisteredEditableSettingMethod is successful (so they are
 	// compliant with the editable definition)
 	// it means that some options and/or settings are changed and they can be fixed
 	//
@@ -660,8 +722,6 @@ public class DABStarter {
 			.warn("ConfigEditableSetting check failed while SimilarityCheck do not failed !!!");
 	    }
 	}
-
-	GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check ENDED");
 
 	//
 	// note that this method returns only the response of the {@link

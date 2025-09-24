@@ -54,7 +54,7 @@ import eu.essi_lab.api.database.cfg.DatabaseSource;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.TabIndex;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
@@ -245,7 +245,7 @@ public class ConfigUploader extends ComponentInfo {
 	//
 
 	TabInfo tabInfo = TabInfoBuilder.get().//
-		withIndex(TabIndex.CONFIG_UPLOADER.getIndex()).//
+		withIndex(GSTabIndex.CONFIGURATION_UPLOADER.getIndex()).//
 		withShowDirective(getComponentName()).//
 		withComponent(verticalLayout).//
 		build();

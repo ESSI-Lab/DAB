@@ -26,6 +26,7 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
@@ -322,7 +323,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	    setComponentName(SystemSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.SYSTEM_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.SYSTEM.getIndex()).//
 		    withShowDirective("System").//
 		    build();
 

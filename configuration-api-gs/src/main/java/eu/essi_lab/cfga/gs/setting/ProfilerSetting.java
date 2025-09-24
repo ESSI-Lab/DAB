@@ -31,6 +31,7 @@ import java.util.List;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
@@ -176,7 +177,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	    setComponentName(ProfilerSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(TabIndex.PROFILER_SETTING.getIndex()).//
+		    withIndex(GSTabIndex.PROFILERS.getIndex()).//
 		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
 		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
 		    withRemoveDirective("Remove profiler", false, ProfilerSetting.class).//

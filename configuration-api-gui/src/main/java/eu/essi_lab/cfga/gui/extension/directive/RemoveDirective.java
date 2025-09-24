@@ -71,7 +71,7 @@ public class RemoveDirective extends AddDirective {
     /**
      * @return
      */
-    public boolean isAllowFullRemoval() {
+    public boolean isFullRemovalAllowed() {
 
 	return allowFullRemoval;
     }
