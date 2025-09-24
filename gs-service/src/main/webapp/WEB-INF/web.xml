@@ -137,6 +137,7 @@
 	<filter>
 		<filter-name>RateLimiterFilter</filter-name>
 		<filter-class>eu.essi_lab.gssrv.servlet.RateLimiterFilter</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 
 	<filter-mapping>
@@ -151,6 +152,7 @@
 	<filter>
 		<filter-name>user-finder-filter</filter-name>
 		<filter-class>eu.essi_lab.gssrv.servlet.UserFinderFilter</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 
 	<filter-mapping>
