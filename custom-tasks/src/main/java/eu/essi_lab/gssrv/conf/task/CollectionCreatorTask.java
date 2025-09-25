@@ -191,9 +191,10 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	List<DatasetCollection> datasets = new SourceCollectionCreator().getCollections(sourceId, view.getSourceDeployment());
 
-	List<DatasetCollection> children = new ParameterCollectionCreator().getCollections(sourceId, view.getSourceDeployment());
-
-	datasets.addAll(children);
+	// List<DatasetCollection> children = new ParameterCollectionCreator().getCollections(sourceId,
+	// view.getSourceDeployment());
+	//
+	// datasets.addAll(children);
 
 	GSLoggerFactory.getLogger(getClass()).info("Number of generated collections: {}", datasets.size());
 

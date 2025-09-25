@@ -76,6 +76,6 @@ public class ParameterCollectionCreator extends SourceCollectionCreator {
     protected String getTitle(GSSource source, String parameterURI) {
 	WHOSOntology ontology = new WHOSOntology();
 	SKOSConcept concept = ontology.getConcept(parameterURI);
-	return "Observations from data provider " + source.getLabel() + ": " + concept.getPreferredLabel().getKey();
+	return concept.getPreferredLabel().getKey() + " observations from " + normalize(source.getLabel());
     }
 }

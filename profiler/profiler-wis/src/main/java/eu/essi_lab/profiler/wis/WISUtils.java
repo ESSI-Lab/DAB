@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -132,8 +133,28 @@ public class WISUtils {
 	return ret;
     }
 
+    public static void addLinkToFeature(JSONObject feature, JSONObject link) {
+
+    }
+
     public static void addLink(JSONArray links, JSONObject link) {
 	links.put(link);
+    }
+
+    public static void addLink(JSONObject feature, String type, String rel, String title, String href) {
+	JSONArray links = null;
+	if (feature.has("links")) {
+	    links = feature.getJSONArray("links");
+	} else {
+	    links = new JSONArray();
+	    feature.put("links", links);
+	}
+	JSONObject link = new JSONObject();
+	link.put("type", type);
+	link.put("rel", rel);
+	link.put("title", title);
+	link.put("href", href);
+	addLink(links, link);
     }
 
     public static void addLink(JSONArray links, String type, String rel, String title, String href) {
@@ -292,7 +313,6 @@ public class WISUtils {
 	feature.put("properties", properties);
 
 	JSONArray conformArray = new JSONArray();
-	conformArray.put("http://wis.wmo.int/spec/wcmp/2.0");
 	conformArray.put("http://wis.wmo.int/spec/wcmp/2/conf/core");
 	feature.put("conformsTo", conformArray);
 	String id = resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier();
@@ -351,7 +371,9 @@ public class WISUtils {
 	properties.put("description", resource.getHarmonizedMetadata().getCoreMetadata().getAbstract());
 	properties.put("id", id);
 	properties.put("identifier", id);
-	properties.put("language", "en");
+	JSONObject lang = new JSONObject();
+	lang.put("code", "en");
+	properties.put("language", lang);
 	properties.put("type", "dataset");
 	String datestamp = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDateStamp();
 	if (datestamp != null) {
@@ -369,11 +391,18 @@ public class WISUtils {
 	    JSONObject contact = new JSONObject();
 	    contact.put("organization", party.getOrganisationName());
 	    JSONArray roles = new JSONArray();
-	    roles.put("producer");
+	    roles.put("host");
 	    contact.put("roles", roles);
 	    contacts.put(contact);
 	}
 	properties.put("wmo:dataPolicy", "recommended");
+	if (resource.getSource().getUniqueIdentifier().equals("argentina-ina")) {
+	    String url = "https://creativecommons.org/licenses/by/4.0/";
+	    WISUtils.addLink(feature, "text/html", "license", "CC BY 4.0", url);
+
+	    WISUtils.addLink(feature, "application/xml", "service", "INA SIyAH - Servicio web de datos WaterML",
+		    "https://alerta.ina.gob.ar/wml/");
+	}
 	// properties.put("rights", "WHOS Terms of Use");
 	properties.put("title", resource.getHarmonizedMetadata().getCoreMetadata().getTitle());
 	properties.put("type", "dataset");
@@ -419,7 +448,7 @@ public class WISUtils {
 	for (int i = 0; i < features.length(); i++) {
 	    JSONObject feature = features.getJSONObject(i);
 	    String id = feature.getString("id");
-	    JSONArray links = new JSONArray();
+
 	    // the base URL, e.g.:
 	    // http://localhost:9090/gs-service/services/essi/view/whos/oapi
 	    SimpleEntry<String, String> sourceParameter = WISUtils.extractSourceAndParameter(id);
@@ -429,9 +458,8 @@ public class WISUtils {
 	    String view = WISUtils.getWHOSView(sourceId, parameterURI);
 	    String url = WISUtils.getUrl(webRequest);
 	    // url = url.replace("/view/whos/", "/view/" + view + "/");
-	    WISUtils.addLink(links, "application/json", "canonical", id, url + "/collections/discovery-metadata/items/" + id);
+	    WISUtils.addLink(feature, "application/json", "canonical", id, url + "/collections/discovery-metadata/items/" + id);
 	    // WISUtils.addLink(links, "application/json", "collection", id, url + "/collections/" + id);
-	    feature.put("links", links);
 	}
 
     }

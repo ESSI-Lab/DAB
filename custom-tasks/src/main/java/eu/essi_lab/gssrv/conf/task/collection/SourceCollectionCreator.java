@@ -23,6 +23,7 @@ package eu.essi_lab.gssrv.conf.task.collection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +33,6 @@ import java.util.ServiceLoader;
 import java.util.UUID;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
@@ -184,8 +184,18 @@ public class SourceCollectionCreator {
 	ComputationResult attributes = count.get(0);
 	ComputationResult platforms = count.get(1);
 
-	coreMetadata.setAbstract("Data provider: " + source.getLabel() + " Temporal range: from " + begin + " to " + end
-		+ "Number of platforms: " + platforms.getValue());
+	String time = "";
+
+	if (begin != null && end != null && !begin.isEmpty() && !end.isEmpty()) {
+	    Date beginDate = ISO8601DateTimeUtils.parseISO8601(begin);
+	    Date endDate = ISO8601DateTimeUtils.parseISO8601(end);
+	    String beginString = ISO8601DateTimeUtils.getISO8601Date(beginDate);
+	    String endString = ISO8601DateTimeUtils.getISO8601Date(endDate);
+	    time = "Temporal range: from " + beginString + " to " + endString + ". ";
+	}
+
+	coreMetadata
+		.setAbstract("Data provider: " + source.getLabel() + ". " + time + "Number of platforms: " + platforms.getValue() + ".");
 
 	addAdditionalElements(dataset, source.getUniqueIdentifier(), groupBy);
 
@@ -197,7 +207,12 @@ public class SourceCollectionCreator {
     }
 
     protected String getTitle(GSSource source, String parameter) {
-	return "Observations from data provider " + source.getLabel();
+	return "Observations from " + normalize(source.getLabel());
+    }
+
+    protected String normalize(String label) {
+	String cleaned = label.replaceAll("[^a-zA-Z0-9()\\s]", "");
+	return cleaned;
     }
 
     protected void addAdditionalElements(DatasetCollection dataset, String sourceId, String groupBy) throws GSException {
@@ -272,12 +287,16 @@ public class SourceCollectionCreator {
 	    properties = properties.substring(0, properties.length() - 2);
 	}
 	String abs = coreMetadata.getAbstract();
-	coreMetadata.setAbstract(abs + " Number of observed properties: " + propertyNames.size() + " (" + properties + ")");
+	String props = "";
+	if (!propertyNames.isEmpty()) {
+	    props = "Number of observed properties: " + propertyNames.size() + " (" + properties + ").";
+	}
+	coreMetadata.setAbstract((abs + props).trim());
 
     }
 
     protected String getMetadataIdentifier(String sourceIdentifier, String groupBy) {
-	return "urn:wmo:md:it-cnr-iia:" + sourceIdentifier + ":all";
+	return "urn:wmo:md:it-cnr-iia:" + sourceIdentifier ;
     }
 
     protected List<ResponseItem> getStatistics(String sourceId, Queryable queryable) throws GSException {
