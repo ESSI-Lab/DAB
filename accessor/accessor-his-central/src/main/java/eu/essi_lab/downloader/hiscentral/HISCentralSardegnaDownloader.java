@@ -192,8 +192,8 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 	    String startTime = ISO8601DateTimeUtils.getISO8601Date(begin);
 	    String endTime = ISO8601DateTimeUtils.getISO8601Date(end);
 
-	    String link = online.getLinkage().endsWith("?") ? online.getLinkage() + "data_iniziale=" + startTime + "&data_finale=" + endTime
-		    : online.getLinkage() + "&data_iniziale=" + startTime + "&data_finale=" + endTime;
+	    String link = online.getLinkage().endsWith("?") ? online.getLinkage() + "data_iniziale=" + startTime + "&data_finale=" + endTime + "&maxResults=999"
+		    : online.getLinkage() + "&data_iniziale=" + startTime + "&data_finale=" + endTime + "&maxResults=999";
 
 	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
