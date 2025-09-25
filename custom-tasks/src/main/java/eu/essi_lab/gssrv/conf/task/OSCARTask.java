@@ -186,9 +186,6 @@ public class OSCARTask extends AbstractCustomTask {
 	    discoveryMessage.setPage(new Page(start, pageSize));
 	    start = start + pageSize;
 
-	    discoveryMessage.setPage(new Page(start, pageSize));
-	    start = start + pageSize;
-
 	    if (searchAfter != null) {
 		discoveryMessage.setSearchAfter(searchAfter);
 	    }
