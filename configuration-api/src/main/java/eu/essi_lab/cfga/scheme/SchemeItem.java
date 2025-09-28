@@ -27,6 +27,7 @@ package eu.essi_lab.cfga.scheme;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import eu.essi_lab.cfga.setting.Setting;
 
@@ -41,7 +42,7 @@ public interface SchemeItem {
     public static class Descriptor {
 
 	private Function<Setting, Boolean> descriptor;
-	private Class<? extends Setting> clazz;
+	private Supplier<Setting> creator;
 
 	/**
 	 * @param descriptor
@@ -54,18 +55,18 @@ public interface SchemeItem {
 
 	/**
 	 * @param descriptor
-	 * @param clazz
+	 * @param creator
 	 * @return
 	 */
-	public static Descriptor of(Function<Setting, Boolean> descriptor, Class<? extends Setting> clazz) {
+	public static Descriptor of(Function<Setting, Boolean> descriptor, Supplier<Setting> creator) {
 
-	    return new Descriptor(descriptor, clazz);
+	    return new Descriptor(descriptor, creator);
 	}
 
 	/**
 	 * @return
 	 */
-	public Function<Setting, Boolean> getFunction() {
+	public Function<Setting, Boolean> describe() {
 
 	    return descriptor;
 	}
@@ -73,20 +74,22 @@ public interface SchemeItem {
 	/**
 	 * @return
 	 */
-	public Optional<Class<? extends Setting>> getSettingClass() {
+	public Optional<Supplier<Setting>> create() {
 
-	    return Optional.ofNullable(clazz);
+	    return Optional.ofNullable(creator);
 	}
 
 	/**
 	 * @param descriptor
 	 * @param clazz
 	 */
-	private Descriptor(Function<Setting, Boolean> descriptor, Class<? extends Setting> clazz) {
+	private Descriptor(Function<Setting, Boolean> descriptor, Supplier<Setting> supplier) {
 
 	    this.descriptor = descriptor;
-	    this.clazz = clazz;
+	    this.creator = supplier;
+
 	}
+
     };
 
     /**
@@ -103,5 +106,4 @@ public interface SchemeItem {
      * @return
      */
     public List<Descriptor> getDescriptors();
-
 }

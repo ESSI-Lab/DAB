@@ -34,7 +34,6 @@ import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
 import eu.essi_lab.cfga.scheme.Scheme;
 import eu.essi_lab.cfga.scheme.SchemeItem;
 import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -120,7 +119,7 @@ public class SchemeCheckMethod implements CheckMethod {
 
 		List<Function<Setting, Boolean>> functions = item.getDescriptors().//
 			stream().//
-			map(d -> d.getFunction()).//
+			map(d -> d.describe()).//
 			collect(Collectors.toList());
 
 		boolean missing = configuration.list().//
@@ -131,10 +130,10 @@ public class SchemeCheckMethod implements CheckMethod {
 		if (missing) {
 
 		    item.getDescriptors().stream().//
-			    filter(d -> configuration.list().stream().noneMatch(s -> d.getFunction().apply(s))).//
+			    filter(d -> configuration.list().stream().noneMatch(s -> d.describe().apply(s))).//
 			    forEach(d -> {
 
-				Setting setting = SettingUtils.create(d.getSettingClass().get());
+				Setting setting = d.create().get().get();
 
 				outSettings.add(setting);
 				response.getMessages().add("Detected missing setting: " + setting.getName());
@@ -150,14 +149,14 @@ public class SchemeCheckMethod implements CheckMethod {
 		boolean optionalSetting = descriptors.//
 			stream().//
 			filter(d -> !d.required() && !d.getDescriptors().isEmpty()).//
-			filter(i -> i.getDescriptors().stream().anyMatch(d -> d.getFunction().apply(setting))).//
+			filter(i -> i.getDescriptors().stream().anyMatch(d -> d.describe().apply(setting))).//
 			findFirst().//
 			isPresent();
 
 		if (!optionalSetting) {
 
 		    boolean redundant = required.stream().//
-			    filter(i -> i.getDescriptors().stream().noneMatch(d -> d.getFunction().apply(setting))).//
+			    filter(i -> i.getDescriptors().stream().noneMatch(d -> d.describe().apply(setting))).//
 			    count() == required.size();
 
 		    if (redundant) {
