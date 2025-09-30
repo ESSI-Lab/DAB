@@ -7,14 +7,14 @@ import org.junit.Test;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.check.CheckResponse;
-import eu.essi_lab.cfga.check.RegisteredEditableSettingMethod;
+import eu.essi_lab.cfga.check.RegisteredEditableMethod;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
 import eu.essi_lab.lib.utils.StreamUtils;
 
 /**
  * @author Fabrizio
  */
-public class RegisteredEditableSettingMethodTest {
+public class RegisteredEditableMethodTest {
 
     /**
      * 
@@ -27,7 +27,7 @@ public class RegisteredEditableSettingMethodTest {
 
 	Assert.assertEquals(14, count);
 
-	RegisteredEditableSettingMethod method = new RegisteredEditableSettingMethod();
+	RegisteredEditableMethod method = new RegisteredEditableMethod();
 
 	CheckResponse check = method.check(null);
 

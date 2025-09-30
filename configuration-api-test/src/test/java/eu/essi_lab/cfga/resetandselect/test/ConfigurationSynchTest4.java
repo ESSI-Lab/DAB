@@ -11,8 +11,8 @@ import org.junit.Test;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.check.CheckResponse;
+import eu.essi_lab.cfga.check.SimilarityMethod;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.gs.SimilarityCheckMethod;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.Setting;
@@ -57,7 +57,7 @@ public class ConfigurationSynchTest4 {
 	//
 	//
 
-	SimilarityCheckMethod method = new SimilarityCheckMethod();
+	SimilarityMethod method = new SimilarityMethod();
 
 	CheckResponse response = method.check(configuration);
 

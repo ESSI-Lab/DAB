@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.check.scheme.SchemeItem;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
 import eu.essi_lab.cfga.gs.setting.driver.DriverSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.gui.TabIndex;
-import eu.essi_lab.cfga.scheme.SchemeItem;
 
 /*-
  * #%L
