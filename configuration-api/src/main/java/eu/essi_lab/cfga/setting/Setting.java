@@ -121,11 +121,11 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 
 	if (mode == SelectionMode.UNSET) {
 
-	    getObject().remove("selectionMode");
+	    getObject().remove(SELECTION_MODE.getKey());
 	    return;
 	}
 
-	getObject().put("selectionMode", mode.getLabel());
+	getObject().put(SELECTION_MODE.getKey(), mode.getLabel());
     }
 
     /**
@@ -134,9 +134,9 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     @Override
     public SelectionMode getSelectionMode() {
 
-	if (getObject().has("selectionMode")) {
+	if (getObject().has(SELECTION_MODE.getKey())) {
 
-	    return LabeledEnum.valueOf(SelectionMode.class, getObject().getString("selectionMode")).get();
+	    return LabeledEnum.valueOf(SelectionMode.class, getObject().getString(SELECTION_MODE.getKey())).get();
 	}
 
 	return SelectionMode.UNSET;
@@ -196,11 +196,11 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     @SuppressWarnings("unchecked")
     private <T extends AfterCleanFunction> Optional<T> getAfterCleanFunction() {
 
-	if (getObject().has("afterCleanFunction")) {
+	if (getObject().has(AFTER_CLEAN_FUNCTION.getKey())) {
 
 	    try {
 
-		Class<?> clazz = Class.forName(getObject().getString("afterCleanFunction"));
+		Class<?> clazz = Class.forName(getObject().getString(AFTER_CLEAN_FUNCTION.getKey()));
 
 		return Optional.of((T) clazz.getDeclaredConstructor().newInstance());
 
@@ -217,7 +217,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public void setAfterCleanFunction(AfterCleanFunction function) {
 
-	getObject().put("afterCleanFunction", function.getClass().getName());
+	getObject().put(AFTER_CLEAN_FUNCTION.getKey(), function.getClass().getName());
     }
 
     /**
@@ -225,9 +225,9 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public Optional<Class<? extends AfterCleanFunction>> getOptionalAfterCleanFunctionClass() {
 
-	if (getObject().has("afterCleanFunction")) {
+	if (getObject().has(AFTER_CLEAN_FUNCTION.getKey())) {
 
-	    String afterCleanFunctionClass = getObject().getString("afterCleanFunction");
+	    String afterCleanFunctionClass = getObject().getString(AFTER_CLEAN_FUNCTION.getKey());
 
 	    try {
 
@@ -250,7 +250,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public void setSelected(boolean selected) {
 
-	setProperty("selected", selected, false);
+	setProperty(SELECTED.getKey(), selected, false);
     }
 
     /**
@@ -260,7 +260,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public boolean isSelected() {
 
-	return isPropertySet("selected", false);
+	return isPropertySet(SELECTED.getKey(), false);
     }
 
     /**
@@ -329,7 +329,9 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 		map(k -> getObject().get(k)).//
 		filter(o -> o instanceof JSONObject).//
 		map(o -> (JSONObject) o). //
-		filter(o -> o.getString("type").equals("setting") || o.getString("type").equals(Scheduling.SCHEDULING_OBJECT_TYPE)).//
+		filter(o -> o.getString(OBJECT_TYPE.getKey()).equals("setting")
+			|| o.getString(OBJECT_TYPE.getKey()).equals(Scheduling.SCHEDULING_OBJECT_TYPE))
+		.//
 		map(o -> new Setting(o)).//
 		collect(Collectors.toList());
     }
@@ -391,7 +393,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public final String getIdentifier() {
 
-	return getObject().getString("settingId");
+	return getObject().getString(IDENTIFIER.getKey());
     }
 
     /**
@@ -399,7 +401,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public final void setIdentifier(String id) {
 
-	getObject().put("settingId", id);
+	getObject().put(IDENTIFIER.getKey(), id);
     }
 
     /**
@@ -407,7 +409,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public final String getName() {
 
-	return getObject().getString("settingName");
+	return getObject().getString(NAME.getKey());
     }
 
     /**
@@ -415,7 +417,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public final void setName(String name) {
 
-	getObject().put("settingName", name);
+	getObject().put(NAME.getKey(), name);
     }
 
     /**
@@ -479,7 +481,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public void setConfigurableType(String configurableType) {
 
-	getObject().put("configurableType", configurableType);
+	getObject().put(CONFIGURABLE_TYPE.getKey(), configurableType);
     }
 
     /**
@@ -487,12 +489,12 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public String getConfigurableType() {
 
-	if (!getObject().has("configurableType")) {
+	if (!getObject().has(CONFIGURABLE_TYPE.getKey())) {
 
 	    throw new RuntimeException("Configurable type not set");
 	}
 
-	return getObject().getString("configurableType");
+	return getObject().getString(CONFIGURABLE_TYPE.getKey());
     }
 
     /**
@@ -504,7 +506,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     public Class<? extends Setting> getSettingClass() {
 
 	try {
-	    return (Class<? extends Setting>) Class.forName(getObject().getString("settingClass"));
+	    return (Class<? extends Setting>) Class.forName(getObject().getString(SETTING_CLASS.getKey()));
 	} catch (ClassNotFoundException | JSONException e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	    throw new RuntimeException(e.toString());
@@ -658,9 +660,17 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     }
 
     /**
+     * @return
+     */
+    public static List<Property<?>> getDeclaredProperties() {
+
+	return new Setting().getProperties();
+    }
+
+    /**
      * 
      */
-    public final List<Property<?>> getProperties() {
+    protected final List<Property<?>> getProperties() {
 
 	List<Property<?>> properties = super.getProperties();
 
@@ -695,7 +705,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 	    return;
 	}
 
-	setting.getObject().put("enabled", value);
+	setting.getObject().put(ENABLED.getKey(), value);
 
 	setting.getOptions().forEach(o -> {
 
@@ -721,7 +731,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     private void propagateVisible(Setting setting, boolean value) {
 
-	setting.getObject().put("visible", value);
+	setting.getObject().put(VISIBLE.getKey(), value);
 	setting.getOptions().forEach(o -> o.setVisible(value));
 
 	setting.getSettings().forEach(s -> propagateVisible(s, value));

@@ -1,7 +1,6 @@
 package eu.essi_lab.cfga.setting.test;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,12 +19,10 @@ public class SettingPropertiesTest {
     @Test
     public void settingPropertiesTest() {
 
-	Setting setting = new Setting();
-
-	List<Property<?>> properties = setting.//
-		getProperties().//
-		stream().sorted((p1, p2) -> p1.getName().compareTo(p2.getName())).//
-		collect(Collectors.toList());
+	List<Property<?>> properties = Setting.getDeclaredProperties().//
+		stream().//
+		sorted((p1, p2) -> p1.getName().compareTo(p2.getName())).//
+		toList();
 
 	Assert.assertEquals(20, properties.size());
 
@@ -33,26 +30,26 @@ public class SettingPropertiesTest {
 	    System.out.println(property);
 	}
 
-//	(AfterCleanFunction, afterCleanFunction, false, true, Optional.empty)
-//	(CanBeCleaned, canBeCleaned, true, true, Optional[true])
-//	(CanBeDisabled, canBeDisabled, true, true, Optional[true])
-//	(CanBeRemoved, canBeRemoved, true, true, Optional[false])
-//	(CompactMode, compactMode, true, true, Optional[true])
-//	(ConfigurableType, configurableType, false, true, Optional.empty)
-//	(Description, description, true, false, Optional.empty)
-//	(Editable, editable, true, true, Optional[true])
-//	(Enabled, enabled, true, true, Optional[true])
-//	(Extension, extensionClass, false, true, Optional.empty)
-//	(FoldedMode, foldedMode, true, true, Optional[false])
-//	(Identifier, settingId, true, false, Optional.empty)
-//	(Name, settingName, true, false, Optional.empty)
-//	(ObjectType, type, true, false, Optional.empty)
-//	(Selected, selected, true, true, Optional[false])
-//	(SelectionMode, selectionMode, true, true, Optional[unset])
-//	(SettingClass, settingClass, true, false, Optional.empty)
-//	(ShowHeader, showHeader, true, true, Optional[true])
-//	(Validator, validatorClass, false, true, Optional.empty)
-//	(Visible, visible, true, true, Optional[true])
+	// (AfterCleanFunction, afterCleanFunction, false, true, Optional.empty)
+	// (CanBeCleaned, canBeCleaned, true, true, Optional[true])
+	// (CanBeDisabled, canBeDisabled, true, true, Optional[true])
+	// (CanBeRemoved, canBeRemoved, true, true, Optional[false])
+	// (CompactMode, compactMode, true, true, Optional[true])
+	// (ConfigurableType, configurableType, false, true, Optional.empty)
+	// (Description, description, true, false, Optional.empty)
+	// (Editable, editable, true, true, Optional[true])
+	// (Enabled, enabled, true, true, Optional[true])
+	// (Extension, extensionClass, false, true, Optional.empty)
+	// (FoldedMode, foldedMode, true, true, Optional[false])
+	// (Identifier, settingId, true, false, Optional.empty)
+	// (Name, settingName, true, false, Optional.empty)
+	// (ObjectType, type, true, false, Optional.empty)
+	// (Selected, selected, true, true, Optional[false])
+	// (SelectionMode, selectionMode, true, true, Optional[unset])
+	// (SettingClass, settingClass, true, false, Optional.empty)
+	// (ShowHeader, showHeader, true, true, Optional[true])
+	// (Validator, validatorClass, false, true, Optional.empty)
+	// (Visible, visible, true, true, Optional[true])
 
 	Assert.assertEquals("(AfterCleanFunction, afterCleanFunction, false, false, Optional.empty)", properties.get(0).toString());
 	Assert.assertEquals("(CanBeCleaned, canBeCleaned, true, true, Optional[true])", properties.get(1).toString());
