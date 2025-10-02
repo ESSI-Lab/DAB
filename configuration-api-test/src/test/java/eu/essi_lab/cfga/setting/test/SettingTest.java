@@ -14,6 +14,7 @@ import org.junit.Test;
 import eu.essi_lab.cfga.Configurable;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.cfga.setting.ObjectExtension;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -24,6 +25,219 @@ import eu.essi_lab.lib.utils.StringUtils;
 public class SettingTest {
 
     private class TestSetting extends Setting {
+    }
+
+    /**
+     * 
+     */
+    @Test
+    public void getPropertyValueTest0() {
+
+	Setting setting = new Setting();
+
+	Assert.assertTrue(StringUtils.isUUID(setting.getPropertyValue(Setting.IDENTIFIER).get().toString()));
+
+	Assert.assertTrue(StringUtils.isUUID(setting.getPropertyValue(Setting.NAME).get().toString()));
+
+	Assert.assertEquals(Setting.class.getCanonicalName(), setting.getPropertyValue(Setting.SETTING_CLASS).get());
+
+	Assert.assertEquals("setting", setting.getPropertyValue(Setting.OBJECT_TYPE).get());
+
+	//
+	//
+	//
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.AFTER_CLEAN_FUNCTION).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.CONFIGURABLE_TYPE).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.SELECTED).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.SELECTION_MODE).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.CAN_BE_CLEANED).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.CAN_BE_DISABLED).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.CAN_BE_REMOVED).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.COMPACT_MODE).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.DESCRIPTION).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.EDITABLE).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.ENABLED).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.EXTENSION).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.FOLDED_MODE).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.SHOW_HEADER).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.VALIDATOR).isEmpty());
+
+	Assert.assertTrue(setting.getPropertyValue(Setting.VISIBLE).isEmpty());
+    }
+
+    /**
+     * 
+     */
+    @Test
+    public void getPropertyValueTest1() {
+
+	Setting setting = new Setting();
+	setting.setIdentifier("id");
+	setting.setName("name");
+
+	Assert.assertEquals("id", setting.getPropertyValue(Setting.IDENTIFIER).get().toString());
+	Assert.assertEquals("name", setting.getPropertyValue(Setting.NAME).get().toString());
+
+	Assert.assertEquals(Setting.class.getCanonicalName(), setting.getPropertyValue(Setting.SETTING_CLASS).get());
+	Assert.assertEquals("setting", setting.getPropertyValue(Setting.OBJECT_TYPE).get());
+
+	//
+	//
+	//
+
+	setting.setAfterCleanFunction(s -> System.out.println());
+	Assert.assertTrue(setting.getPropertyValue(Setting.AFTER_CLEAN_FUNCTION).isPresent());
+
+	setting.setConfigurableType("type");
+	Assert.assertTrue(setting.getPropertyValue(Setting.CONFIGURABLE_TYPE).isPresent());
+
+	//
+	//
+	//
+
+	setting.setSelected(Setting.SELECTED.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.SELECTED).isEmpty());
+
+	setting.setSelected(!Setting.SELECTED.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.SELECTED).isPresent());
+
+	//
+	//
+	//
+
+	setting.setEditable(Setting.EDITABLE.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.EDITABLE).isEmpty());
+
+	setting.setEditable(!Setting.EDITABLE.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.EDITABLE).isPresent());
+
+	//
+	//
+	//
+
+	setting.setEnabled(Setting.ENABLED.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.ENABLED).isEmpty());
+
+	setting.setEnabled(!Setting.ENABLED.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.ENABLED).isPresent());
+
+	//
+	//
+	//
+
+	setting.setCanBeCleaned(Setting.CAN_BE_CLEANED.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.CAN_BE_CLEANED).isEmpty());
+
+	setting.setCanBeCleaned(!Setting.CAN_BE_CLEANED.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.CAN_BE_CLEANED).isPresent());
+
+	//
+	//
+	//
+
+	setting.setCanBeDisabled(Setting.CAN_BE_DISABLED.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.CAN_BE_DISABLED).isEmpty());
+
+	setting.setCanBeDisabled(!Setting.CAN_BE_DISABLED.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.CAN_BE_DISABLED).isPresent());
+
+	//
+	//
+	//
+
+	setting.setCanBeRemoved(Setting.CAN_BE_REMOVED.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.CAN_BE_REMOVED).isEmpty());
+
+	setting.setCanBeRemoved(!Setting.CAN_BE_REMOVED.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.CAN_BE_REMOVED).isPresent());
+
+	//
+	//
+	//
+
+	setting.enableCompactMode(Setting.COMPACT_MODE.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.COMPACT_MODE).isEmpty());
+
+	setting.enableCompactMode(!Setting.COMPACT_MODE.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.COMPACT_MODE).isPresent());
+
+	//
+	//
+	//
+
+	setting.setShowHeader(Setting.SHOW_HEADER.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.SHOW_HEADER).isEmpty());
+
+	setting.setShowHeader(!Setting.SHOW_HEADER.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.SHOW_HEADER).isPresent());
+
+	//
+	//
+	//
+
+	setting.enableFoldedMode(Setting.FOLDED_MODE.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.FOLDED_MODE).isEmpty());
+
+	setting.enableFoldedMode(!Setting.FOLDED_MODE.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.FOLDED_MODE).isPresent());
+
+	//
+	//
+	//
+
+	setting.setVisible(Setting.VISIBLE.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.VISIBLE).isEmpty());
+
+	setting.setVisible(!Setting.VISIBLE.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.VISIBLE).isPresent());
+
+	//
+	//
+	//
+
+	setting.setSelectionMode(Setting.SELECTION_MODE.getDefaultValue().get());
+	Assert.assertTrue(setting.getPropertyValue(Setting.SELECTION_MODE).isEmpty());
+
+	setting.setSelectionMode(SelectionMode.SINGLE);
+	Assert.assertEquals(SelectionMode.SINGLE.getLabel(), setting.getPropertyValue(Setting.SELECTION_MODE).get());
+
+	//
+	//
+	//
+
+	setting.setDescription("desc");
+	Assert.assertEquals("desc", setting.getPropertyValue(Setting.DESCRIPTION).get());
+
+	//
+	//
+	//
+
+	setting.setExtension(new ObjectExtension() {
+	});
+	Assert.assertTrue(setting.getPropertyValue(Setting.EXTENSION).isPresent());
+
+	//
+	//
+	//
+
+	setting.setValidator((c, s, cnt) -> null);
+	Assert.assertTrue(setting.getPropertyValue(Setting.VALIDATOR).isPresent());
+
     }
 
     @Test
