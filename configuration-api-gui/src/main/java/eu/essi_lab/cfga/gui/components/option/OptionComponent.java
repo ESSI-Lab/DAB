@@ -137,7 +137,10 @@ public class OptionComponent extends VerticalLayout {
 	setId("option-component-" + option.getKey());
 	setMargin(false);
 	setSpacing(false);
+
 	getStyle().set("padding", "0px");
+	getStyle().set("margin-top", "5px !important");
+	getStyle().set("margin-bottom", "5px !important");
 
 	boolean visible = option.isVisible();
 
