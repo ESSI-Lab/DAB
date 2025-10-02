@@ -27,14 +27,18 @@ package eu.essi_lab.gssrv.rest.conf;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.core.Response.Status;
+
 import eu.essi_lab.cdk.harvest.wrapper.ConnectorWrapperSetting;
 import eu.essi_lab.cfga.SelectionUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.gssrv.conf.task.ResourcesComparatorTask;
+import eu.essi_lab.gssrv.rest.conf.ConfigService.SettingFinder;
 import eu.essi_lab.gssrv.rest.conf.requests.source.HarvestSchedulingRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.source.PutSourceRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.source.HarvestSchedulingRequest.RepeatIntervalUnit;
@@ -305,5 +309,43 @@ public class HarvestingSettingUtils {
 	//
 
 	return harvSetting;
+    }
+    
+    /**
+     * @param request
+     * @return
+     */
+    static SettingFinder<HarvestingSetting> getHarvestingSettingFinder(ConfigRequest request) {
+
+	Optional<String> optSourceId = request.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
+
+	HarvestingSetting setting = null;
+
+	if (!optSourceId.isPresent()) {
+
+	    return new SettingFinder<HarvestingSetting>(ConfigService.buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing source identifier"));
+
+	} else {
+
+	    String sourceId = optSourceId.get();
+
+	    if (!ConfigurationWrapper.getAllSources().//
+		    stream().//
+		    filter(s -> s.getUniqueIdentifier().equals(sourceId)).//
+		    findFirst().//
+		    isPresent()) {
+
+		return new SettingFinder<HarvestingSetting>(
+			ConfigService.buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' not found"));
+	    }
+
+	    setting = ConfigurationWrapper.getHarvestingSettings().//
+		    stream().//
+		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).//
+		    findFirst().//
+		    get();
+	}
+
+	return new SettingFinder<HarvestingSetting>(setting);
     }
 }

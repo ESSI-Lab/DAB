@@ -214,6 +214,38 @@ public class OntologySetting extends Setting implements EditableSetting {
     }
 
     /**
+     * @param queryLanguage
+     */
+    public void setQueryLanguage(String queryLanguage) {
+
+	getOption(QUERY_LANG_OPTION_KEY, String.class).get().setValue(queryLanguage);
+    }
+
+    /**
+     * @return
+     */
+    public String getQueryLanguage() {
+
+	return getOption(QUERY_LANG_OPTION_KEY, String.class).get().getValue();
+    }
+
+    /**
+     * @param queryLanguage
+     */
+    public void setDataModel(String dataModel) {
+
+	getOption(DATA_MODEL_OPTION_KEY, String.class).get().setValue(dataModel);
+    }
+
+    /**
+     * @return
+     */
+    public String getDataModel() {
+
+	return getOption(DATA_MODEL_OPTION_KEY, String.class).get().getValue();
+    }
+
+    /**
      * @author Fabrizio
      */
     public static class OntologySettingComponentInfo extends ComponentInfo {
