@@ -3,32 +3,37 @@
  */
 package eu.essi_lab.cfga.gs.setting;
 
-import org.joda.time.DateTimeZone;
+import java.util.Arrays;
+import java.util.Optional;
+
 import org.json.JSONObject;
 
 import com.vaadin.flow.data.provider.SortDirection;
 
-import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.scheduling.Scheduling;
-import eu.essi_lab.cfga.setting.validation.ValidationContext;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse;
-import eu.essi_lab.cfga.setting.validation.Validator;
 
 /**
  * @author Fabrizio
  */
 public class OntologySetting extends Setting implements EditableSetting {
+
+    private static final String DATA_MODEL_OPTION_KEY = "ontologyDataModel";
+    private static final String QUERY_LANG_OPTION_KEY = "ontologyQueryLanguage";
+    private static final String ENDPOINT_OPTION_KEY = "ontologyEndpoint";
+    private static final String NAME_OPTION_KEY = "ontologyName";
+    private static final String ID_OPTION_KEY = "ontologyId";
+    private static final String DESCRIPTION_OPTION_KEY = "ontologyDescription";
+    private static final String AVAILABILITY_OPTION_KEY = "ontologyAvailability";
 
     /**
      * 
@@ -38,29 +43,174 @@ public class OntologySetting extends Setting implements EditableSetting {
 	setCanBeRemoved(true);
 	setCanBeDisabled(false);
 	setName("Ontology settings");
-
-	setValidator(new OntologySettingValidator());
+	enableFoldedMode(false);
+	enableCompactMode(false);
 
 	//
-	// set the component extension
 	//
+	//
+
+	Option<String> endpoint = StringOptionBuilder.get().//
+		withKey(ENDPOINT_OPTION_KEY).//
+		withLabel("Endpoint").//
+		withDescription("The ontology endpoint").//
+		cannotBeDisabled().//
+		required().//
+		build();
+
+	addOption(endpoint);
+
+	Option<String> id = StringOptionBuilder.get().//
+		withKey(ID_OPTION_KEY).//
+		withLabel("Name").//
+		withInputPattern(InputPattern.ALPHANUMERIC_AND_UNDERSCORE).//
+		withDescription("The ontology identifier. Only alphanumeric characters and underscore are accepted").//
+		cannotBeDisabled().//
+		required().//
+		build();
+
+	addOption(id);
+
+	Option<String> name = StringOptionBuilder.get().//
+		withKey(NAME_OPTION_KEY).//
+		withLabel("Name").//
+		withDescription("The ontology name").//
+		cannotBeDisabled().//
+		required().//
+		build();
+
+	addOption(name);
+
+	Option<String> description = StringOptionBuilder.get().//
+		withKey(DESCRIPTION_OPTION_KEY).//
+		withLabel("Description").//
+		withDescription("The ontology description").//
+		cannotBeDisabled().//
+		build();
+
+	addOption(description);
+
+	Option<String> model = StringOptionBuilder.get().//
+		withKey(DATA_MODEL_OPTION_KEY).//
+		withLabel("Data model").//
+		withDescription("The ontology data model. At the moment only SKOS is supported").//
+		withSingleSelection().//
+		withValues(Arrays.asList("SKOS")).//
+		withSelectedValue("SKOS").//
+		cannotBeDisabled().//
+		build();
+
+	addOption(model);
+
+	Option<String> queryLanguage = StringOptionBuilder.get().//
+		withKey(QUERY_LANG_OPTION_KEY).//
+		withLabel("Ontology query language").//
+		withDescription("The query language used to query the ontology. At the moment only SPARQL is supported").//
+		withSingleSelection().//
+		withValues(Arrays.asList("SPARQL")).//
+		withSelectedValue("SPARQL").//
+		cannotBeDisabled().//
+		build();
+
+	addOption(queryLanguage);
+
+	Option<String> enabled = StringOptionBuilder.get().//
+		withKey(AVAILABILITY_OPTION_KEY).//
+		withLabel("Ontology availability").//
+		withDescription("If enabled the ontology can be queried").//
+		withSingleSelection().//
+		withValues(Arrays.asList("Enabled", "Disabled")).//
+		withSelectedValue("Enabled").//
+		cannotBeDisabled().//
+		build();
+
+	addOption(enabled);
+
+	//
+	//
+	//
+
 	setExtension(new OntologySettingComponentInfo());
     }
 
     /**
-     * @author Fabrizio
+     * @param endpoint
      */
-    public static class OntologySettingValidator implements Validator {
+    public void setOntolgyEnabled(boolean enabled) {
 
-	@Override
-	public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
+	getOption(AVAILABILITY_OPTION_KEY, String.class).get().setValue(enabled ? "Enabled" : "Disabled");
+    }
 
-	    OntologySetting ontSetting = (OntologySetting) SettingUtils.downCast(setting, setting.getSettingClass());
+    /**
+     * @return
+     */
+    public boolean isOntologyEnabled() {
 
-	    ValidationResponse validationResponse = new ValidationResponse();
+	return getOption(AVAILABILITY_OPTION_KEY, String.class).get().getValue().equals("Enabled");
+    }
 
-	    return validationResponse;
-	}
+    /**
+     * @param desc
+     */
+    public void setOntologyDescription(String desc) {
+
+	getOption(DESCRIPTION_OPTION_KEY, String.class).get().setValue(desc);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getOntologyDescription() {
+
+	return getOption(DESCRIPTION_OPTION_KEY, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param endpoint
+     */
+    public void setOntologyEndpoint(String endpoint) {
+
+	getOption(ENDPOINT_OPTION_KEY, String.class).get().setValue(endpoint);
+    }
+
+    /**
+     * @return
+     */
+    public String getOntologyEndpoint() {
+
+	return getOption(ENDPOINT_OPTION_KEY, String.class).get().getValue();
+    }
+
+    /**
+     * @param id
+     */
+    public void setOntologyId(String id) {
+
+	getOption(ID_OPTION_KEY, String.class).get().setValue(id);
+    }
+
+    /**
+     * @return
+     */
+    public String getOntologyId() {
+
+	return getOption(ID_OPTION_KEY, String.class).get().getValue();
+    }
+
+    /**
+     * 
+     */
+    public void setOntologyName(String name) {
+
+	getOption(NAME_OPTION_KEY, String.class).get().setValue(name);
+    }
+
+    /**
+     * @return
+     */
+    public String getOntologyName() {
+
+	return getOption(NAME_OPTION_KEY, String.class).get().getValue();
     }
 
     /**
@@ -76,7 +226,7 @@ public class OntologySetting extends Setting implements EditableSetting {
 	    setComponentName(AccessorSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(GSTabIndex.DISTRIBUTION.getIndex()).//
+		    withIndex(GSTabIndex.ONTOLOGIES.getIndex()).//
 		    withShowDirective("Ontologies", SortDirection.ASCENDING).//
 		    withAddDirective("Add ontology", OntologySetting.class).//
 		    withRemoveDirective("Remove ontology", true, OntologySetting.class).//
