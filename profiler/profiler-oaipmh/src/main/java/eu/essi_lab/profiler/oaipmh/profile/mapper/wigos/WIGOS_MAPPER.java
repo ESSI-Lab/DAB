@@ -73,6 +73,7 @@ import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.rsm.MappingSchema;
+import eu.essi_lab.profiler.oaipmh.profile.mapper.wigos.WMORegionMapper.WMORegion;
 import eu.essi_lab.wigos._1_0.gmd.MDMetadataType;
 import eu.essi_lab.wigos._1_0.main.ObjectFactory;
 
@@ -479,7 +480,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    if (countryCode.isPresent()) {
 		isoC = countryCode.get();
 		cCode = isoC;
-		record.setTerritoryOfOrigin(countryCode.get(), beginPosition, endPosition);
+		record.setTerritoryOfOrigin(cCode, beginPosition, endPosition);
 	    } else {
 		// TODO: IMPLEMENT: UNDERSTAND THE COUNTRY NAME
 		GSLoggerFactory.getLogger(getClass()).error("NO VALID COUNTRY NAME!!!");
@@ -507,12 +508,26 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	     * one of the following: africa, antarctica, asia, europe, inapplicable, northCentralAmericaCaribbean,
 	     * southAmerica, southWestPacific, unknown
 	     */
-	    boolean isAfrica = cCode.toLowerCase().contains("zaf");
-	    if (isAfrica) {
-		record.setRegionOfOrigin("africa");
-	    } else {
-		record.setRegionOfOrigin("southAmerica");
+	    WMORegion region = WMORegionMapper.getRegion(cCode);
+	    Country country = Country.decode(cCode);
+	    String isoCode = null;
+	    if (country != null) {
+		isoCode = country.getNumericCode();
 	    }
+	    int regionCode = 0;
+
+	    if (region != null) {
+		record.setRegionOfOrigin(region.getDescription());
+		regionCode = region.getCode();
+	    } else {
+		record.setRegionOfOrigin("unknown");
+	    }
+	    // boolean isAfrica = cCode.toLowerCase().contains("zaf");
+	    // if (isAfrica) {
+	    // record.setRegionOfOrigin("africa");
+	    // } else {
+	    // record.setRegionOfOrigin("southAmerica");
+	    // }
 
 	    // record.setSurfaceCover(null, "not applicable");
 	    // record.setTopographyOrBathymetry(null, null, "not applicable", "not applicable", "not applicable", "not
@@ -539,38 +554,54 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
 	    String description = iso.getDataIdentification().getAbstract();
 
-	    /*
-	     * SET setStationOrPlatformDescription - site information
-	     */
-	    String toSplit = "with data from station";
-	    if (description.contains(toSplit)) {
-		String splittedString = description.split(toSplit)[1];
-		description = "Station" + splittedString;
 
-	    }
-	    record.setStationOrPlatformDescription(description, beginPosition, endPosition);
 
 	    String providerId = resource.getSource().getUniqueIdentifier();
 	    String fileIdentifier = iso.getFileIdentifier();
 	    MIPlatform platform = iso.getMIPlatform();
+	    String siteName = null;
 	    if (platform != null) {
-		String siteName = platform.getCitation().getTitle();
+		siteName = platform.getCitation().getTitle();
 		record.setStationOrPlatformName(siteName);
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).warn("Problem mapping site");
 	    }
+	    
+	    
+	    List<String> orgDesc = extensionHandler.getOriginatorOrganisationDescriptions();
+	    List<String> orgId = extensionHandler.getOriginatorOrganisationIdentifiers();
+	    
+	    /*
+	     * SET setStationOrPlatformDescription - site information
+	     */
+	    String toSplit = "with data from station";
+	    if (description != null && description.contains(toSplit)) {
+		String splittedString = description.split(toSplit)[1];
+		description = "Station" + splittedString;
+	    } else if(siteName != null) {
+		description = orgDesc.isEmpty() ? "Station " + siteName + " located in " + country.getOfficialName() : "Station " + siteName + " located in " + country.getOfficialName() + " - " + orgDesc.get(0);
+	    }
+	    record.setStationOrPlatformDescription(description, beginPosition, endPosition);
 
 	    String codeId = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform().getMDIdentifierCode();
-	    String initialId = "0-21016-";
-	    if (isAfrica) {
-		String[] splittedString = codeId.split("/");
-		String stationId = splittedString[splittedString.length - 1];
-		initialId += "17100-" + stationId;
-	    } else {
-		String[] splittedString = codeId.split(":");
-		String stationId = splittedString[splittedString.length - 1];
-		initialId += "30320-" + stationId;
+
+	    String[] splittedString = codeId.split("/");
+	    String stationId = "";
+	    if (splittedString.length == 1) {
+		splittedString = codeId.split(":");
 	    }
+	    stationId = splittedString[splittedString.length - 1];
+	    String initialId = "0-21016-";
+	    initialId += regionCode + isoCode + "0-" + stationId;
+	    // if (isAfrica) {
+	    // String[] splittedString = codeId.split("/");
+	    // String stationId = splittedString[splittedString.length - 1];
+	    // initialId += "17100-" + stationId;
+	    // } else {
+	    // String[] splittedString = codeId.split(":");
+	    // String stationId = splittedString[splittedString.length - 1];
+	    // initialId += "30320-" + stationId;
+	    // }
 
 	    record.setStationOrPlatformIdentifier(initialId);
 
@@ -739,8 +770,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 			beginPosition, endPosition);
 	    } else {
 		// other methods for responsible party
-		List<String> orgDesc = extensionHandler.getOriginatorOrganisationDescriptions();
-		List<String> orgId = extensionHandler.getOriginatorOrganisationIdentifiers();
+		
 		if (!orgDesc.isEmpty())
 		    record.setFacilityContact(null, orgDesc.get(0), null, null, null, null, null, isoC, null, beginPosition, endPosition);
 	    }
@@ -760,11 +790,11 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		} else {
 		    // TODO: decode the unit of measure
 		    // extensionHandler.getAttributeUnits()
-		    if (isAfrica) {
-			record.setMeasurementUnit("m³/s");
-		    } else {
-			record.setMeasurementUnit("mm");
-		    }
+		    // if (isAfrica) {
+		    // record.setMeasurementUnit("m³/s");
+		    // } else {
+		    // record.setMeasurementUnit("mm");
+		    // }
 		    // record.setMeasurementUnit("mm");
 		    GSLoggerFactory.getLogger(getClass()).error("NO VALID UNITS OF MEASURE CODE!!!");
 		}
@@ -807,26 +837,23 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		    // record.setObservedVariable(name,
 		    // code);//http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171
 		    // record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213");
-		    if (isAfrica) {
-			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
-		    } else {
-			if (name.toLowerCase().contains("precipitation")) {
-			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/210");
-			} else if (name.toLowerCase().contains("height")) {
-			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/172");
-			} else if (name.toLowerCase().contains("discharge")) {
-			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
-			} else if (name.toLowerCase().contains("temperature")) {
-			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
-			}else if (name.toLowerCase().contains("temperature")) {
-			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
-			}else if (name.toLowerCase().contains("humidity")) {
-			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12249");
-			}else if (name.toLowerCase().contains("pressure")) {
-			    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/216");
-			}
 
+		    if (name.toLowerCase().contains("precipitation")) {
+			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/210");
+		    } else if (name.toLowerCase().contains("height")) {
+			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/172");
+		    } else if (name.toLowerCase().contains("discharge")) {
+			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
+		    } else if (name.toLowerCase().contains("temperature")) {
+			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
+		    } else if (name.toLowerCase().contains("temperature")) {
+			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
+		    } else if (name.toLowerCase().contains("humidity")) {
+			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12249");
+		    } else if (name.toLowerCase().contains("pressure")) {
+			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/216");
 		    }
+
 		    GSLoggerFactory.getLogger(getClass()).error("NO VALID OBSERVED PROPERTIES CODE!!!");
 
 		}
