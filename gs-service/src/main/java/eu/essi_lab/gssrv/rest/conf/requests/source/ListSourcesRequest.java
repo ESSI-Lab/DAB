@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf.requests;
+package eu.essi_lab.gssrv.rest.conf.requests.source;
 
 /*-
  * #%L
@@ -36,20 +36,18 @@ import eu.essi_lab.model.Queryable.ContentType;
 /**
  * @author Fabrizio
  */
-public class RemoveSourceRequest extends PutSourceRequest {
-
-    public static final String REMOVE_DATA = "removeData";
+public class ListSourcesRequest extends PutSourceRequest {
 
     /**
      * 
      */
-    public RemoveSourceRequest() {
+    public ListSourcesRequest() {
     }
 
     /**
      * @param object
      */
-    public RemoveSourceRequest(JSONObject object) {
+    public ListSourcesRequest(JSONObject object) {
 
 	super(object);
     }
@@ -59,8 +57,10 @@ public class RemoveSourceRequest extends PutSourceRequest {
 
 	ArrayList<Parameter> list = new ArrayList<>();
 
-	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
-	list.add(Parameter.of(REMOVE_DATA, ContentType.BOOLEAN, false));
+	Parameter parameter = Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false);
+	parameter.setMultiValue();
+
+	list.add(parameter);
 
 	return list;
     }

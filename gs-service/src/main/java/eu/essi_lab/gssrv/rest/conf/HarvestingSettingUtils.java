@@ -35,10 +35,10 @@ import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.gssrv.conf.task.ResourcesComparatorTask;
-import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest;
-import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest.RepeatIntervalUnit;
-import eu.essi_lab.gssrv.rest.conf.requests.PutSourceRequest;
-import eu.essi_lab.gssrv.rest.conf.requests.PutSourceRequest.SourceType;
+import eu.essi_lab.gssrv.rest.conf.requests.source.HarvestSchedulingRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.source.PutSourceRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.source.HarvestSchedulingRequest.RepeatIntervalUnit;
+import eu.essi_lab.gssrv.rest.conf.requests.source.PutSourceRequest.SourceType;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**

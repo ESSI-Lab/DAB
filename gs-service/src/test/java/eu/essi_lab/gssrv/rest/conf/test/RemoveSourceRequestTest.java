@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.gssrv.rest.conf.Parameter;
-import eu.essi_lab.gssrv.rest.conf.requests.RemoveSourceRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.source.RemoveSourceRequest;
 import eu.essi_lab.model.Queryable.ContentType;
 
 /**

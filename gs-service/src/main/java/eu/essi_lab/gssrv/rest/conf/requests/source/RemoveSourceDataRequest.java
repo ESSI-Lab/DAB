@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf.requests;
+package eu.essi_lab.gssrv.rest.conf.requests.source;
 
 /*-
  * #%L
