@@ -64,7 +64,7 @@ public class SKOSFederatedSearch {
 
 		// 2. Recursively expand each concept
 		for (String concept : initialConcepts) {
-			expandConcept(concept, conn, searchLangs, expansionRelations, expansionLevel, visited, results, 1);
+			expandConcept(concept, conn, searchLangs, expansionRelations, expansionLevel, visited, results, 0);
 		}
 
 		conn.close();
@@ -132,6 +132,13 @@ public class SKOSFederatedSearch {
 
 		// Fetch labels in desired languages
 		String labelsFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
+		String expansionBlock = currentLevel < expansionLevel
+				? buildExpansionOptionalBlock("concept", expansionRelations)
+				: "";
+		String closeMatchBlock = currentLevel < expansionLevel
+				? "OPTIONAL { ?concept skos:closeMatch ?closeMatch }"
+				: "";
+
 		String queryStr = String.format("""
 				PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 				SELECT DISTINCT ?pref ?alt ?closeMatch ?expanded WHERE {
@@ -140,11 +147,10 @@ public class SKOSFederatedSearch {
 				    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s)) }
 				    OPTIONAL { ?concept skos:altLabel ?alt FILTER(LANG(?alt) IN (%s)) }
 
-				    OPTIONAL { ?concept skos:closeMatch ?closeMatch }
-
-				    OPTIONAL { %s }
+				    %s
+				    %s
 				}
-				""", concept, labelsFilter, labelsFilter, buildExpansionOptionalBlock("concept", expansionRelations));
+				""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock);
 
 		System.out.println(queryStr);
 		TupleQuery query = conn.prepareTupleQuery(queryStr);
