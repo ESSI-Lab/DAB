@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf.requests;
+package eu.essi_lab.gssrv.rest.conf.requests.ontology;
 
 /*-
  * #%L
@@ -36,20 +36,18 @@ import eu.essi_lab.model.Queryable.ContentType;
 /**
  * @author Fabrizio
  */
-public class RemoveSourceRequest extends PutSourceRequest {
-
-    public static final String REMOVE_DATA = "removeData";
+public class ListOntologiesRequest extends PutOntologyRequest {
 
     /**
      * 
      */
-    public RemoveSourceRequest() {
+    public ListOntologiesRequest() {
     }
 
     /**
      * @param object
      */
-    public RemoveSourceRequest(JSONObject object) {
+    public ListOntologiesRequest(JSONObject object) {
 
 	super(object);
     }
@@ -59,8 +57,10 @@ public class RemoveSourceRequest extends PutSourceRequest {
 
 	ArrayList<Parameter> list = new ArrayList<>();
 
-	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
-	list.add(Parameter.of(REMOVE_DATA, ContentType.BOOLEAN, false));
+	Parameter parameter = Parameter.of(ONTOLOGY_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE, true);
+	parameter.setMultiValue();
+
+	list.add(parameter);
 
 	return list;
     }

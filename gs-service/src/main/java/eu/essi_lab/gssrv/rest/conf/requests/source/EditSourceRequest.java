@@ -1,7 +1,9 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf.requests;
+package eu.essi_lab.gssrv.rest.conf.requests.source;
+
+import java.util.ArrayList;
 
 /*-
  * #%L
@@ -24,7 +26,6 @@ package eu.essi_lab.gssrv.rest.conf.requests;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -36,18 +37,18 @@ import eu.essi_lab.model.Queryable.ContentType;
 /**
  * @author Fabrizio
  */
-public class RemoveSourceDataRequest extends PutSourceRequest {
+public class EditSourceRequest extends PutSourceRequest {
 
     /**
      * 
      */
-    public RemoveSourceDataRequest() {
+    public EditSourceRequest() {
     }
 
     /**
      * @param object
      */
-    public RemoveSourceDataRequest(JSONObject object) {
+    public EditSourceRequest(JSONObject object) {
 
 	super(object);
     }
@@ -58,7 +59,25 @@ public class RemoveSourceDataRequest extends PutSourceRequest {
 	ArrayList<Parameter> list = new ArrayList<>();
 
 	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
+	list.add(Parameter.of(SOURCE_LABEL, ContentType.TEXTUAL, false));
+	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, false));
+	list.add(Parameter.of(SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, false));
 
 	return list;
+    }
+
+    /**
+     * 
+     */
+    @Override
+    protected void mandatoryCheck() {
+
+	super.mandatoryCheck();
+
+	if (readParameters().size() == 1) {
+
+	    throw new IllegalArgumentException("At least one of the parameters '" + SOURCE_LABEL + "', '" + SOURCE_ENDPOINT + "', '"
+		    + SERVICE_TYPE + "' must be provided'");
+	}
     }
 }

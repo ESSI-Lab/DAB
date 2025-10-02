@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf.requests;
+package eu.essi_lab.gssrv.rest.conf.requests.ontology;
 
 /*-
  * #%L
@@ -24,41 +24,24 @@ package eu.essi_lab.gssrv.rest.conf.requests;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.json.JSONObject;
-
-import eu.essi_lab.cfga.option.InputPattern;
-import eu.essi_lab.gssrv.rest.conf.Parameter;
-import eu.essi_lab.model.Queryable.ContentType;
 
 /**
  * @author Fabrizio
  */
-public class HarvestUnschedulingRequest extends PutSourceRequest {
+public class EditOntologyRequest extends PutOntologyRequest {
 
     /**
      * 
      */
-    public HarvestUnschedulingRequest() {
+    public EditOntologyRequest() {
     }
 
     /**
      * @param object
      */
-    public HarvestUnschedulingRequest(JSONObject object) {
+    public EditOntologyRequest(JSONObject object) {
 
 	super(object);
-    }
-
-    @Override
-    public List<Parameter> getSupportedParameters() {
-
-	ArrayList<Parameter> list = new ArrayList<>();
-
-	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
-
-	return list;
     }
 }

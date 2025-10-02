@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf.requests;
+package eu.essi_lab.gssrv.rest.conf.requests.source;
 
 /*-
  * #%L
@@ -36,18 +36,18 @@ import eu.essi_lab.model.Queryable.ContentType;
 /**
  * @author Fabrizio
  */
-public class ListSourcesRequest extends PutSourceRequest {
+public class HarvestUnschedulingRequest extends PutSourceRequest {
 
     /**
      * 
      */
-    public ListSourcesRequest() {
+    public HarvestUnschedulingRequest() {
     }
 
     /**
      * @param object
      */
-    public ListSourcesRequest(JSONObject object) {
+    public HarvestUnschedulingRequest(JSONObject object) {
 
 	super(object);
     }
@@ -57,10 +57,7 @@ public class ListSourcesRequest extends PutSourceRequest {
 
 	ArrayList<Parameter> list = new ArrayList<>();
 
-	Parameter parameter = Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false);
-	parameter.setMultiValue();
-
-	list.add(parameter);
+	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
 
 	return list;
     }

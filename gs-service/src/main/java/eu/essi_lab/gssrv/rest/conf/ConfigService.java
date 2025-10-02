@@ -34,6 +34,7 @@ import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.OntologySetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
@@ -41,16 +42,21 @@ import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
+import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
-import eu.essi_lab.gssrv.rest.conf.requests.EditSourceRequest;
-import eu.essi_lab.gssrv.rest.conf.requests.HarvestSchedulingRequest;
-import eu.essi_lab.gssrv.rest.conf.requests.HarvestUnschedulingRequest;
-import eu.essi_lab.gssrv.rest.conf.requests.ListSourcesRequest;
-import eu.essi_lab.gssrv.rest.conf.requests.PutSourceRequest;
-import eu.essi_lab.gssrv.rest.conf.requests.RemoveSourceDataRequest;
-import eu.essi_lab.gssrv.rest.conf.requests.RemoveSourceRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.ontology.EditOntologyRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.ontology.ListOntologiesRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.ontology.PutOntologyRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.ontology.RemoveOntologyRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.source.EditSourceRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.source.HarvestSchedulingRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.source.HarvestUnschedulingRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.source.ListSourcesRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.source.PutSourceRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.source.RemoveSourceDataRequest;
+import eu.essi_lab.gssrv.rest.conf.requests.source.RemoveSourceRequest;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -209,9 +215,238 @@ public class ConfigService {
 	    response = handleListSourcesRequest(request);
 	}
 
+	//
+	//
+	//
+
+	if (requestName.equals(ConfigRequest.computeName(PutOntologyRequest.class))) {
+
+	    PutOntologyRequest request = new PutOntologyRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.isPresent() ? validate.get() : handlePutOntologyRequest(request);
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(EditOntologyRequest.class))) {
+
+	    EditOntologyRequest request = new EditOntologyRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.isPresent() ? validate.get() : handleEditOntologyRequest(request);
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(RemoveOntologyRequest.class))) {
+
+	    RemoveOntologyRequest request = new RemoveOntologyRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.isPresent() ? validate.get() : handleRemoveOntologyRequest(request);
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(ListOntologiesRequest.class))) {
+
+	    ListOntologiesRequest request = new ListOntologiesRequest(requestObject);
+
+	    response = handleListOntologiesRequest(request);
+	}
+
 	GSLoggerFactory.getLogger(getClass()).info("Serving '{}' request ENDED", requestName);
 
 	return response != null ? response : buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Unknown request '" + requestName + "'");
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleListOntologiesRequest(ListOntologiesRequest request) {
+
+	//
+	// reading optional ontology ids
+	//
+
+	final List<String> ontologiesIds = new ArrayList<String>();
+
+	Optional<Object> optional = request.read(ListOntologiesRequest.ONTOLOGY_ID);
+
+	if (optional.isPresent()) {
+
+	    ontologiesIds.addAll(Arrays.asList(optional.get().toString().split(",")).//
+		    stream().//
+		    map(v -> v.trim().strip()).//
+		    collect(Collectors.toList()));
+
+	    List<String> ids = ConfigurationWrapper.getOntologySettings().//
+		    stream().//
+		    map(s -> s.getOntologyId()).//
+		    collect(Collectors.toList());
+
+	    String missingOntologies = ontologiesIds.stream().filter(id -> !ids.contains(id)).collect(Collectors.joining(","));
+
+	    if (missingOntologies != null && !missingOntologies.isEmpty()) {
+
+		String message = missingOntologies.contains(",") ? "Ontology with id '" + missingOntologies + "' not found"
+			: "Ontology with id '" + missingOntologies + "' not found";
+
+		return buildErrorResponse(Status.NOT_FOUND, message);
+	    }
+	}
+
+	//
+	//
+	//
+
+	JSONArray out = new JSONArray();
+
+	List<OntologySetting> settings = ConfigurationWrapper.getOntologySettings();
+
+	settings.forEach(setting -> {
+
+	    if (ontologiesIds.isEmpty() || ontologiesIds.contains(setting.getOntologyId())) {
+
+		JSONObject sourceObject = new JSONObject();
+		out.put(sourceObject);
+
+		sourceObject.put(PutOntologyRequest.ONTOLOGY_AVAILABILITY, setting.getOntologyId());
+		sourceObject.put(PutOntologyRequest.ONTOLOGY_ENDPOINT, setting.getOntologyEndpoint());
+		sourceObject.put(PutOntologyRequest.ONTOLOGY_ID, setting.getOntologyId());
+		sourceObject.put(PutOntologyRequest.ONTOLOGY_NAME, setting.getOntologyName());
+		sourceObject.put(PutOntologyRequest.ONTOLOGY_QUERY_LANGUAGE, setting.getQueryLanguage());
+		sourceObject.put(PutOntologyRequest.ONTOLOGY_DATA_MODEL, setting.getDataModel());
+		setting.getOntologyDescription().ifPresent(desc -> sourceObject.put(PutOntologyRequest.ONTOLOGY_DESCRIPTION, desc));
+	    }
+	});
+
+	return Response.status(Status.OK).//
+		entity(out.toString(3)).//
+		type(MediaType.APPLICATION_JSON.toString()).//
+		build();
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleRemoveOntologyRequest(RemoveOntologyRequest request) {
+
+	//
+	// finding setting id from the given ontology id
+	//
+
+	SettingFinder<OntologySetting> finder = OntologySettingUtils.getOntologySettingFinder(request);
+
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
+	}
+
+	String settingId = finder.getSetting().get().getIdentifier();
+
+	//
+	// removing setting and flushing configuration
+	//
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	boolean removed = configuration.remove(settingId);
+
+	if (!removed) {
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to remove ontology");
+
+	} else {
+
+	    Optional<Response> errorResponse = flush(configuration);
+
+	    if (errorResponse.isPresent()) {
+
+		return errorResponse.get();
+	    }
+	}
+
+	//
+	//
+	//
+
+	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleEditOntologyRequest(EditOntologyRequest request) {
+
+	//
+	// finding setting id from the given ontology id
+	//
+
+	SettingFinder<OntologySetting> finder = OntologySettingUtils.getOntologySettingFinder(request);
+
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
+	}
+
+	//
+	// building ontology setting
+	//
+
+	String settingId = finder.getSetting().get().getIdentifier();
+
+	OntologySetting setting = OntologySettingUtils.build(request);
+	setting.setIdentifier(settingId);
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	//
+	// replacing and flushing
+	//
+
+	boolean replaced = configuration.replace(setting);
+
+	if (!replaced) {
+
+	    return buildErrorResponse(Status.BAD_REQUEST, "No changes to apply");
+	}
+
+	//
+	// flushing configuration
+	//
+
+	return flush(configuration).orElse(Response.status(Status.OK).build());
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handlePutOntologyRequest(PutOntologyRequest request) {
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	OntologySetting setting = OntologySettingUtils.build(request);
+
+	boolean put = configuration.put(setting);
+
+	if (!put) {
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to put new source");
+
+	} else {
+
+	    Optional<Response> errorResponse = flush(configuration);
+
+	    if (errorResponse.isPresent()) {
+
+		return errorResponse.get();
+	    }
+	}
+
+	return Response.status(Status.CREATED).build();
     }
 
     /**
@@ -330,7 +565,7 @@ public class ConfigService {
 	// finding setting id from the given source id
 	//
 
-	SettingFinder finder = getFinder(editSourceRequest);
+	SettingFinder<HarvestingSetting> finder = HarvestingSettingUtils.getHarvestingSettingFinder(editSourceRequest);
 
 	if (finder.getErrorResponse().isPresent()) {
 
@@ -376,7 +611,7 @@ public class ConfigService {
 	// finding setting id from the given source id
 	//
 
-	SettingFinder finder = getFinder(harvestSourceRequest);
+	SettingFinder<HarvestingSetting> finder = HarvestingSettingUtils.getHarvestingSettingFinder(harvestSourceRequest);
 
 	if (finder.getErrorResponse().isPresent()) {
 
@@ -497,7 +732,7 @@ public class ConfigService {
 	// finding setting id from the given source id
 	//
 
-	SettingFinder finder = getFinder(harvestUnschedulingRequest);
+	SettingFinder<HarvestingSetting> finder = HarvestingSettingUtils.getHarvestingSettingFinder(harvestUnschedulingRequest);
 
 	if (finder.getErrorResponse().isPresent()) {
 
@@ -568,7 +803,7 @@ public class ConfigService {
 	// finding setting id from the given source id
 	//
 
-	SettingFinder finder = getFinder(removeSourceRequest);
+	SettingFinder<HarvestingSetting> finder = HarvestingSettingUtils.getHarvestingSettingFinder(removeSourceRequest);
 
 	if (finder.getErrorResponse().isPresent()) {
 
@@ -666,7 +901,7 @@ public class ConfigService {
 	// finding setting id from the given source id
 	//
 
-	SettingFinder finder = getFinder(request);
+	SettingFinder<HarvestingSetting> finder = HarvestingSettingUtils.getHarvestingSettingFinder(request);
 
 	if (finder.getErrorResponse().isPresent()) {
 
@@ -722,8 +957,6 @@ public class ConfigService {
 	// reading optional source ids
 	//
 
-	JSONArray out = new JSONArray();
-
 	final List<String> sourceIds = new ArrayList<String>();
 
 	Optional<Object> optional = request.read(ListSourcesRequest.SOURCE_ID);
@@ -754,6 +987,8 @@ public class ConfigService {
 	//
 	//
 	//
+
+	JSONArray out = new JSONArray();
 
 	List<HarvestingSetting> settings = ConfigurationWrapper.getHarvestingSettings();
 
@@ -910,7 +1145,7 @@ public class ConfigService {
      * @param message
      * @return
      */
-    private Response buildErrorResponse(Status status, String message) {
+    static Response buildErrorResponse(Status status, String message) {
 
 	JSONObject object = new JSONObject();
 	JSONObject error = new JSONObject();
@@ -919,7 +1154,7 @@ public class ConfigService {
 	error.put("reasonPrase", status.toString());
 	error.put("message", message);
 
-	GSLoggerFactory.getLogger(getClass()).error(message);
+	GSLoggerFactory.getLogger(ConfigService.class).error(message);
 
 	return Response.status(status).//
 		entity(object.toString(3)).//
@@ -950,15 +1185,15 @@ public class ConfigService {
     /**
      * @author Fabrizio
      */
-    private class SettingFinder {
+    static class SettingFinder<S extends Setting> {
 
-	private HarvestingSetting setting;
+	private S setting;
 	private Response errorResponse;
 
 	/**
 	 * @param setting
 	 */
-	private SettingFinder(HarvestingSetting setting) {
+	SettingFinder(S setting) {
 
 	    this.setting = setting;
 	}
@@ -966,7 +1201,7 @@ public class ConfigService {
 	/**
 	 * @param response
 	 */
-	private SettingFinder(Response response) {
+	SettingFinder(Response response) {
 
 	    errorResponse = response;
 	}
@@ -974,7 +1209,7 @@ public class ConfigService {
 	/**
 	 * @return
 	 */
-	public Optional<HarvestingSetting> getSetting() {
+	public Optional<S> getSetting() {
 
 	    return Optional.ofNullable(setting);
 	}
@@ -986,42 +1221,5 @@ public class ConfigService {
 
 	    return Optional.ofNullable(errorResponse);
 	}
-    }
-
-    /**
-     * @param request
-     * @return
-     */
-    private SettingFinder getFinder(ConfigRequest request) {
-
-	Optional<String> optSourceId = request.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
-
-	HarvestingSetting setting = null;
-
-	if (!optSourceId.isPresent()) {
-
-	    return new SettingFinder(buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing source identifier"));
-
-	} else {
-
-	    String sourceId = optSourceId.get();
-
-	    if (!ConfigurationWrapper.getAllSources().//
-		    stream().//
-		    filter(s -> s.getUniqueIdentifier().equals(sourceId)).//
-		    findFirst().//
-		    isPresent()) {
-
-		return new SettingFinder(buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' not found"));
-	    }
-
-	    setting = ConfigurationWrapper.getHarvestingSettings().//
-		    stream().//
-		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).//
-		    findFirst().//
-		    get();
-	}
-
-	return new SettingFinder(setting);
     }
 }
