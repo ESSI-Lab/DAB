@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.cfga.resetandselect.test;
+package eu.essi_lab.cfga.properties.check.test;
 
 import java.util.ArrayList;
 import java.util.List;
