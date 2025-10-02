@@ -10,6 +10,7 @@ eu.essi_lab.authorization.rps.EIFFELRolePolicySet
 eu.essi_lab.authorization.rps.LODGEOSSRolePolicySet
 eu.essi_lab.authorization.rps.SSCRolePolicySet
 eu.essi_lab.authorization.rps.HISCentralRolePolicySet
+eu.essi_lab.authorization.rps.HISCentralTestRolePolicySet
 eu.essi_lab.authorization.rps.IChangeRolePolicySet
 eu.essi_lab.authorization.rps.GEOSSReadRolePolicySet
 eu.essi_lab.authorization.rps.GEOSSPrivateWriteRolePolicySet

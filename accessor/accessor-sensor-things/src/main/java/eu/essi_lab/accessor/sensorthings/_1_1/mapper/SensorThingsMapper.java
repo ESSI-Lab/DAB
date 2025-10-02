@@ -797,11 +797,11 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	    boundingBox.setId(locationName.get());
 	}
 
-	boundingBox.setNorth(coordinates.getDouble(1));
-	boundingBox.setSouth(coordinates.getDouble(1));
+	boundingBox.setBigDecimalNorth(coordinates.getBigDecimal(1));
+	boundingBox.setBigDecimalSouth(coordinates.getBigDecimal(1));
 
-	boundingBox.setWest(coordinates.getDouble(0));
-	boundingBox.setEast(coordinates.getDouble(0));
+	boundingBox.setBigDecimalWest(coordinates.getBigDecimal(0));
+	boundingBox.setBigDecimalEast(coordinates.getBigDecimal(0));
 
 	return boundingBox;
     }

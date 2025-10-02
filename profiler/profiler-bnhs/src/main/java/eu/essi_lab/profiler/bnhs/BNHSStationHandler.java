@@ -245,7 +245,6 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    Optional<View> optionalView = WebRequestTransformer.findView(storageUri, viewId);
 
 	    if (optionalView.isPresent()) {
-
 		// discoveryMessage.setView(optionalView.get());
 	    }
 
@@ -495,6 +494,15 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    InputStream stream = null;
 
+	    StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
+
+	    Optional<View> optionalView = WebRequestTransformer.findView(storageUri, viewId);
+
+	    String creator = null;
+	    if (optionalView.isPresent()) {
+		creator = optionalView.get().getCreator();
+	    }
+
 	    switch (viewId) {
 	    case "whos-arctic":
 		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("bnhs/station.html");
@@ -506,9 +514,19 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("hisc/station.html");
 		break;
 	    default:
-//		if (viewId.contains("whos")) {
+		if (creator != null) {
+		    switch (creator) {
+		    case "his_central":
+		    case "his_central_test":
+			stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("hisc/station.html");
+			break;
+		    default:
+			stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("whos/station.html");
+			break;
+		    }
+		} else {
 		    stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("whos/station.html");
-//		}
+		}
 		break;
 	    }
 

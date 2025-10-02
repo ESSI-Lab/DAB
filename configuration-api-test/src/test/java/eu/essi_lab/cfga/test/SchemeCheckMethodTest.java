@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
@@ -27,6 +28,7 @@ import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
+import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
 import eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting;
 import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
@@ -74,7 +76,7 @@ public class SchemeCheckMethodTest {
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
 
-	list.add(create(true, DatabaseSetting.class, s -> s.getIdentifier().equals("TEST")));
+	list.add(create(true, () -> new DatabaseSetting(), s -> s.getIdentifier().equals("TEST")));
 
 	checkMethod.setItems(list);
 
@@ -108,9 +110,9 @@ public class SchemeCheckMethodTest {
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
 
-	list.add(create(true, DatabaseSetting.class, s -> s.getIdentifier().equals("TEST")));
-	list.add(create(true, SystemSetting.class, s -> s.getIdentifier().equals("TEST1")));
-	list.add(create(true, DownloadSetting.class, s -> s.getIdentifier().equals("TEST2")));
+	list.add(create(true, () -> new DatabaseSetting(), s -> s.getIdentifier().equals("TEST")));
+	list.add(create(true, () -> new SystemSetting(), s -> s.getIdentifier().equals("TEST1")));
+	list.add(create(true, () -> new DownloadSetting(), s -> s.getIdentifier().equals("TEST2")));
 
 	checkMethod.setItems(list);
 
@@ -151,10 +153,10 @@ public class SchemeCheckMethodTest {
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
 
-	list.add(create(true, DatabaseSetting.class, s -> s.getIdentifier().equals("TEST")));
-	list.add(create(false, DownloadSetting.class, s -> s.getIdentifier().equals("TEST1")));
-	list.add(create(false, SystemSetting.class, s -> s.getIdentifier().equals("TEST2")));
-	list.add(create(true, GDCSourcesSetting.class, s -> s.getIdentifier().equals("TEST3")));
+	list.add(create(true, () -> new DatabaseSetting(), s -> s.getIdentifier().equals("TEST")));
+	list.add(create(false, () -> new DownloadSetting(), s -> s.getIdentifier().equals("TEST1")));
+	list.add(create(false, () -> new SystemSetting(), s -> s.getIdentifier().equals("TEST2")));
+	list.add(create(true, () -> new GDCSourcesSetting(), s -> s.getIdentifier().equals("TEST3")));
 
 	checkMethod.setItems(list);
 
@@ -199,16 +201,17 @@ public class SchemeCheckMethodTest {
 	//
 	list.add(create(true, //
 
-		Descriptor.of(s -> s.getIdentifier().equals("TEST"), SourceStorageSetting.class),
+		Descriptor.of(s -> s.getIdentifier().equals("TEST"), () -> new SourceStorageSetting()),
 
-		Descriptor.of(s -> s.getIdentifier().equals("TEST1"), CredentialsSetting.class),
+		Descriptor.of(s -> s.getIdentifier().equals("TEST1"), () -> new CredentialsSetting()),
 
-		Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()), DatabaseSetting.class)));
+		Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()),
+			() -> new DatabaseSetting())));
 
-	list.add(create(false, DownloadSetting.class, s -> s.getIdentifier().equals("TEST1")));
-	list.add(create(false, SystemSetting.class, s -> s.getIdentifier().equals("TEST2")));
+	list.add(create(false, () -> new DownloadSetting(), s -> s.getIdentifier().equals("TEST1")));
+	list.add(create(false, () -> new SystemSetting(), s -> s.getIdentifier().equals("TEST2")));
 
-	list.add(create(true, GDCSourcesSetting.class, s -> s.getIdentifier().equals("TEST3")));
+	list.add(create(true, () -> new GDCSourcesSetting(), s -> s.getIdentifier().equals("TEST3")));
 
 	checkMethod.setItems(list);
 
@@ -254,26 +257,28 @@ public class SchemeCheckMethodTest {
 	//
 	list.add(create(true, //
 
-		Descriptor.of(s -> s.getIdentifier().equals("TEST"), SourceStorageSetting.class),
+		Descriptor.of(s -> s.getIdentifier().equals("TEST"), () -> new SourceStorageSetting()),
 
-		Descriptor.of(s -> s.getIdentifier().equals("TEST1"), CredentialsSetting.class),
+		Descriptor.of(s -> s.getIdentifier().equals("TEST1"), () -> new CredentialsSetting()),
 
-		Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()), DatabaseSetting.class)));
+		Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()),
+			() -> new DatabaseSetting())));
 
-	list.add(create(false, DownloadSetting.class, s -> s.getIdentifier().equals("TEST1")));
+	list.add(create(false, () -> new DownloadSetting(), s -> s.getIdentifier().equals("TEST1")));
 
-	list.add(create(false, SystemSetting.class, s -> s.getIdentifier().equals("TEST2")));
+	list.add(create(false, () -> new SystemSetting(), s -> s.getIdentifier().equals("TEST2")));
 
 	//
 	// a tab with multiple kind of settings
 	//
 	list.add(create(true, //
 
-		Descriptor.of(s -> s.getIdentifier().equals("TEST"), DownloadSetting.class),
+		Descriptor.of(s -> s.getIdentifier().equals("TEST"), () -> new DownloadSetting()),
 
-		Descriptor.of(s -> s.getIdentifier().equals("TEST1"), SystemSetting.class),
+		Descriptor.of(s -> s.getIdentifier().equals("TEST1"), () -> new SystemSetting()),
 
-		Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()), DatabaseSetting.class)));
+		Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()),
+			() -> new DatabaseSetting())));
 
 	checkMethod.setItems(list);
 
@@ -319,8 +324,8 @@ public class SchemeCheckMethodTest {
 	// a tab with multiple kind of settings
 	//
 	list.add(create(true, //
-		Descriptor.of(s -> s.getIdentifier().equals("TEST"), Setting.class),
-		Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()), DatabaseSetting.class)));
+		Descriptor.of(s -> s.getIdentifier().equals("TEST"), () -> new Setting()), Descriptor
+			.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()), () -> new DatabaseSetting())));
 
 	checkMethod.setItems(list);
 
@@ -358,8 +363,8 @@ public class SchemeCheckMethodTest {
 	// a tab with multiple kind of settings
 	//
 	list.add(create(true, //
-		Descriptor.of(s -> s.getIdentifier().equals("TEST1"), SystemSetting.class),
-		Descriptor.of(s -> s.getIdentifier().equals("TEST2"), DatabaseSetting.class)));
+		Descriptor.of(s -> s.getIdentifier().equals("TEST1"), () -> new SystemSetting()),
+		Descriptor.of(s -> s.getIdentifier().equals("TEST2"), () -> new DatabaseSetting())));
 
 	checkMethod.setItems(list);
 
@@ -478,7 +483,7 @@ public class SchemeCheckMethodTest {
 
 	List<TabIndex> list = GSTabIndex.getValues();
 
-	// removed system and database settings from the tab
+	// removed system, database setting and user database setting (which are in the same tab) from the tab
 	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.SYSTEM.getIndex()).collect(Collectors.toList());
 	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.DATABASE.getIndex()).collect(Collectors.toList());
 
@@ -488,6 +493,7 @@ public class SchemeCheckMethodTest {
 
 	Assert.assertEquals(CheckResult.CHECK_FAILED, checkReponse.getCheckResult());
 
+//	Assert.assertEquals(3, checkReponse.getSettings().size());
 	Assert.assertEquals(2, checkReponse.getSettings().size());
 
 	List<Setting> settings = checkReponse.getSettings().stream()
@@ -496,6 +502,7 @@ public class SchemeCheckMethodTest {
 
 	Assert.assertEquals(DatabaseSetting.class, settings.get(0).getSettingClass());
 	Assert.assertEquals(SystemSetting.class, settings.get(1).getSettingClass());
+//	Assert.assertEquals(UsersDatabaseSetting.class, settings.get(2).getSettingClass());
 
 	//
 	//
@@ -802,11 +809,12 @@ public class SchemeCheckMethodTest {
 	//
 	list.add(createTabIndex(true, 90, //
 
-		Descriptor.of(s -> s.getIdentifier().equals("TEST"), SourceStorageSetting.class),
+		Descriptor.of(s -> s.getIdentifier().equals("TEST"), () -> new SourceStorageSetting()),
 
-		Descriptor.of(s -> s.getIdentifier().equals("TEST1"), CredentialsSetting.class),
+		Descriptor.of(s -> s.getIdentifier().equals("TEST1"), () -> new CredentialsSetting()),
 
-		Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()), DatabaseSetting.class)));
+		Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()),
+			() -> new DatabaseSetting())));
 
 	//
 	// removing repository setting from the tab
@@ -910,12 +918,12 @@ public class SchemeCheckMethodTest {
      * @param singleton
      * @param required
      * @param function
-     * @param settingClass
+     * @param creator
      * @return
      */
     private static SchemeItem create(//
 	    boolean required, //
-	    Class<? extends Setting> settingClass, //
+	    Supplier<Setting> creator, //
 	    Function<Setting, Boolean> function) {
 
 	return new SchemeItem() {
@@ -929,7 +937,7 @@ public class SchemeCheckMethodTest {
 	    @Override
 	    public List<Descriptor> getDescriptors() {
 
-		return Arrays.asList(Descriptor.of(function, settingClass));
+		return Arrays.asList(Descriptor.of(function, creator));
 
 	    }
 	};
