@@ -640,11 +640,11 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	    boundingBox.setId(locationName.get());
 	}
 
-	boundingBox.setNorth(coordinates.getDouble(0));
-	boundingBox.setSouth(coordinates.getDouble(0));
+	boundingBox.setBigDecimalNorth(coordinates.getBigDecimal(0));
+	boundingBox.setBigDecimalSouth(coordinates.getBigDecimal(0));
 
-	boundingBox.setWest(coordinates.getDouble(1));
-	boundingBox.setEast(coordinates.getDouble(1));
+	boundingBox.setBigDecimalWest(coordinates.getBigDecimal(1));
+	boundingBox.setBigDecimalEast(coordinates.getBigDecimal(1));
 
 	return boundingBox;
     }

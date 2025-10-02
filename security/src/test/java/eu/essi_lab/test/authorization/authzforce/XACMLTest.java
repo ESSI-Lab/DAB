@@ -23,6 +23,7 @@ import eu.essi_lab.authorization.pps.GEOSSReadPermissionPolicySet;
 import eu.essi_lab.authorization.pps.GEOSSWritePermissionPolicySet;
 import eu.essi_lab.authorization.pps.GWPPermissionPolicySet;
 import eu.essi_lab.authorization.pps.HISCentralPermissionPolicySet;
+import eu.essi_lab.authorization.pps.HISCentralTestPermissionPolicySet;
 import eu.essi_lab.authorization.pps.KMAPermissionPolicySet;
 import eu.essi_lab.authorization.pps.LODGEOSSPermissionPolicySet;
 import eu.essi_lab.authorization.pps.SSCPermissionPolicySet;
@@ -38,6 +39,7 @@ import eu.essi_lab.authorization.rps.GEOSSReadRolePolicySet;
 import eu.essi_lab.authorization.rps.GEOSSWriteRolePolicySet;
 import eu.essi_lab.authorization.rps.GWPRolePolicySet;
 import eu.essi_lab.authorization.rps.HISCentralRolePolicySet;
+import eu.essi_lab.authorization.rps.HISCentralTestRolePolicySet;
 import eu.essi_lab.authorization.rps.KMARolePolicySet;
 import eu.essi_lab.authorization.rps.LODGEOSSRolePolicySet;
 import eu.essi_lab.authorization.rps.SSCRolePolicySet;
@@ -85,6 +87,7 @@ public class XACMLTest {
 			new CSW_RIRolePolicySet(), //
 			new EIFFELRolePolicySet(), //
 			new HISCentralRolePolicySet(), //
+			new HISCentralTestRolePolicySet(), //
 			new LODGEOSSRolePolicySet(), //
 			new WHOSRolePolicySet(), //
 			new SSCRolePolicySet(), //
@@ -106,6 +109,7 @@ public class XACMLTest {
 			new EIFFELPermissionPolicySet(), //
 			new GWPPermissionPolicySet(), //
 			new HISCentralPermissionPolicySet(), //
+			new HISCentralTestPermissionPolicySet(), //
 			new KMAPermissionPolicySet(), //
 			new LODGEOSSPermissionPolicySet(), //
 			new SeadatanetPermissionPolicySet(), //

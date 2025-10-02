@@ -10,6 +10,7 @@ eu.essi_lab.authorization.pps.EIFFELPermissionPolicySet
 eu.essi_lab.authorization.pps.LODGEOSSPermissionPolicySet
 eu.essi_lab.authorization.pps.SSCPermissionPolicySet
 eu.essi_lab.authorization.pps.HISCentralPermissionPolicySet
+eu.essi_lab.authorization.pps.HISCentralTestPermissionPolicySet
 eu.essi_lab.authorization.pps.IChangePermissionPolicySet
 eu.essi_lab.authorization.pps.GEOSSReadPermissionPolicySet
 eu.essi_lab.authorization.pps.GEOSSPrivateWritePermissionPolicySet

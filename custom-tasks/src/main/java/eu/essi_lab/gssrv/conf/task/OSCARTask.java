@@ -94,7 +94,7 @@ public class OSCARTask extends AbstractCustomTask {
 	String endpoint = null;
 	String sourceId = null;
 	String bbox = null;
-	boolean isArgentina = false;
+	boolean isGRDC = false;
 	if (taskOptions.isPresent()) {
 	    String options = taskOptions.get();
 	    if (options != null) {
@@ -135,7 +135,7 @@ public class OSCARTask extends AbstractCustomTask {
 	// }
 
 	WIGOS_MAPPER wigosMapper = new WIGOS_MAPPER();
-	isArgentina = sourceId.contains("argentina");
+	isGRDC = sourceId.contains("grdc");
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	discoveryMessage.setRequestId("oscar-task-" + sourceId + "-" + UUID.randomUUID());
 	discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
@@ -145,7 +145,7 @@ public class OSCARTask extends AbstractCustomTask {
 	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	// ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
 	Bond bond;
-	if (bbox != null && !isArgentina) {
+	if (bbox != null && isGRDC) {
 	    bond = BondFactory.createSourceIdentifierBond(sourceId);
 	    String[] splittedBox = bbox.split(",");
 	    SpatialExtent saExtent = new SpatialExtent(); // bbox=11.558,-38.098,39.868,-23.743
@@ -242,7 +242,7 @@ public class OSCARTask extends AbstractCustomTask {
 	    //
 	    // }
 
-//	    if (i > 1000) {
+//	    if (i > 100) {
 //		break main;
 //	    }
 	    
