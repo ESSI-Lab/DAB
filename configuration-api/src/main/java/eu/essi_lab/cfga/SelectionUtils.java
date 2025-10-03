@@ -41,6 +41,47 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 public class SelectionUtils {
 
     /**
+     * @param targetSetting
+     * @param newSetting a setting obtained as result of
+     *        <code>SettingUtils.create(targetSetting.getSettingClass())</code>
+     */
+    public static void deepSelect(Setting targetSetting, Setting newSetting) {
+
+	ArrayList<Setting> newSelectableSettings = new ArrayList<>();
+
+	SettingUtils.deepFind(newSetting, s -> s.getSelectionMode() != SelectionMode.UNSET && s.canBeCleaned(), newSelectableSettings);
+
+	//
+	//
+	//
+
+	for (Setting newSelSetting : newSelectableSettings) {
+
+	    ArrayList<Setting> configSelSetting = new ArrayList<>();
+
+	    SettingUtils.deepFind(targetSetting, s -> s.getIdentifier().equals(newSelSetting.getIdentifier()), configSelSetting);
+
+	    //
+	    //
+	    //
+
+	    List<Setting> newSubSettings = newSelSetting.getSettings();
+
+	    List<Setting> confSubSettings = configSelSetting.get(0).getSettings();
+
+	    newSubSettings.forEach(set -> {
+
+		set.setSelected(//
+			confSubSettings.//
+				stream().//
+				map(s -> s.getIdentifier()).//
+				anyMatch(id -> id.equals(set.getIdentifier())));
+
+	    });
+	}
+    }
+
+    /**
      * Recursively removes all unselected settings and options values of the given <code>configuration</code>
      * from those settings and options that have a {@link SelectionMode}
      * different from {@link SelectionMode#UNSET}

@@ -785,7 +785,9 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
 		Optional<String> labelUnits = extensionHandler.getAttributeUnits();
 		Optional<String> units = extensionHandler.getAttributeUnitsAbbreviation();
-		if (units.isPresent()) {
+		if(variableUnits.isPresent()){
+		    record.setMeasurementUnit(variableUnits.get());
+		} else if (units.isPresent()) {
 		    record.setMeasurementUnit(units.get());
 		} else {
 		    // TODO: decode the unit of measure

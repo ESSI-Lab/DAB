@@ -27,6 +27,7 @@ import eu.essi_lab.cfga.setting.Setting;
 /**
  * @author Fabrizio
  */
+@FunctionalInterface
 public interface Validator {
 
     /**

@@ -15,13 +15,13 @@ import eu.essi_lab.accessor.gbif.harvested.GBIFHarvestedConnector;
 import eu.essi_lab.accessor.oaipmh.OAIPMHConnector;
 import eu.essi_lab.accessor.wcs.WCSConnectorWrapper;
 import eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl;
-import eu.essi_lab.cfga.check.ConfigEditableSettingMethod;
+import eu.essi_lab.cfga.check.ConfigurationEditableMethod;
 import eu.essi_lab.cfga.check.ConfigurationChecker;
 import eu.essi_lab.cfga.check.ReferencedClassesMethod;
-import eu.essi_lab.cfga.check.RegisteredEditableSettingMethod;
+import eu.essi_lab.cfga.check.RegisteredEditableMethod;
+import eu.essi_lab.cfga.check.SimilarityMethod;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
-import eu.essi_lab.cfga.gs.SimilarityCheckMethod;
 import eu.essi_lab.cfga.gs.setting.CredentialsSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
@@ -67,11 +67,11 @@ public class DefaultConfigurationTest {
 
 	ConfigurationChecker checker = new ConfigurationChecker();
 
-	checker.addCheckMethod(new RegisteredEditableSettingMethod());
+	checker.addCheckMethod(new RegisteredEditableMethod());
 	checker.addCheckMethod(new ReferencedClassesMethod());
-	checker.addCheckMethod(new ConfigEditableSettingMethod());
+	checker.addCheckMethod(new ConfigurationEditableMethod());
 
-	checker.addCheckMethod(new SimilarityCheckMethod());
+	checker.addCheckMethod(new SimilarityMethod());
 
 	List<String> messages = checker.//
 		check(configuration).//

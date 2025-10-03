@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.cfga.check;
+package eu.essi_lab.cfga.check.scheme;
 
 /*-
  * #%L
@@ -30,16 +30,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.check.CheckMethod;
+import eu.essi_lab.cfga.check.CheckResponse;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.scheme.Scheme;
-import eu.essi_lab.cfga.scheme.SchemeItem;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio
  */
-public class SchemeCheckMethod implements CheckMethod {
+public class SchemeMethod implements CheckMethod {
 
     /**
      * @author Fabrizio
@@ -68,7 +68,7 @@ public class SchemeCheckMethod implements CheckMethod {
     /**
      * 
      */
-    public SchemeCheckMethod() {
+    public SchemeMethod() {
 
 	setCheckMode(CheckMode.MISSING_SETTINGS);
     }
