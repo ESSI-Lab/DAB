@@ -161,7 +161,11 @@
 						${project.basedir}/src/main/webapp/WEB-INF/jetty.xml,
 						${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml
 					</jettyXml>
-     
+	  				
+	  				<!-- Remove comment to disable set to false the property 'useFileMappedBuffer'
+     				<contextXml>${project.basedir}/src/main/webapp/WEB-INF/jetty-config.xml</contextXml>
+     				-->
+     				
 				</configuration>
 			</plugin>
 
