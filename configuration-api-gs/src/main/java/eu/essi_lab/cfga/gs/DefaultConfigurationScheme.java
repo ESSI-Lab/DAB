@@ -26,8 +26,8 @@ package eu.essi_lab.cfga.gs;
 
 import java.util.List;
 
-import eu.essi_lab.cfga.scheme.Scheme;
-import eu.essi_lab.cfga.scheme.SchemeItem;
+import eu.essi_lab.cfga.check.scheme.Scheme;
+import eu.essi_lab.cfga.check.scheme.SchemeItem;
 
 /**
  * @author Fabrizio

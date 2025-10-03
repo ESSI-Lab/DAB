@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.cfga.scheme;
+package eu.essi_lab.cfga.check.scheme;
 
 /*-
  * #%L

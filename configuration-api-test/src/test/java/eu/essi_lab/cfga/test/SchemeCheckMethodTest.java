@@ -16,8 +16,10 @@ import org.junit.Test;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.check.CheckResponse;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.check.SchemeCheckMethod;
-import eu.essi_lab.cfga.check.SchemeCheckMethod.CheckMode;
+import eu.essi_lab.cfga.check.scheme.SchemeItem;
+import eu.essi_lab.cfga.check.scheme.SchemeMethod;
+import eu.essi_lab.cfga.check.scheme.SchemeItem.Descriptor;
+import eu.essi_lab.cfga.check.scheme.SchemeMethod.CheckMode;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.GSTabIndex;
@@ -33,8 +35,6 @@ import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
 import eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting;
 import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
 import eu.essi_lab.cfga.gui.TabIndex;
-import eu.essi_lab.cfga.scheme.SchemeItem;
-import eu.essi_lab.cfga.scheme.SchemeItem.Descriptor;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.harvester.worker.HarvestingSettingImpl;
 
@@ -51,7 +51,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
 
 	checkMethod.setScheme(configuration.getScheme().get());
@@ -71,7 +71,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
@@ -105,7 +105,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
@@ -148,7 +148,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
@@ -191,7 +191,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
@@ -247,7 +247,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
@@ -315,7 +315,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
@@ -354,7 +354,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
@@ -399,7 +399,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<SchemeItem> list = configuration.getScheme().get().getItems();
@@ -421,7 +421,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<SchemeItem> list = new ArrayList<>();
@@ -443,7 +443,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<TabIndex> list = GSTabIndex.getValues();
@@ -478,7 +478,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<TabIndex> list = GSTabIndex.getValues();
@@ -522,7 +522,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<TabIndex> list = GSTabIndex.getValues();
@@ -555,7 +555,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<TabIndex> list = GSTabIndex.getValues();
@@ -598,7 +598,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<TabIndex> list = GSTabIndex.getValues();
@@ -652,7 +652,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<TabIndex> list = GSTabIndex.getValues();
@@ -695,7 +695,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<TabIndex> list = GSTabIndex.getValues();
@@ -749,7 +749,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<TabIndex> list = GSTabIndex.getValues();
@@ -799,7 +799,7 @@ public class SchemeCheckMethodTest {
 	DefaultConfiguration configuration = new DefaultConfiguration();
 	SelectionUtils.deepClean(configuration);
 
-	SchemeCheckMethod checkMethod = new SchemeCheckMethod();
+	SchemeMethod checkMethod = new SchemeMethod();
 	checkMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
 	List<TabIndex> list = GSTabIndex.getValues();

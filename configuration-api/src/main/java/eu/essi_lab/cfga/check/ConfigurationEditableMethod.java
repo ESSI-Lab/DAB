@@ -37,7 +37,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  * 
  * @author Fabrizio
  */
-public class ConfigEditableSettingMethod implements CheckMethod {
+public class ConfigurationEditableMethod implements CheckMethod {
 
     @Override
     public CheckResponse check(Configuration configuration) {

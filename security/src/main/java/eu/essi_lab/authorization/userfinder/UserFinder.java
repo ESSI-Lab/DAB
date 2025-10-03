@@ -557,7 +557,7 @@ public class UserFinder {
 	if (view.isPresent()) {
 	    // we can extract the creator of the view
 
-	    return Optional.of(view.get().getCreator());
+	    return Optional.ofNullable(view.get().getCreator());
 	} else {
 
 	    // we can extract the creator of the view also in case of dynamic AND bonds (e.g. gs-view-and(...))

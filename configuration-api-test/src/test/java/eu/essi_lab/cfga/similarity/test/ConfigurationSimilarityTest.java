@@ -10,10 +10,10 @@ import org.junit.Test;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.check.CheckResponse;
+import eu.essi_lab.cfga.check.SimilarityMethod;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
-import eu.essi_lab.cfga.gs.SimilarityCheckMethod;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
@@ -89,7 +89,7 @@ public class ConfigurationSimilarityTest {
 
 	ConfigurationWrapper.setConfiguration(configuration);
 
-	SimilarityCheckMethod method = new SimilarityCheckMethod();
+	SimilarityMethod method = new SimilarityMethod();
 
 	CheckResponse response = method.check(configuration);
 
@@ -106,7 +106,7 @@ public class ConfigurationSimilarityTest {
 
 	Class<SystemSetting> clazz = SystemSetting.class;
 
-	SimilarityCheckMethod method = new SimilarityCheckMethod();
+	SimilarityMethod method = new SimilarityMethod();
 
 	method.setModifier(s -> {
 
@@ -141,7 +141,7 @@ public class ConfigurationSimilarityTest {
 
 	Class<SystemSetting> clazz = SystemSetting.class;
 
-	SimilarityCheckMethod method = new SimilarityCheckMethod();
+	SimilarityMethod method = new SimilarityMethod();
 
 	method.setModifier(s -> {
 	    if (s.getSettingClass().equals(clazz)) {
@@ -174,7 +174,7 @@ public class ConfigurationSimilarityTest {
 
 	Class<SystemSetting> clazz = SystemSetting.class;
 
-	SimilarityCheckMethod method = new SimilarityCheckMethod();
+	SimilarityMethod method = new SimilarityMethod();
 
 	method.setModifier(s -> {
 	    if (s.getSettingClass().equals(clazz)) {
@@ -207,7 +207,7 @@ public class ConfigurationSimilarityTest {
 
 	Class<SystemSetting> clazz = SystemSetting.class;
 
-	SimilarityCheckMethod method = new SimilarityCheckMethod();
+	SimilarityMethod method = new SimilarityMethod();
 
 	method.setModifier(s -> {
 
@@ -238,7 +238,7 @@ public class ConfigurationSimilarityTest {
 
 	ConfigurationWrapper.setConfiguration(configuration);
 
-	SimilarityCheckMethod method = new SimilarityCheckMethod();
+	SimilarityMethod method = new SimilarityMethod();
 
 	method.setModifier(new SystemSettingConsumer());
 
@@ -415,7 +415,7 @@ public class ConfigurationSimilarityTest {
 
 	ConfigurationWrapper.setConfiguration(configuration);
 
-	SimilarityCheckMethod method = new SimilarityCheckMethod();
+	SimilarityMethod method = new SimilarityMethod();
 
 	GSLoggerFactory.getLogger(getClass()).debug("Included property: " + propertyToInclude.getName());
 

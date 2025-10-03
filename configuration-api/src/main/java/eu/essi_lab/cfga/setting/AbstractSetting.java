@@ -137,7 +137,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
 
 			JSONObject jsonObject = (JSONObject) obj;
 
-			return jsonObject.has("type") && jsonObject.getString("type").equals("option");
+			return jsonObject.has(OBJECT_TYPE.getKey()) && jsonObject.getString(OBJECT_TYPE.getKey()).equals("option");
 		    }
 
 		    return false;
@@ -196,7 +196,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void enableCompactMode(boolean set) {
 
-	setProperty("compactMode", set, true);
+	setProperty(COMPACT_MODE.getKey(), set, true);
     }
 
     /**
@@ -204,7 +204,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean isCompactModeEnabled() {
 
-	return isPropertySet("compactMode", true);
+	return isPropertySet(COMPACT_MODE.getKey(), true);
     }
 
     /**
@@ -215,7 +215,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void enableFoldedMode(boolean set) {
 
-	setProperty("foldedMode", set, false);
+	setProperty(FOLDED_MODE.getKey(), set, false);
     }
 
     /**
@@ -223,7 +223,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean isFoldedModeEnabled() {
 
-	return isPropertySet("foldedMode", false);
+	return isPropertySet(FOLDED_MODE.getKey(), false);
     }
 
     /**
@@ -233,7 +233,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setCanBeRemoved(boolean canBeRemoved) {
 
-	setProperty("canBeRemoved", canBeRemoved, false);
+	setProperty(CAN_BE_REMOVED.getKey(), canBeRemoved, false);
     }
 
     /**
@@ -241,7 +241,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean canBeRemoved() {
 
-	return isPropertySet("canBeRemoved", false);
+	return isPropertySet(CAN_BE_REMOVED.getKey(), false);
     }
 
     /**
@@ -249,7 +249,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setCanBeCleaned(boolean canBeCleaned) {
 
-	setProperty("canBeCleaned", canBeCleaned, true);
+	setProperty(CAN_BE_CLEANED.getKey(), canBeCleaned, true);
     }
 
     /**
@@ -257,7 +257,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean canBeCleaned() {
 
-	return isPropertySet("canBeCleaned", true);
+	return isPropertySet(CAN_BE_CLEANED.getKey(), true);
     }
 
     /**
@@ -268,7 +268,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setShowHeader(boolean showHeader) {
 
-	setProperty("showHeader", showHeader, true);
+	setProperty(SHOW_HEADER.getKey(), showHeader, true);
     }
 
     /**
@@ -276,7 +276,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean isShowHeaderSet() {
 
-	return isPropertySet("showHeader", true);
+	return isPropertySet(SHOW_HEADER.getKey(), true);
     }
 
     /**
@@ -288,11 +288,11 @@ public abstract class AbstractSetting extends ConfigurationObject {
 
 	try {
 
-	    Class<?> clazz = Class.forName(getObject().getString("extensionClass"));
+	    Class<?> clazz = Class.forName(getObject().getString(EXTENSION.getKey()));
 
 	    if (extension.isAssignableFrom(clazz)) {
 
-		return Optional.of((T) Class.forName(getObject().getString("extensionClass")).getDeclaredConstructor().newInstance());
+		return Optional.of((T) Class.forName(getObject().getString(EXTENSION.getKey())).getDeclaredConstructor().newInstance());
 	    }
 
 	} catch (Exception e) {
@@ -307,7 +307,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setExtension(ObjectExtension extension) {
 
-	getObject().put("extensionClass", extension.getClass().getName());
+	getObject().put(EXTENSION.getKey(), extension.getClass().getName());
     }
 
     /**
@@ -315,9 +315,9 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public Optional<Class<? extends ObjectExtension>> getOptionalExtensionClass() {
 
-	if (getObject().has("extensionClass")) {
+	if (getObject().has(EXTENSION.getKey())) {
 
-	    String extensionClass = getObject().getString("extensionClass");
+	    String extensionClass = getObject().getString(EXTENSION.getKey());
 
 	    try {
 
@@ -344,9 +344,9 @@ public abstract class AbstractSetting extends ConfigurationObject {
 
 	try {
 
-	    if (getObject().has("validatorClass")) {
+	    if (getObject().has(VALIDATOR.getKey())) {
 
-		return Optional.of((T) Class.forName(getObject().getString("validatorClass")).getDeclaredConstructor().newInstance());
+		return Optional.of((T) Class.forName(getObject().getString(VALIDATOR.getKey())).getDeclaredConstructor().newInstance());
 	    }
 
 	} catch (Exception e) {
@@ -361,7 +361,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setValidator(Validator validator) {
 
-	getObject().put("validatorClass", validator.getClass().getName());
+	getObject().put(VALIDATOR.getKey(), validator.getClass().getName());
     }
 
     /**
@@ -369,9 +369,9 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public Optional<Class<? extends Validator>> getOptionalValidatorClass() {
 
-	if (getObject().has("validatorClass")) {
+	if (getObject().has(VALIDATOR.getKey())) {
 
-	    String validatorClass = getObject().getString("validatorClass");
+	    String validatorClass = getObject().getString(VALIDATOR.getKey());
 
 	    try {
 
@@ -392,7 +392,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
     /**
      * @return
      */
-    public List<Property<?>> getProperties() {
+    protected List<Property<?>> getProperties() {
 
 	List<Property<?>> properties = super.getProperties();
 

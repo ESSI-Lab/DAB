@@ -35,7 +35,7 @@ import eu.essi_lab.lib.utils.StreamUtils;
  * 
  * @author Fabrizio
  */
-public class RegisteredEditableSettingMethod implements CheckMethod {
+public class RegisteredEditableMethod implements CheckMethod {
     
    
 

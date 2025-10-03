@@ -43,16 +43,16 @@ import eu.essi_lab.cfga.ConfigurationUtils;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.check.CheckResponse;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.check.ConfigEditableSettingMethod;
+import eu.essi_lab.cfga.check.scheme.SchemeMethod;
+import eu.essi_lab.cfga.check.scheme.SchemeMethod.CheckMode;
+import eu.essi_lab.cfga.check.ConfigurationEditableMethod;
 import eu.essi_lab.cfga.check.ReferencedClassesMethod;
-import eu.essi_lab.cfga.check.RegisteredEditableSettingMethod;
-import eu.essi_lab.cfga.check.SchemeCheckMethod;
-import eu.essi_lab.cfga.check.SchemeCheckMethod.CheckMode;
+import eu.essi_lab.cfga.check.RegisteredEditableMethod;
+import eu.essi_lab.cfga.check.SimilarityMethod;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.DefaultConfigurationScheme;
-import eu.essi_lab.cfga.gs.SimilarityCheckMethod;
 import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
@@ -153,7 +153,7 @@ public class DABStarter {
 	    // - SchemeCheckMethod
 	    //
 
-	    SchemeCheckMethod schemeCheckMethod = new SchemeCheckMethod();
+	    SchemeMethod schemeCheckMethod = new SchemeMethod();
 
 	    schemeCheckMethod.setScheme(new DefaultConfigurationScheme());
 
@@ -614,7 +614,7 @@ public class DABStarter {
 	// definition,
 	// it means that they are bad implemented and they must be manually fixed
 	//
-	RegisteredEditableSettingMethod regEditSettingMethod = new RegisteredEditableSettingMethod();
+	RegisteredEditableMethod regEditSettingMethod = new RegisteredEditableMethod();
 
 	CheckResponse regEditCheck = regEditSettingMethod.check();
 
@@ -669,7 +669,7 @@ public class DABStarter {
 	// it means that some options and/or settings are changed and they can be fixed
 	//
 
-	ConfigEditableSettingMethod configEditSettingMethod = new ConfigEditableSettingMethod();
+	ConfigurationEditableMethod configEditSettingMethod = new ConfigurationEditableMethod();
 
 	CheckResponse configEditCheck = configEditSettingMethod.check(configuration);
 
@@ -691,7 +691,7 @@ public class DABStarter {
 	// settings have less options
 	// than the corresponding Java setting)
 
-	SimilarityCheckMethod similarityCheckMethod = new SimilarityCheckMethod();
+	SimilarityMethod similarityCheckMethod = new SimilarityMethod();
 
 	CheckResponse similarityCheckResponse = similarityCheckMethod.check(configuration);
 

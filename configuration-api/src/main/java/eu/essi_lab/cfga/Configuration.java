@@ -36,7 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent;
-import eu.essi_lab.cfga.scheme.Scheme;
+import eu.essi_lab.cfga.check.scheme.Scheme;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.source.FileSource;

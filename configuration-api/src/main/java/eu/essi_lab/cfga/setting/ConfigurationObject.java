@@ -70,7 +70,7 @@ public abstract class ConfigurationObject {
 
 	this.object = new JSONObject();
 
-	this.object.put("type", initObjectType());
+	this.object.put(OBJECT_TYPE.getKey(), initObjectType());
     }
 
     /**
@@ -100,7 +100,7 @@ public abstract class ConfigurationObject {
 	    return;
 	}
 
-	setProperty("enabled", enabled, true);
+	setProperty(ENABLED.getKey(), enabled, true);
 
 	if (!enabled) {
 	    propagateEnabled(enabled);
@@ -112,7 +112,7 @@ public abstract class ConfigurationObject {
      */
     public final boolean isEnabled() {
 
-	return isPropertySet("enabled", true);
+	return isPropertySet(ENABLED.getKey(), true);
     }
 
     /**
@@ -122,7 +122,7 @@ public abstract class ConfigurationObject {
      */
     public void setCanBeDisabled(boolean canBeDisabled) {
 
-	setProperty("canBeDisabled", canBeDisabled, true);
+	setProperty(CAN_BE_DISABLED.getKey(), canBeDisabled, true);
     }
 
     /**
@@ -130,7 +130,7 @@ public abstract class ConfigurationObject {
      */
     public boolean canBeDisabled() {
 
-	return isPropertySet("canBeDisabled", true);
+	return isPropertySet(CAN_BE_DISABLED.getKey(), true);
     }
 
     /**
@@ -140,7 +140,7 @@ public abstract class ConfigurationObject {
      */
     public final void setVisible(boolean visible) {
 
-	setProperty("visible", visible, true);
+	setProperty(VISIBLE.getKey(), visible, true);
 
 	if (!visible) {
 	    propagateVisible(visible);
@@ -152,7 +152,7 @@ public abstract class ConfigurationObject {
      */
     public final boolean isVisible() {
 
-	return isPropertySet("visible", true);
+	return isPropertySet(VISIBLE.getKey(), true);
     }
 
     /**
@@ -167,7 +167,7 @@ public abstract class ConfigurationObject {
      */
     public boolean isEditable() {
 
-	return isPropertySet("editable", true);
+	return isPropertySet(EDITABLE.getKey(), true);
     }
 
     /**
@@ -182,7 +182,7 @@ public abstract class ConfigurationObject {
      */
     public void setEditable(boolean editable) {
 
-	setProperty("editable", editable, true);
+	setProperty(EDITABLE.getKey(), editable, true);
     }
 
     /**
@@ -190,7 +190,7 @@ public abstract class ConfigurationObject {
      */
     public Optional<String> getDescription() {
 
-	return getObject().has("description") ? Optional.of(getObject().getString("description")) : Optional.empty();
+	return getObject().has(DESCRIPTION.getKey()) ? Optional.of(getObject().getString("description")) : Optional.empty();
     }
 
     /**
@@ -198,7 +198,7 @@ public abstract class ConfigurationObject {
      */
     public void setDescription(String description) {
 
-	getObject().put("description", description);
+	getObject().put(DESCRIPTION.getKey(), description);
     }
 
     /**
@@ -206,9 +206,9 @@ public abstract class ConfigurationObject {
     */
     public void clearDescription() {
 
-	if (getObject().has("description")) {
+	if (getObject().has(DESCRIPTION.getKey())) {
 
-	    getObject().remove("description");
+	    getObject().remove(DESCRIPTION.getKey());
 	}
     }
 
@@ -243,26 +243,33 @@ public abstract class ConfigurationObject {
      */
     public String getObjectType() {
 
-	return getObject().getString("type");
+	return getObject().getString(OBJECT_TYPE.getKey());
+    }
+
+    /**
+     * @param property
+     * @return
+     */
+    public Optional<String> getStringPropertyValue(Property<?> property) {
+
+	return Optional.ofNullable(getObject().opt(property.getKey())).map(v -> v.toString());
+    }
+
+    /**
+     * @param property
+     * @return
+     */
+    public Optional<?> getPropertyValue(Property<?> property) {
+
+	return Optional.ofNullable(getObject().opt(property.getKey()));
     }
 
     /**
      * @return
      */
-    public Optional<Property<?>> getProperty(String name) {
+    protected List<Property<?>> getProperties() {
 
-	return getProperties().//
-		stream().//
-		filter(p -> p.getName().equals(name)).//
-		findFirst();
-    }
-
-    /**
-     * @return
-     */
-    public List<Property<?>> getProperties() {
-
-	ArrayList<Property<?>> properties = new ArrayList<Property<?>>();
+	ArrayList<Property<?>> properties = new ArrayList<>();
 
 	properties.add(ENABLED);
 	properties.add(CAN_BE_DISABLED);

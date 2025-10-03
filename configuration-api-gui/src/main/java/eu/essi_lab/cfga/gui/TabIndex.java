@@ -24,7 +24,7 @@ package eu.essi_lab.cfga.gui;
  * #L%
  */
 
-import eu.essi_lab.cfga.scheme.SchemeItem;
+import eu.essi_lab.cfga.check.scheme.SchemeItem;
 
 /**
  * @author Fabrizio
