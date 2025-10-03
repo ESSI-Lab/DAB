@@ -28,15 +28,46 @@ import java.util.Optional;
 
 import javax.ws.rs.core.Response.Status;
 
+import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.OntologySetting;
+import eu.essi_lab.cfga.gs.setting.OntologySetting.Availability;
+import eu.essi_lab.cfga.gs.setting.OntologySetting.DataModel;
+import eu.essi_lab.cfga.gs.setting.OntologySetting.QueryLanguage;
+import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.gssrv.rest.conf.ConfigService.SettingFinder;
+import eu.essi_lab.gssrv.rest.conf.requests.ontology.EditOntologyRequest;
 import eu.essi_lab.gssrv.rest.conf.requests.ontology.PutOntologyRequest;
+import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
 public class OntologySettingUtils {
+
+    /**
+     * @param request
+     * @param ontologySetting
+     * @return
+     */
+    static OntologySetting build(EditOntologyRequest request, OntologySetting setting) {
+
+	OntologySetting out = SettingUtils.downCast(SelectionUtils.resetAndSelect(setting, false), OntologySetting.class);
+
+	request.read(PutOntologyRequest.ONTOLOGY_ENDPOINT).ifPresent(v -> out.setOntologyEndpoint(v.toString()));
+
+	request.read(PutOntologyRequest.ONTOLOGY_NAME).ifPresent(v -> out.setOntologyName(v.toString()));
+
+	request.read(PutOntologyRequest.ONTOLOGY_AVAILABILITY)
+		.ifPresent(v -> out.setOntologyAvailability(LabeledEnum.valueOf(Availability.class, v.toString()).get()));
+
+	request.read(PutOntologyRequest.ONTOLOGY_DESCRIPTION).ifPresent(v -> out.setOntologyDescription(v.toString()));
+
+	setting.clean();
+	setting.afterClean();
+
+	return out;
+    }
 
     /**
      * @param request
@@ -49,22 +80,29 @@ public class OntologySettingUtils {
 	String id = request.read(PutOntologyRequest.ONTOLOGY_ID).get().toString();
 	String endpoint = request.read(PutOntologyRequest.ONTOLOGY_ENDPOINT).get().toString();
 	String name = request.read(PutOntologyRequest.ONTOLOGY_NAME).get().toString();
-	boolean enabled = request.read(PutOntologyRequest.ONTOLOGY_AVAILABILITY).get().toString().equals("true");
 
-	String queryLang = request.read(PutOntologyRequest.ONTOLOGY_QUERY_LANGUAGE).get().toString();
-	String dataModel = request.read(PutOntologyRequest.ONTOLOGY_DATA_MODEL).get().toString();
+	String availability = request.read(PutOntologyRequest.ONTOLOGY_AVAILABILITY).map(v -> v.toString())
+		.orElse(Availability.ENABLED.getLabel());
+
+	String queryLang = request.read(PutOntologyRequest.ONTOLOGY_QUERY_LANGUAGE).map(v -> v.toString())
+		.orElse(QueryLanguage.SPARQL.getLabel());
+
+	String dataModel = request.read(PutOntologyRequest.ONTOLOGY_DATA_MODEL).map(v -> v.toString()).orElse(DataModel.SKOS.getLabel());
 
 	Optional<String> optDesc = request.read(PutOntologyRequest.ONTOLOGY_DESCRIPTION).map(v -> v.toString());
 
 	setting.setOntologyId(id);
 	setting.setOntologyName(name);
 	setting.setOntologyEndpoint(endpoint);
-	setting.setOntolgyEnabled(enabled);
+	setting.setOntologyAvailability(LabeledEnum.valueOf(Availability.class, availability).get());
 
-	setting.setQueryLanguage(queryLang);
-	setting.setDataModel(dataModel);
+	setting.setQueryLanguage(LabeledEnum.valueOf(QueryLanguage.class, queryLang).get());
+	setting.setDataModel(LabeledEnum.valueOf(DataModel.class, dataModel).get());
 
 	optDesc.ifPresent(desc -> setting.setOntologyDescription(desc));
+
+	setting.clean();
+	setting.afterClean();
 
 	return setting;
     }
@@ -107,4 +145,5 @@ public class OntologySettingUtils {
 
 	return new SettingFinder<OntologySetting>(setting);
     }
+
 }

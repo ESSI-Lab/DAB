@@ -310,12 +310,12 @@ public class ConfigService {
 		JSONObject sourceObject = new JSONObject();
 		out.put(sourceObject);
 
-		sourceObject.put(PutOntologyRequest.ONTOLOGY_AVAILABILITY, setting.getOntologyId());
+		sourceObject.put(PutOntologyRequest.ONTOLOGY_AVAILABILITY, setting.getOntologyAvailability().getLabel());
 		sourceObject.put(PutOntologyRequest.ONTOLOGY_ENDPOINT, setting.getOntologyEndpoint());
 		sourceObject.put(PutOntologyRequest.ONTOLOGY_ID, setting.getOntologyId());
 		sourceObject.put(PutOntologyRequest.ONTOLOGY_NAME, setting.getOntologyName());
-		sourceObject.put(PutOntologyRequest.ONTOLOGY_QUERY_LANGUAGE, setting.getQueryLanguage());
-		sourceObject.put(PutOntologyRequest.ONTOLOGY_DATA_MODEL, setting.getDataModel());
+		sourceObject.put(PutOntologyRequest.ONTOLOGY_QUERY_LANGUAGE, setting.getQueryLanguage().getLabel());
+		sourceObject.put(PutOntologyRequest.ONTOLOGY_DATA_MODEL, setting.getDataModel().getLabel());
 		setting.getOntologyDescription().ifPresent(desc -> sourceObject.put(PutOntologyRequest.ONTOLOGY_DESCRIPTION, desc));
 	    }
 	});
@@ -395,10 +395,7 @@ public class ConfigService {
 	// building ontology setting
 	//
 
-	String settingId = finder.getSetting().get().getIdentifier();
-
-	OntologySetting setting = OntologySettingUtils.build(request);
-	setting.setIdentifier(settingId);
+	OntologySetting setting = OntologySettingUtils.build(request, finder.getSetting().get());
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 
@@ -425,6 +422,15 @@ public class ConfigService {
      * @return
      */
     private Response handlePutOntologyRequest(PutOntologyRequest request) {
+
+	String ontologyId = request.read(PutOntologyRequest.ONTOLOGY_ID).get().toString();
+
+	if (ConfigurationWrapper.getOntologySettings().//
+		stream().//
+		anyMatch(s -> s.getOntologyId().equals(ontologyId))) {
+
+	    return buildErrorResponse(Status.BAD_REQUEST, "Ontology with id '" + ontologyId + "' already exists");
+	}
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 

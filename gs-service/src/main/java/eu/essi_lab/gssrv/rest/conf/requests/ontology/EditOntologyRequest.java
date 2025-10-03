@@ -3,6 +3,9 @@
  */
 package eu.essi_lab.gssrv.rest.conf.requests.ontology;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -26,6 +29,13 @@ package eu.essi_lab.gssrv.rest.conf.requests.ontology;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.gs.setting.OntologySetting.Availability;
+import eu.essi_lab.cfga.gs.setting.OntologySetting.DataModel;
+import eu.essi_lab.cfga.gs.setting.OntologySetting.QueryLanguage;
+import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.gssrv.rest.conf.Parameter;
+import eu.essi_lab.model.Queryable.ContentType;
+
 /**
  * @author Fabrizio
  */
@@ -44,4 +54,37 @@ public class EditOntologyRequest extends PutOntologyRequest {
 
 	super(object);
     }
+
+    @Override
+    public List<Parameter> getSupportedParameters() {
+
+	ArrayList<Parameter> list = new ArrayList<>();
+
+	list.add(Parameter.of(ONTOLOGY_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE, true));
+	list.add(Parameter.of(ONTOLOGY_NAME, ContentType.TEXTUAL, false));
+	list.add(Parameter.of(ONTOLOGY_ENDPOINT, ContentType.TEXTUAL, false));
+
+	list.add(Parameter.of(ONTOLOGY_AVAILABILITY, ContentType.TEXTUAL, Availability.class, false));
+	list.add(Parameter.of(ONTOLOGY_DESCRIPTION, ContentType.TEXTUAL, false));
+	list.add(Parameter.of(ONTOLOGY_DATA_MODEL, ContentType.TEXTUAL, DataModel.class, false));
+	list.add(Parameter.of(ONTOLOGY_QUERY_LANGUAGE, ContentType.TEXTUAL, QueryLanguage.class, false));
+
+	return list;
+    }
+
+    /**
+     * 
+     */
+    @Override
+    protected void mandatoryCheck() {
+
+	super.mandatoryCheck();
+
+	if (readParameters().size() == 1) {
+
+	    throw new IllegalArgumentException("At least one of the parameters '" + ONTOLOGY_NAME + "', '" + ONTOLOGY_DESCRIPTION + "', '"
+		    + "', '" + ONTOLOGY_ENDPOINT + "', '" + ONTOLOGY_AVAILABILITY + "' must be provided'");
+	}
+    }
+
 }

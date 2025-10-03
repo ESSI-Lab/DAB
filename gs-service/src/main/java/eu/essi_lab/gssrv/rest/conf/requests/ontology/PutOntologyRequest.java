@@ -29,10 +29,12 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.gs.setting.OntologySetting.Availability;
+import eu.essi_lab.cfga.gs.setting.OntologySetting.DataModel;
+import eu.essi_lab.cfga.gs.setting.OntologySetting.QueryLanguage;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.gssrv.rest.conf.ConfigRequest;
 import eu.essi_lab.gssrv.rest.conf.Parameter;
-import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.Queryable.ContentType;
 
 /**
@@ -48,72 +50,7 @@ public class PutOntologyRequest extends ConfigRequest {
     public static final String ONTOLOGY_DATA_MODEL = "dataModel";
     public static final String ONTOLOGY_QUERY_LANGUAGE = "queryLanguage";
 
-    /**
-     * @author Fabrizio
-     */
-    public enum QueryLanguage implements LabeledEnum {
-
-	/**
-	 * 
-	 */
-	SPARQL("SPARQL");
-
-	private String label;
-
-	/**
-	 * @param label
-	 */
-	private QueryLanguage(String label) {
-
-	    this.label = label;
-	}
-
-	@Override
-	public String getLabel() {
-
-	    return label;
-	}
-
-	@Override
-	public String toString() {
-
-	    return getLabel();
-	}
-    }
-
-    /**
-     * @author Fabrizio
-     */
-    public enum DataModel implements LabeledEnum {
-
-	/**
-	 * 
-	 */
-	SKOS("SKOS");
-
-	private String label;
-
-	/**
-	 * @param label
-	 */
-	private DataModel(String label) {
-
-	    this.label = label;
-	}
-
-	@Override
-	public String getLabel() {
-
-	    return label;
-	}
-
-	@Override
-	public String toString() {
-
-	    return getLabel();
-	}
-    }
-
+   
     /**
      * 
      */
@@ -136,10 +73,11 @@ public class PutOntologyRequest extends ConfigRequest {
 	list.add(Parameter.of(ONTOLOGY_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE, true));
 	list.add(Parameter.of(ONTOLOGY_NAME, ContentType.TEXTUAL, true));
 	list.add(Parameter.of(ONTOLOGY_ENDPOINT, ContentType.TEXTUAL, true));
-	list.add(Parameter.of(ONTOLOGY_AVAILABILITY, ContentType.BOOLEAN, true));
+
+	list.add(Parameter.of(ONTOLOGY_AVAILABILITY, ContentType.TEXTUAL, Availability.class, false));
 	list.add(Parameter.of(ONTOLOGY_DESCRIPTION, ContentType.TEXTUAL, false));
-	list.add(Parameter.of(ONTOLOGY_DATA_MODEL, ContentType.TEXTUAL, DataModel.class, true));
-	list.add(Parameter.of(ONTOLOGY_QUERY_LANGUAGE, ContentType.TEXTUAL, QueryLanguage.class, true));
+	list.add(Parameter.of(ONTOLOGY_DATA_MODEL, ContentType.TEXTUAL, DataModel.class, false));
+	list.add(Parameter.of(ONTOLOGY_QUERY_LANGUAGE, ContentType.TEXTUAL, QueryLanguage.class, false));
 
 	return list;
     }

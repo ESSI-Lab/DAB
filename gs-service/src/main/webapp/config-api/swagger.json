@@ -2,7 +2,7 @@
 	"openapi": "3.0.1",
 	"info": {
 		"title": "DAB REST Configuration API",
-		"description": "DAB REST API to create, edit and remove the DAB brokered sources. It also allows to manage the harvesting scheduling of the DAB brokered sources",
+		"description": "DAB REST API to create, edit and remove the DAB brokered sources and ontologies. It also allows to manage the harvesting scheduling of the DAB brokered sources",
 		"version": "1.0"
 	},
 	"tags": [
@@ -35,6 +35,18 @@
 							"schema": {
 								"oneOf": [
 									{
+										"$ref": "#/components/schemas/PutOntology"
+									},
+									{
+										"$ref": "#/components/schemas/EditOntology"
+									},
+									{
+										"$ref": "#/components/schemas/RemoveOntology"
+									},
+									{
+										"$ref": "#/components/schemas/ListOntologies"
+									},
+									{
 										"$ref": "#/components/schemas/PutSource"
 									},
 									{
@@ -55,6 +67,92 @@
 								]
 							},
 							"examples": {
+								"putOntology1": {
+									"summary": "'PutOntology' request with only mandatory parameters",
+									"description": "Example of 'PutOntology' request with  only mandatory parameters",
+									"value": {
+										"request": "PutOntology",
+										"parameters": {
+											"id": "ontology1",
+											"endpoint": "https://ontology1/sparql",
+											"name": "Example ontology 1"
+										}
+									}
+								},
+								"putOntology2": {
+									"summary": "'PutOntology' request with optional description parameter",
+									"description": "Example of 'PutOntology' request with optional description parameter",
+									"value": {
+										"request": "PutOntology",
+										"parameters": {
+											"id": "ontology2",
+											"endpoint": "https://ontology2/sparql",
+											"name": "Example ontology 2",
+											"description": "The ontology description"
+										}
+									}
+								},
+								"editOntology1": {
+									"summary": "'EditOntology' request to modifies only the name",
+									"description": "Example of 'EditOntology' to modifies only the name of the ontology with id 'ontology1'",
+									"value": {
+										"request": "EditOntology",
+										"parameters": {
+											"id": "ontology1",
+											"name": "Modified name"
+										}
+									}
+								},
+								"editOntology2": {
+									"summary": "'EditOntology' request to modifies name and description",
+									"description": "Example of 'EditOntology' to modifies name and description of the ontology with id 'ontology2'",
+									"value": {
+										"request": "EditOntology",
+										"parameters": {
+											"id": "ontology2",
+											"name": "Modified name",
+											"description": "Modified description"
+										}
+									}
+								},
+								"editOntology3": {
+									"summary": "'EditOntology' request to modifies the availability",
+									"description": "Example of 'EditOntology' to disable the ontology with id 'ontology1'",
+									"value": {
+										"request": "EditOntology",
+										"parameters": {
+											"id": "ontology1",
+											"availability": "Disabled"
+										}
+									}
+								},
+								"removeOntology": {
+									"summary": "'RemoveOntology' request to remove an ontology",
+									"description": "Example of 'RemoveOntology' to remove the ontology with id 'ontology1'",
+									"value": {
+										"request": "RemoveOntology",
+										"parameters": {
+											"id": "ontology1"
+										}
+									}
+								},
+								"listOntologies1": {
+									"summary": "'ListOntologies' request",
+									"description": "Example of 'ListOntologies' to list all the configured ontology",
+									"value": {
+										"request": "ListOntologies"
+									}
+								},
+								"listOntologies2": {
+									"summary": "'ListOntologies' request which list only a selected ontology",
+									"description": "Example of 'ListOntologies' which list only the ontology with id 'ontology2'",
+									"value": {
+										"request": "ListOntologies",
+										"parameters": {
+											"id": "ontology2"
+										}
+									}
+								},
 								"putSource1": {
 									"summary": "'PutSource' request with explicit source identifier",
 									"description": "Example of 'PutSource' request with explicit source identifier",
@@ -209,6 +307,20 @@
 						"content": {
 							"application/json": {
 								"examples": {
+									"listOntologies": {
+										"summary": "'ListOntologies' request response",
+										"value": [
+											{
+												"endpoint": "https://ontology2/sparql",
+												"name": "Modified name",
+												"dataModel": "SKOS",
+												"description": "Modified description",
+												"queryLanguage": "SPARQL",
+												"availability": "ontology2",
+												"id": "ontology2"
+											}
+										]
+									},
 									"listSources1": {
 										"summary": "'ListSources' request response of a running harvesting",
 										"value": [
@@ -472,6 +584,147 @@
 	},
 	"components": {
 		"schemas": {
+			"PutOntology": {
+				"description": "Adds a new ontology on which to make semantic queries. If the operation succeeds, the response code is '201'",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "PutOntology"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"id",
+							"name",
+							"endpoint"
+						],
+						"properties": {
+							"id": {
+								"description": "The mandatory ontology id. It must contains alphanumeric characters and/or '_' characters. If an ontology with the given id already exists, the request fails with reponse code '400'",
+								"type": "string"
+							},
+							"name": {
+								"description": "The mandatory ontology name",
+								"type": "string"
+							},
+							"endpoint": {
+								"description": "The mandatory ontology endpoint",
+								"type": "string"
+							},
+							"queryLanguage": {
+								"$ref": "#/components/schemas/OntologyQueryLanguage"
+							},
+							"dataModel": {
+								"$ref": "#/components/schemas/OntologyDataModel"
+							},
+							"availability": {
+								"$ref": "#/components/schemas/OntologyAvailability"
+							}
+						}
+					}
+				}
+			},
+			"EditOntology": {
+				"description": "Edits an existing ontology. If the request content does not involve any modification to the given ontology, the request execution fails with response code '400'. If at least one of the parameter 'name', 'endpoint', 'description', 'availability' is not provied, the request fails with response code '405'",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "EditOntology"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"id"
+						],
+						"properties": {
+							"id": {
+								"description": "The mandatory ontology id. It must contains alphanumeric characters and/or '_' characters. If an ontology with the given id is not found, the request fails with reponse code '404'",
+								"type": "string"
+							},
+							"name": {
+								"description": "The ontology name",
+								"type": "string"
+							},
+							"endpoint": {
+								"description": "The ontology endpoint",
+								"type": "string"
+							},
+							"queryLanguage": {
+								"$ref": "#/components/schemas/OntologyQueryLanguage"
+							},
+							"dataModel": {
+								"$ref": "#/components/schemas/OntologyDataModel"
+							},
+							"availability": {
+								"$ref": "#/components/schemas/OntologyAvailability"
+							}
+						}
+					}
+				}
+			},
+			"RemoveOntology": {
+				"description": "Removes an existing ontology from the configuration",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "RemoveOntology"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"id"
+						],
+						"properties": {
+							"id": {
+								"description": "The mandatory ontology id. It must contains alphanumeric characters and/or '_' characters. If an ontology with the given id is not found, the request fails with reponse code be '404'",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"ListOntologies": {
+				"description": "Lists all or a subset of the configured ontologies",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "ListOntologies"
+					},
+					"parameters": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"description": "Optional comma separated list of ontology ids. If one or more of the provided ontologies are not found, the request fails with reponse code '404'",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
 			"PutSource": {
 				"description": "Creates a new DAB source. If the source creation succeeds, the response code is '201'",
 				"type": "object",
@@ -719,6 +972,28 @@
 						}
 					}
 				}
+			},
+			"OntologyAvailability": {
+				"description": "The ontology availability. If not enabled, the ontology cannot be queried. Default value: 'Enabled'",
+				"type": "string",
+				"enum": [
+					"Enabled",
+					"Disabled"
+				]
+			},
+			"OntologyQueryLanguage": {
+				"description": "The ontology query language. At the moment only 'SPARQL' is available",
+				"type": "string",
+				"enum": [
+					"SPARQL"
+				]
+			},
+			"OntologyDataModel": {
+				"description": "The ontology data model. At the moment only 'SKOS' is available",
+				"type": "string",
+				"enum": [
+					"SKOS"
+				]
 			},
 			"ServiceType": {
 				"description": "The supported service types",
