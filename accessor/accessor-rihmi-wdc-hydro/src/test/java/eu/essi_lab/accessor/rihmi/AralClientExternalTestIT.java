@@ -51,7 +51,7 @@ public class AralClientExternalTestIT {
     @Test
     public void testStationIdentifiers() throws Exception {
 	RIHMIClient client = new RIHMIClient();
-	Set<String> ids = client.getStationIdentifiers(true);
+	Set<String> ids = client.getStationIdentifiers(client.getAralStationEndpoint());
 	System.out.println(ids.size() + " values retrieved");
 	assertTrue(ids.size() > 60);
     }

@@ -126,34 +126,32 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	Online onlineValues = new Online();
 
 	onlineValues.setName(id);
-	boolean isAral = false;
+	boolean isAralOrMoldova = false;
 	GSPropertyHandler additionalInfo = originalMD.getAdditionalInfo();
 	if (additionalInfo != null) {
-	    isAral = originalMD.getAdditionalInfo().get("isAral", Boolean.class);
-	    // aral basin case
-	    if (isAral) {
-		String linkage = originalMD.getAdditionalInfo().get("downloadLink", String.class);
-		onlineValues.setProtocol(CommonNameSpaceContext.ARAL_BASIN_URI);
-		onlineValues.setLinkage(linkage);
+	    isAralOrMoldova = true;
+	    String linkage = originalMD.getAdditionalInfo().get("downloadLink", String.class);
+	    onlineValues.setProtocol(CommonNameSpaceContext.ARAL_MOLDOVA_URI);
+	    onlineValues.setLinkage(linkage);
 
+	} else {
+	    // russian case
+	    if (interpolation != null) {
+		onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_HISTORICAL_URI);
+		onlineValues.setLinkage(RIHMIClient.historicalEndpoint + stationId);
 	    } else {
-		// russian case
-		if (interpolation != null) {
-		    onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_HISTORICAL_URI);
-		    onlineValues.setLinkage(RIHMIClient.historicalEndpoint + stationId);
-		} else {
-		    onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_URI);
-		    onlineValues.setLinkage(endpoint);
-		}
+		onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_URI);
+		onlineValues.setLinkage(endpoint);
 	    }
 	}
+
 	onlineValues.setFunctionCode("download");
 
 	coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(onlineValues);
 
 	if (begin != null && end != null) {
 	    TemporalExtent extent = new TemporalExtent();
-	    if (interpolation == null && !isAral) {
+	    if (interpolation == null && !isAralOrMoldova) {
 		TimeIndeterminateValueType endTimeInderminate = TimeIndeterminateValueType.NOW;
 		extent.setIndeterminateEndPosition(endTimeInderminate);
 		extent.setBeforeNowBeginPosition(FrameValue.P1Y);
@@ -266,8 +264,11 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	dataset.getExtensionHandler().setAttributeUnits(units);
 	dataset.getExtensionHandler().setAttributeUnitsAbbreviation(units);
 
-	if (!isAral)
+	if (!isAralOrMoldova) {
 	    dataset.getExtensionHandler().setCountry(Country.RUSSIAN_FEDERATION.getShortName());
+	}else if(onlineValues.getLinkage().contains("Moldova")){
+	    dataset.getExtensionHandler().setCountry(Country.REPUBLIC_OF_MOLDOVA.getShortName());
+	}
 
 	// LegalConstraints lc = new LegalConstraints();
 	// lc.addOtherConstraints("Norwegian Licence for Open Government Data (NLOD)");

@@ -57,14 +57,30 @@ public class RIHMIClient {
 
     public static String aralDischargeEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroDischargesAral/xml?";
 
-    public static String aralWaterLevelEndpoint = " http://hydroweb.meteo.ru/hydro-service/rest/GetHydroWaterLevelAral/xml?";
+    public static String aralWaterLevelEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroWaterLevelAral/xml?";
 
-    public static String aralWaterTemperatureEndpoint = " http://hydroweb.meteo.ru/hydro-service/rest/GetHydroWaterTemperatureAral/xml?";
+    public static String aralWaterTemperatureEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroWaterTemperatureAral/xml?";
+    
+    public static String moldovaStationListendpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetWHOSHydroStationsMoldova/whos";
+
+    public static String moldovaDischargeEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroDischargesMoldova/xml?";
+
+    public static String moldovaWaterLevelEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroWaterLevelMoldova/xml?";
+
+    public static String moldovaWaterTemperatureEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroWaterTemperatureMoldova/xml?";
+
 
     public String getEndpoint() {
 	return realtimeEndpoint;
     }
 
+    public String getAralStationEndpoint() {
+	return aralStationListendpoint;
+    }
+    
+    public String getMoldovaStationEndpoint() {
+	return moldovaStationListendpoint;
+    }
     public String getAralDischargeEndpoint() {
 	return aralDischargeEndpoint;
     }
@@ -75,6 +91,18 @@ public class RIHMIClient {
 
     public String getAralWaterTemperatureEndpoint() {
 	return aralWaterTemperatureEndpoint;
+    }
+    
+    public String getMoldovaDischargeEndpoint() {
+	return moldovaDischargeEndpoint;
+    }
+
+    public String getMoldovaWaterLevelEndpoint() {
+	return moldovaWaterLevelEndpoint;
+    }
+
+    public String getMoldovaWaterTemperatureEndpoint() {
+	return moldovaWaterTemperatureEndpoint;
     }
 
     public void setEndpoint(String endpoint) {
@@ -130,9 +158,25 @@ public class RIHMIClient {
 	return downloadStream(url);
 
     }
+    
+    public InputStream getWaterML(String stationId, Date start, Date end, String endpoint) throws IOException, InterruptedException, URISyntaxException {
 
-    public Set<String> getStationIdentifiers(boolean isAral) throws Exception {
-	String identifierEndpoint = isAral ? aralStationListendpoint : stationListendpoint;
+	String from = sdf.format(start);
+	String to = sdf.format(end);
+
+	String url = endpoint.endsWith("?") ? endpoint + "dateFrom=" + from + "&dateTo=" + to + "&index=" + stationId : endpoint + "?dateFrom=" + from + "&dateTo=" + to + "&index=" + stationId;
+
+	return downloadStream(url);
+
+    }
+
+    public Set<String> getStationIdentifiers(String linkage) throws Exception {
+	String identifierEndpoint = "";
+	if(linkage.contains(aralStationListendpoint) || linkage.contains(moldovaStationListendpoint)) {
+	    identifierEndpoint = linkage;
+	}else {
+	    identifierEndpoint = stationListendpoint;
+	}
 	InputStream stream = downloadStream(identifierEndpoint);
 	XMLDocumentReader reader = new XMLDocumentReader(stream);
 	Node[] nodes = reader.evaluateNodes("//*:MonitoringPoint/*:identifier");
