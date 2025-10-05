@@ -59,7 +59,7 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.wml._2.JAXBWML2;
 import eu.essi_lab.wml._2.ResultWrapper;
 
-public class RIHMIAralDownloader extends DataDownloader {
+public class RIHMIAralMoldovaDownloader extends DataDownloader {
 
     private static final String RIHMI_ARAL_DOWNLOAD_ERROR = "RIHMI_ARAL_DOWNLOAD_ERROR";
 
