@@ -309,9 +309,9 @@ public class RIHMIDownloader extends DataDownloader {
 
 		    File tmp = File.createTempFile(getClass().getSimpleName(), ".wml");
 		    tmp.deleteOnExit();
-		    FileOutputStream fos = new FileOutputStream(tmp);
-
-		    JAXBWML2.getInstance().marshal(collection, fos);
+		    try (FileOutputStream fos = new FileOutputStream(tmp)) {
+			JAXBWML2.getInstance().marshal(collection, fos);
+		    }
 
 		    return tmp;
 
