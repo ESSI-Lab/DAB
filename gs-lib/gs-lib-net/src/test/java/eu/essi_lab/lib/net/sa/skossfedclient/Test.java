@@ -63,13 +63,13 @@ public class Test {
 
 	SKOSSFederatedClient client = new SKOSSFederatedClient();
 
-	client.setExpansionLevel(2);
+	client.setExpansionLevel(0);
 	client.setSearchTerm("water");
 	client.setOntologyUrls(Arrays.asList(//
 		"http://localhost:3031/gemet/query", //
 		"http://hydro.geodab.eu/hydro-ontology/sparql", //
 		"https://vocabularies.unesco.org/sparql" //
-	// "https://dbpedia.org/sparql"
+//		"https://dbpedia.org/sparql"
 	));
 
 	client.setLimit(200);

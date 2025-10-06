@@ -15,9 +15,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import org.eclipse.rdf4j.federated.FedXConfig;
 import org.eclipse.rdf4j.federated.FedXFactory;
 import org.eclipse.rdf4j.federated.repository.FedXRepository;
 import org.eclipse.rdf4j.federated.repository.FedXRepositoryConnection;
+import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -84,6 +86,8 @@ public class SKOSSFederatedClient {
 	FedXFactory fed = FedXFactory.newFederation();
 	fed.withSparqlEndpoints(ontologyUrls);
 
+//	fed.withConfig(new FedXConfig().withEnforceMaxQueryTime(10));
+
 	FedXRepository repo = fed.create();
 
 	FedXRepositoryConnection conn = repo.getConnection();
@@ -92,12 +96,12 @@ public class SKOSSFederatedClient {
 
 	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Finding matching concepts STARTED");
 
-//	Set<String> initConcepts = findMatchingConcepts(conn, sourceLangs, searchTerm);
+	Set<String> initConcepts = findMatchingConcepts(conn, sourceLangs, searchTerm);
 
-	 Set<String> initConcepts = ontologyUrls.//
-	 parallelStream().//
-	 flatMap(url -> findMatchingConcepts(url, sourceLangs, searchTerm).stream()).//
-	 collect(Collectors.toSet());
+	// Set<String> initConcepts = ontologyUrls.//
+	// parallelStream().//
+	// flatMap(url -> findMatchingConcepts(url, sourceLangs, searchTerm).stream()).//
+	// collect(Collectors.toSet());
 
 	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Finding matching concepts ENDED");
 
@@ -336,10 +340,7 @@ public class SKOSSFederatedClient {
 		return;
 	    }
 
-	    synchronized (LOCK) {
-
-		stampSet.add(concept + currentLevel);
-	    }
+	    stampSet.add(concept + currentLevel);
 
 	    visited.add(concept);
 
@@ -364,7 +365,13 @@ public class SKOSSFederatedClient {
 
 	    TupleQuery query = conn.prepareTupleQuery(queryStr);
 
-	    try (TupleQueryResult res = query.evaluate()) {
+	    GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Evaluating STARTED");
+
+	    try {
+
+		TupleQueryResult res = query.evaluate();
+
+		GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Evaluating ENDED");
 
 		while (res.hasNext()) {
 
@@ -410,9 +417,14 @@ public class SKOSSFederatedClient {
 				currentLevel + 1);
 		    }
 		}
-	    }
 
-	    synchronized (LOCK) {
+		res.close();
+
+	    } catch (QueryEvaluationException ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    } finally {
 
 		stampSet.remove(concept + currentLevel);
 	    }
