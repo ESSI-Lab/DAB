@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.rdf4j.federated.FedXFactory;
 import org.eclipse.rdf4j.federated.repository.FedXRepository;
@@ -35,6 +37,8 @@ import org.eclipse.rdf4j.federated.repository.FedXRepositoryConnection;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 public class SKOSFederatedSearch {
 
@@ -51,27 +55,124 @@ public class SKOSFederatedSearch {
 	    List<String> expansionRelations, //
 	    int limit) throws Exception {
 
-	// Create FedX federation
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Creating federation STARTED");
+
 	FedXFactory fed = FedXFactory.newFederation();
 	fed.withSparqlEndpoints(ontologyUrls);
+
 	FedXRepository repo = fed.create();
+
 	List<Map<String, String>> results = new ArrayList<>();
 	Set<String> visited = new HashSet<>();
 
 	FedXRepositoryConnection conn = repo.getConnection();
 
-	// 1. Find initial matching concepts
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Creating federation ENDED");
+
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Finding matching concepts STARTED");
+
 	Set<String> initialConcepts = findMatchingConcepts(conn, sourceLangs, searchTerm);
 
 	System.out.println("Matched concepts: " + initialConcepts.size());
+
 	for (String initialConcept : initialConcepts) {
 	    System.out.println(initialConcept);
 	}
 
-	// 2. Recursively expand each concept
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Finding matching concepts ENDED");
+
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Expanding matching concepts STARTED");
+
 	for (String concept : initialConcepts) {
 	    expandConcept(concept, conn, searchLangs, expansionRelations, expansionLevel, visited, results, 0);
 	}
+
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Expanding matching concepts STARTED");
+
+	conn.close();
+
+	repo.shutDown();
+
+	// Limit results
+	if (results.size() > limit) {
+	    return results.subList(0, limit);
+	} else {
+	    return results;
+	}
+    }
+
+    /**
+     * @param ontologyUrls
+     * @return
+     */
+    private static FedXRepositoryConnection create(List<String> ontologyUrls) {
+
+	FedXFactory fed = FedXFactory.newFederation();
+	fed.withSparqlEndpoints(ontologyUrls);
+
+	FedXRepository repo = fed.create();
+
+	return repo.getConnection();
+    }
+
+    /**
+     * Search a term in sourceLang, expand narrower/related relations up to
+     * expansionLevel, follow closeMatch links, and return labels in searchLangs.
+     */
+    public static List<Map<String, String>> searchAndExpand2(//
+	    List<String> sourceLangs, //
+	    String searchTerm, //
+	    List<String> searchLangs, //
+	    List<String> ontologyUrls, //
+	    int expansionLevel, //
+	    List<String> expansionRelations, //
+	    int limit) throws Exception {
+
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Creating federation STARTED");
+
+	FedXFactory fed = FedXFactory.newFederation();
+	fed.withSparqlEndpoints(ontologyUrls);
+
+	FedXRepository repo = fed.create();
+
+	FedXRepositoryConnection conn = repo.getConnection();
+
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Creating federation ENDED");
+
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Finding matching concepts STARTED");
+
+	Set<String> initialConcepts =
+
+		ontologyUrls.parallelStream().flatMap(url ->
+		{
+		    try {
+			return findMatchingConcepts(create(Arrays.asList(url)), sourceLangs, searchTerm).stream();
+		    } catch (Exception e) {
+			e.printStackTrace();
+		    }
+		    return Stream.of();
+		    
+		}).collect(Collectors.toSet());
+
+	System.out.println("Matched concepts: " + initialConcepts.size());
+
+	for (String initialConcept : initialConcepts) {
+	    System.out.println(initialConcept);
+	}
+
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Finding matching concepts ENDED");
+
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Expanding matching concepts STARTED");
+
+	List<Map<String, String>> results = new ArrayList<>();
+	Set<String> visited = new HashSet<>();
+
+
+	for (String concept : initialConcepts) {
+	    expandConcept(concept, conn, searchLangs, expansionRelations, expansionLevel, visited, results, 0);
+	}
+
+	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Expanding matching concepts STARTED");
 
 	conn.close();
 
@@ -117,12 +218,17 @@ public class SKOSFederatedSearch {
 		""", match);
 
 	TupleQuery query = conn.prepareTupleQuery(queryStr);
+
 	Set<String> concepts = new HashSet<>();
+
 	try (TupleQueryResult res = query.evaluate()) {
+
 	    while (res.hasNext()) {
+
 		concepts.add(res.next().getValue("concept").stringValue());
 	    }
 	}
+
 	return concepts;
     }
 
@@ -139,9 +245,11 @@ public class SKOSFederatedSearch {
 	    List<Map<String, String>> results, //
 	    int currentLevel) throws Exception {
 
-	if (visited.contains(concept) || currentLevel > expansionLevel)
+	if (visited.contains(concept) || currentLevel > expansionLevel) {
+	    
 	    return;
-	
+	}
+
 	visited.add(concept);
 
 	// Fetch labels in desired languages
@@ -162,11 +270,14 @@ public class SKOSFederatedSearch {
 		}
 		""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock);
 
-	System.out.println(queryStr);
+	// System.out.println(queryStr);
+
 	TupleQuery query = conn.prepareTupleQuery(queryStr);
 
 	try (TupleQueryResult res = query.evaluate()) {
+	   
 	    while (res.hasNext()) {
+		
 		var bs = res.next();
 
 		// Save result
@@ -197,41 +308,59 @@ public class SKOSFederatedSearch {
      * relations
      */
     private static String buildExpansionOptionalBlock(String conceptVar, List<String> relations) {
-	
+
 	StringBuilder sb = new StringBuilder();
-	
+
 	for (String rel : relations) {
 	    sb.append("OPTIONAL { ?").append(conceptVar).append(" ").append(rel).append(" ?expanded } ");
 	}
-	
+
 	return sb.toString();
     }
 
     public static void main(String[] args) throws Exception {
-	// Parameters
-	List<String> sourceLangs = Arrays.asList("en", "it");
-	String searchTerm = "livello";
+
+	String searchTerm = "Water";
 	// String searchTerm = "level"; // works as well
+
+	List<String> sourceLangs = Arrays.asList("en", "it");
+
 	List<String> searchLangs = Arrays.asList("en", "it");
+
 	List<String> ontologyUrls = Arrays.asList(
 		//
-		"http://hydro.geodab.eu/hydro-ontology/sparql"
-	// "https://vocabularies.unesco.org/sparql"
-	//
-	// "http://www.eionet.europa.eu/gemet/sparql"
+		"http://localhost:3031/gemet/query", //
+		"http://hydro.geodab.eu/hydro-ontology/sparql", //
+		"https://vocabularies.unesco.org/sparql"//
 	);
-	int expansionLevel = 1;
+
+	int expansionLevel = 2;
+
 	List<String> expansionsRelations = Arrays.asList("skos:narrower", "skos:related");
-	int limit = 50;
 
-	List<Map<String, String>> results = SKOSFederatedSearch.searchAndExpand(sourceLangs, searchTerm, searchLangs, ontologyUrls,
-		expansionLevel, expansionsRelations, limit);
+	int limit = 100;
 
-	for (Map<String, String> result : results) {
+	//
+	//
+	//
+
+	List<Map<String, String>> results0 = SKOSFederatedSearch.searchAndExpand2(//
+		sourceLangs, //
+		searchTerm, //
+		searchLangs, //
+		ontologyUrls, //
+		expansionLevel, //
+		expansionsRelations, //
+		limit);
+
+	results0.stream().sorted((r1, r2) -> r1.get("concept").compareTo(r2.get("concept"))).toList().forEach(result -> {
+
 	    for (String key : result.keySet()) {
-		System.out.println(key + ": " + result.get(key));
+		if (result.get(key) != null) {
+		    System.out.println(key + ": " + result.get(key));
+		}
 	    }
-	    System.out.println("");
-	}
+	    System.out.println("---");
+	});
     }
 }
