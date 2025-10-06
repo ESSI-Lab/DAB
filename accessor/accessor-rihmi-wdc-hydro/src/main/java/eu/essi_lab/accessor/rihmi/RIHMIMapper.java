@@ -253,7 +253,10 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	    if (aggregationDuration.equals("P1M")) {
 		dataset.getExtensionHandler().setTimeUnits("month");
 		dataset.getExtensionHandler().setTimeSupport("1");
-	    } else {
+	    } else if (aggregationDuration.equals("P1D")){
+		dataset.getExtensionHandler().setTimeUnits("day");
+		dataset.getExtensionHandler().setTimeSupport("1");
+	    }else {
 		GSLoggerFactory.getLogger(getClass()).error("Unrecognized aggregation duration: {}", aggregationDuration);
 	    }
 	}

@@ -70,8 +70,12 @@ public class RIHMIClient {
     public static String moldovaWaterTemperatureEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroWaterTemperatureMoldova/xml?";
 
 
-    public String getEndpoint() {
+    public String getRealTimeEndpoint() {
 	return realtimeEndpoint;
+    }
+    
+    public String getHistoricalEndpoint() {
+	return historicalEndpoint;
     }
 
     public String getAralStationEndpoint() {

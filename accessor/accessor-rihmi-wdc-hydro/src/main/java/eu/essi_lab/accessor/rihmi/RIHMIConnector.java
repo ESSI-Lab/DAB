@@ -293,10 +293,6 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 			    split[0] = splittedPos[0].replace(",", ".");
 			    split[1] = splittedPos[1].replace(",", ".");
 			}
-		    } else if(sourceURL.contains(client.getMoldovaStationEndpoint())){
-			String[] splittedPos = pos.split(" ");
-			split[0] = splittedPos[0];
-			split[1] = splittedPos[1];
 		    } else {
 			pos = pos.replace(",", "");
 			split = pos.split(" ");
@@ -309,10 +305,10 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    if (url.contains(client.getAralWaterLevelEndpoint()) || url.contains(client.getMoldovaWaterLevelEndpoint())) {
 			rm.setParameterId("RIHMI:WaterLevel");
 			rm.setParameterName("Water Level");
-		    } else if (url.contains(client.getAralDischargeEndpoint()) || url.contains(client.getMoldovaDischargeEndpoint())) {
+		    } else if (url.contains(client.getAralDischargeEndpoint()) || url.contains(client.getMoldovaDischargeEndpoint()) || url.contains(client.getHistoricalEndpoint()) || url.contains(client.getRealTimeEndpoint())) {
 			rm.setParameterId("RIHMI:Discharge");
 			rm.setParameterName("Discharge");
-		    } else {
+		    } else if (url.contains(client.getAralWaterTemperatureEndpoint()) || url.contains(client.getMoldovaWaterTemperatureEndpoint())) {
 			rm.setParameterId("RIHMI:WaterTemperature");
 			rm.setParameterName("Water Temperature");
 		    }
