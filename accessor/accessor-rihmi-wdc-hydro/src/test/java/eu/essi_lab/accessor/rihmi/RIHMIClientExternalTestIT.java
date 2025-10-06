@@ -51,7 +51,7 @@ public class RIHMIClientExternalTestIT {
     @Test
     public void testStationIdentifiers() throws Exception {
 	RIHMIClient client = new RIHMIClient();
-	Set<String> ids = client.getStationIdentifiers(false);
+	Set<String> ids = client.getStationIdentifiers(client.getRealTimeEndpoint());
 	System.out.println(ids.size() + " values retrieved");
 	assertTrue(ids.size() > 60);
     }

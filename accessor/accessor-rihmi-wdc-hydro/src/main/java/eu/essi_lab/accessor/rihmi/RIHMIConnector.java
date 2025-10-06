@@ -55,8 +55,6 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
     public static final String TYPE = "RIHMIConnector";
     private static final String RIHMI_CONNECTOR_ERROR = "RIHMI_CONNECTOR_ERROR";
 
-    private static boolean isAral = false;
-
     @Override
     public boolean supports(GSSource source) {
 	String url = source.getEndpoint();
@@ -76,10 +74,10 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 	List<String> stationIdentifiers;
 
-	isAral = getSetting().isAral();
+	
 
 	try {
-	    stationIdentifiers = new ArrayList<>(getStationIdentifiers(isAral));
+	    stationIdentifiers = new ArrayList<>(getStationIdentifiers(getSourceURL()));
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
@@ -116,9 +114,9 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
     }
 
-    private static Set<String> stationIdentifiers = null;
+    private Set<String> stationIdentifiers = null;
 
-    private Set<String> getStationIdentifiers(boolean isAral) throws Exception {
+    private Set<String> getStationIdentifiers(String linkage) throws Exception {
 
 	if (client == null) {
 	    client = new RIHMIClient();
@@ -127,7 +125,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	if (stationIdentifiers != null) {
 	    return stationIdentifiers;
 	}
-	stationIdentifiers = client.getStationIdentifiers(isAral);
+	stationIdentifiers = client.getStationIdentifiers(linkage);
 	return stationIdentifiers;
     }
 
@@ -148,8 +146,9 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		}
 
 		List<String> downloadUrls = new ArrayList<>();
+		String sourceURL = getSourceURL();
 
-		if (isAral) {
+		if(sourceURL.contains(client.getAralStationEndpoint())){
 		    // water level
 		    downloadUrls.add(getRealtimeDownloadUrl(client.getAralWaterLevelEndpoint(), stationId));
 		    // discharges
@@ -157,6 +156,13 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    // water temperature
 		    downloadUrls.add(getRealtimeDownloadUrl(client.getAralWaterTemperatureEndpoint(), stationId));
 
+		} else if (sourceURL.contains(client.getMoldovaStationEndpoint())) {
+		    // water level
+		    downloadUrls.add(getRealtimeDownloadUrl(client.getMoldovaWaterLevelEndpoint(), stationId));
+		    // discharges
+		    downloadUrls.add(getRealtimeDownloadUrl(client.getMoldovaDischargeEndpoint(), stationId));
+		    // water temperature
+		    downloadUrls.add(getRealtimeDownloadUrl(client.getMoldovaWaterTemperatureEndpoint(), stationId));
 		} else {
 		    // real time download url
 		    downloadUrls.add(getRealtimeDownloadUrl(getSourceURL(), stationId));
@@ -236,7 +242,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 			    response = client.getDownloadResponse(newURL);
 			} catch (Exception e) {
 			    GSLoggerFactory.getLogger(getClass()).error("Error ({}) while downloading from station {} Reference URL: {}",
-				    e.getMessage(), stationId, url);
+				    e.getMessage(), stationId, newURL);
 			    continue;
 			}
 
@@ -281,7 +287,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 		    String pos = reader.evaluateString("//*:shape/*:Point/*:pos");
 		    String[] split = new String[2];
-		    if (isAral) {
+		    if (sourceURL.contains(client.getAralStationEndpoint())) {
 			String[] splittedPos = pos.split(", ");
 			if (splittedPos != null && splittedPos.length > 1) {
 			    split[0] = splittedPos[0].replace(",", ".");
@@ -296,13 +302,13 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 			rm.setLatitude(Double.parseDouble(split[0]));
 			rm.setLongitude(Double.parseDouble(split[1]));
 		    }
-		    if (url.contains(client.getAralWaterLevelEndpoint())) {
+		    if (url.contains(client.getAralWaterLevelEndpoint()) || url.contains(client.getMoldovaWaterLevelEndpoint())) {
 			rm.setParameterId("RIHMI:WaterLevel");
 			rm.setParameterName("Water Level");
-		    } else if (url.contains(client.getAralDischargeEndpoint())) {
+		    } else if (url.contains(client.getAralDischargeEndpoint()) || url.contains(client.getMoldovaDischargeEndpoint()) || url.contains(client.getHistoricalEndpoint()) || url.contains(client.getRealTimeEndpoint())) {
 			rm.setParameterId("RIHMI:Discharge");
 			rm.setParameterName("Discharge");
-		    } else {
+		    } else if (url.contains(client.getAralWaterTemperatureEndpoint()) || url.contains(client.getMoldovaWaterTemperatureEndpoint())) {
 			rm.setParameterId("RIHMI:WaterTemperature");
 			rm.setParameterName("Water Temperature");
 		    }
@@ -324,12 +330,16 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 			} else {
 			    GSLoggerFactory.getLogger(getClass()).error("Interpolation not recognized: {}", interpolation);
 			}
+		    } else if(sourceURL.contains(client.getMoldovaStationEndpoint()) || sourceURL.contains(client.getAralStationEndpoint())){
+			rm.setInterpolation(InterpolationType.DISCONTINUOUS);
 		    }
 
 		    String aggregationDuration = reader.evaluateString(
 			    "//*:MeasurementTimeseries[1]/*:defaultPointMetadata[1]/*:DefaultTVPMeasurementMetadata[1]/*:aggregationDuration[1]");
 		    if (aggregationDuration != null && !aggregationDuration.isEmpty()) {
 			rm.setAggregationDuration(aggregationDuration);
+		    } else if(sourceURL.contains(client.getMoldovaStationEndpoint()) || sourceURL.contains(client.getAralStationEndpoint())){
+			rm.setAggregationDuration("P1D");
 		    }
 
 		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -343,12 +353,12 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 		    metadataRecord.setMetadata(str);
 
-		    GSPropertyHandler handler = GSPropertyHandler.of(new GSProperty<Boolean>("isAral", isAral));
-		    if (isAral) {
-			handler.add(//
-				new GSProperty<String>("downloadLink", url));
+		    //GSPropertyHandler handler = GSPropertyHandler.of(new GSProperty<Boolean>("isAral", isAral));
+		    if (sourceURL.contains(client.getAralStationEndpoint()) || sourceURL.contains(client.getMoldovaStationEndpoint())) {
+			GSPropertyHandler handler = GSPropertyHandler.of(new GSProperty<String>("downloadLink", url));
+			 metadataRecord.setAdditionalInfo(handler);
 		    }
-		    metadataRecord.setAdditionalInfo(handler);
+		   
 
 		    ret.addRecord(metadataRecord);
 

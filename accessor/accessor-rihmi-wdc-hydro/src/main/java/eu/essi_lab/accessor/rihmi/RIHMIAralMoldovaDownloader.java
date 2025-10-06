@@ -59,21 +59,21 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.wml._2.JAXBWML2;
 import eu.essi_lab.wml._2.ResultWrapper;
 
-public class RIHMIAralDownloader extends DataDownloader {
+public class RIHMIAralMoldovaDownloader extends DataDownloader {
 
     private static final String RIHMI_ARAL_DOWNLOAD_ERROR = "RIHMI_ARAL_DOWNLOAD_ERROR";
 
     private RIHMIClient client = new RIHMIClient();
 
     private String stationId;
-    
+
     private boolean isDischarge;
 
     @Override
     public void setOnlineResource(GSResource resource, String onlineResourceId) throws GSException {
 	super.setOnlineResource(resource, onlineResourceId);
 	this.stationId = RIHMIConnector.extractStationId(online.getLinkage());
-	if(online.getLinkage().contains(client.getAralDischargeEndpoint())){
+	if (online.getLinkage().contains(client.getAralDischargeEndpoint())) {
 	    isDischarge = true;
 	}
 
@@ -86,8 +86,9 @@ public class RIHMIAralDownloader extends DataDownloader {
 		    .parseISO8601ToDate(resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent().getBeginPosition()).get();
 	    Date end = ISO8601DateTimeUtils
 		    .parseISO8601ToDate(resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent().getEndPosition()).get();
-	    
-	    InputStream data = client.getAralWaterML(stationId, start, end, isDischarge);
+
+	    String linkage = resource.getHarmonizedMetadata().getCoreMetadata().getOnline().getLinkage();
+	    InputStream data = client.getWaterML(stationId, start, end, linkage);
 	    XMLDocumentReader reader = new XMLDocumentReader(data);
 	    Number count = reader.evaluateNumber("count(//*:value)");
 	    System.out.println(count.longValue() + " values retrieved");
@@ -101,7 +102,7 @@ public class RIHMIAralDownloader extends DataDownloader {
     @Override
     public boolean canDownload() {
 
-	return (online.getProtocol() != null && online.getProtocol().equals(CommonNameSpaceContext.ARAL_BASIN_URI));
+	return (online.getProtocol() != null && online.getProtocol().equals(CommonNameSpaceContext.ARAL_MOLDOVA_URI));
 
     }
 
@@ -190,9 +191,10 @@ public class RIHMIAralDownloader extends DataDownloader {
 
 		    }
 		}
-
+		String linkage = online.getLinkage();
+		linkage = linkage.contains("?") ? linkage.split("\\?")[0] : linkage;
 		if (begin != null && end != null) {
-		    InputStream wml = client.getAralWaterML(stationId, begin, end, isDischarge);
+		    InputStream wml = client.getWaterML(stationId, begin, end, linkage);
 		    XMLDocumentReader reader = new XMLDocumentReader(wml);
 		    String posValue = reader.evaluateString("//*:pos[1]");
 		    wml.close();
@@ -314,9 +316,9 @@ public class RIHMIAralDownloader extends DataDownloader {
 
 		    File tmp = File.createTempFile(getClass().getSimpleName(), ".wml");
 		    tmp.deleteOnExit();
-		    FileOutputStream fos = new FileOutputStream(tmp);
-
-		    JAXBWML2.getInstance().marshal(collection, fos);
+		    try (FileOutputStream fos = new FileOutputStream(tmp)) {
+			JAXBWML2.getInstance().marshal(collection, fos);
+		    }
 
 		    return tmp;
 
