@@ -43,6 +43,7 @@ import eu.essi_lab.lib.xml.stax.StAXDocumentParser;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
@@ -134,13 +135,20 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 			userBond = optUserBond.get();
 		    }
 
+		    SearchAfter sa = null;
 		    do {
 
 			try {
 
 			    discoveryMessage.setUserBond(userBond);
-
+			    if (sa != null) {
+				discoveryMessage.setSearchAfter(sa);
+			    }
 			    ResultSet<String> resultSet = exec(discoveryMessage);
+			    Optional<SearchAfter> searchAfter = resultSet.getSearchAfter();
+			    if (searchAfter.isPresent()) {
+				sa = searchAfter.get();
+			    }
 
 			    List<String> results = resultSet.getResultsList();
 
@@ -162,8 +170,8 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 				if (geometry != null && !geometry.isEmpty()) {
 				    Optional<Geometry> shape = Shape.of(geometry);
 				    if (shape.isPresent()) {
-					latitude = ""+shape.get().getEnvelopeInternal().getMaxY();
-					longitude = ""+shape.get().getEnvelopeInternal().getMaxX();
+					latitude = "" + shape.get().getEnvelopeInternal().getMaxY();
+					longitude = "" + shape.get().getEnvelopeInternal().getMaxX();
 				    }
 				}
 
@@ -213,19 +221,17 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 				}
 
 			    }
-			    tmpPage.setStart(tmpPage.getStart() + maxPageSize);
 			    totalExpected = resultSet.getCountResponse().getCount();
 			    currentSize = results.size();
 			    totalSize += currentSize;
-			    tmpPage.setSize(Math.min(maxPageSize, userSize - totalSize));
+			    
 
 			} catch (Exception e) {
 			    e.printStackTrace();
 			}
 
-			// tmpPage.setSize(defaultPageSize)
 
-		    } while (totalSize < userSize && currentSize != 0);
+		    } while (totalSize < totalExpected && sa !=null);
 
 		    writer.writeEndDocument();
 		    writer.flush();

@@ -42,10 +42,6 @@ import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.lib.net.protocols.NetProtocols;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.EntityRef;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.SensorThingsRequest;
-import eu.essi_lab.lib.sensorthings._1_1.client.request.options.ExpandItem;
-import eu.essi_lab.lib.sensorthings._1_1.client.request.options.ExpandOption;
-import eu.essi_lab.lib.sensorthings._1_1.client.request.options.SystemQueryOptions;
-import eu.essi_lab.lib.sensorthings._1_1.client.request.options.ExpandItem.Operation;
 import eu.essi_lab.lib.sensorthings._1_1.client.response.AddressableEntityResult;
 import eu.essi_lab.lib.sensorthings._1_1.model.UnitOfMeasurement;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Datastream;
@@ -519,20 +515,24 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 	MIPlatform platform = new MIPlatform();
 
+	String platformName = null;
+
+	if (thing.getName().isPresent()) {
+	    platformName = normalize(thing.getName().get());
+	} else {
+
+	}
+
 	if (location.isPresent()) {
 
 	    //
 	    // Platform Title
 	    //
 
-	    if (location.get().getName().isPresent()) {
+	    if (platformName == null && location.get().getName().isPresent()) {
 
-		String locName = location.get().getName().get();
-		locName = normalize(locName);
-
-		Citation citation = new Citation();
-		citation.setTitle(locName);
-		platform.setCitation(citation);
+		platformName = location.get().getName().get();
+		platformName = normalize(platformName);
 	    }
 
 	    Optional<JSONObject> optLocationProp = location.get().getProperties();
@@ -561,6 +561,10 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 		}
 	    }
 	}
+
+	Citation citation = new Citation();
+	citation.setTitle(platformName);
+	platform.setCitation(citation);
 
 	//
 	// Platform id
