@@ -10,10 +10,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
 import org.eclipse.rdf4j.federated.FedXFactory;
@@ -86,7 +84,7 @@ public class SKOSSFederatedClient {
 	FedXFactory fed = FedXFactory.newFederation();
 	fed.withSparqlEndpoints(ontologyUrls);
 
-//	fed.withConfig(new FedXConfig().withEnforceMaxQueryTime(10));
+	fed.withConfig(new FedXConfig().withEnforceMaxQueryTime(10));
 
 	FedXRepository repo = fed.create();
 
@@ -384,7 +382,7 @@ public class SKOSSFederatedClient {
 			    bs.getValue("alt") != null ? bs.getValue("alt").stringValue() : null);
 
 		    if (!results.contains(item)) {
-
+			//
 			results.add(item);
 		    }
 
@@ -440,7 +438,7 @@ public class SKOSSFederatedClient {
      * @param conn
      * @param searchLangs
      * @param expansionRelations
-     * @param expansionLevel
+     * @param targetLevel
      * @param visited
      * @param results
      * @param currentLevel
@@ -451,7 +449,7 @@ public class SKOSSFederatedClient {
 	    RepositoryConnection conn, //
 	    List<String> searchLangs, //
 	    List<String> expansionRelations, //
-	    int expansionLevel, //
+	    int targetLevel, //
 	    Set<String> visited, //
 	    List<SKOSSResponseItem> results, //
 	    int currentLevel) {
@@ -460,7 +458,7 @@ public class SKOSSFederatedClient {
 
 	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Current level: {}", currentLevel);
 
-	if (visited.contains(concept) || currentLevel > expansionLevel) {
+	if (visited.contains(concept) || currentLevel > targetLevel) {
 
 	    GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Ending recursive call");
 
@@ -470,8 +468,8 @@ public class SKOSSFederatedClient {
 	visited.add(concept);
 
 	String labelsFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
-	String expansionBlock = currentLevel < expansionLevel ? buildExpansionOptionalBlock("concept", expansionRelations) : "";
-	String closeMatchBlock = currentLevel < expansionLevel ? "OPTIONAL { ?concept skos:closeMatch ?closeMatch }" : "";
+	String expansionBlock = currentLevel < targetLevel ? buildExpansionOptionalBlock("concept", expansionRelations) : "";
+	String closeMatchBlock = currentLevel < targetLevel ? "OPTIONAL { ?concept skos:closeMatch ?closeMatch }" : "";
 
 	String queryStr = String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -484,7 +482,7 @@ public class SKOSSFederatedClient {
 		    %s
 		    %s
 		}
-		""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock).trim().strip();
+		""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock);
 
 	// GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Current query: \n{}", queryStr);
 
@@ -514,7 +512,7 @@ public class SKOSSFederatedClient {
 			    conn, //
 			    searchLangs, //
 			    expansionRelations, //
-			    expansionLevel, //
+			    targetLevel, //
 			    visited, //
 			    results, //
 			    currentLevel + 1);
@@ -526,12 +524,15 @@ public class SKOSSFederatedClient {
 			    conn, //
 			    searchLangs, //
 			    expansionRelations, //
-			    expansionLevel, //
+			    targetLevel, //
 			    visited, //
 			    results, //
 			    currentLevel + 1);
 		}
 	    }
+	} catch (QueryEvaluationException ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
 	}
 
 	GSLoggerFactory.getLogger(SKOSFederatedSearch.class).info("Expanding concept {} ENDED", concept);
@@ -724,10 +725,11 @@ public class SKOSSFederatedClient {
 	client.setExpansionLevel(2);
 	client.setSearchTerm("water");
 	client.setOntologyUrls(Arrays.asList(//
-		"http://localhost:3031/gemet/query", //
+		// "http://localhost:3031/gemet/query", //
 		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql", //
-		"https://dbpedia.org/sparql"));
+		"https://vocabularies.unesco.org/sparql" //
+	// "https://dbpedia.org/sparql"
+	));
 
 	client.setLimit(200);
 
@@ -748,7 +750,7 @@ public class SKOSSFederatedClient {
 	chronometer2.start();
 
 	List<SKOSSResponseItem> response2 = client.//
-		search3().//
+		search().//
 		stream().//
 
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())).//
@@ -757,12 +759,12 @@ public class SKOSSFederatedClient {
 
 	String elTime2 = chronometer2.formatElapsedTime();
 
-	System.out.println("\n\n\n---");
-	// System.out.println(elTime1);
-	System.out.println(elTime2);
-	// System.out.println(response1.equals(response2));
-
-	System.out.println("\n\n");
+	// System.out.println("\n\n\n---");
+	// // System.out.println(elTime1);
+	// System.out.println(elTime2);
+	// // System.out.println(response1.equals(response2));
+	//
+	// System.out.println("\n\n");
 
 	// response1.forEach(c -> System.out.println(c + "\n---"));
 	// response1.stream().filter(r -> r.getPref().isPresent()).map(r -> r.getPref().get()).distinct().//
@@ -771,7 +773,10 @@ public class SKOSSFederatedClient {
 
 	System.out.println("\n\n");
 	// response2.forEach(c -> System.out.println(c + "\n---"));
-	response2.stream().filter(r -> r.getPref().isPresent()).map(r -> r.getPref().get()).distinct().//
+
+	response2.stream().//
+		filter(r -> r.getPref().isPresent()).map(r -> r.getPref().get()).//
+		distinct().//
 		sorted().//
 		forEach(v -> System.out.println(v));
 

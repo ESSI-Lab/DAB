@@ -52,9 +52,10 @@ public class Test {
 	System.out.println("\n\n");
 
 	response.forEach(c -> System.out.println(c + "\n---"));
-	response.stream().filter(r -> r.getPref().isPresent()).map(r -> r.getPref().get()).distinct().//
-		sorted().//
-		forEach(v -> System.out.println(v));
+//	
+//	response.stream().filter(r -> r.getPref().isPresent()).map(r -> r.getPref().get()).distinct().//
+//		sorted().//
+//		forEach(v -> System.out.println(v));
 
     }
     
@@ -63,13 +64,13 @@ public class Test {
 
 	SKOSSFederatedClient client = new SKOSSFederatedClient();
 
-	client.setExpansionLevel(0);
+	client.setExpansionLevel(2);
 	client.setSearchTerm("water");
 	client.setOntologyUrls(Arrays.asList(//
 		"http://localhost:3031/gemet/query", //
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql" //
-//		"https://dbpedia.org/sparql"
+		"http://hydro.geodab.eu/hydro-ontology/sparql",//
+		"https://vocabularies.unesco.org/sparql", //
+		"https://dbpedia.org/sparql"
 	));
 
 	client.setLimit(200);
@@ -87,15 +88,16 @@ public class Test {
 
 	String elTime = chronometer.formatElapsedTime();
 
-	System.out.println("\n\n\n---");
-	System.out.println(elTime);
+//	System.out.println("\n\n\n---");
+//	System.out.println(elTime);
 
 	System.out.println("\n\n");
 
 	response.forEach(c -> System.out.println(c + "\n---"));
-	response.stream().filter(r -> r.getPref().isPresent()).map(r -> r.getPref().get()).distinct().//
-		sorted().//
-		forEach(v -> System.out.println(v));
+	
+//	response.stream().filter(r -> r.getPref().isPresent()).map(r -> r.getPref().get()).distinct().//
+//		sorted().//
+//		forEach(v -> System.out.println(v));
 
     }
 }
