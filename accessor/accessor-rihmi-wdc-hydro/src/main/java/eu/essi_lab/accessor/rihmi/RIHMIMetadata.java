@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.rihmi;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.xml.bind.JAXBContext;
@@ -64,9 +65,9 @@ public class RIHMIMetadata {
     @XmlElement
     private Date end;
     @XmlElement
-    private Double latitude;
+    private BigDecimal latitude;
     @XmlElement
-    private Double longitude;
+    private BigDecimal longitude;
     @XmlElement
     private InterpolationType interpolation;
     @XmlElement
@@ -154,20 +155,20 @@ public class RIHMIMetadata {
     }
 
     @XmlTransient
-    public Double getLatitude() {
+    public BigDecimal getLatitude() {
 	return latitude;
     }
 
-    public void setLatitude(Double latitude) {
+    public void setLatitude(BigDecimal latitude) {
 	this.latitude = latitude;
     }
 
     @XmlTransient
-    public Double getLongitude() {
+    public BigDecimal getLongitude() {
 	return longitude;
     }
 
-    public void setLongitude(Double longitude) {
+    public void setLongitude(BigDecimal longitude) {
 	this.longitude = longitude;
     }
 
