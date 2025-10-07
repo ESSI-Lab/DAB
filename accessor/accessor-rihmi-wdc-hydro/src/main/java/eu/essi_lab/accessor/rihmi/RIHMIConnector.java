@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.net.http.HttpResponse;
 import java.text.SimpleDateFormat;
@@ -299,8 +300,8 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    }
 
 		    if (split.length > 1 && split[0] != null) {
-			rm.setLatitude(Double.parseDouble(split[0]));
-			rm.setLongitude(Double.parseDouble(split[1]));
+			rm.setLatitude(new BigDecimal(split[0]));
+			rm.setLongitude(new BigDecimal(split[1]));
 		    }
 		    if (url.contains(client.getAralWaterLevelEndpoint()) || url.contains(client.getMoldovaWaterLevelEndpoint())) {
 			rm.setParameterId("RIHMI:WaterLevel");

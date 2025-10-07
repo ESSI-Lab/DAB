@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.rihmi;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -100,8 +101,8 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 
 	Date begin = md.getBegin();
 	Date end = md.getEnd();
-	Double lat = md.getLatitude();
-	Double lon = md.getLongitude();
+	BigDecimal lat = md.getLatitude();
+	BigDecimal lon = md.getLongitude();
 	String parameterId = md.getParameterId();
 	String parameterName = md.getParameterName();
 	String stationId = md.getStationId();
