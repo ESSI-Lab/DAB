@@ -19,7 +19,7 @@ public class FedXConceptsFinder extends AbstractFedXConceptsFinder {
     private FedXEngine engine;
 
     /**
-     * @param engine
+     *  
      */
     public FedXConceptsFinder() {
     }
