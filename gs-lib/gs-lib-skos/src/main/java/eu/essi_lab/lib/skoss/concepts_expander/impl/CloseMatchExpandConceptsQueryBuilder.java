@@ -6,13 +6,14 @@ package eu.essi_lab.lib.skoss.concepts_expander.impl;
 import java.util.List;
 
 import eu.essi_lab.lib.skoss.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skoss.ExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 
 /**
+ * Builds a query using also {@link SKOSSemanticRelation#CLOSE_MATCH} in the <code>select</code> clause
+ * 
  * @author Fabrizio
  */
-public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBuilder {
+public class CloseMatchExpandConceptsQueryBuilder extends DefaultExpandConceptsQueryBuilder {
 
     @Override
     public String build(//
@@ -28,7 +29,7 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-		SELECT DISTINCT ?pref ?alt ?expanded WHERE {
+		SELECT DISTINCT ?pref ?alt ?closeMatch ?expanded WHERE {
 		    BIND(<%s> AS ?concept)
 
 		    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s)) }
@@ -38,26 +39,5 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 		    %s
 		}
 		""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock);
-    }
-
-    /**
-     * @param conceptVar
-     * @param relations
-     * @return
-     */
-    protected String buildExpansionOptionalBlock(String conceptVar, List<SKOSSemanticRelation> relations) {
-
-	StringBuilder sb = new StringBuilder();
-
-	for (SKOSSemanticRelation rel : relations) {
-
-	    sb.append("OPTIONAL { ?").//
-		    append(conceptVar).//
-		    append(" ").//
-		    append(rel.getLabel()).//
-		    append(" ?expanded } ");
-	}
-
-	return sb.toString();
     }
 }

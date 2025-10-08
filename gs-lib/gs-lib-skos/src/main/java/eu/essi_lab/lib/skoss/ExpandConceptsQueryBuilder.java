@@ -24,7 +24,7 @@ public interface ExpandConceptsQueryBuilder {
     String build(//
 	    String concept, //
 	    List<String> searchLangs, //
-	    List<String> expansionRelations, //
+	    List<SKOSSemanticRelation> expansionRelations, //
 	    ExpansionLevel target, //
 	    ExpansionLevel current);
 }

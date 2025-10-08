@@ -21,6 +21,7 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import eu.essi_lab.lib.skoss.FedXEngine;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSResponseItem;
+import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -62,7 +63,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //
 	    List<String> searchLangs, //
-	    List<String> expansionRelations, //
+	    List<SKOSSemanticRelation> expansionRelations, //
 	    ExpansionLevel targetLevel, //
 	    int limit) throws Exception {
 
@@ -147,7 +148,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 	    RepositoryConnection conn, //
 	    String concept, //
 	    List<String> searchLangs, //
-	    List<String> expansionRelations, //
+	    List<SKOSSemanticRelation> expansionRelations, //
 	    Set<String> visited, //
 	    List<SKOSResponseItem> results, //
 	    ExpansionLevel targetLevel, //

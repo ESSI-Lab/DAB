@@ -5,7 +5,6 @@ package eu.essi_lab.lib.skoss.concepts_expander.test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
@@ -15,6 +14,8 @@ import eu.essi_lab.lib.skoss.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.FedXEngine;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSResponseItem;
+import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
+import eu.essi_lab.lib.skoss.concepts_expander.impl.CloseMatchExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.DefaultExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode;
@@ -41,7 +42,7 @@ public class ConceptsExpanderTest {
 
 	List<String> searchLangs = Arrays.asList("it", "en");
 
-	List<String> expansionRelations = Arrays.asList("skos:narrower", "skos:related");
+	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
@@ -62,7 +63,7 @@ public class ConceptsExpanderTest {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		expansionRelations, //
+		relations, //
 		targetLevel, //
 		limit);//
 
@@ -96,7 +97,7 @@ public class ConceptsExpanderTest {
 
 	List<String> searchLangs = Arrays.asList("it", "en");
 
-	List<String> expansionRelations = Arrays.asList("skos:narrower", "skos:related");
+	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
@@ -133,7 +134,7 @@ public class ConceptsExpanderTest {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		expansionRelations, //
+		relations, //
 		targetLevel, //
 		limit);//
 
@@ -153,7 +154,7 @@ public class ConceptsExpanderTest {
 
 	response.getAltLabels().forEach(alt -> System.out.println(alt));
     }
-    
+
     @Test
     public void singleThreadTest() throws Exception {
 
@@ -167,7 +168,7 @@ public class ConceptsExpanderTest {
 
 	List<String> searchLangs = Arrays.asList("it", "en");
 
-	List<String> expansionRelations = Arrays.asList("skos:narrower", "skos:related");
+	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
@@ -204,7 +205,7 @@ public class ConceptsExpanderTest {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		expansionRelations, //
+		relations, //
 		targetLevel, //
 		limit);//
 
@@ -232,14 +233,14 @@ public class ConceptsExpanderTest {
 		"http://localhost:3031/gemet/query", //
 		"http://hydro.geodab.eu/hydro-ontology/sparql", //
 		"https://vocabularies.unesco.org/sparql" //
-//		"https://dbpedia.org/sparql"
+	// "https://dbpedia.org/sparql"
 	);
 
 	List<String> sourceLangs = Arrays.asList("it", "en");
 
 	List<String> searchLangs = Arrays.asList("it", "en");
 
-	List<String> expansionRelations = Arrays.asList("skos:semanticRelation");
+	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
@@ -276,7 +277,7 @@ public class ConceptsExpanderTest {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		expansionRelations, //
+		relations, //
 		targetLevel, //
 		limit);//
 
@@ -296,7 +297,79 @@ public class ConceptsExpanderTest {
 
 	response.getAltLabels().forEach(alt -> System.out.println(alt));
     }
-    
+
+    @Test
+    public void multiThreadConceptsFinderTestWithCloseMatchExpandQueryBuilder() throws Exception {
+
+	List<String> ontologyUrls = Arrays.asList(//
+		"http://localhost:3031/gemet/query", //
+		"http://hydro.geodab.eu/hydro-ontology/sparql", //
+		"https://vocabularies.unesco.org/sparql" //
+	// "https://dbpedia.org/sparql"
+	);
+
+	List<String> sourceLangs = Arrays.asList("it", "en");
+
+	List<String> searchLangs = Arrays.asList("it", "en");
+
+	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
+
+	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
+
+	int limit = 200;
+
+	//
+	//
+	//
+
+	FedXMultiThreadConceptsFinder finder = new FedXMultiThreadConceptsFinder();
+
+	finder.setConfiguration(new FedXConfig());
+	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
+	finder.setExecutor(new DefaultFedXConceptsQueryExecutor());
+
+	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
+
+	//
+	//
+	//
+
+	FedXConceptsExpander expander = new FedXConceptsExpander();
+
+	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
+	expander.setQueryBuilder(new CloseMatchExpandConceptsQueryBuilder());
+	expander.setThreadMode(ThreadMode.MULTI());
+
+	//
+	//
+	//
+
+	SKOSResponse response = expander.expand(//
+		concepts, //
+		ontologyUrls, //
+		sourceLangs, //
+		searchLangs, //
+		relations, //
+		targetLevel, //
+		limit);//
+
+	List<SKOSResponseItem> results = response.getResults().stream().//
+		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
+		toList();//
+
+	System.out.println("\n\n");
+
+	results.forEach(res -> System.out.println(res + "\n---"));
+
+	System.out.println("\n\n");
+
+	response.getPrefLabels().forEach(pref -> System.out.println(pref));
+
+	System.out.println("\n\n");
+
+	response.getAltLabels().forEach(alt -> System.out.println(alt));
+    }
+
     @Test
     public void multiThreadConceptsFinderWithFixedThreadPoolExecutorTest() throws Exception {
 
@@ -304,14 +377,14 @@ public class ConceptsExpanderTest {
 		"http://localhost:3031/gemet/query", //
 		"http://hydro.geodab.eu/hydro-ontology/sparql", //
 		"https://vocabularies.unesco.org/sparql" //
-//		"https://dbpedia.org/sparql"
+	// "https://dbpedia.org/sparql"
 	);
 
 	List<String> sourceLangs = Arrays.asList("it", "en");
 
 	List<String> searchLangs = Arrays.asList("it", "en");
 
-	List<String> expansionRelations = Arrays.asList("skos:narrower", "skos:related");
+	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
@@ -348,7 +421,7 @@ public class ConceptsExpanderTest {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		expansionRelations, //
+		relations, //
 		targetLevel, //
 		limit);//
 

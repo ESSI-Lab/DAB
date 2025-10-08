@@ -97,7 +97,7 @@ public interface ConceptsExpander {
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //
 	    List<String> searchLangs, //
-	    List<String> expansionRelations, //
+	    List<SKOSSemanticRelation> expansionRelations, //
 	    ExpansionLevel targetLevel, //
 	    int limit) throws Exception;
 }
