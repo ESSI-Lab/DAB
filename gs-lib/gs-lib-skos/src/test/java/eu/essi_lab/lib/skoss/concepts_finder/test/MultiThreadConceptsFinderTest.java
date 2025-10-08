@@ -24,7 +24,7 @@ public class MultiThreadConceptsFinderTest {
     public void defaultTest() throws Exception {
 
 	List<String> ontologyUrls = Arrays.asList(//
-		"http://localhost:3031/gemet/query", //
+		// "http://localhost:3031/gemet/query", //
 		"http://hydro.geodab.eu/hydro-ontology/sparql", //
 		"https://vocabularies.unesco.org/sparql", //
 		"https://dbpedia.org/sparql");
@@ -56,7 +56,12 @@ public class MultiThreadConceptsFinderTest {
 	FedXMultiThreadConceptsFinder finder = new FedXMultiThreadConceptsFinder();
 
 	finder.setConfiguration(new FedXConfig());
-	finder.setExecutor(new DefaultFedXConceptsQueryExecutor());
+
+	DefaultFedXConceptsQueryExecutor executor = new DefaultFedXConceptsQueryExecutor();
+	executor.setTraceQuery(false);
+
+	finder.setExecutor(executor);
+	
 	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
 
 	List<String> concepts = finder.find("water", ontologyUrls, Arrays.asList("it", "en")).//

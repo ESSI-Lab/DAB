@@ -35,6 +35,6 @@ public class DefaultFindConceptsQueryBuilder implements FindConceptsQueryBuilder
 		    UNION { ?concept skos:hiddenLabel ?label }
 		    %s
 		}
-		""", match);
+		""", match).trim();
     }
 }
