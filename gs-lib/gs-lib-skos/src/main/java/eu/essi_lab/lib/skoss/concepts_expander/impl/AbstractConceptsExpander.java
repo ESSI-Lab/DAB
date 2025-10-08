@@ -12,6 +12,7 @@ import eu.essi_lab.lib.skoss.ExpandConceptsQueryBuilder;
 public abstract class AbstractConceptsExpander implements ConceptsExpander {
 
     private ExpandConceptsQueryBuilder builder;
+    private boolean traceQuery;
 
     /**
      * 
@@ -37,4 +38,19 @@ public abstract class AbstractConceptsExpander implements ConceptsExpander {
 	this.builder = builder;
     }
 
+    /**
+     * @return
+     */
+    public boolean traceQuery() {
+
+	return traceQuery;
+    }
+
+    /**
+     * @param traceQuery
+     */
+    public void setTraceQuery(boolean traceQuery) {
+
+	this.traceQuery = traceQuery;
+    }
 }

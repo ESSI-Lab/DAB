@@ -124,6 +124,7 @@ public class ConceptsExpanderTest {
 	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
 	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.setTraceQuery(false);
 
 	//
 	//
@@ -195,6 +196,7 @@ public class ConceptsExpanderTest {
 	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
 	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
 	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.setTraceQuery(false);
 
 	//
 	//
@@ -267,6 +269,7 @@ public class ConceptsExpanderTest {
 	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
 	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.setTraceQuery(false);
 
 	//
 	//
@@ -339,6 +342,7 @@ public class ConceptsExpanderTest {
 	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
 	expander.setQueryBuilder(new CloseMatchExpandConceptsQueryBuilder());
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.setTraceQuery(false);
 
 	//
 	//
@@ -410,7 +414,9 @@ public class ConceptsExpanderTest {
 
 	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
 	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
+	// limit the thread pool to 5 threads
 	expander.setThreadMode(ThreadMode.MULTI(Executors.newFixedThreadPool(5)));
+	expander.setTraceQuery(false);
 
 	//
 	//
