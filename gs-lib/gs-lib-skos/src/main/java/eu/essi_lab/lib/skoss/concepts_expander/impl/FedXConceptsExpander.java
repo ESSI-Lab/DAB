@@ -25,11 +25,52 @@ import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
 public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
+
+    /**
+     * @author Fabrizio
+     */
+    private enum Binding implements LabeledEnum {
+
+	/**
+	 * 
+	 */
+	PREF("pref"),
+	/**
+	 * 
+	 */
+	ALT("alt"),
+	/**
+	 * 
+	 */
+	CLOSE_MATCH("closeMatch"),
+	/**
+	 * 
+	 */
+	EXPANDED("expanded");
+
+	private String label;
+
+	/**
+	 * @param label
+	 */
+	private Binding(String label) {
+
+	    this.label = label;
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return label;
+	}
+
+    }
 
     private ThreadMode threadMode;
 
@@ -178,7 +219,10 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 		    targetLevel, //
 		    currentLevel);
 
-	    // GSLoggerFactory.getLogger(getClass()).info("Current query: \n{}", queryStr);
+	    if (traceQuery()) {
+
+		GSLoggerFactory.getLogger(getClass()).trace("Current query: \n{}", queryStr);
+	    }
 
 	    TupleQuery tupleQuery = conn.prepareTupleQuery(queryStr);
 
@@ -186,26 +230,39 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
 		while (res.hasNext()) {
 
-		    var bs = res.next();
+		    var queryBindingSet = res.next();
 
 		    SKOSResponseItem item = SKOSResponseItem.of(//
 			    concept, //
-			    bs.getValue("pref") != null ? bs.getValue("pref").stringValue() : null, //
-			    bs.getValue("expanded") != null ? bs.getValue("expanded").stringValue() : null, //
-			    bs.getValue("alt") != null ? bs.getValue("alt").stringValue() : null);
+			    queryBindingSet.getValue(Binding.PREF.getLabel()) != null
+				    ? queryBindingSet.getValue(Binding.PREF.getLabel()).stringValue()
+				    : null, //
+			    queryBindingSet.getValue(Binding.EXPANDED.getLabel()) != null
+				    ? queryBindingSet.getValue(Binding.EXPANDED.getLabel()).stringValue()
+				    : null, //
+			    queryBindingSet.getValue(Binding.ALT.getLabel()) != null
+				    ? queryBindingSet.getValue(Binding.ALT.getLabel()).stringValue()
+				    : null);
 
+		    //
+		    // it shouldn't be necessary but some ontologies seem to have duplicates
+		    //
 		    if (!results.contains(item)) {
 
 			results.add(item);
 		    }
 
-		    if (bs.getValue("closeMatch") != null) {
+		    //
+		    // if the ExpandConceptsQueryBuilder don't put closeMatch in the SELECT clause
+		    // (default), this case never occurs
+		    //
+		    if (queryBindingSet.getValue(Binding.CLOSE_MATCH.getLabel()) != null) {
 
 			expandConcept(//
 				stampSet, //
 				executor, //
 				conn, //
-				bs.getValue("closeMatch").stringValue(), //
+				queryBindingSet.getValue(Binding.CLOSE_MATCH.getLabel()).stringValue(), //
 				searchLangs, //
 				expansionRelations, //
 				visited, //
@@ -213,13 +270,13 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 				targetLevel, //
 				currentLevel.next().get());
 
-		    } else if (bs.getValue("expanded") != null) {
+		    } else if (queryBindingSet.getValue(Binding.EXPANDED.getLabel()) != null) {
 
 			expandConcept(//
 				stampSet, //
 				executor, //
 				conn, //
-				bs.getValue("expanded").stringValue(), //
+				queryBindingSet.getValue(Binding.EXPANDED.getLabel()).stringValue(), //
 				searchLangs, //
 				expansionRelations, //
 				visited, //
@@ -234,11 +291,11 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
 	    } finally {
 
+		// always release the stamp
 		stampSet.remove(concept + currentLevel.getValue());
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).info("Expanding concept {} ENDED", concept);
-
 	});
     }
 
