@@ -59,22 +59,22 @@ public class Entity extends JSONObjectWrapper {
      * @param entity
      */
     public Entity(JSONObject entity) {
-    
-        super(entity);
-    
-        downloader = new Downloader();
+
+	super(entity);
+
+	downloader = new Downloader();
     }
 
     /**
      * @param entityUrl
      */
     protected Entity(URL entityUrl) {
-    
-        downloader = new Downloader();
-    
-        String entityString = downloader.downloadOptionalString(entityUrl.toString()).get();
-    
-        setObject(new JSONObject(entityString));
+
+	downloader = new Downloader();
+
+	String entityString = downloader.downloadOptionalString(entityUrl.toString()).get();
+
+	setObject(new JSONObject(entityString));
     }
 
     /**
@@ -134,6 +134,23 @@ public class Entity extends JSONObjectWrapper {
     public Optional<JSONObject> getProperties() {
 
 	return getObject().has("properties") ? Optional.of(getObject().getJSONObject("properties")) : Optional.empty();
+    }
+
+    public HashMap<String, String> getTags() {
+
+	HashMap<String, String> ret = new HashMap<String, String>();
+	Optional<JSONObject> properties = getProperties();
+	if (properties.isPresent()) {
+	    JSONObject jProp = properties.get();
+	    if (jProp.has("tags")) {
+		JSONObject tags = jProp.getJSONObject("tags");
+		for (String key : tags.keySet()) {
+		    ret.put(key, tags.getString(key));
+		}
+	    }
+	}
+
+	return ret;
     }
 
     /**
@@ -238,7 +255,7 @@ public class Entity extends JSONObjectWrapper {
 		return Arrays.asList(create(entity, type));
 	    }
 	}
-	
+
 	//
 	// linked entities
 	//

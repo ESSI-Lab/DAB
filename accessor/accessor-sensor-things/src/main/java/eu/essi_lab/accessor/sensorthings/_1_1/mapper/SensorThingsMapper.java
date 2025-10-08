@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.sensorthings._1_1.mapper;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -32,10 +33,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.accessor.sensorthings._1_1.SensorThingsMangler;
+import eu.essi_lab.iso.datamodel.classes.Address;
+import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
+import eu.essi_lab.iso.datamodel.classes.Online;
+import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.lib.sensorthings._1_1.client.SensorThingsClient;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.EntityRef;
@@ -450,7 +455,37 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
 	addBoundingBox(thing, dataId, keywords);
 
+	HashMap<String, String> tags = thing.getTags();
+
+	String mail = tags.getOrDefault("email", tags.get("mail"));
+	String organizationLabel = tags.getOrDefault("organization_label", tags.get("organization"));
+	String role = tags.getOrDefault("role", tags.get("project_role"));
+
+	if (organizationLabel != null) {
+
+	    ResponsibleParty responsibleParty = new ResponsibleParty();
+
+	    if (!organizationLabel.isEmpty()) {
+
+		responsibleParty.setOrganisationName(organizationLabel.trim());
+
+	    }
+
+	    responsibleParty.setRoleCode(role);
+
+	    if (mail != null) {
+		Contact contact = new Contact();
+		Address address = new Address();
+		address.addElectronicMailAddress(mail);
+		contact.setAddress(address);
+		responsibleParty.setContactInfo(contact);
+	    }
+	    dataId.addPointOfContact(responsibleParty);
+
+	}
+
 	Optional<JSONObject> properties = thing.getProperties();
+
 	if (properties.isPresent()) {
 	    JSONObject prop = properties.get();
 	    JSONArray relatedArray = prop.optJSONArray("relatedTo");
@@ -461,11 +496,13 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 			String href = relatedProperty.optString("href");
 			String title = relatedProperty.optString("title");
 			if (href != null && title != null) {
-			    switch (title) {
-			    case "Watershed":
+			    switch (title.toLowerCase()) {
+			    case "watershed":
+			    case "bacino":
+			    case "basin":
 				dataset.getExtensionHandler().setRiverBasin(href);
 				break;
-			    case "Watercourse":
+			    case "watercourse":
 				dataset.getExtensionHandler().setRiver(href);
 				break;
 			    default:
