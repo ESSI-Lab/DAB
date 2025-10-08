@@ -3,10 +3,14 @@
  */
 package eu.essi_lab.lib.skoss.concepts_expander.impl;
 
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.eclipse.rdf4j.federated.repository.FedXRepositoryConnection;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
@@ -17,6 +21,8 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import eu.essi_lab.lib.skoss.FedXEngine;
 import eu.essi_lab.lib.skoss.SKOSSResponse;
 import eu.essi_lab.lib.skoss.SKOSSResponseItem;
+import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.MultiThreadMode;
+import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -24,10 +30,30 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
+    private ThreadMode threadMode;
+
     /**
      * 
      */
     public FedXConceptsExpander() {
+
+	setThreadMode(ThreadMode.MULTI());
+    }
+
+    /**
+     * @return
+     */
+    public ThreadMode getThreadMode() {
+
+	return threadMode;
+    }
+
+    /**
+     * @param threadMode
+     */
+    public void setThreadMode(ThreadMode threadMode) {
+
+	this.threadMode = threadMode;
     }
 
     @Override
@@ -46,12 +72,25 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
 	FedXRepositoryConnection conn = engine.getConnection();
 
-	List<SKOSSResponseItem> results = new ArrayList<>();
-	Set<String> visited = new HashSet<>();
+	List<SKOSSResponseItem> results = Collections.synchronizedList(new ArrayList<>());
+
+	Set<String> stampSet = Collections.synchronizedSet(new HashSet<>());
+
+	Set<String> visited = Collections.synchronizedSet(new HashSet<>());
+
+	ExecutorService executor = switch (getThreadMode()) {
+	case MultiThreadMode multi -> multi.getExecutor();
+	case SingleThreadMode single -> Executors.newSingleThreadExecutor();
+	default -> throw new IllegalArgumentException();// no way
+	};
+
+	concepts.forEach(con -> stampSet.add(con + ExpansionLevel.NONE.getValue()));
 
 	for (String concept : concepts) {
 
 	    expandConcept(//
+		    stampSet, //
+		    executor, //
 		    conn, //
 		    concept, //
 		    searchLangs, //
@@ -62,9 +101,22 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 		    ExpansionLevel.NONE);
 	}
 
+	while (!stampSet.isEmpty()) {
+
+	    try {
+		Thread.sleep(Duration.ofSeconds(1));
+
+	    } catch (InterruptedException e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
+	}
+
 	GSLoggerFactory.getLogger(getClass()).info("Expanding matching concepts ENDED");
 
 	engine.close();
+
+	executor.shutdown();
 
 	if (results.size() > limit) {
 
@@ -77,6 +129,8 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
     }
 
     /**
+     * @param executor
+     * @param stampSet
      * @param concept
      * @param conn
      * @param searchLangs
@@ -88,6 +142,8 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
      * @throws Exception
      */
     private void expandConcept(//
+	    Set<String> stampSet, //
+	    ExecutorService executor, //
 	    RepositoryConnection conn, //
 	    String concept, //
 	    List<String> searchLangs, //
@@ -97,78 +153,92 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 	    ExpansionLevel targetLevel, //
 	    ExpansionLevel currentLevel) {
 
-	GSLoggerFactory.getLogger(getClass()).info("Expanding concept {} STARTED", concept);
+	executor.submit(() -> {
 
-	GSLoggerFactory.getLogger(getClass()).info("Current level: {}", currentLevel);
+	    GSLoggerFactory.getLogger(getClass()).info("Expanding concept {} STARTED", concept);
 
-	if (visited.contains(concept) || currentLevel.getValue() > targetLevel.getValue()) {
+	    GSLoggerFactory.getLogger(getClass()).info("Current level: {}", currentLevel);
 
-	    GSLoggerFactory.getLogger(getClass()).info("Ending recursive call");
+	    if (visited.contains(concept) || currentLevel.getValue() > targetLevel.getValue()) {
 
-	    return;
-	}
+		GSLoggerFactory.getLogger(getClass()).info("Ending recursive call");
 
-	visited.add(concept);
-
-	String queryStr = getQueryBuilder().build(//
-		concept, //
-		searchLangs, //
-		expansionRelations, //
-		targetLevel, //
-		currentLevel);
-
-	// GSLoggerFactory.getLogger(getClass()).info("Current query: \n{}", queryStr);
-
-	TupleQuery tupleQuery = conn.prepareTupleQuery(queryStr);
-
-	try (TupleQueryResult res = tupleQuery.evaluate()) {
-
-	    while (res.hasNext()) {
-
-		var bs = res.next();
-
-		SKOSSResponseItem item = SKOSSResponseItem.of(//
-			concept, //
-			bs.getValue("pref") != null ? bs.getValue("pref").stringValue() : null, //
-			bs.getValue("expanded") != null ? bs.getValue("expanded").stringValue() : null, //
-			bs.getValue("alt") != null ? bs.getValue("alt").stringValue() : null);
-
-		if (!results.contains(item)) {
-
-		    results.add(item);
-		}
-
-		if (bs.getValue("closeMatch") != null) {
-
-		    expandConcept(//
-			    conn, //
-			    bs.getValue("closeMatch").stringValue(), //
-			    searchLangs, //
-			    expansionRelations, //
-			    visited, //
-			    results, //
-			    targetLevel, //
-			    currentLevel.next().get());
-
-		} else if (bs.getValue("expanded") != null) {
-
-		    expandConcept(//
-			    conn, //
-			    bs.getValue("expanded").stringValue(), //
-			    searchLangs, //
-			    expansionRelations, //
-			    visited, //
-			    results, //
-			    targetLevel, //
-			    currentLevel.next().get());
-		}
+		return;
 	    }
-	} catch (QueryEvaluationException ex) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(ex);
-	}
+	    stampSet.add(concept + currentLevel.getValue());
 
-	GSLoggerFactory.getLogger(getClass()).info("Expanding concept {} ENDED", concept);
+	    visited.add(concept);
+
+	    String queryStr = getQueryBuilder().build(//
+		    concept, //
+		    searchLangs, //
+		    expansionRelations, //
+		    targetLevel, //
+		    currentLevel);
+
+	    // GSLoggerFactory.getLogger(getClass()).info("Current query: \n{}", queryStr);
+
+	    TupleQuery tupleQuery = conn.prepareTupleQuery(queryStr);
+
+	    try (TupleQueryResult res = tupleQuery.evaluate()) {
+
+		while (res.hasNext()) {
+
+		    var bs = res.next();
+
+		    SKOSSResponseItem item = SKOSSResponseItem.of(//
+			    concept, //
+			    bs.getValue("pref") != null ? bs.getValue("pref").stringValue() : null, //
+			    bs.getValue("expanded") != null ? bs.getValue("expanded").stringValue() : null, //
+			    bs.getValue("alt") != null ? bs.getValue("alt").stringValue() : null);
+
+		    if (!results.contains(item)) {
+
+			results.add(item);
+		    }
+
+		    if (bs.getValue("closeMatch") != null) {
+
+			expandConcept(//
+				stampSet, //
+				executor, //
+				conn, //
+				bs.getValue("closeMatch").stringValue(), //
+				searchLangs, //
+				expansionRelations, //
+				visited, //
+				results, //
+				targetLevel, //
+				currentLevel.next().get());
+
+		    } else if (bs.getValue("expanded") != null) {
+
+			expandConcept(//
+				stampSet, //
+				executor, //
+				conn, //
+				bs.getValue("expanded").stringValue(), //
+				searchLangs, //
+				expansionRelations, //
+				visited, //
+				results, //
+				targetLevel, //
+				currentLevel.next().get());
+		    }
+		}
+	    } catch (QueryEvaluationException ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    } finally {
+
+		stampSet.remove(concept + currentLevel.getValue());
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).info("Expanding concept {} ENDED", concept);
+
+	});
     }
 
 }
