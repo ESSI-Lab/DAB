@@ -1,14 +1,14 @@
 /**
  * 
  */
-package eu.essi_lab.lib.net.sparql.federated;
+package eu.essi_lab.lib.skoss;
 
 import java.util.Optional;
 
 /**
  * @author Fabrizio
  */
-public class SKOSSResponseItem {
+public class SKOSResponseItem {
 
     private String concept;
     private String expanded;
@@ -22,9 +22,9 @@ public class SKOSSResponseItem {
      * @param alt
      * @return
      */
-    public static SKOSSResponseItem of(String concept, String pref, String expanded, String alt) {
+    public static SKOSResponseItem of(String concept, String pref, String expanded, String alt) {
 
-	SKOSSResponseItem item = new SKOSSResponseItem();
+	SKOSResponseItem item = new SKOSResponseItem();
 	item.concept = concept;
 	item.pref = pref;
 	item.expanded = expanded;
@@ -78,7 +78,6 @@ public class SKOSSResponseItem {
     @Override
     public boolean equals(Object other) {
 
-	return other instanceof SKOSSResponseItem && other.toString().equals(this.toString());
+	return other instanceof SKOSResponseItem && other.toString().equals(this.toString());
     }
-
 }

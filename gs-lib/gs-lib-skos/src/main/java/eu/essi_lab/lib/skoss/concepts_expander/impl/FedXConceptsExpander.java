@@ -19,8 +19,8 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 
 import eu.essi_lab.lib.skoss.FedXEngine;
-import eu.essi_lab.lib.skoss.SKOSSResponse;
-import eu.essi_lab.lib.skoss.SKOSSResponseItem;
+import eu.essi_lab.lib.skoss.SKOSResponse;
+import eu.essi_lab.lib.skoss.SKOSResponseItem;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -57,7 +57,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
     }
 
     @Override
-    public SKOSSResponse expand(//
+    public SKOSResponse expand(//
 	    List<String> concepts, //
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //
@@ -72,7 +72,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
 	FedXRepositoryConnection conn = engine.getConnection();
 
-	List<SKOSSResponseItem> results = Collections.synchronizedList(new ArrayList<>());
+	List<SKOSResponseItem> results = Collections.synchronizedList(new ArrayList<>());
 
 	Set<String> stampSet = Collections.synchronizedSet(new HashSet<>());
 
@@ -125,7 +125,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
 	GSLoggerFactory.getLogger(getClass()).info("Expanding concepts ENDED");
 
-	return SKOSSResponse.of(results);
+	return SKOSResponse.of(results);
     }
 
     /**
@@ -149,7 +149,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 	    List<String> searchLangs, //
 	    List<String> expansionRelations, //
 	    Set<String> visited, //
-	    List<SKOSSResponseItem> results, //
+	    List<SKOSResponseItem> results, //
 	    ExpansionLevel targetLevel, //
 	    ExpansionLevel currentLevel) {
 
@@ -187,7 +187,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
 		    var bs = res.next();
 
-		    SKOSSResponseItem item = SKOSSResponseItem.of(//
+		    SKOSResponseItem item = SKOSResponseItem.of(//
 			    concept, //
 			    bs.getValue("pref") != null ? bs.getValue("pref").stringValue() : null, //
 			    bs.getValue("expanded") != null ? bs.getValue("expanded").stringValue() : null, //

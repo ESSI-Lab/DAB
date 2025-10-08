@@ -10,7 +10,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>gs-lib-skoss</artifactId>
+	<artifactId>gs-lib-skos</artifactId>
 
 	<dependencies>
 	

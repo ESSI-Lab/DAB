@@ -92,7 +92,7 @@ public interface ConceptsExpander {
      * @return
      * @throws Exception
      */
-    SKOSSResponse expand(//
+    SKOSResponse expand(//
 	    List<String> concepts, //
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //

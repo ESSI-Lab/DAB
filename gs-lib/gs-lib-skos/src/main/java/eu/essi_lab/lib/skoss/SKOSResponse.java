@@ -10,14 +10,14 @@ import java.util.stream.Stream;
 /**
  * @author Fabrizio
  */
-public class SKOSSResponse {
+public class SKOSResponse {
 
-    private List<SKOSSResponseItem> results;
+    private List<SKOSResponseItem> results;
 
     /**
      * @param results
      */
-    private SKOSSResponse(List<SKOSSResponseItem> results) {
+    private SKOSResponse(List<SKOSResponseItem> results) {
 
 	this.results = results;
     }
@@ -26,15 +26,15 @@ public class SKOSSResponse {
      * @param results
      * @return
      */
-    public static SKOSSResponse of(List<SKOSSResponseItem> results) {
+    public static SKOSResponse of(List<SKOSResponseItem> results) {
 
-	return new SKOSSResponse(results);
+	return new SKOSResponse(results);
     }
 
     /**
      * @return the results
      */
-    public List<SKOSSResponseItem> getResults() {
+    public List<SKOSResponseItem> getResults() {
 
 	return results;
     }

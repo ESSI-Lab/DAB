@@ -13,8 +13,8 @@ import org.junit.Test;
 
 import eu.essi_lab.lib.skoss.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.FedXEngine;
-import eu.essi_lab.lib.skoss.SKOSSResponse;
-import eu.essi_lab.lib.skoss.SKOSSResponseItem;
+import eu.essi_lab.lib.skoss.SKOSResponse;
+import eu.essi_lab.lib.skoss.SKOSResponseItem;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.DefaultExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode;
@@ -57,7 +57,7 @@ public class ConceptsExpanderTest {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 
-	SKOSSResponse response = expander.expand(//
+	SKOSResponse response = expander.expand(//
 		concepts, //
 		ontologyUrls, //
 		sourceLangs, //
@@ -66,7 +66,7 @@ public class ConceptsExpanderTest {
 		targetLevel, //
 		limit);//
 
-	List<SKOSSResponseItem> results = response.getResults().stream().//
+	List<SKOSResponseItem> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -128,7 +128,7 @@ public class ConceptsExpanderTest {
 	//
 	//
 
-	SKOSSResponse response = expander.expand(//
+	SKOSResponse response = expander.expand(//
 		concepts, //
 		ontologyUrls, //
 		sourceLangs, //
@@ -137,7 +137,7 @@ public class ConceptsExpanderTest {
 		targetLevel, //
 		limit);//
 
-	List<SKOSSResponseItem> results = response.getResults().stream().//
+	List<SKOSResponseItem> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -199,7 +199,7 @@ public class ConceptsExpanderTest {
 	//
 	//
 
-	SKOSSResponse response = expander.expand(//
+	SKOSResponse response = expander.expand(//
 		concepts, //
 		ontologyUrls, //
 		sourceLangs, //
@@ -208,7 +208,7 @@ public class ConceptsExpanderTest {
 		targetLevel, //
 		limit);//
 
-	List<SKOSSResponseItem> results = response.getResults().stream().//
+	List<SKOSResponseItem> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -271,7 +271,7 @@ public class ConceptsExpanderTest {
 	//
 	//
 
-	SKOSSResponse response = expander.expand(//
+	SKOSResponse response = expander.expand(//
 		concepts, //
 		ontologyUrls, //
 		sourceLangs, //
@@ -280,7 +280,7 @@ public class ConceptsExpanderTest {
 		targetLevel, //
 		limit);//
 
-	List<SKOSSResponseItem> results = response.getResults().stream().//
+	List<SKOSResponseItem> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -343,7 +343,7 @@ public class ConceptsExpanderTest {
 	//
 	//
 
-	SKOSSResponse response = expander.expand(//
+	SKOSResponse response = expander.expand(//
 		concepts, //
 		ontologyUrls, //
 		sourceLangs, //
@@ -352,7 +352,7 @@ public class ConceptsExpanderTest {
 		targetLevel, //
 		limit);//
 
-	List<SKOSSResponseItem> results = response.getResults().stream().//
+	List<SKOSResponseItem> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
