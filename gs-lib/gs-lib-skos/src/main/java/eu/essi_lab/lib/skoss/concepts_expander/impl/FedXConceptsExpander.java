@@ -108,7 +108,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 	    ExpansionLevel targetLevel, //
 	    int limit) throws Exception {
 
-	GSLoggerFactory.getLogger(getClass()).info("Epanding concepts STARTED");
+	GSLoggerFactory.getLogger(getClass()).debug("Epanding concepts STARTED");
 
 	FedXEngine engine = getEngine() == null ? FedXEngine.of(ontologyUrls) : getEngine();
 
@@ -154,8 +154,6 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 	    }
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Expanding matching concepts ENDED");
-
 	engine.close();
 
 	executor.shutdown();
@@ -165,7 +163,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 	    results = results.subList(0, limit);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Expanding concepts ENDED");
+	GSLoggerFactory.getLogger(getClass()).debug("Expanding concepts ENDED");
 
 	return SKOSResponse.of(results);
     }
@@ -197,13 +195,11 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
 	executor.submit(() -> {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Expanding concept {} STARTED", concept);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED", concept);
 
-	    GSLoggerFactory.getLogger(getClass()).info("Current level: {}", currentLevel);
+	    GSLoggerFactory.getLogger(getClass()).trace("Current level: {}", currentLevel);
 
 	    if (visited.contains(concept) || currentLevel.getValue() > targetLevel.getValue()) {
-
-		GSLoggerFactory.getLogger(getClass()).info("Ending recursive call");
 
 		return;
 	    }
@@ -212,7 +208,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
 	    visited.add(concept);
 
-	    String queryStr = getQueryBuilder().build(//
+	    String query = getQueryBuilder().build(//
 		    concept, //
 		    searchLangs, //
 		    expansionRelations, //
@@ -221,10 +217,10 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
 	    if (traceQuery()) {
 
-		GSLoggerFactory.getLogger(getClass()).trace("Current query: \n{}", queryStr);
+		GSLoggerFactory.getLogger(getClass()).trace("\n{}", query);
 	    }
 
-	    TupleQuery tupleQuery = conn.prepareTupleQuery(queryStr);
+	    TupleQuery tupleQuery = conn.prepareTupleQuery(query);
 
 	    try (TupleQueryResult res = tupleQuery.evaluate()) {
 
@@ -295,7 +291,7 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 		stampSet.remove(concept + currentLevel.getValue());
 	    }
 
-	    GSLoggerFactory.getLogger(getClass()).info("Expanding concept {} ENDED", concept);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED", concept);
 	});
     }
 

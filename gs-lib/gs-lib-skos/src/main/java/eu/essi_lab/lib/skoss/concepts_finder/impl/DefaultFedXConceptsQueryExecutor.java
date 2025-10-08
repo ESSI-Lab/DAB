@@ -10,7 +10,6 @@ import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 
-import eu.essi_lab.lib.skoss.FedXConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.FedXEngine;
 import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -18,7 +17,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 /**
  * @author Fabrizio
  */
-public class DefaultFedXConceptsQueryExecutor implements FedXConceptsQueryExecutor {
+public class DefaultFedXConceptsQueryExecutor extends AbstractFedXConceptsQueryExecutor {
 
     /**
      * @param searchTerm
@@ -36,6 +35,11 @@ public class DefaultFedXConceptsQueryExecutor implements FedXConceptsQueryExecut
 	    List<String> sourceLangs) throws Exception {
 
 	String query = queryBuilder.build(searchTerm, sourceLangs);
+
+	if (traceQuery()) {
+
+	    GSLoggerFactory.getLogger(getClass()).trace("\n{}", query);
+	}
 
 	TupleQuery tupleQuery = engine.getConnection().prepareTupleQuery(query);
 
