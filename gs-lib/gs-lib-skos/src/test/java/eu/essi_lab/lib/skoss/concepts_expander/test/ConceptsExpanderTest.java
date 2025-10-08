@@ -11,7 +11,6 @@ import org.eclipse.rdf4j.federated.FedXConfig;
 import org.junit.Test;
 
 import eu.essi_lab.lib.skoss.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skoss.FedXEngine;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSResponseItem;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
@@ -23,6 +22,7 @@ import eu.essi_lab.lib.skoss.concepts_finder.impl.DefaultFedXConceptsQueryExecut
 import eu.essi_lab.lib.skoss.concepts_finder.impl.DefaultFindConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.concepts_finder.impl.FedXConceptsFinder;
 import eu.essi_lab.lib.skoss.concepts_finder.impl.FedXMultiThreadConceptsFinder;
+import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 
 /**
  * @author Fabrizio

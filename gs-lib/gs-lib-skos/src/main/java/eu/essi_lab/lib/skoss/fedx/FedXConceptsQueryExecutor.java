@@ -1,9 +1,11 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss;
+package eu.essi_lab.lib.skoss.fedx;
 
 import java.util.List;
+
+import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
 
 /**
  * @author Fabrizio

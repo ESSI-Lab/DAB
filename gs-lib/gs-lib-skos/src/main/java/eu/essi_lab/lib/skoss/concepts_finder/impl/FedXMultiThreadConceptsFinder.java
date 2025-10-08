@@ -11,9 +11,9 @@ import java.util.stream.Stream;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
 
-import eu.essi_lab.lib.skoss.FedXConceptsQueryExecutor;
-import eu.essi_lab.lib.skoss.FedXEngine;
 import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.fedx.FedXConceptsQueryExecutor;
+import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**

@@ -6,9 +6,9 @@ package eu.essi_lab.lib.skoss.concepts_finder.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.essi_lab.lib.skoss.FedXConceptsQueryExecutor;
-import eu.essi_lab.lib.skoss.FedXEngine;
 import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.fedx.FedXConceptsQueryExecutor;
+import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**

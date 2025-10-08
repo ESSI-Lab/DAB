@@ -3,7 +3,7 @@
  */
 package eu.essi_lab.lib.skoss.concepts_finder.impl;
 
-import eu.essi_lab.lib.skoss.FedXConceptsQueryExecutor;
+import eu.essi_lab.lib.skoss.fedx.FedXConceptsQueryExecutor;
 
 /**
  * @author Fabrizio

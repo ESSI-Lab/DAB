@@ -3,7 +3,7 @@
  */
 package eu.essi_lab.lib.skoss.concepts_expander.impl;
 
-import eu.essi_lab.lib.skoss.FedXEngine;
+import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 
 /**
  * @author Fabrizio

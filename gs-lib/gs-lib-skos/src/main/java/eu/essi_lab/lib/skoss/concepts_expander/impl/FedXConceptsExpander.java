@@ -18,59 +18,19 @@ import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 
-import eu.essi_lab.lib.skoss.FedXEngine;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSResponseItem;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.SingleThreadMode;
+import eu.essi_lab.lib.skoss.fedx.FedXEngine;
+import eu.essi_lab.lib.skoss.fedx.QueryBinding;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
 public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
-
-    /**
-     * @author Fabrizio
-     */
-    private enum Binding implements LabeledEnum {
-
-	/**
-	 * 
-	 */
-	PREF("pref"),
-	/**
-	 * 
-	 */
-	ALT("alt"),
-	/**
-	 * 
-	 */
-	CLOSE_MATCH("closeMatch"),
-	/**
-	 * 
-	 */
-	EXPANDED("expanded");
-
-	private String label;
-
-	/**
-	 * @param label
-	 */
-	private Binding(String label) {
-
-	    this.label = label;
-	}
-
-	@Override
-	public String getLabel() {
-
-	    return label;
-	}
-
-    }
 
     private ThreadMode threadMode;
 
@@ -230,14 +190,14 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 
 		    SKOSResponseItem item = SKOSResponseItem.of(//
 			    concept, //
-			    queryBindingSet.getValue(Binding.PREF.getLabel()) != null
-				    ? queryBindingSet.getValue(Binding.PREF.getLabel()).stringValue()
+			    queryBindingSet.getValue(QueryBinding.PREF.getLabel()) != null
+				    ? queryBindingSet.getValue(QueryBinding.PREF.getLabel()).stringValue()
 				    : null, //
-			    queryBindingSet.getValue(Binding.EXPANDED.getLabel()) != null
-				    ? queryBindingSet.getValue(Binding.EXPANDED.getLabel()).stringValue()
+			    queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()) != null
+				    ? queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()).stringValue()
 				    : null, //
-			    queryBindingSet.getValue(Binding.ALT.getLabel()) != null
-				    ? queryBindingSet.getValue(Binding.ALT.getLabel()).stringValue()
+			    queryBindingSet.getValue(QueryBinding.ALT.getLabel()) != null
+				    ? queryBindingSet.getValue(QueryBinding.ALT.getLabel()).stringValue()
 				    : null);
 
 		    //
@@ -252,13 +212,13 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 		    // if the ExpandConceptsQueryBuilder don't put closeMatch in the SELECT clause
 		    // (default), this case never occurs
 		    //
-		    if (queryBindingSet.getValue(Binding.CLOSE_MATCH.getLabel()) != null) {
+		    if (queryBindingSet.getValue(QueryBinding.CLOSE_MATCH.getLabel()) != null) {
 
 			expandConcept(//
 				stampSet, //
 				executor, //
 				conn, //
-				queryBindingSet.getValue(Binding.CLOSE_MATCH.getLabel()).stringValue(), //
+				queryBindingSet.getValue(QueryBinding.CLOSE_MATCH.getLabel()).stringValue(), //
 				searchLangs, //
 				expansionRelations, //
 				visited, //
@@ -266,13 +226,13 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
 				targetLevel, //
 				currentLevel.next().get());
 
-		    } else if (queryBindingSet.getValue(Binding.EXPANDED.getLabel()) != null) {
+		    } else if (queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()) != null) {
 
 			expandConcept(//
 				stampSet, //
 				executor, //
 				conn, //
-				queryBindingSet.getValue(Binding.EXPANDED.getLabel()).stringValue(), //
+				queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()).stringValue(), //
 				searchLangs, //
 				expansionRelations, //
 				visited, //
