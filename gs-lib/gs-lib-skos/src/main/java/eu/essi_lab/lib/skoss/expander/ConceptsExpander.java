@@ -1,11 +1,14 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss;
+package eu.essi_lab.lib.skoss.expander;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import eu.essi_lab.lib.skoss.SKOSResponse;
+import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 
 /**
  * @author Fabrizio

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss;
+package eu.essi_lab.lib.skoss.finder;
 
 import java.util.List;
 
@@ -18,5 +18,8 @@ public interface ConceptsFinder {
      * @return
      * @throws Exception
      */
-    List<String> find(String searchTerm, List<String> ontologyUrls, List<String> sourceLangs) throws Exception;
+    List<String> find(//
+	    String searchTerm, //
+	    List<String> ontologyUrls, //
+	    List<String> sourceLangs) throws Exception;
 }

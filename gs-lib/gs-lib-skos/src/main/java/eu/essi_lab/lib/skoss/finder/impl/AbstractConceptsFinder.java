@@ -1,10 +1,10 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.concepts_finder.impl;
+package eu.essi_lab.lib.skoss.finder.impl;
 
-import eu.essi_lab.lib.skoss.ConceptsFinder;
-import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
+import eu.essi_lab.lib.skoss.finder.FindConceptsQueryBuilder;
 
 /**
  * @author Fabrizio

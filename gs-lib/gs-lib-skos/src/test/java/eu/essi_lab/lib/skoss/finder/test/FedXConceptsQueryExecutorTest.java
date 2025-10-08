@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.concepts_finder.test;
+package eu.essi_lab.lib.skoss.finder.test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,9 +10,9 @@ import org.eclipse.rdf4j.federated.FedXConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.concepts_finder.impl.FedXConceptsQueryExecutor;
-import eu.essi_lab.lib.skoss.concepts_finder.impl.DefaultFindConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
+import eu.essi_lab.lib.skoss.finder.impl.DefaultFindConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
 
 /**
  * @author Fabrizio

@@ -1,14 +1,14 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.concepts_finder.test;
+package eu.essi_lab.lib.skoss.finder.test;
 
 import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.concepts_finder.impl.DefaultFindConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.impl.DefaultFindConceptsQueryBuilder;
 
 /**
  * @author Fabrizio

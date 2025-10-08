@@ -1,11 +1,11 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.concepts_finder.impl;
+package eu.essi_lab.lib.skoss.finder.impl;
 
 import java.util.List;
 
-import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.FindConceptsQueryBuilder;
 
 /**
  * @author Fabrizio

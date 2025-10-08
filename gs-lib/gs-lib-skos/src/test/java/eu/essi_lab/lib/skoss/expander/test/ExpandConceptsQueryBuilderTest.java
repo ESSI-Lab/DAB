@@ -1,18 +1,18 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.concepts_expander.test;
+package eu.essi_lab.lib.skoss.expander.test;
 
 import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skoss.ExpandConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.expander.ExpandConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skoss.expander.impl.CloseMatchExpandConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.expander.impl.DefaultExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.concepts_expander.impl.CloseMatchExpandConceptsQueryBuilder;
-import eu.essi_lab.lib.skoss.concepts_expander.impl.DefaultExpandConceptsQueryBuilder;
 
 /**
  * @author Fabrizio

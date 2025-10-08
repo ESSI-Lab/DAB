@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.concepts_finder.impl;
+package eu.essi_lab.lib.skoss.finder.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +11,10 @@ import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 
-import eu.essi_lab.lib.skoss.ConceptsQueryExecutor;
-import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.skoss.fedx.QueryBinding;
+import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
+import eu.essi_lab.lib.skoss.finder.FindConceptsQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**

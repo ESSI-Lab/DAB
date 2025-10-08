@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.concepts_expander.impl;
+package eu.essi_lab.lib.skoss.expander.impl;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

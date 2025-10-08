@@ -1,10 +1,10 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.concepts_expander.impl;
+package eu.essi_lab.lib.skoss.expander.impl;
 
-import eu.essi_lab.lib.skoss.ConceptsExpander;
-import eu.essi_lab.lib.skoss.ExpandConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.expander.ConceptsExpander;
+import eu.essi_lab.lib.skoss.expander.ExpandConceptsQueryBuilder;
 
 /**
  * @author Fabrizio

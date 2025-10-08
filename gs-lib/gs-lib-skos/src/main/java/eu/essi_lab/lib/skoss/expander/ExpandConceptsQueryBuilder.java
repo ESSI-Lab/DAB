@@ -1,11 +1,12 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss;
+package eu.essi_lab.lib.skoss.expander;
 
 import java.util.List;
 
-import eu.essi_lab.lib.skoss.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
+import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 
 /**
  * @author Fabrizio

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.concepts_expander.impl;
+package eu.essi_lab.lib.skoss.expander.impl;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSResponseItem;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.MultiThreadMode;
-import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode.SingleThreadMode;
+import eu.essi_lab.lib.skoss.expander.impl.ThreadMode.MultiThreadMode;
+import eu.essi_lab.lib.skoss.expander.impl.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.skoss.fedx.QueryBinding;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -30,9 +30,10 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 /**
  * @author Fabrizio
  */
-public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
+public class FedXConceptsExpander extends AbstractConceptsExpander {
 
     private ThreadMode threadMode;
+    private FedXEngine engine;
 
     /**
      * 
@@ -40,6 +41,22 @@ public class FedXConceptsExpander extends AbstractFedXConceptsExpander {
     public FedXConceptsExpander() {
 
 	setThreadMode(ThreadMode.MULTI());
+    }
+
+    /**
+     * @return
+     */
+    public FedXEngine getEngine() {
+
+	return engine;
+    }
+
+    /**
+     * @param config
+     */
+    public void setEngine(FedXEngine engine) {
+
+	this.engine = engine;
     }
 
     /**
