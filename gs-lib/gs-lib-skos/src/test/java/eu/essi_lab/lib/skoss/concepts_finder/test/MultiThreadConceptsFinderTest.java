@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.lib.skoss.ConceptsFinder;
-import eu.essi_lab.lib.skoss.concepts_finder.impl.DefaultFedXConceptsQueryExecutor;
+import eu.essi_lab.lib.skoss.concepts_finder.impl.FedXConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.concepts_finder.impl.DefaultFindConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.concepts_finder.impl.FedXMultiThreadConceptsFinder;
 
@@ -57,7 +57,7 @@ public class MultiThreadConceptsFinderTest {
 
 	finder.setConfiguration(new FedXConfig());
 
-	DefaultFedXConceptsQueryExecutor executor = new DefaultFedXConceptsQueryExecutor();
+	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
 	executor.setTraceQuery(false);
 
 	finder.setExecutor(executor);

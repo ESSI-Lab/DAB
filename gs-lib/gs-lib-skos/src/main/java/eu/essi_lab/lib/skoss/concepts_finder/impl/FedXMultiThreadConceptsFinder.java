@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
 
+import eu.essi_lab.lib.skoss.ConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
-import eu.essi_lab.lib.skoss.fedx.FedXConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
@@ -49,11 +49,11 @@ public class FedXMultiThreadConceptsFinder extends AbstractFedXConceptsFinder {
 
 		    FindConceptsQueryBuilder queryBuilder = getQueryBuilder();
 
-		    FedXConceptsQueryExecutor executor = getExecutor();
+		    ConceptsQueryExecutor executor = getExecutor();
 
 		    try {
 
-			return executor.execute(engine, queryBuilder, searchTerm, ontologyUrls, sourceLangs).stream();
+			return executor.execute(queryBuilder, searchTerm, ontologyUrls, sourceLangs).stream();
 
 		    } catch (Exception e) {
 

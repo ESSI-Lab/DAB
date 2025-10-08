@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.lib.skoss.ConceptsFinder;
-import eu.essi_lab.lib.skoss.concepts_finder.impl.DefaultFedXConceptsQueryExecutor;
+import eu.essi_lab.lib.skoss.concepts_finder.impl.FedXConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.concepts_finder.impl.DefaultFindConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.concepts_finder.impl.FedXConceptsFinder;
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
@@ -57,7 +57,7 @@ public class ConceptsFinderTest {
 
 	finder.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
 	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
-	finder.setExecutor(new DefaultFedXConceptsQueryExecutor());
+	finder.setExecutor(new FedXConceptsQueryExecutor());
 
 	//
 	//

@@ -1,20 +1,17 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.fedx;
+package eu.essi_lab.lib.skoss;
 
 import java.util.List;
-
-import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
 
 /**
  * @author Fabrizio
  */
 @FunctionalInterface
-public interface FedXConceptsQueryExecutor {
+public interface ConceptsQueryExecutor {
 
     /**
-     * @param engine
      * @param queryBuilder
      * @param searchTerm
      * @param ontologyUrls
@@ -23,7 +20,6 @@ public interface FedXConceptsQueryExecutor {
      * @throws Exception
      */
     List<String> execute(//
-	    FedXEngine engine, //
 	    FindConceptsQueryBuilder queryBuilder, //
 	    String searchTerm, //
 	    List<String> ontologyUrls, //

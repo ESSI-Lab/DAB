@@ -6,8 +6,8 @@ package eu.essi_lab.lib.skoss.concepts_finder.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.essi_lab.lib.skoss.ConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
-import eu.essi_lab.lib.skoss.fedx.FedXConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
@@ -35,11 +35,11 @@ public class FedXConceptsFinder extends AbstractFedXConceptsFinder {
 
 	FindConceptsQueryBuilder queryBuilder = getQueryBuilder();
 
-	FedXConceptsQueryExecutor executor = getExecutor();
+	ConceptsQueryExecutor executor = getExecutor();
 
 	try {
 
-	    results = executor.execute(engine, queryBuilder, searchTerm, ontologyUrls, sourceLangs);
+	    results = executor.execute(queryBuilder, searchTerm, ontologyUrls, sourceLangs);
 
 	} catch (Exception e) {
 

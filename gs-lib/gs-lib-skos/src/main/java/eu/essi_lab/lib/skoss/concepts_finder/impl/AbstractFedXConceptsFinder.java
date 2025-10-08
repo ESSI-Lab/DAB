@@ -3,27 +3,27 @@
  */
 package eu.essi_lab.lib.skoss.concepts_finder.impl;
 
-import eu.essi_lab.lib.skoss.fedx.FedXConceptsQueryExecutor;
+import eu.essi_lab.lib.skoss.ConceptsQueryExecutor;
 
 /**
  * @author Fabrizio
  */
 public abstract class AbstractFedXConceptsFinder extends AbstractConceptsFinder {
 
-    private FedXConceptsQueryExecutor executor;
+    private ConceptsQueryExecutor executor;
 
     /**
      * 
      */
     public AbstractFedXConceptsFinder() {
 
-	setExecutor(new DefaultFedXConceptsQueryExecutor());
+	setExecutor(new FedXConceptsQueryExecutor());
     }
 
     /**
      * @return the executor
      */
-    public FedXConceptsQueryExecutor getExecutor() {
+    public ConceptsQueryExecutor getExecutor() {
 
 	return executor;
     }
@@ -31,7 +31,7 @@ public abstract class AbstractFedXConceptsFinder extends AbstractConceptsFinder 
     /**
      * @param executor
      */
-    public void setExecutor(FedXConceptsQueryExecutor executor) {
+    public void setExecutor(ConceptsQueryExecutor executor) {
 
 	this.executor = executor;
     }

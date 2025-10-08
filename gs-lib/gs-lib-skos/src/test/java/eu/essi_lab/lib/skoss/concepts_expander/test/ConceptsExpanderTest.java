@@ -18,7 +18,7 @@ import eu.essi_lab.lib.skoss.concepts_expander.impl.CloseMatchExpandConceptsQuer
 import eu.essi_lab.lib.skoss.concepts_expander.impl.DefaultExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.concepts_expander.impl.ThreadMode;
-import eu.essi_lab.lib.skoss.concepts_finder.impl.DefaultFedXConceptsQueryExecutor;
+import eu.essi_lab.lib.skoss.concepts_finder.impl.FedXConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.concepts_finder.impl.DefaultFindConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.concepts_finder.impl.FedXConceptsFinder;
 import eu.essi_lab.lib.skoss.concepts_finder.impl.FedXMultiThreadConceptsFinder;
@@ -112,8 +112,10 @@ public class ConceptsExpanderTest {
 	finder.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
 	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
 
-	DefaultFedXConceptsQueryExecutor conceptsQueryExecutor = new DefaultFedXConceptsQueryExecutor();
+	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
 	conceptsQueryExecutor.setTraceQuery(false);
+	
+	conceptsQueryExecutor.setEngineBuilder(ontUrls -> FedXEngine.of(ontUrls, new FedXConfig()));
 
 	finder.setExecutor(conceptsQueryExecutor);
 
@@ -188,8 +190,10 @@ public class ConceptsExpanderTest {
 	finder.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
 	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
 
-	DefaultFedXConceptsQueryExecutor conceptsQueryExecutor = new DefaultFedXConceptsQueryExecutor();
+	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
 	conceptsQueryExecutor.setTraceQuery(false);
+	
+	conceptsQueryExecutor.setEngineBuilder(ontUrls -> FedXEngine.of(ontUrls, new FedXConfig()));
 
 	finder.setExecutor(conceptsQueryExecutor);
 
@@ -265,8 +269,10 @@ public class ConceptsExpanderTest {
 	finder.setConfiguration(new FedXConfig());
 	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
 
-	DefaultFedXConceptsQueryExecutor conceptsQueryExecutor = new DefaultFedXConceptsQueryExecutor();
+	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
 	conceptsQueryExecutor.setTraceQuery(false);
+	
+	conceptsQueryExecutor.setEngineBuilder(ontUrls -> FedXEngine.of(ontUrls, new FedXConfig()));
 
 	finder.setExecutor(conceptsQueryExecutor);
 
@@ -342,8 +348,10 @@ public class ConceptsExpanderTest {
 	finder.setConfiguration(new FedXConfig());
 	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
 
-	DefaultFedXConceptsQueryExecutor conceptsQueryExecutor = new DefaultFedXConceptsQueryExecutor();
-	conceptsQueryExecutor.setTraceQuery(true);
+	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
+	conceptsQueryExecutor.setTraceQuery(false);
+	
+	conceptsQueryExecutor.setEngineBuilder(ontUrls -> FedXEngine.of(ontUrls, new FedXConfig()));
 
 	finder.setExecutor(conceptsQueryExecutor);
 
@@ -419,8 +427,10 @@ public class ConceptsExpanderTest {
 	finder.setConfiguration(new FedXConfig());
 	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
 
-	DefaultFedXConceptsQueryExecutor conceptsQueryExecutor = new DefaultFedXConceptsQueryExecutor();
+	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
 	conceptsQueryExecutor.setTraceQuery(false);
+	
+	conceptsQueryExecutor.setEngineBuilder(ontUrls -> FedXEngine.of(ontUrls, new FedXConfig()));
 
 	finder.setExecutor(conceptsQueryExecutor);
 

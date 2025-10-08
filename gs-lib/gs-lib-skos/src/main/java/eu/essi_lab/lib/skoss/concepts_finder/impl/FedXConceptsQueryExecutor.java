@@ -5,11 +5,13 @@ package eu.essi_lab.lib.skoss.concepts_finder.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 
+import eu.essi_lab.lib.skoss.ConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.FindConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.skoss.fedx.QueryBinding;
@@ -18,7 +20,50 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 /**
  * @author Fabrizio
  */
-public class DefaultFedXConceptsQueryExecutor extends AbstractFedXConceptsQueryExecutor {
+public class FedXConceptsQueryExecutor implements ConceptsQueryExecutor {
+
+    private boolean traceQuery;
+    private Function<List<String>, FedXEngine> engineBuilder;
+
+    /**
+     * 
+     */
+    public FedXConceptsQueryExecutor() {
+
+	setEngineBuilder(ontologyUrls -> FedXEngine.of(ontologyUrls));
+    }
+
+    /**
+     * @return
+     */
+    public boolean traceQuery() {
+
+	return traceQuery;
+    }
+
+    /**
+     * @param traceQuery
+     */
+    public void setTraceQuery(boolean traceQuery) {
+
+	this.traceQuery = traceQuery;
+    }
+
+    /**
+     * @param engine
+     */
+    public void setEngineBuilder(Function<List<String>, FedXEngine> engineBuilder) {
+
+	this.engineBuilder = engineBuilder;
+    }
+
+    /**
+     * @return the engineBuilder
+     */
+    public Function<List<String>, FedXEngine> getEngineBuilder() {
+
+	return engineBuilder;
+    }
 
     /**
      * @param searchTerm
@@ -29,7 +74,6 @@ public class DefaultFedXConceptsQueryExecutor extends AbstractFedXConceptsQueryE
      */
     @Override
     public List<String> execute(//
-	    FedXEngine engine, //
 	    FindConceptsQueryBuilder queryBuilder, //
 	    String searchTerm, //
 	    List<String> ontologyUrls, //
@@ -42,7 +86,10 @@ public class DefaultFedXConceptsQueryExecutor extends AbstractFedXConceptsQueryE
 	    GSLoggerFactory.getLogger(getClass()).trace("\n{}", query);
 	}
 
-	TupleQuery tupleQuery = engine.getConnection().prepareTupleQuery(query);
+	TupleQuery tupleQuery = getEngineBuilder().//
+		apply(ontologyUrls).//
+		getConnection().//
+		prepareTupleQuery(query);
 
 	List<String> concepts = new ArrayList<>();
 
