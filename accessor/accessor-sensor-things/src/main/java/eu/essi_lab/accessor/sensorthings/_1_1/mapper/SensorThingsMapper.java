@@ -39,6 +39,7 @@ import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
@@ -396,6 +397,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 	DataIdentification dataId = coreMetadata.getDataIdentification();
+	Thing thing = stream.getThing().get();
 
 	Keywords keywords = new Keywords();
 	dataId.addKeywords(keywords);
@@ -406,7 +408,30 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
 	    keywords.addKeyword(observationType);
 	}
+	HashMap<String, String> tags = thing.getTags();
+	for (String key : tags.keySet()) {
+	    String value = tags.get(key);
+	    if (key.equalsIgnoreCase("licence")) {
+		LegalConstraints lc = new LegalConstraints();
+		lc.addUseConstraintsCode("other");
+		lc.addOtherConstraints(value);
+		dataId.addLegalConstraints(lc);
+		continue;
+	    }
 
+	    switch (key.toLowerCase()) {
+	    case "organization":
+	    case "organization_label":
+	    case "email":
+	    case "role":
+	    case "project_role":	
+	    case "metadata_created_datestamp":
+	    case "metadata_modified_datestamp":
+		continue;
+	    }
+
+	    keywords.addKeyword(key + ": " + value);
+	}
 	//
 	// File Identifier
 	//
@@ -428,8 +453,6 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	//
 
 	addTemporalExtent(stream, dataId);
-
-	Thing thing = stream.getThing().get();
 
 	//
 	// Platform, Vertical extent and keywords (from the expanded Thing)
@@ -454,8 +477,6 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	//
 
 	addBoundingBox(thing, dataId, keywords);
-
-	HashMap<String, String> tags = thing.getTags();
 
 	String mail = tags.getOrDefault("email", tags.get("mail"));
 	String organizationLabel = tags.getOrDefault("organization_label", tags.get("organization"));
@@ -484,6 +505,8 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
 	}
 
+	String watershed = tags.get("watershed");
+
 	Optional<JSONObject> properties = thing.getProperties();
 
 	if (properties.isPresent()) {
@@ -500,7 +523,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 			    case "watershed":
 			    case "bacino":
 			    case "basin":
-				dataset.getExtensionHandler().setRiverBasin(href);
+				watershed = href;
 				break;
 			    case "watercourse":
 				dataset.getExtensionHandler().setRiver(href);
@@ -513,6 +536,10 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		    }
 		}
 	    }
+	}
+
+	if (watershed != null) {
+	    dataset.getExtensionHandler().setRiverBasin(watershed);
 	}
 
 	//
