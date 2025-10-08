@@ -37,7 +37,7 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 		    %s
 		    %s
 		}
-		""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock);
+		""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock).trim();
     }
 
     /**

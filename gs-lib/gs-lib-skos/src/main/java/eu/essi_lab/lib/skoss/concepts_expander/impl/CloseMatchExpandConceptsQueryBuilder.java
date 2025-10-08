@@ -38,6 +38,6 @@ public class CloseMatchExpandConceptsQueryBuilder extends DefaultExpandConceptsQ
 		    %s
 		    %s
 		}
-		""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock);
+		""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock).trim();
     }
 }
