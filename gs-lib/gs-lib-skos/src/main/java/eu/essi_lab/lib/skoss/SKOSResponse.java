@@ -28,7 +28,9 @@ import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,21 +62,24 @@ public class SKOSResponse {
 
 	Map<String, List<SKOSConcept>> map = results.stream().collect(Collectors.groupingBy((c) -> c.getConcept()));
 
-	ArrayList<SKOSConcept> arrayList = new ArrayList<SKOSConcept>();
-	
-//	
-//	map.keySet().forEach(concept -> {
-//	    
-//	    Optional<SKOSConcept> optional = arrayList.stream().filter(c -> c.getConcept().equals(concept)).findFirst();
-//	    
-//	    if(optional.isEmpty()) {
-//		
-//		
-//	    }
-//	    
-//	});
-	
-	return arrayList;
+	List<SKOSConcept> ret = new ArrayList<SKOSConcept>();
+
+	Set<Entry<String, List<SKOSConcept>>> entries = map.entrySet();
+	for (Entry<String, List<SKOSConcept>> entry : entries) {
+	    SKOSConcept tmp = null;
+	    for (SKOSConcept concept : entry.getValue()) {
+		if (tmp == null) {
+		    tmp = concept;
+		} else {
+		    tmp.getAlt().addAll(concept.getAlt());
+		}
+	    }
+	    if (tmp != null) {
+		ret.add(tmp);
+	    }
+	}
+
+	return ret;
     }
 
     /**

@@ -5,6 +5,7 @@ package eu.essi_lab.lib.skoss;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 /*-
@@ -29,6 +30,7 @@ import java.util.List;
  */
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Fabrizio
@@ -38,14 +40,14 @@ public class SKOSConcept {
     private String concept;
     private String expanded;
     private String pref;
-    private List<String> alt;
+    private Set<String> alt;
 
     /**
      * 
      */
     private SKOSConcept() {
 
-	alt = new ArrayList<String>();
+	alt = new HashSet<String>();
     }
 
     /**
@@ -55,7 +57,7 @@ public class SKOSConcept {
      * @param alt
      * @return
      */
-    public static SKOSConcept of(String concept, String pref, String expanded, List<String> alt) {
+    public static SKOSConcept of(String concept, String pref, String expanded, Set<String> alt) {
 
 	SKOSConcept item = new SKOSConcept();
 	item.concept = concept;
@@ -79,7 +81,8 @@ public class SKOSConcept {
 	item.concept = concept;
 	item.pref = pref;
 	item.expanded = expanded;
-	item.alt = Arrays.asList(alt);
+	item.alt = new HashSet<String>();
+	item.alt.add(alt);
 
 	return item;
     }
@@ -111,7 +114,7 @@ public class SKOSConcept {
     /**
      * @return
      */
-    public List<String> getAlt() {
+    public Set<String> getAlt() {
 
 	return alt;
     }
