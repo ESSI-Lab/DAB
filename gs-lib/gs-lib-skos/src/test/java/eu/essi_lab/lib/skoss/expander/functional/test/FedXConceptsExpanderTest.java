@@ -1,13 +1,14 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.expander.test;
+package eu.essi_lab.lib.skoss.expander.functional.test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
+import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.lib.skoss.SKOSResponse;
@@ -15,7 +16,6 @@ import eu.essi_lab.lib.skoss.SKOSResponseItem;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skoss.expander.impl.CloseMatchExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
@@ -28,6 +28,148 @@ import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
 public class FedXConceptsExpanderTest {
 
     @Test
+    public void noLimitWaterSearchTermHydroOntologyTest() throws Exception {
+
+	int expected = 58;
+
+	//
+	//
+	//
+
+	List<String> ontologyUrls = Arrays.asList(//
+		"http://hydro.geodab.eu/hydro-ontology/sparql");
+
+	List<String> sourceLangs = Arrays.asList("it", "en");
+	List<String> searchLangs = Arrays.asList("it", "en");
+	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
+	ExpansionLevel targetLevel = ExpansionLevel.HIGH;
+
+	int limit = 1000;
+
+	FedXConceptsFinder finder = new FedXConceptsFinder();
+	finder.setThreadMode(ThreadMode.MULTI());
+
+	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
+
+	//
+	//
+	//
+
+	FedXConceptsExpander expander = new FedXConceptsExpander();
+	expander.setThreadMode(ThreadMode.SINGLE()); // default
+
+	SKOSResponse response = expander.expand(//
+		concepts, //
+		ontologyUrls, //
+		sourceLangs, //
+		searchLangs, //
+		relations, //
+		targetLevel, //
+		limit);//
+
+	Assert.assertEquals(expected, response.getResults().size());
+
+	//
+	//
+	//
+
+	expander = new FedXConceptsExpander();
+	expander.setThreadMode(ThreadMode.MULTI());
+
+	response = expander.expand(//
+		concepts, //
+		ontologyUrls, //
+		sourceLangs, //
+		searchLangs, //
+		relations, //
+		targetLevel, //
+		limit);//
+
+	Assert.assertEquals(expected, response.getResults().size());
+    }
+
+    @Test
+    public void withLimitSearchTermWaterHydroOntologyTest() throws Exception {
+
+	limitWaterHydroOntologyTest(5, 5);
+	limitWaterHydroOntologyTest(11, 11);
+	limitWaterHydroOntologyTest(15, 15);
+	limitWaterHydroOntologyTest(33, 33);
+	limitWaterHydroOntologyTest(3, 3);
+	limitWaterHydroOntologyTest(7, 7);
+	limitWaterHydroOntologyTest(23, 23);
+	limitWaterHydroOntologyTest(57, 57);
+	limitWaterHydroOntologyTest(100, 58);
+    }
+
+    /**
+     * @param limit
+     * @throws Exception
+     */
+    private void limitWaterHydroOntologyTest(int limit, int expected) throws Exception {
+
+	//
+	// finds the concepts
+	//
+
+	List<String> ontologyUrls = Arrays.asList(//
+		"http://hydro.geodab.eu/hydro-ontology/sparql");
+
+	List<String> sourceLangs = Arrays.asList("it", "en");
+	List<String> searchLangs = Arrays.asList("it", "en");
+	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
+	ExpansionLevel targetLevel = ExpansionLevel.HIGH;
+
+	FedXConceptsFinder finder = new FedXConceptsFinder();
+	finder.setThreadMode(ThreadMode.MULTI());
+
+	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
+
+	//
+	// expanding in SingleThread mode
+	//
+
+	FedXConceptsExpander expander = new FedXConceptsExpander();
+	expander.setThreadMode(ThreadMode.SINGLE()); // default
+
+	SKOSResponse response1 = expander.expand(//
+		concepts, //
+		ontologyUrls, //
+		sourceLangs, //
+		searchLangs, //
+		relations, //
+		targetLevel, //
+		limit);//
+
+	Assert.assertEquals(expected, response1.getResults().size());
+
+	//
+	// expanding in MultiThread mode, expecting the same results
+	//
+
+	expander = new FedXConceptsExpander();
+	expander.setThreadMode(ThreadMode.MULTI());
+
+	SKOSResponse response2 = expander.expand(//
+		concepts, //
+		ontologyUrls, //
+		sourceLangs, //
+		searchLangs, //
+		relations, //
+		targetLevel, //
+		limit);//
+
+	//
+	// the equals test may fail since with multi thread mode the results may differ from single thread mode
+	//
+
+	// Assert.assertEquals(response1.getResults().stream().sorted().toList(),
+	// response2.getResults().stream().sorted().toList());
+
+	Assert.assertEquals(expected, response2.getResults().size());
+    }
+
+    @Test
     public void defaultTest() throws Exception {
 
 	List<String> ontologyUrls = Arrays.asList(//
@@ -37,14 +179,11 @@ public class FedXConceptsExpanderTest {
 	);
 
 	List<String> sourceLangs = Arrays.asList("it", "en");
-
 	List<String> searchLangs = Arrays.asList("it", "en");
-
 	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
-
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
-	int limit = 200;
+	int limit = 10;
 
 	//
 	//
@@ -80,6 +219,8 @@ public class FedXConceptsExpanderTest {
 	System.out.println("\n\n");
 
 	response.getAltLabels().forEach(alt -> System.out.println(alt));
+
+	Assert.assertEquals(10, results.size());
     }
 
     @Test
@@ -92,14 +233,11 @@ public class FedXConceptsExpanderTest {
 	);
 
 	List<String> sourceLangs = Arrays.asList("it", "en");
-
 	List<String> searchLangs = Arrays.asList("it", "en");
-
 	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
-
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
-	int limit = 200;
+	int limit = 10;
 
 	//
 	//
@@ -155,87 +293,12 @@ public class FedXConceptsExpanderTest {
 	System.out.println("\n\n");
 
 	response.getAltLabels().forEach(alt -> System.out.println(alt));
+
+	Assert.assertEquals(10, results.size());
     }
 
     @Test
-    public void singleThreadTest() throws Exception {
-
-	List<String> ontologyUrls = Arrays.asList(//
-		// "http://localhost:3031/gemet/query", //
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql" //
-	);
-
-	List<String> sourceLangs = Arrays.asList("it", "en");
-
-	List<String> searchLangs = Arrays.asList("it", "en");
-
-	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
-
-	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
-
-	int limit = 200;
-
-	//
-	//
-	//
-
-	FedXConceptsFinder finder = new FedXConceptsFinder();
-
-	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
-
-	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
-	executor.setTraceQuery(false);
-	executor.setEngineConfig(new FedXConfig());
-
-
-	finder.setExecutor(executor);
-
-	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
-
-	//
-	//
-	//
-
-	FedXConceptsExpander expander = new FedXConceptsExpander();
-
-	expander.setEngineConfig(new FedXConfig());
-	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
-	expander.setThreadMode(ThreadMode.SINGLE());
-	expander.setTraceQuery(false);
-
-	//
-	//
-	//
-
-	SKOSResponse response = expander.expand(//
-		concepts, //
-		ontologyUrls, //
-		sourceLangs, //
-		searchLangs, //
-		relations, //
-		targetLevel, //
-		limit);//
-
-	List<SKOSResponseItem> results = response.getResults().stream().//
-		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
-		toList();//
-
-	System.out.println("\n\n");
-
-	results.forEach(res -> System.out.println(res + "\n---"));
-
-	System.out.println("\n\n");
-
-	response.getPrefLabels().forEach(pref -> System.out.println(pref));
-
-	System.out.println("\n\n");
-
-	response.getAltLabels().forEach(alt -> System.out.println(alt));
-    }
-
-    @Test
-    public void multiThreadConceptsFinderTest() throws Exception {
+    public void multiThreadConceptsFinderAndExpanderTest() throws Exception {
 
 	List<String> ontologyUrls = Arrays.asList(//
 		"http://localhost:3031/gemet/query", //
@@ -245,14 +308,11 @@ public class FedXConceptsExpanderTest {
 	);
 
 	List<String> sourceLangs = Arrays.asList("it", "en");
-
 	List<String> searchLangs = Arrays.asList("it", "en");
-
 	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
-
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
-	int limit = 200;
+	int limit = 100;
 
 	//
 	//
@@ -309,6 +369,8 @@ public class FedXConceptsExpanderTest {
 	System.out.println("\n\n");
 
 	response.getAltLabels().forEach(alt -> System.out.println(alt));
+
+	Assert.assertEquals(100, results.size());
     }
 
     @Test
@@ -322,14 +384,12 @@ public class FedXConceptsExpanderTest {
 	);
 
 	List<String> sourceLangs = Arrays.asList("it", "en");
-
 	List<String> searchLangs = Arrays.asList("it", "en");
-
 	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
-	int limit = 200;
+	int limit = 10;
 
 	//
 	//
@@ -354,7 +414,8 @@ public class FedXConceptsExpanderTest {
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 
 	expander.setEngineConfig(new FedXConfig());
-	expander.setQueryBuilder(new CloseMatchExpandConceptsQueryBuilder());
+
+	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder(true));
 	expander.setThreadMode(ThreadMode.MULTI());
 	expander.setTraceQuery(true);
 
@@ -386,6 +447,8 @@ public class FedXConceptsExpanderTest {
 	System.out.println("\n\n");
 
 	response.getAltLabels().forEach(alt -> System.out.println(alt));
+	
+	Assert.assertEquals(10, results.size());
     }
 
     @Test
@@ -406,7 +469,7 @@ public class FedXConceptsExpanderTest {
 
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
-	int limit = 200;
+	int limit = 10;
 
 	//
 	//
@@ -464,5 +527,7 @@ public class FedXConceptsExpanderTest {
 	System.out.println("\n\n");
 
 	response.getAltLabels().forEach(alt -> System.out.println(alt));
+
+	Assert.assertEquals(10, results.size());
     }
 }

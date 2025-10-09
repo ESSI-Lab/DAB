@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.finder.test;
+package eu.essi_lab.lib.skoss.finder.functional.test;
 
 import java.util.Arrays;
 import java.util.List;

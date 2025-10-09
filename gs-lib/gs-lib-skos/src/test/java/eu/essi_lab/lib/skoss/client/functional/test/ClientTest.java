@@ -1,0 +1,188 @@
+/**
+ * 
+ */
+package eu.essi_lab.lib.skoss.client.functional.test;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import eu.essi_lab.lib.skoss.SKOSClient;
+import eu.essi_lab.lib.skoss.SKOSResponse;
+import eu.essi_lab.lib.skoss.SKOSResponseItem;
+import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
+import eu.essi_lab.lib.skoss.ThreadMode;
+import eu.essi_lab.lib.skoss.expander.ConceptsExpander;
+import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
+import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
+import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
+
+/**
+ * @author Fabrizio
+ */
+public class ClientTest {
+
+    @Test
+    public void paramsTest() throws Exception {
+
+	SKOSClient client = new SKOSClient();
+
+	ConceptsExpander expander = client.getExpander();
+	Assert.assertEquals(FedXConceptsExpander.class, expander.getClass());
+
+	ConceptsFinder finder = client.getFinder();
+	Assert.assertEquals(FedXConceptsFinder.class, finder.getClass());
+
+	ExpansionLevel expansionLevel = client.getExpansionLevel();
+	Assert.assertEquals(ExpansionLevel.LOW, expansionLevel);
+
+	List<SKOSSemanticRelation> expansionsRelations = client.getExpansionsRelations();
+	Assert.assertEquals(2, expansionsRelations.size());
+	Assert.assertTrue(expansionsRelations.contains(SKOSSemanticRelation.RELATED));
+	Assert.assertTrue(expansionsRelations.contains(SKOSSemanticRelation.NARROWER));
+
+	int limit = client.getLimit();
+	Assert.assertEquals(10, limit);
+
+	List<String> searchLangs = client.getSearchLangs();
+	Assert.assertEquals(2, searchLangs.size());
+	Assert.assertTrue(searchLangs.contains("it"));
+	Assert.assertTrue(searchLangs.contains("en"));
+
+	List<String> sourceLangs = client.getSourceLangs();
+	Assert.assertEquals(2, sourceLangs.size());
+	Assert.assertTrue(sourceLangs.contains("it"));
+	Assert.assertTrue(sourceLangs.contains("en"));
+
+	List<String> ontologyUrls = client.getOntologyUrls();
+	Assert.assertNull(ontologyUrls);
+
+	String searchTerm = client.getSearchTerm();
+	Assert.assertNull(searchTerm);
+
+	//
+	//
+	//
+
+	client.setExpander(null);
+	client.setFinder(null);
+	client.setExpansionLevel(ExpansionLevel.NONE);
+	client.setExpansionsRelations(Arrays.asList());
+	client.setLimit(0);
+	client.setOntologyUrls(Arrays.asList());
+	client.setSearchLangs(Arrays.asList());
+	client.setSearchTerm("search");
+	client.setSourceLangs(Arrays.asList());
+
+	Assert.assertNull(client.getExpander());
+	Assert.assertNull(client.getFinder());
+	Assert.assertEquals(ExpansionLevel.NONE, client.getExpansionLevel());
+	Assert.assertTrue(client.getExpansionsRelations().isEmpty());
+	Assert.assertEquals(0, client.getLimit());
+	Assert.assertTrue(client.getOntologyUrls().isEmpty());
+	Assert.assertTrue(client.getSearchLangs().isEmpty());
+	Assert.assertEquals("search", client.getSearchTerm());
+	Assert.assertTrue(client.getSourceLangs().isEmpty());
+    }
+
+    @Test
+    public void mediumExpansionLimit200Test() throws Exception {
+
+	SKOSClient client = new SKOSClient();
+
+	client.setOntologyUrls(Arrays.asList(//
+		"http://localhost:3031/gemet/query", //
+		"http://hydro.geodab.eu/hydro-ontology/sparql", //
+		"https://vocabularies.unesco.org/sparql" //
+	));
+
+	client.setExpansionLevel(ExpansionLevel.MEDIUM);
+	client.setLimit(100);
+	client.setSearchTerm("water");
+
+	SKOSResponse response = client.search();
+
+	List<SKOSResponseItem> results = response.getResults().stream().//
+		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
+		toList();//
+
+	System.out.println("\n\n");
+
+	results.forEach(res -> System.out.println(res + "\n---"));
+
+	System.out.println("\n\n");
+
+	response.getPrefLabels().forEach(pref -> System.out.println(pref));
+
+	System.out.println("\n\n");
+
+	response.getAltLabels().forEach(alt -> System.out.println(alt));
+
+	Assert.assertEquals(100, results.size());
+    }
+
+    @Test
+    public void mediumExpansionFinderMultiThreadVSFinderSingleThreadLimit200Test() throws Exception {
+
+	SKOSClient client = new SKOSClient();
+
+	client.setOntologyUrls(Arrays.asList(//
+		"http://localhost:3031/gemet/query", //
+		"http://hydro.geodab.eu/hydro-ontology/sparql", //
+		"https://vocabularies.unesco.org/sparql" //
+	));
+
+	client.setExpansionLevel(ExpansionLevel.MEDIUM);
+	client.setLimit(50);
+	client.setSearchTerm("water");
+
+	SKOSResponse response = client.search();
+
+	List<SKOSResponseItem> singleThreadFinderResults = response.getResults().stream().//
+		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
+		toList();//
+
+	List<String> singlePrefLabels = response.getPrefLabels();
+	singlePrefLabels.forEach(l -> System.out.println(l));
+
+	System.out.println("\n\n---");
+
+	//
+	//
+	//
+
+	client = new SKOSClient();
+
+	client.setOntologyUrls(Arrays.asList(//
+		"http://localhost:3031/gemet/query", //
+		"http://hydro.geodab.eu/hydro-ontology/sparql", //
+		"https://vocabularies.unesco.org/sparql" //
+	));
+
+	client.setExpansionLevel(ExpansionLevel.MEDIUM);
+	client.setLimit(50);
+	client.setSearchTerm("water");
+
+	FedXConceptsFinder finder = new FedXConceptsFinder();
+//	finder.setThreadMode(ThreadMode.MULTI());
+	client.setFinder(finder);
+
+	response = client.search();
+
+	List<SKOSResponseItem> multiThreadFinderResults = response.getResults().stream().//
+		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
+		toList();//
+
+	List<String> multiPrefLabels = response.getPrefLabels();
+	multiPrefLabels.forEach(l -> System.out.println(l));
+
+	//
+	//
+	//
+
+	// Assert.assertEquals(singleThreadFinderResults, multiThreadFinderResults);
+    }
+}
