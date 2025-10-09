@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.lib.skoss;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -98,4 +100,5 @@ public class SKOSResponse {
 		sorted().//
 		collect(Collectors.toList());
     }
+
 }

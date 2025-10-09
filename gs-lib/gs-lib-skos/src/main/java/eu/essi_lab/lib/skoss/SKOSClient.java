@@ -38,13 +38,13 @@ import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
  */
 public class SKOSClient {
 
-    private static final int DEFAULT_LIMIT = 10;
-    private static final ExpansionLevel DEFAULT_EXPANSION_LEVEL = ExpansionLevel.LOW;
-    private static final List<SKOSSemanticRelation> DEFAULT_RELATIONS = Arrays.asList(SKOSSemanticRelation.NARROWER,
+    public static final int DEFAULT_LIMIT = 10;
+    public static final ExpansionLevel DEFAULT_EXPANSION_LEVEL = ExpansionLevel.LOW;
+    public static final List<SKOSSemanticRelation> DEFAULT_RELATIONS = Arrays.asList(SKOSSemanticRelation.NARROWER,
 	    SKOSSemanticRelation.RELATED);
 
-    private static final List<String> DEFAULT_SEARCH_LANGS = Arrays.asList("it", "en");
-    private static final List<String> DEFAULT_SOURCE_LANGS = Arrays.asList("it", "en");
+    public static final List<String> DEFAULT_SEARCH_LANGS = Arrays.asList("it", "en");
+    public static final List<String> DEFAULT_SOURCE_LANGS = Arrays.asList("it", "en");
 
     //
     //
