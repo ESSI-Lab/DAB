@@ -14,6 +14,39 @@ import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
  */
 public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBuilder {
 
+    private boolean closeMatch;
+
+    /**
+     * @param closeMatch
+     */
+    public DefaultExpandConceptsQueryBuilder() {
+
+    }
+
+    /**
+     * @param closeMatch
+     */
+    public DefaultExpandConceptsQueryBuilder(boolean closeMatch) {
+
+	selectCloseMatch(closeMatch);
+    }
+
+    /**
+     * @return
+     */
+    public boolean isCloseMatchSelected() {
+
+	return closeMatch;
+    }
+
+    /**
+     * @param closeMatch
+     */
+    public void selectCloseMatch(boolean closeMatch) {
+
+	this.closeMatch = closeMatch;
+    }
+
     @Override
     public String build(//
 	    String concept, //
@@ -25,6 +58,22 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 	String labelsFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
 	String expansionBlock = current.getValue() < target.getValue() ? buildExpansionOptionalBlock("concept", expansionRelations) : "";
 	String closeMatchBlock = current.getValue() < target.getValue() ? "OPTIONAL { ?concept skos:closeMatch ?closeMatch }" : "";
+
+	if (closeMatch) {
+
+	    return String.format("""
+	    	PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+	    	SELECT DISTINCT ?pref ?alt ?closeMatch ?expanded WHERE {
+	    	    BIND(<%s> AS ?concept)
+
+	    	    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s)) }
+	    	    OPTIONAL { ?concept skos:altLabel ?alt FILTER(LANG(?alt) IN (%s)) }
+
+	    	    %s
+	    	    %s
+	    	}
+	    	""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock).trim();
+	}
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>

@@ -11,7 +11,6 @@ import org.junit.Test;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpandConceptsQueryBuilder;
-import eu.essi_lab.lib.skoss.expander.impl.CloseMatchExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultExpandConceptsQueryBuilder;
 
 /**
@@ -22,7 +21,8 @@ public class ExpandConceptsQueryBuilderTest {
     @Test
     public void defaultExpandConceptsQueryBuilderTest() {
 
-	ExpandConceptsQueryBuilder builder = new DefaultExpandConceptsQueryBuilder();
+	DefaultExpandConceptsQueryBuilder builder = new DefaultExpandConceptsQueryBuilder();
+	Assert.assertFalse(builder.isCloseMatchSelected());
 
 	String query = builder.build(//
 		"CONCEPT", //
@@ -48,7 +48,8 @@ public class ExpandConceptsQueryBuilderTest {
     @Test
     public void closeMatchExpandConceptsQueryBuilderTest() {
 
-	ExpandConceptsQueryBuilder builder = new CloseMatchExpandConceptsQueryBuilder();
+	DefaultExpandConceptsQueryBuilder builder = new DefaultExpandConceptsQueryBuilder(true);
+	Assert.assertTrue(builder.isCloseMatchSelected());
 
 	String query = builder.build(//
 		"CONCEPT", //
