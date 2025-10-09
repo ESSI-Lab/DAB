@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.lib.skoss.expander.impl;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,7 +43,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
      */
     public FedXConceptsExpander() {
 
-	setThreadMode(ThreadMode.MULTI());
+	setThreadMode(ThreadMode.SINGLE());
     }
 
     /**
@@ -89,6 +90,8 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Epanding concepts STARTED");
 
+	GSLoggerFactory.getLogger(getClass()).trace("Thread mode: {} ", threadMode.getClass().getSimpleName());
+
 	FedXEngine engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
 
 	FedXRepositoryConnection conn = engine.getConnection();
@@ -119,19 +122,17 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		    visited, //
 		    results, //
 		    targetLevel, //
-		    ExpansionLevel.NONE);
+		    ExpansionLevel.NONE, //
+		    limit);
 	}
 
 	while (!stampSet.isEmpty()) {
+
+	    Thread.sleep(Duration.ofMillis(100));
 	}
 
 	engine.close();
 	executor.shutdown();
-
-	if (results.size() > limit) {
-
-	    results = results.subList(0, limit);
-	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Expanding concepts ENDED");
 
@@ -149,6 +150,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
      * @param visited
      * @param results
      * @param currentLevel
+     * @param limit
      * @throws Exception
      */
     private void expandConcept(//
@@ -161,18 +163,28 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    Set<String> visited, //
 	    List<SKOSResponseItem> results, //
 	    ExpansionLevel targetLevel, //
-	    ExpansionLevel currentLevel) {
+	    ExpansionLevel currentLevel, //
+	    int limit) {
+
+	if (results.size() >= limit) {
+
+	    executor.shutdownNow();
+	    return;
+	}
+
+	if (visited.contains(concept) || //
+		currentLevel.getValue() > targetLevel.getValue() || //
+		results.size() >= limit || //
+		executor.isShutdown()) {
+
+	    return;
+	}
 
 	executor.submit(() -> {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED", concept);
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Current level: {}", currentLevel);
-
-	    if (visited.contains(concept) || currentLevel.getValue() > targetLevel.getValue()) {
-
-		return;
-	    }
 
 	    stampSet.add(concept + currentLevel.getValue());
 
@@ -210,6 +222,12 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 				    ? queryBindingSet.getValue(QueryBinding.ALT.getLabel()).stringValue()
 				    : null);
 
+		    if (results.size() >= limit) {
+
+			executor.shutdownNow();
+			return;
+		    }
+
 		    //
 		    // it shouldn't be necessary but some ontologies seem to have duplicates
 		    //
@@ -234,7 +252,8 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 				visited, //
 				results, //
 				targetLevel, //
-				currentLevel.next().get());
+				currentLevel.next().get(), //
+				limit);
 
 		    } else if (queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()) != null) {
 
@@ -248,12 +267,16 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 				visited, //
 				results, //
 				targetLevel, //
-				currentLevel.next().get());
+				currentLevel.next().get(), //
+				limit);
 		    }
 		}
 	    } catch (QueryEvaluationException ex) {
 
-		GSLoggerFactory.getLogger(getClass()).error(ex);
+		if (!executor.isShutdown()) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(ex);
+		}
 
 	    } finally {
 
