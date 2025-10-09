@@ -53,7 +53,7 @@ public class HydroOntologyExternalTestIT {
 	assertTrue(labels.contains("Livello"));
 	assertTrue(labels.contains("Water level"));
 	
-	List<SKOSConcept> results = response.getResults();
+	List<SKOSConcept> results = response.getAssembledResults();
 	printItem(results);
 	assertTrue(results.size() == 1);
 

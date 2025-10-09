@@ -56,25 +56,36 @@ public class SKOSResponse {
 	return new SKOSResponse(results);
     }
 
+    /**
+     * 
+     */
     public List<SKOSConcept> getAssembledResults() {
 
 	Map<String, List<SKOSConcept>> map = results.stream().collect(Collectors.groupingBy((c) -> c.getConcept()));
 
-	ArrayList<SKOSConcept> arrayList = new ArrayList<SKOSConcept>();
-	
-//	
-//	map.keySet().forEach(concept -> {
-//	    
-//	    Optional<SKOSConcept> optional = arrayList.stream().filter(c -> c.getConcept().equals(concept)).findFirst();
-//	    
-//	    if(optional.isEmpty()) {
-//		
-//		
-//	    }
-//	    
-//	});
-	
-	return arrayList;
+	ArrayList<SKOSConcept> out = new ArrayList<SKOSConcept>();
+
+	map.keySet().forEach(concept -> {
+
+	    Optional<SKOSConcept> optional = out.stream().filter(c -> c.getConcept().equals(concept)).findFirst();
+
+	    List<SKOSConcept> list = map.get(concept);
+
+	    if (optional.isEmpty()) {
+
+		SKOSConcept skosConcept = SKOSConcept.of(//
+			concept, //
+			list.get(0).getPref().orElse("none"), //
+			"none", //
+			new ArrayList<>());
+
+		list.forEach(c -> skosConcept.getAlt().addAll(c.getAlt()));
+
+		out.add(skosConcept);
+	    }
+	});
+
+	return out;
     }
 
     /**

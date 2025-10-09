@@ -4,7 +4,6 @@
 package eu.essi_lab.lib.skoss;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /*-
@@ -79,7 +78,9 @@ public class SKOSConcept {
 	item.concept = concept;
 	item.pref = pref;
 	item.expanded = expanded;
-	item.alt = Arrays.asList(alt);
+
+	item.alt = new ArrayList<String>();
+	item.alt.add(alt);
 
 	return item;
     }
@@ -122,7 +123,7 @@ public class SKOSConcept {
 	return "concept: " + getConcept() + //
 		getExpanded().map(v -> "\nexpanded: " + v).orElse("") + //
 		getPref().map(v -> "\npref: " + v).orElse("") + //
-		"\nalt: "+getAlt();//
+		"\nalt: " + getAlt();//
 
     }
 
