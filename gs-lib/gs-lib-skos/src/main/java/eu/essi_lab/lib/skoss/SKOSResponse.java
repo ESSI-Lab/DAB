@@ -27,6 +27,8 @@ import java.util.ArrayList;
  */
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,12 +37,12 @@ import java.util.stream.Stream;
  */
 public class SKOSResponse {
 
-    private List<SKOSResponseItem> results;
+    private List<SKOSConcept> results;
 
     /**
      * @param results
      */
-    private SKOSResponse(List<SKOSResponseItem> results) {
+    private SKOSResponse(List<SKOSConcept> results) {
 
 	this.results = results;
     }
@@ -49,15 +51,36 @@ public class SKOSResponse {
      * @param results
      * @return
      */
-    public static SKOSResponse of(List<SKOSResponseItem> results) {
+    public static SKOSResponse of(List<SKOSConcept> results) {
 
 	return new SKOSResponse(results);
+    }
+
+    public List<SKOSConcept> getAssembledResults() {
+
+	Map<String, List<SKOSConcept>> map = results.stream().collect(Collectors.groupingBy((c) -> c.getConcept()));
+
+	ArrayList<SKOSConcept> arrayList = new ArrayList<SKOSConcept>();
+	
+//	
+//	map.keySet().forEach(concept -> {
+//	    
+//	    Optional<SKOSConcept> optional = arrayList.stream().filter(c -> c.getConcept().equals(concept)).findFirst();
+//	    
+//	    if(optional.isEmpty()) {
+//		
+//		
+//	    }
+//	    
+//	});
+	
+	return arrayList;
     }
 
     /**
      * @return the results
      */
-    public List<SKOSResponseItem> getResults() {
+    public List<SKOSConcept> getResults() {
 
 	return results;
     }
@@ -94,8 +117,7 @@ public class SKOSResponse {
 
 	return getResults().//
 		stream().//
-		filter(r -> r.getAlt().isPresent()).//
-		map(r -> r.getAlt().get()).//
+		flatMap(r -> r.getAlt().stream()).//
 		distinct().//
 		sorted().//
 		collect(Collectors.toList());

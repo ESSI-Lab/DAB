@@ -42,7 +42,7 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 
 import eu.essi_lab.lib.skoss.SKOSResponse;
-import eu.essi_lab.lib.skoss.SKOSResponseItem;
+import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
@@ -117,7 +117,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	FedXRepositoryConnection conn = engine.getConnection();
 
-	List<SKOSResponseItem> results = Collections.synchronizedList(new ArrayList<>());
+	List<SKOSConcept> results = Collections.synchronizedList(new ArrayList<>());
 
 	Set<String> stampSet = Collections.synchronizedSet(new HashSet<>());
 
@@ -182,7 +182,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    List<String> searchLangs, //
 	    List<SKOSSemanticRelation> expansionRelations, //
 	    Set<String> visited, //
-	    List<SKOSResponseItem> results, //
+	    List<SKOSConcept> results, //
 	    ExpansionLevel targetLevel, //
 	    ExpansionLevel currentLevel, //
 	    int limit) {
@@ -231,7 +231,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 		    var queryBindingSet = res.next();
 
-		    SKOSResponseItem item = SKOSResponseItem.of(//
+		    SKOSConcept item = SKOSConcept.of(//
 			    concept, //
 			    queryBindingSet.getValue(QueryBinding.PREF.getLabel()) != null
 				    ? queryBindingSet.getValue(QueryBinding.PREF.getLabel()).stringValue()

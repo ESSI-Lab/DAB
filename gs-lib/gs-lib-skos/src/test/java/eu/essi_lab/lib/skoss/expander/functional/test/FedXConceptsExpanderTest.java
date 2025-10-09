@@ -12,7 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.lib.skoss.SKOSResponse;
-import eu.essi_lab.lib.skoss.SKOSResponseItem;
+import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
@@ -26,6 +26,76 @@ import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
  * @author Fabrizio
  */
 public class FedXConceptsExpanderTest {
+
+    @Test
+    public void resultsTest() throws Exception {
+
+	String searchTerm = "water";
+
+	List<String> ontologyUrls = Arrays.asList(//
+		// "http://localhost:3031/gemet/query", //
+		"http://hydro.geodab.eu/hydro-ontology/sparql", //
+		"https://vocabularies.unesco.org/sparql" //
+	);
+
+	List<String> sourceLangs = Arrays.asList("it", "en");
+	List<String> searchLangs = Arrays.asList("it", "en");
+	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
+	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
+	int limit = 50;
+
+	FedXConceptsFinder finder = new FedXConceptsFinder();
+	finder.setThreadMode(ThreadMode.MULTI());
+
+	List<String> concepts = finder.find(searchTerm, ontologyUrls, sourceLangs);
+
+	//
+	//
+	//
+
+	FedXConceptsExpander expander1 = new FedXConceptsExpander();
+	expander1.setTraceQuery(true);
+
+	SKOSResponse response1 = expander1.expand(//
+		concepts, //
+		ontologyUrls, //
+		sourceLangs, //
+		searchLangs, //
+		relations, //
+		targetLevel, //
+		limit);//
+
+	//
+	//
+	//
+
+	FedXConceptsExpander expander2 = new FedXConceptsExpander();
+
+	SKOSResponse response2 = expander2.expand(//
+		concepts, //
+		ontologyUrls, //
+		sourceLangs, //
+		searchLangs, //
+		relations, //
+		targetLevel, //
+		limit);//
+
+	//
+	//
+	//
+
+	response1.getResults().stream().sorted((r1, r2) -> r1.toString().compareTo(r2.toString()))
+		.forEach(r -> System.out.println(r + "\n---"));
+	
+	System.out.println("\n\n\n");
+	
+	response2.getResults().stream().sorted((r1, r2) -> r1.toString().compareTo(r2.toString()))
+		.forEach(r -> System.out.println(r + "\n---"));
+
+	Assert.assertEquals(//
+		response1.getResults().stream().sorted((r1, r2) -> r1.toString().compareTo(r2.toString())).toList().toString(), //
+		response2.getResults().stream().sorted((r1, r2) -> r1.toString().compareTo(r2.toString())).toList().toString());//
+    }
 
     @Test
     public void noLimitWaterSearchTermHydroOntologyTest() throws Exception {
@@ -204,7 +274,7 @@ public class FedXConceptsExpanderTest {
 		targetLevel, //
 		limit);//
 
-	List<SKOSResponseItem> results = response.getResults().stream().//
+	List<SKOSConcept> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -278,7 +348,7 @@ public class FedXConceptsExpanderTest {
 		targetLevel, //
 		limit);//
 
-	List<SKOSResponseItem> results = response.getResults().stream().//
+	List<SKOSConcept> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -354,7 +424,7 @@ public class FedXConceptsExpanderTest {
 		targetLevel, //
 		limit);//
 
-	List<SKOSResponseItem> results = response.getResults().stream().//
+	List<SKOSConcept> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -432,7 +502,7 @@ public class FedXConceptsExpanderTest {
 		targetLevel, //
 		limit);//
 
-	List<SKOSResponseItem> results = response.getResults().stream().//
+	List<SKOSConcept> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -447,7 +517,7 @@ public class FedXConceptsExpanderTest {
 	System.out.println("\n\n");
 
 	response.getAltLabels().forEach(alt -> System.out.println(alt));
-	
+
 	Assert.assertEquals(10, results.size());
     }
 
@@ -512,7 +582,7 @@ public class FedXConceptsExpanderTest {
 		targetLevel, //
 		limit);//
 
-	List<SKOSResponseItem> results = response.getResults().stream().//
+	List<SKOSConcept> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 

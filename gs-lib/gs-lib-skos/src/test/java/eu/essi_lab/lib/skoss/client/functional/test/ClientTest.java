@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import eu.essi_lab.lib.skoss.SKOSClient;
 import eu.essi_lab.lib.skoss.SKOSResponse;
-import eu.essi_lab.lib.skoss.SKOSResponseItem;
+import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander;
@@ -105,7 +105,7 @@ public class ClientTest {
 
 	SKOSResponse response = client.search();
 
-	List<SKOSResponseItem> results = response.getResults().stream().//
+	List<SKOSConcept> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -141,7 +141,7 @@ public class ClientTest {
 
 	SKOSResponse response = client.search();
 
-	List<SKOSResponseItem> singleThreadFinderResults = response.getResults().stream().//
+	List<SKOSConcept> singleThreadFinderResults = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -172,7 +172,7 @@ public class ClientTest {
 
 	response = client.search();
 
-	List<SKOSResponseItem> multiThreadFinderResults = response.getResults().stream().//
+	List<SKOSConcept> multiThreadFinderResults = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 

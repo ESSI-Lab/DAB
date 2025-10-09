@@ -8,14 +8,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import eu.essi_lab.lib.skoss.SKOSClient;
+import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
-import eu.essi_lab.lib.skoss.SKOSResponseItem;
-import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
@@ -55,18 +53,15 @@ public class HydroOntologyExternalTestIT {
 	assertTrue(labels.contains("Livello"));
 	assertTrue(labels.contains("Water level"));
 	
-	List<SKOSResponseItem> results = response.getResults();
+	List<SKOSConcept> results = response.getResults();
 	printItem(results);
 	assertTrue(results.size() == 1);
 
     }
 
-    private void printItem(List<SKOSResponseItem> items) {
-	for (SKOSResponseItem item : items) {
-	    String alt = "";
-	    if (item.getAlt().isPresent()) {
-		alt = ", " + item.getAlt().get();
-	    }
+    private void printItem(List<SKOSConcept> items) {
+	for (SKOSConcept item : items) {
+	    List<String> alt = item.getAlt();
 	    System.out.println(item.getConcept() + ": " + item.getPref().get() + alt);
 	}
     }

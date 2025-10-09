@@ -3,6 +3,10 @@
  */
 package eu.essi_lab.lib.skoss;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -29,12 +33,20 @@ import java.util.Optional;
 /**
  * @author Fabrizio
  */
-public class SKOSResponseItem {
+public class SKOSConcept {
 
     private String concept;
     private String expanded;
     private String pref;
-    private String alt;
+    private List<String> alt;
+
+    /**
+     * 
+     */
+    private SKOSConcept() {
+
+	alt = new ArrayList<String>();
+    }
 
     /**
      * @param concept
@@ -43,13 +55,31 @@ public class SKOSResponseItem {
      * @param alt
      * @return
      */
-    public static SKOSResponseItem of(String concept, String pref, String expanded, String alt) {
+    public static SKOSConcept of(String concept, String pref, String expanded, List<String> alt) {
 
-	SKOSResponseItem item = new SKOSResponseItem();
+	SKOSConcept item = new SKOSConcept();
 	item.concept = concept;
 	item.pref = pref;
 	item.expanded = expanded;
 	item.alt = alt;
+
+	return item;
+    }
+
+    /**
+     * @param concept
+     * @param pref
+     * @param expanded
+     * @param alt
+     * @return
+     */
+    public static SKOSConcept of(String concept, String pref, String expanded, String alt) {
+
+	SKOSConcept item = new SKOSConcept();
+	item.concept = concept;
+	item.pref = pref;
+	item.expanded = expanded;
+	item.alt = Arrays.asList(alt);
 
 	return item;
     }
@@ -81,9 +111,9 @@ public class SKOSResponseItem {
     /**
      * @return
      */
-    public Optional<String> getAlt() {
+    public List<String> getAlt() {
 
-	return Optional.ofNullable(alt);
+	return alt;
     }
 
     @Override
@@ -92,13 +122,13 @@ public class SKOSResponseItem {
 	return "concept: " + getConcept() + //
 		getExpanded().map(v -> "\nexpanded: " + v).orElse("") + //
 		getPref().map(v -> "\npref: " + v).orElse("") + //
-		getAlt().map(v -> "\nalt: " + v).orElse("");//
+		"\nalt: "+getAlt();//
 
     }
 
     @Override
     public boolean equals(Object other) {
 
-	return other instanceof SKOSResponseItem && other.toString().equals(this.toString());
+	return other instanceof SKOSConcept && other.toString().equals(this.toString());
     }
 }
