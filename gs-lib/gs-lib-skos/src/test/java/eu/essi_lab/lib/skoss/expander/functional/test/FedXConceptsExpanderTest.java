@@ -11,8 +11,8 @@ import org.eclipse.rdf4j.federated.FedXConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSConcept;
+import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
@@ -443,83 +443,7 @@ public class FedXConceptsExpanderTest {
 	Assert.assertEquals(100, results.size());
     }
 
-    @Test
-    public void multiThreadConceptsFinderTestWithCloseMatchExpandQueryBuilderWithQueryTracing() throws Exception {
-
-	List<String> ontologyUrls = Arrays.asList(//
-		"http://localhost:3031/gemet/query", //
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql" //
-	// "https://dbpedia.org/sparql"
-	);
-
-	List<String> sourceLangs = Arrays.asList("it", "en");
-	List<String> searchLangs = Arrays.asList("it", "en");
-	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
-
-	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
-
-	int limit = 10;
-
-	//
-	//
-	//
-
-	FedXConceptsFinder finder = new FedXConceptsFinder();
-	finder.setThreadMode(ThreadMode.MULTI());
-	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
-
-	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
-	executor.setTraceQuery(false);
-	executor.setEngineConfig(new FedXConfig());
-
-	finder.setExecutor(executor);
-
-	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
-
-	//
-	//
-	//
-
-	FedXConceptsExpander expander = new FedXConceptsExpander();
-
-	expander.setEngineConfig(new FedXConfig());
-
-	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder(true));
-	expander.setThreadMode(ThreadMode.MULTI());
-	expander.setTraceQuery(true);
-
-	//
-	//
-	//
-
-	SKOSResponse response = expander.expand(//
-		concepts, //
-		ontologyUrls, //
-		sourceLangs, //
-		searchLangs, //
-		relations, //
-		targetLevel, //
-		limit);//
-
-	List<SKOSConcept> results = response.getResults().stream().//
-		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
-		toList();//
-
-	System.out.println("\n\n");
-
-	results.forEach(res -> System.out.println(res + "\n---"));
-
-	System.out.println("\n\n");
-
-	response.getPrefLabels().forEach(pref -> System.out.println(pref));
-
-	System.out.println("\n\n");
-
-	response.getAltLabels().forEach(alt -> System.out.println(alt));
-
-	Assert.assertEquals(10, results.size());
-    }
+   
 
     @Test
     public void multiThreadConceptsFinderWithFixedThreadPoolExecutorTest() throws Exception {

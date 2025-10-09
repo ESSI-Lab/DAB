@@ -4,6 +4,7 @@
 package eu.essi_lab.lib.skoss;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /*-
  * #%L
@@ -28,9 +29,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,26 +64,6 @@ public class SKOSResponse {
 
 	Map<String, List<SKOSConcept>> map = results.stream().collect(Collectors.groupingBy((c) -> c.getConcept()));
 
-<<<<<<< HEAD
-	List<SKOSConcept> ret = new ArrayList<SKOSConcept>();
-
-	Set<Entry<String, List<SKOSConcept>>> entries = map.entrySet();
-	for (Entry<String, List<SKOSConcept>> entry : entries) {
-	    SKOSConcept tmp = null;
-	    for (SKOSConcept concept : entry.getValue()) {
-		if (tmp == null) {
-		    tmp = concept;
-		} else {
-		    tmp.getAlt().addAll(concept.getAlt());
-		}
-	    }
-	    if (tmp != null) {
-		ret.add(tmp);
-	    }
-	}
-
-	return ret;
-=======
 	ArrayList<SKOSConcept> out = new ArrayList<SKOSConcept>();
 
 	map.keySet().forEach(concept -> {
@@ -98,17 +77,20 @@ public class SKOSResponse {
 		SKOSConcept skosConcept = SKOSConcept.of(//
 			concept, //
 			list.get(0).getPref().orElse("none"), //
-			"none", //
-			new ArrayList<>());
+			new HashSet<>(),
+			new HashSet<>(),
+			new HashSet<>());
 
 		list.forEach(c -> skosConcept.getAlt().addAll(c.getAlt()));
+		list.forEach(c -> skosConcept.getExpanded().addAll(c.getExpanded()));
+		list.forEach(c -> skosConcept.getExpandedFrom().addAll(c.getExpandedFrom()));
+
 
 		out.add(skosConcept);
 	    }
 	});
 
 	return out;
->>>>>>> branch 'feature/GIP-785' of https://boldrini@essi-lab.eu/git/r/ESSI/DAB-private.git
     }
 
     /**

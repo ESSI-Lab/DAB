@@ -27,45 +27,19 @@ package eu.essi_lab.lib.skoss.expander.impl;
 import java.util.List;
 
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.expander.ExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skoss.expander.ExpandConceptsQueryBuilder;
 
 /**
  * @author Fabrizio
  */
 public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBuilder {
 
-    private boolean closeMatch;
-
     /**
      * @param closeMatch
      */
     public DefaultExpandConceptsQueryBuilder() {
 
-    }
-
-    /**
-     * @param closeMatch
-     */
-    public DefaultExpandConceptsQueryBuilder(boolean closeMatch) {
-
-	selectCloseMatch(closeMatch);
-    }
-
-    /**
-     * @return
-     */
-    public boolean isCloseMatchSelected() {
-
-	return closeMatch;
-    }
-
-    /**
-     * @param closeMatch
-     */
-    public void selectCloseMatch(boolean closeMatch) {
-
-	this.closeMatch = closeMatch;
     }
 
     @Override
@@ -78,23 +52,6 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 
 	String labelsFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
 	String expansionBlock = current.getValue() < target.getValue() ? buildExpansionOptionalBlock("concept", expansionRelations) : "";
-	String closeMatchBlock = current.getValue() < target.getValue() ? "OPTIONAL { ?concept skos:closeMatch ?closeMatch }" : "";
-
-	if (closeMatch) {
-
-	    return String.format("""
-	    	PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-	    	SELECT DISTINCT ?pref ?alt ?closeMatch ?expanded WHERE {
-	    	    BIND(<%s> AS ?concept)
-
-	    	    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s)) }
-	    	    OPTIONAL { ?concept skos:altLabel ?alt FILTER(LANG(?alt) IN (%s)) }
-
-	    	    %s
-	    	    %s
-	    	}
-	    	""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock).trim();
-	}
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -105,9 +62,8 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 		    OPTIONAL { ?concept skos:altLabel ?alt FILTER(LANG(?alt) IN (%s)) }
 
 		    %s
-		    %s
 		}
-		""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock).trim();
+		""", concept, labelsFilter, labelsFilter, expansionBlock).trim();
     }
 
     /**
@@ -119,13 +75,18 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 
 	StringBuilder sb = new StringBuilder();
 
-	for (SKOSSemanticRelation rel : relations) {
+	for (int i = 0; i < relations.size(); i++) {
+	    SKOSSemanticRelation rel = relations.get(i);
 
-	    sb.append("OPTIONAL { ?").//
+	    sb.append("{ OPTIONAL { ?").//
 		    append(conceptVar).//
 		    append(" ").//
 		    append(rel.getLabel()).//
-		    append(" ?expanded } ");
+		    append(" ?expanded } }");
+
+	    if (i != relations.size() - 1) {
+		sb.append(" UNION ");
+	    }
 	}
 
 	return sb.toString();

@@ -137,6 +137,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		    stampSet, //
 		    executor, //
 		    conn, //
+		    null,
 		    concept, //
 		    searchLangs, //
 		    expansionRelations, //
@@ -178,6 +179,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    Set<String> stampSet, //
 	    ExecutorService executor, //
 	    RepositoryConnection conn, //
+	    String father,
 	    String concept, //
 	    List<String> searchLangs, //
 	    List<SKOSSemanticRelation> expansionRelations, //
@@ -239,6 +241,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 			    queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()) != null
 				    ? queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()).stringValue()
 				    : null, //
+			    father, //
 			    queryBindingSet.getValue(QueryBinding.ALT.getLabel()) != null
 				    ? queryBindingSet.getValue(QueryBinding.ALT.getLabel()).stringValue()
 				    : null);
@@ -261,27 +264,13 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		    // if the ExpandConceptsQueryBuilder don't put closeMatch in the SELECT clause
 		    // (default), this case never occurs
 		    //
-		    if (queryBindingSet.getValue(QueryBinding.CLOSE_MATCH.getLabel()) != null) {
+		   if (queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()) != null) {
 
 			expandConcept(//
 				stampSet, //
 				executor, //
 				conn, //
-				queryBindingSet.getValue(QueryBinding.CLOSE_MATCH.getLabel()).stringValue(), //
-				searchLangs, //
-				expansionRelations, //
-				visited, //
-				results, //
-				targetLevel, //
-				currentLevel.next().get(), //
-				limit);
-
-		    } else if (queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()) != null) {
-
-			expandConcept(//
-				stampSet, //
-				executor, //
-				conn, //
+				concept, //
 				queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()).stringValue(), //
 				searchLangs, //
 				expansionRelations, //

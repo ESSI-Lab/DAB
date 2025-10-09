@@ -3,10 +3,7 @@
  */
 package eu.essi_lab.lib.skoss;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 
 /*-
  * #%L
@@ -38,7 +35,8 @@ import java.util.Set;
 public class SKOSConcept {
 
     private String concept;
-    private String expanded;
+    private Set<String>expandedFrom;
+    private Set<String>expanded;
     private String pref;
     private Set<String> alt;
 
@@ -57,12 +55,13 @@ public class SKOSConcept {
      * @param alt
      * @return
      */
-    public static SKOSConcept of(String concept, String pref, String expanded, Set<String> alt) {
+    public static SKOSConcept of(String concept, String pref, Set<String> expanded,Set<String> expandedFrom, Set<String> alt) {
 
 	SKOSConcept item = new SKOSConcept();
 	item.concept = concept;
 	item.pref = pref;
 	item.expanded = expanded;
+	item.expandedFrom = expandedFrom;
 	item.alt = alt;
 
 	return item;
@@ -75,12 +74,15 @@ public class SKOSConcept {
      * @param alt
      * @return
      */
-    public static SKOSConcept of(String concept, String pref, String expanded, String alt) {
+    public static SKOSConcept of(String concept, String pref, String expanded,String expandedFrom, String alt) {
 
 	SKOSConcept item = new SKOSConcept();
 	item.concept = concept;
 	item.pref = pref;
-	item.expanded = expanded;
+	item.expanded = new HashSet<String>();
+	item.expanded.add(expanded);
+	item.expandedFrom = new HashSet<String>();
+	item.expandedFrom.add(expandedFrom);
 	item.alt = new HashSet<String>();
 	item.alt.add(alt);
 
@@ -99,10 +101,15 @@ public class SKOSConcept {
     /**
      * @return
      */
-    public Optional<String> getExpanded() {
+    public Set<String> getExpanded() {
 
-	return Optional.ofNullable(expanded);
+	return expanded;
     }
+    
+    public Set<String> getExpandedFrom() {
+
+ 	return expandedFrom;
+     }
 
     /**
      * @return
@@ -124,7 +131,8 @@ public class SKOSConcept {
     public String toString() {
 
 	return "concept: " + getConcept() + //
-		getExpanded().map(v -> "\nexpanded: " + v).orElse("") + //
+		"\nexpanded from: " + getExpandedFrom()+//
+		"\nexpanded: " + getExpanded()+//		
 		getPref().map(v -> "\npref: " + v).orElse("") + //
 		"\nalt: " + getAlt();//
 
