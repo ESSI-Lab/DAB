@@ -68,8 +68,7 @@ public class HydroOntologyExternalTestIT {
 	concepts = response.getAssembledResults();
 	printConcepts(concepts);
 	
-	
-
+	 
     }
 
     private void printConcepts(List<SKOSConcept> items) {

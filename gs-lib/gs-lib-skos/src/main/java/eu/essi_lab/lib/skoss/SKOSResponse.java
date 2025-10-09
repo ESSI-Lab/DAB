@@ -58,10 +58,14 @@ public class SKOSResponse {
 	return new SKOSResponse(results);
     }
 
+    /**
+     * 
+     */
     public List<SKOSConcept> getAssembledResults() {
 
 	Map<String, List<SKOSConcept>> map = results.stream().collect(Collectors.groupingBy((c) -> c.getConcept()));
 
+<<<<<<< HEAD
 	List<SKOSConcept> ret = new ArrayList<SKOSConcept>();
 
 	Set<Entry<String, List<SKOSConcept>>> entries = map.entrySet();
@@ -80,6 +84,31 @@ public class SKOSResponse {
 	}
 
 	return ret;
+=======
+	ArrayList<SKOSConcept> out = new ArrayList<SKOSConcept>();
+
+	map.keySet().forEach(concept -> {
+
+	    Optional<SKOSConcept> optional = out.stream().filter(c -> c.getConcept().equals(concept)).findFirst();
+
+	    List<SKOSConcept> list = map.get(concept);
+
+	    if (optional.isEmpty()) {
+
+		SKOSConcept skosConcept = SKOSConcept.of(//
+			concept, //
+			list.get(0).getPref().orElse("none"), //
+			"none", //
+			new ArrayList<>());
+
+		list.forEach(c -> skosConcept.getAlt().addAll(c.getAlt()));
+
+		out.add(skosConcept);
+	    }
+	});
+
+	return out;
+>>>>>>> branch 'feature/GIP-785' of https://boldrini@essi-lab.eu/git/r/ESSI/DAB-private.git
     }
 
     /**

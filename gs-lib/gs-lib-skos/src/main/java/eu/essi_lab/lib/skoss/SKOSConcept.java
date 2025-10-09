@@ -84,6 +84,7 @@ public class SKOSConcept {
 	item.alt = new HashSet<String>();
 	item.alt.add(alt);
 
+
 	return item;
     }
 
@@ -125,7 +126,7 @@ public class SKOSConcept {
 	return "concept: " + getConcept() + //
 		getExpanded().map(v -> "\nexpanded: " + v).orElse("") + //
 		getPref().map(v -> "\npref: " + v).orElse("") + //
-		"\nalt: "+getAlt();//
+		"\nalt: " + getAlt();//
 
     }
 
