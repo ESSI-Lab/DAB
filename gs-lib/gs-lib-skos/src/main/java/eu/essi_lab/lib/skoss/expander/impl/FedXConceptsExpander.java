@@ -3,15 +3,16 @@
  */
 package eu.essi_lab.lib.skoss.expander.impl;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.eclipse.rdf4j.federated.FedXConfig;
 import org.eclipse.rdf4j.federated.repository.FedXRepositoryConnection;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.TupleQuery;
@@ -21,8 +22,9 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSResponseItem;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.expander.impl.ThreadMode.MultiThreadMode;
-import eu.essi_lab.lib.skoss.expander.impl.ThreadMode.SingleThreadMode;
+import eu.essi_lab.lib.skoss.ThreadMode;
+import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
+import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.skoss.fedx.QueryBinding;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -33,7 +35,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class FedXConceptsExpander extends AbstractConceptsExpander {
 
     private ThreadMode threadMode;
-    private FedXEngine engine;
+    private FedXConfig engineConfig;
 
     /**
      * 
@@ -46,17 +48,17 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
     /**
      * @return
      */
-    public FedXEngine getEngine() {
+    public Optional<FedXConfig> getEngineConfig() {
 
-	return engine;
+	return Optional.ofNullable(engineConfig);
     }
 
     /**
      * @param config
      */
-    public void setEngine(FedXEngine engine) {
+    public void setEngineConfig(FedXConfig engine) {
 
-	this.engine = engine;
+	this.engineConfig = engine;
     }
 
     /**
@@ -87,7 +89,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Epanding concepts STARTED");
 
-	FedXEngine engine = getEngine() == null ? FedXEngine.of(ontologyUrls) : getEngine();
+	FedXEngine engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
 
 	FedXRepositoryConnection conn = engine.getConnection();
 
@@ -121,18 +123,9 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	}
 
 	while (!stampSet.isEmpty()) {
-
-	    try {
-		Thread.sleep(Duration.ofSeconds(1));
-
-	    } catch (InterruptedException e) {
-
-		GSLoggerFactory.getLogger(getClass()).error(e);
-	    }
 	}
 
 	engine.close();
-
 	executor.shutdown();
 
 	if (results.size() > limit) {

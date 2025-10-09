@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.finder.impl.DefaultFindConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
 
 /**
  * @author Fabrizio
@@ -18,7 +18,7 @@ public class FindConceptsQueryBuilderTest {
     @Test
     public void defaultFindConceptsQueryBuilderTest() {
 
-	DefaultFindConceptsQueryBuilder builder = new DefaultFindConceptsQueryBuilder();
+	DefaultConceptsQueryBuilder builder = new DefaultConceptsQueryBuilder();
 	
 	String query = builder.build("searchTerm", Arrays.asList("it"));
 	

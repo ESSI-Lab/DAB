@@ -5,12 +5,12 @@ package eu.essi_lab.lib.skoss.finder.impl;
 
 import java.util.List;
 
-import eu.essi_lab.lib.skoss.finder.FindConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.ConceptsQueryBuilder;
 
 /**
  * @author Fabrizio
  */
-public class DefaultFindConceptsQueryBuilder implements FindConceptsQueryBuilder {
+public class DefaultConceptsQueryBuilder implements ConceptsQueryBuilder {
 
     @Override
     public String build(String searchTerm, List<String> sourceLangs) {

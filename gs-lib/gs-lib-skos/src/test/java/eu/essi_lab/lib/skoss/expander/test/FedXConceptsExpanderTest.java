@@ -13,21 +13,19 @@ import org.junit.Test;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSResponseItem;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
+import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.impl.CloseMatchExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
-import eu.essi_lab.lib.skoss.expander.impl.ThreadMode;
-import eu.essi_lab.lib.skoss.fedx.FedXEngine;
-import eu.essi_lab.lib.skoss.finder.impl.DefaultFindConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
-import eu.essi_lab.lib.skoss.finder.impl.FedXMultiThreadConceptsFinder;
 
 /**
  * @author Fabrizio
  */
-public class ConceptsExpanderTest {
+public class FedXConceptsExpanderTest {
 
     @Test
     public void defaultTest() throws Exception {
@@ -108,16 +106,13 @@ public class ConceptsExpanderTest {
 	//
 
 	FedXConceptsFinder finder = new FedXConceptsFinder();
+	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
 
-	finder.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
-	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
+	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
+	executor.setEngineConfig(new FedXConfig());
+	executor.setTraceQuery(false);
 
-	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
-	conceptsQueryExecutor.setTraceQuery(false);
-	
-	conceptsQueryExecutor.setEngineBuilder(ontUrls -> FedXEngine.of(ontUrls, new FedXConfig()));
-
-	finder.setExecutor(conceptsQueryExecutor);
+	finder.setExecutor(executor);
 
 	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
 
@@ -127,7 +122,7 @@ public class ConceptsExpanderTest {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 
-	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
+	expander.setEngineConfig(new FedXConfig());
 	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
 	expander.setThreadMode(ThreadMode.MULTI());
 	expander.setTraceQuery(false);
@@ -187,15 +182,14 @@ public class ConceptsExpanderTest {
 
 	FedXConceptsFinder finder = new FedXConceptsFinder();
 
-	finder.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
-	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
+	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
 
-	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
-	conceptsQueryExecutor.setTraceQuery(false);
-	
-	conceptsQueryExecutor.setEngineBuilder(ontUrls -> FedXEngine.of(ontUrls, new FedXConfig()));
+	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
+	executor.setTraceQuery(false);
+	executor.setEngineConfig(new FedXConfig());
 
-	finder.setExecutor(conceptsQueryExecutor);
+
+	finder.setExecutor(executor);
 
 	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
 
@@ -205,7 +199,7 @@ public class ConceptsExpanderTest {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 
-	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
+	expander.setEngineConfig(new FedXConfig());
 	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
 	expander.setThreadMode(ThreadMode.SINGLE());
 	expander.setTraceQuery(false);
@@ -264,17 +258,15 @@ public class ConceptsExpanderTest {
 	//
 	//
 
-	FedXMultiThreadConceptsFinder finder = new FedXMultiThreadConceptsFinder();
+	FedXConceptsFinder finder = new FedXConceptsFinder();
+	finder.setThreadMode(ThreadMode.MULTI());
+	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
 
-	finder.setConfiguration(new FedXConfig());
-	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
+	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
+	executor.setEngineConfig(new FedXConfig());
+	executor.setTraceQuery(false);
 
-	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
-	conceptsQueryExecutor.setTraceQuery(false);
-	
-	conceptsQueryExecutor.setEngineBuilder(ontUrls -> FedXEngine.of(ontUrls, new FedXConfig()));
-
-	finder.setExecutor(conceptsQueryExecutor);
+	finder.setExecutor(executor);
 
 	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
 
@@ -284,7 +276,7 @@ public class ConceptsExpanderTest {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 
-	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
+	expander.setEngineConfig(new FedXConfig());
 	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
 	expander.setThreadMode(ThreadMode.MULTI());
 	expander.setTraceQuery(false);
@@ -343,17 +335,15 @@ public class ConceptsExpanderTest {
 	//
 	//
 
-	FedXMultiThreadConceptsFinder finder = new FedXMultiThreadConceptsFinder();
+	FedXConceptsFinder finder = new FedXConceptsFinder();
+	finder.setThreadMode(ThreadMode.MULTI());
+	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
 
-	finder.setConfiguration(new FedXConfig());
-	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
+	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
+	executor.setTraceQuery(false);
+	executor.setEngineConfig(new FedXConfig());
 
-	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
-	conceptsQueryExecutor.setTraceQuery(false);
-	
-	conceptsQueryExecutor.setEngineBuilder(ontUrls -> FedXEngine.of(ontUrls, new FedXConfig()));
-
-	finder.setExecutor(conceptsQueryExecutor);
+	finder.setExecutor(executor);
 
 	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
 
@@ -363,7 +353,7 @@ public class ConceptsExpanderTest {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 
-	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
+	expander.setEngineConfig(new FedXConfig());
 	expander.setQueryBuilder(new CloseMatchExpandConceptsQueryBuilder());
 	expander.setThreadMode(ThreadMode.MULTI());
 	expander.setTraceQuery(true);
@@ -422,17 +412,15 @@ public class ConceptsExpanderTest {
 	//
 	//
 
-	FedXMultiThreadConceptsFinder finder = new FedXMultiThreadConceptsFinder();
+	FedXConceptsFinder finder = new FedXConceptsFinder();
+	finder.setThreadMode(ThreadMode.MULTI());
+	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
 
-	finder.setConfiguration(new FedXConfig());
-	finder.setQueryBuilder(new DefaultFindConceptsQueryBuilder());
+	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
+	executor.setTraceQuery(false);
+	executor.setEngineConfig(new FedXConfig());
 
-	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
-	conceptsQueryExecutor.setTraceQuery(false);
-	
-	conceptsQueryExecutor.setEngineBuilder(ontUrls -> FedXEngine.of(ontUrls, new FedXConfig()));
-
-	finder.setExecutor(conceptsQueryExecutor);
+	finder.setExecutor(executor);
 
 	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
 
@@ -442,7 +430,7 @@ public class ConceptsExpanderTest {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 
-	expander.setEngine(FedXEngine.of(ontologyUrls, new FedXConfig()));
+	expander.setEngineConfig(new FedXConfig());
 	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
 	// limit the thread pool to 5 threads
 	expander.setThreadMode(ThreadMode.MULTI(Executors.newFixedThreadPool(5)));

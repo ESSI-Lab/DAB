@@ -5,8 +5,9 @@ package eu.essi_lab.lib.skoss.finder.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Optional;
 
+import org.eclipse.rdf4j.federated.FedXConfig;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
@@ -14,7 +15,7 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.skoss.fedx.QueryBinding;
 import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
-import eu.essi_lab.lib.skoss.finder.FindConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.ConceptsQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -23,14 +24,12 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class FedXConceptsQueryExecutor implements ConceptsQueryExecutor {
 
     private boolean traceQuery;
-    private Function<List<String>, FedXEngine> engineBuilder;
+    private FedXConfig engineConfig;
 
     /**
      * 
      */
     public FedXConceptsQueryExecutor() {
-
-	setEngineBuilder(ontologyUrls -> FedXEngine.of(ontologyUrls));
     }
 
     /**
@@ -50,19 +49,19 @@ public class FedXConceptsQueryExecutor implements ConceptsQueryExecutor {
     }
 
     /**
-     * @param engine
+     * @return
      */
-    public void setEngineBuilder(Function<List<String>, FedXEngine> engineBuilder) {
+    public Optional<FedXConfig> getEngineConfig() {
 
-	this.engineBuilder = engineBuilder;
+	return Optional.ofNullable(engineConfig);
     }
 
     /**
-     * @return the engineBuilder
+     * @param config
      */
-    public Function<List<String>, FedXEngine> getEngineBuilder() {
+    public void setEngineConfig(FedXConfig engine) {
 
-	return engineBuilder;
+	this.engineConfig = engine;
     }
 
     /**
@@ -74,7 +73,7 @@ public class FedXConceptsQueryExecutor implements ConceptsQueryExecutor {
      */
     @Override
     public List<String> execute(//
-	    FindConceptsQueryBuilder queryBuilder, //
+	    ConceptsQueryBuilder queryBuilder, //
 	    String searchTerm, //
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs) throws Exception {
@@ -86,8 +85,7 @@ public class FedXConceptsQueryExecutor implements ConceptsQueryExecutor {
 	    GSLoggerFactory.getLogger(getClass()).trace("\n{}", query);
 	}
 
-	TupleQuery tupleQuery = getEngineBuilder().//
-		apply(ontologyUrls).//
+	TupleQuery tupleQuery = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig())).//
 		getConnection().//
 		prepareTupleQuery(query);
 

@@ -9,7 +9,7 @@ import java.util.List;
  * @author Fabrizio
  */
 @FunctionalInterface
-public interface FindConceptsQueryBuilder {
+public interface ConceptsQueryBuilder {
 
     /**
      * @param searchTerm

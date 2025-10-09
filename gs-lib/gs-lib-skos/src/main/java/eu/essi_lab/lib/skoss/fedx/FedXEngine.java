@@ -11,6 +11,8 @@ import org.eclipse.rdf4j.federated.repository.FedXRepository;
 import org.eclipse.rdf4j.federated.repository.FedXRepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+
 /**
  * @author Fabrizio
  */
@@ -61,7 +63,10 @@ public class FedXEngine {
      */
     private FedXEngine(List<String> ontologyUrls, FedXConfig config) {
 
+	GSLoggerFactory.getLogger(getClass()).info("FedXEngine init STARTED");
+
 	FedXFactory fed = FedXFactory.newFederation();
+
 	fed.withSparqlEndpoints(ontologyUrls);
 
 	if (config != null) {
@@ -70,7 +75,10 @@ public class FedXEngine {
 	}
 
 	repo = fed.create();
+
 	connection = repo.getConnection();
+
+	GSLoggerFactory.getLogger(getClass()).info("FedXEngine init ENDED");
     }
 
     /**

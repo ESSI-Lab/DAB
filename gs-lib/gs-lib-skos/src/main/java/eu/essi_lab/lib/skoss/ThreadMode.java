@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.expander.impl;
+package eu.essi_lab.lib.skoss;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,13 +38,13 @@ public abstract class ThreadMode {
     /**
      * @author Fabrizio
      */
-    static class SingleThreadMode extends ThreadMode {
+    public static class SingleThreadMode extends ThreadMode {
     }
 
     /**
      * @author Fabrizio
      */
-    static class MultiThreadMode extends ThreadMode {
+    public static class MultiThreadMode extends ThreadMode {
 
 	private ExecutorService executor;
 

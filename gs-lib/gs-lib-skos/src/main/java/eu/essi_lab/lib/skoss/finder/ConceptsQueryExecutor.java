@@ -20,7 +20,7 @@ public interface ConceptsQueryExecutor {
      * @throws Exception
      */
     List<String> execute(//
-	    FindConceptsQueryBuilder queryBuilder, //
+	    ConceptsQueryBuilder queryBuilder, //
 	    String searchTerm, //
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs) throws Exception;
