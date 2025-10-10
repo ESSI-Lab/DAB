@@ -111,8 +111,12 @@ public class ClientExternalTestIT {
 	client.setSearchTerm("water");
 	
 	FedXConfig fedXConfig = new FedXConfig();
+//	fedXConfig.withDebugQueryPlan(true);
+//	fedXConfig.withLogQueries(true);
+	fedXConfig.withLogQueryPlan(true);
+	fedXConfig.withEnableMonitoring(true);
+	fedXConfig.withLogQueryPlan(true);
 	
-
 	//
 	//
 	//

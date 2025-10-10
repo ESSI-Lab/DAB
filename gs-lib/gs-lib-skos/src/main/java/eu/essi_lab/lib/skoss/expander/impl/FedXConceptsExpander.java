@@ -130,7 +130,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	default -> throw new IllegalArgumentException();// no way
 	};
 
-	concepts.forEach(con -> stampSet.add(con + ExpansionLevel.BASIC.getValue()));
+	concepts.forEach(con -> stampSet.add(con + ExpansionLevel.NONE.getValue()));
 
 	for (String concept : concepts) {
 
@@ -144,7 +144,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		    visited, //
 		    results, //
 		    targetLevel, //
-		    ExpansionLevel.BASIC, //
+		    ExpansionLevel.NONE, //
 		    limit);
 	}
 

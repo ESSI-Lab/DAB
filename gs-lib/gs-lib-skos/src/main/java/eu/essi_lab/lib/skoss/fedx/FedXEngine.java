@@ -103,6 +103,14 @@ public class FedXEngine {
     }
 
     /**
+     * @return
+     */
+    public FedXRepository getRepository() {
+
+	return repo;
+    }
+
+    /**
      * 
      */
     public void close() throws RepositoryException {

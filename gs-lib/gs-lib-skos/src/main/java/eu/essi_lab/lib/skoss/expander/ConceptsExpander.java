@@ -45,7 +45,7 @@ public interface ConceptsExpander {
 	/**
 	 * 
 	 */
-	BASIC(0),
+	NONE(0),
 	/**
 	 * 
 	 */

@@ -27,7 +27,7 @@ public class ExpandConceptsQueryBuilderTest {
 		Arrays.asList("it"), //
 		Arrays.asList(SKOSSemanticRelation.BROAD_MATCH), //
 		ExpansionLevel.HIGH, //
-		ExpansionLevel.BASIC);//
+		ExpansionLevel.NONE);//
 
 	String expected = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" + //
 		"SELECT DISTINCT ?pref ?alt ?expanded WHERE {\n" //
