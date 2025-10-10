@@ -29,6 +29,8 @@ import java.util.List;
 
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
@@ -38,9 +40,10 @@ import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
  */
 public class SKOSClient {
 
-    public static final int DEFAULT_LIMIT = 10;
+    public static final ExpansionLimit DEFAULT_LIMIT = ExpansionLimit.of(LimitTarget.CONCEPTS, 10);
     public static final ExpansionLevel DEFAULT_EXPANSION_LEVEL = ExpansionLevel.LOW;
-    public static final List<SKOSSemanticRelation> DEFAULT_RELATIONS = Arrays.asList(SKOSSemanticRelation.NARROWER,
+    public static final List<SKOSSemanticRelation> DEFAULT_RELATIONS = Arrays.asList(//
+	    SKOSSemanticRelation.NARROWER, //
 	    SKOSSemanticRelation.RELATED);
 
     public static final List<String> DEFAULT_SEARCH_LANGS = Arrays.asList("it", "en");
@@ -56,7 +59,7 @@ public class SKOSClient {
     private List<String> ontologyUrls;
     private ExpansionLevel expansionLevel;
     private List<SKOSSemanticRelation> expansionsRelations;
-    private int limit;
+    private ExpansionLimit limit;
 
     //
     //
@@ -70,7 +73,7 @@ public class SKOSClient {
      */
     public SKOSClient() {
 
-	setLimit(DEFAULT_LIMIT);
+	setExpansionLimit(DEFAULT_LIMIT);
 	setExpansionLevel(DEFAULT_EXPANSION_LEVEL);
 	setExpansionsRelations(DEFAULT_RELATIONS);
 	setSearchLangs(DEFAULT_SEARCH_LANGS);
@@ -167,14 +170,14 @@ public class SKOSClient {
     /**
      * @return the limit
      */
-    public int getLimit() {
+    public ExpansionLimit getExpansionLimit() {
 	return limit;
     }
 
     /**
      * @param limit
      */
-    public void setLimit(int limit) {
+    public void setExpansionLimit(ExpansionLimit limit) {
 	this.limit = limit;
     }
 
@@ -224,7 +227,7 @@ public class SKOSClient {
 		getSearchLangs(), //
 		getExpansionsRelations(), //
 		getExpansionLevel(), //
-		getLimit());//
+		getExpansionLimit());//
 
 	return response;
     }

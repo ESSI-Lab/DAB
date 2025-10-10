@@ -6,6 +6,7 @@ package eu.essi_lab.lib.skoss.client.functional.test;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.rdf4j.federated.FedXConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,11 +14,17 @@ import eu.essi_lab.lib.skoss.SKOSClient;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
+import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
+import eu.essi_lab.lib.skoss.expander.impl.DefaultExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
+import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
+import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
 
 /**
  * @author Fabrizio
@@ -43,8 +50,8 @@ public class ClientExternalTestIT {
 	Assert.assertTrue(expansionsRelations.contains(SKOSSemanticRelation.RELATED));
 	Assert.assertTrue(expansionsRelations.contains(SKOSSemanticRelation.NARROWER));
 
-	int limit = client.getLimit();
-	Assert.assertEquals(10, limit);
+	ExpansionLimit limit = client.getExpansionLimit();
+	Assert.assertEquals(10, limit.getLimit());
 
 	List<String> searchLangs = client.getSearchLangs();
 	Assert.assertEquals(2, searchLangs.size());
@@ -70,7 +77,7 @@ public class ClientExternalTestIT {
 	client.setFinder(null);
 	client.setExpansionLevel(ExpansionLevel.NONE);
 	client.setExpansionsRelations(Arrays.asList());
-	client.setLimit(0);
+	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.ALT_LABELS, 0));
 	client.setOntologyUrls(Arrays.asList());
 	client.setSearchLangs(Arrays.asList());
 	client.setSearchTerm("search");
@@ -80,7 +87,8 @@ public class ClientExternalTestIT {
 	Assert.assertNull(client.getFinder());
 	Assert.assertEquals(ExpansionLevel.NONE, client.getExpansionLevel());
 	Assert.assertTrue(client.getExpansionsRelations().isEmpty());
-	Assert.assertEquals(0, client.getLimit());
+	Assert.assertEquals(0, client.getExpansionLimit().getLimit());
+	Assert.assertEquals(LimitTarget.ALT_LABELS, client.getExpansionLimit().getTarget());
 	Assert.assertTrue(client.getOntologyUrls().isEmpty());
 	Assert.assertTrue(client.getSearchLangs().isEmpty());
 	Assert.assertEquals("search", client.getSearchTerm());
@@ -88,7 +96,7 @@ public class ClientExternalTestIT {
     }
 
     @Test
-    public void mediumExpansionLimit200Test() throws Exception {
+    public void mediumExpansionLimit100Test() throws Exception {
 
 	SKOSClient client = new SKOSClient();
 
@@ -99,8 +107,45 @@ public class ClientExternalTestIT {
 	));
 
 	client.setExpansionLevel(ExpansionLevel.MEDIUM);
-	client.setLimit(100);
+	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 100));
 	client.setSearchTerm("water");
+	
+	FedXConfig fedXConfig = new FedXConfig();
+	
+
+	//
+	//
+	//
+
+	FedXConceptsFinder finder = new FedXConceptsFinder();
+
+	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
+	conceptsQueryExecutor.setEngineConfig(fedXConfig);
+	conceptsQueryExecutor.setTraceQuery(true);
+
+	finder.setExecutor(conceptsQueryExecutor);
+
+	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
+
+	finder.setThreadMode(ThreadMode.SINGLE());
+
+	client.setFinder(finder);
+
+	//
+	//
+	//
+
+	FedXConceptsExpander expander = new FedXConceptsExpander();
+	expander.setEngineConfig(fedXConfig);
+	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
+	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.setTraceQuery(true);
+
+	client.setExpander(expander);
+
+	//
+	//
+	//
 
 	SKOSResponse response = client.search();
 
@@ -135,7 +180,7 @@ public class ClientExternalTestIT {
 	));
 
 	client.setExpansionLevel(ExpansionLevel.MEDIUM);
-	client.setLimit(50);
+	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 50));
 	client.setSearchTerm("water");
 
 	SKOSResponse response = client.search();
@@ -162,11 +207,11 @@ public class ClientExternalTestIT {
 	));
 
 	client.setExpansionLevel(ExpansionLevel.MEDIUM);
-	client.setLimit(50);
+	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 50));
 	client.setSearchTerm("water");
 
 	FedXConceptsFinder finder = new FedXConceptsFinder();
-//	finder.setThreadMode(ThreadMode.MULTI());
+	// finder.setThreadMode(ThreadMode.MULTI());
 	client.setFinder(finder);
 
 	response = client.search();

@@ -14,6 +14,8 @@ import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
 
@@ -28,13 +30,13 @@ public class HydroOntologyExternalTestIT {
     public void init() throws Exception {
 
 	this.client = new SKOSClient();
-	client.setLimit(1000);
+	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 1000));
 
 	client.setFinder(new FedXConceptsFinder());
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 	expander.setTraceQuery(true);
 	client.setExpander(expander);
-	client.setOntologyUrls(Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql","http://codes.wmo.int/system/query"));
+	client.setOntologyUrls(Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql", "http://codes.wmo.int/system/query"));
     }
 
     @Test
@@ -50,14 +52,14 @@ public class HydroOntologyExternalTestIT {
 
 	List<SKOSConcept> concepts = response.getAggregatedResults();
 	printConcepts(concepts);
-//	assertTrue(concepts.size() == 1);
-//	assertTrue(concepts.get(0).getConcept().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
-//	assertEquals(concepts.get(0).getPref().get(), "Velocity");
-//	assertTrue(concepts.get(0).getAlt().size() == 1);
-//	assertTrue(concepts.get(0).getAlt().contains("Velocità"));
+	// assertTrue(concepts.size() == 1);
+	// assertTrue(concepts.get(0).getConcept().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
+	// assertEquals(concepts.get(0).getPref().get(), "Velocity");
+	// assertTrue(concepts.get(0).getAlt().size() == 1);
+	// assertTrue(concepts.get(0).getAlt().contains("Velocità"));
 
 	client.setExpansionLevel(ExpansionLevel.MEDIUM);// #1
-	client.setExpansionsRelations(Arrays.asList(SKOSSemanticRelation.NARROWER,SKOSSemanticRelation.CLOSE_MATCH));
+	client.setExpansionsRelations(Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.CLOSE_MATCH));
 	client.setSearchLangs(Arrays.asList("it", "en"));
 	client.setSourceLangs(Arrays.asList("it", "en"));
 
@@ -65,14 +67,13 @@ public class HydroOntologyExternalTestIT {
 
 	concepts = response.getAggregatedResults();
 	printConcepts(concepts);
-	
-	 
+
     }
 
     private void printConcepts(List<SKOSConcept> items) {
 	for (SKOSConcept item : items) {
 	    System.out.println("********");
-	 System.out.println(item);
+	    System.out.println(item);
 	}
     }
 

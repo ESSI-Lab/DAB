@@ -16,6 +16,8 @@ import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
@@ -42,7 +44,7 @@ public class FedXConceptsExpanderExternalTestIT {
 	List<String> searchLangs = Arrays.asList("it", "en");
 	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
-	int limit = 50;
+	ExpansionLimit limit = ExpansionLimit.of(LimitTarget.CONCEPTS, 50);
 
 	FedXConceptsFinder finder = new FedXConceptsFinder();
 	finder.setThreadMode(ThreadMode.MULTI());
@@ -114,7 +116,7 @@ public class FedXConceptsExpanderExternalTestIT {
 	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 	ExpansionLevel targetLevel = ExpansionLevel.HIGH;
 
-	int limit = 1000;
+	ExpansionLimit limit = ExpansionLimit.of(LimitTarget.CONCEPTS, 1000);
 
 	FedXConceptsFinder finder = new FedXConceptsFinder();
 	finder.setThreadMode(ThreadMode.MULTI());
@@ -161,22 +163,22 @@ public class FedXConceptsExpanderExternalTestIT {
     @Test
     public void withLimitSearchTermWaterHydroOntologyTest() throws Exception {
 
-	limitWaterHydroOntologyTest(5, 5);
-	limitWaterHydroOntologyTest(11, 11);
-	limitWaterHydroOntologyTest(15, 15);
-	limitWaterHydroOntologyTest(33, 33);
-	limitWaterHydroOntologyTest(3, 3);
-	limitWaterHydroOntologyTest(7, 7);
-	limitWaterHydroOntologyTest(23, 23);
-	limitWaterHydroOntologyTest(57, 57);
-	limitWaterHydroOntologyTest(100, 58);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 5), 5);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 11), 11);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 15), 15);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 33), 33);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 3), 3);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 7), 7);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 23), 23);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 57), 57);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 100), 58);
     }
 
     /**
      * @param limit
      * @throws Exception
      */
-    private void limitWaterHydroOntologyTest(int limit, int expected) throws Exception {
+    private void limitWaterHydroOntologyTest(ExpansionLimit limit, int expected) throws Exception {
 
 	//
 	// finds the concepts
@@ -253,7 +255,7 @@ public class FedXConceptsExpanderExternalTestIT {
 	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
-	int limit = 10;
+	ExpansionLimit limit = ExpansionLimit.of(LimitTarget.CONCEPTS, 10);
 
 	//
 	//
@@ -307,7 +309,7 @@ public class FedXConceptsExpanderExternalTestIT {
 	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
-	int limit = 10;
+	ExpansionLimit limit = ExpansionLimit.of(LimitTarget.CONCEPTS, 10);
 
 	//
 	//
@@ -382,7 +384,7 @@ public class FedXConceptsExpanderExternalTestIT {
 	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
-	int limit = 100;
+	ExpansionLimit limit = ExpansionLimit.of(LimitTarget.CONCEPTS, 100);
 
 	//
 	//
@@ -461,7 +463,7 @@ public class FedXConceptsExpanderExternalTestIT {
 
 	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
 
-	int limit = 10;
+	ExpansionLimit limit = ExpansionLimit.of(LimitTarget.CONCEPTS, 10);
 
 	//
 	//
@@ -561,7 +563,7 @@ public class FedXConceptsExpanderExternalTestIT {
 		searchLangs, //
 		relations, //
 		targetLevel, //
-		100);//
+		ExpansionLimit.of(LimitTarget.CONCEPTS, 100));//
 
 	List<String> labels = response1.getLabels();
 	Assert.assertEquals(49, labels.size());

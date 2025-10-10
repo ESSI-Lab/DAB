@@ -123,5 +123,5 @@ public interface ConceptsExpander {
 	    List<String> searchLangs, //
 	    List<SKOSSemanticRelation> expansionRelations, //
 	    ExpansionLevel targetLevel, //
-	    int limit) throws Exception;
+	    ExpansionLimit limit) throws Exception;
 }

@@ -47,6 +47,7 @@ import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.skoss.fedx.QueryBinding;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -107,7 +108,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    List<String> searchLangs, //
 	    List<SKOSSemanticRelation> expansionRelations, //
 	    ExpansionLevel targetLevel, //
-	    int limit) throws Exception {
+	    ExpansionLimit limit) throws Exception {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Epanding concepts STARTED");
 
@@ -137,8 +138,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		    stampSet, //
 		    executor, //
 		    conn, //
-		    null,
-		    concept, //
+		    null, concept, //
 		    searchLangs, //
 		    expansionRelations, //
 		    visited, //
@@ -179,17 +179,16 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    Set<String> stampSet, //
 	    ExecutorService executor, //
 	    RepositoryConnection conn, //
-	    String father,
-	    String concept, //
+	    String father, String concept, //
 	    List<String> searchLangs, //
 	    List<SKOSSemanticRelation> expansionRelations, //
 	    Set<String> visited, //
 	    List<SKOSConcept> results, //
 	    ExpansionLevel targetLevel, //
 	    ExpansionLevel currentLevel, //
-	    int limit) {
+	    ExpansionLimit limit) {
 
-	if (results.size() >= limit) {
+	if (limitReached(limit, results)) {
 
 	    executor.shutdownNow();
 	    return;
@@ -197,7 +196,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	if (visited.contains(concept) || //
 		currentLevel.getValue() > targetLevel.getValue() || //
-		results.size() >= limit || //
+		limitReached(limit, results) || //
 		executor.isShutdown()) {
 
 	    return;
@@ -246,7 +245,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 				    ? queryBindingSet.getValue(QueryBinding.ALT.getLabel()).stringValue()
 				    : null);
 
-		    if (results.size() >= limit) {
+		    if (limitReached(limit, results)) {
 
 			executor.shutdownNow();
 			return;
@@ -264,7 +263,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		    // if the ExpandConceptsQueryBuilder don't put closeMatch in the SELECT clause
 		    // (default), this case never occurs
 		    //
-		   if (queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()) != null) {
+		    if (queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()) != null) {
 
 			expandConcept(//
 				stampSet, //
@@ -296,6 +295,23 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED", concept);
 	});
+    }
+
+    /**
+     * @param limit
+     * @param results
+     * @return
+     */
+    private boolean limitReached(ExpansionLimit limit, List<SKOSConcept> results) {
+
+	synchronized (results) {
+	    return switch (limit.getTarget()) {
+	    case CONCEPTS -> results.size() >= limit.getLimit();
+	    case LABELS -> SKOSResponse.of(results).getLabels().size() >= limit.getLimit();
+	    case ALT_LABELS -> SKOSResponse.of(results).getAltLabels().size() >= limit.getLimit();
+	    case PREF_LABELS -> SKOSResponse.of(results).getPrefLabels().size() >= limit.getLimit();
+	    };
+	}
     }
 
 }
