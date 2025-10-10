@@ -4,7 +4,6 @@
 package eu.essi_lab.lib.skoss;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /*-
  * #%L
@@ -60,7 +59,7 @@ public class SKOSResponse {
     /**
      * 
      */
-    public List<SKOSConcept> getAssembledResults() {
+    public List<SKOSConcept> getAggregatedResults() {
 
 	Map<String, List<SKOSConcept>> map = results.stream().collect(Collectors.groupingBy((c) -> c.getConcept()));
 
@@ -76,15 +75,11 @@ public class SKOSResponse {
 
 		SKOSConcept skosConcept = SKOSConcept.of(//
 			concept, //
-			list.get(0).getPref().orElse("none"), //
-			new HashSet<>(),
-			new HashSet<>(),
-			new HashSet<>());
+			list.get(0).getPref().orElse("none"));
 
 		list.forEach(c -> skosConcept.getAlt().addAll(c.getAlt()));
 		list.forEach(c -> skosConcept.getExpanded().addAll(c.getExpanded()));
 		list.forEach(c -> skosConcept.getExpandedFrom().addAll(c.getExpandedFrom()));
-
 
 		out.add(skosConcept);
 	    }

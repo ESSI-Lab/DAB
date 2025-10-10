@@ -35,8 +35,8 @@ import java.util.Set;
 public class SKOSConcept {
 
     private String concept;
-    private Set<String>expandedFrom;
-    private Set<String>expanded;
+    private Set<String> expandedFrom;
+    private Set<String> expanded;
     private String pref;
     private Set<String> alt;
 
@@ -45,17 +45,30 @@ public class SKOSConcept {
      */
     private SKOSConcept() {
 
-	alt = new HashSet<String>();
+	alt = new HashSet<>();
+	expandedFrom = new HashSet<>();
+	expanded = new HashSet<>();
+    }
+
+    /**
+     * @param concept
+     * @param pref
+     * @return
+     */
+    public static SKOSConcept of(String concept, String pref) {
+
+	return SKOSConcept.of(concept, pref, new HashSet<>(), new HashSet<>(), new HashSet<>());
     }
 
     /**
      * @param concept
      * @param pref
      * @param expanded
+     * @param expandedFrom
      * @param alt
      * @return
      */
-    public static SKOSConcept of(String concept, String pref, Set<String> expanded,Set<String> expandedFrom, Set<String> alt) {
+    public static SKOSConcept of(String concept, String pref, Set<String> expanded, Set<String> expandedFrom, Set<String> alt) {
 
 	SKOSConcept item = new SKOSConcept();
 	item.concept = concept;
@@ -71,23 +84,19 @@ public class SKOSConcept {
      * @param concept
      * @param pref
      * @param expanded
+     * @param expandedFrom
      * @param alt
      * @return
      */
-    public static SKOSConcept of(String concept, String pref, String expanded,String expandedFrom, String alt) {
+    public static SKOSConcept of(String concept, String pref, String expanded, String expandedFrom, String alt) {
 
-	SKOSConcept item = new SKOSConcept();
-	item.concept = concept;
-	item.pref = pref;
-	item.expanded = new HashSet<String>();
-	item.expanded.add(expanded);
-	item.expandedFrom = new HashSet<String>();
-	item.expandedFrom.add(expandedFrom);
-	item.alt = new HashSet<String>();
-	item.alt.add(alt);
-
-
-	return item;
+	return SKOSConcept.of(//
+		concept, //
+		pref, //
+		new HashSet<String>(Set.of(expanded)), //
+		new HashSet<String>(Set.of(expandedFrom)), //
+		new HashSet<String>(Set.of(alt))//
+	);
     }
 
     /**
@@ -105,11 +114,11 @@ public class SKOSConcept {
 
 	return expanded;
     }
-    
+
     public Set<String> getExpandedFrom() {
 
- 	return expandedFrom;
-     }
+	return expandedFrom;
+    }
 
     /**
      * @return
@@ -131,8 +140,8 @@ public class SKOSConcept {
     public String toString() {
 
 	return "concept: " + getConcept() + //
-		"\nexpanded from: " + getExpandedFrom()+//
-		"\nexpanded: " + getExpanded()+//		
+		"\nexpanded from: " + getExpandedFrom() + //
+		"\nexpanded: " + getExpanded() + //
 		getPref().map(v -> "\npref: " + v).orElse("") + //
 		"\nalt: " + getAlt();//
 

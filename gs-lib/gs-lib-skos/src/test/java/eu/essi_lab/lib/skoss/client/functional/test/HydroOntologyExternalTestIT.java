@@ -3,9 +3,6 @@
  */
 package eu.essi_lab.lib.skoss.client.functional.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +48,7 @@ public class HydroOntologyExternalTestIT {
 
 	SKOSResponse response = client.search();
 
-	List<SKOSConcept> concepts = response.getAssembledResults();
+	List<SKOSConcept> concepts = response.getAggregatedResults();
 	printConcepts(concepts);
 //	assertTrue(concepts.size() == 1);
 //	assertTrue(concepts.get(0).getConcept().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
@@ -66,7 +63,7 @@ public class HydroOntologyExternalTestIT {
 
 	response = client.search();
 
-	concepts = response.getAssembledResults();
+	concepts = response.getAggregatedResults();
 	printConcepts(concepts);
 	
 	 
