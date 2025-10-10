@@ -57,6 +57,18 @@ public class SKOSResponse {
     }
 
     /**
+     * @param concept
+     * @return
+     */
+    public Optional<SKOSConcept> getAggregatedConcept(String concept) {
+
+	return getAggregatedResults().//
+		stream().//
+		filter(c -> c.getConcept().equals(concept)).//
+		findFirst();
+    }
+
+    /**
      * 
      */
     public List<SKOSConcept> getAggregatedResults() {
@@ -104,6 +116,7 @@ public class SKOSResponse {
 	return Stream.concat(//
 		getPrefLabels().stream(), //
 		getAltLabels().stream()).//
+		sorted().//
 		collect(Collectors.toList());
     }
 
