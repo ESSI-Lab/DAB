@@ -86,9 +86,9 @@ public class FedXConceptsExpanderExternalTestIT {
 
 	response1.getResults().stream().sorted((r1, r2) -> r1.toString().compareTo(r2.toString()))
 		.forEach(r -> System.out.println(r + "\n---"));
-	
+
 	System.out.println("\n\n\n");
-	
+
 	response2.getResults().stream().sorted((r1, r2) -> r1.toString().compareTo(r2.toString()))
 		.forEach(r -> System.out.println(r + "\n---"));
 
@@ -443,8 +443,6 @@ public class FedXConceptsExpanderExternalTestIT {
 	Assert.assertEquals(100, results.size());
     }
 
-   
-
     @Test
     public void multiThreadConceptsFinderWithFixedThreadPoolExecutorTest() throws Exception {
 
@@ -523,5 +521,49 @@ public class FedXConceptsExpanderExternalTestIT {
 	response.getAltLabels().forEach(alt -> System.out.println(alt));
 
 	Assert.assertEquals(10, results.size());
+    }
+
+    /**
+     * @param limit
+     * @throws Exception
+     */
+    @Test
+    public void waterHydroOntologyConcept97Test() throws Exception {
+
+	List<String> ontologyUrls = Arrays.asList(//
+		"http://hydro.geodab.eu/hydro-ontology/sparql");
+
+	List<String> sourceLangs = Arrays.asList("it", "en");
+	List<String> searchLangs = Arrays.asList("it", "en");
+
+	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, //
+		SKOSSemanticRelation.RELATED);//
+
+	ExpansionLevel targetLevel = ExpansionLevel.HIGH;
+
+	FedXConceptsFinder finder = new FedXConceptsFinder();
+	finder.setThreadMode(ThreadMode.SINGLE());
+
+	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
+
+	Assert.assertEquals(1, concepts.size());
+
+	Assert.assertEquals("http://hydro.geodab.eu/hydro-ontology/concept/97", concepts.get(0));
+
+	FedXConceptsExpander expander = new FedXConceptsExpander();
+	expander.setThreadMode(ThreadMode.SINGLE()); // default
+	expander.setTraceQuery(true);
+
+	SKOSResponse response1 = expander.expand(//
+		concepts, //
+		ontologyUrls, //
+		sourceLangs, //
+		searchLangs, //
+		relations, //
+		targetLevel, //
+		100);//
+
+	List<String> labels = response1.getLabels();
+	Assert.assertEquals(49, labels.size());
     }
 }

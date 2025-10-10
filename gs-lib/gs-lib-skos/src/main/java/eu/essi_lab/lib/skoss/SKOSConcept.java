@@ -93,9 +93,9 @@ public class SKOSConcept {
 	return SKOSConcept.of(//
 		concept, //
 		pref, //
-		new HashSet<String>(Set.of(expanded)), //
-		new HashSet<String>(Set.of(expandedFrom)), //
-		new HashSet<String>(Set.of(alt))//
+		new HashSet<String>(expanded != null ? Set.of(expanded) : Set.of()), //
+		new HashSet<String>(expandedFrom != null ? Set.of(expandedFrom) : Set.of()), //
+		new HashSet<String>(alt != null ? Set.of(alt) : Set.of())//
 	);
     }
 
