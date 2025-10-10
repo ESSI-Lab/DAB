@@ -26,6 +26,7 @@ import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
 
 /**
+ * Tests the SKOSClient on the hydro ontology concepts e.g.: https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/28
  * @author boldrini
  */
 public class HydroOntologyExternalTestIT {
