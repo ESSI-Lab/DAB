@@ -43,7 +43,7 @@ public class HydroOntologyExternalTestIT {
     public void test() throws Exception {
 
 	client.setSearchTerm("discharge, stream");
-	client.setExpansionLevel(ExpansionLevel.NONE);
+	client.setExpansionLevel(ExpansionLevel.BASIC);
 	client.setExpansionsRelations(Arrays.asList());
 	client.setSearchLangs(Arrays.asList("it", "en"));
 	client.setSourceLangs(Arrays.asList("it", "en"));
