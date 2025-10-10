@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.lib.skoss.expander.impl;
 
+import java.util.Collection;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -44,7 +46,7 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 
     @Override
     public String build(//
-	    String concept, //
+	    Collection<String> concepts, //
 	    List<String> searchLangs, //
 	    List<SKOSSemanticRelation> expansionRelations, //
 	    ExpansionLevel target, //
@@ -55,7 +57,7 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-		SELECT DISTINCT ?pref ?alt ?expanded WHERE {
+		SELECT DISTINCT ?concept ?pref ?alt ?expanded WHERE {
 		    BIND(<%s> AS ?concept)
 
 		    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s)) }
@@ -63,7 +65,7 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 
 		    %s
 		}
-		""", concept, labelsFilter, labelsFilter, expansionBlock).trim();
+		""", concepts.iterator().next(), labelsFilter, labelsFilter, expansionBlock).trim();
     }
 
     /**

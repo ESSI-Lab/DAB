@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.lib.skoss.expander;
 
+import java.util.Collection;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -44,7 +46,7 @@ public interface ExpandConceptsQueryBuilder {
      * @return
      */
     String build(//
-	    String concept, //
+	    Collection<String> concept, //
 	    List<String> searchLangs, //
 	    List<SKOSSemanticRelation> expansionRelations, //
 	    ExpansionLevel target, //

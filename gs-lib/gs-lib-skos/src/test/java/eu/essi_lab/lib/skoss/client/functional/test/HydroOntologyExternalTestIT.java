@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.rdf4j.federated.FedXConfig;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,6 +22,7 @@ import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
+import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
 
 /**
@@ -33,18 +35,41 @@ public class HydroOntologyExternalTestIT {
     @Before
     public void init() throws Exception {
 
+	FedXConfig fedXConfig = new FedXConfig();
+//	fedXConfig.withDebugQueryPlan(true);
+//	fedXConfig.withLogQueries(true);
+	fedXConfig.withLogQueryPlan(true);
+	fedXConfig.withEnableMonitoring(true);
+	fedXConfig.withLogQueryPlan(true);
+	
 	this.client = new SKOSClient();
 	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 1000));
 
 	client.setFinder(new FedXConceptsFinder());
+	
+	client.setOntologyUrls(Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql"
+//		, "http://codes.wmo.int/system/query"
+		));
+    }
+    
+    @Test
+    public void testSingle() throws Exception {
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 	expander.setTraceQuery(true);
 	client.setExpander(expander);
-	client.setOntologyUrls(Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql", "http://codes.wmo.int/system/query"));
+	commonRoutine();
+    }
+    
+    @Test
+    public void testMultiple() throws Exception {
+	
+	FedXLevelsExpander expander = new FedXLevelsExpander();
+	expander.setTraceQuery(true);
+	client.setExpander(expander);
+	commonRoutine();
     }
 
-    @Test
-    public void test() throws Exception {
+    public void commonRoutine() throws Exception {
 
 	client.setSearchTerm("velocity");
 	client.setSearchLangs(Arrays.asList("it", "en"));
@@ -52,6 +77,7 @@ public class HydroOntologyExternalTestIT {
 
 	{
 	    client.setExpansionLevel(ExpansionLevel.NONE);
+
 	    client.setExpansionsRelations(Arrays.asList());
 
 	    SKOSResponse response = client.search();

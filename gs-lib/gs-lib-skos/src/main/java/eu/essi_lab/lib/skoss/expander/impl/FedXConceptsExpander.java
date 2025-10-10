@@ -25,6 +25,7 @@ package eu.essi_lab.lib.skoss.expander.impl;
  */
 
 import java.time.Duration;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
+import org.eclipse.rdf4j.federated.repository.FedXRepository;
 import org.eclipse.rdf4j.federated.repository.FedXRepositoryConnection;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.TupleQuery;
@@ -57,8 +59,9 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class FedXConceptsExpander extends AbstractConceptsExpander {
 
-    private ThreadMode threadMode;
+    protected ThreadMode threadMode;
     private FedXConfig engineConfig;
+    protected FedXRepository repository;
 
     /**
      * 
@@ -115,7 +118,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	GSLoggerFactory.getLogger(getClass()).trace("Thread mode: {} ", threadMode.getClass().getSimpleName());
 
 	FedXEngine engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
-
+	repository = engine.getRepository();
 	FedXRepositoryConnection conn = engine.getConnection();
 
 	List<SKOSConcept> results = Collections.synchronizedList(new ArrayList<>());
@@ -129,25 +132,26 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	case SingleThreadMode single -> Executors.newSingleThreadExecutor();
 	default -> throw new IllegalArgumentException();// no way
 	};
+	
+	concepts.forEach(con -> stampSet.add(con + ":" + ExpansionLevel.NONE.getValue()));
 
-	concepts.forEach(con -> stampSet.add(con + ExpansionLevel.NONE.getValue()));
-
+	List<SimpleEntry<String, String>> fatherConcepts = new ArrayList<>();
 	for (String concept : concepts) {
-
-	    expandConcept(//
-		    stampSet, //
-		    executor, //
-		    conn, //
-		    null, //
-		    concept, //
-		    searchLangs, //
-		    expansionRelations, //
-		    visited, //
-		    results, //
-		    targetLevel, //
-		    ExpansionLevel.NONE, //
-		    limit);
+	    fatherConcepts.add(new SimpleEntry<String, String>(null, concept));
 	}
+
+	expandConcepts(//
+		stampSet, //
+		executor, //
+		conn, //
+		fatherConcepts, //
+		searchLangs, //
+		expansionRelations, //
+		visited, //
+		results, //
+		targetLevel, //
+		ExpansionLevel.NONE, //
+		limit);
 
 	while (!stampSet.isEmpty()) {
 
@@ -176,11 +180,11 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
      * @param limit
      * @throws Exception
      */
-    private void expandConcept(//
+    public void expandConcepts(//
 	    Set<String> stampSet, //
 	    ExecutorService executor, //
 	    RepositoryConnection conn, //
-	    String father, String concept, //
+	    List<SimpleEntry<String, String>> fatherConcepts, //
 	    List<String> searchLangs, //
 	    List<SKOSSemanticRelation> expansionRelations, //
 	    Set<String> visited, //
@@ -188,6 +192,53 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    ExpansionLevel targetLevel, //
 	    ExpansionLevel currentLevel, //
 	    ExpansionLimit limit) {
+
+	for (SimpleEntry<String, String> fatherConcept : fatherConcepts) {
+	    expandConcept(//
+		    stampSet, //
+		    executor, //
+		    conn, //
+		    fatherConcept, //
+		    searchLangs, //
+		    expansionRelations, //
+		    visited, //
+		    results, //
+		    targetLevel, //
+		    currentLevel, //
+		    limit);
+	}
+
+    }
+
+    /**
+     * @param executor
+     * @param stampSet
+     * @param concept
+     * @param conn
+     * @param searchLangs
+     * @param expansionRelations
+     * @param targetLevel
+     * @param visited
+     * @param results
+     * @param currentLevel
+     * @param limit
+     * @throws Exception
+     */
+    private void expandConcept(//
+	    Set<String> stampSet, //
+	    ExecutorService executor, //
+	    RepositoryConnection conn, //
+	    SimpleEntry<String, String> fatherConcept, //
+	    List<String> searchLangs, //
+	    List<SKOSSemanticRelation> expansionRelations, //
+	    Set<String> visited, //
+	    List<SKOSConcept> results, //
+	    ExpansionLevel targetLevel, //
+	    ExpansionLevel currentLevel, //
+	    ExpansionLimit limit) {
+
+	String father = fatherConcept.getKey();
+	String concept = fatherConcept.getValue();
 
 	if (limitReached(limit, results)) {
 	    GSLoggerFactory.getLogger(getClass()).info("Shutting down");
@@ -202,23 +253,24 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	    return;
 	}
-	
+
 	GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED (outside)", concept);
 
-	stampSet.add(concept + currentLevel.getValue());
-	
+	String stamp = concept + ":" + currentLevel.getValue();
+	stampSet.add(stamp);
+
 	executor.submit(() -> {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED (inside)", concept);
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Current level: {}", currentLevel);
 
-	    
-
 	    visited.add(concept);
 
+	    ArrayList<String> concepts = new ArrayList<String>();
+	    concepts.add(concept);
 	    String query = getQueryBuilder().build(//
-		    concept, //
+		    concepts, //
 		    searchLangs, //
 		    expansionRelations, //
 		    targetLevel, //
@@ -271,6 +323,8 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	    }
 
+//	    MonitoringUtil.printMonitoringInformation(repository.getFederationContext());
+
 	    List<SKOSConcept> assembledResults = response.getAggregatedResults();
 
 	    results.addAll(assembledResults);
@@ -290,8 +344,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 				stampSet, //
 				executor, //
 				conn, //
-				concept, //
-				expanded, //
+				new SimpleEntry<String, String>(concept, expanded), //
 				searchLangs, //
 				expansionRelations, //
 				visited, //
@@ -305,7 +358,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    }
 
 	    // always release the stamp
-	    stampSet.remove(concept + currentLevel.getValue());
+	    stampSet.remove(stamp);
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED", concept);
 	});
@@ -316,7 +369,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
      * @param results
      * @return
      */
-    private boolean limitReached(ExpansionLimit limit, List<SKOSConcept> results) {
+    protected boolean limitReached(ExpansionLimit limit, List<SKOSConcept> results) {
 
 	synchronized (results) {
 	    return switch (limit.getTarget()) {

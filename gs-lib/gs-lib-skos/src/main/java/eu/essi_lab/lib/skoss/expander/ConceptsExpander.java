@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.lib.skoss.expander;
 
+import java.util.AbstractMap.SimpleEntry;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
