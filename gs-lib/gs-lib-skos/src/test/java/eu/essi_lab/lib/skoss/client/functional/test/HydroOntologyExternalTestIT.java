@@ -3,8 +3,12 @@
  */
 package eu.essi_lab.lib.skoss.client.functional.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -42,32 +46,89 @@ public class HydroOntologyExternalTestIT {
     @Test
     public void test() throws Exception {
 
-	client.setSearchTerm("discharge, stream");
-	client.setExpansionLevel(ExpansionLevel.NONE);
-	client.setExpansionsRelations(Arrays.asList());
+	client.setSearchTerm("velocity");
 	client.setSearchLangs(Arrays.asList("it", "en"));
 	client.setSourceLangs(Arrays.asList("it", "en"));
 
-	SKOSResponse response = client.search();
+	{
+	    client.setExpansionLevel(ExpansionLevel.NONE);
+	    client.setExpansionsRelations(Arrays.asList());
 
-	List<SKOSConcept> concepts = response.getAggregatedResults();
-	printConcepts(concepts);
-	// assertTrue(concepts.size() == 1);
-	// assertTrue(concepts.get(0).getConcept().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
-	// assertEquals(concepts.get(0).getPref().get(), "Velocity");
-	// assertTrue(concepts.get(0).getAlt().size() == 1);
-	// assertTrue(concepts.get(0).getAlt().contains("Velocità"));
+	    SKOSResponse response = client.search();
 
-	client.setExpansionLevel(ExpansionLevel.MEDIUM);// #1
-	client.setExpansionsRelations(Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.CLOSE_MATCH));
-	client.setSearchLangs(Arrays.asList("it", "en"));
-	client.setSourceLangs(Arrays.asList("it", "en"));
+	    List<SKOSConcept> concepts = response.getAggregatedResults();
+	    printConcepts(concepts);
+	    assertTrue(concepts.size() == 1);
+	    assertTrue(concepts.get(0).getConcept().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
+	    assertEquals(concepts.get(0).getPref().get(), "Velocity");
+	    assertTrue(concepts.get(0).getAlt().size() == 1);
+	    assertTrue(concepts.get(0).getAlt().contains("Velocità"));
+	}
 
-	response = client.search();
+	//////////////////////////////////////////////////////
+	{
+	    client.setExpansionLevel(ExpansionLevel.LOW);// #1
+	    client.setExpansionsRelations(Arrays.asList(SKOSSemanticRelation.NARROWER));
 
-	concepts = response.getAggregatedResults();
-	printConcepts(concepts);
 
+	    SKOSResponse response = client.search();
+
+	    List<SKOSConcept> concepts = response.getAggregatedResults();
+	    printConcepts(concepts);
+	    assertTrue(concepts.size() == 5);
+	    Set<String> uris = response.getConcepts();
+
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/28"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/33"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/5391"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/32"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/30"));
+	}
+
+	//////////////////////////////////////////////////////
+	{
+	    client.setExpansionLevel(ExpansionLevel.MEDIUM);// #1
+	    client.setExpansionsRelations(Arrays.asList(SKOSSemanticRelation.NARROWER));
+
+	    SKOSResponse response = client.search();
+
+	    List<SKOSConcept> concepts = response.getAggregatedResults();
+	    printConcepts(concepts);
+	    assertTrue(concepts.size() == 8);
+	    Set<String> uris = response.getConcepts();
+
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/28"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/33"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/5391"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/32"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/30"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/5328"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/35"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/34"));
+	}
+	//////////////////////////////////////////////////////
+	{
+	    client.setExpansionLevel(ExpansionLevel.MEDIUM);// #1
+	    client.setExpansionsRelations(Arrays.asList(SKOSSemanticRelation.NARROWER,SKOSSemanticRelation.CLOSE_MATCH));
+
+	    SKOSResponse response = client.search();
+
+	    List<SKOSConcept> concepts = response.getAggregatedResults();
+	    printConcepts(concepts);
+	    assertTrue(concepts.size() == 9);
+	    Set<String> uris = response.getConcepts();
+
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/28"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/33"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/5391"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/32"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/30"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/5328"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/35"));
+	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/34"));
+	    assertTrue(uris.contains("http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/12006"));
+	    
+	}
     }
 
     private void printConcepts(List<SKOSConcept> items) {

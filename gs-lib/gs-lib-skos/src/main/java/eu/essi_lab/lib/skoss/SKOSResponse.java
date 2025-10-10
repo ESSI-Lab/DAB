@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -145,6 +146,10 @@ public class SKOSResponse {
 		distinct().//
 		sorted().//
 		collect(Collectors.toList());
+    }
+
+    public Set<String> getConcepts() {
+	return getAggregatedResults().stream().map(SKOSConcept::getConcept).collect(Collectors.toSet());
     }
 
 }

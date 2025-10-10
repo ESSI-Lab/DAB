@@ -75,6 +75,10 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 
 	StringBuilder sb = new StringBuilder();
 
+	if (!relations.isEmpty()) {
+	
+	    sb.append(" OPTIONAL { ");
+	    
 	for (int i = 0; i < relations.size(); i++) {
 	    SKOSSemanticRelation rel = relations.get(i);
 
@@ -87,6 +91,9 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 	    if (i != relations.size() - 1) {
 		sb.append(" UNION ");
 	    }
+	}
+	sb.append(" } ");
+	
 	}
 
 	return sb.toString();

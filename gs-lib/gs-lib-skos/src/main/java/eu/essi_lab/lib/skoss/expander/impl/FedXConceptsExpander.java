@@ -138,7 +138,8 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		    stampSet, //
 		    executor, //
 		    conn, //
-		    null, concept, //
+		    null, //
+		    concept, //
 		    searchLangs, //
 		    expansionRelations, //
 		    visited, //
@@ -150,7 +151,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	while (!stampSet.isEmpty()) {
 
-	    Thread.sleep(Duration.ofMillis(100));
+	    Thread.sleep(Duration.ofMillis(1000));
 	}
 
 	engine.close();
@@ -189,7 +190,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    ExpansionLimit limit) {
 
 	if (limitReached(limit, results)) {
-
+	    GSLoggerFactory.getLogger(getClass()).info("Shutting down");
 	    executor.shutdownNow();
 	    return;
 	}
@@ -201,14 +202,18 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	    return;
 	}
+	
+	GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED (outside)", concept);
 
+	stampSet.add(concept + currentLevel.getValue());
+	
 	executor.submit(() -> {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED", concept);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED (inside)", concept);
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Current level: {}", currentLevel);
 
-	    stampSet.add(concept + currentLevel.getValue());
+	    
 
 	    visited.add(concept);
 
@@ -225,6 +230,9 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    }
 
 	    TupleQuery tupleQuery = conn.prepareTupleQuery(query);
+
+	    List<SKOSConcept> tmpResults = new ArrayList<SKOSConcept>();
+	    SKOSResponse response = SKOSResponse.of(tmpResults);
 
 	    try (TupleQueryResult res = tupleQuery.evaluate()) {
 
@@ -245,40 +253,12 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 				    ? queryBindingSet.getValue(QueryBinding.ALT.getLabel()).stringValue()
 				    : null);
 
-		    if (limitReached(limit, results)) {
-
-			executor.shutdownNow();
-			return;
-		    }
-
 		    //
 		    // it shouldn't be necessary but some ontologies seem to have duplicates
 		    //
-		    if (!results.contains(item)) {
 
-			results.add(item);
-		    }
+		    tmpResults.add(item);
 
-		    //
-		    // if the ExpandConceptsQueryBuilder don't put closeMatch in the SELECT clause
-		    // (default), this case never occurs
-		    //
-		    if (queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()) != null) {
-
-			expandConcept(//
-				stampSet, //
-				executor, //
-				conn, //
-				concept, //
-				queryBindingSet.getValue(QueryBinding.EXPANDED.getLabel()).stringValue(), //
-				searchLangs, //
-				expansionRelations, //
-				visited, //
-				results, //
-				targetLevel, //
-				currentLevel.next().get(), //
-				limit);
-		    }
 		}
 	    } catch (QueryEvaluationException ex) {
 
@@ -289,11 +269,45 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	    } finally {
 
-		// always release the stamp
-		stampSet.remove(concept + currentLevel.getValue());
 	    }
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED", concept);
+	    List<SKOSConcept> assembledResults = response.getAggregatedResults();
+
+	    results.addAll(assembledResults);
+
+	    if (limitReached(limit, results)) {
+		GSLoggerFactory.getLogger(getClass()).info("Shutting down");
+		executor.shutdownNow();
+		return;
+	    }
+
+	    for (SKOSConcept assembledResult : assembledResults) {
+		if (!assembledResult.getExpanded().isEmpty()) {
+
+		    for (String expanded : assembledResult.getExpanded()) {
+
+			expandConcept(//
+				stampSet, //
+				executor, //
+				conn, //
+				concept, //
+				expanded, //
+				searchLangs, //
+				expansionRelations, //
+				visited, //
+				results, //
+				targetLevel, //
+				currentLevel.next().get(), //
+				limit);
+		    }
+		}
+
+	    }
+
+	    // always release the stamp
+	    stampSet.remove(concept + currentLevel.getValue());
+
+	    // GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED", concept);
 	});
     }
 
