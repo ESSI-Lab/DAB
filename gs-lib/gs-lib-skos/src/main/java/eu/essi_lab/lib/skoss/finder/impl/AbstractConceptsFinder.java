@@ -25,8 +25,8 @@ package eu.essi_lab.lib.skoss.finder.impl;
  */
 
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
-import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.finder.ConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
 
 /**
  * @author Fabrizio

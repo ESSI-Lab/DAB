@@ -34,8 +34,8 @@ import java.util.stream.Stream;
 import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
-import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.finder.ConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**

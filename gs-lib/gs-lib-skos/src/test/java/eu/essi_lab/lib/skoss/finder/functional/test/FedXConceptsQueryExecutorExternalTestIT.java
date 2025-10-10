@@ -16,7 +16,7 @@ import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
 /**
  * @author Fabrizio
  */
-public class FedXConceptsQueryExecutorTest {
+public class FedXConceptsQueryExecutorExternalTestIT {
 
     @Test
     public void defaultTest() throws Exception {

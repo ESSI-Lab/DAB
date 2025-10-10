@@ -35,8 +35,8 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 
 import eu.essi_lab.lib.skoss.fedx.FedXEngine;
 import eu.essi_lab.lib.skoss.fedx.QueryBinding;
-import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
 import eu.essi_lab.lib.skoss.finder.ConceptsQueryBuilder;
+import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**

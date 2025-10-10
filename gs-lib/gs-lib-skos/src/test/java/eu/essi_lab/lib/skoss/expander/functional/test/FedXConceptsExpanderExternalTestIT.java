@@ -25,7 +25,7 @@ import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
 /**
  * @author Fabrizio
  */
-public class FedXConceptsExpanderTest {
+public class FedXConceptsExpanderExternalTestIT {
 
     @Test
     public void resultsTest() throws Exception {
