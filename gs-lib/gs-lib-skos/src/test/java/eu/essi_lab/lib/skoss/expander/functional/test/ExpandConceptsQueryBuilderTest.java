@@ -23,7 +23,7 @@ public class ExpandConceptsQueryBuilderTest {
 	DefaultExpandConceptsQueryBuilder builder = new DefaultExpandConceptsQueryBuilder();
 
 	String query = builder.build(//
-		"CONCEPT", //
+		Arrays.asList("CONCEPT"), //
 		Arrays.asList("it"), //
 		Arrays.asList(SKOSSemanticRelation.BROAD_MATCH), //
 		ExpansionLevel.HIGH, //
