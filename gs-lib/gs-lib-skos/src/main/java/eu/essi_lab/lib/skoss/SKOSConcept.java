@@ -115,6 +115,9 @@ public class SKOSConcept {
 	return expanded;
     }
 
+    /**
+     * @return
+     */
     public Set<String> getExpandedFrom() {
 
 	return expandedFrom;
