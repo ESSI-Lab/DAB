@@ -42,6 +42,7 @@ public class FedXEngine {
     private List<String> ontologyUrls;
     private FedXRepositoryConnection connection;
     private FedXRepository repo;
+    private FedXConfig config;
 
     /**
      * @param ontologyUrls
@@ -95,11 +96,19 @@ public class FedXEngine {
 	    fed.withConfig(config);
 	}
 
-	repo = fed.create();
-
-	connection = repo.getConnection();
+	this.config = config;
+	this.repo = fed.create();
+	this.connection = repo.getConnection();
 
 	GSLoggerFactory.getLogger(getClass()).info("FedXEngine init ENDED");
+    }
+
+    /**
+     * @return
+     */
+    public FedXConfig getConfiguration() {
+
+	return config;
     }
 
     /**

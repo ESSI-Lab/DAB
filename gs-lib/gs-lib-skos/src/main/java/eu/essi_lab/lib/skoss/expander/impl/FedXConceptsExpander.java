@@ -36,6 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
+import org.eclipse.rdf4j.federated.monitoring.MonitoringUtil;
 import org.eclipse.rdf4j.federated.repository.FedXRepository;
 import org.eclipse.rdf4j.federated.repository.FedXRepositoryConnection;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
@@ -60,8 +61,9 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class FedXConceptsExpander extends AbstractConceptsExpander {
 
     protected ThreadMode threadMode;
-    private FedXConfig engineConfig;
+    protected FedXConfig engineConfig;
     protected FedXRepository repository;
+    protected FedXEngine engine;
 
     /**
      * 
@@ -117,8 +119,9 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	GSLoggerFactory.getLogger(getClass()).trace("Thread mode: {} ", threadMode.getClass().getSimpleName());
 
-	FedXEngine engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
+	engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
 	repository = engine.getRepository();
+
 	FedXRepositoryConnection conn = engine.getConnection();
 
 	List<SKOSConcept> results = Collections.synchronizedList(new ArrayList<>());
@@ -132,7 +135,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	case SingleThreadMode single -> Executors.newSingleThreadExecutor();
 	default -> throw new IllegalArgumentException();// no way
 	};
-	
+
 	concepts.forEach(con -> stampSet.add(con + ":" + ExpansionLevel.NONE.getValue()));
 
 	List<SimpleEntry<String, String>> fatherConcepts = new ArrayList<>();
@@ -194,6 +197,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    ExpansionLimit limit) {
 
 	for (SimpleEntry<String, String> fatherConcept : fatherConcepts) {
+
 	    expandConcept(//
 		    stampSet, //
 		    executor, //
@@ -207,7 +211,6 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		    currentLevel, //
 		    limit);
 	}
-
     }
 
     /**
@@ -241,7 +244,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	String concept = fatherConcept.getValue();
 
 	if (limitReached(limit, results)) {
-	    GSLoggerFactory.getLogger(getClass()).info("Shutting down");
+	    GSLoggerFactory.getLogger(getClass()).info("Limit reached, shutting down");
 	    executor.shutdownNow();
 	    return;
 	}
@@ -254,21 +257,23 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    return;
 	}
 
-	GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED (outside)", concept);
-
 	String stamp = concept + ":" + currentLevel.getValue();
 	stampSet.add(stamp);
 
+	GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED (outside)", stamp);
+
 	executor.submit(() -> {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED (inside)", concept);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED (inside)", stamp);
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Current level: {}", currentLevel);
 
 	    visited.add(concept);
 
 	    ArrayList<String> concepts = new ArrayList<String>();
+
 	    concepts.add(concept);
+
 	    String query = getQueryBuilder().build(//
 		    concepts, //
 		    searchLangs, //
@@ -305,12 +310,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 				    ? queryBindingSet.getValue(QueryBinding.ALT.getLabel()).stringValue()
 				    : null);
 
-		    //
-		    // it shouldn't be necessary but some ontologies seem to have duplicates
-		    //
-
 		    tmpResults.add(item);
-
 		}
 	    } catch (QueryEvaluationException ex) {
 
@@ -318,19 +318,17 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 		    GSLoggerFactory.getLogger(getClass()).error(ex);
 		}
-
-	    } finally {
-
 	    }
 
-//	    MonitoringUtil.printMonitoringInformation(repository.getFederationContext());
+	    if (engine.getConfiguration().isEnableMonitoring()) {
+		MonitoringUtil.printMonitoringInformation(repository.getFederationContext());
+	    }
 
 	    List<SKOSConcept> assembledResults = response.getAggregatedResults();
-
 	    results.addAll(assembledResults);
 
 	    if (limitReached(limit, results)) {
-		GSLoggerFactory.getLogger(getClass()).info("Shutting down");
+		GSLoggerFactory.getLogger(getClass()).info("Limit reached, shutting down");
 		executor.shutdownNow();
 		return;
 	    }
@@ -354,13 +352,12 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 				limit);
 		    }
 		}
-
 	    }
 
 	    // always release the stamp
 	    stampSet.remove(stamp);
 
-	    // GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED", concept);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED", stamp);
 	});
     }
 
