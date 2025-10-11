@@ -156,7 +156,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		ExpansionLevel.NONE, //
 		limit);
 
-	while (!stampSet.isEmpty()) {
+	while (!stampSet.isEmpty() && !executor.isShutdown()) {
 
 	    Thread.sleep(Duration.ofMillis(1000));
 	}
