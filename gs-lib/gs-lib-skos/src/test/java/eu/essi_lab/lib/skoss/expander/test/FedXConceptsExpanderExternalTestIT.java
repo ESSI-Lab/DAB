@@ -61,7 +61,7 @@ public class FedXConceptsExpanderExternalTestIT {
 		targetLevel, //
 		limit);//
 
-	Assert.assertEquals(FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT, response.getResults().size());
+	Assert.assertEquals(FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT, response.getResults().size());
 
 	//
 	//
@@ -79,7 +79,7 @@ public class FedXConceptsExpanderExternalTestIT {
 		targetLevel, //
 		limit);//
 
-	Assert.assertEquals(FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT, response.getResults().size());
+	Assert.assertEquals(FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT, response.getResults().size());
     }
 
     @Test
@@ -89,15 +89,15 @@ public class FedXConceptsExpanderExternalTestIT {
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 11), 11);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 15), 15);
 	limitWaterHydroOntologyTest(
-		ExpansionLimit.of(LimitTarget.CONCEPTS, FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT),
-		FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
+		ExpansionLimit.of(LimitTarget.CONCEPTS, FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT),
+		FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 3), 3);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 7), 7);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 23), 23);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 57),
-		FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
+		FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 100),
-		FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
+		FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
     }
 
     /**
@@ -305,6 +305,6 @@ public class FedXConceptsExpanderExternalTestIT {
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 100));//
 
 	List<String> labels = response.getLabels();
-	Assert.assertEquals(FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_LABELS_COUNT, labels.size());
+	Assert.assertEquals(FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_LABELS_COUNT, labels.size());
     }
 }

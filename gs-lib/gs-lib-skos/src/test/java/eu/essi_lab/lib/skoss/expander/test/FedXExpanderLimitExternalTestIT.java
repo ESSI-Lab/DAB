@@ -17,11 +17,12 @@ import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
+import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
 
 /**
  * @author Fabrizio
  */
-public class FedXConceptsExpanderLimitExternalTestIT {
+public class FedXExpanderLimitExternalTestIT {
 
     static final int HYDRO_ONT_WATER_LABELS_COUNT = 49;
     static final int HYDRO_ONT_WATER_ALT_LABELS_COUNT = 19;
@@ -31,8 +32,7 @@ public class FedXConceptsExpanderLimitExternalTestIT {
     @Test
     public void noLimitTestSingleThread() throws Exception {
 
-	test(ThreadMode.SINGLE(), ExpansionLimit.of(LimitTarget.CONCEPTS, 1000), 
-		HYDRO_ONT_WATER_CONCEPTS_COUNT,//
+	test(ThreadMode.SINGLE(), ExpansionLimit.of(LimitTarget.CONCEPTS, 1000), HYDRO_ONT_WATER_CONCEPTS_COUNT, //
 		HYDRO_ONT_WATER_LABELS_COUNT, //
 		HYDRO_ONT_WATER_ALT_LABELS_COUNT);//
     }
@@ -40,8 +40,7 @@ public class FedXConceptsExpanderLimitExternalTestIT {
     @Test
     public void noLimitTestMultiThread() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 1000), 
-		HYDRO_ONT_WATER_CONCEPTS_COUNT,//
+	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 1000), HYDRO_ONT_WATER_CONCEPTS_COUNT, //
 		HYDRO_ONT_WATER_LABELS_COUNT, //
 		HYDRO_ONT_WATER_ALT_LABELS_COUNT);//
     }
@@ -383,9 +382,24 @@ public class FedXConceptsExpanderLimitExternalTestIT {
     }
 
     /**
-     * 
+     * @param mode
+     * @param limit
+     * @param excConcepts
+     * @param excLabels
+     * @param excAlt
+     * @throws Exception
      */
     private void test(ThreadMode mode, ExpansionLimit limit, int excConcepts, int excLabels, int excAlt) throws Exception {
+
+	test(new FedXConceptsExpander(), mode, limit, excConcepts, excLabels, excAlt);
+	test(new FedXLevelsExpander(), mode, limit, excConcepts, excLabels, excAlt);
+    }
+
+    /**
+     * 
+     */
+    private void test(FedXConceptsExpander expander, ThreadMode mode, ExpansionLimit limit, int excConcepts, int excLabels, int excAlt)
+	    throws Exception {
 
 	List<String> ontologyUrls = Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql");
 
@@ -398,7 +412,6 @@ public class FedXConceptsExpanderLimitExternalTestIT {
 
 	ExpansionLevel targetLevel = ExpansionLevel.HIGH;
 
-	FedXConceptsExpander expander = new FedXConceptsExpander();
 	expander.setThreadMode(mode);
 
 	SKOSResponse response = expander.expand(//
