@@ -174,50 +174,6 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
     }
 
     /**
-     * @param executor
-     * @param stampSet
-     * @param concept
-     * @param conn
-     * @param searchLangs
-     * @param expansionRelations
-     * @param targetLevel
-     * @param visited
-     * @param results
-     * @param currentLevel
-     * @param limit
-     * @throws Exception
-     */
-    protected void expandConcepts(//
-	    Set<String> stampSet, //
-	    ExecutorService executor, //
-	    RepositoryConnection conn, //
-	    List<SimpleEntry<String, String>> fatherConcepts, //
-	    List<String> searchLangs, //
-	    List<SKOSSemanticRelation> expansionRelations, //
-	    Set<String> visited, //
-	    List<SKOSConcept> results, //
-	    ExpansionLevel targetLevel, //
-	    ExpansionLevel currentLevel, //
-	    ExpansionLimit limit) {
-
-	for (SimpleEntry<String, String> fatherConcept : fatherConcepts) {
-
-	    expandConcept(//
-		    stampSet, //
-		    executor, //
-		    conn, //
-		    fatherConcept, //
-		    searchLangs, //
-		    expansionRelations, //
-		    visited, //
-		    results, //
-		    targetLevel, //
-		    currentLevel, //
-		    limit);
-	}
-    }
-
-    /**
      * @param limit
      * @param results
      * @return
