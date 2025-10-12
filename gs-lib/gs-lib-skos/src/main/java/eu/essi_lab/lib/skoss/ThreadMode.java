@@ -73,8 +73,6 @@ public abstract class ThreadMode {
 	 * @param executor
 	 */
 	MultiThreadMode() {
-
-	    this(Executors.newVirtualThreadPerTaskExecutor());
 	}
 
 	/**
@@ -90,7 +88,7 @@ public abstract class ThreadMode {
 	 */
 	public ExecutorService getExecutor() {
 
-	    return executor;
+	    return executor == null ? Executors.newVirtualThreadPerTaskExecutor() : executor;
 	}
     }
 }
