@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
+
 /**
  * @author Fabrizio
  */
@@ -74,7 +76,9 @@ public class SKOSResponse {
      */
     public List<SKOSConcept> getAggregatedResults() {
 
-	Map<String, List<SKOSConcept>> map = results.stream().collect(Collectors.groupingBy((c) -> c.getConcept()));
+	Map<String, List<SKOSConcept>> map = getResults().//
+		stream().//
+		collect(Collectors.groupingBy((c) -> c.getConcept()));
 
 	ArrayList<SKOSConcept> out = new ArrayList<SKOSConcept>();
 
@@ -97,6 +101,80 @@ public class SKOSResponse {
 		out.add(skosConcept);
 	    }
 	});
+
+	return out;
+    }
+
+    /**
+     * @param limit
+     * @param tempResponse
+     * @param results
+     * @return
+     */
+    public static List<SKOSConcept> getAggregatedResults(ExpansionLimit limit, SKOSResponse tempResponse, List<SKOSConcept> results) {
+
+	int altCount = (int) results.stream().flatMap(c -> c.getAlt().stream()).count();
+	int labCount = results.size() + altCount;
+
+	Map<String, List<SKOSConcept>> map = tempResponse.getResults().//
+		stream().//
+		collect(Collectors.groupingBy((c) -> c.getConcept()));
+
+	ArrayList<SKOSConcept> out = new ArrayList<SKOSConcept>();
+
+	for (String concept : map.keySet()) {
+
+	    Optional<SKOSConcept> optional = out.stream().filter(c -> c.getConcept().equals(concept)).findFirst();
+
+	    List<SKOSConcept> list = map.get(concept);
+
+	    if (optional.isEmpty()) {
+
+		SKOSConcept skosConcept = SKOSConcept.of(//
+			concept, //
+			list.get(0).getPref().orElse("none"));
+
+		list.forEach(c -> skosConcept.getAlt().addAll(c.getAlt()));
+		list.forEach(c -> skosConcept.getExpanded().addAll(c.getExpanded()));
+		list.forEach(c -> skosConcept.getExpandedFrom().addAll(c.getExpandedFrom()));
+
+		switch (limit.getTarget()) {
+		case CONCEPTS:
+		    if (results.size() + 1 > limit.getLimit()) {
+			return out;
+		    }
+		    break;
+
+		case ALT_LABELS:
+
+		    if (altCount + skosConcept.getAlt().size() > limit.getLimit()) {
+			int exc = (altCount + skosConcept.getAlt().size()) - limit.getLimit();
+			int len = skosConcept.getAlt().size() - exc;
+			skosConcept.setAlt(skosConcept.getAlt().stream().limit(len).collect(Collectors.toSet()));
+			out.add(skosConcept);
+			return out;
+		    }
+		    break;
+
+		case LABELS:
+
+		    if (labCount + skosConcept.getAlt().size() + 1 > limit.getLimit()) {
+
+			int exc = (labCount + skosConcept.getAlt().size() + 1) - limit.getLimit();
+			if (skosConcept.getAlt().size() >= exc) {
+			    int len = skosConcept.getAlt().size() - exc;
+			    skosConcept.setAlt(skosConcept.getAlt().stream().limit(len).collect(Collectors.toSet()));
+			} else {
+			    return out;
+			}
+		    }
+
+		    break;
+		}
+
+		out.add(skosConcept);
+	    }
+	}
 
 	return out;
     }
