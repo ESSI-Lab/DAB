@@ -5,7 +5,6 @@ package eu.essi_lab.lib.skoss.expander.functional.test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
 import org.junit.Assert;
@@ -18,11 +17,8 @@ import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
-import eu.essi_lab.lib.skoss.expander.impl.DefaultExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
-import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
-import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
 
 /**
  * @author Fabrizio
@@ -30,83 +26,7 @@ import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
 public class FedXConceptsExpanderExternalTestIT {
 
     @Test
-    public void resultsTest() throws Exception {
-
-	String searchTerm = "water";
-
-	List<String> ontologyUrls = Arrays.asList(//
-		// "http://localhost:3031/gemet/query", //
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql" //
-	);
-
-	List<String> sourceLangs = Arrays.asList("it", "en");
-	List<String> searchLangs = Arrays.asList("it", "en");
-	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
-	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
-	ExpansionLimit limit = ExpansionLimit.of(LimitTarget.CONCEPTS, 50);
-
-	FedXConceptsFinder finder = new FedXConceptsFinder();
-	finder.setThreadMode(ThreadMode.MULTI());
-
-	List<String> concepts = finder.find(searchTerm, ontologyUrls, sourceLangs);
-
-	//
-	//
-	//
-
-	FedXConceptsExpander expander1 = new FedXConceptsExpander();
-	expander1.setTraceQuery(true);
-
-	SKOSResponse response1 = expander1.expand(//
-		concepts, //
-		ontologyUrls, //
-		sourceLangs, //
-		searchLangs, //
-		relations, //
-		targetLevel, //
-		limit);//
-
-	//
-	//
-	//
-
-	FedXConceptsExpander expander2 = new FedXConceptsExpander();
-
-	SKOSResponse response2 = expander2.expand(//
-		concepts, //
-		ontologyUrls, //
-		sourceLangs, //
-		searchLangs, //
-		relations, //
-		targetLevel, //
-		limit);//
-
-	//
-	//
-	//
-
-	response1.getResults().stream().sorted((r1, r2) -> r1.toString().compareTo(r2.toString()))
-		.forEach(r -> System.out.println(r + "\n---"));
-
-	System.out.println("\n\n\n");
-
-	response2.getResults().stream().sorted((r1, r2) -> r1.toString().compareTo(r2.toString()))
-		.forEach(r -> System.out.println(r + "\n---"));
-
-	Assert.assertEquals(//
-		response1.getResults().stream().sorted((r1, r2) -> r1.toString().compareTo(r2.toString())).toList().toString(), //
-		response2.getResults().stream().sorted((r1, r2) -> r1.toString().compareTo(r2.toString())).toList().toString());//
-    }
-
-    @Test
     public void noLimitWaterSearchTermHydroOntologyTest() throws Exception {
-
-	int expected = 58;
-
-	//
-	//
-	//
 
 	List<String> ontologyUrls = Arrays.asList(//
 		"http://hydro.geodab.eu/hydro-ontology/sparql");
@@ -139,7 +59,7 @@ public class FedXConceptsExpanderExternalTestIT {
 		targetLevel, //
 		limit);//
 
-	Assert.assertEquals(expected, response.getResults().size());
+	Assert.assertEquals(FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT, response.getResults().size());
 
 	//
 	//
@@ -157,7 +77,7 @@ public class FedXConceptsExpanderExternalTestIT {
 		targetLevel, //
 		limit);//
 
-	Assert.assertEquals(expected, response.getResults().size());
+	Assert.assertEquals(FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT, response.getResults().size());
     }
 
     @Test
@@ -166,12 +86,16 @@ public class FedXConceptsExpanderExternalTestIT {
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 5), 5);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 11), 11);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 15), 15);
-	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 33), 33);
+	limitWaterHydroOntologyTest(
+		ExpansionLimit.of(LimitTarget.CONCEPTS, FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT),
+		FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 3), 3);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 7), 7);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 23), 23);
-	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 57), 57);
-	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 100), 58);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 57),
+		FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
+	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 100),
+		FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
     }
 
     /**
@@ -193,7 +117,6 @@ public class FedXConceptsExpanderExternalTestIT {
 	ExpansionLevel targetLevel = ExpansionLevel.HIGH;
 
 	FedXConceptsFinder finder = new FedXConceptsFinder();
-	finder.setThreadMode(ThreadMode.MULTI());
 
 	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
 
@@ -242,7 +165,22 @@ public class FedXConceptsExpanderExternalTestIT {
     }
 
     @Test
-    public void defaultTest() throws Exception {
+    public void twoOntologiesWaterLimit10ConcpectsSingleThreadTest() throws Exception {
+
+	twoOntologiesWaterTest(ThreadMode.SINGLE());
+    }
+
+    @Test
+    public void twoOntologiesWaterLimit10ConcpectsMultiThreadTest() throws Exception {
+
+	twoOntologiesWaterTest(ThreadMode.MULTI());
+    }
+
+    /**
+     * @param mode
+     * @throws Exception
+     */
+    private void twoOntologiesWaterTest(ThreadMode mode) throws Exception {
 
 	List<String> ontologyUrls = Arrays.asList(//
 		// "http://localhost:3031/gemet/query", //
@@ -266,6 +204,10 @@ public class FedXConceptsExpanderExternalTestIT {
 	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
+	expander.setThreadMode(mode);
+	FedXConfig fedXConfig = new FedXConfig();
+	fedXConfig.withEnableMonitoring(true);
+	expander.setEngineConfig(fedXConfig);
 
 	SKOSResponse response = expander.expand(//
 		concepts, //
@@ -280,245 +222,15 @@ public class FedXConceptsExpanderExternalTestIT {
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
-	System.out.println("\n\n");
+	System.out.println("\n --- Results ---\n");
 
 	results.forEach(res -> System.out.println(res + "\n---"));
 
-	System.out.println("\n\n");
+	System.out.println("\n --- Pref labels ---\n");
 
 	response.getPrefLabels().forEach(pref -> System.out.println(pref));
 
-	System.out.println("\n\n");
-
-	response.getAltLabels().forEach(alt -> System.out.println(alt));
-
-	Assert.assertEquals(10, results.size());
-    }
-
-    @Test
-    public void defaultWithParamsTest() throws Exception {
-
-	List<String> ontologyUrls = Arrays.asList(//
-		// "http://localhost:3031/gemet/query", //
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql" //
-	);
-
-	List<String> sourceLangs = Arrays.asList("it", "en");
-	List<String> searchLangs = Arrays.asList("it", "en");
-	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
-	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
-
-	ExpansionLimit limit = ExpansionLimit.of(LimitTarget.CONCEPTS, 10);
-
-	//
-	//
-	//
-
-	FedXConceptsFinder finder = new FedXConceptsFinder();
-	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
-
-	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
-	executor.setEngineConfig(new FedXConfig());
-	executor.setTraceQuery(false);
-
-	finder.setExecutor(executor);
-
-	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
-
-	//
-	//
-	//
-
-	FedXConceptsExpander expander = new FedXConceptsExpander();
-
-	expander.setEngineConfig(new FedXConfig());
-	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
-	expander.setThreadMode(ThreadMode.MULTI());
-	expander.setTraceQuery(false);
-
-	//
-	//
-	//
-
-	SKOSResponse response = expander.expand(//
-		concepts, //
-		ontologyUrls, //
-		sourceLangs, //
-		searchLangs, //
-		relations, //
-		targetLevel, //
-		limit);//
-
-	List<SKOSConcept> results = response.getResults().stream().//
-		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
-		toList();//
-
-	System.out.println("\n\n");
-
-	results.forEach(res -> System.out.println(res + "\n---"));
-
-	System.out.println("\n\n");
-
-	response.getPrefLabels().forEach(pref -> System.out.println(pref));
-
-	System.out.println("\n\n");
-
-	response.getAltLabels().forEach(alt -> System.out.println(alt));
-
-	Assert.assertEquals(10, results.size());
-    }
-
-    @Test
-    public void multiThreadConceptsFinderAndExpanderTest() throws Exception {
-
-	List<String> ontologyUrls = Arrays.asList(//
-		"http://localhost:3031/gemet/query", //
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql" //
-	// "https://dbpedia.org/sparql"
-	);
-
-	List<String> sourceLangs = Arrays.asList("it", "en");
-	List<String> searchLangs = Arrays.asList("it", "en");
-	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
-	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
-
-	ExpansionLimit limit = ExpansionLimit.of(LimitTarget.CONCEPTS, 100);
-
-	//
-	//
-	//
-
-	FedXConceptsFinder finder = new FedXConceptsFinder();
-	finder.setThreadMode(ThreadMode.MULTI());
-	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
-
-	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
-	executor.setEngineConfig(new FedXConfig());
-	executor.setTraceQuery(false);
-
-	finder.setExecutor(executor);
-
-	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
-
-	//
-	//
-	//
-
-	FedXConceptsExpander expander = new FedXConceptsExpander();
-
-	expander.setEngineConfig(new FedXConfig());
-	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
-	expander.setThreadMode(ThreadMode.MULTI());
-	expander.setTraceQuery(false);
-
-	//
-	//
-	//
-
-	SKOSResponse response = expander.expand(//
-		concepts, //
-		ontologyUrls, //
-		sourceLangs, //
-		searchLangs, //
-		relations, //
-		targetLevel, //
-		limit);//
-
-	List<SKOSConcept> results = response.getResults().stream().//
-		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
-		toList();//
-
-	System.out.println("\n\n");
-
-	results.forEach(res -> System.out.println(res + "\n---"));
-
-	System.out.println("\n\n");
-
-	response.getPrefLabels().forEach(pref -> System.out.println(pref));
-
-	System.out.println("\n\n");
-
-	response.getAltLabels().forEach(alt -> System.out.println(alt));
-
-	Assert.assertEquals(100, results.size());
-    }
-
-    @Test
-    public void multiThreadConceptsFinderWithFixedThreadPoolExecutorTest() throws Exception {
-
-	List<String> ontologyUrls = Arrays.asList(//
-		"http://localhost:3031/gemet/query", //
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql" //
-	// "https://dbpedia.org/sparql"
-	);
-
-	List<String> sourceLangs = Arrays.asList("it", "en");
-
-	List<String> searchLangs = Arrays.asList("it", "en");
-
-	List<SKOSSemanticRelation> relations = Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED);
-
-	ExpansionLevel targetLevel = ExpansionLevel.MEDIUM;
-
-	ExpansionLimit limit = ExpansionLimit.of(LimitTarget.CONCEPTS, 10);
-
-	//
-	//
-	//
-
-	FedXConceptsFinder finder = new FedXConceptsFinder();
-	finder.setThreadMode(ThreadMode.MULTI());
-	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
-
-	FedXConceptsQueryExecutor executor = new FedXConceptsQueryExecutor();
-	executor.setTraceQuery(false);
-	executor.setEngineConfig(new FedXConfig());
-
-	finder.setExecutor(executor);
-
-	List<String> concepts = finder.find("water", ontologyUrls, sourceLangs);
-
-	//
-	//
-	//
-
-	FedXConceptsExpander expander = new FedXConceptsExpander();
-
-	expander.setEngineConfig(new FedXConfig());
-	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
-	// limit the thread pool to 5 threads
-	expander.setThreadMode(ThreadMode.MULTI(Executors.newFixedThreadPool(5)));
-	expander.setTraceQuery(false);
-
-	//
-	//
-	//
-
-	SKOSResponse response = expander.expand(//
-		concepts, //
-		ontologyUrls, //
-		sourceLangs, //
-		searchLangs, //
-		relations, //
-		targetLevel, //
-		limit);//
-
-	List<SKOSConcept> results = response.getResults().stream().//
-		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
-		toList();//
-
-	System.out.println("\n\n");
-
-	results.forEach(res -> System.out.println(res + "\n---"));
-
-	System.out.println("\n\n");
-
-	response.getPrefLabels().forEach(pref -> System.out.println(pref));
-
-	System.out.println("\n\n");
+	System.out.println("\n\n --- Alt labels ---\n");
 
 	response.getAltLabels().forEach(alt -> System.out.println(alt));
 
@@ -553,10 +265,10 @@ public class FedXConceptsExpanderExternalTestIT {
 	Assert.assertEquals("http://hydro.geodab.eu/hydro-ontology/concept/97", concepts.get(0));
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
-	expander.setThreadMode(ThreadMode.SINGLE()); // default
+	expander.setThreadMode(ThreadMode.SINGLE());
 	expander.setTraceQuery(true);
 
-	SKOSResponse response1 = expander.expand(//
+	SKOSResponse response = expander.expand(//
 		concepts, //
 		ontologyUrls, //
 		sourceLangs, //
@@ -565,7 +277,7 @@ public class FedXConceptsExpanderExternalTestIT {
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 100));//
 
-	List<String> labels = response1.getLabels();
-	Assert.assertEquals(49, labels.size());
+	List<String> labels = response.getLabels();
+	Assert.assertEquals(FedXConceptsExpanderLimitExternalTestIT.HYDRO_ONT_WATER_LABELS_COUNT, labels.size());
     }
 }

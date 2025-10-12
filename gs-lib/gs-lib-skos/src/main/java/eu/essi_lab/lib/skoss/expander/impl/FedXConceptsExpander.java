@@ -139,22 +139,26 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	concepts.forEach(con -> stampSet.add(con + ":" + ExpansionLevel.NONE.getValue()));
 
 	List<SimpleEntry<String, String>> fatherConcepts = new ArrayList<>();
+
 	for (String concept : concepts) {
 	    fatherConcepts.add(new SimpleEntry<String, String>(null, concept));
 	}
 
-	expandConcepts(//
-		stampSet, //
-		executor, //
-		conn, //
-		fatherConcepts, //
-		searchLangs, //
-		expansionRelations, //
-		visited, //
-		results, //
-		targetLevel, //
-		ExpansionLevel.NONE, //
-		limit);
+	for (SimpleEntry<String, String> fatherConcept : fatherConcepts) {
+
+	    expandConcept(//
+		    stampSet, //
+		    executor, //
+		    conn, //
+		    fatherConcept, //
+		    searchLangs, //
+		    expansionRelations, //
+		    visited, //
+		    results, //
+		    targetLevel, //
+		    ExpansionLevel.NONE, //
+		    limit);
+	}
 
 	while (!stampSet.isEmpty() && !executor.isShutdown()) {
 
@@ -183,7 +187,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
      * @param limit
      * @throws Exception
      */
-    public void expandConcepts(//
+    protected void expandConcepts(//
 	    Set<String> stampSet, //
 	    ExecutorService executor, //
 	    RepositoryConnection conn, //
@@ -246,6 +250,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	if (limitReached(limit, results)) {
 	    GSLoggerFactory.getLogger(getClass()).info("Limit reached, shutting down");
 	    executor.shutdownNow();
+	    stampSet.clear();
 	    return;
 	}
 
@@ -260,11 +265,9 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	String stamp = concept + ":" + currentLevel.getValue();
 	stampSet.add(stamp);
 
-	GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED (outside)", stamp);
-
 	executor.submit(() -> {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED (inside)", stamp);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED");
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Current level: {}", currentLevel);
 
@@ -289,7 +292,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    TupleQuery tupleQuery = conn.prepareTupleQuery(query);
 
 	    List<SKOSConcept> tmpResults = new ArrayList<SKOSConcept>();
-	    SKOSResponse response = SKOSResponse.of(tmpResults);
+	    SKOSResponse tmpResponse = SKOSResponse.of(tmpResults);
 
 	    try (TupleQueryResult res = tupleQuery.evaluate()) {
 
@@ -324,12 +327,17 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		MonitoringUtil.printMonitoringInformation(repository.getFederationContext());
 	    }
 
-	    List<SKOSConcept> assembledResults = response.getAggregatedResults();
-	    results.addAll(assembledResults);
+	    List<SKOSConcept> assembledResults = null;
+	    synchronized (results) {
+
+		assembledResults = SKOSResponse.getAggregatedResults(limit, tmpResponse, results);
+		results.addAll(assembledResults);
+	    }
 
 	    if (limitReached(limit, results)) {
 		GSLoggerFactory.getLogger(getClass()).info("Limit reached, shutting down");
 		executor.shutdownNow();
+		stampSet.clear();
 		return;
 	    }
 
@@ -354,10 +362,9 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		}
 	    }
 
-	    // always release the stamp
 	    stampSet.remove(stamp);
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED", stamp);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED");
 	});
     }
 
@@ -373,7 +380,6 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    case CONCEPTS -> results.size() >= limit.getLimit();
 	    case LABELS -> SKOSResponse.of(results).getLabels().size() >= limit.getLimit();
 	    case ALT_LABELS -> SKOSResponse.of(results).getAltLabels().size() >= limit.getLimit();
-	    case PREF_LABELS -> SKOSResponse.of(results).getPrefLabels().size() >= limit.getLimit();
 	    };
 	}
     }
