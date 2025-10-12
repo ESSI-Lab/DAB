@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.client.functional.test;
+package eu.essi_lab.lib.skoss.client.test;
 
 import java.util.Arrays;
 import java.util.List;

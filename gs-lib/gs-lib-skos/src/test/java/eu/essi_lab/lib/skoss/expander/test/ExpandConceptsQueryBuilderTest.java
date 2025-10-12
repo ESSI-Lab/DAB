@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.expander.functional.test;
+package eu.essi_lab.lib.skoss.expander.test;
 
 import java.util.Arrays;
 

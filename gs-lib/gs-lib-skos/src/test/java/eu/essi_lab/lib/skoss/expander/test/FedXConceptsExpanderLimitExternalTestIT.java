@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.expander.functional.test;
+package eu.essi_lab.lib.skoss.expander.test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,15 +31,19 @@ public class FedXConceptsExpanderLimitExternalTestIT {
     @Test
     public void noLimitTestSingleThread() throws Exception {
 
-	test(ThreadMode.SINGLE(), ExpansionLimit.of(LimitTarget.CONCEPTS, 1000), HYDRO_ONT_WATER_CONCEPTS_COUNT,
-		HYDRO_ONT_WATER_PREF_LABELS_COUNT, HYDRO_ONT_WATER_ALT_LABELS_COUNT);
+	test(ThreadMode.SINGLE(), ExpansionLimit.of(LimitTarget.CONCEPTS, 1000), 
+		HYDRO_ONT_WATER_CONCEPTS_COUNT,//
+		HYDRO_ONT_WATER_LABELS_COUNT, //
+		HYDRO_ONT_WATER_ALT_LABELS_COUNT);//
     }
 
     @Test
     public void noLimitTestMultiThread() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 1000), HYDRO_ONT_WATER_CONCEPTS_COUNT,
-		HYDRO_ONT_WATER_PREF_LABELS_COUNT, HYDRO_ONT_WATER_ALT_LABELS_COUNT);
+	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 1000), 
+		HYDRO_ONT_WATER_CONCEPTS_COUNT,//
+		HYDRO_ONT_WATER_LABELS_COUNT, //
+		HYDRO_ONT_WATER_ALT_LABELS_COUNT);//
     }
 
     //
@@ -369,13 +373,13 @@ public class FedXConceptsExpanderLimitExternalTestIT {
     @Test
     public void labels50SingleThreadTest() throws Exception {
 
-	test(ThreadMode.SINGLE(), ExpansionLimit.of(LimitTarget.LABELS, 50), -1, HYDRO_ONT_WATER_PREF_LABELS_COUNT, -1);
+	test(ThreadMode.SINGLE(), ExpansionLimit.of(LimitTarget.LABELS, 50), -1, HYDRO_ONT_WATER_LABELS_COUNT, -1);
     }
 
     @Test
     public void labels50MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.LABELS, 50), -1, HYDRO_ONT_WATER_PREF_LABELS_COUNT, -1);
+	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.LABELS, 50), -1, HYDRO_ONT_WATER_LABELS_COUNT, -1);
     }
 
     /**

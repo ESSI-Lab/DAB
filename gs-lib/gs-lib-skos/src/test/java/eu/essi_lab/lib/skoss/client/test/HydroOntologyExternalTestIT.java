@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.client.functional.test;
+package eu.essi_lab.lib.skoss.client.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

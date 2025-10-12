@@ -1,12 +1,14 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.expander.functional.test;
+package eu.essi_lab.lib.skoss.expander.test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
+import org.eclipse.rdf4j.federated.evaluation.concurrent.TaskWrapper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -205,8 +207,33 @@ public class FedXConceptsExpanderExternalTestIT {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 	expander.setThreadMode(mode);
+//	expander.setTraceQuery(true);
+	
 	FedXConfig fedXConfig = new FedXConfig();
 	fedXConfig.withEnableMonitoring(true);
+	
+//	fedXConfig.withUnionWorkerThreads(1);
+//	fedXConfig.withBoundJoinBlockSize(1);
+//	fedXConfig.withConsumingIterationMax(1);
+//	fedXConfig.withLeftJoinWorkerThreads(1);
+	
+	fedXConfig.withTaskWrapper(new TaskWrapper() {
+	    
+	    @Override
+	    public <T> Callable<T> wrap(Callable<T> callable) {
+
+		return callable;
+	    }
+	    
+	    @Override
+	    public Runnable wrap(Runnable runnable) {
+
+		return runnable;
+	    }
+	});
+
+	
+
 	expander.setEngineConfig(fedXConfig);
 
 	SKOSResponse response = expander.expand(//

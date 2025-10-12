@@ -218,6 +218,22 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
     }
 
     /**
+     * @param limit
+     * @param results
+     * @return
+     */
+    protected boolean limitReached(ExpansionLimit limit, List<SKOSConcept> results) {
+
+	synchronized (results) {
+	    return switch (limit.getTarget()) {
+	    case CONCEPTS -> results.size() >= limit.getLimit();
+	    case LABELS -> SKOSResponse.of(results).getLabels().size() >= limit.getLimit();
+	    case ALT_LABELS -> SKOSResponse.of(results).getAltLabels().size() >= limit.getLimit();
+	    };
+	}
+    }
+
+    /**
      * @param executor
      * @param stampSet
      * @param concept
@@ -341,47 +357,26 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		return;
 	    }
 
-	    for (SKOSConcept assembledResult : assembledResults) {
-		if (!assembledResult.getExpanded().isEmpty()) {
-
-		    for (String expanded : assembledResult.getExpanded()) {
-
-			expandConcept(//
-				stampSet, //
-				executor, //
-				conn, //
-				new SimpleEntry<String, String>(concept, expanded), //
-				searchLangs, //
-				expansionRelations, //
-				visited, //
-				results, //
-				targetLevel, //
-				currentLevel.next().get(), //
-				limit);
-		    }
-		}
-	    }
+	    assembledResults.//
+		    stream().//
+		    flatMap(res -> res.getExpanded().stream()).//
+		    forEach(expanded -> expandConcept(//
+			    stampSet, //
+			    executor, //
+			    conn, //
+			    new SimpleEntry<String, String>(concept, expanded), //
+			    searchLangs, //
+			    expansionRelations, //
+			    visited, //
+			    results, //
+			    targetLevel, //
+			    currentLevel.next().get(), //
+			    limit));
 
 	    stampSet.remove(stamp);
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED");
 	});
-    }
-
-    /**
-     * @param limit
-     * @param results
-     * @return
-     */
-    protected boolean limitReached(ExpansionLimit limit, List<SKOSConcept> results) {
-
-	synchronized (results) {
-	    return switch (limit.getTarget()) {
-	    case CONCEPTS -> results.size() >= limit.getLimit();
-	    case LABELS -> SKOSResponse.of(results).getLabels().size() >= limit.getLimit();
-	    case ALT_LABELS -> SKOSResponse.of(results).getAltLabels().size() >= limit.getLimit();
-	    };
-	}
     }
 
 }
