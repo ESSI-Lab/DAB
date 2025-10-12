@@ -98,6 +98,24 @@ public class SKOSConcept {
 		new HashSet<String>(alt != null ? Set.of(alt) : Set.of())//
 	);
     }
+    
+    
+
+    /**
+     * @param pref 
+     */
+    public void setPref(String pref) {
+	
+        this.pref = pref;
+    }
+
+    /**
+     * @param alt 
+     */
+    public void setAlt(Set<String> alt) {
+	
+        this.alt = alt;
+    }
 
     /**
      * @return
