@@ -42,11 +42,6 @@ public class ExpansionLimit {
 	/**
 	 * 
 	 */
-	PREF_LABELS,
-
-	/**
-	 * 
-	 */
 	ALT_LABELS,
 
 	/**
