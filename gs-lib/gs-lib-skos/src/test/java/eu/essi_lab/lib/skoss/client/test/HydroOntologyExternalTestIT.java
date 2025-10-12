@@ -18,6 +18,7 @@ import eu.essi_lab.lib.skoss.SKOSClient;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
+import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
@@ -26,7 +27,9 @@ import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
 
 /**
- * Tests the SKOSClient on the hydro ontology concepts e.g.: https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/28
+ * Tests the SKOSClient on the hydro ontology concepts e.g.:
+ * https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/28
+ * 
  * @author boldrini
  */
 public class HydroOntologyExternalTestIT {
@@ -37,35 +40,56 @@ public class HydroOntologyExternalTestIT {
     public void init() throws Exception {
 
 	FedXConfig fedXConfig = new FedXConfig();
-//	fedXConfig.withDebugQueryPlan(true);
-//	fedXConfig.withLogQueries(true);
+	// fedXConfig.withDebugQueryPlan(true);
+	// fedXConfig.withLogQueries(true);
 	fedXConfig.withLogQueryPlan(true);
 	fedXConfig.withEnableMonitoring(true);
 	fedXConfig.withLogQueryPlan(true);
-	
+
 	this.client = new SKOSClient();
 	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 1000));
 
 	client.setFinder(new FedXConceptsFinder());
-	
+
 	client.setOntologyUrls(Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql"
-//		, "http://codes.wmo.int/system/query"
-		));
+	// , "http://codes.wmo.int/system/query"
+	));
     }
-    
+
     @Test
-    public void testSingle() throws Exception {
+    public void testConceptsExpanderSingleThread() throws Exception {
+	
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 	expander.setTraceQuery(true);
 	client.setExpander(expander);
 	commonRoutine();
     }
-    
+
     @Test
-    public void testMultiple() throws Exception {
+    public void testConceptsExpanderMultiThread() throws Exception {
 	
+	FedXConceptsExpander expander = new FedXConceptsExpander();
+	expander.setTraceQuery(true);
+	expander.setThreadMode(ThreadMode.MULTI());
+	client.setExpander(expander);
+	commonRoutine();
+    }
+
+    @Test
+    public void testLevelsExpanderSingleThread() throws Exception {
+
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setTraceQuery(true);
+	client.setExpander(expander);
+	commonRoutine();
+    }
+
+    @Test
+    public void testLevelsExpanderMultiThread() throws Exception {
+
+	FedXLevelsExpander expander = new FedXLevelsExpander();
+	expander.setTraceQuery(true);
+	expander.setThreadMode(ThreadMode.MULTI());
 	client.setExpander(expander);
 	commonRoutine();
     }
@@ -96,7 +120,6 @@ public class HydroOntologyExternalTestIT {
 	{
 	    client.setExpansionLevel(ExpansionLevel.LOW);// #1
 	    client.setExpansionsRelations(Arrays.asList(SKOSSemanticRelation.NARROWER));
-
 
 	    SKOSResponse response = client.search();
 
@@ -136,7 +159,7 @@ public class HydroOntologyExternalTestIT {
 	//////////////////////////////////////////////////////
 	{
 	    client.setExpansionLevel(ExpansionLevel.MEDIUM);// #1
-	    client.setExpansionsRelations(Arrays.asList(SKOSSemanticRelation.NARROWER,SKOSSemanticRelation.CLOSE_MATCH));
+	    client.setExpansionsRelations(Arrays.asList(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.CLOSE_MATCH));
 
 	    SKOSResponse response = client.search();
 
@@ -154,7 +177,7 @@ public class HydroOntologyExternalTestIT {
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/35"));
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/34"));
 	    assertTrue(uris.contains("http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/12006"));
-	    
+
 	}
     }
 
