@@ -88,7 +88,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 		ExpansionLevel.NONE, //
 		limit);
 
-	while (!stampSet.isEmpty()) {
+	while (!stampSet.isEmpty() && !executor.isShutdown()) {
 
 	    Thread.sleep(Duration.ofMillis(1000));
 	}
@@ -101,8 +101,20 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	return SKOSResponse.of(results);
     }
 
-    @Override
-    public void expandConcepts(//
+    /**
+     * @param stampSet
+     * @param executor
+     * @param conn
+     * @param fatherConcepts
+     * @param searchLangs
+     * @param expansionRelations
+     * @param visited
+     * @param results
+     * @param targetLevel
+     * @param currentLevel
+     * @param limit
+     */
+    private void expandConcepts(//
 	    Set<String> stampSet, //
 	    ExecutorService executor, //
 	    RepositoryConnection conn, //
@@ -116,8 +128,9 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	    ExpansionLimit limit) {
 
 	if (limitReached(limit, results) || fatherConcepts.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).info("Shutting down");
+	    GSLoggerFactory.getLogger(getClass()).info("Limit reached, shutting down");
 	    executor.shutdownNow();
+	    stampSet.clear();
 	    return;
 	}
 
@@ -142,13 +155,11 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 
 	String stamp = urisToVisit + ":" + currentLevel.getValue();
 
-	GSLoggerFactory.getLogger(getClass()).debug("Expanding concepts {} STARTED (outside)", stamp);
-
 	stampSet.add(stamp);
 
 	executor.submit(() -> {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concepts {} STARTED (inside)", stamp);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concepts {} STARTED");
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Current level: {}", currentLevel);
 
@@ -169,7 +180,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	    TupleQuery tupleQuery = conn.prepareTupleQuery(query);
 
 	    List<SKOSConcept> tmpResults = new ArrayList<SKOSConcept>();
-	    SKOSResponse response = SKOSResponse.of(tmpResults);
+	    SKOSResponse tmpResponse = SKOSResponse.of(tmpResults);
 
 	    try (TupleQueryResult res = tupleQuery.evaluate()) {
 
@@ -219,26 +230,28 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 		MonitoringUtil.printMonitoringInformation(repository.getFederationContext());
 	    }
 
-	    List<SKOSConcept> assembledResults = response.getAggregatedResults();
+	    List<SKOSConcept> assembledResults = null;
+	    synchronized (results) {
 
-	    results.addAll(assembledResults);
+		assembledResults = SKOSResponse.getAggregatedResults(limit, tmpResponse, results);
+		results.addAll(assembledResults);
+	    }
 
-	    if (limitReached(limit, results)) {
-		GSLoggerFactory.getLogger(getClass()).info("Shutting down");
+	    if (limitReached(limit, results) || currentLevel.next().isEmpty()) {
+		GSLoggerFactory.getLogger(getClass()).info("Limit reached, shutting down");
 		executor.shutdownNow();
+		stampSet.clear();
 		return;
 	    }
 
 	    List<SimpleEntry<String, String>> nextLevel = new ArrayList<>();
 
 	    for (SKOSConcept assembledResult : assembledResults) {
-		if (!assembledResult.getExpanded().isEmpty()) {
 
-		    for (String expanded : assembledResult.getExpanded()) {
+		for (String expanded : assembledResult.getExpanded()) {
 
-			SimpleEntry<String, String> next = new SimpleEntry<>(assembledResult.getConcept(), expanded);
-			nextLevel.add(next);
-		    }
+		    SimpleEntry<String, String> next = new SimpleEntry<>(assembledResult.getConcept(), expanded);
+		    nextLevel.add(next);
 		}
 	    }
 
@@ -255,10 +268,9 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 		    currentLevel.next().get(), //
 		    limit);
 
-	    // always release the stamp
 	    stampSet.remove(stamp);
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED", stamp);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED");
 	});
     }
 
