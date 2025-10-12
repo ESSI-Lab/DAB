@@ -140,7 +140,7 @@ public class SKOSResponse {
 
 		switch (limit.getTarget()) {
 		case CONCEPTS:
-		    if (results.size() + 1 > limit.getLimit()) {
+		    if (out.size() + results.size() + 1 > limit.getLimit()) {
 			return out;
 		    }
 		    break;
@@ -171,6 +171,9 @@ public class SKOSResponse {
 
 		    break;
 		}
+		
+		altCount += skosConcept.getAlt().size();
+		labCount += skosConcept.getAlt().size() + 1;
 
 		out.add(skosConcept);
 	    }
