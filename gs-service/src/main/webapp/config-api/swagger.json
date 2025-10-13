@@ -22,8 +22,7 @@
 					{
 						"name": "authenticationToken",
 						"in": "path",
-						"description": "Authentication token required to execute the API requests",
-						"required": true,
+						"description": "Authentication token. Always required, except for listing requests",
 						"type": "string"
 					}
 				],

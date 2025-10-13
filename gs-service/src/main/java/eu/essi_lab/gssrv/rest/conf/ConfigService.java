@@ -101,18 +101,7 @@ public class ConfigService {
 	if (configServiceAuthToken == null) {
 
 	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Configuration service authentication token not defined");
-	}
-
-	Optional<String> path = uriInfo.getPathSegments().stream().map(s -> s.getPath()).findFirst();
-	if (path.isEmpty()) {
-
-	    return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing required authentication token");
-	}
-
-	if (!path.get().equals(configServiceAuthToken)) {
-
-	    return buildErrorResponse(Status.UNAUTHORIZED, "Unrecognized authentication token");
-	}
+	}	
 
 	String stringStream = null;
 	try {
@@ -149,6 +138,17 @@ public class ConfigService {
 	}
 
 	String requestName = optRequestName.get();
+	
+	Optional<String> path = uriInfo.getPathSegments().stream().map(s -> s.getPath()).findFirst();
+	if (path.isEmpty() && !requestName.toLowerCase().contains("list")) {
+
+	    return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing required authentication token");
+	}
+
+	if (!path.get().equals(configServiceAuthToken) && !requestName.toLowerCase().contains("list")) {
+
+	    return buildErrorResponse(Status.UNAUTHORIZED, "Unrecognized authentication token");
+	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Serving '{}' request STARTED", requestName);
 
