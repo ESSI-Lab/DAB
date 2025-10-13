@@ -1523,15 +1523,27 @@ export function initializePortal(config) {
 			}
 
 		}
-		var semanticValue = 0;
-		if (config.semanticSearchValue !== undefined) {
-			semanticValue = config.semanticSearchValue;
-		}
-
+		
+		
 		if (config.semanticSearch !== undefined && config.semanticSearch) {
-			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semanticsearch', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
-		}
+			
+		 			 
+			var searchModeButton = GIAPI.FontAwesomeButton({
+				'width': 250,
+				'label': 'Search mode',
+				'icon': ' fa-search',
+				'handler': function() {
 
+				 	GIAPI.OntologiesSelector.showDialog();
+							 
+				}
+			});
+			
+			searchModeButton.css('div','margin-top','5px');
+			
+			jQuery("#adv-search-div").append(searchModeButton.div());	
+		}
+	  
 		// Only show advanced search if we have constraints to show
 		if (advancedConstraints.length > 0) {
 			GIAPI.search.constWidget.advancedSearch(
@@ -2082,7 +2094,8 @@ export function initializePortal(config) {
 
 		constraints.spatialOp = options.spatialRelation;
 
-		constraints.ontology = config.ontology;
+		constraints.ontologyids = GIAPI.OntologiesSelector.getSelectedIds();
+		constraints.semanticsearch = GIAPI.OntologiesSelector.getSelectedIds().length > 0;
 
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
 		// set the termFrequency option
