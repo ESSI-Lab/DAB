@@ -22,7 +22,7 @@
 					{
 						"name": "authenticationToken",
 						"in": "path",
-						"description": "Authentication token. Always required, except for listing requests",
+						"description": "Authentication token. For listing requests it is ignored",
 						"type": "string"
 					}
 				],
