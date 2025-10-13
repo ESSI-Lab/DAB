@@ -44,7 +44,7 @@ import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
- * @author Fabrizio
+ * @author boldrini
  */
 public class DefaultConceptsExpander implements ConceptsExpander {
 
