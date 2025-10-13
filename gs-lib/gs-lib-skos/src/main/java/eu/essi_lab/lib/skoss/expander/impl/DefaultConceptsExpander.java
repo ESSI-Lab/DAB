@@ -116,7 +116,7 @@ public class DefaultConceptsExpander implements ConceptsExpander {
 
 	SKOSResponse ret = SKOSResponse.of(results);
 
-	return ret;
+	return SKOSResponse.of(ret.getAggregatedResults());
 
     }
 }

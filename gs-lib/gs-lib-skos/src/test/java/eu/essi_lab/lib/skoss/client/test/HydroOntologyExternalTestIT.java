@@ -25,6 +25,7 @@ import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
+import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
 
 /**
@@ -50,7 +51,8 @@ public class HydroOntologyExternalTestIT {
 	this.client = new SKOSClient();
 	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 1000));
 
-	client.setFinder(new FedXConceptsFinder());
+	// client.setFinder(new FedXConceptsFinder());
+	client.setFinder(new DefaultConceptsFinder());
 
 	client.setOntologyUrls(Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql"
 	// , "http://codes.wmo.int/system/query"
@@ -59,7 +61,7 @@ public class HydroOntologyExternalTestIT {
 
     @Test
     public void testConceptsExpanderSingleThread() throws Exception {
-	
+
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 	expander.setTraceQuery(true);
 	client.setExpander(expander);
@@ -68,7 +70,7 @@ public class HydroOntologyExternalTestIT {
 
     @Test
     public void testConceptsExpanderMultiThread() throws Exception {
-	
+
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 	expander.setTraceQuery(true);
 	expander.setThreadMode(ThreadMode.MULTI());
@@ -94,7 +96,7 @@ public class HydroOntologyExternalTestIT {
 	client.setExpander(expander);
 	commonRoutine();
     }
-    
+
     @Test
     public void testLevelsDefaultExpander() throws Exception {
 

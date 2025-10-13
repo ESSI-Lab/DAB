@@ -65,7 +65,7 @@ public class QueryTask implements Callable<List<SKOSConcept>> {
 	List<SKOSConcept> tmpResults = new ArrayList<>();
 	SKOSResponse tmpResponse = SKOSResponse.of(tmpResults);
 
-	if (concepts.isEmpty()) {
+	if (concepts != null && concepts.isEmpty()) {
 	    return tmpResponse;
 	}
 
@@ -85,13 +85,15 @@ public class QueryTask implements Callable<List<SKOSConcept>> {
 			    ? bs.getValue(QueryBinding.CONCEPT.getLabel()).stringValue()
 			    : null;
 
-		    Set<String> father = null;
+		    Set<String> father = new HashSet<String>();
 
 		    if (concept != null) {
-			for (SKOSConcept fatherConcept : concepts) {
-			    Set<String> tmpFathers = fatherConcept.getExpandedFrom();
-			    if (fatherConcept.getConcept().equals(concept)) {
-				father = tmpFathers;
+			if (concepts != null) {
+			    for (SKOSConcept fatherConcept : concepts) {
+				Set<String> tmpFathers = fatherConcept.getExpandedFrom();
+				if (fatherConcept.getConcept().equals(concept)) {
+				    father = tmpFathers;
+				}
 			    }
 			}
 		    }
