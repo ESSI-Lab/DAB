@@ -1,5 +1,18 @@
 package eu.essi_lab.profiler.os.handler.discover;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.ws.rs.core.MediaType;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -22,13 +35,13 @@ package eu.essi_lab.profiler.os.handler.discover;
  */
 
 import com.google.common.collect.Lists;
+
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
-import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.odip.rosetta.RosettaStone;
 import eu.essi_lab.lib.odip.rosetta.RosettaStoneConnector;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -75,17 +88,6 @@ import eu.essi_lab.profiler.os.handler.discover.semantics.connectors.GemetWebApi
 import eu.essi_lab.profiler.os.handler.discover.semantics.expander.SemanticExpansion;
 import eu.essi_lab.profiler.os.handler.discover.semantics.expander.SemanticsExpander;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.ws.rs.core.MediaType;
 
 /**
  * @author Fabrizio
