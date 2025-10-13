@@ -239,9 +239,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	executor.submit(() -> {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} STARTED");
-
-	    GSLoggerFactory.getLogger(getClass()).trace("Current level: {}", currentLevel);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept of level {} STARETD", currentLevel);
 
 	    visited.add(concept);
 
@@ -331,7 +329,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	    stampSet.remove(stamp);
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED");
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept of level {} ENDED", currentLevel);
 	});
     }
 

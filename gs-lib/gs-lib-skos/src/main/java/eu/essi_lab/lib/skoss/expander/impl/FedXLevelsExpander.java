@@ -130,6 +130,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	if (limitReached(limit, results) || fatherConcepts.isEmpty()) {
 	    GSLoggerFactory.getLogger(getClass()).info("Limit reached, shutting down");
 	    executor.shutdownNow();
+	    engine.close();
 	    stampSet.clear();
 	    return;
 	}
@@ -159,9 +160,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 
 	executor.submit(() -> {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concepts {} STARTED");
-
-	    GSLoggerFactory.getLogger(getClass()).trace("Current level: {}", currentLevel);
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concepts of level {} STARTED", currentLevel);
 
 	    visited.addAll(urisToVisit);
 
@@ -270,7 +269,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 
 	    stampSet.remove(stamp);
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept {} ENDED");
+	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concepts of level {} ENDED", currentLevel);
 	});
     }
 
