@@ -62,8 +62,9 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
     protected ThreadMode threadMode;
     protected FedXConfig engineConfig;
-    protected FedXRepository repository;
-    protected FedXEngine engine;
+    private List<String> ontologyUrls;
+    // protected FedXRepository repository;
+    // protected FedXEngine engine;
 
     /**
      * 
@@ -119,10 +120,12 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 
 	GSLoggerFactory.getLogger(getClass()).trace("Thread mode: {} ", threadMode.getClass().getSimpleName());
 
-	engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
-	repository = engine.getRepository();
+	// engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
+	// repository = engine.getRepository();
 
-	FedXRepositoryConnection conn = engine.getConnection();
+	// FedXRepositoryConnection conn = engine.getConnection();
+
+	this.ontologyUrls = ontologyUrls;
 
 	List<SKOSConcept> results = Collections.synchronizedList(new ArrayList<>());
 
@@ -149,7 +152,6 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    expandConcept(//
 		    stampSet, //
 		    executor, //
-		    conn, //
 		    fatherConcept, //
 		    searchLangs, //
 		    expansionRelations, //
@@ -165,7 +167,6 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    Thread.sleep(Duration.ofMillis(1000));
 	}
 
-	engine.close();
 	executor.shutdown();
 
 	GSLoggerFactory.getLogger(getClass()).debug("Expanding concepts ENDED");
@@ -206,7 +207,6 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
     private void expandConcept(//
 	    Set<String> stampSet, //
 	    ExecutorService executor, //
-	    RepositoryConnection conn, //
 	    SimpleEntry<String, String> fatherConcept, //
 	    List<String> searchLangs, //
 	    List<SKOSSemanticRelation> expansionRelations, //
@@ -259,7 +259,9 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		GSLoggerFactory.getLogger(getClass()).trace("\n{}", query);
 	    }
 
-	    TupleQuery tupleQuery = conn.prepareTupleQuery(query);
+	    FedXEngine engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
+
+	    TupleQuery tupleQuery = engine.getConnection().prepareTupleQuery(query);
 
 	    List<SKOSConcept> tmpResults = new ArrayList<SKOSConcept>();
 	    SKOSResponse tmpResponse = SKOSResponse.of(tmpResults);
@@ -294,7 +296,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    }
 
 	    if (engine.getConfiguration().isEnableMonitoring()) {
-		MonitoringUtil.printMonitoringInformation(repository.getFederationContext());
+		MonitoringUtil.printMonitoringInformation(engine.getRepository().getFederationContext());
 	    }
 
 	    List<SKOSConcept> assembledResults = null;
@@ -317,7 +319,6 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 		    forEach(expanded -> expandConcept(//
 			    stampSet, //
 			    executor, //
-			    conn, //
 			    new SimpleEntry<String, String>(concept, expanded), //
 			    searchLangs, //
 			    expansionRelations, //

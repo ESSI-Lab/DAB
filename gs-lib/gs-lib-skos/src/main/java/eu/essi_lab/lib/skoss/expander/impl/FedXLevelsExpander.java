@@ -51,6 +51,8 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 public class FedXLevelsExpander extends FedXConceptsExpander {
 
+    private List<String> ontologyUrls;
+
     public FedXLevelsExpander() {
 
 	setQueryBuilder(new MultipleExpandConceptsQueryBuilder());
@@ -70,10 +72,12 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 
 	GSLoggerFactory.getLogger(getClass()).trace("Thread mode: {} ", threadMode.getClass().getSimpleName());
 
-	engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
-	repository = engine.getRepository();
+	// engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
+	// repository = engine.getRepository();
 
-	FedXRepositoryConnection conn = engine.getConnection();
+	// FedXRepositoryConnection conn = engine.getConnection();
+
+	this.ontologyUrls = ontologyUrls;
 
 	List<SKOSConcept> results = Collections.synchronizedList(new ArrayList<>());
 
@@ -99,7 +103,6 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	expandConcepts(//
 		stampSet, //
 		executor, //
-		conn, //
 		fatherConcepts, //
 		searchLangs, //
 		expansionRelations, //
@@ -114,7 +117,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	    Thread.sleep(Duration.ofMillis(1000));
 	}
 
-	engine.close();
+	// engine.close();
 	executor.shutdown();
 
 	GSLoggerFactory.getLogger(getClass()).debug("Expanding concepts ENDED");
@@ -138,7 +141,6 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
     private void expandConcepts(//
 	    Set<String> stampSet, //
 	    ExecutorService executor, //
-	    RepositoryConnection conn, //
 	    List<SimpleEntry<String, String>> fatherConcepts, //
 	    List<String> searchLangs, //
 	    List<SKOSSemanticRelation> expansionRelations, //
@@ -148,10 +150,20 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	    ExpansionLevel currentLevel, //
 	    ExpansionLimit limit) {
 
-	if (limitReached(limit, results) || fatherConcepts.isEmpty()) {
+	if (limitReached(limit, results)) {
+
 	    GSLoggerFactory.getLogger(getClass()).info("Limit reached, shutting down");
+
 	    executor.shutdownNow();
-	    engine.close();
+	    stampSet.clear();
+	    return;
+	}
+
+	if (fatherConcepts.isEmpty()) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Father concepts empty, shutting down");
+
+	    executor.shutdownNow();
 	    stampSet.clear();
 	    return;
 	}
@@ -197,7 +209,9 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 		GSLoggerFactory.getLogger(getClass()).trace("\n{}", query);
 	    }
 
-	    TupleQuery tupleQuery = conn.prepareTupleQuery(query);
+	    FedXEngine engine = FedXEngine.of(ontologyUrls, getEngineConfig().orElse(new FedXConfig()));
+
+	    TupleQuery tupleQuery = engine.getConnection().prepareTupleQuery(query);
 
 	    List<SKOSConcept> tmpResults = new ArrayList<SKOSConcept>();
 	    SKOSResponse tmpResponse = SKOSResponse.of(tmpResults);
@@ -247,7 +261,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	    }
 
 	    if (engine.getConfiguration().isEnableMonitoring()) {
-		MonitoringUtil.printMonitoringInformation(repository.getFederationContext());
+		MonitoringUtil.printMonitoringInformation(engine.getRepository().getFederationContext());
 	    }
 
 	    List<SKOSConcept> assembledResults = null;
@@ -257,8 +271,15 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 		results.addAll(assembledResults);
 	    }
 
-	    if (limitReached(limit, results) || currentLevel.next().isEmpty()) {
+	    if (limitReached(limit, results)) {
 		GSLoggerFactory.getLogger(getClass()).info("Limit reached, shutting down");
+		executor.shutdownNow();
+		stampSet.clear();
+		return;
+	    }
+
+	    if (currentLevel.next().isEmpty()) {
+		GSLoggerFactory.getLogger(getClass()).info("No next level, shutting down");
 		executor.shutdownNow();
 		stampSet.clear();
 		return;
@@ -278,7 +299,6 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	    expandConcepts(//
 		    stampSet, //
 		    executor, //
-		    conn, //
 		    nextLevel, //
 		    searchLangs, //
 		    expansionRelations, //

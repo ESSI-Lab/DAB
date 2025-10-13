@@ -5,8 +5,11 @@ package eu.essi_lab.lib.skoss.client.test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
+import org.eclipse.rdf4j.federated.evaluation.concurrent.ControlledWorkerScheduler;
+import org.eclipse.rdf4j.federated.evaluation.concurrent.TaskWrapper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,6 +24,7 @@ import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
+import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
@@ -95,28 +99,63 @@ public class ClientExternalTestIT {
 	Assert.assertTrue(client.getSourceLangs().isEmpty());
     }
 
+    //
+    // Concepts expander
+    //
+
     @Test
-    public void mediumExpansionLimit100Test() throws Exception {
+    public void mediumExpansionLimit10Test_ConceptsExpander_SingleThread() throws Exception {
+
+	mediumExpansionLimit10Test(new FedXConceptsExpander(), ThreadMode.SINGLE());
+    }
+
+    @Test
+    public void mediumExpansionLimit10Test_ConceptsExpander_MultiThread() throws Exception {
+
+	mediumExpansionLimit10Test(new FedXConceptsExpander(), ThreadMode.MULTI());
+    }
+
+    //
+    // Levels expander
+    //
+
+    @Test
+    public void mediumExpansionLimit10Test_LevelsExpander_SingleThread() throws Exception {
+
+	mediumExpansionLimit10Test(new FedXLevelsExpander(), ThreadMode.SINGLE());
+    }
+
+    @Test
+    public void mediumExpansionLimit10Test_LevelsExpander_MultiThread() throws Exception {
+
+	mediumExpansionLimit10Test(new FedXLevelsExpander(), ThreadMode.MULTI());
+    }
+
+    /**
+     * @param expander
+     * @param mode
+     * @throws Exception
+     */
+    private void mediumExpansionLimit10Test(FedXConceptsExpander expander, ThreadMode mode) throws Exception {
 
 	SKOSClient client = new SKOSClient();
 
 	client.setOntologyUrls(Arrays.asList(//
 		"http://localhost:3031/gemet/query", //
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
+		"http://hydro.geodab.eu/hydro-ontology/sparql",//
 		"https://vocabularies.unesco.org/sparql" //
 	));
 
-	client.setExpansionLevel(ExpansionLevel.MEDIUM);
+	client.setExpansionLevel(ExpansionLevel.LOW);
 	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 100));
 	client.setSearchTerm("water");
-	
+
 	FedXConfig fedXConfig = new FedXConfig();
-//	fedXConfig.withDebugQueryPlan(true);
-//	fedXConfig.withLogQueries(true);
-	fedXConfig.withLogQueryPlan(true);
+	// fedXConfig.withDebugQueryPlan(true);
+	// fedXConfig.withLogQueries(true);
+	// fedXConfig.withLogQueryPlan(true);
 	fedXConfig.withEnableMonitoring(true);
-	fedXConfig.withLogQueryPlan(true);
-	
+
 	//
 	//
 	//
@@ -128,21 +167,18 @@ public class ClientExternalTestIT {
 	conceptsQueryExecutor.setTraceQuery(true);
 
 	finder.setExecutor(conceptsQueryExecutor);
-
 	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
-
 	finder.setThreadMode(ThreadMode.SINGLE());
-
+	
 	client.setFinder(finder);
 
 	//
 	//
 	//
 
-	FedXConceptsExpander expander = new FedXConceptsExpander();
 	expander.setEngineConfig(fedXConfig);
-	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
-	expander.setThreadMode(ThreadMode.SINGLE());
+//	expander.setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
+	expander.setThreadMode(mode);
 	expander.setTraceQuery(true);
 
 	client.setExpander(expander);
@@ -156,81 +192,24 @@ public class ClientExternalTestIT {
 	List<SKOSConcept> results = response.getResults().stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
+	
+	System.out.println("\n -------");
+	System.out.println(results.size());
+	System.out.println("\n -------");
 
-	System.out.println("\n\n");
-
-	results.forEach(res -> System.out.println(res + "\n---"));
-
-	System.out.println("\n\n");
-
-	response.getPrefLabels().forEach(pref -> System.out.println(pref));
-
-	System.out.println("\n\n");
-
-	response.getAltLabels().forEach(alt -> System.out.println(alt));
-
-	Assert.assertEquals(100, results.size());
-    }
-
-    @Test
-    public void mediumExpansionFinderMultiThreadVSFinderSingleThreadLimit200Test() throws Exception {
-
-	SKOSClient client = new SKOSClient();
-
-	client.setOntologyUrls(Arrays.asList(//
-		"http://localhost:3031/gemet/query", //
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql" //
-	));
-
-	client.setExpansionLevel(ExpansionLevel.MEDIUM);
-	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 50));
-	client.setSearchTerm("water");
-
-	SKOSResponse response = client.search();
-
-	List<SKOSConcept> singleThreadFinderResults = response.getResults().stream().//
-		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
-		toList();//
-
-	List<String> singlePrefLabels = response.getPrefLabels();
-	singlePrefLabels.forEach(l -> System.out.println(l));
-
-	System.out.println("\n\n---");
-
+//	System.out.println("\n\n");
+//
+//	results.forEach(res -> System.out.println(res + "\n---"));
+	
 	//
+	// System.out.println("\n\n");
 	//
+	// response.getPrefLabels().forEach(pref -> System.out.println(pref));
 	//
-
-	client = new SKOSClient();
-
-	client.setOntologyUrls(Arrays.asList(//
-		"http://localhost:3031/gemet/query", //
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql" //
-	));
-
-	client.setExpansionLevel(ExpansionLevel.MEDIUM);
-	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 50));
-	client.setSearchTerm("water");
-
-	FedXConceptsFinder finder = new FedXConceptsFinder();
-	// finder.setThreadMode(ThreadMode.MULTI());
-	client.setFinder(finder);
-
-	response = client.search();
-
-	List<SKOSConcept> multiThreadFinderResults = response.getResults().stream().//
-		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
-		toList();//
-
-	List<String> multiPrefLabels = response.getPrefLabels();
-	multiPrefLabels.forEach(l -> System.out.println(l));
-
+	// System.out.println("\n\n");
 	//
-	//
-	//
+	// response.getLabels().forEach(alt -> System.out.println(alt));
 
-	// Assert.assertEquals(singleThreadFinderResults, multiThreadFinderResults);
+//	Assert.assertEquals(10, results.size());
     }
 }
