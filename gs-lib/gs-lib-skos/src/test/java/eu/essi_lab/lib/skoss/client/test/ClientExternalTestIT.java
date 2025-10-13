@@ -22,6 +22,7 @@ import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
+import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
@@ -102,13 +103,13 @@ public class ClientExternalTestIT {
     @Test
     public void mediumExpansionLimit10Test_ConceptsExpander() throws Exception {
 
-	mediumExpansionLimit10Test(new FedXConceptsExpander(), ThreadMode.SINGLE());
+	mediumExpansionLimit10Test(new DefaultConceptsFinder(),new FedXConceptsExpander(), ThreadMode.SINGLE());
     }
 
     @Test
     public void mediumExpansionLimit10Test_DefaultConceptsExpander() throws Exception {
 
-	mediumExpansionLimit10Test(new DefaultConceptsExpander(), ThreadMode.SINGLE());
+	mediumExpansionLimit10Test(new DefaultConceptsFinder(),new DefaultConceptsExpander(), ThreadMode.SINGLE());
     }
 
     //
@@ -132,7 +133,7 @@ public class ClientExternalTestIT {
      * @param mode
      * @throws Exception
      */
-    private void mediumExpansionLimit10Test(ConceptsExpander expander, ThreadMode mode) throws Exception {
+    private void mediumExpansionLimit10Test(ConceptsFinder finder, ConceptsExpander expander, ThreadMode mode) throws Exception {
 
 	SKOSClient client = new SKOSClient();
 
@@ -156,15 +157,15 @@ public class ClientExternalTestIT {
 	//
 	//
 
-	FedXConceptsFinder finder = new FedXConceptsFinder();
+//	FedXConceptsFinder finder = new FedXConceptsFinder();
 
 	FedXConceptsQueryExecutor conceptsQueryExecutor = new FedXConceptsQueryExecutor();
 	conceptsQueryExecutor.setEngineConfig(fedXConfig);
 	conceptsQueryExecutor.setTraceQuery(true);
 
-	finder.setExecutor(conceptsQueryExecutor);
-	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
-	finder.setThreadMode(ThreadMode.SINGLE());
+//	finder.setExecutor(conceptsQueryExecutor);
+//	finder.setQueryBuilder(new DefaultConceptsQueryBuilder());
+//	finder.setThreadMode(ThreadMode.SINGLE());
 
 	client.setFinder(finder);
 
