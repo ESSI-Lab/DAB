@@ -237,8 +237,8 @@ export const GIAPI = {
 		var timeInterpolation = '';
 		var attrURI = '';
 		var orgName = '';
-		var semantics = '';
-		var ontology = '';
+		var semanticsearch = '';
+		var ontologyids = '';
 
 		if (kvp) {
 			if (!Array.prototype.isArray(kvp)) {
@@ -300,8 +300,8 @@ export const GIAPI = {
 					continue;
 				}
 
-				if (key === 'ontology') {
-					ontology = val;
+				if (key === 'ontologyids') {
+					ontologyids = val;
 					continue;
 				}
 
@@ -325,8 +325,8 @@ export const GIAPI = {
 					continue;
 				}
 
-				if (key === 'semantics') {
-					semantics = val;
+				if (key === 'semanticsearch') {
+					semanticsearch = val;
 					continue;
 				}
 
@@ -366,8 +366,8 @@ export const GIAPI = {
 		attrURI = options && options.termFrequency && GIAPI.readConstraint(constraints, 'observedPropertyURI') || attrURI;
 		orgName = options && options.termFrequency && GIAPI.readConstraint(constraints, 'organisationName') || orgName;
 
-		semantics = options && options.termFrequency && GIAPI.readConstraint(constraints, 'semantics') || semantics;
-		ontology = options && options.termFrequency && GIAPI.readConstraint(constraints, 'ontology') || ontology;
+		semanticsearch = options && options.termFrequency && GIAPI.readConstraint(constraints, 'semanticsearch') || semanticsearch;
+		ontologyids = options && options.termFrequency && GIAPI.readConstraint(constraints, 'ontologyids') || ontologyids;
 
 
 		// *******************************************************
@@ -486,8 +486,8 @@ export const GIAPI = {
 		//        httpGet += 'origOrgId=' + ori + '&';
 
 
-		httpGet += 'semantics=' + semantics + '&';
-		httpGet += 'ontology=' + ontology + '&';
+		httpGet += 'semanticsearch=' + semanticsearch + '&';
+		httpGet += 'ontologyids=' + ontologyids + '&';
 		httpGet += 'instrumentTitle=' + instr + '&';
 		httpGet += 'platformTitle=' + platTitle + '&';
 		httpGet += 'attributeTitle=' + attrTitle + '&';
