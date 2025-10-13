@@ -50,6 +50,14 @@ public class SKOSConcept {
 	expanded = new HashSet<>();
     }
 
+    public static SKOSConcept of(String concept) {
+
+	SKOSConcept item = new SKOSConcept();
+	item.concept = concept;
+	return item;
+
+    }
+
     /**
      * @param concept
      * @param pref
@@ -98,23 +106,21 @@ public class SKOSConcept {
 		new HashSet<String>(alt != null ? Set.of(alt) : Set.of())//
 	);
     }
-    
-    
 
     /**
-     * @param pref 
+     * @param pref
      */
     public void setPref(String pref) {
-	
-        this.pref = pref;
+
+	this.pref = pref;
     }
 
     /**
-     * @param alt 
+     * @param alt
      */
     public void setAlt(Set<String> alt) {
-	
-        this.alt = alt;
+
+	this.alt = alt;
     }
 
     /**
