@@ -524,12 +524,12 @@ public abstract class OSParameters {
     /**
     *
     */
-    public static final OSParameter SEMANTICS = new OSParameter("semantics", "string", null, "{gs:semantics}");
+    public static final OSParameter SEMANTIC_SEARCH = new OSParameter("semanticsearch", "string", null, "{gs:semanticsearch}");
 
     /**
     *
     */
-    public static final OSParameter ONTOLOGY = new OSParameter("ontology", "string", null, "{gs:ontology}");
+    public static final OSParameter ONTOLOGY_IDS = new OSParameter("ontologyids", "string", null, "{gs:ontologyids}");
 
     /**
     *

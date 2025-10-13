@@ -292,7 +292,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		return message;
 	    }
 
-	    String outputFormat = parser.parse(OSParameters.OUTPUT_FORMAT);	    
+	    String outputFormat = parser.parse(OSParameters.OUTPUT_FORMAT);
 	    if (outputFormat != null && !outputFormat.equals("")) {
 		if (outputFormat.equals("application/atom xml")) {
 		    outputFormat = MediaType.APPLICATION_ATOM_XML;
@@ -321,7 +321,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 			DiscoveryMessage.EiffelAPIDiscoveryOption.FILTER_AND_SORT.name())
 			|| eiffelDiscoveryOption.equals(//
-			DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
+				DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
 
 		if (!supported) {
 
@@ -373,8 +373,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	ArrayList<Bond> bondList = new ArrayList<>();
 
 	String rosetta = parser.parse(OSParameters.ROSETTA);
-	String semantics = parser.parse(OSParameters.SEMANTICS);
-	String ontology = parser.parse(OSParameters.ONTOLOGY);
+	String semantics = parser.parse(OSParameters.SEMANTIC_SEARCH);
+	String ontology = parser.parse(OSParameters.ONTOLOGY_IDS);
 
 	//
 	// search terms are NOT included in case of Eiffel SORT_AND_FILTER
@@ -443,7 +443,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			osParameter.equals(OSParameters.PLATFORM_IDENTIFIER) || //
 			osParameter.equals(OSParameters.ORIGINATOR_ORGANISATION_IDENTIFIER) || //
 			osParameter.equals(OSParameters.ATTRIBUTE_IDENTIFIER)) && ( //
-			rosetta != null && !rosetta.equals("false") && value != null)) {
+		rosetta != null && !rosetta.equals("false") && value != null)) {
 
 		    value = handleRosetta(rosetta, value);
 		}
@@ -652,8 +652,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      */
     private void handleSemanticsAndOntology(List<Bond> bondList, String value, String semantics, String ontology) {
 
-	Bond semantic = Semantics.getSemanticBond(value,semantics,ontology);
-	if (semantic!=null) {
+	Bond semantic = Semantics.getSemanticBond(value, semantics, ontology);
+	if (semantic != null) {
 	    bondList.add(semantic);
 	}
     }
@@ -834,7 +834,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
      * <html> <head> <style> table { font-family: arial, sans-serif;
-     * border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd; text-align: left; padding: 8px; } </style> </head>
+     * border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+     * </style> </head>
      * <body>
      * <table>
      * <tr>
@@ -1008,7 +1009,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    for (String searchTerm : terms) {
 
 		createFieldsBond(innerBonds, searchFields, searchTerm, semantics, ontology);
-
 	    }
 
 	    switch (innerBonds.size()) {
@@ -1024,16 +1024,27 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	return null;
     }
 
-    private void createFieldsBond(List<Bond> innerBonds, String searchFields, String searchTerm, String semantics,
-	    String ontology) {
+    /**
+     * @param innerBonds
+     * @param searchFields
+     * @param searchTerm
+     * @param semanticSearch
+     * @param ontologyids
+     */
+    private void createFieldsBond(//
+	    List<Bond> innerBonds, //
+	    String searchFields, //
+	    String searchTerm, //
+	    String semanticSearch, //
+	    String ontologyids) {
 
-	if (semantics != null && !semantics.isEmpty() && ontology != null && !ontology.isEmpty()) {
+	if (semanticSearch != null && !semanticSearch.equals("true") && ontologyids != null && !ontologyids.isEmpty()) {
 
 	    GemetWebApiConnector gemetConnector = new GemetWebApiConnector();
 	    SemanticsExpander expander = new SemanticsExpander(gemetConnector);
 	    SemanticExpansion expansion = SemanticExpansion.NARROWER;
 
-	    if (semantics.equalsIgnoreCase("sameas-narrow"))
+	    if (semanticSearch.equalsIgnoreCase("sameas-narrow"))
 		expansion = SemanticExpansion.NARROWER_CLOSE_MATCH;
 	    // languages of matched concepts
 	    List<String> expandedTerms = expander.expandSearchTerm(searchTerm, expansion, Arrays.asList("it"));
@@ -1044,7 +1055,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	    switch (expandedBonds.size()) {
 	    case 0:
-		//This should never happen, in any I put break to keep going with the usual creating (no semantic expansion)
+		// This should never happen, in any I put break to keep going with the usual creating (no semantic
+		// expansion)
 		break;
 	    case 1:
 		innerBonds.add(expandedBonds.get(0));

@@ -1529,7 +1529,7 @@ export function initializePortal(config) {
 		}
 
 		if (config.semanticSearch !== undefined && config.semanticSearch) {
-			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semantics', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
+			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semanticsearch', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
 		}
 
 		// Only show advanced search if we have constraints to show
