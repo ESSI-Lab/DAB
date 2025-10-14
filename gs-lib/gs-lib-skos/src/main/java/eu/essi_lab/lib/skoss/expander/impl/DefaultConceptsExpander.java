@@ -144,11 +144,9 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 	    results.addAll(currentLevelResults);
 	}
 
-	SKOSResponse ret = SKOSResponse.of(results);
-
 	GSLoggerFactory.getLogger(getClass()).debug("Epanding concepts ENDED");
 
-	return SKOSResponse.of(ret.getAggregatedResults());
+	return SKOSResponse.of(SKOSResponse.getAggregatedResults(limit, results));
     }
 
 }

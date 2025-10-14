@@ -5,6 +5,7 @@ package eu.essi_lab.lib.skoss.expander.test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,8 +17,7 @@ import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
-import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
-import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
+import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 
 /**
  * @author Fabrizio
@@ -40,7 +40,8 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void noLimitTestMultiThread() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 1000), HYDRO_ONT_WATER_CONCEPTS_COUNT, //
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.CONCEPTS, 1000),
+		HYDRO_ONT_WATER_CONCEPTS_COUNT, //
 		HYDRO_ONT_WATER_LABELS_COUNT, //
 		HYDRO_ONT_WATER_ALT_LABELS_COUNT);//
     }
@@ -58,7 +59,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void concepts1MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 1), 1, -1, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.CONCEPTS, 1), 1, -1, -1);
     }
 
     //
@@ -74,7 +75,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void concepts10MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 10), 10, -1, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.CONCEPTS, 10), 10, -1, -1);
     }
 
     //
@@ -90,7 +91,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void concepts3MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 3), 3, -1, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.CONCEPTS, 3), 3, -1, -1);
     }
 
     //
@@ -106,7 +107,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void concepts17MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 17), 17, -1, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.CONCEPTS, 17), 17, -1, -1);
     }
 
     //
@@ -122,7 +123,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void concepts29MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 29), 29, -1, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.CONCEPTS, 29), 29, -1, -1);
     }
 
     //
@@ -138,7 +139,8 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void concepts40MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.CONCEPTS, 40), HYDRO_ONT_WATER_CONCEPTS_COUNT, -1, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.CONCEPTS, 40),
+		HYDRO_ONT_WATER_CONCEPTS_COUNT, -1, -1);
     }
 
     //
@@ -154,7 +156,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void altLabels1MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.ALT_LABELS, 1), -1, -1, 1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 1), -1, -1, 1);
     }
 
     //
@@ -170,7 +172,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void altLabels11MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.ALT_LABELS, 11), -1, -1, 11);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 11), -1, -1, 11);
     }
 
     //
@@ -186,7 +188,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void altLabels13MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.ALT_LABELS, 13), -1, -1, 13);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 13), -1, -1, 13);
     }
 
     //
@@ -202,7 +204,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void altLabels17MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.ALT_LABELS, 17), -1, -1, 17);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 17), -1, -1, 17);
     }
 
     //
@@ -218,7 +220,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void altLabels18MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.ALT_LABELS, 18), -1, -1, 18);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 18), -1, -1, 18);
     }
 
     //
@@ -234,7 +236,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void altLabels19MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.ALT_LABELS, 19), -1, -1, 19);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 19), -1, -1, 19);
     }
 
     //
@@ -250,7 +252,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void altLabels21MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.ALT_LABELS, 21), -1, -1, HYDRO_ONT_WATER_ALT_LABELS_COUNT);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 21), -1, -1, HYDRO_ONT_WATER_ALT_LABELS_COUNT);
     }
 
     //
@@ -266,7 +268,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void labels1MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.LABELS, 1), 1, 1, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.LABELS, 1), 1, 1, -1);
     }
 
     //
@@ -282,7 +284,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void labels2MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.LABELS, 2), -1, 2, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.LABELS, 2), -1, 2, -1);
     }
 
     //
@@ -298,7 +300,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void labels3MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.LABELS, 3), -1, 3, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.LABELS, 3), -1, 3, -1);
     }
 
     //
@@ -314,7 +316,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void labels5MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.LABELS, 5), -1, 5, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.LABELS, 5), -1, 5, -1);
     }
 
     //
@@ -330,7 +332,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void labels17MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.LABELS, 17), -1, 17, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.LABELS, 17), -1, 17, -1);
     }
 
     //
@@ -346,7 +348,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void labels33MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.LABELS, 33), -1, 33, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.LABELS, 33), -1, 33, -1);
     }
 
     //
@@ -362,7 +364,7 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void labels48MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.LABELS, 48), -1, 48, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.LABELS, 48), -1, 48, -1);
     }
 
     //
@@ -378,7 +380,8 @@ public class FedXExpanderLimitExternalTestIT {
     @Test
     public void labels50MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(), ExpansionLimit.of(LimitTarget.LABELS, 50), -1, HYDRO_ONT_WATER_LABELS_COUNT, -1);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.LABELS, 50), -1,
+		HYDRO_ONT_WATER_LABELS_COUNT, -1);
     }
 
     /**
@@ -391,14 +394,13 @@ public class FedXExpanderLimitExternalTestIT {
      */
     private void test(ThreadMode mode, ExpansionLimit limit, int excConcepts, int excLabels, int excAlt) throws Exception {
 
-	test(new FedXConceptsExpander(), mode, limit, excConcepts, excLabels, excAlt);
-	test(new FedXLevelsExpander(), mode, limit, excConcepts, excLabels, excAlt);
+	test(new DefaultConceptsExpander(), mode, limit, excConcepts, excLabels, excAlt);
     }
 
     /**
      * 
      */
-    private void test(FedXConceptsExpander expander, ThreadMode mode, ExpansionLimit limit, int excConcepts, int excLabels, int excAlt)
+    private void test(DefaultConceptsExpander expander, ThreadMode mode, ExpansionLimit limit, int excConcepts, int excLabels, int excAlt)
 	    throws Exception {
 
 	List<String> ontologyUrls = Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql");
