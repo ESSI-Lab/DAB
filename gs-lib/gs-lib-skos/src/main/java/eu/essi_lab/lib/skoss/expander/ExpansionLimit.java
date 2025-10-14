@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf.requests;
+package eu.essi_lab.lib.skoss.expander;
 
 /*-
  * #%L
@@ -24,44 +24,69 @@ package eu.essi_lab.gssrv.rest.conf.requests;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.option.InputPattern;
-import eu.essi_lab.gssrv.rest.conf.Parameter;
-import eu.essi_lab.model.Queryable.ContentType;
-
 /**
  * @author Fabrizio
  */
-public class ListSourcesRequest extends PutSourceRequest {
+public class ExpansionLimit {
+
+    /**
+     * @author Fabrizio
+     */
+    public enum LimitTarget {
+
+	/**
+	 * 
+	 */
+	CONCEPTS,
+
+	/**
+	 * 
+	 */
+	ALT_LABELS,
+
+	/**
+	 * 
+	 */
+	LABELS;
+    }
+
+    private LimitTarget target;
+    private int limit;
+
+    /**
+     * @param target
+     * @param limit
+     * @return
+     */
+    public static ExpansionLimit of(LimitTarget target, int limit) {
+
+	ExpansionLimit out = new ExpansionLimit();
+	out.target = target;
+	out.limit = limit;
+	return out;
+    }
+
+    /**
+     * @return the target
+     */
+    public LimitTarget getTarget() {
+
+	return target;
+    }
+
+    /**
+     * @return the limit
+     */
+    public int getLimit() {
+
+	return limit;
+    }
 
     /**
      * 
      */
-    public ListSourcesRequest() {
+    private ExpansionLimit() {
+
     }
 
-    /**
-     * @param object
-     */
-    public ListSourcesRequest(JSONObject object) {
-
-	super(object);
-    }
-
-    @Override
-    public List<Parameter> getSupportedParameters() {
-
-	ArrayList<Parameter> list = new ArrayList<>();
-
-	Parameter parameter = Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false);
-	parameter.setMultiValue();
-
-	list.add(parameter);
-
-	return list;
-    }
 }

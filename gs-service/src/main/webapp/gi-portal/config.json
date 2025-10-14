@@ -21,7 +21,7 @@
     "generalTermSearch": true,
     "intendedObservationSpacing": true,
     "aggregationDuration": true,
-    "semanticSearch": true,
+    "semanticSearch": false,
     "semanticSearchValue":1,
 
     "language": "en"

@@ -71,5 +71,34 @@
 			<artifactId>google-api-services-sheets</artifactId>
 		</dependency>
 
+<!-- RDF4J core (API + runtime) -->
+  <dependency>
+    <groupId>org.eclipse.rdf4j</groupId>
+    <artifactId>rdf4j-repository-sparql</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.eclipse.rdf4j</groupId>
+    <artifactId>rdf4j-repository-api</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.eclipse.rdf4j</groupId>
+    <artifactId>rdf4j-query</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.eclipse.rdf4j</groupId>
+    <artifactId>rdf4j-rio-api</artifactId>
+  </dependency>
+
+  <!-- FedX federated SPARQL engine -->
+  <dependency>
+    <groupId>org.eclipse.rdf4j</groupId>
+    <artifactId>rdf4j-tools-federation</artifactId>
+  </dependency>
+  <!-- (Optional) RDF4J tools/utilities if you want console/debugging -->
+
+
 	</dependencies>
 </project>

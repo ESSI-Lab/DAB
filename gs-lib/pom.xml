@@ -24,6 +24,7 @@
 		<module>gs-lib-wof-test</module>
 		<module>gs-lib-eiffel-api</module>
 		<module>gs-lib-sensor-things</module>
+		<module>gs-lib-skos</module>
 	</modules>
 
 </project>

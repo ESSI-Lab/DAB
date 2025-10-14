@@ -46,6 +46,7 @@ import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
 import eu.essi_lab.cfga.gs.setting.GSSourceSetting;
+import eu.essi_lab.cfga.gs.setting.OntologySetting.OntologySettingComponentInfo;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
@@ -521,7 +522,8 @@ public class GSConfigurationView extends ConfigurationView {
 		new HarvestingSettingComponentInfo(), //
 		new SourcesInspector(), //
 		new ConfigUploader(), //
-		new AboutComponentInfo() //
+		new AboutComponentInfo(),
+		new OntologySettingComponentInfo()//
 	);
     }
 

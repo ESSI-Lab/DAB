@@ -120,7 +120,7 @@ public class ConfigurationViewFactory {
 
 	    HorizontalLayout headerLayout = ComponentFactory
 		    .createNoSpacingNoMarginHorizontalLayout("tab-container-header-layout-for-" + tabName);
-	    headerLayout.setHeight("40px");
+	    headerLayout.setHeight("45px");
 	    headerLayout.setWidthFull();
 	    headerLayout.setAlignItems(Alignment.BASELINE);
 	    headerLayout.setId(TAB_HEADER_ID_PREFIX+"_"+tabName);
