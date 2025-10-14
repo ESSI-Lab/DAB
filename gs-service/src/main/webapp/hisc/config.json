@@ -23,7 +23,7 @@
     "generalTermSearch": false,
     "intendedObservationSpacing": true,
     "aggregationDuration": true,
-    "semanticSearch": true,
+    "semanticSearch": false,
     "semanticSearchValue":1,
     "ontology": "his-central",
     "wmsEndpoint": "/gs-service/services/essi/token/his_central-471d6d09-aea8-4603-9de2-9cb696e773e7/view/his-central-shapes/wms",
