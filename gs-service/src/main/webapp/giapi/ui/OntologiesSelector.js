@@ -193,28 +193,32 @@ GIAPI.OntologiesSelector = (() => {
 		const tbody = document.createElement("tbody");
 		data.forEach(item => {
 			
-			const tr = document.createElement("tr");
-			const checkbox = document.createElement("input");
-			
-			checkbox.type = "checkbox";
-			checkbox.checked = selectedIds.has(item.id);
-			checkbox.addEventListener("change", () => {
-				if (checkbox.checked){  					
-					selectedIds.add(item.id);									
-				}else{					
-					selectedIds.delete(item.id);				
-				}				
-			});
-
-			tr.innerHTML = `
-	        <td></td>
-	        <td>${item.name}</td>
-			<td>${item.description ? item.description : ''}</td>
-	        <td>${item.endpoint}</td>
-	      
-	        `;
-			tr.cells[0].appendChild(checkbox);
-			tbody.appendChild(tr);
+			if(item.availability === 'Enabled'){
+									
+				const tr = document.createElement("tr");
+				const checkbox = document.createElement("input");
+				
+				checkbox.type = "checkbox";
+				checkbox.checked = selectedIds.has(item.id);
+				checkbox.addEventListener("change", () => {
+					if (checkbox.checked){  					
+						selectedIds.add(item.id);									
+					}else{					
+						selectedIds.delete(item.id);				
+					}				
+				});
+		
+				tr.innerHTML = `
+		        <td></td>
+		        <td>${item.name}</td>
+				<td>${item.description ? item.description : ''}</td>
+		        <td>${item.endpoint}</td>
+		      
+		        `;
+				tr.cells[0].appendChild(checkbox);
+				tbody.appendChild(tr);
+				
+			}
 		});
 
 		table.appendChild(tbody);
