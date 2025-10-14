@@ -416,13 +416,13 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 			    ColumnDescriptor.createPositionalDescriptor(), //
 
-			    ColumnDescriptor.create("Id", true, true, (s) -> getOntologyId(s)), //
+			    ColumnDescriptor.create("Id", 300, true, true, (s) -> getOntologyId(s)), //
 
-			    ColumnDescriptor.create("Endpoint", 300, true, true, (s) -> getOntologyEndpoint(s)), //
+			    ColumnDescriptor.create("Endpoint", 500, true, true, (s) -> getOntologyEndpoint(s)), //
 
-			    ColumnDescriptor.create("Name", 300, true, true, (s) -> getOntologyName(s)), //
+			    ColumnDescriptor.create("Name", 500, true, true, (s) -> getOntologyName(s)), //
 
-			    ColumnDescriptor.create("Description", 300, true, true, (s) -> getOntologyDescription(s)), //
+			    ColumnDescriptor.create("Description", true, true, (s) -> getOntologyDescription(s)), //
 
 			    ColumnDescriptor.create("Query language", 150, true, true, (s) -> getQueryLanguage(s)), //
 
