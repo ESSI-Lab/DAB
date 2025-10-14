@@ -373,7 +373,6 @@
 	  	
 		const url = new URL(window.location.href);       
 	    const segments = url.pathname.split('/').filter(Boolean);
-	    const query   = window.location.search;
 	    const stationCode = segments[segments.length - 1];
 	
 		</script>
@@ -887,7 +886,9 @@
 				
 			}
 							
-			$.getJSON(stationCode+"/timeseries"+query, function(data) {
+			const queryString = window.location.search; // includes the leading "?" if present
+
+			$.getJSON(stationCode+"/timeseries"+queryString, function(data) {
 				
 				$("#timeseries").removeAttr("class");
 				
