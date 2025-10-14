@@ -115,7 +115,9 @@ public class QueryTask implements Callable<List<SKOSConcept>> {
 
 	} catch (QueryEvaluationException ex) {
 	    // handle the error gracefully (same as your FedX code)
+	    GSLoggerFactory.getLogger(DefaultConceptsExpander.class).error("Error occurred with ontology: {}", endpointUrl);
 	    GSLoggerFactory.getLogger(DefaultConceptsExpander.class).error(ex);
+
 	} finally {
 	    repo.shutDown();
 	}
