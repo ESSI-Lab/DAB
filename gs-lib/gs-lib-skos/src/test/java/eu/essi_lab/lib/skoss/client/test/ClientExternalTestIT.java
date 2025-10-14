@@ -23,7 +23,6 @@ import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
-import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
 

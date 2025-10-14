@@ -3,6 +3,12 @@
  */
 package eu.essi_lab.lib.skoss.finder.impl;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import eu.essi_lab.lib.skoss.QueryTask;
+import eu.essi_lab.lib.skoss.ThreadMode;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -26,15 +32,16 @@ package eu.essi_lab.lib.skoss.finder.impl;
 
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.ConceptsQueryBuilder;
-import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
 
 /**
  * @author Fabrizio
  */
-public abstract class AbstractConceptsFinder implements ConceptsFinder {
+public abstract class AbstractConceptsFinder<T extends QueryTask> implements ConceptsFinder<T> {
 
     private ConceptsQueryBuilder builder;
-    private ConceptsQueryExecutor executor;
+    private ThreadMode threadMode;
+    private boolean traceQuery;
+    private Consumer<T> taskConsumer;
 
     /**
      * 
@@ -42,6 +49,8 @@ public abstract class AbstractConceptsFinder implements ConceptsFinder {
     public AbstractConceptsFinder() {
 
 	setQueryBuilder(new DefaultConceptsQueryBuilder());
+	setThreadMode(ThreadMode.SINGLE());
+	setTraceQuery(false);
     }
 
     /**
@@ -61,18 +70,50 @@ public abstract class AbstractConceptsFinder implements ConceptsFinder {
     }
 
     /**
-     * @return the executor
+     * @return
      */
-    public ConceptsQueryExecutor getExecutor() {
+    public ThreadMode getThreadMode() {
 
-	return executor;
+	return threadMode;
     }
 
     /**
-     * @param executor
+     * @param threadMode
      */
-    public void setExecutor(ConceptsQueryExecutor executor) {
+    public void setThreadMode(ThreadMode threadMode) {
 
-	this.executor = executor;
+	this.threadMode = threadMode;
+    }
+
+    /**
+     * @return
+     */
+    public boolean traceQuery() {
+
+	return traceQuery;
+    }
+
+    /**
+     * @param traceQuery
+     */
+    public void setTraceQuery(boolean traceQuery) {
+
+	this.traceQuery = traceQuery;
+    }
+
+    /**
+     * @return the taskConsumer
+     */
+    public Optional<Consumer<T>> getTaskConsumer() {
+
+	return Optional.ofNullable(taskConsumer);
+    }
+
+    /**
+     * @param taskConsumer the taskConsumer to set
+     */
+    public void setTaskConsumer(Consumer<T> taskConsumer) {
+
+	this.taskConsumer = taskConsumer;
     }
 }

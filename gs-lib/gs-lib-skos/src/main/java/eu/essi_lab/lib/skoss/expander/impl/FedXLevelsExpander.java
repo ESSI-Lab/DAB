@@ -33,23 +33,22 @@ import java.util.concurrent.Executors;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
 import org.eclipse.rdf4j.federated.monitoring.MonitoringUtil;
-import org.eclipse.rdf4j.federated.repository.FedXRepositoryConnection;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
 
+import eu.essi_lab.lib.skoss.QueryTask;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
-import eu.essi_lab.lib.skoss.fedx.FedXEngine;
-import eu.essi_lab.lib.skoss.fedx.QueryBinding;
+import eu.essi_lab.lib.skoss.rdf4j.FedXEngine;
+import eu.essi_lab.lib.skoss.rdf4j.QueryBinding;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
-public class FedXLevelsExpander extends FedXConceptsExpander {
+public class FedXLevelsExpander<T> extends FedXConceptsExpander<QueryTask> {
 
     private List<String> ontologyUrls;
 
@@ -64,7 +63,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //
 	    List<String> searchLangs, //
-	    List<SKOSSemanticRelation> expansionRelations, //
+	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel targetLevel, //
 	    ExpansionLimit limit) throws Exception {
 
@@ -105,7 +104,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 		executor, //
 		fatherConcepts, //
 		searchLangs, //
-		expansionRelations, //
+		relations, //
 		visited, //
 		results, //
 		targetLevel, //

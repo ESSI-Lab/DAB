@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.essi_lab.lib.skoss.QueryTask;
 import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
@@ -41,12 +42,9 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 /**
  * @author Fabrizio
  */
-public class FedXConceptsFinder extends AbstractConceptsFinder {
+public class FedXConceptsFinder<T> extends AbstractConceptsFinder<QueryTask> {
 
-    /**
-     * 
-     */
-    private ThreadMode threadMode;
+    private ConceptsQueryExecutor executor;
 
     /**
      *  
@@ -115,18 +113,19 @@ public class FedXConceptsFinder extends AbstractConceptsFinder {
     }
 
     /**
-     * @return
+     * @return the executor
      */
-    public ThreadMode getThreadMode() {
+    public ConceptsQueryExecutor getExecutor() {
 
-	return threadMode;
+	return executor;
     }
 
     /**
-     * @param threadMode
+     * @param executor
      */
-    public void setThreadMode(ThreadMode threadMode) {
+    public void setExecutor(ConceptsQueryExecutor executor) {
 
-	this.threadMode = threadMode;
+	this.executor = executor;
     }
+
 }

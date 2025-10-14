@@ -26,7 +26,6 @@ import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
-import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
 
 /**
  * Tests the SKOSClient on the hydro ontology concepts e.g.:

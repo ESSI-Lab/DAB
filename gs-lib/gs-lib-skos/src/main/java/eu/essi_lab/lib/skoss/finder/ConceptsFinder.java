@@ -25,12 +25,15 @@ package eu.essi_lab.lib.skoss.finder;
  */
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import eu.essi_lab.lib.skoss.QueryTask;
 
 /**
  * @author Fabrizio
  */
-@FunctionalInterface
-public interface ConceptsFinder {
+public interface ConceptsFinder<T extends QueryTask> {
 
     /**
      * @param searchTerm
@@ -43,4 +46,12 @@ public interface ConceptsFinder {
 	    String searchTerm, //
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs) throws Exception;
+
+    /**
+     * @return
+     */
+    default Optional<Consumer<T>> getTaskConsumer() {
+
+	return Optional.empty();
+    }
 }

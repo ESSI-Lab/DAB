@@ -26,6 +26,7 @@ package eu.essi_lab.lib.skoss;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 /**
  * @author Fabrizio
@@ -51,7 +52,7 @@ public abstract class ThreadMode {
     /**
      * @return
      */
-    public static ThreadMode MULTI(ExecutorService executor) {
+    public static ThreadMode MULTI(Supplier<ExecutorService> executor) {
 
 	return new MultiThreadMode(executor);
     }
@@ -67,7 +68,7 @@ public abstract class ThreadMode {
      */
     public static class MultiThreadMode extends ThreadMode {
 
-	private ExecutorService executor;
+	private Supplier<ExecutorService> executor;
 
 	/**
 	 * @param executor
@@ -78,7 +79,7 @@ public abstract class ThreadMode {
 	/**
 	 * @param executor
 	 */
-	MultiThreadMode(ExecutorService executor) {
+	MultiThreadMode(Supplier<ExecutorService> executor) {
 
 	    this.executor = executor;
 	}
@@ -88,7 +89,7 @@ public abstract class ThreadMode {
 	 */
 	public ExecutorService getExecutor() {
 
-	    return executor == null ? Executors.newVirtualThreadPerTaskExecutor() : executor;
+	    return executor == null ? Executors.newVirtualThreadPerTaskExecutor() : executor.get();
 	}
     }
 }

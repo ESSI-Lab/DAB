@@ -3,8 +3,6 @@
  */
 package eu.essi_lab.lib.skoss.expander;
 
-import java.util.AbstractMap.SimpleEntry;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -29,15 +27,16 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
+import eu.essi_lab.lib.skoss.QueryTask;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
 
 /**
  * @author Fabrizio
  */
-@FunctionalInterface
-public interface ConceptsExpander {
+public interface ConceptsExpander<T extends QueryTask> {
 
     /**
      * @author Fabrizio
@@ -112,7 +111,7 @@ public interface ConceptsExpander {
      * @param ontologyUrls
      * @param sourceLangs
      * @param searchLangs
-     * @param expansionRelations
+     * @param relations
      * @param targetLevel
      * @param limit
      * @return
@@ -123,7 +122,15 @@ public interface ConceptsExpander {
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //
 	    List<String> searchLangs, //
-	    List<SKOSSemanticRelation> expansionRelations, //
+	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel targetLevel, //
 	    ExpansionLimit limit) throws Exception;
+
+    /**
+     * @return
+     */
+    default Optional<Consumer<T>> getTaskConsumer(){
+
+	return Optional.empty();
+    }
 }

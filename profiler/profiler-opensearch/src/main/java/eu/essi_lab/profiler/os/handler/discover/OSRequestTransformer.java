@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,9 +47,12 @@ import eu.essi_lab.lib.odip.rosetta.RosettaStone;
 import eu.essi_lab.lib.odip.rosetta.RosettaStoneConnector;
 import eu.essi_lab.lib.skoss.SKOSClient;
 import eu.essi_lab.lib.skoss.SKOSResponse;
+import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
+import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
+import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -1054,7 +1058,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		    ConfigurationWrapper.getOntologySettings().//
 			    stream().//
 			    filter(set -> ids.contains(set.getOntologyId())).//
-			    map(set -> set.getOntologyEndpoint()).toList());
+			    map(set -> set.getOntologyEndpoint()).//
+			    toList());
 
 	    client.setExpansionLevel(ExpansionLevel.MEDIUM);
 	    client.setExpansionLimit(ExpansionLimit.of(LimitTarget.LABELS, 50));
@@ -1062,6 +1067,28 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    client.setExpansionsRelations(SKOSClient.DEFAULT_RELATIONS);
 	    client.setSearchLangs(SKOSClient.DEFAULT_SEARCH_LANGS);
 	    client.setSourceLangs(SKOSClient.DEFAULT_SOURCE_LANGS);
+
+	    //
+	    //
+	    //
+
+	    DefaultConceptsFinder finder = new DefaultConceptsFinder();
+	    finder.setTraceQuery(true);
+	    finder.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
+//	    finder.setTaskConsumer((task) -> System.out.println(task));
+
+	    client.setFinder(new DefaultConceptsFinder());
+
+	    DefaultConceptsExpander expander = new DefaultConceptsExpander();
+	    expander.setTraceQuery(true);
+	    expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // 4 threads per level
+//	    expander.setTaskConsumer((task) -> System.out.println(task));
+
+	    client.setExpander(expander);
+
+	    //
+	    //
+	    //
 
 	    try {
 

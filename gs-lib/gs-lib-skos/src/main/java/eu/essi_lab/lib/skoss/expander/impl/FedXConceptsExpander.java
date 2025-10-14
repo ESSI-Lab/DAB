@@ -37,13 +37,11 @@ import java.util.concurrent.Executors;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
 import org.eclipse.rdf4j.federated.monitoring.MonitoringUtil;
-import org.eclipse.rdf4j.federated.repository.FedXRepository;
-import org.eclipse.rdf4j.federated.repository.FedXRepositoryConnection;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
 
+import eu.essi_lab.lib.skoss.QueryTask;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
@@ -51,14 +49,14 @@ import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
-import eu.essi_lab.lib.skoss.fedx.FedXEngine;
-import eu.essi_lab.lib.skoss.fedx.QueryBinding;
+import eu.essi_lab.lib.skoss.rdf4j.FedXEngine;
+import eu.essi_lab.lib.skoss.rdf4j.QueryBinding;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio
  */
-public class FedXConceptsExpander extends AbstractConceptsExpander {
+public class FedXConceptsExpander<T> extends AbstractConceptsExpander<QueryTask> {
 
     protected ThreadMode threadMode;
     protected FedXConfig engineConfig;
@@ -196,7 +194,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
      * @param concept
      * @param conn
      * @param searchLangs
-     * @param expansionRelations
+     * @param relations
      * @param targetLevel
      * @param visited
      * @param results
@@ -209,7 +207,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    ExecutorService executor, //
 	    SimpleEntry<String, String> fatherConcept, //
 	    List<String> searchLangs, //
-	    List<SKOSSemanticRelation> expansionRelations, //
+	    List<SKOSSemanticRelation> relations, //
 	    Set<String> visited, //
 	    List<SKOSConcept> results, //
 	    ExpansionLevel targetLevel, //
@@ -250,7 +248,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 	    String query = getQueryBuilder().build(//
 		    concepts, //
 		    searchLangs, //
-		    expansionRelations, //
+		    relations, //
 		    targetLevel, //
 		    currentLevel);
 
@@ -321,7 +319,7 @@ public class FedXConceptsExpander extends AbstractConceptsExpander {
 			    executor, //
 			    new SimpleEntry<String, String>(concept, expanded), //
 			    searchLangs, //
-			    expansionRelations, //
+			    relations, //
 			    visited, //
 			    results, //
 			    targetLevel, //

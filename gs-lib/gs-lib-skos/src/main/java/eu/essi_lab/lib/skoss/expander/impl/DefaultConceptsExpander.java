@@ -39,14 +39,27 @@ import java.util.stream.Collectors;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.expander.ConceptsExpander;
+import eu.essi_lab.lib.skoss.ThreadMode;
+import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
+import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
+import eu.essi_lab.lib.skoss.expander.ExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
+import eu.essi_lab.lib.skoss.rdf4j.RDF4JQueryTask;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author boldrini
  */
-public class DefaultConceptsExpander implements ConceptsExpander {
+public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQueryTask> {
+
+    /**
+     * 
+     */
+    public DefaultConceptsExpander() {
+
+	setQueryBuilder(new MultipleExpandConceptsQueryBuilder());
+	setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
+    }
 
     @Override
     public SKOSResponse expand(//
@@ -54,7 +67,7 @@ public class DefaultConceptsExpander implements ConceptsExpander {
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //
 	    List<String> searchLangs, //
-	    List<SKOSSemanticRelation> expansionRelations, //
+	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel targetLevel, //
 	    ExpansionLimit limit) throws Exception {
 
@@ -68,29 +81,44 @@ public class DefaultConceptsExpander implements ConceptsExpander {
 
 	for (int i = 0; i <= targetLevel.getValue(); i++) {
 
-	    ExecutorService executor = Executors.newFixedThreadPool(4);
+	    ExecutorService executor = switch (getThreadMode()) {
+	    case MultiThreadMode multi -> multi.getExecutor();
+	    case SingleThreadMode single -> Executors.newSingleThreadExecutor();
+	    default -> throw new IllegalArgumentException();// no way
+	    };
 
 	    List<Callable<List<SKOSConcept>>> tasks = new ArrayList<>();
 
-	    MultipleExpandConceptsQueryBuilder builder = new MultipleExpandConceptsQueryBuilder();
+	    List<SKOSConcept> queryConcepts = new ArrayList<SKOSConcept>();
 
-	    List<SKOSConcept>queryConcepts = new ArrayList<SKOSConcept>();
-	    
 	    for (SKOSConcept currentLevelResult : currentLevelResults) {
+
 		Set<String> expandeds = currentLevelResult.getExpanded();
+
 		for (String expanded : expandeds) {
+
 		    SKOSConcept sc = SKOSConcept.of(expanded);
+
 		    sc.getExpandedFrom().add(currentLevelResult.getConcept());
-		    queryConcepts.add(sc );
+		    queryConcepts.add(sc);
 		}
 	    }
-	    
+
 	    List<String> queryConceptsURIs = queryConcepts.stream().map(SKOSConcept::getConcept).collect(Collectors.toList());
 
-	    String query = builder.build(queryConceptsURIs, searchLangs, expansionRelations, ExpansionLevel.HIGH, ExpansionLevel.NONE);
+	    ExpandConceptsQueryBuilder builder = getQueryBuilder();
+
+	    String query = builder.build(queryConceptsURIs, searchLangs, relations, ExpansionLevel.HIGH, ExpansionLevel.NONE);
+
+	    if (traceQuery()) {
+		GSLoggerFactory.getLogger(getClass()).trace("\n" + query);
+	    }
 
 	    for (String ontologyURL : ontologyUrls) {
-		Callable<List<SKOSConcept>> task = new QueryTask(ontologyURL, query, queryConcepts);
+
+		RDF4JQueryTask task = new RDF4JQueryTask(ontologyURL, query, queryConcepts);
+
+		getTaskConsumer().ifPresent(consumer -> consumer.accept(task));
 
 		tasks.add(task);
 	    }
@@ -104,19 +132,23 @@ public class DefaultConceptsExpander implements ConceptsExpander {
 		    currentLevelResults.addAll(future.get());
 		}
 
-	    } catch (InterruptedException | ExecutionException e) {
-		e.printStackTrace();
+	    } catch (InterruptedException | ExecutionException ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
+
 	    } finally {
+
 		executor.shutdown();
 	    }
 
 	    results.addAll(currentLevelResults);
-
 	}
 
 	SKOSResponse ret = SKOSResponse.of(results);
 
-	return SKOSResponse.of(ret.getAggregatedResults());
+	GSLoggerFactory.getLogger(getClass()).debug("Epanding concepts ENDED");
 
+	return SKOSResponse.of(ret.getAggregatedResults());
     }
+
 }

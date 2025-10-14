@@ -4,60 +4,32 @@
 package eu.essi_lab.lib.skoss.finder.impl;
 
 import java.util.ArrayList;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import eu.essi_lab.lib.skoss.SKOSConcept;
-import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
-import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skoss.expander.impl.MultipleExpandConceptsQueryBuilder;
-import eu.essi_lab.lib.skoss.expander.impl.QueryTask;
-import eu.essi_lab.lib.skoss.finder.ConceptsQueryBuilder;
-import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
+import eu.essi_lab.lib.skoss.rdf4j.RDF4JQueryTask;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author boldrini
  */
-public class DefaultConceptsFinder extends AbstractConceptsFinder {
+public class DefaultConceptsFinder extends AbstractConceptsFinder<RDF4JQueryTask> {
 
+    /**
+     * 
+     */
     public DefaultConceptsFinder() {
 
+	setQueryBuilder(new DefaultConceptsQueryBuilder());
+	setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
     }
 
     @Override
@@ -65,18 +37,25 @@ public class DefaultConceptsFinder extends AbstractConceptsFinder {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Finding concepts STARTED");
 
-	ExecutorService executor = Executors.newFixedThreadPool(4);
+	ExecutorService executor = switch (getThreadMode()) {
+	case MultiThreadMode multi -> multi.getExecutor();
+	case SingleThreadMode single -> Executors.newSingleThreadExecutor();
+	default -> throw new IllegalArgumentException();// no way
+	};
 
-	List<SKOSConcept> queryConcepts = new ArrayList<SKOSConcept>();
+	String query = getQueryBuilder().build(searchTerm, sourceLangs);
 
-	DefaultConceptsQueryBuilder builder = new DefaultConceptsQueryBuilder();
-
-	String query = builder.build(searchTerm, sourceLangs);
+	if (traceQuery()) {
+	    GSLoggerFactory.getLogger(getClass()).trace("\n" + query);
+	}
 
 	List<Callable<List<SKOSConcept>>> tasks = new ArrayList<>();
 
 	for (String ontologyURL : ontologyUrls) {
-	    Callable<List<SKOSConcept>> task = new QueryTask(ontologyURL, query, null);
+
+	    RDF4JQueryTask task = new RDF4JQueryTask(ontologyURL, query, null);
+
+	    getTaskConsumer().ifPresent(consumer -> consumer.accept(task));
 
 	    tasks.add(task);
 	}
@@ -90,21 +69,23 @@ public class DefaultConceptsFinder extends AbstractConceptsFinder {
 		results.addAll(future.get());
 	    }
 
-	} catch (InterruptedException | ExecutionException e) {
-	    e.printStackTrace();
+	} catch (InterruptedException | ExecutionException ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
 	} finally {
+
 	    executor.shutdown();
 	}
 
 	results.addAll(results);
 
-	 List<String> out = results.stream().map(c->c.getConcept()).toList();
+	List<String> out = results.stream().map(c -> c.getConcept()).toList();
 
-	// GSLoggerFactory.getLogger(getClass()).debug("Concepts found: {}", out.size());
+	GSLoggerFactory.getLogger(getClass()).debug("Found {} concepts: \n{}", out.size(), out);
 
-	// out.forEach(con -> GSLoggerFactory.getLogger(getClass()).debug("{}", con));
+	GSLoggerFactory.getLogger(getClass()).debug("Finding concepts ENDED");
 
 	return out;
     }
-
 }

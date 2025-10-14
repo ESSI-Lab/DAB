@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.skoss.expander.impl;
+package eu.essi_lab.lib.skoss.rdf4j;
 
 /*-
  * #%L
@@ -36,32 +36,54 @@ import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 
+import eu.essi_lab.lib.skoss.QueryTask;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
-import eu.essi_lab.lib.skoss.fedx.QueryBinding;
+import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
-public class QueryTask implements Callable<List<SKOSConcept>> {
+/**
+ * @author boldrini
+ */
+public class RDF4JQueryTask implements Callable<List<SKOSConcept>>, QueryTask {
+
+    static {
+
+	System.setProperty("rdf4j.sparql.url.maxlength", String.valueOf(Integer.MAX_VALUE));
+    }
 
     private String ontologyURL;
     private String query;
+    private List<SKOSConcept> currentLevelResults;
 
-    public QueryTask(String ontologyURL, String query, List<SKOSConcept> currentLevelResults) {
+    /**
+     * @param ontologyURL
+     * @param query
+     * @param currentLevelResults
+     */
+    public RDF4JQueryTask(String ontologyURL, String query, List<SKOSConcept> currentLevelResults) {
 	super();
 	this.ontologyURL = ontologyURL;
 	this.query = query;
 	this.currentLevelResults = currentLevelResults;
     }
 
-    private List<SKOSConcept> currentLevelResults;
-
     @Override
     public List<SKOSConcept> call() throws Exception {
-	SKOSResponse ret = querySingleOntology(ontologyURL, query, currentLevelResults);
+
+	SKOSResponse ret = query(ontologyURL, query, currentLevelResults);
 	return ret.getAggregatedResults();
     }
 
-    private SKOSResponse querySingleOntology(String endpointUrl, String query, List<SKOSConcept> concepts) {
+    /**
+     * @param endpointUrl
+     * @param query
+     * @param concepts
+     * @return
+     */
+    @Override
+    public SKOSResponse query(String endpointUrl, String query, List<SKOSConcept> concepts) {
+
 	List<SKOSConcept> tmpResults = new ArrayList<>();
 	SKOSResponse tmpResponse = SKOSResponse.of(tmpResults);
 
@@ -69,7 +91,6 @@ public class QueryTask implements Callable<List<SKOSConcept>> {
 	    return tmpResponse;
 	}
 
-	// Create a SPARQLRepository for a single endpoint
 	Repository repo = new SPARQLRepository(endpointUrl);
 	repo.init();
 
@@ -114,11 +135,12 @@ public class QueryTask implements Callable<List<SKOSConcept>> {
 	    }
 
 	} catch (QueryEvaluationException ex) {
-	    // handle the error gracefully (same as your FedX code)
+
 	    GSLoggerFactory.getLogger(DefaultConceptsExpander.class).error("Error occurred with ontology: {}", endpointUrl);
 	    GSLoggerFactory.getLogger(DefaultConceptsExpander.class).error(ex);
 
 	} finally {
+
 	    repo.shutDown();
 	}
 

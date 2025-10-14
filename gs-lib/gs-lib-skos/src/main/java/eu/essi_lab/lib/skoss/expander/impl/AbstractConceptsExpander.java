@@ -3,6 +3,12 @@
  */
 package eu.essi_lab.lib.skoss.expander.impl;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import eu.essi_lab.lib.skoss.QueryTask;
+import eu.essi_lab.lib.skoss.ThreadMode;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -30,10 +36,12 @@ import eu.essi_lab.lib.skoss.expander.ExpandConceptsQueryBuilder;
 /**
  * @author Fabrizio
  */
-public abstract class AbstractConceptsExpander implements ConceptsExpander {
+public abstract class AbstractConceptsExpander<T extends QueryTask> implements ConceptsExpander<T> {
 
     private ExpandConceptsQueryBuilder builder;
+    private ThreadMode threadMode;
     private boolean traceQuery;
+    private Consumer<T> taskConsumer;
 
     /**
      * 
@@ -74,4 +82,37 @@ public abstract class AbstractConceptsExpander implements ConceptsExpander {
 
 	this.traceQuery = traceQuery;
     }
+
+    /**
+     * @return
+     */
+    public ThreadMode getThreadMode() {
+
+	return threadMode;
+    }
+
+    /**
+     * @param threadMode
+     */
+    public void setThreadMode(ThreadMode threadMode) {
+
+	this.threadMode = threadMode;
+    }
+
+    /**
+     * @return the taskConsumer
+     */
+    public Optional<Consumer<T>> getTaskConsumer() {
+
+	return Optional.ofNullable(taskConsumer);
+    }
+
+    /**
+     * @param taskConsumer the taskConsumer to set
+     */
+    public void setTaskConsumer(Consumer<T> taskConsumer) {
+
+	this.taskConsumer = taskConsumer;
+    }
+
 }

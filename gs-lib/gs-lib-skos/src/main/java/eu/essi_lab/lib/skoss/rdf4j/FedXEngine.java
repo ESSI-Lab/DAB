@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss.fedx;
+package eu.essi_lab.lib.skoss.rdf4j;
 
 /*-
  * #%L
