@@ -31,9 +31,9 @@ import eu.essi_lab.lib.skoss.expander.ConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
-import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
+import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
-import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
+import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
 
 /**
  * @author Fabrizio
@@ -79,8 +79,8 @@ public class SKOSClient {
 	setSearchLangs(DEFAULT_SEARCH_LANGS);
 	setSourceLangs(DEFAULT_SOURCE_LANGS);
 
-	setFinder(new FedXConceptsFinder());
-	setExpander(new FedXConceptsExpander());
+	setFinder(new DefaultConceptsFinder());
+	setExpander(new DefaultConceptsExpander());
     }
 
     /**
