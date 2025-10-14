@@ -14,10 +14,17 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>gs-lib-odip</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-skos</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>gs-lib-what3words</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>		 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>

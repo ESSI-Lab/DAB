@@ -44,6 +44,11 @@ import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.odip.rosetta.RosettaStone;
 import eu.essi_lab.lib.odip.rosetta.RosettaStoneConnector;
+import eu.essi_lab.lib.skoss.SKOSClient;
+import eu.essi_lab.lib.skoss.SKOSResponse;
+import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -84,9 +89,6 @@ import eu.essi_lab.profiler.os.OSRequestParser;
 import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeDiscoveryHandler;
 import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeOptionsReader;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHelper;
-import eu.essi_lab.profiler.os.handler.discover.semantics.connectors.GemetWebApiConnector;
-import eu.essi_lab.profiler.os.handler.discover.semantics.expander.SemanticExpansion;
-import eu.essi_lab.profiler.os.handler.discover.semantics.expander.SemanticsExpander;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
 
 /**
@@ -1040,35 +1042,60 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    String semanticSearch, //
 	    String ontologyids) {
 
-	if (semanticSearch != null && !semanticSearch.equals("true") && ontologyids != null && !ontologyids.isEmpty()) {
+	if (semanticSearch != null && semanticSearch.equals("true") && ontologyids != null && !ontologyids.isEmpty()) {
 
-	    GemetWebApiConnector gemetConnector = new GemetWebApiConnector();
-	    SemanticsExpander expander = new SemanticsExpander(gemetConnector);
-	    SemanticExpansion expansion = SemanticExpansion.NARROWER;
+	    SKOSClient client = new SKOSClient();
 
-	    if (semanticSearch.equalsIgnoreCase("sameas-narrow"))
-		expansion = SemanticExpansion.NARROWER_CLOSE_MATCH;
-	    // languages of matched concepts
-	    List<String> expandedTerms = expander.expandSearchTerm(searchTerm, expansion, Arrays.asList("it"));
-	    List<Bond> expandedBonds = new ArrayList<>();
-	    expandedTerms.forEach(term -> {
-		createFieldsBond(expandedBonds, searchFields, term, null, null);
-	    });
+	    client.setSearchTerm(searchTerm);
 
-	    switch (expandedBonds.size()) {
-	    case 0:
-		// This should never happen, in any I put break to keep going with the usual creating (no semantic
-		// expansion)
-		break;
-	    case 1:
-		innerBonds.add(expandedBonds.get(0));
-		break;
-	    default:
-		innerBonds.add(BondFactory.createOrBond(expandedBonds));
-		break;
+	    List<String> ids = Arrays.asList(ontologyids.split(" AND "));
+
+	    client.setOntologyUrls(//
+		    ConfigurationWrapper.getOntologySettings().//
+			    stream().//
+			    filter(set -> ids.contains(set.getOntologyId())).//
+			    map(set -> set.getOntologyEndpoint()).toList());
+
+	    client.setExpansionLevel(ExpansionLevel.MEDIUM);
+	    client.setExpansionLimit(ExpansionLimit.of(LimitTarget.LABELS, 50));
+
+	    client.setExpansionsRelations(SKOSClient.DEFAULT_RELATIONS);
+	    client.setSearchLangs(SKOSClient.DEFAULT_SEARCH_LANGS);
+	    client.setSourceLangs(SKOSClient.DEFAULT_SOURCE_LANGS);
+
+	    try {
+
+		SKOSResponse response = client.search();
+
+		List<String> expandedTerms = response.getLabels();
+
+		GSLoggerFactory.getLogger(getClass()).debug("Found {} expanded terms: \n{}", expandedTerms.size(),
+			expandedTerms.toString().replace("[", "").replace("]", ""));
+
+		List<Bond> expandedBonds = new ArrayList<>();
+
+		expandedTerms.forEach(term -> createFieldsBond(expandedBonds, searchFields, term, null, null));
+
+		switch (expandedBonds.size()) {
+		case 0:
+		    // This should never happen, in any I put break to keep going with the usual creating (no semantic
+		    // expansion)
+		    break;
+		case 1:
+		    innerBonds.add(expandedBonds.get(0));
+		    break;
+		default:
+		    innerBonds.add(BondFactory.createOrBond(expandedBonds));
+		    break;
+		}
+
+		return;
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
 	    }
 
-	    return;
 	}
 
 	ArrayList<Bond> operands = new ArrayList<>();
