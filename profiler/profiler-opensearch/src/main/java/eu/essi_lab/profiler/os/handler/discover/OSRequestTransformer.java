@@ -1,5 +1,19 @@
 package eu.essi_lab.profiler.os.handler.discover;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.ws.rs.core.MediaType;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -22,15 +36,23 @@ package eu.essi_lab.profiler.os.handler.discover;
  */
 
 import com.google.common.collect.Lists;
+
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
-import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.odip.rosetta.RosettaStone;
 import eu.essi_lab.lib.odip.rosetta.RosettaStoneConnector;
+import eu.essi_lab.lib.skoss.SKOSClient;
+import eu.essi_lab.lib.skoss.SKOSResponse;
+import eu.essi_lab.lib.skoss.ThreadMode;
+import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
+import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
+import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
+import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -71,21 +93,7 @@ import eu.essi_lab.profiler.os.OSRequestParser;
 import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeDiscoveryHandler;
 import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeOptionsReader;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHelper;
-import eu.essi_lab.profiler.os.handler.discover.semantics.connectors.GemetWebApiConnector;
-import eu.essi_lab.profiler.os.handler.discover.semantics.expander.SemanticExpansion;
-import eu.essi_lab.profiler.os.handler.discover.semantics.expander.SemanticsExpander;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.ws.rs.core.MediaType;
 
 /**
  * @author Fabrizio
@@ -292,7 +300,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		return message;
 	    }
 
-	    String outputFormat = parser.parse(OSParameters.OUTPUT_FORMAT);	    
+	    String outputFormat = parser.parse(OSParameters.OUTPUT_FORMAT);
 	    if (outputFormat != null && !outputFormat.equals("")) {
 		if (outputFormat.equals("application/atom xml")) {
 		    outputFormat = MediaType.APPLICATION_ATOM_XML;
@@ -321,7 +329,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 			DiscoveryMessage.EiffelAPIDiscoveryOption.FILTER_AND_SORT.name())
 			|| eiffelDiscoveryOption.equals(//
-			DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
+				DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
 
 		if (!supported) {
 
@@ -373,8 +381,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	ArrayList<Bond> bondList = new ArrayList<>();
 
 	String rosetta = parser.parse(OSParameters.ROSETTA);
-	String semantics = parser.parse(OSParameters.SEMANTICS);
-	String ontology = parser.parse(OSParameters.ONTOLOGY);
+	String semantics = parser.parse(OSParameters.SEMANTIC_SEARCH);
+	String ontology = parser.parse(OSParameters.ONTOLOGY_IDS);
 
 	//
 	// search terms are NOT included in case of Eiffel SORT_AND_FILTER
@@ -443,7 +451,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			osParameter.equals(OSParameters.PLATFORM_IDENTIFIER) || //
 			osParameter.equals(OSParameters.ORIGINATOR_ORGANISATION_IDENTIFIER) || //
 			osParameter.equals(OSParameters.ATTRIBUTE_IDENTIFIER)) && ( //
-			rosetta != null && !rosetta.equals("false") && value != null)) {
+		rosetta != null && !rosetta.equals("false") && value != null)) {
 
 		    value = handleRosetta(rosetta, value);
 		}
@@ -652,8 +660,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      */
     private void handleSemanticsAndOntology(List<Bond> bondList, String value, String semantics, String ontology) {
 
-	Bond semantic = Semantics.getSemanticBond(value,semantics,ontology);
-	if (semantic!=null) {
+	Bond semantic = Semantics.getSemanticBond(value, semantics, ontology);
+	if (semantic != null) {
 	    bondList.add(semantic);
 	}
     }
@@ -834,7 +842,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
      * <html> <head> <style> table { font-family: arial, sans-serif;
-     * border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd; text-align: left; padding: 8px; } </style> </head>
+     * border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+     * </style> </head>
      * <body>
      * <table>
      * <tr>
@@ -1008,7 +1017,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    for (String searchTerm : terms) {
 
 		createFieldsBond(innerBonds, searchFields, searchTerm, semantics, ontology);
-
 	    }
 
 	    switch (innerBonds.size()) {
@@ -1024,37 +1032,97 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	return null;
     }
 
-    private void createFieldsBond(List<Bond> innerBonds, String searchFields, String searchTerm, String semantics,
-	    String ontology) {
+    /**
+     * @param innerBonds
+     * @param searchFields
+     * @param searchTerm
+     * @param semanticSearch
+     * @param ontologyids
+     */
+    private void createFieldsBond(//
+	    List<Bond> innerBonds, //
+	    String searchFields, //
+	    String searchTerm, //
+	    String semanticSearch, //
+	    String ontologyids) {
 
-	if (semantics != null && !semantics.isEmpty() && ontology != null && !ontology.isEmpty()) {
+	if (semanticSearch != null && semanticSearch.equals("true") && ontologyids != null && !ontologyids.isEmpty()) {
 
-	    GemetWebApiConnector gemetConnector = new GemetWebApiConnector();
-	    SemanticsExpander expander = new SemanticsExpander(gemetConnector);
-	    SemanticExpansion expansion = SemanticExpansion.NARROWER;
+	    SKOSClient client = new SKOSClient();
 
-	    if (semantics.equalsIgnoreCase("sameas-narrow"))
-		expansion = SemanticExpansion.NARROWER_CLOSE_MATCH;
-	    // languages of matched concepts
-	    List<String> expandedTerms = expander.expandSearchTerm(searchTerm, expansion, Arrays.asList("it"));
-	    List<Bond> expandedBonds = new ArrayList<>();
-	    expandedTerms.forEach(term -> {
-		createFieldsBond(expandedBonds, searchFields, term, null, null);
-	    });
+	    client.setSearchTerm(searchTerm);
 
-	    switch (expandedBonds.size()) {
-	    case 0:
-		//This should never happen, in any I put break to keep going with the usual creating (no semantic expansion)
-		break;
-	    case 1:
-		innerBonds.add(expandedBonds.get(0));
-		break;
-	    default:
-		innerBonds.add(BondFactory.createOrBond(expandedBonds));
-		break;
+	    List<String> ids = Arrays.asList(ontologyids.split(" AND "));
+
+	    client.setOntologyUrls(//
+		    ConfigurationWrapper.getOntologySettings().//
+			    stream().//
+			    filter(set -> ids.contains(set.getOntologyId())).//
+			    map(set -> set.getOntologyEndpoint()).//
+			    toList());
+
+	    client.setExpansionLevel(ExpansionLevel.MEDIUM);
+	    client.setExpansionLimit(ExpansionLimit.of(LimitTarget.LABELS, 50));
+
+	    client.setExpansionsRelations(SKOSClient.DEFAULT_RELATIONS);
+	    client.setSearchLangs(SKOSClient.DEFAULT_SEARCH_LANGS);
+	    client.setSourceLangs(SKOSClient.DEFAULT_SOURCE_LANGS);
+
+	    //
+	    //
+	    //
+
+	    DefaultConceptsFinder finder = new DefaultConceptsFinder();
+	    finder.setTraceQuery(true);
+	    finder.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
+//	    finder.setTaskConsumer((task) -> System.out.println(task));
+
+	    client.setFinder(new DefaultConceptsFinder());
+
+	    DefaultConceptsExpander expander = new DefaultConceptsExpander();
+	    expander.setTraceQuery(true);
+	    expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // 4 threads per level
+//	    expander.setTaskConsumer((task) -> System.out.println(task));
+
+	    client.setExpander(expander);
+
+	    //
+	    //
+	    //
+
+	    try {
+
+		SKOSResponse response = client.search();
+
+		List<String> expandedTerms = response.getLabels();
+
+		GSLoggerFactory.getLogger(getClass()).debug("Found {} expanded terms: \n{}", expandedTerms.size(),
+			expandedTerms.toString().replace("[", "").replace("]", ""));
+
+		List<Bond> expandedBonds = new ArrayList<>();
+
+		expandedTerms.forEach(term -> createFieldsBond(expandedBonds, searchFields, term, null, null));
+
+		switch (expandedBonds.size()) {
+		case 0:
+		    // This should never happen, in any I put break to keep going with the usual creating (no semantic
+		    // expansion)
+		    break;
+		case 1:
+		    innerBonds.add(expandedBonds.get(0));
+		    break;
+		default:
+		    innerBonds.add(BondFactory.createOrBond(expandedBonds));
+		    break;
+		}
+
+		return;
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
 	    }
 
-	    return;
 	}
 
 	ArrayList<Bond> operands = new ArrayList<>();

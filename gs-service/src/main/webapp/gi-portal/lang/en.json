@@ -205,7 +205,7 @@
   "select_observation_spacing": "Select observation spacing",
   "select_aggregation_duration": "Select aggregation duration",
   
-  "sameas-narrow-text": "Semantic search w/ translations and narrow matches",
+  "semantic-search-text": "Semantic search w/ translations and narrow matches",
   "basic-text": "Basic search by exact term",
   "ontology-search-help": "Exact search or semantic search with ontology support for translations and narrower terms.<br/>Please check the online ontology browser for possible terms:<br/>",
   

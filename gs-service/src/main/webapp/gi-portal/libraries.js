@@ -64,4 +64,5 @@ import '../giapi/ui/SourcesWidget.js'
 import '../giapi/ui/TermFrequencyWidget.js'
 import '../giapi/ui/ToggleButton.js'
 import '../giapi/ui/UI_Utils.js'
-import '../giapi/ui/UINode.js'//
+import '../giapi/ui/UINode.js'
+import '../giapi/ui/OntologiesSelector.js'

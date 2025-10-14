@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf.requests;
+package eu.essi_lab.lib.skoss.rdf4j;
 
 /*-
  * #%L
@@ -24,41 +24,47 @@ package eu.essi_lab.gssrv.rest.conf.requests;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.option.InputPattern;
-import eu.essi_lab.gssrv.rest.conf.Parameter;
-import eu.essi_lab.model.Queryable.ContentType;
+import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
-public class HarvestUnschedulingRequest extends PutSourceRequest {
+public enum QueryBinding implements LabeledEnum {
 
     /**
      * 
      */
-    public HarvestUnschedulingRequest() {
-    }
+    PREF("pref"),
+    /**
+     * 
+     */
+    ALT("alt"),
+    /**
+     * 
+     */
+    CLOSE_MATCH("closeMatch"),
+    /**
+     * 
+     */
+    EXPANDED("expanded"),
+    /**
+     * 
+     */
+    CONCEPT("concept");
+
+    private String label;
 
     /**
-     * @param object
+     * @param label
      */
-    public HarvestUnschedulingRequest(JSONObject object) {
+    private QueryBinding(String label) {
 
-	super(object);
+	this.label = label;
     }
 
     @Override
-    public List<Parameter> getSupportedParameters() {
+    public String getLabel() {
 
-	ArrayList<Parameter> list = new ArrayList<>();
-
-	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
-
-	return list;
+	return label;
     }
 }

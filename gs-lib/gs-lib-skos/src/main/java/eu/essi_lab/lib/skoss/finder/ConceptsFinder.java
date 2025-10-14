@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.gssrv.rest.conf.requests;
+package eu.essi_lab.lib.skoss.finder;
 
 /*-
  * #%L
@@ -24,44 +24,34 @@ package eu.essi_lab.gssrv.rest.conf.requests;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.option.InputPattern;
-import eu.essi_lab.gssrv.rest.conf.Parameter;
-import eu.essi_lab.model.Queryable.ContentType;
+import eu.essi_lab.lib.skoss.QueryTask;
 
 /**
  * @author Fabrizio
  */
-public class RemoveSourceRequest extends PutSourceRequest {
-
-    public static final String REMOVE_DATA = "removeData";
+public interface ConceptsFinder<T extends QueryTask> {
 
     /**
-     * 
+     * @param searchTerm
+     * @param ontologyUrls
+     * @param sourceLangs
+     * @return
+     * @throws Exception
      */
-    public RemoveSourceRequest() {
-    }
+    List<String> find(//
+	    String searchTerm, //
+	    List<String> ontologyUrls, //
+	    List<String> sourceLangs) throws Exception;
 
     /**
-     * @param object
+     * @return
      */
-    public RemoveSourceRequest(JSONObject object) {
+    default Optional<Consumer<T>> getTaskConsumer() {
 
-	super(object);
-    }
-
-    @Override
-    public List<Parameter> getSupportedParameters() {
-
-	ArrayList<Parameter> list = new ArrayList<>();
-
-	list.add(Parameter.of(SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
-	list.add(Parameter.of(REMOVE_DATA, ContentType.BOOLEAN, false));
-
-	return list;
+	return Optional.empty();
     }
 }

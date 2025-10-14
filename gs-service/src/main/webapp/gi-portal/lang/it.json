@@ -205,7 +205,7 @@
   "select_observation_spacing": "Seleziona la risoluzione temporale",
   "select_aggregation_duration": "Seleziona la durata di aggregazione",
   
-  "sameas-narrow-text": "Ricerca semantica con traduzioni e corrispondenze più specifiche",
+  "semantic-search-text": "Ricerca semantica con traduzioni e corrispondenze più specifiche",
   "basic-text": "Ricerca di base per termine esatto",
   "ontology-search-help": "Ricerca esatta o ricerca semantica con supporto ontologico per traduzioni e termini più specifici.<br/>Controlla il browser dell’ontologia online per i termini disponibili:<br/>",
   

@@ -41,6 +41,7 @@ import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
 import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
 import eu.essi_lab.cfga.gs.setting.GSSourceSetting;
+import eu.essi_lab.cfga.gs.setting.OntologySetting;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
@@ -245,6 +246,14 @@ public class ConfigurationWrapper {
 	).//
 		get();
 
+    }
+
+    /**
+     * @return
+     */
+    public static List<OntologySetting> getOntologySettings() {
+
+	return configuration.list(OntologySetting.class);
     }
 
     /**

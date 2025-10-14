@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.check.scheme.SchemeItem;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
+import eu.essi_lab.cfga.gs.setting.OntologySetting;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
 import eu.essi_lab.cfga.gs.setting.driver.DriverSetting;
@@ -106,10 +107,11 @@ public enum GSTabIndex implements TabIndex {
      * 
      */
     RATE_LIMITER(16, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.RATE_LIMITER_SETTING.getLabel()))),
+
     /**
      * 
      */
-    CONFIGURATION_UPLOADER(17),
+    ONTOLOGIES(17, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
     /**
      * 
      */
@@ -117,7 +119,11 @@ public enum GSTabIndex implements TabIndex {
     /**
      * 
      */
-    ABOUT(19);
+    CONFIGURATION_UPLOADER(19),
+    /**
+     * 
+     */
+    ABOUT(20);
 
     private int index;
     private boolean required;
