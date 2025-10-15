@@ -110,50 +110,7 @@ public class ClientExternalTestIT {
 
     }
 
-    @Test
-    public void noneValueTest() throws IllegalArgumentException, Exception {
-
-	SKOSClient client = new SKOSClient();
-
-	client.setOntologyUrls(Arrays.asList(//
-
-		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://dbpedia.org/sparql", "http://localhost:3031/gemet/query", //
-		"https://vocabularies.unesco.org/sparql"//
-
-	));
-
-	client.setExpansionLevel(ExpansionLevel.MEDIUM);
-	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.LABELS, 1000));
-	client.setSearchValue(SearchTarget.TERMS, "wind");
-
-	client.setExpansionsRelations(SKOSClient.DEFAULT_RELATIONS);
-	client.setSearchLangs(SKOSClient.DEFAULT_SEARCH_LANGS);
-	client.setSourceLangs(SKOSClient.DEFAULT_SOURCE_LANGS);
-
-	//
-	//
-	//
-
-	DefaultConceptsFinder finder = new DefaultConceptsFinder();
-	finder.setTraceQuery(true);
-	finder.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
-	// finder.setTaskConsumer((task) -> System.out.println(task));
-
-	client.setFinder(new DefaultConceptsFinder());
-
-	DefaultConceptsExpander expander = new DefaultConceptsExpander();
-	expander.setTraceQuery(true);
-	expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // 4 threads per level
-	// expander.setTaskConsumer((task) -> System.out.println(task));
-
-	client.setExpander(expander);
-
-	SKOSResponse response = client.search();
-
-	System.out.println(response.getAggregatedResults());
-    }
-
+    
     @Test
     public void mediumExpansionLimit10Test_ConceptsExpander() throws Exception {
 
