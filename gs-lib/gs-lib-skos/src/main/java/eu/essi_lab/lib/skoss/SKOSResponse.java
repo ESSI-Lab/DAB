@@ -40,6 +40,11 @@ import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
  */
 public class SKOSResponse {
 
+    /**
+     * 
+     */
+    public static final String NONE_VALUE = "none";
+
     private List<SKOSConcept> results;
 
     /**
@@ -111,7 +116,7 @@ public class SKOSResponse {
      * @param results
      * @return
      */
-    public static List<SKOSConcept> getAggregatedResults(ExpansionLimit limit,  List<SKOSConcept> results) {
+    public static List<SKOSConcept> getAggregatedResults(ExpansionLimit limit, List<SKOSConcept> results) {
 
 	int altCount = 0;
 	int labCount = 0;
@@ -132,7 +137,7 @@ public class SKOSResponse {
 
 		SKOSConcept skosConcept = SKOSConcept.of(//
 			concept, //
-			list.get(0).getPref().orElse("none"));
+			list.get(0).getPref().orElse(NONE_VALUE));
 
 		list.forEach(c -> skosConcept.getAlt().addAll(c.getAlt()));
 		list.forEach(c -> skosConcept.getExpanded().addAll(c.getExpanded()));
@@ -171,7 +176,7 @@ public class SKOSResponse {
 
 		    break;
 		}
-		
+
 		altCount += skosConcept.getAlt().size();
 		labCount += skosConcept.getAlt().size() + 1;
 
@@ -181,7 +186,7 @@ public class SKOSResponse {
 
 	return out;
     }
-    
+
     /**
      * @param limit
      * @param tempResponse
@@ -248,7 +253,7 @@ public class SKOSResponse {
 
 		    break;
 		}
-		
+
 		altCount += skosConcept.getAlt().size();
 		labCount += skosConcept.getAlt().size() + 1;
 

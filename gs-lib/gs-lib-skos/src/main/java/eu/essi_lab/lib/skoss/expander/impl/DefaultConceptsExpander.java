@@ -73,7 +73,7 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 
 	GSLoggerFactory.getLogger(getClass()).debug("Epanding concepts STARTED");
 
-	ArrayList<SKOSConcept> results = new ArrayList<SKOSConcept>();
+	List<SKOSConcept> results = new ArrayList<SKOSConcept>();
 
 	List<SKOSConcept> currentLevelResults = new ArrayList<SKOSConcept>();
 
@@ -129,6 +129,7 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 		List<Future<List<SKOSConcept>>> futures = executor.invokeAll(tasks);
 
 		for (Future<List<SKOSConcept>> future : futures) {
+
 		    currentLevelResults.addAll(future.get());
 		}
 
@@ -143,6 +144,13 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 
 	    results.addAll(currentLevelResults);
 	}
+
+	//
+	// filters out concepts without pref label
+	//
+	results = results.stream().//
+		filter(c -> c.getPref().isPresent() && !c.getPref().get().equals(SKOSResponse.NONE_VALUE)).//
+		collect(Collectors.toList());
 
 	GSLoggerFactory.getLogger(getClass()).debug("Epanding concepts ENDED");
 
