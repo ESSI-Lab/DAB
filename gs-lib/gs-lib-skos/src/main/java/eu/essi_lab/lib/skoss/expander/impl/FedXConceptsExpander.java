@@ -45,13 +45,13 @@ import eu.essi_lab.lib.skoss.QueryTask;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.ThreadMode;
-import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
-import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.rdf4j.FedXEngine;
 import eu.essi_lab.lib.skoss.rdf4j.QueryBinding;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ThreadMode;
+import eu.essi_lab.lib.utils.ThreadMode.MultiThreadMode;
+import eu.essi_lab.lib.utils.ThreadMode.SingleThreadMode;
 
 /**
  * @author Fabrizio

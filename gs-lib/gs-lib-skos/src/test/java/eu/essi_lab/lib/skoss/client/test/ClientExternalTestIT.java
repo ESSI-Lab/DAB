@@ -6,9 +6,7 @@ package eu.essi_lab.lib.skoss.client.test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Executors;
 
-import org.eclipse.rdf4j.federated.FedXConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,16 +15,14 @@ import eu.essi_lab.lib.skoss.SKOSClient.SearchTarget;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
-import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
-import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
+import eu.essi_lab.lib.utils.ThreadMode;
 
 /**
  * @author Fabrizio

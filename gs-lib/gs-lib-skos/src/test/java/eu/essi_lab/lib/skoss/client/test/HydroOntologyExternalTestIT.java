@@ -19,7 +19,6 @@ import eu.essi_lab.lib.skoss.SKOSClient.SearchTarget;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
@@ -27,6 +26,7 @@ import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
+import eu.essi_lab.lib.utils.ThreadMode;
 
 /**
  * Tests the SKOSClient on the hydro ontology concepts e.g.:

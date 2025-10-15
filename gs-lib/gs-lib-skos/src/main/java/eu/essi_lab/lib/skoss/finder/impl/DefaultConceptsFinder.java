@@ -12,11 +12,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import eu.essi_lab.lib.skoss.SKOSConcept;
-import eu.essi_lab.lib.skoss.ThreadMode;
-import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
-import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.skoss.rdf4j.RDF4JQueryTask;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ThreadMode;
 
 /**
  * @author boldrini
@@ -37,11 +35,7 @@ public class DefaultConceptsFinder extends AbstractConceptsFinder<RDF4JQueryTask
 
 	GSLoggerFactory.getLogger(getClass()).debug("Finding concepts STARTED");
 
-	ExecutorService executor = switch (getThreadMode()) {
-	case MultiThreadMode multi -> multi.getExecutor();
-	case SingleThreadMode single -> Executors.newSingleThreadExecutor();
-	default -> throw new IllegalArgumentException();// no way
-	};
+	ExecutorService executor = getThreadMode().getExecutor();
 
 	String query = getQueryBuilder().build(searchTerm, sourceLangs);
 

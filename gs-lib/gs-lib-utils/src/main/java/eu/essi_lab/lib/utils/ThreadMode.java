@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skoss;
+package eu.essi_lab.lib.utils;
 
 /*-
  * #%L
@@ -32,6 +32,18 @@ import java.util.function.Supplier;
  * @author Fabrizio
  */
 public abstract class ThreadMode {
+
+    /**
+     * @return
+     */
+    public ExecutorService getExecutor() {
+
+	return switch (this) {
+	case MultiThreadMode multi -> multi.getExecutor();
+	case SingleThreadMode single -> Executors.newSingleThreadExecutor();
+	default -> throw new IllegalArgumentException();// no way
+	};
+    }
 
     /**
      * @return

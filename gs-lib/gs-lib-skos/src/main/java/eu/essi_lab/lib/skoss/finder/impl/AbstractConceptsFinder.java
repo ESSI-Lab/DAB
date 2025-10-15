@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import eu.essi_lab.lib.skoss.QueryTask;
-import eu.essi_lab.lib.skoss.ThreadMode;
 
 /*-
  * #%L
@@ -32,6 +31,7 @@ import eu.essi_lab.lib.skoss.ThreadMode;
 
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.ConceptsQueryBuilder;
+import eu.essi_lab.lib.utils.ThreadMode;
 
 /**
  * @author Fabrizio

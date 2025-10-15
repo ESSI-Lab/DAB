@@ -15,13 +15,13 @@ import eu.essi_lab.lib.skoss.SKOSClient;
 import eu.essi_lab.lib.skoss.SKOSClient.SearchTarget;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
-import eu.essi_lab.lib.skoss.ThreadMode;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
 import eu.essi_lab.lib.utils.ListUtils;
+import eu.essi_lab.lib.utils.ThreadMode;
 
 /**
  * @author Fabrizio

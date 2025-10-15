@@ -39,13 +39,11 @@ import java.util.stream.Collectors;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.ThreadMode;
-import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
-import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.skoss.expander.ExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.rdf4j.RDF4JQueryTask;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ThreadMode;
 
 /**
  * @author boldrini
@@ -81,11 +79,7 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 
 	for (int i = 0; i <= targetLevel.getValue(); i++) {
 
-	    ExecutorService executor = switch (getThreadMode()) {
-	    case MultiThreadMode multi -> multi.getExecutor();
-	    case SingleThreadMode single -> Executors.newSingleThreadExecutor();
-	    default -> throw new IllegalArgumentException();// no way
-	    };
+	    ExecutorService executor = getThreadMode().getExecutor();
 
 	    List<Callable<List<SKOSConcept>>> tasks = new ArrayList<>();
 

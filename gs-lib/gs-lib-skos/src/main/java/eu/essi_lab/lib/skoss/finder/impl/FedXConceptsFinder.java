@@ -32,12 +32,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import eu.essi_lab.lib.skoss.QueryTask;
-import eu.essi_lab.lib.skoss.ThreadMode;
-import eu.essi_lab.lib.skoss.ThreadMode.MultiThreadMode;
-import eu.essi_lab.lib.skoss.ThreadMode.SingleThreadMode;
 import eu.essi_lab.lib.skoss.finder.ConceptsQueryBuilder;
 import eu.essi_lab.lib.skoss.finder.ConceptsQueryExecutor;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ThreadMode;
+import eu.essi_lab.lib.utils.ThreadMode.MultiThreadMode;
+import eu.essi_lab.lib.utils.ThreadMode.SingleThreadMode;
 
 /**
  * @author Fabrizio
