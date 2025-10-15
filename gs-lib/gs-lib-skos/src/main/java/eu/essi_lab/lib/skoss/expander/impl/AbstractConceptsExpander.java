@@ -42,6 +42,7 @@ public abstract class AbstractConceptsExpander<T extends QueryTask> implements C
     private ThreadMode threadMode;
     private boolean traceQuery;
     private Consumer<T> taskConsumer;
+    private boolean excludeNoPrefConcepts;
 
     /**
      * 
@@ -49,6 +50,7 @@ public abstract class AbstractConceptsExpander<T extends QueryTask> implements C
     public AbstractConceptsExpander() {
 
 	setQueryBuilder(new DefaultExpandConceptsQueryBuilder());
+	setExcludeNoPrefConcepts(true);
     }
 
     /**
@@ -108,11 +110,26 @@ public abstract class AbstractConceptsExpander<T extends QueryTask> implements C
     }
 
     /**
-     * @param taskConsumer the taskConsumer to set
+     * @param taskConsumer
      */
     public void setTaskConsumer(Consumer<T> taskConsumer) {
 
 	this.taskConsumer = taskConsumer;
     }
 
+    /**
+     * @return 
+     */
+    public boolean isExcludeNoPrefConcepts() {
+	
+        return excludeNoPrefConcepts;
+    }
+
+    /**
+     * @param exclude 
+     */
+    public void setExcludeNoPrefConcepts(boolean exclude) {
+	
+        this.excludeNoPrefConcepts = exclude;
+    }
 }

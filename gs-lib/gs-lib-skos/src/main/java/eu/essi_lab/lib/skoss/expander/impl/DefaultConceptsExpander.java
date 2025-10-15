@@ -139,16 +139,15 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 	    results.addAll(currentLevelResults);
 	}
 
-	//
-	// filters out concepts without pref label
-	//
-	results = results.stream().//
-		filter(c -> c.getPref().isPresent() && !c.getPref().get().equals(SKOSResponse.NONE_VALUE)).//
-		collect(Collectors.toList());
+	if (isExcludeNoPrefConcepts()) {
+
+	    results = results.stream().//
+		    filter(c -> c.getPref().isPresent() && !c.getPref().get().equals(SKOSResponse.NONE_VALUE)).//
+		    collect(Collectors.toList());
+	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Epanding concepts ENDED");
 
 	return SKOSResponse.of(SKOSResponse.getAggregatedResults(limit, results));
     }
-
 }
