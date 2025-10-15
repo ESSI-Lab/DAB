@@ -1102,6 +1102,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			expandedTerms.toString().replace("[", "").replace("]", ""));
 
 		List<Bond> expandedBonds = new ArrayList<>();
+		
+		expandedTerms.add(searchValue); // adds the initial search term/concept
 
 		expandedTerms.forEach(term -> createFieldsBond(expandedBonds, searchFields, term, null, null));
 
