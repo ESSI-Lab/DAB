@@ -82,6 +82,12 @@ public class ExpansionLimit {
 	return limit;
     }
 
+    @Override
+    public String toString() {
+
+	return "[" + target + ":" + limit + "]";
+    }
+
     /**
      * 
      */

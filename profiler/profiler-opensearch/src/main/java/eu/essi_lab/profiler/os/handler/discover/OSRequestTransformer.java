@@ -1035,22 +1035,24 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     /**
      * @param innerBonds
      * @param searchFields
-     * @param searchTerm
+     * @param searchValue
      * @param semanticSearch
      * @param ontologyids
      */
     private void createFieldsBond(//
 	    List<Bond> innerBonds, //
 	    String searchFields, //
-	    String searchTerm, //
+	    String searchValue, //
 	    String semanticSearch, //
 	    String ontologyids) {
 
-	if (semanticSearch != null && semanticSearch.equals("true") && ontologyids != null && !ontologyids.isEmpty()) {
+	if (searchValue != null && !searchValue.isEmpty() && //
+		semanticSearch != null && semanticSearch.equals("true") && //
+		ontologyids != null && !ontologyids.isEmpty()) {
 
 	    SKOSClient client = new SKOSClient();
 
-	    client.setSearchTerm(searchTerm);
+	    client.setSearchValue(searchValue);
 
 	    List<String> ids = Arrays.asList(ontologyids.split(" AND "));
 
@@ -1075,14 +1077,14 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    DefaultConceptsFinder finder = new DefaultConceptsFinder();
 	    finder.setTraceQuery(true);
 	    finder.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
-//	    finder.setTaskConsumer((task) -> System.out.println(task));
+	    // finder.setTaskConsumer((task) -> System.out.println(task));
 
-	    client.setFinder(new DefaultConceptsFinder());
+	    client.setFinder(finder);
 
 	    DefaultConceptsExpander expander = new DefaultConceptsExpander();
 	    expander.setTraceQuery(true);
 	    expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // 4 threads per level
-//	    expander.setTaskConsumer((task) -> System.out.println(task));
+	    // expander.setTaskConsumer((task) -> System.out.println(task));
 
 	    client.setExpander(expander);
 
@@ -1128,23 +1130,23 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	ArrayList<Bond> operands = new ArrayList<>();
 
 	if (searchFields.toLowerCase().contains("anytext")) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ANY_TEXT, searchTerm));
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ANY_TEXT, searchValue));
 	}
 
 	if (searchFields.toLowerCase().contains("title")) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, searchTerm));
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, searchValue));
 	}
 
 	if (searchFields.toLowerCase().contains("subject")) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.SUBJECT, searchTerm));
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.SUBJECT, searchValue));
 	}
 
 	if (searchFields.toLowerCase().contains("abstract") || searchFields.toLowerCase().contains("description")) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ABSTRACT, searchTerm));
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ABSTRACT, searchValue));
 	}
 
 	if (searchFields.toLowerCase().contains("keyword")) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, searchTerm));
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, searchValue));
 	}
 
 	switch (operands.size()) {

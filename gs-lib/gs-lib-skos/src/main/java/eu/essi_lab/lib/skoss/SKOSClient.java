@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.lib.skoss;
 
+import java.net.URI;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -26,6 +28,7 @@ package eu.essi_lab.lib.skoss;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander;
 import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
@@ -34,6 +37,7 @@ import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio
@@ -49,11 +53,48 @@ public class SKOSClient {
     public static final List<String> DEFAULT_SEARCH_LANGS = Arrays.asList("it", "en");
     public static final List<String> DEFAULT_SOURCE_LANGS = Arrays.asList("it", "en");
 
+    /**
+     * @author Fabrizio
+     */
+    public enum SearchTarget {
+	/**
+	 * 
+	 */
+	TERMS,
+	/**
+	 * 
+	 */
+	CONCEPTS;
+
+	/**
+	 * @param value
+	 * @return
+	 */
+	public static SearchTarget of(String value) throws IllegalArgumentException {
+
+	    if (value == null || value.isEmpty()) {
+
+		throw new IllegalArgumentException("Null or empty value");
+	    }
+
+	    return Optional.of(value).map(s -> {
+		try {
+		    new URI(s).toURL();
+		    return SearchTarget.CONCEPTS;
+
+		} catch (Throwable e) {
+		    return SearchTarget.TERMS;
+		}
+	    }).get();
+	}
+    }
+
     //
     //
     //
 
-    private String searchTerm;
+    private String term;
+    private String concept;
     private List<String> sourceLangs;
     private List<String> searchLangs;
     private List<String> ontologyUrls;
@@ -65,8 +106,9 @@ public class SKOSClient {
     //
     //
 
-    private ConceptsFinder finder;
-    private ConceptsExpander expander;
+    private ConceptsFinder<?> finder;
+    private ConceptsExpander<?> expander;
+    private SearchTarget target;
 
     /**
      * 
@@ -84,17 +126,44 @@ public class SKOSClient {
     }
 
     /**
-     * @return the searchTerm
+     * @return the
      */
-    public String getSearchTerm() {
-	return searchTerm;
+    public Optional<String> getSearchValue() {
+
+	return switch (target) {
+	case CONCEPTS -> Optional.ofNullable(concept);
+	case TERMS -> Optional.ofNullable(term);
+	case null -> Optional.empty();
+	};
     }
 
     /**
-     * @param searchTerm
+     * @return
      */
-    public void setSearchTerm(String searchTerm) {
-	this.searchTerm = searchTerm;
+    public Optional<SearchTarget> getSearchTarget() {
+
+	return Optional.ofNullable(target);
+    }
+
+    /**
+     * @param target
+     * @param searchValue
+     */
+    public void setSearchValue(SearchTarget target, String searchValue) {
+
+	this.target = target;
+	switch (target) {
+	case CONCEPTS -> this.concept = searchValue;
+	case TERMS -> this.term = searchValue;
+	}
+    }
+
+    /**
+     * @param searchValue
+     */
+    public void setSearchValue(String searchValue) {
+
+	setSearchValue(SearchTarget.of(searchValue), searchValue);
     }
 
     /**
@@ -184,28 +253,29 @@ public class SKOSClient {
     /**
      * @return the finder
      */
-    public ConceptsFinder getFinder() {
+    public ConceptsFinder<?> getFinder() {
 	return finder;
     }
 
     /**
      * @param finder
      */
-    public void setFinder(ConceptsFinder finder) {
+    public void setFinder(ConceptsFinder<?> finder) {
 	this.finder = finder;
     }
 
     /**
      * @return the expander
      */
-    public ConceptsExpander getExpander() {
+    public ConceptsExpander<?> getExpander() {
 	return expander;
     }
 
     /**
      * @param expander
      */
-    public void setExpander(ConceptsExpander expander) {
+    public void setExpander(ConceptsExpander<?> expander) {
+
 	this.expander = expander;
     }
 
@@ -213,12 +283,30 @@ public class SKOSClient {
      * @return
      * @throws Exception
      */
-    public SKOSResponse search() throws Exception {
+    public SKOSResponse search() throws Exception, IllegalArgumentException {
 
-	List<String> concepts = getFinder().find(//
-		getSearchTerm(), //
+	if (getSearchValue().isEmpty() || getSearchTarget().isEmpty() || getSearchValue().get().isEmpty()) {
+
+	    throw new IllegalArgumentException("Search value missing or empty");
+	}
+
+	GSLoggerFactory.getLogger(getClass()).trace("Search value: {}", getSearchValue().get());
+	GSLoggerFactory.getLogger(getClass()).trace("Search target: {}", getSearchTarget().get());
+	GSLoggerFactory.getLogger(getClass()).trace("Ontologies: {}", getOntologyUrls());
+
+	GSLoggerFactory.getLogger(getClass()).trace("Expansion level: {}", getExpansionLevel());
+	GSLoggerFactory.getLogger(getClass()).trace("Expansion limit: {}", getExpansionLimit());
+
+	GSLoggerFactory.getLogger(getClass()).trace("Source langs: {}", getSourceLangs());
+	GSLoggerFactory.getLogger(getClass()).trace("Search langs: {}", getSearchLangs());
+
+	List<String> concepts = switch (getSearchTarget().get()) {
+	case CONCEPTS -> Arrays.asList(getSearchValue().get());
+	case TERMS -> getFinder().find(//
+		getSearchValue().get(), //
 		getOntologyUrls(), //
 		getSourceLangs());
+	};
 
 	SKOSResponse response = getExpander().expand(//
 		concepts, //
@@ -231,5 +319,4 @@ public class SKOSClient {
 
 	return response;
     }
-
 }

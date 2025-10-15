@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.essi_lab.lib.skoss.SKOSClient;
+import eu.essi_lab.lib.skoss.SKOSClient.SearchTarget;
 import eu.essi_lab.lib.skoss.SKOSConcept;
 import eu.essi_lab.lib.skoss.SKOSResponse;
 import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
@@ -106,7 +107,7 @@ public class HydroOntologyExternalTestIT {
 
     public void commonRoutine() throws Exception {
 
-	client.setSearchTerm("velocity");
+	client.setSearchValue(SearchTarget.TERMS, "velocity");
 	client.setSearchLangs(Arrays.asList("it", "en"));
 	client.setSourceLangs(Arrays.asList("it", "en"));
 
