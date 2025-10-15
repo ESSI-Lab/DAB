@@ -78,8 +78,6 @@ public class DefaultConceptsFinder extends AbstractConceptsFinder<RDF4JQueryTask
 	    executor.shutdown();
 	}
 
-	results.addAll(results);
-
 	List<String> out = results.stream().map(c -> c.getConcept()).toList();
 
 	GSLoggerFactory.getLogger(getClass()).debug("Found {} concepts: \n{}", out.size(), out);
