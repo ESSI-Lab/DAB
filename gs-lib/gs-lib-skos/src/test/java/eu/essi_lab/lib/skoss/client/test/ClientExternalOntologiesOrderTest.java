@@ -21,6 +21,7 @@ import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
 import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
+import eu.essi_lab.lib.utils.ListUtils;
 
 /**
  * @author Fabrizio
@@ -39,7 +40,7 @@ public class ClientExternalOntologiesOrderTest {
 
 	);
 
-	List<List<String>> perms = permutations(ontologies);
+	List<List<String>> perms = ListUtils.permutations(ontologies);
 
 	List<List<String>> out = new ArrayList<>();
 
@@ -55,34 +56,7 @@ public class ClientExternalOntologiesOrderTest {
 	Assert.assertEquals(1, out.stream().distinct().count());
     }
 
-    /**
-     * @param <T>
-     * @param list
-     * @return
-     */
-    private static <T> List<List<T>> permutations(List<T> list) {
-
-	if (list.size() <= 1) {
-	    return List.of(list);
-	}
-
-	List<List<T>> result = new ArrayList<>();
-
-	for (int i = 0; i < list.size(); i++) {
-
-	    T elem = list.get(i);
-	    List<T> rest = new ArrayList<>(list);
-	    rest.remove(i);
-
-	    for (List<T> perm : permutations(rest)) {
-		List<T> newPerm = new ArrayList<>();
-		newPerm.add(elem);
-		newPerm.addAll(perm);
-		result.add(newPerm);
-	    }
-	}
-	return result;
-    }
+  
 
     /**
      * @param ontologies
