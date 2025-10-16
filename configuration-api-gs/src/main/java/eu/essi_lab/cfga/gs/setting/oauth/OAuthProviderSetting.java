@@ -31,7 +31,6 @@ import org.json.JSONObject;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio

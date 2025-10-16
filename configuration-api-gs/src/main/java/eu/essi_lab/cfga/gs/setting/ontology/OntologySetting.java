@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.cfga.gs.setting;
+package eu.essi_lab.cfga.gs.setting.ontology;
 
 import java.util.ArrayList;
 
@@ -445,6 +445,8 @@ public class OntologySetting extends Setting implements EditableSetting {
 	    ArrayList<GridMenuItemHandler> list = new ArrayList<>();
 
 	    list.add(new SettingsRemoveItemHandler(true, true));
+	    list.add(new OntologyDisableItemHandler());
+	    list.add(new OntologyEnableItemHandler(true, false));
 
 	    return list;
 	}

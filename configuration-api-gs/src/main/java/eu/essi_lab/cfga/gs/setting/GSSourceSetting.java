@@ -44,8 +44,8 @@ import eu.essi_lab.cfga.setting.validation.Validator;
 import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.ResultsPriority;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**
