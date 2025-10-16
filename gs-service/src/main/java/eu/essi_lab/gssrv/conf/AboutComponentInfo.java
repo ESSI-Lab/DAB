@@ -39,6 +39,7 @@ import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
+ * 
  * @author Fabrizio
  */
 public class AboutComponentInfo extends ComponentInfo {
