@@ -40,6 +40,7 @@ import com.google.common.collect.Lists;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
 import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
@@ -47,9 +48,6 @@ import eu.essi_lab.lib.odip.rosetta.RosettaStone;
 import eu.essi_lab.lib.odip.rosetta.RosettaStoneConnector;
 import eu.essi_lab.lib.skos.SKOSClient;
 import eu.essi_lab.lib.skos.SKOSResponse;
-import eu.essi_lab.lib.skos.expander.ExpansionLimit;
-import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skos.finder.impl.DefaultConceptsFinder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -913,7 +911,11 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      * @param request
      * @param eiffelOption
      */
-    private Bond createSearchTermsBond(WebRequest request, OSRequestParser parser, boolean eiffelOption, String semantics,
+    private Bond createSearchTermsBond(//
+	    WebRequest request, //
+	    OSRequestParser parser, //
+	    boolean eiffelOption, //
+	    String semantics, //
 	    String ontology) {
 
 	String searchTerms = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_TERMS.getName(), OSParameters.class));
@@ -1063,26 +1065,27 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			    map(set -> set.getOntologyEndpoint()).//
 			    toList());
 
-	    client.setExpansionLevel(ExpansionLevel.MEDIUM);
-	    client.setExpansionLimit(ExpansionLimit.of(LimitTarget.LABELS, 50));
+	    DefaultSemanticSearchSetting setting = ConfigurationWrapper.getSystemSettings().getDefaultSemanticSearchSetting();
 
-	    client.setExpansionsRelations(SKOSClient.DEFAULT_RELATIONS);
-	    client.setSearchLangs(SKOSClient.DEFAULT_SEARCH_LANGS);
-	    client.setSourceLangs(SKOSClient.DEFAULT_SOURCE_LANGS);
+	    client.setExpansionLimit(setting.getDefaultExpansionLimit());
+	    client.setExpansionLevel(setting.getDefaultExpansionLevel());
+	    client.setExpansionsRelations(setting.getDefaultSemanticRelations());
+	    client.setSearchLangs(setting.getDefaultSearchLanguages().stream().map(l -> l.getLabel()).toList());
+	    client.setSourceLangs(setting.getDefaultSourceLanguages().stream().map(l -> l.getLabel()).toList());
 
 	    //
 	    //
 	    //
 
 	    DefaultConceptsFinder finder = new DefaultConceptsFinder();
-	    finder.setTraceQuery(true);
+	    finder.setTraceQuery(false);
 	    finder.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
 	    // finder.setTaskConsumer((task) -> System.out.println(task));
 
 	    client.setFinder(finder);
 
 	    DefaultConceptsExpander expander = new DefaultConceptsExpander();
-	    expander.setTraceQuery(true);
+	    expander.setTraceQuery(false);
 	    expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // 4 threads per level
 	    // expander.setTaskConsumer((task) -> System.out.println(task));
 
@@ -1102,7 +1105,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			expandedTerms.toString().replace("[", "").replace("]", ""));
 
 		List<Bond> expandedBonds = new ArrayList<>();
-		
+
 		expandedTerms.add(searchValue); // adds the initial search term/concept
 
 		expandedTerms.forEach(term -> createFieldsBond(expandedBonds, searchFields, term, null, null));
@@ -1126,7 +1129,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 		GSLoggerFactory.getLogger(getClass()).error(ex);
 	    }
-
 	}
 
 	ArrayList<Bond> operands = new ArrayList<>();
