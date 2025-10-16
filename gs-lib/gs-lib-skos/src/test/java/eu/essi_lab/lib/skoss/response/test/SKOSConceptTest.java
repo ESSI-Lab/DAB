@@ -8,7 +8,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.SKOSConcept;
+import eu.essi_lab.lib.skos.SKOSConcept;
 
 /**
  * @author Fabrizio

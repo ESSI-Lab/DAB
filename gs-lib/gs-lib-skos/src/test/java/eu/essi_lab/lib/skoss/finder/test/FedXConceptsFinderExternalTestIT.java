@@ -9,10 +9,10 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.finder.ConceptsFinder;
-import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
-import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
-import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
+import eu.essi_lab.lib.skos.finder.ConceptsFinder;
+import eu.essi_lab.lib.skos.finder.impl.DefaultConceptsQueryBuilder;
+import eu.essi_lab.lib.skos.finder.impl.FedXConceptsFinder;
+import eu.essi_lab.lib.skos.finder.impl.FedXConceptsQueryExecutor;
 import eu.essi_lab.lib.utils.ThreadMode;
 
 /**

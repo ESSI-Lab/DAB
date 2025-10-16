@@ -11,15 +11,16 @@ import java.util.concurrent.Executors;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.SKOSClient;
-import eu.essi_lab.lib.skoss.SKOSClient.SearchTarget;
-import eu.essi_lab.lib.skoss.SKOSConcept;
-import eu.essi_lab.lib.skoss.SKOSResponse;
-import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
-import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
-import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
-import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
+import eu.essi_lab.lib.skos.SKOSClient;
+import eu.essi_lab.lib.skos.SKOSConcept;
+import eu.essi_lab.lib.skos.SKOSResponse;
+import eu.essi_lab.lib.skos.SKOSClient.SearchTarget;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
+import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
+import eu.essi_lab.lib.skos.finder.impl.DefaultConceptsFinder;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ListUtils;
 import eu.essi_lab.lib.utils.ThreadMode;
 
@@ -29,7 +30,9 @@ import eu.essi_lab.lib.utils.ThreadMode;
 public class ClientExternalOntologiesOrderTest {
 
     @Test
-    public void test() throws IllegalArgumentException, Exception {
+    public void excludeNoPrefLabelsConcepts() throws IllegalArgumentException, Exception {
+
+	GSLoggerFactory.getLogger(getClass()).info("Test STARTED");
 
 	List<String> ontologies = Arrays.asList(//
 
@@ -46,7 +49,38 @@ public class ClientExternalOntologiesOrderTest {
 
 	for (List<String> ont : perms) {
 
-	    List<SKOSConcept> list = test(ont);
+	    List<SKOSConcept> list = test(ont, true);
+
+	    out.add(list.stream().map(c -> c.toString()).sorted().toList());
+	}
+
+	System.out.println(out);
+
+	Assert.assertEquals(1, out.stream().distinct().count());
+
+	GSLoggerFactory.getLogger(getClass()).info("Test ENDED");
+
+    }
+
+    @Test
+    public void includeNoPrefLabelsConcepts() throws IllegalArgumentException, Exception {
+
+	List<String> ontologies = Arrays.asList(//
+
+		"https://dbpedia.org/sparql", //
+		// "http://localhost:3031/gemet/query", //
+		"http://hydro.geodab.eu/hydro-ontology/sparql", //
+		"https://vocabularies.unesco.org/sparql"//
+
+	);
+
+	List<List<String>> perms = ListUtils.permutations(ontologies);
+
+	List<List<String>> out = new ArrayList<>();
+
+	for (List<String> ont : perms) {
+
+	    List<SKOSConcept> list = test(ont, false);
 
 	    out.add(list.stream().map(c -> c.toString()).sorted().toList());
 	}
@@ -56,15 +90,13 @@ public class ClientExternalOntologiesOrderTest {
 	Assert.assertEquals(1, out.stream().distinct().count());
     }
 
-  
-
     /**
      * @param ontologies
      * @return
      * @throws IllegalArgumentException
      * @throws Exception
      */
-    private List<SKOSConcept> test(List<String> ontologies) throws IllegalArgumentException, Exception {
+    private List<SKOSConcept> test(List<String> ontologies, boolean excludeNoPrefConcepts) throws IllegalArgumentException, Exception {
 
 	SKOSClient client = new SKOSClient();
 
@@ -93,6 +125,8 @@ public class ClientExternalOntologiesOrderTest {
 	expander.setTraceQuery(true);
 	expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // 4 threads per level
 	// expander.setTaskConsumer((task) -> System.out.println(task));
+
+	expander.setExcludeNoPrefConcepts(excludeNoPrefConcepts);
 
 	client.setExpander(expander);
 

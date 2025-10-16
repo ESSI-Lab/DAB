@@ -12,14 +12,14 @@ import org.eclipse.rdf4j.federated.evaluation.concurrent.TaskWrapper;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.SKOSConcept;
-import eu.essi_lab.lib.skoss.SKOSResponse;
-import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
-import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
-import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
-import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsFinder;
+import eu.essi_lab.lib.skos.SKOSConcept;
+import eu.essi_lab.lib.skos.SKOSResponse;
+import eu.essi_lab.lib.skos.SKOSSemanticRelation;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
+import eu.essi_lab.lib.skos.expander.impl.FedXConceptsExpander;
+import eu.essi_lab.lib.skos.finder.impl.FedXConceptsFinder;
 import eu.essi_lab.lib.utils.ThreadMode;
 
 /**
@@ -61,7 +61,7 @@ public class FedXConceptsExpanderExternalTestIT {
 		targetLevel, //
 		limit);//
 
-	Assert.assertEquals(FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT, response.getResults().size());
+	Assert.assertEquals(DefaultExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT, response.getResults().size());
 
 	//
 	//
@@ -79,7 +79,7 @@ public class FedXConceptsExpanderExternalTestIT {
 		targetLevel, //
 		limit);//
 
-	Assert.assertEquals(FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT, response.getResults().size());
+	Assert.assertEquals(DefaultExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT, response.getResults().size());
     }
 
     @Test
@@ -89,15 +89,15 @@ public class FedXConceptsExpanderExternalTestIT {
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 11), 11);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 15), 15);
 	limitWaterHydroOntologyTest(
-		ExpansionLimit.of(LimitTarget.CONCEPTS, FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT),
-		FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
+		ExpansionLimit.of(LimitTarget.CONCEPTS, DefaultExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT),
+		DefaultExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 3), 3);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 7), 7);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 23), 23);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 57),
-		FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
+		DefaultExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
 	limitWaterHydroOntologyTest(ExpansionLimit.of(LimitTarget.CONCEPTS, 100),
-		FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
+		DefaultExpanderLimitExternalTestIT.HYDRO_ONT_WATER_CONCEPTS_COUNT);
     }
 
     /**
@@ -305,6 +305,6 @@ public class FedXConceptsExpanderExternalTestIT {
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 100));//
 
 	List<String> labels = response.getLabels();
-	Assert.assertEquals(FedXExpanderLimitExternalTestIT.HYDRO_ONT_WATER_LABELS_COUNT, labels.size());
+	Assert.assertEquals(DefaultExpanderLimitExternalTestIT.HYDRO_ONT_WATER_LABELS_COUNT, labels.size());
     }
 }
