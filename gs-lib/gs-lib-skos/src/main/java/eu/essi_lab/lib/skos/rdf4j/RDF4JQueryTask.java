@@ -49,7 +49,7 @@ public class RDF4JQueryTask implements Callable<List<SKOSConcept>>, QueryTask {
 
     static {
 
-	System.setProperty("rdf4j.sparql.url.maxlength", String.valueOf(Integer.MAX_VALUE));
+//	System.setProperty("rdf4j.sparql.url.maxlength", String.valueOf(Integer.MAX_VALUE));
     }
 
     private String ontologyURL;
