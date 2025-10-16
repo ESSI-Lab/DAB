@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
+import eu.essi_lab.lib.skos.finder.impl.DefaultConceptsQueryBuilder;
 
 /**
  * @author Fabrizio

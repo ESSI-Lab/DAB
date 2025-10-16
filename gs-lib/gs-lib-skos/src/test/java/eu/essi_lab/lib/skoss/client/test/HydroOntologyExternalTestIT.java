@@ -14,18 +14,19 @@ import org.eclipse.rdf4j.federated.FedXConfig;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.SKOSClient;
-import eu.essi_lab.lib.skoss.SKOSConcept;
-import eu.essi_lab.lib.skoss.SKOSResponse;
-import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.ThreadMode;
-import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
-import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
-import eu.essi_lab.lib.skoss.expander.impl.DefaultConceptsExpander;
-import eu.essi_lab.lib.skoss.expander.impl.FedXConceptsExpander;
-import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
-import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsFinder;
+import eu.essi_lab.lib.skos.SKOSClient;
+import eu.essi_lab.lib.skos.SKOSConcept;
+import eu.essi_lab.lib.skos.SKOSResponse;
+import eu.essi_lab.lib.skos.SKOSSemanticRelation;
+import eu.essi_lab.lib.skos.SKOSClient.SearchTarget;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
+import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
+import eu.essi_lab.lib.skos.expander.impl.FedXConceptsExpander;
+import eu.essi_lab.lib.skos.expander.impl.FedXLevelsExpander;
+import eu.essi_lab.lib.skos.finder.impl.DefaultConceptsFinder;
+import eu.essi_lab.lib.utils.ThreadMode;
 
 /**
  * Tests the SKOSClient on the hydro ontology concepts e.g.:
@@ -106,7 +107,7 @@ public class HydroOntologyExternalTestIT {
 
     public void commonRoutine() throws Exception {
 
-	client.setSearchTerm("velocity");
+	client.setSearchValue(SearchTarget.TERMS, "velocity");
 	client.setSearchLangs(Arrays.asList("it", "en"));
 	client.setSourceLangs(Arrays.asList("it", "en"));
 

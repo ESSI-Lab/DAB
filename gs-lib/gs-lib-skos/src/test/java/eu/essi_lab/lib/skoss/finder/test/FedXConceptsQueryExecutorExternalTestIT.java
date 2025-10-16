@@ -10,8 +10,8 @@ import org.eclipse.rdf4j.federated.FedXConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.finder.impl.DefaultConceptsQueryBuilder;
-import eu.essi_lab.lib.skoss.finder.impl.FedXConceptsQueryExecutor;
+import eu.essi_lab.lib.skos.finder.impl.DefaultConceptsQueryBuilder;
+import eu.essi_lab.lib.skos.finder.impl.FedXConceptsQueryExecutor;
 
 /**
  * @author Fabrizio

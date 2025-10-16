@@ -29,6 +29,7 @@ import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
+import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -52,7 +53,8 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     private static final String ENABLE_DOWNLOAD_MAIL_REPORTS_OPTION_KEY = "enableMailDownloadReport";
     private static final String ENABLE_ERROR_LOGS_MAIL_REPORTS_OPTION_KEY = "enableErrorLogsReport";
     private static final String EMAIL_SETTING_ID = "emailSetting";
-    private static final String USERS_DATABASE_SETTING_KEY = "usersDatabase";
+    private static final String USERS_DATABASE_SETTING_ID = "usersDatabase";
+    private static final String SEM_SEARCH_SETTING_ID = "defSemanticSearch";
 
     /**
      * @author Fabrizio
@@ -279,7 +281,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	userdbSetting.enableCompactMode(false);
 	userdbSetting.setName("User database setting");
-	userdbSetting.setIdentifier(USERS_DATABASE_SETTING_KEY);
+	userdbSetting.setIdentifier(USERS_DATABASE_SETTING_ID);
 	userdbSetting
 		.setDescription("If enabled and configured, this setting allows to retrieve users information from a specific database");
 	userdbSetting.removeVolatileSettings();
@@ -289,6 +291,15 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	userdbSetting.hideDatabaseConfigurationFolderOption();
 
 	addSetting(userdbSetting);
+
+	//
+	// Ontology default settings
+	//
+
+	DefaultSemanticSearchSetting semSearchSetting = new DefaultSemanticSearchSetting();
+	semSearchSetting.setIdentifier(SEM_SEARCH_SETTING_ID);
+
+	addSetting(semSearchSetting);
 
 	//
 	// set the rendering extension
@@ -473,7 +484,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
      */
     public Optional<UsersDatabaseSetting> getUsersDatabaseSetting() {
 
-	UsersDatabaseSetting setting = getSetting(USERS_DATABASE_SETTING_KEY, UsersDatabaseSetting.class).get();
+	UsersDatabaseSetting setting = getSetting(USERS_DATABASE_SETTING_ID, UsersDatabaseSetting.class).get();
 
 	if (setting.isEnabled()) {
 
@@ -481,5 +492,13 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * @return
+     */
+    public DefaultSemanticSearchSetting getDefaultSemanticSearchSetting() {
+
+	return getSetting(SEM_SEARCH_SETTING_ID, DefaultSemanticSearchSetting.class).get();
     }
 }

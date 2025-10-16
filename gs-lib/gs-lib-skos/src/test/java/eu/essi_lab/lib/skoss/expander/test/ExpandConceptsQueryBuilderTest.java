@@ -8,9 +8,9 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skoss.expander.impl.DefaultExpandConceptsQueryBuilder;
+import eu.essi_lab.lib.skos.SKOSSemanticRelation;
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.impl.DefaultExpandConceptsQueryBuilder;
 
 /**
  * @author Fabrizio
