@@ -29,9 +29,9 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import eu.essi_lab.cfga.gs.setting.OntologySetting.Availability;
-import eu.essi_lab.cfga.gs.setting.OntologySetting.DataModel;
-import eu.essi_lab.cfga.gs.setting.OntologySetting.QueryLanguage;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.Availability;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.DataModel;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.QueryLanguage;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.gssrv.rest.conf.ConfigRequest;
 import eu.essi_lab.gssrv.rest.conf.Parameter;

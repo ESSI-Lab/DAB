@@ -32,6 +32,7 @@ import java.util.function.Consumer;
 import eu.essi_lab.lib.skos.QueryTask;
 import eu.essi_lab.lib.skos.SKOSResponse;
 import eu.essi_lab.lib.skos.SKOSSemanticRelation;
+import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
@@ -41,7 +42,7 @@ public interface ConceptsExpander<T extends QueryTask> {
     /**
      * @author Fabrizio
      */
-    public enum ExpansionLevel {
+    public enum ExpansionLevel implements LabeledEnum {
 
 	/**
 	 * 
@@ -104,6 +105,12 @@ public interface ConceptsExpander<T extends QueryTask> {
 
 	    return value;
 	}
+
+	@Override
+	public String getLabel() {
+
+	    return String.valueOf(getValue());
+	}
     }
 
     /**
@@ -129,7 +136,7 @@ public interface ConceptsExpander<T extends QueryTask> {
     /**
      * @return
      */
-    default Optional<Consumer<T>> getTaskConsumer(){
+    default Optional<Consumer<T>> getTaskConsumer() {
 
 	return Optional.empty();
     }

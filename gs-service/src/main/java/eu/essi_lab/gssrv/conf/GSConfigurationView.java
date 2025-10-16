@@ -46,7 +46,6 @@ import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
 import eu.essi_lab.cfga.gs.setting.GSSourceSetting;
-import eu.essi_lab.cfga.gs.setting.OntologySetting.OntologySettingComponentInfo;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
@@ -55,6 +54,7 @@ import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting.Distribution
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting.HarvestingSettingComponentInfo;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.OntologySettingComponentInfo;
 import eu.essi_lab.cfga.gui.ConfigurationView;
 import eu.essi_lab.cfga.gui.LogOutButtonListener;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;

@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.lib.skos.expander;
 
+import eu.essi_lab.lib.utils.LabeledEnum;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -32,22 +34,38 @@ public class ExpansionLimit {
     /**
      * @author Fabrizio
      */
-    public enum LimitTarget {
+    public enum LimitTarget implements LabeledEnum {
 
 	/**
 	 * 
 	 */
-	CONCEPTS,
+	CONCEPTS("Concepts"),
 
 	/**
 	 * 
 	 */
-	ALT_LABELS,
+	ALT_LABELS("Alternate labels"),
 
 	/**
 	 * 
 	 */
-	LABELS;
+	LABELS("Labels");
+
+	private String label;
+
+	/**
+	 * @param label
+	 */
+	private LimitTarget(String label) {
+
+	    this.label = label;
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return this.label;
+	}
     }
 
     private LimitTarget target;
@@ -62,7 +80,7 @@ public class ExpansionLimit {
 
 	ExpansionLimit out = new ExpansionLimit();
 	out.target = target;
-	out.limit = limit;
+	out.limit = limit == 0 ? Integer.MAX_VALUE : limit;
 	return out;
     }
 

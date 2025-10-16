@@ -106,11 +106,10 @@ public class ClientExternalTestIT {
 
     }
 
-    
     @Test
     public void mediumExpansionLimit10Test_ConceptsExpander() throws Exception {
 
-	mediumExpansionLimit10Test(new DefaultConceptsFinder(), new DefaultConceptsExpander(), ThreadMode.SINGLE());
+	mediumExpansionLimit10Test(new DefaultConceptsFinder(), new DefaultConceptsExpander(), ThreadMode.MULTI());
     }
 
     /**
@@ -125,11 +124,19 @@ public class ClientExternalTestIT {
 	client.setOntologyUrls(Arrays.asList(//
 		"http://localhost:3031/gemet/query", //
 		"http://hydro.geodab.eu/hydro-ontology/sparql", //
-		"https://vocabularies.unesco.org/sparql" //
-	));
+		"https://vocabularies.unesco.org/sparql", //
+		"https://dbpedia.org/sparql"));
 
-	client.setExpansionLevel(ExpansionLevel.LOW);
-	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 100));
+	client.setSourceLangs(List.of("en"));
+	client.setSearchLangs(List.of("it"));
+
+	client.setExpansionLevel(ExpansionLevel.MEDIUM);
+	client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 1000));
+	
+	client.setExpansionsRelations(List.of(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED));
+//	client.setExpansionsRelations(List.of(SKOSSemanticRelation.NARROWER ));
+
+	
 	client.setSearchValue(SearchTarget.TERMS, "water");
 
 	//
@@ -150,7 +157,8 @@ public class ClientExternalTestIT {
 
 	SKOSResponse response = client.search();
 
-	List<SKOSConcept> results = response.getResults().stream().//
+	List<SKOSConcept> results = response.getAggregatedResults().//
+		stream().//
 		sorted((r1, r2) -> r1.toString().compareTo(r2.toString())). //
 		toList();//
 
@@ -159,9 +167,9 @@ public class ClientExternalTestIT {
 	results.forEach(res -> System.out.println(res + "\n---"));
 
 	//
-	// System.out.println("\n\n");
+	System.out.println("\n\n");
 	//
-	// response.getPrefLabels().forEach(pref -> System.out.println(pref));
+	response.getLabels().forEach(pref -> System.out.println(pref));
 	//
 	// System.out.println("\n\n");
 	//
