@@ -1,6 +1,7 @@
 package eu.essi_lab.cfga.gui.components.option.listener;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 /*-
  * #%L
@@ -192,17 +193,37 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Single labeled enum value from a select");
 
-	    @SuppressWarnings({ "unchecked" })
-	    LabeledEnum enumValue = (LabeledEnum) LabeledEnum.valueOf(//
-		    (Class<? extends LabeledEnum>) valueClass, //
-		    value.toString()).get();
+	    if (value instanceof Collection<?>) {
 
-	    option.select(v -> v.equals(enumValue));
+		Collection<?> col = (Collection<?>) value;
 
-	    Object selectedValue = option.getSelectedValue();
-	    if (selectedValue == null) {
+		@SuppressWarnings("unchecked")
+		List<LabeledEnum> list = col.stream().map(val -> (LabeledEnum) LabeledEnum.valueOf(//
+			(Class<? extends LabeledEnum>) valueClass, //
+			val.toString()).get()).toList();
 
-		GSLoggerFactory.getLogger(getClass()).warn("Selection failed for option {}", option.getKey());
+		option.select(v -> list.contains(v));
+
+		List<?> selectedValues = option.getSelectedValues();
+		if (selectedValues.isEmpty()) {
+
+		    GSLoggerFactory.getLogger(getClass()).warn("Selection failed for option {}", option.getKey());
+		}
+
+	    } else {
+
+		@SuppressWarnings({ "unchecked" })
+		LabeledEnum enumValue = (LabeledEnum) LabeledEnum.valueOf(//
+			(Class<? extends LabeledEnum>) valueClass, //
+			value.toString()).get();
+
+		option.select(v -> v.equals(enumValue));
+
+		Object selectedValue = option.getSelectedValue();
+		if (selectedValue == null) {
+
+		    GSLoggerFactory.getLogger(getClass()).warn("Selection failed for option {}", option.getKey());
+		}
 	    }
 
 	    return;
@@ -211,7 +232,9 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 	//
 	// Single enum value from a select
 	//
-	if (Enum.class.isAssignableFrom(valueClass)) {
+	if (Enum.class.isAssignableFrom(valueClass))
+
+	{
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Single enum value from a select");
 

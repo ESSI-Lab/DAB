@@ -22,7 +22,6 @@ package eu.essi_lab.cfga.gs.setting.connector;
  */
 
 import java.util.Optional;
-import java.util.Properties;
 
 import org.json.JSONObject;
 
