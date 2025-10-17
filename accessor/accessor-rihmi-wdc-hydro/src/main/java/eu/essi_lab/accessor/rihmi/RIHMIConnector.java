@@ -34,12 +34,8 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Node;
 
@@ -84,7 +80,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
     private RIHMIClient client = null;
 
-    private HttpResponse<InputStream> response = null;
+    private List<Node> stationList = new ArrayList<Node>();
 
     @Override
     public ListRecordsResponse<OriginalMetadata> listTimeseries(String stationId) throws GSException {
@@ -103,26 +99,25 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	    }
 
 	    if (getSourceURL().contains(client.getHydrolareStationEndpoint())) {
-
+		HttpResponse<InputStream> response = null;
 		String token = request.getResumptionToken();
 		int start = 0;
 		if (token != null) {
-
 		    start = Integer.valueOf(token);
 		} else {
 		    response = client.getDownloadResponse(getSourceURL());
+		    XMLDocumentReader reader = new XMLDocumentReader(response.body());
+		    Node[] nodes = reader.evaluateNodes("//*:observationMember");
+		    for (Node n : nodes) {
+			OriginalMetadata om = new OriginalMetadata();
+			om = getOM(reader, n);
+			if (om != null) {
+			    ret.addRecord(om);
+			}
+		    }
 		}
 
-		Optional<Integer> mr = getSetting().getMaxRecords();
-		boolean maxNumberReached = false;
-		if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && start > mr.get() - 1) {
-		    // max record set
-		    maxNumberReached = true;
-		}
-
-		XMLDocumentReader reader = new XMLDocumentReader(response.body());
-
-		ret = getOriginalMetadata(reader, start);
+		ret.setResumptionToken(null);
 
 		return ret;
 	    }
@@ -164,35 +159,6 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
     }
 
-    private ListRecordsResponse<OriginalMetadata> getOriginalMetadata(XMLDocumentReader reader, int start) {
-	ListRecordsResponse<OriginalMetadata> listResponse = new ListRecordsResponse<OriginalMetadata>();
-	try {
-	    Node[] nodes = reader.evaluateNodes("//*:observationMember");
-	    int length = nodes.length;
-	    int pageSize = getSetting().getPageSize();
-	    if (start < length) {
-		int end = start + pageSize;
-		if (end > length) {
-		    end = length;
-		}
-
-		int count = 0;
-
-		for (int i = start; i < end; i++) {
-		    Node row = nodes[i];
-		    OriginalMetadata om = getOM(reader, row);
-		    listResponse.addRecord(om);
-		}
-	    }
-
-	} catch (Exception e) {
-	    // TODO: handle exception
-	}
-
-	return listResponse;
-
-    }
-
     private OriginalMetadata getOM(XMLDocumentReader reader, Node row) {
 	OriginalMetadata record = new OriginalMetadata();
 	try {
@@ -201,9 +167,9 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	    source.setEndpoint(getSourceURL());
 	    dataset.setSource(source);
 	    // String shortName = reader.evaluateString(row, "*:td[@class='shortname']/*:a");
-	    String from = reader.evaluateString(row, "//*:TimePeriod/*:beginPosition");
-	    String to = reader.evaluateString(row, "//*:TimePeriod/*:endPosition");
-	    String pos = reader.evaluateString(row, "//*:shape/*:Point/*:pos");
+	    String from = reader.evaluateString(row, "*:OM_Observation/*:phenomenonTime/*:TimePeriod/*:beginPosition");
+	    String to = reader.evaluateString(row, "*:OM_Observation/*:phenomenonTime/*:TimePeriod/*:endPosition");
+	    String pos = reader.evaluateString(row, "*:OM_Observation/*:featureOfInterest/*:MonitoringPoint/*:shape/*:Point/*:pos");
 	    String[] split = new String[2];
 	    split = pos.split(" ");
 
@@ -217,7 +183,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		end = getIsoDateFromYear(to);
 	    }
 
-	    String stationId = reader.evaluateString(row, "//*:MonitoringPoint/*:identifier");
+	    String stationId = reader.evaluateString(row, "*:OM_Observation/*:featureOfInterest/*:MonitoringPoint/*:identifier");
 
 	    RIHMIMetadata rm = new RIHMIMetadata();
 	    rm.setStationId(stationId);
@@ -245,17 +211,18 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	    // }
 
 	    String stationName = reader.evaluateString(row,
-		    "//*:featureOfInterest//*:NamedValue[*:name/@xlink:title='station name'\r\n" + "]/*:value/*:CharacterString/text()");
+		    "*:OM_Observation/*:featureOfInterest//*:NamedValue[*:name/@*:title='station name']/*:value/*:CharacterString/text()");
+
 	    String name = reader.evaluateString(row,
-		    "//*:MonitoringPoint[1]/*:parameter[1]/*:NamedValue[1]/*:value[1]/*:CharacterString[1]");
+		    "*:OM_Observation/*:featureOfInterest/*:MonitoringPoint[1]/*:parameter[1]/*:NamedValue[1]/*:value[1]/*:CharacterString[1]");
 	    rm.setStationName(name);
 
 	    String units = reader.evaluateString(row,
-		    "//*:MeasurementTimeseries[1]/*:defaultPointMetadata[1]/*:DefaultTVPMeasurementMetadata[1]/*:uom[1]/@code");
+		    "*:OM_Observation/*:result/*:MeasurementTimeseries[1]/*:defaultPointMetadata[1]/*:DefaultTVPMeasurementMetadata[1]/*:uom[1]/@code");
 	    rm.setUnits(units);
 
 	    String interpolation = reader.evaluateString(row,
-		    "//*:MeasurementTimeseries[1]/*:defaultPointMetadata[1]/*:DefaultTVPMeasurementMetadata[1]/*:interpolationType[1]/@*:href");
+		    "*:OM_Observation/*:result/*:MeasurementTimeseries[1]/*:defaultPointMetadata[1]/*:DefaultTVPMeasurementMetadata[1]/*:interpolationType[1]/@*:href");
 
 	    if (interpolation != null && !interpolation.isEmpty()) {
 		if (interpolation.equals("http://www.opengis.net/def/waterml/2.0/interpolationType/AverageSucc")) {
@@ -266,7 +233,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	    }
 
 	    String aggregationDuration = reader.evaluateString(row,
-		    "//*:MeasurementTimeseries[1]/*:defaultPointMetadata[1]/*:DefaultTVPMeasurementMetadata[1]/*:aggregationDuration[1]");
+		    "*:OM_Observation/*:result/*:MeasurementTimeseries[1]/*:defaultPointMetadata[1]/*:DefaultTVPMeasurementMetadata[1]/*:aggregationDuration[1]");
 	    if (aggregationDuration != null && !aggregationDuration.isEmpty()) {
 		rm.setAggregationDuration(aggregationDuration);
 	    }
@@ -281,25 +248,19 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	    // }
 
 	    String orgNamePub = reader.evaluateString(row,
-		    "//*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='publisher']/*:CI_ResponsibleParty/*:organisationName/*:CharacterString/text()");
+		    "*:OM_Observation/*:metadata/*:ObservationMetadata/*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='publisher']/*:CI_ResponsibleParty/*:organisationName/*:CharacterString/text()");
 	    String emailPub = reader.evaluateString(row,
-		    "//*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='publisher']//*:electronicMailAddress/*:CharacterString/text()");
+		    "*:OM_Observation/*:metadata/*:ObservationMetadata/*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='publisher']//*:electronicMailAddress/*:CharacterString/text()");
 
 	    String orgNameOriginator = reader.evaluateString(row,
-		    "//*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='originator']/*:CI_ResponsibleParty/*:organisationName/*:CharacterString/text()");
+		    "*:OM_Observation/*:metadata/*:ObservationMetadata/*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='originator']/*:CI_ResponsibleParty/*:organisationName/*:CharacterString/text()");
 	    String emailOriginator = reader.evaluateString(row,
-		    "//*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='originator']//*:electronicMailAddress/*:CharacterString/text()");
+		    "*:OM_Observation/*:metadata/*:ObservationMetadata/*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='originator']//*:electronicMailAddress/*:CharacterString/text()");
 
 	    String country = reader.evaluateString(row,
-		    "//*:featureOfInterest//*:NamedValue[*:name/@xlink:title='country'\r\n" + "]/*:value/*:CharacterString/text()");
+		    "*:OM_Observation/*:featureOfInterest//*:NamedValue[*:name/@*:title='country']/*:value/*:CharacterString/text()");
 
 	    CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
-
-	    RIHMIIdentifierMangler mangler = new RIHMIIdentifierMangler();
-	    mangler.setPlatformIdentifier(stationId);
-	    mangler.setParameterIdentifier(rm.getParameterId());
-
-	    String id = mangler.getMangling();
 
 	    // TIME
 	    if (start != null && end != null) {
@@ -315,7 +276,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	    }
 
 	    String interpolationString = "";
-	    if (interpolation != null) {
+	    if (interpolation != null && !interpolation.isEmpty()) {
 		if (interpolation.equals(InterpolationType.AVERAGE_SUCC)) {
 		    interpolationString = "(" + aggregationDuration + " average)";
 		} else {
@@ -408,7 +369,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	    coverageDescription.setAttributeDescription(attributeDescription);
 	    coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
-	    if (interpolation != null) {
+	    if (interpolation != null && !interpolation.isEmpty()) {
 		dataset.getExtensionHandler().setTimeInterpolation(interpolation);
 	    }
 	    if (aggregationDuration != null && !aggregationDuration.isEmpty()) {
@@ -428,7 +389,9 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 	    // COUNTRY
 	    if (country != null && !country.isEmpty()) {
-		dataset.getExtensionHandler().setCountry(Country.decode(country).getShortName());
+		Country c = Country.decode(country);
+		if (c != null)
+		    dataset.getExtensionHandler().setCountry(c.getShortName());
 	    }
 
 	    String str = dataset.asString(true);
@@ -438,6 +401,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	} catch (Exception e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
+	    return null;
 	}
 	return record;
 
@@ -783,6 +747,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
     public List<String> listMetadataFormats() throws GSException {
 	List<String> ret = new ArrayList<String>();
 	ret.add(CommonNameSpaceContext.RIHMI_URI);
+	ret.add(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
 	return ret;
     }
 
