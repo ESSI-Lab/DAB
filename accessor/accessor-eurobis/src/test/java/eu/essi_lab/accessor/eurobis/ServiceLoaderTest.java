@@ -1,5 +1,6 @@
 package eu.essi_lab.accessor.eurobis;
 
+import eu.essi_lab.accessor.eurobis.ld.EurOBISLdAccessor;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -29,9 +30,9 @@ public class ServiceLoaderTest {
 
 	    accessors.sort((a1, a2) -> a2.getClass().getName().compareTo(a1.getClass().getName()));
 
-	    Assert.assertEquals(1, accessors.size());
+	    Assert.assertEquals(3, accessors.size());
 
-	    Assert.assertEquals(EurOBISAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(EurOBISLdAccessor.class, accessors.get(0).getClass());
 	}
 
 	{
@@ -39,9 +40,9 @@ public class ServiceLoaderTest {
 
 	    accessors.sort((a1, a2) -> a2.getClass().getName().compareTo(a1.getClass().getName()));
 
-	    Assert.assertEquals(1, accessors.size());
+	    Assert.assertEquals(3, accessors.size());
 
-	    Assert.assertEquals(EurOBISAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(EurOBISLdAccessor.class, accessors.get(0).getClass());
 	}
 
 	{
@@ -57,7 +58,7 @@ public class ServiceLoaderTest {
 
 	ServiceLoader<IHarvestedQueryConnector> loader = ServiceLoader.load(IHarvestedQueryConnector.class);
 
-	Assert.assertEquals(1, StreamUtils.iteratorToStream(loader.iterator()).count());
+	Assert.assertEquals(3, StreamUtils.iteratorToStream(loader.iterator()).count());
 
 	Assert.assertTrue(//
 		StreamUtils

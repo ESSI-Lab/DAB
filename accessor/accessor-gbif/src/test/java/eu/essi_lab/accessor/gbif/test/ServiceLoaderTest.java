@@ -107,7 +107,7 @@ public class ServiceLoaderTest {
 	    List<IHarvestedAccessor> accessors = AccessorFactory.getHarvestedAccessors(LookupPolicy.ALL);
 	    accessors.sort((a1, a2) -> a1.getClass().getName().compareTo(a2.getClass().getName()));
 
-	    Assert.assertEquals(2, accessors.size());
+	    Assert.assertEquals(3, accessors.size());
 
 	    Assert.assertEquals(GBIFMixedHarvestedAccessor.class, accessors.get(0).getClass());
 	    Assert.assertEquals(OAIPMHAccessor.class, accessors.get(1).getClass());
@@ -116,7 +116,7 @@ public class ServiceLoaderTest {
 	{
 	    List<IHarvestedAccessor> accessors = AccessorFactory.getHarvestedAccessors(LookupPolicy.SPECIFIC);
 
-	    Assert.assertEquals(1, accessors.size());
+	    Assert.assertEquals(2, accessors.size());
 
 	    Assert.assertEquals(OAIPMHAccessor.class, accessors.get(0).getClass());
 	}
