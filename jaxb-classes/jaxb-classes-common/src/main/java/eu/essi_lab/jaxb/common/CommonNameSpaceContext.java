@@ -65,6 +65,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String EUROBIS_NS_URI = "http://essi-lab.eu/EurOBIS";
     public static final String EUROBIS_LD_NS_URI = "http://essi-lab.eu/EurOBIS-LD";
     public static final String EMODNET_PHYSICS_NS_URI = "http://essi-lab.eu/EMODNETPhysics";
+    public static final String EMODNET_PHYSICS_RIVER_NS_URI = "http://essi-lab.eu/EMODNETPhysics/River";
     public static final String NIWA_NS_URI = "http://essi-lab.eu/NIWA";
     public static final String ICOS_NS_URI = "http://essi-lab.eu/ICOS";
     public static final String MCP_1_NS_URI = "http://bluenet3.antcrc.utas.edu.au/mcp";

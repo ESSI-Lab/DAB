@@ -30,8 +30,23 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 public class ERDDAPRiverClient {
     private String baseURL;
+    public String getBaseURL() {
+        return baseURL;
+    }
+
     private List<String> metadataURLs = new ArrayList<String>();
     private String dataURL = null;
+
+    public String getDataURL() {
+	return dataURL;
+    }
+
+    public void setDataURL(String dataURL) {
+	this.dataURL = dataURL;
+    }
+    public ERDDAPRiverClient() {
+	// TODO Auto-generated constructor stub
+    }
 
     public ERDDAPRiverClient(String url) {
 	this.baseURL = url;
@@ -58,7 +73,7 @@ public class ERDDAPRiverClient {
 	    ERDDAPClient client = new ERDDAPClient(dap);
 	    ret.addAll(client.getRows());
 	}
-	return ret;
+	return ret.subList(0, 10);
     }
 
     public List<ERDDAPRow> getData(String stationCode, Date begin, Date end) {

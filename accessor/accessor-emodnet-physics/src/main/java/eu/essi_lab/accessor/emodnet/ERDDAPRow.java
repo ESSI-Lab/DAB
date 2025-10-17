@@ -1,5 +1,11 @@
 package eu.essi_lab.accessor.emodnet;
 
+import org.json.JSONObject;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -23,9 +29,25 @@ package eu.essi_lab.accessor.emodnet;
 
 public class ERDDAPRow {
 
-    String[] headers = null;
+    private String[] headers = null;
     private Object[] values;
 
+    public Object[] getValues() {
+        return values;
+    }
+
+    public void setValues(Object[] values) {
+        this.values = values;
+    }
+
+    public ERDDAPRow(JSONObject json) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        // Deserialize back
+        ERDDAPRow restored = mapper.readValue(json.toString(), ERDDAPRow.class);
+        this.headers = restored.getHeaders();
+        this.values = restored.getValues();
+    }
+    
     public ERDDAPRow(String[] headers, Object[] values) {
 	this.headers = headers;
 	this.values = values;
@@ -59,5 +81,13 @@ public class ERDDAPRow {
 	}
 	return ret;
     }
+    
+    public JSONObject toJSONObject() throws Exception {
+	ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(this);
+        return new JSONObject(json);
+    }
+    
+    
 
 }
