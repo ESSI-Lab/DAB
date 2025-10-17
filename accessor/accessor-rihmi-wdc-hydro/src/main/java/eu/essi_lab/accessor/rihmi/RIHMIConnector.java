@@ -295,6 +295,8 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	    // BBOX
 	    if (rm.getLatitude() != null && rm.getLongitude() != null) {
 		coreMetadata.addBoundingBox(rm.getLatitude(), rm.getLongitude(), rm.getLatitude(), rm.getLongitude());
+	    } else {
+		return null;
 	    }
 
 	    // RESPONSIBLES
