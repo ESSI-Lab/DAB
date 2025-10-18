@@ -379,6 +379,14 @@
 
 		<docker.elasticsearch>opensearchproject/opensearch:1.3.5</docker.elasticsearch>
 
+        <surefire.arglineopen>
+            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+            --add-opens=java.base/java.lang=ALL-UNNAMED
+            --add-opens=java.base/java.io=ALL-UNNAMED
+            --add-opens=java.base/java.util=ALL-UNNAMED
+            --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+            --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+        </surefire.arglineopen>
 	</properties>
 
 	<dependencyManagement>
@@ -1332,6 +1340,7 @@
 					<version>3.0.0-M3</version>
 					<configuration>
 						<skip>false</skip>
+                        <argLine>${surefire.arglineopen}</argLine>
 					</configuration>
 					<executions>
 						<execution>
