@@ -21,7 +21,7 @@ import eu.essi_lab.model.resource.HarmonizedMetadata;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import junit.framework.TestCase;
 
-public class ARGOMapperTest {
+public class ARGOMapperExternalTestIT {
 
     private ARGOMapper mapper;
 
@@ -34,7 +34,7 @@ public class ARGOMapperTest {
     
     @Test
     public void testMissingLon() throws Exception {
-	InputStream stream = ARGOMapperTest.class.getClassLoader().getResourceAsStream("missingLon.json");
+	InputStream stream = ARGOMapperExternalTestIT.class.getClassLoader().getResourceAsStream("missingLon.json");
 
 	ClonableInputStream cloneStream = new ClonableInputStream(stream);
 
@@ -53,7 +53,7 @@ public class ARGOMapperTest {
 
     @Test
     public void testMinimalMapperFromExample() throws Exception {
-	InputStream stream = ARGOMapperTest.class.getClassLoader().getResourceAsStream("fullARGO.json");
+	InputStream stream = ARGOMapperExternalTestIT.class.getClassLoader().getResourceAsStream("fullARGO.json");
 
 	ClonableInputStream cloneStream = new ClonableInputStream(stream);
 
