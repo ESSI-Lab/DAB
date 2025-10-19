@@ -60,7 +60,7 @@ public class ServiceLoaderTest {
 
 	ServiceLoader<SOSConnector> loader = ServiceLoader.load(SOSConnector.class);
 
-	Assert.assertEquals(3, StreamUtils.iteratorToStream(loader.iterator()).count());
+	Assert.assertEquals(5, StreamUtils.iteratorToStream(loader.iterator()).count());
 
 	List<String> types = StreamUtils.iteratorToStream(loader.iterator()).map(c -> c.getType()).collect(Collectors.toList());
 
