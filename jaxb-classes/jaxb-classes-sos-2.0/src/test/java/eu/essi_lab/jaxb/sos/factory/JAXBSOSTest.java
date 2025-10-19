@@ -19,7 +19,7 @@ public class JAXBSOSTest {
     @Test
     public void testSos() throws JAXBException {
 	InputStream capStream = JAXBSOSTest.class.getClassLoader().getResourceAsStream("soscapabilities.xml");
-	InputStreamReader reader = new InputStreamReader(capStream, StandardCharsets.UTF_8);
+	InputStreamReader reader = new InputStreamReader(capStream, StandardCharsets.UTF_16);
 	JAXBSOS.getInstance().unmarshal(reader);
     }
     
