@@ -27,7 +27,7 @@ import eu.essi_lab.lib.utils.ThreadMode;
 /**
  * @author Fabrizio
  */
-public class ClientExternalOntologiesOrderTest {
+public class ClientExternalOntologiesOrderExternalTestIT {
 
     @Test
     public void excludeNoPrefLabelsConcepts() throws IllegalArgumentException, Exception {
