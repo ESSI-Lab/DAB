@@ -66,9 +66,10 @@ public class GSKnowledgeResourceDescription {
      */
     public void add(GSPredicate gsPredicate, Value value) {
 
-	attributes.computeIfAbsent(//
-		gsPredicate, //
-		k -> attributes.put(gsPredicate, new ArrayList<>()));
+//	attributes.computeIfAbsent(//
+//		gsPredicate, //
+//		k -> attributes.put(gsPredicate, new ArrayList<>()));
+	attributes.computeIfAbsent(gsPredicate, k -> new ArrayList<>());
 
 	attributes.get(gsPredicate).add(value);
     }
