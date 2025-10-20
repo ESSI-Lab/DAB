@@ -75,9 +75,9 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 
 	List<SKOSConcept> currentLevelResults = new ArrayList<SKOSConcept>();
 
-	currentLevelResults.add(SKOSConcept.of(null, null, new HashSet<String>(concepts), Set.of(), Set.of()));
+	currentLevelResults.add(SKOSConcept.of(new HashSet<String>(concepts)));
 
-	for (int i = 0; i <= targetLevel.getValue(); i++) {
+	for (int currentLevel = 0; currentLevel <= targetLevel.getValue(); currentLevel++) {
 
 	    ExecutorService executor = getThreadMode().getExecutor();
 
@@ -93,16 +93,16 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 
 		    SKOSConcept sc = SKOSConcept.of(expanded);
 
-		    sc.getExpandedFrom().add(currentLevelResult.getConcept());
+		    sc.getExpandedFrom().add(currentLevelResult.getConceptURI());
 		    queryConcepts.add(sc);
 		}
 	    }
 
-	    List<String> queryConceptsURIs = queryConcepts.stream().map(SKOSConcept::getConcept).collect(Collectors.toList());
+	    List<String> conceptsURIs = queryConcepts.stream().map(SKOSConcept::getConceptURI).collect(Collectors.toList());
 
 	    ExpandConceptsQueryBuilder builder = getQueryBuilder();
 
-	    String query = builder.build(queryConceptsURIs, searchLangs, relations, ExpansionLevel.HIGH, ExpansionLevel.NONE);
+	    String query = builder.build(conceptsURIs, searchLangs, relations, ExpansionLevel.HIGH, ExpansionLevel.NONE);
 
 	    if (traceQuery()) {
 		GSLoggerFactory.getLogger(getClass()).trace("\n" + query);
@@ -110,7 +110,10 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 
 	    for (String ontologyURL : ontologyUrls) {
 
-		RDF4JQueryTask task = new RDF4JQueryTask(ontologyURL, query, queryConcepts);
+		RDF4JQueryTask task = new RDF4JQueryTask(//
+			ontologyURL, //
+			query, //
+			queryConcepts);
 
 		getTaskConsumer().ifPresent(consumer -> consumer.accept(task));
 
@@ -137,6 +140,11 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 	    }
 
 	    results.addAll(currentLevelResults);
+
+	    for (SKOSConcept skosConcept : currentLevelResults) {
+
+		skosConcept.setLevel(ExpansionLevel.of(currentLevel).get());
+	    }
 	}
 
 	if (isExcludeNoPrefConcepts()) {
