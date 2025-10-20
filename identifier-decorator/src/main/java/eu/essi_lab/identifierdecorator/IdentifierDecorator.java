@@ -158,7 +158,8 @@ public class IdentifierDecorator {
 		    //
 		    request.addIncrementalModifiedResource(existingResource);
 
-		} else if (duplicationCase > 0) {
+		}
+		if (duplicationCase > 0) {
 		    //
 		    // the source administrator should be warn since it means that the source
 		    // provides records with same identifier.
@@ -220,7 +221,7 @@ public class IdentifierDecorator {
 	    }
 	} else if (preserveIds) {
 
-	    if (request.isFirstHarvesting()) {
+	    if (isFirstHarvesting) {
 
 		decorateIdentifier(incomingResource, incomingResource.getSource(), originalId);
 
