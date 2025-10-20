@@ -7,11 +7,10 @@
          xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
          xmlns:d2k="http://eu.essi_lab.core/2018/06/d2k#">
 
-    <rdf:Description rdf:about="http://eu.floraresearch.essi.core/test/unontology">
+    <rdf:Description rdf:about="http://eu.essi_lab.core/test/unontology">
         <rdf:type rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Root"/>
         <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Sustainable Development - Knowledge Platform</rdfs:label>
-        <skos:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Sustainable Development - Knowledge Platform Description
-        </skos:definition>
+        <skos:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Sustainable Development - Knowledge Platform Description</skos:definition>
     </rdf:Description>
 
 </rdf:RDF>

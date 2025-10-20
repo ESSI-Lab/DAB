@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import eu.essi_lab.model.exceptions.GSException;
@@ -14,11 +15,15 @@ import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.ontology.d2k.predicates.D2KGSPredicate;
 import eu.essi_lab.model.ontology.d2k.resources.GSPolicyGoalResource;
 import eu.essi_lab.model.ontology.d2k.resources.GSRootResource;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author ilsanto
  */
 public class J2RDFDeserializerTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void test() throws GSException {
@@ -27,7 +32,7 @@ public class J2RDFDeserializerTest {
 
 	GSKnowledgeResourceDescription resourceDescription = new J2RDFDeserializer().deserialize(is).get(0);
 
-	assertEquals("http://eu.essi_lab.essi.core/test/unontology", resourceDescription.getResource().stringValue());
+	assertEquals("http://eu.essi_lab.core/test/unontology", resourceDescription.getResource().stringValue());
 
 	assertTrue(GSRootResource.class.isAssignableFrom(resourceDescription.getResource().getClass()));
 
@@ -53,7 +58,7 @@ public class J2RDFDeserializerTest {
 
 	GSKnowledgeResourceDescription resourceDescription = descriptions.get(0);
 
-	assertEquals("http://eu.essi_lab.essi.core/test/goal1", resourceDescription.getResource().stringValue());
+	assertEquals("http://eu.essi_lab.core/test/goal1", resourceDescription.getResource().stringValue());
 
 	assertTrue(GSPolicyGoalResource.class.isAssignableFrom(resourceDescription.getResource().getClass()));
 
@@ -61,15 +66,15 @@ public class J2RDFDeserializerTest {
 
 	assertEquals("SDG 1", resourceDescription.getValues(D2KGSPredicate.LABEL).get(0).stringValue());
 
-	assertEquals("http://eu.essi_lab.essi.core/test/unontology", resourceDescription.getValues(D2KGSPredicate.IS_DEFINED_BY).get(0)
+	assertEquals("http://eu.essi_lab.core/test/unontology", resourceDescription.getValues(D2KGSPredicate.IS_DEFINED_BY).get(0)
 		.stringValue());
 
-//	assertEquals("http://eu.essi_lab.essi.core/test/unontology", resourceDescription.getValues(GS_PREDICATES.IS_CHILD_OF).get(0)
-//		.stringValue());
+	//	assertEquals("http://eu.essi_lab.essi.core/test/unontology", resourceDescription.getValues(GS_PREDICATES.IS_CHILD_OF).get(0)
+	//		.stringValue());
 
 	resourceDescription = descriptions.get(1);
 
-	assertEquals("http://eu.essi_lab.essi.core/test/unontology", resourceDescription.getResource().stringValue());
+	assertEquals("http://eu.essi_lab.core/test/unontology", resourceDescription.getResource().stringValue());
 
 	assertTrue(GSRootResource.class.isAssignableFrom(resourceDescription.getResource().getClass()));
 
@@ -84,9 +89,9 @@ public class J2RDFDeserializerTest {
     @Test
     public void test4() throws GSException {
 
-	InputStream is = getClass().getClassLoader().getResourceAsStream("serialization/test4.xml");
+	expectedException.expect(GSException.class);
 
-	assertTrue(new J2RDFDeserializer().deserialize(is).isEmpty());
+	InputStream is = getClass().getClassLoader().getResourceAsStream("serialization/test4.xml");
 
     }
 

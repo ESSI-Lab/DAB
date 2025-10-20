@@ -3,7 +3,7 @@ package eu.essi_lab.model.ontology.d2k;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.openrdf.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.ontology.d2k.predicates.D2KGSPredicate;

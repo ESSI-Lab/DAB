@@ -25,11 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.openrdf.model.IRI;
-import org.openrdf.model.impl.SimpleValueFactory;
-
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.d2k.D2KGSOntologyLoader;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 /**
  * @author ilsanto

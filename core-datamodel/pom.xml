@@ -46,10 +46,17 @@
 		</dependency>	
             
       	<dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-rio-api</artifactId>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-rio-api</artifactId>
         </dependency>
-               
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-repository-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-rio-rdfxml</artifactId>
+        </dependency>
        <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-tdb</artifactId>

@@ -26,8 +26,8 @@ import java.util.Optional;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Value;
+import org.eclipse.rdf4j.model.Literal;
+import org.eclipse.rdf4j.model.Value;
 
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.ontology.GSKnowledgeScheme;

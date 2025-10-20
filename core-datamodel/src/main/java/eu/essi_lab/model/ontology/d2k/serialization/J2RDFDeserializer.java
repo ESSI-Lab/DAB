@@ -25,9 +25,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParser;
-import org.openrdf.rio.Rio;
+import org.eclipse.rdf4j.common.exception.RDF4JException;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFParser;
+import org.eclipse.rdf4j.rio.Rio;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -60,6 +61,11 @@ public class J2RDFDeserializer {
 	    throw GSException.createException(J2RDFSerializer.class, "Can't parse rdf input stream", null, ErrorInfo.ERRORTYPE_INTERNAL,
 		    ErrorInfo.SEVERITY_ERROR, RDF_PARSE_ERROR, e);
 
+	} catch (RDF4JException e) {
+	    GSLoggerFactory.getLogger(J2RDFDeserializer.class).error("RDF4J Exception parsing stream", e);
+
+	    throw GSException.createException(J2RDFDeserializer.class, "Can't parse rdf input stream", null, ErrorInfo.ERRORTYPE_INTERNAL,
+		    ErrorInfo.SEVERITY_ERROR, RDF_PARSE_ERROR, e);
 	}
 
 	return handler.getParsedObjects();

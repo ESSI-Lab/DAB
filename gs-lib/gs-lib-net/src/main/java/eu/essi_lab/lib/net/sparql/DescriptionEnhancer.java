@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.openrdf.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 

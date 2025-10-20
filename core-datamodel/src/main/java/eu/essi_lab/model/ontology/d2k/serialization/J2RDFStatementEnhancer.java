@@ -23,7 +23,7 @@ package eu.essi_lab.model.ontology.d2k.serialization;
 
 import java.util.List;
 
-import org.openrdf.model.Statement;
+import org.eclipse.rdf4j.model.Statement;
 
 /**
  * @author ilsanto
