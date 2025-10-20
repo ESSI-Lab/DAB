@@ -20,17 +20,9 @@ import eu.essi_lab.lib.xml.XMLDocumentWriter;
 /**
  * @author Fabrizio
  */
-public class InvalidXMLDocumentWriterTest {
+public class XMLDocumentRemoverNodeTest {
 
-    /**
-     * This test works with a WCS Capabilities document containing many coverage descriptions and 7134 occurrences of
-     * the text
-     * "null" outside any other elements thus invalidating the document. When all the coverages are removed except one,
-     * all the
-     * "null" elements remain. The test evaluates an xPath on the remained coverage description in order to demonstrate
-     * that
-     * the reader/writer continues to work fine also with an invalid XML document
-     */
+
     @Test
     public void test() throws SAXException, IOException, XPathExpressionException, TransformerException {
 
@@ -40,9 +32,10 @@ public class InvalidXMLDocumentWriterTest {
 	writer.remove("//*:ContentMetadata/*:CoverageOfferingBrief[*:name[text() != '1000_1' ]]");
 
 	String asString = reader.asString();
-	Assert.assertTrue(asString.contains("null"));
+	Assert.assertTrue(asString.contains("1000_1"));
+	Assert.assertFalse(asString.contains("1000_2"));
 
 	List<String> textContent = reader.evaluateTextContent("//*:timePosition/text()");
-	Assert.assertTrue(textContent.size() == 19);
+	Assert.assertTrue(textContent.size() == 2);
     }
 }
