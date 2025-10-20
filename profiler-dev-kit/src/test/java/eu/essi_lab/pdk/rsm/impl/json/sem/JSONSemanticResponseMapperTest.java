@@ -3,10 +3,10 @@ package eu.essi_lab.pdk.rsm.impl.json.sem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.json.JSONObject;
 import org.junit.Test;
-import org.openrdf.model.impl.SimpleValueFactory;
-
+ 
 import eu.essi_lab.model.ontology.GSKnowledgeOntology;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.ontology.RelationToParent;
@@ -36,9 +36,9 @@ public class JSONSemanticResponseMapperTest {
 
 	assertEquals(id, json.getJSONObject("concept").getString("id"));
 
-	//TODO
-	//here I check the attributes exist even if null, this is to be discussed:
-	//better exists with null or not exists?
+	// TODO
+	// here I check the attributes exist even if null, this is to be discussed:
+	// better exists with null or not exists?
 	assertTrue(json.getJSONObject("concept").has("source"));
 	assertTrue(json.getJSONObject("concept").getJSONObject("source").has("id"));
 	assertTrue(json.getJSONObject("concept").getJSONObject("source").has("name"));
@@ -59,7 +59,7 @@ public class JSONSemanticResponseMapperTest {
 
 	GSKnowledgeResourceDescription description = new GSKnowledgeResourceDescription(resource);
 
-	String id = D2KGSKnowledgeScheme.getInstance().getNamespace()+"-root";
+	String id = D2KGSKnowledgeScheme.getInstance().getNamespace() + "-root";
 	resource.setId(id);
 
 	String desc = "desc";
@@ -102,7 +102,7 @@ public class JSONSemanticResponseMapperTest {
 
 	GSKnowledgeResourceDescription description = new GSKnowledgeResourceDescription(resource);
 
-	String id = D2KGSKnowledgeScheme.getInstance().getNamespace()+"-root";
+	String id = D2KGSKnowledgeScheme.getInstance().getNamespace() + "-root";
 	resource.setId(id);
 
 	RelationToParent rtp = new RelationToParent();
@@ -135,9 +135,9 @@ public class JSONSemanticResponseMapperTest {
 
 	assertEquals(id, json.getJSONObject("concept").getString("id"));
 
-	//TODO
-	//here I check the attributes exist even if null, this is to be discussed:
-	//better exists with null or not exists?
+	// TODO
+	// here I check the attributes exist even if null, this is to be discussed:
+	// better exists with null or not exists?
 	assertTrue(json.getJSONObject("concept").has("source"));
 	assertTrue(json.getJSONObject("concept").getJSONObject("source").has("id"));
 	assertTrue(json.getJSONObject("concept").getJSONObject("source").has("name"));
@@ -154,7 +154,6 @@ public class JSONSemanticResponseMapperTest {
 	assertTrue(json.getJSONObject("concept").has("linkedKnwoledgeResourceTypes"));
 	assertTrue(json.getJSONObject("concept").has("geo"));
 	assertTrue(json.getJSONObject("concept").has("image_url"));
-
 
     }
 
