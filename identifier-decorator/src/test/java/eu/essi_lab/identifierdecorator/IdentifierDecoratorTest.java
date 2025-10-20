@@ -706,7 +706,7 @@ public class IdentifierDecoratorTest {
 
 		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
-	    	ListRecordsRequest listRecordsRequest =Mockito.mock(ListRecordsRequest.class);
+	    	ListRecordsRequest listRecordsRequest = Mockito.mock(ListRecordsRequest.class);
 		decorator.setListRecordsRequest(listRecordsRequest);
 
 		GSSource source = new GSSource();

@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.identifierdecorator;
 
+import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -170,8 +171,11 @@ public class DuplicatedResourceTest {
 	public void case3Test() {
 
 		HarvestingProperties harvestingProperties = new HarvestingProperties();
-
+		ListRecordsRequest listRecordsRequest =Mockito.mock(ListRecordsRequest.class);
+		decorator.setListRecordsRequest(listRecordsRequest);
 		try {
+
+
 			decorator.decorateHarvestedIdentifier(//
 					incomingResource, //
 					harvestingProperties, //
@@ -182,6 +186,7 @@ public class DuplicatedResourceTest {
 					true); // is incremental
 
 		} catch (DuplicatedResourceException e) {
+		    Mockito.verify(listRecordsRequest,Mockito.times(1)).addIncrementalModifiedResource(Mockito.any());
 
 			return;
 
