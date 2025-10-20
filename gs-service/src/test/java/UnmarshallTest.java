@@ -1,18 +1,13 @@
-package eu.essi_lab.ogc.pubsub._1_0;
-
+import eu.essi_lab.ogc.pubsub._1_0.ObjectFactory;
+import eu.essi_lab.ogc.pubsub._1_0.SubscribeType;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
-
-import org.junit.Test;
-
-import eu.essi_lab.ogc.pubsub._1_0.ObjectFactory;
-import eu.essi_lab.ogc.pubsub._1_0.SubscribeType;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 public class UnmarshallTest extends TestCase {
 
