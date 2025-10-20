@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+
 /**
  * @author Fabrizio
  */
@@ -39,6 +41,7 @@ public class SKOSConcept {
     private Set<String> expanded;
     private String pref;
     private Set<String> alt;
+    private ExpansionLevel level;
 
     /**
      * 
@@ -50,12 +53,13 @@ public class SKOSConcept {
 	expanded = new HashSet<>();
     }
 
+    /**
+     * @param concept
+     * @return
+     */
     public static SKOSConcept of(String concept) {
 
-	SKOSConcept item = new SKOSConcept();
-	item.concept = concept;
-	return item;
-
+	return SKOSConcept.of(concept, null, new HashSet<>(), new HashSet<>(), new HashSet<>());
     }
 
     /**
@@ -66,6 +70,34 @@ public class SKOSConcept {
     public static SKOSConcept of(String concept, String pref) {
 
 	return SKOSConcept.of(concept, pref, new HashSet<>(), new HashSet<>(), new HashSet<>());
+    }
+
+    /**
+     * @param expanded
+     * @return
+     */
+    public static SKOSConcept of(Set<String> expanded) {
+
+	return SKOSConcept.of(null, null, expanded, new HashSet<>(), new HashSet<>());
+    }
+
+    /**
+     * @param concept
+     * @param pref
+     * @param expanded
+     * @param expandedFrom
+     * @param alt
+     * @return
+     */
+    public static SKOSConcept of(String concept, String pref, String expanded, String expandedFrom, String alt) {
+
+	return SKOSConcept.of(//
+		concept, //
+		pref, //
+		new HashSet<String>(expanded != null ? Set.of(expanded) : Set.of()), //
+		new HashSet<String>(expandedFrom != null ? Set.of(expandedFrom) : Set.of()), //
+		new HashSet<String>(alt != null ? Set.of(alt) : Set.of())//
+	);
     }
 
     /**
@@ -89,25 +121,6 @@ public class SKOSConcept {
     }
 
     /**
-     * @param concept
-     * @param pref
-     * @param expanded
-     * @param expandedFrom
-     * @param alt
-     * @return
-     */
-    public static SKOSConcept of(String concept, String pref, String expanded, String expandedFrom, String alt) {
-
-	return SKOSConcept.of(//
-		concept, //
-		pref, //
-		new HashSet<String>(expanded != null ? Set.of(expanded) : Set.of()), //
-		new HashSet<String>(expandedFrom != null ? Set.of(expandedFrom) : Set.of()), //
-		new HashSet<String>(alt != null ? Set.of(alt) : Set.of())//
-	);
-    }
-
-    /**
      * @param pref
      */
     public void setPref(String pref) {
@@ -126,7 +139,7 @@ public class SKOSConcept {
     /**
      * @return
      */
-    public String getConcept() {
+    public String getConceptURI() {
 
 	return concept;
     }
@@ -163,14 +176,31 @@ public class SKOSConcept {
 	return alt;
     }
 
+    /**
+     * @param level
+     * @return
+     */
+    public void setLevel(ExpansionLevel expansionLevel) {
+
+	this.level = expansionLevel;
+    }
+
+    /**
+     * @return the level
+     */
+    public Optional<ExpansionLevel> getLevel() {
+
+	return Optional.ofNullable(level);
+    }
+
     @Override
     public String toString() {
 
-	return "concept: " + getConcept() + //
+	return "concept: " + getConceptURI() + //
 		"\nexpanded from: " + getExpandedFrom() + //
 		"\nexpanded: " + getExpanded() + //
 		getPref().map(v -> "\npref: " + v).orElse("") + //
-		"\nalt: " + getAlt();//
+		"\nalt: " + getAlt() + getLevel().map(v -> "\nlevel: " + v).orElse(""); //
 
     }
 
