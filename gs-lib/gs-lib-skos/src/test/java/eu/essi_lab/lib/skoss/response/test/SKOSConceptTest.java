@@ -20,7 +20,7 @@ public class SKOSConceptTest {
 
 	SKOSConcept concept = SKOSConcept.of("concept", "pref");
 
-	Assert.assertEquals("concept", concept.getConcept());
+	Assert.assertEquals("concept", concept.getConceptURI());
 	Assert.assertEquals("pref", concept.getPref().get());
 
 	Assert.assertTrue(concept.getAlt().isEmpty());
@@ -33,7 +33,7 @@ public class SKOSConceptTest {
 
 	SKOSConcept concept = SKOSConcept.of("concept", "pref", Set.of("a", "x", "y"), Set.of("b", "k"), Set.of("c"));
 
-	Assert.assertEquals("concept", concept.getConcept());
+	Assert.assertEquals("concept", concept.getConceptURI());
 	Assert.assertEquals("pref", concept.getPref().get());
 
 	Assert.assertTrue(concept.getExpanded().contains("a"));
@@ -51,7 +51,7 @@ public class SKOSConceptTest {
 
 	SKOSConcept concept = SKOSConcept.of("concept", "pref", "a", "b", "c");
 
-	Assert.assertEquals("concept", concept.getConcept());
+	Assert.assertEquals("concept", concept.getConceptURI());
 	Assert.assertEquals("pref", concept.getPref().get());
 
 	Assert.assertEquals("a", concept.getExpanded().toArray()[0]);

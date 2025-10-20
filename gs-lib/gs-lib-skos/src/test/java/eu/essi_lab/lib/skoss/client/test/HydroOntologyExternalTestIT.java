@@ -121,7 +121,7 @@ public class HydroOntologyExternalTestIT {
 	    List<SKOSConcept> concepts = response.getAggregatedResults();
 	    printConcepts(concepts);
 	    assertTrue(concepts.size() == 1);
-	    assertTrue(concepts.get(0).getConcept().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
+	    assertTrue(concepts.get(0).getConceptURI().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
 	    assertEquals(concepts.get(0).getPref().get(), "Velocity");
 	    assertTrue(concepts.get(0).getAlt().size() == 1);
 	    assertTrue(concepts.get(0).getAlt().contains("Velocità"));

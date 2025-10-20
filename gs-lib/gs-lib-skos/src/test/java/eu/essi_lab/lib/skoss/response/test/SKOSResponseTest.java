@@ -57,7 +57,7 @@ public class SKOSResponseTest {
 
 	Assert.assertEquals(results, results2_);
 
-	Map<String, List<SKOSConcept>> conceptsMap = results.stream().collect(Collectors.groupingBy((c) -> c.getConcept()));
+	Map<String, List<SKOSConcept>> conceptsMap = results.stream().collect(Collectors.groupingBy((c) -> c.getConceptURI()));
 
 	//
 	// pref test
@@ -124,7 +124,7 @@ public class SKOSResponseTest {
 
 	SKOSConcept con_1_agg = response.getAggregatedConcept("con_1").get();
 
-	Assert.assertEquals("con_1", con_1_agg.getConcept());
+	Assert.assertEquals("con_1", con_1_agg.getConceptURI());
 
 	Assert.assertEquals(//
 		con_1_pref.get(0).toString(), //
@@ -149,7 +149,7 @@ public class SKOSResponseTest {
 
 	SKOSConcept con_2_agg = response.getAggregatedConcept("con_2").get();
 
-	Assert.assertEquals("con_2", con_2_agg.getConcept());
+	Assert.assertEquals("con_2", con_2_agg.getConceptURI());
 
 	Assert.assertEquals(//
 		con_2_pref.get(0).toString(), //
@@ -174,7 +174,7 @@ public class SKOSResponseTest {
 
 	SKOSConcept con_3_agg = response.getAggregatedConcept("con_3").get();
 
-	Assert.assertEquals("con_3", con_3_agg.getConcept());
+	Assert.assertEquals("con_3", con_3_agg.getConceptURI());
 
 	Assert.assertEquals(//
 		con_3_pref.get(0).toString(), //

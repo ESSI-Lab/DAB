@@ -290,7 +290,7 @@ public class FedXLevelsExpander<T> extends FedXConceptsExpander<QueryTask> {
 
 		for (String expanded : assembledResult.getExpanded()) {
 
-		    SimpleEntry<String, String> next = new SimpleEntry<>(assembledResult.getConcept(), expanded);
+		    SimpleEntry<String, String> next = new SimpleEntry<>(assembledResult.getConceptURI(), expanded);
 		    nextLevel.add(next);
 		}
 	    }
