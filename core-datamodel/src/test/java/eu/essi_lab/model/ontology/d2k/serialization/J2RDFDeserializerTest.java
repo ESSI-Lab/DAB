@@ -92,7 +92,7 @@ public class J2RDFDeserializerTest {
 	expectedException.expect(GSException.class);
 
 	InputStream is = getClass().getClassLoader().getResourceAsStream("serialization/test4.xml");
-
+	new J2RDFDeserializer().deserialize(is);
     }
 
 }
