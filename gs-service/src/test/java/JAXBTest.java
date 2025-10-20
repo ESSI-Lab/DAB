@@ -1,15 +1,16 @@
-package eu.essi_lab.jaxb.wms.extension;
-
-import static org.junit.Assert.assertNotNull;
-
+import eu.essi_lab.jaxb.wms.extension.JAXBWMS;
 import java.util.ServiceLoader;
-
 import javax.xml.bind.JAXBContextFactory;
 import javax.xml.bind.JAXBException;
+import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
 
-public class JAXBWMSTest {
+/**
+ * @author Mattia Santoro
+ */
+public class JAXBTest {
 
-    @org.junit.Test
+    @Test
     public void test() throws JAXBException {
 
 	ServiceLoader<JAXBContextFactory> serviceLoader = ServiceLoader.load(JAXBContextFactory.class);
