@@ -112,7 +112,7 @@ public class IdentifierDecorator {
 		    ErrorInfo.SEVERITY_ERROR, "NoOriginalId");
 
 	}
-	
+
 	String originalId = opOrig.orElse(UUID.randomUUID().toString());
 
 	if (!opOrig.isPresent())
@@ -153,13 +153,13 @@ public class IdentifierDecorator {
 		if (duplicationCase == 3) {
 
 		    //
-		    // set the existing resource as modified resource, before it will be
+		    // set the existing resource as modified resource, before to be
 		    // replaced by the database component
 		    //
 		    request.addIncrementalModifiedResource(existingResource);
-
 		}
-		if (duplicationCase > 0) {
+
+		else if (duplicationCase > 0) {
 		    //
 		    // the source administrator should be warn since it means that the source
 		    // provides records with same identifier.
