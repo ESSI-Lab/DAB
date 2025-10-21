@@ -37,6 +37,8 @@ import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
  */
 public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBuilder {
 
+    private boolean includeNoLanguageConcepts;
+
     /**
      * @param closeMatch
      */
@@ -44,18 +46,34 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 
     }
 
+    /**
+     * @return the includeNoLanguageConcepts
+     */
+    @Override
+    public boolean isNoLanguageConceptsIncluded() {
+
+	return includeNoLanguageConcepts;
+    }
+
+    /**
+     * @param include
+     */
+    public void setIncludeNoLanguageConcepts(boolean include) {
+
+	this.includeNoLanguageConcepts = include;
+    }
+
     @Override
     public String build(//
 	    Collection<String> concepts, //
 	    List<String> searchLangs, //
-	    boolean includeNoLanguage, //
 	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel target, //
 	    ExpansionLevel current) {
 
 	String languageFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
 	String expansionBlock = current.getValue() < target.getValue() ? buildExpansionOptionalBlock("concept", relations) : "";
-	String noLanguageFilter = includeNoLanguage ? "||LANG(?alt)=\"\"" : "";
+	String noLanguageFilter = isNoLanguageConceptsIncluded() ? "||LANG(?alt)=\"\"" : "";
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>

@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Optional;
 
 import eu.essi_lab.lib.skos.expander.ConceptsExpander;
-import eu.essi_lab.lib.skos.expander.ExpansionLimit;
 import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
 import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skos.finder.ConceptsFinder;
@@ -97,16 +97,6 @@ public class SKOSClient {
     private String concept;
     private List<String> sourceLangs;
     private List<String> searchLangs;
-    private boolean includeNoLanguage;
-
-    public boolean isIncludeNoLanguage() {
-	return includeNoLanguage;
-    }
-
-    public void setIncludeNoLanguage(boolean includeNoLanguage) {
-	this.includeNoLanguage = includeNoLanguage;
-    }
-
     private List<String> ontologyUrls;
     private ExpansionLevel expansionLevel;
     private List<SKOSSemanticRelation> expansionsRelations;
@@ -324,7 +314,6 @@ public class SKOSClient {
 		getOntologyUrls(), //
 		getSourceLangs(), //
 		getSearchLangs(), //
-		isIncludeNoLanguage(), //
 		getExpansionsRelations(), //
 		getExpansionLevel(), //
 		getExpansionLimit());//

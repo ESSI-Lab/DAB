@@ -252,7 +252,8 @@ public class DefaultExpanderLimitExternalTestIT {
     @Test
     public void altLabels49MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 49), -1, -1, HYDRO_ONT_WATER_ALT_LABELS_COUNT);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 49), -1, -1,
+		HYDRO_ONT_WATER_ALT_LABELS_COUNT);
     }
 
     //
@@ -416,12 +417,13 @@ public class DefaultExpanderLimitExternalTestIT {
 
 	expander.setThreadMode(mode);
 
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
+
 	SKOSResponse response = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		true, //
 		relations, //
 		targetLevel, //
 		limit);//
@@ -449,11 +451,11 @@ public class DefaultExpanderLimitExternalTestIT {
     }
 
     private void print(List<String> preLabels) {
-//	for (String label : preLabels) {
-//	    System.out.println(label);
-//	}
-//	System.out.println();
-	
+	// for (String label : preLabels) {
+	// System.out.println(label);
+	// }
+	// System.out.println();
+
     }
 
 }

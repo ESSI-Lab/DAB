@@ -56,7 +56,7 @@ import eu.essi_lab.lib.utils.ThreadMode.SingleThreadMode;
 /**
  * @author Fabrizio
  */
-public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
+public class FedXConceptsExpander extends AbstractConceptsExpander<QueryTask> {
 
     protected ThreadMode threadMode;
     protected FedXConfig engineConfig;
@@ -110,7 +110,6 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //
 	    List<String> searchLangs, //
-	    boolean includeNoLanguage, //
 	    List<SKOSSemanticRelation> expansionRelations, //
 	    ExpansionLevel targetLevel, //
 	    ExpansionLimit limit) throws Exception {
@@ -153,7 +152,6 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 		    executor, //
 		    fatherConcept, //
 		    searchLangs, //
-		    includeNoLanguage, //
 		    expansionRelations, //
 		    visited, //
 		    results, //
@@ -209,7 +207,6 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 	    ExecutorService executor, //
 	    SimpleEntry<String, String> fatherConcept, //
 	    List<String> searchLangs, //
-	    boolean includeNoLanguage, //
 	    List<SKOSSemanticRelation> relations, //
 	    Set<String> visited, //
 	    List<SKOSConcept> results, //
@@ -251,7 +248,6 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 	    String query = getQueryBuilder().build(//
 		    concepts, //
 		    searchLangs, //
-		    includeNoLanguage, //
 		    relations, //
 		    targetLevel, //
 		    currentLevel);
@@ -323,7 +319,6 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 			    executor, //
 			    new SimpleEntry<String, String>(concept, expanded), //
 			    searchLangs, //
-			    includeNoLanguage, //
 			    relations, //
 			    visited, //
 			    results, //
@@ -335,6 +330,14 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept of level {} ENDED", currentLevel);
 	});
+    }
+
+    /**
+     * @return the
+     */
+    public DefaultExpandConceptsQueryBuilder getQueryBuilder() {
+
+	return (DefaultExpandConceptsQueryBuilder) super.getQueryBuilder();
     }
 
 }

@@ -65,7 +65,6 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //
 	    List<String> searchLangs, //
-	    boolean includeNoLanguage, //
 	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel targetLevel, //
 	    ExpansionLimit limit) throws Exception {
@@ -103,8 +102,7 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 
 	    ExpandConceptsQueryBuilder builder = getQueryBuilder();
 
-	    
-	    String query = builder.build(conceptsURIs, searchLangs, includeNoLanguage, relations, ExpansionLevel.HIGH, ExpansionLevel.NONE);
+	    String query = builder.build(conceptsURIs, searchLangs, relations, ExpansionLevel.HIGH, ExpansionLevel.NONE);
 
 	    if (traceQuery()) {
 		GSLoggerFactory.getLogger(getClass()).trace("\n" + query);
@@ -161,5 +159,11 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 	return SKOSResponse.of(SKOSResponse.getAggregatedResults(limit, results));
     }
 
-   
+    /**
+     * @return the
+     */
+    public DefaultExpandConceptsQueryBuilder getQueryBuilder() {
+
+	return (DefaultExpandConceptsQueryBuilder) super.getQueryBuilder();
+    }
 }

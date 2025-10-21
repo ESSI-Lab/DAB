@@ -1085,6 +1085,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    client.setFinder(finder);
 
 	    DefaultConceptsExpander expander = new DefaultConceptsExpander();
+	    expander.getQueryBuilder().setIncludeNoLanguageConcepts(false); // default
 	    expander.setTraceQuery(false);
 	    expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // 4 threads per level
 	    // expander.setTaskConsumer((task) -> System.out.println(task));

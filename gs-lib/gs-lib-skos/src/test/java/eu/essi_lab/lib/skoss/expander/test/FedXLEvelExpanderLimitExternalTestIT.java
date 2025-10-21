@@ -22,8 +22,8 @@ import eu.essi_lab.lib.utils.ThreadMode;
  */
 public class FedXLEvelExpanderLimitExternalTestIT {
 
-    final int LABELS_COUNT = 49;
-    final int ALT_LABELS_COUNT = 19;
+    final int LABELS_COUNT = 79;
+    final int ALT_LABELS_COUNT = 49;
     final int PREF_LABELS_COUNT = 30;
 
     @Test
@@ -42,13 +42,13 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		true,//
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 100));//
@@ -79,13 +79,13 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		true,//
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 100));//
@@ -116,13 +116,13 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
 		ontologyUrls, //
-		sourceLangs, //		
+		sourceLangs, //
 		searchLangs, //
-		true,//
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.LABELS, 10));//
@@ -147,13 +147,13 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		true, //
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.LABELS, 10));//
@@ -180,13 +180,13 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		true, //
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 10));//
@@ -211,13 +211,13 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		true,
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 10));//
@@ -242,13 +242,13 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		true, //
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.ALT_LABELS, 10));//
@@ -273,13 +273,13 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
-		true, //
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.ALT_LABELS, 10));//

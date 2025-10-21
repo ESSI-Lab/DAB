@@ -48,8 +48,15 @@ public interface ExpandConceptsQueryBuilder {
     String build(//
 	    Collection<String> concept, //
 	    List<String> searchLangs, //
-	    boolean includeNoLanguage,
 	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel target, //
 	    ExpansionLevel current);
+
+    /**
+     * @return
+     */
+    default boolean isNoLanguageConceptsIncluded() {
+
+	return false;
+    }
 }

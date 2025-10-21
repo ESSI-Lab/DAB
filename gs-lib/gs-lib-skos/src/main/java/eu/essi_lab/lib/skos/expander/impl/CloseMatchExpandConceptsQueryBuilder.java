@@ -29,13 +29,12 @@ import java.util.Collection;
 import java.util.List;
 
 import eu.essi_lab.lib.skos.SKOSSemanticRelation;
-import eu.essi_lab.lib.skos.expander.ExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
 
 /**
  * @author Fabrizio
  */
-public class CloseMatchExpandConceptsQueryBuilder implements ExpandConceptsQueryBuilder {
+public class CloseMatchExpandConceptsQueryBuilder extends DefaultExpandConceptsQueryBuilder {
 
     /**
      * @author Fabrizio
@@ -78,7 +77,7 @@ public class CloseMatchExpandConceptsQueryBuilder implements ExpandConceptsQuery
     public String build(//
 	    Collection<String> concept, //
 	    List<String> searchLangs, //
-	    boolean includeNoLanguage, List<SKOSSemanticRelation> relations, //
+	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel target, //
 	    ExpansionLevel current) {
 
@@ -88,7 +87,7 @@ public class CloseMatchExpandConceptsQueryBuilder implements ExpandConceptsQuery
 
 	if (closeMatch) {
 
-	    String noLanguageFilter = includeNoLanguage ? "||LANG(?alt)=\"\"" : "";
+	    String noLanguageFilter = isNoLanguageConceptsIncluded() ? "||LANG(?alt)=\"\"" : "";
 
 	    return String.format("""
 	    	PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
