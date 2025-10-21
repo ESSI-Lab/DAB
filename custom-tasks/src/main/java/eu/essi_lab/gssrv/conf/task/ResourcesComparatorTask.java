@@ -355,7 +355,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    // modified records are also new (because of the resource time stamp), so here they are removed from
 		    // the new records list
-		    newRecords.remove(modified.getOriginalId().get());
+		    newRecords.remove(modified.getPublicId());
 
 		    GSResource incoming = writingFolder.get(IdentifierType.PUBLIC, modified.getPublicId()).get();
 
