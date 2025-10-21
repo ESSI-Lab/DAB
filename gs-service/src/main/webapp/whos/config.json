@@ -23,6 +23,7 @@
     "semanticSearch": true,    
     "semanticSearchValue":1,
     "ontology": "whos",
+	"ontologyids": "whos",
     "riverSearch": true,
     "timeInterpolation": true,
     "clusterWMS": true,    

@@ -389,10 +389,26 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (!eiffelOption.isPresent() || eiffelOption.get() == EiffelAPIDiscoveryOption.FILTER_AND_SORT) {
 
+	    String searchTerms = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_TERMS.getName(), OSParameters.class));
+	    String attrTitle = parser.parse(WebRequestParameter.findParameter(OSParameters.ATTRIBUTE_TITLE.getName(), OSParameters.class));
+
+	    String searchFields = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_FIELDS.getName(), OSParameters.class));
+
+	    if (attrTitle != null) {
+
+		Bond bond = createSearchTermsBond(attrTitle, MetadataElement.ATTRIBUTE_TITLE_EL_NAME, eiffelOption.isPresent(), semantics,
+			ontology);
+
+		if (bond != null) {
+
+		    bondList.add(bond);
+		}
+	    }
+
 	    //
 	    // creates the search terms bond
 	    //
-	    Bond searchTermsBond = createSearchTermsBond(request, parser, eiffelOption.isPresent(), semantics, ontology);
+	    Bond searchTermsBond = createSearchTermsBond(searchTerms, searchFields, eiffelOption.isPresent(), semantics, ontology);
 
 	    if (searchTermsBond != null) {
 
@@ -432,14 +448,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			|| osParameter.getName().equals(OSParameters.SEARCH_FIELDS.getName())) {
 
 		    continue;
-		}
-
-		//
-		// semantics and ontology
-		//
-		if (osParameter.equals(OSParameters.ATTRIBUTE_TITLE) && value != null) {
-
-		    handleSemanticsAndOntology(bondList, value, semantics, ontology);
 		}
 
 		//
@@ -912,52 +920,11 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      * @param eiffelOption
      */
     private Bond createSearchTermsBond(//
-	    WebRequest request, //
-	    OSRequestParser parser, //
+	    String searchTerms, //
+	    String searchFields, //
 	    boolean eiffelOption, //
 	    String semantics, //
 	    String ontology) {
-
-	String searchTerms = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_TERMS.getName(), OSParameters.class));
-	String searchFields = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_FIELDS.getName(), OSParameters.class));
-
-	///////////////////////////////////////////////
-	// workaround for HIS-Central to be removed once the ontology functionality
-	// is implemented in the query initializer and in the GI-portal
-	///////////////////////////////////////////////
-	Optional<String> optionalView = request.extractViewId();
-	if (optionalView.isPresent() && optionalView.get().equals("his-central") && Objects.nonNull(searchTerms)
-		&& !searchTerms.isEmpty()) {
-
-	    List<Bond> innerBonds = new ArrayList<>();
-	    innerBonds.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, searchTerms));
-
-	    HydroOntology ho = new HISCentralOntology();
-	    List<SKOSConcept> concepts = ho.findConcepts(searchTerms, true, false);
-	    HashSet<String> uris = new HashSet<String>();
-	    for (SKOSConcept concept : concepts) {
-		uris.add(concept.getURI());
-	    }
-	    if (concepts.isEmpty()) {
-		uris.add("notfounddd");
-	    }
-	    for (String uri : uris) {
-		SimpleValueBond b = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, uri);
-		innerBonds.add(b);
-	    }
-
-	    switch (innerBonds.size()) {
-	    case 0:
-		return null;
-	    case 1:
-		return innerBonds.get(0);
-	    default:
-		return BondFactory.createOrBond(innerBonds);
-	    }
-
-	}
-
-	///////////////////////////////////////////////
 
 	Optional<Integer> filterAndSortSplitTreshold = EiffelDiscoveryHelper.getFilterAndSortSplitTreshold(setting);
 
@@ -1101,6 +1068,9 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		SKOSResponse response = client.search();
 
 		List<String> expandedTerms = response.getLabels();
+		
+		Set<String> concepts = response.getConcepts();
+		
 
 		GSLoggerFactory.getLogger(getClass()).debug("Found {} expanded terms: \n{}", expandedTerms.size(),
 			expandedTerms.toString().replace("[", "").replace("]", ""));
@@ -1138,7 +1108,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ANY_TEXT, searchValue));
 	}
 
-	if (searchFields.toLowerCase().contains("title")) {
+	if (searchFields.toLowerCase().equals("title")) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, searchValue));
 	}
 
@@ -1152,6 +1122,10 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (searchFields.toLowerCase().contains("keyword")) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, searchValue));
+	}
+
+	if (searchFields.toLowerCase().equals(MetadataElement.ATTRIBUTE_TITLE_EL_NAME.toLowerCase())) {
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ATTRIBUTE_TITLE, searchValue));
 	}
 
 	switch (operands.size()) {

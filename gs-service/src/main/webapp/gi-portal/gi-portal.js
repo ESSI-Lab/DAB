@@ -2102,7 +2102,7 @@ export function initializePortal(config) {
 
 		constraints.spatialOp = options.spatialRelation;
 
-		constraints.ontologyids = GIAPI.OntologiesSelector.getSelectedIds();
+		constraints.ontologyids = config.ontologyids || GIAPI.OntologiesSelector.getSelectedIds();
 		constraints.semanticsearch = GIAPI.OntologiesSelector.getSelectedIds().length > 0;
 
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
