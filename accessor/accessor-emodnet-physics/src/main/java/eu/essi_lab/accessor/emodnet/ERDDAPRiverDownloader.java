@@ -57,7 +57,7 @@ public class ERDDAPRiverDownloader extends WML2DataDownloader {
     @Override
     public boolean canDownload() {
 
-	return (online.getProtocol() != null && online.getProtocol().equals(CommonNameSpaceContext.NVE_URI));
+	return (online.getProtocol() != null && online.getProtocol().equals(CommonNameSpaceContext.EMODNET_PHYSICS_RIVER_NS_URI));
 
     }
 
@@ -170,7 +170,7 @@ public class ERDDAPRiverDownloader extends WML2DataDownloader {
 			if (oTime.isPresent()) {
 			    Point point = new Point();
 
-			    String ov = data.getValue("RVFL").toString();
+			    String ov = data.getValue("RVFL") == null ? null : data.getValue("RVFL").toString();
 
 			    try {
 				BigDecimal dataValue = new BigDecimal(ov);

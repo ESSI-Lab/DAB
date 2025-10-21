@@ -107,7 +107,8 @@ public class ERDDAPRiverMapper extends FileIdentifierMapper {
 	String dataOwnerLongname = row.getValue("data_owner_longname").toString();
 	String dataOwnerCountryCode = row.getValue("data_owner_country_code").toString();
 	String dataOwnerCountryLongname = row.getValue("data_owner_country_longname").toString();
-	Integer dataOwnerEdmo = Integer.valueOf(row.getValue("data_owner_EDMO").toString());
+	Integer dataOwnerEdmo = row.getValue("data_owner_EDMO") == null ? null
+		: Integer.valueOf(row.getValue("data_owner_EDMO").toString());
 	String dataAssemblyCenterLongname = row.getValue("data_assembly_center_longname").toString();
 	String platformTypeLongname = row.getValue("platform_type_longname").toString();
 	String platformTypeSdnl06 = row.getValue("platform_type_SDNL06").toString();
@@ -164,7 +165,7 @@ public class ERDDAPRiverMapper extends FileIdentifierMapper {
 	    } else if (dataOwnerCountryLongname != null && !dataOwnerCountryLongname.isEmpty()) {
 		dataset.getExtensionHandler().setCountry(dataOwnerCountryLongname);
 	    }
-	    
+
 	    dataset.getExtensionHandler().setAttributeUnits("m3/s");
 
 	    /**

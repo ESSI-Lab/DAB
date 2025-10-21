@@ -33,24 +33,42 @@ public class ERDDAPRow {
     private Object[] values;
 
     public Object[] getValues() {
-        return values;
+	return values;
     }
 
-    public void setValues(Object[] values) {
-        this.values = values;
+    public void setValues(Object[] values) {	
+	for (int i = 0; i < values.length; i++) {
+	    if (values[i] == org.json.JSONObject.NULL) {
+		values[i] = null;
+	    }
+	}
+	this.values = values;
+    }
+    
+    public ERDDAPRow() {	
     }
 
     public ERDDAPRow(JSONObject json) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        // Deserialize back
-        ERDDAPRow restored = mapper.readValue(json.toString(), ERDDAPRow.class);
-        this.headers = restored.getHeaders();
-        this.values = restored.getValues();
+	ObjectMapper mapper = new ObjectMapper();
+	// Deserialize back
+	ERDDAPRow restored = mapper.readValue(json.toString(), ERDDAPRow.class);
+	this.headers = restored.getHeaders();
+	this.values = restored.getValues();
+	for (int i = 0; i < values.length; i++) {
+	    if (values[i] == org.json.JSONObject.NULL) {
+		values[i] = null;
+	    }
+	}
     }
-    
+
     public ERDDAPRow(String[] headers, Object[] values) {
 	this.headers = headers;
 	this.values = values;
+	for (int i = 0; i < values.length; i++) {
+	    if (values[i] == org.json.JSONObject.NULL) {
+		values[i] = null;
+	    }
+	}
     }
 
     public Object getValue(String header) {
@@ -77,17 +95,15 @@ public class ERDDAPRow {
 	String ret = "";
 	for (int i = 0; i < headers.length; i++) {
 	    String header = headers[i];
-	    ret += header + ": " + values[i].toString()+"\n";
+	    ret += header + ": " + values[i].toString() + "\n";
 	}
 	return ret;
     }
-    
+
     public JSONObject toJSONObject() throws Exception {
 	ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(this);
-        return new JSONObject(json);
+	String json = mapper.writeValueAsString(this);
+	return new JSONObject(json);
     }
-    
-    
 
 }

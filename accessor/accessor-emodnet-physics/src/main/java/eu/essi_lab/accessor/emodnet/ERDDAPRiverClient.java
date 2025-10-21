@@ -73,7 +73,7 @@ public class ERDDAPRiverClient {
 	    ERDDAPClient client = new ERDDAPClient(dap);
 	    ret.addAll(client.getRows());
 	}
-	return ret.subList(0, 10);
+	return ret;
     }
 
     public List<ERDDAPRow> getData(String stationCode, Date begin, Date end) {
