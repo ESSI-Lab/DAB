@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skos.expander.ExpansionLimit;
 
 /**
@@ -72,7 +73,7 @@ public class SKOSResponse {
 
 	return getAggregatedResults().//
 		stream().//
-		filter(c -> c.getConcept().equals(concept)).//
+		filter(c -> c.getConceptURI().equals(concept)).//
 		findFirst();
     }
 
@@ -83,13 +84,13 @@ public class SKOSResponse {
 
 	Map<String, List<SKOSConcept>> map = getResults().//
 		stream().//
-		collect(Collectors.groupingBy((c) -> c.getConcept()));
+		collect(Collectors.groupingBy((c) -> c.getConceptURI()));
 
 	ArrayList<SKOSConcept> out = new ArrayList<SKOSConcept>();
 
 	map.keySet().forEach(concept -> {
 
-	    Optional<SKOSConcept> optional = out.stream().filter(c -> c.getConcept().equals(concept)).findFirst();
+	    Optional<SKOSConcept> optional = out.stream().filter(c -> c.getConceptURI().equals(concept)).findFirst();
 
 	    List<SKOSConcept> list = map.get(concept);
 
@@ -111,6 +112,12 @@ public class SKOSResponse {
     }
 
     /**
+     * @author Fabrizio
+     */
+    private record AggregationKey(String concept, Integer level) {
+    };
+
+    /**
      * @param limit
      * @param tempResponse
      * @param results
@@ -121,23 +128,30 @@ public class SKOSResponse {
 	int altCount = 0;
 	int labCount = 0;
 
-	Map<String, List<SKOSConcept>> map = results.//
+	Map<AggregationKey, List<SKOSConcept>> map = results.//
 		stream().//
-		collect(Collectors.groupingBy((c) -> c.getConcept()));
+		collect(Collectors.groupingBy((c) -> new AggregationKey(c.getConceptURI(), c.getLevel().get().getValue())));
 
 	ArrayList<SKOSConcept> out = new ArrayList<SKOSConcept>();
 
-	for (String concept : map.keySet()) {
+	List<AggregationKey> sortedKeys = map.keySet().//
+		stream().//
+		sorted((key1, key2) -> key1.level().compareTo(key2.level())).//
+		toList();
 
-	    Optional<SKOSConcept> optional = out.stream().filter(c -> c.getConcept().equals(concept)).findFirst();
+	for (AggregationKey key : sortedKeys) {
 
-	    List<SKOSConcept> list = map.get(concept);
+	    Optional<SKOSConcept> optional = out.stream().filter(c -> c.getConceptURI().equals(key.concept())).findFirst();
+
+	    List<SKOSConcept> list = map.get(key);
 
 	    if (optional.isEmpty()) {
 
 		SKOSConcept skosConcept = SKOSConcept.of(//
-			concept, //
+			key.concept(), //
 			list.get(0).getPref().orElse(NONE_VALUE));
+		
+		skosConcept.setLevel(ExpansionLevel.of(key.level()).get());
 
 		list.forEach(c -> skosConcept.getAlt().addAll(c.getAlt()));
 		list.forEach(c -> skosConcept.getExpanded().addAll(c.getExpanded()));
@@ -200,13 +214,13 @@ public class SKOSResponse {
 
 	Map<String, List<SKOSConcept>> map = tempResponse.getResults().//
 		stream().//
-		collect(Collectors.groupingBy((c) -> c.getConcept()));
+		collect(Collectors.groupingBy((c) -> c.getConceptURI()));
 
 	ArrayList<SKOSConcept> out = new ArrayList<SKOSConcept>();
 
 	for (String concept : map.keySet()) {
 
-	    Optional<SKOSConcept> optional = out.stream().filter(c -> c.getConcept().equals(concept)).findFirst();
+	    Optional<SKOSConcept> optional = out.stream().filter(c -> c.getConceptURI().equals(concept)).findFirst();
 
 	    List<SKOSConcept> list = map.get(concept);
 
@@ -312,7 +326,7 @@ public class SKOSResponse {
     }
 
     public Set<String> getConcepts() {
-	return getAggregatedResults().stream().map(SKOSConcept::getConcept).collect(Collectors.toSet());
+	return getAggregatedResults().stream().map(SKOSConcept::getConceptURI).collect(Collectors.toSet());
     }
 
 }

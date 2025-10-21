@@ -60,7 +60,7 @@ public class HydroOntologyExternalTestIT {
     }
 
     @Test
-    public void testConceptsExpanderSingleThread() throws Exception {
+    public void testFedXConceptsExpanderSingleThread() throws Exception {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 	expander.setTraceQuery(true);
@@ -69,7 +69,7 @@ public class HydroOntologyExternalTestIT {
     }
 
     @Test
-    public void testConceptsExpanderMultiThread() throws Exception {
+    public void testFedXonceptsExpanderMultiThread() throws Exception {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
 	expander.setTraceQuery(true);
@@ -79,7 +79,7 @@ public class HydroOntologyExternalTestIT {
     }
 
     @Test
-    public void testLevelsExpanderSingleThread() throws Exception {
+    public void testFedXLevelsExpanderSingleThread() throws Exception {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setTraceQuery(true);
@@ -88,7 +88,7 @@ public class HydroOntologyExternalTestIT {
     }
 
     @Test
-    public void testLevelsExpanderMultiThread() throws Exception {
+    public void testFedXLevelsExpanderMultiThread() throws Exception {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setTraceQuery(true);
@@ -98,9 +98,18 @@ public class HydroOntologyExternalTestIT {
     }
 
     @Test
-    public void testLevelsDefaultExpander() throws Exception {
+    public void testDefaultsConceptsExpander() throws Exception {
 
 	DefaultConceptsExpander expander = new DefaultConceptsExpander();
+	client.setExpander(expander);
+	commonRoutine();
+    }
+    
+    @Test
+    public void testDefaultsConceptsExpanderSingleThread() throws Exception {
+
+	DefaultConceptsExpander expander = new DefaultConceptsExpander();
+	expander.setThreadMode(ThreadMode.SINGLE());
 	client.setExpander(expander);
 	commonRoutine();
     }
@@ -120,8 +129,8 @@ public class HydroOntologyExternalTestIT {
 
 	    List<SKOSConcept> concepts = response.getAggregatedResults();
 	    printConcepts(concepts);
-	    assertTrue(concepts.size() == 1);
-	    assertTrue(concepts.get(0).getConcept().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
+	    assertEquals(1, concepts.size());
+	    assertTrue(concepts.get(0).getConceptURI().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
 	    assertEquals(concepts.get(0).getPref().get(), "Velocity");
 	    assertTrue(concepts.get(0).getAlt().size() == 1);
 	    assertTrue(concepts.get(0).getAlt().contains("Velocità"));
@@ -136,7 +145,7 @@ public class HydroOntologyExternalTestIT {
 
 	    List<SKOSConcept> concepts = response.getAggregatedResults();
 	    printConcepts(concepts);
-	    assertTrue(concepts.size() == 5);
+	    assertEquals(5, concepts.size());
 	    Set<String> uris = response.getConcepts();
 
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/28"));
@@ -155,7 +164,7 @@ public class HydroOntologyExternalTestIT {
 
 	    List<SKOSConcept> concepts = response.getAggregatedResults();
 	    printConcepts(concepts);
-	    assertTrue(concepts.size() == 8);
+	    assertEquals(8, concepts.size());
 	    Set<String> uris = response.getConcepts();
 
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/28"));
@@ -176,7 +185,7 @@ public class HydroOntologyExternalTestIT {
 
 	    List<SKOSConcept> concepts = response.getAggregatedResults();
 	    printConcepts(concepts);
-	    assertTrue(concepts.size() == 9);
+	    assertEquals(9, concepts.size());
 	    Set<String> uris = response.getConcepts();
 
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/28"));

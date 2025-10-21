@@ -13,15 +13,15 @@ import eu.essi_lab.lib.skos.finder.impl.DefaultConceptsQueryBuilder;
 /**
  * @author Fabrizio
  */
-public class FindConceptsQueryBuilderTest {
+public class DefaultFindConceptsQueryBuilderTest {
 
     @Test
-    public void defaultFindConceptsQueryBuilderTest() {
+    public void test() {
 
 	DefaultConceptsQueryBuilder builder = new DefaultConceptsQueryBuilder();
-	
+
 	String query = builder.build("searchTerm", Arrays.asList("it"));
-	
+
 	String expected = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" //
 		+ "SELECT DISTINCT ?concept WHERE {\n" //
 		+ "    { ?concept skos:prefLabel ?label }\n" //
@@ -29,7 +29,7 @@ public class FindConceptsQueryBuilderTest {
 		+ "    UNION { ?concept skos:hiddenLabel ?label }\n" //
 		+ "    FILTER(LANG(?label) IN (\"it\") && LCASE(STR(?label)) = \"searchterm\")\n" //
 		+ "}"; //
-	
+
 	Assert.assertEquals(expected, query);
     }
 }

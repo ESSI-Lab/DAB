@@ -42,7 +42,7 @@ import eu.essi_lab.lib.utils.ThreadMode.SingleThreadMode;
 /**
  * @author Fabrizio
  */
-public class FedXConceptsFinder<T> extends AbstractConceptsFinder<QueryTask> {
+public class FedXConceptsFinder extends AbstractConceptsFinder<QueryTask> {
 
     private ConceptsQueryExecutor executor;
 

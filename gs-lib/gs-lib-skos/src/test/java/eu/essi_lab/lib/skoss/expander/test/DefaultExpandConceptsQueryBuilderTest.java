@@ -15,10 +15,10 @@ import eu.essi_lab.lib.skos.expander.impl.DefaultExpandConceptsQueryBuilder;
 /**
  * @author Fabrizio
  */
-public class ExpandConceptsQueryBuilderTest {
+public class DefaultExpandConceptsQueryBuilderTest {
 
     @Test
-    public void defaultExpandConceptsQueryBuilderTest() {
+    public void test() {
 
 	DefaultExpandConceptsQueryBuilder builder = new DefaultExpandConceptsQueryBuilder();
 
@@ -29,19 +29,17 @@ public class ExpandConceptsQueryBuilderTest {
 		ExpansionLevel.HIGH, //
 		ExpansionLevel.NONE);//
 
-	String expected = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" + //
-		"SELECT DISTINCT ?pref ?alt ?expanded WHERE {\n" //
-		+ "    BIND(<CONCEPT> AS ?concept)\n" //
-		+ "\n"//
-		+ "    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (\"it\")) }\n"//
-		+ "    OPTIONAL { ?concept skos:altLabel ?alt FILTER(LANG(?alt) IN (\"it\")) }\n" //
-		+ "\n"//
-		+ "    OPTIONAL { ?concept skos:closeMatch ?closeMatch }\n"//
-		+ "    OPTIONAL { ?concept skos:broadMatch ?expanded } \n"//
-		+ "}";//
+	String expected = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n"+
+	    "SELECT DISTINCT ?concept ?pref ?alt ?expanded WHERE {\n"+
+	    "    BIND(<CONCEPT> AS ?concept)\n\n"+
+
+	    "    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (\"it\")) }\n"+
+	    "    OPTIONAL { ?concept skos:altLabel ?alt FILTER(LANG(?alt) IN (\"it\")) }\n\n"+
+
+	     "     OPTIONAL { { OPTIONAL { ?concept skos:broadMatch ?expanded } } } \n"+
+	     "}";
+	;//
 
 	Assert.assertEquals(expected, query);
     }
-
-    
 }

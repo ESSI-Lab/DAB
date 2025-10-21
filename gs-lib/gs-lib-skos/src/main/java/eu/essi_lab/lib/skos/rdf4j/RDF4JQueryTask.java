@@ -111,7 +111,7 @@ public class RDF4JQueryTask implements Callable<List<SKOSConcept>>, QueryTask {
 		    if (concept != null && concepts != null) {
 			for (SKOSConcept fatherConcept : concepts) {
 			    Set<String> tmpFathers = fatherConcept.getExpandedFrom();
-			    if (fatherConcept.getConcept().equals(concept)) {
+			    if (fatherConcept.getConceptURI().equals(concept)) {
 				father = tmpFathers;
 			    }
 			}
