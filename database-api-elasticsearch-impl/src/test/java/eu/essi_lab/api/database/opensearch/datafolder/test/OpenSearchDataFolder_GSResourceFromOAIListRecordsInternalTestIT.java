@@ -33,12 +33,12 @@ import eu.essi_lab.model.resource.Dataset;
  * @author Fabrizio
  */
 @Ignore
-public class OpenSearchDataFolder_GSResourceFromOAIListRecordsTest extends OpenSearchTest {
+public class OpenSearchDataFolder_GSResourceFromOAIListRecordsInternalTestIT extends OpenSearchTest {
 
     @Test
     public void test() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = "test" + SourceStorageWorker.DATA_1_POSTFIX;
 

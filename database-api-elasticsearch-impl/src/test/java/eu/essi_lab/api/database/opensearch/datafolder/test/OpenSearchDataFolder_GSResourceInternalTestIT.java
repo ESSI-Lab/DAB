@@ -45,7 +45,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
 /**
  * @author Fabrizio
  */
-public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
+public class OpenSearchDataFolder_GSResourceInternalTestIT extends OpenSearchTest {
 
     /*
      * 
@@ -89,7 +89,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
     @Test
     public void listIdentifiersTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	OpenSearchFolder folder1 = createDataFolder(database, "sourceId_1");
 	OpenSearchFolder folder2 = createDataFolder(database, "sourceId_2");
@@ -152,7 +152,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
     @Test
     public void getByIdentifierTest() throws ParserConfigurationException, JAXBException, SAXException, IOException, Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -358,7 +358,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
     @Test
     public void minMaxTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -397,7 +397,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
     @Test
     public void removeTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -444,7 +444,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -524,7 +524,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
     @Test
     public void searchResourcesTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -668,7 +668,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
     @Test
     public void removeResourcesTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 

@@ -36,12 +36,12 @@ import eu.essi_lab.messages.bond.View.ViewVisibility;
 /**
  * @author Fabrizio
  */
-public class OpenSearchViewsFolderTest extends OpenSearchTest {
+public class OpenSearchViewsFolderInternalTestIT extends OpenSearchTest {
 
     @Test
     public void sourceTest1() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -104,7 +104,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
     @Test
     public void sourceTest2() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -165,7 +165,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -202,7 +202,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
     @Test
     public void searchViewsTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -329,7 +329,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
     @Test
     public void getViewIdentifiersSublistTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -436,7 +436,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
     @Test
     public void getViewIdentifiersFilterTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 

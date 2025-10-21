@@ -29,12 +29,12 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 /**
  * @author Fabrizio
  */
-public class OpenSearchDataFolder_GSResourceTempExtentTest extends OpenSearchTest {
+public class OpenSearchDataFolder_GSResourceTempExtentInternalTestIT extends OpenSearchTest {
 
     @Test
     public void onlyTempExtentBeginTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -117,7 +117,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest extends OpenSearchTes
     @Test
     public void tempExtentBeginBeforeNowTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -200,7 +200,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest extends OpenSearchTes
     @Test
     public void tempExtentBeginNowTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -281,7 +281,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest extends OpenSearchTes
     @Test
     public void tempExtentBeginNowWithStringValueTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -362,7 +362,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest extends OpenSearchTes
     @Test
     public void tempExtentEndNowTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -443,7 +443,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest extends OpenSearchTes
     @Test
     public void tempExtentEndNowWithStringValueTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -524,7 +524,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest extends OpenSearchTes
     @Test
     public void onlyTempExtentEndTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -607,7 +607,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest extends OpenSearchTes
     @Test
     public void bothTempExtentTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 

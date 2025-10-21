@@ -28,12 +28,12 @@ import eu.essi_lab.model.resource.MetadataElement;
 /**
  * @author Fabrizio
  */
-public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
+public class OpenSearchDataFolder_GSResourceBboxInternalTestIT extends OpenSearchTest {
 
     @Test
     public void lineStringFromBoundingPolygonTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -115,7 +115,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void polygonFromBoundingPolygonTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -201,7 +201,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void pointTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -277,7 +277,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void multiPointTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -373,7 +373,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void polygonTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -449,7 +449,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void invalidBboxToPointTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -525,7 +525,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void multiPolygonTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -623,7 +623,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void geometryCollectionTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 

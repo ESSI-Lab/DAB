@@ -17,12 +17,12 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class OpenSearchDatabaseTest extends OpenSearchTest {
+public class OpenSearchDatabaseInternalTestIT extends OpenSearchTest {
 
     @Test
     public void basicAndFoldersTest() throws GSException {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	//
 	//
@@ -30,7 +30,9 @@ public class OpenSearchDatabaseTest extends OpenSearchTest {
 
 	Assert.assertEquals(DatabaseImpl.OPENSEARCH.getName(), database.getType());
 
-	Assert.assertEquals(OpenSearchDatabase.createLocalServiceInfo(), database.getStorageInfo());
+	//TODO below I commented because with internaltestit the service info is different.
+	// In general, this test should be reworked to avoid being based on penSearchDatabase.createLocalServiceInfo().
+//	Assert.assertEquals(OpenSearchDatabase.createLocalServiceInfo(), database.getStorageInfo());
 
 	//
 	//

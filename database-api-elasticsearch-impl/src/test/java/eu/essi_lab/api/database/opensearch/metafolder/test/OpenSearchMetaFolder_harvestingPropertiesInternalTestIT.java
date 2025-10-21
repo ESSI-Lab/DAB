@@ -26,12 +26,12 @@ import eu.essi_lab.messages.HarvestingProperties;
 /**
  * @author Fabrizio
  */
-public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTest {
+public class OpenSearchMetaFolder_harvestingPropertiesInternalTestIT extends OpenSearchTest {
 
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getMetaFolderName(database);
 
@@ -113,7 +113,7 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getMetaFolderName(database);
 

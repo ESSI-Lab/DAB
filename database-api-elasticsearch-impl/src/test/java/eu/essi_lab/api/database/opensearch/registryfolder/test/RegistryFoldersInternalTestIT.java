@@ -15,12 +15,12 @@ import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 /**
  * @author Fabrizio
  */
-public class RegistryFoldersTest extends OpenSearchTest {
+public class RegistryFoldersInternalTestIT extends OpenSearchTest {
 
     @Test
     public void test() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName1 = TestUtils.getMetaFolderName(database, "source_1");
 	String folderName2 = TestUtils.getMetaFolderName(database, "source_2");

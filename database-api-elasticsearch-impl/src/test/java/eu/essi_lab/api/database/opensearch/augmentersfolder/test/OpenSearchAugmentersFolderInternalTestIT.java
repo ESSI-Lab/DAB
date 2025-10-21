@@ -24,12 +24,12 @@ import eu.essi_lab.messages.AugmenterProperties;
 /**
  * @author Fabrizio
  */
-public class OpenSearchAugmentersFolderTest extends OpenSearchTest {
+public class OpenSearchAugmentersFolderInternalTestIT extends OpenSearchTest {
 
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.AUGMENTERS_FOLDER;
 
@@ -107,7 +107,7 @@ public class OpenSearchAugmentersFolderTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.AUGMENTERS_FOLDER;
 

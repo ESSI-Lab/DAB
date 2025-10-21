@@ -22,14 +22,14 @@ import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 /**
  * @author Fabrizio
  */
-public class ShapeFilesFolderTest extends OpenSearchTest {
+public class ShapeFilesFolderInternalTestIT extends OpenSearchTest {
 
     @Test
     public void test() throws Exception {
 
-	InputStream stream = ShapeFilesFolderTest.class.getClassLoader().getResourceAsStream("shape.zip");
+	InputStream stream = ShapeFilesFolderInternalTestIT.class.getClassLoader().getResourceAsStream("shape.zip");
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, OpenSearchDatabase.SHAPE_FILES_FOLDER);
 

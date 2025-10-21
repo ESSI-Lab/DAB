@@ -28,12 +28,12 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 /**
  * @author Fabrizio
  */
-public class OpenSearchConfigurationFolderTest extends OpenSearchTest {
+public class OpenSearchConfigurationFolderInternalTestIT extends OpenSearchTest {
 
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.CONFIGURATION_FOLDER;
 
@@ -143,7 +143,7 @@ public class OpenSearchConfigurationFolderTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.CONFIGURATION_FOLDER;
 

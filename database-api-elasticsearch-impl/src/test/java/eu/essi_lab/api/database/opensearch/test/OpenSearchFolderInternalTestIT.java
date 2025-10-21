@@ -1,17 +1,7 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch.test;
-
-import java.util.List;
-import java.util.UUID;
-
-import javax.xml.bind.JAXBException;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.OpenSearchServiceType;
@@ -25,16 +15,23 @@ import eu.essi_lab.api.database.opensearch.datafolder.test.TestUtils;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.StorageInfo;
+import java.util.List;
+import java.util.UUID;
+import javax.xml.bind.JAXBException;
+import org.junit.Assert;
+import org.junit.Test;
+import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 /**
  * @author Fabrizio
  */
-public class OpenSearchFolderTest extends OpenSearchTest {
-
+public class OpenSearchFolderInternalTestIT extends OpenSearchTest {
+    private GSLoggerFactory.GSLogger logger = GSLoggerFactory.getLogger(OpenSearchFolderInternalTestIT.class);
     /**
-     * @param wrapper
      * @param folder
      * @return
      * @throws Exception
@@ -54,7 +51,9 @@ public class OpenSearchFolderTest extends OpenSearchTest {
     @Test
     public void sizeTooBigTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+	logger.info("Starting {} test", "sizeTooBigTest");
+
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -72,32 +71,12 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 
     }
 
-    /**
-     * Not a test, use it to remove folders
-     * 
-     * @throws Exception
-     */
-    public void test() throws Exception {
-
-	StorageInfo info = new StorageInfo();
-
-	info.setIdentifier("identifier");
-	info.setName("identifier");
-	info.setUser("user");
-	info.setPassword("password");
-	info.setUri("https://");
-	info.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol());
-
-	OpenSearchDatabase osDB_ = new OpenSearchDatabase();
-	osDB_.initialize(info);
-
-	osDB_.removeFolder("foldername");
-    }
 
     @Test
     public void testWithBinary() throws Exception {
+	logger.info("Starting {} test", "testWithBinary");
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -159,8 +138,9 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 
     @Test
     public void testWithDoc() throws Exception {
+	logger.info("Starting {} test", "testWithDoc");
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getMetaFolderName(database);
 

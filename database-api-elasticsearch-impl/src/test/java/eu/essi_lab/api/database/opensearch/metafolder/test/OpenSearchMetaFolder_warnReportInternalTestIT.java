@@ -23,12 +23,12 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 /**
  * @author Fabrizio
  */
-public class OpenSearchMetaFolder_warnReportTest extends OpenSearchTest {
+public class OpenSearchMetaFolder_warnReportInternalTestIT extends OpenSearchTest {
 
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getMetaFolderName(database);
 
@@ -94,7 +94,7 @@ public class OpenSearchMetaFolder_warnReportTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getMetaFolderName(database);
 

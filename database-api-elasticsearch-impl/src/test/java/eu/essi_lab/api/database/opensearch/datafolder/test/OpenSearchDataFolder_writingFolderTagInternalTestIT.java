@@ -21,14 +21,14 @@ import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 /**
  * @author Fabrizio
  */
-public class OpenSearchDataFolder_writingFolderTagTest extends OpenSearchTest {
+public class OpenSearchDataFolder_writingFolderTagInternalTestIT extends OpenSearchTest {
 
    
 
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 

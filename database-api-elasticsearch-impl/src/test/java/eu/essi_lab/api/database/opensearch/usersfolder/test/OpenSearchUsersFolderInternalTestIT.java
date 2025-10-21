@@ -33,12 +33,12 @@ import eu.essi_lab.model.auth.UserIdentifierType;
 /**
  * @author Fabrizio
  */
-public class OpenSearchUsersFolderTest extends OpenSearchTest {
+public class OpenSearchUsersFolderInternalTestIT extends OpenSearchTest {
 
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.USERS_FOLDER;
 
@@ -95,7 +95,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
     @Test
     public void sourceTest2() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.USERS_FOLDER;
 
@@ -155,7 +155,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.USERS_FOLDER;
 
@@ -197,7 +197,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
     @Test
     public void searchUsersTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.USERS_FOLDER;
 

@@ -20,7 +20,7 @@ import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchFolderTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchFolderInternalTestIT;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -63,13 +63,13 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 
 	Assert.assertEquals(Integer.valueOf(dataFolder4Size), Integer.valueOf(dataFolder4.listKeys().length));
 
-	Assert.assertEquals(Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(dataFolder1).size()), Integer.valueOf(dataFolder1.listKeys().length));
+	Assert.assertEquals(Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder1).size()), Integer.valueOf(dataFolder1.listKeys().length));
 
-	Assert.assertEquals(Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(dataFolder2).size()), Integer.valueOf(dataFolder2.listKeys().length));
+	Assert.assertEquals(Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder2).size()), Integer.valueOf(dataFolder2.listKeys().length));
 
-	Assert.assertEquals(Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(dataFolder3).size()), Integer.valueOf(dataFolder3.listKeys().length));
+	Assert.assertEquals(Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder3).size()), Integer.valueOf(dataFolder3.listKeys().length));
 
-	Assert.assertEquals(Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(dataFolder4).size()), Integer.valueOf(dataFolder4.listKeys().length));
+	Assert.assertEquals(Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder4).size()), Integer.valueOf(dataFolder4.listKeys().length));
 
 	Assert.assertEquals(Integer.valueOf(dataFolder1Size), Integer.valueOf(dataFolder1.size()));
 
@@ -104,13 +104,13 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 
 	Assert.assertEquals(Integer.valueOf(metaFolder4Size), Integer.valueOf(metaFolder4.listKeys().length));
 
-	Assert.assertEquals(Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(metaFolder1).size()), Integer.valueOf(metaFolder1.listKeys().length));
+	Assert.assertEquals(Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(metaFolder1).size()), Integer.valueOf(metaFolder1.listKeys().length));
 
-	Assert.assertEquals(Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(metaFolder2).size()), Integer.valueOf(metaFolder2.listKeys().length));
+	Assert.assertEquals(Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(metaFolder2).size()), Integer.valueOf(metaFolder2.listKeys().length));
 
-	Assert.assertEquals(Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(metaFolder3).size()), Integer.valueOf(metaFolder3.listKeys().length));
+	Assert.assertEquals(Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(metaFolder3).size()), Integer.valueOf(metaFolder3.listKeys().length));
 
-	Assert.assertEquals(Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(metaFolder4).size()), Integer.valueOf(metaFolder4.listKeys().length));
+	Assert.assertEquals(Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(metaFolder4).size()), Integer.valueOf(metaFolder4.listKeys().length));
 
 	Assert.assertEquals(Integer.valueOf(metaFolder1Size), Integer.valueOf(metaFolder1.size()));
 
@@ -124,15 +124,15 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 	//
 	//
 
-	List<String> dataFolder1ids = OpenSearchFolderTest.listEntryIdentifiers(dataFolder1);
-	List<String> dataFolder2ids = OpenSearchFolderTest.listEntryIdentifiers(dataFolder2);
-	List<String> dataFolder3ids = OpenSearchFolderTest.listEntryIdentifiers(dataFolder3);
-	List<String> dataFolder4ids = OpenSearchFolderTest.listEntryIdentifiers(dataFolder4);
+	List<String> dataFolder1ids = OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder1);
+	List<String> dataFolder2ids = OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder2);
+	List<String> dataFolder3ids = OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder3);
+	List<String> dataFolder4ids = OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder4);
 
-	List<String> metaFolder1ids = OpenSearchFolderTest.listEntryIdentifiers(metaFolder1);
-	List<String> metaFolder2ids = OpenSearchFolderTest.listEntryIdentifiers(metaFolder2);
-	List<String> metaFolder3ids = OpenSearchFolderTest.listEntryIdentifiers(metaFolder3);
-	List<String> metaFolder4ids = OpenSearchFolderTest.listEntryIdentifiers(metaFolder4);
+	List<String> metaFolder1ids = OpenSearchFolderInternalTestIT.listEntryIdentifiers(metaFolder1);
+	List<String> metaFolder2ids = OpenSearchFolderInternalTestIT.listEntryIdentifiers(metaFolder2);
+	List<String> metaFolder3ids = OpenSearchFolderInternalTestIT.listEntryIdentifiers(metaFolder3);
+	List<String> metaFolder4ids = OpenSearchFolderInternalTestIT.listEntryIdentifiers(metaFolder4);
 
 	//
 	//
@@ -406,7 +406,7 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder1.size()));
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder1.listKeys().length));
-	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(dataFolder1).size()));
+	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder1).size()));
 
 	Assert.assertEquals(Integer.valueOf(dataFolder2Size - 1), Integer.valueOf(dataFolder2.size()));
 	Assert.assertEquals(Integer.valueOf(dataFolder3Size - 1), Integer.valueOf(dataFolder3.size()));
@@ -425,7 +425,7 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder2.size()));
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder2.listKeys().length));
-	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(dataFolder2).size()));
+	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder2).size()));
 
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder1.size()));
 
@@ -445,7 +445,7 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder3.size()));
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder3.listKeys().length));
-	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(dataFolder3).size()));
+	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder3).size()));
 
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder1.size()));
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder2.size()));
@@ -465,7 +465,7 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder4.size()));
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder4.listKeys().length));
-	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(OpenSearchFolderTest.listEntryIdentifiers(dataFolder4).size()));
+	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(OpenSearchFolderInternalTestIT.listEntryIdentifiers(dataFolder4).size()));
 
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder1.size()));
 	Assert.assertEquals(Integer.valueOf(0), Integer.valueOf(dataFolder2.size()));
@@ -561,7 +561,7 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 
 	return ids.stream().allMatch(key -> {
 	    try {
-		return OpenSearchFolderTest.listEntryIdentifiers(folder).contains(key);
+		return OpenSearchFolderInternalTestIT.listEntryIdentifiers(folder).contains(key);
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    }
@@ -579,7 +579,7 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 
 	return ids.stream().noneMatch(key -> {
 	    try {
-		return OpenSearchFolderTest.listEntryIdentifiers(folder).contains(key);
+		return OpenSearchFolderInternalTestIT.listEntryIdentifiers(folder).contains(key);
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    }

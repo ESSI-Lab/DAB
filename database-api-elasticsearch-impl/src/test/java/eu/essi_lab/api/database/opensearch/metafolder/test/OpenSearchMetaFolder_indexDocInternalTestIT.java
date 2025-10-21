@@ -26,12 +26,12 @@ import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 /**
  * @author Fabrizio
  */
-public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
+public class OpenSearchMetaFolder_indexDocInternalTestIT extends OpenSearchTest {
 
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getMetaFolderName(database);
 
@@ -96,7 +96,7 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getMetaFolderName(database);
 

@@ -22,12 +22,12 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 /**
  * @author Fabrizio
  */
-public class OpenSearchCacheFolderTest extends OpenSearchTest {
+public class OpenSearchCacheFolderInternalTestIT extends OpenSearchTest {
 
     @Test
     public void test() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.CACHE_FOLDER;
 
