@@ -101,6 +101,7 @@ public class HydroOntologyExternalTestIT {
     public void testDefaultsConceptsExpander() throws Exception {
 
 	DefaultConceptsExpander expander = new DefaultConceptsExpander();
+	expander.setExcludeNoPrefConcepts(false);
 	client.setExpander(expander);
 	client.setIncludeNoLanguage(true);
 	commonRoutine();
@@ -111,6 +112,7 @@ public class HydroOntologyExternalTestIT {
 
 	DefaultConceptsExpander expander = new DefaultConceptsExpander();
 	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.setExcludeNoPrefConcepts(false);
 	client.setExpander(expander);
 	commonRoutine();
     }
