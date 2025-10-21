@@ -35,7 +35,7 @@ import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
 /**
  * @author Fabrizio
  */
-public class CloseMatchExpandConceptsQueryBuilder implements ExpandConceptsQueryBuilder{
+public class CloseMatchExpandConceptsQueryBuilder implements ExpandConceptsQueryBuilder {
 
     /**
      * @author Fabrizio
@@ -78,28 +78,31 @@ public class CloseMatchExpandConceptsQueryBuilder implements ExpandConceptsQuery
     public String build(//
 	    Collection<String> concept, //
 	    List<String> searchLangs, //
-	    List<SKOSSemanticRelation> relations, //
+	    boolean includeNoLanguage, List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel target, //
 	    ExpansionLevel current) {
 
-	String labelsFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
+	String languageFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
 	String expansionBlock = current.getValue() < target.getValue() ? buildExpansionOptionalBlock("concept", relations) : "";
 	String closeMatchBlock = current.getValue() < target.getValue() ? "OPTIONAL { ?concept skos:closeMatch ?closeMatch }" : "";
 
 	if (closeMatch) {
+
+	    String noLanguageFilter = includeNoLanguage ? "||LANG(?alt)=\"\"" : "";
 
 	    return String.format("""
 	    	PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 	    	SELECT DISTINCT ?pref ?alt ?closeMatch ?expanded WHERE {
 	    	    BIND(<%s> AS ?concept)
 
-	    	    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s)) }
-	    	    OPTIONAL { ?concept skos:altLabel ?alt FILTER(LANG(?alt) IN (%s)) }
+	    	    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s) %s ) }
+	    	    OPTIONAL { ?concept skos:altLabel ?alt FILTER(LANG(?alt) IN (%s) %s) }
 
 	    	    %s
 	    	    %s
 	    	}
-	    	""", concept.iterator().next(), labelsFilter, labelsFilter, closeMatchBlock, expansionBlock).trim();
+	    	""", concept.iterator().next(), languageFilter, noLanguageFilter, languageFilter, noLanguageFilter, closeMatchBlock,
+		    expansionBlock).trim();
 	}
 
 	return String.format("""
@@ -113,7 +116,7 @@ public class CloseMatchExpandConceptsQueryBuilder implements ExpandConceptsQuery
 		    %s
 		    %s
 		}
-		""", concept, labelsFilter, labelsFilter, closeMatchBlock, expansionBlock).trim();
+		""", concept, languageFilter, languageFilter, closeMatchBlock, expansionBlock).trim();
     }
 
     /**

@@ -99,9 +99,8 @@ public class SKOSConcept {
 		new HashSet<String>(alt != null ? Set.of(alt) : Set.of()), //
 		null);
     }
-    
+
     /**
-     * 
      * @param concept
      * @param pref
      * @param expanded
@@ -217,7 +216,16 @@ public class SKOSConcept {
      */
     public Optional<String> getPref() {
 
-	return Optional.ofNullable(pref);
+	if (pref != null) {
+	    return Optional.of(pref);
+	} else {
+	    if (getAlt().isEmpty()) {
+		return Optional.empty();
+	    } else {
+		return Optional.of(getAlt().iterator().next());
+	    }
+	}
+
     }
 
     /**

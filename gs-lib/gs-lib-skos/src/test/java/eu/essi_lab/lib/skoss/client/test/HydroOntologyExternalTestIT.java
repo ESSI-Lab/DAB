@@ -55,7 +55,7 @@ public class HydroOntologyExternalTestIT {
 	client.setFinder(new DefaultConceptsFinder());
 
 	client.setOntologyUrls(Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql"
-	// , "http://codes.wmo.int/system/query"
+	 , "http://codes.wmo.int/system/query"
 	));
     }
 
@@ -103,6 +103,7 @@ public class HydroOntologyExternalTestIT {
 	DefaultConceptsExpander expander = new DefaultConceptsExpander();
 	expander.setExcludeNoPrefConcepts(false);
 	client.setExpander(expander);
+	client.setIncludeNoLanguage(true);
 	commonRoutine();
     }
     
@@ -134,7 +135,7 @@ public class HydroOntologyExternalTestIT {
 	    assertEquals(1, concepts.size());
 	    assertTrue(concepts.get(0).getConceptURI().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
 	    assertEquals(concepts.get(0).getPref().get(), "Velocity");
-	    assertTrue(concepts.get(0).getAlt().size() == 1);
+	    assertTrue(concepts.get(0).getAlt().size() == 2);
 	    assertTrue(concepts.get(0).getAlt().contains("Velocità"));
 	}
 
@@ -198,7 +199,7 @@ public class HydroOntologyExternalTestIT {
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/5328"));
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/35"));
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/34"));
-	    assertTrue(uris.contains("http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/12006"));
+	    assertTrue(uris.contains("http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12006"));
 
 	}
     }
