@@ -14,6 +14,9 @@ import org.junit.Test;
 
 import eu.essi_lab.lib.skos.SKOSConcept;
 import eu.essi_lab.lib.skos.SKOSResponse;
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
 
 /**
  * @author Fabrizio
@@ -31,6 +34,16 @@ public class SKOSResponseTest {
 	Assert.assertTrue(response.getAltLabels().isEmpty());
 	Assert.assertTrue(response.getPrefLabels().isEmpty());
 	Assert.assertTrue(response.getLabels().isEmpty());
+
+	ExpansionLimit expLimit = ExpansionLimit.of(LimitTarget.LABELS, 0);
+
+	Assert.assertEquals(LimitTarget.LABELS, expLimit.getTarget());
+	Assert.assertEquals(Integer.MAX_VALUE, expLimit.getLimit());
+
+	expLimit = ExpansionLimit.of(LimitTarget.CONCEPTS, 11);
+
+	Assert.assertEquals(LimitTarget.CONCEPTS, expLimit.getTarget());
+	Assert.assertEquals(11, expLimit.getLimit());
     }
 
     @Test
@@ -195,4 +208,118 @@ public class SKOSResponseTest {
 
     }
 
+    @Test
+    public void aggregationWithLimitationTest() {
+
+	List<SKOSConcept> results = new ArrayList<>();
+
+	results.add(SKOSConcept.of("con_1", "pref_1", "exp_11", "exp_from_con_1a", "alt_A", ExpansionLevel.NONE));
+	results.add(SKOSConcept.of("con_1", "pref_1", "exp_11", "exp_from_con_1a", "alt_A", ExpansionLevel.NONE));
+	results.add(SKOSConcept.of("con_1", "pref_1", "exp_11", "exp_from_con_1b", "alt_A", ExpansionLevel.NONE));
+	results.add(SKOSConcept.of("con_2", "pref_2", "exp_14", "exp_from_con_1b", "alt_D", ExpansionLevel.NONE));
+
+	//
+	//
+	//
+
+	results.add(SKOSConcept.of("con_2", "pref_2", "exp_15", "exp_from_con_1b", "alt_E", ExpansionLevel.LOW));
+	results.add(SKOSConcept.of("con_3", "pref_3", "exp_14", "exp_from_con_1b", "alt_D", ExpansionLevel.LOW));
+
+	//
+	//
+	//
+
+	results.add(SKOSConcept.of("con_3", "pref_3", "exp_15", "exp_from_con_1b", "alt_E", ExpansionLevel.MEDIUM));
+	results.add(SKOSConcept.of("con_4", "pref_4", "exp_21", "exp_from_con_2", "alt_F", ExpansionLevel.MEDIUM));
+	results.add(SKOSConcept.of("con_4", "pref_4", "exp_22", "exp_from_con_2", "alt_G", ExpansionLevel.MEDIUM));
+
+	//
+	//
+	//
+
+	results.add(SKOSConcept.of("con_5", "pref_5", "exp_31", "exp_from_con_3", "alt_H", ExpansionLevel.HIGH));
+	results.add(SKOSConcept.of("con_5", "pref_5", "exp_31", "exp_from_con_3", "alt_H", ExpansionLevel.HIGH));
+
+	//
+	//
+	//
+
+	results.add(SKOSConcept.of("con_6", "pref_6", "exp_32", "exp_from_con_3", "alt_J", ExpansionLevel.HIGH));
+
+	//
+	//
+	//
+
+	List<SKOSConcept> agg1 = SKOSResponse.getAggregatedResults(ExpansionLimit.of(LimitTarget.CONCEPTS, 3), results);
+	Assert.assertEquals(3, agg1.size());
+
+	Assert.assertEquals(ExpansionLevel.NONE, agg1.get(0).getLevel().get());
+	Assert.assertEquals("con_1", agg1.get(0).getConceptURI());
+
+	Assert.assertEquals(ExpansionLevel.NONE, agg1.get(1).getLevel().get());
+	Assert.assertEquals("con_2", agg1.get(1).getConceptURI());
+
+	Assert.assertEquals(ExpansionLevel.LOW, agg1.get(2).getLevel().get());
+	Assert.assertEquals("con_3", agg1.get(2).getConceptURI());
+
+	//
+	//
+	//
+
+	List<SKOSConcept> agg2 = SKOSResponse.getAggregatedResults(ExpansionLimit.of(LimitTarget.CONCEPTS, 5), results);
+	Assert.assertEquals(5, agg2.size());
+
+	Assert.assertEquals(ExpansionLevel.NONE, agg2.get(0).getLevel().get());
+	Assert.assertEquals("con_1", agg2.get(0).getConceptURI());
+
+	Assert.assertEquals(ExpansionLevel.NONE, agg2.get(1).getLevel().get());
+	Assert.assertEquals("con_2", agg2.get(1).getConceptURI());
+
+	Assert.assertEquals(ExpansionLevel.LOW, agg2.get(2).getLevel().get());
+	Assert.assertEquals("con_3", agg2.get(2).getConceptURI());
+
+	Assert.assertEquals(ExpansionLevel.MEDIUM, agg2.get(3).getLevel().get());
+	Assert.assertEquals("con_4", agg2.get(3).getConceptURI());
+
+	Assert.assertEquals(ExpansionLevel.HIGH, agg2.get(4).getLevel().get());
+	Assert.assertEquals("con_5", agg2.get(4).getConceptURI());
+
+	//
+	//
+	//
+
+	List<SKOSConcept> agg3 = SKOSResponse.getAggregatedResults(ExpansionLimit.of(LimitTarget.LABELS, 5), results);
+	SKOSResponse resp = SKOSResponse.of(agg3);
+
+	List<String> labels = resp.getLabels();
+	Assert.assertEquals(5, labels.size());
+
+	Assert.assertEquals("alt_A", labels.get(0)); // con_1
+	Assert.assertEquals("alt_D", labels.get(1)); // con_2
+	Assert.assertEquals("pref_1", labels.get(2)); // con_1
+	Assert.assertEquals("pref_2", labels.get(3));// con_2
+	Assert.assertEquals("pref_3", labels.get(4));// con_3
+
+	//
+	//
+	//
+	
+	List<SKOSConcept> agg4 = SKOSResponse.getAggregatedResults(ExpansionLimit.of(LimitTarget.ALT_LABELS, 3), results);
+	SKOSResponse resp2 = SKOSResponse.of(agg4);
+
+	List<String> labels2 = resp2.getLabels();
+	Assert.assertEquals(6, labels2.size());
+
+	Assert.assertEquals("alt_A", labels2.get(0)); // con_1
+	Assert.assertEquals("alt_D", labels2.get(1)); // con_2
+	Assert.assertEquals("pref_1", labels2.get(2)); // con_1
+	Assert.assertEquals("pref_2", labels2.get(3));// con_2
+	Assert.assertEquals("pref_3", labels2.get(4));// con_3
+	Assert.assertEquals("pref_4", labels2.get(5));// con_4
+
+	List<String> altLabels = resp2.getAltLabels();
+	Assert.assertEquals(2, altLabels.size());
+	Assert.assertEquals("alt_A", altLabels.get(0)); // con_1
+	Assert.assertEquals("alt_D", altLabels.get(1)); // con_2
+    }
 }

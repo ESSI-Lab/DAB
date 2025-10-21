@@ -57,7 +57,6 @@ public class SKOSConceptTest {
 	SKOSConcept concept2 = SKOSConcept.of("concept", "pref", Set.of("a", "x", "y"), Set.of("b", "k"), Set.of("c"));
 
 	Assert.assertEquals(concept, concept2);
-
     }
 
     @Test
@@ -145,4 +144,72 @@ public class SKOSConceptTest {
 	Assert.assertEquals("alt", concept.getAlt().iterator().next());
 	Assert.assertEquals("pref", concept.getPref().get());
     }
+
+    @Test
+    public void test8() {
+
+	SKOSConcept concept = SKOSConcept.of("concept", "pref", Set.of("a", "x", "y"), Set.of("b", "k"), Set.of("c"), ExpansionLevel.HIGH);
+
+	Assert.assertEquals("concept", concept.getConceptURI());
+	Assert.assertEquals("pref", concept.getPref().get());
+
+	Assert.assertTrue(concept.getExpanded().contains("a"));
+	Assert.assertTrue(concept.getExpanded().contains("x"));
+	Assert.assertTrue(concept.getExpanded().contains("y"));
+
+	Assert.assertTrue(concept.getExpandedFrom().contains("b"));
+	Assert.assertTrue(concept.getExpandedFrom().contains("k"));
+
+	Assert.assertEquals("c", concept.getAlt().toArray()[0]);
+
+	Assert.assertEquals(ExpansionLevel.HIGH, concept.getLevel().get());
+
+	SKOSConcept concept2 = SKOSConcept.of("concept", "pref", Set.of("a", "x", "y"), Set.of("b", "k"), Set.of("c"), ExpansionLevel.HIGH);
+
+	Assert.assertEquals(concept, concept2);
+    }
+    
+    @Test
+    public void test9() {
+
+	SKOSConcept concept = SKOSConcept.of("concept", "pref", "y", "k", "c", ExpansionLevel.HIGH);
+
+	Assert.assertEquals("concept", concept.getConceptURI());
+	Assert.assertEquals("pref", concept.getPref().get());
+
+	Assert.assertTrue(concept.getExpanded().contains("y"));
+
+	Assert.assertTrue(concept.getExpandedFrom().contains("k"));
+
+	Assert.assertEquals("c", concept.getAlt().toArray()[0]);
+
+	Assert.assertEquals(ExpansionLevel.HIGH, concept.getLevel().get());
+
+	SKOSConcept concept2 = SKOSConcept.of("concept", "pref", "y", "k", "c", ExpansionLevel.HIGH);
+
+	Assert.assertEquals(concept, concept2);
+    }
+    
+    @Test
+    public void test10() {
+
+	SKOSConcept concept = SKOSConcept.of("concept", "pref", "y", "k", "c");
+
+	Assert.assertEquals("concept", concept.getConceptURI());
+	Assert.assertEquals("pref", concept.getPref().get());
+
+	Assert.assertTrue(concept.getExpanded().contains("y"));
+
+	Assert.assertTrue(concept.getExpandedFrom().contains("k"));
+
+	Assert.assertEquals("c", concept.getAlt().toArray()[0]);
+
+	Assert.assertTrue(concept.getLevel().isEmpty());
+
+	SKOSConcept concept2 = SKOSConcept.of("concept", "pref", "y", "k", "c");
+
+	Assert.assertEquals(concept, concept2);
+    }
+    
+     
 }
