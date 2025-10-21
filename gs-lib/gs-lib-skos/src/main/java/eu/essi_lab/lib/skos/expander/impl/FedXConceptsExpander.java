@@ -56,7 +56,7 @@ import eu.essi_lab.lib.utils.ThreadMode.SingleThreadMode;
 /**
  * @author Fabrizio
  */
-public class FedXConceptsExpander<T> extends AbstractConceptsExpander<QueryTask> {
+public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 
     protected ThreadMode threadMode;
     protected FedXConfig engineConfig;

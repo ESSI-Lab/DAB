@@ -15,10 +15,10 @@ import eu.essi_lab.lib.skos.expander.impl.DefaultExpandConceptsQueryBuilder;
 /**
  * @author Fabrizio
  */
-public class ExpandConceptsQueryBuilderTest {
+public class DefaultExpandConceptsQueryBuilderTest {
 
     @Test
-    public void defaultExpandConceptsQueryBuilderTest() {
+    public void test() {
 
 	DefaultExpandConceptsQueryBuilder builder = new DefaultExpandConceptsQueryBuilder();
 

@@ -37,7 +37,6 @@ import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
 
-import eu.essi_lab.lib.skos.QueryTask;
 import eu.essi_lab.lib.skos.SKOSConcept;
 import eu.essi_lab.lib.skos.SKOSResponse;
 import eu.essi_lab.lib.skos.SKOSSemanticRelation;
@@ -48,7 +47,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ThreadMode.MultiThreadMode;
 import eu.essi_lab.lib.utils.ThreadMode.SingleThreadMode;
 
-public class FedXLevelsExpander<T> extends FedXConceptsExpander<QueryTask> {
+public class FedXLevelsExpander extends FedXConceptsExpander {
 
     private List<String> ontologyUrls;
 

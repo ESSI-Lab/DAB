@@ -53,7 +53,7 @@ public class FedXConceptsFinderExternalTestIT {
 		"https://vocabularies.unesco.org/sparql", //
 		"https://dbpedia.org/sparql");
 
-	ConceptsFinder finder = new FedXConceptsFinder();
+	ConceptsFinder<?> finder = new FedXConceptsFinder();
 
 	List<String> concepts = finder.find("water", ontologyUrls, Arrays.asList("it", "en")).//
 		stream().//
@@ -98,7 +98,7 @@ public class FedXConceptsFinderExternalTestIT {
 		"https://vocabularies.unesco.org/sparql", //
 		"https://dbpedia.org/sparql");
 
-	ConceptsFinder finder = new FedXConceptsFinder();
+	ConceptsFinder<?> finder = new FedXConceptsFinder();
 
 	List<String> concepts = finder.find("water", ontologyUrls, Arrays.asList("it", "en")).//
 		stream().//
