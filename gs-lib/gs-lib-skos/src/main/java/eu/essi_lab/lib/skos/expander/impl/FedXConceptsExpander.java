@@ -110,6 +110,7 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //
 	    List<String> searchLangs, //
+	    boolean includeNoLanguage, //
 	    List<SKOSSemanticRelation> expansionRelations, //
 	    ExpansionLevel targetLevel, //
 	    ExpansionLimit limit) throws Exception {
@@ -152,6 +153,7 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 		    executor, //
 		    fatherConcept, //
 		    searchLangs, //
+		    includeNoLanguage, //
 		    expansionRelations, //
 		    visited, //
 		    results, //
@@ -207,6 +209,7 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 	    ExecutorService executor, //
 	    SimpleEntry<String, String> fatherConcept, //
 	    List<String> searchLangs, //
+	    boolean includeNoLanguage, //
 	    List<SKOSSemanticRelation> relations, //
 	    Set<String> visited, //
 	    List<SKOSConcept> results, //
@@ -248,6 +251,7 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 	    String query = getQueryBuilder().build(//
 		    concepts, //
 		    searchLangs, //
+		    includeNoLanguage, //
 		    relations, //
 		    targetLevel, //
 		    currentLevel);
@@ -319,6 +323,7 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 			    executor, //
 			    new SimpleEntry<String, String>(concept, expanded), //
 			    searchLangs, //
+			    includeNoLanguage, //
 			    relations, //
 			    visited, //
 			    results, //

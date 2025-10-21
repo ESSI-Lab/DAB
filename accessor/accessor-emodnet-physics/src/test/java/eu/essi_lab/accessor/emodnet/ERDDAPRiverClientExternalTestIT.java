@@ -11,7 +11,7 @@ public class ERDDAPRiverClientExternalTestIT {
 
     @Test
     public void test() {
-	String baseURL = "https://data-erddap.emodnet-physics.eu/erddap/tabledap/index";
+	String baseURL = "ata ";
 	ERDDAPRiverClient client = new ERDDAPRiverClient(baseURL);
 	List<ERDDAPRow> metadata = client.getMetaData();
 	System.out.println(metadata.getFirst());

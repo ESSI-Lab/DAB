@@ -48,6 +48,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
+		true,//
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 100));//
@@ -84,6 +85,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
+		true,//
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 100));//
@@ -118,8 +120,9 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
 		ontologyUrls, //
-		sourceLangs, //
+		sourceLangs, //		
 		searchLangs, //
+		true,//
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.LABELS, 10));//
@@ -150,6 +153,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
+		true, //
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.LABELS, 10));//
@@ -182,6 +186,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
+		true, //
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 10));//
@@ -212,6 +217,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
+		true,
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.CONCEPTS, 10));//
@@ -242,6 +248,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
+		true, //
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.ALT_LABELS, 10));//
@@ -272,6 +279,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
+		true, //
 		relations, //
 		targetLevel, //
 		ExpansionLimit.of(LimitTarget.ALT_LABELS, 10));//

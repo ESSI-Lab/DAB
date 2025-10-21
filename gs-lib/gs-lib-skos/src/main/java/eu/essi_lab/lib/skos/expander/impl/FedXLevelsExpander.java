@@ -62,6 +62,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	    List<String> ontologyUrls, //
 	    List<String> sourceLangs, //
 	    List<String> searchLangs, //
+	    boolean includeNoLanguage, //
 	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel targetLevel, //
 	    ExpansionLimit limit) throws Exception {
@@ -103,6 +104,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 		executor, //
 		fatherConcepts, //
 		searchLangs, //
+		includeNoLanguage, //
 		relations, //
 		visited, //
 		results, //
@@ -141,6 +143,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	    ExecutorService executor, //
 	    List<SimpleEntry<String, String>> fatherConcepts, //
 	    List<String> searchLangs, //
+	    boolean includeNoLanguage, //
 	    List<SKOSSemanticRelation> expansionRelations, //
 	    Set<String> visited, //
 	    List<SKOSConcept> results, //
@@ -198,6 +201,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 	    String query = getQueryBuilder().build(//
 		    urisToVisit, //
 		    searchLangs, //
+		    includeNoLanguage, //
 		    expansionRelations, //
 		    targetLevel, //
 		    currentLevel);
@@ -299,6 +303,7 @@ public class FedXLevelsExpander extends FedXConceptsExpander {
 		    executor, //
 		    nextLevel, //
 		    searchLangs, //
+		    includeNoLanguage, //
 		    expansionRelations, //
 		    visited, //
 		    results, //

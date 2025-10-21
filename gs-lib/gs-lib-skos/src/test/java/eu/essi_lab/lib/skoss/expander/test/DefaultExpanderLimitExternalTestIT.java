@@ -24,8 +24,8 @@ import eu.essi_lab.lib.utils.ThreadMode;
  */
 public class DefaultExpanderLimitExternalTestIT {
 
-    static final int HYDRO_ONT_WATER_LABELS_COUNT = 49;
-    static final int HYDRO_ONT_WATER_ALT_LABELS_COUNT = 19;
+    static final int HYDRO_ONT_WATER_LABELS_COUNT = 79;
+    static final int HYDRO_ONT_WATER_ALT_LABELS_COUNT = 49;
     static final int HYDRO_ONT_WATER_CONCEPTS_COUNT = 30;
     static final int HYDRO_ONT_WATER_PREF_LABELS_COUNT = HYDRO_ONT_WATER_CONCEPTS_COUNT;
 
@@ -244,15 +244,15 @@ public class DefaultExpanderLimitExternalTestIT {
     //
 
     @Test
-    public void altLabels21SingleThreadTest() throws Exception {
+    public void altLabels49SingleThreadTest() throws Exception {
 
-	test(ThreadMode.SINGLE(), ExpansionLimit.of(LimitTarget.ALT_LABELS, 21), -1, -1, HYDRO_ONT_WATER_ALT_LABELS_COUNT);
+	test(ThreadMode.SINGLE(), ExpansionLimit.of(LimitTarget.ALT_LABELS, 49), -1, -1, HYDRO_ONT_WATER_ALT_LABELS_COUNT);
     }
 
     @Test
-    public void altLabels21MultiThreadTest() throws Exception {
+    public void altLabels49MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 21), -1, -1, HYDRO_ONT_WATER_ALT_LABELS_COUNT);
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.ALT_LABELS, 49), -1, -1, HYDRO_ONT_WATER_ALT_LABELS_COUNT);
     }
 
     //
@@ -372,15 +372,15 @@ public class DefaultExpanderLimitExternalTestIT {
     //
 
     @Test
-    public void labels50SingleThreadTest() throws Exception {
+    public void labels79SingleThreadTest() throws Exception {
 
-	test(ThreadMode.SINGLE(), ExpansionLimit.of(LimitTarget.LABELS, 50), -1, HYDRO_ONT_WATER_LABELS_COUNT, -1);
+	test(ThreadMode.SINGLE(), ExpansionLimit.of(LimitTarget.LABELS, 79), -1, HYDRO_ONT_WATER_LABELS_COUNT, -1);
     }
 
     @Test
-    public void labels50MultiThreadTest() throws Exception {
+    public void labels55MultiThreadTest() throws Exception {
 
-	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.LABELS, 50), -1,
+	test(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)), ExpansionLimit.of(LimitTarget.LABELS, 85), -1,
 		HYDRO_ONT_WATER_LABELS_COUNT, -1);
     }
 
@@ -421,6 +421,7 @@ public class DefaultExpanderLimitExternalTestIT {
 		ontologyUrls, //
 		sourceLangs, //
 		searchLangs, //
+		true, //
 		relations, //
 		targetLevel, //
 		limit);//
@@ -431,17 +432,28 @@ public class DefaultExpanderLimitExternalTestIT {
 	    List<String> preLabels = response.getPrefLabels();
 	    Assert.assertEquals(excConcepts, preLabels.size());
 	    Assert.assertEquals(excConcepts, results.size());
+	    print(preLabels);
 	}
 
 	if (excLabels > -1) {
 	    List<String> labels = response.getLabels();
 	    Assert.assertEquals(excLabels, labels.size());
+	    print(labels);
 	}
 
 	if (excAlt > -1) {
 	    List<String> altLabels = response.getAltLabels();
 	    Assert.assertEquals(excAlt, altLabels.size());
+	    print(altLabels);
 	}
+    }
+
+    private void print(List<String> preLabels) {
+//	for (String label : preLabels) {
+//	    System.out.println(label);
+//	}
+//	System.out.println();
+	
     }
 
 }

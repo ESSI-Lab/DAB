@@ -48,24 +48,32 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
     public String build(//
 	    Collection<String> concepts, //
 	    List<String> searchLangs, //
+	    boolean includeNoLanguage, //
 	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel target, //
 	    ExpansionLevel current) {
 
-	String labelsFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
+	String languageFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
 	String expansionBlock = current.getValue() < target.getValue() ? buildExpansionOptionalBlock("concept", relations) : "";
+	String noLanguageFilter = includeNoLanguage ? "||LANG(?alt)=\"\"" : "";
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+		PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
 		SELECT DISTINCT ?concept ?pref ?alt ?expanded WHERE {
 		    BIND(<%s> AS ?concept)
 
-		    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s)) }
-		    OPTIONAL { ?concept skos:altLabel ?alt FILTER(LANG(?alt) IN (%s)) }
+		    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s) %s) }
+		     OPTIONAL {
+		                      ?concept ?altProp ?alt
+		                      FILTER(?altProp IN (skos:altLabel, rdfs:label))
+		                      FILTER(LANG(?alt) IN (%s) %s)
+		                    }
 
 		    %s
 		}
-		""", concepts.iterator().next(), labelsFilter, labelsFilter, expansionBlock).trim();
+		""", concepts.iterator().next(), languageFilter, noLanguageFilter, languageFilter, noLanguageFilter, expansionBlock).trim();
     }
 
     /**
@@ -78,24 +86,24 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 	StringBuilder sb = new StringBuilder();
 
 	if (!relations.isEmpty()) {
-	
+
 	    sb.append(" OPTIONAL { ");
-	    
-	for (int i = 0; i < relations.size(); i++) {
-	    SKOSSemanticRelation rel = relations.get(i);
 
-	    sb.append("{ OPTIONAL { ?").//
-		    append(conceptVar).//
-		    append(" ").//
-		    append(rel.getLabel()).//
-		    append(" ?expanded } }");
+	    for (int i = 0; i < relations.size(); i++) {
+		SKOSSemanticRelation rel = relations.get(i);
 
-	    if (i != relations.size() - 1) {
-		sb.append(" UNION ");
+		sb.append("{ OPTIONAL { ?").//
+			append(conceptVar).//
+			append(" ").//
+			append(rel.getLabel()).//
+			append(" ?expanded } }");
+
+		if (i != relations.size() - 1) {
+		    sb.append(" UNION ");
+		}
 	    }
-	}
-	sb.append(" } ");
-	
+	    sb.append(" } ");
+
 	}
 
 	return sb.toString();

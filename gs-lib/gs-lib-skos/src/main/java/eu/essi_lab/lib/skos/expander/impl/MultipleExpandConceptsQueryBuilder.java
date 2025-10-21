@@ -33,12 +33,14 @@ public class MultipleExpandConceptsQueryBuilder extends DefaultExpandConceptsQue
     public String build(//
 	    Collection<String> concepts, //
 	    List<String> searchLangs, //
+	    boolean includeNoLanguage, //
 	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel target, //
 	    ExpansionLevel current) {
 
-	String labelsFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
+	String languageFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
 	String expansionBlock = current.getValue() < target.getValue() ? buildExpansionOptionalBlock("concept", relations) : "";
+	    String noLanguageFilter = includeNoLanguage ? "||LANG(?alt)=\"\"" : "";
 
 	String values = "";
 
@@ -50,16 +52,20 @@ public class MultipleExpandConceptsQueryBuilder extends DefaultExpandConceptsQue
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+		PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 		SELECT DISTINCT ?concept ?pref ?alt ?expanded WHERE {
 		    VALUES ?concept {
 		  %s
 		}
 
 		    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s)) }
-		    OPTIONAL { ?concept skos:altLabel ?alt FILTER(LANG(?alt) IN (%s)) }
+
+                    OPTIONAL { ?concept ?altProp ?alt
+                               FILTER(?altProp IN (skos:altLabel, rdfs:label) %s)
+                               FILTER(LANG(?alt) IN (%s) %s) }
 
 		    %s
 		}
-		""", values, labelsFilter, labelsFilter, expansionBlock).trim();
+		""", values, languageFilter,noLanguageFilter, languageFilter, noLanguageFilter, expansionBlock).trim();
     }
 }
