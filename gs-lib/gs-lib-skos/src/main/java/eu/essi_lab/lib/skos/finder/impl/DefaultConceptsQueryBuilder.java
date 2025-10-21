@@ -50,9 +50,11 @@ public class DefaultConceptsQueryBuilder implements ConceptsQueryBuilder {
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+		PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 		SELECT DISTINCT ?concept WHERE {
 		    { ?concept skos:prefLabel ?label }
 		    UNION { ?concept skos:altLabel ?label }
+		    UNION { ?concept rdfs:label ?label }
 		    UNION { ?concept skos:hiddenLabel ?label }
 		    %s
 		}

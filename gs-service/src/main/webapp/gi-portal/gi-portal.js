@@ -1408,7 +1408,7 @@ export function initializePortal(config) {
 				],
 				readOnlyValues: true
 			}));
-
+			
 			// After constraints are initialized, try to fetch and update values
 			const authToken = localStorage.getItem('authToken') || undefined;
 			
@@ -1440,7 +1440,7 @@ export function initializePortal(config) {
 						// Keep default values if API fails
 					});
 
-
+					
 				if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
 					const spacingId = GIAPI.search.constWidget.getId('intendedObservationSpacing');
 					advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', {
@@ -1480,7 +1480,7 @@ export function initializePortal(config) {
 							// Keep default values if API fails
 						});
 				}
-
+				
 				if (config.aggregationDuration !== undefined && config.aggregationDuration) {
 					const durationId = GIAPI.search.constWidget.getId('aggregationDuration');
 					advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', {
@@ -1525,8 +1525,16 @@ export function initializePortal(config) {
 		}
 		
 		
+		var semanticValue = 0;
+		if (config.semanticSearchValue !== undefined) {
+			semanticValue = config.semanticSearchValue;
+		}
+
 		if (config.semanticSearch !== undefined && config.semanticSearch) {
-			
+			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semanticsearch', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
+		}
+		
+		if (config.semanticOptions !== undefined && config.semanticOptions) {
 		 			 
 			var searchModeButton = GIAPI.FontAwesomeButton({
 				'width': 250,

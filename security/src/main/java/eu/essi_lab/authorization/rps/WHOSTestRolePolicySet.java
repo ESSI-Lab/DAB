@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.authorization.pps;
+package eu.essi_lab.authorization.rps;
 
 /*-
  * #%L
@@ -25,37 +25,15 @@ package eu.essi_lab.authorization.pps;
  */
 
 /**
- * Users having the "blue-cloud-terms" role, are allowed to discovery if and only if:<br>
- * <br>
- * 1) the view creator is "blue-cloud-terms"<br>
- *
- * 2) the discovery path is supported<br>
- * <br>
- * Users having this policy role, are allowed to access if and only if:<br>
- * <br>
- * 1) the view creator is "blue-cloud-terms"<br>
- * 
- * 2) the access path is is supported<br>
- * <br>
- * Users having this policy role are also allowed to perform other actions if
- * and only if:<br>
- * <br>
- * 1) the view creator is "blue-cloud-terms"<br>
- *
- * 2) the discovery path is supported OR the access path is is supported<br>
- * 
  * @author Fabrizio
  */
-public class BlueCloudTermsPermissionPolicySet extends CreatorPermissionPolicySet {
+public class WHOSTestRolePolicySet extends AbstractRolePolicySet {
 
-	public BlueCloudTermsPermissionPolicySet() {
+    /**
+     * @param whos
+     */
+    public WHOSTestRolePolicySet() {
 
-		super("blue-cloud-terms");
-	}
-
-	@Override
-	protected String getCreator() {
-
-		return "blue-cloud-terms";
-	}
+	super("whos-test");
+    }
 }

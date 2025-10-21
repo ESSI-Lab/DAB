@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Optional;
 
 import eu.essi_lab.lib.skos.expander.ConceptsExpander;
-import eu.essi_lab.lib.skos.expander.ExpansionLimit;
 import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
 import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skos.finder.ConceptsFinder;

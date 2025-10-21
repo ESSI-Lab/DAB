@@ -15,12 +15,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.essi_lab.lib.skos.SKOSClient;
+import eu.essi_lab.lib.skos.SKOSClient.SearchTarget;
 import eu.essi_lab.lib.skos.SKOSConcept;
 import eu.essi_lab.lib.skos.SKOSResponse;
 import eu.essi_lab.lib.skos.SKOSSemanticRelation;
-import eu.essi_lab.lib.skos.SKOSClient.SearchTarget;
-import eu.essi_lab.lib.skos.expander.ExpansionLimit;
 import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
 import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skos.expander.impl.FedXConceptsExpander;
@@ -54,24 +54,26 @@ public class HydroOntologyExternalTestIT {
 	// client.setFinder(new FedXConceptsFinder());
 	client.setFinder(new DefaultConceptsFinder());
 
-	client.setOntologyUrls(Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql"
-	// , "http://codes.wmo.int/system/query"
-	));
+	client.setOntologyUrls(Arrays.asList("http://hydro.geodab.eu/hydro-ontology/sparql", "http://codes.wmo.int/system/query"));
     }
 
     @Test
     public void testFedXConceptsExpanderSingleThread() throws Exception {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
+
 	expander.setTraceQuery(true);
 	client.setExpander(expander);
 	commonRoutine();
     }
 
     @Test
-    public void testFedXonceptsExpanderMultiThread() throws Exception {
+    public void testFedXConceptsExpanderMultiThread() throws Exception {
 
 	FedXConceptsExpander expander = new FedXConceptsExpander();
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
+
 	expander.setTraceQuery(true);
 	expander.setThreadMode(ThreadMode.MULTI());
 	client.setExpander(expander);
@@ -82,6 +84,8 @@ public class HydroOntologyExternalTestIT {
     public void testFedXLevelsExpanderSingleThread() throws Exception {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
+
 	expander.setTraceQuery(true);
 	client.setExpander(expander);
 	commonRoutine();
@@ -91,6 +95,8 @@ public class HydroOntologyExternalTestIT {
     public void testFedXLevelsExpanderMultiThread() throws Exception {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
+
 	expander.setTraceQuery(true);
 	expander.setThreadMode(ThreadMode.MULTI());
 	client.setExpander(expander);
@@ -102,14 +108,18 @@ public class HydroOntologyExternalTestIT {
 
 	DefaultConceptsExpander expander = new DefaultConceptsExpander();
 	expander.setExcludeNoPrefConcepts(false);
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
+
 	client.setExpander(expander);
 	commonRoutine();
     }
-    
+
     @Test
     public void testDefaultsConceptsExpanderSingleThread() throws Exception {
 
 	DefaultConceptsExpander expander = new DefaultConceptsExpander();
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
+
 	expander.setThreadMode(ThreadMode.SINGLE());
 	expander.setExcludeNoPrefConcepts(false);
 	client.setExpander(expander);
@@ -134,7 +144,7 @@ public class HydroOntologyExternalTestIT {
 	    assertEquals(1, concepts.size());
 	    assertTrue(concepts.get(0).getConceptURI().equals("http://hydro.geodab.eu/hydro-ontology/concept/28"));
 	    assertEquals(concepts.get(0).getPref().get(), "Velocity");
-	    assertTrue(concepts.get(0).getAlt().size() == 1);
+	    assertTrue(concepts.get(0).getAlt().size() == 2);
 	    assertTrue(concepts.get(0).getAlt().contains("Velocità"));
 	}
 
@@ -198,7 +208,7 @@ public class HydroOntologyExternalTestIT {
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/5328"));
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/35"));
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/34"));
-	    assertTrue(uris.contains("http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/12006"));
+	    assertTrue(uris.contains("http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12006"));
 
 	}
     }

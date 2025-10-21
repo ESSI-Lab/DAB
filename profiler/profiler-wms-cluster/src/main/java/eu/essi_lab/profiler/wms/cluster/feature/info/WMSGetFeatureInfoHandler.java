@@ -153,7 +153,7 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			j = Integer.parseInt(jParameter);
 		    }
 		    
-		    Set<Bond> operands = new HashSet<>();
+		    List<Bond> operands = new ArrayList<>();
 
 
 		    if (bboxString != null && crs != null) {

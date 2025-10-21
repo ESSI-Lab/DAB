@@ -30,7 +30,7 @@ package eu.essi_lab.authorization.rps;
 public class LODGEOSSRolePolicySet extends AbstractRolePolicySet {
 
     /**
-     * @param whos
+     * @param lod-geoss
      */
     public LODGEOSSRolePolicySet() {
 
