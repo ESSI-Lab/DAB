@@ -59,7 +59,7 @@ public class SKOSConcept {
      */
     public static SKOSConcept of(String concept) {
 
-	return SKOSConcept.of(concept, null, new HashSet<>(), new HashSet<>(), new HashSet<>());
+	return SKOSConcept.of(concept, null, new HashSet<>(), new HashSet<>(), new HashSet<>(), null);
     }
 
     /**
@@ -69,7 +69,7 @@ public class SKOSConcept {
      */
     public static SKOSConcept of(String concept, String pref) {
 
-	return SKOSConcept.of(concept, pref, new HashSet<>(), new HashSet<>(), new HashSet<>());
+	return SKOSConcept.of(concept, pref, new HashSet<>(), new HashSet<>(), new HashSet<>(), null);
     }
 
     /**
@@ -78,7 +78,7 @@ public class SKOSConcept {
      */
     public static SKOSConcept of(Set<String> expanded) {
 
-	return SKOSConcept.of(null, null, expanded, new HashSet<>(), new HashSet<>());
+	return SKOSConcept.of(null, null, expanded, new HashSet<>(), new HashSet<>(), null);
     }
 
     /**
@@ -96,8 +96,29 @@ public class SKOSConcept {
 		pref, //
 		new HashSet<String>(expanded != null ? Set.of(expanded) : Set.of()), //
 		new HashSet<String>(expandedFrom != null ? Set.of(expandedFrom) : Set.of()), //
-		new HashSet<String>(alt != null ? Set.of(alt) : Set.of())//
-	);
+		new HashSet<String>(alt != null ? Set.of(alt) : Set.of()), //
+		null);
+    }
+    
+    /**
+     * 
+     * @param concept
+     * @param pref
+     * @param expanded
+     * @param expandedFrom
+     * @param alt
+     * @param level
+     * @return
+     */
+    public static SKOSConcept of(String concept, String pref, String expanded, String expandedFrom, String alt, ExpansionLevel level) {
+
+	return SKOSConcept.of(//
+		concept, //
+		pref, //
+		new HashSet<String>(expanded != null ? Set.of(expanded) : Set.of()), //
+		new HashSet<String>(expandedFrom != null ? Set.of(expandedFrom) : Set.of()), //
+		new HashSet<String>(alt != null ? Set.of(alt) : Set.of()), //
+		level);
     }
 
     /**
@@ -108,16 +129,47 @@ public class SKOSConcept {
      * @param alt
      * @return
      */
-    public static SKOSConcept of(String concept, String pref, Set<String> expanded, Set<String> expandedFrom, Set<String> alt) {
+    public static SKOSConcept of(//
+	    String concept, //
+	    String pref, //
+	    Set<String> expanded, //
+	    Set<String> expandedFrom, //
+	    Set<String> alt) {
 
-	SKOSConcept item = new SKOSConcept();
-	item.concept = concept;
-	item.pref = pref;
-	item.expanded = expanded;
-	item.expandedFrom = expandedFrom;
-	item.alt = alt;
+	return SKOSConcept.of(//
+		concept, //
+		pref, //
+		expanded, //
+		expandedFrom, //
+		alt, //
+		null);
+    }
 
-	return item;
+    /**
+     * @param concept
+     * @param pref
+     * @param expanded
+     * @param expandedFrom
+     * @param alt
+     * @param level
+     * @return
+     */
+    public static SKOSConcept of(//
+	    String concept, //
+	    String pref, Set<String> expanded, //
+	    Set<String> expandedFrom, //
+	    Set<String> alt, //
+	    ExpansionLevel level) {
+
+	SKOSConcept out = new SKOSConcept();
+	out.concept = concept;
+	out.pref = pref;
+	out.expanded = expanded;
+	out.expandedFrom = expandedFrom;
+	out.alt = alt;
+	out.level = level;
+
+	return out;
     }
 
     /**
