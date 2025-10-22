@@ -50,6 +50,7 @@ import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.lib.utils.Chronometer;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -187,6 +188,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 	    RIHMIMetadata rm = new RIHMIMetadata();
 	    rm.setStationId(stationId);
+	    dataset.setOriginalId("Hydrolare:" + stationId);
 
 	    if (split.length > 1 && split[0] != null) {
 		rm.setLatitude(new BigDecimal(split[0]));
@@ -291,7 +293,6 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(stationName);
 
 	    coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
-
 	    // BBOX
 	    if (rm.getLatitude() != null && rm.getLongitude() != null) {
 		coreMetadata.addBoundingBox(rm.getLatitude(), rm.getLongitude(), rm.getLatitude(), rm.getLongitude());
@@ -385,7 +386,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    GSLoggerFactory.getLogger(getClass()).error("Unrecognized aggregation duration: {}", aggregationDuration);
 		}
 	    }
-
+	    
 	    dataset.getExtensionHandler().setAttributeUnits(units);
 	    dataset.getExtensionHandler().setAttributeUnitsAbbreviation(units);
 
@@ -395,7 +396,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		if (c != null)
 		    dataset.getExtensionHandler().setCountry(c.getShortName());
 	    }
-
+	    dataset.getPropertyHandler().setIsTimeseries(true);
 	    String str = dataset.asString(true);
 	    record.setMetadata(str);
 	    record.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
@@ -405,6 +406,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	    e.printStackTrace();
 	    return null;
 	}
+	
 	return record;
 
     }

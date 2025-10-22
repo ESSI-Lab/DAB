@@ -159,11 +159,11 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    // we are interested only on downloadable datasets
 	    ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
-	    operands.add(accessBond);
+	    // operands.add(accessBond);
 
 	    // we are interested only on downloadable datasets
 	    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
-	    operands.add(downBond);
+	    // operands.add(downBond);
 
 	    // we are interested only on TIME SERIES datasets
 	    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
@@ -238,7 +238,17 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		}
 	    }
 
-	    LogicalBond bond = BondFactory.createAndBond(operands);
+	    Bond bond = null;
+
+	    switch (operands.size()) {
+	    case 0:
+		break;
+	    case 1:
+		bond = operands.iterator().next();
+		break;
+	    default:
+		bond = BondFactory.createAndBond(operands);
+	    }
 
 	    StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 
