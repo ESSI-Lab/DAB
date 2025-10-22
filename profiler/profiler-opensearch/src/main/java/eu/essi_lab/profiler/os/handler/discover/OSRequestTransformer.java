@@ -727,98 +727,39 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	for (String v : values) {
 
 	    switch (v) {
-	    case "instrumentDesc":
-		list.add(MetadataElement.INSTRUMENT_DESCRIPTION);
-		break;
-	    case "instrumentTitle":
-		list.add(MetadataElement.INSTRUMENT_TITLE);
-		break;
-	    case "platformDesc":
-		list.add(MetadataElement.PLATFORM_DESCRIPTION);
-		break;
-	    case "platformTitle":
-		list.add(MetadataElement.PLATFORM_TITLE);
-		break;
-	    case "intendedObservationSpacing":
-		list.add(MetadataElement.TIME_RESOLUTION_DURATION_8601);
-		break;
-	    case "aggregationDuration":
-		list.add(MetadataElement.TIME_AGGREGATION_DURATION_8601);
-		break;
-	    case "timeInterpolation":
-		list.add(MetadataElement.TIME_INTERPOLATION);
-		break;
-	    case "orgName":
-		list.add(MetadataElement.ORGANISATION_NAME);
-		break;
-	    case "origOrgDesc":
-		list.add(MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
-	    case "themeCategory":
-		list.add(MetadataElement.THEME_CATEGORY);
-		break;
-	    case "attributeTitle":
-		list.add(MetadataElement.ATTRIBUTE_TITLE);
-		break;
-	    case "attributeURI":
-	    case "observedPropertyURI":
-		list.add(MetadataElement.OBSERVED_PROPERTY_URI);
-		break;
-	    case "instrumentId":
-		list.add(MetadataElement.INSTRUMENT_IDENTIFIER);
-		break;
-	    case "platformId":
-		list.add(MetadataElement.PLATFORM_IDENTIFIER);
-		break;
-	    case "origOrgId":
-		list.add(MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER);
-		break;
-	    case "attributeId":
-		list.add(MetadataElement.ATTRIBUTE_IDENTIFIER);
-		break;
-	    case "keyword":
-		list.add(MetadataElement.KEYWORD);
-		break;
-	    case "format":
-		list.add(MetadataElement.DISTRIBUTION_FORMAT);
-		break;
-	    case "protocol":
-		list.add(MetadataElement.ONLINE_PROTOCOL);
-		break;
-	    case "providerID":
-		list.add(ResourceProperty.SOURCE_ID);
-		break;
-	    case "organisationName":
-		list.add(MetadataElement.ORGANISATION_NAME);
-		break;
-	    case "prodType":
-		list.add(MetadataElement.PRODUCT_TYPE);
-		break;
-	    case "sensorOpMode":
-		list.add(MetadataElement.SENSOR_OP_MODE);
-		break;
-	    case "sensorSwath":
-		list.add(MetadataElement.SENSOR_SWATH);
-		break;
-	    case "sarPolCh":
-		list.add(MetadataElement.SAR_POL_CH);
-		break;
-	    case "sscScore":
-		list.add(ResourceProperty.SSC_SCORE);
-		break;
-	    case "s3InstrumentIdx":
-		list.add(MetadataElement.S3_INSTRUMENT_IDX);
-		break;
-	    case "s3ProductLevel":
-		list.add(MetadataElement.S3_PRODUCT_LEVEL);
-		break;
-	    case "s3Timeliness":
-		list.add(MetadataElement.S3_TIMELINESS);
-		break;
+	    case "instrumentDesc" -> list.add(MetadataElement.INSTRUMENT_DESCRIPTION);
+	    case "instrumentTitle" -> list.add(MetadataElement.INSTRUMENT_TITLE);
+	    case "platformDesc" -> list.add(MetadataElement.PLATFORM_DESCRIPTION);
+	    case "platformTitle" -> list.add(MetadataElement.PLATFORM_TITLE);
+	    case "intendedObservationSpacing" -> list.add(MetadataElement.TIME_RESOLUTION_DURATION_8601);
+	    case "aggregationDuration" -> list.add(MetadataElement.TIME_AGGREGATION_DURATION_8601);
+	    case "timeInterpolation" -> list.add(MetadataElement.TIME_INTERPOLATION);
+	    case "orgName" -> list.add(MetadataElement.ORGANISATION_NAME);
+	    case "origOrgDesc" -> list.add(MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
+	    case "themeCategory" -> list.add(MetadataElement.THEME_CATEGORY);
+	    case "attributeTitle" -> list.add(MetadataElement.ATTRIBUTE_TITLE);
+	    case "attributeURI", "observedPropertyURI" -> list.add(MetadataElement.OBSERVED_PROPERTY_URI);
+	    case "instrumentId" -> list.add(MetadataElement.INSTRUMENT_IDENTIFIER);
+	    case "platformId" -> list.add(MetadataElement.PLATFORM_IDENTIFIER);
+	    case "origOrgId" -> list.add(MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER);
+	    case "attributeId" -> list.add(MetadataElement.ATTRIBUTE_IDENTIFIER);
+	    case "keyword" -> list.add(MetadataElement.KEYWORD);
+	    case "format" -> list.add(MetadataElement.DISTRIBUTION_FORMAT);
+	    case "protocol" -> list.add(MetadataElement.ONLINE_PROTOCOL);
+	    case "providerID" -> list.add(ResourceProperty.SOURCE_ID);
+	    case "organisationName" -> list.add(MetadataElement.ORGANISATION_NAME);
+	    case "prodType" -> list.add(MetadataElement.PRODUCT_TYPE);
+	    case "sensorOpMode" -> list.add(MetadataElement.SENSOR_OP_MODE);
+	    case "sensorSwath" -> list.add(MetadataElement.SENSOR_SWATH);
+	    case "sarPolCh" -> list.add(MetadataElement.SAR_POL_CH);
+	    case "sscScore" -> list.add(ResourceProperty.SSC_SCORE);
+	    case "s3InstrumentIdx" -> list.add(MetadataElement.S3_INSTRUMENT_IDX);
+	    case "s3ProductLevel" -> list.add(MetadataElement.S3_PRODUCT_LEVEL);
+	    case "s3Timeliness" -> list.add(MetadataElement.S3_TIMELINESS);
 	    }
 	}
 
 	message.setTermFrequencyTargets(list);
-
     }
 
     private static String createOrSearch(Set<String> terms) {
