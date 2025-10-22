@@ -141,19 +141,19 @@ export const GIAPI = {
 			if (where.predefinedLayer) {
 				predefinedLayer = where.predefinedLayer;
 			}
-			
+
 			if (Array.prototype.isArray(where)) {
 				if (typeof where[0].west !== 'undefined' && !Number.isNaN(where[0].west) &&
-				 typeof where[0].south !== 'undefined' && !Number.isNaN(where[0].south) && 
-				 typeof where[0].east !== 'undefined' && !Number.isNaN(where[0].east) && 
-				 typeof where[0].north !== 'undefined' && !Number.isNaN(where[0].north)) {
+					typeof where[0].south !== 'undefined' && !Number.isNaN(where[0].south) &&
+					typeof where[0].east !== 'undefined' && !Number.isNaN(where[0].east) &&
+					typeof where[0].north !== 'undefined' && !Number.isNaN(where[0].north)) {
 					bbox = where.west + ',' + where.south + ',' + where.east + ',' + where.north;
 				}
 			} else {
 				if (typeof where.west !== 'undefined' && !Number.isNaN(where.west) &&
-				 typeof where.south !== 'undefined' && !Number.isNaN(where.south) && 
-				 typeof where.east !== 'undefined' && !Number.isNaN(where.east) && 
-				 typeof where.north !== 'undefined' && !Number.isNaN(where.north)) {
+					typeof where.south !== 'undefined' && !Number.isNaN(where.south) &&
+					typeof where.east !== 'undefined' && !Number.isNaN(where.east) &&
+					typeof where.north !== 'undefined' && !Number.isNaN(where.north)) {
 					bbox = where.west + ',' + where.south + ',' + where.east + ',' + where.north;
 				}
 			}
@@ -217,7 +217,7 @@ export const GIAPI = {
 
 		// additional kvp
 		var kvp = constraints && constraints.kvp;
-		var queryKVP = '&';
+		var queryKVP = '';
 
 		var kwd = '';
 		var format = '';
@@ -237,15 +237,15 @@ export const GIAPI = {
 		var timeInterpolation = '';
 		var attrURI = '';
 		var orgName = '';
-		var semanticsearch = '';
-		var ontologyids = '';
-
+	
 		if (kvp) {
+			
 			if (!Array.prototype.isArray(kvp)) {
 				kvp = [kvp];
 			}
 
 			for (var kvpel = 0; kvpel < kvp.length; kvpel++) {
+			
 				var key = kvp[kvpel].key;
 				var val = kvp[kvpel].value;
 
@@ -298,38 +298,28 @@ export const GIAPI = {
 				if (key === 'platformTitle') {
 					platTitle = val;
 					continue;
-				}
-
-				if (key === 'ontologyids') {
-					ontologyids = val;
-					continue;
-				}
+				}				
 
 				if (key === 'attributeTitle') {
 					attrTitle = val;
 					continue;
 				}
-				
+
 				if (key === 'intendedObservationSpacing') {
 					intendedObservationSpacing = val;
 					continue;
 				}
-				
+
 				if (key === 'aggregationDuration') {
 					aggregationDuration = val;
 					continue;
 				}
-				
+
 				if (key === 'timeInterpolation') {
 					timeInterpolation = val;
 					continue;
-				}
-
-				if (key === 'semanticsearch') {
-					semanticsearch = val;
-					continue;
-				}
-
+				}					 
+									
 				if (key === 'observedPropertyURI') {
 					attrURI = val;
 					continue;
@@ -365,14 +355,11 @@ export const GIAPI = {
 		timeInterpolation = options && options.termFrequency && GIAPI.readConstraint(constraints, 'timeInterpolation') || timeInterpolation;
 		attrURI = options && options.termFrequency && GIAPI.readConstraint(constraints, 'observedPropertyURI') || attrURI;
 		orgName = options && options.termFrequency && GIAPI.readConstraint(constraints, 'organisationName') || orgName;
-
-		semanticsearch = options && options.termFrequency && GIAPI.readConstraint(constraints, 'semanticsearch') || semanticsearch;
-		ontologyids = options && options.termFrequency && GIAPI.readConstraint(constraints, 'ontologyids') || ontologyids;
-
-
+		 	 
 		// *******************************************************
 		// Special constraints used only by the PubSubManager
-		//
+		// *******************************************************
+		
 		var from = !constraints ? '' : constraints.from || '';
 		var until = !constraints ? '' : constraints.until || '';
 		//
@@ -384,7 +371,9 @@ export const GIAPI = {
 
 		var subject = '';
 		var relation = '';
+		
 		if (options && options.extension) {
+			
 			if (typeof options.extension.relation === 'string') {
 				relation = options.extension.relation;
 			} else {
@@ -449,82 +438,58 @@ export const GIAPI = {
 		}
 
 		var path = 'opensearch/query?';
+		
 		if (viewId) {
-			//        	viewId = '/'+viewId;
-
+			
 			path = 'view/' + viewId + '/opensearch/query?';
 		}
-
-		//        else{
-		//        	viewId = '';
-		//        }
-
-		//        if (options && options.aggregate) {
-		//            path = openSearchPath + viewId+'?reqID=' + queryID + '&aggregate=true&';
-		//        } else {
-		//            path = (subject || relation ) ? 'opensearchsemanticenhanced'+viewId+'?reqID=' + queryID + '&semExec=expand&' : openSearchPath+viewId+'?reqID=' + queryID + '&';
-		//        }
-
+ 
 		var slash = dabEndpoint.endsWith('/') ? '' : '/';
 		var trgId = targetId ? targetId : '';
 
 		var httpGet = dabEndpoint + slash + servicePath + '/' + path;
 
-		httpGet += 'si=' + start + '&';
-		httpGet += 'ct=' + pageSize + '&';
-		httpGet += 'st=' + what + '&';
+		httpGet += start ? 'si=' + start + '&' : '';
+		httpGet += pageSize ? 'ct=' + pageSize + '&' : '';
+		httpGet += what ? 'st=' + what + '&' : '';
 
-		httpGet += 'kwd=' + kwd + '&';
-		httpGet += 'frmt=' + format + '&';
-		httpGet += 'prot=' + protocol + '&';
-		httpGet += 'kwdOrBbox=' + kwdOrBbox + '&';
-		httpGet += 'sscScore=' + score + '&';
+		httpGet += kwd ? 'kwd=' + kwd + '&' : '';
+		httpGet += format ? 'frmt=' + format + '&' : '';
+		httpGet += protocol ? 'prot=' + protocol + '&' : '';
+		httpGet += kwdOrBbox ? 'kwdOrBbox=' + kwdOrBbox + '&' : '';
+		httpGet += score ? 'sscScore=' + score + '&' : '';
+ 	 
+		httpGet += instr ? 'instrumentTitle=' + instr + '&' : '';
+		httpGet += platTitle ? 'platformTitle=' + platTitle + '&' : '';
+		httpGet += attrTitle ? 'attributeTitle=' + attrTitle + '&' : '';
+		httpGet += intendedObservationSpacing ? 'intendedObservationSpacing=' + intendedObservationSpacing + '&' : '';
+		httpGet += aggregationDuration ? 'aggregationDuration=' + aggregationDuration + '&' : '';
+		httpGet += timeInterpolation ? 'timeInterpolation=' + timeInterpolation + '&' : '';
+		httpGet += attrURI ? 'observedPropertyURI=' + attrURI + '&' : '';
+		httpGet += orgName ? 'organisationName=' + orgName + '&' : '';
 
-		//        httpGet += 'instrumentId=' + sen + '&';
-		//        httpGet += 'platformId=' + pla + '&';
-		//        httpGet += 'attributeId=' + att + '&';        
-		//        httpGet += 'origOrgId=' + ori + '&';
+		httpGet += sf ? 'searchFields=' + sf + '&' : '';
+		httpGet += bbox ? 'bbox=' + bbox + '&' : '';
+		httpGet += predefinedLayer ? 'predefinedLayer=' + predefinedLayer + '&' : '';
+		httpGet += spatialRel ? 'rel=' + spatialRel + '&' : '';
+		httpGet += termFrequency ? 'tf=' + termFrequency + '&' : '';
+		httpGet += when_from ? 'ts=' + when_from + '&' : '';
+		httpGet += when_to ? 'te=' + when_to + '&' : '';
+		httpGet += trgId ? 'targetId=' + trgId + '&' : '';
 
-
-		httpGet += 'semanticsearch=' + semanticsearch + '&';
-		httpGet += 'ontologyids=' + ontologyids + '&';
-		httpGet += 'instrumentTitle=' + instr + '&';
-		httpGet += 'platformTitle=' + platTitle + '&';
-		httpGet += 'attributeTitle=' + attrTitle + '&';
-		httpGet += 'intendedObservationSpacing=' + intendedObservationSpacing + '&';
-		httpGet += 'aggregationDuration=' + aggregationDuration + '&';
-		httpGet += 'timeInterpolation=' + timeInterpolation + '&';
-		httpGet += 'observedPropertyURI=' + attrURI + '&';
-		httpGet += 'organisationName=' + orgName + '&';
-
-
-
-		httpGet += 'searchFields=' + sf + '&';
-		httpGet += 'bbox=' + bbox + '&';
-		httpGet += 'predefinedLayer=' + predefinedLayer + '&';
-		httpGet += 'rel=' + spatialRel + '&';
-		httpGet += 'tf=' + termFrequency + '&';
-		httpGet += 'ts=' + when_from + '&';
-		httpGet += 'te=' + when_to + '&';
-		httpGet += 'targetId=' + trgId + '&';
-
-		httpGet += 'from=' + from + '&';
-		httpGet += 'until=' + until + '&';
-
-		// static variable to disable the crawler and speed up the response time
-		if (GIAPI.disableCrawler) {
-			httpGet += 'crawler=disabled&';
-		}
-
-		if (sources) {
-			httpGet += 'sources=' + sources + '&';
-		}
-
+		httpGet += from ? 'from=' + from + '&' : '';
+		httpGet += until ? 'until=' + until + '&' : '';
+ 	
+		httpGet += sources ? 'sources=' + sources + '&' : '';
+		
 		if (parentId || who) {
 			httpGet += 'parents=' + (parentId ? encodeURIComponent(parentId) : encodeURIComponent(who)) + '&';
 		}
+		
+		httpGet += subject ? 'subj=' + encodeURIComponent(subject) + '&' : '';
+		httpGet += relation ? 'rela=' + relation + '&' : '';
 
-		httpGet += 'subj=' + encodeURIComponent(subject) + '&rela=' + relation + queryKVP + 'outputFormat=application/json';
+		httpGet += queryKVP + 'outputFormat=application/json';
 
 		GIAPI.logger.log('query: ' + httpGet);
 

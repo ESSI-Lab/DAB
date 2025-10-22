@@ -19,12 +19,16 @@
     "instrumentSearch": true,
     "attributeSearch": true,
     "platformSearch": true,
+	
 	"semanticOptions": false,
     "semanticSearch": true,    
     "semanticSearchValue":1,
-    "ontology": "whos",
-	"ontologyids": "whos",
-    "riverSearch": true,
+	"semanticRelations" : "skos:narrower,skos:closeMatch",
+	"withObservedPropertiesURIs" : "true", 
+	"ontologyIds": "hydro",
+	"ontology": "whos",
+
+	"riverSearch": true,
     "timeInterpolation": true,
     "clusterWMS": true,    
     "showSourceEndpoint": false
