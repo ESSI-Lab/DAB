@@ -66,6 +66,7 @@ public class PersistentSchedulerInternalTestIT extends SchedulerTest {
 
 	setting.setSQLDatabaseName("quartzJobStore");
 	setting.setSQLDatabaseUri(System.getProperty("mysql.host"));
+//	setting.setSQLDatabaseUri("jdbc:mysql://localhost:3306");
 	setting.setSQLDatabaseUser("root");
 	setting.setSQLDatabasePassword("pdw");
 

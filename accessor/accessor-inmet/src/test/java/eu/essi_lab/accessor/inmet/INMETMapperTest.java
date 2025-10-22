@@ -155,7 +155,7 @@ public class INMETMapperTest {
     public void testMapperwithErrorHeight() throws Exception {
 	InputStream is = INMETMapperTest.class.getClassLoader().getResourceAsStream(("PREC_S101_20180927.HIS.CSV"));
 	TestCase.assertNotNull(is);
-	File stream = File.createTempFile("MapperTest", "xls");
+	File stream = File.createTempFile("MapperTest", ".xls");
 	OutputStream outputStream = null;
 	outputStream = new FileOutputStream(stream);
 	IOUtils.copy(is, outputStream);
