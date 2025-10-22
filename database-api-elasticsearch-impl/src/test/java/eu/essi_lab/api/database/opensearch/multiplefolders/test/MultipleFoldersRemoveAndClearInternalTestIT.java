@@ -31,12 +31,12 @@ import eu.essi_lab.model.resource.Dataset;
 /**
  * @author Fabrizio
  */
-public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
+public class MultipleFoldersRemoveAndClearInternalTestIT extends OpenSearchTest {
 
     @Test
     public void test() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+	OpenSearchDatabase database = createDataBase();
 
 	//
 	//
