@@ -208,7 +208,7 @@ public class SemanticSearchSupport {
 	DefaultConceptsFinder finder = new DefaultConceptsFinder();
 	finder.setTraceQuery(false);
 	finder.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
-	// finder.setTaskConsumer((task) -> System.out.println(task));
+	// finder.setTaskConsumer((task) -> task.setMaxExecutionTime(0));
 
 	client.setFinder(finder);
 
@@ -216,7 +216,7 @@ public class SemanticSearchSupport {
 	expander.getQueryBuilder().setIncludeNoLanguageConcepts(false); // default
 	expander.setTraceQuery(false);
 	expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // 4 threads per level
-	// expander.setTaskConsumer((task) -> System.out.println(task));
+	// expander.setTaskConsumer((task) -> task.setMaxExecutionTime(0));
 
 	client.setExpander(expander);
 
