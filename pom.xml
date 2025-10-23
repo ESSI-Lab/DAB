@@ -376,9 +376,11 @@
 
 		<!-- Docker images -->
 		<mySQLDocker.registry>
-			672812193635.dkr.ecr.us-east-1.amazonaws.com/mysql:essi-0.1.3-configured</mySQLDocker.registry>
+            mysql:9.5.0</mySQLDocker.registry>
 
 		<docker.elasticsearch>opensearchproject/opensearch:1.3.5</docker.elasticsearch>
+        <docker.keycloak>keycloak/keycloak:26.4.1</docker.keycloak>
+        <docker.redis>redis:8.2.2</docker.redis>
 
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
@@ -1594,12 +1596,14 @@
 						</executions>
 						<configuration>
 							<systemPropertyVariables>
-								<mysql.host>
-									jdbc:mysql://${docker.host.address}:${mysql.port}</mysql.host>
-								<es.host>
-									http://${docker.host.address}:${gi-elasticsearch.port}</es.host>
+								<mysql.host>jdbc:mysql://${docker.host.address}:${mysql.port}</mysql.host>
+								<es.host>http://${docker.host.address}:${gi-elasticsearch.port}</es.host>
+                                <keycloak.host>http://${docker.host.address}:${keycloak.port}</keycloak.host>
+                                <redis.host>http://${docker.host.address}:${redis.port}</redis.host>
 								<es.user>admin</es.user>
 								<es.password>admin</es.password>
+                                <keycloak.user>admin</keycloak.user>
+                                <keycloak.password>admin</keycloak.password>
 								<docker.username>${docker.username}</docker.username>
 								<docker.password>${docker.password}</docker.password>
 								<giProxyEndpoint>${giProxyEndpoint}</giProxyEndpoint>

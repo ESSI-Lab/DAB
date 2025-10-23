@@ -1,5 +1,7 @@
 package eu.essi_lab.pdk;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
@@ -16,7 +18,7 @@ import org.junit.Test;
 
 import eu.essi_lab.lib.utils.TaskListExecutor;
 
-public class RequestBouncerTest {
+public class RequestBouncerInternalTestIT {
 
     private class Metrics {
 
@@ -97,7 +99,7 @@ public class RequestBouncerTest {
     public void testFromSingleIP() throws Exception {
 
 	int maxRequests = 2;
-//	 AbstractRequestBouncer bouncer = getLocalRequestBouncer(maxRequests,maxRequests);
+	//	 AbstractRequestBouncer bouncer = getLocalRequestBouncer(maxRequests,maxRequests);
 	AbstractRequestBouncer bouncer = getDistributedRequestBouncer(maxRequests, maxRequests, 100);
 
 	int requests = 2;
@@ -124,8 +126,18 @@ public class RequestBouncerTest {
 
     }
 
-    private DistributedRequestBouncer getDistributedRequestBouncer(int maxRequests, int maxRequestsPerIp,int maxOverallRequestsPerIp) {
-	DistributedRequestBouncer ret = new DistributedRequestBouncer(maxRequests, maxRequestsPerIp,maxOverallRequestsPerIp);
+    private DistributedRequestBouncer getDistributedRequestBouncer(int maxRequests, int maxRequestsPerIp, int maxOverallRequestsPerIp)
+	    throws URISyntaxException {
+
+	String redishostProp = System.getProperty("redis.host");
+	//	String redishostProp = "http://localhost:6379";
+
+	URI redisuri = new URI(redishostProp);
+
+	//TODO fix the hash hardcoded value to use the actual default (which is now private in DistributedRequestBouncer class)
+	DistributedRequestBouncer ret = new DistributedRequestBouncer(redisuri.getHost(), redisuri.getPort(), "default", maxRequests,
+		maxRequestsPerIp, maxOverallRequestsPerIp);
+
 	ret.setHash("java-test");
 	ret.clearDB();
 	ret.setFacilitateOtherIps(true);

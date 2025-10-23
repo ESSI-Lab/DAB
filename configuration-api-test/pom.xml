@@ -88,12 +88,6 @@
                                         </ports>
                                         <wait>
                                             <time>${fabric8-no-ping-timeout}</time>
-                                            <!-- http>
-                                                <url>http://${docker.host.address}:${mysql.port}</url>
-                                                <method>GET</method>
-                                                <status>200</status>
-                                            </http-->
-
                                         </wait>
                                         <env>
                                             <MYSQL_ROOT_PASSWORD>pdw</MYSQL_ROOT_PASSWORD>

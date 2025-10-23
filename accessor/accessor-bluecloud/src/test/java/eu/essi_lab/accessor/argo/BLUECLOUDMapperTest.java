@@ -78,8 +78,8 @@ public class BLUECLOUDMapperTest {
 	TestCase.assertEquals(-49.266708, bbox.getNorth());
 	TestCase.assertEquals(-55.411179, bbox.getSouth());
 
-	// id
-	TestCase.assertEquals("6CADFEC373A409B575F4DA37496F1C16EC423C59", resource.getOriginalId().get());
+	// id This is updated to match the new impl of generateCode in AbstractResourceMapper
+	TestCase.assertEquals("3C5BE3120174C8AC00F9FFAB720E527BB2199A32", resource.getOriginalId().get());
 
 	// responsible party
 	ResponsibleParty originator = dataIdentification.getPointOfContact("publisher");

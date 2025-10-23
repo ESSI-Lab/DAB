@@ -43,10 +43,8 @@ public class OAuth2AuthenticatorFactory {
 	    OAuthProvider provider = setting.getSelectedProvider();
 
 	    OAuth2Authenticator authenticator = switch (provider) {
-	    case FACEBOOK -> new FacebookOAuth2Authenticator();
-	    case GOOGLE -> new GoogleOAuth2Authenticator();
-	    case TWITTER -> new TwitterOAuthAuthenticator();
-	    case KEYCLOAK -> new KeycloackOAuthAuthenticator();
+		case GOOGLE -> new GoogleOAuth2Authenticator();
+		case KEYCLOAK -> new KeycloackOAuthAuthenticator();
 	    };
 
 	    authenticator.configure(setting);

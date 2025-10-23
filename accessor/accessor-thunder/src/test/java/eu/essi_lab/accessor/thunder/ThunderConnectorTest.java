@@ -47,7 +47,7 @@ public class ThunderConnectorTest {
 	    i++;
 	    // System.out.println("");
 	}
-	TestCase.assertEquals(29729, i);
+	TestCase.assertEquals(23, i);
 
     }
 

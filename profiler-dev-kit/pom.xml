@@ -85,5 +85,43 @@
 		</dependency>
 
 	</dependencies>
+    <profiles>
+        <profile>
+            <id>internaltest</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
 
+                        <configuration>
+                            <images>
+
+                                <image>
+                                    <alias>redis-img</alias>
+                                    <name>${docker.redis}</name>
+                                    <run>
+                                        <ports>
+                                            <port>redis.port:6379</port>
+                                        </ports>
+                                        <wait>
+                                            <time>${fabric8-no-ping-timeout}</time>
+                                        </wait>
+                                    </run>
+                                </image>
+
+                            </images>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

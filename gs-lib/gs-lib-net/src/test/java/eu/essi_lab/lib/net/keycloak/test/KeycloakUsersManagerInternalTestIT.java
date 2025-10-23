@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.lib.net.keycloak.test;
 
@@ -21,7 +21,7 @@ import eu.essi_lab.lib.net.keycloak.KeycloakUser.UserProfileAttribute;
 /**
  * @author Fabrizio
  */
-public class KeycloakUsersManagerTest {
+public class KeycloakUsersManagerInternalTestIT {
 
     private KeycloakUsersClient manager;
 
@@ -29,9 +29,11 @@ public class KeycloakUsersManagerTest {
     public void before() throws IOException, InterruptedException {
 
 	manager = new KeycloakUsersClient();
-	manager.setServiceUrl("http://localhost:8080");
+	//	manager.setServiceUrl("http://localhost:8080");
+	manager.setServiceUrl(System.getProperty("keycloak.host"));
 	manager.setAdminPassword(System.getProperty("keycloak.password"));
 	manager.setAdminUser(System.getProperty("keycloak.user"));
+
 	manager.setUsersRealm("testRealm");
 
 	String accessToken = manager.getAccessToken();
@@ -155,10 +157,14 @@ public class KeycloakUsersManagerTest {
 
 	Assert.assertEquals(rawJSON.getBoolean(KeycloakUser.ENABLED_FIELD), simpleJSON.getBoolean("enabled"));
 	Assert.assertEquals(rawJSON.getString(KeycloakUser.ID_FIELD), simpleJSON.getString("id"));
-	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.EMAIL.getAttribute()), simpleJSON.getString(UserProfileAttribute.EMAIL.getAttribute()));
-	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.USERNAME.getAttribute()), simpleJSON.getString(UserProfileAttribute.USERNAME.getAttribute()));
-	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.LAST_NAME.getAttribute()), simpleJSON.getString(UserProfileAttribute.LAST_NAME.getAttribute()));
-	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.FIRST_NAME.getAttribute()), simpleJSON.getString(UserProfileAttribute.FIRST_NAME.getAttribute()));
+	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.EMAIL.getAttribute()),
+		simpleJSON.getString(UserProfileAttribute.EMAIL.getAttribute()));
+	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.USERNAME.getAttribute()),
+		simpleJSON.getString(UserProfileAttribute.USERNAME.getAttribute()));
+	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.LAST_NAME.getAttribute()),
+		simpleJSON.getString(UserProfileAttribute.LAST_NAME.getAttribute()));
+	Assert.assertEquals(rawJSON.getString(UserProfileAttribute.FIRST_NAME.getAttribute()),
+		simpleJSON.getString(UserProfileAttribute.FIRST_NAME.getAttribute()));
 	Assert.assertEquals(rawJSON.getJSONObject("attributes").toString(), simpleJSON.getJSONObject("attributes").toString());
 
 	Assert.assertNotNull(rawJSON.get(KeycloakUser.CREATED_TIME_STAMP_FIELD)); // in the raw JSON is long
@@ -338,13 +344,13 @@ public class KeycloakUsersManagerTest {
 
 	Assert.assertEquals(true, listedUpdatedUser.isEnabled()); // now it's enabled
 	Assert.assertEquals("pippo", listedUpdatedUser.getUserProfileAttribute(UserProfileAttribute.USERNAME).get()); // username
-														      // cannot
-														      // be
-														      // modified!
+	// cannot
+	// be
+	// modified!
 	Assert.assertEquals("pippo2@gmail.com", listedUpdatedUser.getUserProfileAttribute(UserProfileAttribute.EMAIL).get()); // email
-															      // changed
+	// changed
 	Assert.assertEquals("Pippo2", listedUpdatedUser.getUserProfileAttribute(UserProfileAttribute.FIRST_NAME).get()); // name
-															 // changed
+	// changed
 	Assert.assertEquals("De' Pippis", listedUpdatedUser.getUserProfileAttribute(UserProfileAttribute.LAST_NAME).get());
 
 	Assert.assertEquals(1, listedUpdatedUser.getAttributes().size()); // only one attribute now
