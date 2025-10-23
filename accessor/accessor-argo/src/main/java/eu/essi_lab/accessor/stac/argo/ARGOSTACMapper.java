@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
@@ -46,7 +47,9 @@ import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
+import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
+import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.geo.BBOXUtils;
 import eu.essi_lab.lib.net.nvs.NVSClient;
@@ -87,283 +90,119 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 
 	String originalMetadata = originalMD.getMetadata();
 
-	// logger.debug("STARTED mapping for record number {} .",
-	// station.getRecordID());
-
 	JSONObject object = new JSONObject(originalMetadata);
+	// id
+	// bbox
+	// type
+	// links
+	// assets
+	// geometry
+	// collection
+	// properties
+	// - p
+	// - p
+	// - p
+	// - p
+	// stac_version
+	// stac_extensions
 
-	JSONObject platformObject = object.optJSONObject("platform");
+	String platformId = getString(object, "id");
+	JSONArray bboxArray = getJSONArray(object, "bbox");
+	JSONArray linksArray = getJSONArray(object, "links");
+	JSONObject assetsObj = object.optJSONObject("assets");
+	JSONObject geometryObj = object.optJSONObject("geometry");
+	JSONObject propertiesObj = object.optJSONObject("properties");
+
+	String title = getString(propertiesObj, "title");
+	String PI_name = getString(propertiesObj, "PI_name");
+	String mission = getString(propertiesObj, "mission");
+	String sci_doi = getString(propertiesObj, "sci:doi");
+	String platformCode = getString(propertiesObj, "platform");
+	String parameters = getString(propertiesObj, "parameters");
+	String description = getString(propertiesObj, "description");
+	String manual_version = getString(propertiesObj, "manual_version");
+	String constellation = getString(propertiesObj, "constellation");
+	String platform_type = getString(propertiesObj, "platform_type");
+	String wmo_inst_type = getString(propertiesObj, "wmo_inst_type");
+	String platform_maker = getString(propertiesObj, "platform_maker");
+	String start_datetime = getString(propertiesObj, "start_datetime");
+	String end_datetime = getString(propertiesObj, "end_datetime");
+	String updated_datetime = getString(propertiesObj, "updated");
+	String deployment_ship = getString(propertiesObj, "deployment_ship");
+	String float_serial_no = getString(propertiesObj, "float_serial_no");
+	String firmware_version = getString(propertiesObj, "firmware_version");
+	String positioning_system = getString(propertiesObj, "positioning_system");
+	String deployment_cruise_id = getString(propertiesObj, "deployment_cruise_id");
+
+	JSONArray columnParameters = getJSONArray(propertiesObj, "table:columns");
+
+	JSONArray instruments = getJSONArray(propertiesObj, "instruments");
+	JSONArray providers = getJSONArray(propertiesObj, "providers");
+
+	JSONArray themes = getJSONArray(propertiesObj, "themes");
+
+	// bbox
+	BigDecimal north = null;
+	BigDecimal south = null;
+	BigDecimal west = null;
+	BigDecimal east = null;
+	if (bboxArray.length() == 4) {
+	    west = bboxArray.getBigDecimal(0);
+	    south = bboxArray.getBigDecimal(1);
+	    east = bboxArray.getBigDecimal(2);
+	    north = bboxArray.getBigDecimal(3);
+	}
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
-
 	coreMetadata.getMIMetadata().setHierarchyLevelName("series");
 	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("series");
 
-	String platformName = null;
-	String platformCode = null;
-	String platformDescription = null;
-	String platformType = null;
-	if (platformObject != null) {
-	    platformName = getString(platformObject, "name");
-	    platformCode = getString(platformObject, "code");
-	    platformDescription = getString(platformObject, "description");
-	    platformType = getString(platformObject, "type");
-
-	    // title
-	    if (platformName != null && !platformName.isEmpty()) {
-		String title = platformName;
-		title = (platformCode != null && !platformCode.isEmpty()) ? title + " - " + platformCode : title;
-		title = (platformDescription != null && !platformDescription.isEmpty()) ? title + " - " + platformDescription : title;
-		// title = (platformType != null && !platformType.isEmpty()) ? title + " - " +
-		// platformType : title;
-		coreMetadata.setTitle(title);
-		coreMetadata.setAbstract(title);
-	    }
+	// title
+	if (title != null) {
+	    title = (description != null && !description.isEmpty()) ? title + " - " + description : title;
+	    title = (mission != null && !mission.isEmpty()) ? title + " - " + mission : title;
+	    coreMetadata.setTitle(title);
+	    coreMetadata.setAbstract(title);
 	}
 
-	String countryCode = getString(object, "countryCode");
-
-	JSONArray projectsArray = getJSONArray(object, "projects");
-
-	// String projectName = object.getString("projectName");
-
-	String model = getString(object, "model");
-
-	String maker = getString(object, "maker");
-
-	JSONObject deploymentObject = object.optJSONObject("deployment");
-	String cruiseName = null;
-	String authorName = null;
-	Integer deploymentQC = null;
-	BigDecimal deploymentLat = null;
-	BigDecimal deploymentLon = null;
-	if (deploymentObject != null) {
-	    cruiseName = getString(deploymentObject, "cruiseName");
-	    authorName = getString(deploymentObject, "principalInvestigatorName");
-	    deploymentQC = getInteger(deploymentObject, "qc");
-	    deploymentLat = getBigDecimal(deploymentObject, "lat");
-	    deploymentLon = getBigDecimal(deploymentObject, "lon");
-	}
-
-	JSONArray variablesArray = getJSONArray(object, "variables");
-
-	JSONArray calibrationsArray = getJSONArray(object, "calibrations");
-
-	JSONArray sensorArray = getJSONArray(object, "sensors");
-
-	JSONArray cyclesArray = getJSONArray(object, "cycles");
-
-	BigDecimal minLat = null;
-	BigDecimal minLon = null;
-	BigDecimal maxLat = null;
-	BigDecimal maxLon = null;
-
-	if (deploymentQC != null) {
-	    switch (deploymentQC) {
-	    case 1:
-	    case 2:
-	    case 5:
-	    case 8:
-		minLat = deploymentLat;
-		minLon = deploymentLon;
-		maxLat = deploymentLat;
-		maxLon = deploymentLon;
-		break;
-	    default:
-		GSLoggerFactory.getLogger(getClass()).warn("Discarded deployment position, as quality flag is not good: ", deploymentQC);
-		break;
-	    }
-	}
-
-	TreeSet<Date> dates = new TreeSet<>();
-
-	List<SimpleEntry<BigDecimal, BigDecimal>> latLongs = new ArrayList<>();
-	for (int i = 0; i < cyclesArray.length(); i++) {
-	    JSONObject cycle = cyclesArray.getJSONObject(i);
-	    BigDecimal lat = getBigDecimal(cycle, "lat");
-	    BigDecimal lon = getBigDecimal(cycle, "lon");
-	    Integer positionQc = getInteger(cycle, "positionQc");
-	    if (positionQc != null) {
-		switch (positionQc) {
-		case 1:
-		case 2:
-		case 5:
-		case 8:
-		    SimpleEntry<BigDecimal, BigDecimal> latLon = new SimpleEntry<>(lat, lon);
-		    latLongs.add(latLon);
-		    break;
-		default:
-		    // as for Thierry e-mail of 20 June 2024, see below for the codes
-		    GSLoggerFactory.getLogger(getClass()).warn("Discarded position, as quality flag is not good: ", positionQc);
-		    break;
-		}
-	    }
-
-	    Integer dateQc = getInteger(cycle, "dateQc");
-	    if (dateQc != null) {
-		switch (dateQc) {
-		case 1:
-		case 2:
-		case 5:
-		case 8:
-		    Date start = getDate(getString(cycle, "startDate"), platformCode);
-		    if (start != null) {
-			dates.add(start);
-		    }
-		    Date end = getDate(getString(cycle, "endDate"), platformCode);
-		    if (end != null) {
-			dates.add(end);
-		    }
-		    break;
-		default:
-		    GSLoggerFactory.getLogger(getClass()).warn("Discarded date, as quality flag is not good: ", dateQc);
-		    break;
-		}
-	    }
-	}
-
-	// table 2, pag 73, argo data management user's manual
-	// 0 no qc is performed
-	// 1 good data
-	// 2 probably good data
-	// 3 probably bad data that are potentially adjustable
-	// 4 bad data
-	// 5 value changed
-	// 6 not used
-	// 7 not used
-	// 8 estimated value
-	// 9 missing value
-
-	SimpleEntry<SimpleEntry<BigDecimal, BigDecimal>, SimpleEntry<BigDecimal, BigDecimal>> bbox = BBOXUtils.getBigDecimalBBOX(latLongs);
-	SimpleEntry<BigDecimal, BigDecimal> lowerCorner = bbox.getKey();
-	SimpleEntry<BigDecimal, BigDecimal> upperCorner = bbox.getValue();
-	minLat = lowerCorner.getKey();
-	minLon = lowerCorner.getValue();
-	maxLat = upperCorner.getKey();
-	maxLon = upperCorner.getValue();
-
-	String owner = getString(object, "owner");
-
-	JSONObject dataCenterObject = object.optJSONObject("dataCenter");
-	String dataCenterName = null;
-	if (dataCenterObject != null) {
-	    dataCenterName = getString(dataCenterObject, "name");
-	}
-
-	JSONObject institutionObject = object.optJSONObject("institution");
-	String istitutionName = null;
-	if (institutionObject != null) {
-	    istitutionName = getString(institutionObject, "name");
-	}
-
-	JSONObject latestCycle = object.optJSONObject("latestCycle");
-	JSONObject earliestCycle = object.optJSONObject("earliestCycle");
-
-	if (earliestCycle != null) {
-	    Integer dateQc = getInteger(earliestCycle, "dateQc");
-	    if (dateQc != null) {
-		switch (dateQc) {
-		case 1:
-		case 2:
-		case 5:
-		case 8:
-		    Date start = getDate(getString(earliestCycle, "startDate"), platformCode);
-		    if (start != null) {
-			dates.add(start);
-		    }
-		    Date end = getDate(getString(earliestCycle, "endDate"), platformCode);
-		    if (end != null) {
-			dates.add(end);
-		    }
-		    break;
-		default:
-		    GSLoggerFactory.getLogger(getClass()).warn("Discarded date, as quality flag is not good: ", dateQc);
-		    break;
-		}
-	    }
-
-	}
-	if (latestCycle != null) {
-	    Integer dateQc = getInteger(latestCycle, "dateQc");
-	    if (dateQc != null) {
-		switch (dateQc) {
-		case 1:
-		case 2:
-		case 5:
-		case 8:
-		    Date start = getDate(getString(latestCycle, "startDate"), platformCode);
-		    if (start != null) {
-			dates.add(start);
-		    }
-		    Date end = getDate(getString(latestCycle, "endDate"), platformCode);
-		    if (end != null) {
-			dates.add(end);
-		    }
-		    break;
-		default:
-		    GSLoggerFactory.getLogger(getClass()).warn("Discarded date, as quality flag is not good: ", dateQc);
-		    break;
-		}
-	    }
-	}
-
-	// keywords
-	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword(countryCode);
-
-	for (Object o : projectsArray) {
+	// keywords -
+	// mission -> project
+	if (mission != null) {
 	    Keywords keyword = new Keywords();
 	    keyword.setTypeCode("project");
-	    keyword.addKeyword(o.toString());
+	    keyword.addKeyword(mission);
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword);
 	}
 	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword(maker);
 	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword(model);
-	if (cruiseName != null) {
+	if (deployment_ship != null) {
 	    Keywords keyword = new Keywords();
 	    keyword.setTypeCode("cruise");
-	    keyword.addKeyword(cruiseName);
+	    keyword.addKeyword(deployment_ship);
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword);
 	}
-	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword("ARGO");
+
 	// bbox
-
-	if (minLat != null && minLon != null && maxLat != null && maxLon != null) {
-
-	    if (minLat.equals(BigDecimal.ZERO) || minLon.equals(BigDecimal.ZERO) || maxLat.equals(BigDecimal.ZERO)
-		    || maxLon.equals(BigDecimal.ZERO)) {
-		GSLoggerFactory.getLogger(getClass()).error("Suspect bbox for ARGO float: {}", platformCode);
-	    }
-	    if (minLat.compareTo(maxLat) == 1) {
-		GSLoggerFactory.getLogger(getClass()).error("Wrong bbox for ARGO float: {}", platformCode);
-	    }
-	    if (maxLat.compareTo(new BigDecimal(90)) == 1 || //
-		    minLat.compareTo(new BigDecimal(-90)) == -1 || //
-		    maxLon.compareTo(new BigDecimal(180)) == 1 || //
-		    minLat.compareTo(new BigDecimal(-180)) == -1 //
-	    ) {
-		GSLoggerFactory.getLogger(getClass()).error("Wrong bbox for ARGO float: {}", platformCode);
-	    }
-
-	    coreMetadata.addBoundingBox(maxLat, minLon, minLat, maxLon);
+	if (west != null && east != null && north != null & south != null) {
+	    coreMetadata.addBoundingBox(north, west, south, east);
 	} else {
 	    GSLoggerFactory.getLogger(getClass()).error("Missing bbox for ARGO float: {}", platformCode);
 	}
+
 	// temporal extent
-	if (!dates.isEmpty()) {
-	    Date startDate = dates.first();
-	    Date endDate = dates.last();
-	    if (startDate.after(endDate)) {
-		GSLoggerFactory.getLogger(getClass()).error("Start date after end date for ARGO platform {}", platformCode);
-	    } else {
-		String startTime = ISO8601DateTimeUtils.getISO8601DateTime(startDate);
-		String endTime = ISO8601DateTimeUtils.getISO8601DateTime(endDate);
-		coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(startTime, endTime);
-		coreMetadata.getMIMetadata().getDataIdentification().setCitationRevisionDate(endTime);
-		coreMetadata.getMIMetadata().setDateStampAsDate(endTime);
+	TemporalExtent extent = new TemporalExtent();
+	if (start_datetime != null && !start_datetime.isEmpty()) {
+	    extent.setBeginPosition(start_datetime);
+	    if (end_datetime != null && !end_datetime.isEmpty()) {
+		extent.setEndPosition(end_datetime);
 	    }
+	    coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(extent);
 
 	} else {
 	    GSLoggerFactory.getLogger(getClass()).error("Missing temporal extent for ARGO float: {}", platformCode);
+	}
+	if (updated_datetime != null && !updated_datetime.isEmpty()) {
+	    coreMetadata.getMIMetadata().getDataIdentification().setCitationRevisionDate(updated_datetime);
 	}
 
 	// parameters
@@ -371,85 +210,160 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 	// parts
 	// PARAMETER IDENTIFIERS
 
-	boolean useVariables = false; // it was decided to use parameter on 4 October 2024
+	for (int i = 0; i < themes.length(); i++) {
+	    JSONObject themeObj = themes.getJSONObject(i);
+	    if (themeObj != null && !themeObj.isEmpty()) {
+		String conceptScheme = getString(themeObj, "scheme");
+		JSONArray concepts = getJSONArray(themeObj, "concepts");
+		for (int j = 0; j < concepts.length(); j++) {
+		    JSONObject concept = concepts.getJSONObject(j);
+		    String conceptId = getString(concept, "id");
+		    String conceptURL = getString(concept, "url");
+		    String conceptTitle = getString(concept, "title");
+		    String conceptDescription = getString(concept, "description");
 
-	if (useVariables) {
+		    switch (conceptScheme) {
+		    // R03 -> parameters
+		    case "http://vocab.nerc.ac.uk/collection/R03/current/":
+			CoverageDescription coverage = new CoverageDescription();
+			coverage.setAttributeIdentifier(conceptURL);
+			coverage.setAttributeDescription(conceptDescription);
+			coverage.setAttributeTitle(conceptId);
+			coreMetadata.getMIMetadata().getDataIdentification().addKeyword(conceptId);
+			coreMetadata.getMIMetadata().addCoverageDescription(coverage);
+			break;
+		    // R04 -> organizations
+		    case "http://vocab.nerc.ac.uk/collection/R04/current/":
+			// ResponsibleParty organization = new ResponsibleParty();
+			// organization.setOrganisationName(conceptTitle);
+			// organization.setOrganisationName(conceptTitle);
+			// organization.setRoleCode("author");
+			// coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(organization);
+			dataset.getExtensionHandler().addOriginatorOrganisationDescription(conceptDescription);
+			dataset.getExtensionHandler().addOriginatorOrganisationIdentifier(conceptURL);
+			break;
+		    // R25 -> sensors
+		    case "http://vocab.nerc.ac.uk/collection/R25/current/":
+			MIInstrument myInstrument = new MIInstrument();
+			myInstrument.setMDIdentifierTypeIdentifier(conceptId);
+			myInstrument.setMDIdentifierTypeCode(conceptURL);
+			if (conceptDescription != null) {
+			    myInstrument.setDescription(conceptDescription);
+			}
+			myInstrument.setTitle(conceptTitle);
+			coreMetadata.getMIMetadata().addMIInstrument(myInstrument);
+			Keywords keyword = new Keywords();
+			keyword.setTypeCode("instrument");
+			keyword.addKeyword(conceptId, conceptURL);
+			coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword);
 
-	    for (Object o : variablesArray) {
-		CoverageDescription description = new CoverageDescription();
-		// description.setAttributeIdentifier(o.toString());
-		description.setAttributeDescription(o.toString());
-		description.setAttributeTitle(o.toString());
-		coreMetadata.getMIMetadata().addCoverageDescription(description);
+			break;
+		    // R26 -> other sensors
+		    case "http://vocab.nerc.ac.uk/collection/R26/current/":
+			MIInstrument myInstrument26 = new MIInstrument();
+			myInstrument26.setMDIdentifierTypeIdentifier(conceptId);
+			myInstrument26.setMDIdentifierTypeCode(conceptURL);
+			if (conceptDescription != null) {
+			    myInstrument26.setDescription(conceptDescription);
+			}
+			myInstrument26.setTitle(conceptTitle);
+			coreMetadata.getMIMetadata().addMIInstrument(myInstrument26);
+			Keywords keyword26 = new Keywords();
+			keyword26.setTypeCode("instrument");
+			keyword26.addKeyword(conceptId, conceptURL);
+			coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword26);
+			break;
+		    // R27 -> other sensors
+		    case "http://vocab.nerc.ac.uk/collection/R27/current/":
+			MIInstrument myInstrument27 = new MIInstrument();
+			myInstrument27.setMDIdentifierTypeIdentifier(conceptId);
+			myInstrument27.setMDIdentifierTypeCode(conceptURL);
+			if (conceptDescription != null) {
+			    myInstrument27.setDescription(conceptDescription);
+			}
+			myInstrument27.setTitle(conceptTitle);
+			coreMetadata.getMIMetadata().addMIInstrument(myInstrument27);
+			Keywords keyword27 = new Keywords();
+			keyword27.setTypeCode("instrument");
+			keyword27.addKeyword(conceptId, conceptURL);
+			coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword27);
+			break;
+		    // R022 -> platform family
+		    case "http://vocab.nerc.ac.uk/collection/R22/current/":
+			MIPlatform platform22 = new MIPlatform();
+			platform22.setMDIdentifierCode(platformCode);
+			if (conceptDescription != null) {
+			    platform22.setDescription(conceptDescription);
+			}
+			Citation platformCitation22 = new Citation();
+			platformCitation22.setTitle(conceptTitle);
+			platform22.setCitation(platformCitation22);
+			coreMetadata.getMIMetadata().addMIPlatform(platform22);
+			Keywords keyword22 = new Keywords();
+			keyword22.setTypeCode("platform");
+			keyword22.addKeyword(conceptId, conceptURL);
+			coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword22);
+			break;
+		    // R23 -> platform type
+		    case "http://vocab.nerc.ac.uk/collection/R23/current/":
+			MIPlatform platform23 = new MIPlatform();
+			platform23.setMDIdentifierCode(platformCode);
+			if (conceptDescription != null) {
+			    platform23.setDescription(conceptDescription);
+			}
+			Citation platformCitation23 = new Citation();
+			platformCitation23.setTitle(conceptTitle);
+			platform23.setCitation(platformCitation23);
+			coreMetadata.getMIMetadata().addMIPlatform(platform23);
+			Keywords keyword23 = new Keywords();
+			keyword23.setTypeCode("platform");
+			keyword23.addKeyword(conceptId, conceptURL);
+			coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword23);
+			break;
+		    // R24 -> platform maker
+		    case "http://vocab.nerc.ac.uk/collection/R24/current/":
 
-	    }
+			break;
+		    // R08 -> WMO instrument type
+		    case "http://vocab.nerc.ac.uk/collection/R08/current/":
 
-	} else {
-	    NVSClient client = new NVSClient();
-	    HashMap<String, String> parameters = new HashMap<String, String>();
-	    for (int i = 0; i < calibrationsArray.length(); i++) {
-		JSONObject calibration = calibrationsArray.getJSONObject(i);
-		String r03Code = calibration.getString("parameter");
-		String uri = "http://vocab.nerc.ac.uk/collection/R03/current/" + r03Code + "/";
-		String label = client.getLabel(uri);
-		if (label == null || label.isEmpty()) {
-		    label = r03Code;
-		    uri = null;
+			break;
+		    // R10 -> transmission frequency
+		    case "http://vocab.nerc.ac.uk/collection/R10/current/":
+
+			break;
+		    // R10 -> positioning system ARGOS
+		    case "http://vocab.nerc.ac.uk/collection/R09/current/":
+
+			break;
+
+		    default:
+			break;
+		    }
+
 		}
-		parameters.put(label, uri);
 	    }
-	    Set<Entry<String, String>> entries = parameters.entrySet();
-	    for (Entry<String, String> entry : entries) {
-		String label = entry.getKey();
-		String uri = entry.getValue();
-		CoverageDescription description = new CoverageDescription();
-		if (uri != null) {
-		    description.setAttributeIdentifier(uri);
-		}
-		// description.setAttributeDescription(o.toString());
-		description.setAttributeTitle(label);
-		description.setAttributeDescription(label);
-		coreMetadata.getMIMetadata().addCoverageDescription(description);
-	    }
-
 	}
 
-	// instrument
-	// // INSTRUMENT IDENTIFIERS
-	for (int j = 0; j < sensorArray.length(); j++) {
+	// responsible parties
 
-	    JSONObject jsonObject = sensorArray.getJSONObject(j);
-	    String sensorId = getString(jsonObject, "id");
-	    String sensorModel = getString(jsonObject, "model");
-	    String sensorMaker = getString(jsonObject, "maker");
-	    String sensorSerial = getString(jsonObject, "serial");
-
-	    MIInstrument myInstrument = new MIInstrument();
-	    myInstrument.setMDIdentifierTypeIdentifier(sensorSerial);
-	    myInstrument.setMDIdentifierTypeCode(sensorId);
-	    myInstrument.setDescription("Sensor Model: " + sensorModel + ". Maker: " + sensorMaker);
-	    myInstrument.setTitle(sensorModel);
-	    // myInstrument.getElementType().getCitation().add(e)
-	    coreMetadata.getMIMetadata().addMIInstrument(myInstrument);
-	    Keywords keyword = new Keywords();
-	    keyword.setTypeCode("instrument");
-	    keyword.addKeyword(sensorModel);// or sensorModel
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword);
+	if (PI_name != null) {
+	    ResponsibleParty principalInvestigator = new ResponsibleParty();
+	    principalInvestigator.setIndividualName(PI_name);
+	    principalInvestigator.setRoleCode("originator");
+	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(principalInvestigator);
 	}
 
-	// platform
-	if (platformName != null || platformCode != null || platformDescription != null) {
-	    MIPlatform platform = new MIPlatform();
-	    platform.setMDIdentifierCode(platformCode);
-	    platform.setDescription(platformDescription);
-	    Citation platformCitation = new Citation();
-	    platformCitation.setTitle(platformName);
-	    platform.setCitation(platformCitation);
-	    coreMetadata.getMIMetadata().addMIPlatform(platform);
-	    Keywords keyword = new Keywords();
-	    keyword.setTypeCode("platform");
-	    keyword.addKeyword(platformName);// or platformDescription
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword);
+	// units of measures
+	if (!columnParameters.isEmpty()) {
+	    for (int i = 0; i < columnParameters.length(); i++) {
+		JSONObject parameterObj = columnParameters.getJSONObject(i);
+		String units = getString(parameterObj, "units");
+		if (units != null) {
+		    dataset.getExtensionHandler().setAttributeUnits(units);
+		    dataset.getExtensionHandler().setAttributeUnitsAbbreviation(units);
+		}
+	    }
 	}
 
 	if (platformCode != null && !platformCode.isEmpty()) {
@@ -478,55 +392,102 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 	    }
 	}
 
+	// ONLINE INFORMATION LINKS
+	if (!linksArray.isEmpty()) {
+	    for (int i = 0; i < linksArray.length(); i++) {
+		JSONObject linkObj = linksArray.getJSONObject(i);
+		String relation = getString(linkObj, "rel");
+		if (relation != null && !relation.isEmpty()) {
+		    Online online = new Online();
+		    String href = getString(linkObj, "href");
+		    online.setLinkage(href);
+		    online.setFunctionCode("information");
+		    if (relation.contains("related")) {
+			String t = getString(linkObj, "title");
+			online.setName(t);
+			coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+		    } else if (relation.contains("cite-as")) {
+			online.setName("DOI");
+			coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+		    }
+		}
+	    }
+	}
+
+	// ONLINE DOWNLOAD LINKS
+	if (!assetsObj.isEmpty()) {
+
+	    JSONObject fileObj0 = assetsObj.optJSONObject("Platform_File0");
+	    JSONObject fileObj1 = assetsObj.optJSONObject("Platform_File1");
+	    JSONObject fileObj2 = assetsObj.optJSONObject("Platform_File2");
+	    JSONObject fileObj3 = assetsObj.optJSONObject("Platform_File3");
+
+	    if (fileObj0 != null) {
+		String linkage = getString(fileObj0, "href");
+		String t0 = getString(fileObj0, "title");
+		Online online = new Online();
+		online.setLinkage(linkage);
+		online.setFunctionCode("download");
+		online.setName(t0);
+		coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+	    }
+	    if (fileObj1 != null) {
+		String linkage = getString(fileObj1, "href");
+		String t0 = getString(fileObj1, "title");
+		Online online = new Online();
+		online.setLinkage(linkage);
+		online.setFunctionCode("download");
+		online.setName(t0);
+		coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+	    }
+	    if (fileObj2 != null) {
+		String linkage = getString(fileObj2, "href");
+		String t0 = getString(fileObj2, "title");
+		Online online = new Online();
+		online.setLinkage(linkage);
+		online.setFunctionCode("download");
+		online.setName(t0);
+		coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+	    }
+	    if (fileObj3 != null) {
+		String linkage = getString(fileObj3, "href");
+		String t0 = getString(fileObj3, "title");
+		Online online = new Online();
+		online.setLinkage(linkage);
+		online.setFunctionCode("download");
+		online.setName(t0);
+		coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+	    }
+
+	}
+
 	// organization
-	if (authorName != null) {
-	    ResponsibleParty principalInvestigator = new ResponsibleParty();
-	    principalInvestigator.setIndividualName(authorName);
-	    principalInvestigator.setRoleCode("author");
-	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(principalInvestigator);
-	}
-
-	if (owner != null) {
-	    ResponsibleParty ownerContact = new ResponsibleParty();
-	    ownerContact.setOrganisationName(owner);
-	    ownerContact.setRoleCode("owner");
-	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(ownerContact);
-	}
-
-	if (dataCenterName != null) {
-	    ResponsibleParty publisherContact = new ResponsibleParty();
-	    publisherContact.setOrganisationName(dataCenterName);
-	    publisherContact.setRoleCode("publisher");
-	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(publisherContact);
-	}
-
-	if (istitutionName != null) {
-	    ResponsibleParty istitutionContact = new ResponsibleParty();
-	    istitutionContact.setOrganisationName(istitutionName);
-	    istitutionContact.setRoleCode("publisher");
-	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(istitutionContact);
-	}
-
-	// if(owner != null || authorName != null || dataCenterName != null ||
-	// istitutionName != null ) {
-	//
-	// ResponsibleParty creatorContact = new ResponsibleParty();
-	//// Contact info = new Contact();
-	//// Online online = new Online();
-	//// online.setLinkage("https://www.ana.gov.br/");
-	//// info.setOnline(online);
-	//// creatorContact.setContactInfo(info);
-	// if(authorName != null)
-	// creatorContact.setIndividualName(authorName);
-	// if(istitutionName != null) {
-	// creatorContact.setOrganisationName(istitutionName);
-	// }else if(owner != null){
-	// creatorContact.setOrganisationName(owner);
-	// } else {
-	// creatorContact.setOrganisationName(dataCenterName);
+	// if (authorName != null) {
+	// ResponsibleParty principalInvestigator = new ResponsibleParty();
+	// principalInvestigator.setIndividualName(authorName);
+	// principalInvestigator.setRoleCode("author");
+	// coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(principalInvestigator);
 	// }
-	// creatorContact.setRoleCode("author");
-	// coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(creatorContact);
+	//
+	// if (owner != null) {
+	// ResponsibleParty ownerContact = new ResponsibleParty();
+	// ownerContact.setOrganisationName(owner);
+	// ownerContact.setRoleCode("owner");
+	// coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(ownerContact);
+	// }
+	//
+	// if (dataCenterName != null) {
+	// ResponsibleParty publisherContact = new ResponsibleParty();
+	// publisherContact.setOrganisationName(dataCenterName);
+	// publisherContact.setRoleCode("publisher");
+	// coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(publisherContact);
+	// }
+	//
+	// if (istitutionName != null) {
+	// ResponsibleParty istitutionContact = new ResponsibleParty();
+	// istitutionContact.setOrganisationName(istitutionName);
+	// istitutionContact.setRoleCode("publisher");
+	// coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(istitutionContact);
 	// }
 
     }
