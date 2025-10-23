@@ -1335,7 +1335,13 @@ public abstract class OSParameters {
     /**
     *
     */
-    public static final OSParameter SEMANTIC_SEARCH_URI = new OSParameter("searchUri", "string", null, "{gs:searchUri}");
+    public static final OSParameter SEMANTIC_CONCEPT_URI = new OSParameter("conceptURI", "string", null, "{gs:conceptUri}");
+
+    /**
+    *
+    */
+    public static final OSParameter SEMANTIC_WITH_OBSERVED_PROPERTIES_URIS = new OSParameter("withObservedPropertiesURIs", "string", null,
+	    "{gs:withObservedPropURIs}");
 
     /**
      * [CONCEPTS:50], [LABELS:50], [ALT_LABELS:50]
