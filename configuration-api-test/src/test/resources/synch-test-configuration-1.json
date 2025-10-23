@@ -4381,457 +4381,456 @@
 		"settingId": "d92650ce-217d-45ac-a421-dc3116abd76b"
 	},
 	{
-   "liguriaPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 38,
-      "label": "The password used by HIS-Central Liguria connector",
-      "type": "option",
-      "key": "liguriaPassword",
-      "required": true
-   },
-   "acronetClientPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 24,
-      "label": "The client secret used by Acronet connector",
-      "type": "option",
-      "key": "acronetClientPassword",
-      "required": true
-   },
-   "lazioPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 30,
-      "label": "The password used by HIS-Central Lazio connector",
-      "type": "option",
-      "key": "lazioPassword",
-      "required": true
-   },
-   "lazioId": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 32,
-      "label": "The client id used by HIS-Central Lazio connector",
-      "type": "option",
-      "key": "lazioId",
-      "required": true
-   },
-   "inumetUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 6,
-      "label": "The username used by the INUMET connector and downloader",
-      "type": "option",
-      "key": "inumetUser",
-      "required": true
-   },
-   "type": "setting",
-   "polytopeUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 41,
-      "label": "The username used by Polytope connector",
-      "type": "option",
-      "key": "polytopeUser",
-      "required": true
-   },
-   "lazioInstance": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 31,
-      "label": "The client instance used by HIS-Central Lazio connector",
-      "type": "option",
-      "key": "lazioInstance",
-      "required": true
-   },
-   "inumetPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 7,
-      "label": "The password used by the INUMET connector and downloader",
-      "type": "option",
-      "key": "inumetPassword",
-      "required": true
-   },
-   "sosTahmoToken": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 18,
-      "label": "The token used by SOS THAMO connector to access the service",
-      "type": "option",
-      "key": "sosTahmoToken",
-      "required": true,
-      "textArea": true
-   },
-   "polytopePassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 42,
-      "label": "The password used by Polytope connector",
-      "type": "option",
-      "key": "polytopePassword",
-      "required": true
-   },
-   "basilicataInstance": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 27,
-      "label": "The client instance used by HIS-Central Basilicata connector",
-      "type": "option",
-      "key": "basilicataInstance",
-      "required": true
-   },
-   "wekeoPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 13,
-      "label": "The password used by the WEkEO connector",
-      "type": "option",
-      "key": "wekeoPassword",
-      "required": true
-   },
-   "lombardiaUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 1,
-      "label": "The username used by the Lombardia connector and downloader",
-      "type": "option",
-      "key": "lombardiaUser",
-      "required": true
-   },
-   "dinaguaToken": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 5,
-      "label": "The token used by the DINAGUA connector and downloader",
-      "type": "option",
-      "key": "dinaguaToken",
-      "required": true
-   },
-   "triggerPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 44,
-      "label": "The password used by TRIGGER connector",
-      "type": "option",
-      "key": "triggerPassword",
-      "required": true
-   },
-   "acronetUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 21,
-      "label": "The username used by ACRONET connector",
-      "type": "option",
-      "key": "acronetUser",
-      "required": true
-   },
-   "saeonPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 20,
-      "label": "The password used by SAEON connector",
-      "type": "option",
-      "key": "saeonPassword",
-      "required": true
-   },
-   "pugliaToken": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 10,
-      "label": "The token used by the HIS-Central Puglia connector and downloader",
-      "type": "option",
-      "key": "pugliaToken",
-      "required": true
-   },
-   "friuliPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 34,
-      "label": "The password used by HIS-Central Friuli connector",
-      "type": "option",
-      "key": "friuliPassword",
-      "required": true
-   },
-   "extensionClass": "eu.essi_lab.cfga.gs.setting.CredentialsSetting$CredentialsSettingComponentInfo",
-   "compactMode": false,
-   "dinaguaPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 4,
-      "label": "The password used by the DINAGUA connector and downloader",
-      "type": "option",
-      "key": "dinaguaPassword",
-      "required": true
-   },
-   "settingClass": "eu.essi_lab.cfga.gs.setting.CredentialsSetting",
-   "triggerUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 43,
-      "label": "The username used by TRIGGER connector",
-      "type": "option",
-      "key": "triggerUser",
-      "required": true
-   },
-   "lombardiaPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 2,
-      "label": "The password used by the Lombardia connector and downloader",
-      "type": "option",
-      "key": "lombardiaPassword",
-      "required": true
-   },
-   "liguriaApiKey": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 37,
-      "label": "The username used by HIS-Central Liguria connector",
-      "type": "option",
-      "key": "liguriaApiKey",
-      "required": true
-   },
-   "acronetClientId": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 23,
-      "label": "The client id used by Acronet connector",
-      "type": "option",
-      "key": "acronetClientId",
-      "required": true
-   },
-   "wekeoUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 12,
-      "label": "The username used by the WEkEO connector",
-      "type": "option",
-      "key": "wekeoUser",
-      "required": true
-   },
-   "basilicataUsername": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 25,
-      "label": "The username used by HIS-Central Basilicata connector",
-      "type": "option",
-      "key": "basilicataUsername",
-      "required": true
-   },
-   "settingName": "Credentials settings",
-   "sentinelDownloaderToken": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 17,
-      "label": "The token used by Sentinel downloader for generating previews",
-      "type": "option",
-      "key": "sentinelDownloaderToken",
-      "required": true
-   },
-   "dinaguaUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 3,
-      "label": "The username used by the DINAGUA connector and downloader",
-      "type": "option",
-      "key": "dinaguaUser",
-      "required": true
-   },
-   "nveToken": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 14,
-      "label": "The token used by the Norwegian Water Resources and Energy Directorat connector and downloader",
-      "type": "option",
-      "key": "nveToken",
-      "required": true
-   },
-   "OscarPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 48,
-      "label": "The password used by OSCAR task",
-      "type": "option",
-      "key": "OscarPassword",
-      "required": true
-   },
-   "meteotrackerPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 40,
-      "label": "The password used by Meteotracker connector",
-      "type": "option",
-      "key": "meteotrackerPassword",
-      "required": true
-   },
-   "triggerWAFUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 45,
-      "label": "The username used by TRIGGER WAF  connector",
-      "type": "option",
-      "key": "triggerWAFUser",
-      "required": true
-   },
-   "sentinelUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 15,
-      "label": "The username used by Sentinel connector and mapper",
-      "type": "option",
-      "key": "sentinelUser",
-      "required": true
-   },
-   "aostaId": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 35,
-      "label": "The username used by HIS-Central Valle d'Aosta connector",
-      "type": "option",
-      "key": "aostaId",
-      "required": true
-   },
-   "settingId": "160bf08d-5197-4c53-90f5-a72dc5979562",
-   "canBeDisabled": false,
-   "lazioUsername": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 29,
-      "label": "The username used by HIS-Central Lazio connector",
-      "type": "option",
-      "key": "lazioUsername",
-      "required": true
-   },
-   "triggerWAFPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 46,
-      "label": "The password used by TRIGGER WAF connector",
-      "type": "option",
-      "key": "triggerWAFPassword",
-      "required": true
-   },
-   "meteotrackerUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 39,
-      "label": "The username used by Meteotracker connector",
-      "type": "option",
-      "key": "meteotrackerUser",
-      "required": true
-   },
-   "sardegnaApiKey": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 9,
-      "label": "The Api-key used by the Sardegna connector and downloader",
-      "type": "option",
-      "key": "sardegnaApiKey",
-      "required": true
-   },
-   "saeonUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 19,
-      "label": "The username used by SAEON connector",
-      "type": "option",
-      "key": "saeonUser",
-      "required": true
-   },
-   "basilicataPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 26,
-      "label": "The password used by HIS-Central Basilicata connector",
-      "type": "option",
-      "key": "basilicataPassword",
-      "required": true
-   },
-   "agrostacToken": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 11,
-      "label": "The token used by the AGROSTAC connector and WorldCereal profiler",
-      "type": "option",
-      "key": "agrostacToken",
-      "required": true
-   },
-   "aostaPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 36,
-      "label": "The password used by HIS-Central Valle d'Aosta connector",
-      "type": "option",
-      "key": "aostaPassword",
-      "required": true
-   },
-   "lombardiaKeystorePassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 0,
-      "label": "The password for the TLS certificate to be used by Lombardia client",
-      "type": "option",
-      "key": "lombardiaKeystorePassword",
-      "required": true
-   },
-   "dmhToken": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 8,
-      "label": "The token used by the DMH client to authorize the connection",
-      "type": "option",
-      "key": "dmhToken",
-      "required": true
-   },
-   "acronetPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 22,
-      "label": "The password used by ACRONET connector",
-      "type": "option",
-      "key": "acronetPassword",
-      "required": true
-   },
-   "OscarUser": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 47,
-      "label": "The username used by OSCAR task",
-      "type": "option",
-      "key": "OscarUser",
-      "required": true
-   },
-   "basilicataId": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 28,
-      "label": "The client id used by HIS-Central Basilicata connector",
-      "type": "option",
-      "key": "basilicataId",
-      "required": true
-   },
-   "sentinelPassword": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 16,
-      "label": "The password used by Sentinel connector and mapper",
-      "type": "option",
-      "key": "sentinelPassword",
-      "required": true
-   },
-   "friuliId": {
-      "canBeDisabled": false,
-      "valueClass": "java.lang.String",
-      "position": 33,
-      "label": "The username used by HIS-Central Friuli connector",
-      "type": "option",
-      "key": "friuliId",
-      "required": true
-   }
-}
-,
+		"liguriaPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 38,
+			"label": "The password used by HIS-Central Liguria connector",
+			"type": "option",
+			"key": "liguriaPassword",
+			"required": true
+		},
+		"acronetClientPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 24,
+			"label": "The client secret used by Acronet connector",
+			"type": "option",
+			"key": "acronetClientPassword",
+			"required": true
+		},
+		"lazioPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 30,
+			"label": "The password used by HIS-Central Lazio connector",
+			"type": "option",
+			"key": "lazioPassword",
+			"required": true
+		},
+		"lazioId": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 32,
+			"label": "The client id used by HIS-Central Lazio connector",
+			"type": "option",
+			"key": "lazioId",
+			"required": true
+		},
+		"inumetUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 6,
+			"label": "The username used by the INUMET connector and downloader",
+			"type": "option",
+			"key": "inumetUser",
+			"required": true
+		},
+		"type": "setting",
+		"polytopeUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 41,
+			"label": "The username used by Polytope connector",
+			"type": "option",
+			"key": "polytopeUser",
+			"required": true
+		},
+		"lazioInstance": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 31,
+			"label": "The client instance used by HIS-Central Lazio connector",
+			"type": "option",
+			"key": "lazioInstance",
+			"required": true
+		},
+		"inumetPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 7,
+			"label": "The password used by the INUMET connector and downloader",
+			"type": "option",
+			"key": "inumetPassword",
+			"required": true
+		},
+		"sosTahmoToken": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 18,
+			"label": "The token used by SOS THAMO connector to access the service",
+			"type": "option",
+			"key": "sosTahmoToken",
+			"required": true,
+			"textArea": true
+		},
+		"polytopePassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 42,
+			"label": "The password used by Polytope connector",
+			"type": "option",
+			"key": "polytopePassword",
+			"required": true
+		},
+		"basilicataInstance": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 27,
+			"label": "The client instance used by HIS-Central Basilicata connector",
+			"type": "option",
+			"key": "basilicataInstance",
+			"required": true
+		},
+		"wekeoPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 13,
+			"label": "The password used by the WEkEO connector",
+			"type": "option",
+			"key": "wekeoPassword",
+			"required": true
+		},
+		"lombardiaUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 1,
+			"label": "The username used by the Lombardia connector and downloader",
+			"type": "option",
+			"key": "lombardiaUser",
+			"required": true
+		},
+		"dinaguaToken": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 5,
+			"label": "The token used by the DINAGUA connector and downloader",
+			"type": "option",
+			"key": "dinaguaToken",
+			"required": true
+		},
+		"triggerPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 44,
+			"label": "The password used by TRIGGER connector",
+			"type": "option",
+			"key": "triggerPassword",
+			"required": true
+		},
+		"acronetUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 21,
+			"label": "The username used by ACRONET connector",
+			"type": "option",
+			"key": "acronetUser",
+			"required": true
+		},
+		"saeonPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 20,
+			"label": "The password used by SAEON connector",
+			"type": "option",
+			"key": "saeonPassword",
+			"required": true
+		},
+		"pugliaToken": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 10,
+			"label": "The token used by the HIS-Central Puglia connector and downloader",
+			"type": "option",
+			"key": "pugliaToken",
+			"required": true
+		},
+		"friuliPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 34,
+			"label": "The password used by HIS-Central Friuli connector",
+			"type": "option",
+			"key": "friuliPassword",
+			"required": true
+		},
+		"extensionClass": "eu.essi_lab.cfga.gs.setting.CredentialsSetting$CredentialsSettingComponentInfo",
+		"compactMode": false,
+		"dinaguaPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 4,
+			"label": "The password used by the DINAGUA connector and downloader",
+			"type": "option",
+			"key": "dinaguaPassword",
+			"required": true
+		},
+		"settingClass": "eu.essi_lab.cfga.gs.setting.CredentialsSetting",
+		"triggerUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 43,
+			"label": "The username used by TRIGGER connector",
+			"type": "option",
+			"key": "triggerUser",
+			"required": true
+		},
+		"lombardiaPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 2,
+			"label": "The password used by the Lombardia connector and downloader",
+			"type": "option",
+			"key": "lombardiaPassword",
+			"required": true
+		},
+		"liguriaApiKey": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 37,
+			"label": "The username used by HIS-Central Liguria connector",
+			"type": "option",
+			"key": "liguriaApiKey",
+			"required": true
+		},
+		"acronetClientId": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 23,
+			"label": "The client id used by Acronet connector",
+			"type": "option",
+			"key": "acronetClientId",
+			"required": true
+		},
+		"wekeoUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 12,
+			"label": "The username used by the WEkEO connector",
+			"type": "option",
+			"key": "wekeoUser",
+			"required": true
+		},
+		"basilicataUsername": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 25,
+			"label": "The username used by HIS-Central Basilicata connector",
+			"type": "option",
+			"key": "basilicataUsername",
+			"required": true
+		},
+		"settingName": "Credentials settings",
+		"sentinelDownloaderToken": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 17,
+			"label": "The token used by Sentinel downloader for generating previews",
+			"type": "option",
+			"key": "sentinelDownloaderToken",
+			"required": true
+		},
+		"dinaguaUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 3,
+			"label": "The username used by the DINAGUA connector and downloader",
+			"type": "option",
+			"key": "dinaguaUser",
+			"required": true
+		},
+		"nveToken": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 14,
+			"label": "The token used by the Norwegian Water Resources and Energy Directorat connector and downloader",
+			"type": "option",
+			"key": "nveToken",
+			"required": true
+		},
+		"OscarPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 48,
+			"label": "The password used by OSCAR task",
+			"type": "option",
+			"key": "OscarPassword",
+			"required": true
+		},
+		"meteotrackerPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 40,
+			"label": "The password used by Meteotracker connector",
+			"type": "option",
+			"key": "meteotrackerPassword",
+			"required": true
+		},
+		"triggerWAFUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 45,
+			"label": "The username used by TRIGGER WAF  connector",
+			"type": "option",
+			"key": "triggerWAFUser",
+			"required": true
+		},
+		"sentinelUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 15,
+			"label": "The username used by Sentinel connector and mapper",
+			"type": "option",
+			"key": "sentinelUser",
+			"required": true
+		},
+		"aostaId": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 35,
+			"label": "The username used by HIS-Central Valle d'Aosta connector",
+			"type": "option",
+			"key": "aostaId",
+			"required": true
+		},
+		"settingId": "160bf08d-5197-4c53-90f5-a72dc5979562",
+		"canBeDisabled": false,
+		"lazioUsername": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 29,
+			"label": "The username used by HIS-Central Lazio connector",
+			"type": "option",
+			"key": "lazioUsername",
+			"required": true
+		},
+		"triggerWAFPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 46,
+			"label": "The password used by TRIGGER WAF connector",
+			"type": "option",
+			"key": "triggerWAFPassword",
+			"required": true
+		},
+		"meteotrackerUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 39,
+			"label": "The username used by Meteotracker connector",
+			"type": "option",
+			"key": "meteotrackerUser",
+			"required": true
+		},
+		"sardegnaApiKey": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 9,
+			"label": "The Api-key used by the Sardegna connector and downloader",
+			"type": "option",
+			"key": "sardegnaApiKey",
+			"required": true
+		},
+		"saeonUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 19,
+			"label": "The username used by SAEON connector",
+			"type": "option",
+			"key": "saeonUser",
+			"required": true
+		},
+		"basilicataPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 26,
+			"label": "The password used by HIS-Central Basilicata connector",
+			"type": "option",
+			"key": "basilicataPassword",
+			"required": true
+		},
+		"agrostacToken": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 11,
+			"label": "The token used by the AGROSTAC connector and WorldCereal profiler",
+			"type": "option",
+			"key": "agrostacToken",
+			"required": true
+		},
+		"aostaPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 36,
+			"label": "The password used by HIS-Central Valle d'Aosta connector",
+			"type": "option",
+			"key": "aostaPassword",
+			"required": true
+		},
+		"lombardiaKeystorePassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 0,
+			"label": "The password for the TLS certificate to be used by Lombardia client",
+			"type": "option",
+			"key": "lombardiaKeystorePassword",
+			"required": true
+		},
+		"dmhToken": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 8,
+			"label": "The token used by the DMH client to authorize the connection",
+			"type": "option",
+			"key": "dmhToken",
+			"required": true
+		},
+		"acronetPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 22,
+			"label": "The password used by ACRONET connector",
+			"type": "option",
+			"key": "acronetPassword",
+			"required": true
+		},
+		"OscarUser": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 47,
+			"label": "The username used by OSCAR task",
+			"type": "option",
+			"key": "OscarUser",
+			"required": true
+		},
+		"basilicataId": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 28,
+			"label": "The client id used by HIS-Central Basilicata connector",
+			"type": "option",
+			"key": "basilicataId",
+			"required": true
+		},
+		"sentinelPassword": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 16,
+			"label": "The password used by Sentinel connector and mapper",
+			"type": "option",
+			"key": "sentinelPassword",
+			"required": true
+		},
+		"friuliId": {
+			"canBeDisabled": false,
+			"valueClass": "java.lang.String",
+			"position": 33,
+			"label": "The username used by HIS-Central Friuli connector",
+			"type": "option",
+			"key": "friuliId",
+			"required": true
+		}
+	},
 	{
 		"canBeDisabled": false,
 		"extensionClass": "eu.essi_lab.cfga.gs.setting.DownloadSetting$DownloadSettingComponentInfo",
@@ -5063,415 +5062,594 @@
 		}
 	},
 	{
-   "canBeDisabled": false,
-   "extensionClass": "eu.essi_lab.cfga.gs.setting.SystemSetting$SystemSettingComponentInfo",
-   "enableMailHarvestingReport": {
-      "canBeDisabled": false,
-      "values": ["No"],
-      "description": "System restart required. This feature also require that E-mail settings are correctly compiled",
-      "valueClass": "eu.essi_lab.cfga.option.BooleanChoice",
-      "position": 0,
-      "label": "Send harvesting reports email",
-      "type": "option",
-      "selectedIndexes": [0],
-      "key": "enableMailHarvestingReport"
-   },
-   "enableMailDownloadReport": {
-      "canBeDisabled": false,
-      "values": ["No"],
-      "description": "System restart required. This feature also require that E-mail settings are correctly compiled",
-      "valueClass": "eu.essi_lab.cfga.option.BooleanChoice",
-      "position": 2,
-      "label": "Send download reports email",
-      "type": "option",
-      "selectedIndexes": [0],
-      "key": "enableMailDownloadReport"
-   },
-   "compactMode": false,
-   "keyValue": {
-      "canBeDisabled": false,
-      "description": "Set of key-value options. They must be compliant with Java Properties",
-      "valueClass": "java.lang.String",
-      "position": 5,
-      "label": "Key-value options",
-      "type": "option",
-      "key": "keyValue",
-      "textArea": true
-   },
-   "emailSetting": {
-      "compactMode": false,
-      "editable": false,
-      "smtpPort": {
-         "canBeDisabled": false,
-         "valueClass": "java.lang.Integer",
-         "position": 1,
-         "label": "SMTP port",
-         "type": "option",
-         "key": "smtpPort",
-         "required": true
-      },
-      "settingClass": "eu.essi_lab.cfga.gs.setting.EmailSetting",
-      "description": "Settings required by the DAB to send e-mail messages. E-mail are sent during harvesting(if the related option is enabled) and if errors occur during statistics storing (if statistics gathering is enabled)",
-      "emailRecipients": {
-         "canBeDisabled": false,
-         "description": "Comma separated list of e-mail recipients",
-         "valueClass": "java.lang.String",
-         "position": 4,
-         "label": "E-mail recipients",
-         "type": "option",
-         "key": "emailRecipients",
-         "required": true
-      },
-      "type": "setting",
-      "enabled": false,
-      "settingName": "E-mail Settings",
-      "smtpUser": {
-         "canBeDisabled": false,
-         "valueClass": "java.lang.String",
-         "position": 2,
-         "label": "SMTP user",
-         "type": "option",
-         "key": "smtpUser",
-         "required": true
-      },
-      "smtpHost": {
-         "canBeDisabled": false,
-         "valueClass": "java.lang.String",
-         "position": 0,
-         "label": "SMTP host",
-         "type": "option",
-         "key": "smtpHost",
-         "required": true
-      },
-      "smtpPassword": {
-         "canBeDisabled": false,
-         "valueClass": "java.lang.String",
-         "position": 3,
-         "label": "SMTP password",
-         "type": "option",
-         "key": "smtpPassword",
-         "required": true
-      },
-      "settingId": "emailSetting"
-   },
-   "databaseStatistics": {
-      "extensionClass": "eu.essi_lab.cfga.gs.setting.database.DatabaseSetting$DatabaseComponentInfo",
-      "compactMode": false,
-      "databaseConfiguration": {
-         "canBeDisabled": false,
-         "dbUri": {
-            "canBeDisabled": false,
-            "valueClass": "java.lang.String",
-            "position": 0,
-            "label": "Database URI",
-            "type": "option",
-            "key": "dbUri",
-            "required": true
-         },
-         "compactMode": false,
-         "editable": false,
-         "showHeader": false,
-         "dbName": {
-            "canBeDisabled": false,
-            "valueClass": "java.lang.String",
-            "position": 4,
-            "label": "Database name",
-            "type": "option",
-            "key": "dbName",
-            "required": true
-         },
-         "settingClass": "eu.essi_lab.cfga.setting.Setting",
-         "dbType": {
-            "canBeDisabled": false,
-            "valueClass": "java.lang.String",
-            "position": 5,
-            "label": "Database type",
-            "type": "option",
-            "key": "dbType"
-         },
-         "type": "setting",
-         "settingName": "Database",
-         "dbUser": {
-            "canBeDisabled": false,
-            "valueClass": "java.lang.String",
-            "position": 1,
-            "label": "Database user",
-            "type": "option",
-            "key": "dbUser",
-            "required": true
-         },
-         "selected": true,
-         "configFolder": {
-            "canBeDisabled": false,
-            "visible": false,
-            "valueClass": "java.lang.String",
-            "position": 3,
-            "label": "Configuration folder",
-            "type": "option",
-            "key": "configFolder",
-            "required": true
-         },
-         "settingId": "databaseConfiguration",
-         "dbPassword": {
-            "canBeDisabled": false,
-            "valueClass": "java.lang.String",
-            "position": 2,
-            "label": "Database password",
-            "type": "option",
-            "key": "dbPassword",
-            "required": true
-         }
-      },
-      "editable": false,
-      "settingClass": "eu.essi_lab.cfga.gs.setting.database.DatabaseSetting",
-      "description": "System restart required. Enable/disable statistics gathering and computing by means of an Elasticsearch database",
-      "type": "setting",
-      "enabled": false,
-      "settingName": "DAB statistics gathering",
-      "canBeCleaned": false,
-      "settingId": "databaseStatistics"
-   },
-   "settingClass": "eu.essi_lab.cfga.gs.setting.SystemSetting",
-   "type": "setting",
-   "settingName": "System settings",
-   "enableMailAugmentationReport": {
-      "canBeDisabled": false,
-      "values": ["No"],
-      "description": "System restart required. This feature also require that E-mail settings are correctly compiled",
-      "valueClass": "eu.essi_lab.cfga.option.BooleanChoice",
-      "position": 1,
-      "label": "Send augmentation reports email",
-      "type": "option",
-      "selectedIndexes": [0],
-      "key": "enableMailAugmentationReport"
-   },
-   "enableErrorLogsReport": {
-      "canBeDisabled": false,
-      "values": ["No"],
-      "description": "System restart required. This feature also require that E-mail settings are correctly compiled",
-      "valueClass": "eu.essi_lab.cfga.option.BooleanChoice",
-      "position": 3,
-      "label": "Send error logs reports email (the related custom task must be enabled)",
-      "type": "option",
-      "selectedIndexes": [0],
-      "key": "enableErrorLogsReport"
-   },
-   "usersDatabase": {
-      "extensionClass": "eu.essi_lab.cfga.gs.setting.database.DatabaseSetting$DatabaseComponentInfo",
-      "compactMode": false,
-      "editable": false,
-      "settingClass": "eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting",
-      "description": "If enabled and configured, this setting allows to retrieve users information from a specific database",
-      "type": "setting",
-      "enabled": false,
-      "settingName": "User database setting",
-      "usersDbSetting": {
-         "canBeDisabled": false,
-         "dbUri": {
-            "canBeDisabled": false,
-            "valueClass": "java.lang.String",
-            "position": 0,
-            "label": "Database URI",
-            "type": "option",
-            "key": "dbUri",
-            "required": true
-         },
-         "compactMode": false,
-         "editable": false,
-         "showHeader": false,
-         "dbName": {
-            "canBeDisabled": false,
-            "valueClass": "java.lang.String",
-            "position": 4,
-            "label": "Database name",
-            "type": "option",
-            "key": "dbName",
-            "required": true
-         },
-         "settingClass": "eu.essi_lab.cfga.setting.Setting",
-         "dbType": {
-            "canBeDisabled": false,
-            "valueClass": "java.lang.String",
-            "position": 5,
-            "label": "Database type",
-            "type": "option",
-            "key": "dbType"
-         },
-         "type": "setting",
-         "settingName": "Database",
-         "dbUser": {
-            "canBeDisabled": false,
-            "valueClass": "java.lang.String",
-            "position": 1,
-            "label": "Database user",
-            "type": "option",
-            "key": "dbUser",
-            "required": true
-         },
-         "selected": true,
-         "configFolder": {
-            "canBeDisabled": false,
-            "visible": false,
-            "valueClass": "java.lang.String",
-            "position": 3,
-            "label": "Configuration folder",
-            "type": "option",
-            "key": "configFolder",
-            "required": true
-         },
-         "settingId": "usersDbSetting",
-         "dbPassword": {
-            "canBeDisabled": false,
-            "valueClass": "java.lang.String",
-            "position": 2,
-            "label": "Database password",
-            "type": "option",
-            "key": "dbPassword",
-            "required": true
-         }
-      },
-      "canBeCleaned": false,
-      "settingId": "usersDatabase"
-   },
-   "proxyEndpoint": {
-      "canBeDisabled": false,
-      "description": "The GI-proxy endpoint used by accessors and downloaders (e.g. to circumvent firewalls)",
-      "valueClass": "java.lang.String",
-      "position": 4,
-      "label": "Proxy endpoint",
-      "type": "option",
-      "key": "proxyEndpoint"
-   },
-   "settingId": "b6e6084a-28bf-4a81-bd71-7efc2f34c351"
-}
-,
-	{
 		"canBeDisabled": false,
-		"extensionClass": "eu.essi_lab.cfga.gs.task.CustomTaskSetting$TaskComponentInfo",
-		"validatorClass": "eu.essi_lab.cfga.gs.task.CustomTaskSetting$TaskSettingValidator",
-		"compactMode": false,
-		"taskDescription": {
+		"extensionClass": "eu.essi_lab.cfga.gs.setting.SystemSetting$SystemSettingComponentInfo",
+		"enableMailHarvestingReport": {
 			"canBeDisabled": false,
 			"values": [
-				"No description provided"
+				"Yes",
+				"No"
 			],
-			"valueClass": "java.lang.String",
-			"position": 1,
-			"label": "Task description",
+			"description": "System restart required. This feature also require that E-mail settings are correctly compiled",
+			"valueClass": "eu.essi_lab.cfga.option.BooleanChoice",
+			"position": 0,
+			"label": "Send harvesting reports email",
 			"type": "option",
-			"key": "taskDescription",
-			"required": true
+			"selectedIndexes": [
+				1
+			],
+			"key": "enableMailHarvestingReport",
+			"selectionMode": "single"
 		},
-		"settingClass": "eu.essi_lab.cfga.gs.task.CustomTaskSetting",
-		"description": "A customizable, schedulable task which executes the code provided by an implementation of the 'Task' interface",
-		"emailRecipients": {
+		"enableMailDownloadReport": {
 			"canBeDisabled": false,
-			"description": "The supplied recipients will be notified with an email when the task is done. The system email setting must be configured in order to send the email",
-			"valueClass": "java.lang.String",
-			"position": 3,
-			"label": "Comma separated list of email recipients",
-			"type": "option",
-			"key": "emailRecipients",
-			"textArea": true
-		},
-		"type": "setting",
-		"settingName": "Custom task settings",
-		"taskOptions": {
-			"canBeDisabled": false,
-			"description": "A customizable set of options for the task. The content of these options, the way they are provided and parsed, are completely demanded to the specific task implementation",
-			"valueClass": "java.lang.String",
+			"values": [
+				"Yes",
+				"No"
+			],
+			"description": "System restart required. This feature also require that E-mail settings are correctly compiled",
+			"valueClass": "eu.essi_lab.cfga.option.BooleanChoice",
 			"position": 2,
-			"label": "Custom task options",
+			"label": "Send download reports email",
 			"type": "option",
-			"key": "taskOptions",
+			"selectedIndexes": [
+				1
+			],
+			"key": "enableMailDownloadReport",
+			"selectionMode": "single"
+		},
+		"compactMode": false,
+		"keyValue": {
+			"canBeDisabled": false,
+			"description": "Set of key-value options. They must be compliant with Java Properties",
+			"valueClass": "java.lang.String",
+			"position": 5,
+			"label": "Key-value options",
+			"type": "option",
+			"key": "keyValue",
 			"textArea": true
 		},
-		"scheduling": {
+		"emailSetting": {
 			"compactMode": false,
 			"editable": false,
-			"settingClass": "eu.essi_lab.cfga.setting.scheduling.Scheduling",
-			"description": "When enabled, the default configuration of a scheduling is to run once and to start now",
-			"type": "scheduling",
-			"enabled": false,
-			"settingName": "Scheduling",
-			"repeatInterval": {
+			"smtpPort": {
 				"canBeDisabled": false,
-				"minValue": 1,
-				"values": [
-					1
-				],
-				"description": "The interval between the task ripetitions expressed according by the 'Repeat interval time unit' option. If the scheduler is set to run once, this option is ignored",
 				"valueClass": "java.lang.Integer",
 				"position": 1,
-				"label": "Repeat interval",
+				"label": "SMTP port",
 				"type": "option",
-				"key": "repeatInterval"
+				"key": "smtpPort",
+				"required": true
 			},
-			"startTime": {
-				"description": "Disable this option to start now (default)",
-				"valueClass": "eu.essi_lab.cfga.option.ISODateTime",
+			"settingClass": "eu.essi_lab.cfga.gs.setting.EmailSetting",
+			"description": "Settings required by the DAB to send e-mail messages. E-mail are sent during harvesting(if the related option is enabled) and if errors occur during statistics storing (if statistics gathering is enabled)",
+			"emailRecipients": {
+				"canBeDisabled": false,
+				"description": "Comma separated list of e-mail recipients",
+				"valueClass": "java.lang.String",
+				"position": 4,
+				"label": "E-mail recipients",
+				"type": "option",
+				"key": "emailRecipients",
+				"required": true
+			},
+			"type": "setting",
+			"enabled": false,
+			"settingName": "E-mail Settings",
+			"smtpUser": {
+				"canBeDisabled": false,
+				"valueClass": "java.lang.String",
+				"position": 2,
+				"label": "SMTP user",
+				"type": "option",
+				"key": "smtpUser",
+				"required": true
+			},
+			"smtpHost": {
+				"canBeDisabled": false,
+				"valueClass": "java.lang.String",
+				"position": 0,
+				"label": "SMTP host",
+				"type": "option",
+				"key": "smtpHost",
+				"required": true
+			},
+			"smtpPassword": {
+				"canBeDisabled": false,
+				"valueClass": "java.lang.String",
 				"position": 3,
-				"label": "Start time",
+				"label": "SMTP password",
 				"type": "option",
-				"key": "startTime",
-				"enabled": false
+				"key": "smtpPassword",
+				"required": true
 			},
-			"repeatIntervalUnit": {
+			"settingId": "emailSetting"
+		},
+		"databaseStatistics": {
+			"extensionClass": "eu.essi_lab.cfga.gs.setting.database.DatabaseSetting$DatabaseComponentInfo",
+			"compactMode": false,
+			"databaseConfiguration": {
+				"canBeDisabled": false,
+				"dbUri": {
+					"canBeDisabled": false,
+					"valueClass": "java.lang.String",
+					"position": 0,
+					"label": "Database URI",
+					"type": "option",
+					"key": "dbUri",
+					"required": true
+				},
+				"compactMode": false,
+				"editable": false,
+				"showHeader": false,
+				"dbName": {
+					"canBeDisabled": false,
+					"valueClass": "java.lang.String",
+					"position": 4,
+					"label": "Database name",
+					"type": "option",
+					"key": "dbName",
+					"required": true
+				},
+				"settingClass": "eu.essi_lab.cfga.setting.Setting",
+				"dbType": {
+					"canBeDisabled": false,
+					"valueClass": "java.lang.String",
+					"position": 5,
+					"label": "Database type",
+					"type": "option",
+					"key": "dbType"
+				},
+				"type": "setting",
+				"settingName": "Database",
+				"dbUser": {
+					"canBeDisabled": false,
+					"valueClass": "java.lang.String",
+					"position": 1,
+					"label": "Database user",
+					"type": "option",
+					"key": "dbUser",
+					"required": true
+				},
+				"selected": true,
+				"configFolder": {
+					"canBeDisabled": false,
+					"visible": false,
+					"valueClass": "java.lang.String",
+					"position": 3,
+					"label": "Configuration folder",
+					"type": "option",
+					"key": "configFolder",
+					"required": true
+				},
+				"settingId": "databaseConfiguration",
+				"dbPassword": {
+					"canBeDisabled": false,
+					"valueClass": "java.lang.String",
+					"position": 2,
+					"label": "Database password",
+					"type": "option",
+					"key": "dbPassword",
+					"required": true
+				}
+			},
+			"editable": false,
+			"settingClass": "eu.essi_lab.cfga.gs.setting.database.DatabaseSetting",
+			"description": "System restart required. Enable/disable statistics gathering and computing by means of an Elasticsearch database",
+			"type": "setting",
+			"enabled": false,
+			"settingName": "DAB statistics gathering",
+			"canBeCleaned": false,
+			"settingId": "databaseStatistics"
+		},
+		"settingClass": "eu.essi_lab.cfga.gs.setting.SystemSetting",
+		"type": "setting",
+		"settingName": "System settings",
+		"enableMailAugmentationReport": {
+			"canBeDisabled": false,
+			"values": [
+				"Yes",
+				"No"
+			],
+			"description": "System restart required. This feature also require that E-mail settings are correctly compiled",
+			"valueClass": "eu.essi_lab.cfga.option.BooleanChoice",
+			"position": 1,
+			"label": "Send augmentation reports email",
+			"type": "option",
+			"selectedIndexes": [
+				1
+			],
+			"key": "enableMailAugmentationReport",
+			"selectionMode": "single"
+		},
+		"enableErrorLogsReport": {
+			"canBeDisabled": false,
+			"values": [
+				"Yes",
+				"No"
+			],
+			"description": "System restart required. This feature also require that E-mail settings are correctly compiled",
+			"valueClass": "eu.essi_lab.cfga.option.BooleanChoice",
+			"position": 3,
+			"label": "Send error logs reports email (the related custom task must be enabled)",
+			"type": "option",
+			"selectedIndexes": [
+				1
+			],
+			"key": "enableErrorLogsReport",
+			"selectionMode": "single"
+		},
+		"usersDatabase": {
+			"extensionClass": "eu.essi_lab.cfga.gs.setting.database.DatabaseSetting$DatabaseComponentInfo",
+			"compactMode": false,
+			"editable": false,
+			"settingClass": "eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting",
+			"description": "If enabled and configured, this setting allows to retrieve users information from a specific database",
+			"type": "setting",
+			"enabled": false,
+			"settingName": "User database setting",
+			"usersDbSetting": {
+				"canBeDisabled": false,
+				"dbUri": {
+					"canBeDisabled": false,
+					"valueClass": "java.lang.String",
+					"position": 0,
+					"label": "Database URI",
+					"type": "option",
+					"key": "dbUri",
+					"required": true
+				},
+				"compactMode": false,
+				"editable": false,
+				"showHeader": false,
+				"dbName": {
+					"canBeDisabled": false,
+					"valueClass": "java.lang.String",
+					"position": 4,
+					"label": "Database name",
+					"type": "option",
+					"key": "dbName",
+					"required": true
+				},
+				"settingClass": "eu.essi_lab.cfga.setting.Setting",
+				"dbType": {
+					"canBeDisabled": false,
+					"valueClass": "java.lang.String",
+					"position": 5,
+					"label": "Database type",
+					"type": "option",
+					"key": "dbType"
+				},
+				"type": "setting",
+				"settingName": "Database",
+				"dbUser": {
+					"canBeDisabled": false,
+					"valueClass": "java.lang.String",
+					"position": 1,
+					"label": "Database user",
+					"type": "option",
+					"key": "dbUser",
+					"required": true
+				},
+				"selected": true,
+				"configFolder": {
+					"canBeDisabled": false,
+					"visible": false,
+					"valueClass": "java.lang.String",
+					"position": 3,
+					"label": "Configuration folder",
+					"type": "option",
+					"key": "configFolder",
+					"required": true
+				},
+				"settingId": "usersDbSetting",
+				"dbPassword": {
+					"canBeDisabled": false,
+					"valueClass": "java.lang.String",
+					"position": 2,
+					"label": "Database password",
+					"type": "option",
+					"key": "dbPassword",
+					"required": true
+				}
+			},
+			"canBeCleaned": false,
+			"settingId": "usersDatabase"
+		},
+		"proxyEndpoint": {
+			"canBeDisabled": false,
+			"description": "The GI-proxy endpoint used by accessors and downloaders (e.g. to circumvent firewalls)",
+			"valueClass": "java.lang.String",
+			"position": 4,
+			"label": "Proxy endpoint",
+			"type": "option",
+			"key": "proxyEndpoint"
+		},
+		"defSemanticSearch": {
+			"canBeDisabled": false,
+			"expansionLimitTargetKey": {
 				"canBeDisabled": false,
 				"values": [
-					"DAYS"
+					"Concepts",
+					"Alternate labels",
+					"Labels"
 				],
-				"description": "The time unit of the 'Repeat interval' option. If the scheduler is set to run once, this option is ignored",
-				"valueClass": "java.util.concurrent.TimeUnit",
+				"description": "The results of the semantic search expansion can be limited to a maximum number of concepts (default), or to a maximum number of labels or alternate labels.\nThe default maximum number of results can set with the 'Default maximum number of results' option",
+				"valueClass": "eu.essi_lab.lib.skos.expander.ExpansionLimit$LimitTarget",
 				"position": 2,
-				"label": "Repeat interval time unit",
+				"label": "Default limitation target of the expansion",
 				"type": "option",
 				"selectedIndexes": [
 					0
 				],
-				"key": "repeatIntervalUnit"
+				"key": "expansionLimitTargetKey",
+				"selectionMode": "single"
 			},
-			"endTime": {
-				"description": "If enabled, an eventual value of 'Repeat count' will be ignored and the scheduling will run indefinitely until this date according to the the 'Repeat interval' and the 'Repeat interval time unit' options",
-				"valueClass": "eu.essi_lab.cfga.option.ISODateTime",
-				"position": 4,
-				"label": "End time",
+			"compactMode": false,
+			"expansionLevelKey": {
+				"canBeDisabled": false,
+				"values": [
+					"0",
+					"1",
+					"2",
+					"3"
+				],
+				"description": "The default level by which expand the given term",
+				"valueClass": "eu.essi_lab.lib.skos.expander.ConceptsExpander$ExpansionLevel",
+				"position": 1,
+				"label": "Default expansion level",
 				"type": "option",
-				"key": "endTime",
-				"enabled": false
+				"selectedIndexes": [
+					1
+				],
+				"key": "expansionLevelKey",
+				"selectionMode": "single"
 			},
-			"settingId": "scheduling",
-			"repeatCount": {
-				"minValue": 2,
-				"description": "Enable this option and select how many times to repeat the task, or leave it unset to run indefinitely. Disable this option to run once (default)",
+			"editable": false,
+			"includeOriginalSTKey": {
+				"canBeDisabled": false,
+				"values": [
+					"Yes",
+					"No"
+				],
+				"description": "If set to 'Yes' (default) the original search term is included in the search along with the terms outcome of the semantic expansion",
+				"valueClass": "eu.essi_lab.cfga.option.BooleanChoice",
+				"position": 6,
+				"label": "Include original search term",
+				"type": "option",
+				"selectedIndexes": [
+					0
+				],
+				"key": "includeOriginalSTKey",
+				"selectionMode": "single"
+			},
+			"settingClass": "eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting",
+			"description": "Default settings evaluated by the semantic search engine",
+			"type": "setting",
+			"settingName": "Default semantic search setting",
+			"expansionLimitValueKey": {
+				"canBeDisabled": false,
+				"values": [
+					0,
+					1,
+					2,
+					3,
+					4,
+					5,
+					6,
+					7,
+					8,
+					9,
+					10,
+					11,
+					12,
+					13,
+					14,
+					15,
+					16,
+					17,
+					18,
+					19,
+					20,
+					21,
+					22,
+					23,
+					24,
+					25,
+					26,
+					27,
+					28,
+					29,
+					30,
+					31,
+					32,
+					33,
+					34,
+					35,
+					36,
+					37,
+					38,
+					39,
+					40,
+					41,
+					42,
+					43,
+					44,
+					45,
+					46,
+					47,
+					48,
+					49,
+					50,
+					51,
+					52,
+					53,
+					54,
+					55,
+					56,
+					57,
+					58,
+					59,
+					60,
+					61,
+					62,
+					63,
+					64,
+					65,
+					66,
+					67,
+					68,
+					69,
+					70,
+					71,
+					72,
+					73,
+					74,
+					75,
+					76,
+					77,
+					78,
+					79,
+					80,
+					81,
+					82,
+					83,
+					84,
+					85,
+					86,
+					87,
+					88,
+					89,
+					90,
+					91,
+					92,
+					93,
+					94,
+					95,
+					96,
+					97,
+					98,
+					99,
+					100
+				],
+				"description": "The results of the semantic search expansion are limited by default to a maximum of 50.\n The value '0' means that no limitiation is applied.\nThe default limitation target of the expansion can be set with the 'Default limitation target of the expansion' option",
 				"valueClass": "java.lang.Integer",
-				"position": 0,
-				"label": "Repeat count",
+				"position": 3,
+				"label": "Default maximum number of results (0 = no limitation)",
 				"type": "option",
-				"key": "repeatCount",
-				"enabled": false
-			}
+				"selectedIndexes": [
+					50
+				],
+				"key": "expansionLimitValueKey",
+				"selectionMode": "single"
+			},
+			"sourceLanguagesKey": {
+				"canBeDisabled": false,
+				"values": [
+					"bg",
+					"cs",
+					"da",
+					"en",
+					"de",
+					"el",
+					"es",
+					"et",
+					"fi",
+					"fr",
+					"hr",
+					"hu",
+					"it",
+					"lt",
+					"lv",
+					"nl",
+					"pl",
+					"pt",
+					"ro",
+					"sk",
+					"sl",
+					"sv"
+				],
+				"description": "The default source languages in which the search term is expressed",
+				"valueClass": "eu.essi_lab.lib.utils.EuropeanLanguage",
+				"position": 4,
+				"label": "The default source languages",
+				"type": "option",
+				"selectedIndexes": [
+					3,
+					12
+				],
+				"key": "sourceLanguagesKey",
+				"selectionMode": "multi"
+			},
+			"semRelationKey": {
+				"canBeDisabled": false,
+				"values": [
+					"skos:semanticRelation",
+					"skos:related",
+					"skos:relatedMatch",
+					"skos:broaderTransitive",
+					"skos:broader",
+					"skos:broadMatch",
+					"skos:narrowerTransitive",
+					"skos:narrower",
+					"skos:narrowMatch",
+					"skos:mappingRelation",
+					"skos:closeMatch",
+					"skos:exactMatch"
+				],
+				"description": "The default semantic relations by which expand the given term",
+				"valueClass": "eu.essi_lab.lib.skos.SKOSSemanticRelation",
+				"position": 0,
+				"label": "Default semantic relations",
+				"type": "option",
+				"selectedIndexes": [
+					1,
+					7
+				],
+				"key": "semRelationKey",
+				"selectionMode": "multi"
+			},
+			"searchLanguagesKey": {
+				"canBeDisabled": false,
+				"values": [
+					"bg",
+					"cs",
+					"da",
+					"en",
+					"de",
+					"el",
+					"es",
+					"et",
+					"fi",
+					"fr",
+					"hr",
+					"hu",
+					"it",
+					"lt",
+					"lv",
+					"nl",
+					"pl",
+					"pt",
+					"ro",
+					"sk",
+					"sl",
+					"sv"
+				],
+				"description": "The default search languages in which to request the translation of each concept",
+				"valueClass": "eu.essi_lab.lib.utils.EuropeanLanguage",
+				"position": 5,
+				"label": "The default search languages",
+				"type": "option",
+				"selectedIndexes": [
+					3,
+					12
+				],
+				"key": "searchLanguagesKey",
+				"selectionMode": "multi"
+			},
+			"settingId": "defSemanticSearch"
 		},
-		"taskNameOption": {
-			"canBeDisabled": false,
-			"values": [
-				"Default custom task"
-			],
-			"valueClass": "java.lang.String",
-			"position": 0,
-			"label": "Task name",
-			"type": "option",
-			"valuesLoaderClass": "eu.essi_lab.cfga.gs.task.CustomTaskSetting$CustomTaskValuesLoader",
-			"selectedIndexes": [
-				0
-			],
-			"key": "taskNameOption",
-			"required": true
-		},
-		"canBeRemoved": true,
-		"configurableType": "CustomTaskWorker",
-		"settingId": "customTaskSettings",
-		"group": "customTaskGroup"
+		"settingId": "171d50e2-a167-4d1d-85c2-eb228c575ae4"
 	},
 	{
 		"canBeDisabled": false,
