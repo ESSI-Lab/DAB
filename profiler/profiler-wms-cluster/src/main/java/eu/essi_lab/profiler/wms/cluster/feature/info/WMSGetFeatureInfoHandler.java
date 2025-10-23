@@ -260,15 +260,15 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 
 		    // we are interested only on downloadable datasets
 		    ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
-		    operands.add(accessBond);
+//		     operands.add(accessBond);
 
 		    // we are interested only on downloadable datasets
 		    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
-		    operands.add(downBond);
+//		     operands.add(downBond);
 
 		    // we are interested only on TIME SERIES datasets
 		    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
-		    operands.add(timeSeriesBond);
+		     operands.add(timeSeriesBond);
 
 		    Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
 
@@ -364,7 +364,15 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			}
 		    }
 
-		    discoveryMessage.setUserBond(BondFactory.createAndBond(operands));
+		    Bond bond = null;
+		    if (operands.size() == 0) {
+			bond = null;
+		    } else if (operands.size() == 1) {
+			bond = operands.iterator().next();
+		    } else if (operands.size() > 1) {
+			bond = BondFactory.createAndBond(operands);
+		    }
+		    discoveryMessage.setUserBond(bond);
 
 		    discoveryMessage.setSources(ConfigurationWrapper.getViewSources(view.get()));
 		    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());

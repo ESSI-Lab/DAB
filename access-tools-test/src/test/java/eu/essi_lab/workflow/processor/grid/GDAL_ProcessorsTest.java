@@ -1,5 +1,6 @@
 package eu.essi_lab.workflow.processor.grid;
 
+import eu.essi_lab.model.GSSource;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -44,7 +45,11 @@ public abstract class GDAL_ProcessorsTest {
 
 	DataDescriptor descriptor = geotiffValidator.readDataAttributes(geotiff);
 	CRS originalCRS = descriptor.getCRS();
-	this.netcdf1 = processor1.process(new Dataset(), geotiff, null);
+	Dataset ds = new Dataset();
+	GSSource gsSource = new GSSource();
+	gsSource.setEndpoint("http://example.com/");
+	ds.setSource(gsSource);
+	this.netcdf1 = processor1.process(ds, geotiff, null);
 	netcdf1.getFile().deleteOnExit();
 	descriptor.setDataFormat(DataFormat.NETCDF());
 	netcdf1.setDataDescriptor(descriptor);
