@@ -150,7 +150,7 @@ public class SKOSResponse {
 		SKOSConcept skosConcept = SKOSConcept.of(//
 			key.concept(), //
 			list.get(0).getPref().orElse(NONE_VALUE));
-		
+
 		skosConcept.setLevel(ExpansionLevel.of(key.level()).get());
 
 		list.forEach(c -> skosConcept.getAlt().addAll(c.getAlt()));
@@ -325,7 +325,11 @@ public class SKOSResponse {
 		collect(Collectors.toList());
     }
 
-    public Set<String> getConcepts() {
+    /**
+     * @return
+     */
+    public Set<String> getURIs() {
+
 	return getAggregatedResults().stream().map(SKOSConcept::getConceptURI).collect(Collectors.toSet());
     }
 

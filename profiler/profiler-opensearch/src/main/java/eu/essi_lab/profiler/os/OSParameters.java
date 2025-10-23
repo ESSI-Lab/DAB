@@ -524,16 +524,6 @@ public abstract class OSParameters {
     /**
     *
     */
-    public static final OSParameter SEMANTIC_SEARCH = new OSParameter("semanticsearch", "string", null, "{gs:semanticsearch}");
-
-    /**
-    *
-    */
-    public static final OSParameter ONTOLOGY_IDS = new OSParameter("ontologyids", "string", null, "{gs:ontologyids}");
-
-    /**
-    *
-    */
     public static final OSParameter ATTRIBUTE_IDENTIFIER = new OSParameter("attributeId", "string", null, "{gs:attributeIdentifier}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -873,10 +863,10 @@ public abstract class OSParameters {
 
 		SimpleValueBond max = BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.CLOUD_COVER_PERC,
 			Double.valueOf(range[1]));
-	
+
 		andBond.getOperands().add(min);
 		andBond.getOperands().add(max);
-		
+
 		return Optional.of(andBond);
 	    }
 
@@ -1311,6 +1301,52 @@ public abstract class OSParameters {
     *
     */
     public static final OSParameter OUTPUT_FORMAT = new OSParameter("outputFormat", "freeText", null, null);
+
+    /**
+    *
+    */
+    public static final OSParameter SEMANTIC_SEARCH_ENABLED = new OSParameter("semanticSearch", "string", null, "{gs:semanticSearch}");
+
+    /**
+    *
+    */
+    public static final OSParameter SEMANTIC_RELATIONS = new OSParameter("semanticRelations", "string", null, "{gs:semanticRelations}");
+
+    /**
+    *
+    */
+    public static final OSParameter SEMANTIC_ONTOLOGY_IDS = new OSParameter("ontologyIds", "string", null, "{gs:ontologyIds}");
+
+    /**
+     *
+     */
+    public static final OSParameter SEMANTIC_SEARCH_LANGS = new OSParameter("searchLangs", "string", null, "{gs:searchLangs}");
+
+    /**
+    *
+    */
+    public static final OSParameter SEMANTIC_SOURCE_LANGS = new OSParameter("sourceLangs", "string", null, "{gs:sourceLangs}");
+
+    /**
+    *
+    */
+    public static final OSParameter SEMANTIC_EXPANSION_LEVEL = new OSParameter("expansionLevel", "string", null, "{gs:expansionLevel}");
+
+    /**
+    *
+    */
+    public static final OSParameter SEMANTIC_CONCEPT_URI = new OSParameter("conceptURI", "string", null, "{gs:conceptUri}");
+
+    /**
+    *
+    */
+    public static final OSParameter SEMANTIC_WITH_OBSERVED_PROPERTIES_URIS = new OSParameter("withObservedPropertiesURIs", "string", null,
+	    "{gs:withObservedPropURIs}");
+
+    /**
+     * [CONCEPTS:50], [LABELS:50], [ALT_LABELS:50]
+     */
+    public static final OSParameter SEMANTIC_EXPANSION_LIMIT = new OSParameter("expansionLimit", "string", null, "{gs:expansionLimit}");
 
     /**
      * @param south

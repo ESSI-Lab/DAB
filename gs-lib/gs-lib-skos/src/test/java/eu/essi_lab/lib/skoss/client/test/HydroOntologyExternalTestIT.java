@@ -158,7 +158,7 @@ public class HydroOntologyExternalTestIT {
 	    List<SKOSConcept> concepts = response.getAggregatedResults();
 	    printConcepts(concepts);
 	    assertEquals(5, concepts.size());
-	    Set<String> uris = response.getConcepts();
+	    Set<String> uris = response.getURIs();
 
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/28"));
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/33"));
@@ -177,7 +177,7 @@ public class HydroOntologyExternalTestIT {
 	    List<SKOSConcept> concepts = response.getAggregatedResults();
 	    printConcepts(concepts);
 	    assertEquals(8, concepts.size());
-	    Set<String> uris = response.getConcepts();
+	    Set<String> uris = response.getURIs();
 
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/28"));
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/33"));
@@ -198,7 +198,7 @@ public class HydroOntologyExternalTestIT {
 	    List<SKOSConcept> concepts = response.getAggregatedResults();
 	    printConcepts(concepts);
 	    assertEquals(9, concepts.size());
-	    Set<String> uris = response.getConcepts();
+	    Set<String> uris = response.getURIs();
 
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/28"));
 	    assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/33"));
