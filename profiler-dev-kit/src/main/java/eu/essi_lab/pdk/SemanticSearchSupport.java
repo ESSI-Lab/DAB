@@ -246,7 +246,7 @@ public class SemanticSearchSupport {
 		expandedTerms.forEach(term -> BondUtils.createFieldsBond(searchFields, term).ifPresent(bond -> expandedBonds.add(bond)));
 	    }
 
-	    if (client.getSearchTarget().get() == SearchTarget.TERMS) {
+	    if (client.getSearchTarget().get() == SearchTarget.TERMS && setting.isOriginalTermIncluded()) {
 
 		// adds the initial search term/concept
 		expandedBonds.add(BondUtils.createFieldsBond(searchFields, value).get());
