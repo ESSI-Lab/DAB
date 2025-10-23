@@ -1531,7 +1531,7 @@ export function initializePortal(config) {
 		}
 
 		if (config.semanticSearch !== undefined && config.semanticSearch) {
-			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semanticsearch', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
+			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semanticSearch', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
 		}
 		
 		if (config.semanticOptions !== undefined && config.semanticOptions) {
@@ -2102,16 +2102,37 @@ export function initializePortal(config) {
 
 		constraints.spatialOp = options.spatialRelation;
 
-		constraints.ontologyids = GIAPI.OntologiesSelector.getSelectedIds();
-		constraints.semanticsearch = GIAPI.OntologiesSelector.getSelectedIds().length > 0;
-
+		if(GIAPI.OntologiesSelector.getSelectedIds().length > 0){
+			constraints.kvp.push(
+				{ 'key': 'semanticSearch', 'value': 'true' }
+			);
+		}
+		
+		if(config.semanticRelations){
+			constraints.kvp.push(
+				{ 'key': 'semanticRelations', 'value': config.semanticRelations }
+			);
+		}
+		
+		if(config.withObservedPropertiesURIs){
+					constraints.kvp.push(
+				{ 'key': 'withObservedPropertiesURIs', 'value': config.withObservedPropertiesURIs }
+			);
+		}			
+		
+		var ontologyIds = config.ontologyIds || GIAPI.OntologiesSelector.getSelectedIds();
+		if(ontologyIds){
+			constraints.kvp.push(
+				{ 'key': 'ontologyIds', 'value': ontologyIds }
+			);
+		}
+		 
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
 
-
-
-		if (config.filters !== undefined) {
+		if (config.filters) {
+			
 			options.termFrequency = config.filters;
 		}
 

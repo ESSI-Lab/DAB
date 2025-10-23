@@ -31,12 +31,10 @@ import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -58,7 +56,6 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
@@ -71,12 +68,11 @@ import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.CRSUtils;
 import eu.essi_lab.pdk.BondUtils;
-import eu.essi_lab.pdk.Semantics;
+import eu.essi_lab.pdk.SemanticSearchSupport;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 
 /**
  * @author boldrini
@@ -275,13 +271,28 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		     operands.add(timeSeriesBond);
 
 		    Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
-		    String ont = getParam(parameterMap, "ontology");
-		    String attributeTitle = getParam(parameterMap, "attributeTitle");
-		    String semantics = getParam(parameterMap, "semantics");
 
-		    if (ont != null && attributeTitle != null) {
-			Bond bond = Semantics.getSemanticBond(attributeTitle, semantics, ont);
-			operands.add(bond);
+		    String ontologyIds = getParam(parameterMap, "ontologyIds");
+		    String attributeTitle = getParam(parameterMap, "attributeTitle");
+		    String semanticSearch = getParam(parameterMap, "semanticSearch");
+
+		    if (ontologyIds != null && attributeTitle != null && semanticSearch!= null && semanticSearch.equals("true")) {
+
+			SemanticSearchSupport support = new SemanticSearchSupport();
+			support.setExpansionLevelParam("expansionLevel");
+			support.setExpansionLimitParam("expansionLimit");
+			support.setRelationsParam("semanticRelations");
+			support.setSearchLangsParam("searchLangs");
+			support.setSourceLangsParam("sourceLangs");
+
+			Optional<Bond> bond = support.getSemanticBond(//
+				webRequest, //
+				attributeTitle, //
+				ontologyIds, //
+				MetadataElement.ATTRIBUTE_TITLE_EL_NAME, //
+				true);
+
+			bond.ifPresent(b -> operands.add(b));
 		    }
 
 		    String instrumentTitle = getParam(parameterMap, "instrumentTitle");

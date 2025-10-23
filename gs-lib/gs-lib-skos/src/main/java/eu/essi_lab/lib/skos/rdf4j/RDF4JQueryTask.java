@@ -47,14 +47,20 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class RDF4JQueryTask implements Callable<List<SKOSConcept>>, QueryTask {
 
+    /**
+     * 5 seconds
+     */
+    private static final int DEFAULT_MAX_EXECUTION_TIME = 5;
+
     static {
 
-//	System.setProperty("rdf4j.sparql.url.maxlength", String.valueOf(Integer.MAX_VALUE));
+	// System.setProperty("rdf4j.sparql.url.maxlength", String.valueOf(Integer.MAX_VALUE));
     }
 
     private String ontologyURL;
     private String query;
     private List<SKOSConcept> currentLevelResults;
+    private int maxExecutionTime;
 
     /**
      * @param ontologyURL
@@ -62,10 +68,27 @@ public class RDF4JQueryTask implements Callable<List<SKOSConcept>>, QueryTask {
      * @param currentLevelResults
      */
     public RDF4JQueryTask(String ontologyURL, String query, List<SKOSConcept> currentLevelResults) {
-	super();
+
 	this.ontologyURL = ontologyURL;
 	this.query = query;
 	this.currentLevelResults = currentLevelResults;
+	this.maxExecutionTime = DEFAULT_MAX_EXECUTION_TIME;
+    }
+
+    /**
+     * @return
+     */
+    public int getMaxExecutionTime() {
+
+	return maxExecutionTime;
+    }
+
+    /**
+     * @param maxExecutionTime
+     */
+    public void setMaxExecutionTime(int maxExecutionTime) {
+
+	this.maxExecutionTime = maxExecutionTime;
     }
 
     @Override
@@ -97,6 +120,8 @@ public class RDF4JQueryTask implements Callable<List<SKOSConcept>>, QueryTask {
 	try (RepositoryConnection conn = repo.getConnection()) {
 
 	    TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+
+	    tupleQuery.setMaxExecutionTime(getMaxExecutionTime());
 
 	    try (TupleQueryResult res = tupleQuery.evaluate()) {
 		while (res.hasNext()) {
