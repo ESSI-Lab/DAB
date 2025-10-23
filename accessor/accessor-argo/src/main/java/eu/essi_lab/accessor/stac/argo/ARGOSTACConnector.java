@@ -111,7 +111,7 @@ public class ARGOSTACConnector extends HarvestedQueryConnector<ARGOSTACConnector
 	    }
 	    Optional<Integer> mr = getSetting().getMaxRecords();
 	    boolean maxNumberReached = false;
-	    if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent()) {
+	    if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && partialNumbers > mr.get() -1) {
 		// max record set
 		maxNumberReached = true;
 	    }
