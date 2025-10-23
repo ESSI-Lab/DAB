@@ -79,10 +79,14 @@ public class OSRequestParser {
     public String parse(OSParameter parameter) throws IllegalArgumentException {
 
 	String value = parser.getValue(parameter.getName());
+	
 	if (value == null || value.equals("") || value.equals(KeyValueParser.UNDEFINED)) {
+	    
 	    if (parameter.getDefaultValue() != null) {
+		
 		return parameter.getDefaultValue();
 	    }
+	    
 	    return null;
 	}
  
@@ -117,6 +121,16 @@ public class OSRequestParser {
 	}
 
 	return value;
+    }
+    
+    
+
+    /**
+     * @return the parser
+     */
+    public KeyValueParser getParser() {
+	
+        return parser;
     }
 
     static Integer parseInt(String value) {

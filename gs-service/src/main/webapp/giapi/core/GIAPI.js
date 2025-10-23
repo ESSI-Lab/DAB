@@ -222,7 +222,6 @@ export const GIAPI = {
 		var kwd = '';
 		var format = '';
 		var protocol = '';
-		var kwdOrBbox = '';
 		var pla = '';
 		var sen = '';
 		var att = '';
@@ -237,7 +236,7 @@ export const GIAPI = {
 		var timeInterpolation = '';
 		var attrURI = '';
 		var orgName = '';
-	
+	 
 		if (kvp) {
 			
 			if (!Array.prototype.isArray(kvp)) {
@@ -248,11 +247,6 @@ export const GIAPI = {
 			
 				var key = kvp[kvpel].key;
 				var val = kvp[kvpel].value;
-
-				if (key === 'kwdOrBbox') {
-					kwdOrBbox = val;
-					continue;
-				}
 
 				if (key === 'kwd') {
 					kwd = val;
@@ -456,7 +450,6 @@ export const GIAPI = {
 		httpGet += kwd ? 'kwd=' + kwd + '&' : '';
 		httpGet += format ? 'frmt=' + format + '&' : '';
 		httpGet += protocol ? 'prot=' + protocol + '&' : '';
-		httpGet += kwdOrBbox ? 'kwdOrBbox=' + kwdOrBbox + '&' : '';
 		httpGet += score ? 'sscScore=' + score + '&' : '';
  	 
 		httpGet += instr ? 'instrumentTitle=' + instr + '&' : '';
