@@ -56,7 +56,7 @@ public class WISClient {
 	    JSONArray keywords = collection.getJSONArray("keywords");
 	    for (int j = 0; j < keywords.length(); j++) {
 		String keyword = keywords.getString(j);
-		if (keyword.equals("default")) {
+		if (keyword.equals("default")||keyword.equals("observations")) {
 		    this.observationsUrl = getLink(collection, "application/geo+json", "items");
 		}
 	    }
@@ -216,8 +216,8 @@ public class WISClient {
 	    dateTime = "&datetime=" + beginParameter + "/" + endParameter;
 	}
 
-	String url = observationsUrl + "&lang=en-US&limit=" + pageSize + "&properties=resultTime,value&skipGeometry=true" + //
-		"&sortby=" + sorting + "resultTime" + "&offset=0&name=" + propertyName + "&wigos_station_identifier=" + wigosId + //
+	String url = observationsUrl + "&lang=en-US&limit=" + pageSize + "&properties=reportTime,value&skipGeometry=true" + //
+		"&sortby=" + sorting + "reportTime" + "&offset=0&name=" + propertyName + "&wigos_station_identifier=" + wigosId + //
 		dateTime //
 	;
 	w: while (url != null) {
@@ -227,8 +227,11 @@ public class WISClient {
 		JSONObject feature = features.getJSONObject(i);
 		if (feature.has("properties")) {
 		    JSONObject props = feature.getJSONObject("properties");
-		    if (props.has("resultTime") && props.has("value")) {
-			String time = props.getString("resultTime");
+		    String time = props.optString("resultTime");
+		    if (time ==null||time.isEmpty()) {
+			time = props.optString("reportTime");
+		    }
+		    if (time!=null && props.has("value")) {
 			if (time.contains("/")) {
 			    time = time.substring(time.indexOf("/") + 1);
 			}
