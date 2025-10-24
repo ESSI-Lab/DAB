@@ -31,6 +31,8 @@ import org.json.JSONObject;
 
 import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.pdk.SemanticSearchSupport;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 
 public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
@@ -120,15 +122,15 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
 	    String queryParams = "";
 
-	    String ontology = request.getServletParameter("ontology");
-	    String attributeTitle = request.getServletParameter("attributeTitle");
-	    String semantics = request.getServletParameter("semantics");
+	    String ontology = request.getServletParameter(SemanticSearchSupport.ONTOLOGY_IDS_PARAM);
+	    String attributeTitle = request.getServletParameter(SemanticSearchSupport.ATTRIBUTE_TITLE_PARAM);
+	    String semantics = request.getServletParameter(SemanticSearchSupport.SEMANTIC_SEARCH_PARAM);
 
 	    if (ontology != null && attributeTitle != null && semantics != null) {
-		queryParams += "ontology=" + ontology + "&attributeTitle=" + attributeTitle + "&semantics=" + semantics + "&";
+		queryParams += SemanticSearchSupport.ONTOLOGY_IDS_PARAM+"=" + ontology + "&"+SemanticSearchSupport.ATTRIBUTE_TITLE_PARAM+"=" + attributeTitle + "&"+SemanticSearchSupport.SEMANTIC_SEARCH_PARAM+"=" + semantics + "&";
 	    }
 
-	    queryParams += getParamIfPresent(request, "instrumentTitle");
+	    queryParams += getParamIfPresent(request, MetadataElement.INSTRUMENT_TITLE_EL_NAME);
 	    queryParams += getParamIfPresent(request, "intendedObservationSpacing");
 	    queryParams += getParamIfPresent(request, "aggregationDuration");
 	    queryParams += getParamIfPresent(request, "timeInterpolation");
