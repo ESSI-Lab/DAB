@@ -203,6 +203,7 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 	}
 	if (updated_datetime != null && !updated_datetime.isEmpty()) {
 	    coreMetadata.getMIMetadata().getDataIdentification().setCitationRevisionDate(updated_datetime);
+	    coreMetadata.getMIMetadata().setDateStampAsDate(updated_datetime);
 	}
 
 	// parameters
