@@ -41,6 +41,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.BrowseGraphic;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
@@ -63,6 +64,7 @@ import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.FileIdentifierMapper;
+import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 
 public class ARGOSTACMapper extends FileIdentifierMapper {
 
@@ -175,10 +177,10 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 	}
 	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword(maker);
 	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword(model);
-	if (deployment_ship != null) {
+	if (deployment_cruise_id != null) {
 	    Keywords keyword = new Keywords();
 	    keyword.setTypeCode("cruise");
-	    keyword.addKeyword(deployment_ship);
+	    keyword.addKeyword(deployment_cruise_id);
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword);
 	}
 
@@ -232,16 +234,19 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 			coverage.setAttributeIdentifier(conceptURL);
 			coverage.setAttributeDescription(conceptDescription);
 			coverage.setAttributeTitle(conceptId);
-			coreMetadata.getMIMetadata().getDataIdentification().addKeyword(conceptId);
+			Keywords key = new Keywords();
+			key.addKeyword(conceptId, conceptURL);
+			coreMetadata.getMIMetadata().getDataIdentification().addKeywords(key);
 			coreMetadata.getMIMetadata().addCoverageDescription(coverage);
 			break;
 		    // R04 -> organizations
 		    case "http://vocab.nerc.ac.uk/collection/R04/current/":
-			// ResponsibleParty organization = new ResponsibleParty();
-			// organization.setOrganisationName(conceptTitle);
-			// organization.setOrganisationName(conceptTitle);
+			ResponsibleParty organization = new ResponsibleParty();
+			CharacterStringPropertyType value = ISOMetadata.createAnchorPropertyType(conceptURL, conceptId);
+			organization.getElementType().setOrganisationName(value);
+			organization.setRoleCode("originator");
 			// organization.setRoleCode("author");
-			// coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(organization);
+			coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(organization);
 			dataset.getExtensionHandler().addOriginatorOrganisationDescription(conceptDescription);
 			dataset.getExtensionHandler().addOriginatorOrganisationIdentifier(conceptURL);
 			break;
@@ -258,38 +263,39 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 			Keywords keyword = new Keywords();
 			keyword.setTypeCode("instrument");
 			keyword.addKeyword(conceptId, conceptURL);
+			keyword.addKeyword(conceptId);
 			coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword);
 
 			break;
 		    // R26 -> other sensors
 		    case "http://vocab.nerc.ac.uk/collection/R26/current/":
-			MIInstrument myInstrument26 = new MIInstrument();
-			myInstrument26.setMDIdentifierTypeIdentifier(conceptId);
-			myInstrument26.setMDIdentifierTypeCode(conceptURL);
-			if (conceptDescription != null) {
-			    myInstrument26.setDescription(conceptDescription);
-			}
-			myInstrument26.setTitle(conceptId);
-			coreMetadata.getMIMetadata().addMIInstrument(myInstrument26);
-			Keywords keyword26 = new Keywords();
-			keyword26.setTypeCode("instrument");
-			keyword26.addKeyword(conceptId, conceptURL);
-			coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword26);
+			// MIInstrument myInstrument26 = new MIInstrument();
+			// myInstrument26.setMDIdentifierTypeIdentifier(conceptId);
+			// myInstrument26.setMDIdentifierTypeCode(conceptURL);
+			// if (conceptDescription != null) {
+			// myInstrument26.setDescription(conceptDescription);
+			// }
+			// myInstrument26.setTitle(conceptId);
+			// coreMetadata.getMIMetadata().addMIInstrument(myInstrument26);
+			// Keywords keyword26 = new Keywords();
+			// keyword26.setTypeCode("instrument");
+			// keyword26.addKeyword(conceptId, conceptURL);
+			// coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword26);
 			break;
 		    // R27 -> other sensors
 		    case "http://vocab.nerc.ac.uk/collection/R27/current/":
-			MIInstrument myInstrument27 = new MIInstrument();
-			myInstrument27.setMDIdentifierTypeIdentifier(conceptId);
-			myInstrument27.setMDIdentifierTypeCode(conceptURL);
-			if (conceptDescription != null) {
-			    myInstrument27.setDescription(conceptDescription);
-			}
-			myInstrument27.setTitle(conceptId);
-			coreMetadata.getMIMetadata().addMIInstrument(myInstrument27);
-			Keywords keyword27 = new Keywords();
-			keyword27.setTypeCode("instrument");
-			keyword27.addKeyword(conceptId, conceptURL);
-			coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword27);
+			// MIInstrument myInstrument27 = new MIInstrument();
+			// myInstrument27.setMDIdentifierTypeIdentifier(conceptId);
+			// myInstrument27.setMDIdentifierTypeCode(conceptURL);
+			// if (conceptDescription != null) {
+			// myInstrument27.setDescription(conceptDescription);
+			// }
+			// myInstrument27.setTitle(conceptId);
+			// coreMetadata.getMIMetadata().addMIInstrument(myInstrument27);
+			// Keywords keyword27 = new Keywords();
+			// keyword27.setTypeCode("instrument");
+			// keyword27.addKeyword(conceptId, conceptURL);
+			// coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword27);
 			break;
 		    // R022 -> platform family
 		    case "http://vocab.nerc.ac.uk/collection/R22/current/":
@@ -351,11 +357,11 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 
 	if (platform != null) {
 	    String platTitle = platform.getCitation().getTitle();
+	    if (platform_maker != null) {
+		platTitle = platform_maker + " " + platTitle;
+	    }
 	    if (constellation != null) {
 		platTitle = platTitle + " " + constellation;
-	    }
-	    if (platform_maker != null) {
-		platTitle = platTitle + " " + platform_maker;
 	    }
 	    platform.getCitation().setTitle(platTitle);
 	}
@@ -376,20 +382,23 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 		if (provObj != null) {
 		    String provName = getString(provObj, "name");
 		    if (!provName.equals(PI_name)) {
-			ResponsibleParty respParty = new ResponsibleParty();
-			respParty.setOrganisationName(provName);
-			JSONArray roles = getJSONArray(provObj, "roles");
-			if (!roles.isEmpty()) {
-			    String role = roles.getString(0);
-			    if (role.equals("host")) {
-				respParty.setRoleCode("publisher");
-			    } else if (role.equals("producer")) {
-				respParty.setRoleCode("originator");
-			    } else {
-				respParty.setRoleCode(role);
+			String descrProv = getString(provObj, "description");
+			if (descrProv == null) {
+			    ResponsibleParty respParty = new ResponsibleParty();
+			    respParty.setOrganisationName(provName);
+			    JSONArray roles = getJSONArray(provObj, "roles");
+			    if (!roles.isEmpty()) {
+				String role = roles.getString(0);
+				if (role.equals("host")) {
+				    respParty.setRoleCode("publisher");
+				} else if (role.equals("producer")) {
+				    respParty.setRoleCode("originator");
+				} else {
+				    respParty.setRoleCode(role);
+				}
 			    }
+			    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(respParty);
 			}
-			coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(respParty);
 		    }
 		}
 	    }
