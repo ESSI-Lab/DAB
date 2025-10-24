@@ -25,6 +25,7 @@ package eu.essi_lab.lib.skos.finder.impl;
  */
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.lib.skos.finder.ConceptsQueryBuilder;
 
@@ -36,17 +37,20 @@ public class DefaultConceptsQueryBuilder implements ConceptsQueryBuilder {
     @Override
     public String build(String searchTerm, List<String> sourceLangs) {
 
-	String langFilter = String.join(//
-		",", //
-		sourceLangs.//
-			stream().//
-			map(lang -> "\"" + lang + "\"").//
-			toArray(String[]::new));
+	String langFilter = sourceLangs.//
+		stream().//
+		map(lang -> "\"" + lang + "\"").//
+		collect(Collectors.joining(","));
 
-	String match = String.format(//
-		"FILTER(LANG(?label) IN (%s) && LCASE(STR(?label)) = \"%s\")", //
-		langFilter, //
-		searchTerm.toLowerCase().replace("\"", "\\\""));
+	String match = langFilter.isEmpty() ?
+
+		String.format(//
+			"FILTER(LCASE(STR(?label)) = \"%s\")", //
+			searchTerm.toLowerCase().replace("\"", "\\\""))
+		: String.format(//
+			"FILTER(LANG(?label) IN (%s) && LCASE(STR(?label)) = \"%s\")", //
+			langFilter, //
+			searchTerm.toLowerCase().replace("\"", "\\\""));
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>

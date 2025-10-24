@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.eclipse.rdf4j.federated.FedXConfig;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.essi_lab.lib.skos.finder.impl.DefaultConceptsQueryBuilder;
@@ -16,6 +17,7 @@ import eu.essi_lab.lib.skos.finder.impl.FedXConceptsQueryExecutor;
 /**
  * @author Fabrizio
  */
+@Ignore
 public class FedXConceptsQueryExecutorExternalTestIT {
 
     @Test

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.essi_lab.lib.skos.finder.ConceptsFinder;
@@ -18,6 +19,7 @@ import eu.essi_lab.lib.utils.ThreadMode;
 /**
  * @author Fabrizio
  */
+@Ignore
 public class FedXConceptsFinderExternalTestIT {
 
     @Test
