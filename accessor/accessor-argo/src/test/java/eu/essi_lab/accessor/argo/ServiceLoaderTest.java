@@ -29,7 +29,7 @@ public class ServiceLoaderTest {
 
 	    accessors.sort((a1, a2) -> a1.getClass().getName().compareTo(a2.getClass().getName()));
 
-	    Assert.assertEquals(1, accessors.size());
+	    Assert.assertEquals(2, accessors.size());
 
 	    Assert.assertEquals(ARGOAccessor.class, accessors.get(0).getClass());
 
@@ -40,7 +40,7 @@ public class ServiceLoaderTest {
 
 	    accessors.sort((a1, a2) -> a1.getClass().getName().compareTo(a2.getClass().getName()));
 
-	    Assert.assertEquals(1, accessors.size());
+	    Assert.assertEquals(2, accessors.size());
 
 	    Assert.assertEquals(ARGOAccessor.class, accessors.get(0).getClass());
 	}
@@ -58,7 +58,7 @@ public class ServiceLoaderTest {
 
 	ServiceLoader<IHarvestedQueryConnector> loader = ServiceLoader.load(IHarvestedQueryConnector.class);
 
-	Assert.assertEquals(1, StreamUtils.iteratorToStream(loader.iterator()).count());
+	Assert.assertEquals(2, StreamUtils.iteratorToStream(loader.iterator()).count());
 
 	Assert.assertTrue(//
 		StreamUtils

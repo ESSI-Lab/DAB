@@ -62,7 +62,8 @@ public class BLUECloudReport extends MetadataReport {
 		ICOS("icos-marine", "ICOS Marine"), //
 		ICOS_SOCAT("icos-socat", "ICOS SOCAT"), //
 		ICOS_DATA_PORTAL("icos-data-portal", "ICOS Data Portal"), // ;
-		ELIXIR_ENA_TEST("elixir-ena-test", "ELIXIR-ENA-TEST");
+		ELIXIR_ENA_TEST("elixir-ena-test", "ELIXIR-ENA-TEST"),
+		ARGO_TEST("argo-test", "ARGO-TEST");
 
 		private String label;
 
@@ -142,7 +143,7 @@ public class BLUECloudReport extends MetadataReport {
 
 	public static void main(String[] args) throws Exception {
 
-		new BLUECloudReport(null,false, 200, new String[] { "emodnet-physics" });
+		new BLUECloudReport(null,false, 200, new String[] { "argo-test" });
 
 	}
 
