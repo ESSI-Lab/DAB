@@ -209,7 +209,9 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 	// adding extracted information in ISO 19115-2 (where possible) and extended
 	// parts
 	// PARAMETER IDENTIFIERS
+	String platform_family = null;
 
+	MIPlatform platform = null;
 	for (int i = 0; i < themes.length(); i++) {
 	    JSONObject themeObj = themes.getJSONObject(i);
 	    if (themeObj != null && !themeObj.isEmpty()) {
@@ -250,7 +252,7 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 			if (conceptDescription != null) {
 			    myInstrument.setDescription(conceptDescription);
 			}
-			myInstrument.setTitle(conceptTitle);
+			myInstrument.setTitle(conceptId);
 			coreMetadata.getMIMetadata().addMIInstrument(myInstrument);
 			Keywords keyword = new Keywords();
 			keyword.setTypeCode("instrument");
@@ -266,7 +268,7 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 			if (conceptDescription != null) {
 			    myInstrument26.setDescription(conceptDescription);
 			}
-			myInstrument26.setTitle(conceptTitle);
+			myInstrument26.setTitle(conceptId);
 			coreMetadata.getMIMetadata().addMIInstrument(myInstrument26);
 			Keywords keyword26 = new Keywords();
 			keyword26.setTypeCode("instrument");
@@ -281,7 +283,7 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 			if (conceptDescription != null) {
 			    myInstrument27.setDescription(conceptDescription);
 			}
-			myInstrument27.setTitle(conceptTitle);
+			myInstrument27.setTitle(conceptId);
 			coreMetadata.getMIMetadata().addMIInstrument(myInstrument27);
 			Keywords keyword27 = new Keywords();
 			keyword27.setTypeCode("instrument");
@@ -290,31 +292,32 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 			break;
 		    // R022 -> platform family
 		    case "http://vocab.nerc.ac.uk/collection/R22/current/":
-			MIPlatform platform22 = new MIPlatform();
-			platform22.setMDIdentifierCode(platformCode);
-			if (conceptDescription != null) {
-			    platform22.setDescription(conceptDescription);
-			}
-			Citation platformCitation22 = new Citation();
-			platformCitation22.setTitle(conceptTitle);
-			platform22.setCitation(platformCitation22);
-			coreMetadata.getMIMetadata().addMIPlatform(platform22);
-			Keywords keyword22 = new Keywords();
-			keyword22.setTypeCode("platform");
-			keyword22.addKeyword(conceptId, conceptURL);
-			coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword22);
+			// platform_family = conceptId;
+			// MIPlatform platform22 = new MIPlatform();
+			// platform22.setMDIdentifierCode(platformCode);
+			// if (conceptDescription != null) {
+			// platform22.setDescription(conceptDescription);
+			// }
+			// Citation platformCitation22 = new Citation();
+			// platformCitation22.setTitle(conceptTitle);
+			// platform22.setCitation(platformCitation22);
+			// coreMetadata.getMIMetadata().addMIPlatform(platform22);
+			// Keywords keyword22 = new Keywords();
+			// keyword22.setTypeCode("platform");
+			// keyword22.addKeyword(conceptId, conceptURL);
+			// coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword22);
 			break;
 		    // R23 -> platform type
 		    case "http://vocab.nerc.ac.uk/collection/R23/current/":
-			MIPlatform platform23 = new MIPlatform();
-			platform23.setMDIdentifierCode(platformCode);
+			platform = new MIPlatform();
+			platform.setMDIdentifierCode(platformCode);
 			if (conceptDescription != null) {
-			    platform23.setDescription(conceptDescription);
+			    platform.setDescription(conceptDescription);
 			}
 			Citation platformCitation23 = new Citation();
-			platformCitation23.setTitle(conceptTitle);
-			platform23.setCitation(platformCitation23);
-			coreMetadata.getMIMetadata().addMIPlatform(platform23);
+			platformCitation23.setTitle(conceptId);
+			platform.setCitation(platformCitation23);
+			coreMetadata.getMIMetadata().addMIPlatform(platform);
 			Keywords keyword23 = new Keywords();
 			keyword23.setTypeCode("platform");
 			keyword23.addKeyword(conceptId, conceptURL);
@@ -345,13 +348,50 @@ public class ARGOSTACMapper extends FileIdentifierMapper {
 	    }
 	}
 
+	if (platform != null) {
+	    String platTitle = platform.getCitation().getTitle();
+	    if (constellation != null) {
+		platTitle = platTitle + " " + constellation;
+	    }
+	    if (platform_maker != null) {
+		platTitle = platTitle + " " + platform_maker;
+	    }
+	    platform.getCitation().setTitle(platTitle);
+	}
+
 	// responsible parties
 
 	if (PI_name != null) {
 	    ResponsibleParty principalInvestigator = new ResponsibleParty();
 	    principalInvestigator.setIndividualName(PI_name);
-	    principalInvestigator.setRoleCode("originator");
+	    principalInvestigator.setRoleCode("owner");
 	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(principalInvestigator);
+	}
+
+	if (providers != null) {
+	    for (int j = 0; j < providers.length(); j++) {
+
+		JSONObject provObj = providers.getJSONObject(j);
+		if (provObj != null) {
+		    String provName = getString(provObj, "name");
+		    if (!provName.equals(PI_name)) {
+			ResponsibleParty respParty = new ResponsibleParty();
+			respParty.setOrganisationName(provName);
+			JSONArray roles = getJSONArray(provObj, "roles");
+			if (!roles.isEmpty()) {
+			    String role = roles.getString(0);
+			    if (role.equals("host")) {
+				respParty.setRoleCode("publisher");
+			    } else if (role.equals("producer")) {
+				respParty.setRoleCode("originator");
+			    } else {
+				respParty.setRoleCode(role);
+			    }
+			}
+			coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(respParty);
+		    }
+		}
+	    }
 	}
 
 	// units of measures
