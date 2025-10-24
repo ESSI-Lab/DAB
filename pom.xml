@@ -375,9 +375,7 @@
 		<org.sonarsource.java-sonar-jacoco-listeners.version>3.8</org.sonarsource.java-sonar-jacoco-listeners.version>
 
 		<!-- Docker images -->
-		<mySQLDocker.registry>
-            mysql:9.5.0</mySQLDocker.registry>
-
+		<mySQLDocker.registry>mysql:9.5.0</mySQLDocker.registry>
 		<docker.elasticsearch>opensearchproject/opensearch:1.3.5</docker.elasticsearch>
         <docker.keycloak>keycloak/keycloak:26.4.1</docker.keycloak>
         <docker.redis>redis:8.2.2</docker.redis>

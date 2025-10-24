@@ -118,6 +118,9 @@
                         <artifactId>docker-maven-plugin</artifactId>
 
                         <configuration>
+                            <authConfig>
+                                <skip>true</skip>
+                            </authConfig>
                             <images>
 
                                 <image>
