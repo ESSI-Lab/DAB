@@ -884,11 +884,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	if (semanticSearch && !ontologyIds.isEmpty()) {
 
 	    SemanticSearchSupport support = new SemanticSearchSupport();
-	    support.setExpansionLevelParam(OSParameters.SEMANTIC_EXPANSION_LEVEL.getName());
-	    support.setExpansionLimitParam(OSParameters.SEMANTIC_EXPANSION_LIMIT.getName());
-	    support.setRelationsParam(OSParameters.SEMANTIC_RELATIONS.getName());
-	    support.setSearchLangsParam(OSParameters.SEMANTIC_SEARCH_LANGS.getName());
-	    support.setSourceLangsParam(OSParameters.SEMANTIC_SOURCE_LANGS.getName());
 
 	    return support.getSemanticBond(parser.getParser(), searchValue, ontologyIds, searchFields, withObsPropURIs);
 	}

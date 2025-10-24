@@ -23,7 +23,6 @@ package eu.essi_lab.profiler.bnhs;
 
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;

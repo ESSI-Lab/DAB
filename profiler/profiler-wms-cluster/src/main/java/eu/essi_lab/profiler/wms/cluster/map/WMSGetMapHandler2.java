@@ -1052,7 +1052,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
      */
     private void addAttributeTitleBond(KeyValueParser parser, LogicalBond andBond) {
 
-	Optional<String> attributeTitle = parser.getOptionalValue("attributeTitle");
+	Optional<String> attributeTitle = parser.getOptionalValue(SemanticSearchSupport.ATTRIBUTE_TITLE_PARAM);
 
 	if (attributeTitle.isPresent() && !attributeTitle.get().equals(KeyValueParser.UNDEFINED)) {
 
@@ -1066,16 +1066,11 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	    for (String title : attributeTitles) {
 
-		Optional<String> ontologyIds = parser.getOptionalValue("ontologyIds");
+		Optional<String> ontologyIds = parser.getOptionalValue(SemanticSearchSupport.ONTOLOGY_IDS_PARAM);
 
 		if (ontologyIds.isPresent()) {
 
 		    SemanticSearchSupport support = new SemanticSearchSupport();
-		    support.setExpansionLevelParam("expansionLevel");
-		    support.setExpansionLimitParam("expansionLimit");
-		    support.setRelationsParam("semanticRelations");
-		    support.setSearchLangsParam("searchLangs");
-		    support.setSourceLangsParam("sourceLangs");
 
 		    Optional<Bond> semanticBond = support.getSemanticBond(//
 			    parser, //
@@ -1099,7 +1094,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    }
 
 	    BondFactory.aggregate(operands, LogicalOperator.OR).ifPresent(bond -> andBond.getOperands().add(bond));
-	}	
+	}
     }
 
     private void addSimpleValueBonds(KeyValueParser parser, String propertyName, LogicalBond andBond, MetadataElement element) {

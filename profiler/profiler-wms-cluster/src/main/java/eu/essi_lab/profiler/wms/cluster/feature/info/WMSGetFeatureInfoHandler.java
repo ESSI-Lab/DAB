@@ -260,30 +260,25 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 
 		    // we are interested only on downloadable datasets
 		    ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
-//		     operands.add(accessBond);
+		    // operands.add(accessBond);
 
 		    // we are interested only on downloadable datasets
 		    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
-//		     operands.add(downBond);
+		    // operands.add(downBond);
 
 		    // we are interested only on TIME SERIES datasets
 		    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
-		     operands.add(timeSeriesBond);
+		    operands.add(timeSeriesBond);
 
 		    Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
 
-		    String ontologyIds = getParam(parameterMap, "ontologyIds");
-		    String attributeTitle = getParam(parameterMap, "attributeTitle");
-		    String semanticSearch = getParam(parameterMap, "semanticSearch");
+		    String ontologyIds = getParam(parameterMap, SemanticSearchSupport.ONTOLOGY_IDS_PARAM);
+		    String attributeTitle = getParam(parameterMap, SemanticSearchSupport.ATTRIBUTE_TITLE_PARAM);
+		    String semanticSearch = getParam(parameterMap, SemanticSearchSupport.SEMANTIC_SEARCH_PARAM);
 
-		    if (ontologyIds != null && attributeTitle != null && semanticSearch!= null && semanticSearch.equals("true")) {
+		    if (ontologyIds != null && attributeTitle != null && semanticSearch != null && semanticSearch.equals("true")) {
 
 			SemanticSearchSupport support = new SemanticSearchSupport();
-			support.setExpansionLevelParam("expansionLevel");
-			support.setExpansionLimitParam("expansionLimit");
-			support.setRelationsParam("semanticRelations");
-			support.setSearchLangsParam("searchLangs");
-			support.setSourceLangsParam("sourceLangs");
 
 			Optional<Bond> bond = support.getSemanticBond(//
 				webRequest, //
