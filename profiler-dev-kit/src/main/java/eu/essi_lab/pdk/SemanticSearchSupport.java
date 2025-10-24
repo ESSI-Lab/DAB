@@ -54,7 +54,7 @@ import eu.essi_lab.model.resource.MetadataElement;
  */
 public class SemanticSearchSupport {
 
-    public static final String ONTOLOGY_IDS_PARAM = "ontology";
+    public static final String ONTOLOGY_IDS_PARAM = "ontologyIds";
     public static final String ATTRIBUTE_TITLE_PARAM = "attributeTitle";
     public static final String SEMANTIC_SEARCH_PARAM = "semanticSearch";
 
