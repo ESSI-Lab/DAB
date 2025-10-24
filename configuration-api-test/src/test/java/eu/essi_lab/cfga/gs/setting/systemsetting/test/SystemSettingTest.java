@@ -17,6 +17,8 @@ public class SystemSettingTest {
     public void test() {
 
 	SystemSetting setting = new SystemSetting();
+	
+	System.out.println(setting);
 
 	initTest(setting);
 	initTest(new SystemSetting(setting.getObject()));

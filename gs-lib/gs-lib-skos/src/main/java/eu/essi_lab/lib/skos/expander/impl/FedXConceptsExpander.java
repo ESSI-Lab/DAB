@@ -56,7 +56,7 @@ import eu.essi_lab.lib.utils.ThreadMode.SingleThreadMode;
 /**
  * @author Fabrizio
  */
-public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
+public class FedXConceptsExpander extends AbstractConceptsExpander<QueryTask> {
 
     protected ThreadMode threadMode;
     protected FedXConfig engineConfig;
@@ -330,6 +330,14 @@ public class FedXConceptsExpander  extends AbstractConceptsExpander<QueryTask> {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Expanding concept of level {} ENDED", currentLevel);
 	});
+    }
+
+    /**
+     * @return the
+     */
+    public DefaultExpandConceptsQueryBuilder getQueryBuilder() {
+
+	return (DefaultExpandConceptsQueryBuilder) super.getQueryBuilder();
     }
 
 }

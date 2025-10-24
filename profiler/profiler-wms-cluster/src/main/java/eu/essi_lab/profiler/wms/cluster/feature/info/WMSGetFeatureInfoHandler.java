@@ -31,12 +31,10 @@ import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -58,7 +56,6 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
@@ -71,12 +68,11 @@ import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.CRSUtils;
 import eu.essi_lab.pdk.BondUtils;
-import eu.essi_lab.pdk.Semantics;
+import eu.essi_lab.pdk.SemanticSearchSupport;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 
 /**
  * @author boldrini
@@ -152,9 +148,8 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		    if (jParameter != null) {
 			j = Integer.parseInt(jParameter);
 		    }
-		    
-		    Set<Bond> operands = new HashSet<>();
 
+		    List<Bond> operands = new ArrayList<>();
 
 		    if (bboxString != null && crs != null) {
 			String[] split = bboxString.split(",");
@@ -263,27 +258,41 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		    Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 		    WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
 
-		
 		    // we are interested only on downloadable datasets
 		    ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
-		    operands.add(accessBond);
+//		     operands.add(accessBond);
 
 		    // we are interested only on downloadable datasets
 		    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
-		    operands.add(downBond);
+//		     operands.add(downBond);
 
 		    // we are interested only on TIME SERIES datasets
 		    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
-		    operands.add(timeSeriesBond);
+		     operands.add(timeSeriesBond);
 
 		    Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
-		    String ont = getParam(parameterMap, "ontology");
-		    String attributeTitle = getParam(parameterMap, "attributeTitle");
-		    String semantics = getParam(parameterMap, "semantics");
 
-		    if (ont != null && attributeTitle != null) {
-			Bond bond = Semantics.getSemanticBond(attributeTitle, semantics, ont);
-			operands.add(bond);
+		    String ontologyIds = getParam(parameterMap, "ontologyIds");
+		    String attributeTitle = getParam(parameterMap, "attributeTitle");
+		    String semanticSearch = getParam(parameterMap, "semanticSearch");
+
+		    if (ontologyIds != null && attributeTitle != null && semanticSearch!= null && semanticSearch.equals("true")) {
+
+			SemanticSearchSupport support = new SemanticSearchSupport();
+			support.setExpansionLevelParam("expansionLevel");
+			support.setExpansionLimitParam("expansionLimit");
+			support.setRelationsParam("semanticRelations");
+			support.setSearchLangsParam("searchLangs");
+			support.setSourceLangsParam("sourceLangs");
+
+			Optional<Bond> bond = support.getSemanticBond(//
+				webRequest, //
+				attributeTitle, //
+				ontologyIds, //
+				MetadataElement.ATTRIBUTE_TITLE_EL_NAME, //
+				true);
+
+			bond.ifPresent(b -> operands.add(b));
 		    }
 
 		    String instrumentTitle = getParam(parameterMap, "instrumentTitle");
@@ -355,7 +364,15 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			}
 		    }
 
-		    discoveryMessage.setUserBond(BondFactory.createAndBond(operands));
+		    Bond bond = null;
+		    if (operands.size() == 0) {
+			bond = null;
+		    } else if (operands.size() == 1) {
+			bond = operands.iterator().next();
+		    } else if (operands.size() > 1) {
+			bond = BondFactory.createAndBond(operands);
+		    }
+		    discoveryMessage.setUserBond(bond);
 
 		    discoveryMessage.setSources(ConfigurationWrapper.getViewSources(view.get()));
 		    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());

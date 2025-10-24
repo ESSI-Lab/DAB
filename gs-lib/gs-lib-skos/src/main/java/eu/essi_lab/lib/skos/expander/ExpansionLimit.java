@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.lib.skos.expander;
 
+import java.util.Optional;
+
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /*-
@@ -82,6 +84,25 @@ public class ExpansionLimit {
 	out.target = target;
 	out.limit = limit == 0 ? Integer.MAX_VALUE : limit;
 	return out;
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    public static Optional<ExpansionLimit> of(String value) {
+
+	try {
+
+	    LimitTarget target = LimitTarget.valueOf(value.split(":")[0].replace("[", ""));
+	    Integer limit = Integer.valueOf(value.split(":")[1].replace("]", ""));
+
+	    return Optional.of(ExpansionLimit.of(target, limit));
+
+	} catch (Exception ex) {
+
+	    return Optional.empty();
+	}
     }
 
     /**

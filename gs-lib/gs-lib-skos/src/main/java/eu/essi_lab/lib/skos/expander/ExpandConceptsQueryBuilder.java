@@ -51,4 +51,12 @@ public interface ExpandConceptsQueryBuilder {
 	    List<SKOSSemanticRelation> relations, //
 	    ExpansionLevel target, //
 	    ExpansionLevel current);
+
+    /**
+     * @return
+     */
+    default boolean isNoLanguageConceptsIncluded() {
+
+	return false;
+    }
 }

@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -77,7 +76,7 @@ import eu.essi_lab.model.resource.BNHSPropertyReader;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.BondUtils;
-import eu.essi_lab.pdk.Semantics;
+import eu.essi_lab.pdk.SemanticSearchSupport;
 import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
@@ -159,11 +158,11 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    // we are interested only on downloadable datasets
 	    ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
-	    operands.add(accessBond);
+	    // operands.add(accessBond);
 
 	    // we are interested only on downloadable datasets
 	    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
-	    operands.add(downBond);
+	    // operands.add(downBond);
 
 	    // we are interested only on TIME SERIES datasets
 	    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
@@ -177,13 +176,28 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    operands.add(platformBond);
 
 	    Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
-	    String ont = getParam(parameterMap, "ontology");
-	    String attributeTitle = getParam(parameterMap, "attributeTitle");
-	    String semantics = getParam(parameterMap, "semantics");
 
-	    if (ont != null && attributeTitle != null) {
-		Bond bond = Semantics.getSemanticBond(attributeTitle, semantics, ont);
-		operands.add(bond);
+	    String ontologyIds = getParam(parameterMap, "ontology");
+	    String attributeTitle = getParam(parameterMap, "attributeTitle");
+	    String semanticSearch = getParam(parameterMap, "semanticSearch");
+
+	    if (ontologyIds != null && attributeTitle != null && semanticSearch != null && semanticSearch.equals("true")) {
+
+		SemanticSearchSupport support = new SemanticSearchSupport();
+		support.setExpansionLevelParam("expansionLevel");
+		support.setExpansionLimitParam("expansionLimit");
+		support.setRelationsParam("semanticRelations");
+		support.setSearchLangsParam("searchLangs");
+		support.setSourceLangsParam("sourceLangs");
+
+		Optional<Bond> bond = support.getSemanticBond(//
+			webRequest, //
+			attributeTitle, //
+			ontologyIds, //
+			MetadataElement.ATTRIBUTE_TITLE_EL_NAME, //
+			true);
+
+		bond.ifPresent(b -> operands.add(b));
 	    }
 
 	    String instrumentTitle = getParam(parameterMap, "instrumentTitle");
@@ -238,7 +252,17 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		}
 	    }
 
-	    LogicalBond bond = BondFactory.createAndBond(operands);
+	    Bond bond = null;
+
+	    switch (operands.size()) {
+	    case 0:
+		break;
+	    case 1:
+		bond = operands.iterator().next();
+		break;
+	    default:
+		bond = BondFactory.createAndBond(operands);
+	    }
 
 	    StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 

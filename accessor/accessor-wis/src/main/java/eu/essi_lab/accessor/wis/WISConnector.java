@@ -82,11 +82,13 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
     @Override
     public boolean supports(GSSource source) {
 	String url = source.getEndpoint();
-	if(!url.endsWith("oapi")){
-	    
+	if (!url.endsWith("oapi")) {
+
 	    return false;
 	}
-	
+	if (!this.getSourceURL().equals(url)) {
+	    return false;
+	}
 	try {
 	    WISClient client = new WISClient(url);
 	    if (!client.getStations().isEmpty()) {
@@ -94,7 +96,7 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 	    }
 	} catch (Exception e) {
 	}
-	
+
 	return false;
     }
 
@@ -125,7 +127,12 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 	JSONArray themes = properties.getJSONArray("themes");
 	String title = properties.getString("title");
 	String rights = properties.optString("rights");
-	JSONArray providers = properties.getJSONArray("providers");
+	JSONArray providers = new JSONArray();
+	if (properties.has("providers")) {
+	    providers = properties.getJSONArray("providers");
+	} else if (properties.has("contacts")) {
+	    providers = properties.getJSONArray("contacts");
+	}
 
 	final int GET_VARIABLES_MAX_ATTEMPTS = 2;
 	final int GET_VARIABLES_ATTEMPTS_TIME = 5;// seconds
@@ -205,8 +212,7 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 			String warn = "Invalid longitude for station: " + platformIdentifier;
 			GSLoggerFactory.getLogger(getClass()).error(warn);
 		    }
-		    coreMetadata.getMIMetadata().getDataIdentification().addGeographicBoundingBox(north.doubleValue(), east.doubleValue(),
-			    north.doubleValue(), east.doubleValue());
+		    coreMetadata.getMIMetadata().getDataIdentification().addGeographicBoundingBox(north, east, north, east);
 		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(getClass()).error("Unable to parse site latitude/longitude: " + e.getMessage());
 		}
@@ -244,63 +250,112 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 		    List<String> roles = new ArrayList<>();
 		    JSONArray rolesJSON = provider.getJSONArray("roles");
 		    for (int j = 0; j < rolesJSON.length(); j++) {
-			JSONObject roleJSON = rolesJSON.getJSONObject(j);
-			String roleName = roleJSON.getString("name");
-			roles.add(roleName);
+			JSONObject roleJSON = rolesJSON.optJSONObject(j);
+			if (roleJSON != null) {
+			    String roleName = roleJSON.getString("name");
+			    roles.add(roleName);
+			} else {
+			    String roleName = rolesJSON.getString(j);
+			    roles.add(roleName);
+			}
 		    }
 		    try {
 			for (String role : roles) {
-			    String name = provider.getString("name");
-			    String individual = provider.getString("name");
-			    String position = provider.getString("positionName");
+			    String organization = provider.optString("organization");
+			    String individual = provider.optString("name");
+			    String position = provider.optString("positionName");
 
 			    ResponsibleParty poc = new ResponsibleParty();
 			    poc.setIndividualName(individual);
-			    poc.setOrganisationName(name);
+			    poc.setOrganisationName(organization);
 			    poc.setPositionName(position);
 			    poc.setRoleCode(role);
 			    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(poc);
 
-			    JSONObject contactInfo = provider.getJSONObject("contactInfo");
-			    JSONObject phone = contactInfo.getJSONObject("phone");
-			    String phoneAddress = phone.getString("office");
-			    JSONObject email = contactInfo.getJSONObject("email");
-			    String emailAddress = email.getString("office");
+			    String phoneAddress = null;
+			    List<String> emailAddresses = new ArrayList<String>();
+			    String deliveryPoint = null;
+			    String city = null;
+			    String administrativeArea = null;
+			    String postalCode = null;
+			    String country = null;
+			    Online online = new Online();
 
+			    JSONObject contactInfo = provider.optJSONObject("contactInfo");
+			    if (contactInfo != null) {
+				JSONObject phone = contactInfo.optJSONObject("phone");
+				if (phone != null) {
+				    phoneAddress = phone.optString("office");
+				}
+				JSONObject email = contactInfo.optJSONObject("email");
+				if (email != null) {
+				    String em = email.optString("office");
+				    if (em != null) {
+					emailAddresses.add(em);
+				    }
+				}
+				JSONObject addressJSON = contactInfo.optJSONObject("address");
+				if (addressJSON != null) {
+				    JSONObject officeAddress = addressJSON.optJSONObject("office");
+				    if (officeAddress != null) {
+					deliveryPoint = officeAddress.optString("deliveryPoint");
+					city = officeAddress.optString("city");
+					administrativeArea = officeAddress.optString("administrativeArea");
+					postalCode = officeAddress.optString("postalCode");
+					country = officeAddress.getString("country");
+				    }
+				    if (addressJSON.has("onlineResource")) {
+					JSONObject onlineResource = addressJSON.getJSONObject("onlineResource");
+
+					online.setLinkage(onlineResource.getString("href"));
+
+				    }
+				}
+			    } else {
+				JSONArray emails = provider.optJSONArray("emails");
+				if (emails != null) {
+				    for (int j = 0; j < emails.length(); j++) {
+					Object emailObject = emails.get(j);
+					if (emailObject instanceof String) {
+					    String str = (String) emailObject;
+					    emailAddresses.add(str);
+					} else if (emailObject instanceof JSONObject) {
+					    JSONObject email = (JSONObject) emailObject;
+					    String v = email.optString("value");
+					    if (v != null) {
+						emailAddresses.add(v);
+					    }
+					}
+				    }
+				}
+				JSONArray addresses = provider.optJSONArray("addresses");
+				if (addresses != null && addresses.length() > 0) {
+				    JSONObject address = addresses.optJSONObject(0);
+				    deliveryPoint = address.optString("deliveryPoint");
+				    city = address.optString("city");
+				    administrativeArea = address.optString("administrativeArea");
+				    postalCode = address.optString("postalCode");
+				    country = address.getString("country");
+				}
+			    }
 			    Contact contact = new Contact();
 			    contact.addPhoneVoice(phoneAddress);
 			    Address address = new Address();
-			    address.addElectronicMailAddress(emailAddress);
+
+			    for (String email : emailAddresses) {
+				address.addElectronicMailAddress(email);
+			    }
+
 			    contact.setAddress(address);
 			    poc.setContactInfo(contact);
 
-			    JSONObject addressJSON = contactInfo.getJSONObject("address");
-			    JSONObject officeAddress = addressJSON.getJSONObject("office");
-			    String deliveryPoint = officeAddress.getString("deliveryPoint");
 			    address.addDeliveryPoint(deliveryPoint);
-			    String city = officeAddress.getString("city");
 			    address.setCity(city);
-			    String administrativeArea = officeAddress.getString("administrativeArea");
 			    address.setAdministrativeArea(administrativeArea);
-			    String postalCode = officeAddress.getString("postalCode");
+
 			    address.setPostalCode(postalCode);
-			    String country = officeAddress.getString("country");
 			    address.setCountry(country);
-
-			    if (addressJSON.has("onlineResource")) {
-
-				JSONObject onlineResource = addressJSON.getJSONObject("onlineResource");
-				Online online = new Online();
-				online.setLinkage(onlineResource.getString("href"));
-				contact.setOnline(online);
-			    }
-
-			    // String hoursOfService = contactInfo.getString("hoursOfService");
-			    // String contactInstructions = contactInfo.getString("contactInstructions");
-			    // JSONObject url = contactInfo.getJSONObject("url");
-			    // String urlRel = url.getString("rel");
-			    // String urlType = url.getString("type");
-			    // String urlHref = url.getString("href");
+			    contact.setOnline(online);
 
 			}
 		    } catch (Exception e) {

@@ -1,5 +1,7 @@
 package eu.essi_lab.cfga.scheduler.test;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.junit.Before;
@@ -20,7 +22,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class PersistentSchedulerInternalTestIT extends SchedulerTest {
 
     /**
-     * 
+     *
      */
     private static Scheduler scheduler;
 
@@ -64,8 +66,18 @@ public class PersistentSchedulerInternalTestIT extends SchedulerTest {
 	setting.setJobStoreType(JobStoreType.PERSISTENT);
 	setting.setUserDateTimeZone("UTC");
 
+	String dbUri = System.getProperty("mysql.host");
+//	String dbUri = "jdbc:mysql://localhost:3306";
+
 	setting.setSQLDatabaseName("quartzJobStore");
-	setting.setSQLDatabaseUri(System.getProperty("mysql.host"));
+	setting.setSQLDatabaseUri(dbUri);
+	String url = dbUri + "?useSSL=false&allowPublicKeyRetrieval=true";
+	try {
+	    Connection conn = DriverManager.getConnection(url, "root", "pdw");
+	} catch (SQLException e) {
+	    throw new RuntimeException(e);
+	}
+
 	setting.setSQLDatabaseUser("root");
 	setting.setSQLDatabasePassword("pdw");
 

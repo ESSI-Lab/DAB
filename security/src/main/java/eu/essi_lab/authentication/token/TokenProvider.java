@@ -75,8 +75,17 @@ public class TokenProvider {
     private Verification verifier;
     private ObjectMapper mapper;
 
+    //TODO remove this constructor
     public TokenProvider() {
 	hMACSecretPassphrase = Base64.getEncoder().encode("hMACSecretPassphrase".getBytes(StandardCharsets.UTF_8));
+	hmac256 = Algorithm.HMAC256(hMACSecretPassphrase);
+	jwtBuilder = JWT.create();
+	verifier = JWT.require(hmac256);
+	mapper = new ObjectMapper();
+    }
+
+    public TokenProvider(String secp) {
+	hMACSecretPassphrase = Base64.getEncoder().encode(secp.getBytes(StandardCharsets.UTF_8));
 	hmac256 = Algorithm.HMAC256(hMACSecretPassphrase);
 	jwtBuilder = JWT.create();
 	verifier = JWT.require(hmac256);

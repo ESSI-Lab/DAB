@@ -267,7 +267,7 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	// dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
 	dataset.getExtensionHandler().setAttributeUnits(units);
 	dataset.getExtensionHandler().setAttributeUnitsAbbreviation(units);
-
+	dataset.getPropertyHandler().setIsTimeseries(true);
 	if (!isAralOrMoldova) {
 	    dataset.getExtensionHandler().setCountry(Country.RUSSIAN_FEDERATION.getShortName());
 	}else if(onlineValues.getLinkage().contains("Moldova")){

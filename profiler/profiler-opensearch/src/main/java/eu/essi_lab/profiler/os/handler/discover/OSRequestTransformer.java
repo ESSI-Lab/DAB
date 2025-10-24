@@ -2,13 +2,10 @@ package eu.essi_lab.profiler.os.handler.discover;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,18 +37,9 @@ import com.google.common.collect.Lists;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
-import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
-import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
-import eu.essi_lab.lib.net.utils.whos.HydroOntology;
-import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.odip.rosetta.RosettaStone;
 import eu.essi_lab.lib.odip.rosetta.RosettaStoneConnector;
-import eu.essi_lab.lib.skos.SKOSClient;
-import eu.essi_lab.lib.skos.SKOSResponse;
-import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
-import eu.essi_lab.lib.skos.finder.impl.DefaultConceptsFinder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ThreadMode;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.DiscoveryMessage.EiffelAPIDiscoveryOption;
@@ -63,9 +51,7 @@ import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
-import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
@@ -80,7 +66,8 @@ import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.pdk.Semantics;
+import eu.essi_lab.pdk.BondUtils;
+import eu.essi_lab.pdk.SemanticSearchSupport;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.pdk.wrt.WebRequestParameter;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
@@ -114,6 +101,14 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	SUPPORTED_OUTPUT_FORMATS.add(MediaType.APPLICATION_JSON);
 	SUPPORTED_OUTPUT_FORMATS.add(MediaType.APPLICATION_ATOM_XML);
 	SUPPORTED_OUTPUT_FORMATS.add(NameSpace.GS_DATA_MODEL_XML_MEDIA_TYPE);
+    }
+
+    /**
+     * @param setting
+     */
+    public OSRequestTransformer() {
+
+	this(new OSProfilerSetting());
     }
 
     /**
@@ -208,7 +203,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    // Term frequency
 	    //
 
-	    handleTermFrequncy(parser, message);
+	    handleTermFrequency(parser, message);
 	}
 
 	return message;
@@ -378,10 +373,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	// creates the bond list
 	ArrayList<Bond> bondList = new ArrayList<>();
 
-	String rosetta = parser.parse(OSParameters.ROSETTA);
-	String semantics = parser.parse(OSParameters.SEMANTIC_SEARCH);
-	String ontology = parser.parse(OSParameters.ONTOLOGY_IDS);
-
 	//
 	// search terms are NOT included in case of Eiffel SORT_AND_FILTER
 	//
@@ -389,14 +380,58 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (!eiffelOption.isPresent() || eiffelOption.get() == EiffelAPIDiscoveryOption.FILTER_AND_SORT) {
 
-	    //
-	    // creates the search terms bond
-	    //
-	    Bond searchTermsBond = createSearchTermsBond(request, parser, eiffelOption.isPresent(), semantics, ontology);
+	    Optional<String> searchTerms = parser.optParse(OSParameters.SEARCH_TERMS);
 
-	    if (searchTermsBond != null) {
+	    String searchFields = parser.parse(OSParameters.SEARCH_FIELDS);
 
-		bondList.add(searchTermsBond);
+	    //
+	    // search terms
+	    //
+
+	    if (searchTerms.isPresent()) {
+
+		Optional<Bond> searchTermsBond = createSearchTermsBond(parser, searchTerms.get(), searchFields, eiffelOption.isPresent());
+
+		if (searchTermsBond.isPresent()) {
+
+		    bondList.add(searchTermsBond.get());
+		}
+	    }
+
+	    //
+	    // attribute title
+	    //
+
+	    Optional<String> attrTitle = parser.optParse(OSParameters.ATTRIBUTE_TITLE);
+
+	    if (attrTitle.isPresent()) {
+
+		Optional<Bond> bond = createSearchTermsBond(//
+			parser, //
+			attrTitle.get(), //
+			MetadataElement.ATTRIBUTE_TITLE_EL_NAME, //
+			eiffelOption.isPresent());
+
+		if (bond.isPresent()) {
+
+		    bondList.add(bond.get());
+		}
+	    }
+
+	    //
+	    // concept URI
+	    //
+
+	    Optional<String> conceptUri = parser.optParse(OSParameters.SEMANTIC_CONCEPT_URI);
+
+	    if (conceptUri.isPresent()) {
+
+		Optional<Bond> conceptURIBond = createSearchTermsBond(parser, conceptUri.get(), searchFields, eiffelOption.isPresent());
+
+		if (conceptURIBond.isPresent()) {
+
+		    bondList.add(conceptURIBond.get());
+		}
 	    }
 	}
 
@@ -407,6 +442,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	// adds the bonds created from the the available OS params
 	List<OSParameter> parameters = WebRequestParameter.findParameters(OSParameters.class);
+
+	String rosetta = parser.parse(OSParameters.ROSETTA);
 
 	for (OSParameter osParameter : parameters) {
 
@@ -432,14 +469,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			|| osParameter.getName().equals(OSParameters.SEARCH_FIELDS.getName())) {
 
 		    continue;
-		}
-
-		//
-		// semantics and ontology
-		//
-		if (osParameter.equals(OSParameters.ATTRIBUTE_TITLE) && value != null) {
-
-		    handleSemanticsAndOntology(bondList, value, semantics, ontology);
 		}
 
 		//
@@ -499,18 +528,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    }
 	}
 
-	Bond bond = null;
-
-	if (bondList.size() > 1) {
-
-	    bond = BondFactory.createAndBond(bondList.toArray(new Bond[] {}));
-
-	} else if (bondList.size() == 1) {
-
-	    bond = bondList.get(0);
-	}
-
-	return bond;
+	return BondFactory.aggregate(bondList, LogicalOperator.AND).orElse(null);
     }
 
     @Override
@@ -651,64 +669,10 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     /**
-     * @param bondList
-     * @param value
-     * @param semantics
-     * @param ontology
-     */
-    private void handleSemanticsAndOntology(List<Bond> bondList, String value, String semantics, String ontology) {
-
-	Bond semantic = Semantics.getSemanticBond(value, semantics, ontology);
-	if (semantic != null) {
-	    bondList.add(semantic);
-	}
-    }
-
-    /**
-     * @param rosetta
-     * @param value
-     * @return
-     */
-    private String handleRosetta(String rosetta, String value) {
-
-	RosettaStone rs = new RosettaStoneConnector();
-	Set<String> terms = new TreeSet<>();
-	terms.add(value);
-	terms.addAll(rs.getTranslations(value));
-	switch (rosetta) {
-	case "narrow":
-	    Set<String> narrowerTerms = rs.getNarrower(value);
-	    if (narrowerTerms != null) {
-		terms.addAll(narrowerTerms);
-	    }
-	    break;
-	case "broad":
-	    Set<String> broaderTerms = rs.getBroader(value);
-	    if (broaderTerms != null) {
-		terms.addAll(broaderTerms);
-	    }
-	    break;
-
-	case "true":
-	default:
-	    // do nothing, because translations are always added
-	    break;
-	}
-	if (terms != null && !terms.isEmpty()) {
-	    value = createOrSearch(terms);
-	} else {
-	    value = null;
-	}
-
-	return value;
-
-    }
-
-    /**
      * @param parser
      * @param message
      */
-    private void handleTermFrequncy(OSRequestParser parser, DiscoveryMessage message) {
+    private void handleTermFrequency(OSRequestParser parser, DiscoveryMessage message) {
 
 	String termFrequency = parser.parse(OSParameters.TERM_FREQUENCY);
 
@@ -719,123 +683,39 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	for (String v : values) {
 
 	    switch (v) {
-	    case "instrumentDesc":
-		list.add(MetadataElement.INSTRUMENT_DESCRIPTION);
-		break;
-	    case "instrumentTitle":
-		list.add(MetadataElement.INSTRUMENT_TITLE);
-		break;
-	    case "platformDesc":
-		list.add(MetadataElement.PLATFORM_DESCRIPTION);
-		break;
-	    case "platformTitle":
-		list.add(MetadataElement.PLATFORM_TITLE);
-		break;
-	    case "intendedObservationSpacing":
-		list.add(MetadataElement.TIME_RESOLUTION_DURATION_8601);
-		break;
-	    case "aggregationDuration":
-		list.add(MetadataElement.TIME_AGGREGATION_DURATION_8601);
-		break;
-	    case "timeInterpolation":
-		list.add(MetadataElement.TIME_INTERPOLATION);
-		break;
-	    case "orgName":
-		list.add(MetadataElement.ORGANISATION_NAME);
-		break;
-	    case "origOrgDesc":
-		list.add(MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
-	    case "themeCategory":
-		list.add(MetadataElement.THEME_CATEGORY);
-		break;
-	    case "attributeTitle":
-		list.add(MetadataElement.ATTRIBUTE_TITLE);
-		break;
-	    case "attributeURI":
-	    case "observedPropertyURI":
-		list.add(MetadataElement.OBSERVED_PROPERTY_URI);
-		break;
-	    case "instrumentId":
-		list.add(MetadataElement.INSTRUMENT_IDENTIFIER);
-		break;
-	    case "platformId":
-		list.add(MetadataElement.PLATFORM_IDENTIFIER);
-		break;
-	    case "origOrgId":
-		list.add(MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER);
-		break;
-	    case "attributeId":
-		list.add(MetadataElement.ATTRIBUTE_IDENTIFIER);
-		break;
-	    case "keyword":
-		list.add(MetadataElement.KEYWORD);
-		break;
-	    case "format":
-		list.add(MetadataElement.DISTRIBUTION_FORMAT);
-		break;
-	    case "protocol":
-		list.add(MetadataElement.ONLINE_PROTOCOL);
-		break;
-	    case "providerID":
-		list.add(ResourceProperty.SOURCE_ID);
-		break;
-	    case "organisationName":
-		list.add(MetadataElement.ORGANISATION_NAME);
-		break;
-	    case "prodType":
-		list.add(MetadataElement.PRODUCT_TYPE);
-		break;
-	    case "sensorOpMode":
-		list.add(MetadataElement.SENSOR_OP_MODE);
-		break;
-	    case "sensorSwath":
-		list.add(MetadataElement.SENSOR_SWATH);
-		break;
-	    case "sarPolCh":
-		list.add(MetadataElement.SAR_POL_CH);
-		break;
-	    case "sscScore":
-		list.add(ResourceProperty.SSC_SCORE);
-		break;
-	    case "s3InstrumentIdx":
-		list.add(MetadataElement.S3_INSTRUMENT_IDX);
-		break;
-	    case "s3ProductLevel":
-		list.add(MetadataElement.S3_PRODUCT_LEVEL);
-		break;
-	    case "s3Timeliness":
-		list.add(MetadataElement.S3_TIMELINESS);
-		break;
+	    case "instrumentDesc" -> list.add(MetadataElement.INSTRUMENT_DESCRIPTION);
+	    case "instrumentTitle" -> list.add(MetadataElement.INSTRUMENT_TITLE);
+	    case "platformDesc" -> list.add(MetadataElement.PLATFORM_DESCRIPTION);
+	    case "platformTitle" -> list.add(MetadataElement.PLATFORM_TITLE);
+	    case "intendedObservationSpacing" -> list.add(MetadataElement.TIME_RESOLUTION_DURATION_8601);
+	    case "aggregationDuration" -> list.add(MetadataElement.TIME_AGGREGATION_DURATION_8601);
+	    case "timeInterpolation" -> list.add(MetadataElement.TIME_INTERPOLATION);
+	    case "orgName" -> list.add(MetadataElement.ORGANISATION_NAME);
+	    case "origOrgDesc" -> list.add(MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
+	    case "themeCategory" -> list.add(MetadataElement.THEME_CATEGORY);
+	    case "attributeTitle" -> list.add(MetadataElement.ATTRIBUTE_TITLE);
+	    case "attributeURI", "observedPropertyURI" -> list.add(MetadataElement.OBSERVED_PROPERTY_URI);
+	    case "instrumentId" -> list.add(MetadataElement.INSTRUMENT_IDENTIFIER);
+	    case "platformId" -> list.add(MetadataElement.PLATFORM_IDENTIFIER);
+	    case "origOrgId" -> list.add(MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER);
+	    case "attributeId" -> list.add(MetadataElement.ATTRIBUTE_IDENTIFIER);
+	    case "keyword" -> list.add(MetadataElement.KEYWORD);
+	    case "format" -> list.add(MetadataElement.DISTRIBUTION_FORMAT);
+	    case "protocol" -> list.add(MetadataElement.ONLINE_PROTOCOL);
+	    case "providerID" -> list.add(ResourceProperty.SOURCE_ID);
+	    case "organisationName" -> list.add(MetadataElement.ORGANISATION_NAME);
+	    case "prodType" -> list.add(MetadataElement.PRODUCT_TYPE);
+	    case "sensorOpMode" -> list.add(MetadataElement.SENSOR_OP_MODE);
+	    case "sensorSwath" -> list.add(MetadataElement.SENSOR_SWATH);
+	    case "sarPolCh" -> list.add(MetadataElement.SAR_POL_CH);
+	    case "sscScore" -> list.add(ResourceProperty.SSC_SCORE);
+	    case "s3InstrumentIdx" -> list.add(MetadataElement.S3_INSTRUMENT_IDX);
+	    case "s3ProductLevel" -> list.add(MetadataElement.S3_PRODUCT_LEVEL);
+	    case "s3Timeliness" -> list.add(MetadataElement.S3_TIMELINESS);
 	    }
 	}
 
 	message.setTermFrequencyTargets(list);
-
-    }
-
-    private static String createOrSearch(Set<String> terms) {
-	if (terms == null || terms.isEmpty()) {
-	    return null;
-	}
-	ArrayList<String> list = Lists.newArrayList(terms);
-	if (list.size() == 1) {
-	    return list.get(0);
-	}
-
-	StringBuilder sb = new StringBuilder();
-
-	for (int i = 0; i < list.size() - 1; i++) {
-
-	    sb.append(list.get(i));
-
-	    sb.append(" OR ");
-
-	}
-
-	sb.append(list.get(list.size() - 1));
-
-	return sb.toString();
-
     }
 
     /**
@@ -907,61 +787,21 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      * </tr>
      * </table>
      * </body> </html>
-     *
+     * 
+     * @param keyValueParser
      * @param request
      * @param eiffelOption
      */
-    private Bond createSearchTermsBond(//
-	    WebRequest request, //
+    private Optional<Bond> createSearchTermsBond(//
 	    OSRequestParser parser, //
-	    boolean eiffelOption, //
-	    String semantics, //
-	    String ontology) {
-
-	String searchTerms = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_TERMS.getName(), OSParameters.class));
-	String searchFields = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_FIELDS.getName(), OSParameters.class));
-
-	///////////////////////////////////////////////
-	// workaround for HIS-Central to be removed once the ontology functionality
-	// is implemented in the query initializer and in the GI-portal
-	///////////////////////////////////////////////
-	Optional<String> optionalView = request.extractViewId();
-	if (optionalView.isPresent() && optionalView.get().equals("his-central") && Objects.nonNull(searchTerms)
-		&& !searchTerms.isEmpty()) {
-
-	    List<Bond> innerBonds = new ArrayList<>();
-	    innerBonds.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, searchTerms));
-
-	    HydroOntology ho = new HISCentralOntology();
-	    List<SKOSConcept> concepts = ho.findConcepts(searchTerms, true, false);
-	    HashSet<String> uris = new HashSet<String>();
-	    for (SKOSConcept concept : concepts) {
-		uris.add(concept.getURI());
-	    }
-	    if (concepts.isEmpty()) {
-		uris.add("notfounddd");
-	    }
-	    for (String uri : uris) {
-		SimpleValueBond b = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, uri);
-		innerBonds.add(b);
-	    }
-
-	    switch (innerBonds.size()) {
-	    case 0:
-		return null;
-	    case 1:
-		return innerBonds.get(0);
-	    default:
-		return BondFactory.createOrBond(innerBonds);
-	    }
-
-	}
-
-	///////////////////////////////////////////////
+	    String searchTerms, //
+	    String searchFields, //
+	    boolean eiffelOption //
+    ) {
 
 	Optional<Integer> filterAndSortSplitTreshold = EiffelDiscoveryHelper.getFilterAndSortSplitTreshold(setting);
 
-	if (eiffelOption && searchTerms != null && filterAndSortSplitTreshold.isPresent()) {
+	if (eiffelOption && filterAndSortSplitTreshold.isPresent()) {
 
 	    searchFields = "title,keyword,description";
 
@@ -981,188 +821,149 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    searchFields = "title,keyword";
 	}
 
-	if (Objects.nonNull(searchTerms) && !searchTerms.isEmpty()) {
+	LogicalOperator operator = null;
 
-	    if (searchTerms.startsWith("\"") && searchTerms.endsWith("\"")) {
-		searchTerms = searchTerms.substring(1, searchTerms.length());
-		searchTerms = searchTerms.substring(0, searchTerms.length() - 1);
-	    }
+	if (searchTerms.startsWith("\"") && searchTerms.endsWith("\"")) {
 
-	    searchTerms = searchTerms.trim();
+	    searchTerms = searchTerms.substring(1, searchTerms.length());
+	    searchTerms = searchTerms.substring(0, searchTerms.length() - 1);
+	}
 
-	    LogicalOperator operator = null;
+	searchTerms = searchTerms.trim();
 
-	    String[] terms;
-	    String[] orTerms = searchTerms.split(" OR ");
+	String[] terms;
+	String[] orTerms = searchTerms.split(" OR ");
 
-	    if (orTerms.length > 1) {
+	if (orTerms.length > 1) {
 
-		operator = LogicalOperator.OR;
-		terms = orTerms;
+	    operator = LogicalOperator.OR;
+	    terms = orTerms;
+
+	} else {
+
+	    String[] andTerms = searchTerms.split(" AND ");
+
+	    if (andTerms.length > 1) {
+
+		operator = LogicalOperator.AND;
+		terms = andTerms;
 
 	    } else {
 
-		String[] andTerms = searchTerms.split(" AND ");
-
-		if (andTerms.length > 1) {
-
-		    operator = LogicalOperator.AND;
-		    terms = andTerms;
-
-		} else {
-		    terms = new String[] { searchTerms };
-		}
-	    }
-
-	    List<Bond> innerBonds = new ArrayList<>();
-
-	    for (String searchTerm : terms) {
-
-		createFieldsBond(innerBonds, searchFields, searchTerm, semantics, ontology);
-	    }
-
-	    switch (innerBonds.size()) {
-	    case 0:
-		return null;
-	    case 1:
-		return innerBonds.get(0);
-	    default:
-		return BondFactory.createLogicalBond(operator, innerBonds);
+		terms = new String[] { searchTerms };
 	    }
 	}
 
-	return null;
+	ArrayList<Bond> bonds = new ArrayList<Bond>();
+
+	for (String searchTerm : terms) {
+
+	    createFieldsBond(parser, searchFields, searchTerm).ifPresent(bond -> bonds.add(bond));
+	}
+
+	return BondFactory.aggregate(bonds, operator);
     }
 
     /**
+     * @param parser
      * @param innerBonds
      * @param searchFields
      * @param searchValue
-     * @param semanticSearch
-     * @param ontologyids
      */
-    private void createFieldsBond(//
-	    List<Bond> innerBonds, //
+    private Optional<Bond> createFieldsBond(//
+	    OSRequestParser parser, //
 	    String searchFields, //
-	    String searchValue, //
-	    String semanticSearch, //
-	    String ontologyids) {
+	    String searchValue //
+    ) {
 
-	if (searchValue != null && !searchValue.isEmpty() && //
-		semanticSearch != null && semanticSearch.equals("true") && //
-		ontologyids != null && !ontologyids.isEmpty()) {
+	boolean semanticSearch = parser.optParse(OSParameters.SEMANTIC_SEARCH_ENABLED).map(v -> Boolean.valueOf(v)).orElse(false);
+	String ontologyIds = parser.optParse(OSParameters.SEMANTIC_ONTOLOGY_IDS).orElse("");
+	boolean withObsPropURIs = parser.optParse(OSParameters.SEMANTIC_WITH_OBSERVED_PROPERTIES_URIS).map(v -> Boolean.valueOf(v))
+		.orElse(false);
 
-	    SKOSClient client = new SKOSClient();
+	if (semanticSearch && !ontologyIds.isEmpty()) {
 
-	    client.setSearchValue(searchValue);
+	    SemanticSearchSupport support = new SemanticSearchSupport();
+	    support.setExpansionLevelParam(OSParameters.SEMANTIC_EXPANSION_LEVEL.getName());
+	    support.setExpansionLimitParam(OSParameters.SEMANTIC_EXPANSION_LIMIT.getName());
+	    support.setRelationsParam(OSParameters.SEMANTIC_RELATIONS.getName());
+	    support.setSearchLangsParam(OSParameters.SEMANTIC_SEARCH_LANGS.getName());
+	    support.setSourceLangsParam(OSParameters.SEMANTIC_SOURCE_LANGS.getName());
 
-	    List<String> ids = Arrays.asList(ontologyids.split(" AND "));
+	    return support.getSemanticBond(parser.getParser(), searchValue, ontologyIds, searchFields, withObsPropURIs);
+	}
 
-	    client.setOntologyUrls(//
-		    ConfigurationWrapper.getOntologySettings().//
-			    stream().//
-			    filter(set -> ids.contains(set.getOntologyId())).//
-			    map(set -> set.getOntologyEndpoint()).//
-			    toList());
+	return BondUtils.createFieldsBond(searchFields, searchValue);
+    }
 
-	    DefaultSemanticSearchSetting setting = ConfigurationWrapper.getSystemSettings().getDefaultSemanticSearchSetting();
+    /**
+     * @param rosetta
+     * @param value
+     * @return
+     */
+    private String handleRosetta(String rosetta, String value) {
 
-	    client.setExpansionLimit(setting.getDefaultExpansionLimit());
-	    client.setExpansionLevel(setting.getDefaultExpansionLevel());
-	    client.setExpansionsRelations(setting.getDefaultSemanticRelations());
-	    client.setSearchLangs(setting.getDefaultSearchLanguages().stream().map(l -> l.getLabel()).toList());
-	    client.setSourceLangs(setting.getDefaultSourceLanguages().stream().map(l -> l.getLabel()).toList());
+	RosettaStone rs = new RosettaStoneConnector();
+	Set<String> terms = new TreeSet<>();
 
-	    //
-	    //
-	    //
+	terms.add(value);
+	terms.addAll(rs.getTranslations(value));
 
-	    DefaultConceptsFinder finder = new DefaultConceptsFinder();
-	    finder.setTraceQuery(false);
-	    finder.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
-	    // finder.setTaskConsumer((task) -> System.out.println(task));
-
-	    client.setFinder(finder);
-
-	    DefaultConceptsExpander expander = new DefaultConceptsExpander();
-	    expander.setTraceQuery(false);
-	    expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // 4 threads per level
-	    // expander.setTaskConsumer((task) -> System.out.println(task));
-
-	    client.setExpander(expander);
-
-	    //
-	    //
-	    //
-
-	    try {
-
-		SKOSResponse response = client.search();
-
-		List<String> expandedTerms = response.getLabels();
-
-		GSLoggerFactory.getLogger(getClass()).debug("Found {} expanded terms: \n{}", expandedTerms.size(),
-			expandedTerms.toString().replace("[", "").replace("]", ""));
-
-		List<Bond> expandedBonds = new ArrayList<>();
-
-		expandedTerms.add(searchValue); // adds the initial search term/concept
-
-		expandedTerms.forEach(term -> createFieldsBond(expandedBonds, searchFields, term, null, null));
-
-		switch (expandedBonds.size()) {
-		case 0:
-		    // This should never happen, in any I put break to keep going with the usual creating (no semantic
-		    // expansion)
-		    break;
-		case 1:
-		    innerBonds.add(expandedBonds.get(0));
-		    break;
-		default:
-		    innerBonds.add(BondFactory.createOrBond(expandedBonds));
-		    break;
-		}
-
-		return;
-
-	    } catch (Exception ex) {
-
-		GSLoggerFactory.getLogger(getClass()).error(ex);
+	switch (rosetta) {
+	case "narrow":
+	    Set<String> narrowerTerms = rs.getNarrower(value);
+	    if (narrowerTerms != null) {
+		terms.addAll(narrowerTerms);
 	    }
-	}
-
-	ArrayList<Bond> operands = new ArrayList<>();
-
-	if (searchFields.toLowerCase().contains("anytext")) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ANY_TEXT, searchValue));
-	}
-
-	if (searchFields.toLowerCase().contains("title")) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, searchValue));
-	}
-
-	if (searchFields.toLowerCase().contains("subject")) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.SUBJECT, searchValue));
-	}
-
-	if (searchFields.toLowerCase().contains("abstract") || searchFields.toLowerCase().contains("description")) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ABSTRACT, searchValue));
-	}
-
-	if (searchFields.toLowerCase().contains("keyword")) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, searchValue));
-	}
-
-	switch (operands.size()) {
-	case 0:
 	    break;
-	case 1:
-	    innerBonds.add(operands.get(0));
+	case "broad":
+	    Set<String> broaderTerms = rs.getBroader(value);
+	    if (broaderTerms != null) {
+		terms.addAll(broaderTerms);
+	    }
 	    break;
+
+	case "true":
 	default:
-	    innerBonds.add(BondFactory.createOrBond(operands));
+	    // do nothing, because translations are always added
 	    break;
 	}
+	if (terms != null && !terms.isEmpty()) {
+	    value = createOrSearch(terms);
+	} else {
+	    value = null;
+	}
+
+	return value;
+    }
+
+    /**
+     * @param terms
+     * @return
+     */
+    private String createOrSearch(Set<String> terms) {
+
+	if (terms == null || terms.isEmpty()) {
+	    return null;
+	}
+
+	ArrayList<String> list = Lists.newArrayList(terms);
+
+	if (list.size() == 1) {
+	    return list.get(0);
+	}
+
+	StringBuilder sb = new StringBuilder();
+
+	for (int i = 0; i < list.size() - 1; i++) {
+
+	    sb.append(list.get(i));
+	    sb.append(" OR ");
+	}
+
+	sb.append(list.get(list.size() - 1));
+
+	return sb.toString();
     }
 
 }

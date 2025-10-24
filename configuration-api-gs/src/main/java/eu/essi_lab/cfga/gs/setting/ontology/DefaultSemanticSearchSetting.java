@@ -6,6 +6,10 @@ package eu.essi_lab.cfga.gs.setting.ontology;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.json.JSONObject;
+
+import eu.essi_lab.cfga.option.BooleanChoice;
+import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.IntegerOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
@@ -50,6 +54,21 @@ public class DefaultSemanticSearchSetting extends Setting {
     private static final String EXP_LEVEL_OPTION_KEY = "expansionLevelKey";
     private static final String EXP_LIMIT_TARGET_OPTION_KEY = "expansionLimitTargetKey";
     private static final String EXP_LIMIT_OPTION_KEY = "expansionLimitValueKey";
+    private static final String INCLUDE_ORIGINAL_SEARCH_TERM_KEY = "includeOriginalSTKey";
+
+    /**
+     * @param object
+     */
+    public DefaultSemanticSearchSetting(JSONObject object) {
+	super(object);
+    }
+
+    /**
+     * @param object
+     */
+    public DefaultSemanticSearchSetting(String object) {
+	super(object);
+    }
 
     /**
      * 
@@ -141,6 +160,18 @@ public class DefaultSemanticSearchSetting extends Setting {
 		build();
 
 	addOption(searchLang);
+
+	Option<BooleanChoice> includeOriginalOption = BooleanChoiceOptionBuilder.get().//
+		withKey(INCLUDE_ORIGINAL_SEARCH_TERM_KEY).//
+		withLabel("Include original search term")
+		.withDescription(
+			"If set to 'Yes' (default) the original search term is included in the search along with the terms outcome of the semantic expansion")
+		.withSingleSelection().//
+		withValues(LabeledEnum.values(BooleanChoice.class)).//
+		withSelectedValue(BooleanChoice.TRUE).cannotBeDisabled().//
+		build();
+
+	addOption(includeOriginalOption);
     }
 
     /**
@@ -181,6 +212,14 @@ public class DefaultSemanticSearchSetting extends Setting {
     /**
      * @return
      */
+    public boolean isOriginalTermIncluded() {
+
+	return BooleanChoice.toBoolean(getOption(INCLUDE_ORIGINAL_SEARCH_TERM_KEY, BooleanChoice.class).get().getSelectedValue());
+    }
+
+    /**
+     * @return
+     */
     public List<EuropeanLanguage> getDefaultSearchLanguages() {
 
 	return getOption(SEARCH_LANGUAGES_OPTION_KEY, EuropeanLanguage.class).get().getSelectedValues();
@@ -189,7 +228,7 @@ public class DefaultSemanticSearchSetting extends Setting {
     /**
      * @return
      */
-    public void selectDefaultSemanticRelations(List<SKOSSemanticRelation> rel) {
+    public void setDefaultSemanticRelations(List<SKOSSemanticRelation> rel) {
 
 	getOption(SEM_RELATION_OPTION_KEY, SKOSSemanticRelation.class).get().select(r -> rel.contains(r));
     }
@@ -197,7 +236,7 @@ public class DefaultSemanticSearchSetting extends Setting {
     /**
      * @return
      */
-    public void selectDefaultExpansionLevel(ExpansionLevel level) {
+    public void setDefaultExpansionLevel(ExpansionLevel level) {
 
 	getOption(EXP_LEVEL_OPTION_KEY, ExpansionLevel.class).get().select(l -> l == level);
     }
@@ -205,7 +244,7 @@ public class DefaultSemanticSearchSetting extends Setting {
     /**
      * @return
      */
-    public void selectDefaultSourceLanguages(List<EuropeanLanguage> lang) {
+    public void setDefaultSourceLanguages(List<EuropeanLanguage> lang) {
 
 	getOption(SOURCE_LANGUAGES_OPTION_KEY, EuropeanLanguage.class).get().select(l -> lang.contains(l));
     }
@@ -213,7 +252,7 @@ public class DefaultSemanticSearchSetting extends Setting {
     /**
      * @return
      */
-    public void selectDefaultSearchLanguages(List<EuropeanLanguage> lang) {
+    public void setDefaultSearchLanguages(List<EuropeanLanguage> lang) {
 
 	getOption(SEARCH_LANGUAGES_OPTION_KEY, EuropeanLanguage.class).get().select(l -> lang.contains(l));
     }
@@ -225,5 +264,13 @@ public class DefaultSemanticSearchSetting extends Setting {
 
 	getOption(EXP_LIMIT_OPTION_KEY, Integer.class).get().select(v -> v.equals(limit.getLimit()));
 	getOption(EXP_LIMIT_TARGET_OPTION_KEY, LimitTarget.class).get().select(v -> v.equals(limit.getTarget()));
+    }
+
+    /**
+     * @param include
+     */
+    public void setOriginalTermIncluded(boolean include) {
+
+	getOption(INCLUDE_ORIGINAL_SEARCH_TERM_KEY, BooleanChoice.class).get().select(v -> BooleanChoice.toBoolean(v) == include);
     }
 }

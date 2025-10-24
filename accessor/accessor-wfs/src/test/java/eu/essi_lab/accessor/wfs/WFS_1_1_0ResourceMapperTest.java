@@ -50,8 +50,13 @@ public class WFS_1_1_0ResourceMapperTest {
 	OriginalMetadata originalMD = new OriginalMetadata();
 
 	originalMD.setMetadata(string);
-	
-	GSResource resource = mapper.map(originalMD, new GSSource());
+
+	//Same issue of WMSMapperTest: see comments there at line 55
+	String sourceUrl = "http://testwfs.example?";
+	GSSource gsSource = new GSSource();
+	gsSource.setEndpoint(sourceUrl);
+	GSResource resource = mapper.map(originalMD, gsSource);
+
 
 	HarmonizedMetadata result = resource.getHarmonizedMetadata();
 
@@ -162,7 +167,7 @@ public class WFS_1_1_0ResourceMapperTest {
 	Online online = onlines.get(0);
 	TestCase.assertNotNull(online);
 	TestCase.assertEquals(NetProtocols.WFS_1_1_0.getCommonURN(), online.getProtocol());
-	TestCase.assertEquals("http://sedac.ciesin.columbia.edu:80/geoserver/wfs?", online.getLinkage());
+	TestCase.assertEquals("http://testwfs.example?", online.getLinkage());
 	TestCase.assertEquals("{http://sedac.ciesin.columbia.edu/data/collection/superfund}superfund-atsdr-hazardous-waste-site-v2", online.getName());
 	TestCase.assertEquals(null, online.getDescription());
 	TestCase.assertEquals("download", online.getFunctionCode());

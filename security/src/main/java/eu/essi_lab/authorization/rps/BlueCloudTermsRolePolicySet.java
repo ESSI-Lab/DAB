@@ -30,7 +30,7 @@ package eu.essi_lab.authorization.rps;
 public class BlueCloudTermsRolePolicySet extends AbstractRolePolicySet {
 
     /**
-     * @param whos
+     * @param blue-cloud-terms
      */
     public BlueCloudTermsRolePolicySet() {
 

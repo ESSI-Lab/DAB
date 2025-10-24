@@ -56,8 +56,6 @@ public class OAuthSetting extends Setting implements EditableSetting {
     public enum OAuthProvider implements LabeledEnum {
 
 	GOOGLE("Google", "google"), //
-	FACEBOOK("Facebook", "facebook"), //
-	TWITTER("Twitter", "twitter"), //
 	KEYCLOAK("Keycloak", "keycloak");
 
 	private String label;

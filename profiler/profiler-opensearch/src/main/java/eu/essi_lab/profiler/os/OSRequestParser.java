@@ -23,6 +23,7 @@ package eu.essi_lab.profiler.os;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Optional;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -61,16 +62,31 @@ public class OSRequestParser {
     }
 
     /**
+     * 
+     * @param parameter
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public Optional<String> optParse(OSParameter parameter) throws IllegalArgumentException {
+    
+	return Optional.ofNullable(parse(parameter));
+    }
+    
+    /**
      * @param parameter
      * @return
      */
     public String parse(OSParameter parameter) throws IllegalArgumentException {
 
 	String value = parser.getValue(parameter.getName());
+	
 	if (value == null || value.equals("") || value.equals(KeyValueParser.UNDEFINED)) {
+	    
 	    if (parameter.getDefaultValue() != null) {
+		
 		return parameter.getDefaultValue();
 	    }
+	    
 	    return null;
 	}
  
@@ -105,6 +121,16 @@ public class OSRequestParser {
 	}
 
 	return value;
+    }
+    
+    
+
+    /**
+     * @return the parser
+     */
+    public KeyValueParser getParser() {
+	
+        return parser;
     }
 
     static Integer parseInt(String value) {

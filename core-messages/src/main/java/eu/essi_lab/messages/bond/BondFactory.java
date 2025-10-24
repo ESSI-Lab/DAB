@@ -25,6 +25,7 @@ import java.util.Arrays;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
@@ -47,6 +48,20 @@ import eu.essi_lab.model.resource.composed.ComposedElementItem;
 public class BondFactory {
 
     private BondFactory() {
+    }
+
+    /**
+     * @param bonds
+     * @param op
+     * @return
+     */
+    public static Optional<Bond> aggregate(List<Bond> bonds, LogicalOperator op) {
+
+	return switch (bonds.size()) {
+	case 0 -> Optional.empty();
+	case 1 -> Optional.of(bonds.get(0));
+	default -> Optional.of(BondFactory.createLogicalBond(op, bonds));
+	};
     }
 
     /**

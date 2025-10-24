@@ -158,4 +158,12 @@ public class DefaultConceptsExpander extends AbstractConceptsExpander<RDF4JQuery
 
 	return SKOSResponse.of(SKOSResponse.getAggregatedResults(limit, results));
     }
+
+    /**
+     * @return the
+     */
+    public DefaultExpandConceptsQueryBuilder getQueryBuilder() {
+
+	return (DefaultExpandConceptsQueryBuilder) super.getQueryBuilder();
+    }
 }
