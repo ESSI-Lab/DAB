@@ -1,8 +1,5 @@
 package eu.essi_lab.profiler.bnhs;
 
-import java.util.Optional;
-import java.util.Properties;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB)

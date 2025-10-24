@@ -64,7 +64,6 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
@@ -177,18 +176,13 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
 
-	    String ontologyIds = getParam(parameterMap, "ontology");
-	    String attributeTitle = getParam(parameterMap, "attributeTitle");
-	    String semanticSearch = getParam(parameterMap, "semanticSearch");
+	    String ontologyIds = getParam(parameterMap, SemanticSearchSupport.ONTOLOGY_IDS_PARAM);
+	    String attributeTitle = getParam(parameterMap, SemanticSearchSupport.ATTRIBUTE_TITLE_PARAM);
+	    String semanticSearch = getParam(parameterMap, SemanticSearchSupport.SEMANTIC_SEARCH_PARAM);
 
 	    if (ontologyIds != null && attributeTitle != null && semanticSearch != null && semanticSearch.equals("true")) {
 
 		SemanticSearchSupport support = new SemanticSearchSupport();
-		support.setExpansionLevelParam("expansionLevel");
-		support.setExpansionLimitParam("expansionLimit");
-		support.setRelationsParam("semanticRelations");
-		support.setSearchLangsParam("searchLangs");
-		support.setSourceLangsParam("sourceLangs");
 
 		Optional<Bond> bond = support.getSemanticBond(//
 			webRequest, //

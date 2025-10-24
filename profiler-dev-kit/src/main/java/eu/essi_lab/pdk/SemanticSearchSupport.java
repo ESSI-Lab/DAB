@@ -54,91 +54,15 @@ import eu.essi_lab.model.resource.MetadataElement;
  */
 public class SemanticSearchSupport {
 
-    private String expansionLevelParam;
-    private String expansionLimitParam;
-    private String relationsParam;
-    private String searchLangsParam;
-    private String sourceLangsParam;
+    public static final String ONTOLOGY_IDS_PARAM = "ontology";
+    public static final String ATTRIBUTE_TITLE_PARAM = "attributeTitle";
+    public static final String SEMANTIC_SEARCH_PARAM = "semanticSearch";
 
-    /**
-     * @return
-     */
-    public String getExpansionLevelParam() {
-
-	return expansionLevelParam;
-    }
-
-    /**
-     * @param expansionLevelParam
-     */
-    public void setExpansionLevelParam(String expansionLevelParam) {
-
-	this.expansionLevelParam = expansionLevelParam;
-    }
-
-    /**
-     * @return
-     */
-    public String getExpansionLimitParam() {
-
-	return expansionLimitParam;
-    }
-
-    /**
-     * @param expansionLimitParam
-     */
-    public void setExpansionLimitParam(String expansionLimitParam) {
-
-	this.expansionLimitParam = expansionLimitParam;
-    }
-
-    /**
-     * @return
-     */
-    public String getRelationsParam() {
-
-	return relationsParam;
-    }
-
-    /**
-     * @param relationsParam
-     */
-    public void setRelationsParam(String relationsParam) {
-
-	this.relationsParam = relationsParam;
-    }
-
-    /**
-     * @return
-     */
-    public String getSearchLangsParam() {
-
-	return searchLangsParam;
-    }
-
-    /**
-     * @param searchLangsParam
-     */
-    public void setSearchLangsParam(String searchLangsParam) {
-
-	this.searchLangsParam = searchLangsParam;
-    }
-
-    /**
-     * @return
-     */
-    public String getSourceLangsParam() {
-
-	return sourceLangsParam;
-    }
-
-    /**
-     * @param sourceLangsParam
-     */
-    public void setSourceLangsParam(String sourceLangsParam) {
-
-	this.sourceLangsParam = sourceLangsParam;
-    }
+    private static final String EXPANSION_LEVEL_PARAM = "expansionLevel";
+    private static final String EXPANSION_LIMIT_PARAM = "expansionLimit";
+    private static final String SEMANTIC_RELATIONS_PARAM = "semanticRelations";
+    private static final String SEARCH_LANGS_PARAM = "searchLangs";
+    private static final String SOURCE_LANGS_PARAM = "sourceLangs";
 
     /**
      * @param value
@@ -170,32 +94,32 @@ public class SemanticSearchSupport {
 
 	DefaultSemanticSearchSetting setting = ConfigurationWrapper.getSystemSettings().getDefaultSemanticSearchSetting();
 
-	ExpansionLevel expansionLevel = parser.getOptionalValue(getExpansionLevelParam()).//
+	ExpansionLevel expansionLevel = parser.getOptionalValue(EXPANSION_LEVEL_PARAM).//
 		map(v -> ExpansionLevel.of(Integer.valueOf(v)).orElse(setting.getDefaultExpansionLevel())).//
 		orElse(setting.getDefaultExpansionLevel());
 
 	client.setExpansionLevel(expansionLevel);
 
-	ExpansionLimit expansionLimit = parser.getOptionalValue(getExpansionLimitParam()).//
+	ExpansionLimit expansionLimit = parser.getOptionalValue(EXPANSION_LIMIT_PARAM).//
 		map(v -> ExpansionLimit.of(v).orElse(setting.getDefaultExpansionLimit())).//
 		orElse(setting.getDefaultExpansionLimit());
 
 	client.setExpansionLimit(expansionLimit);
 
-	List<SKOSSemanticRelation> semanticRelations = parser.getOptionalValue(getRelationsParam()).//
+	List<SKOSSemanticRelation> semanticRelations = parser.getOptionalValue(SEMANTIC_RELATIONS_PARAM).//
 		stream().//
 		flatMap(v -> Arrays.asList(v.split(",")).stream()).//
 		flatMap(v -> LabeledEnum.valueOf(SKOSSemanticRelation.class, v).stream()).toList();
 
 	client.setExpansionsRelations(semanticRelations.isEmpty() ? setting.getDefaultSemanticRelations() : semanticRelations);
 
-	List<String> searchLangs = parser.getOptionalValue(getSearchLangsParam()).stream().//
+	List<String> searchLangs = parser.getOptionalValue(SEARCH_LANGS_PARAM).stream().//
 		flatMap(v -> Arrays.asList(v.split(",")).stream()).toList();
 
 	client.setSearchLangs(
 		searchLangs.isEmpty() ? setting.getDefaultSearchLanguages().stream().map(l -> l.getLabel()).toList() : searchLangs);
 
-	List<String> sourceLangs = parser.getOptionalValue(getSourceLangsParam()).stream().//
+	List<String> sourceLangs = parser.getOptionalValue(SOURCE_LANGS_PARAM).stream().//
 		flatMap(v -> Arrays.asList(v.split(",")).stream()).toList();
 
 	client.setSourceLangs(
@@ -207,16 +131,16 @@ public class SemanticSearchSupport {
 
 	DefaultConceptsFinder finder = new DefaultConceptsFinder();
 	finder.setTraceQuery(false);
-	finder.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
-	// finder.setTaskConsumer((task) -> task.setMaxExecutionTime(0));
+	finder.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));// default
+	finder.setTaskConsumer((task) -> task.setMaxExecutionTime(1)); // 1 second timeout
 
 	client.setFinder(finder);
 
 	DefaultConceptsExpander expander = new DefaultConceptsExpander();
 	expander.getQueryBuilder().setIncludeNoLanguageConcepts(false); // default
 	expander.setTraceQuery(false);
-	expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // 4 threads per level
-	// expander.setTaskConsumer((task) -> task.setMaxExecutionTime(0));
+	expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // default, 4 threads per level
+	expander.setTaskConsumer((task) -> task.setMaxExecutionTime(1)); // 1 second timeout
 
 	client.setExpander(expander);
 
