@@ -34,6 +34,7 @@ public class DefaultSemanticSearchSettingTest {
 	Assert.assertEquals(Arrays.asList(SKOSSemanticRelation.RELATED, SKOSSemanticRelation.NARROWER).toString(),
 		setting.getDefaultSemanticRelations().toString());
 	Assert.assertTrue(setting.isOriginalTermIncluded());
+	Assert.assertEquals(1, setting.getDefaultMaxExecutionTime());
 
 	//
 	//
@@ -45,6 +46,7 @@ public class DefaultSemanticSearchSettingTest {
 	setting.setDefaultSourceLanguages(Arrays.asList(EuropeanLanguage.BULGARIAN));
 	setting.setDefaultSemanticRelations(Arrays.asList(SKOSSemanticRelation.BROAD_MATCH));
 	setting.setOriginalTermIncluded(false);
+	setting.setDefaultMaxExecutionTime(25);
 
 	Assert.assertEquals(ExpansionLevel.HIGH, setting.getDefaultExpansionLevel());
 	Assert.assertEquals(ExpansionLimit.of(LimitTarget.LABELS, 10).toString(), setting.getDefaultExpansionLimit().toString());
@@ -52,5 +54,7 @@ public class DefaultSemanticSearchSettingTest {
 	Assert.assertEquals(Arrays.asList(EuropeanLanguage.BULGARIAN).toString(), setting.getDefaultSourceLanguages().toString());
 	Assert.assertEquals(Arrays.asList(SKOSSemanticRelation.BROAD_MATCH).toString(), setting.getDefaultSemanticRelations().toString());
 	Assert.assertFalse(setting.isOriginalTermIncluded());
+	Assert.assertEquals(25, setting.getDefaultMaxExecutionTime());
+
     }
 }

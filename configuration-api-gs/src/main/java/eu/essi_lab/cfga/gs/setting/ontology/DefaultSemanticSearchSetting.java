@@ -55,6 +55,7 @@ public class DefaultSemanticSearchSetting extends Setting {
     private static final String EXP_LIMIT_TARGET_OPTION_KEY = "expansionLimitTargetKey";
     private static final String EXP_LIMIT_OPTION_KEY = "expansionLimitValueKey";
     private static final String INCLUDE_ORIGINAL_SEARCH_TERM_KEY = "includeOriginalSTKey";
+    private static final String MAX_EXECUTION_TIME_KEY = "maxExecTimeKey";
 
     /**
      * @param object
@@ -172,6 +173,20 @@ public class DefaultSemanticSearchSetting extends Setting {
 		build();
 
 	addOption(includeOriginalOption);
+
+	Option<Integer> maxExectionTime = IntegerOptionBuilder.get().//
+		withKey(MAX_EXECUTION_TIME_KEY).//
+		withLabel("Default maximum execution time (in seconds)").//
+		withDescription(
+			"Specifies the maximum time (in seconds) that the expansion operations are allowed to run. The operations will be interrupted when they exceeds the time limit")
+		.//
+		withSingleSelection().//
+		withValues(Stream.iterate(0, n -> n + 1).limit(31).toList()).//
+		withSelectedValue(1).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(maxExectionTime);
     }
 
     /**
@@ -215,6 +230,14 @@ public class DefaultSemanticSearchSetting extends Setting {
     public boolean isOriginalTermIncluded() {
 
 	return BooleanChoice.toBoolean(getOption(INCLUDE_ORIGINAL_SEARCH_TERM_KEY, BooleanChoice.class).get().getSelectedValue());
+    }
+
+    /**
+     * @return
+     */
+    public int getDefaultMaxExecutionTime() {
+
+	return getOption(MAX_EXECUTION_TIME_KEY, Integer.class).get().getSelectedValue();
     }
 
     /**
@@ -272,5 +295,13 @@ public class DefaultSemanticSearchSetting extends Setting {
     public void setOriginalTermIncluded(boolean include) {
 
 	getOption(INCLUDE_ORIGINAL_SEARCH_TERM_KEY, BooleanChoice.class).get().select(v -> BooleanChoice.toBoolean(v) == include);
+    }
+
+    /**
+     * @param time
+     */
+    public void setDefaultMaxExecutionTime(int time) {
+
+	getOption(MAX_EXECUTION_TIME_KEY, Integer.class).get().select(v -> v == time);
     }
 }

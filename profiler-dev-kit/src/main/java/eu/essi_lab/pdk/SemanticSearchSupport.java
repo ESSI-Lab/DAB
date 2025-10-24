@@ -126,22 +126,28 @@ public class SemanticSearchSupport {
 		sourceLangs.isEmpty() ? setting.getDefaultSourceLanguages().stream().map(l -> l.getLabel()).toList() : sourceLangs);
 
 	//
-	//
+	// finder
 	//
 
 	DefaultConceptsFinder finder = new DefaultConceptsFinder();
 	finder.setTraceQuery(false);
 	finder.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));// default
-	finder.setTaskConsumer((task) -> task.setMaxExecutionTime(1)); // 1 second timeout
+	// default 1 second
+	finder.setTaskConsumer((task) -> task.setMaxExecutionTime(setting.getDefaultMaxExecutionTime()));
 
 	client.setFinder(finder);
+	
+	//
+	// expander
+	//
 
 	DefaultConceptsExpander expander = new DefaultConceptsExpander();
 	expander.getQueryBuilder().setIncludeNoLanguageConcepts(false); // default
 	expander.setTraceQuery(false);
-	expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4))); // default, 4 threads per level
-	expander.setTaskConsumer((task) -> task.setMaxExecutionTime(1)); // 1 second timeout
-
+	// default, 4 threads per level
+	expander.setThreadMode(ThreadMode.MULTI(() -> Executors.newFixedThreadPool(4)));
+	// default 1 second
+	expander.setTaskConsumer((task) -> task.setMaxExecutionTime(setting.getDefaultMaxExecutionTime()));
 	client.setExpander(expander);
 
 	//
