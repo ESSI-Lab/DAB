@@ -379,7 +379,7 @@
             mysql:9.5.0</mySQLDocker.registry>
 
 		<docker.elasticsearch>opensearchproject/opensearch:1.3.5</docker.elasticsearch>
-        <docker.keycloak>quay.io/keycloak/keycloak:26.4.1</docker.keycloak>
+        <docker.keycloak>keycloak/keycloak:26.4.1</docker.keycloak>
         <docker.redis>redis:8.2.2</docker.redis>
 
         <surefire.arglineopen>
