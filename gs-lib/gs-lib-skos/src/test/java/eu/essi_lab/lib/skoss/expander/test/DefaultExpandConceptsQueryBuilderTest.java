@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import eu.essi_lab.lib.skos.SKOSSemanticRelation;
 import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skos.expander.impl.DefaultExpandConceptsQueryBuilder;
+import eu.essi_lab.lib.skos.expander.query.impl.DefaultExpandConceptsQueryBuilder;
 
 /**
  * @author Fabrizio
@@ -47,9 +47,7 @@ public class DefaultExpandConceptsQueryBuilderTest {
 		+ "     OPTIONAL { { OPTIONAL { ?concept skos:broadMatch ?expanded } } } \n"
 		+ "}";
 	;//
-	
-	System.out.println(expected);
-	
+		
 	System.out.println(query);
 
 	Assert.assertEquals(expected, query);
@@ -75,7 +73,7 @@ public class DefaultExpandConceptsQueryBuilderTest {
 		+ "SELECT DISTINCT ?concept ?pref ?alt ?expanded WHERE {\n"
 		+ "    BIND(<CONCEPT> AS ?concept)\n"
 		+ "\n"
-		+ "    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (\"it\") ||LANG(?alt)=\"\") }\n"
+		+ "    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (\"it\") ||LANG(?pref)=\"\") }\n"
 		+ "     OPTIONAL {\n"
 		+ "                      ?concept ?altProp ?alt\n"
 		+ "                      FILTER(?altProp IN (skos:altLabel, rdfs:label))\n"
@@ -85,9 +83,7 @@ public class DefaultExpandConceptsQueryBuilderTest {
 		+ "     OPTIONAL { { OPTIONAL { ?concept skos:broadMatch ?expanded } } } \n"
 		+ "}";
 	;//
-	
-	System.out.println(expected);
-	
+		
 	System.out.println(query);
 
 	Assert.assertEquals(expected, query);

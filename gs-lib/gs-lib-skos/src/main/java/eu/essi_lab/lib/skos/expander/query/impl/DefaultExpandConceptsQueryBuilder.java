@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.lib.skos.expander.impl;
+package eu.essi_lab.lib.skos.expander.query.impl;
 
 import java.util.Collection;
 
@@ -27,6 +27,7 @@ import java.util.Collection;
  */
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.lib.skos.SKOSSemanticRelation;
 import eu.essi_lab.lib.skos.expander.ExpandConceptsQueryBuilder;
@@ -71,9 +72,11 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 	    ExpansionLevel target, //
 	    ExpansionLevel current) {
 
-	String languageFilter = String.join(",", searchLangs.stream().map(l -> "\"" + l + "\"").toArray(String[]::new));
+	String languages = searchLangs.stream().map(l -> "\"" + l + "\"").collect(Collectors.joining(","));
 	String expansionBlock = current.getValue() < target.getValue() ? buildExpansionOptionalBlock("concept", relations) : "";
-	String noLanguageFilter = isNoLanguageConceptsIncluded() ? "||LANG(?alt)=\"\"" : "";
+	
+	String noLanguageFilterPref = isNoLanguageConceptsIncluded() ? "||LANG(?pref)=\"\"" : "";
+	String noLanguageFilterAlt = isNoLanguageConceptsIncluded() ? "||LANG(?alt)=\"\"" : "";
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -91,7 +94,7 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 
 		    %s
 		}
-		""", concepts.iterator().next(), languageFilter, noLanguageFilter, languageFilter, noLanguageFilter, expansionBlock).trim();
+		""", concepts.iterator().next(), languages, noLanguageFilterPref, languages, noLanguageFilterAlt, expansionBlock).trim();
     }
 
     /**
@@ -108,6 +111,7 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 	    sb.append(" OPTIONAL { ");
 
 	    for (int i = 0; i < relations.size(); i++) {
+		
 		SKOSSemanticRelation rel = relations.get(i);
 
 		sb.append("{ OPTIONAL { ?").//
@@ -117,11 +121,12 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 			append(" ?expanded } }");
 
 		if (i != relations.size() - 1) {
+		    
 		    sb.append(" UNION ");
 		}
 	    }
+	    
 	    sb.append(" } ");
-
 	}
 
 	return sb.toString();
