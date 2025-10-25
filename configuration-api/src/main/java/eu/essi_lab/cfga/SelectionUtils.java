@@ -440,6 +440,7 @@ public class SelectionUtils {
 
 		//
 		// !!! (*) options with SelectionMode.UNSET are excluded !!!
+		// anyway this case never happens
 		//
 		if (outOption.getSelectionMode() == SelectionMode.UNSET && !list.isEmpty()) {
 

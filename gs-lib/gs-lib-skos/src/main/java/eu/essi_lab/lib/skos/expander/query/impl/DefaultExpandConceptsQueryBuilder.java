@@ -30,11 +30,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.lib.skos.SKOSSemanticRelation;
-import eu.essi_lab.lib.skos.expander.ExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpandConceptsQueryBuilder;
 
 /**
- * @author Fabrizio
+ * @author boldrini
  */
 public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBuilder {
 
@@ -72,11 +72,7 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 	    ExpansionLevel target, //
 	    ExpansionLevel current) {
 
-	String languages = searchLangs.stream().map(l -> "\"" + l + "\"").collect(Collectors.joining(","));
 	String expansionBlock = current.getValue() < target.getValue() ? buildExpansionOptionalBlock("concept", relations) : "";
-	
-	String noLanguageFilterPref = isNoLanguageConceptsIncluded() ? "||LANG(?pref)=\"\"" : "";
-	String noLanguageFilterAlt = isNoLanguageConceptsIncluded() ? "||LANG(?alt)=\"\"" : "";
 
 	return String.format("""
 		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -85,16 +81,74 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 		SELECT DISTINCT ?concept ?pref ?alt ?expanded WHERE {
 		    BIND(<%s> AS ?concept)
 
-		    OPTIONAL { ?concept skos:prefLabel ?pref FILTER(LANG(?pref) IN (%s) %s) }
+		    OPTIONAL { ?concept skos:prefLabel ?pref %s }
 		     OPTIONAL {
 		                      ?concept ?altProp ?alt
 		                      FILTER(?altProp IN (skos:altLabel, rdfs:label))
-		                      FILTER(LANG(?alt) IN (%s) %s)
+		                      %s
 		                    }
 
 		    %s
 		}
-		""", concepts.iterator().next(), languages, noLanguageFilterPref, languages, noLanguageFilterAlt, expansionBlock).trim();
+		""", //
+		concepts.iterator().next(), //
+		getPrefLanguageFilter(searchLangs), //
+		getAltLanguageFilter(searchLangs), //
+		expansionBlock).trim();
+    }
+
+    /**
+     * @param searchLangs
+     * @return
+     */
+    protected String getPrefLanguageFilter(List<String> searchLangs) {
+
+	return getLanguageFilter(searchLangs, "pref");
+
+    }
+
+    /**
+     * @param searchLangs
+     * @return
+     */
+    protected String getAltLanguageFilter(List<String> searchLangs) {
+
+	return getLanguageFilter(searchLangs, "alt");
+    }
+
+    /**
+     * @param searchLangs
+     * @param label
+     * @return
+     */
+    private String getLanguageFilter(List<String> searchLangs, String label) {
+
+	String languages = searchLangs.stream().map(l -> "\"" + l + "\"").collect(Collectors.joining(","));
+
+	String langPref = "LANG(?" + label + ") IN (" + languages + ")";
+
+	String noLangPref = "LANG(?" + label + ")=\"\"";
+
+	String langFilterPref = null;
+
+	if (languages.isEmpty() && !isNoLanguageConceptsIncluded()) {
+
+	    langFilterPref = "";
+
+	} else if (!languages.isEmpty() && !isNoLanguageConceptsIncluded()) {
+
+	    langFilterPref = "FILTER(" + langPref + " )";
+
+	} else if (!languages.isEmpty() && isNoLanguageConceptsIncluded()) {
+
+	    langFilterPref = "FILTER(" + langPref + " || " + noLangPref + " )";
+
+	} else if (languages.isEmpty() && isNoLanguageConceptsIncluded()) {
+
+	    langFilterPref = "FILTER(" + noLangPref + " )";
+	}
+
+	return langFilterPref;
     }
 
     /**
@@ -111,7 +165,7 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 	    sb.append(" OPTIONAL { ");
 
 	    for (int i = 0; i < relations.size(); i++) {
-		
+
 		SKOSSemanticRelation rel = relations.get(i);
 
 		sb.append("{ OPTIONAL { ?").//
@@ -121,11 +175,11 @@ public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBui
 			append(" ?expanded } }");
 
 		if (i != relations.size() - 1) {
-		    
+
 		    sb.append(" UNION ");
 		}
 	    }
-	    
+
 	    sb.append(" } ");
 	}
 
