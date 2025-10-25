@@ -41,6 +41,8 @@ import eu.essi_lab.lib.skos.SKOSResponse;
 import eu.essi_lab.lib.skos.SKOSSemanticRelation;
 import eu.essi_lab.lib.skos.expander.ExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skos.expander.ExpansionLimit;
+import eu.essi_lab.lib.skos.expander.query.impl.DefaultExpandConceptsQueryBuilder;
+import eu.essi_lab.lib.skos.expander.query.impl.MultipleExpandConceptsQueryBuilder;
 import eu.essi_lab.lib.skos.rdf4j.RDF4JQueryTask;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ThreadMode;

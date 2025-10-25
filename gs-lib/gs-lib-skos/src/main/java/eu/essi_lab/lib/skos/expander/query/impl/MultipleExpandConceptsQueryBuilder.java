@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.skos.expander.impl;
+package eu.essi_lab.lib.skos.expander.query.impl;
 
 /*-
  * #%L

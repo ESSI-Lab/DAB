@@ -28,6 +28,7 @@ import eu.essi_lab.lib.skos.QueryTask;
 import eu.essi_lab.lib.skos.QueryTaskExecutor;
 import eu.essi_lab.lib.skos.expander.ConceptsExpander;
 import eu.essi_lab.lib.skos.expander.ExpandConceptsQueryBuilder;
+import eu.essi_lab.lib.skos.expander.query.impl.DefaultExpandConceptsQueryBuilder;
 
 /**
  * @author Fabrizio
