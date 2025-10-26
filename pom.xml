@@ -160,7 +160,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<fabric8-timeout>600000</fabric8-timeout>
-		<fabric8-no-ping-timeout>10000</fabric8-no-ping-timeout>
+		<fabric8-no-ping-timeout>60000</fabric8-no-ping-timeout>
 
 		<antplugin.version>1.8</antplugin.version>
 		<sonar.plugin.version>3.9.0.2155</sonar.plugin.version>
