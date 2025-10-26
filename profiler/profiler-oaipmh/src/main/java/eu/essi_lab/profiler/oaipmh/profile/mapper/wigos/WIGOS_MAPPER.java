@@ -620,7 +620,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    }
 
 	    record.addProgramme("WHYCOS");
-	    // record.setStationOperatingStatus();
+	    record.setStationOperatingStatus(beginPosition, endPosition);
 	    record.setReferenceTime("unknown");
 	    record.setTimeliness(null);
 	    record.setSamplingTimePeriod(null);
@@ -672,16 +672,24 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		DatatypeFactory df = DatatypeFactory.newInstance();
 		XMLGregorianCalendar xmlGregorianCalendar = df.newXMLGregorianCalendar(calendar);
 		record.setStationOrPlatformDateEstablished(xmlGregorianCalendar);
-
+		
+		Optional<Date> optEndDate = ISO8601DateTimeUtils.parseISO8601ToDate(endPosition);
+		if(optEndDate.isPresent()) {
+		    GregorianCalendar end_calendar = new GregorianCalendar();
+		    end_calendar.setTime(optEndDate.get());
+		    endMonth = end_calendar.get(Calendar.MONTH) + 1;
+		    endWeekDay = end_calendar.get(Calendar.DAY_OF_WEEK);
+		    endMonth = end_calendar.get(Calendar.MONTH) + 1;
+		    }
 		// Extract fields
-		startMonth = calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is 0-based
-		endMonth = startMonth; // same, unless you want a duration
-		startWeekDay = calendar.get(Calendar.DAY_OF_WEEK); // Sunday = 1 ... Saturday = 7
-		endWeekDay = startWeekDay;
-		startHour = calendar.get(Calendar.HOUR_OF_DAY);
-		endHour = startHour;
-		startMinute = calendar.get(Calendar.MINUTE);
-		endMinute = startMinute;
+		startMonth = 1 ;//calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is 0-based
+		endMonth = 12; //startMonth; // same, unless you want a duration
+		startWeekDay = 2; //calendar.get(Calendar.DAY_OF_WEEK); // Sunday = 1 ... Saturday = 7
+		endWeekDay = 1; //startWeekDay;
+		startHour = 0; //calendar.get(Calendar.HOUR_OF_DAY);
+		endHour = 23; //startHour;
+		startMinute = 0; //calendar.get(Calendar.MINUTE);
+		endMinute = 59; //startMinute;
 	    }
 
 	    /*
@@ -968,6 +976,16 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    writer.setText("//*:Territory/*:validPeriod/*:TimePeriod/*:beginPosition", minDate);
 	    writer.setText("//*:GeospatialLocation/*:validPeriod/*:TimePeriod/*:endPosition", maxDate);
 	    writer.setText("//*:Territory/*:validPeriod/*:TimePeriod/*:endPosition", maxDate);
+	    
+	    if(end != null) {
+		//Calendar now = Calendar.getInstance();
+	        Calendar oneYearAgo = Calendar.getInstance();
+	        oneYearAgo.add(Calendar.MONTH, -12);
+	        if(end.before(oneYearAgo.getTime())){
+	            writer.setText("//*:ReportingStatus/*:reportingStatus/@*:href", "http://codes.wmo.int/wmdr/ReportingStatus/unkown"); 
+	        }
+	        
+	    }
 	    for (Node n : observationList) {
 		String xpath = "//*:ObservingFacility";
 		writer.addNode(xpath, n);
