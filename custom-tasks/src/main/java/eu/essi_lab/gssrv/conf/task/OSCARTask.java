@@ -274,8 +274,8 @@ public class OSCARTask extends AbstractCustomTask {
 		String logs = jsonObject.optString("logs");
 		String idResponse = jsonObject.optString("id");
 
-		System.out.println(xmlStatus + ": " + logs);
-		System.out.println(xmlStatus + ": " + logs);
+		System.out.println("ID_RESPONSE:" + idResponse + "-" + xmlStatus + ": " + logs);
+		//System.out.println(xmlStatus + ": " + logs);
 		
 
 	    } catch (Exception e) {
