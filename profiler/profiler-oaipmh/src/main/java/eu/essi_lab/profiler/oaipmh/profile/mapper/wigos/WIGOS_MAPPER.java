@@ -982,7 +982,9 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	        Calendar oneYearAgo = Calendar.getInstance();
 	        oneYearAgo.add(Calendar.MONTH, -12);
 	        if(end.before(oneYearAgo.getTime())){
-	            writer.setText("//*:ReportingStatus/*:reportingStatus/@*:href", "http://codes.wmo.int/wmdr/ReportingStatus/unkown"); 
+	            writer.setText("//*:ReportingStatus/*:reportingStatus/@*:href", "http://codes.wmo.int/wmdr/ReportingStatus/unkown");
+	            GSLoggerFactory.getLogger(getClass()).info("NOT OPERATIONAL");
+	            
 	        }
 	        
 	    }
