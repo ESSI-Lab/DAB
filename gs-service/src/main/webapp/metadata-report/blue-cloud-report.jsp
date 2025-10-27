@@ -144,7 +144,7 @@ tables.put(viewId, table);
 HashMap<String, ViewReport> viewReports = new HashMap<>();
 viewReports.put(viewId, viewReport);
 
-String htmlTable = MetadataReport.createHTMLTable(tables, "FAIR-EASE", viewReports, "https://blue-cloud.geodab.eu/",
+String htmlTable = MetadataReport.createHTMLTable(tables, "Blue-Cloud", viewReports, "https://blue-cloud.geodab.eu/",
 	endHarvestingTimestamp);
 out.println(htmlTable);
 %>
