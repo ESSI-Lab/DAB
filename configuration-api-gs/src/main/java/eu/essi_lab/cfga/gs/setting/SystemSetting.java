@@ -1,5 +1,8 @@
 package eu.essi_lab.cfga.gs.setting;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -25,6 +28,7 @@ import java.util.Optional;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
@@ -39,6 +43,11 @@ import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
 import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.cfga.setting.validation.ValidationContext;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
+import eu.essi_lab.cfga.setting.validation.Validator;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
@@ -305,6 +314,70 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	// set the rendering extension
 	//
 	setExtension(new SystemSettingComponentInfo());
+
+	//
+	// set the validator
+	//
+	setValidator(new SystemSettingValidator());
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class SystemSettingValidator implements Validator {
+
+	private boolean error;
+
+	@Override
+	public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
+
+	    SystemSetting sysSetting = (SystemSetting) SettingUtils.downCast(setting, setting.getSettingClass());
+
+	    DefaultSemanticSearchSetting semSetting = sysSetting.getDefaultSemanticSearchSetting();
+
+	    error = semSetting.getDefaultSemanticRelations().isEmpty();
+
+	    Optional<EmailSetting> emailSetting = sysSetting.getEmailSetting();
+
+	    emailSetting.ifPresent(s -> error |= check(s));
+
+	    Optional<DatabaseSetting> statSetting = sysSetting.getStatisticsSetting();
+
+	    statSetting.ifPresent(s -> error |= check(s));
+
+	    Optional<UsersDatabaseSetting> usersSetting = sysSetting.getUsersDatabaseSetting();
+
+	    usersSetting.ifPresent(s -> error |= check(s));
+
+	    ValidationResponse response = new ValidationResponse();
+
+	    if (error) {
+
+		response.getErrors().add("Please provide all the required fields");
+		response.setResult(ValidationResult.VALIDATION_FAILED);
+	    }
+
+	    return response;
+	}
+
+	/**
+	 * @param setting
+	 * @return
+	 */
+	private boolean check(Setting setting) {
+
+	    List<Setting> list = new ArrayList<Setting>();
+
+	    SettingUtils.deepFind(setting, s -> s.isEnabled(), list);
+
+	    return list.//
+		    stream().//
+		    flatMap(s -> s.getOptions().stream()). //
+		    filter(o -> o.isRequired() && !o.getKey().equals("configFolder")
+			    && o.getOptionalValue().isEmpty() && o.getOptionalSelectedValue().isEmpty())
+		    .//
+		    findFirst().isPresent();	    
+ 	}
     }
 
     /**
