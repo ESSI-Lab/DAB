@@ -63,6 +63,7 @@ import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
+import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
 import eu.essi_lab.cfga.source.FileSource;
@@ -692,6 +693,9 @@ public class DABStarter {
 	// than the corresponding Java setting)
 
 	SimilarityMethod similarityCheckMethod = new SimilarityMethod();
+	
+	// in case a validator is added to a Setting (or removed from a Setting)
+	similarityCheckMethod.getExclusions().remove(Setting.VALIDATOR);
 
 	CheckResponse similarityCheckResponse = similarityCheckMethod.check(configuration);
 

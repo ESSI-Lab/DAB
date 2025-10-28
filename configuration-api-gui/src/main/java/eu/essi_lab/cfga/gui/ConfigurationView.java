@@ -799,7 +799,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     protected void onSettingReplaced(List<Setting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Setting {} repalced",
+	GSLoggerFactory.getLogger(getClass()).debug("Setting {} replaced",
 		settings.stream().map(s -> s.getName()).collect(Collectors.joining(",")));
     }
 

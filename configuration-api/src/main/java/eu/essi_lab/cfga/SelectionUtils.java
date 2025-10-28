@@ -396,9 +396,19 @@ public class SelectionUtils {
 	originalSetting.getOptions().forEach(targetOption -> {
 
 	    List<Object> selectedValues = (List<Object>) targetOption.getSelectedValues();
+
 	    if (!selectedValues.isEmpty()) {
 
 		selectedValuesMap.put(targetOption.getKey(), selectedValues);
+
+	    } else {
+
+		//
+		// we insert in the map also the options having no selected values
+		// this is required for options with with SelectionMode.MULTI having no selected values
+		// !!! (*) options with SelectionMode.UNSET have always no selected values !!!
+		//
+		selectedValuesMap.put(targetOption.getKey(), List.of());
 	    }
 	});
 
@@ -428,11 +438,19 @@ public class SelectionUtils {
 		    outOption.setObjectValues(list);
 		}
 
-		if (outOption.getSelectionMode() == SelectionMode.UNSET) {
+		//
+		// !!! (*) options with SelectionMode.UNSET are excluded !!!
+		// anyway this case never happens
+		//
+		if (outOption.getSelectionMode() == SelectionMode.UNSET && !list.isEmpty()) {
 
 		    outOption.setObjectValues(list);
 
-		} else {
+		    //
+		    // options with SelectionMode.SINGLE have always a value selected,
+		    // while options with SelectionMode.MULTI can also have no selected values
+		    //
+		} else if (outOption.getSelectionMode() != SelectionMode.UNSET) {
 
 		    outOption.select(v -> list.contains(v));
 		}

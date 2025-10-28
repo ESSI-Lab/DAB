@@ -92,6 +92,7 @@ public class DefaultSemanticSearchSetting extends Setting {
 		withValues(LabeledEnum.values(SKOSSemanticRelation.class)).//
 		withSelectedValues(List.of(SKOSSemanticRelation.NARROWER, SKOSSemanticRelation.RELATED)).//
 		cannotBeDisabled().//
+		required().//
 		build();
 
 	addOption(semRelOption);
@@ -113,7 +114,7 @@ public class DefaultSemanticSearchSetting extends Setting {
 		withLabel("Default limitation target of the expansion").//
 		withDescription(
 			"The results of the semantic search expansion can be limited to a maximum number of concepts (default), or to a maximum number of labels or alternate labels.\n"
-				+ "The default maximum number of results can set with the 'Default maximum number of results' option")
+				+ "The default maximum number of results can be set with the 'Default maximum number of results' option")
 		.//
 		withSingleSelection().//
 		withValues(LabeledEnum.values(LimitTarget.class)).//
@@ -127,7 +128,7 @@ public class DefaultSemanticSearchSetting extends Setting {
 		withKey(EXP_LIMIT_OPTION_KEY).//
 		withLabel("Default maximum number of results (0 = no limitation)").//
 		withDescription(
-			"The results of the semantic search expansion are limited by default to a maximum of 50.\n The value '0' means that no limitiation is applied.\n"
+			"The results of the semantic search expansion are limited by default to a maximum of 50.\n The value '0' means that no limitation is applied.\n"
 				+ "The default limitation target of the expansion can be set with the 'Default limitation target of the expansion' option")
 		.//
 		withSingleSelection().//
@@ -178,7 +179,7 @@ public class DefaultSemanticSearchSetting extends Setting {
 		withKey(MAX_EXECUTION_TIME_KEY).//
 		withLabel("Default maximum execution time (in seconds)").//
 		withDescription(
-			"Specifies the maximum time (in seconds) that the expansion operations are allowed to run. The operations will be interrupted when they exceeds the time limit")
+			"Specifies the maximum time (in seconds) that the expansion operations are allowed to run. The operations will be interrupted when they exceed the time limit")
 		.//
 		withSingleSelection().//
 		withValues(Stream.iterate(0, n -> n + 1).limit(31).toList()).//
