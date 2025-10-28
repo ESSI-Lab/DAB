@@ -684,8 +684,8 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		// Extract fields
 		startMonth = 1 ;//calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is 0-based
 		endMonth = 12; //startMonth; // same, unless you want a duration
-		startWeekDay = 2; //calendar.get(Calendar.DAY_OF_WEEK); // Sunday = 1 ... Saturday = 7
-		endWeekDay = 1; //startWeekDay;
+		startWeekDay = 1; //calendar.get(Calendar.DAY_OF_WEEK); // Sunday = 1 ... Saturday = 7
+		endWeekDay = 7; //startWeekDay;
 		startHour = 0; //calendar.get(Calendar.HOUR_OF_DAY);
 		endHour = 23; //startHour;
 		startMinute = 0; //calendar.get(Calendar.MINUTE);
@@ -794,7 +794,9 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		Optional<String> labelUnits = extensionHandler.getAttributeUnits();
 		Optional<String> units = extensionHandler.getAttributeUnitsAbbreviation();
 		if(variableUnits.isPresent()){
-		    record.setMeasurementUnit(variableUnits.get());
+		    String measure = variableUnits.get();
+		    measure = measure.contains("m3_s-1") ? "http://codes.wmo.int/wmdr/unit/m3.s-1": measure;
+		    record.setMeasurementUnit(measure);
 		} else if (units.isPresent()) {
 		    record.setMeasurementUnit(units.get());
 		} else {
