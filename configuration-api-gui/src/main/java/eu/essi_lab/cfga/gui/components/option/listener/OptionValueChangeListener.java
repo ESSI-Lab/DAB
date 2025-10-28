@@ -205,7 +205,7 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 		option.select(v -> list.contains(v));
 
 		List<?> selectedValues = option.getSelectedValues();
-		if (selectedValues.isEmpty()) {
+		if (!list.isEmpty() && selectedValues.isEmpty()) {
 
 		    GSLoggerFactory.getLogger(getClass()).warn("Selection failed for option {}", option.getKey());
 		}
