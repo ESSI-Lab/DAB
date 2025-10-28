@@ -581,19 +581,44 @@ public class WIGOSMetadata implements IWIGOSMetadata {
      */
     @Override
     public void setStationOperatingStatus() {
-	// ReportingStatus status = new ReportingStatus();
-	// ReportingStatusType value = new ReportingStatusType();
-	// ReferenceType reference = new ReferenceType();
-	// reference.setHref("http://codes.wmo.int/wmdr/ReportingStatus/" + "operational");
-	// value.setReportingStatus(reference );
-	// status.setReportingStatus(value);
-	// ProgramAffiliation pa = getObservingFacility().getProgramAffiliation().get(0);
-	// ProgramAffiliationType paType = new ProgramAffiliationType();
-	// paType.getReportingStatus().add(status);
-	// pa.setProgramAffiliation(paType);
-	// getObservingFacility().getProgramAffiliation().add(pa);
-	// getObservingCapability().getProgramAffiliation().add(paType.getProgramAffiliation());
+	 ReportingStatus status = new ReportingStatus();
+	 ReportingStatusType value = new ReportingStatusType();
+	 ReferenceType reference = new ReferenceType();
+	 reference.setHref("http://codes.wmo.int/wmdr/ReportingStatus/" + "operational");
+	 value.setReportingStatus(reference);
+	 //TimePeriodPropertyType tp = new TimePeriodPropertyType();
+	 //tp.setTimePeriod(createTimePeriodType(beginPosition, endPosition, null));
+	 status.setReportingStatus(value);
+	 ProgramAffiliation pa = getObservingFacility().getProgramAffiliation().get(0);
+	 ProgramAffiliationType paType = new ProgramAffiliationType();
+	 paType.getReportingStatus().add(status);
+	 //ReferenceType reference2 = new ReferenceType();pa.getProgramAffiliation().getProgramAffiliation()
+	 //reference2.setHref(null);
+	 paType.setProgramAffiliation(pa.getProgramAffiliation().getProgramAffiliation());
+	 pa.setProgramAffiliation(paType);
+	 getObservingFacility().getProgramAffiliation().add(pa);
+	//getObservingCapability().getProgramAffiliation().add(paType.getProgramAffiliation());
 
+    }
+    
+    public void setStationOperatingStatus(String beginPosition, String endPosition) {
+	ReportingStatus status = new ReportingStatus();
+	 ReportingStatusType value = new ReportingStatusType();
+	 ReferenceType reference = new ReferenceType();
+	 reference.setHref("http://codes.wmo.int/wmdr/ReportingStatus/" + "operational");
+	 value.setReportingStatus(reference);
+	 TimePeriodPropertyType tp = new TimePeriodPropertyType();
+	 tp.setTimePeriod(createTimePeriodType(beginPosition, endPosition, null));
+	 value.setValidPeriod(tp);
+	 status.setReportingStatus(value);
+	 ProgramAffiliation pa = getObservingFacility().getProgramAffiliation().get(0);
+	 ProgramAffiliationType paType = new ProgramAffiliationType();
+	 paType.getReportingStatus().add(status);
+	 //ReferenceType reference2 = new ReferenceType();pa.getProgramAffiliation().getProgramAffiliation()
+	 //reference2.setHref(null);
+	 paType.setProgramAffiliation(pa.getProgramAffiliation().getProgramAffiliation());
+	 pa.setProgramAffiliation(paType);
+	// getObservingFacility().getProgramAffiliation().add(pa);
     }
 
     // CATEGORY 4: ENVIRONMENT

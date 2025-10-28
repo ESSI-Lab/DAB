@@ -35,7 +35,7 @@ public class WMORegionMapper {
     public enum WMORegion {
         I("africa", 1),
         II("asia", 2),
-        III("southAmericasouthAmerica", 3),
+        III("southAmerica", 3),
         IV("northCentralAmericaCaribbean", 4),
         V("southWestPacific", 5),
         VI("europe", 6),

@@ -280,7 +280,7 @@ public abstract class MetadataReport {
 		set.add("CF standard names");
 	    } else if (term.contains("https://csr.seadatanet.org/")) {
 		set.add("CSR");
-	      } else if (term.contains("https://oscar.wmo.int/surface/#/search/station/stationReportDetails/")) {
+	    } else if (term.contains("https://oscar.wmo.int/surface/#/search/station/stationReportDetails/")) {
 		set.add("WMO OSCAR STATION");
 	    } else if (term.contains("https://edmerp.seadatanet.org/")) {
 		set.add("EDMERP");
@@ -455,9 +455,9 @@ public abstract class MetadataReport {
 
 	    int rows = table.size();
 	    int cols = table.get(0).length;
-
-	    String testPortal = "https://" + hostname + "/gs-service/search?view=" + viewId;
-	    builder.append("<div><strong>" + label + "</strong> available service at: <strong>https://" + hostname
+	    hostname = hostname.startsWith("http") ? hostname : "https://" + hostname;
+	    String testPortal = hostname + "/gs-service/search?view=" + viewId;
+	    builder.append("<div><strong>" + label + "</strong> available service at: <strong>" + hostname
 		    + "/gs-service/services/essi/view/" + viewId + "/csw</strong><br/>" + "<strong>" + label
 		    + "</strong> available test portal at: <a href=\"" + testPortal + "\">" + testPortal + "</a><br/>"
 		    + "Total number of records: <strong>" + count + "</strong> Number of records analyzed: <strong>" + returned

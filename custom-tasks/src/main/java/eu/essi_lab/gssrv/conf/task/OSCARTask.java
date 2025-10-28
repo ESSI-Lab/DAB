@@ -255,7 +255,7 @@ public class OSCARTask extends AbstractCustomTask {
 	if (!resList.isEmpty()) {
 	    oscarMap.put(platformIdentifier, new ArrayList<>(resList));
 	}
-
+	System.out.println("OSCAR MAP SIZE" + ": " + oscarMap.size());
 	oscarMap.forEach((key, gsresource) -> {
 	    try {
 		String doc = wigosMapper.mapStations(gsresource, key);
@@ -274,7 +274,9 @@ public class OSCARTask extends AbstractCustomTask {
 		String logs = jsonObject.optString("logs");
 		String idResponse = jsonObject.optString("id");
 
-		System.out.println(xmlStatus + ": " + logs);
+		System.out.println("ID_RESPONSE:" + idResponse + "-" + xmlStatus + ": " + logs);
+		//System.out.println(xmlStatus + ": " + logs);
+		
 
 	    } catch (Exception e) {
 
