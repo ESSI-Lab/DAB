@@ -373,7 +373,14 @@ public class JSONDinaguaClient extends DinaguaClient {
 
 	if (statusStations.size() == 0) {
 
-	    String response = downloadString(getEndpoint() + "/estadohidro/estaciones").get();
+	    String url = getEndpoint() + "/estadohidro/estaciones";
+	    Optional<String> stringResponse = downloadString(url);
+	    if (!stringResponse.isPresent()) {
+		String msg = "missing response from URL: " + url;
+		GSLoggerFactory.getLogger(getClass()).error(msg);
+		throw new RuntimeException(msg);
+	    }
+	    String response = stringResponse.get();
 
 	    JSONArray stationsArray = new JSONArray(response);
 
