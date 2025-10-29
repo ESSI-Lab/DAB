@@ -238,6 +238,8 @@ public class SettingTest {
 	setting.setValidator((c, s, cnt) -> null);
 	Assert.assertTrue(setting.getPropertyValue(Setting.VALIDATOR).isPresent());
 
+	setting.removeValidator();
+	Assert.assertFalse(setting.getPropertyValue(Setting.VALIDATOR).isPresent());
     }
 
     @Test
