@@ -4,6 +4,8 @@ import static org.junit.Assert.fail;
 
 import javax.ws.rs.core.MediaType;
 
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.SimpleConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,6 +17,8 @@ import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.profiler.os.OSProfilerSetting;
 import eu.essi_lab.profiler.os.handler.discover.OSRequestTransformer;
+
+import java.util.List;
 
 public class OSSearchTermsRequestTest {
 
@@ -145,6 +149,9 @@ public class OSSearchTermsRequestTest {
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
 	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
+
+	SimpleConfiguration simpleConfiguration = new SimpleConfiguration();
+	ConfigurationWrapper.setConfiguration(simpleConfiguration);
 
 	try {
 
@@ -353,6 +360,9 @@ public class OSSearchTermsRequestTest {
 
 	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
+	SimpleConfiguration simpleConfiguration = new SimpleConfiguration();
+	ConfigurationWrapper.setConfiguration(simpleConfiguration);
+
 	try {
 
 	    LogicalBond userBond = (LogicalBond) transformer.getUserBond(webRequest);
@@ -367,27 +377,29 @@ public class OSSearchTermsRequestTest {
 	    Assert.assertEquals(b1.getLogicalOperator(), LogicalOperator.OR);
 	    Assert.assertEquals(b2.getLogicalOperator(), LogicalOperator.OR);
 
-	    Bond[] logicOp1Array = b1.getOperands().toArray(new Bond[] {});
+	    List<SimpleValueBond> logicOp1Array = b1.getOperands().stream().map(v -> (SimpleValueBond) v)
+		    .sorted((p1, p2) -> p1.getProperty().compareTo(p2.getProperty())).toList();
 
-	    SimpleValueBond SimpleElementBond1 = (SimpleValueBond) logicOp1Array[0];
-	    SimpleValueBond titleBond1 = (SimpleValueBond) logicOp1Array[1];
+	    SimpleValueBond simpleValueBond = (SimpleValueBond) logicOp1Array.get(0);
+	    SimpleValueBond titleBond1 = (SimpleValueBond) logicOp1Array.get(1);
 
-	    Assert.assertEquals(SimpleElementBond1.getProperty().getName(), "anyText");
-	    Assert.assertEquals(SimpleElementBond1.getPropertyValue(), "WATER");
+	    Assert.assertEquals(simpleValueBond.getProperty().getName(), "anyText");
+	    Assert.assertEquals(simpleValueBond.getPropertyValue(), "WATER");
 
 	    Assert.assertEquals(titleBond1.getProperty().getName(), "title");
 	    Assert.assertEquals(titleBond1.getPropertyValue(), "WATER");
 
-	    Bond[] logicOp2Array = b1.getOperands().toArray(new Bond[] {});
+	    List<SimpleValueBond> logicOp2Array = b1.getOperands().stream().map(v -> (SimpleValueBond) v)
+		    .sorted((p1, p2) -> p1.getProperty().compareTo(p2.getProperty())).toList();
 
-	    SimpleValueBond SimpleElementBond2 = (SimpleValueBond) logicOp2Array[0];
-	    SimpleValueBond titleBond2 = (SimpleValueBond) logicOp2Array[1];
+	    SimpleValueBond simpleElementBond2 = (SimpleValueBond) logicOp2Array.get(0);
+	    SimpleValueBond titleBond2 = (SimpleValueBond) logicOp2Array.get(1);
 
 	    Assert.assertEquals(titleBond2.getProperty().getName(), "title");
 	    Assert.assertEquals(titleBond2.getPropertyValue(), "WATER");
 
-	    Assert.assertEquals(SimpleElementBond2.getProperty().getName(), "anyText");
-	    Assert.assertEquals(SimpleElementBond2.getPropertyValue(), "WATER");
+	    Assert.assertEquals(simpleElementBond2.getProperty().getName(), "anyText");
+	    Assert.assertEquals(simpleElementBond2.getPropertyValue(), "WATER");
 
 	} catch (Exception e) {
 	    e.printStackTrace();

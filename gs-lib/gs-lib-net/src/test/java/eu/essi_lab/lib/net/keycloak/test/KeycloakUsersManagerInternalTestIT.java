@@ -33,7 +33,6 @@ public class KeycloakUsersManagerInternalTestIT {
 	manager.setServiceUrl(System.getProperty("keycloak.host"));
 	manager.setAdminPassword(System.getProperty("keycloak.password"));
 	manager.setAdminUser(System.getProperty("keycloak.user"));
-
 	manager.setUsersRealm("testRealm");
 
 	String accessToken = manager.getAccessToken();
@@ -46,39 +45,6 @@ public class KeycloakUsersManagerInternalTestIT {
 	}
 
 	Assert.assertEquals(0, manager.count(accessToken));
-    }
-
-    /**
-     * @param args
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public static void main(String[] args) throws IOException, InterruptedException {
-
-	KeycloakUsersClient manager = new KeycloakUsersClient();
-	manager.setServiceUrl("http://localhost:8080");
-	manager.setAdminPassword(System.getProperty("keycloak.password"));
-	manager.setAdminUser(System.getProperty("keycloak.user"));
-	manager.setUsersRealm("testRealm");
-
-	KeycloakUser user = new KeycloakUser.KeycloakUserBuilder().//
-		enabled(false).//
-		withUserProfileAttribute(UserProfileAttribute.USERNAME, "pluto").//
-		withUserProfileAttribute(UserProfileAttribute.EMAIL, "pluto@gmail.com").//
-		withUserProfileAttribute(UserProfileAttribute.FIRST_NAME, "Pluto").//
-		withUserProfileAttribute(UserProfileAttribute.LAST_NAME, "De Plutis").//
-		withAttribute("key1", "value1").//
-		withAttribute("key2", "value2").//
-		build();
-
-	String accessToken = manager.getAccessToken();
-
-	manager.create(accessToken, user);
-
-	List<JSONObject> listRaw = manager.listRaw(accessToken);
-
-	System.out.println(listRaw.get(0).toString(3));
-
     }
 
     @Test
@@ -439,4 +405,38 @@ public class KeycloakUsersManagerInternalTestIT {
 	Assert.assertEquals(id1, manager.findId(accessToken, "user1").get());
 	Assert.assertEquals(id2, manager.findId(accessToken, "user2").get());
     }
+
+    /**
+     * @param args
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static void main(String[] args) throws IOException, InterruptedException {
+
+	KeycloakUsersClient manager = new KeycloakUsersClient();
+	manager.setServiceUrl("http://localhost:8080");
+	manager.setAdminPassword(System.getProperty("keycloak.password"));
+	manager.setAdminUser(System.getProperty("keycloak.user"));
+	manager.setUsersRealm("testRealm");
+
+	KeycloakUser user = new KeycloakUser.KeycloakUserBuilder().//
+		enabled(false).//
+		withUserProfileAttribute(UserProfileAttribute.USERNAME, "pluto").//
+		withUserProfileAttribute(UserProfileAttribute.EMAIL, "pluto@gmail.com").//
+		withUserProfileAttribute(UserProfileAttribute.FIRST_NAME, "Pluto").//
+		withUserProfileAttribute(UserProfileAttribute.LAST_NAME, "De Plutis").//
+		withAttribute("key1", "value1").//
+		withAttribute("key2", "value2").//
+		build();
+
+	String accessToken = manager.getAccessToken();
+
+	manager.create(accessToken, user);
+
+	List<JSONObject> listRaw = manager.listRaw(accessToken);
+
+	System.out.println(listRaw.get(0).toString(3));
+
+    }
 }
+
