@@ -64,7 +64,10 @@ public class KeycloakUsersClientInternalTestIT {
 	Assert.assertEquals("master", realms.get(0));
 	Assert.assertEquals("testRealm", realms.get(1));
 
-	System.out.println(realms);
+	Assert.assertFalse(client.createUsersRealm(accessToken, USERS_REALM));
+
+	Assert.assertTrue(client.usersRealmExists(accessToken));
+
     }
 
     @Test
