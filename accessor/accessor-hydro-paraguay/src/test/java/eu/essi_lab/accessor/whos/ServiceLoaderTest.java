@@ -62,8 +62,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(DMHConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(DMHConnector.class)));//
     }
 
     @SuppressWarnings("rawtypes")
@@ -73,14 +72,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(DMHAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(DMHAccessor.class.getName())));
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(DMHConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(DMHConnector.class.getName())));
 
     }
 }

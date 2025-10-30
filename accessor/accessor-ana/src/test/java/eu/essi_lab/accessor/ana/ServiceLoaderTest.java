@@ -65,13 +65,11 @@ public class ServiceLoaderTest {
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(ANAConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(ANAConnector.class)));//
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(ANASARConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(ANASARConnector.class)));//
 
     }
 
@@ -81,16 +79,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.ANA_SAR_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.ANA_SAR_URI)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.ANA_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.ANA_URI)));
 
     }
 
@@ -101,27 +93,19 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().getName().equals(ANAAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getClass().getName().equals(ANAAccessor.class.getName())));
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ANASARAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ANASARAccessor.class.getName())));
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ANAConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ANAConnector.class.getName())));
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ANASARConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ANASARConnector.class.getName())));
     }
 
 }

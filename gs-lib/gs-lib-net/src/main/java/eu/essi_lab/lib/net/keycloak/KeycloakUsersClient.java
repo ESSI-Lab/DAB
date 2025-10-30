@@ -210,7 +210,7 @@ public class KeycloakUsersClient {
      */
     public boolean usersRealmExists(String accessToken) throws IOException, InterruptedException {
 
-	return getRealms(accessToken).stream().filter(r -> r.equals(usersRealm)).findFirst().isPresent();
+	return getRealms(accessToken).stream().anyMatch(r -> r.equals(usersRealm));
     }
 
     /**
@@ -291,7 +291,7 @@ public class KeycloakUsersClient {
 	    }
 	}
 	case 409 -> {
-	    GSLoggerFactory.getLogger(getClass()).warn("Realm {} already exists");
+	    GSLoggerFactory.getLogger(getClass()).warn("Realm {} already exists", realm);
 	    return false;
 	}
 	default -> {
@@ -465,7 +465,7 @@ public class KeycloakUsersClient {
 
 	return listRaw(accessToken, realm).//
 		stream().//
-		map(o -> KeycloakUser.of(o)).//
+		map(KeycloakUser::of).//
 		collect(Collectors.toList());
     }
 

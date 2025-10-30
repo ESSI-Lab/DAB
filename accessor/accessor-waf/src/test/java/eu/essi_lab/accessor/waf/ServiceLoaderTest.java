@@ -98,47 +98,38 @@ public class ServiceLoaderTest {
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(DirectoryListingConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(DirectoryListingConnector.class)));//
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(ECOPotentialVLabConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(ECOPotentialVLabConnector.class)));//
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(HttpGetISOConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(HttpGetISOConnector.class)));//
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(S3BucketConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(S3BucketConnector.class)));//
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(ONAMETConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(ONAMETConnector.class)));//
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(ONAMETStationsConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(ONAMETStationsConnector.class)));//
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(NetCDFConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(NetCDFConnector.class)));//
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(ZenodoS3BucketConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(ZenodoS3BucketConnector.class)));//
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(TRIGGERWafConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(TRIGGERWafConnector.class)));//
     }
 
     @SuppressWarnings("rawtypes")
@@ -151,99 +142,67 @@ public class ServiceLoaderTest {
 	Assert.assertEquals(9, count);
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().getName().equals(DirectoryListingAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getClass().getName().equals(DirectoryListingAccessor.class.getName())));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().getName().equals(DirectoryListingConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getClass().getName().equals(DirectoryListingConnector.class.getName())));
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ECOPotentialVlabAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ECOPotentialVlabAccessor.class.getName())));
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ECOPotentialVLabConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ECOPotentialVLabConnector.class.getName())));
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(HTTPGetISOAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(HTTPGetISOAccessor.class.getName())));
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(HttpGetISOConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(HttpGetISOConnector.class.getName())));
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(S3BucketAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(S3BucketAccessor.class.getName())));
 
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(S3BucketConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(S3BucketConnector.class.getName())));
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ONAMETAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ONAMETAccessor.class.getName())));
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ONAMETConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ONAMETConnector.class.getName())));
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ONAMETAugmenter.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ONAMETAugmenter.class.getName())));
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ONAMETStationsAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ONAMETStationsAccessor.class.getName())));
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ONAMETStationsConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ONAMETStationsConnector.class.getName())));
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ONAMETStationsAugmenter.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ONAMETStationsAugmenter.class.getName())));
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ZenodoS3BucketConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ZenodoS3BucketConnector.class.getName())));
 	
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(loader.iterator()).//
-			filter(c -> c.getClass().getName().equals(ZenodoS3BucketAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+			anyMatch(c -> c.getClass().getName().equals(ZenodoS3BucketAccessor.class.getName())));
     }
 
     @Test
@@ -252,16 +211,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(ONAMETMapper.ONAMET_METADATA_SCHEMA)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(ONAMETMapper.ONAMET_METADATA_SCHEMA)));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(ONAMETStationsMapper.ONAMET_STATIONS_METADATA_SCHEMA)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(ONAMETStationsMapper.ONAMET_STATIONS_METADATA_SCHEMA)));
 
     }
 

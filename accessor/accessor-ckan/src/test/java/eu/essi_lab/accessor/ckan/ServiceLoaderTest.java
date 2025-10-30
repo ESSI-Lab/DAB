@@ -64,13 +64,11 @@ public class ServiceLoaderTest {
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(CKANConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(CKANConnector.class)));//
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(CKANPackageSearchConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(CKANPackageSearchConnector.class)));//
 
     }
 
@@ -80,9 +78,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CKANConstants.CKAN)).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CKANConstants.CKAN)));
 
     }
 
@@ -93,24 +89,16 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().getName().equals(CKANAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getClass().getName().equals(CKANAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().getName().equals(CKANPackageSearchAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getClass().getName().equals(CKANPackageSearchAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().getName().equals(CKANConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getClass().getName().equals(CKANConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().getName().equals(CKANPackageSearchConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getClass().getName().equals(CKANPackageSearchConnector.class.getName())));
 
     }
 

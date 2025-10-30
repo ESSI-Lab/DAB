@@ -80,8 +80,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(WMSConnectorWrapper.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(WMSConnectorWrapper.class)));//
     }
 
     @Test

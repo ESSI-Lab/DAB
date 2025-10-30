@@ -70,30 +70,26 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(INAConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(INAConnector.class)));//
 	
 
 	Assert.assertTrue(//
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(ISPRAConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(ISPRAConnector.class)));//
 
 	Assert.assertTrue(//
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(CUAHSIHISCentralConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(CUAHSIHISCentralConnector.class)));//
 
 	Assert.assertTrue(//
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(CUAHSIHISServerConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(CUAHSIHISServerConnector.class)));//
 	
 	
     }
@@ -104,14 +100,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.WML1_NS_URI)).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.WML1_NS_URI)));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.WML1_ISPRA_NS_URI)).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.WML1_ISPRA_NS_URI)));
 
     }
 

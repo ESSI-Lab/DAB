@@ -373,10 +373,8 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	    return list.//
 		    stream().//
 		    flatMap(s -> s.getOptions().stream()). //
-		    filter(o -> o.isRequired() && !o.getKey().equals("configFolder")
-			    && o.getOptionalValue().isEmpty() && o.getOptionalSelectedValue().isEmpty())
-		    .//
-		    findFirst().isPresent();	    
+		    anyMatch(o -> o.isRequired() && !o.getKey().equals("configFolder")
+			    && o.getOptionalValue().isEmpty() && o.getOptionalSelectedValue().isEmpty());
  	}
     }
 

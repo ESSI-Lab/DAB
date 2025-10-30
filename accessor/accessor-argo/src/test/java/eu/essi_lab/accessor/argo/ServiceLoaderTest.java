@@ -31,7 +31,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(2, accessors.size());
 
-	    Assert.assertEquals(ARGOAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(ARGOAccessor.class, accessors.getFirst().getClass());
 
 	}
 
@@ -42,7 +42,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(2, accessors.size());
 
-	    Assert.assertEquals(ARGOAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(ARGOAccessor.class, accessors.getFirst().getClass());
 	}
 
 	{
@@ -64,8 +64,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(ARGOConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(ARGOConnector.class)));//
     }
 
     @Test
@@ -74,10 +73,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.ARGO_NS_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.ARGO_NS_URI)));
 
     }
 
@@ -88,14 +84,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(ARGOAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(ARGOAccessor.class.getName())));
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(ARGOConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(ARGOConnector.class.getName())));
 
     }
 }

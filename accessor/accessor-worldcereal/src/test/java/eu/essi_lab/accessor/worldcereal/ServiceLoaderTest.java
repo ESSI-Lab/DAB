@@ -155,11 +155,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(WorldCerealGranulesMapper.WORLDCEREAL_GRANULES_SCHEME_URI))
-		.findFirst().isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(WorldCerealGranulesMapper.WORLDCEREAL_GRANULES_SCHEME_URI)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(WorldCerealCollectionMapper.SCHEMA_URI)).findFirst().isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(WorldCerealCollectionMapper.SCHEMA_URI)));
 
     }
 
@@ -170,24 +169,16 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(WorldCerealGranulesConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(WorldCerealGranulesConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(WorldCerealGranulesAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(WorldCerealGranulesAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(WorldCerealConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(WorldCerealConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(WorldCerealAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(WorldCerealAccessor.class.getName())));
 
     }
 

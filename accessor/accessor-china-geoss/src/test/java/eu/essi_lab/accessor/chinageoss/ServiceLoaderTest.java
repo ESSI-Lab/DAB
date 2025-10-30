@@ -30,7 +30,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(ChinaGeossAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(ChinaGeossAccessor.class, accessors.getFirst().getClass());
 
 	}
 
@@ -41,7 +41,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(ChinaGeossAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(ChinaGeossAccessor.class, accessors.getFirst().getClass());
 	}
 
 	{
@@ -63,8 +63,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(ChinaGeossConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(ChinaGeossConnector.class)));//
     }
 
     @Test
@@ -73,10 +72,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(ChinaGeossMapper.CHINA_GEOSS_SCHEME_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(ChinaGeossMapper.CHINA_GEOSS_SCHEME_URI)));
 
     }
 
@@ -87,14 +83,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(ChinaGeossAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(ChinaGeossAccessor.class.getName())));
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(ChinaGeossConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(ChinaGeossConnector.class.getName())));
 
     }
 }

@@ -67,8 +67,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(SentinelConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(SentinelConnector.class)));//
     }
 
     @Test
@@ -77,10 +76,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(SentinelMapper.SENTINEL_SCHEME_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(SentinelMapper.SENTINEL_SCHEME_URI)));
 
     }
 
@@ -90,9 +86,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<DataDownloader> loader = ServiceLoader.load(DataDownloader.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(d -> d.getClass().equals(SentinelDownloader.class)).//
-		findFirst().//
-		isPresent());
+		anyMatch(d -> d.getClass().equals(SentinelDownloader.class)));
 
     }
 
@@ -103,19 +97,13 @@ public class ServiceLoaderTest {
 	ServiceLoader<Augmenter> loader = ServiceLoader.load(Augmenter.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(d -> d.getClass().equals(SentinelThumbnailAugmenter.class)).//
-		findFirst().//
-		isPresent());
+		anyMatch(d -> d.getClass().equals(SentinelThumbnailAugmenter.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(d -> d.getClass().equals(SentinelOnlineResourceAugmenter.class)).//
-		findFirst().//
-		isPresent());
+		anyMatch(d -> d.getClass().equals(SentinelOnlineResourceAugmenter.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(d -> d.getClass().equals(SentinelAccessAugmenter.class)).//
-		findFirst().//
-		isPresent());
+		anyMatch(d -> d.getClass().equals(SentinelAccessAugmenter.class)));
 
     }
 
@@ -126,14 +114,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(SentinelAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(SentinelAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(SentinelConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(SentinelConnector.class.getName())));
 
     }
 }
