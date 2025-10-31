@@ -21,10 +21,7 @@ package eu.essi_lab.model.resource;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -765,10 +762,10 @@ public enum MetadataElement implements Queryable {
     public static final String MEASUREMENT_METHOD_ICE_ON_OFF_EL_NAME = "MeasurementMethodIceOnOff";
     // public static final String EQUIPMENT ="Equipment";
 
-    private String name;
-    private boolean volatileElement;
-    private boolean extendedElement;
-    private ContentType type;
+    private final String name;
+    private final boolean volatileElement;
+    private final boolean extendedElement;
+    private final ContentType type;
     private boolean isEnabled;
     private ComposedElement element;
     private String readableName;
@@ -776,7 +773,7 @@ public enum MetadataElement implements Queryable {
     /**
      * @param name
      */
-    private MetadataElement(String name) {
+    MetadataElement(String name) {
 
 	this(name, null, false, false, ContentType.TEXTUAL, true);
     }
@@ -785,7 +782,7 @@ public enum MetadataElement implements Queryable {
      * @param name
      * @param readableName
      */
-    private MetadataElement(String name, String readableName) {
+    MetadataElement(String name, String readableName) {
 
 	this(name, readableName, false, false, ContentType.TEXTUAL, true);
     }
@@ -793,7 +790,7 @@ public enum MetadataElement implements Queryable {
     /**
      * @param name
      */
-    private MetadataElement(String name, boolean enabled) {
+    MetadataElement(String name, boolean enabled) {
 
 	this(name, null, false, false, ContentType.TEXTUAL, enabled);
     }
@@ -803,7 +800,7 @@ public enum MetadataElement implements Queryable {
      * @param readableName
      * @param enabled
      */
-    private MetadataElement(String name, String readableName, boolean enabled) {
+    MetadataElement(String name, String readableName, boolean enabled) {
 
 	this(name, readableName, false, false, ContentType.TEXTUAL, enabled);
     }
@@ -812,7 +809,7 @@ public enum MetadataElement implements Queryable {
      * @param name
      * @param type
      */
-    private MetadataElement(String name, ContentType type) {
+    MetadataElement(String name, ContentType type) {
 
 	this(name, null, false, false, type, true);
     }
@@ -822,7 +819,7 @@ public enum MetadataElement implements Queryable {
      * @param readableName
      * @param type
      */
-    private MetadataElement(String name, String readableName, ContentType type) {
+    MetadataElement(String name, String readableName, ContentType type) {
 
 	this(name, readableName, false, false, type, true);
     }
@@ -830,7 +827,7 @@ public enum MetadataElement implements Queryable {
     /**
      * @param element
      */
-    private MetadataElement(ComposedElement element) {
+    MetadataElement(ComposedElement element) {
 
 	this.name = element.getName();
 	this.element = element;
@@ -847,7 +844,7 @@ public enum MetadataElement implements Queryable {
      * @param type
      * @param enabled
      */
-    private MetadataElement(//
+    MetadataElement(//
 	    String name, //
 	    boolean volatileElement, //
 	    boolean extendedElement, //
@@ -862,7 +859,7 @@ public enum MetadataElement implements Queryable {
      * @param volatileElement
      * @param type
      */
-    private MetadataElement(//
+    MetadataElement(//
 	    String name, //
 	    String readableName, //
 	    boolean volatileElement, //
@@ -970,9 +967,9 @@ public enum MetadataElement implements Queryable {
      */
     public static List<MetadataElement> listOrderedValues() {
 
-	return Arrays.asList(values()).//
-		stream().//
-		sorted((o1, o2) -> o1.getName().compareTo(o2.getName())).//
+	//
+	return Arrays.stream(values()).//
+		sorted(Comparator.comparing(MetadataElement::getName)).//
 		collect(Collectors.toList());//
     }
 
@@ -984,9 +981,7 @@ public enum MetadataElement implements Queryable {
 
 	return listValues().//
 		stream().//
-		filter(e -> e.hasComposedElement() && e.getName().equals(name)).//
-		findFirst().//
-		isPresent();
+		anyMatch(e -> e.hasComposedElement() && e.getName().equals(name));
     }
 
     /**
@@ -997,7 +992,7 @@ public enum MetadataElement implements Queryable {
 
 	return listValues().//
 		stream().//
-		filter(e -> e.hasComposedElement()).//
+		filter(MetadataElement::hasComposedElement).//
 		collect(Collectors.toList());
     }
 
