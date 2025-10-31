@@ -26,5 +26,7 @@
 	"riverSearch": true,
 	"timeInterpolation": true,
 	"clusterWMS": true,    
-	"showSourceEndpoint": false
+	"showSourceEndpoint": false,
+    "top-logo":"wmo-logo.svg",
+    "top-logo-href":"https://wmo.int/activities/wmo-hydrological-observing-system-whos"
 }
