@@ -430,7 +430,14 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		continue;
 	    }
 
-	    keywords.addKeyword(key + ": " + value);
+	    Keywords nks = new Keywords();
+	    nks.setThesaurusNameCitationTitle(key);
+	    String[] values = value.split(",");
+	    for (String v : values) {
+		nks.addKeyword(v.trim());
+	    }
+	    dataId.addKeywords(nks );
+	    
 	}
 	//
 	// File Identifier
