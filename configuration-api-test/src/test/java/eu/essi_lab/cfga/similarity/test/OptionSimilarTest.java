@@ -24,7 +24,7 @@ public class OptionSimilarTest {
 	option1.setKey("key1");
 	option1.setValue("xxx");
 
-	Option<String> option2 = new Option<String>(option1.toString());
+	Option<String> option2 = new Option<>(option1.toString());
 	option2.setValue("yyy");
 
 	boolean similar = option1.similar(option2);
@@ -35,11 +35,11 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest1_1() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setValue("xxx");
 
-	Option<String> option2 = new Option<String>(option1.toString());
+	Option<String> option2 = new Option<>(option1.toString());
 	option2.setValue("xxx");
 
 	boolean similar = option1.similar(option2);
@@ -50,12 +50,12 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest2() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setValue("xxx");
 	option1.setDescription("desc1");
 
-	Option<String> option2 = new Option<String>(option1.toString());
+	Option<String> option2 = new Option<>(option1.toString());
 	option2.setDescription("desc2");
 
 	boolean similar = option1.similar(option2);
@@ -66,12 +66,12 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest2_1() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setValue("xxx");
 	option1.setDescription("desc1");
 
-	Option<String> option2 = new Option<String>(String.class);
+	Option<String> option2 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setValue("xxx");
 
@@ -83,11 +83,11 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest2_2() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setValue("xxx");
 
-	Option<String> option2 = new Option<String>(String.class);
+	Option<String> option2 = new Option<>(String.class);
 	option2.setKey("key1");
 
 	boolean similar = option1.similar(option2);
@@ -98,11 +98,11 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest3() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setDescription("desc1");
 
-	Option<Integer> option2 = new Option<Integer>(Integer.class);
+	Option<Integer> option2 = new Option<>(Integer.class);
 	option2.setKey("key1");
 	option2.setDescription("desc1");
 
@@ -114,13 +114,13 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest4() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setValue("yyy");
 	option1.setDescription("desc1");
 	option1.setPosition(0);
 
-	Option<String> option2 = new Option<String>(option1.toString());
+	Option<String> option2 = new Option<>(option1.toString());
 	option2.setPosition(1);
 
 	boolean similar = option1.similar(option2);
@@ -131,13 +131,13 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest5() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setValue("xxx");
 	option1.setDescription("desc1");
 	option1.setPosition(1);
 
-	Option<String> option2 = new Option<String>(String.class);
+	Option<String> option2 = new Option<>(String.class);
 	option2.setKey("key2");
 	option2.setValue("xxx");
 	option2.setDescription("desc1");
@@ -151,14 +151,14 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest6() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setDescription("desc1");
 	option1.setPosition(0);
 	option1.setSelectionMode(SelectionMode.SINGLE);
 	option1.setValues(Arrays.asList("a", "b", "c", "d", "e"));
 
-	Option<String> option2 = new Option<String>(String.class);
+	Option<String> option2 = new Option<>(String.class);
 	option2.setKey("key2");
 	option2.setDescription("desc2");
 	option2.setPosition(0);
@@ -173,14 +173,14 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest6_1() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setDescription("desc1");
 	option1.setPosition(0);
 	option1.setSelectionMode(SelectionMode.SINGLE);
 	option1.setValues(Arrays.asList("a", "b", "c", "d", "e"));
 
-	Option<String> option2 = new Option<String>(option1.toString());
+	Option<String> option2 = new Option<>(option1.toString());
 	option2.setSelectionMode(SelectionMode.MULTI);
 
 	boolean similar = option1.similar(option2);
@@ -191,7 +191,7 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest7() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setDescription("desc1");
 	option1.setPosition(0);
@@ -199,7 +199,7 @@ public class OptionSimilarTest {
 	option1.setValues(Arrays.asList("a", "b", "c", "d", "e"));
 	option1.select(v -> v.equals("a"));
 
-	Option<String> option2 = new Option<String>(option1.toString());
+	Option<String> option2 = new Option<>(option1.toString());
 
 	boolean similar = option1.similar(option2);
 
@@ -209,7 +209,7 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest7_1() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setDescription("desc1");
 	option1.setPosition(0);
@@ -217,7 +217,7 @@ public class OptionSimilarTest {
 	option1.setValues(Arrays.asList("a", "b", "c", "d", "e"));
 	option1.select(v -> v.equals("a"));
 
-	Option<String> option2 = new Option<String>(option1.toString());
+	Option<String> option2 = new Option<>(option1.toString());
 	option2.select(v -> v.equals("b"));
 
 	boolean similar = option1.similar(option2);
@@ -228,7 +228,7 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest7_2() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setDescription("desc1");
 	option1.setPosition(0);
@@ -236,7 +236,7 @@ public class OptionSimilarTest {
 	option1.setValues(Arrays.asList("a", "b", "c", "d", "e"));
 	option1.select(v -> v.equals("a"));
 
-	Option<String> option2 = new Option<String>(option1.toString());
+	Option<String> option2 = new Option<>(option1.toString());
 	option2.setValues(Arrays.asList("a", "b"));
 	option2.select(v -> v.equals("b"));
 
@@ -248,7 +248,7 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest7_3() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setDescription("desc1");
 	option1.setPosition(0);
@@ -257,7 +257,7 @@ public class OptionSimilarTest {
 	option1.select(v -> v.equals("a"));
 	option1.clean();
 
-	Option<String> option2 = new Option<String>(option1.toString());
+	Option<String> option2 = new Option<>(option1.toString());
 	option2.setSelectionMode(SelectionMode.SINGLE);
 	option2.select(v -> v.equals("b"));
 	option2.clean();
@@ -270,10 +270,10 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest8() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
 	option1.setValue("xxx");
-	option1.setLoader(new ValuesLoader<String>() {
+	option1.setLoader(new ValuesLoader<>() {
 	    @Override
 	    protected List<String> loadValues(Optional<String> input) throws Exception {
 
@@ -281,8 +281,8 @@ public class OptionSimilarTest {
 	    }
 	});
 
-	Option<String> option2 = new Option<String>(option1.toString());
-	option2.setLoader(new ValuesLoader<String>() {
+	Option<String> option2 = new Option<>(option1.toString());
+	option2.setLoader(new ValuesLoader<>() {
 	    @Override
 	    protected List<String> loadValues(Optional<String> input) throws Exception {
 
@@ -298,9 +298,9 @@ public class OptionSimilarTest {
     @Test
     public void optionSimilarTest9() {
 
-	Option<String> option1 = new Option<String>(String.class);
+	Option<String> option1 = new Option<>(String.class);
 	option1.setKey("key1");
-	option1.setMapper(new OptionValueMapper<String>(null) {
+	option1.setMapper(new OptionValueMapper<>(null) {
 
 	    @Override
 	    public String asString(String value) {
@@ -313,9 +313,9 @@ public class OptionSimilarTest {
 	    }
 	});
 
-	Option<String> option2 = new Option<String>(option1.toString());
+	Option<String> option2 = new Option<>(option1.toString());
 	option2.setKey("key1");
-	option2.setMapper(new OptionValueMapper<String>(null) {
+	option2.setMapper(new OptionValueMapper<>(null) {
 
 	    @Override
 	    public String asString(String value) {
