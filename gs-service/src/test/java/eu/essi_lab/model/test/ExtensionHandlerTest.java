@@ -9,17 +9,12 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import eu.essi_lab.model.resource.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.ExtensionHandler;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.SA_ElementWrapper;
-import eu.essi_lab.model.resource.SatelliteScene;
 import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
@@ -70,7 +65,6 @@ public class ExtensionHandlerTest {
 	wrapper2.setSA_Uri("SA_uri2");
 	wrapper2.setSA_UriTitle("SA_uri_title2");
 
-	
 	SA_ElementWrapper wrapper3 = SA_ElementWrapper.of(MetadataElement.PARAMETER_SA);
 
 	wrapper3.setValue("value3");
@@ -79,6 +73,20 @@ public class ExtensionHandlerTest {
 	wrapper3.setSA_MatchType("SA_match_type3");
 	wrapper3.setSA_Uri("SA_uri3");
 	wrapper3.setSA_UriTitle("SA_uri_title3");
+
+	OrganizationElementWrapper orgWrapper = OrganizationElementWrapper.get();
+
+	orgWrapper.setHomePageURL("homePageURL");
+	orgWrapper.setEmail("email");
+	orgWrapper.setIndividualName("indName");
+	orgWrapper.setRole("role");
+	orgWrapper.setOrgName("orgName");
+	orgWrapper.setIndividualURI("indURI");
+	orgWrapper.setOrgURI("orgURI");
+
+	//
+	//
+	//
 
 	Dataset dataset = new Dataset();
 	ExtensionHandler handler = dataset.getExtensionHandler();
@@ -91,7 +99,19 @@ public class ExtensionHandlerTest {
 
 	handler.addComposedElement(wrapper3.getElement());
 
+	handler.addComposedElement(orgWrapper.getElement());
+
 	System.out.println(dataset.asString(true));
+
+	//
+	//
+	//
+
+	ComposedElement orgComposedElement = handler.getComposedElements(MetadataElement.ORGANIZATION.getName()).getFirst();
+
+	Assert.assertTrue(orgComposedElement.getName().equals(MetadataElement.ORGANIZATION.getName()));
+	Assert.assertEquals("homePageURL", orgComposedElement.getElement().getProperty("homePageURL").get().getValue());
+	Assert.assertEquals("email", orgComposedElement.getElement().getProperty("email").get().getValue());
 
 	//
 	//
@@ -101,7 +121,7 @@ public class ExtensionHandlerTest {
 
 	Assert.assertFalse(kwd_SA1.isEmpty());
 
-	ComposedElement composedElement_0 = kwd_SA1.get(0);
+	ComposedElement composedElement_0 = kwd_SA1.getFirst();
 
 	Assert.assertTrue(composedElement_0.getName().equals(MetadataElement.KEYWORD_SA.getName()));
 	Assert.assertEquals("value1", composedElement_0.getElement().getProperty("value").get().getValue());
@@ -125,9 +145,8 @@ public class ExtensionHandlerTest {
 	//
 	//
 
-	ComposedElement param_SA = handler.getComposedElements(MetadataElement.PARAMETER_SA.getName()).get(0);
+	ComposedElement param_SA = handler.getComposedElements(MetadataElement.PARAMETER_SA.getName()).getFirst();
 
- 
 	Assert.assertTrue(param_SA.getName().equals(MetadataElement.PARAMETER_SA.getName()));
 	Assert.assertEquals("value3", param_SA.getElement().getProperty("value").get().getValue());
 	Assert.assertEquals("uri3", param_SA.getElement().getProperty("uri").get().getValue());
@@ -149,14 +168,14 @@ public class ExtensionHandlerTest {
 
 	Assert.assertEquals("acquisitionType", scene.getAcquisitionType());
 	Assert.assertEquals(1, scene.getPolChannels().size());
-	Assert.assertEquals("channel1", scene.getPolChannels().get(0));
+	Assert.assertEquals("channel1", scene.getPolChannels().getFirst());
 
 	Document doc = scene.asDocument(false);
 	scene = SatelliteScene.create(doc);
 
 	Assert.assertEquals("acquisitionType", scene.getAcquisitionType());
 	Assert.assertEquals(1, scene.getPolChannels().size());
-	Assert.assertEquals("channel1", scene.getPolChannels().get(0));
+	Assert.assertEquals("channel1", scene.getPolChannels().getFirst());
 
 	scene.addPolChannel("channel2");
 	scene.addPolChannel("channel3");
@@ -222,26 +241,26 @@ public class ExtensionHandlerTest {
 	map.setIrrigationTypes(irrList);
 	map.setLandCoverTypes(lcList);
 
-	Assert.assertEquals("watermelon", map.getCropTypes().get(0).getLabel());
-	Assert.assertEquals("1103020050", map.getCropTypes().get(0).getCode());
+	Assert.assertEquals("watermelon", map.getCropTypes().getFirst().getLabel());
+	Assert.assertEquals("1103020050", map.getCropTypes().getFirst().getCode());
 
-	Assert.assertEquals("Fully Irrigated - surface", map.getIrrigationTypes().get(0).getLabel());
-	Assert.assertEquals("213", map.getIrrigationTypes().get(0).getCode());
+	Assert.assertEquals("Fully Irrigated - surface", map.getIrrigationTypes().getFirst().getLabel());
+	Assert.assertEquals("213", map.getIrrigationTypes().getFirst().getCode());
 
-	Assert.assertEquals("mixed_cropland", map.getLandCoverTypes().get(0).getLabel());
-	Assert.assertEquals("14", map.getLandCoverTypes().get(0).getCode());
+	Assert.assertEquals("mixed_cropland", map.getLandCoverTypes().getFirst().getLabel());
+	Assert.assertEquals("14", map.getLandCoverTypes().getFirst().getCode());
 
 	Document doc = map.asDocument(false);
 	map = WorldCerealMap.create(doc);
 
-	Assert.assertEquals("watermelon", map.getCropTypes().get(0).getLabel());
-	Assert.assertEquals("1103020050", map.getCropTypes().get(0).getCode());
+	Assert.assertEquals("watermelon", map.getCropTypes().getFirst().getLabel());
+	Assert.assertEquals("1103020050", map.getCropTypes().getFirst().getCode());
 
-	Assert.assertEquals("Fully Irrigated - surface", map.getIrrigationTypes().get(0).getLabel());
-	Assert.assertEquals("213", map.getIrrigationTypes().get(0).getCode());
+	Assert.assertEquals("Fully Irrigated - surface", map.getIrrigationTypes().getFirst().getLabel());
+	Assert.assertEquals("213", map.getIrrigationTypes().getFirst().getCode());
 
-	Assert.assertEquals("mixed_cropland", map.getLandCoverTypes().get(0).getLabel());
-	Assert.assertEquals("14", map.getLandCoverTypes().get(0).getCode());
+	Assert.assertEquals("mixed_cropland", map.getLandCoverTypes().getFirst().getLabel());
+	Assert.assertEquals("14", map.getLandCoverTypes().getFirst().getCode());
 
 	Assert.assertEquals("cropTypes,landCoverTypes,irrigationTypes", map.getWorldCerealQueryables());
 
@@ -271,14 +290,14 @@ public class ExtensionHandlerTest {
 	Assert.assertEquals("92.0", String.valueOf(map.getIrrigationTypeConfidence()));
 	Assert.assertEquals("10.0", String.valueOf(map.getLcTypeConfidence()));
 
-	Assert.assertEquals("watermelon", map.getCropTypes().get(0).getLabel());
-	Assert.assertEquals("1103020050", map.getCropTypes().get(0).getCode());
+	Assert.assertEquals("watermelon", map.getCropTypes().getFirst().getLabel());
+	Assert.assertEquals("1103020050", map.getCropTypes().getFirst().getCode());
 
-	Assert.assertEquals("Fully Irrigated - surface", map.getIrrigationTypes().get(0).getLabel());
-	Assert.assertEquals("213", map.getIrrigationTypes().get(0).getCode());
+	Assert.assertEquals("Fully Irrigated - surface", map.getIrrigationTypes().getFirst().getLabel());
+	Assert.assertEquals("213", map.getIrrigationTypes().getFirst().getCode());
 
-	Assert.assertEquals("mixed_cropland", map.getLandCoverTypes().get(0).getLabel());
-	Assert.assertEquals("14", map.getLandCoverTypes().get(0).getCode());
+	Assert.assertEquals("mixed_cropland", map.getLandCoverTypes().getFirst().getLabel());
+	Assert.assertEquals("14", map.getLandCoverTypes().getFirst().getCode());
     }
 
 }

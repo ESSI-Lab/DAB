@@ -21,16 +21,14 @@ package eu.essi_lab.model.resource;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.resource.composed.ComposedElement;
+import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
 
 /**
  * Enumeration of queryable {@link HarmonizedMetadata} element names
@@ -41,32 +39,37 @@ import eu.essi_lab.model.resource.composed.ComposedElement;
 public enum MetadataElement implements Queryable {
 
     /**
-     * 
+     *
+     */
+    ORGANIZATION(OrganizationElementWrapper.build()),
+
+    /**
+     *
      */
     KEYWORD_SA(SA_ElementWrapper.of("keyword_SA")), //
 
     /**
-     * 
+     *
      */
     PARAMETER_SA(SA_ElementWrapper.of("parameter_SA")), //
 
     /**
-     * 
+     *
      */
     INSTRUMENT_SA(SA_ElementWrapper.of("instrument_SA")), //
 
     /**
-     * 
+     *
      */
     RESPONSIBLE_ORG_SA(SA_ElementWrapper.of("responsibleOrg_SA")), //
 
     /**
-     * 
+     *
      */
     CRUISE_SA(SA_ElementWrapper.of("cruise_SA")), //
 
     /**
-     * 
+     *
      */
     PROJECT_SA(SA_ElementWrapper.of("project_SA")), //
 
@@ -98,17 +101,17 @@ public enum MetadataElement implements Queryable {
     KEYWORD_BLUE_CLOUD(MetadataElement.KEYWORD_BLUE_CLOUD_EL_NAME),
 
     /**
-     * 
+     *
      */
     KEYWORD_URI_BLUE_CLOUD(MetadataElement.KEYWORD_URI_BLUE_CLOUD_EL_NAME),
 
     /**
-     * 
+     *
      */
     KEYWORD(MetadataElement.KEYWORD_EL_NAME, "Keyword"),
 
     /**
-     * 
+     *
      */
     KEYWORD_URI(MetadataElement.KEYWORD_URI_EL_NAME),
 
@@ -123,22 +126,22 @@ public enum MetadataElement implements Queryable {
     HIERARCHY_LEVEL_CODE_LIST_VALUE("hLevelCodeValue"),
 
     /**
-     * 
+     *
      */
     INSTRUMENT_IDENTIFIER(MetadataElement.INSTRUMENT_IDENTIFIER_EL_NAME),
 
     /**
-     * 
+     *
      */
     UNIQUE_INSTRUMENT_IDENTIFIER(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * 
+     *
      */
     INSTRUMENT_DESCRIPTION("instrumentDesc"),
 
     /**
-     * 
+     *
      */
     INSTRUMENT_TITLE("instrumentTitle"), INSTRUMENT_URI("instrumentURI"),
 
@@ -151,34 +154,34 @@ public enum MetadataElement implements Queryable {
     PROJECT_URI(MetadataElement.PROJECT_URI_EL_NAME),
 
     /**
-     * 
+     *
      */
     PLATFORM_IDENTIFIER(MetadataElement.PLATFORM_IDENTIFIER_EL_NAME),
 
     /**
-     * 
+     *
      */
     PLATFORM_TITLE(MetadataElement.PLATFORM_TITLE_EL_NAME),
 
     PLATFORM_URI(MetadataElement.PLATFORM_URI_EL_NAME),
 
     /**
-     * 
+     *
      */
     UNIQUE_PLATFORM_IDENTIFIER(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * 
+     *
      */
     TIME_INTERPOLATION(MetadataElement.TIME_INTERPOLATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * 
+     *
      */
     TIME_SUPPORT(MetadataElement.TIME_SUPPORT_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * 
+     *
      */
     TIME_RESOLUTION(MetadataElement.TIME_RESOLUTION_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
@@ -188,57 +191,57 @@ public enum MetadataElement implements Queryable {
 
     WIS_TOPIC_HIERARCHY(MetadataElement.WIS_TOPIC_HIERARCHY_EL_NAME, false, true, ContentType.TEXTUAL, true),
     /**
-     * 
+     *
      */
     TIME_UNITS(MetadataElement.TIME_UNITS_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * 
+     *
      */
     TIME_UNITS_ABBREVIATION(MetadataElement.TIME_UNITS_ABBREVIATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * 
+     *
      */
     DATA_SIZE(MetadataElement.DATA_SIZE_EL_NAME, false, true, ContentType.LONG, true),
 
     /**
-     * 
+     *
      */
     PLATFORM_DESCRIPTION("platformDesc"),
 
     /**
-     * 
+     *
      */
     ATTRIBUTE_IDENTIFIER(MetadataElement.ATTRIBUTE_IDENTIFIER_EL_NAME),
 
     /**
-     * 
+     *
      */
     ATTRIBUTE_TITLE(MetadataElement.ATTRIBUTE_TITLE_EL_NAME),
 
     /**
-     * 
+     *
      */
     ATTRIBUTE_UNITS(MetadataElement.ATTRIBUTE_UNITS_EL_NAME),
 
     /**
-     * 
+     *
      */
     ATTRIBUTE_UNITS_URI(MetadataElement.ATTRIBUTE_UNITS_URI_EL_NAME),
 
     /**
-     * 
+     *
      */
     ATTRIBUTE_UNITS_ABBREVIATION(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * 
+     *
      */
     ATTRIBUTE_MISSING_VALUE(MetadataElement.ATTRIBUTE_MISSING_VALUE_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * 
+     *
      */
     UNIQUE_ATTRIBUTE_IDENTIFIER(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
@@ -248,30 +251,30 @@ public enum MetadataElement implements Queryable {
     OBSERVED_PROPERTY_URI(MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * 
+     *
      */
     ATTRIBUTE_DESCRIPTION(MetadataElement.ATTRIBUTE_DESCRIPTION_EL_NAME),
 
     /**
-     * 
+     *
      */
     COVERAGE_CONTENT_TYPE_CODE("coverageContentTypeCode"),
 
     /**
-     * 
+     *
      */
     COUPLING_TYPE("couplingType"),
 
     /**
-     * 
+     *
      */
     DISTANCE_UOM("distanceUOM"),
 
     /**
-     * 
+     *
      */
     REVISION_DATE("revisionDate", ContentType.ISO8601_DATE_TIME),
-    
+
     REFERENCE_DATE("referenceDate", ContentType.ISO8601_DATE_TIME),
 
     /**
@@ -280,7 +283,7 @@ public enum MetadataElement implements Queryable {
     ONLINE_LINKAGE("onlineLinkage", "Online link"),
 
     /**
-     * 
+     *
      */
     ONLINE_ID("onlineId"),
 
@@ -390,12 +393,12 @@ public enum MetadataElement implements Queryable {
     ORGANISATION_NAME(MetadataElement.ORGANISATION_NAME_EL_NAME),
 
     /**
-     * 
+     *
      */
     ORGANISATION_ROLE(MetadataElement.ORGANISATION_ROLE_EL_NAME),
 
     /**
-     * 
+     *
      */
     ORGANISATION_URI(MetadataElement.ORGANISATION_URI_EL_NAME),
     /**
@@ -440,7 +443,7 @@ public enum MetadataElement implements Queryable {
     TEMP_EXTENT_BEGIN("tmpExtentBegin", "Temporal extent begin", ContentType.ISO8601_DATE_TIME),
 
     /**
-     * 
+     *
      */
     TEMP_EXTENT_BEGIN_NOW("tmpExtentBegin_Now", ContentType.BOOLEAN),
 
@@ -450,13 +453,13 @@ public enum MetadataElement implements Queryable {
     TEMP_EXTENT_END("tmpExtentEnd", "Temporal extent end", ContentType.ISO8601_DATE_TIME),
 
     /**
-     * 
+     *
      */
     TEMP_EXTENT_END_NOW("tmpExtentEnd_Now", ContentType.BOOLEAN),
 
     /**
-    *
-    */
+     *
+     */
     TEMP_EXTENT_BEGIN_BEFORE_NOW("tmpExtentBeginBeforeNow", ContentType.TEXTUAL),
 
     /**
@@ -576,11 +579,11 @@ public enum MetadataElement implements Queryable {
     // WORLDCEREAL SPECIFIC QUERYABLES
     //
     CROP_TYPES(MetadataElement.CROP_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), QUANTITY_TYPES(
-	    MetadataElement.QUANTITY_TYPES_EL_NAME, false, true, ContentType.TEXTUAL,
-	    true), LAND_COVER_TYPES(MetadataElement.LAND_COVER_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), IRRIGATION_TYPES(
-		    MetadataElement.IRRIGATION_TYPES_EL_NAME, false, true, ContentType.TEXTUAL,
-		    true), CONFIDENCE_CROP_TYPE("cropConfidence", ContentType.DOUBLE), CONFIDENCE_IRR_TYPE("irrigationConfidence",
-			    ContentType.DOUBLE), CONFIDENCE_LC_TYPE("landCoverConfidence", ContentType.DOUBLE),
+	    MetadataElement.QUANTITY_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), LAND_COVER_TYPES(
+	    MetadataElement.LAND_COVER_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), IRRIGATION_TYPES(
+	    MetadataElement.IRRIGATION_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), CONFIDENCE_CROP_TYPE("cropConfidence",
+	    ContentType.DOUBLE), CONFIDENCE_IRR_TYPE("irrigationConfidence", ContentType.DOUBLE), CONFIDENCE_LC_TYPE("landCoverConfidence",
+	    ContentType.DOUBLE),
 
     // ----------------------------------------------------------
     //
@@ -673,11 +676,11 @@ public enum MetadataElement implements Queryable {
     public static final String TIME_RESOLUTION_DURATION_8601_EL_NAME = "timeResolutionDuration8601";
 
     public static final String TIME_RESOLUTION_EL_NAME = "timeResolution"; // the optional regular distance from a
-									   // sample to the next one in the time series
+    // sample to the next one in the time series
     public static final String TIME_SUPPORT_EL_NAME = "timeSupport"; // the time over which the interpolation is
-								     // calculated (e.g. -3 for total precipitation in
-								     // the last 3 hours, or -10 in case average over
-								     // the last 10 minutes)
+    // calculated (e.g. -3 for total precipitation in
+    // the last 3 hours, or -10 in case average over
+    // the last 10 minutes)
     public static final String TIME_UNITS_EL_NAME = "timeUnits"; // can be second, hour, etc.
     public static final String TIME_UNITS_ABBREVIATION_EL_NAME = "timeUnitsAbbreviation"; // can be s, h, etc.
 
@@ -698,8 +701,8 @@ public enum MetadataElement implements Queryable {
     public static final String OBSERVED_PROPERTY_URI_EL_NAME = "observedPropertyURI";
     public static final String ATTRIBUTE_UNITS_EL_NAME = "attributeUnits"; // can be meters, etc.
     public static final String ATTRIBUTE_UNITS_URI_EL_NAME = "attributeUnitsURI"; // can be
-										  // http://codes.wmo.int/common/unit/m3_s-1,
-										  // etc.
+    // http://codes.wmo.int/common/unit/m3_s-1,
+    // etc.
     public static final String ATTRIBUTE_UNITS_ABBREVIATION_EL_NAME = "attributeUnitsAbbreviation"; // can be m, etc.
     public static final String ATTRIBUTE_MISSING_VALUE_EL_NAME = "attributeMissingValue"; // can be -9999
 
@@ -765,10 +768,10 @@ public enum MetadataElement implements Queryable {
     public static final String MEASUREMENT_METHOD_ICE_ON_OFF_EL_NAME = "MeasurementMethodIceOnOff";
     // public static final String EQUIPMENT ="Equipment";
 
-    private String name;
-    private boolean volatileElement;
-    private boolean extendedElement;
-    private ContentType type;
+    private final String name;
+    private final boolean volatileElement;
+    private final boolean extendedElement;
+    private final ContentType type;
     private boolean isEnabled;
     private ComposedElement element;
     private String readableName;
@@ -776,7 +779,7 @@ public enum MetadataElement implements Queryable {
     /**
      * @param name
      */
-    private MetadataElement(String name) {
+    MetadataElement(String name) {
 
 	this(name, null, false, false, ContentType.TEXTUAL, true);
     }
@@ -785,7 +788,7 @@ public enum MetadataElement implements Queryable {
      * @param name
      * @param readableName
      */
-    private MetadataElement(String name, String readableName) {
+    MetadataElement(String name, String readableName) {
 
 	this(name, readableName, false, false, ContentType.TEXTUAL, true);
     }
@@ -793,7 +796,7 @@ public enum MetadataElement implements Queryable {
     /**
      * @param name
      */
-    private MetadataElement(String name, boolean enabled) {
+    MetadataElement(String name, boolean enabled) {
 
 	this(name, null, false, false, ContentType.TEXTUAL, enabled);
     }
@@ -803,7 +806,7 @@ public enum MetadataElement implements Queryable {
      * @param readableName
      * @param enabled
      */
-    private MetadataElement(String name, String readableName, boolean enabled) {
+    MetadataElement(String name, String readableName, boolean enabled) {
 
 	this(name, readableName, false, false, ContentType.TEXTUAL, enabled);
     }
@@ -812,7 +815,7 @@ public enum MetadataElement implements Queryable {
      * @param name
      * @param type
      */
-    private MetadataElement(String name, ContentType type) {
+    MetadataElement(String name, ContentType type) {
 
 	this(name, null, false, false, type, true);
     }
@@ -822,7 +825,7 @@ public enum MetadataElement implements Queryable {
      * @param readableName
      * @param type
      */
-    private MetadataElement(String name, String readableName, ContentType type) {
+    MetadataElement(String name, String readableName, ContentType type) {
 
 	this(name, readableName, false, false, type, true);
     }
@@ -830,7 +833,7 @@ public enum MetadataElement implements Queryable {
     /**
      * @param element
      */
-    private MetadataElement(ComposedElement element) {
+    MetadataElement(ComposedElement element) {
 
 	this.name = element.getName();
 	this.element = element;
@@ -847,7 +850,7 @@ public enum MetadataElement implements Queryable {
      * @param type
      * @param enabled
      */
-    private MetadataElement(//
+    MetadataElement(//
 	    String name, //
 	    boolean volatileElement, //
 	    boolean extendedElement, //
@@ -862,7 +865,7 @@ public enum MetadataElement implements Queryable {
      * @param volatileElement
      * @param type
      */
-    private MetadataElement(//
+    MetadataElement(//
 	    String name, //
 	    String readableName, //
 	    boolean volatileElement, //
@@ -899,8 +902,7 @@ public enum MetadataElement implements Queryable {
     }
 
     /**
-     * Return <code>true</code> if this element has no correspondent {@link IndexedElement}, <code>false</code>
-     * otherwise
+     * Return <code>true</code> if this element has no correspondent {@link IndexedElement}, <code>false</code> otherwise
      *
      * @return
      */
@@ -970,9 +972,9 @@ public enum MetadataElement implements Queryable {
      */
     public static List<MetadataElement> listOrderedValues() {
 
-	return Arrays.asList(values()).//
-		stream().//
-		sorted((o1, o2) -> o1.getName().compareTo(o2.getName())).//
+	//
+	return Arrays.stream(values()).//
+		sorted(Comparator.comparing(MetadataElement::getName)).//
 		collect(Collectors.toList());//
     }
 
@@ -984,9 +986,7 @@ public enum MetadataElement implements Queryable {
 
 	return listValues().//
 		stream().//
-		filter(e -> e.hasComposedElement() && e.getName().equals(name)).//
-		findFirst().//
-		isPresent();
+		anyMatch(e -> e.hasComposedElement() && e.getName().equals(name));
     }
 
     /**
@@ -997,7 +997,7 @@ public enum MetadataElement implements Queryable {
 
 	return listValues().//
 		stream().//
-		filter(e -> e.hasComposedElement()).//
+		filter(MetadataElement::hasComposedElement).//
 		collect(Collectors.toList());
     }
 
@@ -1043,9 +1043,8 @@ public enum MetadataElement implements Queryable {
     }
 
     /**
-     * @return an {@link Optional} with a new instance of {@link ComposedElement} if
-     *         {@link MetadataElement#hasComposedElement()}
-     *         is <code>true</code>, otherwise returns {@link Optional#empty()}
+     * @return an {@link Optional} with a new instance of {@link ComposedElement} if {@link MetadataElement#hasComposedElement()} is
+     * <code>true</code>, otherwise returns {@link Optional#empty()}
      */
     public Optional<ComposedElement> createComposedElement() {
 

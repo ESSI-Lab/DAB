@@ -54,12 +54,8 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.IndexedElementInfo;
 import eu.essi_lab.model.index.IndexedMetadataElement;
-import eu.essi_lab.model.resource.BNHSProperty;
-import eu.essi_lab.model.resource.ExtensionHandler;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.SA_ElementWrapper;
-import eu.essi_lab.model.resource.SatelliteScene;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
@@ -2324,6 +2320,24 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
     //
     // composed elements: TO BE DEFINED
     //
+
+    public static final IndexedMetadataElement ORGANIZATON = new IndexedMetadataElement(MetadataElement.ORGANIZATION) {
+
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    OrganizationElementWrapper wrapper = OrganizationElementWrapper.get();
+
+	    wrapper.setHomePageURL("homePageURL");
+	    wrapper.setEmail("email");
+	    wrapper.setIndividualName("indName");
+	    wrapper.setRole("role");
+	    wrapper.setOrgName("orgName");
+	    wrapper.setIndividualURI("indURI");
+
+//	    addComposedElement(wrapper.getElement());
+	}
+    };
 
     public static final IndexedMetadataElement KEYWORD_SA = new IndexedMetadataElement(MetadataElement.KEYWORD_SA) {
 
