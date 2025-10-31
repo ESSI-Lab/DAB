@@ -10,30 +10,16 @@ package eu.essi_lab.cfga;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent;
 import eu.essi_lab.cfga.check.scheme.Scheme;
@@ -41,6 +27,13 @@ import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.source.FileSource;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Fabrizio
@@ -68,13 +61,13 @@ public class Configuration {
     private TimeUnit unit;
     private Integer interval;
     private boolean writable;
-    private List<ConfigurationChangeListener> listenerList;
+    private final List<ConfigurationChangeListener> listenerList;
     private boolean autoreloadPaused;
     private Scheme scheme;
 
     /**
-     * Creates an empty, in-memory only configuration with no related source.<br>
-     * This configuration <i>cannot be flushed</i>, use it only for test purpose
+     * Creates an empty, in-memory only configuration with no related source.<br> This configuration <i>cannot be flushed</i>, use it only
+     * for test purpose
      */
     public Configuration() {
 
@@ -84,13 +77,12 @@ public class Configuration {
 
     /**
      * Creates an in-memory only configuration with no related source.<br>
-     * 
+     *
      * @param list
-     * @throws Exception
      */
-    public Configuration(JSONArray array) throws Exception {
+    public Configuration(JSONArray array) {
 
-	this.list = new ArrayList<Setting>();
+	this.list = new ArrayList<>();
 	array.forEach(obj -> this.list.add(new Setting((JSONObject) obj)));
 
 	this.listenerList = new ArrayList<>();
@@ -106,9 +98,8 @@ public class Configuration {
     }
 
     /**
-     * Set the autoreload with the given <code>interval</code> expressed in <code>unit</code> starting with a delay
-     * equals to the interval
-     * 
+     * Set the autoreload with the given <code>interval</code> expressed in <code>unit</code> starting with a delay equals to the interval
+     *
      * @param configName
      * @param unit
      * @param interval
@@ -131,9 +122,8 @@ public class Configuration {
     }
 
     /**
-     * Set the autoreload with the given <code>interval</code> expressed in <code>unit</code> starting with a delay
-     * equals to the interval
-     * 
+     * Set the autoreload with the given <code>interval</code> expressed in <code>unit</code> starting with a delay equals to the interval
+     *
      * @param source
      * @param unit
      * @param interval
@@ -147,9 +137,8 @@ public class Configuration {
     }
 
     /**
-     * Set the autoreload with the given <code>interval</code> and <code>delay</delay> 
-     * expressed in <code>unit</code>
-     * 
+     * Set the autoreload with the given <code>interval</code> and <code>delay</delay> expressed in <code>unit</code>
+     *
      * @param unit
      * @param interval
      */
@@ -182,9 +171,8 @@ public class Configuration {
     }
 
     /**
-     * Set the autoreload with the given <code>interval</code> expressed in <code>unit</code> starting with a delay
-     * equals to the interval
-     * 
+     * Set the autoreload with the given <code>interval</code> expressed in <code>unit</code> starting with a delay equals to the interval
+     *
      * @param unit
      * @param interval
      */
@@ -194,10 +182,9 @@ public class Configuration {
     }
 
     /**
-     * Forces configuration reloading by synchronizing with the source.<br>
-     * If the configuration is {@link State#DIRTY} this method
-     * fails and returns false
-     * 
+     * Forces configuration reloading by synchronizing with the source.<br> If the configuration is {@link State#DIRTY} this method fails
+     * and returns false
+     *
      * @return
      * @throws Exception
      */
@@ -216,7 +203,7 @@ public class Configuration {
     }
 
     /**
-     * 
+     *
      */
     public void pauseAutoreload() {
 
@@ -224,7 +211,7 @@ public class Configuration {
     }
 
     /**
-     * 
+     *
      */
     public void resumeAutoreload() {
 
@@ -268,32 +255,32 @@ public class Configuration {
     }
 
     /**
-     * Read-only method. Changes applied to the returned {@link Setting} will not alter
-     * the configuration status. Use write methods to change the configuration status
-     * 
+     * Read-only method. Changes applied to the returned {@link Setting} will not alter the configuration status. Use write methods to
+     * change the configuration status
+     *
+     * @param settingId
      * @see #put(Setting)
      * @see #replace(Setting)
      * @see #remove(String)
      * @see #clear()
-     * @param settingId
      */
     public synchronized Optional<Setting> get(String settingId) {
 
-	return SettingUtils.get(list, settingId).map(s -> s.clone());
+	return SettingUtils.get(list, settingId).map(Setting::clone);
     }
 
     /**
-     * Read-only method. Changes applied to the returned {@link Setting} will not alter
-     * the configuration status. Use write methods to change the configuration status
-     * 
-     * @see #put(Setting)
-     * @see #replace(Setting)
-     * @see #remove(String)
-     * @see #clear()
+     * Read-only method. Changes applied to the returned {@link Setting} will not alter the configuration status. Use write methods to
+     * change the configuration status
+     *
      * @param settingId
      * @param settingClass
      * @return
      * @throws RuntimeException
+     * @see #put(Setting)
+     * @see #replace(Setting)
+     * @see #remove(String)
+     * @see #clear()
      */
     public synchronized <T extends Setting> Optional<T> get(String settingId, Class<T> settingClass) throws RuntimeException {
 
@@ -301,38 +288,36 @@ public class Configuration {
     }
 
     /**
-     * Read-only method. Changes applied to the returned {@link Setting} will not alter
-     * the configuration status. Use write methods to change the configuration status
-     * 
-     * @see #put(Setting)
-     * @see #replace(Setting)
-     * @see #remove(String)
-     * @see #clear()
+     * Read-only method. Changes applied to the returned {@link Setting} will not alter the configuration status. Use write methods to
+     * change the configuration status
+     *
      * @param settingId
      * @param settingClass
      * @return
      * @throws RuntimeException
-     */
-    public synchronized <T extends Setting> Optional<T> get(String settingId, Class<T> settingClass, boolean exactClassMatch)
-	    throws RuntimeException {
-
-	Optional<T> findFirst = list(settingClass, exactClassMatch).//
-		stream().//
-		filter(s -> s.getIdentifier().equals(settingId)).//
-		findFirst();
-
-	return findFirst;
-    }
-
-    /**
-     * Read-only method. Changes applied to the returned {@link Setting} will not alter
-     * the configuration status. Use write methods to change the configuration status
-     * 
      * @see #put(Setting)
      * @see #replace(Setting)
      * @see #remove(String)
      * @see #clear()
+     */
+    public synchronized <T extends Setting> Optional<T> get(String settingId, Class<T> settingClass, boolean exactClassMatch)
+	    throws RuntimeException {
+
+	return list(settingClass, exactClassMatch).//
+		stream().//
+		filter(s -> s.getIdentifier().equals(settingId)).//
+		findFirst();
+    }
+
+    /**
+     * Read-only method. Changes applied to the returned {@link Setting} will not alter the configuration status. Use write methods to
+     * change the configuration status
+     *
      * @return
+     * @see #put(Setting)
+     * @see #replace(Setting)
+     * @see #remove(String)
+     * @see #clear()
      */
     public synchronized List<Setting> list() {
 
@@ -341,7 +326,7 @@ public class Configuration {
 	    return list;
 	}
 
-	ArrayList<Setting> out = new ArrayList<Setting>();
+	ArrayList<Setting> out = new ArrayList<>();
 
 	list.forEach(setting -> out.add(setting.clone()));
 
@@ -349,20 +334,20 @@ public class Configuration {
     }
 
     /**
-     * Read-only method. Changes applied to the returned {@link Setting} will not alter
-     * the configuration status. Use write methods to change the configuration status.<br>
+     * Read-only method. Changes applied to the returned {@link Setting} will not alter the configuration status. Use write methods to
+     * change the configuration status.<br>
      * <br>
-     * For performance reasons, using this list method instead of {@link #list()} with a possible stream is recommended
-     * since the {@link #list()} method returns a clone of the <i>entire</i> list while this method creates a stream of
-     * the original list and then clones only the resulting items
+     * For performance reasons, using this list method instead of {@link #list()} with a possible stream is recommended since the
+     * {@link #list()} method returns a clone of the <i>entire</i> list while this method creates a stream of the original list and then
+     * clones only the resulting items
      *
+     * @param settingClass
+     * @param exactClassMatch
+     * @return
      * @see #put(Setting)
      * @see #replace(Setting)
      * @see #remove(String)
      * @see #clear()
-     * @param settingClass
-     * @param exactClassMatch
-     * @return
      */
     public synchronized <T extends Setting> List<T> list(Class<T> settingClass, boolean exactClassMatch) {
 
@@ -370,49 +355,44 @@ public class Configuration {
     }
 
     /**
-     * Read-only method. Changes applied to the returned {@link Setting} will not alter
-     * the configuration status. Use write methods to change the configuration status.<br>
+     * Read-only method. Changes applied to the returned {@link Setting} will not alter the configuration status. Use write methods to
+     * change the configuration status.<br>
      * <br>
-     * This is a special list implementation which allows to use a custom type of <code>mapper</code>.<br>
-     * The resulting stream is filtered with {@link Objects#nonNull(Object)}, so if a mapping is not available,
-     * the <code>mapper</code> should return a <code>null</code> value.<br>
+     * This is a special list implementation which allows to use a custom type of <code>mapper</code>.<br> The resulting stream is filtered
+     * with {@link Objects#nonNull(Object)}, so if a mapping is not available, the <code>mapper</code> should return a <code>null</code>
+     * value.<br>
      * <br>
-     * For performance reasons, using this list method instead of {@link #list()} with a possible stream is recommended
-     * since the {@link #list()} method returns a clone of the <i>entire</i> list while this method creates a stream of
-     * the original list. It is responsibility of the given <code>mapper</code> to clone the the resulting items
-     * 
+     * For performance reasons, using this list method instead of {@link #list()} with a possible stream is recommended since the
+     * {@link #list()} method returns a clone of the <i>entire</i> list while this method creates a stream of the original list. It is
+     * responsibility of the given <code>mapper</code> to clone the resulting items
+     *
      * @param settingClass
      * @param mapper
      * @return
      */
     public synchronized <T extends Setting> List<T> list(Class<T> settingClass, Function<Setting, T> mapper) {
 
-	List<T> result = list.//
-
+	return list.//
 		stream().//
-
 		map(mapper).//
-
 		filter(Objects::nonNull).//
-		collect(Collectors.toList());//
-
-	return result;
+		collect(Collectors.toList());
     }
 
     /**
-     * Read-only method. Changes applied to the returned {@link Setting} will not alter
-     * the configuration status. Use write methods to change the configuration status.<br>
+     * Read-only method. Changes applied to the returned {@link Setting} will not alter the configuration status. Use write methods to
+     * change the configuration status.<br>
      * <br>
-     * For performance reasons, using this list method instead of {@link #list()} with a possible stream is recommended
-     * since the {@link #list()} method returns a clone of the <i>entire</i> list while this method creates a stream of
-     * the original list and then clones only the resulting items
+     * For performance reasons, using this list method instead of {@link #list()} with a possible stream is recommended since the
+     * {@link #list()} method returns a clone of the <i>entire</i> list while this method creates a stream of the original list and then
+     * clones only the resulting items
      *
+     * @param settingClass
+     * @return
      * @see #put(Setting)
      * @see #replace(Setting)
      * @see #remove(String)
      * @see #clear()
-     * @param settingClass
-     * @return
      */
     public synchronized <T extends Setting> List<T> list(Class<T> settingClass) {
 
@@ -442,9 +422,8 @@ public class Configuration {
     /**
      * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
      * <br>
-     * Put the provide <code>setting</code> in the configuration only if anothe {@link Setting} with same id
-     * is not already in
-     * 
+     * Put the provided <code>setting</code> in the configuration only if anothe {@link Setting} with same id is not already in
+     *
      * @param setting
      */
     public synchronized boolean put(Setting setting) {
@@ -465,10 +444,9 @@ public class Configuration {
     /**
      * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
      * <br>
-     * Replaces an existing setting according to the provided <code>setting</code> identifier,
-     * with the provided <code>setting</code>. The method works only if a {@link Setting} with the
-     * provided <code>setting</code> identifier and different content exists
-     * 
+     * Replaces an existing setting according to the provided <code>setting</code> identifier, with the provided <code>setting</code>. The
+     * method works only if a {@link Setting} with the provided <code>setting</code> identifier and different content exists
+     *
      * @param setting
      * @return
      */
@@ -546,9 +524,9 @@ public class Configuration {
 
 	List<Setting> toRemove = settingIds.//
 		stream().//
-		map(id -> get(id)).//
-		filter(opt -> opt.isPresent()).//
-		map(opt -> opt.get()).//
+		map(this::get).//
+		filter(Optional::isPresent).//
+		map(Optional::get).//
 		collect(Collectors.toList());
 
 	if (!toRemove.isEmpty()) {
@@ -578,11 +556,9 @@ public class Configuration {
     }
 
     /**
-     * The state of a RW configuration changes from {@link State#SYNCH} to {@link State#DIRTY}
-     * when one of the write methods is successfully invoked.<br>
-     * The state of a RW configuration can be
-     * reset to {@link State#SYNCH} invoking the {@link #flush()} method
-     * 
+     * The state of a RW configuration changes from {@link State#SYNCH} to {@link State#DIRTY} when one of the write methods is successfully
+     * invoked.<br> The state of a RW configuration can be reset to {@link State#SYNCH} invoking the {@link #flush()} method
+     *
      * @return
      * @throws Exception
      */
@@ -593,7 +569,7 @@ public class Configuration {
 
     /**
      * Synchronized this configuration with its source and put the RW configuration in a {@link State#SYNCH} state
-     * 
+     *
      * @throws Exception
      */
     public synchronized void flush() throws Exception {
@@ -639,14 +615,13 @@ public class Configuration {
     @Override
     public boolean equals(Object o) {
 
-	if (o instanceof Configuration) {
+	if (o instanceof Configuration otherConfig) {
 
-	    Configuration otherConfig = ((Configuration) o);
 	    List<Setting> otherList = otherConfig.list();
-	    otherList.sort((s1, s2) -> s1.getIdentifier().compareTo(s2.getIdentifier()));
+	    otherList.sort(Comparator.comparing(Setting::getIdentifier));
 
 	    List<Setting> clonedList = list();
-	    clonedList.sort((s1, s2) -> s1.getIdentifier().compareTo(s2.getIdentifier()));
+	    clonedList.sort(Comparator.comparing(Setting::getIdentifier));
 
 	    return otherList.equals(clonedList);
 	}
@@ -655,8 +630,8 @@ public class Configuration {
     }
 
     /**
-     * Returns a clone of this {@link Configuration} sharing the same source, a cloned list
-     * of {@link Setting}, autoreload disabled, and no listeners
+     * Returns a clone of this {@link Configuration} sharing the same source, a cloned list of {@link Setting}, autoreload disabled, and no
+     * listeners
      */
     @Override
     public Configuration clone() {
@@ -687,7 +662,7 @@ public class Configuration {
     }
 
     /**
-     * @return 
+     * @return
      */
     public Optional<Scheme> getScheme() {
 
@@ -695,7 +670,7 @@ public class Configuration {
     }
 
     /**
-     * @param scheme 
+     * @param scheme
      */
     public void setScheme(Scheme scheme) {
 

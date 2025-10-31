@@ -193,7 +193,7 @@ public class JobRescheduler {
 	    JobKey jobKey = context.getJobDetail().getKey();
 	    List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
 
-	    GSLoggerFactory.getLogger(getClass()).info("Found " + triggers.size() + " triggers");
+	    GSLoggerFactory.getLogger(getClass()).info("Found {} triggers", triggers.size());
 
 	    if (triggers.isEmpty()) {
 

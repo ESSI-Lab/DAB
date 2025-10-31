@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -37,34 +37,34 @@ import eu.essi_lab.lib.utils.StreamUtils;
 public abstract class ConfigurationObject {
 
     /**
-     * 
+     *
      */
-    public static Property<Boolean> ENABLED = Property.of("Enabled", "enabled", true, Optional.of(true)); //
+    public static final Property<Boolean> ENABLED = Property.of("Enabled", "enabled", true, Optional.of(true)); //
     /**
-     * 
+     *
      */
-    public static Property<Boolean> CAN_BE_DISABLED = Property.of("CanBeDisabled", "canBeDisabled", true, Optional.of(true));//
+    public static final Property<Boolean> CAN_BE_DISABLED = Property.of("CanBeDisabled", "canBeDisabled", true, Optional.of(true));//
     /**
-     * 
+     *
      */
-    public static Property<Boolean> VISIBLE = Property.of("Visible", "visible", true, Optional.of(true)); //
+    public static final Property<Boolean> VISIBLE = Property.of("Visible", "visible", true, Optional.of(true)); //
     /**
-     * 
+     *
      */
-    public static Property<Boolean> EDITABLE = Property.of("Editable", "editable", true, Optional.of(true)); //
+    public static final Property<Boolean> EDITABLE = Property.of("Editable", "editable", true, Optional.of(true)); //
     /**
-     * 
+     *
      */
-    public static Property<String> DESCRIPTION = Property.of("Description", "description", false, Optional.empty());
+    public static final Property<String> DESCRIPTION = Property.of("Description", "description", false, Optional.empty());
     /**
-     * 
+     *
      */
-    public static Property<String> OBJECT_TYPE = Property.of("ObjectType", "type", true, Optional.empty());
+    public static final Property<String> OBJECT_TYPE = Property.of("ObjectType", "type", true, Optional.empty());
 
     private JSONObject object;
 
     /**
-     * 
+     *
      */
     public ConfigurationObject() {
 
@@ -91,7 +91,7 @@ public abstract class ConfigurationObject {
 
     /**
      * Default: true
-     * 
+     *
      * @param enabled
      */
     public final void setEnabled(boolean enabled) {
@@ -117,7 +117,7 @@ public abstract class ConfigurationObject {
 
     /**
      * Default: true
-     * 
+     *
      * @param canBeDisabled
      */
     public void setCanBeDisabled(boolean canBeDisabled) {
@@ -135,7 +135,7 @@ public abstract class ConfigurationObject {
 
     /**
      * Default: true
-     * 
+     *
      * @param label
      */
     public final void setVisible(boolean visible) {
@@ -156,13 +156,12 @@ public abstract class ConfigurationObject {
     }
 
     /**
-     * Default: true
-     * The behaviour is different according to the object type:<br>
+     * Default: true The behaviour is different according to the object type:<br>
      * <ul>
      * <li>{@link Setting}: shows or hide the edit button</li>
      * <li>{@link Option}: renders the option field editable or readonly</li>
      * </ul>
-     * 
+     *
      * @return
      */
     public boolean isEditable() {
@@ -171,13 +170,12 @@ public abstract class ConfigurationObject {
     }
 
     /**
-     * Default: true
-     * The behaviour is different according to the object type:<br>
+     * Default: true The behaviour is different according to the object type:<br>
      * <ul>
      * <li>{@link Setting}: shows or hide the edit button</li>
      * <li>{@link Option}: renders the option field editable or readonly</li>
      * </ul>
-     * 
+     *
      * @param editable
      */
     public void setEditable(boolean editable) {
@@ -202,8 +200,8 @@ public abstract class ConfigurationObject {
     }
 
     /**
-    * 
-    */
+     *
+     */
     public void clearDescription() {
 
 	if (getObject().has(DESCRIPTION.getKey())) {
@@ -229,12 +227,11 @@ public abstract class ConfigurationObject {
     @Override
     public boolean equals(Object object) {
 
-	if (!(object instanceof ConfigurationObject)) {
+	if (!(object instanceof ConfigurationObject o)) {
 
 	    return false;
 	}
 
-	ConfigurationObject o = (ConfigurationObject) object;
 	return o.getObject().similar(getObject());
     }
 
@@ -252,7 +249,7 @@ public abstract class ConfigurationObject {
      */
     public Optional<String> getStringPropertyValue(Property<?> property) {
 
-	return Optional.ofNullable(getObject().opt(property.getKey())).map(v -> v.toString());
+	return Optional.ofNullable(getObject().opt(property.getKey())).map(Object::toString);
     }
 
     /**

@@ -55,7 +55,7 @@ public class ReferencedClassesMethod implements CheckMethod, Consumer<Setting> {
     /**
      * 
      */
-    private CheckResponse checkResponse;
+    private final CheckResponse checkResponse;
 
     /**
      * 
@@ -101,7 +101,7 @@ public class ReferencedClassesMethod implements CheckMethod, Consumer<Setting> {
 	//
 	Optional<Class<? extends ObjectExtension>> optionalExtensionClass = setting.getOptionalExtensionClass();
 
-	if (!optionalExtensionClass.isPresent() && setting.getObject().has("extensionClass")) {
+	if (optionalExtensionClass.isEmpty() && setting.getObject().has("extensionClass")) {
 
 	    checkResponse.getMessages().add("Setting ObjectExtension class not found: " + setting.getObject().getString("extensionClass"));
 	    checkResponse.setCheckResult(CheckResult.CHECK_FAILED);
@@ -113,7 +113,7 @@ public class ReferencedClassesMethod implements CheckMethod, Consumer<Setting> {
 	//
 	Optional<Class<? extends AfterCleanFunction>> optionalAfterCleanFunctionClass = setting.getOptionalAfterCleanFunctionClass();
 
-	if (!optionalAfterCleanFunctionClass.isPresent() && setting.getObject().has("afterCleanFunction")) {
+	if (optionalAfterCleanFunctionClass.isEmpty() && setting.getObject().has("afterCleanFunction")) {
 
 	    checkResponse.getMessages()
 		    .add("Setting AfterCleanFunction class not found: " + setting.getObject().getString("afterCleanFunction"));
@@ -126,7 +126,7 @@ public class ReferencedClassesMethod implements CheckMethod, Consumer<Setting> {
 	//
 	Optional<Class<? extends Validator>> optionalValidatorClass = setting.getOptionalValidatorClass();
 
-	if (!optionalValidatorClass.isPresent() && setting.getObject().has("validatorClass")) {
+	if (optionalValidatorClass.isEmpty() && setting.getObject().has("validatorClass")) {
 
 	    checkResponse.getMessages().add("Setting Validator class not found: " + setting.getObject().getString("validatorClass"));
 	    checkResponse.setCheckResult(CheckResult.CHECK_FAILED);
@@ -153,7 +153,7 @@ public class ReferencedClassesMethod implements CheckMethod, Consumer<Setting> {
 	    @SuppressWarnings("rawtypes")
 	    Optional<Class<? extends ValuesLoader>> optionalLoaderClass = option.getOptionalLoaderClass();
 
-	    if (!optionalLoaderClass.isPresent() && option.getObject().has("valuesLoaderClass")) {
+	    if (optionalLoaderClass.isEmpty() && option.getObject().has("valuesLoaderClass")) {
 
 		checkResponse.getMessages()
 			.add("Option ValuesLoader class not found: " + option.getObject().getString("valuesLoaderClass"));

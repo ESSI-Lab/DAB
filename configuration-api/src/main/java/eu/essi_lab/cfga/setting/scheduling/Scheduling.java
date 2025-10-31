@@ -185,7 +185,7 @@ public class Scheduling extends Setting {
 	boolean startTimeEnabled = startTimeOption.isEnabled();
 	if (startTimeEnabled) {
 
-	    if (!optStartTime.isPresent()) {
+	    if (optStartTime.isEmpty()) {
 
 		validationResponse.getErrors().add("Start time option enabled but the date/time set is incomplete");
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
@@ -198,7 +198,7 @@ public class Scheduling extends Setting {
 
 	if (endTimeEnabled) {
 
-	    if (!optEndTime.isPresent()) {
+	    if (optEndTime.isEmpty()) {
 
 		validationResponse.getErrors().add("End time option enabled  but the date/time set is incomplete");
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
@@ -213,7 +213,7 @@ public class Scheduling extends Setting {
 
 		validationResponse.getWarnings().add("The scheduling is set to run once");
 
-	    } else if (scheduling.isRunIndefinitelySet() && !scheduling.getEndTime().isPresent()) {
+	    } else if (scheduling.isRunIndefinitelySet() && scheduling.getEndTime().isEmpty()) {
 
 		validationResponse.getWarnings().add("The scheduling is set to run indefinitely at interval of "
 			+ scheduling.getRepeatInterval() + " " + scheduling.getRepeatIntervalUnit());
@@ -275,7 +275,7 @@ public class Scheduling extends Setting {
 
 	Option<Integer> option = getOption(REPEAT_COUNT_OPTION_KEY, Integer.class).get();
 
-	return option.isEnabled() && !option.getOptionalValue().isPresent();
+	return option.isEnabled() && option.getOptionalValue().isEmpty();
     }
 
     /**

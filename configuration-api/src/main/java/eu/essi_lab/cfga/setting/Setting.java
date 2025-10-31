@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -47,44 +47,45 @@ import eu.essi_lab.lib.utils.StreamUtils;
 public class Setting extends AbstractSetting implements Selectable<Setting> {
 
     /**
-     * 
+     *
      */
-    public static Property<String> IDENTIFIER = Property.of("Identifier", "settingId", true, Optional.empty()); //
+    public static final Property<String> IDENTIFIER = Property.of("Identifier", "settingId", true, Optional.empty()); //
 
     /**
-     * 
+     *
      */
-    public static Property<String> NAME = Property.of("Name", "settingName", true, Optional.empty());//
+    public static final Property<String> NAME = Property.of("Name", "settingName", true, Optional.empty());//
 
     /**
-     * 
+     *
      */
-    public static Property<SelectionMode> SELECTION_MODE = Property.of("SelectionMode", "selectionMode", true,
+    public static final Property<SelectionMode> SELECTION_MODE = Property.of("SelectionMode", "selectionMode", true,
 	    Optional.of(SelectionMode.UNSET));//
 
     /**
-     * 
+     *
      */
-    public static Property<AfterCleanFunction> AFTER_CLEAN_FUNCTION = Property.of("AfterCleanFunction", "afterCleanFunction", false,
+    public static final Property<AfterCleanFunction> AFTER_CLEAN_FUNCTION = Property.of("AfterCleanFunction", "afterCleanFunction", false,
 	    Optional.empty());//
 
     /**
-     * 
+     *
      */
-    public static Property<Boolean> SELECTED = Property.of("Selected", "selected", true, Optional.of(false)); //
+    public static final Property<Boolean> SELECTED = Property.of("Selected", "selected", true, Optional.of(false)); //
 
     /**
-     * 
+     *
      */
-    public static Property<String> CONFIGURABLE_TYPE = Property.of("ConfigurableType", "configurableType", false, Optional.empty());//
+    public static final Property<String> CONFIGURABLE_TYPE = Property.of("ConfigurableType", "configurableType", false, Optional.empty());//
 
     /**
-     * 
+     *
      */
-    public static Property<Class<? extends Setting>> SETTING_CLASS = Property.of("SettingClass", "settingClass", true, Optional.empty());//
+    public static final Property<Class<? extends Setting>> SETTING_CLASS = Property.of("SettingClass", "settingClass", true,
+	    Optional.empty());//
 
     /**
-     * 
+     *
      */
     public Setting() {
 
@@ -144,7 +145,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 
     /**
      * {@link Scheduling} cannot be selected
-     * 
+     *
      * @param predicate
      */
     @Override
@@ -173,20 +174,17 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 		stream().//
 		filter(s -> !s.isSelected() && !s.getObjectType().equals(Scheduling.SCHEDULING_OBJECT_TYPE));
 
-	stream.forEach(s -> this.removeSetting(s));
+	stream.forEach(this::removeSetting);
     }
 
     /**
-     * 
+     *
      */
     public void afterClean() {
 
 	Optional<AfterCleanFunction> afterCleanFunction = getAfterCleanFunction();
 
-	if (afterCleanFunction.isPresent()) {
-
-	    afterCleanFunction.get().afterClean(this);
-	}
+	afterCleanFunction.ifPresent(cleanFunction -> cleanFunction.afterClean(this));
     }
 
     /**
@@ -255,7 +253,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 
     /**
      * Default: false
-     * 
+     *
      * @return
      */
     public boolean isSelected() {
@@ -329,10 +327,9 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 		map(k -> getObject().get(k)).//
 		filter(o -> o instanceof JSONObject).//
 		map(o -> (JSONObject) o). //
-		filter(o -> o.getString(OBJECT_TYPE.getKey()).equals("setting")
-			|| o.getString(OBJECT_TYPE.getKey()).equals(Scheduling.SCHEDULING_OBJECT_TYPE))
-		.//
-		map(o -> new Setting(o)).//
+		filter(o -> o.getString(OBJECT_TYPE.getKey()).equals("setting") || o.getString(OBJECT_TYPE.getKey())
+		.equals(Scheduling.SCHEDULING_OBJECT_TYPE)).//
+		map(Setting::new).//
 		collect(Collectors.toList());
     }
 
@@ -421,10 +418,9 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     }
 
     /**
-     * Creates a configured instance of the {@link Configurable}
-     * according to the {@link #getConfigurableType()} method. In order to be instantiated, the concrete
-     * {@link Configurable} implementation must provide an empty constructor
-     * 
+     * Creates a configured instance of the {@link Configurable} according to the {@link #getConfigurableType()} method. In order to be
+     * instantiated, the concrete {@link Configurable} implementation must provide an empty constructor
+     *
      * @return
      * @throws Exception
      */
@@ -439,7 +435,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 		filter(c -> c.getType().equals(getConfigurableType())).//
 		findFirst();
 
-	if (!optional.isPresent()) {
+	if (optional.isEmpty()) {
 
 	    throw new Exception("Configurable of type " + getConfigurableType() + " not found");
 	}
@@ -472,12 +468,11 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     }
 
     /**
-     * Set the type of the {@link Configurable} configured by this setting. <br>
-     * Once set, the method {@link #createConfigurable()} can be invoked in order to create a configured instance of the
-     * given {@link Configurable}
-     * 
-     * @see Configurable#getType()
+     * Set the type of the {@link Configurable} configured by this setting. <br> Once set, the method {@link #createConfigurable()} can be
+     * invoked in order to create a configured instance of the given {@link Configurable}
+     *
      * @param configurableType
+     * @see Configurable#getType()
      */
     public void setConfigurableType(String configurableType) {
 
@@ -514,8 +509,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     }
 
     /**
-     * Verifies if this setting is similar to <code>other</code>.<br>
-     * Two settings are similar if:
+     * Verifies if this setting is similar to <code>other</code>.<br> Two settings are similar if:
      * <ol>
      * <li>they have the same {@link #getSettingClass()}</li>
      * <li>the related {@link #getObject()}s have exactly the same keys, except the keys included in
@@ -525,16 +519,15 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      * {@link Option#similar(Option)} method</li>
      * <li>the above statements are recursively valid for the sub-settings of this and <code>other</code> setting</li>
      * </ol>
-     * 
+     *
      * @param other
-     * @param exclusions the {@link #getObject()} keys to exclude from the check.<br>
-     *        The following properties cannot be excluded, and if the related identifiers are provided, they are
-     *        ignored:
-     *        <ul>
-     *        <li>{@link #IDENTIFIER}</li>
-     *        <li>{@link Setting#SETTING_CLASS}</li>
-     *        <li>{@link Setting#OBJECT_TYPE}</li>
-     *        </ul>
+     * @param exclusions the {@link #getObject()} keys to exclude from the check.<br> The following properties cannot be excluded, and if
+     * the related identifiers are provided, they are ignored:
+     * <ul>
+     * <li>{@link #IDENTIFIER}</li>
+     * <li>{@link Setting#SETTING_CLASS}</li>
+     * <li>{@link Setting#OBJECT_TYPE}</li>
+     * </ul>
      * @return
      */
     public boolean similar(Setting other, List<String> exclusions) {
@@ -549,21 +542,21 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 		stream().//
 		// excludes the keys which are identifiers of settings and options
 		// they are check later, and excludes the selection key
-		filter(k -> getSetting(k).isEmpty() && getOption(k).isEmpty()).//
+			filter(k -> getSetting(k).isEmpty() && getOption(k).isEmpty()).//
 		// excludes the exclusions keys
-		filter(k -> !exclusions.contains(k)).//
-		sorted().//
-		collect(Collectors.toList());
+			filter(k -> !exclusions.contains(k)).//
+			sorted().//
+			toList();
 
 	List<String> otherKeys = other.keys().//
 		stream().//
 		// excludes the keys which are identifiers of settings and options
 		// they are check later, and excludes the selection key
-		filter(k -> other.getSetting(k).isEmpty() && other.getOption(k).isEmpty()).//
+			filter(k -> other.getSetting(k).isEmpty() && other.getOption(k).isEmpty()).//
 		// excludes the exclusions properties
-		filter(k -> !exclusions.contains(k)).//
-		sorted().//
-		collect(Collectors.toList());
+			filter(k -> !exclusions.contains(k)).//
+			sorted().//
+			toList();
 
 	// they must have the same keys
 	if (thisKeys.equals(otherKeys)) {
@@ -582,15 +575,15 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 
 	    List<String> thisOptionsKeys = this.getOptions().//
 		    stream().//
-		    map(o -> o.getKey()).//
+		    map(Option::getKey).//
 		    sorted().//
-		    collect(Collectors.toList());
+		    toList();
 
 	    List<String> otherOptionsKeys = other.getOptions().//
 		    stream().//
-		    map(o -> o.getKey()).//
+		    map(Option::getKey).//
 		    sorted().//
-		    collect(Collectors.toList());
+		    toList();
 
 	    // they must have the same options keys
 	    if (thisOptionsKeys.equals(otherOptionsKeys)) {
@@ -612,15 +605,15 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 
 	List<String> thisSettingsKeys = getSettings().//
 		stream().//
-		map(s -> s.getIdentifier()).//
+		map(Setting::getIdentifier).//
 		sorted().//
-		collect(Collectors.toList());
+		toList();
 
 	List<String> otherSettingsKeys = other.getSettings().//
 		stream().//
-		map(s -> s.getIdentifier()).//
+		map(Setting::getIdentifier).//
 		sorted().//
-		collect(Collectors.toList());
+		toList();
 
 	// they must have the same settings keys
 	if (thisSettingsKeys.equals(otherSettingsKeys)) {
@@ -641,8 +634,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     }
 
     /**
-     * Verifies if this setting is similar to <code>other</code>.<br>
-     * Two settings are similar if:
+     * Verifies if this setting is similar to <code>other</code>.<br> Two settings are similar if:
      * <ol>
      * <li>they have the same {@link #getSettingClass()}</li>
      * <li>the related {@link #getObject()}s have exactly the same keys</li>
@@ -650,13 +642,13 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      * {@link Option#similar(Option)} method</li>
      * <li>the above statements are recursively valid for the sub-settings of this and <code>other</code> setting</li>
      * </ol>
-     * 
+     *
      * @param setting
      * @return
      */
     public boolean similar(Setting other) {
 
-	return similar(other, Arrays.asList());
+	return similar(other, List.of());
     }
 
     /**
@@ -668,7 +660,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     }
 
     /**
-     * 
+     *
      */
     protected final List<Property<?>> getProperties() {
 
@@ -738,7 +730,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     }
 
     /**
-     * 
+     *
      */
     @Override
     public Setting clone() {

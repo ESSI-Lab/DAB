@@ -136,7 +136,7 @@ public class PropertiesMethod implements CheckMethod {
 
 	for (Property<?> property : properties) {
 
-	    String default_ = property.getDefaultValue().map(v -> v.toString()).orElse("");
+	    String default_ = property.getDefaultValue().map(Object::toString).orElse("");
 
 	    String configProp = configSetting.getStringPropertyValue(property).orElse(default_);
 
@@ -144,7 +144,7 @@ public class PropertiesMethod implements CheckMethod {
 
 	    if (!newProp.equals(configProp) && !checkUUIDName(newProp, configProp, property)) {
 
-		if (!checkResponse.getSettings().stream().anyMatch(s -> s.getIdentifier().equals(configSetting.getIdentifier()))) {
+		if (checkResponse.getSettings().stream().noneMatch(s -> s.getIdentifier().equals(configSetting.getIdentifier()))) {
 
 		    checkResponse.getSettings().add(configSetting);
 		}
@@ -162,13 +162,11 @@ public class PropertiesMethod implements CheckMethod {
 		    filter(s -> s.getIdentifier().equals(set.getIdentifier())).//
 		    findFirst();
 
-	    if (opt.isPresent()) {
-
-		compare(checkResponse, //
-			set, //
-			opt.get(), //
-			properties); //
-	    }
+	    //
+	    opt.ifPresent(setting -> compare(checkResponse, //
+		    set, //
+		    setting, //
+		    properties));
 	});
     }
 }

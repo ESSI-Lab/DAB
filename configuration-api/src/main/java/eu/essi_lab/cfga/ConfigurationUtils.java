@@ -140,7 +140,7 @@ public class ConfigurationUtils {
 		settings.stream().map(s -> s.getSettingClass().getSimpleName()).distinct().collect(Collectors.joining(", ")));
 
 	GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("The following settings will be fixed: {} ",
-		settings.stream().map(s -> s.getName()).collect(Collectors.joining(", ")));
+		settings.stream().map(Setting::getName).collect(Collectors.joining(", ")));
 
 	GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Settings fix STARTED");
 
@@ -193,11 +193,9 @@ public class ConfigurationUtils {
      * @param mapped
      * @return
      */
-    public static <T> Object deepMap(Configuration configuration, Function<Setting, T> mapper, List<T> mapped) {
+    public static <T> void deepMap(Configuration configuration, Function<Setting, T> mapper, List<T> mapped) {
 
 	configuration.list().forEach(s -> SettingUtils.deepMap(s, mapper, mapped));
-
-	return null;
     }
 
     /**

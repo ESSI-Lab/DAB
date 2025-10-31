@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.source;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -53,12 +53,10 @@ public class S3Source implements ConfigurationSource {
     private String configName;
 
     /**
-     * Used to initialize an S3 source. The s3 endpoint can be omitted, and in such case the default AWS
-     * endpoint 'https://s3.amazonaws.com' is used.<br>
-     * E.g: s3://awsUser:awsPassword@bucket/config.json
-     * E.g: s3://awsUser:awsPassword@http:endpoint/bucket/config.json
-     * E.g: s3://awsUser:awsPassword@https:endpoint/bucket/config.json
-     * 
+     * Used to initialize an S3 source. The s3 endpoint can be omitted, and in such case the default AWS endpoint 'https://s3.amazonaws.com'
+     * is used.<br> E.g: s3://awsUser:awsPassword@bucket/config.json E.g: s3://awsUser:awsPassword@http:endpoint/bucket/config.json E.g:
+     * s3://awsUser:awsPassword@https:endpoint/bucket/config.json
+     *
      * @param configURL
      * @return
      * @throws URISyntaxException
@@ -79,7 +77,7 @@ public class S3Source implements ConfigurationSource {
 
     /**
      * Used to initialize a Minio S3 source
-     * 
+     *
      * @param configURL s3://user:password@bucket/config.json
      * @param endpoint http://my-hostname:9000
      * @return
@@ -94,7 +92,7 @@ public class S3Source implements ConfigurationSource {
 	String secretKey = userInfo.split(":")[1];
 
 	String bucketName = uri.getHost();
-	String configName = uri.getPath().substring(1, uri.getPath().length());
+	String configName = uri.getPath().substring(1);
 
 	S3TransferWrapper wrapper = new S3TransferWrapper();
 	wrapper.setAccessKey(accessKey);
@@ -106,7 +104,7 @@ public class S3Source implements ConfigurationSource {
 
     /**
      * s3://awsaccesskey:awssecretkey@bucket/config.json
-     * 
+     *
      * @param url
      * @return
      */
@@ -137,7 +135,7 @@ public class S3Source implements ConfigurationSource {
 	    binaryConfig.get().getKey().close();
 	    binaryConfig.get().getValue().delete();
 
-	    return new ArrayList<Setting>();
+	    return new ArrayList<>();
 	}
 
 	GSLoggerFactory.getLogger(getClass()).trace("Converting config to string STARTED");
@@ -154,7 +152,7 @@ public class S3Source implements ConfigurationSource {
 
 	JSONArray jsonArray = new JSONArray(stringConfig);
 
-	ArrayList<Setting> out = new ArrayList<Setting>();
+	ArrayList<Setting> out = new ArrayList<>();
 	jsonArray.forEach(obj -> out.add(new Setting((JSONObject) obj)));
 
 	//
@@ -202,15 +200,12 @@ public class S3Source implements ConfigurationSource {
 
 	boolean out = false;
 
-	if (binaryConfig != null) {
-
-	    String string = IOStreamUtils.asUTF8String(stream).trim();
-	    if (string.isEmpty()) {
-		out = true;
-	    } else {
-		JSONArray jsonArray = new JSONArray(string);
-		out = jsonArray.length() == 0;
-	    }
+	String string = IOStreamUtils.asUTF8String(stream).trim();
+	if (string.isEmpty()) {
+	    out = true;
+	} else {
+	    JSONArray jsonArray = new JSONArray(string);
+	    out = jsonArray.isEmpty();
 	}
 
 	stream.close();
@@ -332,25 +327,25 @@ public class S3Source implements ConfigurationSource {
     }
 
     @Override
-    public LockAcquisitionResult acquireLock(String owner) throws Exception {
+    public LockAcquisitionResult acquireLock(String owner) {
 
 	throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean releaseLock() throws Exception {
+    public boolean releaseLock() {
 
 	throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean orphanLockFound(long maxIdleTime) throws Exception {
+    public boolean orphanLockFound(long maxIdleTime) {
 
 	throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<String> isLocked() throws Exception {
+    public Optional<String> isLocked() {
 
 	throw new UnsupportedOperationException();
     }

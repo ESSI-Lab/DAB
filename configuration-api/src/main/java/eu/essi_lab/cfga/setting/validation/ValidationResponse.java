@@ -44,16 +44,16 @@ public class ValidationResponse {
     }
 
     private ValidationResult result;
-    private List<String> errors;
-    private List<String> warnings;
+    private final List<String> errors;
+    private final List<String> warnings;
 
     /**
      * 
      */
     public ValidationResponse() {
 
-	errors = new ArrayList<String>();
-	warnings = new ArrayList<String>();
+	errors = new ArrayList<>();
+	warnings = new ArrayList<>();
 
 	setResult(ValidationResult.VALIDATION_SUCCESSFUL);
     }

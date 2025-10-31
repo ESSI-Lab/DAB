@@ -226,11 +226,10 @@ public class PersistentJobStoreScheduler extends AbstractScheduler {
      * @param report
      * @param table
      * @throws SQLException
-     * @throws IOException
      * @throws Throwable
      */
     private void checkJobData(ResultSet rs, List<SimpleEntry<String, String>> report, String table)
-	    throws SQLException, IOException, Throwable {
+	    throws SQLException, Throwable {
 
 	while (rs.next()) {
 

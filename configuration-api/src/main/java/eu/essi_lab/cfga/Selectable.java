@@ -52,7 +52,7 @@ public interface Selectable<T> {
 	 */
 	UNSET("unset");
 
-	private String label;
+	private final String label;
 
 	/**
 	 * @param label

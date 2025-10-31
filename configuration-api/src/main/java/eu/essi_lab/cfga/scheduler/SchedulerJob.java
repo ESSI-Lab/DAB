@@ -56,8 +56,6 @@ public class SchedulerJob implements Job {
 	    worker = setting.createConfigurable();
 	} catch (Exception ex) {
 
-	    ex.printStackTrace();
-
 	    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage(), ex);
 	    throw new JobExecutionException(ex);
 	}
@@ -96,8 +94,8 @@ public class SchedulerJob implements Job {
 
 	SchedulerWorkerSetting downCast = (SchedulerWorkerSetting) SettingUtils.downCast(setting, setting.getSettingClass());
 
-	GSLoggerFactory.getLogger(getClass()).debug("Worker name: " + downCast.getWorkerName());
-	GSLoggerFactory.getLogger(getClass()).debug("Worker class: " + worker.getClass().getName());
+	GSLoggerFactory.getLogger(getClass()).debug("Worker name: {}", downCast.getWorkerName());
+	GSLoggerFactory.getLogger(getClass()).debug("Worker class: {}", worker.getClass().getName());
 
 	try {
 
