@@ -1,6 +1,6 @@
 package eu.essi_lab.messages.bond;
 
-import java.util.Arrays;
+import java.util.*;
 
 /*-
  * #%L
@@ -23,9 +23,6 @@ import java.util.Arrays;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
@@ -59,7 +56,7 @@ public class BondFactory {
 
 	return switch (bonds.size()) {
 	case 0 -> Optional.empty();
-	case 1 -> Optional.of(bonds.get(0));
+	case 1 -> Optional.of(bonds.getFirst());
 	default -> Optional.of(BondFactory.createLogicalBond(op, bonds));
 	};
     }
@@ -222,7 +219,7 @@ public class BondFactory {
      */
     public static LogicalBond createNotBond(Bond operand) {
 
-	return new LogicalBond(LogicalOperator.NOT, new Bond[] { operand });
+	return new LogicalBond(LogicalOperator.NOT, operand);
     }
 
     /**
@@ -341,7 +338,7 @@ public class BondFactory {
 			BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, kwd)))
 		.collect(Collectors.toList());
 
-	return resList.size() == 1 ? resList.get(0) : switch (op) {
+	return resList.size() == 1 ? resList.getFirst() : switch (op) {
 	case OR -> BondFactory.createOrBond(resList);
 	case AND -> BondFactory.createAndBond(resList);
 	case NOT -> throw new UnsupportedOperationException("Unimplemented case: " + op);
@@ -614,7 +611,7 @@ public class BondFactory {
 	    MetadataElement element, //
 	    ComposedElementItem item) throws IllegalArgumentException {
 
-	return createComposedElementBond(operator, LogicalOperator.AND, element, Arrays.asList(item));
+	return createComposedElementBond(operator, LogicalOperator.AND, element, Collections.singletonList(item));
     }
 
     /**
