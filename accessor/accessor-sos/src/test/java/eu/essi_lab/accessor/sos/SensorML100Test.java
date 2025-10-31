@@ -36,15 +36,13 @@ public class SensorML100Test {
 		stream().//
 		filter(p -> p.getName().equals("As")).//
 		filter(p -> p.getDefinition().equals("urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:As")).//
-		filter(p -> p.getUom().equals("mg/L")).//
-		findFirst().isPresent());
+		anyMatch(p -> p.getUom().equals("mg/L")));
 
 	assertTrue(observervedProperties.//
 		stream().//
 		filter(p -> p.getName().equals("Salinity")).//
 		filter(p -> p.getDefinition().equals("urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:Salinity")).//
-		filter(p -> p.getUom().equals("g/L")).//
-		findFirst().isPresent());
+		anyMatch(p -> p.getUom().equals("g/L")));
 
 	Optional<String> name = sosSensorML.getName();
 	assertEquals("Test WHOS", name.get());
@@ -112,15 +110,13 @@ public class SensorML100Test {
 		stream().//
 		filter(p -> p.getName().equals("As")).//
 		filter(p -> p.getDefinition().equals("urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:As")).//
-		filter(p -> p.getUom().equals("mg/L")).//
-		findFirst().isPresent());
+		anyMatch(p -> p.getUom().equals("mg/L")));
 
 	assertTrue(observervedProperties.//
 		stream().//
 		filter(p -> p.getName().equals("Salinity")).//
 		filter(p -> p.getDefinition().equals("urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:Salinity")).//
-		filter(p -> p.getUom().equals("g/L")).//
-		findFirst().isPresent());
+		anyMatch(p -> p.getUom().equals("g/L")));
 
 	Optional<String> name = sosSensorML.getName();
 	assertEquals("1000609756", name.get());

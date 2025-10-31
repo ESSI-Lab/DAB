@@ -19,6 +19,8 @@ import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.StreamUtils;
 import eu.essi_lab.ommdk.IResourceMapper;
 
+import static eu.essi_lab.lib.utils.StreamUtils.*;
+
 /**
  * @author Fabrizio
  */
@@ -62,14 +64,12 @@ public class ServiceLoaderTest {
 
 	ServiceLoader<IHarvestedQueryConnector> loader = ServiceLoader.load(IHarvestedQueryConnector.class);
 
-	Assert.assertEquals(1, StreamUtils.iteratorToStream(loader.iterator()).count());
+	Assert.assertEquals(1, iteratorToStream(loader.iterator()).count());
 
 	Assert.assertTrue(//
-		StreamUtils
-			.iteratorToStream(//
+		iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(SavaHISConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(SavaHISConnector.class)));//
     }
 
     @Test
@@ -77,11 +77,8 @@ public class ServiceLoaderTest {
 
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
-	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.SAVAHIS_URI)).//
-
-		findFirst().//
-		isPresent());
+	Assert.assertTrue(iteratorToStream(loader.iterator()).//
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.SAVAHIS_URI)));
 
     }
     
@@ -90,11 +87,8 @@ public class ServiceLoaderTest {
 
 	ServiceLoader<DataDownloader> loader = ServiceLoader.load(DataDownloader.class);
 
-	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(d -> d.getClass().equals(SavaHISDownloader.class)).//
-
-		findFirst().//
-		isPresent());
+	Assert.assertTrue(iteratorToStream(loader.iterator()).//
+		anyMatch(d -> d.getClass().equals(SavaHISDownloader.class)));
 
     }
 
@@ -104,15 +98,10 @@ public class ServiceLoaderTest {
 
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
-	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(SavaHISAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+	Assert.assertTrue(iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(SavaHISAccessor.class.getName())));
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(SavaHISConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+		iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(SavaHISConnector.class.getName())));
 
     }
 }

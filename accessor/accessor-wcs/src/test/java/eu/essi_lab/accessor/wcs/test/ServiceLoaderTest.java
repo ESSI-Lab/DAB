@@ -40,7 +40,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(WCSAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(WCSAccessor.class, accessors.getFirst().getClass());
 	}
 
 	{
@@ -50,7 +50,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(WCSAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(WCSAccessor.class, accessors.getFirst().getClass());
 	}
 
 	{
@@ -67,7 +67,7 @@ public class ServiceLoaderTest {
 
 	Assert.assertEquals(5, StreamUtils.iteratorToStream(loader.iterator()).count());
 
-	List<String> types = StreamUtils.iteratorToStream(loader.iterator()).map(c -> c.getType()).collect(Collectors.toList());
+	List<String> types = StreamUtils.iteratorToStream(loader.iterator()).map(c -> c.getType()).toList();
 
 	Assert.assertTrue(types.contains(WCSConnector_100.TYPE));
 	Assert.assertTrue(types.contains(WCSConnector_100_TDS.TYPE));
@@ -84,8 +84,7 @@ public class ServiceLoaderTest {
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(WCSConnectorWrapper.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(WCSConnectorWrapper.class)));//
 
     }
 
@@ -95,22 +94,13 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(WCSConnector.WCS_SCHEME + WCSConnector_100.class.getSimpleName()))
-		.//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(WCSConnector.WCS_SCHEME + WCSConnector_100.class.getSimpleName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(WCSConnector.WCS_SCHEME + WCSConnector_110.class.getSimpleName()))
-		.//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(WCSConnector.WCS_SCHEME + WCSConnector_110.class.getSimpleName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(WCSConnector.WCS_SCHEME + WCSConnector_111.class.getSimpleName()))
-		.//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(WCSConnector.WCS_SCHEME + WCSConnector_111.class.getSimpleName())));
 
     }
 
@@ -121,14 +111,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(WCSAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(WCSAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(WCSConnectorWrapper.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(WCSConnectorWrapper.class.getName())));
     }
 
 }

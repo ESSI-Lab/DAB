@@ -33,7 +33,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(BLUECLOUDAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(BLUECLOUDAccessor.class, accessors.getFirst().getClass());
 
 	}
 
@@ -44,7 +44,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(BLUECLOUDAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(BLUECLOUDAccessor.class, accessors.getFirst().getClass());
 	}
 
 	{
@@ -66,8 +66,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(BLUECLOUDConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(BLUECLOUDConnector.class)));//
     }
 
     @Test
@@ -76,10 +75,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.BLUECLOUD_API)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.BLUECLOUD_API)));
 
     }
 
@@ -90,14 +86,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(BLUECLOUDAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(BLUECLOUDAccessor.class.getName())));
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(BLUECLOUDConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(BLUECLOUDConnector.class.getName())));
 
     }
 }

@@ -64,8 +64,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(CANADAMSCConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(CANADAMSCConnector.class)));//
     }
 
     @Test
@@ -74,10 +73,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.ENVIRONMENT_CANADA_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.ENVIRONMENT_CANADA_URI)));
 
     }
 
@@ -87,15 +83,11 @@ public class ServiceLoaderTest {
 
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
-	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(CANADAMSCAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
+		.anyMatch(c -> c.getClass().getName().equals(CANADAMSCAccessor.class.getName())));
 
-	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(CANADAMSCConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
+		.anyMatch(c -> c.getClass().getName().equals(CANADAMSCConnector.class.getName())));
 
     }
 }

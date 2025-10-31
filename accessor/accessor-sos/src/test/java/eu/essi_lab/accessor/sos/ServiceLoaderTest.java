@@ -82,8 +82,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(SOSConnectorWrapper.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(SOSConnectorWrapper.class)));//
     }
 
     @Test
@@ -92,10 +91,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.SOS_2_0)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.SOS_2_0)));
 
     }
 
@@ -106,14 +102,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().getName().equals(SOSAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getClass().getName().equals(SOSAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().getName().equals(SOSConnectorWrapper.class.getName())).//
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getClass().getName().equals(SOSConnectorWrapper.class.getName())));
 
     }
 }

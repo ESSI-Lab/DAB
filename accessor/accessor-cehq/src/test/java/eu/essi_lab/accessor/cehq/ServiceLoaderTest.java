@@ -29,7 +29,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(CEHQAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(CEHQAccessor.class, accessors.getFirst().getClass());
 
 	}
 
@@ -40,7 +40,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(CEHQAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(CEHQAccessor.class, accessors.getFirst().getClass());
 	}
 
 	{
@@ -62,8 +62,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(CEHQConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(CEHQConnector.class)));//
     }
 
     @SuppressWarnings("rawtypes")
@@ -73,14 +72,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(CEHQAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(CEHQAccessor.class.getName())));
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(CEHQConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(CEHQConnector.class.getName())));
 
     }
 }

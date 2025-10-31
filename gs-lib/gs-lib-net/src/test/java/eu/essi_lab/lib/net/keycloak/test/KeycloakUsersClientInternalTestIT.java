@@ -3,20 +3,19 @@
  */
 package eu.essi_lab.lib.net.keycloak.test;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
+import eu.essi_lab.lib.net.keycloak.KeycloakUser;
+import eu.essi_lab.lib.net.keycloak.KeycloakUser.UserProfileAttribute;
+import eu.essi_lab.lib.net.keycloak.KeycloakUsersClient;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.essi_lab.lib.net.keycloak.KeycloakUser;
-import eu.essi_lab.lib.net.keycloak.KeycloakUsersClient;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.net.keycloak.KeycloakUser.UserProfileAttribute;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * @author Fabrizio
@@ -61,7 +60,7 @@ public class KeycloakUsersClientInternalTestIT {
 
 	List<String> realms = client.getRealms(accessToken).stream().sorted().toList();
 
-	Assert.assertEquals("master", realms.get(0));
+	Assert.assertEquals("master", realms.getFirst());
 	Assert.assertEquals("testRealm", realms.get(1));
 
 	Assert.assertFalse(client.createUsersRealm(accessToken, USERS_REALM));
@@ -121,7 +120,7 @@ public class KeycloakUsersClientInternalTestIT {
 	// - "firstName": "firstname",
 	//
 	//
-	JSONObject rawJSON = client.listRaw(accessToken).get(0);
+	JSONObject rawJSON = client.listRaw(accessToken).getFirst();
 
 	//
 	// the JSON representation of the KeycloakUser has a subset of the raw JSON object/properties
@@ -138,7 +137,7 @@ public class KeycloakUsersClientInternalTestIT {
 	//
 	//
 	//
-	JSONObject simpleJSON = client.list(accessToken).get(0).toJSON();
+	JSONObject simpleJSON = client.list(accessToken).getFirst().toJSON();
 
 	//
 	// common elements
@@ -219,11 +218,11 @@ public class KeycloakUsersClientInternalTestIT {
 	//
 	//
 
-	KeycloakUser listedUser = client.list(accessToken).get(0);
+	KeycloakUser listedUser = client.list(accessToken).getFirst();
 
 	Assert.assertNotNull(listedUser.getIdentifier());
 
-	Assert.assertEquals(true, listedUser.isEnabled()); // default
+	Assert.assertTrue(listedUser.isEnabled()); // default
 	Assert.assertEquals("pippo", listedUser.getUserProfileAttribute(UserProfileAttribute.USERNAME).get());
 	Assert.assertEquals("pippo@gmail.com", listedUser.getUserProfileAttribute(UserProfileAttribute.EMAIL).get());
 	Assert.assertEquals("Pippo", listedUser.getUserProfileAttribute(UserProfileAttribute.FIRST_NAME).get());
@@ -231,18 +230,18 @@ public class KeycloakUsersClientInternalTestIT {
 
 	Assert.assertEquals(2, listedUser.getAttributes().size());
 
-	List<Entry<String, List<String>>> attributes = listedUser.getAttributes().stream()
-		.sorted((attr1, attr2) -> attr1.getKey().compareTo(attr2.getKey())).collect(Collectors.toList());
+	List<Entry<String, List<String>>> attributes = listedUser.getAttributes().stream().sorted(Comparator.comparing(Entry::getKey))
+		.toList();
 
-	Entry<String, List<String>> entry0 = attributes.get(0);
+	Entry<String, List<String>> entry0 = attributes.getFirst();
 	Assert.assertEquals("key0", entry0.getKey());
-	Assert.assertEquals("value00", entry0.getValue().get(0));
+	Assert.assertEquals("value00", entry0.getValue().getFirst());
 	Assert.assertEquals("value01", entry0.getValue().get(1));
 	Assert.assertEquals("value02", entry0.getValue().get(2));
 
 	Entry<String, List<String>> entry1 = attributes.get(1);
 	Assert.assertEquals("key1", entry1.getKey());
-	Assert.assertEquals("value1", entry1.getValue().get(0));
+	Assert.assertEquals("value1", entry1.getValue().getFirst());
     }
 
     @Test
@@ -268,7 +267,7 @@ public class KeycloakUsersClientInternalTestIT {
 
 	Assert.assertTrue(client.create(accessToken, newUser));
 
-	KeycloakUser listedNewUser = client.list(accessToken).get(0);
+	KeycloakUser listedNewUser = client.list(accessToken).getFirst();
 
 	//
 	// attempt to update the user name
@@ -290,7 +289,7 @@ public class KeycloakUsersClientInternalTestIT {
 	Assert.assertFalse(client.update(accessToken, notUpdatedUser));
 
 	//
-	// attempt to update a non existing
+	// attempt to update a non-existing
 	//
 
 	KeycloakUser notUpdatedUser2 = new KeycloakUser.KeycloakUserBuilder().//
@@ -327,11 +326,11 @@ public class KeycloakUsersClientInternalTestIT {
 	//
 	//
 
-	KeycloakUser listedUpdatedUser = client.list(accessToken).get(0);
+	KeycloakUser listedUpdatedUser = client.list(accessToken).getFirst();
 
 	Assert.assertEquals(listedNewUser.getIdentifier(), listedUpdatedUser.getIdentifier());
 
-	Assert.assertEquals(true, listedUpdatedUser.isEnabled()); // now it's enabled
+	Assert.assertTrue(listedUpdatedUser.isEnabled()); // now it's enabled
 	Assert.assertEquals("pippo", listedUpdatedUser.getUserProfileAttribute(UserProfileAttribute.USERNAME).get()); // username
 	// cannot
 	// be
@@ -344,9 +343,9 @@ public class KeycloakUsersClientInternalTestIT {
 
 	Assert.assertEquals(1, listedUpdatedUser.getAttributes().size()); // only one attribute now
 
-	Entry<String, List<String>> entry1 = listedUpdatedUser.getAttributes().get(0);
+	Entry<String, List<String>> entry1 = listedUpdatedUser.getAttributes().getFirst();
 	Assert.assertEquals("key1", entry1.getKey());
-	Assert.assertEquals("value1", entry1.getValue().get(0));
+	Assert.assertEquals("value1", entry1.getValue().getFirst());
 
     }
 
@@ -373,7 +372,7 @@ public class KeycloakUsersClientInternalTestIT {
 
 	Assert.assertEquals(1, client.count(accessToken));
 
-	KeycloakUser listedNewUser = client.list(accessToken).get(0);
+	KeycloakUser listedNewUser = client.list(accessToken).getFirst();
 
 	//
 	//
@@ -410,7 +409,7 @@ public class KeycloakUsersClientInternalTestIT {
 	Assert.assertTrue(client.create(accessToken, newUser1));
 	Assert.assertTrue(client.create(accessToken, newUser2));
 
-	KeycloakUser listedNewUser1 = client.list(accessToken).get(0);
+	KeycloakUser listedNewUser1 = client.list(accessToken).getFirst();
 	KeycloakUser listedNewUser2 = client.list(accessToken).get(1);
 
 	Assert.assertTrue(listedNewUser1.getUserProfileAttribute(UserProfileAttribute.EMAIL).isEmpty());
@@ -458,7 +457,7 @@ public class KeycloakUsersClientInternalTestIT {
 
 	List<JSONObject> listRaw = manager.listRaw(accessToken);
 
-	System.out.println(listRaw.get(0).toString(3));
+	System.out.println(listRaw.getFirst().toString(3));
 
     }
 }
