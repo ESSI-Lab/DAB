@@ -1,5 +1,8 @@
 package eu.essi_lab.augmenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -62,29 +65,35 @@ public class WHOSUnitsAugmenter extends ResourceAugmenter<AugmenterSetting> {
 	    GSLoggerFactory.getLogger(getClass()).info("Units URI already present in original metadata");
 	    return Optional.of(resource);
 	}
-	String units = null;
+	List<String> unitTerms = new ArrayList<>();
 
 	Optional<String> attributeUnits = extensionHandler.getAttributeUnits();
 	if (attributeUnits.isPresent()) {
-	    units = attributeUnits.get();
-	} else {
-	    Optional<String> attributeUnitsAbbreviation = extensionHandler.getAttributeUnitsAbbreviation();
-	    if (attributeUnitsAbbreviation.isPresent()) {
-		units = attributeUnitsAbbreviation.get();
-	    }
+	    unitTerms.add(attributeUnits.get());
+	}
+	Optional<String> attributeUnitsAbbreviation = extensionHandler.getAttributeUnitsAbbreviation();
+	if (attributeUnitsAbbreviation.isPresent()) {
+	    unitTerms.add(attributeUnitsAbbreviation.get());
 	}
 
-	if (units == null) {
+	if (unitTerms.isEmpty()) {
 	    GSLoggerFactory.getLogger(getClass()).info("Unable to unit augment this resource.. no unit information in original metadata");
 	    return Optional.of(resource);
 	}
 
 	try {
-	    WMOUnit unit = WMOOntology.decodeUnit(units);
+	    WMOUnit unit = null;
+	    for (String unitTerm : unitTerms) {
+		unit = WMOOntology.decodeUnit(unitTerm);
+		if (unit != null) {
+		    extensionHandler.setAttributeUnitsURI(unit.getURI());
+		    GSLoggerFactory.getLogger(getClass()).info("WHOS units augmenter success");
+		    break;
+		}
+	    }
 
-	    if (unit != null) {
-		extensionHandler.setAttributeUnitsURI(unit.getURI());
-		GSLoggerFactory.getLogger(getClass()).info("WHOS units augmenter success");
+	    if (unit == null) {
+		GSLoggerFactory.getLogger(getClass()).info("WHOS units augmenter failed");
 	    }
 
 	} catch (Exception e) {
