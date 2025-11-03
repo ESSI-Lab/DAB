@@ -1,27 +1,22 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.option.test;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.Selectable.SelectionMode;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.source.FileSource;
+import eu.essi_lab.model.BrokeringStrategy;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.Selectable.SelectionMode;
-import eu.essi_lab.cfga.option.InputPattern;
-import eu.essi_lab.cfga.option.IntegerOptionBuilder;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.source.FileSource;
-import eu.essi_lab.model.BrokeringStrategy;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Fabrizio
@@ -30,6 +25,17 @@ public class OptionTest {
 
     @Rule
     public ExpectedException ex = ExpectedException.none();
+
+    /**
+     *
+     */
+    public static class TestLoader extends ValuesLoader {
+
+	@Override
+	protected List loadValues(Optional input) throws Exception {
+	    return List.of();
+	}
+    }
 
     @Test
     public void test() {
@@ -75,6 +81,8 @@ public class OptionTest {
 
 	option.setMultiValue(false);
 
+	option.setLoader(new TestLoader());
+
 	Option<String> buildedOption = builder.//
 		withKey("lettersOption").//
 		withLabel("Choose the letter").//
@@ -89,6 +97,7 @@ public class OptionTest {
 		cannotBeDisabled().//
 		withSingleSelection().//
 		singleValue().//
+		withValuesLoader(new TestLoader()).//
 		hidden().//
 		readOnly().//
 		withTextArea().//
@@ -148,10 +157,10 @@ public class OptionTest {
 	//
 
 	buildedOption = builder.//
-		withValues(Arrays.asList()).//
+		withValues(List.of()).//
 		build();
 
-	option.setValues(Arrays.asList());
+	option.setValues(List.of());
 
 	test4(buildedOption);
 	test4(new Option<>(buildedOption.getObject()));
@@ -203,7 +212,7 @@ public class OptionTest {
 
 	test1(clearedOption);
 
-	Option<Integer> option2 = new Option<Integer>(Integer.class);
+	Option<Integer> option2 = new Option<>(Integer.class);
 	option2.setValue(10);
 
 	testIntegerOption(option2);
@@ -257,7 +266,7 @@ public class OptionTest {
 	Option<Integer> optIntOption = optional.get().getOption("key1", Integer.class).get();
 
 	Integer value = optIntOption.getValue();
-	Assert.assertEquals(new Integer(10), value);
+	Assert.assertEquals(Integer.valueOf(10), value);
 
 	Option<BrokeringStrategy> optStrategyOption = optional.get().getOption("key2", BrokeringStrategy.class).get();
 
@@ -273,13 +282,13 @@ public class OptionTest {
     private void testIntegerOption(Option<Integer> option2) {
 
 	Integer value = option2.getValue();
-	Assert.assertEquals(new Integer(10), value);
+	Assert.assertEquals(Integer.valueOf(10), value);
     }
 
     private void test1(Option<String> option) {
 
 	Assert.assertTrue(option.getValues().isEmpty());
-	Assert.assertTrue(option.getObject().getString("type").equals("option"));
+	Assert.assertEquals("option", option.getObject().getString("type"));
 
 	Assert.assertFalse(option.isRequired());
 	Assert.assertEquals(SelectionMode.UNSET, option.getSelectionMode());
@@ -300,6 +309,11 @@ public class OptionTest {
 	Assert.assertFalse(option.isTextAreaEnabled());
 
 	Assert.assertFalse(option.isMultiValue());
+
+	Assert.assertFalse(option.getLoader().isPresent());
+
+	Assert.assertFalse(option.getOptionalLoaderClass().isPresent());
+
     }
 
     /**
@@ -310,7 +324,7 @@ public class OptionTest {
 
 	Assert.assertFalse(option.isEnabled());
 
-	List<String> values = option.getValues().stream().sorted().collect(Collectors.toList());
+	List<String> values = option.getValues().stream().sorted().toList();
 
 	Assert.assertEquals(3, values.size());
 
@@ -357,6 +371,10 @@ public class OptionTest {
 	boolean multiValue = option.isMultiValue();
 	Assert.assertFalse(multiValue);
 
+	Optional<ValuesLoader<String>> loader = option.getLoader();
+	Assert.assertTrue(loader.isPresent());
+
+	Assert.assertTrue(option.getOptionalLoaderClass().isPresent());
     }
 
     private void test3(Option<String> option) {
@@ -371,7 +389,7 @@ public class OptionTest {
 
 	List<String> values = option.getValues();
 
-	List<String> list = values.stream().sorted().collect(Collectors.toList());
+	List<String> list = values.stream().sorted().toList();
 	Assert.assertEquals("X", list.get(0));
 	Assert.assertEquals("Y", list.get(1));
 	Assert.assertEquals("a", list.get(2));

@@ -81,7 +81,7 @@ public class Property<T> {
      */
     protected static <T> Property<T> of(String name, String key, boolean optional, Optional<T> defaultValue) {
 
-	return new Property<T>(name, key, optional, defaultValue);
+	return new Property<>(name, key, optional, defaultValue);
     }
 
     /**

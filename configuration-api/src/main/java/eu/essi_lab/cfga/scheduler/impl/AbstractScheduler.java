@@ -21,7 +21,6 @@ package eu.essi_lab.cfga.scheduler.impl;
  * #L%
  */
 
-import java.sql.DriverManager;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -138,10 +137,8 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
 
 	boolean isScheduled = settings.//
 		stream().//
-		map(s -> SchedulerUtils.createJob(s)).//
-		filter(j -> j.getKey().equals(jobDetail.getKey())).//
-		findFirst().//
-		isPresent();
+		map(SchedulerUtils::createJob).//
+		anyMatch(j -> j.getKey().equals(jobDetail.getKey()));
 	//
 	// enters here if the worker is not scheduled at all because scheduling was disabled
 	//
@@ -422,9 +419,7 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
 	    triggerBuilder = triggerBuilder.endAt(endTime);
 	}
 
-	Trigger trigger = triggerBuilder.build();
-
-	return trigger;
+	return triggerBuilder.build();
     }
 
     /**
@@ -446,13 +441,13 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
      */
     private void logScheduling(Scheduling scheduling) {
 
-	GSLoggerFactory.getLogger(getClass()).info("With repeat count {}", scheduling.getRepeatCount().map(r -> r.toString()).orElse("-"));
+	GSLoggerFactory.getLogger(getClass()).info("With repeat count {}", scheduling.getRepeatCount().map(Object::toString).orElse("-"));
 	GSLoggerFactory.getLogger(getClass()).info("With repeat interval {}", scheduling.getRepeatInterval());
 	GSLoggerFactory.getLogger(getClass()).info("With repeat interval time unit {}", scheduling.getRepeatIntervalUnit());
 	GSLoggerFactory.getLogger(getClass()).info("With start time {}",
-		scheduling.getStartTime().map(t -> t.toString() + " " + dateTimeZone).orElse("-"));
+		scheduling.getStartTime().map(t -> t + " " + dateTimeZone).orElse("-"));
 	GSLoggerFactory.getLogger(getClass()).info("With end time {}",
-		scheduling.getEndTime().map(t -> t.toString() + " " + dateTimeZone).orElse("-"));
+		scheduling.getEndTime().map(t -> t + " " + dateTimeZone).orElse("-"));
     }
 
     /**
@@ -463,7 +458,7 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
      */
     private void notifyEvent(JobExecutionContext context, JobEventListener listener, JobEvent event, String name, boolean autoRemove) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Registered JobEvent " + event + " occurred");
+	GSLoggerFactory.getLogger(getClass()).debug("Registered JobEvent {} occurred", event);
 
 	GSLoggerFactory.getLogger(getClass()).debug("Notifying event STARTED");
 
@@ -478,7 +473,7 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
 	    try {
 		scheduler.getListenerManager().removeJobListener(name);
 	    } catch (SchedulerException e) {
-		e.printStackTrace();
+
 		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	    }
 

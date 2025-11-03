@@ -73,7 +73,7 @@ public abstract class ValuesLoader<T> {
 
 	    } catch (Exception e) {
 
-		listener.valuesLoaded(Arrays.asList(), Optional.of(e));
+		listener.valuesLoaded(List.of(), Optional.of(e));
 
 		GSLoggerFactory.getLogger(ValuesLoader.class).error(e.getMessage(), e);
 	    }

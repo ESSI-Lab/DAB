@@ -1,9 +1,7 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.gs.setting.ontology;
-
-import java.util.ArrayList;
 
 /*-
  * #%L
@@ -15,25 +13,19 @@ import java.util.ArrayList;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import org.json.JSONObject;
-
 import com.vaadin.flow.data.provider.SortDirection;
-
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
@@ -51,7 +43,16 @@ import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.AfterCleanFunction;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.cfga.setting.validation.ValidationContext;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse;
+import eu.essi_lab.cfga.setting.validation.Validator;
 import eu.essi_lab.lib.utils.LabeledEnum;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Fabrizio
@@ -72,7 +73,7 @@ public class OntologySetting extends Setting implements EditableSetting {
     public enum QueryLanguage implements LabeledEnum {
 
 	/**
-	 * 
+	 *
 	 */
 	SPARQL("SPARQL");
 
@@ -105,7 +106,7 @@ public class OntologySetting extends Setting implements EditableSetting {
     public enum DataModel implements LabeledEnum {
 
 	/**
-	 * 
+	 *
 	 */
 	SKOS("SKOS");
 
@@ -138,11 +139,11 @@ public class OntologySetting extends Setting implements EditableSetting {
     public enum Availability implements LabeledEnum {
 
 	/**
-	 * 
+	 *
 	 */
 	ENABLED("Enabled"),
 	/**
-	 * 
+	 *
 	 */
 	DISABLED("Disabled");
 
@@ -170,7 +171,7 @@ public class OntologySetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public OntologySetting() {
 
@@ -266,6 +267,43 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 	setExtension(new OntologySettingComponentInfo());
 	setAfterCleanFunction(new OntologySettingAfterCleanFunction());
+
+	//
+	//
+	//
+
+	setValidator(new OntologySettingValidator());
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class OntologySettingValidator implements Validator {
+
+	@Override
+	public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
+
+	    ValidationResponse response = new ValidationResponse();
+
+	    if (check(setting)) {
+
+		response.getErrors().add("Please provide all the required fields");
+		response.setResult(ValidationResponse.ValidationResult.VALIDATION_FAILED);
+	    }
+
+	    return response;
+	}
+
+	/**
+	 * @param setting
+	 * @return
+	 */
+	private boolean check(Setting setting) {
+
+	    return setting.getOptions().//
+		    stream().//
+		    anyMatch(o -> o.isRequired() && o.getOptionalValue().isEmpty());
+	}
     }
 
     /**
@@ -333,7 +371,7 @@ public class OntologySetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void setOntologyName(String name) {
 
@@ -400,7 +438,7 @@ public class OntologySetting extends Setting implements EditableSetting {
     public static class OntologySettingComponentInfo extends ComponentInfo {
 
 	/**
-	 * 
+	 *
 	 */
 	public OntologySettingComponentInfo() {
 
@@ -414,23 +452,23 @@ public class OntologySetting extends Setting implements EditableSetting {
 		    withEditDirective("Edit ontology", ConfirmationPolicy.ON_WARNINGS).//
 		    withGridInfo(Arrays.asList(//
 
-			    ColumnDescriptor.createPositionalDescriptor(), //
+		    ColumnDescriptor.createPositionalDescriptor(), //
 
-			    ColumnDescriptor.create("Id", 300, true, true, (s) -> getOntologyId(s)), //
+		    ColumnDescriptor.create("Id", 300, true, true, (s) -> getOntologyId(s)), //
 
-			    ColumnDescriptor.create("Endpoint", 500, true, true, (s) -> getOntologyEndpoint(s)), //
+		    ColumnDescriptor.create("Endpoint", 500, true, true, (s) -> getOntologyEndpoint(s)), //
 
-			    ColumnDescriptor.create("Name", 500, true, true, (s) -> getOntologyName(s)), //
+		    ColumnDescriptor.create("Name", 500, true, true, (s) -> getOntologyName(s)), //
 
-			    ColumnDescriptor.create("Description", true, true, (s) -> getOntologyDescription(s)), //
+		    ColumnDescriptor.create("Description", true, true, (s) -> getOntologyDescription(s)), //
 
-			    ColumnDescriptor.create("Query language", 150, true, true, (s) -> getQueryLanguage(s)), //
+		    ColumnDescriptor.create("Query language", 150, true, true, (s) -> getQueryLanguage(s)), //
 
-			    ColumnDescriptor.create("Data model", 100, true, true, (s) -> getDataModel(s)), //
+		    ColumnDescriptor.create("Data model", 100, true, true, (s) -> getDataModel(s)), //
 
-			    ColumnDescriptor.create("Availability", 100, true, true, (s) -> getOntologyAvailability(s)) //
+		    ColumnDescriptor.create("Availability", 100, true, true, (s) -> getOntologyAvailability(s)) //
 
-		    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).
+	    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).
 
 		    build();
 

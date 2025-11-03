@@ -41,7 +41,7 @@ public enum BooleanChoice implements LabeledEnum {
      */
     FALSE("No");
 
-    private String label;
+    private final String label;
 
     /**
      * @param label
@@ -74,7 +74,7 @@ public enum BooleanChoice implements LabeledEnum {
      */
     public static Boolean toBoolean(BooleanChoice value) {
 
-	return value == BooleanChoice.TRUE ? true : false;
+	return value == BooleanChoice.TRUE;
     }
 
     @Override

@@ -52,7 +52,7 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
  */
 public class FileSource implements ConfigurationSource {
 
-    private File source;
+    private final File source;
 
     /**
      * Uses {@link File#createTempFile(String, String)} with "config" and ".json" as params.<br>
@@ -69,10 +69,9 @@ public class FileSource implements ConfigurationSource {
     /**
      * Creates a new file source in the <code>System.getProperty("java.io.tmpdir")</code> directory and creates
      * a file having as prefix <code>sourceName</code> and ".json" as suffix
-     * 
-     * @throws IOException
+     *
      */
-    public FileSource(String configFileName) throws IOException {
+    public FileSource(String configFileName) {
 
 	this(new File(//
 		System.getProperty("java.io.tmpdir") + File.separator + configFileName + ".json"));
@@ -140,7 +139,7 @@ public class FileSource implements ConfigurationSource {
 
 	JSONArray jsonArray = new JSONArray(getJSONSource());
 
-	ArrayList<Setting> out = new ArrayList<Setting>();
+	ArrayList<Setting> out = new ArrayList<>();
 	jsonArray.forEach(obj -> out.add(new Setting((JSONObject) obj)));
 
 	GSLoggerFactory.getLogger(getClass()).info("Source has #{} settings", jsonArray.length());
@@ -175,7 +174,7 @@ public class FileSource implements ConfigurationSource {
 
 	String json = getJSONSource();
 
-	if (json.isEmpty() || new JSONArray(json).length() == 0) {
+	if (json.isEmpty() || new JSONArray(json).isEmpty()) {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Source {} is empty", source);
 
@@ -218,29 +217,21 @@ public class FileSource implements ConfigurationSource {
     }
 
     @Override
-    public boolean releaseLock() throws Exception {
+    public boolean releaseLock() {
 
 	Optional<File> optional = findLockFile();
 
-	if (optional.isPresent()) {
+	return optional.map(File::delete).orElse(false);
 
-	    return optional.get().delete();
-	}
-
-	return false;
     }
 
     @Override
-    public Optional<String> isLocked() throws Exception {
+    public Optional<String> isLocked() {
 
 	Optional<File> optional = findLockFile();
 
-	if (optional.isPresent()) {
+	return optional.map(this::getExtension);
 
-	    return Optional.of(getExtension(optional.get()));
-	}
-
-	return Optional.empty();
     }
 
     @Override
@@ -276,8 +267,8 @@ public class FileSource implements ConfigurationSource {
 	File[] listFiles = source.getParentFile().listFiles();
 	if (listFiles != null) {
 
-	    return Arrays.asList(listFiles).//
-		    stream().//
+	    //
+	    return Arrays.stream(listFiles).//
 		    filter(f -> f.getName().contains("lock")).//
 		    findFirst();
 	}

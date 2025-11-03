@@ -49,7 +49,7 @@ public class VolatileJobStoreScheduler extends AbstractScheduler {
     /**
      * 
      */
-    private List<SchedulerJobStatus> jobStatusList;
+    private final List<SchedulerJobStatus> jobStatusList;
 
     /**
      * @param quartzScheduler
@@ -137,9 +137,7 @@ public class VolatileJobStoreScheduler extends AbstractScheduler {
 	Optional<SchedulerJobStatus> oldStatus = jobStatusList.stream().filter(s -> s.getJobIdentifier().equals(status.getJobIdentifier()))
 		.findFirst();
 
-	if (oldStatus.isPresent()) {
-	    jobStatusList.remove(oldStatus.get());
-	}
+	oldStatus.ifPresent(jobStatusList::remove);
 
 	jobStatusList.add(status);
     }
