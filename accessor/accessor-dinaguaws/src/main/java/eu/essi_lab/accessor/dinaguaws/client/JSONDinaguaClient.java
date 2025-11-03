@@ -114,7 +114,7 @@ public class JSONDinaguaClient extends DinaguaClient {
 	InputStream content = response.body();
 
 	String token = IOStreamUtils.asUTF8String(content);
-
+	
 	if (token != null && token.toLowerCase().contains("forbidden")) {
 
 	    throw GSException.createException(//
@@ -124,7 +124,7 @@ public class JSONDinaguaClient extends DinaguaClient {
 		    ErrorInfo.SEVERITY_ERROR, //
 		    DINAGUA_CREDENTIALS_INVALID_ERROR);
 	}
-
+	GSLoggerFactory.getLogger(getClass()).info("Got token: {}",token);
 	return token;
     }
 

@@ -41,7 +41,6 @@ import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
-import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.lib.sensorthings._1_1.client.SensorThingsClient;
@@ -419,6 +418,11 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		dataId.addLegalConstraints(lc);
 		continue;
 	    }
+	    if (key.equalsIgnoreCase("disclaimer")) {
+		dataId.setSupplementalInformation(value);
+		dataset.getExtensionHandler().setDataDisclaimer(value);
+		continue;
+	    }
 
 	    if (key.toLowerCase().startsWith("organization_")) {
 
@@ -484,7 +488,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	    if (key.toLowerCase().startsWith("organization")) {
 		continue;
 	    }
-	    
+
 	    switch (key.toLowerCase()) {
 	    case "email":
 	    case "role":

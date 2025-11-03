@@ -391,6 +391,8 @@ public enum MetadataElement implements Queryable {
      *
      */
     ORGANISATION_NAME(MetadataElement.ORGANISATION_NAME_EL_NAME),
+    
+    
 
     /**
      *
@@ -611,6 +613,9 @@ public enum MetadataElement implements Queryable {
     STATION_IDENTIFIER(MetadataElement.STATION_IDENTIFIER_EL_NAME), //
     COUNTRY(MetadataElement.COUNTRY_EL_NAME, false, true, ContentType.TEXTUAL, true), //
     COUNTRY_ISO3(MetadataElement.COUNTRY_ISO3_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    DATA_DISCLAIMER(MetadataElement.DATA_DISCLAIMER_EL_NAME, ContentType.TEXTUAL), //
+    USE_LEGAL_CONSTRAINTS(MetadataElement.USE_LEGAL_CONST_EL_NAME, ContentType.TEXTUAL), //
+
     RIVER(MetadataElement.RIVER_EL_NAME, ContentType.TEXTUAL), //
     RIVER_BASIN(MetadataElement.RIVER_BASIN_EL_NAME, ContentType.TEXTUAL), //
     LAKE_STATION(MetadataElement.LAKE_STATION_EL_NAME), //
@@ -730,6 +735,9 @@ public enum MetadataElement implements Queryable {
     public static final String COUNTRY_ISO3_EL_NAME = "CountryISO3";
     // public static final String INSTITUTE = "Institute";
     // public static final String STATION_NAME="StationName";
+    public static final String DATA_DISCLAIMER_EL_NAME = "dataDisclaimer";
+    public static final String USE_LEGAL_CONST_EL_NAME = "useLegalConst";
+    public static final String USE_LEGAL_CONST_URI_EL_NAME = "useLegalConstURI";
     public static final String RIVER_EL_NAME = "River";
     public static final String RIVER_BASIN_EL_NAME = "RiverBasin";
     public static final String LAKE_STATION_EL_NAME = "LakeStation";
