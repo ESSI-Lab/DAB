@@ -485,6 +485,12 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 		    object = create(object, "vertical_extent", verticalExt.toString(), "vertical extent");
 		}
+		
+		Optional<String> dataDisclaimer = resource.getExtensionHandler().getDataDisclaimer();
+		if (dataDisclaimer.isPresent()) {
+		    object = create(object, "data_disclaimer", dataDisclaimer.get(), "data disclaimer");
+		}
+		
 
 		//
 		// other properties
