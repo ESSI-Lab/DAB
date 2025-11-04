@@ -1492,7 +1492,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    addValue(String.valueOf(found));
 	}
     };
-    public static final IndexedElement USE_LEGAL_CONSTRAINTS = new IndexedMetadataElement(MetadataElement.USE_LEGAL_CONST_EL_NAME) {
+    public static final IndexedElement USE_LEGAL_CONSTRAINTS = new IndexedMetadataElement(MetadataElement.USE_LEGAL_CONSTRAINTS) {
 	@Override
 	public void defineValues(GSResource resource) {
 
@@ -1517,7 +1517,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
-    public static final IndexedElement USE_LEGAL_CONSTRAINTS_URI = new IndexedMetadataElement(MetadataElement.USE_LEGAL_CONST_URI_EL_NAME) {
+    public static final IndexedElement USE_LEGAL_CONSTRAINTS_URI = new IndexedMetadataElement(MetadataElement.USE_LEGAL_CONSTRAINTS_URI) {
 	@Override
 	public void defineValues(GSResource resource) {
 
@@ -2537,6 +2537,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	for (IndexedMetadataElement index : getIndexes()) {
 
+	    System.out.println(index.getElementName());
 	    switch (index.getMetadataElement().get().getContentType()) {
 	    /**
 	     * this is in fact not directly indexed, it is indexed through its accessory indexes

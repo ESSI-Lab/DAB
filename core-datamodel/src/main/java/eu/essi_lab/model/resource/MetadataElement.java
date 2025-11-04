@@ -615,7 +615,7 @@ public enum MetadataElement implements Queryable {
     COUNTRY_ISO3(MetadataElement.COUNTRY_ISO3_EL_NAME, false, true, ContentType.TEXTUAL, true), //
     DATA_DISCLAIMER(MetadataElement.DATA_DISCLAIMER_EL_NAME, ContentType.TEXTUAL), //
     USE_LEGAL_CONSTRAINTS(MetadataElement.USE_LEGAL_CONST_EL_NAME, ContentType.TEXTUAL), //
-
+    USE_LEGAL_CONSTRAINTS_URI(MetadataElement.USE_LEGAL_CONST_URI_EL_NAME, ContentType.TEXTUAL), //
     RIVER(MetadataElement.RIVER_EL_NAME, ContentType.TEXTUAL), //
     RIVER_BASIN(MetadataElement.RIVER_BASIN_EL_NAME, ContentType.TEXTUAL), //
     LAKE_STATION(MetadataElement.LAKE_STATION_EL_NAME), //
