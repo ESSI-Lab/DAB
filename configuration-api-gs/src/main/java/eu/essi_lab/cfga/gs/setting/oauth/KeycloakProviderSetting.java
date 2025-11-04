@@ -31,7 +31,7 @@ import org.json.JSONObject;
  */
 public class KeycloakProviderSetting extends OAuthProviderSetting {
 
-    static String IDENTIFIER = "keycloakProviderSetting";
+    static final String IDENTIFIER = "keycloakProviderSetting";
 
     /**
      * 

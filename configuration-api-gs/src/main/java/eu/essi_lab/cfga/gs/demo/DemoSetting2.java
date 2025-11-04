@@ -38,9 +38,9 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
  */
 public class DemoSetting2 extends SchedulerWorkerSetting {
 
-    private Setting rootNoRenderableSetting;
-    private Setting settingChild1;
-    private Setting settingChild2;
+    private final Setting rootNoRenderableSetting;
+    private final Setting settingChild1;
+    private final Setting settingChild2;
 
     /**
      * 
@@ -231,7 +231,7 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
 	settingChild1.setSelected(true);
 
 	settingChild1.setSelectionMode(SelectionMode.SINGLE);
-	settingChild1.getSettings().get(0).setSelected(true);
+	settingChild1.getSettings().getFirst().setSelected(true);
     }
 
     /**
@@ -251,7 +251,7 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
 	//
 	//
 	rootNoRenderableSetting.setSelected(true);
-	rootNoRenderableSetting.getSettings().get(0).setSelected(true);
+	rootNoRenderableSetting.getSettings().getFirst().setSelected(true);
     }
 
     /**
@@ -275,7 +275,7 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
 	setSelectionMode(SelectionMode.MULTI);
 
 	settingChild1.setSelectionMode(SelectionMode.SINGLE);
-	settingChild1.getSettings().get(0).setSelected(true);
+	settingChild1.getSettings().getFirst().setSelected(true);
     }
 
 }

@@ -50,15 +50,15 @@ public class DemoSetting1 extends Setting {
 	    Option<String> option = StringOptionBuilder.//
 		    get().//
 		    withKey("opt" + i).//
-		    withDescription("Description of option " + String.valueOf(i)).//
-		    withLabel("Option " + String.valueOf(i)).//
+		    withDescription("Description of option " + i).//
+		    withLabel("Option " + i).//
 		    build();
 
 	    option.setEnabled(i % 2 == 0);
 
 	    if (i > 4) {
 		option.setAdvanced(true);
-		option.setDescription("Advanced option " + String.valueOf(i));
+		option.setDescription("Advanced option " + i);
 	    }
 
 	    addOption(option);

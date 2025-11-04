@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
@@ -158,7 +157,7 @@ public class EmailSetting extends Setting {
      */
     public void setRecipients(String... recipients) {
 
-	String joined = Arrays.asList(recipients).stream().collect(Collectors.joining(","));
+	String joined = String.join(",", Arrays.asList(recipients));
 	getOption(RECIPIENTS_OPTION_KEY, String.class).get().setValue(joined);
     }
 
@@ -208,6 +207,6 @@ public class EmailSetting extends Setting {
 	    return Arrays.asList(value.split(","));
 	}
 
-	return new ArrayList<String>();
+	return new ArrayList<>();
     }
 }

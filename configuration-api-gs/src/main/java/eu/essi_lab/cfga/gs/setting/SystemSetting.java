@@ -26,6 +26,7 @@ import java.util.List;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.setting.ConfigurationObject;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
@@ -133,12 +134,12 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	 */
 	public static final String MIRROR_SITE_HEADER_NAME_PREFIX = "mirrorsiteclient";
 
-	private String name;
+	private final String name;
 
 	/**
 	 * @param name
 	 */
-	private KeyValueOptionKeys(String name) {
+	KeyValueOptionKeys(String name) {
 
 	    this.name = name;
 	}
@@ -366,9 +367,9 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	 */
 	private boolean check(Setting setting) {
 
-	    List<Setting> list = new ArrayList<Setting>();
+	    List<Setting> list = new ArrayList<>();
 
-	    SettingUtils.deepFind(setting, s -> s.isEnabled(), list);
+	    SettingUtils.deepFind(setting, ConfigurationObject::isEnabled, list);
 
 	    return list.//
 		    stream().//

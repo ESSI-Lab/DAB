@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs.task;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -41,16 +41,12 @@ import eu.essi_lab.cfga.setting.SettingUtils;
 public class CustomTaskStarter extends TaskStarter {
 
     /**
-     * 
-     */
-    private static final long serialVersionUID = 1657058006141995600L;
-    /**
-     * 
+     *
      */
     private CustomTaskSetting customTaskSetting;
 
     /**
-     * 
+     *
      */
     public CustomTaskStarter() {
 
@@ -100,11 +96,11 @@ public class CustomTaskStarter extends TaskStarter {
     protected String getTextAreaText(GridContextMenuItemClickEvent<HashMap<String, String>> event) {
 
 	final StringBuilder builder = new StringBuilder();
-	builder.append("- Selected task name: " + event.getItem().get().get("Name") + "\n\n");
+	builder.append("- Selected task name: ").append(event.getItem().get().get("Name")).append("\n\n");
 	String description = event.getItem().get().get("Description");
 	if (description != null && !description.isEmpty()) {
 
-	    builder.append("- Selected task decription: " + event.getItem().get().get("Description") + "\n\n");
+	    builder.append("- Selected task decription: ").append(event.getItem().get().get("Description")).append("\n\n");
 	}
 
 	builder.append("- Click \"Start\"  to execute now and once the selected task");
@@ -118,7 +114,7 @@ public class CustomTaskStarter extends TaskStarter {
 	if (optEmailSetting.isPresent() && !recipients.isEmpty()) {
 
 	    builder.append("\n\n- When the task is completed, a notification email will be send to: ");
-	    recipients.forEach(r -> builder.append(r + ","));
+	    recipients.forEach(r -> builder.append(r).append(","));
 	    builder.deleteCharAt(builder.length() - 1);
 	    builder.append("\n");
 

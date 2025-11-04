@@ -44,18 +44,18 @@ public interface BrokeringSetting extends EditableSetting {
     /**
      * @return
      */
-    public Setting getAccessorsSetting();
+    Setting getAccessorsSetting();
 
     /**
      * @return
      * @throws Exception
      */
-    public default AccessorSetting getSelectedAccessorSetting() {
+    default AccessorSetting getSelectedAccessorSetting() {
 
 	return getAccessorsSetting().//
 		getSettings(AccessorSetting.class).//
 		stream().//
-		filter(s -> s.isSelected()).//
+		filter(Setting::isSelected).//
 		findFirst().//
 		orElse(null);
     }
@@ -63,7 +63,7 @@ public interface BrokeringSetting extends EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class BrokeringSettingValidator implements Validator {
+    class BrokeringSettingValidator implements Validator {
 
 	@Override
 	public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
@@ -72,9 +72,7 @@ public interface BrokeringSetting extends EditableSetting {
 
 	    ValidationResponse validationResponse = brokeringSetting.getSelectedAccessorSetting().validate(configuration, context).get();
 
-	    if (brokeringSetting instanceof HarvestingSetting) {
-
-		HarvestingSetting harv = (HarvestingSetting) brokeringSetting;
+	    if (brokeringSetting instanceof HarvestingSetting harv) {
 
 		Scheduling scheduling = harv.getScheduling();
 
@@ -91,7 +89,7 @@ public interface BrokeringSetting extends EditableSetting {
      * @param scheduling
      * @return
      */
-    public static boolean compareScheduling(Scheduling scheduling, String identifier) {
+    static boolean compareScheduling(Scheduling scheduling, String identifier) {
 
 	Scheduling currentScheduling = ConfigurationWrapper.getHarvestingSettings().//
 		stream().//
@@ -110,7 +108,7 @@ public interface BrokeringSetting extends EditableSetting {
     /**
      * @return
      */
-    public default Validator createValidator() {
+    default Validator createValidator() {
 
 	return new BrokeringSettingValidator();
     }

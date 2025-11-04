@@ -40,7 +40,6 @@ public class OBISMixedSettingFactory {
 	AccessorSetting accessorSetting = AccessorSetting.createMixed( //
 		"OBIS", //
 		"http://api.iobis.org", //
-		"v3",//
 		"OBIS Accessor", //
 		OBISMixedHarvestedAccessor.TYPE, //
 		OBISMixedDistributedAccessor.TYPE, //

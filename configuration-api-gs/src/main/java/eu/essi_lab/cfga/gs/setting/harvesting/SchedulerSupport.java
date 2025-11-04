@@ -74,11 +74,6 @@ public class SchedulerSupport {
     /**
      * 
      */
-    private Scheduler scheduler;
-
-    /**
-     * 
-     */
     private static final SchedulerSupport INSTANCE = new SchedulerSupport();
 
     /**
@@ -134,7 +129,7 @@ public class SchedulerSupport {
 
 	    userDateTimeZone = ConfigurationWrapper.getSchedulerSetting().getUserDateTimeZone();
 
-	    scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
+	    Scheduler scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
 
 	    //
 	    //
@@ -154,9 +149,9 @@ public class SchedulerSupport {
 
 	    } catch (Exception e) {
 
-		executingSettings = new ArrayList<String>();
+		executingSettings = new ArrayList<>();
 
-		GSLoggerFactory.getLogger(HarvestingSetting.class).error("List executing settings failed: " + e.getMessage(), e);
+		GSLoggerFactory.getLogger(HarvestingSetting.class).error("List executing settings failed: {}", e.getMessage(), e);
 	    }
 
 	    try {
@@ -176,14 +171,9 @@ public class SchedulerSupport {
 		    List<Optional<Date>> list = tempMap.get(key);
 		    if (list != null) {
 
-			Optional<Date> optional = list.get(0);
+			Optional<Date> optional = list.getFirst();
 
-			if (optional.isPresent()) {
-
-			    Date date = optional.get();
-
-			    nextFireTimeMap.put(key, parseDate(date));
-			}
+			optional.ifPresent(date -> nextFireTimeMap.put(key, parseDate(date)));
 		    }
 		});
 
@@ -191,7 +181,7 @@ public class SchedulerSupport {
 
 		nextFireTimeMap = new HashMap<>();
 
-		GSLoggerFactory.getLogger(HarvestingSetting.class).error("List scheduled settings failed: " + e.getMessage(), e);
+		GSLoggerFactory.getLogger(HarvestingSetting.class).error("List scheduled settings failed: {}", e.getMessage(), e);
 	    }
 
 	    //
@@ -203,7 +193,7 @@ public class SchedulerSupport {
 
 	    } catch (SQLException e) {
 
-		GSLoggerFactory.getLogger(HarvestingSetting.class).error("List job status failed: " + e.getMessage(), e);
+		GSLoggerFactory.getLogger(HarvestingSetting.class).error("List job status failed: {}", e.getMessage(), e);
 	    }
 
 	    //
@@ -229,7 +219,7 @@ public class SchedulerSupport {
 		stream().//
 		filter(s -> retrieveIdentifier(s).equals(setting.getIdentifier())).//
 		findFirst().//
-		map(s -> retrieveFiredTime(s));//
+		map(this::retrieveFiredTime);//
 
 	if (time.isPresent()) {
 
@@ -399,12 +389,8 @@ public class SchedulerSupport {
 
 	Optional<SchedulerJobStatus> jobStatus = getJobStatus(setting);
 
-	if (jobStatus.isPresent()) {
+	return jobStatus.map(schedulerJobStatus -> schedulerJobStatus.getSize().orElse("")).orElse("");
 
-	    return jobStatus.get().getSize().orElse("");
-	}
-
-	return "";
     }
 
     /**
@@ -427,7 +413,7 @@ public class SchedulerSupport {
 		return "Indefinitely";
 	    }
 
-	    return String.valueOf(scheduling.getJSONObject("repeatCount").getJSONArray("values").getInt(0)) + " times";
+	    return scheduling.getJSONObject("repeatCount").getJSONArray("values").getInt(0) + " times";
 	}
 
 	return "Once";

@@ -77,12 +77,12 @@ public class OntologySetting extends Setting implements EditableSetting {
 	 */
 	SPARQL("SPARQL");
 
-	private String label;
+	private final String label;
 
 	/**
 	 * @param label
 	 */
-	private QueryLanguage(String label) {
+	QueryLanguage(String label) {
 
 	    this.label = label;
 	}
@@ -110,12 +110,12 @@ public class OntologySetting extends Setting implements EditableSetting {
 	 */
 	SKOS("SKOS");
 
-	private String label;
+	private final String label;
 
 	/**
 	 * @param label
 	 */
-	private DataModel(String label) {
+	DataModel(String label) {
 
 	    this.label = label;
 	}
@@ -147,12 +147,12 @@ public class OntologySetting extends Setting implements EditableSetting {
 	 */
 	DISABLED("Disabled");
 
-	private String label;
+	private final String label;
 
 	/**
 	 * @param label
 	 */
-	private Availability(String label) {
+	Availability(String label) {
 
 	    this.label = label;
 	}
@@ -454,19 +454,19 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 		    ColumnDescriptor.createPositionalDescriptor(), //
 
-		    ColumnDescriptor.create("Id", 300, true, true, (s) -> getOntologyId(s)), //
+		    ColumnDescriptor.create("Id", 300, true, true, this::getOntologyId), //
 
-		    ColumnDescriptor.create("Endpoint", 500, true, true, (s) -> getOntologyEndpoint(s)), //
+		    ColumnDescriptor.create("Endpoint", 500, true, true, this::getOntologyEndpoint), //
 
-		    ColumnDescriptor.create("Name", 500, true, true, (s) -> getOntologyName(s)), //
+		    ColumnDescriptor.create("Name", 500, true, true, this::getOntologyName), //
 
-		    ColumnDescriptor.create("Description", true, true, (s) -> getOntologyDescription(s)), //
+		    ColumnDescriptor.create("Description", true, true, this::getOntologyDescription), //
 
-		    ColumnDescriptor.create("Query language", 150, true, true, (s) -> getQueryLanguage(s)), //
+		    ColumnDescriptor.create("Query language", 150, true, true, this::getQueryLanguage), //
 
-		    ColumnDescriptor.create("Data model", 100, true, true, (s) -> getDataModel(s)), //
+		    ColumnDescriptor.create("Data model", 100, true, true, this::getDataModel), //
 
-		    ColumnDescriptor.create("Availability", 100, true, true, (s) -> getOntologyAvailability(s)) //
+		    ColumnDescriptor.create("Availability", 100, true, true, this::getOntologyAvailability) //
 
 	    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).
 

@@ -109,7 +109,7 @@ public class HarvestingInfoItemHandler extends GridMenuItemHandler {
      */
     private String formatRowValues(Optional<HashMap<String, String>> rowItem) {
 
-	if (!rowItem.isPresent()) {
+	if (rowItem.isEmpty()) {
 	    return "";
 	}
 

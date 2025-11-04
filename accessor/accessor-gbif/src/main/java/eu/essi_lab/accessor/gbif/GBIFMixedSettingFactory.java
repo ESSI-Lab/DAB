@@ -37,7 +37,6 @@ public class GBIFMixedSettingFactory {
 	AccessorSetting accessorSetting = AccessorSetting.createMixed( //
 		"GBIF", //
 		"http://api.gbif.org/v1/", //
-		"v1",//
 		"GBIF Accessor", //
 		GBIFMixedHarvestedAccessor.ACCESSOR_TYPE, //
 		GBIFMixedDistributedAccessor.ACCESSOR_TYPE, //

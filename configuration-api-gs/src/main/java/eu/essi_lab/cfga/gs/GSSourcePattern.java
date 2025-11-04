@@ -52,12 +52,10 @@ public class GSSourcePattern extends InputPattern {
      */
     public static InputPattern fromName(String name) {
 
-	List<Field> list = new ArrayList<Field>(Arrays.asList(GSSourcePattern.class.getDeclaredFields()));
+	List<Field> list = new ArrayList<>(Arrays.asList(GSSourcePattern.class.getDeclaredFields()));
 
 	list.addAll(Arrays.asList(InputPattern.class.getDeclaredFields()));
 
-	InputPattern out = fromName(list, name);
-
-	return out;
+	return fromName(list, name);
     }
 }

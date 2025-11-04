@@ -101,11 +101,7 @@ public abstract class TaskStarter extends GridMenuItemHandler implements ButtonC
 
 	try {
 
-	    scheduler.addJobEventListener((e, c, ex) -> {
-
-		onJobExecuted(e, c, ex);
-
-	    }, JobEvent.JOB_EXECUTED, //
+	    scheduler.addJobEventListener(this::onJobExecuted, JobEvent.JOB_EXECUTED, //
 		    UUID.randomUUID().toString(), //
 		    true); //
 
@@ -236,15 +232,15 @@ public abstract class TaskStarter extends GridMenuItemHandler implements ButtonC
 
 	final StringBuilder builder = new StringBuilder();
 
-	builder.append("- Status: " + status.getPhase().getLabel() + "\n");
-	builder.append("- Start time: " + status.getStartTime().get() + "\n");
-	builder.append("- End time: " + status.getEndTime().orElse(ISO8601DateTimeUtils.getISO8601DateTime()) + "\n\n");
+	builder.append("- Status: ").append(status.getPhase().getLabel()).append("\n");
+	builder.append("- Start time: ").append(status.getStartTime().get()).append("\n");
+	builder.append("- End time: ").append(status.getEndTime().orElse(ISO8601DateTimeUtils.getISO8601DateTime())).append("\n\n");
 
 	List<String> messagesList = status.getMessagesList(false);
 
 	messagesList.forEach(m -> {
 
-	    builder.append(m + "\n");
+	    builder.append(m).append("\n");
 	});
 
 	return builder.toString();
