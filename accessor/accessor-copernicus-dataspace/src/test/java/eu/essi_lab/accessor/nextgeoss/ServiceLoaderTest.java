@@ -155,11 +155,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CopernicusDataspaceGranulesMetadataSchemas.JSON_COPERNICUS_DATASPACE.toString()))
-		.findFirst().isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CopernicusDataspaceGranulesMetadataSchemas.JSON_COPERNICUS_DATASPACE.toString())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CopernicusDataspaceCollectionMapper.SCHEMA_URI)).findFirst().isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CopernicusDataspaceCollectionMapper.SCHEMA_URI)));
 
     }
 
@@ -170,24 +169,16 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(CopernicusDataspaceGranulesConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(CopernicusDataspaceGranulesConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(CopernicusDataspaceGranulesAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(CopernicusDataspaceGranulesAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(CopernicusDataspaceConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(CopernicusDataspaceConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(CopernicusDataspaceAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(CopernicusDataspaceAccessor.class.getName())));
 
     }
 

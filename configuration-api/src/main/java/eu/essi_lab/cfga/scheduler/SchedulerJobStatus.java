@@ -39,7 +39,7 @@ public class SchedulerJobStatus extends JobStatus {
     /**
      * 
      */
-    private static DecimalFormat decimalFormat;
+    private static final DecimalFormat decimalFormat;
 
     static {
 
@@ -57,7 +57,7 @@ public class SchedulerJobStatus extends JobStatus {
     /**
      * 
      */
-    private JSONObject object;
+    private final JSONObject object;
 
     /**
      * @param context

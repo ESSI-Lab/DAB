@@ -111,7 +111,7 @@ List<Queryable> distArray = new ArrayList<>();
 distArray.add(MetadataElement.ATTRIBUTE_TITLE);
 distArray.add(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
 distArray.add(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
-distArray.add(MetadataElement.ONLINE_ID);
+distArray.add(MetadataElement.IDENTIFIER);
 // computes count distinct of 2 queryables
 statisticsMessage.countDistinct(distArray);
 
@@ -140,7 +140,7 @@ for (ResponseItem responseItem : items) {
     stats.setSiteCount(responseItem.getCountDistinct(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER).get().getValue());
     stats.setUniqueAttributeCount(responseItem.getCountDistinct(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER).get().getValue());
     stats.setAttributeCount(responseItem.getCountDistinct(MetadataElement.ATTRIBUTE_TITLE).get().getValue());
-    stats.setTimeSeriesCount(responseItem.getCountDistinct(MetadataElement.ONLINE_ID).get().getValue());
+    stats.setTimeSeriesCount(responseItem.getCountDistinct(MetadataElement.IDENTIFIER).get().getValue());
     Optional<CardinalValues> cardinalValues = responseItem.getBBoxUnion().getCardinalValues();
     String union = responseItem.getTempExtentUnion().getValue();
     String begin = union.split(" ")[0];

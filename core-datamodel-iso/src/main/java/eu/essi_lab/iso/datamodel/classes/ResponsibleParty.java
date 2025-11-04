@@ -34,134 +34,141 @@ import net.opengis.iso19139.gmd.v_20060504.CIRoleCodePropertyType;
 
 public class ResponsibleParty extends ISOMetadata<CIResponsiblePartyType> {
 
-	public ResponsibleParty(InputStream stream) throws JAXBException {
+    public ResponsibleParty(InputStream stream) throws JAXBException {
 
-		super(stream);
+	super(stream);
+    }
+
+    public ResponsibleParty(CIResponsiblePartyType type) {
+
+	super(type);
+    }
+
+    public ResponsibleParty() {
+
+	super(new CIResponsiblePartyType());
+    }
+
+    @Override
+    public JAXBElement<CIResponsiblePartyType> getElement() {
+
+	JAXBElement<CIResponsiblePartyType> element = ObjectFactories.GMD().createCIResponsibleParty(type);
+	return element;
+    }
+
+    public String getOrganisationURI() {
+	try {
+	    return ISOMetadata.getHREFStringFromCharacterString(type.getOrganisationName());
+	} catch (NullPointerException ex) {
 	}
+	return null;
+    }
 
-	public ResponsibleParty(CIResponsiblePartyType type) {
-
-		super(type);
+    /**
+     * @XPathDirective(target = "gmd:organisationName/*[1]")
+     */
+    public String getOrganisationName() {
+	try {
+	    return ISOMetadata.getStringFromCharacterString(type.getOrganisationName());
+	} catch (NullPointerException ex) {
 	}
+	return null;
+    }
 
-	public ResponsibleParty() {
+    /**
+     * @XPathDirective(target = "gmd:organisationName/gco:CharacterString")
+     */
+    public void setOrganisationName(String organisationName) {
+	type.setOrganisationName(createCharacterStringPropertyType(organisationName));
+    }
 
-		super(new CIResponsiblePartyType());
+    /**
+     * @XPathDirective(target = "gmd:individualName/*[1]")
+     */
+    public String getIndividualName() {
+	try {
+	    return ISOMetadata.getStringFromCharacterString(type.getIndividualName());
+	} catch (NullPointerException ex) {
 	}
+	return null;
+    }
 
-	@Override
-	public JAXBElement<CIResponsiblePartyType> getElement() {
-
-		JAXBElement<CIResponsiblePartyType> element = ObjectFactories.GMD().createCIResponsibleParty(type);
-		return element;
+    public String getIndividualURI() {
+	try {
+	    return ISOMetadata.getHREFStringFromCharacterString(type.getIndividualName());
+	} catch (NullPointerException ex) {
 	}
+	return null;
+    }
 
-	public String getOrganisationURI() {
-		try {
-			return ISOMetadata.getHREFStringFromCharacterString(type.getOrganisationName());
-		} catch (NullPointerException ex) {
-		}
-		return null;
-	}
+    /**
+     * @XPathDirective(target = "gmd:individualName/gco:CharacterString")
+     */
+    public void setIndividualName(String individualName) {
+	type.setIndividualName(createCharacterStringPropertyType(individualName));
+    }
 
-	/**
-	 * @XPathDirective(target = "gmd:organisationName/*[1]")
-	 */
-	public String getOrganisationName() {
-		try {
-			return ISOMetadata.getStringFromCharacterString(type.getOrganisationName());
-		} catch (NullPointerException ex) {
-		}
-		return null;
+    /**
+     * @XPathDirective(target = "gmd:positionName/*[1]")
+     */
+    public String getPositionName() {
+	try {
+	    return ISOMetadata.getStringFromCharacterString(type.getPositionName());
+	} catch (NullPointerException ex) {
 	}
+	return null;
+    }
 
-	/**
-	 * @XPathDirective(target = "gmd:organisationName/gco:CharacterString")
-	 */
-	public void setOrganisationName(String organisationName) {
-		type.setOrganisationName(createCharacterStringPropertyType(organisationName));
-	}
+    /**
+     * @XPathDirective(target = "gmd:positionName/gco:CharacterString")
+     */
+    public void setPositionName(String positionName) {
+	type.setPositionName(createCharacterStringPropertyType(positionName));
+    }
 
-	/**
-	 * @XPathDirective(target = "gmd:individualName/*[1]")
-	 */
-	public String getIndividualName() {
-		try {
-			return ISOMetadata.getStringFromCharacterString(type.getIndividualName());
-		} catch (NullPointerException ex) {
-		}
-		return null;
-	}
+    /**
+     * @XPathDirective(target = ".", clear = "gmd:role", parent = "gmd:role", after
+     *                        = "gmd:contactInfo", position = Position.LAST)
+     */
+    public void setRoleCode(String roleCode) {
+	CIRoleCodePropertyType roleCodeProperty = new CIRoleCodePropertyType();
+	roleCodeProperty.setCIRoleCode(createCodeListValueType(CI_ROLE_CODE_CODELIST, roleCode, ISO_19115_CODESPACE, roleCode));
+	type.setRole(roleCodeProperty);
+    }
 
-	/**
-	 * @XPathDirective(target = "gmd:individualName/gco:CharacterString")
-	 */
-	public void setIndividualName(String individualName) {
-		type.setIndividualName(createCharacterStringPropertyType(individualName));
+    /**
+     * @XPathDirective(target = "gmd:role/gmd:CI_RoleCode")
+     */
+    public String getRoleCode() {
+	try {
+	    return type.getRole().getCIRoleCode().getCodeListValue();
+	} catch (NullPointerException ex) {
 	}
+	return null;
+    }
 
-	/**
-	 * @XPathDirective(target = "gmd:positionName/*[1]")
-	 */
-	public String getPositionName() {
-		try {
-			return ISOMetadata.getStringFromCharacterString(type.getPositionName());
-		} catch (NullPointerException ex) {
-		}
-		return null;
+    /**
+     * @XPathDirective(target = ".", clear = "gmd:contactInfo", parent =
+     *                        "gmd:contactInfo", after = "gmd:positionName",
+     *                        position = Position.LAST)
+     */
+    public void setContactInfo(Contact contact) {
+	if (contact == null) {
+	    type.setContactInfo(null);
+	    return;
 	}
+	CIContactPropertyType contactProperty = new CIContactPropertyType();
+	contactProperty.setCIContact(contact.getElementType());
+	type.setContactInfo(contactProperty);
+    }
 
-	/**
-	 * @XPathDirective(target = "gmd:positionName/gco:CharacterString")
-	 */
-	public void setPositionName(String positionName) {
-		type.setPositionName(createCharacterStringPropertyType(positionName));
+    /**
+     * @XPathDirective(target = "gmd:contactInfo/gmd:CI_Contact")
+     */
+    public Contact getContact() {
+	if (type.isSetContactInfo() && type.getContactInfo().isSetCIContact()) {
+	    return new Contact(type.getContactInfo().getCIContact());
 	}
-
-	/**
-	 * @XPathDirective(target = ".", clear = "gmd:role", parent = "gmd:role", after
-	 *                        = "gmd:contactInfo", position = Position.LAST)
-	 */
-	public void setRoleCode(String roleCode) {
-		CIRoleCodePropertyType roleCodeProperty = new CIRoleCodePropertyType();
-		roleCodeProperty
-				.setCIRoleCode(createCodeListValueType(CI_ROLE_CODE_CODELIST, roleCode, ISO_19115_CODESPACE, roleCode));
-		type.setRole(roleCodeProperty);
-	}
-
-	/**
-	 * @XPathDirective(target = "gmd:role/gmd:CI_RoleCode")
-	 */
-	public String getRoleCode() {
-		try {
-			return type.getRole().getCIRoleCode().getCodeListValue();
-		} catch (NullPointerException ex) {
-		}
-		return null;
-	}
-
-	/**
-	 * @XPathDirective(target = ".", clear = "gmd:contactInfo", parent =
-	 *                        "gmd:contactInfo", after = "gmd:positionName",
-	 *                        position = Position.LAST)
-	 */
-	public void setContactInfo(Contact contact) {
-		if (contact == null) {
-			type.setContactInfo(null);
-			return;
-		}
-		CIContactPropertyType contactProperty = new CIContactPropertyType();
-		contactProperty.setCIContact(contact.getElementType());
-		type.setContactInfo(contactProperty);
-	}
-
-	/**
-	 * @XPathDirective(target = "gmd:contactInfo/gmd:CI_Contact")
-	 */
-	public Contact getContact() {
-		if (type.isSetContactInfo() && type.getContactInfo().isSetCIContact()) {
-			return new Contact(type.getContactInfo().getCIContact());
-		}
-		return null;
-	}
+	return null;
+    }
 }

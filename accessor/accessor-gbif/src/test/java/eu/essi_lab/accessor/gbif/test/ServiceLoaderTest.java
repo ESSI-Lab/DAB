@@ -173,11 +173,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(GBIFCollectionMapper.GBIF_COLLECTION_MAPPER_SCHEME_URI))
-		.findFirst().isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(GBIFCollectionMapper.GBIF_COLLECTION_MAPPER_SCHEME_URI)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(GBIFMapper.GBIFOCCURRENCE_SCHEMA)).findFirst().isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(GBIFMapper.GBIFOCCURRENCE_SCHEMA)));
 
     }
 
@@ -188,24 +187,16 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(GBIFDistributedConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(GBIFDistributedConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(GBIFMixedDistributedAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(GBIFMixedDistributedAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(GBIFHarvestedConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(GBIFHarvestedConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(GBIFMixedHarvestedAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(GBIFMixedHarvestedAccessor.class.getName())));
 
     }
 

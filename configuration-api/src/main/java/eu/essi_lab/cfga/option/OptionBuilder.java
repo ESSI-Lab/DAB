@@ -25,7 +25,6 @@ package eu.essi_lab.cfga.option;
  */
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.json.JSONObject;
 
@@ -62,7 +61,7 @@ public class OptionBuilder<T> {
      */
     public static <T> OptionBuilder<T> get(Class<T> clazz) {
 
-	return new OptionBuilder<T>(clazz);
+	return new OptionBuilder<>(clazz);
     }
 
     /**
@@ -390,7 +389,7 @@ public class OptionBuilder<T> {
      */
     public OptionBuilder<T> withSelectedValues(List<T> values) {
 
-	option.select(v -> values.contains(v));
+	option.select(values::contains);
 	return this;
     }
 

@@ -304,8 +304,7 @@ public class SchedulerSupport {
 
 	return executingSettings.//
 		stream().//
-		filter(s -> retrieveIdentifier(s).equals(setting.getIdentifier())).//
-		findFirst().isPresent() ? "Yes" : "";
+		anyMatch(s -> retrieveIdentifier(s).equals(setting.getIdentifier())) ? "Yes" : "";
     }
 
     /**
@@ -329,8 +328,7 @@ public class SchedulerSupport {
 
 	boolean present = executingSettings.//
 		stream().//
-		filter(s -> retrieveIdentifier(s).equals(setting.getIdentifier())).//
-		findFirst().isPresent();
+		anyMatch(s -> retrieveIdentifier(s).equals(setting.getIdentifier()));
 
 	if (present) {
 

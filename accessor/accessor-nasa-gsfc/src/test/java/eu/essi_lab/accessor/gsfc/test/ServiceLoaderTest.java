@@ -64,8 +64,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(NasaGSFCConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(NasaGSFCConnector.class)));//
     }
 
     @SuppressWarnings("rawtypes")
@@ -75,14 +74,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(NasaGSFCAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(NasaGSFCAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(NasaGSFCConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(NasaGSFCConnector.class.getName())));
 
     }
 }

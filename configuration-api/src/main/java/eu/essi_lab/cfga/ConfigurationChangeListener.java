@@ -22,6 +22,7 @@ package eu.essi_lab.cfga;
  */
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import eu.essi_lab.cfga.setting.Setting;
@@ -64,9 +65,9 @@ public interface ConfigurationChangeListener {
 	 */
 	public static final int CONFIGURATION_AUTO_RELOADED = 5;
 
-	private int eventType;
-	private Configuration configuration;
-	private List<Setting> settings;
+	private final int eventType;
+	private final Configuration configuration;
+	private final List<Setting> settings;
 
 	/**
 	 * @param configuration
@@ -75,7 +76,7 @@ public interface ConfigurationChangeListener {
 	 */
 	public ConfigurationChangeEvent(Configuration configuration, int eventType) {
 
-	    this(configuration, Arrays.asList(), eventType);
+	    this(configuration, List.of(), eventType);
 	}
 
 	/**
@@ -85,7 +86,7 @@ public interface ConfigurationChangeListener {
 	 */
 	public ConfigurationChangeEvent(Configuration configuration, Setting setting, int eventType) {
 
-	    this(configuration, Arrays.asList(setting), eventType);
+	    this(configuration, Collections.singletonList(setting), eventType);
 	}
 
 	/**

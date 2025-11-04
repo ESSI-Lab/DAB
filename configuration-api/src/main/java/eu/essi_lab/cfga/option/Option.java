@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.option;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,12 +43,12 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
- * 
+ *
  */
 public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
     /**
-     * 
+     *
      */
     public Option(Class<T> clazz) {
 
@@ -78,18 +77,13 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     /**
-     * @param mode
+     * @param opt1
+     * @param opt2
+     * @return
      */
-    @Override
-    public void setSelectionMode(SelectionMode mode) {
+    public static int sort(Option<?> opt1, Option<?> opt2) {
 
-	if (mode == SelectionMode.UNSET) {
-
-	    getObject().remove("selectionMode");
-	    return;
-	}
-
-	getObject().put("selectionMode", mode.getLabel());
+	return opt1.getPosition().compareTo(opt2.getPosition());
     }
 
     /**
@@ -106,6 +100,21 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	return SelectionMode.UNSET;
     }
 
+    /**
+     * @param mode
+     */
+    @Override
+    public void setSelectionMode(SelectionMode mode) {
+
+	if (mode == SelectionMode.UNSET) {
+
+	    getObject().remove("selectionMode");
+	    return;
+	}
+
+	getObject().put("selectionMode", mode.getLabel());
+    }
+
     @Override
     public void select(Predicate<T> predicate) throws UnsetSelectionModeException {
 
@@ -117,7 +126,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	List<Integer> selIndexes = getValues().//
 		stream().//
 		filter(predicate).//
-		map(v -> getValueIndex(v)).//
+		map(this::getValueIndex).//
 		collect(Collectors.toList());
 
 	putSelectedIndexes(selIndexes);
@@ -139,7 +148,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
 	List<Integer> selIndexes = getValues().//
 		stream().//
-		map(v -> getValueIndex(v)).//
+		map(this::getValueIndex).//
 		collect(Collectors.toList());
 
 	putSelectedIndexes(selIndexes);
@@ -163,7 +172,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
 	List<T> values = getSelectedValues();
 
-	return values.isEmpty() ? Optional.empty() : Optional.of(values.get(0));
+	return values.isEmpty() ? Optional.empty() : Optional.of(values.getFirst());
     }
 
     /**
@@ -179,11 +188,11 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
      */
     public boolean isBase64EncodedValue() {
 
-	return getObject().has("base64") ? getObject().getBoolean("base64") : false;
+	return getObject().has("base64") && getObject().getBoolean("base64");
     }
 
     /**
-     * 
+     *
      */
     public void setBase64EncodedValue() {
 
@@ -192,7 +201,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
     /**
      * Default: false
-     * 
+     *
      * @return
      */
     public boolean isRequired() {
@@ -202,7 +211,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
     /**
      * Default: false
-     * 
+     *
      * @param required
      */
     public void setRequired(boolean required) {
@@ -212,7 +221,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
     /**
      * Default: false
-     * 
+     *
      * @return
      */
     public boolean isAdvanced() {
@@ -222,36 +231,12 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
     /**
      * Default: false
-     * 
+     *
      * @param advanced
      */
     public void setAdvanced(boolean advanced) {
 
 	setProperty("advanced", advanced, false);
-    }
-
-    /**
-     * @param pattern
-     */
-    public void setInputPattern(InputPattern pattern) {
-
-	getObject().put("inputPattern", pattern.getClass().getName() + "_" + pattern.getName());
-    }
-
-    public static void main(String[] args) {
-
-	String s = "eu.essi_lab.cfga.gs.GSSourcePattern_gsSourceId";
-
-	int lastUs = s.lastIndexOf("_");
-
-	String className = s.substring(0, lastUs);
-
-	System.out.println(className);
-
-	String patternName = s.substring(lastUs + 1, s.length());
-
-	System.out.println(patternName);
-
     }
 
     /**
@@ -266,7 +251,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	    int lastUs = inputPattern.lastIndexOf("_");
 
 	    String className = inputPattern.substring(0, lastUs);
-	    String patternName = inputPattern.substring(lastUs + 1, inputPattern.length());
+	    String patternName = inputPattern.substring(lastUs + 1);
 
 	    try {
 		@SuppressWarnings("unchecked")
@@ -287,11 +272,11 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     /**
-     * @param minValue
+     * @param pattern
      */
-    public void setMinValue(Number minValue) {
+    public void setInputPattern(InputPattern pattern) {
 
-	getObject().put("minValue", minValue);
+	getObject().put("inputPattern", pattern.getClass().getName() + "_" + pattern.getName());
     }
 
     /**
@@ -313,11 +298,11 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     /**
-     * @param maxValue
+     * @param minValue
      */
-    public void setMaxValue(Number maxValue) {
+    public void setMinValue(Number minValue) {
 
-	getObject().put("maxValue", maxValue);
+	getObject().put("minValue", minValue);
     }
 
     /**
@@ -336,6 +321,14 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * @param maxValue
+     */
+    public void setMaxValue(Number maxValue) {
+
+	getObject().put("maxValue", maxValue);
     }
 
     /**
@@ -371,11 +364,9 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     /**
-     * Default: false
-     * If enabled, the option values is shown in a text area. In read-only mode, each new line character
-     * corresponds to a text area row.<br>
-     * This property is valid only for string content
-     * 
+     * Default: false If enabled, the option values is shown in a text area. In read-only mode, each new line character corresponds to a
+     * text area row.<br> This property is valid only for string content
+     *
      * @param enable
      */
     public void enableTextArea(boolean enable) {
@@ -398,7 +389,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
 	List<T> values = getValues();
 
-	return values.isEmpty() ? Optional.empty() : Optional.of(values.get(0));
+	return values.isEmpty() ? Optional.empty() : Optional.of(values.getFirst());
     }
 
     /**
@@ -410,8 +401,20 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     /**
+     * @param value
+     */
+    public void setValue(T value) throws IllegalArgumentException {
+
+	if (value == null) {
+	    throw new IllegalArgumentException("Null value");
+	}
+
+	setValues(List.of(value));
+    }
+
+    /**
      * Default: false
-     * 
+     *
      * @return
      */
     public boolean isMultiValue() {
@@ -421,7 +424,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
     /**
      * Default: false
-     * 
+     *
      * @param multiValue
      */
     public void setMultiValue(boolean multiValue) {
@@ -470,14 +473,12 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	    //
 	    if (LabeledEnum.class.isAssignableFrom(valueClass)) {
 
-		List<T> enums = values.//
+		return values.//
 			map(v -> (String) v).//
 			map(l -> LabeledEnum.valueOf((Class<? extends LabeledEnum>) valueClass, l).orElseGet(null)).//
 			filter(Objects::nonNull).//
 			map(e -> (T) e).//
 			collect(Collectors.toList());
-
-		return enums;
 	    }
 
 	    //
@@ -485,14 +486,12 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	    //
 	    if (Enum.class.isAssignableFrom(valueClass)) {
 
-		List<T> enums = values.//
+		return values.//
 			map(v -> (String) v).//
 			map(n -> valueOfOrNull(valueClass, n)).//
 			filter(Objects::nonNull).//
 			map(e -> (T) e).//
 			collect(Collectors.toList());
-
-		return enums;
 	    }
 
 	    //
@@ -500,13 +499,11 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	    //
 	    if (ISODateTime.class.isAssignableFrom(valueClass)) {
 
-		List<T> isoDateTime = values.//
+		return values.//
 			map(v -> (String) v).//
-			map(v -> new ISODateTime(v)).//
+			map(ISODateTime::new).//
 			map(e -> (T) e).//
 			collect(Collectors.toList());
-
-		return isoDateTime;
 	    }
 
 	    //
@@ -514,13 +511,11 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	    //
 	    if (Setting.class.isAssignableFrom(valueClass)) {
 
-		List<T> setting = values.//
+		//
+		return values.//
 			map(v -> (String) v).//
 			map(v -> create(valueClass)).//
-			map(e -> (T) e).//
 			collect(Collectors.toList());
-
-		return setting;
 	    }
 
 	    //
@@ -535,26 +530,6 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	// No values
 	//
 	return new ArrayList<>();
-    }
-
-    /**
-     * @param value
-     */
-    public void addValue(T value) throws IllegalArgumentException {
-
-	if (value == null) {
-	    throw new IllegalArgumentException("Null value");
-	}
-
-	List<T> values = Arrays.asList(value);
-
-	if (getObject().has("values")) {
-
-	    values = getValues();
-	    values.add(value);
-	}
-
-	setValues(values);
     }
 
     /**
@@ -576,9 +551,9 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	    List<String> mappedValues = values.//
 		    stream().//
 		    map(v -> (mapper.get().asString(v))).//
-		    collect(Collectors.toList());
+		    toList();
 
-	    mappedValues.forEach(v -> array.put(v));
+	    mappedValues.forEach(array::put);
 	}
 
 	//
@@ -591,59 +566,48 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 		List<String> encodedValues = values.//
 			stream().//
 			map(this::encodeOrThrow).//
-			collect(Collectors.toList());
+			toList();
 
-		encodedValues.forEach(v -> array.put(v));
+		encodedValues.forEach(array::put);
 
 	    } catch (ClassCastException ex) {
 
-		throw new IllegalArgumentException("Option class <" + values.get(0).getClass().getName() + "> is not serializable");
+		throw new IllegalArgumentException("Option class <" + values.getFirst().getClass().getName() + "> is not serializable");
 	    } catch (RuntimeException e) {
 		throw new IllegalArgumentException(e.getMessage(), e);
 	    }
 
-	}
-
-	else {
+	} else {
 
 	    values.forEach(v -> {
 
 		//
 		// labels of LabeledEnum
 		//
-		if (v instanceof LabeledEnum) {
+		switch (v) {
+		case LabeledEnum labeledEnum -> array.put(labeledEnum.getLabel());
 
-		    array.put(((LabeledEnum) v).getLabel());
+		//
+		// constant names of Enum
+		//
+		case Enum anEnum -> array.put(anEnum.name());
 
-		    //
-		    // constant names of Enum
-		    //
-		} else if (v instanceof Enum) {
+		//
+		// ISODateTime value
+		//
 
-		    array.put(((Enum) v).name());
+		case ISODateTime isoDateTime -> array.put(isoDateTime.getValue());
 
-		    //
-		    // ISODateTime value
-		    //
+		//
+		// Setting value
+		//
+		case Setting setting -> array.put(setting.getSettingClass().getName());
 
-		} else if (v instanceof ISODateTime) {
+		//
+		// T value
+		//
 
-		    array.put(((ISODateTime) v).getValue());
-
-		    //
-		    // Setting value
-		    //
-		} else if (v instanceof Setting) {
-
-		    array.put(((Setting) v).getSettingClass().getName());
-
-		    //
-		    // T value
-		    //
-
-		} else {
-
-		    array.put(v);
+		case null, default -> array.put(v);
 		}
 	    });
 	}
@@ -657,6 +621,26 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     /**
      * @param value
      */
+    public void addValue(T value) throws IllegalArgumentException {
+
+	if (value == null) {
+	    throw new IllegalArgumentException("Null value");
+	}
+
+	List<T> values = List.of(value);
+
+	if (getObject().has("values")) {
+
+	    values = getValues();
+	    values.add(value);
+	}
+
+	setValues(values);
+    }
+
+    /**
+     * @param value
+     */
     @SuppressWarnings("unchecked")
     public void setObjectValue(Object value) throws IllegalArgumentException {
 
@@ -664,7 +648,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	    throw new IllegalArgumentException("Null value");
 	}
 
-	setValues(Arrays.asList((T) value));
+	setValues(List.of((T) value));
     }
 
     /**
@@ -680,19 +664,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     /**
-     * @param value
-     */
-    public void setValue(T value) throws IllegalArgumentException {
-
-	if (value == null) {
-	    throw new IllegalArgumentException("Null value");
-	}
-
-	setValues(Arrays.asList(value));
-    }
-
-    /**
-     * 
+     *
      */
     public void clearValues() {
 
@@ -722,21 +694,20 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     /**
-     * @param option
-     * @return
-     */
-    public void setPosition(int position) {
-
-	getObject().put("position", position);
-    }
-
-    /**
-     * @param option
      * @return
      */
     public Integer getPosition() {
 
 	return getObject().getInt("position");
+    }
+
+    /**
+     * @param position
+     * @return
+     */
+    public void setPosition(int position) {
+
+	getObject().put("position", position);
     }
 
     /**
@@ -749,8 +720,8 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
 	    if (getObject().has("optionMapperClass")) {
 
-		return (Optional<OptionValueMapper<T>>) Optional
-			.of((T) Class.forName(getObject().getString("optionMapperClass")).getDeclaredConstructor().newInstance());
+		return (Optional<OptionValueMapper<T>>) Optional.of(
+			(T) Class.forName(getObject().getString("optionMapperClass")).getDeclaredConstructor().newInstance());
 	    }
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).warn(e.getMessage(), e);
@@ -777,8 +748,8 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
 	    if (getObject().has("valuesLoaderClass")) {
 
-		return (Optional<ValuesLoader<T>>) Optional
-			.of((T) Class.forName(getObject().getString("valuesLoaderClass")).getDeclaredConstructor().newInstance());
+		return (Optional<ValuesLoader<T>>) Optional.of(
+			(T) Class.forName(getObject().getString("valuesLoaderClass")).getDeclaredConstructor().newInstance());
 	    }
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
@@ -821,25 +792,14 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     /**
-     * Verifies if this option is similar to <code>other</code>.<br>
-     * Two options are similar if they have the same {@link #getValueClass()}
-     * 
+     * Verifies if this option is similar to <code>other</code>.<br> Two options are similar if they have the same {@link #getValueClass()}
+     *
      * @param other
      * @return
      */
     public boolean similar(Option<?> other) {
 
 	return this.getValueClass().equals(other.getValueClass());
-    }
-
-    /**
-     * @param opt1
-     * @param opt2
-     * @return
-     */
-    public static int sort(Option<?> opt1, Option<?> opt2) {
-
-	return opt1.getPosition().compareTo(opt2.getPosition());
     }
 
     @Override
@@ -865,7 +825,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     private void putSelectedIndexes(List<Integer> indexes) {
 
 	JSONArray array = new JSONArray();
-	indexes.forEach(i -> array.put(i));
+	indexes.forEach(array::put);
 
 	getObject().put("selectedIndexes", array);
     }
@@ -910,11 +870,9 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
      */
     private int getValueIndex(T value) {
 
-	int indexOf = getValues().//
+	return getValues().//
 
 		indexOf(value);
-
-	return indexOf;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

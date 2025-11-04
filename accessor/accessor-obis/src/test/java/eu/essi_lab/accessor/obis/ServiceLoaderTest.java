@@ -169,11 +169,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(OBISGranulesResultMapper.OBIS_GRANULES_SCHEME_URI)).findFirst()
-		.isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(OBISGranulesResultMapper.OBIS_GRANULES_SCHEME_URI)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(OBISResourceMapper.OBIS_SCHEME_URI)).findFirst().isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(OBISResourceMapper.OBIS_SCHEME_URI)));
 
     }
 
@@ -184,24 +183,16 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(OBISGranulesConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(OBISGranulesConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(OBISMixedDistributedAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(OBISMixedDistributedAccessor.class.getName())));
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(OBISConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(OBISConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(OBISMixedHarvestedAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(OBISMixedHarvestedAccessor.class.getName())));
 
     }
 

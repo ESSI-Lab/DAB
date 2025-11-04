@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.sensorthings._1_1.mapper;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +41,6 @@ import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
-import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.lib.sensorthings._1_1.client.SensorThingsClient;
@@ -418,20 +418,96 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		dataId.addLegalConstraints(lc);
 		continue;
 	    }
+	    if (key.equalsIgnoreCase("disclaimer")) {
+		dataId.setSupplementalInformation(value);
+		dataset.getExtensionHandler().setDataDisclaimer(value);
+		continue;
+	    }
+
+	    if (key.toLowerCase().startsWith("organization_")) {
+
+		String[] values = value.split(",");
+		String organizationName = null;
+		String individualName = null;
+		String email = null;
+		List<String> roles = new ArrayList<String>();
+		for (String v : values) {
+		    if (v.contains(":")) {
+			String[] vs = v.split(":");
+			String tagKey = vs[0].trim().toLowerCase();
+			String tagValue = vs[1].trim();
+			switch (tagKey) {
+			case "name":
+			    organizationName = tagValue;
+			    break;
+			case "email":
+			    email = tagValue;
+			    break;
+			case "individual":
+			case "individual_name":
+			    individualName = tagValue;
+			    break;
+			case "role":
+			    roles.add(tagValue);
+			    break;
+
+			default:
+			    GSLoggerFactory.getLogger(getClass()).error("unexpected value");
+			}
+		    }
+		}
+		for (String role : roles) {
+		    ResponsibleParty responsibleParty = new ResponsibleParty();
+
+		    if (organizationName != null) {
+
+			responsibleParty.setOrganisationName(organizationName.trim());
+
+		    }
+
+		    if (individualName != null) {
+
+			responsibleParty.setIndividualName(individualName.trim());
+
+		    }
+
+		    responsibleParty.setRoleCode(role);
+
+		    if (email != null) {
+			Contact contact = new Contact();
+			Address address = new Address();
+			address.addElectronicMailAddress(email);
+			contact.setAddress(address);
+			responsibleParty.setContactInfo(contact);
+		    }
+		    dataId.addPointOfContact(responsibleParty);
+		}
+
+	    }
+
+	    if (key.toLowerCase().startsWith("organization")) {
+		continue;
+	    }
 
 	    switch (key.toLowerCase()) {
-	    case "organization":
-	    case "organization_label":
 	    case "email":
 	    case "role":
-	    case "project_role":	
+	    case "project_role":
 	    case "metadata_created_datestamp":
 	    case "metadata_modified_datestamp":
 		continue;
 	    }
 
-	    keywords.addKeyword(key + ": " + value);
+	    Keywords nks = new Keywords();
+	    nks.setThesaurusNameCitationTitle(key);
+	    String[] values = value.split(",");
+	    for (String v : values) {
+		nks.addKeyword(v.trim());
+	    }
+	    dataId.addKeywords(nks);
+
 	}
+
 	//
 	// File Identifier
 	//

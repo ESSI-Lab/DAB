@@ -30,18 +30,24 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import com.google.common.collect.Lists;
 
 import eu.essi_lab.api.database.Database.DatabaseImpl;
 import eu.essi_lab.indexes.marklogic.MarkLogicIndexTypes;
 import eu.essi_lab.indexes.marklogic.MarkLogicScalarType;
+import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.Citation;
+import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.Dimension;
 import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.Format;
 import eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
@@ -54,15 +60,12 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.IndexedElementInfo;
 import eu.essi_lab.model.index.IndexedMetadataElement;
-import eu.essi_lab.model.resource.BNHSProperty;
-import eu.essi_lab.model.resource.ExtensionHandler;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.SA_ElementWrapper;
-import eu.essi_lab.model.resource.SatelliteScene;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
+import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 
 /**
  * This class groups all the available {@link IndexedMetadataElement}s
@@ -1063,6 +1066,21 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    public static final IndexedMetadataElement DATA_DISCLAIMER = new IndexedMetadataElement(MetadataElement.DATA_DISCLAIMER) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getDataDisclaimer();
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (value != null) {
+		    addValue("" + value);
+		}
+	    }
+	}
+    };
+
     public static final IndexedMetadataElement DATA_SIZE = new IndexedMetadataElement(MetadataElement.DATA_SIZE) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -1472,6 +1490,55 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		}
 	    }
 	    addValue(String.valueOf(found));
+	}
+    };
+    public static final IndexedElement USE_LEGAL_CONSTRAINTS = new IndexedMetadataElement(MetadataElement.USE_LEGAL_CONST_EL_NAME) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Iterator<DataIdentification> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+		    .getDataIdentifications();
+
+	    while (iterator.hasNext()) {
+		DataIdentification next = iterator.next();
+		Iterator<LegalConstraints> constraints = next.getLegalConstraints();
+		while (constraints.hasNext()) {
+		    LegalConstraints legalConstraints = (LegalConstraints) constraints.next();
+		    List<CharacterStringPropertyType> others = legalConstraints.getElementType().getOtherConstraints();
+		    for (CharacterStringPropertyType cspt : others) {
+			String text = DataIdentification.getStringFromCharacterString(cspt);
+			if (text != null && !text.isEmpty()) {
+			    addValue(String.valueOf(text));
+			}
+		    }
+		}
+	    }
+
+	}
+    };
+
+    public static final IndexedElement USE_LEGAL_CONSTRAINTS_URI = new IndexedMetadataElement(MetadataElement.USE_LEGAL_CONST_URI_EL_NAME) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Iterator<DataIdentification> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+		    .getDataIdentifications();
+
+	    while (iterator.hasNext()) {
+		DataIdentification next = iterator.next();
+		Iterator<LegalConstraints> constraints = next.getLegalConstraints();
+		while (constraints.hasNext()) {
+		    LegalConstraints legalConstraints = (LegalConstraints) constraints.next();
+		    List<CharacterStringPropertyType> others = legalConstraints.getElementType().getOtherConstraints();
+		    for (CharacterStringPropertyType cspt : others) {
+			String text = DataIdentification.getHREFStringFromCharacterString(cspt);
+			if (text != null && !text.isEmpty()) {
+			    addValue(String.valueOf(text));
+			}
+		    }
+		}
+	    }
+
 	}
     };
     public static final IndexedElement HAS_ACCESS_LEGAL_CONSTRAINTS = new IndexedMetadataElement(
@@ -2324,6 +2391,72 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
     //
     // composed elements: TO BE DEFINED
     //
+
+    public static final IndexedMetadataElement ORGANIZATON = new IndexedMetadataElement(MetadataElement.ORGANIZATION) {
+
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
+
+	    Iterator<ResponsibleParty> contactIterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getContacts();
+	    while (contactIterator != null && contactIterator.hasNext()) {
+		ResponsibleParty responsibleParty = (ResponsibleParty) contactIterator.next();
+		parties.add(responsibleParty);
+	    }
+
+	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
+
+	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
+
+	    for (ResponsibleParty party : parties) {
+		if (party != null) {
+		    OrganizationElementWrapper wrapper = OrganizationElementWrapper.get();
+		    String role = party.getRoleCode();
+		    if (checkStringValue(role)) {
+			wrapper.setRole(role);
+		    }
+		    Contact contact = party.getContact();
+		    if (contact != null) {
+			Address address = contact.getAddress();
+			Online online = contact.getOnline();
+			if (online != null) {
+			    String linkage = online.getLinkage();
+			    if (linkage != null) {
+				wrapper.setHomePageURL(linkage);
+			    }
+			}
+			if (address != null) {
+			    String email = address.getElectronicMailAddress();
+			    if (email != null) {
+				wrapper.setEmail(email);
+			    }
+			}
+		    }
+		    String orgName = party.getOrganisationName();
+		    if (checkStringValue(orgName)) {
+			wrapper.setOrgName(orgName);
+		    }
+		    String orgURI = party.getOrganisationURI();
+		    if (checkStringValue(orgURI)) {
+			wrapper.setOrgURI(orgURI);
+		    }
+		    String indName = party.getIndividualName();
+		    if (checkStringValue(indName)) {
+			wrapper.setIndividualName(indName);
+		    }
+		    String indURI = party.getIndividualURI();
+		    if (checkStringValue(indURI)) {
+			wrapper.setIndividualURI(indURI);
+		    }
+
+		    addComposedElement(wrapper.getElement());
+
+		}
+	    }
+
+	}
+    };
 
     public static final IndexedMetadataElement KEYWORD_SA = new IndexedMetadataElement(MetadataElement.KEYWORD_SA) {
 

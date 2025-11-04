@@ -51,7 +51,7 @@ public class MySQLConnectionManager {
     private boolean autoReconnect;
     private String dbUri;
 
-    private HashMap<ResultSet, Statement> rsSetToStmntMap;
+    private final HashMap<ResultSet, Statement> rsSetToStmntMap;
 
     /**
      * 
@@ -132,7 +132,6 @@ public class MySQLConnectionManager {
      * @return
      * @throws SQLException
      */
-    @SuppressWarnings("resource")
     public void execUpdate(String query) throws SQLException {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Update execution STARTED");
@@ -337,7 +336,7 @@ public class MySQLConnectionManager {
 
 	SQLException e) {
 
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 	}
 

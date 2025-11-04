@@ -67,15 +67,13 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(LocalFileSystemConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(LocalFileSystemConnector.class)));//
 
 	Assert.assertTrue(//
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(CSWTestDataConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(CSWTestDataConnector.class)));//
 
     }
 
@@ -86,24 +84,16 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(LocalFileSystemAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(LocalFileSystemAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(LocalFileSystemConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(LocalFileSystemConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(CSWTestDataAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(CSWTestDataAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(CSWTestDataConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(CSWTestDataConnector.class.getName())));
 
     }
 }

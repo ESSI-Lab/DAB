@@ -33,7 +33,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(HydroshareAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(HydroshareAccessor.class, accessors.getFirst().getClass());
 
 	}
 
@@ -44,7 +44,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(HydroshareAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(HydroshareAccessor.class, accessors.getFirst().getClass());
 	}
 
 	{
@@ -66,8 +66,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(HydroshareConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(HydroshareConnector.class)));//
     }
 
     @Test
@@ -76,10 +75,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(HydroshareMapper.HYDROSHARE_SCHEME_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(HydroshareMapper.HYDROSHARE_SCHEME_URI)));
 
     }
 
@@ -90,14 +86,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(HydroshareAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(HydroshareAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(HydroshareConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(HydroshareConnector.class.getName())));
 
     }
 }

@@ -61,8 +61,7 @@ public class ServiceLoaderTest {
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(ServiceLoader.load(IHarvestedQueryConnector.class).iterator())
-			.filter(c -> c.getClass().equals(CSWConnectorWrapper.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(CSWConnectorWrapper.class)));//
 
     }
 
@@ -73,7 +72,7 @@ public class ServiceLoaderTest {
 
 	Assert.assertEquals(27, StreamUtils.iteratorToStream(loader.iterator()).count());
 
-	List<String> types = StreamUtils.iteratorToStream(loader.iterator()).map(c -> c.getType()).collect(Collectors.toList());
+	List<String> types = StreamUtils.iteratorToStream(loader.iterator()).map(CSWConnector::getType).toList();
 
 	Assert.assertTrue(types.contains(CSWConnector.TYPE));
 	Assert.assertTrue(types.contains(CSWBLUECLOUDConnector.TYPE));

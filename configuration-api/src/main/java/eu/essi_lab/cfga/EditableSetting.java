@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -125,8 +126,7 @@ public interface EditableSetting {
 	if (!distinctIds) {
 
 	    if (log) {
-		GSLoggerFactory.getLogger(EditableSetting.class)
-			.error("Distinct ids test failed: distinct/total: " + distinct + "/" + size);
+		GSLoggerFactory.getLogger(EditableSetting.class).error("Distinct ids test failed: distinct/total: {}/{}", distinct, size);
 	    }
 
 	    // if this test failed, the next test which assumes distinct setting ids cannot be executed
@@ -141,7 +141,7 @@ public interface EditableSetting {
 
 	SettingUtils.deepPerform(clonedSetting, setting -> {
 
-	    List<String> keys = setting.getOptions().stream().map(o -> o.getKey()).collect(Collectors.toList());
+	    List<String> keys = setting.getOptions().stream().map(Option::getKey).collect(Collectors.toList());
 
 	    settingIdToOptionsKeyMap.put(setting.getIdentifier(), keys);
 	});
@@ -162,8 +162,8 @@ public interface EditableSetting {
 	    if (!distinctOptIds && log) {
 
 		GSLoggerFactory.getLogger(EditableSetting.class).error("Options keys test failed:");
-		GSLoggerFactory.getLogger(EditableSetting.class).error("- Setting id: " + settingId);
-		GSLoggerFactory.getLogger(EditableSetting.class).error("- Distinct/total: " + distinctOptIdsCount + "/" + optIdsCount);
+		GSLoggerFactory.getLogger(EditableSetting.class).error("- Setting id: {}", settingId);
+		GSLoggerFactory.getLogger(EditableSetting.class).error("- Distinct/total: {}/{}", distinctOptIdsCount, optIdsCount);
 	    }
 	}
 
@@ -208,15 +208,15 @@ public interface EditableSetting {
 
 	    if (log) {
 		GSLoggerFactory.getLogger(EditableSetting.class).error("Reset test failed:");
-		GSLoggerFactory.getLogger(EditableSetting.class).error("- Setting id: " + targetSetting.getIdentifier());
-		GSLoggerFactory.getLogger(EditableSetting.class).error("- Setting name: " + targetSetting.getName());
+		GSLoggerFactory.getLogger(EditableSetting.class).error("- Setting id: {}", targetSetting.getIdentifier());
+		GSLoggerFactory.getLogger(EditableSetting.class).error("- Setting name: {}", targetSetting.getName());
 	    }
 
 	    targetSettingIds.removeAll(resetIds);
 
 	    if (log) {
 		GSLoggerFactory.getLogger(EditableSetting.class)
-			.error("- Reset setting misses the follwing settings ids: " + targetSettingIds);
+			.error("- Reset setting misses the follwing settings ids: {}", targetSettingIds);
 	    }
 	}
 
@@ -249,15 +249,15 @@ public interface EditableSetting {
 
 	    if (log) {
 		GSLoggerFactory.getLogger(EditableSetting.class).error("Reset test failed:");
-		GSLoggerFactory.getLogger(EditableSetting.class).error("- Setting id: " + targetSetting.getIdentifier());
-		GSLoggerFactory.getLogger(EditableSetting.class).error("- Setting name: " + targetSetting.getName());
+		GSLoggerFactory.getLogger(EditableSetting.class).error("- Setting id: {}", targetSetting.getIdentifier());
+		GSLoggerFactory.getLogger(EditableSetting.class).error("- Setting name: {}", targetSetting.getName());
 	    }
 
 	    targetSettingOptionsKeys.removeAll(resetSettingOptionsKeys);
 
 	    if (log) {
 		GSLoggerFactory.getLogger(EditableSetting.class)
-			.error("- Reset setting misses the following options keys: " + targetSettingOptionsKeys);
+			.error("- Reset setting misses the following options keys: {}", targetSettingOptionsKeys);
 	    }
 	}
 
@@ -265,10 +265,10 @@ public interface EditableSetting {
 	//
 	//
 
-	return distinctIds && //
-		distinctOptIds && //
-		(sameIds || containsAll) && //
-		(sameOptionsKeys || containsOptionsKeys);
+	//
+	//
+	//
+	return distinctOptIds && (sameIds || containsAll) && (sameOptionsKeys || containsOptionsKeys);
     }
 
     /**

@@ -42,7 +42,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class QuartzDB_Initializer {
 
-    private SchedulerSetting setting;
+    private final SchedulerSetting setting;
 
     /**
      * @param setting
@@ -137,12 +137,12 @@ public class QuartzDB_Initializer {
 		setting.getSQLDatabaseUri(), //
 		withDBName ? setting.getSQLDatabaseName() : null);
 
-	Connection conn = DriverManager.getConnection(//
+	//
+
+	return DriverManager.getConnection(//
 		uri, //
 		setting.getSQLDatabaseUser(), //
-		setting.getSQLDatabasePassword());//
-
-	return conn;
+		setting.getSQLDatabasePassword());
     }
 
     /**
@@ -235,7 +235,7 @@ public class QuartzDB_Initializer {
 
 	} catch (SQLException e) {
 
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(QuartzDB_Initializer.class).error(e.getMessage(), e);
 	}
     }

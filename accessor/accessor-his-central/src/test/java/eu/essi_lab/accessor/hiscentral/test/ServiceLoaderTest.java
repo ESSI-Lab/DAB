@@ -118,15 +118,13 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(HISCentralMarcheConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(HISCentralMarcheConnector.class)));//
 	
 	Assert.assertTrue(//
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(HISCentralToscanaConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(HISCentralToscanaConnector.class)));//
     }
 
     @Test
@@ -136,52 +134,28 @@ public class ServiceLoaderTest {
 	
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_VALDAOSTA_NS_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_VALDAOSTA_NS_URI)));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_LAZIO_NS_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_LAZIO_NS_URI)));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_VENETO_NS_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_VENETO_NS_URI)));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_LIGURIA_NS_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_LIGURIA_NS_URI)));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_FRIULI_NS_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_FRIULI_NS_URI)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_MARCHE_NS_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_MARCHE_NS_URI)));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_TOSCANA_NS_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_TOSCANA_NS_URI)));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_UMBRIA_NS_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.HISCENTRAL_UMBRIA_NS_URI)));
 	
 
     }
@@ -193,29 +167,19 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(HISCentralVenetoAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(HISCentralVenetoAccessor.class.getName())));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(HISCentralFriuliAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(HISCentralFriuliAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(HISCentralMarcheConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(HISCentralMarcheConnector.class.getName())));
 	
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(HISCentralToscanaAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(HISCentralToscanaAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(HISCentralToscanaConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(HISCentralToscanaConnector.class.getName())));
 
     }
 }

@@ -31,5 +31,14 @@ public class WMOOntologyExternalTestIT {
 	assertEquals("Stream discharge", variable.getPreferredLabel().getKey());
 	assertTrue(variable.getDefinition().getKey().contains("Volume of water flowing through a stream"));
     }
+    
+    @Test
+    public void testVariables2() throws Exception {
+	SKOSConcept variable = wmo.getVariable("http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/210");
+	assertEquals("Amount of precipitation", variable.getPreferredLabel().getKey());
+
+    }
+    
+    
 
 }

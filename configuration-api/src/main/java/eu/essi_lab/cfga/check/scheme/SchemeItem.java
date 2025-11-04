@@ -41,8 +41,8 @@ public interface SchemeItem {
      */
     public static class Descriptor {
 
-	private Function<Setting, Boolean> descriptor;
-	private Supplier<Setting> creator;
+	private final Function<Setting, Boolean> descriptor;
+	private final Supplier<Setting> creator;
 
 	/**
 	 * @param descriptor
@@ -90,7 +90,7 @@ public interface SchemeItem {
 
 	}
 
-    };
+    }
 
     /**
      * Returns <code>true</code> if this item has always at least one instance of the described {@link Setting}

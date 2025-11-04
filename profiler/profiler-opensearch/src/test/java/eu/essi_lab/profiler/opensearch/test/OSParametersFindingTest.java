@@ -30,7 +30,7 @@ public class OSParametersFindingTest {
 		List<OSParameter> params = (List<OSParameter>) item;
 		boolean accept = false;
 		for (OSParameter param : params) {
-		    accept = param.getName().equals(OSParameters.COUNT.getName())
+		    accept |= param.getName().equals(OSParameters.COUNT.getName())
 			    || param.getName().equals(OSParameters.BBOX.getName())
 			    || param.getName().equals(OSParameters.OUTPUT_FORMAT.getName());
 		}

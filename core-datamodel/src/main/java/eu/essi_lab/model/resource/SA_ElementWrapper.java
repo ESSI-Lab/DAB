@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.model.resource;
 
@@ -83,7 +83,7 @@ public class SA_ElementWrapper {
      */
     public String getUri() {
 
-	return getUriItem().getStringValue();
+	return element.getProperty("uri").get().getStringValue();
     }
 
     /**
@@ -91,7 +91,7 @@ public class SA_ElementWrapper {
      */
     public String getUriTitle() {
 
-	return getUriTitleItem().getStringValue();
+	return element.getProperty("uri_title").get().getStringValue();
     }
 
     /**
@@ -99,7 +99,7 @@ public class SA_ElementWrapper {
      */
     public String getSA_Uri() {
 
-	return getSA_UriItem().getStringValue();
+	return element.getProperty("SA_uri").get().getStringValue();
     }
 
     /**
@@ -107,7 +107,7 @@ public class SA_ElementWrapper {
      */
     public String getSA_UriTitle() {
 
-	return getSA_UriTitleItem().getStringValue();
+	return element.getProperty("SA_uri_title").get().getStringValue();
     }
 
     /**
@@ -115,55 +115,7 @@ public class SA_ElementWrapper {
      */
     public String getSA_MatchType() {
 
-	return getSA_MatchTypeItem().getStringValue();
-    }
-
-    /**
-     * @return
-     */
-    public ComposedElementItem getValueItem() {
-
-	return element.getProperty("value").get();
-    }
-
-    /**
-     * @return
-     */
-    public ComposedElementItem getUriItem() {
-
-	return element.getProperty("uri").get();
-    }
-
-    /**
-     * @return
-     */
-    public ComposedElementItem getUriTitleItem() {
-
-	return element.getProperty("uri_title").get();
-    }
-
-    /**
-     * @return
-     */
-    public ComposedElementItem getSA_UriItem() {
-
-	return element.getProperty("SA_uri").get();
-    }
-
-    /**
-     * @return
-     */
-    public ComposedElementItem getSA_UriTitleItem() {
-
-	return element.getProperty("SA_uri_title").get();
-    }
-
-    /**
-     * @return
-     */
-    public ComposedElementItem getSA_MatchTypeItem() {
-
-	return element.getProperty("SA_match_type").get();
+	return element.getProperty("SA_match_type").get().getStringValue();
     }
 
     /**
@@ -221,5 +173,4 @@ public class SA_ElementWrapper {
 
 	this.element = element;
     }
-
 }

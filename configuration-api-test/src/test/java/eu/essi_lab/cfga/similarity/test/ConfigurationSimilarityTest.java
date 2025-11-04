@@ -1,17 +1,10 @@
 package eu.essi_lab.cfga.similarity.test;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.check.CheckResponse;
-import eu.essi_lab.cfga.check.SimilarityMethod;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
+import eu.essi_lab.cfga.check.SimilarityMethod;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
@@ -26,18 +19,23 @@ import eu.essi_lab.cfga.setting.validation.ValidationResponse;
 import eu.essi_lab.cfga.setting.validation.Validator;
 import eu.essi_lab.harvester.worker.HarvestingSettingImpl;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
- * 
+ *
  */
 public class ConfigurationSimilarityTest {
 
     /**
-     * This modifier modifies all the properties of a SystemSetting.<br>
-     * These properties are excluded per default from the check,
-     * so in a normal case, we expect a successful check as in {@link #systemSettingConsumerTest()}.<br>
-     * By including one or more property in the check, we expect a failing check which involves that property
-     * 
+     * This modifier modifies all the properties of a SystemSetting.<br> These properties are excluded per default from the check, so in a
+     * normal case, we expect a successful check as in {@link #systemSettingConsumerTest()}.<br> By including one or more property in the
+     * check, we expect a failing check which involves that property
+     *
      * @author Fabrizio
      */
     private class SystemSettingConsumer implements Consumer<Setting> {
@@ -68,13 +66,18 @@ public class ConfigurationSimilarityTest {
 		s.setSelected(!s.isSelected());
 		s.setSelectionMode(SelectionMode.MULTI);
 		s.setShowHeader(!s.isShowHeaderSet());
-		s.setValidator(new Validator() {
+		// SystemSetting has now a validator
+		if (s.getValidator().isEmpty()) {
+		    s.setValidator(new Validator() {
 
-		    @Override
-		    public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
-			return null;
-		    }
-		});
+			@Override
+			public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
+			    return null;
+			}
+		    });
+		} else {
+		    s.removeValidator();
+		}
 
 		s.setVisible(!s.isVisible());
 	    }
@@ -287,14 +290,14 @@ public class ConfigurationSimilarityTest {
 	//
 	// 1 SystemSetting
 	//
-	
+
 	List<Setting> settings = response.//
 		getSettings().//
 		stream().//
 		distinct().//
 		sorted((s1, s2) -> s1.getSettingClass().getSimpleName().compareTo(s2.getSettingClass().getSimpleName())).//
 		collect(Collectors.toList());
-	
+
 	Assert.assertEquals(SystemSetting.class, settings.get(0).getSettingClass());
     }
 

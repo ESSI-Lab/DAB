@@ -514,7 +514,7 @@ public class ConfigurationTest {
 	Assert.assertEquals("New name 6", configuration.get("id").get().getName());
 
 	//
-	// now the setting is changes, so the put method works
+	// now the setting is changed, so the put method works
 	//
 
 	replaced = configuration.replace(setting);
@@ -743,6 +743,14 @@ public class ConfigurationTest {
 	Assert.assertTrue(configuration.exists(SCHEDULED_SETTING_ID));
 
 	Assert.assertFalse(configuration.exists(CONFIGURATION_SETTING_1_2_ID));
+
+	//
+ 	//
+ 	//
+
+	Assert.assertTrue(configuration.contains(optionalSetting.get()));
+
+	Assert.assertTrue(configuration.contains(optionalScheduledSetting.get()));
 
 	//
 	//

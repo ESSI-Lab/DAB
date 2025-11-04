@@ -1009,6 +1009,34 @@ export function initializePortal(config) {
 		jQuery('#headerDiv').css('padding-top', '5px');
 		jQuery('#headerDiv').css('height', '30px');
 
+		if (config['top-logo']) {
+			const headerDiv = document.getElementById('headerDiv');
+			if (headerDiv && !document.getElementById('portalTopLogo')) {
+				headerDiv.style.display = 'flex';
+				headerDiv.style.alignItems = 'center';
+
+				const logoLink = document.createElement('a');
+				logoLink.id = 'portalTopLogo';
+				logoLink.className = 'portal-top-logo-link';
+				logoLink.href = config['top-logo-href'] || '#';
+				logoLink.target = '_blank';
+				logoLink.rel = 'noopener noreferrer';
+				logoLink.style.display = 'flex';
+				logoLink.style.alignItems = 'center';
+				logoLink.style.marginLeft = '15px';
+
+				const logoImg = document.createElement('img');
+				logoImg.alt = config.title ? `${config.title} logo` : 'Portal logo';
+				logoImg.style.height = '26px';
+				logoImg.style.display = 'block';
+				const logoSrc = config['top-logo'].startsWith('http') ? config['top-logo'] : `../gi-portal/${config['top-logo']}`;
+				logoImg.src = logoSrc;
+
+				logoLink.appendChild(logoImg);
+				headerDiv.appendChild(logoLink);
+			}
+		}
+
 		//------------------------------------------------------------------
 		// logo div settings
 		//

@@ -37,7 +37,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * @author Boldrini
  */
-@SuppressWarnings("serial")
 @XmlRootElement
 public class LogicalBond implements Bond {
 
@@ -54,7 +53,7 @@ public class LogicalBond implements Bond {
 	    @XmlElement(name = "simpleValueBond", type = SimpleValueBond.class), //
 	    @XmlElement(name = "spatialBond", type = SpatialBond.class), //
 	    @XmlElement(name = "logicalBond", type = LogicalBond.class) })
-    private List<Bond> operands = new ArrayList<Bond>();
+    private List<Bond> operands = new ArrayList<>();
 
     /**
      * No-arg constructor only to be used by JAXB
@@ -168,7 +167,7 @@ public class LogicalBond implements Bond {
      */
     public Bond getFirstOperand() {
 
-	return getOperands().iterator().next();
+	return getOperands().getFirst();
     }
 
     @Override
@@ -178,7 +177,7 @@ public class LogicalBond implements Bond {
 	    return "EMPTY LOGICAL BOND!";
 	}
 	if (operands.size() == 1) {
-	    return getLogicalOperator() + "(" + operands.iterator().next().toString() + ")";
+	    return getLogicalOperator() + "(" + operands.getFirst().toString() + ")";
 	}
 	for (Iterator<Bond> iterator = getOperands().iterator(); iterator.hasNext();) {
 	    Bond bond = iterator.next();
@@ -192,13 +191,12 @@ public class LogicalBond implements Bond {
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof LogicalBond) {
-	    LogicalBond logicalBond = (LogicalBond) obj;
+	if (obj instanceof LogicalBond logicalBond) {
 	    if (!Objects.equals(logicalBond.getLogicalOperator(), getLogicalOperator())) {
 		return false;
 	    }
 	    // the following is hashset and not list by purpose of testing equality!
-	    return Objects.equals(new HashSet<Bond>(getOperands()), new HashSet<Bond>(logicalBond.getOperands()));
+	    return Objects.equals(new HashSet<>(getOperands()), new HashSet<>(logicalBond.getOperands()));
 	}
 	return super.equals(obj);
     }
