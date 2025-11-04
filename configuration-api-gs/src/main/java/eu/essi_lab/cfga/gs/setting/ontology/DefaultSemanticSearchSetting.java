@@ -127,9 +127,10 @@ public class DefaultSemanticSearchSetting extends Setting {
 	Option<Integer> expansionLimit = IntegerOptionBuilder.get().//
 		withKey(EXP_LIMIT_OPTION_KEY).//
 		withLabel("Default maximum number of results (0 = no limitation)").//
-		withDescription(
-			"The results of the semantic search expansion are limited by default to a maximum of 50.\n The value '0' means that no limitation is applied.\n"
-				+ "The default limitation target of the expansion can be set with the 'Default limitation target of the expansion' option")
+		withDescription("""
+		The results of the semantic search expansion are limited by default to a maximum of 50.
+		 The value '0' means that no limitation is applied.
+		The default limitation target of the expansion can be set with the 'Default limitation target of the expansion' option""")
 		.//
 		withSingleSelection().//
 		withValues(Stream.iterate(0, n -> n + 1).limit(101).toList()).//
@@ -254,7 +255,7 @@ public class DefaultSemanticSearchSetting extends Setting {
      */
     public void setDefaultSemanticRelations(List<SKOSSemanticRelation> rel) {
 
-	getOption(SEM_RELATION_OPTION_KEY, SKOSSemanticRelation.class).get().select(r -> rel.contains(r));
+	getOption(SEM_RELATION_OPTION_KEY, SKOSSemanticRelation.class).get().select(rel::contains);
     }
 
     /**
@@ -270,7 +271,7 @@ public class DefaultSemanticSearchSetting extends Setting {
      */
     public void setDefaultSourceLanguages(List<EuropeanLanguage> lang) {
 
-	getOption(SOURCE_LANGUAGES_OPTION_KEY, EuropeanLanguage.class).get().select(l -> lang.contains(l));
+	getOption(SOURCE_LANGUAGES_OPTION_KEY, EuropeanLanguage.class).get().select(lang::contains);
     }
 
     /**
@@ -278,7 +279,7 @@ public class DefaultSemanticSearchSetting extends Setting {
      */
     public void setDefaultSearchLanguages(List<EuropeanLanguage> lang) {
 
-	getOption(SEARCH_LANGUAGES_OPTION_KEY, EuropeanLanguage.class).get().select(l -> lang.contains(l));
+	getOption(SEARCH_LANGUAGES_OPTION_KEY, EuropeanLanguage.class).get().select(lang::contains);
     }
 
     /**

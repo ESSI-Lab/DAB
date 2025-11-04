@@ -62,7 +62,7 @@ public class ConfiguredGmailClient {
 	    EmailSetting emailSetting = optEmailSetting.get();
 
 	    smtpHost = emailSetting.getSMTPHost().orElse(null);
-	    smtpPort = emailSetting.getSMTPPort().map(v -> String.valueOf(v)).orElse(null);
+	    smtpPort = emailSetting.getSMTPPort().map(String::valueOf).orElse(null);
 	    smtpUser = emailSetting.getSMTPUser().orElse(null);
 	    smtpPassword = emailSetting.getSMTPPassword().orElse(null);
 	    

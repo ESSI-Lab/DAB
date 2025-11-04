@@ -21,10 +21,7 @@ package eu.essi_lab.cfga.gs.setting.harvesting;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -203,17 +200,17 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 			    ColumnDescriptor.createPositionalDescriptor(), //
 
-			    ColumnDescriptor.create("Name", 400, true, true, (s) -> s.getName()), //
+			    ColumnDescriptor.create("Name", 400, true, true, Setting::getName), //
 
-			    ColumnDescriptor.create("Type", 150, true, true, (s) -> getSelectedAccessorType(s)), //
+			    ColumnDescriptor.create("Type", 150, true, true, this::getSelectedAccessorType), //
 
-			    ColumnDescriptor.create("Source id", 200, true, true, (s) -> getSourceId(s)), //
+			    ColumnDescriptor.create("Source id", 200, true, true, this::getSourceId), //
 
-			    ColumnDescriptor.create("Setting id", 200, true, true, (s) -> s.getIdentifier()), //
+			    ColumnDescriptor.create("Setting id", 200, true, true, Setting::getIdentifier), //
 
-			    ColumnDescriptor.create("Comment", 150, true, true, (s) -> getComment(s)), //
+			    ColumnDescriptor.create("Comment", 150, true, true, this::getComment), //
 
-			    ColumnDescriptor.create("Deployment", 150, true, true, (s) -> getDeployment(s)), //
+			    ColumnDescriptor.create("Deployment", 150, true, true, this::getDeployment), //
 
 			    ColumnDescriptor.create("Repeat count", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
@@ -223,7 +220,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
 
-				    (item1, item2) -> item1.get("Status").compareTo(item2.get("Status")), //
+				    Comparator.comparing(item -> item.get("Status")), //
 
 				    new JobPhaseColumnRenderer()), //
 
@@ -328,7 +325,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	    if (sourceDeployment.has("values")) {
 
-		return sourceDeployment.getJSONArray("values").toList().stream().map(v -> v.toString()).collect(Collectors.joining(","));
+		return sourceDeployment.getJSONArray("values").toList().stream().map(Object::toString).collect(Collectors.joining(","));
 	    }
 
 	    return "";
@@ -342,12 +339,10 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	    JSONObject object = setting.getObject().getJSONObject("harvestedAccessorsSetting");
 
-	    String accessorType = object.keySet().stream().
+	    return object.keySet().stream().
 
-		    filter(key -> isJSONObject(object, key) && object.getJSONObject(key).has("accessorType")).map(key -> key).findFirst()
+		    filter(key -> isJSONObject(object, key) && object.getJSONObject(key).has("accessorType")).findFirst()
 		    .get();
-
-	    return accessorType;
 	}
 
 	/**
@@ -390,12 +385,8 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	Optional<Setting> setting = getSetting(CUSTOM_TASK_SETTING_IDENTIFIER);
 
-	if (setting.isPresent()) {
+	return setting.map(value -> SettingUtils.downCast(value, CustomTaskSetting.class));
 
-	    return Optional.of(SettingUtils.downCast(setting.get(), CustomTaskSetting.class));
-	}
-
-	return Optional.empty();
     }
 
     /**
@@ -431,7 +422,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	return getAugmentersSetting().//
 		getSettings(AugmenterSetting.class, false).//
 		stream().//
-		filter(s -> s.isSelected()).//
+		filter(Setting::isSelected).//
 		collect(Collectors.toList());
     }
 
@@ -485,8 +476,6 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	Class<? extends HarvestingSetting> clazz = HarvestingSettingLoader.load().getClass();
 
-	HarvestingSetting harvSetting = SettingUtils.downCast(setting, clazz);
-
-	return harvSetting;
+	return SettingUtils.downCast(setting, clazz);
     }
 }

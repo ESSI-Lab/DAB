@@ -114,25 +114,25 @@ public class HarvestingStatsItemHandler extends GridMenuItemHandler {
 
 	if (maxMinSizeSources.isPresent()) {
 
-	    builder.append("- Biggest source: " + maxMinSizeSources.get()[0] + "\n");
-	    builder.append("- Smaller source: " + maxMinSizeSources.get()[1] + "\n\n");
+	    builder.append("- Biggest source: ").append(maxMinSizeSources.get()[0]).append("\n");
+	    builder.append("- Smaller source: ").append(maxMinSizeSources.get()[1]).append("\n\n");
 	}
 
 	Optional<String[]> longestShortestHarvesting = getLongestShortestHarvesting();
 
 	if (longestShortestHarvesting.isPresent()) {
 
-	    builder.append("- Longest harvesting: " + longestShortestHarvesting.get()[0] + "\n");
-	    builder.append("- Shortest harvesting: " + longestShortestHarvesting.get()[1] + "\n\n");
+	    builder.append("- Longest harvesting: ").append(longestShortestHarvesting.get()[0]).append("\n");
+	    builder.append("- Shortest harvesting: ").append(longestShortestHarvesting.get()[1]).append("\n\n");
 	}
 
-	builder.append("- Scheduled sources: " + scheduledSources + "\n");
-	builder.append("- Non scheduled source: " + unscheduledSources + "\n");
+	builder.append("- Scheduled sources: ").append(scheduledSources).append("\n");
+	builder.append("- Non scheduled source: ").append(unscheduledSources).append("\n");
 
 	Scheduler scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
 	try {
 	    long count = scheduler.getJobStatuslist().stream().filter(j -> j.getPhase() == JobPhase.ERROR).count();
-	    builder.append("- Sources with errors: " + count + "\n");
+	    builder.append("- Sources with errors: ").append(count).append("\n");
 
 	} catch (SQLException e) {
 
@@ -202,10 +202,10 @@ public class HarvestingStatsItemHandler extends GridMenuItemHandler {
 
 	if (list.size() == 1) {
 
-	    return Optional.of(new String[] { list.get(0), list.get(0) });
+	    return Optional.of(new String[] { list.getFirst(), list.getFirst() });
 	}
 
-	return Optional.of(new String[] { list.get(0), list.get(list.size() - 1) });
+	return Optional.of(new String[] { list.getFirst(), list.getLast() });
     }
 
     /**

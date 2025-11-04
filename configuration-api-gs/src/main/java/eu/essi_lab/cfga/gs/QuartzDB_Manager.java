@@ -31,12 +31,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import org.quartz.JobDataMap;
 
@@ -55,7 +50,7 @@ import eu.essi_lab.cfga.setting.scheduling.Scheduling;
  */
 public class QuartzDB_Manager {
 
-    private SchedulerSetting setting;
+    private final SchedulerSetting setting;
 
     /**
      * @param setting
@@ -88,10 +83,9 @@ public class QuartzDB_Manager {
 		getHarvestingSettings().//
 		stream().//
 		filter(s -> s.getScheduling().isEnabled()).//
-		sorted((s1, s2) -> s1.getScheduling().getStartTime().get().getValue()
-			.compareTo(s2.getScheduling().getStartTime().get().getValue()))
+		sorted(Comparator.comparing(s -> s.getScheduling().getStartTime().get().getValue()))
 		.//
-		collect(Collectors.toList());
+			toList();
 
 	for (HarvestingSetting harvestingSetting : harvestingSettings) {
 
@@ -162,9 +156,9 @@ public class QuartzDB_Manager {
 
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
 
-		System.out.println("Next start   " + dateFormat.format(new Date(Long.valueOf(nextFireTime))));
+		System.out.println("Next start   " + dateFormat.format(new Date(Long.parseLong(nextFireTime))));
 
-		System.out.println("");
+		System.out.println();
 	    }
 	}
 
@@ -299,10 +293,10 @@ public class QuartzDB_Manager {
 
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
 
-		System.out.println("Fired time   " + dateFormat.format(new Date(Long.valueOf(firedTime))));
-		System.out.println("Sched time   " + dateFormat.format(new Date(Long.valueOf(schedTime))));
+		System.out.println("Fired time   " + dateFormat.format(new Date(Long.parseLong(firedTime))));
+		System.out.println("Sched time   " + dateFormat.format(new Date(Long.parseLong(schedTime))));
 
-		System.out.println("");
+		System.out.println();
 	    }
 	}
 

@@ -43,30 +43,28 @@ public interface CustomTask extends Task {
      * @param context
      * @return
      */
-    public default CustomTaskSetting retrieveSetting(JobExecutionContext context) {
+    default CustomTaskSetting retrieveSetting(JobExecutionContext context) {
 
 	SchedulerWorkerSetting workerSetting = SchedulerUtils.getSetting(context);
 
-	switch (workerSetting.getGroup()) {
+	return switch (workerSetting.getGroup()) {
 
-	//
-	// custom task embedded in a HarvestingSetting
-	//
-	case HARVESTING:
+	    //
+	    // custom task embedded in a HarvestingSetting
+	    //
+	    case HARVESTING -> {
 
-	    HarvestingSetting harvestingSetting = SettingUtils.downCast(workerSetting, HarvestingSettingLoader.load().getClass());
+		HarvestingSetting harvestingSetting = SettingUtils.downCast(workerSetting, HarvestingSettingLoader.load().getClass());
 
-	    return harvestingSetting.getCustomTaskSetting().get();
+		yield harvestingSetting.getCustomTaskSetting().get();
+	    }
 
-	//
-	// stand-alone custom task
-	//
-	case CUSTOM_TASK:
-	default:
+	    //
+	    // stand-alone custom task
+	    //
+	    default -> SettingUtils.downCast(workerSetting, CustomTaskSetting.class);
+	};
 
-	}
-
-	return SettingUtils.downCast(workerSetting, CustomTaskSetting.class);
     }
 
     /**
@@ -98,7 +96,7 @@ public interface CustomTask extends Task {
     /**
      * @return
      */
-    public default boolean clearMessagesBeforeStoreStatus() {
+    default boolean clearMessagesBeforeStoreStatus() {
 
 	return false;
     }
@@ -106,15 +104,15 @@ public interface CustomTask extends Task {
     /**
      * @param source
      */
-    public void setSource(GSSource source);
+    void setSource(GSSource source);
 
     /**
      * @return
      */
-    public Optional<GSSource> getSource();
+    Optional<GSSource> getSource();
 
     /**
      * @return
      */
-    public String getName();
+    String getName();
 }

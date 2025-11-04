@@ -21,6 +21,7 @@ package eu.essi_lab.cfga.gs.setting.distribution;
  * #L%
  */
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -88,8 +89,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 	getAccessorsSetting().//
 		getSettings().//
 		stream().//
-		sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).//
-		findFirst().//
+		min(Comparator.comparing(Setting::getName)).//
 		get().//
 		setSelected(true);
 

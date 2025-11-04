@@ -5,6 +5,7 @@ package eu.essi_lab.cfga.gs.setting;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /*-
@@ -186,21 +187,21 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 			    ColumnDescriptor.createPositionalDescriptor(), //
 
-			    ColumnDescriptor.create("Name", true, true, (s) -> s.getName()), //
+			    ColumnDescriptor.create("Name", true, true, Setting::getName), //
 
 			    ColumnDescriptor.create("State", 150, true, true, //
 
-				    (s) -> getServiceState(s), //
+				    this::getServiceState, //
 
-				    (item1, item2) -> item1.get("State").compareTo(item2.get("State")), //
+				    Comparator.comparing(item -> item.get("State")), //
 
 				    new ProfilerStateColumnRenderer()), //
 
-			    ColumnDescriptor.create("Path", 200, true, true, (s) -> getServicePath(s)), //
+			    ColumnDescriptor.create("Path", 200, true, true, this::getServicePath), //
 
-			    ColumnDescriptor.create("Type", 300, true, true, (s) -> getServiceType(s)), //
+			    ColumnDescriptor.create("Type", 300, true, true, this::getServiceType), //
 
-			    ColumnDescriptor.create("Version", true, true, (s) -> getServiceVersion(s)) //
+			    ColumnDescriptor.create("Version", true, true, this::getServiceVersion) //
 
 		    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).//
 

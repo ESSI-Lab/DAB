@@ -134,12 +134,12 @@ public class DefaultConfiguration extends Configuration {
 	 */
 	RATE_LIMITER_SETTING("rateLimiterSettings");
 
-	private String label;
+	private final String label;
 
 	/**
 	 * @param value
 	 */
-	private SingletonSettingsId(String value) {
+	SingletonSettingsId(String value) {
 
 	    this.label = value;
 	}
@@ -233,7 +233,7 @@ public class DefaultConfiguration extends Configuration {
 	ConfigurableLoader.load().//
 		filter(c -> c.getSetting() instanceof ProfilerSetting).//
 		map(c -> (ProfilerSetting) c.getSetting()).//
-		forEach(s -> this.put(s));
+		forEach(this::put);
 
 	//
 	// --- Accessors ---

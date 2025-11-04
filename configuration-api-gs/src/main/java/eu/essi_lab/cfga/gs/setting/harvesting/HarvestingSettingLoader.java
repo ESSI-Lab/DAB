@@ -53,8 +53,8 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class HarvestingSettingLoader {
 
-    private static String content;
-    private static Class<? extends HarvestingSetting> clazz;
+    private static final String content;
+    private static final Class<? extends HarvestingSetting> clazz;
 
     static {
 

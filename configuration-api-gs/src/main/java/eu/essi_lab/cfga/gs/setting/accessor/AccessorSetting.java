@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.gs.setting.accessor;
 
@@ -13,12 +13,12 @@ package eu.essi_lab.cfga.gs.setting.accessor;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -52,7 +52,7 @@ public final class AccessorSetting extends Setting {
     private static final String ACCESSOR_TYPE_KEY = "accessorType";
 
     /**
-     * 
+     *
      */
     public AccessorSetting() {
 
@@ -119,51 +119,12 @@ public final class AccessorSetting extends Setting {
     public static AccessorSetting createMixed(//
 	    String sharedSourceLabel, //
 	    String sharedSourceEndpoint, //
-	 
-	    String settingName, //
-	    String harvestedAccessorType, //
-	    String distributedAccessorType, //
-	    String accessorType, //
-
-	    
-	    HarvestedConnectorSetting harvSettig, //
-	    DistributedConnectorSetting distSetting) {
-
-	return createMixed(//
-		sharedSourceLabel, //
-		sharedSourceEndpoint, //
-		null, //
-		
-		settingName, //
-		harvestedAccessorType, //
-		distributedAccessorType, //
-		accessorType,//
-		
-		harvSettig, //
-		distSetting);
-    }
-
-    /**
-     * @param sharedSourceLabel
-     * @param sharedSourceEndpoint
-     * @param sharedSourceVersion
-     * @param settingName
-     * @param harvestedAccessorType
-     * @param distributedAccessorType
-     * @param harvSettig
-     * @param distSetting
-     * @return
-     */
-    public static AccessorSetting createMixed(//
-	    String sharedSourceLabel, //
-	    String sharedSourceEndpoint, //
-	    String sharedSourceVersion, //
 
 	    String settingName, //
 	    String harvestedAccessorType, //
 	    String distributedAccessorType, //
 	    String accessorType, //
-	    
+
 	    HarvestedConnectorSetting harvSettig, //
 	    DistributedConnectorSetting distSetting) {
 
@@ -304,7 +265,7 @@ public final class AccessorSetting extends Setting {
 
 	if (!settings.isEmpty()) {
 
-	    return settings.get(0);
+	    return settings.getFirst();
 	}
 
 	return null;
@@ -329,7 +290,7 @@ public final class AccessorSetting extends Setting {
 
 	if (!settings.isEmpty()) {
 
-	    return settings.get(0);
+	    return settings.getFirst();
 	}
 
 	return null;
@@ -398,7 +359,7 @@ public final class AccessorSetting extends Setting {
      */
     public GSSourceSetting getGSSourceSetting() {
 
-	return getSettings(GSSourceSetting.class).get(0);
+	return getSettings(GSSourceSetting.class).getFirst();
     }
 
     /**
@@ -413,7 +374,7 @@ public final class AccessorSetting extends Setting {
      * For non mixed accessors, this is the same as {@link #getConfigurableType()}, while for
      * mixed accessors this method returns the composition of {@link #getDistributedAccessorType()}
      * {@link #getHarvestedAccessorType()} separated by an underscore
-     * 
+     *
      * @return
      */
     public String getAccessorType() {

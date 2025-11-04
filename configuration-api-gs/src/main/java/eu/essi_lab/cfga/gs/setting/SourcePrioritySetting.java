@@ -205,13 +205,9 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 		filter(s -> s.isSelected() && s.getIdentifier().equals(sourceIdentifier)).//
 		findFirst();
 
-	if (optSetting.isPresent()) {
+	return optSetting.filter(setting -> getSetting(SOURCES_SETTING_IDENTIFIER).//
+		get().removeSetting(setting)).isPresent();
 
-	    return getSetting(SOURCES_SETTING_IDENTIFIER).//
-		    get().removeSetting(optSetting.get());
-	}
-
-	return false;
     }
 
     /**
@@ -274,8 +270,8 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 		get().//
 		getSettings().//
 		stream().//
-		filter(s -> s.isSelected()).//
-		map(s -> s.getIdentifier()).//
+		filter(Setting::isSelected).//
+		map(Setting::getIdentifier).//
 		collect(Collectors.toList());
     }
 }

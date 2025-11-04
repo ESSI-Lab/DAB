@@ -58,14 +58,14 @@ public class OAuthSetting extends Setting implements EditableSetting {
 	GOOGLE("Google", "google"), //
 	KEYCLOAK("Keycloak", "keycloak");
 
-	private String label;
-	private String providerName;
+	private final String label;
+	private final String providerName;
 
 	/**
 	 * @param label
 	 * @param providerName
 	 */
-	private OAuthProvider(String label, String providerName) {
+	OAuthProvider(String label, String providerName) {
 	    this.label = label;
 	    this.providerName = providerName;
 	}
@@ -180,21 +180,21 @@ public class OAuthSetting extends Setting implements EditableSetting {
 	    ValidationResponse validationResponse = new ValidationResponse();
 
 	    Optional<String> adminId = thisSetting.getAdminId();
-	    if (!adminId.isPresent()) {
+	    if (adminId.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("Admin identifier missing");
 	    }
 
 	    Optional<String> clientId = thisSetting.getClientId();
-	    if (!clientId.isPresent()) {
+	    if (clientId.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("Client identifier identifier missing");
 	    }
 
 	    Optional<String> clientSecret = thisSetting.getClientSecret();
-	    if (!clientSecret.isPresent()) {
+	    if (clientSecret.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("Client secret missing");
@@ -203,21 +203,21 @@ public class OAuthSetting extends Setting implements EditableSetting {
 	    OAuthProviderSetting providerSetting = thisSetting.getSelectedProviderSetting();
 
 	    Optional<String> loginURL = providerSetting.getLoginURL();
-	    if (!loginURL.isPresent()) {
+	    if (loginURL.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("Login URL missing");
 	    }
 
 	    Optional<String> tokenURL = providerSetting.getTokenURL();
-	    if (!tokenURL.isPresent()) {
+	    if (tokenURL.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("Token URL missing");
 	    }
 
 	    Optional<String> userInfoURL = providerSetting.getUserInfoURL();
-	    if (!userInfoURL.isPresent()) {
+	    if (userInfoURL.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("User info URL missing");

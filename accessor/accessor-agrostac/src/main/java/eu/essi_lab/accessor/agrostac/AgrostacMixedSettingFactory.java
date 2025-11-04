@@ -37,7 +37,6 @@ public class AgrostacMixedSettingFactory {
 	AccessorSetting accessorSetting = AccessorSetting.createMixed( //
 		"Agrostac", //
 		"https://agrostac-test.containers.wur.nl/agrostac/", //
-		"v.1.0",
 		"Agrostac Accessor", //
 		AgrostacAccessor.TYPE, //
 		AgrostacGranulesAccessor.TYPE, //

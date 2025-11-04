@@ -55,12 +55,12 @@ public class DownloadSetting extends Setting implements EditableSetting {
 	 */
 	S3_DOWNLOAD_STORAGE("Amazon S3 storage");
 
-	private String label;
+	private final String label;
 
 	/**
 	 * @param label
 	 */
-	private DownloadStorage(String label) {
+	DownloadStorage(String label) {
 
 	    this.label = label;
 	}

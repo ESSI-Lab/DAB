@@ -40,7 +40,6 @@ public class STACMixedSettingFactory {
 	AccessorSetting accessorSetting = AccessorSetting.createMixed( //
 		"STAC", //
 		"", //
-		"v1.0.0",//
 		"STAC Accessor", //
 		STACMixedHarvestedAccessor.TYPE, //
 		STACMixedDistributedAccessor.TYPE, //

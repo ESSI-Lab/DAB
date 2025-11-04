@@ -27,7 +27,6 @@ package eu.essi_lab.cfga.gs.setting.menuitems;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 
@@ -83,9 +82,9 @@ public class ProfilerStateOnlineItemHandler extends GridMenuItemHandler {
 
 		}).//
 
-		collect(Collectors.toList());
+		toList();
 
-	settings.forEach(s -> configuration.replace(s));
+	settings.forEach(configuration::replace);
 
 	tabContainer.render(true);
     }

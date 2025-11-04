@@ -93,12 +93,12 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 	 */
 	DISTRIBUTED("Distributed");
 
-	private String name;
+	private final String name;
 
 	/**
 	 * @param name
 	 */
-	private ComputationType(String name) {
+	ComputationType(String name) {
 
 	    this.name = name;
 	}
@@ -134,7 +134,7 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 		withLabel("Computation type").//
 		withSingleSelection().//
 		withValues(LabeledEnum.values(ComputationType.class)).//
-		withSelectedValue(LabeledEnum.values(ComputationType.class).get(0)).//
+		withSelectedValue(LabeledEnum.values(ComputationType.class).getFirst()).//
 		cannotBeDisabled().//
 		required().//
 		build();
