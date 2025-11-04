@@ -356,7 +356,9 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 			    address.setPostalCode(postalCode);
 			    address.setCountry(country);
 			    contact.setOnline(online);
-
+			    if (country != null) {
+				dataset.getExtensionHandler().setCountry(country);
+			    }
 			}
 		    } catch (Exception e) {
 			GSLoggerFactory.getLogger(getClass()).error(e);
