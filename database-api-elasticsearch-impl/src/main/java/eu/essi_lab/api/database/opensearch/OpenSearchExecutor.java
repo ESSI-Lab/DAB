@@ -5,6 +5,7 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
@@ -109,7 +110,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
     private Database database;
     private OpenSearchClient client;
-    private OpenSearchWrapper wrapper;
     private OpenSearchFinder finder;
 
     @Override
@@ -120,10 +120,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
     @Override
     public void setDatabase(Database database) {
 	this.database = database;
-	if (database instanceof OpenSearchDatabase) {
-	    OpenSearchDatabase osd = (OpenSearchDatabase) database;
+	if (database instanceof OpenSearchDatabase osd) {
 	    this.client = osd.getClient();
-	    this.wrapper = new OpenSearchWrapper(osd);
 	    this.finder = new OpenSearchFinder();
 	    finder.setDatabase(database);
 	}
@@ -170,7 +168,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	// GENERAL QUERY PART
 	DiscoveryMessage dMessage = new DiscoveryMessage();
-	List<Bond> bonds = new ArrayList<Bond>();
+	List<Bond> bonds = new ArrayList<>();
 	if (message.getUserBond().isPresent()) {
 	    bonds.add(message.getUserBond().get());
 	}
@@ -185,8 +183,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    // nothing to do
 	    break;
 	case 1:
-	    dMessage.setUserBond(bonds.get(0));
-	    dMessage.setPermittedBond(bonds.get(0));
+	    dMessage.setUserBond(bonds.getFirst());
+	    dMessage.setPermittedBond(bonds.getFirst());
 	    break;
 	default:
 	    dMessage.setUserBond(BondFactory.createAndBond(bonds));
@@ -201,7 +199,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	Builder builder = new SearchRequest.Builder();
 	builder.index(DataFolderMapping.get().getIndex()).size(0).query(query);
 
-	Map<String, Aggregation> map = new HashMap<String, Aggregation>();
+	Map<String, Aggregation> map = new HashMap<>();
 
 	Optional<List<Queryable>> countDistinctTargets = message.getCountDistinctTargets();
 
@@ -315,7 +313,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	try {
 
 	    SearchResponse<Void> response = client.search(searchRequest, Void.class);
-	    Map<String, Map<String, Aggregate>> aggregations = new HashMap<String, Map<String, Aggregate>>();
+	    Map<String, Map<String, Aggregate>> aggregations = new HashMap<>();
 	    if (response.aggregations().containsKey(GROUP_BY_AGGREGATION)) {
 		Aggregate gba = response.aggregations().get(GROUP_BY_AGGREGATION);
 		if (gba.isSterms()) {
@@ -433,13 +431,14 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 			    List<StringTermsBucket> groups = sterms.buckets().array();
 			    ComputationResult freq = new ComputationResult();
 			    freq.setTarget(target.getName());
-			    String frequencyValue = "";
+			    StringBuilder frequencyValue = new StringBuilder();
 			    for (StringTermsBucket group : groups) {
 				String value = group.key();
 				long count = group.docCount();
-				frequencyValue += URLEncoder.encode(value, "UTF-8") + ComputationResult.FREQUENCY_ITEM_SEP + count + " ";
+				frequencyValue.append(URLEncoder.encode(value, StandardCharsets.UTF_8))
+					.append(ComputationResult.FREQUENCY_ITEM_SEP).append(count).append(" ");
 			    }
-			    freq.setValue(frequencyValue);
+			    freq.setValue(frequencyValue.toString());
 			    item.addFrequency(freq);
 			}
 
@@ -451,7 +450,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	    return ret;
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
@@ -544,7 +543,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	// Bounding box queries for regions
 	List<SpatialExtent> extents = request.getExtents();
 	Map<String, SpatialExtent> extentMap = new HashMap<>();
-	List<Entry<String, Query>> entries = new ArrayList<Map.Entry<String, Query>>();
+	List<Entry<String, Query>> entries = new ArrayList<>();
 	for (int i = 0; i < extents.size(); i++) {
 	    SpatialExtent extent = extents.get(i);
 	    String name = "region" + i;
@@ -556,7 +555,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		    .boundingBox(bb -> bb.tlbr(new TopLeftBottomRightGeoBounds.Builder()//
 			    .topLeft(tl -> tl.latlon(ll -> ll.lat(extent.getNorth()).lon(extent.getWest())))//
 			    .bottomRight(br -> br.latlon(ll -> ll.lat(extent.getSouth()).lon(extent.getEast()))).build()))));
-	    SimpleEntry<String, Query> entry = new SimpleEntry<String, Query>(name, regionQuery);
+	    SimpleEntry<String, Query> entry = new SimpleEntry<>(name, regionQuery);
 	    entries.add(entry);
 	}
 
@@ -625,13 +624,13 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    Map<String, Aggregate> aggregations = response.aggregations();
 	    Aggregate regionsAgg = aggregations.get("regions");
 
-	    if (regionsAgg == null || regionsAgg.isFilters() == false) {
+	    if (regionsAgg == null || !regionsAgg.isFilters()) {
 		GSLoggerFactory.getLogger(getClass()).error("No region aggregation found!");
 	    }
 
 	    // Extract buckets (regions)
 	    Set<Entry<String, FiltersBucket>> responseRegionBuckets = regionsAgg.filters().buckets().keyed().entrySet();
-	    List<WMSClusterResponse> ret = new ArrayList<DatabaseExecutor.WMSClusterResponse>();
+	    List<WMSClusterResponse> ret = new ArrayList<>();
 
 	    for (Entry<String, FiltersBucket> entry : responseRegionBuckets) {
 		String name = entry.getKey();
@@ -665,7 +664,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		// Get top providers aggregation
 		if (totalStationCount < request.getMaxResults()) {
 		    StringTermsAggregate distinctSamplesAgg = region.aggregations().get("distinct_location_samples").sterms();
-		    List<Dataset> datasets = new ArrayList<Dataset>();
+		    List<Dataset> datasets = new ArrayList<>();
 
 		    for (StringTermsBucket distinctBucket : distinctSamplesAgg.buckets().array()) {
 			String uniqueLocationId = distinctBucket.key();
@@ -738,7 +737,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	    return ret;
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 	//
@@ -748,7 +747,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
     private Query getQuery(Bond constraints, View view) throws GSException {
 	DiscoveryMessage message = new DiscoveryMessage();
-	List<Bond> bonds = new ArrayList<Bond>();
+	List<Bond> bonds = new ArrayList<>();
 	if (constraints != null) {
 	    bonds.add(constraints);
 	}
@@ -761,8 +760,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    // nothing to do
 	    break;
 	case 1:
-	    message.setUserBond(bonds.get(0));
-	    message.setPermittedBond(bonds.get(0));
+	    message.setUserBond(bonds.getFirst());
+	    message.setPermittedBond(bonds.getFirst());
 	    break;
 	default:
 	    message.setUserBond(BondFactory.createAndBond(bonds));
@@ -805,13 +804,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	if (resumptionToken != null) {
 	    cab = cab.after(Map.of(queryable.getName(), resumptionToken));
 	}
-	CompositeAggregation compositeAgg =
 
-		cab.build();
-
-	List<String> includeList = new ArrayList<String>();
-
-	includeList.add(queryable.getName());
+	CompositeAggregation compositeAgg = cab.build();
 
 	Aggregation distinctsAggregation = new Aggregation.Builder().composite(compositeAgg).build();
 
@@ -823,13 +817,13 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	try {
 	    response = client.search(searchRequest, Void.class);
 	} catch (OpenSearchException | IOException e) {
-	    e.printStackTrace();
+
 	    throw GSException.createException();
 	}
 
 	List<CompositeBucket> buckets = response.aggregations().get("distincts").composite().buckets().array();
 
-	ResultSet<TermFrequencyItem> ret = new ResultSet<TermFrequencyItem>();
+	ResultSet<TermFrequencyItem> ret = new ResultSet<>();
 	for (CompositeBucket bucket : buckets) {
 	    String term = bucket.key().get(queryable.getName()).to(String.class);
 	    long termCount = bucket.docCount();
@@ -847,7 +841,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	Map<String, JsonData> afterKey = response.aggregations().get("distincts").composite().afterKey();
 
 	if (afterKey != null && !afterKey.isEmpty()) {
-	    List<Object> values = new ArrayList<Object>();
+	    List<Object> values = new ArrayList<>();
 	    values.add(afterKey.values().iterator().next().toString().replace("\"", ""));
 	    SearchAfter sa = new SearchAfter(values);
 	    ret.setSearchAfter(sa);
@@ -857,7 +851,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
     }
 
     public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws Exception {
-	ResultSet<String> ret = new ResultSet<String>();
+	ResultSet<String> ret = new ResultSet<>();
 
 	Query query = getQuery(message.getUserBond().isPresent() ? message.getUserBond().get() : null,
 		message.getView().isPresent() ? message.getView().get() : null);
@@ -878,16 +872,13 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	cab = cab.size(size).sources(Map.of(queryable.getName(), stationIdSource));
 	if (message.getSearchAfter().isPresent()) {
 	    SearchAfter sa = message.getSearchAfter().get();
-	    cab = cab.after(Map.of(queryable.getName(), sa.getValues().get().get(0).toString()));
+	    cab = cab.after(Map.of(queryable.getName(), sa.getValues().get().getFirst().toString()));
 	}
 	CompositeAggregation compositeAgg =
 
 		cab.build();
 
-	List<String> includeList = new ArrayList<String>();
-	for (String element : message.getResourceSelector().getIndexes()) {
-	    includeList.add(element);
-	}
+	List<String> includeList = new ArrayList<>(message.getResourceSelector().getIndexes());
 
 	Aggregation topHitsAgg = new Aggregation.Builder()
 		.topHits(th -> th.size(1).source(src -> src.filter(f -> f.includes(includeList)))
@@ -918,8 +909,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		    for (String element : message.getResourceSelector().getIndexes()) {
 			if (sj.has(element)) {
 			    JSONArray array = sj.optJSONArray(element, null);
-			    String s = null;
-			    if (array != null && array.length() > 0) {
+			    String s;
+			    if (array != null && !array.isEmpty()) {
 				s = array.get(0).toString();
 			    } else {
 				s = sj.optString(element);
@@ -940,7 +931,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	Map<String, JsonData> afterKey = response.aggregations().get("distincts").composite().afterKey();
 
 	if (afterKey != null && !afterKey.isEmpty()) {
-	    List<Object> values = new ArrayList<Object>();
+	    List<Object> values = new ArrayList<>();
 	    values.add(afterKey.values().iterator().next().toString().replace("\"", ""));
 	    SearchAfter sa = new SearchAfter(values);
 	    ret.setSearchAfter(sa);

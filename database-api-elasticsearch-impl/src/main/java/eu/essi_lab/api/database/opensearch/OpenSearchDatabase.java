@@ -80,7 +80,7 @@ import software.amazon.awssdk.regions.Region;
  */
 public class OpenSearchDatabase extends Database {
 
-    static boolean debugQueries = false;
+    static boolean debugQueries;
 
     static {
 
@@ -142,7 +142,7 @@ public class OpenSearchDatabase extends Database {
 	this.storageInfo = storageInfo;
 	if (!initialized) {
 
-	    // both ignored for local local protocol
+	    // both ignored for local protocol
 	    System.setProperty("aws.accessKeyId", storageInfo.getUser());
 	    System.setProperty("aws.secretAccessKey", storageInfo.getPassword());
 
@@ -272,7 +272,7 @@ public class OpenSearchDatabase extends Database {
      */
     public static OpenSearchClient createNoSSLContextClient(StorageInfo storageInfo) throws GSException {
 
-	URI uri = null;
+	URI uri;
 	try {
 	    uri = new URI(storageInfo.getUri());
 
@@ -309,14 +309,13 @@ public class OpenSearchDatabase extends Database {
 	    credentialsProvider.setCredentials(AuthScope.ANY,
 		    new UsernamePasswordCredentials(storageInfo.getUser(), storageInfo.getPassword()));
 
-	    builder = builder
-		    .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+	    builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
 
 	}
 
 	if (storageInfo.getPath().isPresent()) {
 
-	    builder = builder.setPathPrefix(storageInfo.getPath().get());
+	    builder.setPathPrefix(storageInfo.getPath().get());
 	}
 
 	RestClient restClient = builder.build();
@@ -560,7 +559,7 @@ public class OpenSearchDatabase extends Database {
 
 	    CreateIndexResponse response = client.indices().create(createIndexRequest);
 
-	    if (!response.acknowledged()) {
+	    if (Boolean.FALSE.equals(response.acknowledged())) {
 
 		throw GSException.createException(//
 			getClass(), //

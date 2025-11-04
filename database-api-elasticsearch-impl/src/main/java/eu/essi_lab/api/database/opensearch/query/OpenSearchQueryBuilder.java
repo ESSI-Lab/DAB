@@ -24,12 +24,7 @@ package eu.essi_lab.api.database.opensearch.query;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
@@ -102,12 +97,12 @@ import eu.essi_lab.model.resource.composed.ComposedElementItem;
  */
 public class OpenSearchQueryBuilder {
 
-    private HashMap<String, String> dfMap;
-    private StringBuilder builder;
-    private RankingStrategy ranking;
-    private boolean deletedIncluded;
-    private OpenSearchWrapper wrapper;
-    private boolean weightedQueriesInclued;
+    private final HashMap<String, String> dfMap;
+    private final StringBuilder builder;
+    private final RankingStrategy ranking;
+    private final boolean deletedIncluded;
+    private final OpenSearchWrapper wrapper;
+    private final boolean weightedQueriesInclued;
 
     /**
      * @param wrapper
@@ -482,7 +477,7 @@ public class OpenSearchQueryBuilder {
 
 	if (bond.getPropertyValue().size() == 1) {
 
-	    ComposedElementItem item = bond.getPropertyValue().get(0);
+	    ComposedElementItem item = bond.getPropertyValue().getFirst();
 
 	    return Query.of(//
 		    q -> q.nested(n -> n.path(composed.getName()).//
@@ -553,13 +548,13 @@ public class OpenSearchQueryBuilder {
 	case BBOX:
 	case INTERSECTS:
 
-	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Intersects);
+	    shapeBuilder.relation(GeoShapeRelation.Intersects);
 
 	    break;
 
 	case CONTAINED:
 
-	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Contains);
+	    shapeBuilder.relation(GeoShapeRelation.Contains);
 
 	    weightedQuery = weightedQueriesInclued && area > 0 ? buildContainedWeightQuery(area, 500) : null;
 
@@ -567,7 +562,7 @@ public class OpenSearchQueryBuilder {
 
 	case CONTAINS:
 
-	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Within);
+	    shapeBuilder.relation(GeoShapeRelation.Within);
 
 	    List<Query> operands = new ArrayList<>();
 
@@ -580,7 +575,7 @@ public class OpenSearchQueryBuilder {
 
 	    break;
 	case DISJOINT:
-	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Disjoint);
+	    shapeBuilder.relation(GeoShapeRelation.Disjoint);
 	    break;
 	case INTERSECTS_ANY_POINT_NOT_CONTAINS:
 	    // not supported
@@ -603,7 +598,7 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildIsGDCQuery(String value) {
 
-	ArrayList<Query> shouldList = new ArrayList<Query>();
+	ArrayList<Query> shouldList = new ArrayList<>();
 
 	List<String> ids = ConfigurationWrapper.getGDCSourceSetting().getSelectedSourcesIds();
 	ids.forEach(id -> shouldList.add(buildSourceIdQuery(id)));
@@ -611,9 +606,9 @@ public class OpenSearchQueryBuilder {
 	shouldList.add(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value));
 
 	return buildBoolQuery(//
-		Arrays.asList(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value)), //
+		Collections.singletonList(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value)), //
 		shouldList, //
-		Arrays.asList());
+		List.of());
     }
 
     /**
@@ -659,7 +654,7 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildDataFolderQuery(String databaseId, List<String> sourceIds) {
 
-	ArrayList<Query> idsQueries = new ArrayList<Query>();
+	ArrayList<Query> idsQueries = new ArrayList<>();
 	sourceIds.forEach(id -> idsQueries.add(buildSourceIdQuery(id)));
 
 	return buildFilterQuery(//
@@ -703,20 +698,11 @@ public class OpenSearchQueryBuilder {
 
 	List<Query> filterList = new ArrayList<>();
 
-	if (creator.isPresent()) {
+	creator.ifPresent(s -> filterList.add(buildViewCreatorQuery(s)));
 
-	    filterList.add(buildViewCreatorQuery(creator.get()));
-	}
+	owner.ifPresent(s -> filterList.add(buildViewOwnerQuery(s)));
 
-	if (owner.isPresent()) {
-
-	    filterList.add(buildViewOwnerQuery(owner.get()));
-	}
-
-	if (visibility.isPresent()) {
-
-	    filterList.add(buildViewVisibilityQuery(visibility.get().name()));
-	}
+	visibility.ifPresent(viewVisibility -> filterList.add(buildViewVisibilityQuery(viewVisibility.name())));
 
 	filterList.add(databaseIdQuery);
 
@@ -735,7 +721,7 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildSearchQuery(String databaseId, String index, String field, String fieldValue) {
 
-	return buildSearchQuery(databaseId, index, field, Arrays.asList(fieldValue));
+	return buildSearchQuery(databaseId, index, field, Collections.singletonList(fieldValue));
     }
 
     /**
@@ -750,7 +736,7 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildSearchQuery(String databaseId, String field, String fieldValue) {
 
-	return buildSearchQuery(databaseId, field, Arrays.asList(fieldValue));
+	return buildSearchQuery(databaseId, field, Collections.singletonList(fieldValue));
     }
 
     /**
@@ -767,12 +753,9 @@ public class OpenSearchQueryBuilder {
 
 	List<Query> shouldList = new ArrayList<>();
 
-	fieldValues.forEach(v -> {
+	fieldValues.forEach(v -> shouldList.add(buildMatchPhraseQuery(field, v)));
 
-	    shouldList.add(buildMatchPhraseQuery(field, v));
-	});
-
-	return buildBoolQuery(Arrays.asList(buildDatabaseIdQuery(databaseId)), shouldList, Arrays.asList());
+	return buildBoolQuery(Collections.singletonList(buildDatabaseIdQuery(databaseId)), shouldList, List.of());
     }
 
     /**
@@ -794,7 +777,7 @@ public class OpenSearchQueryBuilder {
 	    list.add(buildMatchPhraseQuery(fields.get(i), fieldsValue.get(i)));
 	}
 
-	return buildBoolQuery(Arrays.asList(buildDatabaseIdQuery(databaseId)), Arrays.asList(), list);
+	return buildBoolQuery(Collections.singletonList(buildDatabaseIdQuery(databaseId)), List.of(), list);
     }
 
     /**
@@ -811,15 +794,12 @@ public class OpenSearchQueryBuilder {
 
 	List<Query> shouldList = new ArrayList<>();
 
-	fieldValues.forEach(v -> {
-
-	    shouldList.add(buildMatchPhraseQuery(field, v));
-	});
+	fieldValues.forEach(v -> shouldList.add(buildMatchPhraseQuery(field, v)));
 
 	return buildBoolQuery(//
 		Arrays.asList(buildDatabaseIdQuery(databaseId), buildIndexQuery(index)), //
 		shouldList, //
-		Arrays.asList());
+		List.of());
     }
 
     /**
@@ -931,22 +911,22 @@ public class OpenSearchQueryBuilder {
 
 	case GREATER:
 
-	    rangeBuilder = rangeBuilder.gt(JsonData.of(value));
+	    rangeBuilder.gt(JsonData.of(value));
 	    break;
 
 	case GREATER_OR_EQUAL:
 
-	    rangeBuilder = rangeBuilder.gte(JsonData.of(value));
+	    rangeBuilder.gte(JsonData.of(value));
 	    break;
 
 	case LESS:
 
-	    rangeBuilder = rangeBuilder.lt(JsonData.of(value));
+	    rangeBuilder.lt(JsonData.of(value));
 	    break;
 
 	case LESS_OR_EQUAL:
 
-	    rangeBuilder = rangeBuilder.lte(JsonData.of(value));
+	    rangeBuilder.lte(JsonData.of(value));
 	    break;
 	}
 
@@ -1051,7 +1031,7 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildMustQuery(List<Query> operands) {
 
-	List<Query> notNulls = new ArrayList<Query>();
+	List<Query> notNulls = new ArrayList<>();
 	for (Query operand : operands) {
 	    if (operand != null) {
 		notNulls.add(operand);
@@ -1158,9 +1138,7 @@ public class OpenSearchQueryBuilder {
      */
     private Query buildSourceDeploymentQuery(String deployment) {
 
-	Query termQuery = buildTermQuery(IndexMapping.toKeywordField(ResourceProperty.SOURCE_DEPLOYMENT.getName()), deployment);
-
-	return termQuery;
+	return buildTermQuery(IndexMapping.toKeywordField(ResourceProperty.SOURCE_DEPLOYMENT.getName()), deployment);
     }
 
     /**
@@ -1223,7 +1201,7 @@ public class OpenSearchQueryBuilder {
 
 		for (FrameValue frameValue : FrameValue.values()) {
 
-		    Date dateBeforeNow = new Date(System.currentTimeMillis() - Long.valueOf(frameValue.asMillis()));
+		    Date dateBeforeNow = new Date(System.currentTimeMillis() - frameValue.asMillis());
 
 		    if (operator == BondOperator.LESS && literalDate.compareTo(dateBeforeNow) > 0 || //
 			    operator == BondOperator.LESS_OR_EQUAL && literalDate.compareTo(dateBeforeNow) >= 0 || //
@@ -1378,7 +1356,7 @@ public class OpenSearchQueryBuilder {
 
 	int areaPercent = 1;
 
-	ArrayList<Query> operands = new ArrayList<Query>();
+	ArrayList<Query> operands = new ArrayList<>();
 
 	for (int weight = 0; weight <= 100; weight += 10) {
 
@@ -1417,7 +1395,7 @@ public class OpenSearchQueryBuilder {
 
 	if (term.startsWith("*")) {
 
-	    term = term.substring(1, term.length());
+	    term = term.substring(1);
 	}
 
 	if (term.endsWith("*")) {
@@ -1547,10 +1525,7 @@ public class OpenSearchQueryBuilder {
 
 	List<Query> queryList = new ArrayList<>();
 
-	indexes.forEach(index -> {
-
-	    queryList.add(buildIndexQuery(index));
-	});
+	indexes.forEach(index -> queryList.add(buildIndexQuery(index)));
 
 	return queryList;
     }

@@ -43,15 +43,14 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.composed.ComposedElement;
 
 /**
  * @author Fabrizio
  */
 public class OpenSearchBondHandler implements DiscoveryBondHandler {
 
-    private OpenSearchQueryBuilder queryBuilder;
-    private boolean count;
+    private final OpenSearchQueryBuilder queryBuilder;
+    private final boolean count;
 
     /**
      * @param wrapper
@@ -87,9 +86,8 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     public void endLogicalBond(LogicalBond bond) {
 
 	switch (bond.getLogicalOperator()) {
-	case AND -> queryBuilder.appendClosingTag(false);
+	case AND, NOT -> queryBuilder.appendClosingTag(false);
 	case OR -> queryBuilder.appendClosingTag(true);
-	case NOT -> queryBuilder.appendClosingTag(false);
 	}
     }
 
@@ -104,7 +102,7 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     @Override
     public void simpleValueBond(SimpleValueBond bond) {
 
-	Query query = null;
+	Query query;
 
 	if (bond.getProperty() == MetadataElement.SUBJECT) {
 

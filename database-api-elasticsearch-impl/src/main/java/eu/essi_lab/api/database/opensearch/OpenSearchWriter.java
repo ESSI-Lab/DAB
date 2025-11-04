@@ -59,7 +59,7 @@ public class OpenSearchWriter extends DatabaseWriter {
     @Override
     public OpenSearchDatabase getDatabase() {
 
-	return (OpenSearchDatabase) database;
+	return database;
     }
 
     @Override

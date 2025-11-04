@@ -71,7 +71,7 @@ public class OpenSearchReader implements DatabaseReader {
     @Override
     public OpenSearchDatabase getDatabase() {
 
-	return (OpenSearchDatabase) database;
+	return database;
     }
 
     @Override
@@ -88,7 +88,7 @@ public class OpenSearchReader implements DatabaseReader {
 	try {
 	    return wrapper.searchBinaries(UsersMapping.get().getIndex(), query).//
 		    stream().//
-		    map(binary -> GSUser.createOrNull(binary)).//
+		    map(GSUser::createOrNull).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
 
@@ -110,7 +110,7 @@ public class OpenSearchReader implements DatabaseReader {
 	try {
 	    return wrapper.searchBinaries(ViewsMapping.get().getIndex(), query).//
 		    stream().//
-		    map(binary -> View.createOrNull(binary)).//
+		    map(View::createOrNull).//
 		    filter(Objects::nonNull).//
 		    findFirst();
 
@@ -133,7 +133,7 @@ public class OpenSearchReader implements DatabaseReader {
 	try {
 	    return wrapper.searchBinaries(ViewsMapping.get().getIndex(), query).//
 		    stream().//
-		    map(binary -> View.createOrNull(binary)).//
+		    map(View::createOrNull).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
 
@@ -179,21 +179,12 @@ public class OpenSearchReader implements DatabaseReader {
     @Override
     public List<GSResource> getResources(IdentifierType type, String identifier) throws GSException {
 
-	Queryable property = null;
-	switch (type) {
-	case OAI_HEADER:
-	    property = ResourceProperty.OAI_PMH_HEADER_ID;
-	    break;
-	case ORIGINAL:
-	    property = ResourceProperty.ORIGINAL_ID;
-	    break;
-	case PRIVATE:
-	    property = ResourceProperty.PRIVATE_ID;
-	    break;
-	case PUBLIC:
-	    property = MetadataElement.IDENTIFIER;
-	    break;
-	}
+	Queryable property = switch (type) {
+	    case OAI_HEADER -> ResourceProperty.OAI_PMH_HEADER_ID;
+	    case ORIGINAL -> ResourceProperty.ORIGINAL_ID;
+	    case PRIVATE -> ResourceProperty.PRIVATE_ID;
+	    case PUBLIC -> MetadataElement.IDENTIFIER;
+	};
 
 	Query query = OpenSearchQueryBuilder.buildFilterQuery(//
 		Arrays.asList(//

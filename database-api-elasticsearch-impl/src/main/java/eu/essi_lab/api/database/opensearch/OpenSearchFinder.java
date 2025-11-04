@@ -1,11 +1,10 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -38,12 +37,12 @@ import org.opensearch.client.opensearch.core.search.SearchResult;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -91,29 +90,30 @@ public class OpenSearchFinder implements DatabaseFinder {
     private OpenSearchWrapper wrapper;
 
     /**
-     * 
+     *
      */
     private static final long MAP_UPDATE_PERIOD = TimeUnit.MINUTES.toMillis(5);
     /**
-     * 
+     *
      */
     private static CachedMapUpdater MAP_UPDATER_TASK;
 
     /**
-     * 
+     *
      */
-    private static HashMap<String, String> SOURCES_DATA_FOLDER_MAP = new HashMap<String, String>();
+    private static HashMap<String, String> SOURCES_DATA_FOLDER_MAP = new HashMap<>();
 
     /**
      * @author Fabrizio
      */
     private static class CachedMapUpdater extends TimerTask {
 
-	private OpenSearchDatabase database;
-	private OpenSearchWrapper wrapper;
+	private final OpenSearchDatabase database;
+	private final OpenSearchWrapper wrapper;
 
 	/**
-	 * @param finder
+	 * @param database
+	 * @param wrapper
 	 */
 	private CachedMapUpdater(OpenSearchDatabase database, OpenSearchWrapper wrapper) {
 
@@ -135,7 +135,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			    wrapper, //
 			    ConfigurationWrapper.getHarvestedAndMixedSources().//
 				    stream().//
-				    map(s -> s.getUniqueIdentifier()).//
+				    map(GSSource::getUniqueIdentifier).//
 				    collect(Collectors.toList()),
 
 			    false);
@@ -149,11 +149,11 @@ public class OpenSearchFinder implements DatabaseFinder {
 		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 		}
 	    }
-	};
+	}
     }
 
     /**
-     * 
+     *
      */
     public OpenSearchFinder() {
 
@@ -177,7 +177,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     @Override
     public OpenSearchDatabase getDatabase() {
 
-	return (OpenSearchDatabase) database;
+	return database;
     }
 
     @Override
@@ -195,7 +195,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	Map<String, Aggregate> aggregations = searchResponse.aggregations();
 
-	int total = 0;
+	int total;
 
 	Optional<Queryable> element = message.getDistinctValuesElement();
 
@@ -233,7 +233,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 	// debugQueries = true;
 
 	ResultSet<GSResource> resultSet = new ResultSet<>();
-	List<GSResource> resources = null;
+	List<GSResource> resources;
 
 	try {
 
@@ -246,7 +246,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 		resources = wrapper.aggregateWithNestedAgg(//
 
 			query, //
-			queryables.stream().map(q -> q.getName()).collect(Collectors.toList()), //
+			queryables.stream().map(Queryable::getName).collect(Collectors.toList()), //
 			message.getDistinctValuesElement().get(), //
 			message.getPage().getSize(), //
 			message.isResourceBinaryExcluded(), true).
@@ -264,7 +264,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		    updateCountSet(countSet, countResponse, message, resources.size());
 
-		    countSet.addCountPair(new SimpleEntry<String, DiscoveryCountResponse>(Type.DATABASE.toString(), countResponse));
+		    countSet.addCountPair(new SimpleEntry<>(Type.DATABASE.toString(), countResponse));
 
 		    resultSet.setCountResponse(countSet);
 		}
@@ -286,7 +286,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 		// set the search after, if present
 		//
 
-		OpenSearchUtils.getSearchAfter(response).ifPresent(sa -> resultSet.setSearchAfter(sa));
+		OpenSearchUtils.getSearchAfter(response).ifPresent(resultSet::setSearchAfter);
 
 		//
 		// handles the tf targets and the count
@@ -309,7 +309,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			setTermFrequencyMap(response, countResponse);
 		    }
 
-		    countSet.addCountPair(new SimpleEntry<String, DiscoveryCountResponse>(Type.DATABASE.toString(), countResponse));
+		    countSet.addCountPair(new SimpleEntry<>(Type.DATABASE.toString(), countResponse));
 
 		    resultSet.setCountResponse(countSet);
 		}
@@ -357,13 +357,16 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	countResponse.setCount(count);
 
-	int pageCount = (int) (countResponse.getCount() < message.getPage().getSize() ? 1
+	int pageCount = (int) (countResponse.getCount() < message.getPage().getSize()
+		? 1
 		: Math.ceil(((double) countResponse.getCount() / message.getPage().getSize())));
 
 	countSet.setPageCount(countResponse.getCount() == 0 || message.getPage().getSize() == 0 ? 0 : pageCount);
 
-	int pageIndex = message.getPage().getSize() == 0 ? 0
-		: message.getPage().getStart() <= message.getPage().getSize() ? 1
+	int pageIndex = message.getPage().getSize() == 0
+		? 0
+		: message.getPage().getStart() <= message.getPage().getSize()
+			? 1
 			: (message.getPage().getStart() / message.getPage().getSize()) + 1;
 
 	countSet.setPageIndex(pageIndex);
@@ -484,7 +487,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 		return OpenSearchQueryBuilder.buildSearchQuery(//
 			database.getIdentifier(), //
 			MetadataElement.IDENTIFIER.getName(), //
-			identifiers.get(0));//
+			identifiers.getFirst());//
 	    }
 	}
 
@@ -511,11 +514,10 @@ public class OpenSearchFinder implements DatabaseFinder {
     }
 
     /**
-     * Returns couples [source id -> query folder ] only of the sources that are
-     * currently harvested, or more in general, of the sources that have a writing folder (for example a source in its
-     * first harvesting, or a source with interrupted harvesting having both data-1 and and data-2 folder where one of
-     * them is the writing folder and the other is the query folder)
-     * 
+     * Returns couples [source id -> query folder ] only of the sources that are currently harvested, or more in general, of the sources
+     * that have a writing folder (for example a source in its first harvesting, or a source with interrupted harvesting having both data-1
+     * and data-2 folder where one of them is the writing folder and the other is the query folder)
+     *
      * @param sourceIds
      * @param useCache
      * @return
@@ -535,7 +537,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		SOURCES_DATA_FOLDER_MAP.keySet().//
 			stream().//
-			filter(id -> sourceIds.contains(id)).//
+			filter(sourceIds::contains).//
 			forEach(id -> out.put(id, SOURCES_DATA_FOLDER_MAP.get(id)));
 
 	    }
@@ -558,13 +560,13 @@ public class OpenSearchFinder implements DatabaseFinder {
 		List<String> incrementalSourceIds = ConfigurationWrapper.//
 			getIncrementalSources().//
 			stream().//
-			map(s -> s.getUniqueIdentifier()).//
-			collect(Collectors.toList());
+			map(GSSource::getUniqueIdentifier).//
+			toList();
 
 		List<JSONObject> incrementalExcluded = aggregateWithNestedAgg.//
 			stream().//
 			filter(v -> !incrementalSourceIds.contains(v.getString(MetaFolderMapping.SOURCE_ID))).//
-			collect(Collectors.toList());
+			toList();
 
 		incrementalExcluded.forEach(agg -> {
 
@@ -593,7 +595,6 @@ public class OpenSearchFinder implements DatabaseFinder {
 
     /**
      * @param message
-     * @param useCache
      * @return
      * @throws GSException
      */
@@ -602,10 +603,10 @@ public class OpenSearchFinder implements DatabaseFinder {
 	if (message.getSources().isEmpty()) {
 
 	    GSLoggerFactory.getLogger(getClass()).error("Missing sources in message {}", message.getRequestId());
-	    return new HashMap<String, String>();
+	    return new HashMap<>();
 	}
 
-	List<GSSource> sources = new ArrayList<>();
+	List<GSSource> sources;
 
 	Optional<View> view = message.getView();
 	if (view.isPresent()) {
@@ -621,7 +622,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 		database, //
 		wrapper, //
 		sources.stream().//
-			map(s -> s.getUniqueIdentifier()).//
+			map(GSSource::getUniqueIdentifier).//
 			collect(Collectors.toList()), //
 		message.isCachedSourcesDataFolderMapUsed());
     }
@@ -633,7 +634,7 @@ public class OpenSearchFinder implements DatabaseFinder {
      */
     private SearchResponse<Object> search_(DiscoveryMessage message, boolean count) throws GSException {
 
-	PerformanceLogger pl = null;
+	PerformanceLogger pl;
 
 	if (count) {
 
@@ -658,7 +659,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 		GSLoggerFactory.getLogger(getClass()).debug(count ? "\n\n--- COUNT ---\n" : "\n\n--- DISCOVER ---\n");
 	    }
 
-	    SearchResponse<Object> response = null;
+	    SearchResponse<Object> response;
 
 	    if (count) {
 

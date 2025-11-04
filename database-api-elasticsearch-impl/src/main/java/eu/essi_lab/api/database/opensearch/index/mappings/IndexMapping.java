@@ -47,8 +47,8 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
  */
 public abstract class IndexMapping {
 
-    private JSONObject mapping;
-    private String index;
+    private final JSONObject mapping;
+    private final String index;
 
     /**
      * 
@@ -90,7 +90,7 @@ public abstract class IndexMapping {
     // Elasticsearch suggests to use ignore_above = 32766 / 4 = 8191 since UTF-8 characters may occupy at most 4 bytes.
     //
     public static final int MAX_KEYWORD_LENGTH = 32766 / 4;
-    private boolean indexAlias;
+    private final boolean indexAlias;
 
     /**
      * @return
