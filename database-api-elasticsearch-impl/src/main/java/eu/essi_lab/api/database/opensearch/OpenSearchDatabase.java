@@ -25,6 +25,7 @@ import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
+import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
@@ -80,7 +81,7 @@ import software.amazon.awssdk.regions.Region;
  */
 public class OpenSearchDatabase extends Database {
 
-    static boolean debugQueries = false;
+    public static boolean debugQueries = false;
 
     static {
 
@@ -625,5 +626,10 @@ public class OpenSearchDatabase extends Database {
     public DatabaseImpl getImplementation() {
 
 	return DatabaseImpl.OPENSEARCH;
+    }
+
+    public static void debugQuery(SearchRequest searchRequest) {
+	// TODO Auto-generated method stub
+	
     }
 }

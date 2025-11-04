@@ -4,6 +4,7 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonData;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
@@ -101,6 +103,7 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import jakarta.json.JsonObject;
+import jakarta.json.stream.JsonGenerator;
 
 /**
  * @author Fabrizio
@@ -314,6 +317,10 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	try {
 
+	    if (OpenSearchDatabase.debugQueries) {
+		debugQuery(searchRequest);
+	    }
+
 	    SearchResponse<Void> response = client.search(searchRequest, Void.class);
 	    Map<String, Map<String, Aggregate>> aggregations = new HashMap<String, Map<String, Aggregate>>();
 	    if (response.aggregations().containsKey(GROUP_BY_AGGREGATION)) {
@@ -457,6 +464,18 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	return null;
     }
+
+    private void debugQuery(SearchRequest  request) {
+	    JacksonJsonpMapper mapper = new JacksonJsonpMapper();
+	    StringWriter sw = new StringWriter();
+	    JsonGenerator generator = mapper.jsonProvider().createGenerator(sw);
+	    
+	    request.serialize(generator, mapper);
+	    generator.close();
+	    
+	    System.out.println(sw.toString());
+	    
+	}
 
     @Override
     public List<String> retrieveEiffelIds(DiscoveryMessage message, int start, int count) throws GSException {

@@ -59,6 +59,7 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
+import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.AbstractResourceMapper;
@@ -357,7 +358,13 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 			    address.setCountry(country);
 			    contact.setOnline(online);
 			    if (country != null) {
-				dataset.getExtensionHandler().setCountry(country);
+				Country c = Country.decode(country);
+				if (c != null) {
+				    dataset.getExtensionHandler().setCountry(c.getShortName());
+				    dataset.getExtensionHandler().setCountryISO3(c.getISO3());
+				} else {
+				    dataset.getExtensionHandler().setCountry(country);
+				}
 			    }
 			}
 		    } catch (Exception e) {
