@@ -58,28 +58,6 @@ public abstract class IndexedMetadataElement extends IndexedElement {
     private BoundingBox boundingBox;
 
     /**
-     * Creates a new custom <code>IndexedMetadataElement</code> with the supplied <code>elementName</code>
-     * 
-     * @param elementName a non <code>null</code> string containing only alphabetical characters and "_" character
-     */
-    public IndexedMetadataElement(String elementName) {
-
-	super(elementName);
-    }
-
-    /**
-     * Creates a new custom <code>IndexedMetadataElement</code> with the supplied <code>elementName</code> and
-     * <code>value</code>
-     * 
-     * @param elementName a non <code>null</code> string containing only alphabetical characters and "_" character
-     * @param value a non <code>null</code> string, empty string is admitted
-     */
-    public IndexedMetadataElement(String elementName, String value) {
-
-	super(elementName, value);
-    }
-
-    /**
      * Creates a new indexed element related to the supplied <code>element</code>
      * 
      * @param element
@@ -310,7 +288,7 @@ public abstract class IndexedMetadataElement extends IndexedElement {
      * If this element is related to {@link MetadataElement#BOUNDING_BOX}, this method set a {@link BoundingBox} with
      * the proper values using the {@link #setBoundingBox(BoundingBox)} method.<br><br>
      * 
-     * If this element has a {@link ComposedElement}, this method set it using the {@link #setComposedElement(ComposedElement)} method
+     * If this element has a {@link ComposedElement}, this method set it using the {@link #addComposedElement(ComposedElement)} method
      * 
      * @implnote
      *           Following example shows the implementation for the {@link IndexedMetadataElement} related to
@@ -354,5 +332,27 @@ public abstract class IndexedMetadataElement extends IndexedElement {
     protected static boolean checkStringValue(String value) {
 
 	return value != null && !value.equals("");
+    }
+
+    /**
+     * Creates a new custom <code>IndexedMetadataElement</code> with the supplied <code>elementName</code>
+     *
+     * @param elementName a non <code>null</code> string containing only alphabetical characters and "_" character
+     */
+    private IndexedMetadataElement(String elementName) {
+
+	super(elementName);
+    }
+
+    /**
+     * Creates a new custom <code>IndexedMetadataElement</code> with the supplied <code>elementName</code> and
+     * <code>value</code>
+     *
+     * @param elementName a non <code>null</code> string containing only alphabetical characters and "_" character
+     * @param value a non <code>null</code> string, empty string is admitted
+     */
+    private IndexedMetadataElement(String elementName, String value) {
+
+	super(elementName, value);
     }
 }
