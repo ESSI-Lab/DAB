@@ -2449,6 +2449,8 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    if (checkStringValue(indURI)) {
 			wrapper.setIndividualURI(indURI);
 		    }
+		    
+		    wrapper.setHash(indURI);
 
 		    addComposedElement(wrapper.getElement());
 

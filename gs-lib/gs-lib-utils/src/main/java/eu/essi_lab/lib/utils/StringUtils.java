@@ -49,12 +49,14 @@ public class StringUtils {
      */
     public static final String SHA1_IDENTIFIER = "SHA-1";
 
+    public static final String SHA256_IDENTIFIER = "SHA-256";
+
     /**
      * 
      */
     public static String format(int value) {
 
-	return format((double)value);
+	return format((double) value);
     }
 
     /**
@@ -83,11 +85,21 @@ public class StringUtils {
      */
     public static String hashSHA1messageDigest(String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
-	MessageDigest msdDigest = MessageDigest.getInstance(SHA1_IDENTIFIER);
-	msdDigest.update(value.getBytes("UTF-8"), 0, value.length());
-	char[] ret = Hex.encodeHex(msdDigest.digest());
-	return new String(ret).toUpperCase();
+	return hashMessageDigest(SHA1_IDENTIFIER,value);
     }
+
+    public static String hashSHA256messageDigest(String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+
+	return hashMessageDigest(SHA256_IDENTIFIER,value);
+    }
+    
+    public static String hashMessageDigest(String algorithm, String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+
+  	MessageDigest msdDigest = MessageDigest.getInstance(algorithm);
+  	msdDigest.update(value.getBytes("UTF-8"), 0, value.length());
+  	char[] ret = Hex.encodeHex(msdDigest.digest());
+  	return new String(ret).toUpperCase();
+      }
 
     /**
      * URL encodes the provided string with UTF-8 using {@link StandardCharsets} defined as "Constant definitions for
@@ -190,7 +202,7 @@ public class StringUtils {
 
 	return !isNull(string);
     }
-    
+
     /**
      * Returns true if the string is <code>null</code> or {@link String#isEmpty()} returns true
      * 

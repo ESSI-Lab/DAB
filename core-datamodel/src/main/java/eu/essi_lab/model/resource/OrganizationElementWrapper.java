@@ -1,5 +1,15 @@
 package eu.essi_lab.model.resource;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import javax.xml.bind.DatatypeConverter;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.StringUtils;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -10,12 +20,12 @@ package eu.essi_lab.model.resource;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -89,6 +99,18 @@ public class OrganizationElementWrapper {
     public void setHash(String hash) {
 
 	element.getProperty("hash").get().setValue(hash);
+    }
+
+    public void setHash() {
+	String key = (getOrgName() + "|" + getOrgUri() + "|" + getIndividualName() + "|" + getIndividualURI() + "|" + getHomePageURL() + "|"
+		+ getEmail() + "|" + getRole()).toLowerCase();
+	String hash = key;
+	try {
+	    hash = StringUtils.hashSHA1messageDigest(key);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+	setHash(hash);
     }
 
     /**
