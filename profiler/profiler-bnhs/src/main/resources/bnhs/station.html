@@ -916,7 +916,24 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 			const queryString = window.location.search; // includes the leading "?" if present
 
 			$.getJSON(stationCode+"/timeseries"+queryString, function(data) {
-				
+				const disclaimersSet = new Set();
+				for (let i = 0; i < data.length; i++) {
+					const disclaimerValue = findValue(data, i, 'data_disclaimer');
+					if (disclaimerValue && typeof disclaimerValue === 'string' && disclaimerValue.trim().length > 0) {
+						disclaimersSet.add(disclaimerValue.trim());
+					}
+				}
+				if (disclaimersSet.size > 0) {
+					const dialogEl = $('#dialog');
+					dialogEl.empty();
+					dialogEl.append($('<b>').text('Disclaimer to accept'));
+					dialogEl.append('<br><br>');
+					const list = $('<ul>');
+					Array.from(disclaimersSet).forEach(function(text) {
+						list.append($('<li>').text(text));
+					});
+					dialogEl.append(list);
+				}
 				$("#timeseries").removeAttr("class");
 				
 				

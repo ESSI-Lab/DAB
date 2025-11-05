@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import org.terracotta.statistics.StatisticMapper;
+
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -102,7 +104,7 @@ public class SourceStatistics {
 		));
 
 	// statisticsMessage.computeSum(Arrays.asList(MetadataElement.DATA_SIZE));
-
+	
 	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
 	IStatisticsExecutor executor = loader.iterator().next();
 

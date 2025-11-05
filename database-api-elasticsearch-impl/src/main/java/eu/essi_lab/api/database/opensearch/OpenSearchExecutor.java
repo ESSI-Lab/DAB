@@ -1,71 +1,7 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch;
-
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.opensearch.client.json.JsonData;
-import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.FieldValue;
-import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.SortOptions;
-import org.opensearch.client.opensearch._types.SortOrder;
-import org.opensearch.client.opensearch._types.TopLeftBottomRightGeoBounds;
-import org.opensearch.client.opensearch._types.aggregations.Aggregate;
-import org.opensearch.client.opensearch._types.aggregations.Aggregation;
-import org.opensearch.client.opensearch._types.aggregations.BucketSortAggregation;
-import org.opensearch.client.opensearch._types.aggregations.Buckets;
-import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregation;
-import org.opensearch.client.opensearch._types.aggregations.CompositeAggregation;
-import org.opensearch.client.opensearch._types.aggregations.CompositeAggregationSource;
-import org.opensearch.client.opensearch._types.aggregations.CompositeBucket;
-import org.opensearch.client.opensearch._types.aggregations.FiltersBucket;
-import org.opensearch.client.opensearch._types.aggregations.GeoBoundsAggregate;
-import org.opensearch.client.opensearch._types.aggregations.GeoCentroidAggregate;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
-import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch.core.SearchRequest;
-import org.opensearch.client.opensearch.core.SearchRequest.Builder;
-import org.opensearch.client.opensearch.core.SearchResponse;
-import org.opensearch.client.opensearch.core.search.Hit;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
@@ -102,6 +38,27 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import jakarta.json.JsonObject;
+import jakarta.json.stream.JsonGenerator;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.*;
+import org.opensearch.client.opensearch._types.aggregations.*;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchRequest.Builder;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.Hit;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author Fabrizio
@@ -286,8 +243,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		int fmax = max;
 		String fieldName = target.getName();
 		map.put("top-" + target.getName(), Aggregation.of(a -> a.terms(t -> //
-		t.field(DataFolderMapping.toKeywordField(fieldName)) //
-			.size(fmax) //
+			t.field(DataFolderMapping.toKeywordField(fieldName)) //
+				.size(fmax) //
 		)));
 	    }
 	}
@@ -311,6 +268,10 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	SearchRequest searchRequest = builder.build();
 
 	try {
+
+	    if (OpenSearchDatabase.debugQueries) {
+		debugQuery(searchRequest);
+	    }
 
 	    SearchResponse<Void> response = client.search(searchRequest, Void.class);
 	    Map<String, Map<String, Aggregate>> aggregations = new HashMap<>();
@@ -395,8 +356,9 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 			result.setTarget("bbox");
 			if (geoBound.bounds() != null) {
 			    TopLeftBottomRightGeoBounds tlbr = geoBound.bounds().tlbr();
-			    result.setValue(tlbr.topLeft().latlon().lon() + " " + tlbr.bottomRight().latlon().lat() + " "
-				    + tlbr.bottomRight().latlon().lon() + " " + tlbr.topLeft().latlon().lat());
+			    result.setValue(
+				    tlbr.topLeft().latlon().lon() + " " + tlbr.bottomRight().latlon().lat() + " " + tlbr.bottomRight()
+					    .latlon().lon() + " " + tlbr.topLeft().latlon().lat());
 			}
 			item.setBBoxUnion(result);
 		    }
@@ -455,6 +417,21 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	}
 
 	return null;
+    }
+
+    /**
+     * @param request
+     */
+    private void debugQuery(SearchRequest request) {
+
+	JacksonJsonpMapper mapper = new JacksonJsonpMapper();
+	StringWriter sw = new StringWriter();
+	JsonGenerator generator = mapper.jsonProvider().createGenerator(sw);
+
+	request.serialize(generator, mapper);
+	generator.close();
+
+	GSLoggerFactory.getLogger(getClass()).debug(sw.toString());
     }
 
     @Override
@@ -563,52 +540,52 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	// Filters aggregation for regions
 	Aggregation regionsAggregation = Aggregation.of(a -> a.filters(f -> f.filters(regionBuckets) //
 	).aggregations(Map.of( //
-		"average_centroid", Aggregation.of(gc -> gc//
-			.geoCentroid(geo -> geo.field("centroid"))//
-		), //
-		"total_unique_location_count", Aggregation.of(c -> c//
-			.cardinality(card -> card.field("uniquePlatformId_keyword"))//
-		), //
-		"providers", Aggregation.of(t -> t//
-			.terms(term -> term//
-				.field("sourceId_keyword")//
-				.size(request.getMaxTermFrequencyItems())//
-				.order(Map.of("unique_location_count", SortOrder.Desc))//
-			)//
-			.aggregations(Map.of(//
-				"unique_location_count", Aggregation.of(c -> c//
-					.cardinality(card -> card.field("uniquePlatformId_keyword"))//
-				), //
-				"top_5_filter", Aggregation.of(bs -> bs//
-					.bucketSort(BucketSortAggregation.of(b -> b//
-						.sort(List.of(//
-							SortOptions.of(s -> s//
-								.field(f -> f.field("unique_location_count").order(SortOrder.Desc))//
+			"average_centroid", Aggregation.of(gc -> gc//
+				.geoCentroid(geo -> geo.field("centroid"))//
+			), //
+			"total_unique_location_count", Aggregation.of(c -> c//
+				.cardinality(card -> card.field("uniquePlatformId_keyword"))//
+			), //
+			"providers", Aggregation.of(t -> t//
+				.terms(term -> term//
+					.field("sourceId_keyword")//
+					.size(request.getMaxTermFrequencyItems())//
+					.order(Map.of("unique_location_count", SortOrder.Desc))//
+				)//
+				.aggregations(Map.of(//
+					"unique_location_count", Aggregation.of(c -> c//
+						.cardinality(card -> card.field("uniquePlatformId_keyword"))//
+					), //
+					"top_5_filter", Aggregation.of(bs -> bs//
+						.bucketSort(BucketSortAggregation.of(b -> b//
+								.sort(List.of(//
+									SortOptions.of(s -> s//
+										.field(f -> f.field("unique_location_count").order(SortOrder.Desc))//
+									)//
+								))//
+								.size(request.getMaxTermFrequencyItems())//
 							)//
-						))//
-						.size(request.getMaxTermFrequencyItems())//
-					)//
-					)//
-				))//
-			)), //
+						)//
+					))//
+				)), //
 
-		"distinct_location_samples", Aggregation.of(agg -> agg //
-			.terms(t -> t //
-				.field("uniquePlatformId_keyword") //
-				.size(request.getMaxResults()) //
-			) //
-			.aggregations("sample_record", subAgg -> subAgg //
-				.topHits(th -> th //
-					.size(1) //
-					.source(src -> src //
-						.filter(flt -> flt.includes("uniquePlatformId", "sourceId", "centroid"))//
+			"distinct_location_samples", Aggregation.of(agg -> agg //
+				.terms(t -> t //
+					.field("uniquePlatformId_keyword") //
+					.size(request.getMaxResults()) //
+				) //
+				.aggregations("sample_record", subAgg -> subAgg //
+					.topHits(th -> th //
+						.size(1) //
+						.source(src -> src //
+							.filter(flt -> flt.includes("uniquePlatformId", "sourceId", "centroid"))//
+						)//
 					)//
 				)//
+
 			)//
 
-		)//
-
-	)
+		)
 
 	));
 
@@ -796,8 +773,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	int size = message.getPage() == null ? 1000 : Math.min(1000, message.getPage().getSize());
 
-	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder()
-		.terms(t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
+	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder().terms(
+		t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
 
 	org.opensearch.client.opensearch._types.aggregations.CompositeAggregation.Builder cab = new CompositeAggregation.Builder();
 	cab = cab.size(size).sources(Map.of(queryable.getName(), stationIdSource));
@@ -865,8 +842,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	int size = Math.min(1000, message.getPage().getSize());
 
-	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder()
-		.terms(t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
+	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder().terms(
+		t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
 
 	org.opensearch.client.opensearch._types.aggregations.CompositeAggregation.Builder cab = new CompositeAggregation.Builder();
 	cab = cab.size(size).sources(Map.of(queryable.getName(), stationIdSource));
@@ -880,10 +857,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	List<String> includeList = new ArrayList<>(message.getResourceSelector().getIndexes());
 
-	Aggregation topHitsAgg = new Aggregation.Builder()
-		.topHits(th -> th.size(1).source(src -> src.filter(f -> f.includes(includeList)))
-			.sort(sort -> sort.field(f -> f.field(IndexMapping.toKeywordField(queryable.getName())).order(SortOrder.Desc))))
-		.build();
+	Aggregation topHitsAgg = new Aggregation.Builder().topHits(th -> th.size(1).source(src -> src.filter(f -> f.includes(includeList)))
+		.sort(sort -> sort.field(f -> f.field(IndexMapping.toKeywordField(queryable.getName())).order(SortOrder.Desc)))).build();
 
 	Aggregation distinctsAggregation = new Aggregation.Builder().composite(compositeAgg)
 		.aggregations(Map.of("sample_record", topHitsAgg)).build();

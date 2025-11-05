@@ -62,6 +62,7 @@ import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
+import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.ExtensionHandler;
@@ -423,7 +424,22 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		dataset.getExtensionHandler().setDataDisclaimer(value);
 		continue;
 	    }
-
+	    if (key.equalsIgnoreCase("territory_of_origin")) {
+		if (value.contains("codes.wmo.int")) {
+		    value = value.replace("http://codes.wmo.int/wmdr/TerritoryName/", "");
+		    value = value.replace("https://codes.wmo.int/wmdr/TerritoryName/", "");
+		    Country country = Country.decode(value);
+		    if (country!=null) {
+			dataset.getExtensionHandler().setCountry(country.getShortName());
+			dataset.getExtensionHandler().setCountryISO3(country.getISO3());
+		    }else {
+			dataset.getExtensionHandler().setCountry(value);
+		    }		    
+		    continue;
+		}
+		dataset.getExtensionHandler().setCountry(value);
+		continue;
+	    }
 	    if (key.toLowerCase().startsWith("organization_")) {
 
 		String[] values = value.split(",");
