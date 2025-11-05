@@ -10,12 +10,12 @@ package eu.essi_lab.messages;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -51,20 +51,19 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     public enum IterationMode {
 
 	/**
-	 * Returns <i>all the available items</i> according to the message properties,
-	 * and the page size of every request during the iteration process is set
-	 * according {@link #getPage()}.getSize()
+	 * Returns <i>all the available items</i> according to the message properties, and the page size of every request during the
+	 * iteration process is set according {@link #getPage()}.getSize()
 	 */
 	FULL_RESPONSE,
 	/**
-	 * Returns a maximum of {@link #getPage()}.getSize() records, and the page size
-	 * of every request during the iteration process is fixed to <i>10</i>
+	 * Returns a maximum of {@link #getPage()}.getSize() records, and the page size of every request during the iteration process is
+	 * fixed to <i>10</i>
 	 */
 	PARTIAL_RESPONSE
     }
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3898362167520217358L;
     private static final String WEB_REQUEST = "webRequest";
@@ -107,7 +106,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     }
 
     /**
-     * 
+     *
      */
     public RequestMessage() {
 
@@ -128,7 +127,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 	RequestMessage message = new RequestMessage() {
 
 	    /**
-	     * 
+	     *
 	     */
 	    private static final long serialVersionUID = 1L;
 
@@ -151,7 +150,16 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public String getRequestId() {
 
-	return requestId;
+	return getRequestId(false);
+    }
+
+    /**
+     * @param clean
+     * @return
+     */
+    public String getRequestId(boolean clean) {
+
+	return clean ? requestId.contains("@") ? requestId.substring(requestId.indexOf("@") + 1) : requestId : requestId;
     }
 
     /**
@@ -170,7 +178,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     /**
      * Gets the request timeout in seconds
-     * 
+     *
      * @return
      */
     public Integer getRequestTimeout() {
@@ -180,7 +188,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     /**
      * Sets the request timeout in seconds
-     * 
+     *
      * @param timeout
      */
     public void setRequestTimeout(Integer timeout) {
@@ -314,10 +322,9 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     }
 
     /**
-     * If set to <code>true</code> the output content of this discovery query must
-     * be generated from {@link #getSources()} instead of from the {@link ResultSet}
-     * S
-     * 
+     * If set to <code>true</code> the output content of this discovery query must be generated from {@link #getSources()} instead of from
+     * the {@link ResultSet} S
+     *
      * @param set
      */
     public void setOutputSources(boolean set) {
@@ -326,9 +333,8 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     }
 
     /**
-     * Retrieves the ordered list of sources related to this discovery message
-     * Default value: empty {@link GSSource}s list
-     * 
+     * Retrieves the ordered list of sources related to this discovery message Default value: empty {@link GSSource}s list
+     *
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -339,7 +345,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     /**
      * Sets the ordered list of sources related to this discovery message
-     * 
+     *
      * @param sources
      */
     public void setSources(List<GSSource> sources) {
@@ -349,7 +355,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     /**
      * Default value: a non null {@link GSException}
-     * 
+     *
      * @return
      */
     public GSException getException() {
@@ -423,7 +429,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     }
 
     /*
-     * 
+     *
      */
     public void setSearchAfter(SearchAfter searchAfter) {
 
