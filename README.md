@@ -53,10 +53,10 @@ Finally, it's possible to launch DAB services on a single node configuration by 
 <code>mvn jetty:run -Ppreconfigured -DdbUser=XXX -DdbPassword=XXX -DquartzUser=root -DquartzPassword=XXX -DadminUser=XXX -DgoogleClientId=XXX -DgoogleClientSecret=XXX</code>
 
 The DAB will launch using a preconfigured configuration where:
-- dbUser/dbPassword are the credentials of a Marklogic db installed on localhost (8002/8004 ports)
+- dbUser/dbPassword are the credentials of a db installed on localhost (9200 port by default for OpenSearch db)
 - quartzUser/quartzPassword are the credentials of a mysql db installed on localhost  (3306 port)
 - adminUser/googleClientId/googleClientSecret are the Google OAuth credentials previously obtained through Google
-- an ElasticSearch instance installed on localhost will receive statistics (9200 port)
+- an OpenSearhc instance installed on localhost will receive statistics (9200 port)
 
 The DAB can then be configured at the URL: 
 
@@ -354,7 +354,7 @@ Previous members of the development team:
 	
 ESSI-Lab would like to credit all the maintainers and developers of the third party services and technologies that DAB uses. They include:
 	
-- MarkLogic Server
+- OpenSearch
 - MySQL
 - ElasticSearch
 - Amazon AWS

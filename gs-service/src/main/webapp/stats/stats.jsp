@@ -294,15 +294,31 @@ if (!csv) {
     css.append("    gap: 16px;\n");
     css.append("    justify-content: space-between;\n");
     css.append("    padding: 16px 20px;\n");
-    css.append("    border: none;\n");
-    css.append("    background: transparent;\n");
-    css.append("    cursor: pointer;\n");
     css.append("    font-size: 1em;\n");
     css.append("    font-family: inherit;\n");
     css.append("    text-align: left;\n");
+    css.append("    flex-wrap: wrap;\n");
     css.append("}\n");
-    css.append(".org-summary:hover {\n");
+    css.append(".org-summary-toggle {\n");
+    css.append("    border: none;\n");
+    css.append("    background: transparent;\n");
+    css.append("    cursor: pointer;\n");
+    css.append("}\n");
+    css.append(".org-summary-toggle:hover {\n");
     css.append("    background: #f3f6fa;\n");
+    css.append("}\n");
+    css.append(".org-summary-static {\n");
+    css.append("    border: none;\n");
+    css.append("    background: transparent;\n");
+    css.append("    cursor: default;\n");
+    css.append("}\n");
+    css.append(".org-summary .org-meta {\n");
+    css.append("    display: flex;\n");
+    css.append("    align-items: center;\n");
+    css.append("    gap: 12px;\n");
+    css.append("    margin-left: auto;\n");
+    css.append("    flex-wrap: wrap;\n");
+    css.append("    justify-content: flex-end;\n");
     css.append("}\n");
     css.append(".org-summary .org-name {\n");
     css.append("    font-weight: 600;\n");
@@ -454,8 +470,8 @@ if (sourceId == null || sourceId.isEmpty()) {
 	}
 
 	java.util.Map<String, OrgEntry> orgMap = new java.util.LinkedHashMap<>();
-	for (TermFrequencyItem fitem : orgs) {
-	    Map<String, String> properties = fitem.getNestedProperties();
+		for (TermFrequencyItem fitem : orgs) {
+		    Map<String, String> properties = fitem.getNestedProperties();
 	    String orgName = properties != null ? trimToNull(properties.get("orgName")) : null;
 	    if (orgName == null) {
 		orgName = unknownOrganization;
@@ -479,7 +495,7 @@ if (sourceId == null || sourceId.isEmpty()) {
 		String email = trimToNull(properties.get("email"));
 		String homepage = trimToNull(properties.get("homePageURL"));
 
-		if (individualName != null) {
+		    if (individualName != null) {
 		    contact.put("individualName", individualName);
 		}
 		if (email != null) {
@@ -520,7 +536,7 @@ if (sourceId == null || sourceId.isEmpty()) {
 	int orgIdx = 0;
 	for (OrgEntry entry : orderedOrgEntries) {
 	    List<String> roleList = new ArrayList<>(entry.roles);
-	    roleList.sort(String.CASE_INSENSITIVE_ORDER);
+	    Collections.sort(roleList, String.CASE_INSENSITIVE_ORDER);
 
 	    String rolesSummary;
 	    if (roleList.isEmpty()) {
@@ -528,21 +544,8 @@ if (sourceId == null || sourceId.isEmpty()) {
 	    } else if (roleList.size() == 1) {
 		rolesSummary = "Role: " + roleList.get(0);
 	    } else {
-		rolesSummary = "Roles: " + String.join(", ", roleList);
+		rolesSummary = "Roles: " + joinWithSeparator(roleList, ", ");
 	    }
-
-	    String detailsId = "org-details-" + orgIdx++;
-	    orgHtml.append("<div class='org-card'>");
-	    orgHtml.append("<button class='org-summary' type='button' data-target='").append(detailsId)
-		    .append("' aria-controls='").append(detailsId).append("' aria-expanded='false'>");
-	    orgHtml.append("<span class='org-name'>").append(escapeHtml(entry.name)).append("</span>");
-	    orgHtml.append("<span class='org-meta'>");
-	    orgHtml.append("<span class='org-roles'>").append(escapeHtml(rolesSummary)).append("</span>");
-	    orgHtml.append("<span class='org-count'>").append(entry.totalCount).append("</span>");
-	    orgHtml.append("</span>");
-	    orgHtml.append("<span class='org-toggle'>").append(escapeHtml(showContributorsLabel)).append("</span>");
-	    orgHtml.append("</button>");
-	    orgHtml.append("<div class='org-details' id='").append(detailsId).append("' hidden>");
 
 	    List<Map<String, String>> contactEntries = new ArrayList<>(entry.contacts);
 	    Collections.sort(contactEntries, new Comparator<Map<String, String>>() {
@@ -560,40 +563,88 @@ if (sourceId == null || sourceId.isEmpty()) {
 		}
 	    });
 
-	    for (Map<String, String> contact : contactEntries) {
-		String contactName = contact.get("individualName");
-		String contactRole = contact.get("role");
-		String contactEmail = contact.get("email");
-		String contactHomepage = contact.get("homePageURL");
-		String contactCount = contact.get("count");
-		if (contactCount == null) {
-		    contactCount = "0";
+	    boolean singleUnnamedNoMeta = false;
+	    if (contactEntries.size() == 1) {
+		Map<String, String> onlyContact = contactEntries.get(0);
+		String singleName = trimToNull(onlyContact.get("individualName"));
+		String singleRole = trimToNull(onlyContact.get("role"));
+		String singleEmail = trimToNull(onlyContact.get("email"));
+		String singleHomepage = trimToNull(onlyContact.get("homePageURL"));
+		if (singleName == null && singleRole == null && singleEmail == null && singleHomepage == null) {
+		    singleUnnamedNoMeta = true;
 		}
+	    }
 
-		orgHtml.append("<div class='org-contact'>");
-		String displayName = contactName != null ? contactName : "Unnamed contributor";
-		orgHtml.append("<div class='org-contact-name'>").append(escapeHtml(displayName)).append(" (")
+	    boolean showContributorToggle = !singleUnnamedNoMeta && !contactEntries.isEmpty();
+
+	    StringBuilder contactHtml = new StringBuilder();
+	    if (!singleUnnamedNoMeta) {
+		for (Map<String, String> contact : contactEntries) {
+		    String contactName = contact.get("individualName");
+		    String contactRole = contact.get("role");
+		    String contactEmail = contact.get("email");
+		    String contactHomepage = contact.get("homePageURL");
+		    String contactCount = contact.get("count");
+		    if (contactCount == null) {
+			contactCount = "0";
+		    }
+
+		    contactHtml.append("<div class='org-contact'>");
+		    String displayName = contactName != null ? contactName : "Unnamed contributor";
+		    contactHtml.append("<div class='org-contact-name'>").append(escapeHtml(displayName)).append(" (")
 			.append(escapeHtml(contactCount)).append(")</div>");
 
-		List<String> metaParts = new ArrayList<>();
-		if (contactRole != null) {
-		    metaParts.add("<span class='org-role-label'>" + escapeHtml(contactRole) + "</span>");
+		    List<String> metaParts = new ArrayList<>();
+		    if (contactRole != null) {
+			metaParts.add("<span class='org-role-label'>" + escapeHtml(contactRole) + "</span>");
+		    }
+		    if (contactEmail != null) {
+			String safeEmail = escapeHtml(contactEmail);
+			metaParts.add("<a href='mailto:" + safeEmail + "'>" + safeEmail + "</a>");
+		    }
+		    if (contactHomepage != null) {
+			String safeHomepage = escapeHtml(contactHomepage);
+			metaParts.add("<a href='" + safeHomepage + "' target='_blank' rel='noopener'>Website</a>");
+		    }
+		    if (!metaParts.isEmpty()) {
+			contactHtml.append("<div class='org-contact-meta'>")
+			    .append(joinWithSeparator(metaParts, "<span class='org-meta-sep'>&#8226;</span>")).append("</div>");
+		    }
+		    contactHtml.append("</div>");
 		}
-		if (contactEmail != null) {
-		    String safeEmail = escapeHtml(contactEmail);
-		    metaParts.add("<a href='mailto:" + safeEmail + "'>" + safeEmail + "</a>");
-		}
-		if (contactHomepage != null) {
-		    String safeHomepage = escapeHtml(contactHomepage);
-		    metaParts.add("<a href='" + safeHomepage + "' target='_blank' rel='noopener'>Website</a>");
-		}
-		if (!metaParts.isEmpty()) {
-		    orgHtml.append("<div class='org-contact-meta'>")
-			    .append(String.join("<span class='org-meta-sep'>&#8226;</span>", metaParts)).append("</div>");
-		}
+	    }
+
+	    boolean hasContactDetails = contactHtml.length() > 0;
+
+	    String detailsId = "org-details-" + orgIdx++;
+	    orgHtml.append("<div class='org-card'>");
+	    if (showContributorToggle && hasContactDetails) {
+		orgHtml.append("<button class='org-summary org-summary-toggle' type='button' data-target='").append(detailsId)
+		    .append("' aria-controls='").append(detailsId).append("' aria-expanded='false'>");
+	    } else {
+		orgHtml.append("<div class='org-summary org-summary-static'>");
+	    }
+	    orgHtml.append("<span class='org-name'>").append(escapeHtml(entry.name)).append("</span>");
+	    orgHtml.append("<span class='org-meta'>");
+	    orgHtml.append("<span class='org-roles'>").append(escapeHtml(rolesSummary)).append("</span>");
+	    orgHtml.append("<span class='org-count'>").append(entry.totalCount).append("</span>");
+	    orgHtml.append("</span>");
+	    if (showContributorToggle && hasContactDetails) {
+		orgHtml.append("<span class='org-toggle'>").append(escapeHtml(showContributorsLabel)).append("</span>");
+		orgHtml.append("</button>");
+	    } else {
 		orgHtml.append("</div>");
 	    }
-	    orgHtml.append("</div>");
+
+	    if (hasContactDetails) {
+		if (showContributorToggle) {
+		    orgHtml.append("<div class='org-details' id='").append(detailsId).append("' hidden>");
+		} else {
+		    orgHtml.append("<div class='org-details org-details-static'>");
+		}
+		orgHtml.append(contactHtml.toString());
+		orgHtml.append("</div>");
+	    }
 	    orgHtml.append("</div>");
 	}
 	orgHtml.append("</div>");
@@ -603,7 +654,7 @@ if (sourceId == null || sourceId.isEmpty()) {
 	out.println("</li>");
 	StringBuilder orgScript = new StringBuilder();
 	orgScript.append("<script>\n");
-	orgScript.append("document.querySelectorAll('.org-summary').forEach(function(btn) {\n");
+	orgScript.append("document.querySelectorAll('.org-summary-toggle').forEach(function(btn) {\n");
 	orgScript.append("  if (btn.dataset.bound === 'true') { return; }\n");
 	orgScript.append("  btn.dataset.bound = 'true';\n");
 	orgScript.append("  btn.addEventListener('click', function() {\n");
