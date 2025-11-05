@@ -65,6 +65,13 @@ import java.util.Map.Entry;
  */
 public class OpenSearchExecutor implements DatabaseExecutor {
 
+    public static final String GROUP_BY_AGGREGATION = "groupBy";
+    public static final String BBOX_AGGREGATION = "bbox";
+    public static final String TIME_MIN_AGGREGATION = "time-min";
+    public static final String TIME_MAX_AGGREGATION = "time-max";
+    public static final String TIME_NOW_AGGREGATION = "time-now";
+    private static String lastBond = null;
+    private static Query lastQuery = null;
     private Database database;
     private OpenSearchClient client;
     private OpenSearchFinder finder;
@@ -72,6 +79,12 @@ public class OpenSearchExecutor implements DatabaseExecutor {
     @Override
     public boolean supports(StorageInfo dbUri) {
 	return OpenSearchDatabase.isSupported(dbUri);
+    }
+
+    @Override
+    public Database getDatabase() {
+
+	return database;
     }
 
     @Override
@@ -86,12 +99,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
     }
 
     @Override
-    public Database getDatabase() {
-
-	return database;
-    }
-
-    @Override
     public void clearDeletedRecords() throws GSException {
 
     }
@@ -101,12 +108,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	return 0;
     }
-
-    public static final String GROUP_BY_AGGREGATION = "groupBy";
-    public static final String BBOX_AGGREGATION = "bbox";
-    public static final String TIME_MIN_AGGREGATION = "time-min";
-    public static final String TIME_MAX_AGGREGATION = "time-max";
-    public static final String TIME_NOW_AGGREGATION = "time-now";
 
     @Override
     public StatisticsResponse compute(StatisticsMessage message) throws GSException {
@@ -419,21 +420,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	return null;
     }
 
-    /**
-     * @param request
-     */
-    private void debugQuery(SearchRequest request) {
-
-	JacksonJsonpMapper mapper = new JacksonJsonpMapper();
-	StringWriter sw = new StringWriter();
-	JsonGenerator generator = mapper.jsonProvider().createGenerator(sw);
-
-	request.serialize(generator, mapper);
-	generator.close();
-
-	GSLoggerFactory.getLogger(getClass()).debug(sw.toString());
-    }
-
     @Override
     public List<String> retrieveEiffelIds(DiscoveryMessage message, int start, int count) throws GSException {
 
@@ -451,9 +437,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	return null;
     }
-
-    private static String lastBond = null;
-    private static Query lastQuery = null;
 
     @Override
     public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
@@ -722,44 +705,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
     }
 
-    private Query getQuery(Bond constraints, View view) throws GSException {
-	DiscoveryMessage message = new DiscoveryMessage();
-	List<Bond> bonds = new ArrayList<>();
-	if (constraints != null) {
-	    bonds.add(constraints);
-	}
-	if (view != null && view.getBond() != null) {
-	    // message.setSources(ConfigurationWrapper.getViewSources(request.getView()));
-	    bonds.add(view.getBond());
-	}
-	switch (bonds.size()) {
-	case 0:
-	    // nothing to do
-	    break;
-	case 1:
-	    message.setUserBond(bonds.getFirst());
-	    message.setPermittedBond(bonds.getFirst());
-	    break;
-	default:
-	    message.setUserBond(BondFactory.createAndBond(bonds));
-	    message.setPermittedBond(BondFactory.createAndBond(bonds));
-	    break;
-	}
-
-	Query tmp = null;
-	if (!bonds.isEmpty()) {
-	    String s = bonds.toString();
-	    if (lastBond != null && lastBond.equals(s)) {
-		tmp = lastQuery;
-	    } else {
-		tmp = finder.buildQuery(message, true);
-		lastBond = s;
-		lastQuery = tmp;
-	    }
-	}
-	return tmp;
-    }
-
     @Override
     public ResultSet<TermFrequencyItem> getIndexValues(DiscoveryMessage message, Queryable queryable, int count, String resumptionToken)
 	    throws GSException {
@@ -913,6 +858,59 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	}
 	return ret;
 
+    }
+
+    /**
+     * @param request
+     */
+    private void debugQuery(SearchRequest request) {
+
+	JacksonJsonpMapper mapper = new JacksonJsonpMapper();
+	StringWriter sw = new StringWriter();
+	JsonGenerator generator = mapper.jsonProvider().createGenerator(sw);
+
+	request.serialize(generator, mapper);
+	generator.close();
+
+	GSLoggerFactory.getLogger(getClass()).debug(sw.toString());
+    }
+
+    private Query getQuery(Bond constraints, View view) throws GSException {
+	DiscoveryMessage message = new DiscoveryMessage();
+	List<Bond> bonds = new ArrayList<>();
+	if (constraints != null) {
+	    bonds.add(constraints);
+	}
+	if (view != null && view.getBond() != null) {
+	    // message.setSources(ConfigurationWrapper.getViewSources(request.getView()));
+	    bonds.add(view.getBond());
+	}
+	switch (bonds.size()) {
+	case 0:
+	    // nothing to do
+	    break;
+	case 1:
+	    message.setUserBond(bonds.getFirst());
+	    message.setPermittedBond(bonds.getFirst());
+	    break;
+	default:
+	    message.setUserBond(BondFactory.createAndBond(bonds));
+	    message.setPermittedBond(BondFactory.createAndBond(bonds));
+	    break;
+	}
+
+	Query tmp = null;
+	if (!bonds.isEmpty()) {
+	    String s = bonds.toString();
+	    if (lastBond != null && lastBond.equals(s)) {
+		tmp = lastQuery;
+	    } else {
+		tmp = finder.buildQuery(message, true);
+		lastBond = s;
+		lastQuery = tmp;
+	    }
+	}
+	return tmp;
     }
 
 }
