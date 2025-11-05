@@ -5,7 +5,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 /*-
  * #%L
@@ -50,6 +53,7 @@ import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.authorization.userfinder.UserFinder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.gssrv.portal.PortalTranslator;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.OutputFormat;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Profile;
@@ -58,18 +62,24 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.stats.ComputationResult;
 import eu.essi_lab.messages.stats.ResponseItem;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.index.jaxb.CardinalValues;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
+import eu.essi_lab.profiler.semantic.Stats;
 import eu.essi_lab.request.executor.IStatisticsExecutor;
 
 @WebService
@@ -112,6 +122,162 @@ public class SupportService {
 	output = callback + "(" + output + ")";
 
 	return Response.ok(output, MediaType.APPLICATION_JSON).build();
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("/metadata-stats")
+    public Response metadataStats(//
+	    @QueryParam("view") String viewId, @QueryParam("source") String sourceId, @QueryParam("token") String token,
+	    @QueryParam("language") String language) { //
+	JSONObject output = new JSONObject();
+	JSONArray statsArray = new JSONArray();
+	output.put("stats", statsArray);
+	PortalTranslator translator = new PortalTranslator(language);
+	StatisticsMessage statisticsMessage = new StatisticsMessage();
+	View view = null;
+	try {
+	    view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId).get();
+	} catch (GSException e) {
+	    e.printStackTrace();
+	}
+
+	List<GSSource> sources = ConfigurationWrapper.getViewSources(view);
+
+	// set the required properties
+	statisticsMessage.setSources(sources);
+	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+
+	// set the view
+
+	try {
+	    WebRequestTransformer.setView(//
+		    viewId, //
+		    statisticsMessage.getDataBaseURI(), //
+		    statisticsMessage);
+	} catch (GSException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+
+	// set the user bond
+	if (sourceId != null && !sourceId.isEmpty()) {
+	    statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(sourceId));
+	}
+
+	// groups by source id
+	statisticsMessage.groupBy(ResourceProperty.SOURCE_ID);
+
+	// pagination works with grouped results. in this case there is one result item for each source.
+	// in order to be sure to get all the items in the same statistics response,
+	// we set the count equals to number of sources
+
+	statisticsMessage.setPage(new Page(1, 100));
+
+	// computes union of bboxes
+	statisticsMessage.computeBboxUnion();
+	List<Queryable> minArray = new ArrayList<>();
+	minArray.add(MetadataElement.ELEVATION_MIN);
+	statisticsMessage.computeMin(minArray);
+	List<Queryable> maxArray = new ArrayList<>();
+	maxArray.add(MetadataElement.ELEVATION_MAX);
+	statisticsMessage.computeMax(maxArray);
+	statisticsMessage.computeTempExtentUnion();
+	List<Queryable> freqs = new ArrayList<>();
+	freqs.add(MetadataElement.ORGANIZATION);
+	freqs.add(MetadataElement.ATTRIBUTE_TITLE);
+	statisticsMessage.computeFrequency(freqs, 1000);
+	List<Queryable> distArray = new ArrayList<>();
+	distArray.add(MetadataElement.ATTRIBUTE_TITLE);
+	distArray.add(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
+	distArray.add(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+	distArray.add(MetadataElement.IDENTIFIER);
+	// computes count distinct of 2 queryables
+	statisticsMessage.countDistinct(distArray);
+
+	// statisticsMessage.computeSum(Arrays.asList(MetadataElement.DATA_SIZE));
+
+	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
+	IStatisticsExecutor executor = loader.iterator().next();
+
+	StatisticsResponse statResponse = null;
+	try {
+	    statResponse = executor.compute(statisticsMessage);
+	} catch (GSException e) {
+	    e.printStackTrace();
+	    return Response.serverError().entity("").build();
+	}
+	List<ResponseItem> items = statResponse.getItems();
+	HashMap<String, Stats> smap = new HashMap<>();
+	for (ResponseItem responseItem : items) {
+	    String id = responseItem.getGroupedBy().isPresent() ? responseItem.getGroupedBy().get() : null;
+	    GSSource source = ConfigurationWrapper.getSource(id);
+	    JSONObject stat = new JSONObject();
+	    stat.put("source", id);
+	    stat.put("source-label", source.getLabel());
+	    // stat.put(", false)
+
+	    JSONArray orgs = toJSON(responseItem.getFrequency(MetadataElement.ORGANIZATION));
+	    stat.put("organization-stats", orgs);
+
+	    JSONArray frequencies = toJSON(responseItem.getFrequency(MetadataElement.ATTRIBUTE_TITLE));
+	    stat.put("attribute-stats", frequencies);
+
+	    stat.put("site-count", responseItem.getCountDistinct(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER).get().getValue());
+	    stat.put("unique-attribute-count", responseItem.getCountDistinct(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER).get().getValue());
+	    stat.put("attribute-count", responseItem.getCountDistinct(MetadataElement.ATTRIBUTE_TITLE).get().getValue());
+	    stat.put("timeseries-count", responseItem.getCountDistinct(MetadataElement.IDENTIFIER).get().getValue());
+	    Optional<CardinalValues> cardinalValues = responseItem.getBBoxUnion().getCardinalValues();
+	    String union = responseItem.getTempExtentUnion().getValue();
+	    String begin = union.split(" ")[0];
+	    String end = union.split(" ")[1];
+	    if (cardinalValues.isPresent()) {
+		stat.put("east", Double.parseDouble(cardinalValues.get().getEast()));
+		stat.put("north", Double.parseDouble(cardinalValues.get().getNorth()));
+		stat.put("south", Double.parseDouble(cardinalValues.get().getSouth()));
+		stat.put("west", Double.parseDouble(cardinalValues.get().getWest()));
+
+	    }
+	    stat.put("begin", begin);
+	    stat.put("end", end);
+	    if (responseItem.getMin(MetadataElement.ELEVATION_MIN).isPresent()) {
+		stat.put("minimimum-elevation", responseItem.getMin(MetadataElement.ELEVATION_MIN).get().getValue());
+	    }
+	    if (responseItem.getMin(MetadataElement.ELEVATION_MAX).isPresent()) {
+		stat.put("maximum-elevation", responseItem.getMin(MetadataElement.ELEVATION_MAX).get().getValue());
+	    }
+
+	    statsArray.put(stat);
+	}
+	return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
+    }
+
+    private JSONArray toJSON(Optional<ComputationResult> propFreq) {
+	JSONArray frequencies = new JSONArray();
+
+	if (propFreq.isPresent()) {
+	    ComputationResult of = propFreq.get();
+	    List<TermFrequencyItem> fitems = of.getFrequencyItems();
+	    for (TermFrequencyItem fitem : fitems) {
+		JSONObject frequency = new JSONObject();
+		frequency.put("term", fitem.getTerm());
+		frequency.put("label", fitem.getLabel());
+		frequency.put("count", fitem.getFreq());
+		Map<String, String> props = fitem.getNestedProperties();
+		if (props != null) {
+		    JSONObject properties = new JSONObject();
+		    frequency.put("properties", properties);
+		    Set<Entry<String, String>> entries = props.entrySet();
+		    for (Entry<String, String> entry : entries) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+			properties.put(key, value);
+		    }
+		}
+		frequencies.put(frequency);
+	    }
+	}
+	return frequencies;
     }
 
     @GET
@@ -274,7 +440,7 @@ public class SupportService {
 
     @SuppressWarnings("rawtypes")
     private LoginResponse getLoginResponse(LoginRequest request) {
-	
+
 	try {
 
 	    UserFinder uf = UserFinder.create();
@@ -303,19 +469,19 @@ public class SupportService {
 		if (request.getApiKey().equals(user.getUri()) && request.getEmail().equals(email)) {
 
 		    LoginResponse response = new LoginResponse(//
-			    true,//
-			    "Login successful",//
-			    user.getStringPropertyValue("firstName").get(),//
-			    user.getStringPropertyValue("lastName").get(),// 
-			    request.getEmail(),//
+			    true, //
+			    "Login successful", //
+			    user.getStringPropertyValue("firstName").get(), //
+			    user.getStringPropertyValue("lastName").get(), //
+			    request.getEmail(), //
 			    request.getApiKey());
 
 		    response.setPermissions(user.getStringPropertyValue("permissions").get());
 
 		    response.setUser(user);
-		    
+
 		    List<String> adminUsers = ConfigurationWrapper.getAdminUsers();
-		   
+
 		    if (adminUsers != null) {
 			for (String adminUser : adminUsers) {
 			    if (user.getUri().equals(adminUser) || request.getEmail().equals(adminUser)) {
@@ -323,7 +489,7 @@ public class SupportService {
 			    }
 			}
 		    }
-		    
+
 		    return response;
 		}
 	    }

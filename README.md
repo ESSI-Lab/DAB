@@ -365,7 +365,7 @@ ESSI-Lab would like to credit all the maintainers and developers of the third pa
 - Docker
 - Kubernetes
 	
-See the `THIRD-PARTIES` file for third-party license notices.
+See the `THIRD-PARTY` file for third-party license notices.
 
 <div> Icons appearing on this page are made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
 
