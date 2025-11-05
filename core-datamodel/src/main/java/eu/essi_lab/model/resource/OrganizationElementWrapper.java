@@ -10,12 +10,12 @@ package eu.essi_lab.model.resource;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -33,12 +33,20 @@ public class OrganizationElementWrapper {
     private ComposedElement element;
 
     /**
+     * @param element
+     */
+    private OrganizationElementWrapper(ComposedElement element) {
+
+	this.element = element;
+    }
+
+    /**
      * @param name
      * @return
      */
     public static ComposedElement build() {
 
-	return ComposedElementBuilder.get("organization").//
+	return ComposedElementBuilder.get("organization_v2").//
 
 		addItem("orgName", Queryable.ContentType.TEXTUAL).//
 		addItem("orgURI", Queryable.ContentType.TEXTUAL).//
@@ -47,6 +55,7 @@ public class OrganizationElementWrapper {
 		addItem("email", Queryable.ContentType.TEXTUAL).//
 		addItem("role", Queryable.ContentType.TEXTUAL).//
 		addItem("homePageURL", Queryable.ContentType.TEXTUAL).//
+		addItem("hash", Queryable.ContentType.TEXTUAL).//
 		build();
     }
 
@@ -69,9 +78,33 @@ public class OrganizationElementWrapper {
     /**
      * @return
      */
+    public String getHash() {
+
+	return element.getProperty("hash").get().getStringValue();
+    }
+
+    /**
+     * @param hash
+     */
+    public void setHash(String hash) {
+
+	element.getProperty("hash").get().setValue(hash);
+    }
+
+    /**
+     * @return
+     */
     public String getOrgName() {
 
 	return element.getProperty("orgName").get().getStringValue();
+    }
+
+    /**
+     * @param orgName
+     */
+    public void setOrgName(String orgName) {
+
+	element.getProperty("orgName").get().setValue(orgName);
     }
 
     /**
@@ -91,11 +124,27 @@ public class OrganizationElementWrapper {
     }
 
     /**
+     * @param individualName
+     */
+    public void setIndividualName(String individualName) {
+
+	element.getProperty("individualName").get().setValue(individualName);
+    }
+
+    /**
      * @return
      */
     public String getIndividualURI() {
 
 	return element.getProperty("individualURI").get().getStringValue();
+    }
+
+    /**
+     * @param individualURI
+     */
+    public void setIndividualURI(String individualURI) {
+
+	element.getProperty("individualURI").get().setValue(individualURI);
     }
 
     /**
@@ -107,6 +156,14 @@ public class OrganizationElementWrapper {
     }
 
     /**
+     * @param email
+     */
+    public void setEmail(String email) {
+
+	element.getProperty("email").get().setValue(email);
+    }
+
+    /**
      * @return
      */
     public String getRole() {
@@ -115,11 +172,27 @@ public class OrganizationElementWrapper {
     }
 
     /**
+     * @param role
+     */
+    public void setRole(String role) {
+
+	element.getProperty("role").get().setValue(role);
+    }
+
+    /**
      * @return
      */
     public String getHomePageURL() {
 
 	return element.getProperty("homePageURL").get().getStringValue();
+    }
+
+    /**
+     * @param URL
+     */
+    public void setHomePageURL(String url) {
+
+	element.getProperty("homePageURL").get().setValue(url);
     }
 
     /**
@@ -133,65 +206,9 @@ public class OrganizationElementWrapper {
     /**
      * @param orgName
      */
-    public void setOrgName(String orgName) {
-
-	element.getProperty("orgName").get().setValue(orgName);
-    }
-
-    /**
-     * @param orgName
-     */
     public void setOrgURI(String orgURI) {
 
 	element.getProperty("orgURI").get().setValue(orgURI);
-    }
-
-    /**
-     * @param individualName
-     */
-    public void setIndividualName(String individualName) {
-
-	element.getProperty("individualName").get().setValue(individualName);
-    }
-
-    /**
-     * @param individualURI
-     */
-    public void setIndividualURI(String individualURI) {
-
-	element.getProperty("individualURI").get().setValue(individualURI);
-    }
-
-    /**
-     * @param email
-     */
-    public void setEmail(String email) {
-
-	element.getProperty("email").get().setValue(email);
-    }
-
-    /**
-     * @param role
-     */
-    public void setRole(String role) {
-
-	element.getProperty("role").get().setValue(role);
-    }
-
-    /**
-     * @param URL
-     */
-    public void setHomePageURL(String url) {
-
-	element.getProperty("homePageURL").get().setValue(url);
-    }
-
-    /**
-     * @param element
-     */
-    private OrganizationElementWrapper(ComposedElement element) {
-
-	this.element = element;
     }
 
 }

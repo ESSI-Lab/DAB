@@ -22,6 +22,8 @@ public class OrganizationElementWrapperTest {
 	Assert.assertNull(wrapper.getOrgName());
 	Assert.assertNull(wrapper.getOrgUri());
 	Assert.assertNull(wrapper.getHomePageURL());
+	Assert.assertNull(wrapper.getHash());
+
 
 	JSONObject json = wrapper.getElement().asJSON();
 
@@ -34,6 +36,7 @@ public class OrganizationElementWrapperTest {
 	Assert.assertNull(fromJSON.getProperty("orgName").get().getStringValue());
 	Assert.assertNull(fromJSON.getProperty("individualURI").get().getStringValue());
 	Assert.assertNull(fromJSON.getProperty("orgURI").get().getStringValue());
+	Assert.assertNull(fromJSON.getProperty("hash").get().getStringValue());
 
 	wrapper.setHomePageURL("homePageURL");
 	wrapper.setEmail("email");
@@ -42,6 +45,7 @@ public class OrganizationElementWrapperTest {
 	wrapper.setOrgName("orgName");
 	wrapper.setIndividualURI("indURI");
 	wrapper.setOrgURI("orgURI");
+	wrapper.setHash("hashValue");
 
 	Assert.assertEquals("homePageURL", wrapper.getHomePageURL());
 	Assert.assertEquals("email", wrapper.getEmail());
@@ -50,6 +54,7 @@ public class OrganizationElementWrapperTest {
 	Assert.assertEquals("orgName", wrapper.getOrgName());
 	Assert.assertEquals("indURI", wrapper.getIndividualURI());
 	Assert.assertEquals("orgURI", wrapper.getOrgUri());
+	Assert.assertEquals("hashValue", wrapper.getHash());
 
 	json = wrapper.getElement().asJSON();
 
@@ -62,5 +67,7 @@ public class OrganizationElementWrapperTest {
 	Assert.assertEquals("orgName", fromJSON.getProperty("orgName").get().getStringValue());
 	Assert.assertEquals("indURI", fromJSON.getProperty("individualURI").get().getStringValue());
 	Assert.assertEquals("orgURI", fromJSON.getProperty("orgURI").get().getStringValue());
+	Assert.assertEquals("hashValue", fromJSON.getProperty("hash").get().getStringValue());
+
     }
 }
