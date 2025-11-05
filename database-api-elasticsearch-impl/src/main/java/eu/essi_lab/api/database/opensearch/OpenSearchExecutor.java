@@ -48,6 +48,7 @@ import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.IndexedMetadataElement;
@@ -58,7 +59,13 @@ import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 import jakarta.json.stream.JsonGenerator;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -255,6 +262,12 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    map.put(TIME_NOW_AGGREGATION, aggregationNow);
 	}
 
+	final String NESTED_HASH_TERMS = "hash_terms";
+	final String NESTED_HASH_SAMPLE = "hash_sample";
+
+	Map<String, List<String>> nestedPropertiesByField = new HashMap<>();
+	nestedPropertiesByField.put(MetadataElement.ORGANIZATION.getName(), Arrays.asList("orgName", "individualName", "role", "email","homePageURL"));
+
 	if (frequencyTargets.isPresent()) {
 	    int max = 10;
 	    if (maxFrequencyItems.isPresent()) {
@@ -262,12 +275,33 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    }
 	    List<Queryable> targets = frequencyTargets.get();
 	    for (Queryable target : targets) {
-		int fmax = max;
 		String fieldName = target.getName();
-		map.put("top-" + target.getName(), Aggregation.of(a -> a.terms(t -> //
-			t.field(DataFolderMapping.toKeywordField(fieldName)) //
-				.size(fmax) //
-		)));
+		if (target.getContentType().equals(ContentType.COMPOSED)) {
+		    List<String> nestedProperties = nestedPropertiesByField.get(fieldName);
+		    // TODO retrieve as well the nested properties
+		    String nestedPath = fieldName;
+		    String hashKeywordField = fieldName + ".hash_keyword";
+		    int fmax = max;
+		    Aggregation hashTermsAgg;
+		    if (nestedProperties != null && !nestedProperties.isEmpty()) {
+			String[] includes = nestedProperties.stream().map(prop -> nestedPath + "." + prop).toArray(String[]::new);
+			Aggregation sampleAgg = Aggregation.of(
+				sub -> sub.topHits(th -> th.size(1).source(src -> src.filter(f -> f.includes(Arrays.asList(includes))))));
+			hashTermsAgg = Aggregation.of(a -> a.terms(t -> t.field(hashKeywordField).size(fmax))
+				.aggregations(Map.of(NESTED_HASH_SAMPLE, sampleAgg)));
+		    } else {
+			hashTermsAgg = Aggregation.of(a -> a.terms(t -> t.field(hashKeywordField).size(fmax)));
+		    }
+		    Aggregation nestedAgg = Aggregation
+			    .of(a -> a.nested(n -> n.path(nestedPath)).aggregations(NESTED_HASH_TERMS, hashTermsAgg));
+		    map.put("top-" + fieldName, nestedAgg);
+		} else {
+		    int fmax = max;
+		    map.put("top-" + fieldName, Aggregation.of(a -> a.terms(t -> //
+		    t.field(DataFolderMapping.toKeywordField(fieldName)) //
+			    .size(fmax) //
+		    )));
+		}
 	    }
 	}
 
@@ -378,9 +412,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 			result.setTarget("bbox");
 			if (geoBound.bounds() != null) {
 			    TopLeftBottomRightGeoBounds tlbr = geoBound.bounds().tlbr();
-			    result.setValue(
-				    tlbr.topLeft().latlon().lon() + " " + tlbr.bottomRight().latlon().lat() + " " + tlbr.bottomRight()
-					    .latlon().lon() + " " + tlbr.topLeft().latlon().lat());
+			    result.setValue(tlbr.topLeft().latlon().lon() + " " + tlbr.bottomRight().latlon().lat() + " "
+				    + tlbr.bottomRight().latlon().lon() + " " + tlbr.topLeft().latlon().lat());
 			}
 			item.setBBoxUnion(result);
 		    }
@@ -409,16 +442,62 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		if (frequencyTargets.isPresent()) {
 		    List<Queryable> targets = frequencyTargets.get();
 		    for (Queryable target : targets) {
+			ComputationResult freq = new ComputationResult();
+			freq.setTarget(target.getName());
+			List<SimpleEntry<String, Long>> occurrences = new ArrayList<>();
+			Map<String, Map<String, String>> nestedProperties = new HashMap<>();
 			Aggregate agg = mapa.get("top-" + target.getName());
-			if (agg != null && agg.isSterms()) {
-			    StringTermsAggregate sterms = agg.sterms();
-			    List<StringTermsBucket> groups = sterms.buckets().array();
-			    ComputationResult freq = new ComputationResult();
-			    freq.setTarget(target.getName());
+			if (target.getContentType().equals(ContentType.COMPOSED)) {
+			    if (agg != null && agg.isNested()) {
+				Aggregate nestedAgg = agg.nested().aggregations().get(NESTED_HASH_TERMS);
+				if (nestedAgg != null && nestedAgg.isSterms()) {
+				    StringTermsAggregate sterms = nestedAgg.sterms();
+				    List<StringTermsBucket> groups = sterms.buckets().array();
+				    List<String> nestedPropsList = nestedPropertiesByField.get(target.getName());
+				    for (StringTermsBucket group : groups) {
+					String value = group.key();
+					long count = group.docCount();
+					occurrences.add(new SimpleEntry<String, Long>(value, count));
+
+					Map<String, String> properties = new HashMap<>();
+					Aggregate sampleAgg = nestedPropsList != null && !nestedPropsList.isEmpty()
+						? group.aggregations().get(NESTED_HASH_SAMPLE)
+						: null;
+					if (sampleAgg != null && sampleAgg.isTopHits()) {
+					    List<Hit<JsonData>> hits = sampleAgg.topHits().hits().hits();
+					    if (!hits.isEmpty()) {
+						JsonData source = hits.get(0).source();
+						if (source != null) {
+						    JsonObject nestedJson = source.toJson().asJsonObject();
+						    Map<String, String> extracted = extractNestedProperties(nestedJson, target.getName(),
+							    nestedPropsList);
+						    properties.putAll(extracted);
+						}
+					    }
+					}
+
+					nestedProperties.put(value, properties);
+				    }
+				}
+			    }
+			    freq.setNestedProperties(nestedProperties);
+			} else {
+			    if (agg != null && agg.isSterms()) {
+				StringTermsAggregate sterms = agg.sterms();
+				List<StringTermsBucket> groups = sterms.buckets().array();
+				for (StringTermsBucket group : groups) {
+				    String value = group.key();
+				    long count = group.docCount();
+				    occurrences.add(new SimpleEntry<String, Long>(value, count));
+				}
+			    }
+			}
+
+			if (!occurrences.isEmpty()) {
 			    StringBuilder frequencyValue = new StringBuilder();
-			    for (StringTermsBucket group : groups) {
-				String value = group.key();
-				long count = group.docCount();
+			    for (SimpleEntry<String, Long> hashOccurrence : occurrences) {
+				String value = hashOccurrence.getKey();
+				Long count = hashOccurrence.getValue();				
 				frequencyValue.append(URLEncoder.encode(value, StandardCharsets.UTF_8))
 					.append(ComputationResult.FREQUENCY_ITEM_SEP).append(count).append(" ");
 			    }
@@ -517,7 +596,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	// }
 	// }
 	// }
-	// }
 
 	Query query = getQuery(request.getConstraints(), request.getView());
 
@@ -544,52 +622,52 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	// Filters aggregation for regions
 	Aggregation regionsAggregation = Aggregation.of(a -> a.filters(f -> f.filters(regionBuckets) //
 	).aggregations(Map.of( //
-			"average_centroid", Aggregation.of(gc -> gc//
-				.geoCentroid(geo -> geo.field("centroid"))//
-			), //
-			"total_unique_location_count", Aggregation.of(c -> c//
-				.cardinality(card -> card.field("uniquePlatformId_keyword"))//
-			), //
-			"providers", Aggregation.of(t -> t//
-				.terms(term -> term//
-					.field("sourceId_keyword")//
-					.size(request.getMaxTermFrequencyItems())//
-					.order(Map.of("unique_location_count", SortOrder.Desc))//
-				)//
-				.aggregations(Map.of(//
-					"unique_location_count", Aggregation.of(c -> c//
-						.cardinality(card -> card.field("uniquePlatformId_keyword"))//
-					), //
-					"top_5_filter", Aggregation.of(bs -> bs//
-						.bucketSort(BucketSortAggregation.of(b -> b//
-								.sort(List.of(//
-									SortOptions.of(s -> s//
-										.field(f -> f.field("unique_location_count").order(SortOrder.Desc))//
-									)//
-								))//
-								.size(request.getMaxTermFrequencyItems())//
+		"average_centroid", Aggregation.of(gc -> gc//
+			.geoCentroid(geo -> geo.field("centroid"))//
+		), //
+		"total_unique_location_count", Aggregation.of(c -> c//
+			.cardinality(card -> card.field("uniquePlatformId_keyword"))//
+		), //
+		"providers", Aggregation.of(t -> t//
+			.terms(term -> term//
+				.field("sourceId_keyword")//
+				.size(request.getMaxTermFrequencyItems())//
+				.order(Map.of("unique_location_count", SortOrder.Desc))//
+			)//
+			.aggregations(Map.of(//
+				"unique_location_count", Aggregation.of(c -> c//
+					.cardinality(card -> card.field("uniquePlatformId_keyword"))//
+				), //
+				"top_5_filter", Aggregation.of(bs -> bs//
+					.bucketSort(BucketSortAggregation.of(b -> b//
+						.sort(List.of(//
+							SortOptions.of(s -> s//
+								.field(f -> f.field("unique_location_count").order(SortOrder.Desc))//
 							)//
-						)//
-					))//
-				)), //
+						))//
+						.size(request.getMaxTermFrequencyItems())//
+					)//
+					)//
+				))//
+			)), //
 
-			"distinct_location_samples", Aggregation.of(agg -> agg //
-				.terms(t -> t //
-					.field("uniquePlatformId_keyword") //
-					.size(request.getMaxResults()) //
-				) //
-				.aggregations("sample_record", subAgg -> subAgg //
-					.topHits(th -> th //
-						.size(1) //
-						.source(src -> src //
-							.filter(flt -> flt.includes("uniquePlatformId", "sourceId", "centroid"))//
-						)//
+		"distinct_location_samples", Aggregation.of(agg -> agg //
+			.terms(t -> t //
+				.field("uniquePlatformId_keyword") //
+				.size(request.getMaxResults()) //
+			) //
+			.aggregations("sample_record", subAgg -> subAgg //
+				.topHits(th -> th //
+					.size(1) //
+					.source(src -> src //
+						.filter(flt -> flt.includes("uniquePlatformId", "sourceId", "centroid"))//
 					)//
 				)//
-
 			)//
 
-		)
+		)//
+
+	)
 
 	));
 
@@ -739,8 +817,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	int size = message.getPage() == null ? 1000 : Math.min(1000, message.getPage().getSize());
 
-	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder().terms(
-		t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
+	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder()
+		.terms(t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
 
 	org.opensearch.client.opensearch._types.aggregations.CompositeAggregation.Builder cab = new CompositeAggregation.Builder();
 	cab = cab.size(size).sources(Map.of(queryable.getName(), stationIdSource));
@@ -808,8 +886,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	int size = Math.min(1000, message.getPage().getSize());
 
-	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder().terms(
-		t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
+	CompositeAggregationSource stationIdSource = new CompositeAggregationSource.Builder()
+		.terms(t -> t.field(IndexMapping.toKeywordField(queryable.getName()))).build();
 
 	org.opensearch.client.opensearch._types.aggregations.CompositeAggregation.Builder cab = new CompositeAggregation.Builder();
 	cab = cab.size(size).sources(Map.of(queryable.getName(), stationIdSource));
@@ -823,8 +901,10 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	List<String> includeList = new ArrayList<>(message.getResourceSelector().getIndexes());
 
-	Aggregation topHitsAgg = new Aggregation.Builder().topHits(th -> th.size(1).source(src -> src.filter(f -> f.includes(includeList)))
-		.sort(sort -> sort.field(f -> f.field(IndexMapping.toKeywordField(queryable.getName())).order(SortOrder.Desc)))).build();
+	Aggregation topHitsAgg = new Aggregation.Builder()
+		.topHits(th -> th.size(1).source(src -> src.filter(f -> f.includes(includeList)))
+			.sort(sort -> sort.field(f -> f.field(IndexMapping.toKeywordField(queryable.getName())).order(SortOrder.Desc))))
+		.build();
 
 	Aggregation distinctsAggregation = new Aggregation.Builder().composite(compositeAgg)
 		.aggregations(Map.of("sample_record", topHitsAgg)).build();
@@ -934,4 +1014,72 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	return tmp;
     }
 
+    private static Map<String, String> extractNestedProperties(JsonObject json, String nestedPath, List<String> properties) {
+	Map<String, String> result = new HashMap<>();
+	if (json == null || properties == null) {
+	    return result;
+	}
+	for (String property : properties) {
+	    String value = resolveNestedProperty(json, nestedPath, property);
+	    if (value != null) {
+		result.put(property, value);
+	    }
+	}
+	return result;
+    }
+
+    private static String resolveNestedProperty(JsonObject json, String nestedPath, String property) {
+	if (json.containsKey(property)) {
+	    return jsonValueAsString(json.get(property));
+	}
+
+	String dottedKey = nestedPath + "." + property;
+	if (json.containsKey(dottedKey)) {
+	    return jsonValueAsString(json.get(dottedKey));
+	}
+
+	if (json.containsKey(nestedPath)) {
+	    return extractFromJsonValue(json.get(nestedPath), property);
+	}
+
+	return extractFromJsonValue(json, property);
+    }
+
+    private static String extractFromJsonValue(JsonValue value, String property) {
+	if (value == null || value.getValueType() == JsonValue.ValueType.NULL) {
+	    return null;
+	}
+	switch (value.getValueType()) {
+	case OBJECT:
+	    JsonObject obj = value.asJsonObject();
+	    if (obj.containsKey(property)) {
+		return jsonValueAsString(obj.get(property));
+	    }
+	    break;
+	case ARRAY:
+	    JsonArray array = value.asJsonArray();
+	    for (JsonValue element : array) {
+		String val = extractFromJsonValue(element, property);
+		if (val != null) {
+		    return val;
+		}
+	    }
+	    break;
+	default:
+	    break;
+	}
+	return null;
+    }
+
+    private static String jsonValueAsString(JsonValue value) {
+	if (value == null || value.getValueType() == JsonValue.ValueType.NULL) {
+	    return null;
+	}
+	return switch (value.getValueType()) {
+	case STRING -> ((JsonString) value).getString();
+	case NUMBER -> ((JsonNumber) value).toString();
+	case TRUE, FALSE -> value.toString();
+	default -> value.toString();
+	};
+    }
 }

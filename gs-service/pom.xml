@@ -32,7 +32,8 @@
     	<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
 		<jetty.version>9.4.54.v20240208</jetty.version>
 		<configuration.url />
-
+	    <maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 	</properties>
 	
 	<build>
@@ -150,7 +151,7 @@
 
 						<!-- Use war output directory to get the webpack files -->
 						<allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
-
+						
 					</webAppConfig>
 
 					<useTestClasspath>false</useTestClasspath>
@@ -165,7 +166,21 @@
 	  				<!-- Remove comment to disable set to false the property 'useFileMappedBuffer' -->
      				<contextXml>${project.basedir}/src/main/webapp/WEB-INF/jetty-config.xml</contextXml>
      				
-     				
+     				<systemProperties>
+				      <systemProperty>
+				        <name>org.eclipse.jdt.core.compiler.source</name>
+				        <value>21</value>
+				      </systemProperty>
+				      <systemProperty>
+				        <name>org.eclipse.jdt.core.compiler.compliance</name>
+				        <value>21</value>
+				      </systemProperty>
+				      <systemProperty>
+				        <name>org.eclipse.jdt.core.compiler.codegen.targetPlatform</name>
+				        <value>21</value>
+				      </systemProperty>
+				    </systemProperties>
+			        
 				</configuration>
 			</plugin>
 

@@ -1,3 +1,4 @@
+<%@page import="java.util.Map"%>
 <%@page import="eu.essi_lab.gssrv.portal.PortalTranslator"%>
 <%@page
 	import="ucar.nc2.ft2.coverage.remote.CdmrFeatureProto.CoordSysOrBuilder"%>
@@ -38,6 +39,8 @@
 <%@page import="eu.essi_lab.messages.stats.StatisticsMessage"%>
 <%@page import="eu.essi_lab.model.GSSource"%>
 <%@page import="java.util.List"%>
+<%@page import="java.util.Locale"%>
+<%@page import="java.util.Collections"%>
 <%@page import="eu.essi_lab.messages.bond.ResourcePropertyBond"%>
 <%@page import="eu.essi_lab.messages.DiscoveryMessage"%>
 <%@page import="java.util.ServiceLoader"%>
@@ -48,6 +51,55 @@
 <%@page import="eu.essi_lab.messages.bond.BondFactory"%>
 <%@page import="eu.essi_lab.model.resource.MetadataElement"%>
 <%@page import="eu.essi_lab.pdk.wrt.WebRequestTransformer"%>
+<%!
+private static String escapeHtml(String value) {
+    if (value == null) {
+	return "";
+    }
+    return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+	    .replace("\"", "&quot;").replace("'", "&#39;");
+}
+
+private static String trimToNull(String value) {
+    if (value == null) {
+	return null;
+    }
+    String trimmed = value.trim();
+    return trimmed.isEmpty() ? null : trimmed;
+}
+
+private static int compareIgnoreCase(String first, String second) {
+    String left = first != null ? first : "";
+    String right = second != null ? second : "";
+    int result = String.CASE_INSENSITIVE_ORDER.compare(left, right);
+    if (result != 0) {
+	return result;
+    }
+    return left.compareTo(right);
+}
+
+private static String escapeForJsString(String value) {
+    if (value == null) {
+	return "";
+    }
+    String escaped = value.replace("\\", "\\\\").replace("'", "\\'");
+    return escaped.replace("\r", "\\r").replace("\n", "\\n");
+}
+
+private static String joinWithSeparator(List<String> values, String separator) {
+    if (values == null || values.isEmpty()) {
+	return "";
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < values.size(); i++) {
+	if (i > 0) {
+	    sb.append(separator);
+	}
+	sb.append(values.get(i));
+    }
+    return sb.toString();
+}
+%>
 <%
 String token = request.getParameter("token");
 String viewId = request.getParameter("view");
@@ -60,8 +112,8 @@ String format = request.getParameter("format");
 boolean csv = false;
 String language = request.getParameter("language");
 
-if (language==null||language.isEmpty()){
-    language="en";
+if (language == null || language.isEmpty()) {
+    language = "en";
 }
 PortalTranslator translator = new PortalTranslator(language);
 StatisticsMessage statisticsMessage = new StatisticsMessage();
@@ -104,9 +156,9 @@ maxArray.add(MetadataElement.ELEVATION_MAX);
 statisticsMessage.computeMax(maxArray);
 statisticsMessage.computeTempExtentUnion();
 List<Queryable> freqs = new ArrayList<>();
-freqs.add(MetadataElement.ORGANISATION_NAME);
+freqs.add(MetadataElement.ORGANIZATION);
 freqs.add(MetadataElement.ATTRIBUTE_TITLE);
-statisticsMessage.computeFrequency(freqs,1000);
+statisticsMessage.computeFrequency(freqs, 1000);
 List<Queryable> distArray = new ArrayList<>();
 distArray.add(MetadataElement.ATTRIBUTE_TITLE);
 distArray.add(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
@@ -125,11 +177,11 @@ List<ResponseItem> items = statResponse.getItems();
 HashMap<String, Stats> smap = new HashMap<>();
 for (ResponseItem responseItem : items) {
     Stats stats = new Stats();
-    Optional<ComputationResult> orgFreq = responseItem.getFrequency(MetadataElement.ORGANISATION_NAME);
+    Optional<ComputationResult> orgFreq = responseItem.getFrequency(MetadataElement.ORGANIZATION);
     if (orgFreq.isPresent()) {
 	ComputationResult of = orgFreq.get();
 	List<TermFrequencyItem> fitems = of.getFrequencyItems();
-	stats.addFrequencyResult(MetadataElement.ORGANISATION_NAME, fitems);
+	stats.addFrequencyResult(MetadataElement.ORGANIZATION, fitems);
     }
     Optional<ComputationResult> propFreq = responseItem.getFrequency(MetadataElement.ATTRIBUTE_TITLE);
     if (propFreq.isPresent()) {
@@ -168,22 +220,155 @@ if (format != null && format.equals("CSV")) {
 }
 if (!csv) {
     response.setContentType("text/html");
-    out.println("<html><head><title>"+translator.getTranslation("data_provider_information")+"</title>");
-    out.println("<style>\n" + "body {\n" + "    font-family: 'Segoe UI', Arial, sans-serif;\n" + "    background: #f8f9fa;\n"
-    + "    color: #222;\n" + "    margin: 0;\n" + "    padding: 0 0 40px 0;\n" + "}\n" + "h1, h2 {\n" + "    color: #005aef;\n"
-    + "    margin-top: 30px;\n" + "}\n" + "ul {\n" + "    background: #fff;\n" + "    border-radius: 6px;\n"
-    + "    box-shadow: 0 2px 8px rgba(0,0,0,0.04);\n" + "    padding: 18px 28px 18px 28px;\n" + "    margin-bottom: 30px;\n"
-
-    + "}\n" + "ul li {\n" + "    margin-bottom: 8px;\n" + "    font-size: 1.08em;\n" + "}\n" + "table {\n"
-    + "    border-collapse: collapse;\n" + "    background: #fff;\n" + "    margin-top: 18px;\n" + "    margin-bottom: 30px;\n"
-    + "    box-shadow: 0 2px 8px rgba(0,0,0,0.04);\n" + "    border-radius: 6px;\n" + "    overflow: hidden;\n"
-    + "    min-width: 400px;\n" + "}\n" + "th, td {\n" + "    border: 1px solid #e0e0e0;\n" + "    padding: 10px 16px;\n"
-    + "    text-align: left;\n" + "}\n" + "th {\n" + "    background: #005aef;\n" + "    color: #fff;\n" + "    font-weight: 600;\n"
-    + "}\n" + "tr:nth-child(even) td {\n" + "    background: #f3f6fa;\n" + "}\n" + "a {\n" + "    color: #005aef;\n"
-    + "    text-decoration: none;\n" + "}\n" + "a:hover {\n" + "    text-decoration: underline;\n" + "}\n" + "</style>");
+    out.println("<html><head><title>" + translator.getTranslation("data_provider_information") + "</title>");
+    StringBuilder css = new StringBuilder();
+    css.append("<style>\n");
+    css.append("body {\n");
+    css.append("    font-family: 'Segoe UI', Arial, sans-serif;\n");
+    css.append("    background: #f8f9fa;\n");
+    css.append("    color: #222;\n");
+    css.append("    margin: 0;\n");
+    css.append("    padding: 0 0 40px 0;\n");
+    css.append("}\n");
+    css.append("h1, h2 {\n");
+    css.append("    color: #005aef;\n");
+    css.append("    margin-top: 30px;\n");
+    css.append("}\n");
+    css.append("ul {\n");
+    css.append("    background: #fff;\n");
+    css.append("    border-radius: 6px;\n");
+    css.append("    box-shadow: 0 2px 8px rgba(0,0,0,0.04);\n");
+    css.append("    padding: 18px 28px 18px 28px;\n");
+    css.append("    margin-bottom: 30px;\n");
+    css.append("}\n");
+    css.append("ul li {\n");
+    css.append("    margin-bottom: 8px;\n");
+    css.append("    font-size: 1.08em;\n");
+    css.append("}\n");
+    css.append("table {\n");
+    css.append("    border-collapse: collapse;\n");
+    css.append("    background: #fff;\n");
+    css.append("    margin-top: 18px;\n");
+    css.append("    margin-bottom: 30px;\n");
+    css.append("    box-shadow: 0 2px 8px rgba(0,0,0,0.04);\n");
+    css.append("    border-radius: 6px;\n");
+    css.append("    overflow: hidden;\n");
+    css.append("    min-width: 400px;\n");
+    css.append("}\n");
+    css.append("th, td {\n");
+    css.append("    border: 1px solid #e0e0e0;\n");
+    css.append("    padding: 10px 16px;\n");
+    css.append("    text-align: left;\n");
+    css.append("}\n");
+    css.append("th {\n");
+    css.append("    background: #005aef;\n");
+    css.append("    color: #fff;\n");
+    css.append("    font-weight: 600;\n");
+    css.append("}\n");
+    css.append("tr:nth-child(even) td {\n");
+    css.append("    background: #f3f6fa;\n");
+    css.append("}\n");
+    css.append("a {\n");
+    css.append("    color: #005aef;\n");
+    css.append("    text-decoration: none;\n");
+    css.append("}\n");
+    css.append("a:hover {\n");
+    css.append("    text-decoration: underline;\n");
+    css.append("}\n");
+    css.append(".org-list {\n");
+    css.append("    margin: 18px 0 0 0;\n");
+    css.append("    display: flex;\n");
+    css.append("    flex-direction: column;\n");
+    css.append("    gap: 12px;\n");
+    css.append("}\n");
+    css.append(".org-card {\n");
+    css.append("    border: 1px solid #e0e0e0;\n");
+    css.append("    border-radius: 6px;\n");
+    css.append("    box-shadow: 0 2px 6px rgba(0,0,0,0.06);\n");
+    css.append("    background: #fff;\n");
+    css.append("}\n");
+    css.append(".org-summary {\n");
+    css.append("    width: 100%;\n");
+    css.append("    display: flex;\n");
+    css.append("    align-items: center;\n");
+    css.append("    gap: 16px;\n");
+    css.append("    justify-content: space-between;\n");
+    css.append("    padding: 16px 20px;\n");
+    css.append("    border: none;\n");
+    css.append("    background: transparent;\n");
+    css.append("    cursor: pointer;\n");
+    css.append("    font-size: 1em;\n");
+    css.append("    font-family: inherit;\n");
+    css.append("    text-align: left;\n");
+    css.append("}\n");
+    css.append(".org-summary:hover {\n");
+    css.append("    background: #f3f6fa;\n");
+    css.append("}\n");
+    css.append(".org-summary .org-name {\n");
+    css.append("    font-weight: 600;\n");
+    css.append("    color: #1f2933;\n");
+    css.append("}\n");
+    css.append(".org-summary .org-meta {\n");
+    css.append("    display: flex;\n");
+    css.append("    align-items: center;\n");
+    css.append("    gap: 12px;\n");
+    css.append("    margin-left: auto;\n");
+    css.append("}\n");
+    css.append(".org-summary .org-roles {\n");
+    css.append("    color: #4b5563;\n");
+    css.append("    font-size: 0.95em;\n");
+    css.append("}\n");
+    css.append(".org-summary .org-count {\n");
+    css.append("    background: #005aef;\n");
+    css.append("    color: #fff;\n");
+    css.append("    border-radius: 999px;\n");
+    css.append("    padding: 4px 12px;\n");
+    css.append("    font-size: 0.9em;\n");
+    css.append("}\n");
+    css.append(".org-toggle {\n");
+    css.append("    font-size: 0.9em;\n");
+    css.append("    color: #005aef;\n");
+    css.append("}\n");
+    css.append(".org-details {\n");
+    css.append("    border-top: 1px solid #e0e0e0;\n");
+    css.append("    padding: 16px 20px 18px 20px;\n");
+    css.append("}\n");
+    css.append(".org-contact {\n");
+    css.append("    margin-bottom: 12px;\n");
+    css.append("}\n");
+    css.append(".org-contact:last-child {\n");
+    css.append("    margin-bottom: 0;\n");
+    css.append("}\n");
+    css.append(".org-contact-name {\n");
+    css.append("    font-weight: 600;\n");
+    css.append("    margin-bottom: 4px;\n");
+    css.append("}\n");
+    css.append(".org-contact-meta {\n");
+    css.append("    font-size: 0.92em;\n");
+    css.append("    color: #444;\n");
+    css.append("    display: flex;\n");
+    css.append("    flex-wrap: wrap;\n");
+    css.append("    gap: 10px;\n");
+    css.append("}\n");
+    css.append(".org-contact-meta a {\n");
+    css.append("    color: #005aef;\n");
+    css.append("    text-decoration: none;\n");
+    css.append("}\n");
+    css.append(".org-contact-meta a:hover {\n");
+    css.append("    text-decoration: underline;\n");
+    css.append("}\n");
+    css.append(".org-role-label {\n");
+    css.append("    font-weight: 500;\n");
+    css.append("}\n");
+    css.append(".org-meta-sep {\n");
+    css.append("    color: #9ca3af;\n");
+    css.append("    margin: 0 6px;\n");
+    css.append("}\n");
+    css.append("</style>");
+    out.println(css.toString());
     out.println("</head><body>");
     out.println("<div style='max-width: 60%; margin: 0 auto;'>");
-    out.println("<h1>"+translator.getTranslation("data_provider_information")+"</h1>");
+    out.println("<h1>" + translator.getTranslation("data_provider_information") + "</h1>");
 }
 
 if (sourceId == null || sourceId.isEmpty()) {
@@ -237,48 +422,225 @@ if (sourceId == null || sourceId.isEmpty()) {
     // Start a container for stats and map
 
     out.println("<div >");
-    out.println("<h2>"+translator.getTranslation("provider_statistics")+"</h2>");
+    out.println("<h2>" + translator.getTranslation("provider_statistics") + "</h2>");
     out.println(
 		    "<table style='width: 100%; max-width: 100%; margin-bottom: 30px; border-collapse: separate; border-spacing: 0; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 6px; overflow: hidden;'>");
     out.println("<tr>");
     out.println("<td style='vertical-align: top; padding: 18px 28px 18px 28px; width: 50%;'>");
     out.println("<ul>");
-    out.println("<li><b># "+translator.getTranslation("platforms")+":</b> " + stats.getSiteCount() + "</li>");
-    out.println("<li><b># "+translator.getTranslation("observed_properties")+":</b> " + stats.getAttributeCount() + "</li>");
-    out.println("<li><b># "+translator.getTranslation("datasets")+":</b> " + stats.getTimeSeriesCount() + "</li>");
-    out.println("<li><b>"+translator.getTranslation("minimum_temporal_extent")+":</b> " + stats.getBegin() + "</li>");
-    out.println("<li><b>"+translator.getTranslation("maximum_temporal_extent")+":</b> " + stats.getEnd() + "</li>");
-    out.println("<li><b>"+translator.getTranslation("bbox")+":</b> " + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", "
-		    + stats.getNorth() + "</li>");
-    out.println("<li><b>"+translator.getTranslation("altitude")+":</b> " + stats.getMinimumAltitude() + " / " + stats.getMaximumAltitude() + "</li>");
-    
+    out.println("<li><b># " + translator.getTranslation("platforms") + ":</b> " + stats.getSiteCount() + "</li>");
+    out.println("<li><b># " + translator.getTranslation("observed_properties") + ":</b> " + stats.getAttributeCount() + "</li>");
+    out.println("<li><b># " + translator.getTranslation("datasets") + ":</b> " + stats.getTimeSeriesCount() + "</li>");
+    out.println("<li><b>" + translator.getTranslation("minimum_temporal_extent") + ":</b> " + stats.getBegin() + "</li>");
+    out.println("<li><b>" + translator.getTranslation("maximum_temporal_extent") + ":</b> " + stats.getEnd() + "</li>");
+    out.println("<li><b>" + translator.getTranslation("bbox") + ":</b> " + stats.getWest() + ", " + stats.getSouth() + ", "
+		    + stats.getEast() + ", " + stats.getNorth() + "</li>");
+    out.println("<li><b>" + translator.getTranslation("altitude") + ":</b> " + stats.getMinimumAltitude() + " / "
+		    + stats.getMaximumAltitude() + "</li>");
+
     // Add organizations
-    List<TermFrequencyItem> orgs = stats.getFrequencyResult(MetadataElement.ORGANISATION_NAME);
+    List<TermFrequencyItem> orgs = stats.getFrequencyResult(MetadataElement.ORGANIZATION);
     if (orgs != null && !orgs.isEmpty()) {
-        StringBuilder orgList = new StringBuilder();
-        orgList.append("<ul>");
-        for (int i = 0; i < orgs.size(); i++) {
-            TermFrequencyItem item = orgs.get(i);
-            orgList.append("<li>"+item.getTerm() + " (" + item.getFreq() + ")</li>");
-            
-        }
-        orgList.append("</ul>");
-        out.println("<li><b>"+translator.getTranslation("involved_organizations")+":</b> " + orgList.toString() + "</li>");
+	class OrgEntry {
+	    String name;
+	    int totalCount = 0;
+	    java.util.Set<String> roles = new java.util.LinkedHashSet<>();
+	    List<java.util.Map<String, String>> contacts = new ArrayList<>();
+	}
+
+	String unknownOrganization = trimToNull(translator.getTranslation("unknown_organization"));
+	if (unknownOrganization == null || "unknown_organization".equalsIgnoreCase(unknownOrganization)) {
+	    unknownOrganization = "Unknown organization";
+	}
+
+	java.util.Map<String, OrgEntry> orgMap = new java.util.LinkedHashMap<>();
+	for (TermFrequencyItem fitem : orgs) {
+	    Map<String, String> properties = fitem.getNestedProperties();
+	    String orgName = properties != null ? trimToNull(properties.get("orgName")) : null;
+	    if (orgName == null) {
+		orgName = unknownOrganization;
+	    }
+	    OrgEntry entry = orgMap.get(orgName);
+	    if (entry == null) {
+		entry = new OrgEntry();
+		entry.name = orgName;
+		orgMap.put(orgName, entry);
+	    }
+	    entry.totalCount += Math.max(fitem.getFreq(), 0);
+
+	    String role = properties != null ? trimToNull(properties.get("role")) : null;
+	    if (role != null) {
+		entry.roles.add(role);
+	    }
+
+	    Map<String, String> contact = new HashMap<>();
+	    if (properties != null) {
+		String individualName = trimToNull(properties.get("individualName"));
+		String email = trimToNull(properties.get("email"));
+		String homepage = trimToNull(properties.get("homePageURL"));
+
+		if (individualName != null) {
+		    contact.put("individualName", individualName);
+		}
+		if (email != null) {
+		    contact.put("email", email);
+		}
+		if (homepage != null) {
+		    contact.put("homePageURL", homepage);
+		}
+		if (role != null) {
+		    contact.put("role", role);
+		}
+	    }
+	    contact.put("count", String.valueOf(Math.max(fitem.getFreq(), 0)));
+	    entry.contacts.add(contact);
+	}
+
+	List<OrgEntry> orderedOrgEntries = new ArrayList<>(orgMap.values());
+	Collections.sort(orderedOrgEntries, new Comparator<OrgEntry>() {
+	    @Override
+	    public int compare(OrgEntry o1, OrgEntry o2) {
+		return compareIgnoreCase(o1.name, o2.name);
+	    }
+	});
+
+	String showContributorsLabel = trimToNull(translator.getTranslation("show_contributors"));
+	if (showContributorsLabel == null || "show_contributors".equalsIgnoreCase(showContributorsLabel)) {
+	    showContributorsLabel = "Show contributors";
+	}
+	String hideContributorsLabel = trimToNull(translator.getTranslation("hide_contributors"));
+	if (hideContributorsLabel == null || "hide_contributors".equalsIgnoreCase(hideContributorsLabel)) {
+	    hideContributorsLabel = "Hide contributors";
+	}
+	String showLabelForJs = escapeForJsString(showContributorsLabel);
+	String hideLabelForJs = escapeForJsString(hideContributorsLabel);
+
+	StringBuilder orgHtml = new StringBuilder();
+	orgHtml.append("<div class='org-list'>");
+	int orgIdx = 0;
+	for (OrgEntry entry : orderedOrgEntries) {
+	    List<String> roleList = new ArrayList<>(entry.roles);
+	    roleList.sort(String.CASE_INSENSITIVE_ORDER);
+
+	    String rolesSummary;
+	    if (roleList.isEmpty()) {
+		rolesSummary = "(unspecified role)";
+	    } else if (roleList.size() == 1) {
+		rolesSummary = "Role: " + roleList.get(0);
+	    } else {
+		rolesSummary = "Roles: " + String.join(", ", roleList);
+	    }
+
+	    String detailsId = "org-details-" + orgIdx++;
+	    orgHtml.append("<div class='org-card'>");
+	    orgHtml.append("<button class='org-summary' type='button' data-target='").append(detailsId)
+		    .append("' aria-controls='").append(detailsId).append("' aria-expanded='false'>");
+	    orgHtml.append("<span class='org-name'>").append(escapeHtml(entry.name)).append("</span>");
+	    orgHtml.append("<span class='org-meta'>");
+	    orgHtml.append("<span class='org-roles'>").append(escapeHtml(rolesSummary)).append("</span>");
+	    orgHtml.append("<span class='org-count'>").append(entry.totalCount).append("</span>");
+	    orgHtml.append("</span>");
+	    orgHtml.append("<span class='org-toggle'>").append(escapeHtml(showContributorsLabel)).append("</span>");
+	    orgHtml.append("</button>");
+	    orgHtml.append("<div class='org-details' id='").append(detailsId).append("' hidden>");
+
+	    List<Map<String, String>> contactEntries = new ArrayList<>(entry.contacts);
+	    Collections.sort(contactEntries, new Comparator<Map<String, String>>() {
+		@Override
+		public int compare(Map<String, String> c1, Map<String, String> c2) {
+		    int cmp = compareIgnoreCase(c1.get("individualName"), c2.get("individualName"));
+		    if (cmp != 0) {
+			return cmp;
+		    }
+		    cmp = compareIgnoreCase(c1.get("role"), c2.get("role"));
+		    if (cmp != 0) {
+			return cmp;
+		    }
+		    return compareIgnoreCase(c1.get("email"), c2.get("email"));
+		}
+	    });
+
+	    for (Map<String, String> contact : contactEntries) {
+		String contactName = contact.get("individualName");
+		String contactRole = contact.get("role");
+		String contactEmail = contact.get("email");
+		String contactHomepage = contact.get("homePageURL");
+		String contactCount = contact.get("count");
+		if (contactCount == null) {
+		    contactCount = "0";
+		}
+
+		orgHtml.append("<div class='org-contact'>");
+		String displayName = contactName != null ? contactName : "Unnamed contributor";
+		orgHtml.append("<div class='org-contact-name'>").append(escapeHtml(displayName)).append(" (")
+			.append(escapeHtml(contactCount)).append(")</div>");
+
+		List<String> metaParts = new ArrayList<>();
+		if (contactRole != null) {
+		    metaParts.add("<span class='org-role-label'>" + escapeHtml(contactRole) + "</span>");
+		}
+		if (contactEmail != null) {
+		    String safeEmail = escapeHtml(contactEmail);
+		    metaParts.add("<a href='mailto:" + safeEmail + "'>" + safeEmail + "</a>");
+		}
+		if (contactHomepage != null) {
+		    String safeHomepage = escapeHtml(contactHomepage);
+		    metaParts.add("<a href='" + safeHomepage + "' target='_blank' rel='noopener'>Website</a>");
+		}
+		if (!metaParts.isEmpty()) {
+		    orgHtml.append("<div class='org-contact-meta'>")
+			    .append(String.join("<span class='org-meta-sep'>&#8226;</span>", metaParts)).append("</div>");
+		}
+		orgHtml.append("</div>");
+	    }
+	    orgHtml.append("</div>");
+	    orgHtml.append("</div>");
+	}
+	orgHtml.append("</div>");
+
+	out.println("<li><b>" + translator.getTranslation("involved_organizations") + ":</b>");
+	out.println(orgHtml.toString());
+	out.println("</li>");
+	StringBuilder orgScript = new StringBuilder();
+	orgScript.append("<script>\n");
+	orgScript.append("document.querySelectorAll('.org-summary').forEach(function(btn) {\n");
+	orgScript.append("  if (btn.dataset.bound === 'true') { return; }\n");
+	orgScript.append("  btn.dataset.bound = 'true';\n");
+	orgScript.append("  btn.addEventListener('click', function() {\n");
+	orgScript.append("    var targetId = btn.getAttribute('data-target');\n");
+	orgScript.append("    var details = document.getElementById(targetId);\n");
+	orgScript.append("    var expanded = btn.getAttribute('aria-expanded') === 'true';\n");
+	orgScript.append("    btn.setAttribute('aria-expanded', String(!expanded));\n");
+	orgScript.append("    var toggleLabel = btn.querySelector('.org-toggle');\n");
+	orgScript.append("    if (toggleLabel) {\n");
+	orgScript.append("      toggleLabel.textContent = expanded ? '" + showLabelForJs + "' : '" + hideLabelForJs + "';\n");
+	orgScript.append("    }\n");
+	orgScript.append("    if (details) {\n");
+	orgScript.append("      if (expanded) {\n");
+	orgScript.append("        details.setAttribute('hidden', 'hidden');\n");
+	orgScript.append("      } else {\n");
+	orgScript.append("        details.removeAttribute('hidden');\n");
+	orgScript.append("      }\n");
+	orgScript.append("    }\n");
+	orgScript.append("  });\n");
+	orgScript.append("});\n");
+	orgScript.append("</script>");
+	out.println(orgScript.toString());
     }
 
     // Add observed properties
     List<TermFrequencyItem> props = stats.getFrequencyResult(MetadataElement.ATTRIBUTE_TITLE);
     if (props != null && !props.isEmpty()) {
-        StringBuilder propList = new StringBuilder();
-        propList.append("<ul>");
-        for (int i = 0; i < props.size(); i++) {
-            TermFrequencyItem item = props.get(i);
-            propList.append("<li>"+item.getTerm() + " (" + item.getFreq() + ")</li>");      
-        }
-        propList.append("</ul>");
-        out.println("<li><b>"+translator.getTranslation("observed_properties")+":</b> " + propList.toString() + "</li>");
+		StringBuilder propList = new StringBuilder();
+		propList.append("<ul>");
+		for (int i = 0; i < props.size(); i++) {
+		    TermFrequencyItem item = props.get(i);
+		    propList.append("<li>" + item.getTerm() + " (" + item.getFreq() + ")</li>");
+		}
+		propList.append("</ul>");
+		out.println("<li><b>" + translator.getTranslation("observed_properties") + ":</b> " + propList.toString() + "</li>");
     }
-    
+
     out.println("</ul>");
     out.println("</td>");
     out.println("<td style='vertical-align: top; padding: 18px 28px 18px 28px; width: 50%;'>");
@@ -300,13 +662,14 @@ if (sourceId == null || sourceId.isEmpty()) {
     out.println("    target: 'provider-map',");
     out.println("    layers: [");
     out.println("      new ol.layer.Tile({");
-    out.println("        source: new ol.source.OSM()") ;
+    out.println("        source: new ol.source.OSM()");
     out.println("      }),");
     // Add WMS layer for stations (template, please update URL and LAYERS as needed)
     out.println("      new ol.layer.Tile({");
     out.println("        source: new ol.source.TileWMS({");
-    out.println("          url: '/gs-service/services/essi/token/"+token+"/view/"+viewId+"/wms-cluster?sources="+sourceId+"&',");
-    out.println("          params: { LAYERS: '"+viewId+"', TILED: true }, ");
+    out.println("          url: '/gs-service/services/essi/token/" + token + "/view/" + viewId + "/wms-cluster?sources=" + sourceId
+		    + "&',");
+    out.println("          params: { LAYERS: '" + viewId + "', TILED: true }, ");
     out.println("          transition: 0");
     out.println("        })");
     out.println("      })");
@@ -328,9 +691,11 @@ if (sourceId == null || sourceId.isEmpty()) {
     out.println("<p>No statistics available for this provider.</p>");
 	}
 
-	out.println("<h1>"+translator.getTranslation("sample_platforms")+"</h1>");
+	out.println("<h1>" + translator.getTranslation("sample_platforms") + "</h1>");
 	out.println("<table>");
-	out.println("<tr><th>"+translator.getTranslation("monitoring_point")+"</th><th>"+translator.getTranslation("latitude")+"</th><th>"+translator.getTranslation("longitude")+"</th><th>"+translator.getTranslation("elevation")+"</th></tr>");
+	out.println("<tr><th>" + translator.getTranslation("monitoring_point") + "</th><th>" + translator.getTranslation("latitude")
+		+ "</th><th>" + translator.getTranslation("longitude") + "</th><th>" + translator.getTranslation("elevation")
+		+ "</th></tr>");
     }
     for (GSResource resource : resources) {
 	String title = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform().getCitation().getTitle();

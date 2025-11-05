@@ -23,6 +23,8 @@ package eu.essi_lab.messages.termfrequency;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -40,6 +42,8 @@ public class TermFrequencyItem {
     private String decodedTerm;
     @XmlElement(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private int freq;
+    @XmlTransient
+    private Map<String, String> nestedProperties = new HashMap<String, String>();
 
     public TermFrequencyItem() {
 	// nothing to init
@@ -119,5 +123,14 @@ public class TermFrequencyItem {
     @Override
     public int hashCode() {
 	return toString().hashCode();
+    }
+
+    @XmlTransient
+    public Map<String, String> getNestedProperties() {
+	return nestedProperties;
+    }
+
+    public void setNestedProperties(Map<String, String> nestedProperties) {
+	this.nestedProperties = nestedProperties;
     }
 }
