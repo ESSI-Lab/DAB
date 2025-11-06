@@ -300,7 +300,7 @@ public class DataFolderMapping extends IndexMapping {
 
 	if (!map.isEmpty()) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Following fields missing: {}", map.keySet());
+	    GSLoggerFactory.getLogger(getClass()).info("Missing following fields: {}", map.keySet());
 
 	    GSLoggerFactory.getLogger(getClass()).info("Updating index STARTED");
 

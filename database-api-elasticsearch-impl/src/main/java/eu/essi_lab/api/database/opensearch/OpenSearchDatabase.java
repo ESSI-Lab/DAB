@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javax.net.ssl.SSLContext;
 
+import eu.essi_lab.configuration.ExecutionMode;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -184,28 +185,34 @@ public class OpenSearchDatabase extends Database {
 		client = new OpenSearchClient(awsSdk2Transport);
 	    }
 
-	    //
-	    //
-	    //
+	    switch (ExecutionMode.get()) {
+	    case CONFIGURATION:
+	    case LOCAL_PRODUCTION:
+	    case MIXED:
 
-	    if (JavaOptions.isEnabled(JavaOptions.INIT_OPENSEARCH_INDEXES)) {
+		//
+		//
+		//
 
-		IndexMapping.initializeIndexes(client);
-	    }
+		if (JavaOptions.isEnabled(JavaOptions.INIT_OPENSEARCH_INDEXES)) {
 
-	    //
-	    //
-	    //
+		    IndexMapping.initializeIndexes(client);
+		}
 
-	    DataFolderMapping mapping = DataFolderMapping.get();
+		//
+		//
+		//
 
-	    try {
+		DataFolderMapping mapping = DataFolderMapping.get();
 
-		mapping.checkAndUpdate(client);
+		try {
 
-	    } catch (IOException e) {
+		    mapping.checkAndUpdate(client);
 
-		throw GSException.createException(getClass(),"OpenSearchDataFolderIndexUpdatingError", e);
+		} catch (IOException e) {
+
+		    throw GSException.createException(getClass(), "OpenSearchDataFolderIndexUpdatingError", e);
+		}
 	    }
 
 	    initialized = true;
