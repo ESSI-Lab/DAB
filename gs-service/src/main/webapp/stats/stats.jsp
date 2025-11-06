@@ -681,9 +681,9 @@
         var maxElevation = entry['maximum-elevation'];
 
         var statsItems = [];
-        statsItems.push('<li><b># ' + escapeHtml(platformsLabel) + ':</b> ' + formatValue(siteCount) + '</li>');
-        statsItems.push('<li><b># ' + escapeHtml(observedLabel) + ':</b> ' + formatValue(attributeCount) + '</li>');
-        statsItems.push('<li><b># ' + escapeHtml(datasetsLabel) + ':</b> ' + formatValue(timeSeriesCount) + '</li>');
+        statsItems.push('<li><b>' + escapeHtml(platformsLabel) + ':</b> ' + formatValue(siteCount) + '</li>');
+        
+        statsItems.push('<li><b>' + escapeHtml(datasetsLabel) + ':</b> ' + formatValue(timeSeriesCount) + '</li>');
         statsItems.push('<li><b>' + escapeHtml(translator('unique_attribute_count', 'Unique observed properties')) + ':</b> ' + formatValue(uniqueAttributeCount) + '</li>');
         statsItems.push('<li><b>' + escapeHtml(minTemporalLabel) + ':</b> ' + formatValue(begin) + '</li>');
         statsItems.push('<li><b>' + escapeHtml(maxTemporalLabel) + ':</b> ' + formatValue(end) + '</li>');
@@ -693,17 +693,17 @@
 
         var altitudeValues = formatValue(minElevation) + ' / ' + formatValue(maxElevation);
         statsItems.push('<li><b>' + escapeHtml(altitudeLabel) + ':</b> ' + altitudeValues + '</li>');
-
+        statsItems.push('<li><b>' + escapeHtml(observedLabel) + ' (' + formatValue(attributeCount) + '):</b></li>');
         var attributeStats = Array.isArray(entry['attribute-stats']) ? entry['attribute-stats'] : [];
         if (attributeStats.length) {
-          var observedList = ['<li><b>' + escapeHtml(observedLabel) + ':</b><ul>'];
+          var observedList = ['<ul>'];
           for (var a = 0; a < attributeStats.length; a++) {
             var attr = attributeStats[a] || {};
             var attrLabel = trimToNull(attr.term) || trimToNull(attr.label) || translator('unknown_value', 'Unknown');
             var attrCount = attr.count !== undefined ? attr.count : attr.freq;
-            observedList.push('<li>' + escapeHtml(attrLabel) + ' (' + formatValue(attrCount) + ')</li>');
+            observedList.push('<li>' + escapeHtml(attrLabel) + ' (' + formatValue(attrCount) + ' datasets)</li>');
           }
-          observedList.push('</ul></li>');
+          observedList.push('</ul>');
           statsItems.push(observedList.join(''));
         }
 
@@ -717,7 +717,6 @@
         page.push('<h1>' + escapeHtml(providerLabel) + '</h1>');
 
         var backUrl = buildSourceUrl(query, '');
-        page.push('<p class="back-link"><a href="' + escapeHtml(backUrl) + '">&#8592; ' + escapeHtml(translator('back_to_sources', 'Back to providers')) + '</a></p>');
 
         page.push('<div class="provider-layout">');
         page.push('<div class="provider-left">');
@@ -728,7 +727,7 @@
 
         page.push('<div class="provider-right">');
         page.push('<div id="provider-map" class="provider-map"></div>');
-        page.push('<div class="map-credit">Â© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></div>');
+        page.push('<div class="map-credit">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></div>');
         page.push('</div>');
         page.push('</div>');
 

@@ -74,6 +74,8 @@ import eu.essi_lab.model.resource.BNHSProperty;
 import eu.essi_lab.model.resource.BNHSPropertyReader;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.OrganizationElementWrapper;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.pdk.BondUtils;
 import eu.essi_lab.pdk.SemanticSearchSupport;
 import eu.essi_lab.pdk.handler.WebRequestHandler;
@@ -355,11 +357,31 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 			}
 		    }
 		}
+		JSONObject object = new JSONObject();
+
 		ResponsibleParty poc = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContact();
+		List<ComposedElement> organizations = resource.getExtensionHandler().getComposedElements(MetadataElement.ORGANIZATION.getName());
+		JSONArray orgArray = new JSONArray();
+		for (ComposedElement organization : organizations) {
+		    OrganizationElementWrapper wrapper = new OrganizationElementWrapper(organization);
+		    JSONObject org = new JSONObject();
+		    org.putOpt("name",wrapper.getOrgName());
+		    org.putOpt("uri",wrapper.getOrgUri());
+		    org.putOpt("individual_name",wrapper.getIndividualName());
+		    org.putOpt("individual_uri",wrapper.getIndividualURI());
+		    org.putOpt("email",wrapper.getEmail());
+		    org.putOpt("homepage", wrapper.getHomePageURL());
+		    org.putOpt("role",wrapper.getRole());
+		    orgArray.put(org);
+		}
+		object.put("organizations", orgArray);
+		
+		
 		String institute = null;
 		if (poc != null) {
 		    institute = poc.getOrganisationName();
 		}
+		
 		String country = resource.getExtensionHandler().getCountry().isPresent() ? //
 			resource.getExtensionHandler().getCountry().get().toString() : null;
 		String timeInter = resource.getExtensionHandler().getTimeInterpolation().isPresent() ? //
@@ -415,7 +437,6 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		// platform
 		//
 
-		JSONObject object = new JSONObject();
 
 		object = create(object, "source_id", sourceId, "Source ID");
 

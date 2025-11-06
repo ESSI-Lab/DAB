@@ -2449,7 +2449,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    if (checkStringValue(indURI)) {
 			wrapper.setIndividualURI(indURI);
 		    }
-		    
+
 		    wrapper.setHash();
 
 		    addComposedElement(wrapper.getElement());
@@ -2494,7 +2494,44 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
+	    Iterator<CoverageDescription> descriptions = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+		    .getCoverageDescriptions();
+
+	    while (descriptions.hasNext()) {
+		CoverageDescription next = descriptions.next();
+		String description = next.getAttributeTitle();
+		boolean add = false;
+		SA_ElementWrapper attributeWrapper = SA_ElementWrapper.of(MetadataElement.PARAMETER_SA);
+		if (checkStringValue(description)) {
+		    attributeWrapper.setUriTitle(description);
+		    attributeWrapper.setValue(description);
+		    add = true;
+		}
+		String id = next.getAttributeIdentifier();
+		if (checkStringValue(id)) {
+		    attributeWrapper.setUri(id);
+		    add = true;
+		}
+		if (add) {
+		    addComposedElement(attributeWrapper.getElement());
+		}
+
+	    }
+	    {
+		SA_ElementWrapper attributeWrapper = addComposedKeywords(resource, "theme",MetadataElement.PARAMETER_SA);
+		if (attributeWrapper != null) {
+		    addComposedElement(attributeWrapper.getElement());
+		}
+	    }
+	    {
+		SA_ElementWrapper attributeWrapper = addComposedKeywords(resource, "parameter",MetadataElement.PARAMETER_SA);
+		if (attributeWrapper != null) {
+		    addComposedElement(attributeWrapper.getElement());
+		}
+	    }
 	}
+
+
     };
 
     public static final IndexedMetadataElement INSTRUMENT_SA = new IndexedMetadataElement(MetadataElement.INSTRUMENT_SA) {

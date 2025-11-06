@@ -138,7 +138,7 @@ public class CITIOBSMapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addInstrument(Datastream stream, CoreMetadata coreMetadata, Keywords keywords) {
+    protected void addInstrument(Datastream stream, CoreMetadata coreMetadata, KeywordsCollector keywords) {
 
 	MIInstrument instrument = null;
 	Optional<Sensor> optSensor = stream.getSensor();
@@ -288,7 +288,7 @@ public class CITIOBSMapper extends SensorThingsMapper {
      * @param dataId
      */
     @Override
-    protected void addVerticalExtent(Thing thing, Keywords keywords, DataIdentification dataId) {
+    protected void addVerticalExtent(Thing thing, KeywordsCollector keywords, DataIdentification dataId) {
 
     }
 
@@ -300,7 +300,7 @@ public class CITIOBSMapper extends SensorThingsMapper {
      * @return
      */
     @Override
-    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,ExtensionHandler handler) {
+    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, KeywordsCollector keywords,ExtensionHandler handler) {
 
 	if (!thing.getLocations().isEmpty()) {
 
@@ -354,7 +354,7 @@ public class CITIOBSMapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addBoundingBox(Thing thing, DataIdentification dataId, Keywords keywords) {
+    protected void addBoundingBox(Thing thing, DataIdentification dataId, KeywordsCollector keywords) {
 
 	if (!thing.getLocations().isEmpty()) {
 
@@ -362,9 +362,6 @@ public class CITIOBSMapper extends SensorThingsMapper {
 
 	    GeographicBoundingBox boundingBox = null;
 
-	    // should be "application/geo+json"
-	    Optional<String> locationEncodingType = location.getEncodingType();
-	    locationEncodingType.ifPresent(enc -> addKeyword(keywords, enc));
 
 	    if (location.getLocation().has("coordinates")) {
 

@@ -1,0 +1,371 @@
+ #map {
+   width: 30%;
+   height: 400px;
+ }
+
+ /**
+  *  Colors
+  */
+ :root {
+   --color1: #00529c;
+   --color2: #00abd0;
+   --color3: lightgray;
+   --color4: white;
+ }
+
+ body {
+   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+ }
+
+ /**
+  *  Put the loading GIF
+  */
+ .loading_div {
+   position: fixed;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   content: url("/gs-service/bnhs/station/gwis-loading.gif");
+ }
+
+ /**
+  *  Header and logos
+  */
+ .page_header {
+   padding: 10px;
+   background-color: var(--color1);
+   margin-left: 12px;
+   margin-right: 12px;
+   font-size: 30px;
+   color: var(--color4);
+ }
+
+ .main_title {
+   margin-left: 50px;
+   font-weight: bold;
+ }
+
+ .sub_title {
+   margin-left: 50px;
+   margin-top: 10px;
+   font-size: 80%;
+ }
+
+ .page_info {
+   line-height: 1.6;
+   padding: 10px;
+   margin-left: 12px;
+   margin-right: 12px;
+   border: 1px solid var(--color3);
+   color: var(--color1);
+ }
+
+ .page_info_text {
+   margin-left: 50px;
+ }
+
+ .wmo_logo {
+   float: right;
+   margin-right: 50px;
+   display: inline-block;
+   margin-top: -70px;
+   width: 190px;
+ }
+
+ .wmo_logo_below {
+   float: right;
+   margin-right: 40px;
+   display: inline-block;
+   margin-top: 12px;
+   width: 200px;
+ }
+
+ #hidden-div {
+   visibility: hidden;
+ }
+
+ #dialog-download {
+ }
+
+ #format-fieldset {
+   border: none;
+ }
+
+ /**
+  *  Layout table
+  */
+ .layout_table {
+   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+   width: 100%;
+   margin-bottom: 10px;
+   padding: 10px;
+   border: none;
+ }
+
+ .layout_table th {
+   background-color: var(--color1);
+   font-size: 20px;
+   color: var(--color4);
+   text-align: left;
+   padding: 5px;
+ }
+
+ /**
+  *  Data table
+  */
+ .data_table {
+   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+   border-collapse: collapse;
+   font-size: 80%;
+   width: 30vw;
+ }
+
+ .data_table_label_td {
+   width: 160px;
+ }
+
+ .data_table td {
+   border: 1px solid var(--color3);
+   padding: 4px;
+   border-collapse: collapse;
+ }
+
+ .data_table_td {
+   padding-right: 10px;
+ }
+
+ .data_table tr:hover {
+   background-color: var(--color3);
+ }
+
+ .station_table_header {
+   font-size: 25px;
+   padding-top: 4px;
+   padding-bottom: 4px;
+   text-align: left;
+   background-color: var(--color2);
+   color: var(--color4);
+ }
+
+ .data_table_header {
+   font-size: 15px;
+   padding-top: 4px;
+   padding-bottom: 4px;
+   text-align: left;
+   background-color: var(--color2);
+   color: var(--color4);
+ }
+
+ .data_table_headers_separator {
+   padding: 7px !important;
+   border: none !important;
+   background-color: white !important;
+ }
+
+.organization-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.organization-list-item {
+  margin-bottom: 12px;
+}
+
+.organization-header {
+  font-weight: bold;
+  color: var(--color1);
+}
+
+.organization-name {
+  margin-left: 0;
+  text-decoration: none;
+}
+
+.organization-contributor-list {
+  list-style: none;
+  margin: 6px 0 0 12px;
+  padding: 0;
+}
+
+.organization-contributor-item {
+  margin-bottom: 4px;
+}
+
+.organization-contributor-name {
+  font-weight: 600;
+}
+
+.organization-contributor-roles {
+  margin-left: 6px;
+  color: var(--color1);
+}
+
+.organization-contributor-email {
+  margin-left: 8px;
+  color: var(--color1);
+}
+
+.station-overview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 30px;
+}
+
+.station-map {
+  flex: 2 1 420px;
+  min-width: 320px;
+}
+
+.station-map #map {
+  width: 100%;
+  height: 420px;
+}
+
+.station-meta {
+  flex: 1 1 320px;
+  min-width: 280px;
+}
+
+.station-meta-table {
+  width: 100%;
+}
+
+@media (max-width: 960px) {
+  .station-overview {
+    flex-direction: column;
+  }
+
+  .station-map,
+  .station-meta {
+    min-width: 100%;
+  }
+
+  .station-map #map {
+    height: 360px;
+  }
+}
+
+ /**
+  *  Plot
+  */
+ .plot_div {
+   margin-top: 15px;
+   height: 513px;
+   width: 63vw;
+ }
+
+ /**
+  *  Temporal extent table
+  */
+ .temp_extent_table {
+   border: 1px solid var(--color3);
+   padding: 5px;
+   color: var(--color1);
+ }
+
+ .temp_extent_info {
+   font-weight: bold;
+   line-height: 1.6;
+ }
+
+ .start_date {
+   font-size: 90%;
+ }
+
+ .end_date {
+   font-size: 90%;
+ }
+
+ /**
+  *  Update graph button
+  */
+ .time_button {
+   padding: 5px;
+   background: var(--color1);
+   color: var(--color4);
+   border-color: var(--color1);
+   border-width: 1px;
+ }
+
+ .time_button:hover {
+   background: var(--color4);
+   color: var(--color1);
+ }
+
+ /**
+  *  Update graph button
+  */
+ .update_graph_button {
+   padding: 5px;
+   background: var(--color1);
+   color: var(--color4);
+   border-color: var(--color1);
+   border-width: 1px;
+   margin-top: 18px;
+ }
+
+ .update_graph_button:hover {
+   background: var(--color4);
+   color: var(--color1);
+ }
+
+ /**
+  *  Download button
+  */
+ .download_button {
+   padding: 5px;
+   margin-top: 15px;
+   background: var(--color1);
+   color: var(--color4);
+   border-color: var(--color1);
+   border-width: 1px;
+ }
+
+ .download_button:hover {
+   background: var(--color4);
+   color: var(--color1);
+ }
+
+ /**
+  * Footer
+  */
+ .page_footer {
+   margin-left: 13px;
+   margin-right: 13px;
+   padding-bottom: 5px;
+   border-bottom: 3px solid var(--color3);
+   visibility: hidden;
+ }
+
+ .dev_footer {
+   width: 200px;
+   margin-top: 50px;
+   font-style: italic;
+   color: var(--color1);
+ }
+
+ .cnr_logo {
+   float: left;
+   margin-left: 165px;
+   width: 60px;
+   margin-top: -55px;
+ }
+
+ .ui-dialog {
+   z-index: 1000 !important;
+ }
+
+ .ui-dialog-buttonset .ui-button {
+   background: #00af00;
+   color: white;
+ }
+
+ .footer_dialog {
+   margin-top: 20px;
+   font-size: smaller;
+   font-style: italic;
+ }
+

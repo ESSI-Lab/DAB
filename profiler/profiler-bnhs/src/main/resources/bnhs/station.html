@@ -23,7 +23,10 @@
 		<script src="https://kit.fontawesome.com/2ec30275d7.js" crossorigin="anonymous"></script>
 		
 		<style>
-		
+		    #map {
+      width: 30%;
+      height: 400px;
+    }
 			/** 
 			 *  Colors	 
 			 */
@@ -169,6 +172,14 @@
 			
 				background-color: var(--color3);
 			}
+						.station_table_header {						
+				  font-size: 25px;
+				  padding-top: 4px;
+				  padding-bottom: 4px;
+				  text-align: left;
+				  background-color: var(--color2);
+				  color: var(--color4);
+			}
 			
 			.data_table_header {
 				  font-size: 15px;
@@ -297,7 +308,7 @@
    				float: left;
 			    margin-left: 165px;
 			    width: 60px;
-			    content: url(../../../../bnhs/station/IIA_new_logo.png);
+			    
 			    margin-top: -55px		
    			}
    			
@@ -363,7 +374,7 @@
 		const url = new URL(window.location.href);       
 	    const segments = url.pathname.split('/').filter(Boolean);
 	    const stationCode = segments[segments.length - 1];
-		
+	
 		</script>
 	
 	</head>
@@ -409,6 +420,10 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 			 
 			</div>		 		
  		</div>
+ 		
+
+		
+		<div id='timeseries' class="loading_div">
 		
 		<div id='timeseries' class="loading_div"></div>
 		

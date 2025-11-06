@@ -27,7 +27,6 @@ package eu.essi_lab.model.resource;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
-import eu.essi_lab.model.resource.composed.ComposedElementItem;
 
 /**
  * @author Fabrizio

@@ -24,6 +24,7 @@ package eu.essi_lab.accessor.sensorthings._1_1.mapper;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -240,14 +241,14 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      * @param coreMetadata
      * @param keywords
      */
-    protected abstract void addInstrument(Datastream stream, CoreMetadata coreMetadata, Keywords keywords);
+    protected abstract void addInstrument(Datastream stream, CoreMetadata coreMetadata, KeywordsCollector keywords);
 
     /**
      * @param stream
      * @param coreMetadata
      * @param keywords
      */
-    protected void addCoverageDescription(Datastream stream, CoreMetadata coreMetadata, Keywords keywords) {
+    protected void addCoverageDescription(Datastream stream, CoreMetadata coreMetadata, KeywordsCollector keywords) {
 
 	Optional<ObservedProperty> optObservedProperty = stream.getObservedProperty();
 
@@ -260,21 +261,21 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	    Optional<String> name = observedProperty.getName();
 	    if (name.isPresent()) {
 
-		addKeyword(keywords, name.get().trim());
+		keywords.addKeyword(name.get().trim(), "observedProperty");
 		coverageDescription.setAttributeTitle(normalize(name.get()));
 	    }
 
 	    Optional<String> description = observedProperty.getDescription();
 	    if (description.isPresent()) {
 
-		addKeyword(keywords, description.get().trim());
+		keywords.addKeyword(description.get().trim(), "observedPropertyDescription");
 		coverageDescription.setAttributeDescription(normalize(description.get()));
 	    }
 
 	    String definition = observedProperty.getObject().optString("definition");
 	    if (!definition.isEmpty()) {
 
-		addKeyword(keywords, definition);
+		keywords.addKeyword(definition, "observedPropertyDefinition");
 		coverageDescription.setAttributeIdentifier(normalize(definition));
 	    }
 
@@ -299,7 +300,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      * @param keywords
      * @param dataId
      */
-    protected abstract void addVerticalExtent(Thing thing, Keywords keywords, DataIdentification dataId);
+    protected abstract void addVerticalExtent(Thing thing, KeywordsCollector keywords, DataIdentification dataId);
 
     /**
      * @param coreMetadata
@@ -308,7 +309,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      * @param dataId
      * @return
      */
-    protected abstract void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,
+    protected abstract void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, KeywordsCollector keywords,
 	    ExtensionHandler handler);
 
     /**
@@ -316,7 +317,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      * @param dataId
      * @param keywords
      */
-    protected abstract void addBoundingBox(Thing thing, DataIdentification dataId, Keywords keywords);
+    protected abstract void addBoundingBox(Thing thing, DataIdentification dataId, KeywordsCollector keywords);
 
     /**
      * @return
@@ -399,15 +400,11 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 	DataIdentification dataId = coreMetadata.getDataIdentification();
 	Thing thing = stream.getThing().get();
-
-	Keywords keywords = new Keywords();
-	dataId.addKeywords(keywords);
-
+	KeywordsCollector collector = new KeywordsCollector();
 	// should be "OM_Measurement"
 	String observationType = stream.getObservationType();
 	if (observationType != null && !observationType.isEmpty()) {
-
-	    keywords.addKeyword(observationType);
+	    collector.addKeyword(observationType, "observationType");
 	}
 	HashMap<String, String> tags = thing.getTags();
 	for (String key : tags.keySet()) {
@@ -429,12 +426,12 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		    value = value.replace("http://codes.wmo.int/wmdr/TerritoryName/", "");
 		    value = value.replace("https://codes.wmo.int/wmdr/TerritoryName/", "");
 		    Country country = Country.decode(value);
-		    if (country!=null) {
+		    if (country != null) {
 			dataset.getExtensionHandler().setCountry(country.getShortName());
 			dataset.getExtensionHandler().setCountryISO3(country.getISO3());
-		    }else {
+		    } else {
 			dataset.getExtensionHandler().setCountry(value);
-		    }		    
+		    }
 		    continue;
 		}
 		dataset.getExtensionHandler().setCountry(value);
@@ -514,14 +511,21 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		continue;
 	    }
 
-	    Keywords nks = new Keywords();
-	    nks.setThesaurusNameCitationTitle(key);
 	    String[] values = value.split(",");
 	    for (String v : values) {
-		nks.addKeyword(v.trim());
+		collector.addKeyword(v, key.toLowerCase());
+	    }
+
+	}
+
+	for (String type : collector.getKeywords().keySet()) {
+	    List<String> keys = collector.getKeywords().get(type);
+	    Keywords nks = new Keywords();
+	    nks.setTypeCode(type);
+	    for (String key : keys) {
+		nks.addKeyword(key.trim());
 	    }
 	    dataId.addKeywords(nks);
-
 	}
 
 	//
@@ -550,7 +554,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	// Platform, Vertical extent and keywords (from the expanded Thing)
 	//
 
-	addPlatform(thing, coreMetadata, dataId, keywords, dataset.getExtensionHandler());
+	addPlatform(thing, coreMetadata, dataId, collector, dataset.getExtensionHandler());
 
 	//
 	// Responsible party
@@ -562,13 +566,13 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	// Vertical extent
 	//
 
-	addVerticalExtent(thing, keywords, dataId);
+	addVerticalExtent(thing, collector, dataId);
 
 	//
 	// Spatial extent (from the expanded Thing)
 	//
 
-	addBoundingBox(thing, dataId, keywords);
+	addBoundingBox(thing, dataId, collector);
 
 	String mail = tags.getOrDefault("email", tags.get("mail"));
 	String organizationLabel = tags.getOrDefault("organization_label", tags.get("organization"));
@@ -637,13 +641,13 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	//
 	// MI_Instument
 	//
-	addInstrument(stream, coreMetadata, keywords);
+	addInstrument(stream, coreMetadata, collector);
 
 	//
 	// Coverage description
 	//
 
-	addCoverageDescription(stream, coreMetadata, keywords);
+	addCoverageDescription(stream, coreMetadata, collector);
 
 	//
 	// Distribution info
@@ -694,9 +698,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	CoreMetadata coreMetadata = collection.getHarmonizedMetadata().getCoreMetadata();
 	DataIdentification dataId = coreMetadata.getDataIdentification();
 
-	Keywords keywords = new Keywords();
-	dataId.addKeywords(keywords);
-
+	KeywordsCollector collector = new KeywordsCollector();
 	//
 	// File Identifier
 	//
@@ -716,7 +718,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	// Platform, Vertical extent and keywords
 	//
 
-	addPlatform(thing, coreMetadata, dataId, keywords, collection.getExtensionHandler());
+	addPlatform(thing, coreMetadata, dataId, collector, collection.getExtensionHandler());
 
 	//
 	// Responsible party
@@ -728,13 +730,13 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	// Vertical extent
 	//
 
-	addVerticalExtent(thing, keywords, dataId);
+	addVerticalExtent(thing, collector, dataId);
 
 	//
 	// Spatial extent
 	//
 
-	addBoundingBox(thing, dataId, keywords);
+	addBoundingBox(thing, dataId, collector);
 
 	//
 	// Temporal extent (from linked streams)
@@ -754,6 +756,16 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	    } else {
 		dataId.addTemporalExtent("2024-01-01T00:00:00Z", "2024-11-21T00:00:00Z");
 	    }
+	}
+
+	for (String type : collector.getKeywords().keySet()) {
+	    List<String> keys = collector.getKeywords().get(type);
+	    Keywords nks = new Keywords();
+	    nks.setTypeCode(type);
+	    for (String key : keys) {
+		nks.addKeyword(key.trim());
+	    }
+	    dataId.addKeywords(nks);
 	}
     }
 
@@ -960,18 +972,6 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	boundingBox.setBigDecimalEast(coordinates.getBigDecimal(0));
 
 	return boundingBox;
-    }
-
-    /**
-     * @param keywords
-     * @param keyword
-     */
-    protected void addKeyword(Keywords keywords, String keyword) {
-
-	if (keyword != null && !keyword.isEmpty()) {
-
-	    keywords.addKeyword(keyword.trim());
-	}
     }
 
     /**

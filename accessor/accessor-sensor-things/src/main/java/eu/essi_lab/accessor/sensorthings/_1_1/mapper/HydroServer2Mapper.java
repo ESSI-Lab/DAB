@@ -33,7 +33,6 @@ import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
@@ -163,7 +162,7 @@ public class HydroServer2Mapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addInstrument(Datastream stream, CoreMetadata coreMetadata, Keywords keywords) {
+    protected void addInstrument(Datastream stream, CoreMetadata coreMetadata, KeywordsCollector keywords) {
 
 	MIInstrument instrument = null;
 	Optional<Sensor> optSensor = stream.getSensor();
@@ -201,18 +200,18 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	    String methodCode = metadata.optString("methodCode");
 	    if (!methodCode.isEmpty()) {
 		sensorCode = sensorCode + ":" + methodCode.trim();
-		addKeyword(keywords, methodCode);
+		keywords.addKeyword(methodCode, "methodCode");
 	    }
 	    instrument.setMDIdentifierTypeCode(sensorCode);
 
 	    String methodType = metadata.optString("methodType");
 	    if (!methodType.isEmpty()) {
 		instrument.setSensorType(methodType.trim());
-		addKeyword(keywords, methodType);
+		keywords.addKeyword(methodType, "methodType");
 	    }
 
 	    String methodLink = metadata.optString("methodLink");
-	    addKeyword(keywords, methodLink);
+	    keywords.addKeyword(methodLink, "mehtodLink");
 
 	    if (metadata.has("sensorModel")) {
 
@@ -222,9 +221,9 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 		String sensorModelURL = sensorModel.optString("sensorModelURL");
 		String sensorManufacturer = sensorModel.optString("sensorManufacturer");
 
-		addKeyword(keywords, sensorModelName);
-		addKeyword(keywords, sensorModelURL);
-		addKeyword(keywords, sensorManufacturer);
+		keywords.addKeyword(sensorModelName, "instrument");
+		keywords.addKeyword(sensorModelURL, "sensorModelURL");
+		keywords.addKeyword(sensorManufacturer, "sensorManufacturer");
 	    }
 	}
     }
@@ -235,7 +234,7 @@ public class HydroServer2Mapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addCoverageDescription(Datastream stream, CoreMetadata coreMetadata, Keywords keywords) {
+    protected void addCoverageDescription(Datastream stream, CoreMetadata coreMetadata, KeywordsCollector keywords) {
 
 	// normally present
 	Optional<ObservedProperty> optObservedProperty = stream.getObservedProperty();
@@ -249,14 +248,14 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	    Optional<String> name = observedProperty.getName();
 	    if (name.isPresent()) {
 
-		addKeyword(keywords, name.get().trim());
+		keywords.addKeyword(normalize(name.get()), "observedProperty");
 		coverageDescription.setAttributeTitle(normalize(name.get()));
 	    }
 
 	    Optional<String> description = observedProperty.getDescription();
 	    if (description.isPresent()) {
 
-		addKeyword(keywords, description.get().trim());
+		keywords.addKeyword(description.get().trim(), "observedPropertyDescription");
 		coverageDescription.setAttributeDescription(normalize(description.get()));
 	    }
 
@@ -274,14 +273,14 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 		    coverageId += variableCode.trim();
 
-		    addKeyword(keywords, variableCode);
+		    keywords.addKeyword(variableCode, "variableCode");
 		}
 
 		if (!variableType.isEmpty()) {
 
 		    coverageId += ":" + variableType.trim();
 
-		    addKeyword(keywords, variableType);
+		    keywords.addKeyword(variableType, "variableType");
 		}
 
 		coverageDescription.setAttributeIdentifier(coverageId);
@@ -460,7 +459,7 @@ public class HydroServer2Mapper extends SensorThingsMapper {
      * @param dataId
      */
     @Override
-    protected void addVerticalExtent(Thing thing, Keywords keywords, DataIdentification dataId) {
+    protected void addVerticalExtent(Thing thing, KeywordsCollector keywords, DataIdentification dataId) {
 
 	Optional<Location> location = thing.getLocations().isEmpty() ? Optional.empty() : Optional.of(thing.getLocations().get(0));
 
@@ -508,7 +507,7 @@ public class HydroServer2Mapper extends SensorThingsMapper {
      * @return
      */
     @Override
-    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,
+    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, KeywordsCollector keywords,
 	    ExtensionHandler handler) {
 
 	Optional<Location> location = thing.getLocations().isEmpty() ? Optional.empty() : Optional.of(thing.getLocations().get(0));
@@ -548,8 +547,8 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 		platform.setDescription("State: " + state + ", county: " + county);
 
-		addKeyword(keywords, state);
-		addKeyword(keywords, county);
+		keywords.addKeyword(state, "place");
+		keywords.addKeyword(county, "place");
 
 		String countryCode = optLocationProp.get().optString("countryCode");
 		if (countryCode != null && !countryCode.isEmpty()) {
@@ -603,17 +602,13 @@ public class HydroServer2Mapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addBoundingBox(Thing thing, DataIdentification dataId, Keywords keywords) {
+    protected void addBoundingBox(Thing thing, DataIdentification dataId, KeywordsCollector keywords) {
 
 	Optional<Location> location = thing.getLocations().isEmpty() ? Optional.empty() : Optional.of(thing.getLocations().get(0));
 
 	if (location.isPresent()) {
 
 	    GeographicBoundingBox boundingBox = null;
-
-	    // should be "application/geo+json"
-	    Optional<String> locationEncodingType = location.get().getEncodingType();
-	    locationEncodingType.ifPresent(enc -> addKeyword(keywords, enc));
 
 	    if (location.get().getLocation().has("geometry")) {
 

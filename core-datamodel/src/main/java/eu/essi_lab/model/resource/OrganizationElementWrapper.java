@@ -45,7 +45,7 @@ public class OrganizationElementWrapper {
     /**
      * @param element
      */
-    private OrganizationElementWrapper(ComposedElement element) {
+    public OrganizationElementWrapper(ComposedElement element) {
 
 	this.element = element;
     }
