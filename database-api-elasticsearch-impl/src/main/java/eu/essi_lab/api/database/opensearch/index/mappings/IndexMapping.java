@@ -13,12 +13,12 @@ package eu.essi_lab.api.database.opensearch.index.mappings;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
+import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.JavaOptions;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -318,12 +319,7 @@ public abstract class IndexMapping {
      */
     protected void addProperty(String key, String type, boolean ignoreMalformed) {
 
-	JSONObject property = new JSONObject();
-	property.put("type", type);
-
-	if (ignoreMalformed) {
-	    property.put("ignore_malformed", true);
-	}
+	JSONObject property = OpenSearchUtils.toJSONObject(createProperty(type, ignoreMalformed));
 
 	mapping.getJSONObject("mappings").//
 		getJSONObject("properties").//
@@ -345,7 +341,7 @@ public abstract class IndexMapping {
      * @param ignoreMalformed
      * @return
      */
-    protected Property createProperty(String type, boolean ignoreMalformed) {
+    public Property createProperty(String type, boolean ignoreMalformed) {
 
 	JSONObject property = new JSONObject();
 	property.put("type", type);
@@ -384,10 +380,7 @@ public abstract class IndexMapping {
      */
     protected void addNested(String key, JSONObject properties) {
 
-	JSONObject nested = new JSONObject();
-	nested.put("type", "nested");
-
-	nested.put("properties", properties);
+	JSONObject nested = OpenSearchUtils.toJSONObject(createNestedProperty(properties));
 
 	mapping.getJSONObject("mappings").//
 		getJSONObject("properties").//
