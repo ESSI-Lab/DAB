@@ -159,6 +159,7 @@ public class AcronetConnector extends HarvestedQueryConnector<AcronetConnectorSe
 		}
 	    }
 	    logger.debug("ADDED {} records. Number of Variables: {}", partialNumbers, variablesIdentifier.size());
+	    ret.setResumptionToken(null);
 
 	    // int recordCount = 0;
 	    // if (!deviceArray.isEmpty()) {
