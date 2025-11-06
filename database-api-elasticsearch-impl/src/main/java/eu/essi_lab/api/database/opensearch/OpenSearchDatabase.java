@@ -203,15 +203,18 @@ public class OpenSearchDatabase extends Database {
 		//
 		//
 
-		DataFolderMapping mapping = DataFolderMapping.get();
+		if (JavaOptions.isEnabled(JavaOptions.UPDATE_DATA_FOLDER_INDEX)) {
 
-		try {
+		    DataFolderMapping mapping = DataFolderMapping.get();
 
-		    mapping.checkAndUpdate(client);
+		    try {
 
-		} catch (IOException e) {
+			mapping.checkAndUpdate(client);
 
-		    throw GSException.createException(getClass(), "OpenSearchDataFolderIndexUpdatingError", e);
+		    } catch (IOException e) {
+
+			throw GSException.createException(getClass(), "OpenSearchDataFolderIndexUpdatingError", e);
+		    }
 		}
 	    }
 
