@@ -33,12 +33,12 @@ import java.util.Set;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -225,7 +225,7 @@ public class DataFolderMapping extends IndexMapping {
 
 	HashMap<String, Property> map = new HashMap<>();
 
-	MetadataElement.listValues().forEach(el -> {
+	MetadataElement.listQueryables().forEach(el -> {
 
 	    if (!properties.contains(el.getName())) {
 
@@ -240,6 +240,8 @@ public class DataFolderMapping extends IndexMapping {
 		    map.put(toDateField(el.getName()), createProperty(FieldType.Date.jsonValue(), true));
 		}
 
+		case SPATIAL -> map.put(el.getName(), createProperty(FieldType.GeoShape.jsonValue(), true));
+
 		case TEXTUAL -> {
 
 		    map.put(el.getName(), createProperty(FieldType.Text.jsonValue()));
@@ -247,11 +249,11 @@ public class DataFolderMapping extends IndexMapping {
 		}
 		}
 
-		if (el.hasComposedElement()) {
+		if (el instanceof MetadataElement mel && mel.hasComposedElement()) {
 
 		    JSONObject nestedProperties = new JSONObject();
 
-		    el.createComposedElement().get().getProperties().forEach(prop -> {
+		    mel.createComposedElement().get().getProperties().forEach(prop -> {
 
 			switch (prop.getType()) {
 			case BOOLEAN -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Boolean));
@@ -274,7 +276,7 @@ public class DataFolderMapping extends IndexMapping {
 	    }
 	});
 
-	ResourceProperty.listValues().forEach(rp -> {
+	ResourceProperty.listQueryables().forEach(rp -> {
 
 	    if (!properties.contains(rp.getName())) {
 
