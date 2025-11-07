@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * @author Fabrizio
  */
-public class OpenSearchDataFolderIndexUpdateTest extends OpenSearchTest {
+public class OpenSearchDataFolderIndexUpdateSimpleFieldsTest extends OpenSearchTest {
 
     private static final String FIELD_NAME = "testField";
 
@@ -115,7 +115,6 @@ public class OpenSearchDataFolderIndexUpdateTest extends OpenSearchTest {
 	    properties = record.mappings().properties().keySet();
 
 	    Assert.assertTrue(properties.contains(FIELD_NAME));
-
 	}
     }
 

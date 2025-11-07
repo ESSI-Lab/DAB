@@ -1,19 +1,21 @@
 package eu.essi_lab.api.database.opensearch.index.mappings.test;
 
-import com.vaadin.flow.component.page.Meta;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
+import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
+import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.JavaOptions;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
-import kotlin.Metadata;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.MockedStatic;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.mapping.Property;
 import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
 import org.opensearch.client.opensearch.indices.GetMappingRequest;
 import org.opensearch.client.opensearch.indices.GetMappingResponse;
@@ -21,22 +23,27 @@ import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
 
 /**
- *
+ * @author Fabrizio
  */
-public class OpenSearchDataFolderIndexMockedMappingTest {
+public class OpenSearchDataFolderIndexUpdateComposedFieldsTest {
+
+    /**
+     *
+     */
+    private static final JSONObject ORIGINAL_MAPPING = DataFolderMapping.get().getMapping();
 
     @Test
     public void allFieldsTest() throws GSException, IOException {
 
-	JSONObject originalMapping = DataFolderMapping.get().getMapping();
-
-	final List<String> originalFields = originalMapping.getJSONObject("properties").keySet().stream().sorted().toList();
+	final List<String> originalFields = new JSONObject(ORIGINAL_MAPPING.toString()).//
+		getJSONObject("properties").keySet().stream().sorted().toList();
 
 	final int mappingFieldsCount = originalFields.size();
 
@@ -111,7 +118,7 @@ public class OpenSearchDataFolderIndexMockedMappingTest {
 	// removes the composed element organization and set it to the data-folder index
 	//
 
-	JSONObject mockedMapping = DataFolderMapping.get().getMapping();
+	JSONObject mockedMapping = new JSONObject(ORIGINAL_MAPPING.toString());
 
 	mockedMapping.getJSONObject("properties").remove(MetadataElement.ORGANIZATION.getName());
 
@@ -159,9 +166,76 @@ public class OpenSearchDataFolderIndexMockedMappingTest {
 	    fields = readFields(dataBase.getClient());
 
 	    Assert.assertTrue(fields.contains(MetadataElement.ORGANIZATION.getName()));
-
 	}
+    }
 
+    @Test
+    public void updatingComposedOrganizationTest() throws GSException, IOException {
+
+	//
+	// removes the orgName property from the composed element organization
+	// and set it to the data-folder index
+	//
+
+	final String fieldName = "orgName";
+
+	JSONObject mockedMapping = new JSONObject(ORIGINAL_MAPPING.toString());
+
+	final JSONObject nestedOrganization = mockedMapping.getJSONObject("properties")
+		.getJSONObject(MetadataElement.ORGANIZATION.getName());
+
+	nestedOrganization.getJSONObject("properties").remove(fieldName);
+	nestedOrganization.getJSONObject("properties").remove(IndexMapping.toKeywordField(fieldName));
+
+	DataFolderMapping dataFolderMapping = spy(DataFolderMapping.class);
+
+	when(dataFolderMapping.getMapping()).thenReturn(new JSONObject(mockedMapping));
+
+	when(dataFolderMapping.getMappingStream()).thenReturn(IOStreamUtils.asStream(mockedMapping.toString()));
+
+	try (MockedStatic<DataFolderMapping> mocked = mockStatic(DataFolderMapping.class)) {
+
+	    mocked.when(DataFolderMapping::get).thenReturn(dataFolderMapping);
+
+	    mocked.when(() -> DataFolderMapping.toDateField(anyString())).thenAnswer(invocation -> {
+		String arg = invocation.getArgument(0, String.class);
+		return arg + "_date";
+	    });
+
+	    //
+	    // removes all the indexes and recreate them, but without updating the data-folder index
+	    // this way, the data-folder index will have the organization field missing the
+	    // orgName nested field according to the mocked mapping
+	    //
+
+	    clearIndexes();
+
+	    System.setProperty(JavaOptions.INIT_OPENSEARCH_INDEXES.getOption(), "true");
+
+	    System.setProperty(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
+
+	    OpenSearchDatabase dataBase = OpenSearchDatabase.createLocalService();
+
+	    //
+	    // expecting organization field missing the orgName nested field in the data-folder index
+	    //
+
+	    JSONObject orgNested = OpenSearchUtils.toJSONObject(
+		    readFieldsToProperties(dataBase.getClient()).get(MetadataElement.ORGANIZATION.getName()));
+
+	    Assert.assertFalse(orgNested.getJSONObject("properties").has(fieldName));
+
+	    //
+	    // expecting also orgName field after updating
+	    //
+
+	    DataFolderMapping.get().checkAndUpdate(dataBase.getClient());
+
+	    orgNested = OpenSearchUtils.toJSONObject(
+		    readFieldsToProperties(dataBase.getClient()).get(MetadataElement.ORGANIZATION.getName()));
+
+	    Assert.assertTrue(orgNested.getJSONObject("properties").has(fieldName));
+	}
     }
 
     /**
@@ -177,6 +251,21 @@ public class OpenSearchDataFolderIndexMockedMappingTest {
 	IndexMappingRecord record = getMappingResponse.result().values().iterator().next();
 
 	return record.mappings().properties().keySet();
+    }
+
+    /**
+     * @param client
+     * @return
+     * @throws IOException
+     */
+    private Map<String, Property> readFieldsToProperties(OpenSearchClient client) throws IOException {
+
+	GetMappingResponse getMappingResponse = client.indices()
+		.getMapping(GetMappingRequest.of(builder -> builder.index(DataFolderMapping.get().getIndex())));
+
+	IndexMappingRecord record = getMappingResponse.result().values().iterator().next();
+
+	return record.mappings().properties();
     }
 
     /**
