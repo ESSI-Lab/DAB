@@ -24,21 +24,14 @@ package eu.essi_lab.api.database.opensearch.index.mappings;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.JavaOptions;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.MetadataElement;
 import jakarta.json.Json;
 import jakarta.json.stream.JsonParser;
 import org.json.JSONObject;
@@ -54,8 +47,13 @@ import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 import org.opensearch.client.opensearch.indices.*;
 
-import eu.essi_lab.api.database.DatabaseFolder.EntryType;
-import eu.essi_lab.lib.utils.IOStreamUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Fabrizio
@@ -148,6 +146,15 @@ public abstract class IndexMapping {
     public static String toKeywordField(String field) {
 
 	return field + "_keyword";
+    }
+
+    /**
+     * @param field
+     * @return
+     */
+    public static String toTextField(String field) {
+
+	return field.replace("_keyword", "");
     }
 
     /**
@@ -462,14 +469,6 @@ public abstract class IndexMapping {
 		properties(key, property).//
 		index(index).//
 		build();
-    }
-
-    /**
-     * @param client
-     * @param element
-     */
-    private static void addField(OpenSearchClient client, MetadataElement element) {
-
     }
 
     /**
