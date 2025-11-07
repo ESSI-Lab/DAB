@@ -1,16 +1,32 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch.index.mappings;
 
-import org.json.JSONObject;
-import org.opensearch.client.opensearch._types.mapping.FieldType;
-
 import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.indexes.IndexedElements;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.JSONUtils;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.model.resource.composed.ComposedElementItem;
+import org.json.JSONObject;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.mapping.FieldType;
+import org.opensearch.client.opensearch._types.mapping.Property;
+import org.opensearch.client.opensearch.indices.GetMappingRequest;
+import org.opensearch.client.opensearch.indices.GetMappingResponse;
+import org.opensearch.client.opensearch.indices.PutMappingRequest;
+import org.opensearch.client.opensearch.indices.PutMappingResponse;
+import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /*-
  * #%L
@@ -22,12 +38,12 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -39,12 +55,12 @@ import eu.essi_lab.model.resource.ResourceProperty;
 public class DataFolderMapping extends IndexMapping {
 
     /**
-     * 
+     *
      */
     private static final String DATA_FOLDER_INDEX = "data-folder-index";
 
     /**
-     * 
+     *
      */
     public static final String GS_RESOURCE = "gsResource";
     // the source storage worker key must be preserved
@@ -55,8 +71,7 @@ public class DataFolderMapping extends IndexMapping {
     private static DataFolderMapping instance;
 
     /**
-     * 
-     *  
+     *
      */
     @SuppressWarnings("incomplete-switch")
     protected DataFolderMapping() {
@@ -95,7 +110,7 @@ public class DataFolderMapping extends IndexMapping {
 	    }
 
 	    case SPATIAL -> addProperty(el.getName(), FieldType.GeoShape.jsonValue(), true); // ignoring malformed
-											     // shapes
+	    // shapes
 	    case TEXTUAL -> {
 		addProperty(el.getName(), FieldType.Text.jsonValue());
 
@@ -113,8 +128,8 @@ public class DataFolderMapping extends IndexMapping {
 		JSONObject nestedProperties = new JSONObject();
 
 		el.createComposedElement().get().getProperties().forEach(prop -> {
-		    
-	 	    switch (prop.getType()) {
+
+		    switch (prop.getType()) {
 		    case BOOLEAN -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Boolean));
 		    case DOUBLE -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Double));
 		    case INTEGER -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Integer));
@@ -128,8 +143,8 @@ public class DataFolderMapping extends IndexMapping {
 			nestedProperties.put(toKeywordField(prop.getName()), createTypeObject(FieldType.Keyword));
 		    }
 		    }
- 		});
-		
+		});
+
 		addNested(el.getName(), nestedProperties);
 	    }
 	});
@@ -197,6 +212,184 @@ public class DataFolderMapping extends IndexMapping {
 	    }
 	    }
 	});
+    }
+
+    /**
+     * @param client
+     */
+    public void checkAndUpdate(OpenSearchClient client) throws IOException {
+
+	GSLoggerFactory.getLogger(getClass()).info("Checking data-folder index for changes STARTED");
+
+	GetMappingResponse mapping = client.indices()
+		.getMapping(GetMappingRequest.of(builder -> builder.index(DataFolderMapping.get().getIndex())));
+
+	IndexMappingRecord record = mapping.result().values().iterator().next();
+
+	Set<String> properties = record.mappings().properties().keySet();
+
+	HashMap<String, Property> missingFieldsMap = new HashMap<>();
+
+	// using listQueryables instead of listValues because of OpenSearchDataFolderIndexUpdateTest
+	MetadataElement.listQueryables().forEach(el -> {
+
+	    if (!properties.contains(el.getName())) {
+
+		//
+		// simple fields missing
+		//
+
+		switch (el.getContentType()) {
+		case BOOLEAN -> missingFieldsMap.put(el.getName(), createProperty(FieldType.Boolean.jsonValue()));
+		case DOUBLE -> missingFieldsMap.put(el.getName(), createProperty(FieldType.Double.jsonValue()));
+		case INTEGER -> missingFieldsMap.put(el.getName(), createProperty(FieldType.Integer.jsonValue()));
+		case LONG -> missingFieldsMap.put(el.getName(), createProperty(FieldType.Long.jsonValue()));
+		case ISO8601_DATE, ISO8601_DATE_TIME -> {
+
+		    missingFieldsMap.put(el.getName(), createProperty(FieldType.Long.jsonValue()));
+		    missingFieldsMap.put(toDateField(el.getName()), createProperty(FieldType.Date.jsonValue(), true));
+		}
+
+		case SPATIAL -> missingFieldsMap.put(el.getName(), createProperty(FieldType.GeoShape.jsonValue(), true));
+
+		case TEXTUAL -> {
+
+		    missingFieldsMap.put(el.getName(), createProperty(FieldType.Text.jsonValue()));
+		    missingFieldsMap.put(toKeywordField(el.getName()), createProperty(FieldType.Keyword.jsonValue()));
+		}
+
+		//
+		// nested fields missing
+		//
+
+		case COMPOSED -> {
+
+		    JSONObject nestedProperties = new JSONObject();
+
+		    ((MetadataElement) el).createComposedElement().get().getProperties().forEach(prop -> {
+
+			switch (prop.getType()) {
+			case BOOLEAN -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Boolean));
+			case DOUBLE -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Double));
+			case INTEGER -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Integer));
+			case LONG -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Long));
+			case ISO8601_DATE, ISO8601_DATE_TIME -> {
+			    nestedProperties.put(prop.getName(), createTypeObject(FieldType.Long));
+			    nestedProperties.put(toDateField(prop.getName()), createTypeObject(FieldType.Date));
+			}
+			case TEXTUAL -> {
+			    nestedProperties.put(prop.getName(), createTypeObject(FieldType.Text));
+			    nestedProperties.put(toKeywordField(prop.getName()), createTypeObject(FieldType.Keyword));
+			}
+			}
+		    });
+
+		    missingFieldsMap.put(el.getName(), createNestedProperty(nestedProperties));
+		}
+		}
+	    }
+
+	    //
+	    // existing nested fields properties missing
+	    //
+
+	    else if (el instanceof MetadataElement mel && mel.hasComposedElement()) {
+
+		final Property nestedProperty = record.mappings().properties().get(mel.getName());
+
+		final JSONObject nestedObject = OpenSearchUtils.toJSONObject(nestedProperty);
+
+		final List<String> nestedObjectProp = nestedObject.getJSONObject("properties").keySet().stream()
+			.map(p -> IndexMapping.toTextField(p)).distinct().collect(Collectors.toList());
+
+		final List<ComposedElementItem> elProperties = mel.createComposedElement().get().getProperties();
+
+		final List<String> elPropNames = elProperties.stream().map(p -> p.getName()).collect(Collectors.toList());
+
+		elPropNames.removeAll(nestedObjectProp);
+
+		if (!elPropNames.isEmpty()) {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Following fields of nested field {} missing: {}", mel.getName(),
+			    elPropNames.stream().collect(Collectors.joining(","))
+
+		    );
+
+		    JSONObject nestedProperties = new JSONObject();
+
+		    elProperties.stream().filter(p -> elPropNames.contains(p.getName())).forEach(prop -> {
+
+			switch (prop.getType()) {
+			case BOOLEAN -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Boolean));
+			case DOUBLE -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Double));
+			case INTEGER -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Integer));
+			case LONG -> nestedProperties.put(prop.getName(), createTypeObject(FieldType.Long));
+			case ISO8601_DATE, ISO8601_DATE_TIME -> {
+			    nestedProperties.put(prop.getName(), createTypeObject(FieldType.Long));
+			    nestedProperties.put(toDateField(prop.getName()), createTypeObject(FieldType.Date));
+			}
+			case TEXTUAL -> {
+			    nestedProperties.put(prop.getName(), createTypeObject(FieldType.Text));
+			    nestedProperties.put(toKeywordField(prop.getName()), createTypeObject(FieldType.Keyword));
+			}
+			}
+		    });
+
+		    missingFieldsMap.put(el.getName(), createNestedProperty(nestedProperties));
+		}
+	    }
+	});
+
+	ResourceProperty.listQueryables().forEach(rp -> {
+
+	    if (!properties.contains(rp.getName())) {
+
+		switch (rp.getContentType()) {
+		case BOOLEAN -> missingFieldsMap.put(rp.getName(), createProperty(FieldType.Boolean.jsonValue()));
+		case DOUBLE -> missingFieldsMap.put(rp.getName(), createProperty(FieldType.Double.jsonValue()));
+		case INTEGER -> missingFieldsMap.put(rp.getName(), createProperty(FieldType.Integer.jsonValue()));
+		case ISO8601_DATE, ISO8601_DATE_TIME -> {
+
+		    missingFieldsMap.put(rp.getName(), createProperty(FieldType.Long.jsonValue()));
+		    missingFieldsMap.put(toDateField(rp.getName()), createProperty(FieldType.Date.jsonValue(), true));
+
+		}
+		case LONG -> missingFieldsMap.put(rp.getName(), createProperty(FieldType.Long.jsonValue()));
+		case TEXTUAL -> {
+
+		    missingFieldsMap.put(rp.getName(), createProperty(FieldType.Text.jsonValue()));
+		    missingFieldsMap.put(toKeywordField(rp.getName()), createProperty(FieldType.Keyword.jsonValue()));
+		}
+		}
+	    }
+	});
+
+	if (!missingFieldsMap.isEmpty()) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Missing following fields: {}", missingFieldsMap.keySet());
+
+	    GSLoggerFactory.getLogger(getClass()).info("Updating index STARTED");
+
+	    PutMappingRequest request = new PutMappingRequest.Builder().//
+		    index(get().getIndex()).//
+		    properties(missingFieldsMap).//
+		    build();
+
+	    PutMappingResponse response = client.indices().putMapping(request);
+
+	    if (!response.acknowledged()) {
+
+		GSLoggerFactory.getLogger(getClass()).error("Unable to update data-folder mapping");
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).info("Updating index ENDED");
+
+	} else {
+
+	    GSLoggerFactory.getLogger(getClass()).info("No changes found");
+	}
+
+	GSLoggerFactory.getLogger(getClass()).info("Checking data-folder index for changes ENDED");
     }
 
     /**

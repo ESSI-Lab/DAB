@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.messages;
 
@@ -24,9 +24,9 @@ package eu.essi_lab.messages;
  * #L%
  */
 
-import java.util.Optional;
-
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+
+import java.util.Optional;
 
 /**
  * @author Fabrizio
@@ -64,7 +64,7 @@ public enum JavaOptions {
     S3_ENDPOINT("s3Endpoint", "S3 endpoint: "),
 
     /**
-     * 
+     *
      */
     SKIP_AUTHORIZATION("DAB_SKIP_AUTHORIZATION", "Authorization disabled", "Authorization enabled"),
 
@@ -79,6 +79,12 @@ public enum JavaOptions {
     INIT_OPENSEARCH_INDEXES("initIndexes", "OpenSearch indexes init enabled", "OpenSearch indexes init disabled"),
 
     /**
+     * - Boolean
+     */
+    UPDATE_DATA_FOLDER_INDEX("updateDataFolderIndex", "Updating of data-folder index enabled", "Updating of data-folder index disabled",
+	    true),
+
+    /**
      * - Integer
      */
     NUMBER_OF_DATA_FOLDER_INDEX_SHARDS("numShards", "Number of data-folder index shards: ");
@@ -87,6 +93,7 @@ public enum JavaOptions {
     private String infoMessage;
     private String enabledMessage;
     private String disabledMessage;
+    private Boolean defaultValue;
 
     /**
      * @param option
@@ -105,9 +112,37 @@ public enum JavaOptions {
      */
     private JavaOptions(String option, String enabledMessage, String disabledMessage) {
 
+	this(option, enabledMessage, disabledMessage, false);
+    }
+
+    /**
+     * @param option
+     * @param enabledMessage
+     * @param disabledMessage
+     * @param defaultValue
+     */
+    private JavaOptions(String option, String enabledMessage, String disabledMessage, boolean defaultValue) {
+
 	this.option = option;
 	this.enabledMessage = enabledMessage;
 	this.disabledMessage = disabledMessage;
+	this.defaultValue = defaultValue;
+    }
+
+    /**
+     * @return
+     */
+    public String getOption() {
+
+	return option;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Boolean> getDefaultValue() {
+
+	return Optional.ofNullable(defaultValue);
     }
 
     /**
@@ -146,9 +181,7 @@ public enum JavaOptions {
      */
     public static boolean isEnabled(JavaOptions javaOpt) {
 
-	Optional<String> check = getValue(javaOpt);
-
-	boolean out = check.isEmpty() ? false : Boolean.valueOf(check.get());
+	boolean out = getValue(javaOpt).map(Boolean::valueOf).orElse(javaOpt.defaultValue);
 
 	GSLoggerFactory.getLogger(JavaOptions.class).debug(out ? javaOpt.enabledMessage : javaOpt.disabledMessage);
 

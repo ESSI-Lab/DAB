@@ -2558,13 +2558,13 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
-    public static final IndexedMetadataElement PROJECT_SA = new IndexedMetadataElement(MetadataElement.PROJECT_SA) {
-
-	@Override
-	public void defineValues(GSResource resource) {
-
-	}
-    };
+//    public static final IndexedMetadataElement PROJECT_SA = new IndexedMetadataElement(MetadataElement.PROJECT_SA) {
+//
+//	@Override
+//	public void defineValues(GSResource resource) {
+//
+//	}
+//    };
 
     static {
 

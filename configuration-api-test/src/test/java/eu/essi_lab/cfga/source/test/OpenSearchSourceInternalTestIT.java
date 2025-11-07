@@ -58,7 +58,7 @@ public class OpenSearchSourceInternalTestIT extends DatabaseSourceTest {
 
 	for (String index : IndexMapping.getIndexes(false)) {
 
-	    if (OpenSearchDatabase.checkIndex(client, index)) {
+	    if (IndexMapping.checkIndex(client, index)) {
 
 		DeleteIndexRequest indexRequest = new DeleteIndexRequest.Builder().//
 			index(index).//
@@ -68,7 +68,7 @@ public class OpenSearchSourceInternalTestIT extends DatabaseSourceTest {
 	    }
 	}
 	OpenSearchDatabase database = (OpenSearchDatabase) DatabaseFactory.get(INFO);
-	database.initializeIndexes();
+	IndexMapping.initializeIndexes(client);
     }
 
     @Test
