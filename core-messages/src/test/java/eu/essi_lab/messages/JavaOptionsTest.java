@@ -28,5 +28,9 @@ public class JavaOptionsTest {
 	Assert.assertFalse(JavaOptions.SKIP_GDAL_TEST.getDefaultValue().get());
 
 	Assert.assertTrue(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getDefaultValue().get());
+
+	Assert.assertFalse(JavaOptions.CONFIGURATION_URL.getDefaultValue().isPresent());
+	Assert.assertFalse(JavaOptions.S3_ENDPOINT.getDefaultValue().isPresent());
+	Assert.assertFalse(JavaOptions.NUMBER_OF_DATA_FOLDER_INDEX_SHARDS.getDefaultValue().isPresent());
     }
 }

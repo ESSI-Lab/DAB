@@ -1,14 +1,12 @@
-package eu.essi_lab.api.database.opensearch.index.mappings;
+package eu.essi_lab.api.database.opensearch.index.mappings.test;
 
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
-import netscape.javascript.JSObject;
-import org.checkerframework.checker.units.qual.N;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.MockedStatic;

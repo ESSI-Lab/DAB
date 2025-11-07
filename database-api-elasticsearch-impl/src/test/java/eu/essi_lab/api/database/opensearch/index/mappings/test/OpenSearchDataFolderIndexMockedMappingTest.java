@@ -1,10 +1,14 @@
-package eu.essi_lab.api.database.opensearch.index.mappings;
+package eu.essi_lab.api.database.opensearch.index.mappings.test;
 
+import com.vaadin.flow.component.page.Meta;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.messages.JavaOptions;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import kotlin.Metadata;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,7 +29,7 @@ import static org.mockito.Mockito.*;
 /**
  *
  */
-public class OpenSearchDataFolderIndexUpdateAllFieldsTest {
+public class OpenSearchDataFolderIndexMockedMappingTest {
 
     @Test
     public void allFieldsTest() throws GSException, IOException {
@@ -96,6 +100,66 @@ public class OpenSearchDataFolderIndexUpdateAllFieldsTest {
 	    list.stream().sorted().forEach(field -> System.out.println(field));
 
 	    Assert.assertTrue(fields.containsAll(list));
+	}
+
+    }
+
+    @Test
+    public void missingComposedOrganizationTest() throws GSException, IOException {
+
+	//
+	// removes the composed element organization and set it to the data-folder index
+	//
+
+	JSONObject mockedMapping = DataFolderMapping.get().getMapping();
+
+	mockedMapping.getJSONObject("properties").remove(MetadataElement.ORGANIZATION.getName());
+
+	DataFolderMapping dataFolderMapping = spy(DataFolderMapping.class);
+
+	when(dataFolderMapping.getMapping()).thenReturn(new JSONObject(mockedMapping));
+
+	try (MockedStatic<DataFolderMapping> mocked = mockStatic(DataFolderMapping.class)) {
+
+	    mocked.when(DataFolderMapping::get).thenReturn(dataFolderMapping);
+
+	    mocked.when(() -> DataFolderMapping.toDateField(anyString())).thenAnswer(invocation -> {
+		String arg = invocation.getArgument(0, String.class);
+		return arg + "_date";
+	    });
+
+	    //
+	    // removes all the indexes and recreate them, but without updating the data-folder index
+	    // this way, the data-folder index will have all the fields but organization,
+	    // according to the mocked DataFolderMapping
+	    //
+
+	    clearIndexes();
+
+	    System.setProperty(JavaOptions.INIT_OPENSEARCH_INDEXES.getOption(), "true");
+
+	    System.setProperty(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
+
+	    OpenSearchDatabase dataBase = OpenSearchDatabase.createLocalService();
+
+	    //
+	    // expecting no organization field in the data-folder index
+	    //
+
+	    Set<String> fields = readFields(dataBase.getClient());
+
+	    Assert.assertFalse(fields.contains(MetadataElement.ORGANIZATION.getName()));
+
+	    //
+	    // expecting also organization field after updating
+	    //
+
+	    DataFolderMapping.get().checkAndUpdate(dataBase.getClient());
+
+	    fields = readFields(dataBase.getClient());
+
+	    Assert.assertTrue(fields.contains(MetadataElement.ORGANIZATION.getName()));
+
 	}
 
     }
