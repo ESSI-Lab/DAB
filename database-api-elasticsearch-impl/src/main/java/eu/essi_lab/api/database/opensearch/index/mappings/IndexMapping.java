@@ -167,16 +167,17 @@ public abstract class IndexMapping {
 
 	GSLoggerFactory.getLogger(IndexMapping.class).info("Indexes init STARTED");
 
-	boolean nothingToDo = false;
+	final ArrayList<String> indexes = new ArrayList<>();
 
 	for (IndexMapping mapping : IndexMapping.getMappings()) {
 
 	    boolean exists = checkIndex(client, mapping.getIndex(false));
-	    nothingToDo &= !exists;
 
 	    PutAliasRequest putAliasRequest = null;
 
 	    if (!exists) {
+
+		indexes.add(mapping.getIndex());
 
 		GSLoggerFactory.getLogger(IndexMapping.class).info("Creating index {} STARTED", mapping.getIndex());
 
@@ -206,9 +207,15 @@ public abstract class IndexMapping {
 	    }
 	}
 
-	if (nothingToDo) {
+	if (indexes.isEmpty()) {
 
 	    GSLoggerFactory.getLogger(IndexMapping.class).debug("No new index created");
+
+	} else {
+
+	    GSLoggerFactory.getLogger(IndexMapping.class).debug("Created indexes: {}",
+
+		    indexes.stream().collect(Collectors.joining(",")));
 	}
 
 	GSLoggerFactory.getLogger(IndexMapping.class).info("Indexes init ENDED");
