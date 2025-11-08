@@ -21,12 +21,12 @@ import javax.ws.rs.core.MediaType;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -242,8 +242,9 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    if (winSize > Database.MAX_RESULT_WINDOW_SIZE) {
 
 		message.setResult(ValidationResult.VALIDATION_FAILED);
-		message.setError("Result window is too large, start index + count must be less than or equal to: "
-			+ Database.MAX_RESULT_WINDOW_SIZE + " but was " + winSize);
+		message.setError(
+			"Result window is too large, start index + count must be less than or equal to: " + Database.MAX_RESULT_WINDOW_SIZE
+				+ " but was " + winSize);
 
 		return message;
 	    }
@@ -320,9 +321,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 		boolean supported = eiffelDiscoveryOption.equals(//
 
-			DiscoveryMessage.EiffelAPIDiscoveryOption.FILTER_AND_SORT.name())
-			|| eiffelDiscoveryOption.equals(//
-				DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
+			DiscoveryMessage.EiffelAPIDiscoveryOption.FILTER_AND_SORT.name()) || eiffelDiscoveryOption.equals(//
+			DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
 
 		if (!supported) {
 
@@ -465,8 +465,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		//
 		// already handled separately
 		//
-		if (osParameter.getName().equals(OSParameters.SEARCH_TERMS.getName())
-			|| osParameter.getName().equals(OSParameters.SEARCH_FIELDS.getName())) {
+		if (osParameter.getName().equals(OSParameters.SEARCH_TERMS.getName()) || osParameter.getName()
+			.equals(OSParameters.SEARCH_FIELDS.getName())) {
 
 		    continue;
 		}
@@ -478,7 +478,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			osParameter.equals(OSParameters.PLATFORM_IDENTIFIER) || //
 			osParameter.equals(OSParameters.ORIGINATOR_ORGANISATION_IDENTIFIER) || //
 			osParameter.equals(OSParameters.ATTRIBUTE_IDENTIFIER)) && ( //
-		rosetta != null && !rosetta.equals("false") && value != null)) {
+			rosetta != null && !rosetta.equals("false") && value != null)) {
 
 		    value = handleRosetta(rosetta, value);
 		}
@@ -787,7 +787,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      * </tr>
      * </table>
      * </body> </html>
-     * 
+     *
      * @param keyValueParser
      * @param request
      * @param eiffelOption

@@ -178,7 +178,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
     /**
      * Returns the element to be used for executing the distinct operation (i.e. removing from all the
      * returned resources the ones having the same values for the given element, except one).
-     * By default this set is empty. Sub transformers can override this method to set specific distinct elements.
+     * By default, this set is empty. Sub transformers can override this method to set specific distinct elements.
      * 
      * @return the optional distinct element
      */
@@ -255,7 +255,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 		    Bond firstOperand = b.getFirstOperand();
 		    if (isSourceIdentifierBond(firstOperand)) {
 			ResourcePropertyBond rb = (ResourcePropertyBond) firstOperand;
-			// this will excludes it by the requested sources list
+			// this will exclude it by the requested sources list
 			rb.setPropertyValue(rb.getPropertyValue() + EXCLUDED);
 		    }
 		}
