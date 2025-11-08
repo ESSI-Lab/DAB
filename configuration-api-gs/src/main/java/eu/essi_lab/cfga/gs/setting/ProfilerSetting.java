@@ -131,6 +131,8 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	Option<String> resourceConsumerOption = StringOptionBuilder.get().//
 		withKey(RESOURCE_CONSUMER_OPTION_KEY).//
 		withLabel("Resource consumer").//
+		withDescription("If selected, the consumer will apply some changes (according to its implementation)"
+		+ " to the result set resources").//
 		cannotBeDisabled().//
 		withSingleSelection().//
 		withValuesLoader(new ResourceConsumerLoader()).//
