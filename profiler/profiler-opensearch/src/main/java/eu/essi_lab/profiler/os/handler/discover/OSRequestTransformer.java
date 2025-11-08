@@ -21,12 +21,12 @@ import javax.ws.rs.core.MediaType;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -91,8 +91,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     private static final List<String> SUPPORTED_OUTPUT_FORMATS = new ArrayList<>();
     private static final String OS_PARAM_PARSING_ERROR = "OS_PARAM_PARSING_ERROR";
 
-    protected ProfilerSetting setting;
-
     //
     //
     // ---------------------------
@@ -108,7 +106,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      */
     public OSRequestTransformer() {
 
-	this(new OSProfilerSetting());
+	super(new OSProfilerSetting());
     }
 
     /**
@@ -116,7 +114,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      */
     public OSRequestTransformer(ProfilerSetting setting) {
 
-	this.setting = setting;
+	super(setting);
     }
 
     @Override
@@ -134,7 +132,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	// set the covering mode view and adjusts the ranking to give a weight only to
 	// bbox
 	//
-	if (CoveringModeOptionsReader.isCoveringModeEnabled(setting)) {
+	if (CoveringModeOptionsReader.isCoveringModeEnabled(getSetting().get())) {
 
 	    message.setResultsPriority(ResultsPriority.DATASET);
 
@@ -376,7 +374,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	//
 	// search terms are NOT included in case of Eiffel SORT_AND_FILTER
 	//
-	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request, setting);
+	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request, getSetting().get());
 
 	if (!eiffelOption.isPresent() || eiffelOption.get() == EiffelAPIDiscoveryOption.FILTER_AND_SORT) {
 
@@ -799,7 +797,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    boolean eiffelOption //
     ) {
 
-	Optional<Integer> filterAndSortSplitTreshold = EiffelDiscoveryHelper.getFilterAndSortSplitTreshold(setting);
+	Optional<Integer> filterAndSortSplitTreshold = EiffelDiscoveryHelper.getFilterAndSortSplitTreshold(getSetting().get());
 
 	if (eiffelOption && filterAndSortSplitTreshold.isPresent()) {
 
