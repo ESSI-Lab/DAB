@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>gs-lib-what3words</artifactId>
-	<name>ESSI-Lab GI-suite Library What3Words</name>
+	<name>ESSI-Lab DAB Library What3Words</name>
 	<description>What3Words Library</description>
 
 	<dependencies>

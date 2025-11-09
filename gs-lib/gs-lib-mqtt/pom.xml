@@ -8,7 +8,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<name>ESSI-Lab GI-suite MQTT Utilities</name>
+	<name>ESSI-Lab DAB MQTT Clients and Utilities</name>
 	<artifactId>gs-lib-mqtt</artifactId>
 
 	<dependencies>

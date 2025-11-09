@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>gs-lib-netcdf</artifactId>
-	<name>ESSI-Lab GI-suite Library NetCDF</name>
+	<name>ESSI-Lab DAB Library NetCDF</name>
 	<description>NetCDF utility Library</description>
 
 	<dependencies>
