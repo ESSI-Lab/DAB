@@ -75,14 +75,13 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
      * 
      */
     private static final String OAI_PMH_POST_QUERY_EXTRACTION_ERROR = "OAI_PMH_POST_QUERY_EXTRACTION_ERROR";
-    private OAIPMHProfilerSetting setting;
 
     /**
      * @param setting
      */
     public OAIPMHRequestTransformer(OAIPMHProfilerSetting setting) {
 
-	this.setting = setting;
+	super(setting);
     }
 
     @Override
@@ -328,7 +327,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
      */
     private int getPageSize() {
 
-	Optional<Properties> properties = setting.getKeyValueOptions();
+	Optional<Properties> properties = getSetting().get().getKeyValueOptions();
 	int pageSize = getDefaultPageSize();
 	if (properties.isPresent()) {
 
@@ -343,7 +342,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
      */
     private boolean sortResults() {
 
-	Optional<Properties> properties = setting.getKeyValueOptions();
+	Optional<Properties> properties = getSetting().get().getKeyValueOptions();
 	boolean sortResults = false;
 	if (properties.isPresent()) {
 

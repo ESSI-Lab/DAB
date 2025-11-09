@@ -1,12 +1,11 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.gs.setting;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /*-
  * #%L
@@ -18,23 +17,27 @@ import java.util.List;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
+import com.mchange.v2.codegen.bean.SimpleClassInfo;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
+import eu.essi_lab.cfga.gs.task.CustomTask;
+import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
+import eu.essi_lab.cfga.gs.task.DefaultCustomTask;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
@@ -44,6 +47,7 @@ import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
+import eu.essi_lab.cfga.option.ValuesLoader;
 import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
@@ -51,6 +55,8 @@ import eu.essi_lab.cfga.setting.validation.ValidationContext;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
 import eu.essi_lab.cfga.setting.validation.Validator;
+import eu.essi_lab.lib.utils.StreamUtils;
+import eu.essi_lab.messages.ResourceConsumer;
 
 /**
  * @author Fabrizio
@@ -61,9 +67,10 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     private static final String TYPE_OPTION_KEY = "typeOption";
     private static final String VERSION_OPTION_KEY = "versionOption";
     private static final String STATE_OPTION = "stateOption";
+    private static final String RESOURCE_CONSUMER_OPTION_KEY = "resourceConsumer";
 
     /**
-     * 
+     *
      */
     public ProfilerSetting() {
 
@@ -121,6 +128,23 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	//
 	//
 
+	Option<String> resourceConsumerOption = StringOptionBuilder.get().//
+		withKey(RESOURCE_CONSUMER_OPTION_KEY).//
+		withLabel("Resource consumer").//
+		withDescription(
+		"If selected, the consumer will apply some changes (according to its implementation)" + " to the result set resources").//
+		cannotBeDisabled().//
+		withSingleSelection().//
+		withValuesLoader(new ResourceConsumerLoader()).//
+		withValues(ResourceConsumerLoader.getValues()).//
+		build();
+
+	addOption(resourceConsumerOption);
+
+	//
+	//
+	//
+
 	addKeyValueOption();
 
 	//
@@ -132,6 +156,50 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	// set the validator
 	//
 	setValidator(new ProfilerSettingValidator());
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class ResourceConsumerLoader extends ValuesLoader<String> {
+
+	public static List<String> getValues() {
+
+	    ServiceLoader<ResourceConsumer> loader = ServiceLoader.load(ResourceConsumer.class);
+
+	    return StreamUtils.iteratorToStream(loader.iterator()).//
+		    map(c -> c.getClass().getSimpleName()).//
+		    sorted().//
+		    collect(Collectors.toList());
+	}
+
+	/**
+	 * @param simpleClass
+	 * @return
+	 */
+	public static ResourceConsumer load(String simpleClass) {
+
+	    ServiceLoader<ResourceConsumer> loader = ServiceLoader.load(ResourceConsumer.class);
+
+	    return StreamUtils.iteratorToStream(loader.iterator()).//
+		    filter(c -> c.getClass().getSimpleName().equals(simpleClass)).//
+		    map(c -> {
+		try {
+		    return c.getClass().getDeclaredConstructor().newInstance();
+		} catch (Exception e) {
+		}
+		return null;
+	    }).filter(Objects::nonNull).//
+		    findFirst().//
+		    get();
+
+	}
+
+	@Override
+	protected List<String> loadValues(Optional<String> input) {
+
+	    return getValues();
+	}
     }
 
     /**
@@ -171,7 +239,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     public static class ProfilerComponentInfo extends ComponentInfo {
 
 	/**
-	 * 
+	 *
 	 */
 	public ProfilerComponentInfo() {
 
@@ -185,25 +253,25 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 		    withShowDirective("Profilers", SortDirection.ASCENDING).//
 		    withGridInfo(Arrays.asList(//
 
-			    ColumnDescriptor.createPositionalDescriptor(), //
+		    ColumnDescriptor.createPositionalDescriptor(), //
 
-			    ColumnDescriptor.create("Name", true, true, Setting::getName), //
+		    ColumnDescriptor.create("Name", true, true, Setting::getName), //
 
-			    ColumnDescriptor.create("State", 150, true, true, //
+		    ColumnDescriptor.create("State", 150, true, true, //
 
-				    this::getServiceState, //
+			    this::getServiceState, //
 
-				    Comparator.comparing(item -> item.get("State")), //
+			    Comparator.comparing(item -> item.get("State")), //
 
-				    new ProfilerStateColumnRenderer()), //
+			    new ProfilerStateColumnRenderer()), //
 
-			    ColumnDescriptor.create("Path", 200, true, true, this::getServicePath), //
+		    ColumnDescriptor.create("Path", 200, true, true, this::getServicePath), //
 
-			    ColumnDescriptor.create("Type", 300, true, true, this::getServiceType), //
+		    ColumnDescriptor.create("Type", 300, true, true, this::getServiceType), //
 
-			    ColumnDescriptor.create("Version", true, true, this::getServiceVersion) //
+		    ColumnDescriptor.create("Version", true, true, this::getServiceVersion) //
 
-		    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).//
+	    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).//
 
 		    build();
 
@@ -277,11 +345,9 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     }
 
     /**
-     * Get the path where the "GI-suite service" is expected to receive the
-     * {@link Profiler} requests from the suitable clients
-     * 
-     * @return a non <code>null</code> string which contains only alphabetic
-     *         characters
+     * Get the path where the "GI-suite service" is expected to receive the {@link Profiler} requests from the suitable clients
+     *
+     * @return a non <code>null</code> string which contains only alphabetic characters
      */
     public String getServicePath() {
 
@@ -289,11 +355,9 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     }
 
     /**
-     * Set the path where the "GI-suite service" is expected to receive the
-     * {@link Profiler} requests from the suitable clients
-     * 
-     * @param path a non <code>null</code> string which contains only alphabetic
-     *        characters
+     * Set the path where the "GI-suite service" is expected to receive the {@link Profiler} requests from the suitable clients
+     *
+     * @param path a non <code>null</code> string which contains only alphabetic characters
      */
     public void setServicePath(String path) {
 
@@ -302,7 +366,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
     /**
      * Returns the {@link Profiler} name
-     * 
+     *
      * @return a non <code>null</code> string
      */
     public String getServiceName() {
@@ -312,7 +376,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
     /**
      * Set the {@link Profiler} name
-     * 
+     *
      * @param name a non <code>null</code> string
      */
     public void setServiceName(String name) {
@@ -322,7 +386,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
     /**
      * Returns the type of the {@link Profiler} service
-     * 
+     *
      * @return a non <code>null</code> string
      */
     public String getServiceType() {
@@ -331,10 +395,9 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     }
 
     /**
-     * Set the type of the {@link Profiler} service (e.g: "OAI-PMH", "OpenSearch",
-     * etc..) by adding the suffix "Profiler" to the type.<br>
+     * Set the type of the {@link Profiler} service (e.g: "OAI-PMH", "OpenSearch", etc...) by adding the suffix "Profiler" to the type.<br>
      * This method also set the {@link #getConfigurableType()} with the same value
-     * 
+     *
      * @param type
      */
     public void setServiceType(String type) {
@@ -347,7 +410,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
     /**
      * Get the version of the {@link Profiler} service
-     * 
+     *
      * @return a non <code>null</code> string
      */
     public String getServiceVersion() {
@@ -356,9 +419,8 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     }
 
     /**
-     * Set the version of the {@link Profiler} service (e.g: "OAI-PMH",
-     * "OpenSearch", etc..)
-     * 
+     * Set the version of the {@link Profiler} service (e.g: "OAI-PMH", "OpenSearch", etc...)
+     *
      * @param version a non <code>null</code> string
      */
     public void setServiceVersion(String version) {
@@ -366,4 +428,14 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	getOption(VERSION_OPTION_KEY, String.class).get().setValue(version);
     }
 
+    /**
+     * @return
+     */
+    public Optional<ResourceConsumer> getConsumer() {
+
+	return getOption(RESOURCE_CONSUMER_OPTION_KEY, String.class).//
+		get().
+		getOptionalSelectedValue().//
+		map(simpleClass -> ResourceConsumerLoader.load(simpleClass));
+    }
 }

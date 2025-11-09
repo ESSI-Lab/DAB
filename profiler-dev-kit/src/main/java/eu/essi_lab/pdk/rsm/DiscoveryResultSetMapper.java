@@ -119,7 +119,6 @@ public abstract class DiscoveryResultSetMapper<T>
     @Override
     public ResultSet<T> map(DiscoveryMessage message, ResultSet<GSResource> resultSet) throws GSException {
 
-
 	//
 	// converts the incoming ResultSet<GSResource> in a ResultSet<T>
 	//
@@ -136,7 +135,7 @@ public abstract class DiscoveryResultSetMapper<T>
 	//
 
 	ThreadFactory factory = Thread.ofVirtual().//
-		name(getClass().getSimpleName()+"@"+message.getRequestId(true)).//
+		name(getClass().getSimpleName() + "@" + message.getRequestId(true)).//
 		factory();
 
 	ExecutorService executor = Executors.newThreadPerTaskExecutor(factory);
@@ -204,6 +203,10 @@ public abstract class DiscoveryResultSetMapper<T>
 	}
 
 	try {
+
+	    // optionally consumes the resource
+	    message.getResourceConsumer().ifPresent(c -> c.accept(res));
+
 	    return map(message, res);
 
 	} catch (GSException e) {
@@ -213,5 +216,4 @@ public abstract class DiscoveryResultSetMapper<T>
 	    return null;
 	}
     }
-
 }

@@ -49,7 +49,7 @@ public class OSRequestTransformerValidationTest {
 	} catch (Exception ex) {
 	}
 
-	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
+	OSRequestTransformer osRequestTransformer =new OSRequestTransformer();
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 

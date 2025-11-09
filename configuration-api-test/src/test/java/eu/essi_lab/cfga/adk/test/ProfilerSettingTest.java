@@ -35,6 +35,8 @@ public class ProfilerSettingTest {
 
 	Assert.assertTrue(setting.isOnline());
 
+	Assert.assertFalse(setting.getConsumer().isPresent());
+
 	//
 	//
 	//
