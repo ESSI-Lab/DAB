@@ -4,6 +4,7 @@ import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.JavaOptions;
 import eu.essi_lab.model.exceptions.GSException;
@@ -11,6 +12,7 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.MockedStatic;
@@ -32,12 +34,16 @@ import static org.mockito.Mockito.*;
 /**
  * @author Fabrizio
  */
-public class OpenSearchDataFolderIndexUpdateComposedFieldsTest {
+public class OpenSearchDataFolderIndexUpdateComposedFieldsTest extends OpenSearchTest {
 
     /**
      *
      */
     private static final JSONObject ORIGINAL_MAPPING = DataFolderMapping.get().getMapping();
+
+    @Before
+    public void before() throws GSException, IOException {
+    }
 
     @Test
     public void allFieldsTest() throws GSException, IOException {
@@ -80,7 +86,7 @@ public class OpenSearchDataFolderIndexUpdateComposedFieldsTest {
 
 	    System.setProperty(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
 
-	    OpenSearchDatabase dataBase = OpenSearchDatabase.createLocalService();
+	    OpenSearchDatabase dataBase = createDataBase();
 
 	    //
 	    // expecting no fields in the data-folder index
@@ -147,7 +153,7 @@ public class OpenSearchDataFolderIndexUpdateComposedFieldsTest {
 
 	    System.setProperty(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
 
-	    OpenSearchDatabase dataBase = OpenSearchDatabase.createLocalService();
+	    OpenSearchDatabase dataBase = createDataBase();
 
 	    //
 	    // expecting no organization field in the data-folder index
@@ -214,7 +220,7 @@ public class OpenSearchDataFolderIndexUpdateComposedFieldsTest {
 
 	    System.setProperty(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
 
-	    OpenSearchDatabase dataBase = OpenSearchDatabase.createLocalService();
+	    OpenSearchDatabase dataBase = createDataBase();
 
 	    //
 	    // expecting organization field missing the orgName nested field in the data-folder index
