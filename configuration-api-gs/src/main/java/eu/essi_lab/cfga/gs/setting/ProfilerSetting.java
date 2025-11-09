@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -131,8 +131,8 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	Option<String> resourceConsumerOption = StringOptionBuilder.get().//
 		withKey(RESOURCE_CONSUMER_OPTION_KEY).//
 		withLabel("Resource consumer").//
-		withDescription("If selected, the consumer will apply some changes (according to its implementation)"
-		+ " to the result set resources").//
+		withDescription(
+		"If selected, the consumer will apply some changes (according to its implementation)" + " to the result set resources").//
 		cannotBeDisabled().//
 		withSingleSelection().//
 		withValuesLoader(new ResourceConsumerLoader()).//
@@ -433,8 +433,9 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
      */
     public Optional<ResourceConsumer> getConsumer() {
 
-	return getOption(RESOURCE_CONSUMER_OPTION_KEY, String.class).get().
-
-		getOptionalValue().map(simpleClass -> ResourceConsumerLoader.load(simpleClass));
+	return getOption(RESOURCE_CONSUMER_OPTION_KEY, String.class).//
+		get().
+		getOptionalSelectedValue().//
+		map(simpleClass -> ResourceConsumerLoader.load(simpleClass));
     }
 }
