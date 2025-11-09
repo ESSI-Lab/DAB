@@ -85,6 +85,7 @@
 			<organization>ESSI-Lab of CNR-IIA</organization>
 			<organizationUrl>https://essi-lab.eu/</organizationUrl>
 			<roles>
+                <role>software design</role>
 				<role>developer</role>
 			</roles>
 			<id>https://orcid.org/0000-0002-9104-7554</id>
@@ -166,10 +167,10 @@
 		<sonar.plugin.version>3.9.0.2155</sonar.plugin.version>
 		<maven-jaxb-plugin.version>2.5.0</maven-jaxb-plugin.version>
 
-		<!--  Docker plugin (J11 UPDATED) -->
+		<!--  Docker plugin -->
 		<docker.plugin.version>0.44.0</docker.plugin.version>
 
-		<!-- Apache CXF (J11 UPDATED) -->
+		<!-- Apache CXF -->
 		<cxf.version>3.3.13</cxf.version>
 
 		<!-- JAX WS RS API-->
@@ -186,22 +187,22 @@
 		<!-- <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version> -->
 		<java.servlet-api.version>4.0.1</java.servlet-api.version>
 
-		<!-- Google Sheets API (J11 UPDATED) -->
+		<!-- Google Sheets API -->
 		<google-api-services-sheets.version>v4-rev20240416-2.0.0</google-api-services-sheets.version>
 
-		<!-- Core Protocol Buffers library (J11 UPDATED) -->
+		<!-- Core Protocol Buffers library -->
 		<com.google.protobuf-protobuf-java.version>3.25.3</com.google.protobuf-protobuf-java.version>
 
-		<!-- Apache Commons Math (J11 UPDATED) -->
+		<!-- Apache Commons Math -->
 		<org.apache.commons-commons-math.version>3.6.1</org.apache.commons-commons-math.version>
 
-		<!-- Apache Commons Compress (J11 UPDATED) -->
+		<!-- Apache Commons Compress -->
 		<org.apache.commons-commons-compress.version>1.26.1</org.apache.commons-commons-compress.version>
 
-		<!-- Apache Commons Net library (J11 UPDATED) -->
+		<!-- Apache Commons Net library -->
 		<commons-net.version>3.10.0</commons-net.version>
 
-		<!-- Apache Commons Lang (J11 UPDATED) -->
+		<!-- Apache Commons Lang -->
 		<org.apache-commons-commons-lang3.version>3.14.0</org.apache-commons-commons-lang3.version>
 
 		<!-- Apache POI - Java API To Access Microsoft Format Files (J11
@@ -209,45 +210,48 @@
 		<org.apache.poi-poi.version>4.1.2</org.apache.poi-poi.version>
 
 		<!-- Apache Jena - Java framework for building Semantic Web and Linked
-		Data applications (J11 UPDATED) -->
+		Data applications -->
 		<org.apache.jena.version>4.10.0</org.apache.jena.version>
 
-		<!-- Saxon - XSLT and XQuery Processor (J11 UPDATED) -->
+		<!-- Saxon - XSLT and XQuery Processor -->
 		<saxon-he.version>9.7.0-15</saxon-he.version>
 
 		<!-- NetCDF (nothing to upate) -->
 		<netcdf.version>5.5.3</netcdf.version>
 
-		<!-- Sesame (project moved to Rio API) (J11 UPDATED) -->
+		<!-- Sesame (project moved to Rio API) -->
 		<rdf4j.version>4.3.9</rdf4j.version>
 
 
-		<!-- API for the Unified Expression Language 3.0 (J11 UPDATED) -->
+		<!-- API for the Unified Expression Language 3.0 -->
 		<javax.el-el-api.version>3.0.1-b06</javax.el-el-api.version>
 
-		<!-- Expression Language 3.0 (J11 UPDATED) -->
+		<!-- Expression Language 3.0 -->
 		<org.glassfish-javax.el.version>3.0.1-b12</org.glassfish-javax.el.version>
 
 		<!-- Hibernate's Jakarta Bean Validation reference implementation (J11
 		UPDATED) -->
 		<org.hibernate.version>6.2.5.Final</org.hibernate.version>
 
-		<!-- AWS IoT Device SDK Java (J11 UPDATED) -->
+		<!-- AWS IoT Device SDK Java -->
 		<aws-iot-device-sdk.version>1.23.0</aws-iot-device-sdk.version>
 
-		<!-- The AWS SDK for Java - BOM module (J11 UPDATED) -->
+		<!-- The AWS SDK for Java - BOM module -->
 		<aws-java-sdk-bom.version>2.30.16</aws-java-sdk-bom.version>
 
-		<!-- S3 Transfer Manager (J11 UPDATED) -->
+        <!-- AWS Common Runtime Libraries -->
+        <aws-crt.version>0.34.0</aws-crt.version>
+
+		<!-- S3 Transfer Manager -->
 		<!--s3-transfer-manager.version>2.29.46</s3-transfer-manager.version-->
 
 		<!-- Authzforce (to update it, some code changes are required) -->
 		<authzforce.version>13.3.1</authzforce.version>
 
-		<!-- Cloud Localstack  (J11 UPDATED) -->
+		<!-- Cloud Localstack  -->
 		<cloud.localstack.version>0.1.22</cloud.localstack.version>
 
-		<!-- MarkLogic (J11 UPDATED) -->
+		<!-- MarkLogic -->
 		<xcc.version>11.1.0</xcc.version>
 		<marklogic-client-api.version>6.5.0</marklogic-client-api.version>
 
@@ -255,94 +259,94 @@
 		<opensearch.client-opensearch-java.version>2.19.0</opensearch.client-opensearch-java.version>
 		<opensearch.client-opensearch-rest-client.version>2.18.0</opensearch.client-opensearch-rest-client.version>
 
-		<!-- Vaadin (J11 UPDATED) -->
+		<!-- Vaadin -->
 		<vaadin.version>23.4.0</vaadin.version>
 		<vaadin.togglebutton.version>3.0.0</vaadin.togglebutton.version>
 
-		<!-- GeoTools (J11 UPDATED) -->
+		<!-- GeoTools -->
 		<geotools-version>32.2</geotools-version>
 
-		<!-- Quartz (J11 UPDATED) -->
+		<!-- Quartz -->
 		<quartz.version>2.3.2</quartz.version>
 
-		<!-- MySQL (J11 UPDATED) -->
+		<!-- MySQL -->
 		<mysql.connector.version>8.3.0</mysql.connector.version>
 
-		<!-- GeoNames (J11 UPDATED) -->
+		<!-- GeoNames -->
 		<geonames.version>1.1.17</geonames.version>
 
-		<!-- Status (J11 UPDATED) -->
+		<!-- Status -->
 		<status.version>1.0.40-7dabb3b</status.version>
 
-		<!-- Failsafe  (J11 UPDATED) -->
+		<!-- Failsafe  -->
 		<dev.failsafe.version>3.3.2</dev.failsafe.version>
 
-		<!-- HIVE Client (J11 UPDATED) -->
+		<!-- HIVE Client -->
 		<hivemq-mqtt-client.version>1.3.3</hivemq-mqtt-client.version>
 
-		<!-- ROME (J11 UPDATED) -->
+		<!-- ROME -->
 		<com.rometools.rome.version>2.1.0</com.rometools.rome.version>
 
-		<!-- Javax mail (J11 UPDATED) -->
+		<!-- Javax mail -->
 		<!-- Relocated to Jakarta Mail API -->
 		<javax.mail-api.version>1.6.2</javax.mail-api.version>
 
-		<!-- Jfree chart (J11 UPDATED) -->
+		<!-- Jfree chart -->
 		<jfreechart.version>1.5.4</jfreechart.version>
 
-		<!-- Tagsoup (J11 UPDATED) -->
+		<!-- Tagsoup -->
 		<org.ccil.cowan.tagsoup.version>1.2.1</org.ccil.cowan.tagsoup.version>
 
-		<!-- XChart (J11 UPDATED) -->
+		<!-- XChart -->
 		<org.knowm.xchart-xchart.version>3.8.7</org.knowm.xchart-xchart.version>
 
-		<!-- MyBatis (J11 UPDATED) -->
+		<!-- MyBatis -->
 		<org.mybatis.version>3.5.16</org.mybatis.version>
 
-		<!-- Schematron validator and plugin (J11 UPDATED) -->
+		<!-- Schematron validator and plugin -->
 		<com.helger-ph-schematron-validator.version>5.6.5</com.helger-ph-schematron-validator.version>
 
-		<!-- Redis client (J11 UPDATED) -->
+		<!-- Redis client -->
 		<redis.clients-jedis.version>5.1.2</redis.clients-jedis.version>
 
-		<!-- OkHttp (J11 UPDATED) -->
+		<!-- OkHttp -->
 		<com.squareup.okhttp3-okhtt.version>4.12.0</com.squareup.okhttp3-okhtt.version>
 
-		<!-- Jackson JAXRS: JSON (J11 UPDATED) -->
+		<!-- Jackson JAXRS: JSON -->
 		<jackson.version>2.15.0</jackson.version>
 
 		<!--Jackson core -->
 		<jackson-core.version>2.17.0</jackson-core.version>
 
-		<!-- EclipseLink (J11 UPDATED) -->
+		<!-- EclipseLink -->
 		<!-- From version 3.x it depends from Jakarta XML bind -->
 		<eclipselink.version>2.7.14</eclipselink.version>
 
-		<!-- Eclipse Paho Client Mqttv3 (J11 UPDATED) -->
+		<!-- Eclipse Paho Client Mqttv3 -->
 		<org.eclipse.paho.client.mqttv3.version>1.2.5</org.eclipse.paho.client.mqttv3.version>
 
-		<!-- OpenSearch client (J11 UPDATED) -->
+		<!-- OpenSearch client -->
 		<opensearch-rest-high-level-client.version>2.5.0</opensearch-rest-high-level-client.version>
 
-		<!-- LogicNG (J11 UPDATED) -->
+		<!-- LogicNG -->
 		<org.logicng.version>2.4.3</org.logicng.version>
 
-		<!-- SPRING Framework (J11 UPDATED) -->
+		<!-- SPRING Framework -->
 		<org.springframework.version>5.3.33</org.springframework.version>
 
-		<!-- ORG JSON (J11 UPDATED) -->
+		<!-- ORG JSON -->
 		<org.json.version>20240303</org.json.version>
 
-		<!-- Java JWT (J11 UPDATED) -->
+		<!-- Java JWT -->
 		<java-jwt.version>4.4.0</java-jwt.version>
 
-		<!-- SLF4J  (J11 UPDATED) -->
+		<!-- SLF4J  -->
 		<slf4j.version>2.0.12</slf4j.version>
 
-		<!-- LOG4J (J11 UPDATED) -->
+		<!-- LOG4J -->
 		<log4j.version>2.23.1</log4j.version>
 
-		<!-- Mockito (J11 UPDATED) -->
+		<!-- Mockito -->
 		<mockito.version>5.2.0</mockito.version>
 
 		<!-- GDAL -->
@@ -380,6 +384,16 @@
         <docker.keycloak>keycloak/keycloak:26.4.1</docker.keycloak>
         <docker.redis>redis:8.2.2</docker.redis>
 
+        <!-- Apache Parquet -->
+        <apache.parquet.version>1.15.1</apache.parquet.version>
+
+        <!-- Micrometer Application Metrics -->
+        <micrometer.version>1.12.13</micrometer.version>
+
+        <!-- FTP Server Core -->
+        <ftpserver-core.version>1.2.1</ftpserver-core.version>
+
+        <!-- Surefire args -->
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
             --add-opens=java.base/java.lang=ALL-UNNAMED
@@ -444,24 +458,25 @@
 			<dependency>
 				<groupId>org.apache.parquet</groupId>
 				<artifactId>parquet-avro</artifactId>
-				<version>1.15.1</version> <!-- or latest version -->
+				<version>${apache.parquet.version}</version> <!-- or latest version -->
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.parquet</groupId>
 				<artifactId>parquet-hadoop</artifactId>
-				<version>1.15.1</version>
+				<version>${apache.parquet.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.micrometer</groupId>
 				<artifactId>micrometer-registry-prometheus</artifactId>
-				<version>1.12.13</version> <!-- Check for the latest version -->
+				<version>${micrometer.version}</version> <!-- Check for the latest version -->
 			</dependency>
+
 			<dependency>
 				<groupId>io.micrometer</groupId>
 				<artifactId>micrometer-core</artifactId>
-				<version>1.12.13</version> <!-- Check for the latest version -->
+				<version>${micrometer.version}</version> <!-- Check for the latest version -->
 			</dependency>
 
 			<dependency>
@@ -626,7 +641,7 @@
 			<dependency>
 				<groupId>software.amazon.awssdk.crt</groupId>
 				<artifactId>aws-crt</artifactId>
-				<version>0.34.0</version>
+				<version>${aws-crt.version}</version>
 			</dependency>
 
 			<!-- OGC Schemas from Aleksei Valikov -->
@@ -1079,6 +1094,13 @@
 				<artifactId>slf4j-simple</artifactId>
 				<version>${slf4j.version}</version>
 			</dependency>
+
+            <dependency>
+                <groupId>org.apache.ftpserver</groupId>
+                <artifactId>ftpserver-core</artifactId>
+                <version>${ftpserver-core.version}</version>
+            </dependency>
+
 		</dependencies>
 
 	</dependencyManagement>
