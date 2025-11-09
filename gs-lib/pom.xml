@@ -9,8 +9,8 @@
 
 	<artifactId>gs-lib</artifactId>
 	<packaging>pom</packaging>
-	<name>ESSI-Lab GI-suite Library</name>
-	<description>GI-Suite Common Library</description>
+	<name>ESSI-Lab DAB Library</name>
+	<description>DAB Common Library</description>
 
 	<modules>
 		<module>gs-lib-mqtt</module>
@@ -25,6 +25,7 @@
 		<module>gs-lib-eiffel-api</module>
 		<module>gs-lib-sensor-things</module>
 		<module>gs-lib-skos</module>
-	</modules>
+        <module>gs-lib-kafka</module>
+    </modules>
 
 </project>

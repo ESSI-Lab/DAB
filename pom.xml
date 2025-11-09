@@ -281,10 +281,13 @@
 		<!-- Failsafe  -->
 		<dev.failsafe.version>3.3.2</dev.failsafe.version>
 
-		<!-- HIVE Client -->
+		<!-- HIVE MQTT Client -->
 		<hivemq-mqtt-client.version>1.3.3</hivemq-mqtt-client.version>
 
-		<!-- ROME -->
+        <!-- Apache Kafka Clients -->
+        <kafka-clients.version>4.1.0</kafka-clients.version>
+
+        <!-- ROME -->
 		<com.rometools.rome.version>2.1.0</com.rometools.rome.version>
 
 		<!-- Javax mail -->
@@ -1099,6 +1102,12 @@
                 <groupId>org.apache.ftpserver</groupId>
                 <artifactId>ftpserver-core</artifactId>
                 <version>${ftpserver-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka-clients.version}</version>
             </dependency>
 
 		</dependencies>
