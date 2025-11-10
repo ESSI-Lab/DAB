@@ -127,7 +127,7 @@ public class KafkaClient implements MessagePublisher {
     @Override
     public void publish(String topic, String value) throws ExecutionException, InterruptedException {
 
-	publish(topic, UUID.randomUUID().toString(), value);
+	publish(topic, null, value);
     }
 
     /**
@@ -220,7 +220,7 @@ public class KafkaClient implements MessagePublisher {
      */
     public Future<RecordMetadata> publish(String topic, String value, Callback callback) throws ExecutionException, InterruptedException {
 
-	return publish(topic, UUID.randomUUID().toString(), value, callback);
+	return publish(topic, null, value, callback);
     }
 
     /**
@@ -266,9 +266,7 @@ public class KafkaClient implements MessagePublisher {
 	    String key = "key-" + i;
 	    String value = "Messaggio numero " + i;
 
-	    records.add(new ProducerRecord<>(topic, key, value));
+	    records.add(new ProducerRecord<>(topic, value));
 	}
-
-	client.publish(records);
     }
 }
