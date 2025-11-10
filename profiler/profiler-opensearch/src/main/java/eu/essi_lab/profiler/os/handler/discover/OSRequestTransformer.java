@@ -91,8 +91,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     private static final List<String> SUPPORTED_OUTPUT_FORMATS = new ArrayList<>();
     private static final String OS_PARAM_PARSING_ERROR = "OS_PARAM_PARSING_ERROR";
 
-    protected ProfilerSetting setting;
-
     //
     //
     // ---------------------------
@@ -108,7 +106,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      */
     public OSRequestTransformer() {
 
-	this(new OSProfilerSetting());
+	super(new OSProfilerSetting());
     }
 
     /**
@@ -116,7 +114,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      */
     public OSRequestTransformer(ProfilerSetting setting) {
 
-	this.setting = setting;
+	super(setting);
     }
 
     @Override
@@ -134,7 +132,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	// set the covering mode view and adjusts the ranking to give a weight only to
 	// bbox
 	//
-	if (CoveringModeOptionsReader.isCoveringModeEnabled(setting)) {
+	if (CoveringModeOptionsReader.isCoveringModeEnabled(getSetting().get())) {
 
 	    message.setResultsPriority(ResultsPriority.DATASET);
 
@@ -242,8 +240,9 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    if (winSize > Database.MAX_RESULT_WINDOW_SIZE) {
 
 		message.setResult(ValidationResult.VALIDATION_FAILED);
-		message.setError("Result window is too large, start index + count must be less than or equal to: "
-			+ Database.MAX_RESULT_WINDOW_SIZE + " but was " + winSize);
+		message.setError(
+			"Result window is too large, start index + count must be less than or equal to: " + Database.MAX_RESULT_WINDOW_SIZE
+				+ " but was " + winSize);
 
 		return message;
 	    }
@@ -320,9 +319,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 		boolean supported = eiffelDiscoveryOption.equals(//
 
-			DiscoveryMessage.EiffelAPIDiscoveryOption.FILTER_AND_SORT.name())
-			|| eiffelDiscoveryOption.equals(//
-				DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
+			DiscoveryMessage.EiffelAPIDiscoveryOption.FILTER_AND_SORT.name()) || eiffelDiscoveryOption.equals(//
+			DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
 
 		if (!supported) {
 
@@ -376,7 +374,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	//
 	// search terms are NOT included in case of Eiffel SORT_AND_FILTER
 	//
-	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request, setting);
+	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request, getSetting().get());
 
 	if (!eiffelOption.isPresent() || eiffelOption.get() == EiffelAPIDiscoveryOption.FILTER_AND_SORT) {
 
@@ -465,8 +463,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		//
 		// already handled separately
 		//
-		if (osParameter.getName().equals(OSParameters.SEARCH_TERMS.getName())
-			|| osParameter.getName().equals(OSParameters.SEARCH_FIELDS.getName())) {
+		if (osParameter.getName().equals(OSParameters.SEARCH_TERMS.getName()) || osParameter.getName()
+			.equals(OSParameters.SEARCH_FIELDS.getName())) {
 
 		    continue;
 		}
@@ -478,7 +476,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			osParameter.equals(OSParameters.PLATFORM_IDENTIFIER) || //
 			osParameter.equals(OSParameters.ORIGINATOR_ORGANISATION_IDENTIFIER) || //
 			osParameter.equals(OSParameters.ATTRIBUTE_IDENTIFIER)) && ( //
-		rosetta != null && !rosetta.equals("false") && value != null)) {
+			rosetta != null && !rosetta.equals("false") && value != null)) {
 
 		    value = handleRosetta(rosetta, value);
 		}
@@ -787,7 +785,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      * </tr>
      * </table>
      * </body> </html>
-     * 
+     *
      * @param keyValueParser
      * @param request
      * @param eiffelOption
@@ -799,7 +797,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    boolean eiffelOption //
     ) {
 
-	Optional<Integer> filterAndSortSplitTreshold = EiffelDiscoveryHelper.getFilterAndSortSplitTreshold(setting);
+	Optional<Integer> filterAndSortSplitTreshold = EiffelDiscoveryHelper.getFilterAndSortSplitTreshold(getSetting().get());
 
 	if (eiffelOption && filterAndSortSplitTreshold.isPresent()) {
 

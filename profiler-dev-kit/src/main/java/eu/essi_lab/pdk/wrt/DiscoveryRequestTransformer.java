@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.RequestMessage;
@@ -55,46 +56,34 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.Profiler;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
+import org.cuahsi.waterml._1.Option;
 
 /**
- * Validates and transforms a "discovery query" in the correspondent {@link DiscoveryMessage}. The discovery query is
- * represented by a
- * {@link WebRequest} which encapsulates request parameters and headers.<br>
- * This component is part of the {@link DiscoveryHandler}
+ * Validates and transforms a "discovery query" in the correspondent {@link DiscoveryMessage}. The discovery query is represented by a
+ * {@link WebRequest} which encapsulates request parameters and headers.<br> This component is part of the {@link DiscoveryHandler}
  * composition and the calling of {@link #transform(WebRequest)} method is the first step of the workflow
  * <h3>Implementation notes</h3>
- * The main goal of a transformer is to provide the {@link Bond} representation of the {@link WebRequest}
- * parameters.<br>
+ * The main goal of a transformer is to provide the {@link Bond} representation of the {@link WebRequest} parameters.<br>
  * <br>
- * This goal can be achieved in many different ways, depending also by the request method supported by the
- * {@link Profiler} service, GET
+ * This goal can be achieved in many different ways, depending also by the request method supported by the {@link Profiler} service, GET
  * and/or POST. The {@link WebRequestParameter} API can be used for GET requests. Implementations can define several
- * {@link
- * WebRequestParameter}s as
+ * {@link WebRequestParameter}s as
  * <code>static</code> fields, one for each parameter supported by the {@link Profiler} web service. The
- * {@link Bond} representation of all the defined {@link WebRequestParameter}s provided by the
- * {@link WebRequestParameter#asBond(String)}
- * method, can be used to properly set the {@link DiscoveryMessage#getUserBond(Bond)} property (see
- * {@link WebRequestParameter} java docs
+ * {@link Bond} representation of all the defined {@link WebRequestParameter}s provided by the {@link WebRequestParameter#asBond(String)}
+ * method, can be used to properly set the {@link DiscoveryMessage#getUserBond(Bond)} property (see {@link WebRequestParameter} java docs
  * for more info).<br>
  * <br>
- * The mapping from {@link WebRequest} parameters to {@link Bond}s depends from the semantic of the parameters supported
- * by {@link Profiler}
+ * The mapping from {@link WebRequest} parameters to {@link Bond}s depends from the semantic of the parameters supported by {@link Profiler}
  * service. Consider for example an
  * <a href="http://www.opensearch.org/Home">OpenSearch</a> web service and its <a href=
- * "http://www.opensearch.org/Specifications/OpenSearch/1.1/Draft_3#The_.22searchTerms.22_parameter">searchTerms</a>
- * parameter. The semantic
- * of such parameter can be described in natural language: "give me all the metadata records with a textual content
- * matching the supplied
- * search terms". In the GI-suite, the textual content of a {@link GSResource} can be queried by means of the
- * {@link AnyTextBond}, which
- * represents a constraint applied on the entire textual content of a {@link GSResource} (for a complete list of the
- * available {@link Bond}s
+ * "http://www.opensearch.org/Specifications/OpenSearch/1.1/Draft_3#The_.22searchTerms.22_parameter">searchTerms</a> parameter. The semantic
+ * of such parameter can be described in natural language: "give me all the metadata records with a textual content matching the supplied
+ * search terms". In the GI-suite, the textual content of a {@link GSResource} can be queried by means of the {@link AnyTextBond}, which
+ * represents a constraint applied on the entire textual content of a {@link GSResource} (for a complete list of the available {@link Bond}s
  * see {@link BondFactory}).<br>
  * <br>
- * As for all the {@link Pluggable}, in order to be loaded the transformer implementation <b>MUST</b> be registered with
- * the {@link
- * ServiceLoader} API<br>
+ * As for all the {@link Pluggable}, in order to be loaded the transformer implementation <b>MUST</b> be registered with the
+ * {@link ServiceLoader} API<br>
  * <br>
  *
  * @author Fabrizio
@@ -106,6 +95,38 @@ import eu.essi_lab.pdk.handler.DiscoveryHandler;
 public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<DiscoveryMessage> {
 
     private static final String EXCLUDED = "EXCLUDED";
+
+    private ProfilerSetting setting;
+
+    /**
+     *
+     */
+    public DiscoveryRequestTransformer() {
+    }
+
+    /**
+     * @param setting
+     */
+    public DiscoveryRequestTransformer(ProfilerSetting setting) {
+
+	setSetting(setting);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<ProfilerSetting> getSetting() {
+
+	return Optional.ofNullable(setting);
+    }
+
+    /**
+     * @param setting
+     */
+    public void setSetting(ProfilerSetting setting) {
+
+	this.setting = setting;
+    }
 
     /**
      * Refines the <code>message</code> by setting the {@link Bond}, the distinct queryables, {@link GSSource}s and
@@ -120,6 +141,16 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
      * @see #getSelector(WebRequest)
      */
     protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
+
+	//
+	// optionally set the ResourceConsumer
+	//
+
+	getSetting().ifPresent(s -> s.getConsumer().ifPresent(c -> message.setResourceConsumer(c)));
+
+	//
+	//
+	//
 
 	message.setIncludeCountInRetrieval(true);
 
@@ -170,16 +201,16 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
      *
      * @param request the {@link WebRequest} triggered by the {@link Profiler} supported client
      * @return a {@link Bond} (possible a {@link LogicalBond} or <code>null</code>) which represents the supplied
-     *         <code>request</code>
-     *         parameters
+     * <code>request</code>
+     * parameters
      */
     protected abstract Bond getUserBond(WebRequest request) throws GSException;
 
     /**
-     * Returns the element to be used for executing the distinct operation (i.e. removing from all the
-     * returned resources the ones having the same values for the given element, except one).
-     * By default this set is empty. Sub transformers can override this method to set specific distinct elements.
-     * 
+     * Returns the element to be used for executing the distinct operation (i.e. removing from all the returned resources the ones having
+     * the same values for the given element, except one). By default, this set is empty. Sub transformers can override this method to set
+     * specific distinct elements.
+     *
      * @return the optional distinct element
      */
     protected Optional<Queryable> getDistinctElement(WebRequest request) {
@@ -199,9 +230,8 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
     protected abstract ResourceSelector getSelector(WebRequest request);
 
     /**
-     * Returns a list (possible empty ) of target {@link GSSource}s by looking for all the {@link SourceIdentifierBond}
-     * of the {@link
-     * DiscoveryMessage} bonds
+     * Returns a list (possible empty ) of target {@link GSSource}s by looking for all the {@link SourceIdentifierBond} of the
+     * {@link DiscoveryMessage} bonds
      */
     protected List<GSSource> getSources(Bond bond, Optional<View> optionalView) throws GSException {
 
@@ -255,7 +285,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 		    Bond firstOperand = b.getFirstOperand();
 		    if (isSourceIdentifierBond(firstOperand)) {
 			ResourcePropertyBond rb = (ResourcePropertyBond) firstOperand;
-			// this will excludes it by the requested sources list
+			// this will exclude it by the requested sources list
 			rb.setPropertyValue(rb.getPropertyValue() + EXCLUDED);
 		    }
 		}

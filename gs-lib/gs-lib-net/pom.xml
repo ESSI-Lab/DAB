@@ -8,7 +8,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <name>ESSI-Lab GI-suite Network Utilities</name>
+    <name>ESSI-Lab DAB Network Utilities</name>
     <artifactId>gs-lib-net</artifactId>
 
     <dependencies>

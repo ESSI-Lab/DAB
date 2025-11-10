@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>gs-lib-utils</artifactId>
-	<name>ESSI-Lab GI-suite Library Utils</name>
+	<name>ESSI-Lab DAB Library Utils</name>
 	<description>General utility Library</description>
 
 	<dependencies>

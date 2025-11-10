@@ -33,6 +33,7 @@ import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.web.WebRequest;
@@ -78,7 +79,7 @@ public class CSWSearchAfterManager {
      * @return
      * @throws GSException
      */
-    public static Optional<SearchAfter> get(Optional<String> viewId, Page page, CSWProfilerSetting setting) throws GSException {
+    public static Optional<SearchAfter> get(Optional<String> viewId, Page page, ProfilerSetting setting) throws GSException {
 
 	try {
 
@@ -107,7 +108,7 @@ public class CSWSearchAfterManager {
      * @return
      * @throws GSException
      */
-    public static boolean isEnabled(CSWProfilerSetting setting, WebRequest webRequest) throws GSException {
+    public static boolean isEnabled(ProfilerSetting setting, WebRequest webRequest) throws GSException {
 
 	boolean fromGET = CSWRequestUtils.isGetRecordsFromGET(webRequest);
 	boolean fromPOST = CSWRequestUtils.isGetRecordsFromPOST(webRequest);
@@ -122,7 +123,7 @@ public class CSWSearchAfterManager {
      * @param setting
      * @return
      */
-    private static String getKey(Optional<String> viewId, CSWProfilerSetting setting) {
+    private static String getKey(Optional<String> viewId, ProfilerSetting setting) {
 
 	String key = setting.getKeyValueOptions().get().getProperty(SEARCH_AFTER_KEY_OPTION);
 

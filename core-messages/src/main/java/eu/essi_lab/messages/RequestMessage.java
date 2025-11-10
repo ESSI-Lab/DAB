@@ -39,6 +39,7 @@ import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.rip.RuntimeInfoProvider;
+import net.sf.saxon.lib.ResourceCollection;
 
 /**
  * @author Fabrizio
@@ -87,6 +88,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     private static final String SEARCH_AFTER = "searchAfter";
     private static final String EXCLUDE_RESOURCE_BINARY = "excludeResourceBinary";
     private static final String USE_CACHED_SOURCES_DATAFOLDER_MAP = "useSourcesDataFolderMap";
+    private static final String RESOURCE_CONSUMER = "resourceConsumer";
 
     private String requestId;
 
@@ -486,4 +488,19 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 	getHeader().add(new GSProperty<Boolean>(INLCUDE_WEIGHTED_QUERIES, include));
     }
 
+    /**
+     * @param consumer
+     */
+    public void setResourceConsumer(ResourceConsumer consumer) {
+
+	getHeader().add(new GSProperty<ResourceConsumer>(RESOURCE_CONSUMER, consumer));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<ResourceConsumer> getResourceConsumer() {
+
+	return Optional.ofNullable(getHeader().get(RESOURCE_CONSUMER, ResourceConsumer.class));
+    }
 }

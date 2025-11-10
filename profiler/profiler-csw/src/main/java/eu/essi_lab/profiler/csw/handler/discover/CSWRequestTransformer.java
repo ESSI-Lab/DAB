@@ -76,17 +76,13 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
      */
     private static final int MAX_SUPPORTED_PAGE_SIZE = 10;
 
-    /**
-     * 
-     */
-    private CSWProfilerSetting setting;
 
     /**
      * For test purpose
      */
     public CSWRequestTransformer() {
 
-	this(new CSWProfilerSetting());
+	super(new CSWProfilerSetting());
     }
 
     /**
@@ -94,7 +90,7 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
      */
     public CSWRequestTransformer(CSWProfilerSetting setting) {
 
-	this.setting = setting;
+	super(setting);
     }
 
     @Override
@@ -112,11 +108,11 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	Page page = refinedMessage.getPage();
 
-	if (CSWSearchAfterManager.isEnabled(setting, message.getWebRequest())) {
+	if (CSWSearchAfterManager.isEnabled(getSetting().get(), message.getWebRequest())) {
 
 	    refinedMessage.setSortedFields(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING));
 
-	    Optional<SearchAfter> searchAfter = CSWSearchAfterManager.get(message.getView().map(v -> v.getId()), page, setting);
+	    Optional<SearchAfter> searchAfter = CSWSearchAfterManager.get(message.getView().map(v -> v.getId()), page, getSetting().get());
 
 	    if (searchAfter.isPresent()) {
 

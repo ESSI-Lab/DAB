@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch;
 
@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javax.net.ssl.SSLContext;
 
+import eu.essi_lab.configuration.ExecutionMode;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -184,86 +185,41 @@ public class OpenSearchDatabase extends Database {
 		client = new OpenSearchClient(awsSdk2Transport);
 	    }
 
-	    //
-	    //
-	    //
+	    switch (ExecutionMode.get()) {
+	    case CONFIGURATION:
+	    case LOCAL_PRODUCTION:
+	    case MIXED:
 
-	    if (JavaOptions.isEnabled(JavaOptions.INIT_OPENSEARCH_INDEXES)) {
+		//
+		//
+		//
 
-		initializeIndexes();
+		if (JavaOptions.isEnabled(JavaOptions.INIT_OPENSEARCH_INDEXES)) {
+
+		    IndexMapping.initializeIndexes(client);
+		}
+
+		//
+		//
+		//
+
+		if (JavaOptions.isEnabled(JavaOptions.UPDATE_DATA_FOLDER_INDEX)) {
+
+		    DataFolderMapping mapping = DataFolderMapping.get();
+
+		    try {
+
+			mapping.checkAndUpdate(client);
+
+		    } catch (IOException e) {
+
+			throw GSException.createException(getClass(), "OpenSearchDataFolderIndexUpdatingError", e);
+		    }
+		}
 	    }
 
 	    initialized = true;
 	}
-    }
-
-    /**
-     * @throws GSException
-     */
-    public void initializeIndexes() throws GSException {
-
-	GSLoggerFactory.getLogger(getClass()).info("Indexes init STARTED");
-
-	boolean nothingToDo = false;
-
-	for (IndexMapping mapping : IndexMapping.getMappings()) {
-
-	    boolean exists = checkIndex(getClient(), mapping.getIndex(false));
-	    nothingToDo |= exists;
-
-	    PutAliasRequest putAliasRequest = null;
-
-	    if (!exists) {
-
-		GSLoggerFactory.getLogger(getClass()).info("Creating index {} STARTED", mapping.getIndex());
-
-		createIndex(mapping);
-
-		GSLoggerFactory.getLogger(getClass()).info("Creating index {} ENDED", mapping.getIndex());
-
-		if (mapping.hasIndexAlias()) {
-
-		    putAliasRequest = mapping.createPutAliasRequest();
-		}
-	    }
-
-	    // else if (mapping.hasIndexAlias()) {
-	    //
-	    // try {
-	    //
-	    // if (!client.indices().existsAlias(mapping.createExistsAliasRequest()).value()) {
-	    //
-	    // putAliasRequest = mapping.createPutAliasRequest();
-	    // }
-	    //
-	    // } catch (OpenSearchException | IOException e) {
-	    //
-	    // throw GSException.createException(getClass(), "OpenSearchDatabaseExistsAliasError", e);
-	    // }
-	    // }
-
-	    if (putAliasRequest != null) {
-
-		GSLoggerFactory.getLogger(getClass()).info("Put alias {} STARTED", mapping.getIndex());
-
-		try {
-		    client.indices().putAlias(putAliasRequest);
-
-		} catch (OpenSearchException | IOException e) {
-
-		    throw GSException.createException(getClass(), "OpenSearchDatabasePutAliasError", e);
-		}
-
-		GSLoggerFactory.getLogger(getClass()).info("Put alias {} ENDED", mapping.getIndex());
-	    }
-	}
-
-	if (nothingToDo) {
-
-	    GSLoggerFactory.getLogger(getClass()).debug("No new index created");
-	}
-
-	GSLoggerFactory.getLogger(getClass()).info("Indexes init ENDED");
     }
 
     /**
@@ -324,28 +280,6 @@ public class OpenSearchDatabase extends Database {
 	OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
 
 	return new OpenSearchClient(transport);
-    }
-
-    /**
-     * @param client
-     * @param indexName
-     * @return
-     * @throws GSException
-     */
-    public static boolean checkIndex(OpenSearchClient client, String indexName) throws GSException {
-
-	ExistsRequest existsIndexRequest = new ExistsRequest.Builder().index(indexName).build();
-
-	try {
-
-	    return client.indices().exists(existsIndexRequest).value();
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
-
-	    throw GSException.createException(OpenSearchDatabase.class, "OpenSearchDatabaseCheckIndexError", ex);
-	}
     }
 
     @Override
@@ -527,98 +461,6 @@ public class OpenSearchDatabase extends Database {
     public OpenSearchClient getClient() {
 
 	return client;
-    }
-
-    /**
-     * @param mapping
-     * @throws GSException
-     */
-    private void createIndex(IndexMapping mapping) throws GSException {
-
-	TypeMapping typeMapping = new TypeMapping.Builder().//
-		withJson(mapping.getMappingStream()).//
-		build();
-
-	Builder createIndexBuilder = new CreateIndexRequest.Builder().//
-		index(mapping.getIndex(false)).//
-		mappings(typeMapping);
-
-	Optional<String> shards = JavaOptions.getValue(JavaOptions.NUMBER_OF_DATA_FOLDER_INDEX_SHARDS);
-
-	if (mapping.getIndex().equals(DataFolderMapping.get().getIndex()) && shards.isPresent()) {
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Number of data-folder index shards: {}", shards.get());
-
-	    createIndexBuilder.settings(new IndexSettings.Builder()//
-		    .numberOfShards(shards.get()).numberOfReplicas("0")//
-		    .build()); //
-	}
-
-	CreateIndexRequest createIndexRequest = createIndexBuilder.build();
-
-	try {
-
-	    CreateIndexResponse response = client.indices().create(createIndexRequest);
-
-	    if (Boolean.FALSE.equals(response.acknowledged())) {
-
-		throw GSException.createException(//
-			getClass(), //
-			null, //
-			ErrorInfo.ERRORTYPE_SERVICE, //
-			ErrorInfo.SEVERITY_FATAL, //
-			"OpenSearchDatabaseCreate" + mapping.getIndex() + "NotAcknowledgedError");
-	    }
-
-	    // synch
-	    client.indices().refresh();
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(ex);
-
-	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + mapping.getIndex() + "Error", ex);
-	}
-    }
-
-    /**
-     * @throws GSException
-     */
-    private void createIndexWithGenericCLient(IndexMapping mapping) throws GSException {
-
-	try {
-
-	    Response response = client.generic().execute(//
-		    Requests.builder().//
-			    endpoint(mapping.getIndex(false)).//
-			    method("PUT").//
-			    json(mapping.getMapping().toString()).build());
-
-	    // synch
-	    client.indices().refresh();
-
-	    String bodyAsString = response.getBody().//
-		    get().//
-		    bodyAsString();
-
-	    JSONObject responseObject = new JSONObject(bodyAsString);
-
-	    if (!responseObject.getBoolean("acknowledged")) {
-
-		throw GSException.createException(//
-			getClass(), //
-			null, //
-			ErrorInfo.ERRORTYPE_SERVICE, //
-			ErrorInfo.SEVERITY_FATAL, //
-			"OpenSearchDatabaseCreate" + mapping.getIndex() + "NotAcknowledgedError");
-	    }
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(ex);
-
-	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + mapping.getIndex() + "Error", ex);
-	}
     }
 
     @Override

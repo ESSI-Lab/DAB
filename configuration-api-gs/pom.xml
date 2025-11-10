@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>configuration-api-gs</artifactId>
-	<name>ESSI-Lab Configuration API classes for GI-Suite</name>
+	<name>ESSI-Lab DAB Configuration API classes</name>
 	
 	<dependencies>
 

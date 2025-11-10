@@ -232,23 +232,23 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 
 			}
 
-			File file = new File("/home/boldrini/ontologiaFALSE");
-			BufferedWriter writer = null;
-			if (file.exists()) {
-				try {
-					writer = new BufferedWriter(new FileWriter(new File(file, "whos-arctic.csv")));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (writer != null) {
-				try {
-					writer.write(
-							"WHOS identifier\tData provider service\tData provider identifier\tVariable name\tVariable description\tHydro-ontology concept\n");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+//			File file = new File("/home/boldrini/ontologiaFALSE");
+//			BufferedWriter writer = null;
+//			if (file.exists()) {
+//				try {
+//					writer = new BufferedWriter(new FileWriter(new File(file, "whos-arctic.csv")));
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			if (writer != null) {
+//				try {
+//					writer.write(
+//							"WHOS identifier\tData provider service\tData provider identifier\tVariable name\tVariable description\tHydro-ontology concept\n");
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//			}
 
 			// STATISTICS
 			SourceStatistics sourceStats = null;
@@ -347,22 +347,22 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 						getRow(ri.getCountry()) + //
 						getRow(ri.getCountryISO3()) + //
 						"</tr>";
-				if (writer != null) {
-					try {
-						writer.write(row.getValue());
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+//				if (writer != null) {
+//					try {
+//						writer.write(row.getValue());
+//					} catch (IOException e) {
+//						e.printStackTrace();
+//					}
+//				}
 			}
 
-			if (writer != null) {
-				try {
-					writer.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+//			if (writer != null) {
+//				try {
+//					writer.close();
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//			}
 		}
 		String str = "<html><head><meta charset=\"UTF-8\"></head><body><h1>Metadata content analysis for view: "
 				+ viewId + "</h1>" //

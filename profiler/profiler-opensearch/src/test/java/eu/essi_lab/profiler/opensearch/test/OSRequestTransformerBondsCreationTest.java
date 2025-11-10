@@ -290,7 +290,7 @@ public class OSRequestTransformerBondsCreationTest {
     }
 
     private OSRequestTransformer createTransformer() {
-	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting()) {
+	OSRequestTransformer transformer = new OSRequestTransformer() {
 	    @Override
 	    public DiscoveryMessage transform(WebRequest request) throws GSException {
 
