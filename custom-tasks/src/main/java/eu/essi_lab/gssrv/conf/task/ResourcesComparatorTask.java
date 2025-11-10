@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.gssrv.conf.task;
 
@@ -34,6 +34,8 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.KafkaClient;
+import eu.essi_lab.lib.net.publisher.MessagePublisher;
 import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 
@@ -74,13 +76,13 @@ import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * This task must be embedded
- * 
+ *
  * @author Fabrizio
  */
 public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
     /**
-     * 
+     *
      */
     private static final int PAGE_SIZE = 1000;
     private List<String> newRecords;
@@ -89,9 +91,10 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     private DatabaseFolder data2Folder;
 
     /**
-     * 
+     *
      */
     private static final List<Queryable> DEFAULT_COMPARISON_PROPERTIES = Lists.newArrayList();
+
     static {
 	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.TITLE);
 	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.ABSTRACT);
@@ -103,12 +106,12 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     }
 
     /**
-     * 
+     *
      */
     private List<Queryable> comparisonProperties = DEFAULT_COMPARISON_PROPERTIES;
 
     /**
-     * 
+     *
      */
     public ResourcesComparatorTask() {
 
@@ -345,9 +348,9 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			getIncrementalModifiedResources().//
 			stream().//
 			// deleted records can be found also in the modified records list, they must be discarded
-			filter(res -> !deletedRecords.contains(res.getOriginalId().get())).//
-			filter(res -> res.getOriginalId().isPresent()).//
-			collect(Collectors.toList());
+				filter(res -> !deletedRecords.contains(res.getOriginalId().get())).//
+				filter(res -> res.getOriginalId().isPresent()).//
+				collect(Collectors.toList());
 
 		DatabaseFolder writingFolder = worker.getWritingFolder();
 
@@ -377,9 +380,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    }
 		}
 	    }
-	} else
-
-	{
+	} else {
 
 	    log(status, "Consolidated folder survived, nothing is changed");
 	}
@@ -388,13 +389,13 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	log(status, "Modified records: " + modifiedRecords.values().stream().flatMap(l -> l.stream()).distinct().count());
 	log(status, "Deleted records: " + deletedRecords.size());
 
-	Optional<MQTTPublisherHive> client = createClient();
+	Optional<MessagePublisher> client = createClient();
 
 	if (client.isPresent()) {
 
 	    if (!newRecords.isEmpty()) {
 
-		String topic = buildTopic(gsSource, "added");
+		String topic = buildTopic(gsSource, "added", client.get());
 		String message = buildMessage(newRecords, gsSource.getUniqueIdentifier(), "added", Optional.empty());
 
 		client.get().publish(topic, message);
@@ -402,7 +403,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    if (!deletedRecords.isEmpty()) {
 
-		String topic = buildTopic(gsSource, "deleted");
+		String topic = buildTopic(gsSource, "deleted", client.get());
 		String message = buildMessage(deletedRecords, gsSource.getUniqueIdentifier(), "deleted", Optional.empty());
 
 		client.get().publish(topic, message);
@@ -414,7 +415,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    List<String> idsList = modifiedRecords.get(property);
 
-		    String topic = buildTopic(gsSource, "modified/" + property);
+		    String topic = buildTopic(gsSource, property, true, client.get());
 		    String message = buildMessage(idsList, gsSource.getUniqueIdentifier(), "modified", Optional.of(property));
 
 		    client.get().publish(topic, message);
@@ -434,9 +435,32 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     /**
      * @param source
      * @param topic
+     * @param client
      * @return
      */
-    private String buildTopic(GSSource source, String topic) {
+    private String buildTopic(GSSource source, String topic, MessagePublisher client) {
+
+	return buildTopic(source, topic, false, client);
+
+    }
+
+    /**
+     * @param source
+     * @param topic
+     * @param modified
+     * @param client
+     * @return
+     */
+    private String buildTopic(GSSource source, String topic, boolean modified, MessagePublisher client) {
+
+	if (client instanceof KafkaClient) {
+
+	    topic = modified ? "modified_" + topic : topic;
+
+	    return "dab_" + source.getUniqueIdentifier() + "_" + topic;
+	}
+
+	topic = modified ? "modified/" + topic : topic;
 
 	return "dab/" + source.getUniqueIdentifier() + "/" + topic;
     }
@@ -467,7 +491,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
      * @return
      * @throws Exception
      */
-    private Optional<MQTTPublisherHive> createClient() throws Exception {
+    private Optional<MessagePublisher> createClient() throws Exception {
 
 	try {
 
@@ -477,19 +501,40 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    if (keyValueOption.isPresent()) {
 
-		String host = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel());
-		String port = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel());
-		String user = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_USER.getLabel());
-		String pwd = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel());
+		String mqttHost = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel());
+		String mqttPort = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel());
+		String mqttUser = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_USER.getLabel());
+		String mqttPwd = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel());
 
-		if (host == null || port == null || user == null || pwd == null) {
+		if (mqttHost == null || mqttPort == null || mqttUser == null || mqttPwd == null) {
 
 		    GSLoggerFactory.getLogger(getClass()).warn("MQTT options not found!");
 
 		} else {
 
-		    return Optional.of(new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd));
+		    GSLoggerFactory.getLogger(getClass()).info("MQTT client created");
+
+		    return Optional.of(new MQTTPublisherHive(mqttHost, Integer.valueOf(mqttPort), mqttUser, mqttPwd));
 		}
+
+		String kafkaHost = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_HOST.getLabel());
+		String kafkaPort = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_PORT.getLabel());
+		String kafkaUser = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_USER.getLabel());
+		String kafkaPwd = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_PWD.getLabel());
+
+		if (kafkaHost == null || kafkaPort == null) {
+
+		    GSLoggerFactory.getLogger(getClass()).warn("Kafka options not found!");
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).info("Kafka client created");
+
+		    String server = kafkaHost + ":" + kafkaPort;
+
+		    return Optional.of(new KafkaClient(server));
+		}
+
 	    } else {
 
 		GSLoggerFactory.getLogger(getClass()).warn("Key-value pair options not found!");

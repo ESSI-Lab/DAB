@@ -13,6 +13,13 @@
   
   <dependencies>
 
+        <!-- Kafka client-->
+        <dependency>
+          <groupId>${project.parent.groupId}</groupId>
+          <artifactId>gs-lib-kafka</artifactId>
+          <version>${project.parent.version}</version>
+        </dependency>
+
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>cloudwatchlogs</artifactId>
