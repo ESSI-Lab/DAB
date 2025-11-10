@@ -1,5 +1,6 @@
 package eu.essi_lab;
 
+import eu.essi_lab.lib.net.publisher.MessagePublisher;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -10,6 +11,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Fabrizio
  */
-public class KafkaClient {
+public class KafkaClient implements MessagePublisher {
 
     private Properties producerProps;
     private Properties consumerProps;
@@ -90,9 +92,21 @@ public class KafkaClient {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public void produce(String topic, String key, String value) throws ExecutionException, InterruptedException {
+    public void publish(String topic, String key, String value) throws ExecutionException, InterruptedException {
 
-	produce(new ProducerRecord<>(topic, key, value));
+	publish(new ProducerRecord<>(topic, key, value));
+    }
+
+    /**
+     * @param topic
+     * @param value
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    @Override
+    public void publish(String topic, String value) throws ExecutionException, InterruptedException {
+
+	publish(topic, UUID.randomUUID().toString(), value);
     }
 
     /**
@@ -100,7 +114,7 @@ public class KafkaClient {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public void produce(List<ProducerRecord<String, String>> records) throws ExecutionException, InterruptedException {
+    public void publish(List<ProducerRecord<String, String>> records) throws ExecutionException, InterruptedException {
 
 	try (KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps)) {
 
@@ -119,9 +133,9 @@ public class KafkaClient {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public void produce(ProducerRecord<String, String> record) throws ExecutionException, InterruptedException {
+    public void publish(ProducerRecord<String, String> record) throws ExecutionException, InterruptedException {
 
-	produce(List.of(record));
+	publish(List.of(record));
     }
 
     /**
@@ -131,7 +145,7 @@ public class KafkaClient {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public List<Future<RecordMetadata>> produce(List<ProducerRecord<String, String>> records, Callback callback)
+    public List<Future<RecordMetadata>> publish(List<ProducerRecord<String, String>> records, Callback callback)
 	    throws ExecutionException, InterruptedException {
 
 	final ArrayList<Future<RecordMetadata>> futures = new ArrayList<>();
@@ -154,10 +168,10 @@ public class KafkaClient {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public Future<RecordMetadata> produce(ProducerRecord<String, String> record, Callback callback)
+    public Future<RecordMetadata> publish(ProducerRecord<String, String> record, Callback callback)
 	    throws ExecutionException, InterruptedException {
 
-	return produce(List.of(record), callback).getFirst();
+	return publish(List.of(record), callback).getFirst();
     }
 
     /**
@@ -169,10 +183,23 @@ public class KafkaClient {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public Future<RecordMetadata> produce(String topic, String key, String value, Callback callback)
+    public Future<RecordMetadata> publish(String topic, String key, String value, Callback callback)
 	    throws ExecutionException, InterruptedException {
 
-	return produce(new ProducerRecord<>(topic, key, value), callback);
+	return publish(new ProducerRecord<>(topic, key, value), callback);
+    }
+
+    /**
+     * @param topic
+     * @param value
+     * @param callback
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    public Future<RecordMetadata> publish(String topic, String value, Callback callback) throws ExecutionException, InterruptedException {
+
+	return publish(topic, UUID.randomUUID().toString(), value, callback);
     }
 
     /**
@@ -221,12 +248,6 @@ public class KafkaClient {
 	    records.add(new ProducerRecord<>(topic, key, value));
 	}
 
-	client.produce(records, new Callback() {
-	    @Override
-	    public void onCompletion(RecordMetadata metadata, Exception exception) {
-
-		GSLoggerFactory.getLogger(getClass()).info("Sent: {}", metadata);
-	    }
-	});
+	client.publish(records);
     }
 }

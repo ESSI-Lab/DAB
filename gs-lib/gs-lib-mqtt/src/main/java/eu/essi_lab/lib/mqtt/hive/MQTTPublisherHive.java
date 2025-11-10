@@ -10,12 +10,12 @@ package eu.essi_lab.lib.mqtt.hive;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -28,12 +28,12 @@ import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3BlockingClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
+import eu.essi_lab.lib.net.publisher.MessagePublisher;
 
 /**
  *
  */
-public class MQTTPublisherHive extends AbstractMQTTClientHive {
-
+public class MQTTPublisherHive extends AbstractMQTTClientHive implements MessagePublisher {
 
     /**
      * @param hostName
@@ -72,7 +72,7 @@ public class MQTTPublisherHive extends AbstractMQTTClientHive {
 
     /**
      * /**
-     * 
+     *
      * @param hostname
      * @param port
      * @param clientId
@@ -117,6 +117,7 @@ public class MQTTPublisherHive extends AbstractMQTTClientHive {
      * @param message
      * @throws Exception
      */
+    @Override
     public void publish(String topic, String message) throws Exception {
 
 	publish(topic, message, false);
@@ -156,5 +157,4 @@ public class MQTTPublisherHive extends AbstractMQTTClientHive {
 	return getBlockingClient();
     }
 
-   
 }
