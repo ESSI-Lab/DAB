@@ -97,6 +97,14 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	MQTT_BROKER_PWD("mqttBrokerPwd"), //
 
 	/**
+	 * Kafka broker
+	 */
+	KAFKA_BROKER_HOST("fafkaBrokerHost"), //
+	KAFKA_BROKER_PORT("fafkaBrokerPort"), //
+	KAFKA_BROKER_USER("fafkaBrokerUser"), //
+	KAFKA_BROKER_PWD("kafkaBrokerPwd"), //
+
+	/**
 	 * HealthCheck options
 	 */
 	TASK_AGE_HEALTH_CHECK_METHOD_TRESHOLD("taskAgeHealthCheckMethodTreshold"), //
