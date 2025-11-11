@@ -35,7 +35,11 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.KafkaClient;
+import eu.essi_lab.KafkaClient.SaslMechanism;
+import eu.essi_lab.KafkaClient.SecurityProtol;
 import eu.essi_lab.lib.net.publisher.MessagePublisher;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 
@@ -109,6 +113,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
      *
      */
     private List<Queryable> comparisonProperties = DEFAULT_COMPARISON_PROPERTIES;
+    private Exception e;
 
     /**
      *
@@ -519,8 +524,6 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		String kafkaHost = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_HOST.getLabel());
 		String kafkaPort = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_PORT.getLabel());
-		String kafkaUser = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_USER.getLabel());
-		String kafkaPwd = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_PWD.getLabel());
 
 		if (kafkaHost == null || kafkaPort == null) {
 
@@ -530,9 +533,46 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    GSLoggerFactory.getLogger(getClass()).info("Kafka client created");
 
-		    String server = kafkaHost + ":" + kafkaPort;
+		    KafkaClient client = new KafkaClient(kafkaHost, Integer.valueOf(kafkaPort));
 
-		    return Optional.of(new KafkaClient(server));
+		    //
+		    // security
+		    //
+
+		    Optional<SecurityProtol> securityProtocol = Optional.ofNullable(
+				    keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_SECURITY_PROTOCOL.getLabel()))
+			    .map(SecurityProtol::valueOf);
+
+		    Optional<SaslMechanism> saslMechanism = Optional.ofNullable(
+				    keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_SASL_MECHANISM.getLabel()))
+			    .flatMap(SaslMechanism::of);
+
+		    Optional<String> kafkaUser = Optional.ofNullable(
+			    keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_USER.getLabel()));
+
+		    Optional<String> kafkaPwd = Optional.ofNullable(
+			    keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_PWD.getLabel()));
+
+		    if (securityProtocol.isPresent() && saslMechanism.isPresent() && kafkaUser.isPresent() && kafkaPwd.isPresent()) {
+
+			client.setSecurity(securityProtocol.get(), saslMechanism.get(), kafkaUser.get(), kafkaPwd.get());
+		    }
+
+		    //
+		    // request timeout
+		    //
+
+		    Optional<String> reqTimeout = Optional.ofNullable(
+			    keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_REQUEST_TIMEOUT.getLabel()));
+
+		    reqTimeout.ifPresent(timeout -> client.getProducerProps().put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, timeout));
+
+		    //
+		    //
+		    //
+
+		    return Optional.of(client);
+
 		}
 
 	    } else {
@@ -540,11 +580,11 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		GSLoggerFactory.getLogger(getClass()).warn("Key-value pair options not found!");
 	    }
 
-	} catch (Exception e) {
+	} catch (Exception ex) {
 
-	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
+	    GSLoggerFactory.getLogger(ResourcesComparatorTask.class).error(e);
 
-	    throw e;
+	    throw ex;
 	}
 
 	return Optional.empty();
