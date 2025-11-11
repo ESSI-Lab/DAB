@@ -451,7 +451,9 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
      */
     public Optional<Integer> getResultSetMapperThreadsCount() {
 
-	int count = Integer.parseInt(getKeyValueOptions().map(o -> o.getProperty(RSM_THREADS_COUNT_PROPERTY, DEFAULT_RSM_THREADS_COUNT)).orElse(DEFAULT_RSM_THREADS_COUNT));
+	int count = Integer.parseInt(getKeyValueOptions().//
+		map(o -> o.getProperty(RSM_THREADS_COUNT_PROPERTY, DEFAULT_RSM_THREADS_COUNT)).//
+		orElse(DEFAULT_RSM_THREADS_COUNT));
 
 	return Optional.ofNullable(count == -1 ? null : count);
     }
