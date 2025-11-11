@@ -21,45 +21,25 @@ package eu.essi_lab.messages;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.locationtech.jts.io.ParseException;
-
 import eu.essi_lab.lib.geo.BBOXUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.QueryableBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.ViewBond;
+import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.messages.bond.spatial.WKT;
 import eu.essi_lab.messages.stats.StatisticsMessage;
-import eu.essi_lab.model.GSProperty;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.ResultsPriority;
-import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.*;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
+import org.locationtech.jts.io.ParseException;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Fabrizio
@@ -67,33 +47,25 @@ import eu.essi_lab.model.resource.RankingStrategy;
 public class DiscoveryMessage extends QueryInitializerMessage {
 
     /**
-     * forceEiffelAPIDiscoveryOption=disabled
-     * eiffelUseFilterAPICache=true
-     * eiffelUseMergedIdsCache=true
-     * eiffelSortAndFilterAPI=FILTER
-     * eiffelAPISearchMinScore=0.7
-     * eiffelAPISearchQueryMethod=semantic
-     * eiffelAPISearchTermsSignificance=none
-     * eiffelAPIFilterTreshold=0.7
-     * eiffelAPIMaxSortIdentifiers=10000
-     * eiffelSortAndFilterPartitionSize=10000
-     * eiffelFilterAndSortSplitTreshold=3
-     * 
+     * forceEiffelAPIDiscoveryOption=disabled eiffelUseFilterAPICache=true eiffelUseMergedIdsCache=true eiffelSortAndFilterAPI=FILTER
+     * eiffelAPISearchMinScore=0.7 eiffelAPISearchQueryMethod=semantic eiffelAPISearchTermsSignificance=none eiffelAPIFilterTreshold=0.7
+     * eiffelAPIMaxSortIdentifiers=10000 eiffelSortAndFilterPartitionSize=10000 eiffelFilterAndSortSplitTreshold=3
+     *
      * @author Fabrizio
      */
     public enum EiffelAPIDiscoveryOption {
 
 	/**
-	 * 
+	 *
 	 */
 	SORT_AND_FILTER,
 	/**
-	 * 
+	 *
 	 */
 	FILTER_AND_SORT;
 
 	/**
-	 * 
+	 *
 	 */
 	public static final String EIFFEL_S3_VIEW_ID = "eiffels3";
 
@@ -118,7 +90,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     }
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -1949423411370425086L;
 
@@ -135,21 +107,22 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     private static final String TF_TARGETS = "TF_TARGETS";
     private static final String EIFFEL_DISCOVERY_OPTION = "EIFFEL_DISCOVERY_OPTION";
     private static final String INLCUDE_COUNT_IN_RETRIEVAL = "INLCUDE_COUNT_IN_RETRIEVAL";
+    private static final String RSM_THREADS_COUNT = "rsmThreadsCount";
 
     /**
-     * 
+     *
      */
     public static final int DEFAULT_MAX_TERM_FREQUENCY_MAP_ITEMS = 50;
 
     /**
-     * 
+     *
      */
     private static final int USER_SELECTION = 10;
 
     private List<GSResource> parents;
 
     /**
-     * 
+     *
      */
     public DiscoveryMessage() {
 
@@ -333,6 +306,22 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     }
 
     /**
+     * @return
+     */
+    public Optional<Integer> getResultSetMapperThreadsCount() {
+
+	return Optional.ofNullable(getHeader().get(RSM_THREADS_COUNT, Integer.class));
+    }
+
+    /**
+     * @param count
+     */
+    public void setResultSetMapperThreadsCount(int count) {
+
+	getHeader().add(new GSProperty<Integer>(RSM_THREADS_COUNT, count));
+    }
+
+    /**
      * Default value: 50
      *
      * @return
@@ -399,9 +388,9 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     }
 
     /**
-     * Used to indicate the type of results expected (e.g. datasets only, collection only or datasets and collection).
-     * This is useful for the case of mixed sources, to indicate the desired results
-     * 
+     * Used to indicate the type of results expected (e.g. datasets only, collection only or datasets and collection). This is useful for
+     * the case of mixed sources, to indicate the desired results
+     *
      * @return
      */
     public Optional<ResultsPriority> getResultsPriority() {
@@ -410,9 +399,9 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     }
 
     /**
-     * Used to indicate the type of results expected (e.g. datasets only, collection only or datasets and collection).
-     * This is useful for the case of mixed sources, to indicate the desired results
-     * 
+     * Used to indicate the type of results expected (e.g. datasets only, collection only or datasets and collection). This is useful for
+     * the case of mixed sources, to indicate the desired results
+     *
      * @param results priority
      */
     public void setResultsPriority(ResultsPriority priority) {
@@ -515,7 +504,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     }
 
     /**
-     * 
+     *
      */
     @Deprecated
     public void disableDataFolderCheck() {
@@ -633,9 +622,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
 			map.put(getName() + RuntimeInfoElement.NAME_SEPARATOR + b.getProperty().getName(), list);
 		    }
-		}
-
-		else if (bond instanceof QueryableBond<?>) {
+		} else if (bond instanceof QueryableBond<?>) {
 
 		} else if (bond instanceof ViewBond) {
 

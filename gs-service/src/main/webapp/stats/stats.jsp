@@ -95,6 +95,18 @@
       font-size: 1.05em;
     }
 
+    .stats-subitem {
+      display: inline-block;
+      margin-right: 12px;
+      font-size: 0.95em;
+      color: #333;
+    }
+
+    .stats-subitem-label {
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
     .table-wrapper {
       overflow-x: auto;
     }
@@ -270,6 +282,19 @@
       font-size: 0.95em;
       color: #555;
       margin-bottom: 8px;
+    }
+
+    .next-stations-button {
+      transition: background-color 0.2s ease;
+    }
+
+    .next-stations-button:hover:not(:disabled) {
+      background: #0048c4 !important;
+    }
+
+    .next-stations-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     @media (max-width: 900px) {
@@ -685,14 +710,51 @@
         
         statsItems.push('<li><b>' + escapeHtml(datasetsLabel) + ':</b> ' + formatValue(timeSeriesCount) + '</li>');
         statsItems.push('<li><b>' + escapeHtml(translator('unique_attribute_count', 'Unique observed properties')) + ':</b> ' + formatValue(uniqueAttributeCount) + '</li>');
-        statsItems.push('<li><b>' + escapeHtml(minTemporalLabel) + ':</b> ' + formatValue(begin) + '</li>');
-        statsItems.push('<li><b>' + escapeHtml(maxTemporalLabel) + ':</b> ' + formatValue(end) + '</li>');
 
-        var bboxValues = [formatValue(west), formatValue(south), formatValue(east), formatValue(north)];
-        statsItems.push('<li><b>' + escapeHtml(bboxLabel) + ':</b> ' + bboxValues.join(', ') + '</li>');
+        var temporalExtentLabel = translator('temporal_extent', 'Temporal extent');
+        var beginLabel = translator('begin_label', 'Begin');
+        var endLabel = translator('end_label', 'End');
+        statsItems.push('<li><b>' + escapeHtml(temporalExtentLabel) + ':</b><ul>' +
+         '<li>' + escapeHtml(beginLabel) + ': ' + escapeHtml(formatValue(begin)) + '</li>'+
+         '<li>' + escapeHtml(endLabel) + ': ' + escapeHtml(formatValue(end)) + '</li>'+          
+         '</ul></li>'
+        
+        );
 
-        var altitudeValues = formatValue(minElevation) + ' / ' + formatValue(maxElevation);
-        statsItems.push('<li><b>' + escapeHtml(altitudeLabel) + ':</b> ' + altitudeValues + '</li>');
+        
+        statsItems.push('<li><b>' + escapeHtml(bboxLabel) + ':</b> <ul>' +
+          
+          "<li>" + translator('west', 'West') + ': ' + formatValue(west) + "</li>",
+          "<li>" + translator('south', 'South') + ': ' + formatValue(south) + "</li>",
+          "<li>" + translator('east', 'East') + ': ' + formatValue(east) + "</li>",
+          "<li>" + translator('north', 'North') + ': ' + formatValue(north) + "</li>"+
+          '</ul></li>');
+
+        var minElevationDefined = minElevation !== undefined && minElevation !== null && minElevation !== '';
+        var maxElevationDefined = maxElevation !== undefined && maxElevation !== null && maxElevation !== '';
+        var minElevationNumber = Number(minElevation);
+        var maxElevationNumber = Number(maxElevation);
+        var sameElevation = false;
+        if (minElevationDefined && maxElevationDefined) {
+          if (!isNaN(minElevationNumber) && !isNaN(maxElevationNumber)) {
+            sameElevation = minElevationNumber === maxElevationNumber;
+          } else {
+            sameElevation = String(minElevation).trim() === String(maxElevation).trim();
+          }
+        }
+
+        var altitudeDisplay;
+        if (minElevationDefined && (!maxElevationDefined || sameElevation)) {
+          altitudeDisplay = formatValue(minElevation);
+        } else if (!minElevationDefined && maxElevationDefined) {
+          altitudeDisplay = formatValue(maxElevation);
+        } else if (minElevationDefined && maxElevationDefined) {
+          altitudeDisplay = formatValue(minElevation) + ' / ' + formatValue(maxElevation);
+        } else {
+          altitudeDisplay = formatValue(minElevation);
+        }
+
+        statsItems.push('<li><b>' + escapeHtml(altitudeLabel) + ':</b> ' + altitudeDisplay + '</li>');
         statsItems.push('<li><b>' + escapeHtml(observedLabel) + ' (' + formatValue(attributeCount) + '):</b></li>');
         var attributeStats = Array.isArray(entry['attribute-stats']) ? entry['attribute-stats'] : [];
         if (attributeStats.length) {
@@ -727,7 +789,7 @@
 
         page.push('<div class="provider-right">');
         page.push('<div id="provider-map" class="provider-map"></div>');
-        page.push('<div class="map-credit">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></div>');
+        page.push('<div class="map-credit">Map copyright: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></div>');
         page.push('</div>');
         page.push('</div>');
 
@@ -743,6 +805,7 @@
         page.push('<tbody id="platform-table-body"></tbody>');
         page.push('</table>');
         page.push('</div>');
+        page.push('<div id="platform-pagination" style="margin-top: 16px; text-align: center;"></div>');
 
         page.push('</div>');
 
@@ -752,7 +815,18 @@
         renderOrganizations(orgContainer, entry['organization-stats'] || [], translator);
 
         var tableBody = document.getElementById('platform-table-body');
-        renderSamplePlatforms(tableBody, [], translator, query);
+        var paginationContainer = document.getElementById('platform-pagination');
+        var sourceId = entry['source'] || query.sourceId;
+        fetchSamplePlatforms(query, sourceId, translator)
+          .then(function (result) {
+            renderSamplePlatforms(tableBody, result.platforms, translator, query, false);
+            updatePlatformPagination(paginationContainer, result.resumptionToken, query, sourceId, translator);
+          })
+          .catch(function (error) {
+            console.error('[stats] Failed to load sample platforms', error);
+            renderSamplePlatforms(tableBody, [], translator, query, false);
+            updatePlatformPagination(paginationContainer, null, query, sourceId, translator);
+          });
 
         createProviderMap({
           bbox: {
@@ -1033,20 +1107,95 @@
         return results;
       }
 
-      function renderSamplePlatforms(tbody, platforms, translator, query) {
+      function fetchSamplePlatforms(query, sourceId, translator, resumptionToken) {
+        if (!query.viewId || !sourceId) {
+          return Promise.resolve({ platforms: [], resumptionToken: null });
+        }
+
+        var url = '/gs-service/services/essi';
+        if (query.token) {
+          url += '/token/' + encodeURIComponent(query.token);
+        }
+        url += '/view/' + encodeURIComponent(query.viewId) + '/om-api/features';
+        
+        var params = new URLSearchParams();
+        params.append('provider', sourceId);
+        params.append('limit', '10');
+        if (resumptionToken) {
+          params.append('resumptionToken', resumptionToken);
+        }
+        url += '?' + params.toString();
+
+        return fetch(url, {
+          headers: { 'Accept': 'application/json' },
+          credentials: 'include'
+        })
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+          })
+          .then(function (data) {
+            var results = Array.isArray(data && data.results) ? data.results : [];
+            var platforms = [];
+            
+            for (var i = 0; i < results.length; i++) {
+              var item = results[i];
+              if (!item) {
+                continue;
+              }
+              
+              var coordinates = item.shape && Array.isArray(item.shape.coordinates) ? item.shape.coordinates : [];
+              var longitude = coordinates.length > 0 ? coordinates[0] : null;
+              var latitude = coordinates.length > 1 ? coordinates[1] : null;
+              
+              var elevation = null;
+              var parameters = Array.isArray(item.parameter) ? item.parameter : [];
+              for (var j = 0; j < parameters.length; j++) {
+                var param = parameters[j];
+                if (param && param.name && (param.name.toLowerCase() === 'elevation' || param.name.toLowerCase() === 'altitude')) {
+                  elevation = param.value;
+                  break;
+                }
+              }
+              
+              platforms.push({
+                platformId: item.id || '',
+                title: item.name || translator('unknown_value', 'Unknown'),
+                north: latitude,
+                east: longitude,
+                elevation: elevation
+              });
+            }
+            
+            var nextToken = trimToNull(data.resumptionToken) || null;
+            
+            return {
+              platforms: platforms,
+              resumptionToken: nextToken
+            };
+          });
+      }
+
+      function renderSamplePlatforms(tbody, platforms, translator, query, append) {
         if (!tbody) {
           return;
         }
-        while (tbody.firstChild) {
-          tbody.removeChild(tbody.firstChild);
+        if (!append) {
+          while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+          }
         }
         if (!platforms || !platforms.length) {
-          var emptyRow = document.createElement('tr');
-          var emptyCell = document.createElement('td');
-          emptyCell.colSpan = 4;
-          emptyCell.textContent = translator('no_sample_platforms', 'No sample platforms available.');
-          emptyRow.appendChild(emptyCell);
-          tbody.appendChild(emptyRow);
+          if (!append) {
+            var emptyRow = document.createElement('tr');
+            var emptyCell = document.createElement('td');
+            emptyCell.colSpan = 4;
+            emptyCell.textContent = translator('no_sample_platforms', 'No sample platforms available.');
+            emptyRow.appendChild(emptyCell);
+            tbody.appendChild(emptyRow);
+          }
           return;
         }
         for (var i = 0; i < platforms.length; i++) {
@@ -1081,6 +1230,39 @@
 
           tbody.appendChild(row);
         }
+      }
+
+      function updatePlatformPagination(paginationContainer, resumptionToken, query, sourceId, translator) {
+        if (!paginationContainer) {
+          return;
+        }
+        paginationContainer.innerHTML = '';
+        if (!resumptionToken) {
+          return;
+        }
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'next-stations-button';
+        button.textContent = translator('next_stations', 'Next stations');
+        button.style.cssText = 'padding: 10px 20px; background: #005aef; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: 600;';
+        button.addEventListener('click', function () {
+          button.disabled = true;
+          button.textContent = translator('loading', 'Loading...');
+          fetchSamplePlatforms(query, sourceId, translator, resumptionToken)
+            .then(function (result) {
+              var tableBody = document.getElementById('platform-table-body');
+              if (tableBody) {
+                renderSamplePlatforms(tableBody, result.platforms, translator, query, true);
+              }
+              updatePlatformPagination(paginationContainer, result.resumptionToken, query, sourceId, translator);
+            })
+            .catch(function (error) {
+              console.error('[stats] Failed to load next batch of platforms', error);
+              button.disabled = false;
+              button.textContent = translator('next_stations', 'Next stations');
+            });
+        });
+        paginationContainer.appendChild(button);
       }
 
       function buildStationLink(query, platformId) {
