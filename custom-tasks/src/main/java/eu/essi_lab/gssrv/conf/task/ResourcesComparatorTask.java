@@ -34,18 +34,16 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import eu.essi_lab.KafkaClient;
-import eu.essi_lab.KafkaClient.SaslMechanism;
-import eu.essi_lab.KafkaClient.SecurityProtol;
+import eu.essi_lab.lib.kafka.client.KafkaClient;
+import eu.essi_lab.lib.kafka.client.KafkaClient.SaslMechanism;
+import eu.essi_lab.lib.kafka.client.KafkaClient.SecurityProtol;
 import eu.essi_lab.lib.net.publisher.MessagePublisher;
-import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 
 import com.beust.jcommander.internal.Lists;
 
-import eu.essi_lab.access.augmenter.DataCacheAugmenter;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFinder;
