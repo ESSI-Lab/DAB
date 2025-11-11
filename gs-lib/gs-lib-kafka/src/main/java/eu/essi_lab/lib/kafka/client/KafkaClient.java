@@ -26,6 +26,8 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.common.config.SaslConfigs;
+import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
@@ -43,25 +45,6 @@ public class KafkaClient implements MessagePublisher {
 
     private Properties producerProps;
     private Properties consumerProps;
-
-    /**
-     * @author Fabrizio
-     */
-    public enum SecurityProtol {
-
-	/**
-	 *
-	 */
-	PLAINTEXT,
-	/**
-	 *
-	 */
-	SASL_PLAINTEXT,
-	/**
-	 *
-	 */
-	SASL_SSL
-    }
 
     /**
      * @author Fabrizio
@@ -87,6 +70,26 @@ public class KafkaClient implements MessagePublisher {
 	OAUTHBEARER;
 
 	/**
+	 * @param user
+	 * @param pwd
+	 * @return
+	 */
+	public static String plainLoginModule(String user, String pwd) {
+
+	    return "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"";
+	}
+
+	/**
+	 * @param user
+	 * @param pwd
+	 * @return
+	 */
+	public static String scramLoginModule(String user, String pwd) {
+
+	    return "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"";
+	}
+
+	/**
 	 * @param value
 	 * @return
 	 */
@@ -105,7 +108,7 @@ public class KafkaClient implements MessagePublisher {
 	/**
 	 * @return
 	 */
-	public String getValue() {
+	public String value() {
 
 	    return switch (this) {
 		case PLAIN -> "PLAIN";
@@ -144,7 +147,7 @@ public class KafkaClient implements MessagePublisher {
 
 	producerProps.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 200); // 200 millis
 	producerProps.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 1000); // one minute
-	producerProps.put(ProducerConfig.LINGER_MS_CONFIG, 5); // 5 milli; suggested [0 - 50]
+	producerProps.put(ProducerConfig.LINGER_MS_CONFIG, 5); // 5 millis; suggested [0 - 50]
 
 	//
 	//
@@ -189,35 +192,31 @@ public class KafkaClient implements MessagePublisher {
      * @param user
      * @param pwd
      * @apiNote Supported combinations: <ol>
-     * <li>  {@link SecurityProtol#SASL_PLAINTEXT} - {@link SaslMechanism#PLAIN} <ul><li>Basic authentication (username/password in clear
+     * <li>  {@link SecurityProtocol#SASL_PLAINTEXT} - {@link SaslMechanism#PLAIN} <ul><li>Basic authentication (username/password in clear
      * text, without SSL)</li></ul>   </li>
-     * <li>{@link SecurityProtol#SASL_SSL} - {@link SaslMechanism#PLAIN}  <ul><li>Username and password required, but the channel is SSL
+     * <li>{@link SecurityProtocol#SASL_SSL} - {@link SaslMechanism#PLAIN}  <ul><li>Username and password required, but the channel is SSL
      * encrypted</li></ul>          </li>
-     * <li>{@link SecurityProtol#SASL_SSL} - {@link SaslMechanism#SCRAM_SHA_512} <ul><li>Username and password required, but the broker does
-     * not store them in clear text: the credentials are stored as SCRAM hashes in the cluster</li></ul>  </li>
+     * <li>{@link SecurityProtocol#SASL_SSL} - {@link SaslMechanism#SCRAM_SHA_512} <ul><li>Username and password required, but the broker
+     * does not store them in clear text: the credentials are stored as SCRAM hashes in the cluster</li></ul>  </li>
      * </ol>
      */
-    public void setSecurity(SecurityProtol protocol, SaslMechanism mechanism, String user, String pwd) {
+    public void setSecurity(SecurityProtocol protocol, SaslMechanism mechanism, String user, String pwd) {
 
-	getProducerProps().put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol);
-	getProducerProps().put("sasl.mechanism", mechanism.getValue());
+	getProducerProps().put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol.name());
+	getProducerProps().put(SaslConfigs.SASL_MECHANISM, mechanism.value());
 
-	getConsumerProps().put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol);
-	getConsumerProps().put("sasl.mechanism", mechanism.getValue());
+	getConsumerProps().put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol.name());
+	getConsumerProps().put(SaslConfigs.SASL_MECHANISM, mechanism.value());
 
 	switch (mechanism) {
 	case PLAIN -> {
-	    getProducerProps().put("sasl.jaas.config",
-		    "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"");
-	    getConsumerProps().put("sasl.jaas.config",
-		    "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"");
+	    getProducerProps().put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.plainLoginModule(user, pwd));
+	    getConsumerProps().put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.plainLoginModule(user, pwd));
 	}
 
 	case SCRAM_SHA_512 -> {
-	    getProducerProps().put("sasl.jaas.config",
-		    "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"");
-	    getConsumerProps().put("sasl.jaas.config",
-		    "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"");
+	    getProducerProps().put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.scramLoginModule(user, pwd));
+	    getConsumerProps().put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.scramLoginModule(user, pwd));
 	}
 	}
     }
@@ -360,8 +359,20 @@ public class KafkaClient implements MessagePublisher {
      */
     public void addBootstrapServer(String server) {
 
-	producerProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, server);
-	consumerProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, server);
+	String curVal = Optional.ofNullable(producerProps.getProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, null)).map(v -> "," + v)
+		.orElse("");
+
+	producerProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, server + curVal);
+	consumerProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, server + curVal);
+    }
+
+    /**
+     * @param host
+     * @param port
+     */
+    public void addBootstrapServer(String host, int port) {
+
+	addBootstrapServer(host + ":" + port);
     }
 
     /**

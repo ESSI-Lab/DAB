@@ -3,47 +3,7 @@
  */
 package eu.essi_lab.gssrv.conf.task;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.util.Optional;
-import java.util.Properties;
-import java.util.stream.Collectors;
-
-import eu.essi_lab.lib.kafka.client.KafkaClient;
-import eu.essi_lab.lib.kafka.client.KafkaClient.SaslMechanism;
-import eu.essi_lab.lib.kafka.client.KafkaClient.SecurityProtol;
-import eu.essi_lab.lib.net.publisher.MessagePublisher;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.json.JSONObject;
-import org.quartz.JobExecutionContext;
-
 import com.beust.jcommander.internal.Lists;
-
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFinder;
@@ -56,7 +16,10 @@ import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.lib.kafka.client.KafkaClient;
+import eu.essi_lab.lib.kafka.client.KafkaClient.SaslMechanism;
 import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;
+import eu.essi_lab.lib.net.publisher.MessagePublisher;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -75,6 +38,13 @@ import eu.essi_lab.model.resource.GSResourceComparator;
 import eu.essi_lab.model.resource.GSResourceComparator.ComparisonResponse;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.security.auth.SecurityProtocol;
+import org.json.JSONObject;
+import org.quartz.JobExecutionContext;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This task must be embedded
@@ -537,9 +507,9 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    // security
 		    //
 
-		    Optional<SecurityProtol> securityProtocol = Optional.ofNullable(
+		    Optional<SecurityProtocol> securityProtocol = Optional.ofNullable(
 				    keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_SECURITY_PROTOCOL.getLabel()))
-			    .map(SecurityProtol::valueOf);
+			    .map(SecurityProtocol::forName);
 
 		    Optional<SaslMechanism> saslMechanism = Optional.ofNullable(
 				    keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_SASL_MECHANISM.getLabel()))
