@@ -29,7 +29,6 @@ import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -131,14 +130,21 @@ public abstract class DiscoveryResultSetMapper<T>
 	List<String> ids = ConfigurationWrapper.getGDCSourceSetting().getSelectedSourcesIds();
 
 	//
-	// parallel mapping with a thread factory of unlimited virtual threads
+	// parallel mapping with a thread factory of unlimited virtual threads or
+	// limited platform threads
 	//
 
-	ThreadFactory factory = Thread.ofVirtual().//
+	ThreadFactory virtualFactory = Thread.ofVirtual().//
 		name(getClass().getSimpleName() + "@" + message.getRequestId(true)).//
 		factory();
 
-	ExecutorService executor = Executors.newThreadPerTaskExecutor(factory);
+	ThreadFactory platformFactory = Thread.ofPlatform().//
+		name(getClass().getSimpleName() + "@" + message.getRequestId(true)).//
+		factory();
+
+	ExecutorService executor = message.getResultSetMapperThreadsCount()
+		.map(count -> Executors.newFixedThreadPool(count, platformFactory))
+		.orElse(Executors.newThreadPerTaskExecutor(virtualFactory));
 
 	List<CompletableFuture<T>> futures = resultSet.getResultsList().//
 		stream().//
