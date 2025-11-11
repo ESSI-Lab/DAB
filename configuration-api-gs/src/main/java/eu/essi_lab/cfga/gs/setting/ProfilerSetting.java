@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -57,6 +57,8 @@ import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
 import eu.essi_lab.cfga.setting.validation.Validator;
 import eu.essi_lab.lib.utils.StreamUtils;
 import eu.essi_lab.messages.ResourceConsumer;
+import it.geosolutions.jaiext.zonal.ZonalStatsOpImage;
+import kotlin.OptIn;
 
 /**
  * @author Fabrizio
@@ -68,6 +70,12 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     private static final String VERSION_OPTION_KEY = "versionOption";
     private static final String STATE_OPTION = "stateOption";
     private static final String RESOURCE_CONSUMER_OPTION_KEY = "resourceConsumer";
+
+    /**
+     *
+     */
+    public static final String RSM_THREADS_COUNT_PROPERTY = "rsmThreadsCount";
+    public static final String DEFAULT_RSM_THREADS_COUNT = "10";
 
     /**
      *
@@ -434,8 +442,17 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     public Optional<ResourceConsumer> getConsumer() {
 
 	return getOption(RESOURCE_CONSUMER_OPTION_KEY, String.class).//
-		get().
-		getOptionalSelectedValue().//
+		get().getOptionalSelectedValue().//
 		map(simpleClass -> ResourceConsumerLoader.load(simpleClass));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Integer> getResultSetMapperThreadsCount() {
+
+	int count = Integer.parseInt(getKeyValueOptions().map(o -> o.getProperty(RSM_THREADS_COUNT_PROPERTY, DEFAULT_RSM_THREADS_COUNT)).orElse(DEFAULT_RSM_THREADS_COUNT));
+
+	return Optional.ofNullable(count == -1 ? null : count);
     }
 }
