@@ -349,6 +349,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	    referenceType.setHref("http://codes.wmo.int/common/unit/" + uomCode);
 	}
 	reporting.setUom(referenceType);
+	reporting.setInternationalExchange(true);
     }
 
     /*
@@ -1492,6 +1493,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	ReportingType repo = reporting.getReporting();
 	if (repo == null) {
 	    repo = new ReportingType();
+	    repo.setInternationalExchange(true);
 	}
 	reporting.setReporting(repo);
 	return repo;
@@ -1503,6 +1505,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	if (reporting == null) {
 	    reporting = new ReportingPropertyType();
 	    ReportingType rt = new ReportingType();
+	    rt.setInternationalExchange(true);
 	    reporting.setReporting(rt);
 	}
 	dg.setReporting(reporting);
