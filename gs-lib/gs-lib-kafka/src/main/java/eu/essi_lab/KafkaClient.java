@@ -10,12 +10,12 @@ package eu.essi_lab;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -31,11 +31,10 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Fabrizio
@@ -46,9 +45,81 @@ public class KafkaClient implements MessagePublisher {
     private Properties consumerProps;
 
     /**
+     * @author Fabrizio
+     */
+    public enum SecurityProtol {
+
+	/**
+	 *
+	 */
+	PLAINTEXT,
+	/**
+	 *
+	 */
+	SASL_PLAINTEXT,
+	/**
+	 *
+	 */
+	SASL_SSL
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public enum SaslMechanism {
+
+	/**
+	 *
+	 */
+	PLAIN,
+	/**
+	 *
+	 */
+	SCRAM_SHA_512,
+	/**
+	 *
+	 */
+	GSSAPI,
+
+	/**
+	 *
+	 */
+	OAUTHBEARER;
+
+	/**
+	 * @param value
+	 * @return
+	 */
+	public static Optional<SaslMechanism> of(String value) {
+	    switch (value) {
+	    case "PLAIN" -> Optional.of(PLAIN);
+	    case "GSSAPI" -> Optional.of(GSSAPI);
+	    case "SCRAM-SHA-512" -> Optional.of(SCRAM_SHA_512);
+	    case "OAUTHBEARER" -> Optional.of(OAUTHBEARER);
+
+	    }
+
+	    return Optional.empty();
+	}
+
+	/**
+	 * @return
+	 */
+	public String getValue() {
+
+	    return switch (this) {
+		case PLAIN -> "PLAIN";
+		case GSSAPI -> "GSSAPI";
+		case SCRAM_SHA_512 -> "SCRAM-SHA-512";
+		case OAUTHBEARER -> "OAUTHBEARER";
+	    };
+	}
+    }
+
+    /**
      *
      */
-    public KafkaClient() {
+    private KafkaClient() {
 
 	producerProps = new Properties();
 	consumerProps = new Properties();
@@ -86,6 +157,15 @@ public class KafkaClient implements MessagePublisher {
     }
 
     /**
+     * @param host
+     * @param port
+     */
+    public KafkaClient(String host, int port) {
+
+	this(List.of(host + ":" + port));
+    }
+
+    /**
      * @param bootstrapServers
      */
     public KafkaClient(String... bootstrapServers) {
@@ -100,9 +180,45 @@ public class KafkaClient implements MessagePublisher {
 
 	this();
 
-	for (String bootstrapServer : bootstrapServers) {
+	bootstrapServers.forEach(this::addBootstrapServer);
+    }
 
-	    addBootstrapServer(bootstrapServer);
+    /**
+     * @param protocol
+     * @param mechanism
+     * @param user
+     * @param pwd
+     * @apiNote Supported combinations: <ol>
+     * <li>  {@link SecurityProtol#SASL_PLAINTEXT} - {@link SaslMechanism#PLAIN} <ul><li>Basic authentication (username/password in clear
+     * text, without SSL)</li></ul>   </li>
+     * <li>{@link SecurityProtol#SASL_SSL} - {@link SaslMechanism#PLAIN}  <ul><li>Username and password required, but the channel is SSL
+     * encrypted</li></ul>          </li>
+     * <li>{@link SecurityProtol#SASL_SSL} - {@link SaslMechanism#SCRAM_SHA_512} <ul><li>Username and password required, but the broker does
+     * not store them in clear text: the credentials are stored as SCRAM hashes in the cluster</li></ul>  </li>
+     * </ol>
+     */
+    public void setSecurity(SecurityProtol protocol, SaslMechanism mechanism, String user, String pwd) {
+
+	getProducerProps().put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol);
+	getProducerProps().put("sasl.mechanism", mechanism.getValue());
+
+	getConsumerProps().put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol);
+	getConsumerProps().put("sasl.mechanism", mechanism.getValue());
+
+	switch (mechanism) {
+	case PLAIN -> {
+	    getProducerProps().put("sasl.jaas.config",
+		    "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"");
+	    getConsumerProps().put("sasl.jaas.config",
+		    "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"");
+	}
+
+	case SCRAM_SHA_512 -> {
+	    getProducerProps().put("sasl.jaas.config",
+		    "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"");
+	    getConsumerProps().put("sasl.jaas.config",
+		    "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"");
+	}
 	}
     }
 
