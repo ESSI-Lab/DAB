@@ -10,24 +10,19 @@ package eu.essi_lab.indexes;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBElement;
@@ -69,15 +64,15 @@ import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 
 /**
  * This class groups all the available {@link IndexedMetadataElement}s
- * 
- * @see MetadataElement
+ *
  * @author Fabrizio
+ * @see MetadataElement
  */
 public final class IndexedMetadataElements extends IndexedElementsGroup {
 
     /**
      * Retrieves all the {@link IndexedMetadataElement}s declared in this class
-     * 
+     *
      * @return
      */
     public static List<IndexedMetadataElement> getIndexes() {
@@ -90,7 +85,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
     /**
      * Retrieves all the {@link IndexedElementInfo}s owned by the {@link IndexedMetadataElement}s declared in this class
-     * 
+     *
      * @param impl
      * @return
      */
@@ -99,9 +94,9 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	return getIndexes().//
 		stream().//
 		// this check excludes the bbox index which is in fact not directly indexed
-		filter(el -> el.getInfo(impl.getName()).getIndexType() != null).//
-		map(el -> el.getInfo(impl.getName())).//
-		collect(Collectors.toList());//
+			filter(el -> el.getInfo(impl.getName()).getIndexType() != null).//
+			map(el -> el.getInfo(impl.getName())).//
+			collect(Collectors.toList());//
     }
 
     // ----------------------------------------------
@@ -2406,8 +2401,9 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 
 	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
-
 	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
+
+	    parties = parties.stream().filter(p -> p.getElementType() != null).toList();
 
 	    for (ResponsibleParty party : parties) {
 		if (party != null) {
@@ -2518,19 +2514,18 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    }
 	    {
-		SA_ElementWrapper attributeWrapper = addComposedKeywords(resource, "theme",MetadataElement.PARAMETER_SA);
+		SA_ElementWrapper attributeWrapper = addComposedKeywords(resource, "theme", MetadataElement.PARAMETER_SA);
 		if (attributeWrapper != null) {
 		    addComposedElement(attributeWrapper.getElement());
 		}
 	    }
 	    {
-		SA_ElementWrapper attributeWrapper = addComposedKeywords(resource, "parameter",MetadataElement.PARAMETER_SA);
+		SA_ElementWrapper attributeWrapper = addComposedKeywords(resource, "parameter", MetadataElement.PARAMETER_SA);
 		if (attributeWrapper != null) {
 		    addComposedElement(attributeWrapper.getElement());
 		}
 	    }
 	}
-
 
     };
 
@@ -2558,13 +2553,13 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
-//    public static final IndexedMetadataElement PROJECT_SA = new IndexedMetadataElement(MetadataElement.PROJECT_SA) {
-//
-//	@Override
-//	public void defineValues(GSResource resource) {
-//
-//	}
-//    };
+    //    public static final IndexedMetadataElement PROJECT_SA = new IndexedMetadataElement(MetadataElement.PROJECT_SA) {
+    //
+    //	@Override
+    //	public void defineValues(GSResource resource) {
+    //
+    //	}
+    //    };
 
     static {
 
