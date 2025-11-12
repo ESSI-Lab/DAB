@@ -3,6 +3,7 @@ package eu.essi_lab.lib.kafka.client.test;
 import eu.essi_lab.lib.kafka.client.KafkaClient;
 import eu.essi_lab.lib.kafka.client.KafkaClient.SaslMechanism;
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SaslConfigs;
@@ -11,10 +12,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -52,12 +50,12 @@ public class KafkaClientInternalTestIT {
 
 	String plainLoginModule = SaslMechanism.plainLoginModule("admin", "pwd");
 
-	Assert.assertEquals("org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"pwd\"",
+	Assert.assertEquals("org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"pwd\";",
 		plainLoginModule);
 
 	String scramLoginModule = SaslMechanism.scramLoginModule("admin", "pwd");
 
-	Assert.assertEquals("org.apache.kafka.common.security.scram.ScramLoginModule required username=\"admin\" password=\"pwd\"",
+	Assert.assertEquals("org.apache.kafka.common.security.scram.ScramLoginModule required username=\"admin\" password=\"pwd\";",
 		scramLoginModule);
     }
 
@@ -264,5 +262,24 @@ public class KafkaClientInternalTestIT {
 
 	Assert.assertEquals(SecurityProtocol.SASL_SSL.name(), consumerProps.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
 	Assert.assertEquals(SaslMechanism.SCRAM_SHA_512.value(), consumerProps.getProperty(SaslConfigs.SASL_MECHANISM));
+
+	//
+	//
+	//
+
+	int deliveryTimeout = Integer.parseInt(producerProps.get(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG).toString());
+	int linger = Integer.parseInt(producerProps.get(ProducerConfig.LINGER_MS_CONFIG).toString());
+	int requestTimeout = Integer.parseInt(producerProps.get(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG).toString());
+
+	Assert.assertEquals(KafkaClient.DEFAULT_DELIVERY_TIMEOUT_MLS, deliveryTimeout);
+	Assert.assertEquals(KafkaClient.DEFAULT_LINGER_MLS, linger);
+	Assert.assertEquals(KafkaClient.DEFAULT_REQUEST_TIMEOUT_MLS, requestTimeout);
+
+	client.setRequestTimeoutMls(10000);
+
+	deliveryTimeout = Integer.parseInt(producerProps.get(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG).toString());
+
+	Assert.assertEquals(10000 + linger, deliveryTimeout);
+
     }
 }

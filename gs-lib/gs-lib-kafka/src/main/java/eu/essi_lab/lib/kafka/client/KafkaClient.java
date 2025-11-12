@@ -10,12 +10,12 @@ package eu.essi_lab.lib.kafka.client;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -39,6 +39,20 @@ import java.util.concurrent.Future;
  * @author Fabrizio
  */
 public class KafkaClient implements MessagePublisher {
+
+    /**
+     *
+     */
+    public static final int DEFAULT_REQUEST_TIMEOUT_MLS = 200;
+
+    /**
+     *
+     */
+    public static final int DEFAULT_DELIVERY_TIMEOUT_MLS = 1000 ;
+    /**
+     *
+     */
+    public static final int DEFAULT_LINGER_MLS = 5;
 
     private final Properties producerProps;
     private final Properties consumerProps;
@@ -73,7 +87,7 @@ public class KafkaClient implements MessagePublisher {
 	 */
 	public static String plainLoginModule(String user, String pwd) {
 
-	    return "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"";
+	    return "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"" + user + "\" password=\"" + pwd + "\";";
 	}
 
 	/**
@@ -83,7 +97,7 @@ public class KafkaClient implements MessagePublisher {
 	 */
 	public static String scramLoginModule(String user, String pwd) {
 
-	    return "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + user + "\" password=\"" + pwd + "\"";
+	    return "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + user + "\" password=\"" + pwd + "\";";
 	}
 
 	/**
@@ -136,9 +150,9 @@ public class KafkaClient implements MessagePublisher {
 	producerProps.put(CommonClientConfigs.RETRIES_CONFIG, Integer.MAX_VALUE); // default
 	producerProps.put(ProducerConfig.ACKS_CONFIG, "all"); // default
 
-	producerProps.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 200); // 200 millis
-	producerProps.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 1000); // one minute
-	producerProps.put(ProducerConfig.LINGER_MS_CONFIG, 5); // 5 millis; suggested [0 - 50]
+	producerProps.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, DEFAULT_REQUEST_TIMEOUT_MLS); // 200 millis
+	producerProps.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, DEFAULT_DELIVERY_TIMEOUT_MLS); // one minute
+	producerProps.put(ProducerConfig.LINGER_MS_CONFIG, DEFAULT_LINGER_MLS); // 5 millis; suggested [0 - 50]
 
 	//
 	//
@@ -180,6 +194,26 @@ public class KafkaClient implements MessagePublisher {
     }
 
     /**
+     *
+     * Since delivery.timeout.ms should be equal to or larger than linger.ms + request.timeout.ms, this method updates
+     * the delivery.timeout.ms if necessary
+     *
+     * @param requestTimeout
+     */
+    public void setRequestTimeoutMls(int requestTimeout){
+
+	int deliveryTimeout = Integer.parseInt(getProducerProps().get(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG).toString());
+	int linger = Integer.parseInt(getProducerProps().get(ProducerConfig.LINGER_MS_CONFIG).toString());
+
+	if(requestTimeout + linger > deliveryTimeout){
+
+	    getProducerProps().put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, requestTimeout + linger);
+	}
+
+	getProducerProps().put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeout);
+    }
+
+    /**
      * @param protocol
      * @param mechanism
      * @param user
@@ -200,7 +234,6 @@ public class KafkaClient implements MessagePublisher {
 
 	switch (mechanism) {
 	case PLAIN -> put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.plainLoginModule(user, pwd));
-
 	case SCRAM_SHA_512 -> put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.scramLoginModule(user, pwd));
 	}
     }
