@@ -31,10 +31,7 @@ import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -43,8 +40,8 @@ import java.util.concurrent.Future;
  */
 public class KafkaClient implements MessagePublisher {
 
-    private Properties producerProps;
-    private Properties consumerProps;
+    private final Properties producerProps;
+    private final Properties consumerProps;
 
     /**
      * @author Fabrizio
@@ -94,15 +91,13 @@ public class KafkaClient implements MessagePublisher {
 	 * @return
 	 */
 	public static Optional<SaslMechanism> of(String value) {
-	    switch (value) {
-	    case "PLAIN" -> Optional.of(PLAIN);
-	    case "GSSAPI" -> Optional.of(GSSAPI);
-	    case "SCRAM-SHA-512" -> Optional.of(SCRAM_SHA_512);
-	    case "OAUTHBEARER" -> Optional.of(OAUTHBEARER);
-
-	    }
-
-	    return Optional.empty();
+	    return switch (value) {
+		case "PLAIN" -> Optional.of(PLAIN);
+		case "GSSAPI" -> Optional.of(GSSAPI);
+		case "SCRAM-SHA-512" -> Optional.of(SCRAM_SHA_512);
+		case "OAUTHBEARER" -> Optional.of(OAUTHBEARER);
+		default -> Optional.empty();
+	    };
 	}
 
 	/**
@@ -127,12 +122,8 @@ public class KafkaClient implements MessagePublisher {
 	producerProps = new Properties();
 	consumerProps = new Properties();
 
-	producerProps.put(CommonClientConfigs.CLIENT_ID_CONFIG, "DAB");
-	consumerProps.put(CommonClientConfigs.CLIENT_ID_CONFIG, "DAB");
-	consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "DAB");
-
-	producerProps.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL);
-	consumerProps.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL);
+	put(CommonClientConfigs.CLIENT_ID_CONFIG, "DAB");
+	put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL);
 
 	//
 	//
@@ -152,6 +143,8 @@ public class KafkaClient implements MessagePublisher {
 	//
 	//
 	//
+
+	consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "DAB");
 
 	consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 	consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
@@ -202,47 +195,55 @@ public class KafkaClient implements MessagePublisher {
      */
     public void setSecurity(SecurityProtocol protocol, SaslMechanism mechanism, String user, String pwd) {
 
-	getProducerProps().put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol.name());
-	getProducerProps().put(SaslConfigs.SASL_MECHANISM, mechanism.value());
-
-	getConsumerProps().put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol.name());
-	getConsumerProps().put(SaslConfigs.SASL_MECHANISM, mechanism.value());
+	put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol.name());
+	put(SaslConfigs.SASL_MECHANISM, mechanism.value());
 
 	switch (mechanism) {
-	case PLAIN -> {
-	    getProducerProps().put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.plainLoginModule(user, pwd));
-	    getConsumerProps().put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.plainLoginModule(user, pwd));
-	}
+	case PLAIN -> put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.plainLoginModule(user, pwd));
 
-	case SCRAM_SHA_512 -> {
-	    getProducerProps().put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.scramLoginModule(user, pwd));
-	    getConsumerProps().put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.scramLoginModule(user, pwd));
-	}
+	case SCRAM_SHA_512 -> put(SaslConfigs.SASL_JAAS_CONFIG, SaslMechanism.scramLoginModule(user, pwd));
 	}
     }
+
+    // -------------------------
+    // Blocking producer methods
+    // -------------------------
 
     /**
      * @param topic
      * @param key
      * @param value
+     * @return
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public void publish(String topic, String key, String value) throws ExecutionException, InterruptedException {
+    public List<RecordMetadata> publish(String topic, String key, String value) throws ExecutionException, InterruptedException {
 
-	publish(new ProducerRecord<>(topic, key, value));
+	return publish(List.of(new ProducerRecord<>(topic, key, value)));
     }
 
     /**
      * @param topic
      * @param value
+     * @return
      * @throws ExecutionException
      * @throws InterruptedException
      */
     @Override
     public void publish(String topic, String value) throws ExecutionException, InterruptedException {
 
-	publish(topic, null, value);
+	publish(List.of(new ProducerRecord<>(topic, null, value)));
+    }
+
+    /**
+     * @param record
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    public List<RecordMetadata> publish(ProducerRecord<String, String> record) throws ExecutionException, InterruptedException {
+
+	return publish(List.of(record));
     }
 
     /**
@@ -250,39 +251,68 @@ public class KafkaClient implements MessagePublisher {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public void publish(List<ProducerRecord<String, String>> records) throws ExecutionException, InterruptedException {
+    public List<RecordMetadata> publish(List<ProducerRecord<String, String>> records) throws ExecutionException, InterruptedException {
+
+	ArrayList<RecordMetadata> out = new ArrayList<>();
 
 	try (KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps)) {
 
 	    for (ProducerRecord<String, String> record : records) {
 
 		final RecordMetadata metadata = producer.send(record).get();
+		out.add(metadata);
 
 		GSLoggerFactory.getLogger(getClass())
-			.debug("Sent -> topic: {}, partition: {}, offset: {}", metadata.topic(), metadata.partition(), metadata.offset());
+			.trace("Sent -> topic: {}, partition: {}, offset: {}", metadata.topic(), metadata.partition(), metadata.offset());
 	    }
 	}
+
+	return out;
     }
+
+    // -------------------------
+    // Asynch producer methods
+    // -------------------------
 
     /**
      * @param record
-     * @throws ExecutionException
-     * @throws InterruptedException
+     * @param callback
+     * @return
      */
-    public void publish(ProducerRecord<String, String> record) throws ExecutionException, InterruptedException {
+    public Future<RecordMetadata> publish(ProducerRecord<String, String> record, Callback callback) {
 
-	publish(List.of(record));
+	return publish(List.of(record), callback).getFirst();
+    }
+
+    /**
+     * @param topic
+     * @param key
+     * @param value
+     * @param callback
+     * @return
+     */
+    public Future<RecordMetadata> publish(String topic, String key, String value, Callback callback) {
+
+	return publish(List.of(new ProducerRecord<>(topic, key, value)), callback).getFirst();
+    }
+
+    /**
+     * @param topic
+     * @param value
+     * @param callback
+     * @return
+     */
+    public Future<RecordMetadata> publish(String topic, String value, Callback callback) {
+
+	return publish(List.of(new ProducerRecord<>(topic, null, value)), callback).getFirst();
     }
 
     /**
      * @param records
      * @param callback
      * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
      */
-    public List<Future<RecordMetadata>> publish(List<ProducerRecord<String, String>> records, Callback callback)
-	    throws ExecutionException, InterruptedException {
+    public List<Future<RecordMetadata>> publish(List<ProducerRecord<String, String>> records, Callback callback) {
 
 	final ArrayList<Future<RecordMetadata>> futures = new ArrayList<>();
 
@@ -295,47 +325,6 @@ public class KafkaClient implements MessagePublisher {
 	}
 
 	return futures;
-    }
-
-    /**
-     * @param record
-     * @param callback
-     * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
-     */
-    public Future<RecordMetadata> publish(ProducerRecord<String, String> record, Callback callback)
-	    throws ExecutionException, InterruptedException {
-
-	return publish(List.of(record), callback).getFirst();
-    }
-
-    /**
-     * @param topic
-     * @param key
-     * @param value
-     * @param callback
-     * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
-     */
-    public Future<RecordMetadata> publish(String topic, String key, String value, Callback callback)
-	    throws ExecutionException, InterruptedException {
-
-	return publish(new ProducerRecord<>(topic, key, value), callback);
-    }
-
-    /**
-     * @param topic
-     * @param value
-     * @param callback
-     * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
-     */
-    public Future<RecordMetadata> publish(String topic, String value, Callback callback) throws ExecutionException, InterruptedException {
-
-	return publish(topic, null, value, callback);
     }
 
     /**
@@ -359,11 +348,11 @@ public class KafkaClient implements MessagePublisher {
      */
     public void addBootstrapServer(String server) {
 
-	String curVal = Optional.ofNullable(producerProps.getProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, null)).map(v -> "," + v)
-		.orElse("");
+	String curVal = Optional.ofNullable(producerProps.getProperty(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, null)).//
+		map(v -> "," + v).//
+		orElse("");
 
-	producerProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, server + curVal);
-	consumerProps.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, server + curVal);
+	put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, server + curVal);
     }
 
     /**
@@ -376,24 +365,12 @@ public class KafkaClient implements MessagePublisher {
     }
 
     /**
-     * @param args
-     * @throws ExecutionException
-     * @throws InterruptedException
+     * @param key
+     * @param value
      */
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+    private void put(String key, String value) {
 
-	final KafkaClient client = new KafkaClient("localhost:9093");
-
-	String topic = "demo-topic-13";
-
-	List<ProducerRecord<String, String>> records = new ArrayList<>();
-
-	for (int i = 0; i < 10; i++) {
-
-	    String key = "key-" + i;
-	    String value = "Messaggio numero " + i;
-
-	    records.add(new ProducerRecord<>(topic, value));
-	}
+	producerProps.put(key, value);
+	consumerProps.put(key, value);
     }
 }
