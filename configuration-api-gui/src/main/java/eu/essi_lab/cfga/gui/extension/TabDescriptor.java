@@ -31,7 +31,7 @@ import eu.essi_lab.cfga.gui.extension.directive.DirectiveManager;
 /**
  * @author Fabrizio
  */
-public class TabInfo {
+public class TabDescriptor {
 
     private int index;
     private DirectiveManager directiveManager;
@@ -43,7 +43,7 @@ public class TabInfo {
     /**
      * 
      */
-    public TabInfo() {
+    public TabDescriptor() {
 
 	directiveManager = new DirectiveManager();
     }
@@ -52,7 +52,7 @@ public class TabInfo {
      * @param index
      * @param label
      */
-    public TabInfo(int index) {
+    public TabDescriptor(int index) {
 
 	this.index = index;
     }

@@ -36,8 +36,8 @@ import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
@@ -405,12 +405,12 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	    setComponentName(SystemSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.SYSTEM.getIndex()).//
 		    withShowDirective("System").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabInfo(tabDescriptor);
 	}
     }
 

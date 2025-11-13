@@ -33,8 +33,8 @@ import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSettingLoader;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.setting.AfterCleanFunction;
 import eu.essi_lab.cfga.setting.Setting;
@@ -124,7 +124,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 
 	    setComponentName(AccessorSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.DISTRIBUTION.getIndex()).//
 		    withShowDirective("Distribution", SortDirection.ASCENDING).//
 		    withAddDirective("Add distributed accessor", DistributionSetting.class).//
@@ -132,7 +132,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 		    withEditDirective("Edit accessor", ConfirmationPolicy.ON_WARNINGS).//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabInfo(tabDescriptor);
 	}
     }
 

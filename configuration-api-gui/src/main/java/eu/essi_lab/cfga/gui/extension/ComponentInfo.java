@@ -34,7 +34,7 @@ public class ComponentInfo implements ObjectExtension {
 
     private String componentName;
     private Orientation orientation;
-    private TabInfo tabInfo;
+    private TabDescriptor tabDescriptor;
     private boolean forceReadOnly;
 
     /**
@@ -97,17 +97,17 @@ public class ComponentInfo implements ObjectExtension {
     /**
      * @return
      */
-    public Optional<TabInfo> getTabInfo() {
+    public Optional<TabDescriptor> getTabInfo() {
 
-	return Optional.ofNullable(tabInfo);
+	return Optional.ofNullable(tabDescriptor);
     }
 
     /**
-     * @param tabInfo
+     * @param tabDescriptor
      */
-    public void setTabInfo(TabInfo tabInfo) {
+    public void setTabInfo(TabDescriptor tabDescriptor) {
 
-	this.tabInfo = tabInfo;
+	this.tabDescriptor = tabDescriptor;
     }
 
     @Override

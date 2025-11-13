@@ -44,7 +44,7 @@ import eu.essi_lab.cfga.gui.components.grid.GridComponent;
 import eu.essi_lab.cfga.gui.components.grid.GridInfo;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
 import eu.essi_lab.cfga.gui.extension.directive.DirectiveManager;
 import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
 import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
@@ -59,7 +59,7 @@ public class TabContainer extends VerticalLayout {
     private GridComponent grid;
     private Optional<RemoveDirective> removeDirective;
     private Optional<EditDirective> editDirective;
-    private TabInfo tabInfo;
+    private TabDescriptor tabDescriptor;
     private ComponentInfo componentInfo;
     private Configuration configuration;
     private boolean rendered;
@@ -94,7 +94,7 @@ public class TabContainer extends VerticalLayout {
 
 	HorizontalLayout headerLayout = findHeader();
 
-	if (tabInfo.isReloadable()) {
+	if (tabDescriptor.isReloadable()) {
 
 	    if (addReloadButton(headerLayout)) {
 
@@ -106,16 +106,16 @@ public class TabContainer extends VerticalLayout {
 
 	removeAllButHeader();
 
-	if (tabInfo.getComponent().isPresent()) {
+	if (tabDescriptor.getComponent().isPresent()) {
 
-	    add(tabInfo.getComponent().get());
+	    add(tabDescriptor.getComponent().get());
 
 	    return;
 	}
 
-	List<Setting> settings = view.retrieveTabSettings(tabInfo);
+	List<Setting> settings = view.retrieveTabSettings(tabDescriptor);
 
-	DirectiveManager directiveManager = tabInfo.getDirectiveManager();
+	DirectiveManager directiveManager = tabDescriptor.getDirectiveManager();
 
 	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
 
@@ -131,9 +131,9 @@ public class TabContainer extends VerticalLayout {
 	    }
 	});
 
-	if (tabInfo.getGridInfo().isPresent()) {
+	if (tabDescriptor.getGridInfo().isPresent()) {
 
-	    Optional<GridInfo> gridInfo = tabInfo.getGridInfo();
+	    Optional<GridInfo> gridInfo = tabDescriptor.getGridInfo();
 
 	    GridComponent gridComponent = new GridComponent(//
 		    gridInfo.get(), //
@@ -146,7 +146,7 @@ public class TabContainer extends VerticalLayout {
 	    TabSheet tabSheet = new TabSheet();
 	    tabSheet.getStyle().set("border-bottom", "1px solid #d3d3d39e");
 
-	    if (tabInfo.getGridInfo().get().isShowColumnsHider()) {
+	    if (tabDescriptor.getGridInfo().get().isShowColumnsHider()) {
 
 		tabSheet.add("Columns", gridComponent.createColumnsHider());
 	    }
@@ -228,14 +228,14 @@ public class TabContainer extends VerticalLayout {
      * @param configuration
      * @param settings
      * @param componentInfo
-     * @param tabInfo
+     * @param tabDescriptor
      */
-    public void init(ConfigurationView view, Configuration configuration, ComponentInfo componentInfo, TabInfo tabInfo) {
+    public void init(ConfigurationView view, Configuration configuration, ComponentInfo componentInfo, TabDescriptor tabDescriptor) {
 
 	this.view = view;
 	this.configuration = configuration;
 	this.componentInfo = componentInfo;
-	this.tabInfo = tabInfo;
+	this.tabDescriptor = tabDescriptor;
     }
 
     /**
@@ -412,9 +412,9 @@ public class TabContainer extends VerticalLayout {
 
 	reloadButton.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 
-	    if (tabInfo.getTabReloader().isPresent()) {
+	    if (tabDescriptor.getTabReloader().isPresent()) {
 
-		tabInfo.getTabReloader().get().run();
+		tabDescriptor.getTabReloader().get().run();
 
 		removeAllButHeader();
 

@@ -62,8 +62,8 @@ import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -244,13 +244,13 @@ public class ConfigUploader extends ComponentInfo {
 	//
 	//
 
-	TabInfo tabInfo = TabInfoBuilder.get().//
+	TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		withIndex(GSTabIndex.CONFIGURATION_UPLOADER.getIndex()).//
 		withShowDirective(getComponentName()).//
 		withComponent(verticalLayout).//
 		build();
 
-	setTabInfo(tabInfo);
+	setTabInfo(tabDescriptor);
     }
 
     /**

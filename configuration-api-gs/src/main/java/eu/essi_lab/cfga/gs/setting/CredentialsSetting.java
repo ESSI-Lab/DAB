@@ -28,8 +28,8 @@ import org.json.JSONObject;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -738,12 +738,12 @@ public class CredentialsSetting extends Setting implements EditableSetting {
 
 	    setComponentName(CredentialsSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.CREDENTIALS.getIndex()).//
 		    withShowDirective("Credentials").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabInfo(tabDescriptor);
 	}
     }
 

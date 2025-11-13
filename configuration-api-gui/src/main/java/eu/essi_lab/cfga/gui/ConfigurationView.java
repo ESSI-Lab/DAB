@@ -66,7 +66,7 @@ import eu.essi_lab.cfga.gui.components.TabsWithContent;
 import eu.essi_lab.cfga.gui.dialog.EnhancedDialog;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
 import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
 import eu.essi_lab.cfga.gui.extension.directive.DirectiveManager;
 import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
@@ -500,11 +500,11 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * {@link ComponentInfo} instances and the related {@link TabInfo}, can be defined to manage one or more
+     * {@link ComponentInfo} instances and the related {@link TabDescriptor}, can be defined to manage one or more
      * {@link Setting}s.<br>
-     * If the {@link RemoveDirective} of the {@link TabInfo} allows the removal of
+     * If the {@link RemoveDirective} of the {@link TabDescriptor} allows the removal of
      * all settings, when the view is initialized and there is no settings coupled with the {@link ComponentInfo},
-     * the {@link ComponentInfo} and its {@link TabInfo} cannot be found and as consequence, the related tab cannot be
+     * the {@link ComponentInfo} and its {@link TabDescriptor} cannot be found and as consequence, the related tab cannot be
      * rendered.<br>
      * In this case, it will no longer be possible to add or remove that kind of settings just because there
      * is no tab with the required {@link AddDirective}.<br>
@@ -746,16 +746,16 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * @param tabInfo
+     * @param tabDescriptor
      * @return
      */
-    public List<Setting> retrieveTabSettings(TabInfo tabInfo) {
+    public List<Setting> retrieveTabSettings(TabDescriptor tabDescriptor) {
 
 	List<Setting> allSetting = configuration.list();
 
-	HashMap<TabInfo, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
+	HashMap<TabDescriptor, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
 
-	return tabInfoMap.getOrDefault(tabInfo, new ArrayList<>());
+	return tabInfoMap.getOrDefault(tabDescriptor, new ArrayList<>());
     }
 
     /**
@@ -816,9 +816,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	List<Setting> allSetting = configuration.list();
 
-	HashMap<TabInfo, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
+	HashMap<TabDescriptor, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
 
-	List<TabInfo> tabInfoList = new ArrayList<>(tabInfoMap.keySet());
+	List<TabDescriptor> tabDescriptorList = new ArrayList<>(tabInfoMap.keySet());
 
 	//
 	//
@@ -828,13 +828,13 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	for (ComponentInfo componentInfo : additionalComps) {
 
-	    Optional<TabInfo> tabInfo = componentInfo.getTabInfo();
+	    Optional<TabDescriptor> tabInfo = componentInfo.getTabInfo();
 
 	    if (tabInfo.isPresent()) {
 
 		int index = tabInfo.get().getIndex();
 
-		boolean missing = tabInfoList.//
+		boolean missing = tabDescriptorList.//
 			stream().//
 			filter(tab -> tab.getIndex() == index).//
 			findFirst().//
@@ -842,7 +842,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 		if (missing) {
 
-		    tabInfoList.add(tabInfo.get());
+		    tabDescriptorList.add(tabInfo.get());
 		}
 	    }
 	}
@@ -851,26 +851,26 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	//
 	//
 
-	tabInfoList = tabInfoList.//
+	tabDescriptorList = tabDescriptorList.//
 		stream().//
-		sorted(Comparator.comparingInt(TabInfo::getIndex)).//
+		sorted(Comparator.comparingInt(TabDescriptor::getIndex)).//
 		collect(Collectors.toList());
 
 	//
 	//
 	//
 
-	for (TabInfo tabInfo : tabInfoList) {
+	for (TabDescriptor tabDescriptor : tabDescriptorList) {
 
-	    if (oneTab < 0 || tabInfo.getIndex() == oneTab) {
+	    if (oneTab < 0 || tabDescriptor.getIndex() == oneTab) {
 
-		List<Setting> settings = tabInfoMap.getOrDefault(tabInfo, new ArrayList<>());
+		List<Setting> settings = tabInfoMap.getOrDefault(tabDescriptor, new ArrayList<>());
 
 		//
 		//
 		//
 
-		DirectiveManager directiveManager = tabInfo.getDirectiveManager();
+		DirectiveManager directiveManager = tabDescriptor.getDirectiveManager();
 
 		Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
 
@@ -880,7 +880,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 		Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
 
-		String tabName = "Tab#" + tabInfo.getIndex();
+		String tabName = "Tab#" + tabDescriptor.getIndex();
 
 		if (showDirective.isPresent()) {
 
@@ -894,7 +894,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 		Optional<ComponentInfo> additionalComp = additionalComps.//
 			stream().//
 			filter(c -> c.getTabInfo().isPresent()).//
-			filter(c -> c.getTabInfo().get().getIndex() == tabInfo.getIndex()).//
+			filter(c -> c.getTabInfo().get().getIndex() == tabDescriptor.getIndex()).//
 			findFirst();
 
 		ComponentInfo componentInfo = additionalComp.orElseGet(() -> settings.getFirst().getExtension(ComponentInfo.class).get());
@@ -920,9 +920,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 		//
 		//
 
-		container.init(this, configuration, componentInfo, tabInfo);
+		container.init(this, configuration, componentInfo, tabDescriptor);
 
-		if (tabInfo.getIndex() == 0) {
+		if (tabDescriptor.getIndex() == 0) {
 
 		    container.render();
 		}
@@ -931,13 +931,13 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 		//
 		//
 
-		if (oneTab >= 0 && tabInfo.getIndex() == oneTab) {
+		if (oneTab >= 0 && tabDescriptor.getIndex() == oneTab) {
 		    addTab(0, tabName, container);
 		    return;
 
 		} else if (oneTab < 0) {
 
-		    addTab(tabInfo.getIndex(), tabName, container);
+		    addTab(tabDescriptor.getIndex(), tabName, container);
 		}
 	    }
 	}
@@ -964,9 +964,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      * @param settings
      * @return
      */
-    private HashMap<TabInfo, List<Setting>> createTabInfoMap(List<Setting> settings) {
+    private HashMap<TabDescriptor, List<Setting>> createTabInfoMap(List<Setting> settings) {
 
-	HashMap<TabInfo, List<Setting>> map = new HashMap<>();
+	HashMap<TabDescriptor, List<Setting>> map = new HashMap<>();
 
 	for (Setting setting : settings) {
 
@@ -974,7 +974,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	    if (extension.isPresent()) {
 
-		Optional<TabInfo> tabInfo = extension.get().getTabInfo();
+		Optional<TabDescriptor> tabInfo = extension.get().getTabInfo();
 
 		if (tabInfo.isPresent()) {
 

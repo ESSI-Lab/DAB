@@ -10,8 +10,8 @@ import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 
 /*-
  * #%L
@@ -184,12 +184,12 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 
 	    setComponentName(SourcePrioritySettingComponentInfo.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.IDENTIFIER_MANAGEMENT.getIndex()).//
 		    withShowDirective("Identifier management").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabInfo(tabDescriptor);
 	}
     }
 

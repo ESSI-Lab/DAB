@@ -42,8 +42,8 @@ import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.setting.AfterCleanFunction;
 import eu.essi_lab.cfga.setting.Setting;
@@ -185,7 +185,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	    setComponentName(HarvestingSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.HARVESTING.getIndex()).//
 		    withShowDirective("Harvesting", SortDirection.ASCENDING).//
 
@@ -254,7 +254,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabInfo(tabDescriptor);
 	}
 
 	/**

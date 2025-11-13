@@ -3,7 +3,6 @@
  */
 package eu.essi_lab.cfga.gs.setting;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,21 +27,17 @@ import java.util.stream.Collectors;
  * #L%
  */
 
-import com.mchange.v2.codegen.bean.SimpleClassInfo;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
-import eu.essi_lab.cfga.gs.task.CustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
-import eu.essi_lab.cfga.gs.task.DefaultCustomTask;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
@@ -57,8 +52,6 @@ import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
 import eu.essi_lab.cfga.setting.validation.Validator;
 import eu.essi_lab.lib.utils.StreamUtils;
 import eu.essi_lab.messages.ResourceConsumer;
-import it.geosolutions.jaiext.zonal.ZonalStatsOpImage;
-import kotlin.OptIn;
 
 /**
  * @author Fabrizio
@@ -253,7 +246,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 	    setComponentName(ProfilerSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.PROFILERS.getIndex()).//
 		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
 		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
@@ -283,7 +276,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabInfo(tabDescriptor);
 	}
 
 	/**

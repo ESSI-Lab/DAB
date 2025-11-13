@@ -33,8 +33,8 @@ import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
@@ -444,7 +444,7 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 	    setComponentName(AccessorSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.ONTOLOGIES.getIndex()).//
 		    withShowDirective("Ontologies", SortDirection.ASCENDING).//
 		    withAddDirective("Add ontology", OntologySetting.class).//
@@ -472,7 +472,7 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabInfo(tabDescriptor);
 	}
 
 	/**
