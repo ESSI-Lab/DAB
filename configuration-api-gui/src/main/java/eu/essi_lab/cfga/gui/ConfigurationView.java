@@ -909,6 +909,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 			configuration, //
 			orientation, //
 			tabName, //
+			showDirective.flatMap(ShowDirective::getDescription),//
 			addDirective, //
 			removeDirective, //
 			editDirective);

@@ -162,6 +162,36 @@ public class TabDescriptorBuilder {
      * @param direction
      * @return
      */
+    public TabDescriptorBuilder withShowDirective(String name, String description) {
+
+	ShowDirective showDirective = new ShowDirective(name);
+	showDirective.setDescription(description);
+
+	tabDescriptor.getDirectiveManager().add(showDirective);
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param direction
+     * @return
+     */
+    public TabDescriptorBuilder withShowDirective(String name, String description, SortDirection direction) {
+
+	ShowDirective showDirective = new ShowDirective(name, direction);
+	showDirective.setDescription(description);
+
+	tabDescriptor.getDirectiveManager().add(showDirective);
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param direction
+     * @return
+     */
     public TabDescriptorBuilder withShowDirective(String name, SortDirection direction) {
 
 	tabDescriptor.getDirectiveManager().add(new ShowDirective(name, direction));
