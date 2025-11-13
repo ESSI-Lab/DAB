@@ -121,7 +121,7 @@ public class DemoSetting6 extends Setting {
 		    withShowDirective("Demo setting 6").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 }

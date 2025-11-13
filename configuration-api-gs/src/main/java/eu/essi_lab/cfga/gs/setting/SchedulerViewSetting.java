@@ -65,7 +65,7 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 		    withShowDirective("Scheduler").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

@@ -175,7 +175,7 @@ public class SourcesInspector extends ComponentInfo {
 		reloadable(() -> update(verticalLayout)).//
 		build();
 
-	setTabInfo(tabDescriptor);
+	setTabDescriptor(tabDescriptor);
     }
 
     /**

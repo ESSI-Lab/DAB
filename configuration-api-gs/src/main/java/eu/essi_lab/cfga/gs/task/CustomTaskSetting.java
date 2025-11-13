@@ -254,7 +254,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
 
 	/**

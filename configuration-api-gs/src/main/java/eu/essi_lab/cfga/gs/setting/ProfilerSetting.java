@@ -276,7 +276,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
 
 	/**

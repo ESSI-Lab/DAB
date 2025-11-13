@@ -254,7 +254,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
 
 	/**

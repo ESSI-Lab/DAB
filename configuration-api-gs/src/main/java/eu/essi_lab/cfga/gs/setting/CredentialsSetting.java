@@ -743,7 +743,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
 		    withShowDirective("Credentials").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

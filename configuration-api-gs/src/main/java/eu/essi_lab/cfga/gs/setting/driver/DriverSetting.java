@@ -71,7 +71,7 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
 		    withShowDirective("Repository").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

@@ -472,7 +472,7 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
 
 	/**

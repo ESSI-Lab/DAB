@@ -330,7 +330,7 @@ public class DemoSetting3 extends Setting {
 		    withShowDirective("Demo setting 3").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 }

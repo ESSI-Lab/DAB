@@ -252,7 +252,7 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 		    withShowDirective("Rate limiter").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

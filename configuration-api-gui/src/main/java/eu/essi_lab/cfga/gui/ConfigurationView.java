@@ -828,7 +828,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	for (ComponentInfo componentInfo : additionalComps) {
 
-	    Optional<TabDescriptor> tabInfo = componentInfo.getTabInfo();
+	    Optional<TabDescriptor> tabInfo = componentInfo.getTabDescriptor();
 
 	    if (tabInfo.isPresent()) {
 
@@ -893,8 +893,8 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 		Optional<ComponentInfo> additionalComp = additionalComps.//
 			stream().//
-			filter(c -> c.getTabInfo().isPresent()).//
-			filter(c -> c.getTabInfo().get().getIndex() == tabDescriptor.getIndex()).//
+			filter(c -> c.getTabDescriptor().isPresent()).//
+			filter(c -> c.getTabDescriptor().get().getIndex() == tabDescriptor.getIndex()).//
 			findFirst();
 
 		ComponentInfo componentInfo = additionalComp.orElseGet(() -> settings.getFirst().getExtension(ComponentInfo.class).get());
@@ -974,7 +974,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	    if (extension.isPresent()) {
 
-		Optional<TabDescriptor> tabInfo = extension.get().getTabInfo();
+		Optional<TabDescriptor> tabInfo = extension.get().getTabDescriptor();
 
 		if (tabInfo.isPresent()) {
 

@@ -97,7 +97,7 @@ public class ComponentInfo implements ObjectExtension {
     /**
      * @return
      */
-    public Optional<TabDescriptor> getTabInfo() {
+    public Optional<TabDescriptor> getTabDescriptor() {
 
 	return Optional.ofNullable(tabDescriptor);
     }
@@ -105,7 +105,7 @@ public class ComponentInfo implements ObjectExtension {
     /**
      * @param tabDescriptor
      */
-    public void setTabInfo(TabDescriptor tabDescriptor) {
+    public void setTabDescriptor(TabDescriptor tabDescriptor) {
 
 	this.tabDescriptor = tabDescriptor;
     }

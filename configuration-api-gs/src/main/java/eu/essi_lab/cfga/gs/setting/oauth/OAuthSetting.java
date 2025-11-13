@@ -244,7 +244,7 @@ public class OAuthSetting extends Setting implements EditableSetting {
 		    withShowDirective("Authorization").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

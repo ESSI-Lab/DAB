@@ -189,7 +189,7 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 		    withShowDirective("Identifier management").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

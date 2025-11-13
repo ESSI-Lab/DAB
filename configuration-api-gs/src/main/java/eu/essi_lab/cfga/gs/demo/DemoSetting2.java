@@ -216,7 +216,7 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
 		    withShowDirective("Demo setting 2").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

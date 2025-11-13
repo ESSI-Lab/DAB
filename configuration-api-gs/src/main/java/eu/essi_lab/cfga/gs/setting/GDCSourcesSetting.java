@@ -125,7 +125,7 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 		    withShowDirective("GDC sources").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

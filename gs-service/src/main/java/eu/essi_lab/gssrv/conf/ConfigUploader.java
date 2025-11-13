@@ -250,7 +250,7 @@ public class ConfigUploader extends ComponentInfo {
 		withComponent(verticalLayout).//
 		build();
 
-	setTabInfo(tabDescriptor);
+	setTabDescriptor(tabDescriptor);
     }
 
     /**

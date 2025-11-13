@@ -89,7 +89,7 @@ public class AboutComponentInfo extends ComponentInfo {
 		withComponent(verticalLayout).//
 		build();
 
-	setTabInfo(tabDescriptor);
+	setTabDescriptor(tabDescriptor);
     }
 
     /**

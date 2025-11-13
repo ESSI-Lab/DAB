@@ -206,7 +206,7 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 		    withShowDirective("Source storage").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

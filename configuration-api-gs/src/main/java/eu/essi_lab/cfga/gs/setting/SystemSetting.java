@@ -410,7 +410,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 		    withShowDirective("System").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

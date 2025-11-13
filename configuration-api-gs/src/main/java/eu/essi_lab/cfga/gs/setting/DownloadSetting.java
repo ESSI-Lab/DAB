@@ -132,7 +132,7 @@ public class DownloadSetting extends Setting implements EditableSetting {
 		    withShowDirective("Download").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

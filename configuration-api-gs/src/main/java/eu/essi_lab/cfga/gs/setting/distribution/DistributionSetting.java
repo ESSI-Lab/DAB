@@ -132,7 +132,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 		    withEditDirective("Edit accessor", ConfirmationPolicy.ON_WARNINGS).//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

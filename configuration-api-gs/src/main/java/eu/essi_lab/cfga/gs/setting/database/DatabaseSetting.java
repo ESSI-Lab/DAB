@@ -189,7 +189,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 		    withShowDirective("Database").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

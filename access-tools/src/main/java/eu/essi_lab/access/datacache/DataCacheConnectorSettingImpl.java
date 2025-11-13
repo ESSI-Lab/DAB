@@ -149,7 +149,7 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 		    withShowDirective("Data cache").//
 		    build();
 
-	    setTabInfo(tabDescriptor);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 
