@@ -110,6 +110,15 @@ public class SiteInfo implements ISiteInfo {
 	    return null;
 	}
     }
+    
+    public String getDataPolicy() {
+	try {
+	    return reader.evaluateString("*:extension/dataPolicy/@name");
+	} catch (XPathExpressionException e) {
+	    logger.warn("Vertical not found", e);
+	    return null;
+	}
+    }
 
     // Site Properties
 
