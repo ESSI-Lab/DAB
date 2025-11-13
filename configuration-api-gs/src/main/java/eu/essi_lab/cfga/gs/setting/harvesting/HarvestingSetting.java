@@ -187,7 +187,8 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.HARVESTING.getIndex()).//
-		    withShowDirective("Harvesting", SortDirection.ASCENDING).//
+		    withShowDirective("Harvesting", "With this tab you can handle the DAB brokered sources. Click \"Reload\" to"
+		    + "update the scheduler information",SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 			    "Add harvested/mixed accessor", //

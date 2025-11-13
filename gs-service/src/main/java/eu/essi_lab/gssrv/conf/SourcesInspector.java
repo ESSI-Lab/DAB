@@ -170,7 +170,10 @@ public class SourcesInspector extends ComponentInfo {
 
 	TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		withIndex(GSTabIndex.SOURCES_INSPECTION.getIndex()).//
-		withShowDirective(getComponentName()).//
+		withShowDirective(getComponentName(),"Click \"Reload\" to show the list of all the brokered sources, referenced by "
+		+ "name and identifier, along with the number of harvested records (\"Size\") and the percentage related to the total "
+		+ "number of records in the database (visible at the bottom of the \"Size\" column). \"Data #\" indicates the logical data folder (#1 or #2) where the "
+		+ "source records are stored").//
 		withComponent(verticalLayout).//
 		reloadable(() -> update(verticalLayout)).//
 		build();

@@ -246,12 +246,21 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 	    setComponentName(ProfilerSetting.class.getName());
 
+	    String desc = "List of available front-end components "
+		    + "which expose and handle specific service functionalities. Profilers can be added, "
+		    + "and removed; furthermore, their configuration, path and state can be modified. "
+		    + "You can also add several profilers of the same type (e.g: OAI-PMH), making sure "
+		    + "they have a different path and possibly, a different configuration. "
+		    + "Once added, the profiler state is \"Online\"; if set to \"Offline\", "
+		    + "its capabilities will no longer be avaiable and each request will return "
+		    + "a 404 error code";
+
 	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.PROFILERS.getIndex()).//
 		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
 		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
 		    withRemoveDirective("Remove profiler", false, ProfilerSetting.class).//
-		    withShowDirective("Profilers", SortDirection.ASCENDING).//
+		    withShowDirective("Profilers", desc,SortDirection.ASCENDING).//
 		    withGridInfo(Arrays.asList(//
 
 		    ColumnDescriptor.createPositionalDescriptor(), //
