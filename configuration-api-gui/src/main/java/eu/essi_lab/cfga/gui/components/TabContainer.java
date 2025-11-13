@@ -117,7 +117,7 @@ public class TabContainer extends VerticalLayout {
 
 	DirectiveManager directiveManager = tabInfo.getDirectiveManager();
 
-	Optional<ShowDirective> showDirective = directiveManager.getDirective(ShowDirective.class);
+	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
 
 	showDirective.flatMap(ShowDirective::getSortDirection).ifPresent(dir -> {
 

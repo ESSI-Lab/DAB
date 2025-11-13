@@ -79,7 +79,7 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withAddDirective(AddDirective directive) {
 
-	tabInfo.getDirectiveManager().addAddDirective(directive);
+	tabInfo.getDirectiveManager().add(directive);
 
 	return this;
     }
@@ -91,7 +91,7 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withAddDirective(String directiveName, Class<? extends Setting> settingClass) {
 
-	tabInfo.getDirectiveManager().addAddDirective(new AddDirective(directiveName, settingClass));
+	tabInfo.getDirectiveManager().add(new AddDirective(directiveName, settingClass));
 
 	return this;
     }
@@ -103,7 +103,7 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withAddDirective(String directiveName, String settingClass) {
 
-	tabInfo.getDirectiveManager().addAddDirective(new AddDirective(directiveName, settingClass));
+	tabInfo.getDirectiveManager().add(new AddDirective(directiveName, settingClass));
 
 	return this;
     }
@@ -114,7 +114,7 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withRemoveDirective(RemoveDirective directive) {
 
-	tabInfo.getDirectiveManager().addRemoveDirective(directive);
+	tabInfo.getDirectiveManager().add(directive);
 
 	return this;
     }
@@ -127,7 +127,7 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withRemoveDirective(String name, boolean allowFullRemoval, Class<? extends Setting> settingClass) {
 
-	tabInfo.getDirectiveManager().addRemoveDirective(new RemoveDirective(name, allowFullRemoval, settingClass));
+	tabInfo.getDirectiveManager().add(new RemoveDirective(name, allowFullRemoval, settingClass));
 
 	return this;
     }
@@ -140,7 +140,7 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withRemoveDirective(String name, boolean allowFullRemoval, String settingClass) {
 
-	tabInfo.getDirectiveManager().addRemoveDirective(new RemoveDirective(name, allowFullRemoval, settingClass));
+	tabInfo.getDirectiveManager().add(new RemoveDirective(name, allowFullRemoval, settingClass));
 
 	return this;
     }
@@ -152,7 +152,7 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withEditDirective(String name, ConfirmationPolicy policy) {
 
-	tabInfo.getDirectiveManager().addEditDirective(new EditDirective(name, policy));
+	tabInfo.getDirectiveManager().add(new EditDirective(name, policy));
 
 	return this;
     }
@@ -164,7 +164,7 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withShowDirective(String name, SortDirection direction) {
 
-	tabInfo.getDirectiveManager().addShowDirective(new ShowDirective(name, direction));
+	tabInfo.getDirectiveManager().add(new ShowDirective(name, direction));
 
 	return this;
     }
@@ -175,7 +175,7 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withShowDirective(String name) {
 
-	tabInfo.getDirectiveManager().addShowDirective(new ShowDirective(name));
+	tabInfo.getDirectiveManager().add(new ShowDirective(name));
 
 	return this;
     }

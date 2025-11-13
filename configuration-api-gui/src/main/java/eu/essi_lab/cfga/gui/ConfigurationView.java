@@ -872,13 +872,13 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 		DirectiveManager directiveManager = tabInfo.getDirectiveManager();
 
-		Optional<AddDirective> addDirective = directiveManager.getDirective(AddDirective.class);
+		Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
 
-		Optional<RemoveDirective> removeDirective = directiveManager.getDirective(RemoveDirective.class);
+		Optional<RemoveDirective> removeDirective = directiveManager.get(RemoveDirective.class);
 
-		Optional<EditDirective> editDirective = directiveManager.getDirective(EditDirective.class);
+		Optional<EditDirective> editDirective = directiveManager.get(EditDirective.class);
 
-		Optional<ShowDirective> showDirective = directiveManager.getDirective(ShowDirective.class);
+		Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
 
 		String tabName = "Tab#" + tabInfo.getIndex();
 

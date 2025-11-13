@@ -43,31 +43,7 @@ public class DirectiveManager {
     /**
      * @param directive
      */
-    public void addAddDirective(AddDirective directive) {
-
-	list.add(directive);
-    }
-
-    /**
-     * @param directive
-     */
-    public void addRemoveDirective(RemoveDirective directive) {
-
-	list.add(directive);
-    }
-
-    /**
-     * @param directive
-     */
-    public void addEditDirective(EditDirective directive) {
-
-	list.add(directive);
-    }
-
-    /**
-     * @param directive
-     */
-    public void addShowDirective(ShowDirective directive) {
+    public void add(Directive directive) {
 
 	list.add(directive);
     }
@@ -75,7 +51,7 @@ public class DirectiveManager {
     /**
      * @return the directives
      */
-    public <T extends Directive> Optional<T> getDirective(Class<T> directiveClass) {
+    public <T extends Directive> Optional<T> get(Class<T> directiveClass) {
 
 	return list.stream().//
 		filter(d -> directiveClass.equals(d.getClass())).//
