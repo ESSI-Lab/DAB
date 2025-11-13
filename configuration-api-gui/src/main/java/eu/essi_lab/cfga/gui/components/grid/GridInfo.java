@@ -39,9 +39,9 @@ public class GridInfo {
 
     private int pageSize;
 
-    private List<ColumnDescriptor> descriptors;
+    private final List<ColumnDescriptor> descriptors;
 
-    private List<GridMenuItemHandler> handlers;
+    private final List<GridMenuItemHandler> handlers;
 
     private Grid.SelectionMode selectionMode;
 

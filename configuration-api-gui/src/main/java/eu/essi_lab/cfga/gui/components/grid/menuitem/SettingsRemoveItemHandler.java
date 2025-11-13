@@ -101,7 +101,7 @@ public class SettingsRemoveItemHandler extends GridMenuItemHandler {
 		list().//
 		stream().//
 		filter(s -> selection.containsKey(s.getIdentifier()) && selection.get(s.getIdentifier())).//
-		map(s -> s.getIdentifier()).//
+		map(Setting::getIdentifier).//
 		collect(Collectors.toList());
 
 	dialog.setOnConfirmListener(e -> {

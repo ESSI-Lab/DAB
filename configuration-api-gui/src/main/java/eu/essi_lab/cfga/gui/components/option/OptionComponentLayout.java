@@ -34,7 +34,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 @SuppressWarnings("serial")
 public class OptionComponentLayout extends VerticalLayout {
 
-    private List<OptionComponent> components;
+    private final List<OptionComponent> components;
     private Details details;
 
     /**
@@ -46,7 +46,7 @@ public class OptionComponentLayout extends VerticalLayout {
 	setMargin(false);
 	setSpacing(false);
 
-	components = new ArrayList<OptionComponent>();
+	components = new ArrayList<>();
     }
 
     /**

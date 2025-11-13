@@ -29,7 +29,7 @@ import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
 @SuppressWarnings("serial")
 public class RadioComponentsHandlerListener extends AbstractValueChangeListener {
 
-    private RadioComponentsHandler handler;
+    private final RadioComponentsHandler handler;
 
     /**
      * @param handler

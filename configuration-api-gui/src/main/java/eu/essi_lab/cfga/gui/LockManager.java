@@ -253,7 +253,7 @@ public class LockManager extends UITask {
 
 	    acquired = !released;
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Lock releasing: " + (released ? "succeeded" : "failed"));
+	    GSLoggerFactory.getLogger(getClass()).debug("Lock releasing: {}", released ? "succeeded" : "failed");
 
 	    updateLockAcquiredState(Optional.empty(), view);
 

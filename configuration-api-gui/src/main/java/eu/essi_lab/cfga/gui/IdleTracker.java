@@ -200,8 +200,6 @@ public class IdleTracker {
      */
     private NotificationDialog initDialog() {
 
-	NotificationDialog dialog = NotificationDialog.getWarningDialog("Session expired due to long inactivity", 400);
-
 	// dialog.addDialogCloseActionListener(new ComponentEventListener<Dialog.DialogCloseActionEvent>() {
 	//
 	// @Override
@@ -241,6 +239,6 @@ public class IdleTracker {
 	// }
 	// });
 
-	return dialog;
+	return NotificationDialog.getWarningDialog("Session expired due to long inactivity", 400);
     }
 }

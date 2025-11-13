@@ -15,3 +15,12 @@ input[type='checkbox'] {
 	cursor: pointer;
 }
 
+vaadin-button {
+
+	cursor: pointer;
+}
+
+vaadin-tab {
+
+  cursor: pointer;
+}

@@ -46,10 +46,10 @@ import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
 @SuppressWarnings("serial")
 public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 
-    protected int dialogHeight;
-    protected int dialogWidth;
-    protected Configuration configuration;
-    protected TabContainer tabContainer;
+    protected final int dialogHeight;
+    protected final int dialogWidth;
+    protected final Configuration configuration;
+    protected final TabContainer tabContainer;
     protected boolean foldedModeEnabled;
 
     /**
@@ -83,7 +83,7 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 	//
 	setOnConfirmListener(e -> {
 
-	    Optional<ValidationResponse> optional = Optional.empty();
+	    Optional<ValidationResponse> optional;
 
 	    //
 	    // in case of a selector, used the selected setting
@@ -93,7 +93,7 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 		@SuppressWarnings("rawtypes")
 		Selector selector = (Selector) getSetting();
 
-		optional = ((Setting) selector.getSelectedSettings().get(0)).validate(configuration, context);
+		optional = ((Setting) selector.getSelectedSettings().getFirst()).validate(configuration, context);
 	   
 	    } else {
 

@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -38,6 +39,7 @@ public abstract class GridColumnRenderer<C extends Component> extends ComponentR
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -6816629717419845396L;
 
     /**

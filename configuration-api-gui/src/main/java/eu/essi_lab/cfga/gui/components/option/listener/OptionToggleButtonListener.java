@@ -33,7 +33,7 @@ import eu.essi_lab.cfga.gui.components.option.OptionComponent;
 @SuppressWarnings("serial")
 public class OptionToggleButtonListener extends AbstractValueChangeListener {
 
-    private OptionComponent optionComponent;
+    private final OptionComponent optionComponent;
 
     /**
      * @param optionComponent

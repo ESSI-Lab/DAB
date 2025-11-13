@@ -42,33 +42,33 @@ import eu.essi_lab.cfga.setting.Setting;
 /**
  * @author Fabrizio
  */
-public class TabInfoBuilder {
+public class TabDescriptorBuilder {
 
-    private TabInfo tabInfo;
+    private final TabDescriptor tabDescriptor;
 
     /**
     * 
     */
-    public TabInfoBuilder() {
+    public TabDescriptorBuilder() {
 
-	tabInfo = new TabInfo();
+	tabDescriptor = new TabDescriptor();
     }
 
     /**
      * @return
      */
-    public static TabInfoBuilder get() {
+    public static TabDescriptorBuilder get() {
 
-	return new TabInfoBuilder();
+	return new TabDescriptorBuilder();
     }
 
     /**
      * @param index
      * @return
      */
-    public TabInfoBuilder withIndex(int index) {
+    public TabDescriptorBuilder withIndex(int index) {
 
-	tabInfo.setIndex(index);
+	tabDescriptor.setIndex(index);
 
 	return this;
     }
@@ -77,9 +77,9 @@ public class TabInfoBuilder {
      * @param directive
      * @return
      */
-    public TabInfoBuilder withAddDirective(AddDirective directive) {
+    public TabDescriptorBuilder withAddDirective(AddDirective directive) {
 
-	tabInfo.getDirectiveManager().addAddDirective(directive);
+	tabDescriptor.getDirectiveManager().add(directive);
 
 	return this;
     }
@@ -89,9 +89,9 @@ public class TabInfoBuilder {
      * @param settingClass
      * @return
      */
-    public TabInfoBuilder withAddDirective(String directiveName, Class<? extends Setting> settingClass) {
+    public TabDescriptorBuilder withAddDirective(String directiveName, Class<? extends Setting> settingClass) {
 
-	tabInfo.getDirectiveManager().addAddDirective(new AddDirective(directiveName, settingClass));
+	tabDescriptor.getDirectiveManager().add(new AddDirective(directiveName, settingClass));
 
 	return this;
     }
@@ -101,9 +101,9 @@ public class TabInfoBuilder {
      * @param settingClass
      * @return
      */
-    public TabInfoBuilder withAddDirective(String directiveName, String settingClass) {
+    public TabDescriptorBuilder withAddDirective(String directiveName, String settingClass) {
 
-	tabInfo.getDirectiveManager().addAddDirective(new AddDirective(directiveName, settingClass));
+	tabDescriptor.getDirectiveManager().add(new AddDirective(directiveName, settingClass));
 
 	return this;
     }
@@ -112,9 +112,9 @@ public class TabInfoBuilder {
      * @param directive
      * @return
      */
-    public TabInfoBuilder withRemoveDirective(RemoveDirective directive) {
+    public TabDescriptorBuilder withRemoveDirective(RemoveDirective directive) {
 
-	tabInfo.getDirectiveManager().addRemoveDirective(directive);
+	tabDescriptor.getDirectiveManager().add(directive);
 
 	return this;
     }
@@ -125,9 +125,9 @@ public class TabInfoBuilder {
      * @param settingClass
      * @return
      */
-    public TabInfoBuilder withRemoveDirective(String name, boolean allowFullRemoval, Class<? extends Setting> settingClass) {
+    public TabDescriptorBuilder withRemoveDirective(String name, boolean allowFullRemoval, Class<? extends Setting> settingClass) {
 
-	tabInfo.getDirectiveManager().addRemoveDirective(new RemoveDirective(name, allowFullRemoval, settingClass));
+	tabDescriptor.getDirectiveManager().add(new RemoveDirective(name, allowFullRemoval, settingClass));
 
 	return this;
     }
@@ -138,9 +138,9 @@ public class TabInfoBuilder {
      * @param settingClass
      * @return
      */
-    public TabInfoBuilder withRemoveDirective(String name, boolean allowFullRemoval, String settingClass) {
+    public TabDescriptorBuilder withRemoveDirective(String name, boolean allowFullRemoval, String settingClass) {
 
-	tabInfo.getDirectiveManager().addRemoveDirective(new RemoveDirective(name, allowFullRemoval, settingClass));
+	tabDescriptor.getDirectiveManager().add(new RemoveDirective(name, allowFullRemoval, settingClass));
 
 	return this;
     }
@@ -150,9 +150,9 @@ public class TabInfoBuilder {
      * @param policy
      * @return
      */
-    public TabInfoBuilder withEditDirective(String name, ConfirmationPolicy policy) {
+    public TabDescriptorBuilder withEditDirective(String name, ConfirmationPolicy policy) {
 
-	tabInfo.getDirectiveManager().addEditDirective(new EditDirective(name, policy));
+	tabDescriptor.getDirectiveManager().add(new EditDirective(name, policy));
 
 	return this;
     }
@@ -162,9 +162,39 @@ public class TabInfoBuilder {
      * @param direction
      * @return
      */
-    public TabInfoBuilder withShowDirective(String name, SortDirection direction) {
+    public TabDescriptorBuilder withShowDirective(String name, String description) {
 
-	tabInfo.getDirectiveManager().addShowDirective(new ShowDirective(name, direction));
+	ShowDirective showDirective = new ShowDirective(name);
+	showDirective.setDescription(description);
+
+	tabDescriptor.getDirectiveManager().add(showDirective);
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param direction
+     * @return
+     */
+    public TabDescriptorBuilder withShowDirective(String name, String description, SortDirection direction) {
+
+	ShowDirective showDirective = new ShowDirective(name, direction);
+	showDirective.setDescription(description);
+
+	tabDescriptor.getDirectiveManager().add(showDirective);
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param direction
+     * @return
+     */
+    public TabDescriptorBuilder withShowDirective(String name, SortDirection direction) {
+
+	tabDescriptor.getDirectiveManager().add(new ShowDirective(name, direction));
 
 	return this;
     }
@@ -173,9 +203,9 @@ public class TabInfoBuilder {
      * @param name
      * @return
      */
-    public TabInfoBuilder withShowDirective(String name) {
+    public TabDescriptorBuilder withShowDirective(String name) {
 
-	tabInfo.getDirectiveManager().addShowDirective(new ShowDirective(name));
+	tabDescriptor.getDirectiveManager().add(new ShowDirective(name));
 
 	return this;
     }
@@ -184,9 +214,9 @@ public class TabInfoBuilder {
      * @param Component
      * @return
      */
-    public TabInfoBuilder withComponent(Component Component) {
+    public TabDescriptorBuilder withComponent(Component Component) {
 
-	tabInfo.setComponent(Component);
+	tabDescriptor.setComponent(Component);
 
 	return this;
     }
@@ -196,7 +226,7 @@ public class TabInfoBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, boolean showColumnsHider) {
+    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, boolean showColumnsHider) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), SelectionMode.NONE, showColumnsHider);
     }
@@ -205,7 +235,7 @@ public class TabInfoBuilder {
      * @param descriptors
      * @return
      */
-    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors) {
+    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), SelectionMode.NONE, true);
     }
@@ -216,7 +246,7 @@ public class TabInfoBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode, boolean showColumnsHider) {
+    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode, boolean showColumnsHider) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), selectionMode, showColumnsHider);
     }
@@ -226,7 +256,7 @@ public class TabInfoBuilder {
      * @param selectionMode
      * @return
      */
-    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
+    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), selectionMode, true);
     }
@@ -237,7 +267,7 @@ public class TabInfoBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, boolean showColumnsHider) {
+    public TabDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, boolean showColumnsHider) {
 
 	return withGridInfo(pageSize, descriptors, new ArrayList<>(), SelectionMode.NONE, showColumnsHider);
     }
@@ -247,7 +277,7 @@ public class TabInfoBuilder {
      * @param descriptors
      * @return
      */
-    public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors) {
+    public TabDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors) {
 
 	return withGridInfo(pageSize, descriptors, new ArrayList<>(), SelectionMode.NONE, true);
     }
@@ -259,7 +289,7 @@ public class TabInfoBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode,
+    public TabDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode,
 	    boolean showColumnsHider) {
 
 	return withGridInfo(pageSize, descriptors, new ArrayList<>(), selectionMode, showColumnsHider);
@@ -271,7 +301,7 @@ public class TabInfoBuilder {
      * @param selectionMode
      * @return
      */
-    public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
+    public TabDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
 
 	return withGridInfo(pageSize, descriptors, new ArrayList<>(), selectionMode, true);
     }
@@ -282,7 +312,7 @@ public class TabInfoBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items, boolean showColumnsHider) {
+    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items, boolean showColumnsHider) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, SelectionMode.NONE, showColumnsHider);
     }
@@ -292,7 +322,7 @@ public class TabInfoBuilder {
      * @param items
      * @return
      */
-    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items) {
+    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, SelectionMode.NONE, true);
     }
@@ -303,7 +333,7 @@ public class TabInfoBuilder {
      * @param selectionMode
      * @return
      */
-    public TabInfoBuilder withGridInfo(//
+    public TabDescriptorBuilder withGridInfo(//
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
 	    SelectionMode selectionMode, //
@@ -318,7 +348,7 @@ public class TabInfoBuilder {
      * @param selectionMode
      * @return
      */
-    public TabInfoBuilder withGridInfo(//
+    public TabDescriptorBuilder withGridInfo(//
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
 	    SelectionMode selectionMode) {
@@ -333,7 +363,7 @@ public class TabInfoBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabInfoBuilder withGridInfo(//
+    public TabDescriptorBuilder withGridInfo(//
 	    int pageSize, //
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
@@ -348,7 +378,7 @@ public class TabInfoBuilder {
      * @param items
      * @return
      */
-    public TabInfoBuilder withGridInfo(//
+    public TabDescriptorBuilder withGridInfo(//
 	    int pageSize, //
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items) {
@@ -363,7 +393,7 @@ public class TabInfoBuilder {
      * @param selectionMode
      * @return
      */
-    public TabInfoBuilder withGridInfo(//
+    public TabDescriptorBuilder withGridInfo(//
 	    int pageSize, //
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
@@ -375,10 +405,10 @@ public class TabInfoBuilder {
 	gridInfo.setSelectionMode(selectionMode);
 	gridInfo.setShowColumnsHider(showColumnsHider);
 
-	descriptors.forEach(d -> gridInfo.addColumnDescriptor(d));
-	items.forEach(i -> gridInfo.addGridMenuItemHandler(i));
+	descriptors.forEach(gridInfo::addColumnDescriptor);
+	items.forEach(gridInfo::addGridMenuItemHandler);
 
-	tabInfo.setGridInfo(gridInfo);
+	tabDescriptor.setGridInfo(gridInfo);
 
 	return this;
     }
@@ -386,9 +416,9 @@ public class TabInfoBuilder {
     /**
     * 
     */
-    public TabInfoBuilder reloadable() {
+    public TabDescriptorBuilder reloadable() {
 
-	tabInfo.setReloadable(true);
+	tabDescriptor.setReloadable(true);
 
 	return this;
     }
@@ -397,9 +427,9 @@ public class TabInfoBuilder {
      * @param reloader
      * @return
      */
-    public TabInfoBuilder reloadable(Runnable reloader) {
+    public TabDescriptorBuilder reloadable(Runnable reloader) {
 
-	tabInfo.setReloadable(true, reloader);
+	tabDescriptor.setReloadable(true, reloader);
 
 	return this;
     }
@@ -407,9 +437,9 @@ public class TabInfoBuilder {
     /**
      * @return
      */
-    public TabInfo build() {
+    public TabDescriptor build() {
 
-	return tabInfo;
+	return tabDescriptor;
     }
 
 }
