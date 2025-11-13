@@ -42,10 +42,10 @@ import eu.essi_lab.cfga.setting.Setting;
 public class SettingAddButtonConfirmationListener implements ButtonChangeListener {
 
     private Setting settingToAdd;
-    private boolean foldedModeEnabled;
-    private Configuration configuration;
-    private TabContainer tabContainer;
-    private SettingPutDialog dialog;
+    private final boolean foldedModeEnabled;
+    private final Configuration configuration;
+    private final TabContainer tabContainer;
+    private final SettingPutDialog dialog;
 
     /**
      * @param dialog
@@ -79,7 +79,7 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
 	    @SuppressWarnings("rawtypes")
 	    Selector selector = (Selector)settingToAdd;
 	    
-	    settingToAdd = (Setting) selector.getSelectedSettings().get(0);
+	    settingToAdd = (Setting) selector.getSelectedSettings().getFirst();
 	}
 
 	//

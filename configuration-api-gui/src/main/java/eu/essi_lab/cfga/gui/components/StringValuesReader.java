@@ -76,7 +76,7 @@ public class StringValuesReader {
 	List<String> selectedValues = readSelectedValues(option);
 	if (!selectedValues.isEmpty()) {
 
-	    return Optional.of(selectedValues.get(0));
+	    return Optional.of(selectedValues.getFirst());
 	}
 
 	return Optional.empty();

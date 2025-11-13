@@ -53,6 +53,7 @@ import eu.essi_lab.cfga.gui.components.option.OptionTextField;
 import eu.essi_lab.cfga.gui.components.setting.group.CheckComponentsHandler;
 import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
 import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.cfga.setting.ConfigurationObject;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
@@ -161,15 +162,15 @@ public class SettingComponent extends Div {
     private HashMap<String, List<Component>> settingNameToComponentsMap;
     private HashMap<String, List<Component>> settingNameToToggleAndOptionsMap;
 
-    private boolean forceReadonly;
+    private final boolean forceReadonly;
     private Setting setting;
     private String settingIdentifier;
 
-    private Configuration configuration;
+    private final Configuration configuration;
     private Details details;
-    private TabContainer tabContainer;
+    private final TabContainer tabContainer;
 
-    private boolean forceHideLabel;
+    private final boolean forceHideLabel;
 
     /**
      * @param configuration
@@ -265,7 +266,6 @@ public class SettingComponent extends Div {
     /**
      * @param enabled
      */
-    @SuppressWarnings("unchecked")
     public void onToggleStateChanged(ValueChangeEvent<?> event) {
 
 	boolean enabled = (Boolean) event.getValue();
@@ -283,10 +283,10 @@ public class SettingComponent extends Div {
 
 	SettingUtils.deepFind(getSetting(), s -> s.getIdentifier().equals(settingId), list);
 
-	Setting settingToUpdate = list.get(0);
+	Setting settingToUpdate = list.getFirst();
 
-	GSLoggerFactory.getLogger(getClass()).debug("Updating state of setting: " + settingToUpdate.getName());
-	GSLoggerFactory.getLogger(getClass()).debug("New state: " + (enabled ? "enabled" : "disabled"));
+	GSLoggerFactory.getLogger(getClass()).debug("Updating state of setting: {}", settingToUpdate.getName());
+	GSLoggerFactory.getLogger(getClass()).debug("New state: {}", enabled ? "enabled" : "disabled");
 
 	settingToUpdate.setEnabled(enabled);
 
@@ -335,13 +335,13 @@ public class SettingComponent extends Div {
 
 	if (list != null && !list.isEmpty()) {
 
-	    OptionComponentLayout layout = (OptionComponentLayout) list.get(0);
+	    OptionComponentLayout layout = (OptionComponentLayout) list.getFirst();
 
 	    return layout.//
 		    getOptionComponents().//
 		    stream().//
-		    map(oc -> oc.getOptionLayout().getChildren().filter(c -> c instanceof OptionTextField).findFirst()
-			    .map(c -> (OptionTextField) c).orElse(null))
+		    map(oc -> (OptionTextField) oc.getOptionLayout().getChildren().filter(c -> c instanceof OptionTextField).findFirst()
+		    .orElse(null))
 		    .//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
@@ -376,9 +376,8 @@ public class SettingComponent extends Div {
 
 	for (Component comp : list) {
 
-	    if (comp instanceof OptionComponent) {
+	    if (comp instanceof OptionComponent optionComp) {
 
-		OptionComponent optionComp = (OptionComponent) comp;
 		optionComp.onSettingToggleStateChanged(enabled, forceReadonly);
 
 	    } else {
@@ -620,11 +619,7 @@ public class SettingComponent extends Div {
 
 	if (toggle.isPresent()) {
 
-	    List<Component> list = settingNameToToggleAndOptionsMap.get(setting.getName());
-	    if (list == null) {
-		list = new ArrayList<>();
-		settingNameToToggleAndOptionsMap.put(setting.getName(), list);
-	    }
+	    List<Component> list = settingNameToToggleAndOptionsMap.computeIfAbsent(setting.getName(), k -> new ArrayList<>());
 
 	    list.add(toggle.get());
 
@@ -632,9 +627,7 @@ public class SettingComponent extends Div {
 
 		List<OptionComponent> optionComponents = optionLayout.get().getOptionComponents();
 
-		for (OptionComponent optionComponent : optionComponents) {
-		    list.add(optionComponent);
-		}
+		list.addAll(optionComponents);
 	    }
 
 	    onToggleStateChanged(setting, toggle.get().getValue());
@@ -667,7 +660,7 @@ public class SettingComponent extends Div {
 
 	Optional<String> description = setting.getDescription();
 
-	if (!description.isPresent() && !hasVisibleOptions(setting) && multiSelectionMode != SelectionMode.UNSET) {
+	if (description.isEmpty() && !hasVisibleOptions(setting) && multiSelectionMode != SelectionMode.UNSET) {
 
 	    //
 	    // if the setting is empty, no description nor options and the setting is an item of check
@@ -820,7 +813,7 @@ public class SettingComponent extends Div {
 
 	long visibileOptions = options.//
 		stream().//
-		filter(o -> o.isVisible()).//
+		filter(ConfigurationObject::isVisible).//
 		count();
 
 	if (!options.isEmpty() && visibileOptions > 0) {
@@ -861,7 +854,7 @@ public class SettingComponent extends Div {
 
 	List<Option<?>> options = setting.getOptions();
 
-	long visibileOptions = options.stream().filter(o -> o.isVisible()).count();
+	long visibileOptions = options.stream().filter(ConfigurationObject::isVisible).count();
 
 	return !options.isEmpty() && visibileOptions > 0;
     }
@@ -994,11 +987,7 @@ public class SettingComponent extends Div {
      */
     private void updateSettingToComponentsMap(Setting setting, Component component) {
 
-	List<Component> list = settingNameToComponentsMap.get(setting.getName());
-	if (list == null) {
-	    list = new ArrayList<>();
-	    settingNameToComponentsMap.put(setting.getName(), list);
-	}
+	List<Component> list = settingNameToComponentsMap.computeIfAbsent(setting.getName(), k -> new ArrayList<>());
 	list.add(component);
     }
 
@@ -1010,11 +999,7 @@ public class SettingComponent extends Div {
 
 	if (parent != null) {
 
-	    List<Setting> list = childToParentsMap.get(setting);
-	    if (list == null) {
-		list = new ArrayList<>();
-		childToParentsMap.put(setting, list);
-	    }
+	    List<Setting> list = childToParentsMap.computeIfAbsent(setting, k -> new ArrayList<>());
 
 	    List<Setting> superParents = childToParentsMap.get(parent);
 	    if (superParents != null) {
@@ -1035,7 +1020,7 @@ public class SettingComponent extends Div {
 		keySet().//
 		stream().//
 		filter(child -> getParentNamesOfChild(child).contains(parentSettingName)).//
-		map(s -> s.getName()).//
+		map(Setting::getName).//
 		collect(Collectors.toList());
     }
 
@@ -1045,7 +1030,7 @@ public class SettingComponent extends Div {
      */
     private List<String> getParentNamesOfChild(Setting childSetting) {
 
-	return childToParentsMap.get(childSetting).stream().map(s -> s.getName()).collect(Collectors.toList());
+	return childToParentsMap.get(childSetting).stream().map(Setting::getName).collect(Collectors.toList());
     }
 
     /**

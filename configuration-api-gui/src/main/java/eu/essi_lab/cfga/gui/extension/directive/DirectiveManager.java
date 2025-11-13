@@ -30,7 +30,7 @@ import java.util.Optional;
  */
 public class DirectiveManager {
 
-    private List<Directive> list;
+    private final List<Directive> list;
 
     /**
      * 
@@ -79,7 +79,7 @@ public class DirectiveManager {
 
 	return list.stream().//
 		filter(d -> directiveClass.equals(d.getClass())).//
-		map(d -> directiveClass.cast(d)).//
+		map(directiveClass::cast).//
 		findFirst();
     }
 

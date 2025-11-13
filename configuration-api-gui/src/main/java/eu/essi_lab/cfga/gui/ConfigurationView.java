@@ -22,10 +22,7 @@ package eu.essi_lab.cfga.gui;
  */
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -86,28 +83,28 @@ import eu.essi_lab.messages.web.WebRequest;
 public abstract class ConfigurationView extends AppLayout implements ConfigurationChangeListener, DomEventListener {
 
     private TabsWithContent tabs;
-    private HorizontalLayout navbarContent;
-    private Label headerLabel;
-    private Image headerImage;
-    private DrawerToggle drawerToggle;
+    private final HorizontalLayout navbarContent;
+    private final Label headerLabel;
+    private final Image headerImage;
+    private final DrawerToggle drawerToggle;
     private boolean drawerOpened;
 
     // for test purpose, shows only the selected tab or all if -1
-    private int oneTab = -1;
+    private final int oneTab = -1;
     private Configuration configuration;
 
     /**
      * 
      */
-    private Button saveButton;
+    private final Button saveButton;
     protected boolean tabAlreadyOpen;
-    Label infoLabel;
+    final Label infoLabel;
 
     /**
      * 
      */
     CustomButton logoutButton;
-    private String requestURL;
+    private final String requestURL;
     private static String ownerBrowserAdress;
 
     /**
@@ -143,7 +140,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	if (!xForwardedForHeaders.isEmpty()) {
 
-	    address = xForwardedForHeaders.get(0);
+	    address = xForwardedForHeaders.getFirst();
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Browser address: {}", address);
@@ -177,15 +174,12 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	drawerToggle = new DrawerToggle();
 	drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_LEFT.create());
-	drawerToggle.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
-	    @Override
-	    public void onComponentEvent(ClickEvent<Button> event) {
-		drawerOpened = !drawerOpened;
-		if (drawerOpened) {
-		    drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_LEFT.create());
-		} else {
-		    drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_RIGHT.create());
-		}
+	drawerToggle.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
+	    drawerOpened = !drawerOpened;
+	    if (drawerOpened) {
+		drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_LEFT.create());
+	    } else {
+		drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_RIGHT.create());
 	    }
 	});
 
@@ -212,14 +206,8 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	infoLabel.setWidth(560, Unit.PIXELS);
 	infoLabel.setHeight(30, Unit.PIXELS);
 
-	saveButton = ConfigurationViewFactory.createSaveButton(new ComponentEventListener<ClickEvent<Button>>() {
-
-	    @Override
-	    public void onComponentEvent(ClickEvent<Button> event) {
-
-		onSaveButtonClicked(event);
-	    }
-	});
+	saveButton = ConfigurationViewFactory.createSaveButton(
+		(ComponentEventListener<ClickEvent<Button>>) this::onSaveButtonClicked);
 
 	saveButton.setEnabled(false);
 	// hides the save button, shows it again if initialized, authorized and the tab was closed
@@ -355,26 +343,18 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	    UI.getCurrent().getElement().addEventListener("click", this);
 
-	    UI.getCurrent().addAttachListener(new ComponentEventListener<AttachEvent>() {
+	    UI.getCurrent().addAttachListener((ComponentEventListener<AttachEvent>) event -> {
 
-		@Override
-		public void onComponentEvent(AttachEvent event) {
+		IdleTracker.getInstance().reset();
 
-		    IdleTracker.getInstance().reset();
-
-		    onAttachEvent(event);
-		}
+		onAttachEvent(event);
 	    });
 
-	    UI.getCurrent().addDetachListener(new ComponentEventListener<DetachEvent>() {
+	    UI.getCurrent().addDetachListener((ComponentEventListener<DetachEvent>) event -> {
 
-		@Override
-		public void onComponentEvent(DetachEvent event) {
+		IdleTracker.getInstance().reset();
 
-		    IdleTracker.getInstance().reset();
-
-		    onDetachEvent(event);
-		}
+		onDetachEvent(event);
 	    });
 	}
 
@@ -669,11 +649,11 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	headerImage.setSrc(source);
 
 	if (height > 0) {
-	    headerImage.setHeight(String.valueOf(height) + "px");
+	    headerImage.setHeight(height + "px");
 	}
 
 	if (width > 0) {
-	    headerImage.setWidth(String.valueOf(width) + "px");
+	    headerImage.setWidth(width + "px");
 	}
     }
 
@@ -693,23 +673,16 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     public void setHeaderImage(InputStream source, int width, int height) {
 
-	StreamResource resource = new StreamResource("icon", new InputStreamFactory() {
-
-	    @Override
-	    public InputStream createInputStream() {
-
-		return source;
-	    }
-	});
+	StreamResource resource = new StreamResource("icon", (InputStreamFactory) () -> source);
 
 	headerImage.setSrc(resource);
 
 	if (height > 0) {
-	    headerImage.setHeight(String.valueOf(height) + "px");
+	    headerImage.setHeight(height + "px");
 	}
 
 	if (width > 0) {
-	    headerImage.setWidth(String.valueOf(width) + "px");
+	    headerImage.setWidth(width + "px");
 	}
     }
 
@@ -782,7 +755,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	HashMap<TabInfo, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
 
-	return tabInfoMap.getOrDefault(tabInfo, new ArrayList<Setting>());
+	return tabInfoMap.getOrDefault(tabInfo, new ArrayList<>());
     }
 
     /**
@@ -791,7 +764,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     protected void onSettingPut(List<Setting> settings) {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Setting {} put",
-		settings.stream().map(s -> s.getName()).collect(Collectors.joining(",")));
+		settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
     }
 
     /**
@@ -800,7 +773,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     protected void onSettingReplaced(List<Setting> settings) {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Setting {} replaced",
-		settings.stream().map(s -> s.getName()).collect(Collectors.joining(",")));
+		settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
     }
 
     /**
@@ -809,7 +782,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     protected void onSettingRemoved(List<Setting> settings) {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Setting {} removed",
-		settings.stream().map(s -> s.getName()).collect(Collectors.joining(",")));
+		settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
     }
 
     /**
@@ -880,7 +853,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	tabInfoList = tabInfoList.//
 		stream().//
-		sorted((i1, i2) -> Integer.compare(i1.getIndex(), i2.getIndex())).//
+		sorted(Comparator.comparingInt(TabInfo::getIndex)).//
 		collect(Collectors.toList());
 
 	//
@@ -889,9 +862,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	for (TabInfo tabInfo : tabInfoList) {
 
-	    if (oneTab >= 0 && tabInfo.getIndex() == oneTab || oneTab < 0) {
+	    if (oneTab < 0 || tabInfo.getIndex() == oneTab) {
 
-		List<Setting> settings = tabInfoMap.getOrDefault(tabInfo, new ArrayList<Setting>());
+		List<Setting> settings = tabInfoMap.getOrDefault(tabInfo, new ArrayList<>());
 
 		//
 		//
@@ -924,8 +897,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 			filter(c -> c.getTabInfo().get().getIndex() == tabInfo.getIndex()).//
 			findFirst();
 
-		ComponentInfo componentInfo = additionalComp.isPresent() ? additionalComp.get()
-			: settings.get(0).getExtension(ComponentInfo.class).get();
+		ComponentInfo componentInfo = additionalComp.orElseGet(() -> settings.getFirst().getExtension(ComponentInfo.class).get());
 
 		Orientation orientation = componentInfo.getOrientation();
 
@@ -1006,13 +978,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 		if (tabInfo.isPresent()) {
 
-		    List<Setting> list = map.get(tabInfo.get());
-
-		    if (list == null) {
-
-			list = new ArrayList<Setting>();
-			map.put(tabInfo.get(), list);
-		    }
+		    List<Setting> list = map.computeIfAbsent(tabInfo.get(), k -> new ArrayList<>());
 
 		    list.add(setting);
 		}

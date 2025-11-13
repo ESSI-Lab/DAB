@@ -38,7 +38,7 @@ public abstract class GridMenuItemHandler {
 
     private boolean withTopDivider;
     private boolean withBottomDivider;
-    private String id;
+    private final String id;
 
     /**
      * 

@@ -40,8 +40,8 @@ import eu.essi_lab.cfga.setting.validation.ValidationContext;
 @SuppressWarnings("serial")
 public class SettingPutDialog extends SettingPutOrEditDialog {
 
-    private Setting settingToAdd;
-    private AddDirective addDirective;
+    private final Setting settingToAdd;
+    private final AddDirective addDirective;
 
     /**
      * @param configuration

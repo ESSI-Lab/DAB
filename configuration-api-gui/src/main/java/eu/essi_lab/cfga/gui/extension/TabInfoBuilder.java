@@ -44,7 +44,7 @@ import eu.essi_lab.cfga.setting.Setting;
  */
 public class TabInfoBuilder {
 
-    private TabInfo tabInfo;
+    private final TabInfo tabInfo;
 
     /**
     * 
@@ -375,8 +375,8 @@ public class TabInfoBuilder {
 	gridInfo.setSelectionMode(selectionMode);
 	gridInfo.setShowColumnsHider(showColumnsHider);
 
-	descriptors.forEach(d -> gridInfo.addColumnDescriptor(d));
-	items.forEach(i -> gridInfo.addGridMenuItemHandler(i));
+	descriptors.forEach(gridInfo::addColumnDescriptor);
+	items.forEach(gridInfo::addGridMenuItemHandler);
 
 	tabInfo.setGridInfo(gridInfo);
 

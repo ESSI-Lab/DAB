@@ -23,7 +23,6 @@ package eu.essi_lab.cfga.gui.components;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.vaadin.componentfactory.ToggleButton;
 import com.vaadin.flow.component.Component;
@@ -139,8 +138,8 @@ public class SettingComponentFactory {
 	List<Option<?>> advancedOptions = setting.//
 		getOptions().//
 		stream().//
-		filter(o -> o.isAdvanced()).//
-		collect(Collectors.toList());
+		filter(Option::isAdvanced).//
+		toList();
 
 	VerticalLayout optionsLayout = ComponentFactory
 		.createNoSpacingNoMarginVerticalLayout("options-layout-for-setting-" + setting.getName());
@@ -407,17 +406,13 @@ public class SettingComponentFactory {
 	Details details = ComponentFactory.createDetails("View options", content);
 	details.addThemeVariants(DetailsVariant.SMALL);
 
-	details.addOpenedChangeListener(new ComponentEventListener<Details.OpenedChangeEvent>() {
+	details.addOpenedChangeListener((ComponentEventListener<OpenedChangeEvent>) event -> {
 
-	    @Override
-	    public void onComponentEvent(OpenedChangeEvent event) {
-
-		boolean opened = event.isOpened();
-		if (opened) {
-		    details.setSummaryText("Hide options");
-		} else {
-		    details.setSummaryText("View options");
-		}
+	    boolean opened = event.isOpened();
+	    if (opened) {
+		details.setSummaryText("Hide options");
+	    } else {
+		details.setSummaryText("View options");
 	    }
 	});
 

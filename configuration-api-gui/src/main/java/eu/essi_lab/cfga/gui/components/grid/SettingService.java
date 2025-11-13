@@ -46,7 +46,7 @@ import eu.essi_lab.cfga.setting.Setting;
  */
 public class SettingService {
 
-    private List<Setting> list;
+    private final List<Setting> list;
 
     /**
      * @param list
@@ -62,13 +62,7 @@ public class SettingService {
     public Stream<Setting> fetch(Query<Setting, Void> query) {
 
 	Optional<Comparator<Setting>> sortingComparator = query.getSortingComparator();
-	if (sortingComparator.isPresent()) {
-
-	    Comparator<Setting> comparator = sortingComparator.get();
-
-	    System.out.println(comparator);
-
-	}
+	sortingComparator.ifPresent(System.out::println);
 
 	List<QuerySortOrder> sortOrders = query.getSortOrders();
 	System.out.println(sortOrders);

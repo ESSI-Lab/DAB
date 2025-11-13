@@ -23,13 +23,13 @@ import java.util.ArrayList;
  * #L%
  */
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
@@ -54,7 +54,6 @@ import eu.essi_lab.cfga.setting.Setting;
 /**
  * @author Fabrizio
  */
-@SuppressWarnings("serial")
 public class TabContainer extends VerticalLayout {
 
     private GridComponent grid;
@@ -65,14 +64,14 @@ public class TabContainer extends VerticalLayout {
     private Configuration configuration;
     private boolean rendered;
     private ConfigurationView view;
-    private List<Component> legends;
+    private final List<Component> legends;
 
     /**
      *
      */
     public TabContainer() {
 
-	legends = new ArrayList<Component>();
+	legends = new ArrayList<>();
     }
 
     /**
@@ -120,20 +119,17 @@ public class TabContainer extends VerticalLayout {
 
 	Optional<ShowDirective> showDirective = directiveManager.getDirective(ShowDirective.class);
 
-	if (showDirective.isPresent()) {
+	showDirective.flatMap(ShowDirective::getSortDirection).ifPresent(dir -> {
 
-	    showDirective.get().getSortDirection().ifPresent(dir -> {
-
-		switch (dir) {
-		case ASCENDING:
-		    settings.sort((s1, s2) -> s1.getName().compareTo(s2.getName()));
-		    break;
-		case DESCENDING:
-		    settings.sort((s1, s2) -> s2.getName().compareTo(s1.getName()));
-		    break;
-		}
-	    });
-	}
+	    switch (dir) {
+	    case ASCENDING:
+		settings.sort(Comparator.comparing(Setting::getName));
+		break;
+	    case DESCENDING:
+		settings.sort((s1, s2) -> s2.getName().compareTo(s1.getName()));
+		break;
+	    }
+	});
 
 	if (tabInfo.getGridInfo().isPresent()) {
 
@@ -184,11 +180,11 @@ public class TabContainer extends VerticalLayout {
 			details.getStyle().set("margin-top", "15px");
 		    }
 
-		    ((HasComponents) this).add(details);
+		    this.add(details);
 
 		} else {
 
-		    ((HasComponents) this).add(component);
+		    this.add(component);
 		}
 	    }
 
@@ -261,7 +257,7 @@ public class TabContainer extends VerticalLayout {
      */
     public void addLegend(Component legend) {
 
-	if (!legends.stream().map(lg -> lg.getId().get()).anyMatch(id -> id.equals(legend.getId().get()))) {
+	if (legends.stream().map(lg -> lg.getId().get()).noneMatch(id -> id.equals(legend.getId().get()))) {
 
 	    legends.add(legend);
 	}
@@ -341,7 +337,6 @@ public class TabContainer extends VerticalLayout {
 	    }
 
 	    component.getStyle().set("display", "none");
-	    component = null;
 	}
     }
 
@@ -397,7 +392,7 @@ public class TabContainer extends VerticalLayout {
 
 	getChildren().forEach(c -> {
 
-	    if (!c.getId().isPresent() || !c.getId().get().startsWith(ConfigurationViewFactory.TAB_HEADER_ID_PREFIX)) {
+	    if (c.getId().isEmpty() || !c.getId().get().startsWith(ConfigurationViewFactory.TAB_HEADER_ID_PREFIX)) {
 
 		remove(c);
 	    }
@@ -415,25 +410,21 @@ public class TabContainer extends VerticalLayout {
 	reloadButton.getStyle().set("margin-left", "15px");
 	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%");
 
-	reloadButton.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
+	reloadButton.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 
-	    @Override
-	    public void onComponentEvent(ClickEvent<Button> event) {
+	    if (tabInfo.getTabReloader().isPresent()) {
 
-		if (tabInfo.getTabReloader().isPresent()) {
+		tabInfo.getTabReloader().get().run();
 
-		    tabInfo.getTabReloader().get().run();
+		removeAllButHeader();
 
-		    removeAllButHeader();
+		render(true);
 
-		    render(true);
+	    } else {
 
-		} else {
+		removeAllButHeader();
 
-		    removeAllButHeader();
-
-		    render(true);
-		}
+		render(true);
 	    }
 	});
 
@@ -446,9 +437,9 @@ public class TabContainer extends VerticalLayout {
      */
     private boolean addReloadButton(HorizontalLayout headerLayout) {
 
-	return !headerLayout.//
+	return headerLayout.//
 		getChildren().//
-		anyMatch(child -> child.getId().isPresent() && child.getId().get().equals("reloadButton"));
+		noneMatch(child -> child.getId().isPresent() && child.getId().get().equals("reloadButton"));
     }
 
     /**

@@ -41,14 +41,14 @@ public class EnabledGroupManager {
 	return INSTANCE;
     }
 
-    private List<HasEnabled> list;
+    private final List<HasEnabled> list;
 
     /**
      * 
      */
     private EnabledGroupManager() {
 
-	list = new ArrayList<HasEnabled>();
+	list = new ArrayList<>();
     }
 
     /**

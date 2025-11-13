@@ -33,7 +33,7 @@ import eu.essi_lab.cfga.gui.components.setting.group.listener.CheckComponentsHan
  */
 public class CheckComponentsHandler extends GroupComponentsHandler<CheckboxGroup<String>> {
 
-    private CheckboxGroup<String> checkBoxGroup;
+    private final CheckboxGroup<String> checkBoxGroup;
 
     /**
     * 

@@ -113,9 +113,7 @@ public class ComponentInfo implements ObjectExtension {
     @Override
     public boolean equals(Object o) {
 
-	if (o instanceof ComponentInfo) {
-
-	    ComponentInfo other = (ComponentInfo) o;
+	if (o instanceof ComponentInfo other) {
 
 	    return this.getComponentName().equals(other.getComponentName());
 	}
