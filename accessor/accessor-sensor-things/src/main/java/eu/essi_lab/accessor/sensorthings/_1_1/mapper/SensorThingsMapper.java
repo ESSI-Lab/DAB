@@ -421,7 +421,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		dataset.getExtensionHandler().setDataDisclaimer(value);
 		continue;
 	    }
-	    if (key.equalsIgnoreCase("territory_of_origin")) {
+	    if (key.equalsIgnoreCase("territory_of_origin") || key.equalsIgnoreCase("territoryOfOrigin")) {
 		if (value.contains("codes.wmo.int")) {
 		    value = value.replace("http://codes.wmo.int/wmdr/TerritoryName/", "");
 		    value = value.replace("https://codes.wmo.int/wmdr/TerritoryName/", "");

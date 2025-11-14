@@ -180,50 +180,58 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	    Optional<String> sensorDesc = sensor.getDescription();
 	    instrument.setDescription(sensorDesc.get().trim());
 
-	    JSONObject metadata = (JSONObject) sensor.getMetadata().get();
-	    //
-	    // "methodCode": "dl-smtp",
-	    // "methodType": "Instrument Deployment",
-	    // "methodLink": "https://www.decentlab.com/",
-	    // "sensorModel": {
-	    // "sensorModelName": "Decentlab DL-SMTP",
-	    // "sensorModelURL": "https://www.decentlab.com/products/soil-moisture-and-temperature-profile-for-lorawan",
-	    // "sensorManufacturer": "Decentlab"
-	    // }
+	    Object metadata = sensor.getMetadata().get();
+	    if (metadata instanceof JSONObject) {
+		JSONObject sensorMetadata = (JSONObject) metadata;
 
-	    //
-	    // Sensor code
-	    //
-	    String sensorCode = SERVER_URN;
-	    sensorCode += sensorName.get().trim();
+		//
+		// "methodCode": "dl-smtp",
+		// "methodType": "Instrument Deployment",
+		// "methodLink": "https://www.decentlab.com/",
+		// "sensorModel": {
+		// "sensorModelName": "Decentlab DL-SMTP",
+		// "sensorModelURL":
+		// "https://www.decentlab.com/products/soil-moisture-and-temperature-profile-for-lorawan",
+		// "sensorManufacturer": "Decentlab"
+		// }
 
-	    String methodCode = metadata.optString("methodCode");
-	    if (!methodCode.isEmpty()) {
-		sensorCode = sensorCode + ":" + methodCode.trim();
-		keywords.addKeyword(methodCode, "methodCode");
-	    }
-	    instrument.setMDIdentifierTypeCode(sensorCode);
+		//
+		// Sensor code
+		//
+		String sensorCode = SERVER_URN;
+		sensorCode += sensorName.get().trim();
 
-	    String methodType = metadata.optString("methodType");
-	    if (!methodType.isEmpty()) {
-		instrument.setSensorType(methodType.trim());
-		keywords.addKeyword(methodType, "methodType");
-	    }
+		String methodCode = sensorMetadata.optString("methodCode");
+		if (!methodCode.isEmpty()) {
+		    sensorCode = sensorCode + ":" + methodCode.trim();
+		    keywords.addKeyword(methodCode, "methodCode");
+		}
+		instrument.setMDIdentifierTypeCode(sensorCode);
 
-	    String methodLink = metadata.optString("methodLink");
-	    keywords.addKeyword(methodLink, "mehtodLink");
+		String methodType = sensorMetadata.optString("methodType");
+		if (!methodType.isEmpty()) {
+		    instrument.setSensorType(methodType.trim());
+		    keywords.addKeyword(methodType, "methodType");
+		}
 
-	    if (metadata.has("sensorModel")) {
+		String methodLink = sensorMetadata.optString("methodLink");
+		keywords.addKeyword(methodLink, "mehtodLink");
 
-		JSONObject sensorModel = metadata.getJSONObject("sensorModel");
+		if (sensorMetadata.has("sensorModel")) {
 
-		String sensorModelName = sensorModel.optString("sensorModelName");
-		String sensorModelURL = sensorModel.optString("sensorModelURL");
-		String sensorManufacturer = sensorModel.optString("sensorManufacturer");
+		    JSONObject sensorModel = sensorMetadata.getJSONObject("sensorModel");
 
-		keywords.addKeyword(sensorModelName, "instrument");
-		keywords.addKeyword(sensorModelURL, "sensorModelURL");
-		keywords.addKeyword(sensorManufacturer, "sensorManufacturer");
+		    String sensorModelName = sensorModel.optString("sensorModelName");
+		    String sensorModelURL = sensorModel.optString("sensorModelURL");
+		    String sensorManufacturer = sensorModel.optString("sensorManufacturer");
+
+		    keywords.addKeyword(sensorModelName, "instrument");
+		    keywords.addKeyword(sensorModelURL, "sensorModelURL");
+		    keywords.addKeyword(sensorManufacturer, "sensorManufacturer");
+		}
+	    }else if (metadata instanceof String) {
+		String strMetadata = (String) metadata;
+		
 	    }
 	}
     }
