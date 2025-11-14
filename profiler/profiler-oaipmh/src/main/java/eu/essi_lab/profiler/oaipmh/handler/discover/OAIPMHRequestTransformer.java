@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.oaipmh.handler.discover;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -72,9 +72,15 @@ import eu.essi_lab.profiler.oaipmh.token.ResumptionToken;
 public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
-     * 
+     *
      */
     private static final String OAI_PMH_POST_QUERY_EXTRACTION_ERROR = "OAI_PMH_POST_QUERY_EXTRACTION_ERROR";
+
+    /**
+     *
+     */
+    public OAIPMHRequestTransformer() {
+    }
 
     /**
      * @param setting
@@ -353,11 +359,10 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     /**
-     * If the "set" parameter in the request is set, the returned bond is a single {@link SourceIdentifierBond} built
-     * with the <code>setSpec</code> value. If the "set" parameter in the request is not set, the returned bond is an OR
-     * logical bond with {@link SourceIdentifierBond} bonds built with the identifiers of the harvested sources. If
-     * there are no harvested sources, the returned bond is a bond which forces the request to return an empty result
-     * set.
+     * If the "set" parameter in the request is set, the returned bond is a single {@link SourceIdentifierBond} built with the
+     * <code>setSpec</code> value. If the "set" parameter in the request is not set, the returned bond is an OR logical bond with
+     * {@link SourceIdentifierBond} bonds built with the identifiers of the harvested sources. If there are no harvested sources, the
+     * returned bond is a bond which forces the request to return an empty result set.
      *
      * @param setSpec
      * @return
