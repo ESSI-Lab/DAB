@@ -214,6 +214,11 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 		Downloader downloader = new Downloader();
 		Optional<String> csvFile = downloader.downloadOptionalString(url.toString());
 
+		if(csvFile.isEmpty()){
+
+		    continue;
+		}
+
 		csvFileContent = csvFile.get();
 
 		cvsContentMap.put(fileName, csvFileContent);
