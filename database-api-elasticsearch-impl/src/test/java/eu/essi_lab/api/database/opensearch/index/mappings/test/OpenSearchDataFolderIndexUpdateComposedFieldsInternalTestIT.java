@@ -13,7 +13,6 @@ import eu.essi_lab.model.resource.ResourceProperty;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.MockedStatic;
 import org.opensearch.client.opensearch.OpenSearchClient;
@@ -34,7 +33,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author Fabrizio
  */
-public class OpenSearchDataFolderIndexUpdateComposedFieldsTest extends OpenSearchTest {
+public class OpenSearchDataFolderIndexUpdateComposedFieldsInternalTestIT extends OpenSearchTest {
 
     /**
      *

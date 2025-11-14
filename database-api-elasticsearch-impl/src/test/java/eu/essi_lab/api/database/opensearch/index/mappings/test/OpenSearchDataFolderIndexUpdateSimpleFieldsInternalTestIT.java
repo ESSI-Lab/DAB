@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * @author Fabrizio
  */
-public class OpenSearchDataFolderIndexUpdateSimpleFieldsTest extends OpenSearchTest {
+public class OpenSearchDataFolderIndexUpdateSimpleFieldsInternalTestIT extends OpenSearchTest {
 
     private static final String FIELD_NAME = "testField";
 
