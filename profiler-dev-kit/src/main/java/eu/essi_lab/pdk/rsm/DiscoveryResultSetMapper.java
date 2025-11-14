@@ -36,6 +36,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
 
 /**
  * Implementation specific to map a <code>ResultSet&ltGSResource&gt</code> in to a <code>ResultSet&ltT&gt</code>
@@ -151,7 +152,11 @@ public abstract class DiscoveryResultSetMapper<T>
 		map(res -> CompletableFuture.supplyAsync(() -> map(message, res, ids), executor)).//
 		toList();
 
-	List<T> out = futures.stream().map(CompletableFuture::join).toList();
+	List<T> out = futures.//
+		stream().//
+		map(CompletableFuture::join).//
+		collect(Collectors.toList());//
+
 	mappedResSet.setResultsList(out);
 
 	//
