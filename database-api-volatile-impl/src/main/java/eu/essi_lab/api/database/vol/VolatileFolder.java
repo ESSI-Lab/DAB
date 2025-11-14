@@ -57,7 +57,7 @@ public class VolatileFolder implements DatabaseFolder {
 	 */
 	public ModifiedInputStream(InputStream inputStream) {
 
-	    this.dateStamp = new Date();
+	   this(inputStream, new Date());
 	}
 
 	/**
