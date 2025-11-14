@@ -4,6 +4,7 @@
 package eu.essi_lab.shared.driver;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -21,6 +22,7 @@ import eu.essi_lab.model.shared.SharedContent.SharedContentType;
  */
 public abstract class DatabaseCacheDriverTest {
 
+    private static final long SLEEP_TIME = TimeUnit.SECONDS.toMillis(3);
     private StorageInfo uri;
 
     /**
@@ -81,7 +83,7 @@ public abstract class DatabaseCacheDriverTest {
 	// wait until the content is stored
 	//
 
-	Thread.sleep(10000);
+	Thread.sleep(SLEEP_TIME);
 
 	//
 	//
@@ -139,7 +141,7 @@ public abstract class DatabaseCacheDriverTest {
 	// wait until the content is stored
 	//
 
-	Thread.sleep(10000);
+	Thread.sleep(SLEEP_TIME);
 
 	//
 	//
@@ -193,7 +195,7 @@ public abstract class DatabaseCacheDriverTest {
 	// wait until the content is stored
 	//
 
-	Thread.sleep(10000);
+	Thread.sleep(SLEEP_TIME);
 
 	//
 	//
