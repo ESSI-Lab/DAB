@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -40,6 +41,7 @@ public class CheckBoxColumnRenderer extends GridColumnRenderer<Checkbox> {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = 233009253707393876L;
     private Consumer<HashMap<String, String>> consumer;
 
@@ -65,10 +67,7 @@ public class CheckBoxColumnRenderer extends GridColumnRenderer<Checkbox> {
 	component.setId(item.get("identifier"));
 
 	if (consumer != null) {
-	    component.addClickListener(event -> {
-
-		consumer.accept(item);
-	    });
+	    component.addClickListener(event -> consumer.accept(item));
 	}
 
 	return component;

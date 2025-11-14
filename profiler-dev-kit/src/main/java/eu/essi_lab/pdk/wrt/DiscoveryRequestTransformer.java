@@ -143,10 +143,12 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
     protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
 
 	//
-	// optionally set the ResourceConsumer
+	// optionally set the ResourceConsumer and the number of threads for the result set mapper
 	//
 
 	getSetting().ifPresent(s -> s.getConsumer().ifPresent(c -> message.setResourceConsumer(c)));
+
+	getSetting().ifPresent(s -> s.getResultSetMapperThreadsCount().ifPresent(c -> message.setResultSetMapperThreadsCount(c)));
 
 	//
 	//

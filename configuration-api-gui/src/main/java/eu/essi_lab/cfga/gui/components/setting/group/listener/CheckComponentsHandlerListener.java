@@ -36,7 +36,7 @@ import eu.essi_lab.cfga.gui.components.setting.group.CheckComponentsHandler;
 @SuppressWarnings("serial")
 public class CheckComponentsHandlerListener implements MultiSelectionListener<CheckboxGroup<String>, String> {
 
-    private CheckComponentsHandler handler;
+    private final CheckComponentsHandler handler;
 
     /**
      * @param handler

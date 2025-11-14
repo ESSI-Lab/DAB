@@ -56,12 +56,7 @@ public class GridFilter {
 
 	String itemValue = item.get(this.columnName);
 
-	if (itemValue == null || itemValue.toLowerCase().contains(value.toLowerCase())) {
-
-	    return true;
-	}
-
-	return false;
+	return itemValue == null || itemValue.toLowerCase().contains(value.toLowerCase());
     }
 
     /**

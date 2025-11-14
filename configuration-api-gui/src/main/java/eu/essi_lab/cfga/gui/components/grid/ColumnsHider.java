@@ -23,7 +23,6 @@ package eu.essi_lab.cfga.gui.components.grid;
 
 import java.util.HashMap;
 
-import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -56,26 +55,20 @@ public class ColumnsHider extends HorizontalLayout {
 	    if (grid.getColumns().//
 		    stream().//
 		    filter(c -> !c.getKey().isEmpty()).//
-		    filter(c -> c.getKey().equals(descriptor.getColumnName()) && c.isVisible()).//
-		    findFirst().//
-		    isPresent()) {
+		    anyMatch(c -> c.getKey().equals(descriptor.getColumnName()) && c.isVisible())) {
 
 		Checkbox checkBox = new Checkbox(descriptor.getColumnName());
 		checkBox.getStyle().set("font-size", "12px");
 
 		add(checkBox);
 
-		checkBox.addClickListener(new CheckBoxClickListener() {
+		checkBox.addClickListener((CheckBoxClickListener) event -> {
 
-		    @Override
-		    public void handleEvent(ClickEvent<Checkbox> event) {
+		    String label = event.getSource().getLabel();
 
-			String label = event.getSource().getLabel();
+		    findColumn(grid, label).setVisible(event.getSource().getValue());
 
-			findColumn(grid, label).setVisible(event.getSource().getValue());
-
-			VALUES_MAP.put(label, event.getSource().getValue());
-		    }
+		    VALUES_MAP.put(label, event.getSource().getValue());
 		});
 
 		Boolean value = VALUES_MAP.get(descriptor.getColumnName());

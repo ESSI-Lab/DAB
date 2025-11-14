@@ -29,7 +29,7 @@ import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 @SuppressWarnings("serial")
 public class SettingToggleButtonListener extends AbstractValueChangeListener {
 
-    private SettingComponent settingComponent;
+    private final SettingComponent settingComponent;
 
     /**
      * @param settingComponent

@@ -39,8 +39,8 @@ import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -209,7 +209,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 	    setComponentName(CustomTaskSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.CUSTOM_TASKS.getIndex()).//
 		    withShowDirective("Custom tasks", SortDirection.ASCENDING).//
 
@@ -254,7 +254,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
 
 	/**

@@ -31,7 +31,7 @@ import eu.essi_lab.cfga.gui.components.setting.group.listener.RadioComponentsHan
  */
 public class RadioComponentsHandler extends GroupComponentsHandler<RadioButtonGroup<String>> {
 
-    private RadioButtonGroup<String> radioButtonGroup;
+    private final RadioButtonGroup<String> radioButtonGroup;
 
     /**
      * 

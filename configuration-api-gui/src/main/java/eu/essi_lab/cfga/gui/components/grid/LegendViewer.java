@@ -44,6 +44,6 @@ public class LegendViewer extends HorizontalLayout {
 	setSpacing(false);
 	setHeight("30px");
 
-	legends.forEach(leg -> add(leg));
+	legends.forEach(this::add);
     }
 }

@@ -105,6 +105,7 @@ public class GSMessageTest {
 	Assert.assertNull(message.getPermittedBond());
 	Assert.assertNull(message.getWebRequest());
 	Assert.assertFalse(message.getIteratedWorkflow().isPresent());
+	Assert.assertFalse(message.getResultSetMapperThreadsCount().isPresent());
 
 	Assert.assertFalse(message.getEiffelAPIDiscoveryOption().isPresent());
 
@@ -180,6 +181,11 @@ public class GSMessageTest {
 	// eiffel discovery option
 	message.enableEiffelAPIDiscoveryOption(EiffelAPIDiscoveryOption.FILTER_AND_SORT);
 	Assert.assertEquals(EiffelAPIDiscoveryOption.FILTER_AND_SORT, message.getEiffelAPIDiscoveryOption().get());
+
+	// result set mapper threads
+	message.setResultSetMapperThreadsCount(10);
+	Assert.assertEquals(Integer.valueOf(10), message.getResultSetMapperThreadsCount().get());
+
     }
 
 }

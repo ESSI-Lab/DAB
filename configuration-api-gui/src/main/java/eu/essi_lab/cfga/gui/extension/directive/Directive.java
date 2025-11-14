@@ -44,8 +44,8 @@ public abstract class Directive {
 	/**
 	 * 
 	 */
-	ON_WARNINGS;
-    };
+	ON_WARNINGS
+    }
 
     private ConfirmationPolicy confirmationPolicy;
 

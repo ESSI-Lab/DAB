@@ -120,7 +120,7 @@ import eu.essi_lab.cfga.setting.Setting;
 public class OptionComponent extends VerticalLayout {
 
     private HasEnabled renderedOption;
-    private Option<?> option;
+    private final Option<?> option;
     private ToggleButton toggle;
     private VerticalLayout optionLayout;
 
@@ -271,7 +271,7 @@ public class OptionComponent extends VerticalLayout {
 	    // if the option can be disabled, it has its own toggle button
 	    // and its state can be set to enabled only with the toggle button
 	    //
-	} else if (value && !option.canBeDisabled()) {
+	} else if (!option.canBeDisabled()) {
 
 	    onToggleStateChanged(true);
 	}

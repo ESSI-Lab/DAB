@@ -67,12 +67,12 @@ public class OptionComponentFactory {
     /**
      * 
      */
-    private static int NUMERIC_FIELD_WIDTH = 200;
+    private static final int NUMERIC_FIELD_WIDTH = 200;
     
     /**
      * 
      */
-    private static int BOOLEAN_FIELD_WIDTH = 100;
+    private static final int BOOLEAN_FIELD_WIDTH = 100;
 
     /**
      * @param option
@@ -170,10 +170,7 @@ public class OptionComponentFactory {
 		TextField textField = new TextField();
 		textField.setReadOnly(true);
 
-		if (optionalValue.isPresent()) {
-
-		    textField.setValue(optionalValue.get().toString());
-		}
+		optionalValue.ifPresent(o -> textField.setValue(o.toString()));
 
 		if (option.canBeDisabled()) {
 
@@ -281,7 +278,7 @@ public class OptionComponentFactory {
 
 	layout.add(button);
 
-	OptionValuesLoaderListener listener = null;
+	OptionValuesLoaderListener listener;
 
 	if (singleSelect != null) {
 
@@ -304,7 +301,7 @@ public class OptionComponentFactory {
      */
     public static Component createOptionMultiSelectionComponent(Option<?> option, boolean forceReadOnly) {
 
-	MultiSelectComboBox<String> select = new MultiSelectComboBox<String>();
+	MultiSelectComboBox<String> select = new MultiSelectComboBox<>();
 	if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)) {
 	    select.setWidthFull();
 	} else {
@@ -388,10 +385,7 @@ public class OptionComponentFactory {
 
 	// GSLoggerFactory.getLogger(ComponentFactory.class).debug("Selected value: " + selectedValue);
 
-	if (selectedValue.isPresent()) {
-
-	    select.setValue(selectedValue.get());
-	}
+	selectedValue.ifPresent(select::setValue);
 
 	if (option.canBeDisabled()) {
 
@@ -422,12 +416,10 @@ public class OptionComponentFactory {
     @SuppressWarnings("unchecked")
     public static OptionSettingComponent createSettingOptionComponent(Configuration configuration, Setting owner, Option<?> option) {
 
-	OptionSettingComponent component = new OptionSettingComponent(//
+	return new OptionSettingComponent(//
 		configuration, //
 		owner, //
 		(Option<? extends Setting>) option);
-
-	return component;
     }
 
     /**

@@ -43,8 +43,8 @@ import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
@@ -245,7 +245,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 	    setComponentName(AugmenterWorkerSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.AUGMENTERS.getIndex()).//
 		    withShowDirective("Augmenters", SortDirection.ASCENDING).//
 
@@ -288,7 +288,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
 
 	/**
