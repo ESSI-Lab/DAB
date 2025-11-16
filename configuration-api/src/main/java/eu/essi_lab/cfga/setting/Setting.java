@@ -182,9 +182,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public void afterClean() {
 
-	Optional<AfterCleanFunction> afterCleanFunction = getAfterCleanFunction();
-
-	afterCleanFunction.ifPresent(cleanFunction -> cleanFunction.afterClean(this));
+	getAfterCleanFunction().ifPresent(f -> f.afterClean(this));
     }
 
     /**
