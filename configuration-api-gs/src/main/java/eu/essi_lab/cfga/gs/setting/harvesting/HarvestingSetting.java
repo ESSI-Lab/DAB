@@ -152,11 +152,11 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	    //
 	    //
 
-	    AccessorSetting selecteAccessorSetting = thisSetting.getSelectedAccessorSetting();
+	    AccessorSetting selAccessorSetting = thisSetting.getSelectedAccessorSetting();
 
-	    selecteAccessorSetting.setShowHeader(false);
+	    selAccessorSetting.setShowHeader(false);
 
-	    thisSetting.setName(selecteAccessorSetting.getGSSourceSetting().getSourceLabel());
+	    thisSetting.setName(selAccessorSetting.getGSSourceSetting().getSourceLabel());
 
 	    //
 	    //
