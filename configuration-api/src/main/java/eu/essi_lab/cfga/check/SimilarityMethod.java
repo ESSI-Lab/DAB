@@ -141,6 +141,8 @@ public class SimilarityMethod implements CheckMethod {
 
 	    SelectionUtils.deepClean(newSetting);
 
+	    SelectionUtils.deepAfterClean(newSetting);
+
 	    similar = newSetting.similar(//
 		    configSetting, //
 		    getExclusions().stream().map(Property::getKey).toList());
