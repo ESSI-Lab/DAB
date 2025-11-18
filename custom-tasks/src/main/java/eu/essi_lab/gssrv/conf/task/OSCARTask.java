@@ -187,8 +187,14 @@ public class OSCARTask extends AbstractCustomTask {
 	    start = start + pageSize;
 
 	    if (searchAfter != null) {
+		
+		if(searchAfter.toString().equals("empty")) {
+		    break main;
+		}
 		discoveryMessage.setSearchAfter(searchAfter);
 	    }
+	    
+	    
 	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
 	    IDiscoveryExecutor executor = loader.iterator().next();
 	    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
