@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -406,7 +408,47 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	if (observationType != null && !observationType.isEmpty()) {
 	    collector.addKeyword(observationType, "observationType");
 	}
-	HashMap<String, String> tags = thing.getTags();
+	HashMap<String, String> tags = stream.getTags();
+	if (tags == null || tags.isEmpty()) {
+	    tags = thing.getTags();
+	}
+	if (tags == null || tags.isEmpty()) {
+	    Optional<JSONObject> props = stream.getProperties();
+	    if (props.isPresent()) {
+		Set<String> keys = props.get().keySet();
+		for (String key : keys) {
+		    Object obj = props.get().get(key);
+		    if (obj != null) {
+			if (obj instanceof String) {
+			    String value = (String) obj;
+			    if (tags == null) {
+				tags = new HashMap<String, String>();
+			    }
+			    tags.put(key, value);
+			}
+		    }
+		}
+	    }
+	}
+	if (tags == null || tags.isEmpty()) {
+	    Optional<JSONObject> props = thing.getProperties();
+	    if (props.isPresent()) {
+		Set<String> keys = props.get().keySet();
+		for (String key : keys) {
+		    Object obj = props.get().get(key);
+		    if (obj != null) {
+			if (obj instanceof String) {
+			    String value = (String) obj;
+			    if (tags == null) {
+				tags = new HashMap<String, String>();
+			    }
+			    tags.put(key, value);
+			}
+		    }
+		}
+	    }
+	}
+
 	for (String key : tags.keySet()) {
 	    String value = tags.get(key);
 	    if (key.equalsIgnoreCase("licence")) {

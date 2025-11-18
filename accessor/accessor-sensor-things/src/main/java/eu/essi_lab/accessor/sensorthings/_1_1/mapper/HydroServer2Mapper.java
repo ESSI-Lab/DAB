@@ -229,9 +229,9 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 		    keywords.addKeyword(sensorModelURL, "sensorModelURL");
 		    keywords.addKeyword(sensorManufacturer, "sensorManufacturer");
 		}
-	    }else if (metadata instanceof String) {
+	    } else if (metadata instanceof String) {
 		String strMetadata = (String) metadata;
-		
+
 	    }
 	}
     }
@@ -304,39 +304,63 @@ public class HydroServer2Mapper extends SensorThingsMapper {
     @Override
     protected void addResponsibleParty(Thing thing, Datastream stream, DataIdentification dataId) {
 
-	if (thing.getProperties().get().has("contactPeople")) {
+	JSONArray contactPeople = null;
 
-	    JSONArray contactPeople = thing.getProperties().get().getJSONArray("contactPeople");
-
-	    contactPeople.forEach(contact -> {
-
-		JSONObject object = (JSONObject) contact;
-		String firstName = object.optString("firstName");
-		String lastName = object.optString("lastName");
-		String email = object.optString("email");
-		String organization = object.optString("organizationName");
-
-		if (!firstName.isEmpty() || !lastName.isEmpty() || !organization.isEmpty()) {
-
-		    ResponsibleParty responsibleParty = new ResponsibleParty();
-		    if (!firstName.isEmpty() && !lastName.isEmpty()) {
-			responsibleParty.setIndividualName(firstName.trim() + " " + lastName.trim());
-		    } else {
-			responsibleParty.setOrganisationName(organization.trim());
-		    }
-
-		    if (!email.isEmpty()) {
-			Contact con = new Contact();
-			Address address = new Address();
-			address.addElectronicMailAddress(email.trim());
-			con.setAddress(address);
-			responsibleParty.setContactInfo(con);
-		    }
-
-		    dataId.addPointOfContact(responsibleParty);
-		}
-	    });
+	if (stream != null) {
+	    contactPeople = stream.getProperties().get().optJSONArray("contactPeople");
+	    if (contactPeople == null) {
+		contactPeople = stream.getProperties().get().optJSONArray("responsibleParties");
+	    }
 	}
+	if (thing != null) {
+	    if (contactPeople == null) {
+		contactPeople = thing.getProperties().get().optJSONArray("contactPeople");
+	    }
+	    if (contactPeople == null) {
+		contactPeople = thing.getProperties().get().optJSONArray("responsibleParties");
+	    }
+	}
+
+	if (contactPeople == null) {
+	    return;
+	}
+	contactPeople.forEach(contact -> {
+
+	    JSONObject object = (JSONObject) contact;
+	    String firstName = object.optString("firstName");
+	    String lastName = object.optString("lastName");
+	    String individualName = object.optString("individualName");
+	    String email = object.optString("email");
+	    String organization = object.optString("organizationName");
+	    String role = object.optString("role");
+
+	    if (!firstName.isEmpty() || !lastName.isEmpty() || !organization.isEmpty()) {
+
+		ResponsibleParty responsibleParty = new ResponsibleParty();
+		if (!firstName.isEmpty() && !lastName.isEmpty()) {
+		    responsibleParty.setIndividualName(firstName.trim() + " " + lastName.trim());
+		}
+		if (!individualName.isEmpty()) {
+		    responsibleParty.setIndividualName(individualName.trim());
+		}
+		if (!organization.isEmpty()) {
+		    responsibleParty.setOrganisationName(organization.trim());
+		}
+
+		if (!role.isEmpty()) {
+		    responsibleParty.setRoleCode(role);
+		}
+		if (!email.isEmpty()) {
+		    Contact con = new Contact();
+		    Address address = new Address();
+		    address.addElectronicMailAddress(email.trim());
+		    con.setAddress(address);
+		    responsibleParty.setContactInfo(con);
+		}
+
+		dataId.addPointOfContact(responsibleParty);
+	    }
+	});
     }
 
     /**
@@ -618,19 +642,23 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 	    GeographicBoundingBox boundingBox = null;
 
-	    if (location.get().getLocation().has("geometry")) {
+	    JSONObject loc = location.get().getLocation();
 
-		JSONObject geometry = location.get().getLocation().getJSONObject("geometry");
+	    JSONObject geometry = loc;
 
-		if (geometry.has("coordinates")) {
-
-		    boundingBox = createBoundingBox(//
-			    location.get().getName(), //
-			    geometry.getJSONArray("coordinates"));
-
-		    dataId.addGeographicBoundingBox(boundingBox);
-		}
+	    if (loc.has("geometry")) {
+		geometry = loc.getJSONObject("geometry");
 	    }
+
+	    if (geometry.has("coordinates")) {
+
+		boundingBox = createBoundingBox(//
+			location.get().getName(), //
+			geometry.getJSONArray("coordinates"));
+
+		dataId.addGeographicBoundingBox(boundingBox);
+	    }
+
 	}
     }
 
