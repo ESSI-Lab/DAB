@@ -21,7 +21,6 @@ package eu.essi_lab.accessor.whos;
  * #L%
  */
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,12 +35,8 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
-import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.iso.datamodel.classes.VerticalCRS;
-import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -53,7 +48,6 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.AbstractResourceMapper;
 import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodeType;

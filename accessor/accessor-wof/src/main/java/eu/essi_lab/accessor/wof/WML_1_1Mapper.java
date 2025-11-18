@@ -58,7 +58,7 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.VerticalCRS;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.GSSource;
@@ -603,10 +603,10 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	String identifier = mangler.getMangling();
 
 	if (onlineGetSite.isEmpty()) {
-	    coreMetadata.addDistributionOnlineResource(identifier, hisServerEndpoint, NetProtocols.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(),
+	    coreMetadata.addDistributionOnlineResource(identifier, hisServerEndpoint, NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(),
 		    "download");
 	} else {
-	    coreMetadata.addDistributionOnlineResource(identifier, onlineGetSite, NetProtocols.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(),
+	    coreMetadata.addDistributionOnlineResource(identifier, onlineGetSite, NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(),
 		    "download");
 	}
 

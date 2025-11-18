@@ -21,7 +21,7 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
@@ -166,7 +166,7 @@ public class WFS_1_1_0ResourceMapperTest {
 	TestCase.assertEquals(1, onlines.size());
 	Online online = onlines.get(0);
 	TestCase.assertNotNull(online);
-	TestCase.assertEquals(NetProtocols.WFS_1_1_0.getCommonURN(), online.getProtocol());
+	TestCase.assertEquals(NetProtocolWrapper.WFS_1_1_0.getCommonURN(), online.getProtocol());
 	TestCase.assertEquals("http://testwfs.example?", online.getLinkage());
 	TestCase.assertEquals("{http://sedac.ciesin.columbia.edu/data/collection/superfund}superfund-atsdr-hazardous-waste-site-v2", online.getName());
 	TestCase.assertEquals(null, online.getDescription());

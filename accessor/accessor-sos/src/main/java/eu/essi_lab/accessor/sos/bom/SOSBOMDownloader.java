@@ -23,12 +23,12 @@ package eu.essi_lab.accessor.sos.bom;
 
 import eu.essi_lab.accessor.sos.SOSConnector;
 import eu.essi_lab.accessor.sos.downloader.SOSDownloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 
 public class SOSBOMDownloader extends SOSDownloader {
     @Override
     public String getSupportedProtocol() {
-	return NetProtocols.SOS_2_0_0_BOM.getCommonURN();
+	return NetProtocolWrapper.SOS_2_0_0_BOM.getCommonURN();
     }
 
     @Override

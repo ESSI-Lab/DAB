@@ -56,7 +56,7 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.jaxb.common.ObjectFactories;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
@@ -425,7 +425,7 @@ public class ODataHidrologyMapper extends OriginalIdentifierMapper {
 	    mangler.setParameterIdentifier(optVariableId.get());
 	    mangler.setPlatformIdentifier(optPlaceId.get());
 	    coreMetadata.addDistributionOnlineResource(mangler.getMangling(), ODataHidrologyClient.DEFAULT_URL,
-		    NetProtocols.ODATA_SYKE.getCommonURN(), "download");
+		    NetProtocolWrapper.ODATA_SYKE.getCommonURN(), "download");
 
 	} catch (Exception ex) {
 	    ex.printStackTrace();

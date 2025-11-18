@@ -35,7 +35,7 @@ import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
@@ -220,13 +220,13 @@ public class ChinaGeossMapper extends OriginalIdentifierMapper {
 		dataset.getHarmonizedMetadata().getCoreMetadata().addDistributionOnlineResource(//
 			fileSpecification, //
 			dataURL, //
-			NetProtocols.HTTP.getCommonURN(), //
+			NetProtocolWrapper.HTTP.getCommonURN(), //
 			"download");
 	    } else if (dataURL.startsWith("ftp")) {
 		dataset.getHarmonizedMetadata().getCoreMetadata().addDistributionOnlineResource(//
 			fileSpecification, //
 			dataURL, //
-			NetProtocols.FTP.getCommonURN(), //
+			NetProtocolWrapper.FTP.getCommonURN(), //
 			"download");
 	    } else {
 
@@ -243,7 +243,7 @@ public class ChinaGeossMapper extends OriginalIdentifierMapper {
 		dataset.getHarmonizedMetadata().getCoreMetadata().addDistributionOnlineResource(//
 			fileSpecification, //
 			online, //
-			NetProtocols.FTP.getCommonURN(), //
+			NetProtocolWrapper.FTP.getCommonURN(), //
 			"download");
 	    }
 	}

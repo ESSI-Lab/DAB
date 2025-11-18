@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import eu.essi_lab.downloader.wcs.WCSDownloader_111;
 import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 
 public class WCSDownloader_Afromaison111ExternalTestIT extends WCSDownloader_AfromaisonTest {
 
@@ -25,7 +25,7 @@ public class WCSDownloader_Afromaison111ExternalTestIT extends WCSDownloader_Afr
 
     @Override
     public NetProtocol getProtocol() {
-	return NetProtocols.WCS_1_1_1;
+	return NetProtocolWrapper.WCS_1_1_1.get();
     }
 
     // this should be a correct download request, however Geoserver WCS 1.1.1 gives back a GeoTIFF with

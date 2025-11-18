@@ -44,7 +44,7 @@ import eu.essi_lab.jaxb.sos._2_0.gml._3_2_1.TimePeriodType;
 import eu.essi_lab.jaxb.sos._2_0.om__2.OMObservationType;
 import eu.essi_lab.jaxb.sos._2_0.swes_2.AbstractOfferingType;
 import eu.essi_lab.jaxb.sos.factory.JAXBSOS;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
@@ -84,7 +84,7 @@ public class SOSDownloader extends DataDownloader {
 	}
 
 	public String getSupportedProtocol() {
-		return NetProtocols.SOS_2_0_0.getCommonURN();
+		return NetProtocolWrapper.SOS_2_0_0.getCommonURN();
 	}
 
 	@Override

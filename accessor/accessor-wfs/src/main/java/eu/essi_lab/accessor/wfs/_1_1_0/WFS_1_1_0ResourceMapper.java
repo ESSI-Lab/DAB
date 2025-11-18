@@ -10,12 +10,12 @@ package eu.essi_lab.accessor.wfs._1_1_0;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -26,7 +26,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,7 +45,7 @@ import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.GSSource;
@@ -403,7 +402,7 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	    }
 	}
 
-	online.setProtocol(NetProtocols.WFS_1_1_0.getCommonURN());
+	online.setProtocol(NetProtocolWrapper.WFS_1_1_0.getCommonURN());
 	online.setLinkage(href);
 	online.setName(featureName);
 	online.setFunctionCode("download");

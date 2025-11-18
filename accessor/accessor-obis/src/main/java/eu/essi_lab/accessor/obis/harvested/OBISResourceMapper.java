@@ -34,7 +34,7 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.lib.geo.BBOXUtils;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
@@ -198,7 +198,7 @@ public class OBISResourceMapper extends OriginalIdentifierMapper {
 		Online online = new Online();
 
 		online.setLinkage(url);
-		online.setProtocol(NetProtocols.HTTP.getCommonURN());
+		online.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 		online.setFunctionCode("information");
 		online.setDescription("GBIF integrated publishing tooolkit");
 
@@ -219,7 +219,7 @@ public class OBISResourceMapper extends OriginalIdentifierMapper {
 		Online online = new Online();
 
 		online.setLinkage(url);
-		online.setProtocol(NetProtocols.HTTP.getCommonURN());
+		online.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 		online.setFunctionCode("download");
 		online.setDescription("GBIF archive");
 

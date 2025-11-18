@@ -20,7 +20,7 @@ import eu.essi_lab.accessor.wof.client.datamodel.TimeSeriesResponseDocument;
 import eu.essi_lab.accessor.wof.client.datamodel.Value;
 import eu.essi_lab.downloader.ina.INADownloader;
 import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.data.CRS;
@@ -42,7 +42,7 @@ public class INADownloaderExternalTestIT {
 	online.setIdentifier("id1");
 	online.setLinkage(getEndpoint());
 	online.setName("parameter;INA:29;platform;alturas_bdhi:2");
-	online.setProtocol(NetProtocols.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN());
+	online.setProtocol(NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN());
 	dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution().addDistributionOnline(online);
 	downloader.setOnlineResource(dataset, "id1");
     }

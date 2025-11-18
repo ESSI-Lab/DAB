@@ -29,11 +29,10 @@ import org.json.JSONObject;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.sensorthings._1_1.model.UnitOfMeasurement;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Datastream;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Location;
@@ -268,6 +267,6 @@ public class BRGM_WQMapper extends SensorThingsMapper {
     @Override
     protected String getSupportedProtocol() {
 
-	return NetProtocols.SENSOR_THINGS_1_0_BRGM_WQ.getCommonURN();
+	return NetProtocolWrapper.SENSOR_THINGS_1_0_BRGM_WQ.getCommonURN();
     }
 }

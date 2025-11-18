@@ -28,14 +28,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
@@ -45,7 +41,7 @@ import eu.essi_lab.accessor.dinaguaws.client.DinaguaStation;
 import eu.essi_lab.accessor.dinaguaws.client.DinaguaValue;
 import eu.essi_lab.accessor.dinaguaws.client.JSONDinaguaClient;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -78,7 +74,7 @@ public class DinaguaDownloader extends WMLDataDownloader {
 
     @Override
     public boolean canDownload() {
-	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocols.DINAGUAWS.getCommonURN()));
+	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocolWrapper.DINAGUAWS.getCommonURN()));
     }
 
     @Override

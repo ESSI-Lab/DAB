@@ -30,7 +30,7 @@ import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
@@ -221,7 +221,7 @@ public class WML_1_1MapperTest {
 	Online online = metadata.getDistribution().getDistributionOnline();
 	Assert.assertEquals(identifier, online.getName());
 	Assert.assertEquals("", online.getLinkage());
-	Assert.assertEquals(NetProtocols.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(), online.getProtocol());
+	Assert.assertEquals(NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(), online.getProtocol());
 	Assert.assertEquals("download", online.getFunctionCode());
 
     }

@@ -45,7 +45,7 @@ import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
@@ -334,7 +334,7 @@ public class STACGranulesResultMapper extends OriginalIdentifierMapper {
 		    } else {
 
 			Online assetOnline = new Online();
-			assetOnline.setProtocol(NetProtocols.HTTP.getCommonURN());
+			assetOnline.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 			if (!s3ToHTTP.isEmpty()) {
 			    // assetOnline.setProtocol(NetProtocols.HTTP.getCommonURN());
 			    // assetOnline.setDescription("AWS Simple Storage Service (S3)");

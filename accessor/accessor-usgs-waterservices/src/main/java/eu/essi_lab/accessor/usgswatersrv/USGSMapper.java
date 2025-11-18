@@ -57,7 +57,7 @@ import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.jaxb.wms._1_3_0.Keyword;
 import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
@@ -472,7 +472,7 @@ public class USGSMapper extends OriginalIdentifierMapper {
 
 	    if (dataTypeCode != null && (dataTypeCode.equals("iv") || dataTypeCode.equals("uv") || dataTypeCode.equals("rt"))) {
 
-		protocol = NetProtocols.USGS_IV;
+		protocol = NetProtocolWrapper.USGS_IV.get();
 		linkage = USGSClient.DEFAULT_IV_URL;
 		mangler.setTimeSeries(timeSeriesId);
 		mangler.setParameterIdentifier(parameterCode);
@@ -482,7 +482,7 @@ public class USGSMapper extends OriginalIdentifierMapper {
 
 	    if (dataTypeCode != null && dataTypeCode.equals("dv")) {
 
-		protocol = NetProtocols.USGS_DV;
+		protocol = NetProtocolWrapper.USGS_DV.get();
 		linkage = USGSClient.DEFAULT_DV_URL;
 		mangler.setParameterIdentifier(parameterCode);
 		mangler.setStatisticalCode(statisticalCode);

@@ -40,7 +40,7 @@ import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -83,7 +83,7 @@ public class SavaHISDownloader extends DataDownloader {
 
     @Override
     public boolean canDownload() {
-	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocols.SAVAHIS.getCommonURN()));
+	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocolWrapper.SAVAHIS.getCommonURN()));
 
     }
 

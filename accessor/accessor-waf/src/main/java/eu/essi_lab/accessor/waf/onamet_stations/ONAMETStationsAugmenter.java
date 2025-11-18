@@ -23,7 +23,6 @@ package eu.essi_lab.accessor.waf.onamet_stations;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.lib.net.dirlisting.WAFClient;
 import eu.essi_lab.lib.net.dirlisting.WAF_URL;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -288,13 +287,13 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 	coreMetadata.addDistributionOnlineResource(//
 		ncFile.getName(), //
 		threddsURL + "fileServer/data/all/" + subFolder + ncFile.getName(), //
-		NetProtocols.HTTP.getCommonURN(), //
+		NetProtocolWrapper.HTTP.getCommonURN(), //
 		"download");
 
 	coreMetadata.addDistributionOnlineResource(//
 		ncFile.getName(), //
 		"https://thredds-data.s3.amazonaws.com/onametStations/" + ncFile.getName(), //
-		NetProtocols.HTTP.getCommonURN(), //
+		NetProtocolWrapper.HTTP.getCommonURN(), //
 		"download");
 
 	//

@@ -41,7 +41,7 @@ import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -349,7 +349,7 @@ public class HMFSConnector extends HarvestedQueryConnector<HMFSConnectorSetting>
 
 			String hmfsIdentifier = mangler.getMangling();
 
-			coreMetadata.addDistributionOnlineResource(hmfsIdentifier, getSourceURL(), NetProtocols.HMFS.getCommonURN(),
+			coreMetadata.addDistributionOnlineResource(hmfsIdentifier, getSourceURL(), NetProtocolWrapper.HMFS.getCommonURN(),
 				"download");
 
 			String resourceIdentifier = AbstractResourceMapper.generateCode(dataset, hmfsIdentifier);

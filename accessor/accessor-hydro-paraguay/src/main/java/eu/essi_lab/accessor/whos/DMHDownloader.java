@@ -38,7 +38,7 @@ import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -70,7 +70,7 @@ public class DMHDownloader extends WMLDataDownloader {
 
     @Override
     public boolean canDownload() {
-	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocols.DMH.getCommonURN()));
+	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocolWrapper.DMH.getCommonURN()));
     }
 
     @Override

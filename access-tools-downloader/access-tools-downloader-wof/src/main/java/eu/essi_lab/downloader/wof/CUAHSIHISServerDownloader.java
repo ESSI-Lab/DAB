@@ -35,7 +35,7 @@ import eu.essi_lab.accessor.wof.client.datamodel.SitesResponseDocument;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeries;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeriesResponseDocument;
 import eu.essi_lab.accessor.wof.utils.WOFIdentifierMangler;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -90,7 +90,7 @@ public class CUAHSIHISServerDownloader extends DataDownloader {
     public boolean canDownload() {
 
 	return (!online.getLinkage().contains("alerta.ina.gob.ar") && !online.getLinkage().contains("correo.ina.gob.ar")
-		&& online.getProtocol() != null && online.getProtocol().equals(NetProtocols.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN()));
+		&& online.getProtocol() != null && online.getProtocol().equals(NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN()));
 
     }
 

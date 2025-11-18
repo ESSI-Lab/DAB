@@ -50,7 +50,7 @@ import eu.essi_lab.accessor.hiscentral.lombardia.RendiDatiResult;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -83,7 +83,7 @@ public class HISCentralLombardiaDownloader extends WMLDataDownloader {
     @Override
     public boolean canDownload() {
 
-	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocols.ARPA_LOMBARDIA.getCommonURN()));
+	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocolWrapper.ARPA_LOMBARDIA.getCommonURN()));
 
     }
 
