@@ -32,6 +32,24 @@ import java.util.stream.Collectors;
 public class ConfigurationSimilarityTest {
 
     /**
+     * @author Fabrizio
+     */
+    public static class systemSettingConsumerAfterCleanFunction implements AfterCleanFunction {
+
+	/**
+	 *
+	 */
+	public systemSettingConsumerAfterCleanFunction() {
+
+	}
+
+	@Override
+	public void afterClean(Setting setting) {
+
+	}
+    }
+
+    /**
      * This modifier modifies all the properties of a SystemSetting.<br> These properties are excluded per default from the check, so in a
      * normal case, we expect a successful check as in {@link #systemSettingConsumerTest()}.<br> By including one or more property in the
      * check, we expect a failing check which involves that property
@@ -45,13 +63,7 @@ public class ConfigurationSimilarityTest {
 
 	    if (s.getSettingClass().equals(SystemSetting.class)) {
 
-		s.setAfterCleanFunction(new AfterCleanFunction() {
-
-		    @Override
-		    public void afterClean(Setting setting) {
-		    }
-		});
-
+		s.setAfterCleanFunction(new systemSettingConsumerAfterCleanFunction());
 		s.setCanBeCleaned(!s.canBeCleaned());
 		s.setCanBeDisabled(!s.canBeDisabled());
 		s.setCanBeRemoved(!s.canBeRemoved());
@@ -334,7 +346,24 @@ public class ConfigurationSimilarityTest {
     @Test
     public void inclusionTest12() {
 
-	inclusionTest(Setting.NAME, 1);
+	CheckResponse response = inclusionTest(Setting.NAME, 3);
+
+	List<Setting> settings = response.//
+		getSettings().//
+		stream().//
+		distinct().//
+		sorted((s1, s2) -> s1.getSettingClass().getSimpleName().compareTo(s2.getSettingClass().getSimpleName())).//
+		collect(Collectors.toList());
+
+	//
+	// the HarvestingSettingAfterCleanFunction modifies the setting name (line 159). since in the
+	// new setting selAccessorSetting.getGSSourceSetting().getSourceLabel() is null, the name of the
+	// new setting is removed, and it impacts on the test results
+	//
+
+	Assert.assertEquals(HarvestingSettingImpl.class, settings.get(0).getSettingClass());
+	Assert.assertEquals(HarvestingSettingImpl.class, settings.get(1).getSettingClass());
+	Assert.assertEquals(SystemSetting.class, settings.get(2).getSettingClass());
     }
 
     @Test
@@ -368,31 +397,7 @@ public class ConfigurationSimilarityTest {
     @Test
     public void inclusionTest15() {
 
-	CheckResponse response = inclusionTest(Setting.SHOW_HEADER, 5);
-
-	//
-	// 1 SystemSetting
-	// 3 Harvested/Mixed
-	// 1 Distributed
-	//
-
-	List<Setting> settings = response.//
-		getSettings().//
-		stream().//
-		distinct().//
-		sorted((s1, s2) -> s1.getSettingClass().getSimpleName().compareTo(s2.getSettingClass().getSimpleName())).//
-		collect(Collectors.toList());
-
-	//
-	// - the accessorsSetting of DistributionSetting has the showHeader property (opt.key, def:true)
-	// set to true (so the property key is hidden in accessorsSetting)
-	// - in the configuration, he accessorsSetting of DistributionSetting has the showHeader property set to false,
-	// so the property is visible with false value
-	// -> they differ for the showHeader property which is included in this test
-	// - the same for HarvestingSettingImpl and its sub-setting
-	//
-	Assert.assertEquals(DistributionSetting.class, settings.get(0).getSettingClass());
-	Assert.assertEquals(HarvestingSettingImpl.class, settings.get(1).getSettingClass());
+	inclusionTest(Setting.SHOW_HEADER, 1);
     }
 
     @Test
@@ -428,11 +433,11 @@ public class ConfigurationSimilarityTest {
 
 	CheckResponse response = method.check(configuration);
 
-	Assert.assertTrue(response.getCheckResult() == CheckResult.CHECK_FAILED);
+	Assert.assertSame(response.getCheckResult(), CheckResult.CHECK_FAILED);
 
 	Assert.assertEquals(matchesSize, response.getSettings().size());
 
-	response.getMessages().forEach(m -> System.out.println(m));
+	response.getMessages().forEach(System.out::println);
 
 	return response;
     }

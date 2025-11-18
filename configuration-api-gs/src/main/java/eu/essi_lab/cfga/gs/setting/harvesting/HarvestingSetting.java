@@ -152,11 +152,11 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	    //
 	    //
 
-	    AccessorSetting selecteAccessorSetting = thisSetting.getSelectedAccessorSetting();
+	    AccessorSetting selAccessorSetting = thisSetting.getSelectedAccessorSetting();
 
-	    selecteAccessorSetting.setShowHeader(false);
+	    selAccessorSetting.setShowHeader(false);
 
-	    thisSetting.setName(selecteAccessorSetting.getGSSourceSetting().getSourceLabel());
+	    thisSetting.setName(selAccessorSetting.getGSSourceSetting().getSourceLabel());
 
 	    //
 	    //
@@ -187,7 +187,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.HARVESTING.getIndex()).//
-		    withShowDirective("Harvesting", "With this tab you can handle the DAB brokered sources. Click \"Reload\" to"
+		    withShowDirective("Harvesting", "With this tab you can handle the DAB harvested sources. Click \"Reload\" to"
 		    + "update the scheduler information",SortDirection.ASCENDING).//
 
 		    withAddDirective(//

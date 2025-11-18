@@ -126,7 +126,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 
 	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.DISTRIBUTION.getIndex()).//
-		    withShowDirective("Distribution", SortDirection.ASCENDING).//
+		    withShowDirective("Distribution", "With this tab you can handle the DAB distributed sources", SortDirection.ASCENDING).//
 		    withAddDirective("Add distributed accessor", DistributionSetting.class).//
 		    withRemoveDirective("Remove accessor", true, DistributionSetting.class).//
 		    withEditDirective("Edit accessor", ConfirmationPolicy.ON_WARNINGS).//
