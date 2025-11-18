@@ -806,26 +806,56 @@ GIAPI.Common_UINode = function(options) {
 			content += '<td class="common-ui-node-report-content-table-right-td">';
 
 			var keywordGroups = {};
+			var keywordTypeArray = Array.isArray(report.keyword_type) ? report.keyword_type : null;
+			
+			// Process all keywords maintlaining index alignment with types
 			for (var i = 0; i < report.keyword.length; i++) {
-				var keywordValue = report.keyword[i];
+				var rawKeywordValue = report.keyword[i];
+				
+				// Get the corresponding type using the same index
+				var keywordType = null;
+				if (keywordTypeArray && i < keywordTypeArray.length) {
+					var rawType = keywordTypeArray[i];
+					if (rawType !== null && rawType !== undefined) {
+						keywordType = String(rawType).trim();
+						if (!keywordType) {
+							keywordType = null;
+						}
+					}
+				}
+				
+				// Process keyword value - only skip if truly invalid
+				if (rawKeywordValue === null || rawKeywordValue === undefined) {
+					continue;
+				}
+				
+				var keywordValue = String(rawKeywordValue).trim();
 				if (!keywordValue) {
 					continue;
 				}
-				var keywordType = null;
-				if (report.keyword_type && report.keyword_type.length > i) {
-					keywordType = report.keyword_type[i];
-				}
-				var groupKey = keywordType && keywordType.trim() ? keywordType.trim() : '__none__';
+				
+				// Group by type (preserving duplicates with same value but different types)
+				var groupKey = keywordType ? keywordType : '__none__';
 				if (!keywordGroups[groupKey]) {
 					keywordGroups[groupKey] = [];
 				}
+				// Add keyword value - duplicates are preserved if they have different types
 				keywordGroups[groupKey].push(keywordValue);
 			}
 
 			var groupKeys = Object.keys(keywordGroups);
 			groupKeys.sort(function(a, b) {
-				var labelA = a === '__none__' ? '' : a;
-				var labelB = b === '__none__' ? '' : b;
+				if (a === '__none__' && b === '__none__') {
+					return 0;
+				}
+				if (a === '__none__') {
+					return 1;
+				}
+				if (b === '__none__') {
+					return -1;
+				}
+				var labelA = a.toLowerCase();
+				var labelB = b.toLowerCase();
 				if (labelA < labelB) {
 					return -1;
 				}
