@@ -10,12 +10,12 @@ package eu.essi_lab.accessor.wfs._1_1_0;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -33,6 +33,7 @@ import java.util.UUID;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.namespace.QName;
 
 import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.Contact;
@@ -80,12 +81,11 @@ import net.opengis.wfs.v_1_1_0.WFSCapabilitiesType;
 public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 
     private static final String WMS_MAPPER_MAP_ERROR = "WMS_MAPPER_MAP_ERROR";
+    @XmlTransient
+    Downloader downloader = new Downloader();
 
     public WFS_1_1_0ResourceMapper() {
     }
-
-    @XmlTransient
-    Downloader downloader = new Downloader();
 
     @Override
     protected String createOriginalIdentifier(GSResource resource) {
@@ -96,9 +96,9 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 		    resource.getOriginalMetadata().//
 			    getMetadata().getBytes(StandardCharsets.UTF_8)));
 
-	    FeatureTypeType feature = ((WFSCapabilitiesType) jaxbElement.getValue()).getFeatureTypeList().getFeatureType().get(0);
+	    FeatureTypeType feature = ((WFSCapabilitiesType) jaxbElement.getValue()).getFeatureTypeList().getFeatureType().getFirst();
 
-	    return feature.getName().toString();
+	    return getFeatureName(feature);
 
 	} catch (Exception e) {
 
@@ -113,8 +113,8 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 
 	try {
 
-	    JAXBElement<?> jaxbElement = (JAXBElement<?>) WFS_1_1_0Connector.unmarshaller
-		    .unmarshal(new ByteArrayInputStream(originalMD.getMetadata().getBytes(StandardCharsets.UTF_8)));
+	    JAXBElement<?> jaxbElement = (JAXBElement<?>) WFS_1_1_0Connector.unmarshaller.unmarshal(
+		    new ByteArrayInputStream(originalMD.getMetadata().getBytes(StandardCharsets.UTF_8)));
 
 	    String endpoint = source.getEndpoint();
 
@@ -124,7 +124,7 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	    return resource;
 
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    throw GSException.createException( //
 		    getClass(), //
 		    e.getMessage(), //
@@ -143,15 +143,33 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	return CommonNameSpaceContext.WFS_1_1_0_NS_URI;
     }
 
+    public void setDownloader(Object object) {
+
+	this.downloader = null;
+    }
+
+    /**
+     * @param feature
+     * @return
+     */
+    private String getFeatureName(FeatureTypeType feature) {
+
+	QName qName = feature.getName();
+
+	String namespaceURI = qName.getNamespaceURI();
+
+	return namespaceURI == null ? qName.getLocalPart() : qName.getPrefix() + ":" + qName.getLocalPart();
+    }
+
     private GSResource mapResource(WFSCapabilitiesType capabilities, String sourceEndpoint) throws Exception {
 
 	MIMetadata metadata = new MIMetadata();
 
 	GSResource ret = new Dataset();
 
-	FeatureTypeType feature = capabilities.getFeatureTypeList().getFeatureType().get(0);
+	FeatureTypeType feature = capabilities.getFeatureTypeList().getFeatureType().getFirst();
 
-	String name = feature.getName().toString();
+	String featureName = getFeatureName(feature);
 
 	HarmonizedMetadata harmonizedMetadata = ret.getHarmonizedMetadata();
 	CoreMetadata coreMetadata = harmonizedMetadata.getCoreMetadata();
@@ -247,7 +265,7 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 		metadata.addReferenceSystemInfo(ref);
 	    }
 	} else {
-	    if (name != null) {
+	    if (featureName != null) {
 		System.err.println("No CRS specified for this layer: " + feature.getName().toString());
 	    }
 	}
@@ -255,10 +273,10 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	DataIdentification identification = new DataIdentification();
 
 	String id;
-	if (name == null || name.isEmpty()) {
+	if (featureName == null || featureName.isEmpty()) {
 	    id = UUID.randomUUID().toString();
 	} else {
-	    id = name;
+	    id = featureName;
 	}
 
 	identification.setResourceIdentifier(id);
@@ -328,16 +346,14 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	    List<Operation> operations = operationsMetadata.getOperation();
 	    if (operations != null) {
 		for (Operation operation : operations) {
-		    if (operation.getName() != null && operation.getName().toLowerCase().equals("getfeature")) {
+		    if (operation.getName() != null && operation.getName().equalsIgnoreCase("getfeature")) {
 			List<DCP> dcps = operation.getDCP();
 			if (dcps != null) {
-			    DCP dcp = dcps.get(0);
+			    DCP dcp = dcps.getFirst();
 			    HTTP http = dcp.getHTTP();
 			    List<JAXBElement<RequestMethodType>> gps = http.getGetOrPost();
 			    if (gps != null) {
-				Iterator<JAXBElement<RequestMethodType>> iterator = gps.iterator();
-				while (iterator.hasNext()) {
-				    JAXBElement<RequestMethodType> gp = iterator.next();
+				for (JAXBElement<RequestMethodType> gp : gps) {
 				    href = gp.getValue().getHref();
 				}
 			    }
@@ -389,7 +405,7 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 
 	online.setProtocol(NetProtocols.WFS_1_1_0.getCommonURN());
 	online.setLinkage(href);
-	online.setName(feature.getName().toString());
+	online.setName(featureName);
 	online.setFunctionCode("download");
 	online.setIdentifier(uuid);
 
@@ -400,11 +416,6 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	// TODO: MetadataURL support missing
 
 	return ret;
-
-    }
-
-    public void setDownloader(Object object) {
-	this.downloader = null;
 
     }
 

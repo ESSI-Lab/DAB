@@ -302,28 +302,28 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 
 	    if (var != null) {
 		if (paramCode.equals("TCI")) {
-		    varPath = "getDataTCI";
+		    varPath = "misure/meteo/getDataTCI";
 		}
 		if (paramCode.equals("P1H")) {
-		    varPath = "getDataP1H";
+		    varPath = "misure/meteo/getDataP1H";
 		}
 		if (paramCode.equals("LIT")) {
-		    varPath = "getDataLIT";
+		    varPath = "misure/idro/getDataLIT";
 		}
 		if (paramCode.equals("QIT")) {
-		    varPath = "getDataQIT";
+		    varPath = "misure/idro/getDataQIT";
 		}
 		if (paramCode.equals("UCI")) {
-		    varPath = "getDataUCI";
+		    varPath = "misure/meteo/getDataUCI";
 		}
 		if (paramCode.equals("VAI")) {
-		    varPath = "getDataVAI";
+		    varPath = "misure/meteo/getDataVAI";
 		}
 		if (paramCode.equals("DVI")) {
-		    varPath = "getDataDVI";
+		    varPath = "misure/meteo/getDataDVI";
 		}
 		if (paramCode.equals("RGI")) {
-		    varPath = "getDataRGI";
+		    varPath = "misure/meteo/getDataRGI";
 		}
 	    }
 

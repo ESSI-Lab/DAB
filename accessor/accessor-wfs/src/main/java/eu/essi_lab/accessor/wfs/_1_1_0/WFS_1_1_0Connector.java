@@ -10,12 +10,12 @@ package eu.essi_lab.accessor.wfs._1_1_0;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -69,7 +69,7 @@ public class WFS_1_1_0Connector extends WFSConnector {
     private WFSCapabilitiesType capabilities;
 
     /**
-     * 
+     *
      */
     public static final String TYPE = "WFS Connector 1.1.0";
 
@@ -93,7 +93,7 @@ public class WFS_1_1_0Connector extends WFSConnector {
     }
 
     /**
-     * 
+     *
      */
     public WFS_1_1_0Connector() {
 
@@ -124,22 +124,32 @@ public class WFS_1_1_0Connector extends WFSConnector {
 	if (resumptionToken == null) {
 
 	    if (featureList.isEmpty() || featureList.size() == 1) {
+
 		nextResumptionToken = null;
+
 	    } else {
+
 		nextResumptionToken = "1";
 	    }
+
 	    if (!featureList.isEmpty()) {
+
 		featureType = featureList.get(0);
 	    }
 
 	} else {
 
 	    try {
+
 		Integer index = Integer.parseInt(resumptionToken);
+
 		featureType = featureList.get(index);
+
 		if (featureList.size() > (index + 1)) {
+
 		    nextResumptionToken = "" + (index + 1);
 		}
+
 	    } catch (Exception e) {
 		throw GSException.createException( //
 			getClass(), //
@@ -152,17 +162,22 @@ public class WFS_1_1_0Connector extends WFSConnector {
 	}
 
 	if (getSourceURL().contains("147.102.5.93") && featureType != null && isApprovedNamespace(featureType.getName().getPrefix())) {
+
 	    skip = true;// featureType.getName()
 	}
 
 	emptyCapabilities.getValue().getFeatureTypeList().getFeatureType().add(featureType);
 
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
 	try {
 	    marshaller.marshal(emptyCapabilities, baos);
+
 	} catch (Exception e) {
+
 	    GSLoggerFactory.getLogger(getClass()).error("Can't marshal empty capabilities", e);
 	}
+
 	String metadata = new String(baos.toByteArray());
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
@@ -178,10 +193,17 @@ public class WFS_1_1_0Connector extends WFSConnector {
 	    response.addRecord(metadataRecord);
 	}
 
+	if (nextResumptionToken != null && Integer.parseInt(nextResumptionToken) >= getSetting().getMaxRecords()
+		.orElse(Integer.MAX_VALUE)) {
+
+	    nextResumptionToken = null;
+
+	    GSLoggerFactory.getLogger(getClass()).info("Max records of {} reached, exit", getSetting().getMaxRecords().get());
+	}
+
 	response.setResumptionToken(nextResumptionToken);
 
 	return response;
-
     }
 
     protected WFSCapabilitiesType retrieveCapabilities() throws GSException {
@@ -369,8 +391,8 @@ public class WFS_1_1_0Connector extends WFSConnector {
     }
 
     private boolean isApprovedNamespace(String layerName) {
-	return layerName != null && !layerName.equals("")
-		&& (!(layerName.contains("geomesa") || layerName.contains("kifisos") || layerName.contains("danube")));
+	return layerName != null && !layerName.equals("") && (!(layerName.contains("geomesa") || layerName.contains("kifisos")
+		|| layerName.contains("danube")));
     }
 
     @Override
