@@ -1,5 +1,6 @@
 package eu.essi_lab.lib.net.protocols.test;
 
+import eu.essi_lab.lib.net.protocols.impl.WCS_1_0_0Protocol;
 import org.junit.Test;
 
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
@@ -35,5 +36,8 @@ public class NetProtocolWrapperTest {
 	assertTrue(bool2);
 	assertTrue(bool3);
 	assertFalse(bool4);
+
+	assertSame(NetProtocolWrapper.WCS_1_0_0.getCommonURN(), new WCS_1_0_0Protocol().getCommonURN());
+	assertSame(NetProtocolWrapper.get("OGC:WCS-1.0-http-get").get().getCommonURN(), new WCS_1_0_0Protocol().getCommonURN());
     }
 }
