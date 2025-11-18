@@ -142,7 +142,7 @@ public enum NetProtocolWrapper {
      */
     public static boolean check(String protocol, NetProtocolWrapper wrapper){
 
-	return NetProtocolWrapper.of(protocol).//
+	return NetProtocolWrapper.get(protocol).//
 		map(p -> wrapper.get().equals(p)).//
 		orElse(false);
     }
@@ -151,7 +151,7 @@ public enum NetProtocolWrapper {
      * @param identifier
      * @return
      */
-    public static Optional<NetProtocolWrapper> value(String identifier) {
+    public static Optional<NetProtocolWrapper> of(String identifier) {
 
 	return Arrays.stream(NetProtocolWrapper.values()).//
 		filter(np -> Arrays.asList(np.get().getURNs()).contains(identifier)).//
@@ -162,8 +162,8 @@ public enum NetProtocolWrapper {
      * @param identifier
      * @return
      */
-    public static Optional<NetProtocol> of(String identifier) {
+    public static Optional<NetProtocol> get(String identifier) {
 
-	return value(identifier).map(NetProtocolWrapper::get);
+	return of(identifier).map(NetProtocolWrapper::get);
     }
 }

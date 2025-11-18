@@ -15,13 +15,13 @@ public class NetProtocolWrapperTest {
     @Test
     public void test() {
 
-	assertEquals(NetProtocolWrapper.WCS_1_0_0.get(), NetProtocolWrapper.of("urn:ogc:serviceType:WebCoverageService:1.0.0:HTTP").get());
+	assertEquals(NetProtocolWrapper.WCS_1_0_0.get(), NetProtocolWrapper.get("urn:ogc:serviceType:WebCoverageService:1.0.0:HTTP").get());
 
-	assertEquals(NetProtocolWrapper.WCS_1_0_0.get(), NetProtocolWrapper.of("OGC:WCS-1.0-http-get").get());
+	assertEquals(NetProtocolWrapper.WCS_1_0_0.get(), NetProtocolWrapper.get("OGC:WCS-1.0-http-get").get());
 
-	assertEquals(NetProtocolWrapper.WCS_1_0_0.get(), NetProtocolWrapper.of("OGC:WCS-1.0.0-http-get-coverage").get());
+	assertEquals(NetProtocolWrapper.WCS_1_0_0.get(), NetProtocolWrapper.get("OGC:WCS-1.0.0-http-get-coverage").get());
 
-	assertTrue(NetProtocolWrapper.of("OGC:WCS-500.0.0-http-get-coverage").isEmpty());
+	assertTrue(NetProtocolWrapper.get("OGC:WCS-500.0.0-http-get-coverage").isEmpty());
 
 	boolean bool1 = NetProtocolWrapper.check("urn:ogc:serviceType:WebMapService:1.1.1:HTTP", NetProtocolWrapper.WMS_1_1_1);
 
