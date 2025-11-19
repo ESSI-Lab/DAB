@@ -46,13 +46,13 @@ public abstract class WCSDownloader_EOXTest extends WCSDownloader_Test {
 
 	NetProtocol protocol = getProtocol();
 
-	if (protocol.equals(NetProtocolWrapper.WCS_2_0_1)) {
+	if (protocol.equals(NetProtocolWrapper.WCS_2_0_1.get())) {
 	    // different values are found in the 2.0.1 description document!
 	    res1 = -0.027930; // rounded
 	    res2 = 0.027921; // rounded
 	    origin1 = -3.600661;
 	    origin2 = -55.398079;// rounded
-	} else if (protocol.equals(NetProtocolWrapper.WCS_1_1_1)) {
+	} else if (protocol.equals(NetProtocolWrapper.WCS_1_1_1.get())) {
 	    // different grid origin found in the 1.1.1 description document!
 	    origin1 = -3.61462610292096;
 	    origin2 = -55.3841183289985;

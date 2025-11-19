@@ -131,11 +131,11 @@ public abstract class WCSDownloader_Test {
     protected void initMockedDownloader(WCSMockedDownloader mock) {
 
 	NetProtocol protocol = getProtocol();
-	if (protocol.equals(NetProtocolWrapper.WCS_1_0_0)) {
+	if (protocol.equals(NetProtocolWrapper.WCS_1_0_0.get())) {
 	   this.downloader = new WCSMockedDownloader_100(mock);
-	} else if (protocol.equals(NetProtocolWrapper.WCS_1_1_1)) {
+	} else if (protocol.equals(NetProtocolWrapper.WCS_1_1_1.get())) {
 	    this.downloader = new WCSMockedDownloader_111(mock);
-	} else if (protocol.equals(NetProtocolWrapper.WCS_2_0_1)) {
+	} else if (protocol.equals(NetProtocolWrapper.WCS_2_0_1.get())) {
 	    this.downloader = new WCSMockedDownloader_201(mock);
 	} else {
 	    fail();
