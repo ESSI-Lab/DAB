@@ -58,7 +58,7 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.TransferOptions;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StreamUtils;
 import eu.essi_lab.lib.xml.atom.CustomEntry;
@@ -891,7 +891,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    if (simpleOnline.getProtocol() != null) {
 
 			if (simpleOnline.getProtocol().contains("WMS-1.3.0")
-				|| simpleOnline.getProtocol().equals(NetProtocols.WMS_1_3_0.getCommonURN())) {
+				|| simpleOnline.getProtocol().equals(NetProtocolWrapper.WMS_1_3_0.getCommonURN())) {
 
 			    simpleOnline.setProtocol(CommonNameSpaceContext.WMS_1_3_0_NS_URI + ":HTTP");
 			    simpleOnline.setDescriptionGmxAnchor(AccessType.COMPLEX_ACCESS.getDescriptionAnchor());
@@ -899,7 +899,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 			if (simpleOnline.getProtocol().contains("WMS-1.1.0") || simpleOnline.getProtocol().contains("WMS-1.1.1")
 				|| simpleOnline.getProtocol().contains("OGC:WMS")
-				|| simpleOnline.getProtocol().equals(NetProtocols.WMS_1_1_1.getCommonURN())) {
+				|| simpleOnline.getProtocol().equals(NetProtocolWrapper.WMS_1_1_1.getCommonURN())) {
 			    simpleOnline.setProtocol(CommonNameSpaceContext.WMS_1_1_1_NS_URI + ":HTTP");
 			    simpleOnline.setDescriptionGmxAnchor(AccessType.COMPLEX_ACCESS.getDescriptionAnchor());
 			}

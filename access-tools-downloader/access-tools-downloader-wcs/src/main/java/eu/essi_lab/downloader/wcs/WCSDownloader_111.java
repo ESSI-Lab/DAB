@@ -36,8 +36,7 @@ import com.google.common.collect.Lists;
 
 import eu.essi_lab.accessor.wcs.WCSConnector;
 import eu.essi_lab.accessor.wcs_1_1_1.WCSConnector_111;
-import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
@@ -69,9 +68,7 @@ public class WCSDownloader_111 extends WCSDownloader {
     @Override
     public boolean canDownload() {
 
-	NetProtocol protocol = NetProtocols.decodeFromIdentifier(online.getProtocol());
-
-	return NetProtocols.WCS_1_1_1.equals(protocol);
+	return NetProtocolWrapper.check(online.getProtocol(),NetProtocolWrapper.WCS_1_1_1);
     }
 
     public String getVersionParameter() {
@@ -133,8 +130,8 @@ public class WCSDownloader_111 extends WCSDownloader {
 	    crsNodes = coverage.evaluateNodes("*:CoverageDescriptions/*:CoverageDescription/*:SupportedCRS");
 	    if (crsNodes.length == 0) {
 		// fall back
-		crsNodes = coverage
-			.evaluateNodes("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS/*:GridBaseCRS");
+		crsNodes = coverage.evaluateNodes(
+			"*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS/*:GridBaseCRS");
 	    }
 	} catch (XPathExpressionException e) {
 	    return crses;
@@ -155,7 +152,7 @@ public class WCSDownloader_111 extends WCSDownloader {
     @Override
     protected String getCoverageName(XMLDocumentReader coverage) {
 	try {
-//	    return coverage.evaluateString("*:CoverageDescription/*:CoverageOffering/*:name");
+	    //	    return coverage.evaluateString("*:CoverageDescription/*:CoverageOffering/*:name");
 	    return coverage.evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:Identifier");
 	} catch (XPathExpressionException e) {
 	    return null;
@@ -164,8 +161,8 @@ public class WCSDownloader_111 extends WCSDownloader {
 
     private String retrieveBBOXCrsIdentifier(XMLDocumentReader coverage, CRS crs) {
 	try {
-	    Node[] bboxCrsNodes = coverage
-		    .evaluateNodes("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox/@crs");
+	    Node[] bboxCrsNodes = coverage.evaluateNodes(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox/@crs");
 	    for (Node bboxCrsNode : bboxCrsNodes) {
 		String bboxCrsString = coverage.evaluateString(bboxCrsNode, ".");
 		CRS tmpCRS = CRS.fromIdentifier(bboxCrsString);
@@ -187,9 +184,9 @@ public class WCSDownloader_111 extends WCSDownloader {
 	}
 	String lowerCorner;
 	try {
-	    lowerCorner = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox[@crs='"
-			    + identifier + "']/*:LowerCorner");
+	    lowerCorner = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox[@crs='" + identifier
+			    + "']/*:LowerCorner");
 	} catch (XPathExpressionException e) {
 	    return null;
 	}
@@ -205,9 +202,9 @@ public class WCSDownloader_111 extends WCSDownloader {
 	}
 	String lowerCorner;
 	try {
-	    lowerCorner = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox[@crs='"
-			    + identifier + "']/*:LowerCorner");
+	    lowerCorner = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox[@crs='" + identifier
+			    + "']/*:LowerCorner");
 	} catch (XPathExpressionException e) {
 	    return null;
 	}
@@ -223,9 +220,9 @@ public class WCSDownloader_111 extends WCSDownloader {
 	}
 	String upperCorner;
 	try {
-	    upperCorner = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox[@crs='"
-			    + identifier + "']/*:UpperCorner");
+	    upperCorner = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox[@crs='" + identifier
+			    + "']/*:UpperCorner");
 	} catch (XPathExpressionException e) {
 	    return null;
 	}
@@ -241,9 +238,9 @@ public class WCSDownloader_111 extends WCSDownloader {
 	}
 	String upperCorner;
 	try {
-	    upperCorner = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox[@crs='"
-			    + identifier + "']/*:UpperCorner");
+	    upperCorner = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox[@crs='" + identifier
+			    + "']/*:UpperCorner");
 	} catch (XPathExpressionException e) {
 	    return null;
 	}
@@ -280,9 +277,9 @@ public class WCSDownloader_111 extends WCSDownloader {
 
 	Node gridCRSNode;
 	try {
-	    gridCRSNode = coverage
-		    .evaluateNode("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS[*:GridBaseCRS='"
-			    + crs.getIdentifier() + "']");
+	    gridCRSNode = coverage.evaluateNode(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS[*:GridBaseCRS='" + crs.getIdentifier()
+			    + "']");
 	} catch (XPathExpressionException e) {
 	    return "";
 	}
@@ -308,9 +305,9 @@ public class WCSDownloader_111 extends WCSDownloader {
 	String identifier = retrieveBBOXCrsIdentifier(coverage, crs);
 	String origin = null;
 	try {
-	    origin = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS[*:GridBaseCRS='"
-			    + identifier + "']/*:GridOrigin");
+	    origin = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS[*:GridBaseCRS='" + identifier
+			    + "']/*:GridOrigin");
 	} catch (XPathExpressionException e) {
 	}
 
@@ -358,8 +355,8 @@ public class WCSDownloader_111 extends WCSDownloader {
 	    String gridResolution = "";
 	    String gridType = null;
 	    try {
-		gridType = coverage
-			.evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS/*:GridType");
+		gridType = coverage.evaluateString(
+			"*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS/*:GridType");
 	    } catch (XPathExpressionException e) {
 	    }
 	    if (gridType != null && gridType.toLowerCase().contains("2dsimplegrid")) {
@@ -404,7 +401,7 @@ public class WCSDownloader_111 extends WCSDownloader {
 
     /**
      * Return a list of resolutions from the coverage description. Multiline resolutions are put on a single line.
-     * 
+     *
      * @param coverage
      * @param crs
      * @return
@@ -414,8 +411,8 @@ public class WCSDownloader_111 extends WCSDownloader {
 
 	String dimensionString;
 	try {
-	    dimensionString = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox/@dimensions");
+	    dimensionString = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox/@dimensions");
 	} catch (XPathExpressionException e) {
 	    return resolutions;
 	}
@@ -425,8 +422,8 @@ public class WCSDownloader_111 extends WCSDownloader {
 
 	String offsetVectors;
 	try {
-	    offsetVectors = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS/*:GridOffsets");
+	    offsetVectors = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS/*:GridOffsets");
 	} catch (XPathExpressionException e) {
 	    return resolutions;
 	}
@@ -447,8 +444,8 @@ public class WCSDownloader_111 extends WCSDownloader {
     protected List<Double> getResolutions(XMLDocumentReader coverage, CRS crs) {
 	String gridType = null;
 	try {
-	    gridType = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS/*:GridType");
+	    gridType = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS/*:GridType");
 	} catch (XPathExpressionException e) {
 	}
 
@@ -483,7 +480,8 @@ public class WCSDownloader_111 extends WCSDownloader {
 	    int dimensions = (int) Math.round(Math.sqrt(originalGridResolutions.size()));
 
 	    int position = 0;
-	    firstFor: for (int i = 0; i < originalGridResolutions.size(); i += dimensions) {
+	    firstFor:
+	    for (int i = 0; i < originalGridResolutions.size(); i += dimensions) {
 		for (int j = 0; j < dimensions; j++) {
 		    Double res = originalGridResolutions.get(i + j);
 		    if (j == position) {

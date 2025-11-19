@@ -38,7 +38,7 @@ import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.VerticalCRS;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.EntityRef;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.SensorThingsRequest;
 import eu.essi_lab.lib.sensorthings._1_1.client.response.AddressableEntityResult;
@@ -693,6 +693,6 @@ public class HydroServer2Mapper extends SensorThingsMapper {
     @Override
     protected String getSupportedProtocol() {
 
-	return NetProtocols.SENSOR_THINGS_1_1_HYDRO_SERVER_2.getCommonURN();
+	return NetProtocolWrapper.SENSOR_THINGS_1_1_HYDRO_SERVER_2.getCommonURN();
     }
 }

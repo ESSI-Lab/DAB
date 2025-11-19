@@ -46,7 +46,7 @@ import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
@@ -406,7 +406,7 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 				String identifier = mangler.getMangling();
 
 				coreMetadata.addDistributionOnlineResource(identifier, getSourceURL(),
-						NetProtocols.ARPA_LOMBARDIA.getCommonURN(), "download");
+						NetProtocolWrapper.ARPA_LOMBARDIA.getCommonURN(), "download");
 
 				String resourceIdentifier = AbstractResourceMapper.generateCode(dataset, identifier);
 

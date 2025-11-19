@@ -22,18 +22,22 @@ package eu.essi_lab.accessor.wfs._1_1_0;
  */
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.namespace.QName;
+import javax.xml.xpath.XPathExpressionException;
 
 import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.Contact;
@@ -44,11 +48,13 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
+import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -73,7 +79,9 @@ import net.opengis.ows.v_1_0_0.ServiceProvider;
 import net.opengis.ows.v_1_0_0.TelephoneType;
 import net.opengis.ows.v_1_0_0.WGS84BoundingBoxType;
 import net.opengis.wfs.v_1_1_0.FeatureTypeType;
+import net.opengis.wfs.v_1_1_0.ObjectFactory;
 import net.opengis.wfs.v_1_1_0.WFSCapabilitiesType;
+import org.xml.sax.SAXException;
 
 /**
  * @author boldrini
@@ -152,15 +160,27 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
      * @param feature
      * @return
      */
-    private String getFeatureName(FeatureTypeType feature) {
+    private String getFeatureName(FeatureTypeType feature) throws XPathExpressionException, JAXBException, IOException, SAXException {
 
-	QName qName = feature.getName();
+	ObjectFactory factory = new ObjectFactory();
 
-	String namespaceURI = qName.getNamespaceURI();
+	JAXBElement<FeatureTypeType> type = new JAXBElement<FeatureTypeType>(feature.getName(), FeatureTypeType.class, null, feature);
 
-	return namespaceURI == null ? qName.getLocalPart() : qName.getPrefix() + ":" + qName.getLocalPart();
+	ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+	WFS_1_1_0Connector.marshaller.marshal(type, stream);
+
+	XMLDocumentReader reader = new XMLDocumentReader(stream.toString(StandardCharsets.UTF_8));
+
+	return reader.evaluateTextContent("//*:Name/text()").getFirst();
     }
 
+    /**
+     * @param capabilities
+     * @param sourceEndpoint
+     * @return
+     * @throws Exception
+     */
     private GSResource mapResource(WFSCapabilitiesType capabilities, String sourceEndpoint) throws Exception {
 
 	MIMetadata metadata = new MIMetadata();
@@ -403,7 +423,7 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	    }
 	}
 
-	online.setProtocol(NetProtocols.WFS_1_1_0.getCommonURN());
+	online.setProtocol(NetProtocolWrapper.WFS_1_1_0.getCommonURN());
 	online.setLinkage(href);
 	online.setName(featureName);
 	online.setFunctionCode("download");

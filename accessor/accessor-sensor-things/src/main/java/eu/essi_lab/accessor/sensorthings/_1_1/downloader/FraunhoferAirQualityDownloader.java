@@ -23,7 +23,7 @@ package eu.essi_lab.accessor.sensorthings._1_1.downloader;
 
 import org.json.JSONArray;
 
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 
 /**
  * @author Fabrizio
@@ -32,7 +32,7 @@ public class FraunhoferAirQualityDownloader extends SensorThingsDownloader {
 
     public String getSupportedProtocol() {
 
-	return NetProtocols.SENSOR_THINGS_1_1_FRAUNHOFER_AIR_QUALITY.getCommonURN();
+	return NetProtocolWrapper.SENSOR_THINGS_1_1_FRAUNHOFER_AIR_QUALITY.getCommonURN();
     }
 
     /**

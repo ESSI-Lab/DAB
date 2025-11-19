@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -50,7 +49,7 @@ import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
@@ -566,7 +565,7 @@ public class ICOSMapper extends FileIdentifierMapper {
 	    if (accessUrl != null) {
 		Online online = new Online();
 		online.setLinkage(accessUrl);
-		online.setProtocol(NetProtocols.HTTP.getCommonURN());
+		online.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 		online.setFunctionCode("download");
 		online.setDescription("ICOS Portal Download Page");
 		coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);

@@ -51,23 +51,15 @@ import eu.essi_lab.jaxb.sos._2_0.om__2.OMObservationType;
 import eu.essi_lab.jaxb.sos._2_0.om__2.ObjectFactory;
 import eu.essi_lab.jaxb.sos._2_0.swes_2.AbstractContentsType.Offering;
 import eu.essi_lab.jaxb.sos.factory.JAXBSOS;
-import eu.essi_lab.jaxb.wml._2_0.MeasureTVPType;
-import eu.essi_lab.jaxb.wml._2_0.MeasureType;
 import eu.essi_lab.jaxb.wml._2_0.MeasurementTimeseriesType;
 import eu.essi_lab.jaxb.wml._2_0.TVPDefaultMetadataPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.TVPMeasurementMetadataType;
 import eu.essi_lab.jaxb.wml._2_0.TVPMetadataType;
-import eu.essi_lab.jaxb.wml._2_0.MeasurementTimeseriesType.Point;
-import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.AbstractTimeObjectType;
-import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.TimeInstantType;
-import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.TimePeriodType;
-import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.TimePositionType;
 import eu.essi_lab.jaxb.wml._2_0.om__2.Result;
-import eu.essi_lab.jaxb.wml._2_0.om__2.TimeObjectPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.swe._2.UnitReference;
 import eu.essi_lab.jaxb.sos._2_0.swes_2.AbstractOfferingType;
 import eu.essi_lab.jaxb.sos._2_0.swes_2.DescribeSensorResponseType;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
@@ -102,7 +94,7 @@ public class SOSBOMConnector extends SOSConnector {
     }
 
     public String getDownloadProtocol() {
-	return NetProtocols.SOS_2_0_0_BOM.getCommonURN();
+	return NetProtocolWrapper.SOS_2_0_0_BOM.getCommonURN();
     }
 
     @Override

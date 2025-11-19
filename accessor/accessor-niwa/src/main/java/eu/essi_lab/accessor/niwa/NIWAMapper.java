@@ -36,7 +36,7 @@ import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -243,7 +243,7 @@ public class NIWAMapper extends FileIdentifierMapper {
 	    coreMetadata.addDistributionOnlineResource(//
 		    identifier, //
 		    source.getEndpoint(), //
-		    NetProtocols.NIWA.getCommonURN(), //
+		    NetProtocolWrapper.NIWA.getCommonURN(), //
 		    "download");
 
 	    String resourceIdentifier = AbstractResourceMapper.generateCode(dataset, identifier);

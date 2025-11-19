@@ -39,7 +39,7 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.VerticalCRS;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -313,7 +313,7 @@ public class SavaHISMapper extends OriginalIdentifierMapper {
 
 	    String identifier = mangler.getMangling(); // Old: platformIdentifier + ";" + parameterIdentifier;
 
-	    coreMetadata.addDistributionOnlineResource(identifier, source.getEndpoint(), NetProtocols.SAVAHIS.getCommonURN(), "download");
+	    coreMetadata.addDistributionOnlineResource(identifier, source.getEndpoint(), NetProtocolWrapper.SAVAHIS.getCommonURN(), "download");
 
 	    Online downloadOnline = coreMetadata.getOnline();
 

@@ -94,6 +94,7 @@ public class CommonContext {
 		    eu.essi_lab.jaxb.org.purl.dc.terms.ObjectFactory.class, // Dublin Core terms
 		    net.opengis.gml.v_3_2_0.ObjectFactory.class, // GML 3.2.0
 
+		    ObjectFactories.WFS().getClass(), //
 		    ObjectFactories.GCO().getClass(), //
 		    ObjectFactories.GMD().getClass(), //
 		    ObjectFactories.GMX().getClass(), //

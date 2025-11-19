@@ -21,7 +21,7 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
@@ -29,7 +29,7 @@ import eu.essi_lab.model.resource.HarmonizedMetadata;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import junit.framework.TestCase;
 
-public class WFS_1_1_0ResourceMapperTest {
+public class WFS_1_1_0ResourceMapperExternalTestIT {
 
     private WFS_1_1_0ResourceMapper mapper;
 
@@ -41,9 +41,12 @@ public class WFS_1_1_0ResourceMapperTest {
 
     @Test
     public void testMapperFromExample() throws Exception {
-	InputStream stream = WFS_1_1_0ResourceMapperTest.class.getClassLoader().getResourceAsStream("geoss-132-sedac-capabilities-single.xml");
+
+	InputStream stream = WFS_1_1_0ResourceMapperExternalTestIT.class.getClassLoader()
+		.getResourceAsStream("geoss-132-sedac-capabilities-single.xml");
 
 	TestCase.assertNotNull(stream);
+
 	String string = IOUtils.toString(stream);
 	stream.close();
 
@@ -57,7 +60,6 @@ public class WFS_1_1_0ResourceMapperTest {
 	gsSource.setEndpoint(sourceUrl);
 	GSResource resource = mapper.map(originalMD, gsSource);
 
-
 	HarmonizedMetadata result = resource.getHarmonizedMetadata();
 
 	TestCase.assertNotNull(result);
@@ -66,8 +68,7 @@ public class WFS_1_1_0ResourceMapperTest {
 
 	MIMetadata metadata = core.getMIMetadata();
 
-	TestCase.assertEquals("{http://sedac.ciesin.columbia.edu/data/collection/superfund}superfund-atsdr-hazardous-waste-site-v2", 
-		resource.getOriginalId().get());
+	TestCase.assertEquals("superfund-atsdr-hazardous-waste-site-v2", resource.getOriginalId().get());
 	TestCase.assertEquals(null, metadata.getLanguage());
 	TestCase.assertEquals(null, metadata.getCharacterSetCode());
 	TestCase.assertEquals(null, metadata.getHierarchyLevelScopeCodeListValue());
@@ -79,17 +80,17 @@ public class WFS_1_1_0ResourceMapperTest {
 	ResponsibleParty metadataContact = metadata.getContacts().next();
 	TestCase.assertEquals("CIESIN, Columbia University", metadataContact.getOrganisationName());
 	Contact contactInfo = metadataContact.getContact();
-//	TestCase.assertEquals("+34 93 581 29 85", contactInfo.getPhoneVoices().next());
-//	TestCase.assertEquals("+34 93 581 13 21", contactInfo.getPhoneFaxList().next());
+	//	TestCase.assertEquals("+34 93 581 29 85", contactInfo.getPhoneVoices().next());
+	//	TestCase.assertEquals("+34 93 581 13 21", contactInfo.getPhoneFaxList().next());
 	Address address = contactInfo.getAddress();
-//	TestCase.assertEquals("Fac. Ciencias. Universidad Autónoma de Barcelona", address.getDeliveryPoint());
-//	TestCase.assertEquals("Bellaterra", address.getCity());
-//	TestCase.assertEquals("08193", address.getPostalCode());
-//	TestCase.assertEquals("España", address.getCountry());
+	//	TestCase.assertEquals("Fac. Ciencias. Universidad Autónoma de Barcelona", address.getDeliveryPoint());
+	//	TestCase.assertEquals("Bellaterra", address.getCity());
+	//	TestCase.assertEquals("08193", address.getPostalCode());
+	//	TestCase.assertEquals("España", address.getCountry());
 	TestCase.assertEquals("ciesin.info@ciesin.columbia.edu", address.getElectronicMailAddress());
-//	Online contactOnline = contactInfo.getOnline();
-//	TestCase.assertEquals("http://www.creaf.uab.es", contactOnline.getLinkage());
-//	TestCase.assertEquals(null, metadataContact.getRoleCode());
+	//	Online contactOnline = contactInfo.getOnline();
+	//	TestCase.assertEquals("http://www.creaf.uab.es", contactOnline.getLinkage());
+	//	TestCase.assertEquals(null, metadataContact.getRoleCode());
 
 	TestCase.assertEquals(null, metadata.getDateStamp());
 	TestCase.assertEquals(null, metadata.getMetadataStandardName());
@@ -115,15 +116,16 @@ public class WFS_1_1_0ResourceMapperTest {
 	TestCase.assertEquals(null, dataIdentification.getCitationAlternateTitle());
 	TestCase.assertEquals(null, dataIdentification.getCitationRevisionDate());
 
-	TestCase.assertEquals("{http://sedac.ciesin.columbia.edu/data/collection/superfund}superfund-atsdr-hazardous-waste-site-v2", dataIdentification.getResourceIdentifier());
+	TestCase.assertEquals("{http://sedac.ciesin.columbia.edu/data/collection/superfund}superfund-atsdr-hazardous-waste-site-v2",
+		dataIdentification.getResourceIdentifier());
 
 	ResponsibleParty originator = dataIdentification.getPointOfContact("custodian");
 
-//	BrowseGraphic overview = dataIdentification.getGraphicOverview();
-//	TestCase.assertEquals("image/png", overview.getFileType());
-//	TestCase.assertEquals(
-//		"http://www.opengis.uab.es/cgi-bin/iberia/MiraMon.cgi?SERVICE=WMS&REQUEST=GetMap&LAYERS=clima_anual_iberia&VERSION=1.3.0&STYLES=Pluvio&CRS=EPSG:4326&FORMAT=image%2Fpng&TRANSPARENT=TRUE&WIDTH=300&HEIGHT=183&BBOX=35.795746,-9.348001,43.744508,3.631159",
-//		overview.getFileName());
+	//	BrowseGraphic overview = dataIdentification.getGraphicOverview();
+	//	TestCase.assertEquals("image/png", overview.getFileType());
+	//	TestCase.assertEquals(
+	//		"http://www.opengis.uab.es/cgi-bin/iberia/MiraMon.cgi?SERVICE=WMS&REQUEST=GetMap&LAYERS=clima_anual_iberia&VERSION=1.3.0&STYLES=Pluvio&CRS=EPSG:4326&FORMAT=image%2Fpng&TRANSPARENT=TRUE&WIDTH=300&HEIGHT=183&BBOX=35.795746,-9.348001,43.744508,3.631159",
+	//		overview.getFileName());
 
 	TestCase.assertNull(originator);
 	// TestCase.assertEquals("BRGM / Office of Geological and Mining Resources", originator.getOrganisationName());
@@ -166,9 +168,10 @@ public class WFS_1_1_0ResourceMapperTest {
 	TestCase.assertEquals(1, onlines.size());
 	Online online = onlines.get(0);
 	TestCase.assertNotNull(online);
-	TestCase.assertEquals(NetProtocols.WFS_1_1_0.getCommonURN(), online.getProtocol());
+	TestCase.assertEquals(NetProtocolWrapper.WFS_1_1_0.getCommonURN(), online.getProtocol());
 	TestCase.assertEquals("http://testwfs.example?", online.getLinkage());
-	TestCase.assertEquals("{http://sedac.ciesin.columbia.edu/data/collection/superfund}superfund-atsdr-hazardous-waste-site-v2", online.getName());
+	TestCase.assertEquals("{http://sedac.ciesin.columbia.edu/data/collection/superfund}superfund-atsdr-hazardous-waste-site-v2",
+		online.getName());
 	TestCase.assertEquals(null, online.getDescription());
 	TestCase.assertEquals("download", online.getFunctionCode());
 	//

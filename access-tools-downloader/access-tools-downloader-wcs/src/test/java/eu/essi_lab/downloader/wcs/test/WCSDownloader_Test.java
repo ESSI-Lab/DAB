@@ -17,7 +17,7 @@ import eu.essi_lab.downloader.wcs.test.mocked.WCSMockedDownloader_111;
 import eu.essi_lab.downloader.wcs.test.mocked.WCSMockedDownloader_201;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.model.resource.Dataset;
@@ -131,11 +131,11 @@ public abstract class WCSDownloader_Test {
     protected void initMockedDownloader(WCSMockedDownloader mock) {
 
 	NetProtocol protocol = getProtocol();
-	if (protocol.equals(NetProtocols.WCS_1_0_0)) {
+	if (protocol.equals(NetProtocolWrapper.WCS_1_0_0.get())) {
 	   this.downloader = new WCSMockedDownloader_100(mock);
-	} else if (protocol.equals(NetProtocols.WCS_1_1_1)) {
+	} else if (protocol.equals(NetProtocolWrapper.WCS_1_1_1.get())) {
 	    this.downloader = new WCSMockedDownloader_111(mock);
-	} else if (protocol.equals(NetProtocols.WCS_2_0_1)) {
+	} else if (protocol.equals(NetProtocolWrapper.WCS_2_0_1.get())) {
 	    this.downloader = new WCSMockedDownloader_201(mock);
 	} else {
 	    fail();

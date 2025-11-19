@@ -50,7 +50,7 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent.FrameValue;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
@@ -465,7 +465,7 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 
 		String identifier = mangler.getMangling();
 
-		coreMetadata.addDistributionOnlineResource(identifier, getSourceURL(), NetProtocols.WIS.getCommonURN(), "download");
+		coreMetadata.addDistributionOnlineResource(identifier, getSourceURL(), NetProtocolWrapper.WIS.getCommonURN(), "download");
 
 		String resourceIdentifier = AbstractResourceMapper.generateCode(dataset, identifier);
 
