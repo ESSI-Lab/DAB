@@ -12,12 +12,12 @@ import java.util.*;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -33,6 +33,7 @@ import eu.essi_lab.cfga.gui.components.option.OptionDoubleField;
 import eu.essi_lab.cfga.gui.components.option.OptionIntegerField;
 import eu.essi_lab.cfga.gui.components.option.OptionTextArea;
 import eu.essi_lab.cfga.gui.components.option.OptionTextField;
+import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.ISODateTime;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -199,14 +200,22 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 
 	    } else {
 
-		@SuppressWarnings({ "unchecked" })
-		LabeledEnum enumValue = LabeledEnum.valueOf(//
-			(Class<? extends LabeledEnum>) valueClass, //
-			value.toString()).get();
+		if (value instanceof Boolean bool) {
 
-		option.select(v -> v.equals(enumValue));
+		    option.select(v -> v.equals(BooleanChoice.fromBoolean(bool)));
+
+		} else {
+
+		    @SuppressWarnings({ "unchecked" })
+		    LabeledEnum enumValue = LabeledEnum.valueOf(//
+			    (Class<? extends LabeledEnum>) valueClass, //
+			    value.toString()).get();
+
+		    option.select(v -> v.equals(enumValue));
+		}
 
 		Object selectedValue = option.getSelectedValue();
+
 		if (selectedValue == null) {
 
 		    GSLoggerFactory.getLogger(getClass()).warn("Selection failed for option {}", option.getKey());
@@ -219,9 +228,7 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 	//
 	// Single enum value from a select
 	//
-	if (Enum.class.isAssignableFrom(valueClass))
-
-	{
+	if (Enum.class.isAssignableFrom(valueClass)) {
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Single enum value from a select");
 
@@ -346,7 +353,7 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 
 	if (valueClass.equals(Integer.class)) {
 
-	    Integer integer = Integer.valueOf(value.toString()); 
+	    Integer integer = Integer.valueOf(value.toString());
 	    return (T) integer;
 
 	} else if (valueClass.equals(Double.class)) {
