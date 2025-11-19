@@ -72,7 +72,7 @@ public class OptionIntegerField extends IntegerField implements OnKeyUpValidatio
 	    setMax((int) option.getMaxValue().get());
 	}
 
-	if (option.isRequired()) {
+	if (option.isRequired() && !forceReadonly) {
 
 	    setRequired(true);
 
