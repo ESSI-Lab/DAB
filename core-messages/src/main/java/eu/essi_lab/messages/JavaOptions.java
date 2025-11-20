@@ -45,7 +45,7 @@ public enum JavaOptions {
     /**
      * - Boolean
      */
-    CHECK_CONFIG("checkConfig", "Configuration check enabled", "Configuration check disabled"),
+    CHECK_CONFIG("checkConfig", "Configuration check enabled", "Configuration check disabled", true),
     /**
      * - Boolean
      */
