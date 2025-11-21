@@ -443,7 +443,7 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 
 	MIPlatform platform = new MIPlatform();
 
-	platform.setMDIdentifierCode(stationName);
+	platform.setMDIdentifierCode(stationCode);
 
 	dataset.getExtensionHandler().setCountry("ITA");
 
