@@ -35,27 +35,4 @@
 
 	</dependencies>
 
-	<build>
-		<plugins>
-
-			<plugin>
-				<groupId>com.helger.maven</groupId>
-				<artifactId>ph-sch2xslt-maven-plugin</artifactId>
-				<version>${com.helger-ph-schematron-validator.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<!-- decomment the following line to generate the xslt from the schematron -->
-							<!-- <goal>convert</goal> -->
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<schematronDirectory>src/test/schematron</schematronDirectory>
-					<xsltDirectory>src/test/resources/xslt</xsltDirectory>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
 </project>
