@@ -36,7 +36,7 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 public interface KeyValueOptionDecorator {
 
     /**
-     * 
+     *
      */
     static final String KEY_VALUE_OPTION_KEY = "keyValue";
 
@@ -49,7 +49,7 @@ public interface KeyValueOptionDecorator {
     }
 
     /**
-     * 
+     *
      */
     public default void addKeyValueOption() {
 
@@ -150,5 +150,14 @@ public interface KeyValueOptionDecorator {
 	}
 
 	return Optional.of(properties);
+    }
+
+    /**
+     * @param property
+     * @return
+     */
+    public default Optional<String> readProperty(String property) {
+
+	return getKeyValueOptions().flatMap(opt -> Optional.ofNullable(opt.getProperty(property)));
     }
 }
