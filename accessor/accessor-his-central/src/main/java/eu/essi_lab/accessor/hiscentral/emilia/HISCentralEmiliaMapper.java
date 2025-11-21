@@ -269,7 +269,7 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 
 	    // platform
 
-	    String platformIdentifier = PLATFORM_PREFIX + stationType + ":" + stationName;
+	    String platformIdentifier = stationType + ":" + stationName;
 
 	    String parameterIdentifier = PLATFORM_PREFIX + ":" + varName;
 
