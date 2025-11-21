@@ -71,6 +71,8 @@ import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
+import eu.essi_lab.model.resource.QualifierElementWrapper;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.ommdk.AbstractResourceMapper;
 import eu.essi_lab.ommdk.IResourceMapper;
 
@@ -479,6 +481,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		dataset.getExtensionHandler().setCountry(value);
 		continue;
 	    }
+
 	    if (key.toLowerCase().startsWith("organization_")) {
 
 		String[] values = value.split(",");
@@ -615,6 +618,20 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	//
 
 	addBoundingBox(thing, dataId, collector);
+
+	// qualifiers
+
+	JSONObject qualifiers = stream.getProperties().get().optJSONObject("qualifiers");
+	if (qualifiers != null) {
+	    Set<String> flags = qualifiers.keySet();
+	    for (String flag : flags) {
+		String description = qualifiers.getString(flag);
+		QualifierElementWrapper qew = QualifierElementWrapper.get();
+		qew.setCode(flag);
+		qew.setDescription(description);
+		dataset.getExtensionHandler().addComposedElement(qew.getElement());
+	    }
+	}
 
 	String mail = tags.getOrDefault("email", tags.get("mail"));
 	String organizationLabel = tags.getOrDefault("organization_label", tags.get("organization"));

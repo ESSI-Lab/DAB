@@ -442,6 +442,11 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 		    ISO8601DateTimeUtils.getDuration(intendedTimeSpacing, intTimeUnit).toString());
 	}
 
+	if (properties.has("intendedTimeSpacing")) {
+	    String its = properties.getString("intendedTimeSpacing");
+	    handler.setTimeResolutionDuration8601(its);
+	}
+	
 	//
 	// Time interpolation
 	//
@@ -483,6 +488,13 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 		    ISO8601DateTimeUtils.getDuration(timeAggregationInterval, aggrTimeUnitName).toString());
 	}
+	
+	if (properties.has("aggregationPeriod")) {
+	    String aggregationPeriod = properties.getString("aggregationPeriod");
+	    handler.setTimeAggregationDuration8601(aggregationPeriod);
+	}
+	
+	
     }
 
     /**
@@ -601,24 +613,21 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	// Platform id
 	//
 
-	String platformId = SERVER_URN;
-
-	String samplingFeatureType = thing.getProperties().get().optString("samplingFeatureType");
-	if (!samplingFeatureType.isEmpty()) {
-	    platformId += samplingFeatureType.trim() + ":";
-	}
-
+	String platformId = "";
 	String samplingFeatureCode = thing.getProperties().get().optString("samplingFeatureCode");
-	if (!samplingFeatureCode.isEmpty()) {
-	    platformId += samplingFeatureCode.trim() + ":";
+	if (platformId.isEmpty() && !samplingFeatureCode.isEmpty()) {
+	    platformId = samplingFeatureCode.trim() ;
+	}
+	String samplingFeatureType = thing.getProperties().get().optString("samplingFeatureType");
+	if (platformId.isEmpty() && !samplingFeatureType.isEmpty()) {
+	    platformId = samplingFeatureType.trim();
 	}
 
 	String siteType = thing.getProperties().get().optString("siteType");
-	if (!siteType.isEmpty()) {
-	    platformId += siteType.trim();
+	if (platformId.isEmpty() && !siteType.isEmpty()) {
+	    platformId = siteType.trim();
 	}
 
-	platformId = platformId.replace(" ", "").replace(",", "").trim();
 	platform.setMDIdentifierCode(platformId);
 
 	//

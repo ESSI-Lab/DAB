@@ -62,7 +62,7 @@ public class H4SingleTimeSeriesWriter extends TimeSeriesWriter {
 	}
 
 	// dimensions
-	int strLen = 128;
+	int strLen = 300;
 
 	String coordinates = ""; // ;"time lat lon alt station_name";
 

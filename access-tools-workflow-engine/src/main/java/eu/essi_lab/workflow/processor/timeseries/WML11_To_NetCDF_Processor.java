@@ -27,13 +27,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.xml.bind.JAXBElement;
@@ -46,6 +52,7 @@ import org.cuahsi.waterml._1.LatLonPointType;
 import org.cuahsi.waterml._1.MethodType;
 import org.cuahsi.waterml._1.ObjectFactory;
 import org.cuahsi.waterml._1.PropertyType;
+import org.cuahsi.waterml._1.QualifierType;
 import org.cuahsi.waterml._1.QualityControlLevelType;
 import org.cuahsi.waterml._1.SiteInfoType;
 import org.cuahsi.waterml._1.SiteInfoType.GeoLocation;
@@ -94,7 +101,7 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
     public static Double TOL = Math.pow(10, -8);
 
     @Override
-    public DataObject process(GSResource resource,DataObject dataObject, TargetHandler handler) throws Exception {
+    public DataObject process(GSResource resource, DataObject dataObject, TargetHandler handler) throws Exception {
 
 	InputStream stream = new FileInputStream(dataObject.getFile());
 	InputStream result = convert(stream);
@@ -200,14 +207,40 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 	    if (serieVariable.getNoDataValue() != null) {
 		missingValue = serieVariable.getNoDataValue();
 	    }
+
+	    HashMap<String, List<String>> qualifierValues = new HashMap<String, List<String>>();
+	    HashMap<String, String> qualifierDescriptions = new HashMap<String, String>();
+
 	    for (TsValuesSingleVariableType value : values) {
 		censorCodes.addAll(value.getCensorCode());
 		qualityControlLevels.addAll(value.getQualityControlLevel());
 		methods.addAll(value.getMethod());
 		sources.addAll(value.getSource());
 
+		List<QualifierType> qualifiers = value.getQualifier();
+		for (QualifierType qualifier : qualifiers) {
+		    String code = qualifier.getQualifierCode();
+		    String description = qualifier.getQualifierDescription();
+		    qualifierDescriptions.put(code, description);
+		}
+
 		List<ValueSingleVariable> innerValues = value.getValue();
 		for (ValueSingleVariable innerValue : innerValues) {
+		    List<String> qs = innerValue.getQualifiers();
+		    for (String q : qs) {
+			if (q != null && !q.isEmpty()) {
+			    q = URLDecoder.decode(q,StandardCharsets.UTF_8);
+			    String[] split = q.split(":");
+			    String qualifierName = split[0];
+			    String qualifierValue = split[1];
+			    List<String> qValues = qualifierValues.get(qualifierName);
+			    if (qValues == null) {
+				qValues = new ArrayList<String>();
+				qualifierValues.put(qualifierName, qValues);
+			    }
+			    qValues.add(qualifierValue);
+			}
+		    }
 		    BigDecimal decimalValue = innerValue.getValue();
 		    double dValue = Double.NaN;
 		    if (decimalValue != null) {
@@ -285,7 +318,37 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 	    mainVariable.setMissingValue(Double.NaN); // in any case we set missing value to NaN, it is more accurate
 
 	    List<NetCDFVariable<String>> ancillaryVariables = new ArrayList<>();
-	    {
+	    Set<String> qualifierNames = qualifierValues.keySet();
+	    for (String qualifierName : qualifierNames) {
+		Set<String> qValues = new HashSet<>();
+		String flagValues = "";
+		String flagMeanings = "";
+		String flagDescriptions = "";
+		if (qualifierName.equals("qualityFlags")) {
+		    qValues = qualifierDescriptions.keySet();
+		    for (String qValue : qValues) {
+			String description = qualifierDescriptions.get(qValue);
+			flagValues += qValue + ", ";
+			flagMeanings += getNetCDFName(description) + ", ";
+			flagDescriptions += description + "; ";
+		    }
+		}
+
+		NetCDFVariable<String> variable = new NetCDFVariable<String>(netCDFVariableName + "_" + qualifierName,
+			new ArrayList<String>(qualifierValues.get(qualifierName)), null, DataType.STRING);
+		variable.addAttribute("long_name", qualifierName);
+
+		if (!flagValues.isEmpty() && !flagDescriptions.isEmpty()) {
+		    flagValues = flagValues.substring(0, flagValues.length() - 2);
+		    flagMeanings = flagMeanings.substring(0, flagMeanings.length() - 2);
+		    flagDescriptions = flagDescriptions.substring(0, flagDescriptions.length() - 2);
+		    variable.addAttribute(FLAG_VALUES, flagValues.trim());
+		    variable.addAttribute(FLAG_MEANINGS, flagMeanings.trim());
+		    variable.addAttribute(FLAG_DESCRIPTIONS, flagDescriptions.trim());
+		}
+		ancillaryVariables.add(variable);
+	    }
+	    if (!censorCodes.isEmpty()) {
 		NetCDFVariable<String> variable = new NetCDFVariable<String>(netCDFVariableName + "_censor_code", censorCode, null,
 			DataType.STRING);
 		variable.addAttribute("long_name", "Censor code");
@@ -307,7 +370,8 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 		}
 		ancillaryVariables.add(variable);
 	    }
-	    {
+
+	    if (!methods.isEmpty()) {
 		NetCDFVariable<String> variable = new NetCDFVariable<String>(netCDFVariableName + "_method_code", methodCode, null,
 			DataType.STRING);
 		variable.addAttribute("long_name", "Method code");
@@ -333,7 +397,7 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 		}
 		ancillaryVariables.add(variable);
 	    }
-	    {
+	    if (!qualityControlLevels.isEmpty()) {
 		NetCDFVariable<String> variable = new NetCDFVariable<String>(netCDFVariableName + "_quality_control_level_code",
 			qualityControlLevelCode, null, DataType.STRING);
 		variable.addAttribute("long_name", "Quality control level code");
@@ -359,7 +423,7 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 		}
 		ancillaryVariables.add(variable);
 	    }
-	    {
+	    if (!sourceCode.isEmpty()) {
 		NetCDFVariable<String> variable = new NetCDFVariable<String>(netCDFVariableName + "_source_code", sourceCode, null,
 			DataType.STRING);
 		variable.addAttribute("long_name", "Source code");
@@ -451,7 +515,7 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 	    IOUtils.copy(fis, baos);
 	    fis.close();
 	    baos.close();
-		eu.essi_lab.lib.utils.FileTrash.deleteLater(out);
+	    eu.essi_lab.lib.utils.FileTrash.deleteLater(out);
 
 	    return new ByteArrayInputStream(baos.toByteArray());
 	} catch (Exception e) {
