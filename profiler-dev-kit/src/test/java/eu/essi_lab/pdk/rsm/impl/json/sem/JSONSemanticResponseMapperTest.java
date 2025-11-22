@@ -1,11 +1,12 @@
 package eu.essi_lab.pdk.rsm.impl.json.sem;
 
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.json.JSONObject;
 import org.junit.Test;
-import org.openrdf.model.impl.SimpleValueFactory;
+
 
 import eu.essi_lab.model.ontology.GSKnowledgeOntology;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;

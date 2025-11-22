@@ -21,7 +21,7 @@ import eu.essi_lab.accessor.wof.client.datamodel.TimeSeriesResponseDocument;
 import eu.essi_lab.accessor.wof.client.datamodel.Value;
 import eu.essi_lab.downloader.wof.CUAHSIHISServerDownloader;
 import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.data.CRS;
@@ -43,7 +43,7 @@ public class CUAHSIHISServerDownloaderExternalTestIT {
 	online.setIdentifier("id1");
 	online.setLinkage(getEndpoint());
 	online.setName("platform;LBR:USU-LBR-Mendon;parameter;LBR:USU3");
-	online.setProtocol(NetProtocols.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN());
+	online.setProtocol(NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN());
 	dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution().addDistributionOnline(online);
 	downloader.setOnlineResource(dataset, "id1");
     }

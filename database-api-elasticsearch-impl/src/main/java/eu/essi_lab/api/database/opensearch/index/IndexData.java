@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -105,12 +106,12 @@ public class IndexData {
 	 */
 	DOC("doc");
 
-	private String type;
+	private final String type;
 
 	/**
 	 * @param type
 	 */
-	private DataType(String type) {
+	DataType(String type) {
 
 	    this.type = type;
 	}
@@ -129,8 +130,8 @@ public class IndexData {
 	 */
 	public static DataType decode(String type) {
 
-	    return Arrays.asList(values()).//
-		    stream().//
+	    //
+	    return Arrays.stream(values()).//
 		    filter(t -> t.getType().equals(type)).//
 		    findFirst().//
 		    orElseThrow();
@@ -158,7 +159,7 @@ public class IndexData {
 
     public static final String _INDEX = "_index";
 
-    private JSONObject object;
+    private final JSONObject object;
     private IndexMapping mapping;
     private String entryId;
     private String index;
@@ -204,7 +205,7 @@ public class IndexData {
 
 	XMLDocumentHandler handler = new XMLDocumentHandler(resourceDoc);
 
-	String privateId = readValues(handler, ResourceProperty.PRIVATE_ID.getName()).get(0);
+	String privateId = readValues(handler, ResourceProperty.PRIVATE_ID.getName()).getFirst();
 
 	//
 	// put the base properties
@@ -529,7 +530,7 @@ public class IndexData {
 
 	List<JSONObject> objects = ShapeFileMapper.map(shapeFile);
 
-	ArrayList<IndexData> out = new ArrayList<IndexData>();
+	ArrayList<IndexData> out = new ArrayList<>();
 
 	for (JSONObject object : objects) {
 
@@ -569,7 +570,7 @@ public class IndexData {
 	    //
 
 	    indexData.put(BINARY_PROPERTY, ShapeFileMapping.SHAPE_FILE);
-	    indexData.put(ShapeFileMapping.SHAPE_FILE, Base64.getEncoder().encodeToString(object.toString().getBytes("UTF-8")));
+	    indexData.put(ShapeFileMapping.SHAPE_FILE, Base64.getEncoder().encodeToString(object.toString().getBytes(StandardCharsets.UTF_8)));
 
 	    indexData.put(ShapeFileMapping.SHAPE, shape);
 
@@ -577,7 +578,7 @@ public class IndexData {
 	}
 
 	// clears the temp folder
-	Arrays.asList(unzipper.getOutputFolder().listFiles()).forEach(f -> f.delete());
+	Arrays.asList(unzipper.getOutputFolder().listFiles()).forEach(File::delete);
 
 	return out;
     }
@@ -742,7 +743,7 @@ public class IndexData {
 
 	Optional<BoundingPolygon> polygon = handler.evaluateNodes("//*:EX_BoundingPolygon").//
 		stream().//
-		map(n -> BoundingPolygon.createOrNull(n)).//
+		map(BoundingPolygon::createOrNull).//
 		findFirst();
 
 	if (polygon.isPresent()) {
@@ -759,7 +760,7 @@ public class IndexData {
 	    shape = Shape.of(boundingBox);
 	}
 
-	if (!shape.isEmpty()) {
+	if (shape.isPresent()) {
 
 	    indexData.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
 	    indexData.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
@@ -776,12 +777,12 @@ public class IndexData {
 
 	    List<ComposedElement> composedList = composedNodes.//
 		    stream().//
-		    map(el -> create(el)).//
+		    map(IndexData::create).//
 		    filter(Objects::nonNull).//
 		    distinct().//
-		    collect(Collectors.toList());
+		    toList();
 
-	    composedList.stream().map(el -> el.getName()).distinct().forEach(elName -> {
+	    composedList.stream().map(ComposedElement::getName).distinct().forEach(elName -> {
 
 		JSONArray nested = new JSONArray();
 
@@ -826,7 +827,7 @@ public class IndexData {
 
 	if (exists(handler, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName())) {
 
-	    put(Arrays.asList("true"), indexData, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName(), Boolean.class);
+	    put(List.of("true"), indexData, MetadataElement.TEMP_EXTENT_BEGIN_NOW.getName(), Boolean.class);
 	}
 
 	//
@@ -846,7 +847,7 @@ public class IndexData {
 
 	if (exists(handler, MetadataElement.TEMP_EXTENT_END_NOW.getName())) {
 
-	    put(Arrays.asList("true"), indexData, MetadataElement.TEMP_EXTENT_END_NOW.getName(), Boolean.class);
+	    put(List.of("true"), indexData, MetadataElement.TEMP_EXTENT_END_NOW.getName(), Boolean.class);
 	}
 
 	//
@@ -939,7 +940,7 @@ public class IndexData {
 
 	if (!boundingPolygons.isEmpty()) {
 
-	    shape = Shape.of(boundingPolygons.get(0));
+	    shape = Shape.of(boundingPolygons.getFirst());
 	}
 
 	if (shape.isEmpty() && indexesMd.readBoundingBox().isPresent()) {
@@ -947,7 +948,7 @@ public class IndexData {
 	    shape = Shape.of(indexesMd.readBoundingBox().get());
 	}
 
-	if (!shape.isEmpty()) {
+	if (shape.isPresent()) {
 
 	    indexData.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
 	    indexData.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
@@ -989,18 +990,12 @@ public class IndexData {
 	//
 	// other metadata elements
 	//
-	MetadataElement.listValues().forEach(el -> {
-
-	    put(el, indexesMd, indexData);
-	});
+	MetadataElement.listValues().forEach(el -> put(el, indexesMd, indexData));
 
 	//
 	// resource properties
 	//
-	ResourceProperty.listValues().forEach(rp -> {
-
-	    put(rp, indexesMd, indexData);
-	});
+	ResourceProperty.listValues().forEach(rp -> put(rp, indexesMd, indexData));
 
 	// clear the indexes (all but the bbox) before storing the binary property
 	indexesMd.clear(false);
@@ -1097,7 +1092,7 @@ public class IndexData {
 
 		if (value.length() > 1) {
 
-		    array.put(String.valueOf(value));
+		    array.put(value);
 		}
 
 	    } else if (valueClass.equals(Integer.class)) {
@@ -1114,7 +1109,7 @@ public class IndexData {
 
 	    } else if (valueClass.equals(Boolean.class)) {
 
-		boolean val = Boolean.valueOf(value);
+		boolean val = Boolean.parseBoolean(value);
 
 		//
 		// particular case to support tmpExtentEnd_Now and tmpExtentBegin_Now elements that in the
@@ -1129,11 +1124,11 @@ public class IndexData {
 
 	    } else if (valueClass.equals(DateTime.class)) {
 
-		OpenSearchUtils.parseToLong(value).ifPresent(dt -> array.put(dt));
+		OpenSearchUtils.parseToLong(value).ifPresent(array::put);
 	    }
 	});
 
-	if (array.length() > 0) {
+	if (!array.isEmpty()) {
 
 	    if (valueClass.equals(DateTime.class)) {
 
@@ -1149,9 +1144,9 @@ public class IndexData {
 			stream().//
 
 			// mapping to ISO-8601 string
-			map(v -> ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.valueOf(v.toString())))).
+			map(v -> ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.parseLong(v.toString())))).
 
-			forEach(date -> dateTimeStringArray.put(date));
+			forEach(dateTimeStringArray::put);
 
 		if (!dateTimeStringArray.isEmpty()) {
 

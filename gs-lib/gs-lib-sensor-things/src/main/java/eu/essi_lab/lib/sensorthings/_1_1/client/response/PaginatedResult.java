@@ -22,6 +22,8 @@ package eu.essi_lab.lib.sensorthings._1_1.client.response;
  */
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
@@ -31,6 +33,53 @@ import eu.essi_lab.lib.utils.JSONObjectWrapper;
  * @author Fabrizio
  */
 public abstract class PaginatedResult extends JSONObjectWrapper {
+
+    /**
+     * @param nextLink
+     * @return
+     */
+    public static Optional<Integer> getSkip(String nextLink) {
+
+	return extractParam(nextLink, "skip").map(v -> Integer.valueOf(v));
+
+    }
+
+    /**
+     * @param nextLink
+     * @return
+     */
+    public static Optional<Integer> getTop(String nextLink) {
+
+	return extractParam(nextLink, "top").map(v -> Integer.valueOf(v));
+    }
+
+    /**
+     * @param url
+     * @param param
+     * @return
+     */
+    private static Optional<String> extractParam(String url, String param) {
+
+	Pattern pattern = Pattern.compile("(?:[?&]\\$" + param + "=)([^&]+)");
+	Matcher matcher = pattern.matcher(url);
+	return Optional.ofNullable(matcher.find() ? matcher.group(1) : null);
+    }
+
+    public static void main(String[] args) {
+
+	String s1 = "http://request&$param1&$skip=100&$top=100";
+	String s2 = "http://request&$skip=90&$param2&$param3&$top=10";
+	String s3 = "http://request&$param2&$param3";
+
+	System.out.println(getSkip(s1));
+	System.out.println(getSkip(s2));
+	System.out.println(getSkip(s3));
+
+	System.out.println(getTop(s1));
+	System.out.println(getTop(s2));
+	System.out.println(getTop(s3));
+
+    }
 
     /**
      * @param object

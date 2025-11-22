@@ -21,11 +21,11 @@ package eu.essi_lab.model.ontology.d2k.resources;
  * #L%
  */
 
-import org.openrdf.model.IRI;
-import org.openrdf.model.Resource;
-import org.openrdf.model.impl.SimpleValueFactory;
 
 import eu.essi_lab.model.ontology.GSKnowledgeOntology;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 /**
  * @author ilsanto

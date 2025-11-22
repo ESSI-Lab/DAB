@@ -30,22 +30,13 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gs.setting.*;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationChangeListener;
 import eu.essi_lab.cfga.ConfigurationUtils;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
-import eu.essi_lab.cfga.gs.setting.CredentialsSetting;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
-import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
-import eu.essi_lab.cfga.gs.setting.GSSourceSetting;
-import eu.essi_lab.cfga.gs.setting.OntologySetting;
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
-import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
-import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
@@ -58,6 +49,7 @@ import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
@@ -125,7 +117,7 @@ public class ConfigurationWrapper {
     /**
      * 
      */
-    private static HashMap<String, Boolean> profilerOnlineMap = new HashMap<>();
+    private static final HashMap<String, Boolean> PROFILER_ONLINE_MAP = new HashMap<>();
 
     /**
      * 
@@ -146,19 +138,15 @@ public class ConfigurationWrapper {
     public static void setConfiguration(Configuration config) {
 
 	configuration = config;
-	configuration.addChangeEventListener(new ConfigurationChangeListener() {
+	configuration.addChangeEventListener(event -> {
 
-	    @Override
-	    public void configurationChanged(ConfigurationChangeEvent event) {
+	    allSources = getSources(null, false);
+	    harvestingSettings = _getHarvestingSettings();
+	    systemSetting = _getSystemSetting();
+	    databaseSetting = _getDatabaseSetting();
+	    distributedSources = _getDistributedSources();
 
-		allSources = getSources(null, false);
-		harvestingSettings = _getHarvestingSettings();
-		systemSetting = _getSystemSetting();
-		databaseSetting = _getDatabaseSetting();
-		distributedSources = _getDistributedSources();
-
-		getProfilerSettings().forEach(ps -> profilerOnlineMap.put(ps.getServicePath(), ps.isOnline()));
-	    }
+	    getProfilerSettings().forEach(ps -> PROFILER_ONLINE_MAP.put(ps.getServicePath(), ps.isOnline()));
 	});
 
 	allSources = getSources(null, false);
@@ -167,7 +155,7 @@ public class ConfigurationWrapper {
 	databaseSetting = _getDatabaseSetting();
 	distributedSources = _getDistributedSources();
 
-	getProfilerSettings().forEach(ps -> profilerOnlineMap.put(ps.getServicePath(), ps.isOnline()));
+	getProfilerSettings().forEach(ps -> PROFILER_ONLINE_MAP.put(ps.getServicePath(), ps.isOnline()));
     }
 
     /**
@@ -285,11 +273,9 @@ public class ConfigurationWrapper {
      */
     public static SharedCacheDriverSetting getSharedCacheDriverSetting() {
 
-	SharedCacheDriverSetting setting = configuration.get(//
+	return configuration.get(//
 		SingletonSettingsId.SHARED_CACHE_REPO_SETTING.getLabel(), //
 		SharedCacheDriverSetting.class).get();
-
-	return setting;
     }
 
     /**
@@ -297,11 +283,9 @@ public class ConfigurationWrapper {
      */
     public static SharedPersistentDriverSetting getSharedPersistentDriverSetting() {
 
-	SharedPersistentDriverSetting setting = configuration.get(//
+	return configuration.get(//
 		SingletonSettingsId.SHARED_PERSISTENT_REPO_SETTING.getLabel(), //
 		SharedPersistentDriverSetting.class).get();
-
-	return setting;
     }
 
     /**
@@ -309,11 +293,9 @@ public class ConfigurationWrapper {
      */
     public static SchedulerViewSetting getSchedulerSetting() {
 
-	SchedulerViewSetting setting = configuration.get(//
+	return configuration.get(//
 		SingletonSettingsId.SCHEDULER_SETTING.getLabel(), //
 		SchedulerViewSetting.class).get();
-
-	return setting;
     }
 
     /**
@@ -321,9 +303,7 @@ public class ConfigurationWrapper {
      */
     public static List<ProfilerSetting> getProfilerSettings() {
 
-	List<ProfilerSetting> list = configuration.list(ProfilerSetting.class, false);
-
-	return list;
+	return configuration.list(ProfilerSetting.class, false);
     }
 
     /**
@@ -332,13 +312,13 @@ public class ConfigurationWrapper {
      */
     public static Optional<Boolean> isProfilerOnline(String requestPath) {
 
-	Optional<String> path = profilerOnlineMap.//
+	Optional<String> path = PROFILER_ONLINE_MAP.//
 		keySet().//
 		parallelStream().//
-		filter(p -> requestPath.contains(p)).//
+		filter(requestPath::contains).//
 		findFirst();
 
-	return path.isPresent() ? Optional.of(profilerOnlineMap.get(path.get())) : Optional.empty();//
+	return path.map(PROFILER_ONLINE_MAP::get);//
     }
 
     /**
@@ -346,11 +326,9 @@ public class ConfigurationWrapper {
      */
     public static List<AugmenterWorkerSetting> getAugmenterWorkerSettings() {
 
-	return configuration.list(//
+	return new ArrayList<>(configuration.list(//
 		AugmenterWorkerSetting.class, //
-		false).//
-		stream().//
-		collect(Collectors.toList());
+		false));
     }
 
     /**
@@ -358,11 +336,9 @@ public class ConfigurationWrapper {
      */
     public static List<CustomTaskSetting> getCustomTaskSettings() {
 
-	return configuration.list(//
+	return new ArrayList<>(configuration.list(//
 		CustomTaskSetting.class, //
-		false).//
-		stream().//
-		collect(Collectors.toList());
+		false));
     }
 
     /**
@@ -383,21 +359,17 @@ public class ConfigurationWrapper {
 	@SuppressWarnings("unchecked")
 	Class<HarvestingSetting> clazz = (Class<HarvestingSetting>) HarvestingSettingLoader.load().getClass();
 
-	List<HarvestingSetting> list = configuration.list(clazz, //
+	return configuration.list(clazz, //
 
 		s -> {
 
 		    if (s.getObject().getString("settingClass").equals(clazz.getName())) {
 
-			HarvestingSetting harvestingSetting = HarvestingSettingLoader.load(s.getObject());
-
-			return harvestingSetting;
+			return HarvestingSettingLoader.load(s.getObject());
 		    }
 
 		    return null;
 		});
-
-	return list;
     }
 
     /**
@@ -407,7 +379,7 @@ public class ConfigurationWrapper {
      */
     public static List<DistributionSetting> getDistributonSettings() {
 
-	List<DistributionSetting> list = configuration.list(DistributionSetting.class, //
+	return configuration.list(DistributionSetting.class, //
 
 		s -> {
 
@@ -418,8 +390,6 @@ public class ConfigurationWrapper {
 
 		    return null;
 		});
-
-	return list;
     }
 
     /**
@@ -519,15 +489,13 @@ public class ConfigurationWrapper {
     public static List<String> checkSources(List<String> sourceIdentifiers) {
 
 	List<String> allSources = getAllSources().stream().//
-		map(s -> s.getUniqueIdentifier()).//
-		collect(Collectors.toList());
+		map(GSSource::getUniqueIdentifier).//
+		toList();
 
-	List<String> collect = sourceIdentifiers.//
+	return sourceIdentifiers.//
 		stream().//
 		filter(s -> !allSources.contains(s)).//
 		collect(Collectors.toList());
-
-	return collect;
     }
 
     /**
@@ -569,18 +537,14 @@ public class ConfigurationWrapper {
     @SuppressWarnings("incomplete-switch")
     private static void findSourceIdentifiers(Bond bond, List<String> out, String sourceDeployment) {
 
-	if (bond instanceof LogicalBond) {
-
-	    LogicalBond logicalBond = (LogicalBond) bond;
+	if (bond instanceof LogicalBond logicalBond) {
 
 	    for (Bond operand : logicalBond.getOperands()) {
 
 		findSourceIdentifiers(operand, out, sourceDeployment);
 	    }
 
-	} else if (bond instanceof ResourcePropertyBond) {
-
-	    ResourcePropertyBond resBond = (ResourcePropertyBond) bond;
+	} else if (bond instanceof ResourcePropertyBond resBond) {
 
 	    if (resBond.getProperty() == ResourceProperty.SOURCE_ID) {
 
@@ -594,8 +558,8 @@ public class ConfigurationWrapper {
 		    List<String> ids = getAllSources().//
 			    stream().//
 			    filter(s -> s.getUniqueIdentifier().startsWith(resBond.getPropertyValue())).//
-			    map(s -> s.getUniqueIdentifier()).//
-			    collect(Collectors.toList());
+			    map(GSSource::getUniqueIdentifier).//
+			    toList();
 
 		    out.addAll(ids);
 		    break;
@@ -610,8 +574,8 @@ public class ConfigurationWrapper {
 			filter(s -> operator == BondOperator.EQUAL ? s.getDeployment().contains(sourceDeployment) : //
 				s.getDeployment().stream().anyMatch(dep -> dep.startsWith(sourceDeployment)))
 			.//
-			map(s -> s.getUniqueIdentifier()).//
-			collect(Collectors.toList());
+			map(GSSource::getUniqueIdentifier).//
+				toList();
 
 		out.addAll(ids);
 	    }
@@ -694,9 +658,9 @@ public class ConfigurationWrapper {
 
 	return getHarvestingSettings().//
 		stream().//
-		map(s -> s.getSelectedAccessorSetting()).//
+		map(BrokeringSetting::getSelectedAccessorSetting).//
 		filter(as -> incrementalConnectors.contains(as.getHarvestedConnectorSetting().getConfigurableType())).//
-		map(as -> as.getSource()).//
+		map(AccessorSetting::getSource).//
 		collect(Collectors.toList());
     }
 
@@ -785,7 +749,7 @@ public class ConfigurationWrapper {
      */
     public static Optional<StorageInfo> getUsersStorageInfo() {
 
-	return getSystemSettings().getUsersDatabaseSetting().map(s -> s.asStorageInfo());
+	return getSystemSettings().getUsersDatabaseSetting().map(DatabaseSetting::asStorageInfo);
     }
 
     /**
@@ -840,11 +804,9 @@ public class ConfigurationWrapper {
 
     public static CredentialsSetting getCredentialsSetting() {
 
-	CredentialsSetting setting = configuration.get(//
+	return configuration.get(//
 		SingletonSettingsId.CREDENTIALS_SETTING.getLabel(), //
 		CredentialsSetting.class).get();
-
-	return setting;
     }
 
     // ----
@@ -855,11 +817,9 @@ public class ConfigurationWrapper {
 
     public static RateLimiterSetting getRateLimiterSettingSettings() {
 
-	RateLimiterSetting setting = configuration.get(//
+	return configuration.get(//
 		SingletonSettingsId.RATE_LIMITER_SETTING.getLabel(), //
 		RateLimiterSetting.class).get();
-
-	return setting;
     }
 
     /**
@@ -867,12 +827,10 @@ public class ConfigurationWrapper {
      */
     public static DataCacheConnectorSetting getDataCacheConnectorSetting() {
 
-	DataCacheConnectorSetting setting = configuration.get(//
+	return configuration.get(//
 		SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel(), //
 		DataCacheConnectorSetting.class, //
 		false).get();
-
-	return setting;
     }
 
     /**
@@ -908,7 +866,7 @@ public class ConfigurationWrapper {
 
 	    if (prop != null) {
 
-		forceSparqlProxyAcceptHeader = Boolean.valueOf(prop);
+		forceSparqlProxyAcceptHeader = Boolean.parseBoolean(prop);
 	    }
 	}
 
@@ -918,7 +876,7 @@ public class ConfigurationWrapper {
     public static List<String> getAdminUsers() {
 
 	Optional<Properties> kvo = getSystemSettings().getKeyValueOptions();
-	List<String> adminUsers = new ArrayList<String>();
+	List<String> adminUsers = new ArrayList<>();
 	if (kvo.isPresent()) {
 
 	    String prop = kvo.get().getProperty(KeyValueOptionKeys.ADMIN_USERS.getLabel());
@@ -926,10 +884,8 @@ public class ConfigurationWrapper {
 	    if (prop != null) {
 
 		String[] s = prop.split(";");
-		adminUsers = new ArrayList<String>();
-		for (String user : s) {
-		    adminUsers.add(user);
-		}
+		adminUsers = new ArrayList<>();
+		adminUsers.addAll(Arrays.asList(s));
 	    }
 	}
 
@@ -947,7 +903,7 @@ public class ConfigurationWrapper {
     /**
      * 
      */
-    private static HashMap<String, Chronometer> isJobCanceledMap = new HashMap<>();
+    private static final HashMap<String, Chronometer> isJobCanceledMap = new HashMap<>();
 
     /**
      * This method returns <code>true</code> in the following cases:
@@ -997,13 +953,13 @@ public class ConfigurationWrapper {
 		stream().//
 		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
 		filter(s -> s.getIdentifier().equals(contextSetting.getIdentifier())).//
-		collect(Collectors.toList()));
+		toList());
 
 	workerSettingList.addAll(getCustomTaskSettings().//
 		stream().//
 		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
 		filter(s -> s.getIdentifier().equals(contextSetting.getIdentifier())).//
-		collect(Collectors.toList()));
+		toList());
 
 	//
 	//
@@ -1011,7 +967,7 @@ public class ConfigurationWrapper {
 
 	if (!workerSettingList.isEmpty()) {
 
-	    Scheduling scheduling = workerSettingList.get(0).getScheduling();
+	    Scheduling scheduling = workerSettingList.getFirst().getScheduling();
 
 	    return !scheduling.isEnabled();
 	}
@@ -1043,7 +999,7 @@ public class ConfigurationWrapper {
 	    }
 	}
 
-	GSLoggerFactory.getLogger(ConfigurationWrapper.class).info("Setting of worker '" + contextSetting.getWorkerName() + "' removed");
+	GSLoggerFactory.getLogger(ConfigurationWrapper.class).info("Setting of worker '{}' removed", contextSetting.getWorkerName());
 
 	return true;
     }
@@ -1065,9 +1021,7 @@ public class ConfigurationWrapper {
 	S3TransferWrapper manager = new S3TransferWrapper();
 	manager.setAccessKey(accessKey);
 	manager.setSecretKey(secretKey);
-	if (endpoint.isPresent()) {
-	    manager.setEndpoint(endpoint.get());
-	}
+	endpoint.ifPresent(manager::setEndpoint);
 	manager.initialize();
 	return Optional.of(manager);
     }

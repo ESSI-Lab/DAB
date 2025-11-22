@@ -54,9 +54,9 @@ public class Shape {
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private static final WKTReader READER = new WKTReader(GEOMETRY_FACTORY);
 
-    public static String SHAPE = "shape";
-    public static String AREA = "area";
-    public static String CENTROID = "centroid";
+    public static final String SHAPE = "shape";
+    public static final String AREA = "area";
+    public static final String CENTROID = "centroid";
 
     /**
      * @param shape
@@ -107,7 +107,7 @@ public class Shape {
     }
 
     private boolean empty;
-    private JSONObject objectBox;
+    private final JSONObject objectBox;
 
     /**
      * @param shape
@@ -135,7 +135,7 @@ public class Shape {
 
 		    String _shape = shape.get();
 
-		    // OpenSearch do not likes the inner points with parentheses
+		    // OpenSearch do not like the inner points with parentheses
 		    if (_shape.startsWith("MULTIPOINT")) {
 
 			_shape = _shape.replace("(", "");
@@ -172,26 +172,26 @@ public class Shape {
 
 	empty = true;
 
-	String shape = null;
+	StringBuilder shape;
 
 	List<List<Double>> multiPoints = polygon.getMultiPoints();
 
 	if (!multiPoints.isEmpty()) {
 
-	    List<Double> first = multiPoints.get(0);
+	    List<Double> first = multiPoints.getFirst();
 
-	    List<Double> last = multiPoints.get(multiPoints.size() - 1);
+	    List<Double> last = multiPoints.getLast();
 
-	    String closing = "";
+	    String closing;
 
 	    if (first.equals(last)) {
 
-		shape = "POLYGON ((";
+		shape = new StringBuilder("POLYGON ((");
 		closing = "))";
 
 	    } else {
 
-		shape = "LINESTRING (";
+		shape = new StringBuilder("LINESTRING (");
 		closing = ")";
 	    }
 
@@ -200,22 +200,22 @@ public class Shape {
 		List<Double> list = multiPoints.get(i);
 
 		String collect = list.stream().//
-			map(v -> String.valueOf(v)).//
+			map(String::valueOf).//
 			collect(Collectors.joining(" "));
 
-		shape += collect;
+		shape.append(collect);
 
 		if (i < multiPoints.size() - 1) {
 
-		    shape += ", ";
+		    shape.append(", ");
 		}
 	    }
 
-	    shape += closing;
+	    shape.append(closing);
 
 	    try {
 
-		Geometry geometry = READER.read(shape);
+		Geometry geometry = READER.read(shape.toString());
 
 		if (geometry.isValid()) {
 
@@ -228,7 +228,7 @@ public class Shape {
 
 		    objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
 
-		    objectBox.put(SHAPE, shape);
+		    objectBox.put(SHAPE, shape.toString());
 
 		    empty = false;
 		}
@@ -237,7 +237,6 @@ public class Shape {
 
 		GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 
-		return;
 	    }
 	}
     }
@@ -424,7 +423,7 @@ public class Shape {
 	    //
 	    // POLYGON
 	    //
-	    Optional<String> polygon = asPolygon(cardinalValues.get(0));
+	    Optional<String> polygon = asPolygon(cardinalValues.getFirst());
 
 	    if (polygon.isPresent()) {
 
@@ -434,7 +433,7 @@ public class Shape {
 	    //
 	    // POINT
 	    //
-	    return asPoint(cardinalValues.get(0));
+	    return asPoint(cardinalValues.getFirst());
 
 	} else {
 
@@ -489,13 +488,13 @@ public class Shape {
 
 		shape = "MULTIPOINT (" + shape;
 
-	    } else if (polygons && points) {
+	    } else if (polygons) {
 
 		//
 		// GEOMETRYCOLLECTION
 		//
 
-		shape = "GEOMETRYCOLLECTION (" + shapeBuilder.toString();
+		shape = "GEOMETRYCOLLECTION (" + shapeBuilder;
 	    }
 
 	    shape += ")";

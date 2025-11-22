@@ -10,7 +10,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<name>ESSI-Lab GI-suite Service</name>
+	<name>ESSI-Lab DAB Main Service</name>
 	<artifactId>gs-service</artifactId>
 	<packaging>war</packaging>
 
@@ -32,7 +32,8 @@
     	<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
 		<jetty.version>9.4.54.v20240208</jetty.version>
 		<configuration.url />
-
+	    <maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 	</properties>
 	
 	<build>
@@ -150,7 +151,7 @@
 
 						<!-- Use war output directory to get the webpack files -->
 						<allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
-
+						
 					</webAppConfig>
 
 					<useTestClasspath>false</useTestClasspath>
@@ -162,10 +163,24 @@
 						${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml
 					</jettyXml>
 	  				
-	  				<!-- Remove comment to disable set to false the property 'useFileMappedBuffer'
+	  				<!-- Remove comment to disable set to false the property 'useFileMappedBuffer' -->
      				<contextXml>${project.basedir}/src/main/webapp/WEB-INF/jetty-config.xml</contextXml>
-     				-->
      				
+     				<systemProperties>
+				      <systemProperty>
+				        <name>org.eclipse.jdt.core.compiler.source</name>
+				        <value>21</value>
+				      </systemProperty>
+				      <systemProperty>
+				        <name>org.eclipse.jdt.core.compiler.compliance</name>
+				        <value>21</value>
+				      </systemProperty>
+				      <systemProperty>
+				        <name>org.eclipse.jdt.core.compiler.codegen.targetPlatform</name>
+				        <value>21</value>
+				      </systemProperty>
+				    </systemProperties>
+			        
 				</configuration>
 			</plugin>
 
@@ -1229,12 +1244,6 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>access-tools</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		
 		<!-- Custom tasks -->
 		
 		<dependency>
@@ -1246,6 +1255,37 @@
 	</dependencies>
 
 	<profiles>
+
+        <profile>
+            <id>no-license</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>license-maven-plugin</artifactId>
+                        <version>2.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>ufh</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>upl</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>atp</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>default-cli</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
 		<profile>
 			<id>continuous-integration</id>
@@ -1386,45 +1426,6 @@
 								</image>
 
 							</images>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>createdockerimage</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<!-- This plugin enables creation of a docker image of
-						gs-service calling: -->
-						<!-- mvn -Pcreatedockerimage clean package -->
-						<!-- Optionally, add a configuration file from a
-						profile, e.g. -Pwcs -->
-						<groupId>com.spotify</groupId>
-						<artifactId>dockerfile-maven-plugin</artifactId>
-						<version>1.4.10</version>
-						<executions>
-							<execution>
-								<id>default</id>
-								<goals>
-									<goal>build</goal>
-									<goal>push</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<dockerfile>
-								${project.basedir}/src/main/resources/docker/run-configured.Dockerfile</dockerfile>
-							<tag>1</tag>
-							<repository>localhost/gi-suite</repository>
-							<buildArgs>
-								<WAR_FILE>target/${project.build.finalName}.war</WAR_FILE>
-							</buildArgs>
 						</configuration>
 					</plugin>
 				</plugins>

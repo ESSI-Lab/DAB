@@ -67,7 +67,7 @@ public class SchedulerWorkerSetting extends Setting {
 	 */
 	CUSTOM_TASK("customTaskGroup");
 
-	private String label;
+	private final String label;
 
 	/**
 	 * @param label

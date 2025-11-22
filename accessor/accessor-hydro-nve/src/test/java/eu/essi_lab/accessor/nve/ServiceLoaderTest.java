@@ -64,8 +64,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(NVEConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(NVEConnector.class)));//
     }
     
     @Test
@@ -74,10 +73,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.NVE_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.NVE_URI)));
 
     }
 
@@ -88,14 +84,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(NVEAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(NVEAccessor.class.getName())));
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(NVEConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(NVEConnector.class.getName())));
 
     }
 }

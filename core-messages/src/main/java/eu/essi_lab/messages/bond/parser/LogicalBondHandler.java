@@ -36,27 +36,27 @@ public interface LogicalBondHandler {
      *
      * @param bond
      */
-    public void startLogicalBond(LogicalBond bond);
+    void startLogicalBond(LogicalBond bond);
 
     /**
      * Receives notification of a {@link LogicalBond} operands separator
      *
      * @param bond
      */
-    public void separator();
+    void separator();
     
     /**
      * Receives notification of a non {@link LogicalBond}
      *
      * @param bond
      */
-    public void nonLogicalBond(Bond bond);
+    void nonLogicalBond(Bond bond);
 
     /**
      * Receives notification of the end of a {@link LogicalBond}
      *
      * @param bond
      */
-    public void endLogicalBond(LogicalBond bond);
+    void endLogicalBond(LogicalBond bond);
 
 }

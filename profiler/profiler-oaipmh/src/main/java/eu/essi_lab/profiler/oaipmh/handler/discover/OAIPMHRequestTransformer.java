@@ -72,17 +72,22 @@ import eu.essi_lab.profiler.oaipmh.token.ResumptionToken;
 public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
-     * 
+     *
      */
     private static final String OAI_PMH_POST_QUERY_EXTRACTION_ERROR = "OAI_PMH_POST_QUERY_EXTRACTION_ERROR";
-    private OAIPMHProfilerSetting setting;
+
+    /**
+     *
+     */
+    public OAIPMHRequestTransformer() {
+    }
 
     /**
      * @param setting
      */
     public OAIPMHRequestTransformer(OAIPMHProfilerSetting setting) {
 
-	this.setting = setting;
+	super(setting);
     }
 
     @Override
@@ -328,7 +333,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
      */
     private int getPageSize() {
 
-	Optional<Properties> properties = setting.getKeyValueOptions();
+	Optional<Properties> properties = getSetting().get().getKeyValueOptions();
 	int pageSize = getDefaultPageSize();
 	if (properties.isPresent()) {
 
@@ -343,7 +348,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
      */
     private boolean sortResults() {
 
-	Optional<Properties> properties = setting.getKeyValueOptions();
+	Optional<Properties> properties = getSetting().get().getKeyValueOptions();
 	boolean sortResults = false;
 	if (properties.isPresent()) {
 
@@ -354,11 +359,10 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     /**
-     * If the "set" parameter in the request is set, the returned bond is a single {@link SourceIdentifierBond} built
-     * with the <code>setSpec</code> value. If the "set" parameter in the request is not set, the returned bond is an OR
-     * logical bond with {@link SourceIdentifierBond} bonds built with the identifiers of the harvested sources. If
-     * there are no harvested sources, the returned bond is a bond which forces the request to return an empty result
-     * set.
+     * If the "set" parameter in the request is set, the returned bond is a single {@link SourceIdentifierBond} built with the
+     * <code>setSpec</code> value. If the "set" parameter in the request is not set, the returned bond is an OR logical bond with
+     * {@link SourceIdentifierBond} bonds built with the identifiers of the harvested sources. If there are no harvested sources, the
+     * returned bond is a bond which forces the request to return an empty result set.
      *
      * @param setSpec
      * @return

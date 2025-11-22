@@ -921,7 +921,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				{ 'label': 'Advanced search w/ Rosetta Stone broad matches', 'value': 'broad' }];
 				label = 'Use ODIP Rosetta Stone service.';
 				break;
-			case 'semanticsearch':
+			case 'semanticSearch':
 				values = [{ 'label': __t("basic-text"), 'value': 'false' },
 				{ 'label': __t("semantic-search-text"), 'value': 'true' }];
 				help = correctHelp;
@@ -1202,7 +1202,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			'rosetta',
 			'instrumentId',
 			'instrumentTitle',
-			'semanticsearch',
+			'semanticSearch',
 			'platformId',
 			'platformTitle',
 			'origOrgId',

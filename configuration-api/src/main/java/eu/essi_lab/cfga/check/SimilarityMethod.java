@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
@@ -112,7 +111,7 @@ public class SimilarityMethod implements CheckMethod {
     /**
      * 
      */
-    private List<Property<?>> exclusions;
+    private final List<Property<?>> exclusions;
 
     /**
      * 
@@ -142,9 +141,11 @@ public class SimilarityMethod implements CheckMethod {
 
 	    SelectionUtils.deepClean(newSetting);
 
+	    SelectionUtils.deepAfterClean(newSetting);
+
 	    similar = newSetting.similar(//
 		    configSetting, //
-		    getExclusions().stream().map(p -> p.getKey()).collect(Collectors.toList()));
+		    getExclusions().stream().map(Property::getKey).toList());
 
 	    if (!similar) {
 

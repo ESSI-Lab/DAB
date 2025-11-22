@@ -1,5 +1,7 @@
 package eu.essi_lab.model.ontology.d2k.loader;
 
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -14,8 +16,6 @@ import java.util.Set;
 import org.apache.jena.graph.Triple;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.openrdf.model.Statement;
-import org.openrdf.model.impl.SimpleValueFactory;
 
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.OntologyURIs;

@@ -21,6 +21,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ public class AccessMessage extends RequestMessage {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 7939395851033735840L;
     private static final String DESCRIPTOR = "descriptor";
     private static final String ONLINE_ID = "onlineId";
@@ -84,7 +86,7 @@ public class AccessMessage extends RequestMessage {
      */
     public void setTargetDataDescriptor(DataDescriptor descriptor) {
 
-	getPayload().add(new GSProperty<DataDescriptor>(DESCRIPTOR, descriptor));
+	getPayload().add(new GSProperty<>(DESCRIPTOR, descriptor));
     }
 
     /**
@@ -100,7 +102,7 @@ public class AccessMessage extends RequestMessage {
      */
     public void setOnlineId(String id) {
 
-	getPayload().add(new GSProperty<String>(ONLINE_ID, id));
+	getPayload().add(new GSProperty<>(ONLINE_ID, id));
     }
 
     /**
@@ -116,6 +118,6 @@ public class AccessMessage extends RequestMessage {
      */
     public void setDownloadCount(int count) {
 
-	getPayload().add(new GSProperty<Integer>(DOWNLOAD_COUNT, count));
+	getPayload().add(new GSProperty<>(DOWNLOAD_COUNT, count));
     }
 }

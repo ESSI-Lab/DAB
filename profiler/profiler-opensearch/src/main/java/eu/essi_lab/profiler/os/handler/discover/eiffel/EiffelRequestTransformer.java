@@ -49,7 +49,7 @@ public class EiffelRequestTransformer extends OSRequestTransformer {
     @Override
     protected void handleView(WebRequest request, StorageInfo storageUri, RequestMessage message) throws GSException {
 
-	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(message.getWebRequest(), setting);
+	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(message.getWebRequest(), getSetting().get());
 
 	GSLoggerFactory.getLogger(getClass()).debug("Enabling EIFFEL API discovery option: " + eiffelOption.get());
 

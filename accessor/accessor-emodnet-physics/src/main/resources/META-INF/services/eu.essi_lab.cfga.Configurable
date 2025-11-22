@@ -1,2 +1,4 @@
 eu.essi_lab.accessor.emodnet.EMODNETPhysicsAccessor
 eu.essi_lab.accessor.emodnet.EMODNETPhysicsConnector
+eu.essi_lab.accessor.emodnet.ERDDAPRiverAccessor
+eu.essi_lab.accessor.emodnet.ERDDAPRiverConnector

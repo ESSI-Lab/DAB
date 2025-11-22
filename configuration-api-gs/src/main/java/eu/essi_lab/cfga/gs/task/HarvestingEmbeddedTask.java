@@ -36,7 +36,7 @@ public interface HarvestingEmbeddedTask extends CustomTask {
     /**
      * @author Fabrizio
      */
-    public enum ExecutionStage {
+    enum ExecutionStage {
 	/**
 	 * 
 	 */
@@ -44,21 +44,21 @@ public interface HarvestingEmbeddedTask extends CustomTask {
 	/**
 	 * 
 	 */
-	AFTER_HARVESTING_END;
+	AFTER_HARVESTING_END
     }
 
     /**
      * @return
      */
-    public ExecutionStage getExecutionStage();
+    ExecutionStage getExecutionStage();
 
     /**
      * @param request
      */
-    public void setListRecordsRequest(ListRecordsRequest request);
+    void setListRecordsRequest(ListRecordsRequest request);
 
     /**
      * @return
      */
-    public ListRecordsRequest getListRecordsRequest();
+    ListRecordsRequest getListRecordsRequest();
 }

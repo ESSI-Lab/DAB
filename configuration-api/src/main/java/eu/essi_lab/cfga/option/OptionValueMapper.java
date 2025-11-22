@@ -27,7 +27,7 @@ package eu.essi_lab.cfga.option;
  */
 public abstract class OptionValueMapper<T> {
 
-    private Class<T> clazz;
+    private final Class<T> clazz;
 
     /**
      * 

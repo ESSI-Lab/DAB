@@ -195,12 +195,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<IDistributedQueryConnector> loader = ServiceLoader.load(IDistributedQueryConnector.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CMRIDNGranulesConnector.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CMRIDNGranulesConnector.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CWICCMRGranulesConnector.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CWICCMRGranulesConnector.class)));
     }
 
     @SuppressWarnings("rawtypes")
@@ -210,12 +208,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<IHarvestedQueryConnector> loader = ServiceLoader.load(IHarvestedQueryConnector.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CMRIDNOpensearchConnector.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CMRIDNOpensearchConnector.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CWICCMROpensearchConnector.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CWICCMROpensearchConnector.class)));
     }
 
     @Test
@@ -224,13 +220,13 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CWICCMROpensearchCollectionMapper.class)).findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CWICCMROpensearchCollectionMapper.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CMRGranulesMapper.class)).findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CMRGranulesMapper.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CMRIDNOpensearchCollectionMapper.class)).findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CMRIDNOpensearchCollectionMapper.class)));
 
     }
 
@@ -241,36 +237,28 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CMRIDNGranulesConnector.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CMRIDNGranulesConnector.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CWICCMRGranulesConnector.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CWICCMRGranulesConnector.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CMRIDNOpensearchConnector.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CMRIDNOpensearchConnector.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CWICCMROpensearchConnector.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CWICCMROpensearchConnector.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CMRIDNOpensearchAccessor.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CMRIDNOpensearchAccessor.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CWICCMROpensearchAccessor.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CWICCMROpensearchAccessor.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CMRIDNAccessor.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CMRIDNAccessor.class)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getClass().equals(CWICCMRGranulesAccessor.class))//
-		.findFirst().isPresent());
+		anyMatch(c -> c.getClass().equals(CWICCMRGranulesAccessor.class)));
 
     }
 

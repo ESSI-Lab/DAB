@@ -70,8 +70,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(AutomaticSystemConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(AutomaticSystemConnector.class)));//
     }
 
     @SuppressWarnings("rawtypes")
@@ -81,24 +80,16 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(AutomaticSystemAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(AutomaticSystemAccessor.class.getName())));
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(AutomaticSystemConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(AutomaticSystemConnector.class.getName())));
 	
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(SIGEDACAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(SIGEDACAccessor.class.getName())));
 	
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(SIGEDACConnector.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(SIGEDACConnector.class.getName())));
 
     }
 }

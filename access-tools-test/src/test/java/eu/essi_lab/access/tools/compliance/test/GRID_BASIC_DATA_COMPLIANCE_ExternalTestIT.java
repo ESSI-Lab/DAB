@@ -14,7 +14,7 @@ import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.DataComplianceTester;
 import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
 import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
@@ -35,7 +35,7 @@ public class GRID_BASIC_DATA_COMPLIANCE_ExternalTestIT {
 	    online.setIdentifier(onlineResourceId);
 	    online.setLinkage("http://ows.eox.at/cite/mapserver?");
 	    online.setName("MER_FRS_1PNUPA20090701_124435_000005122080_00224_38354_6861_RGB");
-	    online.setProtocol(NetProtocols.WCS_1_0_0.getCommonURN());
+	    online.setProtocol(NetProtocolWrapper.WCS_1_0_0.getCommonURN());
 	    dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution().addDistributionOnline(online);
 
 	    // WorkflowBuilder.enableLogs(true);

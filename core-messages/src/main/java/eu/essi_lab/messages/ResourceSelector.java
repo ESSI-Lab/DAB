@@ -21,6 +21,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ public class ResourceSelector implements Serializable {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -7516805077469988112L;
     private boolean includeOriginal;
 
@@ -227,8 +229,8 @@ public class ResourceSelector implements Serializable {
 
     }
 
-    private List<Queryable> quaryableList;
-    private List<String> extendedElementList = new ArrayList<>();
+    private final List<Queryable> quaryableList;
+    private final List<String> extendedElementList = new ArrayList<>();
     private ResourceSubset subset;
     private IndexesPolicy indexesPolicy;
     private ExtendedElementsPolicy extendedElementsPolicy = null;
@@ -355,7 +357,7 @@ public class ResourceSelector implements Serializable {
      */
     public List<String> getIndexes() {
 
-	return quaryableList.stream().map(q -> q.getName()).collect(Collectors.toList());
+	return quaryableList.stream().map(Queryable::getName).collect(Collectors.toList());
     }
 
     /**

@@ -61,10 +61,12 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String BLUECLOUD_NS_URI = "http://essi-lab.eu/BLUECLOUD";
     public static final String BLUECLOUD_API = "http://essi-lab.eu/BlueCloudAPI";
     public static final String ARGO_NS_URI = "http://essi-lab.eu/ARGO";
+    public static final String ARGO_STAC_NS_URI = "http://essi-lab.eu/STAC/ARGO";
     public static final String WEKEO_NS_URI = "http://essi-lab.eu/WEKEO";
     public static final String EUROBIS_NS_URI = "http://essi-lab.eu/EurOBIS";
     public static final String EUROBIS_LD_NS_URI = "http://essi-lab.eu/EurOBIS-LD";
     public static final String EMODNET_PHYSICS_NS_URI = "http://essi-lab.eu/EMODNETPhysics";
+    public static final String EMODNET_PHYSICS_RIVER_NS_URI = "http://essi-lab.eu/EMODNETPhysics/River";
     public static final String NIWA_NS_URI = "http://essi-lab.eu/NIWA";
     public static final String ICOS_NS_URI = "http://essi-lab.eu/ICOS";
     public static final String MCP_1_NS_URI = "http://bluenet3.antcrc.utas.edu.au/mcp";
@@ -224,6 +226,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("sentinel", SENTINEL2_URI);
 	map.put("bluecloud", BLUECLOUD_NS_URI);
 	map.put("argo", ARGO_NS_URI);
+	map.put("argostac", ARGO_STAC_NS_URI);
 	map.put("wekeo", WEKEO_NS_URI);
 	map.put("icos", ICOS_NS_URI);
 	map.put("eurobis", EUROBIS_NS_URI);

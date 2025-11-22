@@ -65,7 +65,23 @@ GIAPI.GINode = function() {
         }
 
         if (report.keyword) {
-            report.keyword = report.keyword.distinctValues();
+            // If keyword_type exists, don't deduplicate to preserve alignment
+            // The same keyword with different types should be preserved
+            if (report.keyword_type && Array.isArray(report.keyword_type)) {
+                // Ensure keyword_type array has same length as keyword array
+                // Pad with null if keyword_type is shorter
+                while (report.keyword_type.length < report.keyword.length) {
+                    report.keyword_type.push(null);
+                }
+                // Truncate if keyword_type is longer (shouldn't happen, but be safe)
+                if (report.keyword_type.length > report.keyword.length) {
+                    report.keyword_type = report.keyword_type.slice(0, report.keyword.length);
+                }
+                // Don't deduplicate - preserve all keywords and their types to maintain alignment
+            } else {
+                // No keyword_type, safe to deduplicate keywords
+                report.keyword = report.keyword.distinctValues();
+            }
         }
     }
 

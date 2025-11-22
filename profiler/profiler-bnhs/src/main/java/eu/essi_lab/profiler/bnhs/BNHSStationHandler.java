@@ -22,6 +22,7 @@ package eu.essi_lab.profiler.bnhs;
  */
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
@@ -29,7 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.xml.datatype.Duration;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -65,7 +66,6 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
@@ -76,8 +76,10 @@ import eu.essi_lab.model.resource.BNHSProperty;
 import eu.essi_lab.model.resource.BNHSPropertyReader;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.OrganizationElementWrapper;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.pdk.BondUtils;
-import eu.essi_lab.pdk.Semantics;
+import eu.essi_lab.pdk.SemanticSearchSupport;
 import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
@@ -159,11 +161,11 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    // we are interested only on downloadable datasets
 	    ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
-	    operands.add(accessBond);
+	    // operands.add(accessBond);
 
 	    // we are interested only on downloadable datasets
 	    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
-	    operands.add(downBond);
+	    // operands.add(downBond);
 
 	    // we are interested only on TIME SERIES datasets
 	    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
@@ -177,13 +179,23 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    operands.add(platformBond);
 
 	    Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
-	    String ont = getParam(parameterMap, "ontology");
-	    String attributeTitle = getParam(parameterMap, "attributeTitle");
-	    String semantics = getParam(parameterMap, "semantics");
 
-	    if (ont != null && attributeTitle != null) {
-		Bond bond = Semantics.getSemanticBond(attributeTitle, semantics, ont);
-		operands.add(bond);
+	    String ontologyIds = getParam(parameterMap, SemanticSearchSupport.ONTOLOGY_IDS_PARAM);
+	    String attributeTitle = getParam(parameterMap, SemanticSearchSupport.ATTRIBUTE_TITLE_PARAM);
+	    String semanticSearch = getParam(parameterMap, SemanticSearchSupport.SEMANTIC_SEARCH_PARAM);
+
+	    if (ontologyIds != null && attributeTitle != null && semanticSearch != null && semanticSearch.equals("true")) {
+
+		SemanticSearchSupport support = new SemanticSearchSupport();
+
+		Optional<Bond> bond = support.getSemanticBond(//
+			webRequest, //
+			attributeTitle, //
+			ontologyIds, //
+			MetadataElement.ATTRIBUTE_TITLE_EL_NAME, //
+			true);
+
+		bond.ifPresent(b -> operands.add(b));
 	    }
 
 	    String instrumentTitle = getParam(parameterMap, "instrumentTitle");
@@ -238,7 +250,17 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		}
 	    }
 
-	    LogicalBond bond = BondFactory.createAndBond(operands);
+	    Bond bond = null;
+
+	    switch (operands.size()) {
+	    case 0:
+		break;
+	    case 1:
+		bond = operands.iterator().next();
+		break;
+	    default:
+		bond = BondFactory.createAndBond(operands);
+	    }
 
 	    StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 
@@ -269,10 +291,13 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 		String platformId = resource.getExtensionHandler().getUniquePlatformIdentifier().isPresent() ? //
 			resource.getExtensionHandler().getUniquePlatformIdentifier().get() : "";
+		String platformIdLocal = "";
 		String platformLabel = "";
 		try {
 		    platformLabel = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform().getCitation()
 			    .getTitle();
+		    platformIdLocal = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform()
+			    .getMDIdentifierCode();
 		} catch (Exception e) {
 		}
 		String attributeId = resource.getExtensionHandler().getUniqueAttributeIdentifier().isPresent() ? //
@@ -337,23 +362,103 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 			}
 		    }
 		}
+		JSONObject object = new JSONObject();
+
 		ResponsibleParty poc = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContact();
+		List<ComposedElement> organizations = resource.getExtensionHandler()
+			.getComposedElements(MetadataElement.ORGANIZATION.getName());
+		JSONArray orgArray = new JSONArray();
+		for (ComposedElement organization : organizations) {
+		    OrganizationElementWrapper wrapper = new OrganizationElementWrapper(organization);
+		    JSONObject org = new JSONObject();
+		    org.putOpt("name", wrapper.getOrgName());
+		    org.putOpt("uri", wrapper.getOrgUri());
+		    String indName = wrapper.getIndividualName();
+		    if (indName != null && !indName.isEmpty()) {
+			JSONArray arr = new JSONArray(indName);
+			org.putOpt("individual_name", arr);
+		    }
+		    String indURI = wrapper.getIndividualURI();
+		    if (indURI != null && !indURI.isEmpty()) {
+			JSONArray arr = new JSONArray(indURI);
+			org.putOpt("individual_uri", arr);
+		    }
+		    org.putOpt("email", wrapper.getEmail());
+		    org.putOpt("homepage", wrapper.getHomePageURL());
+		    String role = wrapper.getRole();
+		    if (role != null && !role.isEmpty()) {
+			JSONArray arr = new JSONArray(role);
+			org.putOpt("role", arr);
+		    }
+		    orgArray.put(org);
+		}
+		object.put("organizations", orgArray);
+
 		String institute = null;
 		if (poc != null) {
 		    institute = poc.getOrganisationName();
 		}
+
 		String country = resource.getExtensionHandler().getCountry().isPresent() ? //
 			resource.getExtensionHandler().getCountry().get().toString() : null;
 		String timeInter = resource.getExtensionHandler().getTimeInterpolation().isPresent() ? //
 			resource.getExtensionHandler().getTimeInterpolation().get().toString() : "";
+		if (timeInter.equals("")) {
+		    List<String> read = resource.getIndexesMetadata().read(MetadataElement.TIME_INTERPOLATION);
+		    if (!read.isEmpty()) {
+			timeInter = read.get(0);
+		    }
+		}
 		String timeSupport = resource.getExtensionHandler().getTimeSupport().isPresent() ? //
 			resource.getExtensionHandler().getTimeSupport().get().toString() : "";
+		if (timeSupport.equals("")) {
+		    List<String> read = resource.getIndexesMetadata().read(MetadataElement.TIME_SUPPORT);
+		    if (!read.isEmpty()) {
+			timeSupport = read.get(0);
+		    }
+		}
 		String timeResolution = resource.getExtensionHandler().getTimeResolution().isPresent() ? //
 			resource.getExtensionHandler().getTimeResolution().get() : "";
+		if (timeResolution.equals("")) {
+		    List<String> read = resource.getIndexesMetadata().read(MetadataElement.TIME_RESOLUTION);
+		    if (!read.isEmpty()) {
+			timeResolution = read.get(0);
+		    }
+		}
 		String timeUnits = resource.getExtensionHandler().getTimeUnits().isPresent() ? //
 			resource.getExtensionHandler().getTimeUnits().get() : "";
+		if (timeUnits.equals("")) {
+		    List<String> read = resource.getIndexesMetadata().read(MetadataElement.TIME_UNITS);
+		    if (!read.isEmpty()) {
+			timeUnits = read.get(0);
+		    }
+		}
 		String timeUnitsAbbreviation = resource.getExtensionHandler().getTimeUnitsAbbreviation().isPresent() ? //
 			resource.getExtensionHandler().getTimeUnitsAbbreviation().get() : "";
+		if (timeUnitsAbbreviation.equals("")) {
+		    List<String> read = resource.getIndexesMetadata().read(MetadataElement.TIME_UNITS_ABBREVIATION);
+		    if (!read.isEmpty()) {
+			timeUnitsAbbreviation = read.get(0);
+		    }
+		}
+		String period = "";
+		Optional<String> timePeriod = resource.getExtensionHandler().getTimeAggregationDuration8601();
+		if (timePeriod.isPresent()) {
+		    period = timePeriod.get();
+		}
+		if (period.equals("")) {
+		    List<String> read = resource.getIndexesMetadata().read(MetadataElement.TIME_AGGREGATION_DURATION_8601);
+		    if (!read.isEmpty()) {
+			period = read.get(0);
+		    }
+		}
+		if (!period.equals("")) {
+		    Duration d = ISO8601DateTimeUtils.getDuration(period);
+		    SimpleEntry<BigDecimal, String> unitsValue = ISO8601DateTimeUtils.getUnitsValueFromDuration(d);
+		    timeUnits = unitsValue.getValue();
+		    timeSupport = unitsValue.getKey().toString();
+		}
+		
 		String timeStart = "";
 		String timeEnd = "";
 		String nearRealTime = "no";
@@ -397,8 +502,6 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		// platform
 		//
 
-		JSONObject object = new JSONObject();
-
 		object = create(object, "source_id", sourceId, "Source ID");
 
 		object = create(object, "source_label", sourceLabel, "Source label");
@@ -409,6 +512,8 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		}
 
 		object = create(object, "platform_id", platformId, "Station ID");
+
+		object = create(object, "platform_id_local", platformIdLocal, "Local station ID");
 
 		object = create(object, "platform_label", platformLabel, "Station/platform name");
 
@@ -466,6 +571,11 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		if (verticalExt != null) {
 
 		    object = create(object, "vertical_extent", verticalExt.toString(), "vertical extent");
+		}
+
+		Optional<String> dataDisclaimer = resource.getExtensionHandler().getDataDisclaimer();
+		if (dataDisclaimer.isPresent()) {
+		    object = create(object, "data_disclaimer", dataDisclaimer.get(), "data disclaimer");
 		}
 
 		//

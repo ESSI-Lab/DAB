@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Fabrizio
@@ -28,8 +30,12 @@ public class HttpHeaderUtilsTest {
 	assertEquals(0, size);
     }
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void emptyTest2() {
+	expectedException.expect(UnsupportedOperationException.class);
 
 	HttpHeaders headers = HttpHeaderUtils.buildEmpty();
 

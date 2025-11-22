@@ -34,5 +34,5 @@ public interface TabIndex extends SchemeItem {
     /**
      * @return
      */
-    public int getIndex();
+    int getIndex();
 }

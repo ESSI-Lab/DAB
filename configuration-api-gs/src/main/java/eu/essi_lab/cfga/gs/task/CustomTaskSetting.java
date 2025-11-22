@@ -21,11 +21,7 @@ package eu.essi_lab.cfga.gs.task;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTimeZone;
@@ -43,8 +39,8 @@ import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -66,32 +62,32 @@ import eu.essi_lab.lib.utils.StreamUtils;
 public class CustomTaskSetting extends SchedulerWorkerSetting implements EditableSetting {
 
     /**
-     * 
+     *
      */
     private static final String CONFIGURABLE_TYPE = "CustomTaskWorker";
 
     /**
-     * 
+     *
      */
     private static final String TASK_NAME_OPTION_KEY = "taskNameOption";
 
     /**
-     * 
+     *
      */
     private static final String TASK_DESCRIPTION_OPTION_KEY = "taskDescription";
 
     /**
-     * 
+     *
      */
     private static final String TASK_OPTIONS_OPTION_KEY = "taskOptions";
 
     /**
-     * 
+     *
      */
     private static final String EMAIL_RECIPIENTS_OPTIONS_OPTION_KEY = "emailRecipients";
 
     /**
-     * 
+     *
      */
     public CustomTaskSetting() {
 
@@ -151,8 +147,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 		withLabel("Custom task options").//
 		withTextArea().//
 		withDescription("A customizable set of options for the task. The content of these options, the way"
-			+ " they are provided and parsed, are completely demanded to the specific task implementation")
-		.//
+		+ " they are provided and parsed, are completely demanded to the specific task implementation").//
 		cannotBeDisabled().//
 		build();
 
@@ -163,8 +158,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 		withLabel("Comma separated list of email recipients").//
 		withTextArea().//
 		withDescription("The supplied recipients will be notified with an email when the task is done."
-			+ " The system email setting must be configured in order to send the email")
-		.//
+		+ " The system email setting must be configured in order to send the email").//
 		cannotBeDisabled().//
 		build();
 
@@ -191,13 +185,13 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	    ServiceLoader<CustomTask> loader = ServiceLoader.load(CustomTask.class);
 
 	    return StreamUtils.iteratorToStream(loader.iterator()).//
-		    map(t -> t.getName()).//
+		    map(CustomTask::getName).//
 		    sorted().//
 		    collect(Collectors.toList());
 	}
 
 	@Override
-	protected List<String> loadValues(Optional<String> input) throws Exception {
+	protected List<String> loadValues(Optional<String> input) {
 
 	    return getValues();
 	}
@@ -209,60 +203,58 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
     public static class TaskComponentInfo extends ComponentInfo {
 
 	/**
-	 * 
+	 *
 	 */
 	public TaskComponentInfo() {
 
 	    setComponentName(CustomTaskSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.CUSTOM_TASKS.getIndex()).//
 		    withShowDirective("Custom tasks", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
-			    "Add task", //
-			    CustomTaskSetting.class.getCanonicalName())
-		    .//
+		    "Add task", //
+		    CustomTaskSetting.class.getCanonicalName()).//
 		    withRemoveDirective("Remove task", false, CustomTaskSetting.class.getCanonicalName()).//
 		    withEditDirective("Edit task", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
 
-			    ColumnDescriptor.create("Id", true, true, false, (s) -> s.getIdentifier()), //
+		    ColumnDescriptor.create("Id", true, true, false, Setting::getIdentifier), //
 
-			    ColumnDescriptor.create("Name", true, true, (s) -> getName(s)), //
+		    ColumnDescriptor.create("Name", true, true, this::getName), //
 
-			    ColumnDescriptor.create("Description", true, true, (s) -> getDescription(s)), //
+		    ColumnDescriptor.create("Description", true, true, this::getDescription), //
 
-			    ColumnDescriptor.create("Repeat count", 150, true, true,
-				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
+		    ColumnDescriptor.create("Repeat count", 150, true, true, (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
 
-			    ColumnDescriptor.create("Repeat interval", 150, true, true,
-				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
+		    ColumnDescriptor.create("Repeat interval", 150, true, true, (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)),
+		    //
 
-			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
+		    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
 
-				    (item1, item2) -> item1.get("Status").compareTo(item2.get("Status")), //
+			    Comparator.comparing(item -> item.get("Status")), //
 
-				    new JobPhaseColumnRenderer()), //
+			    new JobPhaseColumnRenderer()), //
 
-			    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
+		    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
 
-			    ColumnDescriptor.create("End time", 150, true, true, (s) -> SchedulerSupport.getInstance().getEndTime(s)), //
+		    ColumnDescriptor.create("End time", 150, true, true, (s) -> SchedulerSupport.getInstance().getEndTime(s)), //
 
-			    ColumnDescriptor.create("El. time (HH:mm:ss)", 170, true, true,
-				    (s) -> SchedulerSupport.getInstance().getElapsedTime(s)), //
+		    ColumnDescriptor.create("El. time (HH:mm:ss)", 170, true, true,
+			    (s) -> SchedulerSupport.getInstance().getElapsedTime(s)), //
 
-			    ColumnDescriptor.create("Next fire time", true, true, (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
+		    ColumnDescriptor.create("Next fire time", true, true, (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
 
-			    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
-		    ), getItemsList()).//
+		    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
+	    ), getItemsList()).//
 
 		    reloadable(() -> SchedulerSupport.getInstance().update()).//
 
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
 
 	/**
@@ -405,12 +397,12 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 	if (optional.isPresent()) {
 
-	    return Arrays.asList(getOption(EMAIL_RECIPIENTS_OPTIONS_OPTION_KEY, String.class).//
+	    //
+	    return Arrays.stream(getOption(EMAIL_RECIPIENTS_OPTIONS_OPTION_KEY, String.class).//
 		    get().//
 		    getValue().//
 		    split(",")).//
-		    stream().//
-		    map(v -> v.trim()).//
+		    map(String::trim).//
 		    collect(Collectors.toList());
 	}
 
@@ -422,11 +414,11 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
      */
     public void setEmailRecipients(String... recipients) {
 
+	//
+	//
 	getOption(EMAIL_RECIPIENTS_OPTIONS_OPTION_KEY, String.class).//
 		get().//
-		setValue(Arrays.asList(recipients).//
-			stream().//
-			collect(Collectors.joining(",")));
+		setValue(String.join(",", Arrays.asList(recipients)));
     }
 
     /**

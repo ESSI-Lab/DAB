@@ -55,7 +55,7 @@ import eu.essi_lab.jaxb.wms._1_1_1.Keyword;
 import eu.essi_lab.jaxb.wms._1_1_1.KeywordList;
 import eu.essi_lab.jaxb.wms._1_1_1.Layer;
 import eu.essi_lab.jaxb.wms._1_1_1.WMTMSCapabilities;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -434,7 +434,7 @@ public class WMS_1_1_1ResourceMapper extends OriginalIdentifierMapper {
 		}
 	    }
 
-	    online.setProtocol(NetProtocols.WMS_1_1_1.getCommonURN());
+	    online.setProtocol(NetProtocolWrapper.WMS_1_1_1.getCommonURN());
 	    online.setLinkage(mapURL);
 	    online.setName(wmsLayer.getName());
 	    online.setDescription(wmsLayer.getTitle());

@@ -63,8 +63,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(Landsat8Connector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(Landsat8Connector.class)));//
     }
 
     @Test
@@ -73,10 +72,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(Landsat8Mapper.LANDSAT_8_SCHEME_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(Landsat8Mapper.LANDSAT_8_SCHEME_URI)));
 
     }
 
@@ -87,14 +83,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(Landsat8Accessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(Landsat8Accessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(Landsat8Connector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(Landsat8Connector.class.getName())));
 
     }
 }

@@ -21,9 +21,9 @@ package eu.essi_lab.model.ontology.d2k.statements;
  * #L%
  */
 
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.Value;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
 
 import eu.essi_lab.model.ontology.GSPredicate;
 import eu.essi_lab.model.ontology.d2k.resources.GSKnowledgeResource;

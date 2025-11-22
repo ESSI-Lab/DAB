@@ -40,8 +40,8 @@ import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
  */
 public class FolderRegistry {
 
-    private OpenSearchWrapper wrapper;
-    private OpenSearchDatabase database;
+    private final OpenSearchWrapper wrapper;
+    private final OpenSearchDatabase database;
 
     /**
      * @param database

@@ -22,17 +22,22 @@ package eu.essi_lab.accessor.wfs._1_1_0;
  */
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.namespace.QName;
+import javax.xml.xpath.XPathExpressionException;
 
 import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.Contact;
@@ -43,11 +48,13 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
+import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -72,7 +79,9 @@ import net.opengis.ows.v_1_0_0.ServiceProvider;
 import net.opengis.ows.v_1_0_0.TelephoneType;
 import net.opengis.ows.v_1_0_0.WGS84BoundingBoxType;
 import net.opengis.wfs.v_1_1_0.FeatureTypeType;
+import net.opengis.wfs.v_1_1_0.ObjectFactory;
 import net.opengis.wfs.v_1_1_0.WFSCapabilitiesType;
+import org.xml.sax.SAXException;
 
 /**
  * @author boldrini
@@ -80,12 +89,11 @@ import net.opengis.wfs.v_1_1_0.WFSCapabilitiesType;
 public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 
     private static final String WMS_MAPPER_MAP_ERROR = "WMS_MAPPER_MAP_ERROR";
+    @XmlTransient
+    Downloader downloader = new Downloader();
 
     public WFS_1_1_0ResourceMapper() {
     }
-
-    @XmlTransient
-    Downloader downloader = new Downloader();
 
     @Override
     protected String createOriginalIdentifier(GSResource resource) {
@@ -96,9 +104,9 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 		    resource.getOriginalMetadata().//
 			    getMetadata().getBytes(StandardCharsets.UTF_8)));
 
-	    FeatureTypeType feature = ((WFSCapabilitiesType) jaxbElement.getValue()).getFeatureTypeList().getFeatureType().get(0);
+	    FeatureTypeType feature = ((WFSCapabilitiesType) jaxbElement.getValue()).getFeatureTypeList().getFeatureType().getFirst();
 
-	    return feature.getName().toString();
+	    return getFeatureName(feature);
 
 	} catch (Exception e) {
 
@@ -113,8 +121,8 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 
 	try {
 
-	    JAXBElement<?> jaxbElement = (JAXBElement<?>) WFS_1_1_0Connector.unmarshaller
-		    .unmarshal(new ByteArrayInputStream(originalMD.getMetadata().getBytes(StandardCharsets.UTF_8)));
+	    JAXBElement<?> jaxbElement = (JAXBElement<?>) WFS_1_1_0Connector.unmarshaller.unmarshal(
+		    new ByteArrayInputStream(originalMD.getMetadata().getBytes(StandardCharsets.UTF_8)));
 
 	    String endpoint = source.getEndpoint();
 
@@ -124,7 +132,7 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	    return resource;
 
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    throw GSException.createException( //
 		    getClass(), //
 		    e.getMessage(), //
@@ -143,15 +151,45 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	return CommonNameSpaceContext.WFS_1_1_0_NS_URI;
     }
 
+    public void setDownloader(Object object) {
+
+	this.downloader = null;
+    }
+
+    /**
+     * @param feature
+     * @return
+     */
+    private String getFeatureName(FeatureTypeType feature) throws XPathExpressionException, JAXBException, IOException, SAXException {
+
+	ObjectFactory factory = new ObjectFactory();
+
+	JAXBElement<FeatureTypeType> type = new JAXBElement<FeatureTypeType>(feature.getName(), FeatureTypeType.class, null, feature);
+
+	ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+	WFS_1_1_0Connector.marshaller.marshal(type, stream);
+
+	XMLDocumentReader reader = new XMLDocumentReader(stream.toString(StandardCharsets.UTF_8));
+
+	return reader.evaluateTextContent("//*:Name/text()").getFirst();
+    }
+
+    /**
+     * @param capabilities
+     * @param sourceEndpoint
+     * @return
+     * @throws Exception
+     */
     private GSResource mapResource(WFSCapabilitiesType capabilities, String sourceEndpoint) throws Exception {
 
 	MIMetadata metadata = new MIMetadata();
 
 	GSResource ret = new Dataset();
 
-	FeatureTypeType feature = capabilities.getFeatureTypeList().getFeatureType().get(0);
+	FeatureTypeType feature = capabilities.getFeatureTypeList().getFeatureType().getFirst();
 
-	String name = feature.getName().toString();
+	String featureName = getFeatureName(feature);
 
 	HarmonizedMetadata harmonizedMetadata = ret.getHarmonizedMetadata();
 	CoreMetadata coreMetadata = harmonizedMetadata.getCoreMetadata();
@@ -247,7 +285,7 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 		metadata.addReferenceSystemInfo(ref);
 	    }
 	} else {
-	    if (name != null) {
+	    if (featureName != null) {
 		System.err.println("No CRS specified for this layer: " + feature.getName().toString());
 	    }
 	}
@@ -255,10 +293,10 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	DataIdentification identification = new DataIdentification();
 
 	String id;
-	if (name == null || name.isEmpty()) {
+	if (featureName == null || featureName.isEmpty()) {
 	    id = UUID.randomUUID().toString();
 	} else {
-	    id = name;
+	    id = featureName;
 	}
 
 	identification.setResourceIdentifier(id);
@@ -328,16 +366,14 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	    List<Operation> operations = operationsMetadata.getOperation();
 	    if (operations != null) {
 		for (Operation operation : operations) {
-		    if (operation.getName() != null && operation.getName().toLowerCase().equals("getfeature")) {
+		    if (operation.getName() != null && operation.getName().equalsIgnoreCase("getfeature")) {
 			List<DCP> dcps = operation.getDCP();
 			if (dcps != null) {
-			    DCP dcp = dcps.get(0);
+			    DCP dcp = dcps.getFirst();
 			    HTTP http = dcp.getHTTP();
 			    List<JAXBElement<RequestMethodType>> gps = http.getGetOrPost();
 			    if (gps != null) {
-				Iterator<JAXBElement<RequestMethodType>> iterator = gps.iterator();
-				while (iterator.hasNext()) {
-				    JAXBElement<RequestMethodType> gp = iterator.next();
+				for (JAXBElement<RequestMethodType> gp : gps) {
 				    href = gp.getValue().getHref();
 				}
 			    }
@@ -387,9 +423,9 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	    }
 	}
 
-	online.setProtocol(NetProtocols.WFS_1_1_0.getCommonURN());
+	online.setProtocol(NetProtocolWrapper.WFS_1_1_0.getCommonURN());
 	online.setLinkage(href);
-	online.setName(feature.getName().toString());
+	online.setName(featureName);
 	online.setFunctionCode("download");
 	online.setIdentifier(uuid);
 
@@ -400,11 +436,6 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	// TODO: MetadataURL support missing
 
 	return ret;
-
-    }
-
-    public void setDownloader(Object object) {
-	this.downloader = null;
 
     }
 

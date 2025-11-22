@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.scheduler;
 
@@ -50,7 +50,7 @@ public class SchedulerFactory {
     private static final String AUGMENTER_BATCH_THREAD_COUNT = "20";
 
     /**
-     * 
+     *
      */
     private static Scheduler scheduler;
 
@@ -71,8 +71,8 @@ public class SchedulerFactory {
     public synchronized static Scheduler getScheduler(SchedulerSetting setting, boolean start) {
 
 	return switch (setting.getJobStoreType()) {
-	case VOLATILE -> getVolatileScheduler(setting, start);
-	case PERSISTENT -> getPersistentScheduler(setting, start);
+	    case VOLATILE -> getVolatileScheduler(setting, start);
+	    case PERSISTENT -> getPersistentScheduler(setting, start);
 	};
     }
 
@@ -110,7 +110,7 @@ public class SchedulerFactory {
 
 		scheduler.start();
 
-	    } else if (scheduler != null && scheduler instanceof PersistentJobStoreScheduler) {
+	    } else if (scheduler instanceof PersistentJobStoreScheduler) {
 
 		GSLoggerFactory.getLogger(SchedulerFactory.class).info("Shutting down persistent scheduler");
 
@@ -140,9 +140,8 @@ public class SchedulerFactory {
      * @param setting
      * @param start
      * @return
-     * @throws SQLException
      */
-    public synchronized static Scheduler getPersistentScheduler(SchedulerSetting setting) throws SQLException {
+    public synchronized static Scheduler getPersistentScheduler(SchedulerSetting setting) {
 
 	return getPersistentScheduler(setting, true);
     }
@@ -156,7 +155,8 @@ public class SchedulerFactory {
 
 	try {
 
-	    if (scheduler == null) {
+	    switch (scheduler) {
+	    case null -> {
 
 		GSLoggerFactory.getLogger(SchedulerFactory.class).info("Creating new persistent scheduler");
 
@@ -165,8 +165,8 @@ public class SchedulerFactory {
 		if (start) {
 		    scheduler.start();
 		}
-
-	    } else if (scheduler != null && scheduler instanceof VolatileJobStoreScheduler) {
+	    }
+	    case VolatileJobStoreScheduler volatileJobStoreScheduler -> {
 
 		GSLoggerFactory.getLogger(SchedulerFactory.class).info("Shutting down volatile scheduler");
 
@@ -179,10 +179,8 @@ public class SchedulerFactory {
 		if (start) {
 		    scheduler.start();
 		}
-
-	    } else if (scheduler != null && scheduler instanceof PersistentJobStoreScheduler) {
-
-		PersistentJobStoreScheduler sch = (PersistentJobStoreScheduler) scheduler;
+	    }
+	    case PersistentJobStoreScheduler sch -> {
 
 		SchedulerSetting schSetting = sch.getSetting();
 
@@ -200,7 +198,9 @@ public class SchedulerFactory {
 			scheduler.start();
 		    }
 		}
-
+	    }
+	    default -> {
+	    }
 	    }
 	} catch (SchedulerException ex) {
 
@@ -275,8 +275,8 @@ public class SchedulerFactory {
 
 	    if (ExecutionMode.get() == ExecutionMode.AUGMENTER) {
 
-		GSLoggerFactory.getLogger(SchedulerFactory.class).debug("Thread pool count for augmenter execution mode set to {}",
-			AUGMENTER_BATCH_THREAD_COUNT);
+		GSLoggerFactory.getLogger(SchedulerFactory.class)
+			.debug("Thread pool count for augmenter execution mode set to {}", AUGMENTER_BATCH_THREAD_COUNT);
 
 		slotsCout = AUGMENTER_BATCH_THREAD_COUNT;
 	    }
@@ -298,8 +298,8 @@ public class SchedulerFactory {
     private static Properties loadProperties(JobStoreType jobStoreType) {
 
 	InputStream stream = switch (jobStoreType) {
-	case VOLATILE -> SchedulerFactory.class.getClassLoader().getResourceAsStream("ram-quartz.properties");
-	case PERSISTENT -> SchedulerFactory.class.getClassLoader().getResourceAsStream("jdbc-quartz.properties");
+	    case VOLATILE -> SchedulerFactory.class.getClassLoader().getResourceAsStream("ram-quartz.properties");
+	    case PERSISTENT -> SchedulerFactory.class.getClassLoader().getResourceAsStream("jdbc-quartz.properties");
 	};
 
 	Properties properties = new Properties();

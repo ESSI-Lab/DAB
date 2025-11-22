@@ -37,7 +37,6 @@ import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.cfga.scheduler.SchedulerWorker;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
@@ -105,7 +104,7 @@ public class CustomTaskWorker extends SchedulerWorker<CustomTaskSetting> {
     }
 
     @Override
-    protected void storeJobStatus(SchedulerJobStatus status) throws GSException {
+    protected void storeJobStatus(SchedulerJobStatus status) {
 
 	SchedulerViewSetting setting = ConfigurationWrapper.getSchedulerSetting();
 

@@ -520,6 +520,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	JSONArray verticalExtentArray = new JSONArray();
 	JSONArray whenArray = new JSONArray();
 	JSONArray keywordArray = new JSONArray();
+	JSONArray keywordTypeArray = new JSONArray();
 	JSONArray topicArray = new JSONArray();
 	JSONArray overviewArray = new JSONArray();
 	JSONArray geossCategoryArray = new JSONArray();
@@ -716,11 +717,15 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    List<Keywords> keywordList = Lists.newArrayList(identification.getKeywords());
 	    if (!keywordList.isEmpty()) {
 
-		for (Keywords kwd : keywordList) {
-		    List<String> kwdList = Lists.newArrayList(kwd.getKeywords());
-		    for (String s : kwdList) {
-			keywordArray.put(normalizeText(s));
+		for (Keywords kwd : keywordList) {		    
+		    String type = kwd.getTypeCode();
+		    Iterator<String> keywords = kwd.getKeywords();
+		    while (keywords.hasNext()) {
+			String keyword = (String) keywords.next();
+			keywordArray.put(normalizeText(keyword));
+			keywordTypeArray.put(normalizeText(type));
 		    }
+
 		}
 	    }
 
@@ -818,6 +823,9 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	// inserts keyword
 	if (keywordArray.length() > 0) {
 	    report.put("keyword", keywordArray);
+	}
+	if (keywordTypeArray.length() > 0) {
+	    report.put("keyword_type", keywordTypeArray);
 	}
 
 	// --------------
@@ -979,7 +987,9 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
     }
 
     private String normalizeText(String text) {
-
+	if (text==null) {
+	    return "";
+	}
 	return text.trim().replaceAll("\\s+", " ");
     }
 

@@ -29,8 +29,7 @@ import java.util.Optional;
 
 import eu.essi_lab.accessor.wms.WMSDownloader;
 import eu.essi_lab.jaxb.wms._1_3_0.WMSCapabilities;
-import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -71,9 +70,7 @@ public class WMS_1_3_0Downloader extends WMSDownloader {
     @Override
     public boolean canDownload() {
 
-	NetProtocol protocol = NetProtocols.decodeFromIdentifier(online.getProtocol());
-
-	return NetProtocols.WMS_1_3_0.equals(protocol);
+	return NetProtocolWrapper.check(online.getProtocol(),NetProtocolWrapper.WMS_1_3_0);
     }
 
     @Override

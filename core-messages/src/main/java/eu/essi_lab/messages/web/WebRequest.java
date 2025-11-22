@@ -21,11 +21,7 @@ package eu.essi_lab.messages.web;
  * #L%
  */
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,7 +45,6 @@ import javax.servlet.DispatcherType;
 import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -89,8 +84,9 @@ import eu.essi_lab.rip.RuntimeInfoProvider;
 public class WebRequest implements RuntimeInfoProvider, Serializable {
 
     /**
-     * 
+     *
      */
+    @Serial
     private static final long serialVersionUID = -4249959411713525643L;
     /**
      *
@@ -103,45 +99,45 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     public static final String SERVICES_PATH = "/services/essi/";
 
     /**
-     * 
+     *
      */
     public static final String SEMANTIC_PATH = "semantic";
     /**
-     * 
+     *
      */
     public static final String TOKEN_PATH = "token";
     /**
-     * 
+     *
      */
     public static final String VIEW_PATH = "view";
     /**
-     * 
+     *
      */
     public static final String VIEWS_PATH = "views";
     /**
-     * 
+     *
      */
     public static final String HTTP_SERVLET_REQUEST_USER_ATTRIBUTE = "user";
     /**
-     * 
+     *
      */
     public static final String CLIENT_IDENTIFIER_HEADER = "client_dentifier";
     public static final String ESSI_LAB_CLIENT_IDENTIFIER = "ESSILabClient";
 
     /**
-     * 
+     *
      */
     public static final String X_FORWARDED_FOR_HEADER = "x-forwarded-for";
 
     /**
-     * 
+     *
      */
     public static final String HTTP_SERVLET_REQUEST_ID_PROPERTY = "webRequestId";
 
     /**
-     * 
+     *
      */
-    public static String ORIGIN_HEADER = "origin";
+    public static final String ORIGIN_HEADER = "origin";
 
     private transient WebServiceContext context;
     private transient UriInfo uriInfo;
@@ -159,7 +155,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     private String profilerName;
 
     /**
-     * 
+     *
      */
     public WebRequest() {
 
@@ -426,11 +422,9 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * Retrieves the complete host name from the supplied uri in the form <code>scheme://authority</code><br>
-     * E.g:<br>
-     * - <i>Request</i> -> http://localhost:9090/gs-service/services/essi/ssc/feed<br>
-     * - <i>Complete host name</i> -> http://localhost:9090<br>
-     * 
+     * Retrieves the complete host name from the supplied uri in the form <code>scheme://authority</code><br> E.g:<br> - <i>Request</i> ->
+     * http://localhost:9090/gs-service/services/essi/ssc/feed<br> - <i>Complete host name</i> -> http://localhost:9090<br>
+     *
      * @param uri
      * @return
      */
@@ -449,8 +443,9 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	String serverName = request.getServerName(); // localhost
 	int serverPort = request.getServerPort(); // 8080
 
-	return scheme + "://" + serverName
-		+ ((serverPort == 80 && "http".equals(scheme)) || (serverPort == 443 && "https".equals(scheme)) ? "" : ":" + serverPort);
+	return scheme + "://" + serverName + ((serverPort == 80 && "http".equals(scheme)) || (serverPort == 443 && "https".equals(scheme))
+		? ""
+		: ":" + serverPort);
     }
 
     /**
@@ -468,9 +463,9 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    if (StringUtils.isNotEmpty(header)) {
 
 		String[] split = header.split(",");
-		for (int i = 0; i < split.length; i++) {
+		for (String s : split) {
 
-		    list.add(split[i].trim());
+		    list.add(s.trim());
 		}
 	    }
 	}
@@ -499,7 +494,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
     /**
      * See {@link #retrieveCompleteHostName(URI)}
-     * 
+     *
      * @return
      */
     public String retrieveCompleteHostName() {
@@ -642,11 +637,9 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	Optional<String> remoteHost = readRemoteHostHeader();
 
-	String context = origin.isPresent() ? origin.get() : //
+	return origin.isPresent() ? origin.get() : //
 		Objects.nonNull(refererValue) ? refererValue : //
 			remoteHost.orElse(getRequestId());
-
-	return context;
     }
 
     /**
@@ -697,10 +690,8 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * Set the base services path. It must begin and end with '/' (e.g: "/services/essi/"). It must be correctly set and
-     * it must match the
-     * request base services path in order to have a correct behavior during the path comparison of the
-     * {@link GETRequestFilter}
+     * Set the base services path. It must begin and end with '/' (e.g: "/services/essi/"). It must be correctly set and it must match the
+     * request base services path in order to have a correct behavior during the path comparison of the {@link GETRequestFilter}
      *
      * @param path
      */
@@ -719,7 +710,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
     /**
      * Shortcut for {@link #setServletRequest(HttpServletRequest, boolean)} with boolean param set to <code>true</code>
-     * 
+     *
      * @param servletRequest
      * @throws IOException
      */
@@ -814,14 +805,13 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * This method is a shortcut for
-     * {@link #getServletRequest()}getQueryString().<br>
-     * The returned value can be also set calling the {@link #setQueryString(String)} method
-     * 
-     * @deprecated use {@link #getOptionalQueryString()}
+     * This method is a shortcut for {@link #getServletRequest()}getQueryString().<br> The returned value can be also set calling the
+     * {@link #setQueryString(String)} method
+     *
      * @return the query string if available, <code>null</code> otherwise
      * @see #isGetRequest()
      * @see #isPostRequest()
+     * @deprecated use {@link #getOptionalQueryString()}
      */
     @Deprecated()
     public String getQueryString() {
@@ -840,10 +830,9 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * This method is a shortcut for
-     * {@link #getServletRequest()}getQueryString().<br>
-     * The returned value can be also set calling the {@link #setQueryString(String)} method
-     * 
+     * This method is a shortcut for {@link #getServletRequest()}getQueryString().<br> The returned value can be also set calling the
+     * {@link #setQueryString(String)} method
+     *
      * @see #isGetRequest()
      * @see #isPostRequest()
      */
@@ -859,23 +848,17 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	Optional<String> queryString = getOptionalQueryString();
 
-	if (queryString.isPresent()) {
+	return queryString.map(StringUtils::URLDecodeUTF8);
 
-	    return Optional.of(StringUtils.URLDecodeUTF8(queryString.get()));
-	}
-
-	return Optional.empty();
     }
 
     /**
-     * This method retrieves the form data (if available) provided as body in the
-     * "application/x-www-form-urlencoded" encoding, or as query
-     * string in the request URL after the path. In the latter case, this method is equivalent to
-     * {@link #getQueryString()}
-     * 
+     * This method retrieves the form data (if available) provided as body in the "application/x-www-form-urlencoded" encoding, or as query
+     * string in the request URL after the path. In the latter case, this method is equivalent to {@link #getQueryString()}
+     *
+     * @return
      * @see #isPostFormRequest()
      * @see #isGetRequest()
-     * @return
      */
     public Optional<String> getFormData() {
 
@@ -888,8 +871,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 		}
 	    } catch (IOException e) {
 		// this should never happen
-		e.printStackTrace();
-		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }
 	}
 
@@ -921,8 +903,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * Returns the path of the request following the services base path (e.g.: '/services/essi/') deprived of the last
-     * '/': E.g:
+     * Returns the path of the request following the services base path (e.g.: '/services/essi/') deprived of the last '/': E.g:
      * <ul>
      * <li>current path: http://localhost/gs-service/services/essi/opensearch/description</li>
      * <li>request path: opensearch/description</li>
@@ -961,7 +942,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
      * Return a {@link ClonableInputStream} instantiated with the {@link HttpServletRequest} input stream
      *
      * @return a {@link ClonableInputStream} instantiated with the {@link HttpServletRequest} input stream if available,
-     *         <code>null</code> otherwise
+     * <code>null</code> otherwise
      * @see #isGetRequest()
      * @see #isPostRequest()
      */
@@ -1009,10 +990,9 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * The more common way to express the token in GS-service is to put it in the first part of the path preceded by
-     * "token" key in the
-     * form /token/{tokenId}/service This method extracts token id from the request path.<br>
-     * The other way is in the query string as value of the "token" key
+     * The more common way to express the token in GS-service is to put it in the first part of the path preceded by "token" key in the form
+     * /token/{tokenId}/service This method extracts token id from the request path.<br> The other way is in the query string as value of
+     * the "token" key
      *
      * @return the tokenId or null if not found
      */
@@ -1042,11 +1022,9 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * The more common way to express the viewId in GS-service is to put it in the first part of the path (or after the
-     * token path parameter) preceded by
-     * "view" key in the
-     * form /view/{viewId}/service This method extracts view id from the request path.<br>
-     * The other way is in the query string as value of the "token" key
+     * The more common way to express the viewId in GS-service is to put it in the first part of the path (or after the token path
+     * parameter) preceded by "view" key in the form /view/{viewId}/service This method extracts view id from the request path.<br> The
+     * other way is in the query string as value of the "token" key
      *
      * @return the viewId or null if not found
      */
@@ -1106,8 +1084,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * Returns <code>true</code> if the path of this request contains the
-     * semantic path
+     * Returns <code>true</code> if the path of this request contains the semantic path
      */
     public boolean hasSemanticPath() {
 
@@ -1162,7 +1139,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	List<String> forwarded = readXForwardedForHeaders();
 	if (!forwarded.isEmpty()) {
 	    // the first is always the original client ip, followed by the proxy / load balancer ips
-	    return forwarded.get(0);
+	    return forwarded.getFirst();
 	}
 	// otherwise return the direct ip address
 	return getServletRequest().getRemoteAddr();
@@ -1324,6 +1301,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	return new WebRequest() {
 
+	    @Serial
 	    private static final long serialVersionUID = 1244759601771325810L;
 	    private ClonableInputStream is;
 
@@ -1335,7 +1313,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 			is = new ClonableInputStream(body);
 		    } catch (IOException e) {
 
-			GSLoggerFactory.getLogger(getClass()).error("Error cloning body {}", e);
+			GSLoggerFactory.getLogger(getClass()).error("Error cloning body: {}", e.getMessage(), e);
 		    }
 		}
 
@@ -1403,6 +1381,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	return new WebRequest() {
 
+	    @Serial
 	    private static final long serialVersionUID = 7003070247488505800L;
 
 	    @Override
@@ -1422,10 +1401,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 		    WritableHTTPServletRequest wrapper = new WritableHTTPServletRequest(request);
 
-		    headers.keySet().forEach(header -> {
-
-			wrapper.putHeader(header, headers.get(header));
-		    });
+		    headers.keySet().forEach(header -> wrapper.putHeader(header, headers.get(header)));
 
 		    request = wrapper;
 		}
@@ -1456,7 +1432,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    @Override
 	    public boolean isGetRequest() {
 
-		return method.toUpperCase().equals("GET");
+		return method.equalsIgnoreCase("GET");
 	    }
 
 	    @Override
@@ -1467,7 +1443,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	    public boolean isDeleteRequest() {
 
-		return method.toUpperCase().equals("DELETE");
+		return method.equalsIgnoreCase("DELETE");
 	    }
 	};
     }
@@ -1494,7 +1470,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    }
 
 	    @Override
-	    public void setCharacterEncoding(String env) throws UnsupportedEncodingException {
+	    public void setCharacterEncoding(String env) {
 		// TODO Auto-generated method stub
 
 	    }
@@ -1588,7 +1564,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    }
 
 	    @Override
-	    public BufferedReader getReader() throws IOException {
+	    public BufferedReader getReader() {
 		// TODO Auto-generated method stub
 		return null;
 	    }
@@ -1663,7 +1639,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    }
 
 	    @Override
-	    public ServletInputStream getInputStream() throws IOException {
+	    public ServletInputStream getInputStream() {
 
 		return new ServletInputStream() {
 
@@ -1745,19 +1721,19 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    }
 
 	    @Override
-	    public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException {
+	    public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) {
 		// TODO Auto-generated method stub
 		return null;
 	    }
 
 	    @Override
-	    public void logout() throws ServletException {
+	    public void logout() {
 		// TODO Auto-generated method stub
 
 	    }
 
 	    @Override
-	    public void login(String username, String password) throws ServletException {
+	    public void login(String username, String password) {
 		// TODO Auto-generated method stub
 
 	    }
@@ -1813,14 +1789,14 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    @Override
 	    public String getServletPath() {
 		try {
-	            URL url = new URL(requestURL);
-	            String path = url.getPath(); // e.g. "/gs-service/services/essi/token/..."
-	            String[] segments = path.split("/");
-	            return "/" + segments[2];
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	        return null; // or throw exception if you prefer
+		    URL url = new URL(requestURL);
+		    String path = url.getPath(); // e.g. "/gs-service/services/essi/token/..."
+		    String[] segments = path.split("/");
+		    return "/" + segments[2];
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+		return null; // or throw exception if you prefer
 	    }
 
 	    @Override
@@ -1843,7 +1819,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 			out = requestURL.replace("?" + query, "");
 		    }
 		} catch (MalformedURLException e) {
-		    e.printStackTrace();
+		    GSLoggerFactory.getLogger(getClass()).error(e);
 		}
 
 		return new StringBuffer(out);
@@ -1876,27 +1852,27 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    @Override
 	    public String getPathInfo() {
 		try {
-	            URL url = new URL(requestURL);
-	            String fullPath = url.getPath(); // e.g. /gs-service/services/essi/token/...
-	            String marker = "/services";
-	            int index = fullPath.indexOf(marker);
-	            if (index != -1) {
-	                return fullPath.substring(index + marker.length()); // keep everything after "/services"
-	            }
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	        return null;
+		    URL url = new URL(requestURL);
+		    String fullPath = url.getPath(); // e.g. /gs-service/services/essi/token/...
+		    String marker = "/services";
+		    int index = fullPath.indexOf(marker);
+		    if (index != -1) {
+			return fullPath.substring(index + marker.length()); // keep everything after "/services"
+		    }
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+		return null;
 	    }
 
 	    @Override
-	    public Collection<Part> getParts() throws IOException, ServletException {
+	    public Collection<Part> getParts() {
 		// TODO Auto-generated method stub
 		return new ArrayList<>();
 	    }
 
 	    @Override
-	    public Part getPart(String name) throws IOException, ServletException {
+	    public Part getPart(String name) {
 		// TODO Auto-generated method stub
 		return null;
 	    }
@@ -1962,7 +1938,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    }
 
 	    @Override
-	    public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
+	    public boolean authenticate(HttpServletResponse response) {
 		// TODO Auto-generated method stub
 		return false;
 	    }
@@ -2048,7 +2024,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 		String path = url.getPath();
 		path = path.replace(GS_SERVICE_BASE_PATH + servicesPath, "");
 		if (path.startsWith("/")) {
-		    path = path.substring(1, path.length());
+		    path = path.substring(1);
 		}
 		return path;
 	    }
@@ -2089,7 +2065,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 		try {
 		    return new URI(requestUrl);
 		} catch (URISyntaxException e) {
-		    e.printStackTrace();
+		    GSLoggerFactory.getLogger(getClass()).error(e);
 		}
 
 		return null;

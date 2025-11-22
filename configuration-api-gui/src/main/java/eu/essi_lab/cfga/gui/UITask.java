@@ -64,7 +64,7 @@ public abstract class UITask extends TimerTask {
 	
 	ui.access(() -> {
 	    
-	    boolean push = false;
+	    boolean push;
 
 	    synchronized (SHARED_LOCK) {
 		

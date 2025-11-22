@@ -58,10 +58,10 @@ public class GeoShapeUtils {
 	String west = String.valueOf(extent.getWest());
 
 	return SpatialIndexHelper.computeArea(//
-		Double.valueOf(west), //
-		Double.valueOf(east), //
-		Double.valueOf(south), //
-		Double.valueOf(north));
+		Double.parseDouble(west), //
+		Double.parseDouble(east), //
+		Double.parseDouble(south), //
+		Double.parseDouble(north));
 
     }
 

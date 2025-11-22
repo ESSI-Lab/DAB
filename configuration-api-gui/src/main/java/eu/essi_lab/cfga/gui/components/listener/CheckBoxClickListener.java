@@ -34,7 +34,7 @@ import eu.essi_lab.cfga.gui.IdleTracker;
 public interface CheckBoxClickListener extends ComponentEventListener<ClickEvent<Checkbox>> {
 
     @Override
-    public default void onComponentEvent(ClickEvent<Checkbox> event) {
+    default void onComponentEvent(ClickEvent<Checkbox> event) {
 
 	IdleTracker.getInstance().reset();
 
@@ -44,5 +44,5 @@ public interface CheckBoxClickListener extends ComponentEventListener<ClickEvent
     /**
      * @param event
      */
-    public void handleEvent(ClickEvent<Checkbox> event);
+    void handleEvent(ClickEvent<Checkbox> event);
 }

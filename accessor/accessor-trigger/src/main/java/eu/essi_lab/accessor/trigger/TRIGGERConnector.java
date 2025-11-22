@@ -86,8 +86,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
     private static final String TOKEN_REQUEST_URL = "https://trigger-io.difa.unibo.it/api/";
     private static final String REFRESH_REQUEST_URL = "https://app.meteotracker.com/auth/refreshtoken";
-    public static final String SESSION_URL = "https://app.meteotracker.com/api/points/session?";
-
+    
     public static final String BASE_URL = "https://trigger-io.difa.unibo.it/api/";
     private static final String MYAIR_URL = "myair/?";
     private static final String ECG_URL = "ecg/?";
@@ -227,8 +226,8 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
 
-	// Start date: January 2024
-	YearMonth startMonth = YearMonth.of(2024, 1);
+	// Start date: January 2025
+	YearMonth startMonth = YearMonth.of(2025, 1);
 	// Get current year and month
 	YearMonth todayMonth = YearMonth.now();
 
@@ -279,7 +278,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 		// int currentYear = currentDateTime.getYear();
 
 		Map<String, TRIGGERDevice> results = new HashMap<String, TRIGGERDevice>();
-		// current month for 2024
+		// current month for 2025
 		for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusMonths(1)) {
 
 		    String url = getSourceURL().endsWith("/")
@@ -390,7 +389,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
 	    for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusYears(1)) {
 
-		String url = BASE_URL + GPS_URL + "year=" + current.getYear();
+		String url = BASE_URL + GPS_URL + "year=" + current.getYear()+ "&limit=1000&offset=0";
 
 		// add authorization token
 		if (TRIGGER_TOKEN == null) {

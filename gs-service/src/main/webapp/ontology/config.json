@@ -23,9 +23,10 @@
     "generalTermSearch": true,
     "intendedObservationSpacing": false,
     "aggregationDuration": false,
-    "semanticSearch": true,
-    "semanticSearchValue":1,
-    "ontology": "gemet",
-    "login": false,
-    "enableBrowseGEMET": true
+    
+	"semanticSearch": false,
+	"semanticOptions": true,
+	"enableBrowseGEMET": true,
+	
+    "login": false
 }

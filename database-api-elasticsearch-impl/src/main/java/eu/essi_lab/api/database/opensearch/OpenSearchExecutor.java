@@ -1,14 +1,7 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch;
-
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
 /*-
  * #%L
@@ -30,41 +23,6 @@ import java.util.HashMap;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.opensearch.client.json.JsonData;
-import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.FieldValue;
-import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.SortOptions;
-import org.opensearch.client.opensearch._types.SortOrder;
-import org.opensearch.client.opensearch._types.TopLeftBottomRightGeoBounds;
-import org.opensearch.client.opensearch._types.aggregations.Aggregate;
-import org.opensearch.client.opensearch._types.aggregations.Aggregation;
-import org.opensearch.client.opensearch._types.aggregations.BucketSortAggregation;
-import org.opensearch.client.opensearch._types.aggregations.Buckets;
-import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregation;
-import org.opensearch.client.opensearch._types.aggregations.CompositeAggregation;
-import org.opensearch.client.opensearch._types.aggregations.CompositeAggregationSource;
-import org.opensearch.client.opensearch._types.aggregations.CompositeBucket;
-import org.opensearch.client.opensearch._types.aggregations.FiltersBucket;
-import org.opensearch.client.opensearch._types.aggregations.GeoBoundsAggregate;
-import org.opensearch.client.opensearch._types.aggregations.GeoCentroidAggregate;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
-import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch.core.SearchRequest;
-import org.opensearch.client.opensearch.core.SearchRequest.Builder;
-import org.opensearch.client.opensearch.core.SearchResponse;
-import org.opensearch.client.opensearch.core.search.Hit;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
@@ -90,6 +48,7 @@ import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.IndexedMetadataElement;
@@ -100,16 +59,49 @@ import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
+import jakarta.json.stream.JsonGenerator;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.*;
+import org.opensearch.client.opensearch._types.aggregations.*;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchRequest.Builder;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.Hit;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author Fabrizio
  */
 public class OpenSearchExecutor implements DatabaseExecutor {
 
+    public static final String GROUP_BY_AGGREGATION = "groupBy";
+    public static final String BBOX_AGGREGATION = "bbox";
+    public static final String TIME_MIN_AGGREGATION = "time-min";
+    public static final String TIME_MAX_AGGREGATION = "time-max";
+    public static final String TIME_NOW_AGGREGATION = "time-now";
+    private static String lastBond = null;
+    private static Query lastQuery = null;
     private Database database;
     private OpenSearchClient client;
-    private OpenSearchWrapper wrapper;
     private OpenSearchFinder finder;
 
     @Override
@@ -118,22 +110,20 @@ public class OpenSearchExecutor implements DatabaseExecutor {
     }
 
     @Override
+    public Database getDatabase() {
+
+	return database;
+    }
+
+    @Override
     public void setDatabase(Database database) {
 	this.database = database;
-	if (database instanceof OpenSearchDatabase) {
-	    OpenSearchDatabase osd = (OpenSearchDatabase) database;
+	if (database instanceof OpenSearchDatabase osd) {
 	    this.client = osd.getClient();
-	    this.wrapper = new OpenSearchWrapper(osd);
 	    this.finder = new OpenSearchFinder();
 	    finder.setDatabase(database);
 	}
 
-    }
-
-    @Override
-    public Database getDatabase() {
-
-	return database;
     }
 
     @Override
@@ -146,12 +136,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	return 0;
     }
-
-    public static final String GROUP_BY_AGGREGATION = "groupBy";
-    public static final String BBOX_AGGREGATION = "bbox";
-    public static final String TIME_MIN_AGGREGATION = "time-min";
-    public static final String TIME_MAX_AGGREGATION = "time-max";
-    public static final String TIME_NOW_AGGREGATION = "time-now";
 
     @Override
     public StatisticsResponse compute(StatisticsMessage message) throws GSException {
@@ -170,7 +154,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	// GENERAL QUERY PART
 	DiscoveryMessage dMessage = new DiscoveryMessage();
-	List<Bond> bonds = new ArrayList<Bond>();
+	List<Bond> bonds = new ArrayList<>();
 	if (message.getUserBond().isPresent()) {
 	    bonds.add(message.getUserBond().get());
 	}
@@ -185,8 +169,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    // nothing to do
 	    break;
 	case 1:
-	    dMessage.setUserBond(bonds.get(0));
-	    dMessage.setPermittedBond(bonds.get(0));
+	    dMessage.setUserBond(bonds.getFirst());
+	    dMessage.setPermittedBond(bonds.getFirst());
 	    break;
 	default:
 	    dMessage.setUserBond(BondFactory.createAndBond(bonds));
@@ -201,7 +185,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	Builder builder = new SearchRequest.Builder();
 	builder.index(DataFolderMapping.get().getIndex()).size(0).query(query);
 
-	Map<String, Aggregation> map = new HashMap<String, Aggregation>();
+	Map<String, Aggregation> map = new HashMap<>();
 
 	Optional<List<Queryable>> countDistinctTargets = message.getCountDistinctTargets();
 
@@ -278,6 +262,12 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    map.put(TIME_NOW_AGGREGATION, aggregationNow);
 	}
 
+	final String NESTED_HASH_TERMS = "hash_terms";
+	final String NESTED_HASH_SAMPLE = "hash_sample";
+
+	Map<String, List<String>> nestedPropertiesByField = new HashMap<>();
+	nestedPropertiesByField.put(MetadataElement.ORGANIZATION.getName(), Arrays.asList("orgName", "individualName", "role", "email","homePageURL"));
+
 	if (frequencyTargets.isPresent()) {
 	    int max = 10;
 	    if (maxFrequencyItems.isPresent()) {
@@ -285,12 +275,33 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    }
 	    List<Queryable> targets = frequencyTargets.get();
 	    for (Queryable target : targets) {
-		int fmax = max;
 		String fieldName = target.getName();
-		map.put("top-" + target.getName(), Aggregation.of(a -> a.terms(t -> //
-		t.field(DataFolderMapping.toKeywordField(fieldName)) //
-			.size(fmax) //
-		)));
+		if (target.getContentType().equals(ContentType.COMPOSED)) {
+		    List<String> nestedProperties = nestedPropertiesByField.get(fieldName);
+		    // TODO retrieve as well the nested properties
+		    String nestedPath = fieldName;
+		    String hashKeywordField = fieldName + ".hash_keyword";
+		    int fmax = max;
+		    Aggregation hashTermsAgg;
+		    if (nestedProperties != null && !nestedProperties.isEmpty()) {
+			String[] includes = nestedProperties.stream().map(prop -> nestedPath + "." + prop).toArray(String[]::new);
+			Aggregation sampleAgg = Aggregation.of(
+				sub -> sub.topHits(th -> th.size(1).source(src -> src.filter(f -> f.includes(Arrays.asList(includes))))));
+			hashTermsAgg = Aggregation.of(a -> a.terms(t -> t.field(hashKeywordField).size(fmax))
+				.aggregations(Map.of(NESTED_HASH_SAMPLE, sampleAgg)));
+		    } else {
+			hashTermsAgg = Aggregation.of(a -> a.terms(t -> t.field(hashKeywordField).size(fmax)));
+		    }
+		    Aggregation nestedAgg = Aggregation
+			    .of(a -> a.nested(n -> n.path(nestedPath)).aggregations(NESTED_HASH_TERMS, hashTermsAgg));
+		    map.put("top-" + fieldName, nestedAgg);
+		} else {
+		    int fmax = max;
+		    map.put("top-" + fieldName, Aggregation.of(a -> a.terms(t -> //
+		    t.field(DataFolderMapping.toKeywordField(fieldName)) //
+			    .size(fmax) //
+		    )));
+		}
 	    }
 	}
 
@@ -314,8 +325,12 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	try {
 
+	    if (OpenSearchDatabase.debugQueries) {
+		debugQuery(searchRequest);
+	    }
+
 	    SearchResponse<Void> response = client.search(searchRequest, Void.class);
-	    Map<String, Map<String, Aggregate>> aggregations = new HashMap<String, Map<String, Aggregate>>();
+	    Map<String, Map<String, Aggregate>> aggregations = new HashMap<>();
 	    if (response.aggregations().containsKey(GROUP_BY_AGGREGATION)) {
 		Aggregate gba = response.aggregations().get(GROUP_BY_AGGREGATION);
 		if (gba.isSterms()) {
@@ -427,19 +442,66 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		if (frequencyTargets.isPresent()) {
 		    List<Queryable> targets = frequencyTargets.get();
 		    for (Queryable target : targets) {
+			ComputationResult freq = new ComputationResult();
+			freq.setTarget(target.getName());
+			List<SimpleEntry<String, Long>> occurrences = new ArrayList<>();
+			Map<String, Map<String, String>> nestedProperties = new HashMap<>();
 			Aggregate agg = mapa.get("top-" + target.getName());
-			if (agg != null && agg.isSterms()) {
-			    StringTermsAggregate sterms = agg.sterms();
-			    List<StringTermsBucket> groups = sterms.buckets().array();
-			    ComputationResult freq = new ComputationResult();
-			    freq.setTarget(target.getName());
-			    String frequencyValue = "";
-			    for (StringTermsBucket group : groups) {
-				String value = group.key();
-				long count = group.docCount();
-				frequencyValue += URLEncoder.encode(value, "UTF-8") + ComputationResult.FREQUENCY_ITEM_SEP + count + " ";
+			if (target.getContentType().equals(ContentType.COMPOSED)) {
+			    if (agg != null && agg.isNested()) {
+				Aggregate nestedAgg = agg.nested().aggregations().get(NESTED_HASH_TERMS);
+				if (nestedAgg != null && nestedAgg.isSterms()) {
+				    StringTermsAggregate sterms = nestedAgg.sterms();
+				    List<StringTermsBucket> groups = sterms.buckets().array();
+				    List<String> nestedPropsList = nestedPropertiesByField.get(target.getName());
+				    for (StringTermsBucket group : groups) {
+					String value = group.key();
+					long count = group.docCount();
+					occurrences.add(new SimpleEntry<String, Long>(value, count));
+
+					Map<String, String> properties = new HashMap<>();
+					Aggregate sampleAgg = nestedPropsList != null && !nestedPropsList.isEmpty()
+						? group.aggregations().get(NESTED_HASH_SAMPLE)
+						: null;
+					if (sampleAgg != null && sampleAgg.isTopHits()) {
+					    List<Hit<JsonData>> hits = sampleAgg.topHits().hits().hits();
+					    if (!hits.isEmpty()) {
+						JsonData source = hits.get(0).source();
+						if (source != null) {
+						    JsonObject nestedJson = source.toJson().asJsonObject();
+						    Map<String, String> extracted = extractNestedProperties(nestedJson, target.getName(),
+							    nestedPropsList);
+						    properties.putAll(extracted);
+						}
+					    }
+					}
+
+					nestedProperties.put(value, properties);
+				    }
+				}
 			    }
-			    freq.setValue(frequencyValue);
+			    freq.setNestedProperties(nestedProperties);
+			} else {
+			    if (agg != null && agg.isSterms()) {
+				StringTermsAggregate sterms = agg.sterms();
+				List<StringTermsBucket> groups = sterms.buckets().array();
+				for (StringTermsBucket group : groups) {
+				    String value = group.key();
+				    long count = group.docCount();
+				    occurrences.add(new SimpleEntry<String, Long>(value, count));
+				}
+			    }
+			}
+
+			if (!occurrences.isEmpty()) {
+			    StringBuilder frequencyValue = new StringBuilder();
+			    for (SimpleEntry<String, Long> hashOccurrence : occurrences) {
+				String value = hashOccurrence.getKey();
+				Long count = hashOccurrence.getValue();				
+				frequencyValue.append(URLEncoder.encode(value, StandardCharsets.UTF_8))
+					.append(ComputationResult.FREQUENCY_ITEM_SEP).append(count).append(" ");
+			    }
+			    freq.setValue(frequencyValue.toString());
 			    item.addFrequency(freq);
 			}
 
@@ -451,7 +513,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	    return ret;
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
@@ -475,9 +537,6 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	return null;
     }
-
-    private static String lastBond = null;
-    private static Query lastQuery = null;
 
     @Override
     public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
@@ -537,14 +596,13 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	// }
 	// }
 	// }
-	// }
 
 	Query query = getQuery(request.getConstraints(), request.getView());
 
 	// Bounding box queries for regions
 	List<SpatialExtent> extents = request.getExtents();
 	Map<String, SpatialExtent> extentMap = new HashMap<>();
-	List<Entry<String, Query>> entries = new ArrayList<Map.Entry<String, Query>>();
+	List<Entry<String, Query>> entries = new ArrayList<>();
 	for (int i = 0; i < extents.size(); i++) {
 	    SpatialExtent extent = extents.get(i);
 	    String name = "region" + i;
@@ -556,7 +614,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		    .boundingBox(bb -> bb.tlbr(new TopLeftBottomRightGeoBounds.Builder()//
 			    .topLeft(tl -> tl.latlon(ll -> ll.lat(extent.getNorth()).lon(extent.getWest())))//
 			    .bottomRight(br -> br.latlon(ll -> ll.lat(extent.getSouth()).lon(extent.getEast()))).build()))));
-	    SimpleEntry<String, Query> entry = new SimpleEntry<String, Query>(name, regionQuery);
+	    SimpleEntry<String, Query> entry = new SimpleEntry<>(name, regionQuery);
 	    entries.add(entry);
 	}
 
@@ -625,13 +683,13 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    Map<String, Aggregate> aggregations = response.aggregations();
 	    Aggregate regionsAgg = aggregations.get("regions");
 
-	    if (regionsAgg == null || regionsAgg.isFilters() == false) {
+	    if (regionsAgg == null || !regionsAgg.isFilters()) {
 		GSLoggerFactory.getLogger(getClass()).error("No region aggregation found!");
 	    }
 
 	    // Extract buckets (regions)
 	    Set<Entry<String, FiltersBucket>> responseRegionBuckets = regionsAgg.filters().buckets().keyed().entrySet();
-	    List<WMSClusterResponse> ret = new ArrayList<DatabaseExecutor.WMSClusterResponse>();
+	    List<WMSClusterResponse> ret = new ArrayList<>();
 
 	    for (Entry<String, FiltersBucket> entry : responseRegionBuckets) {
 		String name = entry.getKey();
@@ -665,7 +723,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		// Get top providers aggregation
 		if (totalStationCount < request.getMaxResults()) {
 		    StringTermsAggregate distinctSamplesAgg = region.aggregations().get("distinct_location_samples").sterms();
-		    List<Dataset> datasets = new ArrayList<Dataset>();
+		    List<Dataset> datasets = new ArrayList<>();
 
 		    for (StringTermsBucket distinctBucket : distinctSamplesAgg.buckets().array()) {
 			String uniqueLocationId = distinctBucket.key();
@@ -738,50 +796,12 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	    return ret;
 	} catch (Exception e) {
-	    e.printStackTrace();
+
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 	//
 	return null;
 
-    }
-
-    private Query getQuery(Bond constraints, View view) throws GSException {
-	DiscoveryMessage message = new DiscoveryMessage();
-	List<Bond> bonds = new ArrayList<Bond>();
-	if (constraints != null) {
-	    bonds.add(constraints);
-	}
-	if (view != null && view.getBond() != null) {
-	    // message.setSources(ConfigurationWrapper.getViewSources(request.getView()));
-	    bonds.add(view.getBond());
-	}
-	switch (bonds.size()) {
-	case 0:
-	    // nothing to do
-	    break;
-	case 1:
-	    message.setUserBond(bonds.get(0));
-	    message.setPermittedBond(bonds.get(0));
-	    break;
-	default:
-	    message.setUserBond(BondFactory.createAndBond(bonds));
-	    message.setPermittedBond(BondFactory.createAndBond(bonds));
-	    break;
-	}
-
-	Query tmp = null;
-	if (!bonds.isEmpty()) {
-	    String s = bonds.toString();
-	    if (lastBond != null && lastBond.equals(s)) {
-		tmp = lastQuery;
-	    } else {
-		tmp = finder.buildQuery(message, true);
-		lastBond = s;
-		lastQuery = tmp;
-	    }
-	}
-	return tmp;
     }
 
     @Override
@@ -805,13 +825,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	if (resumptionToken != null) {
 	    cab = cab.after(Map.of(queryable.getName(), resumptionToken));
 	}
-	CompositeAggregation compositeAgg =
 
-		cab.build();
-
-	List<String> includeList = new ArrayList<String>();
-
-	includeList.add(queryable.getName());
+	CompositeAggregation compositeAgg = cab.build();
 
 	Aggregation distinctsAggregation = new Aggregation.Builder().composite(compositeAgg).build();
 
@@ -823,13 +838,13 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	try {
 	    response = client.search(searchRequest, Void.class);
 	} catch (OpenSearchException | IOException e) {
-	    e.printStackTrace();
+
 	    throw GSException.createException();
 	}
 
 	List<CompositeBucket> buckets = response.aggregations().get("distincts").composite().buckets().array();
 
-	ResultSet<TermFrequencyItem> ret = new ResultSet<TermFrequencyItem>();
+	ResultSet<TermFrequencyItem> ret = new ResultSet<>();
 	for (CompositeBucket bucket : buckets) {
 	    String term = bucket.key().get(queryable.getName()).to(String.class);
 	    long termCount = bucket.docCount();
@@ -847,7 +862,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	Map<String, JsonData> afterKey = response.aggregations().get("distincts").composite().afterKey();
 
 	if (afterKey != null && !afterKey.isEmpty()) {
-	    List<Object> values = new ArrayList<Object>();
+	    List<Object> values = new ArrayList<>();
 	    values.add(afterKey.values().iterator().next().toString().replace("\"", ""));
 	    SearchAfter sa = new SearchAfter(values);
 	    ret.setSearchAfter(sa);
@@ -857,7 +872,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
     }
 
     public ResultSet<String> discoverDistinctStrings(DiscoveryMessage message) throws Exception {
-	ResultSet<String> ret = new ResultSet<String>();
+	ResultSet<String> ret = new ResultSet<>();
 
 	Query query = getQuery(message.getUserBond().isPresent() ? message.getUserBond().get() : null,
 		message.getView().isPresent() ? message.getView().get() : null);
@@ -878,16 +893,13 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	cab = cab.size(size).sources(Map.of(queryable.getName(), stationIdSource));
 	if (message.getSearchAfter().isPresent()) {
 	    SearchAfter sa = message.getSearchAfter().get();
-	    cab = cab.after(Map.of(queryable.getName(), sa.getValues().get().get(0).toString()));
+	    cab = cab.after(Map.of(queryable.getName(), sa.getValues().get().getFirst().toString()));
 	}
 	CompositeAggregation compositeAgg =
 
 		cab.build();
 
-	List<String> includeList = new ArrayList<String>();
-	for (String element : message.getResourceSelector().getIndexes()) {
-	    includeList.add(element);
-	}
+	List<String> includeList = new ArrayList<>(message.getResourceSelector().getIndexes());
 
 	Aggregation topHitsAgg = new Aggregation.Builder()
 		.topHits(th -> th.size(1).source(src -> src.filter(f -> f.includes(includeList)))
@@ -918,8 +930,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 		    for (String element : message.getResourceSelector().getIndexes()) {
 			if (sj.has(element)) {
 			    JSONArray array = sj.optJSONArray(element, null);
-			    String s = null;
-			    if (array != null && array.length() > 0) {
+			    String s;
+			    if (array != null && !array.isEmpty()) {
 				s = array.get(0).toString();
 			    } else {
 				s = sj.optString(element);
@@ -940,7 +952,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	Map<String, JsonData> afterKey = response.aggregations().get("distincts").composite().afterKey();
 
 	if (afterKey != null && !afterKey.isEmpty()) {
-	    List<Object> values = new ArrayList<Object>();
+	    List<Object> values = new ArrayList<>();
 	    values.add(afterKey.values().iterator().next().toString().replace("\"", ""));
 	    SearchAfter sa = new SearchAfter(values);
 	    ret.setSearchAfter(sa);
@@ -949,4 +961,125 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
     }
 
+    /**
+     * @param request
+     */
+    private void debugQuery(SearchRequest request) {
+
+	JacksonJsonpMapper mapper = new JacksonJsonpMapper();
+	StringWriter sw = new StringWriter();
+	JsonGenerator generator = mapper.jsonProvider().createGenerator(sw);
+
+	request.serialize(generator, mapper);
+	generator.close();
+
+	GSLoggerFactory.getLogger(getClass()).debug(sw.toString());
+    }
+
+    private Query getQuery(Bond constraints, View view) throws GSException {
+	DiscoveryMessage message = new DiscoveryMessage();
+	List<Bond> bonds = new ArrayList<>();
+	if (constraints != null) {
+	    bonds.add(constraints);
+	}
+	if (view != null && view.getBond() != null) {
+	    // message.setSources(ConfigurationWrapper.getViewSources(request.getView()));
+	    bonds.add(view.getBond());
+	}
+	switch (bonds.size()) {
+	case 0:
+	    // nothing to do
+	    break;
+	case 1:
+	    message.setUserBond(bonds.getFirst());
+	    message.setPermittedBond(bonds.getFirst());
+	    break;
+	default:
+	    message.setUserBond(BondFactory.createAndBond(bonds));
+	    message.setPermittedBond(BondFactory.createAndBond(bonds));
+	    break;
+	}
+
+	Query tmp = null;
+	if (!bonds.isEmpty()) {
+	    String s = bonds.toString();
+	    if (lastBond != null && lastBond.equals(s)) {
+		tmp = lastQuery;
+	    } else {
+		tmp = finder.buildQuery(message, true);
+		lastBond = s;
+		lastQuery = tmp;
+	    }
+	}
+	return tmp;
+    }
+
+    private static Map<String, String> extractNestedProperties(JsonObject json, String nestedPath, List<String> properties) {
+	Map<String, String> result = new HashMap<>();
+	if (json == null || properties == null) {
+	    return result;
+	}
+	for (String property : properties) {
+	    String value = resolveNestedProperty(json, nestedPath, property);
+	    if (value != null) {
+		result.put(property, value);
+	    }
+	}
+	return result;
+    }
+
+    private static String resolveNestedProperty(JsonObject json, String nestedPath, String property) {
+	if (json.containsKey(property)) {
+	    return jsonValueAsString(json.get(property));
+	}
+
+	String dottedKey = nestedPath + "." + property;
+	if (json.containsKey(dottedKey)) {
+	    return jsonValueAsString(json.get(dottedKey));
+	}
+
+	if (json.containsKey(nestedPath)) {
+	    return extractFromJsonValue(json.get(nestedPath), property);
+	}
+
+	return extractFromJsonValue(json, property);
+    }
+
+    private static String extractFromJsonValue(JsonValue value, String property) {
+	if (value == null || value.getValueType() == JsonValue.ValueType.NULL) {
+	    return null;
+	}
+	switch (value.getValueType()) {
+	case OBJECT:
+	    JsonObject obj = value.asJsonObject();
+	    if (obj.containsKey(property)) {
+		return jsonValueAsString(obj.get(property));
+	    }
+	    break;
+	case ARRAY:
+	    JsonArray array = value.asJsonArray();
+	    for (JsonValue element : array) {
+		String val = extractFromJsonValue(element, property);
+		if (val != null) {
+		    return val;
+		}
+	    }
+	    break;
+	default:
+	    break;
+	}
+	return null;
+    }
+
+    private static String jsonValueAsString(JsonValue value) {
+	if (value == null || value.getValueType() == JsonValue.ValueType.NULL) {
+	    return null;
+	}
+	return switch (value.getValueType()) {
+	case STRING -> ((JsonString) value).getString();
+	case NUMBER -> ((JsonNumber) value).toString();
+	case TRUE, FALSE -> value.toString();
+	default -> value.toString();
+	};
+    }
 }

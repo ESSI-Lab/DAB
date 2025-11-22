@@ -31,7 +31,7 @@ import java.util.Optional;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.openrdf.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;

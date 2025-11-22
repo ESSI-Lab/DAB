@@ -21,11 +21,7 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,10 +56,10 @@ import eu.essi_lab.cfga.setting.Setting;
 @SuppressWarnings("serial")
 public class GridComponent extends Grid<HashMap<String, String>> {
 
-    private GridInfo gridInfo;
+    private final GridInfo gridInfo;
     private HeaderRow filterRow;
     private GridFilter gridFilter;
-    private ListDataProvider<HashMap<String, String>> dataProvider;
+    private final ListDataProvider<HashMap<String, String>> dataProvider;
     private boolean legendsViewer;
 
     /**
@@ -219,7 +215,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	gridInfo.getColumnsDescriptors().forEach(descriptor -> {
 
-	    Grid.Column<HashMap<String, String>> column = null;
+	    Grid.Column<HashMap<String, String>> column;
 
 	    if (descriptor.getRenderer().isPresent()) {
 
@@ -227,7 +223,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		column = addColumn(renderer);
 
-		renderer.getLegend().ifPresent(leg -> container.addLegend(leg));
+		renderer.getLegend().ifPresent(container::addLegend);
 
 		legendsViewer = renderer.getLegend().isPresent();
 
@@ -321,7 +317,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
      */
     public void addSettingComponent(SettingComponent component) {
 
-	HashMap<String, String> item = createItems(Arrays.asList(component.getSetting())).get(0);
+	HashMap<String, String> item = createItems(Collections.singletonList(component.getSetting())).getFirst();
 
 	this.dataProvider.getItems().add(item);
 
@@ -339,7 +335,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	this.dataProvider.getItems().remove(hashMap);
 
-	HashMap<String, String> items = createItems(Arrays.asList(newComponent.getSetting())).get(0);
+	HashMap<String, String> items = createItems(Collections.singletonList(newComponent.getSetting())).getFirst();
 
 	this.dataProvider.getItems().add(items);
 
@@ -394,7 +390,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	List<String> selIds = getSelectedItems().//
 		stream().//
 		map(item -> item.get("identifier")).//
-		collect(Collectors.toList());
+		toList();
 
 	Stream<HashMap<String, String>> items = getListDataView().getItems();
 
@@ -499,10 +495,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	filterField.getElement().setAttribute("focus-target", "");
 
 	Optional<String> value = GridFilter.getValue(descriptor.getColumnName());
-	if (value.isPresent()) {
-
-	    filterField.setValue(value.get());
-	}
+	value.ifPresent(filterField::setValue);
     }
 
     /**
@@ -516,7 +509,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
      */
     private ArrayList<HashMap<String, String>> createItems(List<Setting> list) {
 
-	ArrayList<HashMap<String, String>> items = new ArrayList<HashMap<String, String>>();
+	ArrayList<HashMap<String, String>> items = new ArrayList<>();
 
 	list.forEach(setting -> {
 
@@ -552,7 +545,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
      */
     private class MapValueProvider implements ValueProvider<HashMap<String, String>, String> {
 
-	private String column;
+	private final String column;
 
 	/**
 	 * The column name used as map key
@@ -572,7 +565,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		return String.valueOf(//
 			GridComponent.this.getListDataView().//
 				getItems().//
-				collect(Collectors.toList()).//
+				toList().//
 				indexOf(source) + 1);
 	    }
 

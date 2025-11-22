@@ -42,24 +42,24 @@ public class ResponseItem {
 
     public static final String ITEMS_RANGE_SEPARATOR = "#";
 
-    @XmlAttribute(name = "groupedBy", required = false)
+    @XmlAttribute(name = "groupedBy")
     private String groupedBy;
     @XmlElement(name = "Min", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private List<ComputationResult> min;
+    private final List<ComputationResult> min;
     @XmlElement(name = "Max", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private List<ComputationResult> max;
+    private final List<ComputationResult> max;
     @XmlElement(name = "Sum", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private List<ComputationResult> sum;
+    private final List<ComputationResult> sum;
     @XmlElement(name = "Avg", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private List<ComputationResult> avg;
+    private final List<ComputationResult> avg;
     @XmlElement(name = "CountDistinct", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private List<ComputationResult> countDistinct;
+    private final List<ComputationResult> countDistinct;
     @XmlElement(name = "BboxUnion", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private ComputationResult bboxUnion;
     @XmlElement(name = "TemporalExtentUnion", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private ComputationResult tmpExtentUnion;
     @XmlElement(name = "Frequency", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private List<ComputationResult> frequency;
+    private final List<ComputationResult> frequency;
 
     /**
      * 

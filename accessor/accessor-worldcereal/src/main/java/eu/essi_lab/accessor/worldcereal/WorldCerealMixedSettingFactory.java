@@ -37,7 +37,6 @@ public class WorldCerealMixedSettingFactory {
 	AccessorSetting accessorSetting = AccessorSetting.createMixed( //
 		"Worldcereal", //
 		"https://ewoc-rdm-api.iiasa.ac.at/", //
-		"v.1.0",
 		"Worldcereal Accessor", //
 		WorldCerealAccessor.TYPE, //
 		WorldCerealGranulesAccessor.TYPE, //

@@ -33,7 +33,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(WFSAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(WFSAccessor.class, accessors.getFirst().getClass());
 
 	}
 
@@ -44,7 +44,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(WFSAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(WFSAccessor.class, accessors.getFirst().getClass());
 	}
 
 	{
@@ -78,8 +78,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(WFSConnectorWrapper.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(WFSConnectorWrapper.class)));//
     }
 
     @Test
@@ -88,10 +87,7 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.WFS_1_1_0_NS_URI)).//
-
-		findFirst().//
-		isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.WFS_1_1_0_NS_URI)));
 
     }
 
@@ -102,14 +98,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(
-		StreamUtils.iteratorToStream(loader.iterator()).filter(c -> c.getClass().getName().equals(WFSAccessor.class.getName())).//
-			findFirst().//
-			isPresent());
+		StreamUtils.iteratorToStream(loader.iterator()).anyMatch(c -> c.getClass().getName().equals(WFSAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(WFSConnectorWrapper.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(WFSConnectorWrapper.class.getName())));
 
     }
 }

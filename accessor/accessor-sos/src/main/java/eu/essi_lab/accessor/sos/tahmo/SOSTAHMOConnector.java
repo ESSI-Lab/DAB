@@ -57,7 +57,7 @@ import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -176,7 +176,7 @@ public class SOSTAHMOConnector extends SOSConnector {
 
     @Override
     public String getDownloadProtocol() {
-	return NetProtocols.SOS_2_0_0_TAHMO.getCommonURN();
+	return NetProtocolWrapper.SOS_2_0_0_TAHMO.getCommonURN();
     }
 
     /**

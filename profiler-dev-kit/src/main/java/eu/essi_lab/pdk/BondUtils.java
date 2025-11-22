@@ -1,5 +1,8 @@
 package eu.essi_lab.pdk;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -27,9 +30,45 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
+import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.model.resource.MetadataElement;
 
 public class BondUtils {
+
+    /**
+     * @param innerBonds
+     * @param searchFields
+     * @param searchValue
+     */
+    public static Optional<Bond> createFieldsBond(//
+	    String searchFields, //
+	    String searchValue //
+    ) {
+
+	ArrayList<Bond> operands = new ArrayList<>();
+
+	Arrays.asList(searchFields.split(",")).stream().map(v -> v.toLowerCase()).forEach(sf -> {
+
+	    MetadataElement.listValues().forEach(el -> {
+
+		if (el == MetadataElement.ABSTRACT) {
+
+		    if (sf.equals(el.getName().toLowerCase()) || sf.equals("description")) {
+			operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, searchValue));
+		    }
+
+		} else {
+
+		    if (sf.equals(el.getName().toLowerCase())) {
+			operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, searchValue));
+		    }
+		}
+	    });
+	});
+
+	return BondFactory.aggregate(operands, LogicalOperator.OR);
+    }
+
     /**
      * @param value
      * @param element

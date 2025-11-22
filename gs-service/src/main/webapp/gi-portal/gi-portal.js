@@ -1009,6 +1009,34 @@ export function initializePortal(config) {
 		jQuery('#headerDiv').css('padding-top', '5px');
 		jQuery('#headerDiv').css('height', '30px');
 
+		if (config['top-logo']) {
+			const headerDiv = document.getElementById('headerDiv');
+			if (headerDiv && !document.getElementById('portalTopLogo')) {
+				headerDiv.style.display = 'flex';
+				headerDiv.style.alignItems = 'center';
+
+				const logoLink = document.createElement('a');
+				logoLink.id = 'portalTopLogo';
+				logoLink.className = 'portal-top-logo-link';
+				logoLink.href = config['top-logo-href'] || '#';
+				logoLink.target = '_blank';
+				logoLink.rel = 'noopener noreferrer';
+				logoLink.style.display = 'flex';
+				logoLink.style.alignItems = 'center';
+				logoLink.style.marginLeft = '15px';
+
+				const logoImg = document.createElement('img');
+				logoImg.alt = config.title ? `${config.title} logo` : 'Portal logo';
+				logoImg.style.height = '26px';
+				logoImg.style.display = 'block';
+				const logoSrc = config['top-logo'].startsWith('http') ? config['top-logo'] : `../gi-portal/${config['top-logo']}`;
+				logoImg.src = logoSrc;
+
+				logoLink.appendChild(logoImg);
+				headerDiv.appendChild(logoLink);
+			}
+		}
+
 		//------------------------------------------------------------------
 		// logo div settings
 		//
@@ -1408,7 +1436,7 @@ export function initializePortal(config) {
 				],
 				readOnlyValues: true
 			}));
-
+			
 			// After constraints are initialized, try to fetch and update values
 			const authToken = localStorage.getItem('authToken') || undefined;
 			
@@ -1440,7 +1468,7 @@ export function initializePortal(config) {
 						// Keep default values if API fails
 					});
 
-
+					
 				if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
 					const spacingId = GIAPI.search.constWidget.getId('intendedObservationSpacing');
 					advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', {
@@ -1480,7 +1508,7 @@ export function initializePortal(config) {
 							// Keep default values if API fails
 						});
 				}
-
+				
 				if (config.aggregationDuration !== undefined && config.aggregationDuration) {
 					const durationId = GIAPI.search.constWidget.getId('aggregationDuration');
 					advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', {
@@ -1525,8 +1553,16 @@ export function initializePortal(config) {
 		}
 		
 		
+		var semanticValue = 0;
+		if (config.semanticSearchValue !== undefined) {
+			semanticValue = config.semanticSearchValue;
+		}
+
 		if (config.semanticSearch !== undefined && config.semanticSearch) {
-			
+			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semanticSearch', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
+		}
+		
+		if (config.semanticOptions !== undefined && config.semanticOptions) {
 		 			 
 			var searchModeButton = GIAPI.FontAwesomeButton({
 				'width': 250,
@@ -1564,6 +1600,24 @@ export function initializePortal(config) {
 			if (!$('#advConstDiv').length) {
 				$('<div>').attr('id', 'advConstDiv').appendTo('#adv-search-div');
 			}
+
+			// Fix positioning to ensure panel opens downward and stays on screen
+			setTimeout(function() {
+				var $advSearchDiv = $('#adv-search-div');
+				var $advConstDiv = $('#advConstDiv');
+				
+				// Ensure parent has relative positioning
+				$advSearchDiv.css('position', 'relative');
+				
+				// Override the relative positioning set by advancedSearch function
+				$advConstDiv.css({
+					'position': 'absolute',
+					'top': '100%',
+					'left': '0',
+					'margin-top': '5px',
+					'z-index': '1000'
+				});
+			}, 0);
 		}
 
 		//------------------------------------
@@ -2094,16 +2148,37 @@ export function initializePortal(config) {
 
 		constraints.spatialOp = options.spatialRelation;
 
-		constraints.ontologyids = GIAPI.OntologiesSelector.getSelectedIds();
-		constraints.semanticsearch = GIAPI.OntologiesSelector.getSelectedIds().length > 0;
-
+		if(GIAPI.OntologiesSelector.getSelectedIds().length > 0){
+			constraints.kvp.push(
+				{ 'key': 'semanticSearch', 'value': 'true' }
+			);
+		}
+		
+		if(config.semanticRelations){
+			constraints.kvp.push(
+				{ 'key': 'semanticRelations', 'value': config.semanticRelations }
+			);
+		}
+		
+		if(config.withObservedPropertiesURIs){
+					constraints.kvp.push(
+				{ 'key': 'withObservedPropertiesURIs', 'value': config.withObservedPropertiesURIs }
+			);
+		}			
+		
+		var ontologyIds = config.ontologyIds || GIAPI.OntologiesSelector.getSelectedIds();
+		if(ontologyIds){
+			constraints.kvp.push(
+				{ 'key': 'ontologyIds', 'value': ontologyIds }
+			);
+		}
+		 
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
 
-
-
-		if (config.filters !== undefined) {
+		if (config.filters) {
+			
 			options.termFrequency = config.filters;
 		}
 

@@ -24,11 +24,7 @@ package eu.essi_lab.cfga.gs.setting.augmenter.worker;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTimeZone;
@@ -47,8 +43,8 @@ import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
@@ -231,9 +227,9 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     public static class SourcesLoader extends ValuesLoader<String> {
 
 	@Override
-	protected List<String> loadValues(Optional<String> input) throws Exception {
+	protected List<String> loadValues(Optional<String> input) {
 
-	    return ConfigurationWrapper.getHarvestedAndMixedSources().stream().map(s -> s.getLabel()).collect(Collectors.toList());
+	    return ConfigurationWrapper.getHarvestedAndMixedSources().stream().map(GSSource::getLabel).collect(Collectors.toList());
 	}
     }
 
@@ -249,7 +245,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 	    setComponentName(AugmenterWorkerSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.AUGMENTERS.getIndex()).//
 		    withShowDirective("Augmenters", SortDirection.ASCENDING).//
 
@@ -262,7 +258,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 		    withGridInfo(Arrays.asList(//
 
-			    ColumnDescriptor.create("Name", true, true, (s) -> getName(s)), //
+			    ColumnDescriptor.create("Name", true, true, this::getName), //
 
 			    ColumnDescriptor.create("Repeat count", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
@@ -272,7 +268,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
 
-				    (item1, item2) -> item1.get("Status").compareTo(item2.get("Status")), //
+				    Comparator.comparing(item -> item.get("Status")), //
 
 				    new JobPhaseColumnRenderer()), //
 
@@ -292,7 +288,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
 
 	/**
@@ -402,7 +398,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	return getAugmentersSetting().//
 		getSettings(AugmenterSetting.class, false).//
 		stream().//
-		filter(s -> s.isSelected()).//
+		filter(Setting::isSelected).//
 		collect(Collectors.toList());
     }
 
@@ -501,7 +497,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
      */
     public void setSelectedSources(List<String> sourcesLabels) {
 
-	getOption(SOURCES_OPTION_KEY, String.class).get().select(v -> sourcesLabels.contains(v));
+	getOption(SOURCES_OPTION_KEY, String.class).get().select(sourcesLabels::contains);
     }
 
     /**
@@ -518,17 +514,15 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	    return ConfigurationWrapper.//
 		    getHarvestedAndMixedSources().//
 		    stream().//
-		    map(s -> s.getUniqueIdentifier()).//
+		    map(GSSource::getUniqueIdentifier).//
 		    collect(Collectors.toList());
 	}
 
-	List<String> identifiers = selectedValues.//
+	return selectedValues.//
 		stream().//
 		map(l -> getSourceIdentifierFromLabel(l)).//
 		filter(Objects::nonNull).//
 		collect(Collectors.toList());
-
-	return identifiers;
     }
 
     /**
@@ -549,14 +543,14 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 	List<ResourcePropertyBond> list = getSelectedSourcesIds().//
 		stream().//
-		map(id -> BondFactory.createSourceIdentifierBond(id)).//
-		collect(Collectors.toList());
+		map(BondFactory::createSourceIdentifierBond).//
+		toList();
 
-	Bond sourcesBond = null;
+	Bond sourcesBond;
 
 	if (list.size() == 1) {
 
-	    sourcesBond = list.get(0);
+	    sourcesBond = list.getFirst();
 
 	} else {
 
@@ -589,7 +583,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	    return sources.//
 		    stream().//
 		    filter(s -> s.getLabel().equals(label)).//
-		    map(s -> s.getUniqueIdentifier()).//
+		    map(GSSource::getUniqueIdentifier).//
 		    findFirst().//
 		    get();
 

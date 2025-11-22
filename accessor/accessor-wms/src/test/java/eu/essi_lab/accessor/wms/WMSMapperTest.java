@@ -22,7 +22,7 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
@@ -52,8 +52,18 @@ public class WMSMapperTest {
 	OriginalMetadata originalMD = new OriginalMetadata();
 
 	originalMD.setMetadata(string);
+	//With the modification below (assigning a source url to gssource), the test passes.
+	//The issue was that the mapper was trying to build the online resource link with
+	//the url found in the capabilities document. But now that url is no longer valid.
+	//Therefore, the mapper tried to use the source url which was null, leading to a null pointer exception.
+	//I fixed it by assigning a test url to gssource, so that the mapper can build the online resource link properly.
+	//I used "http://testwms.example?" as the test url to test this specific case.
+	//A new ExternalTestIT should be created to test the real world scenario with a live WMS 1.3.0 service.
 
-	GSResource resource = mapper.map(originalMD, new GSSource());
+	String sourceUrl = "http://testwms.example?";
+	GSSource gsSource = new GSSource();
+	gsSource.setEndpoint(sourceUrl);
+	GSResource resource = mapper.map(originalMD, gsSource);
 	
 	HarmonizedMetadata result = resource.getHarmonizedMetadata();
 
@@ -162,10 +172,10 @@ public class WMSMapperTest {
 	TestCase.assertEquals(1, onlines.size());
 	Online online = onlines.get(0);
 	TestCase.assertNotNull(online);
-	TestCase.assertEquals(NetProtocols.WMS_1_3_0.getCommonURN(), online.getProtocol());
-	TestCase.assertEquals("http://www.opengis.uab.es/cgi-bin/iberia/MiraMon.cgi?", online.getLinkage());
+	TestCase.assertEquals(NetProtocolWrapper.WMS_1_3_0.getCommonURN(), online.getProtocol());
+	TestCase.assertEquals("http://testwms.example?", online.getLinkage());
 	TestCase.assertEquals("clima_anual_iberia", online.getName());
-	TestCase.assertEquals(null, online.getDescription());
+	TestCase.assertEquals("Clima Anual de la Península Ibèrica.", online.getDescription());
 	TestCase.assertEquals("download", online.getFunctionCode());
 	//
 	// ResponsibleParty poc = dataIdentification.getPointOfContact();

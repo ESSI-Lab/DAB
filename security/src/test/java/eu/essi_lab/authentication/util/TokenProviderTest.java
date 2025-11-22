@@ -21,7 +21,7 @@ public class TokenProviderTest {
 
     @Before
     public void initTest() {
-	tokenProvider = new TokenProvider();
+	tokenProvider = new TokenProvider("hMACSecretPassphrase");
 	token = new Token();
     }
 
@@ -31,7 +31,7 @@ public class TokenProviderTest {
 	String[] claimValue = null;
 	tokenProvider.addClaim(claimName, claimValue);
 	String actualToken = tokenProvider.getToken();
-	String expectedToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e30.WPDCe7u67nslDXOKUpo5huMXlSjLe5ZczuZ5cFsjDBE";
+	String expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjpudWxsfQ.Nc4NUvFqk8tFA5IOS1ahj3PMXTAtPV5kJBIdW3Gp8ZQ";
 	Assert.assertEquals(expectedToken, actualToken);
     }
 
@@ -43,7 +43,7 @@ public class TokenProviderTest {
 	String[] roleClaimValue = new String[] {};
 	String actualToken = tokenProvider.addClaim(usernameClaimName, usernameClaimValue).addClaim(roleClaimName, roleClaimValue)
 		.getToken();
-	String expectedToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbXSwibmFtZSI6ImppbSJ9.WeNaxii56hopa2fdYY2iyASZ19Di69FUa-bRd1H2OPU";
+	String expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiamltIiwicm9sZSI6W119.OpP5yDhM85HXxJRrHwc1vV1ECG7LGPr8QEim0d4G64U";
 	Assert.assertEquals(expectedToken, actualToken);
     }
 
@@ -55,14 +55,14 @@ public class TokenProviderTest {
 	String[] roleClaimValue = new String[] { "superuser", "supervisor", "counselor" };
 	String actualToken = tokenProvider.addClaim(roleClaimName, roleClaimValue).addClaim(usernameClaimName, usernameClaimValue)
 		.getToken();
-	String expectedToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpbInN1cGVydXNlciIsInN1cGVydmlzb3IiLCJjb3Vuc2Vsb3IiXSwibmFtZSI6ImppbSJ9.85da4nyo30hFcAdfHvY92lm3QMbuMywZJ411Q_Pue-4";
+	String expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjpbInN1cGVydXNlciIsInN1cGVydmlzb3IiLCJjb3Vuc2Vsb3IiXSwibmFtZSI6ImppbSJ9.7M8ZFkPhGmcYbdSKOMXMZqewuI02a97x1dfdrLusphE";
 	Assert.assertEquals(expectedToken, actualToken);
     }
 
     @Test
     public void computeJwtTokenByEmptyToken() throws GSException {
 	String actualToken = tokenProvider.getToken(token);
-	String expectedToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e30.WPDCe7u67nslDXOKUpo5huMXlSjLe5ZczuZ5cFsjDBE";
+	String expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6bnVsbCwiYXV0aGVudGljYXRpb24tcHJvdmlkZXIiOm51bGx9.nPRbFyPes-9xs8QorrHeiEb59UmxtDyiS3VARQIzTsc";
 	Assert.assertEquals(expectedToken, actualToken);
     }
 
@@ -75,16 +75,15 @@ public class TokenProviderTest {
 	token.setTokenSecret("tokenSecret");
 	token.setType("type");
 	String actualToken = tokenProvider.getToken(token);
-	String expectedToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRoZW50aWNhdGlvbi1wcm92aWRlciI6InNlcnZpY2VQcm92aWRlciIsImVtYWlsIjoiZW1haWwifQ.3yo5w2H3HBHBWzvBRyBLwpEkTkWkyzUgrSHvcmNTl3g";
+	String expectedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsIiwiYXV0aGVudGljYXRpb24tcHJvdmlkZXIiOiJzZXJ2aWNlUHJvdmlkZXIifQ.67q7ScGcE6oHCHoZdkIvM2hRh5QoOXTTItxKKJyPm44";
 	Assert.assertEquals(expectedToken, actualToken);
     }
 
     @Test
     public void verifyNullToken() {
 	String nullToken = null;
-	expExc.expect(NullPointerException.class);
-	tokenProvider.isValid(nullToken);
-	Assert.fail();
+
+	Assert.assertFalse(tokenProvider.isValid(nullToken));
     }
 
     @Test
@@ -104,7 +103,7 @@ public class TokenProviderTest {
     @Test
     public void decodeNullToken() throws GSException {
 	String nullToken = null;
-	expExc.expect(NullPointerException.class);
+	expExc.expect(GSException.class);
 	tokenProvider.decode(nullToken);
 	Assert.fail();
     }

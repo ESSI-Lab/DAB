@@ -10,7 +10,7 @@
     <rdf:Description rdf:about="http://example#id">
         <label xmlns="http://www.w3.org/2000/01/rdf-schema#" rdf:datatype="http://www.w3.org/2001/XMLSchema#string">name</label>
         <isDefinedBy xmlns="http://www.w3.org/2000/01/rdf-schema#" rdf:resource="http://test/ontology#id"/>
-        <rdf:type rdf:resource="http://eu.essi_lab.core/2018/06/d2k Root"/>
+        <rdf:type rdf:resource="http://eu.essi_lab.core/2018/06/d2 #Root"/>
     </rdf:Description>
 
 

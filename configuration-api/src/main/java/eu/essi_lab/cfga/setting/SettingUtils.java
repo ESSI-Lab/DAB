@@ -239,9 +239,7 @@ public class SettingUtils {
      */
     public static void expand(Setting setting) {
 
-	SettingUtils.deepPerform(setting, s -> {
-	    s.enableCompactMode(false);
-	});
+	SettingUtils.deepPerform(setting, s -> s.enableCompactMode(false));
     }
 
     /**
@@ -249,9 +247,7 @@ public class SettingUtils {
      */
     public static void collapse(Setting setting) {
 
-	SettingUtils.deepPerform(setting, s -> {
-	    s.enableCompactMode(true);
-	});
+	SettingUtils.deepPerform(setting, s -> s.enableCompactMode(true));
     }
 
     /**
@@ -275,7 +271,7 @@ public class SettingUtils {
      * @param mapped
      * @return
      */
-    public static <T> Object deepMap(Setting setting, Function<Setting, T> mapper, List<T> mapped) {
+    public static <T> void deepMap(Setting setting, Function<Setting, T> mapper, List<T> mapped) {
 
 	T apply = mapper.apply(setting);
 
@@ -285,8 +281,6 @@ public class SettingUtils {
 	}
 
 	setting.getSettings().forEach(s -> deepMap(s, mapper, mapped));
-
-	return null;
     }
 
     /**

@@ -1,99 +1,148 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>eu.essi_lab</groupId>
-		<artifactId>DAB</artifactId>
-		<version>1.0-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>eu.essi_lab</groupId>
+        <artifactId>DAB</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>database-api-elasticsearch-impl</artifactId>
-	<name>ESSI-Lab DataBase API Elasticsearch Implementation</name>
+    <artifactId>database-api-elasticsearch-impl</artifactId>
+    <name>ESSI-Lab DataBase API Elasticsearch Implementation</name>
 
-	<dependencies>
-		
+    <dependencies>
 
-		<dependency>
-			<groupId>eu.essi_lab</groupId>
-			<artifactId>database-api</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
 
-		<dependency>
-			<groupId>eu.essi_lab</groupId>
-			<artifactId>database-indexes</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>eu.essi_lab</groupId>
+            <artifactId>database-api</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>eu.essi_lab</groupId>
-			<artifactId>core-datamodel</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>eu.essi_lab</groupId>
+            <artifactId>database-indexes</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>eu.essi_lab</groupId>
-			<artifactId>core-messages</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>eu.essi_lab</groupId>
+            <artifactId>core-datamodel</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.opensearch.client</groupId>
-			<artifactId>opensearch-java</artifactId>
-			<version>${opensearch.client-opensearch-java.version}</version>		
-		</dependency>
+        <dependency>
+            <groupId>eu.essi_lab</groupId>
+            <artifactId>core-messages</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.opensearch.client</groupId>
-			<artifactId>opensearch-rest-client</artifactId>
-			<version>${opensearch.client-opensearch-rest-client.version}</version>			
-		</dependency>
+        <dependency>
+            <groupId>org.opensearch.client</groupId>
+            <artifactId>opensearch-java</artifactId>
+            <version>${opensearch.client-opensearch-java.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>${jackson-core.version}</version><!--$NO-MVN-MAN-VER$-->
-		</dependency>
+        <dependency>
+            <groupId>org.opensearch.client</groupId>
+            <artifactId>opensearch-rest-client</artifactId>
+            <version>${opensearch.client-opensearch-rest-client.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>apache-client</artifactId>			
-			<version>${aws-java-sdk-bom.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>eu.essi_lab</groupId>
-			<artifactId>database-ftp-server</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-shapefile</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-referencing</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-render</artifactId>
-		</dependency>
-	
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-swing</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson-core.version}</version><!--$NO-MVN-MAN-VER$-->
+        </dependency>
 
-		<dependency>
-			<groupId>eu.essi_lab</groupId>
-			<artifactId>access-tools</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache-client</artifactId>
+            <version>${aws-java-sdk-bom.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>eu.essi_lab</groupId>
+            <artifactId>database-ftp-server</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-shapefile</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-referencing</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-render</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-swing</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>eu.essi_lab</groupId>
+            <artifactId>access-tools</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+    <profiles>
+        <profile>
+            <id>internaltest</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+
+                        <configuration>
+                            <images>
+
+                                <image>
+                                    <alias>gi-elasticsearch</alias>
+                                    <name>${docker.elasticsearch}</name>
+                                    <run>
+                                        <ports>
+                                            <port>gi-elasticsearch.port:9200</port>
+                                        </ports>
+                                        <wait>
+                                            <http>
+                                                <!--suppress MavenModelInspection -->
+                                                <url>http://admin:admin@${docker.host.address}:${gi-elasticsearch.port}</url><!--/_cat/health?v -->
+                                            </http>
+                                            <time>${fabric8-timeout}</time>
+                                        </wait>
+                                        <env>
+                                            <discovery.type>single-node</discovery.type>
+                                            <bootstrap.memory_lock>true</bootstrap.memory_lock>
+                                            <OPENSEARCH_JAVA_OPTS>-Xms512m -Xmx512m</OPENSEARCH_JAVA_OPTS>
+                                            <DISABLE_INSTALL_DEMO_CONFIG>true</DISABLE_INSTALL_DEMO_CONFIG>
+                                            <DISABLE_SECURITY_PLUGIN>true</DISABLE_SECURITY_PLUGIN>
+                                        </env>
+                                    </run>
+                                </image>
+
+                            </images>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

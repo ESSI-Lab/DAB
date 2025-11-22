@@ -29,8 +29,8 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -56,18 +56,16 @@ public class OAuthSetting extends Setting implements EditableSetting {
     public enum OAuthProvider implements LabeledEnum {
 
 	GOOGLE("Google", "google"), //
-	FACEBOOK("Facebook", "facebook"), //
-	TWITTER("Twitter", "twitter"), //
 	KEYCLOAK("Keycloak", "keycloak");
 
-	private String label;
-	private String providerName;
+	private final String label;
+	private final String providerName;
 
 	/**
 	 * @param label
 	 * @param providerName
 	 */
-	private OAuthProvider(String label, String providerName) {
+	OAuthProvider(String label, String providerName) {
 	    this.label = label;
 	    this.providerName = providerName;
 	}
@@ -182,21 +180,21 @@ public class OAuthSetting extends Setting implements EditableSetting {
 	    ValidationResponse validationResponse = new ValidationResponse();
 
 	    Optional<String> adminId = thisSetting.getAdminId();
-	    if (!adminId.isPresent()) {
+	    if (adminId.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("Admin identifier missing");
 	    }
 
 	    Optional<String> clientId = thisSetting.getClientId();
-	    if (!clientId.isPresent()) {
+	    if (clientId.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("Client identifier identifier missing");
 	    }
 
 	    Optional<String> clientSecret = thisSetting.getClientSecret();
-	    if (!clientSecret.isPresent()) {
+	    if (clientSecret.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("Client secret missing");
@@ -205,21 +203,21 @@ public class OAuthSetting extends Setting implements EditableSetting {
 	    OAuthProviderSetting providerSetting = thisSetting.getSelectedProviderSetting();
 
 	    Optional<String> loginURL = providerSetting.getLoginURL();
-	    if (!loginURL.isPresent()) {
+	    if (loginURL.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("Login URL missing");
 	    }
 
 	    Optional<String> tokenURL = providerSetting.getTokenURL();
-	    if (!tokenURL.isPresent()) {
+	    if (tokenURL.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("Token URL missing");
 	    }
 
 	    Optional<String> userInfoURL = providerSetting.getUserInfoURL();
-	    if (!userInfoURL.isPresent()) {
+	    if (userInfoURL.isEmpty()) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("User info URL missing");
@@ -241,12 +239,12 @@ public class OAuthSetting extends Setting implements EditableSetting {
 
 	    setComponentName(OAuthSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.AUTHORIZATION.getIndex()).//
 		    withShowDirective("Authorization").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

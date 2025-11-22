@@ -343,12 +343,13 @@ public class WIGOSMetadata implements IWIGOSMetadata {
     public void setMeasurementUnit(String uomCode) {
 	ReportingType reporting = getInnerReporting();
 	ReferenceType referenceType = new ReferenceType();
-	if (uomCode.contains("codes.wmo.int/common/unit/")) {
+	if (uomCode.contains("codes.wmo.int/common/unit/") || uomCode.contains("codes.wmo.int/wmdr/unit/")) {
 	    referenceType.setHref(uomCode);
 	} else {
 	    referenceType.setHref("http://codes.wmo.int/common/unit/" + uomCode);
 	}
 	reporting.setUom(referenceType);
+	reporting.setInternationalExchange(true);
     }
 
     /*
@@ -581,19 +582,44 @@ public class WIGOSMetadata implements IWIGOSMetadata {
      */
     @Override
     public void setStationOperatingStatus() {
-	// ReportingStatus status = new ReportingStatus();
-	// ReportingStatusType value = new ReportingStatusType();
-	// ReferenceType reference = new ReferenceType();
-	// reference.setHref("http://codes.wmo.int/wmdr/ReportingStatus/" + "operational");
-	// value.setReportingStatus(reference );
-	// status.setReportingStatus(value);
-	// ProgramAffiliation pa = getObservingFacility().getProgramAffiliation().get(0);
-	// ProgramAffiliationType paType = new ProgramAffiliationType();
-	// paType.getReportingStatus().add(status);
-	// pa.setProgramAffiliation(paType);
-	// getObservingFacility().getProgramAffiliation().add(pa);
+	ReportingStatus status = new ReportingStatus();
+	ReportingStatusType value = new ReportingStatusType();
+	ReferenceType reference = new ReferenceType();
+	reference.setHref("http://codes.wmo.int/wmdr/ReportingStatus/" + "operational");
+	value.setReportingStatus(reference);
+	// TimePeriodPropertyType tp = new TimePeriodPropertyType();
+	// tp.setTimePeriod(createTimePeriodType(beginPosition, endPosition, null));
+	status.setReportingStatus(value);
+	ProgramAffiliation pa = getObservingFacility().getProgramAffiliation().get(0);
+	ProgramAffiliationType paType = new ProgramAffiliationType();
+	paType.getReportingStatus().add(status);
+	// ReferenceType reference2 = new ReferenceType();pa.getProgramAffiliation().getProgramAffiliation()
+	// reference2.setHref(null);
+	paType.setProgramAffiliation(pa.getProgramAffiliation().getProgramAffiliation());
+	pa.setProgramAffiliation(paType);
+	getObservingFacility().getProgramAffiliation().add(pa);
 	// getObservingCapability().getProgramAffiliation().add(paType.getProgramAffiliation());
 
+    }
+
+    public void setStationOperatingStatus(String beginPosition, String endPosition) {
+	ReportingStatus status = new ReportingStatus();
+	ReportingStatusType value = new ReportingStatusType();
+	ReferenceType reference = new ReferenceType();
+	reference.setHref("http://codes.wmo.int/wmdr/ReportingStatus/" + "operational");
+	value.setReportingStatus(reference);
+	TimePeriodPropertyType tp = new TimePeriodPropertyType();
+	tp.setTimePeriod(createTimePeriodType(beginPosition, endPosition, null));
+	value.setValidPeriod(tp);
+	status.setReportingStatus(value);
+	ProgramAffiliation pa = getObservingFacility().getProgramAffiliation().get(0);
+	ProgramAffiliationType paType = new ProgramAffiliationType();
+	paType.getReportingStatus().add(status);
+	// ReferenceType reference2 = new ReferenceType();pa.getProgramAffiliation().getProgramAffiliation()
+	// reference2.setHref(null);
+	paType.setProgramAffiliation(pa.getProgramAffiliation().getProgramAffiliation());
+	pa.setProgramAffiliation(paType);
+	// getObservingFacility().getProgramAffiliation().add(pa);
     }
 
     // CATEGORY 4: ENVIRONMENT
@@ -1467,6 +1493,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	ReportingType repo = reporting.getReporting();
 	if (repo == null) {
 	    repo = new ReportingType();
+	    repo.setInternationalExchange(true);
 	}
 	reporting.setReporting(repo);
 	return repo;
@@ -1478,6 +1505,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	if (reporting == null) {
 	    reporting = new ReportingPropertyType();
 	    ReportingType rt = new ReportingType();
+	    rt.setInternationalExchange(true);
 	    reporting.setReporting(rt);
 	}
 	dg.setReporting(reporting);
@@ -1848,8 +1876,12 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	    ObservingCapabilityType val = o.getObservingCapability();
 	    obscap.setObservingCapability(val);
 	    OMObservationType observationType = getInnerObservation();
-	    String href = observationType.getObservedProperty().getHref();
-	    obscap.setHref(href);
+	    ReferenceType obsProp = observationType.getObservedProperty();
+	    if (obsProp != null) {
+		String href = obsProp.getHref();
+		obscap.setHref(href);
+	    }
+
 	    // record.getRecord().getFacility().get(0).getObservingFacility().getObservation().add(obscap);
 	    facility.getObservingFacility().getObservation().add(obscap);
 

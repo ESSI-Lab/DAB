@@ -25,7 +25,7 @@ public class BondParserUsageExample {
 	// --------------------------------
 	// creates the first and bond list
 	//
-	ArrayList<Bond> firstBondList = new ArrayList<Bond>();
+	ArrayList<Bond> firstBondList = new ArrayList<>();
 
 	SpatialExtent spatialExtent = new SpatialExtent(0, 0, 0, 0);
 	SpatialBond spatialBond = BondFactory.createSpatialEntityBond(BondOperator.CONTAINS, spatialExtent);
@@ -49,7 +49,7 @@ public class BondParserUsageExample {
 	// --------------------------------
 	// creates the second and bond list
 	//
-	ArrayList<Bond> secondBondList = new ArrayList<Bond>();
+	ArrayList<Bond> secondBondList = new ArrayList<>();
 
 	spatialExtent = new SpatialExtent(1, 1, 1, 1);
 	spatialBond = BondFactory.createSpatialEntityBond(BondOperator.CONTAINS, spatialExtent);
@@ -76,7 +76,7 @@ public class BondParserUsageExample {
 	// ---------------------------------------
 	// inserts the two and bonds in an or bond
 	//
-	ArrayList<Bond> logicalBondsList = new ArrayList<Bond>();
+	ArrayList<Bond> logicalBondsList = new ArrayList<>();
 	logicalBondsList.add(firstAndBond);
 	logicalBondsList.add(secondAndBond);
 	logicalBondsList.add(notBond);

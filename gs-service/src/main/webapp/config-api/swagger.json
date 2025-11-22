@@ -22,8 +22,9 @@
 					{
 						"name": "authenticationToken",
 						"in": "path",
-						"description": "Authentication token. For listing requests it is ignored",
-						"type": "string"
+						"description": "Mandatory authentication token. For listing requests any value is accepted",
+						"type": "string",
+						"required": true
 					}
 				],
 				"requestBody": {

@@ -56,6 +56,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String NC_FILE_CORRUPTED = "ncFileCorrupted";
     private static final String AVAILABLE_GRANULES = "availableGranules";
     private static final String THEME_CATEGORY = "themeCategory";
+    private static final String DATA_DISCLAIMER = "data_disclaimer";
     private static final String IN_SITU = "inSitu";
     private static final String GEOMETRY = "geometry";
     private static final String CENTROID = "centroid";
@@ -211,6 +212,33 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public void setRiver(String river) {
 	try {
 	    this.metadata.add(MetadataElement.RIVER.getName(), river);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+    
+    /**
+     * @return
+     */
+    public Optional<String> getDataDisclaimer() {
+
+	try {
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.DATA_DISCLAIMER.getName()));
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param dataDisclaimer
+     */
+    public void setDataDisclaimer(String dataDisclaimer) {
+	try {
+	    this.metadata.add(MetadataElement.DATA_DISCLAIMER.getName(), dataDisclaimer);
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
@@ -1069,6 +1097,8 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
+    
+
 
     /**
      * 

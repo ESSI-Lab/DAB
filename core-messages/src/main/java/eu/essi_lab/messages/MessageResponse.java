@@ -54,7 +54,7 @@ public abstract class MessageResponse<T, C extends AbstractCountResponse> implem
      */
     public MessageResponse() {
 	setException(GSException.createException());
-	setResultsList(new ArrayList<T>());
+	setResultsList(new ArrayList<>());
 	propertyHandler = new GSPropertyHandler();
     }
 

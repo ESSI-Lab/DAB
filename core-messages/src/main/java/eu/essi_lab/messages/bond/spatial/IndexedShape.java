@@ -29,7 +29,7 @@ package eu.essi_lab.messages.bond.spatial;
  */
 public class IndexedShape implements SpatialEntity {
 
-    private String id;
+    private final String id;
 
     /**
      * @param id

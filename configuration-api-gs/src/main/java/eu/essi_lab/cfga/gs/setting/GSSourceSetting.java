@@ -44,8 +44,8 @@ import eu.essi_lab.cfga.setting.validation.Validator;
 import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.ResultsPriority;
+import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**
@@ -269,7 +269,7 @@ public class GSSourceSetting extends Setting {
      */
     public List<String> getSourceDeployment() {
 
-	return getOption(DEPLOYMENT_OPTION_KEY, String.class).map(option -> option.getValues()).orElse(new ArrayList<String>());
+	return getOption(DEPLOYMENT_OPTION_KEY, String.class).map(Option::getValues).orElse(new ArrayList<>());
     }
 
     /**
@@ -375,12 +375,12 @@ public class GSSourceSetting extends Setting {
      */
     public void setDiscoveryOptions(ResultsPriority priority, MetadataElement orderingProperty, SortOrder direction) {
 
-	if (priority == null && orderingProperty == null && direction == null || priority == null && orderingProperty == null) {
+	if (priority == null && orderingProperty == null) {
 	    getOption(DISCOVERY_OPTIONS_KEY, String.class).get().clearValues();
 	    return;
 	}
 
-	String value = "";
+	String value;
 
 	if (priority != null) {
 	    value = priority.getLabel() + "\n";
@@ -415,12 +415,12 @@ public class GSSourceSetting extends Setting {
 
 	List<String> options = getDiscoveryOptions();
 
-	if (options.isEmpty() || options.get(0).equals("-")) {
+	if (options.isEmpty() || options.getFirst().equals("-")) {
 
 	    return ResultsPriority.UNSET;
 	}
 
-	return LabeledEnum.valueOf(ResultsPriority.class, options.get(0)).get();
+	return LabeledEnum.valueOf(ResultsPriority.class, options.getFirst()).get();
     }
 
     /**
@@ -474,7 +474,7 @@ public class GSSourceSetting extends Setting {
 	    }
 	}
 
-	return new ArrayList<String>();
+	return new ArrayList<>();
     }
 
     /**
@@ -504,7 +504,7 @@ public class GSSourceSetting extends Setting {
 	    setSourceLabel(source.getLabel());
 	}
 
-	source.getDeployment().forEach(dep -> addSourceDeployment(dep));
+	source.getDeployment().forEach(this::addSourceDeployment);
 
 	MetadataElement ordProperty = source.getSortProperty() != null ? MetadataElement.fromName(source.getSortProperty()) : null;
 
@@ -526,7 +526,7 @@ public class GSSourceSetting extends Setting {
 
 	source.setUniqueIdentifier(getSourceIdentifier());
 
-	getSourceDeployment().forEach(dep -> source.addDeployment(dep));
+	getSourceDeployment().forEach(source::addDeployment);
 
 	Optional<MetadataElement> orderingProperty = getSortProperty();
 

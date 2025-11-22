@@ -29,10 +29,9 @@ import org.json.JSONObject;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.sensorthings._1_1.model.UnitOfMeasurement;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Datastream;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Location;
@@ -69,7 +68,7 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addInstrument(Datastream stream, CoreMetadata coreMetadata, Keywords keywords) {
+    protected void addInstrument(Datastream stream, CoreMetadata coreMetadata, KeywordsCollector keywords) {
 
 	MIInstrument instrument = null;
 	Optional<Sensor> optSensor = stream.getSensor();
@@ -88,7 +87,7 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
 	    instrument.setDescription(sensorDesc.get().trim());
 
 	    String metadata = sensor.getMetadata().get().toString();
-	    addKeyword(keywords, metadata);
+	    keywords.addKeyword(sensorName.get(), "instrument");
 
 	    JSONObject properties = sensor.getProperties().get();
 
@@ -101,14 +100,14 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
 	    String method = properties.optString("method");
 	    if (!method.isEmpty()) {
 		sensorCode = sensorCode + ":" + method.trim();
-		addKeyword(keywords, method);
+		keywords.addKeyword(method, "sensorMethod");
 	    }
 	    instrument.setMDIdentifierTypeCode(sensorCode);
 
 	    String measurementType = properties.optString("measurementtype");
 	    if (!measurementType.isEmpty()) {
 		instrument.setSensorType(measurementType.trim());
-		addKeyword(keywords, measurementType);
+		keywords.addKeyword(measurementType, "measurementType");
 	    }
 	}
     }
@@ -157,7 +156,7 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
      * @param dataId
      */
     @Override
-    protected void addVerticalExtent(Thing thing, Keywords keywords, DataIdentification dataId) {
+    protected void addVerticalExtent(Thing thing, KeywordsCollector keywords, DataIdentification dataId) {
 
     }
 
@@ -169,7 +168,8 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
      * @return
      */
     @Override
-    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,ExtensionHandler handler) {
+    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, KeywordsCollector keywords,
+	    ExtensionHandler handler) {
 
 	Location location = thing.getLocations().get(0);
 
@@ -200,10 +200,10 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
 	    String countryCode = optLocationProp.get().optString("countryCode");
 	    if (countryCode != null && !countryCode.isEmpty()) {
 		Country c = Country.decode(countryCode);
-		if (c!=null) {
+		if (c != null) {
 		    handler.setCountry(c.getShortName());
 		    handler.setCountryISO3(c.getISO3());
-		}		
+		}
 	    }
 	}
 
@@ -213,17 +213,17 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
 
 	String namespace = thing.getProperties().get().optString("namespace");
 	if (!namespace.isEmpty()) {
-	    addKeyword(keywords, namespace);
+
 	}
 
 	String owner = thing.getProperties().get().optString("owner");
 	if (!owner.isEmpty()) {
-	    addKeyword(keywords, owner);
+	    keywords.addKeyword(owner, "owner");
 	}
 
 	String localId = thing.getProperties().get().optString("localId");
 	if (!localId.isEmpty()) {
-	    addKeyword(keywords, localId);
+	    keywords.addKeyword(localId, "identifier");
 	}
 
 	platform.setMDIdentifierCode(thing.getSelfLink().get());
@@ -242,15 +242,11 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addBoundingBox(Thing thing, DataIdentification dataId, Keywords keywords) {
+    protected void addBoundingBox(Thing thing, DataIdentification dataId, KeywordsCollector keywords) {
 
 	Location location = thing.getLocations().get(0);
 
 	GeographicBoundingBox boundingBox = null;
-
-	// should be "application/geo+json"
-	Optional<String> locationEncodingType = location.getEncodingType();
-	locationEncodingType.ifPresent(enc -> addKeyword(keywords, enc));
 
 	if (location.getLocation().has("coordinates")) {
 
@@ -273,6 +269,6 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
     @Override
     protected String getSupportedProtocol() {
 
-	return NetProtocols.SENSOR_THINGS_1_1_FRAUNHOFER_AIR_QUALITY.getCommonURN();
+	return NetProtocolWrapper.SENSOR_THINGS_1_1_FRAUNHOFER_AIR_QUALITY.getCommonURN();
     }
 }

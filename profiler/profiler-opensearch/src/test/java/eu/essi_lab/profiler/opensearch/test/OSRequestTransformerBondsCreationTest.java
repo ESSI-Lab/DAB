@@ -78,17 +78,11 @@ public class OSRequestTransformerBondsCreationTest {
 	    Assert.assertEquals("pippo", osRequestReader.parse(OSParameters.SEARCH_TERMS));
 
 	    String startTime = osRequestReader.parse(OSParameters.TIME_START);
+ 	    Assert.assertEquals("2000-01-01T00:00:00.000Z", startTime.toString());
 
-	    // --------------------------------------------------------------------------------------------
-	    // testing the contains since the date time parser return this format: 1900-01-01T00:00:00.000Z
-	    // see OSRequestReader#parseISO8601DateTime
-	    //
-	    if (startTime == null || !startTime.contains("1900")) {
-		fail("Start time not found");
-	    }
 
 	    String endTime = osRequestReader.parse(OSParameters.TIME_END);
-	    Assert.assertEquals("2000-01-01T00:00:00.000Z", endTime.toString());
+	    Assert.assertEquals("1900-01-01T00:00:00.000Z", endTime.toString());
 
 	    String bboxes = osRequestReader.parse(OSParameters.BBOX);
 	    String[] split = bboxes.split("_");
@@ -296,7 +290,7 @@ public class OSRequestTransformerBondsCreationTest {
     }
 
     private OSRequestTransformer createTransformer() {
-	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting()) {
+	OSRequestTransformer transformer = new OSRequestTransformer() {
 	    @Override
 	    public DiscoveryMessage transform(WebRequest request) throws GSException {
 

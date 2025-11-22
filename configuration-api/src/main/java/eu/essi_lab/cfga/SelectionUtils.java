@@ -67,17 +67,13 @@ public class SelectionUtils {
 
 	    List<Setting> newSubSettings = newSelSetting.getSettings();
 
-	    List<Setting> confSubSettings = configSelSetting.get(0).getSettings();
+	    List<Setting> confSubSettings = configSelSetting.getFirst().getSettings();
 
-	    newSubSettings.forEach(set -> {
-
-		set.setSelected(//
-			confSubSettings.//
-				stream().//
-				map(s -> s.getIdentifier()).//
-				anyMatch(id -> id.equals(set.getIdentifier())));
-
-	    });
+	    newSubSettings.forEach(set -> set.setSelected(//
+		    confSubSettings.//
+			    stream().//
+			    map(Setting::getIdentifier).//
+			    anyMatch(id -> id.equals(set.getIdentifier()))));
 	}
     }
 
@@ -94,7 +90,7 @@ public class SelectionUtils {
 
 	List<Setting> list = configuration.list();
 
-	list.forEach(l -> deepClean(l));
+	list.forEach(SelectionUtils::deepClean);
 
 	configuration.setWritable(false);
     }
@@ -110,7 +106,7 @@ public class SelectionUtils {
 
 	List<Setting> list = configuration.list();
 
-	list.forEach(l -> deepAfterClean(l));
+	list.forEach(SelectionUtils::deepAfterClean);
 
 	configuration.setWritable(false);
     }
@@ -127,9 +123,9 @@ public class SelectionUtils {
 
 	setting.clean();
 
-	setting.getOptions().forEach(o -> o.clean());
+	setting.getOptions().forEach(Option::clean);
 
-	setting.getSettings().forEach(s -> deepClean(s));
+	setting.getSettings().forEach(SelectionUtils::deepClean);
     }
 
     /**
@@ -141,7 +137,7 @@ public class SelectionUtils {
 
 	setting.afterClean();
 
-	setting.getSettings().forEach(s -> deepAfterClean(s));
+	setting.getSettings().forEach(SelectionUtils::deepAfterClean);
     }
 
     /**
@@ -303,20 +299,17 @@ public class SelectionUtils {
 	    // it can be empty in a synch case where the option is missing from the
 	    // current setting version
 	    //
-	    if (outOption.isPresent()) {
-
-		outOption.get().setEnabled(targetOption.isEnabled());
-	    }
+	    outOption.ifPresent(option -> option.setEnabled(targetOption.isEnabled()));
 	});
 
 	targetSetting.getSettings().forEach(originalChild -> {
 
-	    ArrayList<Setting> list = new ArrayList<Setting>();
+	    ArrayList<Setting> list = new ArrayList<>();
 	    SettingUtils.deepFind(resetSetting, set -> set.getIdentifier().equals(originalChild.getIdentifier()), list);
 
 	    if (!list.isEmpty()) {
 
-		applySettingPropertiesAndOptionsState(originalChild, list.get(0));
+		applySettingPropertiesAndOptionsState(originalChild, list.getFirst());
 	    }
 	});
     }
@@ -333,13 +326,13 @@ public class SelectionUtils {
 
 	originalSetting.getOptions().forEach(targetOption -> {
 
-	    ArrayList<Setting> list = new ArrayList<Setting>();
+	    ArrayList<Setting> list = new ArrayList<>();
 	    SettingUtils.deepFind(outSetting, set -> set.getIdentifier().equals(originalSetting.getIdentifier()), list);
 
 	    if (!list.isEmpty()) {
 
 		Optional<Option<?>> resetOption = list.//
-			get(0).//
+			getFirst().//
 			getOptions().//
 			stream().//
 			filter(opt -> opt.getKey().equals(targetOption.getKey())).//
@@ -368,20 +361,17 @@ public class SelectionUtils {
      */
     private static void setUnsetSelectionModeOptionsValues(Setting outSetting, HashMap<String, JSONArray> valuesMap) {
 
-	outSetting.getOptions().forEach(outOption -> {
+	outSetting.getOptions().forEach(outOption -> valuesMap.keySet().forEach(key -> {
 
-	    valuesMap.keySet().forEach(key -> {
+	    String settingIdentifier = retrieveSettingIdentifier(key);
+	    String optionKey = retrieveOptionKey(key);
 
-		String settingIdentifier = retrieveSettingIdentifier(key);
-		String optionKey = retrieveOptionKey(key);
+	    if (outSetting.getIdentifier().equals(settingIdentifier) && outOption.getKey().equals(optionKey)) {
 
-		if (outSetting.getIdentifier().equals(settingIdentifier) && outOption.getKey().equals(optionKey)) {
-
-		    JSONArray jsonArray = valuesMap.get(key);
-		    outOption.getObject().put("values", jsonArray);
-		}
-	    });
-	});
+		JSONArray jsonArray = valuesMap.get(key);
+		outOption.getObject().put("values", jsonArray);
+	    }
+	}));
 
 	outSetting.getSettings().forEach(s -> setUnsetSelectionModeOptionsValues(s, valuesMap));
     }
@@ -396,9 +386,19 @@ public class SelectionUtils {
 	originalSetting.getOptions().forEach(targetOption -> {
 
 	    List<Object> selectedValues = (List<Object>) targetOption.getSelectedValues();
+
 	    if (!selectedValues.isEmpty()) {
 
 		selectedValuesMap.put(targetOption.getKey(), selectedValues);
+
+	    } else {
+
+		//
+		// we insert in the map also the options having no selected values
+		// this is required for options with with SelectionMode.MULTI having no selected values
+		// !!! (*) options with SelectionMode.UNSET have always no selected values !!!
+		//
+		selectedValuesMap.put(targetOption.getKey(), List.of());
 	    }
 	});
 
@@ -413,7 +413,7 @@ public class SelectionUtils {
 
 	outSetting.getOptions().forEach(outOption -> {
 
-	    if (selectedValuesMap.keySet().contains(outOption.getKey())) {
+	    if (selectedValuesMap.containsKey(outOption.getKey())) {
 
 		List<Object> list = selectedValuesMap.get(outOption.getKey());
 
@@ -428,13 +428,21 @@ public class SelectionUtils {
 		    outOption.setObjectValues(list);
 		}
 
-		if (outOption.getSelectionMode() == SelectionMode.UNSET) {
+		//
+		// !!! (*) options with SelectionMode.UNSET are excluded !!!
+		// anyway this case never happens
+		//
+		if (outOption.getSelectionMode() == SelectionMode.UNSET && !list.isEmpty()) {
 
 		    outOption.setObjectValues(list);
 
-		} else {
+		    //
+		    // options with SelectionMode.SINGLE have always a value selected,
+		    // while options with SelectionMode.MULTI can also have no selected values
+		    //
+		} else if (outOption.getSelectionMode() != SelectionMode.UNSET) {
 
-		    outOption.select(v -> list.contains(v));
+		    outOption.select(list::contains);
 		}
 	    }
 	});

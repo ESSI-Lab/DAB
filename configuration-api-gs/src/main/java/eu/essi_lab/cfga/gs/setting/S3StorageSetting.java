@@ -36,10 +36,10 @@ import eu.essi_lab.model.StorageInfo;
  */
 public class S3StorageSetting extends Setting implements EditableSetting {
 
-    private static String STORAGE_URI_OPTION_KEY = "s3StorageUri";
-    private static String STORAGE_USER_OPTION_KEY = "s3StorageUser";
-    private static String STORAGE_PWD_OPTION_KEY = "s3StoragePassword";
-    private static String BUCKET_NAME_OPTION_KEY = "s3BucketName";
+    private static final String STORAGE_URI_OPTION_KEY = "s3StorageUri";
+    private static final String STORAGE_USER_OPTION_KEY = "s3StorageUser";
+    private static final String STORAGE_PWD_OPTION_KEY = "s3StoragePassword";
+    private static final String BUCKET_NAME_OPTION_KEY = "s3BucketName";
 
     /**
      * 

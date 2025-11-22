@@ -21,6 +21,7 @@ package eu.essi_lab.cfga.gs.setting.distribution;
  * #L%
  */
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -32,8 +33,8 @@ import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSettingLoader;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.setting.AfterCleanFunction;
 import eu.essi_lab.cfga.setting.Setting;
@@ -88,8 +89,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 	getAccessorsSetting().//
 		getSettings().//
 		stream().//
-		sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).//
-		findFirst().//
+		min(Comparator.comparing(Setting::getName)).//
 		get().//
 		setSelected(true);
 
@@ -124,15 +124,15 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 
 	    setComponentName(AccessorSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.DISTRIBUTION.getIndex()).//
-		    withShowDirective("Distribution", SortDirection.ASCENDING).//
+		    withShowDirective("Distribution", "Manage DAB distributed sources", SortDirection.ASCENDING).//
 		    withAddDirective("Add distributed accessor", DistributionSetting.class).//
 		    withRemoveDirective("Remove accessor", true, DistributionSetting.class).//
 		    withEditDirective("Edit accessor", ConfirmationPolicy.ON_WARNINGS).//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

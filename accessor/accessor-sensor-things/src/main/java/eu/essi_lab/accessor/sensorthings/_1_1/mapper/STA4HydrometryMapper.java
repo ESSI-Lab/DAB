@@ -28,10 +28,9 @@ import org.json.JSONArray;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.sensorthings._1_1.model.UnitOfMeasurement;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Datastream;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Location;
@@ -66,7 +65,7 @@ public class STA4HydrometryMapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addInstrument(Datastream stream, CoreMetadata coreMetadata, Keywords keywords) {
+    protected void addInstrument(Datastream stream, CoreMetadata coreMetadata, KeywordsCollector keywords) {
 
 	MIInstrument instrument = null;
 	Optional<Sensor> optSensor = stream.getSensor();
@@ -144,7 +143,7 @@ public class STA4HydrometryMapper extends SensorThingsMapper {
      * @param dataId
      */
     @Override
-    protected void addVerticalExtent(Thing thing, Keywords keywords, DataIdentification dataId) {
+    protected void addVerticalExtent(Thing thing, KeywordsCollector keywords, DataIdentification dataId) {
 
     }
 
@@ -156,7 +155,7 @@ public class STA4HydrometryMapper extends SensorThingsMapper {
      * @return
      */
     @Override
-    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,ExtensionHandler handler) {
+    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, KeywordsCollector keywords,ExtensionHandler handler) {
 
 	Location location = thing.getLocations().get(0);
 
@@ -203,15 +202,11 @@ public class STA4HydrometryMapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addBoundingBox(Thing thing, DataIdentification dataId, Keywords keywords) {
+    protected void addBoundingBox(Thing thing, DataIdentification dataId, KeywordsCollector keywords) {
 
 	Location location = thing.getLocations().get(0);
 
 	GeographicBoundingBox boundingBox = null;
-
-	// should be "application/vnd.geo+json"
-	Optional<String> locationEncodingType = location.getEncodingType();
-	locationEncodingType.ifPresent(enc -> addKeyword(keywords, enc));
 
 	if (location.getLocation().has("coordinates")) {
 
@@ -234,6 +229,6 @@ public class STA4HydrometryMapper extends SensorThingsMapper {
     @Override
     protected String getSupportedProtocol() {
 
-	return NetProtocols.SENSOR_THINGS_1_1_STA_4_HYDRO.getCommonURN();
+	return NetProtocolWrapper.SENSOR_THINGS_1_1_STA_4_HYDRO.getCommonURN();
     }
 }

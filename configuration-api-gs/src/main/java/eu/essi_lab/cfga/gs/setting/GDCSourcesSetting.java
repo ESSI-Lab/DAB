@@ -31,8 +31,8 @@ import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.GSSource;
 
@@ -120,12 +120,12 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 
 	    setComponentName(GDCSettingComponentInfo.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.GDC_SOURCES.getIndex()).//
 		    withShowDirective("GDC sources").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 
@@ -141,13 +141,9 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 		filter(s -> s.isSelected() && s.getIdentifier().equals(sourceIdentifier)).//
 		findFirst();
 
-	if (optSetting.isPresent()) {
+	return optSetting.filter(setting -> getSetting(SOURCES_SETTING_IDENTIFIER).//
+		get().removeSetting(setting)).isPresent();
 
-	    return getSetting(SOURCES_SETTING_IDENTIFIER).//
-		    get().removeSetting(optSetting.get());
-	}
-
-	return false;
     }
 
     /**
@@ -178,8 +174,8 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 		get().//
 		getSettings().//
 		stream().//
-		filter(s -> s.isSelected()).//
-		map(s -> s.getIdentifier()).//
+		filter(Setting::isSelected).//
+		map(Setting::getIdentifier).//
 		collect(Collectors.toList());
     }
 }

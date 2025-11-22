@@ -22,8 +22,8 @@ package eu.essi_lab.cfga.gs.demo;
  */
 
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -50,15 +50,15 @@ public class DemoSetting8 extends Setting {
 	    Option<String> option = StringOptionBuilder.//
 		    get().//
 		    withKey("opt" + i).//
-		    withDescription("Description of option " + String.valueOf(i)).//
-		    withLabel("Option " + String.valueOf(i)).//
+		    withDescription("Description of option " + i).//
+		    withLabel("Option " + i).//
 		    build();
 
 	    option.setEnabled(i % 2 == 0);
 
 	    if (i > 4) {
 		option.setAdvanced(true);
-		option.setDescription("Advanced option " + String.valueOf(i));
+		option.setDescription("Advanced option " + i);
 	    }
 
 	    addOption(option);
@@ -84,12 +84,12 @@ public class DemoSetting8 extends Setting {
 
 	    setForceReadOnly(true);
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(7).//
 		    withShowDirective("Demo setting 8").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 }

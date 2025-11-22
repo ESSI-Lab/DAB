@@ -24,8 +24,8 @@ package eu.essi_lab.cfga.gs.setting;
 import eu.essi_lab.cfga.Configurable;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 
@@ -60,12 +60,12 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 
 	    setComponentName(SchedulerSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.SCHEDULER.getIndex()).//
 		    withShowDirective("Scheduler").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

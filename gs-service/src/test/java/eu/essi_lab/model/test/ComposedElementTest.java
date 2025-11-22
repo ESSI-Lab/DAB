@@ -164,13 +164,13 @@ public class ComposedElementTest {
 
 	List<ComposedElementItem> properties = fromJSON.getProperties();
 
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("integer")).findFirst().isPresent());
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("double")).findFirst().isPresent());
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("long")).findFirst().isPresent());
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("boolean")).findFirst().isPresent());
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("text")).findFirst().isPresent());
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("date")).findFirst().isPresent());
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("dateTime")).findFirst().isPresent());
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("integer")));
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("double")));
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("long")));
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("boolean")));
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("text")));
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("date")));
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("dateTime")));
 
 	Assert.assertEquals(10, properties.stream().filter(p -> p.getName().equals("integer")).findFirst().get().getValue());
 	Assert.assertEquals(10.5, properties.stream().filter(p -> p.getName().equals("double")).findFirst().get().getValue());
@@ -225,9 +225,9 @@ public class ComposedElementTest {
 
 	List<ComposedElementItem> properties = fromJSON.getProperties();
 
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("integer")).findFirst().isPresent());
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("double")).findFirst().isPresent());
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("long")).findFirst().isPresent());
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("integer")));
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("double")));
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("long")));
 
 	Assert.assertEquals(10, fromJSON.getProperty("integer").get().getValue());
 	Assert.assertEquals(10.0, fromJSON.getProperty("double").get().getValue());
@@ -269,9 +269,9 @@ public class ComposedElementTest {
 
 	List<ComposedElementItem> properties = fromJSON.getProperties();
 
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("integer")).findFirst().isPresent());
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("double")).findFirst().isPresent());
-	Assert.assertTrue(properties.stream().filter(p -> p.getName().equals("long")).findFirst().isPresent());
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("integer")));
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("double")));
+	Assert.assertTrue(properties.stream().anyMatch(p -> p.getName().equals("long")));
 
 	Assert.assertEquals(0, fromJSON.getProperty("integer").get().getValue());
 	Assert.assertEquals(0.0, fromJSON.getProperty("double").get().getValue());

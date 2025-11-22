@@ -33,8 +33,8 @@ import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -72,9 +72,10 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     public SourceStorageSetting() {
 
 	setName("Source storage settings");
-	setDescription("Set of options for the final phases of the harvesting process.\n"
-		+ "To enable/disable a feature for a specific source, enable the related option and add its identifier.\n"
-		+ "To enable/disable a feature for all the sources, enable/disable the related option");
+	setDescription("""
+		Set of options for the final phases of the harvesting process.
+		To enable/disable a feature for a specific source, enable the related option and add its identifier.
+		To enable/disable a feature for all the sources, enable/disable the related option""");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
 
@@ -157,28 +158,28 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	    ValidationResponse validationResponse = new ValidationResponse();
 
 	    Option<String> markOption = srcStrSetting.getOption(MARK_DELETED_RECORDS_KEY, String.class).get();
-	    if (markOption.isEnabled() && (!markOption.getOptionalValue().isPresent() || markOption.getValue().isEmpty())) {
+	    if (markOption.isEnabled() && (markOption.getOptionalValue().isEmpty() || markOption.getValue().isEmpty())) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("One or more source identifier must be set for the 'Mark deleted records' feature");
 	    }
 
 	    Option<String> isoOption = srcStrSetting.getOption(TEST_ISO_COMPLIANCE_KEY, String.class).get();
-	    if (isoOption.isEnabled() && (!isoOption.getOptionalValue().isPresent() || isoOption.getValue().isEmpty())) {
+	    if (isoOption.isEnabled() && (isoOption.getOptionalValue().isEmpty() || isoOption.getValue().isEmpty())) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("One or more source identifier must be set for the 'Test ISO compliance' feature");
 	    }
 
 	    Option<String> tagsOption = srcStrSetting.getOption(RECOVER_TAGS_KEY, String.class).get();
-	    if (tagsOption.isEnabled() && (!tagsOption.getOptionalValue().isPresent() || tagsOption.getValue().isEmpty())) {
+	    if (tagsOption.isEnabled() && (tagsOption.getOptionalValue().isEmpty() || tagsOption.getValue().isEmpty())) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("One or more source identifier must be set for the 'Recover resource tags' feature");
 	    }
 
 	    Option<String> smartOption = srcStrSetting.getOption(SMART_STORAGE_KEY, String.class).get();
-	    if (smartOption.isEnabled() && (!smartOption.getOptionalValue().isPresent() || smartOption.getValue().isEmpty())) {
+	    if (smartOption.isEnabled() && (smartOption.getOptionalValue().isEmpty() || smartOption.getValue().isEmpty())) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
 		validationResponse.getErrors().add("One or more source identifier must be set for the 'Disable smart storage' feature");
@@ -200,12 +201,12 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 
 	    setComponentName(SystemSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.SOURCE_STORAGE.getIndex()).//
 		    withShowDirective("Source storage").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 
@@ -332,7 +333,7 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 
 	option.setEnabled(true);
 
-	option.setValue(option.getOptionalValue().orElse("") + Arrays.asList(sourceIdentifiers).stream().collect(Collectors.joining("\n")));
+	option.setValue(option.getOptionalValue().orElse("") + String.join("\n", Arrays.asList(sourceIdentifiers)));
     }
 
     /**
@@ -351,8 +352,8 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 
 	if (optionalValue.isPresent()) {
 
-	    String newValue = Arrays.asList(optionalValue.get().split("\n")).//
-		    stream().//
+	    //
+	    String newValue = Arrays.stream(optionalValue.get().split("\n")).//
 		    filter(id -> !targetList.contains(id)).//
 		    collect(Collectors.joining("\n"));
 

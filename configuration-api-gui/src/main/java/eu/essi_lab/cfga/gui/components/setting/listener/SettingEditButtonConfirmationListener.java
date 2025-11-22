@@ -40,12 +40,12 @@ import eu.essi_lab.cfga.setting.Setting;
 @SuppressWarnings("serial")
 public class SettingEditButtonConfirmationListener implements ButtonChangeListener {
 
-    private Configuration configuration;
-    private Setting settingToEdit;
-    private boolean foldedModeEnabled;
-    private SettingComponent currentSettingComponent;
-    private TabContainer tabContainer;
-    private SettingEditDialog dialog;
+    private final Configuration configuration;
+    private final Setting settingToEdit;
+    private final boolean foldedModeEnabled;
+    private final SettingComponent currentSettingComponent;
+    private final TabContainer tabContainer;
+    private final SettingEditDialog dialog;
 
     /**
      * @param dialog

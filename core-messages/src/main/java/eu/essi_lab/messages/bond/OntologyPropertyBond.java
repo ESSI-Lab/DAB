@@ -59,8 +59,7 @@ public class OntologyPropertyBond extends QueryableBond<String> {
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof OntologyPropertyBond) {
-	    OntologyPropertyBond bond = (OntologyPropertyBond) obj;
+	if (obj instanceof OntologyPropertyBond bond) {
 	    return bond.getOperator().equals(getOperator()) && //
 		    ((bond.getProperty() == null && getProperty() == null) || //
 			    bond.getProperty().equals(getProperty()))

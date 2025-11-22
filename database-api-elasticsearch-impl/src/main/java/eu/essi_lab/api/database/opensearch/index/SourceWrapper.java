@@ -3,9 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch.index;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /*-
  * #%L
@@ -28,7 +26,6 @@ import java.util.List;
  * #L%
  */
 
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -55,7 +52,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
  */
 public class SourceWrapper {
 
-    private JSONObject source;
+    private final JSONObject source;
 
     /**
      * @param source
@@ -352,13 +349,13 @@ public class SourceWrapper {
 
 	    if (object instanceof JSONArray) {
 
-		return ((JSONArray) object).toList().stream().map(v -> v.toString()).collect(Collectors.toList());
+		return ((JSONArray) object).toList().stream().map(Object::toString).collect(Collectors.toList());
 	    }
 
-	    return Arrays.asList(object.toString());
+	    return Collections.singletonList(object.toString());
 	}
 
-	return new ArrayList<String>();
+	return new ArrayList<>();
     }
 
     /**

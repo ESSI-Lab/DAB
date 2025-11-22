@@ -29,8 +29,8 @@ import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.IntegerOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
@@ -93,12 +93,12 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 	 */
 	DISTRIBUTED("Distributed");
 
-	private String name;
+	private final String name;
 
 	/**
 	 * @param name
 	 */
-	private ComputationType(String name) {
+	ComputationType(String name) {
 
 	    this.name = name;
 	}
@@ -134,7 +134,7 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 		withLabel("Computation type").//
 		withSingleSelection().//
 		withValues(LabeledEnum.values(ComputationType.class)).//
-		withSelectedValue(LabeledEnum.values(ComputationType.class).get(0)).//
+		withSelectedValue(LabeledEnum.values(ComputationType.class).getFirst()).//
 		cannotBeDisabled().//
 		required().//
 		build();
@@ -247,12 +247,12 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 
 	    setComponentName(SystemSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.RATE_LIMITER.getIndex()).//
 		    withShowDirective("Rate limiter").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 

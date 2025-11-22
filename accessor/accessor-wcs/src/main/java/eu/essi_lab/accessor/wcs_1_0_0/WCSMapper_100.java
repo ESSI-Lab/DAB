@@ -40,7 +40,7 @@ import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLNodeReader;
@@ -452,7 +452,7 @@ public class WCSMapper_100 extends WCSMapper {
     @Override
     protected String getWCSProtocol() {
 
-	return NetProtocols.WCS_1_0_0.getCommonURN();
+	return NetProtocolWrapper.WCS_1_0_0.getCommonURN();
     }
 
     @Override

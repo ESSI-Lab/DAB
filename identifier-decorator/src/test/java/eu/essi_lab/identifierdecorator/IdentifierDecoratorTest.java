@@ -1,5 +1,6 @@
 package eu.essi_lab.identifierdecorator;
 
+import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -699,11 +700,14 @@ public class IdentifierDecoratorTest {
 	@Test
 	public void test13() throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
-		expectedException.expect(DuplicatedResourceException.class);
+//		expectedException.expect(DuplicatedResourceException.class);
 
 		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
 
 		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+	    	ListRecordsRequest listRecordsRequest = Mockito.mock(ListRecordsRequest.class);
+		decorator.setListRecordsRequest(listRecordsRequest);
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -763,7 +767,7 @@ public class IdentifierDecoratorTest {
 
 		Assert.assertNotEquals(existingDABId, resource.getPublicId());
 		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, false, false, true);
-
+		Mockito.verify(listRecordsRequest,Mockito.times(1)).addIncrementalModifiedResource(Mockito.any());
 	}
 
 	@Test

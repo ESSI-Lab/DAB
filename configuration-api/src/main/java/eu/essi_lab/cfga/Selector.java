@@ -24,6 +24,7 @@ package eu.essi_lab.cfga;
  * #L%
  */
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,12 +47,14 @@ public abstract class Selector<S extends Setting> extends Setting {
 
 	setSelectionMode(SelectionMode.SINGLE);
 
-	initSettings().forEach(s -> addSetting(s));
+	initSettings().forEach(this::addSetting);
 
+	//
+	//
+	//
 	getSettings().//
 		stream().//
-		sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).//
-		findFirst().//
+		min(Comparator.comparing(Setting::getName)).//
 		get().//
 		setSelected(true);
     }
@@ -70,7 +73,7 @@ public abstract class Selector<S extends Setting> extends Setting {
     public List<S> getSelectedSettings() {
 
 	return (List<S>) getSettings().//
-		stream().filter(s -> s.isSelected()).//
+		stream().filter(Setting::isSelected).//
 		map(s -> SettingUtils.downCast(s, s.getSettingClass())).//
 		collect(Collectors.toList());
     }

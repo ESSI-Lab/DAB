@@ -3,6 +3,7 @@ eu.essi_lab.authorization.pps.GWPPermissionPolicySet
 eu.essi_lab.authorization.pps.AdminPermissionPolicySet
 eu.essi_lab.authorization.pps.AnonymousPermissionPolicySet
 eu.essi_lab.authorization.pps.WHOSPermissionPolicySet
+eu.essi_lab.authorization.pps.WHOSTestPermissionPolicySet
 eu.essi_lab.authorization.pps.BlueCloudTermsPermissionPolicySet
 eu.essi_lab.authorization.pps.CSW_RIPermissionPolicySet
 eu.essi_lab.authorization.pps.SeadatanetPermissionPolicySet

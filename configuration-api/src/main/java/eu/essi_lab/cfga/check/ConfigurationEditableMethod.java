@@ -57,7 +57,7 @@ public class ConfigurationEditableMethod implements CheckMethod {
 
 		checkResponse.setCheckResult(CheckResult.CHECK_FAILED);
 		checkResponse.getMessages()
-			.add("Editable setting isAssignableFrom check of configuration failed: " + ((Setting) s).getName());
+			.add("Editable setting isAssignableFrom check of configuration failed: " + s.getName());
 	    }
 
 	    return false;
@@ -66,12 +66,12 @@ public class ConfigurationEditableMethod implements CheckMethod {
 
 	matches.forEach(setting -> {
 
-	    boolean test = EditableSetting.test((Setting) setting);
+	    boolean test = EditableSetting.test(setting);
 
 	    if (!test) {
 
 		checkResponse.setCheckResult(CheckResult.CHECK_FAILED);
-		checkResponse.getMessages().add("Editable setting check from configuration failed: " + ((Setting) setting).getName());
+		checkResponse.getMessages().add("Editable setting check from configuration failed: " + setting.getName());
 	    }
 	});
 

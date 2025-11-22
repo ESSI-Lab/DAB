@@ -96,7 +96,6 @@ public class SpatialBond extends MetadataElementBond<SpatialEntity> {
     @Override
     protected SpatialBond createClone(BondOperator type, MetadataElement element, SpatialEntity value) {
 	SpatialEntity spatialEntityClone = getPropertyValue().clone();
-	SpatialBond clone = new SpatialBond(getOperator(), spatialEntityClone);
-	return clone;
+	return new SpatialBond(getOperator(), spatialEntityClone);
     }
 }

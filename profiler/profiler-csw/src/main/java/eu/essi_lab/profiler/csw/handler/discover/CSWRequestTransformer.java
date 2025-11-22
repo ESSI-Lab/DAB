@@ -71,22 +71,17 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
     private static final String CSW_GET_PAGE_ERROR = "CSW_GET_PAGE_ERROR";
 
     /**
-     * The max size of a page (CSW max records) supported for a single iteration workflow.<br>
-     * If more than 10 records are requested, then the workflow is iterated in partial mode
+     * The max size of a page (CSW max records) supported for a single iteration workflow.<br> If more than 10 records are requested, then
+     * the workflow is iterated in partial mode
      */
     private static final int MAX_SUPPORTED_PAGE_SIZE = 10;
-
-    /**
-     * 
-     */
-    private CSWProfilerSetting setting;
 
     /**
      * For test purpose
      */
     public CSWRequestTransformer() {
 
-	this(new CSWProfilerSetting());
+	super(new CSWProfilerSetting());
     }
 
     /**
@@ -94,7 +89,7 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
      */
     public CSWRequestTransformer(CSWProfilerSetting setting) {
 
-	this.setting = setting;
+	super(setting);
     }
 
     @Override
@@ -106,17 +101,18 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 	return validate;
     }
 
+    @Override
     protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
 
 	DiscoveryMessage refinedMessage = super.refineMessage(message);
 
 	Page page = refinedMessage.getPage();
 
-	if (CSWSearchAfterManager.isEnabled(setting, message.getWebRequest())) {
+	if (CSWSearchAfterManager.isEnabled(getSetting().get(), message.getWebRequest())) {
 
 	    refinedMessage.setSortedFields(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING));
 
-	    Optional<SearchAfter> searchAfter = CSWSearchAfterManager.get(message.getView().map(v -> v.getId()), page, setting);
+	    Optional<SearchAfter> searchAfter = CSWSearchAfterManager.get(message.getView().map(v -> v.getId()), page, getSetting().get());
 
 	    if (searchAfter.isPresent()) {
 

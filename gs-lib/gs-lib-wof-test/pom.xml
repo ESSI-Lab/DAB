@@ -6,7 +6,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<name>ESSI-Lab GI-suite WOF Utilities- Test</name>
+	<name>ESSI-Lab DAB WOF Utilities- Test</name>
 	<artifactId>gs-lib-wof-test</artifactId>
 
 	<dependencies>

@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.openrdf.model.IRI;
-import org.openrdf.model.Statement;
-import org.openrdf.model.impl.SimpleValueFactory;
-import org.openrdf.rio.helpers.ContextStatementCollector;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.rio.helpers.ContextStatementCollector;
 
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.ontology.d2k.GSKnowledgeResourceLoader;

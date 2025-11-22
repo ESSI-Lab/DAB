@@ -25,22 +25,22 @@ package eu.essi_lab.authorization.pps;
  */
 
 /**
- * Users having the "whos" role, are allowed to discovery if and only if:<br>
+ * Users having the "blue-cloud-terms" role, are allowed to discovery if and only if:<br>
  * <br>
- * 1) the view creator is "whos"<br>
+ * 1) the view creator is "blue-cloud-terms"<br>
  *
  * 2) the discovery path is supported<br>
  * <br>
  * Users having this policy role, are allowed to access if and only if:<br>
  * <br>
- * 1) the view creator is "whos"<br>
+ * 1) the view creator is "blue-cloud-terms"<br>
  * 
  * 2) the access path is is supported<br>
  * <br>
  * Users having this policy role are also allowed to perform other actions if
  * and only if:<br>
  * <br>
- * 1) the view creator is "whos"<br>
+ * 1) the view creator is "blue-cloud-terms"<br>
  *
  * 2) the discovery path is supported OR the access path is is supported<br>
  * 

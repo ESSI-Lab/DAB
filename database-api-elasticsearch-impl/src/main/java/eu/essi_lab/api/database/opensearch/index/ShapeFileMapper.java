@@ -65,9 +65,9 @@ class ShapeFileMapper {
 	FileDataStore store = FileDataStoreFinder.getDataStore(shapeFile);
 	SimpleFeatureSource featureSource = store.getFeatureSource();
 
-	SimpleFeatureCollection featureCollection = (SimpleFeatureCollection) featureSource.getFeatures();
+	SimpleFeatureCollection featureCollection = featureSource.getFeatures();
 
-	List<JSONObject> out = new ArrayList<JSONObject>();
+	List<JSONObject> out = new ArrayList<>();
 
 	try (SimpleFeatureIterator iterator = featureCollection.features()) {
 
@@ -79,9 +79,7 @@ class ShapeFileMapper {
 
 		ObjectMapper mapper = new ObjectMapper();
 
-		if (geometry instanceof Polygon) {
-
-		    Polygon polygon = (Polygon) geometry;
+		if (geometry instanceof Polygon polygon) {
 
 		    ObjectNode geoJson = mapper.createObjectNode();
 		    geoJson.put("type", "polygon");
@@ -103,9 +101,7 @@ class ShapeFileMapper {
 
 		    out.add(object);
 
-		} else if (geometry instanceof MultiPolygon) {
-
-		    MultiPolygon multiPolygon = (MultiPolygon) geometry;
+		} else if (geometry instanceof MultiPolygon multiPolygon) {
 
 		    ObjectNode geoJson = mapper.createObjectNode();
 		    geoJson.put("type", "multipolygon");
@@ -168,7 +164,7 @@ class ShapeFileMapper {
 	FileDataStore store = FileDataStoreFinder.getDataStore(shapeFile);
 	SimpleFeatureSource featureSource = store.getFeatureSource();
 
-	SimpleFeatureCollection featureCollection = (SimpleFeatureCollection) featureSource.getFeatures();
+	SimpleFeatureCollection featureCollection = featureSource.getFeatures();
 
 	// JSONObject object = new JSONObject();
 	//
@@ -196,9 +192,7 @@ class ShapeFileMapper {
 
 		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 
-		if (geometry instanceof MultiPolygon) {
-
-		    MultiPolygon multiPolygon = (MultiPolygon) geometry;
+		if (geometry instanceof MultiPolygon multiPolygon) {
 
 		    ObjectNode geoJson = mapper.createObjectNode();
 		    geoJson.put("type", "multipolygon");
@@ -224,7 +218,7 @@ class ShapeFileMapper {
 
 		    String prettyString = geoJson.toPrettyString();
 		    System.out.println(prettyString);
-		    System.out.println("");
+		    System.out.println();
 
 		    // System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(geoJson));
 		}

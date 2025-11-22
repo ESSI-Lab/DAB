@@ -66,9 +66,9 @@ public class OpenSearchFolder implements DatabaseFolder {
 
     private static final int MAX_PAGE_SIZE = 1000;
 
-    private String name;
-    private OpenSearchDatabase database;
-    private OpenSearchWrapper wrapper;
+    private final String name;
+    private final OpenSearchDatabase database;
+    private final OpenSearchWrapper wrapper;
 
     /**
      * @param database
@@ -183,7 +183,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	OpenSearchQueryBuilder builder = new OpenSearchQueryBuilder(//
 		wrapper, //
 		new RankingStrategy(), //
-		new HashMap<String, String>(), //
+		new HashMap<>(), //
 		false, //
 		false);
 
@@ -213,14 +213,14 @@ public class OpenSearchFolder implements DatabaseFolder {
 	Query folderEntriesQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
 	Query boolQuery = OpenSearchQueryBuilder.buildBoolQuery(//
 		Arrays.asList(query, folderEntriesQuery), //
-		Arrays.asList(), //
-		Arrays.asList());
+		List.of(), //
+		List.of());
 
 	List<JSONObject> sources = wrapper.searchSources(DataFolderMapping.get().getIndex(), boolQuery, 0, 1);
 
 	if (!sources.isEmpty()) {
 
-	    return OpenSearchUtils.toGSResource(sources.get(0));
+	    return OpenSearchUtils.toGSResource(sources.getFirst());
 	}
 
 	return Optional.empty();
@@ -266,7 +266,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	String folderId = getFolderId(this);
 
-	List<String> entries = new ArrayList<String>();
+	List<String> entries = new ArrayList<>();
 
 	for (String r : toRemove) {
 	    String entryId = folderId + "_" + r;
@@ -338,7 +338,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    SearchResponse<Object> response = wrapper.search(//
 		    index, // index
 		    searchQuery, // search query
-		    Arrays.asList(field), // fields
+		    List.of(field), // fields
 		    0, //
 		    MAX_PAGE_SIZE, //
 		    Optional.of(SortedFields.of(ResourceProperty.RESOURCE_TIME_STAMP, SortOrder.ASCENDING)), //
@@ -364,7 +364,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	Query query = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
 
-	return (int) wrapper.count(index, query);
+	return wrapper.count(index, query);
     }
 
     @Override

@@ -4,6 +4,7 @@ eu.essi_lab.authorization.rps.AdminRolePolicySet
 eu.essi_lab.authorization.rps.AnonymousRolePolicySet
 eu.essi_lab.authorization.rps.BlueCloudTermsRolePolicySet
 eu.essi_lab.authorization.rps.WHOSRolePolicySet
+eu.essi_lab.authorization.rps.WHOSTestRolePolicySet
 eu.essi_lab.authorization.rps.CSW_RIRolePolicySet
 eu.essi_lab.authorization.rps.SeadatanetRolePolicySet
 eu.essi_lab.authorization.rps.EIFFELRolePolicySet

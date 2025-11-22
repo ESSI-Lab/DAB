@@ -1,374 +1,1346 @@
-<%@page import="eu.essi_lab.gssrv.portal.PortalTranslator"%>
-<%@page
-	import="ucar.nc2.ft2.coverage.remote.CdmrFeatureProto.CoordSysOrBuilder"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer"%>
-<%@page import="eu.essi_lab.views.DefaultViewManager"%>
-<%@page import="eu.essi_lab.model.index.jaxb.CardinalValues"%>
-<%@page import="eu.essi_lab.profiler.semantic.Stats"%>
-<%@page import="eu.essi_lab.model.SortOrder"%>
-<%@page import="java.util.AbstractMap.SimpleEntry"%>
-<%@page import="eu.essi_lab.messages.SortedFields"%>
-<%@ page language="java" contentType="text/csv; charset=UTF-8"
-	pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
-<%@page import="eu.essi_lab.iso.datamodel.classes.VerticalExtent"%>
-<%@page import="eu.essi_lab.iso.datamodel.classes.MIMetadata"%>
-<%@page import="java.math.BigDecimal"%>
-<%@page import="eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox"%>
-<%@page import="eu.essi_lab.model.resource.GSResource"%>
-<%@page import="eu.essi_lab.messages.ResultSet"%>
-<%@page import="eu.essi_lab.messages.RequestMessage.IterationMode"%>
-<%@page import="java.util.UUID"%>
-<%@page import="java.util.Comparator"%>
-<%@page import="java.util.Arrays"%>
-<%@page import="eu.essi_lab.model.StorageInfo"%>
-<%@page import="net.sf.saxon.expr.instruct.ForEach"%>
-<%@page import="java.util.HashSet"%>
-<%@page import="eu.essi_lab.model.resource.ResourceProperty"%>
-<%@page import="eu.essi_lab.messages.bond.View"%>
-<%@page import="eu.essi_lab.model.Queryable"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="eu.essi_lab.messages.termfrequency.TermFrequencyItem"%>
-<%@page import="eu.essi_lab.messages.stats.ComputationResult"%>
-<%@page import="java.util.Optional"%>
-<%@page import="eu.essi_lab.messages.stats.ResponseItem"%>
-<%@page import="eu.essi_lab.messages.stats.StatisticsResponse"%>
-<%@page import="eu.essi_lab.messages.Page"%>
-<%@page import="eu.essi_lab.request.executor.IStatisticsExecutor"%>
-<%@page import="eu.essi_lab.messages.stats.StatisticsMessage"%>
-<%@page import="eu.essi_lab.model.GSSource"%>
-<%@page import="java.util.List"%>
-<%@page import="eu.essi_lab.messages.bond.ResourcePropertyBond"%>
-<%@page import="eu.essi_lab.messages.DiscoveryMessage"%>
-<%@page import="java.util.ServiceLoader"%>
-<%@page import="eu.essi_lab.request.executor.IDiscoveryExecutor"%>
-<%@page import="eu.essi_lab.messages.ResourceSelector.IndexesPolicy"%>
-<%@page import="eu.essi_lab.messages.ResourceSelector.ResourceSubset"%>
-<%@page import="eu.essi_lab.cfga.gs.ConfigurationWrapper"%>
-<%@page import="eu.essi_lab.messages.bond.BondFactory"%>
-<%@page import="eu.essi_lab.model.resource.MetadataElement"%>
-<%@page import="eu.essi_lab.pdk.wrt.WebRequestTransformer"%>
-<%
-String token = request.getParameter("token");
-String viewId = request.getParameter("view");
-String sourceId = request.getParameter("source");
-if (viewId == null || viewId.isEmpty()) {
-    out.println("Unexpected: view parameter missing");
-    return;
-}
-String format = request.getParameter("format");
-boolean csv = false;
-String language = request.getParameter("language");
-
-if (language==null||language.isEmpty()){
-    language="en";
-}
-PortalTranslator translator = new PortalTranslator(language);
-StatisticsMessage statisticsMessage = new StatisticsMessage();
-View view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId).get();
-
-List<GSSource> sources = ConfigurationWrapper.getViewSources(view);
-
-// set the required properties
-statisticsMessage.setSources(sources);
-statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-
-// set the view
-
-WebRequestTransformer.setView(//
-	viewId, //
-	statisticsMessage.getDataBaseURI(), //
-	statisticsMessage);
-
-// set the user bond
-if (sourceId != null && !sourceId.isEmpty()) {
-    statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(sourceId));
-}
-
-// groups by source id
-statisticsMessage.groupBy(ResourceProperty.SOURCE_ID);
-
-// pagination works with grouped results. in this case there is one result item for each source.
-// in order to be sure to get all the items in the same statistics response,
-// we set the count equals to number of sources
-
-statisticsMessage.setPage(new Page(1, 100));
-
-// computes union of bboxes
-statisticsMessage.computeBboxUnion();
-List<Queryable> minArray = new ArrayList<>();
-minArray.add(MetadataElement.ELEVATION_MIN);
-statisticsMessage.computeMin(minArray);
-List<Queryable> maxArray = new ArrayList<>();
-maxArray.add(MetadataElement.ELEVATION_MAX);
-statisticsMessage.computeMax(maxArray);
-statisticsMessage.computeTempExtentUnion();
-List<Queryable> freqs = new ArrayList<>();
-freqs.add(MetadataElement.ORGANISATION_NAME);
-freqs.add(MetadataElement.ATTRIBUTE_TITLE);
-statisticsMessage.computeFrequency(freqs,1000);
-List<Queryable> distArray = new ArrayList<>();
-distArray.add(MetadataElement.ATTRIBUTE_TITLE);
-distArray.add(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
-distArray.add(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
-distArray.add(MetadataElement.ONLINE_ID);
-// computes count distinct of 2 queryables
-statisticsMessage.countDistinct(distArray);
-
-// statisticsMessage.computeSum(Arrays.asList(MetadataElement.DATA_SIZE));
-
-ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-IStatisticsExecutor executor = loader.iterator().next();
-
-StatisticsResponse statResponse = executor.compute(statisticsMessage);
-List<ResponseItem> items = statResponse.getItems();
-HashMap<String, Stats> smap = new HashMap<>();
-for (ResponseItem responseItem : items) {
-    Stats stats = new Stats();
-    Optional<ComputationResult> orgFreq = responseItem.getFrequency(MetadataElement.ORGANISATION_NAME);
-    if (orgFreq.isPresent()) {
-	ComputationResult of = orgFreq.get();
-	List<TermFrequencyItem> fitems = of.getFrequencyItems();
-	stats.addFrequencyResult(MetadataElement.ORGANISATION_NAME, fitems);
-    }
-    Optional<ComputationResult> propFreq = responseItem.getFrequency(MetadataElement.ATTRIBUTE_TITLE);
-    if (propFreq.isPresent()) {
-	ComputationResult of = propFreq.get();
-	List<TermFrequencyItem> fitems = of.getFrequencyItems();
-	stats.addFrequencyResult(MetadataElement.ATTRIBUTE_TITLE, fitems);
-    }
-    stats.setSiteCount(responseItem.getCountDistinct(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER).get().getValue());
-    stats.setUniqueAttributeCount(responseItem.getCountDistinct(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER).get().getValue());
-    stats.setAttributeCount(responseItem.getCountDistinct(MetadataElement.ATTRIBUTE_TITLE).get().getValue());
-    stats.setTimeSeriesCount(responseItem.getCountDistinct(MetadataElement.ONLINE_ID).get().getValue());
-    Optional<CardinalValues> cardinalValues = responseItem.getBBoxUnion().getCardinalValues();
-    String union = responseItem.getTempExtentUnion().getValue();
-    String begin = union.split(" ")[0];
-    String end = union.split(" ")[1];
-    if (cardinalValues.isPresent()) {
-	stats.setEast(Double.parseDouble(cardinalValues.get().getEast()));
-	stats.setNorth(Double.parseDouble(cardinalValues.get().getNorth()));
-	stats.setWest(Double.parseDouble(cardinalValues.get().getWest()));
-	stats.setSouth(Double.parseDouble(cardinalValues.get().getSouth()));
-    }
-    stats.setBegin(begin);
-    stats.setEnd(end);
-    stats.setMinimumAltitude(responseItem.getMin(MetadataElement.ELEVATION_MIN).get().getValue());
-    stats.setMaximumAltitude(responseItem.getMax(MetadataElement.ELEVATION_MAX).get().getValue());
-    String id = responseItem.getGroupedBy().isPresent() ? responseItem.getGroupedBy().get() : null;
-    smap.put(id, stats);
-
-}
-
-if (format != null && format.equals("CSV")) {
-    csv = true;
-    response.setContentType("text/csv");
-    response.setHeader("Content-Disposition", "attachment; filename=\"data.csv\"");
-
-}
-if (!csv) {
-    response.setContentType("text/html");
-    out.println("<html><head><title>"+translator.getTranslation("data_provider_information")+"</title>");
-    out.println("<style>\n" + "body {\n" + "    font-family: 'Segoe UI', Arial, sans-serif;\n" + "    background: #f8f9fa;\n"
-    + "    color: #222;\n" + "    margin: 0;\n" + "    padding: 0 0 40px 0;\n" + "}\n" + "h1, h2 {\n" + "    color: #005aef;\n"
-    + "    margin-top: 30px;\n" + "}\n" + "ul {\n" + "    background: #fff;\n" + "    border-radius: 6px;\n"
-    + "    box-shadow: 0 2px 8px rgba(0,0,0,0.04);\n" + "    padding: 18px 28px 18px 28px;\n" + "    margin-bottom: 30px;\n"
-
-    + "}\n" + "ul li {\n" + "    margin-bottom: 8px;\n" + "    font-size: 1.08em;\n" + "}\n" + "table {\n"
-    + "    border-collapse: collapse;\n" + "    background: #fff;\n" + "    margin-top: 18px;\n" + "    margin-bottom: 30px;\n"
-    + "    box-shadow: 0 2px 8px rgba(0,0,0,0.04);\n" + "    border-radius: 6px;\n" + "    overflow: hidden;\n"
-    + "    min-width: 400px;\n" + "}\n" + "th, td {\n" + "    border: 1px solid #e0e0e0;\n" + "    padding: 10px 16px;\n"
-    + "    text-align: left;\n" + "}\n" + "th {\n" + "    background: #005aef;\n" + "    color: #fff;\n" + "    font-weight: 600;\n"
-    + "}\n" + "tr:nth-child(even) td {\n" + "    background: #f3f6fa;\n" + "}\n" + "a {\n" + "    color: #005aef;\n"
-    + "    text-decoration: none;\n" + "}\n" + "a:hover {\n" + "    text-decoration: underline;\n" + "}\n" + "</style>");
-    out.println("</head><body>");
-    out.println("<div style='max-width: 60%; margin: 0 auto;'>");
-    out.println("<h1>"+translator.getTranslation("data_provider_information")+"</h1>");
-}
-
-if (sourceId == null || sourceId.isEmpty()) {
-
-    sources.sort(new Comparator<GSSource>() {
-	public int compare(GSSource o1, GSSource o2) {
-    return o1.getLabel().compareTo(o2.getLabel());
-	}
-    });
-
-    for (GSSource source : sources) {
-
-	out.println("<h2>" + source.getLabel() + "</h2>");
-
-	out.println("<a href=\"stats.jsp?view=" + viewId + "&source=" + source.getUniqueIdentifier() + "\">Station list</a>");
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Provider Information</title>
+  <link rel="stylesheet" href="../giapi/ol/ol.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f8f9fa;
+      color: #222;
+      margin: 0;
+      padding: 0 0 40px 0;
     }
 
-} else {
+    h1, h2, h3 {
+      color: #005aef;
+      margin-top: 30px;
+    }
 
-    ServiceLoader<IDiscoveryExecutor> discLoader = ServiceLoader.load(IDiscoveryExecutor.class);
-    IDiscoveryExecutor discExecutor = discLoader.iterator().next();
+    .page-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 16px 32px;
+    }
 
-    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-    List<SimpleEntry<Queryable, SortOrder>> array = new ArrayList<>();
-    // 	    array.add(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING));
-    array.add(new SimpleEntry(MetadataElement.PLATFORM_TITLE, SortOrder.ASCENDING));
+    .loading,
+    .error {
+      font-size: 1.1em;
+      margin-top: 40px;
+    }
 
-    discoveryMessage.setSortedFields(new SortedFields(array));
+    .error {
+      color: #b22222;
+    }
 
-    discoveryMessage.setPage(new Page(1, 10));
-    discoveryMessage.setRequestId(UUID.randomUUID().toString());
-    GSSource source = ConfigurationWrapper.getSource(sourceId);
-    sources.add(source);
-    discoveryMessage.setSources(sources);
-    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
-    discoveryMessage.setDataBaseURI(uri);
-    WebRequestTransformer.setView(view.getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
-    discoveryMessage.setUserBond(BondFactory.createSourceIdentifierBond(sourceId));
-    discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
-    ResultSet<GSResource> resultSet = discExecutor.retrieve(discoveryMessage);
-    List<GSResource> resources = resultSet.getResultsList();
+    a {
+      color: #005aef;
+      text-decoration: none;
+    }
 
-    if (csv) {
-	out.println("Monitoring point\tLatitude\tLongitude\tElevation");
-    } else {
-	out.println("<h1>" + source.getLabel() + "</h1>");
-	Stats stats = smap.get(sourceId);
+    a:hover {
+      text-decoration: underline;
+    }
 
-	if (stats != null) {
-    // Start a container for stats and map
+    .source-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
 
-    out.println("<div >");
-    out.println("<h2>"+translator.getTranslation("provider_statistics")+"</h2>");
-    out.println(
-		    "<table style='width: 100%; max-width: 100%; margin-bottom: 30px; border-collapse: separate; border-spacing: 0; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-radius: 6px; overflow: hidden;'>");
-    out.println("<tr>");
-    out.println("<td style='vertical-align: top; padding: 18px 28px 18px 28px; width: 50%;'>");
-    out.println("<ul>");
-    out.println("<li><b># "+translator.getTranslation("platforms")+":</b> " + stats.getSiteCount() + "</li>");
-    out.println("<li><b># "+translator.getTranslation("observed_properties")+":</b> " + stats.getAttributeCount() + "</li>");
-    out.println("<li><b># "+translator.getTranslation("datasets")+":</b> " + stats.getTimeSeriesCount() + "</li>");
-    out.println("<li><b>"+translator.getTranslation("minimum_temporal_extent")+":</b> " + stats.getBegin() + "</li>");
-    out.println("<li><b>"+translator.getTranslation("maximum_temporal_extent")+":</b> " + stats.getEnd() + "</li>");
-    out.println("<li><b>"+translator.getTranslation("bbox")+":</b> " + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", "
-		    + stats.getNorth() + "</li>");
-    out.println("<li><b>"+translator.getTranslation("altitude")+":</b> " + stats.getMinimumAltitude() + " / " + stats.getMaximumAltitude() + "</li>");
-    
-    // Add organizations
-    List<TermFrequencyItem> orgs = stats.getFrequencyResult(MetadataElement.ORGANISATION_NAME);
-    if (orgs != null && !orgs.isEmpty()) {
-        StringBuilder orgList = new StringBuilder();
-        orgList.append("<ul>");
-        for (int i = 0; i < orgs.size(); i++) {
-            TermFrequencyItem item = orgs.get(i);
-            orgList.append("<li>"+item.getTerm() + " (" + item.getFreq() + ")</li>");
+    .source-list li {
+      margin-bottom: 8px;
+    }
+
+    .provider-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .provider-left {
+      flex: 1 1 360px;
+      min-width: 320px;
+    }
+
+    .provider-right {
+      flex: 1 1 360px;
+      min-width: 320px;
+    }
+
+    .provider-map {
+      width: 100%;
+      height: 320px;
+      background: #e5e5e5;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .map-credit {
+      font-size: 0.95em;
+      color: #666;
+      margin: 4px 0 16px 4px;
+    }
+
+    .stats-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 18px 0;
+    }
+
+    .stats-list li {
+      margin-bottom: 8px;
+      font-size: 1.05em;
+    }
+
+    .stats-subitem {
+      display: inline-block;
+      margin-right: 12px;
+      font-size: 0.95em;
+      color: #333;
+    }
+
+    .stats-subitem-label {
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    .data-table {
+      border-collapse: collapse;
+      background: #fff;
+      margin-top: 18px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border-radius: 6px;
+      overflow: hidden;
+      width: 100%;
+      min-width: 400px;
+    }
+
+    .data-table th,
+    .data-table td {
+      border: 1px solid #e0e0e0;
+      padding: 10px 16px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: #005aef;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .data-table tr:nth-child(even) td {
+      background: #f3f6fa;
+    }
+
+    .back-link {
+      margin: 12px 0 0 0;
+    }
+
+    .back-link a {
+      font-size: 0.95em;
+    }
+
+    .org-list {
+      margin: 18px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .org-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+      background: #fff;
+    }
+
+    .org-summary {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: space-between;
+      padding: 16px 20px;
+      font-size: 1em;
+      font-family: inherit;
+      text-align: left;
+      flex-wrap: wrap;
+    }
+
+    .org-summary-toggle {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .org-summary-toggle:hover {
+      background: #f3f6fa;
+    }
+
+    .org-summary-static {
+      border: none;
+      background: transparent;
+      cursor: default;
+    }
+
+    .org-summary .org-name {
+      font-weight: 600;
+      color: #1f2933;
+    }
+
+    .org-summary .org-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .org-summary .org-roles {
+      color: #4b5563;
+      font-size: 0.95em;
+    }
+
+    .org-summary .org-count {
+      background: #005aef;
+      color: #fff;
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 0.9em;
+    }
+
+    .org-toggle {
+      font-size: 0.9em;
+      color: #005aef;
+    }
+
+    .org-details,
+    .org-details-static {
+      border-top: 1px solid #e0e0e0;
+      padding: 16px 20px 18px 20px;
+    }
+
+    .org-details[hidden] {
+      display: none;
+    }
+
+    .org-contact {
+      margin-bottom: 12px;
+    }
+
+    .org-contact:last-child {
+      margin-bottom: 0;
+    }
+
+    .org-contact-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .org-contact-meta {
+      font-size: 0.92em;
+      color: #444;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .org-contact-meta a {
+      color: #005aef;
+      text-decoration: none;
+    }
+
+    .org-contact-meta a:hover {
+      text-decoration: underline;
+    }
+
+    .org-role-label {
+      font-weight: 500;
+    }
+
+    .org-meta-sep {
+      color: #9ca3af;
+      margin: 0 6px;
+    }
+
+    .map-placeholder {
+      font-size: 0.95em;
+      color: #666;
+      padding: 12px;
+    }
+
+    .table-note {
+      font-size: 0.95em;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .next-stations-button {
+      transition: background-color 0.2s ease;
+    }
+
+    .next-stations-button:hover:not(:disabled) {
+      background: #0048c4 !important;
+    }
+
+    .next-stations-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 900px) {
+      .provider-layout {
+        flex-direction: column;
+      }
+
+      .provider-left,
+      .provider-right {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="page-container">
+      <div class="loading">Loading statistics...</div>
+    </div>
+  </div>
+
+  <script src="../giapi/ol/ol.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var STATS_API_BASE = window.STATS_API_BASE || '../services/support/metadata-stats';
+      var DEFAULT_LANGUAGE = 'en';
+
+      var query = parseQueryParams();
+      var app = document.getElementById('app');
+
+      if (!query.viewId) {
+        renderError('Unexpected: view parameter missing');
+        return;
+      }
+
+      loadTranslations(query.language || DEFAULT_LANGUAGE)
+        .then(function (translations) {
+          var translator = createTranslator(query.language || DEFAULT_LANGUAGE, translations);
+
+          if (query.format && query.format.toLowerCase() === 'csv') {
+            initiateCsvDownload(query);
+            renderMessage(translator('preparing_csv_download', 'Preparing CSV download...'));
+            return;
+          }
+
+          renderMessage(translator('loading_statistics', 'Loading statistics...'));
+
+          return fetchStatsData(query)
+            .then(function (payload) {
+              if (!payload) {
+                throw new Error('Empty payload');
+              }
+              renderStatsPage(payload, translator, query);
+            })
+            .catch(function (error) {
+              console.error('[stats] Failed to load data', error);
+              renderError(translator('stats_load_failed', 'Unable to load statistics. Please try again later.'));
+            });
+        })
+        .catch(function (error) {
+          console.error('[stats] Failed to load translations', error);
+          renderError('Unable to load translations.');
+        });
+
+      function parseQueryParams() {
+        var params = new URLSearchParams(window.location.search);
+        return {
+          token: trimToNull(params.get('token')) || '',
+          viewId: trimToNull(params.get('view')) || '',
+          sourceId: trimToNull(params.get('source')) || '',
+          format: trimToNull(params.get('format')) || '',
+          language: trimToNull(params.get('language')) || ''
+        };
+      }
+
+      function trimToNull(value) {
+        if (value === undefined || value === null) {
+          return null;
+        }
+        var trimmed = String(value).trim();
+        return trimmed === '' ? null : trimmed;
+      }
+
+      function trimToLower(value) {
+        var trimmed = trimToNull(value);
+        return trimmed ? trimmed.toLowerCase() : null;
+      }
+
+      function escapeHtml(value) {
+        if (value === undefined || value === null) {
+          return '';
+        }
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function joinWithSeparator(list, separator) {
+        if (!list || !list.length) {
+          return '';
+        }
+        var buffer = '';
+        for (var i = 0; i < list.length; i++) {
+          if (i > 0) {
+            buffer += separator;
+          }
+          buffer += list[i];
+        }
+        return buffer;
+      }
+
+      function compareIgnoreCase(a, b) {
+        var left = (a || '').toLowerCase();
+        var right = (b || '').toLowerCase();
+        if (left < right) {
+          return -1;
+        }
+        if (left > right) {
+          return 1;
+        }
+        var leftOriginal = a || '';
+        var rightOriginal = b || '';
+        if (leftOriginal < rightOriginal) {
+          return -1;
+        }
+        if (leftOriginal > rightOriginal) {
+          return 1;
+        }
+        return 0;
+      }
+
+      function fetchTranslationResource(language) {
+        var url = '../gi-portal/lang/' + language + '.json';
+        return fetch(url, { cache: 'no-cache' })
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('Translation ' + language + ' not available');
+            }
+            return response.json();
+          });
+      }
+
+      function loadTranslations(language) {
+        var requested = trimToNull(language) || DEFAULT_LANGUAGE;
+        var payload = { primary: {}, fallback: {} };
+
+        return fetchTranslationResource(requested)
+          .then(function (data) {
+            payload.primary = data || {};
+          })
+          .catch(function () {
+            payload.primary = {};
+          })
+          .then(function () {
+            if (requested === DEFAULT_LANGUAGE) {
+              return payload;
+            }
+            return fetchTranslationResource(DEFAULT_LANGUAGE)
+              .then(function (data) {
+                payload.fallback = data || {};
+              })
+              .catch(function () {
+                payload.fallback = {};
+              })
+              .then(function () {
+                return payload;
+              });
+          });
+      }
+
+      function createTranslator(language, translations) {
+        var primary = translations && translations.primary ? translations.primary : {};
+        var fallback = translations && translations.fallback ? translations.fallback : {};
+        return function translate(key, defaultText) {
+          if (primary && primary.hasOwnProperty(key)) {
+            return primary[key];
+          }
+          if (fallback && fallback.hasOwnProperty(key)) {
+            return fallback[key];
+          }
+          return defaultText !== undefined ? defaultText : key;
+        };
+      }
+
+      function renderMessage(message) {
+        app.innerHTML = '<div class="page-container"><p>' + escapeHtml(message) + '</p></div>';
+      }
+
+      function renderError(message) {
+        app.innerHTML = '<div class="page-container"><p class="error">' + escapeHtml(message) + '</p></div>';
+      }
+
+      function buildApiUrl(path, params) {
+        if (!STATS_API_BASE) {
+          throw new Error('STATS_API_BASE is not configured');
+        }
+        var base = STATS_API_BASE;
+        if (base.charAt(base.length - 1) === '/') {
+          base = base.slice(0, -1);
+        }
+        var normalizedPath = '';
+        if (path) {
+          normalizedPath = path.charAt(0) === '/' ? path : '/' + path;
+        }
+        var url = base + normalizedPath;
+        if (params) {
+          var queryString = '';
+          if (typeof params === 'string') {
+            queryString = params;
+          } else if (params instanceof URLSearchParams) {
+            queryString = params.toString();
+          } else {
+            var searchParams = new URLSearchParams();
+            for (var key in params) {
+              if (params.hasOwnProperty(key) && params[key] !== undefined && params[key] !== null && params[key] !== '') {
+                searchParams.append(key, params[key]);
+              }
+            }
+            queryString = searchParams.toString();
+          }
+          if (queryString) {
+            url += '?' + queryString;
+          }
+        }
+        return url;
+      }
+
+      function fetchStatsData(query) {
+        var params = new URLSearchParams();
+        params.append('view', query.viewId);
+        if (query.sourceId) {
+          params.append('source', query.sourceId);
+        }
+        if (query.token) {
+          params.append('token', query.token);
+        }
+        if (query.language) {
+          params.append('language', query.language);
+        }
+
+        return fetch(buildApiUrl('', params), {
+          headers: { 'Accept': 'application/json' },
+          credentials: 'include'
+        }).then(function (response) {
+          if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+          }
+          return response.json();
+        });
+      }
+
+      function initiateCsvDownload(query) {
+        var params = new URLSearchParams();
+        params.append('view', query.viewId);
+        if (query.sourceId) {
+          params.append('source', query.sourceId);
+        }
+        if (query.token) {
+          params.append('token', query.token);
+        }
+        if (query.language) {
+          params.append('language', query.language);
+        }
+        params.append('format', 'CSV');
+        window.location.href = buildApiUrl('/download', params);
+      }
+
+      function renderStatsPage(payload, translator, query) {
+        var statsEntries = Array.isArray(payload && payload.stats) ? payload.stats : [];
+        if (!query.sourceId) {
+          renderSourceList(statsEntries, translator, query);
+          return;
+        }
+
+        var entry = null;
+        for (var i = 0; i < statsEntries.length; i++) {
+          var current = statsEntries[i];
+          if (!current) {
+            continue;
+          }
+          if (trimToLower(current['source']) === trimToLower(query.sourceId)) {
+            entry = current;
+            break;
+          }
+        }
+        if (!entry && statsEntries.length) {
+          entry = statsEntries[0];
+        }
+
+        if (!entry) {
+          renderError(translator('provider_not_found', 'Provider not found.'));
+          return;
+        }
+
+        renderProvider(entry, translator, query);
+      }
+
+      function renderSourceList(statsEntries, translator, query) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'page-container';
+
+        var title = translator('data_provider_information', 'Data provider information');
+        document.title = title;
+
+        var heading = document.createElement('h1');
+        heading.textContent = title;
+        wrapper.appendChild(heading);
+
+        var prompt = document.createElement('p');
+        prompt.textContent = translator('select_provider_prompt', 'Select a provider to view detailed statistics.');
+        wrapper.appendChild(prompt);
+
+        var list = document.createElement('ul');
+        list.className = 'source-list';
+
+        var unique = {};
+        var sources = [];
+        for (var i = 0; i < statsEntries.length; i++) {
+          var entry = statsEntries[i];
+          if (!entry) {
+            continue;
+          }
+          var id = trimToNull(entry['source']);
+          var label = trimToNull(entry['source-label']) || id || translator('unknown_value', 'Unknown');
+          var key = id ? id.toLowerCase() : label.toLowerCase();
+          if (unique[key]) {
+            continue;
+          }
+          unique[key] = true;
+          sources.push({
+            id: id,
+            label: label
+          });
+        }
+
+        sources.sort(function (a, b) {
+          return compareIgnoreCase(a.label, b.label);
+        });
+
+        if (!sources.length) {
+          var emptyItem = document.createElement('li');
+          emptyItem.textContent = translator('no_sources_available', 'No providers available for this view.');
+          list.appendChild(emptyItem);
+        } else {
+          for (var j = 0; j < sources.length; j++) {
+            var item = sources[j];
+            var link = document.createElement('a');
+            link.href = buildSourceUrl(query, item.id || '');
+            link.textContent = item.label;
+
+            var listItem = document.createElement('li');
+            listItem.appendChild(link);
+            list.appendChild(listItem);
+          }
+        }
+
+        wrapper.appendChild(list);
+        app.innerHTML = '';
+        app.appendChild(wrapper);
+      }
+
+      function buildSourceUrl(query, sourceId) {
+        var url = new URL(window.location.href);
+        if (sourceId) {
+          url.searchParams.set('source', sourceId);
+        } else {
+          url.searchParams.delete('source');
+        }
+        url.searchParams.set('view', query.viewId);
+        if (query.token) {
+          url.searchParams.set('token', query.token);
+        } else {
+          url.searchParams.delete('token');
+        }
+        if (query.language) {
+          url.searchParams.set('language', query.language);
+        } else {
+          url.searchParams.delete('language');
+        }
+        url.searchParams.delete('format');
+        return url.pathname + url.search;
+      }
+
+      function renderProvider(entry, translator, query) {
+        var platformsLabel = translator('platforms', 'Platforms');
+        var observedLabel = translator('observed_properties', 'Observed properties');
+        var datasetsLabel = translator('datasets', 'Datasets');
+        var minTemporalLabel = translator('minimum_temporal_extent', 'Minimum temporal extent');
+        var maxTemporalLabel = translator('maximum_temporal_extent', 'Maximum temporal extent');
+        var bboxLabel = translator('bbox', 'BBox');
+        var altitudeLabel = translator('altitude', 'Altitude');
+
+        var siteCount = entry['site-count'];
+        var uniqueAttributeCount = entry['unique-attribute-count'];
+        var attributeCount = entry['attribute-count'];
+        var timeSeriesCount = entry['timeseries-count'];
+        var begin = entry['begin'];
+        var end = entry['end'];
+        var west = entry['west'];
+        var south = entry['south'];
+        var east = entry['east'];
+        var north = entry['north'];
+        var minElevation = entry['minimimum-elevation'] !== undefined ? entry['minimimum-elevation'] : entry['minimum-elevation'];
+        var maxElevation = entry['maximum-elevation'];
+
+        var statsItems = [];
+        statsItems.push('<li><b>' + escapeHtml(platformsLabel) + ':</b> ' + formatValue(siteCount) + '</li>');
+        
+        statsItems.push('<li><b>' + escapeHtml(datasetsLabel) + ':</b> ' + formatValue(timeSeriesCount) + '</li>');
+        statsItems.push('<li><b>' + escapeHtml(translator('unique_attribute_count', 'Unique observed properties')) + ':</b> ' + formatValue(uniqueAttributeCount) + '</li>');
+
+        var temporalExtentLabel = translator('temporal_extent', 'Temporal extent');
+        var beginLabel = translator('begin_label', 'Begin');
+        var endLabel = translator('end_label', 'End');
+        statsItems.push('<li><b>' + escapeHtml(temporalExtentLabel) + ':</b><ul>' +
+         '<li>' + escapeHtml(beginLabel) + ': ' + escapeHtml(formatValue(begin)) + '</li>'+
+         '<li>' + escapeHtml(endLabel) + ': ' + escapeHtml(formatValue(end)) + '</li>'+          
+         '</ul></li>'
+        
+        );
+
+        
+        statsItems.push('<li><b>' + escapeHtml(bboxLabel) + ':</b> <ul>' +
+          
+          "<li>" + translator('west', 'West') + ': ' + formatValue(west) + "</li>",
+          "<li>" + translator('south', 'South') + ': ' + formatValue(south) + "</li>",
+          "<li>" + translator('east', 'East') + ': ' + formatValue(east) + "</li>",
+          "<li>" + translator('north', 'North') + ': ' + formatValue(north) + "</li>"+
+          '</ul></li>');
+
+        var minElevationDefined = minElevation !== undefined && minElevation !== null && minElevation !== '';
+        var maxElevationDefined = maxElevation !== undefined && maxElevation !== null && maxElevation !== '';
+        var minElevationNumber = Number(minElevation);
+        var maxElevationNumber = Number(maxElevation);
+        var sameElevation = false;
+        if (minElevationDefined && maxElevationDefined) {
+          if (!isNaN(minElevationNumber) && !isNaN(maxElevationNumber)) {
+            sameElevation = minElevationNumber === maxElevationNumber;
+          } else {
+            sameElevation = String(minElevation).trim() === String(maxElevation).trim();
+          }
+        }
+
+        var altitudeDisplay;
+        if (minElevationDefined && (!maxElevationDefined || sameElevation)) {
+          altitudeDisplay = formatValue(minElevation);
+        } else if (!minElevationDefined && maxElevationDefined) {
+          altitudeDisplay = formatValue(maxElevation);
+        } else if (minElevationDefined && maxElevationDefined) {
+          altitudeDisplay = formatValue(minElevation) + ' / ' + formatValue(maxElevation);
+        } else {
+          altitudeDisplay = formatValue(minElevation);
+        }
+
+        statsItems.push('<li><b>' + escapeHtml(altitudeLabel) + ':</b> ' + altitudeDisplay + '</li>');
+        statsItems.push('<li><b>' + escapeHtml(observedLabel) + ' (' + formatValue(attributeCount) + '):</b></li>');
+        var attributeStats = Array.isArray(entry['attribute-stats']) ? entry['attribute-stats'] : [];
+        if (attributeStats.length) {
+          var observedList = ['<ul>'];
+          for (var a = 0; a < attributeStats.length; a++) {
+            var attr = attributeStats[a] || {};
+            var attrLabel = trimToNull(attr.term) || trimToNull(attr.label) || translator('unknown_value', 'Unknown');
+            var attrCount = attr.count !== undefined ? attr.count : attr.freq;
+            observedList.push('<li>' + escapeHtml(attrLabel) + ' (' + formatValue(attrCount) + ' datasets)</li>');
+          }
+          observedList.push('</ul>');
+          statsItems.push(observedList.join(''));
+        }
+
+        var page = [];
+        page.push('<div class="page-container">');
+
+        var pageTitle = translator('data_provider_information', 'Data provider information');
+        var providerLabel = trimToNull(entry['source-label']) || trimToNull(entry['source']) || translator('provider', 'Provider');
+        document.title = pageTitle + ' - ' + providerLabel;
+
+        page.push('<h1>' + escapeHtml(providerLabel) + '</h1>');
+
+        var backUrl = buildSourceUrl(query, '');
+
+        page.push('<div class="provider-layout">');
+        page.push('<div class="provider-left">');
+        page.push('<h2>' + escapeHtml(translator('provider_statistics', 'Provider statistics')) + '</h2>');
+        page.push('<ul class="stats-list">' + statsItems.join('') + '</ul>');
+        page.push('<div id="organizations-container"></div>');
+        page.push('</div>');
+
+        page.push('<div class="provider-right">');
+        page.push('<div id="provider-map" class="provider-map"></div>');
+        page.push('<div class="map-credit">Map copyright: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></div>');
+        page.push('</div>');
+        page.push('</div>');
+
+        page.push('<h1>' + escapeHtml(translator('sample_platforms', 'Sample platforms')) + '</h1>');
+        page.push('<div class="table-wrapper">');
+        page.push('<table class="data-table">');
+        page.push('<thead><tr>');
+        page.push('<th>' + escapeHtml(translator('monitoring_point', 'Monitoring point')) + '</th>');
+        page.push('<th>' + escapeHtml(translator('latitude', 'Latitude')) + '</th>');
+        page.push('<th>' + escapeHtml(translator('longitude', 'Longitude')) + '</th>');
+        page.push('<th>' + escapeHtml(translator('elevation', 'Elevation')) + '</th>');
+        page.push('</tr></thead>');
+        page.push('<tbody id="platform-table-body"></tbody>');
+        page.push('</table>');
+        page.push('</div>');
+        page.push('<div id="platform-pagination" style="margin-top: 16px; text-align: center;"></div>');
+
+        page.push('</div>');
+
+        app.innerHTML = page.join('');
+
+        var orgContainer = document.getElementById('organizations-container');
+        renderOrganizations(orgContainer, entry['organization-stats'] || [], translator);
+
+        var tableBody = document.getElementById('platform-table-body');
+        var paginationContainer = document.getElementById('platform-pagination');
+        var sourceId = entry['source'] || query.sourceId;
+        fetchSamplePlatforms(query, sourceId, translator)
+          .then(function (result) {
+            renderSamplePlatforms(tableBody, result.platforms, translator, query, false);
+            updatePlatformPagination(paginationContainer, result.resumptionToken, query, sourceId, translator);
+          })
+          .catch(function (error) {
+            console.error('[stats] Failed to load sample platforms', error);
+            renderSamplePlatforms(tableBody, [], translator, query, false);
+            updatePlatformPagination(paginationContainer, null, query, sourceId, translator);
+          });
+
+        createProviderMap({
+          bbox: {
+            west: west,
+            south: south,
+            east: east,
+            north: north
+          }
+        }, translator, query);
+      }
+
+      function formatValue(value) {
+        if (value === undefined || value === null || value === '') {
+          return '-';
+        }
+        return value;
+      }
+
+      function renderOrganizations(container, frequencyItems, translator) {
+        if (!container) {
+          return;
+        }
+        var showLabel = translator('show_contributors', 'Show contributors');
+        var hideLabel = translator('hide_contributors', 'Hide contributors');
+        var data = aggregateOrganizations(frequencyItems, translator);
+
+        if (!data.length) {
+          container.innerHTML = '<h3>' + escapeHtml(translator('involved_organizations', 'Involved organizations')) + '</h3><p>' + escapeHtml(translator('no_organizations_available', 'No organization data available.')) + '</p>';
+          return;
+        }
+
+        var html = ['<h3>' + escapeHtml(translator('involved_organizations', 'Involved organizations')) + '</h3>', '<div class="org-list">'];
+        for (var i = 0; i < data.length; i++) {
+          var org = data[i];
+          var detailsId = 'org-details-' + i;
+          var summaryTag = org.showToggle ? 'button' : 'div';
+          var summaryAttrs = '';
+          if (org.showToggle) {
+            summaryAttrs = ' type="button" data-target="' + detailsId + '" aria-controls="' + detailsId + '" aria-expanded="false"';
+          }
+          var summaryClass = 'org-summary ' + (org.showToggle ? 'org-summary-toggle' : 'org-summary-static');
+
+          html.push('<div class="org-card">');
+          html.push('<' + summaryTag + summaryAttrs + ' class="' + summaryClass + '">');
+          html.push('<span class="org-name">' + escapeHtml(org.name) + '</span>');
+          html.push('<span class="org-meta"><span class="org-roles">' + escapeHtml(org.rolesSummary) + '</span><span class="org-count">' + org.totalCount + '</span></span>');
+          if (org.showToggle) {
+            html.push('<span class="org-toggle">' + escapeHtml(showLabel) + '</span>');
+          }
+          html.push('</' + summaryTag + '>');
+          if (org.showToggle) {
+            html.push('<div class="org-details" id="' + detailsId + '" hidden>');
+            for (var j = 0; j < org.contributors.length; j++) {
+              var contributor = org.contributors[j];
+              var contributorName = contributor.name ? escapeHtml(contributor.name) : escapeHtml(translator('unnamed_contributor', 'Unnamed contributor'));
+              html.push('<div class="org-contact">');
+              html.push('<div class="org-contact-name">' + contributorName + ' (' + contributor.count + ')</div>');
+
+              var metaParts = [];
+              if (contributor.roleSummary) {
+                metaParts.push('<span class="org-role-label">' + escapeHtml(contributor.roleSummary) + '</span>');
+              }
+              if (contributor.emails.length) {
+                var emailFragments = [];
+                for (var e = 0; e < contributor.emails.length; e++) {
+                  var emailValue = contributor.emails[e];
+                  var emailHref = 'mailto:' + encodeURIComponent(emailValue);
+                  emailFragments.push('<a href="' + emailHref + '">' + escapeHtml(emailValue) + '</a>');
+                }
+                metaParts.push(emailFragments.join(', '));
+              }
+              if (contributor.homepages.length) {
+                var homepageFragments = [];
+                for (var h = 0; h < contributor.homepages.length; h++) {
+                  var homepageValue = contributor.homepages[h];
+                  homepageFragments.push('<a href="' + escapeHtml(homepageValue) + '" target="_blank" rel="noopener">Website</a>');
+                }
+                metaParts.push(homepageFragments.join(', '));
+              }
+              if (metaParts.length) {
+                html.push('<div class="org-contact-meta">' + joinWithSeparator(metaParts, "<span class='org-meta-sep'>&#8226;</span>") + '</div>');
+              }
+              html.push('</div>');
+            }
+            html.push('</div>');
+          }
+          html.push('</div>');
+        }
+        html.push('</div>');
+
+        container.innerHTML = html.join('');
+        initializeOrgToggles(container, showLabel, hideLabel);
+      }
+
+      function initializeOrgToggles(container, showLabel, hideLabel) {
+        var toggles = container.querySelectorAll('.org-summary-toggle');
+        for (var i = 0; i < toggles.length; i++) {
+          var button = toggles[i];
+          if (button.dataset.bound === 'true') {
+            continue;
+          }
+          button.dataset.bound = 'true';
+          button.addEventListener('click', function (event) {
+            var btn = event.currentTarget;
+            var targetId = btn.getAttribute('data-target');
+            var details = document.getElementById(targetId);
+            var expanded = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', (!expanded).toString());
+            var label = btn.querySelector('.org-toggle');
+            if (label) {
+              label.textContent = expanded ? showLabel : hideLabel;
+            }
+            if (details) {
+              if (expanded) {
+                details.setAttribute('hidden', 'hidden');
+              } else {
+                details.removeAttribute('hidden');
+              }
+            }
+          });
+        }
+      }
+
+      function aggregateOrganizations(frequencyItems, translator) {
+        var results = [];
+        if (!frequencyItems || !frequencyItems.length) {
+          return results;
+        }
+
+        var unknownOrganization = translator('unknown_organization', 'Unknown organization');
+        var roleSingle = translator('role_label_single', 'Role');
+        var rolePlural = translator('role_label_plural', 'Roles');
+        var unspecifiedRole = translator('unspecified_role', '(unspecified role)');
+
+        var map = {};
+
+        for (var i = 0; i < frequencyItems.length; i++) {
+          var item = frequencyItems[i];
+          if (!item) {
+            continue;
+          }
+          var props = item.properties || item.nestedProperties || {};
+          var orgName = trimToNull(props.orgName) || trimToNull(item.label) || trimToNull(item.term) || unknownOrganization;
+          var orgKey = orgName.toLowerCase();
+
+          if (!map[orgKey]) {
+            map[orgKey] = {
+              name: orgName,
+              totalCount: 0,
+              roles: {},
+              contributors: {}
+            };
+          }
+
+          var entry = map[orgKey];
+          var freqValueRaw = item.count !== undefined ? item.count : item.freq;
+          var freqValue = Number(freqValueRaw);
+          if (!isNaN(freqValue)) {
+            entry.totalCount += freqValue;
+          }
+
+          var role = trimToNull(props.role);
+          if (role) {
+            entry.roles[role] = true;
+          }
+
+          var contributorKey = [
+            trimToLower(props.individualName) || '',
+            trimToLower(props.email) || '',
+            trimToLower(props.homePageURL || props.homepage) || ''
+          ].join('|');
+
+          if (!entry.contributors[contributorKey]) {
+            entry.contributors[contributorKey] = {
+              name: trimToNull(props.individualName),
+              count: 0,
+              roles: {},
+              emails: {},
+              homepages: {}
+            };
+          }
+
+          var contributor = entry.contributors[contributorKey];
+          if (!isNaN(freqValue)) {
+            contributor.count += freqValue;
+          }
+          if (role) {
+            contributor.roles[role] = true;
+          }
+          var email = trimToNull(props.email);
+          if (email) {
+            contributor.emails[email] = true;
+          }
+          var homepage = trimToNull(props.homePageURL || props.homepage);
+          if (homepage) {
+            contributor.homepages[homepage] = true;
+          }
+        }
+
+        for (var key in map) {
+          if (!map.hasOwnProperty(key)) {
+            continue;
+          }
+          var orgEntry = map[key];
+          var roleKeys = Object.keys(orgEntry.roles);
+          roleKeys.sort(compareIgnoreCase);
+
+          var rolesSummary;
+          if (!roleKeys.length) {
+            rolesSummary = unspecifiedRole;
+          } else if (roleKeys.length === 1) {
+            rolesSummary = roleSingle + ': ' + roleKeys[0];
+          } else {
+            rolesSummary = rolePlural + ': ' + joinWithSeparator(roleKeys, ', ');
+          }
+
+          var contributors = [];
+          for (var contributorKey in orgEntry.contributors) {
+            if (!orgEntry.contributors.hasOwnProperty(contributorKey)) {
+              continue;
+            }
+            var contributorEntry = orgEntry.contributors[contributorKey];
+            var roleList = Object.keys(contributorEntry.roles);
+            roleList.sort(compareIgnoreCase);
+            var emailList = Object.keys(contributorEntry.emails);
+            emailList.sort(compareIgnoreCase);
+            var homepageList = Object.keys(contributorEntry.homepages);
+            homepageList.sort(compareIgnoreCase);
+
+            var hasDetails = !!trimToNull(contributorEntry.name) || roleList.length || emailList.length || homepageList.length;
+            if (!hasDetails) {
+              continue;
+            }
+
+            var contributorRoleSummary = null;
+            if (roleList.length === 1) {
+              contributorRoleSummary = roleSingle + ': ' + roleList[0];
+            } else if (roleList.length > 1) {
+              contributorRoleSummary = rolePlural + ': ' + joinWithSeparator(roleList, ', ');
+            }
+
+            contributors.push({
+              name: contributorEntry.name,
+              count: contributorEntry.count,
+              roleSummary: contributorRoleSummary,
+              emails: emailList,
+              homepages: homepageList
+            });
+          }
+
+          contributors.sort(function (a, b) {
+            var compare = compareIgnoreCase(a.name, b.name);
+            if (compare !== 0) {
+              return compare;
+            }
+            compare = compareIgnoreCase(a.roleSummary, b.roleSummary);
+            if (compare !== 0) {
+              return compare;
+            }
+            var emailA = a.emails.length ? a.emails[0] : '';
+            var emailB = b.emails.length ? b.emails[0] : '';
+            return compareIgnoreCase(emailA, emailB);
+          });
+
+          results.push({
+            name: orgEntry.name,
+            totalCount: orgEntry.totalCount,
+            rolesSummary: rolesSummary,
+            contributors: contributors,
+            showToggle: contributors.length > 0
+          });
+        }
+
+        results.sort(function (a, b) {
+          return compareIgnoreCase(a.name, b.name);
+        });
+
+        return results;
+      }
+
+      function fetchSamplePlatforms(query, sourceId, translator, resumptionToken) {
+        if (!query.viewId || !sourceId) {
+          return Promise.resolve({ platforms: [], resumptionToken: null });
+        }
+
+        var url = '/gs-service/services/essi';
+        if (query.token) {
+          url += '/token/' + encodeURIComponent(query.token);
+        }
+        url += '/view/' + encodeURIComponent(query.viewId) + '/om-api/features';
+        
+        var params = new URLSearchParams();
+        params.append('provider', sourceId);
+        params.append('limit', '10');
+        if (resumptionToken) {
+          params.append('resumptionToken', resumptionToken);
+        }
+        url += '?' + params.toString();
+
+        return fetch(url, {
+          headers: { 'Accept': 'application/json' },
+          credentials: 'include'
+        })
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+          })
+          .then(function (data) {
+            var results = Array.isArray(data && data.results) ? data.results : [];
+            var platforms = [];
             
+            for (var i = 0; i < results.length; i++) {
+              var item = results[i];
+              if (!item) {
+                continue;
+              }
+              
+              var coordinates = item.shape && Array.isArray(item.shape.coordinates) ? item.shape.coordinates : [];
+              var longitude = coordinates.length > 0 ? coordinates[0] : null;
+              var latitude = coordinates.length > 1 ? coordinates[1] : null;
+              
+              var elevation = null;
+              var parameters = Array.isArray(item.parameter) ? item.parameter : [];
+              for (var j = 0; j < parameters.length; j++) {
+                var param = parameters[j];
+                if (param && param.name && (param.name.toLowerCase() === 'elevation' || param.name.toLowerCase() === 'altitude')) {
+                  elevation = param.value;
+                  break;
+                }
+              }
+              
+              platforms.push({
+                platformId: item.id || '',
+                title: item.name || translator('unknown_value', 'Unknown'),
+                north: latitude,
+                east: longitude,
+                elevation: elevation
+              });
+            }
+            
+            var nextToken = trimToNull(data.resumptionToken) || null;
+            
+            return {
+              platforms: platforms,
+              resumptionToken: nextToken
+            };
+          });
+      }
+
+      function renderSamplePlatforms(tbody, platforms, translator, query, append) {
+        if (!tbody) {
+          return;
         }
-        orgList.append("</ul>");
-        out.println("<li><b>"+translator.getTranslation("involved_organizations")+":</b> " + orgList.toString() + "</li>");
-    }
-
-    // Add observed properties
-    List<TermFrequencyItem> props = stats.getFrequencyResult(MetadataElement.ATTRIBUTE_TITLE);
-    if (props != null && !props.isEmpty()) {
-        StringBuilder propList = new StringBuilder();
-        propList.append("<ul>");
-        for (int i = 0; i < props.size(); i++) {
-            TermFrequencyItem item = props.get(i);
-            propList.append("<li>"+item.getTerm() + " (" + item.getFreq() + ")</li>");      
+        if (!append) {
+          while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+          }
         }
-        propList.append("</ul>");
-        out.println("<li><b>"+translator.getTranslation("observed_properties")+":</b> " + propList.toString() + "</li>");
-    }
-    
-    out.println("</ul>");
-    out.println("</td>");
-    out.println("<td style='vertical-align: top; padding: 18px 28px 18px 28px; width: 50%;'>");
-    out.println("<link rel='stylesheet' href='../giapi/ol/ol.css'>");
-    out.println("<script src='../giapi/ol/ol.js'></script>");
-    out.println("<div id='provider-map' style='width: 100%; height: 320px;'></div>");
-    out.println(
-		    "<div style='font-size: 0.95em; color: #666; margin: 4px 0 16px 4px;'>© <a href='https://www.openstreetmap.org/copyright' target='_blank' style='color: #666; text-decoration: underline;'>OpenStreetMap contributors</a></div>");
-    out.println("<script>");
-    out.println("document.addEventListener('DOMContentLoaded', function() {");
-    out.println("  if (!window.ol) {");
-    out.println("    alert('OpenLayers failed to load.');");
-    out.println("    return;");
-    out.println("  }");
-    out.println(
-		    "  var bbox = [" + stats.getWest() + ", " + stats.getSouth() + ", " + stats.getEast() + ", " + stats.getNorth() + "];");
-    out.println("  var center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];");
-    out.println("  var map = new ol.Map({");
-    out.println("    target: 'provider-map',");
-    out.println("    layers: [");
-    out.println("      new ol.layer.Tile({");
-    out.println("        source: new ol.source.OSM()") ;
-    out.println("      }),");
-    // Add WMS layer for stations (template, please update URL and LAYERS as needed)
-    out.println("      new ol.layer.Tile({");
-    out.println("        source: new ol.source.TileWMS({");
-    out.println("          url: '/gs-service/services/essi/token/"+token+"/view/"+viewId+"/wms-cluster?sources="+sourceId+"&',");
-    out.println("          params: { LAYERS: '"+viewId+"', TILED: true }, ");
-    out.println("          transition: 0");
-    out.println("        })");
-    out.println("      })");
-    out.println("    ],");
-    out.println("    view: new ol.View({");
-    out.println("      center: ol.proj.fromLonLat(center),");
-    out.println("      zoom: 6");
-    out.println("    }),");
-    out.println("    controls: []");
-    out.println("  });");
-    out.println("  var extent = ol.proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');");
-    out.println("  map.getView().fit(extent, { padding: [20, 20, 20, 20], maxZoom: 12 });");
+        if (!platforms || !platforms.length) {
+          if (!append) {
+            var emptyRow = document.createElement('tr');
+            var emptyCell = document.createElement('td');
+            emptyCell.colSpan = 4;
+            emptyCell.textContent = translator('no_sample_platforms', 'No sample platforms available.');
+            emptyRow.appendChild(emptyCell);
+            tbody.appendChild(emptyRow);
+          }
+          return;
+        }
+        for (var i = 0; i < platforms.length; i++) {
+          var platform = platforms[i] || {};
+          var row = document.createElement('tr');
 
-    out.println("});");
-    out.println("</script>");
-    out.println("</td>");
-    out.println("</tr></table>");
-	} else {
-    out.println("<p>No statistics available for this provider.</p>");
-	}
+          var titleCell = document.createElement('td');
+          var title = platform.title || translator('unknown_value', 'Unknown');
+          var link = platform.link || buildStationLink(query, platform.platformId);
+          if (link) {
+            var anchor = document.createElement('a');
+            anchor.href = link;
+            anchor.target = '_blank';
+            anchor.textContent = title;
+            titleCell.appendChild(anchor);
+          } else {
+            titleCell.textContent = title;
+          }
+          row.appendChild(titleCell);
 
-	out.println("<h1>"+translator.getTranslation("sample_platforms")+"</h1>");
-	out.println("<table>");
-	out.println("<tr><th>"+translator.getTranslation("monitoring_point")+"</th><th>"+translator.getTranslation("latitude")+"</th><th>"+translator.getTranslation("longitude")+"</th><th>"+translator.getTranslation("elevation")+"</th></tr>");
-    }
-    for (GSResource resource : resources) {
-	String title = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform().getCitation().getTitle();
-	Optional<String> platId = resource.getExtensionHandler().getUniquePlatformIdentifier();
+          var latCell = document.createElement('td');
+          latCell.textContent = formatValue(platform.north);
+          row.appendChild(latCell);
 
-	GeographicBoundingBox bb = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
-	BigDecimal north = bb.getBigDecimalNorth();
-	BigDecimal east = bb.getBigDecimalEast();
-	String ele = "";
-	MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
-	VerticalExtent vertical = miMetadata.getDataIdentification().getVerticalExtent();
-	if (vertical != null) {
-    Double minimum = vertical.getMinimumValue();
-    ele = "" + minimum;
-	}
+          var lonCell = document.createElement('td');
+          lonCell.textContent = formatValue(platform.east);
+          row.appendChild(lonCell);
 
-	if (csv) {
-    out.println(title + "\t" + north + "\t" + east + "\t" + ele);
-	} else {
-    String titleString = title;
+          var elevCell = document.createElement('td');
+          elevCell.textContent = formatValue(platform.elevation);
+          row.appendChild(elevCell);
 
-    if (platId.isPresent()) {
-		String link = "../services/view/" + viewId + "/bnhs/station/" + platId.get() + "/";
-		titleString = "<a target=\"_blank\" href=\"" + link + "\">" + title + "</a>";
-    }
-    out.println("<tr><td>" + titleString + "</td><td>" + north + "</td><td>" + east + "</td><td>" + ele + "</td></tr>");
-	}
-    }
-    if (!csv) {
-	out.println("</table>");
+          tbody.appendChild(row);
+        }
+      }
 
-    }
+      function updatePlatformPagination(paginationContainer, resumptionToken, query, sourceId, translator) {
+        if (!paginationContainer) {
+          return;
+        }
+        paginationContainer.innerHTML = '';
+        if (!resumptionToken) {
+          return;
+        }
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'next-stations-button';
+        button.textContent = translator('next_stations', 'Next stations');
+        button.style.cssText = 'padding: 10px 20px; background: #005aef; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: 600;';
+        button.addEventListener('click', function () {
+          button.disabled = true;
+          button.textContent = translator('loading', 'Loading...');
+          fetchSamplePlatforms(query, sourceId, translator, resumptionToken)
+            .then(function (result) {
+              var tableBody = document.getElementById('platform-table-body');
+              if (tableBody) {
+                renderSamplePlatforms(tableBody, result.platforms, translator, query, true);
+              }
+              updatePlatformPagination(paginationContainer, result.resumptionToken, query, sourceId, translator);
+            })
+            .catch(function (error) {
+              console.error('[stats] Failed to load next batch of platforms', error);
+              button.disabled = false;
+              button.textContent = translator('next_stations', 'Next stations');
+            });
+        });
+        paginationContainer.appendChild(button);
+      }
 
-    if (!csv) {
-	out.println("</div>");
-	out.println("</body></html>");
-    }
-    out.flush();
+      function buildStationLink(query, platformId) {
+        if (!platformId || !query.viewId) {
+          return '';
+        }
+        return '../services/view/' + encodeURIComponent(query.viewId) + '/bnhs/station/' + encodeURIComponent(platformId) + '/';
+      }
 
-}
-%>
+      function createProviderMap(mapData, translator, query) {
+        var mapContainer = document.getElementById('provider-map');
+        if (!mapContainer) {
+          return;
+        }
+        if (!window.ol) {
+          mapContainer.innerHTML = '<div class="map-placeholder">' + escapeHtml(translator('map_library_not_available', 'Map library is not available.')) + '</div>';
+          return;
+        }
+
+        var bbox = mapData && mapData.bbox ? mapData.bbox : {};
+        var west = Number(bbox.west);
+        var east = Number(bbox.east);
+        var north = Number(bbox.north);
+        var south = Number(bbox.south);
+        if (isNaN(west) || isNaN(east) || isNaN(north) || isNaN(south)) {
+          mapContainer.innerHTML = '<div class="map-placeholder">' + escapeHtml(translator('map_data_unavailable', 'Map data unavailable.')) + '</div>';
+          return;
+        }
+
+        mapContainer.innerHTML = '';
+
+        var layers = [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          })
+        ];
+
+        if (query.viewId) {
+          var wmsPath = '/gs-service/services/essi';
+          if (query.token) {
+            wmsPath += '/token/' + encodeURIComponent(query.token);
+          }
+          wmsPath += '/view/' + encodeURIComponent(query.viewId) + '/wms-cluster';
+          var wmsUrl = wmsPath;
+          if (query.sourceId) {
+            wmsUrl += '?sources=' + encodeURIComponent(query.sourceId);
+          }
+          layers.push(new ol.layer.Tile({
+            source: new ol.source.TileWMS({
+              url: wmsUrl,
+              params: {
+                LAYERS: query.viewId,
+                TILED: true
+              },
+              transition: 0
+            })
+          }));
+        }
+
+        var centerLon = (west + east) / 2;
+        var centerLat = (south + north) / 2;
+
+        var map = new ol.Map({
+          target: mapContainer,
+          layers: layers,
+          view: new ol.View({
+            center: ol.proj.fromLonLat([centerLon, centerLat]),
+            zoom: 6
+          }),
+          controls: []
+        });
+
+        var extent = ol.proj.transformExtent([west, south, east, north], 'EPSG:4326', 'EPSG:3857');
+        map.getView().fit(extent, { padding: [20, 20, 20, 20], maxZoom: 12 });
+      }
+
+    })();
+  </script>
+</body>
+</html>
+

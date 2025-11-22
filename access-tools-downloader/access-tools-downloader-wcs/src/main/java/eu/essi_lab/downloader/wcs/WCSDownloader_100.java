@@ -36,8 +36,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.accessor.wcs.WCSConnector;
 import eu.essi_lab.accessor.wcs_1_0_0.WCSConnector_100;
-import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -70,10 +69,7 @@ public class WCSDownloader_100 extends WCSDownloader {
     @Override
     public boolean canDownload() {
 
-	NetProtocol protocol = NetProtocols.decodeFromIdentifier(online.getProtocol());
-
-	return NetProtocols.WCS_1_0_0.equals(protocol);
-
+	return NetProtocolWrapper.check(online.getProtocol(),NetProtocolWrapper.WCS_1_0_0);
     }
 
     public String getVersionParameter() {
@@ -105,8 +101,8 @@ public class WCSDownloader_100 extends WCSDownloader {
     }
 
     /**
-     * Returns the native CRSes that are also present as requestresponseCRSs. If none are present, then the
-     * requestResponseCRSs CRSes are returned.
+     * Returns the native CRSes that are also present as requestresponseCRSs. If none are present, then the requestResponseCRSs CRSes are
+     * returned.
      */
     protected Set<CRS> getResponseCRSes(XMLDocumentReader coverage) {
 	Set<CRS> requestResponseCrses = new HashSet<>();
@@ -121,8 +117,8 @@ public class WCSDownloader_100 extends WCSDownloader {
 	    requestResponseNodes = coverage.evaluateNodes("*:CoverageDescription/*:CoverageOffering/*:supportedCRSs/*:requestResponseCRSs");
 	    nativeCRSNodes = coverage.evaluateNodes("*:CoverageDescription/*:CoverageOffering/*:supportedCRSs/*:nativeCRSs");
 	    responseNodes = coverage.evaluateNodes("*:CoverageDescription/*:CoverageOffering/*:supportedCRSs/*:responseCRSs");
-	    gridCRS = coverage
-		    .evaluateString("*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*:RectifiedGrid/@srsName");
+	    gridCRS = coverage.evaluateString(
+		    "*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*:RectifiedGrid/@srsName");
 	} catch (XPathExpressionException e) {
 	    return requestResponseCrses;
 	}
@@ -194,8 +190,8 @@ public class WCSDownloader_100 extends WCSDownloader {
 	try {
 	    requestResponseNodes = coverage.evaluateNodes("*:CoverageDescription/*:CoverageOffering/*:supportedCRSs/*:requestResponseCRSs");
 	    requestNodes = coverage.evaluateNodes("*:CoverageDescription/*:CoverageOffering/*:supportedCRSs/*:requestCRSs");
-	    gridCRS = coverage
-		    .evaluateString("*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*:RectifiedGrid/@srsName");
+	    gridCRS = coverage.evaluateString(
+		    "*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*:RectifiedGrid/@srsName");
 	} catch (XPathExpressionException e) {
 	    return requestCrses;
 	}
@@ -262,8 +258,9 @@ public class WCSDownloader_100 extends WCSDownloader {
 	String identifier = retrieveBBOXCrsIdentifier(coverage, crs);
 	String origin;
 	try {
-	    origin = coverage.evaluateString("*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain[*[@srsName='"
-		    + identifier + "']]/*:RectifiedGrid/*:origin/*:pos");
+	    origin = coverage.evaluateString(
+		    "*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain[*[@srsName='" + identifier
+			    + "']]/*:RectifiedGrid/*:origin/*:pos");
 	} catch (XPathExpressionException e) {
 	    return null;
 	}
@@ -289,8 +286,8 @@ public class WCSDownloader_100 extends WCSDownloader {
 	String identifier = retrieveBBOXCrsIdentifier(coverage, crs);
 	Node envelope;
 	try {
-	    envelope = coverage
-		    .evaluateNode("*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*[@srsName='" + identifier + "']");
+	    envelope = coverage.evaluateNode(
+		    "*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*[@srsName='" + identifier + "']");
 	} catch (XPathExpressionException e) {
 	    return null;
 	}
@@ -317,8 +314,8 @@ public class WCSDownloader_100 extends WCSDownloader {
 	String identifier = retrieveBBOXCrsIdentifier(coverage, crs);
 	Node envelope;
 	try {
-	    envelope = coverage
-		    .evaluateNode("*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*[@srsName='" + identifier + "']");
+	    envelope = coverage.evaluateNode(
+		    "*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*[@srsName='" + identifier + "']");
 	} catch (XPathExpressionException e) {
 	    return null;
 	}
@@ -345,8 +342,8 @@ public class WCSDownloader_100 extends WCSDownloader {
 	String identifier = retrieveBBOXCrsIdentifier(coverage, crs);
 	Node envelope;
 	try {
-	    envelope = coverage
-		    .evaluateNode("*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*[@srsName='" + identifier + "']");
+	    envelope = coverage.evaluateNode(
+		    "*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*[@srsName='" + identifier + "']");
 	} catch (XPathExpressionException e) {
 	    return null;
 	}
@@ -373,8 +370,8 @@ public class WCSDownloader_100 extends WCSDownloader {
 	String identifier = retrieveBBOXCrsIdentifier(coverage, crs);
 	Node envelope;
 	try {
-	    envelope = coverage
-		    .evaluateNode("*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*[@srsName='" + identifier + "']");
+	    envelope = coverage.evaluateNode(
+		    "*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*[@srsName='" + identifier + "']");
 	} catch (XPathExpressionException e) {
 	    return null;
 	}
@@ -498,8 +495,8 @@ public class WCSDownloader_100 extends WCSDownloader {
 	List<Double> resolutions = new ArrayList<>();
 	Node[] offsetVectors;
 	try {
-	    offsetVectors = coverage
-		    .evaluateNodes("*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*:RectifiedGrid/*:offsetVector");
+	    offsetVectors = coverage.evaluateNodes(
+		    "*:CoverageDescription/*:CoverageOffering/*:domainSet/*:spatialDomain/*:RectifiedGrid/*:offsetVector");
 	} catch (XPathExpressionException e) {
 	    return resolutions;
 	}

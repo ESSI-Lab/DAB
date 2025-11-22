@@ -34,7 +34,7 @@ import eu.essi_lab.cfga.gui.IdleTracker;
 public interface ButtonChangeListener extends ComponentEventListener<ClickEvent<Button>> {
 
     @Override
-    public default void onComponentEvent(ClickEvent<Button> event) {
+    default void onComponentEvent(ClickEvent<Button> event) {
 
 	IdleTracker.getInstance().reset();
 
@@ -44,5 +44,5 @@ public interface ButtonChangeListener extends ComponentEventListener<ClickEvent<
     /**
      * @param event
      */
-    public void handleEvent(ClickEvent<Button> event);
+    void handleEvent(ClickEvent<Button> event);
 }

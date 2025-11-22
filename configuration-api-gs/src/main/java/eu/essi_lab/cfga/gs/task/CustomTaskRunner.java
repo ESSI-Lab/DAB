@@ -41,8 +41,8 @@ import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
  */
 public class CustomTaskRunner {
 
-    private CustomTask task;
-    private JobExecutionContext context;
+    private final CustomTask task;
+    private final JobExecutionContext context;
 
     /**
      * @param task

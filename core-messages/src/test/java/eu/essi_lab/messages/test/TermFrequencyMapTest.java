@@ -51,10 +51,10 @@ public class TermFrequencyMapTest {
 	    Assert.assertEquals(protocol.size(), 3);
 	    Assert.assertEquals(source.size(), 3);
 
-	    String formatTerm = format.get(0).getTerm();
-	    String keywordTerm = keyword.get(0).getTerm();
-	    String protocolTerm = protocol.get(0).getTerm();
-	    String sourceTerm = source.get(0).getTerm();
+	    String formatTerm = format.getFirst().getTerm();
+	    String keywordTerm = keyword.getFirst().getTerm();
+	    String protocolTerm = protocol.getFirst().getTerm();
+	    String sourceTerm = source.getFirst().getTerm();
 
 	    Assert.assertEquals("geoTiff", formatTerm);
 	    Assert.assertEquals("GeoTIFF", keywordTerm);
@@ -111,10 +111,10 @@ public class TermFrequencyMapTest {
 	    Assert.assertEquals(protocol.size(), 11); // was 10, the map 2 item is added
 	    Assert.assertEquals(source.size(), 8); // was 7, the map 2 item is added
 
-	    formatTerm = format.get(0).getTerm();
-	    keywordTerm = keyword.get(0).getTerm();
-	    protocolTerm = protocol.get(0).getTerm();
-	    sourceTerm = source.get(0).getTerm();
+	    formatTerm = format.getFirst().getTerm();
+	    keywordTerm = keyword.getFirst().getTerm();
+	    protocolTerm = protocol.getFirst().getTerm();
+	    sourceTerm = source.getFirst().getTerm();
 
 	    Assert.assertEquals("10000FORMAT", formatTerm);
 	    Assert.assertEquals("10000KWD", keywordTerm);
@@ -155,7 +155,7 @@ public class TermFrequencyMapTest {
 	    int sscSCoreSize = tfMap.getItems(TermFrequencyTarget.SSC_SCORE).size();
 	    Assert.assertEquals(1, sscSCoreSize);
 
-	    TermFrequencyItem item = tfMap.getItems(TermFrequencyTarget.FORMAT).get(0);
+	    TermFrequencyItem item = tfMap.getItems(TermFrequencyTarget.FORMAT).getFirst();
 	    int freq = item.getFreq();
 	    String term = item.getTerm();
 
@@ -165,10 +165,9 @@ public class TermFrequencyMapTest {
 	    tfMap.toStream(outputStream);
 	    // tfMap.toStream(System.out);
 
-	    byte[] byteArray = outputStream.toByteArray();
-	    String mapString = new String(byteArray);
+	    String mapString = outputStream.toString();
 
-	    Assert.assertThat(mapString, new Matcher<String>() {
+	    Assert.assertThat(mapString, new Matcher<>() {
 
 		@Override
 		public void describeTo(Description description) {
@@ -215,12 +214,12 @@ public class TermFrequencyMapTest {
 	    List<TermFrequencyItem> orgs = tfMap.getItems(TermFrequencyTarget.ORGANISATION_NAME);
 	    List<TermFrequencyItem> scores = tfMap.getItems(TermFrequencyTarget.SSC_SCORE);
 	    
-	    String formatTerm = format.get(0).getTerm();
-	    String keywordTerm = keyword.get(0).getTerm();
-	    String protocolTerm = protocol.get(0).getTerm();
-	    String sourceTerm = source.get(0).getTerm();
-	    String orgTerm = orgs.get(0).getTerm();
-	    String scoreTerm = scores.get(0).getTerm();
+	    String formatTerm = format.getFirst().getTerm();
+	    String keywordTerm = keyword.getFirst().getTerm();
+	    String protocolTerm = protocol.getFirst().getTerm();
+	    String sourceTerm = source.getFirst().getTerm();
+	    String orgTerm = orgs.getFirst().getTerm();
+	    String scoreTerm = scores.getFirst().getTerm();
 
 	    Assert.assertEquals("MINES+ParisTech", formatTerm);
 	    Assert.assertEquals("WCS", keywordTerm);
@@ -236,12 +235,12 @@ public class TermFrequencyMapTest {
 	    orgs = tfMap.getItems(TermFrequencyTarget.ORGANISATION_NAME, ItemsSortOrder.BY_FREQUENCY);
 	    scores = tfMap.getItems(TermFrequencyTarget.SSC_SCORE, ItemsSortOrder.BY_FREQUENCY);
 
-	    formatTerm = format.get(0).getTerm();
-	    keywordTerm = keyword.get(0).getTerm();
-	    protocolTerm = protocol.get(0).getTerm();
-	    sourceTerm = source.get(0).getTerm();
-	    orgTerm = orgs.get(0).getTerm();
-	    scoreTerm = scores.get(0).getTerm();
+	    formatTerm = format.getFirst().getTerm();
+	    keywordTerm = keyword.getFirst().getTerm();
+	    protocolTerm = protocol.getFirst().getTerm();
+	    sourceTerm = source.getFirst().getTerm();
+	    orgTerm = orgs.getFirst().getTerm();
+	    scoreTerm = scores.getFirst().getTerm();
 
 	    Assert.assertEquals("geoTiff", formatTerm);
 	    Assert.assertEquals("GeoTIFF", keywordTerm);

@@ -32,7 +32,7 @@ import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 @SuppressWarnings("serial")
 public abstract class LogOutButtonListener implements ButtonChangeListener {
 
-    protected ConfigurationView view;
+    protected final ConfigurationView view;
 
     /**
      * 

@@ -21,7 +21,7 @@ package eu.essi_lab.accessor.sensorthings._1_1.downloader;
  * #L%
  */
 
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 
 /**
  * @author Fabrizio
@@ -30,6 +30,6 @@ public class STA4HydrometryDownloader extends SensorThingsDownloader {
 
     public String getSupportedProtocol() {
 
-	return NetProtocols.SENSOR_THINGS_1_1_STA_4_HYDRO.getCommonURN();
+	return NetProtocolWrapper.SENSOR_THINGS_1_1_STA_4_HYDRO.getCommonURN();
     }
 }

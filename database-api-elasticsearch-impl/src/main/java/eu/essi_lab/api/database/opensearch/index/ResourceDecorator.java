@@ -27,7 +27,6 @@ package eu.essi_lab.api.database.opensearch.index;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -88,7 +87,7 @@ public class ResourceDecorator {
 
 			} else {
 
-			    value = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.valueOf(v.toString())));
+			    value = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.parseLong(v.toString())));
 			}
 		    }
 
@@ -125,7 +124,7 @@ public class ResourceDecorator {
 
 			    } else {
 
-				value = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.valueOf(v.toString())));
+				value = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.parseLong(v.toString())));
 			    }
 			}
 
@@ -144,8 +143,8 @@ public class ResourceDecorator {
 	List<String> composed = source.//
 		keySet().//
 		stream().//
-		filter(key -> MetadataElement.withComposedElement().stream().map(el -> el.getName()).anyMatch(v -> v.equals(key))).//
-		collect(Collectors.toList());
+		filter(key -> MetadataElement.withComposedElement().stream().map(MetadataElement::getName).anyMatch(v -> v.equals(key))).//
+		toList();
 
 	if (!composed.isEmpty()) {
 
@@ -155,7 +154,7 @@ public class ResourceDecorator {
 		jsonArray.forEach(item -> {
 
 		    JSONObject obj = new JSONObject();
-		    obj.put(name, (JSONObject) item);
+		    obj.put(name, item);
 
 		    ComposedElement model = MetadataElement.withComposedElement().//
 			    stream().//
@@ -191,7 +190,7 @@ public class ResourceDecorator {
 
 	    Optional.ofNullable(source.optString(Shape.CENTROID, null)).ifPresent(v -> res.getExtensionHandler().setCentroid(v));
 
-	    Optional.ofNullable(source.opt(Shape.AREA)).ifPresent(v -> res.getExtensionHandler().setArea(Double.valueOf(v.toString())));
+	    Optional.ofNullable(source.opt(Shape.AREA)).ifPresent(v -> res.getExtensionHandler().setArea(Double.parseDouble(v.toString())));
 	}
 
 	if (!source.has(MetadataElement.TEMP_EXTENT_BEGIN.getName()) && //
@@ -220,14 +219,11 @@ public class ResourceDecorator {
 
 	    Optional<JSONArray> sourceId = Optional.ofNullable(source.optJSONArray(ResourceProperty.SOURCE_ID.getName(), null));
 
-	    if (sourceId.isPresent()) {
-
-		ConfigurationWrapper.getAllSources().//
-			stream().//
-			filter(s -> s.getUniqueIdentifier().equals(sourceId.get().get(0))).//
-			findFirst().//
-			ifPresent(s -> res.setSource(s));
-	    }
+	    //
+	    sourceId.flatMap(objects -> ConfigurationWrapper.getAllSources().//
+		    stream().//
+		    filter(s -> s.getUniqueIdentifier().equals(objects.get(0))).//
+		    findFirst()).ifPresent(res::setSource);
 
 	    if (source.has(MetadataElement.BNHS_INFO.getName())) {
 

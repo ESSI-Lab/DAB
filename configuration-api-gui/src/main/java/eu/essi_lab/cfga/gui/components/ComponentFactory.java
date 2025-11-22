@@ -176,17 +176,13 @@ public class ComponentFactory {
 	accordionPanel.setOpened(false);
 	accordionPanel.setSummaryText(expand);
 	accordionPanel.setContent(content);
-	accordionPanel.addOpenedChangeListener(new ComponentEventListener<Details.OpenedChangeEvent>() {
+	accordionPanel.addOpenedChangeListener((ComponentEventListener<OpenedChangeEvent>) event -> {
 
-	    @Override
-	    public void onComponentEvent(OpenedChangeEvent event) {
-
-		boolean opened = event.isOpened();
-		if (opened) {
-		    accordionPanel.setSummaryText(collapse);
-		} else {
-		    accordionPanel.setSummaryText(expand);
-		}
+	    boolean opened = event.isOpened();
+	    if (opened) {
+		accordionPanel.setSummaryText(collapse);
+	    } else {
+		accordionPanel.setSummaryText(expand);
 	    }
 	});
 
@@ -209,17 +205,13 @@ public class ComponentFactory {
 	details.getElement().getStyle().set("margin-top", "0px");
 	details.getElement().getStyle().set("width", "100%");
 
-	details.addOpenedChangeListener(new ComponentEventListener<Details.OpenedChangeEvent>() {
+	details.addOpenedChangeListener((ComponentEventListener<OpenedChangeEvent>) event -> {
 
-	    @Override
-	    public void onComponentEvent(OpenedChangeEvent event) {
-
-		boolean opened = event.isOpened();
-		if (opened) {
-		    details.setSummaryText(collapse);
-		} else {
-		    details.setSummaryText(expand);
-		}
+	    boolean opened = event.isOpened();
+	    if (opened) {
+		details.setSummaryText(collapse);
+	    } else {
+		details.setSummaryText(expand);
 	    }
 	});
 
@@ -279,7 +271,7 @@ public class ComponentFactory {
 	}
 
 	if (fontSize > 0) {
-	    out.getStyle().set("font-size", "" + fontSize + "px");
+	    out.getStyle().set("font-size", fontSize + "px");
 	}
 
 	return out;
@@ -318,9 +310,7 @@ public class ComponentFactory {
      */
     public static Div createDiv() {
 
-	Div div = new Div();
-
-	return div;
+	return new Div();
     }
 
     /**

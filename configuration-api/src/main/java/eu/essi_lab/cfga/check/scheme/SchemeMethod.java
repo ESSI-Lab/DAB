@@ -104,7 +104,7 @@ public class SchemeMethod implements CheckMethod {
 
 	CheckResponse response = new CheckResponse(getName());
 
-	List<Setting> outSettings = new ArrayList<Setting>();
+	List<Setting> outSettings = new ArrayList<>();
 
 	List<SchemeItem> required = descriptors.//
 		stream().//
@@ -119,8 +119,8 @@ public class SchemeMethod implements CheckMethod {
 
 		List<Function<Setting, Boolean>> functions = item.getDescriptors().//
 			stream().//
-			map(d -> d.describe()).//
-			collect(Collectors.toList());
+			map(SchemeItem.Descriptor::describe).//
+			toList();
 
 		boolean missing = configuration.list().//
 			stream().//
@@ -149,9 +149,7 @@ public class SchemeMethod implements CheckMethod {
 		boolean optionalSetting = descriptors.//
 			stream().//
 			filter(d -> !d.required() && !d.getDescriptors().isEmpty()).//
-			filter(i -> i.getDescriptors().stream().anyMatch(d -> d.describe().apply(setting))).//
-			findFirst().//
-			isPresent();
+			anyMatch(i -> i.getDescriptors().stream().anyMatch(d -> d.describe().apply(setting)));
 
 		if (!optionalSetting) {
 

@@ -1,104 +1,156 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>eu.essi_lab</groupId>
-		<artifactId>gs-lib</artifactId>
-		<version>1.0-SNAPSHOT</version>
-	</parent>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>eu.essi_lab</groupId>
+        <artifactId>gs-lib</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
-	<name>ESSI-Lab GI-suite Network Utilities</name>
-	<artifactId>gs-lib-net</artifactId>
+    <name>ESSI-Lab DAB Network Utilities</name>
+    <artifactId>gs-lib-net</artifactId>
 
-	<dependencies>
+    <dependencies>
 
-		<dependency>
-			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>s3-transfer-manager</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>auth</artifactId>
-			<version>${aws-java-sdk-bom.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>apache-client</artifactId>
-			<version>${aws-java-sdk-bom.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3-transfer-manager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>auth</artifactId>
+            <version>${aws-java-sdk-bom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache-client</artifactId>
+            <version>${aws-java-sdk-bom.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>software.amazon.awssdk.crt</groupId>
-			<artifactId>aws-crt</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk.crt</groupId>
+            <artifactId>aws-crt</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>core-datamodel</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-net</groupId>
-			<artifactId>commons-net</artifactId>
-		</dependency>
-		<!-- Required for HTTPServletRequest -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>core-datamodel</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+        </dependency>
+        <!-- Required for HTTPServletRequest -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>javax.mail-api</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>dev.failsafe</groupId>
-			<artifactId>failsafe</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>dev.failsafe</groupId>
+            <artifactId>failsafe</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>com.google.apis</groupId>
-			<artifactId>google-api-services-sheets</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-sheets</artifactId>
+        </dependency>
 
-<!-- RDF4J core (API + runtime) -->
-  <dependency>
-    <groupId>org.eclipse.rdf4j</groupId>
-    <artifactId>rdf4j-repository-sparql</artifactId>
-  </dependency>
+        <!-- RDF4J core (API + runtime) -->
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-repository-sparql</artifactId>
+        </dependency>
 
-  <dependency>
-    <groupId>org.eclipse.rdf4j</groupId>
-    <artifactId>rdf4j-repository-api</artifactId>
-  </dependency>
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-repository-api</artifactId>
+        </dependency>
 
-  <dependency>
-    <groupId>org.eclipse.rdf4j</groupId>
-    <artifactId>rdf4j-query</artifactId>
-  </dependency>
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-query</artifactId>
+        </dependency>
 
-  <dependency>
-    <groupId>org.eclipse.rdf4j</groupId>
-    <artifactId>rdf4j-rio-api</artifactId>
-  </dependency>
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-rio-api</artifactId>
+        </dependency>
 
-  <!-- FedX federated SPARQL engine -->
-  <dependency>
-    <groupId>org.eclipse.rdf4j</groupId>
-    <artifactId>rdf4j-tools-federation</artifactId>
-  </dependency>
-  <!-- (Optional) RDF4J tools/utilities if you want console/debugging -->
+        <!-- FedX federated SPARQL engine -->
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-tools-federation</artifactId>
+        </dependency>
+        <!-- (Optional) RDF4J tools/utilities if you want console/debugging -->
 
 
-	</dependencies>
+    </dependencies>
+    <profiles>
+        <profile>
+            <id>internaltest</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+
+                        <configuration>
+                            <images>
+
+                                <image>
+                                    <alias>keycloak-img</alias>
+                                    <name>${docker.keycloak}</name>
+                                    <run>
+                                        <ports>
+                                            <port>keycloak.port:8080</port>
+                                        </ports>
+                                        <wait>
+                                            <http>
+                                                <!--suppress MavenModelInspection -->
+                                                <url>http://admin:admin@${docker.host.address}:${keycloak.port}</url>
+                                            </http>
+                                            <time>${fabric8-timeout}</time>
+                                        </wait>
+                                        <env>
+                                            <KEYCLOAK_ADMIN>admin</KEYCLOAK_ADMIN>
+                                            <KEYCLOAK_ADMIN_PASSWORD>admin</KEYCLOAK_ADMIN_PASSWORD>
+                                        </env>
+                                        <volumes>
+                                            <bind>${project.basedir}/src/test/resources/keycloak:/opt/keycloak/data/import</bind>
+                                        </volumes>
+                                        <cmd>start-dev --import-realm</cmd>
+                                    </run>
+                                </image>
+
+                            </images>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>

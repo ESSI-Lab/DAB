@@ -40,9 +40,9 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 @SuppressWarnings("serial")
 public class SettingRemoveButtonListener implements ButtonChangeListener {
 
-    private SettingComponent component;
-    private Configuration configuration;
-    private TabContainer tabContainer;
+    private final SettingComponent component;
+    private final Configuration configuration;
+    private final TabContainer tabContainer;
 
     /**
      * @param configuration
@@ -76,7 +76,7 @@ public class SettingRemoveButtonListener implements ButtonChangeListener {
 
 	    tabContainer.removeSettingComponent(component, setting.getIdentifier());
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Removed setting: " + setting.getName());
+	    GSLoggerFactory.getLogger(getClass()).debug("Removed setting: {}", setting.getName());
 	}
     }
 

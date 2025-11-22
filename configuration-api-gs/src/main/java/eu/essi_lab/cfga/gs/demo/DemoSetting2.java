@@ -24,8 +24,8 @@ package eu.essi_lab.cfga.gs.demo;
 import java.util.UUID;
 
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -38,9 +38,9 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
  */
 public class DemoSetting2 extends SchedulerWorkerSetting {
 
-    private Setting rootNoRenderableSetting;
-    private Setting settingChild1;
-    private Setting settingChild2;
+    private final Setting rootNoRenderableSetting;
+    private final Setting settingChild1;
+    private final Setting settingChild2;
 
     /**
      * 
@@ -211,12 +211,12 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
 
 	    setForceReadOnly(false);
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(1).//
 		    withShowDirective("Demo setting 2").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 
@@ -231,7 +231,7 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
 	settingChild1.setSelected(true);
 
 	settingChild1.setSelectionMode(SelectionMode.SINGLE);
-	settingChild1.getSettings().get(0).setSelected(true);
+	settingChild1.getSettings().getFirst().setSelected(true);
     }
 
     /**
@@ -251,7 +251,7 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
 	//
 	//
 	rootNoRenderableSetting.setSelected(true);
-	rootNoRenderableSetting.getSettings().get(0).setSelected(true);
+	rootNoRenderableSetting.getSettings().getFirst().setSelected(true);
     }
 
     /**
@@ -275,7 +275,7 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
 	setSelectionMode(SelectionMode.MULTI);
 
 	settingChild1.setSelectionMode(SelectionMode.SINGLE);
-	settingChild1.getSettings().get(0).setSelected(true);
+	settingChild1.getSettings().getFirst().setSelected(true);
     }
 
 }

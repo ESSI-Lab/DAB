@@ -133,9 +133,7 @@ public class SpatialExtent implements SpatialEntity {
     @Override
     public boolean equals(Object obj) {
 
-	if (obj instanceof SpatialExtent) {
-
-	    SpatialExtent spatialExtent = (SpatialExtent) obj;
+	if (obj instanceof SpatialExtent spatialExtent) {
 
 	    double tol = 0.000000001;
 

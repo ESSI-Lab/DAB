@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch;
 
@@ -112,7 +112,7 @@ public class OpenSearchUtils {
 	    List<FieldValue> sortVals = hit.sortVals();
 
 	    if (!sortVals.isEmpty()) {
-		List<Object> values = new ArrayList<Object>();
+		List<Object> values = new ArrayList<>();
 		for (FieldValue fv : sortVals) {
 		    if (fv.isDouble()) {
 			values.add(fv.doubleValue());
@@ -173,7 +173,7 @@ public class OpenSearchUtils {
 		    mapType.getInstrumentId().add(item);
 		    break;
 		case INSTRUMENT_TITLE:
-		    mapType.getAttributeTitle().add(item);
+		    mapType.getInstrumentTitle().add(item);
 		    break;
 		case KEYWORD:
 		    mapType.getKeyword().add(item);
@@ -239,9 +239,7 @@ public class OpenSearchUtils {
      */
     public static List<JSONObject> toJSONSourcesList(SearchResponse<Object> searchResponse) {
 
-	List<JSONObject> list = toList(searchResponse, hit -> toJSONObject(hit.source()));
-
-	return list;
+	return toList(searchResponse, hit -> toJSONObject(hit.source()));
     }
 
     /**
@@ -263,14 +261,12 @@ public class OpenSearchUtils {
      */
     public static List<InputStream> toBinaryList(SearchResponse<Object> searchResponse) {
 
-	List<InputStream> list = toList(searchResponse, hit -> {
+	return toList(searchResponse, hit -> {
 
 	    SourceWrapper wrapper = new SourceWrapper(toJSONObject(hit.source()));
 	    String binaryValue = wrapper.getBinaryValue();
 	    return decode(binaryValue);
 	});
-
-	return list;
     }
 
     /**
@@ -290,8 +286,8 @@ public class OpenSearchUtils {
 
 	    if (resource.isEmpty()) {
 
-		GSLoggerFactory.getLogger(OpenSearchUtils.class).error("Error occurred while mapping resource of source {}",
-			toJSONObject(hit.source()));
+		GSLoggerFactory.getLogger(OpenSearchUtils.class)
+			.error("Error occurred while mapping resource of source {}", toJSONObject(hit.source()));
 		return null;
 	    }
 
@@ -313,7 +309,7 @@ public class OpenSearchUtils {
 
     /**
      * <b>NOTE</b>: if the given field is an array, only the first element is returned
-     * 
+     *
      * @param response
      * @param field
      * @return
@@ -327,25 +323,25 @@ public class OpenSearchUtils {
 
 		map(hit -> {
 
-		    JSONObject source = toJSONObject(hit.source());
-		    return decorateSource(source, hit.index(), hit.id());
-		}).//
+	    JSONObject source = toJSONObject(hit.source());
+	    return decorateSource(source, hit.index(), hit.id());
+	}).//
 
 		map(source -> {
 
-		    if (source.has(field)) {
+	    if (source.has(field)) {
 
-			Object object = source.get(field);
-			if (object instanceof JSONArray) {
+		Object object = source.get(field);
+		if (object instanceof JSONArray) {
 
-			    return ((JSONArray) object).get(0).toString();
-			}
+		    return ((JSONArray) object).get(0).toString();
+		}
 
-			return source.get(field).toString();
-		    }
+		return source.get(field).toString();
+	    }
 
-		    return null;
-		}).//
+	    return null;
+	}).//
 		filter(Objects::nonNull).//
 		collect(Collectors.toList());
     }
@@ -381,8 +377,8 @@ public class OpenSearchUtils {
 
 	    if (resource.isEmpty()) {
 
-		GSLoggerFactory.getLogger(OpenSearchUtils.class).error("Error occurred while mapping resource of source {}",
-			toJSONObject(hit.source()));
+		GSLoggerFactory.getLogger(OpenSearchUtils.class)
+			.error("Error occurred while mapping resource of source {}", toJSONObject(hit.source()));
 		return null;
 	    }
 
@@ -581,15 +577,11 @@ public class OpenSearchUtils {
 		ResourceType type = ResourceType.fromType(//
 			source.getJSONArray(ResourceProperty.TYPE.getName()).getString(0));
 
-		switch (type) {
-		case DATASET:
-		    res = new Dataset();
-		    break;
-
-		case DATASET_COLLECTION:
-		    res = new DatasetCollection();
-		    break;
-		}
+		res = switch (type) {
+		    case DATASET -> new Dataset();
+		    case DATASET_COLLECTION -> new DatasetCollection();
+		    default -> throw new IllegalArgumentException("Unsupported resource type: " + type);
+		};
 	    }
 
 	    return Optional.of(ResourceDecorator.get().decorate(source, res));
@@ -702,7 +694,7 @@ public class OpenSearchUtils {
 	    date = ISO8601DateTimeUtils.parseISO8601ToDate(dateTime);
 	}
 
-	if (!date.isEmpty()) {
+	if (date.isPresent()) {
 
 	    int year = date.get().getYear();
 	    if (year > 9999) {
@@ -710,7 +702,7 @@ public class OpenSearchUtils {
 		return Optional.empty();
 	    }
 
-	    return date.map(d -> d.getTime());
+	    return date.map(Date::getTime);
 	}
 
 	return Optional.empty();
@@ -764,14 +756,12 @@ public class OpenSearchUtils {
 
 	List<Hit<Object>> hitsList = hits.hits();
 
-	List<T> list = hitsList.stream().//
+	return hitsList.stream().//
 
 		map(mapper).//
 
 		filter(Objects::nonNull).//
 
 		collect(Collectors.toList());
-
-	return list;
     }
 }

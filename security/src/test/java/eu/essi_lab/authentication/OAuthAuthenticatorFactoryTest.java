@@ -15,10 +15,10 @@ import eu.essi_lab.model.exceptions.GSException;
 public class OAuthAuthenticatorFactoryTest {
 
     @Test
-    public void faceBookTest() throws GSException {
+    public void keycloakTest() throws GSException {
 
 	OAuthSetting setting = new OAuthSetting();
-	setting.selectProvider(OAuthProvider.FACEBOOK);
+	setting.selectProvider(OAuthProvider.KEYCLOAK);
 
 	setting.setClientId("clientId");
 	setting.setClientSecret("clientSecret");
@@ -31,27 +31,7 @@ public class OAuthAuthenticatorFactoryTest {
 	Assert.assertEquals(setting.getClientId().get(), clientId);
 	Assert.assertEquals(setting.getClientSecret().get(), clientSecret);
 
-	assertEquals(FacebookOAuth2Authenticator.class, oAuthAuthenticator.getClass());
-    }
-
-    @Test
-    public void twitterTest() throws GSException {
-
-	OAuthSetting setting = new OAuthSetting();
-	setting.selectProvider(OAuthProvider.TWITTER);
-
-	setting.setClientId("clientId");
-	setting.setClientSecret("clientSecret");
-
-	OAuth2Authenticator oAuthAuthenticator = OAuth2AuthenticatorFactory.get(setting);
-
-	String clientId = oAuthAuthenticator.getClientId();
-	String clientSecret = oAuthAuthenticator.getClientSecret();
-
-	Assert.assertEquals(setting.getClientId().get(), clientId);
-	Assert.assertEquals(setting.getClientSecret().get(), clientSecret);
-
-	assertEquals(TwitterOAuthAuthenticator.class, oAuthAuthenticator.getClass());
+	assertEquals(KeycloackOAuthAuthenticator.class, oAuthAuthenticator.getClass());
     }
 
     @Test

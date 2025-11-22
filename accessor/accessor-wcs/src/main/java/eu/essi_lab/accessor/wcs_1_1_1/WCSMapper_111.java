@@ -26,7 +26,7 @@ package eu.essi_lab.accessor.wcs_1_1_1;
 
 import eu.essi_lab.accessor.wcs.WCSConnector;
 import eu.essi_lab.accessor.wcs_1_1_0.WCSMapper_110;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 
 /**
  * @author Fabrizio
@@ -36,7 +36,7 @@ public class WCSMapper_111 extends WCSMapper_110 {
     @Override
     protected String getWCSProtocol() {
 
-	return NetProtocols.WCS_1_1_1.getCommonURN();
+	return NetProtocolWrapper.WCS_1_1_1.getCommonURN();
     }
 
     @Override

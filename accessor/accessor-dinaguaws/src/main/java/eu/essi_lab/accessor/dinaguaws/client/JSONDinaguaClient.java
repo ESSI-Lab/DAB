@@ -114,7 +114,7 @@ public class JSONDinaguaClient extends DinaguaClient {
 	InputStream content = response.body();
 
 	String token = IOStreamUtils.asUTF8String(content);
-
+	
 	if (token != null && token.toLowerCase().contains("forbidden")) {
 
 	    throw GSException.createException(//
@@ -124,7 +124,7 @@ public class JSONDinaguaClient extends DinaguaClient {
 		    ErrorInfo.SEVERITY_ERROR, //
 		    DINAGUA_CREDENTIALS_INVALID_ERROR);
 	}
-
+	GSLoggerFactory.getLogger(getClass()).info("Got token: {}",token);
 	return token;
     }
 
@@ -373,7 +373,14 @@ public class JSONDinaguaClient extends DinaguaClient {
 
 	if (statusStations.size() == 0) {
 
-	    String response = downloadString(getEndpoint() + "/estadohidro/estaciones").get();
+	    String url = getEndpoint() + "/estadohidro/estaciones";
+	    Optional<String> stringResponse = downloadString(url);
+	    if (!stringResponse.isPresent()) {
+		String msg = "missing response from URL: " + url;
+		GSLoggerFactory.getLogger(getClass()).error(msg);
+		throw new RuntimeException(msg);
+	    }
+	    String response = stringResponse.get();
 
 	    JSONArray stationsArray = new JSONArray(response);
 

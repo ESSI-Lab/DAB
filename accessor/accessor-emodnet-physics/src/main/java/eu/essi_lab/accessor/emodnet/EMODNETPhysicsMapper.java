@@ -22,15 +22,14 @@ package eu.essi_lab.accessor.emodnet;
  */
 
 import java.math.BigDecimal;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.AbstractMap.SimpleEntry;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

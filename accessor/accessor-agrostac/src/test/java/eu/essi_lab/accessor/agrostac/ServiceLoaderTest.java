@@ -68,9 +68,9 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(AgrostacGranulesAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(AgrostacGranulesAccessor.class, accessors.getFirst().getClass());
 
-	    Assert.assertEquals(AgrostacGranulesAccessor.TYPE, accessors.get(0).getType());
+	    Assert.assertEquals(AgrostacGranulesAccessor.TYPE, accessors.getFirst().getType());
 
 	}
 
@@ -79,7 +79,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(AgrostacGranulesAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(AgrostacGranulesAccessor.class, accessors.getFirst().getClass());
 	}
 
 	{
@@ -97,9 +97,9 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(1, accessors.size());
 
-	    Assert.assertEquals(AgrostacAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(AgrostacAccessor.class, accessors.getFirst().getClass());
 
-	    Assert.assertEquals(AgrostacAccessor.TYPE, accessors.get(0).getType());
+	    Assert.assertEquals(AgrostacAccessor.TYPE, accessors.getFirst().getType());
 	}
 
     }
@@ -155,11 +155,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<IResourceMapper> loader = ServiceLoader.load(IResourceMapper.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(AgrostacGranulesMapper.WORLDCEREAL_GRANULES_SCHEME_URI))
-		.findFirst().isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(AgrostacGranulesMapper.WORLDCEREAL_GRANULES_SCHEME_URI)));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(c -> c.getSupportedOriginalMetadataSchema().equals(AgrostacCollectionMapper.SCHEMA_URI)).findFirst().isPresent());
+		anyMatch(c -> c.getSupportedOriginalMetadataSchema().equals(AgrostacCollectionMapper.SCHEMA_URI)));
 
     }
 
@@ -170,24 +169,16 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(AgrostacGranulesConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(AgrostacGranulesConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(AgrostacGranulesAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(AgrostacGranulesAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(AgrostacConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(AgrostacConnector.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(AgrostacAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(AgrostacAccessor.class.getName())));
 
     }
 

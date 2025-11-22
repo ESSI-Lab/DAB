@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import org.terracotta.statistics.StatisticMapper;
+
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -98,11 +100,11 @@ public class SourceStatistics {
 			MetadataElement.ATTRIBUTE_TITLE, //
 			MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER, //
 			MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, //
-			MetadataElement.ONLINE_ID//
+			MetadataElement.IDENTIFIER//
 		));
 
 	// statisticsMessage.computeSum(Arrays.asList(MetadataElement.DATA_SIZE));
-
+	
 	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
 	IStatisticsExecutor executor = loader.iterator().next();
 
@@ -113,7 +115,7 @@ public class SourceStatistics {
 	    stats.setSiteCount(responseItem.getCountDistinct(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER).get().getValue());
 	    stats.setUniqueAttributeCount(responseItem.getCountDistinct(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER).get().getValue());
 	    stats.setAttributeCount(responseItem.getCountDistinct(MetadataElement.ATTRIBUTE_TITLE).get().getValue());
-	    stats.setTimeSeriesCount(responseItem.getCountDistinct(MetadataElement.ONLINE_ID).get().getValue());
+	    stats.setTimeSeriesCount(responseItem.getCountDistinct(MetadataElement.IDENTIFIER).get().getValue());
 	    Optional<CardinalValues> cardinalValues = responseItem.getBBoxUnion().getCardinalValues();
 	    String union = responseItem.getTempExtentUnion().getValue();
 	    String begin = union.split(" ")[0];

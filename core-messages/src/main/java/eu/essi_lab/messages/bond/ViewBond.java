@@ -62,8 +62,7 @@ public class ViewBond implements Bond {
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof ViewBond) {
-	    ViewBond vb = (ViewBond) obj;
+	if (obj instanceof ViewBond vb) {
 	    return Objects.equals(vb.getViewIdentifier(), getViewIdentifier());
 	}
 	return super.equals(obj);

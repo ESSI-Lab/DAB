@@ -63,9 +63,9 @@ public class InputPattern {
 	    "^(\\w+|\\w+-{1})+$", //
 	    "^(\\w+|\\w+-{1})*$");
 
-    private String pattern;
-    private String requiredPattern;
-    private String name;
+    private final String pattern;
+    private final String requiredPattern;
+    private final String name;
 
     /**
      * @param name
@@ -119,7 +119,7 @@ public class InputPattern {
 	return fields.//
 		stream().//
 		filter(f -> Modifier.isStatic(f.getModifiers())).//
-		map(f -> fromField(f)).//
+		map(InputPattern::fromField).//
 		filter(Objects::nonNull).//
 		filter(i -> i.getName() != null && i.getName().equals(name)).//
 		findFirst().//

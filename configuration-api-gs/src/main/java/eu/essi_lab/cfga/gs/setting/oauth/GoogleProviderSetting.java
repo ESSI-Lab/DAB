@@ -31,7 +31,7 @@ import org.json.JSONObject;
  */
 public class GoogleProviderSetting extends OAuthProviderSetting {
     
-    static String IDENTIFIER = "googleProviderSetting";
+    static final String IDENTIFIER = "googleProviderSetting";
 
     /**
      * 

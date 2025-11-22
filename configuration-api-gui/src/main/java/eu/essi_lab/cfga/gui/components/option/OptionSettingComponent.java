@@ -71,7 +71,7 @@ public class OptionSettingComponent extends VerticalLayout {
 
 	case SINGLE: {
 
-	    ComboBox<String> select = new ComboBox<String>();
+	    ComboBox<String> select = new ComboBox<>();
 	    select.setWidthFull();
 	    select.getStyle().set("margin-bottom", "10px");
 
@@ -80,7 +80,7 @@ public class OptionSettingComponent extends VerticalLayout {
 	    select.setRequired(option.isRequired());
 	    select.setRequiredIndicatorVisible(option.isRequired());
 
-	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Initialing multi select for option: " + option.getKey());
+	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Initialing multi select for option: {}", option.getKey());
 
 	    //
 	    //
@@ -89,11 +89,11 @@ public class OptionSettingComponent extends VerticalLayout {
 	    List<String> values = option.//
 		    getValues().//
 		    stream().//
-		    map(s -> s.getName()).//
+		    map(Setting::getName).//
 		    sorted().//
 		    collect(Collectors.toList());
 
-	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Values: " + values);
+	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Values: {}", values);
 
 	    select.setItems(values);
 
@@ -111,23 +111,19 @@ public class OptionSettingComponent extends VerticalLayout {
 		select.setReadOnly(true);
 	    }
 
-	    select.addValueChangeListener(new ValueChangeListener<ValueChangeEvent<?>>() {
+	    select.addValueChangeListener((ValueChangeListener<ValueChangeEvent<?>>) event -> {
 
-		@Override
-		public void valueChanged(ValueChangeEvent<?> event) {
+		getChildren().filter(c -> !(c instanceof ComboBox)).forEach(this::remove);
 
-		    getChildren().filter(c -> !(c instanceof ComboBox)).forEach(c -> remove(c));
+		Object value = event.getValue();
 
-		    Object value = event.getValue();
+		option.select(s -> s.getName().equals(value.toString()));
 
-		    option.select(s -> s.getName().equals(value.toString()));
+		Setting selectedValue = option.getSelectedValue();
 
-		    Setting selectedValue = option.getSelectedValue();
+		setting.addSetting(selectedValue);
 
-		    setting.addSetting(selectedValue);
-
-		    add(SettingComponentFactory.createSettingComponent(configuration, selectedValue.getIdentifier(), false));
-		}
+		add(SettingComponentFactory.createSettingComponent(configuration, selectedValue.getIdentifier(), false));
 	    });
 
 	    break;
@@ -145,7 +141,7 @@ public class OptionSettingComponent extends VerticalLayout {
 	    select.setRequired(option.isRequired());
 	    select.setRequiredIndicatorVisible(option.isRequired());
 
-	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Initialing multi select for option: " + option.getKey());
+	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Initialing multi select for option: {}", option.getKey());
 
 	    //
 	    //
@@ -154,11 +150,11 @@ public class OptionSettingComponent extends VerticalLayout {
 	    List<String> values = option.//
 		    getValues().//
 		    stream().//
-		    map(s -> s.getName()).//
+		    map(Setting::getName).//
 		    sorted().//
 		    collect(Collectors.toList());
 
-	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Values: " + values);
+	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Values: {}", values);
 
 	    select.setItems(values);
 
@@ -176,23 +172,19 @@ public class OptionSettingComponent extends VerticalLayout {
 		select.setReadOnly(true);
 	    }
 
-	    select.addValueChangeListener(new ValueChangeListener<ValueChangeEvent<?>>() {
+	    select.addValueChangeListener((ValueChangeListener<ValueChangeEvent<?>>) event -> {
 
-		@Override
-		public void valueChanged(ValueChangeEvent<?> event) {
+		getChildren().filter(c -> !(c instanceof ComboBox)).forEach(this::remove);
 
-		    getChildren().filter(c -> !(c instanceof ComboBox)).forEach(c -> remove(c));
+		Object value = event.getValue();
 
-		    Object value = event.getValue();
+		option.select(s -> s.getName().equals(value.toString()));
 
-		    option.select(s -> s.getName().equals(value.toString()));
+		Setting selectedValue = option.getSelectedValue();
 
-		    Setting selectedValue = option.getSelectedValue();
+		setting.addSetting(selectedValue);
 
-		    setting.addSetting(selectedValue);
-
-		    add(SettingComponentFactory.createSettingComponent(configuration, selectedValue.getIdentifier(), false));
-		}
+		add(SettingComponentFactory.createSettingComponent(configuration, selectedValue.getIdentifier(), false));
 	    });
 	}
     }

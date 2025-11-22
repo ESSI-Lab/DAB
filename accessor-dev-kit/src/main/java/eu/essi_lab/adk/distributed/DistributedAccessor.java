@@ -220,12 +220,8 @@ public abstract class DistributedAccessor<C extends IDistributedQueryConnector> 
 	    } else {
 
 		tfMap = optMap.get();
-		try {
-		    mapType = tfMap.getElement();
-		} catch (JAXBException e) {
-		    // TODO Auto-generated catch block
-		    e.printStackTrace();
-		}
+		mapType = tfMap.getElement();
+
 	    }
 
 	    Optional.of(mapType).ifPresent(mt -> mt.getSourceId().add(item));

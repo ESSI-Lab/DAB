@@ -45,8 +45,8 @@ import eu.essi_lab.lib.xml.XPathResultType;
  */
 public class XMLDocumentHandler {
 
-    private Document targetDoc;
-    private XPath xpath;
+    private final Document targetDoc;
+    private final XPath xpath;
 
     /**
      * @param targetDoc
@@ -81,13 +81,11 @@ public class XMLDocumentHandler {
      */
     public List<Node> evaluateNodes(String xPath) throws XPathExpressionException {
 
-	ArrayList<Node> result = new ArrayList<Node>();
+	ArrayList<Node> result = new ArrayList<>();
 
 	Object ret = this.evaluate(xPath, XPathResultType.NODESET);
 
-	if (ret instanceof NodeList) {
-
-	    NodeList nodes = (NodeList) ret;
+	if (ret instanceof NodeList nodes) {
 
 	    for (int i = 0; i < nodes.getLength(); i++) {
 		Node item = nodes.item(i);
@@ -120,7 +118,7 @@ public class XMLDocumentHandler {
 
 	return evaluateNodes(xPath).//
 		stream().//
-		map(n -> n.getNodeValue()).//
+		map(Node::getNodeValue).//
 		filter(Objects::nonNull).//
 		collect(Collectors.toList());
     }
@@ -160,9 +158,7 @@ public class XMLDocumentHandler {
 
 	Object ret = this.evaluate(xpathExpression, XPathResultType.NODESET);
 
-	if (ret instanceof NodeList) {
-
-	    NodeList nodes = (NodeList) ret;
+	if (ret instanceof NodeList nodes) {
 
 	    for (int i = 0; i < nodes.getLength(); i++) {
 		Node item = nodes.item(i);
@@ -195,7 +191,7 @@ public class XMLDocumentHandler {
 	// removes also the "indent" before the element and the "carriage return"
 	// see GIP-293
 	//
-	if (prev != null && prev.getNodeType() == Node.TEXT_NODE && prev.getNodeValue().trim().length() == 0) {
+	if (prev != null && prev.getNodeType() == Node.TEXT_NODE && prev.getNodeValue().trim().isEmpty()) {
 	    node.getParentNode().removeChild(prev);
 	}
 

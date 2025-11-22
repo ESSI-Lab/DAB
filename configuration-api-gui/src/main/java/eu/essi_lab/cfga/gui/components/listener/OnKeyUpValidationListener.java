@@ -45,7 +45,7 @@ public interface OnKeyUpValidationListener<T> extends ComponentEventListener<Key
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public default void onComponentEvent(KeyUpEvent event) {
+    default void onComponentEvent(KeyUpEvent event) {
 
 	((Focusable) event.getSource()).blur();
 
@@ -60,5 +60,5 @@ public interface OnKeyUpValidationListener<T> extends ComponentEventListener<Key
      * @param value
      * @return
      */
-    public boolean isInvalid(T value);
+    boolean isInvalid(T value);
 }

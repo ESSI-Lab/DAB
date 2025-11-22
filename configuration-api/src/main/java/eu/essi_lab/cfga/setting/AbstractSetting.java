@@ -21,19 +21,18 @@ package eu.essi_lab.cfga.setting;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.json.JSONObject;
-
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.validation.ValidationContext;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse;
 import eu.essi_lab.cfga.setting.validation.Validator;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import org.json.JSONObject;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Fabrizio
@@ -41,35 +40,35 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public abstract class AbstractSetting extends ConfigurationObject {
 
     /**
-     * 
+     *
      */
-    public static Property<Boolean> COMPACT_MODE = Property.of("CompactMode", "compactMode", true, Optional.of(true)); //
+    public static final Property<Boolean> COMPACT_MODE = Property.of("CompactMode", "compactMode", true, Optional.of(true)); //
     /**
-     * 
+     *
      */
-    public static Property<Boolean> FOLDED_MODE = Property.of("FoldedMode", "foldedMode", true, Optional.of(false));//
+    public static final Property<Boolean> FOLDED_MODE = Property.of("FoldedMode", "foldedMode", true, Optional.of(false));//
     /**
-     * 
+     *
      */
-    public static Property<Boolean> CAN_BE_REMOVED = Property.of("CanBeRemoved", "canBeRemoved", true, Optional.of(false)); //
+    public static final Property<Boolean> CAN_BE_REMOVED = Property.of("CanBeRemoved", "canBeRemoved", true, Optional.of(false)); //
     /**
-     * 
+     *
      */
-    public static Property<Boolean> CAN_BE_CLEANED = Property.of("CanBeCleaned", "canBeCleaned", true, Optional.of(true)); //
+    public static final Property<Boolean> CAN_BE_CLEANED = Property.of("CanBeCleaned", "canBeCleaned", true, Optional.of(true)); //
     /**
-     * 
+     *
      */
-    public static Property<Boolean> SHOW_HEADER = Property.of("ShowHeader", "showHeader", true, Optional.of(true));
+    public static final Property<Boolean> SHOW_HEADER = Property.of("ShowHeader", "showHeader", true, Optional.of(true));
 
     /**
-     * 
+     *
      */
-    public static Property<? extends ObjectExtension> EXTENSION = Property.of("Extension", "extensionClass", false, Optional.empty());
+    public static final Property<? extends ObjectExtension> EXTENSION = Property.of("Extension", "extensionClass", false, Optional.empty());
 
     /**
-     * 
+     *
      */
-    public static Property<? extends Validator> VALIDATOR = Property.of("Validator", "validatorClass", false, Optional.empty());
+    public static final Property<? extends Validator> VALIDATOR = Property.of("Validator", "validatorClass", false, Optional.empty());
 
     public AbstractSetting() {
     }
@@ -131,17 +130,15 @@ public abstract class AbstractSetting extends ConfigurationObject {
 		stream().//
 		filter(k -> { //
 
-		    Object obj = getObject().get(k);
+	    Object obj = getObject().get(k);
 
-		    if (obj instanceof JSONObject) {
+	    if (obj instanceof JSONObject jsonObject) {
 
-			JSONObject jsonObject = (JSONObject) obj;
+		return jsonObject.has(OBJECT_TYPE.getKey()) && jsonObject.getString(OBJECT_TYPE.getKey()).equals("option");
+	    }
 
-			return jsonObject.has(OBJECT_TYPE.getKey()) && jsonObject.getString(OBJECT_TYPE.getKey()).equals("option");
-		    }
-
-		    return false;
-		}).
+	    return false;
+	}).
 
 		map(k -> new Option<>(getObject().getJSONObject(k))).//
 
@@ -189,10 +186,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
     }
 
     /**
-     * Default: true
-     * -
-     * This property tells the client to compact all the options inside a component
-     * such as an accordion or a details pane
+     * Default: true - This property tells the client to compact all the options inside a component such as an accordion or a details pane
      */
     public void enableCompactMode(boolean set) {
 
@@ -208,10 +202,8 @@ public abstract class AbstractSetting extends ConfigurationObject {
     }
 
     /**
-     * Default: false
-     * -
-     * This property tells the client to insert the whole setting component inside a component
-     * such as an accordion or a details pane
+     * Default: false - This property tells the client to insert the whole setting component inside a component such as an accordion or a
+     * details pane
      */
     public void enableFoldedMode(boolean set) {
 
@@ -228,7 +220,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
 
     /**
      * Default: false
-     * 
+     *
      * @param canBeRemoved
      */
     public void setCanBeRemoved(boolean canBeRemoved) {
@@ -261,10 +253,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
     }
 
     /**
-     * Default: true
-     * -
-     * -
-     * This property tells the client to show/hide the header
+     * Default: true - - This property tells the client to show/hide the header
      */
     public void setShowHeader(boolean showHeader) {
 
@@ -365,6 +354,15 @@ public abstract class AbstractSetting extends ConfigurationObject {
     }
 
     /**
+     *
+     */
+    public void removeValidator() {
+
+	getObject().remove(VALIDATOR.getKey());
+
+    }
+
+    /**
      * @return
      */
     public Optional<Class<? extends Validator>> getOptionalValidatorClass() {
@@ -418,12 +416,8 @@ public abstract class AbstractSetting extends ConfigurationObject {
 
 	Optional<Validator> validator = getValidator();
 
-	if (validator.isPresent()) {
+	return validator.map(value -> value.validate(configuration, (Setting) this, context));
 
-	    return Optional.of(validator.get().validate(configuration, (Setting) this, context));
-	}
-
-	return Optional.empty();
     }
 
     @Override

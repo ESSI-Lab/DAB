@@ -8,7 +8,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.openrdf.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.lib.xml.XMLNodeReader;

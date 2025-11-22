@@ -36,20 +36,20 @@ public class ConfigurationChecker {
     /**
      * 
      */
-    private List<CheckResponse> responseList;
+    private final List<CheckResponse> responseList;
 
     /**
      * 
      */
-    private List<CheckMethod> methodsList;
+    private final List<CheckMethod> methodsList;
 
     /**
      * 
      */
     public ConfigurationChecker() {
 
-	responseList = new ArrayList<CheckResponse>();
-	methodsList = new ArrayList<CheckMethod>();
+	responseList = new ArrayList<>();
+	methodsList = new ArrayList<>();
     }
 
     /**
@@ -88,7 +88,7 @@ public class ConfigurationChecker {
 	return check(configuration).//
 		stream().//
 		filter(r -> r.getCheckResult() == CheckResult.CHECK_FAILED).//
-		map(r -> r.getCheckResult()).//
+		map(CheckResponse::getCheckResult).//
 		findFirst().//
 		orElse(CheckResult.CHECK_SUCCESSFUL);
     }

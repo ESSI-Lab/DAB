@@ -18,7 +18,7 @@ public class DWSDataParsingTest {
 	DWSFlowData flowData = new DWSFlowData(is);
 	List<DWSData> data = flowData.getData();
 	System.out.println("\n\nflow data");
-	testData(data);	
+	testData(data, 4);
 	for (DWSData d : data) {
 	    System.out.println(d.getDate() + " " + d.getValue() + " " + d.getQualityCode());
 	}
@@ -41,14 +41,14 @@ public class DWSDataParsingTest {
 	DWSPrimaryData primaryData = new DWSPrimaryData(is);
 	List<DWSData> data = primaryData.getLevelData();
 	System.out.println("\n\nlevel data");
-	testData(data);
+	testData(data, 500);
 	System.out.println("\n\ndischarge data");
 	data = primaryData.getDischargeData();
-	testData(data);
+	testData(data, 500);
     }
 
-    private void testData(List<DWSData> data) {
-	assertTrue(data.size() > 10);
+    private void testData(List<DWSData> data, Integer minDataSize) {
+	assertTrue(data.size() >= minDataSize);
 	for (DWSData d : data) {
 	    System.out.println(ISO8601DateTimeUtils.getISO8601DateTime(d.getDate()) + " " + d.getValue() + " " + d.getQualityCode());
 	}

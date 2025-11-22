@@ -35,5 +35,5 @@ public interface BondParser<H extends LogicalBondHandler> {
      * 
      * @param handler
      */
-    public void parse(H handler);
+    void parse(H handler);
 }

@@ -62,7 +62,7 @@ public class SimpleConfiguration extends DefaultConfiguration {
 	ConfigurableLoader.load().//
 		filter(c -> c.getSetting() instanceof ProfilerSetting).//
 		map(c -> (ProfilerSetting) c.getSetting()).//
-		forEach(s -> this.put(s));
+		forEach(this::put);
 
 	//
 	// --- Database - Volatile as default ---

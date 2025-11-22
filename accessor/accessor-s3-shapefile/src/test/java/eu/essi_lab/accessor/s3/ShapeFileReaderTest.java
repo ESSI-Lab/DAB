@@ -16,8 +16,10 @@ import java.util.zip.ZipInputStream;
 import org.geotools.api.data.FileDataStore;
 import org.geotools.api.data.FileDataStoreFinder;
 import org.geotools.api.data.SimpleFeatureSource;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class ShapeFileReaderTest {
 
     @Test

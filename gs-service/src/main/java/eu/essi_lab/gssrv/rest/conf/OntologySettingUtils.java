@@ -30,10 +30,10 @@ import javax.ws.rs.core.Response.Status;
 
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.OntologySetting;
-import eu.essi_lab.cfga.gs.setting.OntologySetting.Availability;
-import eu.essi_lab.cfga.gs.setting.OntologySetting.DataModel;
-import eu.essi_lab.cfga.gs.setting.OntologySetting.QueryLanguage;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.Availability;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.DataModel;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.QueryLanguage;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.gssrv.rest.conf.ConfigService.SettingFinder;
 import eu.essi_lab.gssrv.rest.conf.requests.ontology.EditOntologyRequest;

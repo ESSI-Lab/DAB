@@ -69,7 +69,7 @@ public class PerformanceLogger {
 	OPENSEARCH_FINDER_DISCOVERY, //
 	OPENSEARCH_FINDER_RESOURCES_CREATION, //
 
-	ITERATED_WORKFLOW;
+	ITERATED_WORKFLOW
 
     }
 
@@ -78,10 +78,7 @@ public class PerformanceLogger {
 	chronometer.start();
 	this.phase = p;
 	this.rid = requestIdentifier;
-	if (webRequest.isPresent())
-	    this.qs = Optional.ofNullable(webRequest.get().getQueryString());
-	else
-	    this.qs = Optional.empty();
+	this.qs = webRequest.map(WebRequest::getQueryString);
 
     }
 

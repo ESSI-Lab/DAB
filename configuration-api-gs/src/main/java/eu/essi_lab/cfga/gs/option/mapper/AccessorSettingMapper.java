@@ -48,13 +48,11 @@ public abstract class AccessorSettingMapper extends OptionValueMapper<AccessorSe
     @Override
     public AccessorSetting fromString(String value) {
 
-	AccessorSetting output = loadSettings().//
+	return loadSettings().//
 		stream().//
 		filter(h -> h.getName().equals(value)).//
 		findFirst().//
 		get();
-
-	return output;
     }
 
     /**

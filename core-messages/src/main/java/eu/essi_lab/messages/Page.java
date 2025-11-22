@@ -21,6 +21,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -33,6 +34,7 @@ public class Page implements Serializable {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = 8396125519488916683L;
 
     protected int start;

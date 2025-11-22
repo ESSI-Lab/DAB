@@ -31,7 +31,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(2, accessors.size());
 
-	    Assert.assertEquals(ElixirENAAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(ElixirENAAccessor.class, accessors.getFirst().getClass());
 
 	}
 
@@ -42,7 +42,7 @@ public class ServiceLoaderTest {
 
 	    Assert.assertEquals(2, accessors.size());
 
-	    Assert.assertEquals(ElixirENAAccessor.class, accessors.get(0).getClass());
+	    Assert.assertEquals(ElixirENAAccessor.class, accessors.getFirst().getClass());
 	}
 
 	{
@@ -64,8 +64,7 @@ public class ServiceLoaderTest {
 		StreamUtils
 			.iteratorToStream(//
 				loader.iterator())
-			.filter(c -> c.getClass().equals(ElixirENAConnector.class)).//
-			findFirst().isPresent());//
+			.anyMatch(c -> c.getClass().equals(ElixirENAConnector.class)));//
     }
 
     @SuppressWarnings("rawtypes")
@@ -75,14 +74,10 @@ public class ServiceLoaderTest {
 	ServiceLoader<Configurable> loader = ServiceLoader.load(Configurable.class);
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(ElixirENAAccessor.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(ElixirENAAccessor.class.getName())));
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
-		.filter(c -> c.getClass().getName().equals(ElixirENAConnector.class.getName())).//
-		findFirst().//
-		isPresent());
+		.anyMatch(c -> c.getClass().getName().equals(ElixirENAConnector.class.getName())));
 
     }
 }

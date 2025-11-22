@@ -29,11 +29,10 @@ import org.json.JSONObject;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.sensorthings._1_1.model.UnitOfMeasurement;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Datastream;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Location;
@@ -64,7 +63,7 @@ public class BRGM_WQMapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addInstrument(Datastream stream, CoreMetadata coreMetadata, Keywords keywords) {
+    protected void addInstrument(Datastream stream, CoreMetadata coreMetadata, KeywordsCollector keywords) {
 
 	MIInstrument instrument = null;
 	Optional<Sensor> optSensor = stream.getSensor();
@@ -136,7 +135,7 @@ public class BRGM_WQMapper extends SensorThingsMapper {
      * @param dataId
      */
     @Override
-    protected void addVerticalExtent(Thing thing, Keywords keywords, DataIdentification dataId) {
+    protected void addVerticalExtent(Thing thing, KeywordsCollector keywords, DataIdentification dataId) {
 
 	if (thing.getProperties().isPresent()) {
 
@@ -151,19 +150,19 @@ public class BRGM_WQMapper extends SensorThingsMapper {
 
 		VerticalExtent verticalExtent = new VerticalExtent();
 
- 		if (elevation != Integer.MAX_VALUE) {
+		if (elevation != Integer.MAX_VALUE) {
 
 		    verticalExtent.setMinimumValue(elevation);
 		    verticalExtent.setMaximumValue(elevation);
 
-//		    String elevationDatum = properties.optString("srs");
-//		    if (!elevationDatum.isEmpty()) {
-//
-//			VerticalCRS verticalCRS = new VerticalCRS();
-//			verticalCRS.setId(elevationDatum);
-//
-//			verticalExtent.setVerticalCRS(verticalCRS);
-//		    }
+		    // String elevationDatum = properties.optString("srs");
+		    // if (!elevationDatum.isEmpty()) {
+		    //
+		    // VerticalCRS verticalCRS = new VerticalCRS();
+		    // verticalCRS.setId(elevationDatum);
+		    //
+		    // verticalExtent.setVerticalCRS(verticalCRS);
+		    // }
 
 		    dataId.addVerticalExtent(verticalExtent);
 		}
@@ -179,7 +178,8 @@ public class BRGM_WQMapper extends SensorThingsMapper {
      * @return
      */
     @Override
-    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,ExtensionHandler handler) {
+    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, KeywordsCollector keywords,
+	    ExtensionHandler handler) {
 
 	Location location = thing.getLocations().get(0);
 
@@ -216,7 +216,7 @@ public class BRGM_WQMapper extends SensorThingsMapper {
 	    if (thing.getProperties().get().has("network")) {
 
 		JSONArray network = thing.getProperties().get().getJSONArray("network");
-		network.forEach(n -> addKeyword(keywords, ((JSONObject) n).getString("libelle")));
+		network.forEach(n -> keywords.addKeyword(((JSONObject) n).getString("libelle"), "network"));
 	    }
 	}
 
@@ -240,15 +240,11 @@ public class BRGM_WQMapper extends SensorThingsMapper {
      * @param keywords
      */
     @Override
-    protected void addBoundingBox(Thing thing, DataIdentification dataId, Keywords keywords) {
+    protected void addBoundingBox(Thing thing, DataIdentification dataId, KeywordsCollector keywords) {
 
 	Location location = thing.getLocations().get(0);
 
 	GeographicBoundingBox boundingBox = null;
-
-	// should be "application/vnd.geo+json"
-	Optional<String> locationEncodingType = location.getEncodingType();
-	locationEncodingType.ifPresent(enc -> addKeyword(keywords, enc));
 
 	if (location.getLocation().has("coordinates")) {
 
@@ -271,6 +267,6 @@ public class BRGM_WQMapper extends SensorThingsMapper {
     @Override
     protected String getSupportedProtocol() {
 
-	return NetProtocols.SENSOR_THINGS_1_0_BRGM_WQ.getCommonURN();
+	return NetProtocolWrapper.SENSOR_THINGS_1_0_BRGM_WQ.getCommonURN();
     }
 }

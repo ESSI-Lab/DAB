@@ -34,11 +34,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
+ * 
  * @author Fabrizio
  */
 public class AboutComponentInfo extends ComponentInfo {
@@ -82,13 +83,13 @@ public class AboutComponentInfo extends ComponentInfo {
 	verticalLayout.add(build("Build Timestamp", timeStamp));
 	verticalLayout.add(build("Commit", commit));
 
-	TabInfo tabInfo = TabInfoBuilder.get().//
+	TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		withIndex(GSTabIndex.ABOUT.getIndex()).//
 		withShowDirective(getComponentName()).//
 		withComponent(verticalLayout).//
 		build();
 
-	setTabInfo(tabInfo);
+	setTabDescriptor(tabDescriptor);
     }
 
     /**

@@ -9,21 +9,21 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.lib.skoss.SKOSResponse;
-import eu.essi_lab.lib.skoss.SKOSSemanticRelation;
-import eu.essi_lab.lib.skoss.ThreadMode;
-import eu.essi_lab.lib.skoss.expander.ConceptsExpander.ExpansionLevel;
-import eu.essi_lab.lib.skoss.expander.ExpansionLimit;
-import eu.essi_lab.lib.skoss.expander.ExpansionLimit.LimitTarget;
-import eu.essi_lab.lib.skoss.expander.impl.FedXLevelsExpander;
+import eu.essi_lab.lib.skos.SKOSResponse;
+import eu.essi_lab.lib.skos.SKOSSemanticRelation;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
+import eu.essi_lab.lib.skos.expander.impl.FedXLevelsExpander;
+import eu.essi_lab.lib.utils.ThreadMode;
 
 /**
  * @author Fabrizio
  */
 public class FedXLEvelExpanderLimitExternalTestIT {
 
-    final int LABELS_COUNT = 49;
-    final int ALT_LABELS_COUNT = 19;
+    final int LABELS_COUNT = 79;
+    final int ALT_LABELS_COUNT = 49;
     final int PREF_LABELS_COUNT = 30;
 
     @Test
@@ -42,6 +42,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
@@ -78,6 +79,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
@@ -114,6 +116,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
@@ -144,6 +147,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
@@ -176,6 +180,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
@@ -206,6 +211,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
@@ -236,6 +242,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.SINGLE());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //
@@ -266,6 +273,7 @@ public class FedXLEvelExpanderLimitExternalTestIT {
 
 	FedXLevelsExpander expander = new FedXLevelsExpander();
 	expander.setThreadMode(ThreadMode.MULTI());
+	expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
 
 	SKOSResponse response1 = expander.expand(//
 		Arrays.asList("http://hydro.geodab.eu/hydro-ontology/concept/97"), //

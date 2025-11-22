@@ -21,8 +21,6 @@ package eu.essi_lab.cfga.gui.components.option;
  * #L%
  */
 
-import java.util.stream.Collectors;
-
 import com.vaadin.flow.component.textfield.TextArea;
 
 import eu.essi_lab.cfga.gui.components.StringValuesReader;
@@ -48,9 +46,9 @@ public class OptionTextArea extends TextArea {
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Primitive option value: " + option.getValue());
 
-	    String value = StringValuesReader.readValues(option).//
-		    stream().//
-		    collect(Collectors.joining("\n"));
+	    //
+	    //
+	    String value = String.join("\n", StringValuesReader.readValues(option));
 
 	    setValue(value);
 
@@ -62,7 +60,7 @@ public class OptionTextArea extends TextArea {
 	//
 	// Required
 	//
-	if (option.isRequired()) {
+	if (option.isRequired() && !forceReadonly) {
 
 	    setRequired(true);
 

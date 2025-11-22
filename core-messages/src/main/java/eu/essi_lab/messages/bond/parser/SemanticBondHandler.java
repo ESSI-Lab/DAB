@@ -33,5 +33,5 @@ public interface SemanticBondHandler extends LogicalBondHandler {
      *
      * @param bond
      */
-    public void ontologyPropertyBond(OntologyPropertyBond bond);
+    void ontologyPropertyBond(OntologyPropertyBond bond);
 }

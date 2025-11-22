@@ -41,8 +41,8 @@ import eu.essi_lab.cfga.setting.validation.ValidationContext;
 @SuppressWarnings("serial")
 public class SettingEditDialog extends SettingPutOrEditDialog {
 
-    private Setting settingToEdit;
-    private SettingComponent currentSettingComponent;
+    private final Setting settingToEdit;
+    private final SettingComponent currentSettingComponent;
 
     /**
      * @param configuration

@@ -41,7 +41,7 @@ import org.json.JSONObject;
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.jaxb.common.ObjectFactories;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
@@ -377,13 +377,13 @@ public class ONAMETMapper extends FileIdentifierMapper {
 	coreMetadata.addDistributionOnlineResource(//
 		fileName, //
 		threddsURL + "dodsC/data/all/" + threddsSubFolder + fileName + ".html", //
-		NetProtocols.OPENDAP.getCommonURN(), //
+		NetProtocolWrapper.OPENDAP.getCommonURN(), //
 		"download");
 
 	coreMetadata.addDistributionOnlineResource(//
 		fileName, //
 		threddsURL + "fileServer/data/all/" + threddsSubFolder + fileName, //
-		NetProtocols.HTTP.getCommonURN(), //
+		NetProtocolWrapper.HTTP.getCommonURN(), //
 		"download");
 
 	String wcsQuery = "service=WCS&version=1.0.0&request=GetCapabilities";
@@ -391,7 +391,7 @@ public class ONAMETMapper extends FileIdentifierMapper {
 	coreMetadata.addDistributionOnlineResource(//
 		fileName, //
 		threddsURL + "wcs/data/all/" + threddsSubFolder + fileName + "?" + wcsQuery, //
-		NetProtocols.WCS_1_0_0.getCommonURN(), //
+		NetProtocolWrapper.WCS_1_0_0.getCommonURN(), //
 		"download");
 
 	// String wmsQuery = "service=WMS&version=1.3.0&request=GetCapabilities";
@@ -412,7 +412,7 @@ public class ONAMETMapper extends FileIdentifierMapper {
 	    coreMetadata.addDistributionOnlineResource(//
 		    name, //
 		    threddsURL + "wms/data/all/" + threddsSubFolder + fileName + "?", //
-		    NetProtocols.WMS_1_3_0.getCommonURN(), //
+		    NetProtocolWrapper.WMS_1_3_0.getCommonURN(), //
 		    "download");
 	});
 
@@ -421,7 +421,7 @@ public class ONAMETMapper extends FileIdentifierMapper {
 	coreMetadata.addDistributionOnlineResource(//
 		fileName, //
 		threddsURL + "ncss/grid/data/all/" + threddsSubFolder + fileName + "/dataset.html", //
-		NetProtocols.NETCDFSubset.getCommonURN(), //
+		NetProtocolWrapper.NETCDFSubset.getCommonURN(), //
 		"download");
 
 	String catalogQuery = encodeURL("catalog=" + threddsURL + "catalog/data/all/catalog.html&dataset=datasetScan/" + fileName);
@@ -430,19 +430,19 @@ public class ONAMETMapper extends FileIdentifierMapper {
 	coreMetadata.addDistributionOnlineResource(//
 		fileName, //
 		threddsURL + "iso/data/all/" + threddsSubFolder + fileName, //
-		NetProtocols.ISO.getCommonURN(), //
+		NetProtocolWrapper.ISO.getCommonURN(), //
 		"download");
 
 	coreMetadata.addDistributionOnlineResource(//
 		fileName, //
 		threddsURL + "ncml/data/all/" + threddsSubFolder + fileName + "?" + catalogQuery, //
-		NetProtocols.NCML.getCommonURN(), //
+		NetProtocolWrapper.NCML.getCommonURN(), //
 		"download");
 
 	coreMetadata.addDistributionOnlineResource(//
 		fileName, //
 		threddsURL + "uddc/data/all/" + threddsSubFolder + fileName + "?" + catalogQuery, //
-		NetProtocols.UDDC.getCommonURN(), //
+		NetProtocolWrapper.UDDC.getCommonURN(), //
 		"download");
     }
 

@@ -50,8 +50,8 @@ import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
@@ -168,14 +168,17 @@ public class SourcesInspector extends ComponentInfo {
 	//
 	//
 
-	TabInfo tabInfo = TabInfoBuilder.get().//
+	TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		withIndex(GSTabIndex.SOURCES_INSPECTION.getIndex()).//
-		withShowDirective(getComponentName()).//
+		withShowDirective(getComponentName(),"Click \"Reload\" to show the list of all the harvested sources, referenced by "
+		+ "name and identifier, along with the number of harvested records (\"Size\") and the percentage related to the total "
+		+ "number of records in the database (visible at the bottom of the \"Size\" column). \"Data #\" indicates the logical data folder (#1 or #2) where the "
+		+ "source records are stored").//
 		withComponent(verticalLayout).//
 		reloadable(() -> update(verticalLayout)).//
 		build();
 
-	setTabInfo(tabInfo);
+	setTabDescriptor(tabDescriptor);
     }
 
     /**

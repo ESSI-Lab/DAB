@@ -1,5 +1,8 @@
 package eu.essi_lab.cfga.gs.setting;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -23,21 +26,29 @@ package eu.essi_lab.cfga.gs.setting;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.setting.ConfigurationObject;
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
+import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
 import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.cfga.setting.validation.ValidationContext;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
+import eu.essi_lab.cfga.setting.validation.Validator;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
@@ -52,7 +63,8 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     private static final String ENABLE_DOWNLOAD_MAIL_REPORTS_OPTION_KEY = "enableMailDownloadReport";
     private static final String ENABLE_ERROR_LOGS_MAIL_REPORTS_OPTION_KEY = "enableErrorLogsReport";
     private static final String EMAIL_SETTING_ID = "emailSetting";
-    private static final String USERS_DATABASE_SETTING_KEY = "usersDatabase";
+    private static final String USERS_DATABASE_SETTING_ID = "usersDatabase";
+    private static final String SEM_SEARCH_SETTING_ID = "defSemanticSearch";
 
     /**
      * @author Fabrizio
@@ -122,12 +134,12 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	 */
 	public static final String MIRROR_SITE_HEADER_NAME_PREFIX = "mirrorsiteclient";
 
-	private String name;
+	private final String name;
 
 	/**
 	 * @param name
 	 */
-	private KeyValueOptionKeys(String name) {
+	KeyValueOptionKeys(String name) {
 
 	    this.name = name;
 	}
@@ -279,7 +291,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	userdbSetting.enableCompactMode(false);
 	userdbSetting.setName("User database setting");
-	userdbSetting.setIdentifier(USERS_DATABASE_SETTING_KEY);
+	userdbSetting.setIdentifier(USERS_DATABASE_SETTING_ID);
 	userdbSetting
 		.setDescription("If enabled and configured, this setting allows to retrieve users information from a specific database");
 	userdbSetting.removeVolatileSettings();
@@ -291,9 +303,80 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	addSetting(userdbSetting);
 
 	//
+	// Ontology default settings
+	//
+
+	DefaultSemanticSearchSetting semSearchSetting = new DefaultSemanticSearchSetting();
+	semSearchSetting.setIdentifier(SEM_SEARCH_SETTING_ID);
+
+	addSetting(semSearchSetting);
+
+	//
 	// set the rendering extension
 	//
 	setExtension(new SystemSettingComponentInfo());
+
+	//
+	// set the validator
+	//
+	setValidator(new SystemSettingValidator());
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class SystemSettingValidator implements Validator {
+
+	private boolean error;
+
+	@Override
+	public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
+
+	    SystemSetting sysSetting = (SystemSetting) SettingUtils.downCast(setting, setting.getSettingClass());
+
+	    DefaultSemanticSearchSetting semSetting = sysSetting.getDefaultSemanticSearchSetting();
+
+	    error = semSetting.getDefaultSemanticRelations().isEmpty();
+
+	    Optional<EmailSetting> emailSetting = sysSetting.getEmailSetting();
+
+	    emailSetting.ifPresent(s -> error |= check(s));
+
+	    Optional<DatabaseSetting> statSetting = sysSetting.getStatisticsSetting();
+
+	    statSetting.ifPresent(s -> error |= check(s));
+
+	    Optional<UsersDatabaseSetting> usersSetting = sysSetting.getUsersDatabaseSetting();
+
+	    usersSetting.ifPresent(s -> error |= check(s));
+
+	    ValidationResponse response = new ValidationResponse();
+
+	    if (error) {
+
+		response.getErrors().add("Please provide all the required fields");
+		response.setResult(ValidationResult.VALIDATION_FAILED);
+	    }
+
+	    return response;
+	}
+
+	/**
+	 * @param setting
+	 * @return
+	 */
+	private boolean check(Setting setting) {
+
+	    List<Setting> list = new ArrayList<>();
+
+	    SettingUtils.deepFind(setting, ConfigurationObject::isEnabled, list);
+
+	    return list.//
+		    stream().//
+		    flatMap(s -> s.getOptions().stream()). //
+		    anyMatch(o -> o.isRequired() && !o.getKey().equals("configFolder")
+			    && o.getOptionalValue().isEmpty() && o.getOptionalSelectedValue().isEmpty());
+ 	}
     }
 
     /**
@@ -322,12 +405,12 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	    setComponentName(SystemSetting.class.getName());
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
+	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
 		    withIndex(GSTabIndex.SYSTEM.getIndex()).//
 		    withShowDirective("System").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setTabDescriptor(tabDescriptor);
 	}
     }
 
@@ -473,7 +556,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
      */
     public Optional<UsersDatabaseSetting> getUsersDatabaseSetting() {
 
-	UsersDatabaseSetting setting = getSetting(USERS_DATABASE_SETTING_KEY, UsersDatabaseSetting.class).get();
+	UsersDatabaseSetting setting = getSetting(USERS_DATABASE_SETTING_ID, UsersDatabaseSetting.class).get();
 
 	if (setting.isEnabled()) {
 
@@ -481,5 +564,13 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * @return
+     */
+    public DefaultSemanticSearchSetting getDefaultSemanticSearchSetting() {
+
+	return getSetting(SEM_SEARCH_SETTING_ID, DefaultSemanticSearchSetting.class).get();
     }
 }

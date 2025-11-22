@@ -36,7 +36,7 @@ public interface SpatialEntity extends Cloneable {
      * @param shapeId
      * @return
      */
-    public static IndexedShape ofIndexedShape(String shapeId) {
+    static IndexedShape ofIndexedShape(String shapeId) {
 
 	return new IndexedShape(shapeId);
     }
@@ -45,7 +45,7 @@ public interface SpatialEntity extends Cloneable {
      * @param wkt
      * @return
      */
-    public static WKT of(String wkt) {
+    static WKT of(String wkt) {
 
 	return new WKT(wkt);
     }
@@ -57,7 +57,7 @@ public interface SpatialEntity extends Cloneable {
      * @param east
      * @return
      */
-    public static SpatialExtent of(double south, double west, double north, double east) {
+    static SpatialExtent of(double south, double west, double north, double east) {
 
 	return new SpatialExtent(south, west, north, east);
     }

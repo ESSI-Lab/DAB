@@ -25,19 +25,24 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
@@ -50,7 +55,9 @@ import eu.essi_lab.lib.sensorthings._1_1.client.request.FluentSensorThingsReques
 import eu.essi_lab.lib.sensorthings._1_1.client.request.SensorThingsRequest;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.options.SelectOption;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.options.SystemQueryOptions;
+import eu.essi_lab.lib.sensorthings._1_1.client.response.DataArrayFormatResult;
 import eu.essi_lab.lib.sensorthings._1_1.client.response.DataArrayResultItem;
+import eu.essi_lab.lib.sensorthings._1_1.client.response.PaginatedResult;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Datastream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -197,59 +204,54 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 		get().//
 		filter("phenomenonTime ge " + begin + " and phenomenonTime le " + end);
 
-	SensorThingsRequest request = FluentSensorThingsRequest.//
-		get().//
-		quoteIdentifiers(quoteIds).//
-		add(EntityRef.DATASTREAMS, streamIdentifer).//
-		add(EntityRef.OBSERVATIONS).//
-		setDataArrayResultFormat().//
-		with(options);
+	List<DataArrayResultItem> resultItems = new ArrayList<>();
 
-	List<DataArrayResultItem> resultItems = client.//
-		execute(request).//
-		getDataArrayFormatResult().//
-		get().//
-		getResultItems();
+	Optional<String> nextLink = Optional.empty();
+
+	do {
+
+	    SensorThingsRequest request = FluentSensorThingsRequest.//
+		    get().//
+		    quoteIdentifiers(quoteIds).//
+		    add(EntityRef.DATASTREAMS, streamIdentifer).//
+		    add(EntityRef.OBSERVATIONS).//
+		    setDataArrayResultFormat().//
+		    with(options);
+
+	    DataArrayFormatResult result = client.//
+		    execute(request).//
+		    getDataArrayFormatResult().//
+		    get();
+
+	    // usually there is only one item in each DataArrayFormatResult
+	    resultItems.addAll(result.getResultItems());
+
+	    nextLink = result.getNextLink();
+
+	    if (!nextLink.isEmpty()) {
+
+		Integer skip = PaginatedResult.getSkip(nextLink.get()).get();
+		Integer top = PaginatedResult.getTop(nextLink.get()).orElse(100);
+
+		options = options.skip(skip).top(top);
+	    }
+
+	} while (nextLink.isPresent());
 
 	try {
 	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
 	    if (!resultItems.isEmpty()) {
 
-		DataArrayResultItem resultItem = resultItems.//
-			get(0);
-
-		JSONArray dataArray = resultItem.getDataArray();
-		JSONArray components = resultItem.getComponents();
-
-		int phenomenonTimeIndex = getPhenomenonTimeIndex(components);
-		int resultIndex = getResultIndex(components);
-
-		dataArray.forEach(dataElement -> {
-
-		    JSONArray arrayElement = (JSONArray) dataElement;
-
-		    String phenomenonTime = getPhenomenonTime(arrayElement, phenomenonTimeIndex);
-		    double result = arrayElement.getDouble(resultIndex);
-
-		    ValueSingleVariable v = new ValueSingleVariable();
-
+		resultItems.stream().flatMap(item -> getValue(item).stream()).forEach(var -> {
 		    try {
-			v.setValue(new BigDecimal(result));
+			addValue(tsrt, var);
+		    } catch (JAXBException ex) {
 
-			GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-			c.setTime(ISO8601DateTimeUtils.parseISO8601ToDate(phenomenonTime).get());
-
-			XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-
-			v.setDateTimeUTC(date2);
-			addValue(tsrt, v);
-
-		    } catch (Exception e) {
-
-			GSLoggerFactory.getLogger(getClass()).error(e);
+			GSLoggerFactory.getLogger(getClass()).error(ex);
 		    }
 		});
+
 	    } else {
 
 		GSLoggerFactory.getLogger(getClass()).warn("No results found between [{}/{}]", begin, end);
@@ -261,6 +263,76 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 
 	    throw GSException.createException(getClass(), getClass().getSimpleName() + "_FileCreationError", ex);
 	}
+    }
+
+    /**
+     * @param resultItem
+     * @return
+     */
+    private List<ValueSingleVariable> getValue(DataArrayResultItem resultItem) {
+
+	JSONArray dataArray = resultItem.getDataArray();
+	JSONArray components = resultItem.getComponents();
+
+	int phenomenonTimeIndex = getPhenomenonTimeIndex(components);
+	int resultIndex = getResultIndex(components);
+	int parametersIndex = getComponentIndex(components, "parameters");
+	int resultQualityIndex = getComponentIndex(components, "resultQuality");
+
+	List<ValueSingleVariable> out = new ArrayList<>();
+
+	dataArray.forEach(dataElement -> {
+
+	    JSONArray arrayElement = (JSONArray) dataElement;
+
+	    String phenomenonTime = getPhenomenonTime(arrayElement, phenomenonTimeIndex);
+	    double result = arrayElement.getDouble(resultIndex);
+
+	    ValueSingleVariable v = new ValueSingleVariable();
+
+	    try {
+		v.setValue(new BigDecimal(result));
+
+		GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+		c.setTime(ISO8601DateTimeUtils.parseISO8601ToDate(phenomenonTime).get());
+
+		XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+
+		v.setDateTimeUTC(date2);
+
+		if (parametersIndex >= 0) {
+		    JSONObject parameters = arrayElement.optJSONObject(parametersIndex);
+		    if (parameters != null) {
+			Set<String> keys = parameters.keySet();
+			for (String key : keys) {
+			    String q = key + ":" + parameters.getString(key).replace(" ", "_");
+			    q = URLEncoder.encode(q, StandardCharsets.UTF_8);
+			    v.getQualifiers().add(q);
+			}
+		    }
+		}
+		if (resultQualityIndex >= 0) {
+		    JSONObject resultQuality = arrayElement.optJSONObject(resultQualityIndex);
+		    if (resultQuality != null) {
+			JSONObject dqStatus = resultQuality.optJSONObject("DQ_Status");
+			if (dqStatus != null) {
+			    String code = dqStatus.optString("code");
+			    if (code != null) {
+				v.getQualifiers().add("qualityFlag:" + code);
+			    }
+			}
+		    }
+		}
+
+		out.add(v);
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
+	});
+
+	return out;
     }
 
     @Override

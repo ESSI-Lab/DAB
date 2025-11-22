@@ -36,17 +36,17 @@ public class CheckResponse {
     /**
      * 
      */
-    private Set<String> messages;
+    private final Set<String> messages;
 
     /**
      * 
      */
-    private String methodName;
+    private final String methodName;
 
     /**
      * 
      */
-    private List<Setting> settings;
+    private final List<Setting> settings;
 
     /**
      * 
@@ -72,8 +72,8 @@ public class CheckResponse {
      */
     public CheckResponse(String methodName) {
 
-	this.messages = new HashSet<String>();
-	this.settings = new ArrayList<Setting>();
+	this.messages = new HashSet<>();
+	this.settings = new ArrayList<>();
 
 	this.methodName = methodName;
 

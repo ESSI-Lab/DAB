@@ -49,7 +49,7 @@ public class OSRequestTransformerValidationTest {
 	} catch (Exception ex) {
 	}
 
-	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
+	OSRequestTransformer osRequestTransformer =new OSRequestTransformer();
 	try {
 	    ValidationMessage validate = osRequestTransformer.validate(webRequest);
 
@@ -157,7 +157,7 @@ public class OSRequestTransformerValidationTest {
     @Test
     public void testRequestWithMissingOutputFormat() {
 
-	WebRequest webRequest = WebRequest.createGET("http://opensearch?ct=10&si=0&st=pippo");
+	WebRequest webRequest = WebRequest.createGET("http://opensearch?ct=10&si=1&st=pippo");
 
 	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
 	try {
@@ -198,7 +198,7 @@ public class OSRequestTransformerValidationTest {
     public void testValidRequestWithAllSupportedParameters() {
 
 	WebRequest webRequest = WebRequest
-		.createGET("http://opensearch?ct=10&si=0&st=pippo&ts=2000&te=2010&bbox=-180,-90,180,90&outputFormat=application/json");
+		.createGET("http://opensearch?ct=10&si=1&st=pippo&ts=2000&te=2010&bbox=-180,-90,180,90&outputFormat=application/json");
 
 	OSRequestTransformer osRequestTransformer =new OSRequestTransformer(new OSProfilerSetting());
 	try {

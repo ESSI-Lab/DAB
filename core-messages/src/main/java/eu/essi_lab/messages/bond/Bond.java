@@ -33,5 +33,5 @@ import eu.essi_lab.messages.DiscoveryMessage;
  */
 public interface Bond extends Cloneable, Serializable {
 
-    public Bond clone();
+    Bond clone();
 }

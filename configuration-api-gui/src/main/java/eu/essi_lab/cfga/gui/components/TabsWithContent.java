@@ -43,7 +43,7 @@ import eu.essi_lab.cfga.ConfigurationChangeListener;
 public class TabsWithContent extends Tabs implements ComponentEventListener<SelectedChangeEvent>, ConfigurationChangeListener {
 
     private Map<Tab, TabContainer> tabsToContent;
-    private Div contentDiv;
+    private final Div contentDiv;
 
     /**
      * 

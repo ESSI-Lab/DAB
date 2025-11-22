@@ -1,0 +1,188 @@
+/**
+ * 
+ */
+package eu.essi_lab.lib.skos.expander.query.impl;
+
+import java.util.Collection;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB)
+ * %%
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import eu.essi_lab.lib.skos.SKOSSemanticRelation;
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpandConceptsQueryBuilder;
+
+/**
+ * @author boldrini
+ */
+public class DefaultExpandConceptsQueryBuilder implements ExpandConceptsQueryBuilder {
+
+    private boolean includeNoLanguageConcepts;
+
+    /**
+     * @param closeMatch
+     */
+    public DefaultExpandConceptsQueryBuilder() {
+
+    }
+
+    /**
+     * @return the includeNoLanguageConcepts
+     */
+    @Override
+    public boolean isNoLanguageConceptsIncluded() {
+
+	return includeNoLanguageConcepts;
+    }
+
+    /**
+     * @param include
+     */
+    public void setIncludeNoLanguageConcepts(boolean include) {
+
+	this.includeNoLanguageConcepts = include;
+    }
+
+    @Override
+    public String build(//
+	    Collection<String> concepts, //
+	    List<String> searchLangs, //
+	    List<SKOSSemanticRelation> relations, //
+	    ExpansionLevel target, //
+	    ExpansionLevel current) {
+
+	String expansionBlock = current.getValue() < target.getValue() ? buildExpansionOptionalBlock("concept", relations) : "";
+
+	return String.format("""
+		PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+		PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+		SELECT DISTINCT ?concept ?pref ?alt ?expanded WHERE {
+		    BIND(<%s> AS ?concept)
+
+		    OPTIONAL { ?concept skos:prefLabel ?pref %s }
+		     OPTIONAL {
+		                      ?concept ?altProp ?alt
+		                      FILTER(?altProp IN (skos:altLabel, rdfs:label))
+		                      %s
+		                    }
+
+		    %s
+		}
+		""", //
+		concepts.iterator().next(), //
+		getPrefLanguageFilter(searchLangs), //
+		getAltLanguageFilter(searchLangs), //
+		expansionBlock).trim();
+    }
+
+    /**
+     * @param searchLangs
+     * @return
+     */
+    protected String getPrefLanguageFilter(List<String> searchLangs) {
+
+	return getLanguageFilter(searchLangs, "pref");
+
+    }
+
+    /**
+     * @param searchLangs
+     * @return
+     */
+    protected String getAltLanguageFilter(List<String> searchLangs) {
+
+	return getLanguageFilter(searchLangs, "alt");
+    }
+
+    /**
+     * @param searchLangs
+     * @param label
+     * @return
+     */
+    private String getLanguageFilter(List<String> searchLangs, String label) {
+
+	String languages = searchLangs.stream().map(l -> "\"" + l + "\"").collect(Collectors.joining(","));
+
+	String langPref = "LANG(?" + label + ") IN (" + languages + ")";
+
+	String noLangPref = "LANG(?" + label + ")=\"\"";
+
+	String langFilterPref = null;
+
+	if (languages.isEmpty() && !isNoLanguageConceptsIncluded()) {
+
+	    langFilterPref = "";
+
+	} else if (!languages.isEmpty() && !isNoLanguageConceptsIncluded()) {
+
+	    langFilterPref = "FILTER(" + langPref + " )";
+
+	} else if (!languages.isEmpty() && isNoLanguageConceptsIncluded()) {
+
+	    langFilterPref = "FILTER(" + langPref + " || " + noLangPref + " )";
+
+	} else if (languages.isEmpty() && isNoLanguageConceptsIncluded()) {
+
+	    langFilterPref = "FILTER(" + noLangPref + " )";
+	}
+
+	return langFilterPref;
+    }
+
+    /**
+     * @param conceptVar
+     * @param relations
+     * @return
+     */
+    protected String buildExpansionOptionalBlock(String conceptVar, List<SKOSSemanticRelation> relations) {
+
+	StringBuilder sb = new StringBuilder();
+
+	if (!relations.isEmpty()) {
+
+	    sb.append(" OPTIONAL { ");
+
+	    for (int i = 0; i < relations.size(); i++) {
+
+		SKOSSemanticRelation rel = relations.get(i);
+
+		sb.append("{ OPTIONAL { ?").//
+			append(conceptVar).//
+			append(" ").//
+			append(rel.getLabel()).//
+			append(" ?expanded } }");
+
+		if (i != relations.size() - 1) {
+
+		    sb.append(" UNION ");
+		}
+	    }
+
+	    sb.append(" } ");
+	}
+
+	return sb.toString();
+    }
+}

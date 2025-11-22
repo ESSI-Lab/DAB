@@ -41,7 +41,7 @@ import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalCRS;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
@@ -342,7 +342,7 @@ public class NRFAMapper extends AbstractResourceMapper {
 
 	String identifier = mangler.getMangling();
 
-	coreMetadata.addDistributionOnlineResource(identifier, CommonNameSpaceContext.NRFA_URI, NetProtocols.NRFA.getCommonURN(),
+	coreMetadata.addDistributionOnlineResource(identifier, CommonNameSpaceContext.NRFA_URI, NetProtocolWrapper.NRFA.getCommonURN(),
 		"download");
 
 	coreMetadata.getDataIdentification().setResourceIdentifier(identifier);

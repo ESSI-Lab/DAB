@@ -32,9 +32,11 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.Tabs.Orientation;
 
+import com.vaadin.flow.component.textfield.TextArea;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
 import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
@@ -46,12 +48,13 @@ import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
 public class ConfigurationViewFactory {
 
     /**
-     * 
+     *
      */
     private static final float TAB_WIDTH = 1200;
     static final String TAB_HEADER_ID_PREFIX = "tabHeader";
 
-    /**     * @return
+    /**
+     * @return
      */
     public static HorizontalLayout createConfigurationViewNavBarContentLayout() {
 
@@ -80,8 +83,8 @@ public class ConfigurationViewFactory {
     /**
      * @param orientation
      * @param tabName
-     * @param removeDirective 
-     * @param editDirective 
+     * @param removeDirective
+     * @param editDirective
      * @param addDirectives
      * @return
      */
@@ -89,6 +92,7 @@ public class ConfigurationViewFactory {
 	    Configuration configuration, //
 	    Orientation orientation, //
 	    String tabName, //
+	    Optional<String> tabDescription,//
 	    Optional<AddDirective> addDirective,//
 	    Optional<RemoveDirective> removeDirective,//
 	    Optional<EditDirective> editDirective) {
@@ -109,21 +113,19 @@ public class ConfigurationViewFactory {
 
 	case VERTICAL:
 
-	    TabContainer container = ComponentFactory
-		    .createNoSpacingNoMarginTabContainer("tab-container-vertical-layout-for-" + tabName);
-	  
+	    TabContainer container = ComponentFactory.createNoSpacingNoMarginTabContainer("tab-container-vertical-layout-for-" + tabName);
+
 	    container.setRemoveDirective(removeDirective);
 	    container.setEditDirective(editDirective);
 
-//	    container.setWidth(TAB_WIDTH, Unit.PIXELS);
+	    //	    container.setWidth(TAB_WIDTH, Unit.PIXELS);
 	    container.getStyle().set("margin-bottom", "50px");
 
-	    HorizontalLayout headerLayout = ComponentFactory
-		    .createNoSpacingNoMarginHorizontalLayout("tab-container-header-layout-for-" + tabName);
-	    headerLayout.setHeight("45px");
+	    HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
+		    "tab-container-header-layout-for-" + tabName);
 	    headerLayout.setWidthFull();
 	    headerLayout.setAlignItems(Alignment.BASELINE);
-	    headerLayout.setId(TAB_HEADER_ID_PREFIX+"_"+tabName);
+	    headerLayout.setId(TAB_HEADER_ID_PREFIX + "_" + tabName);
 
 	    container.add(headerLayout);
 
@@ -131,13 +133,37 @@ public class ConfigurationViewFactory {
 	    //
 	    //
 
-	    Label label = new Label();
-	    label.setWidthFull();
-	    label.setText(tabName);
-	    label.getStyle().set("font-size", "30px");
-	    label.getStyle().set("color", "black");
+	    Label nameLabel = new Label();
+	    nameLabel.setWidthFull();
+	    nameLabel.setText(tabName);
+	    nameLabel.getStyle().set("font-size", "30px");
+	    nameLabel.getStyle().set("color", "black");
 
-	    headerLayout.add(label);
+	    if (tabDescription.isPresent()) {
+
+		String desc = tabDescription.get();
+
+		VerticalLayout subLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+		subLayout.setWidthFull();
+
+		Label descLabel = new Label();
+		descLabel.setWidthFull();
+		descLabel.setMaxHeight("130px");
+		descLabel.setText(desc);
+		descLabel.getStyle().set("font-size", "16px");
+		descLabel.getStyle().set("color", "gray");
+
+		subLayout.add(nameLabel);
+		subLayout.add(descLabel);
+
+		headerLayout.add(subLayout);
+
+	    } else {
+
+		headerLayout.setHeight("45px");
+
+		headerLayout.add(nameLabel);
+	    }
 
 	    //
 	    //

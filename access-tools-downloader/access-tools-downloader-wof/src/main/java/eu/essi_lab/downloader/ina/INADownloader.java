@@ -29,7 +29,6 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
-import org.cuahsi.waterml._1.ObjectFactory;
 import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.cuahsi.waterml._1.essi.JAXBWML;
@@ -42,7 +41,7 @@ import eu.essi_lab.accessor.wof.client.datamodel.SitesResponseDocument;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeries;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeriesINAResponseDocument;
 import eu.essi_lab.accessor.wof.utils.WOFIdentifierMangler;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
@@ -339,7 +338,7 @@ public class INADownloader extends WMLDataDownloader {
 
     @Override
     public boolean canDownload() {
-	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocols.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN()));
+	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN()));
     }
 
     @Override

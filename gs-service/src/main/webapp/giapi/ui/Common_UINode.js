@@ -799,13 +799,87 @@ GIAPI.Common_UINode = function(options) {
 		// author
 		var content = GIAPI.Common_UINode.authorRow(report);
 
+		
 		// keywords
 		if (report.keyword && report.keyword.length) {
 			content += '<tr><td class="common-ui-node-report-content-table-left-td"><label class="common-ui-node-report-content-table-left">Keywords</td>';
 			content += '<td class="common-ui-node-report-content-table-right-td">';
+
+			var keywordGroups = {};
+			var keywordTypeArray = Array.isArray(report.keyword_type) ? report.keyword_type : null;
+			
+			// Process all keywords maintlaining index alignment with types
 			for (var i = 0; i < report.keyword.length; i++) {
-				content += '<label class="common-ui-node-report-content-table-right">' + report.keyword[i] + '</label><br>';
+				var rawKeywordValue = report.keyword[i];
+				
+				// Get the corresponding type using the same index
+				var keywordType = null;
+				if (keywordTypeArray && i < keywordTypeArray.length) {
+					var rawType = keywordTypeArray[i];
+					if (rawType !== null && rawType !== undefined) {
+						keywordType = String(rawType).trim();
+						if (!keywordType) {
+							keywordType = null;
+						}
+					}
+				}
+				
+				// Process keyword value - only skip if truly invalid
+				if (rawKeywordValue === null || rawKeywordValue === undefined) {
+					continue;
+				}
+				
+				var keywordValue = String(rawKeywordValue).trim();
+				if (!keywordValue) {
+					continue;
+				}
+				
+				// Group by type (preserving duplicates with same value but different types)
+				var groupKey = keywordType ? keywordType : '__none__';
+				if (!keywordGroups[groupKey]) {
+					keywordGroups[groupKey] = [];
+				}
+				// Add keyword value - duplicates are preserved if they have different types
+				keywordGroups[groupKey].push(keywordValue);
 			}
+
+			var groupKeys = Object.keys(keywordGroups);
+			groupKeys.sort(function(a, b) {
+				if (a === '__none__' && b === '__none__') {
+					return 0;
+				}
+				if (a === '__none__') {
+					return 1;
+				}
+				if (b === '__none__') {
+					return -1;
+				}
+				var labelA = a.toLowerCase();
+				var labelB = b.toLowerCase();
+				if (labelA < labelB) {
+					return -1;
+				}
+				if (labelA > labelB) {
+					return 1;
+				}
+				return 0;
+			});
+
+			for (var g = 0; g < groupKeys.length; g++) {
+				var key = groupKeys[g];
+				var values = keywordGroups[key];
+				if (!values || !values.length) {
+					continue;
+				}
+				var typeLabel = key === '__none__' ? null : key;
+				var joinedValues = values.join(', ');
+				if (typeLabel) {
+					content += '<label class="common-ui-node-report-content-table-right" style="display: inline-block; margin-top: 4px;"><span style="font-weight: bold;">' + typeLabel + ':</span> ' + joinedValues + '</label><br>';
+				} else {
+					content += '<label class="common-ui-node-report-content-table-right" style="display: inline-block; margin-top: 4px;">' + joinedValues + '</label><br>';
+				}
+			}
+
 			content += '</td></tr>';
 		}
 
@@ -879,9 +953,37 @@ GIAPI.Common_UINode = function(options) {
 		// vertical extent
 		if (report.verticalExtent && report.verticalExtent.length > 0) {
 
+			var verticalExtent = report.verticalExtent[0];
+			var minElevation = verticalExtent.min;
+			var maxElevation = verticalExtent.max;
+			var hasMinElevation = minElevation !== undefined && minElevation !== null && minElevation !== '';
+			var hasMaxElevation = maxElevation !== undefined && maxElevation !== null && maxElevation !== '';
+			var sameElevation = false;
+			if (hasMinElevation && hasMaxElevation) {
+				var minNumber = Number(minElevation);
+				var maxNumber = Number(maxElevation);
+				if (!isNaN(minNumber) && !isNaN(maxNumber)) {
+					sameElevation = minNumber === maxNumber;
+				} else {
+					sameElevation = String(minElevation) === String(maxElevation);
+				}
+			}
+
 			content += '<tr><td class="common-ui-node-report-content-table-left-td"><label class="common-ui-node-report-content-table-left">Elevation</td>';
-			content += '<td class="common-ui-node-report-content-table-right-td"><label class="common-ui-node-report-content-table-right">Min: ' + report.verticalExtent[0].min + '</label><br>';
-			content += '<label class="common-ui-node-report-content-table-right">Max: ' + report.verticalExtent[0].max + '</label>';
+			content += '<td class="common-ui-node-report-content-table-right-td">';
+			if (sameElevation && hasMinElevation) {
+				content += '<label class="common-ui-node-report-content-table-right">' + minElevation + '</label>';
+			} else {
+				if (hasMinElevation) {
+					content += '<label class="common-ui-node-report-content-table-right">Min: ' + minElevation + '</label>';
+				}
+				if (hasMinElevation && hasMaxElevation) {
+					content += '<br>';
+				}
+				if (hasMaxElevation) {
+					content += '<label class="common-ui-node-report-content-table-right">Max: ' + maxElevation + '</label>';
+				}
+			}
 			content += '</td></tr>';
 		}
 

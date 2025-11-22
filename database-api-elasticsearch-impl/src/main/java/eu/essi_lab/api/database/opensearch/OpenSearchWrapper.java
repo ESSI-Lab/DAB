@@ -26,13 +26,8 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -111,9 +106,9 @@ public class OpenSearchWrapper {
 
     private static final Integer MAX_DEFAULT_HITS = 10000;
 
-    private OpenSearchClient client;
+    private final OpenSearchClient client;
 
-    private OpenSearchDatabase database;
+    private final OpenSearchDatabase database;
 
     /**
      * @param database
@@ -147,12 +142,8 @@ public class OpenSearchWrapper {
 
 	Optional<JSONObject> source = getSource(ShapeFileMapping.get().getIndex(), id);
 
-	if (source.isPresent()) {
+	return source.map(jsonObject -> jsonObject.getJSONObject("shape").getJSONArray("coordinates"));
 
-	    return Optional.of(source.get().getJSONObject("shape").getJSONArray("coordinates"));
-	}
-
-	return Optional.empty();
     }
 
     /**
@@ -231,12 +222,9 @@ public class OpenSearchWrapper {
 
 	    response = client.search(builder -> {
 
-		targets.forEach(trg -> {
+		targets.forEach(trg -> builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
 
-		    builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
-
-			    DataFolderMapping.toKeywordField(trg.getName())).size(maxItems)));
-		});
+			DataFolderMapping.toKeywordField(trg.getName())).size(maxItems))));
 
 		builder.query(searchQuery).//
 			trackTotalHits(new TrackHits.Builder().enabled(true).build()).//
@@ -343,7 +331,7 @@ public class OpenSearchWrapper {
 	    TopHitsAggregate topHitsAggregate = aggregate.topHits();
 
 	    HitsMetadata<JsonData> hits = topHitsAggregate.hits();
-	    Hit<JsonData> hit = hits.hits().get(0);
+	    Hit<JsonData> hit = hits.hits().getFirst();
 
 	    JsonData source = hit.source();
 	    JSONObject jsonObject = new JSONObject(source.toString());
@@ -379,7 +367,7 @@ public class OpenSearchWrapper {
 
 	return responses.//
 		stream().//
-		map(r -> OpenSearchUtils.toJSONObject(r.result().hits().hits().get(0).source())).//
+		map(r -> OpenSearchUtils.toJSONObject(r.result().hits().hits().getFirst().source())).//
 		collect(Collectors.toList());
 
     }
@@ -420,7 +408,9 @@ public class OpenSearchWrapper {
 
     ) throws Exception {
 
-	SearchResponse<Object> response = client.search(builder -> {
+	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+
+	return client.search(builder -> {
 
 	    //
 	    // optional term frequency
@@ -428,12 +418,9 @@ public class OpenSearchWrapper {
 
 	    if (!termFrequencyTargets.isEmpty()) {
 
-		termFrequencyTargets.forEach(trg -> {
+		termFrequencyTargets.forEach(trg -> builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
 
-		    builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
-
-			    DataFolderMapping.toKeywordField(trg.getName())).size(maxFrequencyMapItems.get())));
-		});
+			DataFolderMapping.toKeywordField(trg.getName())).size(maxFrequencyMapItems.get()))));
 	    }
 
 	    //
@@ -466,10 +453,7 @@ public class OpenSearchWrapper {
 		builder.from(start);
 	    }
 
-	    if (sortedFields.isPresent()) {
-
-		handleSort(builder, sortedFields.get());
-	    }
+	    sortedFields.ifPresent(value -> handleSort(builder, value));
 
 	    handleSourceFields(null, builder, fields, excludeResourceBinary);
 
@@ -498,10 +482,6 @@ public class OpenSearchWrapper {
 	    return builder;
 
 	}, Object.class);
-
-	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
-
-	return response;
     }
 
     /**
@@ -599,7 +579,7 @@ public class OpenSearchWrapper {
 	SearchResponse<Object> searchResponse = search(//
 		index, //
 		searchQuery, //
-		Arrays.asList(), //
+		List.of(), //
 		0, //
 		MAX_DEFAULT_HITS, //
 		Optional.empty(), //
@@ -635,7 +615,7 @@ public class OpenSearchWrapper {
 	SearchResponse<Object> response = search(//
 		index, //
 		searchQuery, //
-		Arrays.asList(), //
+		List.of(), //
 		start, //
 		size, //
 		Optional.empty(), //
@@ -664,7 +644,7 @@ public class OpenSearchWrapper {
 	SearchResponse<Object> response = search(//
 		index, //
 		searchQuery, //
-		Arrays.asList(), //
+		List.of(), //
 		0, //
 		MAX_DEFAULT_HITS, //
 		Optional.empty(), //
@@ -717,7 +697,7 @@ public class OpenSearchWrapper {
 	SearchResponse<Object> response = search(//
 		index, //
 		searchQuery, //
-		Arrays.asList(field), //
+		Collections.singletonList(field), //
 		start, //
 		size, //
 		Optional.empty(), // sorted properties
@@ -943,7 +923,7 @@ public class OpenSearchWrapper {
      */
     private List<FieldValue> getFieldValues(Optional<List<Object>> values) {
 
-	ArrayList<FieldValue> ret = new ArrayList<FieldValue>();
+	ArrayList<FieldValue> ret = new ArrayList<>();
 
 	if (values.isEmpty()) {
 	    return ret;
@@ -951,21 +931,18 @@ public class OpenSearchWrapper {
 
 	for (Object obj : values.get()) {
 
-	    if (obj instanceof String) {
+	    if (obj instanceof String str) {
 
-		String str = (String) obj;
 		FieldValue fv = FieldValue.of(str);
 		ret.add(fv);
 
-	    } else if (obj instanceof Long) {
+	    } else if (obj instanceof Long l) {
 
-		Long l = (Long) obj;
 		FieldValue fv = FieldValue.of(l);
 		ret.add(fv);
 
-	    } else if (obj instanceof Double) {
+	    } else if (obj instanceof Double d) {
 
-		Double d = (Double) obj;
 		FieldValue fv = FieldValue.of(d);
 		ret.add(fv);
 	    }
@@ -1026,12 +1003,9 @@ public class OpenSearchWrapper {
 
 	org.opensearch.client.opensearch.core.SearchRequest.Builder clone = new SearchRequest.Builder();
 
-	targets.forEach(trg -> {
+	targets.forEach(trg -> clone.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
 
-	    clone.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
-
-		    DataFolderMapping.toKeywordField(trg.getName())).size(maxItems)));
-	});
+		DataFolderMapping.toKeywordField(trg.getName())).size(maxItems))));
 
 	clone.query(searchQuery).//
 		index(DataFolderMapping.get().getIndex());
@@ -1079,12 +1053,9 @@ public class OpenSearchWrapper {
 
 	if (!termFrequencyTargets.isEmpty()) {
 
-	    termFrequencyTargets.forEach(trg -> {
+	    termFrequencyTargets.forEach(trg -> clone.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
 
-		clone.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
-
-			DataFolderMapping.toKeywordField(trg.getName())).size(maxFrequencyMapItems.get())));
-	    });
+		    DataFolderMapping.toKeywordField(trg.getName())).size(maxFrequencyMapItems.get()))));
 	}
 
 	if (trackTotalHits) {
@@ -1107,10 +1078,7 @@ public class OpenSearchWrapper {
 	    clone.from(start);
 	}
 
-	if (sortedFields.isPresent()) {
-
-	    handleSort(clone, sortedFields.get());
-	}
+	sortedFields.ifPresent(value -> handleSort(clone, value));
 
 	handleSourceFields(null, clone, fields, excludeResourceBinary);
 
@@ -1134,7 +1102,7 @@ public class OpenSearchWrapper {
 	    org.opensearch.client.opensearch.core.SearchRequest.Builder builder, //
 	    SortedFields sortedFields) {
 
-	List<SortOptions> sortOptions = new ArrayList<SortOptions>();
+	List<SortOptions> sortOptions = new ArrayList<>();
 
 	for (SimpleEntry<Queryable, eu.essi_lab.model.SortOrder> sortedField : sortedFields.getFields()) {
 
@@ -1172,7 +1140,7 @@ public class OpenSearchWrapper {
 
 	if (!fields.isEmpty()) {
 
-	    ArrayList<String> fields_ = new ArrayList<String>(fields);
+	    ArrayList<String> fields_ = new ArrayList<>(fields);
 
 	    if (!fields.contains(ResourceProperty.TYPE.getName())) {
 
@@ -1286,7 +1254,7 @@ public class OpenSearchWrapper {
 	return sterms.buckets().//
 		array().//
 		stream().//
-		map(b -> b.key()).//
+		map(StringTermsBucket::key).//
 		collect(Collectors.toList());
     }
 

@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.identifierdecorator;
 
+import eu.essi_lab.messages.listrecords.ListRecordsRequest;
+
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -25,317 +27,317 @@ import eu.essi_lab.model.resource.Dataset;
  */
 public class DuplicatedResourceTest {
 
-	private DatabaseReader dbReader;
-	private Dataset incomingResource;
-	private IdentifierDecorator decorator;
-	private Dataset storedResource;
-	private Dataset re_storedResource;
-	private String originalId;
+    private DatabaseReader dbReader;
+    private Dataset incomingResource;
+    private IdentifierDecorator decorator;
+    private Dataset storedResource;
+    private Dataset re_storedResource;
+    private String originalId;
 
-	/**
-	 *
-	 */
-	public DuplicatedResourceTest() {
+    /**
+     *
+     */
+    public DuplicatedResourceTest() {
 
+    }
+
+    @Before
+    public void init() {
+
+	dbReader = Mockito.mock(DatabaseReader.class);
+
+	originalId = UUID.randomUUID().toString();
+
+	GSSource source = new GSSource();
+	source.setLabel("Source");
+	source.setUniqueIdentifier("idenfier");
+
+	incomingResource = new Dataset();
+	incomingResource.setSource(source);
+	incomingResource.setOriginalId(originalId);
+
+	storedResource = new Dataset();
+	storedResource.setSource(source);
+	storedResource.setOriginalId(originalId);
+
+	re_storedResource = new Dataset();
+	re_storedResource.setSource(source);
+	re_storedResource.setOriginalId(originalId);
+
+	try {
+	    Mockito.when(dbReader.getResources(IdentifierType.ORIGINAL, originalId)).thenReturn(Arrays.asList(storedResource));
+	} catch (GSException e) {
 	}
 
-	@Before
-	public void init() {
+	SourcePrioritySetting sourcePrioritySetting = Mockito.mock(SourcePrioritySetting.class);
+	Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+	decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
-		dbReader = Mockito.mock(DatabaseReader.class);
+	Mockito.when(decorator.getDatabaseReader()).thenReturn(dbReader);
+    }
 
-		originalId = UUID.randomUUID().toString();
+    @Test
+    public void case1Test() {
 
-		GSSource source = new GSSource();
-		source.setLabel("Source");
-		source.setUniqueIdentifier("idenfier");
+	HarvestingProperties harvestingProperties = new HarvestingProperties();
 
-		incomingResource = new Dataset();
-		incomingResource.setSource(source);
-		incomingResource.setOriginalId(originalId);
+	try {
+	    decorator.decorateHarvestedIdentifier(//
+		    incomingResource, //
+		    harvestingProperties, //
+		    null, //
+		    true, // first harvesting
+		    false, // is recovery
+		    false); // is incremental
 
-		storedResource = new Dataset();
-		storedResource.setSource(source);
-		storedResource.setOriginalId(originalId);
+	} catch (DuplicatedResourceException e) {
 
-		re_storedResource = new Dataset();
-		re_storedResource.setSource(source);
-		re_storedResource.setOriginalId(originalId);
+	    return;
 
-		try {
-			Mockito.when(dbReader.getResources(IdentifierType.ORIGINAL, originalId)).thenReturn(Arrays.asList(storedResource));
-		} catch (GSException e) {
-		}
+	} catch (ConflictingResourceException e) {
 
-		SourcePrioritySetting sourcePrioritySetting = Mockito.mock(SourcePrioritySetting.class);
-		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
-		decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+	    Assert.fail("ConflictingResourceException thrown");
 
-		Mockito.when(decorator.getDatabaseReader()).thenReturn(dbReader);
+	} catch (GSException e) {
+
+	    Assert.fail("GSException thrown");
 	}
 
-	@Test
-	public void case1Test() {
+	Assert.fail("DuplicatedResourceException not thrown");
+    }
 
-		HarvestingProperties harvestingProperties = new HarvestingProperties();
+    @Test
+    public void case2RecoveryTest() {
 
-		try {
-			decorator.decorateHarvestedIdentifier(//
-					incomingResource, //
-					harvestingProperties, //
-					null, //
-					true, // first harvesting
-					false, // is recovery
-					false); // is incremental
+	HarvestingProperties harvestingProperties = new HarvestingProperties();
 
-		} catch (DuplicatedResourceException e) {
+	try {
+	    decorator.decorateHarvestedIdentifier(//
+		    incomingResource, //
+		    harvestingProperties, //
+		    null, //
 
-			return;
+		    true, // first harvesting
+		    true, // is recovery
+		    false); // is incremental
 
-		} catch (ConflictingResourceException e) {
+	} catch (DuplicatedResourceException e) {
 
-			Assert.fail("ConflictingResourceException thrown");
+	    return;
 
-		} catch (GSException e) {
+	} catch (ConflictingResourceException e) {
 
-			Assert.fail("GSException thrown");
-		}
+	    Assert.fail("ConflictingResourceException thrown");
 
-		Assert.fail("DuplicatedResourceException not thrown");
+	} catch (GSException e) {
+
+	    Assert.fail("GSException thrown");
 	}
 
-	@Test
-	public void case2RecoveryTest() {
+	Assert.fail("DuplicatedResourceException not thrown");
+    }
 
-		HarvestingProperties harvestingProperties = new HarvestingProperties();
+    @Test
+    public void case2IncrementalTest() {
 
-		try {
-			decorator.decorateHarvestedIdentifier(//
-					incomingResource, //
-					harvestingProperties, //
-					null, //
+	HarvestingProperties harvestingProperties = new HarvestingProperties();
 
-					true, // first harvesting
-					true, // is recovery
-					false); // is incremental
+	try {
+	    decorator.decorateHarvestedIdentifier(//
+		    incomingResource, //
+		    harvestingProperties, //
+		    null, //
 
-		} catch (DuplicatedResourceException e) {
+		    true, // first harvesting
+		    false, // is recovery
+		    true); // is incremental
 
-			return;
+	} catch (DuplicatedResourceException e) {
 
-		} catch (ConflictingResourceException e) {
+	    return;
 
-			Assert.fail("ConflictingResourceException thrown");
+	} catch (ConflictingResourceException e) {
 
-		} catch (GSException e) {
+	    Assert.fail("ConflictingResourceException thrown");
 
-			Assert.fail("GSException thrown");
-		}
+	} catch (GSException e) {
 
-		Assert.fail("DuplicatedResourceException not thrown");
+	    Assert.fail("GSException thrown");
 	}
 
-	@Test
-	public void case2IncrementalTest() {
+	Assert.fail("DuplicatedResourceException not thrown");
+    }
 
-		HarvestingProperties harvestingProperties = new HarvestingProperties();
+    @Test
+    public void case3Test() {
 
-		try {
-			decorator.decorateHarvestedIdentifier(//
-					incomingResource, //
-					harvestingProperties, //
-					null, //
+	HarvestingProperties harvestingProperties = new HarvestingProperties();
+	ListRecordsRequest listRecordsRequest = Mockito.mock(ListRecordsRequest.class);
+	decorator.setListRecordsRequest(listRecordsRequest);
+	try {
 
-					true, // first harvesting
-					false, // is recovery
-					true); // is incremental
+	    decorator.decorateHarvestedIdentifier(//
+		    incomingResource, //
+		    harvestingProperties, //
+		    null, //
 
-		} catch (DuplicatedResourceException e) {
+		    false, // first harvesting
+		    false, // is recovery
+		    true); // is incremental
 
-			return;
+	} catch (DuplicatedResourceException e) {
 
-		} catch (ConflictingResourceException e) {
+	    Assert.fail("DuplicatedResourceException thrown");
 
-			Assert.fail("ConflictingResourceException thrown");
+	} catch (ConflictingResourceException e) {
 
-		} catch (GSException e) {
+	    Assert.fail("ConflictingResourceException thrown");
 
-			Assert.fail("GSException thrown");
-		}
+	} catch (GSException e) {
 
-		Assert.fail("DuplicatedResourceException not thrown");
+	    Assert.fail("GSException thrown");
+	}
+    }
+
+    @Test
+    public void case4Test() {
+
+	// time stamp is before the end harvesting timestamp, consolidated resource
+	storedResource.getPropertyHandler().setResourceTimeStamp();
+
+	HarvestingProperties harvestingProperties = new HarvestingProperties();
+	harvestingProperties.setEndHarvestingTimestamp();
+
+	// time stamp is after the end harvesting timestamp, is an incoming resource
+	incomingResource.getPropertyHandler().setResourceTimeStamp();
+
+	try {
+	    decorator.decorateHarvestedIdentifier(//
+		    incomingResource, //
+		    harvestingProperties, //
+		    null, //
+
+		    false, // first harvesting
+		    false, // is recovery
+		    false); // is incremental
+
+	} catch (DuplicatedResourceException e) {
+
+	    Assert.fail("DuplicatedResourceException thrown");
+
+	} catch (ConflictingResourceException e) {
+
+	    Assert.fail("ConflictingResourceException thrown");
+
+	} catch (GSException e) {
+
+	    Assert.fail("GSException not thrown");
 	}
 
-	@Test
-	public void case3Test() {
+	// OK
+    }
 
-		HarvestingProperties harvestingProperties = new HarvestingProperties();
+    @Test
+    public void case5Test() {
 
-		try {
-			decorator.decorateHarvestedIdentifier(//
-					incomingResource, //
-					harvestingProperties, //
-					null, //
+	// now there are 3 resources. the incoming, the stored and the re-stored
+	try {
+	    Mockito.when(dbReader.getResources(IdentifierType.ORIGINAL, originalId)).//
+		    thenReturn(Arrays.asList(storedResource, re_storedResource));
 
-					false, // first harvesting
-					false, // is recovery
-					true); // is incremental
-
-		} catch (DuplicatedResourceException e) {
-
-			return;
-
-		} catch (ConflictingResourceException e) {
-
-			Assert.fail("ConflictingResourceException thrown");
-
-		} catch (GSException e) {
-
-			Assert.fail("GSException thrown");
-		}
-
-		Assert.fail("DuplicatedResourceException not thrown");
+	} catch (GSException e) {
 	}
 
-	@Test
-	public void case4Test() {
+	// time stamp is before the end harvesting timestamp, consolidated resource
+	storedResource.getPropertyHandler().setResourceTimeStamp();
 
-		// time stamp is before the end harvesting timestamp, consolidated resource
-		storedResource.getPropertyHandler().setResourceTimeStamp();
+	HarvestingProperties harvestingProperties = new HarvestingProperties();
+	harvestingProperties.setEndHarvestingTimestamp();
 
-		HarvestingProperties harvestingProperties = new HarvestingProperties();
-		harvestingProperties.setEndHarvestingTimestamp();
+	// it means this is a re-harvesting
+	harvestingProperties.setHarvestingCount(1);
 
-		// time stamp is after the end harvesting timestamp, is an incoming resource
-		incomingResource.getPropertyHandler().setResourceTimeStamp();
+	// time stamp is after the end harvesting timestamp, is a re-stored resource
+	re_storedResource.getPropertyHandler().setResourceTimeStamp();
 
-		try {
-			decorator.decorateHarvestedIdentifier(//
-					incomingResource, //
-					harvestingProperties, //
-					null, //
+	// time stamp is after the end harvesting timestamp, is an incoming resource
+	incomingResource.getPropertyHandler().setResourceTimeStamp();
 
-					false, // first harvesting
-					false, // is recovery
-					false); // is incremental
+	try {
+	    decorator.decorateHarvestedIdentifier(//
+		    incomingResource, //
+		    harvestingProperties, //
+		    null, //
 
-		} catch (DuplicatedResourceException e) {
+		    false, // first harvesting
+		    false, // is recovery
+		    false); // is incremental
 
-			Assert.fail("DuplicatedResourceException thrown");
+	} catch (DuplicatedResourceException e) {
 
-		} catch (ConflictingResourceException e) {
+	    return;
 
-			Assert.fail("ConflictingResourceException thrown");
+	} catch (ConflictingResourceException e) {
 
-		} catch (GSException e) {
+	    Assert.fail("ConflictingResourceException thrown");
 
-			Assert.fail("GSException not thrown");
-		}
+	} catch (GSException e) {
 
-		// OK
+	    Assert.fail("GSException not thrown");
 	}
 
-	@Test
-	public void case5Test() {
+	Assert.fail("DuplicatedResourceException not thrown");
+    }
 
-		// now there are 3 resources. the incoming, the stored and the re-stored
-		try {
-			Mockito.when(dbReader.getResources(IdentifierType.ORIGINAL, originalId)).//
-					thenReturn(Arrays.asList(storedResource, re_storedResource));
+    @Test
+    public void case6Test() {
 
-		} catch (GSException e) {
-		}
+	// now there are 3 resources. the incoming, the stored and the re-stored
+	try {
+	    Mockito.when(dbReader.getResources(IdentifierType.ORIGINAL, originalId)).//
+		    thenReturn(Arrays.asList(storedResource, re_storedResource));
 
-		// time stamp is before the end harvesting timestamp, consolidated resource
-		storedResource.getPropertyHandler().setResourceTimeStamp();
-
-		HarvestingProperties harvestingProperties = new HarvestingProperties();
-		harvestingProperties.setEndHarvestingTimestamp();
-
-		// it means this is a re-harvesting
-		harvestingProperties.setHarvestingCount(1);
-
-		// time stamp is after the end harvesting timestamp, is a re-stored resource
-		re_storedResource.getPropertyHandler().setResourceTimeStamp();
-
-		// time stamp is after the end harvesting timestamp, is an incoming resource
-		incomingResource.getPropertyHandler().setResourceTimeStamp();
-
-		try {
-			decorator.decorateHarvestedIdentifier(//
-					incomingResource, //
-					harvestingProperties, //
-					null, //
-
-					false, // first harvesting
-					false, // is recovery
-					false); // is incremental
-
-		} catch (DuplicatedResourceException e) {
-
-			return;
-
-		} catch (ConflictingResourceException e) {
-
-			Assert.fail("ConflictingResourceException thrown");
-
-		} catch (GSException e) {
-
-			Assert.fail("GSException not thrown");
-		}
-
-		Assert.fail("DuplicatedResourceException not thrown");
+	} catch (GSException e) {
 	}
 
-	@Test
-	public void case6Test() {
+	// time stamp is before the end harvesting timestamp, consolidated resource
+	storedResource.getPropertyHandler().setResourceTimeStamp();
 
-		// now there are 3 resources. the incoming, the stored and the re-stored
-		try {
-			Mockito.when(dbReader.getResources(IdentifierType.ORIGINAL, originalId)).//
-					thenReturn(Arrays.asList(storedResource, re_storedResource));
+	HarvestingProperties harvestingProperties = new HarvestingProperties();
+	harvestingProperties.setEndHarvestingTimestamp();
 
-		} catch (GSException e) {
-		}
+	// it means this is a re-harvesting
+	harvestingProperties.setHarvestingCount(1);
 
-		// time stamp is before the end harvesting timestamp, consolidated resource
-		storedResource.getPropertyHandler().setResourceTimeStamp();
+	// time stamp is after the end harvesting timestamp, is an incoming resource
+	incomingResource.getPropertyHandler().setResourceTimeStamp();
 
-		HarvestingProperties harvestingProperties = new HarvestingProperties();
-		harvestingProperties.setEndHarvestingTimestamp();
+	// time stamp is after the end harvesting timestamp, is a re-stored resource
+	re_storedResource.getPropertyHandler().setResourceTimeStamp();
 
-		// it means this is a re-harvesting
-		harvestingProperties.setHarvestingCount(1);
+	try {
+	    decorator.decorateHarvestedIdentifier(//
+		    incomingResource, //
+		    harvestingProperties, //
+		    null, //
 
-		// time stamp is after the end harvesting timestamp, is an incoming resource
-		incomingResource.getPropertyHandler().setResourceTimeStamp();
+		    false, // first harvesting
+		    true, // is recovery
+		    false); // is incremental
 
-		// time stamp is after the end harvesting timestamp, is a re-stored resource
-		re_storedResource.getPropertyHandler().setResourceTimeStamp();
+	} catch (DuplicatedResourceException e) {
 
-		try {
-			decorator.decorateHarvestedIdentifier(//
-					incomingResource, //
-					harvestingProperties, //
-					null, //
+	    return;
 
-					false, // first harvesting
-					true, // is recovery
-					false); // is incremental
+	} catch (ConflictingResourceException e) {
 
-		} catch (DuplicatedResourceException e) {
+	    Assert.fail("ConflictingResourceException thrown");
 
-			return;
+	} catch (GSException e) {
 
-		} catch (ConflictingResourceException e) {
-
-			Assert.fail("ConflictingResourceException thrown");
-
-		} catch (GSException e) {
-
-			Assert.fail("GSException not thrown");
-		}
-
-		Assert.fail("DuplicatedResourceException not thrown");
+	    Assert.fail("GSException not thrown");
 	}
+
+	Assert.fail("DuplicatedResourceException not thrown");
+    }
 }

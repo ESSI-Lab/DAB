@@ -29,7 +29,7 @@ import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
@@ -312,7 +312,7 @@ public class KISTERSMapper extends AbstractResourceMapper {
 	coreMetadata.addDistributionOnlineResource(//
 		tsId, //
 		source.getEndpoint(), //
-		NetProtocols.KISTERS.getCommonURN(), //
+		NetProtocolWrapper.KISTERS.getCommonURN(), //
 		"download");
 
 	return dataset;
@@ -381,7 +381,7 @@ public class KISTERSMapper extends AbstractResourceMapper {
 	// Platform id
 	//
 
-	platform.setMDIdentifierCode(NetProtocols.KISTERS.getCommonURN() + "/" + stationId);
+	platform.setMDIdentifierCode(NetProtocolWrapper.KISTERS.getCommonURN() + "/" + stationId);
 
 	//
 	//
@@ -410,7 +410,7 @@ public class KISTERSMapper extends AbstractResourceMapper {
 
 	String tsId = entity.getObject().getString(KISTERSClient.TS_ID);
 
-	String coverageId = NetProtocols.KISTERS.getCommonURN();
+	String coverageId = NetProtocolWrapper.KISTERS.getCommonURN();
 	coverageId += ":" + tsId;
 
 	coverageDescription.setAttributeIdentifier(coverageId);

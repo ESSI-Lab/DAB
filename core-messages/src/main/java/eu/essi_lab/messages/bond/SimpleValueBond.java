@@ -150,7 +150,6 @@ public class SimpleValueBond extends MetadataElementBond<String> {
     protected MetadataElementBond<String> createClone(BondOperator type, MetadataElement element, String value) {
 
 	MetadataElement cloneProperty = getProperty();
-	SimpleValueBond clone = new SimpleValueBond(getOperator(), cloneProperty, getPropertyValue());
-	return clone;
+	return new SimpleValueBond(getOperator(), cloneProperty, getPropertyValue());
     }
 }

@@ -31,10 +31,17 @@ import com.vaadin.flow.data.provider.SortDirection;
 public class ShowDirective extends Directive {
 
     /**
-     * 
+     *
      */
     private SortDirection sortDirection;
+    /**
+     *
+     */
+    private String description;
 
+    /**
+     *
+     */
     public ShowDirective() {
     }
 
@@ -73,5 +80,21 @@ public class ShowDirective extends Directive {
     public void setSortDirection(SortDirection sortDirection) {
 
 	this.sortDirection = sortDirection;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getDescription() {
+
+	return Optional.ofNullable(description);
+    }
+
+    /**
+     * @param description
+     */
+    public void setDescription(String description) {
+
+	this.description = description;
     }
 }

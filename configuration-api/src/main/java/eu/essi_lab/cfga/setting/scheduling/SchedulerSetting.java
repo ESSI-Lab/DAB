@@ -69,7 +69,7 @@ public class SchedulerSetting extends Setting implements EditableSetting {
 	/**
 	 * 
 	 */
-	PERSISTENT;
+	PERSISTENT
     }
 
     /**
@@ -375,10 +375,10 @@ public class SchedulerSetting extends Setting implements EditableSetting {
      */
     public void debugSQLSettings() {
 
-	GSLoggerFactory.getLogger(getClass()).debug("DB URI: " + getSQLDatabaseUri());
-	GSLoggerFactory.getLogger(getClass()).debug("DB name: " + getSQLDatabaseName());
-	GSLoggerFactory.getLogger(getClass()).debug("DB pwd: " + getSQLDatabasePassword());
-	GSLoggerFactory.getLogger(getClass()).debug("DB user: " + getSQLDatabaseUser());
+	GSLoggerFactory.getLogger(getClass()).debug("DB URI: {}", getSQLDatabaseUri());
+	GSLoggerFactory.getLogger(getClass()).debug("DB name: {}", getSQLDatabaseName());
+	GSLoggerFactory.getLogger(getClass()).debug("DB pwd: {}", getSQLDatabasePassword());
+	GSLoggerFactory.getLogger(getClass()).debug("DB user: {}", getSQLDatabaseUser());
     }
 
     /**
