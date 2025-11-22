@@ -25,11 +25,14 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -39,6 +42,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
@@ -247,7 +251,7 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 			GSLoggerFactory.getLogger(getClass()).error(ex);
 		    }
 		});
-		
+
 	    } else {
 
 		GSLoggerFactory.getLogger(getClass()).warn("No results found between [{}/{}]", begin, end);
@@ -272,6 +276,8 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 
 	int phenomenonTimeIndex = getPhenomenonTimeIndex(components);
 	int resultIndex = getResultIndex(components);
+	int parametersIndex = getComponentIndex(components, "parameters");
+	int resultQualityIndex = getComponentIndex(components, "resultQuality");
 
 	List<ValueSingleVariable> out = new ArrayList<>();
 
@@ -293,6 +299,30 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 		XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 
 		v.setDateTimeUTC(date2);
+
+		if (parametersIndex >= 0) {
+		    JSONObject parameters = arrayElement.optJSONObject(parametersIndex);
+		    if (parameters != null) {
+			Set<String> keys = parameters.keySet();
+			for (String key : keys) {
+			    String q = key + ":" + parameters.getString(key).replace(" ", "_");
+			    q = URLEncoder.encode(q, StandardCharsets.UTF_8);
+			    v.getQualifiers().add(q);
+			}
+		    }
+		}
+		if (resultQualityIndex >= 0) {
+		    JSONObject resultQuality = arrayElement.optJSONObject(resultQualityIndex);
+		    if (resultQuality != null) {
+			JSONObject dqStatus = resultQuality.optJSONObject("DQ_Status");
+			if (dqStatus != null) {
+			    String code = dqStatus.optString("code");
+			    if (code != null) {
+				v.getQualifiers().add("qualityFlag:" + code);
+			    }
+			}
+		    }
+		}
 
 		out.add(v);
 

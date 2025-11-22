@@ -127,6 +127,26 @@ public abstract class HydroOntology {
 	return new ArrayList<SKOSConcept>();
     }
 
+    public List<SKOSConcept> getBroaders(String uri) {
+	try {
+	    InputStream queryStream = HydroOntology.class.getClassLoader().getResourceAsStream("whos/hydro-ontology-get-broaderTransitive.sparql");
+	    String query = IOUtils.toString(queryStream, StandardCharsets.UTF_8);
+	    queryStream.close();
+	    if (!uri.startsWith("<")) {
+		uri = "<" + uri + ">";
+	    }
+	    query = query.replace("${CONCEPT_URI}", uri);
+	    List<SKOSConcept> concepts = conceptQuery(query);
+	    return concepts;
+	} catch (Exception e) {
+	    e.printStackTrace();
+	} finally {
+
+	}
+	return new ArrayList<SKOSConcept>();
+	
+    }
+
     /**
      * Gives the concept correspondent to the URI
      * 

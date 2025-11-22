@@ -203,7 +203,6 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 				String missingValue = "-999.0";
 				dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
 
-				String platformIdentifier = NS + ":" + stationId;
 				String parameterIdentifier = NS + ":" + idTipoSensore;
 				CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
@@ -214,7 +213,7 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 				miMetadata.addHierarchyLevelScopeCodeListValue("dataset");
 
 				MIPlatform platform = new MIPlatform();
-				platform.setMDIdentifierCode(platformIdentifier);
+				platform.setMDIdentifierCode(stationId);
 				platform.setDescription(statoStazione + " " + tipoStazione);
 				Citation citation = new Citation();
 				citation.setTitle(nomeStazione);
