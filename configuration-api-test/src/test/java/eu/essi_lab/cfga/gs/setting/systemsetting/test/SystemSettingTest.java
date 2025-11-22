@@ -190,7 +190,7 @@ public class SystemSettingTest {
 
 	Assert.assertEquals("value1", properties.get("key1"));
 
-	Assert.assertEquals("value1", setting.readProperty("key1").get());
+	Assert.assertEquals("value1", setting.readKeyValue("key1").get());
 
 	//
 	//
@@ -206,8 +206,8 @@ public class SystemSettingTest {
 	Assert.assertEquals("value1", properties.get("key1"));
 	Assert.assertEquals("value2", properties.get("key2"));
 
-	Assert.assertEquals("value1", setting.readProperty("key1").get());
-	Assert.assertEquals("value2", setting.readProperty("key2").get());
+	Assert.assertEquals("value1", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value2", setting.readKeyValue("key2").get());
 
 	//
 	//
@@ -222,8 +222,8 @@ public class SystemSettingTest {
 	Assert.assertEquals("value1", properties.get("key1"));
 	Assert.assertEquals("value5", properties.get("key2"));
 
-	Assert.assertEquals("value1", setting.readProperty("key1").get());
-	Assert.assertEquals("value5", setting.readProperty("key2").get());
+	Assert.assertEquals("value1", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value5", setting.readKeyValue("key2").get());
 
 	//
 	//
@@ -238,8 +238,8 @@ public class SystemSettingTest {
 	Assert.assertEquals("value9", properties.get("key1"));
 	Assert.assertEquals("value5", properties.get("key2"));
 
-	Assert.assertEquals("value9", setting.readProperty("key1").get());
-	Assert.assertEquals("value5", setting.readProperty("key2").get());
+	Assert.assertEquals("value9", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value5", setting.readKeyValue("key2").get());
 
 	//
 	//
@@ -260,10 +260,10 @@ public class SystemSettingTest {
 	Assert.assertEquals("abcd", properties.get("key3"));
 	Assert.assertEquals("xyz", properties.get("key4"));
 
-	Assert.assertEquals("value9", setting.readProperty("key1").get());
-	Assert.assertEquals("value5", setting.readProperty("key2").get());
-	Assert.assertEquals("abcd", setting.readProperty("key3").get());
-	Assert.assertEquals("xyz", setting.readProperty("key4").get());
+	Assert.assertEquals("value9", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value5", setting.readKeyValue("key2").get());
+	Assert.assertEquals("abcd", setting.readKeyValue("key3").get());
+	Assert.assertEquals("xyz", setting.readKeyValue("key4").get());
 
 	//
 	//
@@ -282,10 +282,10 @@ public class SystemSettingTest {
 	Assert.assertEquals("1234", properties.get("key3"));
 	Assert.assertEquals("xyz", properties.get("key4"));
 
-	Assert.assertEquals("value9", setting.readProperty("key1").get());
-	Assert.assertEquals("value5", setting.readProperty("key2").get());
-	Assert.assertEquals("1234", setting.readProperty("key3").get());
-	Assert.assertEquals("xyz", setting.readProperty("key4").get());
+	Assert.assertEquals("value9", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value5", setting.readKeyValue("key2").get());
+	Assert.assertEquals("1234", setting.readKeyValue("key3").get());
+	Assert.assertEquals("xyz", setting.readKeyValue("key4").get());
 
 	//
 	//
@@ -304,10 +304,10 @@ public class SystemSettingTest {
 	Assert.assertEquals("1234", properties.get("key3"));
 	Assert.assertEquals("xxx", properties.get("key4"));
 
-	Assert.assertEquals("value9", setting.readProperty("key1").get());
-	Assert.assertEquals("value5", setting.readProperty("key2").get());
-	Assert.assertEquals("1234", setting.readProperty("key3").get());
-	Assert.assertEquals("xxx", setting.readProperty("key4").get());
+	Assert.assertEquals("value9", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value5", setting.readKeyValue("key2").get());
+	Assert.assertEquals("1234", setting.readKeyValue("key3").get());
+	Assert.assertEquals("xxx", setting.readKeyValue("key4").get());
 
 	//
 	//

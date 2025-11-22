@@ -156,7 +156,7 @@ public interface KeyValueOptionDecorator {
      * @param property
      * @return
      */
-    public default Optional<String> readProperty(String property) {
+    public default Optional<String> readKeyValue(String property) {
 
 	return getKeyValueOptions().flatMap(opt -> Optional.ofNullable(opt.getProperty(property)));
     }
