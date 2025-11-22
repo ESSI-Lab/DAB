@@ -111,7 +111,7 @@ public class StatisticsResponseTest {
 	int itemsCount = response.getReturnedItemsCount();
 	Assert.assertEquals(2, itemsCount);
 
-	ResponseItem responseItem = response.getItems().get(0);
+	ResponseItem responseItem = response.getItems().getFirst();
 
 	//
 	// min
@@ -119,7 +119,7 @@ public class StatisticsResponseTest {
 	List<ComputationResult> min = responseItem.getMin();
 	Assert.assertEquals(2, min.size());
 
-	Assert.assertEquals("1", min.get(0).getValue());
+	Assert.assertEquals("1", min.getFirst().getValue());
 	Assert.assertFalse(min.get(0).getCardinalValues().isPresent());
 
 	Assert.assertEquals(ResourceProperty.ACCESS_QUALITY.getName(), min.get(0).getTarget());
@@ -165,8 +165,8 @@ public class StatisticsResponseTest {
 	List<ComputationResult> sum = responseItem.getSum();
 	Assert.assertEquals(1, sum.size());
 
-	Assert.assertEquals("100", sum.get(0).getValue());
-	Assert.assertEquals(ResourceProperty.ACCESS_QUALITY.getName(), sum.get(0).getTarget());
+	Assert.assertEquals("100", sum.getFirst().getValue());
+	Assert.assertEquals(ResourceProperty.ACCESS_QUALITY.getName(), sum.getFirst().getTarget());
 
 	//
 	// avg
@@ -174,8 +174,8 @@ public class StatisticsResponseTest {
 	List<ComputationResult> avg = responseItem.getAvg();
 	Assert.assertEquals(1, avg.size());
 
-	Assert.assertEquals("10", avg.get(0).getValue());
-	Assert.assertEquals(ResourceProperty.ACCESS_QUALITY.getName(), avg.get(0).getTarget());
+	Assert.assertEquals("10", avg.getFirst().getValue());
+	Assert.assertEquals(ResourceProperty.ACCESS_QUALITY.getName(), avg.getFirst().getTarget());
 
 	//
 	// countDistinct
@@ -183,10 +183,10 @@ public class StatisticsResponseTest {
 	List<ComputationResult> countDistinct = responseItem.getCountDistinct();
 	Assert.assertEquals(1, countDistinct.size());
 
-	Assert.assertEquals("999", countDistinct.get(0).getValue());
-	Assert.assertEquals(ResourceProperty.COMPLIANCE_LEVEL.getName(), countDistinct.get(0).getTarget());
+	Assert.assertEquals("999", countDistinct.getFirst().getValue());
+	Assert.assertEquals(ResourceProperty.COMPLIANCE_LEVEL.getName(), countDistinct.getFirst().getTarget());
 
-	Assert.assertFalse(countDistinct.get(0).getCardinalValues().isPresent());
+	Assert.assertFalse(countDistinct.getFirst().getCardinalValues().isPresent());
 
 	//
 	// bBoxUnion

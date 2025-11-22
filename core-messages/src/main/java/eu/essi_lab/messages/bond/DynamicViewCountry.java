@@ -43,12 +43,12 @@ public class DynamicViewCountry extends DynamicView {
 
     @Override
     public String getLabel() {
-	return "Dyanamic view for country: " + arguments.get(0);
+	return "Dyanamic view for country: " + arguments.getFirst();
     }
 
     @Override
     public Bond getDynamicBond() {
-	return BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.COUNTRY_ISO3, arguments.get(0));
+	return BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.COUNTRY_ISO3, arguments.getFirst());
     }
 
 }

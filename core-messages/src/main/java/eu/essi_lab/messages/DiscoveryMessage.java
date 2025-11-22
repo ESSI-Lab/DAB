@@ -38,6 +38,7 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
 import org.locationtech.jts.io.ParseException;
 
+import java.io.Serial;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,6 +93,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = -1949423411370425086L;
 
     private static final String RANKING = "ranking";
@@ -119,14 +121,12 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     private static final int USER_SELECTION = 10;
 
-    private List<GSResource> parents;
-
     /**
      *
      */
     public DiscoveryMessage() {
 
-	parents = new ArrayList<>();
+	List<GSResource> parents = new ArrayList<>();
 
 	setIncludeDeleted(false);
 	setMaxFrequencyMapItems(DEFAULT_MAX_TERM_FREQUENCY_MAP_ITEMS);
@@ -174,7 +174,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
 	setSources(accessMessage.getSources());
 	setCurrentUser(accessMessage.getCurrentUser().orElse(null));
-	accessMessage.getView().ifPresent(view -> setView(view));
+	accessMessage.getView().ifPresent(this::setView);
 	setWebRequest(accessMessage.getWebRequest());
 	setDataBaseURI(accessMessage.getDataBaseURI());
 	setQueryRegistrationEnabled(false);
@@ -211,12 +211,12 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
 	setSources(statMessage.getSources());
 	setCurrentUser(statMessage.getCurrentUser().orElse(null));
-	statMessage.getView().ifPresent(view -> setView(view));
+	statMessage.getView().ifPresent(this::setView);
 	setWebRequest(statMessage.getWebRequest());
 	setDataBaseURI(statMessage.getDataBaseURI());
 	setPage(statMessage.getPage());
 	setPermittedBond(statMessage.getPermittedBond());
-	statMessage.getUserBond().ifPresent(b -> setUserBond(b));
+	statMessage.getUserBond().ifPresent(this::setUserBond);
 	setNormalizedBond(statMessage.getNormalizedBond());
 
 	setQueryRegistrationEnabled(false);
@@ -250,9 +250,9 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
 	Optional<SortedFields> sortedFields = getSortedFields();
 	sortedFields.ifPresent(d -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_DIRECTION.getName(),
-		Arrays.asList(d.getFields().get(0).getValue().getLabel())));
+		Arrays.asList(d.getFields().getFirst().getValue().getLabel())));
 	sortedFields.ifPresent(d -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_PROPERTY.getName(),
-		Arrays.asList(d.getFields().get(0).getKey().getName())));
+		Arrays.asList(d.getFields().getFirst().getKey().getName())));
 
 	int size = getPage().getSize();
 	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_PAGE_SIZE.getName(), Arrays.asList(String.valueOf(size)));
@@ -267,9 +267,9 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	List<GSSource> sources = getSources();
 	if (sources.size() <= USER_SELECTION) {
 	    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SOURCE_ID.getName(),
-		    sources.stream().map(s -> s.getUniqueIdentifier()).collect(Collectors.toList()));
+		    sources.stream().map(GSSource::getUniqueIdentifier).collect(Collectors.toList()));
 	    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SOURCE_LABEL.getName(),
-		    sources.stream().map(s -> s.getLabel()).collect(Collectors.toList()));
+		    sources.stream().map(GSSource::getLabel).collect(Collectors.toList()));
 	}
 
 	Optional<Bond> userBond = getUserBond();
@@ -293,7 +293,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     @Deprecated
     public void setQueryRegistrationEnabled(boolean enabled) {
 
-	getHeader().add(new GSProperty<Boolean>(QUERY_REGISTRATION, enabled));
+	getHeader().add(new GSProperty<>(QUERY_REGISTRATION, enabled));
     }
 
     /**
@@ -318,7 +318,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     public void setResultSetMapperThreadsCount(int count) {
 
-	getHeader().add(new GSProperty<Integer>(RSM_THREADS_COUNT, count));
+	getHeader().add(new GSProperty<>(RSM_THREADS_COUNT, count));
     }
 
     /**
@@ -333,7 +333,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
     public void setMaxFrequencyMapItems(int max) {
 
-	getHeader().add(new GSProperty<Integer>(MAX_TERM_FREQUENCY_MAP_ITEMS, max));
+	getHeader().add(new GSProperty<>(MAX_TERM_FREQUENCY_MAP_ITEMS, max));
     }
 
     public Optional<String> getQuakeMLEventOrder() {
@@ -343,7 +343,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
     public void setQuakeMLEventOrder(String order) {
 
-	getHeader().add(new GSProperty<String>(QUAKE_ML_EVENT_ORDER, order));
+	getHeader().add(new GSProperty<>(QUAKE_ML_EVENT_ORDER, order));
     }
 
     /**
@@ -361,7 +361,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     public void setIncludeDeleted(boolean include) {
 
-	getHeader().add(new GSProperty<Boolean>(INLCUDE_DELETED, include));
+	getHeader().add(new GSProperty<>(INLCUDE_DELETED, include));
     }
 
     /**
@@ -369,7 +369,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     public void setRankingStrategy(RankingStrategy strategy) {
 
-	getHeader().add(new GSProperty<RankingStrategy>(RANKING, strategy));
+	getHeader().add(new GSProperty<>(RANKING, strategy));
     }
 
     /**
@@ -384,7 +384,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
     public void setResourceSelector(ResourceSelector selector) {
 
-	getHeader().add(new GSProperty<ResourceSelector>(RESOURCE_SELECTOR, selector));
+	getHeader().add(new GSProperty<>(RESOURCE_SELECTOR, selector));
     }
 
     /**
@@ -406,7 +406,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     public void setResultsPriority(ResultsPriority priority) {
 
-	getHeader().add(new GSProperty<ResultsPriority>(RESULTS_PRIORITY, priority));
+	getHeader().add(new GSProperty<>(RESULTS_PRIORITY, priority));
     }
 
     /**
@@ -414,7 +414,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     public void setDistinctValuesElement(Queryable element) {
 
-	getHeader().add(new GSProperty<Queryable>(DISINCT_VALUES_ELEMENT, element));
+	getHeader().add(new GSProperty<>(DISINCT_VALUES_ELEMENT, element));
     }
 
     /**
@@ -458,7 +458,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     public void setIncludeCountInRetrieval(boolean include) {
 
-	getHeader().add(new GSProperty<Boolean>(INLCUDE_COUNT_IN_RETRIEVAL, include));
+	getHeader().add(new GSProperty<>(INLCUDE_COUNT_IN_RETRIEVAL, include));
     }
 
     // ----------------------------------------
@@ -496,11 +496,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     public boolean isDataFolderCheckEnabled() {
 
 	Boolean enabled = getHeader().get(DATA_FOLDER_CHECK, Boolean.class);
-	if (enabled == null) {
-	    return true;
-	}
-
-	return false;
+	return enabled == null;
     }
 
     /**
@@ -509,7 +505,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     @Deprecated
     public void disableDataFolderCheck() {
 
-	getHeader().add(new GSProperty<Boolean>(DATA_FOLDER_CHECK, true));
+	getHeader().add(new GSProperty<>(DATA_FOLDER_CHECK, true));
     }
 
     /**
@@ -517,7 +513,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     public void enableEiffelAPIDiscoveryOption(EiffelAPIDiscoveryOption option) {
 
-	getHeader().add(new GSProperty<EiffelAPIDiscoveryOption>(EIFFEL_DISCOVERY_OPTION, option));
+	getHeader().add(new GSProperty<>(EIFFEL_DISCOVERY_OPTION, option));
     }
 
     /**
@@ -543,9 +539,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	    @Override
 	    public void nonLogicalBond(Bond bond) {
 
-		if (bond instanceof QueryableBond) {
-
-		    QueryableBond<?> b = (QueryableBond<?>) bond;
+		if (bond instanceof QueryableBond<?> b) {
 
 		    if (b.getProperty() == MetadataElement.BOUNDING_BOX) {
 
@@ -713,11 +707,9 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 		    boolean weEqual = (Math.abs(w - e) < TOL);
 
 		    if (snEqual && weEqual) {
-			String shape = "POINT (" + ws + ")";
-			return shape;
+			return "POINT (" + ws + ")";
 		    } else if (!snEqual && !weEqual) {
-			String shape = "POLYGON ((" + ws + "," + wn + "," + en + "," + es + "," + ws + "))";
-			return shape;
+			return "POLYGON ((" + ws + "," + wn + "," + en + "," + es + "," + ws + "))";
 		    } else {
 			GSLoggerFactory.getLogger(DiscoveryMessage.class).warn("Not valid bbox {} {} {} {}", w, s, e, n);
 		    }

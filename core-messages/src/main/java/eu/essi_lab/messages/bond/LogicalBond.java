@@ -53,7 +53,7 @@ public class LogicalBond implements Bond {
 	    @XmlElement(name = "simpleValueBond", type = SimpleValueBond.class), //
 	    @XmlElement(name = "spatialBond", type = SpatialBond.class), //
 	    @XmlElement(name = "logicalBond", type = LogicalBond.class) })
-    private List<Bond> operands = new ArrayList<>();
+    private final List<Bond> operands = new ArrayList<>();
 
     /**
      * No-arg constructor only to be used by JAXB

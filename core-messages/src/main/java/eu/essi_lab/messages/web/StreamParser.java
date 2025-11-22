@@ -39,6 +39,6 @@ public interface StreamParser {
      * @param stream the stream to parse
      * @return a key/value map possible empty in case of error or if the stream is not parsable in a key/value map
      */
-    public Map<String, String> getKeyValueMap(InputStream inputStream);
+    Map<String, String> getKeyValueMap(InputStream inputStream);
 
 }

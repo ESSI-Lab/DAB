@@ -24,7 +24,6 @@ package eu.essi_lab.messages.termfrequency;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -160,9 +159,9 @@ public class TermFrequencyMap extends DOMSerializer {
 	 */
 	S3_TIMELINESS(MetadataElement.S3_TIMELINESS_EL_NAME);
 
-	private String name;
+	private final String name;
 
-	private TermFrequencyTarget(String name) {
+	TermFrequencyTarget(String name) {
 	    this.name = name;
 	}
 
@@ -171,60 +170,38 @@ public class TermFrequencyMap extends DOMSerializer {
 	}
 
 	public static TermFrequencyTarget fromValue(String value) {
-	    switch (value) {
-	    case MetadataElement.DISTRIBUTION_FORMAT_EL_NAME:
-		return FORMAT;
-	    case MetadataElement.KEYWORD_EL_NAME:
-		return KEYWORD;
-	    case ResourceProperty.SOURCE_ID_NAME:
-		return SOURCE;
-	    case ResourceProperty.SSC_SCORE_EL_NAME:
-		return SSC_SCORE;
-	    case MetadataElement.ONLINE_PROTOCOL_EL_NAME:
-		return PROTOCOL;
-	    case MetadataElement.ORGANISATION_NAME_EL_NAME:
-		return ORGANISATION_NAME;
-	    case MetadataElement.INSTRUMENT_IDENTIFIER_EL_NAME:
-		return INSTRUMENT_IDENTIFIER;
-	    case MetadataElement.INSTRUMENT_TITLE_EL_NAME:
-		return INSTRUMENT_TITLE;
-	    case MetadataElement.PLATFORM_IDENTIFIER_EL_NAME:
-		return PLATFORM_IDENTIFIER;
-	    case MetadataElement.PLATFORM_TITLE_EL_NAME:
-		return TermFrequencyTarget.PLATFORM_TITLE;
-	    case MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER_EL_NAME:
-		return ORIGINATOR_ORGANISATION_IDENTIFIER;
-	    case MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION_EL_NAME:
-		return ORIGINATOR_ORGANISATION_DESCRIPTION;
-	    case MetadataElement.ATTRIBUTE_IDENTIFIER_EL_NAME:
-		return ATTRIBUTE_IDENTIFIER;
-	    case MetadataElement.ATTRIBUTE_TITLE_EL_NAME:
-		return ATTRIBUTE_TITLE;
-	    case MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME:
-		return OBSERVED_PROPERTY_URI;
-	    case MetadataElement.PRODUCT_TYPE_EL_NAME:
-		return PROD_TYPE;
-	    case MetadataElement.SENSOR_OP_MODE_EL_NAME:
-		return SENSOR_OP_MODE;
-	    case MetadataElement.SENSOR_SWATH_EL_NAME:
-		return SENSOR_SWATH;
-	    case MetadataElement.SAR_POL_CH_EL_NAME:
-		return TermFrequencyTarget.SAR_POL_CH;
-	    case MetadataElement.S3_INSTRUMENT_IDX_EL_NAME:
-		return TermFrequencyTarget.S3_INSTRUMENT_IDX;
-	    case MetadataElement.S3_PRODUCT_LEVEL_EL_NAME:
-		return TermFrequencyTarget.S3_PRODUCT_LEVEL;
-	    case MetadataElement.S3_TIMELINESS_EL_NAME:
-		return TermFrequencyTarget.S3_TIMELINESS;
-	    }
-	    return null;
+	    return switch (value) {
+		case MetadataElement.DISTRIBUTION_FORMAT_EL_NAME -> FORMAT;
+		case MetadataElement.KEYWORD_EL_NAME -> KEYWORD;
+		case ResourceProperty.SOURCE_ID_NAME -> SOURCE;
+		case ResourceProperty.SSC_SCORE_EL_NAME -> SSC_SCORE;
+		case MetadataElement.ONLINE_PROTOCOL_EL_NAME -> PROTOCOL;
+		case MetadataElement.ORGANISATION_NAME_EL_NAME -> ORGANISATION_NAME;
+		case MetadataElement.INSTRUMENT_IDENTIFIER_EL_NAME -> INSTRUMENT_IDENTIFIER;
+		case MetadataElement.INSTRUMENT_TITLE_EL_NAME -> INSTRUMENT_TITLE;
+		case MetadataElement.PLATFORM_IDENTIFIER_EL_NAME -> PLATFORM_IDENTIFIER;
+		case MetadataElement.PLATFORM_TITLE_EL_NAME -> TermFrequencyTarget.PLATFORM_TITLE;
+		case MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER_EL_NAME -> ORIGINATOR_ORGANISATION_IDENTIFIER;
+		case MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION_EL_NAME -> ORIGINATOR_ORGANISATION_DESCRIPTION;
+		case MetadataElement.ATTRIBUTE_IDENTIFIER_EL_NAME -> ATTRIBUTE_IDENTIFIER;
+		case MetadataElement.ATTRIBUTE_TITLE_EL_NAME -> ATTRIBUTE_TITLE;
+		case MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME -> OBSERVED_PROPERTY_URI;
+		case MetadataElement.PRODUCT_TYPE_EL_NAME -> PROD_TYPE;
+		case MetadataElement.SENSOR_OP_MODE_EL_NAME -> SENSOR_OP_MODE;
+		case MetadataElement.SENSOR_SWATH_EL_NAME -> SENSOR_SWATH;
+		case MetadataElement.SAR_POL_CH_EL_NAME -> TermFrequencyTarget.SAR_POL_CH;
+		case MetadataElement.S3_INSTRUMENT_IDX_EL_NAME -> TermFrequencyTarget.S3_INSTRUMENT_IDX;
+		case MetadataElement.S3_PRODUCT_LEVEL_EL_NAME -> TermFrequencyTarget.S3_PRODUCT_LEVEL;
+		case MetadataElement.S3_TIMELINESS_EL_NAME -> TermFrequencyTarget.S3_TIMELINESS;
+		default -> null;
+	    };
 
 	}
 
 	public static List<String> asStringList() {
 
-	    return Arrays.asList(values()).//
-		    stream().//
+	    //
+	    return Arrays.stream(values()).//
 		    map(TermFrequencyTarget::getName).//
 		    collect(Collectors.toList());
 	}
@@ -239,7 +216,7 @@ public class TermFrequencyMap extends DOMSerializer {
     public TermFrequencyMap(TermFrequencyMapType type) {
 
 	this.type = type;
-	this.targets = new ArrayList<String>();
+	this.targets = new ArrayList<>();
 
 	List<TermFrequencyItem> format = type.getFormat();
 	List<TermFrequencyItem> keyword = type.getKeyword();
@@ -400,53 +377,30 @@ public class TermFrequencyMap extends DOMSerializer {
     }
 
     public List<TermFrequencyItem> getItems(TermFrequencyTarget target) {
-	switch (target) {
-	case FORMAT:
-	    return type.getFormat();
-	case PROTOCOL:
-	    return type.getProtocol();
-	case KEYWORD:
-	    return type.getKeyword();
-	case ORGANISATION_NAME:
-	    return type.getOrganisationName();
-	case SSC_SCORE:
-	    return type.getSSCScore();
-	case SAR_POL_CH:
-	    return type.getSarPolCh();
-	case PROD_TYPE:
-	    return type.getProdType();
-	case SENSOR_OP_MODE:
-	    return type.getSensorOpMode();
-	case SENSOR_SWATH:
-	    return type.getSensorSwath();
-	case S3_INSTRUMENT_IDX:
-	    return type.getS3InstrumentIdx();
-	case S3_PRODUCT_LEVEL:
-	    return type.getS3ProductLevel();
-	case S3_TIMELINESS:
-	    return type.getS3Timeliness();
-	default:
-	case SOURCE:
-	    return type.getSourceId();
-	case INSTRUMENT_IDENTIFIER:
-	    return type.getInstrumentId();
-	case INSTRUMENT_TITLE:
-	    return type.getInstrumentTitle();
-	case ORIGINATOR_ORGANISATION_IDENTIFIER:
-	    return type.getOrigOrgId();
-	case ORIGINATOR_ORGANISATION_DESCRIPTION:
-	    return type.getOrigOrgDescription();
-	case PLATFORM_IDENTIFIER:
-	    return type.getPlatformId();
-	case PLATFORM_TITLE:
-	    return type.getPlatformTitle();
-	case ATTRIBUTE_IDENTIFIER:
-	    return type.getAttributeId();
-	case ATTRIBUTE_TITLE:
-	    return type.getAttributeTitle();
-	case OBSERVED_PROPERTY_URI:
-	    return type.getObservedPropertyURI();
-	}
+	return switch (target) {
+	    case FORMAT -> type.getFormat();
+	    case PROTOCOL -> type.getProtocol();
+	    case KEYWORD -> type.getKeyword();
+	    case ORGANISATION_NAME -> type.getOrganisationName();
+	    case SSC_SCORE -> type.getSSCScore();
+	    case SAR_POL_CH -> type.getSarPolCh();
+	    case PROD_TYPE -> type.getProdType();
+	    case SENSOR_OP_MODE -> type.getSensorOpMode();
+	    case SENSOR_SWATH -> type.getSensorSwath();
+	    case S3_INSTRUMENT_IDX -> type.getS3InstrumentIdx();
+	    case S3_PRODUCT_LEVEL -> type.getS3ProductLevel();
+	    case S3_TIMELINESS -> type.getS3Timeliness();
+	    default -> type.getSourceId();
+	    case INSTRUMENT_IDENTIFIER -> type.getInstrumentId();
+	    case INSTRUMENT_TITLE -> type.getInstrumentTitle();
+	    case ORIGINATOR_ORGANISATION_IDENTIFIER -> type.getOrigOrgId();
+	    case ORIGINATOR_ORGANISATION_DESCRIPTION -> type.getOrigOrgDescription();
+	    case PLATFORM_IDENTIFIER -> type.getPlatformId();
+	    case PLATFORM_TITLE -> type.getPlatformTitle();
+	    case ATTRIBUTE_IDENTIFIER -> type.getAttributeId();
+	    case ATTRIBUTE_TITLE -> type.getAttributeTitle();
+	    case OBSERVED_PROPERTY_URI -> type.getObservedPropertyURI();
+	};
     }
 
     public List<TermFrequencyItem> getItems(TermFrequencyTarget target, ItemsSortOrder sortOrder) {
@@ -458,27 +412,13 @@ public class TermFrequencyMap extends DOMSerializer {
 	switch (sortOrder) {
 	case BY_FREQUENCY:
 
-	    Arrays.sort(a, new Comparator<TermFrequencyItem>() {
-
-		@Override
-		public int compare(TermFrequencyItem o1, TermFrequencyItem o2) {
-
-		    return o1.getFreq() < o2.getFreq() ? 1 : o1.getFreq() > o2.getFreq() ? -1 : 0;
-		}
-	    });
+	    Arrays.sort(a, (o1, o2) -> Integer.compare(o2.getFreq(), o1.getFreq()));
 
 	    break;
 
 	case BY_TERM:
 
-	    Arrays.sort(a, new Comparator<TermFrequencyItem>() {
-
-		@Override
-		public int compare(TermFrequencyItem o1, TermFrequencyItem o2) {
-
-		    return o1.getTerm().compareToIgnoreCase(o2.getTerm());
-		}
-	    });
+	    Arrays.sort(a, (o1, o2) -> o1.getTerm().compareToIgnoreCase(o2.getTerm()));
 
 	    break;
 	}
@@ -504,12 +444,11 @@ public class TermFrequencyMap extends DOMSerializer {
 	    thisItems.addAll(mapItems);
 
 	    // 2: merges items with same term. the merged frequency is the sum
-	    HashMap<String, Integer> hashMap = new HashMap<String, Integer>();
+	    HashMap<String, Integer> hashMap = new HashMap<>();
 	    for (TermFrequencyItem thisItem : thisItems) {
 		String term = thisItem.getTerm();
 		if (hashMap.containsKey(term)) {
-		    Integer freq = hashMap.get(term);
-		    hashMap.put(term, freq + thisItem.getFreq());
+		    hashMap.compute(term, (k, freq) -> freq + thisItem.getFreq());
 		} else {
 		    hashMap.put(term, thisItem.getFreq());
 		}
@@ -530,7 +469,7 @@ public class TermFrequencyMap extends DOMSerializer {
 		    TermFrequencyTarget.fromValue(target), //
 		    ItemsSortOrder.BY_FREQUENCY);//
 	    getItems(TermFrequencyTarget.fromValue(target)).clear();
-	    int max = items.size() <= maxItemsCount ? items.size() : maxItemsCount;
+	    int max = Math.min(items.size(), maxItemsCount);
 	    getItems(TermFrequencyTarget.fromValue(target)).addAll(items.subList(0, max));
 	}
 
@@ -575,7 +514,7 @@ public class TermFrequencyMap extends DOMSerializer {
     }
 
     @Override
-    public TermFrequencyMapType getElement() throws JAXBException {
+    public TermFrequencyMapType getElement() {
 
 	return this.type;
     }

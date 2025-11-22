@@ -41,12 +41,12 @@ public class DynamicViewSource extends DynamicView {
 
     @Override
     public String getLabel() {
-	return "Dyanamic view for source id: " + arguments.get(0);
+	return "Dyanamic view for source id: " + arguments.getFirst();
     }
 
     @Override
     public Bond getDynamicBond() {
-	return BondFactory.createSourceIdentifierBond(arguments.get(0));
+	return BondFactory.createSourceIdentifierBond(arguments.getFirst());
     }
 
 }

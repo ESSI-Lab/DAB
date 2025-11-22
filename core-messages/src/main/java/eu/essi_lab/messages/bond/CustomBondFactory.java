@@ -259,15 +259,15 @@ public class CustomBondFactory {
      */
     public static void printNames() {
 
-	List<String> mes = Arrays.asList(MetadataElement.values()).//
-		stream().//
+	//
+	List<String> mes = Arrays.stream(MetadataElement.values()).//
 		map(MetadataElement::getName).//
 		collect(Collectors.toList());
 
-	List<String> rps = Arrays.asList(ResourceProperty.values()).//
-		stream().//
+	//
+	List<String> rps = Arrays.stream(ResourceProperty.values()).//
 		map(ResourceProperty::getName).//
-		collect(Collectors.toList());
+		toList();
 
 	mes.addAll(rps);
 	mes.forEach(n -> GSLoggerFactory.getLogger(CustomBondFactory.class).trace("{}", n));
@@ -294,15 +294,15 @@ public class CustomBondFactory {
 	    throw new IllegalArgumentException("Given queryable name " + n + " contains invalid characters");
 	}
 
-	List<String> mes = Arrays.asList(MetadataElement.values()).//
-		stream().//
-		map(e -> e.getName()).//
+	//
+	List<String> mes = Arrays.stream(MetadataElement.values()).//
+		map(MetadataElement::getName).//
 		collect(Collectors.toList());
 
-	List<String> rps = Arrays.asList(ResourceProperty.values()).//
-		stream().//
-		map(e -> e.getName()).//
-		collect(Collectors.toList());
+	//
+	List<String> rps = Arrays.stream(ResourceProperty.values()).//
+		map(ResourceProperty::getName).//
+		toList();
 
 	mes.addAll(rps);
 

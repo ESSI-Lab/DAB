@@ -41,9 +41,9 @@ import eu.essi_lab.messages.bond.ViewBond;
  */
 public class NotBondParser {
 
-    public class NotBondHandler implements DiscoveryBondHandler {
+    public static class NotBondHandler implements DiscoveryBondHandler {
 
-	Set<Bond> bonds = new HashSet<>();
+	final Set<Bond> bonds = new HashSet<>();
 
 	public Set<Bond> getBonds() {
 	    return bonds;

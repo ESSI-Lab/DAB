@@ -21,6 +21,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,14 +33,11 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.rip.RuntimeInfoProvider;
-import net.sf.saxon.lib.ResourceCollection;
 
 /**
  * @author Fabrizio
@@ -66,6 +64,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     /**
      *
      */
+    @Serial
     private static final long serialVersionUID = 3898362167520217358L;
     private static final String WEB_REQUEST = "webRequest";
     private static final String REQUEST_ABSOLUTE_PATH = "request_absolute_path";
@@ -113,7 +112,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     public RequestMessage() {
 
 	setException(GSException.createException());
-	setSources(new ArrayList<GSSource>());
+	setSources(new ArrayList<>());
 	setOutputSources(false);
 	setUseCachedSourcesDataFolderMap(true);
 	setIncludeWeightedQueries(false);
@@ -126,12 +125,12 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public static RequestMessage create() {
 
-	RequestMessage message = new RequestMessage() {
+	return new RequestMessage() {
 
 	    /**
 	     *
 	     */
-	    private static final long serialVersionUID = 1L;
+	    private static final long serialVersionUID1 = 1L;
 
 	    @Override
 	    public String getName() {
@@ -143,8 +142,6 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 		return null;
 	    }
 	};
-
-	return message;
     }
 
     /**
@@ -195,7 +192,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setRequestTimeout(Integer timeout) {
 
-	getHeader().add(new GSProperty<Integer>(REQUEST_TIMEOUT, timeout));
+	getHeader().add(new GSProperty<>(REQUEST_TIMEOUT, timeout));
     }
 
     public StorageInfo getUserJobStorageURI() {
@@ -205,7 +202,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     public void setUserJobStorageURI(StorageInfo url) {
 
-	getHeader().add(new GSProperty<StorageInfo>(USER_JOB_STORAGE_URI, url));
+	getHeader().add(new GSProperty<>(USER_JOB_STORAGE_URI, url));
     }
 
     public String getUserJobResultId() {
@@ -215,7 +212,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     public void setUserJobResultId(String id) {
 
-	getHeader().add(new GSProperty<String>(USER_JOB_RESULT_ID, id));
+	getHeader().add(new GSProperty<>(USER_JOB_RESULT_ID, id));
     }
 
     public StorageInfo getDataBaseURI() {
@@ -225,7 +222,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     public void setDataBaseURI(StorageInfo url) {
 
-	getHeader().add(new GSProperty<StorageInfo>(DATABASE_URL, url));
+	getHeader().add(new GSProperty<>(DATABASE_URL, url));
     }
 
     public WebRequest getWebRequest() {
@@ -237,7 +234,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
 	if (request != null) {
 
-	    setHeaderProperty(new GSProperty<WebRequest>(WEB_REQUEST, request));
+	    setHeaderProperty(new GSProperty<>(WEB_REQUEST, request));
 
 	    setRequestId(request.getRequestId());
 
@@ -282,7 +279,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setProfilerName(String name) {
 
-	getHeader().add(new GSProperty<String>(PROFILER_NAME, name));
+	getHeader().add(new GSProperty<>(PROFILER_NAME, name));
     }
 
     public Optional<GSUser> getCurrentUser() {
@@ -292,7 +289,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     public void setCurrentUser(GSUser user) {
 
-	getHeader().add(new GSProperty<GSUser>(CURRENT_USER, user));
+	getHeader().add(new GSProperty<>(CURRENT_USER, user));
     }
 
     public Optional<View> getView() {
@@ -302,7 +299,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     public void setView(View view) {
 
-	getHeader().add(new GSProperty<View>(VIEW, view));
+	getHeader().add(new GSProperty<>(VIEW, view));
     }
 
     public Boolean getScheduled() {
@@ -312,7 +309,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     public void setScheduled(Boolean scheduled) {
 
-	getHeader().add(new GSProperty<Boolean>(SCHEDULED, scheduled));
+	getHeader().add(new GSProperty<>(SCHEDULED, scheduled));
     }
 
     /**
@@ -331,7 +328,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setOutputSources(boolean set) {
 
-	getHeader().add(new GSProperty<Boolean>(OUTPUT_SOURCES, set));
+	getHeader().add(new GSProperty<>(OUTPUT_SOURCES, set));
     }
 
     /**
@@ -352,7 +349,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setSources(List<GSSource> sources) {
 
-	getHeader().add(new GSProperty<List<GSSource>>(SOURCES, sources));
+	getHeader().add(new GSProperty<>(SOURCES, sources));
     }
 
     /**
@@ -367,12 +364,12 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     private void setException(GSException exception) {
 
-	getHeader().add(new GSProperty<GSException>(EXCEPTION, exception));
+	getHeader().add(new GSProperty<>(EXCEPTION, exception));
     }
 
     public void setPage(Page page) {
 
-	getHeader().add(new GSProperty<Page>(PAGE, page));
+	getHeader().add(new GSProperty<>(PAGE, page));
     }
 
     public Page getPage() {
@@ -382,7 +379,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 
     public void setRequestAbsolutePath(String requestAbsolutePath) {
 
-	getHeader().add(new GSProperty<String>(REQUEST_ABSOLUTE_PATH, requestAbsolutePath));
+	getHeader().add(new GSProperty<>(REQUEST_ABSOLUTE_PATH, requestAbsolutePath));
     }
 
     public String getRequestAbsolutePath() {
@@ -403,7 +400,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setIteratedWorkflow(IterationMode iterationMode) {
 
-	getHeader().add(new GSProperty<IterationMode>(ITERATED_WORKFLOW, iterationMode));
+	getHeader().add(new GSProperty<>(ITERATED_WORKFLOW, iterationMode));
     }
 
     /**
@@ -419,7 +416,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setSortedFields(SortedFields fields) {
 
-	getHeader().add(new GSProperty<SortedFields>(SORTED_FIELDS, fields));
+	getHeader().add(new GSProperty<>(SORTED_FIELDS, fields));
     }
 
     /**
@@ -435,7 +432,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setSearchAfter(SearchAfter searchAfter) {
 
-	getHeader().add(new GSProperty<SearchAfter>(SEARCH_AFTER, searchAfter));
+	getHeader().add(new GSProperty<>(SEARCH_AFTER, searchAfter));
     }
 
     /**
@@ -451,7 +448,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setExcludeResourceBinary(boolean exclude) {
 
-	getHeader().add(new GSProperty<Boolean>(EXCLUDE_RESOURCE_BINARY, exclude));
+	getHeader().add(new GSProperty<>(EXCLUDE_RESOURCE_BINARY, exclude));
     }
 
     /**
@@ -467,7 +464,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setUseCachedSourcesDataFolderMap(boolean use) {
 
-	getHeader().add(new GSProperty<Boolean>(USE_CACHED_SOURCES_DATAFOLDER_MAP, use));
+	getHeader().add(new GSProperty<>(USE_CACHED_SOURCES_DATAFOLDER_MAP, use));
     }
 
     /**
@@ -485,7 +482,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setIncludeWeightedQueries(boolean include) {
 
-	getHeader().add(new GSProperty<Boolean>(INLCUDE_WEIGHTED_QUERIES, include));
+	getHeader().add(new GSProperty<>(INLCUDE_WEIGHTED_QUERIES, include));
     }
 
     /**
@@ -493,7 +490,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public void setResourceConsumer(ResourceConsumer consumer) {
 
-	getHeader().add(new GSProperty<ResourceConsumer>(RESOURCE_CONSUMER, consumer));
+	getHeader().add(new GSProperty<>(RESOURCE_CONSUMER, consumer));
     }
 
     /**

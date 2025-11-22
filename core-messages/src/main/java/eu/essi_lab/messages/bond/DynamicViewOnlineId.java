@@ -41,12 +41,12 @@ public class DynamicViewOnlineId extends DynamicView {
 
     @Override
     public String getLabel() {
-	return "Dyanamic view for online id: " + arguments.get(0);
+	return "Dyanamic view for online id: " + arguments.getFirst();
     }
 
     @Override
     public Bond getDynamicBond() {
-	return BondFactory.createOnlineIdentifierBond(arguments.get(0));
+	return BondFactory.createOnlineIdentifierBond(arguments.getFirst());
     }
 
 }

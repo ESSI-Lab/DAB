@@ -44,9 +44,9 @@ import eu.essi_lab.model.exceptions.GSException;
  */
 public class AndBondParser {
 
-    public class AndBondHandler implements DiscoveryBondHandler {
+    public static class AndBondHandler implements DiscoveryBondHandler {
 
-	Set<Bond> bonds = new HashSet<>();
+	final Set<Bond> bonds = new HashSet<>();
 	private String exceptionMessage = null;
 	private String errorId = null;
 	public static final String AND_BOND_PARSER_UNEXPECTED_OPERATOR = "AND_BOND_PARSER_UNEXPECTED_OPERATOR";

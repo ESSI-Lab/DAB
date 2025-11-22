@@ -84,7 +84,7 @@ public class SortedFields {
      */
     public SortedFields(Queryable property, SortOrder order) {
 
-	this(Arrays.asList(new SimpleEntry<Queryable, SortOrder>(property, order)));
+	this(Arrays.asList(new SimpleEntry<>(property, order)));
     }
 
     /**

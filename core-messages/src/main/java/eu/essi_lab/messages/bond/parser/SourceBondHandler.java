@@ -39,13 +39,13 @@ import eu.essi_lab.model.resource.ResourceProperty;
  */
 public class SourceBondHandler implements DiscoveryBondHandler {
 
-    List<ResourcePropertyBond> sourceBonds = new ArrayList<>();
+    final List<ResourcePropertyBond> sourceBonds = new ArrayList<>();
 
     public List<ResourcePropertyBond> getSourceBonds() {
 	return sourceBonds;
     }
 
-    List<String> sourceIdentifiers = new ArrayList<>();
+    final List<String> sourceIdentifiers = new ArrayList<>();
 
     public List<String> getSourceIdentifiers() {
 	return sourceIdentifiers;

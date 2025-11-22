@@ -23,6 +23,7 @@ package eu.essi_lab.messages;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.util.Properties;
 
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -34,6 +35,7 @@ import eu.essi_lab.lib.utils.PropertiesUtils;
  */
 public class AugmenterProperties extends Properties {
 
+    @Serial
     private static final long serialVersionUID = -3182036351371322455L;
     private static final String START = "start";
     private static final String BEGIN_TIME_STAMP = "beginTimestamp";
@@ -85,7 +87,7 @@ public class AugmenterProperties extends Properties {
 
 	String property = getProperty(START);
 
-	return Integer.valueOf(property);
+	return Integer.parseInt(property);
     }
 
     /**

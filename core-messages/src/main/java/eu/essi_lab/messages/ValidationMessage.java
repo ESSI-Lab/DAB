@@ -21,6 +21,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,6 +51,7 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = 7285102693776114634L;
 
     /**
@@ -114,7 +116,7 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
      */
     public void setResult(ValidationResult result) {
 
-	getPayload().add(new GSProperty<ValidationResult>(VALIDATION_RESULT, result));
+	getPayload().add(new GSProperty<>(VALIDATION_RESULT, result));
     }
 
     /**
@@ -137,7 +139,7 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	List exceptions = getPayload().get(VALIDATION_EXCEPTIONS, List.class);
 	if (exceptions == null) {
 	    exceptions = new ArrayList<ValidationException>();
-	    getPayload().add(new GSProperty<List>(VALIDATION_EXCEPTIONS, exceptions));
+	    getPayload().add(new GSProperty<>(VALIDATION_EXCEPTIONS, exceptions));
 	}
 	return exceptions;
     }
@@ -154,7 +156,7 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	    exception = new ValidationException();
 	    exceptions.add(exception);
 	} else {
-	    exception = exceptions.get(0);
+	    exception = exceptions.getFirst();
 	}
 	exception.setMessage(error);
     }
@@ -167,7 +169,7 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	if (exceptions.isEmpty()) {
 	    return null;
 	} else {
-	    return exceptions.get(0).getMessage();
+	    return exceptions.getFirst().getMessage();
 	}
     }
 
@@ -181,7 +183,7 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	    exception = new ValidationException();
 	    exceptions.add(exception);
 	} else {
-	    exception = exceptions.get(0);
+	    exception = exceptions.getFirst();
 	}
 	exception.setLocator(info);
     }
@@ -194,7 +196,7 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	if (exceptions.isEmpty()) {
 	    return null;
 	} else {
-	    return exceptions.get(0).getLocator();
+	    return exceptions.getFirst().getLocator();
 	}
     }
 
@@ -208,7 +210,7 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	    exception = new ValidationException();
 	    exceptions.add(exception);
 	} else {
-	    exception = exceptions.get(0);
+	    exception = exceptions.getFirst();
 	}
 	exception.setCode(error);
     }
@@ -221,7 +223,7 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	if (exceptions.isEmpty()) {
 	    return null;
 	} else {
-	    return exceptions.get(0).getCode();
+	    return exceptions.getFirst().getCode();
 	}
     }
 

@@ -33,7 +33,7 @@ public class IdentifierBondParserTest {
 	IdentifierBondHandler parser = new IdentifierBondHandler(bond);
 	Assert.assertTrue(parser.isCanonicalQueryByIdentifiers());
 	Assert.assertEquals(1, parser.getIdentifiers().size());
-	Assert.assertEquals("id1", parser.getIdentifiers().get(0));
+	Assert.assertEquals("id1", parser.getIdentifiers().getFirst());
     }
 
     /**

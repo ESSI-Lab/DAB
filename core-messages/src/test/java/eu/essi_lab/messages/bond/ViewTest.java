@@ -56,7 +56,7 @@ public class ViewTest {
 	//
 
 	request = WebRequest.createGET("http://localhost:9090/gs-service/views");
-	Assert.assertTrue(!request.extractViewId().isPresent());
+	Assert.assertTrue(request.extractViewId().isEmpty());
 
 	request = WebRequest.createGET("http://localhost:9090/gs-service/views?token=pippo");
 	Assert.assertEquals("pippo", request.extractTokenId().get());
@@ -94,19 +94,19 @@ public class ViewTest {
 	//
 
 	request = WebRequest.createGET("http://localhost:9090/gs-service/services/semantic/pippo/anotherpath");
-	Assert.assertTrue(!request.extractViewId().isPresent());
+	Assert.assertTrue(request.extractViewId().isEmpty());
 
 	request = WebRequest.createGET("http://localhost:9090");
-	Assert.assertTrue(!request.extractViewId().isPresent());
+	Assert.assertTrue(request.extractViewId().isEmpty());
 
 	request = WebRequest.createGET("http://localhost:9090/");
-	Assert.assertTrue(!request.extractViewId().isPresent());
+	Assert.assertTrue(request.extractViewId().isEmpty());
 
 	request = WebRequest.createGET("http");
-	Assert.assertTrue(!request.extractViewId().isPresent());
+	Assert.assertTrue(request.extractViewId().isEmpty());
 
 	request = WebRequest.createGET("");
-	Assert.assertTrue(!request.extractViewId().isPresent());
+	Assert.assertTrue(request.extractViewId().isEmpty());
     }
 
     @Test

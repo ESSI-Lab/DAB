@@ -23,6 +23,7 @@ package eu.essi_lab.messages;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -41,6 +42,7 @@ public class HarvestingProperties extends Properties {
     /**
     * 
     */
+    @Serial
     private static final long serialVersionUID = 8995192992040560943L;
     private static final String RESOURCES_COUNT_KEY = "resourcesCount";
     private static final String HARVESTING_COUNT_KEY = "harvestingCount";
@@ -107,7 +109,7 @@ public class HarvestingProperties extends Properties {
 	    return -1;
 	}
 
-	return Integer.valueOf(property);
+	return Integer.parseInt(property);
     }
 
     /**
@@ -133,7 +135,7 @@ public class HarvestingProperties extends Properties {
      */
     public int getHarvestingCount() {
 
-	return Integer.valueOf(getProperty(HARVESTING_COUNT_KEY));
+	return Integer.parseInt(getProperty(HARVESTING_COUNT_KEY));
     }
 
     /**

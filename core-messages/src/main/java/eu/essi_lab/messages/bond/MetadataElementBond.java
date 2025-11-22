@@ -99,8 +99,7 @@ public abstract class MetadataElementBond<T> extends QueryableBond<T> {
     @Override
     public MetadataElementBond<T> clone() {
 	MetadataElement cloneProperty = getProperty();
-	MetadataElementBond<T> clone = createClone(getOperator(), cloneProperty, getPropertyValue());
-	return clone;
+	return createClone(getOperator(), cloneProperty, getPropertyValue());
     }
 
     /**

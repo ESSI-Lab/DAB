@@ -32,7 +32,6 @@ import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.ViewBond;
-import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**
@@ -46,9 +45,8 @@ public class ParentIdBondHandler implements DiscoveryBondHandler {
     /**
      * @param message
      * @return
-     * @throws GSException
      */
-    public static Optional<String> readParentId(ReducedDiscoveryMessage message) throws GSException {
+    public static Optional<String> readParentId(ReducedDiscoveryMessage message) {
 
 	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getReducedBond());
 

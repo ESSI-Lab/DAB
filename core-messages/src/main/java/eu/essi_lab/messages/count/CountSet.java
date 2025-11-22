@@ -38,7 +38,7 @@ import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
  */
 public class CountSet extends AbstractCountResponse {
 
-    private HashMap<String, SimpleEntry<String, DiscoveryCountResponse>> countPairs;
+    private final HashMap<String, SimpleEntry<String, DiscoveryCountResponse>> countPairs;
     private TermFrequencyMap mergedMap;
     private int pageCount;
     private int pageIndex;

@@ -23,6 +23,8 @@ package eu.essi_lab.messages.view;
 
 import eu.essi_lab.messages.RequestMessage;
 
+import java.io.Serial;
+
 /**
  * @author Fabrizio
  */
@@ -31,6 +33,7 @@ public class DeleteViewMessage extends RequestMessage {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -3038598745886991403L;
 
     @Override

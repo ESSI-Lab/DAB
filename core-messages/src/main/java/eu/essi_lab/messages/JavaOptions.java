@@ -89,7 +89,7 @@ public enum JavaOptions {
      */
     NUMBER_OF_DATA_FOLDER_INDEX_SHARDS("numShards", "Number of data-folder index shards: ");
 
-    private String option;
+    private final String option;
     private String infoMessage;
     private String enabledMessage;
     private String disabledMessage;
@@ -99,7 +99,7 @@ public enum JavaOptions {
      * @param option
      * @param infoMessage
      */
-    private JavaOptions(String option, String infoMessage) {
+    JavaOptions(String option, String infoMessage) {
 
 	this.option = option;
 	this.infoMessage = infoMessage;
@@ -110,7 +110,7 @@ public enum JavaOptions {
      * @param enabledMessage
      * @param disabledMessage
      */
-    private JavaOptions(String option, String enabledMessage, String disabledMessage) {
+    JavaOptions(String option, String enabledMessage, String disabledMessage) {
 
 	this(option, enabledMessage, disabledMessage, false);
     }
@@ -121,7 +121,7 @@ public enum JavaOptions {
      * @param disabledMessage
      * @param defaultValue
      */
-    private JavaOptions(String option, String enabledMessage, String disabledMessage, boolean defaultValue) {
+    JavaOptions(String option, String enabledMessage, String disabledMessage, boolean defaultValue) {
 
 	this.option = option;
 	this.enabledMessage = enabledMessage;
@@ -172,7 +172,7 @@ public enum JavaOptions {
      */
     public static Optional<Integer> getIntValue(JavaOptions javaOpt) {
 
-	return getValue(javaOpt).map(v -> Integer.valueOf(v));
+	return getValue(javaOpt).map(Integer::valueOf);
     }
 
     /**

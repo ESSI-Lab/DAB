@@ -27,6 +27,7 @@ package eu.essi_lab.messages.stats;
 import java.io.InputStream;
 import java.util.Optional;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -70,11 +71,8 @@ public class RegionsManager {
 
 	Optional<String> location = getLocation(bbox);
 
-	if (location.isPresent()) {
-	    return Optional.of(StringUtils.URLEncodeUTF8(location.get()));
-	}
+	return location.map(StringUtils::URLEncodeUTF8);
 
-	return Optional.empty();
     }
 
     /**
@@ -87,7 +85,7 @@ public class RegionsManager {
 	try {
 	    return new JSONArray(IOStreamUtils.asUTF8String(regionsStream));
 	} catch (Exception e) {
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(RegionsManager.class).error(e);
 	}
 
 	return null;

@@ -43,35 +43,35 @@ public interface DiscoveryBondHandler extends LogicalBondHandler {
      *
      * @param bond
      */
-    public void viewBond(ViewBond bond);
+    void viewBond(ViewBond bond);
 
     /**
      * Receives notification of a {@link ResourcePropertyBond}
      *
      * @param bond
      */
-    public void resourcePropertyBond(ResourcePropertyBond bond);
+    void resourcePropertyBond(ResourcePropertyBond bond);
 
     /**
      * Receives notification of a custom {@link QueryableBond}
      *
      * @param bond
      */
-    public void customBond(QueryableBond<String> bond);
+    void customBond(QueryableBond<String> bond);
 
     /**
      * Receives notification of a {@link SimpleValueBond}
      *
      * @param bond
      */
-    public void simpleValueBond(SimpleValueBond bond);
+    void simpleValueBond(SimpleValueBond bond);
 
     /**
      * Receives notification of a {@link ComposedElementBond}
      *
      * @param bond
      */
-    public default void composedElementBond(ComposedElementBond bond) {
+    default void composedElementBond(ComposedElementBond bond) {
 
     }
 
@@ -80,13 +80,13 @@ public interface DiscoveryBondHandler extends LogicalBondHandler {
      *
      * @param bond
      */
-    public void spatialBond(SpatialBond bond);
+    void spatialBond(SpatialBond bond);
 
     /**
      * Receives notification of a {@link RuntimeInfoElementBond}
      *
      * @param bond
      */
-    public void runtimeInfoElementBond(RuntimeInfoElementBond bond);
+    void runtimeInfoElementBond(RuntimeInfoElementBond bond);
 
 }
