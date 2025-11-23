@@ -12,12 +12,12 @@ import java.util.ArrayList;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -75,8 +75,7 @@ public class TabContainer extends VerticalLayout {
     }
 
     /**
-     * 
-     * 
+     *
      */
     public void render() {
 
@@ -122,12 +121,8 @@ public class TabContainer extends VerticalLayout {
 	showDirective.flatMap(ShowDirective::getSortDirection).ifPresent(dir -> {
 
 	    switch (dir) {
-	    case ASCENDING:
-		settings.sort(Comparator.comparing(Setting::getName));
-		break;
-	    case DESCENDING:
-		settings.sort((s1, s2) -> s2.getName().compareTo(s1.getName()));
-		break;
+	    case ASCENDING -> settings.sort(Comparator.comparing(Setting::getName));
+	    case DESCENDING -> settings.sort((s1, s2) -> s2.getName().compareTo(s1.getName()));
 	    }
 	});
 
@@ -187,23 +182,6 @@ public class TabContainer extends VerticalLayout {
 		    this.add(component);
 		}
 	    }
-
-	    // settings.stream().//
-	    //
-	    // map(set -> SettingComponentFactory.createSettingComponent(configuration, set.getIdentifier(), readOnly,
-	    // this)).//
-	    //
-	    // forEach(settingComponent -> {
-	    //
-	    // if (settingComponent.getDetails().isPresent()) {
-	    //
-	    // ((HasComponents) this).add(settingComponent.getDetails().get());
-	    //
-	    // } else {
-	    //
-	    // ((HasComponents) this).add(settingComponent);
-	    // }
-	    // });
 	}
     }
 
@@ -239,7 +217,7 @@ public class TabContainer extends VerticalLayout {
     }
 
     /**
-     * 
+     *
      */
     public void add(Component... components) {
 
@@ -342,7 +320,7 @@ public class TabContainer extends VerticalLayout {
 
     /**
      * Working only if a {@link #getGrid()} is present
-     * 
+     *
      * @param settingIdentifiers
      */
     public void removeSettingComponents(List<String> settingIdentifiers) {
@@ -386,7 +364,7 @@ public class TabContainer extends VerticalLayout {
     }
 
     /**
-     * 
+     *
      */
     void removeAllButHeader() {
 

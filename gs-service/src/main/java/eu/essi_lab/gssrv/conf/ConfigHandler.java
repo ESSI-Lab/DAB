@@ -57,8 +57,7 @@ public class ConfigHandler extends ComponentInfo {
 	//
 
 	TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		withIndex(GSTabIndex
-		.CONFIGURATION_HANDLER.getIndex()).//
+		withIndex(GSTabIndex.CONFIGURATION_HANDLER.getIndex()).//
 		withShowDirective(getComponentName()).//
 		withComponent(mainLayout).//
 		build();
