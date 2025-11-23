@@ -115,20 +115,16 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    CONFIGURATION_UPLOADER(18),
+    CONFIGURATION_HANDLER(18),
 
     /**
      *
      */
-    CONFIGURATION_EXPORTER(19),
+    SYSTEM(19, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SYSTEM_SETTING.getLabel()))),
     /**
      *
      */
-    SYSTEM(20, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SYSTEM_SETTING.getLabel()))),
-    /**
-     *
-     */
-    ABOUT(21);
+    ABOUT(20);
 
     private final int index;
     private final boolean required;

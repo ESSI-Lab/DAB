@@ -521,8 +521,7 @@ public class GSConfigurationView extends ConfigurationView {
 		new DistributionSettingComponentInfo(), //
 		new HarvestingSettingComponentInfo(), //
 		new SourcesInspector(), //
-		new ConfigUploader(), //
-		new ConfigExporter(), //
+		new ConfigHandler(), //
 		new AboutComponentInfo(),
 		new OntologySettingComponentInfo()//
 	);
