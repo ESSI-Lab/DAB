@@ -115,7 +115,8 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    CONFIGURATION_UPLOADER(18),
+    CONFIGURATION_HANDLER(18),
+
     /**
      *
      */
