@@ -21,6 +21,7 @@ package eu.essi_lab.messages.sem;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ public class SemanticMessage extends UserBondMessage implements RuntimeInfoProvi
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = 2698928629747379836L;
     private static final String SEARCH_OPERATION = "SEARCH_OPERATION";
     private static final String BROWSING_OPERATION = "BROWSING_OPERATION";
@@ -139,11 +141,11 @@ public class SemanticMessage extends UserBondMessage implements RuntimeInfoProvi
 
 	if (operation instanceof SemanticBrowsing) {
 
-	    getHeader().add(new GSProperty<SemanticBrowsing>(BROWSING_OPERATION, (SemanticBrowsing) operation));
+	    getHeader().add(new GSProperty<>(BROWSING_OPERATION, (SemanticBrowsing) operation));
 
 	} else if (operation instanceof SemanticSearch) {
 
-	    getHeader().add(new GSProperty<SemanticSearch>(SEARCH_OPERATION, (SemanticSearch) operation));
+	    getHeader().add(new GSProperty<>(SEARCH_OPERATION, (SemanticSearch) operation));
 	}
     }
 }

@@ -23,22 +23,19 @@ public class DynamicViewTest {
 		+ DynamicView.ARGUMENT_SEPARATOR + V2 + DynamicView.ARGUMENT_END;
 	DynamicView view = DynamicView.resolveDynamicView(id).get();
 	Bond bond = view.getBond();
-	if (bond instanceof LogicalBond) {
-	    LogicalBond andBond = (LogicalBond) bond;
+	if (bond instanceof LogicalBond andBond) {
 	    LogicalOperator operator = andBond.getLogicalOperator();
 	    if (operator.equals(LogicalOperator.AND)) {
 		List<Bond> operands = andBond.getOperands();
 		Assert.assertEquals(2, operands.size());
 		Bond operand1 = operands.get(0);
-		if (operand1 instanceof ViewBond) {
-		    ViewBond viewBond = (ViewBond) operand1;
+		if (operand1 instanceof ViewBond viewBond) {
 		    assertEquals(V1, viewBond.getViewIdentifier());
 		} else {
 		    Assert.fail("Not a view bond");
 		}
 		Bond operand2 = operands.get(1);
-		if (operand2 instanceof ViewBond) {
-		    ViewBond viewBond = (ViewBond) operand2;
+		if (operand2 instanceof ViewBond viewBond) {
 		    assertEquals(V2, viewBond.getViewIdentifier());
 		} else {
 		    Assert.fail("Not a view bond");
@@ -65,22 +62,19 @@ public class DynamicViewTest {
     }
 
     private void assertTest2Bond(Bond bond) {
-	if (bond instanceof LogicalBond) {
-	    LogicalBond andBond = (LogicalBond) bond;
+	if (bond instanceof LogicalBond andBond) {
 	    LogicalOperator operator = andBond.getLogicalOperator();
 	    if (operator.equals(LogicalOperator.AND)) {
 		List<Bond> operands = andBond.getOperands();
 		Assert.assertEquals(2, operands.size());
 		Bond operand1 = operands.get(0);
-		if (operand1 instanceof ViewBond) {
-		    ViewBond viewBond = (ViewBond) operand1;
+		if (operand1 instanceof ViewBond viewBond) {
 		    assertEquals(V1, viewBond.getViewIdentifier());
 		} else {
 		    Assert.fail("Not a view bond");
 		}
 		Bond operand2 = operands.get(1);
-		if (operand2 instanceof ResourcePropertyBond) {
-		    ResourcePropertyBond sourceBond = (ResourcePropertyBond) operand2;
+		if (operand2 instanceof ResourcePropertyBond sourceBond) {
 		    assertEquals(S1, sourceBond.getPropertyValue());
 		    assertEquals(ResourceProperty.SOURCE_ID, sourceBond.getProperty());
 		    assertEquals(BondOperator.EQUAL, sourceBond.getOperator());
@@ -105,15 +99,13 @@ public class DynamicViewTest {
 		+ DynamicView.ARGUMENT_START + S1 + DynamicView.ARGUMENT_END + DynamicView.ARGUMENT_END + DynamicView.ARGUMENT_END;
 	DynamicView view = DynamicView.resolveDynamicView(id).get();
 	Bond bond = view.getBond();
-	if (bond instanceof LogicalBond) {
-	    LogicalBond andBond = (LogicalBond) bond;
+	if (bond instanceof LogicalBond andBond) {
 	    LogicalOperator operator = andBond.getLogicalOperator();
 	    if (operator.equals(LogicalOperator.AND)) {
 		List<Bond> operands = andBond.getOperands();
 		Assert.assertEquals(2, operands.size());
 		Bond operand1 = operands.get(0);
-		if (operand1 instanceof ViewBond) {
-		    ViewBond viewBond = (ViewBond) operand1;
+		if (operand1 instanceof ViewBond viewBond) {
 		    assertEquals(V2, viewBond.getViewIdentifier());
 		} else {
 		    Assert.fail("Not a view bond");

@@ -24,10 +24,10 @@ import java.io.InputStream;
  * #L%
  */
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -54,6 +54,7 @@ public class View implements Serializable {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -4652948734431078022L;
 
     /**

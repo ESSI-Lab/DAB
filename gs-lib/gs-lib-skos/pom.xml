@@ -10,6 +10,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
+    <name>ESSI-Lab DAB SKOS Client and Utilities</name>
 	<artifactId>gs-lib-skos</artifactId>
 
 	<dependencies>

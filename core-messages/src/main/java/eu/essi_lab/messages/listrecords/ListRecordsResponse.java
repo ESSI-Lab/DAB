@@ -21,6 +21,7 @@ package eu.essi_lab.messages.listrecords;
  * #L%
  */
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -34,8 +35,9 @@ public class ListRecordsResponse<T> implements Serializable {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -2073523944915364860L;
-    private LinkedList<T> records;
+    private final LinkedList<T> records;
     private String resumptionToken;
 
     public ListRecordsResponse() {

@@ -47,8 +47,8 @@ public class ListRecordsRequest {
     private JobStatus status;
     private Integer expectedRecords;
     private GSPropertyHandler additionalInfo;
-    private List<GSResource> modifiedResources;
-    private List<GSResource> deletedResources;
+    private final List<GSResource> modifiedResources;
+    private final List<GSResource> deletedResources;
 
     /**
      * 
@@ -75,7 +75,7 @@ public class ListRecordsRequest {
 
 	setFirst(true);
 
-	modifiedResources = new ArrayList<GSResource>();
+	modifiedResources = new ArrayList<>();
 	deletedResources = new ArrayList<>();
     }
 

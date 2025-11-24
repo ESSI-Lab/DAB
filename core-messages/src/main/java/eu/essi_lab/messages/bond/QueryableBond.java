@@ -91,7 +91,7 @@ public class QueryableBond<T> implements Bond {
 
     public Bond clone() {
 
-	QueryableBond<T> bond = new QueryableBond<T>();
+	QueryableBond<T> bond = new QueryableBond<>();
 	bond.setOperator(operator);
 	bond.setProperty(property);
 	bond.setPropertyValue(propertyValue);
@@ -101,8 +101,7 @@ public class QueryableBond<T> implements Bond {
 
     public boolean equals(Object o) {
 
-	if (o instanceof QueryableBond) {
-	    QueryableBond<?> bond = (QueryableBond<?>) o;
+	if (o instanceof QueryableBond<?> bond) {
 	    return Objects.equals(bond.getOperator(), getOperator()) && //
 		    Objects.equals(bond.getProperty(), getProperty()) && //
 		    Objects.equals(bond.getPropertyValue(), getPropertyValue());

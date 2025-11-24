@@ -73,8 +73,7 @@ public class ResourcePropertyBond extends QueryableBond<String> {
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof ResourcePropertyBond) {
-	    ResourcePropertyBond bond = (ResourcePropertyBond) obj;
+	if (obj instanceof ResourcePropertyBond bond) {
 	    return Objects.equals(bond.getOperator(), getOperator()) && //
 		    Objects.equals(bond.getProperty(), getProperty()) && //
 		    Objects.equals(bond.getPropertyValue(), getPropertyValue());

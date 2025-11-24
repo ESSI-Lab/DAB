@@ -23,6 +23,8 @@ package eu.essi_lab.messages.view;
 
 import eu.essi_lab.messages.RequestMessage;
 
+import java.io.Serial;
+
 /**
  * @author Fabrizio
  */
@@ -31,6 +33,7 @@ public class CreateViewMessage extends RequestMessage {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -7174138026693753985L;
 
     @Override

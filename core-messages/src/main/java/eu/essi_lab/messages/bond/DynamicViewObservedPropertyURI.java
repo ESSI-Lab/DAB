@@ -43,12 +43,12 @@ public class DynamicViewObservedPropertyURI extends DynamicView {
 
     @Override
     public String getLabel() {
-	return "Dyanamic view for observed property URI: " + arguments.get(0);
+	return "Dyanamic view for observed property URI: " + arguments.getFirst();
     }
 
     @Override
     public Bond getDynamicBond() {
-	return BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, arguments.get(0));
+	return BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, arguments.getFirst());
     }
 
 }

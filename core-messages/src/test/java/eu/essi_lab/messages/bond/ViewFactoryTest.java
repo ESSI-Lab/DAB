@@ -18,12 +18,12 @@ public class ViewFactoryTest {
     }
 
     @Test
-    public void testMarshaller() throws Exception {
+    public void testMarshaller() {
 	ViewFactory.createMarshaller();
     }
 
     @Test
-    public void testUnmarshaller() throws Exception {
+    public void testUnmarshaller() {
 	ViewFactory.createUnmarshaller();
     }
 

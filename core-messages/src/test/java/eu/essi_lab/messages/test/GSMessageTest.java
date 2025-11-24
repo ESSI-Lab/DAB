@@ -26,12 +26,12 @@ public class GSMessageTest {
 
 	String paramName = "p";
 
-	gsMessage.getHeader().add(new GSProperty<String>(paramName, "value1"));
+	gsMessage.getHeader().add(new GSProperty<>(paramName, "value1"));
 
 	String param = gsMessage.getHeader().get(paramName, String.class);
 	Assert.assertEquals(param, "value1");
 
-	boolean add = gsMessage.getHeader().add(new GSProperty<String>(paramName, "value2"));
+	boolean add = gsMessage.getHeader().add(new GSProperty<>(paramName, "value2"));
 
 	// a property with the given name already exists, so the add operation fails
 	Assert.assertEquals(add, false);
@@ -49,7 +49,7 @@ public class GSMessageTest {
 	Page page = gsMessage.getHeader().get(paramName, Page.class);
 	Assert.assertNull(page);
 
-	add = gsMessage.getHeader().add(new GSProperty<Page>(paramName, page));
+	add = gsMessage.getHeader().add(new GSProperty<>(paramName, page));
 	// a property with the given name already exists, but with different types
 	Assert.assertEquals(add, true);
     }
@@ -61,12 +61,12 @@ public class GSMessageTest {
 
 	String paramName = "p";
 
-	gsMessage.getPayload().add(new GSProperty<String>(paramName, "value1"));
+	gsMessage.getPayload().add(new GSProperty<>(paramName, "value1"));
 
 	String param = gsMessage.getPayload().get(paramName, String.class);
 	Assert.assertEquals(param, "value1");
 
-	boolean add = gsMessage.getPayload().add(new GSProperty<String>(paramName, "value2"));
+	boolean add = gsMessage.getPayload().add(new GSProperty<>(paramName, "value2"));
 
 	// a property with the given name already exists, so the add operation fails
 	Assert.assertEquals(add, false);
@@ -84,7 +84,7 @@ public class GSMessageTest {
 	Page page = gsMessage.getPayload().get(paramName, Page.class);
 	Assert.assertNull(page);
 
-	add = gsMessage.getPayload().add(new GSProperty<Page>(paramName, page));
+	add = gsMessage.getPayload().add(new GSProperty<>(paramName, page));
 	// a property with the given name already exists, but with different types
 	Assert.assertEquals(add, true);
     }
@@ -169,7 +169,7 @@ public class GSMessageTest {
 	ErrorInfo errorInfo = new ErrorInfo();
 	errorInfo.setCaller(GSMessageTest.class);
 	message.getException().getErrorInfoList().add(errorInfo);
-	Assert.assertEquals(GSMessageTest.class, message.getException().getErrorInfoList().get(0).getCaller());
+	Assert.assertEquals(GSMessageTest.class, message.getException().getErrorInfoList().getFirst().getCaller());
 
 	message.disableDataFolderCheck();
 	Assert.assertFalse(message.isDataFolderCheckEnabled());

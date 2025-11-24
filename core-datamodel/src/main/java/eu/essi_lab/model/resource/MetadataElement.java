@@ -39,9 +39,14 @@ import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
 public enum MetadataElement implements Queryable {
 
     /**
+    *
+    */
+   ORGANIZATION(OrganizationElementWrapper.build()),
+    
+    /**
      *
      */
-    ORGANIZATION(OrganizationElementWrapper.build()),
+    QUALIFIER(QualifierElementWrapper.build()),
 
     /**
      *

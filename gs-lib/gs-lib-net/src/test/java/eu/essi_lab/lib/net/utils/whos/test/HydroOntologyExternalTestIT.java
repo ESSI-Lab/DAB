@@ -1,6 +1,7 @@
 package eu.essi_lab.lib.net.utils.whos.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.AbstractMap.SimpleEntry;
@@ -57,6 +58,21 @@ public class HydroOntologyExternalTestIT {
 
 	}
 
+	@Test
+	public void testBroadersConcept() {
+
+		List<SKOSConcept> concepts = ontology.getBroaders(dischargeStreamURI);
+		assertFalse(concepts.isEmpty());
+		boolean found = false;
+		for (SKOSConcept concept : concepts) {
+		    if (concept.getURI().equals(dischargeURI)) {
+			found = true;
+		    }
+		}
+		assertTrue(found);
+
+	}
+	
 	@Test
 	public void testGetConcept() {
 

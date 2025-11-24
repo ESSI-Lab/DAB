@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -270,7 +270,7 @@ public class DABStarter {
 
 	    Optional<String> optConfigURL = JavaOptions.getValue(JavaOptions.CONFIGURATION_URL);
 
-	    String configURL = null;
+	    String configURL;
 
 	    if (optConfigURL.isEmpty() || optConfigURL.get().isEmpty()) {
 
@@ -292,7 +292,7 @@ public class DABStarter {
 
 	    Configuration configuration = null;
 
-	    String newConfigName = null;
+	    String newConfigName;
 
 	    ConfigurationSource source = null;
 
@@ -386,26 +386,23 @@ public class DABStarter {
 		// CONF_FILE_MISSING_OR_EMPTY_ERR_ID);
 		// }
 
-		switch (newConfigName) {
+		configuration = switch (newConfigName) {
+		    case "default" -> {
 
-		case "default":
+			GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
 
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
+			yield new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
+				ConfigurationWrapper.CONFIG_RELOAD_TIME);
+		    }
+		    case "demo" -> {
 
-		    configuration = new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
+			GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
 
-		    break;
-
-		case "demo":
-
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
-
-		    configuration = new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
-
-		    break;
-		}
+			yield new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
+				ConfigurationWrapper.CONFIG_RELOAD_TIME);
+		    }
+		    default -> configuration;
+		};
 
 		SelectionUtils.deepClean(configuration);
 
@@ -575,7 +572,7 @@ public class DABStarter {
 
 	    ArrayList<Setting> list = new ArrayList<>();
 
-	    ConfigurationUtils.deepFind(configuration, s -> s.getObject().getString(Setting.SETTING_CLASS.getKey()).toString()
+	    ConfigurationUtils.deepFind(configuration, s -> s.getObject().getString(Setting.SETTING_CLASS.getKey())
 		    .equals("eu.essi_lab.cfga.gs.setting.OntologySetting"), list);
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Found {} legacy ontology settings to convert", list.size());
@@ -585,7 +582,7 @@ public class DABStarter {
 		List<Setting> converted = list.stream().map(s -> s.getObject().toString().replace( //
 			"eu.essi_lab.cfga.gs.setting.OntologySetting", //
 			"eu.essi_lab.cfga.gs.setting.ontology.OntologySetting")).//
-			map(o -> new Setting(o)).//
+			map(Setting::new).//
 			toList();
 
 		for (Setting setting : list) {
@@ -962,9 +959,8 @@ public class DABStarter {
     }
 
     /**
-     * @throws GSException
      */
-    private void startSchedulerLate() throws GSException {
+    private void startSchedulerLate() {
 
 	Optional<Properties> keyValueOptions = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
 
@@ -972,7 +968,7 @@ public class DABStarter {
 
 	if (keyValueOptions.isPresent()) {
 
-	    schedulerStartDelay = Integer.valueOf(keyValueOptions.get()
+	    schedulerStartDelay = Integer.parseInt(keyValueOptions.get()
 		    .getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(), String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
 	}
 

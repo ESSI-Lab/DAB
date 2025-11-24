@@ -21,15 +21,13 @@ package eu.essi_lab.profiler.semantic;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class SemanticCompletenessReport {
 
-	private Set<String> conceptURIs = new TreeSet();
+	private Set<String> conceptURIs = new TreeSet<>();
 	
 	private HashMap<String, String>urisToLabel = new HashMap<String, String>();
 

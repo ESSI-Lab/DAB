@@ -21,6 +21,7 @@ package eu.essi_lab.messages.bond.parser;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ import eu.essi_lab.model.resource.MetadataElement;
  */
 public class IdentifierBondHandler implements DiscoveryBondHandler {
 
-    HashSet<String> identifiers = new HashSet<>();
+    final HashSet<String> identifiers = new HashSet<>();
 
     // initialized to true, the value might change to false during parsing
     private Boolean queryByIdentifiers = true;
@@ -69,7 +70,7 @@ public class IdentifierBondHandler implements DiscoveryBondHandler {
      */
     public List<String> getIdentifiers() {
 
-	return identifiers.stream().collect(Collectors.toList());
+	return new ArrayList<>(identifiers);
     }
 
     public IdentifierBondHandler(Bond bond) {

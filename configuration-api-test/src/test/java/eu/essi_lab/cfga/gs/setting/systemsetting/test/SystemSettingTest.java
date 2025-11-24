@@ -1,6 +1,7 @@
 package eu.essi_lab.cfga.gs.setting.systemsetting.test;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import org.junit.Assert;
@@ -100,9 +101,9 @@ public class SystemSettingTest {
 	semSetting3.setOriginalTermIncluded(false);
 	semSetting3.setDefaultMaxExecutionTime(25);
 
-	semSetting3.setDefaultSearchLanguages(Arrays.asList());
-	semSetting3.setDefaultSourceLanguages(Arrays.asList());
-	semSetting3.setDefaultSemanticRelations(Arrays.asList());
+	semSetting3.setDefaultSearchLanguages(List.of());
+	semSetting3.setDefaultSourceLanguages(List.of());
+	semSetting3.setDefaultSemanticRelations(List.of());
 
 	Assert.assertTrue(semSetting3.getDefaultSemanticRelations().isEmpty());
 
@@ -189,6 +190,8 @@ public class SystemSettingTest {
 
 	Assert.assertEquals("value1", properties.get("key1"));
 
+	Assert.assertEquals("value1", setting.readKeyValue("key1").get());
+
 	//
 	//
 	//
@@ -203,6 +206,9 @@ public class SystemSettingTest {
 	Assert.assertEquals("value1", properties.get("key1"));
 	Assert.assertEquals("value2", properties.get("key2"));
 
+	Assert.assertEquals("value1", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value2", setting.readKeyValue("key2").get());
+
 	//
 	//
 
@@ -216,6 +222,9 @@ public class SystemSettingTest {
 	Assert.assertEquals("value1", properties.get("key1"));
 	Assert.assertEquals("value5", properties.get("key2"));
 
+	Assert.assertEquals("value1", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value5", setting.readKeyValue("key2").get());
+
 	//
 	//
 
@@ -228,6 +237,9 @@ public class SystemSettingTest {
 
 	Assert.assertEquals("value9", properties.get("key1"));
 	Assert.assertEquals("value5", properties.get("key2"));
+
+	Assert.assertEquals("value9", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value5", setting.readKeyValue("key2").get());
 
 	//
 	//
@@ -248,6 +260,11 @@ public class SystemSettingTest {
 	Assert.assertEquals("abcd", properties.get("key3"));
 	Assert.assertEquals("xyz", properties.get("key4"));
 
+	Assert.assertEquals("value9", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value5", setting.readKeyValue("key2").get());
+	Assert.assertEquals("abcd", setting.readKeyValue("key3").get());
+	Assert.assertEquals("xyz", setting.readKeyValue("key4").get());
+
 	//
 	//
 	//
@@ -265,6 +282,11 @@ public class SystemSettingTest {
 	Assert.assertEquals("1234", properties.get("key3"));
 	Assert.assertEquals("xyz", properties.get("key4"));
 
+	Assert.assertEquals("value9", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value5", setting.readKeyValue("key2").get());
+	Assert.assertEquals("1234", setting.readKeyValue("key3").get());
+	Assert.assertEquals("xyz", setting.readKeyValue("key4").get());
+
 	//
 	//
 	//
@@ -281,6 +303,11 @@ public class SystemSettingTest {
 	Assert.assertEquals("value5", properties.get("key2"));
 	Assert.assertEquals("1234", properties.get("key3"));
 	Assert.assertEquals("xxx", properties.get("key4"));
+
+	Assert.assertEquals("value9", setting.readKeyValue("key1").get());
+	Assert.assertEquals("value5", setting.readKeyValue("key2").get());
+	Assert.assertEquals("1234", setting.readKeyValue("key3").get());
+	Assert.assertEquals("xxx", setting.readKeyValue("key4").get());
 
 	//
 	//

@@ -54,16 +54,16 @@ public enum BondOperator {
 
     private String shortRepresentation;
 
-    private BondOperator() {
+    BondOperator() {
     }
 
-    private BondOperator(String shortRepresentation) {
+    BondOperator(String shortRepresentation) {
 	this.shortRepresentation = shortRepresentation;
     }
 
     public String getShortRepresentation() {
 	if (shortRepresentation == null) {
-	    return " " + toString() + " ";
+	    return " " + this + " ";
 	}
 	return shortRepresentation;
     }
@@ -102,21 +102,14 @@ public enum BondOperator {
      * @return
      */
     public static BondOperator negate(BondOperator operator) {
-	switch (operator) {
-	case EQUAL:
-	    return NOT_EQUAL;
-	case NOT_EQUAL:
-	    return EQUAL;
-	case LESS:
-	    return GREATER_OR_EQUAL;
-	case GREATER:
-	    return LESS_OR_EQUAL;
-	case LESS_OR_EQUAL:
-	    return GREATER;
-	case GREATER_OR_EQUAL:
-	    return LESS;
-	default:
-	    return null;
-	}
+	return switch (operator) {
+	    case EQUAL -> NOT_EQUAL;
+	    case NOT_EQUAL -> EQUAL;
+	    case LESS -> GREATER_OR_EQUAL;
+	    case GREATER -> LESS_OR_EQUAL;
+	    case LESS_OR_EQUAL -> GREATER;
+	    case GREATER_OR_EQUAL -> LESS;
+	    default -> null;
+	};
     }
 }

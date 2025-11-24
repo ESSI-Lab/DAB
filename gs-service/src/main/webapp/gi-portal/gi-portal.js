@@ -1600,6 +1600,24 @@ export function initializePortal(config) {
 			if (!$('#advConstDiv').length) {
 				$('<div>').attr('id', 'advConstDiv').appendTo('#adv-search-div');
 			}
+
+			// Fix positioning to ensure panel opens downward and stays on screen
+			setTimeout(function() {
+				var $advSearchDiv = $('#adv-search-div');
+				var $advConstDiv = $('#advConstDiv');
+				
+				// Ensure parent has relative positioning
+				$advSearchDiv.css('position', 'relative');
+				
+				// Override the relative positioning set by advancedSearch function
+				$advConstDiv.css({
+					'position': 'absolute',
+					'top': '100%',
+					'left': '0',
+					'margin-top': '5px',
+					'z-index': '1000'
+				});
+			}, 0);
 		}
 
 		//------------------------------------

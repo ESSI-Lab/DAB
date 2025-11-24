@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
@@ -53,7 +54,7 @@ public class ViewFactory {
 	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 	    return m;
 	} catch (JAXBException e) {
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
 	}
 	// this shouldn't happen as JAXBFactory test is used to check it will not happen
 	return null;
@@ -65,10 +66,9 @@ public class ViewFactory {
     public static Unmarshaller createUnmarshaller() {
 	try {
 	    JAXBContext jc = createContext();
-	    Unmarshaller u = jc.createUnmarshaller();
-	    return u;
+	    return jc.createUnmarshaller();
 	} catch (JAXBException e) {
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
 	}
 	// this shouldn't happen as JAXBFactory test is used to check it will not happen
 	return null;

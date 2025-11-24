@@ -45,7 +45,7 @@ public class SemanticBrowsing extends SemanticOperation {
 	/**
 	 *
 	 */
-	COLLAPSE;
+	COLLAPSE
     }
 
     private String subjectId;

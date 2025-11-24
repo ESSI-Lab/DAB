@@ -73,8 +73,7 @@ public class RuntimeInfoElementBond extends QueryableBond<String> {
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof RuntimeInfoElementBond) {
-	    RuntimeInfoElementBond bond = (RuntimeInfoElementBond) obj;
+	if (obj instanceof RuntimeInfoElementBond bond) {
 	    return Objects.equals(bond.getOperator(), getOperator()) && //
 		    Objects.equals(bond.getProperty(), getProperty()) && //
 		    Objects.equals(bond.getPropertyValue(), getPropertyValue());

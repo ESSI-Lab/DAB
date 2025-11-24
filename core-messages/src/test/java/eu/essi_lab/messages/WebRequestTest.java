@@ -23,27 +23,27 @@ public class WebRequestTest {
     }
 
     @Test
-    public void viewTest1() throws Exception {
+    public void viewTest1() {
 	Mockito.doReturn("opensearch/noview/example").when(request).getRequestPath();
 	Assert.assertFalse(request.extractViewId().isPresent());
     }
 
     @Test
-    public void viewTest2() throws Exception {
+    public void viewTest2() {
 	String uuid = UUID.randomUUID().toString();
 	Mockito.doReturn("view/" + uuid + "/opensearch").when(request).getRequestPath();
 	assertEquals(uuid, request.extractViewId().get());
     }
 
     @Test
-    public void viewTest3() throws Exception {
+    public void viewTest3() {
 	String uuid = UUID.randomUUID().toString();
 	Mockito.doReturn("view/" + uuid + "/opensearch/operation/").when(request).getRequestPath();
 	assertEquals(uuid, request.extractViewId().get());
     }
 
     @Test
-    public void viewTest4() throws Exception {
+    public void viewTest4() {
 	String uuid1 = UUID.randomUUID().toString();
 	String uuid2 = UUID.randomUUID().toString();
 	Mockito.doReturn("view/" + uuid1 + "/opensearch/view/" + uuid2).when(request).getRequestPath();
