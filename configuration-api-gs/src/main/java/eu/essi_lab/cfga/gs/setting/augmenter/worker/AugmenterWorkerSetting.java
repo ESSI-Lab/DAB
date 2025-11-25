@@ -252,7 +252,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(clazz).//
 		    withLabel("Augmenters").//
- 		    withShowDirective("Augmenters", SortDirection.ASCENDING).//
+ 		    withShowDirective(SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 			    "Add augmentation job", //

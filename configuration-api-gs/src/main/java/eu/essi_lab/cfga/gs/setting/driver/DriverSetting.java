@@ -66,7 +66,6 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DriverSetting.class).//
 		    withLabel("Repository").//
-		    withShowDirective("Repository").//
 		    build();
 
 	    setPlaceholder(TabPlaceholder.of(GSTabIndex.REPOSITORY.getIndex(), descriptor));

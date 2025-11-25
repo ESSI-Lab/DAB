@@ -405,7 +405,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(SystemSetting.class).//
 		    withLabel("System").//
- 		    withShowDirective("System").//
 		    build();
 
 	    setPlaceholder(TabPlaceholder.of(GSTabIndex.SYSTEM.getIndex(), descriptor));

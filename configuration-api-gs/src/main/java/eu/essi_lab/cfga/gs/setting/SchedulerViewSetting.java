@@ -60,7 +60,6 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(SchedulerViewSetting.class).//
 		    withLabel("Scheduler").//
- 		    withShowDirective("Scheduler").//
 		    build();
 
 	    setPlaceholder(TabPlaceholder.of(GSTabIndex.SCHEDULER.getIndex(), descriptor));

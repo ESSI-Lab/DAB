@@ -144,7 +144,6 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DataCacheConnectorSettingImpl.class).//
 		    withLabel("Data cache").//
-		    withShowDirective("Data cache").//
 		    build();
 
 	    setPlaceholder(TabPlaceholder.of(GSTabIndex.DATA_CACHE.getIndex(), descriptor));

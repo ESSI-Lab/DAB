@@ -201,7 +201,6 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(SourceStorageSetting.class).//
 		    withLabel("Source storage").//
- 		    withShowDirective("Source storage").//
 		    build();
 
 	    setPlaceholder(TabPlaceholder.of(GSTabIndex.SOURCE_STORAGE.getIndex(), descriptor));

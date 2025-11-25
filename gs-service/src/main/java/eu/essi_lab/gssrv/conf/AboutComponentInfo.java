@@ -83,7 +83,6 @@ public class AboutComponentInfo extends ComponentInfo {
 
 	TabDescriptor descriptor = TabDescriptorBuilder.get().//
 		withLabel(getName()).//
-		withShowDirective(getName()).//
 		withComponent(verticalLayout).//
 		build();
 

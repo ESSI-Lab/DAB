@@ -120,7 +120,6 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(GDCSourcesSetting.class).//
 		    withLabel("GDC sources").//
-		    withShowDirective("GDC sources").//
 		    build();
 
 	    setPlaceholder(TabPlaceholder.of(GSTabIndex.GDC_SOURCES.getIndex(), descriptor));

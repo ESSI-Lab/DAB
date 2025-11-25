@@ -209,7 +209,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(CustomTaskSetting.class).//
 		    withLabel("Custom tasks").//
- 		    withShowDirective("Custom tasks", SortDirection.ASCENDING).//
+ 		    withShowDirective(SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 		    "Add task", //

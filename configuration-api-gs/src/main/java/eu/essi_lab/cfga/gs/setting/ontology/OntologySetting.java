@@ -445,7 +445,7 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(OntologySetting.class).//
 		    withLabel("Ontologies").//
- 		    withShowDirective("Ontologies", SortDirection.ASCENDING).//
+ 		    withShowDirective(SortDirection.ASCENDING).//
 		    withAddDirective("Add ontology", OntologySetting.class).//
 		    withRemoveDirective("Remove ontology", true, OntologySetting.class).//
 		    withEditDirective("Edit ontology", ConfirmationPolicy.ON_WARNINGS).//

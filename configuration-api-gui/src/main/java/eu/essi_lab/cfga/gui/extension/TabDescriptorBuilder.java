@@ -12,12 +12,12 @@ import java.util.ArrayList;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -49,7 +49,7 @@ public class TabDescriptorBuilder {
     /**
      *
      */
-    private TabDescriptorBuilder(){
+    private TabDescriptorBuilder() {
 
 	tabDescriptor = new TabDescriptor();
     }
@@ -186,54 +186,43 @@ public class TabDescriptorBuilder {
     }
 
     /**
-     * @param name
+     * @param description
+     * @return
+     */
+    public TabDescriptorBuilder withShowDirective(String description) {
+
+	return withShowDirective(description, null);
+    }
+
+    /**
      * @param direction
      * @return
      */
-    public TabDescriptorBuilder withShowDirective(String name, String description) {
+    public TabDescriptorBuilder  withShowDirective(SortDirection direction) {
 
-	ShowDirective showDirective = new ShowDirective(name);
-	showDirective.setDescription(description);
+	return withShowDirective(null, direction);
+    }
+
+    /**
+     * @param description
+     * @param direction
+     * @return
+     */
+    public TabDescriptorBuilder withShowDirective(String description, SortDirection direction) {
+
+	ShowDirective showDirective = new ShowDirective();
+
+	if(description != null) {
+
+	    showDirective.setDescription(description);
+	}
+
+	if (direction != null) {
+
+	    showDirective.setSortDirection(direction);
+	}
 
 	tabDescriptor.getDirectiveManager().add(showDirective);
-
-	return this;
-    }
-
-    /**
-     * @param name
-     * @param direction
-     * @return
-     */
-    public TabDescriptorBuilder withShowDirective(String name, String description, SortDirection direction) {
-
-	ShowDirective showDirective = new ShowDirective(name, direction);
-	showDirective.setDescription(description);
-
-	tabDescriptor.getDirectiveManager().add(showDirective);
-
-	return this;
-    }
-
-    /**
-     * @param name
-     * @param direction
-     * @return
-     */
-    public TabDescriptorBuilder withShowDirective(String name, SortDirection direction) {
-
-	tabDescriptor.getDirectiveManager().add(new ShowDirective(name, direction));
-
-	return this;
-    }
-
-    /**
-     * @param name
-     * @return
-     */
-    public TabDescriptorBuilder withShowDirective(String name) {
-
-	tabDescriptor.getDirectiveManager().add(new ShowDirective(name));
 
 	return this;
     }

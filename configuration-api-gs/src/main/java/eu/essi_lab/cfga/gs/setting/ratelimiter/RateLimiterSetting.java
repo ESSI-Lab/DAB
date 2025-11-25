@@ -247,7 +247,6 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(RateLimiterSetting.class).//
 		    withLabel("Rate limiter").//
-		    withShowDirective("Rate limiter").//
 		    build();
 
 	    setPlaceholder(TabPlaceholder.of(GSTabIndex.RATE_LIMITER.getIndex(), descriptor));

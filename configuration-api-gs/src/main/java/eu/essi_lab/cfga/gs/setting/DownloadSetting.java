@@ -127,7 +127,6 @@ public class DownloadSetting extends Setting implements EditableSetting {
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DownloadSetting.class).//
 		    withLabel("Download").//
-		    withShowDirective("Download").//
 		    build();
 
 	    setPlaceholder(TabPlaceholder.of(GSTabIndex.DOWNLOAD.getIndex(), descriptor));

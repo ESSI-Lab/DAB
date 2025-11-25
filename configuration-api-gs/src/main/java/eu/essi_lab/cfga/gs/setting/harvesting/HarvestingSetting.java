@@ -182,15 +182,15 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	    Class<? extends Setting> clazz = null;
 	    try {
-		 clazz = (Class<? extends Setting>) Class.forName("eu.essi_lab.harvester.worker.HarvestingSettingImpl");
+		clazz = (Class<? extends Setting>) Class.forName("eu.essi_lab.harvester.worker.HarvestingSettingImpl");
 	    } catch (ClassNotFoundException e) {
 		throw new RuntimeException(e);
 	    }
 
 	    descriptor = TabDescriptorBuilder.get(clazz).//
 		    withLabel("Harvesting").//
-		    withShowDirective("Harvesting",
-		    "Manage DAB harvested sources. Click \"Reload\" to" + " update the scheduler information", SortDirection.ASCENDING).//
+		    withShowDirective("Manage DAB harvested sources. Click \"Reload\" to" + " update the scheduler information",
+		    SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 		    "Add harvested/mixed accessor", //
@@ -254,11 +254,9 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 		    build();
 
-
 	}
 
 	/**
-	 *
 	 * @return
 	 */
 	public TabDescriptor getDescriptor() {

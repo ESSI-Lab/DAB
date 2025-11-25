@@ -58,7 +58,6 @@ public class ConfigHandler extends ComponentInfo {
 
 	TabDescriptor descriptor = TabDescriptorBuilder.get().//
 		withLabel(getName()).//
-		withShowDirective(getName()).//
 		withComponent(mainLayout).//
 		build();
 

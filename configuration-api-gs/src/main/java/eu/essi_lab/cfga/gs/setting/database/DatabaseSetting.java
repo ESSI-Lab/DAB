@@ -183,7 +183,6 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DatabaseSetting.class).//
 		    withLabel("Database").//
-		    withShowDirective("Database").//
 		    build();
 
 	    setPlaceholder(TabPlaceholder.of(GSTabIndex.DATABASE.getIndex(), descriptor));
