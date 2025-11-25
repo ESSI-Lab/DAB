@@ -150,9 +150,9 @@ public class DABStarter {
 
 	    schemeCheckMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
 
-	    CheckResponse missingRespone = schemeCheckMethod.check(configuration);
+	    CheckResponse missingResponse = schemeCheckMethod.check(configuration);
 
-	    missingRespone.getMessages().forEach(msg -> GSLoggerFactory.getLogger(getClass()).warn(msg));
+	    missingResponse.getMessages().forEach(msg -> GSLoggerFactory.getLogger(getClass()).warn(msg));
 
 	    schemeCheckMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
 
@@ -170,7 +170,7 @@ public class DABStarter {
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check ENDED");
 
 	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED || //
-		    missingRespone.getCheckResult() == CheckResult.CHECK_FAILED || //
+		    missingResponse.getCheckResult() == CheckResult.CHECK_FAILED || //
 		    redundantRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
 
 		switch (mode) {
@@ -191,11 +191,11 @@ public class DABStarter {
 			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Removing redundant settings ENDED");
 		    }
 
-		    if (missingRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
+		    if (missingResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
 
 			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Adding missing settings STARTED");
 
-			missingRespone.getSettings().forEach(setting -> configuration.put(setting));
+			missingResponse.getSettings().forEach(setting -> configuration.put(setting));
 
 			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Adding missing settings ENDED");
 		    }

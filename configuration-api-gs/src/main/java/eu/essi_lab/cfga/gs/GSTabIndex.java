@@ -164,7 +164,7 @@ public enum GSTabIndex implements TabIndex {
      */
     public static List<SchemeItem> getItems() {
 
-	return Arrays.asList(values()).stream().collect(Collectors.toList());
+	return Arrays.stream(values()).collect(Collectors.toList());
     }
 
     /**
@@ -172,6 +172,6 @@ public enum GSTabIndex implements TabIndex {
      */
     public static List<TabIndex> getValues() {
 
-	return Arrays.asList(values()).stream().collect(Collectors.toList());
+	return Arrays.stream(values()).collect(Collectors.toList());
     }
 }
