@@ -53,6 +53,7 @@ public class OMRequest {
 		END_DATE("endDate", "endTime", "end", "endPosition"), //
 		PLATFORM_CODE("sampledFeature", "feature", "featureIdentifier", "featureId", "monitoringPoint",
 				"monitoringPointIdentifier", "platform", "platformCode", "site", "location", "siteCode"), //
+		LOCAL_PLATFORM_CODE("localFeatureIdentifier","localPlatformCode"), //
 		ONTOLOGY("ontology"), //
 		ID("id"), //
 		OBSERVED_PROPERTY("observedProperty"), //

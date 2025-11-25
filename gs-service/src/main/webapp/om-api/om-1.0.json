@@ -61,6 +61,14 @@
 						}
 					},
 					{
+						"name": "localFeatureIdentifier",
+						"in": "query",
+						"description": "Identifier of the feature specified by the data provider",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "observationIdentifier",
 						"in": "query",
 						"description": "Identifier of the observation",
@@ -239,6 +247,14 @@
 						}
 					},
 					{
+						"name": "localFeatureIdentifier",
+						"in": "query",
+						"description": "Identifier of the feature specified by the data provider",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "observationIdentifier",
 						"in": "query",
 						"description": "Identifier of the observation",
@@ -393,7 +409,7 @@
 					}
 				}
 			}
-		},		
+		},
 		"/gs-service/services/essi/token/{token}/view/{view}/om-api/observations": {
 			"get": {
 				"description": "Used to retrieve metadata and data about observations",
@@ -420,6 +436,14 @@
 						"name": "feature",
 						"in": "query",
 						"description": "Identifier of the feature",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "localFeatureIdentifier",
+						"in": "query",
+						"description": "Identifier of the feature specified by the data provider",
 						"schema": {
 							"type": "string"
 						}
@@ -621,6 +645,14 @@
 						}
 					},
 					{
+						"name": "localFeatureIdentifier",
+						"in": "query",
+						"description": "Identifier of the feature specified by the data provider",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "observationIdentifier",
 						"in": "query",
 						"description": "Identifier of the observation",
@@ -727,7 +759,7 @@
 						"schema": {
 							"type": "string"
 						}
-					},				
+					},
 					{
 						"name": "asynchDownloadName",
 						"in": "query",
@@ -751,7 +783,7 @@
 						"schema": {
 							"type": "boolean"
 						}
-					},					
+					},
 					{
 						"name": "limit",
 						"in": "query",
