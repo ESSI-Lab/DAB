@@ -162,17 +162,14 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 
 	    addSetting(dbSettings);
 	}
-
-	//
-	// set the component extension
-	//
-	setExtension(new DatabaseComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
     public static class DatabaseComponentInfo extends ComponentInfo {
+
+	private final TabDescriptor descriptor;
 
 	/**
 	 *
@@ -181,11 +178,17 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 
 	    setName(DatabaseSetting.class.getName());
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(DatabaseSetting.class).//
+	    descriptor = TabDescriptorBuilder.get(DatabaseSetting.class).//
 		    withLabel("Database").//
 		    build();
+	}
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.DATABASE.getIndex(), descriptor));
+	/**
+	 * @return
+	 */
+	public TabDescriptor getDescriptor() {
+
+	    return descriptor;
 	}
     }
 

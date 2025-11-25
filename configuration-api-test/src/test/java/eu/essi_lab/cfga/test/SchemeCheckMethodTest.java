@@ -485,7 +485,7 @@ public class SchemeCheckMethodTest {
 
 	// removed system, database setting and user database setting (which are in the same tab) from the tab
 	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.SYSTEM.getIndex()).collect(Collectors.toList());
-	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.DATABASE.getIndex()).collect(Collectors.toList());
+//	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.DATABASE.getIndex()).collect(Collectors.toList());
 
 	checkMethod.setItems(list);
 
@@ -661,7 +661,7 @@ public class SchemeCheckMethodTest {
 	// removing repository setting from the tab
 	// this tabs holds 2 kind of settings, SharedCacheDriverSetting and SharedPersistentDriverSetting
 	//
-	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.REPOSITORY.getIndex()).collect(Collectors.toList());
+//	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.REPOSITORY.getIndex()).collect(Collectors.toList());
 
 	checkMethod.setItems(list);
 
@@ -713,11 +713,11 @@ public class SchemeCheckMethodTest {
 	//
 	//
 	//
-	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.REPOSITORY.getIndex()).collect(Collectors.toList());
-
-	list.add(createTabIndex(true, GSTabIndex.REPOSITORY.getIndex(),
-
-		Descriptor.of(s -> s.getSettingClass().equals(SharedCacheDriverSetting.class))));
+//	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.REPOSITORY.getIndex()).collect(Collectors.toList());
+//
+//	list.add(createTabIndex(true, GSTabIndex.REPOSITORY.getIndex(),
+//
+//		Descriptor.of(s -> s.getSettingClass().equals(SharedCacheDriverSetting.class))));
 	//
 	//
 	//
@@ -765,13 +765,13 @@ public class SchemeCheckMethodTest {
 	//
 	//
 	//
-	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.REPOSITORY.getIndex()).collect(Collectors.toList());
-
-	list.add(createTabIndex(true, GSTabIndex.REPOSITORY.getIndex(),
-
-		Descriptor.of(s -> s.getSettingClass().equals(SharedCacheDriverSetting.class)),
-
-		Descriptor.of(s -> s.getSettingClass().equals(SharedPersistentDriverSetting.class))));
+//	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.REPOSITORY.getIndex()).collect(Collectors.toList());
+//
+//	list.add(createTabIndex(true, GSTabIndex.REPOSITORY.getIndex(),
+//
+//		Descriptor.of(s -> s.getSettingClass().equals(SharedCacheDriverSetting.class)),
+//
+//		Descriptor.of(s -> s.getSettingClass().equals(SharedPersistentDriverSetting.class))));
 	//
 	//
 	//
@@ -820,7 +820,7 @@ public class SchemeCheckMethodTest {
 	// removing repository setting from the tab
 	// this tabs holds 2 kind of settings, SharedCacheDriverSetting and SharedPersistentDriverSetting
 	//
-	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.REPOSITORY.getIndex()).collect(Collectors.toList());
+//	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.REPOSITORY.getIndex()).collect(Collectors.toList());
 
 	checkMethod.setItems(list);
 

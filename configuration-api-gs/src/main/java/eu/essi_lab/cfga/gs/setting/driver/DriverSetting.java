@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.gs.setting.driver;
 
@@ -40,14 +40,9 @@ import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
 public abstract class DriverSetting extends Setting implements EditableSetting {
 
     /**
-     * 
+     *
      */
     public DriverSetting() {
-
-	//
-	// set the component extension
-	//
-	setExtension(new DriverComponentInfo());
 
 	setCanBeDisabled(false);
     }
@@ -57,18 +52,27 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
      */
     public static class DriverComponentInfo extends ComponentInfo {
 
+	private final TabDescriptor descriptor;
+
 	/**
-	 * 
+	 *
 	 */
 	public DriverComponentInfo() {
 
 	    setName(DriverSetting.class.getName());
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(DriverSetting.class).//
+	    descriptor = TabDescriptorBuilder.get(DriverSetting.class).//
 		    withLabel("Repository").//
 		    build();
+	}
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.REPOSITORY.getIndex(), descriptor));
+	/**
+	 *
+	 * @return
+	 */
+	public TabDescriptor getDescriptor() {
+
+	    return descriptor;
 	}
     }
 

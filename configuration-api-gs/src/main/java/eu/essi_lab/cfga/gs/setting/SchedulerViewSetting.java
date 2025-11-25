@@ -32,12 +32,11 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
  */
 public class SchedulerViewSetting extends SchedulerSetting implements Configurable<Setting> {
 
+    /**
+     *
+     */
     public SchedulerViewSetting() {
 
-	//
-	// set the rendering extension
-	//
-	setExtension(new SchedulerSettingComponentInfo());
     }
 
     @Override
@@ -51,6 +50,8 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
      */
     public static class SchedulerSettingComponentInfo extends ComponentInfo {
 
+	private final TabDescriptor descriptor;
+
 	/**
 	 * 
 	 */
@@ -58,11 +59,18 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 
 	    setName(SchedulerSetting.class.getName());
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(SchedulerViewSetting.class).//
+	    descriptor = TabDescriptorBuilder.get(SchedulerViewSetting.class).//
 		    withLabel("Scheduler").//
 		    build();
+	}
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.SCHEDULER.getIndex(), descriptor));
+	/**
+	 *
+	 * @return
+	 */
+	public TabDescriptor getDescriptor() {
+
+	    return descriptor;
 	}
     }
 

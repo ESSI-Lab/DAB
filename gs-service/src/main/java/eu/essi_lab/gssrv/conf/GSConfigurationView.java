@@ -519,6 +519,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	return Arrays.asList(//
 		new Brokering(),//
+		new System(),//
 		new ConfigHandler(), //
 		new AboutComponentInfo(),
 		new OntologySettingComponentInfo()//

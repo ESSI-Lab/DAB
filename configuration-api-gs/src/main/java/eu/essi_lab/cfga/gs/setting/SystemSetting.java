@@ -310,11 +310,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	addSetting(semSearchSetting);
 
 	//
-	// set the rendering extension
-	//
-	setExtension(new SystemSettingComponentInfo());
-
-	//
 	// set the validator
 	//
 	setValidator(new SystemSettingValidator());
@@ -396,6 +391,8 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
      */
     public static class SystemSettingComponentInfo extends ComponentInfo {
 
+	private final TabDescriptor descriptor;
+
 	/**
 	 * 
 	 */
@@ -403,11 +400,18 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	    setName(SystemSetting.class.getName());
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(SystemSetting.class).//
-		    withLabel("System").//
+	    descriptor = TabDescriptorBuilder.get(SystemSetting.class).//
+		    withLabel("Miscellaneous").//
 		    build();
+	}
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.SYSTEM.getIndex(), descriptor));
+	/**
+	 *
+	 * @return
+	 */
+	public TabDescriptor getDescriptor() {
+
+	    return descriptor;
 	}
     }
 

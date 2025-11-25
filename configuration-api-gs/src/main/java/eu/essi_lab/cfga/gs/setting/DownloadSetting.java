@@ -106,17 +106,14 @@ public class DownloadSetting extends Setting implements EditableSetting {
 	s3StorageSetting.setEditable(false);
 
 	addSetting(s3StorageSetting);
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new DownloadSettingComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
     public static class DownloadSettingComponentInfo extends ComponentInfo {
+
+	private final TabDescriptor descriptor;
 
 	/**
 	 *
@@ -125,11 +122,18 @@ public class DownloadSetting extends Setting implements EditableSetting {
 
 	    setName(DownloadSetting.class.getName());
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(DownloadSetting.class).//
+	    descriptor = TabDescriptorBuilder.get(DownloadSetting.class).//
 		    withLabel("Download").//
 		    build();
+	}
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.DOWNLOAD.getIndex(), descriptor));
+	/**
+	 *
+	 * @return
+	 */
+	public TabDescriptor getDescriptor() {
+
+	    return descriptor;
 	}
     }
 

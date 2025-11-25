@@ -226,17 +226,14 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 	mixedSetting.setIdentifier(MIXED_MODE_SETTING_ID);
 	mixedSetting.setName("Mixed");
 	addSetting(mixedSetting);
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new RateLimiterSettingComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
     public static class RateLimiterSettingComponentInfo extends ComponentInfo {
+
+	private final TabDescriptor descriptor;
 
 	/**
 	 *
@@ -245,11 +242,18 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 
 	    setName(SystemSetting.class.getName());
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(RateLimiterSetting.class).//
+	    descriptor = TabDescriptorBuilder.get(RateLimiterSetting.class).//
 		    withLabel("Rate limiter").//
 		    build();
+	}
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.RATE_LIMITER.getIndex(), descriptor));
+	/**
+	 *
+	 * @return
+	 */
+	public TabDescriptor getDescriptor() {
+
+	    return descriptor;
 	}
     }
 
