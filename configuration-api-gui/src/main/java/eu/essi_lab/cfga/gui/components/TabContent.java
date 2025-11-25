@@ -32,7 +32,7 @@ import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -397,11 +397,13 @@ public class TabContent extends VerticalLayout implements Renderable {
      */
     private CustomButton createReloadButton() {
 
-	CustomButton reloadButton = new CustomButton("Reload", VaadinIcon.REFRESH.create());
+	CustomButton reloadButton = new CustomButton("RELOAD", VaadinIcon.REFRESH.create());
+	reloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	reloadButton.setId("reloadButton");
 	reloadButton.setWidth(150, Unit.PIXELS);
 	reloadButton.getStyle().set("margin-left", "15px");
-	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%");
+	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
+	reloadButton.getStyle().set("border-radius", "0px");
 
 	reloadButton.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 

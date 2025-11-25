@@ -36,7 +36,7 @@ public class AddDirective extends Directive {
      */
     public AddDirective() {
 
-	setName("Add");
+	setName("ADD");
 
 	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
     }

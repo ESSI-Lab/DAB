@@ -59,7 +59,7 @@ public class SettingPutDialog extends SettingPutOrEditDialog {
 	this.settingToAdd = SettingUtils.create(addDirective.getSettingClass());
 
 	setTitle(addDirective.getName());
-	setConfirmText("Add");
+	setConfirmText("ADD");
 
 	//
 	// hides the header and opens expands the setting

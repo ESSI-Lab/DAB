@@ -35,7 +35,7 @@ public class RemoveDirective extends AddDirective {
      */
     public RemoveDirective() {
 
-	setName("Remove");
+	setName("REMOVE");
 
 	setConfirmationPolicy(ConfirmationPolicy.ALWAYS);
     }

@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -141,8 +141,8 @@ public class SettingComponentFactory {
 		filter(Option::isAdvanced).//
 		toList();
 
-	VerticalLayout optionsLayout = ComponentFactory
-		.createNoSpacingNoMarginVerticalLayout("options-layout-for-setting-" + setting.getName());
+	VerticalLayout optionsLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout(
+		"options-layout-for-setting-" + setting.getName());
 	optionsLayout.setSizeFull();
 	optionsLayout.getStyle().set("padding", "0px");
 
@@ -152,11 +152,11 @@ public class SettingComponentFactory {
 		filter(o -> !o.isAdvanced()).//
 		forEach(o -> {
 
-		    OptionComponent optionComponent = new OptionComponent(configuration, setting, o, forceReadonly);
+	    OptionComponent optionComponent = new OptionComponent(configuration, setting, o, forceReadonly);
 
-		    optionsLayout.add(optionComponent);
-		    mainLayout.getOptionComponents().add(optionComponent);
-		});
+	    optionsLayout.add(optionComponent);
+	    mainLayout.getOptionComponents().add(optionComponent);
+	});
 
 	if (setting.isCompactModeEnabled()) {
 
@@ -178,8 +178,8 @@ public class SettingComponentFactory {
 
 	if (!advancedOptions.isEmpty()) {
 
-	    VerticalLayout advLayout = ComponentFactory
-		    .createNoSpacingNoMarginVerticalLayout("advanced-options-layout-for-setting-" + setting.getName());
+	    VerticalLayout advLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout(
+		    "advanced-options-layout-for-setting-" + setting.getName());
 	    advLayout.setSizeFull();
 	    advLayout.getStyle().set("padding", "0px");
 
@@ -199,8 +199,6 @@ public class SettingComponentFactory {
     }
 
     /**
-     *  
-     * 
      * @param configuration
      * @param setting
      * @param forceReadonly
@@ -213,10 +211,8 @@ public class SettingComponentFactory {
 
 	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, false, null, null);
     }
-    
+
     /**
-     *  
-     * 
      * @param configuration
      * @param setting
      * @param forceReadonly
@@ -245,7 +241,7 @@ public class SettingComponentFactory {
 
 	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, false, null, tabContent);
     }
-    
+
     /**
      * @param configuration
      * @param setting
@@ -295,8 +291,8 @@ public class SettingComponentFactory {
 	    Comparator<Setting> comparator, //
 	    TabContent tabContent) {
 
-	SettingComponent settingComponent = new SettingComponent(configuration, settingIdentifier, forceReadonly, forceHideLabel, comparator,
-		tabContent);
+	SettingComponent settingComponent = new SettingComponent(configuration, settingIdentifier, forceReadonly, forceHideLabel,
+		comparator, tabContent);
 
 	settingComponent.getStyle().set("background-color", "white");
 	settingComponent.getStyle().set("padding", "4px");
@@ -305,7 +301,7 @@ public class SettingComponentFactory {
 
 	return settingComponent;
     }
-    
+
     /**
      * @param configuration
      * @param setting
@@ -328,7 +324,7 @@ public class SettingComponentFactory {
 
 	settingComponent.getStyle().set("background-color", "white");
 	settingComponent.getStyle().set("padding", "4px");
-	settingComponent.getStyle().set("border-radius", "5px");
+	settingComponent.getStyle().set("border-radius", "px");
 	settingComponent.getStyle().set("margin-top", "0px");
 
 	return settingComponent;
@@ -351,11 +347,11 @@ public class SettingComponentFactory {
 	    Comparator<Setting> comparator, //
 	    TabContent tabContent) {
 
-	SettingComponent settingComponent = createSettingComponent(configuration, settingIdentifier, forceReadonly, forceHideLabel, comparator,
-		tabContent);
+	SettingComponent settingComponent = createSettingComponent(configuration, settingIdentifier, forceReadonly, forceHideLabel,
+		comparator, tabContent);
 
 	Setting setting = configuration.get(settingIdentifier).get();
-	
+
 	if (setting.isFoldedModeEnabled()) {
 
 	    Details details = ComponentFactory.createDetails(setting.getName(), settingComponent);
@@ -365,7 +361,7 @@ public class SettingComponentFactory {
 
 	return settingComponent;
     }
-    
+
     /**
      * @param configuration
      * @param setting
@@ -385,7 +381,7 @@ public class SettingComponentFactory {
 
 	SettingComponent settingComponent = createSettingComponent(configuration, setting, forceReadonly, forceHideLabel, comparator,
 		tabContent);
-	
+
 	if (setting.isFoldedModeEnabled()) {
 
 	    Details details = ComponentFactory.createDetails(setting.getName(), settingComponent);
@@ -439,18 +435,18 @@ public class SettingComponentFactory {
     public static TextArea createSettingDescriptionArea(String description) {
 
 	TextArea textArea = new TextArea();
-	
+
 	textArea.setReadOnly(true);
 	textArea.setValue(description);
 	textArea.setWidthFull();
 	textArea.getStyle().set("font-size", "15px");
-	textArea.getStyle().set("border-radius", "5px");
+	textArea.getStyle().set("border-radius", "0px");
 	textArea.getStyle().set("background-color", "rgb(158 158 158 / 26%)");
-	
+
 	textArea.addClassName("text-area-no-border");
 
-//	textArea.getStyle().set("color", "gray");
-//	textArea.getStyle().set("margin-bottom", "5px");
+	//	textArea.getStyle().set("color", "gray");
+	//	textArea.getStyle().set("margin-bottom", "5px");
 
 	return textArea;
     }
@@ -461,8 +457,8 @@ public class SettingComponentFactory {
      * @return
      */
     public static Label createSettingNameLabel(Setting setting, Setting parent) {
-	
-	String name = parent != null ? "[ "+setting.getName()+" ]" : setting.getName();
+
+	String name = parent != null ? "[ " + setting.getName() + " ]" : setting.getName();
 
 	Label label = ComponentFactory.createLabel(name);
 	label.getStyle().set("font-weight", "bold");
@@ -476,21 +472,19 @@ public class SettingComponentFactory {
 	}
 
 	if (parent == null) {
-	    
+
 	    label.getStyle().set("font-size", "15px");
 	    label.getStyle().set("background-color", "#3c8df5");
 	    label.getStyle().set("padding", "5px");
 	    label.getStyle().set("padding-bottom", "3px");
 	    label.getStyle().set("padding-top", "1px");
-	    label.getStyle().set("border-radius", "5px");
+	    label.getStyle().set("border-radius", "0px");
 	    label.getStyle().set("color", "white");
 	    label.getStyle().set("opacity", "0.9");
-	
-	}else {
-	    
-	  
-	    label.getStyle().set("padding-bottom", "5px");
 
+	} else {
+
+	    label.getStyle().set("padding-bottom", "5px");
 	}
 
 	return label;
@@ -524,7 +518,7 @@ public class SettingComponentFactory {
 	    SettingComponent currentSettingComponent, //
 	    TabContent tabContent) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton("Edit", VaadinIcon.EDIT.create());
+	ConfigurationViewButton button = new ConfigurationViewButton("EDIT", VaadinIcon.EDIT.create());
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.setWidth(100, Unit.PIXELS);
 	button.getStyle().set("margin-left", "3px");
@@ -559,7 +553,7 @@ public class SettingComponentFactory {
 	    TabContent tabContent, //
 	    AddDirective addDirective) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton("Add", VaadinIcon.PLUS_SQUARE_O.create());
+	ConfigurationViewButton button = new ConfigurationViewButton("ADD", VaadinIcon.PLUS_SQUARE_O.create());
 	button.setWidth(100, Unit.PIXELS);
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.getStyle().set("margin-left", "3px");
@@ -593,7 +587,7 @@ public class SettingComponentFactory {
 	    TabContent tabContent,//
 	    SettingComponent settingComponent) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton("Remove", VaadinIcon.MINUS_SQUARE_O.create());
+	ConfigurationViewButton button = new ConfigurationViewButton("REMOVE", VaadinIcon.MINUS_SQUARE_O.create());
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.setWidth(150, Unit.PIXELS);
 	button.getStyle().set("margin-left", "3px");
@@ -605,6 +599,7 @@ public class SettingComponentFactory {
 	button.addEnabledStyle("color", "red");
 	button.addEnabledStyle("border", "none");
 	button.addEnabledStyle("background-color", "rgb(240 240 240)");
+	button.addEnabledStyle("border", "1px solid lightgray");
 
 	//
 	//
@@ -624,7 +619,7 @@ public class SettingComponentFactory {
     public static ConfirmationDialog createSettingRemoveDialog(ButtonChangeListener onConfirmListener) {
 
 	ConfirmationDialog dialog = new ConfirmationDialog("Are you sure you want to remove this setting?", onConfirmListener);
-	
+
 	dialog.addToCloseAll();
 
 	return dialog;
