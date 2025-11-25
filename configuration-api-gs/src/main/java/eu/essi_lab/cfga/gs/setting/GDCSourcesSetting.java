@@ -111,6 +111,8 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
      */
     public static class GDCSettingComponentInfo extends ComponentInfo {
 
+	private final TabDescriptor descriptor;
+
 	/**
 	 *
 	 */
@@ -118,11 +120,18 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 
 	    setName(GDCSettingComponentInfo.class.getName());
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(GDCSourcesSetting.class).//
+	    descriptor = TabDescriptorBuilder.get(GDCSourcesSetting.class).//
 		    withLabel("GDC sources").//
 		    build();
+	}
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.GDC_SOURCES.getIndex(), descriptor));
+	/**
+	 *
+	 * @return
+	 */
+	public TabDescriptor getDescriptor() {
+
+	    return descriptor;
 	}
     }
 

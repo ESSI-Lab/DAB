@@ -51,46 +51,44 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    AUGMENTERS(1, true, Descriptor.of(s -> s.getSettingClass().getSimpleName().equals("AugmenterWorkerSettingImpl"))),
+    SOURCES(1, false,//
+	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SOURCE_PRIORITY_SETTING.getLabel())),//
+	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SOURCE_STORAGE_SETTING.getLabel())),//
+	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.GDC_SOURCES_SETTING.getLabel()))//
+    ),
 
     /**
      *
      */
-    AUTHORIZATION(2, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.OAUTH_SETTING.getLabel()))),
-    /**
-     *
-     */
-    CREDENTIALS(3, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.CREDENTIALS_SETTING.getLabel()))),
-       /**
-     *
-     */
-    SOURCE_STORAGE(4, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SOURCE_STORAGE_SETTING.getLabel()))),
-    /**
-     *
-     */
-    IDENTIFIER_MANAGEMENT(5, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SOURCE_PRIORITY_SETTING.getLabel()))),
-    /**
-     *
-     */
-    GDC_SOURCES(6, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.GDC_SOURCES_SETTING.getLabel()))),
-    /**
-     *
-     */
-    CUSTOM_TASKS(7, true, Descriptor.of(s -> s.getSettingClass().equals(CustomTaskSetting.class))),
-    /**
-     *
-     */
-    DATA_CACHE(8, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel()))),
+    AUGMENTERS(2, true, Descriptor.of(s -> s.getSettingClass().getSimpleName().equals("AugmenterWorkerSettingImpl"))),
 
     /**
      *
      */
-    ONTOLOGIES(9, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
+    CUSTOM_TASKS(3, true, Descriptor.of(s -> s.getSettingClass().equals(CustomTaskSetting.class))),
 
     /**
      *
      */
-    SYSTEM(10, false,//
+    AUTHORIZATION(4, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.OAUTH_SETTING.getLabel()))),
+    /**
+     *
+     */
+    CREDENTIALS(5, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.CREDENTIALS_SETTING.getLabel()))),
+     /**
+     *
+     */
+    DATA_CACHE(6, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel()))),
+
+    /**
+     *
+     */
+    ONTOLOGIES(7, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
+
+    /**
+     *
+     */
+    SYSTEM(8, false,//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SYSTEM_SETTING.getLabel())),//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel())),//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SCHEDULER_SETTING.getLabel())),//
@@ -101,7 +99,7 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    ABOUT(17);
+    ABOUT(9);
 
     private final int index;
     private final boolean required;

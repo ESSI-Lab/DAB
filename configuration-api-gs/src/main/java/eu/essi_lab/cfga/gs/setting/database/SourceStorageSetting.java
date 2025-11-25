@@ -192,6 +192,8 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
      */
     public static class SourceStorageSettingComponentInfo extends ComponentInfo {
 
+	private final TabDescriptor descriptor;
+
 	/**
 	 * 
 	 */
@@ -199,11 +201,18 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 
 	    setName(SystemSetting.class.getName());
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(SourceStorageSetting.class).//
+	    descriptor = TabDescriptorBuilder.get(SourceStorageSetting.class).//
 		    withLabel("Source storage").//
 		    build();
+	}
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.SOURCE_STORAGE.getIndex(), descriptor));
+	/**
+	 *
+	 * @return
+	 */
+	public TabDescriptor getDescriptor() {
+
+	    return descriptor;
 	}
     }
 

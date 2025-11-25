@@ -44,7 +44,7 @@ public class Brokering extends ComponentInfo {
 	setPlaceholder(TabPlaceholder.of(GSTabIndex.BROKERING.getIndex(),//
 
 		new HarvestingSetting.HarvestingSettingComponentInfo().getDescriptor(), //
-		new SourcesInspector().getDescriptor(),//
+		new RecordsInspector().getDescriptor(),//
 		new DistributionSetting.DistributionSettingComponentInfo().getDescriptor(),//
 		new ProfilerSetting.ProfilerComponentInfo().getDescriptor()//
 	));

@@ -175,6 +175,8 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
      */
     public static class SourcePrioritySettingComponentInfo extends ComponentInfo {
 
+	private final TabDescriptor descriptor;
+
 	/**
 	 *
 	 */
@@ -182,11 +184,18 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 
 	    setName(SourcePrioritySettingComponentInfo.class.getName());
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(SourcePrioritySetting.class).//
+	    descriptor = TabDescriptorBuilder.get(SourcePrioritySetting.class).//
 		    withLabel("Identifier management").//
 		    build();
+	}
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.IDENTIFIER_MANAGEMENT.getIndex(), descriptor));
+	/**
+	 *
+	 * @return
+	 */
+	public TabDescriptor getDescriptor() {
+
+	    return descriptor;
 	}
     }
 

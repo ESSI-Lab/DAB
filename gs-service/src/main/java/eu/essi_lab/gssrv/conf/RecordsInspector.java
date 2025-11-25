@@ -57,7 +57,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class SourcesInspector extends ComponentInfo {
+public class RecordsInspector extends ComponentInfo {
 
     private final TabDescriptor descriptor;
     private VerticalLayout verticalLayout;
@@ -71,9 +71,9 @@ public class SourcesInspector extends ComponentInfo {
     /**
      *
      */
-    public SourcesInspector() {
+    public RecordsInspector() {
 
-	setName("Sources inspection");
+	setName("Records inspection");
 
 	verticalLayout = new VerticalLayout();
 	verticalLayout.getStyle().set("margin-top", "15px");
@@ -262,7 +262,7 @@ public class SourcesInspector extends ComponentInfo {
 	    return db.getDataFolders();
 
 	} catch (GSException e) {
-	    GSLoggerFactory.getLogger(SourcesInspector.class).error(e);
+	    GSLoggerFactory.getLogger(RecordsInspector.class).error(e);
 	}
 
 	return null;
@@ -277,7 +277,7 @@ public class SourcesInspector extends ComponentInfo {
 	try {
 	    return f.size();
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(SourcesInspector.class).error(e);
+	    GSLoggerFactory.getLogger(RecordsInspector.class).error(e);
 	}
 
 	return 0;
