@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -28,12 +28,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.DetachEvent;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -43,7 +38,6 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs.Orientation;
 import com.vaadin.flow.dom.DomEvent;
 import com.vaadin.flow.dom.DomEventListener;
 import com.vaadin.flow.dom.DomListenerRegistration;
@@ -58,20 +52,13 @@ import com.vaadin.flow.server.VaadinSession;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationChangeListener;
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.components.ConfigurationViewFactory;
-import eu.essi_lab.cfga.gui.components.CustomButton;
-import eu.essi_lab.cfga.gui.components.TabContainer;
-import eu.essi_lab.cfga.gui.components.TabsWithContent;
+import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.dialog.EnhancedDialog;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.TabPlaceholder;
 import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
-import eu.essi_lab.cfga.gui.extension.directive.DirectiveManager;
-import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
 import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
-import eu.essi_lab.cfga.gui.extension.directive.ShowDirective;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.WebRequest;
@@ -94,21 +81,21 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     private Configuration configuration;
 
     /**
-     * 
+     *
      */
     private final Button saveButton;
     protected boolean tabAlreadyOpen;
     final Label infoLabel;
 
     /**
-     * 
+     *
      */
     CustomButton logoutButton;
     private final String requestURL;
     private static String ownerBrowserAdress;
 
     /**
-     * 
+     *
      */
     public ConfigurationView() {
 
@@ -206,14 +193,13 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	infoLabel.setWidth(560, Unit.PIXELS);
 	infoLabel.setHeight(30, Unit.PIXELS);
 
-	saveButton = ConfigurationViewFactory.createSaveButton(
-		(ComponentEventListener<ClickEvent<Button>>) this::onSaveButtonClicked);
+	saveButton = ConfigurationViewFactory.createSaveButton((ComponentEventListener<ClickEvent<Button>>) this::onSaveButtonClicked);
 
 	saveButton.setEnabled(false);
 	// hides the save button, shows it again if initialized, authorized and the tab was closed
 	saveButton.setVisible(false);
 
-	navbarContent = ConfigurationViewFactory.createConfigurationViewNavBarContentLayout();
+	navbarContent = ConfigurationViewFactory.createNavBarContentLayout();
 
 	navbarContent.add(drawerToggle, headerImage, headerLabel, saveButton);
 
@@ -291,7 +277,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	saveButton.setVisible(true);
 
-	tabs = ConfigurationViewFactory.createConfigurationViewTabs();
+	tabs = ConfigurationViewFactory.createTabs();
 
 	addToDrawer(tabs);
 
@@ -500,22 +486,19 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * {@link ComponentInfo} instances and the related {@link TabDescriptor}, can be defined to manage one or more
-     * {@link Setting}s.<br>
-     * If the {@link RemoveDirective} of the {@link TabDescriptor} allows the removal of
-     * all settings, when the view is initialized and there is no settings coupled with the {@link ComponentInfo},
-     * the {@link ComponentInfo} and its {@link TabDescriptor} cannot be found and as consequence, the related tab cannot be
-     * rendered.<br>
-     * In this case, it will no longer be possible to add or remove that kind of settings just because there
-     * is no tab with the required {@link AddDirective}.<br>
-     * To avoid this issue, this method can be used to register a list of {@link ComponentInfo} that must be
+     * {@link ComponentInfo} instances and the related {@link TabPlaceholder}, can be defined to manage one or more {@link Setting}s.<br> If
+     * the {@link RemoveDirective} of the {@link TabPlaceholder} allows the removal of all settings, when the view is initialized and there
+     * is no settings coupled with the {@link ComponentInfo}, the {@link ComponentInfo} and its {@link TabPlaceholder} cannot be found and
+     * as consequence, the related tab cannot be rendered.<br> In this case, it will no longer be possible to add or remove that kind of
+     * settings just because there is no tab with the required {@link AddDirective}.<br> To avoid this issue, this method can be used to
+     * register a list of {@link ComponentInfo} that must be
      * <i>always rendered</i> (typically tabs with {@link RemoveDirective}s and {@link AddDirective}), even if the
      * related settings are missing.<br>
      * <br>
      * This method can also be used to add {@link ComponentInfo} instances that have no related {@link Setting}
-     * 
-     *  @see RemoveDirective#isFullRemovalAllowed()
+     *
      * @return
+     * @see RemoveDirective#isFullRemovalAllowed()
      */
     protected List<ComponentInfo> getAdditionalsComponentInfo() {
 
@@ -565,7 +548,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * 
+     *
      */
     public void refresh() {
 
@@ -618,9 +601,20 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      * @param component
      * @return
      */
-    public Tab addTab(int index, String label, TabContainer component) {
+    public Tab addTab(int index, String label, Renderable component) {
 
 	return tabs.addTab(index, label, component);
+    }
+
+    /**
+     * @param index
+     * @param label
+     * @param component
+     * @return
+     */
+    public Tab addTab(int index, Renderable component) {
+
+	return tabs.addTab(index, null, component);
     }
 
     /**
@@ -738,7 +732,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * 
+     *
      */
     public void removeDrawerToggle() {
 
@@ -746,16 +740,16 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * @param tabDescriptor
+     * @param placeholder
      * @return
      */
-    public List<Setting> retrieveTabSettings(TabDescriptor tabDescriptor) {
+    public List<Setting> retrieveTabSettings(TabPlaceholder placeholder) {
 
 	List<Setting> allSetting = configuration.list();
 
-	HashMap<TabDescriptor, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
+	HashMap<TabPlaceholder, List<Setting>> tabInfoMap = createPlaceholdersMap(allSetting);
 
-	return tabInfoMap.getOrDefault(tabDescriptor, new ArrayList<>());
+	return tabInfoMap.getOrDefault(placeholder, new ArrayList<>());
     }
 
     /**
@@ -763,8 +757,8 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     protected void onSettingPut(List<Setting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Setting {} put",
-		settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
+	GSLoggerFactory.getLogger(getClass())
+		.debug("Setting {} put", settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
     }
 
     /**
@@ -772,8 +766,8 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     protected void onSettingReplaced(List<Setting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Setting {} replaced",
-		settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
+	GSLoggerFactory.getLogger(getClass())
+		.debug("Setting {} replaced", settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
     }
 
     /**
@@ -781,12 +775,12 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     protected void onSettingRemoved(List<Setting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Setting {} removed",
-		settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
+	GSLoggerFactory.getLogger(getClass())
+		.debug("Setting {} removed", settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
     }
 
     /**
-     * 
+     *
      */
     protected void onConfigurationCleared() {
 
@@ -794,7 +788,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * 
+     *
      */
     protected void onConfigurationFlushed() {
 
@@ -802,7 +796,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * 
+     *
      */
     protected void onConfigurationAutoReloaded() {
 
@@ -816,9 +810,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	List<Setting> allSetting = configuration.list();
 
-	HashMap<TabDescriptor, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
+	HashMap<TabPlaceholder, List<Setting>> placeholdersMap = createPlaceholdersMap(allSetting);
 
-	List<TabDescriptor> tabDescriptorList = new ArrayList<>(tabInfoMap.keySet());
+	List<TabPlaceholder> placeholders = new ArrayList<>(placeholdersMap.keySet());
 
 	//
 	//
@@ -828,13 +822,13 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	for (ComponentInfo componentInfo : additionalComps) {
 
-	    Optional<TabDescriptor> tabInfo = componentInfo.getTabDescriptor();
+	    Optional<TabPlaceholder> optPlaceholder = componentInfo.getPlaceholder();
 
-	    if (tabInfo.isPresent()) {
+	    if (optPlaceholder.isPresent()) {
 
-		int index = tabInfo.get().getIndex();
+		int index = optPlaceholder.get().getIndex();
 
-		boolean missing = tabDescriptorList.//
+		boolean missing = placeholders.//
 			stream().//
 			filter(tab -> tab.getIndex() == index).//
 			findFirst().//
@@ -842,7 +836,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 		if (missing) {
 
-		    tabDescriptorList.add(tabInfo.get());
+		    placeholders.add(optPlaceholder.get());
 		}
 	    }
 	}
@@ -851,95 +845,40 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	//
 	//
 
-	tabDescriptorList = tabDescriptorList.//
+	placeholders = placeholders.//
 		stream().//
-		sorted(Comparator.comparingInt(TabDescriptor::getIndex)).//
-		collect(Collectors.toList());
+		sorted(Comparator.comparingInt(TabPlaceholder::getIndex)).//
+		toList();
 
 	//
 	//
 	//
 
-	for (TabDescriptor tabDescriptor : tabDescriptorList) {
+	for (TabPlaceholder placeholder : placeholders) {
 
-	    if (oneTab < 0 || tabDescriptor.getIndex() == oneTab) {
+	    if (oneTab < 0 || placeholder.getIndex() == oneTab) {
 
-		List<Setting> settings = tabInfoMap.getOrDefault(tabDescriptor, new ArrayList<>());
-
-		//
-		//
-		//
-
-		DirectiveManager directiveManager = tabDescriptor.getDirectiveManager();
-
-		Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
-
-		Optional<RemoveDirective> removeDirective = directiveManager.get(RemoveDirective.class);
-
-		Optional<EditDirective> editDirective = directiveManager.get(EditDirective.class);
-
-		Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
-
-		String tabName = "Tab#" + tabDescriptor.getIndex();
-
-		if (showDirective.isPresent()) {
-
-		    tabName = showDirective.get().getName();
-		}
-
-		//
-		//
-		//
+		List<Setting> settings = placeholdersMap.getOrDefault(placeholder, new ArrayList<>());
 
 		Optional<ComponentInfo> additionalComp = additionalComps.//
 			stream().//
-			filter(c -> c.getTabDescriptor().isPresent()).//
-			filter(c -> c.getTabDescriptor().get().getIndex() == tabDescriptor.getIndex()).//
+			filter(c -> c.getPlaceholder().isPresent()).//
+			filter(c -> c.getPlaceholder().get().getIndex() == placeholder.getIndex()).//
 			findFirst();
 
 		ComponentInfo componentInfo = additionalComp.orElseGet(() -> settings.getFirst().getExtension(ComponentInfo.class).get());
 
-		Orientation orientation = componentInfo.getOrientation();
-
-		//
-		//
-		//
-
-		TabContainer container = ConfigurationViewFactory.createConfigurationViewTabContainer(//
+		Renderable renderable = ConfigurationViewFactory.createTabContent(//
+			this,//
 			configuration, //
-			orientation, //
-			tabName, //
-			showDirective.flatMap(ShowDirective::getDescription),//
-			addDirective, //
-			removeDirective, //
-			editDirective);
+			componentInfo, //
+			placeholder);
 
-		container.getElement().getStyle().set("margin-left", "auto");
-		container.getElement().getStyle().set("margin-right", "auto");
+		String tabLabel = placeholder.getDescriptors().size() == 1 ? //
+			placeholder.getDescriptors().getFirst().getLabel() : //
+			componentInfo.getName();
 
-		//
-		//
-		//
-
-		container.init(this, configuration, componentInfo, tabDescriptor);
-
-		if (tabDescriptor.getIndex() == 0) {
-
-		    container.render();
-		}
-
-		//
-		//
-		//
-
-		if (oneTab >= 0 && tabDescriptor.getIndex() == oneTab) {
-		    addTab(0, tabName, container);
-		    return;
-
-		} else if (oneTab < 0) {
-
-		    addTab(tabDescriptor.getIndex(), tabName, container);
-		}
+		addTab(placeholder.getIndex(), tabLabel, renderable);
 	    }
 	}
     }
@@ -965,9 +904,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      * @param settings
      * @return
      */
-    private HashMap<TabDescriptor, List<Setting>> createTabInfoMap(List<Setting> settings) {
+    private HashMap<TabPlaceholder, List<Setting>> createPlaceholdersMap(List<Setting> settings) {
 
-	HashMap<TabDescriptor, List<Setting>> map = new HashMap<>();
+	HashMap<TabPlaceholder, List<Setting>> map = new HashMap<>();
 
 	for (Setting setting : settings) {
 
@@ -975,7 +914,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	    if (extension.isPresent()) {
 
-		Optional<TabDescriptor> tabInfo = extension.get().getTabDescriptor();
+		Optional<TabPlaceholder> tabInfo = extension.get().getPlaceholder();
 
 		if (tabInfo.isPresent()) {
 

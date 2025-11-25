@@ -24,7 +24,7 @@ package eu.essi_lab.cfga.gui.components;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -42,7 +42,7 @@ import eu.essi_lab.cfga.ConfigurationChangeListener;
 @SuppressWarnings("serial")
 public class TabsWithContent extends Tabs implements ComponentEventListener<SelectedChangeEvent>, ConfigurationChangeListener {
 
-    private Map<Tab, TabContainer> tabsToContent;
+    private Map<Tab, Renderable> tabsToContent;
     private final Div contentDiv;
 
     /**
@@ -59,17 +59,17 @@ public class TabsWithContent extends Tabs implements ComponentEventListener<Sele
     @Override
     public void onComponentEvent(SelectedChangeEvent event) {
 
-	tabsToContent.values().forEach(tabContent -> tabContent.setVisible(false));
+	tabsToContent.values().forEach(tabContent -> tabContent.getComponent().setVisible(false));
 
-	TabContainer container = tabsToContent.get(getSelectedTab());
+	Renderable renderable = tabsToContent.get(getSelectedTab());
 
-	if (container != null) {
+	if (renderable != null) {
 
-	    container.setVisible(true);
+	    renderable.getComponent().setVisible(true);
 
-	    if (!container.isRendered()) {
+	    if (!renderable.isRendered()) {
 
-		container.render();
+		renderable.render();
 	    }
 	}
     }
@@ -89,13 +89,13 @@ public class TabsWithContent extends Tabs implements ComponentEventListener<Sele
     /**
      * @param index
      * @param label
-     * @param component
+     * @param renderable
      * @param fontSizePx
      * @return
      */
-    public Tab addTab(int index, String label, TabContainer component, int fontSizePx) {
+    public Tab addTab(int index, String label, Renderable renderable, int fontSizePx) {
 
-	component.setVisible(index == 0);
+	renderable.getComponent().setVisible(index == 0);
 
 	Tab tab = new Tab(label);
 
@@ -103,9 +103,9 @@ public class TabsWithContent extends Tabs implements ComponentEventListener<Sele
 
 	add(tab);
 
-	tabsToContent.put(tab, component);
+	tabsToContent.put(tab, renderable);
 
-	contentDiv.add(component);
+	contentDiv.add(renderable.getComponent());
 
 	return tab;
     }
@@ -113,12 +113,12 @@ public class TabsWithContent extends Tabs implements ComponentEventListener<Sele
     /**
      * @param index
      * @param label
-     * @param component
+     * @param renderable
      * @return
      */
-    public Tab addTab(int index, String label, TabContainer component) {
+    public Tab addTab(int index, String label, Renderable renderable) {
 
-	return addTab(index, label, component, 20);
+	return addTab(index, label, renderable, 20);
     }
 
     /**

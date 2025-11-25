@@ -10,96 +10,101 @@ package eu.essi_lab.cfga.gui.extension;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import com.vaadin.flow.component.tabs.Tabs.*;
-import eu.essi_lab.cfga.setting.*;
-
 import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
  */
-public class ComponentInfo implements ObjectExtension {
+public class TabPlaceholder {
 
-    private String name;
-    private Orientation orientation;
-    private TabPlaceholder placeholder;
-    private boolean forceReadOnly;
+    private int index;
+    private List<TabDescriptor> list;
 
     /**
      *
+     * @param index
+     * @param descriptors
+     * @return
      */
-    public ComponentInfo() {
+    public static TabPlaceholder of(int index, TabDescriptor ... descriptors){
 
-	setForceReadOnly(true);
+	TabPlaceholder placeholder = new TabPlaceholder(index);
+	Stream.of(descriptors).forEach(placeholder::addDescriptor);
+
+	return placeholder;
+    }
+
+    /**
+     *
+     * @param index
+     */
+    private TabPlaceholder(int index) {
+
+	list = new ArrayList<>();
+	setIndex(index);
+    }
+
+    /**
+     *
+     * @param descriptor
+     */
+    public void addDescriptor(TabDescriptor descriptor){
+
+	list.add(descriptor);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<TabDescriptor> getDescriptors(){
+
+	return list;
     }
 
     /**
      * @return
      */
-    public String getName() {
+    public int getIndex() {
 
-	return name;
+	return index;
     }
 
     /**
-     * @param name
+     * @param index
      */
-    public void setName(String name) {
+    public void setIndex(int index) {
 
-	this.name = name;
+	this.index = index;
     }
 
-    /**
-     * @param forceReadOnly
-     */
-    public void setForceReadOnly(boolean forceReadOnly) {
+    @Override
+    public String toString() {
 
-	this.forceReadOnly = forceReadOnly;
+	return "Tab#" + getIndex();
     }
 
-    /**
-     * @return
-     */
-    public boolean isForceReadOnlySet() {
+    @Override
+    public int hashCode() {
 
-	return forceReadOnly;
-    }
-
-    /**
-     * @return
-     */
-    public Optional<TabPlaceholder> getPlaceholder() {
-
-	return Optional.ofNullable(placeholder);
-    }
-
-    /**
-     * @param placeholder
-     */
-    public void setPlaceholder(TabPlaceholder placeholder) {
-
-	this.placeholder = placeholder;
+	return toString().hashCode();
     }
 
     @Override
     public boolean equals(Object o) {
 
-	if (o instanceof ComponentInfo other) {
-
-	    return this.getName().equals(other.getName());
-	}
-
-	return false;
+	return this.hashCode() == o.hashCode();
     }
 }

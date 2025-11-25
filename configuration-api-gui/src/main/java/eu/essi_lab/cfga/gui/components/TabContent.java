@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.*;
 
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
@@ -43,8 +44,7 @@ import eu.essi_lab.cfga.gui.ConfigurationView;
 import eu.essi_lab.cfga.gui.components.grid.GridComponent;
 import eu.essi_lab.cfga.gui.components.grid.GridInfo;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
+import eu.essi_lab.cfga.gui.extension.*;
 import eu.essi_lab.cfga.gui.extension.directive.DirectiveManager;
 import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
 import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
@@ -54,37 +54,62 @@ import eu.essi_lab.cfga.setting.Setting;
 /**
  * @author Fabrizio
  */
-public class TabContainer extends VerticalLayout {
+public class TabContent extends VerticalLayout implements Renderable {
 
     private GridComponent grid;
     private Optional<RemoveDirective> removeDirective;
     private Optional<EditDirective> editDirective;
-    private TabDescriptor tabDescriptor;
+    private TabDescriptor descriptor;
     private ComponentInfo componentInfo;
     private Configuration configuration;
     private boolean rendered;
-    private ConfigurationView view;
     private final List<Component> legends;
+    private TabPlaceholder placeholder;
 
     /**
      *
      */
-    public TabContainer() {
+    public TabContent() {
 
 	legends = new ArrayList<>();
+
+	getStyle().set("margin-bottom", "50px");
+	getStyle().set("margin-left", "auto");
+	getStyle().set("margin-right", "auto");
     }
 
     /**
-     *
+     * @return
      */
-    public void render() {
+    @Override
+    public Component getComponent() {
 
-	render(false);
+	return this;
+    }
+
+    /**
+     * @param configuration
+     * @param view
+     * @param componentInfo
+     * @param descriptor
+     * @param placeholder
+     */
+    public void init(//
+	    Configuration configuration, //
+	    ComponentInfo componentInfo,//
+	    TabDescriptor descriptor, //
+	    TabPlaceholder placeholder) {
+
+	this.configuration = configuration;
+	this.componentInfo = componentInfo;
+	this.descriptor = descriptor;
+	this.placeholder = placeholder;
     }
 
     /**
      * @param refresh
      */
+    @Override
     public void render(boolean refresh) {
 
 	rendered = true;
@@ -93,7 +118,7 @@ public class TabContainer extends VerticalLayout {
 
 	HorizontalLayout headerLayout = findHeader();
 
-	if (tabDescriptor.isReloadable()) {
+	if (descriptor.isReloadable()) {
 
 	    if (addReloadButton(headerLayout)) {
 
@@ -105,16 +130,19 @@ public class TabContainer extends VerticalLayout {
 
 	removeAllButHeader();
 
-	if (tabDescriptor.getComponent().isPresent()) {
+	if (descriptor.getContent().isPresent()) {
 
-	    add(tabDescriptor.getComponent().get());
+	    add(descriptor.getContent().get());
 
 	    return;
 	}
 
-	List<Setting> settings = view.retrieveTabSettings(tabDescriptor);
+	List<Setting> settings = configuration.list(descriptor.getSettingClass().get(), false).//
+		stream().//
+		map(s -> (Setting) s).//
+		collect(Collectors.toList());
 
-	DirectiveManager directiveManager = tabDescriptor.getDirectiveManager();
+	DirectiveManager directiveManager = descriptor.getDirectiveManager();
 
 	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
 
@@ -126,9 +154,9 @@ public class TabContainer extends VerticalLayout {
 	    }
 	});
 
-	if (tabDescriptor.getGridInfo().isPresent()) {
+	if (descriptor.getGridInfo().isPresent()) {
 
-	    Optional<GridInfo> gridInfo = tabDescriptor.getGridInfo();
+	    Optional<GridInfo> gridInfo = descriptor.getGridInfo();
 
 	    GridComponent gridComponent = new GridComponent(//
 		    gridInfo.get(), //
@@ -141,7 +169,7 @@ public class TabContainer extends VerticalLayout {
 	    TabSheet tabSheet = new TabSheet();
 	    tabSheet.getStyle().set("border-bottom", "1px solid #d3d3d39e");
 
-	    if (tabDescriptor.getGridInfo().get().isShowColumnsHider()) {
+	    if (descriptor.getGridInfo().get().isShowColumnsHider()) {
 
 		tabSheet.add("Columns", gridComponent.createColumnsHider());
 	    }
@@ -188,6 +216,7 @@ public class TabContainer extends VerticalLayout {
     /**
      * @return the rendered
      */
+    @Override
     public boolean isRendered() {
 
 	return rendered;
@@ -196,24 +225,10 @@ public class TabContainer extends VerticalLayout {
     /**
      * @param rendered
      */
+    @Override
     public void setRendered(boolean rendered) {
 
 	this.rendered = rendered;
-    }
-
-    /**
-     * @param view
-     * @param configuration
-     * @param settings
-     * @param componentInfo
-     * @param tabDescriptor
-     */
-    public void init(ConfigurationView view, Configuration configuration, ComponentInfo componentInfo, TabDescriptor tabDescriptor) {
-
-	this.view = view;
-	this.configuration = configuration;
-	this.componentInfo = componentInfo;
-	this.tabDescriptor = tabDescriptor;
     }
 
     /**
@@ -390,9 +405,9 @@ public class TabContainer extends VerticalLayout {
 
 	reloadButton.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 
-	    if (tabDescriptor.getTabReloader().isPresent()) {
+	    if (descriptor.getTabReloader().isPresent()) {
 
-		tabDescriptor.getTabReloader().get().run();
+		descriptor.getTabReloader().get().run();
 
 		removeAllButHeader();
 

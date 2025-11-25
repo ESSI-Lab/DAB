@@ -47,11 +47,20 @@ public class TabDescriptorBuilder {
     private final TabDescriptor tabDescriptor;
 
     /**
-    * 
-    */
-    public TabDescriptorBuilder() {
+     *
+     */
+    private TabDescriptorBuilder(){
 
 	tabDescriptor = new TabDescriptor();
+    }
+
+    /**
+     *
+     */
+    private TabDescriptorBuilder(Class<? extends Setting> settingClass) {
+
+	tabDescriptor = new TabDescriptor();
+	tabDescriptor.setSettingClass(settingClass);
     }
 
     /**
@@ -63,12 +72,31 @@ public class TabDescriptorBuilder {
     }
 
     /**
-     * @param index
      * @return
      */
-    public TabDescriptorBuilder withIndex(int index) {
+    public static TabDescriptorBuilder get(Class<? extends Setting> settingClass) {
 
-	tabDescriptor.setIndex(index);
+	return new TabDescriptorBuilder(settingClass);
+    }
+
+    /**
+     * @param settingClass
+     * @return
+     */
+    public TabDescriptorBuilder withSettingClass(Class<? extends Setting> settingClass) {
+
+	tabDescriptor.setSettingClass(settingClass);
+
+	return this;
+    }
+
+    /**
+     * @param label
+     * @return
+     */
+    public TabDescriptorBuilder withLabel(String label) {
+
+	tabDescriptor.setLabel(label);
 
 	return this;
     }
@@ -216,7 +244,7 @@ public class TabDescriptorBuilder {
      */
     public TabDescriptorBuilder withComponent(Component Component) {
 
-	tabDescriptor.setComponent(Component);
+	tabDescriptor.setContent(Component);
 
 	return this;
     }
@@ -312,7 +340,8 @@ public class TabDescriptorBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items, boolean showColumnsHider) {
+    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items,
+	    boolean showColumnsHider) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, SelectionMode.NONE, showColumnsHider);
     }
@@ -414,8 +443,8 @@ public class TabDescriptorBuilder {
     }
 
     /**
-    * 
-    */
+     *
+     */
     public TabDescriptorBuilder reloadable() {
 
 	tabDescriptor.setReloadable(true);

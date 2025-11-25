@@ -21,26 +21,22 @@ package eu.essi_lab.cfga.gui.components;
  * #L%
  */
 
-import java.util.Optional;
+import java.util.*;
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.Tabs.Orientation;
 
-import com.vaadin.flow.component.textfield.TextArea;
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
-import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
-import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
+import eu.essi_lab.cfga.gui.*;
+import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.extension.directive.*;
 
 /**
  * @author Fabrizio
@@ -56,7 +52,7 @@ public class ConfigurationViewFactory {
     /**
      * @return
      */
-    public static HorizontalLayout createConfigurationViewNavBarContentLayout() {
+    public static HorizontalLayout createNavBarContentLayout() {
 
 	HorizontalLayout navbarContent = new HorizontalLayout();
 	navbarContent.setWidthFull();
@@ -71,10 +67,10 @@ public class ConfigurationViewFactory {
     /**
      * @return
      */
-    public static TabsWithContent createConfigurationViewTabs() {
+    public static TabsWithContent createTabs() {
 
 	TabsWithContent tabs = new TabsWithContent();
-	tabs.setOrientation(Tabs.Orientation.VERTICAL);
+	tabs.setOrientation(Orientation.VERTICAL);
 	tabs.getStyle().set("padding-left", "15px");
 
 	return tabs;
@@ -88,97 +84,126 @@ public class ConfigurationViewFactory {
      * @param addDirectives
      * @return
      */
-    public static TabContainer createConfigurationViewTabContainer(//
+    public static Renderable createTabContent(//
+	    ConfigurationView view,//
 	    Configuration configuration, //
-	    Orientation orientation, //
-	    String tabName, //
-	    Optional<String> tabDescription,//
-	    Optional<AddDirective> addDirective,//
-	    Optional<RemoveDirective> removeDirective,//
-	    Optional<EditDirective> editDirective) {
+	    ComponentInfo componentInfo,//
+	    TabPlaceholder placeholder) {
 
-	TabContainer layout = null;
+	Renderable content = null;
 
-	switch (orientation) {
-	case HORIZONTAL:
+	List<TabDescriptor> descriptors = placeholder.getDescriptors();
 
-	    HorizontalLayout horizontalLayout = new HorizontalLayout();
-	    // horizontalLayout.getStyle().set("border", "1px solid black");
-	    horizontalLayout.setWidth("100%");
-	    // horizontalLayout.setHeight("100%");
+	if (descriptors.size() == 1) {
 
-	    // layout = horizontalLayout;
+	    TabDescriptor descriptor = descriptors.getFirst();
 
-	    break;
+	    content = createTabContent(descriptor, configuration, view, componentInfo, placeholder, true);
 
-	case VERTICAL:
+	} else {
 
-	    TabContainer container = ComponentFactory.createNoSpacingNoMarginTabContainer("tab-container-vertical-layout-for-" + tabName);
+	    TabSheetContent tabSheet = new TabSheetContent();
 
-	    container.setRemoveDirective(removeDirective);
-	    container.setEditDirective(editDirective);
+	    descriptors.forEach(desc -> tabSheet.add( //
+		    desc, //
+		    createTabContent(desc, configuration, view, componentInfo, placeholder, false)));
 
-	    //	    container.setWidth(TAB_WIDTH, Unit.PIXELS);
-	    container.getStyle().set("margin-bottom", "50px");
-
-	    HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
-		    "tab-container-header-layout-for-" + tabName);
-	    headerLayout.setWidthFull();
-	    headerLayout.setAlignItems(Alignment.BASELINE);
-	    headerLayout.setId(TAB_HEADER_ID_PREFIX + "_" + tabName);
-
-	    container.add(headerLayout);
-
-	    //
-	    //
-	    //
-
-	    Label nameLabel = new Label();
-	    nameLabel.setWidthFull();
-	    nameLabel.setText(tabName);
-	    nameLabel.getStyle().set("font-size", "30px");
-	    nameLabel.getStyle().set("color", "black");
-
-	    if (tabDescription.isPresent()) {
-
-		String desc = tabDescription.get();
-
-		VerticalLayout subLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
-		subLayout.setWidthFull();
-
-		Label descLabel = new Label();
-		descLabel.setWidthFull();
-		descLabel.setMaxHeight("130px");
-		descLabel.setText(desc);
-		descLabel.getStyle().set("font-size", "16px");
-		descLabel.getStyle().set("color", "gray");
-
-		subLayout.add(nameLabel);
-		subLayout.add(descLabel);
-
-		headerLayout.add(subLayout);
-
-	    } else {
-
-		headerLayout.setHeight("45px");
-
-		headerLayout.add(nameLabel);
-	    }
-
-	    //
-	    //
-	    //
-
-	    if (addDirective.isPresent()) {
-
-		Button addButton = SettingComponentFactory.createSettingAddButton(configuration, container, addDirective.get());
-		headerLayout.add(addButton);
-	    }
-
-	    layout = container;
+	    content = tabSheet;
 	}
 
-	return layout;
+	return content;
+    }
+
+    /**
+     * @param descriptor
+     * @param configuration
+     * @param view
+     * @param componentInfo
+     * @param placeholder
+     * @return
+     */
+    private static TabContent createTabContent(//
+	    TabDescriptor descriptor,//
+	    Configuration configuration, //
+	    ConfigurationView view,//
+	    ComponentInfo componentInfo,//
+	    TabPlaceholder placeholder,//
+	    boolean withLabel) {
+
+	DirectiveManager directiveManager = descriptor.getDirectiveManager();
+
+	TabContent container = ComponentFactory.createNoSpacingNoMarginTabContainer(
+		"tab-container-vertical-layout-for-" + descriptor.getLabel());
+
+	container.init(configuration, componentInfo, descriptor, placeholder);
+
+	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
+
+	Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
+
+	Optional<RemoveDirective> removeDirective = directiveManager.get(RemoveDirective.class);
+
+	Optional<EditDirective> editDirective = directiveManager.get(EditDirective.class);
+
+	container.setRemoveDirective(removeDirective);
+	container.setEditDirective(editDirective);
+
+	HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
+		"tab-container-header-layout-for-" + descriptor.getLabel());
+	headerLayout.setWidthFull();
+	headerLayout.setAlignItems(Alignment.BASELINE);
+	headerLayout.setId(TAB_HEADER_ID_PREFIX + "_" + descriptor.getLabel());
+
+	container.add(headerLayout);
+
+	Label tabLabel = new Label();
+	tabLabel.setWidthFull();
+	tabLabel.setText(descriptor.getLabel());
+	tabLabel.getStyle().set("font-size", "30px");
+	tabLabel.getStyle().set("color", "black");
+
+	if (showDirective.flatMap(ShowDirective::getDescription).isPresent()) {
+
+	    String desc = showDirective.flatMap(ShowDirective::getDescription).get();
+
+	    VerticalLayout subLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+	    subLayout.setWidthFull();
+
+	    Label descLabel = new Label();
+	    descLabel.setWidthFull();
+	    descLabel.setMaxHeight("130px");
+	    descLabel.setText(desc);
+	    descLabel.getStyle().set("font-size", "16px");
+	    descLabel.getStyle().set("color", "gray");
+
+	    if (withLabel) {
+
+		subLayout.add(tabLabel);
+	    }
+
+	    subLayout.add(descLabel);
+
+	    headerLayout.add(subLayout);
+
+	} else if (withLabel) {
+
+	    headerLayout.setHeight("45px");
+
+	    headerLayout.add(tabLabel);
+	}
+
+	addDirective.ifPresent(dir -> {
+
+	    Button addButton = SettingComponentFactory.createSettingAddButton(configuration, container, dir);
+	    headerLayout.add(addButton);
+	});
+
+	if (placeholder.getIndex() == 0) {
+
+	    container.render();
+	}
+
+	return container;
     }
 
     /**
