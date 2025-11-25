@@ -21,14 +21,12 @@ package eu.essi_lab.cfga.gs.setting;
  * #L%
  */
 
+import eu.essi_lab.cfga.gui.extension.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.driver.LocalFolderSetting;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.StorageInfo;
@@ -47,11 +45,11 @@ public class DownloadSetting extends Setting implements EditableSetting {
     public enum DownloadStorage implements LabeledEnum {
 
 	/**
-	 * 
+	 *
 	 */
 	LOCAL_DOWNLOAD_STORAGE("Local storage"),
 	/**
-	 * 
+	 *
 	 */
 	S3_DOWNLOAD_STORAGE("Amazon S3 storage");
 
@@ -121,18 +119,18 @@ public class DownloadSetting extends Setting implements EditableSetting {
     public static class DownloadSettingComponentInfo extends ComponentInfo {
 
 	/**
-	 * 
+	 *
 	 */
 	public DownloadSettingComponentInfo() {
 
-	    setComponentName(DownloadSetting.class.getName());
+	    setName(DownloadSetting.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.DOWNLOAD.getIndex()).//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(DownloadSetting.class).//
+		    withLabel("Download").//
 		    withShowDirective("Download").//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.DOWNLOAD.getIndex(), descriptor));
 	}
     }
 

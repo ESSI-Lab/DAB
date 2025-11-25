@@ -234,48 +234,48 @@ public class SettingComponentFactory {
      * @param configuration
      * @param setting
      * @param forceReadonly
-     * @param tabContainer
+     * @param tabContent
      * @return
      */
     public static SettingComponent createSettingComponent(//
 	    Configuration configuration, //
 	    String settingIdentifier, //
 	    boolean forceReadonly, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, false, null, tabContainer);
+	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, false, null, tabContent);
     }
     
     /**
      * @param configuration
      * @param setting
      * @param forceReadonly
-     * @param tabContainer
+     * @param tabContent
      * @return
      */
     public static SettingComponent createSettingComponent(//
 	    Configuration configuration, //
 	    Setting setting, //
 	    boolean forceReadonly, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, setting, forceReadonly, false, null, tabContainer);
+	return createSettingComponentWithOptionalFoldedMode(configuration, setting, forceReadonly, false, null, tabContent);
     }
 
     /**
      * @param configuration
      * @param setting
      * @param forceReadonly
-     * @param tabContainer
+     * @param tabContent
      * @return
      */
     public static SettingComponent createSettingComponentForcingHideLabel(//
 	    Configuration configuration, //
 	    String settingIdentifier, //
 	    boolean forceReadonly, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, true, null, tabContainer);
+	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, true, null, tabContent);
     }
 
     /**
@@ -283,7 +283,7 @@ public class SettingComponentFactory {
      * @param setting
      * @param forceReadonly
      * @param comparator
-     * @param tabContainer
+     * @param tabContent
      * @return
      */
     private static SettingComponent createSettingComponent(//
@@ -293,10 +293,10 @@ public class SettingComponentFactory {
 	    boolean forceHideLabel, //
 
 	    Comparator<Setting> comparator, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
 	SettingComponent settingComponent = new SettingComponent(configuration, settingIdentifier, forceReadonly, forceHideLabel, comparator,
-		tabContainer);
+		tabContent);
 
 	settingComponent.getStyle().set("background-color", "white");
 	settingComponent.getStyle().set("padding", "4px");
@@ -311,7 +311,7 @@ public class SettingComponentFactory {
      * @param setting
      * @param forceReadonly
      * @param comparator
-     * @param tabContainer
+     * @param tabContent
      * @return
      */
     private static SettingComponent createSettingComponent(//
@@ -321,10 +321,10 @@ public class SettingComponentFactory {
 	    boolean forceHideLabel, //
 
 	    Comparator<Setting> comparator, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
 	SettingComponent settingComponent = new SettingComponent(configuration, setting, forceReadonly, forceHideLabel, comparator,
-		tabContainer);
+		tabContent);
 
 	settingComponent.getStyle().set("background-color", "white");
 	settingComponent.getStyle().set("padding", "4px");
@@ -340,7 +340,7 @@ public class SettingComponentFactory {
      * @param forceReadonly
      * @param forceHideLabel
      * @param comparator
-     * @param tabContainer
+     * @param tabContent
      * @return
      */
     private static SettingComponent createSettingComponentWithOptionalFoldedMode(//
@@ -349,10 +349,10 @@ public class SettingComponentFactory {
 	    boolean forceReadonly, //
 	    boolean forceHideLabel, //
 	    Comparator<Setting> comparator, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
 	SettingComponent settingComponent = createSettingComponent(configuration, settingIdentifier, forceReadonly, forceHideLabel, comparator,
-		tabContainer);
+		tabContent);
 
 	Setting setting = configuration.get(settingIdentifier).get();
 	
@@ -372,7 +372,7 @@ public class SettingComponentFactory {
      * @param forceReadonly
      * @param forceHideLabel
      * @param comparator
-     * @param tabContainer
+     * @param tabContent
      * @return
      */
     private static SettingComponent createSettingComponentWithOptionalFoldedMode(//
@@ -381,10 +381,10 @@ public class SettingComponentFactory {
 	    boolean forceReadonly, //
 	    boolean forceHideLabel, //
 	    Comparator<Setting> comparator, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
 	SettingComponent settingComponent = createSettingComponent(configuration, setting, forceReadonly, forceHideLabel, comparator,
-		tabContainer);
+		tabContent);
 	
 	if (setting.isFoldedModeEnabled()) {
 
@@ -515,14 +515,14 @@ public class SettingComponentFactory {
     /**
      * @param configuration
      * @param setting
-     * @param tabContainer
+     * @param tabContent
      * @return
      */
     public static Button createSettingEditButton(//
 	    Configuration configuration, //
 	    Setting setting, //
 	    SettingComponent currentSettingComponent, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
 	ConfigurationViewButton button = new ConfigurationViewButton("Edit", VaadinIcon.EDIT.create());
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
@@ -541,7 +541,7 @@ public class SettingComponentFactory {
 	//
 	//
 
-	button.addClickListener(e -> new SettingEditDialog(configuration, setting, currentSettingComponent, tabContainer).open());
+	button.addClickListener(e -> new SettingEditDialog(configuration, setting, currentSettingComponent, tabContent).open());
 
 	EnabledGroupManager.getInstance().add(button);
 
@@ -550,13 +550,13 @@ public class SettingComponentFactory {
 
     /**
      * @param configuration
-     * @param tabContainer
+     * @param tabContent
      * @param addDirective
      * @return
      */
     public static Button createSettingAddButton(//
 	    Configuration configuration, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    AddDirective addDirective) {
 
 	ConfigurationViewButton button = new ConfigurationViewButton("Add", VaadinIcon.PLUS_SQUARE_O.create());
@@ -575,7 +575,7 @@ public class SettingComponentFactory {
 	//
 	//
 
-	button.addClickListener(e -> new SettingPutDialog(configuration, tabContainer, addDirective).open());
+	button.addClickListener(e -> new SettingPutDialog(configuration, tabContent, addDirective).open());
 
 	EnabledGroupManager.getInstance().add(button);
 
@@ -584,13 +584,13 @@ public class SettingComponentFactory {
 
     /**
      * @param configuration
-     * @param tabContainer
+     * @param tabContent
      * @param settingComponent
      * @return
      */
     public static Button createSettingRemoveButton(//
 	    Configuration configuration,//
-	    TabContainer tabContainer,//
+	    TabContent tabContent,//
 	    SettingComponent settingComponent) {
 
 	ConfigurationViewButton button = new ConfigurationViewButton("Remove", VaadinIcon.MINUS_SQUARE_O.create());
@@ -610,7 +610,7 @@ public class SettingComponentFactory {
 	//
 	//
 
-	button.addClickListener(new SettingRemoveButtonListener(configuration, tabContainer, settingComponent));
+	button.addClickListener(new SettingRemoveButtonListener(configuration, tabContent, settingComponent));
 
 	EnabledGroupManager.getInstance().add(button);
 

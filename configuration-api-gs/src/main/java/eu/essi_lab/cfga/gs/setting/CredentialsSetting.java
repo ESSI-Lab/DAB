@@ -23,13 +23,11 @@ package eu.essi_lab.cfga.gs.setting;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gui.extension.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -108,7 +106,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public CredentialsSetting() {
 
@@ -732,18 +730,17 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     public static class CredentialsSettingComponentInfo extends ComponentInfo {
 
 	/**
-	 * 
+	 *
 	 */
 	public CredentialsSettingComponentInfo() {
 
-	    setComponentName(CredentialsSetting.class.getName());
+	    setName(CredentialsSetting.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.CREDENTIALS.getIndex()).//
-		    withShowDirective("Credentials").//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(CredentialsSetting.class).//
+		    withLabel("Credentials").//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.CREDENTIALS.getIndex(), descriptor));
 	}
     }
 
@@ -772,7 +769,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getDinaguaUser() {
 
@@ -804,7 +801,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getDinaguaToken() {
 
@@ -836,7 +833,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getINUMETPassword() {
 
@@ -852,7 +849,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getDMHToken() {
 
@@ -868,7 +865,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getWekeUser() {
 
@@ -884,7 +881,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getWekeoPassword() {
 
@@ -900,7 +897,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getNVEToken() {
 
@@ -916,7 +913,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getSentinelUser() {
 
@@ -980,7 +977,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getSAEONUser() {
 
@@ -1012,7 +1009,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getACRONETUser() {
 
@@ -1044,7 +1041,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getACRONETClientId() {
 

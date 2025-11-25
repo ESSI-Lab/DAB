@@ -26,7 +26,7 @@ import com.vaadin.flow.component.button.Button;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.TabContent;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
@@ -42,17 +42,17 @@ public class SettingRemoveButtonListener implements ButtonChangeListener {
 
     private final SettingComponent component;
     private final Configuration configuration;
-    private final TabContainer tabContainer;
+    private final TabContent tabContent;
 
     /**
      * @param configuration
-     * @param tabContainer
+     * @param tabContent
      * @param component
      */
-    public SettingRemoveButtonListener(Configuration configuration, TabContainer tabContainer, SettingComponent component) {
+    public SettingRemoveButtonListener(Configuration configuration, TabContent tabContent, SettingComponent component) {
 
 	this.configuration = configuration;
-	this.tabContainer = tabContainer;
+	this.tabContent = tabContent;
 	this.component = component;
     }
 
@@ -74,7 +74,7 @@ public class SettingRemoveButtonListener implements ButtonChangeListener {
 		return;
 	    }
 
-	    tabContainer.removeSettingComponent(component, setting.getIdentifier());
+	    tabContent.removeSettingComponent(component, setting.getIdentifier());
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Removed setting: {}", setting.getName());
 	}
@@ -83,11 +83,11 @@ public class SettingRemoveButtonListener implements ButtonChangeListener {
     @Override
     public void handleEvent(ClickEvent<Button> event) {
 
-	if (tabContainer.getRemoveDirective().isPresent()) {
+	if (tabContent.getRemoveDirective().isPresent()) {
 
-	    boolean allowFullRemoval = tabContainer.getRemoveDirective().get().isFullRemovalAllowed();
+	    boolean allowFullRemoval = tabContent.getRemoveDirective().get().isFullRemovalAllowed();
 
-	    Class<? extends Setting> settingClass = tabContainer.getRemoveDirective().get().getSettingClass();
+	    Class<? extends Setting> settingClass = tabContent.getRemoveDirective().get().getSettingClass();
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Listing settings STARTED");
 	    

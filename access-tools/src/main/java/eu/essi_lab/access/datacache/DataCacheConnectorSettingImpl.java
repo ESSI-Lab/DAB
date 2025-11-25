@@ -28,9 +28,7 @@ import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
+import eu.essi_lab.cfga.gui.extension.*;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -142,14 +140,14 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 	 */
 	public DataCacheConnectorSettingComponentInfo() {
 
-	    setComponentName(DataCacheConnectorSettingImpl.class.getName());
+	    setName(DataCacheConnectorSettingImpl.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.DATA_CACHE.getIndex()).//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(DataCacheConnectorSettingImpl.class).//
+		    withLabel("Data cache").//
 		    withShowDirective("Data cache").//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.DATA_CACHE.getIndex(), descriptor));
 	}
     }
 

@@ -27,6 +27,7 @@ package eu.essi_lab.cfga.gs.setting.augmenter.worker;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.extension.*;
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 
@@ -42,9 +43,6 @@ import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
@@ -243,11 +241,18 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	 */
 	public AugmenterWorkerComponentInfo() {
 
-	    setComponentName(AugmenterWorkerSetting.class.getName());
+	    setName(AugmenterWorkerSetting.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.AUGMENTERS.getIndex()).//
-		    withShowDirective("Augmenters", SortDirection.ASCENDING).//
+	    Class<? extends Setting> clazz = null;
+	    try {
+		clazz = (Class<? extends Setting>) Class.forName("eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl");
+	    } catch (ClassNotFoundException e) {
+		throw new RuntimeException(e);
+	    }
+
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(clazz).//
+		    withLabel("Augmenters").//
+ 		    withShowDirective("Augmenters", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 			    "Add augmentation job", //
@@ -288,7 +293,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.AUGMENTERS.getIndex(), descriptor));
 	}
 
 	/**

@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.gs.setting.ontology;
  * #L%
  */
 
+import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
@@ -32,9 +33,7 @@ import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
+import eu.essi_lab.cfga.gui.extension.*;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
@@ -442,11 +441,11 @@ public class OntologySetting extends Setting implements EditableSetting {
 	 */
 	public OntologySettingComponentInfo() {
 
-	    setComponentName(AccessorSetting.class.getName());
+	    setName(AccessorSetting.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.ONTOLOGIES.getIndex()).//
-		    withShowDirective("Ontologies", SortDirection.ASCENDING).//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(OntologySetting.class).//
+		    withLabel("Ontologies").//
+ 		    withShowDirective("Ontologies", SortDirection.ASCENDING).//
 		    withAddDirective("Add ontology", OntologySetting.class).//
 		    withRemoveDirective("Remove ontology", true, OntologySetting.class).//
 		    withEditDirective("Edit ontology", ConfirmationPolicy.ON_WARNINGS).//
@@ -468,11 +467,11 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 		    ColumnDescriptor.create("Availability", 100, true, true, this::getOntologyAvailability) //
 
-	    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).
+	    ), getItemsList(), Grid.SelectionMode.MULTI).
 
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.ONTOLOGIES.getIndex(), descriptor));
 	}
 
 	/**

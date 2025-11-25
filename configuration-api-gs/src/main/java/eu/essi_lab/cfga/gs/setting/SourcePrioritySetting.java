@@ -4,14 +4,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.extension.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 
 /*-
  * #%L
@@ -182,14 +180,14 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 	 */
 	public SourcePrioritySettingComponentInfo() {
 
-	    setComponentName(SourcePrioritySettingComponentInfo.class.getName());
+	    setName(SourcePrioritySettingComponentInfo.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.IDENTIFIER_MANAGEMENT.getIndex()).//
-		    withShowDirective("Identifier management").//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(SourcePrioritySetting.class).//
+		    withLabel("Identifier management").//
+ 		    withShowDirective("Identifier management").//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.IDENTIFIER_MANAGEMENT.getIndex(), descriptor));
 	}
     }
 

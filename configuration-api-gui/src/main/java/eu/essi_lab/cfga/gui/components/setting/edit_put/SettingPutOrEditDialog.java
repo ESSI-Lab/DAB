@@ -30,7 +30,7 @@ import com.vaadin.flow.component.Unit;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selector;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.TabContent;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.gui.extension.directive.Directive;
@@ -49,20 +49,20 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
     protected final int dialogHeight;
     protected final int dialogWidth;
     protected final Configuration configuration;
-    protected final TabContainer tabContainer;
+    protected final TabContent tabContent;
     protected boolean foldedModeEnabled;
 
     /**
      * @param configuration
-     * @param tabContainer
+     * @param tabContent
      * @param context
      */
-    public SettingPutOrEditDialog(Configuration configuration, TabContainer tabContainer, ValidationContext context) {
+    public SettingPutOrEditDialog(Configuration configuration, TabContent tabContent, ValidationContext context) {
 
 	addToCloseAll();
 
 	this.configuration = configuration;
-	this.tabContainer = tabContainer;
+	this.tabContent = tabContent;
 	setCloseOnConfirm(false);
 
 	dialogHeight = 800;

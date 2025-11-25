@@ -25,14 +25,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.extension.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.GSSource;
 
@@ -42,12 +40,12 @@ import eu.essi_lab.model.GSSource;
 public class GDCSourcesSetting extends Setting implements EditableSetting {
 
     /**
-     * 
+     *
      */
     private static final String SOURCES_SETTING_IDENTIFIER = "availableSources";
 
     /**
-     * 
+     *
      */
     public GDCSourcesSetting() {
 
@@ -114,18 +112,18 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
     public static class GDCSettingComponentInfo extends ComponentInfo {
 
 	/**
-	 * 
+	 *
 	 */
 	public GDCSettingComponentInfo() {
 
-	    setComponentName(GDCSettingComponentInfo.class.getName());
+	    setName(GDCSettingComponentInfo.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.GDC_SOURCES.getIndex()).//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(GDCSourcesSetting.class).//
+		    withLabel("GDC sources").//
 		    withShowDirective("GDC sources").//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.GDC_SOURCES.getIndex(), descriptor));
 	}
     }
 

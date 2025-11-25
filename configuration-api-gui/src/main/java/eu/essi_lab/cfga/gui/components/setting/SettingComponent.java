@@ -46,7 +46,7 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.TabContent;
 import eu.essi_lab.cfga.gui.components.option.OptionComponent;
 import eu.essi_lab.cfga.gui.components.option.OptionComponentLayout;
 import eu.essi_lab.cfga.gui.components.option.OptionTextField;
@@ -168,7 +168,7 @@ public class SettingComponent extends Div {
 
     private final Configuration configuration;
     private Details details;
-    private final TabContainer tabContainer;
+    private final TabContent tabContent;
 
     private final boolean forceHideLabel;
 
@@ -178,7 +178,7 @@ public class SettingComponent extends Div {
      * @param forceReadonly
      * @param forceHideLabel
      * @param comparator
-     * @param tabContainer
+     * @param tabContent
      */
     public SettingComponent(//
 	    Configuration configuration, //
@@ -186,12 +186,12 @@ public class SettingComponent extends Div {
 	    boolean forceReadonly, //
 	    boolean forceHideLabel, //
 	    Comparator<Setting> comparator, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
 	this.configuration = configuration;
 	this.setting = setting;
 	this.forceReadonly = forceReadonly;
-	this.tabContainer = tabContainer;
+	this.tabContent = tabContent;
 	this.forceHideLabel = forceHideLabel;
 
 	init(comparator);
@@ -203,7 +203,7 @@ public class SettingComponent extends Div {
      * @param forceReadonly
      * @param forceHideLabel
      * @param comparator
-     * @param tabContainer
+     * @param tabContent
      */
     public SettingComponent(//
 	    Configuration configuration, //
@@ -211,12 +211,12 @@ public class SettingComponent extends Div {
 	    boolean forceReadonly, //
 	    boolean forceHideLabel, //
 	    Comparator<Setting> comparator, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
 	this.configuration = configuration;
 	this.settingIdentifier = settingIdentifier;
 	this.forceReadonly = forceReadonly;
-	this.tabContainer = tabContainer;
+	this.tabContent = tabContent;
 	this.forceHideLabel = forceHideLabel;
 
 	init(comparator);
@@ -605,7 +605,7 @@ public class SettingComponent extends Div {
 	//
 	// remove button
 	//
-	handleRemoveButton(parent, setting, tabContainer, headerLayout, selectionMode);
+	handleRemoveButton(parent, setting, tabContent, headerLayout, selectionMode);
 
 	//
 	// disable button
@@ -701,7 +701,7 @@ public class SettingComponent extends Div {
 
 	if (isEditable) {
 
-	    Button button = SettingComponentFactory.createSettingEditButton(configuration, setting, this, tabContainer);
+	    Button button = SettingComponentFactory.createSettingEditButton(configuration, setting, this, tabContent);
 
 	    updateSettingToComponentsMap(setting, button);
 
@@ -724,7 +724,7 @@ public class SettingComponent extends Div {
     private void handleRemoveButton(//
 	    Setting parent, //
 	    Setting setting, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    HorizontalLayout headerLayout, //
 	    SelectionMode multiSelectionMode) {
 
@@ -732,7 +732,7 @@ public class SettingComponent extends Div {
 
 	if (canBeRemoved) {
 
-	    Button button = SettingComponentFactory.createSettingRemoveButton(configuration, tabContainer, this);
+	    Button button = SettingComponentFactory.createSettingRemoveButton(configuration, tabContent, this);
 
 	    updateSettingToComponentsMap(setting, button);
 

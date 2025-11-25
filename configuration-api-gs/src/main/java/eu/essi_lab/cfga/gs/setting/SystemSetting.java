@@ -26,6 +26,7 @@ import java.util.List;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gui.extension.*;
 import eu.essi_lab.cfga.setting.ConfigurationObject;
 import org.json.JSONObject;
 
@@ -35,9 +36,6 @@ import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
@@ -403,14 +401,14 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	 */
 	public SystemSettingComponentInfo() {
 
-	    setComponentName(SystemSetting.class.getName());
+	    setName(SystemSetting.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.SYSTEM.getIndex()).//
-		    withShowDirective("System").//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(SystemSetting.class).//
+		    withLabel("System").//
+ 		    withShowDirective("System").//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.SYSTEM.getIndex(), descriptor));
 	}
     }
 

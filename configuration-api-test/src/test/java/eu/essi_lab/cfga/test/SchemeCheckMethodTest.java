@@ -528,7 +528,7 @@ public class SchemeCheckMethodTest {
 	List<TabIndex> list = GSTabIndex.getValues();
 
 	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.ABOUT.getIndex()).collect(Collectors.toList());
-	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.SOURCES_INSPECTION.getIndex()).collect(Collectors.toList());
+//	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.SOURCES_INSPECTION.getIndex()).collect(Collectors.toList());
 
 	checkMethod.setItems(list);
 
@@ -561,8 +561,8 @@ public class SchemeCheckMethodTest {
 	List<TabIndex> list = GSTabIndex.getValues();
 
 	// removing harvesting and distribution settings from the tab
-	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.HARVESTING.getIndex()).collect(Collectors.toList());
-	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.DISTRIBUTION.getIndex()).collect(Collectors.toList());
+//	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.HARVESTING.getIndex()).collect(Collectors.toList());
+//	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.DISTRIBUTION.getIndex()).collect(Collectors.toList());
 
 	checkMethod.setItems(list);
 
@@ -604,7 +604,7 @@ public class SchemeCheckMethodTest {
 	List<TabIndex> list = GSTabIndex.getValues();
 
 	// removing profilers settings from the tab
-	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.PROFILERS.getIndex()).collect(Collectors.toList());
+//	list = list.stream().filter(t -> t.getIndex() != GSTabIndex.PROFILERS.getIndex()).collect(Collectors.toList());
 
 	checkMethod.setItems(list);
 

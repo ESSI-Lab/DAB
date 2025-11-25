@@ -59,9 +59,9 @@ public class ComponentFactory {
      * @param id
      * @return
      */
-    public static TabContainer createTabContainer(String id) {
+    public static TabContent createTabContainer(String id) {
 
-	TabContainer layout = new TabContainer();
+	TabContent layout = new TabContent();
 	// layout.getStyle().set("border","1px solid black");
 	if (id != null) {
 	    layout.setId(id);
@@ -126,9 +126,9 @@ public class ComponentFactory {
      * @param id
      * @return
      */
-    public static TabContainer createNoSpacingNoMarginTabContainer(String id) {
+    public static TabContent createNoSpacingNoMarginTabContainer(String id) {
 
-	TabContainer layout = createTabContainer(id);
+	TabContent layout = createTabContainer(id);
 
 	layout.setMargin(false);
 	layout.setSpacing(false);

@@ -89,6 +89,8 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 	setShowHeader(false);
 	setCanBeCleaned(false);
 	setSelectionMode(SelectionMode.SINGLE);
+	setDescription("The configuration can be uploaded to an OpenSearch or an S3 storage. Configure the desired "
+		+ "storage and click on of the 'Import' buttons to upload the configuration in the configured storage");
 
 	DatabaseSetting dbSetting = ConfigurationWrapper.getDatabaseSetting();
 

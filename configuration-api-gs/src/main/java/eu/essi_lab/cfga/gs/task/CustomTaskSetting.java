@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.gs.task;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.extension.*;
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 
@@ -38,9 +39,6 @@ import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -207,11 +205,11 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	 */
 	public TaskComponentInfo() {
 
-	    setComponentName(CustomTaskSetting.class.getName());
+	    setName(CustomTaskSetting.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.CUSTOM_TASKS.getIndex()).//
-		    withShowDirective("Custom tasks", SortDirection.ASCENDING).//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(CustomTaskSetting.class).//
+		    withLabel("Custom tasks").//
+ 		    withShowDirective("Custom tasks", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 		    "Add task", //
@@ -254,7 +252,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.CUSTOM_TASKS.getIndex(), descriptor));
 	}
 
 	/**

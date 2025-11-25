@@ -23,14 +23,12 @@ package eu.essi_lab.cfga.gs.setting.oauth;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gui.extension.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -86,7 +84,7 @@ public class OAuthSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public OAuthSetting() {
 
@@ -233,18 +231,19 @@ public class OAuthSetting extends Setting implements EditableSetting {
     public static class OAuthSettingComponentInfo extends ComponentInfo {
 
 	/**
-	 * 
+	 *
 	 */
 	public OAuthSettingComponentInfo() {
 
-	    setComponentName(OAuthSetting.class.getName());
+	    setName(OAuthSetting.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.AUTHORIZATION.getIndex()).//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(OAuthSetting.class).//
+		    withLabel("Authorization").//
 		    withShowDirective("Authorization").//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.AUTHORIZATION.getIndex(), descriptor));
+
 	}
     }
 
@@ -288,7 +287,7 @@ public class OAuthSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void setClientId(String clientId) {
 
@@ -320,7 +319,7 @@ public class OAuthSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void setClientSecret(String clientSecret) {
 

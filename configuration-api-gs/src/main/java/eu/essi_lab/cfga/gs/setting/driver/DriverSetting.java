@@ -26,13 +26,11 @@ package eu.essi_lab.cfga.gs.setting.driver;
 
 import java.util.List;
 
+import eu.essi_lab.cfga.gui.extension.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
 
@@ -64,14 +62,14 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
 	 */
 	public DriverComponentInfo() {
 
-	    setComponentName(DriverSetting.class.getName());
+	    setName(DriverSetting.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.REPOSITORY.getIndex()).//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(DriverSetting.class).//
+		    withLabel("Repository").//
 		    withShowDirective("Repository").//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.REPOSITORY.getIndex(), descriptor));
 	}
     }
 

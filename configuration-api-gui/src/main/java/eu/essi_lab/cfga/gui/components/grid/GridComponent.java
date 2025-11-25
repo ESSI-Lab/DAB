@@ -45,7 +45,7 @@ import com.vaadin.flow.function.ValueProvider;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.TabContent;
 import eu.essi_lab.cfga.gui.components.grid.renderer.GridColumnRenderer;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.setting.Setting;
@@ -75,7 +75,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	    GridInfo gridInfo, //
 	    List<Setting> list, //
 	    Configuration configuration, //
-	    TabContainer container, //
+	    TabContent container, //
 	    boolean readOnly, //
 	    boolean refresh) {
 
@@ -433,7 +433,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
      * @return
      */
     private Renderer<HashMap<String, String>> createItemDetailsRenderer(Configuration configuration, boolean readOnly,
-	    TabContainer container) {
+	    TabContent container) {
 
 	return new ComponentRenderer<>((source) -> {
 

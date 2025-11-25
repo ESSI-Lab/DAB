@@ -36,7 +36,7 @@ public class ConfigHandler extends ComponentInfo {
      */
     public ConfigHandler() {
 
-	setComponentName("Configuration");
+	setName("Configuration");
 
 	Div mainLayout = new Div();
 	mainLayout.setWidthFull();
@@ -56,13 +56,13 @@ public class ConfigHandler extends ComponentInfo {
 	//
 	//
 
-	TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		withIndex(GSTabIndex.CONFIGURATION_HANDLER.getIndex()).//
-		withShowDirective(getComponentName()).//
+	TabDescriptor descriptor = TabDescriptorBuilder.get().//
+		withLabel(getName()).//
+		withShowDirective(getName()).//
 		withComponent(mainLayout).//
 		build();
 
-	setTabDescriptor(tabDescriptor);
+	setPlaceholder(TabPlaceholder.of(GSTabIndex.CONFIGURATION_HANDLER.getIndex(), descriptor));
     }
 
 }

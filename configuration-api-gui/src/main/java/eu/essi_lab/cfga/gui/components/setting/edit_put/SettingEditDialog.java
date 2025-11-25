@@ -27,7 +27,7 @@ import com.vaadin.flow.component.Component;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.TabContent;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.components.setting.listener.SettingEditButtonConfirmationListener;
@@ -58,19 +58,19 @@ public class SettingEditDialog extends SettingPutOrEditDialog {
     /**
      * @param configuration
      * @param setting
-     * @param tabContainer
+     * @param tabContent
      */
     public SettingEditDialog(//
 	    Configuration configuration, //
 	    Setting setting, //
 	    SettingComponent currentSettingComponent, //
-	    TabContainer tabContainer) {//
+	    TabContent tabContent) {//
 
-	super(configuration, tabContainer, ValidationContext.edit());
+	super(configuration, tabContent, ValidationContext.edit());
 
 	this.currentSettingComponent = currentSettingComponent;
 	
-	Optional<EditDirective> editDirective = tabContainer == null? Optional.empty() : tabContainer.getEditDirective();
+	Optional<EditDirective> editDirective = tabContent == null? Optional.empty() : tabContent.getEditDirective();
 	String title = "Edit setting";
 	
 	if(editDirective.isPresent()){
@@ -114,13 +114,13 @@ public class SettingEditDialog extends SettingPutOrEditDialog {
 		configuration, //
 		settingToEdit, //
 		currentSettingComponent, //
-		tabContainer, //
+		tabContent, //
 		foldedModeEnabled);
     }
 
     @Override
     protected Optional<EditDirective> getDirective() {
 
-	return tabContainer == null ? Optional.empty() : tabContainer.getEditDirective();
+	return tabContent == null ? Optional.empty() : tabContent.getEditDirective();
     }
 }

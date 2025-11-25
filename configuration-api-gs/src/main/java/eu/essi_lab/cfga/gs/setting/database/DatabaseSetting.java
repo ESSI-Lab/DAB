@@ -23,13 +23,11 @@ package eu.essi_lab.cfga.gs.setting.database;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gui.extension.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.StorageInfo;
@@ -40,8 +38,7 @@ import eu.essi_lab.model.StorageInfo;
 public class DatabaseSetting extends Setting implements EditableSetting {
 
     /**
-     *  
-     *  
+     *
      */
     public static final String VOLATILE_DB_STORAGE_NAME = "Volatile";
     public static final String VOLATILE_DB_URI = "http://volatile-db";
@@ -178,18 +175,18 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     public static class DatabaseComponentInfo extends ComponentInfo {
 
 	/**
-	 * 
+	 *
 	 */
 	public DatabaseComponentInfo() {
 
-	    setComponentName(DatabaseSetting.class.getName());
+	    setName(DatabaseSetting.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.DATABASE.getIndex()).//
+	    TabDescriptor descriptor = TabDescriptorBuilder.get(DatabaseSetting.class).//
+		    withLabel("Database").//
 		    withShowDirective("Database").//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setPlaceholder(TabPlaceholder.of(GSTabIndex.DATABASE.getIndex(), descriptor));
 	}
     }
 
@@ -229,7 +226,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void setVolatile(boolean set) {
 
@@ -258,7 +255,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void removeVolatileSettings() {
 
@@ -466,7 +463,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void hideDatabaseConfigurationName() {
 
@@ -474,7 +471,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void hideDatabaseConfigurationFolderOption() {
 
