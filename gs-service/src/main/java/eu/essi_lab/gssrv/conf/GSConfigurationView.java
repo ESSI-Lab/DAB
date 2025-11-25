@@ -518,9 +518,7 @@ public class GSConfigurationView extends ConfigurationView {
     protected List<ComponentInfo> getAdditionalsComponentInfo() {
 
 	return Arrays.asList(//
-		new DistributionSettingComponentInfo(), //
-		new HarvestingSettingComponentInfo(), //
-		new SourcesInspector(), //
+		new Brokering(),//
 		new ConfigHandler(), //
 		new AboutComponentInfo(),
 		new OntologySettingComponentInfo()//

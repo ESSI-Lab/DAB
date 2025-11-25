@@ -25,11 +25,12 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.vaadin.flow.component.grid.*;
+import eu.essi_lab.cfga.gui.extension.*;
 import org.json.JSONObject;
 
 import com.vaadin.flow.data.provider.SortDirection;
 
-import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
@@ -41,9 +42,6 @@ import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.setting.AfterCleanFunction;
 import eu.essi_lab.cfga.setting.Setting;
@@ -59,7 +57,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
     private static final String CUSTOM_TASK_SETTING_IDENTIFIER = "customTaskSetting";
 
     /**
-     * 
+     *
      */
     public HarvestingSetting() {
 
@@ -128,11 +126,6 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	addSetting(customTaskSetting);
 
 	//
-	// set the component extension
-	//
-	setExtension(new HarvestingSettingComponentInfo());
-
-	//
 	// set the onClean function
 	//
 	setAfterCleanFunction(new HarvestingSettingAfterCleanFunction());
@@ -178,84 +171,99 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
      */
     public static class HarvestingSettingComponentInfo extends ComponentInfo {
 
+	private final TabDescriptor descriptor;
+
 	/**
-	 * 
+	 *
 	 */
 	public HarvestingSettingComponentInfo() {
 
-	    setComponentName(HarvestingSetting.class.getName());
+	    setName(HarvestingSetting.class.getName());
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.HARVESTING.getIndex()).//
-		    withShowDirective("Harvesting", "Manage DAB harvested sources. Click \"Reload\" to"
-		    + " update the scheduler information",SortDirection.ASCENDING).//
+	    Class<? extends Setting> clazz = null;
+	    try {
+		 clazz = (Class<? extends Setting>) Class.forName("eu.essi_lab.harvester.worker.HarvestingSettingImpl");
+	    } catch (ClassNotFoundException e) {
+		throw new RuntimeException(e);
+	    }
+
+	    descriptor = TabDescriptorBuilder.get(clazz).//
+		    withLabel("Harvesting").//
+		    withShowDirective("Harvesting",
+		    "Manage DAB harvested sources. Click \"Reload\" to" + " update the scheduler information", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
-			    "Add harvested/mixed accessor", //
-			    "eu.essi_lab.harvester.worker.HarvestingSettingImpl")
-		    .//
+		    "Add harvested/mixed accessor", //
+		    "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
 		    withRemoveDirective("Remove accessor", true, "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
 		    withEditDirective("Edit accessor", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
 
-			    ColumnDescriptor.createPositionalDescriptor(), //
+		    ColumnDescriptor.createPositionalDescriptor(), //
 
-			    ColumnDescriptor.create("Name", 400, true, true, Setting::getName), //
+		    ColumnDescriptor.create("Name", 400, true, true, Setting::getName), //
 
-			    ColumnDescriptor.create("Type", 150, true, true, this::getSelectedAccessorType), //
+		    ColumnDescriptor.create("Type", 150, true, true, this::getSelectedAccessorType), //
 
-			    ColumnDescriptor.create("Source id", 200, true, true, this::getSourceId), //
+		    ColumnDescriptor.create("Source id", 200, true, true, this::getSourceId), //
 
-			    ColumnDescriptor.create("Setting id", 200, true, true, Setting::getIdentifier), //
+		    ColumnDescriptor.create("Setting id", 200, true, true, Setting::getIdentifier), //
 
-			    ColumnDescriptor.create("Comment", 150, true, true, this::getComment), //
+		    ColumnDescriptor.create("Comment", 150, true, true, this::getComment), //
 
-			    ColumnDescriptor.create("Deployment", 150, true, true, this::getDeployment), //
+		    ColumnDescriptor.create("Deployment", 150, true, true, this::getDeployment), //
 
-			    ColumnDescriptor.create("Repeat count", 150, true, true,
-				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
+		    ColumnDescriptor.create("Repeat count", 150, true, true, (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
 
-			    ColumnDescriptor.create("Repeat interval", 150, true, true,
-				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
+		    ColumnDescriptor.create("Repeat interval", 150, true, true, (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)),
+		    //
 
-			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
+		    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
 
-				    Comparator.comparing(item -> item.get("Status")), //
+			    Comparator.comparing(item -> item.get("Status")), //
 
-				    new JobPhaseColumnRenderer()), //
+			    new JobPhaseColumnRenderer()), //
 
-			    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
+		    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
 
-			    ColumnDescriptor.create("End time", 150, true, true, (s) -> SchedulerSupport.getInstance().getEndTime(s)), //
+		    ColumnDescriptor.create("End time", 150, true, true, (s) -> SchedulerSupport.getInstance().getEndTime(s)), //
 
-			    ColumnDescriptor.create("El. time (HH:mm:ss)", 170, true, true,
-				    (s) -> SchedulerSupport.getInstance().getElapsedTime(s)), //
+		    ColumnDescriptor.create("El. time (HH:mm:ss)", 170, true, true,
+			    (s) -> SchedulerSupport.getInstance().getElapsedTime(s)), //
 
-			    ColumnDescriptor.create("Next fire time", 150, true, true,
-				    (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
+		    ColumnDescriptor.create("Next fire time", 150, true, true, (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
 
-			    // ColumnDescriptor.create("Size", true, true, (s) ->
-			    // SchedulerSupport.getInstance().getSize(s),
-			    //
-			    // (o1, o2) -> {
-			    //
-			    // String size1 = o1.get("Size");
-			    // String size2 = o2.get("Size");
-			    //
-			    // return Integer.valueOf(SchedulerJobStatus.parse(size1))
-			    // .compareTo(Integer.valueOf(SchedulerJobStatus.parse(size2)));
-			    // }),
+		    // ColumnDescriptor.create("Size", true, true, (s) ->
+		    // SchedulerSupport.getInstance().getSize(s),
+		    //
+		    // (o1, o2) -> {
+		    //
+		    // String size1 = o1.get("Size");
+		    // String size2 = o2.get("Size");
+		    //
+		    // return Integer.valueOf(SchedulerJobStatus.parse(size1))
+		    // .compareTo(Integer.valueOf(SchedulerJobStatus.parse(size2)));
+		    // }),
 
-			    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
+		    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
 
-		    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).//
+	    ), getItemsList(), Grid.SelectionMode.MULTI).//
 
 		    reloadable(() -> SchedulerSupport.getInstance().update()).//
 
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public TabDescriptor getDescriptor() {
+
+	    return descriptor;
 	}
 
 	/**
@@ -342,8 +350,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	    return object.keySet().stream().
 
-		    filter(key -> isJSONObject(object, key) && object.getJSONObject(key).has("accessorType")).findFirst()
-		    .get();
+		    filter(key -> isJSONObject(object, key) && object.getJSONObject(key).has("accessorType")).findFirst().get();
 	}
 
 	/**
@@ -428,7 +435,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
     }
 
     /**
-     * 
+     *
      */
     public void setObject(JSONObject object) {
 
@@ -445,22 +452,22 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
     }
 
     /**
-     * 
+     *
      */
     protected abstract Setting initAugmentersSetting();
 
     /**
-     * 
+     *
      */
     protected abstract String getAugmentersSettingIdentifier();
 
     /**
-     * 
+     *
      */
     protected abstract Setting initAccessorsSetting();
 
     /**
-     * 
+     *
      */
     protected abstract String getAccessorsSettingIdentifier();
 

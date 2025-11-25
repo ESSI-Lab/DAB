@@ -41,90 +41,77 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    HARVESTING(0, false, Descriptor.of(s -> s.getSettingClass().getSimpleName().equals("HarvestingSettingImpl"))),
-    /***
-     *
-     */
-    SOURCES_INSPECTION(1),
+    BROKERING(0),
     /**
      *
      */
-    DISTRIBUTION(2, false, Descriptor.of(s -> s.getSettingClass().equals(DistributionSetting.class))),
+    DATABASE(1, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()))),
     /**
      *
      */
-    PROFILERS(3, true, Descriptor.of(s -> s.getSettingClass().getSuperclass().equals(ProfilerSetting.class)),
-	    Descriptor.of(s -> s.getSettingClass().getSuperclass().getSuperclass().equals(ProfilerSetting.class))),
+    SCHEDULER(2, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SCHEDULER_SETTING.getLabel()))),
     /**
      *
      */
-    DATABASE(4, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel()))),
+    AUGMENTERS(3, true, Descriptor.of(s -> s.getSettingClass().getSimpleName().equals("AugmenterWorkerSettingImpl"))),
     /**
      *
      */
-    SCHEDULER(5, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SCHEDULER_SETTING.getLabel()))),
+    REPOSITORY(4, true, Descriptor.of(s -> s.getSettingClass().getSuperclass().equals(DriverSetting.class))),
     /**
      *
      */
-    AUGMENTERS(6, true, Descriptor.of(s -> s.getSettingClass().getSimpleName().equals("AugmenterWorkerSettingImpl"))),
+    AUTHORIZATION(5, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.OAUTH_SETTING.getLabel()))),
     /**
      *
      */
-    REPOSITORY(7, true, Descriptor.of(s -> s.getSettingClass().getSuperclass().equals(DriverSetting.class))),
+    CREDENTIALS(6, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.CREDENTIALS_SETTING.getLabel()))),
     /**
      *
      */
-    AUTHORIZATION(8, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.OAUTH_SETTING.getLabel()))),
+    DOWNLOAD(7, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DOWNLOAD_SETTING.getLabel()))),
     /**
      *
      */
-    CREDENTIALS(9, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.CREDENTIALS_SETTING.getLabel()))),
+    SOURCE_STORAGE(8, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SOURCE_STORAGE_SETTING.getLabel()))),
     /**
      *
      */
-    DOWNLOAD(10, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DOWNLOAD_SETTING.getLabel()))),
+    IDENTIFIER_MANAGEMENT(9, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SOURCE_PRIORITY_SETTING.getLabel()))),
     /**
      *
      */
-    SOURCE_STORAGE(11, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SOURCE_STORAGE_SETTING.getLabel()))),
+    GDC_SOURCES(10, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.GDC_SOURCES_SETTING.getLabel()))),
     /**
      *
      */
-    IDENTIFIER_MANAGEMENT(12, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SOURCE_PRIORITY_SETTING.getLabel()))),
+    CUSTOM_TASKS(11, true, Descriptor.of(s -> s.getSettingClass().equals(CustomTaskSetting.class))),
     /**
      *
      */
-    GDC_SOURCES(13, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.GDC_SOURCES_SETTING.getLabel()))),
+    DATA_CACHE(12, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel()))),
     /**
      *
      */
-    CUSTOM_TASKS(14, true, Descriptor.of(s -> s.getSettingClass().equals(CustomTaskSetting.class))),
-    /**
-     *
-     */
-    DATA_CACHE(15, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel()))),
-    /**
-     *
-     */
-    RATE_LIMITER(16, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.RATE_LIMITER_SETTING.getLabel()))),
+    RATE_LIMITER(13, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.RATE_LIMITER_SETTING.getLabel()))),
 
     /**
      *
      */
-    ONTOLOGIES(17, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
+    ONTOLOGIES(14, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
     /**
      *
      */
-    CONFIGURATION_HANDLER(18),
+    CONFIGURATION_HANDLER(15),
 
     /**
      *
      */
-    SYSTEM(19, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SYSTEM_SETTING.getLabel()))),
+    SYSTEM(16, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SYSTEM_SETTING.getLabel()))),
     /**
      *
      */
-    ABOUT(20);
+    ABOUT(17);
 
     private final int index;
     private final boolean required;
