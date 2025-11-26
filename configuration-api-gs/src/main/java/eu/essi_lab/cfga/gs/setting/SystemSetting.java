@@ -127,7 +127,12 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	/**
 	 * XACMLAutorizer option
 	 */
-	DEV_MACHINE_AUTH("devMachineAuth");
+	DEV_MACHINE_AUTH("devMachineAuth"),
+
+	/**
+	 *
+	 */
+	DATA_PROXY_SERVER("dataProxyServer");
 
 	/**
 	 * MirrorSiteTokenGeneratorHandler option prefix
