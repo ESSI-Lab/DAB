@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -277,14 +277,18 @@ public abstract class AbstractSetting extends ConfigurationObject {
 
 	try {
 
-	    Class<?> clazz = Class.forName(getObject().getString(EXTENSION.getKey()));
+	    if (getObject().has(EXTENSION.getKey())) {
 
-	    if (extension.isAssignableFrom(clazz)) {
+		Class<?> clazz = Class.forName(getObject().getString(EXTENSION.getKey()));
 
-		return Optional.of((T) Class.forName(getObject().getString(EXTENSION.getKey())).getDeclaredConstructor().newInstance());
+		if (extension.isAssignableFrom(clazz)) {
+
+		    return Optional.of((T) Class.forName(getObject().getString(EXTENSION.getKey())).getDeclaredConstructor().newInstance());
+		}
 	    }
 
 	} catch (Exception e) {
+
 	    GSLoggerFactory.getLogger(getClass()).warn(e.getMessage(), e);
 	}
 
@@ -302,7 +306,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
     /**
      * @return
      */
-    public Optional<Class<? extends ObjectExtension>> getOptionalExtensionClass() {
+    public Optional<Class<? extends ObjectExtension>> getExtensionClass() {
 
 	if (getObject().has(EXTENSION.getKey())) {
 
