@@ -249,6 +249,11 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 	if (siteCode != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, siteCode));
 	}
+	
+	String localSiteCode = request.getParameterValue(APIParameters.LOCAL_PLATFORM_CODE);
+	if (localSiteCode != null) {
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.PLATFORM_IDENTIFIER, localSiteCode));
+	}
 
 	String countryCode = request.getParameterValue(APIParameters.COUNTRY);
 	if (countryCode != null) {
