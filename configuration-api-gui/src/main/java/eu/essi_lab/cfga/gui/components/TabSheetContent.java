@@ -48,9 +48,9 @@ public class TabSheetContent extends TabSheet implements Renderable {
      * @param desc
      * @param content
      */
-    public void add(TabDescriptor desc, TabContent content) {
+    public void add(String label, TabContent content) {
 
-	add(desc.getLabel(), content);
+	add(label, content);
 
 	list.add(content);
     }

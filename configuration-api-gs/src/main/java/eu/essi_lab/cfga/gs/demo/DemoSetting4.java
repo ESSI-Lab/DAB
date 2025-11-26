@@ -43,33 +43,28 @@ public class DemoSetting4 extends Setting {
 	setName("Setting demo 4 - #" + i);
 
 	setDescription("A setting that can be removed from the configuration");
-
-	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting4ComponentInfo());
-    }
+  }
 
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting4ComponentInfo extends ComponentInfo {
+    public static class DemoSetting4ComponentInfo extends TabPlaceholder {
 
 	/**
 	 * 
 	 */
 	public DemoSetting4ComponentInfo() {
 
-	    setName(DemoSetting4.class.getName());
+	    setLabel("Demo setting 4");
 	   
 	    setForceReadOnly(false);
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DemoSetting4.class).//
 
-		    withLabel("Demo setting 4").//
-		    build();
+ 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(1, descriptor));
+	    setIndex(1);
+	    addDescriptor(descriptor);
 	}
     }
 }

@@ -69,33 +69,28 @@ public class DemoSetting5 extends Setting {
 		build();
 
 	addOption(option2);
-
-	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting5ComponentInfo());
-    }
+   }
 
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting5ComponentInfo extends ComponentInfo {
+    public static class DemoSetting5ComponentInfo extends TabPlaceholder {
 
 	/**
 	 * 
 	 */
 	public DemoSetting5ComponentInfo() {
 
-	    setName(DemoSetting5.class.getName());
+	    setLabel("Demo setting 5");
 
 	    setForceReadOnly(false);
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DemoSetting5.class).//
 
-		    withLabel("Demo setting 5").//
-		    build();
+ 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(4, descriptor));
+	    setIndex(4);
+	    addDescriptor(descriptor);
 	}
     }
 }

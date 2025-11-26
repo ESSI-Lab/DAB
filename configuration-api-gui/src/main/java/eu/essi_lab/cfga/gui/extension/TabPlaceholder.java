@@ -29,7 +29,9 @@ import java.util.stream.*;
  */
 public class TabPlaceholder {
 
+    private String label;
     private int index;
+    private boolean forceReadOnly;
     private List<TabDescriptor> list;
 
     /**
@@ -48,12 +50,45 @@ public class TabPlaceholder {
 
     /**
      *
+     */
+    public TabPlaceholder() {
+
+	list = new ArrayList<>();
+    }
+
+    /**
+     *
      * @param index
      */
-    private TabPlaceholder(int index) {
+    public TabPlaceholder(int index) {
 
 	list = new ArrayList<>();
 	setIndex(index);
+    }
+
+    /**
+     * @return
+     */
+    public String getLabel() {
+
+	return label;
+    }
+
+    /**
+     * @param label
+     */
+    public void setLabel(String label) {
+
+	this.label = label;
+    }
+
+    /**
+     *
+     * @param descriptor
+     */
+    public void addDescriptors(TabDescriptor... descriptors){
+
+	list.addAll(Arrays.asList(descriptors));
     }
 
     /**
@@ -72,6 +107,22 @@ public class TabPlaceholder {
     public List<TabDescriptor> getDescriptors(){
 
 	return list;
+    }
+
+    /**
+     * @param forceReadOnly
+     */
+    public void setForceReadOnly(boolean forceReadOnly) {
+
+	this.forceReadOnly = forceReadOnly;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isForceReadOnlySet() {
+
+	return forceReadOnly;
     }
 
     /**

@@ -87,7 +87,6 @@ public class ConfigurationViewFactory {
     public static Renderable createTabContent(//
 	    ConfigurationView view,//
 	    Configuration configuration, //
-	    ComponentInfo componentInfo,//
 	    TabPlaceholder placeholder) {
 
 	Renderable content = null;
@@ -98,15 +97,15 @@ public class ConfigurationViewFactory {
 
 	    TabDescriptor descriptor = descriptors.getFirst();
 
-	    content = createTabContent(descriptor, configuration, view, componentInfo, placeholder, true);
+	    content = createTabContent(descriptor, configuration, view, placeholder, true);
 
 	} else {
 
 	    TabSheetContent tabSheet = new TabSheetContent();
 
 	    descriptors.forEach(desc -> tabSheet.add( //
-		    desc, //
-		    createTabContent(desc, configuration, view, componentInfo, placeholder, false)));
+		    placeholder.getLabel(), //
+		    createTabContent(desc, configuration, view, placeholder, false)));
 
 	    content = tabSheet;
 	}
@@ -126,16 +125,15 @@ public class ConfigurationViewFactory {
 	    TabDescriptor descriptor,//
 	    Configuration configuration, //
 	    ConfigurationView view,//
-	    ComponentInfo componentInfo,//
 	    TabPlaceholder placeholder,//
 	    boolean withLabel) {
 
 	DirectiveManager directiveManager = descriptor.getDirectiveManager();
 
 	TabContent container = ComponentFactory.createNoSpacingNoMarginTabContainer(
-		"tab-container-vertical-layout-for-" + descriptor.getLabel());
+		"tab-container-vertical-layout-for-" + placeholder.getLabel());
 
-	container.init(configuration, componentInfo, descriptor, placeholder);
+	container.init(configuration, descriptor, placeholder);
 
 	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
 
@@ -149,16 +147,16 @@ public class ConfigurationViewFactory {
 	container.setEditDirective(editDirective);
 
 	HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
-		"tab-container-header-layout-for-" + descriptor.getLabel());
+		"tab-container-header-layout-for-" + placeholder.getLabel());
 	headerLayout.setWidthFull();
 	headerLayout.setAlignItems(Alignment.BASELINE);
-	headerLayout.setId(TAB_HEADER_ID_PREFIX + "_" + descriptor.getLabel());
+	headerLayout.setId(TAB_HEADER_ID_PREFIX + "_" + placeholder.getLabel());
 
 	container.add(headerLayout);
 
 	Label tabLabel = new Label();
 	tabLabel.setWidthFull();
-	tabLabel.setText(descriptor.getLabel());
+	tabLabel.setText(placeholder.getLabel());
 	tabLabel.getStyle().set("font-size", "30px");
 	tabLabel.getStyle().set("color", "black");
 

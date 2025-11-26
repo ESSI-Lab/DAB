@@ -302,33 +302,28 @@ public class DemoSetting3 extends Setting {
 		build();
 
 	addOption(option6);
-
-	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting3ComponentInfo());
-    }
+ }
 
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting3ComponentInfo extends ComponentInfo {
+    public static class DemoSetting3ComponentInfo extends TabPlaceholder {
 
 	/**
 	 * 
 	 */
 	public DemoSetting3ComponentInfo() {
 
-	    setName(DemoSetting3.class.getName());
+	    setLabel("Demo setting 3");
 
 	    setForceReadOnly(false);
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DemoSetting3.class).//
 
-		    withLabel("Demo setting 3").//
-		    build();
+ 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(2, descriptor));
+	    setIndex(2);
+	    addDescriptor(descriptor);
 	}
     }
 }

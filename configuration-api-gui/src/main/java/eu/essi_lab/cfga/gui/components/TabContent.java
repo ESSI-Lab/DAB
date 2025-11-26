@@ -60,7 +60,6 @@ public class TabContent extends VerticalLayout implements Renderable {
     private Optional<RemoveDirective> removeDirective;
     private Optional<EditDirective> editDirective;
     private TabDescriptor descriptor;
-    private ComponentInfo componentInfo;
     private Configuration configuration;
     private boolean rendered;
     private final List<Component> legends;
@@ -96,12 +95,10 @@ public class TabContent extends VerticalLayout implements Renderable {
      */
     public void init(//
 	    Configuration configuration, //
-	    ComponentInfo componentInfo,//
 	    TabDescriptor descriptor, //
 	    TabPlaceholder placeholder) {
 
 	this.configuration = configuration;
-	this.componentInfo = componentInfo;
 	this.descriptor = descriptor;
 	this.placeholder = placeholder;
     }
@@ -114,7 +111,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	rendered = true;
 
-	boolean readOnly = componentInfo.isForceReadOnlySet();
+	boolean readOnly = placeholder.isForceReadOnlySet();
 
 	HorizontalLayout headerLayout = findHeader();
 

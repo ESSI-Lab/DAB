@@ -231,7 +231,7 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class RateLimiterSettingComponentInfo extends ComponentInfo {
+    public static class RateLimiterSettingComponentInfo extends TabPlaceholder {
 
 	private final TabDescriptor descriptor;
 
@@ -240,10 +240,9 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 	 */
 	public RateLimiterSettingComponentInfo() {
 
-	    setName(SystemSetting.class.getName());
+	    setLabel(SystemSetting.class.getName());
 
 	    descriptor = TabDescriptorBuilder.get(RateLimiterSetting.class).//
-		    withLabel("Rate limiter").//
 		    build();
 	}
 

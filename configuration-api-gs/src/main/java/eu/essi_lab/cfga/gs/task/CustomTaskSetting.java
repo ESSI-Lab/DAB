@@ -163,11 +163,6 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	addOption(emailRecipientsOption);
 
 	//
-	// set the component extension
-	//
-	setExtension(new TaskComponentInfo());
-
-	//
 	// set the validator
 	//
 	setValidator(new TaskSettingValidator());
@@ -198,17 +193,17 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
     /**
      * @author Fabrizio
      */
-    public static class TaskComponentInfo extends ComponentInfo {
+    public static class CustomTaskComponentInfo extends TabPlaceholder {
 
 	/**
 	 *
 	 */
-	public TaskComponentInfo() {
+	public CustomTaskComponentInfo() {
 
-	    setName(CustomTaskSetting.class.getName());
+	    setLabel("Custom tasks");
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(CustomTaskSetting.class).//
-		    withLabel("Custom tasks").//
+
  		    withShowDirective(SortDirection.ASCENDING).//
 
 		    withAddDirective(//
@@ -252,7 +247,8 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.CUSTOM_TASKS.getIndex(), descriptor));
+	    setIndex(GSTabIndex.CUSTOM_TASKS.getIndex());
+	    addDescriptor(descriptor);
 	}
 
 	/**

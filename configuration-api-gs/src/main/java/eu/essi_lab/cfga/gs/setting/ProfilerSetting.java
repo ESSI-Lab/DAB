@@ -230,7 +230,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     /**
      * @author Fabrizio
      */
-    public static class ProfilerComponentInfo extends ComponentInfo {
+    public static class ProfilerComponentInfo extends TabPlaceholder {
 
 	private final TabDescriptor descriptor;
 
@@ -239,7 +239,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	 */
 	public ProfilerComponentInfo() {
 
-	    setName(ProfilerSetting.class.getName());
+	    setLabel("Profilers");
 
 	    String desc = "Manage DAB profilers. Profilers can be added, "
 		    + "and removed; furthermore, their configuration, path and state can be modified. "
@@ -249,7 +249,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 		    + "its capabilities will no longer be available and each request will return " + "a 404 error code";
 
 	    descriptor = TabDescriptorBuilder.get(ProfilerSetting.class).//
-		    withLabel("Profilers").//
+
 		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
 		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
 		    withRemoveDirective("Remove profiler", false, ProfilerSetting.class).//

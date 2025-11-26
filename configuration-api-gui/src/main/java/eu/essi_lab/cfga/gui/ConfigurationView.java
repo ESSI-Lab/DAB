@@ -55,10 +55,7 @@ import eu.essi_lab.cfga.ConfigurationChangeListener;
 import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.dialog.EnhancedDialog;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabPlaceholder;
-import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
-import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.WebRequest;
@@ -76,8 +73,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     private final DrawerToggle drawerToggle;
     private boolean drawerOpened;
 
-    // for test purpose, shows only the selected tab or all if -1
-    private final int oneTab = -1;
     private Configuration configuration;
 
     /**
@@ -291,7 +286,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	configuration.addChangeEventListener(tabs);
 
-	initContent(configuration);
+	init(configuration);
 
 	//
 	//
@@ -486,24 +481,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * {@link ComponentInfo} instances and the related {@link TabPlaceholder}, can be defined to manage one or more {@link Setting}s.<br> If
-     * the {@link RemoveDirective} of the {@link TabPlaceholder} allows the removal of all settings, when the view is initialized and there
-     * is no settings coupled with the {@link ComponentInfo}, the {@link ComponentInfo} and its {@link TabPlaceholder} cannot be found and
-     * as consequence, the related tab cannot be rendered.<br> In this case, it will no longer be possible to add or remove that kind of
-     * settings just because there is no tab with the required {@link AddDirective}.<br> To avoid this issue, this method can be used to
-     * register a list of {@link ComponentInfo} that must be
-     * <i>always rendered</i> (typically tabs with {@link RemoveDirective}s and {@link AddDirective}), even if the
-     * related settings are missing.<br>
-     * <br>
-     * This method can also be used to add {@link ComponentInfo} instances that have no related {@link Setting}
-     *
      * @return
-     * @see RemoveDirective#isFullRemovalAllowed()
      */
-    protected List<ComponentInfo> getAdditionalsComponentInfo() {
-
-	return new ArrayList<>();
-    }
+    protected abstract List<TabPlaceholder> getTabPlaceholders();
 
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
@@ -560,7 +540,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	} catch (Throwable t) {
 	    // a concurrent modification exception is sometimes thrown
 	}
-	initContent(configuration);
+	init(configuration);
     }
 
     /**
@@ -740,19 +720,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * @param placeholder
-     * @return
-     */
-    public List<Setting> retrieveTabSettings(TabPlaceholder placeholder) {
-
-	List<Setting> allSetting = configuration.list();
-
-	HashMap<TabPlaceholder, List<Setting>> tabInfoMap = createPlaceholdersMap(allSetting);
-
-	return tabInfoMap.getOrDefault(placeholder, new ArrayList<>());
-    }
-
-    /**
      * @param setting
      */
     protected void onSettingPut(List<Setting> settings) {
@@ -806,81 +773,20 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     /**
      * @param configuration
      */
-    protected void initContent(Configuration configuration) {
+    protected void init(Configuration configuration) {
 
-	List<Setting> allSetting = configuration.list();
-
-	HashMap<TabPlaceholder, List<Setting>> placeholdersMap = createPlaceholdersMap(allSetting);
-
-	List<TabPlaceholder> placeholders = new ArrayList<>(placeholdersMap.keySet());
-
-	//
-	//
-	//
-
-	List<ComponentInfo> additionalComps = getAdditionalsComponentInfo();
-
-	for (ComponentInfo componentInfo : additionalComps) {
-
-	    Optional<TabPlaceholder> optPlaceholder = componentInfo.getPlaceholder();
-
-	    if (optPlaceholder.isPresent()) {
-
-		int index = optPlaceholder.get().getIndex();
-
-		boolean missing = placeholders.//
-			stream().//
-			filter(tab -> tab.getIndex() == index).//
-			findFirst().//
-			isEmpty();
-
-		if (missing) {
-
-		    placeholders.add(optPlaceholder.get());
-		}
-	    }
-	}
-
-	//
-	//
-	//
-
-	placeholders = placeholders.//
+	getTabPlaceholders().//
 		stream().//
 		sorted(Comparator.comparingInt(TabPlaceholder::getIndex)).//
-		toList();
+		forEach(placeholder -> {
 
-	//
-	//
-	//
+	    Renderable content = ConfigurationViewFactory.createTabContent(//
+		    this,//
+		    configuration, //
+		    placeholder);
 
-	for (TabPlaceholder placeholder : placeholders) {
-
-	    if (oneTab < 0 || placeholder.getIndex() == oneTab) {
-
-		List<Setting> settings = placeholdersMap.getOrDefault(placeholder, new ArrayList<>());
-
-		Optional<ComponentInfo> additionalComp = additionalComps.//
-			stream().//
-			filter(c -> c.getPlaceholder().isPresent()).//
-			filter(c -> c.getPlaceholder().get().getIndex() == placeholder.getIndex()).//
-			findFirst();
-
-		ComponentInfo componentInfo = additionalComp.orElseGet(() -> settings.getFirst().getExtension(ComponentInfo.class).get());
-
-		Renderable renderable = ConfigurationViewFactory.createTabContent(//
-			this,//
-			configuration, //
-			componentInfo, //
-			placeholder);
-
-		String tabLabel = placeholder.getDescriptors().size() == 1 ? //
-			placeholder.getDescriptors().getFirst().getLabel() : //
-			componentInfo.getName();
-
-		addTab(placeholder.getIndex(), tabLabel, renderable);
-	    }
-	}
+	    addTab(placeholder.getIndex(), placeholder.getLabel(), content);
+	});
     }
 
     /**
@@ -898,33 +804,5 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	configuration.addChangeEventListener(this);
 
 	return configuration;
-    }
-
-    /**
-     * @param settings
-     * @return
-     */
-    private HashMap<TabPlaceholder, List<Setting>> createPlaceholdersMap(List<Setting> settings) {
-
-	HashMap<TabPlaceholder, List<Setting>> map = new HashMap<>();
-
-	for (Setting setting : settings) {
-
-	    Optional<ComponentInfo> extension = setting.getExtension(ComponentInfo.class);
-
-	    if (extension.isPresent()) {
-
-		Optional<TabPlaceholder> tabInfo = extension.get().getPlaceholder();
-
-		if (tabInfo.isPresent()) {
-
-		    List<Setting> list = map.computeIfAbsent(tabInfo.get(), k -> new ArrayList<>());
-
-		    list.add(setting);
-		}
-	    }
-	}
-
-	return map;
     }
 }

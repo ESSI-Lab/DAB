@@ -167,7 +167,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class DatabaseComponentInfo extends ComponentInfo {
+    public static class DatabaseComponentInfo extends TabPlaceholder {
 
 	private final TabDescriptor descriptor;
 
@@ -176,10 +176,9 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 	 */
 	public DatabaseComponentInfo() {
 
-	    setName(DatabaseSetting.class.getName());
+	    setLabel("Database");
 
 	    descriptor = TabDescriptorBuilder.get(DatabaseSetting.class).//
-		    withLabel("Database").//
 		    build();
 	}
 

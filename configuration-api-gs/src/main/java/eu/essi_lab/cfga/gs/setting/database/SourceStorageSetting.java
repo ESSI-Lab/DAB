@@ -136,11 +136,6 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	// set the validator
 	//
 	setValidator(new SourceStorageValidator());
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new SourceStorageSettingComponentInfo());
     }
 
     /**
@@ -190,7 +185,7 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class SourceStorageSettingComponentInfo extends ComponentInfo {
+    public static class SourceStorageSettingComponentInfo extends TabPlaceholder {
 
 	private final TabDescriptor descriptor;
 
@@ -199,10 +194,9 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	 */
 	public SourceStorageSettingComponentInfo() {
 
-	    setName(SystemSetting.class.getName());
+	    setLabel(SystemSetting.class.getName());
 
 	    descriptor = TabDescriptorBuilder.get(SourceStorageSetting.class).//
-		    withLabel("Source storage").//
 		    build();
 	}
 

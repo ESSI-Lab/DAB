@@ -204,11 +204,6 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	addSetting(augmentersSetting);
 
 	//
-	// set the component extension
-	//
-	setExtension(new AugmenterWorkerComponentInfo());
-
-	//
 	// set the validator
 	//
 	setValidator(new AugmenterWorkerSettingValidator());
@@ -234,14 +229,14 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     /**
      * @author Fabrizio
      */
-    public static class AugmenterWorkerComponentInfo extends ComponentInfo {
+    public static class AugmenterWorkerComponentInfo extends TabPlaceholder {
 
 	/**
 	 * 
 	 */
 	public AugmenterWorkerComponentInfo() {
 
-	    setName(AugmenterWorkerSetting.class.getName());
+	    setLabel("Augmenters");
 
 	    Class<? extends Setting> clazz = null;
 	    try {
@@ -251,7 +246,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	    }
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(clazz).//
-		    withLabel("Augmenters").//
+
  		    withShowDirective(SortDirection.ASCENDING).//
 
 		    withAddDirective(//
@@ -293,7 +288,8 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.AUGMENTERS.getIndex(), descriptor));
+	    setIndex(GSTabIndex.AUGMENTERS.getIndex());
+	    addDescriptor(descriptor);
 	}
 
 	/**

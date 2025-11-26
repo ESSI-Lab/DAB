@@ -107,7 +107,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
     /**
      * @author Fabrizio
      */
-    public static class DistributionSettingComponentInfo extends ComponentInfo {
+    public static class DistributionSettingComponentInfo extends TabPlaceholder {
 
 	private final TabDescriptor descriptor;
 
@@ -116,10 +116,10 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 	 */
 	public DistributionSettingComponentInfo() {
 
-	    setName(AccessorSetting.class.getName());
+	    setLabel("Distribution");
 
 	    descriptor = TabDescriptorBuilder.get(DistributionSetting.class).//
-		    withLabel("Distribution").//
+
 		    withShowDirective("Manage DAB distributed sources", SortDirection.ASCENDING).//
 		    withAddDirective("Add distributed accessor", DistributionSetting.class).//
 		    withRemoveDirective("Remove accessor", true, DistributionSetting.class).//

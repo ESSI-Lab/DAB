@@ -169,7 +169,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
     /**
      * @author Fabrizio
      */
-    public static class HarvestingSettingComponentInfo extends ComponentInfo {
+    public static class HarvestingSettingComponentInfo extends TabPlaceholder {
 
 	private final TabDescriptor descriptor;
 
@@ -178,7 +178,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	 */
 	public HarvestingSettingComponentInfo() {
 
-	    setName(HarvestingSetting.class.getName());
+	    setLabel("Harvesting");
 
 	    Class<? extends Setting> clazz = null;
 	    try {
@@ -188,7 +188,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	    }
 
 	    descriptor = TabDescriptorBuilder.get(clazz).//
-		    withLabel("Harvesting").//
+
 		    withShowDirective("Manage DAB harvested sources. Click \"Reload\" to" + " update the scheduler information",
 		    SortDirection.ASCENDING).//
 

@@ -139,11 +139,6 @@ public class OAuthSetting extends Setting implements EditableSetting {
 	addOption(clientSecretOption);
 
 	//
-	// set the rendering extension
-	//
-	setExtension(new OAuthSettingComponentInfo());
-
-	//
 	// set the validator
 	//
 	setValidator(new OAuthSettingValidator());
@@ -228,20 +223,21 @@ public class OAuthSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class OAuthSettingComponentInfo extends ComponentInfo {
+    public static class OAuthSettingComponentInfo extends TabPlaceholder {
 
 	/**
 	 *
 	 */
 	public OAuthSettingComponentInfo() {
 
-	    setName(OAuthSetting.class.getName());
+	    setLabel("Authorization");
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(OAuthSetting.class).//
-		    withLabel("Authorization").//
+
 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.AUTHORIZATION.getIndex(), descriptor));
+	    setIndex(GSTabIndex.AUTHORIZATION.getIndex());
+	    addDescriptor(descriptor);
 
 	}
     }

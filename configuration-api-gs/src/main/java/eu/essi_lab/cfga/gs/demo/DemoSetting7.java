@@ -68,34 +68,30 @@ public class DemoSetting7 extends Setting {
 		build();
 
 	addOption(option2);
-
-	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting7ComponentInfo());
-    }
+   }
 
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting7ComponentInfo extends ComponentInfo {
+    public static class DemoSetting7ComponentInfo extends TabPlaceholder {
 
 	/**
 	 * 
 	 */
 	public DemoSetting7ComponentInfo() {
 
-	    setName(DemoSetting7.class.getName());
+	    setLabel("Demo setting 7");
 
 	    setForceReadOnly(false);
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DemoSetting7.class).//
 
-		    withLabel("Demo setting 7").//
+
 		    withAddDirective("Add new demo setting 7", DemoSetting7.class).//
 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(5, descriptor));
+	    setIndex(5);
+	    addDescriptor(descriptor);
 	}
     }
 }

@@ -117,11 +117,6 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
 	settingChild2.addOption(setting2Option);
 
 	addSetting(settingChild2);
-
-	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting2ComponentInfo());
     }
 
     /**
@@ -198,23 +193,23 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting2ComponentInfo extends ComponentInfo {
+    public static class DemoSetting2ComponentInfo extends TabPlaceholder {
 
 	/**
 	 * 
 	 */
 	public DemoSetting2ComponentInfo() {
 
-	    setName(DemoSetting2.class.getName());
+	    setLabel("Demo setting 2");
 
 	    setForceReadOnly(false);
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DemoSetting2.class).//
 
-		    withLabel("Demo setting 2").//
-		    build();
+ 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(1, descriptor));
+	    setIndex(1);
+	    addDescriptor(descriptor);
 	}
     }
 

@@ -23,13 +23,12 @@ package eu.essi_lab.gssrv.conf;
 
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.tabs.*;
-import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gui.extension.*;
 
 /**
  * @author Fabrizio
  */
-public class ConfigHandler extends ComponentInfo {
+public class ConfigHandler extends TabPlaceholder {
 
     private final TabDescriptor descriptor;
 
@@ -38,7 +37,7 @@ public class ConfigHandler extends ComponentInfo {
      */
     public ConfigHandler() {
 
-	setName("Configuration");
+	setLabel("Configuration");
 
 	Div mainLayout = new Div();
 	mainLayout.setWidthFull();
@@ -59,7 +58,6 @@ public class ConfigHandler extends ComponentInfo {
 	//
 
 	descriptor = TabDescriptorBuilder.get().//
-		withLabel(getName()).//
 		withComponent(mainLayout).//
 		build();
 

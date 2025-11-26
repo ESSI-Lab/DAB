@@ -91,17 +91,6 @@ public class TabDescriptorBuilder {
     }
 
     /**
-     * @param label
-     * @return
-     */
-    public TabDescriptorBuilder withLabel(String label) {
-
-	tabDescriptor.setLabel(label);
-
-	return this;
-    }
-
-    /**
      * @param directive
      * @return
      */

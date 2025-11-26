@@ -40,14 +40,14 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  * 
  * @author Fabrizio
  */
-public class AboutComponentInfo extends ComponentInfo {
+public class AboutComponentInfo extends TabPlaceholder {
 
     /**
      * 
      */
     public AboutComponentInfo() {
 
-	setName("About");
+	setLabel("About");
 
 	VerticalLayout verticalLayout = new VerticalLayout();
 	verticalLayout.getStyle().set("margin-top", "15px");
@@ -82,11 +82,11 @@ public class AboutComponentInfo extends ComponentInfo {
 	verticalLayout.add(build("Commit", commit));
 
 	TabDescriptor descriptor = TabDescriptorBuilder.get().//
-		withLabel(getName()).//
 		withComponent(verticalLayout).//
 		build();
 
-	setPlaceholder(TabPlaceholder.of(GSTabIndex.ABOUT.getIndex(), descriptor));
+	setIndex(GSTabIndex.ABOUT.getIndex());
+	addDescriptor(descriptor);
     }
 
     /**

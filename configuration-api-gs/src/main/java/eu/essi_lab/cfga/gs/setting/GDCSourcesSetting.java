@@ -83,11 +83,6 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 		}
 	    });
 	}
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new GDCSettingComponentInfo());
     }
 
     /**
@@ -109,7 +104,7 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class GDCSettingComponentInfo extends ComponentInfo {
+    public static class GDCSettingComponentInfo extends TabPlaceholder {
 
 	private final TabDescriptor descriptor;
 
@@ -118,10 +113,9 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 	 */
 	public GDCSettingComponentInfo() {
 
-	    setName(GDCSettingComponentInfo.class.getName());
+	    setLabel(GDCSettingComponentInfo.class.getName());
 
 	    descriptor = TabDescriptorBuilder.get(GDCSourcesSetting.class).//
-		    withLabel("GDC sources").//
 		    build();
 	}
 

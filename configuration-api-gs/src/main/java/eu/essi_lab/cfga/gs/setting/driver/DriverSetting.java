@@ -50,7 +50,7 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class DriverComponentInfo extends ComponentInfo {
+    public static class DriverComponentInfo extends TabPlaceholder {
 
 	private final TabDescriptor descriptor;
 
@@ -59,10 +59,10 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
 	 */
 	public DriverComponentInfo() {
 
-	    setName(DriverSetting.class.getName());
+	    setLabel(DriverSetting.class.getName());
 
 	    descriptor = TabDescriptorBuilder.get(DriverSetting.class).//
-		    withLabel("Repository").//
+
 		    build();
 	}
 

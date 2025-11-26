@@ -717,30 +717,25 @@ public class CredentialsSetting extends Setting implements EditableSetting {
 	    addOption(password);
 
 	}
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new CredentialsSettingComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
-    public static class CredentialsSettingComponentInfo extends ComponentInfo {
+    public static class CredentialsSettingComponentInfo extends TabPlaceholder {
 
 	/**
 	 *
 	 */
 	public CredentialsSettingComponentInfo() {
 
-	    setName(CredentialsSetting.class.getName());
+	    setLabel("Credentials");
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(CredentialsSetting.class).//
-		    withLabel("Credentials").//
 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.CREDENTIALS.getIndex(), descriptor));
+	    setIndex(GSTabIndex.CREDENTIALS.getIndex());
+	    addDescriptor(descriptor);
 	}
     }
 

@@ -32,21 +32,22 @@ import eu.essi_lab.cfga.gui.extension.*;
  * @author Fabrizio
  *
  */
-public class Brokering extends ComponentInfo {
+public class Brokering extends TabPlaceholder {
 
     /**
      *
      */
     public Brokering() {
 
-	setName("Brokering");
+	setLabel("Brokering");
 
-	setPlaceholder(TabPlaceholder.of(GSTabIndex.BROKERING.getIndex(),//
+	setIndex(GSTabIndex.BROKERING.getIndex());
 
+	addDescriptors(//
 		new HarvestingSetting.HarvestingSettingComponentInfo().getDescriptor(), //
 		new RecordsInspector().getDescriptor(),//
 		new DistributionSetting.DistributionSettingComponentInfo().getDescriptor(),//
 		new ProfilerSetting.ProfilerComponentInfo().getDescriptor()//
-	));
+	);
     }
 }

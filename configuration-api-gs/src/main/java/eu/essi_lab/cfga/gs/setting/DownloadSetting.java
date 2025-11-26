@@ -111,7 +111,7 @@ public class DownloadSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class DownloadSettingComponentInfo extends ComponentInfo {
+    public static class DownloadSettingComponentInfo extends TabPlaceholder {
 
 	private final TabDescriptor descriptor;
 
@@ -120,11 +120,10 @@ public class DownloadSetting extends Setting implements EditableSetting {
 	 */
 	public DownloadSettingComponentInfo() {
 
-	    setName(DownloadSetting.class.getName());
+	    setLabel("Download");
 
 	    descriptor = TabDescriptorBuilder.get(DownloadSetting.class).//
-		    withLabel("Download").//
-		    build();
+ 		    build();
 	}
 
 	/**

@@ -389,7 +389,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     /**
      * @author Fabrizio
      */
-    public static class SystemSettingComponentInfo extends ComponentInfo {
+    public static class SystemSettingComponentInfo extends TabPlaceholder {
 
 	private final TabDescriptor descriptor;
 
@@ -398,10 +398,9 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	 */
 	public SystemSettingComponentInfo() {
 
-	    setName(SystemSetting.class.getName());
+	    setLabel("Miscellaneous");
 
 	    descriptor = TabDescriptorBuilder.get(SystemSetting.class).//
-		    withLabel("Miscellaneous").//
 		    build();
 	}
 

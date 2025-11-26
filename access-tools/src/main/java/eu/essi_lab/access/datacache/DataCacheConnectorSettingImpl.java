@@ -123,30 +123,26 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 	cacheStorageSetting.hideDatabaseConfigurationFolderOption();
 
 	addSetting(cacheStorageSetting);
-
-	//
-	// set the component extension
-	//
-	setExtension(new DataCacheConnectorSettingComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
-    public static class DataCacheConnectorSettingComponentInfo extends ComponentInfo {
+    public static class DataCacheConnectorSettingComponentInfo extends TabPlaceholder {
 
 	/**
 	 * 
 	 */
 	public DataCacheConnectorSettingComponentInfo() {
 
-	    setName(DataCacheConnectorSettingImpl.class.getName());
+	    setLabel("Data cache");
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DataCacheConnectorSettingImpl.class).//
-		    withLabel("Data cache").//
+
 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.DATA_CACHE.getIndex(), descriptor));
+	    setIndex(GSTabIndex.DATA_CACHE.getIndex());
+	    addDescriptor(descriptor);
 	}
     }
 

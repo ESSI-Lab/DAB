@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs.demo;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -69,11 +69,6 @@ public class DemoSetting6 extends Setting {
 	addOption(option2);
 
 	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting6ComponentInfo());
-
-	//
 	// set the onClean function
 	//
 	setAfterCleanFunction(new Demo6AfterCleanFunction());
@@ -103,23 +98,23 @@ public class DemoSetting6 extends Setting {
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting6ComponentInfo extends ComponentInfo {
+    public static class DemoSetting6ComponentInfo extends TabPlaceholder {
 
 	/**
-	 * 
+	 *
 	 */
 	public DemoSetting6ComponentInfo() {
 
-	    setName(DemoSetting6.class.getName());
+	    setLabel("Demo setting 6");
 
 	    setForceReadOnly(false);
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(DemoSetting6.class).//
 
-		    withLabel("Demo setting 6").//
 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(5, descriptor));
+	    setIndex(5);
+	    addDescriptor(descriptor);
 	}
     }
 }

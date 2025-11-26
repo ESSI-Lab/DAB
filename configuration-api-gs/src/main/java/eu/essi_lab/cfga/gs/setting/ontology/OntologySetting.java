@@ -29,7 +29,6 @@ import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
@@ -264,7 +263,6 @@ public class OntologySetting extends Setting implements EditableSetting {
 	//
 	//
 
-	setExtension(new OntologySettingComponentInfo());
 	setAfterCleanFunction(new OntologySettingAfterCleanFunction());
 
 	//
@@ -434,17 +432,17 @@ public class OntologySetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class OntologySettingComponentInfo extends ComponentInfo {
+    public static class OntologySettingComponentInfo extends TabPlaceholder {
 
 	/**
 	 *
 	 */
 	public OntologySettingComponentInfo() {
 
-	    setName(AccessorSetting.class.getName());
+	    setLabel("Ontologies");
 
 	    TabDescriptor descriptor = TabDescriptorBuilder.get(OntologySetting.class).//
-		    withLabel("Ontologies").//
+
  		    withShowDirective(SortDirection.ASCENDING).//
 		    withAddDirective("Add ontology", OntologySetting.class).//
 		    withRemoveDirective("Remove ontology", true, OntologySetting.class).//
@@ -471,7 +469,8 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 		    build();
 
-	    setPlaceholder(TabPlaceholder.of(GSTabIndex.ONTOLOGIES.getIndex(), descriptor));
+	    setIndex(GSTabIndex.ONTOLOGIES.getIndex());
+	    addDescriptor(descriptor);
 	}
 
 	/**
