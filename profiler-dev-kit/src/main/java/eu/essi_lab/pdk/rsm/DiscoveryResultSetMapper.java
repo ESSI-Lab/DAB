@@ -216,7 +216,7 @@ public abstract class DiscoveryResultSetMapper<T>
 	try {
 
 	    // optionally consumes the resource
-	    message.getResourceConsumer().ifPresent(c -> c.accept(res));
+	    message.getResourceConsumer().ifPresent(c -> c.consume(res, message));
 
 	    return map(message, res);
 
