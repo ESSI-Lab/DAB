@@ -186,6 +186,7 @@ public class WHOSUserRegistration {
 	properties.add(new GSProperty<String>("lastName", lname));
 	properties.add(new GSProperty<String>("email", email));
 	properties.add(new GSProperty<String>("country", country));
+
 	// if (institution != null && !institution.trim().isEmpty()) {
 	// properties.add(new GSProperty<String>("institution", institution));
 	// }
@@ -196,7 +197,10 @@ public class WHOSUserRegistration {
 	if (position != null && !position.trim().isEmpty()) {
 	    properties.add(new GSProperty<String>("position", position));
 	}
-	properties.add(new GSProperty<String>("registrationDate", ISO8601DateTimeUtils.getISO8601DateTime()));
+	
+	String iso8601DateTime = ISO8601DateTimeUtils.getISO8601DateTime();
+	properties.add(new GSProperty<String>("registrationDate", iso8601DateTime));
+	properties.add(new GSProperty<String>("createdTimestamp", iso8601DateTime));
 	user.getProperties().addAll(properties);
 	finder.getUsersWriter().store(user);
 

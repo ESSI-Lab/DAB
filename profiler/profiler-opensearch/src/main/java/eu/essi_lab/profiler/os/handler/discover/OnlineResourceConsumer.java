@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.os.handler.discover;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -23,6 +23,7 @@ package eu.essi_lab.profiler.os.handler.discover;
 
 import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResourceConsumer;
 import eu.essi_lab.model.resource.GSResource;
@@ -37,11 +38,15 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 
 	final Distribution dist = gsResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution();
 
+	if(message.getDataProxyServer().isEmpty()){
+
+	    GSLoggerFactory.getLogger(getClass()).warn("Missing 'dataProxyServer' in 'SystemSetting' -> 'Key-value options'");
+	    return;
+	}
+
 	if (dist != null) {
 
 	    String publicId = gsResource.getPublicId();
-
-	    //	    gsResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().get
 
 	    dist.getDistributionOnlines().forEachRemaining(online -> {
 
@@ -56,47 +61,45 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 		    // ESRI MapServer
 		    //
 
-		    case ESRIMapServer_10_0_0, ESRIMapServer ->
-			    "https://sim-dev.mase.gov.it/core/api/gil/request/dataset/" + publicId + "/esri/MapServer/" + name;
+		    case ESRIMapServer_10_0_0, //
+			 ESRIMapServer -> //
+			    buildOnline(message.getDataProxyServer().get(), publicId, "/esri/MapServer/");
 
 		    //
 		    // WCS
 		    //
 
-		    case  WCS_1_0, WCS_EDO, WCS_1_0_0, WCS_1_0_0_TDS -> "";
+		    case WCS_1_0, //
+			 WCS_EDO, //
+			 WCS_1_0_0, //
+			 WCS_1_0_0_TDS,//
+			 WCS_1_1, WCS_1_1_1,//
+			 WCS_1_1_2,//
+			 WCS_2_0,//
+			 WCS_2_0_1,//
 
-		    case WCS_1_1, WCS_1_1_1 -> "";
+			 //
+			 // WFS
+			 //
 
-		    case WCS_1_1_2 -> "";
+			 WFS_1_0_0,//
+			 WFS_1_1_0,//
+			 WFS_2_0_0,//
 
-		    case WCS_2_0 -> "";
-		    case WCS_2_0_1 -> "";
+			 //
+			 // WMS
+			 //
 
-		    //
-		    // WFS
-		    //
+			 WMS_1_1_1,//
+			 WMS_1_3_0, //
+			 WMS_Q_1_3_0,//
 
-		    case WFS_1_0_0 -> buildOnline(message.getDataProxyServer().get(), publicId, wrapper);
-
-		    case WFS_1_1_0 -> buildOnline(message.getDataProxyServer().get(),publicId, wrapper);
-
-		    case WFS_2_0_0 -> buildOnline(message.getDataProxyServer().get(),publicId, wrapper);
-
-
-
-		    //
-		    // WMS
-		    //
-
-		    case WMS_1_1_1 ->  buildOnline(message.getDataProxyServer().get(),publicId, wrapper);
-		    case WMS_1_3_0, WMS_Q_1_3_0 ->  buildOnline(message.getDataProxyServer().get(),publicId, wrapper);
-
-		    case WMTS_1_0_0 ->  buildOnline(message.getDataProxyServer().get(),publicId, wrapper);
+			 WMTS_1_0_0 -> buildOnline(message.getDataProxyServer().get(), publicId, "/ogc");
 
 		    case null, default -> null;
 		};
 
-		if(linkage != null){
+		if (linkage != null) {
 
 		    online.setLinkage(linkage);
 		}
@@ -106,15 +109,13 @@ public class OnlineResourceConsumer implements ResourceConsumer {
     }
 
     /**
-     * @param service
      * @param proxyEndpoint
      * @param datasetId
-     * @param wrapper
+     * @param lastPath
      * @return
      */
-    private String buildOnline(String proxyEndpoint, String datasetId, NetProtocolWrapper wrapper){
+    private String buildOnline(String proxyEndpoint, String datasetId, String lastPath) {
 
-	return proxyEndpoint + "gil/request/dataset/" + datasetId
-		+ "/ogc?service="+wrapper.get().getSrvType()+"&VERSION="+wrapper.get().getSrvVersion()+"&REQUEST=GetCapabilities";
+	return proxyEndpoint + "gil/request/dataset/" + datasetId + lastPath;
     }
 }
