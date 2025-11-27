@@ -139,39 +139,11 @@ public class DABStarter {
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check STARTED");
 
-	    // ---------------------------------
-	    //
-	    // - SchemeCheckMethod
-	    //
-
-	    SchemeMethod schemeCheckMethod = new SchemeMethod();
-
-	    schemeCheckMethod.setScheme(new DefaultConfigurationScheme());
-
-	    schemeCheckMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
-
-	    CheckResponse missingRespone = schemeCheckMethod.check(configuration);
-
-	    missingRespone.getMessages().forEach(msg -> GSLoggerFactory.getLogger(getClass()).warn(msg));
-
-	    schemeCheckMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
-
-	    CheckResponse redundantRespone = schemeCheckMethod.check(configuration);
-
-	    redundantRespone.getMessages().forEach(msg -> GSLoggerFactory.getLogger(getClass()).warn(msg));
-
-	    // ---------------------------------
-	    //
-	    // - Other checks
-	    //
-
 	    CheckResponse similarityCheckResponse = checkConfig();
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check ENDED");
 
-	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED || //
-		    missingRespone.getCheckResult() == CheckResult.CHECK_FAILED || //
-		    redundantRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
+	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
 
 		switch (mode) {
 		case CONFIGURATION:
@@ -181,24 +153,6 @@ public class DABStarter {
 		    GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration fix STARTED");
 
 		    ConfigurationUtils.backup(configuration);
-
-		    if (redundantRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
-
-			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Removing redundant settings STARTED");
-
-			redundantRespone.getSettings().forEach(setting -> configuration.remove(setting.getIdentifier()));
-
-			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Removing redundant settings ENDED");
-		    }
-
-		    if (missingRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
-
-			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Adding missing settings STARTED");
-
-			missingRespone.getSettings().forEach(setting -> configuration.put(setting));
-
-			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Adding missing settings ENDED");
-		    }
 
 		    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
 
