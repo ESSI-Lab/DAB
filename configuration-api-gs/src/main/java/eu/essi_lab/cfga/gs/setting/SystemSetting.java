@@ -403,9 +403,8 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	 */
 	public SystemSettingComponentInfo() {
 
-	    setLabel("Miscellaneous");
-
 	    descriptor = TabDescriptorBuilder.get(SystemSetting.class).//
+		    withLabel("Miscellaneous").//
 		    build();
 	}
 

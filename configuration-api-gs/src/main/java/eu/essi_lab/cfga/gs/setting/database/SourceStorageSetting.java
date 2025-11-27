@@ -194,9 +194,8 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	 */
 	public SourceStorageSettingComponentInfo() {
 
-	    setLabel(SystemSetting.class.getName());
-
 	    descriptor = TabDescriptorBuilder.get(SourceStorageSetting.class).//
+		    withLabel("Storage").//
 		    build();
 	}
 

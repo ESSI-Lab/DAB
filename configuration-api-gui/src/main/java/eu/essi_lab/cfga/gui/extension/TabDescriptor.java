@@ -35,6 +35,7 @@ import java.util.*;
  */
 public class TabDescriptor {
 
+    private String label;
     private DirectiveManager directiveManager;
     private GridInfo gridInfo;
     private boolean reloadable;
@@ -49,6 +50,23 @@ public class TabDescriptor {
 
 	directiveManager = new DirectiveManager();
     }
+
+    /**
+     * @return
+     */
+    public String getLabel() {
+
+	return label;
+    }
+
+    /**
+     * @param label
+     */
+    public void setLabel(String label) {
+
+	this.label = label;
+    }
+
 
     /**
      * @return the directiveManager

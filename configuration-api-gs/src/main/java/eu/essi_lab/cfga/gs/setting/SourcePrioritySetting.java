@@ -174,9 +174,8 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 	 */
 	public SourcePrioritySettingComponentInfo() {
 
-	    setLabel("Identifier management");
-
 	    descriptor = TabDescriptorBuilder.get(SourcePrioritySetting.class).//
+		    withLabel("Identifier management").//
 		    build();
 	}
 

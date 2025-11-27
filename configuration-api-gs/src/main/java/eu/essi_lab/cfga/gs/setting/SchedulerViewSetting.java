@@ -57,9 +57,8 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 	 */
 	public SchedulerSettingComponentInfo() {
 
-	    setLabel(SchedulerSetting.class.getName());
-
 	    descriptor = TabDescriptorBuilder.get(SchedulerViewSetting.class).//
+		    withLabel("Scheduler").//
 		    build();
 	}
 

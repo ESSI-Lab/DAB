@@ -239,8 +239,6 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	 */
 	public ProfilerComponentInfo() {
 
-	    setLabel("Profilers");
-
 	    String desc = "Manage DAB profilers. Profilers can be added, "
 		    + "and removed; furthermore, their configuration, path and state can be modified. "
 		    + "You can also add several profilers of the same type (e.g: OAI-PMH), making sure "
@@ -250,6 +248,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 	    descriptor = TabDescriptorBuilder.get(ProfilerSetting.class).//
 
+		    withLabel("Profilers").//
 		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
 		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
 		    withRemoveDirective("Remove profiler", false, ProfilerSetting.class).//

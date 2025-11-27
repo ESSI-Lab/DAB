@@ -73,8 +73,6 @@ public class RecordsInspector extends TabPlaceholder {
      */
     public RecordsInspector() {
 
-	setLabel("Records inspection");
-
 	verticalLayout = new VerticalLayout();
 	verticalLayout.getStyle().set("margin-top", "15px");
 
@@ -168,6 +166,7 @@ public class RecordsInspector extends TabPlaceholder {
 
 	descriptor = TabDescriptorBuilder.get().//
 
+		withLabel("Records inspection").//
 		withShowDirective("Click \"Reload\" to show the list of all the harvested sources, referenced by "
 		+ "name and identifier, along with the number of harvested records (\"Size\") and the percentage related to the total "
 		+ "number of records in the database (visible at the bottom of the \"Size\" column). \"Data #\" indicates the logical data folder (#1 or #2) where the "

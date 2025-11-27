@@ -507,7 +507,6 @@ public class GSConfigurationView extends ConfigurationView {
 		new OAuthSetting.OAuthSettingComponentInfo(),//
 		new CredentialsSetting.CredentialsSettingComponentInfo(),//
 		new DataCacheConnectorSettingImpl.DataCacheConnectorSettingComponentInfo(),//
-		new OntologySettingComponentInfo(),//
 		new Brokering(),//
 		new System(),//
 		new Sources(),//

@@ -54,6 +54,7 @@ public class TabPlaceholder {
     public TabPlaceholder() {
 
 	list = new ArrayList<>();
+	setForceReadOnly(true);
     }
 
     /**
@@ -62,7 +63,7 @@ public class TabPlaceholder {
      */
     public TabPlaceholder(int index) {
 
-	list = new ArrayList<>();
+	this();
 	setIndex(index);
     }
 

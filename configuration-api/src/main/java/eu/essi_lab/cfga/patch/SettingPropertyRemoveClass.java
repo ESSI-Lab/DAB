@@ -14,22 +14,20 @@ public class SettingPropertyRemoveClass extends Patch {
     private final Property<?> property;
 
     /**
-     *
      * @param configuration
      * @param property
      * @return
      */
-    public static SettingPropertyRemoveClass of(Configuration configuration,Property<?> property) {
+    public static SettingPropertyRemoveClass of(Configuration configuration, Property<?> property) {
 
-	return new SettingPropertyRemoveClass(configuration,property);
+	return new SettingPropertyRemoveClass(configuration, property);
     }
 
     /**
-     *
      * @param configuration
      * @param property
      */
-    private SettingPropertyRemoveClass(Configuration configuration,Property<?> property) {
+    private SettingPropertyRemoveClass(Configuration configuration, Property<?> property) {
 
 	setConfiguration(configuration);
 
@@ -43,19 +41,31 @@ public class SettingPropertyRemoveClass extends Patch {
 
 	ArrayList<Setting> list = new ArrayList<>();
 
-	ConfigurationUtils.deepFind(//
-		getConfiguration(),//
-		s -> s.getObject().has(property.getKey()),//
-		list);//
+	getConfiguration().list().forEach(s -> {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Found {} legacy {} properties to patch", list.size(), property.getName());
+	    String object = s.getObject().toString();
+
+	    if (object.contains(property.getKey())) {
+
+		list.add(s);
+	    }
+	});
+
+	GSLoggerFactory.getLogger(getClass())
+		.debug("Found {} settings with legacy {} properties to patch", list.size(), property.getName());
 
 	if (!list.isEmpty()) {
 
 	    List<Setting> converted = list.//
 		    stream().//
 		    map(s -> {
-		s.getObject().remove(property.getKey());
+
+		ArrayList<Setting> l = new ArrayList<>();
+
+		SettingUtils.deepFind(s, inner -> s.getObject().has(property.getKey()), l);
+
+		l.forEach(si -> si.getObject().remove(property.getKey()));
+
 		return s.getObject();
 	    }).//
 		    map(Setting::new).//

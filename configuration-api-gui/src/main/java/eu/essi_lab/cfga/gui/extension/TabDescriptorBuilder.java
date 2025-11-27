@@ -80,6 +80,17 @@ public class TabDescriptorBuilder {
     }
 
     /**
+     * @param label
+     * @return
+     */
+    public TabDescriptorBuilder withLabel(String label) {
+
+	tabDescriptor.setLabel(label);
+
+	return this;
+    }
+
+    /**
      * @param settingClass
      * @return
      */
@@ -187,7 +198,7 @@ public class TabDescriptorBuilder {
      * @param direction
      * @return
      */
-    public TabDescriptorBuilder  withShowDirective(SortDirection direction) {
+    public TabDescriptorBuilder withShowDirective(SortDirection direction) {
 
 	return withShowDirective(null, direction);
     }
@@ -201,7 +212,7 @@ public class TabDescriptorBuilder {
 
 	ShowDirective showDirective = new ShowDirective();
 
-	if(description != null) {
+	if (description != null) {
 
 	    showDirective.setDescription(description);
 	}

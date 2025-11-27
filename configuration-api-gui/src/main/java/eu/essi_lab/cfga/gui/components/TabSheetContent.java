@@ -50,7 +50,7 @@ public class TabSheetContent extends TabSheet implements Renderable {
      */
     public void add(String label, TabContent content) {
 
-	add(label, content);
+	super.add(label, content);
 
 	list.add(content);
     }

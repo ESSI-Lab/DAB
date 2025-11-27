@@ -37,8 +37,6 @@ public class ConfigHandler extends TabPlaceholder {
      */
     public ConfigHandler() {
 
-	setLabel("Configuration");
-
 	Div mainLayout = new Div();
 	mainLayout.setWidthFull();
 
@@ -58,6 +56,7 @@ public class ConfigHandler extends TabPlaceholder {
 	//
 
 	descriptor = TabDescriptorBuilder.get().//
+		withLabel("Configuration").//
 		withComponent(mainLayout).//
 		build();
 

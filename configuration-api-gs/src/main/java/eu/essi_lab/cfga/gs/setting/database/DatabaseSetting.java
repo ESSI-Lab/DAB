@@ -176,9 +176,8 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 	 */
 	public DatabaseComponentInfo() {
 
-	    setLabel("Database");
-
 	    descriptor = TabDescriptorBuilder.get(DatabaseSetting.class).//
+		    withLabel("Database").//
 		    build();
 	}
 

@@ -104,7 +104,7 @@ public class ConfigurationViewFactory {
 	    TabSheetContent tabSheet = new TabSheetContent();
 
 	    descriptors.forEach(desc -> tabSheet.add( //
-		    placeholder.getLabel(), //
+		    desc.getLabel(), //
 		    createTabContent(desc, configuration, view, placeholder, false)));
 
 	    content = tabSheet;
@@ -131,7 +131,7 @@ public class ConfigurationViewFactory {
 	DirectiveManager directiveManager = descriptor.getDirectiveManager();
 
 	TabContent container = ComponentFactory.createNoSpacingNoMarginTabContainer(
-		"tab-container-vertical-layout-for-" + placeholder.getLabel());
+		"tab-container-vertical-layout-for-" + descriptor.getLabel());
 
 	container.init(configuration, descriptor, placeholder);
 
@@ -147,10 +147,10 @@ public class ConfigurationViewFactory {
 	container.setEditDirective(editDirective);
 
 	HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
-		"tab-container-header-layout-for-" + placeholder.getLabel());
+		"tab-container-header-layout-for-" + descriptor.getLabel());
 	headerLayout.setWidthFull();
 	headerLayout.setAlignItems(Alignment.BASELINE);
-	headerLayout.setId(TAB_HEADER_ID_PREFIX + "_" + placeholder.getLabel());
+	headerLayout.setId(TAB_HEADER_ID_PREFIX + "_" + descriptor.getLabel());
 
 	container.add(headerLayout);
 
