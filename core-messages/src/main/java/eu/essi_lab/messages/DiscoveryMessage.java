@@ -110,6 +110,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     private static final String EIFFEL_DISCOVERY_OPTION = "EIFFEL_DISCOVERY_OPTION";
     private static final String INLCUDE_COUNT_IN_RETRIEVAL = "INLCUDE_COUNT_IN_RETRIEVAL";
     private static final String RSM_THREADS_COUNT = "rsmThreadsCount";
+    private static final String DATA_PROXY_SERVER = "dataProxyServer";
 
     /**
      *
@@ -303,6 +304,22 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     public boolean isQueryRegistrationEnabled() {
 
 	return getHeader().get(QUERY_REGISTRATION, Boolean.class);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getDataProxyServer() {
+
+	return Optional.ofNullable(getHeader().get(DATA_PROXY_SERVER, String.class));
+    }
+
+    /**
+     * @param count
+     */
+    public void setDataProxyServer(String server) {
+
+	getHeader().add(new GSProperty<>(DATA_PROXY_SERVER, server));
     }
 
     /**

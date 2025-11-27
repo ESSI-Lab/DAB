@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.gssrv.conf;
 
@@ -11,13 +11,12 @@ import java.nio.file.Files;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.vaadin.flow.component.html.*;
 import org.apache.commons.io.IOUtils;
 
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 /*-
@@ -54,16 +53,12 @@ import eu.essi_lab.api.database.cfg.DatabaseSource;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -73,25 +68,22 @@ import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 /**
  * @author Fabrizio
  */
-public class ConfigUploader extends ComponentInfo {
+public class ConfigImporter {
 
     /**
-     * 
+     *
      */
     private static final String DEFAULT_CONFIG_NAME = "gs-configuration.json";
+    private final VerticalLayout mainLayout;
 
     /**
-     * 
+     *
      */
-    public ConfigUploader() {
+    public ConfigImporter() {
 
-	setComponentName("Configuration upload");
-
-	VerticalLayout verticalLayout = new VerticalLayout();
-	verticalLayout.getStyle().set("margin-top", "15px");
-
-	verticalLayout.setWidthFull();
-	verticalLayout.setHeightFull();
+	mainLayout = new VerticalLayout();
+	mainLayout.setWidthFull();
+	mainLayout.setHeightFull();
 
 	//
 	//
@@ -117,7 +109,6 @@ public class ConfigUploader extends ComponentInfo {
 		ClonableInputStream configStream = new ClonableInputStream(memoryBuffer.getInputStream());
 
 		switch (setting.getSelectedSource()) {
-		case MARK_LOGIC -> handleMarkLogicUpload(setting, configStream, upload, msgDiv);
 		case OPENSEARCH -> handleOpenSearchUpload(setting, configStream, upload, msgDiv);
 		case S3 -> handleS3Upload(setting, configStream, upload, msgDiv);
 		}
@@ -134,12 +125,12 @@ public class ConfigUploader extends ComponentInfo {
 
 	upload.setMaxFiles(1);
 	upload.setDropAllowed(true);
-	upload.setDropLabel(new Label("Upload configuration file"));
+	upload.setDropLabel(new Label("Import configuration file"));
 	upload.setAcceptedFileTypes("application/json", ".json");
 	upload.setDropLabel(new Label("Drop file here"));
 
-	Button localUploadButton = new Button("Upload local configuration file");
-	localUploadButton.setWidth("400px");
+	Button localUploadButton = new Button("Import from local configuration file");
+	localUploadButton.setWidth("370px");
 	localUploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
 	upload.setUploadButton(localUploadButton);
@@ -151,12 +142,12 @@ public class ConfigUploader extends ComponentInfo {
 	HorizontalLayout remoteUploadLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
 	remoteUploadLayout.setWidthFull();
 
-	Button remoteUploadButton = new Button("Upload remote configuration file");
+	Button remoteUploadButton = new Button("Import from remote configuration file");
 	remoteUploadButton.setWidth("400px");
 	remoteUploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
 	TextField dbSourceTextField = new TextField();
-	dbSourceTextField.setValue("xdbc://user:password@hostname:8000,8004/dbName/folder/");
+	dbSourceTextField.setValue("osl://user:password@http:localhost:9200/test/testConfig");
 	dbSourceTextField.setWidthFull();
 	dbSourceTextField.getStyle().set("margin-left", "10px");
 
@@ -171,7 +162,6 @@ public class ConfigUploader extends ComponentInfo {
 		    ClonableInputStream configStream = new ClonableInputStream(source.getStream());
 
 		    switch (setting.getSelectedSource()) {
-		    case MARK_LOGIC -> handleMarkLogicUpload(setting, configStream, upload, msgDiv);
 		    case OPENSEARCH -> handleOpenSearchUpload(setting, configStream, upload, msgDiv);
 		    case S3 -> handleS3Upload(setting, configStream, upload, msgDiv);
 		    }
@@ -180,7 +170,7 @@ public class ConfigUploader extends ComponentInfo {
 
 		    GSLoggerFactory.getLogger(getClass()).error(ex);
 
-		    NotificationDialog.getErrorDialog("Error occurred, unable to upload configuration: " + ex.getMessage()).open();
+		    NotificationDialog.getErrorDialog("Error occurred, unable to import configuration: " + ex.getMessage()).open();
 
 		    upload.interruptUpload();
 		}
@@ -203,8 +193,9 @@ public class ConfigUploader extends ComponentInfo {
 	msgDiv.getStyle().set("padding", "10px");
 	msgDiv.getStyle().set("border", "1px solid lightgray");
 	msgDiv.getStyle().set("margin-left", "3px");
-
+ 
 	HorizontalLayout uploadLayout = new HorizontalLayout();
+	uploadLayout.getStyle().set("margin-top", "-15px");
 	uploadLayout.setWidthFull();
 	uploadLayout.add(upload);
 	uploadLayout.add(msgDiv);
@@ -216,9 +207,6 @@ public class ConfigUploader extends ComponentInfo {
 	SettingComponent settingComponent = SettingComponentFactory.createSettingComponent(//
 		ConfigurationWrapper.getConfiguration().get(), setting, false);
 
-	settingComponent.getOptionTextFields("MarkLogic")
-		.forEach(tf -> tf.addValueChangeListener(event -> checkFields(msgDiv, upload, remoteUploadButton, setting)));
-
 	settingComponent.getOptionTextFields("OpenSearch")
 		.forEach(tf -> tf.addValueChangeListener(event -> checkFields(msgDiv, upload, remoteUploadButton, setting)));
 
@@ -229,28 +217,40 @@ public class ConfigUploader extends ComponentInfo {
 	RadioButtonGroup<String> radioGroup = radioComponentsHandler.getGroupComponent();
 	radioGroup.addValueChangeListener(event -> checkFields(msgDiv, upload, remoteUploadButton, setting));
 
+	settingComponent.getStyle().set("margin-top", "-10px");
+
 	//
 	//
 	//
 
-	verticalLayout.add(uploadLayout);
-	verticalLayout.add(remoteUploadLayout);
+	Div infoDiv = new Div();
+	infoDiv.setWidthFull();
+	infoDiv.getStyle().set("padding-top", "10px");
+	infoDiv.getStyle().set("font-size", "17px");
 
-	verticalLayout.add(settingComponent);
+	String info =
+		"Configure the storage ('OpenSearch' or 'S3') where to upload the configuration, then click the 'Import from local "
+			+ "configuration file' or 'Import from remote configuration file' button to "
+			+ "upload the selected file into the configured storage. <br>"
+			+ "When the upload is done, you can read in the panel above, the "
+			+ "Java option required to start the DAB with the imported configuration";
+
+	infoDiv.getElement().setProperty("innerHTML", info);
+
+	mainLayout.add(infoDiv);
+	mainLayout.add(uploadLayout);
+	mainLayout.add(remoteUploadLayout);
+	mainLayout.add(settingComponent);
 
 	checkFields(msgDiv, upload, remoteUploadButton, setting);
+    }
 
-	//
-	//
-	//
+    /**
+     * @return
+     */
+    public VerticalLayout getMainLayout() {
 
-	TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		withIndex(GSTabIndex.CONFIGURATION_UPLOADER.getIndex()).//
-		withShowDirective(getComponentName()).//
-		withComponent(verticalLayout).//
-		build();
-
-	setTabDescriptor(tabDescriptor);
+	return mainLayout;
     }
 
     /**
@@ -276,28 +276,27 @@ public class ConfigUploader extends ComponentInfo {
 	    ConfirmationDialog confirmationDialog = new ConfirmationDialog("A configuration is already stored in the given bucket.\n\n"
 		    + " Click 'Confirm' to overwrite the existing configuration, or click 'Cancel' to abort the upload", evt -> {
 
-			try {
+		try {
 
-			    uploadS3Config(wrapper, info, configStream.clone(), true);
+		    uploadS3Config(wrapper, info, configStream.clone(), true);
 
-			    NotificationDialog.getInfoDialog("Configuration correctly overwritten").open();
+		    NotificationDialog.getInfoDialog("Configuration correctly overwritten").open();
 
-			    upload.clearFileList();
+		    upload.clearFileList();
 
-			    setMessage(messageLabel,
-				    "<span style='font-size: 17px;'>Use the following Java option: </span><span style='font-size: 17px; font-weight: bold'>-Dconfiguration.url="
-					    + buildS3StartupURL(setting.getSelectedStorageInfo().get()) + "</span>");
+		    setMessage(messageLabel,
+			    "<span style='font-size: 16px;'>Use the following Java option: </span><span style='font-size: 16px; font-weight: bold'>-Dconfiguration.url="
+				    + buildS3StartupURL(setting.getSelectedStorageInfo().get()) + "</span>");
 
-			} catch (Exception e) {
+		} catch (Exception e) {
 
-			    GSLoggerFactory.getLogger(getClass()).error(e);
+		    GSLoggerFactory.getLogger(getClass()).error(e);
 
-			    NotificationDialog.getErrorDialog("Error occurred, unable to overwrite configuration: " + e.getMessage(), 700)
-				    .open();
+		    NotificationDialog.getErrorDialog("Error occurred, unable to overwrite configuration: " + e.getMessage(), 700).open();
 
-			    upload.interruptUpload();
-			}
-		    });
+		    upload.interruptUpload();
+		}
+	    });
 
 	    confirmationDialog.setOnCancelListener(evt -> upload.clearFileList());
 	    confirmationDialog.setWidth(670, Unit.PIXELS);
@@ -316,7 +315,7 @@ public class ConfigUploader extends ComponentInfo {
 		upload.clearFileList();
 
 		setMessage(messageLabel,
-			"<span style='font-size: 17px;'>Use the following Java option: </span><span style='font-size: 17px; font-weight: bold'>-Dconfiguration.url="
+			"<span style='font-size: 16px;'>Use the following Java option: </span><span style='font-size: 16px; font-weight: bold'>-Dconfiguration.url="
 				+ buildS3StartupURL(setting.getSelectedStorageInfo().get()) + "</span>");
 
 	    } catch (Exception e) {
@@ -333,7 +332,7 @@ public class ConfigUploader extends ComponentInfo {
 
     /**
      * s3://awsUser:awsPassword@https:s3.amazonaws.com/bucket/config.json
-     * 
+     *
      * @param storageInfo
      * @return
      */
@@ -372,17 +371,6 @@ public class ConfigUploader extends ComponentInfo {
      * @param configStream
      * @param upload
      * @param messageDiv
-     * @return
-     */
-    private void handleMarkLogicUpload(ConfigurationSourceSetting setting, ClonableInputStream configStream, Upload upload,
-	    Div messageDiv) {
-    }
-
-    /**
-     * @param setting
-     * @param configStream
-     * @param upload
-     * @param messageDiv
      * @throws Exception
      */
     private void handleOpenSearchUpload(//
@@ -395,31 +383,29 @@ public class ConfigUploader extends ComponentInfo {
 
 	    ConfirmationDialog confirmationDialog = new ConfirmationDialog(
 		    "A configuration with the given name is already stored in the database.\n\n"
-			    + " Click 'Confirm' to overwrite the existing configuration, or click 'Cancel' to abort the upload",
-		    evt -> {
+			    + " Click 'Confirm' to overwrite the existing configuration, or click 'Cancel' to abort the upload", evt -> {
 
-			try {
+		try {
 
-			    uploadOpenSearchConfig(setting.getSelectedStorageInfo().get(), configStream.clone(), true);
+		    uploadOpenSearchConfig(setting.getSelectedStorageInfo().get(), configStream.clone(), true);
 
-			    NotificationDialog.getInfoDialog("Configuration correctly overwritten").open();
+		    NotificationDialog.getInfoDialog("Configuration correctly overwritten").open();
 
-			    upload.clearFileList();
+		    upload.clearFileList();
 
-			    setMessage(messageDiv,
-				    "<span style='font-size: 17px;'>Use the following Java option: </span><span style='font-size: 17px; font-weight: bold'>-Dconfiguration.url="
-					    + buildOpenSearchStartupURL(setting.getSelectedStorageInfo().get()) + "</span>");
+		    setMessage(messageDiv,
+			    "<span style='font-size: 16px;'>Use the following Java option: </span><span style='font-size: 16px; font-weight: bold'>-Dconfiguration.url="
+				    + buildOpenSearchStartupURL(setting.getSelectedStorageInfo().get()) + "</span>");
 
-			} catch (Exception e) {
+		} catch (Exception e) {
 
-			    GSLoggerFactory.getLogger(getClass()).error(e);
+		    GSLoggerFactory.getLogger(getClass()).error(e);
 
-			    NotificationDialog.getErrorDialog("Error occurred, unable to overwrite configuration: " + e.getMessage())
-				    .open();
+		    NotificationDialog.getErrorDialog("Error occurred, unable to overwrite configuration: " + e.getMessage()).open();
 
-			    upload.interruptUpload();
-			}
-		    });
+		    upload.interruptUpload();
+		}
+	    });
 
 	    confirmationDialog.setOnCancelListener(evt -> upload.clearFileList());
 	    confirmationDialog.setWidth(670, Unit.PIXELS);
@@ -438,7 +424,7 @@ public class ConfigUploader extends ComponentInfo {
 		upload.clearFileList();
 
 		setMessage(messageDiv,
-			"<span style='font-size: 17px;'>Use the following Java option: </span><span style='font-size: 17px; font-weight: bold'>-Dconfiguration.url="
+			"<span style='font-size: 16px;'>Use the following Java option: </span><span style='font-size: 16px; font-weight: bold'>-Dconfiguration.url="
 				+ buildOpenSearchStartupURL(setting.getSelectedStorageInfo().get()) + "</span>");
 
 	    } catch (Exception e) {
@@ -455,9 +441,8 @@ public class ConfigUploader extends ComponentInfo {
 
     /**
      * osl://awsaccesskey:awssecretkey@http:localhost:9200/test/testConfig1
-     * osl://awsaccesskey:awssecretkey@https:localhost:9200/test/testConfig2
-     * osm://awsaccesskey:awssecretkey@https:awshost/prod/testConfig3
-     * 
+     * osl://awsaccesskey:awssecretkey@https:localhost:9200/test/testConfig2 osm://awsaccesskey:awssecretkey@https:awshost/prod/testConfig3
+     *
      * @param info
      * @return
      */
@@ -519,12 +504,12 @@ public class ConfigUploader extends ComponentInfo {
     }
 
     /**
-     * @param label
+     * @param div
      * @param message
      */
-    private void setMessage(Div label, String message) {
+    private void setMessage(Div div, String message) {
 
-	label.getElement().setProperty("innerHTML", message);
+	div.getElement().setProperty("innerHTML", message);
     }
 
     /**
@@ -542,12 +527,12 @@ public class ConfigUploader extends ComponentInfo {
 
 	if (info.isEmpty()) {
 
-	    setMessage(label, "<span style='font-size: 17px; color:red;'>Please, fill all the required fields to proceed</span>");
+	    setMessage(label, "<span style='font-size: 16px; color:red;'>Please, fill all the required fields to proceed</span>");
 
 	} else {
 
 	    setMessage(label,
-		    "<span style='font-size: 17px;color:black;'>Click the button on the left to upload the selected configuration file</span>");
+		    "<span style='font-size: 16px;color:black;'>Click one of the button on the left to upload the selected configuration file</span>");
 	}
     }
 }

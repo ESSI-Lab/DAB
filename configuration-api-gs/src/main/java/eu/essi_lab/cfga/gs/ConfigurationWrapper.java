@@ -821,6 +821,8 @@ public class ConfigurationWrapper {
 		SingletonSettingsId.RATE_LIMITER_SETTING.getLabel(), //
 		RateLimiterSetting.class).get();
     }
+    
+    
 
     /**
      * @return
@@ -833,6 +835,11 @@ public class ConfigurationWrapper {
 		false).get();
     }
 
+    public static Optional<WMSCacheSetting> getWMSCacheSettings() {
+
+ 	return getSystemSettings().getWMSCacheSetting();
+     }
+    
     /**
      * @return
      */

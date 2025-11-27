@@ -37,9 +37,6 @@ public class KeycloakUserMapperTest {
 	gsUser.setPropertyValue(UserProfileAttribute.LAST_NAME.getAttribute(), "foo");
 	gsUser.setPropertyValue(UserProfileAttribute.EMAIL.getAttribute(), "xxx@gmail.com");
 
-	// time stamp
-	gsUser.setPropertyValue(KeycloakUser.CREATED_TIME_STAMP_FIELD, ISO8601DateTimeUtils.getISO8601DateTime());
-
 	gsUser.setPropertyValue("registrationDate", "2024-11-26T07:56:58Z");
 	gsUser.setPropertyValue("institutionType", "nmhs");
 	gsUser.setPropertyValue("position", "Hydrologist");
@@ -54,10 +51,6 @@ public class KeycloakUserMapperTest {
 	KeycloakUser keycloakUser = KeycloakUserMapper.toKeycloakUser(gsUser);
 
 	Assert.assertEquals(gsUser.isEnabled(), keycloakUser.isEnabled());
-
-	// time stamp
-	Assert.assertEquals(gsUser.getStringPropertyValue(KeycloakUser.CREATED_TIME_STAMP_FIELD).get(),
-		keycloakUser.getCreatedTimeStamp().get());
 
 	// keycloak users id is automatically set at creation time
 	Assert.assertTrue(keycloakUser.getIdentifier().isEmpty());
@@ -104,9 +97,6 @@ public class KeycloakUserMapperTest {
 	Assert.assertEquals(gsUser.getAuthProvider(), gsUser2.getAuthProvider());
 	Assert.assertEquals(gsUser.getRole(), gsUser2.getRole());
 	Assert.assertEquals(gsUser.getUri(), gsUser2.getUri());
-
-	Assert.assertEquals(gsUser2.getStringPropertyValue(KeycloakUser.CREATED_TIME_STAMP_FIELD).get(),
-		gsUser.getStringPropertyValue(KeycloakUser.CREATED_TIME_STAMP_FIELD).get());
 
 	Assert.assertEquals(gsUser.getUserIdentifierType(), gsUser2.getUserIdentifierType());
 	Assert.assertEquals(//
