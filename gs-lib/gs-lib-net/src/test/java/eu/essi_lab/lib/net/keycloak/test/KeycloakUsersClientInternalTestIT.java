@@ -155,10 +155,6 @@ public class KeycloakUsersClientInternalTestIT {
 		simpleJSON.getString(UserProfileAttribute.FIRST_NAME.getAttribute()));
 	Assert.assertEquals(rawJSON.getJSONObject("attributes").toString(), simpleJSON.getJSONObject("attributes").toString());
 
-	Assert.assertNotNull(rawJSON.get(KeycloakUser.CREATED_TIME_STAMP_FIELD)); // in the raw JSON is long
-	Assert.assertNotNull(simpleJSON.get(KeycloakUser.CREATED_TIME_STAMP_FIELD)); // in the simple JSON it is in ISO8601 format
-	Assert.assertTrue(ISO8601DateTimeUtils.parseISO8601ToDate(simpleJSON.getString(KeycloakUser.CREATED_TIME_STAMP_FIELD)).isPresent());
-
 	//
 	// elements only in the raw JSON
 	//

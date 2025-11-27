@@ -387,7 +387,13 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		    org.putOpt("homepage", wrapper.getHomePageURL());
 		    String role = wrapper.getRole();
 		    if (role != null && !role.isEmpty()) {
-			JSONArray arr = new JSONArray(role);
+			JSONArray arr ;
+			if (role.startsWith("[")) {
+			arr = new JSONArray(role);
+			}else {
+			    arr = new JSONArray();
+			    arr.put(role);
+			}
 			org.putOpt("role", arr);
 		    }
 		    orgArray.put(org);

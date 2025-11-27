@@ -606,8 +606,10 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	    coreMetadata.addDistributionOnlineResource(identifier, hisServerEndpoint, NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(),
 		    "download");
 	} else {
-	    coreMetadata.addDistributionOnlineResource(identifier, onlineGetSite, NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(),
+	    coreMetadata.addDistributionOnlineResource(identifier, hisServerEndpoint, NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(),
 		    "download");
+	    coreMetadata.addDistributionOnlineResource("Site Information", onlineGetSite, NetProtocolWrapper.HTTP.getCommonURN(),
+		    "info");
 	}
 
 	String resourceIdentifier = generateCode(dataset, identifier);

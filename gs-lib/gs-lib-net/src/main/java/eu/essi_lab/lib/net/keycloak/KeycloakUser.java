@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.lib.net.keycloak;
 
@@ -46,7 +46,6 @@ public class KeycloakUser {
 
     public static final String ID_FIELD = "id";
     public static final String ENABLED_FIELD = "enabled";
-    public static final String CREATED_TIME_STAMP_FIELD = "createdTimestamp";
 
     /**
      * @author Fabrizio
@@ -54,22 +53,22 @@ public class KeycloakUser {
     public enum UserProfileAttribute {
 
 	/**
-	 * 
+	 *
 	 */
 	USERNAME("username"),
 
 	/**
-	 * 
+	 *
 	 */
 	EMAIL("email"),
 
 	/**
-	 * 
+	 *
 	 */
 	FIRST_NAME("firstName"),
 
 	/**
-	 * 
+	 *
 	 */
 	LAST_NAME("lastName");
 
@@ -84,7 +83,7 @@ public class KeycloakUser {
 	}
 
 	/***
-	 * 
+	 *
 	 */
 	public String getAttribute() {
 
@@ -96,7 +95,7 @@ public class KeycloakUser {
 	 */
 	public static List<String> getAttributes() {
 
-	    return Arrays.asList(values()).stream().map(v -> v.getAttribute()).collect(Collectors.toList());
+	    return Arrays.stream(values()).map(UserProfileAttribute::getAttribute).collect(Collectors.toList());
 	}
 
 	/**
@@ -114,7 +113,7 @@ public class KeycloakUser {
 	 */
 	public static Optional<UserProfileAttribute> of(String attr) {
 
-	    return Arrays.asList(values()).stream().filter(v -> v.getAttribute().equals(attr)).findFirst();
+	    return Arrays.stream(values()).filter(v -> v.getAttribute().equals(attr)).findFirst();
 	}
     }
 
@@ -122,24 +121,15 @@ public class KeycloakUser {
     private String identifier;
     private List<Entry<String, List<String>>> attributes;
     private HashMap<String, String> userProfileAttributes;
-    private String timeStamp;
 
     /**
-     * 
+     *
      */
     private KeycloakUser() {
 
 	this.attributes = new ArrayList<>();
 	this.userProfileAttributes = new HashMap<>();
 	this.enabled = true;
-    }
-
-    /**
-     * @return
-     */
-    public Optional<String> getCreatedTimeStamp() {
-
-	return Optional.ofNullable(timeStamp);
     }
 
     /**
@@ -187,7 +177,7 @@ public class KeycloakUser {
      */
     public List<String> getAttributeValues(String name) {
 
-	return getAttribute(name).map(attr -> attr.getValue()).orElse(List.of());
+	return getAttribute(name).map(Entry::getValue).orElse(List.of());
     }
 
     /**
@@ -195,7 +185,7 @@ public class KeycloakUser {
      */
     public Optional<String> getAttributeValue(String name) {
 
-	return getAttribute(name).map(attr -> attr.getValue().get(0));
+	return getAttribute(name).map(attr -> attr.getValue().getFirst());
     }
 
     /**
@@ -215,7 +205,6 @@ public class KeycloakUser {
 	JSONObject user = new JSONObject();
 	user.put(ID_FIELD, identifier);
 	user.put(ENABLED_FIELD, enabled);
-	user.put(CREATED_TIME_STAMP_FIELD, timeStamp);
 
 	userProfileAttributes.keySet().forEach(attr -> {
 
@@ -248,7 +237,6 @@ public class KeycloakUser {
 
 	out.identifier = object.getString(ID_FIELD);
 	out.enabled = object.getBoolean(ENABLED_FIELD);
-	out.timeStamp = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.valueOf(object.get(CREATED_TIME_STAMP_FIELD).toString())));
 
 	UserProfileAttribute.getAttributes().forEach(attr -> {
 
@@ -268,7 +256,7 @@ public class KeycloakUser {
 
 		JSONArray values = attributes.getJSONArray(key);
 
-		out.attributes.add(Map.entry(key, values.toList().stream().map(v -> v.toString()).collect(Collectors.toList())));
+		out.attributes.add(Map.entry(key, values.toList().stream().map(Object::toString).collect(Collectors.toList())));
 	    });
 	}
 
@@ -283,7 +271,7 @@ public class KeycloakUser {
 	private KeycloakUser user;
 
 	/**
-	 * 
+	 *
 	 */
 	public KeycloakUserBuilder() {
 
@@ -328,22 +316,6 @@ public class KeycloakUser {
 	    }
 
 	    user.identifier = identifier;
-	    return this;
-	}
-
-	/**
-	 * @param timeStamp
-	 * @return
-	 */
-	public KeycloakUserBuilder withOptionalCreatedTimeStamp(Optional<String> timeStamp) {
-
-	    if (timeStamp == null) {
-
-		throw new IllegalArgumentException();
-	    }
-
-	    timeStamp.ifPresent(v -> user.timeStamp = timeStamp.get());
-
 	    return this;
 	}
 

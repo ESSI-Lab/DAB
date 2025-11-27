@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
+import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.lib.skos.SKOSClient;
 import eu.essi_lab.lib.skos.SKOSClient.SearchTarget;
 import eu.essi_lab.lib.skos.SKOSResponse;
@@ -38,9 +38,7 @@ import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skos.expander.ExpansionLimit;
 import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.skos.finder.impl.DefaultConceptsFinder;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.LabeledEnum;
-import eu.essi_lab.lib.utils.ThreadMode;
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
@@ -89,13 +87,13 @@ public class SemanticSearchSupport {
 		ConfigurationWrapper.getOntologySettings().//
 			stream().//
 			filter(set -> ids.contains(set.getOntologyId())).//
-			map(set -> set.getOntologyEndpoint()).//
+			map(OntologySetting::getOntologyEndpoint).//
 			toList());
 
 	DefaultSemanticSearchSetting setting = ConfigurationWrapper.getSystemSettings().getDefaultSemanticSearchSetting();
 
 	ExpansionLevel expansionLevel = parser.getOptionalValue(EXPANSION_LEVEL_PARAM).//
-		map(v -> ExpansionLevel.of(Integer.valueOf(v)).orElse(setting.getDefaultExpansionLevel())).//
+		map(v -> ExpansionLevel.of(Integer.parseInt(v)).orElse(setting.getDefaultExpansionLevel())).//
 		orElse(setting.getDefaultExpansionLevel());
 
 	client.setExpansionLevel(expansionLevel);
@@ -108,22 +106,22 @@ public class SemanticSearchSupport {
 
 	List<SKOSSemanticRelation> semanticRelations = parser.getOptionalValue(SEMANTIC_RELATIONS_PARAM).//
 		stream().//
-		flatMap(v -> Arrays.asList(v.split(",")).stream()).//
+		flatMap(v -> Arrays.stream(v.split(","))).//
 		flatMap(v -> LabeledEnum.valueOf(SKOSSemanticRelation.class, v).stream()).toList();
 
 	client.setExpansionsRelations(semanticRelations.isEmpty() ? setting.getDefaultSemanticRelations() : semanticRelations);
 
 	List<String> searchLangs = parser.getOptionalValue(SEARCH_LANGS_PARAM).stream().//
-		flatMap(v -> Arrays.asList(v.split(",")).stream()).toList();
+		flatMap(v -> Arrays.stream(v.split(","))).toList();
 
 	client.setSearchLangs(
-		searchLangs.isEmpty() ? setting.getDefaultSearchLanguages().stream().map(l -> l.getLabel()).toList() : searchLangs);
+		searchLangs.isEmpty() ? setting.getDefaultSearchLanguages().stream().map(EuropeanLanguage::getLabel).toList() : searchLangs);
 
 	List<String> sourceLangs = parser.getOptionalValue(SOURCE_LANGS_PARAM).stream().//
-		flatMap(v -> Arrays.asList(v.split(",")).stream()).toList();
+		flatMap(v -> Arrays.stream(v.split(","))).toList();
 
 	client.setSourceLangs(
-		sourceLangs.isEmpty() ? setting.getDefaultSourceLanguages().stream().map(l -> l.getLabel()).toList() : sourceLangs);
+		sourceLangs.isEmpty() ? setting.getDefaultSourceLanguages().stream().map(EuropeanLanguage::getLabel).toList() : sourceLangs);
 
 	//
 	// finder
@@ -173,7 +171,7 @@ public class SemanticSearchSupport {
 			.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, uri)));
 	    } else {
 
-		expandedTerms.forEach(term -> BondUtils.createFieldsBond(searchFields, term).ifPresent(bond -> expandedBonds.add(bond)));
+		expandedTerms.forEach(term -> BondUtils.createFieldsBond(searchFields, term).ifPresent(expandedBonds::add));
 	    }
 
 	    if (client.getSearchTarget().get() == SearchTarget.TERMS && setting.isOriginalTermIncluded()) {

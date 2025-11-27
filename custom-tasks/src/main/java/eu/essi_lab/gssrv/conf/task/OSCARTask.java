@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,7 +44,9 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
+import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.gssrv.conf.task.CollectionCreatorTask.CollectionCreatorTaskOptions;
 import eu.essi_lab.gssrv.conf.task.bluecloud.BLUECloudDownloadReport;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.lib.net.downloader.Downloader;
@@ -66,11 +69,13 @@ import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.oaipmh.profile.mapper.wigos.WIGOS_MAPPER;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
@@ -78,216 +83,243 @@ public class OSCARTask extends AbstractCustomTask {
 
     public OSCARTask() {
     }
+    // source_id=argentina-ina
+    // view_id=whos
+    // hostname=https://whos.geodab.eu
+
+    public enum OSCARTaskOptions implements OptionsKey {
+	TOKEN, OSCAR_ENDPOINT, SOURCE, BBOX;
+    }
 
     @Override
     public String getName() {
-	return "OSCAR  report task";
+	return "OSCAR report task";
     }
 
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 	// TODO Auto-generated method stub
-	Optional<String> taskOptions = readTaskOptions(context);
+	// Optional<String> taskOptions = readTaskOptions(context);
+	Optional<EnumMap<OSCARTaskOptions, String>> taskOptions = readTaskOptions(context, OSCARTaskOptions.class);
 
-	String tokenName = null;
-	String tokenValue = null;
-	String endpoint = null;
-	String sourceId = null;
-	String bbox = null;
-	boolean isGRDC = false;
-	if (taskOptions.isPresent()) {
-	    String options = taskOptions.get();
-	    if (options != null) {
-		if (options.contains("\n")) {
-		    String[] split = options.split("\n");
-		    if (split.length < 3) {
-			GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
-			return;
-		    }
-
-		    String[] token = split[0].trim().split(":");
-		    tokenName = token[0].trim();
-		    tokenValue = token[1].trim();
-		    String[] splittedEndpoint = split[1].trim().split(":");
-		    endpoint = splittedEndpoint[1].trim() + ":" + splittedEndpoint[2].trim();
-		    sourceId = split[2].trim().split(":")[1].trim();
-		    bbox = split[3].trim().split(":")[1].trim();
-
-		}
-	    }
-	}
-	if (tokenName == null || tokenValue == null || endpoint == null || sourceId == null) {
-	    GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
+	if (taskOptions.isEmpty() || taskOptions.get().isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass())
+		    .error("No options specified. Options should be new line separated and in the form key=value");
 	    return;
 	}
 
-	String finalEndpoint = endpoint;
-	// String[] lines = settings.split("\n");
-	// String secret = null;
-	// String access = null;
-	// boolean aggregateMode = false;
-	// String aggregatedTarget = null;
-	// String dataDir = null;
-	// boolean test = false;
-	// List<String> sources = new ArrayList<>();
-	// for (String line : lines) {
+	String hostname = taskOptions.get().get(OSCARTaskOptions.OSCAR_ENDPOINT);
+	if (hostname == null) {
+	    GSLoggerFactory.getLogger(getClass()).info("No hostname option specified, using default");
+	    hostname = "https://whos.geodab.eu";
+	}
+
+	String sourceId = taskOptions.get().get(OSCARTaskOptions.SOURCE);
+	if (sourceId == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("No source id option specified");
+	    return;
+	}
+
+	String tokenValue = taskOptions.get().get(OSCARTaskOptions.TOKEN);
+	if (tokenValue == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("No token option specified");
+	    return;
+	}
+
+	String bbox = taskOptions.get().get(OSCARTaskOptions.BBOX);
+
+	String tokenName = "X-WMO-WMDR-Token";
+	// String tokenValue = null;
+	// String endpoint = null;
+	// String sourceId = null;
+	// String bbox = null;
+	// boolean isGRDC = false;
+	// if (taskOptions.isPresent()) {
+	// String options = taskOptions.get();
+	// if (options != null) {
+	// if (options.contains("\n")) {
+	// String[] split = options.split("\n");
+	// if (split.length < 3) {
+	// GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
+	// return;
+	// }
+	//
+	// String[] token = split[0].trim().split(":");
+	// tokenName = token[0].trim();
+	// tokenValue = token[1].trim();
+	// String[] splittedEndpoint = split[1].trim().split(":");
+	// endpoint = splittedEndpoint[1].trim() + ":" + splittedEndpoint[2].trim();
+	// sourceId = split[2].trim().split(":")[1].trim();
+	// bbox = split[3].trim().split(":")[1].trim();
 	//
 	// }
+	// }
+	// }
+	// if (tokenName == null || tokenValue == null || endpoint == null || sourceId == null) {
+	// GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
+	// return;
+	// }
 
-	WIGOS_MAPPER wigosMapper = new WIGOS_MAPPER();
-	isGRDC = sourceId.contains("grdc");
-	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-	discoveryMessage.setRequestId("oscar-task-" + sourceId + "-" + UUID.randomUUID());
-	discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
-	discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
-	discoveryMessage.setExcludeResourceBinary(false);
-	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-	// ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
-	Bond bond;
-	if (bbox != null && isGRDC) {
-	    bond = BondFactory.createSourceIdentifierBond(sourceId);
-	    String[] splittedBox = bbox.split(",");
-	    SpatialExtent saExtent = new SpatialExtent(); // bbox=11.558,-38.098,39.868,-23.743
-	    saExtent.setEast(Double.valueOf(splittedBox[2])); // 'ZA': ('South Africa', (16.3449768409, -34.8191663551,
-							      // // 32.830120477, -22.0913127581)),
-	    saExtent.setNorth(Double.valueOf(splittedBox[3]));
-	    saExtent.setSouth(Double.valueOf(splittedBox[1]));
-	    saExtent.setWest(Double.valueOf(splittedBox[0]));
-	    bond = BondFactory.createAndBond(bond, BondFactory.createSpatialEntityBond(BondOperator.INTERSECTS, saExtent));
-	    // bond = BondFactory.createAndBond(bond, BondFactory.createSimpleValueBond(BondOperator.EQUAL,
-	    // MetadataElement.COUNTRY, "South Africa")); //
-	} else {
-	    bond = BondFactory.createSourceIdentifierBond(sourceId);
-	}
+	String finalEndpoint = hostname;
 
-	// ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
+	String[] splits = sourceId.split(";");
 
-	discoveryMessage.setPermittedBond(bond);
-	discoveryMessage.setUserBond(bond);
-	discoveryMessage.setNormalizedBond(bond);
-	discoveryMessage.setSortedFields(
-		new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING),
-			new SimpleEntry(MetadataElement.ONLINE_ID, SortOrder.ASCENDING))));
+	for (String split : splits) {
 
-	SearchAfter searchAfter = null;
-	int i = 0;
-	int start = 1;
-	int pageSize = 50;
-	Downloader downloader = new Downloader();
-	HashMap<String, String> params = new HashMap<String, String>();
-	params.put(tokenName, tokenValue);
-	String platformIdentifier = null;
-	Map<String, List<GSResource>> oscarMap = new LinkedHashMap<String, List<GSResource>>();
-	List<GSResource> resList = new ArrayList<GSResource>();
-	main: while (true) {
-
-	    GSLoggerFactory.getLogger(getClass()).info("OSCAR task {} at record {}", sourceId, start);
-	    discoveryMessage.setPage(new Page(start, pageSize));
-	    start = start + pageSize;
-
-	    if (searchAfter != null) {
-		
-		if(searchAfter.toString().equals("empty")) {
-		    break main;
-		}
-		discoveryMessage.setSearchAfter(searchAfter);
+	    WIGOS_MAPPER wigosMapper = new WIGOS_MAPPER();
+	    // isGRDC = sourceId.contains("grdc");
+	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+	    discoveryMessage.setRequestId("oscar-task-" + split + "-" + UUID.randomUUID());
+	    discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
+	    discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
+	    discoveryMessage.setExcludeResourceBinary(false);
+	    discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+	    // ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
+	    Bond bond;
+	    if (bbox != null) {
+		bond = BondFactory.createSourceIdentifierBond(split);
+		String[] splittedBox = bbox.split(",");
+		SpatialExtent saExtent = new SpatialExtent(); // bbox=11.558,-38.098,39.868,-23.743
+		saExtent.setEast(Double.valueOf(splittedBox[2])); // 'ZA': ('South Africa', (16.3449768409,
+								  // -34.8191663551,
+								  // // 32.830120477, -22.0913127581)),
+		saExtent.setNorth(Double.valueOf(splittedBox[3]));
+		saExtent.setSouth(Double.valueOf(splittedBox[1]));
+		saExtent.setWest(Double.valueOf(splittedBox[0]));
+		bond = BondFactory.createAndBond(bond, BondFactory.createSpatialEntityBond(BondOperator.INTERSECTS, saExtent));
+		// bond = BondFactory.createAndBond(bond, BondFactory.createSimpleValueBond(BondOperator.EQUAL,
+		// MetadataElement.COUNTRY, "South Africa")); //
+	    } else {
+		bond = BondFactory.createSourceIdentifierBond(split);
 	    }
-	    
-	    
-	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	    IDiscoveryExecutor executor = loader.iterator().next();
-	    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
-	    if (resultSet.getSearchAfter().isPresent()) {
-		searchAfter = resultSet.getSearchAfter().get();
-	    }
-	    List<GSResource> resources = resultSet.getResultsList();
 
-	    for (GSResource resource : resources) {
-		i++;
-		MIPlatform platform = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform();
-		if (platform != null) {
-		    String code = platform.getMDIdentifierCode();
-		    if (platformIdentifier == null) {
-			platformIdentifier = code;
+	    // ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
+
+	    discoveryMessage.setPermittedBond(bond);
+	    discoveryMessage.setUserBond(bond);
+	    discoveryMessage.setNormalizedBond(bond);
+	    discoveryMessage.setSortedFields(
+		    new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING),
+			    new SimpleEntry(MetadataElement.ONLINE_ID, SortOrder.ASCENDING))));
+
+	    SearchAfter searchAfter = null;
+	    int i = 0;
+	    int start = 1;
+	    int pageSize = 50;
+	    Downloader downloader = new Downloader();
+	    HashMap<String, String> params = new HashMap<String, String>();
+	    params.put(tokenName, tokenValue);
+	    String platformIdentifier = null;
+	    Map<String, List<GSResource>> oscarMap = new LinkedHashMap<String, List<GSResource>>();
+	    List<GSResource> resList = new ArrayList<GSResource>();
+	    main: while (true) {
+
+		GSLoggerFactory.getLogger(getClass()).info("OSCAR task {} at record {}", split, start);
+		discoveryMessage.setPage(new Page(start, pageSize));
+		start = start + pageSize;
+
+		if (searchAfter != null) {
+
+		    if (searchAfter.toString().equals("empty")) {
+			break main;
 		    }
-		    if (!code.equals(platformIdentifier)) {
-			oscarMap.put(platformIdentifier, new ArrayList<>(resList));
-
-			resList.clear();
-			platformIdentifier = code;
-		    }
-
-		    resList.add(resource);
+		    discoveryMessage.setSearchAfter(searchAfter);
 		}
+
+		ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
+		IDiscoveryExecutor executor = loader.iterator().next();
+		ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
+		if (resultSet.getSearchAfter().isPresent()) {
+		    searchAfter = resultSet.getSearchAfter().get();
+		}
+		List<GSResource> resources = resultSet.getResultsList();
+
+		for (GSResource resource : resources) {
+		    i++;
+		    MIPlatform platform = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform();
+		    if (platform != null) {
+			String code = platform.getMDIdentifierCode();
+			if (platformIdentifier == null) {
+			    platformIdentifier = code;
+			}
+			if (!code.equals(platformIdentifier)) {
+			    oscarMap.put(platformIdentifier, new ArrayList<>(resList));
+
+			    resList.clear();
+			    platformIdentifier = code;
+			}
+
+			resList.add(resource);
+		    }
+		}
+
+		// for (GSResource resource : resources) {
+		// i++;
+		// if (i > 1000) {
+		// break main;
+		// }
+		// Element res = wigosMapper.map(discoveryMessage, resource);
+		// String doc = XMLDocumentReader.asString(res);
+		// doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+		// HttpRequest postRequest = HttpRequestUtils.build(//
+		// MethodWithBody.POST, //
+		// endpoint, doc, params);
+		//
+		//// HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
+		////
+		//// InputStream content = response.body();
+		////
+		//// JSONObject jsonObject = JSONUtils.fromStream(content);
+		////
+		//// String xmlStatus = jsonObject.optString("xmlStatus");
+		//// String logs = jsonObject.optString("logs");
+		//// String idResponse = jsonObject.optString("id");
+		////
+		//// System.out.println(xmlStatus + ": " + logs);
+		//
+		// }
+
+		// if (i > 100) {
+		// break main;
+		// }
+
+		if (resources.isEmpty()) {
+		    break;
+		}
+
 	    }
 
-	    // for (GSResource resource : resources) {
-	    // i++;
-	    // if (i > 1000) {
-	    // break main;
-	    // }
-	    // Element res = wigosMapper.map(discoveryMessage, resource);
-	    // String doc = XMLDocumentReader.asString(res);
-	    // doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-	    // HttpRequest postRequest = HttpRequestUtils.build(//
-	    // MethodWithBody.POST, //
-	    // endpoint, doc, params);
-	    //
-	    //// HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
-	    ////
-	    //// InputStream content = response.body();
-	    ////
-	    //// JSONObject jsonObject = JSONUtils.fromStream(content);
-	    ////
-	    //// String xmlStatus = jsonObject.optString("xmlStatus");
-	    //// String logs = jsonObject.optString("logs");
-	    //// String idResponse = jsonObject.optString("id");
-	    ////
-	    //// System.out.println(xmlStatus + ": " + logs);
-	    //
-	    // }
-
-//	    if (i > 100) {
-//		break main;
-//	    }
-	    
-	    if (resources.isEmpty()) {
-		break;
+	    if (!resList.isEmpty()) {
+		oscarMap.put(platformIdentifier, new ArrayList<>(resList));
 	    }
+	    GSLoggerFactory.getLogger(getClass()).info("OSCAR MAP SIZE" + ": " + oscarMap.size());
+	    oscarMap.forEach((key, gsresource) -> {
+		try {
+		    String doc = wigosMapper.mapStations(gsresource, key);
+		    doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+		    HttpRequest postRequest = HttpRequestUtils.build(//
+			    MethodWithBody.POST, //
+			    finalEndpoint, doc, params);
 
+		    HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
+
+		    InputStream content = response.body();
+
+		    JSONObject jsonObject = JSONUtils.fromStream(content);
+
+		    String xmlStatus = jsonObject.optString("xmlStatus");
+		    String logs = jsonObject.optString("logs");
+		    String idResponse = jsonObject.optString("id");
+
+		    GSLoggerFactory.getLogger(getClass()).info("ID_RESPONSE:" + idResponse + "-" + xmlStatus + ": " + logs);
+		    
+
+		} catch (Exception e) {
+
+		}
+	    });
 	}
-
-	if (!resList.isEmpty()) {
-	    oscarMap.put(platformIdentifier, new ArrayList<>(resList));
-	}
-	System.out.println("OSCAR MAP SIZE" + ": " + oscarMap.size());
-	oscarMap.forEach((key, gsresource) -> {
-	    try {
-		String doc = wigosMapper.mapStations(gsresource, key);
-		doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-		HttpRequest postRequest = HttpRequestUtils.build(//
-			MethodWithBody.POST, //
-			finalEndpoint, doc, params);
-
-		HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
-
-		InputStream content = response.body();
-
-		JSONObject jsonObject = JSONUtils.fromStream(content);
-
-		String xmlStatus = jsonObject.optString("xmlStatus");
-		String logs = jsonObject.optString("logs");
-		String idResponse = jsonObject.optString("id");
-
-		System.out.println("ID_RESPONSE:" + idResponse + "-" + xmlStatus + ": " + logs);
-		//System.out.println(xmlStatus + ": " + logs);
-		
-
-	    } catch (Exception e) {
-
-	    }
-	});
 
     }
 
