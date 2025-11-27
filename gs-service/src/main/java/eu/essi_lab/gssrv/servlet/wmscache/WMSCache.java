@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map.Entry;
@@ -102,19 +103,8 @@ public class WMSCache {
 	stats.storeRequest(view, layer, hash, request);
 	stats.updateLeaderboard(view, layer, hash);
 
-	File ret = storage.getCachedResponse(view, layer, hash);
-	if (ret != null && ret.exists()) {
-	    try (InputStream is = new FileInputStream(ret)) {
-		Response.ResponseBuilder builder = Response.ok(is);
-		builder.type(MediaType.valueOf("image/png")); // set MIME type
-		builder.header("Content-Disposition", "inline; filename=\"" + hash + ".png\"");
-		builder.entity(ret);
-		return builder.build();
-	    } catch (IOException e) {
-		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to read image").build();
-	    }
-	}
-	return null;
+	return storage.getCachedResponse(view, layer, hash);
+
     }
 
     public void cacheResponse(String profile, WebRequest request, byte[] body) {
@@ -257,6 +247,52 @@ public class WMSCache {
 	} else {
 	    storage = new WMSCacheStorageOnDisk(name);
 	}
+    }
+
+    public Integer getMaxSize() {
+	return storage.getMaxSize();
+    }
+
+    public void setMaxSize(Integer size) {
+	storage.setMaxSize(size);
+    }
+
+    public void initRedisS3(String redisHostname, String s3hostName, String s3Username, String s3Password, String s3Bucket) {
+	URL url;
+	try {
+	    url = new URL(redisHostname);
+	} catch (MalformedURLException e) {
+	    e.printStackTrace();
+	    return;
+	}
+	if (stats == null) {
+	    stats = new WMSCacheStatsOnRedis(url.getHost(), url.getPort());
+	} else {
+	    if (stats instanceof WMSCacheStatsOnRedis wcsr) {
+		if (wcsr.getHost().equals(redisHostname) && wcsr.getPort() == url.getPort()) {
+		    // nothing to do
+		} else {
+		    stats = new WMSCacheStatsOnRedis(url.getHost(), url.getPort());
+		}
+	    } else {
+		stats = new WMSCacheStatsOnRedis(url.getHost(), url.getPort());
+	    }
+	}
+	if (storage == null) {
+	    storage = new WMSCacheStorageOnS3(s3hostName, s3Username, s3Password, s3Bucket);
+	} else {
+	    if (storage instanceof WMSCacheStorageOnS3 ws3) {
+		if (ws3.getHostname().equals(s3hostName) && ws3.getUsername().equals(s3Username) && ws3.getPassword().equals(s3Password)
+			&& ws3.getBucketname().equals(s3Bucket)) {
+		    // nothing to do
+		} else {
+		    storage = new WMSCacheStorageOnS3(s3hostName, s3Username, s3Password, s3Bucket);
+		}
+	    } else {
+		storage = new WMSCacheStorageOnS3(s3hostName, s3Username, s3Password, s3Bucket);
+	    }
+	}
+
     }
 
 }

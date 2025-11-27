@@ -22,17 +22,27 @@ package eu.essi_lab.gssrv.servlet.wmscache;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 public class WMSCacheStorageOnDisk implements WMSCacheStorage {
 
     private final Path rootDir;
     private String cacheSubFolder;
+    private int maxSize = 1000;
 
     public String getCacheSubFolder() {
 	return cacheSubFolder;
@@ -65,13 +75,29 @@ public class WMSCacheStorageOnDisk implements WMSCacheStorage {
     }
 
     @Override
-    public File getCachedResponse(String view, String layer, String hash) {
+    public Response getCachedResponse(String view, String layer, String hash) {
 	Path filePath = getCacheFilePath(view, layer, hash);
-	return Files.exists(filePath) ? filePath.toFile() : null;
+	File ret = Files.exists(filePath) ? filePath.toFile() : null;
+	if (ret != null && ret.exists()) {
+	    try (InputStream is = new FileInputStream(ret)) {
+		Response.ResponseBuilder builder = Response.ok(is);
+		builder.type(MediaType.valueOf("image/png")); // set MIME type
+		builder.header("Content-Disposition", "inline; filename=\"" + hash + ".png\"");
+		builder.entity(ret);
+		return builder.build();
+	    } catch (IOException e) {
+		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to read image").build();
+	    }
+	}
+	return null;
     }
 
     @Override
     public void putCachedResponse(String view, String layer, String hash, File file) {
+	int currentSize = getSize(view, layer);
+	if (currentSize > maxSize) {
+	    return;
+	}
 	Path dirPath = rootDir.resolve(Paths.get(view, layer));
 	try {
 	    Files.createDirectories(dirPath);
@@ -111,6 +137,99 @@ public class WMSCacheStorageOnDisk implements WMSCacheStorage {
 	} catch (IOException e) {
 	    throw new RuntimeException("Failed to delete cached response", e);
 	}
+    }
+
+    @Override
+    public Integer getSize() {
+	Integer ret = 0;
+	List<String> views = getViews();
+	for (String view : views) {
+	    List<String> layers = getLayers(view);
+	    for (String layer : layers) {
+		Integer size = getSize(view, layer);
+		ret += size;
+	    }
+	}
+	return ret;
+    }
+
+    @Override
+    public Integer getSize(String view, String layer) {
+	Integer ret = 0;
+	if (rootDir == null) {
+	    return ret;
+	}
+	File file = rootDir.toFile();
+	if (file.exists()) {
+	    File viewFolder = new File(file, view);
+	    if (viewFolder.exists() && viewFolder.isDirectory()) {
+		File layerFolder = new File(viewFolder, layer);
+		if (layerFolder.exists() && layerFolder.isDirectory()) {
+		    File[] files = layerFolder.listFiles();
+		    for (File f : files) {
+			if (f.isFile() && f.getName().endsWith(".cache")) {
+			    ret++;
+			}
+		    }
+		}
+	    }
+	}
+
+	return ret;
+    }
+
+    @Override
+    public Integer getMaxSize() {
+	return maxSize;
+    }
+
+    @Override
+    public void setMaxSize(Integer size) {
+	this.maxSize = size;
+
+    }
+
+    @Override
+    public List<String> getViews() {
+	List<String> ret = new ArrayList<String>();
+	if (rootDir == null) {
+	    return ret;
+	}
+	File file = rootDir.toFile();
+	if (file.exists()) {
+	    File[] files = file.listFiles();
+
+	    for (File f : files) {
+		if (f.isDirectory()) {
+		    ret.add(f.getName());
+		}
+	    }
+	}
+
+	return ret;
+    }
+
+    @Override
+    public List<String> getLayers(String view) {
+	List<String> ret = new ArrayList<String>();
+	if (rootDir == null) {
+	    return ret;
+	}
+	File file = rootDir.toFile();
+	if (file.exists()) {
+	    File viewFolder = new File(file, view);
+	    if (viewFolder.exists() && viewFolder.isDirectory()) {
+		File[] files = viewFolder.listFiles();
+
+		for (File f : files) {
+		    if (f.isDirectory()) {
+			ret.add(f.getName());
+		    }
+		}
+	    }
+	}
+
+	return ret;
     }
 
 }

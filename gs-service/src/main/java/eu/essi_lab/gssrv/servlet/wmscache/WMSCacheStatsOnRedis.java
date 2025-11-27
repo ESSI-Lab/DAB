@@ -39,9 +39,22 @@ import redis.clients.jedis.resps.Tuple;
 public class WMSCacheStatsOnRedis implements WMSCacheStats {
 
     private final JedisPool pool;
+    private int port;
+
+    public int getPort() {
+	return port;
+    }
+
+    public String getHost() {
+	return host;
+    }
+
+    private String host;
 
     public WMSCacheStatsOnRedis(String redisHost, int redisPort) {
 	this.pool = new JedisPool(new JedisPoolConfig(), redisHost, redisPort);
+	this.host = redisHost;
+	this.port = redisPort;
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.option.IntegerOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -24,6 +25,7 @@ public class WMSCacheSetting extends Setting {
     private static final String WMS_CACHE_S3_PASSWORD_KEY = "wmsCacheS3Password";
     private static final String WMS_CACHE_S3_BUCKETNAME = "wmsCacheS3BucketName";
     private static final String WMS_CACHE_FOLDERNAME = "wmsCacheFolderName";
+    private static final String WMS_CACHE_SIZE = "wmsCacheSize";
 
     public enum WMSCacheMode implements LabeledEnum {
 
@@ -90,7 +92,7 @@ public class WMSCacheSetting extends Setting {
 		cannotBeDisabled().//
 		build();
 	addOption(hostname);
-	
+
 	Option<String> username = StringOptionBuilder.get().//
 		withKey(WMS_CACHE_REDIS_USERNAME_KEY).//
 		withLabel("Redis username").//
@@ -104,37 +106,42 @@ public class WMSCacheSetting extends Setting {
 		cannotBeDisabled().//
 		build();
 	addOption(password);
-	
+
 	addOption(StringOptionBuilder.get().//
 		withKey(WMS_CACHE_S3_HOSTNAME_KEY).//
 		withLabel("S3 hostname").//
 		cannotBeDisabled().//
 		build());
-	
+
 	addOption(StringOptionBuilder.get().//
 		withKey(WMS_CACHE_S3_USERNAME_KEY).//
 		withLabel("S3 username").//
 		cannotBeDisabled().//
 		build());
-	
+
 	addOption(StringOptionBuilder.get().//
 		withKey(WMS_CACHE_S3_PASSWORD_KEY).//
 		withLabel("S3 password").//
 		cannotBeDisabled().//
 		build());
-	
+
 	addOption(StringOptionBuilder.get().//
 		withKey(WMS_CACHE_S3_BUCKETNAME).//
 		withLabel("S3 bucket name").//
 		cannotBeDisabled().//
 		build());
 
-	Option<String> folder = StringOptionBuilder.get().//
+	addOption(StringOptionBuilder.get().//
 		withKey(WMS_CACHE_FOLDERNAME).//
 		withLabel("Folder name").//
 		cannotBeDisabled().//
-		build();
-	addOption(folder);
+		build());
+
+	addOption(IntegerOptionBuilder.get().//
+		withKey(WMS_CACHE_SIZE).//
+		withLabel("Cache size").//
+		cannotBeDisabled().//
+		build());
     }
 
     /**
@@ -184,7 +191,7 @@ public class WMSCacheSetting extends Setting {
 
 	return getOption(WMS_CACHE_REDIS_HOSTNAME_KEY, String.class).get().getOptionalValue();
     }
-    
+
     /**
      * @param user
      */
@@ -200,7 +207,6 @@ public class WMSCacheSetting extends Setting {
 
 	return getOption(WMS_CACHE_REDIS_USERNAME_KEY, String.class).get().getOptionalValue();
     }
-
 
     /**
      * @param user
@@ -233,7 +239,7 @@ public class WMSCacheSetting extends Setting {
 
 	return getOption(WMS_CACHE_S3_HOSTNAME_KEY, String.class).get().getOptionalValue();
     }
-    
+
     /**
      * @param user
      */
@@ -250,7 +256,6 @@ public class WMSCacheSetting extends Setting {
 	return getOption(WMS_CACHE_S3_USERNAME_KEY, String.class).get().getOptionalValue();
     }
 
-
     /**
      * @param user
      */
@@ -266,7 +271,7 @@ public class WMSCacheSetting extends Setting {
 
 	return getOption(WMS_CACHE_S3_PASSWORD_KEY, String.class).get().getOptionalValue();
     }
-    
+
     /**
      * @param user
      */
@@ -282,7 +287,7 @@ public class WMSCacheSetting extends Setting {
 
 	return getOption(WMS_CACHE_S3_BUCKETNAME, String.class).get().getOptionalValue();
     }
-    
+
     /**
      * @param user
      */
@@ -297,6 +302,22 @@ public class WMSCacheSetting extends Setting {
     public Optional<String> getFoldername() {
 
 	return getOption(WMS_CACHE_FOLDERNAME, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param user
+     */
+    public void setCachesize(Integer size) {
+
+	getOption(WMS_CACHE_SIZE, Integer.class).get().setValue(size);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Integer> getCachesize() {
+
+	return getOption(WMS_CACHE_SIZE, Integer.class).get().getOptionalValue();
     }
 
 }

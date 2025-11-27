@@ -42,6 +42,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -129,7 +130,13 @@ public class WMSCacheFilter implements Filter {
 			getRequestLogPrefix(webRequest) + " WMS CACHE HIT", chronometer.formatElapsedTime());
 		HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 		httpResponse.setStatus(cached.getStatus());
-		httpResponse.setContentType(cached.getMediaType().getType());
+		MediaType mt = cached.getMediaType();
+		if (mt != null) {
+		    String type = mt.getType();
+		    if (type != null) {
+			httpResponse.setContentType(type);
+		    }
+		}
 		MultivaluedMap<String, String> headers = cached.getStringHeaders();
 		Set<Entry<String, List<String>>> entries = headers.entrySet();
 		for (Entry<String, List<String>> entry : entries) {
@@ -207,24 +214,45 @@ public class WMSCacheFilter implements Filter {
 
 	if (setting != null && setting.isPresent()) {
 	    WMSCacheMode mode = setting.get().getMode();
-
+	    Optional<Integer> size = setting.get().getCachesize();
 	    if (mode != null) {
 		switch (mode) {
-		case DISABLED: {
+		case DISABLED:
 		    enabled = false;
-		}
-		case LOCAL_FILESYSTEM: {
+		    break;
+		case LOCAL_FILESYSTEM:
 		    Optional<String> name = setting.get().getFoldername();
 		    String n = null;
 		    if (name.isPresent()) {
 			n = name.get();
 		    }
 		    WMSCache.getInstance().initInMemory(n);
+		    if (size.isPresent()) {
+			Integer s = size.get();
+			Integer currentSize = WMSCache.getInstance().getMaxSize();
+			if (currentSize == null || !s.equals(currentSize)) {
+			    WMSCache.getInstance().setMaxSize(s);
+			}
+		    }
 		    enabled = true;
-		}
-		case REDIS_S3: {
-		    enabled = true;
-		}
+		    break;
+		case REDIS_S3:
+		    Optional<String> redisHost = setting.get().getRedisHostname();
+		    Optional<String> s3Host = setting.get().getS3Hostname();
+		    Optional<String> s3User = setting.get().getS3User();
+		    Optional<String> s3Pass = setting.get().getS3Password();
+		    Optional<String> s3Bucket = setting.get().getS3Bucketname();
+		    if (redisHost.isPresent() && s3Host.isPresent() && s3User.isPresent() && s3Pass.isPresent() && s3Bucket.isPresent()) {
+			String redisHostname = redisHost.get();
+			String s3hostName = s3Host.get();
+			String s3Username = s3User.get();
+			String s3Password = s3Pass.get();
+			String s3b = s3Bucket.get();
+			WMSCache.getInstance().initRedisS3(redisHostname, s3hostName, s3Username, s3Password, s3b);
+
+			enabled = true;
+		    }
+		    break;
 		default:
 		    enabled = false;
 		}
