@@ -1798,18 +1798,25 @@ public class WIGOSMetadata implements IWIGOSMetadata {
      */
     @Override
     public void setObservationDataUrlArchive(String url) {
+	setObservationDataUrlArchive(List.of(url));
+    }
+
+    public void setObservationDataUrlArchive(List<String> urls) {
 	DistributionInfo distribution = new DistributionInfo();
 	MDDistributionType mdd = new MDDistributionType();
 	MDDigitalTransferOptionsPropertyType transfer = new MDDigitalTransferOptionsPropertyType();
 	MDDigitalTransferOptionsType mdo = new MDDigitalTransferOptionsType();
-	CIOnlineResourcePropertyType online = new CIOnlineResourcePropertyType();
-	CIOnlineResourceType cionline = new CIOnlineResourceType();
-	cionline.setId("_" + UUID.randomUUID().toString());
-	URLPropertyType urlPt = new URLPropertyType();
-	urlPt.setURL("<![CDATA[" + url + "]]>");
-	cionline.setLinkage(urlPt);
-	online.setCIOnlineResource(cionline);
-	mdo.getOnLine().add(online);
+
+	for (String url : urls) {
+	    CIOnlineResourcePropertyType online = new CIOnlineResourcePropertyType();
+	    CIOnlineResourceType cionline = new CIOnlineResourceType();
+	    cionline.setId("_" + UUID.randomUUID().toString());
+	    URLPropertyType urlPt = new URLPropertyType();
+	    urlPt.setURL("<![CDATA[" + url + "]]>");
+	    cionline.setLinkage(urlPt);
+	    online.setCIOnlineResource(cionline);
+	    mdo.getOnLine().add(online);
+	}
 	transfer.setMDDigitalTransferOptions(mdo);
 	mdd.getTransferOptions().add(transfer);
 	distribution.setMDDistribution(mdd);

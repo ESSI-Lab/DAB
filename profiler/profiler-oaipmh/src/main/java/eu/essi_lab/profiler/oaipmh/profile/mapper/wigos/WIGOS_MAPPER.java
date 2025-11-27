@@ -1,7 +1,5 @@
 package eu.essi_lab.profiler.oaipmh.profile.mapper.wigos;
 
-import java.io.ByteArrayInputStream;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -12,29 +10,19 @@ import java.io.ByteArrayInputStream;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,8 +31,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -82,7 +68,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
     // CATEGORY 1: OBSERVED VARIABLE
     /**
      * Sets the Observed variable - measurand (1-01). M* (Phase I)
-     * 
+     *
      * @param observationVariableCode a code from the code list at:
      *        https://docs.google.com/spreadsheets/d/19ZGKKJrpvK-2OsO0TTrewWWC1mCEGgk35xeFN1jxm74/edit#gid=0
      */
@@ -91,7 +77,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
     /**
      * Sets the Measurement unit (1-02). C* (Phase I) Mandatory for variables that are measured, as opposed to
      * classified
-     * 
+     *
      * @param uomCode the unit of measure from the code list at:
      *        https://docs.google.com/spreadsheets/d/129h1yGJZ5m16xETpp-qGEFKBWqAG146RgrWHx-LYcjA/edit#gid=0
      */
@@ -99,7 +85,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
     /**
      * Sets the Temporal extent (1-03). M* (Phase I)
-     * 
+     *
      * @param beginPosition
      * @param endPosition
      */
@@ -107,7 +93,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
     /**
      * Sets the Spatial extent (1-04). M* (Phase I)
-     * 
+     *
      * @param latitude
      * @param longitude
      * @param elevation
@@ -554,8 +540,6 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
 	    String description = iso.getDataIdentification().getAbstract();
 
-
-
 	    String providerId = resource.getSource().getUniqueIdentifier();
 	    String fileIdentifier = iso.getFileIdentifier();
 	    MIPlatform platform = iso.getMIPlatform();
@@ -566,11 +550,10 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).warn("Problem mapping site");
 	    }
-	    
-	    
+
 	    List<String> orgDesc = extensionHandler.getOriginatorOrganisationDescriptions();
 	    List<String> orgId = extensionHandler.getOriginatorOrganisationIdentifiers();
-	    
+
 	    /*
 	     * SET setStationOrPlatformDescription - site information
 	     */
@@ -578,8 +561,10 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    if (description != null && description.contains(toSplit)) {
 		String splittedString = description.split(toSplit)[1];
 		description = "Station" + splittedString;
-	    } else if(siteName != null) {
-		description = orgDesc.isEmpty() ? "Station " + siteName + " located in " + country.getOfficialName() : "Station " + siteName + " located in " + country.getOfficialName() + " - " + orgDesc.get(0);
+	    } else if (siteName != null) {
+		description = orgDesc.isEmpty()
+			? "Station " + siteName + " located in " + country.getOfficialName()
+			: "Station " + siteName + " located in " + country.getOfficialName() + " - " + orgDesc.get(0);
 	    }
 	    record.setStationOrPlatformDescription(description, beginPosition, endPosition);
 
@@ -615,8 +600,10 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    String title = iso.getDataIdentification().getCitationTitle();
 
 	    Online online = iso.getDistribution().getDistributionOnline();
-	    if (online != null) {
-		record.setObservationDataUrlArchive(online.getLinkage());
+	    List<String> links = new ArrayList<>();
+	    iso.getDistribution().getDistributionOnlines().forEachRemaining(o -> links.add(o.getLinkage()));
+	    if (!links.isEmpty()) {
+		record.setObservationDataUrlArchive(links);
 	    }
 
 	    record.addProgramme("WHYCOS");
@@ -672,24 +659,24 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		DatatypeFactory df = DatatypeFactory.newInstance();
 		XMLGregorianCalendar xmlGregorianCalendar = df.newXMLGregorianCalendar(calendar);
 		record.setStationOrPlatformDateEstablished(xmlGregorianCalendar);
-		
+
 		Optional<Date> optEndDate = ISO8601DateTimeUtils.parseISO8601ToDate(endPosition);
-		if(optEndDate.isPresent()) {
+		if (optEndDate.isPresent()) {
 		    GregorianCalendar end_calendar = new GregorianCalendar();
 		    end_calendar.setTime(optEndDate.get());
 		    endMonth = end_calendar.get(Calendar.MONTH) + 1;
 		    endWeekDay = end_calendar.get(Calendar.DAY_OF_WEEK);
 		    endMonth = end_calendar.get(Calendar.MONTH) + 1;
-		    }
+		}
 		// Extract fields
-		startMonth = 1 ;//calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is 0-based
-		endMonth = 12; //startMonth; // same, unless you want a duration
-		startWeekDay = 1; //calendar.get(Calendar.DAY_OF_WEEK); // Sunday = 1 ... Saturday = 7
-		endWeekDay = 7; //startWeekDay;
-		startHour = 0; //calendar.get(Calendar.HOUR_OF_DAY);
-		endHour = 23; //startHour;
-		startMinute = 0; //calendar.get(Calendar.MINUTE);
-		endMinute = 59; //startMinute;
+		startMonth = 1;// calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is 0-based
+		endMonth = 12; // startMonth; // same, unless you want a duration
+		startWeekDay = 1; // calendar.get(Calendar.DAY_OF_WEEK); // Sunday = 1 ... Saturday = 7
+		endWeekDay = 7; // startWeekDay;
+		startHour = 0; // calendar.get(Calendar.HOUR_OF_DAY);
+		endHour = 23; // startHour;
+		startMinute = 0; // calendar.get(Calendar.MINUTE);
+		endMinute = 59; // startMinute;
 	    }
 
 	    /*
@@ -778,118 +765,113 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 			beginPosition, endPosition);
 	    } else {
 		// other methods for responsible party
-		
+
 		if (!orgDesc.isEmpty())
 		    record.setFacilityContact(null, orgDesc.get(0), null, null, null, null, null, isoC, null, beginPosition, endPosition);
 	    }
-	    try {
 
-		// TODO: to uncomment the following line we need to be sure that MDMetadata are valid respecting ISO
-		// 19115 specification
+	    // TODO: to uncomment the following line we need to be sure that MDMetadata are valid respecting ISO
+	    // 19115 specification
 
-		// record.setMDMetadata(convertMetadata(resource.getHarmonizedMetadata().getCoreMetadata().getReadOnlyMDMetadata()));
+	    // record.setMDMetadata(convertMetadata(resource.getHarmonizedMetadata().getCoreMetadata().getReadOnlyMDMetadata()));
 
-		Optional<String> variableUnits = extensionHandler.getAttributeUnitsURI();
+	    Optional<String> variableUnits = extensionHandler.getAttributeUnitsURI();
 
-		Optional<String> labelUnits = extensionHandler.getAttributeUnits();
-		Optional<String> units = extensionHandler.getAttributeUnitsAbbreviation();
-		if(variableUnits.isPresent()){
-		    String measure = variableUnits.get();
-		    measure = measure.contains("m3_s-1") ? "http://codes.wmo.int/wmdr/unit/m3.s-1": measure;
-		    record.setMeasurementUnit(measure);
-		} else if (units.isPresent()) {
-		    record.setMeasurementUnit(units.get());
-		} else {
-		    // TODO: decode the unit of measure
-		    // extensionHandler.getAttributeUnits()
-		    // if (isAfrica) {
-		    // record.setMeasurementUnit("m³/s");
-		    // } else {
-		    // record.setMeasurementUnit("mm");
-		    // }
-		    // record.setMeasurementUnit("mm");
-		    GSLoggerFactory.getLogger(getClass()).error("NO VALID UNITS OF MEASURE CODE!!!");
-		}
-
-		Optional<String> riverBasin = extensionHandler.getRiverBasin();
-
-		Optional<String> optionalVariableCode = extensionHandler.getObservedPropertyURI();
-		String code = null;
-		HashSet<String> uris = new HashSet<>();
-		if (optionalVariableCode.isPresent()) { // http://hydro.geodab.eu/hydro-ontology/concept/33 -> null
-							// value
-		    List<SKOSConcept> concepts = ontology.findConcepts(optionalVariableCode.get(), true, false);
-		    for (SKOSConcept concept : concepts) {
-			if (concept != null) {
-			    GSLoggerFactory.getLogger(getClass()).info("CONCEPT URI: " + concept.getURI());
-			    uris.add(concept.getURI());
-			}
-		    }
-		}
-
-		/*
-		 * WMO OBSERVED PROPERTIES:
-		 * https://codes.wmo.int/wmdr/_ObservedVariableAtmosphere
-		 * https://codes.wmo.int/wmdr/_ObservedVariableTerrestrial
-		 * https://codes.wmo.int/wmdr/_ObservedVariableOcean
-		 */
-		// TODO: implement code depending on variable
-		for (String s : uris) {
-		    if (s.contains("codes.wmo.int")) {
-			code = s;
-			break;
-		    }
-
-		}
-
-		if (code != null) {
-		    record.setObservedVariable(name, code);
-		} else {
-		    // TODO found another way to add the relative code
-		    // record.setObservedVariable(name,
-		    // code);//http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171
-		    // record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213");
-
-		    if (name.toLowerCase().contains("precipitation")) {
-			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/210");
-		    } else if (name.toLowerCase().contains("height")) {
-			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/172");
-		    } else if (name.toLowerCase().contains("discharge")) {
-			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
-		    } else if (name.toLowerCase().contains("temperature")) {
-			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
-		    } else if (name.toLowerCase().contains("temperature")) {
-			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
-		    } else if (name.toLowerCase().contains("humidity")) {
-			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12249");
-		    } else if (name.toLowerCase().contains("pressure")) {
-			record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/216");
-		    }
-
-		    GSLoggerFactory.getLogger(getClass()).error("NO VALID OBSERVED PROPERTIES CODE!!!");
-
-		}
-
-		// resultTime seems to be mandatory for OSCAR
-		record.setResultTime(null);
-		record.setDatGenarationValidPeriod(beginPosition, endPosition);
-
-		record.setObservationGeometryType("point");
-
-		// it seems that wmdr:observation should be inside the facility>ObservingFacility
-		record.setObservationInFacility();
-
-	    } catch (Exception e) {
-		e.printStackTrace();
+	    Optional<String> labelUnits = extensionHandler.getAttributeUnits();
+	    Optional<String> units = extensionHandler.getAttributeUnitsAbbreviation();
+	    if (variableUnits.isPresent()) {
+		String measure = variableUnits.get();
+		measure = measure.contains("m3_s-1") ? "http://codes.wmo.int/wmdr/unit/m3.s-1" : measure;
+		record.setMeasurementUnit(measure);
+	    } else if (units.isPresent()) {
+		record.setMeasurementUnit(units.get());
+	    } else {
+		// TODO: decode the unit of measure
+		// extensionHandler.getAttributeUnits()
+		// if (isAfrica) {
+		// record.setMeasurementUnit("m³/s");
+		// } else {
+		// record.setMeasurementUnit("mm");
+		// }
+		// record.setMeasurementUnit("mm");
+		GSLoggerFactory.getLogger(getClass()).error("NO VALID UNITS OF MEASURE CODE!!!");
 	    }
+
+	    Optional<String> riverBasin = extensionHandler.getRiverBasin();
+
+	    Optional<String> optionalVariableCode = extensionHandler.getObservedPropertyURI();
+	    String code = null;
+	    HashSet<String> uris = new HashSet<>();
+	    if (optionalVariableCode.isPresent()) { // http://hydro.geodab.eu/hydro-ontology/concept/33 -> null
+		// value
+		List<SKOSConcept> concepts = ontology.findConcepts(optionalVariableCode.get(), true, false);
+		for (SKOSConcept concept : concepts) {
+		    if (concept != null) {
+			GSLoggerFactory.getLogger(getClass()).info("CONCEPT URI: " + concept.getURI());
+			uris.add(concept.getURI());
+		    }
+		}
+	    }
+
+	    /*
+	     * WMO OBSERVED PROPERTIES:
+	     * https://codes.wmo.int/wmdr/_ObservedVariableAtmosphere
+	     * https://codes.wmo.int/wmdr/_ObservedVariableTerrestrial
+	     * https://codes.wmo.int/wmdr/_ObservedVariableOcean
+	     */
+	    // TODO: implement code depending on variable
+	    for (String s : uris) {
+		if (s.contains("codes.wmo.int")) {
+		    code = s;
+		    break;
+		}
+
+	    }
+
+	    if (code != null) {
+		record.setObservedVariable(name, code);
+	    } else {
+		// TODO found another way to add the relative code
+		// record.setObservedVariable(name,
+		// code);//http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171
+		// record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213");
+
+		if (name.toLowerCase().contains("precipitation")) {
+		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/210");
+		} else if (name.toLowerCase().contains("height") || name.toLowerCase().contains("level")) {
+		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/172");
+		} else if (name.toLowerCase().contains("discharge")) {
+		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
+		} else if (name.toLowerCase().contains("temperature")) {
+		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
+		} else if (name.toLowerCase().contains("humidity")) {
+		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12249");
+		} else if (name.toLowerCase().contains("pressure")) {
+		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/216");
+		}
+
+		GSLoggerFactory.getLogger(getClass()).error("NO VALID OBSERVED PROPERTIES CODE!!!");
+
+	    }
+
+	    // resultTime seems to be mandatory for OSCAR
+	    record.setResultTime(null);
+	    record.setDatGenarationValidPeriod(beginPosition, endPosition);
+
+	    record.setObservationGeometryType("point");
+
+	    // it seems that wmdr:observation should be inside the facility>ObservingFacility
+	    record.setObservationInFacility();
 
 	    Document doc = WIGOSMetadata.getBuilder().newDocument();
 	    ObjectFactory of = new ObjectFactory();
 	    WIGOSMetadata.getMarshaller().marshal(of.createWIGOSMetadataRecord(record.getRecord()), doc);
 	    Element ret = doc.getDocumentElement();
 	    return ret;
+
 	} catch (Exception e) {
 	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 	    return null;
 	}
     }
@@ -978,17 +960,17 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    writer.setText("//*:Territory/*:validPeriod/*:TimePeriod/*:beginPosition", minDate);
 	    writer.setText("//*:GeospatialLocation/*:validPeriod/*:TimePeriod/*:endPosition", maxDate);
 	    writer.setText("//*:Territory/*:validPeriod/*:TimePeriod/*:endPosition", maxDate);
-	    
-	    if(end != null) {
-		//Calendar now = Calendar.getInstance();
-	        Calendar oneYearAgo = Calendar.getInstance();
-	        oneYearAgo.add(Calendar.MONTH, -12);
-	        if(end.before(oneYearAgo.getTime())){
-	            writer.setText("//*:ReportingStatus/*:reportingStatus/@*:href", "http://codes.wmo.int/wmdr/ReportingStatus/unknown");
-	            GSLoggerFactory.getLogger(getClass()).info("NOT OPERATIONAL");
-	            
-	        }
-	        
+
+	    if (end != null) {
+		// Calendar now = Calendar.getInstance();
+		Calendar oneYearAgo = Calendar.getInstance();
+		oneYearAgo.add(Calendar.MONTH, -12);
+		if (end.before(oneYearAgo.getTime())) {
+		    writer.setText("//*:ReportingStatus/*:reportingStatus/@*:href", "http://codes.wmo.int/wmdr/ReportingStatus/unknown");
+		    GSLoggerFactory.getLogger(getClass()).info("NOT OPERATIONAL");
+
+		}
+
 	    }
 	    for (Node n : observationList) {
 		String xpath = "//*:ObservingFacility";
