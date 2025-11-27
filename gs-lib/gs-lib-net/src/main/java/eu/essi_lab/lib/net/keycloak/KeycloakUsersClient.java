@@ -439,6 +439,29 @@ public class KeycloakUsersClient {
      * @throws IOException
      * @throws InterruptedException
      */
+    public boolean deleteByUserName(String accessToken, String userName) throws IOException, InterruptedException {
+
+	String userId = findId(accessToken,userName).get();
+
+	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users/" + userId;
+
+	HttpRequest request = HttpRequest.newBuilder().//
+		uri(URI.create(url)).//
+		header("Authorization", "Bearer " + accessToken).//
+		DELETE().//
+		build();
+
+	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+	return response.statusCode() == 204;
+    }
+
+    /**
+     * @param accessToken
+     * @param userId
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public boolean delete(String accessToken, String userId) throws IOException, InterruptedException {
 
 	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users/" + userId;
