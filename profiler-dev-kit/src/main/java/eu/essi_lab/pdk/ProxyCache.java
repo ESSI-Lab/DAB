@@ -119,7 +119,7 @@ public class ProxyCache {
 	return getCachedResponse(request);
     }
 
-    public Response cloneResponse(Response response) {
+    public static Response cloneResponse(Response response) {
 	Object entity = response.getEntity();
 	InputStream originalInputStream;
 	if (entity instanceof StreamingOutput) {
@@ -131,7 +131,7 @@ public class ProxyCache {
 	} else if (entity instanceof InputStream) {
 	    originalInputStream = (InputStream) entity;
 	} else {
-	    GSLoggerFactory.getLogger(getClass()).error("[PROXY-CACHE] error cloning response");
+	    GSLoggerFactory.getLogger(ProxyCache.class).error("[PROXY-CACHE] error cloning response");
 	    return null;
 	}
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
