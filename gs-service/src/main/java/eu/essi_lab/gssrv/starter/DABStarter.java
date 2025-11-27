@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -44,6 +44,7 @@ import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
+import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.Setting;
@@ -570,33 +571,28 @@ public class DABStarter {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Ontology setting patch STARTED");
 
-	    ArrayList<Setting> list = new ArrayList<>();
+	    SettingPropertyReplacePatch ontologySettingPatch = SettingPropertyReplacePatch.of(//
+		    configuration,//
+		    Setting.SETTING_CLASS,//
+		    "eu.essi_lab.cfga.gs.setting.OntologySetting",//
+		    "eu.essi_lab.cfga.gs.setting.ontology.OntologySetting");//
 
-	    ConfigurationUtils.deepFind(configuration, s -> s.getObject().getString(Setting.SETTING_CLASS.getKey())
-		    .equals("eu.essi_lab.cfga.gs.setting.OntologySetting"), list);
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Found {} legacy ontology settings to convert", list.size());
-
-	    if (!list.isEmpty()) {
-
-		List<Setting> converted = list.stream().map(s -> s.getObject().toString().replace( //
-			"eu.essi_lab.cfga.gs.setting.OntologySetting", //
-			"eu.essi_lab.cfga.gs.setting.ontology.OntologySetting")).//
-			map(Setting::new).//
-			toList();
-
-		for (Setting setting : list) {
-		    configuration.remove(setting.getIdentifier());
-		}
-
-		for (Setting s : converted) {
-		    configuration.put(s);
-		}
-
-		configuration.flush();
-	    }
+	    ontologySettingPatch.patch();
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Ontology setting patch ENDED");
+
+	    // ------------------------------------------------------------------
+	    //
+	    // - Setting.EXTENSION patch
+	    //
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Setting extension patch STARTED");
+
+	    SettingPropertyRemoveClass extensionPatch = SettingPropertyRemoveClass.of(configuration, Setting.EXTENSION);
+
+	    extensionPatch.patch();
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Setting extension patch ENDED");
 
 	    //
 	    //
@@ -959,6 +955,7 @@ public class DABStarter {
     }
 
     /**
+     *
      */
     private void startSchedulerLate() {
 
