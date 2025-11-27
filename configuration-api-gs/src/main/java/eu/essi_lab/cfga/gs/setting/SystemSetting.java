@@ -63,6 +63,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     private static final String ENABLE_DOWNLOAD_MAIL_REPORTS_OPTION_KEY = "enableMailDownloadReport";
     private static final String ENABLE_ERROR_LOGS_MAIL_REPORTS_OPTION_KEY = "enableErrorLogsReport";
     private static final String EMAIL_SETTING_ID = "emailSetting";
+    private static final String WMS_CACHE_SETTING_ID = "wmsCacheSetting";
     private static final String USERS_DATABASE_SETTING_ID = "usersDatabase";
     private static final String SEM_SEARCH_SETTING_ID = "defSemanticSearch";
 
@@ -262,6 +263,15 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	emailSetting.setIdentifier(EMAIL_SETTING_ID);
 
 	addSetting(emailSetting);
+	
+	//
+	// WMS Cache settings
+	//
+
+	WMSCacheSetting wmsCacheSetting = new WMSCacheSetting();
+	wmsCacheSetting.setIdentifier(WMS_CACHE_SETTING_ID);
+
+	addSetting(wmsCacheSetting);
 
 	//
 	// Statistics
@@ -504,6 +514,24 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	if (emailSetting.isEnabled()) {
 
 	    return Optional.of(emailSetting);
+	}
+
+	return Optional.empty();
+    }
+    
+    //
+    // WMS Cache
+    //
+
+    /**
+     * @return
+     */
+    public Optional<WMSCacheSetting> getWMSCacheSetting() {
+
+	WMSCacheSetting setting = getSetting(WMS_CACHE_SETTING_ID, WMSCacheSetting.class).get();
+	if (setting.isEnabled()) {
+
+	    return Optional.of(setting);
 	}
 
 	return Optional.empty();
