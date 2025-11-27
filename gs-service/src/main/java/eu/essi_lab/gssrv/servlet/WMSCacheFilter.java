@@ -66,9 +66,11 @@ public class WMSCacheFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+	// init at startup
+	initWMSCache();
 
 	ConfigurationWrapper.getConfiguration().get().addChangeEventListener(l -> {
-
+	    // init upon configuration changes
 	    initWMSCache();
 	});
     }
@@ -220,7 +222,7 @@ public class WMSCacheFilter implements Filter {
 		    WMSCache.getInstance().initInMemory(n);
 		    enabled = true;
 		}
-		case REDIS: {
+		case REDIS_S3: {
 		    enabled = true;
 		}
 		default:

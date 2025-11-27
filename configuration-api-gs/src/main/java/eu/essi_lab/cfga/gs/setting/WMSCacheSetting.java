@@ -1,35 +1,9 @@
 package eu.essi_lab.cfga.gs.setting;
 
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
 
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
-import eu.essi_lab.cfga.option.IntegerOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -42,8 +16,13 @@ import eu.essi_lab.lib.utils.LabeledEnum;
 public class WMSCacheSetting extends Setting {
 
     private static final String WMSCACHE_MODE_KEY = "wmsCacheMode";
-    private static final String WMS_CACHE_HOSTNAME_KEY = "wmsCacheHostname";
-    private static final String WMS_CACHE_PASSWORD_KEY = "wmsCachePassword";
+    private static final String WMS_CACHE_REDIS_HOSTNAME_KEY = "wmsCacheRedisHostname";
+    private static final String WMS_CACHE_REDIS_USERNAME_KEY = "wmsCacheRedisUsername";
+    private static final String WMS_CACHE_REDIS_PASSWORD_KEY = "wmsCacheRedisPassword";
+    private static final String WMS_CACHE_S3_HOSTNAME_KEY = "wmsCacheS3Hostname";
+    private static final String WMS_CACHE_S3_USERNAME_KEY = "wmsCacheS3Username";
+    private static final String WMS_CACHE_S3_PASSWORD_KEY = "wmsCacheS3Password";
+    private static final String WMS_CACHE_S3_BUCKETNAME = "wmsCacheS3BucketName";
     private static final String WMS_CACHE_FOLDERNAME = "wmsCacheFolderName";
 
     public enum WMSCacheMode implements LabeledEnum {
@@ -59,7 +38,7 @@ public class WMSCacheSetting extends Setting {
 	/**
 	 * 
 	 */
-	REDIS("Redis");
+	REDIS_S3("Redis plus S3");
 
 	private final String name;
 
@@ -103,31 +82,58 @@ public class WMSCacheSetting extends Setting {
 		withSelectedValue(LabeledEnum.values(WMSCacheMode.class).getFirst()).//
 		cannotBeDisabled().//
 		build();
-
 	addOption(compType);
 
 	Option<String> hostname = StringOptionBuilder.get().//
-		withKey(WMS_CACHE_HOSTNAME_KEY).//
-		withLabel("Hostname").//
+		withKey(WMS_CACHE_REDIS_HOSTNAME_KEY).//
+		withLabel("Redis hostname").//
 		cannotBeDisabled().//
 		build();
-
 	addOption(hostname);
+	
+	Option<String> username = StringOptionBuilder.get().//
+		withKey(WMS_CACHE_REDIS_USERNAME_KEY).//
+		withLabel("Redis username").//
+		cannotBeDisabled().//
+		build();
+	addOption(username);
 
 	Option<String> password = StringOptionBuilder.get().//
-		withKey(WMS_CACHE_PASSWORD_KEY).//
-		withLabel("Password").//
+		withKey(WMS_CACHE_REDIS_PASSWORD_KEY).//
+		withLabel("Redis password").//
 		cannotBeDisabled().//
 		build();
-
 	addOption(password);
+	
+	addOption(StringOptionBuilder.get().//
+		withKey(WMS_CACHE_S3_HOSTNAME_KEY).//
+		withLabel("S3 hostname").//
+		cannotBeDisabled().//
+		build());
+	
+	addOption(StringOptionBuilder.get().//
+		withKey(WMS_CACHE_S3_USERNAME_KEY).//
+		withLabel("S3 username").//
+		cannotBeDisabled().//
+		build());
+	
+	addOption(StringOptionBuilder.get().//
+		withKey(WMS_CACHE_S3_PASSWORD_KEY).//
+		withLabel("S3 password").//
+		cannotBeDisabled().//
+		build());
+	
+	addOption(StringOptionBuilder.get().//
+		withKey(WMS_CACHE_S3_BUCKETNAME).//
+		withLabel("S3 bucket name").//
+		cannotBeDisabled().//
+		build());
 
 	Option<String> folder = StringOptionBuilder.get().//
 		withKey(WMS_CACHE_FOLDERNAME).//
 		withLabel("Folder name").//
 		cannotBeDisabled().//
 		build();
-
 	addOption(folder);
     }
 
@@ -166,35 +172,117 @@ public class WMSCacheSetting extends Setting {
     /**
      * @param user
      */
-    public void setHostname(String user) {
+    public void setRedisHostname(String user) {
 
-	getOption(WMS_CACHE_HOSTNAME_KEY, String.class).get().setValue(user);
+	getOption(WMS_CACHE_REDIS_HOSTNAME_KEY, String.class).get().setValue(user);
     }
 
     /**
      * @return
      */
-    public Optional<String> getHostname() {
+    public Optional<String> getRedisHostname() {
 
-	return getOption(WMS_CACHE_HOSTNAME_KEY, String.class).get().getOptionalValue();
+	return getOption(WMS_CACHE_REDIS_HOSTNAME_KEY, String.class).get().getOptionalValue();
+    }
+    
+    /**
+     * @param user
+     */
+    public void setRedisUser(String user) {
+
+	getOption(WMS_CACHE_REDIS_USERNAME_KEY, String.class).get().setValue(user);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getRedisUser() {
+
+	return getOption(WMS_CACHE_REDIS_USERNAME_KEY, String.class).get().getOptionalValue();
+    }
+
+
+    /**
+     * @param user
+     */
+    public void setRedisPassword(String user) {
+
+	getOption(WMS_CACHE_REDIS_PASSWORD_KEY, String.class).get().setValue(user);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getRedisPassword() {
+
+	return getOption(WMS_CACHE_REDIS_PASSWORD_KEY, String.class).get().getOptionalValue();
     }
 
     /**
      * @param user
      */
-    public void setPassword(String user) {
+    public void setS3Hostname(String user) {
 
-	getOption(WMS_CACHE_PASSWORD_KEY, String.class).get().setValue(user);
+	getOption(WMS_CACHE_S3_HOSTNAME_KEY, String.class).get().setValue(user);
     }
 
     /**
      * @return
      */
-    public Optional<String> getPassword() {
+    public Optional<String> getS3Hostname() {
 
-	return getOption(WMS_CACHE_PASSWORD_KEY, String.class).get().getOptionalValue();
+	return getOption(WMS_CACHE_S3_HOSTNAME_KEY, String.class).get().getOptionalValue();
+    }
+    
+    /**
+     * @param user
+     */
+    public void setS3User(String user) {
+
+	getOption(WMS_CACHE_S3_USERNAME_KEY, String.class).get().setValue(user);
     }
 
+    /**
+     * @return
+     */
+    public Optional<String> getS3User() {
+
+	return getOption(WMS_CACHE_S3_USERNAME_KEY, String.class).get().getOptionalValue();
+    }
+
+
+    /**
+     * @param user
+     */
+    public void setS3Password(String user) {
+
+	getOption(WMS_CACHE_S3_PASSWORD_KEY, String.class).get().setValue(user);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getS3Password() {
+
+	return getOption(WMS_CACHE_S3_PASSWORD_KEY, String.class).get().getOptionalValue();
+    }
+    
+    /**
+     * @param user
+     */
+    public void setS3Bucketname(String user) {
+
+	getOption(WMS_CACHE_S3_BUCKETNAME, String.class).get().setValue(user);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getS3Bucketname() {
+
+	return getOption(WMS_CACHE_S3_BUCKETNAME, String.class).get().getOptionalValue();
+    }
+    
     /**
      * @param user
      */
