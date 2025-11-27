@@ -343,7 +343,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
     public void setMeasurementUnit(String uomCode) {
 	ReportingType reporting = getInnerReporting();
 	ReferenceType referenceType = new ReferenceType();
-	if (uomCode.contains("codes.wmo.int/common/unit/") || uomCode.contains("codes.wmo.int/wmdr/unit/")) {
+	if (uomCode.contains("codes.wmo.int/common/unit/") || uomCode.contains("codes.wmo.int/wmdr/unit/") || uomCode.startsWith("http")) {
 	    referenceType.setHref(uomCode);
 	} else {
 	    referenceType.setHref("http://codes.wmo.int/common/unit/" + uomCode);

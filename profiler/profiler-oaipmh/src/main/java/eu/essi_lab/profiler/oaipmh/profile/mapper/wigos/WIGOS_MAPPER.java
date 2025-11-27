@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.oaipmh.profile.mapper.wigos;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -36,6 +36,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.MDMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
@@ -415,6 +416,9 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
     // Map of lowercase name -> Country
     private static final Map<String, Country> NAME_TO_COUNTRY = new HashMap<>();
     private static final Pattern COUNTRY_PATTERN;
+    
+    /** Regex compiled once for performance. Matches 1..16 alphanumeric chars only. */
+    private static final String STATION_ID_REGEX = "^[A-Za-z0-9]{1,16}$";
 
     static {
 	Set<String> allNames = new HashSet<>();
@@ -433,6 +437,28 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	// Build a single regex pattern like: (argentina|brazil|the republic of paraguay|italy)
 	COUNTRY_PATTERN = Pattern.compile("\\b(" + String.join("|", allNames) + ")\\b", Pattern.CASE_INSENSITIVE);
     }
+    
+    
+    public boolean isValidStationId(String stationId) {
+        if (stationId == null) return false;
+        return stationId.matches(STATION_ID_REGEX);
+    }
+    
+    public String sanitizeStationId(String input) {
+        if (input == null) return null;
+
+        // Remove non-alphanumeric characters
+        String cleaned = input.replaceAll("[^A-Za-z0-9]", "");
+
+        if (cleaned.isEmpty()) return null;
+
+        // Truncate to 16 characters if necessary
+        if (cleaned.length() > 16) {
+            cleaned = cleaned.substring(0, 16);
+        }
+
+        return cleaned;
+    }
 
     @Override
     public Element map(DiscoveryMessage message, GSResource resource) throws GSException {
@@ -447,7 +473,14 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
 	    record = addHeader(record);
 
-	    String name = iso.getCoverageDescription().getAttributeTitle();
+	    CoverageDescription coverage = iso.getCoverageDescription();
+	    String name = null; 
+	    if(coverage != null) {
+		name = coverage.getAttributeTitle();
+	    } else {
+		name = "NO COVERAGE NAME";
+		GSLoggerFactory.getLogger(getClass()).error("NO VALID NAME!!!");
+	    }
 
 	    // south africa --- > River discharge
 	    // argentina ------> ???
@@ -577,6 +610,11 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    }
 	    stationId = splittedString[splittedString.length - 1];
 	    String initialId = "0-21016-";
+	        
+	    if(!isValidStationId(stationId)) {
+		stationId = sanitizeStationId(stationId);
+	    }
+	    
 	    initialId += regionCode + isoCode + "0-" + stationId;
 	    // if (isAfrica) {
 	    // String[] splittedString = codeId.split("/");
@@ -779,12 +817,16 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
 	    Optional<String> labelUnits = extensionHandler.getAttributeUnits();
 	    Optional<String> units = extensionHandler.getAttributeUnitsAbbreviation();
-	    if (variableUnits.isPresent()) {
+	    if (units.isPresent()) {
+		String unitM = units.get();
+		if(unitM.equals("°C")) {
+		    unitM = "degC";
+		}
+		record.setMeasurementUnit(unitM);
+	    } else if (variableUnits.isPresent()) {
 		String measure = variableUnits.get();
 		measure = measure.contains("m3_s-1") ? "http://codes.wmo.int/wmdr/unit/m3.s-1" : measure;
-		record.setMeasurementUnit(measure);
-	    } else if (units.isPresent()) {
-		record.setMeasurementUnit(units.get());
+		record.setMeasurementUnit(measure);	
 	    } else {
 		// TODO: decode the unit of measure
 		// extensionHandler.getAttributeUnits()
@@ -829,6 +871,10 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    }
 
 	    if (code != null) {
+		if(code.contains("12166")) {
+		    code = "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/224";
+		}
+		    
 		record.setObservedVariable(name, code);
 	    } else {
 		// TODO found another way to add the relative code
@@ -843,7 +889,8 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		} else if (name.toLowerCase().contains("discharge")) {
 		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
 		} else if (name.toLowerCase().contains("temperature")) {
-		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
+		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/224");
+		    //record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
 		} else if (name.toLowerCase().contains("humidity")) {
 		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12249");
 		} else if (name.toLowerCase().contains("pressure")) {
