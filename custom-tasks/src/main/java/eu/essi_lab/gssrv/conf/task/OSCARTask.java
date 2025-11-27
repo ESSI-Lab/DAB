@@ -64,10 +64,12 @@ import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceType;
 import eu.essi_lab.profiler.oaipmh.profile.mapper.wigos.WIGOS_MAPPER;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
@@ -177,6 +179,8 @@ public class OSCARTask extends AbstractCustomTask {
 	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	    // ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
 	    Bond bond;
+	    
+	    Bond b = BondFactory.createResourceTypeBond(ResourceType.DATASET);
 	    if (bbox != null) {
 		bond = BondFactory.createSourceIdentifierBond(split);
 		String[] splittedBox = bbox.split(",");
@@ -187,11 +191,12 @@ public class OSCARTask extends AbstractCustomTask {
 		saExtent.setNorth(Double.valueOf(splittedBox[3]));
 		saExtent.setSouth(Double.valueOf(splittedBox[1]));
 		saExtent.setWest(Double.valueOf(splittedBox[0]));
-		bond = BondFactory.createAndBond(bond, BondFactory.createSpatialEntityBond(BondOperator.INTERSECTS, saExtent));
+		bond = BondFactory.createAndBond(bond, BondFactory.createSpatialEntityBond(BondOperator.INTERSECTS, saExtent), b);
 		// bond = BondFactory.createAndBond(bond, BondFactory.createSimpleValueBond(BondOperator.EQUAL,
 		// MetadataElement.COUNTRY, "South Africa")); //
 	    } else {
 		bond = BondFactory.createSourceIdentifierBond(split);
+		bond = BondFactory.createAndBond(bond, b);
 	    }
 
 	    // ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
