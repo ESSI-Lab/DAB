@@ -120,6 +120,8 @@ public class OpenSearchUtils {
 			values.add(fv.longValue());
 		    } else if (fv.isString()) {
 			values.add(fv.stringValue());
+		    } else if (fv.isNull()) {
+		    	values.add("");
 		    }
 		}
 		SearchAfter sa = new SearchAfter(values);
