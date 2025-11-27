@@ -39,15 +39,12 @@ import org.json.JSONObject;
  */
 
 import org.quartz.JobExecutionContext;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.gssrv.conf.task.CollectionCreatorTask.CollectionCreatorTaskOptions;
-import eu.essi_lab.gssrv.conf.task.bluecloud.BLUECloudDownloadReport;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
@@ -67,15 +64,10 @@ import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.oaipmh.profile.mapper.wigos.WIGOS_MAPPER;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
@@ -85,10 +77,11 @@ public class OSCARTask extends AbstractCustomTask {
     }
     // source_id=argentina-ina
     // view_id=whos
-    // hostname=https://whos.geodab.eu
+
+    public static final String OSCAR_ENDPOINT = "https://oscardepl.wmo.int/surface/rest/api/wmd/upload";
 
     public enum OSCARTaskOptions implements OptionsKey {
-	TOKEN, OSCAR_ENDPOINT, SOURCE, BBOX;
+	TOKEN, OSCAR_ENDPOINT, SOURCE, BBOX, MAX_RECORD;
     }
 
     @Override
@@ -129,6 +122,13 @@ public class OSCARTask extends AbstractCustomTask {
 	String bbox = taskOptions.get().get(OSCARTaskOptions.BBOX);
 
 	String tokenName = "X-WMO-WMDR-Token";
+
+	String maxRecords = taskOptions.get().get(OSCARTaskOptions.MAX_RECORD);
+
+	Integer limit = null;
+	if (maxRecords != null) {
+	    limit = Integer.parseInt(maxRecords);
+	}
 	// String tokenValue = null;
 	// String endpoint = null;
 	// String sourceId = null;
@@ -160,7 +160,7 @@ public class OSCARTask extends AbstractCustomTask {
 	// return;
 	// }
 
-	String finalEndpoint = hostname;
+	String finalEndpoint = OSCAR_ENDPOINT;
 
 	String[] splits = sourceId.split(";");
 
@@ -254,38 +254,8 @@ public class OSCARTask extends AbstractCustomTask {
 		    }
 		}
 
-		// for (GSResource resource : resources) {
-		// i++;
-		// if (i > 1000) {
-		// break main;
-		// }
-		// Element res = wigosMapper.map(discoveryMessage, resource);
-		// String doc = XMLDocumentReader.asString(res);
-		// doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-		// HttpRequest postRequest = HttpRequestUtils.build(//
-		// MethodWithBody.POST, //
-		// endpoint, doc, params);
-		//
-		//// HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
-		////
-		//// InputStream content = response.body();
-		////
-		//// JSONObject jsonObject = JSONUtils.fromStream(content);
-		////
-		//// String xmlStatus = jsonObject.optString("xmlStatus");
-		//// String logs = jsonObject.optString("logs");
-		//// String idResponse = jsonObject.optString("id");
-		////
-		//// System.out.println(xmlStatus + ": " + logs);
-		//
-		// }
-
-		// if (i > 100) {
-		// break main;
-		// }
-
-		if (resources.isEmpty()) {
-		    break;
+		if ((limit != null && oscarMap.size() > limit) || resources.isEmpty()) {
+		    break main;
 		}
 
 	    }
@@ -294,9 +264,19 @@ public class OSCARTask extends AbstractCustomTask {
 		oscarMap.put(platformIdentifier, new ArrayList<>(resList));
 	    }
 	    GSLoggerFactory.getLogger(getClass()).info("OSCAR MAP SIZE" + ": " + oscarMap.size());
-	    oscarMap.forEach((key, gsresource) -> {
+
+	    int count = 0;
+	    for (Map.Entry<String, List<GSResource>> entry : oscarMap.entrySet()) {
+		if (limit != null && count >= limit) {
+		    break;
+		}
+
+		String key = entry.getKey();
+		List<GSResource> gsresources = entry.getValue();
+
 		try {
-		    String doc = wigosMapper.mapStations(gsresource, key);
+
+		    String doc = wigosMapper.mapStations(gsresources, key);
 		    doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
 		    HttpRequest postRequest = HttpRequestUtils.build(//
 			    MethodWithBody.POST, //
@@ -313,12 +293,39 @@ public class OSCARTask extends AbstractCustomTask {
 		    String idResponse = jsonObject.optString("id");
 
 		    GSLoggerFactory.getLogger(getClass()).info("ID_RESPONSE:" + idResponse + "-" + xmlStatus + ": " + logs);
-		    
+		    count++;
 
 		} catch (Exception e) {
-
+		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 		}
-	    });
+
+	    }
+	    // oscarMap.forEach((key, gsresource) -> {
+	    // try {
+	    // String doc = wigosMapper.mapStations(gsresource, key);
+	    // doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+	    // HttpRequest postRequest = HttpRequestUtils.build(//
+	    // MethodWithBody.POST, //
+	    // finalEndpoint, doc, params);
+	    //
+	    // HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
+	    //
+	    // InputStream content = response.body();
+	    //
+	    // JSONObject jsonObject = JSONUtils.fromStream(content);
+	    //
+	    // String xmlStatus = jsonObject.optString("xmlStatus");
+	    // String logs = jsonObject.optString("logs");
+	    // String idResponse = jsonObject.optString("id");
+	    //
+	    // GSLoggerFactory.getLogger(getClass()).info("ID_RESPONSE:" + idResponse + "-" + xmlStatus + ": " + logs);
+	    //
+	    //
+	    // } catch (Exception e) {
+	    // GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
+	    // }
+	    // });
+	    // }
 	}
 
     }
