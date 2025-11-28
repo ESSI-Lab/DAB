@@ -64,6 +64,8 @@ public class TabSheetContent extends TabSheet implements Renderable {
     @Override
     public void render(boolean refresh) {
 
+	setRendered(true);
+
 	list.forEach(rend -> rend.render(refresh));//
     }
 
