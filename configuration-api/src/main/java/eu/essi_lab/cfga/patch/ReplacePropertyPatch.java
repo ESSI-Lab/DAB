@@ -7,8 +7,8 @@ import eu.essi_lab.lib.utils.*;
 import java.util.*;
 
 /**
- * This patch finds all the configuration settings having the given <code>property</code> value equals to the given
- * <code>legacyValue</code>, and replaces it with the new given <code>newValue</code>
+ * This patch finds all the configuration settings having the given <code>property</code> value equals
+ * to <code>legacyValue</code>, and replaces it with <code>newValue</code>
  *
  * @author Fabrizio
  */
@@ -48,9 +48,10 @@ public class ReplacePropertyPatch extends Patch {
     }
 
     /**
+     * @return
      * @throws Exception
      */
-    public void doPatch() throws Exception {
+    public boolean doPatch() throws Exception {
 
 	ArrayList<Setting> list = new ArrayList<>();
 
@@ -78,6 +79,10 @@ public class ReplacePropertyPatch extends Patch {
 	    for (Setting s : converted) {
 		getConfiguration().put(s);
 	    }
+
+	    return true;
 	}
+
+	return false;
     }
 }

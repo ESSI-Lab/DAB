@@ -28,26 +28,21 @@ import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 /**
  * @author Fabrizio
  */
-public class ConfigHandler {
-
-    private final TabContentDescriptor descriptor;
+public class ConfigHandlerTabDescriptor extends TabContentDescriptor {
 
     /**
      *
      */
-    public ConfigHandler() {
+    public ConfigHandlerTabDescriptor() {
 
 	Div mainLayout = new Div();
 	mainLayout.setWidthFull();
 
 	TabSheet tabSheet = new TabSheet();
 
-	ConfigExporter configExporter = new ConfigExporter();
-	ConfigImporter configImporter = new ConfigImporter();
+	tabSheet.add("Import", new ConfigImporter());
 
-	tabSheet.add("Import", configImporter.getMainLayout());
-
-	tabSheet.add("Export", configExporter.getMainLayout());
+	tabSheet.add("Export", new ConfigExporter());
 
 	mainLayout.add(tabSheet);
 
@@ -55,18 +50,7 @@ public class ConfigHandler {
 	//
 	//
 
-	descriptor = TabContentDescriptorBuilder.get().//
-		withLabel("Configuration").//
-		withComponent(mainLayout).//
-		build();
-
-    }
-
-    /**
-     * @return
-     */
-    public TabContentDescriptor get() {
-
-	return descriptor;
+	setLabel("Configuration");
+	setContent(mainLayout);
     }
 }

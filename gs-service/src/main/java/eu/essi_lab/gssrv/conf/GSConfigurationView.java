@@ -36,7 +36,7 @@ import eu.essi_lab.cfga.gs.setting.augmenter.worker.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.oauth.*;
-import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.*;
+import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.gs.task.*;
 import eu.essi_lab.cfga.gui.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
@@ -507,11 +507,11 @@ public class GSConfigurationView extends ConfigurationView {
 		new OAuthSetting.TabDescriptorProvider(),//
 		new CredentialsSetting.TabDescriptorProvider(),//
 		new DataCacheConnectorSettingImpl.TabDescriptorProvider(),//
-		new Brokering(),//
-		new System(),//
-		new Sources(),//
-		new AboutComponentInfo(),
-		new TabDescriptorProvider()//
+		new BrokeringTabDescriptor(),//
+		new SystemTabDescriptor(),//
+		new SourcesTabDescriptor(),//
+		new AboutTabDescriptor(),
+		new OntologySetting.TabDescriptorProvider()//
 	);
     }
 

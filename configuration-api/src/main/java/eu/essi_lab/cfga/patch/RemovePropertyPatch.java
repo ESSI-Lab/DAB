@@ -35,9 +35,10 @@ public class RemovePropertyPatch extends Patch {
     }
 
     /**
+     * @return
      * @throws Exception
      */
-    public void doPatch() throws Exception {
+    public boolean doPatch() throws Exception {
 
 	ArrayList<Setting> list = new ArrayList<>();
 
@@ -78,6 +79,10 @@ public class RemovePropertyPatch extends Patch {
 	    for (Setting s : converted) {
 		getConfiguration().put(s);
 	    }
+
+	    return true;
 	}
+
+	return false;
     }
 }

@@ -13,12 +13,12 @@ package eu.essi_lab.gssrv.conf;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -44,23 +44,21 @@ import java.io.InputStream;
 /**
  * @author Fabrizio
  */
-public class ConfigExporter {
+public class ConfigExporter extends VerticalLayout {
 
     /**
      *
      */
     private static final String DEFAULT_CONFIG_NAME = "gs-configuration.json";
-    private final VerticalLayout mainLayout;
 
     /**
      *
      */
     public ConfigExporter() {
 
-	mainLayout = new VerticalLayout();
-	mainLayout.getStyle().set("margin-top", "5px");
-	mainLayout.setWidthFull();
-	mainLayout.setHeightFull();
+	getStyle().set("margin-top", "5px");
+	setWidthFull();
+	setHeightFull();
 
 	//
 	//
@@ -140,7 +138,7 @@ public class ConfigExporter {
 
 	msgDiv.setWidthFull();
 	msgDiv.getStyle().set("padding-top", "10px");
-	msgDiv.getStyle().set("font-size", "17px");
+	msgDiv.getStyle().set("font-size", "16px");
 
 	setInfoMessage(msgDiv, "Enter the folder path where to export the configuration and click the 'Export configuration button'");
 
@@ -148,16 +146,8 @@ public class ConfigExporter {
 	//
 	//
 
-	mainLayout.add(msgDiv);
-	mainLayout.add(exportLayout);
-    }
-
-    /**
-     * @return
-     */
-    public VerticalLayout getMainLayout() {
-
-	return mainLayout;
+	add(msgDiv);
+	add(exportLayout);
     }
 
     /**

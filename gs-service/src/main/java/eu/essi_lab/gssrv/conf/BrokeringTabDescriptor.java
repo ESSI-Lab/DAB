@@ -32,12 +32,12 @@ import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
  * @author Fabrizio
  *
  */
-public class Brokering extends TabDescriptor {
+public class BrokeringTabDescriptor extends TabDescriptor {
 
     /**
      *
      */
-    public Brokering() {
+    public BrokeringTabDescriptor() {
 
 	setLabel("Brokering");
 

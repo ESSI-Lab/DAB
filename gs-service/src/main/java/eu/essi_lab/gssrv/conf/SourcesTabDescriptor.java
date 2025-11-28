@@ -8,12 +8,12 @@ import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 /**
  * @author Fabrizio
  */
-public class Sources extends TabDescriptor {
+public class SourcesTabDescriptor extends TabDescriptor {
 
     /**
      *
      */
-    public Sources() {
+    public SourcesTabDescriptor() {
 
 	setLabel("Sources");
 

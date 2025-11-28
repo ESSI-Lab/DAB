@@ -40,12 +40,12 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  * 
  * @author Fabrizio
  */
-public class AboutComponentInfo extends TabDescriptor {
+public class AboutTabDescriptor extends TabDescriptor {
 
     /**
      * 
      */
-    public AboutComponentInfo() {
+    public AboutTabDescriptor() {
 
 	setLabel("About");
 

@@ -46,7 +46,7 @@ public class TabContentDescriptor {
     /**
      *
      */
-    TabContentDescriptor() {
+    public TabContentDescriptor() {
 
 	directiveManager = new DirectiveManager();
     }

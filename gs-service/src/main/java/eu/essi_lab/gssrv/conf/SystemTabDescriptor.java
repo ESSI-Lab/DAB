@@ -12,12 +12,12 @@ import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
  * @author Fabrizio
  *
  */
-public class System extends TabDescriptor {
+public class SystemTabDescriptor extends TabDescriptor {
 
     /**
      *
      */
-    public System() {
+    public SystemTabDescriptor() {
 
 	setLabel("System");
 
@@ -26,11 +26,11 @@ public class System extends TabDescriptor {
 	addContentDescriptors(
 		new SystemSetting.DescriptorProvider().get(), //
 		new DatabaseSetting.DescriptorProvider().get(),//
-		new DriverSetting.DescriptorProvider().get(),//
 		new SchedulerViewSetting.DescriptorProvider().get(),//
+		new DriverSetting.DescriptorProvider().get(),//
 		new DownloadSetting.DescriptorProvider().get(),//
 		new RateLimiterSetting.DescriptorProvider().get(),//
-		new ConfigHandler().get()
+		new ConfigHandlerTabDescriptor()
 	);
     }
 }

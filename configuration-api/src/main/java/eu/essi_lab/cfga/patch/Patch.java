@@ -30,15 +30,16 @@ public abstract class Patch {
      */
     public void patch() throws Exception {
 
-	doPatch();
+	if (doPatch()) {
 
-	getConfiguration().getSource().backup();
-	getConfiguration().flush();
+	    getConfiguration().getSource().backup();
+	    getConfiguration().flush();
+	}
     }
 
     /**
-     *
+     * @return
      */
-    public abstract void doPatch() throws Exception;
+    public abstract boolean doPatch() throws Exception;
 
 }
