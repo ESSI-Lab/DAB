@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensearch
+  template:
+    metadata:
+      labels:
+        app: opensearch
+    spec:
+      containers:
+      - name: opensearch
+        image: {{ .Values.opensearch.image }}
+        env:
+        - name: discovery.type
+          value: "single-node"
+        - name: bootstrap.memory_lock
+          value: "true"
+        - name: DISABLE_INSTALL_DEMO_CONFIG
+          value: "true"
+        - name: DISABLE_SECURITY_PLUGIN
+          value: "true"
+        - name: OPENSEARCH_JAVA_OPTS
+          value: "{{ .Values.opensearch.javaOpts }}"
+        ports:
+        - containerPort: {{ .Values.opensearch.port }}
+        resources: {}

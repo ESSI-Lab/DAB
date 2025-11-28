@@ -1,0 +1,15 @@
+opensearch:
+  image: "opensearchproject/opensearch:2.18.0"
+  port: 9200
+  javaOpts: "-Xms512m -Xmx512m"
+
+dashboard:
+  image: "opensearchproject/opensearch-dashboards:2.18.0"
+  port: 5601
+
+dab:
+  image: "essilab/essilab:dab-49"
+  port: 8080
+  env:
+    DAB_SKIP_AUTHORIZATION: "true"
+    EU_FLORA_ESSI_GI_PROJECT_EXECUTION: "mixed"
