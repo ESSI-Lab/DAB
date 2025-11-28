@@ -67,7 +67,7 @@ import eu.essi_lab.messages.web.WebRequest;
 @SuppressWarnings("serial")
 public abstract class ConfigurationView extends AppLayout implements ConfigurationChangeListener, DomEventListener {
 
-    private TabsWithContent tabs;
+    private VerticalTabs tabs;
     private final HorizontalLayout navbarContent;
     private final Label headerLabel;
     private final Image headerImage;
@@ -484,7 +484,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     /**
      * @return
      */
-    public TabsWithContent getTabs() {
+    public VerticalTabs getTabs() {
 
 	return tabs;
     }

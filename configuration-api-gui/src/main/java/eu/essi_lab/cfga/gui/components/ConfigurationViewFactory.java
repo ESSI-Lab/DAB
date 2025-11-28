@@ -31,7 +31,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tabs.Orientation;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.*;
@@ -67,9 +66,9 @@ public class ConfigurationViewFactory {
     /**
      * @return
      */
-    public static TabsWithContent createTabs() {
+    public static VerticalTabs createTabs() {
 
-	TabsWithContent tabs = new TabsWithContent();
+	VerticalTabs tabs = new VerticalTabs();
 	tabs.getStyle().set("padding-left", "15px");
 
 	return tabs;
@@ -129,10 +128,10 @@ public class ConfigurationViewFactory {
 
 	DirectiveManager directiveManager = descriptor.getDirectiveManager();
 
-	TabContent container = ComponentFactory.createNoSpacingNoMarginTabContainer(
+	TabContent content = ComponentFactory.createNoSpacingNoMarginTabContainer(
 		"tab-container-vertical-layout-for-" + descriptor.getLabel());
 
-	container.init(configuration, descriptor, tabDescriptor);
+	content.init(configuration, descriptor, tabDescriptor);
 
 	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
 
@@ -142,8 +141,8 @@ public class ConfigurationViewFactory {
 
 	Optional<EditDirective> editDirective = directiveManager.get(EditDirective.class);
 
-	container.setRemoveDirective(removeDirective);
-	container.setEditDirective(editDirective);
+	content.setRemoveDirective(removeDirective);
+	content.setEditDirective(editDirective);
 
 	HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
 		"tab-container-header-layout-for-" + descriptor.getLabel());
@@ -151,7 +150,7 @@ public class ConfigurationViewFactory {
 	headerLayout.setAlignItems(Alignment.BASELINE);
 	headerLayout.setId(TabContent.TAB_HEADER_ID_PREFIX + "_" + descriptor.getLabel());
 
-	container.add(headerLayout);
+	content.add(headerLayout);
 
 	Label tabLabel = new Label();
 	tabLabel.setWidthFull();
@@ -191,16 +190,16 @@ public class ConfigurationViewFactory {
 
 	addDirective.ifPresent(dir -> {
 
-	    Button addButton = SettingComponentFactory.createSettingAddButton(configuration, container, dir);
+	    Button addButton = SettingComponentFactory.createSettingAddButton(configuration, content, dir);
 	    headerLayout.add(addButton);
 	});
 
 	if (tabDescriptor.getIndex() == 0) {
 
-	    container.render();
+	    content.render();
 	}
 
-	return container;
+	return content;
     }
 
     /**
