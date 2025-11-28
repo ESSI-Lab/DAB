@@ -12,7 +12,7 @@ import java.util.*;
  *
  * @author Fabrizio
  */
-public class SettingPropertyReplacePatch extends Patch {
+public class ReplacePropertyPatch extends Patch {
 
     private final Property<?> property;
     private final String legacyValue;
@@ -26,9 +26,9 @@ public class SettingPropertyReplacePatch extends Patch {
      * @param newValue
      * @return
      */
-    public static SettingPropertyReplacePatch of(Configuration configuration, Property<?> property, String legacyValue, String newValue) {
+    public static ReplacePropertyPatch of(Configuration configuration, Property<?> property, String legacyValue, String newValue) {
 
-	return new SettingPropertyReplacePatch(configuration, property, legacyValue, newValue);
+	return new ReplacePropertyPatch(configuration, property, legacyValue, newValue);
     }
 
     /**
@@ -38,7 +38,7 @@ public class SettingPropertyReplacePatch extends Patch {
      * @param legacyValue
      * @param newClass
      */
-    private SettingPropertyReplacePatch(Configuration configuration, Property<?> property, String legacyValue, String newClass) {
+    private ReplacePropertyPatch(Configuration configuration, Property<?> property, String legacyValue, String newClass) {
 
 	setConfiguration(configuration);
 
@@ -50,7 +50,7 @@ public class SettingPropertyReplacePatch extends Patch {
     /**
      * @throws Exception
      */
-    public void patch() throws Exception {
+    public void doPatch() throws Exception {
 
 	ArrayList<Setting> list = new ArrayList<>();
 
@@ -78,9 +78,6 @@ public class SettingPropertyReplacePatch extends Patch {
 	    for (Setting s : converted) {
 		getConfiguration().put(s);
 	    }
-
-	    getConfiguration().getSource().backup();
-	    getConfiguration().flush();
 	}
     }
 }

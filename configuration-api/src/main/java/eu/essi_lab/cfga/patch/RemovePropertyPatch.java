@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * @author Fabrizio
  */
-public class SettingPropertyRemoveClass extends Patch {
+public class RemovePropertyPatch extends Patch {
 
     private final Property<?> property;
 
@@ -18,16 +18,16 @@ public class SettingPropertyRemoveClass extends Patch {
      * @param property
      * @return
      */
-    public static SettingPropertyRemoveClass of(Configuration configuration, Property<?> property) {
+    public static RemovePropertyPatch of(Configuration configuration, Property<?> property) {
 
-	return new SettingPropertyRemoveClass(configuration, property);
+	return new RemovePropertyPatch(configuration, property);
     }
 
     /**
      * @param configuration
      * @param property
      */
-    private SettingPropertyRemoveClass(Configuration configuration, Property<?> property) {
+    private RemovePropertyPatch(Configuration configuration, Property<?> property) {
 
 	setConfiguration(configuration);
 
@@ -37,7 +37,7 @@ public class SettingPropertyRemoveClass extends Patch {
     /**
      * @throws Exception
      */
-    public void patch() throws Exception {
+    public void doPatch() throws Exception {
 
 	ArrayList<Setting> list = new ArrayList<>();
 
@@ -78,9 +78,6 @@ public class SettingPropertyRemoveClass extends Patch {
 	    for (Setting s : converted) {
 		getConfiguration().put(s);
 	    }
-
-	    getConfiguration().getSource().backup();
-	    getConfiguration().flush();
 	}
     }
 }

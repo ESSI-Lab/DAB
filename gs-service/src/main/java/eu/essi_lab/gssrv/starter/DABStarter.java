@@ -30,12 +30,9 @@ import eu.essi_lab.cfga.ConfigurationUtils;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.check.*;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.check.scheme.SchemeMethod;
-import eu.essi_lab.cfga.check.scheme.SchemeMethod.CheckMode;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
-import eu.essi_lab.cfga.gs.DefaultConfigurationScheme;
 import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
@@ -529,7 +526,7 @@ public class DABStarter {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Ontology setting patch STARTED");
 
-	    SettingPropertyReplacePatch ontologySettingPatch = SettingPropertyReplacePatch.of(//
+	    ReplacePropertyPatch ontologySettingPatch = ReplacePropertyPatch.of(//
 		    configuration,//
 		    Setting.SETTING_CLASS,//
 		    "eu.essi_lab.cfga.gs.setting.OntologySetting",//
@@ -546,7 +543,7 @@ public class DABStarter {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Setting extension patch STARTED");
 
-	    SettingPropertyRemoveClass extensionPatch = SettingPropertyRemoveClass.of(configuration, Setting.EXTENSION);
+	    RemovePropertyPatch extensionPatch = RemovePropertyPatch.of(configuration, Setting.EXTENSION);
 
 	    extensionPatch.patch();
 

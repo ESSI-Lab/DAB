@@ -28,5 +28,17 @@ public abstract class Patch {
     /**
      * @throws Exception
      */
-    abstract void patch() throws Exception;
+    public void patch() throws Exception {
+
+	doPatch();
+
+	getConfiguration().getSource().backup();
+	getConfiguration().flush();
+    }
+
+    /**
+     *
+     */
+    public abstract void doPatch() throws Exception;
+
 }
