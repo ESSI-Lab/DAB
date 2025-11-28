@@ -154,7 +154,7 @@ public class DABStarter {
 		    GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration fix STARTED");
 
 		    ConfigurationUtils.backup(configuration);
-		    
+
 		    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
 
 			ConfigurationUtils.fix(configuration, similarityCheckResponse.getSettings(), false, false);
@@ -513,7 +513,11 @@ public class DABStarter {
 		    }
 		}
 
-		configuration = FileSource.switchSource(configuration);
+		Optional<File> path = JavaOptions.getValue(JavaOptions.LOCAL_PROD_CONFIG_PATH).map(File::new);
+
+		configuration = path.isPresent() ? //
+			FileSource.switchSource(configuration, path.get()) : //
+			FileSource.switchSource(configuration);
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
