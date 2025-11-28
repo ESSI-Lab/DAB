@@ -23,7 +23,7 @@ package eu.essi_lab.cfga.gs.setting;
 
 import java.util.Optional;
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
@@ -722,20 +722,20 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class CredentialsSettingComponentInfo extends TabPlaceholder {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
 	 *
 	 */
-	public CredentialsSettingComponentInfo() {
+	public TabDescriptorProvider() {
 
 	    setLabel("Credentials");
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(CredentialsSetting.class).//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(CredentialsSetting.class).//
 		    build();
 
 	    setIndex(GSTabIndex.CREDENTIALS.getIndex());
-	    addDescriptor(descriptor);
+	    addContentDescriptor(descriptor);
 	}
     }
 

@@ -52,8 +52,9 @@ import eu.essi_lab.cfga.gui.components.setting.group.CheckComponentsHandler;
 import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
 import eu.essi_lab.cfga.gui.components.setting.listener.SettingRemoveButtonListener;
 import eu.essi_lab.cfga.gui.components.setting.listener.SettingToggleButtonListener;
+import eu.essi_lab.cfga.gui.components.tabs.*;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
-import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
+import eu.essi_lab.cfga.gui.directive.AddDirective;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.Setting;
 

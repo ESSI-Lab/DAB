@@ -33,14 +33,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * 
  * @author Fabrizio
  */
-public class AboutComponentInfo extends TabPlaceholder {
+public class AboutComponentInfo extends TabDescriptor {
 
     /**
      * 
@@ -81,12 +81,12 @@ public class AboutComponentInfo extends TabPlaceholder {
 	verticalLayout.add(build("Build Timestamp", timeStamp));
 	verticalLayout.add(build("Commit", commit));
 
-	TabDescriptor descriptor = TabDescriptorBuilder.get().//
+	TabContentDescriptor descriptor = TabContentDescriptorBuilder.get().//
 		withComponent(verticalLayout).//
 		build();
 
 	setIndex(GSTabIndex.ABOUT.getIndex());
-	addDescriptor(descriptor);
+	addContentDescriptor(descriptor);
     }
 
     /**

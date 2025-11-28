@@ -27,11 +27,11 @@ import com.vaadin.flow.component.Component;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
-import eu.essi_lab.cfga.gui.components.TabContent;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.components.setting.listener.SettingEditButtonConfirmationListener;
-import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
+import eu.essi_lab.cfga.gui.directive.EditDirective;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.validation.ValidationContext;
 

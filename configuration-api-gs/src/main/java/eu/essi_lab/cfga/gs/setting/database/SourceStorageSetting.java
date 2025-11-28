@@ -26,13 +26,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -185,17 +183,17 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class SourceStorageSettingComponentInfo extends TabPlaceholder {
+    public static class DescriptorProvider {
 
-	private final TabDescriptor descriptor;
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 * 
 	 */
-	public SourceStorageSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    descriptor = TabDescriptorBuilder.get(SourceStorageSetting.class).//
-		    withLabel("Storage").//
+	    descriptor = TabContentDescriptorBuilder.get(SourceStorageSetting.class).//
+		    withLabel("Source storage").//
 		    build();
 	}
 
@@ -203,7 +201,7 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	 *
 	 * @return
 	 */
-	public TabDescriptor getDescriptor() {
+	public TabContentDescriptor get() {
 
 	    return descriptor;
 	}

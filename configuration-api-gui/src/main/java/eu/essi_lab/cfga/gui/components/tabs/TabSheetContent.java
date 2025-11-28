@@ -1,4 +1,4 @@
-package eu.essi_lab.gssrv.conf;
+package eu.essi_lab.cfga.gui.components.tabs;
 
 /*-
  * #%L
@@ -21,52 +21,61 @@ package eu.essi_lab.gssrv.conf;
  * #L%
  */
 
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.tabs.*;
-import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.components.*;
+
+import java.util.*;
 
 /**
  * @author Fabrizio
  */
-public class ConfigHandler {
+public class TabSheetContent extends TabSheet implements Renderable {
 
-    private final TabContentDescriptor descriptor;
+    private boolean rendered;
+    private final List<TabContent> list;
 
     /**
      *
      */
-    public ConfigHandler() {
+    public TabSheetContent() {
 
-	Div mainLayout = new Div();
-	mainLayout.setWidthFull();
-
-	TabSheet tabSheet = new TabSheet();
-
-	ConfigExporter configExporter = new ConfigExporter();
-	ConfigImporter configImporter = new ConfigImporter();
-
-	tabSheet.add("Import", configImporter.getMainLayout());
-
-	tabSheet.add("Export", configExporter.getMainLayout());
-
-	mainLayout.add(tabSheet);
-
-	//
-	//
-	//
-
-	descriptor = TabContentDescriptorBuilder.get().//
-		withLabel("Configuration").//
-		withComponent(mainLayout).//
-		build();
-
+	setWidthFull();
+	list = new ArrayList<>();
     }
 
     /**
-     * @return
+     * @param desc
+     * @param content
      */
-    public TabContentDescriptor get() {
+    public void add(String label, TabContent content) {
 
-	return descriptor;
+	super.add(label, content);
+
+	list.add(content);
+    }
+
+    @Override
+    public void setRendered(boolean rendered) {
+
+	this.rendered = true;
+    }
+
+    @Override
+    public void render(boolean refresh) {
+
+	list.forEach(rend -> rend.render(refresh));//
+    }
+
+    @Override
+    public boolean isRendered() {
+
+	return rendered;
+    }
+
+    @Override
+    public Component getComponent() {
+
+	return this;
     }
 }

@@ -24,7 +24,7 @@ package eu.essi_lab.cfga.gs.demo;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.DoubleOptionBuilder;
@@ -307,23 +307,23 @@ public class DemoSetting3 extends Setting {
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting3ComponentInfo extends TabPlaceholder {
+    public static class DemoSetting3TabDescriptor extends TabDescriptor {
 
 	/**
 	 * 
 	 */
-	public DemoSetting3ComponentInfo() {
+	public DemoSetting3TabDescriptor() {
 
 	    setLabel("Demo setting 3");
 
 	    setForceReadOnly(false);
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(DemoSetting3.class).//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(DemoSetting3.class).//
 
  		    build();
 
 	    setIndex(2);
-	    addDescriptor(descriptor);
+	    addContentDescriptor(descriptor);
 	}
     }
 }

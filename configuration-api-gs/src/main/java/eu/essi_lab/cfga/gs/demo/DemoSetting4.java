@@ -21,7 +21,7 @@ package eu.essi_lab.cfga.gs.demo;
  * #L%
  */
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
@@ -48,23 +48,23 @@ public class DemoSetting4 extends Setting {
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting4ComponentInfo extends TabPlaceholder {
+    public static class DemoSetting4TabDescriptor extends TabDescriptor {
 
 	/**
 	 * 
 	 */
-	public DemoSetting4ComponentInfo() {
+	public DemoSetting4TabDescriptor() {
 
 	    setLabel("Demo setting 4");
 	   
 	    setForceReadOnly(false);
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(DemoSetting4.class).//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(DemoSetting4.class).//
 
  		    build();
 
 	    setIndex(1);
-	    addDescriptor(descriptor);
+	    addContentDescriptor(descriptor);
 	}
     }
 }

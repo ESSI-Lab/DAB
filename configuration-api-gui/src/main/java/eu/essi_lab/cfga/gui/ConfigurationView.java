@@ -53,9 +53,10 @@ import com.vaadin.flow.server.VaadinSession;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationChangeListener;
 import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
 import eu.essi_lab.cfga.gui.dialog.EnhancedDialog;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.cfga.gui.extension.TabPlaceholder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.TabDescriptor;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.WebRequest;
@@ -483,7 +484,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     /**
      * @return
      */
-    protected abstract List<TabPlaceholder> getTabPlaceholders();
+    protected abstract List<TabDescriptor> getDescriptors();
 
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
@@ -775,9 +776,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     protected void init(Configuration configuration) {
 
-	getTabPlaceholders().//
+	getDescriptors().//
 		stream().//
-		sorted(Comparator.comparingInt(TabPlaceholder::getIndex)).//
+		sorted(Comparator.comparingInt(TabDescriptor::getIndex)).//
 		forEach(placeholder -> {
 
 	    Renderable content = ConfigurationViewFactory.createTabContent(//

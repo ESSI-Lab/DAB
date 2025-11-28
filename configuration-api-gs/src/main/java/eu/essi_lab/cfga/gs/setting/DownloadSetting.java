@@ -10,22 +10,21 @@ package eu.essi_lab.cfga.gs.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.driver.LocalFolderSetting;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.LabeledEnum;
@@ -111,25 +110,24 @@ public class DownloadSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class DownloadSettingComponentInfo extends TabPlaceholder {
+    public static class DescriptorProvider {
 
-	private final TabDescriptor descriptor;
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public DownloadSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    descriptor = TabDescriptorBuilder.get(DownloadSetting.class).//
+	    descriptor = TabContentDescriptorBuilder.get(DownloadSetting.class).//
 		    withLabel("Download").//
- 		    build();
+		    build();
 	}
 
 	/**
-	 *
 	 * @return
 	 */
-	public TabDescriptor getDescriptor() {
+	public TabContentDescriptor get() {
 
 	    return descriptor;
 	}

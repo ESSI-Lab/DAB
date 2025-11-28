@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.extension;
+package eu.essi_lab.cfga.gui.components.tabs.descriptor;
 
 /*-
  * #%L
@@ -23,7 +23,7 @@ package eu.essi_lab.cfga.gui.extension;
 
 import com.vaadin.flow.component.*;
 import eu.essi_lab.cfga.gui.components.grid.*;
-import eu.essi_lab.cfga.gui.extension.directive.*;
+import eu.essi_lab.cfga.gui.directive.*;
 import eu.essi_lab.cfga.setting.*;
 
 import java.util.*;
@@ -33,7 +33,7 @@ import java.util.*;
  * @author Fabrizio
  *
  */
-public class TabDescriptor {
+public class TabContentDescriptor {
 
     private String label;
     private DirectiveManager directiveManager;
@@ -46,7 +46,7 @@ public class TabDescriptor {
     /**
      *
      */
-    TabDescriptor() {
+    TabContentDescriptor() {
 
 	directiveManager = new DirectiveManager();
     }

@@ -25,12 +25,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.GSSource;
 
@@ -104,16 +103,16 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class GDCSettingComponentInfo extends TabPlaceholder {
+    public static class DescriptorProvider {
 
-	private final TabDescriptor descriptor;
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public GDCSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    descriptor = TabDescriptorBuilder.get(GDCSourcesSetting.class).//
+	    descriptor = TabContentDescriptorBuilder.get(GDCSourcesSetting.class).//
 		    withLabel("GDC Sources").//
 		    build();
 	}
@@ -121,7 +120,7 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 	/**
 	 * @return
 	 */
-	public TabDescriptor getDescriptor() {
+	public TabContentDescriptor get() {
 
 	    return descriptor;
 	}

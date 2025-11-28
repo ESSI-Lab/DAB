@@ -39,8 +39,8 @@ import eu.essi_lab.cfga.gs.setting.oauth.*;
 import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.*;
 import eu.essi_lab.cfga.gs.task.*;
 import eu.essi_lab.cfga.gui.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.gui.dialog.*;
-import eu.essi_lab.cfga.gui.extension.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.*;
@@ -499,19 +499,19 @@ public class GSConfigurationView extends ConfigurationView {
     }
 
     @Override
-    protected List<TabPlaceholder> getTabPlaceholders() {
+    protected List<TabDescriptor> getDescriptors() {
 
 	return Arrays.asList(//
-		new AugmenterWorkerSetting.AugmenterWorkerComponentInfo(),//
-		new CustomTaskSetting.CustomTaskComponentInfo(),//
-		new OAuthSetting.OAuthSettingComponentInfo(),//
-		new CredentialsSetting.CredentialsSettingComponentInfo(),//
-		new DataCacheConnectorSettingImpl.DataCacheConnectorSettingComponentInfo(),//
+		new AugmenterWorkerSetting.TabDescriptorProvider(),//
+		new CustomTaskSetting.TabDescriptorProvider(),//
+		new OAuthSetting.TabDescriptorProvider(),//
+		new CredentialsSetting.TabDescriptorProvider(),//
+		new DataCacheConnectorSettingImpl.TabDescriptorProvider(),//
 		new Brokering(),//
 		new System(),//
 		new Sources(),//
 		new AboutComponentInfo(),
-		new OntologySettingComponentInfo()//
+		new TabDescriptorProvider()//
 	);
     }
 

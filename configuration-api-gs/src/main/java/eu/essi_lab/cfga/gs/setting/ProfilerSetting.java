@@ -35,8 +35,8 @@ import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
-import eu.essi_lab.cfga.gui.extension.*;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -230,14 +230,14 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     /**
      * @author Fabrizio
      */
-    public static class ProfilerComponentInfo extends TabPlaceholder {
+    public static class DescriptorProvider {
 
-	private final TabDescriptor descriptor;
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public ProfilerComponentInfo() {
+	public DescriptorProvider() {
 
 	    String desc = "Manage DAB profilers. Profilers can be added, "
 		    + "and removed; furthermore, their configuration, path and state can be modified. "
@@ -246,7 +246,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 		    + "Once added, the profiler state is \"Online\"; if set to \"Offline\", "
 		    + "its capabilities will no longer be available and each request will return " + "a 404 error code";
 
-	    descriptor = TabDescriptorBuilder.get(ProfilerSetting.class).//
+	    descriptor = TabContentDescriptorBuilder.get(ProfilerSetting.class).//
 
 		    withLabel("Profilers").//
 		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
@@ -282,7 +282,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	/**
 	 * @return
 	 */
-	public TabDescriptor getDescriptor() {
+	public TabContentDescriptor get() {
 
 	    return descriptor;
 	}

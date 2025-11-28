@@ -46,7 +46,7 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContent;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.option.OptionComponent;
 import eu.essi_lab.cfga.gui.components.option.OptionComponentLayout;
 import eu.essi_lab.cfga.gui.components.option.OptionTextField;

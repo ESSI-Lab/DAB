@@ -32,8 +32,8 @@ import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
-import eu.essi_lab.cfga.gui.extension.*;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
@@ -432,16 +432,16 @@ public class OntologySetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class OntologySettingComponentInfo extends TabPlaceholder {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
 	 *
 	 */
-	public OntologySettingComponentInfo() {
+	public TabDescriptorProvider() {
 
 	    setLabel("Ontologies");
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(OntologySetting.class).//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(OntologySetting.class).//
 
  		    withShowDirective(SortDirection.ASCENDING).//
 		    withAddDirective("Add ontology", OntologySetting.class).//
@@ -470,7 +470,7 @@ public class OntologySetting extends Setting implements EditableSetting {
 		    build();
 
 	    setIndex(GSTabIndex.ONTOLOGIES.getIndex());
-	    addDescriptor(descriptor);
+	    addContentDescriptor(descriptor);
 	}
 
 	/**

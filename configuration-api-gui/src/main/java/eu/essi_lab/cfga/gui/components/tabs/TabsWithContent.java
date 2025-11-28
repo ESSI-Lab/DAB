@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.components;
+package eu.essi_lab.cfga.gui.components.tabs;
 
 /*-
  * #%L
@@ -31,6 +31,7 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.Tabs.SelectedChangeEvent;
 
 import eu.essi_lab.cfga.ConfigurationChangeListener;
+import eu.essi_lab.cfga.gui.components.*;
 
 /**
  * In Vaadin tabs are just tabs, they have no control on the tab content.<br>

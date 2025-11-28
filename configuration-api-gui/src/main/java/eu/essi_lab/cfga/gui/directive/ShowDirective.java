@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.extension.directive;
+package eu.essi_lab.cfga.gui.directive;
 
 /*-
  * #%L
@@ -21,39 +21,80 @@ package eu.essi_lab.cfga.gui.extension.directive;
  * #L%
  */
 
+import java.util.Optional;
+
+import com.vaadin.flow.data.provider.SortDirection;
+
 /**
  * @author Fabrizio
  */
-public class EditDirective extends Directive {
+public class ShowDirective extends Directive {
 
     /**
-     * 
+     *
      */
-    public EditDirective() {
+    private SortDirection sortDirection;
+    /**
+     *
+     */
+    private String description;
 
-	setName("Edit setting");
-
-	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
+    /**
+     *
+     */
+    public ShowDirective() {
     }
 
     /**
      * @param name
      * @param settingClass
      */
-    public EditDirective(String name) {
+    public ShowDirective(String name) {
 
 	super(name);
-
-	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
-
     }
 
     /**
      * @param name
      * @param confirmationPolicy
      */
-    public EditDirective(String name, ConfirmationPolicy confirmationPolicy) {
+    public ShowDirective(String name, SortDirection direction) {
 
-	super(name, confirmationPolicy);
+	super(name);
+
+	setSortDirection(direction);
+    }
+
+    /**
+     * @return the sortDirection
+     */
+    public Optional<SortDirection> getSortDirection() {
+
+	return Optional.ofNullable(sortDirection);
+
+    }
+
+    /**
+     * @param sortDirection
+     */
+    public void setSortDirection(SortDirection sortDirection) {
+
+	this.sortDirection = sortDirection;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getDescription() {
+
+	return Optional.ofNullable(description);
+    }
+
+    /**
+     * @param description
+     */
+    public void setDescription(String description) {
+
+	this.description = description;
     }
 }

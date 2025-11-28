@@ -35,8 +35,9 @@ import com.vaadin.flow.component.tabs.Tabs.Orientation;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.*;
-import eu.essi_lab.cfga.gui.extension.*;
-import eu.essi_lab.cfga.gui.extension.directive.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.directive.*;
 
 /**
  * @author Fabrizio
@@ -47,7 +48,6 @@ public class ConfigurationViewFactory {
      *
      */
     private static final float TAB_WIDTH = 1200;
-    static final String TAB_HEADER_ID_PREFIX = "tabHeader";
 
     /**
      * @return
@@ -87,17 +87,17 @@ public class ConfigurationViewFactory {
     public static Renderable createTabContent(//
 	    ConfigurationView view,//
 	    Configuration configuration, //
-	    TabPlaceholder placeholder) {
+	    TabDescriptor tabDescriptor) {
 
 	Renderable content = null;
 
-	List<TabDescriptor> descriptors = placeholder.getDescriptors();
+	List<TabContentDescriptor> descriptors = tabDescriptor.getContentDescriptors();
 
 	if (descriptors.size() == 1) {
 
-	    TabDescriptor descriptor = descriptors.getFirst();
+	    TabContentDescriptor descriptor = descriptors.getFirst();
 
-	    content = createTabContent(descriptor, configuration, view, placeholder, true);
+	    content = createTabContent(descriptor, configuration, view, tabDescriptor, true);
 
 	} else {
 
@@ -105,7 +105,7 @@ public class ConfigurationViewFactory {
 
 	    descriptors.forEach(desc -> tabSheet.add( //
 		    desc.getLabel(), //
-		    createTabContent(desc, configuration, view, placeholder, false)));
+		    createTabContent(desc, configuration, view, tabDescriptor, false)));
 
 	    content = tabSheet;
 	}
@@ -118,14 +118,14 @@ public class ConfigurationViewFactory {
      * @param configuration
      * @param view
      * @param componentInfo
-     * @param placeholder
+     * @param tabDescriptor
      * @return
      */
     private static TabContent createTabContent(//
-	    TabDescriptor descriptor,//
+	    TabContentDescriptor descriptor,//
 	    Configuration configuration, //
 	    ConfigurationView view,//
-	    TabPlaceholder placeholder,//
+	    TabDescriptor tabDescriptor,//
 	    boolean withLabel) {
 
 	DirectiveManager directiveManager = descriptor.getDirectiveManager();
@@ -133,7 +133,7 @@ public class ConfigurationViewFactory {
 	TabContent container = ComponentFactory.createNoSpacingNoMarginTabContainer(
 		"tab-container-vertical-layout-for-" + descriptor.getLabel());
 
-	container.init(configuration, descriptor, placeholder);
+	container.init(configuration, descriptor, tabDescriptor);
 
 	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
 
@@ -150,13 +150,13 @@ public class ConfigurationViewFactory {
 		"tab-container-header-layout-for-" + descriptor.getLabel());
 	headerLayout.setWidthFull();
 	headerLayout.setAlignItems(Alignment.BASELINE);
-	headerLayout.setId(TAB_HEADER_ID_PREFIX + "_" + descriptor.getLabel());
+	headerLayout.setId(TabContent.TAB_HEADER_ID_PREFIX + "_" + descriptor.getLabel());
 
 	container.add(headerLayout);
 
 	Label tabLabel = new Label();
 	tabLabel.setWidthFull();
-	tabLabel.setText(placeholder.getLabel());
+	tabLabel.setText(tabDescriptor.getLabel());
 	tabLabel.getStyle().set("font-size", "30px");
 	tabLabel.getStyle().set("color", "black");
 
@@ -196,7 +196,7 @@ public class ConfigurationViewFactory {
 	    headerLayout.add(addButton);
 	});
 
-	if (placeholder.getIndex() == 0) {
+	if (tabDescriptor.getIndex() == 0) {
 
 	    container.render();
 	}

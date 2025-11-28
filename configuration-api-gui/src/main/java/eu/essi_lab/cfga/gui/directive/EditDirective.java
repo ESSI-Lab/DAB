@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.components;
+package eu.essi_lab.cfga.gui.directive;
 
 /*-
  * #%L
@@ -10,72 +10,50 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import com.vaadin.flow.component.*;
-import com.vaadin.flow.component.tabs.*;
-import eu.essi_lab.cfga.gui.extension.*;
-
-import java.util.*;
-
 /**
  * @author Fabrizio
  */
-public class TabSheetContent extends TabSheet implements Renderable {
-
-    private boolean rendered;
-    private final List<TabContent> list;
+public class EditDirective extends Directive {
 
     /**
-     *
+     * 
      */
-    public TabSheetContent() {
+    public EditDirective() {
 
-	setWidthFull();
-	list = new ArrayList<>();
+	setName("Edit setting");
+
+	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
     }
 
     /**
-     * @param desc
-     * @param content
+     * @param name
+     * @param settingClass
      */
-    public void add(String label, TabContent content) {
+    public EditDirective(String name) {
 
-	super.add(label, content);
+	super(name);
 
-	list.add(content);
+	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
+
     }
 
-    @Override
-    public void setRendered(boolean rendered) {
+    /**
+     * @param name
+     * @param confirmationPolicy
+     */
+    public EditDirective(String name, ConfirmationPolicy confirmationPolicy) {
 
-	this.rendered = true;
-    }
-
-    @Override
-    public void render(boolean refresh) {
-
-	list.forEach(rend -> rend.render(refresh));//
-    }
-
-    @Override
-    public boolean isRendered() {
-
-	return rendered;
-    }
-
-    @Override
-    public Component getComponent() {
-
-	return this;
+	super(name, confirmationPolicy);
     }
 }

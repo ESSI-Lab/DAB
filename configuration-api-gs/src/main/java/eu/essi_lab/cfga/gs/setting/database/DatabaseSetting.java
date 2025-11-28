@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs.setting.database;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -23,11 +23,10 @@ package eu.essi_lab.cfga.gs.setting.database;
 
 import java.util.Optional;
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.StorageInfo;
@@ -167,16 +166,16 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class DatabaseComponentInfo extends TabPlaceholder {
+    public static class DescriptorProvider {
 
-	private final TabDescriptor descriptor;
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public DatabaseComponentInfo() {
+	public DescriptorProvider() {
 
-	    descriptor = TabDescriptorBuilder.get(DatabaseSetting.class).//
+	    descriptor = TabContentDescriptorBuilder.get(DatabaseSetting.class).//
 		    withLabel("Database").//
 		    build();
 	}
@@ -184,7 +183,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 	/**
 	 * @return
 	 */
-	public TabDescriptor getDescriptor() {
+	public TabContentDescriptor get() {
 
 	    return descriptor;
 	}

@@ -25,14 +25,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import eu.essi_lab.cfga.gs.setting.*;
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSettingLoader;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.setting.AfterCleanFunction;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
@@ -107,16 +107,16 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
     /**
      * @author Fabrizio
      */
-    public static class DistributionSettingComponentInfo extends TabPlaceholder {
+    public static class DescriptorProvider {
 
-	private final TabDescriptor descriptor;
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public DistributionSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    descriptor = TabDescriptorBuilder.get(DistributionSetting.class).//
+	    descriptor = TabContentDescriptorBuilder.get(DistributionSetting.class).//
 		    withLabel("Distribution").//
 		    withShowDirective("Manage DAB distributed sources", SortDirection.ASCENDING).//
 		    withAddDirective("Add distributed accessor", DistributionSetting.class).//
@@ -128,7 +128,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 	/**
 	 * @return
 	 */
-	public TabDescriptor getDescriptor() {
+	public TabContentDescriptor get() {
 
 	    return descriptor;
 	}

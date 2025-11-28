@@ -25,14 +25,14 @@ import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.distribution.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 
 /**
  *
  * @author Fabrizio
  *
  */
-public class Brokering extends TabPlaceholder {
+public class Brokering extends TabDescriptor {
 
     /**
      *
@@ -43,11 +43,12 @@ public class Brokering extends TabPlaceholder {
 
 	setIndex(GSTabIndex.BROKERING.getIndex());
 
-	addDescriptors(//
-		new HarvestingSetting.HarvestingSettingComponentInfo().getDescriptor(), //
-		new RecordsInspector().getDescriptor(),//
-		new DistributionSetting.DistributionSettingComponentInfo().getDescriptor(),//
-		new ProfilerSetting.ProfilerComponentInfo().getDescriptor()//
+	addContentDescriptors(//
+		new HarvestingSetting.DescriptorProvider().get(), //
+		new SourcePrioritySetting.DescriptorProvider().get(), //
+		new RecordsInspector().get(),//
+		new DistributionSetting.DescriptorProvider().get(),//
+		new ProfilerSetting.DescriptorProvider().get()//
 	);
     }
 }

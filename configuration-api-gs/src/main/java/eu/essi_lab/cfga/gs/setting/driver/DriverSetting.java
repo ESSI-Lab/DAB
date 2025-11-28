@@ -26,11 +26,10 @@ package eu.essi_lab.cfga.gs.setting.driver;
 
 import java.util.List;
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
 
@@ -50,16 +49,16 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class DriverComponentInfo extends TabPlaceholder {
+    public static class DescriptorProvider {
 
-	private final TabDescriptor descriptor;
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public DriverComponentInfo() {
+	public DescriptorProvider() {
 
-	    descriptor = TabDescriptorBuilder.get(DriverSetting.class).//
+	    descriptor = TabContentDescriptorBuilder.get(DriverSetting.class).//
 		    withLabel("Driver").//
 		    build();
 	}
@@ -67,7 +66,7 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
 	/**
 	 * @return
 	 */
-	public TabDescriptor getDescriptor() {
+	public TabContentDescriptor get() {
 
 	    return descriptor;
 	}

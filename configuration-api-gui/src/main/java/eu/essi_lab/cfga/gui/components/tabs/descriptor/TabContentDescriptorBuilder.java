@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.extension;
+package eu.essi_lab.cfga.gui.components.tabs.descriptor;
 
 import java.util.ArrayList;
 
@@ -32,60 +32,60 @@ import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridInfo;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
-import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
-import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
-import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
-import eu.essi_lab.cfga.gui.extension.directive.ShowDirective;
+import eu.essi_lab.cfga.gui.directive.AddDirective;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.directive.EditDirective;
+import eu.essi_lab.cfga.gui.directive.RemoveDirective;
+import eu.essi_lab.cfga.gui.directive.ShowDirective;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
-public class TabDescriptorBuilder {
+public class TabContentDescriptorBuilder {
 
-    private final TabDescriptor tabDescriptor;
+    private final TabContentDescriptor descriptor;
 
     /**
      *
      */
-    private TabDescriptorBuilder() {
+    private TabContentDescriptorBuilder() {
 
-	tabDescriptor = new TabDescriptor();
+	descriptor = new TabContentDescriptor();
     }
 
     /**
      *
      */
-    private TabDescriptorBuilder(Class<? extends Setting> settingClass) {
+    private TabContentDescriptorBuilder(Class<? extends Setting> settingClass) {
 
-	tabDescriptor = new TabDescriptor();
-	tabDescriptor.setSettingClass(settingClass);
+	descriptor = new TabContentDescriptor();
+	descriptor.setSettingClass(settingClass);
     }
 
     /**
      * @return
      */
-    public static TabDescriptorBuilder get() {
+    public static TabContentDescriptorBuilder get() {
 
-	return new TabDescriptorBuilder();
+	return new TabContentDescriptorBuilder();
     }
 
     /**
      * @return
      */
-    public static TabDescriptorBuilder get(Class<? extends Setting> settingClass) {
+    public static TabContentDescriptorBuilder get(Class<? extends Setting> settingClass) {
 
-	return new TabDescriptorBuilder(settingClass);
+	return new TabContentDescriptorBuilder(settingClass);
     }
 
     /**
      * @param label
      * @return
      */
-    public TabDescriptorBuilder withLabel(String label) {
+    public TabContentDescriptorBuilder withLabel(String label) {
 
-	tabDescriptor.setLabel(label);
+	descriptor.setLabel(label);
 
 	return this;
     }
@@ -94,9 +94,9 @@ public class TabDescriptorBuilder {
      * @param settingClass
      * @return
      */
-    public TabDescriptorBuilder withSettingClass(Class<? extends Setting> settingClass) {
+    public TabContentDescriptorBuilder withSettingClass(Class<? extends Setting> settingClass) {
 
-	tabDescriptor.setSettingClass(settingClass);
+	descriptor.setSettingClass(settingClass);
 
 	return this;
     }
@@ -105,9 +105,9 @@ public class TabDescriptorBuilder {
      * @param directive
      * @return
      */
-    public TabDescriptorBuilder withAddDirective(AddDirective directive) {
+    public TabContentDescriptorBuilder withAddDirective(AddDirective directive) {
 
-	tabDescriptor.getDirectiveManager().add(directive);
+	descriptor.getDirectiveManager().add(directive);
 
 	return this;
     }
@@ -117,9 +117,9 @@ public class TabDescriptorBuilder {
      * @param settingClass
      * @return
      */
-    public TabDescriptorBuilder withAddDirective(String directiveName, Class<? extends Setting> settingClass) {
+    public TabContentDescriptorBuilder withAddDirective(String directiveName, Class<? extends Setting> settingClass) {
 
-	tabDescriptor.getDirectiveManager().add(new AddDirective(directiveName, settingClass));
+	descriptor.getDirectiveManager().add(new AddDirective(directiveName, settingClass));
 
 	return this;
     }
@@ -129,9 +129,9 @@ public class TabDescriptorBuilder {
      * @param settingClass
      * @return
      */
-    public TabDescriptorBuilder withAddDirective(String directiveName, String settingClass) {
+    public TabContentDescriptorBuilder withAddDirective(String directiveName, String settingClass) {
 
-	tabDescriptor.getDirectiveManager().add(new AddDirective(directiveName, settingClass));
+	descriptor.getDirectiveManager().add(new AddDirective(directiveName, settingClass));
 
 	return this;
     }
@@ -140,9 +140,9 @@ public class TabDescriptorBuilder {
      * @param directive
      * @return
      */
-    public TabDescriptorBuilder withRemoveDirective(RemoveDirective directive) {
+    public TabContentDescriptorBuilder withRemoveDirective(RemoveDirective directive) {
 
-	tabDescriptor.getDirectiveManager().add(directive);
+	descriptor.getDirectiveManager().add(directive);
 
 	return this;
     }
@@ -153,9 +153,9 @@ public class TabDescriptorBuilder {
      * @param settingClass
      * @return
      */
-    public TabDescriptorBuilder withRemoveDirective(String name, boolean allowFullRemoval, Class<? extends Setting> settingClass) {
+    public TabContentDescriptorBuilder withRemoveDirective(String name, boolean allowFullRemoval, Class<? extends Setting> settingClass) {
 
-	tabDescriptor.getDirectiveManager().add(new RemoveDirective(name, allowFullRemoval, settingClass));
+	descriptor.getDirectiveManager().add(new RemoveDirective(name, allowFullRemoval, settingClass));
 
 	return this;
     }
@@ -166,9 +166,9 @@ public class TabDescriptorBuilder {
      * @param settingClass
      * @return
      */
-    public TabDescriptorBuilder withRemoveDirective(String name, boolean allowFullRemoval, String settingClass) {
+    public TabContentDescriptorBuilder withRemoveDirective(String name, boolean allowFullRemoval, String settingClass) {
 
-	tabDescriptor.getDirectiveManager().add(new RemoveDirective(name, allowFullRemoval, settingClass));
+	descriptor.getDirectiveManager().add(new RemoveDirective(name, allowFullRemoval, settingClass));
 
 	return this;
     }
@@ -178,9 +178,9 @@ public class TabDescriptorBuilder {
      * @param policy
      * @return
      */
-    public TabDescriptorBuilder withEditDirective(String name, ConfirmationPolicy policy) {
+    public TabContentDescriptorBuilder withEditDirective(String name, ConfirmationPolicy policy) {
 
-	tabDescriptor.getDirectiveManager().add(new EditDirective(name, policy));
+	descriptor.getDirectiveManager().add(new EditDirective(name, policy));
 
 	return this;
     }
@@ -189,7 +189,7 @@ public class TabDescriptorBuilder {
      * @param description
      * @return
      */
-    public TabDescriptorBuilder withShowDirective(String description) {
+    public TabContentDescriptorBuilder withShowDirective(String description) {
 
 	return withShowDirective(description, null);
     }
@@ -198,7 +198,7 @@ public class TabDescriptorBuilder {
      * @param direction
      * @return
      */
-    public TabDescriptorBuilder withShowDirective(SortDirection direction) {
+    public TabContentDescriptorBuilder withShowDirective(SortDirection direction) {
 
 	return withShowDirective(null, direction);
     }
@@ -208,7 +208,7 @@ public class TabDescriptorBuilder {
      * @param direction
      * @return
      */
-    public TabDescriptorBuilder withShowDirective(String description, SortDirection direction) {
+    public TabContentDescriptorBuilder withShowDirective(String description, SortDirection direction) {
 
 	ShowDirective showDirective = new ShowDirective();
 
@@ -222,7 +222,7 @@ public class TabDescriptorBuilder {
 	    showDirective.setSortDirection(direction);
 	}
 
-	tabDescriptor.getDirectiveManager().add(showDirective);
+	descriptor.getDirectiveManager().add(showDirective);
 
 	return this;
     }
@@ -231,9 +231,9 @@ public class TabDescriptorBuilder {
      * @param Component
      * @return
      */
-    public TabDescriptorBuilder withComponent(Component Component) {
+    public TabContentDescriptorBuilder withComponent(Component Component) {
 
-	tabDescriptor.setContent(Component);
+	descriptor.setContent(Component);
 
 	return this;
     }
@@ -243,7 +243,7 @@ public class TabDescriptorBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, boolean showColumnsHider) {
+    public TabContentDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, boolean showColumnsHider) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), SelectionMode.NONE, showColumnsHider);
     }
@@ -252,7 +252,7 @@ public class TabDescriptorBuilder {
      * @param descriptors
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors) {
+    public TabContentDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), SelectionMode.NONE, true);
     }
@@ -263,7 +263,7 @@ public class TabDescriptorBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode, boolean showColumnsHider) {
+    public TabContentDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode, boolean showColumnsHider) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), selectionMode, showColumnsHider);
     }
@@ -273,7 +273,7 @@ public class TabDescriptorBuilder {
      * @param selectionMode
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
+    public TabContentDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), selectionMode, true);
     }
@@ -284,7 +284,7 @@ public class TabDescriptorBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, boolean showColumnsHider) {
+    public TabContentDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, boolean showColumnsHider) {
 
 	return withGridInfo(pageSize, descriptors, new ArrayList<>(), SelectionMode.NONE, showColumnsHider);
     }
@@ -294,7 +294,7 @@ public class TabDescriptorBuilder {
      * @param descriptors
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors) {
+    public TabContentDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors) {
 
 	return withGridInfo(pageSize, descriptors, new ArrayList<>(), SelectionMode.NONE, true);
     }
@@ -306,7 +306,7 @@ public class TabDescriptorBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode,
+    public TabContentDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode,
 	    boolean showColumnsHider) {
 
 	return withGridInfo(pageSize, descriptors, new ArrayList<>(), selectionMode, showColumnsHider);
@@ -318,7 +318,7 @@ public class TabDescriptorBuilder {
      * @param selectionMode
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
+    public TabContentDescriptorBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
 
 	return withGridInfo(pageSize, descriptors, new ArrayList<>(), selectionMode, true);
     }
@@ -329,7 +329,7 @@ public class TabDescriptorBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items,
+    public TabContentDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items,
 	    boolean showColumnsHider) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, SelectionMode.NONE, showColumnsHider);
@@ -340,7 +340,7 @@ public class TabDescriptorBuilder {
      * @param items
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items) {
+    public TabContentDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, SelectionMode.NONE, true);
     }
@@ -351,7 +351,7 @@ public class TabDescriptorBuilder {
      * @param selectionMode
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(//
+    public TabContentDescriptorBuilder withGridInfo(//
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
 	    SelectionMode selectionMode, //
@@ -366,7 +366,7 @@ public class TabDescriptorBuilder {
      * @param selectionMode
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(//
+    public TabContentDescriptorBuilder withGridInfo(//
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
 	    SelectionMode selectionMode) {
@@ -381,7 +381,7 @@ public class TabDescriptorBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(//
+    public TabContentDescriptorBuilder withGridInfo(//
 	    int pageSize, //
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
@@ -396,7 +396,7 @@ public class TabDescriptorBuilder {
      * @param items
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(//
+    public TabContentDescriptorBuilder withGridInfo(//
 	    int pageSize, //
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items) {
@@ -411,7 +411,7 @@ public class TabDescriptorBuilder {
      * @param selectionMode
      * @return
      */
-    public TabDescriptorBuilder withGridInfo(//
+    public TabContentDescriptorBuilder withGridInfo(//
 	    int pageSize, //
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
@@ -426,7 +426,7 @@ public class TabDescriptorBuilder {
 	descriptors.forEach(gridInfo::addColumnDescriptor);
 	items.forEach(gridInfo::addGridMenuItemHandler);
 
-	tabDescriptor.setGridInfo(gridInfo);
+	descriptor.setGridInfo(gridInfo);
 
 	return this;
     }
@@ -434,9 +434,9 @@ public class TabDescriptorBuilder {
     /**
      *
      */
-    public TabDescriptorBuilder reloadable() {
+    public TabContentDescriptorBuilder reloadable() {
 
-	tabDescriptor.setReloadable(true);
+	descriptor.setReloadable(true);
 
 	return this;
     }
@@ -445,9 +445,9 @@ public class TabDescriptorBuilder {
      * @param reloader
      * @return
      */
-    public TabDescriptorBuilder reloadable(Runnable reloader) {
+    public TabContentDescriptorBuilder reloadable(Runnable reloader) {
 
-	tabDescriptor.setReloadable(true, reloader);
+	descriptor.setReloadable(true, reloader);
 
 	return this;
     }
@@ -455,9 +455,9 @@ public class TabDescriptorBuilder {
     /**
      * @return
      */
-    public TabDescriptor build() {
+    public TabContentDescriptor build() {
 
-	return tabDescriptor;
+	return descriptor;
     }
 
 }

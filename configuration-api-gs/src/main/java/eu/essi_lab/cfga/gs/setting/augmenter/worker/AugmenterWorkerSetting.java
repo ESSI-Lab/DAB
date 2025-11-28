@@ -27,7 +27,7 @@ package eu.essi_lab.cfga.gs.setting.augmenter.worker;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 
@@ -43,7 +43,7 @@ import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.IntegerOptionBuilder;
@@ -229,12 +229,12 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     /**
      * @author Fabrizio
      */
-    public static class AugmenterWorkerComponentInfo extends TabPlaceholder {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
 	 * 
 	 */
-	public AugmenterWorkerComponentInfo() {
+	public TabDescriptorProvider() {
 
 	    setLabel("Augmenters");
 
@@ -245,7 +245,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 		throw new RuntimeException(e);
 	    }
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(clazz).//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(clazz).//
 
  		    withShowDirective(SortDirection.ASCENDING).//
 
@@ -289,7 +289,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 		    build();
 
 	    setIndex(GSTabIndex.AUGMENTERS.getIndex());
-	    addDescriptor(descriptor);
+	    addContentDescriptor(descriptor);
 	}
 
 	/**

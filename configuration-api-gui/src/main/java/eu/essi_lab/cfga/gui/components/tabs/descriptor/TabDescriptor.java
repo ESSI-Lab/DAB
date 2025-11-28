@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.extension;
+package eu.essi_lab.cfga.gui.components.tabs.descriptor;
 
 /*-
  * #%L
@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.extension;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -27,44 +27,54 @@ import java.util.stream.*;
 /**
  * @author Fabrizio
  */
-public class TabPlaceholder {
+public class TabDescriptor {
 
     private String label;
     private int index;
     private boolean forceReadOnly;
-    private List<TabDescriptor> list;
+    private List<TabContentDescriptor> list;
 
     /**
-     *
      * @param index
      * @param descriptors
      * @return
      */
-    public static TabPlaceholder of(int index, TabDescriptor ... descriptors){
+    public static TabDescriptor of(int index, String label, TabContentDescriptor... descriptors) {
 
-	TabPlaceholder placeholder = new TabPlaceholder(index);
-	Stream.of(descriptors).forEach(placeholder::addDescriptor);
+	TabDescriptor out = new TabDescriptor(index);
+	out.setLabel(label);
+	Stream.of(descriptors).forEach(out::addContentDescriptor);
 
-	return placeholder;
+	return out;
     }
 
     /**
      *
      */
-    public TabPlaceholder() {
+    public TabDescriptor() {
 
 	list = new ArrayList<>();
 	setForceReadOnly(true);
     }
 
     /**
-     *
      * @param index
      */
-    public TabPlaceholder(int index) {
+    public TabDescriptor(int index) {
 
 	this();
 	setIndex(index);
+    }
+
+    /**
+     * @param index
+     * @param label
+     */
+    public TabDescriptor(int index, String label) {
+
+	this();
+	setIndex(index);
+	setLabel(label);
     }
 
     /**
@@ -84,28 +94,25 @@ public class TabPlaceholder {
     }
 
     /**
-     *
      * @param descriptor
      */
-    public void addDescriptors(TabDescriptor... descriptors){
+    public void addContentDescriptors(TabContentDescriptor... descriptors) {
 
 	list.addAll(Arrays.asList(descriptors));
     }
 
     /**
-     *
      * @param descriptor
      */
-    public void addDescriptor(TabDescriptor descriptor){
+    public void addContentDescriptor(TabContentDescriptor descriptor) {
 
 	list.add(descriptor);
     }
 
     /**
-     *
      * @return
      */
-    public List<TabDescriptor> getDescriptors(){
+    public List<TabContentDescriptor> getContentDescriptors() {
 
 	return list;
     }

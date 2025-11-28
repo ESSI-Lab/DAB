@@ -22,8 +22,7 @@ package eu.essi_lab.cfga.gs.setting;
  */
 
 import eu.essi_lab.cfga.Configurable;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 
@@ -48,16 +47,16 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
     /**
      * @author Fabrizio
      */
-    public static class SchedulerSettingComponentInfo extends TabPlaceholder {
+    public static class DescriptorProvider {
 
-	private final TabDescriptor descriptor;
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 * 
 	 */
-	public SchedulerSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    descriptor = TabDescriptorBuilder.get(SchedulerViewSetting.class).//
+	    descriptor = TabContentDescriptorBuilder.get(SchedulerViewSetting.class).//
 		    withLabel("Scheduler").//
 		    build();
 	}
@@ -66,7 +65,7 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 	 *
 	 * @return
 	 */
-	public TabDescriptor getDescriptor() {
+	public TabContentDescriptor get() {
 
 	    return descriptor;
 	}

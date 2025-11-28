@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.extension.directive;
+package eu.essi_lab.cfga.gui.directive;
 
 /*-
  * #%L
@@ -21,80 +21,85 @@ package eu.essi_lab.cfga.gui.extension.directive;
  * #L%
  */
 
-import java.util.Optional;
-
-import com.vaadin.flow.data.provider.SortDirection;
-
 /**
  * @author Fabrizio
  */
-public class ShowDirective extends Directive {
+public abstract class Directive {
+
+    private String name;
 
     /**
-     *
+     * @author Fabrizio
      */
-    private SortDirection sortDirection;
-    /**
-     *
-     */
-    private String description;
+    public enum ConfirmationPolicy {
 
-    /**
-     *
-     */
-    public ShowDirective() {
+	/**
+	 * 
+	 */
+	NEVER,
+	/**
+	 * 
+	 */
+	ALWAYS,
+	/**
+	 * 
+	 */
+	ON_WARNINGS
+    }
+
+    private ConfirmationPolicy confirmationPolicy;
+
+    public Directive() {
     }
 
     /**
      * @param name
      * @param settingClass
      */
-    public ShowDirective(String name) {
+    public Directive(String name) {
 
-	super(name);
+	this.name = name;
     }
 
     /**
      * @param name
      * @param confirmationPolicy
      */
-    public ShowDirective(String name, SortDirection direction) {
+    public Directive(String name, ConfirmationPolicy confirmationPolicy) {
 
-	super(name);
-
-	setSortDirection(direction);
+	this.name = name;
+	this.confirmationPolicy = confirmationPolicy;
     }
 
     /**
-     * @return the sortDirection
+     * @return the name
      */
-    public Optional<SortDirection> getSortDirection() {
+    public String getName() {
 
-	return Optional.ofNullable(sortDirection);
-
+	return name;
     }
 
     /**
-     * @param sortDirection
+     * @param name the name to set
      */
-    public void setSortDirection(SortDirection sortDirection) {
+    public void setName(String name) {
 
-	this.sortDirection = sortDirection;
+	this.name = name;
     }
 
     /**
      * @return
      */
-    public Optional<String> getDescription() {
+    public ConfirmationPolicy getConfirmationPolicy() {
 
-	return Optional.ofNullable(description);
+	return confirmationPolicy;
     }
 
     /**
-     * @param description
+     * @param confirmationPolicy
      */
-    public void setDescription(String description) {
+    public void setConfirmationPolicy(ConfirmationPolicy confirmationPolicy) {
 
-	this.description = description;
+	this.confirmationPolicy = confirmationPolicy;
     }
 }

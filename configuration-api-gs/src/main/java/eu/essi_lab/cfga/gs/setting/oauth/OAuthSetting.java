@@ -23,7 +23,7 @@ package eu.essi_lab.cfga.gs.setting.oauth;
 
 import java.util.Optional;
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
@@ -223,21 +223,21 @@ public class OAuthSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class OAuthSettingComponentInfo extends TabPlaceholder {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
 	 *
 	 */
-	public OAuthSettingComponentInfo() {
+	public TabDescriptorProvider() {
 
 	    setLabel("Authorization");
 
-	    TabDescriptor descriptor = TabDescriptorBuilder.get(OAuthSetting.class).//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(OAuthSetting.class).//
 
 		    build();
 
 	    setIndex(GSTabIndex.AUTHORIZATION.getIndex());
-	    addDescriptor(descriptor);
+	    addContentDescriptor(descriptor);
 
 	}
     }

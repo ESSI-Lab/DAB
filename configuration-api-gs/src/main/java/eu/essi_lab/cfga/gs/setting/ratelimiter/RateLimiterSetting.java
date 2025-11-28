@@ -23,12 +23,10 @@ package eu.essi_lab.cfga.gs.setting.ratelimiter;
 
 import java.util.Optional;
 
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.option.IntegerOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
@@ -231,16 +229,16 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class RateLimiterSettingComponentInfo extends TabPlaceholder {
+    public static class DescriptorProvider {
 
-	private final TabDescriptor descriptor;
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public RateLimiterSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    descriptor = TabDescriptorBuilder.get(RateLimiterSetting.class).//
+	    descriptor = TabContentDescriptorBuilder.get(RateLimiterSetting.class).//
 		    withLabel("Rate limiter").//
 		    build();
 	}
@@ -249,7 +247,7 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 	 *
 	 * @return
 	 */
-	public TabDescriptor getDescriptor() {
+	public TabContentDescriptor get() {
 
 	    return descriptor;
 	}

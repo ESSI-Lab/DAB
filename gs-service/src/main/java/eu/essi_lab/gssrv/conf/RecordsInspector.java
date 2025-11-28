@@ -48,7 +48,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
@@ -57,9 +57,9 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class RecordsInspector extends TabPlaceholder {
+public class RecordsInspector {
 
-    private final TabDescriptor descriptor;
+    private final TabContentDescriptor descriptor;
     private VerticalLayout verticalLayout;
     private Grid<GridData> grid;
     private GridFilter gridFilter;
@@ -164,7 +164,7 @@ public class RecordsInspector extends TabPlaceholder {
 	//
 	//
 
-	descriptor = TabDescriptorBuilder.get().//
+	descriptor = TabContentDescriptorBuilder.get().//
 
 		withLabel("Records inspection").//
 		withShowDirective("Click \"Reload\" to show the list of all the harvested sources, referenced by "
@@ -180,7 +180,7 @@ public class RecordsInspector extends TabPlaceholder {
      *
      * @return
      */
-    public TabDescriptor getDescriptor() {
+    public TabContentDescriptor get() {
 
 	return descriptor;
     }

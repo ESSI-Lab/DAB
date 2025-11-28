@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.grid.*;
-import eu.essi_lab.cfga.gui.extension.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import com.vaadin.flow.data.provider.SortDirection;
@@ -42,7 +42,7 @@ import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.setting.AfterCleanFunction;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
@@ -169,14 +169,14 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
     /**
      * @author Fabrizio
      */
-    public static class HarvestingSettingComponentInfo extends TabPlaceholder {
+    public static class DescriptorProvider {
 
-	private final TabDescriptor descriptor;
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public HarvestingSettingComponentInfo() {
+	public DescriptorProvider() {
 
 	    Class<? extends Setting> clazz = null;
 	    try {
@@ -185,7 +185,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 		throw new RuntimeException(e);
 	    }
 
-	    descriptor = TabDescriptorBuilder.get(clazz).//
+	    descriptor = TabContentDescriptorBuilder.get(clazz).//
 
 		    withLabel("Harvesting").//
 		    withShowDirective("Manage DAB harvested sources. Click \"Reload\" to" + " update the scheduler information",
@@ -258,7 +258,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	/**
 	 * @return
 	 */
-	public TabDescriptor getDescriptor() {
+	public TabContentDescriptor get() {
 
 	    return descriptor;
 	}
