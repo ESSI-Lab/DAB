@@ -407,84 +407,13 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     /**
      * @return
      */
-    protected boolean isInitialized() {
-
-	return true;
-    }
-
-    /**
-     * @return
-     */
-    protected boolean isAuthorized() {
-
-	return true;
-    }
-
-    /**
-     * @param event
-     */
-    protected void onSaveButtonClicked(ClickEvent<Button> event) {
-
-	try {
-	    configuration.flush();
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
-
-	    NotificationDialog.getErrorDialog(e.getMessage(), e).open();
-	}
-    }
-
-    /**
-     * @param event
-     */
-    protected void onDetachEvent(DetachEvent event) {
-
-    }
-
-    /**
-     * @param event
-     */
-    protected void onAttachEvent(AttachEvent event) {
-
-    }
-
-    /**
-     * @return
-     */
-    protected boolean showLogOutButton() {
-
-	return false;
-    }
-
-    /**
-     * @return
-     */
-    protected LogOutButtonListener getLogOutButtonListener() {
-
-	return null;
-    }
-
-    /**
-     * @return
-     */
-    protected boolean logOutAfterInactivity() {
-
-	return false;
-    }
-
-    /**
-     * @return
-     */
-    protected boolean enableMultipleTabs() {
-
-	return false;
-    }
-
-    /**
-     * @return
-     */
     protected abstract List<TabDescriptor> getDescriptors();
+
+    /**
+     *
+     * @return
+     */
+    protected abstract Configuration initConfiguration();
 
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
@@ -721,6 +650,84 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
+     * @return
+     */
+    protected boolean isInitialized() {
+
+	return true;
+    }
+
+    /**
+     * @return
+     */
+    protected boolean isAuthorized() {
+
+	return true;
+    }
+
+    /**
+     * @param event
+     */
+    protected void onSaveButtonClicked(ClickEvent<Button> event) {
+
+	try {
+	    configuration.flush();
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
+
+	    NotificationDialog.getErrorDialog(e.getMessage(), e).open();
+	}
+    }
+
+    /**
+     * @param event
+     */
+    protected void onDetachEvent(DetachEvent event) {
+
+    }
+
+    /**
+     * @param event
+     */
+    protected void onAttachEvent(AttachEvent event) {
+
+    }
+
+    /**
+     * @return
+     */
+    protected boolean showLogOutButton() {
+
+	return false;
+    }
+
+    /**
+     * @return
+     */
+    protected LogOutButtonListener getLogOutButtonListener() {
+
+	return null;
+    }
+
+    /**
+     * @return
+     */
+    protected boolean logOutAfterInactivity() {
+
+	return false;
+    }
+
+    /**
+     * @return
+     */
+    protected boolean enableMultipleTabs() {
+
+	return false;
+    }
+
+
+    /**
      * @param setting
      */
     protected void onSettingPut(List<Setting> settings) {
@@ -768,7 +775,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     protected void onConfigurationAutoReloaded() {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Configuration autoreloaded");
+	GSLoggerFactory.getLogger(getClass()).debug("Configuration auto-reloaded");
     }
 
     /**
@@ -779,21 +786,16 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	getDescriptors().//
 		stream().//
 		sorted(Comparator.comparingInt(TabDescriptor::getIndex)).//
-		forEach(placeholder -> {
+		forEach(descriptor -> {
 
 	    Renderable content = ConfigurationViewFactory.createTabContent(//
 		    this,//
 		    configuration, //
-		    placeholder);
+		    descriptor);
 
-	    addTab(placeholder.getIndex(), placeholder.getLabel(), content);
+	    addTab(descriptor.getIndex(), descriptor.getLabel(), content);
 	});
     }
-
-    /**
-     * @return
-     */
-    protected abstract Configuration initConfiguration();
 
     /**
      * @return

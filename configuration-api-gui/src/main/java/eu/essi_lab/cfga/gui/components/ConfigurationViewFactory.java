@@ -70,7 +70,6 @@ public class ConfigurationViewFactory {
     public static TabsWithContent createTabs() {
 
 	TabsWithContent tabs = new TabsWithContent();
-	tabs.setOrientation(Orientation.VERTICAL);
 	tabs.getStyle().set("padding-left", "15px");
 
 	return tabs;

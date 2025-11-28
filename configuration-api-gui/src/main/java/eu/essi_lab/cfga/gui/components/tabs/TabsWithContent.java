@@ -36,7 +36,10 @@ import eu.essi_lab.cfga.gui.components.*;
 /**
  * In Vaadin tabs are just tabs, they have no control on the tab content.<br>
  * This component allows to
- * set a content to the tabs, and to select the content according to its tab
+ * set a content to the tabs, and to select the content according to its tab.
+ *
+ * @apiNote from Vaadin version 23.4.0 {@link com.vaadin.flow.component.tabs.TabSheet} provides
+ * this functionality
  * 
  * @author Fabrizio
  */
@@ -54,6 +57,7 @@ public class TabsWithContent extends Tabs implements ComponentEventListener<Sele
 	tabsToContent = new HashMap<>();
 	contentDiv = new Div();
 
+	setOrientation(Orientation.VERTICAL);
 	addSelectedChangeListener(this);
     }
 
