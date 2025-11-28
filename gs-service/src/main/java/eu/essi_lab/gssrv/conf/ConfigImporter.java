@@ -228,7 +228,7 @@ public class ConfigImporter extends VerticalLayout {
 
 	String info = "Configure the storage ('OpenSearch' or 'S3') where to upload the configuration, then click the 'Import from local "
 		+ "configuration file' or 'Import from remote configuration file' button to "
-		+ "upload the selected file into the configured storage. <br>"
+		+ "upload the selected file into the configured storage. "
 		+ "When the upload is done, you can read in the panel above, the "
 		+ "Java option required to start the DAB with the imported configuration";
 
