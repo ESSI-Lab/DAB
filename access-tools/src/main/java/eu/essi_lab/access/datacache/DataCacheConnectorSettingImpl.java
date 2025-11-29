@@ -28,9 +28,7 @@ import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -62,7 +60,7 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 	setCanBeRemoved(false);
 	setCanBeDisabled(false);
 	enableCompactMode(false);
-
+	setShowHeader(false);
 	setName("Data cache connector setting");
 
 	//
@@ -125,31 +123,26 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 	cacheStorageSetting.hideDatabaseConfigurationFolderOption();
 
 	addSetting(cacheStorageSetting);
-
-	//
-	// set the component extension
-	//
-	setExtension(new DataCacheConnectorSettingComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
-    public static class DataCacheConnectorSettingComponentInfo extends ComponentInfo {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
 	 * 
 	 */
-	public DataCacheConnectorSettingComponentInfo() {
+	public TabDescriptorProvider() {
 
-	    setComponentName(DataCacheConnectorSettingImpl.class.getName());
+	    setLabel("Data cache");
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.DATA_CACHE.getIndex()).//
-		    withShowDirective("Data cache").//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(DataCacheConnectorSettingImpl.class).//
+
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setIndex(GSTabIndex.DATA_CACHE.getIndex());
+	    addContentDescriptor(descriptor);
 	}
     }
 

@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.extension.directive;
+package eu.essi_lab.cfga.gui.directive;
 
 /*-
  * #%L
@@ -21,42 +21,39 @@ package eu.essi_lab.cfga.gui.extension.directive;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 /**
  * @author Fabrizio
  */
-public class DirectiveManager {
-
-    private final List<Directive> list;
+public class EditDirective extends Directive {
 
     /**
      * 
      */
-    public DirectiveManager() {
+    public EditDirective() {
 
-	list = new ArrayList<>();
+	setName("Edit setting");
+
+	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
     }
 
     /**
-     * @param directive
+     * @param name
+     * @param settingClass
      */
-    public void add(Directive directive) {
+    public EditDirective(String name) {
 
-	list.add(directive);
+	super(name);
+
+	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
+
     }
 
     /**
-     * @return the directives
+     * @param name
+     * @param confirmationPolicy
      */
-    public <T extends Directive> Optional<T> get(Class<T> directiveClass) {
+    public EditDirective(String name, ConfirmationPolicy confirmationPolicy) {
 
-	return list.stream().//
-		filter(d -> directiveClass.equals(d.getClass())).//
-		map(directiveClass::cast).//
-		findFirst();
+	super(name, confirmationPolicy);
     }
-
 }

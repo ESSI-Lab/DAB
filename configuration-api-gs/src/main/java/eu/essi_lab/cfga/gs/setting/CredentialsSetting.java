@@ -23,13 +23,11 @@ package eu.essi_lab.cfga.gs.setting;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -108,13 +106,15 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public CredentialsSetting() {
 
 	setName("Credentials settings");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
+	setShowHeader(false);
+
 	//
 	// LOMBARDIA
 	//
@@ -719,31 +719,25 @@ public class CredentialsSetting extends Setting implements EditableSetting {
 	    addOption(password);
 
 	}
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new CredentialsSettingComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
-    public static class CredentialsSettingComponentInfo extends ComponentInfo {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
-	 * 
+	 *
 	 */
-	public CredentialsSettingComponentInfo() {
+	public TabDescriptorProvider() {
 
-	    setComponentName(CredentialsSetting.class.getName());
+	    setLabel("Credentials");
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.CREDENTIALS.getIndex()).//
-		    withShowDirective("Credentials").//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(CredentialsSetting.class).//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setIndex(GSTabIndex.CREDENTIALS.getIndex());
+	    addContentDescriptor(descriptor);
 	}
     }
 
@@ -772,7 +766,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getDinaguaUser() {
 
@@ -804,7 +798,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getDinaguaToken() {
 
@@ -836,7 +830,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getINUMETPassword() {
 
@@ -852,7 +846,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getDMHToken() {
 
@@ -868,7 +862,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getWekeUser() {
 
@@ -884,7 +878,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getWekeoPassword() {
 
@@ -900,7 +894,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getNVEToken() {
 
@@ -916,7 +910,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getSentinelUser() {
 
@@ -980,7 +974,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getSAEONUser() {
 
@@ -1012,7 +1006,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getACRONETUser() {
 
@@ -1044,7 +1038,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public Optional<String> getACRONETClientId() {
 

@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.extension.directive;
+package eu.essi_lab.cfga.gui.directive;
 
 /*-
  * #%L
@@ -35,7 +35,7 @@ public class RemoveDirective extends AddDirective {
      */
     public RemoveDirective() {
 
-	setName("Remove");
+	setName("REMOVE");
 
 	setConfirmationPolicy(ConfirmationPolicy.ALWAYS);
     }

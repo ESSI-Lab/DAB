@@ -10,37 +10,34 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Optional;
+import java.util.*;
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.tabs.Tabs.Orientation;
 
-import com.vaadin.flow.component.textfield.TextArea;
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
-import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
-import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
+import eu.essi_lab.cfga.gui.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.directive.*;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -51,12 +48,11 @@ public class ConfigurationViewFactory {
      *
      */
     private static final float TAB_WIDTH = 1200;
-    static final String TAB_HEADER_ID_PREFIX = "tabHeader";
 
     /**
      * @return
      */
-    public static HorizontalLayout createConfigurationViewNavBarContentLayout() {
+    public static HorizontalLayout createNavBarContentLayout() {
 
 	HorizontalLayout navbarContent = new HorizontalLayout();
 	navbarContent.setWidthFull();
@@ -71,10 +67,9 @@ public class ConfigurationViewFactory {
     /**
      * @return
      */
-    public static TabsWithContent createConfigurationViewTabs() {
+    public static VerticalTabs createTabs() {
 
-	TabsWithContent tabs = new TabsWithContent();
-	tabs.setOrientation(Tabs.Orientation.VERTICAL);
+	VerticalTabs tabs = new VerticalTabs();
 	tabs.getStyle().set("padding-left", "15px");
 
 	return tabs;
@@ -88,97 +83,139 @@ public class ConfigurationViewFactory {
      * @param addDirectives
      * @return
      */
-    public static TabContainer createConfigurationViewTabContainer(//
+    public static Renderable createTabContent(//
+	    ConfigurationView view,//
 	    Configuration configuration, //
-	    Orientation orientation, //
-	    String tabName, //
-	    Optional<String> tabDescription,//
-	    Optional<AddDirective> addDirective,//
-	    Optional<RemoveDirective> removeDirective,//
-	    Optional<EditDirective> editDirective) {
+	    TabDescriptor tabDescriptor) {
 
-	TabContainer layout = null;
+	Renderable content = null;
 
-	switch (orientation) {
-	case HORIZONTAL:
+	List<TabContentDescriptor> descriptors = tabDescriptor.getContentDescriptors();
 
-	    HorizontalLayout horizontalLayout = new HorizontalLayout();
-	    // horizontalLayout.getStyle().set("border", "1px solid black");
-	    horizontalLayout.setWidth("100%");
-	    // horizontalLayout.setHeight("100%");
+	if (descriptors.size() == 1) {
 
-	    // layout = horizontalLayout;
+	    TabContentDescriptor descriptor = descriptors.getFirst();
 
-	    break;
+	    content = createTabContent(descriptor, configuration, view, tabDescriptor, true);
 
-	case VERTICAL:
+	} else {
 
-	    TabContainer container = ComponentFactory.createNoSpacingNoMarginTabContainer("tab-container-vertical-layout-for-" + tabName);
+	    TabSheetContent tabSheet = new TabSheetContent();
 
-	    container.setRemoveDirective(removeDirective);
-	    container.setEditDirective(editDirective);
+	    descriptors.forEach(desc -> tabSheet.add( //
+		    desc.getLabel(), //
+		    createTabContent(desc, configuration, view, tabDescriptor, false)));
 
-	    //	    container.setWidth(TAB_WIDTH, Unit.PIXELS);
-	    container.getStyle().set("margin-bottom", "50px");
+	    if(tabDescriptor.getIndex() == 0){
 
-	    HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
-		    "tab-container-header-layout-for-" + tabName);
-	    headerLayout.setWidthFull();
-	    headerLayout.setAlignItems(Alignment.BASELINE);
-	    headerLayout.setId(TAB_HEADER_ID_PREFIX + "_" + tabName);
-
-	    container.add(headerLayout);
-
-	    //
-	    //
-	    //
-
-	    Label nameLabel = new Label();
-	    nameLabel.setWidthFull();
-	    nameLabel.setText(tabName);
-	    nameLabel.getStyle().set("font-size", "30px");
-	    nameLabel.getStyle().set("color", "black");
-
-	    if (tabDescription.isPresent()) {
-
-		String desc = tabDescription.get();
-
-		VerticalLayout subLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
-		subLayout.setWidthFull();
-
-		Label descLabel = new Label();
-		descLabel.setWidthFull();
-		descLabel.setMaxHeight("130px");
-		descLabel.setText(desc);
-		descLabel.getStyle().set("font-size", "16px");
-		descLabel.getStyle().set("color", "gray");
-
-		subLayout.add(nameLabel);
-		subLayout.add(descLabel);
-
-		headerLayout.add(subLayout);
-
-	    } else {
-
-		headerLayout.setHeight("45px");
-
-		headerLayout.add(nameLabel);
+		tabSheet.setRendered(true);
 	    }
 
-	    //
-	    //
-	    //
-
-	    if (addDirective.isPresent()) {
-
-		Button addButton = SettingComponentFactory.createSettingAddButton(configuration, container, addDirective.get());
-		headerLayout.add(addButton);
-	    }
-
-	    layout = container;
+	    content = tabSheet;
 	}
 
-	return layout;
+	return content;
+    }
+
+    /**
+     * @param descriptor
+     * @param configuration
+     * @param view
+     * @param componentInfo
+     * @param tabDescriptor
+     * @return
+     */
+    private static TabContent createTabContent(//
+	    TabContentDescriptor descriptor,//
+	    Configuration configuration, //
+	    ConfigurationView view,//
+	    TabDescriptor tabDescriptor,//
+	    boolean withLabel) {
+
+	DirectiveManager directiveManager = descriptor.getDirectiveManager();
+
+	TabContent content = ComponentFactory.createNoSpacingNoMarginTabContainer(
+		"tab-container-vertical-layout-for-" + descriptor.getLabel());
+
+	content.init(configuration, descriptor, tabDescriptor);
+
+	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
+
+	Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
+
+	Optional<RemoveDirective> removeDirective = directiveManager.get(RemoveDirective.class);
+
+	Optional<EditDirective> editDirective = directiveManager.get(EditDirective.class);
+
+	content.setRemoveDirective(removeDirective);
+	content.setEditDirective(editDirective);
+
+	HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
+		"tab-container-header-layout-for-" + descriptor.getLabel());
+	headerLayout.setWidthFull();
+	headerLayout.setAlignItems(Alignment.BASELINE);
+	headerLayout.setId(TabContent.TAB_HEADER_ID_PREFIX + "_" + descriptor.getLabel());
+
+	content.add(headerLayout);
+
+	Label tabLabel = new Label();
+	tabLabel.setWidthFull();
+	tabLabel.setText(tabDescriptor.getLabel());
+	tabLabel.getStyle().set("font-size", "30px");
+	tabLabel.getStyle().set("color", "black");
+
+	if (showDirective.flatMap(ShowDirective::getDescription).isPresent()) {
+
+	    String desc = showDirective.flatMap(ShowDirective::getDescription).get();
+
+	    VerticalLayout subLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+	    subLayout.setWidthFull();
+
+	    Label descLabel = new Label();
+	    descLabel.setWidthFull();
+	    descLabel.setMaxHeight("130px");
+	    descLabel.setText(desc);
+	    descLabel.getStyle().set("margin-left", "-7px");
+	    descLabel.getStyle().set("font-size", "16px");
+	    descLabel.getStyle().set("color", "black");
+
+	    if (withLabel) {
+
+		subLayout.add(tabLabel);
+	    }
+
+	    subLayout.add(descLabel);
+
+	    if (showDirective.get().withDescriptionSeparator()) {
+
+		Div separator = ComponentFactory.createSeparator("#e8ebef");
+		separator.getStyle().set("margin-top", "3px");
+		separator.getStyle().set("margin-left", "-7px");
+
+		subLayout.add(separator);
+	    }
+
+	    headerLayout.add(subLayout);
+
+	} else if (withLabel) {
+
+	    headerLayout.setHeight("45px");
+
+	    headerLayout.add(tabLabel);
+	}
+
+	addDirective.ifPresent(dir -> {
+
+	    Button addButton = SettingComponentFactory.createSettingAddButton(configuration, content, dir);
+	    headerLayout.add(addButton);
+	});
+
+	if (tabDescriptor.getIndex() == 0) {
+
+	    content.render();
+	}
+
+	return content;
     }
 
     /**

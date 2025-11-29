@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.extension;
+package eu.essi_lab.cfga.gui.components.tabs.descriptor;
 
 /*-
  * #%L
@@ -21,41 +21,52 @@ package eu.essi_lab.cfga.gui.extension;
  * #L%
  */
 
-import java.util.Optional;
+import com.vaadin.flow.component.*;
+import eu.essi_lab.cfga.gui.components.grid.*;
+import eu.essi_lab.cfga.gui.directive.*;
+import eu.essi_lab.cfga.setting.*;
 
-import com.vaadin.flow.component.Component;
-
-import eu.essi_lab.cfga.gui.components.grid.GridInfo;
-import eu.essi_lab.cfga.gui.extension.directive.DirectiveManager;
+import java.util.*;
 
 /**
+ *
  * @author Fabrizio
+ *
  */
-public class TabDescriptor {
+public class TabContentDescriptor {
 
-    private int index;
+    private String label;
     private DirectiveManager directiveManager;
     private GridInfo gridInfo;
     private boolean reloadable;
     private Runnable tabReloadHandler;
-    private Component component;
+    private Component content;
+    private Class<? extends Setting> settingClass;
 
     /**
-     * 
+     *
      */
-    public TabDescriptor() {
+    public TabContentDescriptor() {
 
 	directiveManager = new DirectiveManager();
     }
 
     /**
-     * @param index
+     * @return
+     */
+    public String getLabel() {
+
+	return label;
+    }
+
+    /**
      * @param label
      */
-    public TabDescriptor(int index) {
+    public void setLabel(String label) {
 
-	this.index = index;
+	this.label = label;
     }
+
 
     /**
      * @return the directiveManager
@@ -63,22 +74,6 @@ public class TabDescriptor {
     public DirectiveManager getDirectiveManager() {
 
 	return directiveManager;
-    }
-
-    /**
-     * @return
-     */
-    public int getIndex() {
-
-	return index;
-    }
-
-    /**
-     * @param index
-     */
-    public void setIndex(int index) {
-
-	this.index = index;
     }
 
     /**
@@ -131,42 +126,37 @@ public class TabDescriptor {
 	return Optional.ofNullable(tabReloadHandler);
     }
 
-    
-    
+    /**
+     *
+     * @return
+     */
+    public Optional<Class<? extends Setting>> getSettingClass() {
+
+	return Optional.ofNullable(settingClass);
+    }
+
+    /**
+     *
+     * @param settingClass
+     */
+    public void setSettingClass(Class<? extends Setting> settingClass) {
+
+	this.settingClass = settingClass;
+    }
+
     /**
      * @return the component
      */
-    public Optional<Component> getComponent() {
-	
-        return Optional.ofNullable(component);
+    public Optional<Component> getContent() {
+
+	return Optional.ofNullable(content);
     }
 
     /**
-     * @param component 
+     * @param content
      */
-    public void setComponent(Component component) {
-	
-        this.component = component;
-    }
+    public void setContent(Component content) {
 
-    /**
-     * 
-     */
-    @Override
-    public String toString() {
-
-	return "Tab#" + getIndex();
-    }
-
-    @Override
-    public int hashCode() {
-
-	return toString().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-
-	return this.hashCode() == o.hashCode();
+	this.content = content;
     }
 }

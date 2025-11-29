@@ -26,10 +26,10 @@ import java.util.Optional;
 import com.vaadin.flow.component.Component;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.components.setting.listener.SettingAddButtonConfirmationListener;
-import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
+import eu.essi_lab.cfga.gui.directive.AddDirective;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.validation.ValidationContext;
@@ -45,21 +45,21 @@ public class SettingPutDialog extends SettingPutOrEditDialog {
 
     /**
      * @param configuration
-     * @param tabContainer
+     * @param tabContent
      * @param addDirective
      */
     public SettingPutDialog(//
 	    Configuration configuration, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    AddDirective addDirective) {
 
-	super(configuration, tabContainer, ValidationContext.put());
+	super(configuration, tabContent, ValidationContext.put());
 	
 	this.addDirective = addDirective;
 	this.settingToAdd = SettingUtils.create(addDirective.getSettingClass());
 
 	setTitle(addDirective.getName());
-	setConfirmText("Add");
+	setConfirmText("ADD");
 
 	//
 	// hides the header and opens expands the setting
@@ -98,7 +98,7 @@ public class SettingPutDialog extends SettingPutOrEditDialog {
 		this, //
 		configuration, //
 		settingToAdd, //
-		tabContainer, //
+		tabContent, //
 		foldedModeEnabled);
     }
 }

@@ -23,9 +23,7 @@ package eu.essi_lab.cfga.gs.demo;
 
 import java.util.UUID;
 
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -70,34 +68,30 @@ public class DemoSetting7 extends Setting {
 		build();
 
 	addOption(option2);
-
-	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting7ComponentInfo());
-    }
+   }
 
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting7ComponentInfo extends ComponentInfo {
+    public static class DemoSetting7TabDescriptor extends TabDescriptor {
 
 	/**
 	 * 
 	 */
-	public DemoSetting7ComponentInfo() {
+	public DemoSetting7TabDescriptor() {
 
-	    setComponentName(DemoSetting7.class.getName());
+	    setLabel("Demo setting 7");
 
 	    setForceReadOnly(false);
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(6).//
-		    withShowDirective("Demo setting 7").//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(DemoSetting7.class).//
+
+
 		    withAddDirective("Add new demo setting 7", DemoSetting7.class).//
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setIndex(5);
+	    addContentDescriptor(descriptor);
 	}
     }
 }

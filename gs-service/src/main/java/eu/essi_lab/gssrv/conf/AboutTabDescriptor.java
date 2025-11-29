@@ -33,23 +33,21 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * 
  * @author Fabrizio
  */
-public class AboutComponentInfo extends ComponentInfo {
+public class AboutTabDescriptor extends TabDescriptor {
 
     /**
      * 
      */
-    public AboutComponentInfo() {
+    public AboutTabDescriptor() {
 
-	setComponentName("About");
+	setLabel("About");
 
 	VerticalLayout verticalLayout = new VerticalLayout();
 	verticalLayout.getStyle().set("margin-top", "15px");
@@ -83,13 +81,12 @@ public class AboutComponentInfo extends ComponentInfo {
 	verticalLayout.add(build("Build Timestamp", timeStamp));
 	verticalLayout.add(build("Commit", commit));
 
-	TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		withIndex(GSTabIndex.ABOUT.getIndex()).//
-		withShowDirective(getComponentName()).//
+	TabContentDescriptor descriptor = TabContentDescriptorBuilder.get().//
 		withComponent(verticalLayout).//
 		build();
 
-	setTabDescriptor(tabDescriptor);
+	setIndex(GSTabIndex.ABOUT.getIndex());
+	addContentDescriptor(descriptor);
     }
 
     /**

@@ -56,7 +56,7 @@ public class ResetAndSelectTest2 {
 	Assert.assertFalse(setting.canBeCleaned());
 	Assert.assertFalse(setting.isShowHeaderSet());
 
-	Assert.assertEquals(TestObjectExension.class, setting.getOptionalExtensionClass().get());
+	Assert.assertEquals(TestObjectExension.class, setting.getExtensionClass().get());
 	Assert.assertEquals(TestValidator.class, setting.getOptionalValidatorClass().get());
 
 	Assert.assertEquals("identifier", setting.getIdentifier());

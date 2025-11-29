@@ -27,6 +27,7 @@ package eu.essi_lab.cfga.gs.setting.augmenter.worker;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 
@@ -42,10 +43,7 @@ import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.IntegerOptionBuilder;
@@ -206,11 +204,6 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	addSetting(augmentersSetting);
 
 	//
-	// set the component extension
-	//
-	setExtension(new AugmenterWorkerComponentInfo());
-
-	//
 	// set the validator
 	//
 	setValidator(new AugmenterWorkerSettingValidator());
@@ -236,18 +229,25 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     /**
      * @author Fabrizio
      */
-    public static class AugmenterWorkerComponentInfo extends ComponentInfo {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
 	 * 
 	 */
-	public AugmenterWorkerComponentInfo() {
+	public TabDescriptorProvider() {
 
-	    setComponentName(AugmenterWorkerSetting.class.getName());
+	    setLabel("Augmenters");
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.AUGMENTERS.getIndex()).//
-		    withShowDirective("Augmenters", SortDirection.ASCENDING).//
+	    Class<? extends Setting> clazz = null;
+	    try {
+		clazz = (Class<? extends Setting>) Class.forName("eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl");
+	    } catch (ClassNotFoundException e) {
+		throw new RuntimeException(e);
+	    }
+
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(clazz).//
+
+ 		    withShowDirective(SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 			    "Add augmentation job", //
@@ -288,7 +288,8 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setIndex(GSTabIndex.AUGMENTERS.getIndex());
+	    addContentDescriptor(descriptor);
 	}
 
 	/**

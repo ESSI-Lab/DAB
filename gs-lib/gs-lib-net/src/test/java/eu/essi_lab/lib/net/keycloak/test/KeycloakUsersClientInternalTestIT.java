@@ -437,6 +437,8 @@ public class KeycloakUsersClientInternalTestIT {
 	manager.setAdminUser(System.getProperty("keycloak.user"));
 	manager.setUsersRealm("testRealm");
 
+
+
 	KeycloakUser user = new KeycloakUser.KeycloakUserBuilder().//
 		enabled(false).//
 		withUserProfileAttribute(UserProfileAttribute.USERNAME, "pluto").//

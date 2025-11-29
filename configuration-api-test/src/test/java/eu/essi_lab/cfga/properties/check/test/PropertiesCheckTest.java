@@ -267,10 +267,10 @@ public class PropertiesCheckTest {
 	systemSettings.enableFoldedMode(true);
 
 	//
-	// in setting -> true
+	// in setting -> false
 	// default -> true
 	//
-	systemSettings.setShowHeader(false);
+	systemSettings.setShowHeader(true);
 
 	//
 	// in setting -> true

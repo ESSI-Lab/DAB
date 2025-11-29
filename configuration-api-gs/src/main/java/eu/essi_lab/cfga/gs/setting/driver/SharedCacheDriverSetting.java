@@ -93,6 +93,7 @@ public class SharedCacheDriverSetting extends DriverSetting {
 	// already exists, it is the local cache
 	//
 	DatabaseSetting dbCacheSetting = new DatabaseSetting();
+	dbCacheSetting.setShowHeader(true);
 	dbCacheSetting.setName("Database");
 	dbCacheSetting.setDescription("Cached repository implementation based on a database");
 	dbCacheSetting.setIdentifier(DATABASE_CACHE_SETTING_ID);

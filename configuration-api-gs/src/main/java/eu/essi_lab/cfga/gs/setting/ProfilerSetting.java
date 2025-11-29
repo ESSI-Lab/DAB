@@ -27,18 +27,16 @@ import java.util.stream.Collectors;
  * #L%
  */
 
+import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -149,11 +147,6 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	addKeyValueOption();
 
 	//
-	// set the component extension
-	//
-	setExtension(new ProfilerComponentInfo());
-
-	//
 	// set the validator
 	//
 	setValidator(new ProfilerSettingValidator());
@@ -237,29 +230,29 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     /**
      * @author Fabrizio
      */
-    public static class ProfilerComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public ProfilerComponentInfo() {
-
-	    setComponentName(ProfilerSetting.class.getName());
+	public DescriptorProvider() {
 
 	    String desc = "Manage DAB profilers. Profilers can be added, "
 		    + "and removed; furthermore, their configuration, path and state can be modified. "
 		    + "You can also add several profilers of the same type (e.g: OAI-PMH), making sure "
 		    + "they have a different path and possibly, a different configuration. "
 		    + "Once added, the profiler state is \"Online\"; if set to \"Offline\", "
-		    + "its capabilities will no longer be avaiable and each request will return "
-		    + "a 404 error code";
+		    + "its capabilities will no longer be available and each request will return " + "a 404 error code";
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.PROFILERS.getIndex()).//
+	    descriptor = TabContentDescriptorBuilder.get(ProfilerSetting.class).//
+
+		    withLabel("Profilers").//
 		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
 		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
 		    withRemoveDirective("Remove profiler", false, ProfilerSetting.class).//
-		    withShowDirective("Profilers", desc,SortDirection.ASCENDING).//
+		    withShowDirective(desc, SortDirection.ASCENDING).//
 		    withGridInfo(Arrays.asList(//
 
 		    ColumnDescriptor.createPositionalDescriptor(), //
@@ -280,11 +273,18 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 		    ColumnDescriptor.create("Version", true, true, this::getServiceVersion) //
 
-	    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).//
+	    ), getItemsList(), Grid.SelectionMode.MULTI).//
 
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	}
+
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
 
 	/**

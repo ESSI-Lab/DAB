@@ -23,14 +23,10 @@ package eu.essi_lab.cfga.gs.setting.ratelimiter;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.IntegerOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
@@ -81,15 +77,15 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
     public enum ComputationType implements LabeledEnum {
 
 	/**
-	 * 
+	 *
 	 */
 	DISABLED("Disabled"),
 	/**
-	 * 
+	 *
 	 */
 	LOCAL("Local"),
 	/**
-	 * 
+	 *
 	 */
 	DISTRIBUTED("Distributed");
 
@@ -117,13 +113,14 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public RateLimiterSetting() {
 
 	setName("Rate limiter settings");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
+	setShowHeader(false);
 
 	//
 	//
@@ -228,36 +225,37 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 	mixedSetting.setIdentifier(MIXED_MODE_SETTING_ID);
 	mixedSetting.setName("Mixed");
 	addSetting(mixedSetting);
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new RateLimiterSettingComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
-    public static class RateLimiterSettingComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
-	public RateLimiterSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(SystemSetting.class.getName());
-
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.RATE_LIMITER.getIndex()).//
-		    withShowDirective("Rate limiter").//
+	    descriptor = TabContentDescriptorBuilder.get(RateLimiterSetting.class).//
+		    withLabel("Rate limiter").//
 		    build();
+	}
 
-	    setTabDescriptor(tabDescriptor);
+	/**
+	 *
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 
     /**
-     *  
+     *
      */
     public void setComputationType(ComputationType computationType) {
 
@@ -326,13 +324,13 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
     public Optional<ExecutionModeSetting> getExecutionModeSetting(ExecutionMode mode) {
 
 	return switch (mode) {
-	case ACCESS -> Optional.of(getSetting(ACCCESS_SETTING_ID, ExecutionModeSetting.class).get());
-	case AUGMENTER -> Optional.of(getSetting(AUGMENTER_SETTING_ID, ExecutionModeSetting.class).get());
-	case FRONTEND -> Optional.of(getSetting(FRONTEND_SETTING_ID, ExecutionModeSetting.class).get());
-	case INTENSIVE -> Optional.of(getSetting(INTENSIVE_SETTING_ID, ExecutionModeSetting.class).get());
-	case LOCAL_PRODUCTION -> Optional.of(getSetting(LOCAL_PROD_SETTING_ID, ExecutionModeSetting.class).get());
-	case MIXED -> Optional.of(getSetting(MIXED_MODE_SETTING_ID, ExecutionModeSetting.class).get());
-	default -> Optional.empty();
+	    case ACCESS -> Optional.of(getSetting(ACCCESS_SETTING_ID, ExecutionModeSetting.class).get());
+	    case AUGMENTER -> Optional.of(getSetting(AUGMENTER_SETTING_ID, ExecutionModeSetting.class).get());
+	    case FRONTEND -> Optional.of(getSetting(FRONTEND_SETTING_ID, ExecutionModeSetting.class).get());
+	    case INTENSIVE -> Optional.of(getSetting(INTENSIVE_SETTING_ID, ExecutionModeSetting.class).get());
+	    case LOCAL_PRODUCTION -> Optional.of(getSetting(LOCAL_PROD_SETTING_ID, ExecutionModeSetting.class).get());
+	    case MIXED -> Optional.of(getSetting(MIXED_MODE_SETTING_ID, ExecutionModeSetting.class).get());
+	    default -> Optional.empty();
 	};
     }
 }

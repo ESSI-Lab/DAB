@@ -29,12 +29,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -68,22 +68,20 @@ import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 /**
  * @author Fabrizio
  */
-public class ConfigImporter {
+public class ConfigImporter extends VerticalLayout {
 
     /**
      *
      */
     private static final String DEFAULT_CONFIG_NAME = "gs-configuration.json";
-    private final VerticalLayout mainLayout;
 
     /**
      *
      */
     public ConfigImporter() {
 
-	mainLayout = new VerticalLayout();
-	mainLayout.setWidthFull();
-	mainLayout.setHeightFull();
+	setWidthFull();
+	setHeightFull();
 
 	//
 	//
@@ -193,7 +191,7 @@ public class ConfigImporter {
 	msgDiv.getStyle().set("padding", "10px");
 	msgDiv.getStyle().set("border", "1px solid lightgray");
 	msgDiv.getStyle().set("margin-left", "3px");
- 
+
 	HorizontalLayout uploadLayout = new HorizontalLayout();
 	uploadLayout.getStyle().set("margin-top", "-15px");
 	uploadLayout.setWidthFull();
@@ -226,31 +224,22 @@ public class ConfigImporter {
 	Div infoDiv = new Div();
 	infoDiv.setWidthFull();
 	infoDiv.getStyle().set("padding-top", "10px");
-	infoDiv.getStyle().set("font-size", "17px");
+	infoDiv.getStyle().set("font-size", "16px");
 
-	String info =
-		"Configure the storage ('OpenSearch' or 'S3') where to upload the configuration, then click the 'Import from local "
-			+ "configuration file' or 'Import from remote configuration file' button to "
-			+ "upload the selected file into the configured storage. <br>"
-			+ "When the upload is done, you can read in the panel above, the "
-			+ "Java option required to start the DAB with the imported configuration";
+	String info = "Configure the storage ('OpenSearch' or 'S3') where to upload the configuration, then click the 'Import from local "
+		+ "configuration file' or 'Import from remote configuration file' button to "
+		+ "upload the selected file into the configured storage. "
+		+ "When the upload is done, you can read in the panel above, the "
+		+ "Java option required to start the DAB with the imported configuration";
 
 	infoDiv.getElement().setProperty("innerHTML", info);
 
-	mainLayout.add(infoDiv);
-	mainLayout.add(uploadLayout);
-	mainLayout.add(remoteUploadLayout);
-	mainLayout.add(settingComponent);
+	add(infoDiv);
+	add(uploadLayout);
+	add(remoteUploadLayout);
+	add(settingComponent);
 
 	checkFields(msgDiv, upload, remoteUploadButton, setting);
-    }
-
-    /**
-     * @return
-     */
-    public VerticalLayout getMainLayout() {
-
-	return mainLayout;
     }
 
     /**

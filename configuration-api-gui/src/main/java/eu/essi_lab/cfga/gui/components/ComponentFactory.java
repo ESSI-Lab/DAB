@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -34,6 +34,7 @@ import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import eu.essi_lab.cfga.gui.components.tabs.*;
 
 /**
  * @author Fabrizio
@@ -59,9 +60,9 @@ public class ComponentFactory {
      * @param id
      * @return
      */
-    public static TabContainer createTabContainer(String id) {
+    public static TabContent createTabContainer(String id) {
 
-	TabContainer layout = new TabContainer();
+	TabContent layout = new TabContent();
 	// layout.getStyle().set("border","1px solid black");
 	if (id != null) {
 	    layout.setId(id);
@@ -126,9 +127,9 @@ public class ComponentFactory {
      * @param id
      * @return
      */
-    public static TabContainer createNoSpacingNoMarginTabContainer(String id) {
+    public static TabContent createNoSpacingNoMarginTabContainer(String id) {
 
-	TabContainer layout = createTabContainer(id);
+	TabContent layout = createTabContainer(id);
 
 	layout.setMargin(false);
 	layout.setSpacing(false);
@@ -314,6 +315,21 @@ public class ComponentFactory {
     }
 
     /**
+     *
+     * @param color
+     * @return
+     */
+    public static Div createSeparator(String color) {
+
+	Div separator = new Div();
+	separator.setWidthFull();
+	separator.setHeight("1px");
+	separator.getStyle().set("background-color", color);
+
+	return separator;
+    }
+
+    /**
      * @param defaultColor
      * @return
      */
@@ -323,6 +339,19 @@ public class ComponentFactory {
 	if (!defaultColor) {
 	    hr.getStyle().set("background", "lightgray");
 	}
+
+	return hr;
+    }
+
+    /**
+     *
+     * @param color
+     * @return
+     */
+    public static Hr createHr(String color) {
+
+	Hr hr = new Hr();
+	hr.getStyle().set("background", color);
 
 	return hr;
     }

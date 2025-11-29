@@ -24,18 +24,15 @@ package eu.essi_lab.cfga.gs.setting.distribution;
 import java.util.Comparator;
 import java.util.List;
 
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import com.vaadin.flow.data.provider.SortDirection;
 
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSettingLoader;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.setting.AfterCleanFunction;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
@@ -46,12 +43,12 @@ import eu.essi_lab.cfga.setting.SettingUtils;
 public class DistributionSetting extends Setting implements BrokeringSetting {
 
     /**
-     * 
+     *
      */
     private static final String ACCESSORS_SETTING_IDENTIFIER = "accessorsSetting";
 
     /**
-     * 
+     *
      */
     public DistributionSetting() {
 
@@ -77,12 +74,12 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 	addSetting(accessorsSetting);
 
 	List<AccessorSetting> distributed = AccessorSettingLoader.loadDistributed();
-	
+
 	distributed.forEach(s -> {
 
 	    Setting setting = s.clone();
- 	    setting.setIdentifier(s.getConfigurableType());
- 	    accessorsSetting.addSetting(setting);
+	    setting.setIdentifier(s.getConfigurableType());
+	    accessorsSetting.addSetting(setting);
 	});
 
 	// selects the first, because one must be selected
@@ -97,11 +94,6 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 	//
 	//
 	setAfterCleanFunction(new DistributionSettingAfterCleanFunction());
-
-	//
-	// set the component extension
-	//
-	setExtension(new DistributionSettingComponentInfo());
     }
 
     /**
@@ -115,24 +107,30 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
     /**
      * @author Fabrizio
      */
-    public static class DistributionSettingComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
-	public DistributionSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(AccessorSetting.class.getName());
-
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.DISTRIBUTION.getIndex()).//
-		    withShowDirective("Distribution", "Manage DAB distributed sources", SortDirection.ASCENDING).//
+	    descriptor = TabContentDescriptorBuilder.get(DistributionSetting.class).//
+		    withLabel("Distribution").//
+		    withShowDirective("Manage DAB distributed sources", SortDirection.ASCENDING).//
 		    withAddDirective("Add distributed accessor", DistributionSetting.class).//
 		    withRemoveDirective("Remove accessor", true, DistributionSetting.class).//
 		    withEditDirective("Edit accessor", ConfirmationPolicy.ON_WARNINGS).//
 		    build();
+	}
 
-	    setTabDescriptor(tabDescriptor);
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 

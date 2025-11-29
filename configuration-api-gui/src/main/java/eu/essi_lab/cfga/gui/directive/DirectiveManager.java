@@ -1,4 +1,4 @@
-package eu.essi_lab.gssrv.conf;
+package eu.essi_lab.cfga.gui.directive;
 
 /*-
  * #%L
@@ -21,48 +21,42 @@ package eu.essi_lab.gssrv.conf;
  * #L%
  */
 
-import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.tabs.*;
-import eu.essi_lab.cfga.gs.*;
-import eu.essi_lab.cfga.gui.extension.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Fabrizio
  */
-public class ConfigHandler extends ComponentInfo {
+public class DirectiveManager {
+
+    private final List<Directive> list;
 
     /**
-     *
+     * 
      */
-    public ConfigHandler() {
+    public DirectiveManager() {
 
-	setComponentName("Configuration");
+	list = new ArrayList<>();
+    }
 
-	Div mainLayout = new Div();
-	mainLayout.setWidthFull();
+    /**
+     * @param directive
+     */
+    public void add(Directive directive) {
 
-	TabSheet tabSheet = new TabSheet();
+	list.add(directive);
+    }
 
-	ConfigExporter configExporter = new ConfigExporter();
-	ConfigImporter configImporter = new ConfigImporter();
+    /**
+     * @return the directives
+     */
+    public <T extends Directive> Optional<T> get(Class<T> directiveClass) {
 
-	tabSheet.add("Import", configImporter.getMainLayout());
-
-	tabSheet.add("Export", configExporter.getMainLayout());
-
-	mainLayout.add(tabSheet);
-
-	//
-	//
-	//
-
-	TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		withIndex(GSTabIndex.CONFIGURATION_HANDLER.getIndex()).//
-		withShowDirective(getComponentName()).//
-		withComponent(mainLayout).//
-		build();
-
-	setTabDescriptor(tabDescriptor);
+	return list.stream().//
+		filter(d -> directiveClass.equals(d.getClass())).//
+		map(directiveClass::cast).//
+		findFirst();
     }
 
 }

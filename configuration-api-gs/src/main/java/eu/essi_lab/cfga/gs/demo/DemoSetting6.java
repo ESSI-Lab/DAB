@@ -10,20 +10,18 @@ package eu.essi_lab.cfga.gs.demo;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.AfterCleanFunction;
@@ -71,11 +69,6 @@ public class DemoSetting6 extends Setting {
 	addOption(option2);
 
 	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting6ComponentInfo());
-
-	//
 	// set the onClean function
 	//
 	setAfterCleanFunction(new Demo6AfterCleanFunction());
@@ -105,23 +98,23 @@ public class DemoSetting6 extends Setting {
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting6ComponentInfo extends ComponentInfo {
+    public static class DemoSetting6TabDescriptor extends TabDescriptor {
 
 	/**
-	 * 
+	 *
 	 */
-	public DemoSetting6ComponentInfo() {
+	public DemoSetting6TabDescriptor() {
 
-	    setComponentName(DemoSetting6.class.getName());
+	    setLabel("Demo setting 6");
 
 	    setForceReadOnly(false);
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(5).//
-		    withShowDirective("Demo setting 6").//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(DemoSetting6.class).//
+
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setIndex(5);
+	    addContentDescriptor(descriptor);
 	}
     }
 }

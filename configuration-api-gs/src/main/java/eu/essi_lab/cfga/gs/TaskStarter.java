@@ -41,7 +41,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.server.VaadinSession;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
@@ -152,7 +152,7 @@ public abstract class TaskStarter extends GridMenuItemHandler implements ButtonC
     @Override
     public void onClick(//
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    Configuration configuration, //
 	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selection) {

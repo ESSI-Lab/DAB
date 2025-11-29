@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -30,12 +30,9 @@ import eu.essi_lab.cfga.ConfigurationUtils;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.check.*;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.check.scheme.SchemeMethod;
-import eu.essi_lab.cfga.check.scheme.SchemeMethod.CheckMode;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
-import eu.essi_lab.cfga.gs.DefaultConfigurationScheme;
 import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
@@ -44,6 +41,7 @@ import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
+import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.Setting;
@@ -512,7 +510,11 @@ public class DABStarter {
 		    }
 		}
 
-		configuration = FileSource.switchSource(configuration);
+		Optional<File> path = JavaOptions.getValue(JavaOptions.LOCAL_PROD_CONFIG_PATH).map(File::new);
+
+		configuration = path.isPresent() ? //
+			FileSource.switchSource(configuration, path.get()) : //
+			FileSource.switchSource(configuration);
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
@@ -522,35 +524,30 @@ public class DABStarter {
 	    // - eu.essi_lab.cfga.gs.setting.OntologySetting patch
 	    //
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Ontology setting patch STARTED");
+	    GSLoggerFactory.getLogger(getClass()).debug("Legacy Ontology setting patch STARTED");
 
-	    ArrayList<Setting> list = new ArrayList<>();
+	    ReplacePropertyPatch ontologySettingPatch = ReplacePropertyPatch.of(//
+		    configuration,//
+		    Setting.SETTING_CLASS,//
+		    "eu.essi_lab.cfga.gs.setting.OntologySetting",//
+		    "eu.essi_lab.cfga.gs.setting.ontology.OntologySetting");//
 
-	    ConfigurationUtils.deepFind(configuration, s -> s.getObject().getString(Setting.SETTING_CLASS.getKey())
-		    .equals("eu.essi_lab.cfga.gs.setting.OntologySetting"), list);
+	    ontologySettingPatch.patch();
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Found {} legacy ontology settings to convert", list.size());
+	    GSLoggerFactory.getLogger(getClass()).debug("Legacy Ontology setting patch ENDED");
 
-	    if (!list.isEmpty()) {
+	    // ------------------------------------------------------------------
+	    //
+	    // - Setting.EXTENSION patch
+	    //
 
-		List<Setting> converted = list.stream().map(s -> s.getObject().toString().replace( //
-			"eu.essi_lab.cfga.gs.setting.OntologySetting", //
-			"eu.essi_lab.cfga.gs.setting.ontology.OntologySetting")).//
-			map(Setting::new).//
-			toList();
+	    GSLoggerFactory.getLogger(getClass()).debug("Setting.EXTENSION patch STARTED");
 
-		for (Setting setting : list) {
-		    configuration.remove(setting.getIdentifier());
-		}
+	    RemovePropertyPatch extensionPatch = RemovePropertyPatch.of(configuration, Setting.EXTENSION);
 
-		for (Setting s : converted) {
-		    configuration.put(s);
-		}
+	    extensionPatch.patch();
 
-		configuration.flush();
-	    }
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Ontology setting patch ENDED");
+	    GSLoggerFactory.getLogger(getClass()).debug("Setting.EXTENSION patch ENDED");
 
 	    //
 	    //
@@ -676,6 +673,8 @@ public class DABStarter {
 
 	// in case a validator is added to a Setting (or removed from a Setting)
 	similarityCheckMethod.getExclusions().remove(Setting.VALIDATOR);
+
+	similarityCheckMethod.getExclusions().remove(Setting.SHOW_HEADER);
 
 	CheckResponse similarityCheckResponse = similarityCheckMethod.check(configuration);
 
@@ -913,6 +912,7 @@ public class DABStarter {
     }
 
     /**
+     *
      */
     private void startSchedulerLate() {
 
