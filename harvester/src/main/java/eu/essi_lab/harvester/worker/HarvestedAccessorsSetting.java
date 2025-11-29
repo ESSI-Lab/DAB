@@ -69,10 +69,10 @@ public class HarvestedAccessorsSetting extends Setting {
 	//
 	// selects the first, because one must be selected
 	//
+
 	getSettings().//
-		stream().//
-		sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).//
-		findFirst().//
+		parallelStream().//
+		min((s1, s2) -> s1.getName().compareTo(s2.getName())).//
 		get().//
 		setSelected(true);
 
