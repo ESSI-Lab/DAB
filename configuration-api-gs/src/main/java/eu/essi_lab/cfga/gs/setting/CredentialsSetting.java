@@ -113,6 +113,8 @@ public class CredentialsSetting extends Setting implements EditableSetting {
 	setName("Credentials settings");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
+	setShowHeader(false);
+
 	//
 	// LOMBARDIA
 	//

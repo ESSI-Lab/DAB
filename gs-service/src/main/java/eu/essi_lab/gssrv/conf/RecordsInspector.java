@@ -170,7 +170,7 @@ public class RecordsInspector {
 		withShowDirective("Click \"Reload\" to show the list of all the harvested sources, referenced by "
 		+ "name and identifier, along with the number of harvested records (\"Size\") and the percentage related to the total "
 		+ "number of records in the database (visible at the bottom of the \"Size\" column). \"Data #\" indicates the logical data folder (#1 or #2) where the "
-		+ "source records are stored").//
+		+ "source records are stored", false).//
 		withComponent(verticalLayout).//
 		reloadable(() -> update(verticalLayout)).//
 		build();

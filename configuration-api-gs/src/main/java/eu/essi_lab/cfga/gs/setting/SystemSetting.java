@@ -168,6 +168,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	setName("System settings");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
+	setShowHeader(false);
 
 	//
 	// Email harvesting report

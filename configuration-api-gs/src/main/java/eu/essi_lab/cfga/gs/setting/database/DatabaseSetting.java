@@ -56,8 +56,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 
 	setCanBeDisabled(false);
 	setName("Database settings");
-	setDescription("Main database settings");
-
+	setShowHeader(false);
 	setCanBeCleaned(false);
 
 	//
@@ -66,14 +65,14 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 	setSelectionMode(SelectionMode.SINGLE);
 
 	//
-	// Database database configuration, read-only
+	// Database configuration, read-only
 	//
 	{
 	    Setting volatileDb = new Setting();
 	    volatileDb.setName("Volatile database");
 	    volatileDb.setIdentifier(getVolatileDbSettingId());
 	    String desc = "This configuration is not editable and " + //
-		    "the underlyind database implementation is not persistent " + //
+		    "the underlying database implementation is not persistent " + //
 		    "and it is supposed to be used only for test purpose";
 	    volatileDb.setDescription(desc);
 	    volatileDb.setCanBeDisabled(false);
@@ -176,6 +175,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 	public DescriptorProvider() {
 
 	    descriptor = TabContentDescriptorBuilder.get(DatabaseSetting.class).//
+		    withShowDirective("Configuration of the harvested sources database").//
 		    withLabel("Database").//
 		    build();
 	}

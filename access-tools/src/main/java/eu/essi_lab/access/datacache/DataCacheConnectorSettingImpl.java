@@ -60,7 +60,7 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 	setCanBeRemoved(false);
 	setCanBeDisabled(false);
 	enableCompactMode(false);
-
+	setShowHeader(false);
 	setName("Data cache connector setting");
 
 	//

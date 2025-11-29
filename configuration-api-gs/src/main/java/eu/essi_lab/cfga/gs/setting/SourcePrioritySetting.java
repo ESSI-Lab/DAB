@@ -62,6 +62,7 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 		"Define global (DAB-level) Identifier Management options and optionally select one or more sources to prioritize. Collections and datasets of 'priority sources' maintain their original id during harvesting");
 	setCanBeDisabled(false);
 	enableCompactMode(false);
+	setShowHeader(false);
 
 	//
 	// setting with available sources

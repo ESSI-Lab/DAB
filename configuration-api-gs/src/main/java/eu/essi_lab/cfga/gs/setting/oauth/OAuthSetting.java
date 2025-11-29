@@ -91,7 +91,7 @@ public class OAuthSetting extends Setting implements EditableSetting {
 	setName("OAuth settings");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
-
+	setShowHeader(false);
 	setCanBeCleaned(false);
 
 	//

@@ -38,6 +38,11 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 
     }
 
+    public static void main(String[] args) {
+
+	System.out.println(new SchedulerViewSetting());
+    }
+
     @Override
     public String getType() {
 
@@ -57,6 +62,7 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 	public DescriptorProvider() {
 
 	    descriptor = TabContentDescriptorBuilder.get(SchedulerViewSetting.class).//
+		    withShowDirective("This setting defines the type of scheduler used to schedule the batch tasks of harvested sources, custom tasks and augmenters").//
 		    withLabel("Scheduler").//
 		    build();
 	}

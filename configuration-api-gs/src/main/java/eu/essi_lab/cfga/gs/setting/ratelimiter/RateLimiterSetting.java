@@ -120,6 +120,7 @@ public class RateLimiterSetting extends Setting implements EditableSetting {
 	setName("Rate limiter settings");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
+	setShowHeader(false);
 
 	//
 	//
