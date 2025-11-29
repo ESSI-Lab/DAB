@@ -202,7 +202,7 @@ public class SettingUtils {
 	@SuppressWarnings("unchecked")
 	List<T> collect = list.//
 
-		stream().//
+		parallelStream().//
 
 		map(s -> {
 
