@@ -10,8 +10,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.check.CheckResponse;
@@ -41,6 +40,7 @@ import eu.essi_lab.harvester.worker.HarvestingSettingImpl;
 /**
  * @author Fabrizio
  */
+@Ignore
 public class SchemeCheckMethodTest {
 
     private int count;

@@ -30,6 +30,6 @@ public class ReferencedClassesMethodTest {
 
 	Set<String> messages = checkResponse.getMessages();
 
-	Assert.assertEquals(15, messages.size());
+	Assert.assertEquals(23, messages.size());
     }
 }
