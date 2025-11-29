@@ -38,6 +38,7 @@ public class ShowDirective extends Directive {
      *
      */
     private String description;
+    private boolean descriptionSeparator;
 
     /**
      *
@@ -52,6 +53,7 @@ public class ShowDirective extends Directive {
     public ShowDirective(String name) {
 
 	super(name);
+	showDescriptionSeparator(true);
     }
 
     /**
@@ -60,7 +62,7 @@ public class ShowDirective extends Directive {
      */
     public ShowDirective(String name, SortDirection direction) {
 
-	super(name);
+	this(name);
 
 	setSortDirection(direction);
     }
@@ -96,5 +98,22 @@ public class ShowDirective extends Directive {
     public void setDescription(String description) {
 
 	this.description = description;
+    }
+
+    /**
+     *
+      * @return
+     */
+    public boolean withDescriptionSeparator() {
+
+	return descriptionSeparator;
+    }
+
+    /**
+     * @param description
+     */
+    public void showDescriptionSeparator(boolean show) {
+
+	this.descriptionSeparator = show;
     }
 }

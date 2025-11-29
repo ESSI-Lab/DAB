@@ -191,16 +191,17 @@ public class TabContentDescriptorBuilder {
      */
     public TabContentDescriptorBuilder withShowDirective(String description) {
 
-	return withShowDirective(description, null);
+	return withShowDirective(description, null, true);
     }
 
     /**
-     * @param direction
+     * @param description
+     * @param showDescriptionSeparator
      * @return
      */
-    public TabContentDescriptorBuilder withShowDirective(SortDirection direction) {
+    public TabContentDescriptorBuilder withShowDirective(String description, boolean showDescriptionSeparator) {
 
-	return withShowDirective(null, direction);
+	return withShowDirective(description, null, showDescriptionSeparator);
     }
 
     /**
@@ -210,11 +211,31 @@ public class TabContentDescriptorBuilder {
      */
     public TabContentDescriptorBuilder withShowDirective(String description, SortDirection direction) {
 
+	return withShowDirective(description, direction, true);
+    }
+
+    /**
+     * @param direction
+     * @return
+     */
+    public TabContentDescriptorBuilder withShowDirective(SortDirection direction) {
+
+	return withShowDirective(null, direction, true);
+    }
+
+    /**
+     * @param description
+     * @param direction
+     * @return
+     */
+    public TabContentDescriptorBuilder withShowDirective(String description, SortDirection direction, boolean showDescriptionSeparator) {
+
 	ShowDirective showDirective = new ShowDirective();
 
 	if (description != null) {
 
 	    showDirective.setDescription(description);
+	    showDirective.showDescriptionSeparator(showDescriptionSeparator);
 	}
 
 	if (direction != null) {
@@ -263,7 +284,8 @@ public class TabContentDescriptorBuilder {
      * @param showColumnsHider
      * @return
      */
-    public TabContentDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode, boolean showColumnsHider) {
+    public TabContentDescriptorBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode,
+	    boolean showColumnsHider) {
 
 	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), selectionMode, showColumnsHider);
     }
