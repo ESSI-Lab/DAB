@@ -674,6 +674,8 @@ public class DABStarter {
 	// in case a validator is added to a Setting (or removed from a Setting)
 	similarityCheckMethod.getExclusions().remove(Setting.VALIDATOR);
 
+	similarityCheckMethod.getExclusions().remove(Setting.SHOW_HEADER);
+
 	CheckResponse similarityCheckResponse = similarityCheckMethod.check(configuration);
 
 	if (configEditCheck.getCheckResult() == CheckResult.CHECK_FAILED || //
