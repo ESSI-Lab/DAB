@@ -524,7 +524,7 @@ public class DABStarter {
 	    // - eu.essi_lab.cfga.gs.setting.OntologySetting patch
 	    //
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Ontology setting patch STARTED");
+	    GSLoggerFactory.getLogger(getClass()).debug("Legacy Ontology setting patch STARTED");
 
 	    ReplacePropertyPatch ontologySettingPatch = ReplacePropertyPatch.of(//
 		    configuration,//
@@ -534,20 +534,20 @@ public class DABStarter {
 
 	    ontologySettingPatch.patch();
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Ontology setting patch ENDED");
+	    GSLoggerFactory.getLogger(getClass()).debug("Legacy Ontology setting patch ENDED");
 
 	    // ------------------------------------------------------------------
 	    //
 	    // - Setting.EXTENSION patch
 	    //
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Setting extension patch STARTED");
+	    GSLoggerFactory.getLogger(getClass()).debug("Setting.EXTENSION patch STARTED");
 
 	    RemovePropertyPatch extensionPatch = RemovePropertyPatch.of(configuration, Setting.EXTENSION);
 
 	    extensionPatch.patch();
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Setting extension patch ENDED");
+	    GSLoggerFactory.getLogger(getClass()).debug("Setting.EXTENSION patch ENDED");
 
 	    //
 	    //
