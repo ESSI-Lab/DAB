@@ -37,6 +37,7 @@ import eu.essi_lab.cfga.gui.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.gui.directive.*;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -104,6 +105,11 @@ public class ConfigurationViewFactory {
 	    descriptors.forEach(desc -> tabSheet.add( //
 		    desc.getLabel(), //
 		    createTabContent(desc, configuration, view, tabDescriptor, false)));
+
+	    if(tabDescriptor.getIndex() == 0){
+
+		tabSheet.setRendered(true);
+	    }
 
 	    content = tabSheet;
 	}
