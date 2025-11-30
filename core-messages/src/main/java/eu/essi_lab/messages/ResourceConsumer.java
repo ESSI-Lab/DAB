@@ -29,6 +29,11 @@ import java.util.function.Consumer;
  * @author Fabrizio
  */
 @FunctionalInterface
-public interface ResourceConsumer extends Consumer<GSResource> {
+public interface ResourceConsumer {
 
+    /**
+     * @param resource
+     * @param message
+     */
+    void consume(GSResource resource, DiscoveryMessage message);
 }

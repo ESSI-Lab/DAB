@@ -79,7 +79,7 @@ public class SchedulerSetting extends Setting implements EditableSetting {
 
 	setName("Scheduler");
 	setCanBeDisabled(false);
-
+	setShowHeader(false);
 	setCanBeCleaned(false);
 	enableCompactMode(false);
 

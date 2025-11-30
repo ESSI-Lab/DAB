@@ -27,7 +27,7 @@ import com.vaadin.flow.component.button.Button;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
@@ -44,7 +44,7 @@ public class SettingEditButtonConfirmationListener implements ButtonChangeListen
     private final Setting settingToEdit;
     private final boolean foldedModeEnabled;
     private final SettingComponent currentSettingComponent;
-    private final TabContainer tabContainer;
+    private final TabContent tabContent;
     private final SettingEditDialog dialog;
 
     /**
@@ -52,7 +52,7 @@ public class SettingEditButtonConfirmationListener implements ButtonChangeListen
      * @param configuration
      * @param settingToEdit
      * @param currentSettingComponent
-     * @param tabContainer
+     * @param tabContent
      * @param foldedModeEnabled
      */
     public SettingEditButtonConfirmationListener(//
@@ -60,14 +60,14 @@ public class SettingEditButtonConfirmationListener implements ButtonChangeListen
 	    Configuration configuration, //
 	    Setting settingToEdit, //
 	    SettingComponent currentSettingComponent, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    boolean foldedModeEnabled) {
 
 	this.dialog = dialog;
 	this.configuration = configuration;
 	this.settingToEdit = settingToEdit;
 	this.currentSettingComponent = currentSettingComponent;
-	this.tabContainer = tabContainer;
+	this.tabContent = tabContent;
 	this.foldedModeEnabled = foldedModeEnabled;
     }
 
@@ -119,9 +119,9 @@ public class SettingEditButtonConfirmationListener implements ButtonChangeListen
 		    configuration, //
 		    settingToEdit, //
 		    true, //
-		    this.tabContainer);
+		    this.tabContent);
 
-	    tabContainer.replaceSettingComponent(currentSettingComponent, editedSettingComponent);
+	    tabContent.replaceSettingComponent(currentSettingComponent, editedSettingComponent);
 	}
 
 	dialog.close();

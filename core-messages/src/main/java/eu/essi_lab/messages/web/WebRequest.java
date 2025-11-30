@@ -422,8 +422,11 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * Retrieves the complete host name from the supplied uri in the form <code>scheme://authority</code><br> E.g:<br> - <i>Request</i> ->
-     * http://localhost:9090/gs-service/services/essi/ssc/feed<br> - <i>Complete host name</i> -> http://localhost:9090<br>
+     * Retrieves the complete host name from the supplied uri in the form <code>scheme://authority</code><br>
+     * E.g:<br>
+     * - <i>Request</i> ->
+     * http://localhost:9090/gs-service/services/essi/ssc/feed<br>
+     * - <i>Complete host name</i> -> http://localhost:9090<br>
      *
      * @param uri
      * @return
@@ -443,9 +446,8 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	String serverName = request.getServerName(); // localhost
 	int serverPort = request.getServerPort(); // 8080
 
-	return scheme + "://" + serverName + ((serverPort == 80 && "http".equals(scheme)) || (serverPort == 443 && "https".equals(scheme))
-		? ""
-		: ":" + serverPort);
+	return scheme + "://" + serverName
+		+ ((serverPort == 80 && "http".equals(scheme)) || (serverPort == 443 && "https".equals(scheme)) ? "" : ":" + serverPort);
     }
 
     /**
@@ -690,8 +692,10 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * Set the base services path. It must begin and end with '/' (e.g: "/services/essi/"). It must be correctly set and it must match the
-     * request base services path in order to have a correct behavior during the path comparison of the {@link GETRequestFilter}
+     * Set the base services path. It must begin and end with '/' (e.g: "/services/essi/"). It must be correctly set and
+     * it must match the
+     * request base services path in order to have a correct behavior during the path comparison of the
+     * {@link GETRequestFilter}
      *
      * @param path
      */
@@ -805,7 +809,8 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * This method is a shortcut for {@link #getServletRequest()}getQueryString().<br> The returned value can be also set calling the
+     * This method is a shortcut for {@link #getServletRequest()}getQueryString().<br>
+     * The returned value can be also set calling the
      * {@link #setQueryString(String)} method
      *
      * @return the query string if available, <code>null</code> otherwise
@@ -830,7 +835,8 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * This method is a shortcut for {@link #getServletRequest()}getQueryString().<br> The returned value can be also set calling the
+     * This method is a shortcut for {@link #getServletRequest()}getQueryString().<br>
+     * The returned value can be also set calling the
      * {@link #setQueryString(String)} method
      *
      * @see #isGetRequest()
@@ -853,8 +859,10 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * This method retrieves the form data (if available) provided as body in the "application/x-www-form-urlencoded" encoding, or as query
-     * string in the request URL after the path. In the latter case, this method is equivalent to {@link #getQueryString()}
+     * This method retrieves the form data (if available) provided as body in the "application/x-www-form-urlencoded"
+     * encoding, or as query
+     * string in the request URL after the path. In the latter case, this method is equivalent to
+     * {@link #getQueryString()}
      *
      * @return
      * @see #isPostFormRequest()
@@ -903,7 +911,8 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * Returns the path of the request following the services base path (e.g.: '/services/essi/') deprived of the last '/': E.g:
+     * Returns the path of the request following the services base path (e.g.: '/services/essi/') deprived of the last
+     * '/': E.g:
      * <ul>
      * <li>current path: http://localhost/gs-service/services/essi/opensearch/description</li>
      * <li>request path: opensearch/description</li>
@@ -942,7 +951,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
      * Return a {@link ClonableInputStream} instantiated with the {@link HttpServletRequest} input stream
      *
      * @return a {@link ClonableInputStream} instantiated with the {@link HttpServletRequest} input stream if available,
-     * <code>null</code> otherwise
+     *         <code>null</code> otherwise
      * @see #isGetRequest()
      * @see #isPostRequest()
      */
@@ -975,6 +984,11 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	String queryString = getQueryString();
 
+	return extractQueryParameter(queryString, key);
+    }
+
+    public static Optional<String> extractQueryParameter(String queryString, String key) {
+
 	if (queryString != null && queryString.contains(key + "=")) {
 
 	    String split = queryString.split(key + "=")[1];
@@ -989,22 +1003,19 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	return Optional.empty();
     }
 
-    /**
-     * The more common way to express the token in GS-service is to put it in the first part of the path preceded by "token" key in the form
-     * /token/{tokenId}/service This method extracts token id from the request path.<br> The other way is in the query string as value of
-     * the "token" key
-     *
-     * @return the tokenId or null if not found
-     */
-    public Optional<String> extractTokenId() {
+    public static Optional<String> extractTokenId(URL url) {
+  	return extractTokenId(url.getPath(), url.getQuery());
+      }
+    
+    public static Optional<String> extractTokenId(String requestPath, String query) {
 
-	Optional<String> optionalToken = extractQueryParameter("token");
+	Optional<String> optionalToken = extractQueryParameter(query,"token");
 
 	if (optionalToken.isPresent()) {
 	    return optionalToken;
 	}
 
-	String requestPath = getRequestPath();
+	
 	if (requestPath == null) {
 	    return Optional.empty();
 	}
@@ -1020,17 +1031,43 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	return Optional.empty();
     }
+    
+    /**
+     * The more common way to express the token in GS-service is to put it in the first part of the path preceded by
+     * "token" key in the form
+     * /token/{tokenId}/service This method extracts token id from the request path.<br>
+     * The other way is in the query string as value of
+     * the "token" key
+     *
+     * @return the tokenId or null if not found
+     */
+    public Optional<String> extractTokenId() {
+
+	return extractTokenId(getRequestPath(), getQueryString());
+	
+    }
 
     /**
-     * The more common way to express the viewId in GS-service is to put it in the first part of the path (or after the token path
-     * parameter) preceded by "view" key in the form /view/{viewId}/service This method extracts view id from the request path.<br> The
+     * The more common way to express the viewId in GS-service is to put it in the first part of the path (or after the
+     * token path
+     * parameter) preceded by "view" key in the form /view/{viewId}/service This method extracts view id from the
+     * request path.<br>
+     * The
      * other way is in the query string as value of the "token" key
      *
      * @return the viewId or null if not found
      */
     public Optional<String> extractViewId() {
 
-	String requestPath = getRequestPath();
+	return extractViewId(getRequestPath(), getQueryString());
+
+    }
+
+    public static Optional<String> extractViewId(URL fullRequest) {
+	return extractViewId(fullRequest.getPath(), fullRequest.getQuery());
+    }
+
+    public static Optional<String> extractViewId(String requestPath, String query) {
 
 	try {
 
@@ -1065,16 +1102,16 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    //
 	    // we try in the query string
 	    //
-	    Optional<String> optionalView = extractQueryParameter("view");
 
-	    if (optionalView.isPresent()) {
+	    Optional<String> viewQueryParameter = extractQueryParameter(query, "view");
+	    if (viewQueryParameter.isPresent()) {
 
-		return optionalView;
+		return viewQueryParameter;
 	    }
 
 	} catch (Exception ex) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(//
+	    GSLoggerFactory.getLogger(WebRequest.class).error(//
 		    "Error occurred '{}' trying to extract view id from request path: {}", //
 		    ex.getMessage(), //
 		    requestPath);
@@ -2090,5 +2127,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	};
 
     }
+
+  
 
 }

@@ -129,6 +129,21 @@
 		<filter-name>RequestLoggingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping> -->
+	
+	<!-- ================================== -->
+	<!-- WMSCacheFilter -->
+	<!-- ================================== -->
+
+	<filter>
+		<filter-name>WMSCacheFilter</filter-name>
+		<filter-class>eu.essi_lab.gssrv.servlet.WMSCacheFilter</filter-class>
+		<async-supported>true</async-supported>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>WMSCacheFilter</filter-name>
+		<url-pattern>*</url-pattern>
+	</filter-mapping>
 
 	<!-- ================================== -->
 	<!-- RateLimiterFilter -->

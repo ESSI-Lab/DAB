@@ -22,10 +22,7 @@ package eu.essi_lab.cfga.gs.setting;
  */
 
 import eu.essi_lab.cfga.Configurable;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 
@@ -34,12 +31,16 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
  */
 public class SchedulerViewSetting extends SchedulerSetting implements Configurable<Setting> {
 
+    /**
+     *
+     */
     public SchedulerViewSetting() {
 
-	//
-	// set the rendering extension
-	//
-	setExtension(new SchedulerSettingComponentInfo());
+    }
+
+    public static void main(String[] args) {
+
+	System.out.println(new SchedulerViewSetting());
     }
 
     @Override
@@ -51,21 +52,28 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
     /**
      * @author Fabrizio
      */
-    public static class SchedulerSettingComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 * 
 	 */
-	public SchedulerSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(SchedulerSetting.class.getName());
-
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.SCHEDULER.getIndex()).//
-		    withShowDirective("Scheduler").//
+	    descriptor = TabContentDescriptorBuilder.get(SchedulerViewSetting.class).//
+		    withShowDirective("This setting defines the type of scheduler used to schedule the batch tasks of harvested sources, custom tasks and augmenters").//
+		    withLabel("Scheduler").//
 		    build();
+	}
 
-	    setTabDescriptor(tabDescriptor);
+	/**
+	 *
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 

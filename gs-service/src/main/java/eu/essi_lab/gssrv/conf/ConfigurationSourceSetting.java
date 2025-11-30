@@ -46,13 +46,6 @@ import eu.essi_lab.model.exceptions.GSException;
  */
 public class ConfigurationSourceSetting extends Setting implements EditableSetting {
 
-    private static final String MARK_LOGIC_SETTING_ID = "mlSetting";
-    private static final String MARK_LOGIC_NAME_OPTION_KEY = "mlName";
-    private static final String MARK_LOGIC_URI_OPTION_KEY = "mlUri";
-    private static final String MARK_LOGIC_USER_OPTION_KEY = "mlUser";
-    private static final String MARK_LOGIC_PWD_OPTION_KEY = "mlPwd";
-    private static final String MARK_LOGIC_FOLDER_OPTION_KEY = "mlFolder";
-
     private static final String OS_SETTING_ID = "osSetting";
     private static final String OS_URI_OPTION_KEY = "osUri";
     private static final String OS_NAME_OPTION_KEY = "osName";
@@ -96,10 +89,8 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 	setShowHeader(false);
 	setCanBeCleaned(false);
 	setSelectionMode(SelectionMode.SINGLE);
-	setDescription("Configure the storage ('OpenSearch' or 'S3'), " //
-		+ "then click the 'Upload local configuration file' or 'Upload remote configuration file' "
-		+ "button to upload the selected file into the configured storage. \n\n"
-		+ "When the upload is done, you can read in the panel above, the Java option required to start the DAB with the uploaded configuration");
+	setDescription("The configuration can be uploaded to an OpenSearch or an S3 storage. Configure the desired "
+		+ "storage and click on of the 'Import' buttons to upload the configuration in the configured storage");
 
 	DatabaseSetting dbSetting = ConfigurationWrapper.getDatabaseSetting();
 
@@ -234,70 +225,6 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 	    osSourceSetting.addOption(pwdOption);
 
 	    addSetting(osSourceSetting);
-	}
-
-	{
-	    Setting mlSourceSetting = new Setting();
-	    mlSourceSetting.setName("MarkLogic");
-	    mlSourceSetting.setIdentifier(MARK_LOGIC_SETTING_ID);
-	    mlSourceSetting.setCanBeDisabled(false);
-	    mlSourceSetting.enableCompactMode(false);
-	    mlSourceSetting.setEditable(false);
-
-	    Option<String> dbNameOption = StringOptionBuilder.get().//
-		    withLabel("Database name").//
-		    withDescription("E.g.: 'TEST-DB', 'PRODUCTION-DB'").//
-		    withConditionalValue(impl == DatabaseImpl.MARK_LOGIC, dbSetting.getDatabaseName()).//
-		    withKey(MARK_LOGIC_NAME_OPTION_KEY).//
-		    cannotBeDisabled().//
-		    required().//
-		    build();
-
-	    mlSourceSetting.addOption(dbNameOption);
-
-	    Option<String> uriOption = StringOptionBuilder.get().//
-		    withLabel("Database URI").//
-		    withDescription("E.g.: 'xdbc://localhost:8000,8004'").//
-		    withConditionalValue(impl == DatabaseImpl.MARK_LOGIC, dbSetting.getDatabaseUri(), "xdbc://").//
-		    withKey(MARK_LOGIC_URI_OPTION_KEY).//
-		    cannotBeDisabled().//
-		    required().//
-		    build();
-
-	    mlSourceSetting.addOption(uriOption);
-
-	    Option<String> userOption = StringOptionBuilder.get().//
-		    withLabel("Database user").//
-		    withKey(MARK_LOGIC_USER_OPTION_KEY).//
-		    withConditionalValue(impl == DatabaseImpl.MARK_LOGIC, dbSetting.getDatabaseUser()).//
-		    cannotBeDisabled().//
-		    required().//
-		    build();
-
-	    mlSourceSetting.addOption(userOption);
-
-	    Option<String> pwdOption = StringOptionBuilder.get().//
-		    withLabel("Database password").//
-		    withKey(MARK_LOGIC_PWD_OPTION_KEY).//
-		    withConditionalValue(impl == DatabaseImpl.MARK_LOGIC, dbSetting.getDatabasePassword()).//
-		    cannotBeDisabled().//
-		    required().//
-		    build();
-
-	    mlSourceSetting.addOption(pwdOption);
-
-	    Option<String> folderOption = StringOptionBuilder.get().//
-		    withLabel("Configuration folder").//
-		    withDescription("E.g.: 'test', 'preprod', 'prod'").//
-		    withKey(MARK_LOGIC_FOLDER_OPTION_KEY).//
-		    withConditionalValue(impl == DatabaseImpl.MARK_LOGIC, dbSetting.getConfigurationFolder()).//
-		    cannotBeDisabled().//
-		    required().//
-		    build();
-
-	    mlSourceSetting.addOption(folderOption);
-
-	    // addSetting(mlSourceSetting);
 	}
     }
 

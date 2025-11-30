@@ -23,9 +23,7 @@ package eu.essi_lab.cfga.gs.demo;
 
 import java.util.UUID;
 
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -119,11 +117,6 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
 	settingChild2.addOption(setting2Option);
 
 	addSetting(settingChild2);
-
-	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting2ComponentInfo());
     }
 
     /**
@@ -200,23 +193,23 @@ public class DemoSetting2 extends SchedulerWorkerSetting {
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting2ComponentInfo extends ComponentInfo {
+    public static class DemoSetting2TabDescriptor extends TabDescriptor {
 
 	/**
 	 * 
 	 */
-	public DemoSetting2ComponentInfo() {
+	public DemoSetting2TabDescriptor() {
 
-	    setComponentName(DemoSetting2.class.getName());
+	    setLabel("Demo setting 2");
 
 	    setForceReadOnly(false);
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(1).//
-		    withShowDirective("Demo setting 2").//
-		    build();
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(DemoSetting2.class).//
 
-	    setTabDescriptor(tabDescriptor);
+ 		    build();
+
+	    setIndex(1);
+	    addContentDescriptor(descriptor);
 	}
     }
 

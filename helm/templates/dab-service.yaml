@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dab
+spec:
+  selector:
+    app: dab
+  ports:
+  - port: {{ .Values.dab.port }}
+    targetPort: {{ .Values.dab.port }}
+  type: ClusterIP

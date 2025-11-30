@@ -110,6 +110,8 @@ public class ConfigurationViewButton extends CustomButton {
      */
     protected void init() {
 
+	getStyle().set("border-radius", "0px");
+
 	addDisabledStyle("color", "lightgray");
 	addDisabledStyle("background-color", "white");
 	addDisabledStyle("border", "1px solid lightgray");

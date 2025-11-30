@@ -4,14 +4,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 
 /*-
  * #%L
@@ -23,12 +20,12 @@ import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -65,6 +62,7 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 		"Define global (DAB-level) Identifier Management options and optionally select one or more sources to prioritize. Collections and datasets of 'priority sources' maintain their original id during harvesting");
 	setCanBeDisabled(false);
 	enableCompactMode(false);
+	setShowHeader(false);
 
 	//
 	// setting with available sources
@@ -96,17 +94,11 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 	    });
 	}
 
-	//
-	// set the rendering extension
-	//
-	setExtension(new SourcePrioritySettingComponentInfo());
-
 	Option<BooleanChoice> mantainuuid = BooleanChoiceOptionBuilder.get().//
 		withKey(MANTAIN_UUID_KEY).//
 		withLabel("Always use original ID when it is a valid UUID").//
 		withDescription(
-			"Metadata with an original identifier which is a valid UUID will maintain the original id after the " + "mapping")
-		.//
+		"Metadata with an original identifier which is a valid UUID will maintain the original id after the " + "mapping").//
 		withSingleSelection().//
 		withValues(LabeledEnum.values(BooleanChoice.class)).//
 		withSelectedValue(BooleanChoice.TRUE).//
@@ -131,8 +123,7 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 		withKey(PRESERVE_ID_KEY).//
 		withLabel("Mantain persistent id").//
 		withDescription(
-			"Metadata with the same original identifier will mantain the same DAB identifier after each " + "re-harvesting")
-		.//
+		"Metadata with the same original identifier will mantain the same DAB identifier after each " + "re-harvesting").//
 		withSingleSelection().//
 		withValues(LabeledEnum.values(BooleanChoice.class)).//
 		withSelectedValue(BooleanChoice.FALSE).//
@@ -145,8 +136,7 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 		withKey(NULL_ORIGINAL_ID_KEY).//
 		withLabel("Allow null original id").//
 		withDescription("Metadata with a null original identifier are allowed, DAB will generate a random id which will change "
-			+ "after each re-harvesting")
-		.//
+		+ "after each re-harvesting").//
 		withSingleSelection().//
 		withValues(LabeledEnum.values(BooleanChoice.class)).//
 		withSelectedValue(BooleanChoice.TRUE).//
@@ -175,21 +165,26 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class SourcePrioritySettingComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public SourcePrioritySettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(SourcePrioritySettingComponentInfo.class.getName());
-
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.IDENTIFIER_MANAGEMENT.getIndex()).//
-		    withShowDirective("Identifier management").//
+	    descriptor = TabContentDescriptorBuilder.get(SourcePrioritySetting.class).//
+		    withLabel("Identifier management").//
 		    build();
+	}
 
-	    setTabDescriptor(tabDescriptor);
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 

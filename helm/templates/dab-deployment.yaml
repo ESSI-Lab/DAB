@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dab
+  template:
+    metadata:
+      labels:
+        app: dab
+    spec:
+      containers:
+      - name: dab
+        image: {{ .Values.dab.image }}
+        env:
+        {{- range $key, $value := .Values.dab.env }}
+        - name: {{ $key }}
+          value: "{{ $value }}"
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.dab.port }}

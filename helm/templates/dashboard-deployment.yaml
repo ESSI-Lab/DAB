@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch-dashboards
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opensearch-dashboards
+  template:
+    metadata:
+      labels:
+        app: opensearch-dashboards
+    spec:
+      containers:
+      - name: dashboard
+        image: {{ .Values.dashboard.image }}
+        env:
+        - name: OPENSEARCH_HOSTS
+          value: "[\"http://opensearch:9200\"]"
+        - name: DISABLE_SECURITY_DASHBOARDS_PLUGIN
+          value: "true"
+        ports:
+        - containerPort: {{ .Values.dashboard.port }}

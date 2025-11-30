@@ -26,18 +26,15 @@ import java.util.List;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.setting.ConfigurationObject;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
@@ -63,6 +60,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     private static final String ENABLE_DOWNLOAD_MAIL_REPORTS_OPTION_KEY = "enableMailDownloadReport";
     private static final String ENABLE_ERROR_LOGS_MAIL_REPORTS_OPTION_KEY = "enableErrorLogsReport";
     private static final String EMAIL_SETTING_ID = "emailSetting";
+    private static final String WMS_CACHE_SETTING_ID = "wmsCacheSetting";
     private static final String USERS_DATABASE_SETTING_ID = "usersDatabase";
     private static final String SEM_SEARCH_SETTING_ID = "defSemanticSearch";
 
@@ -127,7 +125,12 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	/**
 	 * XACMLAutorizer option
 	 */
-	DEV_MACHINE_AUTH("devMachineAuth");
+	DEV_MACHINE_AUTH("devMachineAuth"),
+
+	/**
+	 *
+	 */
+	DATA_PROXY_SERVER("dataProxyServer");
 
 	/**
 	 * MirrorSiteTokenGeneratorHandler option prefix
@@ -165,6 +168,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	setName("System settings");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
+	setShowHeader(false);
 
 	//
 	// Email harvesting report
@@ -257,6 +261,15 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	emailSetting.setIdentifier(EMAIL_SETTING_ID);
 
 	addSetting(emailSetting);
+	
+	//
+	// WMS Cache settings
+	//
+
+	WMSCacheSetting wmsCacheSetting = new WMSCacheSetting();
+	wmsCacheSetting.setIdentifier(WMS_CACHE_SETTING_ID);
+
+	addSetting(wmsCacheSetting);
 
 	//
 	// Statistics
@@ -310,11 +323,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	semSearchSetting.setIdentifier(SEM_SEARCH_SETTING_ID);
 
 	addSetting(semSearchSetting);
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new SystemSettingComponentInfo());
 
 	//
 	// set the validator
@@ -396,21 +404,27 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     /**
      * @author Fabrizio
      */
-    public static class SystemSettingComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 * 
 	 */
-	public SystemSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(SystemSetting.class.getName());
-
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.SYSTEM.getIndex()).//
-		    withShowDirective("System").//
+	    descriptor = TabContentDescriptorBuilder.get(SystemSetting.class).//
+		    withLabel("Miscellaneous").//
 		    build();
+	}
 
-	    setTabDescriptor(tabDescriptor);
+	/**
+	 *
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 
@@ -499,6 +513,24 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	if (emailSetting.isEnabled()) {
 
 	    return Optional.of(emailSetting);
+	}
+
+	return Optional.empty();
+    }
+    
+    //
+    // WMS Cache
+    //
+
+    /**
+     * @return
+     */
+    public Optional<WMSCacheSetting> getWMSCacheSetting() {
+
+	WMSCacheSetting setting = getSetting(WMS_CACHE_SETTING_ID, WMSCacheSetting.class).get();
+	if (setting.isEnabled()) {
+
+	    return Optional.of(setting);
 	}
 
 	return Optional.empty();

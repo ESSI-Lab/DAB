@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.extension.directive;
+package eu.essi_lab.gssrv.servlet.wmscache;
 
 /*-
  * #%L
@@ -21,42 +21,37 @@ package eu.essi_lab.cfga.gui.extension.directive;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map.Entry;
 
-/**
- * @author Fabrizio
- */
-public class DirectiveManager {
+public interface WMSCacheStats {
 
-    private final List<Directive> list;
+    public List<String>getViews();
+    
+    public List<String>getLayers(String view);
+    
+    /**
+     * Increments usage counter for a given reqid.
+     */
+    public long incrementUsage(String view, String layer, String reqid);
 
     /**
-     * 
+     * Adds one usage point to the global leaderboard.
      */
-    public DirectiveManager() {
-
-	list = new ArrayList<>();
-    }
+    public void updateLeaderboard(String view, String layer, String reqid);
 
     /**
-     * @param directive
+     * Stores metadata related to a reqid (e.g. canonical JSON, timestamps).
      */
-    public void add(Directive directive) {
-
-	list.add(directive);
-    }
+    public void storeRequest(String view, String layer, String reqid, String request);
 
     /**
-     * @return the directives
+     * Fetch metadata for a reqid.
      */
-    public <T extends Directive> Optional<T> get(Class<T> directiveClass) {
+    public String loadRequest(String view, String layer, String reqid);
 
-	return list.stream().//
-		filter(d -> directiveClass.equals(d.getClass())).//
-		map(directiveClass::cast).//
-		findFirst();
-    }
-
+    /**
+     * Retrieves top N most-used reqids from the leaderboard.
+     */
+    public List<Entry<String, Double>> getTopRequests(String view, String layer, int limit);
 }

@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -25,14 +25,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.GSSource;
 
@@ -42,12 +39,12 @@ import eu.essi_lab.model.GSSource;
 public class GDCSourcesSetting extends Setting implements EditableSetting {
 
     /**
-     * 
+     *
      */
     private static final String SOURCES_SETTING_IDENTIFIER = "availableSources";
 
     /**
-     * 
+     *
      */
     public GDCSourcesSetting() {
 
@@ -85,11 +82,6 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 		}
 	    });
 	}
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new GDCSettingComponentInfo());
     }
 
     /**
@@ -111,21 +103,26 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class GDCSettingComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
-	public GDCSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(GDCSettingComponentInfo.class.getName());
-
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.GDC_SOURCES.getIndex()).//
-		    withShowDirective("GDC sources").//
+	    descriptor = TabContentDescriptorBuilder.get(GDCSourcesSetting.class).//
+		    withLabel("GDC Sources").//
 		    build();
+	}
 
-	    setTabDescriptor(tabDescriptor);
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 

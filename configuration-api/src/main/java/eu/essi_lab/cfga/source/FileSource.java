@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.source;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -55,10 +55,10 @@ public class FileSource implements ConfigurationSource {
     private final File source;
 
     /**
-     * Uses {@link File#createTempFile(String, String)} with "config" and ".json" as params.<br>
-     * Since according to the {@link File#createTempFile(String, String)} the file name has a random prefix, use this
-     * constructor for test purpose when it is not required to reuse a flushed source
-     * 
+     * Uses {@link File#createTempFile(String, String)} with "config" and ".json" as params.<br> Since according to the
+     * {@link File#createTempFile(String, String)} the file name has a random prefix, use this constructor for test purpose when it is not
+     * required to reuse a flushed source
+     *
      * @throws IOException
      */
     public FileSource() throws IOException {
@@ -67,9 +67,8 @@ public class FileSource implements ConfigurationSource {
     }
 
     /**
-     * Creates a new file source in the <code>System.getProperty("java.io.tmpdir")</code> directory and creates
-     * a file having as prefix <code>sourceName</code> and ".json" as suffix
-     *
+     * Creates a new file source in the <code>System.getProperty("java.io.tmpdir")</code> directory and creates a file having as prefix
+     * <code>sourceName</code> and ".json" as suffix
      */
     public FileSource(String configFileName) {
 
@@ -104,16 +103,17 @@ public class FileSource implements ConfigurationSource {
     }
 
     /**
-     * Creates a clone of the given <code>configuration</code> having a local File System source located
-     * in the user temp directory
-     * 
+     * Creates a clone of the given <code>configuration</code> having a local File System source located in the given
+     * <code>configFolder</code>
+     *
      * @param configuration
+     * @param configFolder
      * @return
      * @throws Exception
      */
-    public static Configuration switchSource(Configuration configuration) throws Exception {
+    public static Configuration switchSource(Configuration configuration, File configFolder) throws Exception {
 
-	File localFile = File.createTempFile("gs-configuration", ".json");
+	File localFile = new File(configFolder, "gs-configuration.json");
 	String configString = configuration.toString();
 
 	FileOutputStream fileOutputStream = new FileOutputStream(localFile);
@@ -125,6 +125,18 @@ public class FileSource implements ConfigurationSource {
 
 	FileSource fileSource = new FileSource(localFile);
 	return new Configuration(fileSource);
+    }
+
+    /**
+     * Creates a clone of the given <code>configuration</code> having a local File System source located in the user temp directory
+     *
+     * @param configuration
+     * @return
+     * @throws Exception
+     */
+    public static Configuration switchSource(Configuration configuration) throws Exception {
+
+	return switchSource(configuration, File.createTempFile("gs-configuration", ".json"));
     }
 
     @Override

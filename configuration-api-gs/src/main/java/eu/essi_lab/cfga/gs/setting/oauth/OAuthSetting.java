@@ -23,14 +23,12 @@ package eu.essi_lab.cfga.gs.setting.oauth;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -86,14 +84,14 @@ public class OAuthSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public OAuthSetting() {
 
 	setName("OAuth settings");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
-
+	setShowHeader(false);
 	setCanBeCleaned(false);
 
 	//
@@ -139,11 +137,6 @@ public class OAuthSetting extends Setting implements EditableSetting {
 		build();
 
 	addOption(clientSecretOption);
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new OAuthSettingComponentInfo());
 
 	//
 	// set the validator
@@ -230,21 +223,22 @@ public class OAuthSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class OAuthSettingComponentInfo extends ComponentInfo {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
-	 * 
+	 *
 	 */
-	public OAuthSettingComponentInfo() {
+	public TabDescriptorProvider() {
 
-	    setComponentName(OAuthSetting.class.getName());
+	    setLabel("Authorization");
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.AUTHORIZATION.getIndex()).//
-		    withShowDirective("Authorization").//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(OAuthSetting.class).//
+
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setIndex(GSTabIndex.AUTHORIZATION.getIndex());
+	    addContentDescriptor(descriptor);
+
 	}
     }
 
@@ -288,7 +282,7 @@ public class OAuthSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void setClientId(String clientId) {
 
@@ -320,7 +314,7 @@ public class OAuthSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void setClientSecret(String clientSecret) {
 

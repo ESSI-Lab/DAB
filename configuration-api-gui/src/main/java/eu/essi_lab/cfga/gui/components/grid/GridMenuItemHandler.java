@@ -28,7 +28,7 @@ import java.util.UUID;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
@@ -64,7 +64,7 @@ public abstract class GridMenuItemHandler {
      */
     public abstract void onClick(//
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    Configuration configuration, //
 	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selected);
@@ -79,7 +79,7 @@ public abstract class GridMenuItemHandler {
      */
     public boolean isEnabled(//
 	    HashMap<String, String> eventItem, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    Configuration configuration, //
 	    Setting setting, //
 	    HashMap<String, Boolean> selection) {

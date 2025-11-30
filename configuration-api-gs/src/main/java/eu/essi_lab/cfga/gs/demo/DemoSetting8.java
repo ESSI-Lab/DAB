@@ -10,20 +10,18 @@ package eu.essi_lab.cfga.gs.demo;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -63,33 +61,28 @@ public class DemoSetting8 extends Setting {
 
 	    addOption(option);
 	}
-
-	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting1ComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting1ComponentInfo extends ComponentInfo {
+    public static class DemoSetting8TabDescriptor extends TabDescriptor {
 
 	/**
-	 * 
+	 *
 	 */
-	public DemoSetting1ComponentInfo() {
+	public DemoSetting8TabDescriptor() {
 
-	    setComponentName(DemoSetting8.class.getName());
+	    setLabel(DemoSetting8.class.getName());
 
 	    setForceReadOnly(true);
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(7).//
-		    withShowDirective("Demo setting 8").//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(DemoSetting8.class).//
+
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setIndex(2);
+	    addContentDescriptor(descriptor);
 	}
     }
 }

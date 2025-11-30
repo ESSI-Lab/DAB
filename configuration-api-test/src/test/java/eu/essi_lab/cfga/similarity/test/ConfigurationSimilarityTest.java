@@ -11,9 +11,7 @@ import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
 import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.setting.AfterCleanFunction;
-import eu.essi_lab.cfga.setting.Property;
-import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.cfga.setting.validation.ValidationContext;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse;
 import eu.essi_lab.cfga.setting.validation.Validator;
@@ -92,6 +90,14 @@ public class ConfigurationSimilarityTest {
 		}
 
 		s.setVisible(!s.isVisible());
+
+		// SystemSetting no longer has an object extension
+		s.setExtension(new ObjectExtension() {
+		    @Override
+		    public int hashCode() {
+			return super.hashCode();
+		    }
+		});
 	    }
 	}
     }

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.gs.setting.driver;
 
@@ -13,12 +13,12 @@ package eu.essi_lab.cfga.gs.setting.driver;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -26,13 +26,10 @@ package eu.essi_lab.cfga.gs.setting.driver;
 
 import java.util.List;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
 
@@ -42,14 +39,9 @@ import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
 public abstract class DriverSetting extends Setting implements EditableSetting {
 
     /**
-     * 
+     *
      */
     public DriverSetting() {
-
-	//
-	// set the component extension
-	//
-	setExtension(new DriverComponentInfo());
 
 	setCanBeDisabled(false);
     }
@@ -57,21 +49,26 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class DriverComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
-	public DriverComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(DriverSetting.class.getName());
-
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.REPOSITORY.getIndex()).//
-		    withShowDirective("Repository").//
+	    descriptor = TabContentDescriptorBuilder.get(DriverSetting.class).//
+		    withLabel("Driver").//
 		    build();
+	}
 
-	    setTabDescriptor(tabDescriptor);
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 

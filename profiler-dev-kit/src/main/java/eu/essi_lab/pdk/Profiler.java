@@ -439,6 +439,7 @@ public abstract class Profiler<PS extends ProfilerSetting> implements Configurab
 		pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 		response = ProxyCache.getInstance().cache(request, response);
+
 		return response;
 	    }
 

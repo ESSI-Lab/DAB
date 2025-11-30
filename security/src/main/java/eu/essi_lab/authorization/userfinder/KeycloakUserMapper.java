@@ -64,13 +64,9 @@ public class KeycloakUserMapper {
 	List<GSProperty> properties = keycloakUser.getAttributes().//
 		stream().filter(attr -> !attr.getKey().equals(GSUser.ROLE) && !attr.getKey().equals(GSUser.AUTH_PROVIDER)).//
 		// keycloak attributes can have multiple values, here only the first is taken!
-		map(attr -> GSProperty.of(attr.getKey(), attr.getValue().get(0))).//
+		map(attr -> GSProperty.of(attr.getKey(), attr.getValue().getFirst())).//
 		collect(Collectors.toList());
 
-	//
-	// createdTimeStamp has a specific field in the keycloak user
-	//
-	keycloakUser.getCreatedTimeStamp().ifPresent(v -> properties.add(GSProperty.of(KeycloakUser.CREATED_TIME_STAMP_FIELD, v)));
 
 	//
 	// all the keycloak user profile attributes, except username, are mapped to the GSUser properties
@@ -86,8 +82,8 @@ public class KeycloakUserMapper {
 	//
 	// role and authProvider have a specific field in the GSUser
 	//
-	keycloakUser.getAttributeValue(GSUser.ROLE).ifPresent(v -> gsUser.setRole(v));
-	keycloakUser.getAttributeValue(GSUser.AUTH_PROVIDER).ifPresent(v -> gsUser.setAuthProvider(v));
+	keycloakUser.getAttributeValue(GSUser.ROLE).ifPresent(gsUser::setRole);
+	keycloakUser.getAttributeValue(GSUser.AUTH_PROVIDER).ifPresent(gsUser::setAuthProvider);
 
 	return gsUser;
     }
@@ -99,14 +95,12 @@ public class KeycloakUserMapper {
     public static KeycloakUser toKeycloakUser(GSUser gsUser) {
 
 	//
-	// all the GSUser properties, except the keycloak user profile attributes and createdTimeStamp, are mapped
+	// all the GSUser properties, except the keycloak user profile attributes, are mapped
 	// to the keycloak user attributes
 	//
 	List<Entry<String, String>> attributes = gsUser.getProperties().//
 		stream().//
-		filter(prop -> !UserProfileAttribute.getAttributes().contains(prop.getName())
-			&& !prop.getName().equals(KeycloakUser.CREATED_TIME_STAMP_FIELD))
-		.//
+		filter(prop -> !UserProfileAttribute.getAttributes().contains(prop.getName())).//
 		map(prop -> Map.entry(prop.getName(), prop.getValue().toString())).//
 		collect(Collectors.toList());
 
@@ -133,13 +127,11 @@ public class KeycloakUserMapper {
 	//
 	UserProfileAttribute.//
 		getAttributes().//
-
 		forEach(attr -> gsUser.getStringPropertyValue(attr).ifPresent(v ->
-
 		userProfileAttr.add(Map.entry(UserProfileAttribute.of(attr).get(), v))));
 
-	return new KeycloakUser.KeycloakUserBuilder().enabled(gsUser.isEnabled()).//
-		withOptionalCreatedTimeStamp(gsUser.getStringPropertyValue(KeycloakUser.CREATED_TIME_STAMP_FIELD)).//
+	return new KeycloakUser.KeycloakUserBuilder().//
+		enabled(gsUser.isEnabled()).//
 		withUserProfileAttributes(userProfileAttr).//
 		withAttributes(attributes).//
 		build();

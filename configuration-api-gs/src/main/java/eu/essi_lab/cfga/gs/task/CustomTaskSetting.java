@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.gs.task;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 
@@ -38,10 +39,7 @@ import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.option.ValuesLoader;
@@ -165,11 +163,6 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	addOption(emailRecipientsOption);
 
 	//
-	// set the component extension
-	//
-	setExtension(new TaskComponentInfo());
-
-	//
 	// set the validator
 	//
 	setValidator(new TaskSettingValidator());
@@ -200,18 +193,18 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
     /**
      * @author Fabrizio
      */
-    public static class TaskComponentInfo extends ComponentInfo {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
 	 *
 	 */
-	public TaskComponentInfo() {
+	public TabDescriptorProvider() {
 
-	    setComponentName(CustomTaskSetting.class.getName());
+	    setLabel("Custom tasks");
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.CUSTOM_TASKS.getIndex()).//
-		    withShowDirective("Custom tasks", SortDirection.ASCENDING).//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(CustomTaskSetting.class).//
+
+ 		    withShowDirective(SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 		    "Add task", //
@@ -254,7 +247,8 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setIndex(GSTabIndex.CUSTOM_TASKS.getIndex());
+	    addContentDescriptor(descriptor);
 	}
 
 	/**

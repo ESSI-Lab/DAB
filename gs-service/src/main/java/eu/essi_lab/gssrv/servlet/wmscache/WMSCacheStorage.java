@@ -1,4 +1,10 @@
-package eu.essi_lab.cfga.gui.extension.directive;
+package eu.essi_lab.gssrv.servlet.wmscache;
+
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+
+import javax.ws.rs.core.Response;
 
 /*-
  * #%L
@@ -21,39 +27,25 @@ package eu.essi_lab.cfga.gui.extension.directive;
  * #L%
  */
 
-/**
- * @author Fabrizio
- */
-public class EditDirective extends Directive {
+public interface WMSCacheStorage {
 
-    /**
-     * 
-     */
-    public EditDirective() {
+    public List<String>getViews();
+    
+    public List<String>getLayers(String view);
+    
+    public Response getCachedResponse(String view, String layer, String hash);
 
-	setName("Edit setting");
+    public void putCachedResponse(String view, String layer, String hash, File file);
 
-	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
-    }
+    public Date getCachedResponseDate(String view, String layer, String hash);
 
-    /**
-     * @param name
-     * @param settingClass
-     */
-    public EditDirective(String name) {
+    public void deleteCachedResponse(String view, String layer, String hash);
 
-	super(name);
+    public Integer getSize();
+    
+    public Integer getMaxSize();
 
-	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
+    public void setMaxSize(Integer size);
 
-    }
-
-    /**
-     * @param name
-     * @param confirmationPolicy
-     */
-    public EditDirective(String name, ConfirmationPolicy confirmationPolicy) {
-
-	super(name, confirmationPolicy);
-    }
+    public Integer getSize(String view, String layer);
 }

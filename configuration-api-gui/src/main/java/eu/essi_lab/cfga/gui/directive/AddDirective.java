@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.extension.directive;
+package eu.essi_lab.cfga.gui.directive;
 
 /*-
  * #%L
@@ -36,7 +36,7 @@ public class AddDirective extends Directive {
      */
     public AddDirective() {
 
-	setName("Add");
+	setName("ADD");
 
 	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
     }

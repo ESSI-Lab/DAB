@@ -24,18 +24,16 @@ package eu.essi_lab.cfga.gs.setting.ontology;
  * #L%
  */
 
+import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
@@ -265,7 +263,6 @@ public class OntologySetting extends Setting implements EditableSetting {
 	//
 	//
 
-	setExtension(new OntologySettingComponentInfo());
 	setAfterCleanFunction(new OntologySettingAfterCleanFunction());
 
 	//
@@ -435,18 +432,18 @@ public class OntologySetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class OntologySettingComponentInfo extends ComponentInfo {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
 	 *
 	 */
-	public OntologySettingComponentInfo() {
+	public TabDescriptorProvider() {
 
-	    setComponentName(AccessorSetting.class.getName());
+	    setLabel("Ontologies");
 
-	    TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		    withIndex(GSTabIndex.ONTOLOGIES.getIndex()).//
-		    withShowDirective("Ontologies", SortDirection.ASCENDING).//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(OntologySetting.class).//
+
+ 		    withShowDirective(SortDirection.ASCENDING).//
 		    withAddDirective("Add ontology", OntologySetting.class).//
 		    withRemoveDirective("Remove ontology", true, OntologySetting.class).//
 		    withEditDirective("Edit ontology", ConfirmationPolicy.ON_WARNINGS).//
@@ -468,11 +465,12 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 		    ColumnDescriptor.create("Availability", 100, true, true, this::getOntologyAvailability) //
 
-	    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).
+	    ), getItemsList(), Grid.SelectionMode.MULTI).
 
 		    build();
 
-	    setTabDescriptor(tabDescriptor);
+	    setIndex(GSTabIndex.ONTOLOGIES.getIndex());
+	    addContentDescriptor(descriptor);
 	}
 
 	/**

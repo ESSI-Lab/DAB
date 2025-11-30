@@ -58,6 +58,12 @@ public enum JavaOptions {
      * - String
      */
     CONFIGURATION_URL("configuration.url", "Configuration URL: "),
+
+    /**
+     *
+     */
+    LOCAL_PROD_CONFIG_PATH("localProdConfigPath", "Local production config. path: "),
+
     /**
      * - String
      */

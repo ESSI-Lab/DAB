@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.gssrv.conf;
 
@@ -48,10 +48,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabDescriptor;
-import eu.essi_lab.cfga.gui.extension.TabDescriptorBuilder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
@@ -60,8 +57,9 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class SourcesInspector extends ComponentInfo {
+public class RecordsInspector {
 
+    private final TabContentDescriptor descriptor;
     private VerticalLayout verticalLayout;
     private Grid<GridData> grid;
     private GridFilter gridFilter;
@@ -71,11 +69,9 @@ public class SourcesInspector extends ComponentInfo {
     private static final String SIZE_COLUMN = "Size";
 
     /**
-     * 
+     *
      */
-    public SourcesInspector() {
-
-	setComponentName("Sources inspection");
+    public RecordsInspector() {
 
 	verticalLayout = new VerticalLayout();
 	verticalLayout.getStyle().set("margin-top", "15px");
@@ -168,17 +164,25 @@ public class SourcesInspector extends ComponentInfo {
 	//
 	//
 
-	TabDescriptor tabDescriptor = TabDescriptorBuilder.get().//
-		withIndex(GSTabIndex.SOURCES_INSPECTION.getIndex()).//
-		withShowDirective(getComponentName(),"Click \"Reload\" to show the list of all the harvested sources, referenced by "
+	descriptor = TabContentDescriptorBuilder.get().//
+
+		withLabel("Records inspection").//
+		withShowDirective("Click \"Reload\" to show the list of all the harvested sources, referenced by "
 		+ "name and identifier, along with the number of harvested records (\"Size\") and the percentage related to the total "
 		+ "number of records in the database (visible at the bottom of the \"Size\" column). \"Data #\" indicates the logical data folder (#1 or #2) where the "
-		+ "source records are stored").//
+		+ "source records are stored", false).//
 		withComponent(verticalLayout).//
 		reloadable(() -> update(verticalLayout)).//
 		build();
+    }
 
-	setTabDescriptor(tabDescriptor);
+    /**
+     *
+     * @return
+     */
+    public TabContentDescriptor get() {
+
+	return descriptor;
     }
 
     /**
@@ -196,7 +200,7 @@ public class SourcesInspector extends ComponentInfo {
 	ConfigurationWrapper.getHarvestedAndMixedSources().//
 		parallelStream().//
 		// filter(sourceFilter).//
-		forEach(s -> {//
+			forEach(s -> {//
 
 		    sdList.addAll(dataFolders.stream().//
 			    filter(f -> DatabaseFolder.computeSourceId(db, f).equals(s.getUniqueIdentifier())).//
@@ -257,7 +261,7 @@ public class SourcesInspector extends ComponentInfo {
 	    return db.getDataFolders();
 
 	} catch (GSException e) {
-	    GSLoggerFactory.getLogger(SourcesInspector.class).error(e);
+	    GSLoggerFactory.getLogger(RecordsInspector.class).error(e);
 	}
 
 	return null;
@@ -272,7 +276,7 @@ public class SourcesInspector extends ComponentInfo {
 	try {
 	    return f.size();
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(SourcesInspector.class).error(e);
+	    GSLoggerFactory.getLogger(RecordsInspector.class).error(e);
 	}
 
 	return 0;
@@ -300,7 +304,7 @@ public class SourcesInspector extends ComponentInfo {
 	private HashMap<String, String> valuesMap;
 
 	/**
-	 * 
+	 *
 	 */
 	private GridFilter() {
 

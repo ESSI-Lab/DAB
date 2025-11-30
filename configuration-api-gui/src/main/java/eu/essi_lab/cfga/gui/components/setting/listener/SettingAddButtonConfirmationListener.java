@@ -28,7 +28,7 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.Selector;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingPutDialog;
@@ -44,27 +44,27 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
     private Setting settingToAdd;
     private final boolean foldedModeEnabled;
     private final Configuration configuration;
-    private final TabContainer tabContainer;
+    private final TabContent tabContent;
     private final SettingPutDialog dialog;
 
     /**
      * @param dialog
      * @param configuration
      * @param settingToAdd
-     * @param tabContainer
+     * @param tabContent
      * @param foldedModeEnabled
      */
     public SettingAddButtonConfirmationListener(//
 	    SettingPutDialog dialog, //
 	    Configuration configuration, //
 	    Setting settingToAdd, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    boolean foldedModeEnabled) {
 
 	this.dialog = dialog;
 	this.configuration = configuration;
 	this.settingToAdd = settingToAdd;
-	this.tabContainer = tabContainer;
+	this.tabContent = tabContent;
 	this.foldedModeEnabled = foldedModeEnabled;
     }
 
@@ -114,9 +114,9 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
 		configuration, //
 		settingToAdd, //
 		true, //
-		this.tabContainer);
+		this.tabContent);
 
-	tabContainer.addSettingComponent(addedSettingComponent);
+	tabContent.addSettingComponent(addedSettingComponent);
 
 	dialog.close();
     }

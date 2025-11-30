@@ -68,6 +68,7 @@ public class SharedPersistentDriverSetting extends DriverSetting {
 	//
 
 	DatabaseSetting esPersistentSetting = new DatabaseSetting();
+	esPersistentSetting.setShowHeader(true);
 	esPersistentSetting.setName("Elasticsearch");
 	esPersistentSetting.setIdentifier(ES_PERSISTENT_SETTING_ID);
 	esPersistentSetting.setDescription("Persistent repository implementation based on Elasticsearch");
