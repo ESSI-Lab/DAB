@@ -43,6 +43,7 @@
 		<module>accessor-socat</module>
 		<module>accessor-south-africa</module>
 		<module>accessor-egaskro</module>
+		<module>accessor-dataloggers</module>		
 		<module>accessor-digital-globe</module>
 		<module>accessor-nasa-gsfc</module>
 		<module>accessor-landsat8</module>
