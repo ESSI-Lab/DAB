@@ -87,6 +87,11 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     /**
      *
      */
+    private boolean forceHideHeader;
+
+    /**
+     *
+     */
     public Setting() {
 
 	setIdentifier(UUID.randomUUID().toString());
@@ -413,6 +418,22 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     public final void setName(String name) {
 
 	getObject().put(NAME.getKey(), name);
+    }
+
+    /**
+     * @apiNote volatile option
+     */
+    public void setForceHideheader(){
+
+	this.forceHideHeader = true;
+    }
+
+    /**
+     * @apiNote volatile option
+     */
+    public boolean isForceHideHeader() {
+
+	return forceHideHeader;
     }
 
     /**

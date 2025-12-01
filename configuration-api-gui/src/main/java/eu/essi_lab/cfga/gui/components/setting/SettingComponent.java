@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -62,24 +62,9 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 /**
  * <info>
  * <style>
- * #component {
- * font-family: Arial, Helvetica, sans-serif;
- * border-collapse: collapse;
- * width: 100%;
- * }
- * #component td, #component th {
- * border: 1px solid #ddd;
- * padding: 8px;
- * }
- * #component tr:nth-child(even){background-color: #f2f2f2;}
- * #component tr:hover {background-color: #ddd;}
- * #component th {
- * padding-top: 12px;
- * padding-bottom: 12px;
- * text-align: left;
- * background-color: #4CAF50;
- * color: white;
- * }
+ * #component { font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%; } #component td, #component th { border:
+ * 1px solid #ddd; padding: 8px; } #component tr:nth-child(even){background-color: #f2f2f2;} #component tr:hover {background-color: #ddd;}
+ * #component th { padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #4CAF50; color: white; }
  * </style>
  * <table id='component'>
  * <tr>
@@ -149,7 +134,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class SettingComponent extends Div {
 
     /**
-     * 
+     *
      */
     private static final Integer LEVEL_LEFT_PADDING = 10;
 
@@ -341,8 +326,7 @@ public class SettingComponent extends Div {
 		    getOptionComponents().//
 		    stream().//
 		    map(oc -> (OptionTextField) oc.getOptionLayout().getChildren().filter(c -> c instanceof OptionTextField).findFirst()
-		    .orElse(null))
-		    .//
+		    .orElse(null)).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
 	}
@@ -354,16 +338,16 @@ public class SettingComponent extends Div {
      * @return
      */
     public Optional<RadioComponentsHandler> getRadioHandler() {
-    
-        return radioMap.values().stream().findFirst();
+
+	return radioMap.values().stream().findFirst();
     }
 
     /**
      * @return
      */
     public Optional<CheckComponentsHandler> getCheckHandler() {
-    
-        return checkMap.values().stream().findFirst();
+
+	return checkMap.values().stream().findFirst();
     }
 
     /**
@@ -471,9 +455,17 @@ public class SettingComponent extends Div {
 	}
 
 	// hides the header
-	if (!setting.isShowHeaderSet()) {
+	if (setting.isForceHideHeader()) {
 
 	    headerLayout.getStyle().set("display", "none");
+	}
+
+	if (!setting.isShowHeaderSet()) {
+
+	    Div div = ComponentFactory.createDiv();
+	    div.setWidthFull();
+
+	    headerLayout.add(div);
 	}
 
 	HorizontalLayout descriptionLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
@@ -499,7 +491,10 @@ public class SettingComponent extends Div {
 
 		Label label = handleLabel(parent, setting, headerLayout);
 
-		updateSettingToComponentsMap(setting, label);
+		if (label != null) {
+
+		    updateSettingToComponentsMap(setting, label);
+		}
 
 	    } else {
 		//
@@ -598,7 +593,7 @@ public class SettingComponent extends Div {
 	handleDescription(parent, setting, descriptionLayout, selectionMode);
 
 	//
-	// reset button
+	// edit button
 	//
 	handleEditButton(parent, setting, headerLayout, selectionMode);
 
@@ -641,11 +636,16 @@ public class SettingComponent extends Div {
      */
     private Label handleLabel(Setting parent, Setting setting, HorizontalLayout headerLayout) {
 
-	Label label = SettingComponentFactory.createSettingNameLabel(setting, parent);
+	if (setting.isShowHeaderSet()) {
 
-	headerLayout.add(label);
+	    Label label = SettingComponentFactory.createSettingNameLabel(setting, parent);
 
-	return label;
+	    headerLayout.add(label);
+
+	    return label;
+	}
+
+	return null;
     }
 
     /**
@@ -860,7 +860,7 @@ public class SettingComponent extends Div {
     }
 
     /**
-     * 
+     *
      */
     private void addRadioMultiSelectionComponents() {
 
@@ -905,7 +905,7 @@ public class SettingComponent extends Div {
     }
 
     /**
-     * 
+     *
      */
     private void addCheckMultiSelectionComponents() {
 
