@@ -88,7 +88,7 @@ public class OSCARTask extends AbstractCustomTask {
 
     @Override
     public String getName() {
-	return "OSCAR report task";
+	return "OSCAR upload task";
     }
 
     @Override
@@ -129,7 +129,11 @@ public class OSCARTask extends AbstractCustomTask {
 
 	Integer limit = null;
 	if (maxRecords != null) {
-	    limit = Integer.parseInt(maxRecords);
+	    try {
+		limit = Integer.parseInt(maxRecords);
+	    } catch (Exception e) {
+		limit = null;
+	    }
 	}
 	// String tokenValue = null;
 	// String endpoint = null;
@@ -179,7 +183,7 @@ public class OSCARTask extends AbstractCustomTask {
 	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	    // ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
 	    Bond bond;
-	    
+
 	    Bond b = BondFactory.createResourceTypeBond(ResourceType.DATASET);
 	    if (bbox != null) {
 		bond = BondFactory.createSourceIdentifierBond(split);
