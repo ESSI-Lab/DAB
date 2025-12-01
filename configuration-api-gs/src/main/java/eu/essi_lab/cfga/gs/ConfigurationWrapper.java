@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.ontology.*;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.Configuration;
@@ -49,7 +50,6 @@ import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
-import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
@@ -84,48 +84,48 @@ public class ConfigurationWrapper {
     public static final int CONFIG_RELOAD_TIME = 5;
 
     /**
-     * 
+     *
      */
     public static final TimeUnit CONFIG_RELOAD_TIME_UNIT = TimeUnit.MINUTES;
 
     /**
-     * 
+     *
      */
     private static List<GSSource> allSources;
 
     /**
-     * 
+     *
      */
     private static List<GSSource> distributedSources;
 
     /**
-     * 
+     *
      */
     private static List<HarvestingSetting> harvestingSettings;
 
     /**
-     * 
+     *
      */
     private static SystemSetting systemSetting;
 
     /**
-     * 
+     *
      */
     private static String sparqlProxyEndpoint;
     private static boolean forceSparqlProxyAcceptHeader;
 
     /**
-     * 
+     *
      */
     private static final HashMap<String, Boolean> PROFILER_ONLINE_MAP = new HashMap<>();
 
     /**
-     * 
+     *
      */
     private static DatabaseSetting databaseSetting;
 
     /**
-     * 
+     *
      */
     private static Configuration configuration;
 
@@ -205,6 +205,17 @@ public class ConfigurationWrapper {
     public static SourcePrioritySetting getSourcePrioritySetting() {
 
 	return getSourcePrioritySetting(configuration);
+    }
+
+    /**
+     * @return
+     */
+    public static DefaultSemanticSearchSetting getDefaultSemanticSearchSetting() {
+
+	return configuration.get( //
+		SingletonSettingsId.DEFAULT_SEMANTIC_SEARCH_SETTING.getLabel(), //
+		DefaultSemanticSearchSetting.class).//
+		get();
     }
 
     /**
@@ -343,7 +354,7 @@ public class ConfigurationWrapper {
 
     /**
      * Return the list of all the configured harvesting settings
-     * 
+     *
      * @return
      */
     public static List<HarvestingSetting> getHarvestingSettings() {
@@ -374,7 +385,7 @@ public class ConfigurationWrapper {
 
     /**
      * Return the list of all the configured distribution settings
-     * 
+     *
      * @return
      */
     public static List<DistributionSetting> getDistributonSettings() {
@@ -456,9 +467,8 @@ public class ConfigurationWrapper {
 
 	return getAccessorSettings().//
 		stream().//
-		filter(s -> s.getSource().getUniqueIdentifier() != null
-			&& s.getSource().getUniqueIdentifier().equals(source.getUniqueIdentifier()))
-		.//
+		filter(s -> s.getSource().getUniqueIdentifier() != null && s.getSource().getUniqueIdentifier()
+		.equals(source.getUniqueIdentifier())).//
 		findFirst();
     }
 
@@ -470,8 +480,7 @@ public class ConfigurationWrapper {
     //
 
     /**
-     * This utility method can be used to implement the {@link #validate(WebRequest)} method. It checks whether a
-     * {@link GSSource} with the
+     * This utility method can be used to implement the {@link #validate(WebRequest)} method. It checks whether a {@link GSSource} with the
      * supplied <code>sourceIdentifier</code> exists
      *
      * @param sourceIdentifier the identifier of the {@link GSSource} to retrieve
@@ -510,8 +519,8 @@ public class ConfigurationWrapper {
     }
 
     /**
-     * Retrieves all the {@link GSSource}s defined by the current configuration (brokered, harvested, mixed)
-     * according to the given <code>view</code>
+     * Retrieves all the {@link GSSource}s defined by the current configuration (brokered, harvested, mixed) according to the given
+     * <code>view</code>
      *
      * @return
      * @throws GSException
@@ -572,10 +581,9 @@ public class ConfigurationWrapper {
 			stream().//
 
 			filter(s -> operator == BondOperator.EQUAL ? s.getDeployment().contains(sourceDeployment) : //
-				s.getDeployment().stream().anyMatch(dep -> dep.startsWith(sourceDeployment)))
-			.//
+			s.getDeployment().stream().anyMatch(dep -> dep.startsWith(sourceDeployment))).//
 			map(GSSource::getUniqueIdentifier).//
-				toList();
+			toList();
 
 		out.addAll(ids);
 	    }
@@ -629,7 +637,7 @@ public class ConfigurationWrapper {
 
     /**
      * Retrieves all the mixed {@link GSSource}s defined by the current configuration
-     * 
+     *
      * @return
      */
     public static List<GSSource> getMixedSources() {
@@ -665,16 +673,16 @@ public class ConfigurationWrapper {
     }
 
     /**
-     * Since the mixed sources are also harvested, this is a quick way to get all the
-     * sources that can be harvested
-     * 
+     * Since the mixed sources are also harvested, this is a quick way to get all the sources that can be harvested
+     *
      * @return
      */
     public static List<GSSource> getHarvestedAndMixedSources() {
 
 	return getAllSources().//
 		stream().//
-		filter(s -> s.getBrokeringStrategy() == BrokeringStrategy.MIXED || s.getBrokeringStrategy() == BrokeringStrategy.HARVESTED).//
+		filter(
+		s -> s.getBrokeringStrategy() == BrokeringStrategy.MIXED || s.getBrokeringStrategy() == BrokeringStrategy.HARVESTED).//
 		collect(Collectors.toList());
     }
 
@@ -694,10 +702,9 @@ public class ConfigurationWrapper {
 
 		    (strategy == null && !harvestedAndMixed ||
 
-			    strategy == null && harvestedAndMixed
-				    && (s.getObject().getString("brokeringStrategy").equals(BrokeringStrategy.HARVESTED.getLabel())
-					    || s.getObject().getString("brokeringStrategy").equals(BrokeringStrategy.MIXED.getLabel()))
-			    ||
+			    strategy == null && harvestedAndMixed && (
+				    s.getObject().getString("brokeringStrategy").equals(BrokeringStrategy.HARVESTED.getLabel())
+					    || s.getObject().getString("brokeringStrategy").equals(BrokeringStrategy.MIXED.getLabel())) ||
 
 			    strategy != null && s.getObject().getString("brokeringStrategy").equals(strategy.getLabel())
 
@@ -821,8 +828,6 @@ public class ConfigurationWrapper {
 		SingletonSettingsId.RATE_LIMITER_SETTING.getLabel(), //
 		RateLimiterSetting.class).get();
     }
-    
-    
 
     /**
      * @return
@@ -837,9 +842,9 @@ public class ConfigurationWrapper {
 
     public static Optional<WMSCacheSetting> getWMSCacheSettings() {
 
- 	return getSystemSettings().getWMSCacheSetting();
-     }
-    
+	return getSystemSettings().getWMSCacheSetting();
+    }
+
     /**
      * @return
      */
@@ -908,7 +913,7 @@ public class ConfigurationWrapper {
     }
 
     /**
-     * 
+     *
      */
     private static final HashMap<String, Chronometer> isJobCanceledMap = new HashMap<>();
 
@@ -938,7 +943,7 @@ public class ConfigurationWrapper {
      * ({@value #CONFIG_RELOAD_TIME} * 2) minutes are not passed, the method returns <code>false</code> because we
      * cannot be sure that the setting is
      * actually not present in the configuration
-     * 
+     *
      * @param context
      * @return
      */

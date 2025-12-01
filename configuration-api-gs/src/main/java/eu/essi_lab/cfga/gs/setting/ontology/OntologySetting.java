@@ -13,12 +13,12 @@ package eu.essi_lab.cfga.gs.setting.ontology;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -29,6 +29,7 @@ import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
+import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
@@ -432,18 +433,18 @@ public class OntologySetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class TabDescriptorProvider extends TabDescriptor {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public TabDescriptorProvider() {
+	public DescriptorProvider() {
 
-	    setLabel("Ontologies");
-
-	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(OntologySetting.class).//
-
- 		    withShowDirective(SortDirection.ASCENDING).//
+	    descriptor = TabContentDescriptorBuilder.get(OntologySetting.class).//
+		    withLabel("Ontologies").//
+		    withShowDirective("List of registered ontologies that can be brokered by the semantic search engine", SortDirection.ASCENDING).//
 		    withAddDirective("Add ontology", OntologySetting.class).//
 		    withRemoveDirective("Remove ontology", true, OntologySetting.class).//
 		    withEditDirective("Edit ontology", ConfirmationPolicy.ON_WARNINGS).//
@@ -468,9 +469,14 @@ public class OntologySetting extends Setting implements EditableSetting {
 	    ), getItemsList(), Grid.SelectionMode.MULTI).
 
 		    build();
+	}
 
-	    setIndex(GSTabIndex.ONTOLOGIES.getIndex());
-	    addContentDescriptor(descriptor);
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
 
 	/**

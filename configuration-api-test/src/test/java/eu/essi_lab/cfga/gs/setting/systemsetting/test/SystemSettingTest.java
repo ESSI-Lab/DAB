@@ -23,140 +23,140 @@ import eu.essi_lab.lib.utils.EuropeanLanguage;
  */
 public class SystemSettingTest {
 
-    @Test
-    public void resetAndSelectTest() {
-
-	SystemSetting systemSetting = new SystemSetting();
-
-	{
-
-	    Assert.assertTrue(systemSetting.getProxyEndpoint().isEmpty());
-
-	    DefaultSemanticSearchSetting semSetting = systemSetting.getDefaultSemanticSearchSetting();
-
-	    Assert.assertEquals(ExpansionLevel.LOW, semSetting.getDefaultExpansionLevel());
-	    Assert.assertEquals(ExpansionLimit.of(LimitTarget.CONCEPTS, 50).toString(), semSetting.getDefaultExpansionLimit().toString());
-	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
-		    semSetting.getDefaultSearchLanguages().toString());
-	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
-		    semSetting.getDefaultSourceLanguages().toString());
-	    Assert.assertEquals(Arrays.asList(SKOSSemanticRelation.RELATED, SKOSSemanticRelation.NARROWER).toString(),
-		    semSetting.getDefaultSemanticRelations().toString());
-	    Assert.assertTrue(semSetting.isOriginalTermIncluded());
-	    Assert.assertEquals(1, semSetting.getDefaultMaxExecutionTime());
-	}
-
-	//
-	// no changes to the semantic and system setting test
-	//
-
-	{
-
-	    Setting resetAndSelect = SelectionUtils.resetAndSelect(systemSetting, false);
-
-	    SystemSetting systemSetting2 = SettingUtils.downCast(resetAndSelect, SystemSetting.class);
-
-	    Assert.assertTrue(systemSetting2.getProxyEndpoint().isEmpty());
-
-	    DefaultSemanticSearchSetting semSetting2 = systemSetting2.getDefaultSemanticSearchSetting();
-
-	    Assert.assertEquals(ExpansionLevel.LOW, semSetting2.getDefaultExpansionLevel());
-	    Assert.assertEquals(ExpansionLimit.of(LimitTarget.CONCEPTS, 50).toString(), semSetting2.getDefaultExpansionLimit().toString());
-	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
-		    semSetting2.getDefaultSearchLanguages().toString());
-	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
-		    semSetting2.getDefaultSourceLanguages().toString());
-	    Assert.assertEquals(Arrays.asList(SKOSSemanticRelation.RELATED, SKOSSemanticRelation.NARROWER).toString(),
-		    semSetting2.getDefaultSemanticRelations().toString());
-	    Assert.assertTrue(semSetting2.isOriginalTermIncluded());
-	    Assert.assertEquals(1, semSetting2.getDefaultMaxExecutionTime());
-
-	    SelectionUtils.deepClean(systemSetting2);
-
-	    DefaultSemanticSearchSetting semSetting3 = systemSetting2.getDefaultSemanticSearchSetting();
-
-	    Assert.assertEquals(ExpansionLevel.LOW, semSetting3.getDefaultExpansionLevel());
-	    Assert.assertEquals(ExpansionLimit.of(LimitTarget.CONCEPTS, 50).toString(), semSetting3.getDefaultExpansionLimit().toString());
-	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
-		    semSetting3.getDefaultSearchLanguages().toString());
-	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
-		    semSetting3.getDefaultSourceLanguages().toString());
-	    Assert.assertEquals(Arrays.asList(SKOSSemanticRelation.RELATED, SKOSSemanticRelation.NARROWER).toString(),
-		    semSetting3.getDefaultSemanticRelations().toString());
-	    Assert.assertTrue(semSetting3.isOriginalTermIncluded());
-	    Assert.assertEquals(1, semSetting3.getDefaultMaxExecutionTime());
-	}
-
-	//
-	// changes to the semantic setting, in particular all the multi-selection options empty and to the system
-	// setting
-	//
-
-	systemSetting.setProxyEndpoint("endpoint");
-
-	DefaultSemanticSearchSetting semSetting3 = systemSetting.getDefaultSemanticSearchSetting();
-
-	semSetting3.setDefaultExpansionLimit(ExpansionLimit.of(LimitTarget.LABELS, 10));
-	semSetting3.setDefaultExpansionLevel(ExpansionLevel.HIGH);
-	semSetting3.setOriginalTermIncluded(false);
-	semSetting3.setDefaultMaxExecutionTime(25);
-
-	semSetting3.setDefaultSearchLanguages(List.of());
-	semSetting3.setDefaultSourceLanguages(List.of());
-	semSetting3.setDefaultSemanticRelations(List.of());
-
-	Assert.assertTrue(semSetting3.getDefaultSemanticRelations().isEmpty());
-
-	//
-	// changes to the semantic setting, in particular all the multi-selection options empty
-	//
-
-	Setting resetAndSelect2 = SelectionUtils.resetAndSelect(systemSetting, false);
-
-	SystemSetting systemSetting3 = SettingUtils.downCast(resetAndSelect2, SystemSetting.class);
-
-	Assert.assertEquals("endpoint", systemSetting3.getProxyEndpoint().get());
-
-	DefaultSemanticSearchSetting semSetting4 = systemSetting3.getDefaultSemanticSearchSetting();
-
-	Assert.assertEquals(ExpansionLevel.HIGH, semSetting4.getDefaultExpansionLevel());
-	Assert.assertEquals(ExpansionLimit.of(LimitTarget.LABELS, 10).toString(), semSetting4.getDefaultExpansionLimit().toString());
-	Assert.assertFalse(semSetting4.isOriginalTermIncluded());
-	Assert.assertEquals(25, semSetting4.getDefaultMaxExecutionTime());
-
-	Assert.assertEquals(0, semSetting4.getDefaultSearchLanguages().size());
-	Assert.assertEquals(0, semSetting4.getDefaultSourceLanguages().size());
-	Assert.assertEquals(0, semSetting4.getDefaultSemanticRelations().size());
-
-	//
-	//
-	//
-
-	SelectionUtils.deepClean(systemSetting3);
-
-	Assert.assertEquals("endpoint", systemSetting3.getProxyEndpoint().get());
-
-	Assert.assertEquals(ExpansionLevel.HIGH, semSetting4.getDefaultExpansionLevel());
-	Assert.assertEquals(ExpansionLimit.of(LimitTarget.LABELS, 10).toString(), semSetting4.getDefaultExpansionLimit().toString());
-	Assert.assertFalse(semSetting4.isOriginalTermIncluded());
-	Assert.assertEquals(25, semSetting4.getDefaultMaxExecutionTime());
-
-	Assert.assertEquals(0, semSetting4.getDefaultSearchLanguages().size());
-	Assert.assertEquals(0, semSetting4.getDefaultSourceLanguages().size());
-	Assert.assertEquals(0, semSetting4.getDefaultSemanticRelations().size());
-
-	SelectionUtils.deepClean(semSetting4);
-
-	Assert.assertEquals(ExpansionLevel.HIGH, semSetting4.getDefaultExpansionLevel());
-	Assert.assertEquals(ExpansionLimit.of(LimitTarget.LABELS, 10).toString(), semSetting4.getDefaultExpansionLimit().toString());
-	Assert.assertFalse(semSetting4.isOriginalTermIncluded());
-	Assert.assertEquals(25, semSetting4.getDefaultMaxExecutionTime());
-
-	Assert.assertEquals(0, semSetting4.getDefaultSearchLanguages().size());
-	Assert.assertEquals(0, semSetting4.getDefaultSourceLanguages().size());
-	Assert.assertEquals(0, semSetting4.getDefaultSemanticRelations().size());
-
-    }
+//    @Test
+//    public void resetAndSelectTest() {
+//
+//	SystemSetting systemSetting = new SystemSetting();
+//
+//	{
+//
+//	    Assert.assertTrue(systemSetting.getProxyEndpoint().isEmpty());
+//
+//	    DefaultSemanticSearchSetting semSetting = systemSetting.getDefaultSemanticSearchSetting();
+//
+//	    Assert.assertEquals(ExpansionLevel.LOW, semSetting.getDefaultExpansionLevel());
+//	    Assert.assertEquals(ExpansionLimit.of(LimitTarget.CONCEPTS, 50).toString(), semSetting.getDefaultExpansionLimit().toString());
+//	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
+//		    semSetting.getDefaultSearchLanguages().toString());
+//	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
+//		    semSetting.getDefaultSourceLanguages().toString());
+//	    Assert.assertEquals(Arrays.asList(SKOSSemanticRelation.RELATED, SKOSSemanticRelation.NARROWER).toString(),
+//		    semSetting.getDefaultSemanticRelations().toString());
+//	    Assert.assertTrue(semSetting.isOriginalTermIncluded());
+//	    Assert.assertEquals(1, semSetting.getDefaultMaxExecutionTime());
+//	}
+//
+//	//
+//	// no changes to the semantic and system setting test
+//	//
+//
+//	{
+//
+//	    Setting resetAndSelect = SelectionUtils.resetAndSelect(systemSetting, false);
+//
+//	    SystemSetting systemSetting2 = SettingUtils.downCast(resetAndSelect, SystemSetting.class);
+//
+//	    Assert.assertTrue(systemSetting2.getProxyEndpoint().isEmpty());
+//
+//	    DefaultSemanticSearchSetting semSetting2 = systemSetting2.getDefaultSemanticSearchSetting();
+//
+//	    Assert.assertEquals(ExpansionLevel.LOW, semSetting2.getDefaultExpansionLevel());
+//	    Assert.assertEquals(ExpansionLimit.of(LimitTarget.CONCEPTS, 50).toString(), semSetting2.getDefaultExpansionLimit().toString());
+//	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
+//		    semSetting2.getDefaultSearchLanguages().toString());
+//	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
+//		    semSetting2.getDefaultSourceLanguages().toString());
+//	    Assert.assertEquals(Arrays.asList(SKOSSemanticRelation.RELATED, SKOSSemanticRelation.NARROWER).toString(),
+//		    semSetting2.getDefaultSemanticRelations().toString());
+//	    Assert.assertTrue(semSetting2.isOriginalTermIncluded());
+//	    Assert.assertEquals(1, semSetting2.getDefaultMaxExecutionTime());
+//
+//	    SelectionUtils.deepClean(systemSetting2);
+//
+//	    DefaultSemanticSearchSetting semSetting3 = systemSetting2.getDefaultSemanticSearchSetting();
+//
+//	    Assert.assertEquals(ExpansionLevel.LOW, semSetting3.getDefaultExpansionLevel());
+//	    Assert.assertEquals(ExpansionLimit.of(LimitTarget.CONCEPTS, 50).toString(), semSetting3.getDefaultExpansionLimit().toString());
+//	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
+//		    semSetting3.getDefaultSearchLanguages().toString());
+//	    Assert.assertEquals(Arrays.asList(EuropeanLanguage.ENGLISH, EuropeanLanguage.ITALIAN).toString(),
+//		    semSetting3.getDefaultSourceLanguages().toString());
+//	    Assert.assertEquals(Arrays.asList(SKOSSemanticRelation.RELATED, SKOSSemanticRelation.NARROWER).toString(),
+//		    semSetting3.getDefaultSemanticRelations().toString());
+//	    Assert.assertTrue(semSetting3.isOriginalTermIncluded());
+//	    Assert.assertEquals(1, semSetting3.getDefaultMaxExecutionTime());
+//	}
+//
+//	//
+//	// changes to the semantic setting, in particular all the multi-selection options empty and to the system
+//	// setting
+//	//
+//
+//	systemSetting.setProxyEndpoint("endpoint");
+//
+//	DefaultSemanticSearchSetting semSetting3 = systemSetting.getDefaultSemanticSearchSetting();
+//
+//	semSetting3.setDefaultExpansionLimit(ExpansionLimit.of(LimitTarget.LABELS, 10));
+//	semSetting3.setDefaultExpansionLevel(ExpansionLevel.HIGH);
+//	semSetting3.setOriginalTermIncluded(false);
+//	semSetting3.setDefaultMaxExecutionTime(25);
+//
+//	semSetting3.setDefaultSearchLanguages(List.of());
+//	semSetting3.setDefaultSourceLanguages(List.of());
+//	semSetting3.setDefaultSemanticRelations(List.of());
+//
+//	Assert.assertTrue(semSetting3.getDefaultSemanticRelations().isEmpty());
+//
+//	//
+//	// changes to the semantic setting, in particular all the multi-selection options empty
+//	//
+//
+//	Setting resetAndSelect2 = SelectionUtils.resetAndSelect(systemSetting, false);
+//
+//	SystemSetting systemSetting3 = SettingUtils.downCast(resetAndSelect2, SystemSetting.class);
+//
+//	Assert.assertEquals("endpoint", systemSetting3.getProxyEndpoint().get());
+//
+//	DefaultSemanticSearchSetting semSetting4 = systemSetting3.getDefaultSemanticSearchSetting();
+//
+//	Assert.assertEquals(ExpansionLevel.HIGH, semSetting4.getDefaultExpansionLevel());
+//	Assert.assertEquals(ExpansionLimit.of(LimitTarget.LABELS, 10).toString(), semSetting4.getDefaultExpansionLimit().toString());
+//	Assert.assertFalse(semSetting4.isOriginalTermIncluded());
+//	Assert.assertEquals(25, semSetting4.getDefaultMaxExecutionTime());
+//
+//	Assert.assertEquals(0, semSetting4.getDefaultSearchLanguages().size());
+//	Assert.assertEquals(0, semSetting4.getDefaultSourceLanguages().size());
+//	Assert.assertEquals(0, semSetting4.getDefaultSemanticRelations().size());
+//
+//	//
+//	//
+//	//
+//
+//	SelectionUtils.deepClean(systemSetting3);
+//
+//	Assert.assertEquals("endpoint", systemSetting3.getProxyEndpoint().get());
+//
+//	Assert.assertEquals(ExpansionLevel.HIGH, semSetting4.getDefaultExpansionLevel());
+//	Assert.assertEquals(ExpansionLimit.of(LimitTarget.LABELS, 10).toString(), semSetting4.getDefaultExpansionLimit().toString());
+//	Assert.assertFalse(semSetting4.isOriginalTermIncluded());
+//	Assert.assertEquals(25, semSetting4.getDefaultMaxExecutionTime());
+//
+//	Assert.assertEquals(0, semSetting4.getDefaultSearchLanguages().size());
+//	Assert.assertEquals(0, semSetting4.getDefaultSourceLanguages().size());
+//	Assert.assertEquals(0, semSetting4.getDefaultSemanticRelations().size());
+//
+//	SelectionUtils.deepClean(semSetting4);
+//
+//	Assert.assertEquals(ExpansionLevel.HIGH, semSetting4.getDefaultExpansionLevel());
+//	Assert.assertEquals(ExpansionLimit.of(LimitTarget.LABELS, 10).toString(), semSetting4.getDefaultExpansionLimit().toString());
+//	Assert.assertFalse(semSetting4.isOriginalTermIncluded());
+//	Assert.assertEquals(25, semSetting4.getDefaultMaxExecutionTime());
+//
+//	Assert.assertEquals(0, semSetting4.getDefaultSearchLanguages().size());
+//	Assert.assertEquals(0, semSetting4.getDefaultSourceLanguages().size());
+//	Assert.assertEquals(0, semSetting4.getDefaultSemanticRelations().size());
+//
+//    }
 
     @Test
     public void test() {

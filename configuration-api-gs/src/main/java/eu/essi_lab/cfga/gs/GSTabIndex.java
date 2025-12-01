@@ -83,7 +83,7 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    ONTOLOGIES(7, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
+    SEMANTICS(7, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
 
     /**
      *

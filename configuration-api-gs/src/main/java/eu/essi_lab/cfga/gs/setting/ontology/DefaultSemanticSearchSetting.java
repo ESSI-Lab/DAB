@@ -6,6 +6,7 @@ package eu.essi_lab.cfga.gs.setting.ontology;
 import java.util.List;
 import java.util.stream.Stream;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.option.BooleanChoice;
@@ -77,8 +78,9 @@ public class DefaultSemanticSearchSetting extends Setting {
     public DefaultSemanticSearchSetting() {
 
 	setCanBeDisabled(false);
-	setEditable(false);
+	setEditable(true);
 	setEnabled(false);
+	setShowHeader(false);
 
 	enableCompactMode(false);
 	setName("Default semantic search setting");
@@ -168,7 +170,7 @@ public class DefaultSemanticSearchSetting extends Setting {
 		withKey(INCLUDE_ORIGINAL_SEARCH_TERM_KEY).//
 		withLabel("Include original search term")
 		.withDescription(
-			"If set to 'Yes' (default) the original search term is included in the search along with the terms outcome of the semantic expansion")
+			"If checked (default) the original search term is included in the search along with the terms outcome of the semantic expansion")
 		.withSingleSelection().//
 		withValues(LabeledEnum.values(BooleanChoice.class)).//
 		withSelectedValue(BooleanChoice.TRUE).cannotBeDisabled().//
@@ -189,6 +191,32 @@ public class DefaultSemanticSearchSetting extends Setting {
 		build();
 
 	addOption(maxExectionTime);
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
+
+	/**
+	 *
+	 */
+	public DescriptorProvider() {
+
+	    descriptor = TabContentDescriptorBuilder.get(DefaultSemanticSearchSetting.class).//
+		    withLabel("Settings").//
+		    build();
+	}
+
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
+	}
     }
 
     /**
