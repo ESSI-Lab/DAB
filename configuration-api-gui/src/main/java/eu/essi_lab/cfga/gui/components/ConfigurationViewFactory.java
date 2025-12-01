@@ -106,7 +106,7 @@ public class ConfigurationViewFactory {
 		    desc.getLabel(), //
 		    createTabContent(desc, configuration, view, tabDescriptor, false)));
 
-	    if(tabDescriptor.getIndex() == 0){
+	    if (tabDescriptor.getIndex() == 0) {
 
 		tabSheet.setRendered(true);
 	    }
@@ -197,11 +197,21 @@ public class ConfigurationViewFactory {
 
 	    headerLayout.add(subLayout);
 
-	} else if (withLabel) {
+	} else {
 
-	    headerLayout.setHeight("45px");
+	    if (withLabel) {
 
-	    headerLayout.add(tabLabel);
+		headerLayout.setHeight("45px");
+
+		headerLayout.add(tabLabel);
+
+	    } else {
+
+		Div div = ComponentFactory.createDiv();
+		div.setWidthFull();
+
+		headerLayout.add(div);
+	    }
 	}
 
 	addDirective.ifPresent(dir -> {
