@@ -280,7 +280,7 @@ public class S3Source implements ConfigurationSource {
 
 	GSLoggerFactory.getLogger(getClass()).trace("Source backup STARTED");
 
-	String date = ISO8601DateTimeUtils.getISO8601DateTime().//
+	String date = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds().//
 		replace("-", "_").//
 		replace(":", "_").//
 		replace(".", "");
