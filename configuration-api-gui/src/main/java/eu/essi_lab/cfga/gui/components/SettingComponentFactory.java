@@ -528,8 +528,8 @@ public class SettingComponentFactory {
 	//
 	//
 
-	button.addEnabledStyle("color", "#008ab7");
-	button.addEnabledStyle("background-color", "white");
+	button.addEnabledStyle("color", "black");
+	button.addEnabledStyle("background-color", "rgb(255 252 0 / 41%)");
 	button.addEnabledStyle("border", "1px solid lightgray");
 
 	//
