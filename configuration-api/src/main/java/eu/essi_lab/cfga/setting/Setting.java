@@ -423,9 +423,9 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     /**
      * @apiNote volatile option
      */
-    public void setForceHideheader(){
+    public void setForceHideheader(boolean set){
 
-	this.forceHideHeader = true;
+	this.forceHideHeader = set;
     }
 
     /**

@@ -92,7 +92,8 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
 	//
 	// shows the header end set folded and collapse mode
 	//
-	settingToAdd.setShowHeader(true);
+//	settingToAdd.setShowHeader(true);
+	settingToAdd.setForceHideheader(false);
 
 	settingToAdd.enableFoldedMode(this.foldedModeEnabled);
 

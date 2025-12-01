@@ -84,7 +84,8 @@ public class SettingEditButtonConfirmationListener implements ButtonChangeListen
 	//
 	// shows the header end set folded and collapse mode
 	//
-	settingToEdit.setShowHeader(true);
+//	settingToEdit.setShowHeader(true);
+	settingToEdit.setForceHideheader(false);
 
 	settingToEdit.enableFoldedMode(this.foldedModeEnabled);
 
