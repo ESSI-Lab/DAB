@@ -400,13 +400,7 @@ public class TabContent extends VerticalLayout implements Renderable {
      */
     private CustomButton createReloadButton() {
 
-	CustomButton reloadButton = new CustomButton("RELOAD", VaadinIcon.REFRESH.create());
-	reloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-	reloadButton.setId("reloadButton");
-	reloadButton.setWidth(150, Unit.PIXELS);
-	reloadButton.getStyle().set("margin-left", "15px");
-	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
-	reloadButton.getStyle().set("border-radius", "0px");
+	CustomButton reloadButton = ComponentFactory.createReloadButton();
 
 	reloadButton.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 

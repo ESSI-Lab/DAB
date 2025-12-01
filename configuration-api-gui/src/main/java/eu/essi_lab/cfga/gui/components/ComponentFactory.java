@@ -22,16 +22,17 @@ package eu.essi_lab.cfga.gui.components;
  */
 
 import com.vaadin.componentfactory.ToggleButton;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.accordion.AccordionPanel;
+import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.details.Details.OpenedChangeEvent;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import eu.essi_lab.cfga.gui.components.tabs.*;
@@ -256,6 +257,23 @@ public class ComponentFactory {
 	toggle.setEnabled(enabled);
 
 	return toggle;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static CustomButton createReloadButton(){
+
+	CustomButton reloadButton = new CustomButton("RELOAD", VaadinIcon.REFRESH.create());
+	reloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+	reloadButton.setId("reloadButton");
+	reloadButton.setWidth(150, Unit.PIXELS);
+	reloadButton.getStyle().set("margin-left", "15px");
+	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
+	reloadButton.getStyle().set("border-radius", "0px");
+
+	return reloadButton;
     }
 
     /**
