@@ -286,6 +286,9 @@ public class OSCARTask extends AbstractCustomTask {
 		try {
 
 		    String doc = wigosMapper.mapStations(gsresources, key);
+		    if(doc == null) {
+			continue;
+		    }
 		    doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
 		    HttpRequest postRequest = HttpRequestUtils.build(//
 			    MethodWithBody.POST, //
