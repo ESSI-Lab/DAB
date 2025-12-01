@@ -316,6 +316,14 @@ public class ComponentFactory {
 
     /**
      *
+     * @return
+     */
+    public static Div createSeparator() {
+
+	return createSeparator("#e8ebef");
+    }
+
+    /**
      * @param color
      * @return
      */
@@ -344,7 +352,6 @@ public class ComponentFactory {
     }
 
     /**
-     *
      * @param color
      * @return
      */

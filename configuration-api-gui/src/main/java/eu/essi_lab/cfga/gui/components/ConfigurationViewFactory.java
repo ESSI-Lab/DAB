@@ -176,7 +176,7 @@ public class ConfigurationViewFactory {
 	    descLabel.setMaxHeight("130px");
 	    descLabel.setText(desc);
 	    descLabel.getStyle().set("margin-left", "-7px");
-	    descLabel.getStyle().set("font-size", "16px");
+	    descLabel.getStyle().set("font-size", "15px");
 	    descLabel.getStyle().set("color", "black");
 
 	    if (withLabel) {
@@ -188,7 +188,7 @@ public class ConfigurationViewFactory {
 
 	    if (showDirective.get().withDescriptionSeparator()) {
 
-		Div separator = ComponentFactory.createSeparator("#e8ebef");
+		Div separator = ComponentFactory.createSeparator();
 		separator.getStyle().set("margin-top", "3px");
 		separator.getStyle().set("margin-left", "-7px");
 

@@ -349,7 +349,7 @@ public class FileSource implements ConfigurationSource {
 
 	String name = FilenameUtils.removeExtension(source.getName());
 
-	String date = ISO8601DateTimeUtils.getISO8601DateTime().//
+	String date = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds().//
 		replace("-", "_").//
 		replace(":", "_").//
 		replace(".", "");

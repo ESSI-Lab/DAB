@@ -39,6 +39,7 @@ import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
+import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
 import eu.essi_lab.cfga.patch.*;
@@ -548,6 +549,22 @@ public class DABStarter {
 	    extensionPatch.patch();
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Setting.EXTENSION patch ENDED");
+
+	    // ------------------------------------------------------------------
+	    //
+	    // - DefaultSemanticSearchSetting patch
+	    //
+
+	    GSLoggerFactory.getLogger(getClass()).debug("DefaultSemanticSearchSetting move patch STARTED");
+
+	    MoveSettingPatch moveSettingPatch = MoveSettingPatch.of(configuration, //
+		    DefaultSemanticSearchSetting.class, //
+		    SingletonSettingsId.DEFAULT_SEMANTIC_SEARCH_SETTING.getLabel(),//
+		    configuration.get(SingletonSettingsId.SYSTEM_SETTING.getLabel()).get());
+
+	    moveSettingPatch.patch();
+
+	    GSLoggerFactory.getLogger(getClass()).debug("DefaultSemanticSearchSetting move patch ENDED");
 
 	    //
 	    //

@@ -62,7 +62,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     private static final String EMAIL_SETTING_ID = "emailSetting";
     private static final String WMS_CACHE_SETTING_ID = "wmsCacheSetting";
     private static final String USERS_DATABASE_SETTING_ID = "usersDatabase";
-    private static final String SEM_SEARCH_SETTING_ID = "defSemanticSearch";
 
     /**
      * @author Fabrizio
@@ -316,15 +315,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	addSetting(userdbSetting);
 
 	//
-	// Ontology default settings
-	//
-
-	DefaultSemanticSearchSetting semSearchSetting = new DefaultSemanticSearchSetting();
-	semSearchSetting.setIdentifier(SEM_SEARCH_SETTING_ID);
-
-	addSetting(semSearchSetting);
-
-	//
 	// set the validator
 	//
 	setValidator(new SystemSettingValidator());
@@ -341,10 +331,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
 
 	    SystemSetting sysSetting = (SystemSetting) SettingUtils.downCast(setting, setting.getSettingClass());
-
-	    DefaultSemanticSearchSetting semSetting = sysSetting.getDefaultSemanticSearchSetting();
-
-	    error = semSetting.getDefaultSemanticRelations().isEmpty();
 
 	    Optional<EmailSetting> emailSetting = sysSetting.getEmailSetting();
 
@@ -596,13 +582,5 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	}
 
 	return Optional.empty();
-    }
-
-    /**
-     * @return
-     */
-    public DefaultSemanticSearchSetting getDefaultSemanticSearchSetting() {
-
-	return getSetting(SEM_SEARCH_SETTING_ID, DefaultSemanticSearchSetting.class).get();
     }
 }
