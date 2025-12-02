@@ -45,21 +45,14 @@ import eu.essi_lab.lib.utils.*;
 public class ConfigurationViewFactory {
 
     /**
-     *
-     */
-    private static final float TAB_WIDTH = 1200;
-
-    /**
      * @return
      */
     public static HorizontalLayout createNavBarContentLayout() {
 
 	HorizontalLayout navbarContent = new HorizontalLayout();
 	navbarContent.setWidthFull();
-	navbarContent.getStyle().set("padding-bottom", "15px");
 	navbarContent.getStyle().set("padding-left", "15px");
 	navbarContent.getStyle().set("padding-right", "15px");
-	navbarContent.getStyle().set("padding-top", "0px");
 
 	return navbarContent;
     }
@@ -96,7 +89,7 @@ public class ConfigurationViewFactory {
 
 	    TabContentDescriptor descriptor = descriptors.getFirst();
 
-	    content = createTabContent(descriptor, configuration, view, tabDescriptor, true);
+	    content = createTabContent(descriptor, configuration, view, tabDescriptor);
 
 	} else {
 
@@ -104,7 +97,7 @@ public class ConfigurationViewFactory {
 
 	    descriptors.forEach(desc -> tabSheet.add( //
 		    desc.getLabel(), //
-		    createTabContent(desc, configuration, view, tabDescriptor, false)));
+		    createTabContent(desc, configuration, view, tabDescriptor)));
 
 	    if (tabDescriptor.getIndex() == 0) {
 
@@ -129,13 +122,12 @@ public class ConfigurationViewFactory {
 	    TabContentDescriptor descriptor,//
 	    Configuration configuration, //
 	    ConfigurationView view,//
-	    TabDescriptor tabDescriptor,//
-	    boolean withLabel) {
+	    TabDescriptor tabDescriptor) {
 
 	DirectiveManager directiveManager = descriptor.getDirectiveManager();
 
 	TabContent content = ComponentFactory.createNoSpacingNoMarginTabContainer(
-		"tab-container-vertical-layout-for-" + descriptor.getLabel());
+		"tab-content-vertical-layout-for-" + descriptor.getLabel());
 
 	content.init(configuration, descriptor, tabDescriptor);
 
@@ -179,11 +171,6 @@ public class ConfigurationViewFactory {
 	    descLabel.getStyle().set("font-size", "15px");
 	    descLabel.getStyle().set("color", "black");
 
-	    if (withLabel) {
-
-		subLayout.add(tabLabel);
-	    }
-
 	    subLayout.add(descLabel);
 
 	    if (showDirective.get().withDescriptionSeparator()) {
@@ -199,19 +186,10 @@ public class ConfigurationViewFactory {
 
 	} else {
 
-	    if (withLabel) {
+	    Div div = ComponentFactory.createDiv();
+	    div.setWidthFull();
 
-		headerLayout.setHeight("45px");
-
-		headerLayout.add(tabLabel);
-
-	    } else {
-
-		Div div = ComponentFactory.createDiv();
-		div.setWidthFull();
-
-		headerLayout.add(div);
-	    }
+	    headerLayout.add(div);
 	}
 
 	addDirective.ifPresent(dir -> {

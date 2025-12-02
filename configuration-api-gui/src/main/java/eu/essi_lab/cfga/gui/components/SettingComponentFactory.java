@@ -522,7 +522,6 @@ public class SettingComponentFactory {
 	ConfigurationViewButton button = new ConfigurationViewButton("EDIT", VaadinIcon.EDIT.create());
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.setWidth(100, Unit.PIXELS);
-	button.getStyle().set("margin-left", "3px");
 
 	//
 	//

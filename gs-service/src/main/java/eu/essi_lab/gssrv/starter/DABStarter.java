@@ -24,10 +24,7 @@ package eu.essi_lab.gssrv.starter;
 import eu.essi_lab.api.database.cfg.DatabaseSource;
 import eu.essi_lab.api.database.cfg.DatabaseSourceUrl;
 import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationSource;
-import eu.essi_lab.cfga.ConfigurationUtils;
-import eu.essi_lab.cfga.SelectionUtils;
+import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.check.*;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -130,7 +127,7 @@ public class DABStarter {
 
 	initLocale();
 
-	initJaxb();
+	initContext();
 
 	initConfig();
 
@@ -815,14 +812,11 @@ public class DABStarter {
     /**
      * @throws GSException
      */
-    private void initJaxb() throws GSException {
-	// --------------------------------------
-	//
-	// this will initialize the JAXB contexts
-	//
+    private void initContext() throws GSException {
+
 	try {
 
-	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization STARTED");
+	    GSLoggerFactory.getLogger(DABStarter.class).debug("Context initialization STARTED");
 
 	    CommonContext.createMarshaller(true);
 	    CommonContext.createUnmarshaller();
@@ -830,11 +824,16 @@ public class DABStarter {
 
 	    JAXBWMS.getInstance().getMarshaller();
 
-	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization ENDED");
+	    // this is done here to guarantee that is done in the right thread
+	    // in some cases we notice that this call is firstly done by threads with a context class loader
+	    // devoid of the necessary classes to load
+	    ConfigurableLoader.load();
+
+	    GSLoggerFactory.getLogger(DABStarter.class).debug("Context initialization ENDED");
 
 	} catch (JAXBException e) {
 
-	    GSLoggerFactory.getLogger(DABStarter.class).error("Fatal error on startup, JAXB could not be initialized", e);
+	    GSLoggerFactory.getLogger(DABStarter.class).error("Fatal error on startup, context could not be initialized", e);
 
 	    throw GSException.createException(//
 		    this.getClass(), //
@@ -843,7 +842,7 @@ public class DABStarter {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //
-		    "JAXBInitError", //
+		    "ContextInitError", //
 		    e);
 	}
     }
