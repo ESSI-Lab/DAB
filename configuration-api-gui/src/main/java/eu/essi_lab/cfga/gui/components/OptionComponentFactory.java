@@ -430,6 +430,8 @@ public class OptionComponentFactory {
 	VerticalLayout verticalLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
 
 	verticalLayout.getStyle().set("margin-left", "-15px");
+	verticalLayout.getStyle().set("padding-top", "0px");
+	verticalLayout.getStyle().set("padding-bottom", "0px");
 
 	HorizontalLayout horizontalLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
 

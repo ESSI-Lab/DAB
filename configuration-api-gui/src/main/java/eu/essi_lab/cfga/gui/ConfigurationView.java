@@ -311,6 +311,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	    logoutButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%");
 	    logoutButton.getStyle().set("margin-left", "100px");
 	    logoutButton.getStyle().set("background-color", "white");
+	    logoutButton.getStyle().set("margin-right", "-15px");
 
 	    getNavbarContent().add(logoutButton);
 	}

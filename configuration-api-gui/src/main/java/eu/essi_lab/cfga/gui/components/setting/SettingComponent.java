@@ -703,6 +703,11 @@ public class SettingComponent extends Div {
 
 	    Button button = SettingComponentFactory.createSettingEditButton(configuration, setting, this, tabContent);
 
+	    if(setting.isShowHeaderSet()){
+
+		button.getStyle().set("margin-left", "3px");
+	    }
+
 	    updateSettingToComponentsMap(setting, button);
 
 	    boolean radioUpdated = !isScheduling(setting) && updateRadioGroup(parent, setting, button, multiSelectionMode);
