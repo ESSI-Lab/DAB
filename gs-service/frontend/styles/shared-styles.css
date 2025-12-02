@@ -32,3 +32,11 @@ vaadin-checkbox.booleanChoice[disabled]::part(checkbox) {
     opacity: 1;
     border: 1px solid #80808082;
 }
+
+.dab-configurator-app-layout {
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  box-sizing: border-box;
+}

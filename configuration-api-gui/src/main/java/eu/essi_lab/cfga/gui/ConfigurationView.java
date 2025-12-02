@@ -33,10 +33,9 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.dom.DomEvent;
 import com.vaadin.flow.dom.DomEventListener;
@@ -97,6 +96,8 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	GSLoggerFactory.getLogger(getClass()).info("Loading configuration view STARTED");
 
+	addClassName("dab-configurator-app-layout");
+
 	//
 	//
 	//
@@ -149,7 +150,8 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	//
 	//
 
-	setPrimarySection(AppLayout.Section.NAVBAR); // default
+	VerticalLayout mainLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout("dab-configurator");
+	mainLayout.setWidthFull();
 
 	//
 	// header
@@ -197,9 +199,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	navbarContent = ConfigurationViewFactory.createNavBarContentLayout();
 
-	navbarContent.add(drawerToggle, headerImage, headerLabel, saveButton);
+	navbarContent.add(headerImage, headerLabel, saveButton);
 
-	addToNavbar(navbarContent);
+	mainLayout.add(navbarContent);
 
 	//
 	//
@@ -275,9 +277,15 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	tabs = ConfigurationViewFactory.createTabs();
 
-	addToDrawer(tabs);
+	HorizontalLayout contentLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
+	contentLayout.setWidthFull();
 
-	setContent(tabs.getContent());
+	contentLayout.add(tabs);
+	contentLayout.add(tabs.getContent());
+
+	mainLayout.add(contentLayout);
+
+	setContent(mainLayout);
 
 	//
 	//
@@ -410,7 +418,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     protected abstract List<TabDescriptor> getDescriptors();
 
     /**
-     *
      * @return
      */
     protected abstract Configuration initConfiguration();
@@ -725,7 +732,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	return false;
     }
-
 
     /**
      * @param setting

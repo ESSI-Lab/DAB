@@ -78,9 +78,9 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	legends = new ArrayList<>();
 
-	getStyle().set("margin-bottom", "50px");
-	getStyle().set("margin-left", "auto");
-	getStyle().set("margin-right", "auto");
+//	getStyle().set("margin-bottom", "50px");
+//	getStyle().set("margin-left", "auto");
+//	getStyle().set("margin-right", "auto");
     }
 
     /**
