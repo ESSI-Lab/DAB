@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.piemonte;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -352,12 +354,14 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 	    referenceSystem.setCode("EPSG:4326");
 	    referenceSystem.setCodeSpace("EPSG");
 	    coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
-	    
-	    coreMetadata.addBoundingBox(//
-		    lat, //
-		    lon, //
-		    lat, //
-		    lon);
+
+	    if (lat != null && lon != null) {
+		coreMetadata.addBoundingBox(//
+			new BigDecimal(lat), //
+			new BigDecimal(lon), //
+			new BigDecimal(lat), //
+			new BigDecimal(lon));
+	    }
 
 	    if (alt != null)
 		coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(alt, alt);

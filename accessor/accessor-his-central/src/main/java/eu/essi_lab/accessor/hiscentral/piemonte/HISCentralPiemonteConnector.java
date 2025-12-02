@@ -22,8 +22,10 @@ package eu.essi_lab.accessor.hiscentral.piemonte;
  */
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -263,6 +265,8 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 	String res = client.getStations(path);
 	//Optional<String> response = downloader.downloadString(requestURL);
 
+	Set<String> varPrint = new HashSet<String>();
+	
 	if (res != null) {
 
 	    JSONObject object = new JSONObject(res);
@@ -281,6 +285,7 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 
 		    JSONObject sensorInfo;
 		    if (getVariableField.isEmpty()) {
+			
 			// snow case
 			for (PIEMONTE_Variable s : variableNames) {
 			    ret.addRecord(HISCentralPiemonteMapper.create(originalMetadataInfo, variableType, s.name()));
@@ -293,8 +298,10 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 			// meteo - hydro case
 			JSONArray variables = originalMetadataInfo.optJSONArray(getVariableField);
 			List<PIEMONTE_Variable> varList = new ArrayList<PIEMONTE_Variable>();
+			
 			for (int k = 0; k < variables.length(); k++) {
 			    String paramId = variables.getJSONObject(k).optString("id_parametro");
+			    varPrint.add(paramId);
 			    if (paramId.equals("IDRO")) {
 				varList.add(PIEMONTE_Variable.IDRO);
 			    }
@@ -324,6 +331,8 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 			    }
 
 			}
+			
+
 			// varList.contains(PIEMONTE_HYDROVariable.IDRO);
 			for (PIEMONTE_Variable p : variableNames) {
 			    if (varList.contains(p)) {
@@ -337,6 +346,8 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 		}
 	    }
 	}
+	GSLoggerFactory.getLogger(getClass()).info("VAR_LIST:");
+	varPrint.forEach(System.out::println);
 	Optional<Integer> mr = getSetting().getMaxRecords();
 	// metadataTemplate = null;
 	page = page + 1;
