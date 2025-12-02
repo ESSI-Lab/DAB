@@ -96,7 +96,7 @@ public class ConfigurationViewFactory {
 
 	    TabContentDescriptor descriptor = descriptors.getFirst();
 
-	    content = createTabContent(descriptor, configuration, view, tabDescriptor, true);
+	    content = createTabContent(descriptor, configuration, view, tabDescriptor);
 
 	} else {
 
@@ -104,7 +104,7 @@ public class ConfigurationViewFactory {
 
 	    descriptors.forEach(desc -> tabSheet.add( //
 		    desc.getLabel(), //
-		    createTabContent(desc, configuration, view, tabDescriptor, false)));
+		    createTabContent(desc, configuration, view, tabDescriptor)));
 
 	    if (tabDescriptor.getIndex() == 0) {
 
@@ -129,8 +129,7 @@ public class ConfigurationViewFactory {
 	    TabContentDescriptor descriptor,//
 	    Configuration configuration, //
 	    ConfigurationView view,//
-	    TabDescriptor tabDescriptor,//
-	    boolean withLabel) {
+	    TabDescriptor tabDescriptor) {
 
 	DirectiveManager directiveManager = descriptor.getDirectiveManager();
 
@@ -179,11 +178,6 @@ public class ConfigurationViewFactory {
 	    descLabel.getStyle().set("font-size", "15px");
 	    descLabel.getStyle().set("color", "black");
 
-	    if (withLabel) {
-
-		subLayout.add(tabLabel);
-	    }
-
 	    subLayout.add(descLabel);
 
 	    if (showDirective.get().withDescriptionSeparator()) {
@@ -199,19 +193,10 @@ public class ConfigurationViewFactory {
 
 	} else {
 
-	    if (withLabel) {
+	    Div div = ComponentFactory.createDiv();
+	    div.setWidthFull();
 
-		headerLayout.setHeight("45px");
-
-		headerLayout.add(tabLabel);
-
-	    } else {
-
-		Div div = ComponentFactory.createDiv();
-		div.setWidthFull();
-
-		headerLayout.add(div);
-	    }
+	    headerLayout.add(div);
 	}
 
 	addDirective.ifPresent(dir -> {
