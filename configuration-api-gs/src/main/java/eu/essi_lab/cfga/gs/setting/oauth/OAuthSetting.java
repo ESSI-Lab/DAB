@@ -233,7 +233,7 @@ public class OAuthSetting extends Setting implements EditableSetting {
 	    setLabel("Authorization");
 
 	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(OAuthSetting.class).//
-
+		    withEditDirective("Edit authorization settings").//
 		    build();
 
 	    setIndex(GSTabIndex.AUTHORIZATION.getIndex());

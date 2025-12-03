@@ -119,7 +119,7 @@ public class DownloadSetting extends Setting implements EditableSetting {
 	public DescriptorProvider() {
 
 	    descriptor = TabContentDescriptorBuilder.get(DownloadSetting.class).//
-		    withShowDirective("Downloaded items can be stored in the local file system (default) or with Amazon S3 storage", false).//
+		    withShowDirective("Downloaded items can be stored in the local file system (default) or with Amazon S3 storage", true).//
 		    withLabel("Download").//
 		    build();
 	}
