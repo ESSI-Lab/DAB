@@ -734,6 +734,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
 	    setLabel("Credentials");
 
 	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(CredentialsSetting.class).//
+		    withEditDirective("Edit credentials").//
 		    build();
 
 	    setIndex(GSTabIndex.CREDENTIALS.getIndex());

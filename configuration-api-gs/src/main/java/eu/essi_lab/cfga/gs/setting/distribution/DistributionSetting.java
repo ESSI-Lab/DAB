@@ -121,7 +121,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 		    withShowDirective("Manage DAB distributed sources", SortDirection.ASCENDING).//
 		    withAddDirective("Add distributed accessor", DistributionSetting.class).//
 		    withRemoveDirective("Remove accessor", true, DistributionSetting.class).//
-		    withEditDirective("Edit accessor", ConfirmationPolicy.ON_WARNINGS).//
+		    withEditDirective("Edit distributed source").//
 		    build();
 	}
 

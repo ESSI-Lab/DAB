@@ -401,6 +401,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	    descriptor = TabContentDescriptorBuilder.get(SystemSetting.class).//
 		    withLabel("Miscellaneous").//
+		    withEditDirective("Edit system miscellaneous settings").//
 		    build();
 	}
 

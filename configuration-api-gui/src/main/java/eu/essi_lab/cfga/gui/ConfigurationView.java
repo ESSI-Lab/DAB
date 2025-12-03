@@ -21,44 +21,29 @@ package eu.essi_lab.cfga.gui;
  * #L%
  */
 
-import java.io.InputStream;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.vaadin.flow.component.*;
-import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.applayout.*;
+import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.*;
-import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.*;
+import com.vaadin.flow.dom.*;
 import com.vaadin.flow.dom.DomEvent;
-import com.vaadin.flow.dom.DomEventListener;
-import com.vaadin.flow.dom.DomListenerRegistration;
-import com.vaadin.flow.server.ErrorEvent;
-import com.vaadin.flow.server.ErrorHandler;
-import com.vaadin.flow.server.InputStreamFactory;
-import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.VaadinRequest;
-import com.vaadin.flow.server.VaadinService;
-import com.vaadin.flow.server.VaadinServletRequest;
-import com.vaadin.flow.server.VaadinSession;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationChangeListener;
+import com.vaadin.flow.server.*;
+import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
-import eu.essi_lab.cfga.gui.dialog.EnhancedDialog;
-import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.cfga.gui.components.tabs.descriptor.TabDescriptor;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.web.*;
+
+import javax.servlet.http.*;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -67,27 +52,16 @@ import eu.essi_lab.messages.web.WebRequest;
 public abstract class ConfigurationView extends AppLayout implements ConfigurationChangeListener, DomEventListener {
 
     private VerticalTabs tabs;
-    private final HorizontalLayout navbarContent;
+    private final HorizontalLayout header;
     private final Label headerLabel;
     private final Image headerImage;
-    private final DrawerToggle drawerToggle;
-    private boolean drawerOpened;
-
-    private Configuration configuration;
-
-    /**
-     *
-     */
     private final Button saveButton;
     protected boolean tabAlreadyOpen;
     final Label infoLabel;
-
-    /**
-     *
-     */
-    CustomButton logoutButton;
+    Button logoutButton;
     private final String requestURL;
     private static String ownerBrowserAdress;
+    private Configuration configuration;
 
     /**
      *
@@ -97,12 +71,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	GSLoggerFactory.getLogger(getClass()).info("Loading configuration view STARTED");
 
 	addClassName("dab-configurator-app-layout");
-
-	//
-	//
-	//
-
-	drawerOpened = true;
 
 	//
 	//
@@ -157,17 +125,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	// header
 	//
 
-	drawerToggle = new DrawerToggle();
-	drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_LEFT.create());
-	drawerToggle.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
-	    drawerOpened = !drawerOpened;
-	    if (drawerOpened) {
-		drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_LEFT.create());
-	    } else {
-		drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_RIGHT.create());
-	    }
-	});
-
 	headerImage = new Image();
 	// headerImage.setSrc("https://i.imgur.com/GPpnszs.png");
 	// headerImage.setHeight("44px");
@@ -197,11 +154,11 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	// hides the save button, shows it again if initialized, authorized and the tab was closed
 	saveButton.setVisible(false);
 
-	navbarContent = ConfigurationViewFactory.createNavBarContentLayout();
+	header = ConfigurationViewFactory.createHeaderLayout();
 
-	navbarContent.add(headerImage, headerLabel, saveButton);
+	header.add(headerImage, headerLabel, saveButton);
 
-	mainLayout.add(navbarContent);
+	mainLayout.add(header);
 
 	//
 	//
@@ -303,17 +260,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	if (showLogOutButton()) {
 
-	    logoutButton = new CustomButton(VaadinIcon.SIGN_OUT.create());
-	    logoutButton.addThemeVariants(ButtonVariant.LUMO_LARGE);
-	    logoutButton.addClickListener(getLogOutButtonListener());
-	    logoutButton.setTooltip("Logout");
+	    logoutButton = ConfigurationViewFactory.createLogoutButton(getLogOutButtonListener());
 
-	    logoutButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%");
-	    logoutButton.getStyle().set("margin-left", "100px");
-	    logoutButton.getStyle().set("background-color", "white");
-	    logoutButton.getStyle().set("margin-right", "-15px");
-
-	    getNavbarContent().add(logoutButton);
+	    getHeader().add(logoutButton);
 	}
 
 	//
@@ -506,14 +455,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * @return
-     */
-    public DrawerToggle getDrawerToggle() {
-
-	return drawerToggle;
-    }
-
-    /**
      * @param index
      * @param label
      * @param component
@@ -538,9 +479,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     /**
      * @return
      */
-    public HorizontalLayout getNavbarContent() {
+    public HorizontalLayout getHeader() {
 
-	return navbarContent;
+	return header;
     }
 
     /**
@@ -647,14 +588,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     public Label getHeaderLabel() {
 
 	return headerLabel;
-    }
-
-    /**
-     *
-     */
-    public void removeDrawerToggle() {
-
-	navbarContent.remove(drawerToggle);
     }
 
     /**

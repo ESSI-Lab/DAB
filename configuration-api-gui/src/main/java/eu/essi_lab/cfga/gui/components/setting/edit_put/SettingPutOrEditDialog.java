@@ -75,8 +75,9 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 	//
 
 	getContentLayout().getStyle().set("border", "1px solid lightgray");
-	getContentLayout().getStyle().set("padding", "10px");
+	getContentLayout().getStyle().set("padding", "5px");
 	getContentLayout().getStyle().set("border-radius", "3px");
+	getContentLayout().getStyle().set("width", "98%");
 
 	//
 	// OnConfirm listener

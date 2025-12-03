@@ -37,7 +37,6 @@ import eu.essi_lab.cfga.gui.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.gui.directive.*;
-import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -47,11 +46,11 @@ public class ConfigurationViewFactory {
     /**
      * @return
      */
-    public static HorizontalLayout createNavBarContentLayout() {
+    public static HorizontalLayout createHeaderLayout() {
 
 	HorizontalLayout navbarContent = new HorizontalLayout();
 	navbarContent.setWidthFull();
-	navbarContent.getStyle().set("padding-left", "15px");
+	navbarContent.getStyle().set("padding-left", "30px");
 	navbarContent.getStyle().set("padding-right", "15px");
 
 	return navbarContent;
@@ -161,13 +160,14 @@ public class ConfigurationViewFactory {
 	    String desc = showDirective.flatMap(ShowDirective::getDescription).get();
 
 	    VerticalLayout subLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+	    subLayout.getStyle().set("padding", "0px");
 	    subLayout.setWidthFull();
 
 	    Label descLabel = new Label();
 	    descLabel.setWidthFull();
 	    descLabel.setMaxHeight("130px");
 	    descLabel.setText(desc);
-	    descLabel.getStyle().set("margin-left", "-7px");
+	    descLabel.getStyle().set("margin-left", "4px");
 	    descLabel.getStyle().set("font-size", "15px");
 	    descLabel.getStyle().set("color", "black");
 
@@ -177,7 +177,7 @@ public class ConfigurationViewFactory {
 
 		Div separator = ComponentFactory.createSeparator();
 		separator.getStyle().set("margin-top", "3px");
-		separator.getStyle().set("margin-left", "-7px");
+		separator.getStyle().set("margin-left", "4px");
 
 		subLayout.add(separator);
 	    }
@@ -204,6 +204,26 @@ public class ConfigurationViewFactory {
 	}
 
 	return content;
+    }
+
+    /**
+     * @param listener
+     * @return
+     */
+    public static Button createLogoutButton(LogOutButtonListener listener) {
+
+	CustomButton logoutButton = new CustomButton(VaadinIcon.SIGN_OUT.create());
+
+	logoutButton.addThemeVariants(ButtonVariant.LUMO_LARGE);
+	logoutButton.addClickListener(listener);
+	logoutButton.setTooltip("Logout");
+
+	logoutButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%");
+	logoutButton.getStyle().set("margin-left", "0px");
+	logoutButton.getStyle().set("background-color", "white");
+	logoutButton.getStyle().set("margin-right", "-15px");
+
+	return logoutButton;
     }
 
     /**

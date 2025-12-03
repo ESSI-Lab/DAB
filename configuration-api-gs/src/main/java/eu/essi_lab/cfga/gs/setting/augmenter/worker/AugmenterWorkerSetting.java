@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.gs.setting.augmenter.worker;
 
@@ -13,12 +13,12 @@ package eu.essi_lab.cfga.gs.setting.augmenter.worker;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -72,34 +72,34 @@ import eu.essi_lab.model.GSSource;
 public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting implements EditableSetting {
 
     /**
-     * 
+     *
      */
     private static final String NAME_OPTION_KEY = "nameOption";
 
     /**
-     * 
+     *
      */
     private static final String MAX_RECORDS_KEY = "maxRecords";
     /**
-     * 
+     *
      */
     private static final String LESS_RECENT_ORDERING_KEY = "lessRecentOrdering";
     /**
-     * 
+     *
      */
     private static final String TIME_BACK_OPTION_KEY = "timeBackOption";
     /**
-     * 
+     *
      */
     private static final String SOURCES_OPTION_KEY = "sourcesOption";
 
     /**
-     * 
+     *
      */
     private static final String VIEW_OPTION_KEY = "viewOption";
 
     /**
-     * 
+     *
      */
     public AugmenterWorkerSetting() {
 
@@ -232,7 +232,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
-	 * 
+	 *
 	 */
 	public TabDescriptorProvider() {
 
@@ -247,42 +247,41 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(clazz).//
 
- 		    withShowDirective(SortDirection.ASCENDING).//
+		    withShowDirective("Manage DAB augmenters. Click \"Reload\" to update the scheduler information\n",
+		    SortDirection.ASCENDING).//
 
 		    withAddDirective(//
-			    "Add augmentation job", //
-			    "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl")
-		    .//
+		    "Add augmentation job", //
+		    "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl").//
 		    withRemoveDirective("Remove augmenter", false, "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl").//
 		    withEditDirective("Edit augmenter", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
 
-			    ColumnDescriptor.create("Name", true, true, this::getName), //
+		    ColumnDescriptor.create("Name", true, true, this::getName), //
 
-			    ColumnDescriptor.create("Repeat count", 150, true, true,
-				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
+		    ColumnDescriptor.create("Repeat count", 150, true, true, (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
 
-			    ColumnDescriptor.create("Repeat interval", 150, true, true,
-				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
+		    ColumnDescriptor.create("Repeat interval", 150, true, true, (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)),
+		    //
 
-			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
+		    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
 
-				    Comparator.comparing(item -> item.get("Status")), //
+			    Comparator.comparing(item -> item.get("Status")), //
 
-				    new JobPhaseColumnRenderer()), //
+			    new JobPhaseColumnRenderer()), //
 
-			    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
+		    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
 
-			    ColumnDescriptor.create("End time", 150, true, true, (s) -> SchedulerSupport.getInstance().getEndTime(s)), //
+		    ColumnDescriptor.create("End time", 150, true, true, (s) -> SchedulerSupport.getInstance().getEndTime(s)), //
 
-			    ColumnDescriptor.create("El. time (HH:mm:ss)", 170, true, true,
-				    (s) -> SchedulerSupport.getInstance().getElapsedTime(s)), //
+		    ColumnDescriptor.create("El. time (HH:mm:ss)", 170, true, true,
+			    (s) -> SchedulerSupport.getInstance().getElapsedTime(s)), //
 
-			    ColumnDescriptor.create("Next fire time", true, true, (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
+		    ColumnDescriptor.create("Next fire time", true, true, (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
 
-			    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
-		    ), getItemsList()).//
+		    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
+	    ), getItemsList()).//
 
 		    reloadable(() -> SchedulerSupport.getInstance().update()).//
 
@@ -404,12 +403,12 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     }
 
     /**
-     * 
+     *
      */
     protected abstract Setting initAugmentersSetting();
 
     /**
-     * 
+     *
      */
     protected abstract String getAugmentersSettingIdentifier();
 
