@@ -264,7 +264,7 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 	    if (lon != null && lat != null) {
 
-		coreMetadata.addBoundingBox(lat.doubleValue(), lon.doubleValue(), lat.doubleValue(), lon.doubleValue());
+		coreMetadata.addBoundingBox(lat, lon, lat, lon);
 	    }
 
 	    // platform

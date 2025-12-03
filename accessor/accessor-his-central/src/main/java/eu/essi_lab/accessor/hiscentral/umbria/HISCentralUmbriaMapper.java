@@ -22,6 +22,7 @@ package eu.essi_lab.accessor.hiscentral.umbria;
  */
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -75,7 +76,8 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
      * @param sensorInfo
      * @return
      */
-    static OriginalMetadata create(JSONObject datasetInfo, JSONObject sensorInfo, String varName, String resourceId, String timeType, String startDate) {
+    static OriginalMetadata create(JSONObject datasetInfo, JSONObject sensorInfo, String varName, String resourceId, String timeType,
+	    String startDate) {
 
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
@@ -142,7 +144,7 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
     }
 
     /**
-     * @param 
+     * @param
      * @return station metadata
      */
     private JSONObject retrieveStationInfo(OriginalMetadata metadata) {
@@ -151,15 +153,15 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
     }
 
     /**
-     * @param 
+     * @param
      * @return UMBRIA_VARIABLE name
      */
     private String retieveVariableInfo(OriginalMetadata metadata) {
 	return new JSONObject(metadata.getMetadata()).optString("variable");
     }
-    
+
     /**
-     * @param 
+     * @param
      * @return resourceIdentifier
      */
     private String retieveResourceIdentifier(OriginalMetadata metadata) {
@@ -210,7 +212,7 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	String varId = retieveVariableInfo(originalMD);
 
 	String timeType = retrieveTimeType(originalMD);
-	
+
 	String resourceIdentifier = retieveResourceIdentifier(originalMD);
 
 	String tempExtenBegin = retrieveStartDate(originalMD);
@@ -259,8 +261,12 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
 	// bbox
-	if (lon != null && lat != null) {
-	    coreMetadata.addBoundingBox(lat, lon, lat, lon);
+	if (lat != null && lon != null) {
+	    coreMetadata.addBoundingBox(//
+		    new BigDecimal(lat), //
+		    new BigDecimal(lon), //
+		    new BigDecimal(lat), //
+		    new BigDecimal(lon));
 	}
 
 	if (timeType != null && !timeType.equals("NA")) {
@@ -394,7 +400,7 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	// mangler.setQualityIdentifier(qualityCode);
 
 	mangler.setResourceIdentifier(resourceIdentifier);
-	
+
 	mangler.setSourceIdentifier(id);
 
 	CoverageDescription coverageDescription = new CoverageDescription();
@@ -448,7 +454,7 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 
 	coreMetadata.getDataIdentification().setResourceIdentifier(identifier);
 
-	//Online downloadOnline = coreMetadata.getOnline();
+	// Online downloadOnline = coreMetadata.getOnline();
 
 	String resourceId = generateCode(dataset, stationId + "-" + paramDescription);
 

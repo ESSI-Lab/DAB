@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.veneto;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -54,7 +56,7 @@ import eu.essi_lab.ommdk.FileIdentifierMapper;
 public class HISCentralVenetoMapper extends FileIdentifierMapper {
 
     private SimpleDateFormat iso8601Format;
-    
+
     @Override
     public String getSupportedOriginalMetadataSchema() {
 	return CommonNameSpaceContext.HISCENTRAL_VENETO_NS_URI;
@@ -64,7 +66,7 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	this.iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	iso8601Format.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
-    
+
     public static void setIndeterminatePosition(GSResource gsResource) {
 	setIndeterminatePosition(gsResource, TimeUnit.DAYS.toMillis(30));
     }
@@ -74,7 +76,7 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
      * @param sensorInfo
      * @return
      */
-    static OriginalMetadata create(JSONObject datasetInfo, JSONObject sensorInfo, String valore, int startYear, int endYear ) {
+    static OriginalMetadata create(JSONObject datasetInfo, JSONObject sensorInfo, String valore, int startYear, int endYear) {
 
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
@@ -116,7 +118,7 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	ret = jsonMetadata.optString("value");
 	return ret;
     }
-    
+
     private String retrieveStartYear(OriginalMetadata metadata) {
 	JSONObject jsonMetadata = new JSONObject(metadata.getMetadata());
 	int startYear = jsonMetadata.optInt("startDate");
@@ -140,44 +142,43 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 
 	JSONObject sensorInfo = retrieveSensorInfo(originalMD);
 
-//	{
-//	    "endDate": 2023,
-//	    "dataset-info": {
-//	        "altitude": 5,
-//	        "tipo": "TARIA2M",
-//	        "comune": "MOGLIANO VENETO",
-//	        "latitudine": 45.5807425,
-//	        "nome_stazione": "Mogliano Veneto",
-//	        "codice_stazione": 227,
-//	        "codseq": 300001606,
-//	        "provincia": "TREVISO",
-//	        "point": {
-//	            "type": "Point",
-//	            "coordinates": [
-//	                12.30779083,
-//	                45.5807425
-//	            ]
-//	        },
-//	        "longitudine": 12.30779083
-//	    },
-//	    "sensor-info": {
-//	        "dataora": "2023-07-31T00:00:00",
-//	        "tipo": "TARIA2M",
-//	        "valore": {
-//	            "MINIMO": 19.8,
-//	            "MEDIO": 24.9,
-//	            "MASSIMO": 30.0
-//	        },
-//	        "aggiornamento": "2023-08-25T18:11:32",
-//	        "unitnm": "°C",
-//	        "nome_stazione": "Mogliano Veneto",
-//	        "nome_sensore": "Temperatura aria a 2m",
-//	        "codice_stazione": 227
-//	    },
-//	    "value": "MEDIO",
-//	    "startDate": 2010
-//	}
-	
+	// {
+	// "endDate": 2023,
+	// "dataset-info": {
+	// "altitude": 5,
+	// "tipo": "TARIA2M",
+	// "comune": "MOGLIANO VENETO",
+	// "latitudine": 45.5807425,
+	// "nome_stazione": "Mogliano Veneto",
+	// "codice_stazione": 227,
+	// "codseq": 300001606,
+	// "provincia": "TREVISO",
+	// "point": {
+	// "type": "Point",
+	// "coordinates": [
+	// 12.30779083,
+	// 45.5807425
+	// ]
+	// },
+	// "longitudine": 12.30779083
+	// },
+	// "sensor-info": {
+	// "dataora": "2023-07-31T00:00:00",
+	// "tipo": "TARIA2M",
+	// "valore": {
+	// "MINIMO": 19.8,
+	// "MEDIO": 24.9,
+	// "MASSIMO": 30.0
+	// },
+	// "aggiornamento": "2023-08-25T18:11:32",
+	// "unitnm": "°C",
+	// "nome_stazione": "Mogliano Veneto",
+	// "nome_sensore": "Temperatura aria a 2m",
+	// "codice_stazione": 227
+	// },
+	// "value": "MEDIO",
+	// "startDate": 2010
+	// }
 
 	// String resourceLocator = datasetInfo.getString("ResourceLocator");
 	//
@@ -201,7 +202,6 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	String stationCode = datasetInfo.optString("codice_stazione");
 	// String abbr = datasetInfo.optString("sigla");
 	String timeSeriesId = datasetInfo.optString("codseq");
-
 
 	// String timeSeriesId = sensorInfo.optString("id");
 	String measureName = sensorInfo.optString("nome_sensore");
@@ -263,7 +263,8 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 	coreMetadata.addDistributionFormat("WaterML 1.1");
 
-	coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(stationName + " - " + measureName + " (" + interpolation + ")");
+	coreMetadata.getMIMetadata().getDataIdentification()
+		.setCitationTitle(stationName + " - " + measureName + " (" + interpolation + ")");
 	coreMetadata.getMIMetadata().getDataIdentification().setAbstract(stationName + " - " + measureName + " (" + interpolation + ")");
 
 	//
@@ -307,11 +308,13 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	//
 	// bbox
 	//
-	coreMetadata.addBoundingBox(//
-		pointLat, //
-		pointLon, //
-		pointLat, //
-		pointLon);
+	if (pointLat != null && pointLon != null) {
+	    coreMetadata.addBoundingBox(//
+		    new BigDecimal(pointLat), //
+		    new BigDecimal(pointLon), //
+		    new BigDecimal(pointLat), //
+		    new BigDecimal(pointLon));
+	}
 
 	// vertical extent
 	coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(altitude, altitude);
@@ -340,13 +343,12 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 
 	TemporalExtent temporalExtent = new TemporalExtent();
 	String startYear = retrieveStartYear(originalMD);
-	if(startYear != null && !startYear.isEmpty()) {
-	    temporalExtent.setBeginPosition(startYear + "-01-01T00:00:00");    
-	}else {
+	if (startYear != null && !startYear.isEmpty()) {
+	    temporalExtent.setBeginPosition(startYear + "-01-01T00:00:00");
+	} else {
 	    temporalExtent.setBeginPosition("2010-01-01T00:00:00");
 	}
-	
-	
+
 	if (endTime != null && !endTime.isEmpty()) {
 	    temporalExtent.setEndPosition(endTime);
 	} else {
@@ -354,7 +356,7 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	}
 
 	coreMetadata.getDataIdentification().addTemporalExtent(temporalExtent);
-	
+
 	setIndeterminatePosition(dataset);
 
 	Distribution distribution = coreMetadata.getMIMetadata().getDistribution();
@@ -395,12 +397,12 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	CoverageDescription coverageDescription = new CoverageDescription();
 
 	coverageDescription.setAttributeIdentifier(measureType);
-	
+
 	DescriptionParsingResult parsedDescription = HISCentralUtils.parseDescription(measureName);
 	if (parsedDescription != null) {
 	    measureName = parsedDescription.getRest();
 	    coverageDescription.setAttributeDescription(measureName);
-	}else {
+	} else {
 	    HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
 	}
 	if (measureName.startsWith("Portata ")) {
@@ -409,7 +411,7 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	if (measureName.startsWith("Livello idrometrico ")) {
 	    measureName = "Livello idrometrico";
 	}
-	
+
 	coverageDescription.setAttributeTitle(measureName);
 
 	String missingValue = "-9999";
@@ -418,8 +420,7 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setAttributeUnits(units);
 	}
 	// as no description is given this field is calculated
-	
-	
+
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
     }

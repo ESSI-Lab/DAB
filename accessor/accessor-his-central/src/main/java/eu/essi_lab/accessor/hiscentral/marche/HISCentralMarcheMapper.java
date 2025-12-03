@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.marche;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -252,10 +254,10 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 
 	coreMetadata.addBoundingBox(//
-		Double.valueOf(pointLat), //
-		Double.valueOf(pointLon), //
-		Double.valueOf(pointLat), //
-		Double.valueOf(pointLon));
+		new BigDecimal(pointLat), //
+		new BigDecimal(pointLon), //
+		new BigDecimal(pointLat), //
+		new BigDecimal(pointLon));
 
 	//
 	// platform
