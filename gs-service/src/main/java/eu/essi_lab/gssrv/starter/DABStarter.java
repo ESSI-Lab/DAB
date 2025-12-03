@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -337,21 +337,21 @@ public class DABStarter {
 		// }
 
 		configuration = switch (newConfigName) {
-		    case "default" -> {
+		case "default" -> {
 
-			GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
 
-			yield new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-				ConfigurationWrapper.CONFIG_RELOAD_TIME);
-		    }
-		    case "demo" -> {
+		    yield new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
+			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
+		}
+		case "demo" -> {
 
-			GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
 
-			yield new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-				ConfigurationWrapper.CONFIG_RELOAD_TIME);
-		    }
-		    default -> configuration;
+		    yield new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
+			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
+		}
+		default -> configuration;
 		};
 
 		SelectionUtils.deepClean(configuration);
@@ -525,9 +525,9 @@ public class DABStarter {
 	    GSLoggerFactory.getLogger(getClass()).debug("Legacy Ontology setting patch STARTED");
 
 	    ReplacePropertyPatch ontologySettingPatch = ReplacePropertyPatch.of(//
-		    configuration,//
-		    Setting.SETTING_CLASS,//
-		    "eu.essi_lab.cfga.gs.setting.OntologySetting",//
+		    configuration, //
+		    Setting.SETTING_CLASS, //
+		    "eu.essi_lab.cfga.gs.setting.OntologySetting", //
 		    "eu.essi_lab.cfga.gs.setting.ontology.OntologySetting");//
 
 	    ontologySettingPatch.patch();
@@ -556,7 +556,7 @@ public class DABStarter {
 
 	    MoveSettingPatch moveSettingPatch = MoveSettingPatch.of(configuration, //
 		    DefaultSemanticSearchSetting.class, //
-		    SingletonSettingsId.DEFAULT_SEMANTIC_SEARCH_SETTING.getLabel(),//
+		    SingletonSettingsId.DEFAULT_SEMANTIC_SEARCH_SETTING.getLabel(), //
 		    configuration.get(SingletonSettingsId.SYSTEM_SETTING.getLabel()).get());
 
 	    moveSettingPatch.patch();
@@ -575,7 +575,7 @@ public class DABStarter {
 
 	} catch (
 
-		GSException gsex) {
+	GSException gsex) {
 
 	    throw gsex;
 
@@ -902,8 +902,8 @@ public class DABStarter {
 	case ACCESS:
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
-	    CachedCollections.getInstance()
-		    .prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic", new FeatureLayer1StationsArctic());
+	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
+		    new FeatureLayer1StationsArctic());
 	    break;
 	case BATCH:
 	case CONFIGURATION:
@@ -921,8 +921,8 @@ public class DABStarter {
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_PHYSICS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
-	    CachedCollections.getInstance()
-		    .prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic", new FeatureLayer1StationsArctic());
+	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
+		    new FeatureLayer1StationsArctic());
 	default:
 	}
     }
@@ -938,8 +938,8 @@ public class DABStarter {
 
 	if (keyValueOptions.isPresent()) {
 
-	    schedulerStartDelay = Integer.parseInt(keyValueOptions.get()
-		    .getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(), String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
+	    schedulerStartDelay = Integer.parseInt(keyValueOptions.get().getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(),
+		    String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
 	}
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("Scheduler will start in {} minutes", schedulerStartDelay);

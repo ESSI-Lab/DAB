@@ -799,7 +799,14 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 
 	var lon = findValue(data, 0, 'longitude');
 
-	var geoLocation = "lat: " + lat + "° lon: " + lon + "°";
+	var alt = findValue(data, 0, 'vertical_extent');
+
+	
+	var geoLocation = "latitude: " + lat + "°<br/> longitude: " + lon + "°";
+	
+	if (alt!=null && alt!= undefined){
+		geoLocation +="<br/> elevation: "+alt+" m";
+	}
 
 	const pointerCoordinates = ol.proj.fromLonLat([lon, lat]);
 
