@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.lib.utils;
 
@@ -13,12 +13,12 @@ package eu.essi_lab.lib.utils;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -59,7 +59,7 @@ public class FileUtils {
      * @param makeDir
      * @return
      */
-    public static File createTempDir(String child, boolean makeDir) {
+    public static File getTempDir(String child, boolean makeDir) {
 
 	File file = new File(System.getProperty("java.io.tmpdir"), child);
 
@@ -75,17 +75,8 @@ public class FileUtils {
      * @param makeDir
      * @return
      */
-    public static File createTempDir(boolean makeDir) {
+    public static File getTempDir() {
 
-	File file = new File(System.getProperty("java.io.tmpdir"));
-
-	if (!file.exists() && makeDir) {
-
-	    boolean mkdirs = file.mkdirs();
-
-	    System.out.println(mkdirs);
-	}
-
-	return file;
+	return new File(System.getProperty("java.io.tmpdir"));
     }
 }
