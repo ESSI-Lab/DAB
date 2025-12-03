@@ -174,6 +174,18 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
+     *
+     * @param name
+     * @return
+     */
+    public TabContentDescriptorBuilder withEditDirective(String name) {
+
+	descriptor.getDirectiveManager().add(new EditDirective(name));
+
+	return this;
+    }
+
+    /**
      * @param name
      * @param policy
      * @return
