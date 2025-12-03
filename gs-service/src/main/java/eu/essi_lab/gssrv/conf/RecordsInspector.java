@@ -60,9 +60,9 @@ import eu.essi_lab.model.exceptions.GSException;
 public class RecordsInspector {
 
     private final TabContentDescriptor descriptor;
-    private VerticalLayout verticalLayout;
-    private Grid<GridData> grid;
-    private GridFilter gridFilter;
+    private final VerticalLayout verticalLayout;
+    private final Grid<GridData> grid;
+    private final GridFilter gridFilter;
 
     private static final String NAME_COLUMN = "Name";
     private static final String ID_COLUMN = "Source id";
@@ -84,6 +84,7 @@ public class RecordsInspector {
 	//
 
 	grid = new Grid<>(GridData.class, false);
+	grid.getStyle().set("font-size", "13px");
 
 	grid.addColumn(GridData::getPosition).//
 		setWidth("60px").//
@@ -130,8 +131,6 @@ public class RecordsInspector {
 		setFlexGrow(0).//
 		setHeader("%").//
 		setSortable(true);
-
-	grid.getStyle().set("font-size", "14px");
 
 	grid.setWidthFull();
 
@@ -205,7 +204,7 @@ public class RecordsInspector {
 		    sdList.addAll(dataFolders.stream().//
 			    filter(f -> DatabaseFolder.computeSourceId(db, f).equals(s.getUniqueIdentifier())).//
 			    map(f -> new GridData(f, s)).//
-			    collect(Collectors.toList()));
+			    toList());
 		});
 
 	double total = sdList.stream().mapToInt(sd -> sd.getSize().intValue()).sum();
@@ -301,7 +300,7 @@ public class RecordsInspector {
      */
     private class GridFilter {
 
-	private HashMap<String, String> valuesMap;
+	private final HashMap<String, String> valuesMap;
 
 	/**
 	 *
@@ -328,12 +327,12 @@ public class RecordsInspector {
 		return nameMatch && idMatch;
 	    }
 
-	    if (sourceName != null && sourceId == null) { // only name
+	    if (sourceName != null) { // only name
 
 		return nameMatch;
 	    }
 
-	    if (sourceName == null && sourceId != null) { // only id
+	    if (sourceId != null) { // only id
 
 		return idMatch;
 	    }
@@ -356,11 +355,11 @@ public class RecordsInspector {
      */
     private class GridData {
 
-	private String sourceLabel;
-	private double size;
+	private final String sourceLabel;
+	private final double size;
 	private double total;
-	private String dataFolder;
-	private String sourceId;
+	private final String dataFolder;
+	private final String sourceId;
 	private boolean writingFolder;
 
 	/**
@@ -404,7 +403,7 @@ public class RecordsInspector {
 	    return String.valueOf(//
 		    grid.getListDataView().//
 			    getItems().//
-			    collect(Collectors.toList()).//
+			    toList().//
 			    indexOf(this) + 1);
 	}
 

@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -26,17 +26,13 @@ import java.util.*;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.cfga.gui.directive.*;
 
 /**
  * @author Fabrizio
@@ -98,10 +94,7 @@ public class ConfigurationViewFactory {
 		    desc.getLabel(), //
 		    createTabContent(desc, configuration, view, tabDescriptor)));
 
-	    if (tabDescriptor.getIndex() == 0) {
-
-		tabSheet.setRendered(true);
-	    }
+	    tabSheet.setRendered(true);
 
 	    content = tabSheet;
 	}
@@ -123,85 +116,11 @@ public class ConfigurationViewFactory {
 	    ConfigurationView view,//
 	    TabDescriptor tabDescriptor) {
 
-	DirectiveManager directiveManager = descriptor.getDirectiveManager();
-
-	TabContent content = ComponentFactory.createNoSpacingNoMarginTabContainer(
-		"tab-content-vertical-layout-for-" + descriptor.getLabel());
+	TabContent content = ComponentFactory.createTabContent("tab-content-vertical-layout-for-" + descriptor.getLabel());
 
 	content.init(configuration, descriptor, tabDescriptor);
 
-	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
-
-	Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
-
-	Optional<RemoveDirective> removeDirective = directiveManager.get(RemoveDirective.class);
-
-	Optional<EditDirective> editDirective = directiveManager.get(EditDirective.class);
-
-	content.setRemoveDirective(removeDirective);
-	content.setEditDirective(editDirective);
-
-	HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
-		"tab-container-header-layout-for-" + descriptor.getLabel());
-	headerLayout.setWidthFull();
-	headerLayout.setAlignItems(Alignment.BASELINE);
-	headerLayout.setId(TabContent.TAB_HEADER_ID_PREFIX + "_" + descriptor.getLabel());
-
-	content.add(headerLayout);
-
-	Label tabLabel = new Label();
-	tabLabel.setWidthFull();
-	tabLabel.setText(tabDescriptor.getLabel());
-	tabLabel.getStyle().set("font-size", "30px");
-	tabLabel.getStyle().set("color", "black");
-
-	if (showDirective.flatMap(ShowDirective::getDescription).isPresent()) {
-
-	    String desc = showDirective.flatMap(ShowDirective::getDescription).get();
-
-	    VerticalLayout subLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
-	    subLayout.getStyle().set("padding", "0px");
-	    subLayout.setWidthFull();
-
-	    Label descLabel = new Label();
-	    descLabel.setWidthFull();
-	    descLabel.setMaxHeight("130px");
-	    descLabel.setText(desc);
-	    descLabel.getStyle().set("margin-left", "4px");
-	    descLabel.getStyle().set("font-size", "15px");
-	    descLabel.getStyle().set("color", "black");
-
-	    subLayout.add(descLabel);
-
-	    if (showDirective.get().withDescriptionSeparator()) {
-
-		Div separator = ComponentFactory.createSeparator();
-		separator.getStyle().set("margin-top", "3px");
-		separator.getStyle().set("margin-left", "4px");
-
-		subLayout.add(separator);
-	    }
-
-	    headerLayout.add(subLayout);
-
-	} else {
-
-	    Div div = ComponentFactory.createDiv();
-	    div.setWidthFull();
-
-	    headerLayout.add(div);
-	}
-
-	addDirective.ifPresent(dir -> {
-
-	    Button addButton = SettingComponentFactory.createSettingAddButton(configuration, content, dir);
-	    headerLayout.add(addButton);
-	});
-
-	if (tabDescriptor.getIndex() == 0) {
-
-	    content.render();
-	}
+	content.render();
 
 	return content;
     }

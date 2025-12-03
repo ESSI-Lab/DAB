@@ -124,7 +124,7 @@ public class LegendBuilder {
 
 	Label legendLabel = ComponentFactory.createLabel(legendName, false, 12);
 	legendLabel.getStyle().set("font-weight", "bold");
-	legendLabel.getStyle().set("margin-right", "-10px");
+	legendLabel.getStyle().set("margin-right", "5px");
 	legendLabel.getStyle().set("margin-top", "-2px");
 
 	layout.add(legendLabel);
@@ -142,6 +142,8 @@ public class LegendBuilder {
     private VerticalLayout crateLegendPart(String name, Icon icon, int width, int marginLeft) {
 
 	VerticalLayout vl = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+	vl.getStyle().set("padding","0px");
+
 	vl.getStyle().set("width", width + "px");
 	if (marginLeft != 0) {
 	    vl.getStyle().set("margin-left", marginLeft + "px");
