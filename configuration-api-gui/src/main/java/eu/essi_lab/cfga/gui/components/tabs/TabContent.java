@@ -249,7 +249,8 @@ public class TabContent extends VerticalLayout implements Renderable {
 		    configuration, //
 		    this, //
 		    readOnly, //
-		    refresh);
+		    refresh,
+		    tabDesc.getContentDescriptors().size() > 1);
 
 	    TabSheet tabSheet = new TabSheet();
 	    tabSheet.getStyle().set("border-bottom", "1px solid #d3d3d39e");
