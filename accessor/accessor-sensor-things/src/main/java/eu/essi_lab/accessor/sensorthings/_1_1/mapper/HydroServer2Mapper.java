@@ -253,9 +253,10 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 	    ObservedProperty observedProperty = optObservedProperty.get();
 
+	    String variableCode = null;
 	    Optional<String> name = observedProperty.getName();
 	    if (name.isPresent()) {
-
+		variableCode = normalize(name.get());
 		keywords.addKeyword(normalize(name.get()), "observedProperty");
 		coverageDescription.setAttributeTitle(normalize(name.get()));
 	    }
@@ -272,28 +273,25 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 		JSONObject optObservedPropertyProp = optProperties.get();
 
-		String variableCode = optObservedPropertyProp.optString("variableCode");
-		String variableType = optObservedPropertyProp.optString("variableType");
+		if (variableCode != null && !variableCode.isEmpty()) {
 
+		    variableCode = optObservedPropertyProp.optString("variableCode");
+
+		}
+
+	    }
+
+	    if (variableCode != null && !variableCode.isEmpty()) {
 		String coverageId = SERVER_URN;
 
-		if (!variableCode.isEmpty()) {
+		coverageId += variableCode.trim();
 
-		    coverageId += variableCode.trim();
-
-		    keywords.addKeyword(variableCode, "variableCode");
-		}
-
-		if (!variableType.isEmpty()) {
-
-		    coverageId += ":" + variableType.trim();
-
-		    keywords.addKeyword(variableType, "variableType");
-		}
+		keywords.addKeyword(variableCode, "variableCode");
 
 		coverageDescription.setAttributeIdentifier(coverageId);
 		coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 	    }
+
 	}
     }
 
@@ -306,13 +304,13 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 	JSONArray contactPeople = null;
 
-	if (stream != null) {
+	if (stream != null && stream.getProperties().isPresent()) {
 	    contactPeople = stream.getProperties().get().optJSONArray("contactPeople");
 	    if (contactPeople == null) {
 		contactPeople = stream.getProperties().get().optJSONArray("responsibleParties");
 	    }
 	}
-	if (thing != null) {
+	if (thing != null && thing.getProperties().isPresent()) {
 	    if (contactPeople == null) {
 		contactPeople = thing.getProperties().get().optJSONArray("contactPeople");
 	    }
@@ -446,7 +444,7 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	    String its = properties.getString("intendedTimeSpacing");
 	    handler.setTimeResolutionDuration8601(its);
 	}
-	
+
 	//
 	// Time interpolation
 	//
@@ -488,13 +486,12 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 		    ISO8601DateTimeUtils.getDuration(timeAggregationInterval, aggrTimeUnitName).toString());
 	}
-	
+
 	if (properties.has("aggregationPeriod")) {
 	    String aggregationPeriod = properties.getString("aggregationPeriod");
 	    handler.setTimeAggregationDuration8601(aggregationPeriod);
 	}
-	
-	
+
     }
 
     /**
@@ -616,7 +613,7 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	String platformId = "";
 	String samplingFeatureCode = thing.getProperties().get().optString("samplingFeatureCode");
 	if (platformId.isEmpty() && !samplingFeatureCode.isEmpty()) {
-	    platformId = samplingFeatureCode.trim() ;
+	    platformId = samplingFeatureCode.trim();
 	}
 	String samplingFeatureType = thing.getProperties().get().optString("samplingFeatureType");
 	if (platformId.isEmpty() && !samplingFeatureType.isEmpty()) {
