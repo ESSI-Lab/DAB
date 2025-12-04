@@ -57,20 +57,7 @@ public class ComponentFactory {
 	return layout;
     }
 
-    /**
-     * @param id
-     * @return
-     */
-    public static TabContent createTabContainer(String id) {
 
-	TabContent layout = new TabContent();
-	// layout.getStyle().set("border","1px solid black");
-	if (id != null) {
-	    layout.setId(id);
-	}
-
-	return layout;
-    }
 
     /**
      * @return
@@ -128,14 +115,12 @@ public class ComponentFactory {
      * @param id
      * @return
      */
-    public static TabContent createNoSpacingNoMarginTabContainer(String id) {
+    public static TabContent createTabContent(String id) {
 
-	TabContent layout = createTabContainer(id);
+	TabContent content = new TabContent();
+	content.setId(id);
 
-	layout.setMargin(false);
-	layout.setSpacing(false);
-
-	return layout;
+	return content;
     }
 
     /**

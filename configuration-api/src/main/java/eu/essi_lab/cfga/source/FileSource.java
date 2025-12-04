@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.lib.utils.*;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,9 +44,6 @@ import com.google.common.base.Charsets;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 /**
  * @author Fabrizio
@@ -136,7 +134,7 @@ public class FileSource implements ConfigurationSource {
      */
     public static Configuration switchSource(Configuration configuration) throws Exception {
 
-	return switchSource(configuration, File.createTempFile("gs-configuration", ".json"));
+	return switchSource(configuration, FileUtils.getTempDir());
     }
 
     @Override

@@ -154,7 +154,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 
 	Path tempPath = null;
 
-	File tempDirFile = FileUtils.createTempDir("basic-data-harvester", false);
+	File tempDirFile = FileUtils.getTempDir("basic-data-harvester", false);
 
 	tempPath = tempDirFile.toPath();
 

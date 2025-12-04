@@ -440,7 +440,7 @@ public class SettingComponentFactory {
 	textArea.setReadOnly(true);
 	textArea.setValue(description);
 	textArea.setWidthFull();
-	textArea.getStyle().set("font-size", "15px");
+	textArea.getStyle().set("font-size", "14px");
 	textArea.getStyle().set("border-radius", "0px");
 	textArea.getStyle().set("background-color", "rgb(158 158 158 / 26%)");
 

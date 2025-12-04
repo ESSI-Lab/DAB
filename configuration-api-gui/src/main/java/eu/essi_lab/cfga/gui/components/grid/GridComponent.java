@@ -184,7 +184,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	//
 
-	getStyle().set("font-size", "14px");
+	getStyle().set("font-size", "13px");
 
 	addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
@@ -305,9 +305,9 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     /**
      * @return
      */
-    public Component createLegendsViewer(List<Component> legends) {
+    public Component createLegendViewer(List<Component> legends) {
 
-	return new LegendViewer(this, legends);
+	return new LegendViewer(legends);
     }
 
     /**
