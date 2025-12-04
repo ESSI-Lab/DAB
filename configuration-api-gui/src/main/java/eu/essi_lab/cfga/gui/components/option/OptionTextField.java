@@ -43,6 +43,7 @@ public class OptionTextField extends TextField implements OnKeyUpValidationListe
 
 	setPreventInvalidInput(true);
 	setClearButtonVisible(true);
+	getStyle().set("font-size","14px");
 
 	addKeyUpListener(this);
     }
@@ -54,6 +55,7 @@ public class OptionTextField extends TextField implements OnKeyUpValidationListe
     public OptionTextField(Option<?> option, boolean forceReadonly) {
 
 	this();
+	setId("option-text-field-for-"+option.getKey());
 
 	//
 	// Option

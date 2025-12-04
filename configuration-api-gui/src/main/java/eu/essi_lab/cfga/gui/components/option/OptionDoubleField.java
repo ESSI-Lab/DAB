@@ -40,6 +40,8 @@ public class OptionDoubleField extends NumberField implements OnKeyUpValidationL
     @SuppressWarnings("deprecation")
     public OptionDoubleField(Option<?> option, boolean forceReadonly) {
 
+	getStyle().set("font-size","14px");
+
 	setHasControls(true);
 
 	setPreventInvalidInput(true);
