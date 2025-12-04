@@ -279,7 +279,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	// set the grid height according to the screen height and a fixed offset
 
-	int offset = 600;
+	int offset = gridInfo.isShowColumnsHider() || legendsViewer ? 460 : 370;
 
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
 
