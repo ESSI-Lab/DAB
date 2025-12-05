@@ -1,29 +1,77 @@
+# Global namespace for all resources
+namespace: dab
+
+# Image pull policy for all containers
+imagePullPolicy: IfNotPresent
+
 opensearch:
   image: "opensearchproject/opensearch:2.18.0"
   port: 9200
   javaOpts: "-Xms512m -Xmx512m"
+  replicas: 1
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+  service:
+    type: ClusterIP
 
 dashboard:
   image: "opensearchproject/opensearch-dashboards:2.18.0"
   port: 5601
+  replicas: 1
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  service:
+    type: ClusterIP
 
 dab:
   image: "essilab/essilab:dab-49"
   port: 8080
+  replicas: 1
   env:
     DAB_SKIP_AUTHORIZATION: "true"
     EU_FLORA_ESSI_GI_PROJECT_EXECUTION: "mixed"
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  service:
+    type: ClusterIP
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 5
 
 ingress:
   enabled: true
-  namespace: 
-  host: 
+  namespace: dab
+  host: ""
   path: /
   ingressClassName: nginx
-  tlsSecretName: argocd-tls
-  clusterIssuer: lets-encrypt
-  serviceName: argocd-server
-  servicePort: 80
+  tlsSecretName: ""
+  clusterIssuer: ""
+  serviceName: dab
+  servicePort: 8080
   backendProtocol: "HTTP"
   annotations: {}
   #   nginx.ingress.kubernetes.io/rewrite-target: /

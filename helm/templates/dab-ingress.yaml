@@ -1,11 +1,17 @@
 {{- if .Values.ingress.enabled }}
+{{- if .Values.ingress.host }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "dab.fullname" . }}-ingress
-  namespace: {{ .Values.ingress.namespace }}
+  namespace: {{ .Values.ingress.namespace | default .Values.namespace }}
+  labels:
+    {{- include "dab.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingress
   annotations:
+    {{- if .Values.ingress.clusterIssuer }}
     cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer }}
+    {{- end }}
     nginx.ingress.kubernetes.io/backend-protocol: {{ .Values.ingress.backendProtocol | quote }}
     {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
@@ -23,8 +29,11 @@ spec:
             name: {{ .Values.ingress.serviceName }}
             port:
               number: {{ .Values.ingress.servicePort }}
+  {{- if .Values.ingress.tlsSecretName }}
   tls:
   - hosts:
     - {{ .Values.ingress.host }}
     secretName: {{ .Values.ingress.tlsSecretName }}
+  {{- end }}
+{{- end }}
 {{- end }}

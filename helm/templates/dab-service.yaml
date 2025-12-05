@@ -2,11 +2,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dab
-  namespace: dab
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "dab.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dab
 spec:
   selector:
     app: dab
+    {{- include "dab.selectorLabels" . | nindent 4 }}
   ports:
   - port: {{ .Values.dab.port }}
     targetPort: {{ .Values.dab.port }}
-  type: ClusterIP
+    protocol: TCP
+    name: http
+  type: {{ .Values.dab.service.type }}

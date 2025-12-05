@@ -2,20 +2,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dab
-  namespace: dab
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "dab.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dab
 spec:
-  replicas: 1
+  replicas: {{ .Values.dab.replicas }}
   selector:
     matchLabels:
       app: dab
+      {{- include "dab.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         app: dab
+        {{- include "dab.selectorLabels" . | nindent 8 }}
     spec:
       containers:
       - name: dab
         image: {{ .Values.dab.image }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
         env:
         {{- range $key, $value := .Values.dab.env }}
         - name: {{ $key }}
@@ -23,3 +29,16 @@ spec:
         {{- end }}
         ports:
         - containerPort: {{ .Values.dab.port }}
+          name: http
+        {{- if .Values.dab.resources }}
+        resources:
+          {{- toYaml .Values.dab.resources | nindent 10 }}
+        {{- end }}
+        {{- if .Values.dab.livenessProbe }}
+        livenessProbe:
+          {{- toYaml .Values.dab.livenessProbe | nindent 10 }}
+        {{- end }}
+        {{- if .Values.dab.readinessProbe }}
+        readinessProbe:
+          {{- toYaml .Values.dab.readinessProbe | nindent 10 }}
+        {{- end }}
