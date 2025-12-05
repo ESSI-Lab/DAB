@@ -25,7 +25,7 @@ package eu.essi_lab.authorization.pps;
  */
 
 /**
- * Users having the "whos" role, are allowed to discovery if and only if:<br>
+ * Users having the " " role, are allowed to discovery if and only if:<br>
  * <br>
  * 1) the view creator is "whos"<br>
  *
