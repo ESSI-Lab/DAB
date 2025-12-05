@@ -13,3 +13,18 @@ dab:
   env:
     DAB_SKIP_AUTHORIZATION: "true"
     EU_FLORA_ESSI_GI_PROJECT_EXECUTION: "mixed"
+	
+ingress:
+  enabled: true
+  namespace: 
+  host: 
+  path: /
+  ingressClassName: nginx
+  tlsSecretName: argocd-tls
+  clusterIssuer: lets-encrypt
+  serviceName: argocd-server
+  servicePort: 80
+  backendProtocol: "HTTP"
+  annotations: {}
+  #   nginx.ingress.kubernetes.io/rewrite-target: /
+	
