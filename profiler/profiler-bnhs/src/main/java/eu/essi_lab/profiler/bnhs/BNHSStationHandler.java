@@ -375,22 +375,34 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		    org.putOpt("uri", wrapper.getOrgUri());
 		    String indName = wrapper.getIndividualName();
 		    if (indName != null && !indName.isEmpty()) {
-			JSONArray arr = new JSONArray(indName);
-			org.putOpt("individual_name", arr);
+			if (indName.startsWith("[")) {
+			    JSONArray arr = new JSONArray(indName);
+			    org.putOpt("individual_name", arr);
+			} else {
+			    JSONArray arr = new JSONArray();
+			    arr.put(indName);
+			    org.putOpt("individual_name", arr);
+			}
 		    }
 		    String indURI = wrapper.getIndividualURI();
 		    if (indURI != null && !indURI.isEmpty()) {
-			JSONArray arr = new JSONArray(indURI);
-			org.putOpt("individual_uri", arr);
+			if (indURI.startsWith("[")) {
+			    JSONArray arr = new JSONArray(indURI);
+			    org.putOpt("individual_uri", arr);
+			} else {
+			    JSONArray arr = new JSONArray();
+			    arr.put(indURI);
+			    org.putOpt("individual_uri", arr);
+			}
 		    }
 		    org.putOpt("email", wrapper.getEmail());
 		    org.putOpt("homepage", wrapper.getHomePageURL());
 		    String role = wrapper.getRole();
 		    if (role != null && !role.isEmpty()) {
-			JSONArray arr ;
+			JSONArray arr;
 			if (role.startsWith("[")) {
-			arr = new JSONArray(role);
-			}else {
+			    arr = new JSONArray(role);
+			} else {
 			    arr = new JSONArray();
 			    arr.put(role);
 			}
@@ -464,7 +476,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		    timeUnits = unitsValue.getValue();
 		    timeSupport = unitsValue.getKey().toString();
 		}
-		
+
 		String timeStart = "";
 		String timeEnd = "";
 		String nearRealTime = "no";
