@@ -32,6 +32,7 @@ import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.components.grid.*;
 import eu.essi_lab.cfga.gui.components.setting.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.dialog.*;
 import eu.essi_lab.cfga.gui.directive.*;
 import eu.essi_lab.cfga.setting.*;
 
@@ -123,17 +124,23 @@ public class TabContent extends VerticalLayout implements Renderable {
 	    descLayout.getStyle().set("padding", "0px");
 	    descLayout.setWidthFull();
 
-	    String desc = showDirective.flatMap(ShowDirective::getDescription).get();
+	    final String desc = showDirective.flatMap(ShowDirective::getDescription).get();
+
+	    HorizontalLayout labelLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
+	    labelLayout.getStyle().set("padding", "0px");
+	    labelLayout.setWidthFull();
 
 	    Label descLabel = new Label();
 	    descLabel.setWidthFull();
 	    descLabel.setMaxHeight("130px");
-	    descLabel.setText(desc);
 	    descLabel.getStyle().set("margin-left", "4px");
 	    descLabel.getStyle().set("font-size", "14px");
 	    descLabel.getStyle().set("color", "black");
+	    descLabel.setText(desc);
 
-	    descLayout.add(descLabel);
+	    labelLayout.add(descLabel);
+
+	    descLayout.add(labelLayout);
 
 	    if (showDirective.get().withDescriptionSeparator()) {
 
@@ -146,6 +153,25 @@ public class TabContent extends VerticalLayout implements Renderable {
 	    }
 
 	    headerLayout.add(descLayout);
+
+	    if (desc.length() > 200) {
+
+		String shortDesc = desc.substring(0, 195);
+
+		descLabel.setText(shortDesc);
+
+		Button extraDescButton = new Button("...");
+		extraDescButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+		extraDescButton.getStyle().set("margin-right", "21px");
+		extraDescButton.setTooltipText("Click to see full description");
+		extraDescButton.addClickListener(evt -> {
+
+		    NotificationDialog.getNotificationDialog("Description",desc).open();
+		});
+
+		labelLayout.add(extraDescButton);
+	    }
+
 
 	} else {
 
@@ -244,7 +270,8 @@ public class TabContent extends VerticalLayout implements Renderable {
 		    configuration, //
 		    this, //
 		    readOnly, //
-		    refresh);
+		    refresh,
+		    tabDesc.getContentDescriptors().size() > 1);
 
 	    TabSheet tabSheet = new TabSheet();
 	    tabSheet.getStyle().set("border-bottom", "1px solid #d3d3d39e");

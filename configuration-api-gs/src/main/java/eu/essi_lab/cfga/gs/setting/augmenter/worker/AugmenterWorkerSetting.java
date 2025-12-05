@@ -247,7 +247,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(clazz).//
 
-		    withShowDirective("Manage DAB augmenters. Click \"Reload\" to update the scheduler information\n",
+		    withShowDirective("Manage augmenters. Click \"Reload\" to update the scheduler information\n",
 		    SortDirection.ASCENDING).//
 
 		    withAddDirective(//

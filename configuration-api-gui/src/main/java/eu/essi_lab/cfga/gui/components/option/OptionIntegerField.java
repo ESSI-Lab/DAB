@@ -39,6 +39,8 @@ public class OptionIntegerField extends IntegerField implements OnKeyUpValidatio
      */
     public OptionIntegerField(Option<?> option, boolean forceReadonly) {
 
+	getStyle().set("font-size","14px");
+
 	setHasControls(true);
 
 	setPreventInvalidInput(true);
