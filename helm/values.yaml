@@ -13,7 +13,7 @@ dab:
   env:
     DAB_SKIP_AUTHORIZATION: "true"
     EU_FLORA_ESSI_GI_PROJECT_EXECUTION: "mixed"
-	
+
 ingress:
   enabled: true
   namespace: 
@@ -27,4 +27,4 @@ ingress:
   backendProtocol: "HTTP"
   annotations: {}
   #   nginx.ingress.kubernetes.io/rewrite-target: /
-	
+
