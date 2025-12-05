@@ -40,6 +40,7 @@ dab:
   env:
     DAB_SKIP_AUTHORIZATION: "true"
     EU_FLORA_ESSI_GI_PROJECT_EXECUTION: "mixed"
+    JAVA_OPTS: "-Dfile.encoding=UTF-8 --add-opens java.xml/com.sun.org.apache.xerces.internal.jaxp.datatype=ALL-UNNAMED -DinitCaches=true -DcheckConfig=true -DinitIndexes=true"
   resources:
     requests:
       memory: "512Mi"
