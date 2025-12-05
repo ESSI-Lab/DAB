@@ -179,7 +179,7 @@ public abstract class TaskStarter extends GridMenuItemHandler implements ButtonC
 	textArea.setValue(getTextAreaText(event));
 	textArea.setSizeFull();
 	textArea.setWidth(635, Unit.PIXELS);
-	textArea.setHeight(350, Unit.PIXELS);
+	textArea.setHeight(330, Unit.PIXELS);
 	textArea.getStyle().set("font-size", "14px");
 
 	textArea.setReadOnly(true);
