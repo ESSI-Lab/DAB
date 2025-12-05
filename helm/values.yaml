@@ -68,11 +68,19 @@ ingress:
   host: ""
   path: /
   ingressClassName: nginx
-  tlsSecretName: ""
+  # TLS Configuration - choose one of the following options:
+  # Option 1: Use cert-manager for automatic TLS certificate management (recommended)
+  #   Set clusterIssuer to your cert-manager ClusterIssuer name (e.g., "letsencrypt-prod", "letsencrypt-staging")
+  #   cert-manager will automatically create the TLS secret
   clusterIssuer: ""
+  # Option 2: Use an existing TLS secret (manual certificate)
+  #   Set tlsSecretName to the name of an existing secret containing tls.crt and tls.key
+  #   If both clusterIssuer and tlsSecretName are set, clusterIssuer takes precedence
+  tlsSecretName: ""
   serviceName: dab
   servicePort: 8080
   backendProtocol: "HTTP"
   annotations: {}
   #   nginx.ingress.kubernetes.io/rewrite-target: /
+  #   nginx.ingress.kubernetes.io/ssl-redirect: "true"  # Uncomment to force HTTPS redirect
 

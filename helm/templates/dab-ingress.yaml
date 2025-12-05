@@ -29,11 +29,11 @@ spec:
             name: {{ .Values.ingress.serviceName }}
             port:
               number: {{ .Values.ingress.servicePort }}
-  {{- if .Values.ingress.tlsSecretName }}
+  {{- if or .Values.ingress.tlsSecretName .Values.ingress.clusterIssuer }}
   tls:
   - hosts:
     - {{ .Values.ingress.host }}
-    secretName: {{ .Values.ingress.tlsSecretName }}
+    secretName: {{ .Values.ingress.tlsSecretName | default (printf "%s-tls" (include "dab.fullname" .)) }}
   {{- end }}
 {{- end }}
 {{- end }}
