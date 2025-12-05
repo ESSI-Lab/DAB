@@ -391,7 +391,6 @@ public class SettingComponent extends Div {
 		}
 	    }
 	}
-
     }
 
     /**
@@ -454,7 +453,7 @@ public class SettingComponent extends Div {
 	    // headerLayout = SettingComponentFactory.createSettingHeaderLayoutWithBottomMargin(setting);
 	}
 
-	// hides the header
+	// foced to hide the whole header. this is done by the put/edit dialogs
 	if (setting.isForceHideHeader()) {
 
 	    headerLayout.getStyle().set("display", "none");

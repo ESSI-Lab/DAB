@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -210,7 +210,13 @@ public class SettingComponentFactory {
 	    String settingIdentifier, //
 	    boolean forceReadonly) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, false, null, null);
+	return createSettingComponentWithOptionalFoldedMode(//
+		configuration,//
+		settingIdentifier,//
+		forceReadonly,//
+		false,//
+		null,//
+		null);
     }
 
     /**
@@ -224,7 +230,13 @@ public class SettingComponentFactory {
 	    Setting setting, //
 	    boolean forceReadonly) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, setting, forceReadonly, false, null, null);
+	return createSettingComponentWithOptionalFoldedMode(//
+		configuration, //
+		setting, //
+		forceReadonly, //
+		false, //
+		null, //
+		null);//
     }
 
     /**
@@ -240,7 +252,13 @@ public class SettingComponentFactory {
 	    boolean forceReadonly, //
 	    TabContent tabContent) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, false, null, tabContent);
+	return createSettingComponentWithOptionalFoldedMode(//
+		configuration, //
+		settingIdentifier,//
+		forceReadonly, //
+		false, //
+		null, //
+		tabContent);
     }
 
     /**
@@ -256,23 +274,11 @@ public class SettingComponentFactory {
 	    boolean forceReadonly, //
 	    TabContent tabContent) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, setting, forceReadonly, false, null, tabContent);
-    }
-
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @param tabContent
-     * @return
-     */
-    public static SettingComponent createSettingComponentForcingHideLabel(//
-	    Configuration configuration, //
-	    String settingIdentifier, //
-	    boolean forceReadonly, //
-	    TabContent tabContent) {
-
-	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, true, null, tabContent);
+	return createSettingComponentWithOptionalFoldedMode(configuration,//
+		setting,//
+		forceReadonly, false,//
+		null,//
+		tabContent);//
     }
 
     /**
@@ -292,8 +298,12 @@ public class SettingComponentFactory {
 	    Comparator<Setting> comparator, //
 	    TabContent tabContent) {
 
-	SettingComponent settingComponent = new SettingComponent(configuration, settingIdentifier, forceReadonly, forceHideLabel,
-		comparator, tabContent);
+	SettingComponent settingComponent = new SettingComponent(configuration,//
+		settingIdentifier,//
+		forceReadonly,//
+		forceHideLabel,//
+		comparator,//
+		tabContent);//
 
 	settingComponent.getStyle().set("background-color", "white");
 	settingComponent.getStyle().set("padding", "4px");
@@ -348,8 +358,13 @@ public class SettingComponentFactory {
 	    Comparator<Setting> comparator, //
 	    TabContent tabContent) {
 
-	SettingComponent settingComponent = createSettingComponent(configuration, settingIdentifier, forceReadonly, forceHideLabel,
-		comparator, tabContent);
+	SettingComponent settingComponent = createSettingComponent( //
+		configuration,//
+		settingIdentifier,//
+		forceReadonly,//
+		forceHideLabel,//
+		comparator,//
+		tabContent);
 
 	Setting setting = configuration.get(settingIdentifier).get();
 
@@ -463,7 +478,7 @@ public class SettingComponentFactory {
 
 	Label label = ComponentFactory.createLabel(name);
 	label.getStyle().set("font-weight", "bold");
-//	label.getStyle().set("margin-top", "10px");
+	//	label.getStyle().set("margin-top", "10px");
 
 	if (!setting.isCompactModeEnabled() || //
 		(setting.isCompactModeEnabled() && setting.getOptions().isEmpty()) || //
@@ -528,7 +543,7 @@ public class SettingComponentFactory {
 	//
 
 	button.addEnabledStyle("color", "black");
-//	button.addEnabledStyle("background-color", "rgb(255 252 0 / 41%)");
+	//	button.addEnabledStyle("background-color", "rgb(255 252 0 / 41%)");
 	button.addEnabledStyle("border", "1px solid gray");
 
 	//
