@@ -34,7 +34,7 @@ dashboard:
     type: ClusterIP
 
 dab:
-  image: "essilab/essilab:dab-49"
+  image: "essilab/essilab:dab-50"
   port: 8080
   replicas: 1
   env:
