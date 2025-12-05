@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frost-server
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "frost.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frost-server
+spec:
+  replicas: {{ .Values.frost.replicas }}
+  selector:
+    matchLabels:
+      app: frost-server
+  template:
+    metadata:
+      labels:
+        app: frost-server
+        {{- include "frost.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: frost-server
+        image: {{ .Values.frost.image }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        env:
+        - name: serviceRootUrl
+          value: {{ .Values.frost.serviceRootUrl | quote }}
+        - name: persistence_db_driver
+          value: "org.postgresql.Driver"
+        - name: persistence_db_url
+          value: "jdbc:postgresql://postgres:{{ .Values.postgres.port }}/{{ .Values.postgres.database }}"
+        - name: persistence_db_username
+          value: {{ .Values.postgres.username | quote }}
+        - name: persistence_db_password
+          value: {{ .Values.postgres.password | quote }}
+        {{- range $key, $value := .Values.frost.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.frost.httpPort }}
+          name: http
+        - containerPort: {{ .Values.frost.mqttPort }}
+          name: mqtt
+        {{- if .Values.frost.resources }}
+        resources:
+          {{- toYaml .Values.frost.resources | nindent 10 }}
+        {{- end }}
+        {{- if .Values.frost.livenessProbe }}
+        livenessProbe:
+          {{- toYaml .Values.frost.livenessProbe | nindent 10 }}
+        {{- end }}
+        {{- if .Values.frost.readinessProbe }}
+        readinessProbe:
+          {{- toYaml .Values.frost.readinessProbe | nindent 10 }}
+        {{- end }}
+

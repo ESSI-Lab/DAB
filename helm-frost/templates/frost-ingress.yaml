@@ -1,0 +1,40 @@
+{{- if .Values.ingress.enabled }}
+{{- if .Values.ingress.host }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "frost.fullname" . }}-ingress
+  namespace: {{ .Values.ingress.namespace | default .Values.namespace }}
+  labels:
+    {{- include "frost.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingress
+  annotations:
+    {{- if .Values.ingress.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer }}
+    {{- end }}
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - path: {{ .Values.ingress.path }}
+        pathType: Prefix
+        backend:
+          service:
+            name: frost-server
+            port:
+              number: {{ .Values.frost.httpPort }}
+  {{- if or .Values.ingress.tlsSecretName .Values.ingress.clusterIssuer }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.host }}
+    secretName: {{ .Values.ingress.tlsSecretName | default (printf "%s-tls" (include "frost.fullname" .)) }}
+  {{- end }}
+{{- end }}
+{{- end }}
+

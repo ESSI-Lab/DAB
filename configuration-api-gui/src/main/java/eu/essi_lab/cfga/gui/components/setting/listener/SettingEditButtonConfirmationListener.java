@@ -82,9 +82,8 @@ public class SettingEditButtonConfirmationListener implements ButtonChangeListen
 	SelectionUtils.deepAfterClean(settingToEdit);
 
 	//
-	// shows the header end set folded and collapse mode
+	// enables the header end set folded and collapse mode
 	//
-//	settingToEdit.setShowHeader(true);
 	settingToEdit.setForceHideheader(false);
 
 	settingToEdit.enableFoldedMode(this.foldedModeEnabled);

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frost-server
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "frost.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frost-server
+spec:
+  selector:
+    app: frost-server
+    {{- include "frost.selectorLabels" . | nindent 4 }}
+  ports:
+  - port: {{ .Values.frost.httpPort }}
+    targetPort: {{ .Values.frost.httpPort }}
+    protocol: TCP
+    name: http
+  - port: {{ .Values.frost.mqttPort }}
+    targetPort: {{ .Values.frost.mqttPort }}
+    protocol: TCP
+    name: mqtt
+  type: {{ .Values.frost.service.type }}
+

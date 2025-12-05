@@ -39,6 +39,8 @@ public class OptionTextArea extends TextArea {
      */
     public OptionTextArea(Option<?> option, boolean forceReadonly) {
 
+	getStyle().set("font-size","14px");
+
 	//
 	// Option
 	//

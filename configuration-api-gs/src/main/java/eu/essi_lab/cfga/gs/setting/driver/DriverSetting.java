@@ -59,7 +59,7 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
 	public DescriptorProvider() {
 
 	    descriptor = TabContentDescriptorBuilder.get(DriverSetting.class).//
-		    withLabel("Driver").//
+		    withLabel("Repositories").//
 		    build();
 	}
 

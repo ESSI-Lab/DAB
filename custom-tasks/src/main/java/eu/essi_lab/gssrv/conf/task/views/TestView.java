@@ -1,7 +1,4 @@
-/**
- * 
- */
-package eu.essi_lab.authorization.pps;
+package eu.essi_lab.gssrv.conf.task.views;
 
 /*-
  * #%L
@@ -24,37 +21,19 @@ package eu.essi_lab.authorization.pps;
  * #L%
  */
 
-/**
- * Users having the " " role, are allowed to discovery if and only if:<br>
- * <br>
- * 1) the view creator is "whos"<br>
- *
- * 2) the discovery path is supported<br>
- * <br>
- * Users having this policy role, are allowed to access if and only if:<br>
- * <br>
- * 1) the view creator is "whos"<br>
- * 
- * 2) the access path is is supported<br>
- * <br>
- * Users having this policy role are also allowed to perform other actions if and only if:<br>
- * <br>
- * 1) the view creator is "whos"<br>
- *
- * 2) the discovery path is supported OR the access path is is supported<br>
- * 
- * @author Fabrizio
- */
-public class WHOSPermissionPolicySet extends CreatorPermissionPolicySet {
+import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.model.resource.ResourceProperty;
 
-    public WHOSPermissionPolicySet() {
+public class TestView extends View {
 
-	super("whos");
+    public TestView() {	
+	super();
+	setLabel("Test");
+	setBond(BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.SOURCE_DEPLOYMENT, "test"));
+	setCreator("test");
+	setId("test");
     }
-
-    @Override
-    protected String getCreator() {
-
-	return "whos";
-    }
+    
 }

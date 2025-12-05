@@ -1,0 +1,7 @@
+apiVersion: v2
+name: frost-chart
+description: Helm chart for FROST Server with PostgreSQL/PostGIS
+type: application
+version: 0.1.0
+appVersion: "2.6"
+

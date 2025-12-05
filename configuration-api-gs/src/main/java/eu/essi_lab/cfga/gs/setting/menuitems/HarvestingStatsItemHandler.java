@@ -83,8 +83,8 @@ public class HarvestingStatsItemHandler extends GridMenuItemHandler {
 
 	TextArea textArea = new TextArea();
 
-	textArea.setWidth(580, Unit.PIXELS);
-	textArea.setHeight(275, Unit.PIXELS);
+	textArea.setWidth(570, Unit.PIXELS);
+	textArea.setHeight(260, Unit.PIXELS);
 	textArea.getStyle().set("font-size", "14px");
 	textArea.setReadOnly(true);
 
