@@ -473,10 +473,10 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
 	    record = addHeader(record);
 
-	    CoverageDescription coverage = iso.getCoverageDescription();
+	    CoverageDescription coverageDescrp = iso.getCoverageDescription();
 	    String name = null; 
-	    if(coverage != null) {
-		name = coverage.getAttributeTitle();
+	    if(coverageDescrp != null) {
+		name = coverageDescrp.getAttributeTitle();
 	    } else {
 		name = "NO COVERAGE NAME";
 		GSLoggerFactory.getLogger(getClass()).error("NO VALID NAME!!!");
