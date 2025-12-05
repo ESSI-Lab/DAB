@@ -9,7 +9,6 @@ metadata:
 spec:
   selector:
     app: opensearch-dashboards
-    {{- include "dab.selectorLabels" . | nindent 4 }}
   ports:
   - port: {{ .Values.dashboard.port }}
     targetPort: {{ .Values.dashboard.port }}

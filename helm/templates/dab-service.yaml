@@ -9,7 +9,6 @@ metadata:
 spec:
   selector:
     app: dab
-    {{- include "dab.selectorLabels" . | nindent 4 }}
   ports:
   - port: {{ .Values.dab.port }}
     targetPort: {{ .Values.dab.port }}

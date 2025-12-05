@@ -9,7 +9,6 @@ metadata:
 spec:
   selector:
     app: opensearch
-    {{- include "dab.selectorLabels" . | nindent 4 }}
   ports:
   - port: {{ .Values.opensearch.port }}
     targetPort: {{ .Values.opensearch.port }}
