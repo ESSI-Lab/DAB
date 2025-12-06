@@ -494,6 +494,10 @@ public class ISO8601DateTimeUtils {
 	    units = "years";
 	    decimal = new BigDecimal(years);
 	}
+	if (decimal==null) {
+	    decimal = new BigDecimal(0);
+	    units = "seconds";
+	}
 
 	SimpleEntry<BigDecimal, String> ret = new SimpleEntry<>(decimal, units);
 	return ret;
