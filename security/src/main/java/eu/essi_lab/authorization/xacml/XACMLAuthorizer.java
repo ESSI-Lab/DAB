@@ -100,28 +100,6 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	logBuilder = new StringBuilder();
 
-	//
-	// developer machine
-	//
-	boolean devMachineAuth = true;
-
-	Optional<Configuration> configuration = ConfigurationWrapper.getConfiguration();
-
-	Optional<Properties> keyValueOption = configuration.isPresent() ? ConfigurationWrapper.getSystemSettings().getKeyValueOptions()
-		: Optional.empty();
-
-	if (keyValueOption.isPresent()) {
-	    devMachineAuth = keyValueOption.get().getProperty(KeyValueOptionKeys.DEV_MACHINE_AUTH.getLabel(), "true").equals("true") ? true
-		    : false;
-	}
-
-	if (isLocalHost(message) && devMachineAuth) {
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Dev. machine authorized");
-	    //
-	    return true;
-	}
-
 	Optional<GSUser> requestUser = message.getCurrentUser();
 
 	String role = null;

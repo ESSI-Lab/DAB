@@ -90,7 +90,7 @@ public class SemanticSearchSupport {
 			map(OntologySetting::getOntologyEndpoint).//
 			toList());
 
-	DefaultSemanticSearchSetting setting = ConfigurationWrapper.getSystemSettings().getDefaultSemanticSearchSetting();
+	DefaultSemanticSearchSetting setting = ConfigurationWrapper.getDefaultSemanticSearchSetting();
 
 	ExpansionLevel expansionLevel = parser.getOptionalValue(EXPANSION_LEVEL_PARAM).//
 		map(v -> ExpansionLevel.of(Integer.parseInt(v)).orElse(setting.getDefaultExpansionLevel())).//

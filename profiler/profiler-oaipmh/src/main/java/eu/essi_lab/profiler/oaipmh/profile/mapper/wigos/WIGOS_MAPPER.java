@@ -473,10 +473,10 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
 	    record = addHeader(record);
 
-	    CoverageDescription coverage = iso.getCoverageDescription();
+	    CoverageDescription coverageDescrp = iso.getCoverageDescription();
 	    String name = null; 
-	    if(coverage != null) {
-		name = coverage.getAttributeTitle();
+	    if(coverageDescrp != null) {
+		name = coverageDescrp.getAttributeTitle();
 	    } else {
 		name = "NO COVERAGE NAME";
 		GSLoggerFactory.getLogger(getClass()).error("NO VALID NAME!!!");
@@ -492,7 +492,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
 	    String beginPosition = iso.getDataIdentification().getTemporalExtent().getBeginPosition();
 	    String endPosition = iso.getDataIdentification().getTemporalExtent().getEndPosition();
-
+	    GeographicBoundingBox bbox = iso.getDataIdentification().getGeographicBoundingBox();
 	    Optional<String> countryCode = resource.getExtensionHandler().getCountryISO3();
 	    String isoC = null;
 	    String cCode = null;
@@ -502,7 +502,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		record.setTerritoryOfOrigin(cCode, beginPosition, endPosition);
 	    } else {
 		// TODO: IMPLEMENT: UNDERSTAND THE COUNTRY NAME
-		GSLoggerFactory.getLogger(getClass()).error("NO VALID COUNTRY NAME!!!");
+		GSLoggerFactory.getLogger(getClass()).error("No valid Country name!");
 		String label = resource.getSource().getLabel().toLowerCase();
 
 		if (label.contains("hmfs")) {
@@ -519,9 +519,17 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
 		if (cCode != null) {
 		    record.setTerritoryOfOrigin(cCode, beginPosition, endPosition);
+		} else {
+		    GSLoggerFactory.getLogger(getClass()).error("No Country recognized, skip the dataset!!!");
+		    cCode = "unknown";
+		    return null;
+		    //record.setTerritoryOfOrigin(cCode, beginPosition, endPosition);
 		}
 	    }
 
+	    
+	    
+	    
 	    /*
 	     * WMO REGION: https://codes.wmo.int/wmdr/_WMORegion
 	     * one of the following: africa, antarctica, asia, europe, inapplicable, northCentralAmericaCaribbean,
@@ -595,9 +603,15 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		String splittedString = description.split(toSplit)[1];
 		description = "Station" + splittedString;
 	    } else if (siteName != null) {
+		if(country != null) {
 		description = orgDesc.isEmpty()
 			? "Station " + siteName + " located in " + country.getOfficialName()
 			: "Station " + siteName + " located in " + country.getOfficialName() + " - " + orgDesc.get(0);
+		} else {
+		    description = orgDesc.isEmpty()
+				? "Station " + siteName + " located in " + cCode
+				: "Station " + siteName + " located in " + cCode + " - " + orgDesc.get(0);
+		}
 	    }
 	    record.setStationOrPlatformDescription(description, beginPosition, endPosition);
 
@@ -729,7 +743,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    // Duration duration = getDuration(beginPosition);
 	    // record.setTemporalReportingPeriod(duration , beginPosition);
 	    record.setPhenomenontTemporalExtent(beginPosition, endPosition);
-	    GeographicBoundingBox bbox = iso.getDataIdentification().getGeographicBoundingBox();
+
 	    if (bbox != null && bbox.getNorth() != null) {
 		Double north = bbox.getNorth();
 		Double south = bbox.getSouth();
@@ -821,6 +835,8 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		String unitM = units.get();
 		if(unitM.equals("°C")) {
 		    unitM = "degC";
+		}else if(unitM.equals("m³/s")) {
+		    unitM = "m3.s-1";
 		}
 		record.setMeasurementUnit(unitM);
 	    } else if (variableUnits.isPresent()) {
@@ -979,6 +995,9 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 		if (!setTitle.contains(t)) {
 		    setTitle.add(t);
 		    Element element = map(null, resource);
+		    if(element == null) {
+			return null;
+		    }
 		    if (k == 0) {
 			wigosElem = element;
 			k++;

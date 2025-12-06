@@ -50,7 +50,7 @@ public class AboutTabDescriptor extends TabDescriptor {
 	setLabel("About");
 
 	VerticalLayout verticalLayout = new VerticalLayout();
-	verticalLayout.getStyle().set("margin-top", "15px");
+	verticalLayout.getStyle().set("margin-top", "-20px");
 
 	verticalLayout.setWidthFull();
 	verticalLayout.setHeightFull();

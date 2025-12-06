@@ -30,13 +30,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -88,7 +86,7 @@ public class DataDownloaderTool {
 	try {
 	    zipFile = File.createTempFile(getClass().getSimpleName(), ".zip");
 
-	    File tempDirFile = FileUtils.createTempDir(StringUtils.urlEncode(operationId), false);
+	    File tempDirFile = FileUtils.getTempDir(StringUtils.urlEncode(operationId), false);
 
 	    tempPath = tempDirFile.toPath();
 

@@ -22,16 +22,17 @@ package eu.essi_lab.cfga.gui.components;
  */
 
 import com.vaadin.componentfactory.ToggleButton;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.accordion.AccordionPanel;
+import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.details.Details.OpenedChangeEvent;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import eu.essi_lab.cfga.gui.components.tabs.*;
@@ -56,20 +57,7 @@ public class ComponentFactory {
 	return layout;
     }
 
-    /**
-     * @param id
-     * @return
-     */
-    public static TabContent createTabContainer(String id) {
 
-	TabContent layout = new TabContent();
-	// layout.getStyle().set("border","1px solid black");
-	if (id != null) {
-	    layout.setId(id);
-	}
-
-	return layout;
-    }
 
     /**
      * @return
@@ -127,14 +115,12 @@ public class ComponentFactory {
      * @param id
      * @return
      */
-    public static TabContent createNoSpacingNoMarginTabContainer(String id) {
+    public static TabContent createTabContent(String id) {
 
-	TabContent layout = createTabContainer(id);
+	TabContent content = new TabContent();
+	content.setId(id);
 
-	layout.setMargin(false);
-	layout.setSpacing(false);
-
-	return layout;
+	return content;
     }
 
     /**
@@ -259,6 +245,23 @@ public class ComponentFactory {
     }
 
     /**
+     *
+     * @return
+     */
+    public static CustomButton createReloadButton(){
+
+	CustomButton reloadButton = new CustomButton("RELOAD", VaadinIcon.REFRESH.create());
+	reloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+	reloadButton.setId("reloadButton");
+	reloadButton.setWidth(150, Unit.PIXELS);
+	reloadButton.getStyle().set("margin-left", "15px");
+	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
+	reloadButton.getStyle().set("border-radius", "0px");
+
+	return reloadButton;
+    }
+
+    /**
      * @param label
      * @param widthFull
      * @param fontSize
@@ -316,6 +319,14 @@ public class ComponentFactory {
 
     /**
      *
+     * @return
+     */
+    public static Div createSeparator() {
+
+	return createSeparator("#e8ebef");
+    }
+
+    /**
      * @param color
      * @return
      */
@@ -344,7 +355,6 @@ public class ComponentFactory {
     }
 
     /**
-     *
      * @param color
      * @return
      */

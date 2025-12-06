@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.lazio;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -301,11 +303,14 @@ public class HISCentralLazioMapper extends FileIdentifierMapper {
 	referenceSystem.setCodeSpace("EPSG");
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 	
-	coreMetadata.addBoundingBox(//
-		pointLat, //
-		pointLon, //
-		pointLat, //
-		pointLon);
+	if (pointLat != null && pointLon != null) {
+	    coreMetadata.addBoundingBox(//
+		    new BigDecimal(pointLat), //
+		    new BigDecimal(pointLon), //
+		    new BigDecimal(pointLat), //
+		    new BigDecimal(pointLon));
+	}
+
 
 	// vertical extent
 	coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(altitude, altitude);

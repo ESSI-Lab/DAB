@@ -22,6 +22,7 @@ package eu.essi_lab.accessor.hiscentral.toscana;
  */
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -246,9 +247,13 @@ public class HISCentralToscanaMapper extends FileIdentifierMapper {
 	    referenceSystem.setCodeSpace("EPSG");
 	    coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 
-	    // bbox
-	    if (lon != null && lat != null) {
-		coreMetadata.addBoundingBox(lat, lon, lat, lon);
+	    // bbox    
+	    if (lat != null && lon != null) {
+		coreMetadata.addBoundingBox(//
+			new BigDecimal(lat), //
+			new BigDecimal(lon), //
+			new BigDecimal(lat), //
+			new BigDecimal(lon));
 	    }
 
 	    // platform

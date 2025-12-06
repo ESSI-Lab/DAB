@@ -199,6 +199,7 @@ public class NotificationDialog extends ConfirmationDialog {
 
 	Label label = ComponentFactory.createLabel(text);
 	// label.getStyle().set("color", "red");
+	label.getStyle().set("font-size","14px");
 
 	setContent(label);
 	getConfirmButton().setVisible(false);

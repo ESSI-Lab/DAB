@@ -87,7 +87,7 @@ public class SettingEditDialog extends SettingPutOrEditDialog {
 	//
 	// hides the header and opens expands the setting
 	//
-	this.settingToEdit.setShowHeader(false);
+	this.settingToEdit.setForceHideheader(true);
 
 	this.foldedModeEnabled = this.settingToEdit.isFoldedModeEnabled();
 
@@ -95,7 +95,10 @@ public class SettingEditDialog extends SettingPutOrEditDialog {
 
 	// SettingHelper.expand(settingToEdit);
 
-	Component settingToAddComponent = createSettingToAddOrEditComponent(configuration, this.settingToEdit, dialogHeight);
+	Component settingToAddComponent = createSettingToAddOrEditComponent(
+		configuration,
+		this.settingToEdit,
+		dialogHeight);
 
 	setContent(settingToAddComponent);
     }

@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.valdaosta;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -484,10 +486,10 @@ public class HISCentralValdaostaMapper extends FileIdentifierMapper {
 
 	if (pointLat != null && pointLon != null) {
 	    coreMetadata.addBoundingBox(//
-		    pointLat, //
-		    pointLon, //
-		    pointLat, //
-		    pointLon);
+		    new BigDecimal(pointLat), //
+		    new BigDecimal(pointLon), //
+		    new BigDecimal(pointLat), //
+		    new BigDecimal(pointLon));
 	}
 
 	// vertical extent

@@ -24,10 +24,7 @@ package eu.essi_lab.gssrv.starter;
 import eu.essi_lab.api.database.cfg.DatabaseSource;
 import eu.essi_lab.api.database.cfg.DatabaseSourceUrl;
 import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationSource;
-import eu.essi_lab.cfga.ConfigurationUtils;
-import eu.essi_lab.cfga.SelectionUtils;
+import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.check.*;
 import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -39,6 +36,7 @@ import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
+import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
 import eu.essi_lab.cfga.patch.*;
@@ -129,7 +127,7 @@ public class DABStarter {
 
 	initLocale();
 
-	initJaxb();
+	initContext();
 
 	initConfig();
 
@@ -339,21 +337,21 @@ public class DABStarter {
 		// }
 
 		configuration = switch (newConfigName) {
-		    case "default" -> {
+		case "default" -> {
 
-			GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
 
-			yield new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-				ConfigurationWrapper.CONFIG_RELOAD_TIME);
-		    }
-		    case "demo" -> {
+		    yield new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
+			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
+		}
+		case "demo" -> {
 
-			GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
 
-			yield new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-				ConfigurationWrapper.CONFIG_RELOAD_TIME);
-		    }
-		    default -> configuration;
+		    yield new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
+			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
+		}
+		default -> configuration;
 		};
 
 		SelectionUtils.deepClean(configuration);
@@ -527,9 +525,9 @@ public class DABStarter {
 	    GSLoggerFactory.getLogger(getClass()).debug("Legacy Ontology setting patch STARTED");
 
 	    ReplacePropertyPatch ontologySettingPatch = ReplacePropertyPatch.of(//
-		    configuration,//
-		    Setting.SETTING_CLASS,//
-		    "eu.essi_lab.cfga.gs.setting.OntologySetting",//
+		    configuration, //
+		    Setting.SETTING_CLASS, //
+		    "eu.essi_lab.cfga.gs.setting.OntologySetting", //
 		    "eu.essi_lab.cfga.gs.setting.ontology.OntologySetting");//
 
 	    ontologySettingPatch.patch();
@@ -549,6 +547,22 @@ public class DABStarter {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Setting.EXTENSION patch ENDED");
 
+	    // ------------------------------------------------------------------
+	    //
+	    // - DefaultSemanticSearchSetting patch
+	    //
+
+	    GSLoggerFactory.getLogger(getClass()).debug("DefaultSemanticSearchSetting move patch STARTED");
+
+	    MoveSettingPatch moveSettingPatch = MoveSettingPatch.of(configuration, //
+		    DefaultSemanticSearchSetting.class, //
+		    SingletonSettingsId.DEFAULT_SEMANTIC_SEARCH_SETTING.getLabel(), //
+		    configuration.get(SingletonSettingsId.SYSTEM_SETTING.getLabel()).get());
+
+	    moveSettingPatch.patch();
+
+	    GSLoggerFactory.getLogger(getClass()).debug("DefaultSemanticSearchSetting move patch ENDED");
+
 	    //
 	    //
 	    // ---------------------------------------------------------------
@@ -561,7 +575,7 @@ public class DABStarter {
 
 	} catch (
 
-		GSException gsex) {
+	GSException gsex) {
 
 	    throw gsex;
 
@@ -798,14 +812,11 @@ public class DABStarter {
     /**
      * @throws GSException
      */
-    private void initJaxb() throws GSException {
-	// --------------------------------------
-	//
-	// this will initialize the JAXB contexts
-	//
+    private void initContext() throws GSException {
+
 	try {
 
-	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization STARTED");
+	    GSLoggerFactory.getLogger(DABStarter.class).debug("Context initialization STARTED");
 
 	    CommonContext.createMarshaller(true);
 	    CommonContext.createUnmarshaller();
@@ -813,11 +824,16 @@ public class DABStarter {
 
 	    JAXBWMS.getInstance().getMarshaller();
 
-	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization ENDED");
+	    // this is done here to guarantee that is done in the right thread
+	    // in some cases we notice that this call is firstly done by threads with a context class loader
+	    // devoid of the necessary classes to load
+	    ConfigurableLoader.load();
+
+	    GSLoggerFactory.getLogger(DABStarter.class).debug("Context initialization ENDED");
 
 	} catch (JAXBException e) {
 
-	    GSLoggerFactory.getLogger(DABStarter.class).error("Fatal error on startup, JAXB could not be initialized", e);
+	    GSLoggerFactory.getLogger(DABStarter.class).error("Fatal error on startup, context could not be initialized", e);
 
 	    throw GSException.createException(//
 		    this.getClass(), //
@@ -826,7 +842,7 @@ public class DABStarter {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //
-		    "JAXBInitError", //
+		    "ContextInitError", //
 		    e);
 	}
     }
@@ -886,8 +902,8 @@ public class DABStarter {
 	case ACCESS:
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
-	    CachedCollections.getInstance()
-		    .prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic", new FeatureLayer1StationsArctic());
+	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
+		    new FeatureLayer1StationsArctic());
 	    break;
 	case BATCH:
 	case CONFIGURATION:
@@ -905,8 +921,8 @@ public class DABStarter {
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_PHYSICS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
-	    CachedCollections.getInstance()
-		    .prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic", new FeatureLayer1StationsArctic());
+	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
+		    new FeatureLayer1StationsArctic());
 	default:
 	}
     }
@@ -922,8 +938,8 @@ public class DABStarter {
 
 	if (keyValueOptions.isPresent()) {
 
-	    schedulerStartDelay = Integer.parseInt(keyValueOptions.get()
-		    .getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(), String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
+	    schedulerStartDelay = Integer.parseInt(keyValueOptions.get().getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(),
+		    String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
 	}
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("Scheduler will start in {} minutes", schedulerStartDelay);

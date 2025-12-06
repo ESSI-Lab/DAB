@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.setting.edit_put;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -75,8 +75,9 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 	//
 
 	getContentLayout().getStyle().set("border", "1px solid lightgray");
-	getContentLayout().getStyle().set("padding", "10px");
+	getContentLayout().getStyle().set("padding", "5px");
 	getContentLayout().getStyle().set("border-radius", "3px");
+	getContentLayout().getStyle().set("width", "98%");
 
 	//
 	// OnConfirm listener
@@ -94,7 +95,7 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 		Selector selector = (Selector) getSetting();
 
 		optional = ((Setting) selector.getSelectedSettings().getFirst()).validate(configuration, context);
-	   
+
 	    } else {
 
 		optional = getSetting().validate(configuration, context);
@@ -167,7 +168,10 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 
 	int componentHeight = height - 150;
 
-	Component component = SettingComponentFactory.createSettingComponent(configuration, setting, false);
+	Component component = SettingComponentFactory.createSettingComponent(
+		configuration, //
+		setting,//
+		false);
 
 	((HasSize) component).setWidthFull();
 	((HasSize) component).setHeight(componentHeight, Unit.PIXELS);

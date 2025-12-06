@@ -204,13 +204,13 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(CustomTaskSetting.class).//
 
- 		    withShowDirective(SortDirection.ASCENDING).//
+ 		    withShowDirective("Manage custom tasks. Click \"Reload\" to update the scheduler information\n", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 		    "Add task", //
 		    CustomTaskSetting.class.getCanonicalName()).//
 		    withRemoveDirective("Remove task", false, CustomTaskSetting.class.getCanonicalName()).//
-		    withEditDirective("Edit task", ConfirmationPolicy.ON_WARNINGS).//
+		    withEditDirective("Edit custom task", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
 

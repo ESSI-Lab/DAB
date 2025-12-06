@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.liguria;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -292,8 +294,8 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setTimeSupport(timeResolution);
 	}
 
-	double pointLon = sensorInfo.optDouble("LON");// sensorInfo.optString("lon");
-	double pointLat = sensorInfo.optDouble("LAT");
+	Double pointLon = sensorInfo.optDouble("LON");// sensorInfo.optString("lon");
+	Double pointLat = sensorInfo.optDouble("LAT");
 
 	double div = 100000;
 
@@ -429,11 +431,13 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	referenceSystem.setCodeSpace("EPSG");
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 
+	if(pointLat != null && pointLon != null) {
 	coreMetadata.addBoundingBox(//
-		pointLat / div, //
-		pointLon / div, //
-		pointLat / div, //
-		pointLon / div);
+		new BigDecimal(pointLat / div), //
+		new BigDecimal(pointLon / div), //
+		new BigDecimal(pointLat / div), //
+		new BigDecimal(pointLon / div));
+	}
 
 	coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(elevation, elevation);
 

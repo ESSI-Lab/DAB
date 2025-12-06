@@ -38,7 +38,7 @@ public class LegendViewer extends HorizontalLayout {
     /**
      * 
      */
-    public LegendViewer(GridComponent grid, List<Component> legends) {
+    public LegendViewer(List<Component> legends) {
 
 	setMargin(false);
 	setSpacing(false);

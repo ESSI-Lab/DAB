@@ -29,6 +29,7 @@ import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
+import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
@@ -432,18 +433,18 @@ public class OntologySetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class TabDescriptorProvider extends TabDescriptor {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public TabDescriptorProvider() {
+	public DescriptorProvider() {
 
-	    setLabel("Ontologies");
-
-	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(OntologySetting.class).//
-
- 		    withShowDirective(SortDirection.ASCENDING).//
+	    descriptor = TabContentDescriptorBuilder.get(OntologySetting.class).//
+		    withLabel("Ontologies").//
+		    withShowDirective("Registered ontologies that can be brokered by the semantic search engine", SortDirection.ASCENDING).//
 		    withAddDirective("Add ontology", OntologySetting.class).//
 		    withRemoveDirective("Remove ontology", true, OntologySetting.class).//
 		    withEditDirective("Edit ontology", ConfirmationPolicy.ON_WARNINGS).//
@@ -451,11 +452,11 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 		    ColumnDescriptor.createPositionalDescriptor(), //
 
-		    ColumnDescriptor.create("Id", 300, true, true, this::getOntologyId), //
+		    ColumnDescriptor.create("Id", 200, true, true, this::getOntologyId), //
 
-		    ColumnDescriptor.create("Endpoint", 500, true, true, this::getOntologyEndpoint), //
+		    ColumnDescriptor.create("Endpoint", 300, true, true, this::getOntologyEndpoint), //
 
-		    ColumnDescriptor.create("Name", 500, true, true, this::getOntologyName), //
+		    ColumnDescriptor.create("Name", 300, true, true, this::getOntologyName), //
 
 		    ColumnDescriptor.create("Description", true, true, this::getOntologyDescription), //
 
@@ -468,9 +469,14 @@ public class OntologySetting extends Setting implements EditableSetting {
 	    ), getItemsList(), Grid.SelectionMode.MULTI).
 
 		    build();
+	}
 
-	    setIndex(GSTabIndex.ONTOLOGIES.getIndex());
-	    addContentDescriptor(descriptor);
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
 
 	/**

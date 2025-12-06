@@ -53,7 +53,9 @@ public class VerticalTabs extends Tabs implements ComponentEventListener<Selecte
     public VerticalTabs() {
 
 	tabsToContent = new HashMap<>();
+
 	contentDiv = new Div();
+	contentDiv.setWidthFull();
 
 	setOrientation(Orientation.VERTICAL);
 	addSelectedChangeListener(this);

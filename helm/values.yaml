@@ -1,15 +1,87 @@
+# Global namespace for all resources
+namespace: dab
+
+# Image pull policy for all containers
+imagePullPolicy: IfNotPresent
+
 opensearch:
   image: "opensearchproject/opensearch:2.18.0"
   port: 9200
   javaOpts: "-Xms512m -Xmx512m"
+  replicas: 1
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+  service:
+    type: ClusterIP
 
 dashboard:
   image: "opensearchproject/opensearch-dashboards:2.18.0"
   port: 5601
+  replicas: 1
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  service:
+    type: ClusterIP
 
 dab:
-  image: "essilab/essilab:dab-49"
+  image: "essilab/essilab:dab-50"
   port: 8080
+  replicas: 1
   env:
     DAB_SKIP_AUTHORIZATION: "true"
     EU_FLORA_ESSI_GI_PROJECT_EXECUTION: "mixed"
+    JAVA_OPTS: "-Dfile.encoding=UTF-8 --add-opens java.xml/com.sun.org.apache.xerces.internal.jaxp.datatype=ALL-UNNAMED -DinitCaches=true -DcheckConfig=true -DinitIndexes=true"
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  service:
+    type: ClusterIP
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+ingress:
+  enabled: true
+  namespace: dab
+  host: ""
+  path: /
+  ingressClassName: nginx
+  # TLS Configuration - choose one of the following options:
+  # Option 1: Use cert-manager for automatic TLS certificate management (recommended)
+  #   Set clusterIssuer to your cert-manager ClusterIssuer name (e.g., "letsencrypt-prod", "letsencrypt-staging")
+  #   cert-manager will automatically create the TLS secret
+  clusterIssuer: ""
+  # Option 2: Use an existing TLS secret (manual certificate)
+  #   Set tlsSecretName to the name of an existing secret containing tls.crt and tls.key
+  #   If both clusterIssuer and tlsSecretName are set, clusterIssuer takes precedence
+  tlsSecretName: ""
+  serviceName: dab
+  servicePort: 8080
+  backendProtocol: "HTTP"
+  annotations: {}
+  #   nginx.ingress.kubernetes.io/rewrite-target: /
+  #   nginx.ingress.kubernetes.io/ssl-redirect: "true"  # Uncomment to force HTTPS redirect
+

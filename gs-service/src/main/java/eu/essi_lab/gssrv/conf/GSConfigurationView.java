@@ -510,8 +510,8 @@ public class GSConfigurationView extends ConfigurationView {
 		new BrokeringTabDescriptor(),//
 		new SystemTabDescriptor(),//
 		new SourcesTabDescriptor(),//
-		new AboutTabDescriptor(),
-		new OntologySetting.TabDescriptorProvider()//
+		new AboutTabDescriptor(),//
+		new SemanticTabDescriptor()//
 	);
     }
 

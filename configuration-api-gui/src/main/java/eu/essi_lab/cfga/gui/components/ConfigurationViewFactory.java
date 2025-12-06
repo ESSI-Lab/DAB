@@ -26,18 +26,13 @@ import java.util.*;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.cfga.gui.directive.*;
-import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -45,21 +40,14 @@ import eu.essi_lab.lib.utils.*;
 public class ConfigurationViewFactory {
 
     /**
-     *
-     */
-    private static final float TAB_WIDTH = 1200;
-
-    /**
      * @return
      */
-    public static HorizontalLayout createNavBarContentLayout() {
+    public static HorizontalLayout createHeaderLayout() {
 
 	HorizontalLayout navbarContent = new HorizontalLayout();
 	navbarContent.setWidthFull();
-	navbarContent.getStyle().set("padding-bottom", "15px");
-	navbarContent.getStyle().set("padding-left", "15px");
+	navbarContent.getStyle().set("padding-left", "30px");
 	navbarContent.getStyle().set("padding-right", "15px");
-	navbarContent.getStyle().set("padding-top", "0px");
 
 	return navbarContent;
     }
@@ -96,7 +84,7 @@ public class ConfigurationViewFactory {
 
 	    TabContentDescriptor descriptor = descriptors.getFirst();
 
-	    content = createTabContent(descriptor, configuration, view, tabDescriptor, true);
+	    content = createTabContent(descriptor, configuration, view, tabDescriptor);
 
 	} else {
 
@@ -104,12 +92,9 @@ public class ConfigurationViewFactory {
 
 	    descriptors.forEach(desc -> tabSheet.add( //
 		    desc.getLabel(), //
-		    createTabContent(desc, configuration, view, tabDescriptor, false)));
+		    createTabContent(desc, configuration, view, tabDescriptor)));
 
-	    if(tabDescriptor.getIndex() == 0){
-
-		tabSheet.setRendered(true);
-	    }
+	    tabSheet.setRendered(true);
 
 	    content = tabSheet;
 	}
@@ -129,93 +114,35 @@ public class ConfigurationViewFactory {
 	    TabContentDescriptor descriptor,//
 	    Configuration configuration, //
 	    ConfigurationView view,//
-	    TabDescriptor tabDescriptor,//
-	    boolean withLabel) {
+	    TabDescriptor tabDescriptor) {
 
-	DirectiveManager directiveManager = descriptor.getDirectiveManager();
-
-	TabContent content = ComponentFactory.createNoSpacingNoMarginTabContainer(
-		"tab-container-vertical-layout-for-" + descriptor.getLabel());
+	TabContent content = ComponentFactory.createTabContent("tab-content-vertical-layout-for-" + descriptor.getLabel());
 
 	content.init(configuration, descriptor, tabDescriptor);
 
-	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
-
-	Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
-
-	Optional<RemoveDirective> removeDirective = directiveManager.get(RemoveDirective.class);
-
-	Optional<EditDirective> editDirective = directiveManager.get(EditDirective.class);
-
-	content.setRemoveDirective(removeDirective);
-	content.setEditDirective(editDirective);
-
-	HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
-		"tab-container-header-layout-for-" + descriptor.getLabel());
-	headerLayout.setWidthFull();
-	headerLayout.setAlignItems(Alignment.BASELINE);
-	headerLayout.setId(TabContent.TAB_HEADER_ID_PREFIX + "_" + descriptor.getLabel());
-
-	content.add(headerLayout);
-
-	Label tabLabel = new Label();
-	tabLabel.setWidthFull();
-	tabLabel.setText(tabDescriptor.getLabel());
-	tabLabel.getStyle().set("font-size", "30px");
-	tabLabel.getStyle().set("color", "black");
-
-	if (showDirective.flatMap(ShowDirective::getDescription).isPresent()) {
-
-	    String desc = showDirective.flatMap(ShowDirective::getDescription).get();
-
-	    VerticalLayout subLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
-	    subLayout.setWidthFull();
-
-	    Label descLabel = new Label();
-	    descLabel.setWidthFull();
-	    descLabel.setMaxHeight("130px");
-	    descLabel.setText(desc);
-	    descLabel.getStyle().set("margin-left", "-7px");
-	    descLabel.getStyle().set("font-size", "16px");
-	    descLabel.getStyle().set("color", "black");
-
-	    if (withLabel) {
-
-		subLayout.add(tabLabel);
-	    }
-
-	    subLayout.add(descLabel);
-
-	    if (showDirective.get().withDescriptionSeparator()) {
-
-		Div separator = ComponentFactory.createSeparator("#e8ebef");
-		separator.getStyle().set("margin-top", "3px");
-		separator.getStyle().set("margin-left", "-7px");
-
-		subLayout.add(separator);
-	    }
-
-	    headerLayout.add(subLayout);
-
-	} else if (withLabel) {
-
-	    headerLayout.setHeight("45px");
-
-	    headerLayout.add(tabLabel);
-	}
-
-	addDirective.ifPresent(dir -> {
-
-	    Button addButton = SettingComponentFactory.createSettingAddButton(configuration, content, dir);
-	    headerLayout.add(addButton);
-	});
-
-	if (tabDescriptor.getIndex() == 0) {
-
-	    content.render();
-	}
+	content.render();
 
 	return content;
+    }
+
+    /**
+     * @param listener
+     * @return
+     */
+    public static Button createLogoutButton(LogOutButtonListener listener) {
+
+	CustomButton logoutButton = new CustomButton(VaadinIcon.SIGN_OUT.create());
+
+	logoutButton.addThemeVariants(ButtonVariant.LUMO_LARGE);
+	logoutButton.addClickListener(listener);
+	logoutButton.setTooltip("Logout");
+
+	logoutButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%");
+	logoutButton.getStyle().set("margin-left", "0px");
+	logoutButton.getStyle().set("background-color", "white");
+	logoutButton.getStyle().set("margin-right", "-15px");
+
+	return logoutButton;
     }
 
     /**

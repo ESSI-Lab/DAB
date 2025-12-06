@@ -210,7 +210,13 @@ public class SettingComponentFactory {
 	    String settingIdentifier, //
 	    boolean forceReadonly) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, false, null, null);
+	return createSettingComponentWithOptionalFoldedMode(//
+		configuration,//
+		settingIdentifier,//
+		forceReadonly,//
+		false,//
+		null,//
+		null);
     }
 
     /**
@@ -224,7 +230,13 @@ public class SettingComponentFactory {
 	    Setting setting, //
 	    boolean forceReadonly) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, setting, forceReadonly, false, null, null);
+	return createSettingComponentWithOptionalFoldedMode(//
+		configuration, //
+		setting, //
+		forceReadonly, //
+		false, //
+		null, //
+		null);//
     }
 
     /**
@@ -240,7 +252,13 @@ public class SettingComponentFactory {
 	    boolean forceReadonly, //
 	    TabContent tabContent) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, false, null, tabContent);
+	return createSettingComponentWithOptionalFoldedMode(//
+		configuration, //
+		settingIdentifier,//
+		forceReadonly, //
+		false, //
+		null, //
+		tabContent);
     }
 
     /**
@@ -256,23 +274,11 @@ public class SettingComponentFactory {
 	    boolean forceReadonly, //
 	    TabContent tabContent) {
 
-	return createSettingComponentWithOptionalFoldedMode(configuration, setting, forceReadonly, false, null, tabContent);
-    }
-
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @param tabContent
-     * @return
-     */
-    public static SettingComponent createSettingComponentForcingHideLabel(//
-	    Configuration configuration, //
-	    String settingIdentifier, //
-	    boolean forceReadonly, //
-	    TabContent tabContent) {
-
-	return createSettingComponentWithOptionalFoldedMode(configuration, settingIdentifier, forceReadonly, true, null, tabContent);
+	return createSettingComponentWithOptionalFoldedMode(configuration,//
+		setting,//
+		forceReadonly, false,//
+		null,//
+		tabContent);//
     }
 
     /**
@@ -292,8 +298,12 @@ public class SettingComponentFactory {
 	    Comparator<Setting> comparator, //
 	    TabContent tabContent) {
 
-	SettingComponent settingComponent = new SettingComponent(configuration, settingIdentifier, forceReadonly, forceHideLabel,
-		comparator, tabContent);
+	SettingComponent settingComponent = new SettingComponent(configuration,//
+		settingIdentifier,//
+		forceReadonly,//
+		forceHideLabel,//
+		comparator,//
+		tabContent);//
 
 	settingComponent.getStyle().set("background-color", "white");
 	settingComponent.getStyle().set("padding", "4px");
@@ -348,8 +358,13 @@ public class SettingComponentFactory {
 	    Comparator<Setting> comparator, //
 	    TabContent tabContent) {
 
-	SettingComponent settingComponent = createSettingComponent(configuration, settingIdentifier, forceReadonly, forceHideLabel,
-		comparator, tabContent);
+	SettingComponent settingComponent = createSettingComponent( //
+		configuration,//
+		settingIdentifier,//
+		forceReadonly,//
+		forceHideLabel,//
+		comparator,//
+		tabContent);
 
 	Setting setting = configuration.get(settingIdentifier).get();
 
@@ -440,7 +455,7 @@ public class SettingComponentFactory {
 	textArea.setReadOnly(true);
 	textArea.setValue(description);
 	textArea.setWidthFull();
-	textArea.getStyle().set("font-size", "15px");
+	textArea.getStyle().set("font-size", "14px");
 	textArea.getStyle().set("border-radius", "0px");
 	textArea.getStyle().set("background-color", "rgb(158 158 158 / 26%)");
 
@@ -463,7 +478,7 @@ public class SettingComponentFactory {
 
 	Label label = ComponentFactory.createLabel(name);
 	label.getStyle().set("font-weight", "bold");
-	label.getStyle().set("margin-top", "10px");
+	//	label.getStyle().set("margin-top", "10px");
 
 	if (!setting.isCompactModeEnabled() || //
 		(setting.isCompactModeEnabled() && setting.getOptions().isEmpty()) || //
@@ -478,7 +493,7 @@ public class SettingComponentFactory {
 	    label.getStyle().set("background-color", "#3c8df5");
 	    label.getStyle().set("padding", "5px");
 	    label.getStyle().set("padding-bottom", "3px");
-	    label.getStyle().set("padding-top", "1px");
+	    label.getStyle().set("padding-top", "2px");
 	    label.getStyle().set("border-radius", "0px");
 	    label.getStyle().set("color", "white");
 	    label.getStyle().set("opacity", "0.9");
@@ -522,15 +537,14 @@ public class SettingComponentFactory {
 	ConfigurationViewButton button = new ConfigurationViewButton("EDIT", VaadinIcon.EDIT.create());
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.setWidth(100, Unit.PIXELS);
-	button.getStyle().set("margin-left", "3px");
 
 	//
 	//
 	//
 
-	button.addEnabledStyle("color", "#008ab7");
-	button.addEnabledStyle("background-color", "white");
-	button.addEnabledStyle("border", "1px solid lightgray");
+	button.addEnabledStyle("color", "black");
+	//	button.addEnabledStyle("background-color", "rgb(255 252 0 / 41%)");
+	button.addEnabledStyle("border", "1px solid gray");
 
 	//
 	//
@@ -600,7 +614,7 @@ public class SettingComponentFactory {
 	button.addEnabledStyle("color", "red");
 	button.addEnabledStyle("border", "none");
 	button.addEnabledStyle("background-color", "rgb(240 240 240)");
-	button.addEnabledStyle("border", "1px solid lightgray");
+	button.addEnabledStyle("border", "1px solid gray");
 
 	//
 	//

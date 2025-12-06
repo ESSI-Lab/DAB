@@ -195,7 +195,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 		    "Add harvested/mixed accessor", //
 		    "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
 		    withRemoveDirective("Remove accessor", true, "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
-		    withEditDirective("Edit accessor", ConfirmationPolicy.ON_WARNINGS).//
+		    withEditDirective("Edit harvested source").//
 
 		    withGridInfo(Arrays.asList(//
 

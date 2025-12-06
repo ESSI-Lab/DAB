@@ -7,9 +7,11 @@ import javax.xml.bind.JAXBException;
 
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteAccessor;
+import eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteClient;
 import eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteConnector;
 import eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteConnectorSetting;
 import eu.essi_lab.cfga.gs.setting.GSSourceSetting;
@@ -27,6 +29,14 @@ import eu.essi_lab.model.resource.GSResource;
  * @author Fabrizio
  */
 public class HISCentralPiemonteAccessorExternalTestIT {
+
+    @Before
+    public void before() {
+	String prop = System.getProperty("gi-proxy");
+	if (prop != null) {
+	    HISCentralPiemonteClient.setGiProxyEndpoint(prop);
+	}
+    }
 
     /**
      * @throws GSException
@@ -144,7 +154,7 @@ public class HISCentralPiemonteAccessorExternalTestIT {
 
 	List<GSResource> recordsAsList = listRecordsResponse.getRecordsAsList();
 
-	Assert.assertEquals(3, recordsAsList.size());
+	Assert.assertEquals(7, recordsAsList.size());
 
 	GSResource gsResource = recordsAsList.get(0);
 

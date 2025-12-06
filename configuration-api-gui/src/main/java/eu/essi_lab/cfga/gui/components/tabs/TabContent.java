@@ -1,7 +1,5 @@
 package eu.essi_lab.cfga.gui.components.tabs;
 
-import java.util.ArrayList;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -23,34 +21,23 @@ import java.util.ArrayList;
  * #L%
  */
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.*;
-
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.*;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.TabSheet;
-
-import eu.essi_lab.cfga.Configuration;
+import com.vaadin.flow.component.details.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.tabs.*;
+import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.gui.components.*;
-import eu.essi_lab.cfga.gui.components.grid.GridComponent;
-import eu.essi_lab.cfga.gui.components.grid.GridInfo;
-import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
+import eu.essi_lab.cfga.gui.components.grid.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.cfga.gui.directive.DirectiveManager;
-import eu.essi_lab.cfga.gui.directive.EditDirective;
-import eu.essi_lab.cfga.gui.directive.RemoveDirective;
-import eu.essi_lab.cfga.gui.directive.ShowDirective;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.cfga.gui.directive.*;
+import eu.essi_lab.cfga.setting.*;
+
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -65,7 +52,7 @@ public class TabContent extends VerticalLayout implements Renderable {
     private GridComponent grid;
     private Optional<RemoveDirective> removeDirective;
     private Optional<EditDirective> editDirective;
-    private TabDescriptor tabDescriptor;
+    private TabDescriptor tabDesc;
     private TabContentDescriptor tabContentDesc;
     private Configuration configuration;
     private boolean rendered;
@@ -78,9 +65,11 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	legends = new ArrayList<>();
 
-	getStyle().set("margin-bottom", "50px");
-	getStyle().set("margin-left", "auto");
-	getStyle().set("margin-right", "auto");
+	getStyle().set("padding", "0px");
+	getStyle().set("padding-top", "5px");
+
+	setMargin(false);
+	setSpacing(false);
     }
 
     /**
@@ -94,32 +83,119 @@ public class TabContent extends VerticalLayout implements Renderable {
 
     /**
      * @param configuration
-     * @param view
-     * @param componentInfo
-     * @param descriptor
-     * @param tabDescriptor
+     * @param tabContentDesc
+     * @param tabDesc
      */
     public void init(//
 	    Configuration configuration, //
-	    TabContentDescriptor descriptor, //
-	    TabDescriptor tabDescriptor) {
+	    TabContentDescriptor tabContentDesc, //
+	    TabDescriptor tabDesc) {
 
 	this.configuration = configuration;
-	this.tabContentDesc = descriptor;
-	this.tabDescriptor = tabDescriptor;
-    }
+	this.tabContentDesc = tabContentDesc;
+	this.tabDesc = tabDesc;
 
-    /**
-     * @param refresh
-     */
-    @Override
-    public void render(boolean refresh) {
+	DirectiveManager directiveManager = tabContentDesc.getDirectiveManager();
 
-	setRendered(true);
+	this.removeDirective = directiveManager.get(RemoveDirective.class);
+	this.editDirective = directiveManager.get(EditDirective.class);
 
-	boolean readOnly = tabDescriptor.isForceReadOnlySet();
+	//
+	// Header
+	//
 
-	HorizontalLayout headerLayout = findHeader();
+	HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
+		"tab-container-header-layout-for-" + tabContentDesc.getLabel());
+	headerLayout.setWidthFull();
+	headerLayout.setAlignItems(Alignment.BASELINE);
+	headerLayout.setId(TabContent.TAB_HEADER_ID_PREFIX + "_" + tabContentDesc.getLabel());
+
+	add(headerLayout);
+
+	//
+	// Description
+	//
+
+	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
+
+	if (showDirective.flatMap(ShowDirective::getDescription).isPresent()) {
+
+	    VerticalLayout descLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+	    descLayout.getStyle().set("padding", "0px");
+	    descLayout.setWidthFull();
+
+	    final String desc = showDirective.flatMap(ShowDirective::getDescription).get();
+
+	    HorizontalLayout labelLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
+	    labelLayout.getStyle().set("padding", "0px");
+	    labelLayout.setWidthFull();
+
+	    Label descLabel = new Label();
+	    descLabel.setWidthFull();
+	    descLabel.setMaxHeight("130px");
+	    descLabel.getStyle().set("margin-left", "4px");
+	    descLabel.getStyle().set("font-size", "14px");
+	    descLabel.getStyle().set("color", "black");
+	    descLabel.setText(desc);
+
+	    labelLayout.add(descLabel);
+
+	    descLayout.add(labelLayout);
+
+	    if (showDirective.get().withDescriptionSeparator()) {
+
+		Div separator = ComponentFactory.createSeparator();
+		separator.getStyle().set("width", "99%");
+		separator.getStyle().set("margin-top", "3px");
+		separator.getStyle().set("margin-left", "4px");
+
+		descLayout.add(separator);
+	    }
+
+	    headerLayout.add(descLayout);
+
+	    if (desc.length() > 200) {
+
+		String shortDesc = desc.substring(0, 195);
+
+		descLabel.setText(shortDesc);
+
+		Button extraDescButton = new Button("...");
+		extraDescButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+		extraDescButton.getStyle().set("margin-right", "21px");
+		extraDescButton.setTooltipText("Click to see full description");
+		extraDescButton.addClickListener(evt -> {
+
+		    NotificationDialog.getNotificationDialog("Description",desc).open();
+		});
+
+		labelLayout.add(extraDescButton);
+	    }
+
+
+	} else {
+
+	    Div div = ComponentFactory.createDiv();
+	    div.setWidthFull();
+
+	    headerLayout.add(div);
+	}
+
+	//
+	// ADD button
+	//
+
+	Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
+
+	addDirective.ifPresent(dir -> {
+
+	    Button addButton = SettingComponentFactory.createSettingAddButton(configuration, this, dir);
+	    headerLayout.add(addButton);
+	});
+
+	//
+	// RELOAD button
+	//
 
 	if (tabContentDesc.isReloadable()) {
 
@@ -130,8 +206,21 @@ public class TabContent extends VerticalLayout implements Renderable {
 		headerLayout.add(reloadButton);
 	    }
 	}
+    }
+
+    /**
+     * @param refresh
+     */
+    @Override
+    public void render(boolean refresh) {
+
+	setRendered(true);
 
 	removeAllButHeader();
+
+	//
+	// rendering according to the content provided by the TabContentDescriptor
+	//
 
 	if (tabContentDesc.getContent().isPresent()) {
 
@@ -139,6 +228,10 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	    return;
 	}
+
+	//
+	// rendering according to the TabContentDescriptor setting class
+	//
 
 	List<Setting> settings = configuration.list(tabContentDesc.getSettingClass().get(), false).//
 		stream().//
@@ -149,6 +242,10 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
 
+	//
+	// optional settings sorting
+	//
+
 	showDirective.flatMap(ShowDirective::getSortDirection).ifPresent(dir -> {
 
 	    switch (dir) {
@@ -156,6 +253,12 @@ public class TabContent extends VerticalLayout implements Renderable {
 	    case DESCENDING -> settings.sort((s1, s2) -> s2.getName().compareTo(s1.getName()));
 	    }
 	});
+
+	boolean readOnly = tabDesc.isForceReadOnlySet();
+
+	//
+	// grid component
+	//
 
 	if (tabContentDesc.getGridInfo().isPresent()) {
 
@@ -167,22 +270,29 @@ public class TabContent extends VerticalLayout implements Renderable {
 		    configuration, //
 		    this, //
 		    readOnly, //
-		    refresh);
+		    refresh,
+		    tabDesc.getContentDescriptors().size() > 1);
 
 	    TabSheet tabSheet = new TabSheet();
 	    tabSheet.getStyle().set("border-bottom", "1px solid #d3d3d39e");
+	    boolean addTabSheet = false;
 
 	    if (tabContentDesc.getGridInfo().get().isShowColumnsHider()) {
 
 		tabSheet.add("Columns", gridComponent.createColumnsHider());
+		addTabSheet = true;
 	    }
 
 	    if (!legends.isEmpty()) {
 
-		tabSheet.add("Legend", gridComponent.createLegendsViewer(legends));
+		tabSheet.add("Legend", gridComponent.createLegendViewer(legends));
+		addTabSheet = true;
 	    }
 
-	    add(tabSheet);
+	    if (addTabSheet) {
+
+		add(tabSheet);
+	    }
 
 	    add(gridComponent);
 
@@ -190,12 +300,19 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	} else {
 
+	    //
+	    // settings list
+	    //
+
 	    for (int i = 0; i < settings.size(); i++) {
 
 		Setting setting = settings.get(i);
 
-		SettingComponent component = SettingComponentFactory.createSettingComponent(configuration, setting.getIdentifier(),
-			readOnly, this);
+		SettingComponent component = SettingComponentFactory.createSettingComponent(//
+			configuration, //
+			setting.getIdentifier(), //
+			readOnly, //
+			this); //
 
 		if (component.getDetails().isPresent()) {
 
@@ -350,27 +467,11 @@ public class TabContent extends VerticalLayout implements Renderable {
     }
 
     /**
-     * @param removeDirective
-     */
-    public void setRemoveDirective(Optional<RemoveDirective> removeDirective) {
-
-	this.removeDirective = removeDirective;
-    }
-
-    /**
      * @return the removeDirective
      */
     public Optional<RemoveDirective> getRemoveDirective() {
 
 	return removeDirective;
-    }
-
-    /**
-     * @param editDirective
-     */
-    public void setEditDirective(Optional<EditDirective> editDirective) {
-
-	this.editDirective = editDirective;
     }
 
     /**
@@ -400,13 +501,7 @@ public class TabContent extends VerticalLayout implements Renderable {
      */
     private CustomButton createReloadButton() {
 
-	CustomButton reloadButton = new CustomButton("RELOAD", VaadinIcon.REFRESH.create());
-	reloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-	reloadButton.setId("reloadButton");
-	reloadButton.setWidth(150, Unit.PIXELS);
-	reloadButton.getStyle().set("margin-left", "15px");
-	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
-	reloadButton.getStyle().set("border-radius", "0px");
+	CustomButton reloadButton = ComponentFactory.createReloadButton();
 
 	reloadButton.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 

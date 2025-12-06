@@ -175,7 +175,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 	public DescriptorProvider() {
 
 	    descriptor = TabContentDescriptorBuilder.get(DatabaseSetting.class).//
-		    withShowDirective("Configuration of the harvested sources database").//
+		    withShowDirective("Configuration of the harvested sources database", true).//
 		    withLabel("Database").//
 		    build();
 	}

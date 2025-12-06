@@ -53,8 +53,8 @@ public abstract class Patch {
 
 	if (doPatch()) {
 
-	    getConfiguration().getSource().backup();
-	    getConfiguration().flush();
+	    ConfigurationUtils.backup(getConfiguration());
+	    ConfigurationUtils.flush(getConfiguration());
 	}
     }
 

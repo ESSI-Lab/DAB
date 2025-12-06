@@ -169,6 +169,8 @@ public class OptionComponentFactory {
 	    if (!option.isEditable() || forceReadonly) {
 
 		TextField textField = new TextField();
+		textField.setId("option-text-field-for-"+option.getKey());
+		textField.getStyle().set("font-size","14px");
 		textField.setReadOnly(true);
 
 		optionalValue.ifPresent(o -> textField.setValue(o.toString()));
@@ -311,6 +313,7 @@ public class OptionComponentFactory {
     public static Component createOptionMultiSelectionComponent(Option<?> option, boolean forceReadOnly) {
 
 	MultiSelectComboBox<String> select = new MultiSelectComboBox<>();
+	select.getStyle().set("font-size","14px");
 
 	if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)) {
 
@@ -375,6 +378,7 @@ public class OptionComponentFactory {
 	if (!option.isValueOf(BooleanChoice.class)) {
 
 	    Select<String> select = new Select<>();
+	    select.getStyle().set("font-size","14px");
 
 	    if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)) {
 
@@ -430,6 +434,8 @@ public class OptionComponentFactory {
 	VerticalLayout verticalLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
 
 	verticalLayout.getStyle().set("margin-left", "-15px");
+	verticalLayout.getStyle().set("padding-top", "0px");
+	verticalLayout.getStyle().set("padding-bottom", "0px");
 
 	HorizontalLayout horizontalLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
 

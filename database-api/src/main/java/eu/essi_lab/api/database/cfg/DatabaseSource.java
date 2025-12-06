@@ -419,7 +419,7 @@ public class DatabaseSource implements ConfigurationSource {
     @Override
     public DatabaseSource backup() throws Exception {
 
-	String date = ISO8601DateTimeUtils.getISO8601DateTime().//
+	String date = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds().//
 		replace("-", "_").//
 		replace(":", "_").//
 		replace(".", "");

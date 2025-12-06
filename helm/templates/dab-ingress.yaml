@@ -1,0 +1,39 @@
+{{- if .Values.ingress.enabled }}
+{{- if .Values.ingress.host }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "dab.fullname" . }}-ingress
+  namespace: {{ .Values.ingress.namespace | default .Values.namespace }}
+  labels:
+    {{- include "dab.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingress
+  annotations:
+    {{- if .Values.ingress.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer }}
+    {{- end }}
+    nginx.ingress.kubernetes.io/backend-protocol: {{ .Values.ingress.backendProtocol | quote }}
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - path: {{ .Values.ingress.path }}
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.ingress.serviceName }}
+            port:
+              number: {{ .Values.ingress.servicePort }}
+  {{- if or .Values.ingress.tlsSecretName .Values.ingress.clusterIssuer }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.host }}
+    secretName: {{ .Values.ingress.tlsSecretName | default (printf "%s-tls" (include "dab.fullname" .)) }}
+  {{- end }}
+{{- end }}
+{{- end }}
