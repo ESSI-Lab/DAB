@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.dataloggers;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.time.OffsetDateTime;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
