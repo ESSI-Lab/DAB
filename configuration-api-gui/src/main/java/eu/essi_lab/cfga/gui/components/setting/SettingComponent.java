@@ -178,6 +178,11 @@ public class SettingComponent extends Div {
 	this.tabContent = tabContent;
 	this.forceHideHeader = forceHideHeader;
 
+	if (setting.isFoldedModeEnabled()) {
+
+	    this.details = ComponentFactory.createDetails(setting.getName(), this);
+	}
+
 	init(comparator);
     }
 
@@ -266,14 +271,6 @@ public class SettingComponent extends Div {
     public Setting getSetting() {
 
 	return setting;
-    }
-
-    /**
-     * @param details
-     */
-    public void setDetails(Details details) {
-
-	this.details = details;
     }
 
     /**
@@ -434,8 +431,8 @@ public class SettingComponent extends Div {
 	}
 
 	//
- 	// if the name is hidden, an empty div is added instead of the label
- 	//
+	// if the name is hidden, an empty div is added instead of the label
+	//
 	if (!setting.isShowHeaderSet()) {
 
 	    Div div = ComponentFactory.createDiv();
@@ -799,8 +796,10 @@ public class SettingComponent extends Div {
 
 	if (!options.isEmpty() && visibileOptions > 0) {
 
-	    OptionComponentLayout optionLayout = SettingComponentFactory.createSettingOptionsComponent(configuration, setting,
-		    forceReadonly);
+	    OptionComponentLayout optionLayout = SettingComponentFactory.createSettingOptionsComponent(//
+		    configuration, //
+		    setting,//
+		    forceReadonly);//
 
 	    Component component = optionLayout;
 
