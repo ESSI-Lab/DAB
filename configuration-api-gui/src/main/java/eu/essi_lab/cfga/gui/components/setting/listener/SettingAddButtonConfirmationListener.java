@@ -90,9 +90,8 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
 	SelectionUtils.deepAfterClean(settingToAdd);
 
 	//
-	// enables the header end set folded and collapse mode
+	// set folded and collapse mode
 	//
-	settingToAdd.setForceHideheader(false);
 
 	settingToAdd.enableFoldedMode(this.foldedModeEnabled);
 
@@ -113,7 +112,8 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
 	SettingComponent addedSettingComponent = SettingComponentFactory.createSettingComponent(//
 		configuration, //
 		settingToAdd, //
-		true, //
+		true, // forceReadonly
+		false,// forceHideHeader
 		this.tabContent);
 
 	tabContent.addSettingComponent(addedSettingComponent);

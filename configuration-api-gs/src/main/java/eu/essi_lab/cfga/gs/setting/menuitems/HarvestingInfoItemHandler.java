@@ -77,7 +77,7 @@ public class HarvestingInfoItemHandler extends GridMenuItemHandler {
 	TextArea textArea = new TextArea();
 	textArea.setValue(values);
 	textArea.setWidth(580, Unit.PIXELS);
-	textArea.setHeight(375, Unit.PIXELS);
+	textArea.setHeight(350, Unit.PIXELS);
 	textArea.getStyle().set("font-size", "14px");
 
 	textArea.setReadOnly(true);

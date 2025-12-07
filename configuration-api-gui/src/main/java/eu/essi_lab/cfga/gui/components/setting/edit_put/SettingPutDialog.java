@@ -64,7 +64,6 @@ public class SettingPutDialog extends SettingPutOrEditDialog {
 	//
 	// hides the header and opens expands the setting
 	//
-	this.settingToAdd.setForceHideheader(true);
 
 	this.foldedModeEnabled = this.settingToAdd.isFoldedModeEnabled();
 

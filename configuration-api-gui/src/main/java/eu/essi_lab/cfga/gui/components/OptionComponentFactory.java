@@ -49,7 +49,6 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.option.OptionComponent;
 import eu.essi_lab.cfga.gui.components.option.OptionDoubleField;
 import eu.essi_lab.cfga.gui.components.option.OptionIntegerField;
-import eu.essi_lab.cfga.gui.components.option.OptionSettingComponent;
 import eu.essi_lab.cfga.gui.components.option.OptionTextArea;
 import eu.essi_lab.cfga.gui.components.option.OptionTextField;
 import eu.essi_lab.cfga.gui.components.option.listener.OptionToggleButtonListener;
@@ -485,21 +484,6 @@ public class OptionComponentFactory {
 	}
 
 	return horizontalLayout;
-    }
-
-    /**
-     * @param configuration
-     * @param owner
-     * @param option
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public static OptionSettingComponent createSettingOptionComponent(Configuration configuration, Setting owner, Option<?> option) {
-
-	return new OptionSettingComponent(//
-		configuration, //
-		owner, //
-		(Option<? extends Setting>) option);
     }
 
     /**
