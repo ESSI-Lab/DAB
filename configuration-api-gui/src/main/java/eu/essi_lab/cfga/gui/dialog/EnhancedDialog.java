@@ -102,7 +102,7 @@ public class EnhancedDialog extends Dialog {
 	content = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
 	content.setSizeFull();
 	content.getStyle().set("padding", "5px");
-	content.getStyle().set("margin-top", "10px");
+//	content.getStyle().set("margin-top", "10px");
 	content.getStyle().set("margin-bottom", "10px");
 	content.setId("content");
 		
