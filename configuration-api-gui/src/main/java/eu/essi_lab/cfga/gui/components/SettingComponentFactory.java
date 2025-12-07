@@ -211,15 +211,13 @@ public class SettingComponentFactory {
 	    boolean forceHideHeader,//
 	    TabContent tabContent) {
 
-	SettingComponent settingComponent = new SettingComponent( //
+	return new SettingComponent( //
 		configuration,//
 		setting,//
 		forceReadonly,//
 		forceHideHeader, //
 		null,// comparator
-		tabContent);//
-
-	return settingComponent;
+		tabContent);
     }
 
     /**
