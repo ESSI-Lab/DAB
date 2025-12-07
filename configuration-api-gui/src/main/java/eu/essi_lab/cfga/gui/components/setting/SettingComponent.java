@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -149,19 +149,18 @@ public class SettingComponent extends Div {
 
     private final boolean forceReadonly;
     private Setting setting;
-    private String settingIdentifier;
 
     private final Configuration configuration;
     private Details details;
     private final TabContent tabContent;
 
-    private final boolean forceHideLabel;
+    private final boolean forceHideHeader;
 
     /**
      * @param configuration
      * @param setting
      * @param forceReadonly
-     * @param forceHideLabel
+     * @param forceHideHeader
      * @param comparator
      * @param tabContent
      */
@@ -169,7 +168,7 @@ public class SettingComponent extends Div {
 	    Configuration configuration, //
 	    Setting setting, //
 	    boolean forceReadonly, //
-	    boolean forceHideLabel, //
+	    boolean forceHideHeader, //
 	    Comparator<Setting> comparator, //
 	    TabContent tabContent) {
 
@@ -177,32 +176,7 @@ public class SettingComponent extends Div {
 	this.setting = setting;
 	this.forceReadonly = forceReadonly;
 	this.tabContent = tabContent;
-	this.forceHideLabel = forceHideLabel;
-
-	init(comparator);
-    }
-
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @param forceHideLabel
-     * @param comparator
-     * @param tabContent
-     */
-    public SettingComponent(//
-	    Configuration configuration, //
-	    String settingIdentifier, //
-	    boolean forceReadonly, //
-	    boolean forceHideLabel, //
-	    Comparator<Setting> comparator, //
-	    TabContent tabContent) {
-
-	this.configuration = configuration;
-	this.settingIdentifier = settingIdentifier;
-	this.forceReadonly = forceReadonly;
-	this.tabContent = tabContent;
-	this.forceHideLabel = forceHideLabel;
+	this.forceHideHeader = forceHideHeader;
 
 	init(comparator);
     }
@@ -216,6 +190,11 @@ public class SettingComponent extends Div {
 
 	setHeightFull();
 	setWidthFull();
+
+	getStyle().set("background-color", "white");
+	getStyle().set("padding", "4px");
+	getStyle().set("border-radius", "5px");
+	getStyle().set("margin-top", "0px");
 
 	radioMap = new HashMap<>();
 	checkMap = new HashMap<>();
@@ -286,12 +265,7 @@ public class SettingComponent extends Div {
      */
     public Setting getSetting() {
 
-	if (this.setting != null) {
-
-	    return setting;
-	}
-
-	return configuration.get(settingIdentifier).get();
+	return setting;
     }
 
     /**
@@ -449,16 +423,19 @@ public class SettingComponent extends Div {
 	add(mainLayout);
 
 	HorizontalLayout headerLayout = SettingComponentFactory.createSettingHeaderLayout(setting);
-	if (!setting.isEditable()) {
-	    // headerLayout = SettingComponentFactory.createSettingHeaderLayoutWithBottomMargin(setting);
-	}
 
-	// foced to hide the whole header. this is done by the put/edit dialogs
-	if (setting.isForceHideHeader()) {
+	//
+	// forced to hide the whole header by the put/edit dialogs
+	// the header is hidden only in the root setting
+	//
+	if (forceHideHeader && parent == null) {
 
 	    headerLayout.getStyle().set("display", "none");
 	}
 
+	//
+ 	// if the name is hidden, an empty div is added instead of the label
+ 	//
 	if (!setting.isShowHeaderSet()) {
 
 	    Div div = ComponentFactory.createDiv();
@@ -476,7 +453,7 @@ public class SettingComponent extends Div {
 	mainLayout.add(descriptionLayout);
 
 	//
-	// get the multi selection of its parent (if exists)
+	// get selection mode of its parent (if exists)
 	//
 	SelectionMode selectionMode = parent != null ? parent.getSelectionMode() : SelectionMode.UNSET;
 
@@ -486,7 +463,7 @@ public class SettingComponent extends Div {
 	    // name is added to the header if the setting is not folded
 	    // if the setting is folded, the name is visible in the details component
 	    //
-	    if (!setting.isFoldedModeEnabled() && !forceHideLabel) {
+	    if (!setting.isFoldedModeEnabled()) {
 
 		Label label = handleLabel(parent, setting, headerLayout);
 
@@ -702,7 +679,7 @@ public class SettingComponent extends Div {
 
 	    Button button = SettingComponentFactory.createSettingEditButton(configuration, setting, this, tabContent);
 
-	    if(setting.isShowHeaderSet()){
+	    if (setting.isShowHeaderSet()) {
 
 		button.getStyle().set("margin-left", "3px");
 	    }
