@@ -34,12 +34,13 @@ dashboard:
     type: ClusterIP
 
 dab:
-  image: "essilab/essilab:dab-49"
+  image: "essilab/essilab:dab-50"
   port: 8080
   replicas: 1
   env:
     DAB_SKIP_AUTHORIZATION: "true"
     EU_FLORA_ESSI_GI_PROJECT_EXECUTION: "mixed"
+    JAVA_OPTS: "-Dfile.encoding=UTF-8 --add-opens java.xml/com.sun.org.apache.xerces.internal.jaxp.datatype=ALL-UNNAMED -DinitCaches=true -DcheckConfig=true -DinitIndexes=true"
   resources:
     requests:
       memory: "512Mi"

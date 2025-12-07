@@ -441,7 +441,7 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	}
 
 	if (properties.has("intendedTimeSpacing")) {
-	    String its = properties.getString("intendedTimeSpacing");
+	    String its = properties.get("intendedTimeSpacing").toString();
 	    handler.setTimeResolutionDuration8601(its);
 	}
 

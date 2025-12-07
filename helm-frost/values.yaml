@@ -1,0 +1,77 @@
+# Global namespace for all resources
+namespace: frost
+
+# Image pull policy for all containers
+imagePullPolicy: IfNotPresent
+
+frost:
+  image: "fraunhoferiosb/frost-server:2.6"
+  replicas: 1
+  httpPort: 8080
+  mqttPort: 8883
+  # Service root URL - update with your actual ingress hostname if using ingress
+  serviceRootUrl: "http://localhost:8080/FROST-Server"
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  service:
+    type: ClusterIP
+  env:
+    plugins_multiDatastream.enable: "false"
+    http_cors_enable: "true"
+    http_cors_allowed_origins: "*"
+    persistence_autoUpdateDatabase: "true"
+  livenessProbe:
+    httpGet:
+      path: /FROST-Server/v1.1/Things
+      port: 8080
+    initialDelaySeconds: 60
+    periodSeconds: 30
+  readinessProbe:
+    httpGet:
+      path: /FROST-Server/v1.1/Things
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+
+postgres:
+  image: "postgis/postgis:16-3.4-alpine"
+  port: 5432
+  replicas: 1
+  database: "sensorthings"
+  username: "sensorthings"
+  password: "ChangeMe"  # CHANGE THIS IN PRODUCTION!
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+  service:
+    type: ClusterIP
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClassName: ""  # Use default storage class if empty
+  healthcheck:
+    interval: 2  # seconds
+    timeout: 2  # seconds
+    retries: 10
+
+ingress:
+  enabled: false
+  namespace: frost
+  host: ""
+  path: /FROST-Server
+  ingressClassName: nginx
+  # TLS Configuration
+  clusterIssuer: ""
+  tlsSecretName: ""
+  annotations: {}
+  #   nginx.ingress.kubernetes.io/rewrite-target: /FROST-Server
+
