@@ -418,7 +418,6 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 
 			} catch (Exception e) {
 			    e.printStackTrace();
-
 			}
 		    }
 
