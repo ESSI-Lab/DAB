@@ -31,6 +31,7 @@ public class TestView extends View {
     public TestView() {	
 	super();
 	setLabel("Test");
+	setSourceDeployment("test");
 	setBond(BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.SOURCE_DEPLOYMENT, "test"));
 	setCreator("test");
 	setId("test");
