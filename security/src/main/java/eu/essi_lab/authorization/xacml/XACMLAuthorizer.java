@@ -121,6 +121,22 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	logBuilder.append("\n- User role: " + role);
 
+	Optional<View> optionalView = message.getView();
+	if (optionalView.isPresent()) {
+	    View view = optionalView.get();
+	    String creator = view.getCreator();
+	    switch (creator) {
+	    case "whos":
+	    case "his-central":
+		if (role.equals("anonymous")) {
+		    return false;
+		}
+		break;
+	    default:
+		break;
+	    }
+	}
+
 	if (message instanceof DiscoveryMessage) {
 
 	    mapMessage(role, (DiscoveryMessage) message);
