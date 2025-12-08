@@ -146,7 +146,7 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
 
         var queryID = GIAPI.random();     
         var sources = dabNode.findSources(constraints);
-               
+
         var query = GIAPI.query(
         		dabEndpoint,//
         		constraints,//
