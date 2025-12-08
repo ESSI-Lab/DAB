@@ -162,16 +162,19 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
      * @param height
      * @return
      */
-    protected Component createSettingToAddOrEditComponent(Configuration configuration, Setting setting, int height) {
-
-	// Comparator<Setting> comparator = (s1, s2) -> s1.getName().compareTo(s2.getName());
+    protected Component createSettingToAddOrEditComponent(//
+	    Configuration configuration,//
+	    Setting setting,//
+	    int height) {//
 
 	int componentHeight = height - 150;
 
-	Component component = SettingComponentFactory.createSettingComponent(
+	Component component = SettingComponentFactory.createSettingComponent(//
 		configuration, //
 		setting,//
-		false);
+		false, //  forceReadonly
+		true,// forceHideHeader
+		null); // tabContent
 
 	((HasSize) component).setWidthFull();
 	((HasSize) component).setHeight(componentHeight, Unit.PIXELS);

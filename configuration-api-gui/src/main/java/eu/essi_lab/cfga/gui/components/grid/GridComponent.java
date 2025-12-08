@@ -439,7 +439,9 @@ public class GridComponent extends Grid<HashMap<String, String>> {
      * @param container
      * @return
      */
-    private Renderer<HashMap<String, String>> createItemDetailsRenderer(Configuration configuration, boolean readOnly,
+    private Renderer<HashMap<String, String>> createItemDetailsRenderer(//
+	    Configuration configuration,//
+	    boolean readOnly,//
 	    TabContent container) {
 
 	return new ComponentRenderer<>((source) -> {
@@ -448,8 +450,9 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    SettingComponent comp = SettingComponentFactory.createSettingComponent(//
 		    configuration, //
-		    settingId, //
+		    configuration.get(settingId).get(), //
 		    readOnly, //
+		    false,// forceHideHeader
 		    container);
 
 	    comp.getElement().getStyle().set("border", "2px solid gray");

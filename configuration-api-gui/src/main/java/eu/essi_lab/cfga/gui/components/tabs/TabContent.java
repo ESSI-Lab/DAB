@@ -310,8 +310,9 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 		SettingComponent component = SettingComponentFactory.createSettingComponent(//
 			configuration, //
-			setting.getIdentifier(), //
+			setting, //
 			readOnly, //
+			false,// forceHideHeader
 			this); //
 
 		if (component.getDetails().isPresent()) {

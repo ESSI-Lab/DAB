@@ -69,7 +69,10 @@ public class SettingComponentFactory {
      * @param enabled
      * @return
      */
-    public static ToggleButton createSettingDisableEnableButton(SettingComponent settingComponent, boolean value, boolean enabled) {
+    public static ToggleButton createSettingDisableEnableButton(//
+	    SettingComponent settingComponent,//
+	    boolean value, //
+	    boolean enabled) {//
 
 	ToggleButton toggle = ComponentFactory.createToggleButton(value, enabled);
 	// toggle.getStyle().set("margin-top", "-5px");
@@ -87,7 +90,11 @@ public class SettingComponentFactory {
      * @param paddingLeft
      * @return
      */
-    public static VerticalLayout createSettingMainLayout(Setting parent, Setting setting, String id, int paddingLeft) {
+    public static VerticalLayout createSettingMainLayout(//
+	    Setting parent,//
+	    Setting setting,//
+	    String id, //
+	    int paddingLeft) {
 
 	VerticalLayout mainLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout(id);
 
@@ -114,23 +121,14 @@ public class SettingComponentFactory {
     }
 
     /**
-     * @param setting
-     * @return
-     */
-    public static HorizontalLayout createSettingHeaderLayoutWithBottomMargin(Setting setting) {
-
-	HorizontalLayout headerLayout = createSettingHeaderLayout(setting);
-	headerLayout.getStyle().set("margin-bottom", "3px");
-
-	return headerLayout;
-    }
-
-    /**
      * @param configuration
      * @param setting
      * @return
      */
-    public static OptionComponentLayout createSettingOptionsComponent(Configuration configuration, Setting setting, boolean forceReadonly) {
+    public static OptionComponentLayout createSettingOptionsComponent(//
+	    Configuration configuration,//
+	    Setting setting,//
+	    boolean forceReadonly) {//
 
 	OptionComponentLayout mainLayout = new OptionComponentLayout("main-options-layout-for-setting-" + setting.getName());
 	mainLayout.setSizeFull();
@@ -203,209 +201,23 @@ public class SettingComponentFactory {
      * @param configuration
      * @param setting
      * @param forceReadonly
+     * @param tabContent
      * @return
      */
     public static SettingComponent createSettingComponent(//
 	    Configuration configuration, //
-	    String settingIdentifier, //
-	    boolean forceReadonly) {
+	    Setting setting, //
+	    boolean forceReadonly, //
+	    boolean forceHideHeader,//
+	    TabContent tabContent) {
 
-	return createSettingComponentWithOptionalFoldedMode(//
+	return new SettingComponent( //
 		configuration,//
-		settingIdentifier,//
-		forceReadonly,//
-		false,//
-		null,//
-		null);
-    }
-
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @return
-     */
-    public static SettingComponent createSettingComponent(//
-	    Configuration configuration, //
-	    Setting setting, //
-	    boolean forceReadonly) {
-
-	return createSettingComponentWithOptionalFoldedMode(//
-		configuration, //
-		setting, //
-		forceReadonly, //
-		false, //
-		null, //
-		null);//
-    }
-
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @param tabContent
-     * @return
-     */
-    public static SettingComponent createSettingComponent(//
-	    Configuration configuration, //
-	    String settingIdentifier, //
-	    boolean forceReadonly, //
-	    TabContent tabContent) {
-
-	return createSettingComponentWithOptionalFoldedMode(//
-		configuration, //
-		settingIdentifier,//
-		forceReadonly, //
-		false, //
-		null, //
-		tabContent);
-    }
-
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @param tabContent
-     * @return
-     */
-    public static SettingComponent createSettingComponent(//
-	    Configuration configuration, //
-	    Setting setting, //
-	    boolean forceReadonly, //
-	    TabContent tabContent) {
-
-	return createSettingComponentWithOptionalFoldedMode(configuration,//
 		setting,//
-		forceReadonly, false,//
-		null,//
-		tabContent);//
-    }
-
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @param comparator
-     * @param tabContent
-     * @return
-     */
-    private static SettingComponent createSettingComponent(//
-	    Configuration configuration, //
-	    String settingIdentifier, //
-	    boolean forceReadonly, //
-	    boolean forceHideLabel, //
-
-	    Comparator<Setting> comparator, //
-	    TabContent tabContent) {
-
-	SettingComponent settingComponent = new SettingComponent(configuration,//
-		settingIdentifier,//
 		forceReadonly,//
-		forceHideLabel,//
-		comparator,//
-		tabContent);//
-
-	settingComponent.getStyle().set("background-color", "white");
-	settingComponent.getStyle().set("padding", "4px");
-	settingComponent.getStyle().set("border-radius", "5px");
-	settingComponent.getStyle().set("margin-top", "0px");
-
-	return settingComponent;
-    }
-
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @param comparator
-     * @param tabContent
-     * @return
-     */
-    private static SettingComponent createSettingComponent(//
-	    Configuration configuration, //
-	    Setting setting, //
-	    boolean forceReadonly, //
-	    boolean forceHideLabel, //
-
-	    Comparator<Setting> comparator, //
-	    TabContent tabContent) {
-
-	SettingComponent settingComponent = new SettingComponent(configuration, setting, forceReadonly, forceHideLabel, comparator,
+		forceHideHeader, //
+		null,// comparator
 		tabContent);
-
-	settingComponent.getStyle().set("background-color", "white");
-	settingComponent.getStyle().set("padding", "4px");
-	settingComponent.getStyle().set("border-radius", "px");
-	settingComponent.getStyle().set("margin-top", "0px");
-
-	return settingComponent;
-    }
-
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @param forceHideLabel
-     * @param comparator
-     * @param tabContent
-     * @return
-     */
-    private static SettingComponent createSettingComponentWithOptionalFoldedMode(//
-	    Configuration configuration, //
-	    String settingIdentifier, //
-	    boolean forceReadonly, //
-	    boolean forceHideLabel, //
-	    Comparator<Setting> comparator, //
-	    TabContent tabContent) {
-
-	SettingComponent settingComponent = createSettingComponent( //
-		configuration,//
-		settingIdentifier,//
-		forceReadonly,//
-		forceHideLabel,//
-		comparator,//
-		tabContent);
-
-	Setting setting = configuration.get(settingIdentifier).get();
-
-	if (setting.isFoldedModeEnabled()) {
-
-	    Details details = ComponentFactory.createDetails(setting.getName(), settingComponent);
-
-	    settingComponent.setDetails(details);
-	}
-
-	return settingComponent;
-    }
-
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @param forceHideLabel
-     * @param comparator
-     * @param tabContent
-     * @return
-     */
-    private static SettingComponent createSettingComponentWithOptionalFoldedMode(//
-	    Configuration configuration, //
-	    Setting setting, //
-	    boolean forceReadonly, //
-	    boolean forceHideLabel, //
-	    Comparator<Setting> comparator, //
-	    TabContent tabContent) {
-
-	SettingComponent settingComponent = createSettingComponent(configuration, setting, forceReadonly, forceHideLabel, comparator,
-		tabContent);
-
-	if (setting.isFoldedModeEnabled()) {
-
-	    Details details = ComponentFactory.createDetails(setting.getName(), settingComponent);
-
-	    settingComponent.setDetails(details);
-	}
-
-	return settingComponent;
     }
 
     /**
@@ -427,19 +239,6 @@ public class SettingComponentFactory {
 		details.setSummaryText("View options");
 	    }
 	});
-
-	return details;
-    }
-
-    /**
-     * @param content
-     * @return
-     */
-    public static Details createSettingFoldedModeComponent(Setting setting, SettingComponent component) {
-
-	Details details = ComponentFactory.createDetails(setting.getName(), component);
-
-	component.setDetails(details);
 
 	return details;
     }
