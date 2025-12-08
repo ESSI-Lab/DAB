@@ -462,7 +462,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 			if (cachedLayer == null) {
 			    	if (view.isPresent()) {
 			    	    String v = view.get();
-			    	    if (v.equals("trigger")||v.equals("i-change")) {
+			    	    if (v.equals("i-change")) {
 			    		return null;
 			    		// skipping cache creation as it fills the memory currently
 			    	    }
