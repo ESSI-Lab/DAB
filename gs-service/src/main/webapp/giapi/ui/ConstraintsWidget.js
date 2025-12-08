@@ -2062,6 +2062,11 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			ontologyTreeUrl = 'https://whos.geodab.eu/gs-service/sparql-navigator/whos';
 			conceptBaseUrl = 'http://hydro.geodab.eu/hydro-ontology/concept/';
 		}
+		if (options.ontology === "hydro") {
+					ontologyUrl = 'https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1';
+					ontologyTreeUrl = 'https://whos.geodab.eu/gs-service/sparql-navigator/whos';
+					conceptBaseUrl = 'http://hydro.geodab.eu/hydro-ontology/concept/';
+				}
 
 		if (options.ontology === "gemet") {
             ontologyUrl = '../ontology-browser/gemet-ontology.html?http://www.eionet.europa.eu/gemet/gemetThesaurus';
