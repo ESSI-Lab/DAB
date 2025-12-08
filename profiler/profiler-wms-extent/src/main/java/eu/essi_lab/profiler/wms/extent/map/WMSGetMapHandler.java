@@ -460,6 +460,13 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 		synchronized (cachedLayers) {
 			Layer cachedLayer = cachedLayers.get(layers);
 			if (cachedLayer == null) {
+			    	if (view.isPresent()) {
+			    	    String v = view.get();
+			    	    if (v.equals("trigger")||v.equals("i-change")) {
+			    		return null;
+			    		// skipping cache creation as it fills the memory currently
+			    	    }
+			    	}
 				if (!inPreparation.contains(layers)) {
 					inPreparation.add(layers);
 					GSLoggerFactory.getLogger(WMSGetMapHandler.class).info("Added layer in preparation: " + layers);
