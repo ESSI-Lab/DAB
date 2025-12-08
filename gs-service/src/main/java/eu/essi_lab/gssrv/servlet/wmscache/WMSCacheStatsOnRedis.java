@@ -61,6 +61,8 @@ public class WMSCacheStatsOnRedis implements WMSCacheStats {
     public long incrementUsage(String view, String layer, String reqid) {
 	try (Jedis jedis = pool.getResource()) {
 	    return jedis.incr("wms:reqcount:view" + view + ":layer:" + layer + ":" + reqid);
+	}catch (Exception e) {
+	   return 0;
 	}
     }
 
@@ -68,6 +70,8 @@ public class WMSCacheStatsOnRedis implements WMSCacheStats {
     public void storeRequest(String view, String layer, String reqid, String request) {
 	try (Jedis jedis = pool.getResource()) {
 	    jedis.set("wms:reqmeta:view:" + view + ":layer:" + layer + ":" + reqid, request);
+	}catch (Exception e) {
+	   
 	}
     }
 
@@ -85,6 +89,8 @@ public class WMSCacheStatsOnRedis implements WMSCacheStats {
 
 	try (Jedis jedis = pool.getResource()) {
 	    jedis.zincrby("wms:reqleaderboard:view" + view + ":layer:" + layer, 1.0, reqid);
+	}catch (Exception e) {
+	  
 	}
 
     }

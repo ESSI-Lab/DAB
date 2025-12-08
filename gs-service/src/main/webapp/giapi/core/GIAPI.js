@@ -119,6 +119,7 @@ export const GIAPI = {
 
 	query: function(dabEndpoint, constraints, options, parentId, targetId, sources, queryID, viewId, servicePath, openSearchPath) {
 
+
 		if (!queryID) {
 			queryID = GIAPI.random();
 		}
@@ -431,11 +432,24 @@ export const GIAPI = {
 			}
 		}
 
+
 		var path = 'opensearch/query?';
-		
+		var tok = (config && config.token) ? config.token : '';
+		// Prefer an explicit token from constraints.kvp when config.token is missing
+		if (!tok && constraints && Array.isArray(constraints.kvp)) {
+			var kvpToken = constraints.kvp.find(function(kvp) { return kvp && kvp.key === 'token' && kvp.value; });
+			tok = kvpToken ? kvpToken.value : '';
+		}
+		// Skip adding token for expand queries (sources list, etc.)
+		if (queryID && typeof queryID === 'string' && queryID.indexOf('expand_') === 0) {
+			tok = '';
+		}
 		if (viewId) {
-			
-			path = 'view/' + viewId + '/opensearch/query?';
+			if (tok) {
+				path = 'token/' + tok + '/view/' + viewId +  '/opensearch/query?';
+			} else {
+				path = 'view/' + viewId + '/opensearch/query?';
+			}
 		}
  
 		var slash = dabEndpoint.endsWith('/') ? '' : '/';
