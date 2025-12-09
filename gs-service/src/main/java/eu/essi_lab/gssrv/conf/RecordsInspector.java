@@ -16,12 +16,12 @@ import java.util.HashMap;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -48,6 +48,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -84,6 +85,7 @@ public class RecordsInspector {
 	//
 
 	grid = new Grid<>(GridData.class, false);
+
 	grid.getStyle().set("font-size", "13px");
 
 	grid.addColumn(GridData::getPosition).//
@@ -139,7 +141,7 @@ public class RecordsInspector {
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
 
 	    int screenHeight = receiver.getScreenHeight();
-	    grid.setHeight(screenHeight - 370, Unit.PIXELS);
+	    grid.setHeight(screenHeight - ComponentFactory.MIN_HEIGHT_OFFSET - 400, Unit.PIXELS);
 	});
 
 	//
@@ -176,7 +178,6 @@ public class RecordsInspector {
     }
 
     /**
-     *
      * @return
      */
     public TabContentDescriptor get() {
