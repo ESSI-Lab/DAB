@@ -281,7 +281,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	// computes the grid height
 
-	int _offset = 370;
+	int _offset = ComponentFactory.MIN_HEIGHT_OFFSET;
 
 	if ((gridInfo.isShowColumnsHider() || legendsViewer)) {
 

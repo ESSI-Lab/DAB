@@ -43,6 +43,11 @@ import eu.essi_lab.cfga.gui.components.tabs.*;
 public class ComponentFactory {
 
     /**
+     *
+     */
+    public static final int MIN_HEIGHT_OFFSET = 370;
+
+    /**
      * @param id
      * @return
      */

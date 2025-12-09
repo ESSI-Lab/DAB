@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.tabs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -70,6 +70,13 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	setMargin(false);
 	setSpacing(false);
+
+	// computes the height
+	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
+
+	    int screenHeight = receiver.getScreenHeight();
+	    setHeight(screenHeight - ComponentFactory.MIN_HEIGHT_OFFSET, Unit.PIXELS);
+	});
     }
 
     /**
@@ -105,10 +112,9 @@ public class TabContent extends VerticalLayout implements Renderable {
 	//
 
 	HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
-		"tab-container-header-layout-for-" + tabContentDesc.getLabel());
+		TabContent.TAB_HEADER_ID_PREFIX + "_" + tabContentDesc.getLabel());
 	headerLayout.setWidthFull();
 	headerLayout.setAlignItems(Alignment.BASELINE);
-	headerLayout.setId(TabContent.TAB_HEADER_ID_PREFIX + "_" + tabContentDesc.getLabel());
 
 	add(headerLayout);
 
@@ -166,12 +172,11 @@ public class TabContent extends VerticalLayout implements Renderable {
 		extraDescButton.setTooltipText("Click to see full description");
 		extraDescButton.addClickListener(evt -> {
 
-		    NotificationDialog.getNotificationDialog("Description",desc).open();
+		    NotificationDialog.getNotificationDialog("Description", desc).open();
 		});
 
 		labelLayout.add(extraDescButton);
 	    }
-
 
 	} else {
 
@@ -270,8 +275,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 		    configuration, //
 		    this, //
 		    readOnly, //
-		    refresh,
-		    tabDesc.getContentDescriptors().size() > 1);
+		    refresh, tabDesc.getContentDescriptors().size() > 1);
 
 	    TabSheet tabSheet = new TabSheet();
 	    tabSheet.getStyle().set("border-bottom", "1px solid #d3d3d39e");
