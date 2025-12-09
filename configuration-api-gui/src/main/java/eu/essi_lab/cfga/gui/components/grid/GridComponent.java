@@ -48,7 +48,6 @@ import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.grid.renderer.GridColumnRenderer;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.gui.directive.*;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
@@ -90,7 +89,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	if (!refresh) {
 
-	    GridFilter.clearValuesCache();
+	    GridFilter.clearSelection();
 	    ColumnsHider.clearValuesCache();
 	}
 
