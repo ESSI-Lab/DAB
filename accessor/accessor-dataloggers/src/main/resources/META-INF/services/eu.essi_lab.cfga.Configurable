@@ -1,4 +1,2 @@
-eu.essi_lab.accessor.dinaguaws.DinaguaAccessor
-eu.essi_lab.accessor.dinaguaws.DinaguaConnector
-eu.essi_lab.accessor.dinaguaws.DinaguaStatusAccessor
-eu.essi_lab.accessor.dinaguaws.DinaguaStatusConnector
+eu.essi_lab.accessor.dataloggers.DataloggersConnector
+eu.essi_lab.accessor.dataloggers.DataloggersAccessor
