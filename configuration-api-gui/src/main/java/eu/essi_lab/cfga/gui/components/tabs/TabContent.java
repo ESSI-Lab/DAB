@@ -160,9 +160,30 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	    headerLayout.add(descLayout);
 
-	    if (desc.length() > 200) {
+	    //
+ 	    // max description length is limited
+ 	    //
 
-		String shortDesc = desc.substring(0, 195);
+	    Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
+
+	    int maxDescLength = 300; // no add, no reload
+
+	    if (addDirective.isPresent() && tabContentDesc.isReloadable()) { // add & reload
+
+		maxDescLength = 180;
+
+	    } else if (addDirective.isPresent() && !tabContentDesc.isReloadable()) { // only add
+
+		maxDescLength = 200;
+
+	    } else if (addDirective.isEmpty() && tabContentDesc.isReloadable()) { // only reload
+
+		maxDescLength = 190;
+	    }
+
+	    if (desc.length() > maxDescLength) {
+
+		String shortDesc = desc.substring(0, maxDescLength - 5);
 
 		descLabel.setText(shortDesc);
 
