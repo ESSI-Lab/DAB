@@ -93,19 +93,19 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 
     public enum PIEMONTE_Variable {
 
-	TMEDIA("Temperatura", "tmedia", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
-	TMAX("Temperatura", "tmax", "°C", InterpolationType.MAX, PiemonteStationType.METEO), //
-	TMIN("Temperatura", "tmin", "°C", InterpolationType.MIN, PiemonteStationType.METEO), //
-	UMIN("Umidità", "umin", "%", InterpolationType.MIN, PiemonteStationType.METEO), //
-	UMMEDIA("Umidità", "umedia", "%", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
-	UMAX("Umidità", "umax", "%", InterpolationType.MAX, PiemonteStationType.METEO), //
+	TMEDIA("Temperatura dell'aria", "tmedia", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
+	TMAX("Temperatura dell'aria", "tmax", "°C", InterpolationType.MAX, PiemonteStationType.METEO), //
+	TMIN("Temperatura dell'aria", "tmin", "°C", InterpolationType.MIN, PiemonteStationType.METEO), //
+	UMIN("Umidità relativa", "umin", "%", InterpolationType.MIN, PiemonteStationType.METEO), //
+	UMMEDIA("Umidità relativa", "umedia", "%", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
+	UMAX("Umidità relativa", "umax", "%", InterpolationType.MAX, PiemonteStationType.METEO), //
 	VMEDIA("Velocità del vento", "vmedia", "m/s", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
 	VRAFFICA("Velocità del vento", "vraffica", "m/s", InterpolationType.MAX, PiemonteStationType.METEO), //
-	PTOT("Precipitazione", "ptot", "cm", InterpolationType.TOTAL, PiemonteStationType.METEO), //
+	PTOT("Precipitazione", "ptot", "mm", InterpolationType.TOTAL, PiemonteStationType.METEO), //
 	RADD("Radiazione", "rtot", "MJ/m²", InterpolationType.TOTAL, PiemonteStationType.METEO), //
 
 	PORTATA("Portata", "portatamedia", "m³/s", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
-	IDRO("Livello", "livellomedio", "m", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
+	IDRO("Livello idrometrico", "livellomedio", "m", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
 
 	HS("Altezza neve dal suolo", "hs", "cm", InterpolationType.MAX, PiemonteStationType.SNOW), //
 	HN("Altezza neve fresca", "hn", "cm", InterpolationType.TOTAL, PiemonteStationType.SNOW); //
