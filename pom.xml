@@ -425,6 +425,18 @@
 		<!-- Commons IO VULN-UPDATE-->
 		<commons-io.version>2.21.0</commons-io.version>
 
+		<!-- Jackson dataformat-cbor VULN-UPDATE-->
+		<jackson-dataformat-cbor.version>2.20.1</jackson-dataformat-cbor.version>
+
+		<!-- httpclient5 VULN-UPDATE-->
+		<httpclient5.version>5.5.1</httpclient5.version>
+
+		<!-- commons file upload required by Vaadin  VULN-UPDATE-->
+		<commons-fileupload.version>1.6.0</commons-fileupload.version>
+
+		<!-- required by Vaadin  VULN-UPDATE-->
+		<nimbus-jose-jwt.version>9.37.4</nimbus-jose-jwt.version>
+		
         <!-- Surefire args -->
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
@@ -439,6 +451,30 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+			<dependency>
+				<groupId>com.nimbusds</groupId>
+				<artifactId>nimbus-jose-jwt</artifactId>
+				<version>${nimbus-jose-jwt.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-fileupload</groupId>
+				<artifactId>commons-fileupload</artifactId>
+				<version>${commons-fileupload.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.httpcomponents.client5</groupId>
+				<artifactId>httpclient5</artifactId>
+				<version>${httpclient5.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.dataformat</groupId>
+				<artifactId>jackson-dataformat-cbor</artifactId>
+				<version>${jackson-dataformat-cbor.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>commons-io</groupId>
