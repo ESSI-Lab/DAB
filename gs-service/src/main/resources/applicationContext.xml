@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:jaxws="http://cxf.apache.org/jaxws"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-    http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd
-    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-    http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
-    http://cxf.apache.org/jaxrs    http://cxf.apache.org/schemas/jaxrs.xsd"
+    http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd"
 	default-lazy-init="false">
 
 	<!-- Load the needed resources that are present in the cxf* jars -->
