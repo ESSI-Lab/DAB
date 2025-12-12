@@ -268,8 +268,8 @@
 		<!-- GeoTools -->
 		<geotools-version>32.2</geotools-version>
 
-		<!-- Quartz -->
-		<quartz.version>2.3.2</quartz.version>
+		<!-- Quartz VULN-UPDATE -->
+		<quartz.version>2.5.2</quartz.version>
 
 		<!-- MySQL -->
 		<mysql.connector.version>8.3.0</mysql.connector.version>
