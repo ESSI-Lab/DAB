@@ -1,7 +1,6 @@
 package eu.essi_lab.gssrv.servlet.wmscache;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 
 /*-
  * #%L
@@ -24,11 +23,7 @@ import java.util.HashSet;
  * #L%
  */
 
-import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
-
-import com.mchange.v1.util.SimpleMapEntry;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -106,7 +101,7 @@ public class WMSCacheStatsOnRedis implements WMSCacheStats {
 	    List<Tuple> tuples = jedis.zrevrangeWithScores(key, 0, limit - 1);
 
 	    for (Tuple t : tuples) {
-		result.add(new SimpleMapEntry(t.getElement(), t.getScore()));
+		result.add(new AbstractMap.SimpleEntry(t.getElement(), t.getScore()));
 	    }
 	}
 
