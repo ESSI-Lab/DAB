@@ -205,8 +205,8 @@
 		<!-- Apache mina VULN-UPDATE -->
 		<apache.mina.version>2.2.5</apache.mina.version>
 
-		<!-- Apache Commons Lang -->
-		<org.apache-commons-commons-lang3.version>3.14.0</org.apache-commons-commons-lang3.version>
+		<!-- Apache Commons Lang VULN-UPDATE -->
+		<org.apache-commons-commons-lang3.version>3.20.0</org.apache-commons-commons-lang3.version>
 
 		<!-- Apache POI - Java API To Access Microsoft Format Files VULN-UPDATE -->
 		<org.apache.poi-poi.version>5.5.1</org.apache.poi-poi.version>
