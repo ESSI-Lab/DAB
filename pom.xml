@@ -208,9 +208,8 @@
 		<!-- Apache Commons Lang -->
 		<org.apache-commons-commons-lang3.version>3.14.0</org.apache-commons-commons-lang3.version>
 
-		<!-- Apache POI - Java API To Access Microsoft Format Files (J11
-		UPDATED) -->
-		<org.apache.poi-poi.version>4.1.2</org.apache.poi-poi.version>
+		<!-- Apache POI - Java API To Access Microsoft Format Files VULN-UPDATE -->
+		<org.apache.poi-poi.version>5.5.1</org.apache.poi-poi.version>
 
 		<!-- Apache Jena - Java framework for building Semantic Web and Linked
 		Data applications -->
@@ -219,7 +218,7 @@
 		<!-- Saxon - XSLT and XQuery Processor -->
 		<saxon-he.version>9.7.0-15</saxon-he.version>
 
-		<!-- NetCDF (nothing to upate) -->
+		<!-- NetCDF (nothing to update) -->
 		<netcdf.version>5.5.3</netcdf.version>
 
 		<!-- Sesame (project moved to Rio API) -->
@@ -423,6 +422,9 @@
 		<!-- Jetty servlets VULN-UPDATE -->
 		<eclipse.jetty.version>9.4.58.v20250814</eclipse.jetty.version>
 
+		<!-- Commons IO VULN-UPDATE-->
+		<commons-io.version>2.21.0</commons-io.version>
+
         <!-- Surefire args -->
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
@@ -437,6 +439,12 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>com.mchange</groupId>
