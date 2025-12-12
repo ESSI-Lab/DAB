@@ -271,6 +271,9 @@
 		<!-- Quartz VULN-UPDATE -->
 		<quartz.version>2.5.2</quartz.version>
 
+		<!-- Required for Quartz VULN-UPDATE -->
+		<com.change.c3p0.version>0.11.2</com.change.c3p0.version>
+
 		<!-- MySQL -->
 		<mysql.connector.version>8.3.0</mysql.connector.version>
 
@@ -434,6 +437,12 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+			<dependency>
+				<groupId>com.mchange</groupId>
+				<artifactId>c3p0</artifactId>
+				<version>${com.change.c3p0.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.opensearch.client</groupId>
@@ -798,6 +807,10 @@
 					<exclusion>
 						<groupId>com.fasterxml.jackson.core</groupId>
 						<artifactId>jackson-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.guava</groupId>
+						<artifactId>guava</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
