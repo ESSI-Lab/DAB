@@ -28,10 +28,32 @@ import org.opensearch.search.builder.SearchSourceBuilder;
 
 public class ESSearch {
 
+    /**
+     * @return
+     */
+    private static String getUser() {
+
+	return System.getProperty("els.main.user");
+    }
+
+    /**
+     * @return
+     */
+    private static String getPassword() {
+
+	return System.getProperty("els.main.password");
+    }
+
+    /**
+     * 
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
 
 	CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-	credentialsProvider.setCredentials(AuthScope.ANY, new org.apache.http.auth.UsernamePasswordCredentials("admin", "admin"));
+	credentialsProvider.setCredentials(AuthScope.ANY, new org.apache.http.auth.UsernamePasswordCredentials(
+		getUser(), getPassword()));
 
 	RestHighLevelClient client = new RestHighLevelClient(
 		RestClient.builder(new HttpHost("localhost", 9200, "http")).setHttpClientConfigCallback(new HttpClientConfigCallback() {
