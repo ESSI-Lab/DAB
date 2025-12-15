@@ -157,8 +157,8 @@ public class HISCentralLazioMapper extends FileIdentifierMapper {
 	
 	
 
-	Double pointLon = datasetInfo.optDouble("longitude");
-	Double pointLat = datasetInfo.optDouble("latitude");
+	BigDecimal pointLon = datasetInfo.optBigDecimal("longitude", null);
+	BigDecimal pointLat = datasetInfo.optBigDecimal("latitude", null);
 	Double altitude = datasetInfo.optDouble("altitude");
 	
 	String locality = datasetInfo.optString("locality");
@@ -305,10 +305,10 @@ public class HISCentralLazioMapper extends FileIdentifierMapper {
 	
 	if (pointLat != null && pointLon != null) {
 	    coreMetadata.addBoundingBox(//
-		    new BigDecimal(pointLat), //
-		    new BigDecimal(pointLon), //
-		    new BigDecimal(pointLat), //
-		    new BigDecimal(pointLon));
+		    pointLat, //
+		    pointLon, //
+		    pointLat, //
+		    pointLon);
 	}
 
 
