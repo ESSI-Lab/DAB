@@ -453,6 +453,32 @@
 		<dependencies>
 
 			<dependency>
+				<groupId>org.opensearch.client</groupId>
+				<artifactId>opensearch-java</artifactId>
+				<version>${opensearch.client-opensearch-java.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.opensearch.client</groupId>
+				<artifactId>opensearch-rest-client</artifactId>
+				<version>${opensearch.client-opensearch-rest-client.version}</version>
+			</dependency>
+
+			<!-- required after CXF version VULN-UPDATE -->
+			<dependency>
+				<groupId>jakarta.json.bind</groupId>
+				<artifactId>jakarta.json.bind-api</artifactId>
+				<version>${jakarta.json.bind-api.version}</version>
+			</dependency>
+
+			<!-- required after CXF version VULN-UPDATE -->
+			<dependency>
+				<groupId>jakarta.json</groupId>
+				<artifactId>jakarta.json-api</artifactId>
+				<version>${jakarta.json-api.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>com.nimbusds</groupId>
 				<artifactId>nimbus-jose-jwt</artifactId>
 				<version>${nimbus-jose-jwt.version}</version>
@@ -892,20 +918,35 @@
 				<version>${aws-java-sdk-bom.version}</version>
 				<type>pom</type>
 			</dependency>
+
+			<dependency>
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>auth</artifactId>
+				<version>${aws-java-sdk-bom.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>software.amazon.awssdk</groupId>
 				<artifactId>cloudwatchlogs</artifactId>
 				<version>${aws-java-sdk-bom.version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>software.amazon.awssdk</groupId>
 				<artifactId>s3-transfer-manager</artifactId>
 				<version>${aws-java-sdk-bom.version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>software.amazon.awssdk.crt</groupId>
 				<artifactId>aws-crt</artifactId>
 				<version>${aws-crt.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>apache-client</artifactId>
+				<version>${aws-java-sdk-bom.version}</version>
 			</dependency>
 
 			<!-- OGC Schemas from Aleksei Valikov -->
@@ -1365,31 +1406,17 @@
                 <version>${ftpserver-core.version}</version>
             </dependency>
 
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jackson-core.version}</version>
+			</dependency>
+
 		</dependencies>
 
 	</dependencyManagement>
 
 	<dependencies>
-
-		<!-- required after CXF version VULN-UPDATE -->
-		<dependency>
-			<groupId>jakarta.json.bind</groupId>
-			<artifactId>jakarta.json.bind-api</artifactId>
-			<version>${jakarta.json.bind-api.version}</version>
-		</dependency>
-
-		<!-- required after CXF version VULN-UPDATE -->
-		<dependency>
-			<groupId>jakarta.json</groupId>
-			<artifactId>jakarta.json-api</artifactId>
-			<version>${jakarta.json-api.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>${jackson-core.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
