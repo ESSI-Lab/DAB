@@ -59,7 +59,7 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 
     public static final String MISSING_VALUE = "-9999";
-    
+
     public static final String ORGANIZATION = "Dipartimento Rischi Naturali e Ambientali";
 
     private SimpleDateFormat iso8601Format;
@@ -187,8 +187,8 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 	    String puntoMisuraUrl = datasetInfo.optString(varType);
 
 	    String stationName = datasetInfo.getString("denominazione").replaceAll("\\s+$", "");
-	    Double lat = datasetInfo.optDouble("latitudine_n_wgs84_d");
-	    Double lon = datasetInfo.optDouble("longitudine_e_wgs84_d");
+	    BigDecimal lat = datasetInfo.optBigDecimal("latitudine_n_wgs84_d", null);
+	    BigDecimal lon = datasetInfo.optBigDecimal("longitudine_e_wgs84_d", null);
 	    Double alt = datasetInfo.optDouble("quota_stazione");
 	    String stationType = datasetInfo.optString("tipo_staz").replaceAll("\\s+$", "");
 	    String stationCode = datasetInfo.optString("codice_stazione").replaceAll("\\s+$", "");
@@ -322,10 +322,10 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 	    //
 	    // responsible party
 	    //
-	     ResponsibleParty publisherContact = new ResponsibleParty();	  
-	     publisherContact.setOrganisationName(ORGANIZATION);
-	     publisherContact.setRoleCode("publisher");	      
-	     coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(publisherContact);
+	    ResponsibleParty publisherContact = new ResponsibleParty();
+	    publisherContact.setOrganisationName(ORGANIZATION);
+	    publisherContact.setRoleCode("publisher");
+	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(publisherContact);
 
 	    //
 	    // keywords
@@ -350,10 +350,10 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 
 	    if (lat != null && lon != null) {
 		coreMetadata.addBoundingBox(//
-			new BigDecimal(lat), //
-			new BigDecimal(lon), //
-			new BigDecimal(lat), //
-			new BigDecimal(lon));
+			lat, //
+			lon, //
+			lat, //
+			lon);
 	    }
 
 	    if (alt != null)
