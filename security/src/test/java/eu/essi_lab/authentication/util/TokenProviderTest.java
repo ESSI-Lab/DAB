@@ -12,6 +12,8 @@ import eu.essi_lab.authentication.token.Token;
 import eu.essi_lab.authentication.token.TokenProvider;
 import eu.essi_lab.model.exceptions.GSException;
 
+import java.util.*;
+
 public class TokenProviderTest {
 
     @Rule
@@ -88,14 +90,21 @@ public class TokenProviderTest {
 
     @Test
     public void verifyInvalidToken() {
-	String invalidToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImVsdmlzIiwiZW1haWwiOiJ0aGVraW5nQGhlbGwub3JnIn0.PGO3QCci-YOkKqmC7K3SLqRMW3QQB8ba55yyOq7KZrA";
-	boolean result = tokenProvider.isValid(invalidToken);
+	boolean result = tokenProvider.isValid(UUID.randomUUID().toString());
 	Assert.assertFalse(result);
+    }
+
+    /**
+     * @return
+     */
+    private static String getValidToken() {
+
+	return System.getProperty("token");
     }
 
     @Test
     public void verifyValidToken() {
-	String validToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRoZW50aWNhdGlvbi1wcm92aWRlciI6InNlcnZpY2VQcm92aWRlciIsImVtYWlsIjoiZW1haWwifQ.3yo5w2H3HBHBWzvBRyBLwpEkTkWkyzUgrSHvcmNTl3g";
+	String validToken = getValidToken();
 	boolean result = tokenProvider.isValid(validToken);
 	Assert.assertTrue(result);
     }
