@@ -74,7 +74,7 @@ public abstract class IndexedElementsGroup {
      */
     protected static boolean checkStringValue(String value) {
 
-	return value != null && !value.equals("");
+	return value != null && !value.isEmpty();
     }
 
     /**

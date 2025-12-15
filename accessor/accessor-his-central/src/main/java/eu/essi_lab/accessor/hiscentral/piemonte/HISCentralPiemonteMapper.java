@@ -38,6 +38,7 @@ import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
+import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -58,6 +59,8 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 
     public static final String MISSING_VALUE = "-9999";
+    
+    public static final String ORGANIZATION = "Dipartimento Rischi Naturali e Ambientali";
 
     private SimpleDateFormat iso8601Format;
 
@@ -319,20 +322,10 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 	    //
 	    // responsible party
 	    //
-	    // ResponsibleParty publisherContact = new ResponsibleParty();
-	    //
-	    // publisherContact.setOrganisationName(organisationName);
-	    // publisherContact.setRoleCode("publisher");
-	    //
-	    // Contact contact = new Contact();
-	    //
-	    // Address address = new Address();
-	    // address.addElectronicMailAddress(contactInfo);
-	    // contact.setAddress(address);
-	    //
-	    // publisherContact.setContactInfo(contact);
-	    //
-	    // coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(publisherContact);
+	     ResponsibleParty publisherContact = new ResponsibleParty();	  
+	     publisherContact.setOrganisationName(ORGANIZATION);
+	     publisherContact.setRoleCode("publisher");	      
+	     coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(publisherContact);
 
 	    //
 	    // keywords

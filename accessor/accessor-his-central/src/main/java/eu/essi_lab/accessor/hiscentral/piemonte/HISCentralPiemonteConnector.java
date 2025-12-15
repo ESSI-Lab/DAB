@@ -93,19 +93,33 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 
     public enum PIEMONTE_Variable {
 
-	TMEDIA("Temperatura", "tmedia", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
-	TMAX("Temperatura", "tmax", "°C", InterpolationType.MAX, PiemonteStationType.METEO), //
-	TMIN("Temperatura", "tmin", "°C", InterpolationType.MIN, PiemonteStationType.METEO), //
-	UMIN("Umidità", "umin", "%", InterpolationType.MIN, PiemonteStationType.METEO), //
-	UMMEDIA("Umidità", "umedia", "%", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
-	UMAX("Umidità", "umax", "%", InterpolationType.MAX, PiemonteStationType.METEO), //
+	TMEDIA("Temperatura dell'aria", "tmedia", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
+	TMAX("Temperatura dell'aria", "tmax", "°C", InterpolationType.MAX, PiemonteStationType.METEO), //
+	TMIN("Temperatura dell'aria", "tmin", "°C", InterpolationType.MIN, PiemonteStationType.METEO), //
+	GRADI18("Gradi giorno","hdd_base18", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO),
+	GRADI20("Gradi giorno","hdd_base20", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO),
+	GRADICOOL("Gradi giorno","cdd_base20", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO),
+	UMIN("Umidità relativa", "umin", "%", InterpolationType.MIN, PiemonteStationType.METEO), //
+	UMMEDIA("Umidità relativa", "umedia", "%", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
+	UMAX("Umidità relativa", "umax", "%", InterpolationType.MAX, PiemonteStationType.METEO), //
 	VMEDIA("Velocità del vento", "vmedia", "m/s", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
 	VRAFFICA("Velocità del vento", "vraffica", "m/s", InterpolationType.MAX, PiemonteStationType.METEO), //
-	PTOT("Precipitazione", "ptot", "cm", InterpolationType.TOTAL, PiemonteStationType.METEO), //
+	PTOT("Precipitazione", "ptot", "mm", InterpolationType.TOTAL, PiemonteStationType.METEO), //
 	RADD("Radiazione", "rtot", "MJ/m²", InterpolationType.TOTAL, PiemonteStationType.METEO), //
-
-	PORTATA("Portata", "portatamedia", "m³/s", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
-	IDRO("Livello", "livellomedio", "m", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
+	DIRV("Direzione del vento", "settore_prevalente", "degrees", InterpolationType.TOTAL, PiemonteStationType.METEO), //
+	TEMPPERM("Direzione del vento", "tempo_permanenza", "minutes", InterpolationType.TOTAL, PiemonteStationType.METEO), //
+	DURATACALMA("Velocità del vento", "durata_calma", "minutes", InterpolationType.TOTAL, PiemonteStationType.METEO), //
+	
+	PRESSIONEMEDIA("Pressione atmosferica", "bmedia", "hPa", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
+	PRESSIONEMEDIASML("Pressione atmosferica", "bmedia_slm", "hPa", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
+	
+	
+	
+	PORTATA("Portata fiume", "portatamedia", "m³/s", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
+	PORTATA1("Portata canale", "portatamedia1", "m³/s", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
+	PORTATANAT("Portata naturale", "portatamediat", "m³/s", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
+	IDRO("Livello idrometrico", "livellomedio", "m", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
+	IDRO1("Livello idrometrico canale", "livellomedio1", "m", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
 
 	HS("Altezza neve dal suolo", "hs", "cm", InterpolationType.MAX, PiemonteStationType.SNOW), //
 	HN("Altezza neve fresca", "hn", "cm", InterpolationType.TOTAL, PiemonteStationType.SNOW); //
@@ -304,9 +318,12 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 			    varPrint.add(paramId);
 			    if (paramId.equals("IDRO")) {
 				varList.add(PIEMONTE_Variable.IDRO);
+				varList.add(PIEMONTE_Variable.IDRO1);
 			    }
 			    if (paramId.equals("PORTATA")) {
 				varList.add(PIEMONTE_Variable.PORTATA);
+				varList.add(PIEMONTE_Variable.PORTATA1);
+				varList.add(PIEMONTE_Variable.PORTATANAT);
 			    }
 			    if (paramId.equals("PLUV")) {
 				varList.add(PIEMONTE_Variable.PTOT);
@@ -315,6 +332,9 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 				varList.add(PIEMONTE_Variable.TMAX);
 				varList.add(PIEMONTE_Variable.TMIN);
 				varList.add(PIEMONTE_Variable.TMEDIA);
+				varList.add(PIEMONTE_Variable.GRADI18);
+				varList.add(PIEMONTE_Variable.GRADI20);
+				varList.add(PIEMONTE_Variable.GRADICOOL);
 			    }
 			    if (paramId.equals("IGRO")) {
 				varList.add(PIEMONTE_Variable.UMIN);
@@ -329,6 +349,20 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 				varList.add(PIEMONTE_Variable.RADD);
 				// varList.add(PIEMONTE_METEOVariable.VRAFFICA);
 			    }
+			    
+			    if (paramId.equals("DIRV")) {
+				varList.add(PIEMONTE_Variable.DIRV);
+				varList.add(PIEMONTE_Variable.TEMPPERM);
+				varList.add(PIEMONTE_Variable.DURATACALMA);
+				// varList.add(PIEMONTE_METEOVariable.VRAFFICA);
+			    }
+			    
+			    if (paramId.equals("BARO")) {
+				varList.add(PIEMONTE_Variable.PRESSIONEMEDIA);
+				varList.add(PIEMONTE_Variable.PRESSIONEMEDIASML);
+				// varList.add(PIEMONTE_METEOVariable.VRAFFICA);
+			    }
+
 
 			}
 			

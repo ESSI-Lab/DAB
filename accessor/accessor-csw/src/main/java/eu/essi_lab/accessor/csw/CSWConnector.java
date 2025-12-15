@@ -424,10 +424,16 @@ public class CSWConnector extends WrappedConnector {
      * @param ret
      * @param optional
      */
-    protected void toOriginalMetadataFromAnies(ListRecordsResponse<OriginalMetadata> ret, Optional<List<Object>> optional) {
+    protected void toOriginalMetadataFromAnies(//
+	    ListRecordsResponse<OriginalMetadata> ret,//
+	    Optional<List<Object>> optional) {//
 
-	optional.ifPresent(
-		anies -> anies.stream().map(object -> objectToOriginalMetadata(object)).filter(Objects::nonNull).forEach(ret::addRecord));
+	optional.ifPresent( //
+		anies -> anies.//
+			stream().//
+			map(object -> objectToOriginalMetadata(object)).//
+			filter(Objects::nonNull).//
+			forEach(ret::addRecord));//
 
     }
 
@@ -435,7 +441,8 @@ public class CSWConnector extends WrappedConnector {
      * @param ret
      * @param optional
      */
-    protected void toOriginalMetadataFromAbstractRecords(ListRecordsResponse<OriginalMetadata> ret,
+    protected void toOriginalMetadataFromAbstractRecords(//
+	    ListRecordsResponse<OriginalMetadata> ret,//
 	    Optional<List<JAXBElement<? extends AbstractRecordType>>> optional) {
 
 	optional.ifPresent(abstractRecords -> abstractRecords.stream().map(elem ->
@@ -453,7 +460,8 @@ public class CSWConnector extends WrappedConnector {
 	    }
 	}
 
-	).filter(Objects::nonNull).forEach(ret::addRecord));
+	).filter(Objects::nonNull).//
+		forEach(ret::addRecord));
     }
 
     protected OriginalMetadata objectToOriginalMetadata(Object object) {

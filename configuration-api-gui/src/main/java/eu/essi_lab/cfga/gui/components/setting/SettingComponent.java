@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -31,8 +31,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.vaadin.componentfactory.ToggleButton;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
@@ -193,12 +193,10 @@ public class SettingComponent extends Div {
 
 	setId("setting-component-" + getSetting().getName());
 
-	setHeightFull();
 	setWidthFull();
 
 	getStyle().set("background-color", "white");
-	getStyle().set("padding", "4px");
-	getStyle().set("border-radius", "5px");
+ 	getStyle().set("border-radius", "5px");
 	getStyle().set("margin-top", "0px");
 
 	radioMap = new HashMap<>();
