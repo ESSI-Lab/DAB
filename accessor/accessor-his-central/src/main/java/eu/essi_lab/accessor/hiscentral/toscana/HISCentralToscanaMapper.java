@@ -204,13 +204,13 @@ public class HISCentralToscanaMapper extends FileIdentifierMapper {
 	    }
 
 	    // bbox
-	    Double lat = null;
-	    Double lon = null;
+	    BigDecimal lat = null;
+	    BigDecimal lon = null;
 	    coordinates = coordinates.replace("[", "").replace("]", "");
 	    String[] splittedCoord = coordinates.split(",");
 	    if (splittedCoord.length > 1) {
-		lon = Double.valueOf(splittedCoord[0]);
-		lat = Double.valueOf(splittedCoord[1]);
+		lon = new BigDecimal(splittedCoord[0]);
+		lat = new BigDecimal(splittedCoord[1]);
 	    }
 
 	    CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
@@ -250,10 +250,10 @@ public class HISCentralToscanaMapper extends FileIdentifierMapper {
 	    // bbox    
 	    if (lat != null && lon != null) {
 		coreMetadata.addBoundingBox(//
-			new BigDecimal(lat), //
-			new BigDecimal(lon), //
-			new BigDecimal(lat), //
-			new BigDecimal(lon));
+			lat, //
+			lon, //
+			lat, //
+			lon);
 	    }
 
 	    // platform
