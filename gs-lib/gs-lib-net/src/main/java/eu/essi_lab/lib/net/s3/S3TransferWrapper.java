@@ -462,7 +462,7 @@ public class S3TransferWrapper {
      * @param destination
      * @throws MalformedURLException
      */
-    public boolean download(String bucketName, String objectKey, File destination) throws MalformedURLException {
+    public boolean download(String bucketName, String objectKey, File destination){
 
 	if (getObjectDate(bucketName, objectKey) == null) {
 	    return false;

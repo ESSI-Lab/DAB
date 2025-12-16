@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.conf.task;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -62,17 +62,17 @@ import eu.essi_lab.model.exceptions.GSException;
 public class ErrorLogsPublisherTask extends AbstractCustomTask implements ErrorLogListener {
 
     /**
-     * 
+     *
      */
     private static final File LOGS_FOLDER = new File(IOStreamUtils.getUserTempDirectory() + File.separator + "errorLogs");
 
     /**
-     * 
+     *
      */
     private static final String ERROR_LOGS_MAP_PATH = LOGS_FOLDER + File.separator + "errorLogsMap";
 
     /**
-     * 
+     *
      */
     private static final String ERROR_LOGS_BUCKET_NAME = "gip-error-logs";
 
@@ -271,15 +271,8 @@ public class ErrorLogsPublisherTask extends AbstractCustomTask implements ErrorL
 		    filter(s -> daysBeforeLogs ? !s.key().contains(ISO8601DateTimeUtils.getISO8601Date()) : true).//
 		    forEach(summary -> {
 
-			try {
-
-			    manager.get().download(ERROR_LOGS_BUCKET_NAME, summary.key(), new File(LOGS_FOLDER, summary.key()));
-
-			} catch (MalformedURLException e) {
-
-			    e.printStackTrace();
-			}
-		    });
+		manager.get().download(ERROR_LOGS_BUCKET_NAME, summary.key(), new File(LOGS_FOLDER, summary.key()));
+	    });
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Downloading error log files from S3 ENDED");
 	}
