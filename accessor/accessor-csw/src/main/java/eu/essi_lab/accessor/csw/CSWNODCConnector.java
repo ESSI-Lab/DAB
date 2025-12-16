@@ -149,7 +149,7 @@ public class CSWNODCConnector extends CSWGetConnector {
 
 		    GSLoggerFactory.getLogger(getClass()).info("Global metadata found: {}", requestURL);
 
-		    Optional<S3TransferWrapper> optS3TransferManager = ConfigurationWrapper.getS3TransferManager();
+		    Optional<S3TransferWrapper> optS3TransferManager = ConfigurationWrapper.getS3TransferWrapper();
 
 		    if (optS3TransferManager.isPresent()) {
 

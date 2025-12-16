@@ -1019,7 +1019,7 @@ public class ConfigurationWrapper {
     /**
      * @return
      */
-    public static Optional<S3TransferWrapper> getS3TransferManager() {
+    public static Optional<S3TransferWrapper> getS3TransferWrapper() {
 
 	if (getDownloadSetting().getDownloadStorage() == DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
 
@@ -1028,13 +1028,18 @@ public class ConfigurationWrapper {
 
 	String accessKey = getDownloadSetting().getS3StorageSetting().getAccessKey().get();
 	String secretKey = getDownloadSetting().getS3StorageSetting().getSecretKey().get();
+
 	Optional<String> endpoint = getDownloadSetting().getS3StorageSetting().getEndpoint();
 
 	S3TransferWrapper manager = new S3TransferWrapper();
+
 	manager.setAccessKey(accessKey);
 	manager.setSecretKey(secretKey);
+
 	endpoint.ifPresent(manager::setEndpoint);
+
 	manager.initialize();
+
 	return Optional.of(manager);
     }
 

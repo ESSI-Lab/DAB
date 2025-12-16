@@ -87,7 +87,7 @@ public abstract class AbstractCustomTask implements CustomTask {
 
 	if (this.manager == null) {
 
-	    Optional<S3TransferWrapper> optional = ConfigurationWrapper.getS3TransferManager();
+	    Optional<S3TransferWrapper> optional = ConfigurationWrapper.getS3TransferWrapper();
 
 	    this.manager = optional;
 	}
