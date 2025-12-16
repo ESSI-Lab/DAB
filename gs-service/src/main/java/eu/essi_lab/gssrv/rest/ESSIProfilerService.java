@@ -1,5 +1,7 @@
 package eu.essi_lab.gssrv.rest;
 
+import java.io.IOException;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -22,6 +24,7 @@ package eu.essi_lab.gssrv.rest;
  */
 
 import javax.jws.WebService;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -33,6 +36,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import com.amazonaws.util.IOUtils;
 
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 
