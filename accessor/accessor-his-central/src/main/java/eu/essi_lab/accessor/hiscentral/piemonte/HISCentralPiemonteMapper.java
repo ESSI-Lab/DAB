@@ -469,8 +469,14 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		    o.setProtocol(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI);
 		    distribution.addDistributionOnline(o);
 
+		} else {
+		    GSLoggerFactory.getLogger(this.getClass()).warn("Last path url {}: ", lastPath);
+		    GSLoggerFactory.getLogger(this.getClass()).warn("Error reading key {}: ", stationName);
 		}
 
+	    } else {
+		GSLoggerFactory.getLogger(this.getClass()).warn("!!!SHOULD NOT HAPPEN");
+		GSLoggerFactory.getLogger(this.getClass()).warn("Error reading key {}: ", stationName);
 	    }
 
 	    // if (tempExtenBegin.contains("+")) {
@@ -531,7 +537,8 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		break;
 	    }
 	    if (pId.equals("TERMA") && (PIEMONTE_Variable.TMAX.name().equals(paramId) || PIEMONTE_Variable.TMIN.name().equals(paramId)
-		    || PIEMONTE_Variable.TMEDIA.name().equals(paramId))) {
+		    || PIEMONTE_Variable.TMEDIA.name().equals(paramId) || PIEMONTE_Variable.GRADI18.name().equals(paramId) || PIEMONTE_Variable.GRADI20.name().equals(paramId)
+		    || PIEMONTE_Variable.GRADICOOL.name().equals(paramId))) {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
@@ -549,11 +556,19 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
-	    if (pId.equals("IDRO") && PIEMONTE_Variable.IDRO.name().equals(paramId)) {
+	    if (pId.equals("IDRO") && (PIEMONTE_Variable.IDRO.name().equals(paramId) || PIEMONTE_Variable.IDRO1.name().equals(paramId))) {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
-	    if (pId.equals("PORTATA") && PIEMONTE_Variable.PORTATA.name().equals(paramId)) {
+	    if (pId.equals("PORTATA") && (PIEMONTE_Variable.PORTATA.name().equals(paramId) || PIEMONTE_Variable.PORTATA1.name().equals(paramId) || PIEMONTE_Variable.PORTATANAT.name().equals(paramId))) {
+		sensorUrl = variables.getJSONObject(k).optString("url");
+		break;
+	    }
+	    if (pId.equals("DIRV") && (PIEMONTE_Variable.DIRV.name().equals(paramId) || PIEMONTE_Variable.TEMPPERM.name().equals(paramId) || PIEMONTE_Variable.DURATACALMA.name().equals(paramId))) {
+		sensorUrl = variables.getJSONObject(k).optString("url");
+		break;
+	    }
+	    if (pId.equals("BARO") && (PIEMONTE_Variable.PRESSIONEMEDIA.name().equals(paramId) || PIEMONTE_Variable.PRESSIONEMEDIASML.name().equals(paramId))) {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
