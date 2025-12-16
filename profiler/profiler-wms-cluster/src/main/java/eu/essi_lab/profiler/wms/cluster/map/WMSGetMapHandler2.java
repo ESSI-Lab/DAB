@@ -972,14 +972,6 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    instrumentTitle.get()));
 	}
 
-	Optional<String> platformTitle = parser.getOptionalValue("platformTitle");
-	if (platformTitle.isPresent() && !platformTitle.get().equals(KeyValueParser.UNDEFINED)) {
-
-	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
-		    BondOperator.EQUAL, //
-		    MetadataElement.PLATFORM_TITLE, //
-		    platformTitle.get()));
-	}
 
 	Optional<String> observedPropertyURI = parser.getOptionalValue("observedPropertyURI");
 	if (observedPropertyURI.isPresent() && !observedPropertyURI.get().equals(KeyValueParser.UNDEFINED)) {
@@ -1110,12 +1102,12 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    String[] split = value.split(",");
 		    LogicalBond orBond = BondFactory.createOrBond();
 		    for (String s : split) {
-			SimpleValueBond sourceBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, s);
+			SimpleValueBond sourceBond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, element, s);
 			orBond.getOperands().add(sourceBond);
 		    }
 		    andBond.getOperands().add(orBond);
 		} else {
-		    SimpleValueBond sourceBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, value);
+		    SimpleValueBond sourceBond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, element, value);
 		    andBond.getOperands().add(sourceBond);
 		}
 
