@@ -96,8 +96,10 @@ public class DataloggersDownloader extends WMLDataDownloader {
     @Override
     public void setOnlineResource(GSResource resource, String onlineResourceId) throws GSException {
 	super.setOnlineResource(resource, onlineResourceId);
-	this.connector.setSourceURL(resource.getSource().getEndpoint());
-	this.client = new DataloggersClient(resource.getSource().getEndpoint());
+	if (online.getProtocol().equals(CommonNameSpaceContext.DATALOGGERS_NS_URI)) {
+	    this.connector.setSourceURL(resource.getSource().getEndpoint());
+	    this.client = new DataloggersClient(resource.getSource().getEndpoint());
+	}
     }
 
     @Override
@@ -243,8 +245,7 @@ public class DataloggersDownloader extends WMLDataDownloader {
 
 		    if (dataResponse.getContent() != null && dataResponse.getContent().getFeatures() != null) {
 			for (Feature feature : dataResponse.getContent().getFeatures()) {
-			    if (feature.getProperties() != null
-				    && feature.getProperties().getAdditionalAttributes() != null
+			    if (feature.getProperties() != null && feature.getProperties().getAdditionalAttributes() != null
 				    && feature.getProperties().getAdditionalAttributes().getMeasurement() != null) {
 
 				Measurement measurement = feature.getProperties().getAdditionalAttributes().getMeasurement();
@@ -289,4 +290,3 @@ public class DataloggersDownloader extends WMLDataDownloader {
     }
 
 }
-
