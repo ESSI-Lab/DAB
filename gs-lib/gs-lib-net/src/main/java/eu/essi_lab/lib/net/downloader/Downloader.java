@@ -10,67 +10,46 @@ package eu.essi_lab.lib.net.downloader;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Authenticator;
-import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
-import java.net.Socket;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpClient.Builder;
-import java.net.http.HttpClient.Redirect;
-import java.net.http.HttpClient.Version;
-import java.net.http.HttpHeaders;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import dev.failsafe.*;
+import dev.failsafe.function.*;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.*;
+import eu.essi_lab.lib.net.utils.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.exceptions.*;
+import org.apache.commons.io.*;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509ExtendedTrustManager;
-
-import org.apache.commons.io.IOUtils;
-
-import dev.failsafe.Failsafe;
-import dev.failsafe.FailsafeException;
-import dev.failsafe.RetryPolicy;
-import dev.failsafe.function.CheckedPredicate;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
-import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.exceptions.GSException;
+import javax.net.ssl.*;
+import java.io.*;
+import java.net.*;
+import java.net.http.*;
+import java.net.http.HttpClient.*;
+import java.nio.charset.*;
+import java.security.*;
+import java.time.*;
+import java.time.temporal.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
  */
 public class Downloader {
+
+    /**
+     *
+     */
+    public static final String DEFAULT_KEY_STORE_TYPE = "PKCS12";
 
     /**
      * 30 seconds
@@ -83,37 +62,37 @@ public class Downloader {
     private static final long DEFAULT_REPONSE_TIMEOUT = 60;
 
     /**
-     * 
+     *
      */
     private Long connectionTimeout;
 
     /**
-     * 
+     *
      */
     private Long responseTimeout;
 
     /**
-     * 
+     *
      */
     private Version version;
 
     /**
-     * 
+     *
      */
     private HttpRequest request;
 
     /**
-     * 
+     *
      */
     private RetryPolicy<HttpResponse<InputStream>> retryPolicy;
 
     /**
-     * 
+     *
      */
     private Redirect redirect;
 
     /**
-     * 
+     *
      */
     public Downloader() {
 
@@ -132,9 +111,9 @@ public class Downloader {
     }
 
     /**
-     * Set a retry policy with the given attempts and delay and with a retry condition which is approved if the
-     * {@link HttpResponse} returns a status code different from 200
-     * 
+     * Set a retry policy with the given attempts and delay and with a retry condition which is approved if the {@link HttpResponse} returns
+     * a status code different from 200
+     *
      * @param delayTimeUnit
      * @param attempts
      * @param delay
@@ -165,11 +144,11 @@ public class Downloader {
 		withDelay(Duration.ofSeconds(delayTimeUnit.toSeconds(delay))).//
 		withMaxAttempts(attempts).//
 		onRetry(e -> {
-		    GSLoggerFactory.getLogger(getClass()).warn("Failure #{}. Retrying...", e.getAttemptCount());
-		}).//
+	    GSLoggerFactory.getLogger(getClass()).warn("Failure #{}. Retrying...", e.getAttemptCount());
+	}).//
 		onRetriesExceeded(e -> {
-		    GSLoggerFactory.getLogger(getClass()).warn("Failed to connect. Max retries exceeded");
-		}).//
+	    GSLoggerFactory.getLogger(getClass()).warn("Failed to connect. Max retries exceeded");
+	}).//
 		build());
     }
 
@@ -441,8 +420,8 @@ public class Downloader {
 		username, //
 		password, //
 		null, //
-		null, //
-		null);
+		null //
+	);
     }
 
     /**
@@ -468,7 +447,7 @@ public class Downloader {
      */
     public HttpResponse<InputStream> downloadResponse(HttpRequest request) throws FailsafeException, IOException, InterruptedException {
 
-	return downloadResponse(request, null, null);
+	return downloadResponse(request, null, null, null, null);
     }
 
     /**
@@ -476,6 +455,7 @@ public class Downloader {
      * @param username
      * @param password
      * @return
+     * @throws FailsafeException
      * @throws IOException
      * @throws InterruptedException
      */
@@ -484,35 +464,34 @@ public class Downloader {
 	    String username, //
 	    String password) throws FailsafeException, IOException, InterruptedException {
 
-	return downloadResponse(request, username, password, null, null, null);
+	return downloadResponse(request, username, password, null, null);
     }
 
     /**
      * @param request
      * @param keystore
      * @param keystorePassword
-     * @param certificatePassword
      * @return
+     * @throws FailsafeException
      * @throws IOException
      * @throws InterruptedException
      */
     public HttpResponse<InputStream> downloadResponse(//
 	    HttpRequest request, //
 	    InputStream keystore, //
-	    String keystorePassword, //
-	    String certificatePassword) throws FailsafeException, IOException, InterruptedException {
+	    String keystorePassword) throws FailsafeException, IOException, InterruptedException {
 
-	return downloadResponse(request, null, null, keystore, keystorePassword, certificatePassword);
+	return downloadResponse(request, null, null, keystore, keystorePassword);
     }
 
     /**
      * @param request
      * @param username
      * @param password
-     * @param keystore
-     * @param keystorePassword
-     * @param certificatePassword
+     * @param trustStore
+     * @param trustStorePwd
      * @return
+     * @throws FailsafeException
      * @throws IOException
      * @throws InterruptedException
      */
@@ -520,21 +499,19 @@ public class Downloader {
 	    HttpRequest request, //
 	    String username, //
 	    String password, //
-	    InputStream keystore, //
-	    String keystorePassword, //
-	    String certificatePassword) throws FailsafeException, IOException, InterruptedException {
+	    InputStream trustStore, //
+	    String trustStorePwd) throws FailsafeException, IOException, InterruptedException {
 
 	GSLoggerFactory.getLogger(getClass()).trace("Execution of {} STARTED", request.uri().toString());
 
 	HttpClient client = createHttpClient(//
-		request.uri().toURL().getProtocol().toLowerCase().equals("https"), //
+		request.uri().toURL().getProtocol().equalsIgnoreCase("https"), //
 		request.uri().toURL().getHost(), //
 		request.uri().toURL().getPort(), //
 		username, //
 		password, //
-		keystore, //
-		keystorePassword, //
-		certificatePassword);
+		trustStore, //
+		trustStorePwd);
 
 	// set the response timeout to the request
 	java.net.http.HttpRequest.Builder requestBuilder = HttpRequestUtils.fromRequest(request);
@@ -565,28 +542,28 @@ public class Downloader {
      * @return
      */
     private String[] getUserInfo(String url) {
-    
-        String user = null;
-        String pwd = null;
-    
-        try {
-    
-            String userInfo = new URL(url).getUserInfo();
-    
-            if (userInfo != null) {
-        	String[] split = userInfo.split(":");
-    
-        	if (split.length == 2) {
-        	    user = split[0];
-        	    pwd = split[1];
-        	}
-            }
-        } catch (MalformedURLException e) {
-    
-            GSLoggerFactory.getLogger(getClass()).error(e);
-        }
-    
-        return new String[] { user, pwd };
+
+	String user = null;
+	String pwd = null;
+
+	try {
+
+	    String userInfo = new URL(url).getUserInfo();
+
+	    if (userInfo != null) {
+		String[] split = userInfo.split(":");
+
+		if (split.length == 2) {
+		    user = split[0];
+		    pwd = split[1];
+		}
+	    }
+	} catch (MalformedURLException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
+	return new String[] { user, pwd };
     }
 
     /**
@@ -595,8 +572,8 @@ public class Downloader {
      * @param port
      * @param username
      * @param password
-     * @param keystore
-     * @param keystorePassword
+     * @param trustStoreStream
+     * @param trustStorePassword
      * @param certificatePassword
      * @return
      */
@@ -606,22 +583,16 @@ public class Downloader {
 	    int port, //
 	    String username, //
 	    String password, //
-	    InputStream keystore, //
-	    String keystorePassword, //
-	    String certificatePassword) {
+	    InputStream trustStoreStream, //
+	    String trustStorePassword) {
 
 	Builder builder = HttpClient.newBuilder().version(version);
-
-	//
-	// https://www.baeldung.com/java-httpclient-basic-auth
-	// https://dev.to/noelopez/http-client-api-in-java-part-2-75e#:~:text=Basic%20Authentication%20is%20a%20simple,in%20the%20Authorization%20HTTP%20header.
-	//
 
 	if (username != null && password != null) {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Using basic auth: {}-{}", username, password);
 
-	    builder = builder.authenticator(new Authenticator() {
+	    builder.authenticator(new Authenticator() {
 		@Override
 		protected PasswordAuthentication getPasswordAuthentication() {
 		    return new PasswordAuthentication(username, password.toCharArray());
@@ -629,49 +600,22 @@ public class Downloader {
 	    });
 	}
 
-	if (https) {
+	if (https && trustStoreStream != null) {
 
 	    try {
 
-		SSLContext sslContext = SSLContext.getInstance("SSL");
+		GSLoggerFactory.getLogger(getClass()).debug("Using trust store");
 
-		//
-		// https://stackoverflow.com/questions/52988677/allow-insecure-https-connection-for-java-jdk-11-httpclient
-		//
+		TrustManagerFactory tmf = getTrustManagerFactory(trustStoreStream, trustStorePassword);
 
-		if (keystore != null) {
+		SSLContext sslContext = SSLContext.getInstance("TLS");
 
-		    GSLoggerFactory.getLogger(getClass()).debug("Using key store");
+		sslContext.init(//
+			null, // key store, required only in case of HTTPS with mutual TLS (mTLS)
+			tmf.getTrustManagers(), //
+			null); // randomness source
 
-		    // certificatePassword seems to be not necessary
-		    if (certificatePassword == null) {
-			certificatePassword = "";
-		    }
-
-		    KeyStore keyStore = readStore(keystore, keystorePassword);
-
-		    KeyManagerFactory kmf = KeyManagerFactory.getInstance("PKIX");
-		    kmf.init(keyStore, keystorePassword.toCharArray());
-
-		    TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
-		    tmf.init(keyStore);
-
-		    sslContext.init(//
-			    kmf.getKeyManagers(), //
-			    tmf.getTrustManagers(), //
-			    new SecureRandom());
-
-		} else {
-
-		    TrustManager trustManager = createTrustManager();
-
-		    sslContext.init(//
-			    null, //
-			    new TrustManager[] { trustManager }, //
-			    new SecureRandom());
-		}
-
-		builder = builder.sslContext(sslContext);
+		builder.sslContext(sslContext);
 
 	    } catch (Exception ex) {
 
@@ -679,70 +623,38 @@ public class Downloader {
 	    }
 	}
 
-	builder = builder.connectTimeout(Duration.of((long) connectionTimeout, ChronoUnit.MILLIS));
+	builder.connectTimeout(Duration.of((long) connectionTimeout, ChronoUnit.MILLIS));
 
-	builder = builder.followRedirects(redirect);
+	builder.followRedirects(redirect);
 
-	HttpClient client = builder.build();
-
-	return client;
+	return builder.build();
     }
 
     /**
-     * https://medium.com/javarevisited/java-http-client-invalid-certificate-93673415fdec
-     * 
-     * @return
-     */
-    private X509ExtendedTrustManager createTrustManager() {
-
-	return new X509ExtendedTrustManager() {
-	    @Override
-	    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-		return new java.security.cert.X509Certificate[0];
-	    }
-
-	    @Override
-	    public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-	    }
-
-	    @Override
-	    public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws FailsafeException, CertificateException {
-	    }
-
-	    @Override
-	    public void checkClientTrusted(X509Certificate[] arg0, String arg1, Socket arg2) throws CertificateException {
-	    }
-
-	    @Override
-	    public void checkClientTrusted(X509Certificate[] arg0, String arg1, SSLEngine arg2) throws CertificateException {
-	    }
-
-	    @Override
-	    public void checkServerTrusted(X509Certificate[] arg0, String arg1, Socket arg2) throws CertificateException {
-
-	    }
-
-	    @Override
-	    public void checkServerTrusted(X509Certificate[] arg0, String arg1, SSLEngine arg2)
-		    throws FailsafeException, CertificateException {
-	    }
-	};
-    }
-
-    /**
-     * @param keyStoreStream
-     * @param keystorePassword
+     * @param stream
+     * @param pwd
      * @return
      * @throws Exception
      */
-    private KeyStore readStore(InputStream keyStoreStream, String keystorePassword) throws Exception {
-	if (keystorePassword == null) {
-	    keystorePassword = "";
+    private TrustManagerFactory getTrustManagerFactory(InputStream stream, String pwd) throws Exception {
+
+	char[] charArray = null;
+
+	if (pwd != null) {
+
+	    charArray = pwd.toCharArray();
 	}
 
-	KeyStore keyStore = KeyStore.getInstance("PKCS12"); // JKS or "PKCS12"
-	keyStore.load(keyStoreStream, keystorePassword.toCharArray());
-	keyStoreStream.close();
-	return keyStore;
+	KeyStore store = KeyStore.getInstance(DEFAULT_KEY_STORE_TYPE); // JKS or "PKCS12"
+	store.load(stream, charArray);
+
+	stream.close();
+
+	TrustManagerFactory tmf = TrustManagerFactory.getInstance(//
+		TrustManagerFactory.getDefaultAlgorithm());
+
+	tmf.init(store);
+
+	return tmf;
     }
 }
