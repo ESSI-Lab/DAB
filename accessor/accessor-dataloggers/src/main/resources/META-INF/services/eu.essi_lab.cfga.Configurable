@@ -1,7 +1,2 @@
-<<<<<<< HEAD
 eu.essi_lab.accessor.dataloggers.DataloggersAccessor
 eu.essi_lab.accessor.dataloggers.DataloggersConnector
-=======
-eu.essi_lab.accessor.dataloggers.DataloggersConnector
-eu.essi_lab.accessor.dataloggers.DataloggersAccessor
->>>>>>> branch 'main' of https://boldrini@essi-lab.eu/git/r/ESSI/DAB-private.git
