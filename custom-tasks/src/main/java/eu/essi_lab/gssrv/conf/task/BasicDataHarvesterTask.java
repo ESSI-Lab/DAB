@@ -331,6 +331,11 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
     }
 
     static XMLInputFactory factory = XMLInputFactory.newInstance();
+    static{
+
+	factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+	factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    }
 
     private static String readValue(XMLEventReader reader) {
 
