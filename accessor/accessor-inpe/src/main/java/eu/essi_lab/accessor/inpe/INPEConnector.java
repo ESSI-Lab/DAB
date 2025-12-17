@@ -51,6 +51,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.xpath.XPathExpressionException;
 
+import eu.essi_lab.lib.xml.*;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -66,8 +67,6 @@ import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.lib.xml.XMLNodeReader;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
@@ -231,10 +230,7 @@ public class INPEConnector extends SatelliteConnector<INPEConnectorSetting> {
 	    SAXSource source = new SAXSource(tagsoupReader, input);
 	    DOMResult result = new DOMResult();
 
-	    TransformerFactory factory = TransformerFactory.newInstance();
-
-	    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-	    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+	    TransformerFactory factory = XMLFactories.newTransformerFactory();
 
 	    Transformer transformer = factory.newTransformer();
 

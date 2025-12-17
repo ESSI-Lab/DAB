@@ -34,6 +34,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
 
+import eu.essi_lab.lib.xml.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -41,7 +42,6 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 
 public class INPESatellites {
 
@@ -88,10 +88,7 @@ public class INPESatellites {
 	SAXSource source = new SAXSource(tagsoupReader, input);
 	DOMResult result = new DOMResult();
 
-	TransformerFactory factory = TransformerFactory.newInstance();
-
-	factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-	factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+	TransformerFactory factory = XMLFactories.newTransformerFactory();
 
 	Transformer transformer = factory.newTransformer();
 

@@ -660,11 +660,9 @@ public class OpenSearchUtils {
      */
     public static String toString(Document document) throws TransformerException {
 
-	TransformerFactory transformerFactory = TransformerFactory.newInstance();
-	transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-	transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-	
-	Transformer transformer = transformerFactory.newTransformer();
+	TransformerFactory factory = XMLFactories.newTransformerFactory();
+
+	Transformer transformer = factory.newTransformer();
 
 	StringWriter stringWriter = new StringWriter();
 	transformer.transform(new DOMSource(document), new StreamResult(stringWriter));

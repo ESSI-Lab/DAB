@@ -10,20 +10,25 @@ package eu.essi_lab.lib.xml;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
+import net.sf.saxon.lib.*;
+import org.xml.sax.*;
+
 import javax.xml.*;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.*;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.validation.*;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
 
@@ -33,13 +38,13 @@ import javax.xml.xpath.XPathFactoryConfigurationException;
 public class XMLFactories {
 
     /**
-     * SAXON is used ads default, see <code>TransformerFactoryTest</code> for info
+     * SAXON is used as default, see <code>TransformerFactoryTest</code> for info
      */
-    public static TransformerFactoryImpl defaultTransformerFactoryImpl = TransformerFactoryImpl.SAXON;
+    public static TransformerFactoryImpl DEFAULT_IMPL = TransformerFactoryImpl.SAXON;
 
     /**
      * See <code>TransformerFactoryTest</code> for info
-     * 
+     *
      * @author Fabrizio
      */
     public enum TransformerFactoryImpl {
@@ -48,8 +53,8 @@ public class XMLFactories {
 	 */
 	XALAN("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"),
 	/**
-	 * It seems to be more slowly for unmarshalling/marshalling than XALAN, but it ensures that children nodes
-	 * have all the name space declarations of the parent node
+	 * It seems to be more slowly for unmarshalling/marshalling than XALAN, but it ensures that children nodes have all the name space
+	 * declarations of the parent node
 	 */
 	SAXON("net.sf.saxon.TransformerFactoryImpl");
 
@@ -90,7 +95,7 @@ public class XMLFactories {
      */
     public static TransformerFactory newTransformerFactory() {
 
-	return newTransformerFactory(defaultTransformerFactoryImpl);
+	return newTransformerFactory(DEFAULT_IMPL);
     }
 
     /**
@@ -103,8 +108,9 @@ public class XMLFactories {
 		impl.getImpl(), //
 		TransformerFactory.class.getClassLoader());//
 
-	factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-	factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+	factory.setAttribute(FeatureKeys.DTD_VALIDATION, false);
+	factory.setAttribute(FeatureKeys.ALLOW_EXTERNAL_FUNCTIONS, false);
+	factory.setAttribute(FeatureKeys.RECOVERY_POLICY, 0);
 
 	return factory;
     }
@@ -121,5 +127,42 @@ public class XMLFactories {
 		XPathFactory.class.getClassLoader());
 
 	return xpathFactory;
+    }
+
+    static {
+
+	//
+	// This is required in order to load the SUN implementation of the factory instead of the woodstox
+	// implementation
+	//
+
+	System.setProperty("javax.xml.stream.XMLInputFactory", "com.sun.xml.internal.stream.XMLInputFactoryImpl");
+    }
+
+    /**
+     * @return
+     */
+    public static XMLInputFactory newXMLInputFactory() {
+
+	XMLInputFactory inputFactory = XMLInputFactory.newFactory("javax.xml.stream.XMLInputFactory", null);
+
+	inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+	inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+
+	return inputFactory;
+    }
+
+    /**
+     * @return
+     */
+    public static SchemaFactory newSchemaFactory() throws SAXNotSupportedException, SAXNotRecognizedException {
+
+	SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+	schemaFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	schemaFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+	schemaFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+	return schemaFactory;
     }
 }

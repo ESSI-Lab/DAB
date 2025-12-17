@@ -49,6 +49,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
+import eu.essi_lab.lib.xml.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -491,13 +492,7 @@ public class TimeseriesHandler extends StreamingRequestHandler {
 	return ret.trim();
     }
 
-    static XMLInputFactory factory = XMLInputFactory.newInstance();
-
-    static{
-
-	factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-	factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-    }
+    static XMLInputFactory factory = XMLFactories.newXMLInputFactory();
 
     public String getObject() {
 	return "timeseries";

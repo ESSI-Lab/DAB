@@ -37,10 +37,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathExpressionException;
 
 import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.xml.*;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 
 public class StationListDocument extends XMLDocumentReader {
 
@@ -105,10 +104,7 @@ public class StationListDocument extends XMLDocumentReader {
 		Source xmlSource = new DOMSource(node);
 		Result outputTarget = new StreamResult(outputStream);
 
-		TransformerFactory factory = TransformerFactory.newInstance();
-
-		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+		TransformerFactory factory = XMLFactories.newTransformerFactory();
 
 		Transformer transformer = factory.newTransformer();
 

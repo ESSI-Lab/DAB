@@ -43,6 +43,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import eu.essi_lab.lib.xml.*;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.View;
@@ -175,10 +176,7 @@ public class THREDDSCatalogResultSetFormatter extends DiscoveryResultSetFormatte
     private String transformToHtml(String catalog, String id) {
 	try {
 	    // Create transformer factory
-	    TransformerFactory factory = TransformerFactory.newInstance();
-	    
-	    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-	    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+	    TransformerFactory factory = XMLFactories.newTransformerFactory();
 
 	    // Use the factory to create a template containing the xsl file
 	    InputStream xslStream;

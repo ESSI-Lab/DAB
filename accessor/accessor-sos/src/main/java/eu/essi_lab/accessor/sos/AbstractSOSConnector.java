@@ -44,6 +44,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
 
+import eu.essi_lab.lib.xml.*;
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -91,8 +92,6 @@ import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.lib.xml.XMLNodeReader;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -704,10 +703,7 @@ public abstract class AbstractSOSConnector extends WrappedConnector {
 			    SAXSource source = new SAXSource(tagsoupReader, input);
 			    DOMResult result = new DOMResult();
 
-			    TransformerFactory transformerFactory = TransformerFactory.newInstance();
-
-			    transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-			    transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+			    TransformerFactory transformerFactory = XMLFactories.newTransformerFactory();
 
 			    Transformer transformer = transformerFactory.newTransformer();
 			    

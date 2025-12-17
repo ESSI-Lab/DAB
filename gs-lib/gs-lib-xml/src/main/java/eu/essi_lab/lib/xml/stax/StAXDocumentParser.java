@@ -10,12 +10,12 @@ package eu.essi_lab.lib.xml.stax;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -49,6 +49,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
+import eu.essi_lab.lib.xml.*;
 import org.apache.commons.io.IOUtils;
 
 import com.google.common.xml.XmlEscapers;
@@ -62,27 +63,12 @@ import eu.essi_lab.lib.utils.StreamUtils;
  */
 public class StAXDocumentParser {
 
-    static {
-
-	//
-	// This is required in order to load the SUN implementation of the factory instead of the woodstox
-	// implementation
-	//
-
-	System.setProperty("javax.xml.stream.XMLInputFactory", "com.sun.xml.internal.stream.XMLInputFactoryImpl");
-    }
-
     public static boolean debug;
 
     /**
-     * 
+     *
      */
-    private static final XMLInputFactory FACTORY = XMLInputFactory.newFactory("javax.xml.stream.XMLInputFactory", null);
-    static{
-
-	FACTORY.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-	FACTORY.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-    }
+    private static final XMLInputFactory FACTORY = XMLFactories.newXMLInputFactory();
 
     private HashMap<List<QName>, Consumer<String>> pathsMap;
     private HashMap<List<QName>, Consumer<String>> parentsMap;
@@ -119,11 +105,11 @@ public class StAXDocumentParser {
     }
 
     /**
-     * The elements returned from the <code>find</code> methods are not formatted. If set to <code>true</code>,
-     * adds the new line character on the closing tags of the elements found with the
+     * The elements returned from the <code>find</code> methods are not formatted. If set to <code>true</code>, adds the new line character
+     * on the closing tags of the elements found with the
      * <code>find</code> methods thus allowing further parsing by reading them line by line (for example by means
      * of the {@link BufferedReader#lines()} method).<br>
-     * 
+     *
      * @param addNewLine
      */
     public void addNewLineOnCloseTags(boolean addNewLine) {
@@ -132,22 +118,19 @@ public class StAXDocumentParser {
     }
 
     /**
-     * Defines an XML element as <i>parsing target</i> according to <code>targetPath</code>
-     * and performs <code>action</code> with its text content.<br>
-     * The given <code>targetPath</code> represents a <i>precise</i> path of XML elements in the document, from the
+     * Defines an XML element as <i>parsing target</i> according to <code>targetPath</code> and performs <code>action</code> with its text
+     * content.<br> The given <code>targetPath</code> represents a <i>precise</i> path of XML elements in the document, from the
      * <i>root</i> element to the <i>parsing target</i>.<br>
-     * So, the first {@link QName} in the list <i>must</i> be related to the <i>root</i>
-     * document, and the last is related to the <i>parsing target</i>.<br>
-     * The symbol "*" can be used as local part of the {@link QName} taking
-     * care not to define an ambiguous path<br>
+     * So, the first {@link QName} in the list <i>must</i> be related to the <i>root</i> document, and the last is related to the <i>parsing
+     * target</i>.<br> The symbol "*" can be used as local part of the {@link QName} taking care not to define an ambiguous path<br>
      * <br>
      * E.g.:<br>
      * <br>
-     * Defines the XML element 'a' as a parsing target and when found, adds its text content to the given list.<br>
-     * The element 'c' is the root of the document, so this path corresponds to the xPath: <code>c/b/a/text()</code><br>
+     * Defines the XML element 'a' as a parsing target and when found, adds its text content to the given list.<br> The element 'c' is the
+     * root of the document, so this path corresponds to the xPath: <code>c/b/a/text()</code><br>
      * <br>
      * <code>parser.add(Arrays.asList(new QName("c"), new QName("b"), new QName("a")), v -> list.add(v));</code>
-     * 
+     *
      * @param targetPath the path to the <i>parsing target</i>
      * @param action the action to perform with the text content of the XML element of the <i>parsing target</i>
      */
@@ -157,21 +140,19 @@ public class StAXDocumentParser {
     }
 
     /**
-     * Defines an XML element as <i>parsing target</i> according to <code>parent</code> and <code>target</code>
-     * and performs <code>action</code> with its text content.<br>
-     * The <i>parsing target</i> can be located in any position of the document.<br>
-     * The xPath corresponding to the <i>parsing target</i> is:
+     * Defines an XML element as <i>parsing target</i> according to <code>parent</code> and <code>target</code> and performs
+     * <code>action</code> with its text content.<br> The <i>parsing target</i> can be located in any position of the document.<br> The
+     * xPath corresponding to the <i>parsing target</i> is:
      * <code>&#47;&#47;*&#47;parent&#47;target/text()</code><br>
      * <br>
      * E.g.:<br>
      * <br>
-     * Defines the XML element 'b' as a <i>parsing target</i> with the element 'a' as parent and when found, adds its
-     * text content to the given list.<br>
-     * The xPath corresponding to the <i>parsing target</i> is: <code>&#47;&#47;*&#47;a&#47;b/text()</code>
+     * Defines the XML element 'b' as a <i>parsing target</i> with the element 'a' as parent and when found, adds its text content to the
+     * given list.<br> The xPath corresponding to the <i>parsing target</i> is: <code>&#47;&#47;*&#47;a&#47;b/text()</code>
      * <br>
      * <br>
      * <code>parser.add(new QName("a"), new QName("b"), v -> list.add(v));</code>
-     * 
+     *
      * @param parent the parent element of the <i>parsing target</i>
      * @param target the <i>parsing target</i>
      * @param action the action to perform with the text content of the XML element of the <i>parsing target</i>
@@ -184,20 +165,18 @@ public class StAXDocumentParser {
     }
 
     /**
-     * Defines an XML element as <i>parsing target</i> according to <code>target</code>
-     * and performs <code>action</code> with its text content.<br>
-     * The <i>parsing target</i> can be located in any position of the document<br>
-     * The xPath corresponding to the <i>parsing target</i> is: <code>&#47;&#47;*&#47;target/text()</code><br>
+     * Defines an XML element as <i>parsing target</i> according to <code>target</code> and performs <code>action</code> with its text
+     * content.<br> The <i>parsing target</i> can be located in any position of the document<br> The xPath corresponding to the <i>parsing
+     * target</i> is: <code>&#47;&#47;*&#47;target/text()</code><br>
      * <br>
      * E.g.:<br>
      * <br>
-     * Defines the XML element 'a' as a <i>parsing target</i> and when found, adds its text content to the given
-     * list.<br>
-     * The xPath corresponding to the <i>parsing target</i> is: <code>&#47;&#47;*&#47;a/text()</code>
+     * Defines the XML element 'a' as a <i>parsing target</i> and when found, adds its text content to the given list.<br> The xPath
+     * corresponding to the <i>parsing target</i> is: <code>&#47;&#47;*&#47;a/text()</code>
      * <br>
      * <br>
      * <code>parser.add(new QName("a"), v -> list.add(v));</code>
-     * 
+     *
      * @param target the <i>parsing target</i>
      * @param action the action to perform with the text content of the XML element of the <i>parsing target</i>
      */
@@ -210,27 +189,23 @@ public class StAXDocumentParser {
     }
 
     /**
-     * Defines one or more XML element as <i>parsing targets</i> according to the given <code>condition</code> and
-     * performs <code>action</code> on the current {@link XMLEvent} stack.<br>
-     * The {@link XMLEvent} at the top of the stack
-     * is the last parsed {@link XMLEvent} while the first is the 'start document' event<br>
-     * E.g::<br>
+     * Defines one or more XML element as <i>parsing targets</i> according to the given <code>condition</code> and performs
+     * <code>action</code> on the current {@link XMLEvent} stack.<br> The {@link XMLEvent} at the top of the stack is the last parsed
+     * {@link XMLEvent} while the first is the 'start document' event<br> E.g::<br>
      * <br>
-     * Defines as <i>parsing targets</i> all the XML elements having non empty text content, and prints the text
-     * content:<br>
+     * Defines as <i>parsing targets</i> all the XML elements having non empty text content, and prints the text content:<br>
      * <br>
      * <code>parser.add( <br>
-    	stack -> stack.peek().isCharacters() && !stack.peek().asCharacters().getData().trim().isEmpty(),  <br>
-    	stack -> System.out.println("[" + stack.peek().asCharacters().getData().trim() + "]"));</code><br>
+     * stack -> stack.peek().isCharacters() && !stack.peek().asCharacters().getData().trim().isEmpty(),  <br> stack ->
+     * System.out.println("[" + stack.peek().asCharacters().getData().trim() + "]"));</code><br>
      * <br>
-     * Defines as <i>parsing targets</i> all the XML elements having at least one attribute, and prints the first
-     * attribute:<br>
+     * Defines as <i>parsing targets</i> all the XML elements having at least one attribute, and prints the first attribute:<br>
      * <br>
      * <code>parser.add( <br>
-    	stack -> stack.peek().isStartElement() && stack.peek().asStartElement().getAttributes().hasNext(), <br>
-    	stack -> System.out.println("[" + stack.peek().asStartElement().getAttributes().next() + "]"));
-     </code>
-     * 
+     * stack -> stack.peek().isStartElement() && stack.peek().asStartElement().getAttributes().hasNext(), <br> stack ->
+     * System.out.println("[" + stack.peek().asStartElement().getAttributes().next() + "]"));
+     * </code>
+     *
      * @param condition the condition which defines the <i>parsing target</i>
      * @param action the action to perform on the current {@link XMLEvent} stack
      */
@@ -245,18 +220,17 @@ public class StAXDocumentParser {
     /**
      * Defines an attribute as <i>parsing target</i> according to the given <code>attributeName</code> and
      * <code>target</code> and performs <code>action</code> with the attribute value.<br>
-     * The <i>parsing target</i> can be located in any position of the document.<br>
-     * The xPath corresponding to the <i>parsing target</i> is: <code>&#47;&#47;*&#47;target/@attributeName</code><br>
+     * The <i>parsing target</i> can be located in any position of the document.<br> The xPath corresponding to the <i>parsing target</i>
+     * is: <code>&#47;&#47;*&#47;target/@attributeName</code><br>
      * <br>
      * E.g.:<br>
      * <br>
-     * Defines the attribute 'id' owned by the XML element 'a' as a <i>parsing target</i> and when found,
-     * adds the attribute value to the given list.<br>
-     * The xPath corresponding to the <i>parsing target</i> is: <code>&#47;&#47;*&#47;a/@id</code>
+     * Defines the attribute 'id' owned by the XML element 'a' as a <i>parsing target</i> and when found, adds the attribute value to the
+     * given list.<br> The xPath corresponding to the <i>parsing target</i> is: <code>&#47;&#47;*&#47;a/@id</code>
      * <br>
      * <br>
      * <code>parser.add(new QName("a"), "id", v -> list.add(v));</code>
-     * 
+     *
      * @param target the <i>parsing target</i>
      * @param attributeName the name of the attribute owned by the <code>target</code> XML element
      * @param action the action to perform with the value of the <i>parsing target</i> attribute
@@ -297,12 +271,10 @@ public class StAXDocumentParser {
     }
 
     /**
-     * Finds all the XML elements according to the given <code>condition</code> and returns such elements represented as
-     * a string.<br>
-     * If the XML elements defined by the given <code>condition</code> or one or more of the children (element or
-     * attribute) have a namespace prefix, the
-     * declaration of all the found namespaces are provided in the returned elements
-     * 
+     * Finds all the XML elements according to the given <code>condition</code> and returns such elements represented as a string.<br> If
+     * the XML elements defined by the given <code>condition</code> or one or more of the children (element or attribute) have a namespace
+     * prefix, the declaration of all the found namespaces are provided in the returned elements
+     *
      * @param condition the condition which defines the XML elements to find
      * @return
      * @throws IOException
@@ -418,12 +390,10 @@ public class StAXDocumentParser {
     }
 
     /**
-     * Finds all the XML elements according to the given <code>target</code> and returns such
-     * elements represented as a string.<br>
-     * If <code>target</code> or one or more of its children (element or attribute) have a namespace prefix, the
-     * declaration of
-     * all the found namespaces are provided in the <code>target</code> element
-     * 
+     * Finds all the XML elements according to the given <code>target</code> and returns such elements represented as a string.<br> If
+     * <code>target</code> or one or more of its children (element or attribute) have a namespace prefix, the declaration of all the found
+     * namespaces are provided in the <code>target</code> element
+     *
      * @param target the XML element to find
      * @return
      * @throws IOException
@@ -435,12 +405,10 @@ public class StAXDocumentParser {
     }
 
     /**
-     * Finds all the XML elements according to the given <code>parent</code> and <code>target</code> and returns such
-     * elements represented as a string.<br>
-     * If <code>target</code> or one or more of its children (element or attribute) have a namespace prefix, the
-     * declaration of
-     * all the found namespaces are provided in the <code>target</code> element
-     * 
+     * Finds all the XML elements according to the given <code>parent</code> and <code>target</code> and returns such elements represented
+     * as a string.<br> If <code>target</code> or one or more of its children (element or attribute) have a namespace prefix, the
+     * declaration of all the found namespaces are provided in the <code>target</code> element
+     *
      * @param parent the parent of the XML element to find
      * @param target the XML element to find which must be child of <code>parent</code>
      * @return
@@ -468,7 +436,7 @@ public class StAXDocumentParser {
     /**
      * Parses the document and executes the actions related to the defined <i>parsing targets</i> by means of the
      * <code>add</code> methods
-     * 
+     *
      * @throws XMLStreamException
      * @throws IOException
      */
