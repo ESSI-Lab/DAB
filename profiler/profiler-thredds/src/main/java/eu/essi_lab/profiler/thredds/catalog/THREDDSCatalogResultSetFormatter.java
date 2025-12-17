@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.xml.*;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.transform.Result;
@@ -175,6 +176,9 @@ public class THREDDSCatalogResultSetFormatter extends DiscoveryResultSetFormatte
 	try {
 	    // Create transformer factory
 	    TransformerFactory factory = TransformerFactory.newInstance();
+	    
+	    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
 	    // Use the factory to create a template containing the xsl file
 	    InputStream xslStream;
