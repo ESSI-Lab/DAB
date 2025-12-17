@@ -98,7 +98,7 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 	TMIN("Temperatura dell'aria", "tmin", "°C", InterpolationType.MIN, PiemonteStationType.METEO), //
 	GRADI18("Gradi giorno","hdd_base18", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO),
 	GRADI20("Gradi giorno","hdd_base20", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO),
-	GRADICOOL("Gradi giorno","cdd_base20", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO),
+	GRADICOOL("Gradi giorno","cdd_base18", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO),
 	UMIN("Umidità relativa", "umin", "%", InterpolationType.MIN, PiemonteStationType.METEO), //
 	UMMEDIA("Umidità relativa", "umedia", "%", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
 	UMAX("Umidità relativa", "umax", "%", InterpolationType.MAX, PiemonteStationType.METEO), //
