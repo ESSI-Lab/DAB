@@ -23,8 +23,10 @@ package eu.essi_lab.authentication.token;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.*;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.concurrent.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -49,7 +51,7 @@ import eu.essi_lab.model.exceptions.GSException;
  * good and will be only temporary. We must change this as soon as possible.
  * Parameters like:<br>
  * - {@link TokenProvider#hMACSecretPassphrase},<br>
- * - {@link TokenProvider#EXPIRATION_TIME} <br>
+ * - {@link TokenProvider#EXPIRATION_TIME_SECONDS} <br>
  * must be turned into configurable parameters.
  * 
  * @author pezzati
@@ -68,26 +70,32 @@ public class TokenProvider {
     /**
      * 
      */
-    public static long EXPIRATION_TIME = 1800000;
+    public static long EXPIRATION_TIME_SECONDS = TimeUnit.MINUTES.toSeconds(5);
+
     private byte[] hMACSecretPassphrase;
     private Builder jwtBuilder = null;
     private Algorithm hmac256;
     private Verification verifier;
     private ObjectMapper mapper;
 
-    //TODO remove this constructor
+    /**
+     *
+     */
     public TokenProvider() {
-	hMACSecretPassphrase = Base64.getEncoder().encode("hMACSecretPassphrase".getBytes(StandardCharsets.UTF_8));
-	hmac256 = Algorithm.HMAC256(hMACSecretPassphrase);
-	jwtBuilder = JWT.create();
-	verifier = JWT.require(hmac256);
-	mapper = new ObjectMapper();
+	this("hMACSecretPassphrase");
     }
 
+    /**
+     *
+     * @param secp
+     */
     public TokenProvider(String secp) {
 	hMACSecretPassphrase = Base64.getEncoder().encode(secp.getBytes(StandardCharsets.UTF_8));
 	hmac256 = Algorithm.HMAC256(hMACSecretPassphrase);
+
 	jwtBuilder = JWT.create();
+	jwtBuilder.withExpiresAt(Instant.now().plusSeconds(EXPIRATION_TIME_SECONDS));
+
 	verifier = JWT.require(hmac256);
 	mapper = new ObjectMapper();
     }
