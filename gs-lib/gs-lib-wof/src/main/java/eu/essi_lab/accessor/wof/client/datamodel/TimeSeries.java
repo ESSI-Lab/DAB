@@ -673,6 +673,10 @@ public class TimeSeries {
 		    xmlEventFactory.createAttribute(new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi"), "SiteInfoType"));
 
 	    XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+
+	    inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+	    inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+
 	    XMLEventReader siteReader = inputFactory.createXMLEventReader(site.getReader().asStream());
 	    while (siteReader.hasNext()) {
 
