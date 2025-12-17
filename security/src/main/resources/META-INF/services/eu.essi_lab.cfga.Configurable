@@ -1,3 +1,1 @@
-eu.essi_lab.authentication.FacebookOAuth2Authenticator
 eu.essi_lab.authentication.GoogleOAuth2Authenticator
-eu.essi_lab.authentication.TwitterOAuthAuthenticator
