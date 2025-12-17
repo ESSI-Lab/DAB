@@ -21,6 +21,7 @@ package eu.essi_lab.lib.xml;
  * #L%
  */
 
+import javax.xml.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.xpath.XPathFactory;
@@ -101,6 +102,9 @@ public class XMLFactories {
 	TransformerFactory factory = TransformerFactory.newInstance(//
 		impl.getImpl(), //
 		TransformerFactory.class.getClassLoader());//
+
+	factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
 	return factory;
     }
