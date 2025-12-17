@@ -42,6 +42,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.xml.*;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -660,6 +661,9 @@ public class OpenSearchUtils {
     public static String toString(Document document) throws TransformerException {
 
 	TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+	
 	Transformer transformer = transformerFactory.newTransformer();
 
 	StringWriter stringWriter = new StringWriter();
