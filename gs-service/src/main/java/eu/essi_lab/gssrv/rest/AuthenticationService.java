@@ -62,7 +62,8 @@ import eu.essi_lab.model.exceptions.GSException;
  */
 @WebService
 @Path("/")
-public class AuthenticationService {
+public class
+AuthenticationService {
 
     private TokenProvider tokenProvider;
 
@@ -241,6 +242,16 @@ public class AuthenticationService {
 	    if (redirect == null) {
 
 		redirect = buildLogoutRedirectURL(httpRequest);
+	    }
+
+	    if(!redirect.startsWith("http://") && !redirect.startsWith("https://")) {
+
+		throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
+	    }
+
+	    if(!redirect.endsWith("gs-service/configuration/")) {
+
+		throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
 	    }
 
 	    httpResponse.sendRedirect(redirect);
@@ -439,6 +450,16 @@ public class AuthenticationService {
 	}
 
 	httpResponse.setHeader("Set-Cookie", TokenProvider.USER_COOKIE_NAME + "=" + tokenProvider.getToken(token) + ";Path=/");
+
+	if(!redirect.startsWith("http://") && !redirect.startsWith("https://")) {
+
+	    throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
+	}
+
+	if(!redirect.endsWith("gs-service/configuration/")) {
+
+	    throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
+	}
 
 	httpResponse.sendRedirect(redirect);
 
