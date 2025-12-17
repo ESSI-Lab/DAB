@@ -288,7 +288,7 @@ public abstract class GSResource extends DOMSerializer {
 	}
 	return null;
     }
-    
+
     /**
      * @param node
      * @return
@@ -315,7 +315,7 @@ public abstract class GSResource extends DOMSerializer {
 	try {
 	    stream.close();
 	} catch (IOException e) {
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 	return ret;
     }

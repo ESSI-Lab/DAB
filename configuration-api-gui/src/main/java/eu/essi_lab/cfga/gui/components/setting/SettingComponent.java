@@ -31,8 +31,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.vaadin.componentfactory.ToggleButton;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
@@ -193,12 +193,10 @@ public class SettingComponent extends Div {
 
 	setId("setting-component-" + getSetting().getName());
 
-	setHeightFull();
 	setWidthFull();
 
 	getStyle().set("background-color", "white");
-	getStyle().set("padding", "4px");
-	getStyle().set("border-radius", "5px");
+ 	getStyle().set("border-radius", "5px");
 	getStyle().set("margin-top", "0px");
 
 	radioMap = new HashMap<>();

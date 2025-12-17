@@ -38,6 +38,7 @@ import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
+import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -58,6 +59,8 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 
     public static final String MISSING_VALUE = "-9999";
+
+    public static final String ORGANIZATION = "Dipartimento Rischi Naturali e Ambientali";
 
     private SimpleDateFormat iso8601Format;
 
@@ -184,8 +187,8 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 	    String puntoMisuraUrl = datasetInfo.optString(varType);
 
 	    String stationName = datasetInfo.getString("denominazione").replaceAll("\\s+$", "");
-	    Double lat = datasetInfo.optDouble("latitudine_n_wgs84_d");
-	    Double lon = datasetInfo.optDouble("longitudine_e_wgs84_d");
+	    BigDecimal lat = datasetInfo.optBigDecimal("latitudine_n_wgs84_d", null);
+	    BigDecimal lon = datasetInfo.optBigDecimal("longitudine_e_wgs84_d", null);
 	    Double alt = datasetInfo.optDouble("quota_stazione");
 	    String stationType = datasetInfo.optString("tipo_staz").replaceAll("\\s+$", "");
 	    String stationCode = datasetInfo.optString("codice_stazione").replaceAll("\\s+$", "");
@@ -319,20 +322,10 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 	    //
 	    // responsible party
 	    //
-	    // ResponsibleParty publisherContact = new ResponsibleParty();
-	    //
-	    // publisherContact.setOrganisationName(organisationName);
-	    // publisherContact.setRoleCode("publisher");
-	    //
-	    // Contact contact = new Contact();
-	    //
-	    // Address address = new Address();
-	    // address.addElectronicMailAddress(contactInfo);
-	    // contact.setAddress(address);
-	    //
-	    // publisherContact.setContactInfo(contact);
-	    //
-	    // coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(publisherContact);
+	    ResponsibleParty publisherContact = new ResponsibleParty();
+	    publisherContact.setOrganisationName(ORGANIZATION);
+	    publisherContact.setRoleCode("publisher");
+	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(publisherContact);
 
 	    //
 	    // keywords
@@ -357,10 +350,10 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 
 	    if (lat != null && lon != null) {
 		coreMetadata.addBoundingBox(//
-			new BigDecimal(lat), //
-			new BigDecimal(lon), //
-			new BigDecimal(lat), //
-			new BigDecimal(lon));
+			lat, //
+			lon, //
+			lat, //
+			lon);
 	    }
 
 	    if (alt != null)
@@ -476,8 +469,14 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		    o.setProtocol(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI);
 		    distribution.addDistributionOnline(o);
 
+		} else {
+		    GSLoggerFactory.getLogger(this.getClass()).warn("Last path url {}: ", lastPath);
+		    GSLoggerFactory.getLogger(this.getClass()).warn("Error reading key {}: ", stationName);
 		}
 
+	    } else {
+		GSLoggerFactory.getLogger(this.getClass()).warn("!!!SHOULD NOT HAPPEN");
+		GSLoggerFactory.getLogger(this.getClass()).warn("Error reading key {}: ", stationName);
 	    }
 
 	    // if (tempExtenBegin.contains("+")) {
@@ -538,7 +537,8 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		break;
 	    }
 	    if (pId.equals("TERMA") && (PIEMONTE_Variable.TMAX.name().equals(paramId) || PIEMONTE_Variable.TMIN.name().equals(paramId)
-		    || PIEMONTE_Variable.TMEDIA.name().equals(paramId))) {
+		    || PIEMONTE_Variable.TMEDIA.name().equals(paramId) || PIEMONTE_Variable.GRADI18.name().equals(paramId) || PIEMONTE_Variable.GRADI20.name().equals(paramId)
+		    || PIEMONTE_Variable.GRADICOOL.name().equals(paramId))) {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
@@ -556,11 +556,19 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
-	    if (pId.equals("IDRO") && PIEMONTE_Variable.IDRO.name().equals(paramId)) {
+	    if (pId.equals("IDRO") && (PIEMONTE_Variable.IDRO.name().equals(paramId) || PIEMONTE_Variable.IDRO1.name().equals(paramId))) {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
-	    if (pId.equals("PORTATA") && PIEMONTE_Variable.PORTATA.name().equals(paramId)) {
+	    if (pId.equals("PORTATA") && (PIEMONTE_Variable.PORTATA.name().equals(paramId) || PIEMONTE_Variable.PORTATA1.name().equals(paramId) || PIEMONTE_Variable.PORTATANAT.name().equals(paramId))) {
+		sensorUrl = variables.getJSONObject(k).optString("url");
+		break;
+	    }
+	    if (pId.equals("DIRV") && (PIEMONTE_Variable.DIRV.name().equals(paramId) || PIEMONTE_Variable.TEMPPERM.name().equals(paramId) || PIEMONTE_Variable.DURATACALMA.name().equals(paramId))) {
+		sensorUrl = variables.getJSONObject(k).optString("url");
+		break;
+	    }
+	    if (pId.equals("BARO") && (PIEMONTE_Variable.PRESSIONEMEDIA.name().equals(paramId) || PIEMONTE_Variable.PRESSIONEMEDIASML.name().equals(paramId))) {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }

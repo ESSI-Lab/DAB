@@ -161,8 +161,8 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	String tempExtenBegin = datasetInfo.optString("data_inizio");
 	String tempExtenEnd = datasetInfo.optString("data_fine");
 
-	Double pointLon = datasetInfo.optDouble("lon");
-	Double pointLat = datasetInfo.optDouble("lat");
+	BigDecimal pointLon = datasetInfo.optBigDecimal("lon", null);
+	BigDecimal pointLat = datasetInfo.optBigDecimal("lat", null);
 	Double altitude = datasetInfo.optDouble("alt");
 
 	String code = datasetInfo.optString("codice");
@@ -294,12 +294,11 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 
 	if (pointLat != null && pointLon != null) {
 	    coreMetadata.addBoundingBox(//
-		    new BigDecimal(pointLat), //
-		    new BigDecimal(pointLon), //
-		    new BigDecimal(pointLat), //
-		    new BigDecimal(pointLon));
+		    pointLat, //
+		    pointLon, //
+		    pointLat, //
+		    pointLon);
 	}
-
 
 	// vertical extent
 	coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(altitude, altitude);

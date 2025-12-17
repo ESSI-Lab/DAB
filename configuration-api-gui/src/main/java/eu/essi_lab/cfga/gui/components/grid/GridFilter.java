@@ -32,15 +32,7 @@ public class GridFilter {
     /**
      * 
      */
-    private String columnName;
-    /**
-     * 
-     */
-    private String value;
-    /**
-     * 
-     */
-    private static final HashMap<String, String> VALUES_MAP = new HashMap<>();
+    private static final HashMap<String, String> SELECTION_MAP = new HashMap<>();
 
     /**
      * @param items
@@ -54,9 +46,16 @@ public class GridFilter {
      */
     public boolean test(HashMap<String, String> item) {
 
-	String itemValue = item.get(this.columnName);
+	boolean match = true;
 
-	return itemValue == null || itemValue.toLowerCase().contains(value.toLowerCase());
+	for(String colum: SELECTION_MAP.keySet()){
+
+	    String itemValue = item.get(colum);
+
+	    match &= itemValue == null || itemValue.toLowerCase().contains(SELECTION_MAP.get(colum).toLowerCase());
+	}
+
+	return match;
     }
 
     /**
@@ -65,10 +64,7 @@ public class GridFilter {
      */
     public void filter(String columnName, String value) {
 
-	VALUES_MAP.put(columnName, value);
-
-	this.columnName = columnName;
-	this.value = value;
+	SELECTION_MAP.put(columnName, value);
     }
 
     /**
@@ -77,14 +73,14 @@ public class GridFilter {
      */
     public static Optional<String> getValue(String columnName) {
 
-	return Optional.ofNullable(VALUES_MAP.get(columnName));
+	return Optional.ofNullable(SELECTION_MAP.get(columnName));
     }
 
     /**
      * 
      */
-    public static void clearValuesCache() {
+    public static void clearSelection() {
 
-	VALUES_MAP.clear();
+	SELECTION_MAP.clear();
     }
 }

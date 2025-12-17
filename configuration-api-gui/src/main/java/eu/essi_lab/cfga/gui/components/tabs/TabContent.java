@@ -70,6 +70,13 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	setMargin(false);
 	setSpacing(false);
+
+	// computes the height
+	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
+
+	    int screenHeight = receiver.getScreenHeight();
+	    setHeight(screenHeight - ComponentFactory.MIN_HEIGHT_OFFSET, Unit.PIXELS);
+	});
     }
 
     /**
@@ -105,10 +112,9 @@ public class TabContent extends VerticalLayout implements Renderable {
 	//
 
 	HorizontalLayout headerLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout(
-		"tab-container-header-layout-for-" + tabContentDesc.getLabel());
+		TabContent.TAB_HEADER_ID_PREFIX + "_" + tabContentDesc.getLabel());
 	headerLayout.setWidthFull();
 	headerLayout.setAlignItems(Alignment.BASELINE);
-	headerLayout.setId(TabContent.TAB_HEADER_ID_PREFIX + "_" + tabContentDesc.getLabel());
 
 	add(headerLayout);
 
@@ -154,9 +160,30 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	    headerLayout.add(descLayout);
 
-	    if (desc.length() > 200) {
+	    //
+ 	    // max description length is limited
+ 	    //
 
-		String shortDesc = desc.substring(0, 195);
+	    Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
+
+	    int maxDescLength = 300; // no add, no reload
+
+	    if (addDirective.isPresent() && tabContentDesc.isReloadable()) { // add & reload
+
+		maxDescLength = 180;
+
+	    } else if (addDirective.isPresent() && !tabContentDesc.isReloadable()) { // only add
+
+		maxDescLength = 200;
+
+	    } else if (addDirective.isEmpty() && tabContentDesc.isReloadable()) { // only reload
+
+		maxDescLength = 190;
+	    }
+
+	    if (desc.length() > maxDescLength) {
+
+		String shortDesc = desc.substring(0, maxDescLength - 5);
 
 		descLabel.setText(shortDesc);
 
@@ -166,12 +193,11 @@ public class TabContent extends VerticalLayout implements Renderable {
 		extraDescButton.setTooltipText("Click to see full description");
 		extraDescButton.addClickListener(evt -> {
 
-		    NotificationDialog.getNotificationDialog("Description",desc).open();
+		    NotificationDialog.getNotificationDialog("Description", desc).open();
 		});
 
 		labelLayout.add(extraDescButton);
 	    }
-
 
 	} else {
 
@@ -270,8 +296,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 		    configuration, //
 		    this, //
 		    readOnly, //
-		    refresh,
-		    tabDesc.getContentDescriptors().size() > 1);
+		    refresh, tabDesc.getContentDescriptors().size() > 1);
 
 	    TabSheet tabSheet = new TabSheet();
 	    tabSheet.getStyle().set("border-bottom", "1px solid #d3d3d39e");

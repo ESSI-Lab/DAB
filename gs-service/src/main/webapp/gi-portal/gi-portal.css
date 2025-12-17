@@ -19,6 +19,37 @@
 @import
 	url("../giapi/font-awesome/4.7.0/css/font-awesome.min.css" );
 
+/* Reset html and body margins to ensure headerDiv starts at page edge */
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+/* Create a flex container wrapper for content after header using a pseudo-element approach */
+#headerDiv {
+	flex-shrink: 0;
+}
+
+/* Use CSS to create a row layout for elements after header */
+body {
+	display: flex;
+	flex-direction: column;
+}
+
+/* Group paginator, tabs, and map in a horizontal row */
+/* Note: These are now inside main-content-wrapper, so this rule may not apply */
+#resMapWidget,
+#paginator-widget,
+#tabs-div {
+	display: inline-flex;
+	vertical-align: top;
+}
+
 #selectedParameter {
 	font-weight: bold;
 }
@@ -67,6 +98,25 @@
 	margin-left: -198px !important;
 }
 
+/* Ensure layer switcher and all OpenLayers controls are clickable above tabs/paginator */
+.layer-switcher,
+.ol-control {
+	z-index: 10 !important;
+	pointer-events: auto !important;
+}
+
+.layer-switcher button,
+.ol-control button,
+.layer-switcher *,
+.ol-control * {
+	pointer-events: auto !important;
+}
+
+.layer-switcher button,
+.ol-control button {
+	cursor: pointer !important;
+}
+
 .ol-zoomslider {
 	right: 10px !important; /* Position it 10px from the right edge */
 	left: auto !important; /* Remove the default left positioning */
@@ -76,10 +126,65 @@
 /* -------------------------------- */
 /* header                           */
 /*                                  */
+.portal-header-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px 20px;
+	background: #f8f9fa;
+	border-bottom: 1px solid #c0c0c0;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.portal-header-left {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	flex: 1;
+}
+
+.portal-header-right {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	justify-content: flex-end;
+	flex: 1;
+}
+
+.portal-header-logo-left,
+.portal-header-logo-right {
+	max-height: 60px;
+	max-width: 200px;
+	object-fit: contain;
+}
+
+.portal-header-title-left {
+	font-size: 1.5em;
+	font-weight: bold;
+	color: #2c3e50;
+	flex: 1;
+	min-width: 0;
+	word-wrap: break-word;
+}
+
+.portal-header-title-right {
+	font-size: 0.9em;
+	color: #555;
+	text-align: right;
+	flex: 1;
+	min-width: 0;
+	word-wrap: break-word;
+	max-width: 100%;
+}
+
 #headerDiv {
 	border: 1px solid #c0c0c0;
 	background: #c0c0c0;
 	margin-bottom: 0px;
+	margin-left: 0px;
+	position: relative;
+	flex-shrink: 0;
 }
 
 #logoDiv {
@@ -146,14 +251,60 @@
 /* tabs                             */
 /*                                  */
 #tabs-ul {
-	
+	white-space: nowrap;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: center;
+	margin: 0;
+	padding: 0;
+}
+
+#tabs-ul li {
+	flex-shrink: 0;
+	white-space: nowrap;
+	margin-left: 0;
+}
+
+#tabs-ul li:first-child {
+	margin-left: 0;
+}
+
+/* Remove inline margin-left from results tab link */
+#results-tab-link {
+	margin-left: 0 !important;
+}
+
+#left-sidebar {
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+	width: 40%;
+	min-width: 0;
+	max-width: 40%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	position: relative;
+	z-index: 1;
+	/* Only capture events within sidebar bounds */
+	pointer-events: auto;
+	box-sizing: border-box;
+	/* Ensure it doesn't extend beyond its visual bounds */
+	contain: layout style;
 }
 
 #tabs-div {
-	position: absolute;
-	z-index: 99;
+	position: relative;
+	z-index: 1;
 	border: none;
 	background: transparent;
+	flex-shrink: 0;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
 }
 
 .tabs-element {
@@ -163,13 +314,71 @@
 .ui-widget-header[role="tablist"] {
 	border: 1px solid #999999;
 	background: #999999;
+	white-space: nowrap;
+	overflow: visible;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 0;
+	margin: 0;
+}
+
+.ui-widget-header[role="tablist"] ul {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+}
+
+.ui-widget-header[role="tablist"] li {
+	display: inline-block;
+	white-space: nowrap;
+	flex-shrink: 0;
 }
 
 /* -------------------------------- */
 /* results tab                      */
 /*                                  */
 #results-tab {
-	
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+	width: 100%;
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box;
+	position: relative;
+	z-index: 1;
+}
+
+/* Remove default jQuery UI tabs panel spacing */
+.ui-tabs-panel {
+	margin: 0 !important;
+	padding: 0 !important;
+	overflow: visible;
+}
+
+#tabs-div .ui-tabs-panel {
+	margin: 0 !important;
+	padding: 0 !important;
+	overflow: visible;
+}
+
+/* Only results tab should scroll, not its parent containers */
+#tabs-div .ui-tabs-panel#results-tab {
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+/* Ensure no other containers inside results tab create scrollbars */
+#results-tab > * {
+	overflow: visible;
+}
+
+#results-tab .resultset-layout-ul,
+#results-tab .resultset-layout-table-div {
+	overflow: visible;
 }
 
 li[aria-controls="results-tab"] {
@@ -187,11 +396,15 @@ li[aria-controls="results-tab"] {
 }
 
 #paginator-widget {
-	z-index: 100;
-	position: absolute;
+	z-index: 1;
+	position: relative;
 	text-align: center;
-	display: inline-block;
+	display: block;
 	background: #c0c0c0;
+	padding: 0px;
+	margin: 0;
+	flex-shrink: 0;
+	width: 100%;
 }
 
 .paginator-widget-results-label {
@@ -239,6 +452,14 @@ li[aria-controls="results-tab"] {
 
 .resultset-layout-table-div {
 	padding-right: 0px !important;
+	overflow: visible !important;
+	max-height: none !important;
+}
+
+/* Remove scrollbar from resultset layout table div - only results tab should scroll */
+#results-tab .resultset-layout-table-div {
+	overflow: visible !important;
+	max-height: none !important;
 }
 
 /* -------------------------------- */
@@ -279,10 +500,102 @@ li[aria-controls="results-tab"] {
 /* -------------------------------- */
 /* map                              */
 /*                                  */
+/* Main content wrapper created by JavaScript */
+#main-content-wrapper {
+	display: flex;
+	flex-direction: row;
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+	position: relative;
+	z-index: 0;
+}
+
+#headerDiv {
+	flex-shrink: 0;
+}
+
+#resMapWidget {
+	position: relative;
+	flex: 1;
+	min-height: 0;
+	min-width: 0;
+	overflow: hidden;
+	box-sizing: border-box;
+	z-index: 0;
+	pointer-events: auto !important;
+	touch-action: none;
+}
+
+/* Force all map children to be interactive */
+#resMapWidget .map-widget-div,
+#resMapWidget .ol-viewport,
+#resMapWidget canvas {
+	pointer-events: auto !important;
+	touch-action: none;
+}
+
 .map-widget-div {
 	background: transparent;
 	padding: 0px;
 	border-radius: 0px;
+	width: 100% !important;
+	height: 100% !important;
+	box-sizing: border-box;
+	position: relative;
+	z-index: inherit;
+	pointer-events: auto !important;
+}
+
+.map-widget-div .ol-fullscreen-map {
+	width: 100% !important;
+	height: 100% !important;
+	box-sizing: border-box;
+	position: relative;
+	z-index: inherit;
+	pointer-events: auto !important;
+}
+
+/* Ensure OpenLayers viewport and canvas are interactive */
+/* The overlay container should let events pass through */
+#resMapWidget .ol-overlaycontainer-stopevent {
+	pointer-events: none !important;
+}
+
+/* But the actual map canvas and viewport must be interactive */
+#resMapWidget .ol-viewport,
+#resMapWidget .ol-viewport canvas {
+	pointer-events: auto !important;
+}
+
+/* Map widget container and its direct children */
+#resMapWidget .map-widget-div,
+#resMapWidget .map-widget-div > * {
+	pointer-events: auto !important;
+}
+
+#stationInfo {
+	position: relative;
+	z-index: 10;
+}
+
+/* Ensure spatial extent widget dialog appears above results tab and all other content */
+/* jQuery UI dialogs are appended to body, so they need very high z-index */
+.ui-dialog,
+.ui-dialog-wrapper {
+	z-index: 10000 !important;
+	position: fixed !important;
+}
+
+.ui-widget-overlay {
+	z-index: 9999 !important;
+	position: fixed !important;
+}
+
+/* Ensure all dialog content is above */
+.ui-dialog * {
+	position: relative;
+	z-index: inherit;
 }
 
 /* -------------------------------- */
@@ -429,8 +742,9 @@ li[aria-controls="results-tab"] {
 /* Login component styles */
 .login-container {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
     z-index: 1000;
 }
 

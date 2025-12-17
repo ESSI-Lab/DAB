@@ -96,7 +96,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
     /**
      * 
      */
-    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int DEFAULT_PAGE_SIZE = 50;
     private String viewId;
 
     /**
@@ -267,7 +267,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    Optional<View> optionalView = WebRequestTransformer.findView(storageUri, viewId);
 
 	    if (optionalView.isPresent()) {
-		// discoveryMessage.setView(optionalView.get());
+		 discoveryMessage.setView(optionalView.get());
 	    }
 
 	    discoveryMessage.setPermittedBond(bond);

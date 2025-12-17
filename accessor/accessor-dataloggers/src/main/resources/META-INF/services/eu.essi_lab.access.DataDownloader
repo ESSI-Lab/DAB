@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 eu.essi_lab.accessor.dataloggers.DataloggersDownloader
+=======
+eu.essi_lab.downloader.dataloggers.DataloggersDownloader
+>>>>>>> branch 'main' of https://boldrini@essi-lab.eu/git/r/ESSI/DAB-private.git

@@ -476,77 +476,84 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    /**
+     *
+     */
     public static final IndexedMetadataElement CREATION_DATE = new IndexedMetadataElement(MetadataElement.CREATION_DATE) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
-	    while (identifications.hasNext()) {
-
-		DataIdentification next = identifications.next();
-
-		String creationDate = next.getCitationCreationDate();
-		if (checkStringValue(creationDate)) {
-
-		    addValue(creationDate);
-		} else {
-		    XMLGregorianCalendar dateTime = next.getCitationCreationDateTime();
-		    if (dateTime != null) {
-			addValue(dateTime.toString());
-		    }
-		}
-	    }
+	    defineCodeListValues(this, resource, "creation");
 	}
     };
 
+    /**
+     *
+     */
     public static final IndexedMetadataElement PUBLICATION_DATE = new IndexedMetadataElement(MetadataElement.PUBLICATION_DATE) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
-	    while (identifications.hasNext()) {
-
-		DataIdentification next = identifications.next();
-
-		String pubDate = next.getCitationPublicationDate();
-		if (checkStringValue(pubDate)) {
-
-		    addValue(pubDate);
-		} else {
-		    XMLGregorianCalendar dateTime = next.getCitationPublicationDateTime();
-		    if (dateTime != null) {
-			addValue(dateTime.toString());
-		    }
-		}
-	    }
+	    defineCodeListValues(this, resource, "publication");
 	}
     };
 
+    /**
+     *
+     */
     public static final IndexedElement REVISION_DATE = new IndexedMetadataElement(MetadataElement.REVISION_DATE) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
-	    while (identifications.hasNext()) {
+	    defineCodeListValues(this, resource, "revision");
+	}
+    };
 
-		DataIdentification next = identifications.next();
+    /**
+     *
+     * @param el
+     * @param resource
+     * @param codeListValue
+     */
+    private static void defineCodeListValues(IndexedMetadataElement el, GSResource resource, String codeListValue) {
 
-		String revDate = next.getCitationRevisionDate();
-		if (checkStringValue(revDate)) {
+	Iterator<DataIdentification> identifications = resource.
+			getHarmonizedMetadata().
+			getCoreMetadata().
+			getMIMetadata()
+		.getDataIdentifications();
 
-		    addValue(revDate);
-		} else {
-		    XMLGregorianCalendar dateTime = next.getCitationRevisionDateTime();
-		    if (dateTime != null) {
-			addValue(dateTime.toString());
-		    }
+	while (identifications.hasNext()) {
+
+	    DataIdentification next = identifications.next();
+
+	    String date = switch(codeListValue){
+		case "revision" -> next.getCitationRevisionDate();
+		case "publication" -> next.getCitationPublicationDate();
+		case "creation" -> next.getCitationCreationDate();
+		default -> null;
+	    };
+
+	    if (checkStringValue(date)) {
+
+		el.addValue(date);
+
+	    } else {
+
+		XMLGregorianCalendar dateTime = switch(codeListValue){
+		    case "revision" -> next.getCitationRevisionDateTime();
+		    case "publication" -> next.getCitationPublicationDateTime();
+		    case "creation" -> next.getCitationCreationDateTime();
+		    default -> null;
+		};
+
+		if (dateTime != null) {
+
+		    el.addValue(dateTime.toString());
 		}
 	    }
 	}
-    };
+    }
 
     public static final IndexedElement REFERENCE_DATE = new IndexedMetadataElement(MetadataElement.REFERENCE_DATE) {
 	@Override

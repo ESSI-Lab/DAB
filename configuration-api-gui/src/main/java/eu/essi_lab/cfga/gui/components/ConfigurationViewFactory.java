@@ -86,6 +86,8 @@ public class ConfigurationViewFactory {
 
 	    content = createTabContent(descriptor, configuration, view, tabDescriptor);
 
+	    content.getComponent().getElement().getStyle().set("overflow-y", "auto");
+
 	} else {
 
 	    TabSheetContent tabSheet = new TabSheetContent();
