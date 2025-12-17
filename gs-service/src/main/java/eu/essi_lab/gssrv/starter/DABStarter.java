@@ -1069,43 +1069,4 @@ public class DABStarter {
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("Starting scheduler ENDED");
     }
-
-    public static void main(String[] args) throws Exception {
-
-	FileSource fileSource = new FileSource(new File("D:\\Desktop\\prod-config\\gs-configuration.json"));
-
-	Configuration conf = new Configuration(fileSource);
-
-	List<Setting> list = new ArrayList<>();
-
-	ConfigurationUtils.deepFind(conf, s -> s.getSettingClass().equals(GSSourceSetting.class), list);
-
-	final ArrayList<String> found = new ArrayList<>();
-
-	list.stream().map(s -> SettingUtils.downCast(s, GSSourceSetting.class)).//
-		map(GSSourceSetting::getSourceEndpoint).//
-		filter(sourceEndpoint -> sourceEndpoint.startsWith("https://")).//
-		forEach(endpoint -> {
-
-	    Downloader downloader = new Downloader();
-	    downloader.setConnectionTimeout(TimeUnit.SECONDS, 5);
-	    downloader.setResponseTimeout(TimeUnit.SECONDS, 5);
-
-	    HttpResponse<InputStream> resp = null;
-	    try {
-		resp = downloader.downloadResponse(endpoint);
-
-	    } catch (SSLHandshakeException e) {
-
-		found.add(endpoint);
-
-	    } catch (Exception e) {
-
-	    }
-
-	});
-
-	System.out.println("\n\n\n\n\n\n\n");
-	found.forEach(System.out::println);
-    }
 }
