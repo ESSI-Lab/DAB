@@ -735,6 +735,11 @@ public class OMHandler extends StreamingRequestHandler {
     }
 
     static XMLInputFactory factory = XMLInputFactory.newInstance();
+    static{
+
+	factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+	factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    }
 
     @Override
     public MediaType getMediaType(WebRequest webRequest) {
