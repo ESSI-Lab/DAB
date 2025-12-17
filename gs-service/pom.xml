@@ -324,6 +324,11 @@
 	<dependencies>
 
 		<dependency>
+			<groupId>org.owasp.encoder</groupId>
+			<artifactId>encoder</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>cloudwatchlogs</artifactId>
 		</dependency>

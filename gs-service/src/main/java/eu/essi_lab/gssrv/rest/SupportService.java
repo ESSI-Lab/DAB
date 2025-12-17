@@ -81,6 +81,7 @@ import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.semantic.Stats;
 import eu.essi_lab.request.executor.IStatisticsExecutor;
+import org.owasp.encoder.*;
 
 @WebService
 @Path("/")
@@ -119,7 +120,8 @@ public class SupportService {
 	    output = object.toString();
 	}
 
-	output = callback + "(" + output + ")";
+	String safeCallback = Encode.forHtml(callback);
+	output = safeCallback + "(" + output + ")";
 
 	return Response.ok(output, MediaType.APPLICATION_JSON).build();
     }

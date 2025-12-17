@@ -436,7 +436,11 @@
 
 		<!-- required by Vaadin  VULN-UPDATE-->
 		<nimbus-jose-jwt.version>9.37.4</nimbus-jose-jwt.version>
-		
+
+
+		<!--required for vulnerability in SupportService  VULN-UPDATE -->
+		<owasp.encoder.version>1.4.0</owasp.encoder.version>
+
         <!-- Surefire args -->
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
@@ -451,6 +455,12 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+			<dependency>
+				<groupId>org.owasp.encoder</groupId>
+				<artifactId>encoder</artifactId>
+				<version>${owasp.encoder.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.opensearch.client</groupId>
