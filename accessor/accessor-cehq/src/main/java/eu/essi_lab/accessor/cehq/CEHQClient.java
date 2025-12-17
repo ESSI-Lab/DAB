@@ -42,6 +42,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 
+import javax.xml.*;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -427,7 +428,12 @@ public class CEHQClient {
 	parser.setFeature(Parser.namespacesFeature, false);
 	parser.setFeature(Parser.namespacePrefixesFeature, false);
 
-	Transformer transformer = TransformerFactory.newInstance().newTransformer();
+	TransformerFactory transformerFactory = TransformerFactory.newInstance();
+
+	transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
+	Transformer transformer = transformerFactory.newTransformer();
 	DOMResult result = new DOMResult();
 	InputStream s = new ByteArrayInputStream(response);
 	Reader rdr = new InputStreamReader(s, Charset.forName("windows-1252"));
