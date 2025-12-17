@@ -73,6 +73,10 @@ public class TimeSeriesTemplate {
 
 	// start writing data file
 	XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+
+	inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+	inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+	
 	XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
 	this.reader = inputFactory.createXMLStreamReader(new FileInputStream(templateFile));
