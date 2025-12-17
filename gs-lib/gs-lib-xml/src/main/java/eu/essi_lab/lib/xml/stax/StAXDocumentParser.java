@@ -78,6 +78,11 @@ public class StAXDocumentParser {
      * 
      */
     private static final XMLInputFactory FACTORY = XMLInputFactory.newFactory("javax.xml.stream.XMLInputFactory", null);
+    static{
+
+	FACTORY.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+	FACTORY.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    }
 
     private HashMap<List<QName>, Consumer<String>> pathsMap;
     private HashMap<List<QName>, Consumer<String>> parentsMap;

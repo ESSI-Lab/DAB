@@ -59,6 +59,10 @@ public class StAXDocumentIterator implements Iterator<XMLDocumentReader> {
 
     public StAXDocumentIterator(InputStream stream, String searchElement) throws XMLStreamException {
 	XMLInputFactory factory = XMLInputFactory.newInstance();
+
+	factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+	factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+	
 	this.reader = factory.createXMLEventReader(stream);
 	this.searchElement = searchElement;
 
