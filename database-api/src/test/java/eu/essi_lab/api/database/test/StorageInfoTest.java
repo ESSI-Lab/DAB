@@ -1,5 +1,5 @@
 /**
- *
+ * 
  */
 package eu.essi_lab.api.database.test;
 
@@ -18,53 +18,36 @@ import eu.essi_lab.model.StorageInfo;
  */
 public class StorageInfoTest {
 
-    /**
-     * @return
-     */
-    private static String getUser() {
-
-	return System.getProperty("test.user");
-
-    }
-
-    /**
-     * @return
-     */
-    private static String getPassword() {
-
-	return System.getProperty("test.password");
-    }
-
     @Test
     public void isStartupUriTest() throws URISyntaxException {
 
 	{
-	    String uri = "xdbc://" + getUser() + ":" + getPassword() + "@hostname:8000,8004/dbName/folder/";
+	    String uri = "xdbc://user:password@hostname:8000,8004/dbName/folder/";
 	    Assert.assertTrue(DatabaseSourceUrl.check(uri));
 	}
 
 	{
-	    String uri = "osm://" + getUser() + ":" + getPassword() + "@productionhost/prod/prodConfig";
+	    String uri = "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertTrue(DatabaseSourceUrl.check(uri));
 	}
 
 	{
-	    String uri = "oss://" + getUser() + ":" + getPassword() + "@productionhost/prod/prodConfig";
+	    String uri = "oss://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertTrue(DatabaseSourceUrl.check(uri));
 	}
 
 	{
-	    String uri = "osl://" + getUser() + ":" + getPassword() + "@localhost/test/testConfig";
+	    String uri = "osl://awsaccesskey:awssecretkey@localhost/test/testConfig";
 	    Assert.assertTrue(DatabaseSourceUrl.check(uri));
 	}
 
 	{
-	    String uri = "http://" + getUser() + ":" + getPassword() + "@productionhost/prod/prodConfig";
+	    String uri = "http://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertFalse(DatabaseSourceUrl.check(uri));
 	}
 
 	{
-	    String uri = "https://" + getUser() + ":" + getPassword() + "@productionhost/prod/prodConfig";
+	    String uri = "https://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertFalse(DatabaseSourceUrl.check(uri));
 	}
 
@@ -78,37 +61,37 @@ public class StorageInfoTest {
     public void implTest() throws URISyntaxException {
 
 	{
-	    String uri = "xdbc://" + getUser() + ":" + getPassword() + "@hostname:8000,8004/dbName/folder/";
+	    String uri = "xdbc://user:password@hostname:8000,8004/dbName/folder/";
 	    Assert.assertEquals(DatabaseImpl.MARK_LOGIC, DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
-	    String uri = "osm://" + getUser() + ":" + getPassword() + "@productionhost/prod/prodConfig";
+	    String uri = "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
-	    String uri = "oss://" + getUser() + ":" + getPassword() + "@productionhost/prod/prodConfig";
+	    String uri = "oss://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
-	    String uri = "osl://" + getUser() + ":" + getPassword() + "@localhost:9200/test/testConfig";
+	    String uri = "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig";
 	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
-	    String uri = "os://" + getUser() + ":" + getPassword() + "@productionhost/prod/prodConfig";
+	    String uri = "os://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertNull(DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
-	    String uri = "http://" + getUser() + ":" + getPassword() + "@productionhost/prod/prodConfig";
+	    String uri = "http://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertNull(DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
-	    String uri = getUser() + ":" + getPassword() + "@hostname:8000,8004/dbName/folder/";
+	    String uri = "user:password@hostname:8000,8004/dbName/folder/";
 	    Assert.assertNull(DatabaseSourceUrl.detectImpl(uri));
 	}
     }
@@ -116,12 +99,12 @@ public class StorageInfoTest {
     @Test
     public void markLogicTest() throws URISyntaxException {
 
-	String uri = "xdbc://" + getUser() + ":" + getPassword() + "@hostname:8000,8004/dbName/folder/";
+	String uri = "xdbc://user:password@hostname:8000,8004/dbName/folder/";
 
 	StorageInfo info = DatabaseSourceUrl.build(uri);
 
-	Assert.assertEquals(getUser(), info.getUser());
-	Assert.assertEquals(getPassword(), info.getPassword());
+	Assert.assertEquals("user", info.getUser());
+	Assert.assertEquals("password", info.getPassword());
 	Assert.assertEquals("xdbc://hostname:8000,8004", info.getUri());
 	Assert.assertEquals("folder", info.getIdentifier());
 	Assert.assertEquals("dbName", info.getName());
@@ -131,12 +114,12 @@ public class StorageInfoTest {
     @Test
     public void openSearchManagedTest() throws URISyntaxException {
 
-	String uri = "osm://" + getUser() + ":" + getPassword() + "@https:productionhost/prod/prodConfig";
+	String uri = "osm://awsaccesskey:awssecretkey@https:productionhost/prod/prodConfig";
 
 	StorageInfo info = DatabaseSourceUrl.build(uri);
 
-	Assert.assertEquals(getUser(), info.getUser());
-	Assert.assertEquals(getPassword(), info.getPassword());
+	Assert.assertEquals("awsaccesskey", info.getUser());
+	Assert.assertEquals("awssecretkey", info.getPassword());
 
 	Assert.assertEquals("https://productionhost", info.getUri());
 
@@ -150,12 +133,12 @@ public class StorageInfoTest {
     @Test
     public void openSearchServerlessTest() throws URISyntaxException {
 
-	String uri = "oss://" + getUser() + ":" + getPassword() + "@https:productionhost/preprod/preProdConfig";
+	String uri = "oss://awsaccesskey:awssecretkey@https:productionhost/preprod/preProdConfig";
 
 	StorageInfo info = DatabaseSourceUrl.build(uri);
 
-	Assert.assertEquals(getUser(), info.getUser());
-	Assert.assertEquals(getPassword(), info.getPassword());
+	Assert.assertEquals("awsaccesskey", info.getUser());
+	Assert.assertEquals("awssecretkey", info.getPassword());
 
 	Assert.assertEquals("https://productionhost", info.getUri());
 
@@ -169,12 +152,12 @@ public class StorageInfoTest {
     @Test
     public void openSearchLocalTest1() throws URISyntaxException {
 
-	String uri = "osl://" + getUser() + ":" + getPassword() + "@http:localhost:9200/test/testConfig";
+	String uri = "osl://awsaccesskey:awssecretkey@http:localhost:9200/test/testConfig";
 
 	StorageInfo info = DatabaseSourceUrl.build(uri);
 
-	Assert.assertEquals(getUser(), info.getUser());
-	Assert.assertEquals(getPassword(), info.getPassword());
+	Assert.assertEquals("awsaccesskey", info.getUser());
+	Assert.assertEquals("awssecretkey", info.getPassword());
 
 	Assert.assertEquals("http://localhost:9200", info.getUri());
 
@@ -184,16 +167,17 @@ public class StorageInfoTest {
 
 	Assert.assertEquals(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol(), info.getType().get());
     }
+    
 
     @Test
     public void openSearchLocalTest2() throws URISyntaxException {
 
-	String uri = "osl://" + getUser() + ":" + getPassword() + "@https:localhost:9200/test2/testConfig2";
+	String uri = "osl://awsaccesskey:awssecretkey@https:localhost:9200/test2/testConfig2";
 
 	StorageInfo info = DatabaseSourceUrl.build(uri);
 
-	Assert.assertEquals(getUser(), info.getUser());
-	Assert.assertEquals(getPassword(), info.getPassword());
+	Assert.assertEquals("awsaccesskey", info.getUser());
+	Assert.assertEquals("awssecretkey", info.getPassword());
 
 	Assert.assertEquals("https://localhost:9200", info.getUri());
 
