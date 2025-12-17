@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.xml.*;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -82,7 +83,13 @@ public class WebConnector {
 
 		SAXSource source = new SAXSource(tagsoupReader, input);
 		DOMResult result = new DOMResult();
-		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
+		Transformer transformer =transformerFactory.newTransformer();
+
 		transformer.transform(source, result);
 
 		XMLDocumentReader xdoc = new XMLDocumentReader((Document) result.getNode());
