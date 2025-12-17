@@ -38,6 +38,7 @@ import java.util.AbstractMap.SimpleEntry;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.*;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -491,6 +492,12 @@ public class TimeseriesHandler extends StreamingRequestHandler {
     }
 
     static XMLInputFactory factory = XMLInputFactory.newInstance();
+
+    static{
+
+	factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+	factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    }
 
     public String getObject() {
 	return "timeseries";
