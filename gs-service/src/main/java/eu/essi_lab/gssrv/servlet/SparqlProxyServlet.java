@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -92,6 +90,7 @@ public class SparqlProxyServlet extends HttpServlet {
 	GSLoggerFactory.getLogger(getClass()).debug("Creating URL STARTED");
 
 	URL url = createURL(urlWithParams);
+
 	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	conn.setRequestMethod(method);
 	conn.setDoInput(true);
@@ -268,7 +267,15 @@ public class SparqlProxyServlet extends HttpServlet {
     private URL createURL(String urlWithParams) {
 
 	try {
-	    return new URI(urlWithParams).toURL();
+
+	    URI uri = new URI(urlWithParams);
+
+	    if (!uri.getScheme().startsWith("https") || uri.getScheme().startsWith("http")) {
+		throw new Exception("Invalid URL scheme");
+	    }
+
+	    return uri.toURL();
+
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
