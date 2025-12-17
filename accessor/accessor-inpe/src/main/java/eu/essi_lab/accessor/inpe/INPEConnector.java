@@ -44,6 +44,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.*;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
@@ -229,7 +230,14 @@ public class INPEConnector extends SatelliteConnector<INPEConnectorSetting> {
 
 	    SAXSource source = new SAXSource(tagsoupReader, input);
 	    DOMResult result = new DOMResult();
-	    Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
+	    TransformerFactory factory = TransformerFactory.newInstance();
+
+	    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
+	    Transformer transformer = factory.newTransformer();
+
 	    transformer.transform(source, result);
 
 	    XMLDocumentReader xdoc = new XMLDocumentReader((Document) result.getNode());
