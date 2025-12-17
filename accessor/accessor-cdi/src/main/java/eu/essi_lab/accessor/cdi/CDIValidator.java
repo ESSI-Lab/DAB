@@ -60,6 +60,11 @@ public abstract class CDIValidator {
 	    URL schemaURL = getSchemaURL();
 	    // XSD validation
 	    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+	    schemaFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	    schemaFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+	    schemaFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
 	    Schema schema = schemaFactory.newSchema(schemaURL);
 	    this.schemaValidator = schema.newValidator();
 	} catch (Exception e) {
