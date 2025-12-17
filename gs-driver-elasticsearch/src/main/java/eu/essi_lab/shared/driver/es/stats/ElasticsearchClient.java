@@ -50,7 +50,7 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.*;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -246,7 +246,7 @@ public class ElasticsearchClient {
 				public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
 
 				    return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider).//
-				    setSSLHostnameVerifier(new NoopHostnameVerifier());
+				    setSSLHostnameVerifier(new DefaultHostnameVerifier());
 				}
 			    });
 
