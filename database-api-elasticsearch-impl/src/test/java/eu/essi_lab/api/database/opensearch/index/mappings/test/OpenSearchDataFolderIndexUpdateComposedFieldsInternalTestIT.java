@@ -278,7 +278,7 @@ public class OpenSearchDataFolderIndexUpdateComposedFieldsInternalTestIT extends
      */
     private void clearIndexes() throws GSException, IOException {
 
-	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(OpenSearchDatabase.createLocalServiceInfo());
+	OpenSearchClient client = OpenSearchDatabase.createClient(OpenSearchDatabase.createLocalServiceInfo());
 
 	for (String index : IndexMapping.getIndexes(false)) {
 
