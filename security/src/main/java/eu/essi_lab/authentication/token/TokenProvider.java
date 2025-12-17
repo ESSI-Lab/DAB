@@ -70,7 +70,7 @@ public class TokenProvider {
     /**
      * 
      */
-    public static long EXPIRATION_TIME_SECONDS = TimeUnit.MINUTES.toSeconds(5);
+    public static long EXPIRATION_TIME_SECONDS = TimeUnit.DAYS.toSeconds(1000);
 
     private byte[] hMACSecretPassphrase;
     private Builder jwtBuilder = null;
