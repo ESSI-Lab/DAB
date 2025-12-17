@@ -175,8 +175,8 @@ public class SparqlProxyServlet extends HttpServlet {
 
 	for (Entry<String, List<String>> entry : entrySet) {
 	    String headerName = entry.getKey();
-	    String headerValue = entry.getValue().stream().collect(Collectors.joining(","));
-	    if (headerName != null && headerValue != null && !headerValue.isEmpty()) {
+	    String headerValue = String.join(",", entry.getValue());
+	    if (headerName != null && !headerValue.isEmpty()) {
 
 		if (ConfigurationWrapper.forceSparqlProxyAcceptHeader() && headerName.toLowerCase().equals("content-type")) {
 		    headerValue = "application/sparql-results+json; charset=utf-8";
