@@ -1357,7 +1357,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		helpIconImage,
 		initValue,
 		whatResizable) {
-
+	    
 		var taxonFieldWidth = (id === _getId('what') && whatOpt && whatOpt.showTaxonDialog) ? 'width: ' + (initOptions.fieldsWidth - 28) + 'px;' : '';
 
 		var taxonDiv = (id === _getId('what') && whatOpt.showTaxonDialog) ? createTaxonDiv() : '';
@@ -1379,8 +1379,14 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		}
 
 		var width = (id === _getId('what') && whatResizable) ? '100%' : initOptions.fieldsWidth + 'px';
+		
+		var ro = '';
 
-		textInput += '<input value="' + initValue + '" style="width: ' + width + '; cursor: ' + cursor + ';' + taxonFieldWidth + '" placeholder="' + label + '" value="' + sel + '" class="cnst-widget-input" id="' + id + '" type="text" ' + readOnly + '/>' + taxonDiv;
+		if (time) {
+			ro = 'readonly';
+		}
+
+		textInput += '<input '+ ro + ' value="' + initValue + '" style="width: ' + width + '; cursor: ' + cursor + ';' + taxonFieldWidth + '" placeholder="' + label + '" value="' + sel + '" class="cnst-widget-input" id="' + id + '" autocomplete="new-password" type="text" ' + readOnly + '/>' + taxonDiv;
 
 		if (id != _getId('what')) {
 			textInput += '</div>';
