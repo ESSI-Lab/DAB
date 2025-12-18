@@ -21,25 +21,45 @@ package eu.essi_lab.lib.net.downloader;
  * #L%
  */
 
-import dev.failsafe.*;
-import dev.failsafe.function.*;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.*;
-import eu.essi_lab.lib.net.utils.*;
-import eu.essi_lab.lib.utils.*;
-import eu.essi_lab.model.exceptions.*;
-import org.apache.commons.io.*;
-
-import javax.net.ssl.*;
-import java.io.*;
-import java.net.*;
-import java.net.http.*;
-import java.net.http.HttpClient.*;
-import java.nio.charset.*;
-import java.security.*;
-import java.time.*;
-import java.time.temporal.*;
-import java.util.*;
-import java.util.concurrent.*;
+import dev.failsafe.Failsafe;
+import dev.failsafe.FailsafeException;
+import dev.failsafe.RetryPolicy;
+import dev.failsafe.function.CheckedPredicate;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
+import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.exceptions.GSException;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.Authenticator;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Builder;
+import java.net.http.HttpClient.Redirect;
+import java.net.http.HttpClient.Version;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author Fabrizio
@@ -127,7 +147,7 @@ public class Downloader {
     }
 
     /**
-     * @param condition the condition by which a retry should be done
+     * @param condition     the condition by which a retry should be done
      * @param delayTimeUnit
      * @param attempts
      * @param delay
@@ -600,19 +620,37 @@ public class Downloader {
 	    });
 	}
 
+	if (trustStoreStream == null) {
+
+	    if (System.getProperty("dab.net.ssl.trustStore") != null) {
+
+		GSLoggerFactory.getLogger(getClass()).debug("Using dab trust store from system property");
+
+		try {
+		    trustStoreStream = new FileInputStream(System.getProperty("dab.net.ssl.trustStore"));
+
+		    trustStorePassword = System.getProperty("dab.net.ssl.trustStorePassword");
+
+		} catch (IOException e) {
+
+		    throw new RuntimeException(e);
+		}
+	    }
+	}
+
 	if (https && trustStoreStream != null) {
 
 	    try {
 
 		GSLoggerFactory.getLogger(getClass()).debug("Using trust store");
 
-		TrustManagerFactory tmf = getTrustManagerFactory(trustStoreStream, trustStorePassword);
+		X509TrustManager combinedTm = getX509TrustManager(trustStoreStream, trustStorePassword);
 
 		SSLContext sslContext = SSLContext.getInstance("TLS");
 
 		sslContext.init(//
 			null, // key store, required only in case of HTTPS with mutual TLS (mTLS)
-			tmf.getTrustManagers(), //
+			new TrustManager[] { combinedTm }, //
 			null); // randomness source
 
 		builder.sslContext(sslContext);
@@ -628,6 +666,7 @@ public class Downloader {
 	builder.followRedirects(redirect);
 
 	return builder.build();
+
     }
 
     /**
@@ -636,7 +675,11 @@ public class Downloader {
      * @return
      * @throws Exception
      */
-    private TrustManagerFactory getTrustManagerFactory(InputStream stream, String pwd) throws Exception {
+    private X509TrustManager getX509TrustManager(InputStream stream, String pwd) throws Exception {
+
+	TrustManagerFactory defaultTmf =
+		TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+	defaultTmf.init((KeyStore) null); // system truststore
 
 	char[] charArray = null;
 
@@ -655,6 +698,51 @@ public class Downloader {
 
 	tmf.init(store);
 
-	return tmf;
+	X509TrustManager defaultTm = getX509Tm(defaultTmf);
+	X509TrustManager customTm = getX509Tm(tmf);
+
+	X509TrustManager combinedTm = new X509TrustManager() {
+	    @Override
+	    public void checkClientTrusted(X509Certificate[] chain, String authType)
+		    throws CertificateException {
+		try {
+		    customTm.checkClientTrusted(chain, authType);
+		} catch (CertificateException e) {
+		    defaultTm.checkClientTrusted(chain, authType);
+		}
+	    }
+
+	    @Override
+	    public void checkServerTrusted(X509Certificate[] chain, String authType)
+		    throws CertificateException {
+		try {
+		    customTm.checkServerTrusted(chain, authType);
+		} catch (CertificateException e) {
+		    defaultTm.checkServerTrusted(chain, authType);
+		}
+	    }
+
+	    @Override
+	    public X509Certificate[] getAcceptedIssuers() {
+		X509Certificate[] a = customTm.getAcceptedIssuers();
+		X509Certificate[] b = defaultTm.getAcceptedIssuers();
+		X509Certificate[] all = new X509Certificate[a.length + b.length];
+		System.arraycopy(a, 0, all, 0, a.length);
+		System.arraycopy(b, 0, all, a.length, b.length);
+		return all;
+	    }
+	};
+
+	return combinedTm;
     }
+
+    private static X509TrustManager getX509Tm(TrustManagerFactory tmf) {
+	for (TrustManager tm : tmf.getTrustManagers()) {
+	    if (tm instanceof X509TrustManager) {
+		return (X509TrustManager) tm;
+	    }
+	}
+	throw new IllegalStateException("No X509TrustManager found");
+    }
+
 }
