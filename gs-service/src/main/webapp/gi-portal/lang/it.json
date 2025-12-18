@@ -37,8 +37,8 @@
   "search_text":"Ricerca in corso...",
   "show_results": "Mostra",
   "hide_results": "Nascondi",
-  "start_time": "Data/ora iniziale",
-  "end_time": "Data/ora finale",
+  "start_time": "Data iniziale",
+  "end_time": "Data finale",
   "bulk_data_download": "Download dati in blocco",
   "matching_results": "Risultati",
   "spatial_extent": "Area",
@@ -210,6 +210,8 @@
   "ontology-search-help": "Ricerca esatta o ricerca semantica con supporto ontologico per traduzioni e termini più specifici.<br/>Controlla il browser dell’ontologia online per i termini disponibili:<br/>",
   
   "select-from-ontology": "Seleziona un parametro dall'ontologia",
+  
+  "observed-property-uri": "URI della proprietà osservata",
   
     "tf-format": "Formato",
   "tf-source": "Sorgente",

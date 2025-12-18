@@ -307,10 +307,6 @@ body {
 	overflow: hidden;
 }
 
-.tabs-element {
-	
-}
-
 .ui-widget-header[role="tablist"] {
 	border: 1px solid #999999;
 	background: #999999;
@@ -379,14 +375,6 @@ body {
 #results-tab .resultset-layout-ul,
 #results-tab .resultset-layout-table-div {
 	overflow: visible;
-}
-
-li[aria-controls="results-tab"] {
-	
-}
-
-.resultset-layout-ul {
-	
 }
 
 .series-browser-widget-table {
@@ -598,6 +586,41 @@ li[aria-controls="results-tab"] {
 	z-index: inherit;
 }
 
+/* Ensure discover dialog (searching popup) is properly formatted */
+#discoverDialog {
+	padding: 10px !important;
+	overflow: visible !important;
+	background: #f8f8f8 !important;
+}
+
+/* Ensure dialog wrapper and content have proper background */
+.ui-dialog[aria-describedby="discoverDialog"],
+.ui-dialog[aria-describedby="discoverDialog"] .ui-dialog-content {
+	background: #f8f8f8 !important;
+	padding: 10px !important;
+}
+
+/* For no-titlebar dialogs, ensure background covers everything */
+.ui-dialog.no-titlebar .ui-dialog-content {
+	background: #f8f8f8 !important;
+	padding: 10px !important;
+}
+
+#discoverDialog #progressBar {
+	margin-bottom: 10px;
+}
+
+#discoverDialog #status-label {
+	display: block !important;
+	visibility: visible !important;
+	color: black !important;
+	font-weight: bold !important;
+	font-size: 11px !important;
+	margin-top: 5px;
+	padding: 0;
+	line-height: normal;
+}
+
 /* -------------------------------- */
 /* constraints widget               */
 /*                                  */
@@ -606,7 +629,9 @@ li[aria-controls="results-tab"] {
 }
 
 .cnst-widget-where-input-control-button {
-	display: none;
+	display: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
 }
 
 /* -------------------------------- */
@@ -742,10 +767,19 @@ li[aria-controls="results-tab"] {
 /* Login component styles */
 .login-container {
     position: absolute;
-    top: 50%;
+    top: 6px;
     right: 16px;
-    transform: translateY(-50%);
+    transform: none;
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.login-button.lang-button {
+    padding: 8px 10px;
+    min-width: 44px;
+    text-align: center;
 }
 
 .login-button {
@@ -787,12 +821,39 @@ li[aria-controls="results-tab"] {
     border-radius: 5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 1001;
+    /* Keep modal fully inside the viewport */
+    width: 420px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+.login-modal .login-modal-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #2c3e50;
+    font-size: 22px;
+    line-height: 28px;
+    cursor: pointer;
+}
+
+.login-modal .login-modal-close:hover {
+    background: rgba(44, 62, 80, 0.08);
+    border-radius: 4px;
 }
 
 .login-modal h3 {
     margin-top: 0;
     margin-bottom: 15px;
     color: #2c3e50;
+    padding-right: 34px; /* space for the close button */
 }
 
 .login-info {
@@ -809,6 +870,7 @@ li[aria-controls="results-tab"] {
     margin-bottom: 10px;
     border: 1px solid #bdc3c7;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 
 .login-modal button {
@@ -819,6 +881,7 @@ li[aria-controls="results-tab"] {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 .login-modal button:hover {

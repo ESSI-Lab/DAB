@@ -59,6 +59,33 @@ var cutDate = function(date) {
 	return date.substring(0, date.lastIndexOf(":")) + "Z";
 };
 
+// Extract YYYY-MM-DD from various ISO-ish strings (e.g. "2025-12-18", "2025-12-18T10:00:00Z")
+var dateOnly = function(value) {
+	if (!value || typeof value !== 'string') {
+		return "";
+	}
+	var m = value.match(/^(\d{4}-\d{2}-\d{2})/);
+	return m ? m[1] : "";
+};
+
+var formatPickerDate = function(value) {
+	if (!value) {
+		return "";
+	}
+	// jQuery UI datepicker option values may be Date objects
+	if (value instanceof Date) {
+		try {
+			return $.datepicker.formatDate('yy-mm-dd', value);
+		} catch (e) {
+			return "";
+		}
+	}
+	if (typeof value === 'string') {
+		return dateOnly(value) || value;
+	}
+	return "";
+};
+
 var findValueOrEmpty = function(data, i, targetKey) {
 	var fv = findValue(data, i, targetKey);
 	if (typeof fv === 'undefined') {
@@ -563,24 +590,19 @@ var createPlot = function(data, i, recent) {
 		controls: "all",
 
 		on_success: function(plot) {
-
-			initDatePickers(data, i);
+			// Date pickers are initialized separately on page load; no need to re-init here.
 		},
 
 		on_error: function(plot) {
-
-			initDatePickers(data, i);
+			// Date pickers are initialized separately on page load; no need to re-init here.
 		}
 	});
 };
 
 var initDatePickers = function(data, i) {
 
-	var maxEndDate = cutDate(data[i].time_end.value);
-	maxEndDate = maxEndDate.substring(0, maxEndDate.indexOf('T'));
-
-	var minStartDate = cutDate(data[i].time_start.value);
-	minStartDate = minStartDate.substring(0, minStartDate.indexOf('T'));
+	var maxEndDate = dateOnly(data[i].time_end.value);
+	var minStartDate = dateOnly(data[i].time_start.value);
 
 	var dstartId = "datepicker-start_" + i;
 	var dendId = "datepicker-end_" + i;
@@ -597,7 +619,8 @@ var initDatePickers = function(data, i) {
 
 			var plotId = this.id.substring(this.id.indexOf('_') + 1, this.id.length);
 
-			data[plotId].time_start.value = dateText + "T00:00Z";
+			// Keep seconds so cutDate() trims only seconds (not minutes)
+			data[plotId].time_start.value = dateText + "T00:00:00Z";
 
 			$("#" + dendId).datepicker("option", "minDate", dateText);
 		}
@@ -615,7 +638,8 @@ var initDatePickers = function(data, i) {
 
 			var plotId = this.id.substring(this.id.indexOf('_') + 1, this.id.length);
 
-			data[plotId].time_end.value = dateText + "T23:59Z";
+			// Keep seconds so cutDate() trims only seconds (not minutes)
+			data[plotId].time_end.value = dateText + "T23:59:00Z";
 		}
 	});
 };
@@ -649,6 +673,8 @@ var createTempExtentTable = function(data, i) {
 
 		var plotId = this.id.substring(this.id.indexOf('_') + 1, this.id.length);
 
+		// Clear existing plot content to avoid stacking multiple renders
+		$("#plot_" + plotId).empty();
 		plots[plotId] = createPlot(data, plotId);
 	});
 
@@ -656,32 +682,31 @@ var createTempExtentTable = function(data, i) {
 
 		var plotId = this.id.substring(this.id.indexOf('_') + 1, this.id.length);
 
-		var recentDate = cutDate(data[i].time_end_recent.value);
-		recentDate = recentDate.substring(0, recentDate.indexOf('T'));
+		var recentDate = dateOnly(data[plotId].time_end_recent.value);
 
-		data[plotId].time_start.value = recentDate + "T00:00Z";
+		data[plotId].time_start.value = recentDate + "T00:00:00Z";
 		$("#" + dstartId).datepicker("setDate", recentDate);
 
-		var maxEndDate = $("#" + dendId).datepicker("option", "maxDate");
-
-		data[plotId].time_end.value = maxEndDate + "T23:59Z";
-		$("#" + dendId).datepicker("setDate", maxEndDate);
+		// End date defaults to the series max end date
+		var maxEnd = $("#" + dendId).datepicker("option", "maxDate");
+		var maxEndStr = formatPickerDate(maxEnd) || dateOnly(data[plotId].time_end.value);
+		data[plotId].time_end.value = maxEndStr + "T23:59:00Z";
+		$("#" + dendId).datepicker("setDate", maxEndStr);
 	});
 
 	$("#time-button-1y_" + i).click(function(event) {
 
 		var plotId = this.id.substring(this.id.indexOf('_') + 1, this.id.length);
 
-		var lastYearDate = cutDate(data[i].time_end_last_year.value);
-		lastYearDate = lastYearDate.substring(0, lastYearDate.indexOf('T'));
+		var lastYearDate = dateOnly(data[plotId].time_end_last_year.value);
 
-		data[plotId].time_start.value = lastYearDate + "T00:00Z";
+		data[plotId].time_start.value = lastYearDate + "T00:00:00Z";
 		$("#" + dstartId).datepicker("setDate", lastYearDate);
 
 		var maxEndDate = $("#" + dendId).datepicker("option", "maxDate");
-
-		data[plotId].time_end.value = maxEndDate + "T23:59Z";
-		$("#" + dendId).datepicker("setDate", maxEndDate);
+		var maxEndStr = formatPickerDate(maxEndDate) || dateOnly(data[plotId].time_end.value);
+		data[plotId].time_end.value = maxEndStr + "T23:59:00Z";
+		$("#" + dendId).datepicker("setDate", maxEndStr);
 	});
 
 	$("#time-button-fe_" + i).click(function(event) {
@@ -689,14 +714,14 @@ var createTempExtentTable = function(data, i) {
 		var plotId = this.id.substring(this.id.indexOf('_') + 1, this.id.length);
 
 		var minStartDate = $("#" + dstartId).datepicker("option", "minDate");
-
-		data[plotId].time_start.value = minStartDate + "T00:00Z";
-		$("#" + dstartId).datepicker("setDate", minStartDate);
+		var minStartStr = formatPickerDate(minStartDate) || dateOnly(data[plotId].time_start.value);
+		data[plotId].time_start.value = minStartStr + "T00:00:00Z";
+		$("#" + dstartId).datepicker("setDate", minStartStr);
 
 		var maxEndDate = $("#" + dendId).datepicker("option", "maxDate");
-
-		data[plotId].time_end.value = maxEndDate + "T23:59Z";
-		$("#" + dendId).datepicker("setDate", maxEndDate);
+		var maxEndStr = formatPickerDate(maxEndDate) || dateOnly(data[plotId].time_end.value);
+		data[plotId].time_end.value = maxEndStr + "T23:59:00Z";
+		$("#" + dendId).datepicker("setDate", maxEndStr);
 	});
 
 
@@ -706,7 +731,12 @@ var createLayoutTable = function(data, i, k) {
 
 	var layoutTable = "<table class='layout_table' id='layoutTable_" + i + "'>";
 
-	var label = data[i].attribute_label.value; // +" from "+convertDate(data[i].time_start.value)+" to "+convertDate(data[i].time_end.value);
+	// Prefer the time series title from the response (when available), otherwise fallback to observed property label
+	var seriesTitle = findValue(data, i, 'title');
+	if (typeof seriesTitle === 'undefined' || seriesTitle === null || ('' + seriesTitle).trim() === '') {
+		seriesTitle = data[i].attribute_label.value;
+	}
+	var label = seriesTitle; // +" from "+convertDate(data[i].time_start.value)+" to "+convertDate(data[i].time_end.value);
 
 	layoutTable += "<th colspan='2'>Time series " + (k + 1) + ": " + label + "</th>";
 
@@ -901,13 +931,19 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 
 		$("<div id='plot_" + i + "' class='plot_div'></div>").appendTo("#plotDiv_" + i);
 
-		plots[i] = createPlot(data, i, true);
-
 		//
 		// temporal extent table
 		//
 
 		createTempExtentTable(data, i);
+
+		// Do NOT load plots automatically on page load.
+		// Initialize date pickers and default dates; user will load plots via "Update plot".
+		// IMPORTANT: datepicker inputs are created by createTempExtentTable(), so initDatePickers() must run AFTER it.
+		initDatePickers(data, i);
+
+		// Default date range: last 2 months (reuse existing button logic)
+		$("#time-button-2m_" + i).trigger('click');
 
 		//
 		// download

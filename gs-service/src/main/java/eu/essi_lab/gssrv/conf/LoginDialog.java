@@ -49,8 +49,11 @@ class LoginDialog extends EnhancedDialog {
 
 	getCloseButton().getStyle().set("display", "none");
 
+	getMainLayout().getStyle().set("padding-bottom", "0px");
+
 	VerticalLayout contentLayout = getContentLayout();
 	contentLayout.getStyle().set("padding", "20px");
+	contentLayout.getStyle().set("padding-bottom", "0px");
 
 	Label label1 = ComponentFactory.createLabel("You must be logged in as administrator to view this page.");
 	Label label2 = ComponentFactory.createLabel("Please login with one of the following providers:");
