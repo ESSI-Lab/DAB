@@ -29,7 +29,7 @@ import java.util.Optional;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.Dimension;
@@ -381,9 +381,9 @@ public class HMFSConnector extends HarvestedQueryConnector<HMFSConnectorSetting>
 
 	} catch (Exception e) {
 	    e.printStackTrace();
-	    String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_HARVESTING_SUBJECT
-		    + ConfiguredGmailClient.MAIL_ERROR_SUBJECT;
-	    ConfiguredGmailClient.sendEmail(subject, "ERROR DURING HMFS HARVESTING: {}", e.getMessage());
+	    String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT
+		    + ConfiguredSMTPClient.MAIL_ERROR_SUBJECT;
+	    ConfiguredSMTPClient.sendEmail(subject, "ERROR DURING HMFS HARVESTING: {}", e.getMessage());
 	    throw GSException.createException(getClass(), e.getMessage(), e);
 	}
 

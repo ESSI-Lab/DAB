@@ -26,7 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.HostNamePropertyUtils;
@@ -47,7 +47,7 @@ public class AvailableDiskSpaceChecker {
 		    String hostname = HostNamePropertyUtils.getHostNameProperty();
 		    String alarmMessage = "Error: the disk free space is below 1GB " + hostname + " (" + executionMode + ")";
 		    GSLoggerFactory.getLogger(AvailableDiskSpaceChecker.class).error(alarmMessage);
-		    ConfiguredGmailClient.sendEmail(ConfiguredGmailClient.MAIL_ALARM, "Disk space alert \n\n" + alarmMessage);
+		    ConfiguredSMTPClient.sendEmail(ConfiguredSMTPClient.MAIL_ALARM, "Disk space alert \n\n" + alarmMessage);
 		}
 	    } else {
 		GSLoggerFactory.getLogger(AvailableDiskSpaceChecker.class).info("Disk space available: " + gb + " GB [O.K.]");

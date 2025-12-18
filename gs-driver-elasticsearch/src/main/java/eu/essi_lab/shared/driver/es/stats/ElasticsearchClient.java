@@ -101,7 +101,6 @@ import org.opensearch.cluster.metadata.RepositoryMetadata;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.unit.TimeValue;
 import org.opensearch.common.xcontent.XContentType;
-import org.opensearch.core.rest.*;
 import org.opensearch.core.rest.RestStatus;
 import org.opensearch.geometry.Geometry;
 import org.opensearch.geometry.Rectangle;
@@ -140,7 +139,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.bond.Bond;
@@ -724,7 +723,7 @@ public class ElasticsearchClient {
 	    }
 	}
 	if (!success) {
-	    ConfiguredGmailClient.sendEmail(ConfiguredGmailClient.MAIL_REPORT_STATISTICS + ConfiguredGmailClient.MAIL_ERROR_SUBJECT,
+	    ConfiguredSMTPClient.sendEmail(ConfiguredSMTPClient.MAIL_REPORT_STATISTICS + ConfiguredSMTPClient.MAIL_ERROR_SUBJECT,
 		    "Unable to index document(s) \n\n" + failureMessage);
 	}
 	return success;

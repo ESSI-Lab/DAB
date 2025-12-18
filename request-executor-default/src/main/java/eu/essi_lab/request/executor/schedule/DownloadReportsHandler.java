@@ -23,7 +23,7 @@ package eu.essi_lab.request.executor.schedule;
 
 import java.util.Optional;
 
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting.SchedulingGroup;
 import eu.essi_lab.messages.BulkDownloadMessage;
 import eu.essi_lab.model.resource.data.DataReferences;
@@ -66,7 +66,7 @@ public class DownloadReportsHandler {
 
 	SchedulingGroup group = setting.getGroup();
 
-	String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + "[" + group.name() + "]" + "[" + status + "]";
+	String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + "[" + group.name() + "]" + "[" + status + "]";
 	//
 	StringBuilder builder = new StringBuilder();
 
@@ -88,6 +88,6 @@ public class DownloadReportsHandler {
 
 	resultStorageURI.ifPresent(uri -> builder.append("Storage uri: " + uri + "\n"));
 
-	ConfiguredGmailClient.sendEmail(subject, builder.toString());
+	ConfiguredSMTPClient.sendEmail(subject, builder.toString());
     }
 }

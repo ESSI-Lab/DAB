@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.api.database.SourceStorage;
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -93,19 +93,19 @@ public class HarvestingReportsHandler {
 
 		builder.append(errorsReport.stream().collect(Collectors.joining("\n")));
 
-		String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_HARVESTING_SUBJECT
-			+ ConfiguredGmailClient.MAIL_ERROR_SUBJECT;
+		String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT
+			+ ConfiguredSMTPClient.MAIL_ERROR_SUBJECT;
 
-		ConfiguredGmailClient.sendEmail(subject, builder.toString());
+		ConfiguredSMTPClient.sendEmail(subject, builder.toString());
 	    }
 
 	    if (!warnReport.isEmpty()) {
 
 		builder.append(warnReport.stream().collect(Collectors.joining("\n")));
-		String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_HARVESTING_SUBJECT
-			+ ConfiguredGmailClient.MAIL_WARNING_SUBJECT;
+		String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT
+			+ ConfiguredSMTPClient.MAIL_WARNING_SUBJECT;
 
-		ConfiguredGmailClient.sendEmail(subject, builder.toString());
+		ConfiguredSMTPClient.sendEmail(subject, builder.toString());
 	    }
 
 	} catch (GSException e) {
@@ -135,7 +135,7 @@ public class HarvestingReportsHandler {
 	    return;
 	}
 
-	String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_HARVESTING_SUBJECT
+	String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT
 		+ (start ? "[STARTED]" : "[ENDED]");
 
 	String message = "Label: " + source.getLabel() + "\n";
@@ -171,7 +171,7 @@ public class HarvestingReportsHandler {
 
 	message += "--- \n";
 
-	ConfiguredGmailClient.sendEmail(subject, message);
+	ConfiguredSMTPClient.sendEmail(subject, message);
     }
 
     /**

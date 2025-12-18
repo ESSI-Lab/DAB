@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
 import eu.essi_lab.accessor.cdi.CDI13Validator;
 import eu.essi_lab.accessor.cdi.ValidationResult;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.smtp.GmailClient;
+import eu.essi_lab.lib.net.smtp.SMTPClient;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 
 public class CDI13ValidatorExternalTestIT {
@@ -54,7 +54,7 @@ public class CDI13ValidatorExternalTestIT {
 		System.out.println("not sending report, as it is manually launched from developer machine");
 		return;
 	    }
-	    GmailClient client = new GmailClient();
+	    SMTPClient client = new SMTPClient();
 	    client.send("[SeaDataNet] CDI validation error", message, emails);
 
 	}

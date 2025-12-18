@@ -10,7 +10,7 @@ import javax.mail.internet.AddressException;
 import org.junit.Test;
 
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.smtp.GmailClient;
+import eu.essi_lab.lib.net.smtp.SMTPClient;
 
 public class GIProxyExternalTestIT {
 
@@ -46,7 +46,7 @@ public class GIProxyExternalTestIT {
 		System.out.println("not sending report, as it is manually launched from developer machine");
 		return;
 	    }
-	    GmailClient client = new GmailClient();
+	    SMTPClient client = new SMTPClient();
 	    client.send("[GI-PROXY] GI-proxy is not working fine!",
 		    "[GI-PROXY] GI-proxy is not working fine!\n"+System.getProperty("system.proxy.url")+"\n" + message, emails);
 

@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import eu.essi_lab.authorization.userfinder.UserFinder;
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.auth.GSUser;
@@ -253,7 +253,7 @@ public class HISUserRegistration {
 	System.out.println("Sending mail to: " + recipient);
 	System.out.println(message);
 
-	return ConfiguredGmailClient.sendEmail(subject, message, recipient);
+	return ConfiguredSMTPClient.sendEmail(subject, message, recipient);
     }
 
     public GSUser addUser() throws Exception {

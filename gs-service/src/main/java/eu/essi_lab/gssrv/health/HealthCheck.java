@@ -38,7 +38,7 @@ import com.indeed.status.core.CheckResultSystemReport;
 import com.indeed.status.core.CheckStatus;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
@@ -84,7 +84,7 @@ public class HealthCheck {
 		    Boolean sendEmail = Boolean.valueOf(keyValueOption.get().getOrDefault(KeyValueOptionKeys.SEND_HEALTH_CHECK_REPORT.getLabel(), "true").toString());
 		    if (sendEmail) {
 
-			ConfiguredGmailClient.sendEmail("[GS-REPORT][HEALTH-CHECK-REPORT]", printResultSet(true));
+			ConfiguredSMTPClient.sendEmail("[GS-REPORT][HEALTH-CHECK-REPORT]", printResultSet(true));
 		    }
 		}
 	    }
