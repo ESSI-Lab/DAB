@@ -988,30 +988,12 @@ export function initializePortal(config) {
 
 		var standardLogos = '<a style="display:inline-block" target=_blank href="http://api.geodab.eu/"><img style="margin-top:-3px;" src="http://api.geodab.eu/docs/assets/img/api-logo-small-2.png"></img></a><a style="display:inline-block" target=_blank href="http://www.eurogeoss.eu/"><img src="http://api.geodab.eu/docs/assets/img/eurogeoss-small.png"></img></a><a style="display:inline-block" target=_blank href="http://www.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/iia.png"></img></a><a style="display:inline-block" targ et=_blank href="http://www.uos-firenze.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/essilab.png"></img></a>';
 
-		// Position results tab directly below paginator to close the gap
+		// Results tab now flows naturally in flexbox layout, no positioning needed
 		function positionResultsTab() {
-			// Set margin-top to 55px (paginator height) and margin-bottom to 55px
-			jQuery('#results-tab').css('margin-top', '55px');
-			jQuery('#results-tab').css('margin-bottom', '55px');
-			
-			// Calculate height to prevent results-tab from extending beyond viewport
-			// Force a reflow to ensure margins are applied
-			const resultsTab = document.getElementById('results-tab');
-			if (resultsTab) {
-				void resultsTab.offsetHeight;
-				
-				const windowHeight = jQuery(window).height();
-				const resultsTabRect = resultsTab.getBoundingClientRect();
-				// Calculate height: from top of results-tab (in viewport) to bottom of viewport minus margin-bottom
-				// resultsTabRect.top is relative to viewport, so we can use it directly
-				// We want: resultsTabRect.top + height + 55px (margin-bottom) = windowHeight
-				const availableHeight = windowHeight - resultsTabRect.top - 55;
-				if (availableHeight > 0) {
-					jQuery('#results-tab').css('height', availableHeight + 'px');
-					jQuery('#results-tab').css('overflow', 'hidden');
-					jQuery('#results-tab').css('box-sizing', 'border-box');
-				}
-			}
+			// Remove any margins that might create white space
+			jQuery('#results-tab').css('margin-top', '0px');
+			jQuery('#results-tab').css('margin-bottom', '0px');
+			jQuery('#results-tab').css('padding', '0px');
 		}
 
 		// init the tabs	        	
@@ -1216,133 +1198,49 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// tabs
 		//
-		jQuery('#tabs-ul').css('width', (baseWidth + 22) + 'px');
+		// Let tabs-ul size dynamically based on content
+		jQuery('#tabs-ul').css('width', 'auto');
 		jQuery('#tabs-ul').css('height', '40px');
 		jQuery('#tabs-ul').css('margin-left', '0px');
+		jQuery('#tabs-ul').css('white-space', 'nowrap');
 
-		// Adjust tabs top position to start at the bottom edge of headerDiv
-		// Use requestAnimationFrame to ensure DOM is fully laid out
-		function positionTabs() {
-			const headerDiv = document.getElementById('headerDiv');
-			const portalHeaderRow = document.getElementById('portalHeaderRow');
-			let tabsTop = '60px'; // default
-			
-			if (headerDiv) {
-				// Force a reflow to ensure accurate measurements
-				void headerDiv.offsetHeight;
-				
-				const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-				
-				// If portalHeaderRow exists, calculate from its top to headerDiv bottom
-				if (portalHeaderRow) {
-					void portalHeaderRow.offsetHeight;
-					const portalHeaderRect = portalHeaderRow.getBoundingClientRect();
-					const headerRect = headerDiv.getBoundingClientRect();
-					// Calculate: portalHeaderRow top (in document) + portalHeaderRow height + headerDiv height
-					const portalHeaderTop = portalHeaderRect.top + scrollTop;
-					tabsTop = (portalHeaderTop + portalHeaderRect.height + headerRect.height) + 'px';
-				} else {
-					// No portalHeaderRow, just use headerDiv bottom
-					const headerRect = headerDiv.getBoundingClientRect();
-					const headerBottom = headerRect.top + scrollTop + headerRect.height;
-					tabsTop = headerBottom + 'px';
-				}
-			}
-			jQuery('#tabs-div').css('top', tabsTop);
-		}
-		
-		// Combined repositioning function that updates both tabs and paginator
-		function repositionTabsAndPaginator() {
-			positionTabs();
-			// Small delay to ensure tabs position is updated before calculating paginator
-			setTimeout(function() {
-				positionPaginator();
-			}, 10);
-		}
-		
-		// Expose repositioning callback so image load listeners can call it
-		window.positionTabsCallback = repositionTabsAndPaginator;
-		
-		// Try immediately first
-		positionTabs();
-		// Also try after next paint to catch any delayed layout
-		requestAnimationFrame(function() {
-			requestAnimationFrame(function() {
-				positionTabs();
-				setTimeout(positionPaginator, 10);
-			});
-		});
-		// Additional retry after a short delay to catch portalHeaderRow if added later
-		setTimeout(function() {
-			positionTabs();
-			setTimeout(positionPaginator, 10);
-		}, 200);
-		// Also retry on window load to ensure everything is rendered
-		jQuery(window).on('load', function() {
-			positionTabs();
-			setTimeout(positionPaginator, 10);
-		});
-		jQuery('#tabs-div').css('left', '0px');
+		// Tabs and paginator now flow naturally in the document, no positioning needed
 		jQuery('#tabs-div').css('padding', '0px');
 
 		//------------------------------------------------------------------
 		// results tab
 		//
-		jQuery('#results-tab').css('width', (baseWidth + 31) + 'px');
+		// Let results-tab take full width of its container
+		jQuery('#results-tab').css('width', '100%');
 		jQuery('#results-tab').css('margin-left', '0px');
 		jQuery('#results-tab-link').text(t("results_tab"));
 
-		jQuery('li[aria-controls="results-tab"').css('margin-left', '190px');
+		// Remove margin-left from results tab to center tabs
+		jQuery('li[aria-controls="results-tab"').css('margin-left', '0px');
+		// Also remove inline margin from the link
+		jQuery('#results-tab-link').css('margin-left', '0px');
 
-		var css = 'width: ' + (baseWidth + 22) + 'px';
+		// Let results layout size dynamically
+		var css = 'width: 100%;';
 		GIAPI.UI_Utils.appendStyle('.resultset-layout-ul {' + css + '}');
 
-		jQuery('#paginator-widget').css('width', (baseWidth + 30) + 'px');
+		// Let paginator take full width of its container
+		jQuery('#paginator-widget').css('width', '100%');
 		jQuery('#paginator-widget').css('height', '55px');
 		jQuery('#paginator-widget').css('padding', '0px');
-		// Position paginator directly below tabs-ul to close the gap
-		function positionPaginator() {
-			const tabsDiv = document.getElementById('tabs-div');
-			const tabsUl = document.getElementById('tabs-ul');
-			let paginatorTop = '108px'; // default fallback
-			if (tabsDiv && tabsUl) {
-				// Force a reflow to ensure accurate measurements
-				void tabsDiv.offsetHeight;
-				void tabsUl.offsetHeight;
-				// Get tabs-div's top position (it's absolutely positioned)
-				const tabsDivTop = parseFloat(jQuery('#tabs-div').css('top')) || tabsDiv.offsetTop;
-				// Get tabs-ul's height
-				const tabsUlHeight = tabsUl.offsetHeight;
-				// Calculate paginator position: tabs-div top + tabs-ul height
-				paginatorTop = (tabsDivTop + tabsUlHeight) + 'px';
-			} else {
-				// Fallback: Adjust paginator top position if portal header row is present
-				const portalHeaderRowForPaginator = document.getElementById('portalHeaderRow');
-				paginatorTop = portalHeaderRowForPaginator ? '178px' : '108px';
-			}
-			jQuery('#paginator-widget').css('top', paginatorTop);
-			// Position results tab after paginator is positioned
-			positionResultsTab();
-		}
-		// Try immediately first
-		positionPaginator();
-		// Also try after next paint to catch any delayed layout
-		requestAnimationFrame(function() {
-			requestAnimationFrame(function() {
-				positionPaginator();
-				// Call positionResultsTab again after paginator is positioned
-				setTimeout(positionResultsTab, 10);
-			});
-		});
-		jQuery('#paginator-widget').css('left', '0px');
 		
-		// Reposition on window resize
+		// Paginator now flows naturally in the document, no positioning needed
+		// Position results tab after a short delay to ensure layout is complete
+		setTimeout(function() {
+			positionResultsTab();
+		}, 100);
+		
+		// Reposition results tab on window resize
 		let resizeTimeout;
 		jQuery(window).on('resize', function() {
 			clearTimeout(resizeTimeout);
 			resizeTimeout = setTimeout(function() {
-				positionPaginator();
-				setTimeout(positionResultsTab, 10);
+				positionResultsTab();
 			}, 100);
 		});
 
@@ -1354,7 +1252,7 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// sources tab
 		//
-		jQuery('#sources-tab').css('width', (baseWidth + 27) + 'px');
+		jQuery('#sources-tab').css('width', '100%');
 		jQuery('#sources-tab').css('margin-top', '3px');
 		jQuery('#sources-tab').css('margin-left', '2px');
 		jQuery('#sources-tab-link').text(t("sources_tab"));
@@ -1366,7 +1264,7 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// filters tab     
 		//
-		jQuery('#filters-tab').css('width', (baseWidth + 29) + 'px');
+		jQuery('#filters-tab').css('width', '100%');
 		jQuery('#filters-tab').css('height', '100%');
 		jQuery('#filters-tab').css('margin-top', '3px');
 		jQuery('#filters-tab-link').text(t("filters_tab"));
@@ -1374,7 +1272,7 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// browse tab     
 		//
-		jQuery('#browse-tab').css('width', (baseWidth + 23) + 'px');
+		jQuery('#browse-tab').css('width', '100%');
 		jQuery('#browse-tab').css('margin-left', '3px');
 		jQuery('#browse-tab').css('margin-top', '3px');
 		jQuery('#browse-tab').css('padding-left', '5px');
@@ -1406,7 +1304,7 @@ export function initializePortal(config) {
 
 
 			'width': '100%',
-			'height': jQuery(window).height() - 70,
+			'height': '100%',
 			'markerTitle': function(node) {
 
 				return node.report().title;
@@ -1463,7 +1361,149 @@ export function initializePortal(config) {
 			'defaultLayer': config.defaultLayer
 		});
 
-
+		// Create a wrapper div for the main content area (left sidebar + map)
+		var contentWrapper = jQuery('<div id="main-content-wrapper"></div>');
+		contentWrapper.css({
+			'display': 'flex',
+			'flex-direction': 'row',
+			'flex': '1',
+			'min-height': '0',
+			'width': '100%'
+		});
+		
+		// Create left sidebar container
+		var leftSidebar = jQuery('<div id="left-sidebar"></div>');
+		leftSidebar.css({
+			'display': 'flex',
+			'flex-direction': 'column',
+			'flex-shrink': '0',
+			'width': '40%',
+			'min-width': '0',
+			'max-width': 'none',
+			'overflow': 'hidden'
+		});
+		
+		// Move tabs, paginator, and results tab into left sidebar (in order: tabs, paginator, results tab)
+		var tabs = jQuery('#tabs-div');
+		var paginator = jQuery('#paginator-widget');
+		var resultsTab = jQuery('#results-tab');
+		var map = jQuery('#resMapWidget');
+		var stationInfo = jQuery('#stationInfo');
+		
+		// Add tabs first (at the top)
+		if (tabs.length) {
+			tabs.css({
+				'flex-shrink': '0',
+				'width': '100%'
+			});
+			leftSidebar.append(tabs);
+		}
+		
+		// Add paginator second (below tabs)
+		if (paginator.length) {
+			paginator.css({
+				'flex-shrink': '0',
+				'width': '100%'
+			});
+			leftSidebar.append(paginator);
+		}
+		
+		// Add results tab third (below paginator)
+		if (resultsTab.length) {
+			resultsTab.css({
+				'flex': '1',
+				'min-height': '0',
+				'width': '100%',
+				'overflow-y': 'auto'
+			});
+			leftSidebar.append(resultsTab);
+		}
+		
+		// Add left sidebar to wrapper
+		contentWrapper.append(leftSidebar);
+		
+		// Add map to wrapper (takes remaining space on the right)
+		if (map.length) {
+			map.css({
+				'flex': '1',
+				'min-width': '0',
+				'pointer-events': 'auto',
+				'position': 'relative',
+				'z-index': '0'
+			});
+			contentWrapper.append(map);
+		}
+		
+		// Add station info if needed
+		if (stationInfo.length) {
+			contentWrapper.append(stationInfo);
+		}
+		
+		// Insert wrapper after header
+		jQuery('#headerDiv').after(contentWrapper);
+		
+		// Add window resize listener to update map size
+		var mapResizeTimeout;
+		var updateMapSize = function() {
+			if (GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+				// Small delay to ensure DOM has updated
+				setTimeout(function() {
+					GIAPI.search.resultsMapWidget.map.updateSize();
+				}, 50);
+			}
+		};
+		
+		jQuery(window).on('resize', function() {
+			clearTimeout(mapResizeTimeout);
+			mapResizeTimeout = setTimeout(updateMapSize, 100);
+		});
+		
+		// Update map size after initial render
+		setTimeout(updateMapSize, 200);
+		
+		// Ensure map is interactive after DOM manipulation
+		// OpenLayers may need the map container to be re-initialized after DOM moves
+		setTimeout(function() {
+			if (map.length && GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+				// Force pointer events on map container
+				map.css({
+					'pointer-events': 'auto',
+					'z-index': '0'
+				});
+				
+				// Critical: The overlay container should NOT block events
+				var overlayContainer = map.find('.ol-overlaycontainer-stopevent');
+				if (overlayContainer.length) {
+					overlayContainer.css('pointer-events', 'none');
+				}
+				
+				// The viewport and canvas MUST be interactive
+				var viewport = map.find('.ol-viewport');
+				if (viewport.length) {
+					viewport.css('pointer-events', 'auto');
+					// Find canvas inside viewport
+					var canvas = viewport.find('canvas');
+					if (canvas.length) {
+						canvas.css('pointer-events', 'auto');
+					}
+				}
+				
+				// Also check for canvas directly in map
+				var allCanvases = map.find('canvas');
+				allCanvases.css('pointer-events', 'auto');
+				
+				var mapWidgetDiv = map.find('.map-widget-div');
+				if (mapWidgetDiv.length) {
+					mapWidgetDiv.css('pointer-events', 'auto');
+				}
+				
+				// Update map size again to ensure it's properly sized
+				GIAPI.search.resultsMapWidget.map.updateSize();
+				
+				// Force a repaint
+				GIAPI.search.resultsMapWidget.map.render();
+			}
+		}, 400);
 
 		//------------------------------------
 		// search button
@@ -1495,9 +1535,11 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// hide results button
 		//           	
+		// Check config for initial visibility state
+		var initialResultsVisible = config.resultsVisibility !== undefined ? config.resultsVisibility : true;
 		var hideResultsButton = GIAPI.ButtonsFactory.onOffSwitchButton(t('show_results'), t('hide_results'), {
 			'id': 'hideResultsButton',
-			'checked': false,
+			'checked': !initialResultsVisible,
 			'size': 'large',
 			'offBckColor': 'white',
 			'onBckColor': 'white',
@@ -1512,22 +1554,23 @@ export function initializePortal(config) {
 
 		function updateResultsVisibility() {
 			if (jQuery('#hideResultsButton').is(":checked")) {
-				// Hide results: hide paginator and tabs-div
-				jQuery('#paginator-widget').css('display', 'none');
-				jQuery('#tabs-div').css('display', 'none');
+				// Hide the entire left sidebar (tabs + paginator + results)
+				jQuery('#left-sidebar').css('display', 'none');
+				// Let the map reclaim space
+				if (GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+					setTimeout(function() {
+						GIAPI.search.resultsMapWidget.map.updateSize();
+					}, 50);
+				}
 			} else {
-				// Show results: show paginator and tabs-div
-				jQuery('#paginator-widget').css('display', 'block');
-				jQuery('#tabs-div').css('display', 'block');
-				// Reposition after showing to ensure correct placement
-				setTimeout(function() {
-					if (window.positionTabsCallback) {
-						window.positionTabsCallback();
-					}
-					// Ensure display is still set after repositioning
-					jQuery('#tabs-div').css('display', 'block');
-					jQuery('#paginator-widget').css('display', 'block');
-				}, 50);
+				// Show the entire left sidebar
+				jQuery('#left-sidebar').css('display', 'flex');
+				// Ensure map resizes after layout change
+				if (GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+					setTimeout(function() {
+						GIAPI.search.resultsMapWidget.map.updateSize();
+					}, 50);
+				}
 			}
 		}
 		
@@ -2496,13 +2539,18 @@ export function initializePortal(config) {
 	};
 
 	if (config.resultsVisibility !== undefined && !config.resultsVisibility) {
-		// Set button to checked state and hide results initially
-		// Use setTimeout to ensure button is fully initialized
+		// Set button to checked state and hide the entire left sidebar initially
+		// Use setTimeout to ensure button and left sidebar are fully initialized
 		setTimeout(function() {
 			jQuery('#hideResultsButton').prop('checked', true);
-			jQuery('#paginator-widget').css('display', 'none');
-			jQuery('#tabs-div').css('display', 'none');
-		}, 100);
+			jQuery('#left-sidebar').css('display', 'none');
+			// Let the map reclaim space
+			if (GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+				setTimeout(function() {
+					GIAPI.search.resultsMapWidget.map.updateSize();
+				}, 50);
+			}
+		}, 200);
 	}
 
 	if (config.bboxSelectorVisibility !== undefined && !config.bboxSelectorVisibility) {
