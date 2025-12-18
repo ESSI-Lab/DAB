@@ -168,7 +168,7 @@
 		<maven-jaxb-plugin.version>2.5.0</maven-jaxb-plugin.version>
 
 		<!--  Docker plugin -->
-		<docker.plugin.version>0.44.0</docker.plugin.version>
+		<docker.plugin.version>0.48.0</docker.plugin.version>
 
 		<!-- Apache CXF VULN-UPDATE -->
 		<cxf.version>3.5.11</cxf.version>

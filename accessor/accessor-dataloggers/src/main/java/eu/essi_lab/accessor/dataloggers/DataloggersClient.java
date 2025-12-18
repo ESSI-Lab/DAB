@@ -37,6 +37,8 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+
 public class DataloggersClient {
 
     private String endpoint;
@@ -94,6 +96,7 @@ public class DataloggersClient {
 	}
 
 	// Create POST request with query parameters (no body)
+	GSLoggerFactory.getLogger(getClass()).info("Connecting to {}",url);
 	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).POST(HttpRequest.BodyPublishers.noBody()).build();
 
 	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -273,7 +276,7 @@ public class DataloggersClient {
      * @throws InterruptedException if the request is interrupted
      */
     public VariablesResponse getVariables(Integer page, Integer size) throws IOException, InterruptedException {
-	String url = endpoint + "vars";
+	String url = endpoint + "/vars";
 
 	// Build query parameters
 	StringBuilder queryParams = new StringBuilder();
@@ -435,7 +438,7 @@ public class DataloggersClient {
      */
     public DataResponse getData(List<Integer> varIds, List<Integer> dataloggerIds, List<Integer> datastreamIds, String startDate,
 	    String endDate, Integer page, Integer size) throws IOException, InterruptedException {
-	String url = endpoint + "data";
+	String url = endpoint + "/data";
 
 	// Build query parameters for pagination
 	StringBuilder queryParams = new StringBuilder();
