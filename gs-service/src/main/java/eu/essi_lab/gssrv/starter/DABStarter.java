@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -109,7 +109,6 @@ public class DABStarter {
     }
 
     /**
-     * @param confConnector
      * @throws GSException
      */
     public void start() throws GSException {
@@ -768,9 +767,9 @@ public class DABStarter {
 
 		} else {
 
-		    System.setProperty("javax.net.ssl.trustStore", target.getAbsolutePath());
-		    System.setProperty("javax.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
-		    System.setProperty("javax.net.ssl.trustStorePassword", trustStorePwd.get());
+		    System.setProperty("dab.net.ssl.trustStore", target.getAbsolutePath());
+		    System.setProperty("dab.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
+		    System.setProperty("dab.net.ssl.trustStorePassword", trustStorePwd.get());
 		}
 
 		GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
