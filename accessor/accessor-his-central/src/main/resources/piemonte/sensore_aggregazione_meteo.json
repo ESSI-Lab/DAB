@@ -11,7 +11,7 @@
                     "timeResolution": "P1D",
                     "flag_validazione": {
                         "code": "tclasse",
-                        "position": 1
+                        "position": 2
                     }
                 },
                 {
@@ -22,7 +22,7 @@
                     "timeResolution": "P1D",
                     "flag_validazione": {
                         "code": "tclasse",
-                        "position": 2
+                        "position": 3
                     }
                 },
                 {
@@ -33,7 +33,7 @@
                     "timeResolution": "P1D",
                     "flag_validazione": {
                         "code": "tclasse",
-                        "position": 3
+                        "position": 1
                     }
                 },
                 {
@@ -54,7 +54,7 @@
                     "code": "cdd_base18",
                     "observedProperty": "Gradi giorno",
                     "uom": "°C",
-                    "interpolationType": "Cooling degree day base 18 °C",
+                    "interpolationType": "Cooling degree day base 20 °C",
                     "timeResolution": "P1D"
                 }
             ]
@@ -113,7 +113,7 @@
                     "timeResolution": "P1D",
                     "flag_validazione": {
                         "code": "uclasse",
-                        "position": 1
+                        "position": 3
                     }
                 },
                 {
@@ -128,14 +128,14 @@
                     }
                 },
                 {
-                    "code": "tmedia",
+                    "code": "umedia",
                     "observedProperty": "Umidità relativa dell'aria",
                     "uom": "%",
                     "interpolationType": "media intervallo precedente (o successivo?)",
                     "timeResolution": "P1D",
                     "flag_validazione": {
                         "code": "uclasse",
-                        "position": 3
+                        "position": 1
                     }
                 }
             ]
