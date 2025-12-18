@@ -1,0 +1,213 @@
+{
+    "results": [
+        {
+            "id_parametro": "TERMA",
+            "aggregati": [
+                {
+                    "code": "tmax",
+                    "observedProperty": "Temperatura dell'aria",
+                    "uom": "°C",
+                    "interpolationType": "massimo intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "tclasse",
+                        "position": 1
+                    }
+                },
+                {
+                    "code": "tmin",
+                    "observedProperty": "Temperatura dell'aria",
+                    "uom": "°C",
+                    "interpolationType": "minimo intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "tclasse",
+                        "position": 2
+                    }
+                },
+                {
+                    "code": "tmedia",
+                    "observedProperty": "Temperatura dell'aria",
+                    "uom": "°C",
+                    "interpolationType": "media intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "tclasse",
+                        "position": 3
+                    }
+                },
+                {
+                    "code": "hdd_base18",
+                    "observedProperty": "Gradi giorno",
+                    "uom": "°C",
+                    "interpolationType": "Heating degree day base 18 °C",
+                    "timeResolution": "P1D"
+                },
+                {
+                    "code": "hdd_base20",
+                    "observedProperty": "Gradi giorno",
+                    "uom": "°C",
+                    "interpolationType": "Heating degree day base 20 °C",
+                    "timeResolution": "P1D"
+                },
+                {
+                    "code": "cdd_base18",
+                    "observedProperty": "Gradi giorno",
+                    "uom": "°C",
+                    "interpolationType": "Cooling degree day base 18 °C",
+                    "timeResolution": "P1D"
+                }
+            ]
+        },
+        {
+            "id_parametro": "PLUV",
+            "aggregati": [
+                {
+                    "code": "ptot",
+                    "observedProperty": "Precipitazione",
+                    "uom": "mm",
+                    "interpolationType": "totale intervallo precedente",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "pclasse",
+                        "position": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id_parametro": "VELV",
+            "aggregati": [
+                {
+                    "code": "vmedia",
+                    "observedProperty": "Velocità del vento",
+                    "uom": "m/s",
+                    "interpolationType": "media intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "vclasse",
+                        "position": 1
+                    }
+                },
+                {
+                    "code": "vraffica",
+                    "observedProperty": "Velocità del vento",
+                    "uom": "m/s",
+                    "interpolationType": "massimo intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "vclasse",
+                        "position": 2
+                    }
+                }
+            ]
+        },
+        {
+            "id_parametro": "IGRO",
+            "aggregati": [
+                {
+                    "code": "umax",
+                    "observedProperty": "Umidità relativa dell'aria",
+                    "uom": "%",
+                    "interpolationType": "massimo intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "uclasse",
+                        "position": 1
+                    }
+                },
+                {
+                    "code": "umin",
+                    "observedProperty": "Umidità relativa dell'aria",
+                    "uom": "%",
+                    "interpolationType": "minimo intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "uclasse",
+                        "position": 2
+                    }
+                },
+                {
+                    "code": "tmedia",
+                    "observedProperty": "Umidità relativa dell'aria",
+                    "uom": "%",
+                    "interpolationType": "media intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "uclasse",
+                        "position": 3
+                    }
+                }
+            ]
+        },
+        {
+            "id_parametro": "RADD",
+            "aggregati": [
+                {
+                    "code": "rtot",
+                    "observedProperty": "Radiazione Globale",
+                    "uom": "MJ",
+                    "interpolationType": "totale intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "rclasse",
+                        "position": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id_parametro": "DIRV",
+            "aggregati": [
+                {
+                    "code": "settore_prevalente",
+                    "observedProperty": "Direzione del vento",
+                    "uom": "degrees",
+                    "interpolationType": "most frequent sector in current interval",
+                    "timeResolution": "P1D"
+                },
+                {
+                    "code": "tempo_permanenza",
+                    "observedProperty": "Direzione del vento",
+                    "uom": "minutes",
+                    "interpolationType": "duration over current interval",
+                    "timeResolution": "P1D"
+                },
+                {
+                    "code": "durata_calma",
+                    "observedProperty": "Velocità del vento",
+                    "uom": "minutes",
+                    "interpolationType": "calm of wind duration over current interval",
+                    "timeResolution": "P1D"
+                }
+            ]
+        },
+        {
+            "id_parametro": "BARO",
+            "aggregati": [
+                {
+                    "code": "bmedia",
+                    "observedProperty": "Pressione atmosferica",
+                    "uom": "hPa",
+                    "interpolationType": "media intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "bclasse",
+                        "position": 1
+                    }
+                },
+                {
+                    "code": "bmedia_slm",
+                    "observedProperty": "Pressione atmosferica msl",
+                    "uom": "hPa",
+                    "interpolationType": "media intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "bclasse",
+                        "position": 2
+                    }
+                }
+            ]
+        }
+    ]
+}
