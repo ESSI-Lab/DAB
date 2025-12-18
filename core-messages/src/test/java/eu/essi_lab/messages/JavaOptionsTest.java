@@ -11,7 +11,9 @@ public class JavaOptionsTest {
     @Test
     public void test() {
 
-	Assert.assertFalse(JavaOptions.CHECK_CONFIG.getDefaultValue().get());
+	Assert.assertTrue(JavaOptions.CHECK_CONFIG.getDefaultValue().get());
+
+	Assert.assertTrue(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getDefaultValue().get());
 
 	Assert.assertFalse(JavaOptions.INIT_CACHES.getDefaultValue().get());
 
@@ -26,8 +28,6 @@ public class JavaOptionsTest {
 	Assert.assertFalse(JavaOptions.SKIP_HEALTH_CHECK.getDefaultValue().get());
 
 	Assert.assertFalse(JavaOptions.SKIP_GDAL_TEST.getDefaultValue().get());
-
-	Assert.assertTrue(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getDefaultValue().get());
 
 	Assert.assertFalse(JavaOptions.CONFIGURATION_URL.getDefaultValue().isPresent());
 	Assert.assertFalse(JavaOptions.S3_ENDPOINT.getDefaultValue().isPresent());
