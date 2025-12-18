@@ -30,6 +30,7 @@
 	"timeInterpolation" : true,
 	"clusterWMS" : true,
 	"showSourceEndpoint" : false,
-	"top-logo" : "wmo-logo.svg",
-	"top-logo-href" : "https://wmo.int/activities/wmo-hydrological-observing-system-whos"
+	"title-left": "WMO Hydrological Observing System (WHOS) global portal",
+	"logo-left" : "wmo-logo.svg",
+	"logo-left-href" : "https://wmo.int/activities/wmo-hydrological-observing-system-whos"
 }

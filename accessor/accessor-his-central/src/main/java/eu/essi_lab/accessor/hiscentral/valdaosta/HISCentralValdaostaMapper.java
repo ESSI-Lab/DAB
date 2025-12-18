@@ -189,19 +189,19 @@ public class HISCentralValdaostaMapper extends FileIdentifierMapper {
 	//
 	// spatailextent: seems to be lat, lon, alt
 	// e.g.45.6783,7.10742,1238
-	Double pointLon = null;
-	Double pointLat = null;
+	BigDecimal pointLon = null;
+	BigDecimal pointLat = null;
 	Double altitude = null;
 
 	String[] splittedSpatial = spatialExtent.split(",");
 	if (splittedSpatial.length > 0) {
 	    if (splittedSpatial.length > 2) {
-		pointLat = Double.parseDouble(splittedSpatial[0]);
-		pointLon = Double.parseDouble(splittedSpatial[1]);
+		pointLat = new BigDecimal(splittedSpatial[0]);
+		pointLon = new BigDecimal(splittedSpatial[1]);
 		altitude = Double.parseDouble(splittedSpatial[2]);
 	    } else {
-		pointLat = Double.parseDouble(splittedSpatial[0]);
-		pointLon = Double.parseDouble(splittedSpatial[1]);
+		pointLat = new BigDecimal(splittedSpatial[0]);
+		pointLon = new BigDecimal(splittedSpatial[1]);
 	    }
 	}
 	String region = datasetInfo.optString("territory-of-origin-of-data");
@@ -486,10 +486,10 @@ public class HISCentralValdaostaMapper extends FileIdentifierMapper {
 
 	if (pointLat != null && pointLon != null) {
 	    coreMetadata.addBoundingBox(//
-		    new BigDecimal(pointLat), //
-		    new BigDecimal(pointLon), //
-		    new BigDecimal(pointLat), //
-		    new BigDecimal(pointLon));
+		    pointLat, //
+		    pointLon, //
+		    pointLat, //
+		    pointLon);
 	}
 
 	// vertical extent

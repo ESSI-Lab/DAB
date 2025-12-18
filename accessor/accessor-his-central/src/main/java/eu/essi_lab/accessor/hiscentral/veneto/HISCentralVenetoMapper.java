@@ -195,8 +195,8 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	// String tempExtenBegin = datasetInfo.optString("data_inizio");
 	// String tempExtenEnd = datasetInfo.optString("data_fine");
 
-	Double pointLon = datasetInfo.optDouble("longitudine");
-	Double pointLat = datasetInfo.optDouble("latitudine");
+	BigDecimal pointLon = datasetInfo.optBigDecimal("longitudine", null);
+	BigDecimal pointLat = datasetInfo.optBigDecimal("latitudine", null);
 	Double altitude = datasetInfo.optDouble("altitude");
 
 	String stationCode = datasetInfo.optString("codice_stazione");
@@ -310,10 +310,10 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	//
 	if (pointLat != null && pointLon != null) {
 	    coreMetadata.addBoundingBox(//
-		    new BigDecimal(pointLat), //
-		    new BigDecimal(pointLon), //
-		    new BigDecimal(pointLat), //
-		    new BigDecimal(pointLon));
+		    pointLat, //
+		    pointLon, //
+		    pointLat, //
+		    pointLon);
 	}
 
 	// vertical extent

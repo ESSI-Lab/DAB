@@ -90,7 +90,13 @@ function initializeLogin(config) {
 		<div id=\"modalOverlay\" class=\"modal-overlay\"></div>
 	`;
 
-	document.body.insertBefore(loginContainer, document.body.firstChild);
+	// Append login container to headerDiv instead of body
+	const headerDiv = document.getElementById('headerDiv');
+	if (headerDiv) {
+		headerDiv.appendChild(loginContainer);
+	} else {
+		document.body.insertBefore(loginContainer, document.body.firstChild);
+	}
 
 	// Setup event listeners
 	const loginBtn = document.getElementById('loginBtn');
@@ -982,6 +988,32 @@ export function initializePortal(config) {
 
 		var standardLogos = '<a style="display:inline-block" target=_blank href="http://api.geodab.eu/"><img style="margin-top:-3px;" src="http://api.geodab.eu/docs/assets/img/api-logo-small-2.png"></img></a><a style="display:inline-block" target=_blank href="http://www.eurogeoss.eu/"><img src="http://api.geodab.eu/docs/assets/img/eurogeoss-small.png"></img></a><a style="display:inline-block" target=_blank href="http://www.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/iia.png"></img></a><a style="display:inline-block" targ et=_blank href="http://www.uos-firenze.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/essilab.png"></img></a>';
 
+		// Position results tab directly below paginator to close the gap
+		function positionResultsTab() {
+			// Set margin-top to 55px (paginator height) and margin-bottom to 55px
+			jQuery('#results-tab').css('margin-top', '55px');
+			jQuery('#results-tab').css('margin-bottom', '55px');
+			
+			// Calculate height to prevent results-tab from extending beyond viewport
+			// Force a reflow to ensure margins are applied
+			const resultsTab = document.getElementById('results-tab');
+			if (resultsTab) {
+				void resultsTab.offsetHeight;
+				
+				const windowHeight = jQuery(window).height();
+				const resultsTabRect = resultsTab.getBoundingClientRect();
+				// Calculate height: from top of results-tab (in viewport) to bottom of viewport minus margin-bottom
+				// resultsTabRect.top is relative to viewport, so we can use it directly
+				// We want: resultsTabRect.top + height + 55px (margin-bottom) = windowHeight
+				const availableHeight = windowHeight - resultsTabRect.top - 55;
+				if (availableHeight > 0) {
+					jQuery('#results-tab').css('height', availableHeight + 'px');
+					jQuery('#results-tab').css('overflow', 'hidden');
+					jQuery('#results-tab').css('box-sizing', 'border-box');
+				}
+			}
+		}
+
 		// init the tabs	        	
 		jQuery('#tabs-div').tabs({
 			activate: function(event, ui) {
@@ -990,6 +1022,13 @@ export function initializePortal(config) {
 				if (ui.newPanel.selector === '#results-tab') {
 
 					jQuery('#paginator-widget').css('display', 'block');
+					// Reposition results tab after paginator is shown and measured
+					// Use multiple timeouts to ensure DOM is fully updated
+					setTimeout(function() {
+						positionResultsTab();
+						// Try again after a brief delay to catch any layout changes
+						setTimeout(positionResultsTab, 50);
+					}, 10);
 
 				} else {
 					jQuery('#paginator-widget').css('display', 'none');
@@ -1007,7 +1046,125 @@ export function initializePortal(config) {
 		//
 		jQuery('#headerDiv').css('padding', '10px');
 		jQuery('#headerDiv').css('padding-top', '5px');
+		jQuery('#headerDiv').css('padding-left', '10px');
+		jQuery('#headerDiv').css('margin-left', '0px');
 		jQuery('#headerDiv').css('height', '30px');
+
+		//------------------------------------------------------------------
+		// portal header row with logos and titles (if configured)
+		//
+		if (config['logo-left'] || config['logo-right'] || config['title-left'] || config['title-right']) {
+			const headerDiv = document.getElementById('headerDiv');
+			if (headerDiv && !document.getElementById('portalHeaderRow')) {
+				const portalHeaderRow = document.createElement('div');
+				portalHeaderRow.id = 'portalHeaderRow';
+				portalHeaderRow.className = 'portal-header-row';
+
+				// Left section: logo-left + title-left
+				const leftSection = document.createElement('div');
+				leftSection.className = 'portal-header-left';
+				
+				if (config['logo-left']) {
+					const leftLogoImg = document.createElement('img');
+					leftLogoImg.className = 'portal-header-logo-left';
+					leftLogoImg.alt = 'Left logo';
+					// Use path as-is if relative, or full URL if absolute
+					const leftLogoSrc = config['logo-left'].startsWith('http') ? config['logo-left'] : config['logo-left'];
+					
+					// Function to recalculate position
+					const recalculatePosition = function() {
+						setTimeout(function() {
+							if (window.positionTabsCallback) {
+								window.positionTabsCallback();
+							}
+						}, 10);
+					};
+					
+					// Add load listener to recalculate position when image loads
+					leftLogoImg.addEventListener('load', recalculatePosition);
+					// Also handle errors (image fails to load)
+					leftLogoImg.addEventListener('error', recalculatePosition);
+					
+					// Add click handler if href is provided
+					if (config['logo-left-href']) {
+						leftLogoImg.style.cursor = 'pointer';
+						leftLogoImg.addEventListener('click', function() {
+							window.open(config['logo-left-href'], '_blank', 'noopener,noreferrer');
+						});
+					}
+					
+					leftLogoImg.src = leftLogoSrc;
+					leftSection.appendChild(leftLogoImg);
+					
+					// If image is already loaded (cached), trigger recalculation
+					if (leftLogoImg.complete) {
+						recalculatePosition();
+					}
+				}
+				
+				if (config['title-left']) {
+					const leftTitle = document.createElement('div');
+					leftTitle.className = 'portal-header-title-left';
+					leftTitle.textContent = config['title-left'];
+					leftSection.appendChild(leftTitle);
+				}
+
+				// Right section: logo-right + title-right
+				const rightSection = document.createElement('div');
+				rightSection.className = 'portal-header-right';
+				
+				if (config['logo-right']) {
+					const rightLogoImg = document.createElement('img');
+					rightLogoImg.className = 'portal-header-logo-right';
+					rightLogoImg.alt = 'Right logo';
+					// Use path as-is if relative, or full URL if absolute
+					const rightLogoSrc = config['logo-right'].startsWith('http') ? config['logo-right'] : config['logo-right'];
+					
+					// Function to recalculate position
+					const recalculatePosition = function() {
+						setTimeout(function() {
+							if (window.positionTabsCallback) {
+								window.positionTabsCallback();
+							}
+						}, 10);
+					};
+					
+					// Add load listener to recalculate position when image loads
+					rightLogoImg.addEventListener('load', recalculatePosition);
+					// Also handle errors (image fails to load)
+					rightLogoImg.addEventListener('error', recalculatePosition);
+					
+					// Add click handler if href is provided
+					if (config['logo-right-href']) {
+						rightLogoImg.style.cursor = 'pointer';
+						rightLogoImg.addEventListener('click', function() {
+							window.open(config['logo-right-href'], '_blank', 'noopener,noreferrer');
+						});
+					}
+					
+					rightLogoImg.src = rightLogoSrc;
+					rightSection.appendChild(rightLogoImg);
+					
+					// If image is already loaded (cached), trigger recalculation
+					if (rightLogoImg.complete) {
+						recalculatePosition();
+					}
+				}
+				
+				if (config['title-right']) {
+					const rightTitle = document.createElement('div');
+					rightTitle.className = 'portal-header-title-right';
+					rightTitle.textContent = config['title-right'];
+					rightSection.appendChild(rightTitle);
+				}
+
+				portalHeaderRow.appendChild(leftSection);
+				portalHeaderRow.appendChild(rightSection);
+
+				// Insert before headerDiv
+				headerDiv.parentNode.insertBefore(portalHeaderRow, headerDiv);
+			}
+		}
 
 		if (config['top-logo']) {
 			const headerDiv = document.getElementById('headerDiv');
@@ -1061,17 +1218,78 @@ export function initializePortal(config) {
 		//
 		jQuery('#tabs-ul').css('width', (baseWidth + 22) + 'px');
 		jQuery('#tabs-ul').css('height', '40px');
-		jQuery('#tabs-ul').css('margin-left', '3px');
+		jQuery('#tabs-ul').css('margin-left', '0px');
 
-		jQuery('#tabs-div').css('top', '60px');
-		jQuery('#tabs-div').css('left', '15px');
+		// Adjust tabs top position to start at the bottom edge of headerDiv
+		// Use requestAnimationFrame to ensure DOM is fully laid out
+		function positionTabs() {
+			const headerDiv = document.getElementById('headerDiv');
+			const portalHeaderRow = document.getElementById('portalHeaderRow');
+			let tabsTop = '60px'; // default
+			
+			if (headerDiv) {
+				// Force a reflow to ensure accurate measurements
+				void headerDiv.offsetHeight;
+				
+				const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+				
+				// If portalHeaderRow exists, calculate from its top to headerDiv bottom
+				if (portalHeaderRow) {
+					void portalHeaderRow.offsetHeight;
+					const portalHeaderRect = portalHeaderRow.getBoundingClientRect();
+					const headerRect = headerDiv.getBoundingClientRect();
+					// Calculate: portalHeaderRow top (in document) + portalHeaderRow height + headerDiv height
+					const portalHeaderTop = portalHeaderRect.top + scrollTop;
+					tabsTop = (portalHeaderTop + portalHeaderRect.height + headerRect.height) + 'px';
+				} else {
+					// No portalHeaderRow, just use headerDiv bottom
+					const headerRect = headerDiv.getBoundingClientRect();
+					const headerBottom = headerRect.top + scrollTop + headerRect.height;
+					tabsTop = headerBottom + 'px';
+				}
+			}
+			jQuery('#tabs-div').css('top', tabsTop);
+		}
+		
+		// Combined repositioning function that updates both tabs and paginator
+		function repositionTabsAndPaginator() {
+			positionTabs();
+			// Small delay to ensure tabs position is updated before calculating paginator
+			setTimeout(function() {
+				positionPaginator();
+			}, 10);
+		}
+		
+		// Expose repositioning callback so image load listeners can call it
+		window.positionTabsCallback = repositionTabsAndPaginator;
+		
+		// Try immediately first
+		positionTabs();
+		// Also try after next paint to catch any delayed layout
+		requestAnimationFrame(function() {
+			requestAnimationFrame(function() {
+				positionTabs();
+				setTimeout(positionPaginator, 10);
+			});
+		});
+		// Additional retry after a short delay to catch portalHeaderRow if added later
+		setTimeout(function() {
+			positionTabs();
+			setTimeout(positionPaginator, 10);
+		}, 200);
+		// Also retry on window load to ensure everything is rendered
+		jQuery(window).on('load', function() {
+			positionTabs();
+			setTimeout(positionPaginator, 10);
+		});
+		jQuery('#tabs-div').css('left', '0px');
 		jQuery('#tabs-div').css('padding', '0px');
 
 		//------------------------------------------------------------------
 		// results tab
 		//
 		jQuery('#results-tab').css('width', (baseWidth + 31) + 'px');
-		jQuery('#results-tab').css('margin-top', '52px');
+		jQuery('#results-tab').css('margin-left', '0px');
 		jQuery('#results-tab-link').text(t("results_tab"));
 
 		jQuery('li[aria-controls="results-tab"').css('margin-left', '190px');
@@ -1081,8 +1299,52 @@ export function initializePortal(config) {
 
 		jQuery('#paginator-widget').css('width', (baseWidth + 30) + 'px');
 		jQuery('#paginator-widget').css('height', '55px');
-		jQuery('#paginator-widget').css('top', '108px');
-		jQuery('#paginator-widget').css('left', '18px');
+		jQuery('#paginator-widget').css('padding', '0px');
+		// Position paginator directly below tabs-ul to close the gap
+		function positionPaginator() {
+			const tabsDiv = document.getElementById('tabs-div');
+			const tabsUl = document.getElementById('tabs-ul');
+			let paginatorTop = '108px'; // default fallback
+			if (tabsDiv && tabsUl) {
+				// Force a reflow to ensure accurate measurements
+				void tabsDiv.offsetHeight;
+				void tabsUl.offsetHeight;
+				// Get tabs-div's top position (it's absolutely positioned)
+				const tabsDivTop = parseFloat(jQuery('#tabs-div').css('top')) || tabsDiv.offsetTop;
+				// Get tabs-ul's height
+				const tabsUlHeight = tabsUl.offsetHeight;
+				// Calculate paginator position: tabs-div top + tabs-ul height
+				paginatorTop = (tabsDivTop + tabsUlHeight) + 'px';
+			} else {
+				// Fallback: Adjust paginator top position if portal header row is present
+				const portalHeaderRowForPaginator = document.getElementById('portalHeaderRow');
+				paginatorTop = portalHeaderRowForPaginator ? '178px' : '108px';
+			}
+			jQuery('#paginator-widget').css('top', paginatorTop);
+			// Position results tab after paginator is positioned
+			positionResultsTab();
+		}
+		// Try immediately first
+		positionPaginator();
+		// Also try after next paint to catch any delayed layout
+		requestAnimationFrame(function() {
+			requestAnimationFrame(function() {
+				positionPaginator();
+				// Call positionResultsTab again after paginator is positioned
+				setTimeout(positionResultsTab, 10);
+			});
+		});
+		jQuery('#paginator-widget').css('left', '0px');
+		
+		// Reposition on window resize
+		let resizeTimeout;
+		jQuery(window).on('resize', function() {
+			clearTimeout(resizeTimeout);
+			resizeTimeout = setTimeout(function() {
+				positionPaginator();
+				setTimeout(positionResultsTab, 10);
+			}, 100);
+		});
 
 		css = 'width: 290px;';
 		css += 'margin-left:640px;';
@@ -1207,7 +1469,7 @@ export function initializePortal(config) {
 		// search button
 		//
 		var searchButton = GIAPI.FontAwesomeButton({
-			'width': baseWidth - 100,
+			'width': 100,
 			'label': t('search'),
 			'icon': 'fa-search',
 			'handler': function() {
@@ -1248,18 +1510,31 @@ export function initializePortal(config) {
 
 		jQuery('#hide-results-button').append(hideResultsButton);
 
-		jQuery(document).on('click', '#hideResultsButton', function() {
-
+		function updateResultsVisibility() {
 			if (jQuery('#hideResultsButton').is(":checked")) {
-
+				// Hide results: hide paginator and tabs-div
 				jQuery('#paginator-widget').css('display', 'none');
 				jQuery('#tabs-div').css('display', 'none');
-
 			} else {
-
-				jQuery('#paginator-widget').css('display', 'inline-block');
+				// Show results: show paginator and tabs-div
+				jQuery('#paginator-widget').css('display', 'block');
 				jQuery('#tabs-div').css('display', 'block');
+				// Reposition after showing to ensure correct placement
+				setTimeout(function() {
+					if (window.positionTabsCallback) {
+						window.positionTabsCallback();
+					}
+					// Ensure display is still set after repositioning
+					jQuery('#tabs-div').css('display', 'block');
+					jQuery('#paginator-widget').css('display', 'block');
+				}, 50);
 			}
+		}
+		
+		jQuery(document).on('change', '#hideResultsButton', updateResultsVisibility);
+		// Also listen to click as backup in case change event doesn't fire
+		jQuery(document).on('click', '#hideResultsButton', function() {
+			setTimeout(updateResultsVisibility, 10);
 		});
 
 
@@ -2221,7 +2496,13 @@ export function initializePortal(config) {
 	};
 
 	if (config.resultsVisibility !== undefined && !config.resultsVisibility) {
-		$('#hideResultsButton').click();
+		// Set button to checked state and hide results initially
+		// Use setTimeout to ensure button is fully initialized
+		setTimeout(function() {
+			jQuery('#hideResultsButton').prop('checked', true);
+			jQuery('#paginator-widget').css('display', 'none');
+			jQuery('#tabs-div').css('display', 'none');
+		}, 100);
 	}
 
 	if (config.bboxSelectorVisibility !== undefined && !config.bboxSelectorVisibility) {

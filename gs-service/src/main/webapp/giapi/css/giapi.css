@@ -996,9 +996,9 @@ body{
 }
 .common-ui-node-report-div{
 	background-color: #DDD;
-	padding-left:5px;
-	padding-right:5px;
-	padding-top:5px;	
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 0px;	
 	text-align:left;
  	border-color: rgba(153, 153, 153, 0.44);
 	height: 100%;
@@ -1012,6 +1012,16 @@ body{
 	 box-shadow: 0px 0px 6px 4px rgba(0,0,0,0.3);
 /*     -webkit-filter: brightness(110%); */
 /*     filter: brightness(110%); */
+}
+#section-div-q5onfpveyce{
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+}
+#section-div-ozovhei5dnl{
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
 }
 .common-ui-node-report-title{
 	font-size:120%;
@@ -1152,7 +1162,7 @@ body{
 /* ResultSetLayout                       */  
 .resultset-layout-table{
  	width:100%;
-	border-spacing: 0 4px;
+	border-spacing: 0;
 }
 .resultset-layout-table-div{
 	width: 100%; 

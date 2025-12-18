@@ -189,8 +189,13 @@ public class HISCentralPiemonteDownloader extends WMLDataDownloader {
 
 		JSONObject jsonObj = new JSONObject(dataResponse);
 		JSONArray valuesData = jsonObj.optJSONArray("results");
-
-		String var = online.getName().split("_")[1];
+		String[] splittedVariable = online.getName().split("_");
+		String var = "";
+		if (splittedVariable.length > 2) {
+		    var = splittedVariable[1] + "_" + splittedVariable[2];
+		} else {
+		    var = splittedVariable[1];
+		}
 
 		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 		DateFormat iso8601OutputFormat = null;

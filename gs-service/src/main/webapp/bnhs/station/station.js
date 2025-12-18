@@ -110,7 +110,15 @@ var createDataTable = function(data, i) {
 
 	items.push("<tr><td class='data_table_label_td'>Observed variable</td><td>" + findValue(data, i, 'attribute_label') + "</td></tr>");
 
-	items.push("<tr><td>Measurement unit</td><td>" + findValue(data, i, 'attribute_units') + " (" + findValue(data, i, 'attribute_units_abbreviation') + ") </td></tr>");
+	var unitAbbr = findValue(data, i, 'attribute_units_abbreviation');
+
+					if (unitAbbr !== undefined && unitAbbr !== null && unitAbbr !== "") {
+					  unitAbbr = " (" + unitAbbr + ")";
+					} else {
+					  unitAbbr = "";
+					}
+					
+	items.push("<tr><td>Measurement unit</td><td>"+ findValue(data, i, 'attribute_units')  + unitAbbr +"</td></tr>");	
 
 	items.push("<tr><td>Temporal extent</td><td>" + tempExtent + "</td></tr>");
 
