@@ -1,4 +1,4 @@
-package eu.essi_lab.downloader.dataloggers;
+package eu.essi_lab.accessor.dataloggers;
 
 /*-
  * #%L
@@ -46,12 +46,6 @@ import org.cuahsi.waterml._1.essi.JAXBWML;
 
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
-import eu.essi_lab.accessor.dataloggers.DataloggersClient;
-import eu.essi_lab.accessor.dataloggers.DataloggersConnector;
-import eu.essi_lab.accessor.dataloggers.DataloggersIdentifierMangler;
-import eu.essi_lab.accessor.dataloggers.DataResponse;
-import eu.essi_lab.accessor.dataloggers.Feature;
-import eu.essi_lab.accessor.dataloggers.Measurement;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;

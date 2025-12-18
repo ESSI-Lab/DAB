@@ -306,7 +306,18 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	}
 
 	var divId = GIAPI.random();
-	var div = '<div style="width: ' + options.width + '; height: ' + options.height + 'px" class="map-widget-div"><div id="' + divId + '"  class="ol-fullscreen-map"></div></div>';
+	// Don't set inline height/width if they are percentages - let CSS handle it
+	var heightStyle = '';
+	var widthStyle = '';
+	if (options.height && options.height !== '100%') {
+		heightStyle = jQuery.isNumeric(options.height) ? options.height + 'px' : options.height;
+		heightStyle = 'height: ' + heightStyle + ';';
+	}
+	if (options.width && options.width !== '100%') {
+		widthStyle = jQuery.isNumeric(options.width) ? options.width + 'px' : options.width;
+		widthStyle = 'width: ' + widthStyle + ';';
+	}
+	var div = '<div style="' + widthStyle + ' ' + heightStyle + '" class="map-widget-div"><div id="' + divId + '"  class="ol-fullscreen-map"></div></div>';
 
 	jQuery('#' + id).append(div);
 

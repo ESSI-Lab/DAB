@@ -203,12 +203,27 @@ public class HISCentralPiemonteDownloader extends WMLDataDownloader {
 
 		if (valuesData != null) {
 
-		    for (Object arr : valuesData) {
+		    dataLoop: for (Object arr : valuesData) {
 
 			JSONObject data = (JSONObject) arr;
 
 			// TODO: get variable of interest -- see PiemonteConnector class
 			String valueString = data.optString(var);
+			
+			if(var.equals("settore_prevalente")) {
+			    break dataLoop;
+//			    if(valueString.toLowerCase().equals("n")) {
+//				valueString = "0";
+//			    }else if(valueString.toLowerCase().equals("nne") || valueString.toLowerCase().equals("ne") || valueString.toLowerCase().equals("e")) {
+//				valueString = "90";
+//			    }else if(valueString.toLowerCase().equals("ese") || valueString.toLowerCase().equals("se") || valueString.toLowerCase().equals("sse") || valueString.toLowerCase().equals("s")) {
+//				valueString = "180";
+//			    }else if(valueString.toLowerCase().equals("ssw") || valueString.toLowerCase().equals("sw") || valueString.toLowerCase().equals("wsw") || valueString.toLowerCase().equals("w")) {
+//				valueString = "270";
+//			    }else if(valueString.toLowerCase().equals("wnw") || valueString.toLowerCase().equals("nw") || valueString.toLowerCase().equals("nnw")) {
+//				valueString = "270";
+//			    }
+			}
 
 			ValueSingleVariable variable = new ValueSingleVariable();
 
