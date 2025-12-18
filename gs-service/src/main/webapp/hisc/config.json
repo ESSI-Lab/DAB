@@ -19,6 +19,7 @@
 	"logo-right" : "logo-right.png",
 	"title-left": "Piattaforma nazionale di condivisione dei dati idro-meteorologici HIS Central",
 	"title-right": "Sviluppata con il supporto di CNR-IIA e INFN nell'ambito del Progetto Bilancio Idrologico Nazionale del Piano Operativo Ambiente",
+	"disclaimer" : "Dati dei Servizi idro-meteorologici regionali e delle province autonome. I dati possono essere soggetti a revisioni.",
 	"attributeSearch" : true,
 	"platformSearch" : true,
 	"validatedSearch" : false,

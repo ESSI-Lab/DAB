@@ -529,6 +529,8 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		    object = create(object, "longitude", bbox.getBigDecimalEast().toString(), "longitude");
 		}
 
+		object = create(object, "title", resource.getHarmonizedMetadata().getCoreMetadata().getTitle(), "Title");
+
 		object = create(object, "platform_id", platformId, "Station ID");
 
 		object = create(object, "platform_id_local", platformIdLocal, "Local station ID");

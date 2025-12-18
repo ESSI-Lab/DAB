@@ -38,16 +38,36 @@ function loadI18nSync(lang) {
 		}
 		return {};
 	}
-	var enCandidates = [
-		'../gi-portal/lang/en.json'
-	];
-	var itCandidates = [
-		'../gi-portal/lang/it.json'
-	];
-	i18n.en = loadJsonSync(enCandidates);
-	if (i18n.current === 'it') {
-		i18n.it = loadJsonSync(itCandidates);
+
+	// Base translations shipped with the portal (resolved relative to this module)
+	var baseEnUrl = '';
+	var baseItUrl = '';
+	try {
+		baseEnUrl = new URL('./lang/en.json', import.meta.url).toString();
+		baseItUrl = new URL('./lang/it.json', import.meta.url).toString();
+	} catch (e) {
+		// Fallback (works when portal is hosted as /<portal>/search.html and gi-portal is a sibling dir)
+		baseEnUrl = '../gi-portal/lang/en.json';
+		baseItUrl = '../gi-portal/lang/it.json';
 	}
+
+	// Optional portal-local overrides (e.g. /hisc/en.json, /hisc/it.json)
+	// These should override the base translations when present.
+	var localEnUrl = './en.json';
+	var localItUrl = './it.json';
+	try {
+		localEnUrl = new URL('./en.json', window.location.href).toString();
+		localItUrl = new URL('./it.json', window.location.href).toString();
+	} catch (e) { }
+
+	var baseEn = loadJsonSync([baseEnUrl, '../gi-portal/lang/en.json']);
+	var baseIt = loadJsonSync([baseItUrl, '../gi-portal/lang/it.json']);
+	var overrideEn = loadJsonSync([localEnUrl, './en.json']);
+	var overrideIt = loadJsonSync([localItUrl, './it.json']);
+
+	// Merge base + overrides (overrides win)
+	i18n.en = Object.assign({}, baseEn, overrideEn);
+	i18n.it = Object.assign({}, baseIt, overrideIt);
 }
 function interpolate(template, vars) {
 	if (!template || !vars) return template;
@@ -68,6 +88,42 @@ try { window.__t = t; } catch (e) { }
 
 try { window.__lang = lang; } catch (e) { }
 
+function openLanguageChooser() {
+	try {
+		const dialogDiv = $('<div>');
+		dialogDiv.append($('<div>').text(t('choose_language')).css({ 'margin-bottom': '10px' }));
+		const current = i18n.current || 'en';
+		const enOpt = $('<div>');
+		enOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_en', value: 'en', checked: (current === 'en') }));
+		enOpt.append($('<label>').attr('for', 'lang_en').text(t('language_en')).css({ 'margin-left': '6px' }));
+		const itOpt = $('<div>');
+		itOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_it', value: 'it', checked: (current === 'it') }));
+		itOpt.append($('<label>').attr('for', 'lang_it').text(t('language_it')).css({ 'margin-left': '6px' }));
+		dialogDiv.append(enOpt).append(itOpt);
+		dialogDiv.dialog({
+			title: t('change_language_title'),
+			modal: true,
+			width: 360,
+			buttons: [
+				{
+					text: 'OK', click: function() {
+						const sel = dialogDiv.find('input[name="langSel"]:checked').val() || 'en';
+						localStorage.setItem('lang', sel);
+						$(this).dialog('close');
+						window.location.reload();
+					}
+				},
+				{ text: 'Cancel', click: function() { $(this).dialog('close'); } }
+			]
+		});
+	} catch (e) {
+		// Fallback: just toggle en/it and reload
+		const next = (i18n.current === 'it') ? 'en' : 'it';
+		try { localStorage.setItem('lang', next); } catch (ex) { }
+		window.location.reload();
+	}
+}
+
 
 function initializeLogin(config) {
 	if (!config.login) {
@@ -77,17 +133,11 @@ function initializeLogin(config) {
 	// Create and append login elements
 	const loginContainer = document.createElement('div');
 	loginContainer.className = 'login-container';
+	const curLang = (i18n.current || 'en').toUpperCase();
 	loginContainer.innerHTML = `
 		<button id=\"loginBtn\" class=\"login-button\">${t('login')}</button>
 		<button id=\"logoutBtn\" class=\"login-button\" style=\"display: none;\">${t('logout')}</button>
-		<div id=\"loginModal\" class=\"login-modal\">
-			<h3>${t('login_to_portal', { title: (config.title || 'Portal') })}</h3>
-			<p class=\"login-info\">${t('login_info')}</p>
-			<input type=\"email\" id=\"email\" placeholder=\"${t('email_placeholder')}\" autocomplete=\"off\">
-			<input type=\"password\" id=\"apiKey\" placeholder=\"${t('api_key_placeholder')}\" autocomplete=\"off\">
-			<button id=\"submitLogin\">${t('login_submit')}</button>
-		</div>
-		<div id=\"modalOverlay\" class=\"modal-overlay\"></div>
+		<button id=\"langBtn\" class=\"login-button lang-button\" title=\"${t('menu_change_language')}\">${curLang}</button>
 	`;
 
 	// Append login container to headerDiv instead of body
@@ -98,14 +148,50 @@ function initializeLogin(config) {
 		document.body.insertBefore(loginContainer, document.body.firstChild);
 	}
 
+	// IMPORTANT: Append modal + overlay to <body> so they are fixed to the viewport.
+	// If they were inside a transformed ancestor (e.g. the header login container),
+	// position:fixed would behave like position:absolute and could overflow the window.
+	const existingModal = document.getElementById('loginModal');
+	const existingOverlay = document.getElementById('modalOverlay');
+	if (!existingModal) {
+		const loginModal = document.createElement('div');
+		loginModal.id = 'loginModal';
+		loginModal.className = 'login-modal';
+		loginModal.innerHTML = `
+			<button type="button" class="login-modal-close" aria-label="Close">×</button>
+			<h3>${t('login_to_portal', { title: (config.title || 'Portal') })}</h3>
+			<p class=\"login-info\">${t('login_info')}</p>
+			<input type=\"email\" id=\"email\" placeholder=\"${t('email_placeholder')}\" autocomplete=\"off\">
+			<input type=\"password\" id=\"apiKey\" placeholder=\"${t('api_key_placeholder')}\" autocomplete=\"off\">
+			<button id=\"submitLogin\">${t('login_submit')}</button>
+		`;
+		document.body.appendChild(loginModal);
+	}
+	if (!existingOverlay) {
+		const modalOverlay = document.createElement('div');
+		modalOverlay.id = 'modalOverlay';
+		modalOverlay.className = 'modal-overlay';
+		document.body.appendChild(modalOverlay);
+	}
+
 	// Setup event listeners
 	const loginBtn = document.getElementById('loginBtn');
 	let logoutBtn = document.getElementById('logoutBtn');
+	const langBtn = document.getElementById('langBtn');
 	const loginModal = document.getElementById('loginModal');
 	const modalOverlay = document.getElementById('modalOverlay');
 	const submitLogin = document.getElementById('submitLogin');
 	const emailInput = document.getElementById('email');
 	const apiKeyInput = document.getElementById('apiKey');
+	const closeBtn = loginModal ? loginModal.querySelector('.login-modal-close') : null;
+
+	// Always-visible language chooser button (also for non-logged users)
+	if (langBtn) {
+		langBtn.addEventListener('click', function(e) {
+			e.preventDefault();
+			openLanguageChooser();
+		});
+	}
 
 	// Show modal
 	loginBtn.addEventListener('click', function() {
@@ -128,13 +214,32 @@ function initializeLogin(config) {
 		window.location.reload();
 	});
 
-	// Hide modal when clicking outside
-	modalOverlay.addEventListener('click', function() {
+	function closeLoginModal() {
 		loginModal.style.display = 'none';
 		modalOverlay.style.display = 'none';
 		// Clear inputs when closing modal
 		emailInput.value = '';
 		apiKeyInput.value = '';
+	}
+
+	// Close modal using the X button
+	if (closeBtn) {
+		closeBtn.addEventListener('click', function(e) {
+			e.preventDefault();
+			closeLoginModal();
+		});
+	}
+
+	// Hide modal when clicking outside
+	modalOverlay.addEventListener('click', function() {
+		closeLoginModal();
+	});
+
+	// Close modal with ESC key
+	document.addEventListener('keydown', function(e) {
+		if (e.key === 'Escape' && loginModal.style.display === 'block') {
+			closeLoginModal();
+		}
 	});
 
 	// Handle login submission
@@ -218,7 +323,6 @@ function initializeLogin(config) {
 			menuHtml += `<button id=\"listUsersBtn\" class=\"menu-button\">${t('menu_manage_users')}</button>\n`;
 			menuHtml += `<button id=\"dataReportBtn\" class=\"menu-button\">${t('menu_data_report')}</button>\n`;
 		}
-		menuHtml += `<button id=\"changeLangBtn\" class=\"menu-button\">${t('menu_change_language')}</button>`;
 		menuHtml += `<button id=\"logoutMenuBtn\" class=\"menu-button\">${t('menu_logout')}</button>`;
 		userMenu.innerHTML = menuHtml;
 		document.body.appendChild(userMenu);
@@ -242,37 +346,6 @@ function initializeLogin(config) {
 			if (!userMenu.contains(e.target) && e.target !== logoutBtn) {
 				userMenu.style.display = 'none';
 			}
-		});
-
-		// Add change language handler
-		document.getElementById('changeLangBtn').addEventListener('click', function() {
-			userMenu.style.display = 'none';
-			const dialogDiv = $('<div>');
-			dialogDiv.append($('<div>').text(t('choose_language')).css({ 'margin-bottom': '10px' }));
-			const current = i18n.current || 'en';
-			const enOpt = $('<div>');
-			enOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_en', value: 'en', checked: (current === 'en') }));
-			enOpt.append($('<label>').attr('for', 'lang_en').text(t('language_en')).css({ 'margin-left': '6px' }));
-			const itOpt = $('<div>');
-			itOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_it', value: 'it', checked: (current === 'it') }));
-			itOpt.append($('<label>').attr('for', 'lang_it').text(t('language_it')).css({ 'margin-left': '6px' }));
-			dialogDiv.append(enOpt).append(itOpt);
-			dialogDiv.dialog({
-				title: t('change_language_title'),
-				modal: true,
-				width: 360,
-				buttons: [
-					{
-						text: 'OK', click: function() {
-							const sel = dialogDiv.find('input[name="langSel"]:checked').val() || 'en';
-							localStorage.setItem('lang', sel);
-							$(this).dialog('close');
-							window.location.reload();
-						}
-					},
-					{ text: 'Cancel', click: function() { $(this).dialog('close'); } }
-				]
-			});
 		});
 
 		// Status button click handler
