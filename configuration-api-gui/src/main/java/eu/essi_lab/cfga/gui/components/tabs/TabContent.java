@@ -27,6 +27,7 @@ import com.vaadin.flow.component.details.*;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.tabs.*;
+import com.vaadin.flow.component.textfield.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.components.grid.*;
@@ -132,21 +133,23 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	    final String desc = showDirective.flatMap(ShowDirective::getDescription).get();
 
-	    HorizontalLayout labelLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
-	    labelLayout.getStyle().set("padding", "0px");
-	    labelLayout.setWidthFull();
+	    HorizontalLayout descFieldLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
+	    descFieldLayout.getStyle().set("padding", "0px");
+	    descFieldLayout.setWidthFull();
 
-	    Label descLabel = new Label();
-	    descLabel.setWidthFull();
-	    descLabel.setMaxHeight("130px");
-	    descLabel.getStyle().set("margin-left", "4px");
-	    descLabel.getStyle().set("font-size", "14px");
-	    descLabel.getStyle().set("color", "black");
-	    descLabel.setText(desc);
+	    TextField descField = new TextField();
+	    descField.setWidthFull();
+	    descField.setReadOnly(true);
+	    descField.addClassName("text-field-no-border");
 
-	    labelLayout.add(descLabel);
+	    descField.getStyle().set("margin-left", "4px");
+	    descField.getStyle().set("font-size", "14px");
+	    descField.getStyle().set("color", "black");
+	    descField.setValue(desc);
 
-	    descLayout.add(labelLayout);
+	    descFieldLayout.add(descField);
+
+	    descLayout.add(descFieldLayout);
 
 	    if (showDirective.get().withDescriptionSeparator()) {
 
@@ -170,13 +173,20 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	    if (addDirective.isPresent() && tabContentDesc.isReloadable()) { // add & reload
 
+		descLayout.setMaxWidth("1070px");
 		maxDescLength = 180;
 
 	    } else if (addDirective.isPresent() && !tabContentDesc.isReloadable()) { // only add
 
+		descLayout.setMaxWidth("1240px");
+		descField.setMaxWidth("1200px");
+
 		maxDescLength = 200;
 
 	    } else if (addDirective.isEmpty() && tabContentDesc.isReloadable()) { // only reload
+
+		descLayout.setMaxWidth("1165px");
+		descField.setMaxWidth("1150px");
 
 		maxDescLength = 190;
 	    }
@@ -185,7 +195,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 		String shortDesc = desc.substring(0, maxDescLength - 5);
 
-		descLabel.setText(shortDesc);
+		descField.setValue(shortDesc);
 
 		Button extraDescButton = new Button("...");
 		extraDescButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
@@ -193,10 +203,23 @@ public class TabContent extends VerticalLayout implements Renderable {
 		extraDescButton.setTooltipText("Click to see full description");
 		extraDescButton.addClickListener(evt -> {
 
-		    NotificationDialog.getNotificationDialog("Description", desc).open();
+		    TextArea textArea = new TextArea();
+		    textArea.addClassName("text-area-no-border");
+		    textArea.getStyle().set("font-size", "14px");
+		    textArea.getStyle().set("padding", "0px");
+
+		    textArea.setWidth("485px");
+		    textArea.setHeight("300px");
+		    textArea.setReadOnly(true);
+		    textArea.setValue(desc);
+
+		    NotificationDialog dialog = NotificationDialog.getNotificationDialog("Description", desc);
+		    dialog.setContent(textArea);
+
+		    dialog.open();
 		});
 
-		labelLayout.add(extraDescButton);
+		descFieldLayout.add(extraDescButton);
 	    }
 
 	} else {
