@@ -441,6 +441,9 @@
 		<!--required for vulnerability in SupportService  VULN-UPDATE -->
 		<owasp.encoder.version>1.4.0</owasp.encoder.version>
 
+		<!--required to make Tomcat happpy after VULN-UPDATE -->
+		<jakarta.validation-api.version>2.0.2</jakarta.validation-api.version>
+
         <!-- Surefire args -->
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
@@ -455,6 +458,12 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+			<dependency>
+				<groupId>jakarta.validation</groupId>
+				<artifactId>jakarta.validation-api</artifactId>
+				<version>${jakarta.validation-api.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.owasp.encoder</groupId>

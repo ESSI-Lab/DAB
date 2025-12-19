@@ -21,27 +21,26 @@ package eu.essi_lab.lib.net.protocols.impl;
  * #L%
  */
 
-import eu.essi_lab.lib.net.protocols.AbstractNetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocol;
+import eu.essi_lab.lib.net.protocols.*;
 
-public class WMSProtocol extends AbstractNetProtocol implements NetProtocol {
+public class WMTSProtocol extends AbstractNetProtocol implements NetProtocol {
 
     @Override
     public String getDescription() {
 
-	return "OGC Web Map Service Protocol";
+	return "OGC Web Map Tile Service Protocol";
     }
 
     @Override
     public String[] getURNs() {
 
-	return new String[] {"http://www.opengis.net/def/serviceType/ogc/wms", "urn:ogc:serviceType:WebMapService:HTTP", "urn:ogc:serviceType:WebMapService", "OGC:WMS" };
+	return new String[] {"http://www.opengis.net/def/serviceType/ogc/wmts"};
     }
 
     @Override
     public String getSrvType() {
 
-	return "WMS";
+	return "WMTS";
     }
 
     @Override
