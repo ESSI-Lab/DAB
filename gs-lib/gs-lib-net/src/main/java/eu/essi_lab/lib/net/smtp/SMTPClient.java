@@ -89,9 +89,9 @@ public class SMTPClient {
 	properties.put("mail.smtp.port", port);
 	properties.put("mail.smtp.host", host);
 
-	properties.put("mail.smtp.connectiontimeout", String.valueOf(TIMEOUT)); // 10s
-	properties.put("mail.smtp.timeout", String.valueOf(TIMEOUT));           // 10s
-	properties.put("mail.smtp.writetimeout", String.valueOf(TIMEOUT));      // 10s
+	properties.put("mail.smtp.connectiontimeout", String.valueOf(TIMEOUT)); 
+	properties.put("mail.smtp.timeout", String.valueOf(TIMEOUT));
+	properties.put("mail.smtp.writetimeout", String.valueOf(TIMEOUT));
 
 	enableSSL(true);
     }
@@ -169,7 +169,7 @@ public class SMTPClient {
 
 	try {
 	    Transport.send(mimeMessage);
-	} catch (MessagingException e) {
+	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    return false;
 	}
