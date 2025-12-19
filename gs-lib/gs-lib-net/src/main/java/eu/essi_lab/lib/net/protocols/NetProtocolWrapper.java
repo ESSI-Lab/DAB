@@ -100,6 +100,8 @@ public enum NetProtocolWrapper {
     WMS_1_3_0(new WMS_1_3_0Protocol()),//
     WMS_Q_1_3_0(new WMS_Q_1_3_0Protocol()),//
     WMS(new WMSProtocol()),//
+
+    WMTS(new WMTSProtocol()),//
     WMTS_1_0_0(new WMTS_1_0_0Protocol()),//
 
     SENSOR_THINGS_1_1_HYDRO_SERVER_2(new SensorThings_1_1_HydroServer2_Protocol()),//
