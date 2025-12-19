@@ -31,12 +31,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.xml.*;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
 
+import eu.essi_lab.lib.xml.*;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -44,7 +46,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 
 /**
  * @author Fabrizio
@@ -82,7 +83,11 @@ public class WebConnector {
 
 		SAXSource source = new SAXSource(tagsoupReader, input);
 		DOMResult result = new DOMResult();
-		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
+		TransformerFactory factory = XMLFactories.newTransformerFactory();
+
+		Transformer transformer = factory.newTransformer();
+
 		transformer.transform(source, result);
 
 		XMLDocumentReader xdoc = new XMLDocumentReader((Document) result.getNode());

@@ -50,7 +50,7 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.*;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -101,6 +101,7 @@ import org.opensearch.cluster.metadata.RepositoryMetadata;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.unit.TimeValue;
 import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.core.rest.RestStatus;
 import org.opensearch.geometry.Geometry;
 import org.opensearch.geometry.Rectangle;
 import org.opensearch.index.query.BoolQueryBuilder;
@@ -111,7 +112,6 @@ import org.opensearch.index.reindex.BulkByScrollResponse;
 import org.opensearch.index.reindex.DeleteByQueryRequest;
 import org.opensearch.index.reindex.ScrollableHitSource;
 import org.opensearch.index.reindex.UpdateByQueryRequest;
-import org.opensearch.rest.RestStatus;
 import org.opensearch.script.Script;
 import org.opensearch.script.ScriptType;
 import org.opensearch.search.SearchHit;
@@ -139,7 +139,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.bond.Bond;
@@ -245,7 +245,7 @@ public class ElasticsearchClient {
 				public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
 
 				    return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider).//
-				    setSSLHostnameVerifier(new NoopHostnameVerifier());
+				    setSSLHostnameVerifier(new DefaultHostnameVerifier());
 				}
 			    });
 
@@ -723,7 +723,7 @@ public class ElasticsearchClient {
 	    }
 	}
 	if (!success) {
-	    ConfiguredGmailClient.sendEmail(ConfiguredGmailClient.MAIL_REPORT_STATISTICS + ConfiguredGmailClient.MAIL_ERROR_SUBJECT,
+	    ConfiguredSMTPClient.sendEmail(ConfiguredSMTPClient.MAIL_REPORT_STATISTICS + ConfiguredSMTPClient.MAIL_ERROR_SUBJECT,
 		    "Unable to index document(s) \n\n" + failureMessage);
 	}
 	return success;

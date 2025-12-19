@@ -170,8 +170,8 @@
 		<!--  Docker plugin -->
 		<docker.plugin.version>0.48.0</docker.plugin.version>
 
-		<!-- Apache CXF -->
-		<cxf.version>3.3.13</cxf.version>
+		<!-- Apache CXF VULN-UPDATE -->
+		<cxf.version>3.5.11</cxf.version>
 
 		<!-- JAX WS RS API-->
 		<jax-ws-rs-api.version>2.1.1</jax-ws-rs-api.version>
@@ -191,7 +191,7 @@
 		<google-api-services-sheets.version>v4-rev20240416-2.0.0</google-api-services-sheets.version>
 
 		<!-- Core Protocol Buffers library -->
-		<com.google.protobuf-protobuf-java.version>3.25.3</com.google.protobuf-protobuf-java.version>
+		<com.google.protobuf-protobuf-java.version>3.25.8</com.google.protobuf-protobuf-java.version>
 
 		<!-- Apache Commons Math -->
 		<org.apache.commons-commons-math.version>3.6.1</org.apache.commons-commons-math.version>
@@ -202,12 +202,14 @@
 		<!-- Apache Commons Net library -->
 		<commons-net.version>3.10.0</commons-net.version>
 
-		<!-- Apache Commons Lang -->
-		<org.apache-commons-commons-lang3.version>3.14.0</org.apache-commons-commons-lang3.version>
+		<!-- Apache mina VULN-UPDATE -->
+		<apache.mina.version>2.2.5</apache.mina.version>
 
-		<!-- Apache POI - Java API To Access Microsoft Format Files (J11
-		UPDATED) -->
-		<org.apache.poi-poi.version>4.1.2</org.apache.poi-poi.version>
+		<!-- Apache Commons Lang VULN-UPDATE -->
+		<org.apache-commons-commons-lang3.version>3.20.0</org.apache-commons-commons-lang3.version>
+
+		<!-- Apache POI - Java API To Access Microsoft Format Files VULN-UPDATE -->
+		<org.apache.poi-poi.version>5.5.1</org.apache.poi-poi.version>
 
 		<!-- Apache Jena - Java framework for building Semantic Web and Linked
 		Data applications -->
@@ -216,12 +218,11 @@
 		<!-- Saxon - XSLT and XQuery Processor -->
 		<saxon-he.version>9.7.0-15</saxon-he.version>
 
-		<!-- NetCDF (nothing to upate) -->
+		<!-- NetCDF (nothing to update) -->
 		<netcdf.version>5.5.3</netcdf.version>
 
 		<!-- Sesame (project moved to Rio API) -->
 		<rdf4j.version>4.3.9</rdf4j.version>
-
 
 		<!-- API for the Unified Expression Language 3.0 -->
 		<javax.el-el-api.version>3.0.1-b06</javax.el-el-api.version>
@@ -266,8 +267,11 @@
 		<!-- GeoTools -->
 		<geotools-version>32.2</geotools-version>
 
-		<!-- Quartz -->
-		<quartz.version>2.3.2</quartz.version>
+		<!-- Quartz VULN-UPDATE -->
+		<quartz.version>2.5.2</quartz.version>
+
+		<!-- Required for Quartz VULN-UPDATE -->
+		<com.change.c3p0.version>0.11.2</com.change.c3p0.version>
 
 		<!-- MySQL -->
 		<mysql.connector.version>8.3.0</mysql.connector.version>
@@ -326,13 +330,19 @@
 		<org.eclipse.paho.client.mqttv3.version>1.2.5</org.eclipse.paho.client.mqttv3.version>
 
 		<!-- OpenSearch client -->
-		<opensearch-rest-high-level-client.version>2.5.0</opensearch-rest-high-level-client.version>
+		<opensearch-rest-high-level-client.version>2.14.0</opensearch-rest-high-level-client.version>
 
 		<!-- LogicNG -->
 		<org.logicng.version>2.4.3</org.logicng.version>
 
-		<!-- SPRING Framework -->
-		<org.springframework.version>5.3.33</org.springframework.version>
+		<!-- SPRING Framework - VULN-UPDATE -->
+		<org.springframework.version>5.3.39</org.springframework.version>
+
+		<!-- Apache commons - VULN-UPDATE -->
+		<apache.commons.version>1.15.0</apache.commons.version>
+
+		<!-- Apache commons beanutils - VULN-UPDATE -->
+		<apache.commons.beanutils.version>1.11.0</apache.commons.beanutils.version>
 
 		<!-- ORG JSON -->
 		<org.json.version>20240303</org.json.version>
@@ -393,6 +403,44 @@
         <!-- FTP Server Core -->
         <ftpserver-core.version>1.2.1</ftpserver-core.version>
 
+		<!-- H2 Database -->
+		<h2.database.version>1.2.140</h2.database.version>
+
+		<!-- Jakarta JSON bind-api - required after CXF version VULN-UPDATE -->
+		<jakarta.json.bind-api.version>3.0.1</jakarta.json.bind-api.version>
+
+		<!-- Jakarta JSON api - required after CXF version VULN-UPDATE -->
+		<jakarta.json-api.version>2.1.3</jakarta.json-api.version>
+
+		<!-- This is AWS JAVA SDK ver.1 which is utilized indirectly by other deps  -->
+		<!-- DAB code should use version 2 of AWS SDK as defined by property aws-java-sdk-bom.version VULN-UPDATE  -->
+		<aws-java-sdk-core.version>1.12.795</aws-java-sdk-core.version>
+
+		<!-- Netty project VULN-UPDATE -->
+		<io.netty.version>4.2.7.Final</io.netty.version>
+
+		<!-- Jetty servlets VULN-UPDATE -->
+		<eclipse.jetty.version>9.4.58.v20250814</eclipse.jetty.version>
+
+		<!-- Commons IO VULN-UPDATE-->
+		<commons-io.version>2.21.0</commons-io.version>
+
+		<!-- Jackson dataformat-cbor VULN-UPDATE-->
+		<jackson-dataformat-cbor.version>2.20.1</jackson-dataformat-cbor.version>
+
+		<!-- httpclient5 VULN-UPDATE-->
+		<httpclient5.version>5.5.1</httpclient5.version>
+
+		<!-- commons file upload required by Vaadin  VULN-UPDATE-->
+		<commons-fileupload.version>1.6.0</commons-fileupload.version>
+
+		<!-- required by Vaadin  VULN-UPDATE-->
+		<nimbus-jose-jwt.version>9.37.4</nimbus-jose-jwt.version>
+
+
+		<!--required for vulnerability in SupportService  VULN-UPDATE -->
+		<owasp.encoder.version>1.4.0</owasp.encoder.version>
+
         <!-- Surefire args -->
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
@@ -407,6 +455,254 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+			<dependency>
+				<groupId>org.owasp.encoder</groupId>
+				<artifactId>encoder</artifactId>
+				<version>${owasp.encoder.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.opensearch.client</groupId>
+				<artifactId>opensearch-java</artifactId>
+				<version>${opensearch.client-opensearch-java.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.opensearch.client</groupId>
+				<artifactId>opensearch-rest-client</artifactId>
+				<version>${opensearch.client-opensearch-rest-client.version}</version>
+			</dependency>
+
+			<!-- required after CXF version VULN-UPDATE -->
+			<dependency>
+				<groupId>jakarta.json.bind</groupId>
+				<artifactId>jakarta.json.bind-api</artifactId>
+				<version>${jakarta.json.bind-api.version}</version>
+			</dependency>
+
+			<!-- required after CXF version VULN-UPDATE -->
+			<dependency>
+				<groupId>jakarta.json</groupId>
+				<artifactId>jakarta.json-api</artifactId>
+				<version>${jakarta.json-api.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.nimbusds</groupId>
+				<artifactId>nimbus-jose-jwt</artifactId>
+				<version>${nimbus-jose-jwt.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-fileupload</groupId>
+				<artifactId>commons-fileupload</artifactId>
+				<version>${commons-fileupload.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.httpcomponents.client5</groupId>
+				<artifactId>httpclient5</artifactId>
+				<version>${httpclient5.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.dataformat</groupId>
+				<artifactId>jackson-dataformat-cbor</artifactId>
+				<version>${jackson-dataformat-cbor.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.mchange</groupId>
+				<artifactId>c3p0</artifactId>
+				<version>${com.change.c3p0.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.opensearch.client</groupId>
+				<artifactId>opensearch-java</artifactId>
+				<version>${opensearch.client-opensearch-java.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-servlets</artifactId>
+				<version>${eclipse.jetty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-continuation</artifactId>
+				<version>${eclipse.jetty.version}</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-util</artifactId>
+				<version>${eclipse.jetty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-servlet</artifactId>
+				<version>${eclipse.jetty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-io</artifactId>
+				<version>${eclipse.jetty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-security</artifactId>
+				<version>${eclipse.jetty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-util-ajax</artifactId>
+				<version>${eclipse.jetty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-server</artifactId>
+				<version>${eclipse.jetty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-http</artifactId>
+				<version>${eclipse.jetty.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-transport-classes-epoll</artifactId>
+				<version>${io.netty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-codec-http</artifactId>
+				<version>${io.netty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-codec-http2</artifactId>
+				<version>${io.netty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-buffer</artifactId>
+				<version>${io.netty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-codec</artifactId>
+				<version>${io.netty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-common</artifactId>
+				<version>${io.netty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-handler</artifactId>
+				<version>${io.netty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-resolver</artifactId>
+				<version>${io.netty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-transport</artifactId>
+				<version>${io.netty.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-java-sdk-core</artifactId>
+				<version>${aws-java-sdk-core.version}</version>
+			</dependency>
+
+			<!-- h2 database -->
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>${h2.database.version}</version>
+			</dependency>
+
+			<!-- apache mina -->
+			<dependency>
+				<groupId>org.apache.mina</groupId>
+				<artifactId>mina-core</artifactId>
+				<version>${apache.mina.version}</version>
+			</dependency>
+
+			<!-- apache commons bean utils -->
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>${apache.commons.beanutils.version}</version>
+			</dependency>
+
+			<!-- apache commons -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-text</artifactId>
+				<version>${apache.commons.version}</version>
+			</dependency>
+
+			<!-- spring -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-aop</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
 
 
 			<!-- RDF4J core (API + runtime) -->
@@ -592,6 +888,10 @@
 						<groupId>com.fasterxml.jackson.core</groupId>
 						<artifactId>jackson-core</artifactId>
 					</exclusion>
+					<exclusion>
+						<groupId>com.google.guava</groupId>
+						<artifactId>guava</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 
@@ -628,20 +928,35 @@
 				<version>${aws-java-sdk-bom.version}</version>
 				<type>pom</type>
 			</dependency>
+
+			<dependency>
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>auth</artifactId>
+				<version>${aws-java-sdk-bom.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>software.amazon.awssdk</groupId>
 				<artifactId>cloudwatchlogs</artifactId>
 				<version>${aws-java-sdk-bom.version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>software.amazon.awssdk</groupId>
 				<artifactId>s3-transfer-manager</artifactId>
 				<version>${aws-java-sdk-bom.version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>software.amazon.awssdk.crt</groupId>
 				<artifactId>aws-crt</artifactId>
 				<version>${aws-crt.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>apache-client</artifactId>
+				<version>${aws-java-sdk-bom.version}</version>
 			</dependency>
 
 			<!-- OGC Schemas from Aleksei Valikov -->
@@ -1101,17 +1416,17 @@
                 <version>${ftpserver-core.version}</version>
             </dependency>
 
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jackson-core.version}</version>
+			</dependency>
+
 		</dependencies>
 
 	</dependencyManagement>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>${jackson-core.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

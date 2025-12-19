@@ -5,7 +5,6 @@ package eu.essi_lab.cfga.source.test;
 
 import java.io.IOException;
 
-import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +53,7 @@ public class OpenSearchSourceInternalTestIT extends DatabaseSourceTest {
 
 	INFO.setType(Database.OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol());
 
-	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(INFO);
+	OpenSearchClient client = OpenSearchDatabase.createClient(INFO);
 
 	for (String index : IndexMapping.getIndexes(false)) {
 

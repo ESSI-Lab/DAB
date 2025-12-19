@@ -62,7 +62,7 @@ public class HISCentralShapefileInitializer extends AbstractCustomTask {
 
 	database.initialize(ConfigurationWrapper.getStorageInfo());
 	OpenSearchFolder folder = new OpenSearchFolder(database, OpenSearchDatabase.SHAPE_FILES_FOLDER);
-	Optional<S3TransferWrapper> optManager = ConfigurationWrapper.getS3TransferManager();
+	Optional<S3TransferWrapper> optManager = ConfigurationWrapper.getS3TransferWrapper();
 	if (optManager.isPresent()) {
 	    S3TransferWrapper wrapper = optManager.get();
 	    File s3Dir = null;

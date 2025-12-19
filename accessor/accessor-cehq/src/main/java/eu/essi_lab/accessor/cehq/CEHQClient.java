@@ -42,12 +42,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 
+import javax.xml.*;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
 
+import com.sun.xml.bind.*;
+import eu.essi_lab.lib.xml.*;
 import org.apache.commons.io.IOUtils;
 import org.ccil.cowan.tagsoup.Parser;
 import org.w3c.dom.Document;
@@ -58,7 +61,6 @@ import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
@@ -427,7 +429,9 @@ public class CEHQClient {
 	parser.setFeature(Parser.namespacesFeature, false);
 	parser.setFeature(Parser.namespacePrefixesFeature, false);
 
-	Transformer transformer = TransformerFactory.newInstance().newTransformer();
+	TransformerFactory factory = XMLFactories.newTransformerFactory();
+
+	Transformer transformer = factory.newTransformer();
 	DOMResult result = new DOMResult();
 	InputStream s = new ByteArrayInputStream(response);
 	Reader rdr = new InputStreamReader(s, Charset.forName("windows-1252"));

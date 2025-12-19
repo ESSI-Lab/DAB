@@ -9,32 +9,16 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.net.ssl.SSLContext;
-
 import eu.essi_lab.configuration.ExecutionMode;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.json.JSONObject;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.mapping.TypeMapping;
-import org.opensearch.client.opensearch.core.SearchRequest;
-import org.opensearch.client.opensearch.generic.Requests;
-import org.opensearch.client.opensearch.generic.Response;
-import org.opensearch.client.opensearch.indices.CreateIndexRequest;
-import org.opensearch.client.opensearch.indices.CreateIndexRequest.Builder;
-import org.opensearch.client.opensearch.indices.CreateIndexResponse;
-import org.opensearch.client.opensearch.indices.ExistsRequest;
-import org.opensearch.client.opensearch.indices.IndexSettings;
-import org.opensearch.client.opensearch.indices.PutAliasRequest;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.aws.AwsSdk2Transport;
 import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
@@ -71,7 +55,6 @@ import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.JavaOptions;
 import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
@@ -171,7 +154,7 @@ public class OpenSearchDatabase extends Database {
 
 	    if (schemeName.equals("http") || serviceType == OpenSearchServiceType.OPEN_SEARCH_LOCAL) {
 
-		client = createNoSSLContextClient(storageInfo);
+		client = createClient(storageInfo);
 
 	    } else {
 
@@ -227,7 +210,7 @@ public class OpenSearchDatabase extends Database {
      * @return
      * @throws URISyntaxException
      */
-    public static OpenSearchClient createNoSSLContextClient(StorageInfo storageInfo) throws GSException {
+    public static OpenSearchClient createClient(StorageInfo storageInfo) throws GSException {
 
 	URI uri;
 	try {
@@ -241,22 +224,7 @@ public class OpenSearchDatabase extends Database {
 
 	HttpHost httpHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
 
-	RestClientBuilder builder = RestClient.builder(httpHost)
-		.setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
-		    @Override
-		    public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
-
-			try {
-			    SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(null, (chain, authType) -> true).build();
-			    return httpClientBuilder.setSSLContext(sslContext).setSSLHostnameVerifier((hostname1, session) -> true);
-
-			} catch (Exception e) {
-			    GSLoggerFactory.getLogger(getClass()).error(e);
-			}
-
-			return null;
-		    }
-		});
+	RestClientBuilder builder = RestClient.builder(httpHost);
 
 	if (storageInfo.getUser() != null && !storageInfo.getUser().isEmpty() && //
 		storageInfo.getPassword() != null && !storageInfo.getPassword().isEmpty()) {

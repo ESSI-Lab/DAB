@@ -56,7 +56,7 @@ public class AvailabilityMonitor {
 
 	if (this.manager == null || this.manager.isEmpty()) {
 
-	    this.manager = ConfigurationWrapper.getS3TransferManager();
+	    this.manager = ConfigurationWrapper.getS3TransferWrapper();
 	}
 
 	return this.manager;

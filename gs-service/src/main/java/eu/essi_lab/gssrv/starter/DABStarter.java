@@ -10,70 +10,64 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.api.database.cfg.DatabaseSource;
-import eu.essi_lab.api.database.cfg.DatabaseSourceUrl;
-import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
+import eu.essi_lab.api.database.cfg.*;
+import eu.essi_lab.augmenter.worker.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.check.*;
-import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.DefaultConfiguration;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
-import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
-import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
+import eu.essi_lab.cfga.check.CheckResponse.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.*;
+import eu.essi_lab.cfga.gs.demo.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
 import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
-import eu.essi_lab.cfga.source.FileSource;
-import eu.essi_lab.cfga.source.S3Source;
-import eu.essi_lab.configuration.ClusterType;
-import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask;
-import eu.essi_lab.gssrv.health.HealthCheck;
-import eu.essi_lab.gssrv.servlet.ServletListener;
-import eu.essi_lab.harvester.HarvestingReportsHandler;
-import eu.essi_lab.jaxb.common.CommonContext;
-import eu.essi_lab.jaxb.wms.extension.JAXBWMS;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.JavaOptions;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.profiler.esri.feature.FeatureLayer1StationsArctic;
-import eu.essi_lab.profiler.esri.feature.query.CachedCollections;
-import eu.essi_lab.profiler.wms.extent.WMSLayer;
-import eu.essi_lab.profiler.wms.extent.map.WMSGetMapHandler;
-import eu.essi_lab.request.executor.schedule.DownloadReportsHandler;
-import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
-import org.quartz.SchedulerException;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.*;
+import eu.essi_lab.cfga.source.*;
+import eu.essi_lab.configuration.*;
+import eu.essi_lab.gssrv.conf.task.*;
+import eu.essi_lab.gssrv.health.*;
+import eu.essi_lab.gssrv.servlet.*;
+import eu.essi_lab.harvester.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.jaxb.wms.extension.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.net.s3.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.profiler.esri.feature.*;
+import eu.essi_lab.profiler.esri.feature.query.*;
+import eu.essi_lab.profiler.wms.extent.*;
+import eu.essi_lab.profiler.wms.extent.map.*;
+import eu.essi_lab.request.executor.schedule.*;
+import eu.essi_lab.shared.driver.es.stats.*;
+import org.quartz.*;
 
-import javax.ws.rs.ext.RuntimeDelegate;
-import javax.xml.bind.JAXBException;
-import java.io.File;
+import javax.ws.rs.ext.*;
+import javax.xml.bind.*;
+import java.io.*;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -113,7 +107,6 @@ public class DABStarter {
     }
 
     /**
-     * @param confConnector
      * @throws GSException
      */
     public void start() throws GSException {
@@ -174,6 +167,8 @@ public class DABStarter {
 	}
 
 	applySystemSettings();
+
+	initTrustStore();
 
 	healthCheckTest();
 
@@ -337,21 +332,21 @@ public class DABStarter {
 		// }
 
 		configuration = switch (newConfigName) {
-		case "default" -> {
+		    case "default" -> {
 
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
+			GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
 
-		    yield new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
-		}
-		case "demo" -> {
+			yield new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
+				ConfigurationWrapper.CONFIG_RELOAD_TIME);
+		    }
+		    case "demo" -> {
 
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
+			GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
 
-		    yield new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
-		}
-		default -> configuration;
+			yield new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
+				ConfigurationWrapper.CONFIG_RELOAD_TIME);
+		    }
+		    default -> configuration;
 		};
 
 		SelectionUtils.deepClean(configuration);
@@ -575,7 +570,7 @@ public class DABStarter {
 
 	} catch (
 
-	GSException gsex) {
+		GSException gsex) {
 
 	    throw gsex;
 
@@ -730,6 +725,80 @@ public class DABStarter {
 	//
 
 	return similarityCheckResponse;
+    }
+
+    /**
+     *
+     */
+    private void initTrustStore() {
+
+	Optional<String> trustStoreName = ConfigurationWrapper. //
+		getSystemSettings().//
+		readKeyValue(KeyValueOptionKeys.TRUST_STORE_NAME.getLabel());
+
+	Optional<String> trustStorePwd = ConfigurationWrapper. //
+		getSystemSettings().//
+		readKeyValue(KeyValueOptionKeys.TRUST_STORE_PWD.getLabel());
+
+	Optional<String> trustStore = ConfigurationWrapper. //
+		getSystemSettings().//
+		readKeyValue(KeyValueOptionKeys.TRUST_STORE.getLabel());
+
+	if (trustStore.isPresent() && trustStorePwd.isPresent() && trustStoreName.isPresent()) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Trust store init STARTED");
+
+	    File target = null;
+
+	    File trustFile = new File(trustStore.get());
+
+	    if (trustFile.exists()) {
+
+		target = trustFile;
+
+		GSLoggerFactory.getLogger(getClass()).info("Loading trust store from file system: {}", target.getAbsolutePath());
+
+	    } else {
+
+		Optional<S3TransferWrapper> wrapper = ConfigurationWrapper.getS3TransferWrapper();
+
+		if (wrapper.isPresent()) {
+
+		    GSLoggerFactory.getLogger(getClass()).info("Loading trust store S3 bucket: {}", trustStore.get());
+
+		    target = new File(FileUtils.getTempDir(), trustStoreName.get());
+
+		    boolean downloaded = wrapper.get().download( //
+			    trustStore.get(), //
+			    trustStoreName.get(), //
+			    target);
+
+		    if (!downloaded) {
+
+			target = null;
+
+			GSLoggerFactory.getLogger(getClass()).error("Error occurred. Unable to download trust store from S3");
+		    }
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).warn("Unable to init trust store, S3 transfer wrapper is not configured");
+		}
+	    }
+
+	    if (target != null) {
+
+		System.setProperty("dab.net.ssl.trustStore", target.getAbsolutePath());
+		System.setProperty("dab.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
+		System.setProperty("dab.net.ssl.trustStorePassword", trustStorePwd.get());
+
+		GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
+	    }
+
+	} else {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Trust store credentials missing");
+	}
     }
 
     /**
@@ -902,8 +971,8 @@ public class DABStarter {
 	case ACCESS:
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
-	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
-		    new FeatureLayer1StationsArctic());
+	    CachedCollections.getInstance()
+		    .prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic", new FeatureLayer1StationsArctic());
 	    break;
 	case BATCH:
 	case CONFIGURATION:
@@ -921,8 +990,8 @@ public class DABStarter {
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_PHYSICS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
-	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
-		    new FeatureLayer1StationsArctic());
+	    CachedCollections.getInstance()
+		    .prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic", new FeatureLayer1StationsArctic());
 	default:
 	}
     }
@@ -938,8 +1007,8 @@ public class DABStarter {
 
 	if (keyValueOptions.isPresent()) {
 
-	    schedulerStartDelay = Integer.parseInt(keyValueOptions.get().getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(),
-		    String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
+	    schedulerStartDelay = Integer.parseInt(keyValueOptions.get()
+		    .getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(), String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
 	}
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("Scheduler will start in {} minutes", schedulerStartDelay);

@@ -12,12 +12,12 @@ import java.io.ByteArrayOutputStream;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -55,6 +55,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
+import eu.essi_lab.lib.xml.*;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
@@ -221,8 +222,8 @@ public class OMHandler extends StreamingRequestHandler {
 	Date begin = null;
 	Date end = null;
 	boolean useCache = false;
-	if (useCacheParameter != null
-		&& (useCacheParameter.toLowerCase().trim().equals("true") || useCacheParameter.toLowerCase().trim().equals("yes"))) {
+	if (useCacheParameter != null && (useCacheParameter.toLowerCase().trim().equals("true") || useCacheParameter.toLowerCase().trim()
+		.equals("yes"))) {
 	    useCache = true;
 	}
 
@@ -374,8 +375,8 @@ public class OMHandler extends StreamingRequestHandler {
 
 		String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
 
-		if (asynchDownloadRequest || (includeValues != null
-			&& (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
+		if (asynchDownloadRequest || (includeValues != null && (includeValues.toLowerCase().equals("yes")
+			|| includeValues.toLowerCase().equals("true")))) {
 
 		    if (results.size() > 1) {
 
@@ -498,8 +499,8 @@ public class OMHandler extends StreamingRequestHandler {
 
 		    // DATA part
 
-		    if ((includeValues != null
-			    && (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase().equals("true")))) {
+		    if ((includeValues != null && (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase()
+			    .equals("true")))) {
 
 			if (useCache && identifier != null) {
 			    ResultWriter finalWriter = resultWriter;
@@ -734,7 +735,7 @@ public class OMHandler extends StreamingRequestHandler {
 	return ret.trim();
     }
 
-    static XMLInputFactory factory = XMLInputFactory.newInstance();
+    static XMLInputFactory factory = XMLFactories.newXMLInputFactory();
 
     @Override
     public MediaType getMediaType(WebRequest webRequest) {

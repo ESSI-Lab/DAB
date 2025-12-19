@@ -1587,7 +1587,7 @@
         "validatorClass": "eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting$OAuthSettingValidator",
         "clientId": {
             "canBeDisabled": false,
-            "values": ["476857622798-ju41vdjog88vfiu103cmcobgqmrioku3.apps.googleusercontent.com"],
+            "values": ["clientId"],
             "valueClass": "java.lang.String",
             "position": 2,
             "label": "Client id",
@@ -1609,7 +1609,7 @@
         "settingClass": "eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting",
         "clientSecret": {
             "canBeDisabled": false,
-            "values": ["MGVMM8W_y61tGrjXDG9Wmoyd"],
+            "values": ["clientSecret"],
             "valueClass": "java.lang.String",
             "position": 3,
             "label": "Client secret",

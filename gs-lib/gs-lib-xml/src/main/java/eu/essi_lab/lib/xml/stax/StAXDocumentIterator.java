@@ -36,10 +36,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import eu.essi_lab.lib.xml.*;
 import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 
 /**
  * This class is useful to read large XML files containing long lists of similar elements. Large files can't be parsed
@@ -58,7 +58,9 @@ public class StAXDocumentIterator implements Iterator<XMLDocumentReader> {
     private Logger logger = GSLoggerFactory.getLogger(StAXDocumentIterator.class);
 
     public StAXDocumentIterator(InputStream stream, String searchElement) throws XMLStreamException {
-	XMLInputFactory factory = XMLInputFactory.newInstance();
+
+	XMLInputFactory factory = XMLFactories.newXMLInputFactory();
+	
 	this.reader = factory.createXMLEventReader(stream);
 	this.searchElement = searchElement;
 

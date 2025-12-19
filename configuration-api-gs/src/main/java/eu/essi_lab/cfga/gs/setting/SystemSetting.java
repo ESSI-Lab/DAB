@@ -34,7 +34,6 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
@@ -94,7 +93,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	MQTT_BROKER_PWD("mqttBrokerPwd"), //
 
 	/**
-	 * HealthCheck options
+	 * Health check options
 	 */
 	TASK_AGE_HEALTH_CHECK_METHOD_TRESHOLD("taskAgeHealthCheckMethodTreshold"), //
 	FREE_MEMORY_HEALTH_CHECK_METHOD_TRESHOLD("freeMemoryHealthCheckMethodTreshold"), //
@@ -105,6 +104,13 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	 * DABStarter option
 	 */
 	SCHEDULER_START_DELAY("schedulerStartDelay"),
+
+	/**
+	 * Trust store options
+	 */
+	TRUST_STORE("trustStore"),
+	TRUST_STORE_PWD("trustStorePassword"),
+	TRUST_STORE_NAME("trustStoreName"),
 
 	/**
 	 * SOSConnector option

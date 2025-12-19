@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.authorization.xacml;
 
@@ -122,18 +122,23 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	logBuilder.append("\n- User role: " + role);
 
 	Optional<View> optionalView = message.getView();
+
 	if (optionalView.isPresent()) {
+
 	    View view = optionalView.get();
 	    String creator = view.getCreator();
-	    switch (creator) {
-	    case "whos":
-	    case "his-central":
-		if (role.equals("anonymous")) {
-		    return false;
+
+	    if (creator != null) {
+		switch (creator) {
+		case "whos":
+		case "his-central":
+		    if (role.equals("anonymous")) {
+			return false;
+		    }
+		    break;
+		default:
+		    break;
 		}
-		break;
-	    default:
-		break;
 	    }
 	}
 

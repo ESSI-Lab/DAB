@@ -21,6 +21,32 @@ public class ThunderConnectorTestExternalTestIT {
     private ThunderConnector connector;
     private GSSource source;
 
+    /**
+     * @return
+     */
+    private static String getPassword() {
+
+	return System.getProperty("thunder.password");
+    }
+
+    /**
+     * @return
+     */
+    private static String getUser() {
+
+	return System.getProperty("thunder.user");
+
+    }
+
+    /**
+     * @return
+     */
+    private static String getHost() {
+
+	return System.getProperty("thunder.host");
+
+    }
+
     @Before
     public void init() {
 
@@ -31,7 +57,7 @@ public class ThunderConnectorTestExternalTestIT {
     @Test
     public void testFTPService() throws Exception {
 
-	String endpoint = "ftp://thunder:thunder123@18.18.83.11";
+	String endpoint = "ftp://"+getUser()+":"+getPassword()+"@"+getHost();
 
 	FTPDownloader downloader = new FTPDownloader();
 
@@ -44,7 +70,7 @@ public class ThunderConnectorTestExternalTestIT {
     @Test
     public void testFTPMetadataFileExist() throws Exception {
 
-	String endpoint = "ftp://thunder:thunder123@18.18.83.11";
+	String endpoint = "ftp://"+getUser()+":"+getPassword()+"@"+getHost();
 
 	String metadataFileName = "isd-history.csv";
 
@@ -65,10 +91,9 @@ public class ThunderConnectorTestExternalTestIT {
 
 	FTPClient ftpClient = new FTPClient();
 
-	ftpClient.connect("18.18.83.11", 21);
-	String user = "thunder";
-	String pass = "thunder123";
-	ftpClient.login(user, pass);
+	ftpClient.connect(getHost(), 21);
+
+	ftpClient.login(getUser(), getPassword());
 
 	// use local passive mode to pass firewall
 	ftpClient.enterLocalPassiveMode();
@@ -86,10 +111,9 @@ public class ThunderConnectorTestExternalTestIT {
 
 	FTPClient ftpClient = new FTPClient();
 
-	ftpClient.connect("18.18.83.11", 21);
-	String user = "thunder";
-	String pass = "thunder123";
-	ftpClient.login(user, pass);
+	ftpClient.connect(getHost(), 21);
+
+	ftpClient.login(getUser(), getPassword());
 
 	// use local passive mode to pass firewall
 	ftpClient.enterLocalPassiveMode();
@@ -101,7 +125,7 @@ public class ThunderConnectorTestExternalTestIT {
 
 	String name = subFiles[0].getName();
 
-	String endpoint = "ftp://thunder:thunder123@18.18.83.11";
+	String endpoint = "ftp://"+getUser()+":"+getPassword()+"@"+getHost();
 	FTPDownloader downloader = new FTPDownloader();
 	File res = downloader.downloadStream(endpoint, "/thunder_data_GSOD/" + name);
 
@@ -111,8 +135,8 @@ public class ThunderConnectorTestExternalTestIT {
     @Test
     public void testFTPResumptionToken() throws Exception {
 
-	Mockito.when(source.getEndpoint()).thenReturn("ftp://18.18.83.11");
-	connector.setSourceURL("ftp://18.18.83.11");
+	Mockito.when(source.getEndpoint()).thenReturn("ftp://"+getHost());
+	connector.setSourceURL("ftp://"+getHost());
 
 	// first record
 	ListRecordsRequest listRecords = new ListRecordsRequest();

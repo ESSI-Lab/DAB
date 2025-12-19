@@ -50,7 +50,7 @@ public class OpenSearchTest {
 
 	logger.debug("Executing Before {}", es.getUri());
 
-	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(es);
+	OpenSearchClient client = OpenSearchDatabase.createClient(es);
 	for (String index : IndexMapping.getIndexes(false)) {
 
 	    if (DataFolderMapping.checkIndex(client, index)) {
