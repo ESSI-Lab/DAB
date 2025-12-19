@@ -34,7 +34,6 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
 import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
@@ -109,7 +108,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	/**
 	 * Trust store options
 	 */
-	TRUST_STORE_BUCKET("trustStoreBucket"),
+	TRUST_STORE("trustStore"),
 	TRUST_STORE_PWD("trustStorePassword"),
 	TRUST_STORE_NAME("trustStoreName"),
 

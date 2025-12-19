@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -63,11 +63,9 @@ import eu.essi_lab.request.executor.schedule.*;
 import eu.essi_lab.shared.driver.es.stats.*;
 import org.quartz.*;
 
-import javax.net.ssl.*;
 import javax.ws.rs.ext.*;
 import javax.xml.bind.*;
 import java.io.*;
-import java.net.http.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -742,42 +740,61 @@ public class DABStarter {
 		getSystemSettings().//
 		readKeyValue(KeyValueOptionKeys.TRUST_STORE_PWD.getLabel());
 
-	Optional<String> trustStoreBucket = ConfigurationWrapper. //
+	Optional<String> trustStore = ConfigurationWrapper. //
 		getSystemSettings().//
-		readKeyValue(KeyValueOptionKeys.TRUST_STORE_BUCKET.getLabel());
+		readKeyValue(KeyValueOptionKeys.TRUST_STORE.getLabel());
 
-	if (trustStoreBucket.isPresent() && trustStorePwd.isPresent() && trustStoreName.isPresent()) {
+	if (trustStore.isPresent() && trustStorePwd.isPresent() && trustStoreName.isPresent()) {
 
-	    Optional<S3TransferWrapper> wrapper = ConfigurationWrapper.getS3TransferWrapper();
+	    GSLoggerFactory.getLogger(getClass()).info("Trust store init STARTED");
 
-	    if (wrapper.isPresent()) {
+	    File target = null;
 
-		GSLoggerFactory.getLogger(getClass()).info("Trust store init STARTED");
+	    File trustFile = new File(trustStore.get());
 
-		File target = new File(FileUtils.getTempDir(), trustStoreName.get());
+	    if (trustFile.exists()) {
 
-		boolean downloaded = wrapper.get().download( //
-			trustStoreBucket.get(), //
-			trustStoreName.get(), //
-			target);
+		target = trustFile;
 
-		if (!downloaded) {
-
-		    GSLoggerFactory.getLogger(getClass()).error("Error occurred. Unable to download trust store from S3");
-
-		} else {
-
-		    System.setProperty("dab.net.ssl.trustStore", target.getAbsolutePath());
-		    System.setProperty("dab.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
-		    System.setProperty("dab.net.ssl.trustStorePassword", trustStorePwd.get());
-		}
-
-		GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
+		GSLoggerFactory.getLogger(getClass()).info("Loading trust store from file system: {}", target.getAbsolutePath());
 
 	    } else {
 
-		GSLoggerFactory.getLogger(getClass()).warn("Unable to init trust store, S3 transfer wrapper is not configured");
+		Optional<S3TransferWrapper> wrapper = ConfigurationWrapper.getS3TransferWrapper();
+
+		if (wrapper.isPresent()) {
+
+		    GSLoggerFactory.getLogger(getClass()).info("Loading trust store S3 bucket: {}", trustStore.get());
+
+		    target = new File(FileUtils.getTempDir(), trustStoreName.get());
+
+		    boolean downloaded = wrapper.get().download( //
+			    trustStore.get(), //
+			    trustStoreName.get(), //
+			    target);
+
+		    if (!downloaded) {
+
+			target = null;
+
+			GSLoggerFactory.getLogger(getClass()).error("Error occurred. Unable to download trust store from S3");
+		    }
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).warn("Unable to init trust store, S3 transfer wrapper is not configured");
+		}
 	    }
+
+	    if (target != null) {
+
+		System.setProperty("dab.net.ssl.trustStore", target.getAbsolutePath());
+		System.setProperty("dab.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
+		System.setProperty("dab.net.ssl.trustStorePassword", trustStorePwd.get());
+
+		GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
+	    }
+
 	} else {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Trust store credentials missing");
