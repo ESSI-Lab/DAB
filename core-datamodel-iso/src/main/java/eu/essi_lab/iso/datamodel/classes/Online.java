@@ -193,6 +193,22 @@ public class Online extends ISOMetadata<CIOnlineResourceType> {
 	return null;
     }
 
+    /**
+     * @XPathDirective(target = "gmd:protocol/gmx:Anchor/@*:href")
+     */
+    public String getProtocolGmxAnchor() {
+
+	try {
+	    JAXBElement<?> jaxbElement = type.getProtocol().getCharacterString();
+	    @SuppressWarnings("unchecked")
+	    JAXBElement<AnchorType> anchor = (JAXBElement<AnchorType>) jaxbElement;
+	    return anchor.getValue().getHref();
+	} catch (ClassCastException | NullPointerException ex) {
+	}
+
+	return null;
+    }
+
     // --------------------------------------------------------
     //
     // Function code
