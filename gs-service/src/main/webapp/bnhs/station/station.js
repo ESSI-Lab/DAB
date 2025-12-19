@@ -17,7 +17,7 @@ $(document).ready(function() {
 		modal: true,
 		buttons: [
 			{
-				text: "Accept",
+				text: t('accept'),
 				click: function() {
 					agreed = true;
 					$(this).dialog("close");
@@ -44,7 +44,222 @@ const url = new URL(window.location.href);
 const segments = url.pathname.split('/').filter(Boolean);
 const stationCode = segments[segments.length - 1];
 
+// i18n support
+var i18n = { current: 'en', en: {}, it: {} };
+function loadI18nSync(lang) {
+	var desired = (localStorage.getItem('lang') || lang || 'en').toLowerCase();
+	i18n.current = (desired === 'it') ? 'it' : 'en';
 
+	function loadJsonSync(paths) {
+		for (var j = 0; j < paths.length; j++) {
+			try {
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', paths[j], false);
+				xhr.send(null);
+				if (xhr.status >= 200 && xhr.status < 300 && (xhr.responseText || '').trim().length > 0) {
+					return JSON.parse(xhr.responseText);
+				}
+			} catch (e) { }
+		}
+		return {};
+	}
+
+	// Base translations from gi-portal
+	// Try multiple path resolutions
+	var baseEnUrls = [
+		'/gs-service/gi-portal/lang/en.json',
+		'../gi-portal/lang/en.json',
+		'../../gi-portal/lang/en.json'
+	];
+	var baseItUrls = [
+		'/gs-service/gi-portal/lang/it.json',
+		'../gi-portal/lang/it.json',
+		'../../gi-portal/lang/it.json'
+	];
+
+	// Station-specific translations (try multiple paths)
+	var localEnUrls = [
+		'/gs-service/bnhs/station/lang/en.json',
+		'./lang/en.json',
+		'lang/en.json',
+		'../station/lang/en.json'
+	];
+	var localItUrls = [
+		'/gs-service/bnhs/station/lang/it.json',
+		'./lang/it.json',
+		'lang/it.json',
+		'../station/lang/it.json'
+	];
+
+	var baseEn = loadJsonSync(baseEnUrls);
+	var baseIt = loadJsonSync(baseItUrls);
+	var overrideEn = loadJsonSync(localEnUrls);
+	var overrideIt = loadJsonSync(localItUrls);
+
+	// Merge base + overrides (overrides win)
+	i18n.en = Object.assign({}, baseEn, overrideEn);
+	i18n.it = Object.assign({}, baseIt, overrideIt);
+	
+	// Debug: log if translations loaded
+	if (Object.keys(i18n[i18n.current]).length === 0) {
+		console.warn('No translations loaded for language:', i18n.current);
+	} else {
+		console.log('Loaded', Object.keys(i18n[i18n.current]).length, 'translations for', i18n.current);
+	}
+}
+
+function interpolate(template, vars) {
+	if (!template || !vars) return template;
+	return template.replace(/\$\{([^}]+)\}/g, function(_, k) { return (vars[k] != null) ? vars[k] : ''; });
+}
+
+function t(key, vars) {
+	var cur = (i18n[i18n.current] || {});
+	var str = cur[key] || i18n.en[key] || key;
+	return interpolate(str, vars);
+}
+
+function lang() {
+	return i18n.current;
+}
+
+function openLanguageChooser() {
+	try {
+		const dialogDiv = $('<div>');
+		dialogDiv.append($('<div>').text(t('choose_language')).css({ 'margin-bottom': '10px' }));
+		const current = i18n.current || 'en';
+		const enOpt = $('<div>');
+		enOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_en', value: 'en', checked: (current === 'en') }));
+		enOpt.append($('<label>').attr('for', 'lang_en').text(t('language_en')).css({ 'margin-left': '6px' }));
+		const itOpt = $('<div>');
+		itOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_it', value: 'it', checked: (current === 'it') }));
+		itOpt.append($('<label>').attr('for', 'lang_it').text(t('language_it')).css({ 'margin-left': '6px' }));
+		dialogDiv.append(enOpt).append(itOpt);
+		dialogDiv.dialog({
+			title: t('change_language_title'),
+			modal: true,
+			width: 360,
+			buttons: [
+				{
+					text: 'OK', click: function() {
+						const sel = dialogDiv.find('input[name="langSel"]:checked').val() || 'en';
+						localStorage.setItem('lang', sel);
+						$(this).dialog('close');
+						window.location.reload();
+					}
+				},
+				{ text: t('cancel'), click: function() { $(this).dialog('close'); } }
+			]
+		});
+	} catch (e) {
+		// Fallback: just toggle en/it and reload
+		const next = (i18n.current === 'it') ? 'en' : 'it';
+		try { localStorage.setItem('lang', next); } catch (ex) { }
+		window.location.reload();
+	}
+}
+
+// Initialize i18n
+try { 
+	loadI18nSync(); 
+} catch (e) { 
+	console.error('Error loading translations:', e);
+}
+
+// Translate static HTML content
+function translateStaticContent() {
+	// Translate page info text
+	var $pageInfo = $('.page_info_text');
+	if ($pageInfo.length) {
+		var netcdfLink = '<a href="https://www.ogc.org/standards/netcdf">' + t('netcdf_link') + '</a>';
+		var waterml2Link = '<a href="https://www.ogc.org/standards/waterml">' + t('waterml2_link') + '</a>';
+		var waterml1Link = '<a href="https://his.cuahsi.org/documents/WaterML_1_0_part1.pdf">' + t('waterml1_link') + '</a>';
+		
+		var metadataSectionInfo = t('metadata_section_info', {
+			netcdf: netcdfLink,
+			waterml2: waterml2Link,
+			waterml1: waterml1Link
+		});
+		
+		$pageInfo.html(
+			t('page_info_text') + ' <br> ' +
+			t('plot_features_include') + ' <br> ' +
+			'• ' + t('interactive_zoom') + '<br> ' +
+			'• ' + t('interactive_legend') + ' <br> ' +
+			'<br> ' +
+			t('metadata_info') + ' <br> ' +
+			'<br> ' +
+			metadataSectionInfo
+		);
+	}
+	
+	// Translate sub title
+	var $subTitle = $('.sub_title');
+	if ($subTitle.length) {
+		var subTitleText = $subTitle.text().trim();
+		if (subTitleText === 'Station information page' || subTitleText.indexOf('Station') !== -1) {
+			$subTitle.text(t('station_information_page'));
+		}
+	}
+	
+	// Translate footer note
+	var $footerNote = $('.page_footer > div:first-child');
+	if ($footerNote.length) {
+		var footerText = $footerNote.text();
+		if (footerText.indexOf('Please note') !== -1 || footerText.indexOf('data plotting') !== -1 || footerText.indexOf('*') === 0) {
+			$footerNote.text(t('full_extent_note'));
+		}
+	}
+	
+	// Translate station table headers
+	var $stationTable = $('.station-meta-table');
+	if ($stationTable.length) {
+		$stationTable.find('td:contains("Station/platform")').text(t('station_platform'));
+		$stationTable.find('td:contains("Name")').not('#station-name-td').text(t('name'));
+		$stationTable.find('td:contains("Data publisher")').not('#source-label-td').text(t('data_publisher'));
+		$stationTable.find('td:contains("Platform id")').not('#platform_id_local').text(t('platform_id'));
+		$stationTable.find('td:contains("Territory of origin of data")').not('#country-td').text(t('territory_origin'));
+		$stationTable.find('td:contains("Involved organizations")').not('#originator-td').text(t('involved_organizations'));
+		$stationTable.find('td:contains("Geospatial location")').not('#geolocation-td').text(t('geospatial_location'));
+	}
+}
+
+// Add language button to header and translate static content
+$(document).ready(function() {
+	const curLang = (i18n.current || 'en').toUpperCase();
+	const langBtn = $('<button>')
+		.attr('id', 'langBtn')
+		.addClass('lang-button')
+		.css({
+			'float': 'right',
+			'margin-right': '20px',
+			'margin-top': '10px',
+			'padding': '5px 15px',
+			'background-color': 'var(--color4)',
+			'color': 'var(--color1)',
+			'border': '1px solid var(--color1)',
+			'cursor': 'pointer',
+			'font-size': '14px'
+		})
+		.text(curLang)
+		.attr('title', t('menu_change_language'));
+	
+	langBtn.on('click', function(e) {
+		e.preventDefault();
+		openLanguageChooser();
+	});
+	
+	$('.page_header').append(langBtn);
+	
+	// Translate static HTML content
+	translateStaticContent();
+	
+	// Translate page title if it contains "Pagina della stazione" or "Station"
+	var pageTitle = document.title;
+	if (pageTitle.indexOf('Pagina della stazione') !== -1 || pageTitle.indexOf('Station') !== -1) {
+		document.title = t('station_information_page');
+	}
+});
 
 GWIS._nwisRootUrl = "../../gwis"; // this is the URL of the profiler. E.g. https://gs-service-production.geodab.eu/gs-service/services/bnhs
 
@@ -133,9 +348,9 @@ var createDataTable = function(data, i) {
 	// Observed variable
 	//
 
-	items.push("<tr><td class='data_table_header' colspan='2'>Observed variable</td></tr>");
+	items.push("<tr><td class='data_table_header' colspan='2'>" + t('timeseries_metadata') + "</td></tr>");
 
-	items.push("<tr><td class='data_table_label_td'>Observed variable</td><td>" + findValue(data, i, 'attribute_label') + "</td></tr>");
+	items.push("<tr><td class='data_table_label_td'>" + t('observed_variable') + "</td><td>" + findValue(data, i, 'attribute_label') + "</td></tr>");
 
 	var unitAbbr = findValue(data, i, 'attribute_units_abbreviation');
 
@@ -145,28 +360,28 @@ var createDataTable = function(data, i) {
 					  unitAbbr = "";
 					}
 					
-	items.push("<tr><td>Measurement unit</td><td>"+ findValue(data, i, 'attribute_units')  + unitAbbr +"</td></tr>");	
+	items.push("<tr><td>" + t('measurement_unit') + "</td><td>"+ findValue(data, i, 'attribute_units')  + unitAbbr +"</td></tr>");	
 
-	items.push("<tr><td>Temporal extent</td><td>" + tempExtent + "</td></tr>");
+	items.push("<tr><td>" + t('temporal_extent') + "</td><td>" + tempExtent + "</td></tr>");
 
 	if (!(typeof aggregationDuration === 'undefined' || aggregationDuration === "")) {
-		items.push("<tr><td>Aggregation duration</td><td>" + aggregationDuration + "</td></tr>");
+		items.push("<tr><td>" + t('aggregation_duration') + "</td><td>" + aggregationDuration + "</td></tr>");
 	}
 
 	if (!(typeof interpolationType === 'undefined' || interpolationType === "")) {
 		switch (interpolationType) {
 			case "http://www.opengis.net/def/waterml/2.0/interpolationtype/maxprec":
-				interpolationType = "Maximum in the preceding interval";
+				interpolationType = t('maximum_preceding');
 				break;
 			case "http://www.opengis.net/def/waterml/2.0/interpolationtype/minprec":
-				interpolationType = "Minimum in the preceding interval";
+				interpolationType = t('minimum_preceding');
 				break;
 			case "http://www.opengis.net/def/waterml/2.0/interpolationtype/totalprec":
-				interpolationType = "Total in the preceding interval";
+				interpolationType = t('total_preceding');
 				break;
 
 		}
-		items.push("<tr><td>Interpolation type</td><td>" + interpolationType + "</td></tr>");
+		items.push("<tr><td>" + t('interpolation_type') + "</td><td>" + interpolationType + "</td></tr>");
 	}
 
 
@@ -183,7 +398,7 @@ var createDataTable = function(data, i) {
 
 var getTemporalExtent = function(data, i) {
 
-	var continuous = findValue(data, i, 'time_interpolation') === "CONTINUOUS" ? "Continuous" : null;
+	var continuous = findValue(data, i, 'time_interpolation') === "CONTINUOUS" ? t('continuous') : null;
 
 	var timeSupport = findValue(data, i, 'time_support');
 	var timeUnits = findValue(data, i, 'time_units');
@@ -192,7 +407,7 @@ var getTemporalExtent = function(data, i) {
 	var endDate = convertDate(findValue(data, i, 'time_end'));
 	var nearRealTime = findValue(data, i, 'near_real_time') === "yes" ? "yes" : null;
 	if (nearRealTime) {
-		endDate = "present";
+		endDate = t('present');
 	}
 
 	var aggregates = continuous ? continuous : 'TO DO';
@@ -203,7 +418,7 @@ var getTemporalExtent = function(data, i) {
 		//return continuous +", available for the period from "+startDate+" to "+endDate;   
 	}
 
-	return "Available for the period from " + startDate + " to " + endDate;
+	return t('available_for_period') + " " + startDate + " " + t('to') + " " + endDate;
 	// as for Igor meeting 2020-12-3
 	//        " <i>(temporal interpolation not available)</i>";  
 };
@@ -265,19 +480,19 @@ var getInterpolationType = function(data, i) {
 	}
 
 	if (interpolationType === "AVERAGE") {
-		interpolationType = "mean";
+		interpolationType = t('mean');
 	}
 	if (interpolationType === "CONTINUOUS") {
-		interpolationType = "instantaneous";
+		interpolationType = t('instantaneous');
 	}
 	if (interpolationType === "MAXIMUM") {
-		interpolationType = "maximum";
+		interpolationType = t('maximum');
 	}
 	if (interpolationType === "MINIMUM") {
-		interpolationType = "minimum";
+		interpolationType = t('minimum');
 	}
 
-	return interpolationType.toLowerCase();
+	return interpolationType;
 
 };
 
@@ -562,9 +777,9 @@ var createPlot = function(data, i, recent) {
 
 	return GWIS.plot({
 
-		title: data[i].attribute_label.value + " at the station: " + data[i].platform_label.value,
+		title: data[i].attribute_label.value + " " + t('at_station') + " " + data[i].platform_label.value,
 
-		xlabel: 'Time',
+		xlabel: t('time'),
 
 		ylabel: data[i].attribute_label.value + " (" + data[i].attribute_units_abbreviation.value + ")",
 
@@ -651,27 +866,35 @@ var createTempExtentTable = function(data, i) {
 
 	var timeTable = "<table class='temp_extent_table'>";
 
-	timeTable += "<tr><td colspan='3' class='temp_extent_info'>Please select time period of interest:</td></tr>";
+	timeTable += "<tr><td colspan='3' class='temp_extent_info'>" + t('please_select_time_period') + "</td></tr>";
 
 	timeTable += "<tr><td colspan='3'>";
-	timeTable += "<button class='time_button' id='time-button-2m_" + i + "'>Last 2 months</button> ";
-	timeTable += "<button class='time_button' id='time-button-1y_" + i + "'>Last year</button> ";
-	timeTable += "<button class='time_button' id='time-button-fe_" + i + "'>Full extent *</button>";
+	timeTable += "<button class='time_button' id='time-button-2m_" + i + "'>" + t('last_2_months') + "</button> ";
+	timeTable += "<button class='time_button' id='time-button-1y_" + i + "'>" + t('last_year') + "</button> ";
+	timeTable += "<button class='time_button' id='time-button-fe_" + i + "'>" + t('full_extent') + "</button>";
 	timeTable += "</td></tr>";
 
-	timeTable += "<tr><td class='start_date'>Start date</td><td><input type='text' id='" + dstartId + "' autocomplete='off'></td><td rowspan=2 id='update-button-td_" + i + "'></td></tr>";
+	timeTable += "<tr><td class='start_date'>" + t('start_date') + "</td><td><input type='text' id='" + dstartId + "' autocomplete='off'></td><td rowspan=2 id='update-button-td_" + i + "'></td></tr>";
 
-	timeTable += "<tr><td class='end_date'>End date</td><td><input type='text' id='" + dendId + "' autocomplete='off'></td><td></td></tr>";
+	timeTable += "<tr><td class='end_date'>" + t('end_date') + "</td><td><input type='text' id='" + dendId + "' autocomplete='off'></td><td></td></tr>";
 
 	timeTable += "</table>";
 
 	$(timeTable).appendTo("#bottom-td_" + i);
 
-	$("<button class='update_graph_button' id='button_" + i + "'>Update plot<i style='margin-left:5px' class='fas fa-sync'></i></button>").appendTo("#update-button-td_" + i);
+	$("<button class='update_graph_button' id='button_" + i + "'>" + t('view_plot') + "<i style='margin-left:5px' class='fas fa-sync'></i></button>").appendTo("#bottom-td_" + i);
+	$("<button class='download_button' id='download_" + i + "' style='margin-left: 10px;'>" + t('download_data') + "<i style='margin-left:5px' class='fas fa-download'></i></button>").appendTo("#bottom-td_" + i);
 
 	$("#button_" + i).click(function(event) {
 
 		var plotId = this.id.substring(this.id.indexOf('_') + 1, this.id.length);
+
+		// Check if this is the first click (button still says "View plot")
+		var $button = $(this);
+		if ($button.html().indexOf(t('view_plot')) !== -1) {
+			// Change button text to "Update plot" after first click
+			$button.html(t('update_plot') + '<i style="margin-left:5px" class="fas fa-sync"></i>');
+		}
 
 		// Clear existing plot content to avoid stacking multiple renders
 		$("#plot_" + plotId).empty();
@@ -738,17 +961,35 @@ var createLayoutTable = function(data, i, k) {
 	}
 	var label = seriesTitle; // +" from "+convertDate(data[i].time_start.value)+" to "+convertDate(data[i].time_end.value);
 
-	layoutTable += "<th colspan='2'>Time series " + (k + 1) + ": " + label + "</th>";
+	layoutTable += "<thead><tr><th colspan='2' class='timeseries-header' id='timeseries-header_" + i + "' style='cursor: pointer;'>";
+	layoutTable += "<span class='expand-icon' style='display: inline-block; margin-right: 8px;'>▶</span>";
+	layoutTable += t('time_series') + " " + (k + 1) + ": " + label;
+	layoutTable += "</th></tr></thead>";
 
+	layoutTable += "<tbody id='timeseries-content_" + i + "' style='display: none;'>";
 	layoutTable += "<tr><td class='data_table_td' id='dataTable_" + i + "'></td>";
 
 	layoutTable += "<td rowspan='2'id='plotDiv_" + i + "'></td></tr>";
 
 	layoutTable += "<tr><td id='bottom-td_" + i + "'></td></tr>";
+	layoutTable += "</tbody>";
 
 	layoutTable += "</table>";
 
 	$(layoutTable).appendTo("#timeseries");
+
+	// Add click handler to toggle content visibility
+	$("#timeseries-header_" + i).click(function() {
+		var $content = $("#timeseries-content_" + i);
+		var $icon = $(this).find('.expand-icon');
+		if ($content.is(':visible')) {
+			$content.slideUp();
+			$icon.text('▶');
+		} else {
+			$content.slideDown();
+			$icon.text('▼');
+		}
+	});
 };
 
 var download = function(button, event, data) {
@@ -756,8 +997,21 @@ var download = function(button, event, data) {
 	$("#dialog-download").dialog({
 		resizable: false,
 		height: "auto",
-
 		modal: true,
+		open: function() {
+			var $dialog = $(this).dialog("widget");
+			
+			// Use CSS transform to center - this is more reliable
+			$dialog.css({
+				position: "fixed",
+				top: "50%",
+				left: "50%",
+				margin: "0",
+				transform: "translate(-50%, -50%)",
+				"-webkit-transform": "translate(-50%, -50%)",
+				"-ms-transform": "translate(-50%, -50%)"
+			});
+		},
 		buttons: {
 			"Download": function() {
 
@@ -779,7 +1033,8 @@ var download = function(button, event, data) {
 			Cancel: function() {
 				$(this).dialog("close");
 			}
-		}
+		},
+		title: t('please_select_data_format')
 	});
 
 
@@ -797,7 +1052,7 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 	if (disclaimersSet.size > 0) {
 		const dialogEl = $('#dialog');
 		dialogEl.empty();
-		dialogEl.append($('<b>').text('Disclaimer to accept'));
+		dialogEl.append($('<b>').text(t('disclaimer_to_accept')));
 		dialogEl.append('<br><br>');
 		const list = $('<ul>');
 		Array.from(disclaimersSet).forEach(function(text) {
@@ -948,8 +1203,6 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 		//
 		// download
 		//
-
-		$("<button class='download_button' id='download_" + i + "'>Download data<i style='margin-left:5px' class='fas fa-download'></i></button>").appendTo("#bottom-td_" + i);
 
 		$("#download_" + i).click(function(event) {
 

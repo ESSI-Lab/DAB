@@ -1858,89 +1858,87 @@ export function initializePortal(config) {
 						console.error('Error fetching interpolation types:', error);
 						// Keep default values if API fails
 					});
-
-					
-				if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
-					const spacingId = GIAPI.search.constWidget.getId('intendedObservationSpacing');
-					advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', {
-						helpIconImage: 'fa-arrows-h',
-						values: [
-							{ label: t("select_observation_spacing"), value: '' }
-						],
-						readOnlyValues: true
-					}));
-
-					// After constraints are initialized, try to fetch and update values
-					const authToken = localStorage.getItem('authToken') || 'my-token';
-					fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
-						.then(response => response.json())
-						.then(data => {
-							if (data.intendedObservationSpacing && data.intendedObservationSpacing.length > 0) {
-								// Find the select element using the correct ID
-								const selectElement = document.getElementById(spacingId);
-								if (selectElement) {
-									const options = [
-										{ label: t("select_observation_spacing"), value: '' },
-										...data.intendedObservationSpacing.map(type => ({
-											label: `${type.value} (${type.observationCount} observations)`,
-											value: type.value
-										}))
-									];
-
-									// Update the select options
-									selectElement.innerHTML = options.map(option =>
-										`<option value="${option.value}">${option.label}</option>`
-									).join('');
-								}
-							}
-						})
-						.catch(error => {
-							console.error('Error fetching observation spacing types:', error);
-							// Keep default values if API fails
-						});
-				}
-				
-				if (config.aggregationDuration !== undefined && config.aggregationDuration) {
-					const durationId = GIAPI.search.constWidget.getId('aggregationDuration');
-					advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', {
-						helpIconImage: 'fa-hourglass',
-						values: [
-							{ label: t("select_aggregation_duration"), value: '' }
-						],
-						readOnlyValues: true
-					}));
-
-					// After constraints are initialized, try to fetch and update values
-					const authToken = localStorage.getItem('authToken') || 'my-token';
-					fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=aggregationDuration&limit=50`)
-						.then(response => response.json())
-						.then(data => {
-							if (data.aggregationDuration && data.aggregationDuration.length > 0) {
-								// Find the select element using the correct ID
-								const selectElement = document.getElementById(durationId);
-								if (selectElement) {
-									const options = [
-										{ label: t("select_aggregation_duration"), value: '' },
-										...data.aggregationDuration.map(type => ({
-											label: `${type.value} (${type.observationCount} observations)`,
-											value: type.value
-										}))
-									];
-
-									// Update the select options
-									selectElement.innerHTML = options.map(option =>
-										`<option value="${option.value}">${option.label}</option>`
-									).join('');
-								}
-							}
-						})
-						.catch(error => {
-							console.error('Error fetching aggregation duration types:', error);
-							// Keep default values if API fails
-						});
-				}
 			}
+		}
 
+		if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
+			const spacingId = GIAPI.search.constWidget.getId('intendedObservationSpacing');
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', {
+				helpIconImage: 'fa-arrows-h',
+				values: [
+					{ label: t("select_observation_spacing"), value: '' }
+				],
+				readOnlyValues: true
+			}));
+
+			// After constraints are initialized, try to fetch and update values
+			const authToken = localStorage.getItem('authToken') || 'my-token';
+			fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
+				.then(response => response.json())
+				.then(data => {
+					if (data.intendedObservationSpacing && data.intendedObservationSpacing.length > 0) {
+						// Find the select element using the correct ID
+						const selectElement = document.getElementById(spacingId);
+						if (selectElement) {
+							const options = [
+								{ label: t("select_observation_spacing"), value: '' },
+								...data.intendedObservationSpacing.map(type => ({
+									label: `${type.value} (${type.observationCount} observations)`,
+									value: type.value
+								}))
+							];
+
+							// Update the select options
+							selectElement.innerHTML = options.map(option =>
+								`<option value="${option.value}">${option.label}</option>`
+							).join('');
+						}
+					}
+				})
+				.catch(error => {
+					console.error('Error fetching observation spacing types:', error);
+					// Keep default values if API fails
+				});
+		}
+		
+		if (config.aggregationDuration !== undefined && config.aggregationDuration) {
+			const durationId = GIAPI.search.constWidget.getId('aggregationDuration');
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', {
+				helpIconImage: 'fa-hourglass',
+				values: [
+					{ label: t("select_aggregation_duration"), value: '' }
+				],
+				readOnlyValues: true
+			}));
+
+			// After constraints are initialized, try to fetch and update values
+			const authToken = localStorage.getItem('authToken') || 'my-token';
+			fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=aggregationDuration&limit=50`)
+				.then(response => response.json())
+				.then(data => {
+					if (data.aggregationDuration && data.aggregationDuration.length > 0) {
+						// Find the select element using the correct ID
+						const selectElement = document.getElementById(durationId);
+						if (selectElement) {
+							const options = [
+								{ label: t("select_aggregation_duration"), value: '' },
+								...data.aggregationDuration.map(type => ({
+									label: `${type.value} (${type.observationCount} observations)`,
+									value: type.value
+								}))
+							];
+
+							// Update the select options
+							selectElement.innerHTML = options.map(option =>
+								`<option value="${option.value}">${option.label}</option>`
+							).join('');
+						}
+					}
+				})
+				.catch(error => {
+					console.error('Error fetching aggregation duration types:', error);
+					// Keep default values if API fails
+				});
 		}
 		
 		
