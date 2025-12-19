@@ -24,7 +24,11 @@ package eu.essi_lab.lib.net.smtp;
  * #L%
  */
 
+import java.io.*;
+import java.net.http.*;
+import java.time.*;
 import java.util.Properties;
+import java.util.concurrent.*;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -35,6 +39,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import dev.failsafe.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -46,8 +51,14 @@ public class SMTPClient {
     private String password;
     private Properties properties;
 
+    private static final long TIMEOUT = TimeUnit.SECONDS.toMillis(15);
+
+    private static final int RETRY_DELAY_SECONDS = 60;
+
+    private static final int MAX_RETRY_ATTEMTPS = 5;
+
     /**
-     * The default constructor initializes the gmail client from system properties
+     *
      */
     public SMTPClient() {
 	this(//
@@ -58,7 +69,10 @@ public class SMTPClient {
     }
 
     /**
-     *
+     * @param host
+     * @param port
+     * @param user
+     * @param password
      */
     public SMTPClient(String host, String port, String user, String password) {
 
@@ -74,6 +88,12 @@ public class SMTPClient {
 	properties.put("mail.smtp.auth", "true");
 	properties.put("mail.smtp.port", port);
 	properties.put("mail.smtp.host", host);
+
+	properties.put("mail.smtp.connectiontimeout", String.valueOf(TIMEOUT)); 
+	properties.put("mail.smtp.timeout", String.valueOf(TIMEOUT));
+	properties.put("mail.smtp.writetimeout", String.valueOf(TIMEOUT));
+
+	enableSSL(true);
     }
 
     /**
@@ -122,10 +142,39 @@ public class SMTPClient {
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Sending email STARTED");
 
-	    Transport.send(mimeMessage);
+	    RetryPolicy<Boolean> retryPolicy = RetryPolicy.<Boolean> //
+		    builder().//
+		    handleResultIf(sent -> !sent).//
+		    withDelay(Duration.ofSeconds(RETRY_DELAY_SECONDS)).//
+		    withMaxAttempts(MAX_RETRY_ATTEMTPS).//
+		    onRetry(e -> {
+		GSLoggerFactory.getLogger(getClass()).warn("Failure #{}. Retrying...", e.getAttemptCount());
+	    }).//
+		    onRetriesExceeded(e -> {
+		GSLoggerFactory.getLogger(getClass()).warn("Failed to connect. Max retries exceeded");
+	    }).//
+		    build();
+
+	    Boolean sent = Failsafe.with(retryPolicy).get(() -> send(mimeMessage));
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Sending email ENDED");
 	}
+    }
+
+    /**
+     * @param mimeMessage
+     * @return
+     */
+    private boolean send(MimeMessage mimeMessage) {
+
+	try {
+	    Transport.send(mimeMessage);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return false;
+	}
+
+	return true;
     }
 
 }
