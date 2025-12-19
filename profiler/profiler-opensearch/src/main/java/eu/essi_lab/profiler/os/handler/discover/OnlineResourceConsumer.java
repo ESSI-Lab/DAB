@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.os.handler.discover;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -38,7 +38,7 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 
 	final Distribution dist = gsResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution();
 
-	if(message.getDataProxyServer().isEmpty()){
+	if (message.getDataProxyServer().isEmpty()) {
 
 	    GSLoggerFactory.getLogger(getClass()).warn("Missing 'dataProxyServer' in 'SystemSetting' -> 'Key-value options'");
 	    return;
@@ -53,59 +53,117 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 		String name = online.getName();
 		String protocol = online.getProtocol();
 
-		NetProtocolWrapper wrapper = NetProtocolWrapper.of(protocol).orElse(null);
+		//
+		// first try: reading from protocol encoded by us by WCS, WMS, WFS, WMTS mapping
+		//
+		String linkage = buildOnline(message, publicId, protocol);
 
-		String linkage = switch (wrapper) {
-
-		    //
-		    // ESRI MapServer
-		    //
-
-		    case ESRIMapServer_10_0_0, //
-			 ESRIMapServer -> //
-			    buildOnline(message.getDataProxyServer().get(), publicId, "/esri/MapServer/");
+		if (linkage == null) {
 
 		    //
-		    // WCS
+		    // second try: reading from protocol encoded with OpenGIS IRI (e.g.: http://www.opengis.net/def/serviceType/ogc/wms)
 		    //
+		    String protocolGmxAnchor = online.getProtocolGmxAnchor();
 
-		    case WCS_1_0, //
-			 WCS_EDO, //
-			 WCS_1_0_0, //
-			 WCS_1_0_0_TDS,//
-			 WCS_1_1, WCS_1_1_1,//
-			 WCS_1_1_2,//
-			 WCS_2_0,//
-			 WCS_2_0_1,//
+		    linkage = buildOnline(message, publicId, protocolGmxAnchor);
 
-			 //
-			 // WFS
-			 //
+		    if (linkage == null) {
 
-			 WFS_1_0_0,//
-			 WFS_1_1_0,//
-			 WFS_2_0_0,//
+		 	//
+			// last chance: reading plain text protocol (e.g: WMS, OGC Web Map Service (WMS), etc..)
+			//
 
-			 //
-			 // WMS
-			 //
+			if (protocol.toLowerCase().contains("wms")) {
 
-			 WMS_1_1_1,//
-			 WMS_1_3_0, //
-			 WMS_Q_1_3_0,//
+			    linkage = buildOnline(message, publicId, NetProtocolWrapper.WMS.getCommonURN());
 
-			 WMTS_1_0_0 -> buildOnline(message.getDataProxyServer().get(), publicId, "/ogc");
+			} else if (protocol.toLowerCase().contains("wfs")) {
 
-		    case null, default -> null;
-		};
+			    linkage = buildOnline(message, publicId, NetProtocolWrapper.WFS.getCommonURN());
+
+			} else if (protocol.toLowerCase().contains("wcs")) {
+
+			    linkage = buildOnline(message, publicId, NetProtocolWrapper.WCS.getCommonURN());
+
+			} else if (protocol.toLowerCase().contains("wmts")) {
+
+			    linkage = buildOnline(message, publicId, NetProtocolWrapper.WMTS.getCommonURN());
+			}
+
+		    }
+		}
 
 		if (linkage != null) {
 
 		    online.setLinkage(linkage);
 		}
-
 	    });
 	}
+    }
+
+    /**
+     * @param message
+     * @param publicId
+     * @param protocol
+     * @return
+     */
+    private String buildOnline(DiscoveryMessage message, String publicId, String protocol) {
+
+	NetProtocolWrapper wrapper = NetProtocolWrapper.of(protocol).orElse(null);
+
+	String linkage = switch (wrapper) {
+
+	    //
+	    // ESRI MapServer
+	    //
+
+	    case ESRIMapServer_10_0_0, //
+		 ESRIMapServer -> //
+		    buildOnline(message.getDataProxyServer().get(), publicId, "/esri/MapServer/");
+
+	    //
+	    // WCS
+	    //
+
+	    case WCS,//
+		 WCS_1_0, //
+		 WCS_EDO, //
+		 WCS_1_0_0, //
+		 WCS_1_0_0_TDS,//
+		 WCS_1_1, WCS_1_1_1,//
+		 WCS_1_1_2,//
+		 WCS_2_0,//
+		 WCS_2_0_1,//
+
+		 //
+		 // WFS
+		 //
+
+		 WFS,//
+		 WFS_1_0_0,//
+		 WFS_1_1_0,//
+		 WFS_2_0_0,//
+
+		 //
+		 // WMS
+		 //
+
+		 WMS,//
+		 WMS_1_1_1,//
+		 WMS_1_3_0, //
+		 WMS_Q_1_3_0,//
+
+		 //
+		 // WMTS
+		 //
+
+		 WMTS,//
+		 WMTS_1_0_0 -> buildOnline(message.getDataProxyServer().get(), publicId, "/ogc");
+
+	    case null, default -> null;
+	};
+
+	return linkage;
     }
 
     /**
