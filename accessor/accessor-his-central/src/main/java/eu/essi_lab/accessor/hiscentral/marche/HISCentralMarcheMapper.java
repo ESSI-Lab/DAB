@@ -1,6 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.marche;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /*-
  * #%L
@@ -27,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.accessor.hiscentral.utils.HISCentralUtils;
@@ -169,8 +171,21 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	String uom = sensorInfo.getJSONObject("observedProperty").getString("uom");
 	String basePhenomenon = sensorInfo.getJSONObject("observedProperty").getString("basePhenomenon");
 
-	String pointLon = sensorInfo.getJSONObject("spatialSamplingFeature").getJSONArray("Point").get(0).toString();
-	String pointLat = sensorInfo.getJSONObject("spatialSamplingFeature").getJSONArray("Point").get(1).toString();
+//	String pointLon = sensorInfo.getJSONObject("spatialSamplingFeature").getJSONArray("Point").get(0).toString();
+//	String pointLat = sensorInfo.getJSONObject("spatialSamplingFeature").getJSONArray("Point").get(1).toString();
+	
+	JSONArray pointArray = sensorInfo
+	        .getJSONObject("spatialSamplingFeature")
+	        .getJSONArray("Point");
+
+	BigDecimal lon = BigDecimal
+	        .valueOf(pointArray.getDouble(0))
+	        .setScale(5, RoundingMode.HALF_UP);
+
+	BigDecimal lat = BigDecimal
+	        .valueOf(pointArray.getDouble(1))
+	        .setScale(5, RoundingMode.HALF_UP);
+
 
 	String intendedObservationSpacing = sensorInfo.getString("intendedObservationSpacing");
 
@@ -254,10 +269,10 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 
 	coreMetadata.addBoundingBox(//
-		new BigDecimal(pointLat), //
-		new BigDecimal(pointLon), //
-		new BigDecimal(pointLat), //
-		new BigDecimal(pointLon));
+		lat, //
+		lon, //
+		lat, //
+		lon);
 
 	//
 	// platform

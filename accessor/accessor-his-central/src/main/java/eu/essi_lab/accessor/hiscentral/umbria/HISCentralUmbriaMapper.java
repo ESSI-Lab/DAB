@@ -218,8 +218,8 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	String tempExtenBegin = retrieveStartDate(originalMD);
 
 	// bbox
-	Double lat = null;
-	Double lon = null;
+	BigDecimal lat = null;
+	BigDecimal lon = null;
 	String stationName = null;
 	String stationId = null;
 	String stationCity = null;
@@ -235,8 +235,8 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	String uom = null;
 
 	if (stationObj != null) {
-	    lat = getDouble(stationObj, "LAT");
-	    lon = getDouble(stationObj, "LON");
+	    lat = stationObj.optBigDecimal("LAT", null);//getDouble(stationObj, "LAT");
+	    lon = stationObj.optBigDecimal("LON", null);//getDouble(stationObj, "LON");
 	    stationName = getString(stationObj, "NOME_STAZIONE");
 	    stationId = getString(stationObj, "ID_STAZIONE");
 	    stationCity = getString(stationObj, "COMUNE");
@@ -263,10 +263,10 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	// bbox
 	if (lat != null && lon != null) {
 	    coreMetadata.addBoundingBox(//
-		    new BigDecimal(lat), //
-		    new BigDecimal(lon), //
-		    new BigDecimal(lat), //
-		    new BigDecimal(lon));
+		    lat, //
+		    lon, //
+		    lat, //
+		    lon);
 	}
 
 	if (timeType != null && !timeType.equals("NA")) {

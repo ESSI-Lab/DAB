@@ -1,6 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.liguria;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /*-
  * #%L
@@ -294,8 +295,14 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setTimeSupport(timeResolution);
 	}
 
-	Double pointLon = sensorInfo.optDouble("LON");// sensorInfo.optString("lon");
-	Double pointLat = sensorInfo.optDouble("LAT");
+	// Double pointLon = sensorInfo.optDouble("LON");// sensorInfo.optString("lon");
+	// Double pointLat = sensorInfo.optDouble("LAT");
+	//
+
+	BigDecimal SCALE = new BigDecimal("100000");
+
+	BigDecimal pointLat = new BigDecimal(sensorInfo.get("LAT").toString()).divide(SCALE, 5, RoundingMode.UNNECESSARY);
+	BigDecimal pointLon = new BigDecimal(sensorInfo.get("LON").toString()).divide(SCALE, 5, RoundingMode.UNNECESSARY);
 
 	double div = 100000;
 
@@ -431,12 +438,12 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	referenceSystem.setCodeSpace("EPSG");
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 
-	if(pointLat != null && pointLon != null) {
-	coreMetadata.addBoundingBox(//
-		new BigDecimal(pointLat / div), //
-		new BigDecimal(pointLon / div), //
-		new BigDecimal(pointLat / div), //
-		new BigDecimal(pointLon / div));
+	if (pointLat != null && pointLon != null) {
+	    coreMetadata.addBoundingBox(//
+		    pointLat, //
+		    pointLon, //
+		    pointLat, //
+		    pointLon);
 	}
 
 	coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(elevation, elevation);
@@ -483,11 +490,11 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	//
 
 	Online online = new Online();
-//	online.setLinkage(link);
-//	online.setFunctionCode("information");
-//	online.setName("Rete Meteo-Idro-Pluviometrica");
-//
-//	distribution.addDistributionOnline(online);
+	// online.setLinkage(link);
+	// online.setFunctionCode("information");
+	// online.setName("Rete Meteo-Idro-Pluviometrica");
+	//
+	// distribution.addDistributionOnline(online);
 
 	//
 	// distribution info, download
@@ -497,7 +504,7 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	//
 	// tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
 	// }
-	//Date d = new Date();
+	// Date d = new Date();
 	String linkage = HISCentralLiguriaConnector.BASE_URL + HISCentralLiguriaConnector.DATI_URL;
 
 	online = new Online();
