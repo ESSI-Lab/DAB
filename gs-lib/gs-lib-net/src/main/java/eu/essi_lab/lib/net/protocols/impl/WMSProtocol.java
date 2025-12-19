@@ -35,7 +35,7 @@ public class WMSProtocol extends AbstractNetProtocol implements NetProtocol {
     @Override
     public String[] getURNs() {
 
-	return new String[] { "urn:ogc:serviceType:WebMapService:HTTP", "urn:ogc:serviceType:WebMapService", "OGC:WMS" };
+	return new String[] {"http://www.opengis.net/def/serviceType/ogc/wms", "urn:ogc:serviceType:WebMapService:HTTP", "urn:ogc:serviceType:WebMapService", "OGC:WMS" };
     }
 
     @Override

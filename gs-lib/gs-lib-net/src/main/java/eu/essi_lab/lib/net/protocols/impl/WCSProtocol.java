@@ -35,7 +35,7 @@ public class WCSProtocol extends AbstractNetProtocol implements NetProtocol {
     @Override
     public String[] getURNs() {
 
-	return new String[] { "urn:ogc:serviceType:WebCoverageService:HTTP", "urn:ogc:serviceType:WebCoverageService", "OGC:WCS" };
+	return new String[] {"http://www.opengis.net/def/serviceType/ogc/wcs", "urn:ogc:serviceType:WebCoverageService:HTTP", "urn:ogc:serviceType:WebCoverageService", "OGC:WCS" };
     }
 
     @Override

@@ -35,7 +35,7 @@ public class WFSProtocol extends AbstractNetProtocol implements NetProtocol {
     @Override
     public String[] getURNs() {
 
-	return new String[] { "urn:ogc:serviceType:WebFeatureService:HTTP", "urn:ogc:serviceType:WebFeatureService", "OGC:WFS" };
+	return new String[] {"http://www.opengis.net/def/serviceType/ogc/wfs", "urn:ogc:serviceType:WebFeatureService:HTTP", "urn:ogc:serviceType:WebFeatureService", "OGC:WFS" };
     }
 
     @Override
