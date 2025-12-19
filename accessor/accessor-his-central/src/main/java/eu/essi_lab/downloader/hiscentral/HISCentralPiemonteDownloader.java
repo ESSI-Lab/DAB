@@ -24,6 +24,7 @@ package eu.essi_lab.downloader.hiscentral;
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteClient;
 import eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteConnector;
+import eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteMangler;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -183,90 +185,132 @@ public class HISCentralPiemonteDownloader extends WMLDataDownloader {
 	    }
 
 	    String linkage = online.getLinkage();
-	    HISCentralPiemonteClient client = new HISCentralPiemonteClient(linkage);
-	    String dataResponse = client.getLastData(startString, endString);
-	    if (dataResponse != null) {
 
-		JSONObject jsonObj = new JSONObject(dataResponse);
-		JSONArray valuesData = jsonObj.optJSONArray("results");
-		String[] splittedVariable = online.getName().split("_");
-		String var = "";
-		if (splittedVariable.length > 2) {
-		    var = splittedVariable[1] + "_" + splittedVariable[2];
-		} else {
-		    var = splittedVariable[1];
-		}
+	    boolean completed = false;
 
-		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
-		DateFormat iso8601OutputFormat = null;
-		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
+	    String newLink = linkage;
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
+	    DateFormat iso8601OutputFormat = null;
+	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
-		if (valuesData != null) {
+	    while (!completed) {
 
-		    dataLoop: for (Object arr : valuesData) {
+		HISCentralPiemonteClient client = new HISCentralPiemonteClient(newLink);
+		String dataResponse = client.getLastData(startString, endString);
+		if (dataResponse != null) {
+		    JSONObject jsonObj = new JSONObject(dataResponse);
+		    JSONArray valuesData = jsonObj.optJSONArray("results");
 
-			JSONObject data = (JSONObject) arr;
+		    String nextToken = jsonObj.optString("next");
+		    if (nextToken == null || nextToken.isEmpty()) {
+			completed = true;
+		    } else {
+			// String queryExecutionId = jsonObj.optString("queryExecutionId");
+			newLink = nextToken;
+		    }
 
-			// TODO: get variable of interest -- see PiemonteConnector class
-			String valueString = data.optString(var);
-			
-			if(var.equals("settore_prevalente")) {
-			    break dataLoop;
-//			    if(valueString.toLowerCase().equals("n")) {
-//				valueString = "0";
-//			    }else if(valueString.toLowerCase().equals("nne") || valueString.toLowerCase().equals("ne") || valueString.toLowerCase().equals("e")) {
-//				valueString = "90";
-//			    }else if(valueString.toLowerCase().equals("ese") || valueString.toLowerCase().equals("se") || valueString.toLowerCase().equals("sse") || valueString.toLowerCase().equals("s")) {
-//				valueString = "180";
-//			    }else if(valueString.toLowerCase().equals("ssw") || valueString.toLowerCase().equals("sw") || valueString.toLowerCase().equals("wsw") || valueString.toLowerCase().equals("w")) {
-//				valueString = "270";
-//			    }else if(valueString.toLowerCase().equals("wnw") || valueString.toLowerCase().equals("nw") || valueString.toLowerCase().equals("nnw")) {
-//				valueString = "270";
-//			    }
-			}
+		    HISCentralPiemonteMangler mangler = new HISCentralPiemonteMangler();
+		    String name = online.getName();
+		    mangler.setMangling(name);
+		    String var = mangler.getParameterIdentifier();
+		    String clazz = mangler.getQualityIdentifier();
+		    String qualityField = null;
+		    Integer position = null;
+		    if (clazz != null) {
+			String[] splittedClass = clazz.split(":");
+			qualityField = splittedClass[0];
+			position = Integer.valueOf(splittedClass[1]);
+		    }
 
-			ValueSingleVariable variable = new ValueSingleVariable();
+		    // String[] splittedVariable = online.getName().split("_");
+		    // String var = "";
+		    // if (splittedVariable.length > 2) {
+		    // var = splittedVariable[1] + "_" + splittedVariable[2];
+		    // } else {
+		    // var = splittedVariable[1];
+		    // }
 
-			if (valueString != null && !valueString.isEmpty()) {
+		    if (valuesData != null) {
 
-			    //
-			    // value
-			    //
+			dataLoop: for (Object arr : valuesData) {
 
-			    BigDecimal dataValue = new BigDecimal(valueString);
-			    variable.setValue(dataValue);
+			    JSONObject data = (JSONObject) arr;
 
-			    //
-			    // date
-			    //
-
-			    String date = data.optString("data");
-
-			    if (iso8601OutputFormat == null) {
-				iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-				iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+			    if (var.equals("settore_prevalente")) {
+				break dataLoop;
+				// if(valueString.toLowerCase().equals("n")) {
+				// valueString = "0";
+				// }else if(valueString.toLowerCase().equals("nne") ||
+				// valueString.toLowerCase().equals("ne") || valueString.toLowerCase().equals("e")) {
+				// valueString = "90";
+				// }else if(valueString.toLowerCase().equals("ese") ||
+				// valueString.toLowerCase().equals("se") || valueString.toLowerCase().equals("sse") ||
+				// valueString.toLowerCase().equals("s")) {
+				// valueString = "180";
+				// }else if(valueString.toLowerCase().equals("ssw") ||
+				// valueString.toLowerCase().equals("sw") || valueString.toLowerCase().equals("wsw") ||
+				// valueString.toLowerCase().equals("w")) {
+				// valueString = "270";
+				// }else if(valueString.toLowerCase().equals("wnw") ||
+				// valueString.toLowerCase().equals("nw") || valueString.toLowerCase().equals("nnw")) {
+				// valueString = "270";
+				// }
 			    }
 
-			    Date parsed = iso8601OutputFormat.parse(date);
+			    // TODO: get variable of interest -- see PiemonteConnector class
+			    String valueString = data.optString(var);
 
-			    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-			    gregCal.setTime(parsed);
+			    ValueSingleVariable variable = new ValueSingleVariable();
 
-			    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
-			    variable.setDateTimeUTC(xmlGregCal);
+			    if (valueString != null && !valueString.isEmpty()) {
 
-			    //
-			    //
-			    //
+				//
+				// value
+				//
 
-			    addValue(tsrt, variable);
+				BigDecimal dataValue = new BigDecimal(valueString);
+				variable.setValue(dataValue);
+
+				//
+				// date
+				//
+
+				String date = data.optString("data");
+
+				if (iso8601OutputFormat == null) {
+				    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+				    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+				}
+
+				Date parsed = iso8601OutputFormat.parse(date);
+
+				GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+				gregCal.setTime(parsed);
+
+				XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+				variable.setDateTimeUTC(xmlGregCal);
+
+				//
+				// quality
+				//
+				if (qualityField != null) {
+				    String quality = data.optString(qualityField);
+				    String qualityString = "" + quality.charAt(0) + quality.charAt(position);
+				    variable.setQualityControlLevelCode(qualityString);
+				}
+
+				addValue(tsrt, variable);
+			    }
 			}
 		    }
+		} else {
+		    completed = true;
 		}
 
-		return tsrt.getDataFile();
 	    }
 
+	    return tsrt.getDataFile();
+	    
 	} catch (Exception e) {
 
 	    ex = e;
