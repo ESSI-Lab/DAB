@@ -1,4 +1,4 @@
-package eu.essi_lab.profiler.os.handler.discover;
+package eu.essi_lab.pdk;
 
 /*-
  * #%L
@@ -54,42 +54,33 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 		String protocol = online.getProtocol();
 
 		//
-		// first try: reading from protocol encoded by us by WCS, WMS, WFS, WMTS mapping
+		// first try: guessing from protocol encoded by us from WCS, WMS, WFS, WMTS mappers
 		//
-		String linkage = buildOnline(message, publicId, protocol);
+
+		String linkage = fromProtocol(message, publicId, protocol);
 
 		if (linkage == null) {
 
 		    //
-		    // second try: reading from protocol encoded with OpenGIS IRI (e.g.: http://www.opengis.net/def/serviceType/ogc/wms)
+		    // second try: guessing from protocol encoded with OpenGIS IRI (e.g.: http://www.opengis.net/def/serviceType/ogc/wms)
 		    //
+
 		    String protocolGmxAnchor = online.getProtocolGmxAnchor();
 
-		    linkage = buildOnline(message, publicId, protocolGmxAnchor);
+		    linkage = fromProtocol(message, publicId, protocolGmxAnchor);
 
 		    if (linkage == null) {
 
-		 	//
-			// last chance: reading plain text protocol (e.g: WMS, OGC Web Map Service (WMS), etc..)
+			//
+			// last chances: guessing from plain text (e.g: WMS, OGC Web Map Service (WMS), etc..)
 			//
 
-			if (protocol.toLowerCase().contains("wms")) {
+			linkage = fromPlainText(message, publicId, protocol);
 
-			    linkage = buildOnline(message, publicId, NetProtocolWrapper.WMS.getCommonURN());
+			if (linkage == null) {
 
-			} else if (protocol.toLowerCase().contains("wfs")) {
-
-			    linkage = buildOnline(message, publicId, NetProtocolWrapper.WFS.getCommonURN());
-
-			} else if (protocol.toLowerCase().contains("wcs")) {
-
-			    linkage = buildOnline(message, publicId, NetProtocolWrapper.WCS.getCommonURN());
-
-			} else if (protocol.toLowerCase().contains("wmts")) {
-
-			    linkage = buildOnline(message, publicId, NetProtocolWrapper.WMTS.getCommonURN());
+			    linkage = fromPlainText(message, publicId, protocolGmxAnchor);
 			}
-
 		    }
 		}
 
@@ -102,16 +93,49 @@ public class OnlineResourceConsumer implements ResourceConsumer {
     }
 
     /**
+     * @param protocol
+     * @param message
+     * @param publicId
+     * @return
+     */
+    private String fromPlainText(DiscoveryMessage message, String publicId, String protocol) {
+
+	if (protocol == null) {
+
+	    return null;
+	}
+
+	if (protocol.toLowerCase().contains("wms")) {
+
+	    return fromProtocol(message, publicId, NetProtocolWrapper.WMS.getCommonURN());
+
+	} else if (protocol.toLowerCase().contains("wfs")) {
+
+	    return fromProtocol(message, publicId, NetProtocolWrapper.WFS.getCommonURN());
+
+	} else if (protocol.toLowerCase().contains("wcs")) {
+
+	    return fromProtocol(message, publicId, NetProtocolWrapper.WCS.getCommonURN());
+
+	} else if (protocol.toLowerCase().contains("wmts")) {
+
+	    return fromProtocol(message, publicId, NetProtocolWrapper.WMTS.getCommonURN());
+	}
+
+	return null;
+    }
+
+    /**
      * @param message
      * @param publicId
      * @param protocol
      * @return
      */
-    private String buildOnline(DiscoveryMessage message, String publicId, String protocol) {
+    private String fromProtocol(DiscoveryMessage message, String publicId, String protocol) {
 
 	NetProtocolWrapper wrapper = NetProtocolWrapper.of(protocol).orElse(null);
 
-	String linkage = switch (wrapper) {
+	return switch (wrapper) {
 
 	    //
 	    // ESRI MapServer
@@ -119,7 +143,7 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 
 	    case ESRIMapServer_10_0_0, //
 		 ESRIMapServer -> //
-		    buildOnline(message.getDataProxyServer().get(), publicId, "/esri/MapServer/");
+		    fromProtocol(message.getDataProxyServer().get(), publicId, "/esri/MapServer/");
 
 	    //
 	    // WCS
@@ -158,12 +182,10 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 		 //
 
 		 WMTS,//
-		 WMTS_1_0_0 -> buildOnline(message.getDataProxyServer().get(), publicId, "/ogc");
+		 WMTS_1_0_0 -> fromProtocol(message.getDataProxyServer().get(), publicId, "/ogc");
 
 	    case null, default -> null;
 	};
-
-	return linkage;
     }
 
     /**
@@ -172,7 +194,7 @@ public class OnlineResourceConsumer implements ResourceConsumer {
      * @param lastPath
      * @return
      */
-    private String buildOnline(String proxyEndpoint, String datasetId, String lastPath) {
+    private String fromProtocol(String proxyEndpoint, String datasetId, String lastPath) {
 
 	return proxyEndpoint + "gil/request/dataset/" + datasetId + lastPath;
     }
