@@ -1613,14 +1613,15 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				'handler': function() {
 					// Same logic as #pButton click, but set search term input instead of parameter name
 					if (!dialogPCreated) {
-						$('<div  id="pDialog"></div>')
-							.html('<iframe src="' + ontologyUrl + '" id="parameterFrame"></iframe><div style="margin-top: 10px; text-align: center;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
+						$('<div  id="pDialog" style="padding: 0; overflow: hidden;"></div>')
+							.html('<iframe src="' + ontologyUrl + '" id="parameterFrame" width="830" height="580" style="display: block; border: none; margin: 0;"></iframe><div style="margin: 10px; text-align: center; padding-bottom: 0;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
 							.dialog({
 								title: __t("select-from-ontology"),
 								width: 850,
-								height: 700,
+								height: 650,     // Height adjusted to fit content without scrollbars
 								autoOpen: true,
-								modal: true
+								modal: true,
+								resizable: false
 							});
 
 						window.addEventListener('message', (event) => {
@@ -2089,14 +2090,15 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 
 		if (!dialogBCreated) {
 			// Create the dialog
-			$('<div  id="bDialog"></div>')
-				.html('<iframe src="' + ontologyTreeUrl + '" id="barameterFrame" width=800 height=600></iframe><div style="margin-top: 10px; text-align: center;"><label for="selectedBarameter"><b>Selected parameter: </b></label><span id="selectedBarameter"><b>None</b></span></div>')
+			$('<div  id="bDialog" style="padding: 0; overflow: hidden;"></div>')
+				.html('<iframe src="' + ontologyTreeUrl + '" id="barameterFrame" width="830" height="580" style="display: block; border: none; margin: 0;"></iframe><div style="margin: 10px; text-align: center; padding-bottom: 0;"><label for="selectedBarameter"><b>Selected parameter: </b></label><span id="selectedBarameter"><b>None</b></span></div>')
 				.dialog({
 					title: __t("select-from-ontology"),
 					width: 850,      // Width of the dialog
-					height: 700,     // Height of the dialog
+					height: 650,     // Height adjusted to fit content without scrollbars
 					autoOpen: true,
-					modal: true
+					modal: true,
+					resizable: false
 				});
 
 			// Listen for messages from the iframe
@@ -2143,14 +2145,15 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 
 		if (!dialogPCreated) {
 			// Create the dialog
-			$('<div  id="pDialog"></div>')
-				.html('<iframe src="' + ontologyUrl + '" id="parameterFrame"></iframe><div style="margin-top: 10px; text-align: center;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
+			$('<div  id="pDialog" style="padding: 0; overflow: hidden;"></div>')
+				.html('<iframe src="' + ontologyUrl + '" id="parameterFrame" width="830" height="580" style="display: block; border: none; margin: 0;"></iframe><div style="margin: 10px; text-align: center; padding-bottom: 0;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
 				.dialog({
 					title: __t("select-from-ontology"),
 					width: 850,      // Width of the dialog
-					height: 700,     // Height of the dialog
+					height: 650,     // Height adjusted to fit content without scrollbars
 					autoOpen: true,
-					modal: true
+					modal: true,
+					resizable: false
 				});
 
 			// Listen for messages from the iframe
