@@ -1120,40 +1120,51 @@ export function initializePortal(config) {
 				leftSection.className = 'portal-header-left';
 				
 				if (config['logo-left']) {
-					const leftLogoImg = document.createElement('img');
-					leftLogoImg.className = 'portal-header-logo-left';
-					leftLogoImg.alt = 'Left logo';
-					// Use path as-is if relative, or full URL if absolute
-					const leftLogoSrc = config['logo-left'].startsWith('http') ? config['logo-left'] : config['logo-left'];
-					
-					// Function to recalculate position
-					const recalculatePosition = function() {
-						setTimeout(function() {
-							if (window.positionTabsCallback) {
-								window.positionTabsCallback();
+					// Support multiple comma-separated logos in "logo-left"
+					const leftLogos = String(config['logo-left'])
+						.split(',')
+						.map(function(item) { return item.trim(); })
+						.filter(function(item) { return item.length > 0; });
+
+					if (leftLogos.length > 0) {
+						// Function to recalculate position
+						const recalculatePosition = function() {
+							setTimeout(function() {
+								if (window.positionTabsCallback) {
+									window.positionTabsCallback();
+								}
+							}, 10);
+						};
+
+						leftLogos.forEach(function(logoSrc) {
+							const leftLogoImg = document.createElement('img');
+							leftLogoImg.className = 'portal-header-logo-left';
+							leftLogoImg.alt = 'Left logo';
+
+							// Use path as-is if relative, or full URL if absolute
+							const leftLogoSrc = logoSrc.startsWith('http') ? logoSrc : logoSrc;
+
+							// Add load listener to recalculate position when image loads
+							leftLogoImg.addEventListener('load', recalculatePosition);
+							// Also handle errors (image fails to load)
+							leftLogoImg.addEventListener('error', recalculatePosition);
+
+							// Add click handler if href is provided
+							if (config['logo-left-href']) {
+								leftLogoImg.style.cursor = 'pointer';
+								leftLogoImg.addEventListener('click', function() {
+									window.open(config['logo-left-href'], '_blank', 'noopener,noreferrer');
+								});
 							}
-						}, 10);
-					};
-					
-					// Add load listener to recalculate position when image loads
-					leftLogoImg.addEventListener('load', recalculatePosition);
-					// Also handle errors (image fails to load)
-					leftLogoImg.addEventListener('error', recalculatePosition);
-					
-					// Add click handler if href is provided
-					if (config['logo-left-href']) {
-						leftLogoImg.style.cursor = 'pointer';
-						leftLogoImg.addEventListener('click', function() {
-							window.open(config['logo-left-href'], '_blank', 'noopener,noreferrer');
+
+							leftLogoImg.src = leftLogoSrc;
+							leftSection.appendChild(leftLogoImg);
+
+							// If image is already loaded (cached), trigger recalculation
+							if (leftLogoImg.complete) {
+								recalculatePosition();
+							}
 						});
-					}
-					
-					leftLogoImg.src = leftLogoSrc;
-					leftSection.appendChild(leftLogoImg);
-					
-					// If image is already loaded (cached), trigger recalculation
-					if (leftLogoImg.complete) {
-						recalculatePosition();
 					}
 				}
 				
