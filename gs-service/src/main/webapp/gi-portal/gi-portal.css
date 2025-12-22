@@ -562,6 +562,55 @@ body {
 	pointer-events: auto !important;
 }
 
+/* -------------------------------- */
+/* beta badge                       */
+/*                                  */
+.beta-badge {
+	position: absolute;
+	right: 16px;
+	bottom: 16px;
+	z-index: 20;
+	background-color: #e74c3c;
+	color: #fff;
+	border-radius: 999px;
+	padding: 6px 10px;
+	font-size: 12px;
+	font-weight: bold;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.beta-badge i {
+	font-size: 12px;
+}
+
+.beta-badge-tooltip {
+	position: absolute;
+	right: 0;
+	bottom: 40px;
+	max-width: 260px;
+	background-color: #2c3e50;
+	color: #fff;
+	padding: 8px 10px;
+	border-radius: 4px;
+	font-size: 12px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+	z-index: 21;
+}
+
+.beta-badge-tooltip::after {
+	content: "";
+	position: absolute;
+	right: 12px;
+	top: 100%;
+	border-width: 6px;
+	border-style: solid;
+	border-color: #2c3e50 transparent transparent transparent;
+}
+
 #stationInfo {
 	position: relative;
 	z-index: 10;

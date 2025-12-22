@@ -40,5 +40,6 @@
 	"login" : true,
 	"showSourceEndpoint" : false,
 	"permissions" : "downloads,api",
-	"language" : "en"
+	"language" : "en",
+	"beta-message" : "This is a beta version of the HIS-Central portal. Functionality and data are still under validation."
 }

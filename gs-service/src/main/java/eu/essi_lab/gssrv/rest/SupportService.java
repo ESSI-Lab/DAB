@@ -478,8 +478,11 @@ public class SupportService {
 			    request.getEmail(), //
 			    request.getApiKey());
 
-		    response.setPermissions(user.getStringPropertyValue("permissions").get());
-
+		    Optional<String> perm = user.getStringPropertyValue("permissions");
+		    if (perm.isPresent()) {
+		    response.setPermissions(perm.get());
+		    }
+		    
 		    response.setUser(user);
 
 		    List<String> adminUsers = ConfigurationWrapper.getAdminUsers();

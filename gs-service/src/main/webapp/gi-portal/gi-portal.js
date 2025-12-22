@@ -1516,6 +1516,47 @@ export function initializePortal(config) {
 				'z-index': '0'
 			});
 			contentWrapper.append(map);
+
+			// If a beta-message is configured, add a small beta badge over the map
+			if (config['beta-message']) {
+				var betaBadge = jQuery(
+					'<div class="beta-badge">' +
+						'<span>beta</span>' +
+						'<i class="fa fa-info-circle" aria-hidden="true"></i>' +
+					'</div>'
+				);
+
+				var tooltipVisible = false;
+				var tooltip;
+
+				var toggleTooltip = function() {
+					if (tooltipVisible) {
+						if (tooltip) {
+							tooltip.remove();
+							tooltip = null;
+						}
+						tooltipVisible = false;
+					} else {
+						tooltip = jQuery('<div class="beta-badge-tooltip"></div>').text(config['beta-message']);
+						betaBadge.append(tooltip);
+						tooltipVisible = true;
+					}
+				};
+
+				betaBadge.on('click', function(event) {
+					event.stopPropagation();
+					toggleTooltip();
+				});
+
+				// Close tooltip when clicking anywhere else on the document
+				jQuery(document).on('click', function() {
+					if (tooltipVisible) {
+						toggleTooltip();
+					}
+				});
+
+				map.append(betaBadge);
+			}
 		}
 		
 		// Add station info if needed
