@@ -425,6 +425,7 @@ public class SettingComponent extends Div {
 	//
 	if (forceHideHeader && parent == null) {
 
+	    headerLayout.setId("XXXXXXXXXXXXXXXXXXXXXXXX");
 	    headerLayout.getStyle().set("display", "none");
 	}
 

@@ -1,69 +1,32 @@
 /**
  *
  */
-package eu.essi_lab.gssrv.conf;
+package eu.essi_lab.gssrv.conf.import_export;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.Optional;
-import java.util.UUID;
-
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.html.*;
-import org.apache.commons.io.IOUtils;
+import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.radiobutton.*;
+import com.vaadin.flow.component.textfield.*;
+import com.vaadin.flow.component.upload.*;
+import com.vaadin.flow.component.upload.receivers.*;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.DatabaseFolder.*;
+import eu.essi_lab.api.database.cfg.*;
+import eu.essi_lab.api.database.opensearch.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
+import eu.essi_lab.cfga.gui.components.setting.group.*;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.lib.net.s3.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.*;
+import software.amazon.awssdk.services.s3.model.*;
 
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
-
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFolder.EntryType;
-import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.cfg.DatabaseSource;
-import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
-import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
-import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
-import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.lib.net.s3.S3TransferWrapper;
-import eu.essi_lab.lib.utils.ClonableInputStream;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.StorageInfo;
-import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -73,12 +36,9 @@ public class ConfigImporter extends VerticalLayout {
     /**
      *
      */
-    private static final String DEFAULT_CONFIG_NAME = "gs-configuration.json";
-
-    /**
-     *
-     */
     public ConfigImporter() {
+
+	getStyle().set("padding", "0px");
 
 	setWidthFull();
 	setHeightFull();
@@ -128,7 +88,8 @@ public class ConfigImporter extends VerticalLayout {
 	upload.setDropLabel(new Label("Drop file here"));
 
 	Button localUploadButton = new Button("Import from local configuration file");
-	localUploadButton.setWidth("370px");
+	localUploadButton.getStyle().set("font-size", "14px");
+	localUploadButton.setWidth("330px");
 	localUploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
 	upload.setUploadButton(localUploadButton);
@@ -141,10 +102,12 @@ public class ConfigImporter extends VerticalLayout {
 	remoteUploadLayout.setWidthFull();
 
 	Button remoteUploadButton = new Button("Import from remote configuration file");
+	remoteUploadButton.getStyle().set("font-size", "14px");
 	remoteUploadButton.setWidth("400px");
 	remoteUploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
 	TextField dbSourceTextField = new TextField();
+	dbSourceTextField.getStyle().set("font-size", "14px");
 	dbSourceTextField.setValue("osl://user:password@http:localhost:9200/test/testConfig");
 	dbSourceTextField.setWidthFull();
 	dbSourceTextField.getStyle().set("margin-left", "10px");
@@ -177,7 +140,6 @@ public class ConfigImporter extends VerticalLayout {
 
 		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }
-
 	});
 
 	remoteUploadLayout.add(remoteUploadButton);
@@ -189,6 +151,7 @@ public class ConfigImporter extends VerticalLayout {
 
 	msgDiv.setWidthFull();
 	msgDiv.getStyle().set("padding", "10px");
+	msgDiv.getStyle().set("padding-top", "5px");
 	msgDiv.getStyle().set("border", "1px solid lightgray");
 	msgDiv.getStyle().set("margin-left", "3px");
 
@@ -227,13 +190,13 @@ public class ConfigImporter extends VerticalLayout {
 
 	Div infoDiv = new Div();
 	infoDiv.setWidthFull();
-	infoDiv.getStyle().set("padding-top", "10px");
-	infoDiv.getStyle().set("font-size", "16px");
+	infoDiv.getStyle().set("padding-top", "5px");
+	infoDiv.getStyle().set("font-size", "14px");
 
-	String info = "Configure the storage ('OpenSearch' or 'S3') where to upload the configuration, then click the 'Import from local "
-		+ "configuration file' or 'Import from remote configuration file' button to "
-		+ "upload the selected file into the configured storage. "
-		+ "When the upload is done, you can read in the panel above, the "
+	String info = "Configure the storage ('OpenSearch' or 'S3') where to import the configuration, then click the 'Import from local "
+		+ "configuration file' or 'Import from remote configuration file' button to start the "
+		+ "import into the configured storage. "
+		+ "When the import is done, you can read in the panel above, the "
 		+ "Java option required to start the DAB with the imported configuration";
 
 	infoDiv.getElement().setProperty("innerHTML", info);
@@ -262,7 +225,7 @@ public class ConfigImporter extends VerticalLayout {
 	wrapper.setSecretKey(info.getPassword());
 	wrapper.setEndpoint(info.getUri());
 
-	HeadObjectResponse objectMetadata = wrapper.getObjectMetadata(info.getName(), DEFAULT_CONFIG_NAME);
+	HeadObjectResponse objectMetadata = wrapper.getObjectMetadata(info.getName(), ConfigImportExportDescriptor.DEFAULT_CONFIG_NAME);
 
 	if (objectMetadata != null) {
 
@@ -271,15 +234,15 @@ public class ConfigImporter extends VerticalLayout {
 
 		try {
 
-		    uploadS3Config(wrapper, info, configStream.clone(), true);
+		    ConfigImportExportDescriptor.uploadS3Config(wrapper, info, configStream.clone());
 
 		    NotificationDialog.getInfoDialog("Configuration correctly overwritten").open();
 
 		    upload.clearFileList();
 
 		    setMessage(messageLabel,
-			    "<span style='font-size: 16px;'>Use the following Java option: </span><span style='font-size: 16px; font-weight: bold'>-Dconfiguration.url="
-				    + buildS3StartupURL(setting.getSelectedStorageInfo().get()) + "</span>");
+			    "<span style='font-size: 14px;'>Use the following Java option: </span><br><div style='font-size: 14px; font-weight: bold'>-Dconfiguration.url="
+				    + buildS3StartupURL(setting.getSelectedStorageInfo().get()) + "</div>");
 
 		} catch (Exception e) {
 
@@ -295,21 +258,22 @@ public class ConfigImporter extends VerticalLayout {
 	    confirmationDialog.setWidth(670, Unit.PIXELS);
 
 	    confirmationDialog.setTitle("Configuration overwriting");
+	    confirmationDialog.getContentLayout().getStyle().set("font-size", "14px");
 	    confirmationDialog.open();
 
 	} else {
 
 	    try {
 
-		uploadS3Config(wrapper, setting.getSelectedStorageInfo().get(), configStream.clone(), false);
+		ConfigImportExportDescriptor.uploadS3Config(wrapper, setting.getSelectedStorageInfo().get(), configStream.clone());
 
-		NotificationDialog.getInfoDialog("Configuration correctly uploaded").open();
+		NotificationDialog.getInfoDialog("Configuration correctly imported").open();
 
 		upload.clearFileList();
 
 		setMessage(messageLabel,
-			"<span style='font-size: 16px;'>Use the following Java option: </span><span style='font-size: 16px; font-weight: bold'>-Dconfiguration.url="
-				+ buildS3StartupURL(setting.getSelectedStorageInfo().get()) + "</span>");
+			"<span style='font-size: 14px;'>Use the following Java option: </span><br><div style='font-size: 14px; font-weight: bold'>-Dconfiguration.url="
+				+ buildS3StartupURL(setting.getSelectedStorageInfo().get()) + "</div>");
 
 	    } catch (Exception e) {
 
@@ -336,27 +300,7 @@ public class ConfigImporter extends VerticalLayout {
 		+ info.getPassword() + "@" //
 		+ info.getUri().replace("://", ":").replace("/", "") + "/" //
 		+ info.getName() + "/"//
-		+ DEFAULT_CONFIG_NAME;
-    }
-
-    /**
-     * @param wrapper
-     * @param info
-     * @param configStream
-     * @param replace
-     * @throws IOException
-     */
-    private void uploadS3Config(S3TransferWrapper wrapper, StorageInfo info, InputStream configStream, boolean replace) throws IOException {
-
-	File tempFile = Files.createTempFile(UUID.randomUUID().toString(), ".json").toFile();
-
-	FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-
-	IOUtils.copy(configStream, fileOutputStream);
-
-	wrapper.uploadFile(tempFile.getAbsolutePath(), info.getName(), DEFAULT_CONFIG_NAME);
-
-	tempFile.delete();
+		+ ConfigImportExportDescriptor.DEFAULT_CONFIG_NAME;
     }
 
     /**
@@ -412,12 +356,12 @@ public class ConfigImporter extends VerticalLayout {
 
 		uploadOpenSearchConfig(setting.getSelectedStorageInfo().get(), configStream.clone(), false);
 
-		NotificationDialog.getInfoDialog("Configuration correctly uploaded").open();
+		NotificationDialog.getInfoDialog("Configuration correctly imported").open();
 
 		upload.clearFileList();
 
 		setMessage(messageDiv,
-			"<span style='font-size: 16px;'>Use the following Java option: </span><span style='font-size: 16px; font-weight: bold'>-Dconfiguration.url="
+			"<span style='font-size: 16px;'>Use the following Java option: </span><span style='font-size: 14px; font-weight: bold'>-Dconfiguration.url="
 				+ buildOpenSearchStartupURL(setting.getSelectedStorageInfo().get()) + "</span>");
 
 	    } catch (Exception e) {
@@ -473,7 +417,7 @@ public class ConfigImporter extends VerticalLayout {
      * @return
      * @throws Exception
      */
-    private boolean uploadOpenSearchConfig(StorageInfo info, InputStream configStream, boolean replace) throws Exception {
+    private void uploadOpenSearchConfig(StorageInfo info, InputStream configStream, boolean replace) throws Exception {
 
 	OpenSearchDatabase database = new OpenSearchDatabase();
 	database.initialize(info);
@@ -484,16 +428,17 @@ public class ConfigImporter extends VerticalLayout {
 
 	if (replace) {
 
-	    return folder.replace(//
+	    folder.replace(//
+		    configName, //
+		    FolderEntry.of(configStream), //
+		    EntryType.CONFIGURATION);
+	} else {
+
+	    folder.store(//
 		    configName, //
 		    FolderEntry.of(configStream), //
 		    EntryType.CONFIGURATION);
 	}
-
-	return folder.store(//
-		configName, //
-		FolderEntry.of(configStream), //
-		EntryType.CONFIGURATION);
     }
 
     /**
@@ -520,12 +465,12 @@ public class ConfigImporter extends VerticalLayout {
 
 	if (info.isEmpty()) {
 
-	    setMessage(label, "<span style='font-size: 16px; color:red;'>Please, fill all the required fields to proceed</span>");
+	    setMessage(label, "<span style='font-size: 14px; color:red;'>Please, fill all the required fields to proceed</span>");
 
 	} else {
 
 	    setMessage(label,
-		    "<span style='font-size: 16px;color:black;'>Click one of the button on the left to upload the selected configuration file</span>");
+		    "<span style='font-size: 14px;color:black;'>Click one of the button on the left to upload the selected configuration file</span>");
 	}
     }
 }

@@ -27,6 +27,7 @@ import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.driver.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.gssrv.conf.import_export.*;
 
 /**
  *
@@ -51,7 +52,7 @@ public class SystemTabDescriptor extends TabDescriptor {
 		new DriverSetting.DescriptorProvider().get(),//
 		new DownloadSetting.DescriptorProvider().get(),//
 		new RateLimiterSetting.DescriptorProvider().get(),//
-		new ConfigHandlerTabDescriptor()
+		new ConfigImportExportDescriptor()
 	);
     }
 }

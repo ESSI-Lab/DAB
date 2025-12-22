@@ -1,7 +1,7 @@
 /**
- * 
+ *
  */
-package eu.essi_lab.gssrv.conf;
+package eu.essi_lab.gssrv.conf.import_export;
 
 /*-
  * #%L
@@ -13,12 +13,12 @@ package eu.essi_lab.gssrv.conf;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -66,21 +66,17 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
     enum ConfigurationSource {
 
 	/**
-	 * 
-	 */
-	MARK_LOGIC,
-	/**
-	 * 
+	 *
 	 */
 	OPENSEARCH,
 	/**
-	 * 
+	 *
 	 */
 	S3
     }
 
     /**
-     * 
+     *
      */
     public ConfigurationSourceSetting() {
 
@@ -89,8 +85,6 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 	setShowHeader(false);
 	setCanBeCleaned(false);
 	setSelectionMode(SelectionMode.SINGLE);
-	setDescription("The configuration can be uploaded to an OpenSearch or an S3 storage. Configure the desired "
-		+ "storage and click on of the 'Import' buttons to upload the configuration in the configured storage");
 
 	DatabaseSetting dbSetting = ConfigurationWrapper.getDatabaseSetting();
 
@@ -121,7 +115,6 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 	    Option<String> bucketOption = StringOptionBuilder.get().//
 		    withLabel("Configuration bucket").//
 		    withKey(S3_CONFIG_BUCKET_OPTION_KEY).//
-		    withConditionalValue(s3.getBucketName().isPresent(), s3.getBucketName().orElse(null)).//
 		    cannotBeDisabled().//
 		    required().//
 		    build();
@@ -175,10 +168,8 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 		    withKey(OS_TYPE_OPTION_KEY).//
 		    withSingleSelection().//
 		    withValues(Arrays.asList("OpenSearch", "OpenSearch managed (AWS)")).//
-		    withSelectedValue(impl == DatabaseImpl.OPENSEARCH
-			    ? dbSetting.getDatabaseType().map(v -> v.equals("osl") ? "OpenSearch" : "OpenSearch managed (AWS)").get()
-			    : "OpenSearch")
-		    .//
+		    withSelectedValue(impl == DatabaseImpl.OPENSEARCH ? dbSetting.getDatabaseType()
+		    .map(v -> v.equals("osl") ? "OpenSearch" : "OpenSearch managed (AWS)").get() : "OpenSearch").//
 		    cannotBeDisabled().//
 		    required().//
 		    build();
@@ -229,16 +220,22 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
     }
 
     /**
+     *
+     */
+    public void removeOpenSearchSetting() {
+
+	getSetting(OS_SETTING_ID).get().setSelected(false);
+	getSetting(S3_SETTING_ID).get().setSelected(true);
+	getSetting(S3_SETTING_ID).get().setShowHeader(false);
+
+	removeSetting(OS_SETTING_ID);
+	setSelectionMode(SelectionMode.UNSET);
+    }
+
+    /**
      * @return
      */
     public ConfigurationSource getSelectedSource() {
-
-	// Setting mlSetting = getSetting(MARK_LOGIC_SETTING_ID, Setting.class).get();
-	//
-	// if (mlSetting.isSelected()) {
-	//
-	// return ConfigurationSource.MARK_LOGIC;
-	// }
 
 	Setting osSetting = getSetting(OS_SETTING_ID, Setting.class).get();
 
@@ -255,39 +252,17 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
      */
     public Optional<StorageInfo> getSelectedStorageInfo() {
 
-	// Setting mlSetting = getSetting(MARK_LOGIC_SETTING_ID, Setting.class).get();
-	//
-	// if (mlSetting.isSelected()) {
-	//
-	// Optional<String> mlName = mlSetting.getOption(MARK_LOGIC_NAME_OPTION_KEY,
-	// String.class).get().getOptionalValue();
-	// Optional<String> mlPwd = mlSetting.getOption(MARK_LOGIC_PWD_OPTION_KEY,
-	// String.class).get().getOptionalValue();
-	// Optional<String> mlUser = mlSetting.getOption(MARK_LOGIC_USER_OPTION_KEY,
-	// String.class).get().getOptionalValue();
-	// Optional<String> mlUri = mlSetting.getOption(MARK_LOGIC_URI_OPTION_KEY,
-	// String.class).get().getOptionalValue();
-	// Optional<String> mlFolder = mlSetting.getOption(MARK_LOGIC_FOLDER_OPTION_KEY,
-	// String.class).get().getOptionalValue();
-	//
-	// if (mlName.isEmpty() || mlPwd.isEmpty() || mlUser.isEmpty() || mlUri.isEmpty() || mlFolder.isEmpty()) {
-	//
-	// return Optional.empty();
-	// }
-	//
-	// }
+	Optional<Setting> osSetting = getSetting(OS_SETTING_ID, Setting.class);
 
-	Setting osSetting = getSetting(OS_SETTING_ID, Setting.class).get();
+	if (osSetting.isPresent() && osSetting.get().isSelected()) {
 
-	if (osSetting.isSelected()) {
+	    Optional<String> osName = osSetting.get().getOption(OS_NAME_OPTION_KEY, String.class).get().getOptionalValue();
+	    Optional<String> osConfigName = osSetting.get().getOption(OS_CONFIG_NAME_OPTION_KEY, String.class).get().getOptionalValue();
 
-	    Optional<String> osName = osSetting.getOption(OS_NAME_OPTION_KEY, String.class).get().getOptionalValue();
-	    Optional<String> osConfigName = osSetting.getOption(OS_CONFIG_NAME_OPTION_KEY, String.class).get().getOptionalValue();
-
-	    Optional<String> osUri = osSetting.getOption(OS_URI_OPTION_KEY, String.class).get().getOptionalValue();
-	    Optional<String> osPwd = osSetting.getOption(OS_PWD_OPTION_KEY, String.class).get().getOptionalValue();
-	    Optional<String> osUser = osSetting.getOption(OS_USER_OPTION_KEY, String.class).get().getOptionalValue();
-	    Optional<String> osType = osSetting.getOption(OS_TYPE_OPTION_KEY, String.class).get().getOptionalValue();
+	    Optional<String> osUri = osSetting.get().getOption(OS_URI_OPTION_KEY, String.class).get().getOptionalValue();
+	    Optional<String> osPwd = osSetting.get().getOption(OS_PWD_OPTION_KEY, String.class).get().getOptionalValue();
+	    Optional<String> osUser = osSetting.get().getOption(OS_USER_OPTION_KEY, String.class).get().getOptionalValue();
+	    Optional<String> osType = osSetting.get().getOption(OS_TYPE_OPTION_KEY, String.class).get().getOptionalValue();
 
 	    if (osName.isEmpty() || osUri.isEmpty() || osPwd.isEmpty() || osUser.isEmpty() || osConfigName.isEmpty()) {
 
