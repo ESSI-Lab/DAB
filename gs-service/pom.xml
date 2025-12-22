@@ -14,7 +14,7 @@
 	<artifactId>gs-service</artifactId>
 	<packaging>war</packaging>
 
-	<properties>
+	<properties> 
 		<hostname>localhost</hostname>
 
 		<!-- To override this port value when starting jetty:run: - open the
