@@ -468,7 +468,10 @@ body {
 /* filters tab                      */
 /*                                  */
 #filters-tab {
-	overflow-y: auto;
+	overflow-y: auto !important;
+	overflow-x: hidden !important;
+	max-height: 100%;
+	box-sizing: border-box;
 }
 
 /* -------------------------------- */

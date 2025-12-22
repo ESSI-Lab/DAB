@@ -1351,6 +1351,8 @@ export function initializePortal(config) {
 		jQuery('#filters-tab').css('width', '100%');
 		jQuery('#filters-tab').css('height', '100%');
 		jQuery('#filters-tab').css('margin-top', '3px');
+		jQuery('#filters-tab').css('overflow-y', 'auto');
+		jQuery('#filters-tab').css('overflow-x', 'hidden');
 		jQuery('#filters-tab-link').text(t("filters_tab"));
 
 		//------------------------------------------------------------------
@@ -1518,10 +1520,14 @@ export function initializePortal(config) {
 			contentWrapper.append(map);
 
 			// If a beta-message is configured, add a small beta badge over the map
-			if (config['beta-message']) {
+			// Check for beta-message and beta-title in translation keys first, then fall back to config
+			var betaMessage = (t('beta-message') !== 'beta-message' ? t('beta-message') : null) || config['beta-message'];
+			var betaTitle = (t('beta-title') !== 'beta-title' ? t('beta-title') : null) || config['beta-title'] || 'beta';
+			
+			if (betaMessage) {
 				var betaBadge = jQuery(
 					'<div class="beta-badge">' +
-						'<span>beta</span>' +
+						'<span>' + betaTitle + '</span>' +
 						'<i class="fa fa-info-circle" aria-hidden="true"></i>' +
 					'</div>'
 				);
@@ -1537,7 +1543,7 @@ export function initializePortal(config) {
 						}
 						tooltipVisible = false;
 					} else {
-						tooltip = jQuery('<div class="beta-badge-tooltip"></div>').text(config['beta-message']);
+						tooltip = jQuery('<div class="beta-badge-tooltip"></div>').text(betaMessage);
 						betaBadge.append(tooltip);
 						tooltipVisible = true;
 					}
@@ -2517,7 +2523,23 @@ export function initializePortal(config) {
 			}
 		);
 
-		jQuery('#filters-tab').css('height', jQuery(window).height() - 150);
+		// Set height and ensure scrolling works properly
+		var filtersTabHeight = jQuery(window).height() - 150;
+		jQuery('#filters-tab').css({
+			'height': filtersTabHeight + 'px',
+			'max-height': filtersTabHeight + 'px',
+			'overflow-y': 'auto',
+			'overflow-x': 'hidden'
+		});
+		
+		// Update height on window resize
+		jQuery(window).on('resize', function() {
+			var newHeight = jQuery(window).height() - 150;
+			jQuery('#filters-tab').css({
+				'height': newHeight + 'px',
+				'max-height': newHeight + 'px'
+			});
+		});
 
 
 		//------------------------------------
