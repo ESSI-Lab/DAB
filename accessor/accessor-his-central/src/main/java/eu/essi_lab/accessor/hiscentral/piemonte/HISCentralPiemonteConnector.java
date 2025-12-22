@@ -52,7 +52,8 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
     public enum PiemonteStationType {
 	METEO("dati_giornalieri_meteo", "sensori_meteo"), //
 	HYDRO("dati_giornalieri_idro", "sensori_idro"), //
-	SNOW("dati_giornalieri_nivo", null);
+	SNOW("dati_giornalieri_nivo", null),
+	SCALADEFLUSSO("scale_deflusso", null);
 
 	private String dataParameter;
 
@@ -121,6 +122,8 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 	PORTATANAT("Portata naturale", "portatamediat", "m³/s", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
 	IDRO("Livello idrometrico", "livellomedio", "m", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
 	IDRO1("Livello idrometrico canale", "livellomedio1", "m", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
+	
+	SCALADEFLUSSO("Scala di deflusso", "scala_deflusso", "table", InterpolationType.AVERAGE, PiemonteStationType.SCALADEFLUSSO), //
 
 	HS("Altezza neve dal suolo", "hs", "cm", InterpolationType.MAX, PiemonteStationType.SNOW), //
 	HN("Altezza neve fresca", "hn", "cm", InterpolationType.TOTAL, PiemonteStationType.SNOW); //
@@ -333,17 +336,17 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 			    List<String> paramList = new ArrayList<String>();
 
 			    JSONArray resultsStream = jsonObject.getJSONArray("results");
-			    
+
 			    for (int k = 0; k < variables.length(); k++) {
 				String paramId = variables.getJSONObject(k).optString("id_parametro");
 				varPrint.add(paramId);
-				
+
 				JSONArray aggregatiFound = null;
 				for (int j = 0; j < resultsStream.length(); j++) {
 				    JSONObject item = resultsStream.getJSONObject(j);
 
 				    if (paramId.equals(item.getString("id_parametro"))) {
-					if(!paramList.contains(paramId)) {
+					if (!paramList.contains(paramId)) {
 					    paramList.add(paramId);
 					    aggregatiFound = item.getJSONArray("aggregati");
 					}
@@ -359,6 +362,12 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 					countDataset++;
 				    }
 				}
+			    }
+
+			    if (getVariableField.equals("sensori_idro")) {
+				ret.addRecord(HISCentralPiemonteMapper.create(originalMetadataInfo, variableType,
+					PIEMONTE_Variable.SCALADEFLUSSO.name(), null));
+				countDataset++;
 			    }
 
 			    // for (int k = 0; k < variables.length(); k++) {
