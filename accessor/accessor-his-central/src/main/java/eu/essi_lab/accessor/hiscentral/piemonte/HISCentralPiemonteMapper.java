@@ -256,6 +256,8 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		if (getVariableField != null) {
 		    variables = datasetInfo.optJSONArray(getVariableField);
 		    sensorUrl = getSensorUrl(variables, paramId);
+		} else if (m.equals(PIEMONTE_Variable.SCALADEFLUSSO)) {
+		    sensorUrl = null;
 		} else {
 		    sensorUrl = datasetInfo.optString("url");
 		}
@@ -476,47 +478,60 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		String[] splittedUrl = puntoMisuraUrl.split("/");
 		String lastPath = splittedUrl[splittedUrl.length - 1];
 		puntoMisuraUrl = puntoMisuraUrl.replace(lastPath, "");
-		HISCentralPiemonteClient client = new HISCentralPiemonteClient(puntoMisuraUrl);
-		lastPath = lastPath + "/?format=json";
-		String resp = client.getData(lastPath);
-		if (resp != null) {
-		    JSONObject listObjects = new JSONObject(resp);
-		    String onlineData = listObjects.optString(getDataParam);
-		    String beginData = listObjects.optString("data_inizio_dati");
-		    String endData = listObjects.optString("data_fine_dati");
 
-		    if (beginData != null && !beginData.isEmpty()) {
-			coreMetadata.getDataIdentification().getTemporalExtent().setBeginPosition(beginData);
-		    }
-		    if (endData != null && !endData.isEmpty()) {
-			coreMetadata.getDataIdentification().getTemporalExtent().setEndPosition(endData);
-		    }
+		HISCentralPiemonteMangler mangler = new HISCentralPiemonteMangler();
+		// site code network + site code: both needed for access
+		mangler.setPlatformIdentifier(stationName);
+		// variable vocabulary + variable code: both needed for access
+		mangler.setParameterIdentifier(paramCode);
+		if (flagCode != null && position != null) {
+		    mangler.setQualityIdentifier(flagCode + ":" + position);
+		}
 
-		    onlineData = onlineData.contains("?format=json") ? onlineData.replace("?format=json", "") : onlineData;
-		    HISCentralPiemonteMangler mangler = new HISCentralPiemonteMangler();
-		    // site code network + site code: both needed for access
-		    mangler.setPlatformIdentifier(stationName);
-		    // variable vocabulary + variable code: both needed for access
-		    mangler.setParameterIdentifier(paramCode);
-		    if (flagCode != null && position != null) {
-			mangler.setQualityIdentifier(flagCode + ":" + position);
-		    }
+		String identifier = mangler.getMangling();
 
-		    String identifier = mangler.getMangling();
-
-		    coreMetadata.addDistributionOnlineResource(identifier, onlineData, CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI,
-			    "download");
-
-		    // Online o = new Online();
-		    // o.setLinkage(onlineData);
-		    // o.setFunctionCode("download");
-		    // o.setName(stationName + "_" + paramCode);
-		    // o.setProtocol(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI);
-		    // distribution.addDistributionOnline(o);
+		if (m != null && m.equals(PIEMONTE_Variable.SCALADEFLUSSO)) {
+		    puntoMisuraUrl = puntoMisuraUrl.replace("punti_misura_idro", getDataParam);
+		    puntoMisuraUrl = puntoMisuraUrl + "?" + varType + "=" + lastPath;
+		    HISCentralPiemonteClient client = new HISCentralPiemonteClient(puntoMisuraUrl);
+		    coreMetadata.addDistributionOnlineResource(identifier, puntoMisuraUrl,
+			    CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI, "download");
 
 		} else {
-		    GSLoggerFactory.getLogger(this.getClass()).warn("Last path url {}: ", lastPath);
-		    GSLoggerFactory.getLogger(this.getClass()).warn("Error reading key {}: ", stationName);
+
+		    HISCentralPiemonteClient client = new HISCentralPiemonteClient(puntoMisuraUrl);
+		    lastPath = lastPath + "/?format=json";
+		    String resp = client.getData(lastPath);
+		    if (resp != null) {
+			JSONObject listObjects = new JSONObject(resp);
+			String onlineData = listObjects.optString(getDataParam);
+			String beginData = listObjects.optString("data_inizio_dati");
+			String endData = listObjects.optString("data_fine_dati");
+
+			if (beginData != null && !beginData.isEmpty()) {
+			    coreMetadata.getDataIdentification().getTemporalExtent().setBeginPosition(beginData);
+			}
+			if (endData != null && !endData.isEmpty()) {
+			    coreMetadata.getDataIdentification().getTemporalExtent().setEndPosition(endData);
+			}
+
+			onlineData = onlineData.contains("?format=json") ? onlineData.replace("?format=json", "") : onlineData;
+
+			coreMetadata.addDistributionOnlineResource(identifier, onlineData,
+				CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI, "download");
+
+			// Online o = new Online();
+			// o.setLinkage(onlineData);
+			// o.setFunctionCode("download");
+			// o.setName(stationName + "_" + paramCode);
+			// o.setProtocol(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI);
+			// distribution.addDistributionOnline(o);
+
+		    } else {
+			GSLoggerFactory.getLogger(this.getClass()).warn("Last path url {}: ", lastPath);
+			GSLoggerFactory.getLogger(this.getClass()).warn("Error reading key {}: ", stationName);
+		    }
+
 		}
 
 	    } else {
