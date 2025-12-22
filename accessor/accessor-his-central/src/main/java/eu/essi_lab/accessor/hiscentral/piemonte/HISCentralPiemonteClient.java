@@ -172,8 +172,8 @@ public class HISCentralPiemonteClient {
 
 		logger.info("Sending request to: {}", url);
 
-		HttpResponse<InputStream> response = new Downloader()
-			.downloadResponse(HttpRequestUtils.build(MethodNoBody.GET, url, HttpHeaderUtils.build("accept", "application/json")));
+		HttpResponse<InputStream> response = new Downloader().downloadResponse(
+			HttpRequestUtils.build(MethodNoBody.GET, url, HttpHeaderUtils.build("accept", "application/json")));
 
 		InputStream input = response.body();
 
@@ -216,67 +216,83 @@ public class HISCentralPiemonteClient {
 		PIEMONTE_REMOTE_SERVICE_ERROR //
 	);
     }
-    
+
     public List<RatingCurve> getRatingCurves(String initialPath) throws GSException {
 
-	    try {
-	        Map<String, RatingCurve> curvesByPeriod = new LinkedHashMap<>();
+	try {
+	    Map<String, RatingCurve> curvesByPeriod = new LinkedHashMap<>();
 
-	        String pathOrUrl = initialPath;
+	    String pathOrUrl = endpoint.trim() + initialPath;
 
-	        while (pathOrUrl != null) {
+	    while (pathOrUrl != null) {
 
-	            String json = getResponse(pathOrUrl);
-	            JSONObject root = new JSONObject(json);
+		pathOrUrl = URLEncoder.encode(pathOrUrl, "UTF-8");
 
-	            JSONArray results = root.getJSONArray("results");
+		String url = pathOrUrl;
 
-	            for (int i = 0; i < results.length(); i++) {
+		String proxyEndpoint = getGiProxyEndpoint();
+		if (proxyEndpoint != null) {
+		    url = proxyEndpoint + "/get?url=" + url;
+		}
 
-	                JSONObject obj = results.getJSONObject(i);
+		logger.info("Sending request to: {}", url);
 
-	                LocalDate beginDate = LocalDate.parse(obj.getString("data_inizio"));
-	                LocalDate endDate = LocalDate.parse(obj.getString("data_fine"));
+		HttpResponse<InputStream> response = new Downloader().downloadResponse(
+			HttpRequestUtils.build(MethodNoBody.GET, url, HttpHeaderUtils.build("accept", "application/json")));
 
-	                BigDecimal level = obj.optBigDecimal("livello", null);
-	                BigDecimal discharge = obj.optBigDecimal("portata", null);
+		InputStream input = response.body();
 
-	                String key = beginDate + "|" + endDate;
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-	                RatingCurve curve = curvesByPeriod.get(key);
-	                if (curve == null) {
-	                    curve = new RatingCurve(beginDate, endDate);
-	                    curvesByPeriod.put(key, curve);
-	                }
+		IOUtils.copy(input, output);
 
-	                curve.addPoint(new RatingCurvePoint(level, discharge));
-	            }
+		input.close();
 
-	            // gestione paginazione
-	            if (root.isNull("next")) {
-	                pathOrUrl = null;
-	            } else {
-	                String nextUrl = root.optString("next", null);
-	                pathOrUrl = nextUrl;
-	            }
-	        }
+		String json = new String(output.toByteArray());
 
-	        return new ArrayList<>(curvesByPeriod.values());
+		JSONObject root = new JSONObject(json);
 
-	    } catch (Exception e) {
-	        logger.error("Error while parsing paginated rating curves", e);
+		JSONArray results = root.getJSONArray("results");
 
-	        throw GSException.createException(
-	                getClass(),
-	                "Unable to parse paginated rating curves",
-	                null,
-	                ErrorInfo.ERRORTYPE_INTERNAL,
-	                ErrorInfo.SEVERITY_ERROR,
-	                PIEMONTE_CLIENT_UNABLE_TO_GET_STATIONS_ERROR
-	        );
-	        
+		for (int i = 0; i < results.length(); i++) {
+
+		    JSONObject obj = results.getJSONObject(i);
+
+		    LocalDate beginDate = LocalDate.parse(obj.getString("data_inizio"));
+		    LocalDate endDate = LocalDate.parse(obj.getString("data_fine"));
+
+		    BigDecimal level = obj.optBigDecimal("livello", null);
+		    BigDecimal discharge = obj.optBigDecimal("portata", null);
+
+		    String key = beginDate + "|" + endDate;
+
+		    RatingCurve curve = curvesByPeriod.get(key);
+		    if (curve == null) {
+			curve = new RatingCurve(beginDate, endDate);
+			curvesByPeriod.put(key, curve);
+		    }
+
+		    curve.addPoint(new RatingCurvePoint(level, discharge));
+		}
+
+		if (root.isNull("next")) {
+		    pathOrUrl = null;
+		} else {
+		    String nextUrl = root.optString("next", null);
+		    pathOrUrl = nextUrl;
+		}
 	    }
-	    
+
+	    return new ArrayList<>(curvesByPeriod.values());
+
+	} catch (Exception e) {
+	    logger.error("Error while parsing paginated rating curves", e);
+
+	    throw GSException.createException(getClass(), "Unable to parse paginated rating curves", null, ErrorInfo.ERRORTYPE_INTERNAL,
+		    ErrorInfo.SEVERITY_ERROR, PIEMONTE_CLIENT_UNABLE_TO_GET_STATIONS_ERROR);
+
+	}
+
     }
-    
+
 }
