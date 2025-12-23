@@ -193,6 +193,11 @@ public final class IndexedResourceElements extends IndexedElementsGroup {
     public static final IndexedResourceProperty IS_TIMESERIES = new IndexedResourceProperty(ResourceProperty.IS_TIMESERIES);
 
     /**
+     * Set by the AccessAugmenter
+     */
+    public static final IndexedResourceProperty IS_RATING_CURVE = new IndexedResourceProperty(ResourceProperty.IS_RATING_CURVE);
+
+    /**
      * Set once using a tool
      */
     public static final IndexedResourceProperty IS_EIFFEL_RECORD = new IndexedResourceProperty(ResourceProperty.IS_EIFFEL_RECORD);

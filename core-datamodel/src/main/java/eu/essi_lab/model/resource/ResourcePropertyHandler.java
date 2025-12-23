@@ -627,6 +627,24 @@ public class ResourcePropertyHandler {
     }
 
     /**
+     * Set the {@link ResourceProperty#IS_RATING_CURVE} property
+     * 
+     * @param set
+     */
+    public void setIsRatingCurve(boolean set) {
+
+	resource.setProperty(ResourceProperty.IS_RATING_CURVE, String.valueOf(set));
+    }
+
+    /**
+     * Get the {@link ResourceProperty#IS_RATING_CURVE} property
+     */
+    public boolean isRatingCurve() {
+
+	return Boolean.valueOf(resource.getPropertyValue(ResourceProperty.IS_RATING_CURVE).orElse("false"));
+    }
+
+    /**
      * Get the {@link ResourceProperty#IS_EXECUTABLE} property
      */
     public Optional<Boolean> isExecutable() {
