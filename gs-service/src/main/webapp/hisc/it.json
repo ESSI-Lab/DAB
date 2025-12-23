@@ -1,6 +1,6 @@
 {
-  "platformTitle_label": "Nome stazione",
-  "platformTitle_help": "Nome della stazione"
+	"platformTitle_label" : "Nome stazione",
+	"platformTitle_help" : "Nome della stazione",
+	"beta-title": "Versione beta - release 1",
+    "beta-message" : "La piattaforma è tuttora in fase di sviluppo e sarà progressivamente perfezionata nel corso del 2026. Release 1: dicembre 2025"
 }
-
-
