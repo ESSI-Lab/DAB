@@ -83,7 +83,7 @@ public class EurOBISLdClient {
 			Model model = ModelFactory.createDefaultModel();
 
 			// Load data from a Turtle file into the model
-			model = FileManager.get().readModel(model, tempFile.getAbsolutePath(), "TURTLE");
+			model = FileManager.get().readModel(model, tempFile.getAbsolutePath());
 
 			// Iterate over the statements in the model and do something with them
 			StmtIterator iter = model.listStatements();

@@ -10,6 +10,11 @@
 	<artifactId>gs-lib-odip</artifactId>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-rdfconnection</artifactId>
+            <version>5.6.0</version>
+        </dependency>
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
