@@ -67,7 +67,7 @@ public class OptionTextArea extends TextArea {
 	    setRequired(true);
 
 	    setRequiredIndicatorVisible(true);
-	    setErrorMessage("A value is required");
+	    setErrorMessage("Required value");
 
 	    if (option.getValue() == null) {
 		setInvalid(true);

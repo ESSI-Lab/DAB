@@ -79,7 +79,7 @@ public class OptionIntegerField extends IntegerField implements OnKeyUpValidatio
 	    setRequired(true);
 
 	    setRequiredIndicatorVisible(true);
-	    setErrorMessage("A value is required");
+	    setErrorMessage("Required value");
 
 	    if (option.getValue() == null) {
 		setInvalid(true);

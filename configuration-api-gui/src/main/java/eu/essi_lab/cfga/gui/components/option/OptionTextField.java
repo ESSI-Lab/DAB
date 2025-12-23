@@ -81,7 +81,7 @@ public class OptionTextField extends TextField implements OnKeyUpValidationListe
 	    setRequired(true);
 
 	    setRequiredIndicatorVisible(true);
-	    setErrorMessage("A value is required");
+	    setErrorMessage("Required value");
 
 	    if (option.getValue() == null) {
 		setInvalid(true);

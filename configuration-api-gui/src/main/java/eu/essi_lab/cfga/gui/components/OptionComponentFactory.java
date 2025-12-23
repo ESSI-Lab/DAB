@@ -325,7 +325,7 @@ public class OptionComponentFactory {
 
 	select.setRequired(option.isRequired());
 	select.setRequiredIndicatorVisible(option.isRequired());
-	select.setErrorMessage("A value is required");
+	select.setErrorMessage("Required value");
 
 	// GSLoggerFactory.getLogger(ComponentFactory.class).debug("Initialing multi select for option: " +
 	// option.getKey());

@@ -80,7 +80,7 @@ public class OptionDoubleField extends NumberField implements OnKeyUpValidationL
 	    setRequired(true);
 
 	    setRequiredIndicatorVisible(true);
-	    setErrorMessage("A value is required");
+	    setErrorMessage("Required value");
 
 	    if (option.getValue() == null) {
 		setInvalid(true);
