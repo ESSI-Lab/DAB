@@ -49,6 +49,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
+import org.locationtech.jts.geom.util.GeometryFixer;
 
 /**
  * @author Fabrizio
@@ -75,7 +76,8 @@ class ShapeFileMapper {
 
 		SimpleFeature feature = iterator.next();
 
-		Object geometry = feature.getDefaultGeometry();
+		Geometry geometry = (Geometry) feature.getDefaultGeometry();
+		geometry = GeometryFixer.fix(geometry);
 
 		ObjectMapper mapper = new ObjectMapper();
 
@@ -191,6 +193,7 @@ class ShapeFileMapper {
 		System.out.println(name.toString());
 
 		Geometry geometry = (Geometry) feature.getDefaultGeometry();
+		geometry = GeometryFixer.fix(geometry);
 
 		if (geometry instanceof MultiPolygon multiPolygon) {
 
