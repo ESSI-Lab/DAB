@@ -379,7 +379,7 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 
 			jQuery('#' + currentId).jtable({
 
-				title: target.toUpperCase(),
+				title: (__t("tf-" + target) !== "tf-" + target ? __t("tf-" + target) : target.toUpperCase()),
 
 				selecting: true,
 				multiselect: true,
