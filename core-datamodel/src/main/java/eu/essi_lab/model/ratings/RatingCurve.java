@@ -1,4 +1,4 @@
-package eu.essi_lab.accessor.hiscentral.piemonte;
+package eu.essi_lab.model.ratings;
 
 /*-
  * #%L

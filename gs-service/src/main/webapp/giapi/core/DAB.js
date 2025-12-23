@@ -1029,23 +1029,26 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
         // this method at the moment works since these params are set
         // only by the term frequency object
         return constraints && (
-        		constraints.format || 
-        		constraints.keyword || 
-        		constraints.source || 
-        		constraints.protocol || 
-        		constraints.platformId || 
-        		constraints.instrumentId || 
-        		constraints.origOrgId || 
-        		constraints.attributeId || 
-        		constraints.score || 
-        		
-        		constraints.instrumentTitle || 
-        		constraints.platformTitle || 
-        		constraints.organisationName || 
-        		constraints.intendedObservationSpacing ||
-        		constraints.timeInterpolation ||
-        		constraints.aggregationDuration ||
-        		constraints.attributeTitle          
+                constraints.format || 
+                constraints.keyword || 
+                constraints.source || 
+                constraints.protocol || 
+                constraints.platformId || 
+                constraints.instrumentId || 
+                constraints.origOrgId || 
+                constraints.attributeId || 
+                constraints.score || 
+                
+                constraints.instrumentTitle || 
+                constraints.platformTitle || 
+                constraints.organisationName || 
+                constraints.intendedObservationSpacing ||
+                constraints.timeInterpolation ||
+                constraints.aggregationDuration ||
+                constraints.attributeTitle ||
+                // include observedPropertyURI so TF selections on observed properties
+                // are correctly recognized as term-frequency-driven queries
+                constraints.observedPropertyURI
         );
         
         // this method is preferred but is disabled to allow the correct working of the new portal

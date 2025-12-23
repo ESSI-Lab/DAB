@@ -1095,10 +1095,10 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 	var alt = findValue(data, 0, 'vertical_extent');
 
 	
-	var geoLocation = "latitude: " + lat + "°<br/> longitude: " + lon + "°";
+	var geoLocation = t('latitude') + ": " + lat + "°<br/> " + t('longitude') + ": " + lon + "°";
 	
 	if (alt!=null && alt!= undefined){
-		geoLocation +="<br/> elevation: "+alt+" m";
+		geoLocation +="<br/> " + t('elevation') + ": "+alt+" " + t('elevation_unit');
 	}
 
 	const pointerCoordinates = ol.proj.fromLonLat([lon, lat]);
