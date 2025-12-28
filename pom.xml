@@ -331,7 +331,7 @@
 		<org.eclipse.paho.client.mqttv3.version>1.2.5</org.eclipse.paho.client.mqttv3.version>
 
 		<!-- OpenSearch client -->
-		<opensearch-rest-high-level-client.version>2.14.0</opensearch-rest-high-level-client.version>
+		<opensearch-rest-high-level-client.version>2.19.4</opensearch-rest-high-level-client.version>
 
 		<!-- LogicNG -->
 		<org.logicng.version>2.4.3</org.logicng.version>
