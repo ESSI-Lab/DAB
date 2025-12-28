@@ -341,7 +341,7 @@
         <org.logicng.version>2.4.3</org.logicng.version>
 
         <!-- SPRING Framework - VULN-UPDATE -->
-        <org.springframework.version>5.3.39</org.springframework.version>
+        <org.springframework.version>5.3.39-wso2v4</org.springframework.version>
 
         <!-- Apache commons - VULN-UPDATE -->
         <apache.commons.version>1.15.0</apache.commons.version>
