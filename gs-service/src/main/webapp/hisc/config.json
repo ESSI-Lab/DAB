@@ -13,12 +13,12 @@
 	"layersSelectorButtonVisibility" : true,
 	"zoomSlider" : false,
 	"defaultLayer" : "OpenStreetMap",
-	"filters" : "source,keyword,organisationName,attributeTitle,attributeURI,platformTitle,instrumentTitle",
+	"filters" : "source,organisationName,attributeURI,platformTitle,instrumentTitle",
 	"instrumentSearch" : false,
-	"logo-left" : "logo_HISCentral.png,logo-left.png",
-	"logo-right" : "logo-right.png",
-	"title-left" : "Piattaforma nazionale di condivisione dei dati idro-meteorologici HIS Central",
-	"title-right" : "Sviluppata con il supporto di CNR-IIA e INFN nell'ambito del Progetto Bilancio Idrologico Nazionale del Piano Operativo Ambiente",
+	"logo-left" : "logo_HISCentral.png,logo-left.png,logo_label.png",
+	"logo-right" : "logo-right.png,logo_label_right.png",
+	"title-left" : "",
+	"title-right" : "",
 	"disclaimer" : "Dati dei Servizi idro-meteorologici regionali e delle province autonome. I dati possono essere soggetti a revisioni.",
 	"attributeSearch" : true,
 	"platformSearch" : true,
@@ -41,5 +41,6 @@
 	"showSourceEndpoint" : false,
 	"permissions" : "downloads,api",
 	"language" : "en",
-	"beta-message" : "This is a beta version of the HIS-Central portal. Functionality and data are still under validation."
+	"beta-title" : true,
+	"beta-message" : true
 }

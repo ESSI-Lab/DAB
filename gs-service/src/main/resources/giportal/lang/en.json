@@ -13,5 +13,11 @@
 "monitoring_point":"Monitoring point",
 "latitude": "Latitude",
 "longitude": "Longitude",
-"elevation": "Altitude"
+"elevation": "Altitude",
+"tf-source": "Source",
+"tf-organisationName": "Organisation",
+"tf-attributeTitle": "Observed property",
+"tf-attributeURI": "Observed property URI",
+"tf-platformTitle": "Station",
+"tf-instrumentTitle": "Instrument"
 }

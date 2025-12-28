@@ -1089,9 +1089,13 @@ export function initializePortal(config) {
 					jQuery('#paginator-widget').css('display', 'none');
 				}
 
-				// refreshes the filters accordion 
+				// refreshes the filters accordion (only if it's initialized)
 				if (ui.newPanel.selector === '#filters-tab') {
-					jQuery('#filters-tab').accordion('refresh');
+					var $filtersTab = jQuery('#filters-tab');
+					// Check if accordion is initialized before trying to refresh
+					if ($filtersTab.hasClass('ui-accordion')) {
+						$filtersTab.accordion('refresh');
+					}
 				}
 			}
 		});
@@ -1180,40 +1184,51 @@ export function initializePortal(config) {
 				rightSection.className = 'portal-header-right';
 				
 				if (config['logo-right']) {
-					const rightLogoImg = document.createElement('img');
-					rightLogoImg.className = 'portal-header-logo-right';
-					rightLogoImg.alt = 'Right logo';
-					// Use path as-is if relative, or full URL if absolute
-					const rightLogoSrc = config['logo-right'].startsWith('http') ? config['logo-right'] : config['logo-right'];
-					
-					// Function to recalculate position
-					const recalculatePosition = function() {
-						setTimeout(function() {
-							if (window.positionTabsCallback) {
-								window.positionTabsCallback();
+					// Support multiple comma-separated logos in "logo-right"
+					const rightLogos = String(config['logo-right'])
+						.split(',')
+						.map(function(item) { return item.trim(); })
+						.filter(function(item) { return item.length > 0; });
+
+					if (rightLogos.length > 0) {
+						// Function to recalculate position
+						const recalculatePosition = function() {
+							setTimeout(function() {
+								if (window.positionTabsCallback) {
+									window.positionTabsCallback();
+								}
+							}, 10);
+						};
+
+						rightLogos.forEach(function(logoSrc) {
+							const rightLogoImg = document.createElement('img');
+							rightLogoImg.className = 'portal-header-logo-right';
+							rightLogoImg.alt = 'Right logo';
+
+							// Use path as-is if relative, or full URL if absolute
+							const rightLogoSrc = logoSrc.startsWith('http') ? logoSrc : logoSrc;
+
+							// Add load listener to recalculate position when image loads
+							rightLogoImg.addEventListener('load', recalculatePosition);
+							// Also handle errors (image fails to load)
+							rightLogoImg.addEventListener('error', recalculatePosition);
+
+							// Add click handler if href is provided
+							if (config['logo-right-href']) {
+								rightLogoImg.style.cursor = 'pointer';
+								rightLogoImg.addEventListener('click', function() {
+									window.open(config['logo-right-href'], '_blank', 'noopener,noreferrer');
+								});
 							}
-						}, 10);
-					};
-					
-					// Add load listener to recalculate position when image loads
-					rightLogoImg.addEventListener('load', recalculatePosition);
-					// Also handle errors (image fails to load)
-					rightLogoImg.addEventListener('error', recalculatePosition);
-					
-					// Add click handler if href is provided
-					if (config['logo-right-href']) {
-						rightLogoImg.style.cursor = 'pointer';
-						rightLogoImg.addEventListener('click', function() {
-							window.open(config['logo-right-href'], '_blank', 'noopener,noreferrer');
+
+							rightLogoImg.src = rightLogoSrc;
+							rightSection.appendChild(rightLogoImg);
+
+							// If image is already loaded (cached), trigger recalculation
+							if (rightLogoImg.complete) {
+								recalculatePosition();
+							}
 						});
-					}
-					
-					rightLogoImg.src = rightLogoSrc;
-					rightSection.appendChild(rightLogoImg);
-					
-					// If image is already loaded (cached), trigger recalculation
-					if (rightLogoImg.complete) {
-						recalculatePosition();
 					}
 				}
 				
@@ -1290,6 +1305,12 @@ export function initializePortal(config) {
 
 		// Tabs and paginator now flow naturally in the document, no positioning needed
 		jQuery('#tabs-div').css('padding', '0px');
+		// Ensure tab panels are properly contained (filters-tab will override overflow-y)
+		jQuery('#tabs-div .tabs-element').css({
+			'position': 'relative'
+		});
+		// Ensure results-tab and sources-tab don't overflow
+		jQuery('#results-tab, #sources-tab').css('overflow', 'hidden');
 
 		//------------------------------------------------------------------
 		// results tab
@@ -1349,7 +1370,6 @@ export function initializePortal(config) {
 		// filters tab     
 		//
 		jQuery('#filters-tab').css('width', '100%');
-		jQuery('#filters-tab').css('height', '100%');
 		jQuery('#filters-tab').css('margin-top', '3px');
 		jQuery('#filters-tab').css('overflow-y', 'auto');
 		jQuery('#filters-tab').css('overflow-x', 'hidden');
@@ -2519,26 +2539,72 @@ export function initializePortal(config) {
 			{
 				'itemLabelFontSize': '80%',
 				'divCSS': 'max-height:550px; overflow:auto',
-				'accordionMode': true
+				'accordionMode': false
 			}
 		);
 
 		// Set height and ensure scrolling works properly
-		var filtersTabHeight = jQuery(window).height() - 150;
+		// Calculate available height based on the left-sidebar container
+		var calculateFiltersTabHeight = function() {
+			var leftSidebar = jQuery('#left-sidebar');
+			if (leftSidebar.length && leftSidebar.is(':visible')) {
+				// Calculate based on available space in left-sidebar
+				var sidebarHeight = leftSidebar.height();
+				var tabsHeight = jQuery('#tabs-ul').outerHeight(true) || 40;
+				var paginatorHeight = jQuery('#paginator-widget').is(':visible') ? jQuery('#paginator-widget').outerHeight(true) : 0;
+				var margins = 10; // Small margin for spacing
+				var availableHeight = sidebarHeight - tabsHeight - paginatorHeight - margins;
+				// Ensure minimum height
+				return Math.max(availableHeight, 300);
+			} else {
+				// Fallback to window-based calculation if sidebar not available
+				var windowHeight = jQuery(window).height();
+				var headerHeight = jQuery('#headerDiv').outerHeight(true) || 0;
+				var portalHeaderHeight = jQuery('#portalHeaderRow').outerHeight(true) || 0;
+				var tabsHeight = jQuery('#tabs-ul').outerHeight(true) || 40;
+				var margins = 200;
+				var availableHeight = windowHeight - headerHeight - portalHeaderHeight - tabsHeight - margins;
+				return Math.max(availableHeight, 300);
+			}
+		};
+		
+		// Ensure filters-tab is properly contained
 		jQuery('#filters-tab').css({
-			'height': filtersTabHeight + 'px',
-			'max-height': filtersTabHeight + 'px',
+			'position': 'relative',
 			'overflow-y': 'auto',
-			'overflow-x': 'hidden'
+			'overflow-x': 'hidden',
+			'background-color': 'white',
+			'z-index': '1'
 		});
+		
+		// Set initial height after a short delay to ensure layout is ready
+		setTimeout(function() {
+			var filtersTabHeight = calculateFiltersTabHeight();
+			jQuery('#filters-tab').css({
+				'height': filtersTabHeight + 'px',
+				'max-height': filtersTabHeight + 'px',
+				'min-height': '300px'
+			});
+		}, 100);
 		
 		// Update height on window resize
 		jQuery(window).on('resize', function() {
-			var newHeight = jQuery(window).height() - 150;
+			var newHeight = calculateFiltersTabHeight();
 			jQuery('#filters-tab').css({
 				'height': newHeight + 'px',
 				'max-height': newHeight + 'px'
 			});
+		});
+		
+		// Also update when tabs are activated (in case paginator visibility changes)
+		jQuery('#tabs-div').on('tabsactivate', function() {
+			setTimeout(function() {
+				var newHeight = calculateFiltersTabHeight();
+				jQuery('#filters-tab').css({
+					'height': newHeight + 'px',
+					'max-height': newHeight + 'px'
+				});
+			}, 50);
 		});
 
 

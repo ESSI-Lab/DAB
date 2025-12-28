@@ -362,6 +362,8 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 
 			var currentId = idList[i];
 			var target = tfObject.targets()[i];
+			// Capture target in closure for display function
+			var currentTarget = target;
 
 			var label = __t("tf-"+target);
 
@@ -377,9 +379,10 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 
 			idToTargetMap[idList[i]] = target;
 
+
 			jQuery('#' + currentId).jtable({
 
-				title: target.toUpperCase(),
+				title: (__t("tf-" + target) !== "tf-" + target ? __t("tf-" + target) : target.toUpperCase()),
 
 				selecting: true,
 				multiselect: true,
@@ -395,6 +398,27 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 						key: true,
 						title: '',
 						width: '80%',
+						display: (function(targetName) {
+							return function(data) {
+								var label = data.record.decodedTerm || '';
+								// Add link icon for attributeURI or observedPropertyURI target (observed property filter)
+								if ((targetName === 'attributeURI' || targetName === 'observedPropertyURI') && data.record.term) {
+									var termUri = data.record.term;
+									// Escape URI for HTML attribute
+									var escapedUri = jQuery('<div>').text(termUri).html();
+								// Create a link icon wrapped in a span that stops propagation but opens the link
+								var iconHtml = '<span class="tf-uri-link-wrapper" style="display: inline-block; margin-left: 5px;" ' +
+									'onclick="event.stopPropagation(); event.preventDefault(); var uri = this.querySelector(\'.tf-uri-link\').getAttribute(\'data-uri\'); if(uri) window.open(uri, \'_blank\', \'noopener,noreferrer\'); return false;" ' +
+									'onmousedown="event.stopPropagation(); event.preventDefault(); return false;">' +
+									'<i class="fa fa-external-link tf-uri-link" ' +
+									'style="cursor: pointer; color: #0066cc; text-decoration: none;" ' +
+									'title="Open URI in new window" ' +
+									'data-uri="' + escapedUri + '"></i></span>';
+								return label + iconHtml;
+								}
+								return label;
+							};
+						})(currentTarget)
 					},
 					freq: {
 						title: '',
@@ -403,6 +427,14 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 				},
 
 				selectionChanged: function(event, data) {
+					// Check if the click originated from the URI link icon - if so, ignore selection
+					if (event && event.originalEvent && event.originalEvent.target) {
+						var $target = jQuery(event.originalEvent.target);
+						if ($target.closest('.tf-uri-link-wrapper, .tf-uri-link').length > 0) {
+							// Click was on the icon, don't process selection
+							return;
+						}
+					}
 
 					var selRows = jQuery('#' + this.id).jtable('selectedRows');
 					var id = this.id;
@@ -459,8 +491,81 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 
 						jQuery('#' + currentId).jtable('selectRows', data.row);
 					}
+					
+					// Add link icon for attributeURI/observedPropertyURI targets after row is inserted
+					var rowTarget = idToTargetMap[event.target.id];
+					if ((rowTarget === 'attributeURI' || rowTarget === 'observedPropertyURI') && data.record.term) {
+						// Find the decodedTerm cell - it's the second td (index 1) after the checkbox column
+						var $cells = data.row.find('td');
+						if ($cells.length > 1) {
+							var $decodedTermCell = $cells.eq(1); // Second cell (index 1) contains decodedTerm
+							if (!$decodedTermCell.find('.tf-uri-link').length) {
+								var termUri = data.record.term;
+								var escapedUri = jQuery('<div>').text(termUri).html();
+								// Wrap icon in a span that stops propagation but opens the link
+								var $wrapper = jQuery('<span>').addClass('tf-uri-link-wrapper')
+									.css('display', 'inline-block')
+									.css('margin-left', '5px')
+									.on('mousedown', function(e) {
+										e.stopPropagation();
+										e.preventDefault();
+										return false;
+									})
+									.on('click', function(e) {
+										e.stopPropagation();
+										e.preventDefault();
+										var uri = $icon.attr('data-uri');
+										if (uri) {
+											window.open(uri, '_blank', 'noopener,noreferrer');
+										}
+										return false;
+									});
+								var $icon = jQuery('<i>').addClass('fa fa-external-link tf-uri-link')
+									.css('cursor', 'pointer')
+									.css('color', '#0066cc')
+									.css('text-decoration', 'none')
+									.attr('title', 'Open URI in new window')
+									.attr('data-uri', escapedUri);
+								$wrapper.append($icon);
+								$decodedTermCell.append($wrapper);
+							}
+						}
+					}
 				}
 			});
+
+			// Add event delegation for URI link icons (for attributeURI or observedPropertyURI target)
+			if (currentTarget === 'attributeURI' || currentTarget === 'observedPropertyURI') {
+				// Handle clicks on the wrapper or icon - stop all propagation
+				// Use a more specific selector and handle both wrapper and icon
+				var handleIconClick = function(e) {
+					e.stopPropagation();
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					var $icon = jQuery(e.target).closest('.tf-uri-link-wrapper').find('.tf-uri-link');
+					if ($icon.length === 0 && jQuery(e.target).hasClass('tf-uri-link')) {
+						$icon = jQuery(e.target);
+					}
+					var uri = $icon.attr('data-uri');
+					if (uri) {
+						window.open(uri, '_blank', 'noopener,noreferrer');
+					}
+					return false;
+				};
+				
+				var handleIconMousedown = function(e) {
+					e.stopPropagation();
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					return false;
+				};
+				
+				// Attach handlers to the jtable container
+				jQuery('#' + currentId).on('click', '.tf-uri-link-wrapper', handleIconClick);
+				jQuery('#' + currentId).on('click', '.tf-uri-link', handleIconClick);
+				jQuery('#' + currentId).on('mousedown', '.tf-uri-link-wrapper', handleIconMousedown);
+				jQuery('#' + currentId).on('mousedown', '.tf-uri-link', handleIconMousedown);
+			}
 
 			jQuery('.jtable thead').remove();
 
@@ -468,11 +573,19 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 			if (checkedItems) {
 				for (var j = 0; j < checkedItems.length; j++) {
 
-					jQuery('#' + currentId).jtable('addRecord', {
+					if (checkedItems[j].term != null) {
+						// Handle URL-encoded terms or URIs (like observedPropertyURI) that contain colons
+						// Apply the same modification to checked items to ensure consistency
+						if (checkedItems[j].term.length > 32 && (checkedItems[j].term.indexOf('%3A') != -1 || checkedItems[j].term.indexOf('://') != -1)) {
+							checkedItems[j].decodedTerm = checkedItems[j].decodedTerm.replace(/:/g, ' : ');
+						}
 
-						record: checkedItems[j],
-						clientOnly: true
-					});
+						jQuery('#' + currentId).jtable('addRecord', {
+
+							record: checkedItems[j],
+							clientOnly: true
+						});
+					}
 				};
 			}
 
@@ -482,7 +595,8 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 				if (!tfObject.isCheckedItem(target, items[j])) {
 
 					if (items[j].term != null) {
-						if (items[j].term.length > 32 && items[j].term.indexOf('%3A') != -1) {
+						// Handle URL-encoded terms or URIs (like observedPropertyURI) that contain colons
+						if (items[j].term.length > 32 && (items[j].term.indexOf('%3A') != -1 || items[j].term.indexOf('://') != -1)) {
 							items[j].decodedTerm = items[j].decodedTerm.replace(/:/g, ' : ');
 						}
 

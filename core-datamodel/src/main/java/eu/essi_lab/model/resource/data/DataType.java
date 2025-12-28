@@ -33,5 +33,6 @@ public enum DataType {
     PROFILE, // a series of connected observations along a vertical line, like an atmospheric or ocean sounding
     TIME_SERIES_PROFILE, // when profiles are taken repeatedly at a station, one gets a time series of profiles
     TRAJECTORY_PROFILE, // when profiles are taken repeatedly at a station, one gets a time series of profiles
-    VECTOR // vector features that can be encoded by GML (e.g. including circles, polygons etc.)
+    VECTOR, // vector features that can be encoded by GML (e.g. including circles, polygons etc.)
+    RATING_CURVE // functional relationship between input and output variables (e.g., stage–discharge)
 }

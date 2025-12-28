@@ -32,6 +32,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import eu.essi_lab.model.ratings.RatingCurve;
+import eu.essi_lab.model.ratings.RatingCurvePoint;
+import eu.essi_lab.model.ratings.RatingCurves;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -217,7 +220,7 @@ public class HISCentralPiemonteClient {
 	);
     }
 
-    public List<RatingCurve> getRatingCurves(String initialPath) throws GSException {
+    public RatingCurves getRatingCurves(String initialPath) throws GSException {
 
 	try {
 	    Map<String, RatingCurve> curvesByPeriod = new LinkedHashMap<>();
@@ -283,7 +286,7 @@ public class HISCentralPiemonteClient {
 		}
 	    }
 
-	    return new ArrayList<>(curvesByPeriod.values());
+	    return new RatingCurves(curvesByPeriod.values());
 
 	} catch (Exception e) {
 	    logger.error("Error while parsing paginated rating curves", e);

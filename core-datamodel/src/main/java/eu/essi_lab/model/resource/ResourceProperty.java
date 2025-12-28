@@ -204,6 +204,11 @@ public enum ResourceProperty implements Queryable {
     IS_TRAJECTORY("isTrajectory", ContentType.BOOLEAN),
 
     /**
+     * IS RATING CURVE
+     */
+    IS_RATING_CURVE("isRatingCurve", ContentType.BOOLEAN),
+
+    /**
      * IS EIFFEL RECORD
      */
     IS_EIFFEL_RECORD("eiffelRecord", ContentType.BOOLEAN),

@@ -1029,6 +1029,15 @@ public class BondFactory {
     }
 
     /**
+     * @param isRatingCurve
+     * @return
+     */
+    public static ResourcePropertyBond createIsRatingCurveBond(boolean isRatingCurve) {
+
+	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_RATING_CURVE, String.valueOf(isRatingCurve));
+    }
+
+    /**
      * @param executable
      * @return
      */
