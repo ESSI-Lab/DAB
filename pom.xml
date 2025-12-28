@@ -172,7 +172,7 @@
         <docker.plugin.version>0.48.0</docker.plugin.version>
 
         <!-- Apache CXF VULN-UPDATE -->
-        <cxf.version>3.5.11</cxf.version>
+        <cxf.version>3.6.9</cxf.version>
 
         <!-- JAX WS RS API-->
         <jax-ws-rs-api.version>2.1.1</jax-ws-rs-api.version>
