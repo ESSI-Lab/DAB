@@ -449,7 +449,7 @@
 
         <!--required to make Tomcat happpy after VULN-UPDATE -->
         <jakarta.validation-api.version>2.0.2</jakarta.validation-api.version>
-
+        <guava.version>30.1.0.jre-redhat-00003</guava.version>
         <!-- Surefire args -->
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
@@ -464,6 +464,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>jakarta.validation</groupId>
