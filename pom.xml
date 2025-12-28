@@ -418,7 +418,7 @@
 		<aws-java-sdk-core.version>1.12.795</aws-java-sdk-core.version>
 
 		<!-- Netty project VULN-UPDATE -->
-		<io.netty.version>4.2.7.Final</io.netty.version>
+		<io.netty.version>4.2.9.Final</io.netty.version>
 
 		<!-- Jetty servlets VULN-UPDATE -->
 		<eclipse.jetty.version>9.4.58.v20250814</eclipse.jetty.version>
