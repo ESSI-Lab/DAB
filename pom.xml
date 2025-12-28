@@ -405,7 +405,8 @@
         <ftpserver-core.version>1.2.1</ftpserver-core.version>
 
 		<!-- H2 Database -->
-		<h2.database.version>1.2.140</h2.database.version>
+		<h2.database.version>1.2.140-wso2v3</h2.database.version>
+<!--        <h2.database.version>1.2.140</h2.database.version>-->
 
 		<!-- Jakarta JSON bind-api - required after CXF version VULN-UPDATE -->
 		<jakarta.json.bind-api.version>3.0.1</jakarta.json.bind-api.version>
@@ -660,6 +661,12 @@
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
 				<version>${h2.database.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
 			</dependency>
 
 			<!-- apache mina -->
@@ -2444,7 +2451,12 @@
 			<id>vaadin-addons</id>
 			<url>https://maven.vaadin.com/vaadin-addons</url>
 		</repository>
+        <repository>
+            <id>wso2-nexus</id>
+            <url>https://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+        </repository>
 
-	</repositories> 
+
+    </repositories>
  
 </project>
