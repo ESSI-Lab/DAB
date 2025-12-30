@@ -450,6 +450,7 @@
         <!--required to make Tomcat happpy after VULN-UPDATE -->
         <jakarta.validation-api.version>2.0.2</jakarta.validation-api.version>
         <guava.version>30.1.0.jre-redhat-00003</guava.version>
+        <sun.mail.version>1.6.2</sun.mail.version>
         <!-- Surefire args -->
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
@@ -464,6 +465,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>javax.mail</artifactId>
+                <version>${sun.mail.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
