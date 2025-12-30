@@ -61,9 +61,25 @@ public class ConfigExporter extends VerticalLayout {
 	//
 	//
 
+	Div infoDiv = new Div();
+	infoDiv.setWidthFull();
+	infoDiv.getStyle().set("padding-top", "5px");
+	infoDiv.getStyle().set("font-size", "14px");
+
+	String infoMsg = "To export the configuration to a local folder, enter the folder path"
+		+ " and click the 'Export to local file system' button. "
+		+ "To export the configuration to an S3 bucket, fill all the related fields and click " + " 'Export to S3 bucket' button";
+
+	infoDiv.getElement().setProperty("innerHTML", infoMsg);
+
+	add(infoDiv);
+
+	//
+	//
+	//
+
 	Div msgDiv = new Div();
 	msgDiv.setWidthFull();
-	msgDiv.getStyle().set("padding-top", "5px");
 	msgDiv.getStyle().set("padding-bottom", "5px");
 	msgDiv.getStyle().set("font-size", "14px");
 
@@ -138,16 +154,6 @@ public class ConfigExporter extends VerticalLayout {
 	localExportLayout.add(localExportField);
 
 	add(localExportLayout);
-
-	//
-	//
-	//
-
-
-	setMessage(msgDiv, "To export the configuration to a local folder, enter the folder path"
-			+ " and click the 'Export to local file system' button. "
-			+ "To export the configuration to an S3 bucket, fill all the related fields and click " + " 'Export to S3 bucket' button",
-		"black");
 
 	//
 	//
