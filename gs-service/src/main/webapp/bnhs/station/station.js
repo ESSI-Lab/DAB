@@ -874,9 +874,9 @@ var createTempExtentTable = function(data, i) {
 	timeTable += "<button class='time_button' id='time-button-fe_" + i + "'>" + t('full_extent') + "</button>";
 	timeTable += "</td></tr>";
 
-	timeTable += "<tr><td class='start_date'>" + t('start_date') + "</td><td><input type='text' id='" + dstartId + "' autocomplete='off'></td><td rowspan=2 id='update-button-td_" + i + "'></td></tr>";
+	timeTable += "<tr><td class='start_date'>" + t('start_date') + "</td><td><input type='text' id='" + dstartId + "' autocomplete='off' readonly></td><td rowspan=2 id='update-button-td_" + i + "'></td></tr>";
 
-	timeTable += "<tr><td class='end_date'>" + t('end_date') + "</td><td><input type='text' id='" + dendId + "' autocomplete='off'></td><td></td></tr>";
+	timeTable += "<tr><td class='end_date'>" + t('end_date') + "</td><td><input type='text' id='" + dendId + "' autocomplete='off' readonly></td><td></td></tr>";
 
 	timeTable += "</table>";
 
