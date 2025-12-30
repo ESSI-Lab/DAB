@@ -3,12 +3,14 @@ package eu.essi_lab.gssrv.rest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.UUID;
 
 /*-
  * #%L
@@ -60,9 +62,19 @@ import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Profile;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Target;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.messages.AccessMessage;
+import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.RequestMessage.IterationMode;
+import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
+import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.ResourcePropertyBond;
+import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.stats.ComputationResult;
 import eu.essi_lab.messages.stats.ResponseItem;
@@ -75,12 +87,25 @@ import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.index.jaxb.CardinalValues;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.model.resource.data.CRS;
+import eu.essi_lab.model.resource.data.DataDescriptor;
+import eu.essi_lab.model.resource.data.DataFormat;
+import eu.essi_lab.model.resource.data.DataObject;
+import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.semantic.Stats;
+import eu.essi_lab.request.executor.IAccessExecutor;
+import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.request.executor.IStatisticsExecutor;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.IOUtils;
 import org.owasp.encoder.*;
 
 @WebService
@@ -280,6 +305,139 @@ public class SupportService {
 	    }
 	}
 	return frequencies;
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_XML })
+    @Path("/rating-curves")
+    public Response getRatingCurves(//
+	    @QueryParam("platformId") String platformId, //
+	    @QueryParam("view") String viewId, //
+	    @QueryParam("token") String token) { //
+
+	if (platformId == null || platformId.isEmpty()) {
+	    return Response.serverError().entity(getErrorResponse("platformId parameter is required").toString()).build();
+	}
+
+	try {
+	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
+	    IDiscoveryExecutor executor = loader.iterator().next();
+
+	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+	    discoveryMessage.setRequestId("rating-curves-" + UUID.randomUUID().toString());
+
+	    discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
+	    discoveryMessage.getResourceSelector().setSubset(ResourceSubset.CORE_EXTENDED);
+	    discoveryMessage.setPage(new Page(1, 100));
+	    discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
+	    discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+
+	    Set<Bond> operands = new HashSet<>();
+
+	    // Filter for downloadable datasets
+	    ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
+	    operands.add(accessBond);
+
+	    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
+	    operands.add(downBond);
+
+	    // Filter for RATING_CURVE data type
+	    ResourcePropertyBond ratingCurveBond = BondFactory.createIsRatingCurveBond(true);
+	    operands.add(ratingCurveBond);
+
+	    // Filter by platform identifier
+	    SimpleValueBond platformBond = BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, //
+		    platformId);
+	    operands.add(platformBond);
+
+	    Bond bond = null;
+	    switch (operands.size()) {
+	    case 0:
+		break;
+	    case 1:
+		bond = operands.iterator().next();
+		break;
+	    default:
+		bond = BondFactory.createAndBond(operands);
+	    }
+
+	    // Set view if provided
+	    if (viewId != null && !viewId.isEmpty()) {
+		try {
+		    View view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId).get();
+		    discoveryMessage.setView(view);
+		} catch (GSException e) {
+		    GSLoggerFactory.getLogger(getClass()).warn("View not found: " + viewId, e);
+		}
+	    }
+
+	    discoveryMessage.setPermittedBond(bond);
+	    discoveryMessage.setUserBond(bond);
+	    discoveryMessage.setNormalizedBond(bond);
+
+	    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
+	    List<GSResource> resources = resultSet.getResultsList();
+
+	    if (resources.isEmpty()) {
+		return Response.serverError().entity(getErrorResponse("No rating curves found for platform: " + platformId).toString())
+			.build();
+	    }
+
+	    // Perform access request for the first rating curve found
+	    GSResource resource = resources.get(0);
+	    String onlineId = resource.getHarmonizedMetadata().getCoreMetadata().getOnline().getIdentifier();
+	    
+	    if (onlineId == null || onlineId.isEmpty()) {
+		return Response.serverError().entity(getErrorResponse("Online ID not found for rating curve").toString()).build();
+	    }
+
+	    // Execute access request
+	    ServiceLoader<IAccessExecutor> accessLoader = ServiceLoader.load(IAccessExecutor.class);
+	    IAccessExecutor accessExecutor = accessLoader.iterator().next();
+
+	    AccessMessage accessMessage = new AccessMessage();
+	    accessMessage.setOnlineId(onlineId);
+	    accessMessage.setSources(discoveryMessage.getSources());
+	    accessMessage.setCurrentUser(discoveryMessage.getCurrentUser().orElse(null));
+	    accessMessage.setDataBaseURI(discoveryMessage.getDataBaseURI());
+
+	    DataDescriptor descriptor = new DataDescriptor();
+	    descriptor.setDataFormat(DataFormat.WATERML_2_0());
+	    descriptor.setDataType(DataType.RATING_CURVE);
+	    descriptor.setCRS(CRS.EPSG_4326());
+	    accessMessage.setTargetDataDescriptor(descriptor);
+
+	    ResultSet<DataObject> accessResult = accessExecutor.retrieve(accessMessage);
+
+	    if (accessResult.getResultsList().isEmpty()) {
+		return Response.serverError().entity(getErrorResponse("Unable to retrieve rating curve data").toString()).build();
+	    }
+
+	    DataObject dataObject = accessResult.getResultsList().get(0);
+	    File dataFile = dataObject.getFile();
+
+	    // Read the XML file content
+	    String xmlContent;
+	    try (FileInputStream stream = new FileInputStream(dataFile)) {
+		xmlContent = IOUtils.toString(stream, StandardCharsets.UTF_8);
+		stream.close();
+		dataFile.delete();
+	    } catch (IOException e) {
+		GSLoggerFactory.getLogger(getClass()).error("Error reading rating curve file", e);
+		return Response.serverError().entity(getErrorResponse("Error reading rating curve data: " + e.getMessage()).toString())
+			.build();
+	    }
+
+	    return Response.ok(xmlContent, MediaType.APPLICATION_XML).build();
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Error retrieving rating curves", e);
+	    return Response.serverError().entity(getErrorResponse("Error retrieving rating curves: " + e.getMessage()).toString())
+		    .build();
+	}
     }
 
     @GET

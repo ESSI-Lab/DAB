@@ -5,8 +5,9 @@
   "beta-message": "The platform is still under development and will be progressively improved during 2026. Release 1: December 2025",
   "tf-source": "Source",
   "tf-organisationName": "Organisation",
-  "tf-attributeTitle": "Observed property",
-  "tf-attributeURI": "Observed property URI",
+  "tf-attributeTitle": "Local observed property",
+  "tf-attributeURI": "Harmonized observed property",
+  "tf-observedPropertyURI": "Harmonized observed property",
   "tf-platformTitle": "Station",
   "tf-instrumentTitle": "Instrument"
 }

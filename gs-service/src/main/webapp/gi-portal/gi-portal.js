@@ -1089,9 +1089,13 @@ export function initializePortal(config) {
 					jQuery('#paginator-widget').css('display', 'none');
 				}
 
-				// refreshes the filters accordion 
+				// refreshes the filters accordion (only if it's initialized)
 				if (ui.newPanel.selector === '#filters-tab') {
-					jQuery('#filters-tab').accordion('refresh');
+					var $filtersTab = jQuery('#filters-tab');
+					// Check if accordion is initialized before trying to refresh
+					if ($filtersTab.hasClass('ui-accordion')) {
+						$filtersTab.accordion('refresh');
+					}
 				}
 			}
 		});
@@ -1180,40 +1184,51 @@ export function initializePortal(config) {
 				rightSection.className = 'portal-header-right';
 				
 				if (config['logo-right']) {
-					const rightLogoImg = document.createElement('img');
-					rightLogoImg.className = 'portal-header-logo-right';
-					rightLogoImg.alt = 'Right logo';
-					// Use path as-is if relative, or full URL if absolute
-					const rightLogoSrc = config['logo-right'].startsWith('http') ? config['logo-right'] : config['logo-right'];
-					
-					// Function to recalculate position
-					const recalculatePosition = function() {
-						setTimeout(function() {
-							if (window.positionTabsCallback) {
-								window.positionTabsCallback();
+					// Support multiple comma-separated logos in "logo-right"
+					const rightLogos = String(config['logo-right'])
+						.split(',')
+						.map(function(item) { return item.trim(); })
+						.filter(function(item) { return item.length > 0; });
+
+					if (rightLogos.length > 0) {
+						// Function to recalculate position
+						const recalculatePosition = function() {
+							setTimeout(function() {
+								if (window.positionTabsCallback) {
+									window.positionTabsCallback();
+								}
+							}, 10);
+						};
+
+						rightLogos.forEach(function(logoSrc) {
+							const rightLogoImg = document.createElement('img');
+							rightLogoImg.className = 'portal-header-logo-right';
+							rightLogoImg.alt = 'Right logo';
+
+							// Use path as-is if relative, or full URL if absolute
+							const rightLogoSrc = logoSrc.startsWith('http') ? logoSrc : logoSrc;
+
+							// Add load listener to recalculate position when image loads
+							rightLogoImg.addEventListener('load', recalculatePosition);
+							// Also handle errors (image fails to load)
+							rightLogoImg.addEventListener('error', recalculatePosition);
+
+							// Add click handler if href is provided
+							if (config['logo-right-href']) {
+								rightLogoImg.style.cursor = 'pointer';
+								rightLogoImg.addEventListener('click', function() {
+									window.open(config['logo-right-href'], '_blank', 'noopener,noreferrer');
+								});
 							}
-						}, 10);
-					};
-					
-					// Add load listener to recalculate position when image loads
-					rightLogoImg.addEventListener('load', recalculatePosition);
-					// Also handle errors (image fails to load)
-					rightLogoImg.addEventListener('error', recalculatePosition);
-					
-					// Add click handler if href is provided
-					if (config['logo-right-href']) {
-						rightLogoImg.style.cursor = 'pointer';
-						rightLogoImg.addEventListener('click', function() {
-							window.open(config['logo-right-href'], '_blank', 'noopener,noreferrer');
+
+							rightLogoImg.src = rightLogoSrc;
+							rightSection.appendChild(rightLogoImg);
+
+							// If image is already loaded (cached), trigger recalculation
+							if (rightLogoImg.complete) {
+								recalculatePosition();
+							}
 						});
-					}
-					
-					rightLogoImg.src = rightLogoSrc;
-					rightSection.appendChild(rightLogoImg);
-					
-					// If image is already loaded (cached), trigger recalculation
-					if (rightLogoImg.complete) {
-						recalculatePosition();
 					}
 				}
 				

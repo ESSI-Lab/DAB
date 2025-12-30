@@ -166,6 +166,7 @@ body {
 	flex: 1;
 	min-width: 0;
 	word-wrap: break-word;
+	white-space: pre-line;
 }
 
 .portal-header-title-right {
@@ -176,6 +177,7 @@ body {
 	min-width: 0;
 	word-wrap: break-word;
 	max-width: 100%;
+	white-space: pre-line;
 }
 
 #headerDiv {

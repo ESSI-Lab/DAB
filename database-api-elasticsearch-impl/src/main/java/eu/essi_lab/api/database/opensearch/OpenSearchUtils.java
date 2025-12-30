@@ -53,6 +53,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
+import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonpSerializable;
@@ -158,7 +160,15 @@ public class OpenSearchUtils {
 
 		TermFrequencyItem item = new TermFrequencyItem();
 		item.setTerm(term);
-		item.setDecodedTerm(term);
+		String decoded = term;
+		if (term.startsWith("http://his-central-ontology.geodab.eu/hydro-ontology")){
+		    HISCentralOntology ontology = new HISCentralOntology();
+		    SKOSConcept concept = ontology.getConcept(term);
+		    if (concept!=null){
+			decoded = concept.getPreferredLabel().getKey();
+		    }
+		}
+		item.setDecodedTerm(decoded);
 		item.setFreq(count);
 		item.setLabel(target);
 

@@ -36,6 +36,7 @@
   "latitude": "latitudine",
   "longitude": "longitudine",
   "elevation": "quota",
+  "elevation_unit": "m s.l.m.",
   "at_station": "alla stazione:",
   "time": "Tempo",
   "please_select_data_format": "Seleziona il formato dei dati",

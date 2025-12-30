@@ -5,8 +5,9 @@
     "beta-message" : "La piattaforma è tuttora in fase di sviluppo e sarà progressivamente perfezionata nel corso del 2026. Release 1: dicembre 2025",
     "tf-source": "Sorgente",
     "tf-organisationName": "Organizzazione",
-    "tf-attributeTitle": "Proprietà osservata",
-    "tf-attributeURI": "URI proprietà osservata",
+    "tf-attributeTitle": "Parametro locale",
+    "tf-attributeURI": "Parametro armonizzato",
+    "tf-observedPropertyURI": "Parametro armonizzato",
     "tf-platformTitle": "Stazione",
     "tf-instrumentTitle": "Strumento"
 }

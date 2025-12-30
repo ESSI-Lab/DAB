@@ -1095,10 +1095,10 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 	var alt = findValue(data, 0, 'vertical_extent');
 
 	
-	var geoLocation = "latitude: " + lat + "°<br/> longitude: " + lon + "°";
+	var geoLocation = t('latitude') + ": " + lat + "°<br/> " + t('longitude') + ": " + lon + "°";
 	
 	if (alt!=null && alt!= undefined){
-		geoLocation +="<br/> elevation: "+alt+" m";
+		geoLocation +="<br/> " + t('elevation') + ": "+alt+" " + t('elevation_unit');
 	}
 
 	const pointerCoordinates = ol.proj.fromLonLat([lon, lat]);
@@ -1161,7 +1161,29 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 
 	document.getElementById('geolocation-td').innerHTML = geoLocation;
 
-
+	// Fetch rating curves for this platform
+	var platformId = findValue(data, 0, 'platform_id');
+	if (platformId) {
+		// Extract view from URL if available, or use default
+		var viewId = 'his-central'; // default
+		var pathSegments = window.location.pathname.split('/');
+		var viewIndex = pathSegments.indexOf('view');
+		if (viewIndex !== -1 && viewIndex + 1 < pathSegments.length) {
+			viewId = pathSegments[viewIndex + 1];
+		}
+		
+		// Construct the rating curves endpoint URL
+		var ratingCurvesUrl = '/gs-service/services/support/rating-curves?platformId=' + encodeURIComponent(platformId) + '&view=' + encodeURIComponent(viewId);
+		
+		$.getJSON(ratingCurvesUrl, function(ratingCurvesData) {
+			console.log('Rating curves loaded:', ratingCurvesData);
+			// TODO: Process rating curves data and display them
+			// For now, just log the data - graphical part will be added later
+		}).fail(function(jqXHR, textStatus, errorThrown) {
+			console.log('No rating curves found or error loading rating curves:', textStatus, errorThrown);
+			// It's okay if there are no rating curves - not all stations have them
+		});
+	}
 
 	for (var x = 0, len = data.length; x < len; x++) {
 

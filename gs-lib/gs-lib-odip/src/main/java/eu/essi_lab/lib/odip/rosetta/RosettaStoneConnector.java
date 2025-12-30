@@ -36,6 +36,7 @@ import org.apache.jena.query.ResultSet;
 import com.google.common.collect.Lists;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import org.apache.jena.rdfconnection.RDFConnectionFactory;
 
 public class RosettaStoneConnector extends RosettaStone {
 
@@ -156,7 +157,9 @@ public class RosettaStoneConnector extends RosettaStone {
 	Set<String> ret = new TreeSet<String>();
 
 	Query query = QueryFactory.create(queryString);
-	QueryExecution qexec = QueryExecutionFactory.sparqlService("http://vocab.nerc.ac.uk/sparql/sparql", query);
+
+	QueryExecution qexec = 	RDFConnectionFactory.connect("http://vocab.nerc.ac.uk/sparql/sparql").query(query);
+//	QueryExecution qexec = QueryExecutionFactory.sparqlService("http://vocab.nerc.ac.uk/sparql/sparql", query);
 	// QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", query);
 
 	ResultSet results = null;
