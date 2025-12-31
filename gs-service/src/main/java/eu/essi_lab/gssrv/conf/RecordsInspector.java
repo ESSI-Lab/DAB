@@ -3,8 +3,7 @@
  */
 package eu.essi_lab.gssrv.conf;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 /*-
  * #%L
@@ -27,7 +26,6 @@ import java.util.HashMap;
  * #L%
  */
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.UI;
@@ -191,7 +189,7 @@ public class RecordsInspector {
      */
     private void update(VerticalLayout verticalLayout) {
 
-	final List<GridData> sdList = new ArrayList<>();
+	final List<GridData> sdList = Collections.synchronizedList(new ArrayList<>());
 
 	Database db = getDatabase();
 
