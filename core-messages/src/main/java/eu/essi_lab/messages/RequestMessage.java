@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import eu.essi_lab.configuration.*;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSProperty;
@@ -114,7 +115,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 	setException(GSException.createException());
 	setSources(new ArrayList<>());
 	setOutputSources(false);
-	setUseCachedSourcesDataFolderMap(true);
+	setUseCachedSourcesDataFolderMap(ExecutionMode.get() != ExecutionMode.MIXED);
 	setIncludeWeightedQueries(false);
 
 	requestId = UUID.randomUUID().toString();
