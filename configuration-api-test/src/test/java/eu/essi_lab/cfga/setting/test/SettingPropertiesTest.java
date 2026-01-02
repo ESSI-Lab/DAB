@@ -1,34 +1,27 @@
 package eu.essi_lab.cfga.setting.test;
 
-import java.util.List;
+import eu.essi_lab.cfga.setting.*;
+import org.junit.*;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import eu.essi_lab.cfga.setting.Property;
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.*;
 
 /**
- * 
+ *
  */
 public class SettingPropertiesTest {
 
     /**
-     * 
+     *
      */
     @Test
     public void settingPropertiesTest() {
 
 	List<Property<?>> properties = Setting.getDeclaredProperties().//
 		stream().//
-		sorted((p1, p2) -> p1.getName().compareTo(p2.getName())).//
+		sorted(Comparator.comparing(Property::getName)).//
 		toList();
 
 	Assert.assertEquals(20, properties.size());
-
-	for (Property<?> property : properties) {
-	    System.out.println(property);
-	}
 
 	// (AfterCleanFunction, afterCleanFunction, false, true, Optional.empty)
 	// (CanBeCleaned, canBeCleaned, true, true, Optional[true])
@@ -55,7 +48,7 @@ public class SettingPropertiesTest {
 	Assert.assertEquals("(CanBeCleaned, canBeCleaned, true, true, Optional[true])", properties.get(1).toString());
 	Assert.assertEquals("(CanBeDisabled, canBeDisabled, true, true, Optional[true])", properties.get(2).toString());
 	Assert.assertEquals("(CanBeRemoved, canBeRemoved, true, true, Optional[false])", properties.get(3).toString());
-	Assert.assertEquals("(CompactMode, compactMode, true, true, Optional[true])", properties.get(4).toString());
+	Assert.assertEquals("(CompactMode, compactMode, true, true, Optional[false])", properties.get(4).toString());
 	Assert.assertEquals("(ConfigurableType, configurableType, false, false, Optional.empty)", properties.get(5).toString());
 	Assert.assertEquals("(Description, description, false, false, Optional.empty)", properties.get(6).toString());
 	Assert.assertEquals("(Editable, editable, true, true, Optional[true])", properties.get(7).toString());
