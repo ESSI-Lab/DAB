@@ -42,7 +42,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
     /**
      *
      */
-    public static final Property<Boolean> COMPACT_MODE = Property.of("CompactMode", "compactMode", true, Optional.of(true)); //
+    public static final Property<Boolean> COMPACT_MODE = Property.of("CompactMode", "compactMode", true, Optional.of(false)); //
     /**
      *
      */
