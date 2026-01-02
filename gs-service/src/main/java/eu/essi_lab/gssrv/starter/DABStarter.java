@@ -512,52 +512,6 @@ public class DABStarter {
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
 
-	    // ------------------------------------------------------------------
-	    //
-	    // - eu.essi_lab.cfga.gs.setting.OntologySetting patch
-	    //
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Legacy Ontology setting patch STARTED");
-
-	    ReplacePropertyPatch ontologySettingPatch = ReplacePropertyPatch.of(//
-		    configuration, //
-		    Setting.SETTING_CLASS, //
-		    "eu.essi_lab.cfga.gs.setting.OntologySetting", //
-		    "eu.essi_lab.cfga.gs.setting.ontology.OntologySetting");//
-
-	    ontologySettingPatch.patch();
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Legacy Ontology setting patch ENDED");
-
-	    // ------------------------------------------------------------------
-	    //
-	    // - Setting.EXTENSION patch
-	    //
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Setting.EXTENSION patch STARTED");
-
-	    RemovePropertyPatch extensionPatch = RemovePropertyPatch.of(configuration, Setting.EXTENSION);
-
-	    extensionPatch.patch();
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Setting.EXTENSION patch ENDED");
-
-	    // ------------------------------------------------------------------
-	    //
-	    // - DefaultSemanticSearchSetting patch
-	    //
-
-	    GSLoggerFactory.getLogger(getClass()).debug("DefaultSemanticSearchSetting move patch STARTED");
-
-	    MoveSettingPatch moveSettingPatch = MoveSettingPatch.of(configuration, //
-		    DefaultSemanticSearchSetting.class, //
-		    SingletonSettingsId.DEFAULT_SEMANTIC_SEARCH_SETTING.getLabel(), //
-		    configuration.get(SingletonSettingsId.SYSTEM_SETTING.getLabel()).get());
-
-	    moveSettingPatch.patch();
-
-	    GSLoggerFactory.getLogger(getClass()).debug("DefaultSemanticSearchSetting move patch ENDED");
-
 	    //
 	    //
 	    // ---------------------------------------------------------------
