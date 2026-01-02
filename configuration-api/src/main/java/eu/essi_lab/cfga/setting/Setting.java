@@ -251,7 +251,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public void setSelected(boolean selected) {
 
-	setProperty(SELECTED.getKey(), selected, false);
+	setProperty(SELECTED.getKey(), selected, SELECTED.getDefaultValue().get());
     }
 
     /**
@@ -261,7 +261,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public boolean isSelected() {
 
-	return isPropertySet(SELECTED.getKey(), false);
+	return isPropertySet(SELECTED.getKey(), SELECTED.getDefaultValue().get());
     }
 
     /**

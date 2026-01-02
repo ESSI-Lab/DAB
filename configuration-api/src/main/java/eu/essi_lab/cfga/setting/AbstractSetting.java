@@ -190,7 +190,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void enableCompactMode(boolean set) {
 
-	setProperty(COMPACT_MODE.getKey(), set, true);
+	setProperty(COMPACT_MODE.getKey(), set, COMPACT_MODE.getDefaultValue().get());
     }
 
     /**
@@ -198,7 +198,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean isCompactModeEnabled() {
 
-	return isPropertySet(COMPACT_MODE.getKey(), true);
+	return isPropertySet(COMPACT_MODE.getKey(), COMPACT_MODE.getDefaultValue().get());
     }
 
     /**
@@ -207,7 +207,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void enableFoldedMode(boolean set) {
 
-	setProperty(FOLDED_MODE.getKey(), set, false);
+	setProperty(FOLDED_MODE.getKey(), set, FOLDED_MODE.getDefaultValue().get());
     }
 
     /**
@@ -215,7 +215,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean isFoldedModeEnabled() {
 
-	return isPropertySet(FOLDED_MODE.getKey(), false);
+	return isPropertySet(FOLDED_MODE.getKey(), FOLDED_MODE.getDefaultValue().get());
     }
 
     /**
@@ -225,7 +225,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setCanBeRemoved(boolean canBeRemoved) {
 
-	setProperty(CAN_BE_REMOVED.getKey(), canBeRemoved, false);
+	setProperty(CAN_BE_REMOVED.getKey(), canBeRemoved, CAN_BE_REMOVED.getDefaultValue().get());
     }
 
     /**
@@ -233,7 +233,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean canBeRemoved() {
 
-	return isPropertySet(CAN_BE_REMOVED.getKey(), false);
+	return isPropertySet(CAN_BE_REMOVED.getKey(), CAN_BE_REMOVED.getDefaultValue().get());
     }
 
     /**
@@ -241,7 +241,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setCanBeCleaned(boolean canBeCleaned) {
 
-	setProperty(CAN_BE_CLEANED.getKey(), canBeCleaned, true);
+	setProperty(CAN_BE_CLEANED.getKey(), canBeCleaned, CAN_BE_CLEANED.getDefaultValue().get());
     }
 
     /**
@@ -249,7 +249,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean canBeCleaned() {
 
-	return isPropertySet(CAN_BE_CLEANED.getKey(), true);
+	return isPropertySet(CAN_BE_CLEANED.getKey(), CAN_BE_CLEANED.getDefaultValue().get());
     }
 
     /**
@@ -257,7 +257,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setShowHeader(boolean showHeader) {
 
-	setProperty(SHOW_HEADER.getKey(), showHeader, true);
+	setProperty(SHOW_HEADER.getKey(), showHeader, SHOW_HEADER.getDefaultValue().get());
     }
 
     /**
@@ -265,7 +265,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean isShowHeaderSet() {
 
-	return isPropertySet(SHOW_HEADER.getKey(), true);
+	return isPropertySet(SHOW_HEADER.getKey(), SHOW_HEADER.getDefaultValue().get());
     }
 
     /**
