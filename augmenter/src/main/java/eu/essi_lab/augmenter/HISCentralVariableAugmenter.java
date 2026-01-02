@@ -1,10 +1,12 @@
 package eu.essi_lab.augmenter;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -109,6 +111,49 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
     public List<SKOSConcept> getConcepts(String variable) {
 	HydroOntology ontology = new HISCentralOntology();
 	List<SKOSConcept> ret = ontology.findConcepts(variable, false,true);
+	List<SKOSConcept> toRemove = new ArrayList<SKOSConcept>();
+	List<SKOSConcept> toAdd = new ArrayList<SKOSConcept>();
+	for (SKOSConcept concept : ret) {
+	    switch (concept.getURI()) {
+
+		
+		
+	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/3": // level
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/11")); // level, stream 
+		break;
+	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/3b": // water level
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/11")); // level, stream 
+		break;
+	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/40": // temperature
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/49")); // temperature, air 
+		break;
+	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/132": // humidity
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/133")); // relative humidity
+		break;		
+	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/52": // pressure
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/55")); // atmospheric pressure
+		break;
+	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/53": // air pressure
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/55")); // atmospheric pressure
+		break;
+	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/6": // snow level
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/9")); // snow depth
+		break;
+
+		
+	    default:
+		break;
+	    }
+	}
+	ret.removeAll(toRemove);
+	ret.addAll(toAdd);
 	return ret;
     }
 
