@@ -281,11 +281,12 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	// computes the grid height
 
+	// no columns header / legends viewer and no tab sheet
 	int _offset = ComponentFactory.MIN_HEIGHT_OFFSET;
 
 	if ((gridInfo.isShowColumnsHider() || legendsViewer)) {
 
-	    _offset = !withTabSheet ? 400 : 460;
+	    _offset = !withTabSheet ? ComponentFactory.MIN_HEIGHT_OFFSET + 30 : ComponentFactory.MIN_HEIGHT_OFFSET + 90;
 	}
 
 	final int offset = _offset;

@@ -352,6 +352,12 @@ public class TabContent extends VerticalLayout implements Renderable {
 	    // settings list
 	    //
 
+	    Div div = ComponentFactory.createDiv();
+	    div.setHeightFull();
+	    div.setWidthFull();
+	    div.getStyle().set("overflow","auto");
+	    add(div);
+
 	    for (int i = 0; i < settings.size(); i++) {
 
 		Setting setting = settings.get(i);
@@ -372,11 +378,13 @@ public class TabContent extends VerticalLayout implements Renderable {
 			details.getStyle().set("margin-top", "15px");
 		    }
 
-		    this.add(details);
+		    div.add(details);
 
 		} else {
 
-		    this.add(component);
+		    component.setWidth("99%");
+
+		    div.add(component);
 		}
 	    }
 	}

@@ -45,7 +45,7 @@ public class ComponentFactory {
     /**
      *
      */
-    public static final int MIN_HEIGHT_OFFSET = 370;
+    public static final int MIN_HEIGHT_OFFSET = 330;
 
     /**
      * @param id
