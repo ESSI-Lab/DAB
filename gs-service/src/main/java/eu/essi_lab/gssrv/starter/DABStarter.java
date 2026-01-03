@@ -512,6 +512,19 @@ public class DABStarter {
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
 
+	    // ------------------------------------------------------------------
+	    //
+	    // - Setting.COMPACT_MODE = false patch
+	    //
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Setting.COMPACT_MODE = false patch STARTED");
+
+	    RemovePropertyPatch patch = RemovePropertyPatch.of(configuration, Setting.COMPACT_MODE, false);
+
+	    patch.patch();
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Setting.COMPACT_MODE = false patch ENDED");
+
 	    //
 	    //
 	    // ---------------------------------------------------------------
