@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.bndmet.download;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,14 +32,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.ObjectFactory;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
-import org.cuahsi.waterml._1.essi.JAXBWML;
 
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
@@ -52,7 +49,7 @@ import eu.essi_lab.accessor.bndmet.model.BNDMETParameter;
 import eu.essi_lab.accessor.bndmet.model.BNDMETParameter.BNDMET_Parameter_Code;
 import eu.essi_lab.accessor.bndmet.model.BNDMETStation;
 import eu.essi_lab.accessor.bndmet.model.BNDMETStation.BNDMET_Station_Code;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -99,7 +96,7 @@ public class BNDMETDownloader extends WMLDataDownloader {
 
     @Override
     public boolean canDownload() {
-	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocols.BNDMET.getCommonURN()));
+	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocolWrapper.BNDMET.getCommonURN()));
     }
 
     @Override

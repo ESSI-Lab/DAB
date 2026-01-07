@@ -38,16 +38,36 @@ function loadI18nSync(lang) {
 		}
 		return {};
 	}
-	var enCandidates = [
-		'../gi-portal/lang/en.json'
-	];
-	var itCandidates = [
-		'../gi-portal/lang/it.json'
-	];
-	i18n.en = loadJsonSync(enCandidates);
-	if (i18n.current === 'it') {
-		i18n.it = loadJsonSync(itCandidates);
+
+	// Base translations shipped with the portal (resolved relative to this module)
+	var baseEnUrl = '';
+	var baseItUrl = '';
+	try {
+		baseEnUrl = new URL('./lang/en.json', import.meta.url).toString();
+		baseItUrl = new URL('./lang/it.json', import.meta.url).toString();
+	} catch (e) {
+		// Fallback (works when portal is hosted as /<portal>/search.html and gi-portal is a sibling dir)
+		baseEnUrl = '../gi-portal/lang/en.json';
+		baseItUrl = '../gi-portal/lang/it.json';
 	}
+
+	// Optional portal-local overrides (e.g. /hisc/en.json, /hisc/it.json)
+	// These should override the base translations when present.
+	var localEnUrl = './en.json';
+	var localItUrl = './it.json';
+	try {
+		localEnUrl = new URL('./en.json', window.location.href).toString();
+		localItUrl = new URL('./it.json', window.location.href).toString();
+	} catch (e) { }
+
+	var baseEn = loadJsonSync([baseEnUrl, '../gi-portal/lang/en.json']);
+	var baseIt = loadJsonSync([baseItUrl, '../gi-portal/lang/it.json']);
+	var overrideEn = loadJsonSync([localEnUrl, './en.json']);
+	var overrideIt = loadJsonSync([localItUrl, './it.json']);
+
+	// Merge base + overrides (overrides win)
+	i18n.en = Object.assign({}, baseEn, overrideEn);
+	i18n.it = Object.assign({}, baseIt, overrideIt);
 }
 function interpolate(template, vars) {
 	if (!template || !vars) return template;
@@ -68,6 +88,42 @@ try { window.__t = t; } catch (e) { }
 
 try { window.__lang = lang; } catch (e) { }
 
+function openLanguageChooser() {
+	try {
+		const dialogDiv = $('<div>');
+		dialogDiv.append($('<div>').text(t('choose_language')).css({ 'margin-bottom': '10px' }));
+		const current = i18n.current || 'en';
+		const enOpt = $('<div>');
+		enOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_en', value: 'en', checked: (current === 'en') }));
+		enOpt.append($('<label>').attr('for', 'lang_en').text(t('language_en')).css({ 'margin-left': '6px' }));
+		const itOpt = $('<div>');
+		itOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_it', value: 'it', checked: (current === 'it') }));
+		itOpt.append($('<label>').attr('for', 'lang_it').text(t('language_it')).css({ 'margin-left': '6px' }));
+		dialogDiv.append(enOpt).append(itOpt);
+		dialogDiv.dialog({
+			title: t('change_language_title'),
+			modal: true,
+			width: 360,
+			buttons: [
+				{
+					text: 'OK', click: function() {
+						const sel = dialogDiv.find('input[name="langSel"]:checked').val() || 'en';
+						localStorage.setItem('lang', sel);
+						$(this).dialog('close');
+						window.location.reload();
+					}
+				},
+				{ text: 'Cancel', click: function() { $(this).dialog('close'); } }
+			]
+		});
+	} catch (e) {
+		// Fallback: just toggle en/it and reload
+		const next = (i18n.current === 'it') ? 'en' : 'it';
+		try { localStorage.setItem('lang', next); } catch (ex) { }
+		window.location.reload();
+	}
+}
+
 
 function initializeLogin(config) {
 	if (!config.login) {
@@ -77,29 +133,65 @@ function initializeLogin(config) {
 	// Create and append login elements
 	const loginContainer = document.createElement('div');
 	loginContainer.className = 'login-container';
+	const curLang = (i18n.current || 'en').toUpperCase();
 	loginContainer.innerHTML = `
 		<button id=\"loginBtn\" class=\"login-button\">${t('login')}</button>
 		<button id=\"logoutBtn\" class=\"login-button\" style=\"display: none;\">${t('logout')}</button>
-		<div id=\"loginModal\" class=\"login-modal\">
+		<button id=\"langBtn\" class=\"login-button lang-button\" title=\"${t('menu_change_language')}\">${curLang}</button>
+	`;
+
+	// Append login container to headerDiv instead of body
+	const headerDiv = document.getElementById('headerDiv');
+	if (headerDiv) {
+		headerDiv.appendChild(loginContainer);
+	} else {
+		document.body.insertBefore(loginContainer, document.body.firstChild);
+	}
+
+	// IMPORTANT: Append modal + overlay to <body> so they are fixed to the viewport.
+	// If they were inside a transformed ancestor (e.g. the header login container),
+	// position:fixed would behave like position:absolute and could overflow the window.
+	const existingModal = document.getElementById('loginModal');
+	const existingOverlay = document.getElementById('modalOverlay');
+	if (!existingModal) {
+		const loginModal = document.createElement('div');
+		loginModal.id = 'loginModal';
+		loginModal.className = 'login-modal';
+		loginModal.innerHTML = `
+			<button type="button" class="login-modal-close" aria-label="Close">×</button>
 			<h3>${t('login_to_portal', { title: (config.title || 'Portal') })}</h3>
 			<p class=\"login-info\">${t('login_info')}</p>
 			<input type=\"email\" id=\"email\" placeholder=\"${t('email_placeholder')}\" autocomplete=\"off\">
 			<input type=\"password\" id=\"apiKey\" placeholder=\"${t('api_key_placeholder')}\" autocomplete=\"off\">
 			<button id=\"submitLogin\">${t('login_submit')}</button>
-		</div>
-		<div id=\"modalOverlay\" class=\"modal-overlay\"></div>
-	`;
-
-	document.body.insertBefore(loginContainer, document.body.firstChild);
+		`;
+		document.body.appendChild(loginModal);
+	}
+	if (!existingOverlay) {
+		const modalOverlay = document.createElement('div');
+		modalOverlay.id = 'modalOverlay';
+		modalOverlay.className = 'modal-overlay';
+		document.body.appendChild(modalOverlay);
+	}
 
 	// Setup event listeners
 	const loginBtn = document.getElementById('loginBtn');
 	let logoutBtn = document.getElementById('logoutBtn');
+	const langBtn = document.getElementById('langBtn');
 	const loginModal = document.getElementById('loginModal');
 	const modalOverlay = document.getElementById('modalOverlay');
 	const submitLogin = document.getElementById('submitLogin');
 	const emailInput = document.getElementById('email');
 	const apiKeyInput = document.getElementById('apiKey');
+	const closeBtn = loginModal ? loginModal.querySelector('.login-modal-close') : null;
+
+	// Always-visible language chooser button (also for non-logged users)
+	if (langBtn) {
+		langBtn.addEventListener('click', function(e) {
+			e.preventDefault();
+			openLanguageChooser();
+		});
+	}
 
 	// Show modal
 	loginBtn.addEventListener('click', function() {
@@ -122,13 +214,32 @@ function initializeLogin(config) {
 		window.location.reload();
 	});
 
-	// Hide modal when clicking outside
-	modalOverlay.addEventListener('click', function() {
+	function closeLoginModal() {
 		loginModal.style.display = 'none';
 		modalOverlay.style.display = 'none';
 		// Clear inputs when closing modal
 		emailInput.value = '';
 		apiKeyInput.value = '';
+	}
+
+	// Close modal using the X button
+	if (closeBtn) {
+		closeBtn.addEventListener('click', function(e) {
+			e.preventDefault();
+			closeLoginModal();
+		});
+	}
+
+	// Hide modal when clicking outside
+	modalOverlay.addEventListener('click', function() {
+		closeLoginModal();
+	});
+
+	// Close modal with ESC key
+	document.addEventListener('keydown', function(e) {
+		if (e.key === 'Escape' && loginModal.style.display === 'block') {
+			closeLoginModal();
+		}
 	});
 
 	// Handle login submission
@@ -212,7 +323,6 @@ function initializeLogin(config) {
 			menuHtml += `<button id=\"listUsersBtn\" class=\"menu-button\">${t('menu_manage_users')}</button>\n`;
 			menuHtml += `<button id=\"dataReportBtn\" class=\"menu-button\">${t('menu_data_report')}</button>\n`;
 		}
-		menuHtml += `<button id=\"changeLangBtn\" class=\"menu-button\">${t('menu_change_language')}</button>`;
 		menuHtml += `<button id=\"logoutMenuBtn\" class=\"menu-button\">${t('menu_logout')}</button>`;
 		userMenu.innerHTML = menuHtml;
 		document.body.appendChild(userMenu);
@@ -236,37 +346,6 @@ function initializeLogin(config) {
 			if (!userMenu.contains(e.target) && e.target !== logoutBtn) {
 				userMenu.style.display = 'none';
 			}
-		});
-
-		// Add change language handler
-		document.getElementById('changeLangBtn').addEventListener('click', function() {
-			userMenu.style.display = 'none';
-			const dialogDiv = $('<div>');
-			dialogDiv.append($('<div>').text(t('choose_language')).css({ 'margin-bottom': '10px' }));
-			const current = i18n.current || 'en';
-			const enOpt = $('<div>');
-			enOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_en', value: 'en', checked: (current === 'en') }));
-			enOpt.append($('<label>').attr('for', 'lang_en').text(t('language_en')).css({ 'margin-left': '6px' }));
-			const itOpt = $('<div>');
-			itOpt.append($('<input>').attr({ type: 'radio', name: 'langSel', id: 'lang_it', value: 'it', checked: (current === 'it') }));
-			itOpt.append($('<label>').attr('for', 'lang_it').text(t('language_it')).css({ 'margin-left': '6px' }));
-			dialogDiv.append(enOpt).append(itOpt);
-			dialogDiv.dialog({
-				title: t('change_language_title'),
-				modal: true,
-				width: 360,
-				buttons: [
-					{
-						text: 'OK', click: function() {
-							const sel = dialogDiv.find('input[name="langSel"]:checked').val() || 'en';
-							localStorage.setItem('lang', sel);
-							$(this).dialog('close');
-							window.location.reload();
-						}
-					},
-					{ text: 'Cancel', click: function() { $(this).dialog('close'); } }
-				]
-			});
 		});
 
 		// Status button click handler
@@ -982,6 +1061,14 @@ export function initializePortal(config) {
 
 		var standardLogos = '<a style="display:inline-block" target=_blank href="http://api.geodab.eu/"><img style="margin-top:-3px;" src="http://api.geodab.eu/docs/assets/img/api-logo-small-2.png"></img></a><a style="display:inline-block" target=_blank href="http://www.eurogeoss.eu/"><img src="http://api.geodab.eu/docs/assets/img/eurogeoss-small.png"></img></a><a style="display:inline-block" target=_blank href="http://www.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/iia.png"></img></a><a style="display:inline-block" targ et=_blank href="http://www.uos-firenze.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/essilab.png"></img></a>';
 
+		// Results tab now flows naturally in flexbox layout, no positioning needed
+		function positionResultsTab() {
+			// Remove any margins that might create white space
+			jQuery('#results-tab').css('margin-top', '0px');
+			jQuery('#results-tab').css('margin-bottom', '0px');
+			jQuery('#results-tab').css('padding', '0px');
+		}
+
 		// init the tabs	        	
 		jQuery('#tabs-div').tabs({
 			activate: function(event, ui) {
@@ -990,14 +1077,25 @@ export function initializePortal(config) {
 				if (ui.newPanel.selector === '#results-tab') {
 
 					jQuery('#paginator-widget').css('display', 'block');
+					// Reposition results tab after paginator is shown and measured
+					// Use multiple timeouts to ensure DOM is fully updated
+					setTimeout(function() {
+						positionResultsTab();
+						// Try again after a brief delay to catch any layout changes
+						setTimeout(positionResultsTab, 50);
+					}, 10);
 
 				} else {
 					jQuery('#paginator-widget').css('display', 'none');
 				}
 
-				// refreshes the filters accordion 
+				// refreshes the filters accordion (only if it's initialized)
 				if (ui.newPanel.selector === '#filters-tab') {
-					jQuery('#filters-tab').accordion('refresh');
+					var $filtersTab = jQuery('#filters-tab');
+					// Check if accordion is initialized before trying to refresh
+					if ($filtersTab.hasClass('ui-accordion')) {
+						$filtersTab.accordion('refresh');
+					}
 				}
 			}
 		});
@@ -1007,7 +1105,147 @@ export function initializePortal(config) {
 		//
 		jQuery('#headerDiv').css('padding', '10px');
 		jQuery('#headerDiv').css('padding-top', '5px');
+		jQuery('#headerDiv').css('padding-left', '10px');
+		jQuery('#headerDiv').css('margin-left', '0px');
 		jQuery('#headerDiv').css('height', '30px');
+
+		//------------------------------------------------------------------
+		// portal header row with logos and titles (if configured)
+		//
+		if (config['logo-left'] || config['logo-right'] || config['title-left'] || config['title-right']) {
+			const headerDiv = document.getElementById('headerDiv');
+			if (headerDiv && !document.getElementById('portalHeaderRow')) {
+				const portalHeaderRow = document.createElement('div');
+				portalHeaderRow.id = 'portalHeaderRow';
+				portalHeaderRow.className = 'portal-header-row';
+
+				// Left section: logo-left + title-left
+				const leftSection = document.createElement('div');
+				leftSection.className = 'portal-header-left';
+				
+				if (config['logo-left']) {
+					// Support multiple comma-separated logos in "logo-left"
+					const leftLogos = String(config['logo-left'])
+						.split(',')
+						.map(function(item) { return item.trim(); })
+						.filter(function(item) { return item.length > 0; });
+
+					if (leftLogos.length > 0) {
+						// Function to recalculate position
+						const recalculatePosition = function() {
+							setTimeout(function() {
+								if (window.positionTabsCallback) {
+									window.positionTabsCallback();
+								}
+							}, 10);
+						};
+
+						leftLogos.forEach(function(logoSrc) {
+							const leftLogoImg = document.createElement('img');
+							leftLogoImg.className = 'portal-header-logo-left';
+							leftLogoImg.alt = 'Left logo';
+
+							// Use path as-is if relative, or full URL if absolute
+							const leftLogoSrc = logoSrc.startsWith('http') ? logoSrc : logoSrc;
+
+							// Add load listener to recalculate position when image loads
+							leftLogoImg.addEventListener('load', recalculatePosition);
+							// Also handle errors (image fails to load)
+							leftLogoImg.addEventListener('error', recalculatePosition);
+
+							// Add click handler if href is provided
+							if (config['logo-left-href']) {
+								leftLogoImg.style.cursor = 'pointer';
+								leftLogoImg.addEventListener('click', function() {
+									window.open(config['logo-left-href'], '_blank', 'noopener,noreferrer');
+								});
+							}
+
+							leftLogoImg.src = leftLogoSrc;
+							leftSection.appendChild(leftLogoImg);
+
+							// If image is already loaded (cached), trigger recalculation
+							if (leftLogoImg.complete) {
+								recalculatePosition();
+							}
+						});
+					}
+				}
+				
+				if (config['title-left']) {
+					const leftTitle = document.createElement('div');
+					leftTitle.className = 'portal-header-title-left';
+					leftTitle.textContent = config['title-left'];
+					leftSection.appendChild(leftTitle);
+				}
+
+				// Right section: logo-right + title-right
+				const rightSection = document.createElement('div');
+				rightSection.className = 'portal-header-right';
+				
+				if (config['logo-right']) {
+					// Support multiple comma-separated logos in "logo-right"
+					const rightLogos = String(config['logo-right'])
+						.split(',')
+						.map(function(item) { return item.trim(); })
+						.filter(function(item) { return item.length > 0; });
+
+					if (rightLogos.length > 0) {
+						// Function to recalculate position
+						const recalculatePosition = function() {
+							setTimeout(function() {
+								if (window.positionTabsCallback) {
+									window.positionTabsCallback();
+								}
+							}, 10);
+						};
+
+						rightLogos.forEach(function(logoSrc) {
+							const rightLogoImg = document.createElement('img');
+							rightLogoImg.className = 'portal-header-logo-right';
+							rightLogoImg.alt = 'Right logo';
+
+							// Use path as-is if relative, or full URL if absolute
+							const rightLogoSrc = logoSrc.startsWith('http') ? logoSrc : logoSrc;
+
+							// Add load listener to recalculate position when image loads
+							rightLogoImg.addEventListener('load', recalculatePosition);
+							// Also handle errors (image fails to load)
+							rightLogoImg.addEventListener('error', recalculatePosition);
+
+							// Add click handler if href is provided
+							if (config['logo-right-href']) {
+								rightLogoImg.style.cursor = 'pointer';
+								rightLogoImg.addEventListener('click', function() {
+									window.open(config['logo-right-href'], '_blank', 'noopener,noreferrer');
+								});
+							}
+
+							rightLogoImg.src = rightLogoSrc;
+							rightSection.appendChild(rightLogoImg);
+
+							// If image is already loaded (cached), trigger recalculation
+							if (rightLogoImg.complete) {
+								recalculatePosition();
+							}
+						});
+					}
+				}
+				
+				if (config['title-right']) {
+					const rightTitle = document.createElement('div');
+					rightTitle.className = 'portal-header-title-right';
+					rightTitle.textContent = config['title-right'];
+					rightSection.appendChild(rightTitle);
+				}
+
+				portalHeaderRow.appendChild(leftSection);
+				portalHeaderRow.appendChild(rightSection);
+
+				// Insert before headerDiv
+				headerDiv.parentNode.insertBefore(portalHeaderRow, headerDiv);
+			}
+		}
 
 		if (config['top-logo']) {
 			const headerDiv = document.getElementById('headerDiv');
@@ -1059,30 +1297,57 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// tabs
 		//
-		jQuery('#tabs-ul').css('width', (baseWidth + 22) + 'px');
+		// Let tabs-ul size dynamically based on content
+		jQuery('#tabs-ul').css('width', 'auto');
 		jQuery('#tabs-ul').css('height', '40px');
-		jQuery('#tabs-ul').css('margin-left', '3px');
+		jQuery('#tabs-ul').css('margin-left', '0px');
+		jQuery('#tabs-ul').css('white-space', 'nowrap');
 
-		jQuery('#tabs-div').css('top', '60px');
-		jQuery('#tabs-div').css('left', '15px');
+		// Tabs and paginator now flow naturally in the document, no positioning needed
 		jQuery('#tabs-div').css('padding', '0px');
+		// Ensure tab panels are properly contained (filters-tab will override overflow-y)
+		jQuery('#tabs-div .tabs-element').css({
+			'position': 'relative'
+		});
+		// Ensure results-tab and sources-tab don't overflow
+		jQuery('#results-tab, #sources-tab').css('overflow', 'hidden');
 
 		//------------------------------------------------------------------
 		// results tab
 		//
-		jQuery('#results-tab').css('width', (baseWidth + 31) + 'px');
-		jQuery('#results-tab').css('margin-top', '52px');
+		// Let results-tab take full width of its container
+		jQuery('#results-tab').css('width', '100%');
+		jQuery('#results-tab').css('margin-left', '0px');
 		jQuery('#results-tab-link').text(t("results_tab"));
 
-		jQuery('li[aria-controls="results-tab"').css('margin-left', '190px');
+		// Remove margin-left from results tab to center tabs
+		jQuery('li[aria-controls="results-tab"').css('margin-left', '0px');
+		// Also remove inline margin from the link
+		jQuery('#results-tab-link').css('margin-left', '0px');
 
-		var css = 'width: ' + (baseWidth + 22) + 'px';
+		// Let results layout size dynamically
+		var css = 'width: 100%;';
 		GIAPI.UI_Utils.appendStyle('.resultset-layout-ul {' + css + '}');
 
-		jQuery('#paginator-widget').css('width', (baseWidth + 30) + 'px');
+		// Let paginator take full width of its container
+		jQuery('#paginator-widget').css('width', '100%');
 		jQuery('#paginator-widget').css('height', '55px');
-		jQuery('#paginator-widget').css('top', '108px');
-		jQuery('#paginator-widget').css('left', '18px');
+		jQuery('#paginator-widget').css('padding', '0px');
+		
+		// Paginator now flows naturally in the document, no positioning needed
+		// Position results tab after a short delay to ensure layout is complete
+		setTimeout(function() {
+			positionResultsTab();
+		}, 100);
+		
+		// Reposition results tab on window resize
+		let resizeTimeout;
+		jQuery(window).on('resize', function() {
+			clearTimeout(resizeTimeout);
+			resizeTimeout = setTimeout(function() {
+				positionResultsTab();
+			}, 100);
+		});
 
 		css = 'width: 290px;';
 		css += 'margin-left:640px;';
@@ -1092,7 +1357,7 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// sources tab
 		//
-		jQuery('#sources-tab').css('width', (baseWidth + 27) + 'px');
+		jQuery('#sources-tab').css('width', '100%');
 		jQuery('#sources-tab').css('margin-top', '3px');
 		jQuery('#sources-tab').css('margin-left', '2px');
 		jQuery('#sources-tab-link').text(t("sources_tab"));
@@ -1104,15 +1369,16 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// filters tab     
 		//
-		jQuery('#filters-tab').css('width', (baseWidth + 29) + 'px');
-		jQuery('#filters-tab').css('height', '100%');
+		jQuery('#filters-tab').css('width', '100%');
 		jQuery('#filters-tab').css('margin-top', '3px');
+		jQuery('#filters-tab').css('overflow-y', 'auto');
+		jQuery('#filters-tab').css('overflow-x', 'hidden');
 		jQuery('#filters-tab-link').text(t("filters_tab"));
 
 		//------------------------------------------------------------------
 		// browse tab     
 		//
-		jQuery('#browse-tab').css('width', (baseWidth + 23) + 'px');
+		jQuery('#browse-tab').css('width', '100%');
 		jQuery('#browse-tab').css('margin-left', '3px');
 		jQuery('#browse-tab').css('margin-top', '3px');
 		jQuery('#browse-tab').css('padding-left', '5px');
@@ -1144,7 +1410,7 @@ export function initializePortal(config) {
 
 
 			'width': '100%',
-			'height': jQuery(window).height() - 70,
+			'height': '100%',
 			'markerTitle': function(node) {
 
 				return node.report().title;
@@ -1201,13 +1467,200 @@ export function initializePortal(config) {
 			'defaultLayer': config.defaultLayer
 		});
 
+		// Create a wrapper div for the main content area (left sidebar + map)
+		var contentWrapper = jQuery('<div id="main-content-wrapper"></div>');
+		contentWrapper.css({
+			'display': 'flex',
+			'flex-direction': 'row',
+			'flex': '1',
+			'min-height': '0',
+			'width': '100%'
+		});
+		
+		// Create left sidebar container
+		var leftSidebar = jQuery('<div id="left-sidebar"></div>');
+		leftSidebar.css({
+			'display': 'flex',
+			'flex-direction': 'column',
+			'flex-shrink': '0',
+			'width': '40%',
+			'min-width': '0',
+			'max-width': 'none',
+			'overflow': 'hidden'
+		});
+		
+		// Move tabs, paginator, and results tab into left sidebar (in order: tabs, paginator, results tab)
+		var tabs = jQuery('#tabs-div');
+		var paginator = jQuery('#paginator-widget');
+		var resultsTab = jQuery('#results-tab');
+		var map = jQuery('#resMapWidget');
+		var stationInfo = jQuery('#stationInfo');
+		
+		// Add tabs first (at the top)
+		if (tabs.length) {
+			tabs.css({
+				'flex-shrink': '0',
+				'width': '100%'
+			});
+			leftSidebar.append(tabs);
+		}
+		
+		// Add paginator second (below tabs)
+		if (paginator.length) {
+			paginator.css({
+				'flex-shrink': '0',
+				'width': '100%'
+			});
+			leftSidebar.append(paginator);
+		}
+		
+		// Add results tab third (below paginator)
+		if (resultsTab.length) {
+			resultsTab.css({
+				'flex': '1',
+				'min-height': '0',
+				'width': '100%',
+				'overflow-y': 'auto'
+			});
+			leftSidebar.append(resultsTab);
+		}
+		
+		// Add left sidebar to wrapper
+		contentWrapper.append(leftSidebar);
+		
+		// Add map to wrapper (takes remaining space on the right)
+		if (map.length) {
+			map.css({
+				'flex': '1',
+				'min-width': '0',
+				'pointer-events': 'auto',
+				'position': 'relative',
+				'z-index': '0'
+			});
+			contentWrapper.append(map);
 
+			// If a beta-message is configured, add a small beta badge over the map
+			// Check for beta-message and beta-title in translation keys first, then fall back to config
+			var betaMessage = (t('beta-message') !== 'beta-message' ? t('beta-message') : null) || config['beta-message'];
+			var betaTitle = (t('beta-title') !== 'beta-title' ? t('beta-title') : null) || config['beta-title'] || 'beta';
+			
+			if (betaMessage) {
+				var betaBadge = jQuery(
+					'<div class="beta-badge">' +
+						'<span>' + betaTitle + '</span>' +
+						'<i class="fa fa-info-circle" aria-hidden="true"></i>' +
+					'</div>'
+				);
+
+				var tooltipVisible = false;
+				var tooltip;
+
+				var toggleTooltip = function() {
+					if (tooltipVisible) {
+						if (tooltip) {
+							tooltip.remove();
+							tooltip = null;
+						}
+						tooltipVisible = false;
+					} else {
+						tooltip = jQuery('<div class="beta-badge-tooltip"></div>').text(betaMessage);
+						betaBadge.append(tooltip);
+						tooltipVisible = true;
+					}
+				};
+
+				betaBadge.on('click', function(event) {
+					event.stopPropagation();
+					toggleTooltip();
+				});
+
+				// Close tooltip when clicking anywhere else on the document
+				jQuery(document).on('click', function() {
+					if (tooltipVisible) {
+						toggleTooltip();
+					}
+				});
+
+				map.append(betaBadge);
+			}
+		}
+		
+		// Add station info if needed
+		if (stationInfo.length) {
+			contentWrapper.append(stationInfo);
+		}
+		
+		// Insert wrapper after header
+		jQuery('#headerDiv').after(contentWrapper);
+		
+		// Add window resize listener to update map size
+		var mapResizeTimeout;
+		var updateMapSize = function() {
+			if (GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+				// Small delay to ensure DOM has updated
+				setTimeout(function() {
+					GIAPI.search.resultsMapWidget.map.updateSize();
+				}, 50);
+			}
+		};
+		
+		jQuery(window).on('resize', function() {
+			clearTimeout(mapResizeTimeout);
+			mapResizeTimeout = setTimeout(updateMapSize, 100);
+		});
+		
+		// Update map size after initial render
+		setTimeout(updateMapSize, 200);
+		
+		// Ensure map is interactive after DOM manipulation
+		// OpenLayers may need the map container to be re-initialized after DOM moves
+		setTimeout(function() {
+			if (map.length && GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+				// Force pointer events on map container
+				map.css({
+					'pointer-events': 'auto',
+					'z-index': '0'
+				});
+				
+				// Critical: The overlay container should NOT block events
+				var overlayContainer = map.find('.ol-overlaycontainer-stopevent');
+				if (overlayContainer.length) {
+					overlayContainer.css('pointer-events', 'none');
+				}
+				
+				// The viewport and canvas MUST be interactive
+				var viewport = map.find('.ol-viewport');
+				if (viewport.length) {
+					viewport.css('pointer-events', 'auto');
+					// Find canvas inside viewport
+					var canvas = viewport.find('canvas');
+					if (canvas.length) {
+						canvas.css('pointer-events', 'auto');
+					}
+				}
+				
+				// Also check for canvas directly in map
+				var allCanvases = map.find('canvas');
+				allCanvases.css('pointer-events', 'auto');
+				
+				var mapWidgetDiv = map.find('.map-widget-div');
+				if (mapWidgetDiv.length) {
+					mapWidgetDiv.css('pointer-events', 'auto');
+				}
+				
+				// Update map size again to ensure it's properly sized
+				GIAPI.search.resultsMapWidget.map.updateSize();
+				
+				// Force a repaint
+				GIAPI.search.resultsMapWidget.map.render();
+			}
+		}, 400);
 
 		//------------------------------------
 		// search button
 		//
 		var searchButton = GIAPI.FontAwesomeButton({
-			'width': baseWidth - 100,
+			'width': 100,
 			'label': t('search'),
 			'icon': 'fa-search',
 			'handler': function() {
@@ -1233,9 +1686,11 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// hide results button
 		//           	
+		// Check config for initial visibility state
+		var initialResultsVisible = config.resultsVisibility !== undefined ? config.resultsVisibility : true;
 		var hideResultsButton = GIAPI.ButtonsFactory.onOffSwitchButton(t('show_results'), t('hide_results'), {
 			'id': 'hideResultsButton',
-			'checked': false,
+			'checked': !initialResultsVisible,
 			'size': 'large',
 			'offBckColor': 'white',
 			'onBckColor': 'white',
@@ -1248,18 +1703,32 @@ export function initializePortal(config) {
 
 		jQuery('#hide-results-button').append(hideResultsButton);
 
-		jQuery(document).on('click', '#hideResultsButton', function() {
-
+		function updateResultsVisibility() {
 			if (jQuery('#hideResultsButton').is(":checked")) {
-
-				jQuery('#paginator-widget').css('display', 'none');
-				jQuery('#tabs-div').css('display', 'none');
-
+				// Hide the entire left sidebar (tabs + paginator + results)
+				jQuery('#left-sidebar').css('display', 'none');
+				// Let the map reclaim space
+				if (GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+					setTimeout(function() {
+						GIAPI.search.resultsMapWidget.map.updateSize();
+					}, 50);
+				}
 			} else {
-
-				jQuery('#paginator-widget').css('display', 'inline-block');
-				jQuery('#tabs-div').css('display', 'block');
+				// Show the entire left sidebar
+				jQuery('#left-sidebar').css('display', 'flex');
+				// Ensure map resizes after layout change
+				if (GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+					setTimeout(function() {
+						GIAPI.search.resultsMapWidget.map.updateSize();
+					}, 50);
+				}
 			}
+		}
+		
+		jQuery(document).on('change', '#hideResultsButton', updateResultsVisibility);
+		// Also listen to click as backup in case change event doesn't fire
+		jQuery(document).on('click', '#hideResultsButton', function() {
+			setTimeout(updateResultsVisibility, 10);
 		});
 
 
@@ -1467,89 +1936,87 @@ export function initializePortal(config) {
 						console.error('Error fetching interpolation types:', error);
 						// Keep default values if API fails
 					});
-
-					
-				if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
-					const spacingId = GIAPI.search.constWidget.getId('intendedObservationSpacing');
-					advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', {
-						helpIconImage: 'fa-arrows-h',
-						values: [
-							{ label: t("select_observation_spacing"), value: '' }
-						],
-						readOnlyValues: true
-					}));
-
-					// After constraints are initialized, try to fetch and update values
-					const authToken = localStorage.getItem('authToken') || 'my-token';
-					fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
-						.then(response => response.json())
-						.then(data => {
-							if (data.intendedObservationSpacing && data.intendedObservationSpacing.length > 0) {
-								// Find the select element using the correct ID
-								const selectElement = document.getElementById(spacingId);
-								if (selectElement) {
-									const options = [
-										{ label: t("select_observation_spacing"), value: '' },
-										...data.intendedObservationSpacing.map(type => ({
-											label: `${type.value} (${type.observationCount} observations)`,
-											value: type.value
-										}))
-									];
-
-									// Update the select options
-									selectElement.innerHTML = options.map(option =>
-										`<option value="${option.value}">${option.label}</option>`
-									).join('');
-								}
-							}
-						})
-						.catch(error => {
-							console.error('Error fetching observation spacing types:', error);
-							// Keep default values if API fails
-						});
-				}
-				
-				if (config.aggregationDuration !== undefined && config.aggregationDuration) {
-					const durationId = GIAPI.search.constWidget.getId('aggregationDuration');
-					advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', {
-						helpIconImage: 'fa-hourglass',
-						values: [
-							{ label: t("select_aggregation_duration"), value: '' }
-						],
-						readOnlyValues: true
-					}));
-
-					// After constraints are initialized, try to fetch and update values
-					const authToken = localStorage.getItem('authToken') || 'my-token';
-					fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=aggregationDuration&limit=50`)
-						.then(response => response.json())
-						.then(data => {
-							if (data.aggregationDuration && data.aggregationDuration.length > 0) {
-								// Find the select element using the correct ID
-								const selectElement = document.getElementById(durationId);
-								if (selectElement) {
-									const options = [
-										{ label: t("select_aggregation_duration"), value: '' },
-										...data.aggregationDuration.map(type => ({
-											label: `${type.value} (${type.observationCount} observations)`,
-											value: type.value
-										}))
-									];
-
-									// Update the select options
-									selectElement.innerHTML = options.map(option =>
-										`<option value="${option.value}">${option.label}</option>`
-									).join('');
-								}
-							}
-						})
-						.catch(error => {
-							console.error('Error fetching aggregation duration types:', error);
-							// Keep default values if API fails
-						});
-				}
 			}
+		}
 
+		if (config.intendedObservationSpacing !== undefined && config.intendedObservationSpacing) {
+			const spacingId = GIAPI.search.constWidget.getId('intendedObservationSpacing');
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'intendedObservationSpacing', {
+				helpIconImage: 'fa-arrows-h',
+				values: [
+					{ label: t("select_observation_spacing"), value: '' }
+				],
+				readOnlyValues: true
+			}));
+
+			// After constraints are initialized, try to fetch and update values
+			const authToken = localStorage.getItem('authToken') || 'my-token';
+			fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
+				.then(response => response.json())
+				.then(data => {
+					if (data.intendedObservationSpacing && data.intendedObservationSpacing.length > 0) {
+						// Find the select element using the correct ID
+						const selectElement = document.getElementById(spacingId);
+						if (selectElement) {
+							const options = [
+								{ label: t("select_observation_spacing"), value: '' },
+								...data.intendedObservationSpacing.map(type => ({
+									label: `${type.value} (${type.observationCount} observations)`,
+									value: type.value
+								}))
+							];
+
+							// Update the select options
+							selectElement.innerHTML = options.map(option =>
+								`<option value="${option.value}">${option.label}</option>`
+							).join('');
+						}
+					}
+				})
+				.catch(error => {
+					console.error('Error fetching observation spacing types:', error);
+					// Keep default values if API fails
+				});
+		}
+		
+		if (config.aggregationDuration !== undefined && config.aggregationDuration) {
+			const durationId = GIAPI.search.constWidget.getId('aggregationDuration');
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'aggregationDuration', {
+				helpIconImage: 'fa-hourglass',
+				values: [
+					{ label: t("select_aggregation_duration"), value: '' }
+				],
+				readOnlyValues: true
+			}));
+
+			// After constraints are initialized, try to fetch and update values
+			const authToken = localStorage.getItem('authToken') || 'my-token';
+			fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=aggregationDuration&limit=50`)
+				.then(response => response.json())
+				.then(data => {
+					if (data.aggregationDuration && data.aggregationDuration.length > 0) {
+						// Find the select element using the correct ID
+						const selectElement = document.getElementById(durationId);
+						if (selectElement) {
+							const options = [
+								{ label: t("select_aggregation_duration"), value: '' },
+								...data.aggregationDuration.map(type => ({
+									label: `${type.value} (${type.observationCount} observations)`,
+									value: type.value
+								}))
+							];
+
+							// Update the select options
+							selectElement.innerHTML = options.map(option =>
+								`<option value="${option.value}">${option.label}</option>`
+							).join('');
+						}
+					}
+				})
+				.catch(error => {
+					console.error('Error fetching aggregation duration types:', error);
+					// Keep default values if API fails
+				});
 		}
 		
 		
@@ -1600,6 +2067,24 @@ export function initializePortal(config) {
 			if (!$('#advConstDiv').length) {
 				$('<div>').attr('id', 'advConstDiv').appendTo('#adv-search-div');
 			}
+
+			// Fix positioning to ensure panel opens downward and stays on screen
+			setTimeout(function() {
+				var $advSearchDiv = $('#adv-search-div');
+				var $advConstDiv = $('#advConstDiv');
+				
+				// Ensure parent has relative positioning
+				$advSearchDiv.css('position', 'relative');
+				
+				// Override the relative positioning set by advancedSearch function
+				$advConstDiv.css({
+					'position': 'absolute',
+					'top': '100%',
+					'left': '0',
+					'margin-top': '5px',
+					'z-index': '1000'
+				});
+			}, 0);
 		}
 
 		//------------------------------------
@@ -2054,11 +2539,73 @@ export function initializePortal(config) {
 			{
 				'itemLabelFontSize': '80%',
 				'divCSS': 'max-height:550px; overflow:auto',
-				'accordionMode': true
+				'accordionMode': false
 			}
 		);
 
-		jQuery('#filters-tab').css('height', jQuery(window).height() - 150);
+		// Set height and ensure scrolling works properly
+		// Calculate available height based on the left-sidebar container
+		var calculateFiltersTabHeight = function() {
+			var leftSidebar = jQuery('#left-sidebar');
+			if (leftSidebar.length && leftSidebar.is(':visible')) {
+				// Calculate based on available space in left-sidebar
+				var sidebarHeight = leftSidebar.height();
+				var tabsHeight = jQuery('#tabs-ul').outerHeight(true) || 40;
+				var paginatorHeight = jQuery('#paginator-widget').is(':visible') ? jQuery('#paginator-widget').outerHeight(true) : 0;
+				var margins = 10; // Small margin for spacing
+				var availableHeight = sidebarHeight - tabsHeight - paginatorHeight - margins;
+				// Ensure minimum height
+				return Math.max(availableHeight, 300);
+			} else {
+				// Fallback to window-based calculation if sidebar not available
+				var windowHeight = jQuery(window).height();
+				var headerHeight = jQuery('#headerDiv').outerHeight(true) || 0;
+				var portalHeaderHeight = jQuery('#portalHeaderRow').outerHeight(true) || 0;
+				var tabsHeight = jQuery('#tabs-ul').outerHeight(true) || 40;
+				var margins = 200;
+				var availableHeight = windowHeight - headerHeight - portalHeaderHeight - tabsHeight - margins;
+				return Math.max(availableHeight, 300);
+			}
+		};
+		
+		// Ensure filters-tab is properly contained
+		jQuery('#filters-tab').css({
+			'position': 'relative',
+			'overflow-y': 'auto',
+			'overflow-x': 'hidden',
+			'background-color': 'white',
+			'z-index': '1'
+		});
+		
+		// Set initial height after a short delay to ensure layout is ready
+		setTimeout(function() {
+			var filtersTabHeight = calculateFiltersTabHeight();
+			jQuery('#filters-tab').css({
+				'height': filtersTabHeight + 'px',
+				'max-height': filtersTabHeight + 'px',
+				'min-height': '300px'
+			});
+		}, 100);
+		
+		// Update height on window resize
+		jQuery(window).on('resize', function() {
+			var newHeight = calculateFiltersTabHeight();
+			jQuery('#filters-tab').css({
+				'height': newHeight + 'px',
+				'max-height': newHeight + 'px'
+			});
+		});
+		
+		// Also update when tabs are activated (in case paginator visibility changes)
+		jQuery('#tabs-div').on('tabsactivate', function() {
+			setTimeout(function() {
+				var newHeight = calculateFiltersTabHeight();
+				jQuery('#filters-tab').css({
+					'height': newHeight + 'px',
+					'max-height': newHeight + 'px'
+				});
+			}, 50);
+		});
 
 
 		//------------------------------------
@@ -2203,7 +2750,18 @@ export function initializePortal(config) {
 	};
 
 	if (config.resultsVisibility !== undefined && !config.resultsVisibility) {
-		$('#hideResultsButton').click();
+		// Set button to checked state and hide the entire left sidebar initially
+		// Use setTimeout to ensure button and left sidebar are fully initialized
+		setTimeout(function() {
+			jQuery('#hideResultsButton').prop('checked', true);
+			jQuery('#left-sidebar').css('display', 'none');
+			// Let the map reclaim space
+			if (GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+				setTimeout(function() {
+					GIAPI.search.resultsMapWidget.map.updateSize();
+				}, 50);
+			}
+		}, 200);
 	}
 
 	if (config.bboxSelectorVisibility !== undefined && !config.bboxSelectorVisibility) {

@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "dab.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opensearch
+spec:
+  replicas: {{ .Values.opensearch.replicas }}
+  selector:
+    matchLabels:
+      app: opensearch
+  template:
+    metadata:
+      labels:
+        app: opensearch
+        {{- include "dab.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: opensearch
+        image: {{ .Values.opensearch.image }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        env:
+        - name: discovery.type
+          value: "single-node"
+        - name: bootstrap.memory_lock
+          value: "true"
+        - name: DISABLE_INSTALL_DEMO_CONFIG
+          value: "true"
+        - name: DISABLE_SECURITY_PLUGIN
+          value: "true"
+        - name: OPENSEARCH_JAVA_OPTS
+          value: "{{ .Values.opensearch.javaOpts }}"
+        ports:
+        - containerPort: {{ .Values.opensearch.port }}
+          name: http
+        {{- if .Values.opensearch.resources }}
+        resources:
+          {{- toYaml .Values.opensearch.resources | nindent 10 }}
+        {{- end }}
+        securityContext:
+          capabilities:
+            add:
+            - IPC_LOCK
+          runAsUser: 1000
+          runAsGroup: 1000
+          fsGroup: 1000
+        livenessProbe:
+          httpGet:
+            path: /_cluster/health
+            port: {{ .Values.opensearch.port }}
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health
+            port: {{ .Values.opensearch.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10

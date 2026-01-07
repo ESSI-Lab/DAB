@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf.task;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,17 +62,17 @@ import eu.essi_lab.model.exceptions.GSException;
 public class ErrorLogsPublisherTask extends AbstractCustomTask implements ErrorLogListener {
 
     /**
-     * 
+     *
      */
     private static final File LOGS_FOLDER = new File(IOStreamUtils.getUserTempDirectory() + File.separator + "errorLogs");
 
     /**
-     * 
+     *
      */
     private static final String ERROR_LOGS_MAP_PATH = LOGS_FOLDER + File.separator + "errorLogsMap";
 
     /**
-     * 
+     *
      */
     private static final String ERROR_LOGS_BUCKET_NAME = "gip-error-logs";
 
@@ -271,15 +271,8 @@ public class ErrorLogsPublisherTask extends AbstractCustomTask implements ErrorL
 		    filter(s -> daysBeforeLogs ? !s.key().contains(ISO8601DateTimeUtils.getISO8601Date()) : true).//
 		    forEach(summary -> {
 
-			try {
-
-			    manager.get().download(ERROR_LOGS_BUCKET_NAME, summary.key(), new File(LOGS_FOLDER, summary.key()));
-
-			} catch (MalformedURLException e) {
-
-			    e.printStackTrace();
-			}
-		    });
+		manager.get().download(ERROR_LOGS_BUCKET_NAME, summary.key(), new File(LOGS_FOLDER, summary.key()));
+	    });
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Downloading error log files from S3 ENDED");
 	}

@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gui.components.grid.menuitem;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMen
 import com.vaadin.flow.component.textfield.TextArea;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.setting.Setting;
@@ -63,7 +63,7 @@ public class SettingsRemoveItemHandler extends GridMenuItemHandler {
     @Override
     public void onClick(//
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    Configuration configuration, //
 	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selection) {
@@ -101,21 +101,21 @@ public class SettingsRemoveItemHandler extends GridMenuItemHandler {
 		list().//
 		stream().//
 		filter(s -> selection.containsKey(s.getIdentifier()) && selection.get(s.getIdentifier())).//
-		map(s -> s.getIdentifier()).//
+		map(Setting::getIdentifier).//
 		collect(Collectors.toList());
 
 	dialog.setOnConfirmListener(e -> {
 
 	    configuration.remove(ids);
 
-	    tabContainer.removeSettingComponents(ids);
+	    tabContent.removeSettingComponents(ids);
 	});
     }
 
     @Override
     public boolean isEnabled(//
 	    HashMap<String, String> eventItem, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    Configuration configuration, //
 	    Setting setting, //
 	    HashMap<String, Boolean> selection) {

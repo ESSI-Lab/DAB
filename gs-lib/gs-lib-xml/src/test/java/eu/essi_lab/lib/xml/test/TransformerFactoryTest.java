@@ -79,7 +79,7 @@ public class TransformerFactoryTest {
 
 	// -----------------------------------------------------------------------
 	//
-	XMLFactories.defaultTransformerFactoryImpl = TransformerFactoryImpl.XALAN;
+	XMLFactories.DEFAULT_IMPL = TransformerFactoryImpl.XALAN;
 	//
 	// -----------------------------------------------------------------------
 

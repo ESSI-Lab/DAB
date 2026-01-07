@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.demo;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,9 +21,7 @@ package eu.essi_lab.cfga.gs.demo;
  * #L%
  */
 
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -63,33 +61,27 @@ public class DemoSetting1 extends Setting {
 
 	    addOption(option);
 	}
-
-	//
-	// set the component extension
-	//
-	setExtension(new DemoSetting1ComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
-    public static class DemoSetting1ComponentInfo extends ComponentInfo {
+    public static class DemoSetting1TabDescriptor extends TabDescriptor {
 
 	/**
-	 * 
+	 *
 	 */
-	public DemoSetting1ComponentInfo() {
+	public DemoSetting1TabDescriptor() {
 
-	    setComponentName(DemoSetting1.class.getName());
+	    setLabel("Demo setting 1");
 
 	    setForceReadOnly(false);
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(0).//
-		    withShowDirective("Demo setting 1").//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(DemoSetting1.class).//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setIndex(0);
+	    addContentDescriptor(descriptor);
 	}
     }
 }

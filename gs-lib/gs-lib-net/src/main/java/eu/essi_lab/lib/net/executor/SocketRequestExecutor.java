@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.executor;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -200,9 +200,12 @@ public class SocketRequestExecutor extends HTTPExecutor {
     }
 
     private static Socket createSocket(String protocol, String host, int port) throws Exception {
+
 	if (protocol.equals("https")) {
+
 	    SSLContext sslContext = SSLContext.getInstance("TLS");
-	    sslContext.init(null, new TrustManager[] { new CustomTrustManager() }, null);
+
+//	    sslContext.init(null, new TrustManager[] { new CustomTrustManager() }, null);
 
 	    SSLSocketFactory socketFactory = sslContext.getSocketFactory();
 
@@ -223,17 +226,6 @@ public class SocketRequestExecutor extends HTTPExecutor {
 	throw new RuntimeException("Unexpected protocol: " + protocol);
     }
 
-    // Custom TrustManager to trust all certificates (not suitable for production)
-    static class CustomTrustManager implements X509TrustManager {
-	public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-	}
 
-	public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-	}
-
-	public X509Certificate[] getAcceptedIssuers() {
-	    return new X509Certificate[0];
-	}
-    }
 
 }

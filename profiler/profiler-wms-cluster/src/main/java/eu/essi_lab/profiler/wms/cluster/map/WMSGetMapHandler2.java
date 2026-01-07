@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.profiler.wms.cluster.map;
 
@@ -7,7 +7,7 @@ package eu.essi_lab.profiler.wms.cluster.map;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -77,6 +77,7 @@ import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.bond.spatial.SpatialEntity;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
@@ -391,8 +392,8 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 			    SimpleEntry<Double, Double> upper = new SimpleEntry<>(maxx.doubleValue(), maxy.doubleValue());
 			    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = new SimpleEntry<>(lower,
 				    upper);
-			    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox4326 = CRSUtils
-				    .translateBBOX(bbox3857, CRS.EPSG_3857(), CRS.EPSG_4326());
+			    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox4326 = CRSUtils.translateBBOX(
+				    bbox3857, CRS.EPSG_3857(), CRS.EPSG_4326());
 			    lower = bbox4326.getKey();
 			    upper = bbox4326.getValue();
 
@@ -439,8 +440,8 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 				    SimpleEntry<Double, Double> upper = new SimpleEntry<>(tmpBboxMaxX, tmpBboxMaxY);
 				    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = new SimpleEntry<>(
 					    lower, upper);
-				    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox4326 = CRSUtils
-					    .translateBBOX(bbox3857, CRS.EPSG_3857(), CRS.EPSG_4326());
+				    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox4326 = CRSUtils.translateBBOX(
+					    bbox3857, CRS.EPSG_3857(), CRS.EPSG_4326());
 				    lower = bbox4326.getKey();
 				    upper = bbox4326.getValue();
 				    tmpBboxMinX = lower.getValue();
@@ -489,8 +490,8 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 				SimpleEntry<Double, Double> upper = new SimpleEntry<>(bboxMaxY, bboxMaxX);
 				SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox4326 = new SimpleEntry<>(lower,
 					upper);
-				SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = CRSUtils
-					.translateBBOX(bbox4326, CRS.EPSG_4326(), CRS.EPSG_3857());
+				SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = CRSUtils.translateBBOX(
+					bbox4326, CRS.EPSG_4326(), CRS.EPSG_3857());
 				lower = bbox3857.getKey();
 				upper = bbox3857.getValue();
 				bboxMinX = lower.getKey();
@@ -569,8 +570,8 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 					SimpleEntry<Double, Double> upper = new SimpleEntry<>(avgbboxMaxY, avgbboxMaxX);
 					SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox4326 = new SimpleEntry<>(
 						lower, upper);
-					SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = CRSUtils
-						.translateBBOX(bbox4326, CRS.EPSG_4326(), CRS.EPSG_3857());
+					SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = CRSUtils.translateBBOX(
+						bbox4326, CRS.EPSG_4326(), CRS.EPSG_3857());
 					lower = bbox3857.getKey();
 					upper = bbox3857.getValue();
 					avgbboxMinX = lower.getKey();
@@ -755,8 +756,8 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 					SimpleEntry<Double, Double> upper = new SimpleEntry<>(stationY, stationX);
 					SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox4326 = new SimpleEntry<>(
 						lower, upper);
-					SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = CRSUtils
-						.translateBBOX(bbox4326, CRS.EPSG_4326(), CRS.EPSG_3857());
+					SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = CRSUtils.translateBBOX(
+						bbox4326, CRS.EPSG_4326(), CRS.EPSG_3857());
 					lower = bbox3857.getKey();
 					upper = bbox3857.getValue();
 					stationX = lower.getKey();
@@ -837,7 +838,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    };
 	} catch (
 
-	Exception e) {
+		Exception e) {
 	    e.printStackTrace();
 	    return new StreamingOutput() {
 
@@ -972,15 +973,6 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    instrumentTitle.get()));
 	}
 
-	Optional<String> platformTitle = parser.getOptionalValue("platformTitle");
-	if (platformTitle.isPresent() && !platformTitle.get().equals(KeyValueParser.UNDEFINED)) {
-
-	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
-		    BondOperator.EQUAL, //
-		    MetadataElement.PLATFORM_TITLE, //
-		    platformTitle.get()));
-	}
-
 	Optional<String> observedPropertyURI = parser.getOptionalValue("observedPropertyURI");
 	if (observedPropertyURI.isPresent() && !observedPropertyURI.get().equals(KeyValueParser.UNDEFINED)) {
 
@@ -1019,13 +1011,21 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	Optional<String> predefinedLayer = parser.getOptionalValue("predefinedLayer");
 	if (predefinedLayer.isPresent() && !predefinedLayer.get().equals(KeyValueParser.UNDEFINED)) {
-	    // Get WKT from layer
-	    String wkt = LayerFeatureRetrieval.getInstance().getFeature(predefinedLayer.get());
-	    if (wkt != null) {
-		Optional<String> spatialOp = parser.getOptionalValue("spatialOp");
-		eu.essi_lab.messages.bond.spatial.SpatialEntity entity = eu.essi_lab.messages.bond.spatial.SpatialEntity.of(wkt);
-		andBond.getOperands().add(BondFactory.createSpatialEntityBond(BondOperator.decode(spatialOp.get()), entity));
-	    }
+	    // Get WKT from layer: this has been replaced, as it's slow to pass the coordinates!
+	    //	    String wkt = LayerFeatureRetrieval.getInstance().getFeature(predefinedLayer.get());
+	    //	    if (wkt != null) {
+	    //		Optional<String> spatialOp = parser.getOptionalValue("spatialOp");
+	    //		eu.essi_lab.messages.bond.spatial.SpatialEntity entity = eu.essi_lab.messages.bond.spatial.SpatialEntity.of(wkt);
+	    //		andBond.getOperands().add(BondFactory.createSpatialEntityBond(BondOperator.decode(spatialOp.get()), entity));
+	    //	    }
+	    String value = predefinedLayer.get();
+	    String id = "UOMIT20181025_" + value.substring(value.lastIndexOf(":") + 1, value.length());
+
+	    SpatialEntity entity = SpatialEntity.ofIndexedShape(id);
+
+	    BondOperator operator = BondOperator.CONTAINS;
+
+	    andBond.getOperands().add(BondFactory.createSpatialEntityBond(operator, entity));
 	}
 
 	Optional<String> isValidated = parser.getOptionalValue("isValidated");
@@ -1110,12 +1110,12 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    String[] split = value.split(",");
 		    LogicalBond orBond = BondFactory.createOrBond();
 		    for (String s : split) {
-			SimpleValueBond sourceBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, s);
+			SimpleValueBond sourceBond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, element, s);
 			orBond.getOperands().add(sourceBond);
 		    }
 		    andBond.getOperands().add(orBond);
 		} else {
-		    SimpleValueBond sourceBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, value);
+		    SimpleValueBond sourceBond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, element, value);
 		    andBond.getOperands().add(sourceBond);
 		}
 

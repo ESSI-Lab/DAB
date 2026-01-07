@@ -37,8 +37,8 @@
   "search_text":"Ricerca in corso...",
   "show_results": "Mostra",
   "hide_results": "Nascondi",
-  "start_time": "Data/ora iniziale",
-  "end_time": "Data/ora finale",
+  "start_time": "Data iniziale",
+  "end_time": "Data finale",
   "bulk_data_download": "Download dati in blocco",
   "matching_results": "Risultati",
   "spatial_extent": "Area",
@@ -128,7 +128,7 @@
   "united_nations": "Nazioni Unite",
   "overlays": "Layer principali",
   "results_layer_group": "Layer risultati",
-  
+
   "loc_help": "Nome di una località su cui limitare la ricerca. Es.: \"Italia\", \"U.S.A.\", \"Africa\"",
   "loc_label": "Località",
 
@@ -211,6 +211,8 @@
   
   "select-from-ontology": "Seleziona un parametro dall'ontologia",
   
+  "observed-property-uri": "URI della proprietà osservata",
+  
     "tf-format": "Formato",
   "tf-source": "Sorgente",
   "tf-keyword": "Parola chiave",
@@ -218,7 +220,7 @@
 
   "tf-instrumentTitle": "Strumento",
   "tf-organisationName": "Organizzazione",
-  "tf-platformTitle": "Piattaforma",
+  "tf-platformTitle": "Stazione",
   "tf-attributeTitle": "Proprietà osservata",
   "tf-intendedObservationSpacing": "Risoluzione temporale",
   "tf-timeInterpolation": "Interpolazione temporale",
@@ -240,7 +242,13 @@
 
   "tf-s3Timeliness": "Puntualità S3",
   "tf-s3InstrumentIdx": "Indice strumento S3",
-  "tf-s3ProductLevel": "Livello prodotto S3"
+  "tf-s3ProductLevel": "Livello prodotto S3",
+  "tf-source": "Sorgente",
+  "tf-organisationName": "Organizzazione",
+  "tf-attributeTitle": "Proprietà osservata",
+  "tf-attributeURI": "URI proprietà osservata",
+  "tf-platformTitle": "Stazione",
+  "tf-instrumentTitle": "Strumento"
 }
 
 

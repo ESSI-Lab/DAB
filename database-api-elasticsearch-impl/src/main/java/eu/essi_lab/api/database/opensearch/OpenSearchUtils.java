@@ -7,7 +7,7 @@ package eu.essi_lab.api.database.opensearch;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,6 +42,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.xml.*;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -52,6 +53,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
+import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonpSerializable;
@@ -120,6 +123,8 @@ public class OpenSearchUtils {
 			values.add(fv.longValue());
 		    } else if (fv.isString()) {
 			values.add(fv.stringValue());
+		    } else if (fv.isNull()) {
+		    	values.add("");
 		    }
 		}
 		SearchAfter sa = new SearchAfter(values);
@@ -155,7 +160,15 @@ public class OpenSearchUtils {
 
 		TermFrequencyItem item = new TermFrequencyItem();
 		item.setTerm(term);
-		item.setDecodedTerm(term);
+		String decoded = term;
+		if (term.startsWith("http://his-central-ontology.geodab.eu/hydro-ontology")){
+		    HISCentralOntology ontology = new HISCentralOntology();
+		    SKOSConcept concept = ontology.getConcept(term);
+		    if (concept!=null){
+			decoded = concept.getPreferredLabel().getKey();
+		    }
+		}
+		item.setDecodedTerm(decoded);
 		item.setFreq(count);
 		item.setLabel(target);
 
@@ -657,8 +670,9 @@ public class OpenSearchUtils {
      */
     public static String toString(Document document) throws TransformerException {
 
-	TransformerFactory transformerFactory = TransformerFactory.newInstance();
-	Transformer transformer = transformerFactory.newTransformer();
+	TransformerFactory factory = XMLFactories.newTransformerFactory();
+
+	Transformer transformer = factory.newTransformer();
 
 	StringWriter stringWriter = new StringWriter();
 	transformer.transform(new DOMSource(document), new StreamResult(stringWriter));

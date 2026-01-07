@@ -7,7 +7,7 @@ package eu.essi_lab.accessor.sos.downloader._1_0_0;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.cuahsi.waterml._1.ObjectFactory;
 import org.cuahsi.waterml._1.TimeSeriesResponseType;
@@ -49,13 +48,12 @@ import org.cuahsi.waterml._1.essi.JAXBWML;
 
 import eu.essi_lab.access.wml.WMLDataDownloaderAdapter;
 import eu.essi_lab.accessor.sos.AbstractSOSConnector;
-import eu.essi_lab.accessor.sos.SOSConnector;
 import eu.essi_lab.accessor.sos.SOSIdentifierMangler;
 import eu.essi_lab.accessor.sos.SOSRequestBuilder;
 import eu.essi_lab.accessor.sos._1_0_0.SOSSensorML;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -214,7 +212,7 @@ public class SOSDownloader extends eu.essi_lab.accessor.sos.downloader.SOSDownlo
     @Override
     public String getSupportedProtocol() {
     
-        return NetProtocols.SOS_1_0_0.getCommonURN();
+        return NetProtocolWrapper.SOS_1_0_0.getCommonURN();
     }
 
     /**

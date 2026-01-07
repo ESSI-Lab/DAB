@@ -7,7 +7,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ package eu.essi_lab.lib.utils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -85,21 +86,40 @@ public class StringUtils {
      */
     public static String hashSHA1messageDigest(String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
-	return hashMessageDigest(SHA1_IDENTIFIER,value);
+	return hashMessageDigest(SHA1_IDENTIFIER, value);
     }
 
     public static String hashSHA256messageDigest(String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
-	return hashMessageDigest(SHA256_IDENTIFIER,value);
+	return hashMessageDigest(SHA256_IDENTIFIER, value);
     }
-    
+
     public static String hashMessageDigest(String algorithm, String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
-  	MessageDigest msdDigest = MessageDigest.getInstance(algorithm);
-  	msdDigest.update(value.getBytes("UTF-8"), 0, value.length());
-  	char[] ret = Hex.encodeHex(msdDigest.digest());
-  	return new String(ret).toUpperCase();
-      }
+	MessageDigest msdDigest = MessageDigest.getInstance(algorithm);
+	msdDigest.update(value.getBytes("UTF-8"), 0, value.length());
+	char[] ret = Hex.encodeHex(msdDigest.digest());
+	return new String(ret).toUpperCase();
+    }
+
+    public static Long hashSHA1messageDigestLong(String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+
+	return hashMessageDigestLong(SHA1_IDENTIFIER, value);
+    }
+
+    public static Long hashSHA256messageDigestLong(String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+
+	return hashMessageDigestLong(SHA256_IDENTIFIER, value);
+    }
+
+    public static Long hashMessageDigestLong(String algorithm, String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+
+	MessageDigest msdDigest = MessageDigest.getInstance(algorithm);
+	msdDigest.update(value.getBytes("UTF-8"), 0, value.length());
+	byte[] hashBytes = msdDigest.digest();
+	return ByteBuffer.wrap(hashBytes).getLong();
+
+    }
 
     /**
      * URL encodes the provided string with UTF-8 using {@link StandardCharsets} defined as "Constant definitions for

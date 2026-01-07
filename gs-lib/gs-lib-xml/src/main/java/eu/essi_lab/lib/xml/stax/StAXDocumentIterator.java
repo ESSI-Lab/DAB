@@ -4,7 +4,7 @@ package eu.essi_lab.lib.xml.stax;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,10 +36,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import eu.essi_lab.lib.xml.*;
 import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 
 /**
  * This class is useful to read large XML files containing long lists of similar elements. Large files can't be parsed
@@ -58,7 +58,9 @@ public class StAXDocumentIterator implements Iterator<XMLDocumentReader> {
     private Logger logger = GSLoggerFactory.getLogger(StAXDocumentIterator.class);
 
     public StAXDocumentIterator(InputStream stream, String searchElement) throws XMLStreamException {
-	XMLInputFactory factory = XMLInputFactory.newInstance();
+
+	XMLInputFactory factory = XMLFactories.newXMLInputFactory();
+	
 	this.reader = factory.createXMLEventReader(stream);
 	this.searchElement = searchElement;
 

@@ -4,7 +4,7 @@ package eu.essi_lab.indexes;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,12 +22,7 @@ package eu.essi_lab.indexes;
  */
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBElement;
@@ -69,15 +64,15 @@ import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 
 /**
  * This class groups all the available {@link IndexedMetadataElement}s
- * 
- * @see MetadataElement
+ *
  * @author Fabrizio
+ * @see MetadataElement
  */
 public final class IndexedMetadataElements extends IndexedElementsGroup {
 
     /**
      * Retrieves all the {@link IndexedMetadataElement}s declared in this class
-     * 
+     *
      * @return
      */
     public static List<IndexedMetadataElement> getIndexes() {
@@ -90,7 +85,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
     /**
      * Retrieves all the {@link IndexedElementInfo}s owned by the {@link IndexedMetadataElement}s declared in this class
-     * 
+     *
      * @param impl
      * @return
      */
@@ -99,9 +94,9 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	return getIndexes().//
 		stream().//
 		// this check excludes the bbox index which is in fact not directly indexed
-		filter(el -> el.getInfo(impl.getName()).getIndexType() != null).//
-		map(el -> el.getInfo(impl.getName())).//
-		collect(Collectors.toList());//
+			filter(el -> el.getInfo(impl.getName()).getIndexType() != null).//
+			map(el -> el.getInfo(impl.getName())).//
+			collect(Collectors.toList());//
     }
 
     // ----------------------------------------------
@@ -481,77 +476,84 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    /**
+     *
+     */
     public static final IndexedMetadataElement CREATION_DATE = new IndexedMetadataElement(MetadataElement.CREATION_DATE) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
-	    while (identifications.hasNext()) {
-
-		DataIdentification next = identifications.next();
-
-		String creationDate = next.getCitationCreationDate();
-		if (checkStringValue(creationDate)) {
-
-		    addValue(creationDate);
-		} else {
-		    XMLGregorianCalendar dateTime = next.getCitationCreationDateTime();
-		    if (dateTime != null) {
-			addValue(dateTime.toString());
-		    }
-		}
-	    }
+	    defineCodeListValues(this, resource, "creation");
 	}
     };
 
+    /**
+     *
+     */
     public static final IndexedMetadataElement PUBLICATION_DATE = new IndexedMetadataElement(MetadataElement.PUBLICATION_DATE) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
-	    while (identifications.hasNext()) {
-
-		DataIdentification next = identifications.next();
-
-		String pubDate = next.getCitationPublicationDate();
-		if (checkStringValue(pubDate)) {
-
-		    addValue(pubDate);
-		} else {
-		    XMLGregorianCalendar dateTime = next.getCitationPublicationDateTime();
-		    if (dateTime != null) {
-			addValue(dateTime.toString());
-		    }
-		}
-	    }
+	    defineCodeListValues(this, resource, "publication");
 	}
     };
 
+    /**
+     *
+     */
     public static final IndexedElement REVISION_DATE = new IndexedMetadataElement(MetadataElement.REVISION_DATE) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
-	    while (identifications.hasNext()) {
+	    defineCodeListValues(this, resource, "revision");
+	}
+    };
 
-		DataIdentification next = identifications.next();
+    /**
+     *
+     * @param el
+     * @param resource
+     * @param codeListValue
+     */
+    private static void defineCodeListValues(IndexedMetadataElement el, GSResource resource, String codeListValue) {
 
-		String revDate = next.getCitationRevisionDate();
-		if (checkStringValue(revDate)) {
+	Iterator<DataIdentification> identifications = resource.
+			getHarmonizedMetadata().
+			getCoreMetadata().
+			getMIMetadata()
+		.getDataIdentifications();
 
-		    addValue(revDate);
-		} else {
-		    XMLGregorianCalendar dateTime = next.getCitationRevisionDateTime();
-		    if (dateTime != null) {
-			addValue(dateTime.toString());
-		    }
+	while (identifications.hasNext()) {
+
+	    DataIdentification next = identifications.next();
+
+	    String date = switch(codeListValue){
+		case "revision" -> next.getCitationRevisionDate();
+		case "publication" -> next.getCitationPublicationDate();
+		case "creation" -> next.getCitationCreationDate();
+		default -> null;
+	    };
+
+	    if (checkStringValue(date)) {
+
+		el.addValue(date);
+
+	    } else {
+
+		XMLGregorianCalendar dateTime = switch(codeListValue){
+		    case "revision" -> next.getCitationRevisionDateTime();
+		    case "publication" -> next.getCitationPublicationDateTime();
+		    case "creation" -> next.getCitationCreationDateTime();
+		    default -> null;
+		};
+
+		if (dateTime != null) {
+
+		    el.addValue(dateTime.toString());
 		}
 	    }
 	}
-    };
+    }
 
     public static final IndexedElement REFERENCE_DATE = new IndexedMetadataElement(MetadataElement.REFERENCE_DATE) {
 	@Override
@@ -2406,8 +2408,9 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 
 	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
-
 	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
+
+	    parties = parties.stream().filter(p -> p.getElementType() != null).toList();
 
 	    for (ResponsibleParty party : parties) {
 		if (party != null) {
@@ -2518,19 +2521,18 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    }
 	    {
-		SA_ElementWrapper attributeWrapper = addComposedKeywords(resource, "theme",MetadataElement.PARAMETER_SA);
+		SA_ElementWrapper attributeWrapper = addComposedKeywords(resource, "theme", MetadataElement.PARAMETER_SA);
 		if (attributeWrapper != null) {
 		    addComposedElement(attributeWrapper.getElement());
 		}
 	    }
 	    {
-		SA_ElementWrapper attributeWrapper = addComposedKeywords(resource, "parameter",MetadataElement.PARAMETER_SA);
+		SA_ElementWrapper attributeWrapper = addComposedKeywords(resource, "parameter", MetadataElement.PARAMETER_SA);
 		if (attributeWrapper != null) {
 		    addComposedElement(attributeWrapper.getElement());
 		}
 	    }
 	}
-
 
     };
 
@@ -2558,13 +2560,13 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
-//    public static final IndexedMetadataElement PROJECT_SA = new IndexedMetadataElement(MetadataElement.PROJECT_SA) {
-//
-//	@Override
-//	public void defineValues(GSResource resource) {
-//
-//	}
-//    };
+    //    public static final IndexedMetadataElement PROJECT_SA = new IndexedMetadataElement(MetadataElement.PROJECT_SA) {
+    //
+    //	@Override
+    //	public void defineValues(GSResource resource) {
+    //
+    //	}
+    //    };
 
     static {
 

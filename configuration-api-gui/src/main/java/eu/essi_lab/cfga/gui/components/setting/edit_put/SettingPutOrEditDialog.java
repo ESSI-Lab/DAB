@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.setting.edit_put;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,11 +30,11 @@ import com.vaadin.flow.component.Unit;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selector;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
-import eu.essi_lab.cfga.gui.extension.directive.Directive;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.directive.Directive;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.validation.ValidationContext;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse;
@@ -46,23 +46,23 @@ import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
 @SuppressWarnings("serial")
 public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 
-    protected int dialogHeight;
-    protected int dialogWidth;
-    protected Configuration configuration;
-    protected TabContainer tabContainer;
+    protected final int dialogHeight;
+    protected final int dialogWidth;
+    protected final Configuration configuration;
+    protected final TabContent tabContent;
     protected boolean foldedModeEnabled;
 
     /**
      * @param configuration
-     * @param tabContainer
+     * @param tabContent
      * @param context
      */
-    public SettingPutOrEditDialog(Configuration configuration, TabContainer tabContainer, ValidationContext context) {
+    public SettingPutOrEditDialog(Configuration configuration, TabContent tabContent, ValidationContext context) {
 
 	addToCloseAll();
 
 	this.configuration = configuration;
-	this.tabContainer = tabContainer;
+	this.tabContent = tabContent;
 	setCloseOnConfirm(false);
 
 	dialogHeight = 800;
@@ -75,15 +75,16 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 	//
 
 	getContentLayout().getStyle().set("border", "1px solid lightgray");
-	getContentLayout().getStyle().set("padding", "10px");
+	getContentLayout().getStyle().set("padding", "5px");
 	getContentLayout().getStyle().set("border-radius", "3px");
+	getContentLayout().getStyle().set("width", "98%");
 
 	//
 	// OnConfirm listener
 	//
 	setOnConfirmListener(e -> {
 
-	    Optional<ValidationResponse> optional = Optional.empty();
+	    Optional<ValidationResponse> optional;
 
 	    //
 	    // in case of a selector, used the selected setting
@@ -93,8 +94,8 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 		@SuppressWarnings("rawtypes")
 		Selector selector = (Selector) getSetting();
 
-		optional = ((Setting) selector.getSelectedSettings().get(0)).validate(configuration, context);
-	   
+		optional = ((Setting) selector.getSelectedSettings().getFirst()).validate(configuration, context);
+
 	    } else {
 
 		optional = getSetting().validate(configuration, context);
@@ -161,13 +162,19 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
      * @param height
      * @return
      */
-    protected Component createSettingToAddOrEditComponent(Configuration configuration, Setting setting, int height) {
-
-	// Comparator<Setting> comparator = (s1, s2) -> s1.getName().compareTo(s2.getName());
+    protected Component createSettingToAddOrEditComponent(//
+	    Configuration configuration,//
+	    Setting setting,//
+	    int height) {//
 
 	int componentHeight = height - 150;
 
-	Component component = SettingComponentFactory.createSettingComponent(configuration, setting, false);
+	Component component = SettingComponentFactory.createSettingComponent(//
+		configuration, //
+		setting,//
+		false, //  forceReadonly
+		true,// forceHideHeader
+		null); // tabContent
 
 	((HasSize) component).setWidthFull();
 	((HasSize) component).setHeight(componentHeight, Unit.PIXELS);

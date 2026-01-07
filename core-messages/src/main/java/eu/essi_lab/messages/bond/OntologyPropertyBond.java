@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -59,8 +59,7 @@ public class OntologyPropertyBond extends QueryableBond<String> {
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof OntologyPropertyBond) {
-	    OntologyPropertyBond bond = (OntologyPropertyBond) obj;
+	if (obj instanceof OntologyPropertyBond bond) {
 	    return bond.getOperator().equals(getOperator()) && //
 		    ((bond.getProperty() == null && getProperty() == null) || //
 			    bond.getProperty().equals(getProperty()))

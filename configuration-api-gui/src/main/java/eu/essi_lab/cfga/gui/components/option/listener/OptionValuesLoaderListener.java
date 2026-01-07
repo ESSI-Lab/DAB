@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.option.listener;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -51,10 +51,10 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 @SuppressWarnings("serial")
 public class OptionValuesLoaderListener implements ButtonChangeListener {
 
-    private Option<?> option;
+    private final Option<?> option;
     private Select<String> singleSelect;
     private MultiSelectComboBox<String> multiSelect;
-    private UI ui;
+    private final UI ui;
 
     /**
      * @param option
@@ -160,12 +160,12 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 		return;
 	    }
 
-	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Loaded values: " + values);
+	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Loaded values: {}", values);
 
 	    //
 	    // set the values to the option
 	    //
-	    List<String> stringValues = values.stream().map(v -> v.toString()).collect(Collectors.toList());
+	    List<String> stringValues = values.stream().map(Object::toString).collect(Collectors.toList());
 
 	    option.setObjectValues(stringValues);
 

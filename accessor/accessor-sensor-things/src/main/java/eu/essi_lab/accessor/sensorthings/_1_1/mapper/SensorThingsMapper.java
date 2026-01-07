@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.sensorthings._1_1.mapper;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -69,6 +71,8 @@ import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
+import eu.essi_lab.model.resource.QualifierElementWrapper;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.ommdk.AbstractResourceMapper;
 import eu.essi_lab.ommdk.IResourceMapper;
 
@@ -406,7 +410,47 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	if (observationType != null && !observationType.isEmpty()) {
 	    collector.addKeyword(observationType, "observationType");
 	}
-	HashMap<String, String> tags = thing.getTags();
+	HashMap<String, String> tags = stream.getTags();
+	if (tags == null || tags.isEmpty()) {
+	    tags = thing.getTags();
+	}
+	if (tags == null || tags.isEmpty()) {
+	    Optional<JSONObject> props = stream.getProperties();
+	    if (props.isPresent()) {
+		Set<String> keys = props.get().keySet();
+		for (String key : keys) {
+		    Object obj = props.get().get(key);
+		    if (obj != null) {
+			if (obj instanceof String) {
+			    String value = (String) obj;
+			    if (tags == null) {
+				tags = new HashMap<String, String>();
+			    }
+			    tags.put(key, value);
+			}
+		    }
+		}
+	    }
+	}
+	if (tags == null || tags.isEmpty()) {
+	    Optional<JSONObject> props = thing.getProperties();
+	    if (props.isPresent()) {
+		Set<String> keys = props.get().keySet();
+		for (String key : keys) {
+		    Object obj = props.get().get(key);
+		    if (obj != null) {
+			if (obj instanceof String) {
+			    String value = (String) obj;
+			    if (tags == null) {
+				tags = new HashMap<String, String>();
+			    }
+			    tags.put(key, value);
+			}
+		    }
+		}
+	    }
+	}
+
 	for (String key : tags.keySet()) {
 	    String value = tags.get(key);
 	    if (key.equalsIgnoreCase("licence")) {
@@ -421,7 +465,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		dataset.getExtensionHandler().setDataDisclaimer(value);
 		continue;
 	    }
-	    if (key.equalsIgnoreCase("territory_of_origin")) {
+	    if (key.equalsIgnoreCase("territory_of_origin") || key.equalsIgnoreCase("territoryOfOrigin")) {
 		if (value.contains("codes.wmo.int")) {
 		    value = value.replace("http://codes.wmo.int/wmdr/TerritoryName/", "");
 		    value = value.replace("https://codes.wmo.int/wmdr/TerritoryName/", "");
@@ -437,6 +481,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 		dataset.getExtensionHandler().setCountry(value);
 		continue;
 	    }
+
 	    if (key.toLowerCase().startsWith("organization_")) {
 
 		String[] values = value.split(",");
@@ -573,6 +618,20 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	//
 
 	addBoundingBox(thing, dataId, collector);
+
+	// qualifiers
+
+	JSONObject qualifiers = stream.getProperties().get().optJSONObject("qualifiers");
+	if (qualifiers != null) {
+	    Set<String> flags = qualifiers.keySet();
+	    for (String flag : flags) {
+		String description = qualifiers.getString(flag);
+		QualifierElementWrapper qew = QualifierElementWrapper.get();
+		qew.setCode(flag);
+		qew.setDescription(description);
+		dataset.getExtensionHandler().addComposedElement(qew.getElement());
+	    }
+	}
 
 	String mail = tags.getOrDefault("email", tags.get("mail"));
 	String organizationLabel = tags.getOrDefault("organization_label", tags.get("organization"));

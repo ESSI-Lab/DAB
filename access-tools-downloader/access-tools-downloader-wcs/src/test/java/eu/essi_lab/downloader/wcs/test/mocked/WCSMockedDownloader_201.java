@@ -38,9 +38,8 @@ public class WCSMockedDownloader_201 extends WCSDownloader_201 {
 		    HttpRequest request, //
 		    String username, //
 		    String password, //
-		    InputStream keystore, //
-		    String keystorePassword, //
-		    String certificatePassword) throws FailsafeException, IOException, InterruptedException {
+		    InputStream trustStore, //
+		    String trustStorePwd) throws FailsafeException, IOException, InterruptedException {
 
 		HttpResponse<InputStream> response = new HttpResponse<InputStream>() {
 

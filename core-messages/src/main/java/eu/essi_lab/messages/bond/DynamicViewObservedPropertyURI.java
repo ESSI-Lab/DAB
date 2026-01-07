@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,12 +43,12 @@ public class DynamicViewObservedPropertyURI extends DynamicView {
 
     @Override
     public String getLabel() {
-	return "Dyanamic view for observed property URI: " + arguments.get(0);
+	return "Dyanamic view for observed property URI: " + arguments.getFirst();
     }
 
     @Override
     public Bond getDynamicBond() {
-	return BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, arguments.get(0));
+	return BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, arguments.getFirst());
     }
 
 }

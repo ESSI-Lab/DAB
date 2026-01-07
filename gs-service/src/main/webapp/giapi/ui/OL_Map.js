@@ -187,6 +187,7 @@ GIAPI.OL_Map = function(options) {
 	var satelliteLayer = new ol.layer.Tile({
 
 		title: 'Satellite',
+		key: 'satellite',
 		type: 'base',
 		visible: false,
 
@@ -199,6 +200,7 @@ GIAPI.OL_Map = function(options) {
 
 	var osmLayer = new ol.layer.Tile({
 		title: 'OpenStreetMap',
+		key: 'openstreetmap',
 		type: 'base',
 		visible: true,
 		source: new ol.source.OSM(),
@@ -208,6 +210,7 @@ GIAPI.OL_Map = function(options) {
 	var unLayer = new ol.layer.Tile({
 
 		title: __t("united_nations"),
+		key: 'united_nations',
 		type: 'base',
 		visible: false,
 
@@ -237,13 +240,48 @@ GIAPI.OL_Map = function(options) {
 	});
 
 	if (options.defaultLayer !== undefined) {
-		layers.forEach((layer) => {
-			layer.setVisible(false);
-			var title = layer.get('title');
-			if (title === options.defaultLayer) {
-				layer.setVisible(true);
+		var normalize = function(s) {
+			return (s == null) ? '' : ('' + s).trim().toLowerCase();
+		};
+
+		var desiredRaw = options.defaultLayer;
+		var desiredNorm = normalize(desiredRaw);
+
+		// Accept both stable keys and display titles (in any language) via a small alias map.
+		var aliases = {
+			'united nations': 'united_nations',
+			'nazioni unite': 'united_nations',
+			'united_nations': 'united_nations',
+
+			'openstreetmap': 'openstreetmap',
+			'open street map': 'openstreetmap',
+			'osm': 'openstreetmap',
+
+			'satellite': 'satellite',
+			'world imagery': 'satellite'
+		};
+		var desiredKey = aliases[desiredNorm] || desiredNorm;
+
+		// Find best match by key first, then by title as a fallback.
+		var match = null;
+		for (var i = 0; i < layers.length; i++) {
+			var layer = layers[i];
+			var layerKey = normalize(layer.get('key') || layer.get('id'));
+			var layerTitle = normalize(layer.get('title'));
+			if (layerKey && layerKey === desiredKey) {
+				match = layer;
+				break;
 			}
-		});
+			if (!match && layerTitle && layerTitle === desiredNorm) {
+				match = layer;
+			}
+		}
+
+		// Only override visibility if we found a matching base layer; otherwise keep defaults.
+		if (match) {
+			layers.forEach((layer) => layer.setVisible(false));
+			match.setVisible(true);
+		}
 
 	}
 

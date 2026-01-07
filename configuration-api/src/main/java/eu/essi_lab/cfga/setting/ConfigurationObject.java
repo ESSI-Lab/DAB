@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.setting;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -100,7 +100,7 @@ public abstract class ConfigurationObject {
 	    return;
 	}
 
-	setProperty(ENABLED.getKey(), enabled, true);
+	setProperty(ENABLED.getKey(), enabled, ENABLED.getDefaultValue().get());
 
 	if (!enabled) {
 	    propagateEnabled(enabled);
@@ -112,7 +112,7 @@ public abstract class ConfigurationObject {
      */
     public final boolean isEnabled() {
 
-	return isPropertySet(ENABLED.getKey(), true);
+	return isPropertySet(ENABLED.getKey(), ENABLED.getDefaultValue().get());
     }
 
     /**
@@ -122,7 +122,7 @@ public abstract class ConfigurationObject {
      */
     public void setCanBeDisabled(boolean canBeDisabled) {
 
-	setProperty(CAN_BE_DISABLED.getKey(), canBeDisabled, true);
+	setProperty(CAN_BE_DISABLED.getKey(), canBeDisabled, CAN_BE_DISABLED.getDefaultValue().get());
     }
 
     /**
@@ -130,7 +130,7 @@ public abstract class ConfigurationObject {
      */
     public boolean canBeDisabled() {
 
-	return isPropertySet(CAN_BE_DISABLED.getKey(), true);
+	return isPropertySet(CAN_BE_DISABLED.getKey(), CAN_BE_DISABLED.getDefaultValue().get());
     }
 
     /**
@@ -140,7 +140,7 @@ public abstract class ConfigurationObject {
      */
     public final void setVisible(boolean visible) {
 
-	setProperty(VISIBLE.getKey(), visible, true);
+	setProperty(VISIBLE.getKey(), visible, VISIBLE.getDefaultValue().get());
 
 	if (!visible) {
 	    propagateVisible(visible);
@@ -152,7 +152,7 @@ public abstract class ConfigurationObject {
      */
     public final boolean isVisible() {
 
-	return isPropertySet(VISIBLE.getKey(), true);
+	return isPropertySet(VISIBLE.getKey(), VISIBLE.getDefaultValue().get());
     }
 
     /**
@@ -166,7 +166,7 @@ public abstract class ConfigurationObject {
      */
     public boolean isEditable() {
 
-	return isPropertySet(EDITABLE.getKey(), true);
+	return isPropertySet(EDITABLE.getKey(), EDITABLE.getDefaultValue().get());
     }
 
     /**
@@ -180,7 +180,7 @@ public abstract class ConfigurationObject {
      */
     public void setEditable(boolean editable) {
 
-	setProperty(EDITABLE.getKey(), editable, true);
+	setProperty(EDITABLE.getKey(), editable, EDITABLE.getDefaultValue().get());
     }
 
     /**

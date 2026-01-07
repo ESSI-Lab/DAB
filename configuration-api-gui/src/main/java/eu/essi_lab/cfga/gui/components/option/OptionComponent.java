@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.option;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,30 +33,16 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.gui.components.OptionComponentFactory;
+import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * <info>
  * <style>
- * #component {
- * font-family: Arial, Helvetica, sans-serif;
- * border-collapse: collapse;
- * width: 100%;
- * }
- * #component td, #component th {
- * border: 1px solid #ddd;
- * padding: 8px;
- * }
- * #component tr:nth-child(even){background-color: #f2f2f2;}
- * #component tr:hover {background-color: #ddd;}
- * #component th {
- * padding-top: 12px;
- * padding-bottom: 12px;
- * text-align: left;
- * background-color: #4CAF50;
- * color: white;
- * }
+ * #component { font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%; } #component td, #component th { border:
+ * 1px solid #ddd; padding: 8px; } #component tr:nth-child(even){background-color: #f2f2f2;} #component tr:hover {background-color: #ddd;}
+ * #component th { padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #4CAF50; color: white; }
  * </style>
  * <table id='component'>
  * <tr>
@@ -120,7 +106,7 @@ import eu.essi_lab.cfga.setting.Setting;
 public class OptionComponent extends VerticalLayout {
 
     private HasEnabled renderedOption;
-    private Option<?> option;
+    private final Option<?> option;
     private ToggleButton toggle;
     private VerticalLayout optionLayout;
 
@@ -186,9 +172,11 @@ public class OptionComponent extends VerticalLayout {
 
 	Optional<String> description = option.getDescription();
 
+	Label descriptionLabel = null;
+
 	if (description.isPresent()) {
 
-	    Label descriptionLabel = OptionComponentFactory.createOptionDescriptionLabel(description.get());
+	    descriptionLabel = OptionComponentFactory.createOptionDescriptionLabel(description.get());
 
 	    optionLayout.add(descriptionLabel);
 	}
@@ -204,6 +192,16 @@ public class OptionComponent extends VerticalLayout {
 	    Component valueField = OptionComponentFactory.createOptionUnsetValueComponent(option, forceReadonly);
 
 	    renderedOption = (HasEnabled) valueField;
+
+	    if (option.getValueClass().equals(BooleanChoice.class)) {
+
+		if (descriptionLabel != null) {
+
+		    optionLayout.remove(descriptionLabel);
+		}
+
+		optionLayout.remove(label);
+	    }
 
 	    optionLayout.add(valueField);
 
@@ -246,11 +244,21 @@ public class OptionComponent extends VerticalLayout {
 
 	    } else {
 
-		Component select = OptionComponentFactory.createOptionSingleSelectionComponent(option, forceReadonly);
+		Component comp = OptionComponentFactory.createOptionSingleSelectionComponent(option, forceReadonly);
 
-		renderedOption = (HasEnabled) select;
+		renderedOption = (HasEnabled) comp;
 
-		optionLayout.add(select);
+		if (option.getValueClass().equals(BooleanChoice.class)) {
+
+		    if (descriptionLabel != null) {
+
+			optionLayout.remove(descriptionLabel);
+		    }
+
+		    optionLayout.remove(label);
+		}
+
+		optionLayout.add(comp);
 	    }
 
 	    break;
@@ -271,7 +279,7 @@ public class OptionComponent extends VerticalLayout {
 	    // if the option can be disabled, it has its own toggle button
 	    // and its state can be set to enabled only with the toggle button
 	    //
-	} else if (value && !option.canBeDisabled()) {
+	} else if (!option.canBeDisabled()) {
 
 	    onToggleStateChanged(true);
 	}

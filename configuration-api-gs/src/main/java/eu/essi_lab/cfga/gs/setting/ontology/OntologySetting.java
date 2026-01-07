@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gs.setting.ontology;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,18 +24,17 @@ package eu.essi_lab.cfga.gs.setting.ontology;
  * #L%
  */
 
+import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
+import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
@@ -265,7 +264,6 @@ public class OntologySetting extends Setting implements EditableSetting {
 	//
 	//
 
-	setExtension(new OntologySettingComponentInfo());
 	setAfterCleanFunction(new OntologySettingAfterCleanFunction());
 
 	//
@@ -435,18 +433,18 @@ public class OntologySetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class OntologySettingComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public OntologySettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(AccessorSetting.class.getName());
-
-	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(GSTabIndex.ONTOLOGIES.getIndex()).//
-		    withShowDirective("Ontologies", SortDirection.ASCENDING).//
+	    descriptor = TabContentDescriptorBuilder.get(OntologySetting.class).//
+		    withLabel("Ontologies").//
+		    withShowDirective("Registered ontologies that can be brokered by the semantic search engine", SortDirection.ASCENDING).//
 		    withAddDirective("Add ontology", OntologySetting.class).//
 		    withRemoveDirective("Remove ontology", true, OntologySetting.class).//
 		    withEditDirective("Edit ontology", ConfirmationPolicy.ON_WARNINGS).//
@@ -454,11 +452,11 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 		    ColumnDescriptor.createPositionalDescriptor(), //
 
-		    ColumnDescriptor.create("Id", 300, true, true, this::getOntologyId), //
+		    ColumnDescriptor.create("Id", 200, true, true, this::getOntologyId), //
 
-		    ColumnDescriptor.create("Endpoint", 500, true, true, this::getOntologyEndpoint), //
+		    ColumnDescriptor.create("Endpoint", 300, true, true, this::getOntologyEndpoint), //
 
-		    ColumnDescriptor.create("Name", 500, true, true, this::getOntologyName), //
+		    ColumnDescriptor.create("Name", 300, true, true, this::getOntologyName), //
 
 		    ColumnDescriptor.create("Description", true, true, this::getOntologyDescription), //
 
@@ -468,11 +466,17 @@ public class OntologySetting extends Setting implements EditableSetting {
 
 		    ColumnDescriptor.create("Availability", 100, true, true, this::getOntologyAvailability) //
 
-	    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).
+	    ), getItemsList(), Grid.SelectionMode.MULTI).
 
 		    build();
+	}
 
-	    setTabInfo(tabInfo);
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
 
 	/**

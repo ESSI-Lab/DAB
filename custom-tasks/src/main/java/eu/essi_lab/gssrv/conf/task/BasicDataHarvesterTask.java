@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf.task;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
+import eu.essi_lab.lib.xml.*;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -92,7 +93,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	    return;
 	}
 	dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, "10000"); // note: 100000 is too much, it returns
-										 // 413
+	// 413
 	dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, "2000");
 	dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, "0");
 
@@ -154,7 +155,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 
 	Path tempPath = null;
 
-	File tempDirFile = FileUtils.createTempDir("basic-data-harvester", false);
+	File tempDirFile = FileUtils.getTempDir("basic-data-harvester", false);
 
 	tempPath = tempDirFile.toPath();
 
@@ -167,7 +168,8 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	    tempDirFile.mkdirs();
 	}
 
-	base: while (firstLoop || resumptionToken != null) {
+	base:
+	while (firstLoop || resumptionToken != null) {
 
 	    firstLoop = false;
 
@@ -193,8 +195,8 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 		if (json.has("member")) {
 
 		    JSONArray members = json.getJSONArray("member");
-		    GSLoggerFactory.getLogger(getClass()).info("Retrieved block of size {}, resumption token {}", members.length(),
-			    resumptionToken);
+		    GSLoggerFactory.getLogger(getClass())
+			    .info("Retrieved block of size {}, resumption token {}", members.length(), resumptionToken);
 		    if (members.length() == 0) {
 			break;
 		    }
@@ -294,9 +296,9 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 			    Thread.sleep(1000);
 			}
 
-			GSLoggerFactory.getLogger(getClass()).info(
-				"Basic data augmenter stats. Source id {}. Records seen: {} Records inserted: {} Errors: {} Major errors: {}",
-				sourceId, totalRecords, recordsDone, errors, majorErrors);
+			GSLoggerFactory.getLogger(getClass())
+				.info("Basic data augmenter stats. Source id {}. Records seen: {} Records inserted: {} Errors: {} Major errors: {}",
+					sourceId, totalRecords, recordsDone, errors, majorErrors);
 
 			// CHECKING CANCELED JOB
 
@@ -330,7 +332,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	return "Basic Data harvester task";
     }
 
-    static XMLInputFactory factory = XMLInputFactory.newInstance();
+    static XMLInputFactory factory = XMLFactories.newXMLInputFactory();
 
     private static String readValue(XMLEventReader reader) {
 

@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.database;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,15 +26,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -138,11 +134,6 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	// set the validator
 	//
 	setValidator(new SourceStorageValidator());
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new SourceStorageSettingComponentInfo());
     }
 
     /**
@@ -192,21 +183,28 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class SourceStorageSettingComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 * 
 	 */
-	public SourceStorageSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(SystemSetting.class.getName());
-
-	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(GSTabIndex.SOURCE_STORAGE.getIndex()).//
-		    withShowDirective("Source storage").//
+	    descriptor = TabContentDescriptorBuilder.get(SourceStorageSetting.class).//
+		    withLabel("Source storage").//
+		    withEditDirective("Edit source storage settings").//
 		    build();
+	}
 
-	    setTabInfo(tabInfo);
+	/**
+	 *
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 

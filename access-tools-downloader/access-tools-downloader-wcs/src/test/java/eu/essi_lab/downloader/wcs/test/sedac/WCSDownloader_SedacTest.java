@@ -7,7 +7,7 @@ import org.junit.Assert;
 import eu.essi_lab.downloader.wcs.test.WCSDownloader_Test;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataType;
@@ -45,7 +45,7 @@ public abstract class WCSDownloader_SedacTest extends WCSDownloader_Test {
 
 	NetProtocol protocol = getProtocol();
 
-	if (protocol.equals(NetProtocols.WCS_1_1_1)) {
+	if (protocol.equals(NetProtocolWrapper.WCS_1_1_1)) {
 	    // the size is missing from the coverage description, but it is inferred
 	    // (as different) from the bounding box & resolution values
 	    size1 = 14098l;

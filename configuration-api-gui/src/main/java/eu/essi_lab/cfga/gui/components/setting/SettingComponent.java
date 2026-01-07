@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.setting;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,8 +31,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.vaadin.componentfactory.ToggleButton;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
@@ -46,13 +46,14 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.option.OptionComponent;
 import eu.essi_lab.cfga.gui.components.option.OptionComponentLayout;
 import eu.essi_lab.cfga.gui.components.option.OptionTextField;
 import eu.essi_lab.cfga.gui.components.setting.group.CheckComponentsHandler;
 import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
 import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.cfga.setting.ConfigurationObject;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
@@ -61,24 +62,9 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 /**
  * <info>
  * <style>
- * #component {
- * font-family: Arial, Helvetica, sans-serif;
- * border-collapse: collapse;
- * width: 100%;
- * }
- * #component td, #component th {
- * border: 1px solid #ddd;
- * padding: 8px;
- * }
- * #component tr:nth-child(even){background-color: #f2f2f2;}
- * #component tr:hover {background-color: #ddd;}
- * #component th {
- * padding-top: 12px;
- * padding-bottom: 12px;
- * text-align: left;
- * background-color: #4CAF50;
- * color: white;
- * }
+ * #component { font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%; } #component td, #component th { border:
+ * 1px solid #ddd; padding: 8px; } #component tr:nth-child(even){background-color: #f2f2f2;} #component tr:hover {background-color: #ddd;}
+ * #component th { padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #4CAF50; color: white; }
  * </style>
  * <table id='component'>
  * <tr>
@@ -148,7 +134,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class SettingComponent extends Div {
 
     /**
-     * 
+     *
      */
     private static final Integer LEVEL_LEFT_PADDING = 10;
 
@@ -161,62 +147,41 @@ public class SettingComponent extends Div {
     private HashMap<String, List<Component>> settingNameToComponentsMap;
     private HashMap<String, List<Component>> settingNameToToggleAndOptionsMap;
 
-    private boolean forceReadonly;
+    private final boolean forceReadonly;
     private Setting setting;
-    private String settingIdentifier;
 
-    private Configuration configuration;
+    private final Configuration configuration;
     private Details details;
-    private TabContainer tabContainer;
+    private final TabContent tabContent;
 
-    private boolean forceHideLabel;
+    private final boolean forceHideHeader;
 
     /**
      * @param configuration
      * @param setting
      * @param forceReadonly
-     * @param forceHideLabel
+     * @param forceHideHeader
      * @param comparator
-     * @param tabContainer
+     * @param tabContent
      */
     public SettingComponent(//
 	    Configuration configuration, //
 	    Setting setting, //
 	    boolean forceReadonly, //
-	    boolean forceHideLabel, //
+	    boolean forceHideHeader, //
 	    Comparator<Setting> comparator, //
-	    TabContainer tabContainer) {
+	    TabContent tabContent) {
 
 	this.configuration = configuration;
 	this.setting = setting;
 	this.forceReadonly = forceReadonly;
-	this.tabContainer = tabContainer;
-	this.forceHideLabel = forceHideLabel;
+	this.tabContent = tabContent;
+	this.forceHideHeader = forceHideHeader;
 
-	init(comparator);
-    }
+	if (setting.isFoldedModeEnabled()) {
 
-    /**
-     * @param configuration
-     * @param setting
-     * @param forceReadonly
-     * @param forceHideLabel
-     * @param comparator
-     * @param tabContainer
-     */
-    public SettingComponent(//
-	    Configuration configuration, //
-	    String settingIdentifier, //
-	    boolean forceReadonly, //
-	    boolean forceHideLabel, //
-	    Comparator<Setting> comparator, //
-	    TabContainer tabContainer) {
-
-	this.configuration = configuration;
-	this.settingIdentifier = settingIdentifier;
-	this.forceReadonly = forceReadonly;
-	this.tabContainer = tabContainer;
-	this.forceHideLabel = forceHideLabel;
+	    this.details = ComponentFactory.createDetails(setting.getName(), this);
+	}
 
 	init(comparator);
     }
@@ -228,8 +193,11 @@ public class SettingComponent extends Div {
 
 	setId("setting-component-" + getSetting().getName());
 
-	setHeightFull();
 	setWidthFull();
+
+	getStyle().set("background-color", "white");
+ 	getStyle().set("border-radius", "5px");
+	getStyle().set("margin-top", "0px");
 
 	radioMap = new HashMap<>();
 	checkMap = new HashMap<>();
@@ -265,7 +233,6 @@ public class SettingComponent extends Div {
     /**
      * @param enabled
      */
-    @SuppressWarnings("unchecked")
     public void onToggleStateChanged(ValueChangeEvent<?> event) {
 
 	boolean enabled = (Boolean) event.getValue();
@@ -283,10 +250,10 @@ public class SettingComponent extends Div {
 
 	SettingUtils.deepFind(getSetting(), s -> s.getIdentifier().equals(settingId), list);
 
-	Setting settingToUpdate = list.get(0);
+	Setting settingToUpdate = list.getFirst();
 
-	GSLoggerFactory.getLogger(getClass()).debug("Updating state of setting: " + settingToUpdate.getName());
-	GSLoggerFactory.getLogger(getClass()).debug("New state: " + (enabled ? "enabled" : "disabled"));
+	GSLoggerFactory.getLogger(getClass()).debug("Updating state of setting: {}", settingToUpdate.getName());
+	GSLoggerFactory.getLogger(getClass()).debug("New state: {}", enabled ? "enabled" : "disabled");
 
 	settingToUpdate.setEnabled(enabled);
 
@@ -301,20 +268,7 @@ public class SettingComponent extends Div {
      */
     public Setting getSetting() {
 
-	if (this.setting != null) {
-
-	    return setting;
-	}
-
-	return configuration.get(settingIdentifier).get();
-    }
-
-    /**
-     * @param details
-     */
-    public void setDetails(Details details) {
-
-	this.details = details;
+	return setting;
     }
 
     /**
@@ -335,14 +289,13 @@ public class SettingComponent extends Div {
 
 	if (list != null && !list.isEmpty()) {
 
-	    OptionComponentLayout layout = (OptionComponentLayout) list.get(0);
+	    OptionComponentLayout layout = (OptionComponentLayout) list.getFirst();
 
 	    return layout.//
 		    getOptionComponents().//
 		    stream().//
-		    map(oc -> oc.getOptionLayout().getChildren().filter(c -> c instanceof OptionTextField).findFirst()
-			    .map(c -> (OptionTextField) c).orElse(null))
-		    .//
+		    map(oc -> (OptionTextField) oc.getOptionLayout().getChildren().filter(c -> c instanceof OptionTextField).findFirst()
+		    .orElse(null)).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
 	}
@@ -354,16 +307,16 @@ public class SettingComponent extends Div {
      * @return
      */
     public Optional<RadioComponentsHandler> getRadioHandler() {
-    
-        return radioMap.values().stream().findFirst();
+
+	return radioMap.values().stream().findFirst();
     }
 
     /**
      * @return
      */
     public Optional<CheckComponentsHandler> getCheckHandler() {
-    
-        return checkMap.values().stream().findFirst();
+
+	return checkMap.values().stream().findFirst();
     }
 
     /**
@@ -376,9 +329,8 @@ public class SettingComponent extends Div {
 
 	for (Component comp : list) {
 
-	    if (comp instanceof OptionComponent) {
+	    if (comp instanceof OptionComponent optionComp) {
 
-		OptionComponent optionComp = (OptionComponent) comp;
 		optionComp.onSettingToggleStateChanged(enabled, forceReadonly);
 
 	    } else {
@@ -408,7 +360,6 @@ public class SettingComponent extends Div {
 		}
 	    }
 	}
-
     }
 
     /**
@@ -467,14 +418,26 @@ public class SettingComponent extends Div {
 	add(mainLayout);
 
 	HorizontalLayout headerLayout = SettingComponentFactory.createSettingHeaderLayout(setting);
-	if (!setting.isEditable()) {
-	    // headerLayout = SettingComponentFactory.createSettingHeaderLayoutWithBottomMargin(setting);
+
+	//
+	// forced to hide the whole header by the put/edit dialogs
+	// the header is hidden only in the root setting
+	//
+	if (forceHideHeader && parent == null) {
+
+	    headerLayout.setId("XXXXXXXXXXXXXXXXXXXXXXXX");
+	    headerLayout.getStyle().set("display", "none");
 	}
 
-	// hides the header
+	//
+	// if the name is hidden, an empty div is added instead of the label
+	//
 	if (!setting.isShowHeaderSet()) {
 
-	    headerLayout.getStyle().set("display", "none");
+	    Div div = ComponentFactory.createDiv();
+	    div.setWidthFull();
+
+	    headerLayout.add(div);
 	}
 
 	HorizontalLayout descriptionLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
@@ -486,7 +449,7 @@ public class SettingComponent extends Div {
 	mainLayout.add(descriptionLayout);
 
 	//
-	// get the multi selection of its parent (if exists)
+	// get selection mode of its parent (if exists)
 	//
 	SelectionMode selectionMode = parent != null ? parent.getSelectionMode() : SelectionMode.UNSET;
 
@@ -496,11 +459,14 @@ public class SettingComponent extends Div {
 	    // name is added to the header if the setting is not folded
 	    // if the setting is folded, the name is visible in the details component
 	    //
-	    if (!setting.isFoldedModeEnabled() && !forceHideLabel) {
+	    if (!setting.isFoldedModeEnabled()) {
 
 		Label label = handleLabel(parent, setting, headerLayout);
 
-		updateSettingToComponentsMap(setting, label);
+		if (label != null) {
+
+		    updateSettingToComponentsMap(setting, label);
+		}
 
 	    } else {
 		//
@@ -599,14 +565,14 @@ public class SettingComponent extends Div {
 	handleDescription(parent, setting, descriptionLayout, selectionMode);
 
 	//
-	// reset button
+	// edit button
 	//
 	handleEditButton(parent, setting, headerLayout, selectionMode);
 
 	//
 	// remove button
 	//
-	handleRemoveButton(parent, setting, tabContainer, headerLayout, selectionMode);
+	handleRemoveButton(parent, setting, tabContent, headerLayout, selectionMode);
 
 	//
 	// disable button
@@ -620,11 +586,7 @@ public class SettingComponent extends Div {
 
 	if (toggle.isPresent()) {
 
-	    List<Component> list = settingNameToToggleAndOptionsMap.get(setting.getName());
-	    if (list == null) {
-		list = new ArrayList<>();
-		settingNameToToggleAndOptionsMap.put(setting.getName(), list);
-	    }
+	    List<Component> list = settingNameToToggleAndOptionsMap.computeIfAbsent(setting.getName(), k -> new ArrayList<>());
 
 	    list.add(toggle.get());
 
@@ -632,9 +594,7 @@ public class SettingComponent extends Div {
 
 		List<OptionComponent> optionComponents = optionLayout.get().getOptionComponents();
 
-		for (OptionComponent optionComponent : optionComponents) {
-		    list.add(optionComponent);
-		}
+		list.addAll(optionComponents);
 	    }
 
 	    onToggleStateChanged(setting, toggle.get().getValue());
@@ -648,11 +608,16 @@ public class SettingComponent extends Div {
      */
     private Label handleLabel(Setting parent, Setting setting, HorizontalLayout headerLayout) {
 
-	Label label = SettingComponentFactory.createSettingNameLabel(setting, parent);
+	if (setting.isShowHeaderSet()) {
 
-	headerLayout.add(label);
+	    Label label = SettingComponentFactory.createSettingNameLabel(setting, parent);
 
-	return label;
+	    headerLayout.add(label);
+
+	    return label;
+	}
+
+	return null;
     }
 
     /**
@@ -667,7 +632,7 @@ public class SettingComponent extends Div {
 
 	Optional<String> description = setting.getDescription();
 
-	if (!description.isPresent() && !hasVisibleOptions(setting) && multiSelectionMode != SelectionMode.UNSET) {
+	if (description.isEmpty() && !hasVisibleOptions(setting) && multiSelectionMode != SelectionMode.UNSET) {
 
 	    //
 	    // if the setting is empty, no description nor options and the setting is an item of check
@@ -708,7 +673,12 @@ public class SettingComponent extends Div {
 
 	if (isEditable) {
 
-	    Button button = SettingComponentFactory.createSettingEditButton(configuration, setting, this, tabContainer);
+	    Button button = SettingComponentFactory.createSettingEditButton(configuration, setting, this, tabContent);
+
+	    if (setting.isShowHeaderSet()) {
+
+		button.getStyle().set("margin-left", "3px");
+	    }
 
 	    updateSettingToComponentsMap(setting, button);
 
@@ -731,7 +701,7 @@ public class SettingComponent extends Div {
     private void handleRemoveButton(//
 	    Setting parent, //
 	    Setting setting, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    HorizontalLayout headerLayout, //
 	    SelectionMode multiSelectionMode) {
 
@@ -739,7 +709,7 @@ public class SettingComponent extends Div {
 
 	if (canBeRemoved) {
 
-	    Button button = SettingComponentFactory.createSettingRemoveButton(configuration, tabContainer, this);
+	    Button button = SettingComponentFactory.createSettingRemoveButton(configuration, tabContent, this);
 
 	    updateSettingToComponentsMap(setting, button);
 
@@ -820,13 +790,15 @@ public class SettingComponent extends Div {
 
 	long visibileOptions = options.//
 		stream().//
-		filter(o -> o.isVisible()).//
+		filter(ConfigurationObject::isVisible).//
 		count();
 
 	if (!options.isEmpty() && visibileOptions > 0) {
 
-	    OptionComponentLayout optionLayout = SettingComponentFactory.createSettingOptionsComponent(configuration, setting,
-		    forceReadonly);
+	    OptionComponentLayout optionLayout = SettingComponentFactory.createSettingOptionsComponent(//
+		    configuration, //
+		    setting,//
+		    forceReadonly);//
 
 	    Component component = optionLayout;
 
@@ -861,13 +833,13 @@ public class SettingComponent extends Div {
 
 	List<Option<?>> options = setting.getOptions();
 
-	long visibileOptions = options.stream().filter(o -> o.isVisible()).count();
+	long visibileOptions = options.stream().filter(ConfigurationObject::isVisible).count();
 
 	return !options.isEmpty() && visibileOptions > 0;
     }
 
     /**
-     * 
+     *
      */
     private void addRadioMultiSelectionComponents() {
 
@@ -912,7 +884,7 @@ public class SettingComponent extends Div {
     }
 
     /**
-     * 
+     *
      */
     private void addCheckMultiSelectionComponents() {
 
@@ -994,11 +966,7 @@ public class SettingComponent extends Div {
      */
     private void updateSettingToComponentsMap(Setting setting, Component component) {
 
-	List<Component> list = settingNameToComponentsMap.get(setting.getName());
-	if (list == null) {
-	    list = new ArrayList<>();
-	    settingNameToComponentsMap.put(setting.getName(), list);
-	}
+	List<Component> list = settingNameToComponentsMap.computeIfAbsent(setting.getName(), k -> new ArrayList<>());
 	list.add(component);
     }
 
@@ -1010,11 +978,7 @@ public class SettingComponent extends Div {
 
 	if (parent != null) {
 
-	    List<Setting> list = childToParentsMap.get(setting);
-	    if (list == null) {
-		list = new ArrayList<>();
-		childToParentsMap.put(setting, list);
-	    }
+	    List<Setting> list = childToParentsMap.computeIfAbsent(setting, k -> new ArrayList<>());
 
 	    List<Setting> superParents = childToParentsMap.get(parent);
 	    if (superParents != null) {
@@ -1035,7 +999,7 @@ public class SettingComponent extends Div {
 		keySet().//
 		stream().//
 		filter(child -> getParentNamesOfChild(child).contains(parentSettingName)).//
-		map(s -> s.getName()).//
+		map(Setting::getName).//
 		collect(Collectors.toList());
     }
 
@@ -1045,7 +1009,7 @@ public class SettingComponent extends Div {
      */
     private List<String> getParentNamesOfChild(Setting childSetting) {
 
-	return childToParentsMap.get(childSetting).stream().map(s -> s.getName()).collect(Collectors.toList());
+	return childToParentsMap.get(childSetting).stream().map(Setting::getName).collect(Collectors.toList());
     }
 
     /**

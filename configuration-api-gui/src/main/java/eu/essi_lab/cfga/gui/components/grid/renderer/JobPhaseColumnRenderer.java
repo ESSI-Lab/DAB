@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -39,6 +40,7 @@ import eu.essi_lab.messages.JobStatus.JobPhase;
  */
 public class JobPhaseColumnRenderer extends IconColumnRenderer {
 
+    @Serial
     private static final long serialVersionUID = -5355241303442699327L;
 
     /**
@@ -75,18 +77,12 @@ public class JobPhaseColumnRenderer extends IconColumnRenderer {
     protected Optional<String> getToolTip(HashMap<String, String> item) {
 
 	String status = item.get("Status");
-	switch (status) {
+	return switch (status) {
+	    case JobPhase.RUNNING_LABEL, JobPhase.CANCELED_LABEL, JobPhase.COMPLETED_LABEL, JobPhase.ERROR_LABEL,
+		 JobPhase.RESCHEDULED_LABEL -> Optional.of(status);
+	    default -> Optional.empty();
+	};
 
-	case JobPhase.RUNNING_LABEL:
-	case JobPhase.CANCELED_LABEL:
-	case JobPhase.COMPLETED_LABEL:
-	case JobPhase.ERROR_LABEL:
-	case JobPhase.RESCHEDULED_LABEL:
-
-	    return Optional.of(status);
-	}
-
-	return Optional.empty();
     }
 
     /**
@@ -95,30 +91,13 @@ public class JobPhaseColumnRenderer extends IconColumnRenderer {
      */
     private Icon createIcon(String status) {
 
-	switch (status) {
-
-	case JobPhase.RUNNING_LABEL:
-
-	    return VaadinIcon.PLAY_CIRCLE_O.create();
-
-	case JobPhase.CANCELED_LABEL:
-
-	    return VaadinIcon.CLOSE_CIRCLE_O.create();
-
-	case JobPhase.COMPLETED_LABEL:
-
-	    return VaadinIcon.CHECK_SQUARE_O.create();
-
-	case JobPhase.ERROR_LABEL:
-
-	    return VaadinIcon.WARNING.create();
-
-	case JobPhase.RESCHEDULED_LABEL:
-
-	    return VaadinIcon.ALARM.create();
-
-	default:
-	    return IconColumnRenderer.getEmptyIcon();
-	}
+	return switch (status) {
+	    case JobPhase.RUNNING_LABEL -> VaadinIcon.PLAY_CIRCLE_O.create();
+	    case JobPhase.CANCELED_LABEL -> VaadinIcon.CLOSE_CIRCLE_O.create();
+	    case JobPhase.COMPLETED_LABEL -> VaadinIcon.CHECK_SQUARE_O.create();
+	    case JobPhase.ERROR_LABEL -> VaadinIcon.WARNING.create();
+	    case JobPhase.RESCHEDULED_LABEL -> VaadinIcon.ALARM.create();
+	    default -> IconColumnRenderer.getEmptyIcon();
+	};
     }
 }

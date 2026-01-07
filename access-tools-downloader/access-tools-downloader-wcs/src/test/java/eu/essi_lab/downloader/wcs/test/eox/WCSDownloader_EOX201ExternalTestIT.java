@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import eu.essi_lab.downloader.wcs.WCSDownloader_201;
 import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 
 public class WCSDownloader_EOX201ExternalTestIT extends WCSDownloader_EOXTest {
 
@@ -24,7 +24,7 @@ public class WCSDownloader_EOX201ExternalTestIT extends WCSDownloader_EOXTest {
 
     @Override
     public NetProtocol getProtocol() {
-	return NetProtocols.WCS_2_0_1;
+	return NetProtocolWrapper.WCS_2_0_1.get();
     }
 
     @Override

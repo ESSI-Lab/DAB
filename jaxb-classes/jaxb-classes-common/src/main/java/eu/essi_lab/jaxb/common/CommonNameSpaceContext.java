@@ -4,7 +4,7 @@ package eu.essi_lab.jaxb.common;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -151,6 +151,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String HISCENTRAL_LAZIO_NS_URI = "http://essi-lab.eu/his-central/lazio";
     public static final String HISCENTRAL_VALDAOSTA_NS_URI = "http://essi-lab.eu/his-central/valdaosta";
     public static final String HISCENTRAL_PIEMONTE_NS_URI = "http://essi-lab.eu/his-central/piemonte";
+    public static final String HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI = "http://essi-lab.eu/his-central/piemonte-scala-deflusso";
     public static final String HISCENTRAL_LIGURIA_NS_URI = "http://essi-lab.eu/his-central/liguria";
     public static final String HISCENTRAL_BOLZANO_NS_URI = "http://essi-lab.eu/his-central/bolzano";
     public static final String HISCENTRAL_PUGLIA_NS_URI = "http://essi-lab.eu/his-central/puglia";
@@ -182,6 +183,8 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String EEA_NS_URI = "http://essi-lab.eu/eea";
     
     public static final String AGAME_NS_URI = "http://essi-lab.eu/agame";
+    
+    public static final String DATALOGGERS_NS_URI = "http://essi-lab.eu/dataloggers";
 
     public CommonNameSpaceContext() {
 
@@ -241,6 +244,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("hiscentrallazio", HISCENTRAL_LAZIO_NS_URI);
 	map.put("hiscentralvaldaosta", HISCENTRAL_VALDAOSTA_NS_URI);
 	map.put("hiscentralpiemonte", HISCENTRAL_PIEMONTE_NS_URI);
+	map.put("hiscentralpiemontescaladeflusso", HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI);
 	map.put("hiscentralliguria", HISCENTRAL_LIGURIA_NS_URI);
 	map.put("hiscentralbolzano", HISCENTRAL_BOLZANO_NS_URI);
 	map.put("hiscentralsardegna", HISCENTRAL_SARDEGNA_NS_URI);
@@ -263,6 +267,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("geomountain", GEOMOUNTAIN);
 	map.put("eea", EEA_NS_URI);
 	map.put("agame", AGAME_NS_URI);
+	map.put("dataloggers", DATALOGGERS_NS_URI);
 
     }
 

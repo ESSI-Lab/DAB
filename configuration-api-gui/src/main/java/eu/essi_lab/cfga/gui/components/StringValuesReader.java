@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -76,7 +76,7 @@ public class StringValuesReader {
 	List<String> selectedValues = readSelectedValues(option);
 	if (!selectedValues.isEmpty()) {
 
-	    return Optional.of(selectedValues.get(0));
+	    return Optional.of(selectedValues.getFirst());
 	}
 
 	return Optional.empty();

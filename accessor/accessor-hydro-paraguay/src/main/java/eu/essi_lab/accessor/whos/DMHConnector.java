@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.whos;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,7 @@ import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalCRS;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -247,7 +247,7 @@ public class DMHConnector extends HarvestedQueryConnector<DMHConnectorSetting> {
 
 		    String identifier = mangler.getMangling();
 
-		    coreMetadata.addDistributionOnlineResource(identifier, getSourceURL(), NetProtocols.DMH.getCommonURN(), "download");
+		    coreMetadata.addDistributionOnlineResource(identifier, getSourceURL(), NetProtocolWrapper.DMH.getCommonURN(), "download");
 
 		    String resourceIdentifier = AbstractResourceMapper.generateCode(dataset, identifier);
 

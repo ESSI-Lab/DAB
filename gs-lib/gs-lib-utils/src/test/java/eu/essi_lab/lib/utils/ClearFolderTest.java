@@ -19,7 +19,7 @@ public class ClearFolderTest {
     @Test
     public void test1() throws IOException, URISyntaxException {
 
-	File tempDir = FileUtils.createTempDir(UUID.randomUUID().toString(), true);
+	File tempDir = FileUtils.getTempDir(UUID.randomUUID().toString(), true);
 
 	Assert.assertTrue(tempDir.exists());
 
@@ -47,7 +47,7 @@ public class ClearFolderTest {
     @Test
     public void test2() throws IOException, URISyntaxException {
 
-	File tempDir = FileUtils.createTempDir(UUID.randomUUID().toString(), true);
+	File tempDir = FileUtils.getTempDir(UUID.randomUUID().toString(), true);
 
 	Assert.assertTrue(tempDir.exists());
 

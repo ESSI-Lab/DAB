@@ -1,0 +1,71 @@
+{
+    "results": [
+        {
+            "id_parametro": "IDRO",
+            "aggregati": [
+                {
+                    "code": "livellomedio",
+                    "observedProperty": "Livello idrometrico",
+                    "uom": "m",
+                    "interpolationType": "media intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "lclasse",
+                        "position": 1
+                    }
+                },
+                {
+                    "code": "livellomedio1",
+                    "observedProperty": "Livello idrometrico canale",
+                    "uom": "m",
+                    "interpolationType": "media intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "lclasse",
+                        "position": 2
+                    }
+                }
+            ],
+            "flag_validazione": "lclasse"
+        },
+        {
+            "id_parametro": "PORTATA",
+            "aggregati": [
+                {
+                    "code": "portatamedia",
+                    "observedProperty": "Portata fiume",
+                    "uom": "m3/s",
+                    "interpolationType": "media intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "pclasse",
+                        "position": 1
+                    }
+                },
+                {
+                    "code": "portatamedia1",
+                    "observedProperty": "Portata canale",
+                    "uom": "m3/s",
+                    "interpolationType": "media intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "pclasse",
+                        "position": 2
+                    }
+                },
+                {
+                    "code": "portatamediat",
+                    "observedProperty": "Portata naturale",
+                    "uom": "m3/s",
+                    "interpolationType": "media intervallo precedente (o successivo?)",
+                    "timeResolution": "P1D",
+                    "flag_validazione": {
+                        "code": "pclasse",
+                        "position": 3
+                    }
+                }
+            ],
+			"flag_validazione": "pclasse"
+        }
+    ]
+}

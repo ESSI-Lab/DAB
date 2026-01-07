@@ -7,7 +7,7 @@ package eu.essi_lab.messages.stats;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@ package eu.essi_lab.messages.stats;
  * #L%
  */
 
-import java.util.HashMap;
+import java.io.Serial;
 import java.util.List;
 import java.util.Optional;
 
@@ -135,6 +135,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -2588502390274546072L;
 
     /**
@@ -143,7 +144,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void groupBy(GroupByPeriod groupByPeriod) {
 
-	getPayload().add(new GSProperty<GroupByPeriod>(GROUP_BY_PERIOD, groupByPeriod));
+	getPayload().add(new GSProperty<>(GROUP_BY_PERIOD, groupByPeriod));
     }
 
     /**
@@ -159,7 +160,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void groupBy(Queryable queryable) {
 
-	getPayload().add(new GSProperty<Queryable>(GROUP_BY_QUERYABLE, queryable));
+	getPayload().add(new GSProperty<>(GROUP_BY_QUERYABLE, queryable));
     }
 
     /**
@@ -175,7 +176,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void computeBboxUnion() {
 
-	getPayload().add(new GSProperty<Boolean>(BBOX_UNION, true));
+	getPayload().add(new GSProperty<>(BBOX_UNION, true));
     }
 
     /**
@@ -184,11 +185,8 @@ public class StatisticsMessage extends QueryInitializerMessage {
     public boolean isBboxUnionComputationSet() {
 
 	Optional<Boolean> optional = Optional.ofNullable(getPayload().get(BBOX_UNION, Boolean.class));
-	if (optional.isPresent()) {
-	    return optional.get();
-	}
+	return optional.orElse(false);
 
-	return false;
     }
 
     /**
@@ -196,7 +194,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void computeQueryBboxUnion() {
 
-	getPayload().add(new GSProperty<Boolean>(QUERY_BBOX_UNION, true));
+	getPayload().add(new GSProperty<>(QUERY_BBOX_UNION, true));
     }
 
     /**
@@ -205,11 +203,8 @@ public class StatisticsMessage extends QueryInitializerMessage {
     public boolean isQueryBboxUnionComputationSet() {
 
 	Optional<Boolean> optional = Optional.ofNullable(getPayload().get(QUERY_BBOX_UNION, Boolean.class));
-	if (optional.isPresent()) {
-	    return optional.get();
-	}
+	return optional.orElse(false);
 
-	return false;
     }
 
     /**
@@ -217,7 +212,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void computeTempExtentUnion() {
 
-	getPayload().add(new GSProperty<Boolean>(TEMP_EXTENT_UNION, true));
+	getPayload().add(new GSProperty<>(TEMP_EXTENT_UNION, true));
     }
 
     /**
@@ -225,7 +220,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void computeQueryTempExtentUnion() {
 
-	getPayload().add(new GSProperty<Boolean>(QUERY_TEMP_EXTENT_UNION, true));
+	getPayload().add(new GSProperty<>(QUERY_TEMP_EXTENT_UNION, true));
     }
 
     /**
@@ -234,11 +229,8 @@ public class StatisticsMessage extends QueryInitializerMessage {
     public boolean isTempExtentUnionComputationSet() {
 
 	Optional<Boolean> optional = Optional.ofNullable(getPayload().get(TEMP_EXTENT_UNION, Boolean.class));
-	if (optional.isPresent()) {
-	    return optional.get();
-	}
+	return optional.orElse(false);
 
-	return false;
     }
 
     /**
@@ -247,11 +239,8 @@ public class StatisticsMessage extends QueryInitializerMessage {
     public boolean isQueryTempExtentUnionComputationSet() {
 
 	Optional<Boolean> optional = Optional.ofNullable(getPayload().get(QUERY_TEMP_EXTENT_UNION, Boolean.class));
-	if (optional.isPresent()) {
-	    return optional.get();
-	}
+	return optional.orElse(false);
 
-	return false;
     }
 
     /**
@@ -259,7 +248,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void countDistinct(List<Queryable> queryables) {
 
-	getPayload().add(new GSProperty<List<Queryable>>(COUNT_DISTINCT, queryables));
+	getPayload().add(new GSProperty<>(COUNT_DISTINCT, queryables));
     }
 
     /**
@@ -276,7 +265,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void computeMin(List<Queryable> queryables) {
 
-	getPayload().add(new GSProperty<List<Queryable>>(MIN, queryables));
+	getPayload().add(new GSProperty<>(MIN, queryables));
     }
 
     /**
@@ -293,7 +282,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void computeMax(List<Queryable> queryables) {
 
-	getPayload().add(new GSProperty<List<Queryable>>(MAX, queryables));
+	getPayload().add(new GSProperty<>(MAX, queryables));
     }
 
     /**
@@ -310,7 +299,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void computeSum(List<Queryable> queryables) {
 
-	getPayload().add(new GSProperty<List<Queryable>>(SUM, queryables));
+	getPayload().add(new GSProperty<>(SUM, queryables));
     }
 
     /**
@@ -327,7 +316,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void computeAvg(List<Queryable> queryables) {
 
-	getPayload().add(new GSProperty<List<Queryable>>(AVG, queryables));
+	getPayload().add(new GSProperty<>(AVG, queryables));
     }
 
     /**
@@ -353,8 +342,8 @@ public class StatisticsMessage extends QueryInitializerMessage {
      */
     public void computeFrequency(List<Queryable> queryables, int maxItems) {
 
-	getPayload().add(new GSProperty<List<Queryable>>(FREQUENCY, queryables));
-	getPayload().add(new GSProperty<Integer>(FREQUENCY_MAX_ITEMS, maxItems));
+	getPayload().add(new GSProperty<>(FREQUENCY, queryables));
+	getPayload().add(new GSProperty<>(FREQUENCY_MAX_ITEMS, maxItems));
     }
 
     /**
@@ -372,12 +361,6 @@ public class StatisticsMessage extends QueryInitializerMessage {
     public Optional<List<Queryable>> getFrequencyTargets() {
 
 	return Optional.ofNullable(getPayload().get(FREQUENCY, List.class));
-    }
-
-    @Override
-    public HashMap<String, List<String>> provideInfo() {
-
-	return super.provideInfo();
     }
 
     @Override

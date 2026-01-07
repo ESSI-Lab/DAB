@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.agrostac.harvested;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,10 +40,8 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
-import org.w3c.dom.Node;
 
 import eu.essi_lab.iso.datamodel.ISOMetadata;
-import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.BrowseGraphic;
 import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.DataQuality;
@@ -54,16 +51,13 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.jaxb.common.ObjectFactories;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
@@ -71,14 +65,9 @@ import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 import eu.essi_lab.ommdk.FileIdentifierMapper;
 import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
-import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
 import net.opengis.iso19139.gco.v_20060504.DateTimePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.DQAccuracyOfATimeMeasurementType;
-import net.opengis.iso19139.gmd.v_20060504.DQDataQualityType;
 import net.opengis.iso19139.gmd.v_20060504.DQResultPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.DQScopePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.DQScopeType;
-import net.opengis.iso19139.gmd.v_20060504.MDScopeCodePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.ObjectFactory;
 
 public class AgrostacCollectionMapper extends FileIdentifierMapper {
@@ -696,7 +685,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    Online online = new Online();
 
 	    online.setLinkage(wikiUrl.get());
-	    online.setProtocol(NetProtocols.HTTP.getCommonURN());
+	    online.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 	    online.setFunctionCode("information");
 	    online.setDescription("Data curation URL");
 
@@ -731,7 +720,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    if (checkUrl.startsWith("http")) {
 		Online online = new Online();
 		online.setLinkage(checkUrl);
-		online.setProtocol(NetProtocols.HTTP.getCommonURN());
+		online.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 		online.setFunctionCode("information");
 		online.setDescription("Source URL");
 		miMetadata.getDistribution().addDistributionOnline(online);
@@ -759,7 +748,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	// enrichMetadata(miMetadata);
 	Online information = new Online();
 	information.setLinkage(BACKGROUND_INFO_URL);
-	information.setProtocol(NetProtocols.HTTP.getCommonURN());
+	information.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 	information.setFunctionCode("information");
 	information.setDescription("AGROSTAC API description");
 	miMetadata.getDistribution().addDistributionOnline(information);

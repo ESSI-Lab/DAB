@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.thredds;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -46,7 +46,7 @@ import eu.essi_lab.iso.datamodel.classes.TransferOptions;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.GSSource;
@@ -550,7 +550,7 @@ public class THREDDSMapper extends FileIdentifierMapper {
 		    String layerName = n.getTextContent();
 		    Online wmsOnline = new Online();
 		    wmsOnline.setLinkage(linkage);
-		    wmsOnline.setProtocol(NetProtocols.WMS_1_3_0.getCommonURN());
+		    wmsOnline.setProtocol(NetProtocolWrapper.WMS_1_3_0.getCommonURN());
 		    wmsOnline.setName(layerName);
 		    wmsOnline.setDescription(layerName);// "OGC:WMS"
 		    wmsOnline.setFunctionCode("download");
@@ -579,7 +579,7 @@ public class THREDDSMapper extends FileIdentifierMapper {
 		    String coverageName = n.getTextContent();
 		    Online wcsOnline = new Online();
 		    wcsOnline.setLinkage(linkage);
-		    wcsOnline.setProtocol(NetProtocols.WCS_1_0_0.getCommonURN());
+		    wcsOnline.setProtocol(NetProtocolWrapper.WCS_1_0_0.getCommonURN());
 		    wcsOnline.setName(coverageName);
 		    wcsOnline.setDescription(coverageName);// "OGC:WMS"
 		    wcsOnline.setFunctionCode("download");

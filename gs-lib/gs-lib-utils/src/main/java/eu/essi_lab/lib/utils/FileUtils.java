@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.lib.utils;
 
@@ -7,7 +7,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -59,7 +59,7 @@ public class FileUtils {
      * @param makeDir
      * @return
      */
-    public static File createTempDir(String child, boolean makeDir) {
+    public static File getTempDir(String child, boolean makeDir) {
 
 	File file = new File(System.getProperty("java.io.tmpdir"), child);
 
@@ -75,17 +75,8 @@ public class FileUtils {
      * @param makeDir
      * @return
      */
-    public static File createTempDir(boolean makeDir) {
+    public static File getTempDir() {
 
-	File file = new File(System.getProperty("java.io.tmpdir"));
-
-	if (!file.exists() && makeDir) {
-
-	    boolean mkdirs = file.mkdirs();
-
-	    System.out.println(mkdirs);
-	}
-
-	return file;
+	return new File(System.getProperty("java.io.tmpdir"));
     }
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.pdk;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -119,7 +119,7 @@ public class ProxyCache {
 	return getCachedResponse(request);
     }
 
-    public Response cloneResponse(Response response) {
+    public static Response cloneResponse(Response response) {
 	Object entity = response.getEntity();
 	InputStream originalInputStream;
 	if (entity instanceof StreamingOutput) {
@@ -131,7 +131,7 @@ public class ProxyCache {
 	} else if (entity instanceof InputStream) {
 	    originalInputStream = (InputStream) entity;
 	} else {
-	    GSLoggerFactory.getLogger(getClass()).error("[PROXY-CACHE] error cloning response");
+	    GSLoggerFactory.getLogger(ProxyCache.class).error("[PROXY-CACHE] error cloning response");
 	    return null;
 	}
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();

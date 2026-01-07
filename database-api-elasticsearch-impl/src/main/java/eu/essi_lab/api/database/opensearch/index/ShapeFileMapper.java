@@ -7,7 +7,7 @@ package eu.essi_lab.api.database.opensearch.index;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,6 +49,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
+import org.locationtech.jts.geom.util.GeometryFixer;
 
 /**
  * @author Fabrizio
@@ -75,7 +76,8 @@ class ShapeFileMapper {
 
 		SimpleFeature feature = iterator.next();
 
-		Object geometry = feature.getDefaultGeometry();
+		Geometry geometry = (Geometry) feature.getDefaultGeometry();
+		geometry = GeometryFixer.fix(geometry);
 
 		ObjectMapper mapper = new ObjectMapper();
 
@@ -191,6 +193,7 @@ class ShapeFileMapper {
 		System.out.println(name.toString());
 
 		Geometry geometry = (Geometry) feature.getDefaultGeometry();
+		geometry = GeometryFixer.fix(geometry);
 
 		if (geometry instanceof MultiPolygon multiPolygon) {
 

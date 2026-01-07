@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,7 +45,7 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -221,8 +221,8 @@ public class CSWEMODNETConnector extends CSWConnector {
 				    if (prot != null) {
 					// check if WMS
 					if (prot.contains("WMS-1.1.0") || prot.contains("WMS-1.1.1") || prot.contains("OGC:WMS")
-						|| prot.contains(NetProtocols.WMS_1_1_1.getCommonURN()) || prot.contains("WMS-1.3.0")
-						|| prot.contains(NetProtocols.WMS_1_3_0.getCommonURN())) {
+						|| prot.contains(NetProtocolWrapper.WMS_1_1_1.getCommonURN()) || prot.contains("WMS-1.3.0")
+						|| prot.contains(NetProtocolWrapper.WMS_1_3_0.getCommonURN())) {
 
 					    String name = ISOMetadata.getStringFromCharacterString(onlineResource.getName());
 					    String link = onlineResource.getLinkage().getURL();

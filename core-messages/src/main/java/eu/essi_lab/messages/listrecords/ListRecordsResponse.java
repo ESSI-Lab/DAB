@@ -4,7 +4,7 @@ package eu.essi_lab.messages.listrecords;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.messages.listrecords;
  * #L%
  */
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -34,8 +35,9 @@ public class ListRecordsResponse<T> implements Serializable {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -2073523944915364860L;
-    private LinkedList<T> records;
+    private final LinkedList<T> records;
     private String resumptionToken;
 
     public ListRecordsResponse() {

@@ -23,9 +23,34 @@ import org.opensearch.search.SearchHits;
 import org.opensearch.search.builder.SearchSourceBuilder;
 
 public class ElasticSearchClientTest {
+
+    /**
+     * @return
+     */
+    private static String getUser() {
+
+	return System.getProperty("els.main.user");
+
+    }
+
+    /**
+     * @return
+     */
+    private static String getPassword() {
+
+	return System.getProperty("els.main.password");
+    }
+
+    /**
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
-	ElasticsearchClient elasticClient = new ElasticsearchClient("https://country-test.es.us-central1.gcp.cloud.es.io:9243", "elastic",
-		"1xV8rxtnTHnIHJOhALmXp6DK");
+
+	ElasticsearchClient elasticClient = new ElasticsearchClient( //
+		"https://country-test.es.us-central1.gcp.cloud.es.io:9243",//
+		getUser(),//
+		getPassword());//
 
 	RestHighLevelClient client = elasticClient.getClient();
 
@@ -48,8 +73,8 @@ public class ElasticSearchClientTest {
 	    // bbox
 	    double south = -90;
 	    double west = -180;
-	    double north = south+Math.random() * 180;
-	    double east = west+Math.random() * 360;
+	    double north = south + Math.random() * 180;
+	    double east = west + Math.random() * 360;
 	    Geometry geometry = new Rectangle(west, east, north, south);
 	    GeoShapeQueryBuilder bboxQuery = QueryBuilders.geoWithinQuery("shape", geometry);
 	    ((BoolQueryBuilder) query).must(bboxQuery);

@@ -7,6 +7,7 @@ import javax.ws.rs.core.MediaType;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.SimpleConfiguration;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import eu.essi_lab.messages.bond.Bond;
@@ -21,6 +22,13 @@ import eu.essi_lab.profiler.os.handler.discover.OSRequestTransformer;
 import java.util.List;
 
 public class OSSearchTermsRequestTest {
+
+    @Before
+    public void before() {
+
+	SimpleConfiguration simpleConfiguration = new SimpleConfiguration();
+	ConfigurationWrapper.setConfiguration(simpleConfiguration);
+    }
 
     @Test
     public void testCase1_Title() {
@@ -150,9 +158,6 @@ public class OSSearchTermsRequestTest {
 
 	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
 
-	SimpleConfiguration simpleConfiguration = new SimpleConfiguration();
-	ConfigurationWrapper.setConfiguration(simpleConfiguration);
-
 	try {
 
 	    LogicalBond userBond = (LogicalBond) transformer.getUserBond(webRequest);
@@ -228,8 +233,8 @@ public class OSSearchTermsRequestTest {
 	    Bond[] array = userBond.getOperands().toArray(new Bond[] {});
 
 	    SimpleValueBond titleBond = (SimpleValueBond) array[0];
-	    SimpleValueBond absBond = (SimpleValueBond) array[1];
-	    SimpleValueBond kwdBond = (SimpleValueBond) array[2];
+	    SimpleValueBond kwdBond = (SimpleValueBond) array[1];
+	    SimpleValueBond absBond = (SimpleValueBond) array[2];
 
 	    Assert.assertEquals(titleBond.getProperty().getName(), "title");
 	    Assert.assertEquals(titleBond.getPropertyValue(), "WATER");
@@ -359,9 +364,6 @@ public class OSSearchTermsRequestTest {
 	WebRequest webRequest = WebRequest.createGET(queryString);
 
 	OSRequestTransformer transformer = new OSRequestTransformer(new OSProfilerSetting());
-
-	SimpleConfiguration simpleConfiguration = new SimpleConfiguration();
-	ConfigurationWrapper.setConfiguration(simpleConfiguration);
 
 	try {
 

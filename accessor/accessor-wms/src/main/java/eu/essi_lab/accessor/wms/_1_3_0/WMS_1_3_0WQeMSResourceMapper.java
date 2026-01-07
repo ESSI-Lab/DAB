@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wms._1_3_0;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -55,7 +55,7 @@ import eu.essi_lab.jaxb.wms._1_3_0.Layer;
 import eu.essi_lab.jaxb.wms._1_3_0.MetadataURL;
 import eu.essi_lab.jaxb.wms._1_3_0.WMSCapabilities;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -192,7 +192,7 @@ public class WMS_1_3_0WQeMSResourceMapper extends OriginalIdentifierMapper {
 		if (wmsHref.endsWith("geoserver/")) {
 		    wmsHref += "ows?DIM_GRANULE=" + granule;
 		    Online datOnline = new Online();
-		    datOnline.setProtocol(NetProtocols.WMS_1_3_0.getCommonURN());
+		    datOnline.setProtocol(NetProtocolWrapper.WMS_1_3_0.getCommonURN());
 		    datOnline.setLinkage(wmsHref);
 		    datOnline.setName(name);
 		    datOnline.setFunctionCode("download");
@@ -705,7 +705,7 @@ public class WMS_1_3_0WQeMSResourceMapper extends OriginalIdentifierMapper {
 		}
 	    }
 
-	    online.setProtocol(NetProtocols.WMS_1_3_0.getCommonURN());
+	    online.setProtocol(NetProtocolWrapper.WMS_1_3_0.getCommonURN());
 	    online.setLinkage(mapURL);
 	    online.setName(wmsLayer.getName());
 	    online.setFunctionCode("download");

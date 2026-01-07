@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,12 +38,12 @@ public class LegendViewer extends HorizontalLayout {
     /**
      * 
      */
-    public LegendViewer(GridComponent grid, List<Component> legends) {
+    public LegendViewer(List<Component> legends) {
 
 	setMargin(false);
 	setSpacing(false);
 	setHeight("30px");
 
-	legends.forEach(leg -> add(leg));
+	legends.forEach(this::add);
     }
 }

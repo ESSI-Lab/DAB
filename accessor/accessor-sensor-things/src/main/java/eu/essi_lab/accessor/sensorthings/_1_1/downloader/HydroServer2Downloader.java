@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.sensorthings._1_1.downloader;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ package eu.essi_lab.accessor.sensorthings._1_1.downloader;
 
 import java.util.Optional;
 
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.options.SystemQueryOptions;
 
 /**
@@ -43,6 +43,6 @@ public class HydroServer2Downloader extends SensorThingsDownloader {
     @Override
     public String getSupportedProtocol() {
 
-	return NetProtocols.SENSOR_THINGS_1_1_HYDRO_SERVER_2.getCommonURN();
+	return NetProtocolWrapper.SENSOR_THINGS_1_1_HYDRO_SERVER_2.getCommonURN();
     }
 }

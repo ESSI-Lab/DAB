@@ -7,7 +7,7 @@ package eu.essi_lab.lib.net.keycloak;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -431,6 +431,29 @@ public class KeycloakUsersClient {
 		delete(accessToken, user.getIdentifier().get());
 	    }
 	}
+    }
+
+    /**
+     * @param accessToken
+     * @param userId
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public boolean deleteByUserName(String accessToken, String userName) throws IOException, InterruptedException {
+
+	String userId = findId(accessToken,userName).get();
+
+	String url = serviceUrl + "/admin/realms/" + usersRealm + "/users/" + userId;
+
+	HttpRequest request = HttpRequest.newBuilder().//
+		uri(URI.create(url)).//
+		header("Authorization", "Bearer " + accessToken).//
+		DELETE().//
+		build();
+
+	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+	return response.statusCode() == 204;
     }
 
     /**

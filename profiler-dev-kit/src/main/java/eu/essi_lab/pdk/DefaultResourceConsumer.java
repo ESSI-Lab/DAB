@@ -4,7 +4,7 @@ package eu.essi_lab.pdk;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.pdk;
  * #L%
  */
 
+import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResourceConsumer;
 import eu.essi_lab.model.resource.GSResource;
 
@@ -28,8 +29,9 @@ import eu.essi_lab.model.resource.GSResource;
  * @author Fabrizio
  */
 public class DefaultResourceConsumer implements ResourceConsumer {
+
     @Override
-    public void accept(GSResource gsResource) {
+    public void consume(GSResource resource, DiscoveryMessage message) {
 
     }
 }

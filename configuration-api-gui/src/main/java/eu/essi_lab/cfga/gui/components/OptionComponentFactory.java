@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.details.Details;
@@ -48,7 +49,6 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.option.OptionComponent;
 import eu.essi_lab.cfga.gui.components.option.OptionDoubleField;
 import eu.essi_lab.cfga.gui.components.option.OptionIntegerField;
-import eu.essi_lab.cfga.gui.components.option.OptionSettingComponent;
 import eu.essi_lab.cfga.gui.components.option.OptionTextArea;
 import eu.essi_lab.cfga.gui.components.option.OptionTextField;
 import eu.essi_lab.cfga.gui.components.option.listener.OptionToggleButtonListener;
@@ -65,14 +65,14 @@ import eu.essi_lab.cfga.setting.Setting;
 public class OptionComponentFactory {
 
     /**
-     * 
+     *
      */
-    private static int NUMERIC_FIELD_WIDTH = 200;
-    
+    private static final int NUMERIC_FIELD_WIDTH = 200;
+
     /**
-     * 
+     *
      */
-    private static int BOOLEAN_FIELD_WIDTH = 100;
+    private static final int BOOLEAN_FIELD_WIDTH = 100;
 
     /**
      * @param option
@@ -168,12 +168,11 @@ public class OptionComponentFactory {
 	    if (!option.isEditable() || forceReadonly) {
 
 		TextField textField = new TextField();
+		textField.setId("option-text-field-for-"+option.getKey());
+		textField.getStyle().set("font-size","14px");
 		textField.setReadOnly(true);
 
-		if (optionalValue.isPresent()) {
-
-		    textField.setValue(optionalValue.get().toString());
-		}
+		optionalValue.ifPresent(o -> textField.setValue(o.toString()));
 
 		if (option.canBeDisabled()) {
 
@@ -243,6 +242,14 @@ public class OptionComponentFactory {
 	    return textArea;
 	}
 
+	//
+ 	// Boolean choice
+ 	//
+	if (option.isValueOf(BooleanChoice.class)) {
+
+	    return createBooleanChoiceComponent(option, forceReadonly);
+	}
+
 	OptionTextField textField = new OptionTextField(option, forceReadonly);
 	textField.setWidthFull();
 
@@ -281,7 +288,7 @@ public class OptionComponentFactory {
 
 	layout.add(button);
 
-	OptionValuesLoaderListener listener = null;
+	OptionValuesLoaderListener listener;
 
 	if (singleSelect != null) {
 
@@ -304,17 +311,22 @@ public class OptionComponentFactory {
      */
     public static Component createOptionMultiSelectionComponent(Option<?> option, boolean forceReadOnly) {
 
-	MultiSelectComboBox<String> select = new MultiSelectComboBox<String>();
+	MultiSelectComboBox<String> select = new MultiSelectComboBox<>();
+	select.getStyle().set("font-size","14px");
+
 	if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)) {
+
 	    select.setWidthFull();
+
 	} else {
+
 	    select.setWidth(NUMERIC_FIELD_WIDTH, Unit.PIXELS);
 	}
 
 	select.setRequired(option.isRequired());
 	select.setRequiredIndicatorVisible(option.isRequired());
-	select.setErrorMessage("A value is required");
-	
+	select.setErrorMessage("Required value");
+
 	// GSLoggerFactory.getLogger(ComponentFactory.class).debug("Initialing multi select for option: " +
 	// option.getKey());
 
@@ -362,72 +374,116 @@ public class OptionComponentFactory {
 
 	// GSLoggerFactory.getLogger(ComponentFactory.class).debug("Initialing select for option: " + option.getKey());
 
-	Select<String> select = new Select<>();
+	if (!option.isValueOf(BooleanChoice.class)) {
 
-	if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)
-		&& !option.getValueClass().equals(BooleanChoice.class)) {
+	    Select<String> select = new Select<>();
+	    select.getStyle().set("font-size","14px");
 
-	    select.setWidthFull();
+	    if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)) {
 
-	} else if (option.getValueClass().equals(BooleanChoice.class)) {
+		select.setWidthFull();
 
-	    select.setWidth(BOOLEAN_FIELD_WIDTH, Unit.PIXELS);
+	    } else {
 
-	} else {
+		select.setWidth(NUMERIC_FIELD_WIDTH, Unit.PIXELS);
+	    }
 
-	    select.setWidth(NUMERIC_FIELD_WIDTH, Unit.PIXELS);
+	    List<String> values = StringValuesReader.readValues(option);
+
+	    // GSLoggerFactory.getLogger(ComponentFactory.class).debug("Values: " + values);
+
+	    select.setItems(values);
+
+	    Optional<String> selectedValue = StringValuesReader.readSelectedValue(option);
+
+	    // GSLoggerFactory.getLogger(ComponentFactory.class).debug("Selected value: " + selectedValue);
+
+	    selectedValue.ifPresent(select::setValue);
+
+	    if (option.canBeDisabled()) {
+
+		select.setEnabled(option.isEnabled());
+	    }
+
+	    if (!option.isEditable() || forceReadOnly) {
+
+		select.setReadOnly(true);
+	    }
+
+	    select.addValueChangeListener(new OptionValueChangeListener(option));
+
+	    if (option.getLoader().isPresent()) {
+
+		return createOptionWithLoaderLayout(option, select, null, forceReadOnly);
+	    }
+
+	    return select;
 	}
 
-	List<String> values = StringValuesReader.readValues(option);
+	return createBooleanChoiceComponent(option, forceReadOnly);
+    }
 
-	// GSLoggerFactory.getLogger(ComponentFactory.class).debug("Values: " + values);
+    /**
+     * @param option
+     * @param forceReadOnly
+     * @return
+     */
+    private static Component createBooleanChoiceComponent(Option<?> option, boolean forceReadOnly) {
 
-	select.setItems(values);
+	VerticalLayout verticalLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+
+	verticalLayout.getStyle().set("margin-left", "-15px");
+	verticalLayout.getStyle().set("padding-top", "0px");
+	verticalLayout.getStyle().set("padding-bottom", "0px");
+
+	HorizontalLayout horizontalLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
+
+	Checkbox checkbox = new Checkbox();
+
+	checkbox.addClassName("booleanChoice");
+
+	checkbox.getStyle().set("margin-left", "-5px");
 
 	Optional<String> selectedValue = StringValuesReader.readSelectedValue(option);
 
-	// GSLoggerFactory.getLogger(ComponentFactory.class).debug("Selected value: " + selectedValue);
-
-	if (selectedValue.isPresent()) {
-
-	    select.setValue(selectedValue.get());
-	}
+	selectedValue.ifPresent(v -> checkbox.setValue(v.equals("Yes")));
 
 	if (option.canBeDisabled()) {
 
-	    select.setEnabled(option.isEnabled());
+	    checkbox.setEnabled(option.isEnabled());
 	}
 
 	if (!option.isEditable() || forceReadOnly) {
 
-	    select.setReadOnly(true);
+	    checkbox.setReadOnly(true);
+	    checkbox.setEnabled(false);
 	}
 
-	select.addValueChangeListener(new OptionValueChangeListener(option));
+	checkbox.addValueChangeListener(new OptionValueChangeListener(option));
 
-	if (option.getLoader().isPresent()) {
+	Label label = OptionComponentFactory.createOptionLabel(option.getLabel());
 
-	    return createOptionWithLoaderLayout(option, select, null, forceReadOnly);
+	label.getStyle().set("margin-top", "3px");
+	label.getStyle().set("margin-left", "3px");
+
+	Optional<String> description = option.getDescription();
+
+	horizontalLayout.add(checkbox);
+
+	horizontalLayout.add(label);
+
+	if (description.isPresent()) {
+
+	    Label descriptionLabel = OptionComponentFactory.createOptionDescriptionLabel(description.get());
+
+	    verticalLayout.add(horizontalLayout);
+
+	    verticalLayout.add(descriptionLabel);
+
+	    return verticalLayout;
 	}
 
-	return select;
-    }
-
-    /**
-     * @param configuration
-     * @param owner
-     * @param option
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public static OptionSettingComponent createSettingOptionComponent(Configuration configuration, Setting owner, Option<?> option) {
-
-	OptionSettingComponent component = new OptionSettingComponent(//
-		configuration, //
-		owner, //
-		(Option<? extends Setting>) option);
-
-	return component;
+	return horizontalLayout;
     }
 
     /**

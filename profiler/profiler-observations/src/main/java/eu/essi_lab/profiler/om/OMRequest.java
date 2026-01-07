@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.om;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -53,6 +53,7 @@ public class OMRequest {
 		END_DATE("endDate", "endTime", "end", "endPosition"), //
 		PLATFORM_CODE("sampledFeature", "feature", "featureIdentifier", "featureId", "monitoringPoint",
 				"monitoringPointIdentifier", "platform", "platformCode", "site", "location", "siteCode"), //
+		LOCAL_PLATFORM_CODE("localFeatureIdentifier","localPlatformCode"), //
 		ONTOLOGY("ontology"), //
 		ID("id"), //
 		OBSERVED_PROPERTY("observedProperty"), //

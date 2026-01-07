@@ -1,10 +1,12 @@
 package eu.essi_lab.accessor.hiscentral.friuli;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -159,8 +161,8 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	String tempExtenBegin = datasetInfo.optString("data_inizio");
 	String tempExtenEnd = datasetInfo.optString("data_fine");
 
-	Double pointLon = datasetInfo.optDouble("lon");
-	Double pointLat = datasetInfo.optDouble("lat");
+	BigDecimal pointLon = datasetInfo.optBigDecimal("lon", null);
+	BigDecimal pointLat = datasetInfo.optBigDecimal("lat", null);
 	Double altitude = datasetInfo.optDouble("alt");
 
 	String code = datasetInfo.optString("codice");
@@ -290,11 +292,13 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	referenceSystem.setCodeSpace("EPSG");
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 
-	coreMetadata.addBoundingBox(//
-		pointLat, //
-		pointLon, //
-		pointLat, //
-		pointLon);
+	if (pointLat != null && pointLon != null) {
+	    coreMetadata.addBoundingBox(//
+		    pointLat, //
+		    pointLon, //
+		    pointLat, //
+		    pointLon);
+	}
 
 	// vertical extent
 	coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(altitude, altitude);

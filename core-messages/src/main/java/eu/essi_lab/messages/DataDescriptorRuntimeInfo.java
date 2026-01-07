@@ -7,7 +7,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -47,7 +47,7 @@ public class DataDescriptorRuntimeInfo {
     enum TargetProvider {
 
 	ACCESS_MESSAGE, //
-	RESULT_SET;//
+	RESULT_SET//
     }
 
     /**
@@ -112,11 +112,7 @@ public class DataDescriptorRuntimeInfo {
 		RuntimeInfoElement.ACCESS_MESSAGE_SPATIAL_DIMENSION_NAME : //
 		RuntimeInfoElement.RESULT_SET_SPATIAL_DIMENSION_NAME;
 
-		List<String> list = map.get(el.getName());
-		if (list == null) {
-		    list = new ArrayList<>();
-		    map.put(el.getName(), list);
-		}
+		List<String> list = map.computeIfAbsent(el.getName(), k -> new ArrayList<>());
 
 		list.add(name);
 	    }
@@ -127,11 +123,7 @@ public class DataDescriptorRuntimeInfo {
 		RuntimeInfoElement.ACCESS_MESSAGE_SPATIAL_DIMENSION_ID : //
 		RuntimeInfoElement.RESULT_SET_SPATIAL_DIMENSION_ID;
 
-		List<String> list = map.get(el.getName());
-		if (list == null) {
-		    list = new ArrayList<>();
-		    map.put(el.getName(), list);
-		}
+		List<String> list = map.computeIfAbsent(el.getName(), k -> new ArrayList<>());
 
 		list.add(identifier);
 	    }

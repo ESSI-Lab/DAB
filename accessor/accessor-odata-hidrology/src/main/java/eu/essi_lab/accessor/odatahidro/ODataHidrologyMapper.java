@@ -7,7 +7,7 @@ package eu.essi_lab.accessor.odatahidro;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -56,7 +56,7 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.jaxb.common.ObjectFactories;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
@@ -425,7 +425,7 @@ public class ODataHidrologyMapper extends OriginalIdentifierMapper {
 	    mangler.setParameterIdentifier(optVariableId.get());
 	    mangler.setPlatformIdentifier(optPlaceId.get());
 	    coreMetadata.addDistributionOnlineResource(mangler.getMangling(), ODataHidrologyClient.DEFAULT_URL,
-		    NetProtocols.ODATA_SYKE.getCommonURN(), "download");
+		    NetProtocolWrapper.ODATA_SYKE.getCommonURN(), "download");
 
 	} catch (Exception ex) {
 	    ex.printStackTrace();

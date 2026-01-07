@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.setting;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 public interface KeyValueOptionDecorator {
 
     /**
-     * 
+     *
      */
     static final String KEY_VALUE_OPTION_KEY = "keyValue";
 
@@ -49,7 +49,7 @@ public interface KeyValueOptionDecorator {
     }
 
     /**
-     * 
+     *
      */
     public default void addKeyValueOption() {
 
@@ -150,5 +150,14 @@ public interface KeyValueOptionDecorator {
 	}
 
 	return Optional.of(properties);
+    }
+
+    /**
+     * @param property
+     * @return
+     */
+    public default Optional<String> readKeyValue(String property) {
+
+	return getKeyValueOptions().flatMap(opt -> Optional.ofNullable(opt.getProperty(property)));
     }
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.setting;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -83,6 +83,11 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public static final Property<Class<? extends Setting>> SETTING_CLASS = Property.of("SettingClass", "settingClass", true,
 	    Optional.empty());//
+
+    /**
+     *
+     */
+    private boolean forceHideHeader;
 
     /**
      *
@@ -182,9 +187,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public void afterClean() {
 
-	Optional<AfterCleanFunction> afterCleanFunction = getAfterCleanFunction();
-
-	afterCleanFunction.ifPresent(cleanFunction -> cleanFunction.afterClean(this));
+	getAfterCleanFunction().ifPresent(f -> f.afterClean(this));
     }
 
     /**
@@ -248,7 +251,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public void setSelected(boolean selected) {
 
-	setProperty(SELECTED.getKey(), selected, false);
+	setProperty(SELECTED.getKey(), selected, SELECTED.getDefaultValue().get());
     }
 
     /**
@@ -258,7 +261,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     public boolean isSelected() {
 
-	return isPropertySet(SELECTED.getKey(), false);
+	return isPropertySet(SELECTED.getKey(), SELECTED.getDefaultValue().get());
     }
 
     /**

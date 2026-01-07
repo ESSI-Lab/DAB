@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.authorization.xacml;
 
@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.xacml;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -100,28 +100,6 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	logBuilder = new StringBuilder();
 
-	//
-	// developer machine
-	//
-	boolean devMachineAuth = true;
-
-	Optional<Configuration> configuration = ConfigurationWrapper.getConfiguration();
-
-	Optional<Properties> keyValueOption = configuration.isPresent() ? ConfigurationWrapper.getSystemSettings().getKeyValueOptions()
-		: Optional.empty();
-
-	if (keyValueOption.isPresent()) {
-	    devMachineAuth = keyValueOption.get().getProperty(KeyValueOptionKeys.DEV_MACHINE_AUTH.getLabel(), "true").equals("true") ? true
-		    : false;
-	}
-
-	if (isLocalHost(message) && devMachineAuth) {
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Dev. machine authorized");
-	    //
-	    return true;
-	}
-
 	Optional<GSUser> requestUser = message.getCurrentUser();
 
 	String role = null;
@@ -142,6 +120,27 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	logBuilder.append("\n- User identifier: " + identifier);
 
 	logBuilder.append("\n- User role: " + role);
+
+	Optional<View> optionalView = message.getView();
+
+	if (optionalView.isPresent()) {
+
+	    View view = optionalView.get();
+	    String creator = view.getCreator();
+
+	    if (creator != null) {
+		switch (creator) {
+		case "whos":
+		case "his-central":
+		    if (role.equals("anonymous")) {
+			return false;
+		    }
+		    break;
+		default:
+		    break;
+		}
+	    }
+	}
 
 	if (message instanceof DiscoveryMessage) {
 

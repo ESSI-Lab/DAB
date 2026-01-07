@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -38,6 +39,7 @@ public abstract class GridColumnRenderer<C extends Component> extends ComponentR
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -6816629717419845396L;
 
     /**

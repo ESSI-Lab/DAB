@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ import java.util.ServiceLoader;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.RequestMessage;
@@ -56,7 +57,6 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.Profiler;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
-import org.cuahsi.waterml._1.Option;
 
 /**
  * Validates and transforms a "discovery query" in the correspondent {@link DiscoveryMessage}. The discovery query is represented by a
@@ -143,10 +143,19 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
     protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
 
 	//
-	// optionally set the ResourceConsumer
+	// optionally set the ResourceConsumer and the number of threads for the result set mapper
 	//
 
-	getSetting().ifPresent(s -> s.getConsumer().ifPresent(c -> message.setResourceConsumer(c)));
+	getSetting().flatMap(ProfilerSetting::getConsumer).ifPresent(message::setResourceConsumer);
+
+	getSetting().flatMap(ProfilerSetting::getResultSetMapperThreadsCount).ifPresent(message::setResultSetMapperThreadsCount);
+
+	//
+ 	// optionally set the data proxy server endpoint
+ 	//
+
+	ConfigurationWrapper.getSystemSettings().readKeyValue(SystemSetting.KeyValueOptionKeys.DATA_PROXY_SERVER.getLabel()).
+		ifPresent(message::setDataProxyServer);
 
 	//
 	//

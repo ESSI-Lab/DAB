@@ -7,7 +7,7 @@ package eu.essi_lab.messages.stats;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,8 @@ package eu.essi_lab.messages.stats;
  */
 
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -60,7 +60,7 @@ public class ComputationResult {
     /**
      * @return
      */
-    @XmlAttribute(name = "target", required = false)
+    @XmlAttribute(name = "target")
     public String getTarget() {
 	return target;
     }
@@ -108,8 +108,8 @@ public class ComputationResult {
     @XmlTransient
     public List<TermFrequencyItem> getFrequencyItems() {
 
-	return Arrays.asList(getValue().split(" ")).//
-		stream().//
+	//
+	return Arrays.stream(getValue().split(" ")).//
 		map(f -> {
 
 		    if (f.equals("")) {
@@ -121,13 +121,13 @@ public class ComputationResult {
 
 		    String[] values = f.split(FREQUENCY_ITEM_SEP);
 		    try {
-			item.setTerm(URLDecoder.decode(values[0], "UTF-8"));
+			item.setTerm(URLDecoder.decode(values[0], StandardCharsets.UTF_8));
 
 		    } catch (Exception e) {
 		    }
 
 		    item.setDecodedTerm(values[0]);
-		    item.setFreq(Integer.valueOf(values[1]));
+		    item.setFreq(Integer.parseInt(values[1]));
 		    if (nestedProperties != null) {
 			item.setNestedProperties(nestedProperties.get(values[0]));
 		    }

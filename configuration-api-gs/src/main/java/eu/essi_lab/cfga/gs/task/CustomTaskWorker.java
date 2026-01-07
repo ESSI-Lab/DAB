@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.task;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ import java.util.Optional;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.cfga.gs.TaskStarter;
 import eu.essi_lab.cfga.gs.setting.EmailSetting;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
@@ -82,9 +82,9 @@ public class CustomTaskWorker extends SchedulerWorker<CustomTaskSetting> {
 
 		String[] recArray = recipients.toArray(new String[] {});
 
-		String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + "[CUSTOM TASK][" + taskName + "]" + "[COMPLETED]";
+		String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + "[CUSTOM TASK][" + taskName + "]" + "[COMPLETED]";
 
-		ConfiguredGmailClient.sendEmail(subject, message, recArray);
+		ConfiguredSMTPClient.sendEmail(subject, message, recArray);
 	    }
 	} else {
 

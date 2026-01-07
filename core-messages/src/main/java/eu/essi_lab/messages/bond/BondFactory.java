@@ -6,7 +6,7 @@ import java.util.*;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -1026,6 +1026,15 @@ public class BondFactory {
     public static ResourcePropertyBond createIsVectorBond(boolean isVectorBond) {
 
 	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_VECTOR, String.valueOf(isVectorBond));
+    }
+
+    /**
+     * @param isRatingCurve
+     * @return
+     */
+    public static ResourcePropertyBond createIsRatingCurveBond(boolean isRatingCurve) {
+
+	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_RATING_CURVE, String.valueOf(isRatingCurve));
     }
 
     /**

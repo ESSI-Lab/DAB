@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.oaipmh.profile.mapper.wigos;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -343,12 +343,13 @@ public class WIGOSMetadata implements IWIGOSMetadata {
     public void setMeasurementUnit(String uomCode) {
 	ReportingType reporting = getInnerReporting();
 	ReferenceType referenceType = new ReferenceType();
-	if (uomCode.contains("codes.wmo.int/common/unit/") || uomCode.contains("codes.wmo.int/wmdr/unit/")) {
+	if (uomCode.contains("codes.wmo.int/common/unit/") || uomCode.contains("codes.wmo.int/wmdr/unit/") || uomCode.startsWith("http")) {
 	    referenceType.setHref(uomCode);
 	} else {
 	    referenceType.setHref("http://codes.wmo.int/common/unit/" + uomCode);
 	}
 	reporting.setUom(referenceType);
+	reporting.setInternationalExchange(true);
     }
 
     /*
@@ -1492,6 +1493,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	ReportingType repo = reporting.getReporting();
 	if (repo == null) {
 	    repo = new ReportingType();
+	    repo.setInternationalExchange(true);
 	}
 	reporting.setReporting(repo);
 	return repo;
@@ -1503,6 +1505,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	if (reporting == null) {
 	    reporting = new ReportingPropertyType();
 	    ReportingType rt = new ReportingType();
+	    rt.setInternationalExchange(true);
 	    reporting.setReporting(rt);
 	}
 	dg.setReporting(reporting);
@@ -1795,18 +1798,25 @@ public class WIGOSMetadata implements IWIGOSMetadata {
      */
     @Override
     public void setObservationDataUrlArchive(String url) {
+	setObservationDataUrlArchive(List.of(url));
+    }
+
+    public void setObservationDataUrlArchive(List<String> urls) {
 	DistributionInfo distribution = new DistributionInfo();
 	MDDistributionType mdd = new MDDistributionType();
 	MDDigitalTransferOptionsPropertyType transfer = new MDDigitalTransferOptionsPropertyType();
 	MDDigitalTransferOptionsType mdo = new MDDigitalTransferOptionsType();
-	CIOnlineResourcePropertyType online = new CIOnlineResourcePropertyType();
-	CIOnlineResourceType cionline = new CIOnlineResourceType();
-	cionline.setId("_" + UUID.randomUUID().toString());
-	URLPropertyType urlPt = new URLPropertyType();
-	urlPt.setURL("<![CDATA[" + url + "]]>");
-	cionline.setLinkage(urlPt);
-	online.setCIOnlineResource(cionline);
-	mdo.getOnLine().add(online);
+
+	for (String url : urls) {
+	    CIOnlineResourcePropertyType online = new CIOnlineResourcePropertyType();
+	    CIOnlineResourceType cionline = new CIOnlineResourceType();
+	    cionline.setId("_" + UUID.randomUUID().toString());
+	    URLPropertyType urlPt = new URLPropertyType();
+	    urlPt.setURL("<![CDATA[" + url + "]]>");
+	    cionline.setLinkage(urlPt);
+	    online.setCIOnlineResource(cionline);
+	    mdo.getOnLine().add(online);
+	}
 	transfer.setMDDigitalTransferOptions(mdo);
 	mdd.getTransferOptions().add(transfer);
 	distribution.setMDDistribution(mdd);

@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.thredds.catalog;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.xml.*;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.transform.Result;
@@ -42,6 +43,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import eu.essi_lab.lib.xml.*;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.View;
@@ -174,7 +176,7 @@ public class THREDDSCatalogResultSetFormatter extends DiscoveryResultSetFormatte
     private String transformToHtml(String catalog, String id) {
 	try {
 	    // Create transformer factory
-	    TransformerFactory factory = TransformerFactory.newInstance();
+	    TransformerFactory factory = XMLFactories.newTransformerFactory();
 
 	    // Use the factory to create a template containing the xsl file
 	    InputStream xslStream;

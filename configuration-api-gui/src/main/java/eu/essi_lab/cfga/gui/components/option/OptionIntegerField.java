@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.option;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,8 @@ public class OptionIntegerField extends IntegerField implements OnKeyUpValidatio
      */
     public OptionIntegerField(Option<?> option, boolean forceReadonly) {
 
+	getStyle().set("font-size","14px");
+
 	setHasControls(true);
 
 	setPreventInvalidInput(true);
@@ -72,12 +74,12 @@ public class OptionIntegerField extends IntegerField implements OnKeyUpValidatio
 	    setMax((int) option.getMaxValue().get());
 	}
 
-	if (option.isRequired()) {
+	if (option.isRequired() && !forceReadonly) {
 
 	    setRequired(true);
 
 	    setRequiredIndicatorVisible(true);
-	    setErrorMessage("A value is required");
+	    setErrorMessage("Required value");
 
 	    if (option.getValue() == null) {
 		setInvalid(true);

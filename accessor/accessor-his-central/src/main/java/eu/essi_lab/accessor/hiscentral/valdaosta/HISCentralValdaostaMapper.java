@@ -1,10 +1,12 @@
 package eu.essi_lab.accessor.hiscentral.valdaosta;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -187,19 +189,19 @@ public class HISCentralValdaostaMapper extends FileIdentifierMapper {
 	//
 	// spatailextent: seems to be lat, lon, alt
 	// e.g.45.6783,7.10742,1238
-	Double pointLon = null;
-	Double pointLat = null;
+	BigDecimal pointLon = null;
+	BigDecimal pointLat = null;
 	Double altitude = null;
 
 	String[] splittedSpatial = spatialExtent.split(",");
 	if (splittedSpatial.length > 0) {
 	    if (splittedSpatial.length > 2) {
-		pointLat = Double.parseDouble(splittedSpatial[0]);
-		pointLon = Double.parseDouble(splittedSpatial[1]);
+		pointLat = new BigDecimal(splittedSpatial[0]);
+		pointLon = new BigDecimal(splittedSpatial[1]);
 		altitude = Double.parseDouble(splittedSpatial[2]);
 	    } else {
-		pointLat = Double.parseDouble(splittedSpatial[0]);
-		pointLon = Double.parseDouble(splittedSpatial[1]);
+		pointLat = new BigDecimal(splittedSpatial[0]);
+		pointLon = new BigDecimal(splittedSpatial[1]);
 	    }
 	}
 	String region = datasetInfo.optString("territory-of-origin-of-data");

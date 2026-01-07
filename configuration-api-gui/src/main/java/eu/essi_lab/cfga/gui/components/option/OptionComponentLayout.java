@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.option;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 @SuppressWarnings("serial")
 public class OptionComponentLayout extends VerticalLayout {
 
-    private List<OptionComponent> components;
+    private final List<OptionComponent> components;
     private Details details;
 
     /**
@@ -46,7 +46,7 @@ public class OptionComponentLayout extends VerticalLayout {
 	setMargin(false);
 	setSpacing(false);
 
-	components = new ArrayList<OptionComponent>();
+	components = new ArrayList<>();
     }
 
     /**

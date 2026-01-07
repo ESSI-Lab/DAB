@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -69,7 +69,7 @@ public class PerformanceLogger {
 	OPENSEARCH_FINDER_DISCOVERY, //
 	OPENSEARCH_FINDER_RESOURCES_CREATION, //
 
-	ITERATED_WORKFLOW;
+	ITERATED_WORKFLOW
 
     }
 
@@ -78,10 +78,7 @@ public class PerformanceLogger {
 	chronometer.start();
 	this.phase = p;
 	this.rid = requestIdentifier;
-	if (webRequest.isPresent())
-	    this.qs = Optional.ofNullable(webRequest.get().getQueryString());
-	else
-	    this.qs = Optional.empty();
+	this.qs = webRequest.map(WebRequest::getQueryString);
 
     }
 

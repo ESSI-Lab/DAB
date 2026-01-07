@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.option;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,9 @@ package eu.essi_lab.cfga.gui.components.option;
  * #L%
  */
 
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.textfield.TextField;
 
@@ -39,12 +37,13 @@ import eu.essi_lab.cfga.option.Option;
 public class OptionTextField extends TextField implements OnKeyUpValidationListener<String> {
 
     /**
-     * 
+     *
      */
     public OptionTextField() {
 
 	setPreventInvalidInput(true);
 	setClearButtonVisible(true);
+	getStyle().set("font-size","14px");
 
 	addKeyUpListener(this);
     }
@@ -56,6 +55,7 @@ public class OptionTextField extends TextField implements OnKeyUpValidationListe
     public OptionTextField(Option<?> option, boolean forceReadonly) {
 
 	this();
+	setId("option-text-field-for-"+option.getKey());
 
 	//
 	// Option
@@ -64,7 +64,7 @@ public class OptionTextField extends TextField implements OnKeyUpValidationListe
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Primitive option value: " + option.getValue());
 
-	    String values = StringValuesReader.readValues(option).stream().collect(Collectors.joining(","));
+	    String values = String.join(",", StringValuesReader.readValues(option));
 
 	    setValue(values);
 
@@ -76,12 +76,12 @@ public class OptionTextField extends TextField implements OnKeyUpValidationListe
 	//
 	// Required
 	//
-	if (option.isRequired()) {
+	if (option.isRequired() && !forceReadonly) {
 
 	    setRequired(true);
 
 	    setRequiredIndicatorVisible(true);
-	    setErrorMessage("A value is required");
+	    setErrorMessage("Required value");
 
 	    if (option.getValue() == null) {
 		setInvalid(true);

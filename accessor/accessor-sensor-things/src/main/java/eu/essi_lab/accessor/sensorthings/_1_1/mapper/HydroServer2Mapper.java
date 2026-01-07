@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.sensorthings._1_1.mapper;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@ import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.VerticalCRS;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.EntityRef;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.SensorThingsRequest;
 import eu.essi_lab.lib.sensorthings._1_1.client.response.AddressableEntityResult;
@@ -180,50 +180,58 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	    Optional<String> sensorDesc = sensor.getDescription();
 	    instrument.setDescription(sensorDesc.get().trim());
 
-	    JSONObject metadata = (JSONObject) sensor.getMetadata().get();
-	    //
-	    // "methodCode": "dl-smtp",
-	    // "methodType": "Instrument Deployment",
-	    // "methodLink": "https://www.decentlab.com/",
-	    // "sensorModel": {
-	    // "sensorModelName": "Decentlab DL-SMTP",
-	    // "sensorModelURL": "https://www.decentlab.com/products/soil-moisture-and-temperature-profile-for-lorawan",
-	    // "sensorManufacturer": "Decentlab"
-	    // }
+	    Object metadata = sensor.getMetadata().get();
+	    if (metadata instanceof JSONObject) {
+		JSONObject sensorMetadata = (JSONObject) metadata;
 
-	    //
-	    // Sensor code
-	    //
-	    String sensorCode = SERVER_URN;
-	    sensorCode += sensorName.get().trim();
+		//
+		// "methodCode": "dl-smtp",
+		// "methodType": "Instrument Deployment",
+		// "methodLink": "https://www.decentlab.com/",
+		// "sensorModel": {
+		// "sensorModelName": "Decentlab DL-SMTP",
+		// "sensorModelURL":
+		// "https://www.decentlab.com/products/soil-moisture-and-temperature-profile-for-lorawan",
+		// "sensorManufacturer": "Decentlab"
+		// }
 
-	    String methodCode = metadata.optString("methodCode");
-	    if (!methodCode.isEmpty()) {
-		sensorCode = sensorCode + ":" + methodCode.trim();
-		keywords.addKeyword(methodCode, "methodCode");
-	    }
-	    instrument.setMDIdentifierTypeCode(sensorCode);
+		//
+		// Sensor code
+		//
+		String sensorCode = SERVER_URN;
+		sensorCode += sensorName.get().trim();
 
-	    String methodType = metadata.optString("methodType");
-	    if (!methodType.isEmpty()) {
-		instrument.setSensorType(methodType.trim());
-		keywords.addKeyword(methodType, "methodType");
-	    }
+		String methodCode = sensorMetadata.optString("methodCode");
+		if (!methodCode.isEmpty()) {
+		    sensorCode = sensorCode + ":" + methodCode.trim();
+		    keywords.addKeyword(methodCode, "methodCode");
+		}
+		instrument.setMDIdentifierTypeCode(sensorCode);
 
-	    String methodLink = metadata.optString("methodLink");
-	    keywords.addKeyword(methodLink, "mehtodLink");
+		String methodType = sensorMetadata.optString("methodType");
+		if (!methodType.isEmpty()) {
+		    instrument.setSensorType(methodType.trim());
+		    keywords.addKeyword(methodType, "methodType");
+		}
 
-	    if (metadata.has("sensorModel")) {
+		String methodLink = sensorMetadata.optString("methodLink");
+		keywords.addKeyword(methodLink, "mehtodLink");
 
-		JSONObject sensorModel = metadata.getJSONObject("sensorModel");
+		if (sensorMetadata.has("sensorModel")) {
 
-		String sensorModelName = sensorModel.optString("sensorModelName");
-		String sensorModelURL = sensorModel.optString("sensorModelURL");
-		String sensorManufacturer = sensorModel.optString("sensorManufacturer");
+		    JSONObject sensorModel = sensorMetadata.getJSONObject("sensorModel");
 
-		keywords.addKeyword(sensorModelName, "instrument");
-		keywords.addKeyword(sensorModelURL, "sensorModelURL");
-		keywords.addKeyword(sensorManufacturer, "sensorManufacturer");
+		    String sensorModelName = sensorModel.optString("sensorModelName");
+		    String sensorModelURL = sensorModel.optString("sensorModelURL");
+		    String sensorManufacturer = sensorModel.optString("sensorManufacturer");
+
+		    keywords.addKeyword(sensorModelName, "instrument");
+		    keywords.addKeyword(sensorModelURL, "sensorModelURL");
+		    keywords.addKeyword(sensorManufacturer, "sensorManufacturer");
+		}
+	    } else if (metadata instanceof String) {
+		String strMetadata = (String) metadata;
+
 	    }
 	}
     }
@@ -245,9 +253,10 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 	    ObservedProperty observedProperty = optObservedProperty.get();
 
+	    String variableCode = null;
 	    Optional<String> name = observedProperty.getName();
 	    if (name.isPresent()) {
-
+		variableCode = normalize(name.get());
 		keywords.addKeyword(normalize(name.get()), "observedProperty");
 		coverageDescription.setAttributeTitle(normalize(name.get()));
 	    }
@@ -264,28 +273,25 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 		JSONObject optObservedPropertyProp = optProperties.get();
 
-		String variableCode = optObservedPropertyProp.optString("variableCode");
-		String variableType = optObservedPropertyProp.optString("variableType");
+		if (variableCode != null && !variableCode.isEmpty()) {
 
+		    variableCode = optObservedPropertyProp.optString("variableCode");
+
+		}
+
+	    }
+
+	    if (variableCode != null && !variableCode.isEmpty()) {
 		String coverageId = SERVER_URN;
 
-		if (!variableCode.isEmpty()) {
+		coverageId += variableCode.trim();
 
-		    coverageId += variableCode.trim();
-
-		    keywords.addKeyword(variableCode, "variableCode");
-		}
-
-		if (!variableType.isEmpty()) {
-
-		    coverageId += ":" + variableType.trim();
-
-		    keywords.addKeyword(variableType, "variableType");
-		}
+		keywords.addKeyword(variableCode, "variableCode");
 
 		coverageDescription.setAttributeIdentifier(coverageId);
 		coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 	    }
+
 	}
     }
 
@@ -296,39 +302,63 @@ public class HydroServer2Mapper extends SensorThingsMapper {
     @Override
     protected void addResponsibleParty(Thing thing, Datastream stream, DataIdentification dataId) {
 
-	if (thing.getProperties().get().has("contactPeople")) {
+	JSONArray contactPeople = null;
 
-	    JSONArray contactPeople = thing.getProperties().get().getJSONArray("contactPeople");
-
-	    contactPeople.forEach(contact -> {
-
-		JSONObject object = (JSONObject) contact;
-		String firstName = object.optString("firstName");
-		String lastName = object.optString("lastName");
-		String email = object.optString("email");
-		String organization = object.optString("organizationName");
-
-		if (!firstName.isEmpty() || !lastName.isEmpty() || !organization.isEmpty()) {
-
-		    ResponsibleParty responsibleParty = new ResponsibleParty();
-		    if (!firstName.isEmpty() && !lastName.isEmpty()) {
-			responsibleParty.setIndividualName(firstName.trim() + " " + lastName.trim());
-		    } else {
-			responsibleParty.setOrganisationName(organization.trim());
-		    }
-
-		    if (!email.isEmpty()) {
-			Contact con = new Contact();
-			Address address = new Address();
-			address.addElectronicMailAddress(email.trim());
-			con.setAddress(address);
-			responsibleParty.setContactInfo(con);
-		    }
-
-		    dataId.addPointOfContact(responsibleParty);
-		}
-	    });
+	if (stream != null && stream.getProperties().isPresent()) {
+	    contactPeople = stream.getProperties().get().optJSONArray("contactPeople");
+	    if (contactPeople == null) {
+		contactPeople = stream.getProperties().get().optJSONArray("responsibleParties");
+	    }
 	}
+	if (thing != null && thing.getProperties().isPresent()) {
+	    if (contactPeople == null) {
+		contactPeople = thing.getProperties().get().optJSONArray("contactPeople");
+	    }
+	    if (contactPeople == null) {
+		contactPeople = thing.getProperties().get().optJSONArray("responsibleParties");
+	    }
+	}
+
+	if (contactPeople == null) {
+	    return;
+	}
+	contactPeople.forEach(contact -> {
+
+	    JSONObject object = (JSONObject) contact;
+	    String firstName = object.optString("firstName");
+	    String lastName = object.optString("lastName");
+	    String individualName = object.optString("individualName");
+	    String email = object.optString("email");
+	    String organization = object.optString("organizationName");
+	    String role = object.optString("role");
+
+	    if (!firstName.isEmpty() || !lastName.isEmpty() || !organization.isEmpty()) {
+
+		ResponsibleParty responsibleParty = new ResponsibleParty();
+		if (!firstName.isEmpty() && !lastName.isEmpty()) {
+		    responsibleParty.setIndividualName(firstName.trim() + " " + lastName.trim());
+		}
+		if (!individualName.isEmpty()) {
+		    responsibleParty.setIndividualName(individualName.trim());
+		}
+		if (!organization.isEmpty()) {
+		    responsibleParty.setOrganisationName(organization.trim());
+		}
+
+		if (!role.isEmpty()) {
+		    responsibleParty.setRoleCode(role);
+		}
+		if (!email.isEmpty()) {
+		    Contact con = new Contact();
+		    Address address = new Address();
+		    address.addElectronicMailAddress(email.trim());
+		    con.setAddress(address);
+		    responsibleParty.setContactInfo(con);
+		}
+
+		dataId.addPointOfContact(responsibleParty);
+	    }
+	});
     }
 
     /**
@@ -410,6 +440,11 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 		    ISO8601DateTimeUtils.getDuration(intendedTimeSpacing, intTimeUnit).toString());
 	}
 
+	if (properties.has("intendedTimeSpacing")) {
+	    String its = properties.get("intendedTimeSpacing").toString();
+	    handler.setTimeResolutionDuration8601(its);
+	}
+
 	//
 	// Time interpolation
 	//
@@ -451,6 +486,12 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 		    ISO8601DateTimeUtils.getDuration(timeAggregationInterval, aggrTimeUnitName).toString());
 	}
+
+	if (properties.has("aggregationPeriod")) {
+	    String aggregationPeriod = properties.getString("aggregationPeriod");
+	    handler.setTimeAggregationDuration8601(aggregationPeriod);
+	}
+
     }
 
     /**
@@ -569,24 +610,21 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	// Platform id
 	//
 
-	String platformId = SERVER_URN;
-
-	String samplingFeatureType = thing.getProperties().get().optString("samplingFeatureType");
-	if (!samplingFeatureType.isEmpty()) {
-	    platformId += samplingFeatureType.trim() + ":";
-	}
-
+	String platformId = "";
 	String samplingFeatureCode = thing.getProperties().get().optString("samplingFeatureCode");
-	if (!samplingFeatureCode.isEmpty()) {
-	    platformId += samplingFeatureCode.trim() + ":";
+	if (platformId.isEmpty() && !samplingFeatureCode.isEmpty()) {
+	    platformId = samplingFeatureCode.trim();
+	}
+	String samplingFeatureType = thing.getProperties().get().optString("samplingFeatureType");
+	if (platformId.isEmpty() && !samplingFeatureType.isEmpty()) {
+	    platformId = samplingFeatureType.trim();
 	}
 
 	String siteType = thing.getProperties().get().optString("siteType");
-	if (!siteType.isEmpty()) {
-	    platformId += siteType.trim();
+	if (platformId.isEmpty() && !siteType.isEmpty()) {
+	    platformId = siteType.trim();
 	}
 
-	platformId = platformId.replace(" ", "").replace(",", "").trim();
 	platform.setMDIdentifierCode(platformId);
 
 	//
@@ -610,19 +648,23 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 	    GeographicBoundingBox boundingBox = null;
 
-	    if (location.get().getLocation().has("geometry")) {
+	    JSONObject loc = location.get().getLocation();
 
-		JSONObject geometry = location.get().getLocation().getJSONObject("geometry");
+	    JSONObject geometry = loc;
 
-		if (geometry.has("coordinates")) {
-
-		    boundingBox = createBoundingBox(//
-			    location.get().getName(), //
-			    geometry.getJSONArray("coordinates"));
-
-		    dataId.addGeographicBoundingBox(boundingBox);
-		}
+	    if (loc.has("geometry")) {
+		geometry = loc.getJSONObject("geometry");
 	    }
+
+	    if (geometry.has("coordinates")) {
+
+		boundingBox = createBoundingBox(//
+			location.get().getName(), //
+			geometry.getJSONArray("coordinates"));
+
+		dataId.addGeographicBoundingBox(boundingBox);
+	    }
+
 	}
     }
 
@@ -657,6 +699,6 @@ public class HydroServer2Mapper extends SensorThingsMapper {
     @Override
     protected String getSupportedProtocol() {
 
-	return NetProtocols.SENSOR_THINGS_1_1_HYDRO_SERVER_2.getCommonURN();
+	return NetProtocolWrapper.SENSOR_THINGS_1_1_HYDRO_SERVER_2.getCommonURN();
     }
 }

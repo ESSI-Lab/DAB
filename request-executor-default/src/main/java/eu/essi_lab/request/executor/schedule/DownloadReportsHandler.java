@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.schedule;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ package eu.essi_lab.request.executor.schedule;
 
 import java.util.Optional;
 
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting.SchedulingGroup;
 import eu.essi_lab.messages.BulkDownloadMessage;
 import eu.essi_lab.model.resource.data.DataReferences;
@@ -66,7 +66,7 @@ public class DownloadReportsHandler {
 
 	SchedulingGroup group = setting.getGroup();
 
-	String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + "[" + group.name() + "]" + "[" + status + "]";
+	String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + "[" + group.name() + "]" + "[" + status + "]";
 	//
 	StringBuilder builder = new StringBuilder();
 
@@ -88,6 +88,6 @@ public class DownloadReportsHandler {
 
 	resultStorageURI.ifPresent(uri -> builder.append("Storage uri: " + uri + "\n"));
 
-	ConfiguredGmailClient.sendEmail(subject, builder.toString());
+	ConfiguredSMTPClient.sendEmail(subject, builder.toString());
     }
 }

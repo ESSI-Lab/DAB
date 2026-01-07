@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.wms.cluster.feature.info;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@ import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
     @Override
-    public InputStream getInfoPage(String hostname, String viewId, List<StationRecord> stations, int total, String contentType,
+    public InputStream getInfoPage(String hostname, String token, String viewId, List<StationRecord> stations, int total, String contentType,
 	    WMSGetFeatureInfoRequest request) {
 
 	StringBuilder htmlBuilder = new StringBuilder();
@@ -137,7 +137,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    queryParams += getParamIfPresent(request, "observedPropertyURI");
 	    queryParams += getParamIfPresent(request, "organisationName");
 
-	    htmlBuilder = append(hostname, htmlBuilder, station, viewId, queryParams);
+	    htmlBuilder = append(hostname, htmlBuilder, station, token, viewId, queryParams);
 	}
 
 	if (stations.isEmpty()) {
@@ -194,9 +194,9 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
      * @param viewId
      * @return
      */
-    private StringBuilder append(String hostname, StringBuilder builder, StationRecord station, String viewId, String queryParams) {
+    private StringBuilder append(String hostname, StringBuilder builder, StationRecord station,String token, String viewId, String queryParams) {
 
-	String url = hostname + "/gs-service/services/view/" + viewId + "/bnhs/station/" + station.getPlatformIdentifier() + "?"
+	String url = hostname + "/gs-service/services/token/"+token+"/view/" + viewId + "/bnhs/station/" + station.getPlatformIdentifier() + "?"
 		+ queryParams;
 
 	String stationLink = "<a class=\"relative-to-absolute\" href=\"" + url + "\" target=\"_blank\">\n" //

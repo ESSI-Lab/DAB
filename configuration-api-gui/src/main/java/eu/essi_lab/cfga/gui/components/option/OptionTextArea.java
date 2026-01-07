@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.option;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,8 +20,6 @@ package eu.essi_lab.cfga.gui.components.option;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.textfield.TextArea;
 
@@ -41,6 +39,8 @@ public class OptionTextArea extends TextArea {
      */
     public OptionTextArea(Option<?> option, boolean forceReadonly) {
 
+	getStyle().set("font-size","14px");
+
 	//
 	// Option
 	//
@@ -48,9 +48,9 @@ public class OptionTextArea extends TextArea {
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Primitive option value: " + option.getValue());
 
-	    String value = StringValuesReader.readValues(option).//
-		    stream().//
-		    collect(Collectors.joining("\n"));
+	    //
+	    //
+	    String value = String.join("\n", StringValuesReader.readValues(option));
 
 	    setValue(value);
 
@@ -62,12 +62,12 @@ public class OptionTextArea extends TextArea {
 	//
 	// Required
 	//
-	if (option.isRequired()) {
+	if (option.isRequired() && !forceReadonly) {
 
 	    setRequired(true);
 
 	    setRequiredIndicatorVisible(true);
-	    setErrorMessage("A value is required");
+	    setErrorMessage("Required value");
 
 	    if (option.getValue() == null) {
 		setInvalid(true);

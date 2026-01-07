@@ -7,7 +7,7 @@ import org.junit.Assert;
 import eu.essi_lab.downloader.wcs.test.WCSDownloader_Test;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataType;
@@ -45,9 +45,9 @@ public abstract class WCSDownloader_AtlasNorthTest extends WCSDownloader_Test {
 
 	NetProtocol protocol = getProtocol();
 
-	if (protocol.equals(NetProtocols.WCS_2_0_1)) {
+	if (protocol.equals(NetProtocolWrapper.WCS_2_0_1)) {
 
-	} else if (protocol.equals(NetProtocols.WCS_1_1_1)) {
+	} else if (protocol.equals(NetProtocolWrapper.WCS_1_1_1)) {
 	    // slightly different origin is provided in the WCS 1.1.1 description document
 	    origin1 = -822767.555;
 	    origin2 = 2039072.863;

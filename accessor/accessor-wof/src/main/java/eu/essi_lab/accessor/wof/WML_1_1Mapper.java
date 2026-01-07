@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,6 +49,7 @@ import eu.essi_lab.iso.datamodel.classes.DataQuality;
 import eu.essi_lab.iso.datamodel.classes.Dimension;
 import eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MDResolution;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.Online;
@@ -57,7 +58,7 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.VerticalCRS;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.GSSource;
@@ -230,11 +231,24 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 
 	GSSource source = dataset.getSource();
 	String platformPrefix = "";
+	String attributePrefix = "";
+	String onlineGetSite = "";
 	if (source != null) {
 	    if (source.getEndpoint().contains("alerta.ina.gob.ar")) {
 		platformPrefix = "argentina-ina:";
+		attributePrefix = "argentina-ina:";
+		if (!hisServerEndpoint.isEmpty()) {
+		    onlineGetSite = hisServerEndpoint.endsWith("/") ? hisServerEndpoint + "GetSiteInfo?site=" + siteInfo.getSiteCode()
+			    : hisServerEndpoint + "/GetSiteInfo?site=" + siteInfo.getSiteCode();
+		}
+		if (siteInfo.getDataPolicy() != null) {
+		    LegalConstraints rc = new LegalConstraints();
+		    rc.addUseLimitation(siteInfo.getDataPolicy());
+		    coreMetadata.getDataIdentification().addLegalConstraints(rc);
+		}
 	    } else {
 		platformPrefix = "cuahsi:";
+		attributePrefix = "cuahsi:";
 	    }
 	}
 
@@ -375,14 +389,6 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 
 	CoverageDescription coverageDescription = new CoverageDescription();
 
-	String attributePrefix = "";
-	if (source != null) {
-	    if (source.getEndpoint().contains("alerta.ina.gob.ar")) {
-		attributePrefix = "argentina-ina:";
-	    } else {
-		attributePrefix = "cuahsi:";
-	    }
-	}
 	coverageDescription.setAttributeIdentifier(attributePrefix + series.getVariableVocabulary() + ":" + series.getVariableCode());
 	coverageDescription.setAttributeTitle(series.getVariableName());
 
@@ -453,7 +459,7 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	String endPosition = series.getEndTimePositionUTC();
 	endPosition = normalizeUTCPosition(endPosition);
 
-	try {	    
+	try {
 	    iso8601WMLFormat.parse(beginPosition);
 	    iso8601WMLFormat.parse(endPosition);
 	    coreMetadata.addTemporalExtent(beginPosition, endPosition);
@@ -596,11 +602,18 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 
 	String identifier = mangler.getMangling();
 
-	coreMetadata.addDistributionOnlineResource(identifier, hisServerEndpoint, NetProtocols.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(),
-		"download");
-	
+	if (onlineGetSite.isEmpty()) {
+	    coreMetadata.addDistributionOnlineResource(identifier, hisServerEndpoint, NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(),
+		    "download");
+	} else {
+	    coreMetadata.addDistributionOnlineResource(identifier, hisServerEndpoint, NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(),
+		    "download");
+	    coreMetadata.addDistributionOnlineResource("Site Information", onlineGetSite, NetProtocolWrapper.HTTP.getCommonURN(),
+		    "info");
+	}
+
 	String resourceIdentifier = generateCode(dataset, identifier);
-	
+
 	coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 
 	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);

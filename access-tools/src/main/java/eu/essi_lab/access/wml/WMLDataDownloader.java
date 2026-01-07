@@ -6,7 +6,7 @@ import java.io.File;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,7 @@ import javax.xml.datatype.Duration;
 import org.cuahsi.waterml._1.ContactInformationType;
 import org.cuahsi.waterml._1.LatLonPointType;
 import org.cuahsi.waterml._1.ObjectFactory;
+import org.cuahsi.waterml._1.QualifierType;
 import org.cuahsi.waterml._1.SiteInfoType;
 import org.cuahsi.waterml._1.SiteInfoType.GeoLocation;
 import org.cuahsi.waterml._1.SiteInfoType.SiteCode;
@@ -51,6 +52,8 @@ import org.cuahsi.waterml._1.VariableInfoType.TimeScale;
 import org.cuahsi.waterml._1.VariableInfoType.VariableCode;
 import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.cuahsi.waterml._1.essi.JAXBWML.WML_SiteProperty;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.iso.datamodel.classes.Address;
@@ -69,6 +72,10 @@ import eu.essi_lab.model.resource.BNHSPropertyReader;
 import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.OrganizationElementWrapper;
+import eu.essi_lab.model.resource.QualifierElementWrapper;
+import eu.essi_lab.model.resource.composed.ComposedElement;
 
 /**
  * Helper for downloaders in the hydrology domain. A subclass can useful call getTimeSeriesTemplate method to have a WML
@@ -98,7 +105,6 @@ public abstract class WMLDataDownloader extends DataDownloader {
 
     public TimeSeriesResponseType getJaxbTimeSeriesTemplate() {
 	TimeSeriesResponseType ret = new TimeSeriesResponseType();
-
 	TimeSeriesType timeSeries = new TimeSeriesType();
 	VariableInfoType variableInfo = new VariableInfoType();
 	ExtensionHandler extensions = resource.getExtensionHandler();
@@ -284,6 +290,17 @@ public abstract class WMLDataDownloader extends DataDownloader {
 	// variableInfo.g
 
 	timeSeries.setVariable(variableInfo);
+	List<ComposedElement> qualifiers = resource.getExtensionHandler().getComposedElements("qualifier");
+	
+	for (ComposedElement qualifier : qualifiers) {
+	    QualifierElementWrapper wrapper = new QualifierElementWrapper(qualifier);
+	    String flag = wrapper.getCode();
+	    String description = wrapper.getDescription();
+	    QualifierType qt = new QualifierType();
+	    qt.setQualifierCode(flag);
+	    qt.setQualifierDescription(description);
+	    value.getQualifier().add(qt);
+	}
 
 	ret.getTimeSeries().add(timeSeries);
 

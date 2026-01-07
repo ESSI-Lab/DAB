@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.worldcereal.harvested;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,7 +50,7 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.ObjectFactories;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
@@ -660,7 +660,7 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 	    Online online = new Online();
 
 	    online.setLinkage(doi);
-	    online.setProtocol(NetProtocols.HTTP.getCommonURN());
+	    online.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 	    online.setFunctionCode("information");
 	    online.setDescription("DOI");
 
@@ -685,7 +685,7 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 	    Online online = new Online();
 
 	    online.setLinkage(geoParquetUrl);
-	    online.setProtocol(NetProtocols.HTTP.getCommonURN());
+	    online.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 	    online.setFunctionCode("download");
 	    online.setDescription("Download complete dataset (not filtered)");
 
@@ -708,7 +708,7 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 	if (pdfUrl != null) {
 	    Online pfdInfo = new Online();
 	    pfdInfo.setLinkage(pdfUrl);
-	    pfdInfo.setProtocol(NetProtocols.HTTP.getCommonURN());
+	    pfdInfo.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 	    pfdInfo.setFunctionCode("information");
 	    pfdInfo.setDescription("Background Information on Curation");
 	    miMetadata.getDistribution().addDistributionOnline(pfdInfo);
@@ -716,28 +716,28 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 
 	Online information = new Online();
 	information.setLinkage(BACKGROUND_INFO_URL);
-	information.setProtocol(NetProtocols.HTTP.getCommonURN());
+	information.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 	information.setFunctionCode("information");
 	information.setDescription("WorldCereal Legend");
 	miMetadata.getDistribution().addDistributionOnline(information);
 
 	Online irrigationInfoURL = new Online();
 	irrigationInfoURL.setLinkage(IRRIGATION_INFO_URL);
-	irrigationInfoURL.setProtocol(NetProtocols.HTTP.getCommonURN());
+	irrigationInfoURL.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 	irrigationInfoURL.setFunctionCode("information");
 	irrigationInfoURL.setDescription("Irrigation Legend");
 	miMetadata.getDistribution().addDistributionOnline(irrigationInfoURL);
 
 	Online confidenceScore = new Online();
 	confidenceScore.setLinkage(CONFIDENCE_SCORE_URL);
-	confidenceScore.setProtocol(NetProtocols.HTTP.getCommonURN());
+	confidenceScore.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 	confidenceScore.setFunctionCode("information");
 	confidenceScore.setDescription("Confidence Score");
 	miMetadata.getDistribution().addDistributionOnline(confidenceScore);
 
 	Online calculationDate = new Online();
 	calculationDate.setLinkage(CALCULATION_DATE_URL);
-	calculationDate.setProtocol(NetProtocols.HTTP.getCommonURN());
+	calculationDate.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 	calculationDate.setFunctionCode("information");
 	calculationDate.setDescription("Calculation of date");
 	miMetadata.getDistribution().addDistributionOnline(calculationDate);

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.hiscentral.toscana;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.accessor.hiscentral.toscana;
  */
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -203,13 +204,13 @@ public class HISCentralToscanaMapper extends FileIdentifierMapper {
 	    }
 
 	    // bbox
-	    Double lat = null;
-	    Double lon = null;
+	    BigDecimal lat = null;
+	    BigDecimal lon = null;
 	    coordinates = coordinates.replace("[", "").replace("]", "");
 	    String[] splittedCoord = coordinates.split(",");
 	    if (splittedCoord.length > 1) {
-		lon = Double.valueOf(splittedCoord[0]);
-		lat = Double.valueOf(splittedCoord[1]);
+		lon = new BigDecimal(splittedCoord[0]);
+		lat = new BigDecimal(splittedCoord[1]);
 	    }
 
 	    CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
@@ -246,9 +247,13 @@ public class HISCentralToscanaMapper extends FileIdentifierMapper {
 	    referenceSystem.setCodeSpace("EPSG");
 	    coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 
-	    // bbox
-	    if (lon != null && lat != null) {
-		coreMetadata.addBoundingBox(lat, lon, lat, lon);
+	    // bbox    
+	    if (lat != null && lon != null) {
+		coreMetadata.addBoundingBox(//
+			lat, //
+			lon, //
+			lat, //
+			lon);
 	    }
 
 	    // platform

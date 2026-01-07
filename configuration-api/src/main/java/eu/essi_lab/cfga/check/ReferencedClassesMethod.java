@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.check;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  * The following referenced classes are tested:<br>
  * <ul>
  * <li>{@link Setting#getSettingClass()}</li>
- * <li>{@link Setting#getOptionalExtensionClass()}</li>
+ * <li>{@link Setting#getExtensionClass()}</li>
  * <li>{@link Setting#getOptionalAfterCleanFunctionClass()}</li>
  * <li>{@link Setting#getOptionalValidatorClass()}</li>
  * <li>{@link Option#getValueClass()}</li>
@@ -99,7 +99,7 @@ public class ReferencedClassesMethod implements CheckMethod, Consumer<Setting> {
 	//
 	// 2) Setting extension class
 	//
-	Optional<Class<? extends ObjectExtension>> optionalExtensionClass = setting.getOptionalExtensionClass();
+	Optional<Class<? extends ObjectExtension>> optionalExtensionClass = setting.getExtensionClass();
 
 	if (optionalExtensionClass.isEmpty() && setting.getObject().has("extensionClass")) {
 

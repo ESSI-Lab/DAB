@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ package eu.essi_lab.messages;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.util.Properties;
 
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -34,6 +35,7 @@ import eu.essi_lab.lib.utils.PropertiesUtils;
  */
 public class AugmenterProperties extends Properties {
 
+    @Serial
     private static final long serialVersionUID = -3182036351371322455L;
     private static final String START = "start";
     private static final String BEGIN_TIME_STAMP = "beginTimestamp";
@@ -85,7 +87,7 @@ public class AugmenterProperties extends Properties {
 
 	String property = getProperty(START);
 
-	return Integer.valueOf(property);
+	return Integer.parseInt(property);
     }
 
     /**

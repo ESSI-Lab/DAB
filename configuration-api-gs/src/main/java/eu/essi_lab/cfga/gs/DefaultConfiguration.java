@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gs;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,6 +49,7 @@ import eu.essi_lab.cfga.gs.setting.driver.DriverSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
+import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.source.FileSource;
@@ -128,6 +129,11 @@ public class DefaultConfiguration extends Configuration {
 	 * 
 	 */
 	DOWNLOAD_SETTING("downloadSettings"),
+
+	/**
+	 *
+	 */
+	DEFAULT_SEMANTIC_SEARCH_SETTING("defSemanticSearch"),
 
 	/**
 	 * 
@@ -436,6 +442,16 @@ public class DefaultConfiguration extends Configuration {
 	systemSetting.setIdentifier(SingletonSettingsId.SYSTEM_SETTING.getLabel());
 
 	put(systemSetting);
+
+	//
+	// --- DefaultSemanticSearchSetting settings ----
+	//
+
+	DefaultSemanticSearchSetting defaultSemanticSearchSetting = new DefaultSemanticSearchSetting();
+
+	systemSetting.setIdentifier(SingletonSettingsId.DEFAULT_SEMANTIC_SEARCH_SETTING.getLabel());
+
+	put(defaultSemanticSearchSetting);
 
 	//
 	// --- Custom Task settings ----

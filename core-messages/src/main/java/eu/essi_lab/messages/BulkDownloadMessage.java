@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ public class BulkDownloadMessage extends RequestMessage {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = 57092734370735768L;
     private static final String DATA_REFERENCES = "DATA_REFERENCES";
     private static final String STORE_EXEC_RESPONSE = "STORE_EXEC_RESPONSE";
@@ -80,7 +82,7 @@ public class BulkDownloadMessage extends RequestMessage {
      */
     public void setStoreExecuteResponse(boolean store) {
 
-	getPayload().add(new GSProperty<Boolean>(STORE_EXEC_RESPONSE, store));
+	getPayload().add(new GSProperty<>(STORE_EXEC_RESPONSE, store));
     }
 
     /**
@@ -96,7 +98,7 @@ public class BulkDownloadMessage extends RequestMessage {
      */
     public void setDataReferences(DataReferences references) {
 
-	getPayload().add(new GSProperty<DataReferences>(DATA_REFERENCES, references));
+	getPayload().add(new GSProperty<>(DATA_REFERENCES, references));
     }
 
     /**

@@ -14,7 +14,7 @@ package eu.essi_lab.accessor.wof.client.datamodel;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,11 +49,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.xpath.XPathExpressionException;
 
+import eu.essi_lab.lib.xml.*;
 import org.w3c.dom.Node;
-
-import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.lib.xml.XMLNodeReader;
-import eu.essi_lab.lib.xml.XMLNodeWriter;
 
 public class TimeSeries {
 
@@ -672,7 +669,8 @@ public class TimeSeries {
 	    writer.add(
 		    xmlEventFactory.createAttribute(new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi"), "SiteInfoType"));
 
-	    XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+	    XMLInputFactory inputFactory = XMLFactories.newXMLInputFactory();
+
 	    XMLEventReader siteReader = inputFactory.createXMLEventReader(site.getReader().asStream());
 	    while (siteReader.hasNext()) {
 

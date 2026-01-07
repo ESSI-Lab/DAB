@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter.worker;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,7 @@ package eu.essi_lab.augmenter.worker;
  * #L%
  */
 
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
 import eu.essi_lab.model.GSSource;
@@ -65,7 +65,7 @@ public class AugmentationReportsHandler {
 	    return;
 	}
 
-	String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_AUGMENTATION_SUBJECT
+	String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_AUGMENTATION_SUBJECT
 		+ (start ? "[STARTED]" : "[ENDED]");
 
 	String message = "--- \n\n";
@@ -92,6 +92,6 @@ public class AugmentationReportsHandler {
 
 	message += "\n---";
 
-	ConfiguredGmailClient.sendEmail(subject, message);
+	ConfiguredSMTPClient.sendEmail(subject, message);
     }
 }

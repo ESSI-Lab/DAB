@@ -6,7 +6,7 @@ import java.math.BigDecimal;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -106,26 +106,24 @@ public class ResultSet<T> extends MessageResponse<T, CountSet> {
 
 	    if (!resultsList.isEmpty()) {
 
-		List<String> discResourceTitlesList = new ArrayList<String>();
-		List<String> discResourceAttributeTitlesList = new ArrayList<String>();
-		List<String> discResourceIdsList = new ArrayList<String>();
+		List<String> discResourceTitlesList = new ArrayList<>();
+		List<String> discResourceAttributeTitlesList = new ArrayList<>();
+		List<String> discResourceIdsList = new ArrayList<>();
 
-		List<String> discSourceIdsList = new ArrayList<String>();
-		List<String> discSourceLabelsList = new ArrayList<String>();
+		List<String> discSourceIdsList = new ArrayList<>();
+		List<String> discSourceLabelsList = new ArrayList<>();
 
-		List<String> discBboxNorthList = new ArrayList<String>();
-		List<String> discBboxSouthList = new ArrayList<String>();
-		List<String> discBboxEastList = new ArrayList<String>();
-		List<String> discBboxWestList = new ArrayList<String>();
+		List<String> discBboxNorthList = new ArrayList<>();
+		List<String> discBboxSouthList = new ArrayList<>();
+		List<String> discBboxEastList = new ArrayList<>();
+		List<String> discBboxWestList = new ArrayList<>();
 
-		List<String> accessSourceIdsList = new ArrayList<String>();
-		List<String> accessSourceLabelsList = new ArrayList<String>();
+		List<String> accessSourceIdsList = new ArrayList<>();
+		List<String> accessSourceLabelsList = new ArrayList<>();
 
 		resultsList.forEach(item -> {
 
-		    if (item instanceof GSResource) {
-
-			GSResource resource = (GSResource) item;
+		    if (item instanceof GSResource resource) {
 
 			String title = resource.getHarmonizedMetadata().getCoreMetadata().getTitle();
 
@@ -164,9 +162,8 @@ public class ResultSet<T> extends MessageResponse<T, CountSet> {
 			discSourceIdsList.add(source.getUniqueIdentifier());
 			discSourceLabelsList.add(source.getLabel());
 
-		    } else if (item instanceof DataObject) {
+		    } else if (item instanceof DataObject object) {
 
-			DataObject object = (DataObject) item;
 			DataDescriptor descriptor = object.getDataDescriptor();
 
 			DataDescriptorRuntimeInfo.publishDataDescriptorInfo(TargetProvider.RESULT_SET, descriptor, map);
@@ -195,9 +192,7 @@ public class ResultSet<T> extends MessageResponse<T, CountSet> {
 			    }
 
 			}
-		    } else if (item instanceof String) {
-
-			String strJSON = (String) item;
+		    } else if (item instanceof String strJSON) {
 
 			try {
 			    JSONObject json = new JSONObject(strJSON);
@@ -232,20 +227,17 @@ public class ResultSet<T> extends MessageResponse<T, CountSet> {
 
 			    if (strJSON.startsWith("<entry")) {
 
-				String xmlEntry = strJSON;
-
 				try {
 
-				    StAXDocumentParser parser = new StAXDocumentParser(xmlEntry);
+				    StAXDocumentParser parser = new StAXDocumentParser(strJSON);
 
-				    parser.add(Arrays.asList(new QName("entry"), new QName("id")), v -> discResourceIdsList.add(v));
+				    parser.add(Arrays.asList(new QName("entry"), new QName("id")), discResourceIdsList::add);
 
-				    parser.add(Arrays.asList(new QName("entry"), new QName("title")), v -> discResourceTitlesList.add(v));
+				    parser.add(Arrays.asList(new QName("entry"), new QName("title")), discResourceTitlesList::add);
 
-				    parser.add(Arrays.asList(new QName("entry"), new QName("sourceId")), v -> discSourceIdsList.add(v));
+				    parser.add(Arrays.asList(new QName("entry"), new QName("sourceId")), discSourceIdsList::add);
 
-				    parser.add(Arrays.asList(new QName("entry"), new QName("sourceTitle")),
-					    v -> discSourceLabelsList.add(v));
+				    parser.add(Arrays.asList(new QName("entry"), new QName("sourceTitle")), discSourceLabelsList::add);
 
 				    parser.parse();
 

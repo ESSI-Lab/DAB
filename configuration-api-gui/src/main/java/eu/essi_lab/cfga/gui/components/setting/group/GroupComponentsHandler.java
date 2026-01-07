@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.setting.group;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,7 @@ package eu.essi_lab.cfga.gui.components.setting.group;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.Component;
@@ -56,7 +52,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
 	CHECK
     }
 
-    private HashMap<String, ArrayList<Component>> itemToComponentsMap;
+    private final HashMap<String, ArrayList<Component>> itemToComponentsMap;
     protected Setting groupSetting;
 
     /**
@@ -112,14 +108,12 @@ public abstract class GroupComponentsHandler<T extends Component> {
      */
     protected Set<String> getSelection() {
 
-	Set<String> selection = getGroupSetting().//
+	return getGroupSetting().//
 		getSettings().//
 		stream().//
 		filter(Setting::isSelected).//
-		map(s -> s.getName()).//
+		map(Setting::getName).//
 		collect(Collectors.toSet());
-
-	return selection;
     }
 
     /**
@@ -140,11 +134,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
 
 	list.forEach(c -> c.setVisible(false));
 
-	ArrayList<Component> compList = getItemToComponentsMap().get(name);
-	if (compList == null) {
-	    compList = new ArrayList<>();
-	    getItemToComponentsMap().put(name, compList);
-	}
+	ArrayList<Component> compList = getItemToComponentsMap().computeIfAbsent(name, k -> new ArrayList<>());
 
 	compList.addAll(list);
     }
@@ -155,7 +145,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
      */
     public void addComponent(String name, Component component) {
 
-	addComponents(name, Arrays.asList(component));
+	addComponents(name, Collections.singletonList(component));
     }
 
     /**

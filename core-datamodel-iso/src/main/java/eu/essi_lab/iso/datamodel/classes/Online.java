@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -184,6 +184,22 @@ public class Online extends ISOMetadata<CIOnlineResourceType> {
 
 	try {
 	    JAXBElement<?> jaxbElement = type.getDescription().getCharacterString();
+	    @SuppressWarnings("unchecked")
+	    JAXBElement<AnchorType> anchor = (JAXBElement<AnchorType>) jaxbElement;
+	    return anchor.getValue().getHref();
+	} catch (ClassCastException | NullPointerException ex) {
+	}
+
+	return null;
+    }
+
+    /**
+     * @XPathDirective(target = "gmd:protocol/gmx:Anchor/@*:href")
+     */
+    public String getProtocolGmxAnchor() {
+
+	try {
+	    JAXBElement<?> jaxbElement = type.getProtocol().getCharacterString();
 	    @SuppressWarnings("unchecked")
 	    JAXBElement<AnchorType> anchor = (JAXBElement<AnchorType>) jaxbElement;
 	    return anchor.getValue().getHref();

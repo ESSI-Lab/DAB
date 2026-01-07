@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -26,7 +24,7 @@ import javax.net.ssl.X509TrustManager;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -56,22 +54,6 @@ import eu.essi_lab.lib.utils.zip.GZIPUnzipper;
 
 @SuppressWarnings("serial")
 public class SparqlProxyServlet extends HttpServlet {
-
-    static {
-
-	try {
-
-	    GSLoggerFactory.getLogger(SparqlProxyServlet.class).debug("Disabling certificate validation STARTED");
-
-	    disableCertificateValidation();
-
-	    GSLoggerFactory.getLogger(SparqlProxyServlet.class).debug("Disabling certificate validation ENDED");
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(SparqlProxyServlet.class).error(e);
-	}
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -108,6 +90,7 @@ public class SparqlProxyServlet extends HttpServlet {
 	GSLoggerFactory.getLogger(getClass()).debug("Creating URL STARTED");
 
 	URL url = createURL(urlWithParams);
+
 	HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	conn.setRequestMethod(method);
 	conn.setDoInput(true);
@@ -192,8 +175,8 @@ public class SparqlProxyServlet extends HttpServlet {
 
 	for (Entry<String, List<String>> entry : entrySet) {
 	    String headerName = entry.getKey();
-	    String headerValue = entry.getValue().stream().collect(Collectors.joining(","));
-	    if (headerName != null && headerValue != null && !headerValue.isEmpty()) {
+	    String headerValue = String.join(",", entry.getValue());
+	    if (headerName != null && !headerValue.isEmpty()) {
 
 		if (ConfigurationWrapper.forceSparqlProxyAcceptHeader() && headerName.toLowerCase().equals("content-type")) {
 		    headerValue = "application/sparql-results+json; charset=utf-8";
@@ -211,9 +194,7 @@ public class SparqlProxyServlet extends HttpServlet {
 		case "vary":
 		case "retry-after":
 		case "cache-control":
-		case "pragma":
-
-		{
+		case "pragma": {
 
 		    GSLoggerFactory.getLogger(getClass()).debug("Copied header: {}:{}", headerName, headerValue);
 
@@ -228,7 +209,7 @@ public class SparqlProxyServlet extends HttpServlet {
 
 	    }
 	}
-	
+
 	response.setHeader("Content-Length", null); // needed
 
 	GSLoggerFactory.getLogger(getClass()).debug("Copy headers to response ENDED");
@@ -286,36 +267,20 @@ public class SparqlProxyServlet extends HttpServlet {
     private URL createURL(String urlWithParams) {
 
 	try {
-	    return new URI(urlWithParams).toURL();
+
+	    URI uri = new URI(urlWithParams);
+
+	    if (!uri.getScheme().startsWith("https") || uri.getScheme().startsWith("http")) {
+		throw new Exception("Invalid URL scheme");
+	    }
+
+	    return uri.toURL();
+
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
 	return null;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private static void disableCertificateValidation() throws Exception {
-
-	TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-	    public X509Certificate[] getAcceptedIssuers() {
-		return new X509Certificate[0];
-	    }
-
-	    public void checkClientTrusted(X509Certificate[] certs, String authType) {
-	    }
-
-	    public void checkServerTrusted(X509Certificate[] certs, String authType) {
-	    }
-	} };
-
-	SSLContext sc = SSLContext.getInstance("TLS");
-	sc.init(null, trustAllCerts, new SecureRandom());
-	HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-	HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
     }
 }

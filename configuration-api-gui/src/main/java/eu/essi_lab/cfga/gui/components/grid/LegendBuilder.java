@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,7 @@ import eu.essi_lab.lib.utils.StringUtils;
  */
 public class LegendBuilder {
 
-    private List<VerticalLayout> legendParts;
+    private final List<VerticalLayout> legendParts;
 
     /**
      * 
@@ -98,7 +98,7 @@ public class LegendBuilder {
 	icon.getStyle().set("height", "15px !important");
 
 	if (iconMarginLeft != 0) {
-	    icon.getStyle().set("margin-left", String.valueOf(iconMarginLeft) + "px");
+	    icon.getStyle().set("margin-left", iconMarginLeft + "px");
 	}
 
 	VerticalLayout part = crateLegendPart(label, icon, partWidth, partMarginLeft);
@@ -124,12 +124,12 @@ public class LegendBuilder {
 
 	Label legendLabel = ComponentFactory.createLabel(legendName, false, 12);
 	legendLabel.getStyle().set("font-weight", "bold");
-	legendLabel.getStyle().set("margin-right", "-10px");
+	legendLabel.getStyle().set("margin-right", "5px");
 	legendLabel.getStyle().set("margin-top", "-2px");
 
 	layout.add(legendLabel);
 
-	legendParts.forEach(lp -> layout.add(lp));
+	legendParts.forEach(layout::add);
 
 	return layout;
     }
@@ -142,7 +142,9 @@ public class LegendBuilder {
     private VerticalLayout crateLegendPart(String name, Icon icon, int width, int marginLeft) {
 
 	VerticalLayout vl = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
-	vl.getStyle().set("width", String.valueOf(width) + "px");
+	vl.getStyle().set("padding","0px");
+
+	vl.getStyle().set("width", width + "px");
 	if (marginLeft != 0) {
 	    vl.getStyle().set("margin-left", marginLeft + "px");
 	}

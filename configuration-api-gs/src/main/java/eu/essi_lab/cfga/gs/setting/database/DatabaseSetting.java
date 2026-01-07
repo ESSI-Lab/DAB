@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.database;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,13 +23,10 @@ package eu.essi_lab.cfga.gs.setting.database;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.StorageInfo;
@@ -40,8 +37,7 @@ import eu.essi_lab.model.StorageInfo;
 public class DatabaseSetting extends Setting implements EditableSetting {
 
     /**
-     *  
-     *  
+     *
      */
     public static final String VOLATILE_DB_STORAGE_NAME = "Volatile";
     public static final String VOLATILE_DB_URI = "http://volatile-db";
@@ -60,8 +56,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 
 	setCanBeDisabled(false);
 	setName("Database settings");
-	setDescription("Main database settings");
-
+	setShowHeader(false);
 	setCanBeCleaned(false);
 
 	//
@@ -70,14 +65,14 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 	setSelectionMode(SelectionMode.SINGLE);
 
 	//
-	// Database database configuration, read-only
+	// Database configuration, read-only
 	//
 	{
 	    Setting volatileDb = new Setting();
 	    volatileDb.setName("Volatile database");
 	    volatileDb.setIdentifier(getVolatileDbSettingId());
 	    String desc = "This configuration is not editable and " + //
-		    "the underlyind database implementation is not persistent " + //
+		    "the underlying database implementation is not persistent " + //
 		    "and it is supposed to be used only for test purpose";
 	    volatileDb.setDescription(desc);
 	    volatileDb.setCanBeDisabled(false);
@@ -165,31 +160,32 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 
 	    addSetting(dbSettings);
 	}
-
-	//
-	// set the component extension
-	//
-	setExtension(new DatabaseComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
-    public static class DatabaseComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
-	public DatabaseComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(DatabaseSetting.class.getName());
-
-	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(GSTabIndex.DATABASE.getIndex()).//
-		    withShowDirective("Database").//
+	    descriptor = TabContentDescriptorBuilder.get(DatabaseSetting.class).//
+		    withShowDirective("Configuration of the harvested sources database", true).//
+		    withLabel("Database").//
 		    build();
+	}
 
-	    setTabInfo(tabInfo);
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 
@@ -229,7 +225,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void setVolatile(boolean set) {
 
@@ -258,7 +254,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void removeVolatileSettings() {
 
@@ -466,7 +462,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void hideDatabaseConfigurationName() {
 
@@ -474,7 +470,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void hideDatabaseConfigurationFolderOption() {
 

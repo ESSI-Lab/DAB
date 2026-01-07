@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.niwa;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,7 +39,7 @@ import org.cuahsi.waterml._1.ValueSingleVariable;
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
@@ -88,7 +88,7 @@ public class NIWADownloader extends WMLDataDownloader {
 
     @Override
     public boolean canDownload() {
-	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocols.NIWA.getCommonURN()));
+	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocolWrapper.NIWA.getCommonURN()));
     }
 
     @Override
@@ -221,7 +221,7 @@ public class NIWADownloader extends WMLDataDownloader {
 	dataset.getHarmonizedMetadata().getCoreMetadata().addDistributionOnlineResource(//
 		"parameter;Discharge.Master;platform;15341", //
 		"https://hydrowebportal.niwa.co.nz", //
-		NetProtocols.NIWA.getCommonURN(), //
+		NetProtocolWrapper.NIWA.getCommonURN(), //
 		"download");
 
 	String resourceIdentifier = AbstractResourceMapper.generateCode(dataset, "parameter;Discharge.Master;platform;15341");

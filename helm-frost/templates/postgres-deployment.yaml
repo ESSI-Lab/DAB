@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "frost.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgres
+spec:
+  replicas: {{ .Values.postgres.replicas }}
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        {{- include "frost.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: postgres
+        image: {{ .Values.postgres.image }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        env:
+        - name: POSTGRES_DB
+          value: {{ .Values.postgres.database | quote }}
+        - name: POSTGRES_USER
+          value: {{ .Values.postgres.username | quote }}
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.postgres.password | quote }}
+        ports:
+        - containerPort: {{ .Values.postgres.port }}
+          name: postgres
+        {{- if .Values.postgres.resources }}
+        resources:
+          {{- toYaml .Values.postgres.resources | nindent 10 }}
+        {{- end }}
+        {{- if .Values.postgres.persistence.enabled }}
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        {{- end }}
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -d
+            - {{ .Values.postgres.database }}
+            - -U
+            - {{ .Values.postgres.username }}
+          initialDelaySeconds: 30
+          periodSeconds: {{ .Values.postgres.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.postgres.healthcheck.timeout }}
+          failureThreshold: {{ .Values.postgres.healthcheck.retries }}
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -d
+            - {{ .Values.postgres.database }}
+            - -U
+            - {{ .Values.postgres.username }}
+          initialDelaySeconds: 5
+          periodSeconds: {{ .Values.postgres.healthcheck.interval }}
+          timeoutSeconds: {{ .Values.postgres.healthcheck.timeout }}
+          failureThreshold: {{ .Values.postgres.healthcheck.retries }}
+      {{- if .Values.postgres.persistence.enabled }}
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-data
+      {{- end }}
+

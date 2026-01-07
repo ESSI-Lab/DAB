@@ -14,7 +14,7 @@ import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.DataComplianceTester;
 import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
 import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
@@ -35,7 +35,7 @@ public class TimeSeries_TIME_SERIES_BASIC_DATA_COMPLIANCE_ExternalTestIT {
 	    online.setIdentifier(onlineResourceId);
 	    online.setLinkage("http://icewater.usu.edu/littlebearriverwof/cuahsi_1_1.asmx?WSDL");
 	    online.setName("platform;LBR:USU-LBR-Mendon;parameter;LBR:USU3");
-	    online.setProtocol(NetProtocols.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN());
+	    online.setProtocol(NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN());
 	    dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution().addDistributionOnline(online);
 
 	    // WorkflowBuilder.enableLogs(true);

@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,11 @@ package eu.essi_lab.cfga.gs.setting;
  * #L%
  */
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.driver.LocalFolderSetting;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.StorageInfo;
@@ -47,11 +44,11 @@ public class DownloadSetting extends Setting implements EditableSetting {
     public enum DownloadStorage implements LabeledEnum {
 
 	/**
-	 * 
+	 *
 	 */
 	LOCAL_DOWNLOAD_STORAGE("Local storage"),
 	/**
-	 * 
+	 *
 	 */
 	S3_DOWNLOAD_STORAGE("Amazon S3 storage");
 
@@ -77,10 +74,9 @@ public class DownloadSetting extends Setting implements EditableSetting {
 	super();
 
 	setName("Download settings");
-	setDescription("Downloaded items can be stored in the local file system (default) or with Amazon S3 storage");
 	setSelectionMode(SelectionMode.SINGLE);
 	setCanBeDisabled(false);
-
+	setShowHeader(false);
 	setCanBeCleaned(false);
 
 	//
@@ -108,31 +104,32 @@ public class DownloadSetting extends Setting implements EditableSetting {
 	s3StorageSetting.setEditable(false);
 
 	addSetting(s3StorageSetting);
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new DownloadSettingComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
-    public static class DownloadSettingComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
-	public DownloadSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(DownloadSetting.class.getName());
-
-	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(GSTabIndex.DOWNLOAD.getIndex()).//
-		    withShowDirective("Download").//
+	    descriptor = TabContentDescriptorBuilder.get(DownloadSetting.class).//
+		    withShowDirective("Downloaded items can be stored in the local file system (default) or with Amazon S3 storage", true).//
+		    withLabel("Download").//
 		    build();
+	}
 
-	    setTabInfo(tabInfo);
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 

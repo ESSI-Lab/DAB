@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.starter;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,73 +21,53 @@ package eu.essi_lab.gssrv.starter;
  * #L%
  */
 
-import java.io.File;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
-import javax.ws.rs.ext.RuntimeDelegate;
-import javax.xml.bind.JAXBException;
-
-import org.quartz.SchedulerException;
-
-import eu.essi_lab.api.database.cfg.DatabaseSource;
-import eu.essi_lab.api.database.cfg.DatabaseSourceUrl;
-import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationSource;
-import eu.essi_lab.cfga.ConfigurationUtils;
-import eu.essi_lab.cfga.SelectionUtils;
-import eu.essi_lab.cfga.check.CheckResponse;
-import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.check.scheme.SchemeMethod;
-import eu.essi_lab.cfga.check.scheme.SchemeMethod.CheckMode;
-import eu.essi_lab.cfga.check.ConfigurationEditableMethod;
-import eu.essi_lab.cfga.check.ReferencedClassesMethod;
-import eu.essi_lab.cfga.check.RegisteredEditableMethod;
-import eu.essi_lab.cfga.check.SimilarityMethod;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.DefaultConfiguration;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
-import eu.essi_lab.cfga.gs.DefaultConfigurationScheme;
-import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
-import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
+import eu.essi_lab.api.database.cfg.*;
+import eu.essi_lab.augmenter.worker.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.check.*;
+import eu.essi_lab.cfga.check.CheckResponse.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.*;
+import eu.essi_lab.cfga.gs.demo.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.ontology.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
+import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
-import eu.essi_lab.cfga.source.FileSource;
-import eu.essi_lab.cfga.source.S3Source;
-import eu.essi_lab.configuration.ClusterType;
-import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask;
-import eu.essi_lab.gssrv.health.HealthCheck;
-import eu.essi_lab.gssrv.servlet.ServletListener;
-import eu.essi_lab.harvester.HarvestingReportsHandler;
-import eu.essi_lab.jaxb.common.CommonContext;
-import eu.essi_lab.jaxb.wms.extension.JAXBWMS;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.JavaOptions;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.profiler.esri.feature.FeatureLayer1StationsArctic;
-import eu.essi_lab.profiler.esri.feature.query.CachedCollections;
-import eu.essi_lab.profiler.wms.extent.WMSLayer;
-import eu.essi_lab.profiler.wms.extent.map.WMSGetMapHandler;
-import eu.essi_lab.request.executor.schedule.DownloadReportsHandler;
-import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.*;
+import eu.essi_lab.cfga.source.*;
+import eu.essi_lab.configuration.*;
+import eu.essi_lab.gssrv.conf.task.*;
+import eu.essi_lab.gssrv.health.*;
+import eu.essi_lab.gssrv.servlet.*;
+import eu.essi_lab.harvester.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.jaxb.wms.extension.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.net.s3.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.profiler.esri.feature.*;
+import eu.essi_lab.profiler.esri.feature.query.*;
+import eu.essi_lab.profiler.wms.extent.*;
+import eu.essi_lab.profiler.wms.extent.map.*;
+import eu.essi_lab.request.executor.schedule.*;
+import eu.essi_lab.shared.driver.es.stats.*;
+import org.quartz.*;
+
+import javax.ws.rs.ext.*;
+import javax.xml.bind.*;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -95,13 +75,13 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 public class DABStarter {
 
     /**
-    * 
-    */
+     *
+     */
     public static Configuration configuration;
 
     /**
-    * 
-    */
+     *
+     */
     public static boolean schedulerStartError;
 
     /**
@@ -110,12 +90,12 @@ public class DABStarter {
     private static final int DEFAULT_SCHEDULER_START_DELAY = 15;
 
     /**
-     * 
+     *
      */
     private final ExecutionMode mode;
 
     /**
-     * 
+     *
      */
     public DABStarter() {
 
@@ -127,7 +107,6 @@ public class DABStarter {
     }
 
     /**
-     * @param confConnector
      * @throws GSException
      */
     public void start() throws GSException {
@@ -141,7 +120,7 @@ public class DABStarter {
 
 	initLocale();
 
-	initJaxb();
+	initContext();
 
 	initConfig();
 
@@ -149,39 +128,11 @@ public class DABStarter {
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check STARTED");
 
-	    // ---------------------------------
-	    //
-	    // - SchemeCheckMethod
-	    //
-
-	    SchemeMethod schemeCheckMethod = new SchemeMethod();
-
-	    schemeCheckMethod.setScheme(new DefaultConfigurationScheme());
-
-	    schemeCheckMethod.setCheckMode(CheckMode.MISSING_SETTINGS);
-
-	    CheckResponse missingRespone = schemeCheckMethod.check(configuration);
-
-	    missingRespone.getMessages().forEach(msg -> GSLoggerFactory.getLogger(getClass()).warn(msg));
-
-	    schemeCheckMethod.setCheckMode(CheckMode.REDUNDANT_SETTINGS);
-
-	    CheckResponse redundantRespone = schemeCheckMethod.check(configuration);
-
-	    redundantRespone.getMessages().forEach(msg -> GSLoggerFactory.getLogger(getClass()).warn(msg));
-
-	    // ---------------------------------
-	    //
-	    // - Other checks
-	    //
-
 	    CheckResponse similarityCheckResponse = checkConfig();
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check ENDED");
 
-	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED || //
-		    missingRespone.getCheckResult() == CheckResult.CHECK_FAILED || //
-		    redundantRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
+	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
 
 		switch (mode) {
 		case CONFIGURATION:
@@ -191,24 +142,6 @@ public class DABStarter {
 		    GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration fix STARTED");
 
 		    ConfigurationUtils.backup(configuration);
-
-		    if (redundantRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
-
-			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Removing redundant settings STARTED");
-
-			redundantRespone.getSettings().forEach(setting -> configuration.remove(setting.getIdentifier()));
-
-			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Removing redundant settings ENDED");
-		    }
-
-		    if (missingRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
-
-			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Adding missing settings STARTED");
-
-			missingRespone.getSettings().forEach(setting -> configuration.put(setting));
-
-			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Adding missing settings ENDED");
-		    }
 
 		    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
 
@@ -234,6 +167,8 @@ public class DABStarter {
 	}
 
 	applySystemSettings();
+
+	initTrustStore();
 
 	healthCheckTest();
 
@@ -280,7 +215,7 @@ public class DABStarter {
 
 	    Optional<String> optConfigURL = JavaOptions.getValue(JavaOptions.CONFIGURATION_URL);
 
-	    String configURL = null;
+	    String configURL;
 
 	    if (optConfigURL.isEmpty() || optConfigURL.get().isEmpty()) {
 
@@ -302,7 +237,7 @@ public class DABStarter {
 
 	    Configuration configuration = null;
 
-	    String newConfigName = null;
+	    String newConfigName;
 
 	    ConfigurationSource source = null;
 
@@ -396,26 +331,23 @@ public class DABStarter {
 		// CONF_FILE_MISSING_OR_EMPTY_ERR_ID);
 		// }
 
-		switch (newConfigName) {
+		configuration = switch (newConfigName) {
+		    case "default" -> {
 
-		case "default":
+			GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
 
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
+			yield new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
+				ConfigurationWrapper.CONFIG_RELOAD_TIME);
+		    }
+		    case "demo" -> {
 
-		    configuration = new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
+			GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
 
-		    break;
-
-		case "demo":
-
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
-
-		    configuration = new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
-
-		    break;
-		}
+			yield new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
+				ConfigurationWrapper.CONFIG_RELOAD_TIME);
+		    }
+		    default -> configuration;
+		};
 
 		SelectionUtils.deepClean(configuration);
 
@@ -571,10 +503,31 @@ public class DABStarter {
 		    }
 		}
 
-		configuration = FileSource.switchSource(configuration);
+		Optional<File> path = JavaOptions.getValue(JavaOptions.LOCAL_PROD_CONFIG_PATH).map(File::new);
+
+		configuration = path.isPresent() ? //
+			FileSource.switchSource(configuration, path.get()) : //
+			FileSource.switchSource(configuration);
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
+
+	    // ------------------------------------------------------------------
+	    //
+	    // - Setting.COMPACT_MODE = false patch
+	    //
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Setting.COMPACT_MODE = false patch STARTED");
+
+	    RemovePropertyPatch patch = RemovePropertyPatch.of(configuration, Setting.COMPACT_MODE, false);
+
+	    patch.patch();
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Setting.COMPACT_MODE = false patch ENDED");
+
+	    //
+	    //
+	    // ---------------------------------------------------------------
 
 	    DABStarter.configuration = configuration;
 
@@ -584,7 +537,7 @@ public class DABStarter {
 
 	} catch (
 
-	GSException gsex) {
+		GSException gsex) {
 
 	    throw gsex;
 
@@ -693,9 +646,11 @@ public class DABStarter {
 	// than the corresponding Java setting)
 
 	SimilarityMethod similarityCheckMethod = new SimilarityMethod();
-	
+
 	// in case a validator is added to a Setting (or removed from a Setting)
 	similarityCheckMethod.getExclusions().remove(Setting.VALIDATOR);
+
+	similarityCheckMethod.getExclusions().remove(Setting.SHOW_HEADER);
 
 	CheckResponse similarityCheckResponse = similarityCheckMethod.check(configuration);
 
@@ -740,7 +695,81 @@ public class DABStarter {
     }
 
     /**
-     * 
+     *
+     */
+    private void initTrustStore() {
+
+	Optional<String> trustStoreName = ConfigurationWrapper. //
+		getSystemSettings().//
+		readKeyValue(KeyValueOptionKeys.TRUST_STORE_NAME.getLabel());
+
+	Optional<String> trustStorePwd = ConfigurationWrapper. //
+		getSystemSettings().//
+		readKeyValue(KeyValueOptionKeys.TRUST_STORE_PWD.getLabel());
+
+	Optional<String> trustStore = ConfigurationWrapper. //
+		getSystemSettings().//
+		readKeyValue(KeyValueOptionKeys.TRUST_STORE.getLabel());
+
+	if (trustStore.isPresent() && trustStorePwd.isPresent() && trustStoreName.isPresent()) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Trust store init STARTED");
+
+	    File target = null;
+
+	    File trustFile = new File(trustStore.get());
+
+	    if (trustFile.exists()) {
+
+		target = trustFile;
+
+		GSLoggerFactory.getLogger(getClass()).info("Loading trust store from file system: {}", target.getAbsolutePath());
+
+	    } else {
+
+		Optional<S3TransferWrapper> wrapper = ConfigurationWrapper.getS3TransferWrapper();
+
+		if (wrapper.isPresent()) {
+
+		    GSLoggerFactory.getLogger(getClass()).info("Loading trust store S3 bucket: {}", trustStore.get());
+
+		    target = new File(FileUtils.getTempDir(), trustStoreName.get());
+
+		    boolean downloaded = wrapper.get().download( //
+			    trustStore.get(), //
+			    trustStoreName.get(), //
+			    target);
+
+		    if (!downloaded) {
+
+			target = null;
+
+			GSLoggerFactory.getLogger(getClass()).error("Error occurred. Unable to download trust store from S3");
+		    }
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).warn("Unable to init trust store, S3 transfer wrapper is not configured");
+		}
+	    }
+
+	    if (target != null) {
+
+		System.setProperty("dab.net.ssl.trustStore", target.getAbsolutePath());
+		System.setProperty("dab.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
+		System.setProperty("dab.net.ssl.trustStorePassword", trustStorePwd.get());
+
+		GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
+	    }
+
+	} else {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Trust store credentials missing");
+	}
+    }
+
+    /**
+     *
      */
     private void applySystemSettings() {
 
@@ -807,7 +836,7 @@ public class DABStarter {
     }
 
     /**
-     * 
+     *
      */
     private void initLocale() {
 	// set the English locale
@@ -819,14 +848,11 @@ public class DABStarter {
     /**
      * @throws GSException
      */
-    private void initJaxb() throws GSException {
-	// --------------------------------------
-	//
-	// this will initialize the JAXB contexts
-	//
+    private void initContext() throws GSException {
+
 	try {
 
-	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization STARTED");
+	    GSLoggerFactory.getLogger(DABStarter.class).debug("Context initialization STARTED");
 
 	    CommonContext.createMarshaller(true);
 	    CommonContext.createUnmarshaller();
@@ -834,11 +860,16 @@ public class DABStarter {
 
 	    JAXBWMS.getInstance().getMarshaller();
 
-	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization ENDED");
+	    // this is done here to guarantee that is done in the right thread
+	    // in some cases we notice that this call is firstly done by threads with a context class loader
+	    // devoid of the necessary classes to load
+	    ConfigurableLoader.load();
+
+	    GSLoggerFactory.getLogger(DABStarter.class).debug("Context initialization ENDED");
 
 	} catch (JAXBException e) {
 
-	    GSLoggerFactory.getLogger(DABStarter.class).error("Fatal error on startup, JAXB could not be initialized", e);
+	    GSLoggerFactory.getLogger(DABStarter.class).error("Fatal error on startup, context could not be initialized", e);
 
 	    throw GSException.createException(//
 		    this.getClass(), //
@@ -847,7 +878,7 @@ public class DABStarter {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //
-		    "JAXBInitError", //
+		    "ContextInitError", //
 		    e);
 	}
     }
@@ -889,7 +920,7 @@ public class DABStarter {
     }
 
     /**
-     * 
+     *
      */
     private void initCaches() {
 
@@ -907,8 +938,8 @@ public class DABStarter {
 	case ACCESS:
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
-	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
-		    new FeatureLayer1StationsArctic());
+	    CachedCollections.getInstance()
+		    .prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic", new FeatureLayer1StationsArctic());
 	    break;
 	case BATCH:
 	case CONFIGURATION:
@@ -926,16 +957,16 @@ public class DABStarter {
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.EMOD_PACE_PHYSICS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.TRIGGER_MONITORING_POINTS);
 	    WMSGetMapHandler.getCachedLayer(WMSLayer.ICHANGE_MONITORING_POINTS);
-	    CachedCollections.getInstance().prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic",
-		    new FeatureLayer1StationsArctic());
+	    CachedCollections.getInstance()
+		    .prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic", new FeatureLayer1StationsArctic());
 	default:
 	}
     }
 
     /**
-     * @throws GSException
+     *
      */
-    private void startSchedulerLate() throws GSException {
+    private void startSchedulerLate() {
 
 	Optional<Properties> keyValueOptions = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
 
@@ -943,8 +974,8 @@ public class DABStarter {
 
 	if (keyValueOptions.isPresent()) {
 
-	    schedulerStartDelay = Integer.valueOf(keyValueOptions.get().getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(),
-		    String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
+	    schedulerStartDelay = Integer.parseInt(keyValueOptions.get()
+		    .getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(), String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
 	}
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("Scheduler will start in {} minutes", schedulerStartDelay);

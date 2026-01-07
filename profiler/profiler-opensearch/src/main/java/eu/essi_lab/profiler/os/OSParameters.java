@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.os;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -619,7 +619,7 @@ public abstract class OSParameters {
     /**
     *
     */
-    public static final OSParameter PUB_DATE_FROM = new OSParameter("pubDatefrom", "dateTime", null, "{gs:pubDatefrom}") {
+    public static final OSParameter PUB_DATE_FROM = new OSParameter("pubDateFrom", "dateTime", null, "{gs:pubDateFrom}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -627,14 +627,14 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.PUBLICATION_DATE, value));
 	}
     };
 
     /**
     *
     */
-    public static final OSParameter PUB_DATE_UNTIL = new OSParameter("pubDateuntil", "dateTime", null, "{gs:pubDateuntil}") {
+    public static final OSParameter PUB_DATE_UNTIL = new OSParameter("pubDateUntil", "dateTime", null, "{gs:pubDateUntil}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -642,7 +642,67 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.PUBLICATION_DATE, value));
+	}
+    };
+
+    /**
+     *
+     */
+    public static final OSParameter REVISION_DATE_FROM = new OSParameter("revDateFrom", "dateTime", null, "{gs:revDateFrom}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.REVISION_DATE, value));
+	}
+    };
+
+    /**
+     *
+     */
+    public static final OSParameter REVISION_DATE_UNTIL = new OSParameter("revDateUntil", "dateTime", null, "{gs:revDateUntil}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.REVISION_DATE, value));
+	}
+    };
+
+    /**
+     *
+     */
+    public static final OSParameter CREATION_DATE_FROM = new OSParameter("creDateFrom", "dateTime", null, "{gs:creDateFrom}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.CREATION_DATE, value));
+	}
+    };
+
+    /**
+     *
+     */
+    public static final OSParameter CREATION_DATE_UNTIL = new OSParameter("creDateUntil", "dateTime", null, "{gs:creDateUntil}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.CREATION_DATE, value));
 	}
     };
 

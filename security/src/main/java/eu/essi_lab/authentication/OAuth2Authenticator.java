@@ -4,7 +4,7 @@ package eu.essi_lab.authentication;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,9 +23,7 @@ package eu.essi_lab.authentication;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,15 +53,10 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
- * OAuthAuthenticator2 types implements oauth2 requests flow services. This
- * flow is made up by two/three steps:<br>
- * -
- * {@link OAuthAuthenticator#handleLogin(HttpServletRequest, HttpServletResponse)
- * handleLogin} method covers initial step/steps,<br>
- * - {@link OAuthAuthenticator#handleCallback(HttpServletRequest)
- * handleCallback} method covers later steps.<br>
- * Once we have an access_token we use it to obtain a user identifier, usually
- * his/her email. This is also covered in later step.
+ * OAuthAuthenticator2 types implements oauth2 requests flow services. This flow is made up by two/three steps:<br> -
+ * {@link OAuthAuthenticator#handleLogin(HttpServletRequest, HttpServletResponse) handleLogin} method covers initial step/steps,<br> -
+ * {@link OAuthAuthenticator#handleCallback(HttpServletRequest) handleCallback} method covers later steps.<br> Once we have an access_token
+ * we use it to obtain a user identifier, usually his/her email. This is also covered in later step.
  *
  * @author pezzati/Fabrizio
  */
@@ -88,16 +81,16 @@ public abstract class OAuth2Authenticator implements Configurable<OAuthSetting> 
     private OAuthSetting setting;
 
     /**
-     * 
+     *
      */
     private final String LOGIN_QUERY = "client_id=%s&redirect_uri=%s&response_type=code&scope=openid profile email&state=%s";
     /**
-     * 
+     *
      */
     private final String TOKEN_QUERY = "client_id=%s&client_secret=%s&redirect_uri=%s&code=%s&grant_type=authorization_code";
 
     /**
-     * 
+     *
      */
     public OAuth2Authenticator() {
 
@@ -132,9 +125,9 @@ public abstract class OAuth2Authenticator implements Configurable<OAuthSetting> 
 
 	    String stateJson = "{\"" + CLIENT_URL_JSON_KEY + "\":\"" + clienturl + "\"}";
 	    String state = URLEncoder.encode(stateJson, "UTF-8");
-	    
+
 	    String loginRedirectURL = buildLoginRedirectURL(state);
-	    
+
 	    GSLoggerFactory.getLogger(getClass()).debug("Login redirect URL: {}", loginRedirectURL);
 
 	    httpResponse.sendRedirect(loginRedirectURL);
@@ -213,7 +206,7 @@ public abstract class OAuth2Authenticator implements Configurable<OAuthSetting> 
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Retrieving token ENDED");
 
-	} catch (IOException e) {
+	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 
@@ -413,7 +406,20 @@ public abstract class OAuth2Authenticator implements Configurable<OAuthSetting> 
      * @return
      * @throws IOException
      */
-    private JsonNode getToken(String postTokenUrl, CloseableHttpClient httpClient, ObjectMapper objM) throws IOException {
+    private JsonNode getToken(String postTokenUrl, CloseableHttpClient httpClient, ObjectMapper objM) throws Exception {
+
+	try {
+	    URI uri = new URI(postTokenUrl);
+
+	    if (!uri.getScheme().startsWith("https")) {
+		throw new Exception("Invalid URL scheme");
+	    }
+
+
+	} catch (URISyntaxException e) {
+
+	    throw new Exception("Invalid token URL", e);
+	}
 
 	HttpPost httpPost = new HttpPost(postTokenUrl.substring(0, postTokenUrl.indexOf("?")));
 

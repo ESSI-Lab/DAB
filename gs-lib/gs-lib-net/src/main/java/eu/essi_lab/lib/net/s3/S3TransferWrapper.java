@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.s3;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -439,7 +439,9 @@ public class S3TransferWrapper {
 	    HeadObjectResponse response = client.headObject(headRequest).get();
 	    return new Date(1000l * response.lastModified().getEpochSecond());
 	} catch (Exception e) {
-	    return null;
+
+	   GSLoggerFactory.getLogger(getClass()).error(e);
+	   return null;
 	}
     }
 
@@ -460,7 +462,7 @@ public class S3TransferWrapper {
      * @param destination
      * @throws MalformedURLException
      */
-    public boolean download(String bucketName, String objectKey, File destination) throws MalformedURLException {
+    public boolean download(String bucketName, String objectKey, File destination){
 
 	if (getObjectDate(bucketName, objectKey) == null) {
 	    return false;

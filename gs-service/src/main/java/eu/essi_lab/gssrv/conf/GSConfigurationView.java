@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,59 +21,43 @@ package eu.essi_lab.gssrv.conf;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.quartz.SchedulerException;
-
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinRequest;
-import com.vaadin.flow.server.VaadinService;
-import com.vaadin.flow.server.VaadinServletRequest;
-
-import eu.essi_lab.authorization.userfinder.UserFinder;
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.SelectionUtils;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
-import eu.essi_lab.cfga.gs.setting.GSSourceSetting;
-import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
-import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting.DistributionSettingComponentInfo;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting.HarvestingSettingComponentInfo;
-import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
-import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.OntologySettingComponentInfo;
-import eu.essi_lab.cfga.gui.ConfigurationView;
-import eu.essi_lab.cfga.gui.LogOutButtonListener;
-import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.dependency.*;
+import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.*;
+import eu.essi_lab.access.datacache.*;
+import eu.essi_lab.authorization.userfinder.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
+import eu.essi_lab.cfga.gs.setting.augmenter.worker.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.oauth.*;
+import eu.essi_lab.cfga.gs.setting.ontology.*;
+import eu.essi_lab.cfga.gs.task.*;
+import eu.essi_lab.cfga.gui.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.dialog.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
-import eu.essi_lab.cfga.setting.validation.ValidationContext;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
-import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.gssrv.starter.DABStarter;
-import eu.essi_lab.harvester.worker.HarvestingSettingImpl;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.JavaOptions;
-import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.*;
+import eu.essi_lab.cfga.setting.validation.*;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
+import eu.essi_lab.configuration.*;
+import eu.essi_lab.gssrv.starter.*;
+import eu.essi_lab.harvester.worker.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.auth.*;
+import eu.essi_lab.model.exceptions.*;
+import org.quartz.*;
+
+import javax.servlet.http.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -515,15 +499,19 @@ public class GSConfigurationView extends ConfigurationView {
     }
 
     @Override
-    protected List<ComponentInfo> getAdditionalsComponentInfo() {
+    protected List<TabDescriptor> getDescriptors() {
 
 	return Arrays.asList(//
-		new DistributionSettingComponentInfo(), //
-		new HarvestingSettingComponentInfo(), //
-		new SourcesInspector(), //
-		new ConfigUploader(), //
-		new AboutComponentInfo(),
-		new OntologySettingComponentInfo()//
+		new AugmenterWorkerSetting.TabDescriptorProvider(),//
+		new CustomTaskSetting.TabDescriptorProvider(),//
+		new OAuthSetting.TabDescriptorProvider(),//
+		new CredentialsSetting.TabDescriptorProvider(),//
+		new DataCacheConnectorSettingImpl.TabDescriptorProvider(),//
+		new BrokeringTabDescriptor(),//
+		new SystemTabDescriptor(),//
+		new SourcesTabDescriptor(),//
+		new AboutTabDescriptor(),//
+		new SemanticTabDescriptor()//
 	);
     }
 

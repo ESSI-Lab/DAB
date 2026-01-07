@@ -4,7 +4,7 @@ package eu.essi_lab.messages.termfrequency;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,118 +43,118 @@ public class TermFrequencyMapType {
 
     @XmlElementWrapper(name = ResourceProperty.SOURCE_ID_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private List<TermFrequencyItem> sourceId;
+    private final List<TermFrequencyItem> sourceId;
 
     @XmlElementWrapper(name = MetadataElement.KEYWORD_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private List<TermFrequencyItem> keyword;
+    private final List<TermFrequencyItem> keyword;
 
     @XmlElementWrapper(name = MetadataElement.DISTRIBUTION_FORMAT_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private List<TermFrequencyItem> format;
+    private final List<TermFrequencyItem> format;
 
     @XmlElementWrapper(name = MetadataElement.ONLINE_PROTOCOL_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> protocol;
+    private final ArrayList<TermFrequencyItem> protocol;
 
     @XmlElementWrapper(name = MetadataElement.INSTRUMENT_IDENTIFIER_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> instrumentId;
+    private final ArrayList<TermFrequencyItem> instrumentId;
     
     @XmlElementWrapper(name = MetadataElement.INSTRUMENT_TITLE_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> instrumentTitle;
+    private final ArrayList<TermFrequencyItem> instrumentTitle;
 
     @XmlElementWrapper(name = MetadataElement.PLATFORM_IDENTIFIER_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> platformId;
+    private final ArrayList<TermFrequencyItem> platformId;
     
     @XmlElementWrapper(name = MetadataElement.PLATFORM_TITLE_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> platformTitle;
+    private final ArrayList<TermFrequencyItem> platformTitle;
 
     @XmlElementWrapper(name = MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> origOrgId;
+    private final ArrayList<TermFrequencyItem> origOrgId;
     
     @XmlElementWrapper(name = MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> origOrgDesc;
+    private final ArrayList<TermFrequencyItem> origOrgDesc;
 
     @XmlElementWrapper(name = MetadataElement.ATTRIBUTE_IDENTIFIER_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> attributeId;
+    private final ArrayList<TermFrequencyItem> attributeId;
     
     @XmlElementWrapper(name = MetadataElement.ATTRIBUTE_TITLE_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> attributeTitle;
+    private final ArrayList<TermFrequencyItem> attributeTitle;
     
     @XmlElementWrapper(name = MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> observedPropertyURI;
+    private final ArrayList<TermFrequencyItem> observedPropertyURI;
 
     @XmlElementWrapper(name = MetadataElement.ORGANISATION_NAME_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> orgName;
+    private final ArrayList<TermFrequencyItem> orgName;
 
     @XmlElementWrapper(name = MetadataElement.PRODUCT_TYPE_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> prodType;
+    private final ArrayList<TermFrequencyItem> prodType;
 
     @XmlElementWrapper(name = MetadataElement.SENSOR_OP_MODE_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> sensorOpMode;
+    private final ArrayList<TermFrequencyItem> sensorOpMode;
 
     @XmlElementWrapper(name = MetadataElement.SENSOR_SWATH_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> sensorSwath;
+    private final ArrayList<TermFrequencyItem> sensorSwath;
 
     @XmlElementWrapper(name = MetadataElement.SAR_POL_CH_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> sarPolCh;
+    private final ArrayList<TermFrequencyItem> sarPolCh;
 
     @XmlElementWrapper(name = MetadataElement.S3_INSTRUMENT_IDX_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> s3InstrumentIdx;
+    private final ArrayList<TermFrequencyItem> s3InstrumentIdx;
 
     @XmlElementWrapper(name = MetadataElement.S3_PRODUCT_LEVEL_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> s3ProductLevel;
+    private final ArrayList<TermFrequencyItem> s3ProductLevel;
 
     @XmlElementWrapper(name = MetadataElement.S3_TIMELINESS_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
-    private ArrayList<TermFrequencyItem> s3Timeliness;
+    private final ArrayList<TermFrequencyItem> s3Timeliness;
 
     @XmlElementWrapper(name = ResourceProperty.SSC_SCORE_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     // this is required due to a possible bug of Jackson mapper
     // see JS_API_ResultSetFormatter for more info
     @JsonProperty(ResourceProperty.SSC_SCORE_EL_NAME)
-    private List<TermFrequencyItem> sscScore;
+    private final List<TermFrequencyItem> sscScore;
 
     public TermFrequencyMapType() {
-	sourceId = new ArrayList<TermFrequencyItem>();
-	keyword = new ArrayList<TermFrequencyItem>();
-	format = new ArrayList<TermFrequencyItem>();
-	protocol = new ArrayList<TermFrequencyItem>();
-	instrumentId = new ArrayList<TermFrequencyItem>();
-	instrumentTitle= new ArrayList<TermFrequencyItem>();
-	platformId = new ArrayList<TermFrequencyItem>();
-	platformTitle = new ArrayList<TermFrequencyItem>();
-	origOrgId = new ArrayList<TermFrequencyItem>();
-	origOrgDesc= new ArrayList<TermFrequencyItem>();
-	attributeId = new ArrayList<TermFrequencyItem>();
-	attributeTitle = new ArrayList<TermFrequencyItem>();
-	observedPropertyURI = new ArrayList<TermFrequencyItem>();
-	orgName = new ArrayList<TermFrequencyItem>();
-	sscScore = new ArrayList<TermFrequencyItem>();
-	prodType = new ArrayList<TermFrequencyItem>();
-	sensorOpMode = new ArrayList<TermFrequencyItem>();
-	sensorSwath = new ArrayList<TermFrequencyItem>();
-	sarPolCh = new ArrayList<TermFrequencyItem>();
-	s3InstrumentIdx = new ArrayList<TermFrequencyItem>();
-	s3ProductLevel = new ArrayList<TermFrequencyItem>();
-	s3Timeliness = new ArrayList<TermFrequencyItem>();
+	sourceId = new ArrayList<>();
+	keyword = new ArrayList<>();
+	format = new ArrayList<>();
+	protocol = new ArrayList<>();
+	instrumentId = new ArrayList<>();
+	instrumentTitle= new ArrayList<>();
+	platformId = new ArrayList<>();
+	platformTitle = new ArrayList<>();
+	origOrgId = new ArrayList<>();
+	origOrgDesc= new ArrayList<>();
+	attributeId = new ArrayList<>();
+	attributeTitle = new ArrayList<>();
+	observedPropertyURI = new ArrayList<>();
+	orgName = new ArrayList<>();
+	sscScore = new ArrayList<>();
+	prodType = new ArrayList<>();
+	sensorOpMode = new ArrayList<>();
+	sensorSwath = new ArrayList<>();
+	sarPolCh = new ArrayList<>();
+	s3InstrumentIdx = new ArrayList<>();
+	s3ProductLevel = new ArrayList<>();
+	s3Timeliness = new ArrayList<>();
     }
 
     @XmlTransient

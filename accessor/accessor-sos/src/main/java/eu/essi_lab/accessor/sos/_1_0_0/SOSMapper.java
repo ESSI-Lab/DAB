@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.sos._1_0_0;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ import eu.essi_lab.accessor.sos.SOSIdentifierMangler;
 import eu.essi_lab.accessor.sos.SOSProperties;
 import eu.essi_lab.accessor.sos.SOSProperties.SOSProperty;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -53,7 +53,7 @@ public class SOSMapper extends eu.essi_lab.accessor.sos.SOSMapper {
      */
     protected String getProtocol() {
 
-	return NetProtocols.SOS_1_0_0.getCommonURN();
+	return NetProtocolWrapper.SOS_1_0_0.getCommonURN();
     }
 
     /**

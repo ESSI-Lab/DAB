@@ -3,7 +3,6 @@
  */
 package eu.essi_lab.cfga.gs.setting;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -11,39 +10,33 @@ import java.util.stream.Collectors;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import com.mchange.v2.codegen.bean.SimpleClassInfo;
+import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
-import eu.essi_lab.cfga.gs.task.CustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
-import eu.essi_lab.cfga.gs.task.DefaultCustomTask;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -68,6 +61,12 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     private static final String VERSION_OPTION_KEY = "versionOption";
     private static final String STATE_OPTION = "stateOption";
     private static final String RESOURCE_CONSUMER_OPTION_KEY = "resourceConsumer";
+
+    /**
+     *
+     */
+    public static final String RSM_THREADS_COUNT_PROPERTY = "rsmThreadsCount";
+    public static final String DEFAULT_RSM_THREADS_COUNT = "10";
 
     /**
      *
@@ -146,11 +145,6 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	//
 
 	addKeyValueOption();
-
-	//
-	// set the component extension
-	//
-	setExtension(new ProfilerComponentInfo());
 
 	//
 	// set the validator
@@ -236,21 +230,29 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     /**
      * @author Fabrizio
      */
-    public static class ProfilerComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
 	 *
 	 */
-	public ProfilerComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(ProfilerSetting.class.getName());
+	    String desc = "Manage DAB profilers. Profilers can be added, "
+		    + "and removed; furthermore, their configuration, path and state can be modified. "
+		    + "You can also add several profilers of the same type (e.g: OAI-PMH), making sure "
+		    + "they have a different path and possibly, a different configuration. "
+		    + "Once added, the profiler state is \"Online\"; if set to \"Offline\", "
+		    + "its capabilities will no longer be available and each request will return " + "a 404 error code";
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(GSTabIndex.PROFILERS.getIndex()).//
+	    descriptor = TabContentDescriptorBuilder.get(ProfilerSetting.class).//
+
+		    withLabel("Profilers").//
 		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
 		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
 		    withRemoveDirective("Remove profiler", false, ProfilerSetting.class).//
-		    withShowDirective("Profilers", SortDirection.ASCENDING).//
+		    withShowDirective(desc, SortDirection.ASCENDING).//
 		    withGridInfo(Arrays.asList(//
 
 		    ColumnDescriptor.createPositionalDescriptor(), //
@@ -271,11 +273,18 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 		    ColumnDescriptor.create("Version", true, true, this::getServiceVersion) //
 
-	    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).//
+	    ), getItemsList(), Grid.SelectionMode.MULTI).//
 
 		    build();
 
-	    setTabInfo(tabInfo);
+	}
+
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
 
 	/**
@@ -434,8 +443,19 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     public Optional<ResourceConsumer> getConsumer() {
 
 	return getOption(RESOURCE_CONSUMER_OPTION_KEY, String.class).//
-		get().
-		getOptionalSelectedValue().//
+		get().getOptionalSelectedValue().//
 		map(simpleClass -> ResourceConsumerLoader.load(simpleClass));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Integer> getResultSetMapperThreadsCount() {
+
+	int count = Integer.parseInt(getKeyValueOptions().//
+		map(o -> o.getProperty(RSM_THREADS_COUNT_PROPERTY, DEFAULT_RSM_THREADS_COUNT)).//
+		orElse(DEFAULT_RSM_THREADS_COUNT));
+
+	return Optional.ofNullable(count == -1 ? null : count);
     }
 }

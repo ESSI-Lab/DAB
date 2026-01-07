@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.hmfs;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ import java.util.Optional;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.Dimension;
@@ -41,7 +41,7 @@ import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -349,7 +349,7 @@ public class HMFSConnector extends HarvestedQueryConnector<HMFSConnectorSetting>
 
 			String hmfsIdentifier = mangler.getMangling();
 
-			coreMetadata.addDistributionOnlineResource(hmfsIdentifier, getSourceURL(), NetProtocols.HMFS.getCommonURN(),
+			coreMetadata.addDistributionOnlineResource(hmfsIdentifier, getSourceURL(), NetProtocolWrapper.HMFS.getCommonURN(),
 				"download");
 
 			String resourceIdentifier = AbstractResourceMapper.generateCode(dataset, hmfsIdentifier);
@@ -381,9 +381,9 @@ public class HMFSConnector extends HarvestedQueryConnector<HMFSConnectorSetting>
 
 	} catch (Exception e) {
 	    e.printStackTrace();
-	    String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_HARVESTING_SUBJECT
-		    + ConfiguredGmailClient.MAIL_ERROR_SUBJECT;
-	    ConfiguredGmailClient.sendEmail(subject, "ERROR DURING HMFS HARVESTING: {}", e.getMessage());
+	    String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT
+		    + ConfiguredSMTPClient.MAIL_ERROR_SUBJECT;
+	    ConfiguredSMTPClient.sendEmail(subject, "ERROR DURING HMFS HARVESTING: {}", e.getMessage());
 	    throw GSException.createException(getClass(), e.getMessage(), e);
 	}
 

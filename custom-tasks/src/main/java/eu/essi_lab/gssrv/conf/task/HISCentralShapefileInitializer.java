@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf.task;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,7 +62,7 @@ public class HISCentralShapefileInitializer extends AbstractCustomTask {
 
 	database.initialize(ConfigurationWrapper.getStorageInfo());
 	OpenSearchFolder folder = new OpenSearchFolder(database, OpenSearchDatabase.SHAPE_FILES_FOLDER);
-	Optional<S3TransferWrapper> optManager = ConfigurationWrapper.getS3TransferManager();
+	Optional<S3TransferWrapper> optManager = ConfigurationWrapper.getS3TransferWrapper();
 	if (optManager.isPresent()) {
 	    S3TransferWrapper wrapper = optManager.get();
 	    File s3Dir = null;

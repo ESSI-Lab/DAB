@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond.parser;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,27 +36,27 @@ public interface LogicalBondHandler {
      *
      * @param bond
      */
-    public void startLogicalBond(LogicalBond bond);
+    void startLogicalBond(LogicalBond bond);
 
     /**
      * Receives notification of a {@link LogicalBond} operands separator
      *
      * @param bond
      */
-    public void separator();
+    void separator();
     
     /**
      * Receives notification of a non {@link LogicalBond}
      *
      * @param bond
      */
-    public void nonLogicalBond(Bond bond);
+    void nonLogicalBond(Bond bond);
 
     /**
      * Receives notification of the end of a {@link LogicalBond}
      *
      * @param bond
      */
-    public void endLogicalBond(LogicalBond bond);
+    void endLogicalBond(LogicalBond bond);
 
 }

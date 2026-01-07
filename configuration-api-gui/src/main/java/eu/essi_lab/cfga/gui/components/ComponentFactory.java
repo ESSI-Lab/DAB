@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,23 +22,30 @@ package eu.essi_lab.cfga.gui.components;
  */
 
 import com.vaadin.componentfactory.ToggleButton;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.accordion.AccordionPanel;
+import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.details.Details.OpenedChangeEvent;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import eu.essi_lab.cfga.gui.components.tabs.*;
 
 /**
  * @author Fabrizio
  */
 public class ComponentFactory {
+
+    /**
+     *
+     */
+    public static final int MIN_HEIGHT_OFFSET = 330;
 
     /**
      * @param id
@@ -55,20 +62,7 @@ public class ComponentFactory {
 	return layout;
     }
 
-    /**
-     * @param id
-     * @return
-     */
-    public static TabContainer createTabContainer(String id) {
 
-	TabContainer layout = new TabContainer();
-	// layout.getStyle().set("border","1px solid black");
-	if (id != null) {
-	    layout.setId(id);
-	}
-
-	return layout;
-    }
 
     /**
      * @return
@@ -126,14 +120,12 @@ public class ComponentFactory {
      * @param id
      * @return
      */
-    public static TabContainer createNoSpacingNoMarginTabContainer(String id) {
+    public static TabContent createTabContent(String id) {
 
-	TabContainer layout = createTabContainer(id);
+	TabContent content = new TabContent();
+	content.setId(id);
 
-	layout.setMargin(false);
-	layout.setSpacing(false);
-
-	return layout;
+	return content;
     }
 
     /**
@@ -176,17 +168,13 @@ public class ComponentFactory {
 	accordionPanel.setOpened(false);
 	accordionPanel.setSummaryText(expand);
 	accordionPanel.setContent(content);
-	accordionPanel.addOpenedChangeListener(new ComponentEventListener<Details.OpenedChangeEvent>() {
+	accordionPanel.addOpenedChangeListener((ComponentEventListener<OpenedChangeEvent>) event -> {
 
-	    @Override
-	    public void onComponentEvent(OpenedChangeEvent event) {
-
-		boolean opened = event.isOpened();
-		if (opened) {
-		    accordionPanel.setSummaryText(collapse);
-		} else {
-		    accordionPanel.setSummaryText(expand);
-		}
+	    boolean opened = event.isOpened();
+	    if (opened) {
+		accordionPanel.setSummaryText(collapse);
+	    } else {
+		accordionPanel.setSummaryText(expand);
 	    }
 	});
 
@@ -209,17 +197,13 @@ public class ComponentFactory {
 	details.getElement().getStyle().set("margin-top", "0px");
 	details.getElement().getStyle().set("width", "100%");
 
-	details.addOpenedChangeListener(new ComponentEventListener<Details.OpenedChangeEvent>() {
+	details.addOpenedChangeListener((ComponentEventListener<OpenedChangeEvent>) event -> {
 
-	    @Override
-	    public void onComponentEvent(OpenedChangeEvent event) {
-
-		boolean opened = event.isOpened();
-		if (opened) {
-		    details.setSummaryText(collapse);
-		} else {
-		    details.setSummaryText(expand);
-		}
+	    boolean opened = event.isOpened();
+	    if (opened) {
+		details.setSummaryText(collapse);
+	    } else {
+		details.setSummaryText(expand);
 	    }
 	});
 
@@ -266,6 +250,23 @@ public class ComponentFactory {
     }
 
     /**
+     *
+     * @return
+     */
+    public static CustomButton createReloadButton(){
+
+	CustomButton reloadButton = new CustomButton("RELOAD", VaadinIcon.REFRESH.create());
+	reloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+	reloadButton.setId("reloadButton");
+	reloadButton.setWidth(150, Unit.PIXELS);
+	reloadButton.getStyle().set("margin-left", "15px");
+	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
+	reloadButton.getStyle().set("border-radius", "0px");
+
+	return reloadButton;
+    }
+
+    /**
      * @param label
      * @param widthFull
      * @param fontSize
@@ -279,7 +280,7 @@ public class ComponentFactory {
 	}
 
 	if (fontSize > 0) {
-	    out.getStyle().set("font-size", "" + fontSize + "px");
+	    out.getStyle().set("font-size", fontSize + "px");
 	}
 
 	return out;
@@ -318,9 +319,30 @@ public class ComponentFactory {
      */
     public static Div createDiv() {
 
-	Div div = new Div();
+	return new Div();
+    }
 
-	return div;
+    /**
+     *
+     * @return
+     */
+    public static Div createSeparator() {
+
+	return createSeparator("#e8ebef");
+    }
+
+    /**
+     * @param color
+     * @return
+     */
+    public static Div createSeparator(String color) {
+
+	Div separator = new Div();
+	separator.setWidthFull();
+	separator.setHeight("1px");
+	separator.getStyle().set("background-color", color);
+
+	return separator;
     }
 
     /**
@@ -333,6 +355,18 @@ public class ComponentFactory {
 	if (!defaultColor) {
 	    hr.getStyle().set("background", "lightgray");
 	}
+
+	return hr;
+    }
+
+    /**
+     * @param color
+     * @return
+     */
+    public static Hr createHr(String color) {
+
+	Hr hr = new Hr();
+	hr.getStyle().set("background", color);
 
 	return hr;
     }

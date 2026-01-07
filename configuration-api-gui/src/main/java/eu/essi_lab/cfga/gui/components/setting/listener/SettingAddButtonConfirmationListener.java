@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.setting.listener;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.Selector;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingPutDialog;
@@ -42,29 +42,29 @@ import eu.essi_lab.cfga.setting.Setting;
 public class SettingAddButtonConfirmationListener implements ButtonChangeListener {
 
     private Setting settingToAdd;
-    private boolean foldedModeEnabled;
-    private Configuration configuration;
-    private TabContainer tabContainer;
-    private SettingPutDialog dialog;
+    private final boolean foldedModeEnabled;
+    private final Configuration configuration;
+    private final TabContent tabContent;
+    private final SettingPutDialog dialog;
 
     /**
      * @param dialog
      * @param configuration
      * @param settingToAdd
-     * @param tabContainer
+     * @param tabContent
      * @param foldedModeEnabled
      */
     public SettingAddButtonConfirmationListener(//
 	    SettingPutDialog dialog, //
 	    Configuration configuration, //
 	    Setting settingToAdd, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    boolean foldedModeEnabled) {
 
 	this.dialog = dialog;
 	this.configuration = configuration;
 	this.settingToAdd = settingToAdd;
-	this.tabContainer = tabContainer;
+	this.tabContent = tabContent;
 	this.foldedModeEnabled = foldedModeEnabled;
     }
 
@@ -79,7 +79,7 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
 	    @SuppressWarnings("rawtypes")
 	    Selector selector = (Selector)settingToAdd;
 	    
-	    settingToAdd = (Setting) selector.getSelectedSettings().get(0);
+	    settingToAdd = (Setting) selector.getSelectedSettings().getFirst();
 	}
 
 	//
@@ -90,9 +90,8 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
 	SelectionUtils.deepAfterClean(settingToAdd);
 
 	//
-	// shows the header end set folded and collapse mode
+	// set folded and collapse mode
 	//
-	settingToAdd.setShowHeader(true);
 
 	settingToAdd.enableFoldedMode(this.foldedModeEnabled);
 
@@ -113,10 +112,11 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
 	SettingComponent addedSettingComponent = SettingComponentFactory.createSettingComponent(//
 		configuration, //
 		settingToAdd, //
-		true, //
-		this.tabContainer);
+		true, // forceReadonly
+		false,// forceHideHeader
+		this.tabContent);
 
-	tabContainer.addSettingComponent(addedSettingComponent);
+	tabContent.addSettingComponent(addedSettingComponent);
 
 	dialog.close();
     }

@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.utils.whos;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -125,6 +125,26 @@ public abstract class HydroOntology {
 	}
 
 	return new ArrayList<SKOSConcept>();
+    }
+
+    public List<SKOSConcept> getBroaders(String uri) {
+	try {
+	    InputStream queryStream = HydroOntology.class.getClassLoader().getResourceAsStream("whos/hydro-ontology-get-broaderTransitive.sparql");
+	    String query = IOUtils.toString(queryStream, StandardCharsets.UTF_8);
+	    queryStream.close();
+	    if (!uri.startsWith("<")) {
+		uri = "<" + uri + ">";
+	    }
+	    query = query.replace("${CONCEPT_URI}", uri);
+	    List<SKOSConcept> concepts = conceptQuery(query);
+	    return concepts;
+	} catch (Exception e) {
+	    e.printStackTrace();
+	} finally {
+
+	}
+	return new ArrayList<SKOSConcept>();
+	
     }
 
     /**

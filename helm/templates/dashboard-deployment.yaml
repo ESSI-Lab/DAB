@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opensearch-dashboards
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "dab.labels" . | nindent 4 }}
+    app.kubernetes.io/component: opensearch-dashboards
+spec:
+  replicas: {{ .Values.dashboard.replicas }}
+  selector:
+    matchLabels:
+      app: opensearch-dashboards
+  template:
+    metadata:
+      labels:
+        app: opensearch-dashboards
+        {{- include "dab.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: dashboard
+        image: {{ .Values.dashboard.image }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        env:
+        - name: OPENSEARCH_HOSTS
+          value: "[\"http://opensearch:{{ .Values.opensearch.port }}\"]"
+        - name: DISABLE_SECURITY_DASHBOARDS_PLUGIN
+          value: "true"
+        ports:
+        - containerPort: {{ .Values.dashboard.port }}
+          name: http
+        {{- if .Values.dashboard.resources }}
+        resources:
+          {{- toYaml .Values.dashboard.resources | nindent 10 }}
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            path: /api/status
+            port: {{ .Values.dashboard.port }}
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/status
+            port: {{ .Values.dashboard.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10

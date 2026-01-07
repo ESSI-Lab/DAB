@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,7 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,7 +45,7 @@ import com.vaadin.flow.function.ValueProvider;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.grid.renderer.GridColumnRenderer;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.setting.Setting;
@@ -60,28 +56,30 @@ import eu.essi_lab.cfga.setting.Setting;
 @SuppressWarnings("serial")
 public class GridComponent extends Grid<HashMap<String, String>> {
 
-    private GridInfo gridInfo;
+    private final GridInfo gridInfo;
     private HeaderRow filterRow;
     private GridFilter gridFilter;
-    private ListDataProvider<HashMap<String, String>> dataProvider;
+    private final ListDataProvider<HashMap<String, String>> dataProvider;
     private boolean legendsViewer;
 
     /**
      * @param gridInfo
      * @param list
      * @param configuration
-     * @param container
+     * @param content
      * @param readOnly
      * @param refresh
+     * @param withTabSheet
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public GridComponent(//
 	    GridInfo gridInfo, //
 	    List<Setting> list, //
 	    Configuration configuration, //
-	    TabContainer container, //
+	    TabContent content, //
 	    boolean readOnly, //
-	    boolean refresh) {
+	    boolean refresh, //
+	    boolean withTabSheet) {
 
 	//
 	//
@@ -91,7 +89,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	if (!refresh) {
 
-	    GridFilter.clearValuesCache();
+	    GridFilter.clearSelection();
 	    ColumnsHider.clearValuesCache();
 	}
 
@@ -136,7 +134,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		    if (eventItem.isPresent()) {
 
-			menuItem.setEnabled(gmih.isEnabled(eventItem.get(), container, configuration, setting.get(), map));
+			menuItem.setEnabled(gmih.isEnabled(eventItem.get(), content, configuration, setting.get(), map));
 
 		    } else {
 
@@ -169,7 +167,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		    // since they are enabled also if no context is selected
 		    Optional<Setting> setting = findEventSetting(configuration, eventItem);
 
-		    gmih.onClick(event, container, configuration, setting, map);
+		    gmih.onClick(event, content, configuration, setting, map);
 		});
 
 		// set the identifier according to its handler
@@ -188,7 +186,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	//
 
-	getStyle().set("font-size", "14px");
+	getStyle().set("font-size", "13px");
 
 	addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
@@ -209,7 +207,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	// shows the setting component when the user clicks on a row
 	//
-	setItemDetailsRenderer(createItemDetailsRenderer(configuration, readOnly, container));
+	setItemDetailsRenderer(createItemDetailsRenderer(configuration, readOnly, content));
 
 	//
 	//
@@ -219,7 +217,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	gridInfo.getColumnsDescriptors().forEach(descriptor -> {
 
-	    Grid.Column<HashMap<String, String>> column = null;
+	    Grid.Column<HashMap<String, String>> column;
 
 	    if (descriptor.getRenderer().isPresent()) {
 
@@ -227,7 +225,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		column = addColumn(renderer);
 
-		renderer.getLegend().ifPresent(leg -> container.addLegend(leg));
+		renderer.getLegend().ifPresent(content::addLegend);
 
 		legendsViewer = renderer.getLegend().isPresent();
 
@@ -281,11 +279,17 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	});
 
 	//
-	// set the grid height according to the screen height and the presence
-	// or not of the columns selector and of the legends viewer
-	//
+	// computes the grid height
 
-	int offset = gridInfo.isShowColumnsHider() || legendsViewer ? 430 : 370;
+	// no columns header / legends viewer and no tab sheet
+	int _offset = ComponentFactory.MIN_HEIGHT_OFFSET;
+
+	if ((gridInfo.isShowColumnsHider() || legendsViewer)) {
+
+	    _offset = !withTabSheet ? ComponentFactory.MIN_HEIGHT_OFFSET + 30 : ComponentFactory.MIN_HEIGHT_OFFSET + 90;
+	}
+
+	final int offset = _offset;
 
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
 
@@ -311,9 +315,9 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     /**
      * @return
      */
-    public Component createLegendsViewer(List<Component> legends) {
+    public Component createLegendViewer(List<Component> legends) {
 
-	return new LegendViewer(this, legends);
+	return new LegendViewer(legends);
     }
 
     /**
@@ -321,7 +325,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
      */
     public void addSettingComponent(SettingComponent component) {
 
-	HashMap<String, String> item = createItems(Arrays.asList(component.getSetting())).get(0);
+	HashMap<String, String> item = createItems(Collections.singletonList(component.getSetting())).getFirst();
 
 	this.dataProvider.getItems().add(item);
 
@@ -339,7 +343,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	this.dataProvider.getItems().remove(hashMap);
 
-	HashMap<String, String> items = createItems(Arrays.asList(newComponent.getSetting())).get(0);
+	HashMap<String, String> items = createItems(Collections.singletonList(newComponent.getSetting())).getFirst();
 
 	this.dataProvider.getItems().add(items);
 
@@ -347,9 +351,9 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     }
 
     /**
-     * Setting id is also required since when we get here, the setting has already been removed from the configuration
-     * so the method SettingComponent.getSetting would fail because the setting would be searched in the configuration
-     * 
+     * Setting id is also required since when we get here, the setting has already been removed from the configuration so the method
+     * SettingComponent.getSetting would fail because the setting would be searched in the configuration
+     *
      * @param component
      * @param settingIdentifier
      */
@@ -374,12 +378,11 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	List<HashMap<String, String>> list = settingIdentifiers.//
 		stream().map(id -> dataProvider.//
-			getItems().//
-			stream().//
-			filter(map -> map.get("identifier").equals(id)).//
-			findFirst().//
-			get())
-		.collect(Collectors.toList());
+		getItems().//
+		stream().//
+		filter(map -> map.get("identifier").equals(id)).//
+		findFirst().//
+		get()).collect(Collectors.toList());
 
 	this.dataProvider.getItems().removeAll(list);
 
@@ -394,7 +397,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	List<String> selIds = getSelectedItems().//
 		stream().//
 		map(item -> item.get("identifier")).//
-		collect(Collectors.toList());
+		toList();
 
 	Stream<HashMap<String, String>> items = getListDataView().getItems();
 
@@ -436,8 +439,10 @@ public class GridComponent extends Grid<HashMap<String, String>> {
      * @param container
      * @return
      */
-    private Renderer<HashMap<String, String>> createItemDetailsRenderer(Configuration configuration, boolean readOnly,
-	    TabContainer container) {
+    private Renderer<HashMap<String, String>> createItemDetailsRenderer(//
+	    Configuration configuration,//
+	    boolean readOnly,//
+	    TabContent container) {
 
 	return new ComponentRenderer<>((source) -> {
 
@@ -445,8 +450,9 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    SettingComponent comp = SettingComponentFactory.createSettingComponent(//
 		    configuration, //
-		    settingId, //
+		    configuration.get(settingId).get(), //
 		    readOnly, //
+		    false,// forceHideHeader
 		    container);
 
 	    comp.getElement().getStyle().set("border", "2px solid gray");
@@ -499,24 +505,20 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	filterField.getElement().setAttribute("focus-target", "");
 
 	Optional<String> value = GridFilter.getValue(descriptor.getColumnName());
-	if (value.isPresent()) {
-
-	    filterField.setValue(value.get());
-	}
+	value.ifPresent(filterField::setValue);
     }
 
     /**
-     * A {@link Grid} of {@link Setting} would be to heavy to
-     * handle, so we convert each {@link Setting} in a {@link HashMap} of strings, according to the value providers
-     * retrieved from the given <code>gridInfo</code>
-     * 
+     * A {@link Grid} of {@link Setting} would be to heavy to handle, so we convert each {@link Setting} in a {@link HashMap} of strings,
+     * according to the value providers retrieved from the given <code>gridInfo</code>
+     *
      * @param gridInfo
      * @param list
      * @return
      */
     private ArrayList<HashMap<String, String>> createItems(List<Setting> list) {
 
-	ArrayList<HashMap<String, String>> items = new ArrayList<HashMap<String, String>>();
+	ArrayList<HashMap<String, String>> items = new ArrayList<>();
 
 	list.forEach(setting -> {
 
@@ -545,18 +547,17 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     }
 
     /**
-     * Provides values from the given map, according to the supplied column name which is
-     * used as map key
-     * 
+     * Provides values from the given map, according to the supplied column name which is used as map key
+     *
      * @author Fabrizio
      */
     private class MapValueProvider implements ValueProvider<HashMap<String, String>, String> {
 
-	private String column;
+	private final String column;
 
 	/**
 	 * The column name used as map key
-	 * 
+	 *
 	 * @param column
 	 */
 	private MapValueProvider(String column) {
@@ -572,7 +573,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		return String.valueOf(//
 			GridComponent.this.getListDataView().//
 				getItems().//
-				collect(Collectors.toList()).//
+				toList().//
 				indexOf(source) + 1);
 	    }
 

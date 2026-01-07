@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.dialog;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -199,6 +199,7 @@ public class NotificationDialog extends ConfirmationDialog {
 
 	Label label = ComponentFactory.createLabel(text);
 	// label.getStyle().set("color", "red");
+	label.getStyle().set("font-size","14px");
 
 	setContent(label);
 	getConfirmButton().setVisible(false);

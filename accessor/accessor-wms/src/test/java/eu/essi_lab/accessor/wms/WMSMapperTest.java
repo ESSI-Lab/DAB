@@ -22,7 +22,7 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
@@ -172,7 +172,7 @@ public class WMSMapperTest {
 	TestCase.assertEquals(1, onlines.size());
 	Online online = onlines.get(0);
 	TestCase.assertNotNull(online);
-	TestCase.assertEquals(NetProtocols.WMS_1_3_0.getCommonURN(), online.getProtocol());
+	TestCase.assertEquals(NetProtocolWrapper.WMS_1_3_0.getCommonURN(), online.getProtocol());
 	TestCase.assertEquals("http://testwms.example?", online.getLinkage());
 	TestCase.assertEquals("clima_anual_iberia", online.getName());
 	TestCase.assertEquals("Clima Anual de la Península Ibèrica.", online.getDescription());

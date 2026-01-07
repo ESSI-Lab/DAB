@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.pps;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ package eu.essi_lab.authorization.pps;
  */
 
 /**
- * Users having the "whos" role, are allowed to discovery if and only if:<br>
+ * Users having the " " role, are allowed to discovery if and only if:<br>
  * <br>
  * 1) the view creator is "whos"<br>
  *

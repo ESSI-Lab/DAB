@@ -61,7 +61,7 @@ public class SettingTest {
 
 	Assert.assertTrue(setting.getPropertyValue(Setting.CAN_BE_REMOVED).isEmpty());
 
-	Assert.assertTrue(setting.getPropertyValue(Setting.COMPACT_MODE).isEmpty());
+	Assert.assertFalse(setting.getPropertyValue(Setting.COMPACT_MODE).isEmpty());
 
 	Assert.assertTrue(setting.getPropertyValue(Setting.DESCRIPTION).isEmpty());
 

@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gs.setting.ontology;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMen
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting.Availability;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
@@ -61,7 +61,7 @@ public class OntologyEnableItemHandler extends GridMenuItemHandler {
     @Override
     public void onClick(//
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    Configuration configuration, //
 	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selection) {
@@ -86,7 +86,7 @@ public class OntologyEnableItemHandler extends GridMenuItemHandler {
 
 	settings.forEach(configuration::replace);
 
-	tabContainer.render(true);
+	tabContent.render(true);
     }
 
     /**
@@ -106,7 +106,7 @@ public class OntologyEnableItemHandler extends GridMenuItemHandler {
     @Override
     public boolean isEnabled(//
 	    HashMap<String, String> eventItem, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    Configuration configuration, //
 	    Setting setting, //
 	    HashMap<String, Boolean> selection) {

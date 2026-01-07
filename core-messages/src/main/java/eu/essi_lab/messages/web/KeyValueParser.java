@@ -4,7 +4,7 @@ package eu.essi_lab.messages.web;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,8 +22,8 @@ package eu.essi_lab.messages.web;
  */
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -51,7 +51,7 @@ public class KeyValueParser {
      * Creates a new parser
      */
     public KeyValueParser() {
-	map = new HashMap<String, String>();
+	map = new HashMap<>();
     }
 
     /**
@@ -59,7 +59,7 @@ public class KeyValueParser {
      */
     public KeyValueParser(boolean decodeValues) {
 	this.decodeValues = decodeValues;
-	map = new HashMap<String, String>();
+	map = new HashMap<>();
     }
 
     /**
@@ -321,8 +321,7 @@ public class KeyValueParser {
 		//
 		if (keyValue.length == 1) {
 
-		    String value = UNDEFINED;
-		    hashMap.put(key, value);
+		    hashMap.put(key, UNDEFINED);
 		}
 
 		// ---------------------------------------------------------------------------
@@ -334,10 +333,7 @@ public class KeyValueParser {
 		    String value = keyValue[1];
 
 		    if (decodeValues) {
-			try {
-			    value = URLDecoder.decode(value, "UTF-8");
-			} catch (UnsupportedEncodingException e1) {
-			}
+			value = URLDecoder.decode(value, StandardCharsets.UTF_8);
 		    }
 
 		    hashMap.put(key, value);
@@ -357,10 +353,7 @@ public class KeyValueParser {
 		    }
 
 		    if (decodeValues) {
-			try {
-			    value = URLDecoder.decode(value, "UTF-8");
-			} catch (UnsupportedEncodingException e1) {
-			}
+			value = URLDecoder.decode(value, StandardCharsets.UTF_8);
 		    }
 
 		    hashMap.put(key, value);

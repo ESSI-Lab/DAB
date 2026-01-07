@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -624,6 +624,24 @@ public class ResourcePropertyHandler {
     public boolean isTrajectory() {
 
 	return Boolean.valueOf(resource.getPropertyValue(ResourceProperty.IS_TRAJECTORY).orElse("false"));
+    }
+
+    /**
+     * Set the {@link ResourceProperty#IS_RATING_CURVE} property
+     * 
+     * @param set
+     */
+    public void setIsRatingCurve(boolean set) {
+
+	resource.setProperty(ResourceProperty.IS_RATING_CURVE, String.valueOf(set));
+    }
+
+    /**
+     * Get the {@link ResourceProperty#IS_RATING_CURVE} property
+     */
+    public boolean isRatingCurve() {
+
+	return Boolean.valueOf(resource.getPropertyValue(ResourceProperty.IS_RATING_CURVE).orElse("false"));
     }
 
     /**

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.hiscentral.umbria;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.accessor.hiscentral.umbria;
  */
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -75,7 +76,8 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
      * @param sensorInfo
      * @return
      */
-    static OriginalMetadata create(JSONObject datasetInfo, JSONObject sensorInfo, String varName, String resourceId, String timeType, String startDate) {
+    static OriginalMetadata create(JSONObject datasetInfo, JSONObject sensorInfo, String varName, String resourceId, String timeType,
+	    String startDate) {
 
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
@@ -142,7 +144,7 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
     }
 
     /**
-     * @param 
+     * @param
      * @return station metadata
      */
     private JSONObject retrieveStationInfo(OriginalMetadata metadata) {
@@ -151,15 +153,15 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
     }
 
     /**
-     * @param 
+     * @param
      * @return UMBRIA_VARIABLE name
      */
     private String retieveVariableInfo(OriginalMetadata metadata) {
 	return new JSONObject(metadata.getMetadata()).optString("variable");
     }
-    
+
     /**
-     * @param 
+     * @param
      * @return resourceIdentifier
      */
     private String retieveResourceIdentifier(OriginalMetadata metadata) {
@@ -210,14 +212,14 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	String varId = retieveVariableInfo(originalMD);
 
 	String timeType = retrieveTimeType(originalMD);
-	
+
 	String resourceIdentifier = retieveResourceIdentifier(originalMD);
 
 	String tempExtenBegin = retrieveStartDate(originalMD);
 
 	// bbox
-	Double lat = null;
-	Double lon = null;
+	BigDecimal lat = null;
+	BigDecimal lon = null;
 	String stationName = null;
 	String stationId = null;
 	String stationCity = null;
@@ -233,8 +235,8 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	String uom = null;
 
 	if (stationObj != null) {
-	    lat = getDouble(stationObj, "LAT");
-	    lon = getDouble(stationObj, "LON");
+	    lat = stationObj.optBigDecimal("LAT", null);//getDouble(stationObj, "LAT");
+	    lon = stationObj.optBigDecimal("LON", null);//getDouble(stationObj, "LON");
 	    stationName = getString(stationObj, "NOME_STAZIONE");
 	    stationId = getString(stationObj, "ID_STAZIONE");
 	    stationCity = getString(stationObj, "COMUNE");
@@ -259,8 +261,12 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
 	// bbox
-	if (lon != null && lat != null) {
-	    coreMetadata.addBoundingBox(lat, lon, lat, lon);
+	if (lat != null && lon != null) {
+	    coreMetadata.addBoundingBox(//
+		    lat, //
+		    lon, //
+		    lat, //
+		    lon);
 	}
 
 	if (timeType != null && !timeType.equals("NA")) {
@@ -394,7 +400,7 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	// mangler.setQualityIdentifier(qualityCode);
 
 	mangler.setResourceIdentifier(resourceIdentifier);
-	
+
 	mangler.setSourceIdentifier(id);
 
 	CoverageDescription coverageDescription = new CoverageDescription();
@@ -448,7 +454,7 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 
 	coreMetadata.getDataIdentification().setResourceIdentifier(identifier);
 
-	//Online downloadOnline = coreMetadata.getOnline();
+	// Online downloadOnline = coreMetadata.getOnline();
 
 	String resourceId = generateCode(dataset, stationId + "-" + paramDescription);
 

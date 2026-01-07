@@ -4,7 +4,7 @@ package eu.essi_lab.access.datacache.opensearch;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -311,25 +311,9 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    httpHost = new HttpHost(uri.getHost(), uri.getPort(), uri.toURI().getScheme());
 	} catch (URISyntaxException e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    e.printStackTrace();
 	}
 
-	RestClientBuilder builder = RestClient.builder(httpHost)
-		.setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
-		    @Override
-		    public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
-
-			try {
-			    SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(null, (chain, authType) -> true).build();
-			    return httpClientBuilder.setSSLContext(sslContext).setSSLHostnameVerifier((hostname1, session) -> true);
-
-			} catch (Exception e) {
-			    GSLoggerFactory.getLogger(getClass()).error(e);
-			}
-
-			return null;
-		    }
-		});
+	RestClientBuilder builder = RestClient.builder(httpHost);
 
 	if (username != null && !username.isEmpty() && //
 		password != null && !password.isEmpty()) {
@@ -338,7 +322,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	    credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 
-	    builder = builder
+	    builder
 		    .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
 
 	}

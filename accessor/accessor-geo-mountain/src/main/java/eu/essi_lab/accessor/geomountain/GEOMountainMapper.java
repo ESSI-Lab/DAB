@@ -7,7 +7,7 @@ package eu.essi_lab.accessor.geomountain;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@ import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
@@ -626,7 +626,7 @@ public class GEOMountainMapper extends OriginalIdentifierMapper {
 	for (String s : linkageList) {
 	    Online online = new Online();
 	    online.setLinkage(s);
-	    online.setProtocol(NetProtocols.HTTP.getCommonURN());
+	    online.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 	    online.setFunctionCode("information");
 	    online.setDescription(type);
 	    ret.add(online);

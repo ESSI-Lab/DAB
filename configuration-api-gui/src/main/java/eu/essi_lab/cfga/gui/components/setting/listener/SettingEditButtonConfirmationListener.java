@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.setting.listener;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ import com.vaadin.flow.component.button.Button;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.tabs.TabContent;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
@@ -40,19 +40,19 @@ import eu.essi_lab.cfga.setting.Setting;
 @SuppressWarnings("serial")
 public class SettingEditButtonConfirmationListener implements ButtonChangeListener {
 
-    private Configuration configuration;
-    private Setting settingToEdit;
-    private boolean foldedModeEnabled;
-    private SettingComponent currentSettingComponent;
-    private TabContainer tabContainer;
-    private SettingEditDialog dialog;
+    private final Configuration configuration;
+    private final Setting settingToEdit;
+    private final boolean foldedModeEnabled;
+    private final SettingComponent currentSettingComponent;
+    private final TabContent tabContent;
+    private final SettingEditDialog dialog;
 
     /**
      * @param dialog
      * @param configuration
      * @param settingToEdit
      * @param currentSettingComponent
-     * @param tabContainer
+     * @param tabContent
      * @param foldedModeEnabled
      */
     public SettingEditButtonConfirmationListener(//
@@ -60,14 +60,14 @@ public class SettingEditButtonConfirmationListener implements ButtonChangeListen
 	    Configuration configuration, //
 	    Setting settingToEdit, //
 	    SettingComponent currentSettingComponent, //
-	    TabContainer tabContainer, //
+	    TabContent tabContent, //
 	    boolean foldedModeEnabled) {
 
 	this.dialog = dialog;
 	this.configuration = configuration;
 	this.settingToEdit = settingToEdit;
 	this.currentSettingComponent = currentSettingComponent;
-	this.tabContainer = tabContainer;
+	this.tabContent = tabContent;
 	this.foldedModeEnabled = foldedModeEnabled;
     }
 
@@ -82,9 +82,8 @@ public class SettingEditButtonConfirmationListener implements ButtonChangeListen
 	SelectionUtils.deepAfterClean(settingToEdit);
 
 	//
-	// shows the header end set folded and collapse mode
+	// set folded and collapse mode
 	//
-	settingToEdit.setShowHeader(true);
 
 	settingToEdit.enableFoldedMode(this.foldedModeEnabled);
 
@@ -118,10 +117,11 @@ public class SettingEditButtonConfirmationListener implements ButtonChangeListen
 	    SettingComponent editedSettingComponent = SettingComponentFactory.createSettingComponent(//
 		    configuration, //
 		    settingToEdit, //
-		    true, //
-		    this.tabContainer);
+		    true, // forceReadonly
+		    false,// forceHideHeader
+		    this.tabContent);
 
-	    tabContainer.replaceSettingComponent(currentSettingComponent, editedSettingComponent);
+	    tabContent.replaceSettingComponent(currentSettingComponent, editedSettingComponent);
 	}
 
 	dialog.close();

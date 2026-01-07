@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,14 +25,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.GSSource;
 
@@ -42,12 +39,12 @@ import eu.essi_lab.model.GSSource;
 public class GDCSourcesSetting extends Setting implements EditableSetting {
 
     /**
-     * 
+     *
      */
     private static final String SOURCES_SETTING_IDENTIFIER = "availableSources";
 
     /**
-     * 
+     *
      */
     public GDCSourcesSetting() {
 
@@ -85,11 +82,6 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 		}
 	    });
 	}
-
-	//
-	// set the rendering extension
-	//
-	setExtension(new GDCSettingComponentInfo());
     }
 
     /**
@@ -111,21 +103,27 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
     /**
      * @author Fabrizio
      */
-    public static class GDCSettingComponentInfo extends ComponentInfo {
+    public static class DescriptorProvider {
+
+	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
-	public GDCSettingComponentInfo() {
+	public DescriptorProvider() {
 
-	    setComponentName(GDCSettingComponentInfo.class.getName());
-
-	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(GSTabIndex.GDC_SOURCES.getIndex()).//
-		    withShowDirective("GDC sources").//
+	    descriptor = TabContentDescriptorBuilder.get(GDCSourcesSetting.class).//
+		    withLabel("GDC Sources").//
+		    withEditDirective("Edit GEOSS Data Core settings").//
 		    build();
+	}
 
-	    setTabInfo(tabInfo);
+	/**
+	 * @return
+	 */
+	public TabContentDescriptor get() {
+
+	    return descriptor;
 	}
     }
 

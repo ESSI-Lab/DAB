@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.sensorthings._1_1.mapper;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,11 +29,10 @@ import org.json.JSONObject;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.EntityRef;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.SensorThingsRequest;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.options.ExpandItem;
@@ -385,6 +384,6 @@ public class CITIOBSMapper extends SensorThingsMapper {
     @Override
     protected String getSupportedProtocol() {
 
-	return NetProtocols.SENSOR_THINGS_1_1_CITIOBS.getCommonURN();
+	return NetProtocolWrapper.SENSOR_THINGS_1_1_CITIOBS.getCommonURN();
     }
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,8 +49,11 @@ class LoginDialog extends EnhancedDialog {
 
 	getCloseButton().getStyle().set("display", "none");
 
+	getMainLayout().getStyle().set("padding-bottom", "0px");
+
 	VerticalLayout contentLayout = getContentLayout();
 	contentLayout.getStyle().set("padding", "20px");
+	contentLayout.getStyle().set("padding-bottom", "0px");
 
 	Label label1 = ComponentFactory.createLabel("You must be logged in as administrator to view this page.");
 	Label label2 = ComponentFactory.createLabel("Please login with one of the following providers:");

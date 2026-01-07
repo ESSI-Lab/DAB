@@ -3,13 +3,7 @@
  */
 package eu.essi_lab.messages;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +11,7 @@ import java.util.List;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,8 +38,9 @@ public class SearchAfter implements Serializable {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -6533469371427721506L;
-    private List<Object> values = new ArrayList<>();
+    private final List<Object> values = new ArrayList<>();
 
     public SearchAfter(List<Object> values) {
 	this.values.addAll(values);
@@ -130,7 +125,7 @@ public class SearchAfter implements Serializable {
 	String ret = "";
 
 	for (Object value : values) {
-	    ret += String.valueOf(value) + ",";
+	    ret += value + ",";
 	}
 	if (ret.endsWith(",")) {
 	    ret = ret.substring(0, ret.length() - 1);

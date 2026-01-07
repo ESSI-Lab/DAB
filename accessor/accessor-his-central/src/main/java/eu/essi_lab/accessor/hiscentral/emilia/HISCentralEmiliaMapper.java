@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.hiscentral.emilia;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -264,12 +264,12 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 	    if (lon != null && lat != null) {
 
-		coreMetadata.addBoundingBox(lat.doubleValue(), lon.doubleValue(), lat.doubleValue(), lon.doubleValue());
+		coreMetadata.addBoundingBox(lat, lon, lat, lon);
 	    }
 
 	    // platform
 
-	    String platformIdentifier = PLATFORM_PREFIX + stationType + ":" + stationName;
+	    String platformIdentifier = stationType + ":" + stationName;
 
 	    String parameterIdentifier = PLATFORM_PREFIX + ":" + varName;
 

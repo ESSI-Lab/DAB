@@ -4,7 +4,7 @@ package eu.essi_lab.indexes;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -191,6 +191,11 @@ public final class IndexedResourceElements extends IndexedElementsGroup {
      * Set by the AccessAugmenter
      */
     public static final IndexedResourceProperty IS_TIMESERIES = new IndexedResourceProperty(ResourceProperty.IS_TIMESERIES);
+
+    /**
+     * Set by the AccessAugmenter
+     */
+    public static final IndexedResourceProperty IS_RATING_CURVE = new IndexedResourceProperty(ResourceProperty.IS_RATING_CURVE);
 
     /**
      * Set once using a tool

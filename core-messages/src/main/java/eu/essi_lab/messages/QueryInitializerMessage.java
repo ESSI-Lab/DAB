@@ -7,7 +7,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,8 @@ package eu.essi_lab.messages;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.model.GSProperty;
 
+import java.io.Serial;
+
 /**
  * @author Fabrizio
  */
@@ -35,6 +37,7 @@ public abstract class QueryInitializerMessage extends UserBondMessage {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -3346736605997668879L;
     public static final String PERMITTED_BOND = "permittedBond";
     public static final String NORMALIZED_BOND = "normalizedBond";
@@ -60,7 +63,7 @@ public abstract class QueryInitializerMessage extends UserBondMessage {
      */
     public void setNormalizedBond(Bond bond) {
 
-	getPayload().add(new GSProperty<Bond>(NORMALIZED_BOND, bond));
+	getPayload().add(new GSProperty<>(NORMALIZED_BOND, bond));
     }
 
     /**
@@ -85,7 +88,7 @@ public abstract class QueryInitializerMessage extends UserBondMessage {
      */
     public void setPermittedBond(Bond bond) {
 
-	getPayload().add(new GSProperty<Bond>(PERMITTED_BOND, bond));
+	getPayload().add(new GSProperty<>(PERMITTED_BOND, bond));
     }
 
 }

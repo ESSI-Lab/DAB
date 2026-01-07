@@ -6,7 +6,7 @@ import java.net.URI;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ import java.net.URI;
 
 import java.util.Optional;
 
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting.SchedulingGroup;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.KeyValueParser;
@@ -60,7 +60,7 @@ public class OMDownloadReportsHandler {
 	if (toUser) {
 	    subject = "[HIS-Central][Download " + status.name().toLowerCase() + "] " + setting.getAsynchDownloadName();
 	} else {
-	    subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + "[" + group.name() + "]" + "[" + status + "] "
+	    subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + "[" + group.name() + "]" + "[" + status + "] "
 		    + setting.getAsynchDownloadName();
 	}
 
@@ -123,14 +123,14 @@ public class OMDownloadReportsHandler {
 
 	if (toUser) {
 
-	    ConfiguredGmailClient.sendEmail(subject, builder.toString(), userMail.get());
+	    ConfiguredSMTPClient.sendEmail(subject, builder.toString(), userMail.get());
 
 	} else {
 
 	    builder.append(
 		    "\n\nRequest parameters: " + setting.getRequestURL().substring(setting.getRequestURL().indexOf("?") + 1) + "\n\n");
 
-	    ConfiguredGmailClient.sendEmail(subject, builder.toString());
+	    ConfiguredSMTPClient.sendEmail(subject, builder.toString());
 	}
     }
 }

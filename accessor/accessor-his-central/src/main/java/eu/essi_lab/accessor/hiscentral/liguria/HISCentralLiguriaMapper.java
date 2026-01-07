@@ -1,10 +1,13 @@
 package eu.essi_lab.accessor.hiscentral.liguria;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -292,8 +295,14 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setTimeSupport(timeResolution);
 	}
 
-	double pointLon = sensorInfo.optDouble("LON");// sensorInfo.optString("lon");
-	double pointLat = sensorInfo.optDouble("LAT");
+	// Double pointLon = sensorInfo.optDouble("LON");// sensorInfo.optString("lon");
+	// Double pointLat = sensorInfo.optDouble("LAT");
+	//
+
+	BigDecimal SCALE = new BigDecimal("100000");
+
+	BigDecimal pointLat = new BigDecimal(sensorInfo.get("LAT").toString()).divide(SCALE, 5, RoundingMode.UNNECESSARY);
+	BigDecimal pointLon = new BigDecimal(sensorInfo.get("LON").toString()).divide(SCALE, 5, RoundingMode.UNNECESSARY);
 
 	double div = 100000;
 
@@ -429,11 +438,13 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	referenceSystem.setCodeSpace("EPSG");
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 
-	coreMetadata.addBoundingBox(//
-		pointLat / div, //
-		pointLon / div, //
-		pointLat / div, //
-		pointLon / div);
+	if (pointLat != null && pointLon != null) {
+	    coreMetadata.addBoundingBox(//
+		    pointLat, //
+		    pointLon, //
+		    pointLat, //
+		    pointLon);
+	}
 
 	coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(elevation, elevation);
 
@@ -443,7 +454,7 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 
 	MIPlatform platform = new MIPlatform();
 
-	platform.setMDIdentifierCode(stationName);
+	platform.setMDIdentifierCode(stationCode);
 
 	dataset.getExtensionHandler().setCountry("ITA");
 
@@ -479,11 +490,11 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	//
 
 	Online online = new Online();
-//	online.setLinkage(link);
-//	online.setFunctionCode("information");
-//	online.setName("Rete Meteo-Idro-Pluviometrica");
-//
-//	distribution.addDistributionOnline(online);
+	// online.setLinkage(link);
+	// online.setFunctionCode("information");
+	// online.setName("Rete Meteo-Idro-Pluviometrica");
+	//
+	// distribution.addDistributionOnline(online);
 
 	//
 	// distribution info, download
@@ -493,7 +504,7 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	//
 	// tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
 	// }
-	//Date d = new Date();
+	// Date d = new Date();
 	String linkage = HISCentralLiguriaConnector.BASE_URL + HISCentralLiguriaConnector.DATI_URL;
 
 	online = new Online();

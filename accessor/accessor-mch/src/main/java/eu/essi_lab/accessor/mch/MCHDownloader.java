@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.mch;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,7 @@ import eu.essi_lab.accessor.mch.MCHConnector.Resolution;
 import eu.essi_lab.accessor.mch.datamodel.MCHAvailability;
 import eu.essi_lab.accessor.mch.datamodel.MCHStation;
 import eu.essi_lab.accessor.mch.datamodel.MCHValue;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -62,7 +62,7 @@ public class MCHDownloader extends WMLDataDownloader {
 
     @Override
     public boolean canConnect() {
-	return online.getProtocol() != null && online.getProtocol().equals(NetProtocols.MCH.getCommonURN());
+	return online.getProtocol() != null && online.getProtocol().equals(NetProtocolWrapper.MCH.getCommonURN());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class MCHDownloader extends WMLDataDownloader {
 
     @Override
     public boolean canDownload() {
-	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocols.MCH.getCommonURN()));
+	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocolWrapper.MCH.getCommonURN()));
     }
 
     @Override

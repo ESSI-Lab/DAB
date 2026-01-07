@@ -4,7 +4,7 @@ package eu.essi_lab.lib.xml;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +21,14 @@ package eu.essi_lab.lib.xml;
  * #L%
  */
 
+import net.sf.saxon.lib.*;
+import org.xml.sax.*;
+
+import javax.xml.*;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.*;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.validation.*;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathFactoryConfigurationException;
 
@@ -32,13 +38,13 @@ import javax.xml.xpath.XPathFactoryConfigurationException;
 public class XMLFactories {
 
     /**
-     * SAXON is used ads default, see <code>TransformerFactoryTest</code> for info
+     * SAXON is used as default, see <code>TransformerFactoryTest</code> for info
      */
-    public static TransformerFactoryImpl defaultTransformerFactoryImpl = TransformerFactoryImpl.SAXON;
+    public static TransformerFactoryImpl DEFAULT_IMPL = TransformerFactoryImpl.SAXON;
 
     /**
      * See <code>TransformerFactoryTest</code> for info
-     * 
+     *
      * @author Fabrizio
      */
     public enum TransformerFactoryImpl {
@@ -47,8 +53,8 @@ public class XMLFactories {
 	 */
 	XALAN("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"),
 	/**
-	 * It seems to be more slowly for unmarshalling/marshalling than XALAN, but it ensures that children nodes
-	 * have all the name space declarations of the parent node
+	 * It seems to be more slowly for unmarshalling/marshalling than XALAN, but it ensures that children nodes have all the name space
+	 * declarations of the parent node
 	 */
 	SAXON("net.sf.saxon.TransformerFactoryImpl");
 
@@ -89,7 +95,7 @@ public class XMLFactories {
      */
     public static TransformerFactory newTransformerFactory() {
 
-	return newTransformerFactory(defaultTransformerFactoryImpl);
+	return newTransformerFactory(DEFAULT_IMPL);
     }
 
     /**
@@ -101,6 +107,10 @@ public class XMLFactories {
 	TransformerFactory factory = TransformerFactory.newInstance(//
 		impl.getImpl(), //
 		TransformerFactory.class.getClassLoader());//
+
+	factory.setAttribute(FeatureKeys.DTD_VALIDATION, false);
+	factory.setAttribute(FeatureKeys.ALLOW_EXTERNAL_FUNCTIONS, false);
+	factory.setAttribute(FeatureKeys.RECOVERY_POLICY, 0);
 
 	return factory;
     }
@@ -117,5 +127,42 @@ public class XMLFactories {
 		XPathFactory.class.getClassLoader());
 
 	return xpathFactory;
+    }
+
+    static {
+
+	//
+	// This is required in order to load the SUN implementation of the factory instead of the woodstox
+	// implementation
+	//
+
+	System.setProperty("javax.xml.stream.XMLInputFactory", "com.sun.xml.internal.stream.XMLInputFactoryImpl");
+    }
+
+    /**
+     * @return
+     */
+    public static XMLInputFactory newXMLInputFactory() {
+
+	XMLInputFactory inputFactory = XMLInputFactory.newFactory("javax.xml.stream.XMLInputFactory", null);
+
+	inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+	inputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+
+	return inputFactory;
+    }
+
+    /**
+     * @return
+     */
+    public static SchemaFactory newSchemaFactory() throws SAXNotSupportedException, SAXNotRecognizedException {
+
+	SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+	schemaFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+	schemaFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+	schemaFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+	return schemaFactory;
     }
 }

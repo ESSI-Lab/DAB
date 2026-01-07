@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -91,7 +91,7 @@ public class QueryableBond<T> implements Bond {
 
     public Bond clone() {
 
-	QueryableBond<T> bond = new QueryableBond<T>();
+	QueryableBond<T> bond = new QueryableBond<>();
 	bond.setOperator(operator);
 	bond.setProperty(property);
 	bond.setPropertyValue(propertyValue);
@@ -101,8 +101,7 @@ public class QueryableBond<T> implements Bond {
 
     public boolean equals(Object o) {
 
-	if (o instanceof QueryableBond) {
-	    QueryableBond<?> bond = (QueryableBond<?>) o;
+	if (o instanceof QueryableBond<?> bond) {
 	    return Objects.equals(bond.getOperator(), getOperator()) && //
 		    Objects.equals(bond.getProperty(), getProperty()) && //
 		    Objects.equals(bond.getPropertyValue(), getPropertyValue());

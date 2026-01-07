@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.rest;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,7 +62,8 @@ import eu.essi_lab.model.exceptions.GSException;
  */
 @WebService
 @Path("/")
-public class AuthenticationService {
+public class
+AuthenticationService {
 
     private TokenProvider tokenProvider;
 
@@ -241,6 +242,16 @@ public class AuthenticationService {
 	    if (redirect == null) {
 
 		redirect = buildLogoutRedirectURL(httpRequest);
+	    }
+
+	    if(!redirect.startsWith("http://") && !redirect.startsWith("https://")) {
+
+		throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
+	    }
+
+	    if(!redirect.endsWith("gs-service/configuration/")) {
+
+		throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
 	    }
 
 	    httpResponse.sendRedirect(redirect);
@@ -439,6 +450,16 @@ public class AuthenticationService {
 	}
 
 	httpResponse.setHeader("Set-Cookie", TokenProvider.USER_COOKIE_NAME + "=" + tokenProvider.getToken(token) + ";Path=/");
+
+	if(!redirect.startsWith("http://") && !redirect.startsWith("https://")) {
+
+	    throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
+	}
+
+	if(!redirect.endsWith("gs-service/configuration/")) {
+
+	    throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
+	}
 
 	httpResponse.sendRedirect(redirect);
 

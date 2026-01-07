@@ -13,7 +13,6 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**
@@ -55,11 +54,10 @@ public class NotBondParserTest {
 
     /**
      * Tests null -> null
-     * 
-     * @throws GSException
+     *
      */
     @Test
-    public void testBondParser0() throws GSException {
+    public void testBondParser0() {
 	Set<Bond> result = parser.parseBond(null);
 	Set<Bond> expected = new HashSet<>();
 	expected.add(null);
@@ -68,11 +66,10 @@ public class NotBondParserTest {
 
     /**
      * Tests P1 -> {}
-     * 
-     * @throws GSException
+     *
      */
     @Test
-    public void testBondParser1() throws GSException {
+    public void testBondParser1() {
 	Set<Bond> result = parser.parseBond(property1Bond);
 	Set<Bond> expected = new HashSet<>();
 	Assert.assertEquals(expected, result);
@@ -80,11 +77,10 @@ public class NotBondParserTest {
 
     /**
      * Tests P1 AND S1 -> {}
-     * 
-     * @throws GSException
+     *
      */
     @Test
-    public void testBondParser2() throws GSException {
+    public void testBondParser2() {
 	Set<Bond> result = parser.parseBond(s1p1Bond);
 	Set<Bond> expected = new HashSet<>();
 	Assert.assertEquals(expected, result);
@@ -94,11 +90,10 @@ public class NotBondParserTest {
 
     /**
      * Tests NOT(P1) -> NOT(P1)
-     * 
-     * @throws GSException
+     *
      */
     @Test
-    public void testBondParser4() throws GSException {
+    public void testBondParser4() {
 	Set<Bond> result = parser.parseBond(notBond);
 	Set<Bond> expected = new HashSet<>();
 	expected.add(notBond);
@@ -108,11 +103,10 @@ public class NotBondParserTest {
 
     /**
      * Tests P1 AND (S1 OR (P2 AND NOT(P1)) ) -> NOT(P1)
-     * 
-     * @throws GSException
+     *
      */
     @Test
-    public void testBondParser5() throws GSException {
+    public void testBondParser5() {
 	Bond p2Andnotp1 = BondFactory.createAndBond(property2Bond, notBond);
 	Bond s1Orp2Andnotp1 = BondFactory.createOrBond(source1Bond,p2Andnotp1 );
 	LogicalBond targetBond = BondFactory.createAndBond(property1Bond,s1Orp2Andnotp1 );
@@ -124,11 +118,10 @@ public class NotBondParserTest {
     
     /**
      * Tests NOT(P2) AND (S1 OR (P2 AND NOT(P1)) ) -> NOT(P1), NOT(P2)
-     * 
-     * @throws GSException
+     *
      */
     @Test
-    public void testBondParser6() throws GSException {
+    public void testBondParser6() {
 	Bond p2Andnotp1 = BondFactory.createAndBond(property2Bond, notBond);
 	Bond s1Orp2Andnotp1 = BondFactory.createOrBond(source1Bond,p2Andnotp1 );
 	LogicalBond targetBond = BondFactory.createAndBond(notBond2,s1Orp2Andnotp1 );

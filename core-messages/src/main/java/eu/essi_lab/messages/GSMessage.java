@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import eu.essi_lab.model.GSProperty;
@@ -43,6 +44,7 @@ public class GSMessage implements Serializable {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -7668464862195580878L;
     protected GSPropertyHandler header;
     protected GSPropertyHandler payload;
@@ -81,8 +83,8 @@ public class GSMessage implements Serializable {
 
 	GSMessage m = new GSMessage();
 
-	m.getPayload().add(new GSProperty<String>("startPage", "23"));
-	m.getPayload().add(new GSProperty<String>("maxRecords", "48"));
+	m.getPayload().add(new GSProperty<>("startPage", "23"));
+	m.getPayload().add(new GSProperty<>("maxRecords", "48"));
 
 	String startPage = m.getPayload().get("startPage", String.class);
 	System.out.println(startPage);

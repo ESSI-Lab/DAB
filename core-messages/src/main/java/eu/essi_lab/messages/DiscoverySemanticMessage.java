@@ -7,7 +7,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ public class DiscoverySemanticMessage extends DiscoveryMessage {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -7565049436947423137L;
     private static final String QUERY_EXPANSION_POLICY = "QUERY_EXPANSION_POLICY";
     private static final String EXPANSION_SEARCH_TERMS_QUERYABLES = "EXPANSION_SEARCH_TERMS_QUERYABLES";
@@ -88,7 +90,7 @@ public class DiscoverySemanticMessage extends DiscoveryMessage {
 	map.put(EXPANSION_POLICY, Arrays.asList(expansionPolicy.toString()));
 
 	List<Queryable> discoveryQueryables = getDiscoveryQueryables();
-	map.put(DISCOVERY_QUERYABLES, discoveryQueryables.stream().map(q -> q.getName()).collect(Collectors.toList()));
+	map.put(DISCOVERY_QUERYABLES, discoveryQueryables.stream().map(Queryable::getName).collect(Collectors.toList()));
 
 	List<String> termsToExpand = getTermsToExpand();
 	map.put(TERMS_TO_EXPAND, termsToExpand);
@@ -110,7 +112,7 @@ public class DiscoverySemanticMessage extends DiscoveryMessage {
      */
     public void setExpansionPolicy(ExpansionPolicy policy) {
 
-	getHeader().add(new GSProperty<ExpansionPolicy>(QUERY_EXPANSION_POLICY, policy));
+	getHeader().add(new GSProperty<>(QUERY_EXPANSION_POLICY, policy));
     }
 
     /**
@@ -129,7 +131,7 @@ public class DiscoverySemanticMessage extends DiscoveryMessage {
      */
     public void setDiscoveryQueryables(List<Queryable> queryables) {
 
-	getHeader().add(new GSProperty<List<Queryable>>(EXPANSION_SEARCH_TERMS_QUERYABLES, queryables));
+	getHeader().add(new GSProperty<>(EXPANSION_SEARCH_TERMS_QUERYABLES, queryables));
     }
 
     /**
@@ -151,7 +153,7 @@ public class DiscoverySemanticMessage extends DiscoveryMessage {
      */
     public void setTermsToExpand(List<String> searchTerms) {
 
-	getHeader().add(new GSProperty<List<String>>(TERMS_TO_EXPAND, searchTerms));
+	getHeader().add(new GSProperty<>(TERMS_TO_EXPAND, searchTerms));
     }
 
     /**
@@ -170,7 +172,7 @@ public class DiscoverySemanticMessage extends DiscoveryMessage {
      */
     public void setScheme(GSKnowledgeScheme scheme) {
 
-	getHeader().add(new GSProperty<GSKnowledgeScheme>(SCHEME, scheme));
+	getHeader().add(new GSProperty<>(SCHEME, scheme));
     }
 
     /**

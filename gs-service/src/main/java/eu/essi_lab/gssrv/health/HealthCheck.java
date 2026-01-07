@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.health;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@ import com.indeed.status.core.CheckResultSystemReport;
 import com.indeed.status.core.CheckStatus;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
@@ -84,7 +84,7 @@ public class HealthCheck {
 		    Boolean sendEmail = Boolean.valueOf(keyValueOption.get().getOrDefault(KeyValueOptionKeys.SEND_HEALTH_CHECK_REPORT.getLabel(), "true").toString());
 		    if (sendEmail) {
 
-			ConfiguredGmailClient.sendEmail("[GS-REPORT][HEALTH-CHECK-REPORT]", printResultSet(true));
+			ConfiguredSMTPClient.sendEmail("[GS-REPORT][HEALTH-CHECK-REPORT]", printResultSet(true));
 		    }
 		}
 	    }

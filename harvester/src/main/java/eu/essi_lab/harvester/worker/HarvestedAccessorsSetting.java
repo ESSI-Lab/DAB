@@ -4,7 +4,7 @@ package eu.essi_lab.harvester.worker;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -69,10 +69,10 @@ public class HarvestedAccessorsSetting extends Setting {
 	//
 	// selects the first, because one must be selected
 	//
+
 	getSettings().//
-		stream().//
-		sorted((s1, s2) -> s1.getName().compareTo(s2.getName())).//
-		findFirst().//
+		parallelStream().//
+		min((s1, s2) -> s1.getName().compareTo(s2.getName())).//
 		get().//
 		setSelected(true);
 

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.eurobis.ld;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -83,7 +83,7 @@ public class EurOBISLdClient {
 			Model model = ModelFactory.createDefaultModel();
 
 			// Load data from a Turtle file into the model
-			model = FileManager.get().readModel(model, tempFile.getAbsolutePath(), "TURTLE");
+			model = FileManager.get().readModel(model, tempFile.getAbsolutePath());
 
 			// Iterate over the statements in the model and do something with them
 			StmtIterator iter = model.listStatements();

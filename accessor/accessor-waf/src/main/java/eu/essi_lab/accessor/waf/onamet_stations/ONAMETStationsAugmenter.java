@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.waf.onamet_stations;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,6 @@ package eu.essi_lab.accessor.waf.onamet_stations;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.lib.net.dirlisting.WAFClient;
 import eu.essi_lab.lib.net.dirlisting.WAF_URL;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -214,6 +213,11 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 		Downloader downloader = new Downloader();
 		Optional<String> csvFile = downloader.downloadOptionalString(url.toString());
 
+		if(csvFile.isEmpty()){
+
+		    continue;
+		}
+
 		csvFileContent = csvFile.get();
 
 		cvsContentMap.put(fileName, csvFileContent);
@@ -283,13 +287,13 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 	coreMetadata.addDistributionOnlineResource(//
 		ncFile.getName(), //
 		threddsURL + "fileServer/data/all/" + subFolder + ncFile.getName(), //
-		NetProtocols.HTTP.getCommonURN(), //
+		NetProtocolWrapper.HTTP.getCommonURN(), //
 		"download");
 
 	coreMetadata.addDistributionOnlineResource(//
 		ncFile.getName(), //
 		"https://thredds-data.s3.amazonaws.com/onametStations/" + ncFile.getName(), //
-		NetProtocols.HTTP.getCommonURN(), //
+		NetProtocolWrapper.HTTP.getCommonURN(), //
 		"download");
 
 	//

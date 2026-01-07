@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wfs._1_1_0;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -69,7 +69,7 @@ public class WFS_1_1_0Connector extends WFSConnector {
     private WFSCapabilitiesType capabilities;
 
     /**
-     * 
+     *
      */
     public static final String TYPE = "WFS Connector 1.1.0";
 
@@ -93,7 +93,7 @@ public class WFS_1_1_0Connector extends WFSConnector {
     }
 
     /**
-     * 
+     *
      */
     public WFS_1_1_0Connector() {
 
@@ -124,22 +124,32 @@ public class WFS_1_1_0Connector extends WFSConnector {
 	if (resumptionToken == null) {
 
 	    if (featureList.isEmpty() || featureList.size() == 1) {
+
 		nextResumptionToken = null;
+
 	    } else {
+
 		nextResumptionToken = "1";
 	    }
+
 	    if (!featureList.isEmpty()) {
+
 		featureType = featureList.get(0);
 	    }
 
 	} else {
 
 	    try {
+
 		Integer index = Integer.parseInt(resumptionToken);
+
 		featureType = featureList.get(index);
+
 		if (featureList.size() > (index + 1)) {
+
 		    nextResumptionToken = "" + (index + 1);
 		}
+
 	    } catch (Exception e) {
 		throw GSException.createException( //
 			getClass(), //
@@ -152,17 +162,22 @@ public class WFS_1_1_0Connector extends WFSConnector {
 	}
 
 	if (getSourceURL().contains("147.102.5.93") && featureType != null && isApprovedNamespace(featureType.getName().getPrefix())) {
+
 	    skip = true;// featureType.getName()
 	}
 
 	emptyCapabilities.getValue().getFeatureTypeList().getFeatureType().add(featureType);
 
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
 	try {
 	    marshaller.marshal(emptyCapabilities, baos);
+
 	} catch (Exception e) {
+
 	    GSLoggerFactory.getLogger(getClass()).error("Can't marshal empty capabilities", e);
 	}
+
 	String metadata = new String(baos.toByteArray());
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
@@ -178,10 +193,17 @@ public class WFS_1_1_0Connector extends WFSConnector {
 	    response.addRecord(metadataRecord);
 	}
 
+	if (nextResumptionToken != null && Integer.parseInt(nextResumptionToken) >= getSetting().getMaxRecords()
+		.orElse(Integer.MAX_VALUE)) {
+
+	    nextResumptionToken = null;
+
+	    GSLoggerFactory.getLogger(getClass()).info("Max records of {} reached, exit", getSetting().getMaxRecords().get());
+	}
+
 	response.setResumptionToken(nextResumptionToken);
 
 	return response;
-
     }
 
     protected WFSCapabilitiesType retrieveCapabilities() throws GSException {
@@ -369,8 +391,8 @@ public class WFS_1_1_0Connector extends WFSConnector {
     }
 
     private boolean isApprovedNamespace(String layerName) {
-	return layerName != null && !layerName.equals("")
-		&& (!(layerName.contains("geomesa") || layerName.contains("kifisos") || layerName.contains("danube")));
+	return layerName != null && !layerName.equals("") && (!(layerName.contains("geomesa") || layerName.contains("kifisos")
+		|| layerName.contains("danube")));
     }
 
     @Override

@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,11 @@ import java.util.function.Consumer;
  * @author Fabrizio
  */
 @FunctionalInterface
-public interface ResourceConsumer extends Consumer<GSResource> {
+public interface ResourceConsumer {
 
+    /**
+     * @param resource
+     * @param message
+     */
+    void consume(GSResource resource, DiscoveryMessage message);
 }

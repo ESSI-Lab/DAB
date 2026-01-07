@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,7 @@ import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.exceptions.GSException;
@@ -70,10 +70,10 @@ public class WFSAugmenter extends ResourceAugmenter<AugmenterSetting> {
 	if (dist != null) {
 	    List<Online> onlines = Lists.newArrayList(dist.getDistributionOnlines());
 	    for (Online o : onlines) {
-		if (o.getProtocol().equalsIgnoreCase("ogc:wfs") || o.getProtocol().equals(NetProtocols.WFS_1_1_0.getCommonURN())
-			|| o.getProtocol().equals(NetProtocols.WFS.getCommonURN())
-			|| o.getProtocol().equals(NetProtocols.WFS_1_1_0.getCommonURN())
-			|| o.getProtocol().equals(NetProtocols.WFS_2_0_0.getCommonURN())) {
+		if (o.getProtocol().equalsIgnoreCase("ogc:wfs") || o.getProtocol().equals(NetProtocolWrapper.WFS_1_1_0.getCommonURN())
+			|| o.getProtocol().equals(NetProtocolWrapper.WFS.getCommonURN())
+			|| o.getProtocol().equals(NetProtocolWrapper.WFS_1_1_0.getCommonURN())
+			|| o.getProtocol().equals(NetProtocolWrapper.WFS_2_0_0.getCommonURN())) {
 		    String baseWFS = o.getLinkage();
 		    String name = o.getName();
 		    // https://sdi.iia.cnr.it/gmosgeoserver/ows?request=GetFeature&service=WFS&version=1.1.0&typeName=GMOS:MAL&outputFormat=csv

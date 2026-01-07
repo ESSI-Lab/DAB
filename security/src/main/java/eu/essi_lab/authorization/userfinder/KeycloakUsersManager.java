@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.authorization.userfinder;
 
@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.userfinder;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ package eu.essi_lab.authorization.userfinder;
  */
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.api.database.UsersManager;
@@ -42,14 +42,14 @@ import eu.essi_lab.model.exceptions.GSException;
 public class KeycloakUsersManager implements UsersManager {
 
     /**
-     * 
+     *
      */
     public static final String KEYCLOAK_TYPE = "Keycloak";
 
     private KeycloakUsersClient manager;
 
     /**
-     * 
+     *
      */
     public KeycloakUsersManager() {
 
@@ -95,6 +95,18 @@ public class KeycloakUsersManager implements UsersManager {
     public void store(GSUser user) throws GSException {
 
 	try {
+	    manager.deleteByUserName(getAccessToken(), user.getIdentifier());
+
+	} catch (NoSuchElementException e) {
+	    // first time user is stored, no problem
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+
+	    throw GSException.createException(getClass(), "KeycloakUsersManagerRemoveBeforeStoreUserError", e);
+	}
+
+	try {
 
 	    boolean created = manager.create(getAccessToken(), KeycloakUserMapper.toKeycloakUser(user));
 
@@ -118,10 +130,11 @@ public class KeycloakUsersManager implements UsersManager {
     }
 
     @Override
-    public void removeUser(String userIdentifier) throws GSException {
+    public void removeUser(String userName) throws GSException {
 
 	try {
-	    boolean deleted = manager.delete(getAccessToken(), userIdentifier);
+
+	    boolean deleted = manager.deleteByUserName(getAccessToken(), userName);
 
 	    if (!deleted) {
 

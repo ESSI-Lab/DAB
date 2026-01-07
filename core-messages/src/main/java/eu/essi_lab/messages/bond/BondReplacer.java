@@ -7,7 +7,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,8 +37,8 @@ import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
  */
 class BondReplacer {
 
-    private Bond bond;
-    private LogicalBond clone;
+    private final Bond bond;
+    private final LogicalBond clone;
 
     /**
      * @param searchValues
@@ -232,10 +232,10 @@ class BondReplacer {
     /**
      * @author Fabrizio
      */
-    private class FindBondHandler implements DiscoveryBondHandler {
+    private static class FindBondHandler implements DiscoveryBondHandler {
 
 	private Optional<LogicalBond> out;
-	private String search;
+	private final String search;
 
 	/***
 	 * @param original
@@ -261,9 +261,7 @@ class BondReplacer {
 		    stream().//
 		    filter(b -> b instanceof QueryableBond).//
 		    map(b -> ((QueryableBond) b).getPropertyValue()).//
-		    filter(v -> v.equals(search)).//
-		    findFirst().//
-		    isPresent();
+		    anyMatch(v -> v.equals(search));
 
 	    if (found) {
 

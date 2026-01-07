@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -37,6 +38,7 @@ public abstract class IconColumnRenderer extends GridColumnRenderer<Icon> {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -6824495335399746205L;
 
     /**
@@ -51,7 +53,7 @@ public abstract class IconColumnRenderer extends GridColumnRenderer<Icon> {
 	Icon component = createIcon(item);
 	component.setId(item.get("identifier"));
 
-	getToolTip(item).ifPresent(toolTip -> component.setTooltipText(toolTip));
+	getToolTip(item).ifPresent(component::setTooltipText);
 
 	return component;
     }

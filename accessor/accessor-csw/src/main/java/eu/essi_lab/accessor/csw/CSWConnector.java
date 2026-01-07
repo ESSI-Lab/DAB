@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -424,10 +424,16 @@ public class CSWConnector extends WrappedConnector {
      * @param ret
      * @param optional
      */
-    protected void toOriginalMetadataFromAnies(ListRecordsResponse<OriginalMetadata> ret, Optional<List<Object>> optional) {
+    protected void toOriginalMetadataFromAnies(//
+	    ListRecordsResponse<OriginalMetadata> ret,//
+	    Optional<List<Object>> optional) {//
 
-	optional.ifPresent(
-		anies -> anies.stream().map(object -> objectToOriginalMetadata(object)).filter(Objects::nonNull).forEach(ret::addRecord));
+	optional.ifPresent( //
+		anies -> anies.//
+			stream().//
+			map(object -> objectToOriginalMetadata(object)).//
+			filter(Objects::nonNull).//
+			forEach(ret::addRecord));//
 
     }
 
@@ -435,7 +441,8 @@ public class CSWConnector extends WrappedConnector {
      * @param ret
      * @param optional
      */
-    protected void toOriginalMetadataFromAbstractRecords(ListRecordsResponse<OriginalMetadata> ret,
+    protected void toOriginalMetadataFromAbstractRecords(//
+	    ListRecordsResponse<OriginalMetadata> ret,//
 	    Optional<List<JAXBElement<? extends AbstractRecordType>>> optional) {
 
 	optional.ifPresent(abstractRecords -> abstractRecords.stream().map(elem ->
@@ -453,7 +460,8 @@ public class CSWConnector extends WrappedConnector {
 	    }
 	}
 
-	).filter(Objects::nonNull).forEach(ret::addRecord));
+	).filter(Objects::nonNull).//
+		forEach(ret::addRecord));
     }
 
     protected OriginalMetadata objectToOriginalMetadata(Object object) {

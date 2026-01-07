@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,63 +21,29 @@ package eu.essi_lab.cfga.gui;
  * #L%
  */
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.DetachEvent;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs.Orientation;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.applayout.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.tabs.*;
+import com.vaadin.flow.dom.*;
 import com.vaadin.flow.dom.DomEvent;
-import com.vaadin.flow.dom.DomEventListener;
-import com.vaadin.flow.dom.DomListenerRegistration;
-import com.vaadin.flow.server.ErrorEvent;
-import com.vaadin.flow.server.ErrorHandler;
-import com.vaadin.flow.server.InputStreamFactory;
-import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.VaadinRequest;
-import com.vaadin.flow.server.VaadinService;
-import com.vaadin.flow.server.VaadinServletRequest;
-import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.web.*;
 
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationChangeListener;
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.components.ConfigurationViewFactory;
-import eu.essi_lab.cfga.gui.components.CustomButton;
-import eu.essi_lab.cfga.gui.components.TabContainer;
-import eu.essi_lab.cfga.gui.components.TabsWithContent;
-import eu.essi_lab.cfga.gui.dialog.EnhancedDialog;
-import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
-import eu.essi_lab.cfga.gui.extension.directive.DirectiveManager;
-import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
-import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
-import eu.essi_lab.cfga.gui.extension.directive.ShowDirective;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.web.WebRequest;
+import javax.servlet.http.*;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -85,43 +51,26 @@ import eu.essi_lab.messages.web.WebRequest;
 @SuppressWarnings("serial")
 public abstract class ConfigurationView extends AppLayout implements ConfigurationChangeListener, DomEventListener {
 
-    private TabsWithContent tabs;
-    private HorizontalLayout navbarContent;
-    private Label headerLabel;
-    private Image headerImage;
-    private DrawerToggle drawerToggle;
-    private boolean drawerOpened;
-
-    // for test purpose, shows only the selected tab or all if -1
-    private int oneTab = -1;
+    private VerticalTabs tabs;
+    private final HorizontalLayout header;
+    private final Label headerLabel;
+    private final Image headerImage;
+    private final Button saveButton;
+    protected boolean tabAlreadyOpen;
+    final Label infoLabel;
+    Button logoutButton;
+    private final String requestURL;
+    private static String ownerBrowserAdress;
     private Configuration configuration;
 
     /**
-     * 
-     */
-    private Button saveButton;
-    protected boolean tabAlreadyOpen;
-    Label infoLabel;
-
-    /**
-     * 
-     */
-    CustomButton logoutButton;
-    private String requestURL;
-    private static String ownerBrowserAdress;
-
-    /**
-     * 
+     *
      */
     public ConfigurationView() {
 
 	GSLoggerFactory.getLogger(getClass()).info("Loading configuration view STARTED");
 
-	//
-	//
-	//
-
-	drawerOpened = true;
+	addClassName("dab-configurator-app-layout");
 
 	//
 	//
@@ -143,7 +92,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	if (!xForwardedForHeaders.isEmpty()) {
 
-	    address = xForwardedForHeaders.get(0);
+	    address = xForwardedForHeaders.getFirst();
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Browser address: {}", address);
@@ -169,25 +118,12 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	//
 	//
 
-	setPrimarySection(AppLayout.Section.NAVBAR); // default
+	VerticalLayout mainLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout("dab-configurator");
+	mainLayout.setWidthFull();
 
 	//
 	// header
 	//
-
-	drawerToggle = new DrawerToggle();
-	drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_LEFT.create());
-	drawerToggle.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
-	    @Override
-	    public void onComponentEvent(ClickEvent<Button> event) {
-		drawerOpened = !drawerOpened;
-		if (drawerOpened) {
-		    drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_LEFT.create());
-		} else {
-		    drawerToggle.setIcon(VaadinIcon.ANGLE_DOUBLE_RIGHT.create());
-		}
-	    }
-	});
 
 	headerImage = new Image();
 	// headerImage.setSrc("https://i.imgur.com/GPpnszs.png");
@@ -212,24 +148,17 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	infoLabel.setWidth(560, Unit.PIXELS);
 	infoLabel.setHeight(30, Unit.PIXELS);
 
-	saveButton = ConfigurationViewFactory.createSaveButton(new ComponentEventListener<ClickEvent<Button>>() {
-
-	    @Override
-	    public void onComponentEvent(ClickEvent<Button> event) {
-
-		onSaveButtonClicked(event);
-	    }
-	});
+	saveButton = ConfigurationViewFactory.createSaveButton((ComponentEventListener<ClickEvent<Button>>) this::onSaveButtonClicked);
 
 	saveButton.setEnabled(false);
 	// hides the save button, shows it again if initialized, authorized and the tab was closed
 	saveButton.setVisible(false);
 
-	navbarContent = ConfigurationViewFactory.createConfigurationViewNavBarContentLayout();
+	header = ConfigurationViewFactory.createHeaderLayout();
 
-	navbarContent.add(drawerToggle, headerImage, headerLabel, saveButton);
+	header.add(headerImage, headerLabel, saveButton);
 
-	addToNavbar(navbarContent);
+	mainLayout.add(header);
 
 	//
 	//
@@ -303,11 +232,17 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	saveButton.setVisible(true);
 
-	tabs = ConfigurationViewFactory.createConfigurationViewTabs();
+	tabs = ConfigurationViewFactory.createTabs();
 
-	addToDrawer(tabs);
+	HorizontalLayout contentLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
+	contentLayout.setWidthFull();
 
-	setContent(tabs.getContent());
+	contentLayout.add(tabs);
+	contentLayout.add(tabs.getContent());
+
+	mainLayout.add(contentLayout);
+
+	setContent(mainLayout);
 
 	//
 	//
@@ -317,7 +252,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	configuration.addChangeEventListener(tabs);
 
-	initContent(configuration);
+	init(configuration);
 
 	//
 	//
@@ -325,16 +260,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	if (showLogOutButton()) {
 
-	    logoutButton = new CustomButton(VaadinIcon.SIGN_OUT.create());
-	    logoutButton.addThemeVariants(ButtonVariant.LUMO_LARGE);
-	    logoutButton.addClickListener(getLogOutButtonListener());
-	    logoutButton.setTooltip("Logout");
+	    logoutButton = ConfigurationViewFactory.createLogoutButton(getLogOutButtonListener());
 
-	    logoutButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%");
-	    logoutButton.getStyle().set("margin-left", "100px");
-	    logoutButton.getStyle().set("background-color", "white");
-
-	    getNavbarContent().add(logoutButton);
+	    getHeader().add(logoutButton);
 	}
 
 	//
@@ -355,26 +283,18 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	    UI.getCurrent().getElement().addEventListener("click", this);
 
-	    UI.getCurrent().addAttachListener(new ComponentEventListener<AttachEvent>() {
+	    UI.getCurrent().addAttachListener((ComponentEventListener<AttachEvent>) event -> {
 
-		@Override
-		public void onComponentEvent(AttachEvent event) {
+		IdleTracker.getInstance().reset();
 
-		    IdleTracker.getInstance().reset();
-
-		    onAttachEvent(event);
-		}
+		onAttachEvent(event);
 	    });
 
-	    UI.getCurrent().addDetachListener(new ComponentEventListener<DetachEvent>() {
+	    UI.getCurrent().addDetachListener((ComponentEventListener<DetachEvent>) event -> {
 
-		@Override
-		public void onComponentEvent(DetachEvent event) {
+		IdleTracker.getInstance().reset();
 
-		    IdleTracker.getInstance().reset();
-
-		    onDetachEvent(event);
-		}
+		onDetachEvent(event);
 	    });
 	}
 
@@ -440,6 +360,234 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	    infoLabel.getStyle().set("color", "lightgray");
 	    infoLabel.getStyle().set("border", "1px solid lightgray");
 	}
+    }
+
+    /**
+     * @return
+     */
+    protected abstract List<TabDescriptor> getDescriptors();
+
+    /**
+     * @return
+     */
+    protected abstract Configuration initConfiguration();
+
+    @Override
+    public void configurationChanged(ConfigurationChangeEvent event) {
+
+	switch (event.getEventType()) {
+	case ConfigurationChangeEvent.SETTING_PUT:
+	    onSettingPut(event.getSettings());
+	    break;
+	case ConfigurationChangeEvent.SETTING_REPLACED:
+	    onSettingReplaced(event.getSettings());
+	    break;
+	case ConfigurationChangeEvent.SETTING_REMOVED:
+	    onSettingRemoved(event.getSettings());
+	    break;
+	case ConfigurationChangeEvent.CONFIGURATION_CLEARED:
+	    onConfigurationCleared();
+	    break;
+	case ConfigurationChangeEvent.CONFIGURATION_FLUSHED:
+	    onConfigurationFlushed();
+	    break;
+	case ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED:
+	    onConfigurationAutoReloaded();
+	    break;
+	}
+    }
+
+    /**
+     * @return the requestURL
+     */
+    public String getRequestURL() {
+
+	return requestURL;
+    }
+
+    /**
+     * Handles the registered DOM events by resetting the the {@link IdleTracker}
+     */
+    @Override
+    public void handleEvent(DomEvent event) {
+
+	IdleTracker.getInstance().reset();
+    }
+
+    /**
+     *
+     */
+    public void refresh() {
+
+	configuration = retrieveConfiguration();
+
+	tabs.clear();
+	try {
+	    EnhancedDialog.closeAll();
+	} catch (Throwable t) {
+	    // a concurrent modification exception is sometimes thrown
+	}
+	init(configuration);
+    }
+
+    /**
+     * @return the configuration
+     */
+    public Configuration getConfiguration() {
+
+	return configuration;
+    }
+
+    /**
+     * @return
+     */
+    public VerticalTabs getTabs() {
+
+	return tabs;
+    }
+
+    /**
+     * @return the saveButton
+     */
+    public Button getSaveButton() {
+
+	return saveButton;
+    }
+
+    /**
+     * @param index
+     * @param label
+     * @param component
+     * @return
+     */
+    public Tab addTab(int index, String label, Renderable component) {
+
+	return tabs.addTab(index, label, component);
+    }
+
+    /**
+     * @param index
+     * @param label
+     * @param component
+     * @return
+     */
+    public Tab addTab(int index, Renderable component) {
+
+	return tabs.addTab(index, null, component);
+    }
+
+    /**
+     * @return
+     */
+    public HorizontalLayout getHeader() {
+
+	return header;
+    }
+
+    /**
+     * @param source
+     */
+    public void setHeaderImageUrl(String source) {
+
+	headerImage.setSrc(source);
+    }
+
+    /**
+     * @param source
+     * @param width
+     * @param height
+     */
+    public void setHeaderImageUrl(String source, int width, int height) {
+
+	headerImage.setSrc(source);
+
+	if (height > 0) {
+	    headerImage.setHeight(height + "px");
+	}
+
+	if (width > 0) {
+	    headerImage.setWidth(width + "px");
+	}
+    }
+
+    /**
+     * @param source
+     * @param height
+     */
+    public void setHeaderImageUrl(String source, int height) {
+
+	setHeaderImageUrl(source, -1, height);
+    }
+
+    /**
+     * @param source
+     * @param width
+     * @param height
+     */
+    public void setHeaderImage(InputStream source, int width, int height) {
+
+	StreamResource resource = new StreamResource("icon", (InputStreamFactory) () -> source);
+
+	headerImage.setSrc(resource);
+
+	if (height > 0) {
+	    headerImage.setHeight(height + "px");
+	}
+
+	if (width > 0) {
+	    headerImage.setWidth(width + "px");
+	}
+    }
+
+    /**
+     * @param source
+     * @param height
+     */
+    public void setHeaderImage(InputStream source, int height) {
+
+	setHeaderImage(source, -1, height);
+    }
+
+    /**
+     * @param source
+     */
+    public void setHeaderImage(InputStream source) {
+
+	setHeaderImage(source, -1, -1);
+    }
+
+    /**
+     * @param headerText
+     */
+    public void setHeaderText(String headerText) {
+
+	headerLabel.setText(headerText);
+    }
+
+    /**
+     * @param headerText
+     * @param width
+     */
+    public void setHeaderText(String headerText, int width) {
+
+	headerLabel.setText(headerText);
+	headerLabel.getStyle().set("width", width + "px");
+    }
+
+    /**
+     * @return
+     */
+    public Image getHeaderImage() {
+
+	return headerImage;
+    }
+
+    /**
+     * @return the headerLabel
+     */
+    public Label getHeaderLabel() {
+
+	return headerLabel;
     }
 
     /**
@@ -520,278 +668,12 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * {@link ComponentInfo} instances and the related {@link TabInfo}, can be defined to manage one or more
-     * {@link Setting}s.<br>
-     * If the {@link RemoveDirective} of the {@link TabInfo} allows the removal of
-     * all settings, when the view is initialized and there is no settings coupled with the {@link ComponentInfo},
-     * the {@link ComponentInfo} and its {@link TabInfo} cannot be found and as consequence, the related tab cannot be
-     * rendered.<br>
-     * In this case, it will no longer be possible to add or remove that kind of settings just because there
-     * is no tab with the required {@link AddDirective}.<br>
-     * To avoid this issue, this method can be used to register a list of {@link ComponentInfo} that must be
-     * <i>always rendered</i> (typically tabs with {@link RemoveDirective}s and {@link AddDirective}), even if the
-     * related settings are missing.<br>
-     * <br>
-     * This method can also be used to add {@link ComponentInfo} instances that have no related {@link Setting}
-     * 
-     *  @see RemoveDirective#isFullRemovalAllowed()
-     * @return
-     */
-    protected List<ComponentInfo> getAdditionalsComponentInfo() {
-
-	return new ArrayList<>();
-    }
-
-    @Override
-    public void configurationChanged(ConfigurationChangeEvent event) {
-
-	switch (event.getEventType()) {
-	case ConfigurationChangeEvent.SETTING_PUT:
-	    onSettingPut(event.getSettings());
-	    break;
-	case ConfigurationChangeEvent.SETTING_REPLACED:
-	    onSettingReplaced(event.getSettings());
-	    break;
-	case ConfigurationChangeEvent.SETTING_REMOVED:
-	    onSettingRemoved(event.getSettings());
-	    break;
-	case ConfigurationChangeEvent.CONFIGURATION_CLEARED:
-	    onConfigurationCleared();
-	    break;
-	case ConfigurationChangeEvent.CONFIGURATION_FLUSHED:
-	    onConfigurationFlushed();
-	    break;
-	case ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED:
-	    onConfigurationAutoReloaded();
-	    break;
-	}
-    }
-
-    /**
-     * @return the requestURL
-     */
-    public String getRequestURL() {
-
-	return requestURL;
-    }
-
-    /**
-     * Handles the registered DOM events by resetting the the {@link IdleTracker}
-     */
-    @Override
-    public void handleEvent(DomEvent event) {
-
-	IdleTracker.getInstance().reset();
-    }
-
-    /**
-     * 
-     */
-    public void refresh() {
-
-	configuration = retrieveConfiguration();
-
-	tabs.clear();
-	try {
-	    EnhancedDialog.closeAll();
-	} catch (Throwable t) {
-	    // a concurrent modification exception is sometimes thrown
-	}
-	initContent(configuration);
-    }
-
-    /**
-     * @return the configuration
-     */
-    public Configuration getConfiguration() {
-
-	return configuration;
-    }
-
-    /**
-     * @return
-     */
-    public TabsWithContent getTabs() {
-
-	return tabs;
-    }
-
-    /**
-     * @return the saveButton
-     */
-    public Button getSaveButton() {
-
-	return saveButton;
-    }
-
-    /**
-     * @return
-     */
-    public DrawerToggle getDrawerToggle() {
-
-	return drawerToggle;
-    }
-
-    /**
-     * @param index
-     * @param label
-     * @param component
-     * @return
-     */
-    public Tab addTab(int index, String label, TabContainer component) {
-
-	return tabs.addTab(index, label, component);
-    }
-
-    /**
-     * @return
-     */
-    public HorizontalLayout getNavbarContent() {
-
-	return navbarContent;
-    }
-
-    /**
-     * @param source
-     */
-    public void setHeaderImageUrl(String source) {
-
-	headerImage.setSrc(source);
-    }
-
-    /**
-     * @param source
-     * @param width
-     * @param height
-     */
-    public void setHeaderImageUrl(String source, int width, int height) {
-
-	headerImage.setSrc(source);
-
-	if (height > 0) {
-	    headerImage.setHeight(String.valueOf(height) + "px");
-	}
-
-	if (width > 0) {
-	    headerImage.setWidth(String.valueOf(width) + "px");
-	}
-    }
-
-    /**
-     * @param source
-     * @param height
-     */
-    public void setHeaderImageUrl(String source, int height) {
-
-	setHeaderImageUrl(source, -1, height);
-    }
-
-    /**
-     * @param source
-     * @param width
-     * @param height
-     */
-    public void setHeaderImage(InputStream source, int width, int height) {
-
-	StreamResource resource = new StreamResource("icon", new InputStreamFactory() {
-
-	    @Override
-	    public InputStream createInputStream() {
-
-		return source;
-	    }
-	});
-
-	headerImage.setSrc(resource);
-
-	if (height > 0) {
-	    headerImage.setHeight(String.valueOf(height) + "px");
-	}
-
-	if (width > 0) {
-	    headerImage.setWidth(String.valueOf(width) + "px");
-	}
-    }
-
-    /**
-     * @param source
-     * @param height
-     */
-    public void setHeaderImage(InputStream source, int height) {
-
-	setHeaderImage(source, -1, height);
-    }
-
-    /**
-     * @param source
-     */
-    public void setHeaderImage(InputStream source) {
-
-	setHeaderImage(source, -1, -1);
-    }
-
-    /**
-     * @param headerText
-     */
-    public void setHeaderText(String headerText) {
-
-	headerLabel.setText(headerText);
-    }
-
-    /**
-     * @param headerText
-     * @param width
-     */
-    public void setHeaderText(String headerText, int width) {
-
-	headerLabel.setText(headerText);
-	headerLabel.getStyle().set("width", width + "px");
-    }
-
-    /**
-     * @return
-     */
-    public Image getHeaderImage() {
-
-	return headerImage;
-    }
-
-    /**
-     * @return the headerLabel
-     */
-    public Label getHeaderLabel() {
-
-	return headerLabel;
-    }
-
-    /**
-     * 
-     */
-    public void removeDrawerToggle() {
-
-	navbarContent.remove(drawerToggle);
-    }
-
-    /**
-     * @param tabInfo
-     * @return
-     */
-    public List<Setting> retrieveTabSettings(TabInfo tabInfo) {
-
-	List<Setting> allSetting = configuration.list();
-
-	HashMap<TabInfo, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
-
-	return tabInfoMap.getOrDefault(tabInfo, new ArrayList<Setting>());
-    }
-
-    /**
      * @param setting
      */
     protected void onSettingPut(List<Setting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Setting {} put",
-		settings.stream().map(s -> s.getName()).collect(Collectors.joining(",")));
+	GSLoggerFactory.getLogger(getClass())
+		.debug("Setting {} put", settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
     }
 
     /**
@@ -799,8 +681,8 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     protected void onSettingReplaced(List<Setting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Setting {} replaced",
-		settings.stream().map(s -> s.getName()).collect(Collectors.joining(",")));
+	GSLoggerFactory.getLogger(getClass())
+		.debug("Setting {} replaced", settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
     }
 
     /**
@@ -808,12 +690,12 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     protected void onSettingRemoved(List<Setting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Setting {} removed",
-		settings.stream().map(s -> s.getName()).collect(Collectors.joining(",")));
+	GSLoggerFactory.getLogger(getClass())
+		.debug("Setting {} removed", settings.stream().map(Setting::getName).collect(Collectors.joining(",")));
     }
 
     /**
-     * 
+     *
      */
     protected void onConfigurationCleared() {
 
@@ -821,7 +703,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * 
+     *
      */
     protected void onConfigurationFlushed() {
 
@@ -829,152 +711,31 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * 
+     *
      */
     protected void onConfigurationAutoReloaded() {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Configuration autoreloaded");
+	GSLoggerFactory.getLogger(getClass()).debug("Configuration auto-reloaded");
     }
 
     /**
      * @param configuration
      */
-    protected void initContent(Configuration configuration) {
+    protected void init(Configuration configuration) {
 
-	List<Setting> allSetting = configuration.list();
-
-	HashMap<TabInfo, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
-
-	List<TabInfo> tabInfoList = new ArrayList<>(tabInfoMap.keySet());
-
-	//
-	//
-	//
-
-	List<ComponentInfo> additionalComps = getAdditionalsComponentInfo();
-
-	for (ComponentInfo componentInfo : additionalComps) {
-
-	    Optional<TabInfo> tabInfo = componentInfo.getTabInfo();
-
-	    if (tabInfo.isPresent()) {
-
-		int index = tabInfo.get().getIndex();
-
-		boolean missing = tabInfoList.//
-			stream().//
-			filter(tab -> tab.getIndex() == index).//
-			findFirst().//
-			isEmpty();
-
-		if (missing) {
-
-		    tabInfoList.add(tabInfo.get());
-		}
-	    }
-	}
-
-	//
-	//
-	//
-
-	tabInfoList = tabInfoList.//
+	getDescriptors().//
 		stream().//
-		sorted((i1, i2) -> Integer.compare(i1.getIndex(), i2.getIndex())).//
-		collect(Collectors.toList());
+		sorted(Comparator.comparingInt(TabDescriptor::getIndex)).//
+		forEach(descriptor -> {
 
-	//
-	//
-	//
+	    Renderable content = ConfigurationViewFactory.createTabContent(//
+		    this,//
+		    configuration, //
+		    descriptor);
 
-	for (TabInfo tabInfo : tabInfoList) {
-
-	    if (oneTab >= 0 && tabInfo.getIndex() == oneTab || oneTab < 0) {
-
-		List<Setting> settings = tabInfoMap.getOrDefault(tabInfo, new ArrayList<Setting>());
-
-		//
-		//
-		//
-
-		DirectiveManager directiveManager = tabInfo.getDirectiveManager();
-
-		Optional<AddDirective> addDirective = directiveManager.getDirective(AddDirective.class);
-
-		Optional<RemoveDirective> removeDirective = directiveManager.getDirective(RemoveDirective.class);
-
-		Optional<EditDirective> editDirective = directiveManager.getDirective(EditDirective.class);
-
-		Optional<ShowDirective> showDirective = directiveManager.getDirective(ShowDirective.class);
-
-		String tabName = "Tab#" + tabInfo.getIndex();
-
-		if (showDirective.isPresent()) {
-
-		    tabName = showDirective.get().getName();
-		}
-
-		//
-		//
-		//
-
-		Optional<ComponentInfo> additionalComp = additionalComps.//
-			stream().//
-			filter(c -> c.getTabInfo().isPresent()).//
-			filter(c -> c.getTabInfo().get().getIndex() == tabInfo.getIndex()).//
-			findFirst();
-
-		ComponentInfo componentInfo = additionalComp.isPresent() ? additionalComp.get()
-			: settings.get(0).getExtension(ComponentInfo.class).get();
-
-		Orientation orientation = componentInfo.getOrientation();
-
-		//
-		//
-		//
-
-		TabContainer container = ConfigurationViewFactory.createConfigurationViewTabContainer(//
-			configuration, //
-			orientation, //
-			tabName, //
-			addDirective, //
-			removeDirective, //
-			editDirective);
-
-		container.getElement().getStyle().set("margin-left", "auto");
-		container.getElement().getStyle().set("margin-right", "auto");
-
-		//
-		//
-		//
-
-		container.init(this, configuration, componentInfo, tabInfo);
-
-		if (tabInfo.getIndex() == 0) {
-
-		    container.render();
-		}
-
-		//
-		//
-		//
-
-		if (oneTab >= 0 && tabInfo.getIndex() == oneTab) {
-		    addTab(0, tabName, container);
-		    return;
-
-		} else if (oneTab < 0) {
-
-		    addTab(tabInfo.getIndex(), tabName, container);
-		}
-	    }
-	}
+	    addTab(descriptor.getIndex(), descriptor.getLabel(), content);
+	});
     }
-
-    /**
-     * @return
-     */
-    protected abstract Configuration initConfiguration();
 
     /**
      * @return
@@ -986,39 +747,5 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	configuration.addChangeEventListener(this);
 
 	return configuration;
-    }
-
-    /**
-     * @param settings
-     * @return
-     */
-    private HashMap<TabInfo, List<Setting>> createTabInfoMap(List<Setting> settings) {
-
-	HashMap<TabInfo, List<Setting>> map = new HashMap<>();
-
-	for (Setting setting : settings) {
-
-	    Optional<ComponentInfo> extension = setting.getExtension(ComponentInfo.class);
-
-	    if (extension.isPresent()) {
-
-		Optional<TabInfo> tabInfo = extension.get().getTabInfo();
-
-		if (tabInfo.isPresent()) {
-
-		    List<Setting> list = map.get(tabInfo.get());
-
-		    if (list == null) {
-
-			list = new ArrayList<Setting>();
-			map.put(tabInfo.get(), list);
-		    }
-
-		    list.add(setting);
-		}
-	    }
-	}
-
-	return map;
     }
 }

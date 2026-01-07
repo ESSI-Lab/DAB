@@ -7,7 +7,7 @@ package eu.essi_lab.profiler.wms.cluster.feature.info;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -254,6 +254,7 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		    discoveryMessage.setPage(new Page(1, maxRecords));
 		    discoveryMessage.setIncludeCountInRetrieval(true);
 
+		    String token = webRequest.extractTokenId().isPresent()?webRequest.extractTokenId().get():null;
 		    String viewId = webRequest.extractViewId().get();
 		    Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 		    WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
@@ -400,7 +401,7 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			stations.add(station);
 		    }
 
-		    InputStream stream = generator.getInfoPage(webRequest.getBaseUrl(), viewId, stations,
+		    InputStream stream = generator.getInfoPage(webRequest.getBaseUrl(),token, viewId, stations,
 			    resultSet.getCountResponse().getCount(), format, request);
 
 		    IOUtils.copy(stream, output);

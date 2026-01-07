@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.wcs;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,8 +26,7 @@ import java.util.List;
 
 import eu.essi_lab.accessor.wcs.WCSConnector;
 import eu.essi_lab.accessor.wcs_1_0_0_TDS.WCSConnector_100_TDS;
-import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
@@ -49,10 +48,7 @@ public class WCSDownloader_100_TDS extends WCSDownloader_100 {
     @Override
     public boolean canDownload() {
 
-	NetProtocol protocol = NetProtocols.decodeFromIdentifier(online.getProtocol());
-
-	return NetProtocols.WCS_1_0_0_TDS.equals(protocol);
-
+	return NetProtocolWrapper.check(online.getProtocol(),NetProtocolWrapper.WCS_1_0_0_TDS);
     }
 
     @Override

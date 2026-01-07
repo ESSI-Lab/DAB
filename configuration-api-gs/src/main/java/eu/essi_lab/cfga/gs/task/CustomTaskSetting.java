@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.task;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.gs.task;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 
@@ -38,10 +39,7 @@ import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
-import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.option.ValuesLoader;
@@ -165,11 +163,6 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	addOption(emailRecipientsOption);
 
 	//
-	// set the component extension
-	//
-	setExtension(new TaskComponentInfo());
-
-	//
 	// set the validator
 	//
 	setValidator(new TaskSettingValidator());
@@ -200,24 +193,24 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
     /**
      * @author Fabrizio
      */
-    public static class TaskComponentInfo extends ComponentInfo {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
 	 *
 	 */
-	public TaskComponentInfo() {
+	public TabDescriptorProvider() {
 
-	    setComponentName(CustomTaskSetting.class.getName());
+	    setLabel("Custom tasks");
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(GSTabIndex.CUSTOM_TASKS.getIndex()).//
-		    withShowDirective("Custom tasks", SortDirection.ASCENDING).//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(CustomTaskSetting.class).//
+
+ 		    withShowDirective("Manage custom tasks. Click \"Reload\" to update the scheduler information\n", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 		    "Add task", //
 		    CustomTaskSetting.class.getCanonicalName()).//
 		    withRemoveDirective("Remove task", false, CustomTaskSetting.class.getCanonicalName()).//
-		    withEditDirective("Edit task", ConfirmationPolicy.ON_WARNINGS).//
+		    withEditDirective("Edit custom task", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
 
@@ -254,7 +247,8 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setIndex(GSTabIndex.CUSTOM_TASKS.getIndex());
+	    addContentDescriptor(descriptor);
 	}
 
 	/**

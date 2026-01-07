@@ -4,7 +4,7 @@ package eu.essi_lab.access.wml;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import eu.essi_lab.lib.xml.*;
 import org.cuahsi.waterml._1.ObjectFactory;
 import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
@@ -72,7 +73,8 @@ public class TimeSeriesTemplate {
 	JAXBWML.getInstance().marshal(response, templateFile);
 
 	// start writing data file
-	XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+	XMLInputFactory inputFactory = XMLFactories.newXMLInputFactory();
+	
 	XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
 	this.reader = inputFactory.createXMLStreamReader(new FileInputStream(templateFile));

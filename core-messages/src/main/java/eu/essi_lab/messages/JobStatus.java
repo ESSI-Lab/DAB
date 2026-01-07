@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.json.JSONArray;
@@ -76,12 +72,12 @@ public abstract class JobStatus {
 	public static final String CANCELED_LABEL = "Canceled";
 	public static final String ERROR_LABEL = "Error";
 
-	private String label;
+	private final String label;
 
 	/**
 	 * @param label
 	 */
-	private JobPhase(String label) {
+	JobPhase(String label) {
 
 	    this.label = label;
 	}
@@ -96,7 +92,7 @@ public abstract class JobStatus {
     /**
      * @author Fabrizio
      */
-    private static enum MessageType {
+    private enum MessageType {
 
 	INFO, //
 	WARN, //
@@ -104,14 +100,11 @@ public abstract class JobStatus {
 
 	public String getType() {
 
-	    switch (this) {
-	    case ERROR:
-		return "errorMessages";
-	    case WARN:
-		return "warnMessages";
-	    default:
-		return "infoMessages";
-	    }
+	    return switch (this) {
+		case ERROR -> "errorMessages";
+		case WARN -> "warnMessages";
+		default -> "infoMessages";
+	    };
 	}
     }
 
@@ -244,23 +237,20 @@ public abstract class JobStatus {
 	return messages.//
 		stream(). //
 
-		sorted((o1, o2) -> o1.getString("timeStamp").compareTo(o2.getString("timeStamp"))).//
+		sorted(Comparator.comparing(o -> o.getString("timeStamp"))).//
 
-		flatMap(o -> {
+		flatMap(o -> o.keySet().stream().//
 
-		    return o.keySet().stream().//
+			filter(k -> !k.equals("timeStamp")).//
+			sorted((k1, k2) -> {
 
-			    filter(k -> !k.equals("timeStamp")).//
-			    sorted((k1, k2) -> {
+			    int v1 = Integer.parseInt(k1.equals("message") ? "1" : k1.replace("message ", ""));
+			    int v2 = Integer.parseInt(k2.equals("message") ? "1" : k2.replace("message ", ""));
 
-				int v1 = Integer.valueOf(k1.equals("message") ? "1" : k1.replace("message ", ""));
-				int v2 = Integer.valueOf(k2.equals("message") ? "1" : k2.replace("message ", ""));
+			    return Integer.compare(v1, v2);
+			}).//
 
-				return Integer.compare(v1, v2);
-			    }).//
-
-			    map(k -> o.get(k).toString());
-		}).//
+			map(k -> o.get(k).toString())).//
 
 		collect(Collectors.toList());
     }
@@ -302,7 +292,7 @@ public abstract class JobStatus {
      */
     public String getJoinedMessages() {
 
-	return getMessagesList().stream().collect(Collectors.joining("\n"));
+	return String.join("\n", getMessagesList());
     }
 
     /**
@@ -452,7 +442,7 @@ public abstract class JobStatus {
 
 		if (msgTimeStamp.equals(timeStamp)) {
 
-		    objMsg.put("message " + String.valueOf(objMsg.keySet().size()), message);
+		    objMsg.put("message " + objMsg.keySet().size(), message);
 		    return;
 		}
 	    }

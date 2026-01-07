@@ -4,7 +4,7 @@ package eu.essi_lab.access.datacache;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,9 +28,7 @@ import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
 import eu.essi_lab.cfga.gs.GSTabIndex;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
-import eu.essi_lab.cfga.gui.extension.ComponentInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfo;
-import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.OptionBuilder;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
@@ -62,7 +60,7 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 	setCanBeRemoved(false);
 	setCanBeDisabled(false);
 	enableCompactMode(false);
-
+	setShowHeader(false);
 	setName("Data cache connector setting");
 
 	//
@@ -125,31 +123,26 @@ public class DataCacheConnectorSettingImpl extends DataCacheConnectorSetting {
 	cacheStorageSetting.hideDatabaseConfigurationFolderOption();
 
 	addSetting(cacheStorageSetting);
-
-	//
-	// set the component extension
-	//
-	setExtension(new DataCacheConnectorSettingComponentInfo());
     }
 
     /**
      * @author Fabrizio
      */
-    public static class DataCacheConnectorSettingComponentInfo extends ComponentInfo {
+    public static class TabDescriptorProvider extends TabDescriptor {
 
 	/**
 	 * 
 	 */
-	public DataCacheConnectorSettingComponentInfo() {
+	public TabDescriptorProvider() {
 
-	    setComponentName(DataCacheConnectorSettingImpl.class.getName());
+	    setLabel("Data cache");
 
-	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(GSTabIndex.DATA_CACHE.getIndex()).//
-		    withShowDirective("Data cache").//
+	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(DataCacheConnectorSettingImpl.class).//
+		    withEditDirective("Edit data cache settings").//
 		    build();
 
-	    setTabInfo(tabInfo);
+	    setIndex(GSTabIndex.DATA_CACHE.getIndex());
+	    addContentDescriptor(descriptor);
 	}
     }
 

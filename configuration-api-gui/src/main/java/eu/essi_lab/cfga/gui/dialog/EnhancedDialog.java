@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.dialog;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,16 +44,16 @@ import eu.essi_lab.cfga.gui.components.ComponentFactory;
 @SuppressWarnings("serial")
 public class EnhancedDialog extends Dialog {
 
-    private VerticalLayout layout;
-    private HorizontalLayout header;
-    private VerticalLayout footer;
-    private VerticalLayout content;
-    private Button closeButton;
-    private Label titleLabel;
+    private final VerticalLayout layout;
+    private final HorizontalLayout header;
+    private final VerticalLayout footer;
+    private final VerticalLayout content;
+    private final Button closeButton;
+    private final Label titleLabel;
 
     private ComponentEventListener<ClickEvent<Button>> onCloseListener;
 
-    private static List<EnhancedDialog> dialogs = new ArrayList<EnhancedDialog>();
+    private static final List<EnhancedDialog> dialogs = new ArrayList<>();
 
     /**
      * 
@@ -102,7 +102,7 @@ public class EnhancedDialog extends Dialog {
 	content = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
 	content.setSizeFull();
 	content.getStyle().set("padding", "5px");
-	content.getStyle().set("margin-top", "10px");
+//	content.getStyle().set("margin-top", "10px");
 	content.getStyle().set("margin-bottom", "10px");
 	content.setId("content");
 		
@@ -283,6 +283,6 @@ public class EnhancedDialog extends Dialog {
      */
     public static void closeAll() {
 
-	dialogs.forEach(d -> d.close());
+	dialogs.forEach(Dialog::close);
     }
 }

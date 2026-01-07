@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -259,15 +259,15 @@ public class CustomBondFactory {
      */
     public static void printNames() {
 
-	List<String> mes = Arrays.asList(MetadataElement.values()).//
-		stream().//
+	//
+	List<String> mes = Arrays.stream(MetadataElement.values()).//
 		map(MetadataElement::getName).//
 		collect(Collectors.toList());
 
-	List<String> rps = Arrays.asList(ResourceProperty.values()).//
-		stream().//
+	//
+	List<String> rps = Arrays.stream(ResourceProperty.values()).//
 		map(ResourceProperty::getName).//
-		collect(Collectors.toList());
+		toList();
 
 	mes.addAll(rps);
 	mes.forEach(n -> GSLoggerFactory.getLogger(CustomBondFactory.class).trace("{}", n));
@@ -294,15 +294,15 @@ public class CustomBondFactory {
 	    throw new IllegalArgumentException("Given queryable name " + n + " contains invalid characters");
 	}
 
-	List<String> mes = Arrays.asList(MetadataElement.values()).//
-		stream().//
-		map(e -> e.getName()).//
+	//
+	List<String> mes = Arrays.stream(MetadataElement.values()).//
+		map(MetadataElement::getName).//
 		collect(Collectors.toList());
 
-	List<String> rps = Arrays.asList(ResourceProperty.values()).//
-		stream().//
-		map(e -> e.getName()).//
-		collect(Collectors.toList());
+	//
+	List<String> rps = Arrays.stream(ResourceProperty.values()).//
+		map(ResourceProperty::getName).//
+		toList();
 
 	mes.addAll(rps);
 

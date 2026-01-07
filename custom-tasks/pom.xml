@@ -21,11 +21,6 @@
         </dependency>
 
 		<dependency>
-			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>cloudwatchlogs</artifactId>
-		</dependency>
-
-		<dependency>
 		    <groupId>org.apache.jena</groupId>
 		    <artifactId>jena-shacl</artifactId>
 		</dependency>
@@ -60,6 +55,11 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>			
 		</dependency>
+
+	   <dependency>
+		  <groupId>org.springframework</groupId>
+		  <artifactId>spring-aop</artifactId>
+	   </dependency>
 		
 		<dependency>
 		    <groupId>org.springframework</groupId>

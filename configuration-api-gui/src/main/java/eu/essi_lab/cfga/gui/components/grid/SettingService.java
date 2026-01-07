@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -46,7 +46,7 @@ import eu.essi_lab.cfga.setting.Setting;
  */
 public class SettingService {
 
-    private List<Setting> list;
+    private final List<Setting> list;
 
     /**
      * @param list
@@ -62,13 +62,7 @@ public class SettingService {
     public Stream<Setting> fetch(Query<Setting, Void> query) {
 
 	Optional<Comparator<Setting>> sortingComparator = query.getSortingComparator();
-	if (sortingComparator.isPresent()) {
-
-	    Comparator<Setting> comparator = sortingComparator.get();
-
-	    System.out.println(comparator);
-
-	}
+	sortingComparator.ifPresent(System.out::println);
 
 	List<QuerySortOrder> sortOrders = query.getSortOrders();
 	System.out.println(sortOrders);

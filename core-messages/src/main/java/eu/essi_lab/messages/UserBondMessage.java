@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import java.io.Serial;
 import java.util.Optional;
 
 import eu.essi_lab.messages.bond.Bond;
@@ -37,6 +38,7 @@ public abstract class UserBondMessage extends RequestMessage {
     /**
      * 
      */
+    @Serial
     private static final long serialVersionUID = -2748397786444699512L;
     private static final String BOND = "bond";
 
@@ -57,7 +59,7 @@ public abstract class UserBondMessage extends RequestMessage {
      */
     public void setUserBond(Bond bond) {
 
-	getPayload().add(new GSProperty<Bond>(BOND, bond));
+	getPayload().add(new GSProperty<>(BOND, bond));
     }
 
 }

@@ -77,26 +77,33 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 
 		
 		<div id='timeseries' class="loading_div">
-		
-		 		<table width='30%'>
-				<tr><td class='station_table_headers_separator' colspan='2'></td></tr>
-				
-				<tr><td class='station_table_header' colspan='2'>Station/platform</td></tr>	
-				
-				<tr><td>Name</td><td id="station-name-td"></td></tr>
-				
-				<tr><td>Data publisher</td><td id="source-label-td"></td></tr>
-				
-				<tr><td>Territory of origin of data</td><td id="country-td"></td></tr>
-				
-				<tr><td>Inolved organizations</td><td id="originator-td"></td></tr>	
-				
-				<tr><td>Geospatial location</td><td id="geolocation-td"></td></tr>	
 
-				</table>
- 		
- 		
-		<div id="map"></div>
+			<div class="station-overview">
+				
+				<div class="station-meta">
+					<table class="station-meta-table">
+					<tr><td class='station_table_headers_separator' colspan='2'></td></tr>
+					
+					<tr><td class='station_table_header' colspan='2'>Station/platform</td></tr>	
+					
+					<tr><td>Name</td><td id="station-name-td"></td></tr>
+					
+					<tr><td>Data publisher</td><td id="source-label-td"></td></tr>
+					
+					<tr><td>Platform id</td><td id="platform_id_local"></td></tr>
+					
+					<tr><td>Territory of origin of data</td><td id="country-td"></td></tr>
+					
+					<tr><td>Involved organizations</td><td id="originator-td"></td></tr>	
+					
+					<tr><td>Geospatial location</td><td id="geolocation-td"></td></tr>	
+
+					</table>
+				</div>
+				<div class="station-map">
+					<div id="map"></div>
+				</div>
+			</div>
 		
 		
 		</div>

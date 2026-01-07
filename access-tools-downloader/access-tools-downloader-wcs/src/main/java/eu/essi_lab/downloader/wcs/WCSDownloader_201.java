@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.wcs;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,8 +34,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.accessor.wcs.WCSConnector;
 import eu.essi_lab.accessor.wcs_2_0_1.WCSConnector_201;
-import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
@@ -67,9 +66,7 @@ public class WCSDownloader_201 extends WCSDownloader {
     @Override
     public boolean canDownload() {
 
-	NetProtocol protocol = NetProtocols.decodeFromIdentifier(online.getProtocol());
-
-	return NetProtocols.WCS_2_0_1.equals(protocol);
+	return NetProtocolWrapper.check(online.getProtocol(), NetProtocolWrapper.WCS_2_0_1);
     }
 
     public String getVersionParameter() {
@@ -127,8 +124,8 @@ public class WCSDownloader_201 extends WCSDownloader {
 	Set<CRS> crses = new HashSet<>();
 	Node[] crsNodes;
 	try {
-	    crsNodes = coverage
-		    .evaluateNodes("*:CoverageDescriptions/*:CoverageDescription/*:domainSet/*:RectifiedGrid/*:offsetVector/@srsName");
+	    crsNodes = coverage.evaluateNodes(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:domainSet/*:RectifiedGrid/*:offsetVector/@srsName");
 
 	} catch (XPathExpressionException e) {
 	    return crses;
@@ -152,9 +149,9 @@ public class WCSDownloader_201 extends WCSDownloader {
 
 	String origin = null;
 	try {
-	    origin = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:domainSet/*:RectifiedGrid/*:origin/*:Point[@srsName='"
-			    + identifier + "']/*:pos");
+	    origin = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:domainSet/*:RectifiedGrid/*:origin/*:Point[@srsName='" + identifier
+			    + "']/*:pos");
 	} catch (XPathExpressionException e) {
 	}
 
@@ -275,8 +272,8 @@ public class WCSDownloader_201 extends WCSDownloader {
 	String dim1 = "";
 	String dim2 = "";
 	try {
-	    String spatialDimensionNames = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:boundedBy/*:Envelope[@srsName='" + crs.getIdentifier()
+	    String spatialDimensionNames = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:boundedBy/*:Envelope[@srsName='" + crs.getIdentifier()
 			    + "']/@axisLabels");
 	    String[] split = spatialDimensionNames.split(" ");
 	    dim1 = split[0];
@@ -307,8 +304,8 @@ public class WCSDownloader_201 extends WCSDownloader {
 	String dim1 = "";
 	String dim2 = "";
 	try {
-	    String spatialDimensionNames = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:boundedBy/*:Envelope[@srsName='" + crs.getIdentifier()
+	    String spatialDimensionNames = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:boundedBy/*:Envelope[@srsName='" + crs.getIdentifier()
 			    + "']/@axisLabels");
 	    String[] split = spatialDimensionNames.split(" ");
 	    dim1 = split[0];
@@ -365,8 +362,8 @@ public class WCSDownloader_201 extends WCSDownloader {
 	List<Double> resolutions = new ArrayList<>();
 
 	try {
-	    String res = coverage
-		    .evaluateString("*:CoverageDescriptions/*:CoverageDescription/*:domainSet/*:RectifiedGrid/*:offsetVector[1]");
+	    String res = coverage.evaluateString(
+		    "*:CoverageDescriptions/*:CoverageDescription/*:domainSet/*:RectifiedGrid/*:offsetVector[1]");
 	    String[] split = res.split(" ");
 	    for (String s : split) {
 		double d = Double.parseDouble(s);

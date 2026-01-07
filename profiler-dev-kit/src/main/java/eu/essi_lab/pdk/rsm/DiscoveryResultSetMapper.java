@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,6 @@ import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +36,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
 
 /**
  * Implementation specific to map a <code>ResultSet&ltGSResource&gt</code> in to a <code>ResultSet&ltT&gt</code>
@@ -131,21 +131,32 @@ public abstract class DiscoveryResultSetMapper<T>
 	List<String> ids = ConfigurationWrapper.getGDCSourceSetting().getSelectedSourcesIds();
 
 	//
-	// parallel mapping with a thread factory of unlimited virtual threads
+	// parallel mapping with a thread factory of unlimited virtual threads or
+	// limited platform threads
 	//
 
-	ThreadFactory factory = Thread.ofVirtual().//
+	ThreadFactory virtualFactory = Thread.ofVirtual().//
 		name(getClass().getSimpleName() + "@" + message.getRequestId(true)).//
 		factory();
 
-	ExecutorService executor = Executors.newThreadPerTaskExecutor(factory);
+	ThreadFactory platformFactory = Thread.ofPlatform().//
+		name(getClass().getSimpleName() + "@" + message.getRequestId(true)).//
+		factory();
+
+	ExecutorService executor = message.getResultSetMapperThreadsCount()
+		.map(count -> Executors.newFixedThreadPool(count, platformFactory))
+		.orElse(Executors.newThreadPerTaskExecutor(virtualFactory));
 
 	List<CompletableFuture<T>> futures = resultSet.getResultsList().//
 		stream().//
 		map(res -> CompletableFuture.supplyAsync(() -> map(message, res, ids), executor)).//
 		toList();
 
-	List<T> out = futures.stream().map(CompletableFuture::join).toList();
+	List<T> out = futures.//
+		stream().//
+		map(CompletableFuture::join).//
+		collect(Collectors.toList());//
+
 	mappedResSet.setResultsList(out);
 
 	//
@@ -205,7 +216,7 @@ public abstract class DiscoveryResultSetMapper<T>
 	try {
 
 	    // optionally consumes the resource
-	    message.getResourceConsumer().ifPresent(c -> c.accept(res));
+	    message.getResourceConsumer().ifPresent(c -> c.consume(res, message));
 
 	    return map(message, res);
 

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.cdi;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -59,7 +59,8 @@ public abstract class CDIValidator {
 	try {
 	    URL schemaURL = getSchemaURL();
 	    // XSD validation
-	    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+	    SchemaFactory schemaFactory = XMLFactories.newSchemaFactory();
+
 	    Schema schema = schemaFactory.newSchema(schemaURL);
 	    this.schemaValidator = schema.newValidator();
 	} catch (Exception e) {

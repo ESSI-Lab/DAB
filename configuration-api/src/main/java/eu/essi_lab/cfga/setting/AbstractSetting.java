@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.setting;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
     /**
      *
      */
-    public static final Property<Boolean> COMPACT_MODE = Property.of("CompactMode", "compactMode", true, Optional.of(true)); //
+    public static final Property<Boolean> COMPACT_MODE = Property.of("CompactMode", "compactMode", true, Optional.of(false)); //
     /**
      *
      */
@@ -190,7 +190,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void enableCompactMode(boolean set) {
 
-	setProperty(COMPACT_MODE.getKey(), set, true);
+	setProperty(COMPACT_MODE.getKey(), set, COMPACT_MODE.getDefaultValue().get());
     }
 
     /**
@@ -198,7 +198,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean isCompactModeEnabled() {
 
-	return isPropertySet(COMPACT_MODE.getKey(), true);
+	return isPropertySet(COMPACT_MODE.getKey(), COMPACT_MODE.getDefaultValue().get());
     }
 
     /**
@@ -207,7 +207,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void enableFoldedMode(boolean set) {
 
-	setProperty(FOLDED_MODE.getKey(), set, false);
+	setProperty(FOLDED_MODE.getKey(), set, FOLDED_MODE.getDefaultValue().get());
     }
 
     /**
@@ -215,7 +215,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean isFoldedModeEnabled() {
 
-	return isPropertySet(FOLDED_MODE.getKey(), false);
+	return isPropertySet(FOLDED_MODE.getKey(), FOLDED_MODE.getDefaultValue().get());
     }
 
     /**
@@ -225,7 +225,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setCanBeRemoved(boolean canBeRemoved) {
 
-	setProperty(CAN_BE_REMOVED.getKey(), canBeRemoved, false);
+	setProperty(CAN_BE_REMOVED.getKey(), canBeRemoved, CAN_BE_REMOVED.getDefaultValue().get());
     }
 
     /**
@@ -233,7 +233,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean canBeRemoved() {
 
-	return isPropertySet(CAN_BE_REMOVED.getKey(), false);
+	return isPropertySet(CAN_BE_REMOVED.getKey(), CAN_BE_REMOVED.getDefaultValue().get());
     }
 
     /**
@@ -241,7 +241,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setCanBeCleaned(boolean canBeCleaned) {
 
-	setProperty(CAN_BE_CLEANED.getKey(), canBeCleaned, true);
+	setProperty(CAN_BE_CLEANED.getKey(), canBeCleaned, CAN_BE_CLEANED.getDefaultValue().get());
     }
 
     /**
@@ -249,7 +249,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean canBeCleaned() {
 
-	return isPropertySet(CAN_BE_CLEANED.getKey(), true);
+	return isPropertySet(CAN_BE_CLEANED.getKey(), CAN_BE_CLEANED.getDefaultValue().get());
     }
 
     /**
@@ -257,7 +257,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public void setShowHeader(boolean showHeader) {
 
-	setProperty(SHOW_HEADER.getKey(), showHeader, true);
+	setProperty(SHOW_HEADER.getKey(), showHeader, SHOW_HEADER.getDefaultValue().get());
     }
 
     /**
@@ -265,7 +265,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
      */
     public boolean isShowHeaderSet() {
 
-	return isPropertySet(SHOW_HEADER.getKey(), true);
+	return isPropertySet(SHOW_HEADER.getKey(), SHOW_HEADER.getDefaultValue().get());
     }
 
     /**
@@ -277,14 +277,18 @@ public abstract class AbstractSetting extends ConfigurationObject {
 
 	try {
 
-	    Class<?> clazz = Class.forName(getObject().getString(EXTENSION.getKey()));
+	    if (getObject().has(EXTENSION.getKey())) {
 
-	    if (extension.isAssignableFrom(clazz)) {
+		Class<?> clazz = Class.forName(getObject().getString(EXTENSION.getKey()));
 
-		return Optional.of((T) Class.forName(getObject().getString(EXTENSION.getKey())).getDeclaredConstructor().newInstance());
+		if (extension.isAssignableFrom(clazz)) {
+
+		    return Optional.of((T) Class.forName(getObject().getString(EXTENSION.getKey())).getDeclaredConstructor().newInstance());
+		}
 	    }
 
 	} catch (Exception e) {
+
 	    GSLoggerFactory.getLogger(getClass()).warn(e.getMessage(), e);
 	}
 
@@ -302,7 +306,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
     /**
      * @return
      */
-    public Optional<Class<? extends ObjectExtension>> getOptionalExtensionClass() {
+    public Optional<Class<? extends ObjectExtension>> getExtensionClass() {
 
 	if (getObject().has(EXTENSION.getKey())) {
 

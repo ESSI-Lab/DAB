@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond.parser;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,13 +39,13 @@ import eu.essi_lab.model.resource.ResourceProperty;
  */
 public class SourceBondHandler implements DiscoveryBondHandler {
 
-    List<ResourcePropertyBond> sourceBonds = new ArrayList<>();
+    final List<ResourcePropertyBond> sourceBonds = new ArrayList<>();
 
     public List<ResourcePropertyBond> getSourceBonds() {
 	return sourceBonds;
     }
 
-    List<String> sourceIdentifiers = new ArrayList<>();
+    final List<String> sourceIdentifiers = new ArrayList<>();
 
     public List<String> getSourceIdentifiers() {
 	return sourceIdentifiers;

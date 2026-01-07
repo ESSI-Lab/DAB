@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,24 +21,18 @@ package eu.essi_lab.cfga.gui.components;
  * #L%
  */
 
-import java.util.Optional;
+import java.util.*;
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.tabs.Tabs.Orientation;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
-import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
-import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
+import eu.essi_lab.cfga.gui.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 
 /**
  * @author Fabrizio
@@ -46,21 +40,14 @@ import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
 public class ConfigurationViewFactory {
 
     /**
-     * 
+     * @return
      */
-    private static final float TAB_WIDTH = 1200;
-    static final String TAB_HEADER_ID_PREFIX = "tabHeader";
-
-    /**     * @return
-     */
-    public static HorizontalLayout createConfigurationViewNavBarContentLayout() {
+    public static HorizontalLayout createHeaderLayout() {
 
 	HorizontalLayout navbarContent = new HorizontalLayout();
 	navbarContent.setWidthFull();
-	navbarContent.getStyle().set("padding-bottom", "15px");
-	navbarContent.getStyle().set("padding-left", "15px");
+	navbarContent.getStyle().set("padding-left", "30px");
 	navbarContent.getStyle().set("padding-right", "15px");
-	navbarContent.getStyle().set("padding-top", "0px");
 
 	return navbarContent;
     }
@@ -68,10 +55,9 @@ public class ConfigurationViewFactory {
     /**
      * @return
      */
-    public static TabsWithContent createConfigurationViewTabs() {
+    public static VerticalTabs createTabs() {
 
-	TabsWithContent tabs = new TabsWithContent();
-	tabs.setOrientation(Tabs.Orientation.VERTICAL);
+	VerticalTabs tabs = new VerticalTabs();
 	tabs.getStyle().set("padding-left", "15px");
 
 	return tabs;
@@ -80,79 +66,85 @@ public class ConfigurationViewFactory {
     /**
      * @param orientation
      * @param tabName
-     * @param removeDirective 
-     * @param editDirective 
+     * @param removeDirective
+     * @param editDirective
      * @param addDirectives
      * @return
      */
-    public static TabContainer createConfigurationViewTabContainer(//
+    public static Renderable createTabContent(//
+	    ConfigurationView view,//
 	    Configuration configuration, //
-	    Orientation orientation, //
-	    String tabName, //
-	    Optional<AddDirective> addDirective,//
-	    Optional<RemoveDirective> removeDirective,//
-	    Optional<EditDirective> editDirective) {
+	    TabDescriptor tabDescriptor) {
 
-	TabContainer layout = null;
+	Renderable content = null;
 
-	switch (orientation) {
-	case HORIZONTAL:
+	List<TabContentDescriptor> descriptors = tabDescriptor.getContentDescriptors();
 
-	    HorizontalLayout horizontalLayout = new HorizontalLayout();
-	    // horizontalLayout.getStyle().set("border", "1px solid black");
-	    horizontalLayout.setWidth("100%");
-	    // horizontalLayout.setHeight("100%");
+	if (descriptors.size() == 1) {
 
-	    // layout = horizontalLayout;
+	    TabContentDescriptor descriptor = descriptors.getFirst();
 
-	    break;
+	    content = createTabContent(descriptor, configuration, view, tabDescriptor);
 
-	case VERTICAL:
+	    content.getComponent().getElement().getStyle().set("overflow-y", "auto");
 
-	    TabContainer container = ComponentFactory
-		    .createNoSpacingNoMarginTabContainer("tab-container-vertical-layout-for-" + tabName);
-	  
-	    container.setRemoveDirective(removeDirective);
-	    container.setEditDirective(editDirective);
+	} else {
 
-//	    container.setWidth(TAB_WIDTH, Unit.PIXELS);
-	    container.getStyle().set("margin-bottom", "50px");
+	    TabSheetContent tabSheet = new TabSheetContent();
 
-	    HorizontalLayout headerLayout = ComponentFactory
-		    .createNoSpacingNoMarginHorizontalLayout("tab-container-header-layout-for-" + tabName);
-	    headerLayout.setHeight("45px");
-	    headerLayout.setWidthFull();
-	    headerLayout.setAlignItems(Alignment.BASELINE);
-	    headerLayout.setId(TAB_HEADER_ID_PREFIX+"_"+tabName);
+	    descriptors.forEach(desc -> tabSheet.add( //
+		    desc.getLabel(), //
+		    createTabContent(desc, configuration, view, tabDescriptor)));
 
-	    container.add(headerLayout);
+	    tabSheet.setRendered(true);
 
-	    //
-	    //
-	    //
-
-	    Label label = new Label();
-	    label.setWidthFull();
-	    label.setText(tabName);
-	    label.getStyle().set("font-size", "30px");
-	    label.getStyle().set("color", "black");
-
-	    headerLayout.add(label);
-
-	    //
-	    //
-	    //
-
-	    if (addDirective.isPresent()) {
-
-		Button addButton = SettingComponentFactory.createSettingAddButton(configuration, container, addDirective.get());
-		headerLayout.add(addButton);
-	    }
-
-	    layout = container;
+	    content = tabSheet;
 	}
 
-	return layout;
+	return content;
+    }
+
+    /**
+     * @param descriptor
+     * @param configuration
+     * @param view
+     * @param componentInfo
+     * @param tabDescriptor
+     * @return
+     */
+    private static TabContent createTabContent(//
+	    TabContentDescriptor descriptor,//
+	    Configuration configuration, //
+	    ConfigurationView view,//
+	    TabDescriptor tabDescriptor) {
+
+	TabContent content = ComponentFactory.createTabContent("tab-content-vertical-layout-for-" + descriptor.getLabel());
+
+	content.init(configuration, descriptor, tabDescriptor);
+
+	content.render();
+
+	return content;
+    }
+
+    /**
+     * @param listener
+     * @return
+     */
+    public static Button createLogoutButton(LogOutButtonListener listener) {
+
+	CustomButton logoutButton = new CustomButton(VaadinIcon.SIGN_OUT.create());
+
+	logoutButton.addThemeVariants(ButtonVariant.LUMO_LARGE);
+	logoutButton.addClickListener(listener);
+	logoutButton.setTooltip("Logout");
+
+	logoutButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%");
+	logoutButton.getStyle().set("margin-left", "0px");
+	logoutButton.getStyle().set("background-color", "white");
+	logoutButton.getStyle().set("margin-right", "-15px");
+
+	return logoutButton;
     }
 
     /**

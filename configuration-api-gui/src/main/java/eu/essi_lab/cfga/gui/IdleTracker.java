@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -200,8 +200,6 @@ public class IdleTracker {
      */
     private NotificationDialog initDialog() {
 
-	NotificationDialog dialog = NotificationDialog.getWarningDialog("Session expired due to long inactivity", 400);
-
 	// dialog.addDialogCloseActionListener(new ComponentEventListener<Dialog.DialogCloseActionEvent>() {
 	//
 	// @Override
@@ -241,6 +239,6 @@ public class IdleTracker {
 	// }
 	// });
 
-	return dialog;
+	return NotificationDialog.getWarningDialog("Session expired due to long inactivity", 400);
     }
 }

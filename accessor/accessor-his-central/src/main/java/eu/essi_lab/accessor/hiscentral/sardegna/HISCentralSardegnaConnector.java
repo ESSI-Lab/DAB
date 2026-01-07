@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.hiscentral.sardegna;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -67,16 +67,16 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
      * 
      */
 
-    static final String STATIONS_URL = "getStations";
+    static final String STATIONS_URL = "anagrafiche/stazioni/getStations";
     // getLITStations- livelli idrometrici station
     // getTCIStations - temperature
 
-    static final String METADATI = "getMetadati";
+    static final String METADATI = "anagrafiche/metadati/getMetadati";
     /**
      * 
      */
 
-    public static final String BASE_URL = "https://devapi.arpasambiente.it/";
+    public static final String BASE_URL = "https://api.arpasambiente.it/";
 
     private static final String HIS_CENTRAL_SARDEGNA_CONNECTOR_DOWNLOAD_ERROR = "HIS_CENTRAL_SARDEGNA_CONNECTOR_DOWNLOAD_ERROR";
 
@@ -322,7 +322,7 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
     @Override
     public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
-	return endpoint.contains("eu-central-1.aws.data.mongodb-api.com") || endpoint.contains("devapi.arpasambiente.it");
+	return endpoint.contains("eu-central-1.aws.data.mongodb-api.com") || endpoint.contains("arpasambiente.it");
     }
 
     @Override

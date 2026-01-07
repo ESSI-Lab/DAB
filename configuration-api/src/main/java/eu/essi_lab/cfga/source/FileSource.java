@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.source;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.lib.utils.*;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,9 +44,6 @@ import com.google.common.base.Charsets;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 /**
  * @author Fabrizio
@@ -55,10 +53,10 @@ public class FileSource implements ConfigurationSource {
     private final File source;
 
     /**
-     * Uses {@link File#createTempFile(String, String)} with "config" and ".json" as params.<br>
-     * Since according to the {@link File#createTempFile(String, String)} the file name has a random prefix, use this
-     * constructor for test purpose when it is not required to reuse a flushed source
-     * 
+     * Uses {@link File#createTempFile(String, String)} with "config" and ".json" as params.<br> Since according to the
+     * {@link File#createTempFile(String, String)} the file name has a random prefix, use this constructor for test purpose when it is not
+     * required to reuse a flushed source
+     *
      * @throws IOException
      */
     public FileSource() throws IOException {
@@ -67,9 +65,8 @@ public class FileSource implements ConfigurationSource {
     }
 
     /**
-     * Creates a new file source in the <code>System.getProperty("java.io.tmpdir")</code> directory and creates
-     * a file having as prefix <code>sourceName</code> and ".json" as suffix
-     *
+     * Creates a new file source in the <code>System.getProperty("java.io.tmpdir")</code> directory and creates a file having as prefix
+     * <code>sourceName</code> and ".json" as suffix
      */
     public FileSource(String configFileName) {
 
@@ -104,16 +101,17 @@ public class FileSource implements ConfigurationSource {
     }
 
     /**
-     * Creates a clone of the given <code>configuration</code> having a local File System source located
-     * in the user temp directory
-     * 
+     * Creates a clone of the given <code>configuration</code> having a local File System source located in the given
+     * <code>configFolder</code>
+     *
      * @param configuration
+     * @param configFolder
      * @return
      * @throws Exception
      */
-    public static Configuration switchSource(Configuration configuration) throws Exception {
+    public static Configuration switchSource(Configuration configuration, File configFolder) throws Exception {
 
-	File localFile = File.createTempFile("gs-configuration", ".json");
+	File localFile = new File(configFolder, "gs-configuration.json");
 	String configString = configuration.toString();
 
 	FileOutputStream fileOutputStream = new FileOutputStream(localFile);
@@ -125,6 +123,18 @@ public class FileSource implements ConfigurationSource {
 
 	FileSource fileSource = new FileSource(localFile);
 	return new Configuration(fileSource);
+    }
+
+    /**
+     * Creates a clone of the given <code>configuration</code> having a local File System source located in the user temp directory
+     *
+     * @param configuration
+     * @return
+     * @throws Exception
+     */
+    public static Configuration switchSource(Configuration configuration) throws Exception {
+
+	return switchSource(configuration, FileUtils.getTempDir());
     }
 
     @Override
@@ -337,7 +347,7 @@ public class FileSource implements ConfigurationSource {
 
 	String name = FilenameUtils.removeExtension(source.getName());
 
-	String date = ISO8601DateTimeUtils.getISO8601DateTime().//
+	String date = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds().//
 		replace("-", "_").//
 		replace(":", "_").//
 		replace(".", "");

@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.user_reg;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import eu.essi_lab.authorization.userfinder.UserFinder;
-import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.auth.GSUser;
@@ -253,7 +253,7 @@ public class HISUserRegistration {
 	System.out.println("Sending mail to: " + recipient);
 	System.out.println(message);
 
-	return ConfiguredGmailClient.sendEmail(subject, message, recipient);
+	return ConfiguredSMTPClient.sendEmail(subject, message, recipient);
     }
 
     public GSUser addUser() throws Exception {

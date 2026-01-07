@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.sos.bom;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,12 +23,12 @@ package eu.essi_lab.accessor.sos.bom;
 
 import eu.essi_lab.accessor.sos.SOSConnector;
 import eu.essi_lab.accessor.sos.downloader.SOSDownloader;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 
 public class SOSBOMDownloader extends SOSDownloader {
     @Override
     public String getSupportedProtocol() {
-	return NetProtocols.SOS_2_0_0_BOM.getCommonURN();
+	return NetProtocolWrapper.SOS_2_0_0_BOM.getCommonURN();
     }
 
     @Override

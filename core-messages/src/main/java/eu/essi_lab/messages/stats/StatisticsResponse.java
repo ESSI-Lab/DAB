@@ -7,7 +7,7 @@ package eu.essi_lab.messages.stats;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,6 @@ package eu.essi_lab.messages.stats;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +72,7 @@ public class StatisticsResponse extends DOMSerializer {
 	}
     }
 
-    @XmlAttribute(name = "groupBy", required = false)
+    @XmlAttribute(name = "groupBy")
     private String groupBy;
 
     @XmlAttribute(name = "itemsCount", required = true)
@@ -83,7 +82,7 @@ public class StatisticsResponse extends DOMSerializer {
     private int startIndex;
 
     @XmlTransient
-    private List<ResponseItem> itemsList;
+    private final List<ResponseItem> itemsList;
 
     /**
      * 
@@ -97,7 +96,7 @@ public class StatisticsResponse extends DOMSerializer {
      * @param groupBy
      */
     public StatisticsResponse(String groupBy) {
-	itemsList = new ArrayList<ResponseItem>();
+	itemsList = new ArrayList<>();
 	if (groupBy != null) {
 	    setGroupBy(groupBy);
 	}
@@ -190,8 +189,8 @@ public class StatisticsResponse extends DOMSerializer {
 
 		    String[] split = groupedBy.split(ResponseItem.ITEMS_RANGE_SEPARATOR);
 
-		    String start = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.valueOf(split[0])));
-		    String end = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.valueOf(split[1])));
+		    String start = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.parseLong(split[0])));
+		    String end = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.parseLong(split[1])));
 
 		    item.setGroupedBy(start + ResponseItem.ITEMS_RANGE_SEPARATOR + end);
 
@@ -241,8 +240,8 @@ public class StatisticsResponse extends DOMSerializer {
 		//
 		// sorts and reduce the list size
 		//
-		List<String> list = Arrays.asList(value.split(" ")).//
-		stream().//
+		//
+		List<String> list = Arrays.stream(value.split(" ")).//
 		sorted((v1, v2) -> {
 
 		    Integer freq1 = Integer.valueOf(v1.split(ComputationResult.FREQUENCY_ITEM_SEP)[1]);
@@ -265,12 +264,8 @@ public class StatisticsResponse extends DOMSerializer {
 		    String freq = e.split(ComputationResult.FREQUENCY_ITEM_SEP)[1];
 
 		    Optional<String> location = RegionsManager.getURLEncodedLocation(bbox);
-		    if (location.isPresent()) {
+		    return location.map(s -> s + ComputationResult.FREQUENCY_ITEM_SEP + freq).orElse(null);
 
-			return location.get() + ComputationResult.FREQUENCY_ITEM_SEP + freq;
-		    }
-
-		    return null;
 		}).//
 		filter(Objects::nonNull).//
 		collect(Collectors.joining(" "));
@@ -284,9 +279,8 @@ public class StatisticsResponse extends DOMSerializer {
      * @param stream
      * @return
      * @throws JAXBException
-     * @throws UnsupportedEncodingException
      */
-    public static StatisticsResponse create(String string) throws JAXBException, UnsupportedEncodingException {
+    public static StatisticsResponse create(String string) throws JAXBException {
 
 	return new StatisticsResponse() {
 	}.fromStream(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
@@ -345,7 +339,7 @@ public class StatisticsResponse extends DOMSerializer {
     }
 
     @Override
-    protected Object getElement() throws JAXBException {
+    protected Object getElement() {
 
 	return this;
     }

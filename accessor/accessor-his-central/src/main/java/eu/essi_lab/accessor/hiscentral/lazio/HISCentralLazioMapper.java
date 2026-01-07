@@ -1,10 +1,12 @@
 package eu.essi_lab.accessor.hiscentral.lazio;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -155,8 +157,8 @@ public class HISCentralLazioMapper extends FileIdentifierMapper {
 	
 	
 
-	Double pointLon = datasetInfo.optDouble("longitude");
-	Double pointLat = datasetInfo.optDouble("latitude");
+	BigDecimal pointLon = datasetInfo.optBigDecimal("longitude", null);
+	BigDecimal pointLat = datasetInfo.optBigDecimal("latitude", null);
 	Double altitude = datasetInfo.optDouble("altitude");
 	
 	String locality = datasetInfo.optString("locality");
@@ -301,11 +303,14 @@ public class HISCentralLazioMapper extends FileIdentifierMapper {
 	referenceSystem.setCodeSpace("EPSG");
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 	
-	coreMetadata.addBoundingBox(//
-		pointLat, //
-		pointLon, //
-		pointLat, //
-		pointLon);
+	if (pointLat != null && pointLon != null) {
+	    coreMetadata.addBoundingBox(//
+		    pointLat, //
+		    pointLon, //
+		    pointLat, //
+		    pointLon);
+	}
+
 
 	// vertical extent
 	coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(altitude, altitude);

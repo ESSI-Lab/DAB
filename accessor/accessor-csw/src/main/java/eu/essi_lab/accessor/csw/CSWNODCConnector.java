@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -149,7 +149,7 @@ public class CSWNODCConnector extends CSWGetConnector {
 
 		    GSLoggerFactory.getLogger(getClass()).info("Global metadata found: {}", requestURL);
 
-		    Optional<S3TransferWrapper> optS3TransferManager = ConfigurationWrapper.getS3TransferManager();
+		    Optional<S3TransferWrapper> optS3TransferManager = ConfigurationWrapper.getS3TransferWrapper();
 
 		    if (optS3TransferManager.isPresent()) {
 

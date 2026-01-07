@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw.mapper;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,7 @@ import eu.essi_lab.iso.datamodel.classes.MDMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.ComparableEntry;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -134,7 +134,7 @@ public class AGAMEMapper extends FileIdentifierMapper {
 	    for (String s : listUrl) {
 		Online online = new Online();
 		online.setLinkage(s);
-		online.setProtocol(NetProtocols.HTTP.getCommonURN());
+		online.setProtocol(NetProtocolWrapper.HTTP.getCommonURN());
 		online.setFunctionCode("information");
 		online.setDescription("DATASET LINK");
 

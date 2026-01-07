@@ -4,7 +4,7 @@ package eu.essi_lab.messages.web;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,6 @@ public interface StreamParser {
      * @param stream the stream to parse
      * @return a key/value map possible empty in case of error or if the stream is not parsable in a key/value map
      */
-    public Map<String, String> getKeyValueMap(InputStream inputStream);
+    Map<String, String> getKeyValueMap(InputStream inputStream);
 
 }

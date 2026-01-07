@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.usgswatersrv;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,7 +57,7 @@ import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.jaxb.wms._1_3_0.Keyword;
 import eu.essi_lab.lib.net.protocols.NetProtocol;
-import eu.essi_lab.lib.net.protocols.NetProtocols;
+import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
@@ -472,7 +472,7 @@ public class USGSMapper extends OriginalIdentifierMapper {
 
 	    if (dataTypeCode != null && (dataTypeCode.equals("iv") || dataTypeCode.equals("uv") || dataTypeCode.equals("rt"))) {
 
-		protocol = NetProtocols.USGS_IV;
+		protocol = NetProtocolWrapper.USGS_IV.get();
 		linkage = USGSClient.DEFAULT_IV_URL;
 		mangler.setTimeSeries(timeSeriesId);
 		mangler.setParameterIdentifier(parameterCode);
@@ -482,7 +482,7 @@ public class USGSMapper extends OriginalIdentifierMapper {
 
 	    if (dataTypeCode != null && dataTypeCode.equals("dv")) {
 
-		protocol = NetProtocols.USGS_DV;
+		protocol = NetProtocolWrapper.USGS_DV.get();
 		linkage = USGSClient.DEFAULT_DV_URL;
 		mangler.setParameterIdentifier(parameterCode);
 		mangler.setStatisticalCode(statisticalCode);

@@ -1,13 +1,12 @@
 package eu.essi_lab.cfga.gui.components.option.listener;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,8 +23,6 @@ import java.util.Collection;
  * #L%
  */
 
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.HasValue;
@@ -36,6 +33,7 @@ import eu.essi_lab.cfga.gui.components.option.OptionDoubleField;
 import eu.essi_lab.cfga.gui.components.option.OptionIntegerField;
 import eu.essi_lab.cfga.gui.components.option.OptionTextArea;
 import eu.essi_lab.cfga.gui.components.option.OptionTextField;
+import eu.essi_lab.cfga.option.BooleanChoice;
 import eu.essi_lab.cfga.option.ISODateTime;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -47,7 +45,7 @@ import eu.essi_lab.lib.utils.LabeledEnum;
 @SuppressWarnings("serial")
 public class OptionValueChangeListener extends AbstractValueChangeListener {
 
-    private Option<?> option;
+    private final Option<?> option;
 
     /**
      * @param option
@@ -78,11 +76,9 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 	//
 	// Single value from a text field
 	//
-	if (hasValue instanceof OptionTextField) {
+	if (hasValue instanceof OptionTextField field) {
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Single value from a restricted text field");
-
-	    OptionTextField field = (OptionTextField) hasValue;
 
 	    //
 	    // the second case is required to support the clear button
@@ -103,11 +99,9 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 	//
 	// Single value from a text area
 	//
-	if (hasValue instanceof OptionTextArea) {
+	if (hasValue instanceof OptionTextArea area) {
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Single value from a restricted text field");
-
-	    OptionTextArea area = (OptionTextArea) hasValue;
 
 	    //
 	    //
@@ -127,11 +121,9 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 	//
 	// Single value from an integer field
 	//
-	if (hasValue instanceof OptionIntegerField) {
+	if (hasValue instanceof OptionIntegerField field) {
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Single value from an integer field");
-
-	    OptionIntegerField field = (OptionIntegerField) hasValue;
 
 	    //
 	    // the second case is required to support the clear button
@@ -152,11 +144,9 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 	//
 	// Single value from an double field
 	//
-	if (hasValue instanceof OptionDoubleField) {
+	if (hasValue instanceof OptionDoubleField field) {
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Single value from a double field");
-
-	    OptionDoubleField field = (OptionDoubleField) hasValue;
 
 	    //
 	    // the second case is required to support the clear button
@@ -193,16 +183,14 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Single labeled enum value from a select");
 
-	    if (value instanceof Collection<?>) {
-
-		Collection<?> col = (Collection<?>) value;
+	    if (value instanceof Collection<?> col) {
 
 		@SuppressWarnings("unchecked")
 		List<LabeledEnum> list = col.stream().map(val -> (LabeledEnum) LabeledEnum.valueOf(//
 			(Class<? extends LabeledEnum>) valueClass, //
 			val.toString()).get()).toList();
 
-		option.select(v -> list.contains(v));
+		option.select(list::contains);
 
 		List<?> selectedValues = option.getSelectedValues();
 		if (!list.isEmpty() && selectedValues.isEmpty()) {
@@ -212,14 +200,22 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 
 	    } else {
 
-		@SuppressWarnings({ "unchecked" })
-		LabeledEnum enumValue = (LabeledEnum) LabeledEnum.valueOf(//
-			(Class<? extends LabeledEnum>) valueClass, //
-			value.toString()).get();
+		if (value instanceof Boolean bool) {
 
-		option.select(v -> v.equals(enumValue));
+		    option.select(v -> v.equals(BooleanChoice.fromBoolean(bool)));
+
+		} else {
+
+		    @SuppressWarnings({ "unchecked" })
+		    LabeledEnum enumValue = LabeledEnum.valueOf(//
+			    (Class<? extends LabeledEnum>) valueClass, //
+			    value.toString()).get();
+
+		    option.select(v -> v.equals(enumValue));
+		}
 
 		Object selectedValue = option.getSelectedValue();
+
 		if (selectedValue == null) {
 
 		    GSLoggerFactory.getLogger(getClass()).warn("Selection failed for option {}", option.getKey());
@@ -232,9 +228,7 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 	//
 	// Single enum value from a select
 	//
-	if (Enum.class.isAssignableFrom(valueClass))
-
-	{
+	if (Enum.class.isAssignableFrom(valueClass)) {
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Single enum value from a select");
 
@@ -264,7 +258,7 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 		    map(v -> castObjectValue(valueClass, v)).//
 		    collect(Collectors.toSet());
 
-	    option.select(v -> set.contains(v));
+	    option.select(set::contains);
 
 	    List<?> selectedValues = option.getSelectedValues();
 	    if (selectedValues.isEmpty()) {
@@ -322,9 +316,9 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 
 	    if (option.isMultiValue()) {
 
-		List<Integer> values = Arrays.asList(value.toString().split(",")).//
-			stream().//
-			map(v -> Integer.valueOf(v)).//
+		//
+		List<Integer> values = Arrays.stream(value.toString().split(",")).//
+			map(Integer::valueOf).//
 			collect(Collectors.toList());
 
 		option.setObjectValues(values);
@@ -339,9 +333,7 @@ public class OptionValueChangeListener extends AbstractValueChangeListener {
 
 	    if (option.isMultiValue()) {
 
-		List<String> values = Arrays.asList(value.toString().split(",")).//
-			stream().//
-			collect(Collectors.toList());
+		List<String> values = new ArrayList<>(Arrays.asList(value.toString().split(",")));
 
 		option.setObjectValues(values);
 
