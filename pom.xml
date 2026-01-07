@@ -176,7 +176,7 @@
         <jax-ws-rs-api.version>2.1.1</jax-ws-rs-api.version>
 
         <!-- JAX WS API (commented Jakarta EE 9 dep) -->
-        <!-- <jakarta.xml.ws-api.version>4.0.1</jakarta.xml.ws-api.version> -->
+        <!-- <jakarta.xml.ws-api.version>4.0.1</jakarta.xml.ws-api.version > -->
         <jax-ws-api.version>2.3.1</jax-ws-api.version>
 
         <!-- JAX XML SOAP API-->
