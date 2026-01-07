@@ -25,6 +25,7 @@
 		<module>gs-lib-eiffel-api</module>
 		<module>gs-lib-sensor-things</module>
 		<module>gs-lib-skos</module>
-	</modules>
+        <module>gs-lib-kafka</module>
+    </modules>
 
 </project>

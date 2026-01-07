@@ -291,6 +291,9 @@
         <!-- ROME -->
         <com.rometools.rome.version>2.1.0</com.rometools.rome.version>
 
+        <!-- Apache Kafka Clients -->
+        <kafka-clients.version>4.1.0</kafka-clients.version>
+
         <!-- Javax mail -->
         <!-- Relocated to Jakarta Mail API -->
         <javax.mail-api.version>1.6.2</javax.mail-api.version>
@@ -1434,6 +1437,12 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson-core.version}</version>
+            </dependency>
+
+              <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka-clients.version}</version>
             </dependency>
 
         </dependencies>
