@@ -234,19 +234,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	try {
 
-	    // checks result window size
-	    Page page = getPage(request);
-	    int winSize = page.getStart() + page.getSize();
-	    if (winSize > Database.MAX_RESULT_WINDOW_SIZE) {
-
-		message.setResult(ValidationResult.VALIDATION_FAILED);
-		message.setError(
-			"Result window is too large, start index + count must be less than or equal to: " + Database.MAX_RESULT_WINDOW_SIZE
-				+ " but was " + winSize);
-
-		return message;
-	    }
-
 	    // checks the sources param
 	    OSParameter sourceParam = WebRequestParameter.findParameter(OSParameters.SOURCES.getName(), OSParameters.class);
 
@@ -580,6 +567,12 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	int startIndex = Integer.parseInt(parser.parse(OSParameters.START_INDEX));
 	int count = Integer.parseInt(parser.parse(OSParameters.COUNT));
+
+ 	int winSize = startIndex + count;
+	if (winSize > Database.MAX_RESULT_WINDOW_SIZE) {
+
+	    startIndex = Database.MAX_RESULT_WINDOW_SIZE -  count;
+	}
 
 	return new Page(startIndex, count);
     }
