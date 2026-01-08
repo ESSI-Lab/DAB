@@ -181,6 +181,7 @@ public class SettingComponent extends Div {
 	if (setting.isFoldedModeEnabled()) {
 
 	    this.details = ComponentFactory.createDetails(setting.getName(), this);
+	    this.details.setId("setting-component-" + getSetting().getName());
 	}
 
 	init(comparator);
