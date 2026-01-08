@@ -214,7 +214,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    switch (mode) {
 	    case BATCH, AUGMENTER, BULK -> {
 
-		if (schedulerSetting.equals(ConfigurationWrapper.getSchedulerSetting())) {
+		if (!schedulerSetting.equals(ConfigurationWrapper.getSchedulerSetting())) {
 
 		    GSLoggerFactory.getLogger(DABStarter.class).info("Detected scheduler setting changes");
 		    GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler STARTED");
