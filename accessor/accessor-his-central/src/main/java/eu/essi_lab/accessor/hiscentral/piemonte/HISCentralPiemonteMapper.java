@@ -24,9 +24,12 @@ import java.math.BigDecimal;
  */
 
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import eu.essi_lab.model.ratings.RatingCurves;
+import org.cuahsi.waterml._1.LatLonLineString;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -147,6 +150,21 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 	dataset.setSource(source);
 
 	mapMetadata(originalMD, dataset);
+
+	Iterator<Online> onlines = dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution()
+		.getDistributionOnlines();
+
+	while (onlines.hasNext()) {
+	    Online online = onlines.next();
+	    if (online.getProtocol() != null && online.getProtocol() .equals(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI)) {
+		HISCentralPiemonteClient client = new HISCentralPiemonteClient(online.getLinkage());
+		RatingCurves ratingCurves = client.getRatingCurves("&format=json");
+		if (ratingCurves == null || (ratingCurves != null && ratingCurves.getCurves().isEmpty())) {
+		    return null;
+		}
+	    }
+
+	}
 
 	return dataset;
     }
@@ -493,7 +511,6 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		if (m != null && m.equals(PIEMONTE_Variable.SCALADEFLUSSO)) {
 		    puntoMisuraUrl = puntoMisuraUrl.replace("punti_misura_idro", getDataParam);
 		    puntoMisuraUrl = puntoMisuraUrl + "?" + varType + "=" + lastPath;
-		    HISCentralPiemonteClient client = new HISCentralPiemonteClient(puntoMisuraUrl);
 		    coreMetadata.addDistributionOnlineResource(identifier, puntoMisuraUrl,
 			    CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI, "download");
 
@@ -607,8 +624,8 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
-	    if ((pId.equals("VELV") || paramId.equals("VELS"))
-		    && (PIEMONTE_Variable.VMEDIA.name().equals(paramId) || PIEMONTE_Variable.VRAFFICA.name().equals(paramId))) {
+	    if ((pId.equals("VELV") || paramId.equals("VELS")) && (PIEMONTE_Variable.VMEDIA.name().equals(paramId)
+		    || PIEMONTE_Variable.VRAFFICA.name().equals(paramId))) {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
@@ -620,8 +637,8 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
-	    if (pId.equals("PORTATA") && (PIEMONTE_Variable.PORTATA.name().equals(paramId)
-		    || PIEMONTE_Variable.PORTATA1.name().equals(paramId) || PIEMONTE_Variable.PORTATANAT.name().equals(paramId))) {
+	    if (pId.equals("PORTATA") && (PIEMONTE_Variable.PORTATA.name().equals(paramId) || PIEMONTE_Variable.PORTATA1.name()
+		    .equals(paramId) || PIEMONTE_Variable.PORTATANAT.name().equals(paramId))) {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
@@ -630,8 +647,8 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
-	    if (pId.equals("BARO") && (PIEMONTE_Variable.PRESSIONEMEDIA.name().equals(paramId)
-		    || PIEMONTE_Variable.PRESSIONEMEDIASML.name().equals(paramId))) {
+	    if (pId.equals("BARO") && (PIEMONTE_Variable.PRESSIONEMEDIA.name().equals(paramId) || PIEMONTE_Variable.PRESSIONEMEDIASML.name()
+		    .equals(paramId))) {
 		sensorUrl = variables.getJSONObject(k).optString("url");
 		break;
 	    }
