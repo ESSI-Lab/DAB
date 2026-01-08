@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -33,7 +33,6 @@ import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
-import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
 import eu.essi_lab.cfga.patch.*;
@@ -69,10 +68,12 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED;
+
 /**
  * @author Fabrizio
  */
-public class DABStarter {
+public class DABStarter implements ConfigurationChangeListener {
 
     /**
      *
@@ -93,6 +94,11 @@ public class DABStarter {
      *
      */
     private final ExecutionMode mode;
+
+    /**
+     *
+     */
+    private SchedulerViewSetting schedulerSetting;
 
     /**
      *
@@ -198,6 +204,34 @@ public class DABStarter {
 	    initCaches();
 	}
 
+    }
+
+    @Override
+    public void configurationChanged(ConfigurationChangeEvent event) {
+
+	if (event.getEventType() == CONFIGURATION_AUTO_RELOADED) {
+
+	    switch (mode) {
+	    case BATCH, AUGMENTER, BULK -> {
+
+		JobStoreType previousJobStoreType = schedulerSetting.getJobStoreType();
+
+		JobStoreType jobStoreType = ConfigurationWrapper.getSchedulerSetting().getJobStoreType();
+
+		if (previousJobStoreType != jobStoreType) {
+
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Scheduler jobStore type changed: {}", jobStoreType);
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler STARTED");
+
+		    schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+
+		    SchedulerFactory.getScheduler(schedulerSetting, true);
+
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler ENDED");
+		}
+	    }
+	    }
+	}
     }
 
     /**
@@ -532,6 +566,8 @@ public class DABStarter {
 	    DABStarter.configuration = configuration;
 
 	    ConfigurationWrapper.setConfiguration(configuration);
+
+	    configuration.addChangeEventListener(this);
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Initializing configuration ENDED");
 
@@ -989,7 +1025,7 @@ public class DABStarter {
 
 		    GSLoggerFactory.getLogger(DABStarter.class).info("Delayed scheduler start STARTED");
 
-		    SchedulerViewSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+		    schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
 		    GSLoggerFactory.getLogger(DABStarter.class).info("JobStore type: {}", schedulerSetting.getJobStoreType());
 
@@ -1017,7 +1053,7 @@ public class DABStarter {
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("Starting scheduler STARTED");
 
-	SchedulerViewSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+	schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("JobStore type: {}", schedulerSetting.getJobStoreType());
 
@@ -1030,7 +1066,7 @@ public class DABStarter {
 	    //
 	    // for these exec modes also starts the SchedulerSupport
 	    //
-	    if (mode == ExecutionMode.CONFIGURATION || mode == ExecutionMode.MIXED) {
+	    if (mode == ExecutionMode.CONFIGURATION || mode == ExecutionMode.MIXED || mode == ExecutionMode.LOCAL_PRODUCTION) {
 
 		SchedulerSupport.getInstance().updateDelayed();
 	    }
