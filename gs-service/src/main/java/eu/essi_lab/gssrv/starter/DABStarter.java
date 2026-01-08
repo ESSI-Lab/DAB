@@ -181,7 +181,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	switch (mode) {
 	case BATCH:
 
-	    startSchedulerLate();
+	    startSchedulerDelayed();
 	    break;
 
 	case AUGMENTER:
@@ -1002,7 +1002,7 @@ public class DABStarter implements ConfigurationChangeListener {
     /**
      *
      */
-    private void startSchedulerLate() {
+    private void startSchedulerDelayed() {
 
 	Optional<Properties> keyValueOptions = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
 
