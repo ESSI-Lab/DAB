@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.request.executor.worker.schedule.test;
 
@@ -89,6 +89,130 @@ public class SchedulerSettingTest {
 	test2(new SchedulerSetting(setting.getObject().toString()));
 	test2(SettingUtils.downCast(setting, SchedulerSetting.class, true));
 
+    }
+
+    @Test
+    public void equalsTest1() {
+
+	SchedulerSetting schedulerSetting1 = new SchedulerSetting();
+
+	SchedulerSetting schedulerSetting2 = new SchedulerSetting();
+
+	Assert.assertEquals(schedulerSetting1, schedulerSetting2);
+
+	SelectionUtils.deepClean(schedulerSetting1);
+	SelectionUtils.deepClean(schedulerSetting2);
+
+	Assert.assertEquals(schedulerSetting1, schedulerSetting2);
+    }
+
+    @Test
+    public void equalsTest2() {
+
+	SchedulerSetting schedulerSetting1 = new SchedulerSetting();
+
+	SchedulerSetting schedulerSetting2 = new SchedulerSetting();
+
+	Assert.assertEquals(schedulerSetting1, schedulerSetting2);
+
+	schedulerSetting1.setSlotsCount(7);
+
+	SelectionUtils.deepClean(schedulerSetting1);
+
+	Assert.assertNotEquals(schedulerSetting1, schedulerSetting2);
+    }
+
+    @Test
+    public void equalsTest2_1() {
+
+	SchedulerSetting schedulerSetting1 = new SchedulerSetting();
+
+	SchedulerSetting schedulerSetting2 = new SchedulerSetting();
+
+	Assert.assertEquals(schedulerSetting1, schedulerSetting2);
+
+	schedulerSetting2.setSlotsCount(7);
+
+	SelectionUtils.deepClean(schedulerSetting1);
+
+	Assert.assertNotEquals(schedulerSetting1, schedulerSetting2);
+    }
+
+    @Test
+    public void equalsTest3() {
+
+	SchedulerSetting schedulerSetting1 = new SchedulerSetting();
+
+	SchedulerSetting schedulerSetting2 = new SchedulerSetting();
+
+	Assert.assertEquals(schedulerSetting1, schedulerSetting2);
+
+	schedulerSetting1.setJobStoreType(JobStoreType.PERSISTENT);
+
+	Assert.assertNotEquals(schedulerSetting1, schedulerSetting2);
+    }
+
+    @Test
+    public void equalsTest3_1() {
+
+	SchedulerSetting schedulerSetting1 = new SchedulerSetting();
+
+	SchedulerSetting schedulerSetting2 = new SchedulerSetting();
+
+	Assert.assertEquals(schedulerSetting1, schedulerSetting2);
+
+	schedulerSetting2.setJobStoreType(JobStoreType.PERSISTENT);
+
+	Assert.assertNotEquals(schedulerSetting1, schedulerSetting2);
+    }
+
+    @Test
+    public void equalsTest4() {
+
+	SchedulerSetting schedulerSetting1 = new SchedulerSetting();
+
+	SchedulerSetting schedulerSetting2 = new SchedulerSetting();
+
+	Assert.assertEquals(schedulerSetting1, schedulerSetting2);
+
+	schedulerSetting1.setJobStoreType(JobStoreType.PERSISTENT);
+
+	schedulerSetting1.setSQLDatabaseName("name");
+
+	Assert.assertNotEquals(schedulerSetting1, schedulerSetting2);
+    }
+
+    @Test
+    public void equalsTest5() {
+
+	SchedulerSetting schedulerSetting1 = new SchedulerSetting();
+
+	SchedulerSetting schedulerSetting2 = new SchedulerSetting();
+
+	Assert.assertEquals(schedulerSetting1, schedulerSetting2);
+
+	schedulerSetting1.setJobStoreType(JobStoreType.PERSISTENT);
+
+	schedulerSetting1.setSQLDatabasePassword("pwd");
+
+	Assert.assertNotEquals(schedulerSetting1, schedulerSetting2);
+    }
+
+
+    @Test
+    public void equalsTest6() {
+
+	SchedulerSetting schedulerSetting1 = new SchedulerSetting();
+
+	SchedulerSetting schedulerSetting2 = new SchedulerSetting();
+
+	Assert.assertEquals(schedulerSetting1, schedulerSetting2);
+
+	schedulerSetting1.setJobStoreType(JobStoreType.PERSISTENT);
+
+	schedulerSetting1.setSQLDatabaseUser("user");
+
+	Assert.assertNotEquals(schedulerSetting1, schedulerSetting2);
     }
 
     /**

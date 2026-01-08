@@ -214,13 +214,9 @@ public class DABStarter implements ConfigurationChangeListener {
 	    switch (mode) {
 	    case BATCH, AUGMENTER, BULK -> {
 
-		JobStoreType previousJobStoreType = schedulerSetting.getJobStoreType();
+		if (schedulerSetting.equals(ConfigurationWrapper.getSchedulerSetting())) {
 
-		JobStoreType jobStoreType = ConfigurationWrapper.getSchedulerSetting().getJobStoreType();
-
-		if (previousJobStoreType != jobStoreType) {
-
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Scheduler jobStore type changed: {}", jobStoreType);
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Detected scheduler setting changes");
 		    GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler STARTED");
 
 		    schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
