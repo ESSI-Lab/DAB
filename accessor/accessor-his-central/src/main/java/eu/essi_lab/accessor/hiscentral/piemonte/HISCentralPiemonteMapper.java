@@ -496,8 +496,10 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		    HISCentralPiemonteClient client = new HISCentralPiemonteClient(puntoMisuraUrl);
 		    coreMetadata.addDistributionOnlineResource(identifier, puntoMisuraUrl,
 			    CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI, "download");
+		    dataset.getPropertyHandler().setIsRatingCurve(true);
 
 		} else {
+		    dataset.getPropertyHandler().setIsTimeseries(true);
 
 		    HISCentralPiemonteClient client = new HISCentralPiemonteClient(puntoMisuraUrl);
 		    lastPath = lastPath + "/?format=json";

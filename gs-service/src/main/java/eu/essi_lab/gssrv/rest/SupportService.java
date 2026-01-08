@@ -1,16 +1,7 @@
 package eu.essi_lab.gssrv.rest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.UUID;
 
 /*-
  * #%L
@@ -44,6 +35,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import eu.essi_lab.iso.datamodel.classes.Online;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -388,7 +380,18 @@ public class SupportService {
 
 	    // Perform access request for the first rating curve found
 	    GSResource resource = resources.get(0);
-	    String onlineId = resource.getHarmonizedMetadata().getCoreMetadata().getOnline().getIdentifier();
+
+	    Iterator<Online> onlineIterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution()
+		    .getDistributionOnlines();
+	    Online online = null;
+	    while(onlineIterator.hasNext()){
+		Online next = onlineIterator.next();
+		String function = next.getFunctionCode();
+		if (function!=null && function.equals("download")){
+		    online = next;
+		}
+	    }
+	    String onlineId = online.getIdentifier();
 	    
 	    if (onlineId == null || onlineId.isEmpty()) {
 		return Response.serverError().entity(getErrorResponse("Online ID not found for rating curve").toString()).build();

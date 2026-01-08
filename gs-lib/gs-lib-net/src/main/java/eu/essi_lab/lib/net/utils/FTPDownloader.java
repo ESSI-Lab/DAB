@@ -318,34 +318,6 @@ public class FTPDownloader implements Serializable {
 	return opt;
     }
 
-    public static void main(String[] args) throws Exception {
-
-	// ftp://broker:Pla645!z@ftp.inmet.gov.br/
-	String host = "ftp://broker:Pla645!z@ftp.inmet.gov.br/";
-
-	FTPDownloader ftpDownloader = new FTPDownloader();
-
-	List<String> listNames = ftpDownloader.downloadFileNames(host);
-
-	if (listNames.isEmpty()) {
-	    System.out.println(listNames.size());
-	    for (int i = 0; i < 100; i++) {
-		File isRes = ftpDownloader.downloadStream(host, listNames.get(i));
-		if (isRes != null) {
-		    try (FileReader reader = new FileReader(isRes); BufferedReader br = new BufferedReader(reader)) {
-			// read line by line
-			String line;
-			while ((line = br.readLine()) != null) {
-			    System.out.println(line);
-			}
-
-		    }
-		}
-	    }
-	}
-
-    }
-
     private String readReplyCode() {
 
 	String replyString = ftpClient.getReplyString();

@@ -1,7 +1,6 @@
 package eu.essi_lab.gssrv.servlet;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 
 /*-
  * #%L
@@ -24,10 +23,8 @@ import java.io.FileInputStream;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;

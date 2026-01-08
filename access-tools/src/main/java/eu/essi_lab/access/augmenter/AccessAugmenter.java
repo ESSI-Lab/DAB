@@ -162,6 +162,11 @@ public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
 	DataDownloader downloader = DataDownloaderFactory.getDataDownloader(resource, onlineId);
 
+	boolean isRatingCurve = resource.getPropertyHandler().isRatingCurve();
+	if (isRatingCurve){
+	    System.out.println("it is");
+	}
+
 	if (downloader == null) {
 
 	    GSLoggerFactory.getLogger(getClass()).error("No DataDownloader found");
@@ -206,6 +211,9 @@ public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 		break;
 	    case TIME_SERIES:
 		level = DataComplianceLevel.TIME_SERIES_BASIC_DATA_COMPLIANCE;
+		break;
+	    case RATING_CURVE:
+		level = DataComplianceLevel.RATING_CURVE_BASIC_DATA_COMPLIANCE;
 		break;
 	    case TRAJECTORY:
 		level = DataComplianceLevel.TRAJECTORY_BASIC_DATA_COMPLIANCE;
