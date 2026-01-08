@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import eu.essi_lab.lib.utils.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -43,8 +44,6 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -195,8 +194,7 @@ public class MeteoTrackerMapper extends OriginalIdentifierMapper {
 
 	if (object.has("_id")) {
 	    String toHash = object.getString("_id") + "_" + varName;
-	    String uuid = UUID.nameUUIDFromBytes(toHash.getBytes()).toString();
-	    return uuid;
+	    return StringUtils.toUUID(toHash);
 	}
 
 	return null;

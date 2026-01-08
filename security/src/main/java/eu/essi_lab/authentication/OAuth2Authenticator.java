@@ -409,9 +409,9 @@ public abstract class OAuth2Authenticator implements Configurable<OAuthSetting> 
     private JsonNode getToken(String postTokenUrl, CloseableHttpClient httpClient, ObjectMapper objM) throws Exception {
 
 	try {
-	    URI uri = new URI(postTokenUrl);
+	    URI uri = URI.create(postTokenUrl);
 
-	    if (!uri.getScheme().startsWith("https")) {
+	    if (!uri.getScheme().equalsIgnoreCase("https")) {
 		throw new Exception("Invalid URL scheme");
 	    }
 

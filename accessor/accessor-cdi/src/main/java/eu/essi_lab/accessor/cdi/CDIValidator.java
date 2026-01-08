@@ -62,7 +62,10 @@ public abstract class CDIValidator {
 	    SchemaFactory schemaFactory = XMLFactories.newSchemaFactory();
 
 	    Schema schema = schemaFactory.newSchema(schemaURL);
+
 	    this.schemaValidator = schema.newValidator();
+	    this.schemaValidator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+
 	} catch (Exception e) {
 	    // This should not happen
 	    e.printStackTrace();
