@@ -336,13 +336,13 @@
         <opensearch-rest-high-level-client.version>2.19.4</opensearch-rest-high-level-client.version>
 
         <!-- Snale YAML -->
-        <snakeyaml.version>1.33</snakeyaml.version>
+        <snakeyaml.version>1.33.0.SP1-redhat-00001</snakeyaml.version>
 
         <!-- LogicNG -->
         <org.logicng.version>2.4.3</org.logicng.version>
 
         <!-- SPRING Framework - VULN-UPDATE -->
-        <org.springframework.version>5.3.39</org.springframework.version>
+        <org.springframework.version>5.3.39-wso2v4</org.springframework.version>
 
         <!-- Apache commons - VULN-UPDATE -->
         <apache.commons.version>1.15.0</apache.commons.version>
@@ -410,7 +410,7 @@
         <ftpserver-core.version>1.2.1</ftpserver-core.version>
 
         <!-- H2 Database -->
-        <h2.database.version>1.2.140</h2.database.version>
+        <h2.database.version>1.2.140-wso2v3</h2.database.version>
         <!--        <h2.database.version>1.2.140</h2.database.version>-->
 
         <!-- Jakarta JSON bind-api - required after CXF version VULN-UPDATE -->

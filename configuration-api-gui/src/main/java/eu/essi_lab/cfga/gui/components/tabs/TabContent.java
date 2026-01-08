@@ -352,12 +352,6 @@ public class TabContent extends VerticalLayout implements Renderable {
 	    // settings list
 	    //
 
-	    Div div = ComponentFactory.createDiv();
-	    div.setHeightFull();
-	    div.setWidthFull();
-	    div.getStyle().set("overflow","auto");
-	    add(div);
-
 	    for (int i = 0; i < settings.size(); i++) {
 
 		Setting setting = settings.get(i);
@@ -369,6 +363,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 			false,// forceHideHeader
 			this); //
 
+
 		if (component.getDetails().isPresent()) {
 
 		    Details details = component.getDetails().get();
@@ -378,9 +373,21 @@ public class TabContent extends VerticalLayout implements Renderable {
 			details.getStyle().set("margin-top", "15px");
 		    }
 
-		    div.add(details);
+		   add(details);
 
 		} else {
+
+		    // inserts the setting component inside a div with auto overflow
+		    Div div = ComponentFactory.createDiv();
+		    div.setHeightFull();
+		    div.setWidthFull();
+		    div.getStyle().set("overflow","auto");
+
+		    // this is required to allow the replacing of the modified setting component
+		    // see #replaceSettingComponent
+		    div.setId(component.getId().get());
+
+		    add(div);
 
 		    component.setWidth("99%");
 
@@ -474,20 +481,57 @@ public class TabContent extends VerticalLayout implements Renderable {
 	    Component toRemove = oldComponent.getDetails().isPresent() ? oldComponent.getDetails().get() : oldComponent;
 	    Component toAdd = newComponent.getDetails().isPresent() ? newComponent.getDetails().get() : newComponent;
 
-	    int index = indexOf(toRemove);
+	    // the indexOf(Component component) method would return -1 since the SettingComponent do not fully correspond
+	    // to the oldComponent, because before to add it to this tab content, it is inserted in a div with overflow auto
+	    // see #render 381
+	    int index = indexOf(toRemove.getId().get());
+
+	    Component component = find(toRemove.getId().get());
+
+	    component.getElement().getStyle().set("display", "none");
+
+	    remove(component);
 
 	    addComponentAtIndex(index, toAdd);
-
-	    toRemove.getElement().getStyle().set("display", "none");
-
-	    remove(toRemove);
-
-	    // int index = indexOf(oldComponent);
-	    //
-	    // addComponentAtIndex(index, newComponent);
-	    //
-	    // remove(oldComponent);
 	}
+    }
+
+    /**
+     *
+     * @param componentId
+     * @return
+     */
+    private int indexOf(String componentId){
+
+	Iterator<Component> it = getChildren().sequential().iterator();
+	int index = 0;
+	while (it.hasNext()) {
+	    Component next = it.next();
+	    Optional<String> nextId = next.getId();
+	    if (nextId.isPresent() && componentId.equals(nextId.get())) {
+		return index;
+	    }
+	    index++;
+	}
+	return -1;
+    }
+
+    /**
+     *
+     * @param componentId
+     * @return
+     */
+    private Component find(String componentId){
+
+	Iterator<Component> it = getChildren().sequential().iterator();
+	while (it.hasNext()) {
+	    Component next = it.next();
+	    Optional<String> nextId = next.getId();
+	    if (nextId.isPresent() && componentId.equals(nextId.get())) {
+		return next;
+	    }
+	}
+	return null;
     }
 
     /**

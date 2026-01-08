@@ -1,7 +1,5 @@
 package eu.essi_lab.gssrv.rest;
 
-import java.io.IOException;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -23,23 +21,17 @@ import java.io.IOException;
  * #L%
  */
 
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+
 import javax.jws.WebService;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
-import com.amazonaws.util.IOUtils;
-
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 @WebService
 @Path("/")
@@ -118,6 +110,7 @@ public class ESSIProfilerService extends AbstractProfilerService {
     @Path("view/{viewId:[^/]+}/{path:.*}")
     public Response postRequestWithView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("viewId") String viewId,
 	    @PathParam("path") String path) {
+
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
     

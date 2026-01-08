@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.setting.scheduling;
 
@@ -44,7 +44,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class SchedulerSetting extends Setting implements EditableSetting {
 
     /**
-     * 
+     *
      */
     private static final String USER_DATE_TIME_OPTION_KEY = "userDateTime";
     private static final String SLOTS_COUNT_KEY = "slotsCount";
@@ -63,17 +63,17 @@ public class SchedulerSetting extends Setting implements EditableSetting {
     public enum JobStoreType {
 
 	/**
-	 * 
+	 *
 	 */
 	VOLATILE,
 	/**
-	 * 
+	 *
 	 */
 	PERSISTENT
     }
 
     /**
-     * 
+     *
      */
     public SchedulerSetting() {
 
@@ -371,7 +371,7 @@ public class SchedulerSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void debugSQLSettings() {
 
@@ -379,6 +379,21 @@ public class SchedulerSetting extends Setting implements EditableSetting {
 	GSLoggerFactory.getLogger(getClass()).debug("DB name: {}", getSQLDatabaseName());
 	GSLoggerFactory.getLogger(getClass()).debug("DB pwd: {}", getSQLDatabasePassword());
 	GSLoggerFactory.getLogger(getClass()).debug("DB user: {}", getSQLDatabaseUser());
+    }
+
+    @Override
+    public boolean equals(Object object) {
+
+	return object instanceof SchedulerSetting sch && (this.getJobStoreType() == sch.getJobStoreType() && (
+		this.getSQLDatabaseName() == null && sch.getSQLDatabaseName() == null || this.getSQLDatabaseName()
+			.equals(sch.getSQLDatabaseName()))) && (
+		this.getSQLDatabasePassword() == null && sch.getSQLDatabasePassword() == null || this.getSQLDatabasePassword()
+			.equals(sch.getSQLDatabasePassword())) && (this.getSQLDatabaseName() == null && sch.getSQLDatabaseName() == null
+		|| this.getSQLDatabaseName().equals(sch.getSQLDatabaseName())) && (
+		this.getSQLDatabaseUri() == null && sch.getSQLDatabaseUri() == null || this.getSQLDatabaseUri()
+			.equals(sch.getSQLDatabaseUri())) && (this.getUserDateTimeZone() == null && sch.getUserDateTimeZone() == null
+		|| this.getUserDateTimeZone().equals(sch.getUserDateTimeZone())) && (this.getSlotsCout() == sch.getSlotsCout());
+
     }
 
     /**

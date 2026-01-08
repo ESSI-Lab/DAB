@@ -950,6 +950,427 @@ var createTempExtentTable = function(data, i) {
 
 };
 
+// Helper function to find elements by local name (handles namespaces)
+var findByName = function($parent, localName) {
+	var result = $parent.find('*');
+	var filtered = $();
+	result.each(function() {
+		var nodeName = this.nodeName || this.tagName || '';
+		// Remove namespace prefix if present
+		var local = nodeName.indexOf(':') >= 0 ? nodeName.split(':')[1] : nodeName;
+		if (local === localName) {
+			filtered = filtered.add(this);
+		}
+	});
+	return filtered;
+};
+
+// Parse rating curves XML and extract all periods with their points
+var parseRatingCurvesXML = function(xmlData) {
+	var ratingCurves = [];
+	var $xml = $(xmlData);
+	
+	// Find all ConversionPeriod elements - try multiple namespace patterns
+	var periods = $xml.find('rgs\\:ConversionPeriod');
+	if (periods.length === 0) {
+		// Try without namespace prefix
+		periods = $xml.find('ConversionPeriod');
+	}
+	if (periods.length === 0) {
+		// Try using helper function for local name
+		periods = findByName($xml, 'ConversionPeriod');
+	}
+	
+	periods.each(function() {
+		var period = $(this);
+		
+		// Extract period start date - try multiple patterns
+		var periodStart = period.find('rgs\\:periodStart rgs\\:TimeInstant gml\\:timePosition').first().text();
+		if (!periodStart) {
+			periodStart = period.find('rgs\\:periodStart gml\\:TimeInstant gml\\:timePosition').first().text();
+		}
+		if (!periodStart) {
+			periodStart = period.find('periodStart TimeInstant timePosition').first().text();
+		}
+		if (!periodStart) {
+			var periodStartEl = findByName(period, 'periodStart');
+			var timePos = findByName(periodStartEl, 'timePosition');
+			periodStart = timePos.first().text();
+		}
+		
+		// Extract period end date - try multiple patterns
+		var periodEnd = period.find('rgs\\:periodEnd rgs\\:TimeInstant gml\\:timePosition').first().text();
+		if (!periodEnd) {
+			periodEnd = period.find('rgs\\:periodEnd gml\\:TimeInstant gml\\:timePosition').first().text();
+		}
+		if (!periodEnd) {
+			periodEnd = period.find('periodEnd TimeInstant timePosition').first().text();
+		}
+		if (!periodEnd) {
+			var periodEndEl = findByName(period, 'periodEnd');
+			var timePos = findByName(periodEndEl, 'timePosition');
+			periodEnd = timePos.first().text();
+		}
+		
+		// Extract points from ConversionTable
+		var points = [];
+		// Find ConversionTable within applicableConversion
+		var conversionTable = period.find('rgs\\:applicableConversion rgs\\:ConversionTable').first();
+		if (conversionTable.length === 0) {
+			conversionTable = period.find('applicableConversion ConversionTable').first();
+		}
+		if (conversionTable.length === 0) {
+			var applicableConv = findByName(period, 'applicableConversion');
+			conversionTable = findByName(applicableConv, 'ConversionTable').first();
+		}
+		if (conversionTable.length === 0) {
+			// Try direct ConversionTable
+			conversionTable = period.find('rgs\\:ConversionTable').first();
+		}
+		if (conversionTable.length === 0) {
+			conversionTable = findByName(period, 'ConversionTable').first();
+		}
+		
+		// Find all point elements containing TableTuple
+		var tableTuples = conversionTable.find('rgs\\:point rgs\\:TableTuple');
+		if (tableTuples.length === 0) {
+			tableTuples = conversionTable.find('point TableTuple');
+		}
+		if (tableTuples.length === 0) {
+			var points = findByName(conversionTable, 'point');
+			tableTuples = findByName(points, 'TableTuple');
+		}
+		if (tableTuples.length === 0) {
+			// Try direct TableTuple
+			tableTuples = conversionTable.find('rgs\\:TableTuple');
+		}
+		if (tableTuples.length === 0) {
+			tableTuples = findByName(conversionTable, 'TableTuple');
+		}
+		
+		tableTuples.each(function() {
+			var tuple = $(this);
+			
+			// Extract input value (water level)
+			var inputValueText = tuple.find('rgs\\:inputValue swe\\:Quantity swe\\:value').first().text();
+			if (!inputValueText) {
+				inputValueText = tuple.find('inputValue Quantity value').first().text();
+			}
+			if (!inputValueText) {
+				var inputValueEl = findByName(tuple, 'inputValue');
+				var quantityEl = findByName(inputValueEl, 'Quantity');
+				var valueEl = findByName(quantityEl, 'value');
+				inputValueText = valueEl.first().text();
+			}
+			
+			// Extract output value (discharge)
+			var outputValueText = tuple.find('rgs\\:outputValue swe\\:Quantity swe\\:value').first().text();
+			if (!outputValueText) {
+				outputValueText = tuple.find('outputValue Quantity value').first().text();
+			}
+			if (!outputValueText) {
+				var outputValueEl = findByName(tuple, 'outputValue');
+				var quantityEl = findByName(outputValueEl, 'Quantity');
+				var valueEl = findByName(quantityEl, 'value');
+				outputValueText = valueEl.first().text();
+			}
+			
+			var inputValue = parseFloat(inputValueText);
+			var outputValue = parseFloat(outputValueText);
+			
+			if (!isNaN(inputValue) && !isNaN(outputValue)) {
+				points.push({
+					level: inputValue,
+					discharge: outputValue
+				});
+			}
+		});
+		
+		// Sort points by level (input value)
+		points.sort(function(a, b) {
+			return a.level - b.level;
+		});
+		
+		if (points.length > 0 && periodStart && periodEnd) {
+			ratingCurves.push({
+				periodStart: periodStart,
+				periodEnd: periodEnd,
+				points: points
+			});
+		}
+	});
+	
+	// Sort rating curves by period start date (most recent first)
+	ratingCurves.sort(function(a, b) {
+		var dateA = new Date(a.periodStart);
+		var dateB = new Date(b.periodStart);
+		return dateB - dateA;
+	});
+	
+	return ratingCurves;
+};
+
+// Display rating curves section with dropdown and plot
+var displayRatingCurvesSection = function(ratingCurves) {
+	if (!ratingCurves || ratingCurves.length === 0) {
+		return;
+	}
+	
+	// Check if Plotly script is in the page
+	var plotlyScript = document.querySelector('script[src*="plotly"]');
+	if (!plotlyScript && typeof Plotly === 'undefined') {
+		console.warn('Plotly.js script not found in page. Rating curves will not be displayed.');
+		// Still create the section but show a message
+		var sectionHtml = '<table class="layout_table" id="ratingCurvesTable">';
+		sectionHtml += '<thead><tr><th colspan="2" class="timeseries-header">';
+		sectionHtml += t('rating_curves');
+		sectionHtml += '</th></tr></thead>';
+		sectionHtml += '<tbody><tr><td colspan="2" style="padding: 20px; text-align: center; color: red;">';
+		sectionHtml += t('plot_library_error') + '<br><small>Please ensure Plotly.js is loaded</small>';
+		sectionHtml += '</td></tr></tbody></table>';
+		// Insert after station-overview, before timeseries sections
+		var $stationOverview = $("#timeseries .station-overview");
+		if ($stationOverview.length > 0) {
+			$(sectionHtml).insertAfter($stationOverview);
+		} else {
+			$(sectionHtml).prependTo("#timeseries");
+		}
+		return;
+	}
+	
+	// Create the rating curves section
+	var sectionHtml = '<table class="layout_table" id="ratingCurvesTable">';
+	sectionHtml += '<thead><tr><th colspan="2" class="timeseries-header" id="ratingCurves-header" style="cursor: pointer;">';
+	sectionHtml += '<span class="expand-icon" style="display: inline-block; margin-right: 8px;">▶</span>';
+	sectionHtml += t('rating_curves');
+	sectionHtml += '</th></tr></thead>';
+	sectionHtml += '<tbody id="ratingCurves-content" style="display: none;">';
+	sectionHtml += '<tr><td class="data_table_td" id="ratingCurvesDataTable"></td>';
+	sectionHtml += '<td rowspan="2" id="ratingCurvesPlotDiv"></td></tr>';
+	sectionHtml += '<tr><td id="ratingCurvesBottomTd"></td></tr>';
+	sectionHtml += '</tbody>';
+	sectionHtml += '</table>';
+	
+	// Insert after station-overview, before timeseries sections
+	var $stationOverview = $("#timeseries .station-overview");
+	if ($stationOverview.length > 0) {
+		$(sectionHtml).insertAfter($stationOverview);
+	} else {
+		// Fallback: if station-overview not found, prepend to timeseries
+		$(sectionHtml).prependTo("#timeseries");
+	}
+	
+	// Create metadata table
+	var metadataItems = [];
+	metadataItems.push("<tr><td class='data_table_header' colspan='2'>" + t('rating_curve_metadata') + "</td></tr>");
+	metadataItems.push("<tr><td class='data_table_label_td'>" + t('available_periods') + "</td><td id='ratingCurvesPeriodInfo'></td></tr>");
+	metadataItems.push("<tr><td class='data_table_label_td'>" + t('selected_period') + "</td><td id='ratingCurvesSelectedPeriod'></td></tr>");
+	
+	$("<table></table>", {
+		"class": "data_table",
+		html: metadataItems.join("")
+	}).appendTo("#ratingCurvesDataTable");
+	
+	// Create dropdown for period selection
+	var selectHtml = '<select id="ratingCurvesPeriodSelect" style="width: 100%; padding: 5px; margin-top: 10px;">';
+	for (var i = 0; i < ratingCurves.length; i++) {
+		var curve = ratingCurves[i];
+		var periodLabel = curve.periodStart + ' - ' + curve.periodEnd;
+		selectHtml += '<option value="' + i + '">' + periodLabel + '</option>';
+	}
+	selectHtml += '</select>';
+	
+	$("#ratingCurvesBottomTd").html(selectHtml);
+	
+	// Create plot container
+	$("<div id='ratingCurvesPlot' style='width: 100%; height: 400px; min-height: 400px;'></div>").appendTo("#ratingCurvesPlotDiv");
+	
+	// Update period info
+	var periodsText = ratingCurves.length + ' ' + (ratingCurves.length === 1 ? t('period') : t('periods'));
+	$("#ratingCurvesPeriodInfo").text(periodsText);
+	
+	// Set initial selected period (last one)
+	var selectedIndex = 0;
+	$("#ratingCurvesPeriodSelect").val(selectedIndex);
+	updateRatingCurvePlot(ratingCurves, selectedIndex);
+	updateSelectedPeriodInfo(ratingCurves, selectedIndex);
+	
+	// Add click handler to toggle content visibility
+	$("#ratingCurves-header").click(function() {
+		var $content = $("#ratingCurves-content");
+		var $icon = $(this).find('.expand-icon');
+		if ($content.is(':visible')) {
+			$content.slideUp();
+			$icon.text('▶');
+		} else {
+			$content.slideDown();
+			$icon.text('▼');
+			// Redraw plot when section is expanded to ensure proper sizing
+			setTimeout(function() {
+				if (typeof Plotly !== 'undefined') {
+					var currentIndex = parseInt($("#ratingCurvesPeriodSelect").val());
+					Plotly.Plots.resize('ratingCurvesPlot');
+				}
+			}, 300);
+		}
+	});
+	
+	// Add change handler for dropdown
+	$("#ratingCurvesPeriodSelect").change(function() {
+		var selectedIndex = parseInt($(this).val());
+		updateRatingCurvePlot(ratingCurves, selectedIndex);
+		updateSelectedPeriodInfo(ratingCurves, selectedIndex);
+	});
+};
+
+// Update selected period info
+var updateSelectedPeriodInfo = function(ratingCurves, index) {
+	if (index >= 0 && index < ratingCurves.length) {
+		var curve = ratingCurves[index];
+		var periodText = curve.periodStart + ' - ' + curve.periodEnd;
+		$("#ratingCurvesSelectedPeriod").text(periodText);
+	}
+};
+
+// Plot rating curve using Plotly.js
+var updateRatingCurvePlot = function(ratingCurves, index) {
+	if (index < 0 || index >= ratingCurves.length) {
+		return;
+	}
+	
+	var curve = ratingCurves[index];
+	var points = curve.points;
+	
+	if (points.length === 0) {
+		$("#ratingCurvesPlot").html('<div style="padding: 20px; text-align: center;">' + t('no_data_available') + '</div>');
+		return;
+	}
+	
+	// Check if Plotly is available, wait a bit if not (script might still be loading)
+	if (typeof Plotly === 'undefined') {
+		console.warn('Plotly.js not yet loaded, waiting...');
+		// Check if script tag exists
+		var plotlyScript = document.querySelector('script[src*="plotly"]');
+		if (!plotlyScript) {
+			console.error('Plotly.js script tag not found in page');
+			$("#ratingCurvesPlot").html('<div style="padding: 20px; text-align: center; color: red;">' + t('plot_library_error') + '<br><small>Script tag not found</small></div>');
+			return;
+		}
+		// Wait for Plotly to load (max 5 seconds)
+		var attempts = 0;
+		var maxAttempts = 50; // 50 attempts * 100ms = 5 seconds
+		var checkPlotly = setInterval(function() {
+			attempts++;
+			if (typeof Plotly !== 'undefined') {
+				clearInterval(checkPlotly);
+				console.log('Plotly.js loaded successfully after', attempts * 100, 'ms');
+				// Retry plotting now that Plotly is loaded
+				updateRatingCurvePlot(ratingCurves, index);
+			} else if (attempts >= maxAttempts) {
+				clearInterval(checkPlotly);
+				console.error('Plotly.js failed to load after waiting', maxAttempts * 100, 'ms');
+				console.error('Script tag found:', plotlyScript ? plotlyScript.src : 'none');
+				$("#ratingCurvesPlot").html('<div style="padding: 20px; text-align: center; color: red;">' + t('plot_library_error') + '<br><small>Check browser console for details</small></div>');
+			}
+		}, 100);
+		return;
+	}
+	
+	// Prepare data arrays (flipped: discharge on x-axis, level on y-axis)
+	var levels = points.map(function(p) { return p.level; });
+	var discharges = points.map(function(p) { return p.discharge; });
+	
+	// Create hover text with detailed information
+	var hoverText = points.map(function(p, i) {
+		return t('water_level') + ': ' + p.level.toFixed(3) + ' m<br>' +
+		       t('discharge') + ': ' + p.discharge.toFixed(3) + ' m³/s';
+	});
+	
+	// Create trace for the line (flipped axes: x=discharge, y=level)
+	var trace = {
+		x: discharges,
+		y: levels,
+		type: 'scatter',
+		mode: 'lines+markers',
+		name: t('rating_curve'),
+		line: {
+			color: '#00529c',
+			width: 2
+		},
+		marker: {
+			color: '#00529c',
+			size: 6,
+			line: {
+				color: '#ffffff',
+				width: 1
+			}
+		},
+		hovertemplate: '<b>%{text}</b><extra></extra>',
+		text: hoverText
+	};
+	
+	// Layout configuration (flipped axes)
+	var layout = {
+		title: {
+			text: t('rating_curve'),
+			font: {
+				size: 16,
+				color: '#000000'
+			}
+		},
+		xaxis: {
+			title: {
+				text: t('discharge') + ' (m³/s)',
+				font: {
+					size: 12
+				}
+			},
+			showgrid: true,
+			gridcolor: '#e0e0e0',
+			zeroline: false
+		},
+		yaxis: {
+			title: {
+				text: t('water_level') + ' (m)',
+				font: {
+					size: 12
+				}
+			},
+			showgrid: true,
+			gridcolor: '#e0e0e0',
+			zeroline: false
+		},
+		plot_bgcolor: '#ffffff',
+		paper_bgcolor: '#ffffff',
+		hovermode: 'closest',
+		margin: {
+			l: 60,
+			r: 30,
+			t: 50,
+			b: 50
+		},
+		showlegend: false
+	};
+	
+	// Configuration for interactivity
+	var config = {
+		displayModeBar: true,
+		displaylogo: false,
+		modeBarButtonsToRemove: ['lasso2d', 'select2d'],
+		toImageButtonOptions: {
+			format: 'png',
+			filename: 'rating_curve',
+			height: 600,
+			width: 800,
+			scale: 1
+		},
+		responsive: true
+	};
+	
+	// Create or update the plot
+	Plotly.newPlot('ratingCurvesPlot', [trace], layout, config);
+};
+
 var createLayoutTable = function(data, i, k) {
 
 	var layoutTable = "<table class='layout_table' id='layoutTable_" + i + "'>";
@@ -1175,13 +1596,25 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 		// Construct the rating curves endpoint URL
 		var ratingCurvesUrl = '/gs-service/services/support/rating-curves?platformId=' + encodeURIComponent(platformId) + '&view=' + encodeURIComponent(viewId);
 		
-		$.getJSON(ratingCurvesUrl, function(ratingCurvesData) {
-			console.log('Rating curves loaded:', ratingCurvesData);
-			// TODO: Process rating curves data and display them
-			// For now, just log the data - graphical part will be added later
-		}).fail(function(jqXHR, textStatus, errorThrown) {
-			console.log('No rating curves found or error loading rating curves:', textStatus, errorThrown);
-			// It's okay if there are no rating curves - not all stations have them
+		// Fetch XML data instead of JSON
+		$.ajax({
+			url: ratingCurvesUrl,
+			type: 'GET',
+			dataType: 'xml',
+			success: function(xmlData) {
+				try {
+					var ratingCurves = parseRatingCurvesXML(xmlData);
+					if (ratingCurves && ratingCurves.length > 0) {
+						displayRatingCurvesSection(ratingCurves);
+					}
+				} catch (e) {
+					console.error('Error parsing rating curves XML:', e);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('No rating curves found or error loading rating curves:', textStatus, errorThrown);
+				// It's okay if there are no rating curves - not all stations have them
+			}
 		});
 	}
 

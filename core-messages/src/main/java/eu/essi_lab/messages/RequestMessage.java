@@ -115,7 +115,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 	setException(GSException.createException());
 	setSources(new ArrayList<>());
 	setOutputSources(false);
-	setUseCachedSourcesDataFolderMap(ExecutionMode.get() != ExecutionMode.MIXED);
+	setUseCachedSourcesDataFolderMap(ExecutionMode.get() != ExecutionMode.MIXED && ExecutionMode.get() != ExecutionMode.LOCAL_PRODUCTION);
 	setIncludeWeightedQueries(false);
 
 	requestId = UUID.randomUUID().toString();

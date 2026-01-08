@@ -38,11 +38,6 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 
     }
 
-    public static void main(String[] args) {
-
-	System.out.println(new SchedulerViewSetting());
-    }
-
     @Override
     public String getType() {
 
@@ -57,7 +52,7 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
 	public DescriptorProvider() {
 
@@ -69,7 +64,6 @@ public class SchedulerViewSetting extends SchedulerSetting implements Configurab
 	}
 
 	/**
-	 *
 	 * @return
 	 */
 	public TabContentDescriptor get() {
