@@ -1122,6 +1122,8 @@ export function initializePortal(config) {
 				// Left section: logo-left + title-left
 				const leftSection = document.createElement('div');
 				leftSection.className = 'portal-header-left';
+				leftSection.style.padding = '0';
+				leftSection.style.margin = '0';
 				
 				if (config['logo-left']) {
 					// Support multiple comma-separated logos in "logo-left"
@@ -1144,6 +1146,8 @@ export function initializePortal(config) {
 							const leftLogoImg = document.createElement('img');
 							leftLogoImg.className = 'portal-header-logo-left';
 							leftLogoImg.alt = 'Left logo';
+							leftLogoImg.style.padding = '0';
+							leftLogoImg.style.margin = '0';
 
 							// Use path as-is if relative, or full URL if absolute
 							const leftLogoSrc = logoSrc.startsWith('http') ? logoSrc : logoSrc;
@@ -1182,6 +1186,8 @@ export function initializePortal(config) {
 				// Right section: logo-right + title-right
 				const rightSection = document.createElement('div');
 				rightSection.className = 'portal-header-right';
+				rightSection.style.padding = '0';
+				rightSection.style.margin = '0';
 				
 				if (config['logo-right']) {
 					// Support multiple comma-separated logos in "logo-right"
@@ -1204,6 +1210,8 @@ export function initializePortal(config) {
 							const rightLogoImg = document.createElement('img');
 							rightLogoImg.className = 'portal-header-logo-right';
 							rightLogoImg.alt = 'Right logo';
+							rightLogoImg.style.padding = '0';
+							rightLogoImg.style.margin = '0';
 
 							// Use path as-is if relative, or full URL if absolute
 							const rightLogoSrc = logoSrc.startsWith('http') ? logoSrc : logoSrc;

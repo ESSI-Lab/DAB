@@ -53,6 +53,17 @@
   "netcdf_link": "OGC NetCDF (CF conventions)",
   "waterml2_link": "OGC WaterML 2.0",
   "waterml1_link": "CUAHSI WaterML 1.0",
-  "station_information_page": "Pagina informazioni stazione"
+  "station_information_page": "Pagina informazioni stazione",
+  "rating_curves": "Scale di deflusso",
+  "rating_curve_metadata": "Metadati scale di deflusso",
+  "available_periods": "Periodi disponibili",
+  "selected_period": "Periodo selezionato",
+  "period": "periodo",
+  "periods": "periodi",
+  "water_level": "Livello dell'acqua",
+  "discharge": "Portata",
+  "no_data_available": "Nessun dato disponibile",
+  "rating_curve": "Scale di deflusso",
+  "plot_library_error": "Errore: Libreria grafica non caricata"
 }
 
