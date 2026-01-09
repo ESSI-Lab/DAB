@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.iso.datamodel.classes.*;
 import eu.essi_lab.messages.count.AbstractCountResponse;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSPropertyHandler;
@@ -48,6 +49,7 @@ public abstract class MessageResponse<T, C extends AbstractCountResponse> implem
     private GSPropertyHandler propertyHandler;
 
     private static final String SEARCH_AFTER = "searchAfter";
+    private static final String BBOX_UNION = "bboxUnion";
 
     /**
      * 
@@ -172,11 +174,29 @@ public abstract class MessageResponse<T, C extends AbstractCountResponse> implem
     }
 
     /**
+     *
+     * @param bbox
+     */
+    public void setBBoxUnion(GeographicBoundingBox bbox) {
+
+	getPropertyHandler().add(GSProperty.of(BBOX_UNION, bbox));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<GeographicBoundingBox> getBboxUnion() {
+
+	return Optional.ofNullable(getPropertyHandler().get(BBOX_UNION, GeographicBoundingBox.class));
+    }
+
+    /**
      * @param exception
      */
     protected void setException(GSException exception) {
 
 	this.exception = exception;
     }
+
 
 }
