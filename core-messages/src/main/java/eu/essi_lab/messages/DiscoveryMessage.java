@@ -137,7 +137,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	setQueryRegistrationEnabled(false);
 	setTermFrequencyTargets(Arrays.asList());
 	setIncludeCountInRetrieval(false);
-	setIncludeBboxUnion(true);
+	setIncludeBboxUnion(false);
 
 	getPayload().add(new GSProperty<>(PARENTS_GSRESOURCE, parents));
     }
