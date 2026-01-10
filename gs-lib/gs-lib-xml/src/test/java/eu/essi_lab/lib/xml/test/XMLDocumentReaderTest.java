@@ -251,4 +251,15 @@ public class XMLDocumentReaderTest {
 	Assert.assertEquals(3, xml2.evaluateNumber("count(//*:a)").intValue());
     }
 
+    @Test
+    public void testSingleQuotes() throws Exception {
+	Assert.assertEquals("text",new XMLDocumentReader("<msg txt=\"text\"/>").evaluateString("/*[1]/@txt"));
+	Assert.assertEquals("text",new XMLDocumentReader("<msg txt='text'/>").evaluateString("/*[1]/@txt"));
+    }
+
+    @Test
+    public void testXML() throws Exception {
+	new XMLDocumentReader("<?xml version='1.0' encoding='UTF-8'?>\n" + "<csw:GetRecords xmlns:csw='http://www.opengis.net/cat/csw/2.0.2' xmlns:ogc='http://www.opengis.net/ogc' outputFormat='application/xml' outputSchema='http://www.isotc211.org/2005/gmd' resultType='results' service='CSW' version='2.0.2' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd'\n" + "    startPosition='201' maxRecords='20'>\n" + "    <csw:Query typeNames='csw:Record'>\n" + "        <csw:ElementSetName>brief</csw:ElementSetName>\n" + "    </csw:Query>\n" + "</csw:GetRecords>\n");
+    }
+
 }

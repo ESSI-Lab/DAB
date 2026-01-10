@@ -181,6 +181,17 @@ public enum DataComplianceLevel {
 		    new BooleanCapabilityElement(PresenceType.ANY)), //
 
 	    ResamplingCapability.ANY_RESAMPLING()), "TS-B"),
+
+    RATING_CURVE_BASIC_DATA_COMPLIANCE(ProcessorCapabilities.create(//
+	    CapabilityElement.anyFromDataType(DataType.RATING_CURVE), //
+	    CapabilityElement.anyFromCRS(CRS.EPSG_4326()), //
+	    CapabilityElement.anyFromDataFormat(DataFormat.WATERML_2_0()), //
+	    new SubsettingCapability(//
+		    new BooleanCapabilityElement(PresenceType.ANY), //
+		    new BooleanCapabilityElement(PresenceType.ANY), //
+		    new BooleanCapabilityElement(PresenceType.ANY)), //
+
+	    ResamplingCapability.ANY_RESAMPLING()), "TS-B"),
     
     /**
      * Data compliance level properties and operations:

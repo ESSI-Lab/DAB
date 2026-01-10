@@ -200,7 +200,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		    continue;
 		}
 		DataDescriptor fdd = tmpReport.getFullDataDescriptor();
-		if (fdd.getDataFormat().equals(targetDescriptor.getDataFormat())) {
+		if (targetDescriptor!=null && fdd.getDataFormat().equals(targetDescriptor.getDataFormat())) {
 		    report = tmpReport;
 		    break;
 		}
@@ -391,7 +391,10 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 	    if (targetDescriptor.getDataFormat().equals(DataFormat.WKT())) {
 		// TODO WKT validator
-	    } else {
+	    } else if (targetDescriptor.getDataType().equals(DataType.RATING_CURVE)){
+		// TODO R_C validator
+	    }
+	    else {
 
 		String msg = "The downloaded file is not in expected format. Remote service error?";
 		GSLoggerFactory.getLogger(getClass()).error(msg);
@@ -555,7 +558,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	    targetCRS = sourceCRS;
 	}
 
-	if (!sourceCRS.equals(targetCRS)) {
+	if (sourceCRS!=null && !sourceCRS.equals(targetCRS)) {
 	    DataDimension spatial1 = targetDescriptor.getFirstSpatialDimension();
 	    DataDimension spatial2 = targetDescriptor.getSecondSpatialDimension();
 	    if (spatial1 != null && spatial2 != null) {
@@ -653,7 +656,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 	    }
 	}
-	if (sourceCRS.equals(targetCRS)) {
+	if (sourceCRS!=null && sourceCRS.equals(targetCRS)) {
 	    for (int i = 0; i < fullDescriptor.getSpatialDimensions().size(); i++) {
 		DataDimension dataDimension = fullDescriptor.getSpatialDimensions().get(i);
 		if (downloader.canSubset(dataDimension.getName())) { //

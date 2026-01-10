@@ -220,7 +220,19 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 		// hides the tf widget headers (the label is shown by the accordion)
 		style += '[widget="tf"] div.jtable-main-container div.jtable-title { display: none;}';
 
-		jQuery('#' + id).accordion();
+		// Initialize accordion with settings that allow multiple panels open
+		// collapsible: true allows all panels to be closed
+		// active: false starts with all panels closed
+		// beforeActivate: false prevents accordion from managing state (we'll handle it ourselves)
+		jQuery('#' + id).accordion({
+			collapsible: true,
+			active: false,
+			beforeActivate: function() {
+				// Return false to prevent accordion from managing state
+				// External code will handle panel toggling
+				return false;
+			}
+		});
 	}
 
 	GIAPI.UI_Utils.appendStyle(style);
@@ -612,9 +624,22 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 
 		if (options.accordionMode) {
 
-			var active = jQuery('#' + id).accordion('option', 'active');
-			jQuery('#' + id).accordion('refresh');
-			jQuery('#' + id).accordion('option', 'active', active);
+			// Refresh the accordion but don't change the active state
+			// The external code managing the accordion will handle state preservation
+			// We just need to refresh the structure
+			var $accordion = jQuery('#' + id);
+			if ($accordion.hasClass('ui-accordion')) {
+				// Get current state before refresh
+				var currentActive = $accordion.accordion('option', 'active');
+				// Refresh the accordion structure
+				$accordion.accordion('refresh');
+				// Restore the active state (but external handlers will override if needed)
+				$accordion.accordion('option', 'active', currentActive);
+				// Ensure beforeActivate still prevents default behavior
+				$accordion.accordion('option', 'beforeActivate', function() {
+					return false;
+				});
+			}
 		}
 
 		if (chartTabId) {

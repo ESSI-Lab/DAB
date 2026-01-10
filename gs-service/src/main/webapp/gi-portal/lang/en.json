@@ -209,5 +209,10 @@
 	"tf-sensorSwath" : "Sensor Swath",
 	"tf-s3Timeliness" : "S3 Timeliness",
 	"tf-s3InstrumentIdx" : "S3 Instrument Idx",
-	"tf-s3ProductLevel" : "S3 Product Level"
+	"tf-s3ProductLevel" : "S3 Product Level",
+	"clear_all" : "Clear All",
+	"clear_all_tooltip" : "Clear all search constraints",
+	"clear_all_title" : "Clear All Constraints",
+	"confirm_clear_all" : "Are you sure you want to clear all constraints?",
+	"confirm_clear_all_details" : "This will reset all search parameters including text, dates, spatial extent, sources, and filters."
 }

@@ -1353,6 +1353,11 @@ public abstract class OSParameters {
     public static final OSParameter EIFFEL_DISCOVERY = new OSParameter("eiffelDiscovery", "string", null, "{gs:eiffelDiscovery}");
 
     /**
+     *
+     */
+    public static final OSParameter BBOX_UNION = new OSParameter("bboxUnion", "string", null, "{gs:bboxUnion}");
+
+    /**
     *
     */
     public static final OSParameter OUTPUT_VERSION = new OSParameter("outputVersion", "versionString", "1.0", "{gs:version}");

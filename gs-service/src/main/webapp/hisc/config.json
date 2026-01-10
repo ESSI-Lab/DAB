@@ -16,7 +16,7 @@
 	"filters" : "source,organisationName,attributeURI,platformTitle,instrumentTitle",
 	"instrumentSearch" : false,
 	"logo-left" : "logo_HISCentral.png,logo-left.png,logo_label.png",
-	"logo-right" : "logo-right.png,logo_label_right.png",
+	"logo-right" : "logo-right-full.png",
 	"title-left" : "",
 	"title-right" : "",
 	"disclaimer" : "Dati dei Servizi idro-meteorologici regionali e delle province autonome. I dati possono essere soggetti a revisioni.",

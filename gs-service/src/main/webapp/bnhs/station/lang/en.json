@@ -53,6 +53,17 @@
   "netcdf_link": "OGC NetCDF (CF conventions)",
   "waterml2_link": "OGC WaterML 2.0",
   "waterml1_link": "CUAHSI WaterML 1.0",
-  "station_information_page": "Station information page"
+  "station_information_page": "Station information page",
+  "rating_curves": "Rating Curves",
+  "rating_curve_metadata": "Rating curve metadata",
+  "available_periods": "Available periods",
+  "selected_period": "Selected period",
+  "period": "period",
+  "periods": "periods",
+  "water_level": "Water level",
+  "discharge": "Stream discharge",
+  "no_data_available": "No data available",
+  "rating_curve": "Rating Curve",
+  "plot_library_error": "Error: Plot library not loaded"
 }
 

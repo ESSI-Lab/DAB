@@ -248,7 +248,12 @@
   "tf-attributeTitle": "Proprietà osservata",
   "tf-attributeURI": "URI proprietà osservata",
   "tf-platformTitle": "Stazione",
-  "tf-instrumentTitle": "Strumento"
+  "tf-instrumentTitle": "Strumento",
+  "clear_all": "Pulisci tutto",
+  "clear_all_tooltip": "Pulisci tutti i vincoli di ricerca",
+  "clear_all_title": "Pulisci tutti i vincoli",
+  "confirm_clear_all": "Sei sicuro di voler cancellare tutti i vincoli?",
+  "confirm_clear_all_details": "Questo azzererà tutti i parametri di ricerca inclusi testo, date, estensione spaziale, sorgenti e filtri."
 }
 
 

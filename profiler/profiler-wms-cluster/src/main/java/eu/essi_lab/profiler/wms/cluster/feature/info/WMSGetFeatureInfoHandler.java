@@ -360,6 +360,15 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			}
 		    }
 
+		    String platformTitle = getParam(parameterMap, "platformTitle");
+		    if (platformTitle != null) {
+			Optional<Bond> optBond = BondUtils.createBond(BondOperator.TEXT_SEARCH, platformTitle,
+				MetadataElement.PLATFORM_TITLE);
+			if (optBond.isPresent()) {
+			    operands.add(optBond.get());
+			}
+		    }
+
 		    Bond bond = null;
 		    if (operands.size() == 0) {
 			bond = null;
@@ -385,7 +394,7 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		    List<GSResource> results = resultSet.getResultsList();
 		    for (GSResource result : results) {
 			String id = result.getExtensionHandler().getUniquePlatformIdentifier().get();
-			String platformTitle = result.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform()
+			String pt = result.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform()
 				.getCitation().getTitle();
 			String sourceId = result.getSource().getUniqueIdentifier();
 			GSSource source = ConfigurationWrapper.getSource(sourceId);
@@ -395,8 +404,8 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			}
 			StationRecord station = new StationRecord();
 			station.setPlatformIdentifier(id);
-			station.setPlatformName(platformTitle);
-			station.setDatasetName(platformTitle);
+			station.setPlatformName(pt);
+			station.setDatasetName(pt);
 			station.setSourceLabel(sourceLabel);
 			stations.add(station);
 		    }

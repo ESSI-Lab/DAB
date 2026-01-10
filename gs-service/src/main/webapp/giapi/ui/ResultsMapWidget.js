@@ -226,7 +226,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	}
 
 	if (!options.markerColor) {
-		options.markerColor = 'red';
+		options.markerColor = 'blue';
 	}
 	if (!options.selectionColor) {
 		options.selectionColor = '#0000FF';
@@ -626,11 +626,12 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			options.visible = false;
 			var layerArray2 = createWMSCLusterLayer(options, constraints);
 	
-			olMap.removeLayers(layerArray);
-			olMap.addLayers(layerArray);
-	
+			// Add layers in reverse order so "his-central" (layerArray) appears on top
 			olMap.removeLayers(layerArray2);
 			olMap.addLayers(layerArray2);
+	
+			olMap.removeLayers(layerArray);
+			olMap.addLayers(layerArray);
 	
 			layerSwitcher.renderPanel();
 		}

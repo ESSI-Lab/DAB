@@ -261,12 +261,12 @@ GIAPI.Common_UINode = function(options) {
 
 		jQuery(document).on('mouseover', '#' + sectionDivId, function() {
 			if (options.mapWidget) {
-				options.mapWidget.markerIcon(node, { url: '../giapi/ui/images/circle-yellow-marker.png' });
+				options.mapWidget.markerIcon(node, { url: '../giapi/ui/images/red-marker.png' });
 			}
 		});
 		jQuery(document).on('mouseout', '#' + sectionDivId, function() {
 			if (options.mapWidget) {
-				options.mapWidget.markerIcon(node, { color: 'red' });
+				options.mapWidget.markerIcon(node, { color: 'blue' });
 			}
 		});
 

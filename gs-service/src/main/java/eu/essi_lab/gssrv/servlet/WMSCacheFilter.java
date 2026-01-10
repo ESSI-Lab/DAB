@@ -1,7 +1,6 @@
 package eu.essi_lab.gssrv.servlet;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 
 /*-
  * #%L
@@ -24,10 +23,8 @@ import java.io.FileInputStream;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -98,18 +95,18 @@ public class WMSCacheFilter implements Filter {
 	WebRequest webRequest = new WebRequest((HttpServletRequest) servletRequest, false, requestId);
 
 	String requestPath = webRequest.getRequestPath();
-
-	//
+	String requestURL = webRequest.getServletRequest().getRequestURL().toString();	//
+	String query = webRequest.getServletRequest().getQueryString();
 	//
 	//
 
 	if ( // requestPath.endsWith("/wms") || //
 	     // requestPath.endsWith("/wms-extent") || //
-	requestPath.endsWith("/wms-cluster") //
+	requestPath.endsWith("/wms-cluster")&&query!=null && query.toLowerCase().contains("getmap") //
 
 	) {
 
-	    StringBuffer requestURL = webRequest.getServletRequest().getRequestURL();
+
 	    URL url = new URL(requestURL.toString());
 	    String hostname = url.getHost();
 	    boolean useCache = true;

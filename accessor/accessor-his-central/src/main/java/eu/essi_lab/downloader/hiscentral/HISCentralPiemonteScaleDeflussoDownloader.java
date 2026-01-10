@@ -84,6 +84,7 @@ public class HISCentralPiemonteScaleDeflussoDownloader extends WMLDataDownloader
 
 	DataDescriptor descriptor = new DataDescriptor();
 	descriptor.setDataType(DataType.RATING_CURVE);
+	descriptor.setCRS(CRS.EPSG_4326());
 	descriptor.setDataFormat(DataFormat.WATERML_2_0());
 
 	ret.add(descriptor);
@@ -132,12 +133,18 @@ public class HISCentralPiemonteScaleDeflussoDownloader extends WMLDataDownloader
     @Override
     public boolean canDownload() {
 
-	return (online.getFunctionCode() != null && //
+	boolean ret = (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
 		online.getLinkage().contains(HISCentralPiemonteConnector.BASE_URL) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI));
+
+	if (ret){
+	    GSLoggerFactory.getLogger(getClass()).info("Deflusso downloader found");
+	}
+
+	return ret;
     }
 
     @Override

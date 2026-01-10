@@ -6,8 +6,8 @@
     "tf-source": "Sorgente",
     "tf-organisationName": "Organizzazione",
     "tf-attributeTitle": "Parametro locale",
-    "tf-attributeURI": "Parametro armonizzato",
-    "tf-observedPropertyURI": "Parametro armonizzato",
+    "tf-attributeURI": "Parametro",
+    "tf-observedPropertyURI": "Parametro",
     "tf-platformTitle": "Stazione",
     "tf-instrumentTitle": "Strumento"
 }

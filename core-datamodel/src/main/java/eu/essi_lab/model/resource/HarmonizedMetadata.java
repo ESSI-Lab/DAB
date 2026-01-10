@@ -87,4 +87,6 @@ public class HarmonizedMetadata {
 	return extendedMetadata;
     }
 
+    public void get() {
+    }
 }
