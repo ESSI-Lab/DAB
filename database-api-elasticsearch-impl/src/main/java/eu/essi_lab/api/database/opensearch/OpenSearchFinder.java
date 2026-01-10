@@ -313,7 +313,6 @@ public class OpenSearchFinder implements DatabaseFinder {
     }
 
     /**
-     *
      * @param response
      * @param resultSet
      */
@@ -325,20 +324,27 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	if (geoBound != null && geoBound.bounds() != null) {
 
-	    ComputationResult result = new ComputationResult();
-	    result.setTarget(OpenSearchWrapper.BBOX_AGG);
+	    try {
 
-	    GeographicBoundingBox bbox = new GeographicBoundingBox();
+		ComputationResult result = new ComputationResult();
+		result.setTarget(OpenSearchWrapper.BBOX_AGG);
 
-	    TopLeftBottomRightGeoBounds tlbr = geoBound.bounds().tlbr();
+		GeographicBoundingBox bbox = new GeographicBoundingBox();
 
-	    bbox.setBigDecimalSouth(new BigDecimal(tlbr.bottomRight().latlon().lat()));
-	    bbox.setBigDecimalWest(new BigDecimal(tlbr.topLeft().latlon().lon()));
+		TopLeftBottomRightGeoBounds tlbr = geoBound.bounds().tlbr();
 
-	    bbox.setBigDecimalNorth(new BigDecimal(tlbr.topLeft().latlon().lat()));
-	    bbox.setBigDecimalEast(new BigDecimal(tlbr.bottomRight().latlon().lon()));
+		bbox.setBigDecimalSouth(new BigDecimal(tlbr.bottomRight().latlon().lat()));
+		bbox.setBigDecimalWest(new BigDecimal(tlbr.topLeft().latlon().lon()));
 
-	    resultSet.setBBoxUnion(bbox);
+		bbox.setBigDecimalNorth(new BigDecimal(tlbr.topLeft().latlon().lat()));
+		bbox.setBigDecimalEast(new BigDecimal(tlbr.bottomRight().latlon().lon()));
+
+		resultSet.setBBoxUnion(bbox);
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
+	    }
 	}
     }
 
