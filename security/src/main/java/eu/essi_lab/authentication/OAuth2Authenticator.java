@@ -10,47 +10,36 @@ package eu.essi_lab.authentication;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
-
-import eu.essi_lab.authentication.token.Token;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
+import eu.essi_lab.authentication.token.*;
 import eu.essi_lab.cfga.Configurable;
-import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.cfga.gs.setting.oauth.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.exceptions.*;
+import org.apache.http.*;
+import org.apache.http.client.entity.*;
+import org.apache.http.client.methods.*;
+import org.apache.http.impl.client.*;
+import org.apache.http.message.*;
+import org.json.*;
+
+import javax.servlet.http.*;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.*;
+import java.util.*;
 
 /**
  * OAuthAuthenticator2 types implements oauth2 requests flow services. This flow is made up by two/three steps:<br> -
@@ -75,6 +64,7 @@ public abstract class OAuth2Authenticator implements Configurable<OAuthSetting> 
 
     private String loginUrl;
     private String tokenUrl;
+    private String tokeUrlHost;
     private String userInfoUrl;
     private URI redirectUri;
     private CloseableHttpClient httpClient;
@@ -107,6 +97,8 @@ public abstract class OAuth2Authenticator implements Configurable<OAuthSetting> 
 
 	this.tokenUrl = setting.getSelectedProviderSetting().getTokenURL().get();
 	this.tokenUrl = tokenUrl.endsWith("?") ? tokenUrl + TOKEN_QUERY : tokenUrl + "?" + TOKEN_QUERY;
+
+	this.tokeUrlHost = URI.create(tokenUrl.substring(0,tokenUrl.indexOf("?") )).getHost();
 
 	this.userInfoUrl = setting.getSelectedProviderSetting().getUserInfoURL().get();
     }
@@ -408,20 +400,32 @@ public abstract class OAuth2Authenticator implements Configurable<OAuthSetting> 
      */
     private JsonNode getToken(String postTokenUrl, CloseableHttpClient httpClient, ObjectMapper objM) throws Exception {
 
+	URI uri = null;
 	try {
-	    URI uri = URI.create(postTokenUrl);
+	    uri = URI.create(postTokenUrl);
 
-	    if (!uri.getScheme().equalsIgnoreCase("https")) {
-		throw new Exception("Invalid URL scheme");
-	    }
-
-
-	} catch (URISyntaxException e) {
+	} catch (Exception e) {
 
 	    throw new Exception("Invalid token URL", e);
 	}
 
-	HttpPost httpPost = new HttpPost(postTokenUrl.substring(0, postTokenUrl.indexOf("?")));
+	if (!uri.getScheme().equalsIgnoreCase("https")) {
+	    throw new Exception("Invalid URL scheme");
+	}
+
+	if (uri.getHost() == null || !uri.getHost().equals(tokeUrlHost)) {
+	    throw new Exception("Untrusted token host");
+	}
+
+	URI baseUri = new URI(
+		uri.getScheme(),
+		uri.getAuthority(),
+		uri.getPath(),
+		null,
+		null
+	);
+
+	HttpPost httpPost = new HttpPost(baseUri);
 
 	List<NameValuePair> params = extractParamsFromUrl(postTokenUrl);
 
