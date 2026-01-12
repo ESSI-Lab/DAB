@@ -6,8 +6,8 @@
   "tf-source": "Source",
   "tf-organisationName": "Organisation",
   "tf-attributeTitle": "Local observed property",
-  "tf-attributeURI": "Harmonized observed property",
-  "tf-observedPropertyURI": "Harmonized observed property",
+  "tf-attributeURI": "Observed property",
+  "tf-observedPropertyURI": "Observed property",
   "tf-platformTitle": "Station",
   "tf-instrumentTitle": "Instrument"
 }

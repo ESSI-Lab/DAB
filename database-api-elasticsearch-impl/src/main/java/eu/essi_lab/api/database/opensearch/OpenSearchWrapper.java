@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch;
 
@@ -13,91 +13,45 @@ package eu.essi_lab.api.database.opensearch;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.stream.Collectors;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.opensearch.client.json.JsonData;
-import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.ErrorCause;
-import org.opensearch.client.opensearch._types.ErrorResponse;
-import org.opensearch.client.opensearch._types.FieldSort;
-import org.opensearch.client.opensearch._types.FieldValue;
-import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.Result;
-import org.opensearch.client.opensearch._types.SortOptions;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.opensearch.index.*;
+import eu.essi_lab.api.database.opensearch.index.mappings.*;
+import eu.essi_lab.api.database.opensearch.query.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.Queryable.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.json.*;
+import org.opensearch.client.json.*;
+import org.opensearch.client.opensearch.*;
+import org.opensearch.client.opensearch._types.*;
 import org.opensearch.client.opensearch._types.SortOrder;
-import org.opensearch.client.opensearch._types.aggregations.Aggregate;
-import org.opensearch.client.opensearch._types.aggregations.Aggregation;
-import org.opensearch.client.opensearch._types.aggregations.Buckets;
-import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregation;
-import org.opensearch.client.opensearch._types.aggregations.MaxAggregation;
-import org.opensearch.client.opensearch._types.aggregations.MinAggregation;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
-import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
-import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregate;
-import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation;
-import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.Builder;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch.core.BulkRequest;
-import org.opensearch.client.opensearch.core.BulkResponse;
-import org.opensearch.client.opensearch.core.CountRequest;
-import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
-import org.opensearch.client.opensearch.core.DeleteByQueryResponse;
-import org.opensearch.client.opensearch.core.DeleteRequest;
-import org.opensearch.client.opensearch.core.DeleteResponse;
-import org.opensearch.client.opensearch.core.ExistsRequest;
-import org.opensearch.client.opensearch.core.GetRequest;
-import org.opensearch.client.opensearch.core.GetResponse;
-import org.opensearch.client.opensearch.core.IndexRequest;
-import org.opensearch.client.opensearch.core.IndexResponse;
-import org.opensearch.client.opensearch.core.MsearchRequest;
-import org.opensearch.client.opensearch.core.MsearchResponse;
-import org.opensearch.client.opensearch.core.SearchRequest;
-import org.opensearch.client.opensearch.core.SearchResponse;
-import org.opensearch.client.opensearch.core.bulk.BulkOperation;
-import org.opensearch.client.opensearch.core.msearch.MultiSearchResponseItem;
-import org.opensearch.client.opensearch.core.msearch.RequestItem;
-import org.opensearch.client.opensearch.core.search.Hit;
-import org.opensearch.client.opensearch.core.search.HitsMetadata;
-import org.opensearch.client.opensearch.core.search.SourceFilter;
-import org.opensearch.client.opensearch.core.search.TrackHits;
-import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
-import org.opensearch.client.opensearch.generic.Requests;
-import org.opensearch.client.opensearch.generic.Response;
+import org.opensearch.client.opensearch._types.aggregations.*;
+import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.*;
+import org.opensearch.client.opensearch._types.query_dsl.*;
+import org.opensearch.client.opensearch.core.*;
+import org.opensearch.client.opensearch.core.bulk.*;
+import org.opensearch.client.opensearch.core.msearch.*;
+import org.opensearch.client.opensearch.core.search.*;
+import org.opensearch.client.opensearch.generic.*;
 
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
-import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
-import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.SearchAfter;
-import eu.essi_lab.messages.SortedFields;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.Queryable.ContentType;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
+import java.io.*;
+import java.util.AbstractMap.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -105,6 +59,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
 public class OpenSearchWrapper {
 
     private static final Integer MAX_DEFAULT_HITS = 10000;
+    static final String BBOX_AGG = "bbox";
 
     private final OpenSearchClient client;
 
@@ -279,21 +234,19 @@ public class OpenSearchWrapper {
 	Aggregation topHitsAgg = new Aggregation.Builder().// takes the first result
 
 		topHits(topHitsBuilder.//
-			size(1).//
-			build())
-		.build();
+		size(1).//
+		build()).build();
 
 	Aggregation termsAgg = new Aggregation.Builder().terms(//
 		new TermsAggregation.Builder().//
 			field(DataFolderMapping.toKeywordField(target.getName())).//
 			size(size).//
-			build())
-		.//
+			build()).//
 		aggregations(new HashMap<>() {
-		    {
-			put(topHitsAggName, topHitsAgg);
-		    }
-		}).build();
+	    {
+		put(topHitsAggName, topHitsAgg);
+	    }
+	}).build();
 
 	map.put(termsAggName, termsAgg);
 
@@ -375,7 +328,7 @@ public class OpenSearchWrapper {
     /**
      * <b>NOTE</b>: if <code>size</code> is greater than {@link #MAX_DEFAULT_HITS}, the request will fail and an
      * {@link OpenSearchException} will be thrown
-     * 
+     *
      * @param index
      * @param searchQuery
      * @param fields
@@ -400,8 +353,8 @@ public class OpenSearchWrapper {
 	    Optional<SortedFields> sortedFields, //
 	    Optional<SearchAfter> searchAfter, //
 	    boolean requestCache, //
-	    boolean excludeResourceBinary,
-
+	    boolean excludeResourceBinary,//
+	    boolean bboxUnionIncluded,//
 	    boolean trackTotalHits, //
 	    List<Queryable> termFrequencyTargets, //
 	    Optional<Integer> maxFrequencyMapItems//
@@ -421,6 +374,17 @@ public class OpenSearchWrapper {
 		termFrequencyTargets.forEach(trg -> builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
 
 			DataFolderMapping.toKeywordField(trg.getName())).size(maxFrequencyMapItems.get()))));
+	    }
+
+	    //
+	    // optional bbox union
+	    //
+
+	    if (bboxUnionIncluded) {
+
+		Aggregation bboxAgg = Aggregation.of(b -> b.geoBounds(bb -> bb.field(MetadataElement.BOUNDING_BOX.getName())));
+
+		builder.aggregations(BBOX_AGG, bboxAgg);
 	    }
 
 	    //
@@ -474,9 +438,9 @@ public class OpenSearchWrapper {
 			fields, //
 			excludeResourceBinary, //
 			requestCache, //
+			bboxUnionIncluded,//
 			trackTotalHits, //
-			termFrequencyTargets,
-			maxFrequencyMapItems);//
+			termFrequencyTargets, maxFrequencyMapItems);//
 	    }
 
 	    return builder;
@@ -487,7 +451,7 @@ public class OpenSearchWrapper {
     /**
      * <b>NOTE</b>: if <code>size</code> is greater than {@link #MAX_DEFAULT_HITS}, the request will fail and an
      * {@link OpenSearchException} will be thrown
-     * 
+     *
      * @param index
      * @param searchQuery
      * @param fields
@@ -522,7 +486,8 @@ public class OpenSearchWrapper {
 		searchAfter, //
 		requestCache, //
 		excludeResourceBinary, //
-		false, //
+		false, // bbox union
+		false, // track total hits
 		new ArrayList<>(), //
 		Optional.empty());
 
@@ -531,7 +496,7 @@ public class OpenSearchWrapper {
     /**
      * <b>NOTE</b>: if <code>size</code> is greater than {@link #MAX_DEFAULT_HITS}, the request will fail and an
      * {@link OpenSearchException} will be thrown
-     * 
+     *
      * @param index
      * @param searchQuery
      * @param message
@@ -557,6 +522,7 @@ public class OpenSearchWrapper {
 		message.getSearchAfter(), //
 		requestCache, //
 		message.isResourceBinaryExcluded(), //
+		message.isBboxUnionIncluded(),//
 		message.isCountInRetrievalIncluded(), // track total hits
 		message.getTermFrequencyTargets(), //
 		Optional.of(message.getMaxFrequencyMapItems()));
@@ -565,10 +531,9 @@ public class OpenSearchWrapper {
 
     /**
      * <b>NOTE</b>: use it with care! It returns a maximum of {@link #MAX_DEFAULT_HITS} which are requested (and
-     * optionally returned) in a single query.<br>
-     * This method is actually used by {@link OpenSearchReader} to get the users and the views, so the limit of
-     * {@link #MAX_DEFAULT_HITS} is not a problem
-     * 
+     * optionally returned) in a single query.<br> This method is actually used by {@link OpenSearchReader} to get the users and the views,
+     * so the limit of {@link #MAX_DEFAULT_HITS} is not a problem
+     *
      * @param searchQuery
      * @param key
      * @return
@@ -586,7 +551,7 @@ public class OpenSearchWrapper {
 		Optional.empty(), //
 		false, //
 		false, //
-
+		false,// bbox union
 		false, //
 		new ArrayList<>(), //
 		Optional.empty()//
@@ -598,11 +563,10 @@ public class OpenSearchWrapper {
 
     /**
      * <b>NOTE</b>: if <code>size</code> is greater than {@link #MAX_DEFAULT_HITS}, the request will fail and an
-     * {@link OpenSearchException} will be thrown.<br>
-     * This method is actually used by
-     * {@link OpenSearchFolder#get(eu.essi_lab.api.database.Database.IdentifierType, String)} method with
-     * a <code>size</code> of 1, so the limit of {@link #MAX_DEFAULT_HITS} is not a problem
-     * 
+     * {@link OpenSearchException} will be thrown.<br> This method is actually used by
+     * {@link OpenSearchFolder#get(eu.essi_lab.api.database.Database.IdentifierType, String)} method with a <code>size</code> of 1, so the
+     * limit of {@link #MAX_DEFAULT_HITS} is not a problem
+     *
      * @param index
      * @param searchQuery
      * @param start
@@ -630,10 +594,10 @@ public class OpenSearchWrapper {
      * <b>NOTE</b>: use it with care! It returns a maximum of {@link #MAX_DEFAULT_HITS} which are requested (and
      * optionally returned) in a single query.<br>
      * <b>WARNING</b>: this method is actually called by
-     * {@link OpenSearchReader#getResources(eu.essi_lab.api.database.Database.IdentifierType, String)}
-     * and {@link OpenSearchReader#getResources(String, eu.essi_lab.model.GSSource, boolean)} methods where ALL
-     * resources should be searched and the limit of {@link #MAX_DEFAULT_HITS} could be a problem
-     * 
+     * {@link OpenSearchReader#getResources(eu.essi_lab.api.database.Database.IdentifierType, String)} and
+     * {@link OpenSearchReader#getResources(String, eu.essi_lab.model.GSSource, boolean)} methods where ALL resources should be searched and
+     * the limit of {@link #MAX_DEFAULT_HITS} could be a problem
+     *
      * @param index
      * @param searchQuery
      * @return
@@ -657,14 +621,12 @@ public class OpenSearchWrapper {
 
     /**
      * <b>NOTE</b>: use it with care! It returns a maximum of {@link #MAX_DEFAULT_HITS} which are requested (and
-     * optionally returned) in a single query.<br>
-     * The search request is performed excluding binaries and only the given <code>field</code> is searched and
-     * returned.<br>
-     * Actually this method is called by {@link FolderRegistry#getRegisteredFolders()},
-     * {@link OpenSearchFolder#listKeys()} for non-data folders,
-     * and by {@link OpenSearchReader#getViewIdentifiers(eu.essi_lab.api.database.GetViewIdentifiersRequest)}; in all
-     * these cases the limitation of {@link #MAX_DEFAULT_HITS} is not a problem
-     * 
+     * optionally returned) in a single query.<br> The search request is performed excluding binaries and only the given <code>field</code>
+     * is searched and returned.<br> Actually this method is called by {@link FolderRegistry#getRegisteredFolders()},
+     * {@link OpenSearchFolder#listKeys()} for non-data folders, and by
+     * {@link OpenSearchReader#getViewIdentifiers(eu.essi_lab.api.database.GetViewIdentifiersRequest)}; in all these cases the limitation of
+     * {@link #MAX_DEFAULT_HITS} is not a problem
+     *
      * @param searchQuery
      * @param field
      * @return
@@ -677,9 +639,9 @@ public class OpenSearchWrapper {
 
     /**
      * <b>NOTE</b>: if <code>size</code> is greater than {@link #MAX_DEFAULT_HITS}, the request will fail and an
-     * {@link OpenSearchException} will be thrown.<br>
-     * The search request is performed excluding binaries and only the given <code>field</code> is searched and returned
-     * 
+     * {@link OpenSearchException} will be thrown.<br> The search request is performed excluding binaries and only the given
+     * <code>field</code> is searched and returned
+     *
      * @param searchQuery
      * @param field
      * @param start
@@ -710,10 +672,9 @@ public class OpenSearchWrapper {
     }
 
     /**
-     * See <a href=
-     * "https://stackoverflow.com/questions/74823431/how-to-implement-nested-aggregations-using-opensearch-java-client">Nested
+     * See <a href= "https://stackoverflow.com/questions/74823431/how-to-implement-nested-aggregations-using-opensearch-java-client">Nested
      * aggregations</a>
-     * 
+     *
      * @param searchQuery
      * @param field
      * @param max
@@ -727,7 +688,8 @@ public class OpenSearchWrapper {
 
 	String aggName = "minMaxAgg";
 
-	Aggregation agg = max ? new Aggregation.Builder().max(new MaxAggregation.Builder().field(field).build()).build()
+	Aggregation agg = max
+		? new Aggregation.Builder().max(new MaxAggregation.Builder().field(field).build()).build()
 		: new Aggregation.Builder().min(new MinAggregation.Builder().field(field).build()).build();
 
 	map.put(aggName, agg);
@@ -1033,7 +995,7 @@ public class OpenSearchWrapper {
      * @param requestCache
      * @param trackTotalHits
      * @param termFrequencyTargets
-     * @param maxFrequencyMapItems 
+     * @param maxFrequencyMapItems
      */
     private void debugSearchRequest(//
 	    Query searchQuery, //
@@ -1045,6 +1007,7 @@ public class OpenSearchWrapper {
 	    List<String> fields, //
 	    boolean excludeResourceBinary, //
 	    boolean requestCache, //
+	    boolean bboxUnionIncluded,//
 	    boolean trackTotalHits, //
 	    List<Queryable> termFrequencyTargets,//
 	    Optional<Integer> maxFrequencyMapItems) {
@@ -1056,6 +1019,13 @@ public class OpenSearchWrapper {
 	    termFrequencyTargets.forEach(trg -> clone.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
 
 		    DataFolderMapping.toKeywordField(trg.getName())).size(maxFrequencyMapItems.get()))));
+	}
+
+	if (bboxUnionIncluded) {
+
+	    Aggregation bboxAgg = Aggregation.of(b -> b.geoBounds(bb -> bb.field(MetadataElement.BOUNDING_BOX.getName())));
+
+	    clone.aggregations(BBOX_AGG, bboxAgg);
 	}
 
 	if (trackTotalHits) {
@@ -1111,14 +1081,14 @@ public class OpenSearchWrapper {
 
 	    ContentType contentType = orderingProperty.getContentType();
 
-	    String field = contentType == ContentType.TEXTUAL ? DataFolderMapping.toKeywordField(orderingProperty.getName())
+	    String field = contentType == ContentType.TEXTUAL
+		    ? DataFolderMapping.toKeywordField(orderingProperty.getName())
 		    : orderingProperty.getName();
 
 	    SortOptions sortOption = new SortOptions.Builder().//
 		    field(new FieldSort.Builder().//
-			    field(field).//
-			    order(sortOrder == eu.essi_lab.model.SortOrder.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build())
-		    .//
+		    field(field).//
+		    order(sortOrder == eu.essi_lab.model.SortOrder.ASCENDING ? SortOrder.Asc : SortOrder.Desc).build()).//
 		    build();
 
 	    sortOptions.add(sortOption);

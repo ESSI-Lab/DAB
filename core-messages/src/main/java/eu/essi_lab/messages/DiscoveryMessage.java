@@ -111,6 +111,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     private static final String INLCUDE_COUNT_IN_RETRIEVAL = "INLCUDE_COUNT_IN_RETRIEVAL";
     private static final String RSM_THREADS_COUNT = "rsmThreadsCount";
     private static final String DATA_PROXY_SERVER = "dataProxyServer";
+    private static final String BBOX_UNION = "bboxUnion";
 
     /**
      *
@@ -136,6 +137,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	setQueryRegistrationEnabled(false);
 	setTermFrequencyTargets(Arrays.asList());
 	setIncludeCountInRetrieval(false);
+	setIncludeBboxUnion(false);
 
 	getPayload().add(new GSProperty<>(PARENTS_GSRESOURCE, parents));
     }
@@ -476,6 +478,24 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     public void setIncludeCountInRetrieval(boolean include) {
 
 	getHeader().add(new GSProperty<>(INLCUDE_COUNT_IN_RETRIEVAL, include));
+    }
+
+    /**
+     * Default value: false
+     *
+     * @return
+     */
+    public boolean isBboxUnionIncluded() {
+
+	return getHeader().get(BBOX_UNION, Boolean.class);
+    }
+
+    /**
+     * @param include
+     */
+    public void setIncludeBboxUnion(boolean include) {
+
+	getHeader().add(new GSProperty<>(BBOX_UNION, include));
     }
 
     // ----------------------------------------

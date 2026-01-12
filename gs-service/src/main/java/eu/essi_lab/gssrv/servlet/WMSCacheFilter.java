@@ -95,18 +95,18 @@ public class WMSCacheFilter implements Filter {
 	WebRequest webRequest = new WebRequest((HttpServletRequest) servletRequest, false, requestId);
 
 	String requestPath = webRequest.getRequestPath();
-
-	//
+	String requestURL = webRequest.getServletRequest().getRequestURL().toString();	//
+	String query = webRequest.getServletRequest().getQueryString();
 	//
 	//
 
 	if ( // requestPath.endsWith("/wms") || //
 	     // requestPath.endsWith("/wms-extent") || //
-	requestPath.endsWith("/wms-cluster") //
+	requestPath.endsWith("/wms-cluster")&&query!=null && query.toLowerCase().contains("getmap") //
 
 	) {
 
-	    StringBuffer requestURL = webRequest.getServletRequest().getRequestURL();
+
 	    URL url = new URL(requestURL.toString());
 	    String hostname = url.getHost();
 	    boolean useCache = true;

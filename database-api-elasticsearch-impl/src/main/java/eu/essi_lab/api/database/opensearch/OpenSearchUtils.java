@@ -101,6 +101,8 @@ import jakarta.json.stream.JsonParser;
  */
 public class OpenSearchUtils {
 
+    private static final String HYDRO_ONTOLOGY = "http://his-central-ontology.geodab.eu/hydro-ontology";
+
     /**
      * @param response
      * @return
@@ -161,13 +163,15 @@ public class OpenSearchUtils {
 		TermFrequencyItem item = new TermFrequencyItem();
 		item.setTerm(term);
 		String decoded = term;
-		if (term.startsWith("http://his-central-ontology.geodab.eu/hydro-ontology")){
+
+		if (term.startsWith(HYDRO_ONTOLOGY)){
 		    HISCentralOntology ontology = new HISCentralOntology();
 		    SKOSConcept concept = ontology.getConcept(term);
 		    if (concept!=null){
 			decoded = concept.getPreferredLabel().getKey();
 		    }
 		}
+
 		item.setDecodedTerm(decoded);
 		item.setFreq(count);
 		item.setLabel(target);

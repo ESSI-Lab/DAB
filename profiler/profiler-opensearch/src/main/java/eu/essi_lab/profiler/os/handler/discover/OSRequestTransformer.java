@@ -1,84 +1,33 @@
 package eu.essi_lab.profiler.os.handler.discover;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.google.common.collect.*;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.lib.odip.rosetta.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.DiscoveryMessage.*;
+import eu.essi_lab.messages.ResourceSelector.*;
+import eu.essi_lab.messages.ValidationMessage.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.LogicalBond.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.pluggable.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.pdk.*;
+import eu.essi_lab.pdk.wrt.*;
+import eu.essi_lab.profiler.os.*;
+import eu.essi_lab.profiler.os.handler.discover.covering.*;
+import eu.essi_lab.profiler.os.handler.discover.eiffel.*;
+import eu.essi_lab.profiler.os.handler.srvinfo.*;
 
-import javax.ws.rs.core.MediaType;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import com.google.common.collect.Lists;
-
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
-import eu.essi_lab.lib.odip.rosetta.RosettaStone;
-import eu.essi_lab.lib.odip.rosetta.RosettaStoneConnector;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.NameSpace;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.DiscoveryMessage.EiffelAPIDiscoveryOption;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
-import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
-import eu.essi_lab.messages.ValidationMessage;
-import eu.essi_lab.messages.ValidationMessage.ValidationResult;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.web.KeyValueParser;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.ResultsPriority;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.pluggable.ESSILabProvider;
-import eu.essi_lab.model.pluggable.Provider;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.RankingStrategy;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.pdk.BondUtils;
-import eu.essi_lab.pdk.SemanticSearchSupport;
-import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.pdk.wrt.WebRequestParameter;
-import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.profiler.os.OSParameter;
-import eu.essi_lab.profiler.os.OSParameters;
-import eu.essi_lab.profiler.os.OSProfilerSetting;
-import eu.essi_lab.profiler.os.OSRequestParser;
-import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeDiscoveryHandler;
-import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeOptionsReader;
-import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHelper;
-import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
+import javax.ws.rs.core.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -183,6 +132,13 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 		message.setQuakeMLEventOrder(evtOrderValue);
 	    }
+
+	    //
+  	    // bbox union
+	    //
+
+	    String bboxUnion = parser.parse(OSParameters.BBOX_UNION);
+	    message.setIncludeBboxUnion(bboxUnion != null && bboxUnion.equals("true"));
 
 	    OSParameter viewIdParam = WebRequestParameter.findParameter(OSParameters.VIEW_ID.getName(), OSParameters.class);
 
@@ -568,10 +524,10 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	int startIndex = Integer.parseInt(parser.parse(OSParameters.START_INDEX));
 	int count = Integer.parseInt(parser.parse(OSParameters.COUNT));
 
- 	int winSize = startIndex + count;
+	int winSize = startIndex + count;
 	if (winSize > Database.MAX_RESULT_WINDOW_SIZE) {
 
-	    startIndex = Database.MAX_RESULT_WINDOW_SIZE -  count;
+	    startIndex = Database.MAX_RESULT_WINDOW_SIZE - count;
 	}
 
 	return new Page(startIndex, count);

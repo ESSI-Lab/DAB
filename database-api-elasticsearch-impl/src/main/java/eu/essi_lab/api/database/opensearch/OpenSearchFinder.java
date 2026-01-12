@@ -3,83 +3,39 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
-import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.json.JSONObject;
-import org.opensearch.client.opensearch._types.ErrorCause;
-import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch._types.aggregations.Aggregate;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch.core.SearchResponse;
-import org.opensearch.client.opensearch.core.search.SearchResult;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.opensearch.index.mappings.*;
+import eu.essi_lab.api.database.opensearch.query.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.parser.*;
+import eu.essi_lab.messages.count.*;
+import eu.essi_lab.messages.stats.*;
+import eu.essi_lab.messages.termfrequency.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.request.executor.query.IQueryExecutor.*;
+import org.json.*;
+import org.opensearch.client.opensearch._types.*;
+import org.opensearch.client.opensearch._types.aggregations.*;
+import org.opensearch.client.opensearch._types.query_dsl.*;
+import org.opensearch.client.opensearch.core.*;
+import org.opensearch.client.opensearch.core.search.*;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
-import eu.essi_lab.api.database.opensearch.query.OpenSearchBondHandler;
-import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.StreamUtils;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.PerformanceLogger;
-import eu.essi_lab.messages.RequestMessage;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
-import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
-import eu.essi_lab.messages.count.CountSet;
-import eu.essi_lab.messages.count.DiscoveryCountResponse;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
+import javax.xml.bind.*;
+import javax.xml.parsers.*;
+import java.io.*;
+import java.math.*;
+import java.util.AbstractMap.*;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -313,6 +269,15 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		    resultSet.setCountResponse(countSet);
 		}
+
+		//
+		// handles the optional bbox union
+		//
+
+		if (message.isBboxUnionIncluded()) {
+
+		    setBboxUnion(response, resultSet);
+		}
 	    }
 
 	    //
@@ -348,6 +313,42 @@ public class OpenSearchFinder implements DatabaseFinder {
     }
 
     /**
+     * @param response
+     * @param resultSet
+     */
+    private void setBboxUnion(SearchResponse<Object> response, ResultSet<GSResource> resultSet) {
+
+	Aggregate agg = response.aggregations().get(OpenSearchWrapper.BBOX_AGG);
+
+	GeoBoundsAggregate geoBound = (agg != null && agg.isGeoBounds()) ? agg.geoBounds() : null;
+
+	if (geoBound != null && geoBound.bounds() != null) {
+
+	    try {
+
+		ComputationResult result = new ComputationResult();
+		result.setTarget(OpenSearchWrapper.BBOX_AGG);
+
+		GeographicBoundingBox bbox = new GeographicBoundingBox();
+
+		TopLeftBottomRightGeoBounds tlbr = geoBound.bounds().tlbr();
+
+		bbox.setBigDecimalSouth(new BigDecimal(tlbr.bottomRight().latlon().lat()));
+		bbox.setBigDecimalWest(new BigDecimal(tlbr.topLeft().latlon().lon()));
+
+		bbox.setBigDecimalNorth(new BigDecimal(tlbr.topLeft().latlon().lat()));
+		bbox.setBigDecimalEast(new BigDecimal(tlbr.bottomRight().latlon().lon()));
+
+		resultSet.setBBoxUnion(bbox);
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
+	    }
+	}
+    }
+
+    /**
      * @param countSet
      * @param countResponse
      * @param message
@@ -379,7 +380,13 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	Map<String, Aggregate> aggregations = response.aggregations();
 
-	TermFrequencyMapType mapType = OpenSearchUtils.fromAgg(aggregations);
+	HashMap<String, Aggregate> clone = new HashMap<>();
+
+	aggregations.keySet().stream().filter(key -> !key.equals(OpenSearchWrapper.BBOX_AGG)).forEach(key ->
+
+		clone.put(key, aggregations.get(key)));
+
+	TermFrequencyMapType mapType = OpenSearchUtils.fromAgg(clone);
 
 	TermFrequencyMap tfMap = new TermFrequencyMap(mapType);
 

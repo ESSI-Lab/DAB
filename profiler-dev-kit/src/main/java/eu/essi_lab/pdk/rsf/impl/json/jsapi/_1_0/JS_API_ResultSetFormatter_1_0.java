@@ -10,47 +10,34 @@ package eu.essi_lab.pdk.rsf.impl.json.jsapi._1_0;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.ByteArrayOutputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.fasterxml.jackson.databind.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.count.*;
+import eu.essi_lab.messages.termfrequency.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.pluggable.*;
+import eu.essi_lab.pdk.rsf.*;
+import org.json.*;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.MessageResponse;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.count.CountSet;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
-import eu.essi_lab.messages.web.KeyValueParser;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.pluggable.ESSILabProvider;
-import eu.essi_lab.model.pluggable.Provider;
-import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatter;
-import eu.essi_lab.pdk.rsf.FormattingEncoding;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.*;
+import java.io.*;
+import java.util.*;
 
 /**
  * This formatter encapsulates the resources in a JSON object according to an encoding defined for the
@@ -61,7 +48,7 @@ import eu.essi_lab.pdk.rsf.FormattingEncoding;
  * <li>encoding name is {@value #JS_API_FORMATTING_ENCODING_NAME}</li>
  * <li>encoding version is {@value #JS_API_FORMATTING_ENCODING_VERSION}</li>
  * </ul>
- * 
+ *
  * @author Fabrizio
  */
 public class JS_API_ResultSetFormatter_1_0 extends DiscoveryResultSetFormatter<String> {
@@ -98,6 +85,18 @@ public class JS_API_ResultSetFormatter_1_0 extends DiscoveryResultSetFormatter<S
 	    jsonOutput = formatSources(mappedResultSet.getResultsList());
 	} else {
 	    jsonOutput = formatResultSet(message, mappedResultSet);
+	}
+
+	if (mappedResultSet.getBboxUnion().isPresent()) {
+
+	    GeographicBoundingBox geoBbox = mappedResultSet.getBboxUnion().get();
+	    JSONObject bboxUnion = new JSONObject();
+
+	    bboxUnion.put("west", geoBbox.getWest());
+	    bboxUnion.put("east", geoBbox.getEast());
+	    bboxUnion.put("south", geoBbox.getSouth());
+	    bboxUnion.put("north", geoBbox.getNorth());
+	    jsonOutput.put("bboxUnion", bboxUnion);
 	}
 
 	String outToString = jsonOutput.toString(3);
@@ -177,9 +176,10 @@ public class JS_API_ResultSetFormatter_1_0 extends DiscoveryResultSetFormatter<S
 	out.put("reports", reports);
 
 	try {
-	    Optional<TermFrequencyMap> map = mappedResultSet.getCountResponse() == null ? Optional.empty()
+	    Optional<TermFrequencyMap> map = mappedResultSet.getCountResponse() == null
+		    ? Optional.empty()
 		    : mappedResultSet.getCountResponse().mergeTermFrequencyMaps(message.getMaxFrequencyMapItems());
-	  
+
 	    if (map.isPresent()) {
 
 		JSONObject termFrequency = mapTermFrequencyMap(map.get().getElement(), message.getSources());
