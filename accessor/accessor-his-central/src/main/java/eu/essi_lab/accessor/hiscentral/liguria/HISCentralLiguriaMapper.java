@@ -283,16 +283,9 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	//
 	// intendedObservationSpacing = "PT1H"
 	//
-	// 15 -> timeResolution
-	// M -> timeUnits
-
 	if (intervalTime != null) {
-	    String timeResolution = intervalTime.substring(2, intervalTime.length() - 1);
-	    String timeUnits = intervalTime.substring(intervalTime.length() - 1);
-
-	    dataset.getExtensionHandler().setTimeUnits(timeUnits);
-	    dataset.getExtensionHandler().setTimeResolution(timeResolution);
-	    dataset.getExtensionHandler().setTimeSupport(timeResolution);
+	    dataset.getExtensionHandler().setTimeResolutionDuration8601(intervalTime);
+	    dataset.getExtensionHandler().setTimeAggregationDuration8601(intervalTime);
 	}
 
 	// Double pointLon = sensorInfo.optDouble("LON");// sensorInfo.optString("lon");

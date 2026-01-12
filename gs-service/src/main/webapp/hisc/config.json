@@ -42,5 +42,6 @@
 	"permissions" : "downloads,api",
 	"language" : "en",
 	"beta-title" : true,
-	"beta-message" : true
+	"beta-message" : true,
+	"zoomOnResults" : true
 }

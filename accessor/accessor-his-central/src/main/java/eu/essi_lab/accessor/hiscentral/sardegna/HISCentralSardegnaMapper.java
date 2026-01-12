@@ -519,12 +519,12 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	    // 1 -> timeResolution
 	    // H -> timeUnits
 	    //
-	    String timeResolution = aggregationPeriodUnits.substring(2, aggregationPeriodUnits.length() - 1);
 	    String timeUnits = aggregationPeriodUnits.substring(aggregationPeriodUnits.length() - 1);
 
 	    dataset.getExtensionHandler().setTimeUnits(timeUnits);
-	    dataset.getExtensionHandler().setTimeResolution(timeResolution);
-	    dataset.getExtensionHandler().setTimeSupport(timeResolution);
+	    dataset.getExtensionHandler().setTimeResolutionDuration8601(aggregationPeriodUnits);
+	    dataset.getExtensionHandler().setTimeAggregationDuration8601(aggregationPeriodUnits);
+
 
 	    // dataset.getExtensionHandler().setTimeUnits("h");
 	    // dataset.getExtensionHandler().setTimeSupport("1");

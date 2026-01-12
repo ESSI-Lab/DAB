@@ -413,8 +413,8 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 	}
 
 	// currently only daily observation are considered
-	dataset.getExtensionHandler().setTimeResolution("1");
-	dataset.getExtensionHandler().setTimeSupport("1");
+	dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
+	dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
 	dataset.getExtensionHandler().setTimeUnits("d");
 
 	String attributeTitle = label;

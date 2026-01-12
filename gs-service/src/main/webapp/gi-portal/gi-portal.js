@@ -3332,6 +3332,13 @@ export function initializePortal(config) {
 				{ 'key': 'ontologyIds', 'value': ontologyIds }
 			);
 		}
+		
+		// Add bboxUnion parameter if zoomOnResults is enabled
+		if (config.zoomOnResults === true) {
+			constraints.kvp.push(
+				{ 'key': 'bboxUnion', 'value': 'true' }
+			);
+		}
 		 
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
 		// set the termFrequency option
@@ -3378,6 +3385,17 @@ export function initializePortal(config) {
 		if (GIAPI.UI_Utils.discoverDialog('isOpen')) {
 			GIAPI.UI_Utils.discoverDialog('close');
 		}
+		
+		// Handle zoom based on result set size and zoomOnResults setting
+		if (config.zoomOnResults === true) {
+			if (resultSet.size < 1000 && response.bboxUnion) {
+				// Zoom to bboxUnion for smaller result sets
+				window.GIAPI.zoomToBoundingBox(response.bboxUnion);
+			} else if (resultSet.size >= 1000) {
+				// Reset to default initial extent for larger result sets
+				window.GIAPI.zoomToDefaultExtent();
+			}
+		}
 	};
 
 	if (config.resultsVisibility !== undefined && !config.resultsVisibility) {
@@ -3410,16 +3428,64 @@ export function initializePortal(config) {
 			}
 		}
 		if (olMap && typeof olMap.fitBounds === 'function') {
+			
+			// Add padding to bbox to better frame stations, especially for point bboxes
+			var padding = 0.05; // Default padding for non-point bboxes (degrees)
+			var isPoint = (bbox.west === bbox.east && bbox.south === bbox.north);
+			
+			if (isPoint) {
+				// For point bboxes, use larger padding (0.1 degrees) to avoid too much zoom
+				padding = 0.1;
+			}
+			
+			// Apply padding to bbox coordinates
+			var paddedBbox = {
+				west: bbox.west - padding,
+				south: bbox.south - padding,
+				east: bbox.east + padding,
+				north: bbox.north + padding
+			};
+			
+			// Clamp coordinates to valid ranges
+			paddedBbox.west = Math.max(-180, paddedBbox.west);
+			paddedBbox.south = Math.max(-90, paddedBbox.south);
+			paddedBbox.east = Math.min(180, paddedBbox.east);
+			paddedBbox.north = Math.min(90, paddedBbox.north);
 
-
-			var minlatLon = ol.proj.transform([bbox.west, bbox.south], 'EPSG:4326', 'EPSG:3857');
-			var maxlatLon = ol.proj.transform([bbox.east, bbox.north], 'EPSG:4326', 'EPSG:3857');
-
-
+			var minlatLon = ol.proj.transform([paddedBbox.west, paddedBbox.south], 'EPSG:4326', 'EPSG:3857');
+			var maxlatLon = ol.proj.transform([paddedBbox.east, paddedBbox.north], 'EPSG:4326', 'EPSG:3857');
 
 			var tbbox = { 'south': minlatLon[1], 'west': minlatLon[0], 'north': maxlatLon[1], 'east': maxlatLon[0] };
 
 			olMap.fitBounds(tbbox);
+		} else {
+			alert('Map zoom function not available.');
+		}
+	};
+	
+	// Function to reset map to default initial extent from config
+	window.GIAPI.zoomToDefaultExtent = function() {
+		var mapWidget = GIAPI.search && GIAPI.search.resultsMapWidget;
+		var olMap = null;
+		if (mapWidget) {
+			if (mapWidget.map) {
+				olMap = mapWidget.map;
+			} else if (mapWidget.olMap) {
+				olMap = mapWidget.olMap;
+			}
+		}
+		if (olMap && olMap.getView) {
+			var view = olMap.getView();
+			var centerLat = config.centerLat !== undefined ? config.centerLat : 0;
+			var centerLon = config.centerLon !== undefined ? config.centerLon : 0;
+			var zoom = config.zoom !== undefined ? config.zoom : 4;
+			
+			// Transform center coordinates to map projection
+			var center = ol.proj.transform([centerLon, centerLat], 'EPSG:4326', 'EPSG:3857');
+			
+			// Set center and zoom
+			view.setCenter(center);
+			view.setZoom(zoom);
 		} else {
 			alert('Map zoom function not available.');
 		}

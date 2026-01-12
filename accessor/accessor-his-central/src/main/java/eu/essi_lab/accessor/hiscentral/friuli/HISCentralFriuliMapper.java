@@ -192,48 +192,6 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	String description = jsonType.optString("descrizione");
 	String delta_t = jsonType.optString("delta_t");
 
-	//
-	// String stationName = sensorInfo.getString("name");
-	//
-	// String statisticalFunction = "";
-	// if (sensorInfo.getJSONObject("observedProperty").has("statisticalFunction")) {
-	//
-	// statisticalFunction = sensorInfo.getJSONObject("observedProperty").getString("statisticalFunction");
-	//
-	// if (statisticalFunction.equals("sum")) {
-	// dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
-	// } else {
-	// dataset.getExtensionHandler().setTimeInterpolation(statisticalFunction);
-	// }
-	// }
-
-	// String uom = sensorInfo.getJSONObject("observedProperty").getString("uom");
-	// String basePhenomenon = sensorInfo.getJSONObject("observedProperty").getString("basePhenomenon");
-
-	// String intendedObservationSpacing = sensorInfo.getString("intendedObservationSpacing");
-	//
-	// String aggregationTimePeriod = sensorInfo.get("aggregationTimePeriod").toString();
-
-	//
-	// intendedObservationSpacing = "P15M"
-	//
-	// 15 -> timeResolution
-	// M -> timeUnits
-	//
-	// String timeUnits = intendedObservationSpacing.substring(1, intendedObservationSpacing.length() - 1);
-	// String timeResolution = intendedObservationSpacing.substring(intendedObservationSpacing.length() - 1);
-	//
-	// dataset.getExtensionHandler().setTimeUnits(timeUnits);
-	// dataset.getExtensionHandler().setTimeResolution(timeResolution);
-	//
-	// if (aggregationTimePeriod != null && aggregationTimePeriod.equals("0")) {
-	// dataset.getExtensionHandler().setTimeSupport(timeUnits);
-	// }
-
-	//
-	//
-	//
-
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
 	coreMetadata.getMIMetadata().setLanguage("Italian");
@@ -380,8 +338,7 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 
 	DescriptionParsingResult parsedDescription = HISCentralUtils.parseDescription(description);
 
-	dataset.getExtensionHandler().setTimeUnits("seconds");
-	dataset.getExtensionHandler().setTimeResolution(delta_t);
+	dataset.getExtensionHandler().setTimeResolutionDuration8601("PT" + delta_t + "S");
 
 	String attributeTitle = null;
 
@@ -392,7 +349,7 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	    InterpolationType interpolation = parsedDescription.getInterpolation();
 	    if (interpolation != null && !interpolation.equals(InterpolationType.CONTINUOUS)//
 		    && !interpolation.equals(InterpolationType.DISCONTINUOUS)) {
-		dataset.getExtensionHandler().setTimeSupport(delta_t);
+		dataset.getExtensionHandler().setTimeAggregationDuration8601("PT"+delta_t+"S");
 	    }
 	    dataset.getExtensionHandler().setTimeInterpolation(interpolation);
 	}

@@ -546,6 +546,11 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
                         
                         response.push(resSet);
                     }
+                    
+                    // Preserve bboxUnion from server response if present (for extended queries)
+                    if (data.bboxUnion) {
+                    	response.bboxUnion = data.bboxUnion;
+                    }
                 } else {
                     // ***
                     // Normal query
@@ -579,7 +584,12 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
                     		dabNode,
                     		paginator);
                                        
-                    response.push(data.resultSet);                 
+                    response.push(data.resultSet);
+                    
+                    // Preserve bboxUnion from server response if present
+                    if (data.bboxUnion) {
+                    	response.bboxUnion = data.bboxUnion;
+                    }
 //                    console.log(JSON.stringify(data.reports));
                 }
                                                

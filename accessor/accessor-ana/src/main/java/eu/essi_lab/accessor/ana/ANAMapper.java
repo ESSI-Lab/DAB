@@ -238,7 +238,7 @@ public class ANAMapper extends OriginalIdentifierMapper {
 		dataset.getExtensionHandler().setTimeSupport("1");
 
 	    }else {
-		dataset.getExtensionHandler().setTimeResolution("1");
+		dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1H");
 	    }
 
 	    String variableId = variable + "_HOURLY";

@@ -331,9 +331,9 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 	    // if (aggregationTimePeriod != null && aggregationTimePeriod.equals("0")) {
 
 	    // the datasets are available on a daily aggregated basis
-	    dataset.getExtensionHandler().setTimeUnits("d");
-	    dataset.getExtensionHandler().setTimeSupport("1");
-	    dataset.getExtensionHandler().setTimeResolution("1");
+	    dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
+	    dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
+
 	    // }
 
 	    //

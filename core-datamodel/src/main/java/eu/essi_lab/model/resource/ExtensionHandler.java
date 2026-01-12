@@ -551,7 +551,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
     /**
      * @param timeResolution
+     * @deprecated  use setTimeResolutionDuration8601
      */
+    @Deprecated
     public void setTimeResolution(String timeResolution) {
 	try {
 	    this.metadata.add(MetadataElement.TIME_RESOLUTION.getName(), timeResolution);
@@ -621,11 +623,12 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param resolution
+     * @param resolution8601
      */
-    public void setTimeResolutionDuration8601(String resolution) {
+    public void setTimeResolutionDuration8601(String resolution8601) {
 	try {
-	    this.metadata.add(MetadataElement.TIME_RESOLUTION_DURATION_8601.getName(), resolution);
+	    resolution8601 = ISO8601DateTimeUtils.normalizeISO8601Duration(resolution8601);
+	    this.metadata.add(MetadataElement.TIME_RESOLUTION_DURATION_8601.getName(), resolution8601);
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
@@ -664,11 +667,12 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param timeAggregation
+     * @param timeAggregation8601
      */
-    public void setTimeAggregationDuration8601(String timeAggregation) {
+    public void setTimeAggregationDuration8601(String timeAggregation8601) {
 	try {
-	    this.metadata.add(MetadataElement.TIME_AGGREGATION_DURATION_8601.getName(), timeAggregation);
+	    timeAggregation8601 = ISO8601DateTimeUtils.normalizeISO8601Duration(timeAggregation8601);
+	    this.metadata.add(MetadataElement.TIME_AGGREGATION_DURATION_8601.getName(), timeAggregation8601);
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);

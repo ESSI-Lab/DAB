@@ -463,9 +463,8 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    // String timeUnitsAbbreviation = getTimeScaleUnitAbbreviation(series);
 	    // dataset.getExtensionHandler().setTimeUnitsAbbreviation(timeUnitsAbbreviation);
 
-	    dataset.getExtensionHandler().setTimeUnits("M");
-	    dataset.getExtensionHandler().setTimeResolution("15");
-	    dataset.getExtensionHandler().setTimeSupport("15");
+	    dataset.getExtensionHandler().setTimeResolutionDuration8601("PT15M");
+	    dataset.getExtensionHandler().setTimeAggregationDuration8601("PT15M");
 
 	    dataset.getExtensionHandler().setCountry("ITA");
 

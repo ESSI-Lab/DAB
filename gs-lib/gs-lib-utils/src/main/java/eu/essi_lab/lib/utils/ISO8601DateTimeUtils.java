@@ -70,6 +70,30 @@ public class ISO8601DateTimeUtils {
 	// force static usage
     }
 
+    public static String normalizeISO8601Duration(String isoDuration) {
+	java.time.Duration d = java.time.Duration.parse(isoDuration);
+
+	long seconds = d.getSeconds();
+
+	// days
+	if (seconds % 86400 == 0) {
+	    return "P" + (seconds / 86400) + "D";
+	}
+
+	// hours
+	if (seconds % 3600 == 0) {
+	    return "PT" + (seconds / 3600) + "H";
+	}
+
+	// minutes
+	if (seconds % 60 == 0) {
+	    return "PT" + (seconds / 60) + "M";
+	}
+
+	// seconds
+	return "PT" + seconds + "S";
+    }
+
     /**
      * 
      */
