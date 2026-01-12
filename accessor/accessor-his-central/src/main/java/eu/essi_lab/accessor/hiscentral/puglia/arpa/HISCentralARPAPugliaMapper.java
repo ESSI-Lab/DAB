@@ -12,12 +12,12 @@ import java.math.BigDecimal;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -123,8 +123,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
 	return new JSONObject(metadata.getMetadata()).getJSONObject("variable-info");
     }
-    
-    
+
     /**
      * @param metadata
      * @return
@@ -133,7 +132,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 
 	return new JSONObject(metadata.getMetadata()).optString("originator");
     }
-    
+
     /**
      * @param metadata
      * @return
@@ -159,7 +158,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
 
 	JSONObject stationInfo = retrieveVariableInfo(originalMD);
-	
+
 	String originator = retrieveOriginator(originalMD);
 	String contactPoint = retrieveContactPoint(originalMD);
 
@@ -388,7 +387,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	// data linkage (last 24 hours)
 	String linkage = HISCentralARPAPugliaConnector.BASE_URL.endsWith("/")
 		? HISCentralARPAPugliaConnector.BASE_URL.substring(0, HISCentralARPAPugliaConnector.BASE_URL.length() - 1) + "?id_station="
-			+ stationId + "&label_pollutant=" + measureName
+		+ stationId + "&label_pollutant=" + measureName
 		: HISCentralARPAPugliaConnector.BASE_URL + "?id_station=" + stationId + "&label_pollutant=" + measureName;
 
 	Online online = new Online();
@@ -420,8 +419,8 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	    // period
 	    if (measureInterpolation.toLowerCase().contains("annua") || measureInterpolation.toLowerCase().contains("annuo")) {
 		duration = "P1Y";
-	    } else if (measureInterpolation.toLowerCase().contains("giornaliera")
-		    || measureInterpolation.toLowerCase().contains("giornaliero")) {
+	    } else if (measureInterpolation.toLowerCase().contains("giornaliera") || measureInterpolation.toLowerCase()
+		    .contains("giornaliero")) {
 		duration = "P1D";
 	    } else if (measureInterpolation.toLowerCase().contains("orario") || measureInterpolation.toLowerCase().contains("orario")) {
 		duration = "P1H";
@@ -454,7 +453,7 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 		break;
 	    }
 	}
-	    coverageDescription.setAttributeIdentifier(varName + "_" + measureId);
+	coverageDescription.setAttributeIdentifier(varName + "_" + measureId);
 	coverageDescription.setAttributeTitle(varName);
 
 	coverageDescription.setAttributeDescription(pollutantDescription);
@@ -465,9 +464,9 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setAttributeUnitsAbbreviation(measureUnits);
 	}
 
-	if (pollutantUri != null && !pollutantUri.isEmpty()) {
-	    dataset.getExtensionHandler().setObservedPropertyURI(pollutantUri);
-	}
+//	if (pollutantUri != null && !pollutantUri.isEmpty()) {
+//	    dataset.getExtensionHandler().setObservedPropertyURI(pollutantUri);
+//	}
 
 	// as no description is given this field is calculated
 	HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
