@@ -97,7 +97,7 @@ public class StringUtils {
     public static String hashMessageDigest(String algorithm, String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
 	MessageDigest msdDigest = MessageDigest.getInstance(algorithm);
-	msdDigest.update(value.getBytes("UTF-8"), 0, value.length());
+	msdDigest.update(value.getBytes(StandardCharsets.UTF_8), 0, value.length());
 	char[] ret = Hex.encodeHex(msdDigest.digest());
 	return new String(ret).toUpperCase();
     }
@@ -119,6 +119,32 @@ public class StringUtils {
 	byte[] hashBytes = msdDigest.digest();
 	return ByteBuffer.wrap(hashBytes).getLong();
 
+    }
+
+    /**
+     *
+     * @param value
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
+    public static String toUUID(String value){
+
+ 	try {
+	    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+	    byte[] hash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+
+	    ByteBuffer bb = ByteBuffer.wrap(hash, 0, 16);
+	    long high = bb.getLong();
+	    long low = bb.getLong();
+
+	    UUID uuid = new UUID(high, low);
+	    return uuid.toString();
+
+	} catch (NoSuchAlgorithmException e) {
+
+	    throw new RuntimeException(e);
+	}
     }
 
     /**
