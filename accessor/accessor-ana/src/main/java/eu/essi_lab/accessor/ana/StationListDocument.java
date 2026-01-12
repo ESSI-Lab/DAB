@@ -77,7 +77,11 @@ public class StationListDocument extends XMLDocumentReader {
 	    Source xmlSource = new DOMSource(nodes.get(0));
 	    Result outputTarget = new StreamResult(outputStream);
 
-	    TransformerFactory.newInstance().newTransformer().transform(xmlSource, outputTarget);
+	    TransformerFactory factory = XMLFactories.newTransformerFactory();
+
+	    Transformer transformer = factory.newTransformer();
+
+	    transformer.transform(xmlSource, outputTarget);
 
 	    InputStream is = new ByteArrayInputStream(outputStream.toByteArray());
 

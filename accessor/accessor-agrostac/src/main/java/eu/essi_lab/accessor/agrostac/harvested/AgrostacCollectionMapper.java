@@ -10,12 +10,12 @@ package eu.essi_lab.accessor.agrostac.harvested;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -36,6 +36,7 @@ import java.util.UUID;
 
 import javax.xml.bind.JAXBElement;
 
+import eu.essi_lab.lib.utils.*;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,7 +54,6 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
@@ -158,26 +158,14 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
 	BN("common_beans", "1105010018"), WHD("durum_hard_wheat", "1101010020"), TRI("triticale", "1101050000"), ONI("onions",
 		"1103110040"), SBN("soy_soybeans", "1106000020"), CBN("beans", "1105010010"), COT("cotton", "1108000010"), SUN("sunflower",
-			"1106000010"), RYEW("winter_rye", "1101030001"), WHBW("winter_common_soft_wheat", "1101010011"), TRO(
-				"unspecified_wheat",
-				"1101010000"), SGG("unspecified_sorghum", "1101070030"), PML("unspecified_millet", "1101070010"), RIC(
-					"rice",
-					"1101080000"), GRS("grass_fodder_crops", "1111000000"), RAP("rapeseed_rape", "1106000030"), RAPW(
-						"winter_rapeseed_rape",
-						"1106000031"), POT("potatoes", "1107000010"), FAB("beans", "1105010010"), RYE(
-							"unspecified_rye",
-							"1101030000"), OAT("unspecified_oats", "1101040000"), LABL("beans",
-								"1105010010"), MAZ("maize", "1101060000"), RAPI("brassicaceae_cruciferae",
-									"1103050000"), BAR("unspecified_barley", "1101020000"), PEA("peas",
-										"1105010020"), WHB("common_soft_wheat",
-											"1101010010"), BBN("beans", "1105010010"), FBT(
-												"fodder_beet", "1107000032"), FLAX("flax",
-													"1108020010"), BARW("winter_barley",
-														"1101020001"), SBT(
-															"sugar_beet",
-															"1107000031"), BARS(
-																"spring_barley",
-																"1101020002");
+		"1106000010"), RYEW("winter_rye", "1101030001"), WHBW("winter_common_soft_wheat", "1101010011"), TRO("unspecified_wheat",
+		"1101010000"), SGG("unspecified_sorghum", "1101070030"), PML("unspecified_millet", "1101070010"), RIC("rice",
+		"1101080000"), GRS("grass_fodder_crops", "1111000000"), RAP("rapeseed_rape", "1106000030"), RAPW("winter_rapeseed_rape",
+		"1106000031"), POT("potatoes", "1107000010"), FAB("beans", "1105010010"), RYE("unspecified_rye", "1101030000"), OAT(
+		"unspecified_oats", "1101040000"), LABL("beans", "1105010010"), MAZ("maize", "1101060000"), RAPI("brassicaceae_cruciferae",
+		"1103050000"), BAR("unspecified_barley", "1101020000"), PEA("peas", "1105010020"), WHB("common_soft_wheat",
+		"1101010010"), BBN("beans", "1105010010"), FBT("fodder_beet", "1107000032"), FLAX("flax", "1108020010"), BARW(
+		"winter_barley", "1101020001"), SBT("sugar_beet", "1107000031"), BARS("spring_barley", "1101020002");
 
 	private String name;
 	private String code;
@@ -219,10 +207,10 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
 	CANOPY_HEIGHT_M("CANOPY_HEIGHT_M", CANOPY_HEIGHT_M_COUNT), LAIG("LAIG", LAIG_COUNT), CROP_DEV_BBCH("CROP_DEV_BBCH",
 		CROP_DEV_BBCH_COUNT), LAIT("LAIT", LAIT_COUNT), CUL_NAME("CUL_NAME", CUL_NAME_COUNT), PLANT_DENSITY_CNT_M2(
-			"PLANT_DENSITY_CNT_M2", PLANT_DENSITY_CNT_M2_COUNT), SO_DWT_KGHA("SO_DWT_KGHA", SO_DWT_KGHA_COUNT), TOPS_DWT_KGHA(
-				"TOPS_DWT_KGHA", TOPS_DWT_KGHA_COUNT), SO_FWT_KGHA("SO_FWT_KGHA", SO_FWT_KGHA_COUNT), TOPS_FWT_KGHA(
-					"TOPS_FWT_KGHA", TOPS_FWT_KGHA_COUNT), CUL_NOTES("CUL_NOTES", CUL_NOTES_COUNT), SO_MOISTURE_FWT_FR(
-						"SO_MOISTURE_FWT_FR", SO_MOISTURE_FWT_FR_COUNT), CROP_CODE("CROP_CODE", "CROP_CODE");
+		"PLANT_DENSITY_CNT_M2", PLANT_DENSITY_CNT_M2_COUNT), SO_DWT_KGHA("SO_DWT_KGHA", SO_DWT_KGHA_COUNT), TOPS_DWT_KGHA(
+		"TOPS_DWT_KGHA", TOPS_DWT_KGHA_COUNT), SO_FWT_KGHA("SO_FWT_KGHA", SO_FWT_KGHA_COUNT), TOPS_FWT_KGHA("TOPS_FWT_KGHA",
+		TOPS_FWT_KGHA_COUNT), CUL_NOTES("CUL_NOTES", CUL_NOTES_COUNT), SO_MOISTURE_FWT_FR("SO_MOISTURE_FWT_FR",
+		SO_MOISTURE_FWT_FR_COUNT), CROP_CODE("CROP_CODE", "CROP_CODE");
 
 	private String name;
 	private String code;
@@ -578,7 +566,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 		if (t != null) {
 		    toHash += t;
 		}
-		uuid = UUID.nameUUIDFromBytes(toHash.getBytes()).toString();
+		uuid = StringUtils.toUUID(toHash);
 		miMetadata.setFileIdentifier(uuid);
 	    }
 	}
@@ -781,8 +769,8 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	Double maxWest = null;
 	Double minEast = null;
 	Double maxEast = null;
-	String request = endpoint + CROPDATABYAREA_URL + "/" + cCode + "?accesstoken=" + token + "cropquantity=" + qCode + "datasetid="
-		+ datasetId;
+	String request =
+		endpoint + CROPDATABYAREA_URL + "/" + cCode + "?accesstoken=" + token + "cropquantity=" + qCode + "datasetid=" + datasetId;
 	Optional<String> resp = getDownloader().downloadOptionalString(request);
 	if (resp.isPresent()) {
 	    JSONObject cropQuantities = new JSONObject(resp.get());

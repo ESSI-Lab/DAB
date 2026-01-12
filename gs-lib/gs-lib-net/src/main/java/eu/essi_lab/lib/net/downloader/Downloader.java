@@ -709,6 +709,7 @@ public class Downloader {
 		    customTm.checkClientTrusted(chain, authType);
 		} catch (CertificateException e) {
 		    defaultTm.checkClientTrusted(chain, authType);
+		    GSLoggerFactory.getLogger(getClass()).error(e);
 		}
 	    }
 
@@ -719,6 +720,7 @@ public class Downloader {
 		    customTm.checkServerTrusted(chain, authType);
 		} catch (CertificateException e) {
 		    defaultTm.checkServerTrusted(chain, authType);
+		    GSLoggerFactory.getLogger(getClass()).error(e);
 		}
 	    }
 
