@@ -22,12 +22,13 @@ package eu.essi_lab.lib.net.utils.whos;
  */
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.HashMap;
 import java.util.HashSet;
 
 
 public class SKOSConcept {
 
-    private SimpleEntry<String, String> preferredLabel;
+    private HashMap<String, String> preferredLabels = new HashMap<>();
     private SimpleEntry<String, String> definition;
     private HashSet<SimpleEntry<String, String>> alternateLabels = new java.util.HashSet();
     private HashSet<String> closeMatches = new HashSet<>();
@@ -46,12 +47,12 @@ public class SKOSConcept {
 	this.definition = definition;
     }
 
-    public SimpleEntry<String, String> getPreferredLabel() {
-	return preferredLabel;
+    public String getPreferredLabel(String language) {
+	return preferredLabels.get(language);
     }
 
-    public void setPreferredLabel(SimpleEntry<String, String> preferredLabel) {
-	this.preferredLabel = preferredLabel;
+    public void setPreferredLabels(HashMap<String, String> preferredLabels) {
+	this.preferredLabels = preferredLabels;
     }
 
     public HashSet<SimpleEntry<String, String>> getAlternateLabels() {
@@ -76,5 +77,9 @@ public class SKOSConcept {
 
     public void setURI(String uri) {
 	this.uri = uri;
+    }
+
+    public void addPreferredLabel(String language, String prefLabelValue) {
+	this.preferredLabels.put(language,prefLabelValue);
     }
 }

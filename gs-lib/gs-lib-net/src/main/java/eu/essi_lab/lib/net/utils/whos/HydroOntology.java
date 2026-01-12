@@ -227,12 +227,11 @@ public abstract class HydroOntology {
 	    if (binding.has("prefLabel")) {
 		JSONObject prefLabelObject = binding.getJSONObject("prefLabel");
 		String prefLabelValue = prefLabelObject.getString("value");
-		String language = null;
+		String language = "en";
 		if (prefLabelObject.has("xml:lang")) {
 		    language = prefLabelObject.getString("xml:lang");
 		}
-		SimpleEntry<String, String> preferredLabel = new SimpleEntry<>(prefLabelValue, language);
-		concept.setPreferredLabel(preferredLabel);
+		concept.addPreferredLabel(language, prefLabelValue);
 	    }
 
 	    if (binding.has("altLabel")) {

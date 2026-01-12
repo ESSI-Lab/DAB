@@ -299,7 +299,7 @@ public class WMOOntology {
 		    String label = binding.getJSONObject("label").getString("value");
 		    String abbreviation = binding.getJSONObject("abbreviation").getString("value");
 		    WMOUnit unit = new WMOUnit(uri);
-		    unit.setPreferredLabel(new SimpleEntry<>(label, null));
+		    unit.addPreferredLabel(null,label);
 		    unit.setAbbreviation(abbreviation);
 		    unitCache.put(uri, unit);
 		}
@@ -341,7 +341,7 @@ public class WMOOntology {
 		    String label = binding.getJSONObject("label").getString("value");
 		    String definition = binding.getJSONObject("description").getString("value");
 		    SKOSConcept concept = new SKOSConcept(uri);
-		    concept.setPreferredLabel(new SimpleEntry<>(label, null));
+		    concept.addPreferredLabel(null,label);
 		    concept.setDefinition(new SimpleEntry<>(definition, null));
 		    variableCache.put(uri, concept);
 		}
@@ -411,7 +411,7 @@ public class WMOOntology {
 	for (String uri : units) {
 	    WMOUnit unit = getUnit(uri);
 	    List<String> syns = new ArrayList<>();
-	    syns.add(unit.getPreferredLabel().getKey());
+	    syns.add(unit.getPreferredLabel(null));
 	    syns.add(unit.getAbbreviation());
 
 	    if (uri.equals(CommonWMOUnit.CUBIC_METRES_PER_SECOND.getUri())) {
@@ -460,7 +460,7 @@ public class WMOOntology {
 		synonyms += ",\"" + syn + "\"";
 	    }
 
-	    String e = unit.getPreferredLabel().getKey().toUpperCase().replace(" ", "_").replace("(", "").replace(")", "").replace("-", "")
+	    String e = unit.getPreferredLabel(null).toUpperCase().replace(" ", "_").replace("(", "").replace(")", "").replace("-", "")
 		    .replace("^", "").replace("=", "").replace("__", "_") + "(\"" + uri + "\"" + synonyms + "),//";
 	    enums.add(e);
 	}

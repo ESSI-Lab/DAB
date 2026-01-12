@@ -25,11 +25,7 @@ public class HydroOntologyPrinter {
 	    for (String match : matches) {
 		close += match + ";";
 	    }
-	    String pref = "";
-	    SimpleEntry<String, String> pl = concept.getPreferredLabel();
-	    if (pl != null) {
-		pref = pl.getKey();
-	    }
+	    String pref = concept.getPreferredLabel("en");
 
 	    if (labels == null || labels.isEmpty()) {
 		writer.write(concept.getURI() + "\t" + pref.replace("\t", "") + "\t" + "" + "\t" + close.replace("\t", "") + "\n");

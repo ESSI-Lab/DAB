@@ -31,6 +31,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
+import eu.essi_lab.messages.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -39,10 +40,6 @@ import com.google.common.base.Charsets;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.SearchAfter;
-import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.web.WebRequest;
@@ -185,6 +182,7 @@ public class PropertiesHandler extends StreamingRequestHandler {
 		default:
 
 		    try {
+			discoveryMessage.setPage(new Page(1,max));
 			results = executor.getIndexValues(discoveryMessage, q, max, resumption);
 		    } catch (GSException e) {
 			// TODO Auto-generated catch block

@@ -45,7 +45,7 @@ public class HydroOntologyExternalTestIT {
 
 		concepts = ontology.findConcepts("temperatura");
 		for (SKOSConcept concept : concepts) {
-			System.out.println(concept.getPreferredLabel());
+			System.out.println(concept.getPreferredLabel("en"));
 		}
 	}
 
@@ -86,7 +86,7 @@ public class HydroOntologyExternalTestIT {
 
 		SKOSConcept concept = ontology.getConcept(dischargeStreamURI);
 		assertEquals(dischargeStreamURI, concept.getURI());
-		assertEquals("Discharge, stream", concept.getPreferredLabel().getKey());
+		assertEquals("Discharge, stream", concept.getPreferredLabel("en"));
 		assertTrue(!concept.getCloseMatches().isEmpty());
 	}
 
@@ -108,13 +108,14 @@ public class HydroOntologyExternalTestIT {
 	@Test
 	public void testFindCloseConcepts2() {
 
-		List<SKOSConcept> concepts = ontology.findConcepts("portata", true, false);
+		List<SKOSConcept> concepts = ontology.findConcepts("Flusso, portata", true, false);
 		System.out.println(concepts.size());
 
 		HashSet uris = new HashSet<>();
 		for (SKOSConcept concept : concepts) {
 			System.out.println(concept.getURI());
 			uris.add(concept.getURI());
+
 		}
 		assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/78"));
 		assertTrue(uris.contains("http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171"));
@@ -122,7 +123,7 @@ public class HydroOntologyExternalTestIT {
 
 	private void assertDischargeConcept(SKOSConcept concept) {
 		assertEquals(dischargeURI, concept.getURI());
-		assertEquals("Flux, discharge", concept.getPreferredLabel().getKey());
+		assertEquals("Flux, discharge", concept.getPreferredLabel("en"));
 		HashSet<SimpleEntry<String, String>> alternateLabels = concept.getAlternateLabels();
 		boolean found = false;
 		for (SimpleEntry<String, String> simpleEntry : alternateLabels) {

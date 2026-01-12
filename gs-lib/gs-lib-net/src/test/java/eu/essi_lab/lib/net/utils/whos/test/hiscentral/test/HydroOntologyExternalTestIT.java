@@ -24,6 +24,10 @@ public class HydroOntologyExternalTestIT {
 	assertEquals(1, concepts.size());
 	assertEquals("http://his-central-ontology.geodab.eu/hydro-ontology/concept/40", concepts.get(0).getURI());
 
+	SKOSConcept temp = concepts.get(0);
+	assertEquals("Temperature",temp.getPreferredLabel("en"));
+	assertEquals("Temperatura",temp.getPreferredLabel("it"));
+
 	// search of a specific concept in the ontology, with spaces in the search term
 	concepts = ontology.findConcepts("temperatura del mare", false, true);
 	assertEquals(1, concepts.size());

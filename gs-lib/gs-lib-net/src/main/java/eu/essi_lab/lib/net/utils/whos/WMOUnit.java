@@ -38,7 +38,7 @@ public class WMOUnit extends SKOSConcept {
 
     @Override
     public String toString() {
-	return getPreferredLabel() + " (" + abbreviation + ")";
+	return getPreferredLabel(null) + " (" + abbreviation + ")";
     }
 
 }

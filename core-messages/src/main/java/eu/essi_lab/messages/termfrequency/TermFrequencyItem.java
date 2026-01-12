@@ -38,8 +38,29 @@ public class TermFrequencyItem {
     private String term;
     @XmlElement(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private String label;
+
+    public String getAlternateDecodedTermLanguage() {
+	return alternateDecodedTermLanguage;
+    }
+
     @XmlElement(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private String decodedTerm;
+
+    public String getAlternateDecodedTerm() {
+	return alternateDecodedTerm;
+    }
+
+    public void setAlternateDecodedTerm(String alternateDecodedTerm) {
+	this.alternateDecodedTerm = alternateDecodedTerm;
+    }
+
+    private String alternateDecodedTerm;
+
+    public void setAlternateDecodedTermLanguage(String alternateDecodedTermLanguage) {
+	this.alternateDecodedTermLanguage = alternateDecodedTermLanguage;
+    }
+
+    private String alternateDecodedTermLanguage;
     @XmlElement(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private int freq;
     @XmlTransient
