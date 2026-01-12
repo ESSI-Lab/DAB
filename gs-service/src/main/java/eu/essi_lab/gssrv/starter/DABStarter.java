@@ -563,6 +563,8 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	    ConfigurationWrapper.setConfiguration(configuration);
 
+	    schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+
 	    configuration.addChangeEventListener(this);
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Initializing configuration ENDED");
@@ -1021,8 +1023,6 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		    GSLoggerFactory.getLogger(DABStarter.class).info("Delayed scheduler start STARTED");
 
-		    schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
-
 		    GSLoggerFactory.getLogger(DABStarter.class).info("JobStore type: {}", schedulerSetting.getJobStoreType());
 
 		    Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting, false);
@@ -1048,8 +1048,6 @@ public class DABStarter implements ConfigurationChangeListener {
     private void startScheduler() throws GSException {
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("Starting scheduler STARTED");
-
-	schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("JobStore type: {}", schedulerSetting.getJobStoreType());
 
