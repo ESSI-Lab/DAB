@@ -212,8 +212,7 @@ public class SocketRequestExecutor extends HTTPExecutor {
 	    // Create an SSL socket
 	    SSLSocket socket = (SSLSocket) socketFactory.createSocket(host, port);
 
-	    // Enable all supported SSL/TLS protocols
-	    socket.setEnabledProtocols(socket.getSupportedProtocols());
+ 	    socket.setEnabledProtocols(new String [] { "TLSv1.3" });
 
 	    // Handshake
 	    socket.startHandshake();
