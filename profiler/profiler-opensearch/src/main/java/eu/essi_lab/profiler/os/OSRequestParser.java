@@ -23,6 +23,7 @@ package eu.essi_lab.profiler.os;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.*;
 import java.util.Optional;
 
 import org.joda.time.DateTime;
@@ -39,7 +40,7 @@ import eu.essi_lab.messages.web.WebRequest;
  */
 public class OSRequestParser {
 
-    private KeyValueParser parser;
+    private final KeyValueParser parser;
 
     /**
      * @param parser
@@ -54,7 +55,7 @@ public class OSRequestParser {
      */
     public OSRequestParser(WebRequest request) {
 
-	if (!request.getFormData().isPresent()) {
+	if (request.getFormData().isEmpty()) {
 	    this.parser = new KeyValueParser("");
 	} else {
 	    this.parser = new KeyValueParser(request.getFormData().get());
@@ -80,7 +81,7 @@ public class OSRequestParser {
 
 	String value = parser.getValue(parameter.getName());
 	
-	if (value == null || value.equals("") || value.equals(KeyValueParser.UNDEFINED)) {
+	if (value == null || value.isEmpty() || value.equals(KeyValueParser.UNDEFINED)) {
 	    
 	    if (parameter.getDefaultValue() != null) {
 		
@@ -102,23 +103,18 @@ public class OSRequestParser {
 	case "dateTime":
 	    return parseISO8601DateTime(value);
 	case "bbox":
-	    if (value != null && value.length() > 0) {
-		// this is to support the GEOSS Web Portal
-		if(value.equals(",,,")){
-		    return null;
-		}
-		String[] split = value.split("_");
-		for (String box : split) {
-		    new OSBox(box);
-		}
+	    // this is to support the GEOSS Web Portal
+	    if(value.equals(",,,")){
+		return null;
+	    }
+	    String[] split = value.split("_");
+	    for (String box : split) {
+		new OSBox(box);
 	    }
 	}
 
-	try {
-	    value = URLDecoder.decode(value, "UTF-8");
-	    value = value.contains("&") ? value.replace("&", "&amp;") : value;
-	} catch (UnsupportedEncodingException e) {
-	}
+	value = URLDecoder.decode(value, StandardCharsets.UTF_8);
+	value = value.contains("&") ? value.replace("&", "&amp;") : value;
 
 	return value;
     }
