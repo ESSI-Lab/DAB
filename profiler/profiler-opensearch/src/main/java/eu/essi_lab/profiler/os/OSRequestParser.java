@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.os;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -63,16 +63,15 @@ public class OSRequestParser {
     }
 
     /**
-     * 
      * @param parameter
      * @return
      * @throws IllegalArgumentException
      */
     public Optional<String> optParse(OSParameter parameter) throws IllegalArgumentException {
-    
+
 	return Optional.ofNullable(parse(parameter));
     }
-    
+
     /**
      * @param parameter
      * @return
@@ -80,17 +79,20 @@ public class OSRequestParser {
     public String parse(OSParameter parameter) throws IllegalArgumentException {
 
 	String value = parser.getValue(parameter.getName());
-	
+
 	if (value == null || value.isEmpty() || value.equals(KeyValueParser.UNDEFINED)) {
-	    
+
 	    if (parameter.getDefaultValue() != null) {
-		
+
 		return parameter.getDefaultValue();
 	    }
-	    
+
 	    return null;
 	}
- 
+
+	value = URLDecoder.decode(value, StandardCharsets.UTF_8);
+	value = value.contains("&") ? value.replace("&", "&amp;") : value;
+
 	switch (parameter.getValueType()) {
 	case "freeText":
 	    break;
@@ -104,7 +106,7 @@ public class OSRequestParser {
 	    return parseISO8601DateTime(value);
 	case "bbox":
 	    // this is to support the GEOSS Web Portal
-	    if(value.equals(",,,")){
+	    if (value.equals(",,,")) {
 		return null;
 	    }
 	    String[] split = value.split("_");
@@ -113,20 +115,15 @@ public class OSRequestParser {
 	    }
 	}
 
-	value = URLDecoder.decode(value, StandardCharsets.UTF_8);
-	value = value.contains("&") ? value.replace("&", "&amp;") : value;
-
 	return value;
     }
-    
-    
 
     /**
      * @return the parser
      */
     public KeyValueParser getParser() {
-	
-        return parser;
+
+	return parser;
     }
 
     static Integer parseInt(String value) {
