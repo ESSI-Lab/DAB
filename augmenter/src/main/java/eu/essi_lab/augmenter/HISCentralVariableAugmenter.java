@@ -47,6 +47,7 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
     public HISCentralVariableAugmenter() {
 
     }
+    HydroOntology ontology = new HISCentralOntology();
 
     /**
      * @param setting
@@ -64,8 +65,25 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 	ExtensionHandler extensionHandler = resource.getExtensionHandler();
 	Optional<String> uri = extensionHandler.getObservedPropertyURI();
 	if (uri.isPresent()) {
-	    GSLoggerFactory.getLogger(getClass()).info("Variable URI already present in original metadata");
-	    return Optional.of(resource);
+
+	    if (uri.get().contains("his-central-ontology")){
+		GSLoggerFactory.getLogger(getClass()).info("HIS-Central Variable URI already present in original metadata");
+		return Optional.of(resource);
+	    }else  if (uri.get().contains("codes.wmo.int")) {
+		List<SKOSConcept> concepts = ontology.findConcepts(uri.get(), false, true);
+		if (!concepts.isEmpty()) {
+		    extensionHandler.clearObservedPropertyURI();
+		    extensionHandler.setObservedPropertyURI(concepts.get(0).getURI());
+		    GSLoggerFactory.getLogger(getClass()).info("HIS-Central variable augmenter success");
+		    GSLoggerFactory.getLogger(getClass()).warn("HIS-Central variable augmentation of current resource ENDED");
+		    return Optional.of(resource);
+		}
+
+	    }else{
+		GSLoggerFactory.getLogger(getClass()).warn("Unexpected uri found: "+uri.get());
+	    }
+
+
 	}
 	CoverageDescription coverageDescription = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
 		.getCoverageDescription();
@@ -109,7 +127,6 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
     }
 
     public List<SKOSConcept> getConcepts(String variable) {
-	HydroOntology ontology = new HISCentralOntology();
 	List<SKOSConcept> ret = ontology.findConcepts(variable, false,true);
 	List<SKOSConcept> toRemove = new ArrayList<SKOSConcept>();
 	List<SKOSConcept> toAdd = new ArrayList<SKOSConcept>();

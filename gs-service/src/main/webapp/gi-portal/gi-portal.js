@@ -362,7 +362,8 @@ function initializeLogin(config) {
 					'padding': '10px',
 					'background-color': '#f8f9fa',
 					'border-left': '4px solid #2c3e50',
-					'border-radius': '4px'
+					'border-radius': '4px',
+					'flex-shrink': '0'
 				})
 				.append(
 					$('<p>')
@@ -375,24 +376,61 @@ function initializeLogin(config) {
 
 			dialogContent.prepend(infoText);
 
-			// Create refresh button
-			const refreshButton = $('<button>')
-				.addClass('refresh-button')
-				.html(`<i class="fa fa-refresh"></i> ${t('refresh')}`)
+			// Create a wrapper div for the refresh button
+			const refreshButtonWrapper = $('<div>')
 				.css({
 					'margin-bottom': '10px',
 					'margin-top': '15px',
-					'float': 'right'
+					'text-align': 'right',
+					'position': 'relative',
+					'z-index': '1000',
+					'flex-shrink': '0'
 				});
 
-			dialogContent.append(refreshButton);
-			dialogContent.append($('<div>').attr('id', 'status-content'));
+			// Create refresh button
+			const refreshButton = $('<button>')
+				.attr('type', 'button')
+				.attr('id', 'bulk-download-refresh-btn')
+				.addClass('refresh-button')
+				.html(`<i class="fa fa-refresh"></i> ${t('refresh')}`)
+				.css({
+					'position': 'relative',
+					'z-index': '1001',
+					'pointer-events': 'auto',
+					'cursor': 'pointer',
+					'padding': '6px 12px',
+					'background-color': '#2c3e50',
+					'color': 'white',
+					'border': 'none',
+					'border-radius': '4px',
+					'font-size': '14px',
+					'margin': '0'
+				});
+
+			refreshButtonWrapper.append(refreshButton);
+			dialogContent.append(refreshButtonWrapper);
+			
+			// Create a scrollable container for the status content
+			const statusContentWrapper = $('<div>')
+				.attr('id', 'status-content-wrapper')
+				.css({
+					'max-height': (window.innerHeight - 300) + 'px',
+					'overflow-y': 'auto',
+					'overflow-x': 'hidden',
+					'position': 'relative',
+					'flex': '1',
+					'min-height': '0'
+				});
+			
+			statusContentWrapper.append($('<div>').attr('id', 'status-content'));
+			dialogContent.append(statusContentWrapper);
 
 			// Show dialog first
 			const dialog = dialogContent.dialog({
 				title: t('bulk_downloads_status_title'),
 				modal: true,
 				width: 1310,
+				maxHeight: window.innerHeight - 100,
 				position: { my: "center", at: "center top+150", of: window },
 				classes: {
 					"ui-dialog": "bulk-download-dialog"
@@ -406,17 +444,94 @@ function initializeLogin(config) {
 			// Add CSS to ensure table fits in dialog
 			dialogContent.css({
 				'overflow-x': 'hidden',
-				'padding': '0 15px'
+				'padding': '0 15px',
+				'position': 'relative',
+				'max-height': (window.innerHeight - 200) + 'px',
+				'display': 'flex',
+				'flex-direction': 'column'
 			});
+			
+			// Add custom scrollbar styling for the status content wrapper
+			setTimeout(function() {
+				const wrapper = $('#status-content-wrapper');
+				if (wrapper.length) {
+					// Add smooth scrolling
+					wrapper.css({
+						'scroll-behavior': 'smooth'
+					});
+					
+					// Add some padding to the status content for better appearance
+					$('#status-content').css({
+						'padding-bottom': '10px'
+					});
+				}
+			}, 150);
+			
+			// Function to recalculate scrollable area height
+			const recalculateScrollHeight = function() {
+				const wrapper = $('#status-content-wrapper');
+				if (wrapper.length && dialogContent.parent().length) {
+					// Recalculate max-height based on actual dialog size
+					const dialogHeight = dialogContent.parent().height();
+					const infoTextHeight = infoText.outerHeight(true) || 0;
+					const headerHeight = refreshButtonWrapper.outerHeight(true) || 50;
+					const padding = 40;
+					const calculatedHeight = dialogHeight - infoTextHeight - headerHeight - padding;
+					wrapper.css('max-height', Math.max(300, calculatedHeight) + 'px');
+				}
+			};
+			
+			// Initial calculation
+			setTimeout(recalculateScrollHeight, 100);
+			
+			// Recalculate on window resize
+			const resizeHandler = function() {
+				recalculateScrollHeight();
+			};
+			$(window).on('resize.bulk-download-dialog', resizeHandler);
+			
+			// Clean up resize handler when dialog is closed
+			const originalClose = dialogContent.dialog('option', 'close');
+			dialogContent.dialog('option', 'close', function() {
+				$(window).off('resize.bulk-download-dialog');
+				if (originalClose) {
+					originalClose.call(this);
+				}
+			});
+
+			// Ensure the refresh button wrapper is clickable after dialog is created
+			setTimeout(function() {
+				refreshButtonWrapper.css({
+					'position': 'relative',
+					'z-index': '10000',
+					'pointer-events': 'auto'
+				});
+				refreshButton.css({
+					'position': 'relative',
+					'z-index': '10001',
+					'pointer-events': 'auto',
+					'display': 'inline-block'
+				});
+			}, 100);
+
+			// Add hover effect to refresh button using event delegation
+			$(document).off('mouseenter mouseleave', '#bulk-download-refresh-btn')
+				.on('mouseenter', '#bulk-download-refresh-btn', function() {
+					$(this).css('background-color', '#34495e');
+				})
+				.on('mouseleave', '#bulk-download-refresh-btn', function() {
+					$(this).css('background-color', '#2c3e50');
+				});
 
 			// Function to fetch and update status
 			const fetchAndUpdateStatus = () => {
 				const statusContent = $('#status-content');
+				const refreshBtn = $('#bulk-download-refresh-btn');
 				statusContent.html('<p>Loading status of bulk downloads...</p>');
 
 				// Disable refresh button while loading
-				refreshButton.prop('disabled', true);
-				refreshButton.find('i').addClass('fa-spin');
+				refreshBtn.prop('disabled', true);
+				refreshBtn.find('i').addClass('fa-spin');
 
 				// Fetch status from API
 				const authToken = localStorage.getItem('authToken');
@@ -682,13 +797,44 @@ function initializeLogin(config) {
 					})
 					.finally(() => {
 						// Re-enable refresh button and stop spinning
-						refreshButton.prop('disabled', false);
-						refreshButton.find('i').removeClass('fa-spin');
+						const refreshBtn = $('#bulk-download-refresh-btn');
+						refreshBtn.prop('disabled', false);
+						refreshBtn.find('i').removeClass('fa-spin');
 					});
 			};
 
-			// Add click handler to refresh button
-			refreshButton.on('click', fetchAndUpdateStatus);
+			// Add click handler to refresh button using event delegation
+			// This ensures it works even after dialog DOM manipulation
+			$(document).off('click', '#bulk-download-refresh-btn')
+				.on('click', '#bulk-download-refresh-btn', function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					if (!$(this).prop('disabled')) {
+						fetchAndUpdateStatus();
+					}
+					return false;
+				});
+
+			// Also attach handler directly after dialog is fully rendered
+			setTimeout(function() {
+				const btn = $('#bulk-download-refresh-btn');
+				if (btn.length) {
+					btn.off('click.refresh').on('click.refresh', function(e) {
+						e.preventDefault();
+						e.stopPropagation();
+						if (!$(this).prop('disabled')) {
+							fetchAndUpdateStatus();
+						}
+						return false;
+					});
+					// Ensure button is visible and clickable
+					btn.css({
+						'pointer-events': 'auto',
+						'cursor': 'pointer',
+						'opacity': '1'
+					});
+				}
+			}, 300);
 
 			// Initial fetch after dialog is shown
 			setTimeout(fetchAndUpdateStatus, 100);
@@ -1925,8 +2071,10 @@ export function initializePortal(config) {
 				readOnlyValues: true
 			}));
 
-			// After constraints are initialized, try to fetch and update values
-			const authToken = localStorage.getItem('authToken') || 'my-token';
+		// After constraints are initialized, try to fetch and update values
+		const authToken = localStorage.getItem('authToken') || config.token;
+		
+		if (authToken !== undefined) {
 			fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
 				.then(response => response.json())
 				.then(data => {
@@ -1954,6 +2102,7 @@ export function initializePortal(config) {
 					// Keep default values if API fails
 				});
 		}
+		}
 		
 		if (config.aggregationDuration !== undefined && config.aggregationDuration) {
 			const durationId = GIAPI.search.constWidget.getId('aggregationDuration');
@@ -1965,8 +2114,10 @@ export function initializePortal(config) {
 				readOnlyValues: true
 			}));
 
-			// After constraints are initialized, try to fetch and update values
-			const authToken = localStorage.getItem('authToken') || 'my-token';
+		// After constraints are initialized, try to fetch and update values
+		const authToken = localStorage.getItem('authToken') || config.token;
+		
+		if (authToken !== undefined) {
 			fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=aggregationDuration&limit=50`)
 				.then(response => response.json())
 				.then(data => {
@@ -1993,6 +2144,7 @@ export function initializePortal(config) {
 					console.error('Error fetching aggregation duration types:', error);
 					// Keep default values if API fails
 				});
+		}
 		}
 		
 		
@@ -2427,6 +2579,17 @@ export function initializePortal(config) {
 													return response.json();
 												})
 												.then(data => {
+													// Check if the response contains an error message
+													if (data.message && !data.id) {
+														// This is an error response (e.g., permission denied)
+														GIAPI.UI_Utils.dialog('open', {
+															title: 'Error',
+															message: data.message || 'Failed to initiate bulk download. Please try again later.'
+														});
+														return;
+													}
+													
+													// Success response - should have an id field
 													// Show success message
 													GIAPI.UI_Utils.dialog('open', {
 														title: 'Download Started',

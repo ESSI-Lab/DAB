@@ -133,13 +133,6 @@ public class MarkLogicReader implements DatabaseReader {
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    message.setRequestId(getClass().getSimpleName() + "-" + UUID.randomUUID().toString());
 	    message.setIncludeDeleted(true);
-	    //
-	    // disables the time stamp check of the source id query. in this moment
-	    // the harvesting time stamp is not yet updated, so only the old resource has a timestamp less
-	    // then the harvesting time stamp. if the check is enabled, the new resource is not inserted
-	    // in the result set
-	    //
-	    message.disableDataFolderCheck();
 
 	    Bond bond = null;
 
@@ -202,13 +195,6 @@ public class MarkLogicReader implements DatabaseReader {
 	DiscoveryMessage message = new DiscoveryMessage();
 	message.setRequestId(getClass().getSimpleName() + "-" + UUID.randomUUID().toString());
 	message.setIncludeDeleted(includeDeleted);
-	//
-	// disables the time stamp check of the source id query. in this moment
-	// the harvesting time stamp is not yet updated, so only the old resource has a timestamp less
-	// then the harvesting time stamp. if the check is enabled, the new resource is not inserted
-	// in the result set
-	//
-	message.disableDataFolderCheck();
 
 	ResourcePropertyBond sourceBond = BondFactory.createSourceIdentifierBond(source.getUniqueIdentifier());
 	ResourcePropertyBond identifierBond = BondFactory.createOriginalIdentifierBond(originalIdentifier);
@@ -500,7 +486,7 @@ public class MarkLogicReader implements DatabaseReader {
 
 	pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.MARKLOGIC_COUNTQUERY_EXECUTION, message.getRequestId(), oqs);
 
-	DiscoveryCountResponse estimate = markLogicDB.estimate(ctsSearch, message.isQueryRegistrationEnabled(), message.getRequestId());
+	DiscoveryCountResponse estimate = markLogicDB.estimate(ctsSearch, false, message.getRequestId());
 
 	pl.logPerformance(GSLoggerFactory.getLogger(MarkLogicReader.class));
 	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_COUNT_COMPLETED);

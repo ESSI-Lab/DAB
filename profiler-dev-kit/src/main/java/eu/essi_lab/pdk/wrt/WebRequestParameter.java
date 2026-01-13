@@ -245,15 +245,15 @@ public abstract class WebRequestParameter {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <T extends WebRequestParameter> T findParameter(String name, Class<?> containerClass) {
+    public static <T extends WebRequestParameter> Optional<T> findParameter(String name, Class<?> containerClass) {
 
 	List<WebRequestParameter> findParameters = findParameters(containerClass);
 	for (WebRequestParameter webRequestParameter : findParameters) {
 	    if (webRequestParameter.getName().equals(name)) {
-		return (T) webRequestParameter;
+		return Optional.of((T) webRequestParameter);
 	    }
 	}
-	return null;
+	return Optional.empty();
     }
 
     /**

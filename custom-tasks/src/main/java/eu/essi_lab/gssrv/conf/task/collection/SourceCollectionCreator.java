@@ -248,13 +248,13 @@ public class SourceCollectionCreator {
 					wmoKeywords.setThesaurusNameCitationTitle(
 						concept.getURI().substring(0, concept.getURI().lastIndexOf("/")));
 				    }
-				    wmoKeywords.addKeyword(concept.getPreferredLabel().getKey(), concept.getURI());
+				    wmoKeywords.addKeyword(concept.getPreferredLabel("en"), concept.getURI());
 				} else if (concept.getURI().contains("hydro.geodab.eu")) {
 				    if (whosKeywords == null) {
 					whosKeywords = new Keywords();
 					whosKeywords.setThesaurusNameCitationTitle("http://hydro.geodab.eu/hydro-ontology/");
 				    }
-				    whosKeywords.addKeyword(concept.getPreferredLabel().getKey(), concept.getURI());
+				    whosKeywords.addKeyword(concept.getPreferredLabel("en"), concept.getURI());
 				}
 				dataset.getExtensionHandler().setObservedPropertyURI(concept.getURI());
 

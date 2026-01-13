@@ -316,7 +316,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 			HydroOntology ontology = new WHOSOntology();
 			SKOSConcept concept = ontology.getConcept(uri);
 			if (concept != null) {
-			    attributeLabel = concept.getPreferredLabel().getKey();
+			    attributeLabel = concept.getPreferredLabel("en");
 			    HashSet<String> closeMatches = concept.getCloseMatches();
 			    if (closeMatches != null && !closeMatches.isEmpty()) {
 				try {
@@ -324,9 +324,9 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 				    for (String closeMatch : closeMatches) {
 					SKOSConcept variable = wmoOntology.getVariable(closeMatch);
 					if (variable != null) {
-					    SimpleEntry<String, String> preferredLabel = variable.getPreferredLabel();
+					   String preferredLabel = variable.getPreferredLabel("en");
 					    if (preferredLabel != null) {
-						attributeLabel = preferredLabel.getKey();
+						attributeLabel = preferredLabel;
 					    }
 					}
 				    }
@@ -354,7 +354,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 			    WMOOntology codes = new WMOOntology();
 			    WMOUnit unit = codes.getUnit(uri);
 			    if (unit != null) {
-				attributeUnits = unit.getPreferredLabel().getKey();
+				attributeUnits = unit.getPreferredLabel("");
 				attributeUnitsAbbreviation = unit.getAbbreviation();
 			    }
 			} catch (Exception e) {

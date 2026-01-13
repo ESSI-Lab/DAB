@@ -346,6 +346,31 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
   return 0;
 	}
 
+	// Helper function to get the appropriate term based on language
+	// This function is used to display alternateDecodedTerm when language is Italian
+	var getDisplayTerm = function(item, targetName) {
+		// Only apply language-specific logic for observedPropertyURI and attributeURI
+		if ((targetName === 'observedPropertyURI' || targetName === 'attributeURI') && item) {
+			var currentLang = 'en';
+			try {
+				if (typeof window.__lang === 'function') {
+					currentLang = window.__lang();
+				} else if (window.i18n && window.i18n.current) {
+					currentLang = window.i18n.current;
+				}
+			} catch (e) {
+				// Fallback to English if language detection fails
+			}
+			
+			// If current language is Italian and item has alternateDecodedTerm with language "it", use it
+			if (currentLang === 'it' && item.alternateDecodedTerm && item.alternateDecodedTermLanguage === 'it') {
+				return item.alternateDecodedTerm;
+			}
+		}
+		// Default to decodedTerm
+		return item.decodedTerm || '';
+	};
+
 	/**
 	 * Updates the widget with the <a href="../classes/TermFrequencyObject.html" class="crosslink">term frequency object</a> of the current <a href="../classes/ResultSet.html" class="crosslink">result set</a>
 	 * 
@@ -412,7 +437,7 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 						width: '80%',
 						display: (function(targetName) {
 							return function(data) {
-								var label = data.record.decodedTerm || '';
+								var label = getDisplayTerm(data.record, targetName);
 								// Add link icon for attributeURI or observedPropertyURI target (observed property filter)
 								if ((targetName === 'attributeURI' || targetName === 'observedPropertyURI') && data.record.term) {
 									var termUri = data.record.term;
@@ -586,15 +611,21 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 				for (var j = 0; j < checkedItems.length; j++) {
 
 					if (checkedItems[j].term != null) {
+						// Get the display term based on language
+						var displayTerm = getDisplayTerm(checkedItems[j], target);
+						// Create a copy of the item to avoid modifying the original
+						var itemCopy = jQuery.extend({}, checkedItems[j]);
+						itemCopy.decodedTerm = displayTerm;
+						
 						// Handle URL-encoded terms or URIs (like observedPropertyURI) that contain colons
 						// Apply the same modification to checked items to ensure consistency
-						if (checkedItems[j].term.length > 32 && (checkedItems[j].term.indexOf('%3A') != -1 || checkedItems[j].term.indexOf('://') != -1)) {
-							checkedItems[j].decodedTerm = checkedItems[j].decodedTerm.replace(/:/g, ' : ');
+						if (itemCopy.term.length > 32 && (itemCopy.term.indexOf('%3A') != -1 || itemCopy.term.indexOf('://') != -1)) {
+							itemCopy.decodedTerm = itemCopy.decodedTerm.replace(/:/g, ' : ');
 						}
 
 						jQuery('#' + currentId).jtable('addRecord', {
 
-							record: checkedItems[j],
+							record: itemCopy,
 							clientOnly: true
 						});
 					}
@@ -607,14 +638,20 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 				if (!tfObject.isCheckedItem(target, items[j])) {
 
 					if (items[j].term != null) {
+						// Get the display term based on language
+						var displayTerm = getDisplayTerm(items[j], target);
+						// Create a copy of the item to avoid modifying the original
+						var itemCopy = jQuery.extend({}, items[j]);
+						itemCopy.decodedTerm = displayTerm;
+						
 						// Handle URL-encoded terms or URIs (like observedPropertyURI) that contain colons
-						if (items[j].term.length > 32 && (items[j].term.indexOf('%3A') != -1 || items[j].term.indexOf('://') != -1)) {
-							items[j].decodedTerm = items[j].decodedTerm.replace(/:/g, ' : ');
+						if (itemCopy.term.length > 32 && (itemCopy.term.indexOf('%3A') != -1 || itemCopy.term.indexOf('://') != -1)) {
+							itemCopy.decodedTerm = itemCopy.decodedTerm.replace(/:/g, ' : ');
 						}
 
 						jQuery('#' + currentId).jtable('addRecord', {
 
-							record: items[j],
+							record: itemCopy,
 							clientOnly: true
 						});
 					}
@@ -727,8 +764,8 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 		chartData[target].datasets[0].data = [];
 
 		items.forEach(function(item) {
-
-			var term = item.decodedTerm;
+			// Get the display term based on language
+			var term = getDisplayTerm(item, target);
 			if (term) {
 				var shortTerm = term.length < 20 ? term : term.substring(0, 20) + '...';
 				var freq = item.freq;

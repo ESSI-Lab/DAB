@@ -42,7 +42,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.xml.*;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -101,7 +100,8 @@ import jakarta.json.stream.JsonParser;
  */
 public class OpenSearchUtils {
 
-    private static final String HYDRO_ONTOLOGY = "http://his-central-ontology.geodab.eu/hydro-ontology";
+    private static final String HIS_CENTRAL_HYDRO_ONTOLOGY = "http://his-central-ontology.geodab.eu/hydro-ontology";
+    private static final String WMO_ONTOLOGY = "http://codes.wmo.int/wmdr";
 
     /**
      * @param response
@@ -164,11 +164,14 @@ public class OpenSearchUtils {
 		item.setTerm(term);
 		String decoded = term;
 
-		if (term.startsWith(HYDRO_ONTOLOGY)){
+		if (term.startsWith(HIS_CENTRAL_HYDRO_ONTOLOGY)){
 		    HISCentralOntology ontology = new HISCentralOntology();
 		    SKOSConcept concept = ontology.getConcept(term);
 		    if (concept!=null){
-			decoded = concept.getPreferredLabel().getKey();
+			decoded = concept.getPreferredLabel("en");
+			String italianLabel = concept.getPreferredLabel("it");
+			item.setAlternateDecodedTerm(italianLabel);
+			item.setAlternateDecodedTermLanguage("it");
 		    }
 		}
 

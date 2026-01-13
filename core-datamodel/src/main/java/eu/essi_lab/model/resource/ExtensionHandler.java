@@ -744,6 +744,16 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
     }
 
+    public void clearObservedPropertyURI() {
+
+	try {
+	    this.metadata.remove("//" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + ":" + MetadataElement.OBSERVED_PROPERTY_URI.getName());
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
     /**
      * @return
      */

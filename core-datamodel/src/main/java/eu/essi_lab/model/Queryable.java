@@ -10,20 +10,19 @@ package eu.essi_lab.model;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.*;
 
 import javax.xml.bind.annotation.XmlSeeAlso;
 
@@ -33,15 +32,14 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
- * An interface for queryable properties with a name.
- * A queryable property can be used as parameter of a discovery query
+ * An interface for queryable properties with a name. A queryable property can be used as parameter of a discovery query
  * <li>The volatile property</li><br>
- * Usually a queryable property has a correspondent {@link IndexedElement}, otherwise the {@link #isVolatile()}
- * property is set to <code>true</code>
- * 
+ * Usually a queryable property has a correspondent {@link IndexedElement}, otherwise the {@link #isVolatile()} property is set to
+ * <code>true</code>
+ *
+ * @author Fabrizio
  * @see MetadataElement
  * @see ResourceProperty
- * @author Fabrizio
  */
 @XmlSeeAlso({ MetadataElement.class, ResourceProperty.class, OntologyObjectProperty.class, RuntimeInfoElement.class })
 public interface Queryable {
@@ -51,41 +49,41 @@ public interface Queryable {
      */
     public enum ContentType {
 	/**
-	 * 
+	 *
 	 */
 	TEXTUAL,
 	/**
-	 * 
+	 *
 	 */
 	INTEGER,
 
 	/**
-	 * 
+	 *
 	 */
 	LONG,
 
 	/**
-	 * 
+	 *
 	 */
 	DOUBLE,
 	/**
-	 * 
+	 *
 	 */
 	SPATIAL,
 	/**
-	 * 
+	 *
 	 */
 	ISO8601_DATE_TIME,
 	/**
-	 * 
+	 *
 	 */
 	ISO8601_DATE,
 	/**
-	 * 
+	 *
 	 */
 	BOOLEAN,
 	/**
-	 * 
+	 *
 	 */
 	COMPOSED
     }
@@ -137,8 +135,7 @@ public interface Queryable {
     public ContentType getContentType();
 
     /**
-     * Return <code>true</code> if this element has no correspondent {@link IndexedElement}, <code>false</code>
-     * otherwise
+     * Return <code>true</code> if this element has no correspondent {@link IndexedElement}, <code>false</code> otherwise
      */
     public boolean isVolatile();
 
@@ -151,4 +148,39 @@ public interface Queryable {
      * Return <code>true</code> if this element is enabled to be queried, <code>false</code> otherwise
      */
     public boolean isEnabled();
+
+    /**
+     *
+     */
+    public static List<String> listSortableQueryables() {
+
+	List<String> mList = MetadataElement.listValues().//
+		stream().//
+		filter(v -> !v.hasComposedElement()).//
+		filter(v -> v != MetadataElement.ANY_TEXT && v != MetadataElement.SUBJECT).//
+		filter(v -> v.getContentType() == ContentType.TEXTUAL || //
+		v.getContentType() == ContentType.DOUBLE || //
+		v.getContentType() == ContentType.INTEGER || //
+		v.getContentType() == ContentType.LONG || //
+		v.getContentType() == ContentType.ISO8601_DATE || //
+		v.getContentType() == ContentType.ISO8601_DATE_TIME).//
+		sorted() //
+		.map(MetadataElement::getName).//
+			collect(Collectors.toList());
+
+	List<String> rList = ResourceProperty.listValues().//
+		stream().//
+		filter(v -> v.getContentType() == ContentType.TEXTUAL || //
+		v.getContentType() == ContentType.DOUBLE ||//
+		v.getContentType() == ContentType.INTEGER || //
+		v.getContentType() == ContentType.LONG ||//
+		v.getContentType() == ContentType.ISO8601_DATE || //
+		v.getContentType() == ContentType.ISO8601_DATE_TIME).sorted() //
+		.map(ResourceProperty::getName).//
+			toList();
+
+	mList.addAll(rList);
+
+	return mList.stream().sorted().toList();
+    }
 }

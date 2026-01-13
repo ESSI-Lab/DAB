@@ -658,7 +658,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 			station.setUnitsURI(unitsURI.get());
 			WMOUnit units = WMOOntology.decodeUnit(unitsURI.get());
 			if (units != null) {
-			    unitsLabel = units.getPreferredLabel().getKey();
+			    unitsLabel = units.getPreferredLabel(null);
 			}
 		    }
 		    if (unitsLabel == null) {
@@ -684,9 +684,9 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 				    for (String closeMatch : closeMatches) {
 					SKOSConcept variable = wmoOntology.getVariable(closeMatch);
 					if (variable != null) {
-					    SimpleEntry<String, String> preferredLabel = variable.getPreferredLabel();
+					    String preferredLabel = variable.getPreferredLabel("");
 					    if (preferredLabel != null) {
-						observedProperty = preferredLabel.getKey();
+						observedProperty = preferredLabel;
 					    }
 					}
 				    }
@@ -695,7 +695,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 				}
 
 			    } else {
-				observedProperty = concept.getPreferredLabel().getKey();
+				observedProperty = concept.getPreferredLabel("");
 			    }
 			}
 		    }

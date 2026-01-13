@@ -120,8 +120,6 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 			    message.setRequestId(request.getRequestId());
 			    message.setUserBond(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ONLINE_ID, onlineId));
 
-			    message.setQueryRegistrationEnabled(false);
-
 			    message.setSources(ConfigurationWrapper.getAllSources());
 
 			    Page page = new Page(1, 1);
