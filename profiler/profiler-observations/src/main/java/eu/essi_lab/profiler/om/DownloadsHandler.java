@@ -29,9 +29,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
@@ -144,33 +146,29 @@ public class DownloadsHandler extends StreamingRequestHandler {
 
 	if (method.toLowerCase().equals("delete")) {
 
-	    if (operationId != null) {
-		List<JSONObject> statuses = getStatuses(email);
-		for (JSONObject status : statuses) {
-		    String id = status.optString("id");
-		    if (id != null && id.equals(operationId)) {
-			String stat = status.optString("status");
-			if (stat != null && stat.equals("Completed")) {
-			    // delete result
-			    s3wrapper.deleteObject("his-central", "data-downloads/" + id + "-cancel");
-			    s3wrapper.deleteObject("his-central", "data-downloads/" + id + ".zip");
-			    status.put("locator", "");
-			    status.put("status", "Removed");
-			    OMHandler.status(s3wrapper, "his-central", id, status);
-			} else {
-			    // interrupt job
-			    putCancelFlag(operationId);
-			}
-			break;
-		    }
-		}
+	    delete(operationId,email);
 
-	    }
 	    return;
 
 	}
 
 	List<JSONObject> statuses = getStatuses(email);
+
+	for (JSONObject status: statuses){
+	    String stat = status.optString("status");
+	    if (stat!=null && stat.equals("Completed")) {
+		String ts = status.optString("timestamp");
+		if (ts!=null){
+		    Date completedDate = ISO8601DateTimeUtils.parseISO8601ToDate(ts).get();
+		    long diffMillis = new Date().getTime() - completedDate.getTime();
+		    boolean isOlderThan2Days = diffMillis >= TimeUnit.DAYS.toMillis(2);
+		    if (isOlderThan2Days){
+			String stId = status.optString("id");
+			delete(stId,email);
+		    }
+		}
+	    }
+	}
 
 	if (operationId == null) {
 	    for (JSONObject jsonObject : statuses) {
@@ -197,6 +195,31 @@ public class DownloadsHandler extends StreamingRequestHandler {
 	try (OutputStreamWriter writer = new OutputStreamWriter(output)) {
 	    writer.write(ret.toString());
 	    writer.flush();
+	}
+    }
+
+    private void delete(String operationId,String email) throws Exception {
+	if (operationId != null) {
+	    List<JSONObject> statuses = getStatuses(email);
+	    for (JSONObject status : statuses) {
+		String id = status.optString("id");
+		if (id != null && id.equals(operationId)) {
+		    String stat = status.optString("status");
+		    if (stat != null && stat.equals("Completed")) {
+			// delete result
+			s3wrapper.deleteObject("his-central", "data-downloads/" + id + "-cancel");
+			s3wrapper.deleteObject("his-central", "data-downloads/" + id + ".zip");
+			status.put("locator", "");
+			status.put("status", "Removed");
+			OMHandler.status(s3wrapper, "his-central", id, status);
+		    } else {
+			// interrupt job
+			putCancelFlag(operationId);
+		    }
+		    break;
+		}
+	    }
+
 	}
     }
 

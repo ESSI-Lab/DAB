@@ -119,12 +119,12 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
 	this.markLogicDB = markLogicDB;
 	this.ranking = message.getRankingStrategy();
-	this.dataFolderCheckEnabled = message.isDataFolderCheckEnabled();
+	this.dataFolderCheckEnabled = true;
 	this.deletedIncluded = message.isDeletedIncluded();
 	this.maxFrequencyMapItems = message.getMaxFrequencyMapItems();
 	this.spatialBuilder = createSpatialQueryBuilder(this);
 	this.tfTargets = message.getTermFrequencyTargets();
-	this.registerQuery = message.isQueryRegistrationEnabled();
+	this.registerQuery = false;
 	this.unfilteredQuery = true;
 	this.sortedFields = message.getSortedFields();
     }

@@ -10,12 +10,12 @@ package eu.essi_lab.messages;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -134,7 +134,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	setMaxFrequencyMapItems(DEFAULT_MAX_TERM_FREQUENCY_MAP_ITEMS);
 	setRankingStrategy(new RankingStrategy());
 	setResourceSelector(new ResourceSelector());
-	setQueryRegistrationEnabled(false);
 	setTermFrequencyTargets(Arrays.asList());
 	setIncludeCountInRetrieval(false);
 	setIncludeBboxUnion(false);
@@ -180,7 +179,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	accessMessage.getView().ifPresent(this::setView);
 	setWebRequest(accessMessage.getWebRequest());
 	setDataBaseURI(accessMessage.getDataBaseURI());
-	setQueryRegistrationEnabled(false);
 
 	setPage(new Page(10));
 	setIncludeDeleted(false);
@@ -222,7 +220,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	statMessage.getUserBond().ifPresent(this::setUserBond);
 	setNormalizedBond(statMessage.getNormalizedBond());
 
-	setQueryRegistrationEnabled(false);
 	setIncludeDeleted(false);
 	setMaxFrequencyMapItems(DEFAULT_MAX_TERM_FREQUENCY_MAP_ITEMS);
 	setRankingStrategy(new RankingStrategy());
@@ -288,24 +285,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     public String getName() {
 
 	return "DISCOVERY_MESSAGE";
-    }
-
-    /**
-     * @param enabled
-     */
-    @Deprecated
-    public void setQueryRegistrationEnabled(boolean enabled) {
-
-	getHeader().add(new GSProperty<>(QUERY_REGISTRATION, enabled));
-    }
-
-    /**
-     * @return
-     */
-    @Deprecated
-    public boolean isQueryRegistrationEnabled() {
-
-	return getHeader().get(QUERY_REGISTRATION, Boolean.class);
     }
 
     /**
@@ -525,26 +504,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 		filter(res -> ((GSResource) res).getPublicId().equals(id)).//
 		findFirst();
     }
-
-    /**
-     * @return
-     */
-    @Deprecated
-    public boolean isDataFolderCheckEnabled() {
-
-	Boolean enabled = getHeader().get(DATA_FOLDER_CHECK, Boolean.class);
-	return enabled == null;
-    }
-
-    /**
-     *
-     */
-    @Deprecated
-    public void disableDataFolderCheck() {
-
-	getHeader().add(new GSProperty<>(DATA_FOLDER_CHECK, true));
-    }
-
+    
     /**
      * @param option
      */

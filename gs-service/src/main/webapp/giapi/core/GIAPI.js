@@ -453,8 +453,6 @@ export const GIAPI = {
 		}
  
 		var slash = dabEndpoint.endsWith('/') ? '' : '/';
-		var trgId = targetId ? targetId : '';
-
 		var httpGet = dabEndpoint + slash + servicePath + '/' + path;
 
 		httpGet += start ? 'si=' + start + '&' : '';
@@ -482,7 +480,7 @@ export const GIAPI = {
 		httpGet += termFrequency ? 'tf=' + termFrequency + '&' : '';
 		httpGet += when_from ? 'ts=' + when_from + '&' : '';
 		httpGet += when_to ? 'te=' + when_to + '&' : '';
-		httpGet += trgId ? 'targetId=' + trgId + '&' : '';
+		httpGet += targetId ? 'identifier=' + targetId + '&' : '';
 
 		httpGet += from ? 'from=' + from + '&' : '';
 		httpGet += until ? 'until=' + until + '&' : '';
