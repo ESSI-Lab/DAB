@@ -54,7 +54,7 @@ public class ParameterCollectionCreator extends SourceCollectionCreator {
 	String level11 = parameterURI;
 	if (concept != null) {
 	    wisLevel10 = WIS2Level10Topic.decode(parameterURI);
-	    level11 = concept.getPreferredLabel().getKey();
+	    level11 = concept.getPreferredLabel("");
 	}
 	String level10 = wisLevel10.getId();
 	String level9 = wisLevel10.getBroaderLevel().getId();
@@ -76,6 +76,6 @@ public class ParameterCollectionCreator extends SourceCollectionCreator {
     protected String getTitle(GSSource source, String parameterURI) {
 	WHOSOntology ontology = new WHOSOntology();
 	SKOSConcept concept = ontology.getConcept(parameterURI);
-	return concept.getPreferredLabel().getKey() + " observations from " + normalize(source.getLabel());
+	return concept.getPreferredLabel("") + " observations from " + normalize(source.getLabel());
     }
 }

@@ -168,7 +168,7 @@ public class OpenSearchUtils {
 		    HISCentralOntology ontology = new HISCentralOntology();
 		    SKOSConcept concept = ontology.getConcept(term);
 		    if (concept!=null){
-			decoded = concept.getPreferredLabel().getKey();
+			decoded = concept.getPreferredLabel("");
 		    }
 		}
 

@@ -315,7 +315,7 @@ public class ObservationMapper {
 	if (ontologyConcept != null) {
 	    String originalAttributeName = parser.getAttributeName();
 	    parser.getAttributeNames().clear();
-	    parser.getAttributeNames().add(ontologyConcept.getPreferredLabel().getKey());
+	    parser.getAttributeNames().add(ontologyConcept.getPreferredLabel(""));
 	    observation.addParameter("originalObservedProperty", originalAttributeName);
 	} else {
 	    parser.getAttributeURIs().clear();

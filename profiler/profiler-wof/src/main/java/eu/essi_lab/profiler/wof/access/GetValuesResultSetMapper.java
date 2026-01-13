@@ -236,7 +236,7 @@ public class GetValuesResultSetMapper extends DefaultAccessResultSetMapper {
 				HydroOntology ontology = new WHOSOntology();
 				SKOSConcept concept = ontology.getConcept(uri);
 				if (concept != null) {
-				    variableName = concept.getPreferredLabel().getKey();
+				    variableName = concept.getPreferredLabel("");
 				    HashSet<String> closeMatches = concept.getCloseMatches();
 				    if (closeMatches != null && !closeMatches.isEmpty()) {
 					try {
@@ -244,9 +244,9 @@ public class GetValuesResultSetMapper extends DefaultAccessResultSetMapper {
 					    for (String closeMatch : closeMatches) {
 						SKOSConcept skosConcept = wmoOntology.getVariable(closeMatch);
 						if (skosConcept != null) {
-						    SimpleEntry<String, String> preferredLabel = skosConcept.getPreferredLabel();
+						    String preferredLabel = skosConcept.getPreferredLabel("");
 						    if (preferredLabel != null) {
-							variableName = preferredLabel.getKey();
+							variableName = preferredLabel;
 						    }
 						}
 					    }
@@ -300,7 +300,7 @@ public class GetValuesResultSetMapper extends DefaultAccessResultSetMapper {
 				    WMOOntology codes = new WMOOntology();
 				    WMOUnit unit = codes.getUnit(uri);
 				    if (unit != null) {
-					units.setUnitName(unit.getPreferredLabel().getKey());
+					units.setUnitName(unit.getPreferredLabel(""));
 					units.setUnitAbbreviation(unit.getAbbreviation());
 				    }
 				} catch (Exception e) {
