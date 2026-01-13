@@ -585,10 +585,12 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 			if (checkedItems) {
 				for (var j = 0; j < checkedItems.length; j++) {
 
-					if (checkedItems[j].term != null) {
+					if (checkedItems[j].term && checkedItems[j].decodedTerm) {
 						// Handle URL-encoded terms or URIs (like observedPropertyURI) that contain colons
 						// Apply the same modification to checked items to ensure consistency
-						if (checkedItems[j].term.length > 32 && (checkedItems[j].term.indexOf('%3A') != -1 || checkedItems[j].term.indexOf('://') != -1)) {
+						if (checkedItems[j].term.length > 32 &&
+						    (checkedItems[j].term.indexOf('%3A') != -1 || checkedItems[j].term.indexOf('://') != -1)) {
+
 							checkedItems[j].decodedTerm = checkedItems[j].decodedTerm.replace(/:/g, ' : ');
 						}
 
@@ -606,7 +608,7 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 
 				if (!tfObject.isCheckedItem(target, items[j])) {
 
-					if (items[j].term != null) {
+					if (items[j].term && items[j].decodedTerm) {
 						// Handle URL-encoded terms or URIs (like observedPropertyURI) that contain colons
 						if (items[j].term.length > 32 && (items[j].term.indexOf('%3A') != -1 || items[j].term.indexOf('://') != -1)) {
 							items[j].decodedTerm = items[j].decodedTerm.replace(/:/g, ' : ');
