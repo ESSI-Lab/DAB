@@ -94,7 +94,6 @@ public class GSMessageTest {
 
 	DiscoveryMessage message = new DiscoveryMessage();
 
-	Assert.assertTrue(message.isDataFolderCheckEnabled());
 	Assert.assertFalse(message.getView().isPresent());
 	Assert.assertNull(message.getDataBaseURI());
 	Assert.assertNull(message.getNormalizedBond());
@@ -170,9 +169,6 @@ public class GSMessageTest {
 	errorInfo.setCaller(GSMessageTest.class);
 	message.getException().getErrorInfoList().add(errorInfo);
 	Assert.assertEquals(GSMessageTest.class, message.getException().getErrorInfoList().getFirst().getCaller());
-
-	message.disableDataFolderCheck();
-	Assert.assertFalse(message.isDataFolderCheckEnabled());
 
 	// iteration mode
 	message.setIteratedWorkflow(IterationMode.FULL_RESPONSE);

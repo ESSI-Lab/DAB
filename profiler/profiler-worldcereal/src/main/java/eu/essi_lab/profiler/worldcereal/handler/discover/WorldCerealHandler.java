@@ -153,8 +153,6 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 		discMessage.setRequestId(rid);
 		discMessage.setUserBond(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, parentid));
 
-		discMessage.setQueryRegistrationEnabled(false);
-
 		discMessage.setSources(ConfigurationWrapper.getAllSources());
 
 		Page page = new Page(1, 1);
