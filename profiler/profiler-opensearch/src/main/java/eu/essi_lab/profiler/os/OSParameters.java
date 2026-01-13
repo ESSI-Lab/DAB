@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.os;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -44,6 +44,7 @@ import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
 
 public abstract class OSParameters {
 
+
     /**
      *
      */
@@ -55,8 +56,8 @@ public abstract class OSParameters {
     public static final OSParameter COUNT = new OSParameter("ct", "int", "10", "{count}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SOURCES = new OSParameter("sources", "identifiers", null, "{gs:sources}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -79,59 +80,53 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter PARENTS = new OSParameter("parents", "identifiers", null, "{gs:parents}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
-		return Optional.empty();
-	    }
-
-	    String[] split = value.split(",");
-	    if (split.length > 1) {
-		LogicalBond orBond = BondFactory.createOrBond();
-		for (int i = 0; i < split.length; i++) {
-		    orBond.getOperands().add(//
-			    BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.PARENT_IDENTIFIER, split[i]));
-		}
-		return Optional.of(orBond);
-	    }
-
-	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.PARENT_IDENTIFIER, value));
+	    return readId(value, MetadataElement.PARENT_IDENTIFIER);
 	}
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter IDENTIFIER = new OSParameter("identifier", "string", null, "{gs:identifier}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
-		return Optional.empty();
-	    }
-
-	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, value));
+	    return readId(value, MetadataElement.IDENTIFIER);
 	}
     };
 
     /**
-    *
-    */
-    public static final OSParameter TARGETID = new OSParameter("targetId", "string", null, "{gs:targetId}") {
-	@Override
-	public Optional<Bond> asBond(String value, String... relatedValues) {
+     * @param idParam
+     * @param el
+     * @return
+     */
+    private static Optional<Bond> readId(String idParam, MetadataElement el) {
 
-	    if (value == null || value.equals("")) {
-		return Optional.empty();
+	if (idParam == null || idParam.isEmpty()) {
+	    return Optional.empty();
+	}
+
+	String[] split = idParam.split(",");
+
+	if (split.length > 1) {
+	    LogicalBond orBond = BondFactory.createOrBond();
+
+	    for (String s : split) {
+		orBond.getOperands().add(//
+			BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, s));
 	    }
 
-	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, value));
+	    return Optional.of(orBond);
 	}
-    };
+
+	return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, idParam));
+    }
 
     public static final OSParameter PREDEFINED_LAYER = new OSParameter("predefinedLayer", "string", null, "{gs:predefinedLayer}") {
 	@Override
@@ -189,58 +184,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
-    public static final OSParameter ID = new OSParameter("id", "identifiers", null, "{gs:id}") {
-	@Override
-	public Optional<Bond> asBond(String value, String... relatedValues) {
-
-	    if (value == null || value.equals("")) {
-		return Optional.empty();
-	    }
-
-	    String[] split = value.split(",");
-	    if (split.length > 1) {
-		LogicalBond orBond = BondFactory.createOrBond();
-		for (int i = 0; i < split.length; i++) {
-		    orBond.getOperands().add(//
-			    BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.PARENT_IDENTIFIER, split[i]));
-		}
-		return Optional.of(orBond);
-	    }
-
-	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.PARENT_IDENTIFIER, value));
-	}
-    };
-
-    /**
-    *
-    */
-    public static final OSParameter TARGETIDS = new OSParameter("targetIds", "identifiers", null, "{gs:targetIds}") {
-	@Override
-	public Optional<Bond> asBond(String value, String... relatedValues) {
-
-	    if (value == null || value.equals("")) {
-		return Optional.empty();
-	    }
-
-	    String[] split = value.split(",");
-	    if (split.length > 1) {
-		LogicalBond orBond = BondFactory.createOrBond();
-		for (int i = 0; i < split.length; i++) {
-		    orBond.getOperands().add(//
-			    BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, split[i]));
-		}
-		return Optional.of(orBond);
-	    }
-
-	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, value));
-	}
-    };
-
-    /**
-    *
-    */
+     *
+     */
     public static final OSParameter KEYWORD = new OSParameter("kwd", "string", null, "{gs:keyword}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -250,9 +195,9 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
-    public static final OSParameter VIEW_ID = new OSParameter("viewid", "string", null, "{gs:viewId}") {
+     *
+     */
+    public static final OSParameter VIEW_ID = new OSParameter("viewId", "string", null, "{gs:viewId}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -261,8 +206,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter FORMAT = new OSParameter("frmt", "string", null, "{gs:format}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -272,8 +217,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter PROTOCOL = new OSParameter("prot", "string", null, "{gs:protocol}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -288,17 +233,17 @@ public abstract class OSParameters {
     public static final OSParameter SEARCH_TERMS = new OSParameter("st", "freeText", null, "{searchTerms}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SEARCH_FIELDS = new OSParameter("searchFields", "enumeration", "title,subject", "{gs:searchFields}");
 
     /**
-    *
-    */
+     *
+     */
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter HL = new OSParameter("hl", "string", null, "{gs:hl}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -326,8 +271,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter INSTRUMENT_IDENTIFIER = new OSParameter("instrumentId", "string", null, "{gs:instrumentIdentifier}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -341,8 +286,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter INSTRUMENT_DESCRIPTION = new OSParameter("instrumentDesc", "string", null,
 	    "{gs:instrumentDescription}") {
 	@Override
@@ -357,8 +302,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter INSTRUMENT_TITLE = new OSParameter("instrumentTitle", "string", null, "{gs:instrumentTitle}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -372,8 +317,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter PLATFORM_IDENTIFIER = new OSParameter("platformId", "string", null, "{gs:platformIdentifier}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -387,8 +332,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter PLATFORM_TITLE = new OSParameter("platformTitle", "string", null, "{gs:platformTitle}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -440,8 +385,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter PLATFORM_DESCRIPTION = new OSParameter("platformDesc", "string", null, "{gs:platformDescription}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -455,8 +400,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter ORIGINATOR_ORGANISATION_IDENTIFIER = new OSParameter("origOrgId", "string", null,
 	    "{gs:originatorOrganisationIdenfitier}") {
 	@Override
@@ -471,8 +416,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter ORIGINATOR_ORGANISATION_DESCRIPTION = new OSParameter("origOrgDesc", "string", null,
 	    "{gs:originatorOrganisationDescription}") {
 	@Override
@@ -487,8 +432,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter TEAM_CATEGORY = new OSParameter("themeCategory", "string", null, "{gs:themeCategory}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -502,8 +447,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter ORGANISATION_NAME = new OSParameter("organisationName", "string", null, "{gs:organisationName}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -517,13 +462,13 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter ROSETTA = new OSParameter("rosetta", "string", null, "{gs:rosetta}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter ATTRIBUTE_IDENTIFIER = new OSParameter("attributeId", "string", null, "{gs:attributeIdentifier}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -537,8 +482,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter ATTRIBUTE_DESCRIPTION = new OSParameter("attributeDesc", "string", null, "{gs:attributeDescription}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -552,8 +497,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter ATTRIBUTE_TITLE = new OSParameter("attributeTitle", "string", null, "{gs:attributeTitle}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -567,8 +512,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter OBSERVED_PROPERTY_URI = new OSParameter("observedPropertyURI", "string", null,
 	    "{gs:observedPropertyURI}") {
 	@Override
@@ -604,8 +549,8 @@ public abstract class OSParameters {
 	    switch (operator) {
 	    case BBOX: // same as not disjoint, as OGC filter encoding 09-026r2
 	    case INTERSECTS:
-		return Optional
-			.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
+		return Optional.of(
+			BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
 	    case CONTAINS:
 		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER, MetadataElement.TEMP_EXTENT_BEGIN, value));
 	    case DISJOINT:
@@ -617,8 +562,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter PUB_DATE_FROM = new OSParameter("pubDateFrom", "dateTime", null, "{gs:pubDateFrom}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -632,8 +577,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter PUB_DATE_UNTIL = new OSParameter("pubDateUntil", "dateTime", null, "{gs:pubDateUntil}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -742,8 +687,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter MAX_MAG = new OSParameter("maxmag", "double", null, "{gs:maxmag}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -758,8 +703,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter MIN_MAG = new OSParameter("minmag", "double", null, "{gs:minmag}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -774,8 +719,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter MAX_DEPTH = new OSParameter("maxdepth", "double", null, "{gs:maxdepth}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -790,8 +735,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter MIN_DEPTH = new OSParameter("mindepth", "double", null, "{gs:mindepth}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -806,8 +751,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter MAX_TYPE = new OSParameter("magtype", "double", null, "{gs:magtype}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -823,18 +768,18 @@ public abstract class OSParameters {
     public static final OSParameter EVENT_ORDER = new OSParameter("evtOrd", "enumeration", null, "{gs:evtOrd}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SPATIAL_RELATION = new OSParameter("rel", "string", "OVERLAPS", "{gs:rel}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter TIME_RELATION = new OSParameter("timeRel", "string", "OVERLAPS", "{gs:timeRel}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter GDC = new OSParameter("gdc", "boolean", null, "{gs:gdc}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -848,8 +793,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter INSITU = new OSParameter("inSitu", "boolean", null, "{gs:inSitu}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -875,8 +820,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SSC_SCORE = new OSParameter("sscScore", "string", "", "{gs:sscScore}") {
 
 	@Override
@@ -899,8 +844,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter CLOUD_COVER_PERC = new OSParameter("cloudcp", "string", "", "{gs:cloudcp}") {
 
 	@Override
@@ -935,8 +880,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter PRODUCT_TYPE = new OSParameter("prodType", "string", null, "{gs:prodType}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -950,8 +895,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SENSOR_OP_MODE = new OSParameter("sensorOpMode", "string", null, "{gs:sensorOpMode}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -965,8 +910,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SENSOR_SWATH = new OSParameter("sensorSwath", "string", null, "{gs:sensorSwath}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -980,8 +925,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter S3_INSTRUMENT_IDX = new OSParameter("s3InstrumentIdx", "string", null, "{gs:s3InstrumentIdx}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -995,8 +940,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter S3_PRODUCT_LEVEL = new OSParameter("s3ProductLevel", "string", null, "{gs:s3ProductLevel}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -1010,8 +955,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter S3_TIMELINESS = new OSParameter("s3Timeliness", "string", null, "{gs:s3Timeliness}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -1025,8 +970,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter EOP_POLARIZATION_ORIENTATION_CODE = new OSParameter("sarPolCh", "string", null, "{gs:sarPolCh}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -1040,8 +985,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter RELATIVE_ORBIT = new OSParameter("relOrbit", "string", null, "{gs:relOrbit}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -1055,8 +1000,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter ROW = new OSParameter("row", "int", null, "{gs:row}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -1070,8 +1015,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter PATH = new OSParameter("path", "int", null, "{gs:path}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -1085,8 +1030,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter IS_VALIDATED = new OSParameter("isValidated", "string", null, "{gs:isValidated}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -1139,8 +1084,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter WKT = new OSParameter("wkt", "wkt", null, "{wkt}") {
 
 	@Override
@@ -1158,8 +1103,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter W3W = new OSParameter("w3w", "string", null, "{gs:w3w}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) throws Exception {
@@ -1268,8 +1213,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter CROP_CONFIDENCE = new OSParameter("cropConfidence", "string", "", "{gs:cropConfidence}") {
 
 	@Override
@@ -1294,8 +1239,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter LAND_COVER_CONFIDENCE = new OSParameter("landCoverConfidence", "string", "",
 	    "{gs:landCoverConfidence}") {
 
@@ -1321,8 +1266,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter IRRIGATION_CONFIDENCE = new OSParameter("irrigationConfidence", "string", "",
 	    "{gs:irrigationConfidence}") {
 
@@ -1348,8 +1293,8 @@ public abstract class OSParameters {
     };
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter EIFFEL_DISCOVERY = new OSParameter("eiffelDiscovery", "string", null, "{gs:eiffelDiscovery}");
 
     /**
@@ -1358,28 +1303,28 @@ public abstract class OSParameters {
     public static final OSParameter BBOX_UNION = new OSParameter("bboxUnion", "string", null, "{gs:bboxUnion}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter OUTPUT_VERSION = new OSParameter("outputVersion", "versionString", "1.0", "{gs:version}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter OUTPUT_FORMAT = new OSParameter("outputFormat", "freeText", null, null);
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SEMANTIC_SEARCH_ENABLED = new OSParameter("semanticSearch", "string", null, "{gs:semanticSearch}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SEMANTIC_RELATIONS = new OSParameter("semanticRelations", "string", null, "{gs:semanticRelations}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SEMANTIC_ONTOLOGY_IDS = new OSParameter("ontologyIds", "string", null, "{gs:ontologyIds}");
 
     /**
@@ -1388,23 +1333,23 @@ public abstract class OSParameters {
     public static final OSParameter SEMANTIC_SEARCH_LANGS = new OSParameter("searchLangs", "string", null, "{gs:searchLangs}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SEMANTIC_SOURCE_LANGS = new OSParameter("sourceLangs", "string", null, "{gs:sourceLangs}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SEMANTIC_EXPANSION_LEVEL = new OSParameter("expansionLevel", "string", null, "{gs:expansionLevel}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SEMANTIC_CONCEPT_URI = new OSParameter("conceptURI", "string", null, "{gs:conceptUri}");
 
     /**
-    *
-    */
+     *
+     */
     public static final OSParameter SEMANTIC_WITH_OBSERVED_PROPERTIES_URIS = new OSParameter("withObservedPropertiesURIs", "string", null,
 	    "{gs:withObservedPropURIs}");
 
