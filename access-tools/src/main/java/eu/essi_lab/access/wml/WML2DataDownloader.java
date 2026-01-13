@@ -133,7 +133,7 @@ public abstract class WML2DataDownloader extends DataDownloader {
 		    HydroOntology ontology = new WHOSOntology();
 		    SKOSConcept concept = ontology.getConcept(uri);
 		    if (concept != null) {
-			label = concept.getPreferredLabel("");
+			label = concept.getPreferredLabel("en");
 			HashSet<String> closeMatches = concept.getCloseMatches();
 			if (closeMatches != null && !closeMatches.isEmpty()) {
 			    try {
@@ -141,7 +141,7 @@ public abstract class WML2DataDownloader extends DataDownloader {
 				for (String closeMatch : closeMatches) {
 				    SKOSConcept variable = wmoOntology.getVariable(closeMatch);
 				    if (variable != null) {
-					String preferredLabel = variable.getPreferredLabel("");
+					String preferredLabel = variable.getPreferredLabel("en");
 					if (preferredLabel != null) {
 					    label = preferredLabel;
 					}

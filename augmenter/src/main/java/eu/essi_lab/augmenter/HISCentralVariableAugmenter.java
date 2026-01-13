@@ -87,7 +87,7 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 	    } else if (concepts.size() > 1) {
 		String value = "";
 		for (SKOSConcept concept : concepts) {
-		    value += concept.getURI() + " (" + concept.getPreferredLabel("") + ") ";
+		    value += concept.getURI() + " (" + concept.getPreferredLabel("en") + ") ";
 		}
 		GSLoggerFactory.getLogger(getClass()).warn("More than one concept found in hydro ontology! ", value);
 
