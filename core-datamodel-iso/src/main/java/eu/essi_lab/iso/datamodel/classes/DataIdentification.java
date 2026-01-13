@@ -164,6 +164,30 @@ public class DataIdentification extends Identification {
 	getElementType().getTopicCategory().add(type);
     }
 
+    /**
+     * Convenience method to add topic category by string code
+     * @param topicCategoryString
+     */
+    public void addTopicCategory(String topicCategoryString) {
+	if (topicCategoryString == null || topicCategoryString.isEmpty()) {
+	    return;
+	}
+	// Try to find matching enum value
+	try {
+	    MDTopicCategoryCodeType topic = MDTopicCategoryCodeType.fromValue(topicCategoryString.toLowerCase());
+	    addTopicCategory(topic);
+	} catch (Exception e) {
+	    // If enum conversion fails, try to match by name
+	    try {
+		MDTopicCategoryCodeType topic = MDTopicCategoryCodeType.valueOf(topicCategoryString.toUpperCase());
+		addTopicCategory(topic);
+	    } catch (Exception e2) {
+		// If still fails, log warning and skip
+		eu.essi_lab.lib.utils.GSLoggerFactory.getLogger(getClass()).warn("Could not convert topic category string to enum: " + topicCategoryString);
+	    }
+	}
+    }
+
     // --------------------------------------------------------
     //
     // resource languages
@@ -608,6 +632,24 @@ public class DataIdentification extends Identification {
 	addVerticalExtent(extent);
     }
 
+    /**
+     * Convenience method to add vertical extent with CRS
+     * @param min
+     * @param max
+     * @param crs
+     */
+    public void addVerticalExtent(double min, double max, String crs) {
+	VerticalExtent extent = new VerticalExtent();
+	extent.setMinimumValue(min);
+	extent.setMaximumValue(max);
+	if (crs != null && !crs.isEmpty()) {
+	    VerticalCRS verticalCRS = new VerticalCRS();
+	    // Set CRS identifier if needed
+	    extent.setVerticalCRS(verticalCRS);
+	}
+	addVerticalExtent(extent);
+    }
+
     public void clearExtents() {
 	getElementType().unsetExtent();
 
@@ -750,6 +792,20 @@ public class DataIdentification extends Identification {
     }
 
     /**
+     * Convenience method to add a browse graphic from URL and description
+     * @param url
+     * @param description
+     */
+    public void addBrowseGraphic(String url, String description) {
+	BrowseGraphic graphic = new BrowseGraphic();
+	graphic.setFileName(url);
+	if (description != null) {
+	    graphic.setFileDescription(description);
+	}
+	addGraphicOverview(graphic);
+    }
+
+    /**
      * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
      * @return
      */
@@ -780,6 +836,33 @@ public class DataIdentification extends Identification {
     public void setSpatialResolution(MDResolution resolution) {
 	clearSpatialResolution();
 	addSpatialResolution(resolution);
+    }
+
+    /**
+     * Convenience method to set spatial resolution from a distance value
+     * @param distance
+     */
+    public void setSpatialResolution(Double distance) {
+	if (distance == null || distance.isNaN()) {
+	    clearSpatialResolution();
+	    return;
+	}
+	MDResolution resolution = new MDResolution();
+	resolution.setDistance("m", distance);
+	setSpatialResolution(resolution);
+    }
+
+    /**
+     * Convenience method to set equivalent scale
+     * @param scale
+     */
+    public void setEquivalentScale(int scale) {
+	MDResolution resolution = getSpatialResolution();
+	if (resolution == null) {
+	    resolution = new MDResolution();
+	}
+	resolution.setEquivalentScale(java.math.BigInteger.valueOf(scale));
+	setSpatialResolution(resolution);
     }
 
     public void addSpatialResolution(MDResolution resolution) {

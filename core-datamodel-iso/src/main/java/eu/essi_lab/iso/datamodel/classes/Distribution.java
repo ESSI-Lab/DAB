@@ -36,6 +36,7 @@ import eu.essi_lab.jaxb.common.ObjectFactories;
 import net.opengis.iso19139.gco.v_20060504.RealPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourcePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourceType;
+import net.opengis.iso19139.gmd.v_20060504.CIResponsiblePartyPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDDigitalTransferOptionsPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDDigitalTransferOptionsType;
 import net.opengis.iso19139.gmd.v_20060504.MDDistributionType;
@@ -277,6 +278,27 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 
 	List<MDDistributorPropertyType> distributor = type.getDistributor();
 	distributor.clear();
+    }
+
+    /**
+     * Adds a distributor contact (responsible party)
+     * @param contact
+     */
+    public void addDistributorContact(ResponsibleParty contact) {
+	List<MDDistributorPropertyType> distributor = type.getDistributor();
+	MDDistributorType mdDistributor = null;
+	if (!distributor.isEmpty()) {
+	    mdDistributor = distributor.get(0).getMDDistributor();
+	} else {
+	    mdDistributor = new MDDistributorType();
+	    MDDistributorPropertyType mdDistributorPropertyType = new MDDistributorPropertyType();
+	    mdDistributorPropertyType.setMDDistributor(mdDistributor);
+	    distributor.add(mdDistributorPropertyType);
+	}
+
+	CIResponsiblePartyPropertyType contactProperty = new CIResponsiblePartyPropertyType();
+	contactProperty.setCIResponsibleParty(contact.getElementType());
+	mdDistributor.setDistributorContact(contactProperty);
     }
 
     private void addOnline(List<MDDigitalTransferOptionsPropertyType> transferOptions,
