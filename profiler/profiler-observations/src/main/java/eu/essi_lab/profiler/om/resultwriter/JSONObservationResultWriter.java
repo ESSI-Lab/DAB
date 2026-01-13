@@ -103,6 +103,7 @@ public class JSONObservationResultWriter extends ResultWriter {
 		} else {
 			String href = foi.getString("id");
 			jsonFoi.put("href", href);
+			jsonFoi.put("title",foi.optString("name"));
 		}
 
 		if (!expandFeatures) {
