@@ -243,7 +243,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	    List<OSParameter> parameters = WebRequestParameter.findParameters(OSParameters.class);
 
-	    // it can throws an IllegalArgumentException
+	    // it can throw an IllegalArgumentException
 	    boolean paramFound = false;
 	    for (OSParameter osParameter : parameters) {
 		String parse = parser.parse(osParameter);
