@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.os.handler.discover;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -146,30 +146,35 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    KeyValueParser keyValueParser = new KeyValueParser(message.getWebRequest().getFormData().get());
 	    OSRequestParser parser = new OSRequestParser(keyValueParser);
 
-	    OSParameter evtOrder = WebRequestParameter.findParameter(OSParameters.EVENT_ORDER.getName(), OSParameters.class);
-	    String evtOrderValue = parser.parse(evtOrder);
+	    Optional<OSParameter> evtOrder = WebRequestParameter.findParameter(OSParameters.EVENT_ORDER.getName(), OSParameters.class);
 
-	    if (evtOrderValue != null && !evtOrderValue.equals("")) {
+	    //
+	    // event order
+	    //
+
+	    String evtOrderValue = evtOrder.map(parser::parse).orElse(null);
+
+	    if (evtOrderValue != null && !evtOrderValue.isEmpty()) {
 
 		message.setQuakeMLEventOrder(evtOrderValue);
 	    }
 
 	    //
-  	    // bbox union
+	    // bbox union
 	    //
 
 	    String bboxUnion = parser.parse(OSParameters.BBOX_UNION);
 	    message.setIncludeBboxUnion(bboxUnion != null && bboxUnion.equals("true"));
 
-	    OSParameter viewIdParam = WebRequestParameter.findParameter(OSParameters.VIEW_ID.getName(), OSParameters.class);
-
 	    //
-	    // Set the view from the param if present
+	    // set the view from the param if present
 	    //
 
-	    String viewIdValue = parser.parse(viewIdParam);
+	    Optional<OSParameter> viewIdParam = WebRequestParameter.findParameter(OSParameters.VIEW_ID.getName(), OSParameters.class);
 
-	    if (viewIdValue != null && !viewIdValue.equals("")) {
+	    String viewIdValue = viewIdParam.map(parser::parse).orElse(null);
+
+	    if (viewIdValue != null && !viewIdValue.isEmpty()) {
 
 		setView(viewIdValue, databaseURI, message);
 	    }
@@ -212,9 +217,9 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	try {
 
 	    // checks the sources param
-	    OSParameter sourceParam = WebRequestParameter.findParameter(OSParameters.SOURCES.getName(), OSParameters.class);
+	    Optional<OSParameter> sourceParam = WebRequestParameter.findParameter(OSParameters.SOURCES.getName(), OSParameters.class);
 
-	    String value = parser.parse(sourceParam);
+	    String value = sourceParam.map(parser::parse).orElse(null);
 
 	    if (value != null) {
 
