@@ -1,6 +1,6 @@
 package eu.essi_lab.profiler.opensearch.test;
 
-import java.util.List;
+import java.util.*;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -46,8 +46,8 @@ public class OSParametersFindingTest {
 	    }
 	});
 
-	OSParameter count = WebRequestParameter.findParameter("ct", OSParameters.class);
-	Assert.assertEquals("ct", count.getName());
+	Optional<OSParameter> count = WebRequestParameter.findParameter("ct", OSParameters.class);
+	Assert.assertEquals("ct", count.get().getName());
 
     }
 

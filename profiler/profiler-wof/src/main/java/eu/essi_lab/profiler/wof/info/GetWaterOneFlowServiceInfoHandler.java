@@ -394,8 +394,6 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 
 	message.setRequestId(requestId);
 
-	message.setQueryRegistrationEnabled(false);
-
 	message.setSources(ConfigurationWrapper.getAllSources());
 
 	Page page = new Page(1, 1000);

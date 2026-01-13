@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.os.handler.discover;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -25,6 +25,7 @@ import com.google.common.collect.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.jaxb.wms._1_3_0.xlink.*;
 import eu.essi_lab.lib.odip.rosetta.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.lib.xml.*;
@@ -129,7 +130,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	if (message.getWebRequest().getFormData().isPresent()) {
 
 	    //
-	    // Get Sources query
+	    // get sources query
 	    //
 
 	    if (OSGetSourcesFilter.isGetSourcesQuery(message.getWebRequest())) {
@@ -146,30 +147,60 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    KeyValueParser keyValueParser = new KeyValueParser(message.getWebRequest().getFormData().get());
 	    OSRequestParser parser = new OSRequestParser(keyValueParser);
 
-	    OSParameter evtOrder = WebRequestParameter.findParameter(OSParameters.EVENT_ORDER.getName(), OSParameters.class);
-	    String evtOrderValue = parser.parse(evtOrder);
+	    //
+	    // sorting
+	    //
 
-	    if (evtOrderValue != null && !evtOrderValue.equals("")) {
+	    Optional<OSParameter> sortBy = WebRequestParameter.findParameter(OSParameters.SORT_BY.getName(), OSParameters.class);
+
+	    String sortByValue = sortBy.map(parser::parse).orElse(null);
+
+	    if (sortByValue != null) {
+
+		final String[] split = sortByValue.split(":");
+
+		String property = split[0];
+		String sortOrder = split[1];
+
+		if (MetadataElement.optFromName(property).isPresent()) {
+
+		    message.setSortedFields(SortedFields.of(MetadataElement.fromName(property), SortOrder.of(sortOrder).get()));
+
+		} else {
+
+		    message.setSortedFields(SortedFields.of(ResourceProperty.fromName(property), SortOrder.of(sortOrder).get()));
+		}
+	    }
+
+	    //
+	    // event order
+	    //
+
+	    Optional<OSParameter> evtOrder = WebRequestParameter.findParameter(OSParameters.EVENT_ORDER.getName(), OSParameters.class);
+
+	    String evtOrderValue = evtOrder.map(parser::parse).orElse(null);
+
+	    if (evtOrderValue != null && !evtOrderValue.isEmpty()) {
 
 		message.setQuakeMLEventOrder(evtOrderValue);
 	    }
 
 	    //
-  	    // bbox union
+	    // bbox union
 	    //
 
 	    String bboxUnion = parser.parse(OSParameters.BBOX_UNION);
 	    message.setIncludeBboxUnion(bboxUnion != null && bboxUnion.equals("true"));
 
-	    OSParameter viewIdParam = WebRequestParameter.findParameter(OSParameters.VIEW_ID.getName(), OSParameters.class);
-
 	    //
-	    // Set the view from the param if present
+	    // set the view from the param if present
 	    //
 
-	    String viewIdValue = parser.parse(viewIdParam);
+	    Optional<OSParameter> viewIdParam = WebRequestParameter.findParameter(OSParameters.VIEW_ID.getName(), OSParameters.class);
 
-	    if (viewIdValue != null && !viewIdValue.equals("")) {
+	    String viewIdValue = viewIdParam.map(parser::parse).orElse(null);
+
+	    if (viewIdValue != null && !viewIdValue.isEmpty()) {
 
 		setView(viewIdValue, databaseURI, message);
 	    }
@@ -211,10 +242,12 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	try {
 
+	    //
 	    // checks the sources param
-	    OSParameter sourceParam = WebRequestParameter.findParameter(OSParameters.SOURCES.getName(), OSParameters.class);
+	    //
+	    Optional<OSParameter> sourceParam = WebRequestParameter.findParameter(OSParameters.SOURCES.getName(), OSParameters.class);
 
-	    String value = parser.parse(sourceParam);
+	    String value = sourceParam.map(parser::parse).orElse(null);
 
 	    if (value != null) {
 
@@ -236,11 +269,58 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		GSLoggerFactory.getLogger(getClass()).trace("Completed sources check");
 	    }
 
+	    //
+	    //	checks the sort by param
+	    //
+
+	    Optional<OSParameter> sortBy = WebRequestParameter.findParameter(OSParameters.SORT_BY.getName(), OSParameters.class);
+
+	    String sortByValue = sortBy.map(parser::parse).orElse(null);
+
+	    if (sortByValue != null) {
+
+		String errorMsg = "Validation failed, unexpected 'sortBy' parameter. " //
+			+ "Found: sortBy='" + sortByValue + "'. Expected: 'sortBy=property:sortOrder' where 'property' ∈ {" //
+			+ Queryable.listSortableQueryables().toString().replace("[", "").replace("]", "") //
+			+ "} and 'sortOrder' ∈ {asc,desc}";
+
+		boolean error = false;
+
+		if (!sortByValue.contains(":")) {
+
+		    error = true;
+
+		} else {
+
+		    final String[] split = sortByValue.split(":");
+
+		    String property = Optional.ofNullable(split[0]).orElse("");
+		    String sortOrder = Optional.ofNullable(split[1]).orElse("");
+
+		    if (Queryable.listSortableQueryables().stream().noneMatch(property::equals) || SortOrder.of(sortOrder).isEmpty()) {
+
+			error = true;
+		    }
+		}
+
+		if (error) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(errorMsg);
+
+		    message.setResult(ValidationResult.VALIDATION_FAILED);
+		    message.setError(errorMsg);
+
+		    return message;
+		}
+	    }
+
 	    List<OSParameter> parameters = WebRequestParameter.findParameters(OSParameters.class);
 
-	    // it can throws an IllegalArgumentException
+	    // it can throw an IllegalArgumentException
 	    boolean paramFound = false;
+
 	    for (OSParameter osParameter : parameters) {
+
 		String parse = parser.parse(osParameter);
 		paramFound |= parse != null && !parse.equals("");
 	    }
@@ -257,11 +337,15 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    }
 
 	    String outputFormat = parser.parse(OSParameters.OUTPUT_FORMAT);
+
 	    if (outputFormat != null && !outputFormat.equals("")) {
+
 		if (outputFormat.equals("application/atom xml")) {
 		    outputFormat = MediaType.APPLICATION_ATOM_XML;
 		}
+
 		boolean supported = false;
+
 		for (String format : SUPPORTED_OUTPUT_FORMATS) {
 		    supported |= outputFormat.equals(format);
 		}
@@ -340,7 +424,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	//
 	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request, getSetting().get());
 
-	if (!eiffelOption.isPresent() || eiffelOption.get() == EiffelAPIDiscoveryOption.FILTER_AND_SORT) {
+	if (eiffelOption.isEmpty() || eiffelOption.get() == EiffelAPIDiscoveryOption.FILTER_AND_SORT) {
 
 	    Optional<String> searchTerms = parser.optParse(OSParameters.SEARCH_TERMS);
 
@@ -354,10 +438,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 		Optional<Bond> searchTermsBond = createSearchTermsBond(parser, searchTerms.get(), searchFields, eiffelOption.isPresent());
 
-		if (searchTermsBond.isPresent()) {
-
-		    bondList.add(searchTermsBond.get());
-		}
+		searchTermsBond.ifPresent(bondList::add);
 	    }
 
 	    //
@@ -374,10 +455,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			MetadataElement.ATTRIBUTE_TITLE_EL_NAME, //
 			eiffelOption.isPresent());
 
-		if (bond.isPresent()) {
-
-		    bondList.add(bond.get());
-		}
+		bond.ifPresent(bondList::add);
 	    }
 
 	    //
@@ -390,10 +468,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 		Optional<Bond> conceptURIBond = createSearchTermsBond(parser, conceptUri.get(), searchFields, eiffelOption.isPresent());
 
-		if (conceptURIBond.isPresent()) {
-
-		    bondList.add(conceptURIBond.get());
-		}
+		conceptURIBond.ifPresent(bondList::add);
 	    }
 	}
 
