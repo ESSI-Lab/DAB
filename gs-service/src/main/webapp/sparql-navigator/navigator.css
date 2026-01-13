@@ -1,0 +1,53 @@
+/* SPARQL Navigator Styles */
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.navigator-container {
+  padding: 20px;
+}
+
+.navigator-container h1 {
+  margin-top: 0;
+}
+
+.navigator-concept-node {
+  margin-top: 4px;
+}
+
+.navigator-concept-node button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.navigator-concept-node button:hover {
+  background-color: #e0e0e0;
+}
+
+.navigator-concept-node button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.navigator-children {
+  margin-left: 20px;
+  margin-top: 8px;
+}
+
+#language-selector {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 14px;
+}
+

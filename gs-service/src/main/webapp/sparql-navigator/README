@@ -1,23 +1,33 @@
-Creating the project:
-from root folder:
-npx create-react-app npm-project
-cp SparqlOntologyNavigator.jsx in src/components/.
-cp App.jsx in src
-from the project root:
+# SPARQL Navigator
 
-customization needed:
-modify package.json:
-"homepage": ".",
+A plain JavaScript library for navigating SKOS ontologies via SPARQL endpoints.
 
-npm install
-npm install react-router-dom
+## Structure
 
-npm run build 
+- `sparql-navigator.js` - Core navigator library (reusable)
+- `navigator.css` - Shared styles
+- `his-central/` - HIS-Central navigator instance
+- `whos/` - WHOS navigator instance
 
-mv the content of build/* to ../his-central and ../whos folders
+## Usage
 
-npm start // to instead run the app for demo
+Each navigator instance (his-central, whos) loads its own `config.json` file containing:
+- `endpoint`: SPARQL endpoint URL
+- `title`: Display title
 
+The navigator automatically:
+- Fetches top concepts from the SPARQL endpoint
+- Displays them in an expandable tree structure
+- Supports language filtering
+- Sends messages to parent window when clicking concept URIs
 
- 
- 
+## Adding a New Navigator Instance
+
+1. Create a new directory (e.g., `new-navigator/`)
+2. Copy `index.html` from an existing navigator
+3. Create a `config.json` with your endpoint and title
+4. Update the HTML title and meta description
+
+## Development
+
+The library is plain JavaScript with no build step required. Simply edit the files and refresh the browser.

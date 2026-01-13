@@ -299,7 +299,7 @@ public class TimeseriesMapper {
 	}
 	if (ontologyConcept != null) {
 	    String originalAttributeName = attributeName;
-	    attributeName = ontologyConcept.getPreferredLabel("");
+	    attributeName = ontologyConcept.getPreferredLabel("en");
 	    timeseries.addParameter("originalObservedProperty", originalAttributeName);
 	} else {
 	    attributeURI = attributeCode;

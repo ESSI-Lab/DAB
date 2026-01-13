@@ -658,7 +658,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 			station.setUnitsURI(unitsURI.get());
 			WMOUnit units = WMOOntology.decodeUnit(unitsURI.get());
 			if (units != null) {
-			    unitsLabel = units.getPreferredLabel("");
+			    unitsLabel = units.getPreferredLabel(null);
 			}
 		    }
 		    if (unitsLabel == null) {

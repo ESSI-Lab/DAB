@@ -54,7 +54,7 @@ public class ParameterCollectionCreator extends SourceCollectionCreator {
 	String level11 = parameterURI;
 	if (concept != null) {
 	    wisLevel10 = WIS2Level10Topic.decode(parameterURI);
-	    level11 = concept.getPreferredLabel("");
+	    level11 = concept.getPreferredLabel("en");
 	}
 	String level10 = wisLevel10.getId();
 	String level9 = wisLevel10.getBroaderLevel().getId();
