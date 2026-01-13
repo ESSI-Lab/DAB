@@ -128,6 +128,14 @@ public abstract class OSParameters {
 	return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, idParam));
     }
 
+    /**
+     *
+     */
+    public static final OSParameter SORT_BY = new OSParameter("sortBy", "string", null, "{gs:sortBy}");
+
+    /**
+     *
+     */
     public static final OSParameter PREDEFINED_LAYER = new OSParameter("predefinedLayer", "string", null, "{gs:predefinedLayer}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -142,6 +150,9 @@ public abstract class OSParameters {
 	}
     };
 
+    /**
+     *
+     */
     public static final OSParameter KEYWORD_SA = new OSParameter("kwdSA", "string", null, "{gs:kwdSA}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
