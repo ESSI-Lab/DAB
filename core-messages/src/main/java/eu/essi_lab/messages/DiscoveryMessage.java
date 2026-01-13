@@ -504,16 +504,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 		filter(res -> ((GSResource) res).getPublicId().equals(id)).//
 		findFirst();
     }
-
-    /**
-     *
-     */
-    @Deprecated
-    public void disableDataFolderCheck() {
-
-	getHeader().add(new GSProperty<>(DATA_FOLDER_CHECK, true));
-    }
-
+    
     /**
      * @param option
      */
