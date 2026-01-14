@@ -21,15 +21,32 @@ package eu.essi_lab.accessor.datahub;
  * #L%
  */
 
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEAlgorithmPropertyType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEAlgorithmType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessStepReportPropertyType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessStepReportType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessStepType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessingPropertyType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessingType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LESourcePropertyType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LESourceType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.Address;
+import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.Format;
@@ -38,15 +55,25 @@ import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
+import eu.essi_lab.jaxb.common.ObjectFactories;
+import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
+import net.opengis.iso19139.gco.v_20060504.DateTimePropertyType;
+import net.opengis.iso19139.gmd.v_20060504.CIResponsiblePartyPropertyType;
+import net.opengis.iso19139.gmd.v_20060504.MDIdentifierPropertyType;
+import net.opengis.iso19139.gmd.v_20060504.MDIdentifierType;
+import net.opengis.iso19139.gmd.v_20060504.MDClassificationCodePropertyType;
+import net.opengis.iso19139.gmd.v_20060504.MDConstraintsPropertyType;
+import net.opengis.iso19139.gmd.v_20060504.MDSecurityConstraintsType;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.ModelSpecificFields;
 import eu.essi_lab.model.resource.OriginalMetadata;
-import eu.essi_lab.model.resource.ResourceType;
 import eu.essi_lab.ommdk.FileIdentifierMapper;
 
 /**
@@ -246,8 +273,9 @@ public class DatahubMapper extends FileIdentifierMapper {
 	if (graphicOverview != null) {
 	    String graphicUrl = graphicOverview.optString("url", null);
 	    String graphicDescription = graphicOverview.optString("description", null);
+		String fileType = graphicOverview.optString("file_type", null);
 	    if (graphicUrl != null) {
-		coreMetadata.getMIMetadata().getDataIdentification().addBrowseGraphic(graphicUrl, graphicDescription);
+		coreMetadata.getMIMetadata().getDataIdentification().addBrowseGraphic(graphicUrl, graphicDescription,fileType);
 	    }
 	}
 
@@ -271,7 +299,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 	// Data language
 	String dataLanguage = json.optString("data_language", null);
 	if (dataLanguage != null) {
-	    coreMetadata.getMIMetadata().getDataIdentification().setLanguage(dataLanguage);
+	    coreMetadata.getMIMetadata().getDataIdentification().addLanguage(dataLanguage);
 	}
 
 	// Topic categories
@@ -452,17 +480,18 @@ public class DatahubMapper extends FileIdentifierMapper {
 			String revisionDate = thesaurus.optString("revision_date", null);
 
 			Citation thesaurusCitation = new Citation();
-			if (thesaurusName != null) {
+			if (thesaurusUrl != null) {
+			    // Use anchor property type when URL is available
+			    String title = thesaurusName != null ? thesaurusName : "";
+			    thesaurusCitation.getElementType().setTitle(ISOMetadata.createAnchorPropertyType(thesaurusUrl, title));
+			} else if (thesaurusName != null) {
 			    thesaurusCitation.setTitle(thesaurusName);
 			}
-			if (thesaurusUrl != null) {
-			    thesaurusCitation.setTitleAnchor(thesaurusUrl, thesaurusName);
-			}
 			if (publicationDate != null) {
-			    thesaurusCitation.setPublicationDate(publicationDate);
+			    thesaurusCitation.addDate(publicationDate,"publication");
 			}
 			if (revisionDate != null) {
-			    thesaurusCitation.setRevisionDate(revisionDate);
+			    thesaurusCitation.addDate(revisionDate,"revision");
 			}
 			keywords.setThesaurusCitation(thesaurusCitation);
 		    }
@@ -491,14 +520,17 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    JSONObject thesaurus = spatialScope.optJSONObject("thesaurus");
 	    if (thesaurus != null) {
 		Citation thesaurusCitation = new Citation();
-		thesaurusCitation.setTitle("Spatial scope");
-		String url = thesaurus.optString("url", null);
-		if (url != null) {
-		    thesaurusCitation.setTitleAnchor(url, "Spatial scope");
+		String name = thesaurus.optString("name", "Spatial scope");
+			String url = thesaurus.optString("url", null);
+
+			if (url != null) {
+		    thesaurusCitation.getElementType().setTitle(ISOMetadata.createAnchorPropertyType(url, name));
+		} else {
+		    thesaurusCitation.setTitle("Spatial scope");
 		}
 		String publicationDate = thesaurus.optString("publication_date", null);
 		if (publicationDate != null) {
-		    thesaurusCitation.setPublicationDate(publicationDate);
+		    thesaurusCitation.addDate(publicationDate, "publication");
 		}
 		keywords.setThesaurusCitation(thesaurusCitation);
 	    }
@@ -524,14 +556,16 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    JSONObject thesaurus = inspirePriorityDataset.optJSONObject("thesaurus");
 	    if (thesaurus != null) {
 		Citation thesaurusCitation = new Citation();
-		thesaurusCitation.setTitle("INSPIRE priority data set");
 		String url = thesaurus.optString("url", null);
+			String name = thesaurus.optString("name", "INSPIRE priority data set");
 		if (url != null) {
-		    thesaurusCitation.setTitleAnchor(url, "INSPIRE priority data set");
+		    thesaurusCitation.getElementType().setTitle(ISOMetadata.createAnchorPropertyType(url, name));
+		} else {
+		    thesaurusCitation.setTitle("INSPIRE priority data set");
 		}
 		String publicationDate = thesaurus.optString("publication_date", null);
 		if (publicationDate != null) {
-		    thesaurusCitation.setPublicationDate(publicationDate);
+		    thesaurusCitation.addDate(publicationDate, "publication");
 		}
 		keywords.setThesaurusCitation(thesaurusCitation);
 	    }
@@ -546,12 +580,12 @@ public class DatahubMapper extends FileIdentifierMapper {
 	// Bounding box (EPSG:4326)
 	JSONObject bbox4326 = json.optJSONObject("bbox_4326");
 	if (bbox4326 != null) {
-	    Double west = bbox4326.optDouble("west_bound_longitude", Double.NaN);
-	    Double east = bbox4326.optDouble("east_bound_longitude", Double.NaN);
-	    Double south = bbox4326.optDouble("south_bound_latitude", Double.NaN);
-	    Double north = bbox4326.optDouble("north_bound_latitude", Double.NaN);
+	    BigDecimal west = bbox4326.optBigDecimal("west_bound_longitude",null);
+		BigDecimal east = bbox4326.optBigDecimal("east_bound_longitude",null);
+		BigDecimal south = bbox4326.optBigDecimal("south_bound_latitude",null);
+		BigDecimal north = bbox4326.optBigDecimal("north_bound_latitude",null);
 
-	    if (!west.isNaN() && !east.isNaN() && !south.isNaN() && !north.isNaN()) {
+	    if (west!=null && east!=null && south!=null && north!=null) {
 		coreMetadata.addBoundingBox(north, west, south, east);
 	    }
 	}
@@ -563,18 +597,40 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    String label = nativeEpsg.optString("label", null);
 	    if (url != null) {
 		ReferenceSystem refSystem = new ReferenceSystem();
-		refSystem.setCode(url);
+		// Use anchor property type if label is available, otherwise use plain text
+		if (label != null && !label.isEmpty()) {
+		    refSystem.setCodeWithAnchor(url, label);
+		} else {
+		    refSystem.setCode(url);
+		}
 		refSystem.setCodeSpace("EPSG");
 		coreMetadata.getMIMetadata().addReferenceSystemInfo(refSystem);
 	    }
 	}
 
 	// Bounding polygon in native EPSG
-	// TODO: bbox_native_epsg_gml_polygon - no direct ISO 19115 mapping
-	// Should be added as extension element
 	String bboxNativeEpsgGmlPolygon = json.optString("bbox_native_epsg_gml_polygon", null);
-	if (bboxNativeEpsgGmlPolygon != null) {
-	    logger.debug("TODO: Add extension element for bbox_native_epsg_gml_polygon");
+	if (bboxNativeEpsgGmlPolygon != null && !bboxNativeEpsgGmlPolygon.isEmpty()) {
+	    try {
+		// Parse space-separated coordinates string (format: x1 y1 x2 y2 x3 y3 ...)
+		String[] coordStrings = bboxNativeEpsgGmlPolygon.trim().split("\\s+");
+		List<Double> coordinates = new ArrayList<>();
+		for (String coordStr : coordStrings) {
+		    if (coordStr != null && !coordStr.isEmpty()) {
+			coordinates.add(Double.parseDouble(coordStr));
+		    }
+		}
+		
+		if (!coordinates.isEmpty()) {
+		    BoundingPolygon boundingPolygon = new BoundingPolygon();
+		    boundingPolygon.setCoordinates(coordinates);
+		    coreMetadata.getMIMetadata().getDataIdentification().addBoundingPolygon(boundingPolygon);
+		}
+	    } catch (NumberFormatException e) {
+		logger.warn("Error parsing coordinates from bbox_native_epsg_gml_polygon: {}", bboxNativeEpsgGmlPolygon, e);
+	    } catch (Exception e) {
+		logger.warn("Error creating bounding polygon from bbox_native_epsg_gml_polygon", e);
+	    }
 	}
 
 	// Vertical extent
@@ -634,12 +690,33 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    }
 
 	    // Security constraints
-	    // TODO: security_classification and security_note - need to use MD_SecurityConstraints
-	    // This requires proper ISO 19115-2 SecurityConstraints handling
 	    String securityClassification = resourceConstraints.optString("security_classification", null);
 	    String securityNote = resourceConstraints.optString("security_note", null);
 	    if (securityClassification != null || (securityNote != null && !"null".equals(securityNote))) {
-		logger.debug("TODO: Add security constraints (classification: {}, note: {})", securityClassification, securityNote);
+		// Create security constraints
+		MDSecurityConstraintsType securityConstraintsType = new MDSecurityConstraintsType();
+		
+		// Set classification (required field)
+		if (securityClassification != null && !securityClassification.isEmpty()) {
+		    MDClassificationCodePropertyType classificationProperty = new MDClassificationCodePropertyType();
+		    CodeListValueType classificationCode = ISOMetadata.createCodeListValueType(
+			ISOMetadata.MD_CLASSIFICATION_CODE_CODELIST, 
+			securityClassification, 
+			ISOMetadata.ISO_19115_CODESPACE, 
+			securityClassification);
+		    classificationProperty.setMDClassificationCode(classificationCode);
+		    securityConstraintsType.setClassification(classificationProperty);
+		}
+		
+		// Set user note (optional field)
+		if (securityNote != null && !"null".equals(securityNote) && !securityNote.isEmpty()) {
+		    securityConstraintsType.setUserNote(ISOMetadata.createCharacterStringPropertyType(securityNote));
+		}
+		
+		// Add security constraints to resource constraints
+		MDConstraintsPropertyType constraintProperty = new MDConstraintsPropertyType();
+		constraintProperty.setMDConstraints(ObjectFactories.GMD().createMDSecurityConstraints(securityConstraintsType));
+		coreMetadata.getMIMetadata().getDataIdentification().getElementType().getResourceConstraints().add(constraintProperty);
 	    }
 
 	    coreMetadata.getMIMetadata().getDataIdentification().addLegalConstraints(legalConstraints);
@@ -708,8 +785,9 @@ public class DatahubMapper extends FileIdentifierMapper {
 		    if (protocol != null) {
 			String protocolCode = protocol.optString("code", null);
 			String protocolName = protocol.optString("name", null);
-			if (protocolCode != null) {
-			    online.setProtocol(protocolCode);
+			if (protocolCode != null ) {
+			    // Use anchor when code is available
+			    online.setProtocolAnchor(protocolCode, protocolName);
 			} else if (protocolName != null) {
 			    online.setProtocol(protocolName);
 			}
@@ -720,12 +798,17 @@ public class DatahubMapper extends FileIdentifierMapper {
 			online.setApplicationProfile(applicationProfile);
 		    }
 
-		    // TODO: query_string_fragment, layer_pk, temporal_wms, layer_style, source_auth_type, source_auth_key
+		    // TODO: query_string_fragment, layer_pk, temporal_wms, layer_style
 		    // These fields don't have direct ISO 19115 mappings and should be added as extension elements
 		    String queryStringFragment = onlineResourceObj.optString("query_string_fragment", null);
 		    String layerPk = onlineResourceObj.optString("layer_pk", null);
 		    Boolean temporalWms = onlineResourceObj.optBoolean("temporal_wms", false);
 		    JSONObject layerStyle = onlineResourceObj.optJSONObject("layer_style");
+			if (layerStyle!=null){
+				layerStyle.optString("name");
+				layerStyle.optString("workspace");
+			}
+
 		    if (queryStringFragment != null || layerPk != null || temporalWms || layerStyle != null) {
 			logger.debug("TODO: Add extension elements for online resource extensions (query_string_fragment, layer_pk, temporal_wms, layer_style)");
 		    }
@@ -735,11 +818,10 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    }
 	}
 
-	// TODO: dataset_location, raster_mosaic - no direct ISO 19115 mapping
+	// TODO:  raster_mosaic - no direct ISO 19115 mapping
 	// These should be added as extension elements
-	String datasetLocation = json.optString("dataset_location", null);
 	Boolean rasterMosaic = json.optBoolean("raster_mosaic", false);
-	if (datasetLocation != null || rasterMosaic) {
+	if ( rasterMosaic) {
 	    logger.debug("TODO: Add extension elements for dataset_location and raster_mosaic");
 	}
     }
@@ -764,7 +846,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 			specificationCitation.setTitle(specificationTitle);
 		    }
 		    if (specificationPublicationDate != null) {
-			specificationCitation.setPublicationDate(specificationPublicationDate);
+			specificationCitation.addDate(specificationPublicationDate, "publication");
 		    }
 
 		    coreMetadata.getMIMetadata().getDataQualityInfo().addConformanceResult(specificationCitation, explanation, pass);
@@ -821,7 +903,13 @@ public class DatahubMapper extends FileIdentifierMapper {
 				if (onlineResourceObj != null) {
 				    String url = onlineResourceObj.optString("url", null);
 				    if (url != null) {
-					citation.addOnlineResource(url);
+					// Create Online resource and add to citation
+					Online online = new Online();
+					online.setLinkage(url);
+
+					// TODO: Citation doesn't have a direct method to add online resources
+					// This may need to be added as an extension or handled differently
+					logger.debug("TODO: Add online resource to citation - Citation class doesn't support online resources directly");
 				    }
 				}
 			    }
@@ -838,61 +926,387 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    for (int i = 0; i < lineageProcessStep.length(); i++) {
 		JSONObject processStepObj = lineageProcessStep.optJSONObject(i);
 		if (processStepObj != null) {
-		    String description = processStepObj.optString("description", null);
-		    String rationale = processStepObj.optString("rationale", null);
-		    String date = processStepObj.optString("date", null);
-		    JSONObject processor = processStepObj.optJSONObject("processor");
-		    JSONObject source = processStepObj.optJSONObject("source");
-		    JSONObject processingInformation = processStepObj.optJSONObject("processing_information");
-		    JSONObject output = processStepObj.optJSONObject("output");
-		    JSONObject report = processStepObj.optJSONObject("report");
-
-		    // TODO: Complete lineage process step mapping - this is complex and may require
-		    // additional ISO 19115-2 extensions
-		    logger.debug("TODO: Complete lineage_process_step mapping with all sub-elements");
+		    mapProcessStep(processStepObj, coreMetadata);
 		}
 	    }
 	}
     }
 
     /**
+     * Maps a lineage process step from JSON to ISO 19115 structure.
+     */
+    private void mapProcessStep(JSONObject processStepObj, CoreMetadata coreMetadata) {
+	// Ensure lineage exists by setting a statement if needed (this creates the lineage structure)
+	// We'll access it directly through the metadata
+	eu.essi_lab.iso.datamodel.classes.MDMetadata metadata = coreMetadata.getMIMetadata();
+	Iterator<eu.essi_lab.iso.datamodel.classes.DataQuality> dataQualities = metadata.getDataQualities();
+	eu.essi_lab.iso.datamodel.classes.DataQuality dataQuality;
+	if (dataQualities.hasNext()) {
+	    dataQuality = dataQualities.next();
+	} else {
+	    dataQuality = new eu.essi_lab.iso.datamodel.classes.DataQuality();
+	    metadata.addDataQuality(dataQuality);
+	}
+	
+	// Get or create lineage structure
+	net.opengis.iso19139.gmd.v_20060504.LILineagePropertyType lineageProperty = 
+	    dataQuality.getElementType().getLineage();
+	if (lineageProperty == null) {
+	    lineageProperty = new net.opengis.iso19139.gmd.v_20060504.LILineagePropertyType();
+	    dataQuality.getElementType().setLineage(lineageProperty);
+	}
+	net.opengis.iso19139.gmd.v_20060504.LILineageType lineageType = lineageProperty.getLILineage();
+	if (lineageType == null) {
+	    lineageType = new net.opengis.iso19139.gmd.v_20060504.LILineageType();
+	    lineageProperty.setLILineage(lineageType);
+	}
+	
+	// Create LIProcessStepType
+	LEProcessStepType processStepType = new LEProcessStepType();
+	// Map description (required)
+	String description = processStepObj.optString("description", null);
+	if (description != null && !description.isEmpty()) {
+	    processStepType.setDescription(ISOMetadata.createCharacterStringPropertyType(description));
+	} else {
+	    // Set empty description if not provided (required field)
+	    processStepType.setDescription(ISOMetadata.createCharacterStringPropertyType(""));
+	}
+	
+	// Map rationale (optional)
+	String rationale = processStepObj.optString("rationale", null);
+	if (rationale != null && !rationale.isEmpty()) {
+	    processStepType.setRationale(ISOMetadata.createCharacterStringPropertyType(rationale));
+	}
+	
+	// Map date (optional) - can be Date or DateTime
+	String date = processStepObj.optString("date", null);
+	if (date != null && !date.isEmpty()) {
+	    try {
+		Optional<Date> parsedDate = ISO8601DateTimeUtils.parseISO8601ToDate(date);
+		if (parsedDate.isPresent()) {
+		    XMLGregorianCalendar xmlCal = ISO8601DateTimeUtils.getXMLGregorianCalendar(parsedDate.get());
+		    DateTimePropertyType dateTimeProperty = new DateTimePropertyType();
+		    dateTimeProperty.setDateTime(xmlCal);
+		    processStepType.setDateTime(dateTimeProperty);
+		}
+	    } catch (DatatypeConfigurationException e) {
+		logger.warn("Error parsing date for process step: {}", date, e);
+	    }
+	}
+	
+	// Map processor (optional) - CI_ResponsibleParty with role "processor"
+	JSONObject processor = processStepObj.optJSONObject("processor");
+	if (processor != null) {
+	    ResponsibleParty processorParty = createResponsibleParty(processor);
+
+		// Set role to "processor" if not already set
+		if (processorParty.getRoleCode() == null || processorParty.getRoleCode().isEmpty()) {
+		    processorParty.setRoleCode("processor");
+		}
+		CIResponsiblePartyPropertyType processorProperty = new CIResponsiblePartyPropertyType();
+		processorProperty.setCIResponsibleParty(processorParty.getElementType());
+		processStepType.getProcessor().add(processorProperty);
+
+	}
+	
+	// Map source (optional) - use LE_Source (GMI extension)
+	JSONObject source = processStepObj.optJSONObject("source");
+	if (source != null) {
+	    LESourceType sourceType = new LESourceType();
+	    
+	    // Map source citation if available
+	    JSONObject sourceCitation = source.optJSONObject("source_citation");
+	    if (sourceCitation != null) {
+		Citation citation = new Citation();
+		String title = sourceCitation.optString("title", null);
+		if (title != null) {
+		    citation.setTitle(title);
+		}
+		net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = 
+		    new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
+		citationProperty.setCICitation(citation.getElementType());
+		sourceType.setSourceCitation(citationProperty);
+	    }
+	    
+	    // Map source description if available
+	    String sourceDescription = source.optString("description", null);
+	    if (sourceDescription != null && !sourceDescription.isEmpty()) {
+		sourceType.setDescription(ISOMetadata.createCharacterStringPropertyType(sourceDescription));
+	    }
+	    
+	    // Use LISourcePropertyType since getSource() returns List<LISourcePropertyType>
+	    // LESourceType extends LISourceType, so we can set it via setLISource
+	    net.opengis.iso19139.gmd.v_20060504.LISourcePropertyType sourceProperty = 
+		new net.opengis.iso19139.gmd.v_20060504.LISourcePropertyType();
+	    sourceProperty.setLISource(sourceType); // LESourceType extends LISourceType
+	    processStepType.getSource().add(sourceProperty);
+	}
+	
+	// Map processing_information (optional) - gmi:LE_Processing
+	JSONObject processingInformation = processStepObj.optJSONObject("processing_information");
+	if (processingInformation != null) {
+	    LEProcessingType processingType = new LEProcessingType();
+	    
+	    // Map identifier (required)
+	    String id = processingInformation.optString("id", null);
+	    if (id != null && !id.isEmpty()) {
+		MDIdentifierPropertyType identifierProperty = new MDIdentifierPropertyType();
+		MDIdentifierType identifierType = new MDIdentifierType();
+		identifierType.setCode(ISOMetadata.createCharacterStringPropertyType(id));
+		identifierProperty.setMDIdentifier(ObjectFactories.GMD().createMDIdentifier(identifierType));
+		processingType.setIdentifier(identifierProperty);
+	    } else {
+		// Set empty identifier if not provided (required field)
+		MDIdentifierPropertyType identifierProperty = new MDIdentifierPropertyType();
+		MDIdentifierType identifierType = new MDIdentifierType();
+		identifierType.setCode(ISOMetadata.createCharacterStringPropertyType(""));
+		identifierProperty.setMDIdentifier(ObjectFactories.GMD().createMDIdentifier(identifierType));
+		processingType.setIdentifier(identifierProperty);
+	    }
+	    
+	    // Map software_reference (optional)
+	    JSONObject softwareReference = processingInformation.optJSONObject("software_reference");
+	    if (softwareReference != null) {
+		Citation citation = new Citation();
+		String title = softwareReference.optString("title", null);
+		if (title != null) {
+		    citation.setTitle(title);
+		}
+		// TODO: Map online_resource if needed
+		net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = 
+		    new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
+		citationProperty.setCICitation(citation.getElementType());
+		processingType.getSoftwareReference().add(citationProperty);
+	    }
+	    
+	    // Map procedure_description (optional)
+	    String procedureDescription = processingInformation.optString("procedure_description", null);
+	    if (procedureDescription != null && !procedureDescription.isEmpty()) {
+		processingType.setProcedureDescription(ISOMetadata.createCharacterStringPropertyType(procedureDescription));
+	    }
+	    
+	    // Map documentation (optional) - array of citations
+	    JSONArray documentation = processingInformation.optJSONArray("documentation");
+	    if (documentation != null) {
+		for (int j = 0; j < documentation.length(); j++) {
+		    JSONObject docObj = documentation.optJSONObject(j);
+		    if (docObj != null) {
+			Citation docCitation = new Citation();
+			String docTitle = docObj.optString("title", null);
+			if (docTitle != null) {
+			    docCitation.setTitle(docTitle);
+			}
+			// TODO: Map online_resource if needed
+			net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType docCitationProperty = 
+			    new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
+			docCitationProperty.setCICitation(docCitation.getElementType());
+			processingType.getDocumentation().add(docCitationProperty);
+		    }
+		}
+	    }
+	    
+	    // Map run_time_parameters (optional)
+	    String runTimeParameters = processingInformation.optString("run_time_parameters", null);
+	    if (runTimeParameters != null && !runTimeParameters.isEmpty()) {
+		processingType.setRunTimeParameters(ISOMetadata.createCharacterStringPropertyType(runTimeParameters));
+	    }
+	    
+	    // Map algorithm (optional)
+	    JSONObject algorithm = processingInformation.optJSONObject("algorithm");
+	    if (algorithm != null) {
+		LEAlgorithmType algorithmType = new LEAlgorithmType();
+		
+		// Map citation (required)
+		JSONObject algorithmCitation = algorithm.optJSONObject("citation");
+		if (algorithmCitation != null) {
+		    Citation citation = new Citation();
+		    String title = algorithmCitation.optString("title", null);
+		    if (title != null) {
+			citation.setTitle(title);
+		    }
+		    // TODO: Map online_resource if needed
+		    net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = 
+			new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
+		    citationProperty.setCICitation(citation.getElementType());
+		    algorithmType.setCitation(citationProperty);
+		}
+		
+		// Map description (required)
+		String algorithmDescription = algorithm.optString("description", null);
+		if (algorithmDescription != null && !algorithmDescription.isEmpty()) {
+		    algorithmType.setDescription(ISOMetadata.createCharacterStringPropertyType(algorithmDescription));
+		} else {
+		    // Set empty description if not provided (required field)
+		    algorithmType.setDescription(ISOMetadata.createCharacterStringPropertyType(""));
+		}
+		
+		LEAlgorithmPropertyType algorithmProperty = new LEAlgorithmPropertyType();
+		algorithmProperty.setLEAlgorithm(algorithmType);
+		processingType.getAlgorithm().add(algorithmProperty);
+	    }
+	    
+	    // Note: parameter array is mentioned in hints but requires mrl:LE_ProcessParameter
+	    // which may not be available. Skipping for now.
+	    
+	    LEProcessingPropertyType processingProperty = new LEProcessingPropertyType();
+	    processingProperty.setLEProcessing(processingType);
+	    processStepType.setProcessingInformation(processingProperty);
+	}
+	
+	// Map output (optional) - gmi:LE_Source
+	JSONObject output = processStepObj.optJSONObject("output");
+	if (output != null) {
+	    LESourceType outputSourceType = new LESourceType();
+	    
+	    // Map source citation if available
+	    JSONObject outputCitation = output.optJSONObject("source_citation");
+	    if (outputCitation != null) {
+		Citation citation = new Citation();
+		String title = outputCitation.optString("title", null);
+		if (title != null) {
+		    citation.setTitle(title);
+		}
+		net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = 
+		    new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
+		citationProperty.setCICitation(citation.getElementType());
+		outputSourceType.setSourceCitation(citationProperty);
+	    }
+	    
+	    // Map description if available
+	    String outputDescription = output.optString("description", null);
+	    if (outputDescription != null && !outputDescription.isEmpty()) {
+		outputSourceType.setDescription(ISOMetadata.createCharacterStringPropertyType(outputDescription));
+	    }
+	    
+	    LESourcePropertyType outputProperty = new LESourcePropertyType();
+	    outputProperty.setLESource(outputSourceType);
+	    processStepType.getOutput().add(outputProperty);
+	}
+	
+	// Map report (optional) - gmi:LE_ProcessStepReport
+	JSONObject report = processStepObj.optJSONObject("report");
+	if (report != null) {
+	    LEProcessStepReportType reportType = new LEProcessStepReportType();
+	    
+	    // Map name (required)
+	    String reportName = report.optString("name", null);
+	    if (reportName != null && !reportName.isEmpty()) {
+		reportType.setName(ISOMetadata.createCharacterStringPropertyType(reportName));
+	    } else {
+		// Set empty name if not provided (required field)
+		reportType.setName(ISOMetadata.createCharacterStringPropertyType(""));
+	    }
+	    
+	    // Map description (optional)
+	    String reportDescription = report.optString("description", null);
+	    if (reportDescription != null && !reportDescription.isEmpty()) {
+		reportType.setDescription(ISOMetadata.createCharacterStringPropertyType(reportDescription));
+	    }
+	    
+	    // Map file_type (optional)
+	    String fileType = report.optString("file_type", null);
+	    if (fileType != null && !fileType.isEmpty()) {
+		reportType.setFileType(ISOMetadata.createCharacterStringPropertyType(fileType));
+	    }
+	    
+	    LEProcessStepReportPropertyType reportProperty = new LEProcessStepReportPropertyType();
+	    reportProperty.setLEProcessStepReport(reportType);
+	    processStepType.getReport().add(reportProperty);
+	}
+	
+	// Wrap in LEProcessStepPropertyType and add to lineage processStep list
+	// Note: getProcessStep() returns List<LIProcessStepPropertyType>, but LEProcessStepType extends LIProcessStepType
+	// So we use LIProcessStepPropertyType and set the LEProcessStepType via setLIProcessStep
+	net.opengis.iso19139.gmd.v_20060504.LIProcessStepPropertyType processStepProperty = 
+	    new net.opengis.iso19139.gmd.v_20060504.LIProcessStepPropertyType();
+	processStepProperty.setLIProcessStep(processStepType); // LEProcessStepType extends LIProcessStepType
+	lineageType.getProcessStep().add(processStepProperty);
+    }
+
+    /**
      * Maps model-specific fields
      */
     private void mapModelSpecificFields(JSONObject json, CoreMetadata coreMetadata, GSResource resource) {
-	// TODO: model_maturity_level - no direct ISO 19115 mapping
+	// Create ModelSpecificFields extension object
+	ModelSpecificFields modelFields = new ModelSpecificFields();
+	boolean hasFields = false;
+	
+	// Map model_maturity_level
 	String modelMaturityLevel = json.optString("model_maturity_level", null);
-	if (modelMaturityLevel != null) {
-	    logger.debug("TODO: Add extension element for model_maturity_level");
+	if (modelMaturityLevel != null && !modelMaturityLevel.isEmpty()) {
+	    modelFields.setModelMaturityLevel(modelMaturityLevel);
+	    hasFields = true;
 	}
 
-	// TODO: model_computational_requirements - no direct ISO 19115 mapping
+	// Map model_computational_requirements
 	JSONObject modelComputationalRequirements = json.optJSONObject("model_computational_requirements");
 	if (modelComputationalRequirements != null) {
-	    logger.debug("TODO: Add extension elements for model_computational_requirements (cpu, gpu, ram, storage)");
+	    String cpu = modelComputationalRequirements.optString("cpu", null);
+	    if (cpu != null && !cpu.isEmpty()) {
+		modelFields.setCpu(cpu);
+		hasFields = true;
+	    }
+	    
+	    String gpu = modelComputationalRequirements.optString("gpu", null);
+	    if (gpu != null && !gpu.isEmpty()) {
+		modelFields.setGpu(gpu);
+		hasFields = true;
+	    }
+	    
+	    String ram = modelComputationalRequirements.optString("ram", null);
+	    if (ram != null && !ram.isEmpty()) {
+		modelFields.setRam(ram);
+		hasFields = true;
+	    }
+	    
+	    String storage = modelComputationalRequirements.optString("storage", null);
+	    if (storage != null && !storage.isEmpty()) {
+		modelFields.setStorage(storage);
+		hasFields = true;
+	    }
 	}
 
-	// TODO: model_types - no direct ISO 19115 mapping
+	// Map model_types
 	JSONArray modelTypes = json.optJSONArray("model_types");
 	if (modelTypes != null) {
-	    logger.debug("TODO: Add extension element for model_types");
+	    for (int i = 0; i < modelTypes.length(); i++) {
+		String modelType = modelTypes.optString(i, null);
+		if (modelType != null && !modelType.isEmpty()) {
+		    modelFields.addModelType(modelType);
+		    hasFields = true;
+		}
+	    }
 	}
 
-	// TODO: supported_platforms - no direct ISO 19115 mapping
+	// Map supported_platforms
 	JSONArray supportedPlatforms = json.optJSONArray("supported_platforms");
 	if (supportedPlatforms != null) {
-	    logger.debug("TODO: Add extension element for supported_platforms");
+	    for (int i = 0; i < supportedPlatforms.length(); i++) {
+		String platform = supportedPlatforms.optString(i, null);
+		if (platform != null && !platform.isEmpty()) {
+		    modelFields.addSupportedPlatform(platform);
+		    hasFields = true;
+		}
+	    }
 	}
 
-	// TODO: model_category - no direct ISO 19115 mapping
+	// Map model_category
 	String modelCategory = json.optString("model_category", null);
-	if (modelCategory != null) {
-	    logger.debug("TODO: Add extension element for model_category");
+	if (modelCategory != null && !modelCategory.isEmpty()) {
+	    modelFields.setModelCategory(modelCategory);
+	    hasFields = true;
 	}
 
-	// TODO: model_methodology_description - no direct ISO 19115 mapping
+	// Map model_methodology_description
 	String modelMethodologyDescription = json.optString("model_methodology_description", null);
-	if (modelMethodologyDescription != null) {
-	    logger.debug("TODO: Add extension element for model_methodology_description");
+	if (modelMethodologyDescription != null && !modelMethodologyDescription.isEmpty()) {
+	    modelFields.setModelMethodologyDescription(modelMethodologyDescription);
+	    hasFields = true;
+	}
+	
+	// Set the extension if any fields were populated
+	if (hasFields) {
+	    resource.getExtensionHandler().setModelSpecificFields(modelFields);
 	}
 
 	// Model quality information
@@ -947,10 +1361,9 @@ public class DatahubMapper extends FileIdentifierMapper {
 	}
 
 	// Raster nodata value
-	// TODO: raster_nodata_value - no direct ISO 19115 mapping
 	Double rasterNodataValue = json.optDouble("raster_nodata_value", Double.NaN);
 	if (!rasterNodataValue.isNaN()) {
-	    logger.debug("TODO: Add extension element for raster_nodata_value");
+	   resource.getExtensionHandler().setAttributeMissingValue(rasterNodataValue.toString());
 	}
 
 	// Parent identifier

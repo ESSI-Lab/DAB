@@ -22,6 +22,7 @@ package eu.essi_lab.iso.datamodel.classes;
  */
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -29,11 +30,7 @@ import javax.xml.bind.JAXBException;
 
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.jaxb.common.ObjectFactories;
-import net.opengis.iso19139.gmd.v_20060504.DQAccuracyOfATimeMeasurementType;
-import net.opengis.iso19139.gmd.v_20060504.DQDataQualityType;
-import net.opengis.iso19139.gmd.v_20060504.DQElementPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.LILineagePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.LILineageType;
+import net.opengis.iso19139.gmd.v_20060504.*;
 
 public class DataQuality extends ISOMetadata<DQDataQualityType> {
     public DataQuality(InputStream stream) throws JAXBException {
@@ -79,11 +76,14 @@ public class DataQuality extends ISOMetadata<DQDataQualityType> {
 	}
     }
 
-    public void addReport(JAXBElement<DQAccuracyOfATimeMeasurementType> accuracyOfMeasure) {
-	
+    public void addReport(JAXBElement<? extends AbstractDQElementType> element) {
+
 	List<DQElementPropertyType> reports = type.getReport();
+	if (reports == null) {
+	    reports = new ArrayList<>();
+	}
 	DQElementPropertyType elem = new DQElementPropertyType();
-	elem.setAbstractDQElement(accuracyOfMeasure);
+	elem.setAbstractDQElement(element);
 	reports.add(elem);
 	type.setReport(reports);
     }

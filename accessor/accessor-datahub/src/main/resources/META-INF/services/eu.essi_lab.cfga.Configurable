@@ -1,2 +1,2 @@
-eu.essi_lab.accessor.dataloggers.DatahubAccessor
-eu.essi_lab.accessor.dataloggers.DatahubConnector
+eu.essi_lab.accessor.datahub.DatahubAccessor
+eu.essi_lab.accessor.datahub.DatahubConnector

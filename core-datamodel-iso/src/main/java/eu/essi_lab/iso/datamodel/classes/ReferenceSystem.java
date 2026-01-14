@@ -100,6 +100,14 @@ public class ReferenceSystem extends ISOMetadata<MDReferenceSystemType> {
 	return null;
     }
 
+	/**
+	 * @XPathDirective(target = "gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gco:CharacterString")
+	 */
+	public void setCodeWithAnchor(String codeHref, String codeLabel) {
+		initRSIdentifier();
+		type.getReferenceSystemIdentifier().getRSIdentifier().setCode(createAnchorPropertyType(codeHref,codeLabel));
+	}
+
     /**
      * @XPathDirective(target = "gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gco:CharacterString")
      */

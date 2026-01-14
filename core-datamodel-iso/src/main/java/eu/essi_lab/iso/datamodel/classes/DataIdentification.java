@@ -805,6 +805,16 @@ public class DataIdentification extends Identification {
 	addGraphicOverview(graphic);
     }
 
+	public void addBrowseGraphic(String url, String description,String fileType) {
+		BrowseGraphic graphic = new BrowseGraphic();
+		graphic.setFileName(url);
+		if (description != null) {
+			graphic.setFileDescription(description);
+		}
+		graphic.setFileType(fileType);
+		addGraphicOverview(graphic);
+	}
+
     /**
      * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
      * @return
