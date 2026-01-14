@@ -58,7 +58,7 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter SOURCES = new OSParameter("sources", "identifiers", null, "{gs:sources}") {
+    public static final OSParameter SOURCES = new OSParameter("sources", "string", null, "{gs:sources}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -83,6 +83,7 @@ public abstract class OSParameters {
      *
      */
     public static final OSParameter HIERARCHY_LEVEL = new OSParameter("hLevel", "string", null, "{gs:hLevel}") {
+
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 

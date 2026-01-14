@@ -180,6 +180,17 @@ public class DataDownloaderTool {
 		    for (int i = 0; i < members.length(); i++) {
 			JSONObject member = members.getJSONObject(i);
 			String id = member.getString("id");
+			String observedPropertyTitle = id;
+			JSONObject observedProperty = member.optJSONObject("observedProperty");
+			if (observedProperty!=null){
+			    observedPropertyTitle = observedProperty.optString("title",observedPropertyTitle);
+			}
+			String foiTitle = id;
+			JSONObject foi = member.optJSONObject("featureOfInterest");
+			if (foi!=null){
+			    foiTitle = foi.optString("title",foi.optString("href",foiTitle));
+			}
+
 			String sourceId = "unknown";
 
 			JSONArray parameters = member.getJSONArray("parameter");
@@ -187,8 +198,18 @@ public class DataDownloaderTool {
 			    JSONObject parameter = parameters.getJSONObject(j);
 			    String name = parameter.getString("name");
 			    String value = parameter.getString("value");
-			    if (name.equals("sourceId")) {
+			    if (name.equals("source")) {
 				sourceId = value;
+			    }
+			}
+			if (sourceId.equals("unknown")){
+			    for (int j = 0; j < parameters.length(); j++) {
+				JSONObject parameter = parameters.getJSONObject(j);
+				String name = parameter.getString("name");
+				String value = parameter.getString("value");
+				if (name.equals("sourceId")) {
+				    sourceId = value;
+				}
 			    }
 			}
 
@@ -209,11 +230,12 @@ public class DataDownloaderTool {
 			    sourceDir.mkdir();
 			}
 
-			File idDir = new File(sourceDir, id);
+			File propertyDir = new File(sourceDir, observedPropertyTitle);
 
-			if (!idDir.exists()) {
-			    idDir.mkdir();
+			if (!propertyDir.exists()) {
+			    propertyDir.mkdir();
 			}
+
 
 			OMFormat oFormat = OMFormat.decode(format);
 			if (oFormat == null) {
@@ -221,8 +243,10 @@ public class DataDownloaderTool {
 			}
 			String extension = oFormat.getExtension();
 
-			File logFile = new File(idDir, "log.txt");
-			File dataFile = new File(idDir, "data" + extension);
+			String baseName = foiTitle;
+
+			File logFile = new File(propertyDir, "log_"+baseName+".txt");
+			File dataFile = new File(propertyDir, "data_"+baseName+ extension);
 
 			WebRequest get2 = WebRequest.createGET(downloadURL);
 

@@ -565,25 +565,43 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setTimeAggregationDuration8601(duration);
 	    dataset.getExtensionHandler().setTimeResolutionDuration8601(duration);
 	}
-	switch (aggProcedure) {
-	case "max":
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MAX);
-	    break;
-	case "min":
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MIN);
-	    break;
-	case "avg":
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.AVERAGE);
-	    break;
-	case "sum":
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
-	    break;
-	case "real-time":
-	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
-	    break;
-	default:
-	    dataset.getExtensionHandler().setTimeInterpolation(aggProcedure);
-	    break;
+
+	if(aggProcedure.contains("cumsum")){
+	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.STATISTICAL);
+	} else {
+
+	    switch (aggProcedure) {
+	    case "max":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MAX);
+		break;
+	    case "min":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MIN);
+		break;
+	    case "avg":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.AVERAGE);
+		break;
+	    case "sum":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
+		break;
+	    case "rt":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
+		break;
+	    case "00":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
+		break;
+	    case "06":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
+		break;
+	    case "12":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
+		break;
+	    case "18":
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
+		break;
+	    default:
+		dataset.getExtensionHandler().setTimeInterpolation(aggProcedure);
+		break;
+	    }
 	}
 
 	coverageDescription.setAttributeIdentifier(aggregationAggregation);
