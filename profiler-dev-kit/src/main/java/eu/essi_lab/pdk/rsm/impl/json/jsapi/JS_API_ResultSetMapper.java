@@ -192,19 +192,13 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	MIMetadata md_Metadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
 
 	List<Identification> diList = Lists.newArrayList(md_Metadata.getDataIdentifications());
-	// if (res instanceof Catalog) {
-	// diList = md_Metadata.getServiceIdentificationList();
-	// } else {
-	// diList = md_Metadata.getDataIdentificationList();
-	// }
 
 	// ---
 	// id
 	// ---
+
 	String id = md_Metadata.getFileIdentifier();
-	// if (id == null) {
-	// id = res.getId();
-	// }
+
 	report.put("id", id);
 
 	// ---
@@ -223,6 +217,14 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	if (parent != null) {
 	    report.put("parentId", parent);
 	}
+
+	// --------------------
+	// hierarchy level code
+	// --------------------
+	md_Metadata.getHierarchyLevelScopeCodeListValues().forEachRemaining(value -> {
+
+	    report.put("hierarchyLevel", value);
+	});
 
 	// --------------------
 	// coverageDescription (API TO IMPLEMENT)

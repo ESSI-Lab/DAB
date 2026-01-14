@@ -82,7 +82,18 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter PARENTS = new OSParameter("parents", "identifiers", null, "{gs:parents}") {
+    public static final OSParameter HIERARCHY_LEVEL = new OSParameter("hLevel", "string", null, "{gs:hLevel}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    return readMultiValues(value, MetadataElement.HIERARCHY_LEVEL_CODE_LIST_VALUE);
+	}
+    };
+
+    /**
+     *
+     */
+    public static final OSParameter PARENTS = new OSParameter("parents", "string", null, "{gs:parents}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
