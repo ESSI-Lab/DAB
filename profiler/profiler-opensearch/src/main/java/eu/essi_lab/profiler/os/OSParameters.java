@@ -58,7 +58,7 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter SOURCES = new OSParameter("sources", "identifiers", null, "{gs:sources}") {
+    public static final OSParameter SOURCES = new OSParameter("sources", "string", null, "{gs:sources}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -82,7 +82,7 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter PARENTS = new OSParameter("parents", "identifiers", null, "{gs:parents}") {
+    public static final OSParameter PARENTS = new OSParameter("parents", "string", null, "{gs:parents}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
