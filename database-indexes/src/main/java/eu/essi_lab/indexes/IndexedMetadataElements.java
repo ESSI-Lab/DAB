@@ -176,6 +176,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+
     public static final IndexedMetadataElement SPATIAL_REPRESENTATION_TYPE = new IndexedMetadataElement(
 	    MetadataElement.SPATIAL_REPRESENTATION_TYPE) {
 	@Override
@@ -2266,6 +2267,18 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
+	}
+    };
+
+    public static final IndexedMetadataElement RASTER_MOSAIC = new IndexedMetadataElement(MetadataElement.RASTER_MOSAIC) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    resource.getExtensionHandler().getRasterMosaic().ifPresent(mosaic -> {
+
+		addValue(String.valueOf(mosaic));
+
+	    });
 	}
     };
 

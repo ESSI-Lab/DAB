@@ -105,6 +105,17 @@ public abstract class OSParameters {
     /**
      *
      */
+    public static final OSParameter RASTER_MOSAIC = new OSParameter("rasterMosaic", "string", null, "{gs:rasterMosaic}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    return createBond(value, MetadataElement.RASTER_MOSAIC);
+	}
+    };
+
+    /**
+     *
+     */
     public static final OSParameter PARENTS = new OSParameter("parents", "string", null, "{gs:parents}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {

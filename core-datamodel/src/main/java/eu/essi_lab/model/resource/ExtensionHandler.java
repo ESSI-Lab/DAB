@@ -61,6 +61,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String GEOMETRY = "geometry";
     private static final String CENTROID = "centroid";
     private static final String AREA = "area";
+    private static final String RASTER_MOSAIC = "rasterMosaic";
 
     private ExtendedMetadata metadata;
 
@@ -1348,6 +1349,40 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public void setAvailableGranules(String condition) {
 	try {
 	    this.metadata.add(AVAILABLE_GRANULES, condition);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+
+    /**
+     * @return
+     */
+    public Optional<Boolean> getRasterMosaic() {
+
+	try {
+	    if (this.metadata.getTextContent(RASTER_MOSAIC) == null) {
+
+		return Optional.empty();
+	    }
+
+	    return Optional.of(Boolean.valueOf(this.metadata.getTextContent(RASTER_MOSAIC)));
+
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param raster
+     */
+    public void setRasterMosaic(boolean raster) {
+	try {
+	    this.metadata.add(RASTER_MOSAIC, Boolean.toString(raster));
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);

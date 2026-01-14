@@ -419,6 +419,14 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		}
 	    }
 
+	    // --------------------------
+	    // raster mosaic
+	    // --------------------------
+	    resource.getExtensionHandler().getRasterMosaic().ifPresent(mosaic -> {
+
+		report.put("rasterMosaic", mosaic);
+	    });
+
 	    // --------------
 	    // dataAuthority (API TO IMPLEMENT)
 	    // --------------

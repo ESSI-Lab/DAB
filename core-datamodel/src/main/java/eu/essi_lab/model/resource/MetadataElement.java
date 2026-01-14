@@ -307,6 +307,11 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
+    RASTER_MOSAIC ("rasterMosaic"),
+
+    /**
+     *
+     */
     AUTHOR("creator"),
     /**
      *
