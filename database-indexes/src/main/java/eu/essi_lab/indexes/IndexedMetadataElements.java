@@ -10,12 +10,12 @@ package eu.essi_lab.indexes;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -175,6 +175,23 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 	}
     };
+
+    public static final IndexedMetadataElement SPATIAL_REPRESENTATION_TYPE = new IndexedMetadataElement(
+	    MetadataElement.SPATIAL_REPRESENTATION_TYPE) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+	    miMetadata.getDataIdentifications().forEachRemaining(dataId -> {
+
+		String codeListValue = dataId.getSpatialRepresentationTypeCodeListValue();
+		if (checkStringValue(codeListValue)) {
+		    addValue(codeListValue);
+		}
+	    });
+	}
+    };
+
     public static final IndexedMetadataElement TITLE = new IndexedMetadataElement(MetadataElement.TITLE) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -190,6 +207,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 	}
     };
+
     public static final IndexedMetadataElement PARENT_IDENTIFIER = new IndexedMetadataElement(MetadataElement.PARENT_IDENTIFIER) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -529,24 +547,20 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
     };
 
     /**
-     *
      * @param el
      * @param resource
      * @param codeListValue
      */
     private static void defineCodeListValues(IndexedMetadataElement el, GSResource resource, String codeListValue) {
 
-	Iterator<DataIdentification> identifications = resource.
-			getHarmonizedMetadata().
-			getCoreMetadata().
-			getMIMetadata()
+	Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
 		.getDataIdentifications();
 
 	while (identifications.hasNext()) {
 
 	    DataIdentification next = identifications.next();
 
-	    String date = switch(codeListValue){
+	    String date = switch (codeListValue) {
 		case "revision" -> next.getCitationRevisionDate();
 		case "publication" -> next.getCitationPublicationDate();
 		case "creation" -> next.getCitationCreationDate();
@@ -559,7 +573,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    } else {
 
-		XMLGregorianCalendar dateTime = switch(codeListValue){
+		XMLGregorianCalendar dateTime = switch (codeListValue) {
 		    case "revision" -> next.getCitationRevisionDateTime();
 		    case "publication" -> next.getCitationPublicationDateTime();
 		    case "creation" -> next.getCitationCreationDateTime();

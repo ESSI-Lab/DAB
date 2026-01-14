@@ -298,6 +298,12 @@ public enum MetadataElement implements Queryable {
      *
      */
     BOUNDING_BOX("bbox", "Spatial extent", ContentType.SPATIAL),
+
+    /**
+     *
+     */
+    SPATIAL_REPRESENTATION_TYPE("spatialRepresentationType"),
+
     /**
      *
      */

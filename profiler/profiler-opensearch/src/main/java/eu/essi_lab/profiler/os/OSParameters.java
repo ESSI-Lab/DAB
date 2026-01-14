@@ -93,6 +93,17 @@ public abstract class OSParameters {
     /**
      *
      */
+    public static final OSParameter SPATIAL_REPRESENTATION_TYPE = new OSParameter("spatialRepType", "string", null, "{gs:spatialRepType}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    return readMultiValues(value, MetadataElement.SPATIAL_REPRESENTATION_TYPE);
+	}
+    };
+
+    /**
+     *
+     */
     public static final OSParameter PARENTS = new OSParameter("parents", "string", null, "{gs:parents}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
