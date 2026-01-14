@@ -98,6 +98,29 @@ public class Format extends ISOMetadata<MDFormatType> {
 	return null;
     }
 
+    /**
+     * @XPathDirective(target = "gmd:specification/gco:CharacterString")
+     * @param specification
+     */
+    public void setSpecification(String specification) {
+
+	type.setSpecification(createCharacterStringPropertyType(specification));
+    }
+
+    /**
+     * @XPathDirective(target = "gmd:specification/gco:CharacterString")
+     * @return
+     */
+    public String getSpecification() {
+
+	try {
+	    return ISOMetadata.getStringFromCharacterString(type.getSpecification());
+	} catch (NullPointerException ex) {
+	}
+
+	return null;
+    }
+
     @Override
     public JAXBElement<MDFormatType> getElement() {
 

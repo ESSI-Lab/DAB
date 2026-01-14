@@ -1,15 +1,6 @@
 {
   "platformTitle_label": "Station name",
-  "platformTitle_help": "Name of the station",
-  "beta-title": "Beta version - release 1",
-  "beta-message": "The platform is still under development and will be progressively improved during 2026. Release 1: December 2025",
-  "tf-source": "Source",
-  "tf-organisationName": "Organisation",
-  "tf-attributeTitle": "Local observed property",
-  "tf-attributeURI": "Observed property",
-  "tf-observedPropertyURI": "Observed property",
-  "tf-platformTitle": "Station",
-  "tf-instrumentTitle": "Instrument"
+  "platformTitle_help": "Name of the station"
 }
 
 

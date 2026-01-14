@@ -1202,6 +1202,40 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
+     * @param modelSpecificFields
+     */
+    public void setModelSpecificFields(ModelSpecificFields modelSpecificFields) {
+
+	try {
+	    this.metadata.remove("//*:modelSpecificFields");
+	    this.metadata.add(modelSpecificFields.asDocument(true).getDocumentElement());
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<ModelSpecificFields> getModelSpecificFields() {
+
+	try {
+	    List<Node> list = this.metadata.get("//*:modelSpecificFields");
+	    if (!list.isEmpty()) {
+
+		Node node = list.get(0);
+		return Optional.of(ModelSpecificFields.create(node));
+	    }
+	} catch (XPathExpressionException | JAXBException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
      * @param scene
      */
     public void setWorldCereal(WorldCerealMap map) {

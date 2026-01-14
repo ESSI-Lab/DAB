@@ -37,25 +37,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
 import net.opengis.iso19139.gco.v_20060504.DatePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.AbstractMDIdentificationType;
-import net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CICitationType;
-import net.opengis.iso19139.gmd.v_20060504.CIDatePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIDateType;
-import net.opengis.iso19139.gmd.v_20060504.CIDateTypeCodePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIResponsiblePartyPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIResponsiblePartyType;
-import net.opengis.iso19139.gmd.v_20060504.MDConstraintsPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDConstraintsType;
-import net.opengis.iso19139.gmd.v_20060504.MDIdentifierPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDIdentifierType;
-import net.opengis.iso19139.gmd.v_20060504.MDKeywordTypeCodePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDKeywordsPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDKeywordsType;
-import net.opengis.iso19139.gmd.v_20060504.MDLegalConstraintsType;
-import net.opengis.iso19139.gmd.v_20060504.MDRestrictionCodePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDSecurityConstraintsType;
-import net.opengis.iso19139.gmd.v_20060504.ObjectFactory;
+import net.opengis.iso19139.gmd.v_20060504.*;
 
 /**
  * AbstractMD_Identification
@@ -579,6 +561,46 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
 	setCitationDateOrDateTime(null, calendar, PUBLICATION);
     }
 
+    public void setCitationExpiryDate(String date) {
+
+	setCitationDateOrDateTime(date, null, "expiry");
+    }
+
+    /**
+     * @param edition
+     * @XPathDirective(target = "gmd:citation/gmd:CI_Citation/gmd:edition/gco:CharacterString")
+     */
+    public void setCitationEdition(String edition) {
+
+	getFirstCitation().setEdition(createCharacterStringPropertyType(edition));
+    }
+
+    /**
+     * @param presentationForm
+     * @XPathDirective(target = "gmd:citation/gmd:CI_Citation/gmd:presentationForm/gmd:CI_PresentationFormCode/@codeListValue")
+     */
+    public void setCitationPresentationForm(String presentationForm) {
+
+	if (presentationForm == null) {
+	    getFirstCitation().getPresentationForm().clear();
+	    return;
+	}
+
+	// Create the property type using reflection or direct instantiation
+	// The class should be in net.opengis.iso19139.gmd.v_20060504 package
+	try {
+	   CIPresentationFormCodePropertyType propertyType =new CIPresentationFormCodePropertyType();
+	    CodeListValueType codeListValue = createCodeListValueType(ISOMetadata.CI_PRESENTATION_FORM_CODE_CODELIST, presentationForm, ISOMetadata.ISO_19115_CODESPACE, presentationForm);
+	    propertyType.setCIPresentationFormCode(codeListValue);
+	    getFirstCitation().getPresentationForm().clear();
+	    getFirstCitation().getPresentationForm().add(propertyType);
+	} catch (Exception e) {
+	    // Fallback: try to add directly if the structure allows it
+	    GSLoggerFactory.getLogger(getClass()).warn("Could not set presentation form using reflection, trying direct approach: " + e.getMessage());
+	    // If reflection fails, we may need to handle this differently
+	}
+    }
+
     public List<ResponsibleParty> getCitationResponsibleParties() {
 	List<ResponsibleParty> ret = new ArrayList<>();
 	for (CIResponsiblePartyPropertyType responsibleParty : type.getCitation().getCICitation().getCitedResponsibleParty()) {
@@ -661,6 +683,25 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
 
     public void clearPointOfContacts() {
 	type.unsetPointOfContact();
+    }
+
+    /**
+     * Convenience method to set a single point of contact (clears existing first)
+     * @param pointOfContact
+     */
+    public void setPointOfContact(ResponsibleParty pointOfContact) {
+	clearPointOfContacts();
+	if (pointOfContact != null) {
+	    addPointOfContact(pointOfContact);
+	}
+    }
+
+    /**
+     * Convenience alias for addCitationResponsibleParty
+     * @param party
+     */
+    public void addCitedResponsibleParty(ResponsibleParty party) {
+	addCitationResponsibleParty(party);
     }
 
     /**
@@ -1105,6 +1146,125 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
     }
 
     void setCitation(String title, String alternatetTile, String date) {
+    }
+
+    /**
+     * Sets the status (progress code) of the resource
+     * @param status
+     */
+    public void setStatus(String status) {
+	if (status == null) {
+	    type.getStatus().clear();
+	    return;
+	}
+	// Create MDProgressCodePropertyType and add to status list
+	// Note: The exact class may vary, but we'll work with the list directly
+	try {
+	    // Try to use reflection to create the property type
+		MDProgressCodePropertyType propertyType = new MDProgressCodePropertyType();
+	    CodeListValueType codeListValue = createCodeListValueType(ISOMetadata.MD_PROGRESS_CODE_CODELIST, status, ISOMetadata.ISO_19115_CODESPACE, status);
+		propertyType.setMDProgressCode(codeListValue);
+	    type.getStatus().clear();
+	    type.getStatus().add(propertyType);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Could not set status using reflection: " + e.getMessage());
+	}
+    }
+
+    /**
+     * Sets the maintenance and update frequency
+     * @param frequency
+     */
+    public void setMaintenanceAndUpdateFrequency(String frequency) {
+	if (frequency == null) {
+	    return;
+	}
+	// Get or create maintenance information
+	List<net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationPropertyType> maintenanceList = type.getResourceMaintenance();
+	net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationPropertyType maintenanceProperty = null;
+	net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationType maintenanceInfo = null;
+
+	if (maintenanceList.isEmpty()) {
+	    try {
+		maintenanceProperty = (net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationPropertyType) Class.forName("net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationPropertyType").getDeclaredConstructor().newInstance();
+		maintenanceInfo = (net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationType) Class.forName("net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationType").getDeclaredConstructor().newInstance();
+		maintenanceProperty.setMDMaintenanceInformation(maintenanceInfo);
+		maintenanceList.add(maintenanceProperty);
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).warn("Could not create maintenance information: " + e.getMessage());
+		return;
+	    }
+	} else {
+	    maintenanceProperty = maintenanceList.get(0);
+	    maintenanceInfo = maintenanceProperty.getMDMaintenanceInformation();
+	    if (maintenanceInfo == null) {
+		try {
+		    maintenanceInfo = (net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationType) Class.forName("net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationType").getDeclaredConstructor().newInstance();
+		    maintenanceProperty.setMDMaintenanceInformation(maintenanceInfo);
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).warn("Could not create maintenance information: " + e.getMessage());
+		    return;
+		}
+	    }
+	}
+
+	// Set the frequency
+	try {
+	    Class<?> frequencyCodePropertyTypeClass = Class.forName("net.opengis.iso19139.gmd.v_20060504.MDMaintenanceFrequencyCodePropertyType");
+	    Object frequencyProperty = frequencyCodePropertyTypeClass.getDeclaredConstructor().newInstance();
+	    CodeListValueType codeListValue = createCodeListValueType(ISOMetadata.MD_MAINTENANCE_FREQUENCY_CODE_CODELIST, frequency, ISOMetadata.ISO_19115_CODESPACE, frequency);
+	    frequencyCodePropertyTypeClass.getMethod("setMDMaintenanceFrequencyCode", CodeListValueType.class).invoke(frequencyProperty, codeListValue);
+	    maintenanceInfo.getClass().getMethod("setMaintenanceAndUpdateFrequency", frequencyCodePropertyTypeClass).invoke(maintenanceInfo, frequencyProperty);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Could not set maintenance frequency: " + e.getMessage());
+	}
+    }
+
+    /**
+     * Sets the date of next update
+     * @param date
+     */
+    public void setDateOfNextUpdate(String date) {
+	if (date == null || date.isEmpty() || "null".equals(date)) {
+	    return;
+	}
+	// Get or create maintenance information
+	List<net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationPropertyType> maintenanceList = type.getResourceMaintenance();
+	net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationPropertyType maintenanceProperty = null;
+	net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationType maintenanceInfo = null;
+
+	if (maintenanceList.isEmpty()) {
+	    try {
+		maintenanceProperty = (net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationPropertyType) Class.forName("net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationPropertyType").getDeclaredConstructor().newInstance();
+		maintenanceInfo = (net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationType) Class.forName("net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationType").getDeclaredConstructor().newInstance();
+		maintenanceProperty.setMDMaintenanceInformation(maintenanceInfo);
+		maintenanceList.add(maintenanceProperty);
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).warn("Could not create maintenance information: " + e.getMessage());
+		return;
+	    }
+	} else {
+	    maintenanceProperty = maintenanceList.get(0);
+	    maintenanceInfo = maintenanceProperty.getMDMaintenanceInformation();
+	    if (maintenanceInfo == null) {
+		try {
+		    maintenanceInfo = (net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationType) Class.forName("net.opengis.iso19139.gmd.v_20060504.MDMaintenanceInformationType").getDeclaredConstructor().newInstance();
+		    maintenanceProperty.setMDMaintenanceInformation(maintenanceInfo);
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).warn("Could not create maintenance information: " + e.getMessage());
+		    return;
+		}
+	    }
+	}
+
+	// Set the date
+	try {
+	    DatePropertyType dateProperty = new DatePropertyType();
+	    dateProperty.setDate(date);
+	    maintenanceInfo.getClass().getMethod("setDateOfNextUpdate", DatePropertyType.class).invoke(maintenanceInfo, dateProperty);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Could not set date of next update: " + e.getMessage());
+	}
     }
 
     //

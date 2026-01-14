@@ -128,7 +128,7 @@
   "united_nations": "Nazioni Unite",
   "overlays": "Layer principali",
   "results_layer_group": "Layer risultati",
-
+  
   "loc_help": "Nome di una località su cui limitare la ricerca. Es.: \"Italia\", \"U.S.A.\", \"Africa\"",
   "loc_label": "Località",
 
@@ -220,7 +220,7 @@
 
   "tf-instrumentTitle": "Strumento",
   "tf-organisationName": "Organizzazione",
-  "tf-platformTitle": "Stazione",
+  "tf-platformTitle": "Piattaforma",
   "tf-attributeTitle": "Proprietà osservata",
   "tf-intendedObservationSpacing": "Risoluzione temporale",
   "tf-timeInterpolation": "Interpolazione temporale",
@@ -242,18 +242,7 @@
 
   "tf-s3Timeliness": "Puntualità S3",
   "tf-s3InstrumentIdx": "Indice strumento S3",
-  "tf-s3ProductLevel": "Livello prodotto S3",
-  "tf-source": "Sorgente",
-  "tf-organisationName": "Organizzazione",
-  "tf-attributeTitle": "Proprietà osservata",
-  "tf-attributeURI": "URI proprietà osservata",
-  "tf-platformTitle": "Stazione",
-  "tf-instrumentTitle": "Strumento",
-  "clear_all": "Pulisci tutto",
-  "clear_all_tooltip": "Pulisci tutti i vincoli di ricerca",
-  "clear_all_title": "Pulisci tutti i vincoli",
-  "confirm_clear_all": "Sei sicuro di voler cancellare tutti i vincoli?",
-  "confirm_clear_all_details": "Questo azzererà tutti i parametri di ricerca inclusi testo, date, estensione spaziale, sorgenti e filtri."
+  "tf-s3ProductLevel": "Livello prodotto S3"
 }
 
 

@@ -1,7 +1,4 @@
-/**
- *
- */
-package eu.essi_lab.model;
+package eu.essi_lab.accessor.datahub;
 
 /*-
  * #%L
@@ -24,63 +21,51 @@ package eu.essi_lab.model;
  * #L%
  */
 
-import eu.essi_lab.lib.utils.LabeledEnum;
+import org.json.JSONObject;
 
-import java.util.*;
+import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 
 /**
- * @author Fabrizio
+ * @author Generated
  */
-public enum SortOrder implements LabeledEnum {
+public class DatahubConnectorSetting extends HarvestedConnectorSetting {
+
+    private static final int DEFAULT_PAGE_SIZE = 50;
 
     /**
-     *
+     * 
      */
-    ASCENDING("Ascending"),
-    /**
-     *
-     */
-    DESCENDING("Descending");
+    public DatahubConnectorSetting() {
 
-    private String label;
-
-    /**
-     * @param label
-     */
-    private SortOrder(String label) {
-
-	this.label = label;
+	setPageSize(DEFAULT_PAGE_SIZE);
     }
 
     /**
-     *
-     * @param label
-     * @return
+     * @param object
      */
-    public static Optional<SortOrder> of(String label) {
+    public DatahubConnectorSetting(JSONObject object) {
 
-	if (label.equals(ASCENDING.label) || label.equals("asc")) {
-	    return Optional.of(SortOrder.ASCENDING);
-	}
-
-	if (label.equals(DESCENDING.label) || label.equals("desc")) {
-	    return Optional.of(SortOrder.DESCENDING);
-	}
-
-	return Optional.empty();
+	super(object);
     }
 
     /**
-     *
+     * @param object
      */
-    public String getLabel() {
+    public DatahubConnectorSetting(String object) {
 
-	return label;
+	super(object);
     }
 
     @Override
-    public String toString() {
+    protected String initConnectorType() {
 
-	return getLabel();
+	return DatahubConnector.TYPE;
+    }
+
+    @Override
+    protected String initSettingName() {
+
+	return "Datahub Connector settings";
     }
 }
+

@@ -130,7 +130,7 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 0;
+	padding: 15px 20px;
 	background: #f8f9fa;
 	border-bottom: 1px solid #c0c0c0;
 	width: 100%;
@@ -142,8 +142,6 @@ body {
 	align-items: center;
 	gap: 15px;
 	flex: 1;
-	padding: 0;
-	margin: 0;
 }
 
 .portal-header-right {
@@ -152,19 +150,13 @@ body {
 	gap: 15px;
 	justify-content: flex-end;
 	flex: 1;
-	padding: 0;
-	margin: 0;
 }
 
 .portal-header-logo-left,
 .portal-header-logo-right {
-	max-height: 90px;
-	height: auto;
-	max-width: 1000px;
-	width: auto;
+	max-height: 60px;
+	max-width: 200px;
 	object-fit: contain;
-	padding: 0;
-	margin: 0;
 }
 
 .portal-header-title-left {
@@ -174,7 +166,6 @@ body {
 	flex: 1;
 	min-width: 0;
 	word-wrap: break-word;
-	white-space: pre-line;
 }
 
 .portal-header-title-right {
@@ -185,7 +176,6 @@ body {
 	min-width: 0;
 	word-wrap: break-word;
 	max-width: 100%;
-	white-space: pre-line;
 }
 
 #headerDiv {
@@ -222,15 +212,7 @@ body {
 #where-div {
 	display: inline-block;
 	margin-left: -10px;
-	margin-right: 8px;
 	vertical-align: top;
-	background-color: #c0c0c0; /* Match headerDiv background */
-}
-
-/* Style the spatial extent label/button to match headerDiv background */
-#whereTableCaption,
-.cnst-widget-where-input-table-ol-caption {
-	background-color: #c0c0c0 !important; /* Match headerDiv background */
 }
 
 #adv-search-div {
@@ -247,95 +229,12 @@ body {
 	top: 100% !important;
 	left: 0 !important;
 	margin-top: 5px !important;
-	min-width: 260px; /* Increased to accommodate wider inputs (210px + icon space) */
-	max-width: 260px; /* Constrain maximum width */
+	min-width: 250px;
 	max-height: calc(100vh - 200px);
 	overflow-y: auto;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	border: 1px solid #ddd;
 	border-radius: 4px;
-	line-height: 1.5; /* Moderate line height */
-}
-
-/* Improve spacing in advanced panel content - moderate spacing */
-#advConstDiv .cnst-widget-table {
-	border-spacing: 0px 4px !important; /* Moderate spacing */
-	margin-bottom: 6px !important; /* Moderate margin between constraint tables */
-	margin-top: 4px !important;
-}
-
-#advConstDiv .cnst-widget-label {
-	line-height: 1.5;
-	margin-bottom: 3px;
-	display: block; /* Ensure label is on its own line */
-}
-
-#advConstDiv table {
-	margin-bottom: 6px !important; /* Moderate spacing between tables */
-	margin-top: 4px !important;
-}
-
-#advConstDiv > table {
-	margin-bottom: 6px !important; /* Spacing for direct child tables */
-}
-
-#advConstDiv tr {
-	line-height: 1.5;
-}
-
-#advConstDiv td {
-	padding-top: 3px !important; /* Moderate padding */
-	padding-bottom: 3px !important;
-	line-height: 1.5;
-}
-
-/* Input width set to 150% of previous size (140px * 1.5 = 210px) */
-#advConstDiv .cnst-widget-input,
-#advConstDiv .cnst-widget-select-input,
-#advConstDiv input[type="text"],
-#advConstDiv input[type="number"],
-#advConstDiv select {
-	width: 210px !important; /* 150% of 140px */
-	max-width: 210px !important;
-	margin-bottom: 3px !important; /* Moderate margin */
-	margin-top: 1px !important;
-	box-sizing: border-box !important; /* Include padding in width */
-}
-
-/* Reduce width of input container cells - these contain the input fields */
-#advConstDiv td[style*="width"] {
-	max-width: 210px !important;
-	width: 210px !important;
-}
-
-/* Ensure table cells with inputs have proper width */
-#advConstDiv table table td:first-child {
-	max-width: 210px !important;
-	width: 210px !important;
-}
-
-/* Ensure the outer table cells that contain the input table have enough space for icons */
-#advConstDiv table > tbody > tr > td > table > tbody > tr > td:first-child {
-	max-width: 210px !important;
-	width: 210px !important;
-}
-
-/* Give space to the cell containing clear button and help icon */
-#advConstDiv table > tbody > tr > td > table > tbody > tr > td:nth-child(2) {
-	min-width: 30px !important; /* Reduced from 40px to minimize white space */
-	width: auto !important;
-	padding-left: 2px !important; /* Minimal padding */
-}
-
-/* Reduce spacing in nested tables that contain inputs and icons */
-#advConstDiv table > tbody > tr > td > table {
-	border-spacing: 0px !important; /* Remove spacing between cells */
-	width: 100% !important;
-}
-
-/* Ensure proper spacing for nested tables */
-#advConstDiv table table {
-	margin-bottom: 4px !important;
 }
 
 #search-button {
@@ -569,24 +468,7 @@ body {
 /* filters tab                      */
 /*                                  */
 #filters-tab {
-	overflow-y: auto !important;
-	overflow-x: hidden !important;
-	max-height: 100%;
-	box-sizing: border-box;
-}
-
-/* Fix white space issue when only one item is selected in filter sections */
-#filters-tab [widget="tf"] div.jtable-main-container {
-	height: auto !important;
-	min-height: auto !important;
-}
-
-#filters-tab [widget="tf"] div.jtable-main-container table.jtable {
-	height: auto !important;
-}
-
-#filters-tab [widget="tf"] div.jtable-main-container table.jtable tbody {
-	height: auto !important;
+	overflow-y: auto;
 }
 
 /* -------------------------------- */

@@ -10,12 +10,12 @@ package eu.essi_lab.iso.datamodel.classes;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -34,11 +34,19 @@ import com.google.common.collect.Lists;
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.jaxb.common.ObjectFactories;
 import net.opengis.iso19139.gco.v_20060504.RealPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.*;
+import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourcePropertyType;
+import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourceType;
+import net.opengis.iso19139.gmd.v_20060504.MDDigitalTransferOptionsPropertyType;
+import net.opengis.iso19139.gmd.v_20060504.MDDigitalTransferOptionsType;
+import net.opengis.iso19139.gmd.v_20060504.MDDistributionType;
+import net.opengis.iso19139.gmd.v_20060504.MDDistributorPropertyType;
+import net.opengis.iso19139.gmd.v_20060504.MDDistributorType;
+import net.opengis.iso19139.gmd.v_20060504.MDFormatPropertyType;
+import net.opengis.iso19139.gmd.v_20060504.MDFormatType;
 
 /**
  * MD_Distribution
- *
+ * 
  * @author Fabrizio
  */
 public class Distribution extends ISOMetadata<MDDistributionType> {
@@ -58,35 +66,13 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 	super(stream);
     }
 
-    /**
-     * @return
-     */
-    public List<ResponsibleParty> getDistributorParties() {
-
-	final ArrayList<ResponsibleParty> out = new ArrayList<>();
-
-	try {
-	    type.getDistributor().forEach(prop -> {
-
-		final CIResponsiblePartyType ciResponsibleParty = prop.getMDDistributor().getDistributorContact().getCIResponsibleParty();
-
-		out.add(new ResponsibleParty(ciResponsibleParty));
-	    });
-
-	} catch (Exception e) {
-	}
-
-	return out;
-    }
-
     // --------------------------------------------------------
     //
     // Format
     //
-
     /**
-     * @return
      * @XPathDirective(target = "gmd:distributionFormat/*")
+     * @return
      */
     public Iterator<Format> getFormats() {
 
@@ -114,8 +100,9 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
     }
 
     /**
+     * @XPathDirective(target = ".", parent = "gmd:distributionFormat", before = "gmd:transferOptions", position =
+     *                        Position.LAST)
      * @param format
-     * @XPathDirective(target = ".", parent = "gmd:distributionFormat", before = "gmd:transferOptions", position = Position.LAST)
      */
     public void addFormat(Format format) {
 
@@ -137,10 +124,9 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
     //
     // Online
     //
-
     /**
-     * @return
      * @XPathDirective(target = ".//gmd:MD_DigitalTransferOptions/gmd:onLine/*")
+     * @return
      */
     public Iterator<Online> getDistributionOnlines() {
 
@@ -188,8 +174,9 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
     }
 
     /**
+     * @XPathDirective(target = "gmd:transferOptions/gmd:MD_DigitalTransferOptions", parent = "gmd:onLine", position =
+     *                        Position.LAST)
      * @param onLine
-     * @XPathDirective(target = "gmd:transferOptions/gmd:MD_DigitalTransferOptions", parent = "gmd:onLine", position = Position.LAST)
      */
     public void addDistributionOnline(Online onLine) {
 
@@ -198,9 +185,10 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
     }
 
     /**
+     * @XPathDirective(target = "gmd:transferOptions/gmd:MD_DigitalTransferOptions", parent = "gmd:onLine", position =
+     *                        Position.LAST)
      * @param onLine
      * @param transferSize
-     * @XPathDirective(target = "gmd:transferOptions/gmd:MD_DigitalTransferOptions", parent = "gmd:onLine", position = Position.LAST)
      */
     public void addDistributionOnline(Online onLine, Double transferSize) {
 
@@ -226,10 +214,9 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
     //
     // Distributor onlines
     //
-
     /**
-     * @return
      * @XPathDirective(target = ".//gmd:distributorTransferOptions//gmd:MD_DigitalTransferOptions/gmd:onLine/*")
+     * @return
      */
     public Iterator<Online> getDistributorOnlines() {
 
@@ -337,7 +324,7 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 
     /**
      * Gets an iterator for the distribution transfer options
-     *
+     * 
      * @return
      */
     public Iterator<TransferOptions> getDistributionTransferOptions() {
@@ -353,7 +340,7 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 
     /**
      * Gets an iterator for the transfer options from all the distributors
-     *
+     * 
      * @return
      */
     public Iterator<TransferOptions> getDistributorTransferOptions() {

@@ -1,7 +1,4 @@
-/**
- *
- */
-package eu.essi_lab.model;
+package eu.essi_lab.accessor.datahub;
 
 /*-
  * #%L
@@ -24,63 +21,34 @@ package eu.essi_lab.model;
  * #L%
  */
 
-import eu.essi_lab.lib.utils.LabeledEnum;
-
-import java.util.*;
+import eu.essi_lab.adk.harvest.HarvestedAccessor;
 
 /**
- * @author Fabrizio
+ * @author Generated
  */
-public enum SortOrder implements LabeledEnum {
+public class DatahubAccessor extends HarvestedAccessor<DatahubConnector> {
 
     /**
-     *
+     * 
      */
-    ASCENDING("Ascending"),
-    /**
-     *
-     */
-    DESCENDING("Descending");
+    public static final String TYPE = "DATAHUB";
 
-    private String label;
+    @Override
+    protected String initSettingName() {
 
-    /**
-     * @param label
-     */
-    private SortOrder(String label) {
-
-	this.label = label;
-    }
-
-    /**
-     *
-     * @param label
-     * @return
-     */
-    public static Optional<SortOrder> of(String label) {
-
-	if (label.equals(ASCENDING.label) || label.equals("asc")) {
-	    return Optional.of(SortOrder.ASCENDING);
-	}
-
-	if (label.equals(DESCENDING.label) || label.equals("desc")) {
-	    return Optional.of(SortOrder.DESCENDING);
-	}
-
-	return Optional.empty();
-    }
-
-    /**
-     *
-     */
-    public String getLabel() {
-
-	return label;
+	return "Datahub Accessor";
     }
 
     @Override
-    public String toString() {
+    protected String initAccessorType() {
 
-	return getLabel();
+	return TYPE;
+    }
+
+    @Override
+    protected DatahubConnectorSetting initHarvestedConnectorSetting() {
+
+	return new DatahubConnectorSetting();
     }
 }
+

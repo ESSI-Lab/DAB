@@ -134,6 +134,35 @@ public class Online extends ISOMetadata<CIOnlineResourceType> {
 	return null;
     }
 
+    /**
+     * @XPathDirective(target = "gmd:protocol/gmx:Anchor/@xlink:href,@xlink:title")
+     */
+    public void setProtocolAnchor(String href, String text) {
+
+	type.setProtocol(createAnchorPropertyType(href, text));
+    }
+
+    /**
+     * @XPathDirective(target = "gmd:applicationProfile/gco:CharacterString")
+     */
+    public void setApplicationProfile(String value) {
+
+	type.setApplicationProfile(createCharacterStringPropertyType(value));
+    }
+
+    /**
+     * @XPathDirective(target = "gmd:applicationProfile/gco:CharacterString")
+     */
+    public String getApplicationProfile() {
+
+	try {
+	    return ISOMetadata.getStringFromCharacterString(type.getApplicationProfile());
+	} catch (NullPointerException ex) {
+	}
+
+	return null;
+    }
+
     // --------------------------------------------------------
     //
     // Description
