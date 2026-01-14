@@ -292,6 +292,27 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 	distributor.clear();
     }
 
+    /**
+     * Adds a distributor contact (responsible party)
+     * @param contact
+     */
+    public void addDistributorContact(ResponsibleParty contact) {
+	List<MDDistributorPropertyType> distributor = type.getDistributor();
+	MDDistributorType mdDistributor = null;
+	if (!distributor.isEmpty()) {
+	    mdDistributor = distributor.get(0).getMDDistributor();
+	} else {
+	    mdDistributor = new MDDistributorType();
+	    MDDistributorPropertyType mdDistributorPropertyType = new MDDistributorPropertyType();
+	    mdDistributorPropertyType.setMDDistributor(mdDistributor);
+	    distributor.add(mdDistributorPropertyType);
+	}
+
+	CIResponsiblePartyPropertyType contactProperty = new CIResponsiblePartyPropertyType();
+	contactProperty.setCIResponsibleParty(contact.getElementType());
+	mdDistributor.setDistributorContact(contactProperty);
+    }
+
     private void addOnline(List<MDDigitalTransferOptionsPropertyType> transferOptions,
 	    CIOnlineResourcePropertyType ciOnlineResourcePropertyType, Double transferSize) {
 
