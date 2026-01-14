@@ -428,6 +428,11 @@ public class OMHandler extends StreamingRequestHandler {
 
 			    String asynchDownloadName = request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD_NAME);
 
+			    if (asynchDownloadName==null || asynchDownloadName.isEmpty()){
+				GSLoggerFactory.getLogger(getClass()).info("Download name not given, assigning its id");
+				operationId = asynchDownloadName;
+			    }
+
 			    setting.setAsynchDownloadName(asynchDownloadName);
 
 			    scheduler.schedule(setting);

@@ -72,13 +72,13 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 	String requestURL = getSetting().getRequestURL();
 	String operationId = getSetting().getOperationId();
+	String asynchDownloadName = getSetting().getAsynchDownloadName();
 	String bucket = getSetting().getBucket();
 	String publicURL = getSetting().getPublicURL();
 
-	String fname = operationId + ".zip";
+	String fname = asynchDownloadName + ".zip";
 
 	DataDownloaderTool downloader = new DataDownloaderTool();
-	String asynchDownloadName = getSetting().getAsynchDownloadName();
 
 	S3TransferWrapper s3wrapper = null;
 
