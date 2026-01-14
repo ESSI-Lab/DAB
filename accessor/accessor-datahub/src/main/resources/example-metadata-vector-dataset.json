@@ -1,0 +1,290 @@
+{
+    "id": "example_changedetection_city_asbestos_20251011_shape",
+    "resource_author_id": "0a4af5a1-9ddd-485d-8bf4-b384b223510b",
+    "character_set": "utf8",
+    "hierarchy_level": "dataset",
+    "parent_identifier": "example_changedetection_series",
+    "metadata_profile": {
+        "name": "Linee guida RNDT",
+        "version": "2.0"
+    },
+    "metadata_language": "it",
+    "metadata_updated_at": "2025-10-11",
+    "metadata_owner": {
+        "organization_name": "Example Organization",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org",
+        "role": "pointOfContact"
+    },
+    "metadata_version": "1.0",
+    "title": "Example Dataset Title (2025-10-11) - Vettoriale",
+    "abstract": "Il dataset contiene i risultati dell'analisi di change detection. L'analisi comprende immagini satellitari acquisite in date diverse, mentre l'elaborazione è stata effettuata in data 2025-10-11.",
+    "resource_creation_date": "2025-10-11T12:00:00Z",
+    "resource_publication_date": "2025-10-11T12:00:00Z",
+    "resource_revision_date": "2025-10-11T12:00:00Z",
+    "resource_expiration_date": "2025-12-11T12:00:00Z",
+    "resource_owner": {
+        "organization_name": "Example Organization",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org",
+        "role": "owner"
+    },
+    "other_roles": [
+        {
+            "organization_name": "Example Organization",
+            "address": {
+                "email": "contact@example.org"
+            },
+            "link": "https://www.example.org",
+            "role": "author"
+        },
+        {
+            "organization_name": "Example Research Institute",
+            "address": {
+                "email": "info@example.org"
+            },
+            "link": "https://www.example.org",
+            "role": "contributor"
+        }
+    ],
+    "presentation_form": "documentDigital",
+    "point_of_contact": {
+        "organization_name": "Example Organization",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org",
+        "role": "pointOfContact"
+    },
+    "graphic_overview": {
+        "url": "https://www.example.org/path/to/metadata/preview.png",
+        "description": "Anteprima del dataset",
+        "file_type": "PNG"
+    },
+    "descriptive_keywords": [
+        {
+            "keywords": [
+                {
+                    "label": "remote sensing",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/7102"
+                },
+                {
+                    "label": "environmental change",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2782"
+                },
+                {
+                    "label": "environmental monitoring",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2882"
+                },
+                {
+                    "label": "survey",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/8240"
+                }
+            ],
+            "thesaurus": {
+                "name": "GEMET - INSPIRE themes, version 1.0",
+                "url": "https://www.eionet.europa.eu/gemet/it/inspire-themes",
+                "publication_date": "2008-06-01"
+            }
+        },
+        {
+            "keywords": [
+                {
+                    "label": "remote sensing",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_6498"
+                },
+                {
+                    "label": "satellite observation",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_9000182"
+                },
+                {
+                    "label": "earth observation satellites",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_9000039"
+                },
+                {
+                    "label": "temporal variations",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_8fc366d4"
+                }
+            ],
+            "thesaurus": {
+                "name": "AGROVOC Multilingual Thesaurus",
+                "url": "http://aims.fao.org/aos/agrovoc",
+                "revision_date": "2024-01-01"
+            }
+        },
+        {
+            "keywords": [
+                {
+                    "label": "change detection"
+                },
+                {
+                    "label": "EXAMPLE.CU.V4.07"
+                },
+                {
+                    "label": "open data"
+                },
+                {
+                    "label": "Example Monitoring System"
+                }
+            ]
+        }
+    ],
+    "spatial_scope": {
+        "keywords": {
+            "label": "Local",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/local"
+        },
+        "thesaurus": {
+            "name": "Spatial scope",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope",
+            "publication_date": "2019-05-22"
+        }
+    },
+    "inspire_priority_dataset": {
+        "keywords": {
+            "label": "Establishments involving dangerous substances (SEVESO III Directive)",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset/EstablishmentsInvolvingDangerousSubstances-dir-2012-18"
+        },
+        "thesaurus": {
+            "name": "INSPIRE priority data set",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset",
+            "publication_date": "2018-04-04"
+        }
+    },
+    "status": "completed",
+    "update_frequency": "notPlanned",
+    "date_of_next_update": null,
+    "temporal_extent": {
+        "start_date": "2024-10-10",
+        "end_date": "2025-10-11"
+    },
+    "bbox_4326": {
+        "west_bound_longitude": 15.758,
+        "east_bound_longitude": 15.892,
+        "south_bound_latitude": 38.055,
+        "north_bound_latitude": 38.167
+    },
+    "native_epsg": {
+        "url": "http://www.opengis.net/def/crs/EPSG/0/32632",
+        "label": "WGS 84 / UTM zone 32N"
+    },
+    "bbox_native_epsg_gml_polygon": "1093222.384452345315367 4233539.465107622556388 1104998.453366933856159 4234408.290833427571 1104069.77282649744302 4246856.559968182817 1092311.991264782846 4245986.91919365339 1093222.384452345315 4233539.465107622556",
+    "vertical_extent": {
+        "minimum_value": 0,
+        "maximum_value": 100,
+        "crs": "http://www.opengis.net/def/crs/EPSG/0/5773"
+    },
+    "resource_constraints": {
+        "use_limitation": "IODL 2.0",
+        "access_constraints": "otherRestrictions",
+        "use_constraints": "otherRestrictions",
+        "other_constraints": "http://publications.europa.eu/resource/authority/licence/IODL_2_0",
+        "security_classification": "unclassified",
+        "security_note": null
+    },
+    "data_language": "en",
+    "dataset_type": "vector",
+    "equivalent_scale": 20000,
+    "topic_categories": [
+        "environment",
+        "location",
+        "imageryBaseMapsEarthCover"
+    ],
+    "resource_provider": {
+        "organization_name": "Example Department",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org/department",
+        "role": "resourceProvider"
+    },
+    "formats": [
+        {
+            "name": "ESRI Shapefile",
+            "version": "inapplicable"
+        },
+        {
+            "name": "GML",
+            "version": "3.2"
+        },
+        {
+            "name": "GeoJSON",
+            "version": "unknown"
+        },
+        {
+            "name": "GeoPackage",
+            "version": "unknown"
+        },
+        {
+            "name": "KML",
+            "version": "unknown"
+        }
+    ],
+    "online_resources": [
+        {
+            "protocol": {
+                "code": "http://www.opengis.net/def/serviceType/ogc/wms",
+                "name": "OGC:WFS"
+            },
+            "application_profile": "download",
+            "description": "accessPoint",
+            "url": "https://example.com/gis-services/example_dept/ows",
+            "name": "example_dept:example_dataset_20251011_shape",
+            "layer_style": {
+                "name": "example_style",
+                "workspace": "example_dept"
+            },
+            "source_auth_type": "INTERNAL_GEOSERVER"
+        },
+        {
+            "protocol": {
+                "code": "http://www.opengis.net/def/serviceType/ogc/wms",
+                "name": "OGC:WMS"
+            },
+            "application_profile": "view",
+            "description": "accessPoint",
+            "url": "https://example.com/gis-services/example_dept/ows",
+            "name": "example_dept:example_dataset_20251011_shape",
+            "layer_style": {
+                "name": "example_style",
+                "workspace": "example_dept"
+            },
+            "source_auth_type": "INTERNAL_GEOSERVER"
+        }
+    ],
+    "conformity": [
+        {
+            "specification_title": "REGOLAMENTO (UE) N. 1089/2010 DELLA COMMISSIONE del 23 novembre 2010 recante attuazione della direttiva 2007/2/CE del Parlamento europeo e del Consiglio per quanto riguarda l'interoperabilità dei set di dati territoriali e dei servizi di dati territoriali",
+            "specification_publication_date": "2010-12-08",
+            "explanation": "Vedi specifiche",
+            "pass": true
+        }
+    ],
+    "positional_accuracy": {
+        "unit": "m",
+        "unit_system": "http://www.bipm.org/en/si",
+        "value": 5
+    },
+    "quality_scope": {
+        "scope_code": "dataset"
+    },
+    "lineage_statement": "L'elaborazione si basa sul confronto di dati acquisiti in date diverse e sull'applicazione di metodologie di telerilevamento e classificazione tematica.",
+    "lineage_source": [
+        {
+            "description": "La procedura utilizzata è stata adottata per la produzione di questo dataset.",
+            "source_citation": {
+                "title": "Example Research Paper Title",
+                "online_resource": [
+                    {
+                        "url": "https://example.org/publications/example-paper"
+                    }
+                ]
+            }
+        }
+    ]
+}
+

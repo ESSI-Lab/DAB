@@ -1,0 +1,429 @@
+{
+    "id": "example_changedetection_city_asbestos_20251011",
+    "resource_author_id": "0a4af5a1-9ddd-485d-8bf4-b384b223510b",
+    "character_set": "utf8",
+    "hierarchy_level": "dataset",
+    "parent_identifier": "example_changedetection_series",
+    "metadata_profile": {
+        "name": "ISO 19115-2 Geographic information — Metadata — Part 2: Extensions for imagery and gridded data",
+        "version": "ISO 19115-2:2019"
+    },
+    "metadata_language": "it",
+    "metadata_updated_at": "2025-10-11T12:00:00Z",
+    "metadata_owner": {
+        "organization_name": "Example Organization",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org",
+        "role": "pointOfContact"
+    },
+    "metadata_version": "2.0",
+    "metadata_original_version": "example_changedetection_20251011_86e48f81-61eb-4433-a4e3-28343d87f74c",
+    "title": "Example Dataset Title (2025-10-11)",
+    "abstract": "Il dataset contiene i risultati dell'analisi di change detection. L'analisi comprende immagini satellitari acquisite in date diverse, mentre l'elaborazione è stata effettuata in data 2025-10-11.",
+    "edition": "Version 2",
+    "edition_date": "2021-10-11T12:00:00Z",
+    "resource_creation_date": "2025-10-11T12:00:00Z",
+    "resource_publication_date": "2025-10-11T12:00:00Z",
+    "resource_revision_date": "2025-10-11T12:00:00Z",
+    "resource_expiration_date": "2025-12-11T12:00:00Z",
+    "resource_owner": {
+        "organization_name": "Example Organization",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org",
+        "role": "owner"
+    },
+    "other_roles": [
+        {
+            "organization_name": "Example Organization",
+            "address": {
+                "email": "contact@example.org"
+            },
+            "link": "https://www.example.org",
+            "role": "author"
+        }
+    ],
+    "presentation_form": "documentDigital",
+    "point_of_contact": {
+        "organization_name": "Example Organization",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org",
+        "role": "pointOfContact"
+    },
+    "graphic_overview": {
+        "url": "https://www.example.org/path/to/metadata/preview.png",
+        "description": "Anteprima del dataset",
+        "file_type": "PNG"
+    },
+    "descriptive_keywords": [
+        {
+            "keywords": [
+                {
+                    "label": "remote sensing",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/7102"
+                },
+                {
+                    "label": "environmental change",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2782"
+                },
+                {
+                    "label": "environmental monitoring",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2882"
+                },
+                {
+                    "label": "survey",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/8240"
+                }
+            ],
+            "thesaurus": {
+                "name": "GEMET - INSPIRE themes, version 1.0",
+                "url": "https://www.eionet.europa.eu/gemet/it/inspire-themes",
+                "publication_date": "2008-06-01"
+            }
+        },
+        {
+            "keywords": [
+                {
+                    "label": "change detection"
+                },
+                {
+                    "label": "EXAMPLE.CU.V4.07"
+                },
+                {
+                    "label": "open data"
+                },
+                {
+                    "label": "Example Monitoring System"
+                }
+            ]
+        }
+    ],
+    "spatial_scope": {
+        "keywords": {
+            "label": "Local",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/local"
+        },
+        "thesaurus": {
+            "name": "Spatial scope",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope",
+            "publication_date": "2019-05-22"
+        }
+    },
+    "inspire_priority_dataset": {
+        "keywords": {
+            "label": "Establishments involving dangerous substances (SEVESO III Directive)",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset/EstablishmentsInvolvingDangerousSubstances-dir-2012-18"
+        },
+        "thesaurus": {
+            "name": "INSPIRE priority data set",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset",
+            "publication_date": "2018-04-04"
+        }
+    },
+    "status": "completed",
+    "update_frequency": "notPlanned",
+    "date_of_next_update": null,
+    "temporal_extent": {
+        "start_date": "2024-10-10",
+        "end_date": "2025-10-11"
+    },
+    "bbox_4326": {
+        "west_bound_longitude": 15.758,
+        "east_bound_longitude": 15.892,
+        "south_bound_latitude": 38.055,
+        "north_bound_latitude": 38.167
+    },
+    "native_epsg": {
+        "url": "http://www.opengis.net/def/crs/EPSG/0/32632",
+        "label": "WGS 84 / UTM zone 32N"
+    },
+    "bbox_native_epsg_gml_polygon": "1093222.384452345315367 4233539.465107622556388 1104998.453366933856159 4234408.290833427571 1104069.77282649744302 4246856.559968182817 1092311.991264782846 4245986.91919365339 1093222.384452345315 4233539.465107622556",
+    "vertical_extent": {
+        "minimum_value": 0,
+        "maximum_value": 100,
+        "crs": "http://www.opengis.net/def/crs/EPSG/0/5773"
+    },
+    "resource_constraints": {
+        "use_limitation": "IODL 2.0",
+        "access_constraints": "otherRestrictions",
+        "use_constraints": "otherRestrictions",
+        "other_constraints": "http://publications.europa.eu/resource/authority/licence/IODL_2_0",
+        "security_classification": "unclassified",
+        "security_note": null
+    },
+    "data_language": "en",
+    "dataset_type": "grid",
+    "spatial_resolution": 10,
+    "raster_nodata_value": -9999,
+    "topic_categories": [
+        "environment",
+        "location",
+        "imageryBaseMapsEarthCover"
+    ],
+    "resource_provider": {
+        "organization_name": "Example Department",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org/department",
+        "role": "resourceProvider"
+    },
+    "formats": [
+        {
+            "name": "GeoTIFF",
+            "version": "inapplicable"
+        }
+    ],
+    "dataset_location": "S3;output-data;EXAMPLE/example_dept/example_dataset_20251011.tif",
+    "online_resources": [
+        {
+            "protocol": {
+                "code": "http://www.w3.org/TR/xlink/",
+                "name": "WWW:LINK-1.0-http--link"
+            },
+            "application_profile": "download",
+            "description": "accessPoint",
+            "url": "https://example.com/api/downloader/bucket/example_dataset_20251011",
+            "name": "example_dataset_20251011",
+            "source_auth_type": "NO_AUTH"
+        },
+        {
+            "protocol": {
+                "code": "http://www.opengis.net/def/serviceType/ogc/wms",
+                "name": "OGC:WMS"
+            },
+            "application_profile": "view",
+            "description": "accessPoint",
+            "url": "https://example.com/gis-services/example_dept/ows",
+            "name": "example_dept:example_dataset_20251011",
+            "layer_style": {
+                "name": "example_style",
+                "workspace": "example_dept"
+            },
+            "temporal_wms": false,
+            "source_auth_type": "INTERNAL_GEOSERVER"
+        }
+    ],
+    "conformity": [
+        {
+            "specification_title": "REGOLAMENTO (UE) N. 1089/2010 DELLA COMMISSIONE del 23 novembre 2010 recante attuazione della direttiva 2007/2/CE del Parlamento europeo e del Consiglio per quanto riguarda l'interoperabilità dei set di dati territoriali e dei servizi di dati territoriali",
+            "specification_publication_date": "2010-12-08",
+            "explanation": "Vedi specifiche",
+            "pass": true
+        }
+    ],
+    "positional_accuracy": {
+        "unit": "m",
+        "unit_system": "http://www.bipm.org/en/si",
+        "value": 5
+    },
+    "quality_scope": {
+        "scope_code": "dataset"
+    },
+    "lineage_statement": "L'elaborazione si basa sul confronto di dati acquisiti in date diverse e sull'applicazione di metodologie di telerilevamento e classificazione tematica.",
+    "lineage_source": [
+        {
+            "description": "La procedura utilizzata è stata adottata per la produzione di questo dataset.",
+            "source_citation": {
+                "title": "Example Research Paper Title",
+                "online_resource": [
+                    {
+                        "url": "https://example.org/publications/example-paper"
+                    }
+                ]
+            }
+        }
+    ],
+    "lineage_process_step": [
+        {
+            "description": "Pre-processing delle immagini per correzione radiometrica e atmosferica.",
+            "rationale": "Garantire la comparabilità temporale delle immagini acquisite in date diverse.",
+            "date": "2025-10-10T10:30:00Z",
+            "processor": {
+                "individual_name": "John Doe",
+                "organisation_name": "Example Organization",
+                "role": "processor"
+            },
+            "source": {
+                "description": "Scene multispettrali preprocessate",
+                "source_citation": {
+                    "title": "Satellite Data User Guide",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/docs/satellite-guide"
+                        }
+                    ]
+                }
+            },
+            "processing_information": {
+                "id": "PROC_STEP_001",
+                "software_reference": {
+                    "title": "Example Processing Tool X.Y.Z",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/software/processing-tool"
+                        }
+                    ]
+                },
+                "procedure_description": "Applicazione di moduli per la correzione atmosferica e normalizzazione radiometrica.",
+                "documentation": [
+                    {
+                        "title": "Example Processing Tool User Guide",
+                        "online_resource": [
+                            {
+                                "url": "https://example.org/software/processing-tool/docs"
+                            }
+                        ]
+                    }
+                ],
+                "parameter": [
+                    {
+                        "name": "Atmospheric Correction Level",
+                        "direction": "in",
+                        "description": "Livello di correzione applicato alle bande multispettrali.",
+                        "optionality": false,
+                        "repeatability": false,
+                        "value_type": {
+                            "url": "http://www.w3.org/2001/XMLSchema#string",
+                            "label": "xsd:string"
+                        },
+                        "value": "L2A",
+                        "source": {
+                            "description": "Parametri di configurazione",
+                            "source_citation": {
+                                "title": "Example Configuration Guide",
+                                "online_resource": [
+                                    {
+                                        "url": "https://example.org/docs/configuration"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "Target Resolution",
+                        "direction": "in",
+                        "description": "Risoluzione spaziale impostata per l'elaborazione.",
+                        "optionality": false,
+                        "repeatability": false,
+                        "value_type": {
+                            "url": "http://www.w3.org/2001/XMLSchema#integer",
+                            "label": "xsd:integer"
+                        },
+                        "value": "10",
+                        "source": {
+                            "description": "Parametri di configurazione",
+                            "source_citation": {
+                                "title": "Example Configuration Guide",
+                                "online_resource": [
+                                    {
+                                        "url": "https://example.org/docs/configuration"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "algorithm": {
+                    "citation": {
+                        "title": "Example Atmospheric Correction Algorithm",
+                        "online_resource": [
+                            {
+                                "url": "https://example.org/publications/algorithm"
+                            }
+                        ]
+                    },
+                    "description": "Algoritmo di correzione atmosferica."
+                }
+            },
+            "output": {
+                "description": "Immagini correttamente calibrate per analisi successive.",
+                "source_citation": {
+                    "title": "Pre-processed Dataset",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/datasets/preprocessed"
+                        }
+                    ]
+                }
+            },
+            "report": {
+                "name": "Rapporto di pre-processing",
+                "description": "Report generato automaticamente contenente log e parametri.",
+                "file_type": "PDF"
+            }
+        },
+        {
+            "description": "Classificazione tematica tramite analisi multitemporale.",
+            "rationale": "Identificare variazioni significative.",
+            "date": "2025-10-10T15:00:00Z",
+            "processor": {
+                "organisation_name": "Example Department",
+                "role": "processor"
+            },
+            "source": {
+                "description": "Dataset pre-processato",
+                "source_citation": {
+                    "title": "Pre-processed Dataset",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/datasets/preprocessed"
+                        }
+                    ]
+                }
+            },
+            "processing_information": {
+                "id": "PROC_STEP_002",
+                "software_reference": {
+                    "title": "Example Classification Tool X.Y.Z",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/software/classification-tool"
+                        }
+                    ]
+                },
+                "procedure_description": "Classificazione supervisionata.",
+                "documentation": [
+                    {
+                        "title": "Example Classification Tool Documentation",
+                        "online_resource": [
+                            {
+                                "url": "https://example.org/software/classification-tool/docs"
+                            }
+                        ],
+                        "graphic_overview": []
+                    }
+                ],
+                "run_time_parameters": "classifier=example;n_estimators=200",
+                "algorithm": {
+                    "citation": {
+                        "title": "Example Classification Algorithm",
+                        "online_resource": [
+                            {
+                                "url": "https://example.org/publications/algorithm"
+                            }
+                        ]
+                    },
+                    "description": "Algoritmo di classificazione."
+                }
+            },
+            "output": {
+                "description": "Mappa delle variazioni tematiche.",
+                "source_citation": {
+                    "title": "Classified Dataset"
+                }
+            },
+            "report": {
+                "name": "Rapporto di classificazione",
+                "description": "Descrizione delle classi ottenute e delle metriche di accuratezza.",
+                "file_type": "PDF"
+            }
+        }
+    ]
+}
+

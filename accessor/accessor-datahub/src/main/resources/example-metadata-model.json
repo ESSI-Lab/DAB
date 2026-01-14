@@ -1,0 +1,473 @@
+{
+    "id": "change_detection_classification_model",
+    "resource_author_id": "0a4af5a1-9ddd-485d-8bf4-b384b223510b",
+    "character_set": "utf8",
+    "hierarchy_level": "model",
+    "metadata_profile": {
+        "name": "ISO 19115-2 Geographic information — Metadata — Part 2: Extensions for imagery and gridded data",
+        "version": "ISO 19115-2:2019"
+    },
+    "metadata_language": "it",
+    "metadata_updated_at": "2021-10-11",
+    "metadata_owner": {
+        "organization_name": "Example Organization",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org",
+        "role": "pointOfContact"
+    },
+    "metadata_version": "1.0",
+    "title": "Titolo del modello qui",
+    "abstract": "Abstract qui.",
+    "resource_creation_date": "2025-10-11T12:00:00Z",
+    "resource_publication_date": "2025-10-11T12:00:00Z",
+    "resource_revision_date": "2025-10-11T12:00:00Z",
+    "resource_owner": {
+        "organization_name": "Example Organization",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org",
+        "role": "owner"
+    },
+    "other_roles": [
+        {
+            "organization_name": "Example Organization",
+            "address": {
+                "email": "contact@example.org"
+            },
+            "link": "https://www.example.org",
+            "role": "author"
+        },
+        {
+            "organization_name": "Example Research Institute",
+            "address": {
+                "email": "info@example.org"
+            },
+            "link": "https://www.example.org",
+            "role": "contributor"
+        }
+    ],
+    "presentation_form": "documentDigital",
+    "point_of_contact": {
+        "organization_name": "Example Organization",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org",
+        "role": "pointOfContact"
+    },
+    "graphic_overview": {
+        "url": "https://www.example.org/path/to/metadata/preview.png",
+        "description": "Anteprima del modello",
+        "file_type": "PNG"
+    },
+    "descriptive_keywords": [
+        {
+            "keywords": [
+                {
+                    "label": "remote sensing",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/7102"
+                },
+                {
+                    "label": "environmental change",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2782"
+                },
+                {
+                    "label": "environmental monitoring",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2882"
+                },
+                {
+                    "label": "survey",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/8240"
+                }
+            ],
+            "thesaurus": {
+                "name": "GEMET - INSPIRE themes, version 1.0",
+                "url": "https://www.eionet.europa.eu/gemet/it/inspire-themes",
+                "publication_date": "2008-06-01"
+            }
+        },
+        {
+            "keywords": [
+                {
+                    "label": "remote sensing",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_6498"
+                },
+                {
+                    "label": "satellite observation",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_9000182"
+                },
+                {
+                    "label": "earth observation satellites",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_9000039"
+                },
+                {
+                    "label": "temporal variations",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_8fc366d4"
+                }
+            ],
+            "thesaurus": {
+                "name": "AGROVOC Multilingual Thesaurus",
+                "url": "http://aims.fao.org/aos/agrovoc",
+                "revision_date": "2024-01-01"
+            }
+        },
+        {
+            "keywords": [
+                {
+                    "label": "change detection"
+                },
+                {
+                    "label": "EXAMPLE.CU.V4.07"
+                },
+                {
+                    "label": "open data"
+                },
+                {
+                    "label": "Example Monitoring System"
+                }
+            ]
+        }
+    ],
+    "inspire_priority_dataset": {
+        "keywords": {
+            "label": "Establishments involving dangerous substances (SEVESO III Directive)",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset/EstablishmentsInvolvingDangerousSubstances-dir-2012-18"
+        },
+        "thesaurus": {
+            "name": "INSPIRE priority data set",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset",
+            "publication_date": "2018-04-04"
+        }
+    },
+    "status": "accepted",
+    "update_frequency": "monthly",
+    "date_of_next_update": "2025-11-11",
+    "temporal_extent": {
+        "start_date": "2024-10-10",
+        "end_date": "2025-10-11"
+    },
+    "resource_constraints": {
+        "use_limitation": "Usage of this model is restricted to authorized internal personnel. Redistribution, commercial use, or external dissemination is prohibited without written approval.",
+        "access_constraints": "restricted",
+        "use_constraints": "license",
+        "other_constraints": "Access and usage are governed by the 'Internal Research Data License v1.3'. Only authenticated organization members may use this model for internal research purposes.",
+        "security_classification": "restricted",
+        "security_note": "Contains sensitive methodological details and training data sources not intended for public distribution."
+    },
+    "data_language": "en",
+    "topic_categories": [
+        "environment",
+        "location",
+        "imageryBaseMapsEarthCover"
+    ],
+    "resource_provider": {
+        "organization_name": "Example Department",
+        "address": {
+            "email": "contact@example.org"
+        },
+        "link": "https://www.example.org/department",
+        "role": "resourceProvider"
+    },
+    "formats": [
+        {
+            "name": "Python"
+        },
+        {
+            "name": "R"
+        },
+        {
+            "name": "C++"
+        }
+    ],
+    "online_resources": [
+        {
+            "protocol": {
+                "code": "http://www.w3.org/TR/xlink/",
+                "name": "HTTP"
+            },
+            "application_profile": "download",
+            "description": "accessPoint",
+            "url": "https://example.com/downloads/ai-model-v1.0.tar.gz",
+            "name": "ai-model-v1.0-artifact"
+        },
+        {
+            "protocol": {
+                "code": "http://www.w3.org/TR/xlink/",
+                "name": "HTTP"
+            },
+            "application_profile": "other",
+            "description": "accessPoint",
+            "url": "https://api.example.com/v1/predict",
+            "name": "ai-model-v1.0-rest-endpoint"
+        }
+    ],
+    "conformity": [
+        {
+            "specification_title": "ISO/IEC 23053:2020 - Framework for Artificial Intelligence (AI) Systems Using Machine Learning",
+            "specification_publication_date": "2020-07-01",
+            "explanation": "The model conforms to the ISO/IEC 23053:2020 framework for ML-based AI systems, ensuring standardized lifecycle processes and performance evaluation.",
+            "pass": true
+        },
+        {
+            "specification_title": "EU AI Act - Risk Management and Transparency Requirements (Draft 2024)",
+            "specification_publication_date": "2024-03-10",
+            "explanation": "The model follows internal compliance processes aligned with the transparency and data governance principles of the EU AI Act.",
+            "pass": false
+        }
+    ],
+    "quality_scope": {
+        "scope_code": "model"
+    },
+    "lineage_statement": "lineage statement here.",
+    "lineage_source": [
+        {
+            "description": "Source description here.",
+            "source_citation": {
+                "title": "Example Research Paper Title",
+                "online_resource": [
+                    {
+                        "url": "https://example.org/publications/example-paper"
+                    }
+                ]
+            }
+        }
+    ],
+    "lineage_process_step": [
+        {
+            "description": "Addestramento del modello di machine learning.",
+            "rationale": "Ottimizzare il modello per la previsione.",
+            "date": "2025-10-05T10:30:00Z",
+            "processor": {
+                "individual_name": "John Doe",
+                "organisation_name": "Example Research Center",
+                "role": "data scientist"
+            },
+            "source": {
+                "description": "Set di dati pre-processato",
+                "source_citation": {
+                    "title": "Pre-processed Dataset",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/datasets/preprocessed"
+                        }
+                    ]
+                }
+            },
+            "processing_information": {
+                "id": "PROC_STEP_001",
+                "software_reference": {
+                    "title": "Example ML Framework X.Y.Z",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/software/ml-framework"
+                        }
+                    ]
+                },
+                "procedure_description": "Addestramento del modello utilizzando un'architettura di rete neurale.",
+                "documentation": [
+                    {
+                        "title": "Example ML Framework Documentation",
+                        "online_resource": [
+                            {
+                                "url": "https://example.org/software/ml-framework/docs"
+                            }
+                        ]
+                    }
+                ],
+                "parameter": [
+                    {
+                        "name": "Learning Rate",
+                        "direction": "in",
+                        "description": "Velocità di apprendimento del modello durante l'addestramento.",
+                        "optionality": false,
+                        "repeatability": false,
+                        "value_type": {
+                            "url": "http://www.w3.org/2001/XMLSchema#double",
+                            "label": "xsd:double"
+                        },
+                        "value": "0.001",
+                        "source": {
+                            "description": "Parametri di configurazione",
+                            "source_citation": {
+                                "title": "Example Configuration Guide",
+                                "online_resource": [
+                                    {
+                                        "url": "https://example.org/docs/configuration"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "Regularization",
+                        "direction": "in",
+                        "description": "Tecnica di regolarizzazione per evitare l'overfitting.",
+                        "optionality": false,
+                        "repeatability": false,
+                        "value_type": {
+                            "url": "http://www.w3.org/2001/XMLSchema#string",
+                            "label": "xsd:string"
+                        },
+                        "value": "L2",
+                        "source": {
+                            "description": "Parametri di configurazione",
+                            "source_citation": {
+                                "title": "Example Configuration Guide",
+                                "online_resource": [
+                                    {
+                                        "url": "https://example.org/docs/configuration"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "algorithm": {
+                    "citation": {
+                        "title": "Example Algorithm for Data Analysis",
+                        "online_resource": [
+                            {
+                                "url": "https://example.org/publications/algorithm"
+                            }
+                        ]
+                    },
+                    "description": "Algoritmo di machine learning per l'analisi dei dati."
+                }
+            },
+            "output": {
+                "description": "Modello addestrato.",
+                "source_citation": {
+                    "title": "Trained Model",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/models/trained"
+                        }
+                    ]
+                }
+            },
+            "report": {
+                "name": "Rapporto di Addestramento",
+                "description": "Dettagli sull'addestramento del modello.",
+                "file_type": "PDF"
+            }
+        },
+        {
+            "description": "Validazione del modello utilizzando un set di dati di validazione.",
+            "rationale": "Valutare le prestazioni del modello.",
+            "date": "2025-10-06T14:00:00Z",
+            "processor": {
+                "individual_name": "Jane Doe",
+                "organisation_name": "Example Research Institute",
+                "role": "data scientist"
+            },
+            "source": {
+                "description": "Set di dati di validazione",
+                "source_citation": {
+                    "title": "Validation Dataset",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/datasets/validation"
+                        }
+                    ]
+                }
+            },
+            "processing_information": {
+                "id": "PROC_STEP_002",
+                "software_reference": {
+                    "title": "Example Evaluation Tool X.Y.Z",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/software/evaluation-tool"
+                        }
+                    ]
+                },
+                "procedure_description": "Calcolo delle metriche di valutazione.",
+                "documentation": [
+                    {
+                        "title": "Example Evaluation Tool Documentation",
+                        "online_resource": [
+                            {
+                                "url": "https://example.org/software/evaluation-tool/docs"
+                            }
+                        ]
+                    }
+                ],
+                "run_time_parameters": "metric=accuracy;test_size=0.2",
+                "algorithm": {
+                    "citation": {
+                        "title": "Example Evaluation Method",
+                        "online_resource": [
+                            {
+                                "url": "https://example.org/publications/evaluation"
+                            }
+                        ]
+                    },
+                    "description": "Metodo di valutazione del modello."
+                }
+            },
+            "output": {
+                "description": "Metriche di valutazione del modello.",
+                "source_citation": {
+                    "title": "Model Evaluation Results"
+                }
+            },
+            "report": {
+                "name": "Rapporto di Validazione",
+                "description": "Dettagli sulle metriche di valutazione del modello.",
+                "file_type": "PDF"
+            }
+        }
+    ],
+    "model_maturity_level": "TRL6",
+    "model_computational_requirements": {
+        "cpu": "Quad-core 3,0 GHz o superiore (es. Intel i7/AMD Ryzen 7)",
+        "gpu": "GPU NVIDIA con supporto CUDA, ≥8 GB di VRAM (es. RTX 3080 consigliata)",
+        "ram": "16–32 GB di RAM",
+        "storage": "20 GB di spazio libero per i dati di training + 5 GB per il modello e gli output"
+    },
+    "model_types": [
+        "DNN",
+        "CNN"
+    ],
+    "supported_platforms": [
+        "TENSORFLOW_SERVING",
+        "DOCKER",
+        "KUBERNETES",
+        "ONNX_RUNTIME"
+    ],
+    "model_methodology_description": "Il modello utilizza una rete neurale addestrata su dati pre-processati. L'architettura è composta da più livelli con funzioni di attivazione e pooling. L'ottimizzazione avviene tramite algoritmo di ottimizzazione con apprendimento supervisionato. La validazione è stata eseguita mediante test set e metriche di accuratezza.",
+    "model_category": "classification",
+    "model_quality_information": {
+        "model_quality_report": "Il modello ha mostrato buone prestazioni nella classificazione. L'accuratezza complessiva è risultata elevata e l'analisi degli errori indica una buona capacità di generalizzare.",
+        "model_metrics": [
+            {
+                "id": "METRIC_001",
+                "name": "Accuracy",
+                "description": "Percentuale di previsioni corrette sul dataset di test.",
+                "value": 0.91
+            },
+            {
+                "id": "METRIC_002",
+                "name": "Precision",
+                "description": "Capacità del modello di evitare falsi positivi.",
+                "value": 0.88
+            },
+            {
+                "id": "METRIC_003",
+                "name": "Recall",
+                "description": "Capacità del modello di identificare correttamente le variazioni.",
+                "value": 0.92
+            },
+            {
+                "id": "METRIC_004",
+                "name": "F1-score",
+                "description": "Media armonica di precision e recall.",
+                "value": 0.90
+            }
+        ]
+    }
+}
+
