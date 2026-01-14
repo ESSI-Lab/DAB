@@ -2282,6 +2282,30 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    public static final IndexedMetadataElement METADATA_VERSION = new IndexedMetadataElement(MetadataElement.METADATA_VERSION) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    resource.getExtensionHandler().getMetadataVersion().ifPresent(version -> {
+
+		addValue(version);
+
+	    });
+	}
+    };
+
+    public static final IndexedMetadataElement METADATA_ORIGINAL_VERSION = new IndexedMetadataElement(MetadataElement.METADATA_ORIGINAL_VERSION) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    resource.getExtensionHandler().getMetadataOriginalVersion().ifPresent(originalVersion -> {
+
+		addValue(originalVersion);
+
+	    });
+	}
+    };
+
     public static final IndexedMetadataElement CROP_TYPES = new IndexedMetadataElement(MetadataElement.CROP_TYPES) {
 	@Override
 	public void defineValues(GSResource resource) {

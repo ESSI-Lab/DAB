@@ -34,15 +34,7 @@ import com.google.common.collect.Lists;
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.jaxb.common.ObjectFactories;
 import net.opengis.iso19139.gco.v_20060504.RealPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourcePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourceType;
-import net.opengis.iso19139.gmd.v_20060504.MDDigitalTransferOptionsPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDDigitalTransferOptionsType;
-import net.opengis.iso19139.gmd.v_20060504.MDDistributionType;
-import net.opengis.iso19139.gmd.v_20060504.MDDistributorPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDDistributorType;
-import net.opengis.iso19139.gmd.v_20060504.MDFormatPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDFormatType;
+import net.opengis.iso19139.gmd.v_20060504.*;
 
 /**
  * MD_Distribution
@@ -99,7 +91,29 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 	return null;
     }
 
-    /**
+	/**
+	 * @return
+	 */
+	public List<ResponsibleParty> getDistributorParties() {
+
+		final ArrayList<ResponsibleParty> out = new ArrayList<>();
+
+		try {
+			type.getDistributor().forEach(prop -> {
+
+				final CIResponsiblePartyType ciResponsibleParty = prop.getMDDistributor().getDistributorContact().getCIResponsibleParty();
+
+				out.add(new ResponsibleParty(ciResponsibleParty));
+			});
+
+		} catch (Exception e) {
+		}
+
+		return out;
+	}
+
+
+	/**
      * @XPathDirective(target = ".", parent = "gmd:distributionFormat", before = "gmd:transferOptions", position =
      *                        Position.LAST)
      * @param format

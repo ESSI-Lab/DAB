@@ -18,8 +18,8 @@
         "role": "pointOfContact"
     },
     "metadata_version": "1.0",
-    "title": "Titolo del modello qui",
-    "abstract": "Abstract qui.",
+    "title": "Example model",
+    "abstract": "Model abstract should be here.",
     "resource_creation_date": "2025-10-11T12:00:00Z",
     "resource_publication_date": "2025-10-11T12:00:00Z",
     "resource_revision_date": "2025-10-11T12:00:00Z",

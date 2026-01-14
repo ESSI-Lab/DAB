@@ -140,7 +140,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 	mapConstraints(json, coreMetadata);
 
 	// Map distribution
-	mapDistribution(json, coreMetadata);
+	mapDistribution(json, coreMetadata, resource);
 
 	// Map quality information
 	mapQualityInformation(json, coreMetadata);
@@ -222,12 +222,14 @@ public class DatahubMapper extends FileIdentifierMapper {
 	}
 
 	// Metadata version and original version
-	// TODO: metadata_version and metadata_original_version - no direct ISO 19115 mapping
-	// These should be added as extension elements
 	String metadataVersion = json.optString("metadata_version", null);
+	if (metadataVersion != null) {
+	    resource.getExtensionHandler().setMetadataVersion(metadataVersion);
+	}
+
 	String metadataOriginalVersion = json.optString("metadata_original_version", null);
-	if (metadataVersion != null || metadataOriginalVersion != null) {
-	    logger.debug("TODO: Add extension elements for metadata_version and metadata_original_version");
+	if (metadataOriginalVersion != null) {
+	    resource.getExtensionHandler().setMetadataOriginalVersion(metadataOriginalVersion);
 	}
 
 	// Resource dates
@@ -726,7 +728,7 @@ public class DatahubMapper extends FileIdentifierMapper {
     /**
      * Maps distribution information
      */
-    private void mapDistribution(JSONObject json, CoreMetadata coreMetadata) {
+    private void mapDistribution(JSONObject json, CoreMetadata coreMetadata, GSResource resource) {
 	// Formats
 	JSONArray formats = json.optJSONArray("formats");
 	if (formats != null) {
@@ -818,14 +820,14 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    }
 	}
 
-	// TODO:  raster_mosaic - no direct ISO 19115 mapping
-	// These should be added as extension elements
-	Boolean rasterMosaic = json.optBoolean("raster_mosaic", false);
-	if ( rasterMosaic) {
-	    logger.debug("TODO: Add extension elements for dataset_location and raster_mosaic");
-	}
-    }
+		// TODO:  raster_mosaic - no direct ISO 19115 mapping
+		// These should be added as extension element
+		if (json.has("raster_mosaic")) {
+			Boolean rasterMosaic = json.optBoolean("raster_mosaic", false);
+			resource.getExtensionHandler().setRasterMosaic(rasterMosaic);
 
+		}
+	}
     /**
      * Maps quality information
      */

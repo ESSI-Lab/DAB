@@ -19,8 +19,8 @@
         "role": "pointOfContact"
     },
     "metadata_version": "1.0",
-    "title": "Example Dataset Title (2025-10-11) - Vettoriale",
-    "abstract": "Il dataset contiene i risultati dell'analisi di change detection. L'analisi comprende immagini satellitari acquisite in date diverse, mentre l'elaborazione è stata effettuata in data 2025-10-11.",
+    "title": "Example vector dataset",
+    "abstract": "Example dataset abstract here",
     "resource_creation_date": "2025-10-11T12:00:00Z",
     "resource_publication_date": "2025-10-11T12:00:00Z",
     "resource_revision_date": "2025-10-11T12:00:00Z",

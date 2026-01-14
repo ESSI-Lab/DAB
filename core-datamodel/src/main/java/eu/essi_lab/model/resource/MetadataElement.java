@@ -312,6 +312,16 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
+    METADATA_VERSION("metadataVersion"),
+
+    /**
+     *
+     */
+    METADATA_ORIGINAL_VERSION("metadataOriginalVersion"),
+
+    /**
+     *
+     */
     AUTHOR("creator"),
     /**
      *

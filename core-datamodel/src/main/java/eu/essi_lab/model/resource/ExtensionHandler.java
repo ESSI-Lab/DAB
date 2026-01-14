@@ -62,6 +62,8 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String CENTROID = "centroid";
     private static final String AREA = "area";
     private static final String RASTER_MOSAIC = "rasterMosaic";
+    private static final String METADATA_VERSION = "metadataVersion";
+    private static final String METADATA_ORIGINAL_VERSION = "metadataOriginalVersion";
 
     private ExtendedMetadata metadata;
 
@@ -1027,7 +1029,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param themeCategory
+     *
      */
     public void setIsInSitu() {
 	try {
@@ -1236,7 +1238,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param scene
+     *
      */
     public void setWorldCereal(WorldCerealMap map) {
 
@@ -1294,7 +1296,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param info
+     *
      */
     public void setIsNCFileCorrupted() {
 	try {
@@ -1378,7 +1380,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param info
+     * 
      */
     public void setAvailableGranules(String condition) {
 	try {
@@ -1417,6 +1419,72 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public void setRasterMosaic(boolean raster) {
 	try {
 	    this.metadata.add(RASTER_MOSAIC, Boolean.toString(raster));
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getMetadataVersion() {
+
+	try {
+	    if (this.metadata.getTextContent(METADATA_VERSION) == null) {
+
+		return Optional.empty();
+	    }
+
+	    return Optional.of(this.metadata.getTextContent(METADATA_VERSION));
+
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param version
+     */
+    public void setMetadataVersion(String version) {
+	try {
+	    this.metadata.add(METADATA_VERSION, version);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getMetadataOriginalVersion() {
+
+	try {
+	    if (this.metadata.getTextContent(METADATA_ORIGINAL_VERSION) == null) {
+
+		return Optional.empty();
+	    }
+
+	    return Optional.of(this.metadata.getTextContent(METADATA_ORIGINAL_VERSION));
+
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param originalVersion
+     */
+    public void setMetadataOriginalVersion(String originalVersion) {
+	try {
+	    this.metadata.add(METADATA_ORIGINAL_VERSION, originalVersion);
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
