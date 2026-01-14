@@ -25,10 +25,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
-
-import com.google.common.collect.Lists;
 
 import eu.essi_lab.api.database.Database.DatabaseImpl;
 import eu.essi_lab.indexes.marklogic.MarkLogicIndexTypes;
@@ -56,7 +53,6 @@ import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.IndexedElementInfo;
 import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.resource.*;
-import eu.essi_lab.model.resource.composed.ComposedElement;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
 import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
@@ -435,6 +431,29 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    addValue(name);
 		}
 	    }
+	}
+    };
+
+    public static final IndexedMetadataElement DISTRIBUTOR_ORG_NAME = new IndexedMetadataElement(MetadataElement.DISTRIBUTOR_ORG_NAME) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Distribution distribution = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution();
+
+	    if (distribution == null) {
+		return;
+	    }
+
+	    final List<ResponsibleParty> parties = distribution.getDistributorParties();
+
+	    parties.forEach(party -> {
+
+		final String name = party.getOrganisationName();
+		if (checkStringValue(name)) {
+
+		    addValue(name);
+		}
+	    });
 	}
     };
 

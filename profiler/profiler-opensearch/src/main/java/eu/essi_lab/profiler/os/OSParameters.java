@@ -86,7 +86,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readId(value, MetadataElement.PARENT_IDENTIFIER);
+	    return readMultiValues(value, MetadataElement.PARENT_IDENTIFIER);
 	}
     };
 
@@ -97,41 +97,26 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readId(value, MetadataElement.IDENTIFIER);
+	    return readMultiValues(value, MetadataElement.IDENTIFIER);
 	}
     };
-
-    /**
-     * @param idParam
-     * @param el
-     * @return
-     */
-    private static Optional<Bond> readId(String idParam, MetadataElement el) {
-
-	if (idParam == null || idParam.isEmpty()) {
-	    return Optional.empty();
-	}
-
-	String[] split = idParam.split(",");
-
-	if (split.length > 1) {
-	    LogicalBond orBond = BondFactory.createOrBond();
-
-	    for (String s : split) {
-		orBond.getOperands().add(//
-			BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, s));
-	    }
-
-	    return Optional.of(orBond);
-	}
-
-	return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, idParam));
-    }
 
     /**
      *
      */
     public static final OSParameter SORT_BY = new OSParameter("sortBy", "string", null, "{gs:sortBy}");
+
+    /**
+     *
+     */
+    public static final OSParameter DISTRIBUTOR_ORG_NAME = new OSParameter("distOrgName", "string", null, "{gs:distPartyOrgName}"){
+
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    return readMultiValues(value, MetadataElement.DISTRIBUTOR_ORG_NAME);
+	}
+    };
 
     /**
      *
@@ -1468,7 +1453,41 @@ public abstract class OSParameters {
 		lon1 >= lon2 ? lon1 : lon2, relatedValues); // east
     }
 
+    /**
+     * @param paramValue
+     * @param el
+     * @return
+     */
+    private static Optional<Bond> readMultiValues(String paramValue, MetadataElement el) {
+
+	if (paramValue == null || paramValue.isEmpty()) {
+	    return Optional.empty();
+	}
+
+	String[] split = paramValue.split(",");
+
+	if (split.length > 1) {
+	    LogicalBond orBond = BondFactory.createOrBond();
+
+	    for (String s : split) {
+		orBond.getOperands().add(//
+			BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, s));
+	    }
+
+	    return Optional.of(orBond);
+	}
+
+	return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, paramValue));
+    }
+
+    /**
+     *
+     * @param value
+     * @param element
+     * @return
+     */
     private static Optional<Bond> createBond(String value, MetadataElement element) {
+
 	return BondUtils.createBond(BondOperator.EQUAL, value, element);
     }
 

@@ -10,12 +10,12 @@ package eu.essi_lab.model.resource;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -28,7 +28,6 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.resource.composed.ComposedElement;
-import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
 
 /**
  * Enumeration of queryable {@link HarmonizedMetadata} element names
@@ -39,10 +38,10 @@ import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
 public enum MetadataElement implements Queryable {
 
     /**
-    *
-    */
-   ORGANIZATION(OrganizationElementWrapper.build()),
-    
+     *
+     */
+    ORGANIZATION(OrganizationElementWrapper.build()),
+
     /**
      *
      */
@@ -82,13 +81,16 @@ public enum MetadataElement implements Queryable {
      *
      */
     ANY_TEXT("anyText", false),
-    //
 
     /**
      *
      */
     SUBJECT("subject"),
-    //
+
+    /**
+     *
+     */
+    DISTRIBUTOR_ORG_NAME("distOrgName"),
 
     /**
      *
@@ -396,8 +398,6 @@ public enum MetadataElement implements Queryable {
      *
      */
     ORGANISATION_NAME(MetadataElement.ORGANISATION_NAME_EL_NAME),
-    
-    
 
     /**
      *
