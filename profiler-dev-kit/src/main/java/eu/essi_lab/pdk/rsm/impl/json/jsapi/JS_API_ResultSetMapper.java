@@ -10,12 +10,12 @@ package eu.essi_lab.pdk.rsm.impl.json.jsapi;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -74,9 +74,9 @@ import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.rsm.MappingSchema;
 
 /**
- * Result set mapper implementation which maps the {@link GSResource}s according to a JSON schema encoding defined for
- * the <a href="http://api.eurogeoss-broker.eu/docs/index.html">JavaScript API</a>. The {@link #JS_API_MAPPING_SCHEMA}
- * has the following properties:
+ * Result set mapper implementation which maps the {@link GSResource}s according to a JSON schema encoding defined for the <a
+ * href="http://api.eurogeoss-broker.eu/docs/index.html">JavaScript API</a>. The {@link #JS_API_MAPPING_SCHEMA} has the following
+ * properties:
  * <ul>
  * <li>schema uri: {@link GSNameSpaceContext#GS_DATA_MODEL_SCHEMA_URI}</li>
  * <li>schema name: {@link GSNameSpaceContext#GS_DATA_MODEL_SCHEMA_NAME}</li>
@@ -85,7 +85,7 @@ import eu.essi_lab.pdk.rsm.MappingSchema;
  * <li>encoding version: {@value #JS_API_DATA_MODEL_ENCODING_NAME_VERSION}</li>
  * <li>encoding media type: {@link MediaType#APPLICATION_JSON}</li>
  * </ul>
- * 
+ *
  * @author Fabrizio
  */
 public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
@@ -104,6 +104,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
      * The {@link MappingSchema} schema of this mapper
      */
     public static final MappingSchema JS_API_MAPPING_SCHEMA = new MappingSchema();
+
     static {
 
 	JS_API_MAPPING_SCHEMA.setUri(NameSpace.GS_DATA_MODEL_SCHEMA_URI);
@@ -116,6 +117,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
     }
 
     private static final ArrayList<String> GEOSS_CATEGORIES = new ArrayList<String>();
+
     static {
 	GEOSS_CATEGORIES.add("dataSetDataBase");
 	GEOSS_CATEGORIES.add("observingSystemSensorNetwork");
@@ -190,19 +192,13 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	MIMetadata md_Metadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
 
 	List<Identification> diList = Lists.newArrayList(md_Metadata.getDataIdentifications());
-	// if (res instanceof Catalog) {
-	// diList = md_Metadata.getServiceIdentificationList();
-	// } else {
-	// diList = md_Metadata.getDataIdentificationList();
-	// }
 
 	// ---
 	// id
 	// ---
+
 	String id = md_Metadata.getFileIdentifier();
-	// if (id == null) {
-	// id = res.getId();
-	// }
+
 	report.put("id", id);
 
 	// ---
@@ -221,6 +217,14 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	if (parent != null) {
 	    report.put("parentId", parent);
 	}
+
+	// --------------------
+	// hierarchy level code
+	// --------------------
+	md_Metadata.getHierarchyLevelScopeCodeListValues().forEachRemaining(value -> {
+
+	    report.put("hierarchyLevel", value);
+	});
 
 	// --------------------
 	// coverageDescription (API TO IMPLEMENT)
@@ -245,11 +249,27 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	Distribution distribution = md_Metadata.getDistribution();
 
-	// -------
-	// format
-	// -------
 	if (distribution != null) {
+
+	    // ----------------------------
+	    // distributor parties org.name
+	    // ----------------------------
+
+	    distribution.getDistributorParties().forEach(party -> {
+
+		final String name = party.getOrganisationName();
+		if (name != null && !name.isEmpty()) {
+
+		    report.put("distributorOrgName", name);
+		}
+	    });
+
+	    // -------
+	    // format
+	    // -------
+
 	    List<Format> formats = Lists.newArrayList(distribution.getFormats());
+
 	    if (!formats.isEmpty()) {
 		JSONArray array = new JSONArray();
 		for (Format format : formats) {
@@ -263,7 +283,9 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    // -------
 	    // online
 	    // -------
+
 	    List<Online> onlineList = Lists.newArrayList(distribution.getDistributionOnlines());
+
 	    onlineList.addAll(Lists.newArrayList(distribution.getDistributorOnlines()));
 
 	    if (!onlineList.isEmpty()) {
@@ -396,6 +418,14 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    report.put("spatialRepresentationType", spatialRepresentationType);
 		}
 	    }
+
+	    // --------------------------
+	    // raster mosaic
+	    // --------------------------
+	    resource.getExtensionHandler().getRasterMosaic().ifPresent(mosaic -> {
+
+		report.put("rasterMosaic", mosaic);
+	    });
 
 	    // --------------
 	    // dataAuthority (API TO IMPLEMENT)
@@ -569,7 +599,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 		Iterator<ResponsibleParty> pointOfContacts = ((DataIdentification) identification).getPointOfContacts();
 
-		for (Iterator<ResponsibleParty> iterator = pointOfContacts; iterator.hasNext();) {
+		for (Iterator<ResponsibleParty> iterator = pointOfContacts; iterator.hasNext(); ) {
 
 		    ResponsibleParty party = iterator.next();
 		    if (party != null) {
@@ -717,7 +747,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    List<Keywords> keywordList = Lists.newArrayList(identification.getKeywords());
 	    if (!keywordList.isEmpty()) {
 
-		for (Keywords kwd : keywordList) {		    
+		for (Keywords kwd : keywordList) {
 		    String type = kwd.getTypeCode();
 		    Iterator<String> keywords = kwd.getKeywords();
 		    while (keywords.hasNext()) {
@@ -854,23 +884,23 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	List<CoverageDescription> coverageDescriptions = Lists.newArrayList(md_Metadata.getCoverageDescriptions());
 	TreeSet<String> sortedAttributeDescriptions = new TreeSet<>();
 	TreeSet<String> sortedAttributeTitles = new TreeSet<>();
-//	for (CoverageDescription coverageDescription : coverageDescriptions) {
-//	    String attribute = coverageDescription.getAttributeDescription();
-//	    String title = coverageDescription.getAttributeTitle();
-//	    if (attribute != null) {
-//		sortedAttributeDescriptions.add(attribute);
-//	    }
-//	    if (title != null) {
-//		sortedAttributeTitles.add(title);
-//	    }
-//	}
-	
+	//	for (CoverageDescription coverageDescription : coverageDescriptions) {
+	//	    String attribute = coverageDescription.getAttributeDescription();
+	//	    String title = coverageDescription.getAttributeTitle();
+	//	    if (attribute != null) {
+	//		sortedAttributeDescriptions.add(attribute);
+	//	    }
+	//	    if (title != null) {
+	//		sortedAttributeTitles.add(title);
+	//	    }
+	//	}
+
 	List<String> titles = resource.getIndexesMetadata().read(MetadataElement.ATTRIBUTE_TITLE);
 	sortedAttributeTitles.addAll(titles);
-	
+
 	List<String> descriptions = resource.getIndexesMetadata().read(MetadataElement.ATTRIBUTE_DESCRIPTION);
 	sortedAttributeDescriptions.addAll(descriptions);
-	
+
 	for (String sortedDescription : sortedAttributeDescriptions) {
 	    attributeDescription.put(sortedDescription);
 	}
@@ -987,7 +1017,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
     }
 
     private String normalizeText(String text) {
-	if (text==null) {
+	if (text == null) {
 	    return "";
 	}
 	return text.trim().replaceAll("\\s+", " ");
@@ -1042,7 +1072,8 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    URL checkURL = new URL(url);
 		    if (checkURL.getQuery() != null && !checkURL.getQuery().isEmpty()) {
 			String instanceBaseUrl = message.getWebRequest().getUriInfo().getBaseUri().toString();
-			String replaceUrl = instanceBaseUrl.endsWith("/") ? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
+			String replaceUrl = instanceBaseUrl.endsWith("/")
+				? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
 				: instanceBaseUrl + "/" + SOS_TAHMO_PROXY_PATH;
 			url = url.replace(SOS_TAHMO_URL, replaceUrl);
 		    }
@@ -1060,7 +1091,8 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    URL checkURL = new URL(url);
 		    if (checkURL.getQuery() != null && !checkURL.getQuery().isEmpty()) {
 			String instanceBaseUrl = message.getWebRequest().getUriInfo().getBaseUri().toString();
-			String replaceUrl = instanceBaseUrl.endsWith("/") ? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
+			String replaceUrl = instanceBaseUrl.endsWith("/")
+				? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
 				: instanceBaseUrl + "/" + SOS_TAHMO_PROXY_PATH;
 			url = url.replace(SOS_TWIGA_URL, replaceUrl);
 		    }
