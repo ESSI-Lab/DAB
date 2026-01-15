@@ -65,6 +65,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String WEKEO_NS_URI = "http://essi-lab.eu/WEKEO";
     public static final String EUROBIS_NS_URI = "http://essi-lab.eu/EurOBIS";
     public static final String EUROBIS_LD_NS_URI = "http://essi-lab.eu/EurOBIS-LD";
+    public static final String EMOBON_NS_URI = "http://essi-lab.eu/EMOBON";
     public static final String EMODNET_PHYSICS_NS_URI = "http://essi-lab.eu/EMODNETPhysics";
     public static final String EMODNET_PHYSICS_RIVER_NS_URI = "http://essi-lab.eu/EMODNETPhysics/River";
     public static final String NIWA_NS_URI = "http://essi-lab.eu/NIWA";
@@ -232,8 +233,9 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("argostac", ARGO_STAC_NS_URI);
 	map.put("wekeo", WEKEO_NS_URI);
 	map.put("icos", ICOS_NS_URI);
-	map.put("eurobis", EUROBIS_NS_URI);
-	map.put("catalog", THREDDS_NS_URI);
+		map.put("eurobis", EUROBIS_NS_URI);
+		map.put("emobon", EMOBON_NS_URI);
+		map.put("catalog", THREDDS_NS_URI);
 	map.put("invenio", INVENIO_NS_URI);
 	map.put("hiscentraltoscana", HISCENTRAL_TOSCANA_NS_URI);
 	map.put("hiscentralumbria", HISCENTRAL_UMBRIA_NS_URI);

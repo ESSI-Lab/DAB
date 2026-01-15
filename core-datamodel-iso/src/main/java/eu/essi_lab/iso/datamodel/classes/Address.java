@@ -107,6 +107,16 @@ public class Address extends ISOMetadata<CIAddressType> {
     }
 
     /**
+     * gmd:city/gco:CharacterString
+     * Convenience method that sets the city (since city is a single value, not a list)
+     * 
+     * @param city
+     */
+    public void addCity(String city) {
+	setCity(city);
+    }
+
+    /**
      * @XPathDirective(target = "//gmd:city/gco:CharacterString")
      * @return
      */
@@ -164,6 +174,16 @@ public class Address extends ISOMetadata<CIAddressType> {
      */
     public void setCountry(String country) {
 	type.setCountry(createCharacterStringPropertyType(country));
+    }
+
+    /**
+     * gmd:country/gco:CharacterString
+     * Convenience method that sets the country (since country is a single value, not a list)
+     * 
+     * @param country
+     */
+    public void addCountry(String country) {
+	setCountry(country);
     }
 
     /**

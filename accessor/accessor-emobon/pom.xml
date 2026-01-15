@@ -7,10 +7,15 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   
-  <name>ESSI-Lab Accessor EurOBIS</name>
+  <name>ESSI-Lab Accessor EMOBON</name>
   
-  <artifactId>accessor-eurobis</artifactId>
+  <artifactId>accessor-emobon</artifactId>
   <dependencies>
-
+  	<dependency>
+  		<groupId>eu.essi_lab</groupId>
+  		<artifactId>accessor-eurobis</artifactId>
+  		<version>1.0-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
 </project>
+
