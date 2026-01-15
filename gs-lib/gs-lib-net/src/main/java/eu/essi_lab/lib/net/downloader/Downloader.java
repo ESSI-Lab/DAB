@@ -701,7 +701,7 @@ public class Downloader {
 	X509TrustManager defaultTm = getX509Tm(defaultTmf);
 	X509TrustManager customTm = getX509Tm(tmf);
 
-	X509TrustManager combinedTm = new X509TrustManager() {
+	return new X509TrustManager() {
 	    @Override
 	    public void checkClientTrusted(X509Certificate[] chain, String authType)
 		    throws CertificateException {
@@ -734,8 +734,6 @@ public class Downloader {
 		return all;
 	    }
 	};
-
-	return combinedTm;
     }
 
     private static X509TrustManager getX509Tm(TrustManagerFactory tmf) {
