@@ -170,7 +170,7 @@ public class SMTPClient {
 	try {
 	    Transport.send(mimeMessage);
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    GSLoggerFactory.getLogger(getClass()).warn(e.getMessage());
 	    return false;
 	}
 
