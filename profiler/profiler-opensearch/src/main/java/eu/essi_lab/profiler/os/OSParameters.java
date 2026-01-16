@@ -10,40 +10,29 @@ package eu.essi_lab.profiler.os;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Optional;
+import eu.essi_lab.lib.what3words.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.LogicalBond.*;
+import eu.essi_lab.messages.bond.spatial.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.pdk.*;
+import eu.essi_lab.profiler.os.OSBox.*;
+import org.h2.util.*;
 
-import org.h2.util.StringUtils;
-
-import eu.essi_lab.lib.what3words.What3Words;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.spatial.SpatialEntity;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceType;
-import eu.essi_lab.model.resource.SA_ElementWrapper;
-import eu.essi_lab.pdk.BondUtils;
-import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
+import java.util.*;
 
 public abstract class OSParameters {
-
 
     /**
      *
@@ -143,12 +132,15 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter DISTRIBUTOR_ORG_NAME = new OSParameter("distOrgName", "string", null, "{gs:distPartyOrgName}"){
+    public static final OSParameter DISTRIBUTOR_ORG_NAME = new OSParameter("distOrgName", "string", null, "{gs:distOrgName}") {
 
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readMultiValues(value, MetadataElement.DISTRIBUTOR_ORG_NAME);
+	    return Optional.of( //
+		    BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, //
+			    MetadataElement.DISTRIBUTOR_ORG_NAME,//
+			    value));//
 	}
     };
 
@@ -1515,7 +1507,6 @@ public abstract class OSParameters {
     }
 
     /**
-     *
      * @param value
      * @param element
      * @return
