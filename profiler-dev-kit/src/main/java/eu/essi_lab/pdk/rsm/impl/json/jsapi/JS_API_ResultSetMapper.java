@@ -10,68 +10,35 @@ package eu.essi_lab.pdk.rsm.impl.json.jsapi;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.TreeSet;
+import com.google.common.collect.*;
+import eu.essi_lab.access.compliance.*;
+import eu.essi_lab.access.compliance.DataComplianceTester.*;
+import eu.essi_lab.access.compliance.wrapper.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.pluggable.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.data.*;
+import eu.essi_lab.pdk.rsm.*;
+import org.json.*;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.google.common.collect.Lists;
-
-import eu.essi_lab.access.compliance.DataComplianceReport;
-import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
-import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
-import eu.essi_lab.iso.datamodel.classes.Address;
-import eu.essi_lab.iso.datamodel.classes.BrowseGraphic;
-import eu.essi_lab.iso.datamodel.classes.Citation;
-import eu.essi_lab.iso.datamodel.classes.Contact;
-import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.DataIdentification;
-import eu.essi_lab.iso.datamodel.classes.Distribution;
-import eu.essi_lab.iso.datamodel.classes.Format;
-import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.iso.datamodel.classes.Identification;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
-import eu.essi_lab.iso.datamodel.classes.MIInstrument;
-import eu.essi_lab.iso.datamodel.classes.MIMetadata;
-import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.iso.datamodel.classes.ServiceIdentification;
-import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.xml.NameSpace;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.model.BrokeringStrategy;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.pluggable.ESSILabProvider;
-import eu.essi_lab.model.pluggable.Provider;
-import eu.essi_lab.model.resource.DatasetCollection;
-import eu.essi_lab.model.resource.ExtensionHandler;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.data.DataType;
-import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
-import eu.essi_lab.pdk.rsm.MappingSchema;
+import javax.ws.rs.core.*;
+import javax.xml.datatype.*;
+import java.net.*;
+import java.util.*;
 
 /**
  * Result set mapper implementation which maps the {@link GSResource}s according to a JSON schema encoding defined for the <a
@@ -559,17 +526,23 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	// ORIGINATOR ORGANIZATION IDENTIFIER
 	// -------
 	ExtensionHandler handler = resource.getExtensionHandler();
-	TreeSet<String> originatorOrganisationDescriptions = new TreeSet<>();
-	originatorOrganisationDescriptions.addAll(handler.getOriginatorOrganisationDescriptions());
-	JSONArray jsonOriginatorOrganisationDescription = new JSONArray();
-	for (String originatorOrganisationDescription : originatorOrganisationDescriptions) {
+
+	TreeSet<String> origOrgDesc = new TreeSet<>();
+
+	origOrgDesc.addAll(handler.getOriginatorOrganisationDescriptions());
+
+	JSONArray jsonOrigOrgDesc = new JSONArray();
+
+	for (String originatorOrganisationDescription : origOrgDesc) {
 	    if (originatorOrganisationDescription != null) {
-		jsonOriginatorOrganisationDescription.put(originatorOrganisationDescription);
+		jsonOrigOrgDesc.put(originatorOrganisationDescription);
 	    }
 	}
-	if (jsonOriginatorOrganisationDescription.length() > 0) {
-	    report.put("origOrgDesc", jsonOriginatorOrganisationDescription);
+
+	if (jsonOrigOrgDesc.length() > 0) {
+	    report.put("origOrgDesc", jsonOrigOrgDesc);
 	}
+
 	Optional<String> themeCategoryOpt = handler.getThemeCategory();
 
 	if (themeCategoryOpt.isPresent()) {
@@ -577,6 +550,41 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	}
 
 	for (Identification identification : diList) {
+
+	    //
+	    // updated
+	    //
+
+	    String revDate = identification.getCitationDate(Identification.REVISION);
+	    if (revDate != null && !revDate.isEmpty()) {
+
+		report.put("updated", revDate);
+
+	    } else {
+
+		XMLGregorianCalendar revDateTime = identification.getCitationDateTime(Identification.REVISION);
+		if (revDateTime != null) {
+		    report.put("updated", revDateTime.toString());
+		}
+	    }
+
+	    //
+	    // expiry
+	    //
+
+	    String expDate = identification.getCitationDate(Identification.EXPIRATION);
+	    if (expDate != null && !expDate.isEmpty()) {
+
+		report.put("expiration", expDate);
+
+	    } else {
+
+		XMLGregorianCalendar expDateTime = identification.getCitationDateTime(Identification.EXPIRATION);
+		if (expDateTime != null) {
+
+		    report.put("expiration", expDateTime.toString());
+		}
+	    }
 
 	    // -------
 	    // rights

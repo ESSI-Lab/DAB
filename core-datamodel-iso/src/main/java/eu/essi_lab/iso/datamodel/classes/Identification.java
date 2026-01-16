@@ -49,6 +49,7 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
     public static final String PUBLICATION = "publication";
     public static final String REVISION = "revision";
     public static final String CREATION = "creation";
+    public static final String EXPIRATION = "expiry";
 
     public Identification(AbstractMDIdentificationType type) {
 
@@ -1010,7 +1011,12 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
 	getFirstCitation().getDate().add(ciDatePropertyType);
     }
 
-    private String getCitationDate(String codeListValue) {
+    /**
+     *
+     * @param codeListValue
+     * @return
+     */
+    public String getCitationDate(String codeListValue) {
 
 	try {
 	    List<CIDatePropertyType> date = getFirstCitation().getDate();
@@ -1037,7 +1043,12 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
 	return null;
     }
 
-    private XMLGregorianCalendar getCitationDateTime(String codeListValue) {
+    /**
+     *
+     * @param codeListValue
+     * @return
+     */
+    public XMLGregorianCalendar getCitationDateTime(String codeListValue) {
 
 	try {
 	    List<CIDatePropertyType> date = getFirstCitation().getDate();
