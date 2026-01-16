@@ -147,17 +147,21 @@ public abstract class DiscoveryResultSetMapper<T>
 		.map(count -> Executors.newFixedThreadPool(count, platformFactory))
 		.orElse(Executors.newThreadPerTaskExecutor(virtualFactory));
 
-	List<CompletableFuture<T>> futures = resultSet.getResultsList().//
+	try {
+	    List<CompletableFuture<T>> futures = resultSet.getResultsList().//
 		stream().//
 		map(res -> CompletableFuture.supplyAsync(() -> map(message, res, ids), executor)).//
 		toList();
 
-	List<T> out = futures.//
+	    List<T> out = futures.//
 		stream().//
 		map(CompletableFuture::join).//
 		collect(Collectors.toList());//
 
-	mappedResSet.setResultsList(out);
+	    mappedResSet.setResultsList(out);
+	} finally {
+	    executor.shutdown();
+	}
 
 	//
 	//
