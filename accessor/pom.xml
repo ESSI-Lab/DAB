@@ -22,6 +22,7 @@
 		<module>accessor-datahub</module>
 		<module>accessor-egy-mwri</module>
 		<module>accessor-emodnet-physics</module>
+		<module>accessor-emobon</module>
 		<module>accessor-eurobis</module>
 		<module>accessor-mcp</module>
 		<module>accessor-odip</module>
