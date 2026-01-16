@@ -83,6 +83,149 @@ function lang() {
 	return i18n.current;
 }
 
+/**
+ * Converts ISO8601 duration to a sortable numeric value (total seconds)
+ * @param {string} iso8601Value - The ISO8601 duration string
+ * @returns {number} - Total seconds for sorting, or 0 if not ISO8601
+ */
+function getISO8601DurationSortValue(iso8601Value) {
+	if (!iso8601Value || typeof iso8601Value !== 'string' || !iso8601Value.startsWith('P')) {
+		return 0;
+	}
+
+	// Parse ISO8601 pattern: P[nY][nM][nD][T[nH][nM][nS]]
+	const pattern = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/;
+	const match = iso8601Value.match(pattern);
+	
+	if (!match) {
+		return 0;
+	}
+
+	const [, years, months, days, hours, minutes, seconds] = match.map(v => v ? parseInt(v, 10) : 0);
+	
+	// Convert to total seconds for comparison
+	// Note: Using approximate values for months and years (30 days/month, 365 days/year)
+	const totalSeconds = 
+		(years * 365 * 24 * 60 * 60) +
+		(months * 30 * 24 * 60 * 60) +
+		(days * 24 * 60 * 60) +
+		(hours * 60 * 60) +
+		(minutes * 60) +
+		seconds;
+	
+	return totalSeconds;
+}
+
+/**
+ * Converts ISO8601 duration strings to natural language
+ * @param {string} iso8601Value - The ISO8601 duration string (e.g., "P1D", "PT30M", "PT5H")
+ * @returns {string} - Natural language representation or original value if not ISO8601
+ */
+function formatISO8601Duration(iso8601Value) {
+	// Only process values that start with 'P' (ISO8601 duration indicator)
+	if (!iso8601Value || typeof iso8601Value !== 'string' || !iso8601Value.startsWith('P')) {
+		return iso8601Value;
+	}
+
+	const currentLang = lang() || 'en';
+	
+	// Common ISO8601 duration mappings for frequently used values
+	const mappings = {
+		en: {
+			'P1Y': 'yearly',
+			'P1M': 'monthly',
+			'P1W': 'weekly',
+			'P1D': 'daily',
+			'PT1H': 'hourly',
+			'PT1M': 'every minute'
+		},
+		it: {
+			'P1Y': 'annuale',
+			'P1M': 'mensile',
+			'P1W': 'settimanale',
+			'P1D': 'giornaliero',
+			'PT1H': 'orario',
+			'PT1M': 'ogni minuto'
+		}
+	};
+
+	// Check for exact matches first
+	if (mappings[currentLang] && mappings[currentLang][iso8601Value]) {
+		return mappings[currentLang][iso8601Value];
+	}
+
+	// Parse ISO8601 pattern: P[nY][nM][nD][T[nH][nM][nS]]
+	// Examples: P1D, PT1H, PT30M, PT5H, PT20M, P1Y2M3DT4H5M6S
+	const pattern = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/;
+	const match = iso8601Value.match(pattern);
+	
+	if (!match) {
+		return iso8601Value; // Not a valid ISO8601 duration, return as-is
+	}
+
+	const [, years, months, days, hours, minutes, seconds] = match.map(v => v ? parseInt(v, 10) : 0);
+	
+	// Check if this is a time-only duration (PT...)
+	const isTimeOnly = !years && !months && !days && (hours || minutes || seconds);
+	
+	// Check if this is a date-only duration (P... without T)
+	const isDateOnly = (years || months || days) && !hours && !minutes && !seconds;
+	
+	// Check if this is a single unit duration (only one component)
+	const componentCount = [years, months, days, hours, minutes, seconds].filter(v => v > 0).length;
+	const isSingleUnit = componentCount === 1;
+
+	if (currentLang === 'en') {
+		// English formatting
+		if (isTimeOnly && isSingleUnit) {
+			// Single time unit: "every X hours/minutes"
+			if (hours) return hours === 1 ? 'hourly' : `every ${hours} hours`;
+			if (minutes) return minutes === 1 ? 'every minute' : `every ${minutes} minutes`;
+			if (seconds) return seconds === 1 ? 'every second' : `every ${seconds} seconds`;
+		} else if (isDateOnly && isSingleUnit) {
+			// Single date unit: use natural forms
+			if (years) return years === 1 ? 'yearly' : `every ${years} years`;
+			if (months) return months === 1 ? 'monthly' : `every ${months} months`;
+			if (days) return days === 1 ? 'daily' : `every ${days} days`;
+		}
+		
+		// Multiple components or complex durations
+		const parts = [];
+		if (years) parts.push(years === 1 ? '1 year' : `${years} years`);
+		if (months) parts.push(months === 1 ? '1 month' : `${months} months`);
+		if (days) parts.push(days === 1 ? '1 day' : `${days} days`);
+		if (hours) parts.push(hours === 1 ? '1 hour' : `${hours} hours`);
+		if (minutes) parts.push(minutes === 1 ? '1 minute' : `${minutes} minutes`);
+		if (seconds) parts.push(seconds === 1 ? '1 second' : `${seconds} seconds`);
+		
+		return parts.length > 0 ? parts.join(', ') : iso8601Value;
+	} else {
+		// Italian formatting
+		if (isTimeOnly && isSingleUnit) {
+			// Single time unit: "ogni X ore/minuti"
+			if (hours) return hours === 1 ? 'orario' : `ogni ${hours} ore`;
+			if (minutes) return minutes === 1 ? 'ogni minuto' : `ogni ${minutes} minuti`;
+			if (seconds) return seconds === 1 ? 'ogni secondo' : `ogni ${seconds} secondi`;
+		} else if (isDateOnly && isSingleUnit) {
+			// Single date unit: use natural forms
+			if (years) return years === 1 ? 'annuale' : `ogni ${years} anni`;
+			if (months) return months === 1 ? 'mensile' : `ogni ${months} mesi`;
+			if (days) return days === 1 ? 'giornaliero' : `ogni ${days} giorni`;
+		}
+		
+		// Multiple components or complex durations
+		const parts = [];
+		if (years) parts.push(years === 1 ? '1 anno' : `${years} anni`);
+		if (months) parts.push(months === 1 ? '1 mese' : `${months} mesi`);
+		if (days) parts.push(days === 1 ? '1 giorno' : `${days} giorni`);
+		if (hours) parts.push(hours === 1 ? '1 ora' : `${hours} ore`);
+		if (minutes) parts.push(minutes === 1 ? '1 minuto' : `${minutes} minuti`);
+		if (seconds) parts.push(seconds === 1 ? '1 secondo' : `${seconds} secondi`);
+		
+		return parts.length > 0 ? parts.join(', ') : iso8601Value;
+	}
+}
+
 // Expose translator globally for GIAPI widgets
 try { window.__t = t; } catch (e) { }
 
@@ -1320,15 +1463,32 @@ export function initializePortal(config) {
 			
 			// Clear sources selection (select all sources)
 			if (GIAPI.search.sourcesWidget) {
-				// Get all source checkboxes and check them (select all)
-				jQuery('#sourcesWidgetTable input[type="checkbox"]').each(function() {
-					if (!jQuery(this).is(':checked')) {
-						jQuery(this).prop('checked', true).trigger('change');
+				// Use the "check all" checkbox to select all sources
+				// This is the proper way as it handles both UI and source.include() calls
+				var checkAll = jQuery('#check_all');
+				if (checkAll.length) {
+					if (!checkAll.is(':checked')) {
+						// Trigger click on check_all, which will automatically check all individual sources
+						// and call source.include(true) for each source
+						checkAll.click();
 					}
-				});
-				// Also check the "check all" checkbox if it exists
-				if (jQuery('#check_all').length && !jQuery('#check_all').is(':checked')) {
-					jQuery('#check_all').prop('checked', true).trigger('change');
+				} else {
+					// Fallback: if check_all doesn't exist, find all individual source checkboxes
+					// Source checkboxes have IDs like check_0, check_1, check_2, etc.
+					var sourceIndex = 0;
+					while (true) {
+						var checkId = 'check_' + sourceIndex;
+						var checkbox = jQuery('#' + checkId);
+						if (checkbox.length) {
+							if (!checkbox.is(':checked')) {
+								checkbox.click();
+							}
+							sourceIndex++;
+						} else {
+							// No more checkboxes found
+							break;
+						}
+					}
 				}
 			}
 			
@@ -2394,12 +2554,30 @@ export function initializePortal(config) {
 						// Find the select element using the correct ID
 						const selectElement = document.getElementById(spacingId);
 						if (selectElement) {
+							// Sort durations by value (largest first), keeping non-ISO8601 values at the end
+							const sortedTypes = [...data.intendedObservationSpacing].sort((a, b) => {
+								const aValue = getISO8601DurationSortValue(a.value);
+								const bValue = getISO8601DurationSortValue(b.value);
+								// If both are ISO8601, sort by value (descending - largest first)
+								if (aValue > 0 && bValue > 0) {
+									return bValue - aValue;
+								}
+								// If only one is ISO8601, put ISO8601 first
+								if (aValue > 0) return -1;
+								if (bValue > 0) return 1;
+								// If neither is ISO8601, maintain original order
+								return 0;
+							});
+
 							const options = [
 								{ label: t("select_observation_spacing"), value: '' },
-								...data.intendedObservationSpacing.map(type => ({
-									label: `${type.value} (${type.observationCount} observations)`,
-									value: type.value
-								}))
+								...sortedTypes.map(type => {
+									const displayValue = formatISO8601Duration(type.value);
+									return {
+										label: `${displayValue} (${type.observationCount} observations)`,
+										value: type.value
+									};
+								})
 							];
 
 							// Update the select options
@@ -2437,12 +2615,30 @@ export function initializePortal(config) {
 						// Find the select element using the correct ID
 						const selectElement = document.getElementById(durationId);
 						if (selectElement) {
+							// Sort durations by value (largest first), keeping non-ISO8601 values at the end
+							const sortedTypes = [...data.aggregationDuration].sort((a, b) => {
+								const aValue = getISO8601DurationSortValue(a.value);
+								const bValue = getISO8601DurationSortValue(b.value);
+								// If both are ISO8601, sort by value (descending - largest first)
+								if (aValue > 0 && bValue > 0) {
+									return bValue - aValue;
+								}
+								// If only one is ISO8601, put ISO8601 first
+								if (aValue > 0) return -1;
+								if (bValue > 0) return 1;
+								// If neither is ISO8601, maintain original order
+								return 0;
+							});
+
 							const options = [
 								{ label: t("select_aggregation_duration"), value: '' },
-								...data.aggregationDuration.map(type => ({
-									label: `${type.value} (${type.observationCount} observations)`,
-									value: type.value
-								}))
+								...sortedTypes.map(type => {
+									const displayValue = formatISO8601Duration(type.value);
+									return {
+										label: `${displayValue} (${type.observationCount} observations)`,
+										value: type.value
+									};
+								})
 							];
 
 							// Update the select options

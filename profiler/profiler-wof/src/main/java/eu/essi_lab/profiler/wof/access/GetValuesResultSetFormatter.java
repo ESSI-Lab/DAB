@@ -112,6 +112,10 @@ public class GetValuesResultSetFormatter extends AccessResultSetFormatter<DataOb
 	    // netcdf
 	    builder.type(new MediaType("application", "x-netcdf"));
 	    extension = ".nc";
+	} else if (format != null && format.toLowerCase().contains("csv")) {
+	    // csv
+	    builder.type(new MediaType("text", "csv"));
+	    extension = ".csv";
 	} else {
 	    // waterml 1 & 2
 	    builder.type(MediaType.TEXT_XML);

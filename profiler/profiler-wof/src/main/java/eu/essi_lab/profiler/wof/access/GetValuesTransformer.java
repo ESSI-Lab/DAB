@@ -337,6 +337,8 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 		    descriptor.setDataFormat(DataFormat.WATERML_2_0());
 		} else if (format != null && format.toLowerCase().contains("netcdf")) {
 		    descriptor.setDataFormat(DataFormat.NETCDF());
+		} else if (format != null && format.toLowerCase().contains("csv")) {
+		    descriptor.setDataFormat(DataFormat.CSV());
 		} else {
 		    descriptor.setDataFormat(DataFormat.WATERML_1_1());
 		}

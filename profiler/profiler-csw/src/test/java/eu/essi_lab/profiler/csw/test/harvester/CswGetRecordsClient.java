@@ -26,8 +26,8 @@ import org.w3c.dom.*;
 
 public class CswGetRecordsClient {
 
-    private static final String CSW_ENDPOINT = "http://localhost:9090/gs-service/services/essi/view/elixir-ena/harvestingcsw";
-    // private static final String CSW_ENDPOINT = "http://blue-cloud.geodab.eu/gs-service/services/essi/view/elixir-ena/harvestingcsw";
+    //private static final String CSW_ENDPOINT = "http://localhost:9090/gs-service/services/essi/view/elixir-ena/harvestingcsw";
+     private static final String CSW_ENDPOINT = "http://blue-cloud.geodab.eu/gs-service/services/essi/view/elixir-ena/harvestingcsw";
    // private static final String CSW_ENDPOINT = "http://54.175.100.77:33106/gs-service/services/essi/view/elixir-ena/harvestingcsw";
 
     private static final int MAX_RECORDS = 20;

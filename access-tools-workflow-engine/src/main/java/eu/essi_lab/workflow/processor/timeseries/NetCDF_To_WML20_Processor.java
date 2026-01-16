@@ -28,17 +28,8 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
-import eu.essi_lab.jaxb.wml._2_0.CollectionType;
-import eu.essi_lab.jaxb.wml._2_0.DocumentMetadataPropertyType;
-import eu.essi_lab.jaxb.wml._2_0.DocumentMetadataType;
-import eu.essi_lab.jaxb.wml._2_0.MeasureTVPType;
-import eu.essi_lab.jaxb.wml._2_0.MeasurementTimeseriesType;
+import eu.essi_lab.jaxb.wml._2_0.*;
 import eu.essi_lab.jaxb.wml._2_0.MeasurementTimeseriesType.Point;
-import eu.essi_lab.jaxb.wml._2_0.MonitoringPointType;
-import eu.essi_lab.jaxb.wml._2_0.ObservationProcessType;
-import eu.essi_lab.jaxb.wml._2_0.TVPDefaultMetadataPropertyType;
-import eu.essi_lab.jaxb.wml._2_0.TVPMeasurementMetadataType;
-import eu.essi_lab.jaxb.wml._2_0.TVPMetadataType;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.CodeWithAuthorityType;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.DirectPositionType;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.FeaturePropertyType;
@@ -55,6 +46,7 @@ import eu.essi_lab.jaxb.wml._2_0.om__2.OMObservationType;
 import eu.essi_lab.jaxb.wml._2_0.om__2.OMProcessPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.om__2.TimeObjectPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.sams._2_0.ShapeType;
+import eu.essi_lab.jaxb.wml._2_0.swe._2.QualityPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.swe._2.UnitReference;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -64,9 +56,11 @@ import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.netcdf.NetCDFAttribute;
 import eu.essi_lab.wml._2.JAXBWML2;
 import eu.essi_lab.wml._2.ResultWrapper;
+import eu.essi_lab.wml._2.WML2QualityCategory;
 import eu.essi_lab.workflow.processor.DataProcessor;
 import eu.essi_lab.workflow.processor.TargetHandler;
 import ucar.ma2.StructureData;
+import ucar.ma2.StructureMembers;
 import ucar.nc2.Attribute;
 import ucar.nc2.Variable;
 import ucar.nc2.VariableSimpleIF;
@@ -357,8 +351,33 @@ public class NetCDF_To_WML20_Processor extends DataProcessor {
 	    }
 	    
 	    measurement.setValue(measure);
-	    point.setMeasurementTVP(measurement);
 
+	    point.setMeasurementTVP(measurement);
+	    List<StructureMembers.Member> members = featureData.getMembers();
+	    String qualifier = null;
+	    for(StructureMembers.Member member : members) {
+		if (member.getName().contains("quality_control_level_code")){
+		    qualifier = featureData.getScalarString(member.getName());
+		    break;
+		}
+	    }
+	    if (qualifier!=null) {
+		TVPMeasurementMetadataPropertyType pointMetadata = new TVPMeasurementMetadataPropertyType();
+		TVPMeasurementMetadataType tvpm = new TVPMeasurementMetadataType();
+		QualityPropertyType q = new QualityPropertyType();
+		WML2QualityCategory wmlQuality = null;
+		if (qualifier.startsWith("http")){
+		    q.setHref(qualifier);
+		    wmlQuality = WML2QualityCategory.decodeUri(qualifier);
+		}
+		q.setTitle(qualifier);
+		if (wmlQuality!=null){
+		    q.setTitle(wmlQuality.getLabel());
+		}
+		tvpm.getQualifier().add(q);
+		pointMetadata.setTVPMeasurementMetadata(tvpm);
+		measurement.setMetadata(pointMetadata);
+	    }
 	    measurementTimeseriesType.getPoint().add(point);
 	    count++;
 	}

@@ -99,6 +99,10 @@ public class DataFormat implements Serializable {
 	return new DataFormat(FormatType.WKT);
     }
 
+    public static DataFormat CSV() {
+	return new DataFormat(FormatType.CSV);
+    }
+
     public enum FormatType {
 	WATERML, //
 	WATERML_1_1(WATERML), //
@@ -117,6 +121,7 @@ public class DataFormat implements Serializable {
 	DDS, //
 	DAS, //
 	WKT, //
+	CSV, //
 	O_M;
 
 	private FormatType parent = null;
@@ -225,6 +230,8 @@ public class DataFormat implements Serializable {
 	    ret.setType(FormatType.WKT);
 	} else if (identifier.toLowerCase().contains("das")) {
 	    ret.setType(FormatType.DAS);
+	} else if (identifier.toLowerCase().contains("csv")) {
+	    ret.setType(FormatType.CSV);
 	}
 
 	return ret;

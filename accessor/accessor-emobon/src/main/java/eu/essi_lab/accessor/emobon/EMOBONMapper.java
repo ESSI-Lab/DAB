@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -364,6 +366,18 @@ public class EMOBONMapper extends FileIdentifierMapper {
 
 	    // online resources
 	    if (accessURL != null && !accessURL.isEmpty()) {
+		// Transform raw.githubusercontent.com URLs to GitHub archive URLs
+		// Pattern: https://raw.githubusercontent.com/{owner}/{repo}/{branch}/ro-crate-metadata.json
+		// Transform to: https://github.com/{owner}/{repo}/archive/refs/heads/{branch}.zip
+		Pattern rawGitHubPattern = Pattern.compile("^https://raw\\.githubusercontent\\.com/([^/]+)/([^/]+)/([^/]+)/ro-crate-metadata\\.json$");
+		Matcher matcher = rawGitHubPattern.matcher(accessURL);
+		if (matcher.matches()) {
+		    String owner = matcher.group(1);
+		    String repo = matcher.group(2);
+		    String branch = matcher.group(3);
+		    accessURL = String.format("https://github.com/%s/%s/archive/refs/heads/%s.zip", owner, repo, branch);
+		}
+		
 		Online online = new Online();
 		online.setLinkage(accessURL);
 		online.setProtocol("HTTP");
