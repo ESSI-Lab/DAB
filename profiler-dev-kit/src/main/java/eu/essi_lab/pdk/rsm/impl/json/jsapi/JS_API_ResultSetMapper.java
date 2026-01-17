@@ -195,15 +195,18 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    report.put("rasterMosaic", mosaic);
 	});
 
-	// ------------------------------
-	// distributor and owner org.name
-	// ------------------------------
+	// --------------------------------------------
+	// distributor and owner org.name from contacts
+	// --------------------------------------------
+
+	JSONArray ownerOrgNameArray = new JSONArray();
+	JSONArray distOrgNameArray = new JSONArray();
 
 	ArrayList<ResponsibleParty> contacts = Lists.newArrayList(mi_Metadata.getContacts());//
 
 	contacts.forEach(contact -> {
 
-	    handleOrgName(contact, report);
+	    handleOrgName(contact, ownerOrgNameArray, distOrgNameArray);
 	});
 
 	// -----------
@@ -218,7 +221,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	    Optional<String> codeString = info.getCodeString();
 
-	    if(codeAnchorType.isPresent()) {
+	    if (codeAnchorType.isPresent()) {
 
 		String label = codeAnchorType.get().getTitle();
 		String url = codeAnchorType.get().getHref();
@@ -230,7 +233,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 		epsgArray.put(epsg);
 
-	    }else if(codeString.isPresent()){
+	    } else if (codeString.isPresent()) {
 
 		JSONObject epsg = new JSONObject();
 
@@ -240,7 +243,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    }
 	});
 
-	if(!epsgArray.isEmpty()){
+	if (!epsgArray.isEmpty()) {
 
 	    report.put("nativeEPSG", epsgArray);
 	}
@@ -445,6 +448,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	JSONArray keywordTypeArray = new JSONArray();
 	JSONArray topicArray = new JSONArray();
 	JSONArray overviewArray = new JSONArray();
+	JSONArray spatialRepTypeArray = new JSONArray();
 
 	for (DataIdentification identification : diList) {
 
@@ -452,11 +456,11 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    // spatialRepresentationType
 	    // --------------------------
 
-	    String spatialRepresentationType = identification.getSpatialRepresentationTypeCodeListValue();
+	    List<String> spatialRepTypeList = identification.getSpatialRepresentationTypeCodeListValueList();
 
-	    if (spatialRepresentationType != null) {
+	    for (String code : spatialRepTypeList) {
 
-		report.put("spatialRepresentationType", spatialRepresentationType);
+		normalizeText(code).ifPresent(type -> spatialRepTypeArray.put(type));
 	    }
 
 	    // -------
@@ -531,7 +535,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    // distributor and owner org.name
 		    // ------------------------------
 
-		    handleOrgName(party, report);
+		    handleOrgName(party, ownerOrgNameArray, distOrgNameArray);
 
 		    //
 		    //
@@ -721,6 +725,27 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    overviewArray.put(fileName);
 		}
 	    }
+	}
+
+	// ------------------------
+	// inserts spatial rep.type
+	if (!spatialRepTypeArray.isEmpty()) {
+
+	    report.put("spatialRepresentationType", spatialRepTypeArray);
+	}
+
+	// --------------------------------
+	// inserts owner organisation names
+	if (!ownerOrgNameArray.isEmpty()) {
+
+	    report.put("ownerOrgName", ownerOrgNameArray);
+	}
+
+	// --------------------------------------
+	// inserts distributor organisation names
+	if (!distOrgNameArray.isEmpty()) {
+
+	    report.put("distributorOrgName", distOrgNameArray);
 	}
 
 	// ---------------
@@ -963,7 +988,9 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
      * @param responsibleParty
      * @param report
      */
-    private void handleOrgName(ResponsibleParty responsibleParty, JSONObject report) {
+    private void handleOrgName(ResponsibleParty responsibleParty, //
+	    JSONArray ownerOrgNameArray, //
+	    JSONArray distributionOrgNameArray) { //
 
 	String roleCode = responsibleParty.getRoleCode();
 
@@ -973,11 +1000,11 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	    if (roleCode.equals("owner")) {
 
-		report.put("ownerOrgName", roleCode);
+		ownerOrgNameArray.put(orgName);
 
 	    } else if (roleCode.equals("distributor")) {
 
-		report.put("distributorOrgName", roleCode);
+		distributionOrgNameArray.put(orgName);
 	    }
 	}
     }
