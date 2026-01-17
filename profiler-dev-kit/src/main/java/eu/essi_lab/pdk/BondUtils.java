@@ -76,7 +76,7 @@ public class BondUtils {
      */
     public static Optional<Bond> createBond(BondOperator operator, String value, MetadataElement element) {
 
-	if (value == null || value.equals("")) {
+	if (value == null || value.isEmpty()) {
 	    return Optional.empty();
 	}
 
