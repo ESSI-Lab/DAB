@@ -486,6 +486,21 @@ public abstract class OSParameters {
     /**
      *
      */
+    public static final OSParameter OWNER_ORGANISATION_NAME = new OSParameter("ownerOrgName", "string", null, "{gs:ownerOrgName}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.OWNER_ORGANISATION_NAME);
+	}
+    };
+
+    /**
+     *
+     */
     public static final OSParameter ROSETTA = new OSParameter("rosetta", "string", null, "{gs:rosetta}");
 
     /**

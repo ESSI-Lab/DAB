@@ -10,24 +10,24 @@ package eu.essi_lab.model.resource;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.*;
-import java.util.stream.Collectors;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.index.*;
+import eu.essi_lab.model.resource.composed.*;
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.index.IndexedElement;
-import eu.essi_lab.model.resource.composed.ComposedElement;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * Enumeration of queryable {@link HarmonizedMetadata} element names
@@ -307,7 +307,7 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    RASTER_MOSAIC ("rasterMosaic"),
+    RASTER_MOSAIC("rasterMosaic"),
 
     /**
      *
@@ -419,6 +419,12 @@ public enum MetadataElement implements Queryable {
      *
      */
     ORGANISATION_NAME(MetadataElement.ORGANISATION_NAME_EL_NAME),
+
+    /**
+     *
+     */
+    OWNER_ORGANISATION_NAME("ownerOrgName"),
+
 
     /**
      *

@@ -10,53 +10,31 @@ package eu.essi_lab.indexes;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.math.BigInteger;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import eu.essi_lab.api.database.Database.DatabaseImpl;
-import eu.essi_lab.indexes.marklogic.MarkLogicIndexTypes;
-import eu.essi_lab.indexes.marklogic.MarkLogicScalarType;
-import eu.essi_lab.iso.datamodel.classes.Address;
-import eu.essi_lab.iso.datamodel.classes.Citation;
-import eu.essi_lab.iso.datamodel.classes.Contact;
-import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.DataIdentification;
-import eu.essi_lab.iso.datamodel.classes.Dimension;
-import eu.essi_lab.iso.datamodel.classes.Distribution;
-import eu.essi_lab.iso.datamodel.classes.Format;
-import eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation;
-import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
-import eu.essi_lab.iso.datamodel.classes.MIInstrument;
-import eu.essi_lab.iso.datamodel.classes.MIMetadata;
-import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
-import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.index.IndexedElement;
-import eu.essi_lab.model.index.IndexedElementInfo;
-import eu.essi_lab.model.index.IndexedMetadataElement;
+import eu.essi_lab.api.database.Database.*;
+import eu.essi_lab.indexes.marklogic.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.index.*;
 import eu.essi_lab.model.resource.*;
-import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
-import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
-import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
-import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
+import eu.essi_lab.model.resource.worldcereal.*;
+import net.opengis.gml.v_3_2_0.*;
+import net.opengis.iso19139.gco.v_20060504.*;
+
+import javax.xml.datatype.*;
+import java.math.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * This class groups all the available {@link IndexedMetadataElement}s
@@ -175,7 +153,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 	}
     };
-
 
     public static final IndexedMetadataElement SPATIAL_REPRESENTATION_TYPE = new IndexedMetadataElement(
 	    MetadataElement.SPATIAL_REPRESENTATION_TYPE) {
@@ -698,7 +675,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	public void defineValues(GSResource resource) {
 
 	    addKeywordsURI(resource, null);
-
 	}
     };
 
@@ -722,6 +698,28 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    public static final IndexedMetadataElement OWNER_ORGANISATION_NAME = new IndexedMetadataElement(
+	    MetadataElement.OWNER_ORGANISATION_NAME) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    List<ResponsibleParty> parties = getAllParties(resource);
+
+	    for (ResponsibleParty party : parties) {
+
+		if (party != null) {
+		    String roleCode = party.getRoleCode();
+		    if(roleCode != null && roleCode.equals("owner")) {
+			String orgName = party.getOrganisationName();
+			if (checkStringValue(orgName)) {
+			    addValue(orgName);
+			}
+		    }
+		}
+	    }
+	}
+    };
+
     public static final IndexedMetadataElement ORGANISATION_NAME = new IndexedMetadataElement(MetadataElement.ORGANISATION_NAME) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -739,7 +737,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 
 	    defineBNHSProperty(BNHSProperty.INSTITUTE, resource);
-
 	}
     };
 
@@ -759,7 +756,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    }
 		}
 	    }
-
 	}
     };
 
@@ -777,7 +773,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    }
 		}
 	    }
-
 	}
     };
 
