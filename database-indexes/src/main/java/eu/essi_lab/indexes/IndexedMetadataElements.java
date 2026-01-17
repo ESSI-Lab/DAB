@@ -726,19 +726,10 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
-
-	    Iterator<ResponsibleParty> contactIterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getContacts();
-	    while (contactIterator != null && contactIterator.hasNext()) {
-		ResponsibleParty responsibleParty = (ResponsibleParty) contactIterator.next();
-		parties.add(responsibleParty);
-	    }
-
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
-
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
+	    List<ResponsibleParty> parties = getAllParties(resource);
 
 	    for (ResponsibleParty party : parties) {
+
 		if (party != null) {
 		    String orgName = party.getOrganisationName();
 		    if (checkStringValue(orgName)) {
@@ -756,14 +747,13 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
+	    List<ResponsibleParty> parties = getAllParties(resource);
 
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
-
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
 	    for (ResponsibleParty party : parties) {
 		if (party != null) {
+
 		    String role = party.getRoleCode();
+
 		    if (checkStringValue(role)) {
 			addValue(role);
 		    }
@@ -777,11 +767,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
-
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
-
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
+	    List<ResponsibleParty> parties = getAllParties(resource);
 
 	    for (ResponsibleParty party : parties) {
 		if (party != null) {
@@ -795,14 +781,52 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    /**
+     * @param resource
+     * @return
+     */
+    private static List<ResponsibleParty> getAllParties(GSResource resource) {
+
+	List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
+
+	MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+
+	Iterator<ResponsibleParty> contacts = miMetadata.getContacts();//
+
+	while (contacts != null && contacts.hasNext()) {
+
+	    ResponsibleParty responsibleParty = contacts.next();
+
+	    parties.add(responsibleParty);
+	}
+
+	Iterator<DataIdentification> dataIds = miMetadata.getDataIdentifications();
+
+	while (dataIds != null && dataIds.hasNext()) {
+
+	    DataIdentification dataId = dataIds.next();
+
+	    parties.addAll(dataId.getPointOfContactParty());
+
+	    parties.addAll(dataId.getCitedParty());
+	}
+
+	parties.addAll(miMetadata.getDistribution().getDistributorParties());
+
+	return parties;
+    }
+
     public static final IndexedMetadataElement ORIGINATOR_ORGANISATION_IDENTIFIER = new IndexedMetadataElement(
 	    MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER) {
 	@Override
 	public void defineValues(GSResource resource) {
 
 	    ExtensionHandler handler = resource.getExtensionHandler();
+
 	    List<String> identifiers = handler.getOriginatorOrganisationIdentifiers();
+
 	    for (String identifier : identifiers) {
+
 		if (checkStringValue(identifier)) {
 		    addValue(identifier);
 		}
@@ -816,17 +840,24 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    HashSet<String> names = new HashSet<>();
 
-	    List<ResponsibleParty> originators = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
-		    .getOriginatorParty();
+	    List<ResponsibleParty> originators = resource.getHarmonizedMetadata(). //
+		    getCoreMetadata().//
+		    getDataIdentification().//
+		    getOriginatorParty();//
+
 	    for (ResponsibleParty originator : originators) {
+
 		String orgName = originator.getOrganisationName();
+
 		if (checkStringValue(orgName)) {
 		    names.add(orgName);
 		}
 	    }
 
 	    ExtensionHandler handler = resource.getExtensionHandler();
+
 	    List<String> descriptions = handler.getOriginatorOrganisationDescriptions();
+
 	    for (String description : descriptions) {
 		if (checkStringValue(description)) {
 		    names.add(description);
@@ -2294,7 +2325,8 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
-    public static final IndexedMetadataElement METADATA_ORIGINAL_VERSION = new IndexedMetadataElement(MetadataElement.METADATA_ORIGINAL_VERSION) {
+    public static final IndexedMetadataElement METADATA_ORIGINAL_VERSION = new IndexedMetadataElement(
+	    MetadataElement.METADATA_ORIGINAL_VERSION) {
 	@Override
 	public void defineValues(GSResource resource) {
 
