@@ -25,7 +25,6 @@ import com.google.common.collect.*;
 import eu.essi_lab.access.compliance.*;
 import eu.essi_lab.access.compliance.DataComplianceTester.*;
 import eu.essi_lab.access.compliance.wrapper.*;
-import eu.essi_lab.iso.datamodel.*;
 import eu.essi_lab.iso.datamodel.classes.*;
 import eu.essi_lab.lib.xml.*;
 import eu.essi_lab.messages.*;
@@ -34,12 +33,9 @@ import eu.essi_lab.model.pluggable.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.model.resource.data.*;
 import eu.essi_lab.pdk.rsm.*;
-import net.opengis.iso19139.gco.v_20060504.*;
-import net.opengis.iso19139.gmx.v_20060504.*;
 import org.json.*;
 
 import javax.ws.rs.core.*;
-import javax.xml.bind.*;
 import javax.xml.datatype.*;
 import java.net.*;
 import java.util.*;
@@ -198,50 +194,48 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    report.put("rasterMosaic", mosaic);
 	});
 
-	Iterator<ResponsibleParty> contacts = mi_Metadata.getContacts();//
-
 	// ------------------------------
 	// distributor and owner org.name
 	// ------------------------------
 
-	while (contacts != null && contacts.hasNext()) {
+	ArrayList<ResponsibleParty> contacts = Lists.newArrayList(mi_Metadata.getContacts());//
 
-	    ResponsibleParty responsibleParty = contacts.next();
+	contacts.forEach(contact -> {
 
-	    handleOrgName(responsibleParty, report);
-	}
+	    handleOrgName(contact, report);
+	});
+
+	// -----------
+	// native EPSG
+	// -----------
 
 	mi_Metadata.getReferenceSystemInfos().forEachRemaining(info -> {
 
-	    final CharacterStringPropertyType type = info.getElementType().getReferenceSystemIdentifier().getRSIdentifier().getCode();
+	    info.getCodeAnchorType().ifPresent(anchor -> {
 
-	    final JAXBElement<?> characterString = type.getCharacterString();
+		String label = anchor.getTitle();
+		String url = anchor.getHref();
 
-	    final Object value = characterString.getValue();
+		JSONObject epsg = new JSONObject();
 
-	    if (value instanceof AnchorType anchor) {
+		epsg.put("label", label);
+		epsg.put("url", url);
 
-		final String label = anchor.getTitle();
-		final String url = anchor.getHref();
+		report.put("nativeEPSG", epsg);
+	    });
 
-		//
-		// TODO
-		//
+	    info.getCodeString().ifPresent(string -> {
 
-	    } else if (value instanceof CharacterStringPropertyType string) {
+		JSONObject epsg = new JSONObject();
 
-		final String label = ISOMetadata.getStringFromCharacterString(string);
+		epsg.put("label", string);
 
-		//
-		// TODO
-		//
-
-	    }
-
+		report.put("nativeEPSG", epsg);
+	    });
 	});
 
 	// --------------------
-	// coverageDescription (API TO IMPLEMENT)
+	// coverageDescription
 	// --------------------
 
 	CoverageDescription covDesc = mi_Metadata.getCoverageDescription();
@@ -440,8 +434,6 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	JSONArray keywordTypeArray = new JSONArray();
 	JSONArray topicArray = new JSONArray();
 	JSONArray overviewArray = new JSONArray();
-
-
 
 	for (DataIdentification identification : diList) {
 

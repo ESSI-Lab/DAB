@@ -10,27 +10,26 @@ package eu.essi_lab.iso.datamodel.classes;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.InputStream;
+import eu.essi_lab.iso.datamodel.*;
+import eu.essi_lab.jaxb.common.*;
+import net.opengis.iso19139.gco.v_20060504.*;
+import net.opengis.iso19139.gmd.v_20060504.*;
+import net.opengis.iso19139.gmx.v_20060504.*;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-
-import eu.essi_lab.iso.datamodel.ISOMetadata;
-import eu.essi_lab.jaxb.common.ObjectFactories;
-import net.opengis.iso19139.gmd.v_20060504.MDReferenceSystemType;
-import net.opengis.iso19139.gmd.v_20060504.RSIdentifierPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.RSIdentifierType;
+import javax.xml.bind.*;
+import java.io.*;
+import java.util.*;
 
 public class ReferenceSystem extends ISOMetadata<MDReferenceSystemType> {
 
@@ -52,17 +51,50 @@ public class ReferenceSystem extends ISOMetadata<MDReferenceSystemType> {
     @Override
     public JAXBElement<MDReferenceSystemType> getElement() {
 
-	JAXBElement<MDReferenceSystemType> element = ObjectFactories.GMD().createMDReferenceSystem(type);
-	return element;
+	return ObjectFactories.GMD().createMDReferenceSystem(type);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<AnchorType> getCodeAnchorType() {
+
+	try {
+
+	    CharacterStringPropertyType type = getElementType().getReferenceSystemIdentifier().getRSIdentifier().getCode();
+
+	    JAXBElement<?> characterString = type.getCharacterString();
+
+	    Object value = characterString.getValue();
+
+	    if (value instanceof AnchorType anchor) {
+
+		return Optional.of(anchor);
+	    }
+
+	} catch (Exception e) {
+	}
+
+	return Optional.empty();
+
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getCodeString() {
+
+	return Optional.ofNullable(getCode());
     }
 
     /**
      * @XPathDirective(target = "gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gco:CharacterString")
      */
+    @Deprecated
     public String getCode() {
 	try {
 	    return ISOMetadata.getStringFromCharacterString(type.getReferenceSystemIdentifier().getRSIdentifier().getCode());
-	} catch (NullPointerException e) {
+	} catch (Exception e) {
 	}
 	return null;
     }
@@ -100,13 +132,13 @@ public class ReferenceSystem extends ISOMetadata<MDReferenceSystemType> {
 	return null;
     }
 
-	/**
-	 * @XPathDirective(target = "gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gco:CharacterString")
-	 */
-	public void setCodeWithAnchor(String codeHref, String codeLabel) {
-		initRSIdentifier();
-		type.getReferenceSystemIdentifier().getRSIdentifier().setCode(createAnchorPropertyType(codeHref,codeLabel));
-	}
+    /**
+     * @XPathDirective(target = "gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gco:CharacterString")
+     */
+    public void setCodeWithAnchor(String codeHref, String codeLabel) {
+	initRSIdentifier();
+	type.getReferenceSystemIdentifier().getRSIdentifier().setCode(createAnchorPropertyType(codeHref, codeLabel));
+    }
 
     /**
      * @XPathDirective(target = "gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gco:CharacterString")
