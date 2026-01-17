@@ -807,9 +807,9 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    DataIdentification dataId = dataIds.next();
 
-	    parties.addAll(dataId.getPointOfContactParty());
-
 	    parties.addAll(dataId.getCitedParty());
+
+	    dataId.getPointOfContacts().forEachRemaining(parties::add);
 	}
 
 	parties.addAll(miMetadata.getDistribution().getDistributorParties());
