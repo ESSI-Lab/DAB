@@ -33,6 +33,7 @@ import eu.essi_lab.model.pluggable.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.model.resource.data.*;
 import eu.essi_lab.pdk.rsm.*;
+import net.opengis.iso19139.gmx.v_20060504.*;
 import org.json.*;
 
 import javax.ws.rs.core.*;
@@ -209,30 +210,40 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	// native EPSG
 	// -----------
 
+	JSONArray epsgArray = new JSONArray();
+
 	mi_Metadata.getReferenceSystemInfos().forEachRemaining(info -> {
 
-	    info.getCodeAnchorType().ifPresent(anchor -> {
+	    Optional<AnchorType> codeAnchorType = info.getCodeAnchorType();
 
-		String label = anchor.getTitle();
-		String url = anchor.getHref();
+	    Optional<String> codeString = info.getCodeString();
+
+	    if(codeAnchorType.isPresent()) {
+
+		String label = codeAnchorType.get().getTitle();
+		String url = codeAnchorType.get().getHref();
 
 		JSONObject epsg = new JSONObject();
 
 		epsg.put("label", label);
 		epsg.put("url", url);
 
-		report.put("nativeEPSG", epsg);
-	    });
+		epsgArray.put(epsg);
 
-	    info.getCodeString().ifPresent(string -> {
+	    }else if(codeString.isPresent()){
 
 		JSONObject epsg = new JSONObject();
 
-		epsg.put("label", string);
+		epsg.put("label", codeString.get());
 
-		report.put("nativeEPSG", epsg);
-	    });
+		epsgArray.put(epsg);
+	    }
 	});
+
+	if(!epsgArray.isEmpty()){
+
+	    report.put("nativeEPSG", epsgArray);
+	}
 
 	// --------------------
 	// coverageDescription
