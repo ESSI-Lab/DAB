@@ -389,48 +389,6 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    // -----------
 
 	    normalizeText(firstId.getAbstract()).ifPresent(desc -> report.put("description", desc));
-
-	    // --------
-	    // updated
-	    // --------
-
-	    String revDate = firstId.getCitationRevisionDate();
-
-	    String revDateTime = null;
-
-	    XMLGregorianCalendar dateTime = firstId.getCitationRevisionDateTime();
-
-	    if (dateTime != null) {
-		revDateTime = dateTime.toString();
-	    }
-
-	    if (revDate != null || revDateTime != null) {
-		if (revDate != null) {
-		    report.put("update", revDate);
-		} else {
-		    report.put("update", revDateTime);
-		}
-	    }
-
-	    // --------
-	    // created
-	    // --------
-
-	    String crDate = firstId.getCitationCreationDate();
-
-	    String crDateTime = null;
-	    dateTime = firstId.getCitationCreationDateTime();
-
-	    if (dateTime != null) {
-		crDateTime = dateTime.toString();
-	    }
-
-	    String created = crDate != null ? crDate : crDateTime;
-
-	    if (created != null) {
-
-		report.put("created", created);
-	    }
 	}
 
 	// ---------------------------------------------
@@ -450,6 +408,10 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	JSONArray overviewArray = new JSONArray();
 	JSONArray spatialRepTypeArray = new JSONArray();
 
+	JSONArray updatedArray = new JSONArray();
+	JSONArray createdArray = new JSONArray();
+	JSONArray expirationArray = new JSONArray();
+
 	for (DataIdentification identification : diList) {
 
 	    // --------------------------
@@ -467,41 +429,19 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    // updated
 	    // -------
 
-	    String revDate = identification.getCitationDate(Identification.REVISION);
-
-	    if (revDate != null && !revDate.isEmpty()) {
-
-		report.put("updated", revDate);
-
-	    } else {
-
-		XMLGregorianCalendar revDateTime = identification.getCitationDateTime(Identification.REVISION);
-
-		if (revDateTime != null) {
-
-		    report.put("updated", revDateTime.toString());
-		}
-	    }
+	    handleCitationDate(identification, updatedArray, Identification.REVISION);
 
 	    // ----------
 	    // expiration
 	    // ----------
 
-	    String expDate = identification.getCitationDate(Identification.EXPIRATION);
+	    handleCitationDate(identification, expirationArray, Identification.EXPIRATION);
 
-	    if (expDate != null && !expDate.isEmpty()) {
+	    // ----------
+	    // creation
+	    // ----------
 
-		report.put("expiration", expDate);
-
-	    } else {
-
-		XMLGregorianCalendar expDateTime = identification.getCitationDateTime(Identification.EXPIRATION);
-
-		if (expDateTime != null) {
-
-		    report.put("expiration", expDateTime.toString());
-		}
-	    }
+	    handleCitationDate(identification, createdArray, Identification.CREATION);
 
 	    // -------
 	    // rights
@@ -725,6 +665,27 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    overviewArray.put(fileName);
 		}
 	    }
+	}
+
+	// ------------------------
+	// inserts updates dates
+	if (!updatedArray.isEmpty()) {
+
+	    report.put("updated", updatedArray);
+	}
+
+	// ------------------------
+	// inserts created dates
+	if (!createdArray.isEmpty()) {
+
+	    report.put("created", createdArray);
+	}
+
+	// ------------------------
+	// inserts expiration dates
+	if (!expirationArray.isEmpty()) {
+
+	    report.put("expiration", expirationArray);
 	}
 
 	// ------------------------
@@ -1005,6 +966,30 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    } else if (roleCode.equals("distributor")) {
 
 		distributionOrgNameArray.put(orgName);
+	    }
+	}
+    }
+
+    /**
+     * @param identification
+     * @param dateArray
+     * @param type
+     */
+    private void handleCitationDate(Identification identification, JSONArray dateArray, String type) {
+
+	String revDate = identification.getCitationDate(type);
+
+	if (revDate != null && !revDate.isEmpty()) {
+
+	    dateArray.put(revDate);
+
+	} else {
+
+	    XMLGregorianCalendar revDateTime = identification.getCitationDateTime(type);
+
+	    if (revDateTime != null) {
+
+		dateArray.put(revDateTime.toString());
 	    }
 	}
     }
