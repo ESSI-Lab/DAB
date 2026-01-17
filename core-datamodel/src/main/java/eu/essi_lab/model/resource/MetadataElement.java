@@ -90,11 +90,6 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    DISTRIBUTOR_ORG_NAME("distOrgName"),
-
-    /**
-     *
-     */
     DATE_STAMP("dateStamp", "Date stamp", ContentType.ISO8601_DATE_TIME),
 
     /**
@@ -425,6 +420,10 @@ public enum MetadataElement implements Queryable {
      */
     OWNER_ORGANISATION_NAME("ownerOrgName"),
 
+    /**
+     *
+     */
+    DISTRIBUTOR_ORGANISATION_NAME("distOrgName"),
 
     /**
      *
