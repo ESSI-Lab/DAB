@@ -430,29 +430,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
-    public static final IndexedMetadataElement DISTRIBUTOR_ORG_NAME = new IndexedMetadataElement(MetadataElement.DISTRIBUTOR_ORG_NAME) {
-	@Override
-	public void defineValues(GSResource resource) {
-
-	    Distribution distribution = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution();
-
-	    if (distribution == null) {
-		return;
-	    }
-
-	    final List<ResponsibleParty> parties = distribution.getDistributorParties();
-
-	    parties.forEach(party -> {
-
-		final String name = party.getOrganisationName();
-		if (checkStringValue(name)) {
-
-		    addValue(name);
-		}
-	    });
-	}
-    };
-
     public static final IndexedMetadataElement ONLINE_PROTOCOL = new IndexedMetadataElement(MetadataElement.ONLINE_PROTOCOL) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -698,27 +675,56 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
-    public static final IndexedMetadataElement OWNER_ORGANISATION_NAME = new IndexedMetadataElement(
+    /**
+     *
+     */
+    public static final IndexedMetadataElement OWNER_ORGANISATION_NAME = new IndexedMetadataElement(//
 	    MetadataElement.OWNER_ORGANISATION_NAME) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    List<ResponsibleParty> parties = getAllParties(resource);
+	    getPartyNamesByRoleCode(resource, "owner").forEach(this::addValue);
+	}
+    };
 
-	    for (ResponsibleParty party : parties) {
+    /**
+     *
+     */
+    public static final IndexedMetadataElement DIST_ORGANISATION_NAME = new IndexedMetadataElement(//
+	    MetadataElement.DISTRIBUTOR_ORGANISATION_NAME) {
+	@Override
+	public void defineValues(GSResource resource) {
 
-		if (party != null) {
-		    String roleCode = party.getRoleCode();
-		    if(roleCode != null && roleCode.equals("owner")) {
-			String orgName = party.getOrganisationName();
-			if (checkStringValue(orgName)) {
-			    addValue(orgName);
-			}
+	    getPartyNamesByRoleCode(resource, "distributor").forEach(this::addValue);
+	}
+    };
+
+    /**
+     * @param resource
+     * @param code
+     * @return
+     */
+    private static List<String> getPartyNamesByRoleCode(GSResource resource, String code) {
+
+	List<ResponsibleParty> parties = getAllParties(resource);
+
+	ArrayList<String> out = new ArrayList<>();
+
+	for (ResponsibleParty party : parties) {
+
+	    if (party != null) {
+		String roleCode = party.getRoleCode();
+		if (roleCode != null && roleCode.equals("distributor")) {
+		    String orgName = party.getOrganisationName();
+		    if (checkStringValue(orgName)) {
+			out.add(orgName);
 		    }
 		}
 	    }
 	}
-    };
+
+	return out;
+    }
 
     public static final IndexedMetadataElement ORGANISATION_NAME = new IndexedMetadataElement(MetadataElement.ORGANISATION_NAME) {
 	@Override

@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.os;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -128,21 +128,6 @@ public abstract class OSParameters {
      *
      */
     public static final OSParameter SORT_BY = new OSParameter("sortBy", "string", null, "{gs:sortBy}");
-
-    /**
-     *
-     */
-    public static final OSParameter DISTRIBUTOR_ORG_NAME = new OSParameter("distOrgName", "string", null, "{gs:distOrgName}") {
-
-	@Override
-	public Optional<Bond> asBond(String value, String... relatedValues) {
-
-	    return Optional.of( //
-		    BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, //
-			    MetadataElement.DISTRIBUTOR_ORG_NAME,//
-			    value));//
-	}
-    };
 
     /**
      *
@@ -475,10 +460,6 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
-		return Optional.empty();
-	    }
-
 	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.ORGANISATION_NAME);
 	}
     };
@@ -490,11 +471,19 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
-		return Optional.empty();
-	    }
-
 	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.OWNER_ORGANISATION_NAME);
+	}
+    };
+
+    /**
+     *
+     */
+    public static final OSParameter DIST_ORGANISATION_NAME = new OSParameter("distOrgName", "string", null, "{gs:distOrgName}") {
+
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.DISTRIBUTOR_ORGANISATION_NAME);
 	}
     };
 
