@@ -476,7 +476,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.ORGANISATION_NAME);
+	    return readMultiValues(value, MetadataElement.ORGANISATION_NAME);
 	}
     };
 
@@ -487,7 +487,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.OWNER_ORGANISATION_NAME);
+	    return readMultiValues(value, MetadataElement.OWNER_ORGANISATION_NAME);
 	}
     };
 
@@ -499,7 +499,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.DISTRIBUTOR_ORGANISATION_NAME);
+	    return readMultiValues(value, MetadataElement.DISTRIBUTOR_ORGANISATION_NAME);
 	}
     };
 
@@ -1517,13 +1517,13 @@ public abstract class OSParameters {
 
 	    for (String s : split) {
 		orBond.getOperands().add(//
-			BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, s));
+			BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, s));
 	    }
 
 	    return Optional.of(orBond);
 	}
 
-	return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, paramValue));
+	return Optional.of(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, paramValue));
     }
 
     /**
