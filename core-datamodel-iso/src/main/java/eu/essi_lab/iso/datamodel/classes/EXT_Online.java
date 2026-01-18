@@ -6,7 +6,6 @@ import eu.essi_lab.lib.xml.*;
 import org.w3c.dom.*;
 
 import javax.xml.bind.*;
-import javax.xml.bind.annotation.*;
 import javax.xml.namespace.*;
 import java.io.*;
 import java.nio.charset.*;
@@ -23,6 +22,60 @@ public class EXT_Online extends Online {
 	    context = JAXBContext.newInstance(EXT_CIOnlineResourceType.class);
 	} catch (JAXBException e) {
 	    GSLoggerFactory.getLogger(EXT_Online.class).error(e);
+	}
+    }
+
+    /**
+     * @param online
+     * @throws JAXBException
+     */
+    public EXT_Online(Online online) {
+
+	super(new EXT_CIOnlineResourceType());
+
+	if (online.getLinkage() != null) {
+
+	    setLinkage(online.getLinkage());
+	}
+
+	if (online.getName() != null) {
+
+	    setName(online.getName());
+	}
+
+	if (online.getDescription() != null) {
+
+	    setDescription(online.getDescription());
+	}
+
+	if (online.getIdentifier() != null) {
+
+	    setIdentifier(online.getIdentifier());
+	}
+
+	if (online.getProtocol() != null) {
+
+	    setProtocol(online.getProtocol());
+	}
+
+	if (online.getFunctionCode() != null) {
+
+	    setFunctionCode(online.getFunctionCode());
+	}
+
+	if (online.getApplicationProfile() != null) {
+
+	    setApplicationProfile(online.getApplicationProfile());
+	}
+
+	if (online.getDescriptionGmxAnchor() != null) {
+
+	    setDescriptionGmxAnchor(online.getDescriptionGmxAnchor());
+	}
+
+	if (online.getProtocolGmxAnchor() != null) {
+
+	    setProtocolAnchor(online.getProtocolGmxAnchor(), online.getProtocolValueGmxAnchor());
 	}
     }
 

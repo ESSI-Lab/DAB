@@ -15,6 +15,54 @@ import java.io.*;
 public class EXT_OnlineTest {
 
     @Test
+    public void wrapperTest1(){
+
+	Online online = new Online();
+
+	online.setName("name");
+	online.setProtocol("protocol");
+	online.setDescription("desc");
+	online.setLinkage("link");
+	online.setFunctionCode("download");
+	online.setIdentifier("id");
+
+	EXT_Online extOnline = new EXT_Online(online);
+
+	Assert.assertEquals("name", extOnline.getName());
+	Assert.assertEquals("protocol", extOnline.getProtocol());
+	Assert.assertEquals("desc", extOnline.getDescription());
+	Assert.assertEquals("link", extOnline.getLinkage());
+	Assert.assertEquals("download", extOnline.getFunctionCode());
+	Assert.assertEquals("id", extOnline.getIdentifier());
+    }
+
+    @Test
+    public void wrapperWithAnchorTest(){
+
+	Online online = new Online();
+
+	online.setDescriptionGmxAnchor("descriptionGmxAnchor");
+	online.setProtocolAnchor("protocolHrefGmxAnchor", "protocolValueGmxAnchor");
+
+	online.setName("name");
+	online.setLinkage("link");
+	online.setFunctionCode("download");
+	online.setIdentifier("id");
+
+	EXT_Online extOnline = new EXT_Online(online);
+
+	Assert.assertEquals("descriptionGmxAnchor", extOnline.getDescriptionGmxAnchor());
+	Assert.assertEquals("protocolHrefGmxAnchor", extOnline.getProtocolGmxAnchor());
+	Assert.assertEquals("protocolValueGmxAnchor", extOnline.getProtocolValueGmxAnchor());
+
+	Assert.assertEquals("name", extOnline.getName());
+	Assert.assertEquals("link", extOnline.getLinkage());
+	Assert.assertEquals("download", extOnline.getFunctionCode());
+	Assert.assertEquals("id", extOnline.getIdentifier());
+    }
+
+
+    @Test
     public void initTest() {
 
 	EXT_Online extOnline = new EXT_Online();
