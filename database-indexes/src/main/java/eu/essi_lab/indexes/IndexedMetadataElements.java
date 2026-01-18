@@ -714,7 +714,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    if (party != null) {
 		String roleCode = party.getRoleCode();
-		if (roleCode != null && roleCode.equals("distributor")) {
+		if (roleCode != null && roleCode.equals(code)) {
 		    String orgName = party.getOrganisationName();
 		    if (checkStringValue(orgName)) {
 			out.add(orgName);
