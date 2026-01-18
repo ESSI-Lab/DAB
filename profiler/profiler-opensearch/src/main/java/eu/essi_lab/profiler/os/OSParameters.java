@@ -98,7 +98,23 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return createBond(value, MetadataElement.RASTER_MOSAIC);
+	    if(value == null || value.isEmpty()){
+
+		return Optional.empty();
+	    }
+
+	    boolean parsed = Boolean.parseBoolean(value);
+
+	    Bond bond = BondFactory.createSimpleValueBond(MetadataElement.RASTER_MOSAIC, parsed);
+
+	    if (parsed) {
+
+		return Optional.of(bond);
+	    }
+
+	    return Optional.of(BondFactory.createOrBond( //
+		    bond, //
+		    BondFactory.createNotExistsSimpleValueBond(MetadataElement.RASTER_MOSAIC)));
 	}
     };
 
@@ -197,7 +213,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return createBond(value, MetadataElement.KEYWORD);
+	    return createEqualBond(value, MetadataElement.KEYWORD);
 	}
     };
 
@@ -219,7 +235,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return createBond(value, MetadataElement.DISTRIBUTION_FORMAT);
+	    return createEqualBond(value, MetadataElement.DISTRIBUTION_FORMAT);
 	}
     };
 
@@ -230,7 +246,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return createBond(value, MetadataElement.ONLINE_PROTOCOL);
+	    return createEqualBond(value, MetadataElement.ONLINE_PROTOCOL);
 	}
     };
 
@@ -288,7 +304,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.INSTRUMENT_IDENTIFIER);
+	    return createEqualBond(value, MetadataElement.INSTRUMENT_IDENTIFIER);
 	}
     };
 
@@ -304,7 +320,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.INSTRUMENT_DESCRIPTION);
+	    return createEqualBond(value, MetadataElement.INSTRUMENT_DESCRIPTION);
 	}
     };
 
@@ -334,7 +350,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.PLATFORM_IDENTIFIER);
+	    return createEqualBond(value, MetadataElement.PLATFORM_IDENTIFIER);
 	}
     };
 
@@ -362,7 +378,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.TIME_RESOLUTION_DURATION_8601);
+	    return createEqualBond(value, MetadataElement.TIME_RESOLUTION_DURATION_8601);
 	}
     };
 
@@ -375,7 +391,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.TIME_AGGREGATION_DURATION_8601);
+	    return createEqualBond(value, MetadataElement.TIME_AGGREGATION_DURATION_8601);
 	}
     };
 
@@ -387,7 +403,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.TIME_INTERPOLATION);
+	    return createEqualBond(value, MetadataElement.TIME_INTERPOLATION);
 	}
     };
 
@@ -402,7 +418,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.PLATFORM_DESCRIPTION);
+	    return createEqualBond(value, MetadataElement.PLATFORM_DESCRIPTION);
 	}
     };
 
@@ -418,7 +434,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER);
+	    return createEqualBond(value, MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER);
 	}
     };
 
@@ -434,7 +450,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
+	    return createEqualBond(value, MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
 	}
     };
 
@@ -449,7 +465,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.THEME_CATEGORY);
+	    return createEqualBond(value, MetadataElement.THEME_CATEGORY);
 	}
     };
 
@@ -503,7 +519,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.ATTRIBUTE_IDENTIFIER);
+	    return createEqualBond(value, MetadataElement.ATTRIBUTE_IDENTIFIER);
 	}
     };
 
@@ -518,7 +534,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.ATTRIBUTE_DESCRIPTION);
+	    return createEqualBond(value, MetadataElement.ATTRIBUTE_DESCRIPTION);
 	}
     };
 
@@ -549,7 +565,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.OBSERVED_PROPERTY_URI);
+	    return createEqualBond(value, MetadataElement.OBSERVED_PROPERTY_URI);
 	}
     };
 
@@ -1515,9 +1531,8 @@ public abstract class OSParameters {
      * @param element
      * @return
      */
-    private static Optional<Bond> createBond(String value, MetadataElement element) {
+    private static Optional<Bond> createEqualBond(String value, MetadataElement element) {
 
 	return BondUtils.createBond(BondOperator.EQUAL, value, element);
     }
-
 }
