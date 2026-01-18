@@ -302,7 +302,7 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    RASTER_MOSAIC("rasterMosaic"),
+    RASTER_MOSAIC("rasterMosaic", ContentType.BOOLEAN),
 
     /**
      *
