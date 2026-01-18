@@ -278,6 +278,28 @@ public class BondFactory {
     }
 
     /**
+     * Creates a {@link SimpleValueBond} using {@link BondOperator#NOT_EXISTS} as operator
+     *
+     * @param element
+     * @return
+     */
+    public static SimpleValueBond createNotExistsSimpleValueBond(MetadataElement element) {
+
+	return new SimpleValueBond(BondOperator.NOT_EXISTS, element, null);
+    }
+
+    /**
+     * Creates a {@link ResourcePropertyBond} using {@link BondOperator#NOT_EXISTS} as operator.
+     *
+     * @param property
+     * @return
+     */
+    public static ResourcePropertyBond createNotExistsResourcePropertyBond(ResourceProperty property) throws IllegalArgumentException {
+
+	return new ResourcePropertyBond(BondOperator.NOT_EXISTS, property);
+    }
+
+    /**
      * Creates a simple value bond applied on the given string <code>value</code>.<br>
      * The supplied <code>element</code> must have one of the following {@link ContentType}:
      * <ul>
