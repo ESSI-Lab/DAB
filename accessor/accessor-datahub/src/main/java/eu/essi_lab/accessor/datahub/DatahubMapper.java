@@ -761,23 +761,56 @@ public class DatahubMapper extends FileIdentifierMapper {
 			online.setApplicationProfile(applicationProfile);
 		    }
 
-		    // TODO: query_string_fragment, layer_pk, temporal_wms, layer_style
-		    // These fields don't have direct ISO 19115 mappings and should be added as extension elements
+		    //
+		    // EXT_Online
+		    //
+
 		    String queryStringFragment = onlineResourceObj.optString("query_string_fragment", null);
+
 		    String layerPk = onlineResourceObj.optString("layer_pk", null);
-		    Boolean temporalWms = onlineResourceObj.optBoolean("temporal_wms", false);
+
+		    boolean temporalWms = onlineResourceObj.optBoolean("temporal_wms", false);
+
 		    JSONObject layerStyle = onlineResourceObj.optJSONObject("layer_style");
-		    if (layerStyle != null) {
-			layerStyle.optString("name");
-			layerStyle.optString("workspace");
-		    }
 
 		    if (queryStringFragment != null || layerPk != null || temporalWms || layerStyle != null) {
-			logger.debug(
-				"TODO: Add extension elements for online resource extensions (query_string_fragment, layer_pk, temporal_wms, layer_style)");
-		    }
 
-		    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+			EXT_Online extOnline = new EXT_Online(online);
+
+			if (queryStringFragment != null) {
+
+			    extOnline.getElementType().setQueryStringFragment(queryStringFragment);
+			}
+
+			if (layerPk != null) {
+
+			    extOnline.getElementType().setLayerPk(layerPk);
+			}
+
+			if (layerStyle != null) {
+
+			    String layerStyleName = layerStyle.optString("name");
+			    String layerStyleWs = layerStyle.optString("workspace");
+
+			    if (layerStyleName != null) {
+
+				extOnline.getElementType().setLayerStyleName(layerStyleName);
+			    }
+
+			    if (layerStyleWs != null) {
+
+				extOnline.getElementType().setLayerStyleWorkspace(layerStyleWs);
+			    }
+			}
+
+			extOnline.getElementType().setTemporal(temporalWms);
+
+			coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(extOnline);
+
+		    } else {
+
+			coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+		    }
 		}
 	    }
 	}

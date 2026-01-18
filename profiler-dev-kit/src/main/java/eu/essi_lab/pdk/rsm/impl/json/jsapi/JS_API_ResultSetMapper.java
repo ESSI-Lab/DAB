@@ -312,6 +312,8 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	    onlineList.addAll(Lists.newArrayList(distribution.getDistributorOnlines()));
 
+	    onlineList.addAll(Lists.newArrayList(distribution.getExtendedDistributionOnlines()));
+
 	    if (!onlineList.isEmpty()) {
 
 		JSONArray online = new JSONArray();
@@ -1051,6 +1053,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	JSONObject online = new JSONObject();
 	boolean addOnline = false;
+
 	if (url != null) {
 
 	    // filter old gi-axe urls
@@ -1127,6 +1130,50 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		anchor = "direct";
 	    }
 	    online.put("accessType", anchor);
+	}
+
+	if (on instanceof EXT_Online extOnline) {
+
+	    String queryStringFragment = extOnline.getElementType().getQueryStringFragment();
+
+	    if (queryStringFragment != null && !queryStringFragment.isEmpty()) {
+
+		online.put("queryStringFragment", queryStringFragment);
+	    }
+
+	    String layerPk = extOnline.getElementType().getLayerPk();
+
+	    if (layerPk != null && !layerPk.isEmpty()) {
+
+		online.put("layerPk", layerPk);
+
+	    }
+
+	    boolean temporal = extOnline.getElementType().isTemporal();
+
+	    online.put("temporal", temporal);
+
+	    JSONObject layerStyle = new JSONObject();
+
+	    String layerStyleName = extOnline.getElementType().getLayerStyleName();
+
+	    if (layerStyleName != null && !layerStyleName.isEmpty()) {
+
+		layerStyle.put("name", layerStyleName);
+	    }
+
+	    String layerStyleWorkspace = extOnline.getElementType().getLayerStyleWorkspace();
+
+	    if (layerStyleWorkspace != null && !layerStyleWorkspace.isEmpty()) {
+
+		layerStyle.put("workspace", layerStyleWorkspace);
+	    }
+
+	    if (!layerStyle.keySet().isEmpty()) {
+
+		online.put("layerStyle", layerStyle);
+	    }
+
 	}
 
 	if (addOnline) {
