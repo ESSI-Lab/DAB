@@ -707,7 +707,7 @@ public class DataIdentification extends Identification {
 
 	List<String> list = getSpatialRepresentationTypeCodeListValueList();
 
-	if (list.isEmpty()) {
+	if (!list.isEmpty()) {
 
 	    return list.get(0);
 	}
