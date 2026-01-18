@@ -10,75 +10,39 @@ package eu.essi_lab.accessor.datahub;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import eu.essi_lab.iso.datamodel.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.ommdk.*;
+import net.opengis.iso19139.gco.v_20060504.*;
+import net.opengis.iso19139.gmd.v_20060504.*;
+import org.json.*;
+import org.slf4j.*;
+
+import javax.xml.datatype.*;
+import java.math.*;
+import java.util.*;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEAlgorithmPropertyType;
-import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEAlgorithmType;
-import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessStepReportPropertyType;
-import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessStepReportType;
-import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessStepType;
-import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessingPropertyType;
-import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessingType;
-import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LESourcePropertyType;
-import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LESourceType;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-
-import eu.essi_lab.iso.datamodel.ISOMetadata;
-import eu.essi_lab.iso.datamodel.classes.Address;
-import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
-import eu.essi_lab.iso.datamodel.classes.Citation;
-import eu.essi_lab.iso.datamodel.classes.Contact;
-import eu.essi_lab.iso.datamodel.classes.Format;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
-import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
-import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
-import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.jaxb.common.ObjectFactories;
-import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
-import net.opengis.iso19139.gco.v_20060504.DateTimePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIResponsiblePartyPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDIdentifierPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDIdentifierType;
-import net.opengis.iso19139.gmd.v_20060504.MDClassificationCodePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDConstraintsPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDSecurityConstraintsType;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.CoreMetadata;
-import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.DatasetCollection;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.ModelSpecificFields;
-import eu.essi_lab.model.resource.OriginalMetadata;
-import eu.essi_lab.ommdk.FileIdentifierMapper;
 
 /**
  * Mapper for DataHub JSON metadata to GSResource
- * 
+ *
  * @author Generated
  */
 public class DatahubMapper extends FileIdentifierMapper {
@@ -275,9 +239,9 @@ public class DatahubMapper extends FileIdentifierMapper {
 	if (graphicOverview != null) {
 	    String graphicUrl = graphicOverview.optString("url", null);
 	    String graphicDescription = graphicOverview.optString("description", null);
-		String fileType = graphicOverview.optString("file_type", null);
+	    String fileType = graphicOverview.optString("file_type", null);
 	    if (graphicUrl != null) {
-		coreMetadata.getMIMetadata().getDataIdentification().addBrowseGraphic(graphicUrl, graphicDescription,fileType);
+		coreMetadata.getMIMetadata().getDataIdentification().addBrowseGraphic(graphicUrl, graphicDescription, fileType);
 	    }
 	}
 
@@ -490,10 +454,10 @@ public class DatahubMapper extends FileIdentifierMapper {
 			    thesaurusCitation.setTitle(thesaurusName);
 			}
 			if (publicationDate != null) {
-			    thesaurusCitation.addDate(publicationDate,"publication");
+			    thesaurusCitation.addDate(publicationDate, "publication");
 			}
 			if (revisionDate != null) {
-			    thesaurusCitation.addDate(revisionDate,"revision");
+			    thesaurusCitation.addDate(revisionDate, "revision");
 			}
 			keywords.setThesaurusCitation(thesaurusCitation);
 		    }
@@ -523,9 +487,9 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    if (thesaurus != null) {
 		Citation thesaurusCitation = new Citation();
 		String name = thesaurus.optString("name", "Spatial scope");
-			String url = thesaurus.optString("url", null);
+		String url = thesaurus.optString("url", null);
 
-			if (url != null) {
+		if (url != null) {
 		    thesaurusCitation.getElementType().setTitle(ISOMetadata.createAnchorPropertyType(url, name));
 		} else {
 		    thesaurusCitation.setTitle("Spatial scope");
@@ -559,7 +523,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    if (thesaurus != null) {
 		Citation thesaurusCitation = new Citation();
 		String url = thesaurus.optString("url", null);
-			String name = thesaurus.optString("name", "INSPIRE priority data set");
+		String name = thesaurus.optString("name", "INSPIRE priority data set");
 		if (url != null) {
 		    thesaurusCitation.getElementType().setTitle(ISOMetadata.createAnchorPropertyType(url, name));
 		} else {
@@ -582,12 +546,12 @@ public class DatahubMapper extends FileIdentifierMapper {
 	// Bounding box (EPSG:4326)
 	JSONObject bbox4326 = json.optJSONObject("bbox_4326");
 	if (bbox4326 != null) {
-	    BigDecimal west = bbox4326.optBigDecimal("west_bound_longitude",null);
-		BigDecimal east = bbox4326.optBigDecimal("east_bound_longitude",null);
-		BigDecimal south = bbox4326.optBigDecimal("south_bound_latitude",null);
-		BigDecimal north = bbox4326.optBigDecimal("north_bound_latitude",null);
+	    BigDecimal west = bbox4326.optBigDecimal("west_bound_longitude", null);
+	    BigDecimal east = bbox4326.optBigDecimal("east_bound_longitude", null);
+	    BigDecimal south = bbox4326.optBigDecimal("south_bound_latitude", null);
+	    BigDecimal north = bbox4326.optBigDecimal("north_bound_latitude", null);
 
-	    if (west!=null && east!=null && south!=null && north!=null) {
+	    if (west != null && east != null && south != null && north != null) {
 		coreMetadata.addBoundingBox(north, west, south, east);
 	    }
 	}
@@ -622,7 +586,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 			coordinates.add(Double.parseDouble(coordStr));
 		    }
 		}
-		
+
 		if (!coordinates.isEmpty()) {
 		    BoundingPolygon boundingPolygon = new BoundingPolygon();
 		    boundingPolygon.setCoordinates(coordinates);
@@ -697,24 +661,21 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    if (securityClassification != null || (securityNote != null && !"null".equals(securityNote))) {
 		// Create security constraints
 		MDSecurityConstraintsType securityConstraintsType = new MDSecurityConstraintsType();
-		
+
 		// Set classification (required field)
 		if (securityClassification != null && !securityClassification.isEmpty()) {
 		    MDClassificationCodePropertyType classificationProperty = new MDClassificationCodePropertyType();
-		    CodeListValueType classificationCode = ISOMetadata.createCodeListValueType(
-			ISOMetadata.MD_CLASSIFICATION_CODE_CODELIST, 
-			securityClassification, 
-			ISOMetadata.ISO_19115_CODESPACE, 
-			securityClassification);
+		    CodeListValueType classificationCode = ISOMetadata.createCodeListValueType(ISOMetadata.MD_CLASSIFICATION_CODE_CODELIST,
+			    securityClassification, ISOMetadata.ISO_19115_CODESPACE, securityClassification);
 		    classificationProperty.setMDClassificationCode(classificationCode);
 		    securityConstraintsType.setClassification(classificationProperty);
 		}
-		
+
 		// Set user note (optional field)
 		if (securityNote != null && !"null".equals(securityNote) && !securityNote.isEmpty()) {
 		    securityConstraintsType.setUserNote(ISOMetadata.createCharacterStringPropertyType(securityNote));
 		}
-		
+
 		// Add security constraints to resource constraints
 		MDConstraintsPropertyType constraintProperty = new MDConstraintsPropertyType();
 		constraintProperty.setMDConstraints(ObjectFactories.GMD().createMDSecurityConstraints(securityConstraintsType));
@@ -787,7 +748,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 		    if (protocol != null) {
 			String protocolCode = protocol.optString("code", null);
 			String protocolName = protocol.optString("name", null);
-			if (protocolCode != null ) {
+			if (protocolCode != null) {
 			    // Use anchor when code is available
 			    online.setProtocolAnchor(protocolCode, protocolName);
 			} else if (protocolName != null) {
@@ -806,13 +767,14 @@ public class DatahubMapper extends FileIdentifierMapper {
 		    String layerPk = onlineResourceObj.optString("layer_pk", null);
 		    Boolean temporalWms = onlineResourceObj.optBoolean("temporal_wms", false);
 		    JSONObject layerStyle = onlineResourceObj.optJSONObject("layer_style");
-			if (layerStyle!=null){
-				layerStyle.optString("name");
-				layerStyle.optString("workspace");
-			}
+		    if (layerStyle != null) {
+			layerStyle.optString("name");
+			layerStyle.optString("workspace");
+		    }
 
 		    if (queryStringFragment != null || layerPk != null || temporalWms || layerStyle != null) {
-			logger.debug("TODO: Add extension elements for online resource extensions (query_string_fragment, layer_pk, temporal_wms, layer_style)");
+			logger.debug(
+				"TODO: Add extension elements for online resource extensions (query_string_fragment, layer_pk, temporal_wms, layer_style)");
 		    }
 
 		    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
@@ -820,14 +782,12 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    }
 	}
 
-		// TODO:  raster_mosaic - no direct ISO 19115 mapping
-		// These should be added as extension element
-		if (json.has("raster_mosaic")) {
-			Boolean rasterMosaic = json.optBoolean("raster_mosaic", false);
-			resource.getExtensionHandler().setRasterMosaic(rasterMosaic);
-
-		}
+	if (json.has("raster_mosaic")) {
+	    boolean rasterMosaic = json.optBoolean("raster_mosaic", false);
+	    resource.getExtensionHandler().setRasterMosaic(rasterMosaic);
 	}
+    }
+
     /**
      * Maps quality information
      */
@@ -911,7 +871,8 @@ public class DatahubMapper extends FileIdentifierMapper {
 
 					// TODO: Citation doesn't have a direct method to add online resources
 					// This may need to be added as an extension or handled differently
-					logger.debug("TODO: Add online resource to citation - Citation class doesn't support online resources directly");
+					logger.debug(
+						"TODO: Add online resource to citation - Citation class doesn't support online resources directly");
 				    }
 				}
 			    }
@@ -949,10 +910,9 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    dataQuality = new eu.essi_lab.iso.datamodel.classes.DataQuality();
 	    metadata.addDataQuality(dataQuality);
 	}
-	
+
 	// Get or create lineage structure
-	net.opengis.iso19139.gmd.v_20060504.LILineagePropertyType lineageProperty = 
-	    dataQuality.getElementType().getLineage();
+	net.opengis.iso19139.gmd.v_20060504.LILineagePropertyType lineageProperty = dataQuality.getElementType().getLineage();
 	if (lineageProperty == null) {
 	    lineageProperty = new net.opengis.iso19139.gmd.v_20060504.LILineagePropertyType();
 	    dataQuality.getElementType().setLineage(lineageProperty);
@@ -962,7 +922,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    lineageType = new net.opengis.iso19139.gmd.v_20060504.LILineageType();
 	    lineageProperty.setLILineage(lineageType);
 	}
-	
+
 	// Create LIProcessStepType
 	LEProcessStepType processStepType = new LEProcessStepType();
 	// Map description (required)
@@ -973,13 +933,13 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    // Set empty description if not provided (required field)
 	    processStepType.setDescription(ISOMetadata.createCharacterStringPropertyType(""));
 	}
-	
+
 	// Map rationale (optional)
 	String rationale = processStepObj.optString("rationale", null);
 	if (rationale != null && !rationale.isEmpty()) {
 	    processStepType.setRationale(ISOMetadata.createCharacterStringPropertyType(rationale));
 	}
-	
+
 	// Map date (optional) - can be Date or DateTime
 	String date = processStepObj.optString("date", null);
 	if (date != null && !date.isEmpty()) {
@@ -995,27 +955,27 @@ public class DatahubMapper extends FileIdentifierMapper {
 		logger.warn("Error parsing date for process step: {}", date, e);
 	    }
 	}
-	
+
 	// Map processor (optional) - CI_ResponsibleParty with role "processor"
 	JSONObject processor = processStepObj.optJSONObject("processor");
 	if (processor != null) {
 	    ResponsibleParty processorParty = createResponsibleParty(processor);
 
-		// Set role to "processor" if not already set
-		if (processorParty.getRoleCode() == null || processorParty.getRoleCode().isEmpty()) {
-		    processorParty.setRoleCode("processor");
-		}
-		CIResponsiblePartyPropertyType processorProperty = new CIResponsiblePartyPropertyType();
-		processorProperty.setCIResponsibleParty(processorParty.getElementType());
-		processStepType.getProcessor().add(processorProperty);
+	    // Set role to "processor" if not already set
+	    if (processorParty.getRoleCode() == null || processorParty.getRoleCode().isEmpty()) {
+		processorParty.setRoleCode("processor");
+	    }
+	    CIResponsiblePartyPropertyType processorProperty = new CIResponsiblePartyPropertyType();
+	    processorProperty.setCIResponsibleParty(processorParty.getElementType());
+	    processStepType.getProcessor().add(processorProperty);
 
 	}
-	
+
 	// Map source (optional) - use LE_Source (GMI extension)
 	JSONObject source = processStepObj.optJSONObject("source");
 	if (source != null) {
 	    LESourceType sourceType = new LESourceType();
-	    
+
 	    // Map source citation if available
 	    JSONObject sourceCitation = source.optJSONObject("source_citation");
 	    if (sourceCitation != null) {
@@ -1024,31 +984,29 @@ public class DatahubMapper extends FileIdentifierMapper {
 		if (title != null) {
 		    citation.setTitle(title);
 		}
-		net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = 
-		    new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
+		net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
 		citationProperty.setCICitation(citation.getElementType());
 		sourceType.setSourceCitation(citationProperty);
 	    }
-	    
+
 	    // Map source description if available
 	    String sourceDescription = source.optString("description", null);
 	    if (sourceDescription != null && !sourceDescription.isEmpty()) {
 		sourceType.setDescription(ISOMetadata.createCharacterStringPropertyType(sourceDescription));
 	    }
-	    
+
 	    // Use LISourcePropertyType since getSource() returns List<LISourcePropertyType>
 	    // LESourceType extends LISourceType, so we can set it via setLISource
-	    net.opengis.iso19139.gmd.v_20060504.LISourcePropertyType sourceProperty = 
-		new net.opengis.iso19139.gmd.v_20060504.LISourcePropertyType();
+	    net.opengis.iso19139.gmd.v_20060504.LISourcePropertyType sourceProperty = new net.opengis.iso19139.gmd.v_20060504.LISourcePropertyType();
 	    sourceProperty.setLISource(sourceType); // LESourceType extends LISourceType
 	    processStepType.getSource().add(sourceProperty);
 	}
-	
+
 	// Map processing_information (optional) - gmi:LE_Processing
 	JSONObject processingInformation = processStepObj.optJSONObject("processing_information");
 	if (processingInformation != null) {
 	    LEProcessingType processingType = new LEProcessingType();
-	    
+
 	    // Map identifier (required)
 	    String id = processingInformation.optString("id", null);
 	    if (id != null && !id.isEmpty()) {
@@ -1065,7 +1023,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 		identifierProperty.setMDIdentifier(ObjectFactories.GMD().createMDIdentifier(identifierType));
 		processingType.setIdentifier(identifierProperty);
 	    }
-	    
+
 	    // Map software_reference (optional)
 	    JSONObject softwareReference = processingInformation.optJSONObject("software_reference");
 	    if (softwareReference != null) {
@@ -1075,18 +1033,17 @@ public class DatahubMapper extends FileIdentifierMapper {
 		    citation.setTitle(title);
 		}
 		// TODO: Map online_resource if needed
-		net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = 
-		    new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
+		net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
 		citationProperty.setCICitation(citation.getElementType());
 		processingType.getSoftwareReference().add(citationProperty);
 	    }
-	    
+
 	    // Map procedure_description (optional)
 	    String procedureDescription = processingInformation.optString("procedure_description", null);
 	    if (procedureDescription != null && !procedureDescription.isEmpty()) {
 		processingType.setProcedureDescription(ISOMetadata.createCharacterStringPropertyType(procedureDescription));
 	    }
-	    
+
 	    // Map documentation (optional) - array of citations
 	    JSONArray documentation = processingInformation.optJSONArray("documentation");
 	    if (documentation != null) {
@@ -1099,25 +1056,24 @@ public class DatahubMapper extends FileIdentifierMapper {
 			    docCitation.setTitle(docTitle);
 			}
 			// TODO: Map online_resource if needed
-			net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType docCitationProperty = 
-			    new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
+			net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType docCitationProperty = new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
 			docCitationProperty.setCICitation(docCitation.getElementType());
 			processingType.getDocumentation().add(docCitationProperty);
 		    }
 		}
 	    }
-	    
+
 	    // Map run_time_parameters (optional)
 	    String runTimeParameters = processingInformation.optString("run_time_parameters", null);
 	    if (runTimeParameters != null && !runTimeParameters.isEmpty()) {
 		processingType.setRunTimeParameters(ISOMetadata.createCharacterStringPropertyType(runTimeParameters));
 	    }
-	    
+
 	    // Map algorithm (optional)
 	    JSONObject algorithm = processingInformation.optJSONObject("algorithm");
 	    if (algorithm != null) {
 		LEAlgorithmType algorithmType = new LEAlgorithmType();
-		
+
 		// Map citation (required)
 		JSONObject algorithmCitation = algorithm.optJSONObject("citation");
 		if (algorithmCitation != null) {
@@ -1127,12 +1083,11 @@ public class DatahubMapper extends FileIdentifierMapper {
 			citation.setTitle(title);
 		    }
 		    // TODO: Map online_resource if needed
-		    net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = 
-			new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
+		    net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
 		    citationProperty.setCICitation(citation.getElementType());
 		    algorithmType.setCitation(citationProperty);
 		}
-		
+
 		// Map description (required)
 		String algorithmDescription = algorithm.optString("description", null);
 		if (algorithmDescription != null && !algorithmDescription.isEmpty()) {
@@ -1141,25 +1096,25 @@ public class DatahubMapper extends FileIdentifierMapper {
 		    // Set empty description if not provided (required field)
 		    algorithmType.setDescription(ISOMetadata.createCharacterStringPropertyType(""));
 		}
-		
+
 		LEAlgorithmPropertyType algorithmProperty = new LEAlgorithmPropertyType();
 		algorithmProperty.setLEAlgorithm(algorithmType);
 		processingType.getAlgorithm().add(algorithmProperty);
 	    }
-	    
+
 	    // Note: parameter array is mentioned in hints but requires mrl:LE_ProcessParameter
 	    // which may not be available. Skipping for now.
-	    
+
 	    LEProcessingPropertyType processingProperty = new LEProcessingPropertyType();
 	    processingProperty.setLEProcessing(processingType);
 	    processStepType.setProcessingInformation(processingProperty);
 	}
-	
+
 	// Map output (optional) - gmi:LE_Source
 	JSONObject output = processStepObj.optJSONObject("output");
 	if (output != null) {
 	    LESourceType outputSourceType = new LESourceType();
-	    
+
 	    // Map source citation if available
 	    JSONObject outputCitation = output.optJSONObject("source_citation");
 	    if (outputCitation != null) {
@@ -1168,28 +1123,27 @@ public class DatahubMapper extends FileIdentifierMapper {
 		if (title != null) {
 		    citation.setTitle(title);
 		}
-		net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = 
-		    new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
+		net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
 		citationProperty.setCICitation(citation.getElementType());
 		outputSourceType.setSourceCitation(citationProperty);
 	    }
-	    
+
 	    // Map description if available
 	    String outputDescription = output.optString("description", null);
 	    if (outputDescription != null && !outputDescription.isEmpty()) {
 		outputSourceType.setDescription(ISOMetadata.createCharacterStringPropertyType(outputDescription));
 	    }
-	    
+
 	    LESourcePropertyType outputProperty = new LESourcePropertyType();
 	    outputProperty.setLESource(outputSourceType);
 	    processStepType.getOutput().add(outputProperty);
 	}
-	
+
 	// Map report (optional) - gmi:LE_ProcessStepReport
 	JSONObject report = processStepObj.optJSONObject("report");
 	if (report != null) {
 	    LEProcessStepReportType reportType = new LEProcessStepReportType();
-	    
+
 	    // Map name (required)
 	    String reportName = report.optString("name", null);
 	    if (reportName != null && !reportName.isEmpty()) {
@@ -1198,29 +1152,28 @@ public class DatahubMapper extends FileIdentifierMapper {
 		// Set empty name if not provided (required field)
 		reportType.setName(ISOMetadata.createCharacterStringPropertyType(""));
 	    }
-	    
+
 	    // Map description (optional)
 	    String reportDescription = report.optString("description", null);
 	    if (reportDescription != null && !reportDescription.isEmpty()) {
 		reportType.setDescription(ISOMetadata.createCharacterStringPropertyType(reportDescription));
 	    }
-	    
+
 	    // Map file_type (optional)
 	    String fileType = report.optString("file_type", null);
 	    if (fileType != null && !fileType.isEmpty()) {
 		reportType.setFileType(ISOMetadata.createCharacterStringPropertyType(fileType));
 	    }
-	    
+
 	    LEProcessStepReportPropertyType reportProperty = new LEProcessStepReportPropertyType();
 	    reportProperty.setLEProcessStepReport(reportType);
 	    processStepType.getReport().add(reportProperty);
 	}
-	
+
 	// Wrap in LEProcessStepPropertyType and add to lineage processStep list
 	// Note: getProcessStep() returns List<LIProcessStepPropertyType>, but LEProcessStepType extends LIProcessStepType
 	// So we use LIProcessStepPropertyType and set the LEProcessStepType via setLIProcessStep
-	net.opengis.iso19139.gmd.v_20060504.LIProcessStepPropertyType processStepProperty = 
-	    new net.opengis.iso19139.gmd.v_20060504.LIProcessStepPropertyType();
+	net.opengis.iso19139.gmd.v_20060504.LIProcessStepPropertyType processStepProperty = new net.opengis.iso19139.gmd.v_20060504.LIProcessStepPropertyType();
 	processStepProperty.setLIProcessStep(processStepType); // LEProcessStepType extends LIProcessStepType
 	lineageType.getProcessStep().add(processStepProperty);
     }
@@ -1232,7 +1185,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 	// Create ModelSpecificFields extension object
 	ModelSpecificFields modelFields = new ModelSpecificFields();
 	boolean hasFields = false;
-	
+
 	// Map model_maturity_level
 	String modelMaturityLevel = json.optString("model_maturity_level", null);
 	if (modelMaturityLevel != null && !modelMaturityLevel.isEmpty()) {
@@ -1248,19 +1201,19 @@ public class DatahubMapper extends FileIdentifierMapper {
 		modelFields.setCpu(cpu);
 		hasFields = true;
 	    }
-	    
+
 	    String gpu = modelComputationalRequirements.optString("gpu", null);
 	    if (gpu != null && !gpu.isEmpty()) {
 		modelFields.setGpu(gpu);
 		hasFields = true;
 	    }
-	    
+
 	    String ram = modelComputationalRequirements.optString("ram", null);
 	    if (ram != null && !ram.isEmpty()) {
 		modelFields.setRam(ram);
 		hasFields = true;
 	    }
-	    
+
 	    String storage = modelComputationalRequirements.optString("storage", null);
 	    if (storage != null && !storage.isEmpty()) {
 		modelFields.setStorage(storage);
@@ -1305,7 +1258,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    modelFields.setModelMethodologyDescription(modelMethodologyDescription);
 	    hasFields = true;
 	}
-	
+
 	// Set the extension if any fields were populated
 	if (hasFields) {
 	    resource.getExtensionHandler().setModelSpecificFields(modelFields);
@@ -1332,7 +1285,8 @@ public class DatahubMapper extends FileIdentifierMapper {
 
 			if (metricName != null && !metricValue.isNaN()) {
 			    // TODO: Metric values are adimensional - may need special handling
-			    coreMetadata.getMIMetadata().getDataQualityInfo().addQuantitativeAttributeAccuracy(metricName, metricDescription, metricValue, null);
+			    coreMetadata.getMIMetadata().getDataQualityInfo()
+				    .addQuantitativeAttributeAccuracy(metricName, metricDescription, metricValue, null);
 			}
 		    }
 		}
@@ -1365,7 +1319,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 	// Raster nodata value
 	Double rasterNodataValue = json.optDouble("raster_nodata_value", Double.NaN);
 	if (!rasterNodataValue.isNaN()) {
-	   resource.getExtensionHandler().setAttributeMissingValue(rasterNodataValue.toString());
+	    resource.getExtensionHandler().setAttributeMissingValue(rasterNodataValue.toString());
 	}
 
 	// Parent identifier
