@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.authorization.pps;
 
@@ -13,41 +13,31 @@ package eu.essi_lab.authorization.pps;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.UUID;
+import eu.essi_lab.authorization.*;
+import eu.essi_lab.authorization.builder.*;
+import eu.essi_lab.authorization.xacml.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.View.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.ow2.authzforce.core.pdp.api.func.*;
+import org.ow2.authzforce.core.pdp.api.value.*;
+import org.ow2.authzforce.core.pdp.impl.combining.*;
+import org.ow2.authzforce.core.pdp.impl.func.*;
+import org.ow2.authzforce.xacml.identifiers.*;
 
-import org.ow2.authzforce.core.pdp.api.func.Function;
-import org.ow2.authzforce.core.pdp.api.value.StandardDatatypes;
-import org.ow2.authzforce.core.pdp.impl.combining.StandardCombiningAlgorithm;
-import org.ow2.authzforce.core.pdp.impl.func.StandardFunction;
-import org.ow2.authzforce.xacml.identifiers.XacmlAttributeCategory;
-import org.ow2.authzforce.xacml.identifiers.XacmlAttributeId;
-
-import eu.essi_lab.authorization.PolicySetWrapper;
-import eu.essi_lab.authorization.builder.PPSBuilder;
-import eu.essi_lab.authorization.builder.PPSPolicyBuilder;
-import eu.essi_lab.authorization.builder.PPSRuleBuilder;
-import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
-import eu.essi_lab.jaxb.common.ObjectFactories;
-import eu.essi_lab.messages.bond.View.ViewVisibility;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AnyOf;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeDesignatorType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.Condition;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.Policy;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -60,27 +50,39 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     private HashMap<String, PPSRuleBuilder> buildersMap;
 
     /**
-     * 
+     *
      */
-    public static final int DEFAULT_OFFSET_LIMIT = 200;
+    public static final int DEFAULT_ANONYMOUS_OFFSET_LIMIT = 200;
 
     /**
-     * 
+     *
      */
-    public static final int DEFAULT_MAX_RECORDS_LIMIT = 50;
+    public static final int DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT = 50;
 
     /**
-     * 
+     *
      */
-    public static final int ANONYMOUS_MAX_RECORDS_LIMIT = 10;
+    public static final int ANONYMOUS_OFFSET_LIMIT = //
+	    JavaOptions.getValue(JavaOptions.ANONYMOUS_OFFSET_LIMIT).//
+		    map(Integer::parseInt).//
+		    map(v -> v == -1 ? Integer.MAX_VALUE : v).//
+		    orElse(DEFAULT_ANONYMOUS_OFFSET_LIMIT);//
 
     /**
-     * 
+     *
+     */
+    public static final int ANONYMOUS_PAGE_SIZE_LIMIT = //
+	    JavaOptions.getValue(JavaOptions.ANONYMOUS_PAGE_SIZE_LIMIT).//
+		    map(Integer::parseInt).//
+		    orElse(DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT);//
+
+    /**
+     *
      */
     public static final String VIEW_ID_MISSING_VALUE = "viewMissing";
 
     /**
-     * 
+     *
      */
     public static final String VIEW_CREATOR_MISSING_VALUE = "viewCreatorMissing";
 
@@ -137,7 +139,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
-     * 
+     *
      */
     protected abstract void editPPSPolicy();
 
@@ -162,7 +164,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
-     * 
+     *
      */
     protected void setAccessAction(String ruleId) {
 
@@ -170,7 +172,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
-     * 
+     *
      */
     protected void setDiscoveryAction(String ruleId) {
 
@@ -178,7 +180,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
-     * 
+     *
      */
     protected void setReadViewAction(String ruleId) {
 
@@ -186,7 +188,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
-     * 
+     *
      */
     protected void setCreateViewAction(String ruleId) {
 
@@ -194,7 +196,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
-     * 
+     *
      */
     protected void setUpdateViewAction(String ruleId) {
 
@@ -202,7 +204,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
-     * 
+     *
      */
     protected void setDeleteViewAction(String ruleId) {
 
@@ -210,7 +212,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
-     * 
+     *
      */
     protected void setOtherAction(String ruleId) {
 
@@ -237,7 +239,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
-     * 
+     *
      */
     protected void setUnapplicableRule(String ruleId) {
 

@@ -62,9 +62,9 @@ public class AnonymousPermissionPolicySet extends AbstractPermissionPolicySet {
 
 	    setDiscoveryAction(ruleId);
 
-	    setOffsetLimit(ruleId, DEFAULT_OFFSET_LIMIT);
+	    setOffsetLimit(ruleId, ANONYMOUS_OFFSET_LIMIT);
 
-	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
+	    setMaxRecordsLimit(ruleId, ANONYMOUS_PAGE_SIZE_LIMIT);
 
 	    setAndCondition(ruleId, //
 		    createDiscoveryPathApply(), //
@@ -81,9 +81,9 @@ public class AnonymousPermissionPolicySet extends AbstractPermissionPolicySet {
 
 	    setAccessAction(ruleId);
 
-	    setOffsetLimit(ruleId, DEFAULT_OFFSET_LIMIT);
+	    setOffsetLimit(ruleId, ANONYMOUS_OFFSET_LIMIT);
 
-	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
+	    setMaxRecordsLimit(ruleId, ANONYMOUS_PAGE_SIZE_LIMIT);
 
 	    setAndCondition(//
 		    ruleId, //

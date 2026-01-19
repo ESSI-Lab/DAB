@@ -13,20 +13,20 @@ package eu.essi_lab.messages;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.*;
 
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -70,15 +70,14 @@ public enum JavaOptions {
     S3_ENDPOINT("s3Endpoint", "S3 endpoint: "),
 
     /**
-     *
+     * - Boolean
      */
     SKIP_CONFIG_AUTHORIZATION("skipConfigAuthorization", "Configuration authorization disabled", "Configuration authorization enabled"),
 
     /**
-     *
+     * - Boolean
      */
     SKIP_REQUESTS_AUTHORIZATION("skipReqAuthorization", "Requests authorization disabled", "Requests authorization enabled"),
-
 
     /**
      * - Boolean
@@ -99,13 +98,24 @@ public enum JavaOptions {
     /**
      * - Integer
      */
-    NUMBER_OF_DATA_FOLDER_INDEX_SHARDS("numShards", "Number of data-folder index shards: ");
+    NUMBER_OF_DATA_FOLDER_INDEX_SHARDS("numShards", "Number of data-folder index shards: "),
+
+    /**
+     * - Integer
+     */
+    ANONYMOUS_OFFSET_LIMIT("offsetLimit", "Maximum request offset granted to the anonymous user: "),
+
+    /**
+     * - Integer
+     */
+    ANONYMOUS_PAGE_SIZE_LIMIT("pageSizeLimit", "Maximum page size granted to the anonymous user: ");
 
     private final String option;
     private String infoMessage;
     private String enabledMessage;
     private String disabledMessage;
-    private Boolean defaultValue;
+    private Boolean defaultBooleanValue;
+    private Integer defaultIntValue;
 
     /**
      * @param option
@@ -138,7 +148,21 @@ public enum JavaOptions {
 	this.option = option;
 	this.enabledMessage = enabledMessage;
 	this.disabledMessage = disabledMessage;
-	this.defaultValue = defaultValue;
+	this.defaultBooleanValue = defaultValue;
+    }
+
+    /**
+     * @param option
+     * @param enabledMessage
+     * @param disabledMessage
+     * @param defaultValue
+     */
+    JavaOptions(String option, String enabledMessage, String disabledMessage, int defaultValue) {
+
+	this.option = option;
+	this.enabledMessage = enabledMessage;
+	this.disabledMessage = disabledMessage;
+	this.defaultIntValue = defaultValue;
     }
 
     /**
@@ -152,9 +176,17 @@ public enum JavaOptions {
     /**
      * @return
      */
-    public Optional<Boolean> getDefaultValue() {
+    public Optional<Boolean> getDefaultBooleanValue() {
 
-	return Optional.ofNullable(defaultValue);
+	return Optional.ofNullable(defaultBooleanValue);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Integer> getDefaultIntegerValue() {
+
+	return Optional.ofNullable(defaultIntValue);
     }
 
     /**
@@ -184,7 +216,14 @@ public enum JavaOptions {
      */
     public static Optional<Integer> getIntValue(JavaOptions javaOpt) {
 
-	return getValue(javaOpt).map(Integer::valueOf);
+	Optional<Integer> opt = getValue(javaOpt).map(Integer::valueOf);
+
+	if (opt.isEmpty()) {
+
+	    return javaOpt.getDefaultIntegerValue();
+	}
+
+	return opt;
     }
 
     /**
@@ -193,7 +232,7 @@ public enum JavaOptions {
      */
     public static boolean isEnabled(JavaOptions javaOpt) {
 
-	boolean out = getValue(javaOpt).map(Boolean::valueOf).orElse(javaOpt.defaultValue);
+	boolean out = getValue(javaOpt).map(Boolean::valueOf).orElse(javaOpt.defaultBooleanValue);
 
 	GSLoggerFactory.getLogger(JavaOptions.class).debug(out ? javaOpt.enabledMessage : javaOpt.disabledMessage);
 

@@ -1,66 +1,26 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.test.authorization.authzforce.essi.rbac;
 
-import java.io.IOException;
+import eu.essi_lab.authorization.*;
+import eu.essi_lab.authorization.pps.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.test.authorization.authzforce.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.junit.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import java.io.*;
 
-import eu.essi_lab.authorization.BasicRole;
-import eu.essi_lab.authorization.PolicySetWrapper.Action;
-import eu.essi_lab.authorization.pps.AbstractPermissionPolicySet;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.test.authorization.authzforce.XACMLTest;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.DecisionType;
+import static eu.essi_lab.authorization.pps.AbstractPermissionPolicySet.*;
 
 /**
- * Anonymous users are allowed to discovery and access if and only if:
- * 1) offset is <= 200
- * -
- * 2) max records <= 50
- * -
- * -
- * 4) the discovery path is one of:
- * "opensearch",
- * "bnhs",
- * "thredds",
- * "csw",
- * "cswisogeo",
- * "oaipmh",
- * "hiscentral.asmx",
- * "arpa-rest",
- * "cuahsi_1_1.asmx",
- * "rest",
- * "hydrocsv",
- * "sos",
- * "wfs",
- * "gwis",
- * "ArcGIS",
- * "ArcGISProxy",
- * "gwps",
- * "timeseries-api",
- * "semantic"
- * -
- * 5) the access path is one of:
- * "cuahsi_1_1.asmx",
- * "rest",
- * "hydrocsv",
- * "thredds",
- * "wms",
- * "wfs",
- * "sos",
- * "gwps",
- * "ArcGIS",
- * "ArcGISProxy",
- * "timeseries-api",
- * "gwis"
- * -
- * OR
- * -
+ * Anonymous users are allowed to discovery and access if and only if: 1) offset is <= 200 - 2) max records <= 50 - - 4) the discovery path
+ * is one of: "opensearch", "bnhs", "thredds", "csw", "cswisogeo", "oaipmh", "hiscentral.asmx", "arpa-rest", "cuahsi_1_1.asmx", "rest",
+ * "hydrocsv", "sos", "wfs", "gwis", "ArcGIS", "ArcGISProxy", "gwps", "timeseries-api", "semantic" - 5) the access path is one of:
+ * "cuahsi_1_1.asmx", "rest", "hydrocsv", "thredds", "wms", "wfs", "sos", "gwps", "ArcGIS", "ArcGISProxy", "timeseries-api", "gwis" - OR -
  * 1) the client identifier {@link WebRequest#ESSI_LAB_CLIENT_IDENTIFIER} is provided
- * 
+ *
  * @author Fabrizio
  */
 public class Anonymous_Test extends XACMLTest {
@@ -73,6 +33,18 @@ public class Anonymous_Test extends XACMLTest {
 	wrapper.reset();
 
 	wrapper.setUserRole(BasicRole.ANONYMOUS.getRole());
+    }
+
+    /**
+     *
+     */
+    @Test
+    public void javaOptionsDefaultValuesTest() {
+
+	Assert.assertEquals(AbstractPermissionPolicySet.DEFAULT_ANONYMOUS_OFFSET_LIMIT, AbstractPermissionPolicySet.ANONYMOUS_OFFSET_LIMIT);
+
+	Assert.assertEquals(AbstractPermissionPolicySet.DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT,
+		AbstractPermissionPolicySet.ANONYMOUS_PAGE_SIZE_LIMIT);
     }
 
     /**
@@ -89,7 +61,7 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setOffset(1);
 
-	wrapper.setMaxRecords(AbstractPermissionPolicySet.DEFAULT_MAX_RECORDS_LIMIT + 1);
+	wrapper.setMaxRecords(DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT + 1);
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 
@@ -110,7 +82,7 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setPath("opensearch");
 
-	wrapper.setOffset(AbstractPermissionPolicySet.DEFAULT_OFFSET_LIMIT + 1);
+	wrapper.setOffset(DEFAULT_ANONYMOUS_OFFSET_LIMIT + 1);
 
 	wrapper.setMaxRecords(1);
 
@@ -344,9 +316,9 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setPath("oaipmh");
 
-	wrapper.setOffset(AbstractPermissionPolicySet.DEFAULT_OFFSET_LIMIT);
+	wrapper.setOffset(DEFAULT_ANONYMOUS_OFFSET_LIMIT);
 
-	wrapper.setMaxRecords(AbstractPermissionPolicySet.ANONYMOUS_MAX_RECORDS_LIMIT);
+	wrapper.setMaxRecords(AbstractPermissionPolicySet.DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT);
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 
@@ -367,9 +339,9 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setPath("oaipmh");
 
-	wrapper.setOffset(AbstractPermissionPolicySet.DEFAULT_OFFSET_LIMIT);
+	wrapper.setOffset(DEFAULT_ANONYMOUS_OFFSET_LIMIT);
 
-	wrapper.setMaxRecords(AbstractPermissionPolicySet.DEFAULT_MAX_RECORDS_LIMIT);
+	wrapper.setMaxRecords(DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT);
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 
@@ -396,7 +368,7 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setOffset(1);
 
-	wrapper.setMaxRecords(AbstractPermissionPolicySet.DEFAULT_MAX_RECORDS_LIMIT + 1);
+	wrapper.setMaxRecords(DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT + 1);
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 
@@ -417,7 +389,7 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setPath("wms");
 
-	wrapper.setOffset(AbstractPermissionPolicySet.DEFAULT_OFFSET_LIMIT + 1);
+	wrapper.setOffset(DEFAULT_ANONYMOUS_OFFSET_LIMIT + 1);
 
 	wrapper.setMaxRecords(1);
 
@@ -605,9 +577,9 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setPath("timeseries-api");
 
-	wrapper.setOffset(AbstractPermissionPolicySet.DEFAULT_OFFSET_LIMIT);
+	wrapper.setOffset(DEFAULT_ANONYMOUS_OFFSET_LIMIT);
 
-	wrapper.setMaxRecords(AbstractPermissionPolicySet.ANONYMOUS_MAX_RECORDS_LIMIT);
+	wrapper.setMaxRecords(AbstractPermissionPolicySet.DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT);
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 
