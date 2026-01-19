@@ -73,7 +73,7 @@ public class GetValuesObjectResultSetMapper extends GetValuesResultSetMapper {
 	}
 	
 	// NetCDF switch (e.g. used by WHOS-Arctic portal)
-	if (format != null && format.toLowerCase().contains("netcdf")) {
+	if (format != null && (format.toLowerCase().contains("netcdf")|| format.toLowerCase().contains("csv"))) {
 //	    Optional<GSResource> optionalResource = resource.getResource();
 //	    if (optionalResource.isPresent()) {
 //		try {
