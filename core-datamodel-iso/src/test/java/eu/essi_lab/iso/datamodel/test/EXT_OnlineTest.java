@@ -52,8 +52,8 @@ public class EXT_OnlineTest {
 	EXT_Online extOnline = new EXT_Online(online);
 
 	Assert.assertEquals("descriptionGmxAnchor", extOnline.getDescriptionGmxAnchor());
-	Assert.assertEquals("protocolHrefGmxAnchor", extOnline.getProtocolGmxAnchor());
-	Assert.assertEquals("protocolValueGmxAnchor", extOnline.getProtocolValueGmxAnchor());
+	Assert.assertEquals("protocolHrefGmxAnchor", extOnline.getProtocolGmxAnchorHref());
+	Assert.assertEquals("protocolValueGmxAnchor", extOnline.getProtocolGmxAnchorTitle());
 
 	Assert.assertEquals("name", extOnline.getName());
 	Assert.assertEquals("link", extOnline.getLinkage());

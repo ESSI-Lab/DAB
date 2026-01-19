@@ -225,7 +225,7 @@ public class Online extends ISOMetadata<CIOnlineResourceType> {
     /**
      * @XPathDirective(target = "gmd:protocol/gmx:Anchor/@*:href")
      */
-    public String getProtocolGmxAnchor() {
+    public String getProtocolGmxAnchorHref() {
 
 	try {
 	    JAXBElement<?> jaxbElement = type.getProtocol().getCharacterString();
@@ -241,7 +241,7 @@ public class Online extends ISOMetadata<CIOnlineResourceType> {
     /**
      * @XPathDirective(target = "gmd:protocol/gmx:Anchor/@*:href")
      */
-    public String getProtocolValueGmxAnchor() {
+    public String getProtocolGmxAnchorTitle() {
 
 	try {
 	    JAXBElement<?> jaxbElement = type.getProtocol().getCharacterString();

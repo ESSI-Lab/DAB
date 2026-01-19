@@ -73,9 +73,9 @@ public class EXT_Online extends Online {
 	    setDescriptionGmxAnchor(online.getDescriptionGmxAnchor());
 	}
 
-	if (online.getProtocolGmxAnchor() != null) {
+	if (online.getProtocolGmxAnchorHref() != null) {
 
-	    setProtocolAnchor(online.getProtocolGmxAnchor(), online.getProtocolValueGmxAnchor());
+	    setProtocolAnchor(online.getProtocolGmxAnchorHref(), online.getProtocolGmxAnchorTitle());
 	}
     }
 
