@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
  */
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -282,9 +283,6 @@ public class OMHandler extends StreamingRequestHandler {
 	OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
 
 	switch (userOutputFormat) {
-	case CSV:
-	    resultWriter = new CSVResultWriter(writer);
-	    break;
 	case JSON:
 	    String expandFeaturesString = request.getParameterValue(APIParameters.EXPAND_FEATURES);
 	    boolean expandFeatures = false;
@@ -296,6 +294,7 @@ public class OMHandler extends StreamingRequestHandler {
 	case NETCDF:
 	case WATERML_1:
 	case WATERML_2:
+	case CSV:
 	    resultWriter = new EmptyResultWriter(writer);
 	    break;
 	default:
@@ -549,7 +548,6 @@ public class OMHandler extends StreamingRequestHandler {
 			    switch (type) {
 			    case TimeSeriesObservation:
 				switch (userOutputFormat) {
-				case CSV:
 				case JSON:
 				case WATERML_1:
 				    descriptor.setDataFormat(DataFormat.WATERML_1_1());
@@ -559,6 +557,9 @@ public class OMHandler extends StreamingRequestHandler {
 				    break;
 				case NETCDF:
 				    descriptor.setDataFormat(DataFormat.NETCDF());
+				    break;
+				case CSV:
+				    descriptor.setDataFormat(DataFormat.CSV());
 				    break;
 
 				default:
@@ -597,13 +598,14 @@ public class OMHandler extends StreamingRequestHandler {
 			    switch (type) {
 			    case TimeSeriesObservation:
 				switch (userOutputFormat) {
-				case CSV:
 				case JSON:
 				    addPointsFromWML(dataObject.getFile(), resultWriter, observation, userOutputFormat, coord);
 				    break;
 				case WATERML_1:
 				case WATERML_2:
 				case NETCDF:
+				case CSV:
+
 				    FileInputStream stream = new FileInputStream(dataObject.getFile());
 				    IOUtils.copy(stream, output);
 				    stream.close();
@@ -1078,10 +1080,30 @@ public class OMHandler extends StreamingRequestHandler {
 			    if (nodataValue == null || !nodataValue.equals(value)) {
 				v = new BigDecimal(value);
 			    }
-			    Attribute qualityAttribute = startElement.getAttributeByName(new QName("qualityControlLevelCode"));
+			    
+			    // Read qualifiers from the qualifiers attribute (WaterML 1.1 format)
 			    String quality = null;
-			    if (qualityAttribute != null) {
-				quality = qualityAttribute.getValue();
+			    Attribute qualifiersAttribute = startElement.getAttributeByName(new QName("qualifiers"));
+			    if (qualifiersAttribute != null) {
+				String qualifiersString = qualifiersAttribute.getValue();
+				if (qualifiersString != null && !qualifiersString.trim().isEmpty()) {
+				    try {
+					// URL decode the qualifiers string
+					String decodedQualifiers = URLDecoder.decode(qualifiersString, StandardCharsets.UTF_8.name());
+					// Qualifiers are space-separated key:value pairs
+					// Combine them into a single quality string
+					quality = decodedQualifiers;
+				    } catch (Exception e) {
+					// If decoding fails, use the original string
+					quality = qualifiersString;
+				    }
+				}
+			    } else {
+				// Fallback to qualityControlLevelCode for backward compatibility
+				Attribute qualityAttribute = startElement.getAttributeByName(new QName("qualityControlLevelCode"));
+				if (qualityAttribute != null) {
+				    quality = qualityAttribute.getValue();
+				}
 			    }
 
 			    Optional<Date> d = ISO8601DateTimeUtils.parseISO8601ToDate(date);

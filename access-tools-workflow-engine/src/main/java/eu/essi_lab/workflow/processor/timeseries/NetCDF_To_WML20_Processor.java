@@ -143,6 +143,28 @@ public class NetCDF_To_WML20_Processor extends DataProcessor {
 
 	VariableSimpleIF mainVariable = mainVariables.isEmpty() ? dataVariables.get(0) : mainVariables.get(0);
 
+	// Extract ancillary variables for qualifiers
+	List<VariableSimpleIF> ancillaryVariableList = new ArrayList<>();
+	Attribute ancillaryVariablesAttribute = mainVariable.findAttributeIgnoreCase("ancillary_variables");
+	if (ancillaryVariablesAttribute != null) {
+	    String ancillaryVariablesString = ancillaryVariablesAttribute.getStringValue();
+	    if (ancillaryVariablesString != null && !ancillaryVariablesString.trim().isEmpty()) {
+		// Ancillary variables are space-separated
+		String[] ancillaryVarNames = ancillaryVariablesString.trim().split("\\s+");
+		for (String varName : ancillaryVarNames) {
+		    if (varName != null && !varName.trim().isEmpty()) {
+			// Find the variable in the dataset
+			for (VariableSimpleIF var : dataVariables) {
+			    if (var.getShortName().equals(varName.trim())) {
+				ancillaryVariableList.add(var);
+				break;
+			    }
+			}
+		    }
+		}
+	    }
+	}
+
 	String variableLongName = null;
 	Attribute longNameAttribute = mainVariable.findAttributeIgnoreCase("long_name");
 	if (longNameAttribute != null) {
@@ -353,28 +375,81 @@ public class NetCDF_To_WML20_Processor extends DataProcessor {
 	    measurement.setValue(measure);
 
 	    point.setMeasurementTVP(measurement);
+	    
+	    // Extract qualifiers from all ancillary variables
 	    List<StructureMembers.Member> members = featureData.getMembers();
-	    String qualifier = null;
-	    for(StructureMembers.Member member : members) {
-		if (member.getName().contains("quality_control_level_code")){
-		    qualifier = featureData.getScalarString(member.getName());
-		    break;
+	    List<QualityPropertyType> qualifiers = new ArrayList<>();
+	    
+	    for (VariableSimpleIF ancVar : ancillaryVariableList) {
+		String ancVarName = ancVar.getShortName();
+		String qualifierValue = null;
+		
+		try {
+		    // Find the member to check its data type
+		    StructureMembers.Member member = null;
+		    for (StructureMembers.Member m : members) {
+			if (m.getName().equals(ancVarName)) {
+			    member = m;
+			    break;
+			}
+		    }
+		    
+		    if (member != null && member.getDataType().isNumeric()) {
+			// For numeric types, try to get as double
+			try {
+			    Double ancValue = featureData.getScalarDouble(ancVarName);
+			    if (ancValue != null && !ancValue.isNaN() && !ancValue.isInfinite()) {
+				qualifierValue = ancValue.toString();
+			    }
+			} catch (Exception e) {
+			    // If getScalarDouble fails, try as string
+			    String ancValueString = featureData.getScalarString(ancVarName);
+			    if (ancValueString != null) {
+				qualifierValue = ancValueString;
+			    }
+			}
+		    } else {
+			// For non-numeric types, get as string
+			String ancValueString = featureData.getScalarString(ancVarName);
+			if (ancValueString != null) {
+			    qualifierValue = ancValueString;
+			}
+		    }
+		    
+		    if (qualifierValue != null && !qualifierValue.trim().isEmpty()) {
+			QualityPropertyType q = new QualityPropertyType();
+			WML2QualityCategory wmlQuality = null;
+			if (qualifierValue.startsWith("http")) {
+			    q.setHref(qualifierValue);
+			    wmlQuality = WML2QualityCategory.decodeUri(qualifierValue);
+			}
+			
+			// Use variable long_name if available, otherwise short name
+			String qualifierTitle = qualifierValue;
+			Attribute ancLongNameAttr = ancVar.findAttributeIgnoreCase("long_name");
+			if (ancLongNameAttr != null) {
+			    qualifierTitle = ancLongNameAttr.getStringValue() + ": " + qualifierValue;
+			} else {
+			    qualifierTitle = ancVarName + ": " + qualifierValue;
+			}
+			
+			q.setTitle(qualifierTitle);
+			if (wmlQuality != null) {
+			    q.setTitle(wmlQuality.getLabel());
+			}
+			qualifiers.add(q);
+		    }
+		} catch (Exception e) {
+		    // If extraction fails, skip this ancillary variable
 		}
 	    }
-	    if (qualifier!=null) {
+	    
+	    if (!qualifiers.isEmpty()) {
 		TVPMeasurementMetadataPropertyType pointMetadata = new TVPMeasurementMetadataPropertyType();
 		TVPMeasurementMetadataType tvpm = new TVPMeasurementMetadataType();
-		QualityPropertyType q = new QualityPropertyType();
-		WML2QualityCategory wmlQuality = null;
-		if (qualifier.startsWith("http")){
-		    q.setHref(qualifier);
-		    wmlQuality = WML2QualityCategory.decodeUri(qualifier);
+		for (QualityPropertyType q : qualifiers) {
+		    tvpm.getQualifier().add(q);
 		}
-		q.setTitle(qualifier);
-		if (wmlQuality!=null){
-		    q.setTitle(wmlQuality.getLabel());
-		}
-		tvpm.getQualifier().add(q);
 		pointMetadata.setTVPMeasurementMetadata(tvpm);
 		measurement.setMetadata(pointMetadata);
 	    }
