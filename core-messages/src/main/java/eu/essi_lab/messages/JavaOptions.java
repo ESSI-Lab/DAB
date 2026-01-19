@@ -72,7 +72,13 @@ public enum JavaOptions {
     /**
      *
      */
-    SKIP_AUTHORIZATION("DAB_SKIP_AUTHORIZATION", "Authorization disabled", "Authorization enabled"),
+    SKIP_CONFIG_AUTHORIZATION("skipConfigAuthorization", "Configuration authorization disabled", "Configuration authorization enabled"),
+
+    /**
+     *
+     */
+    SKIP_REQUESTS_AUTHORIZATION("skipReqAuthorization", "Requests authorization disabled", "Requests authorization enabled"),
+
 
     /**
      * - Boolean

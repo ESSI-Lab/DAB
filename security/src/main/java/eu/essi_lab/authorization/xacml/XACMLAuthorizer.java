@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.ow2.authzforce.core.pdp.api.CloseablePdpEngine;
@@ -52,9 +51,6 @@ import eu.essi_lab.authorization.psloader.PolicySetLoader;
 import eu.essi_lab.authorization.rps.GEOSSPrivateWriteRolePolicySet;
 import eu.essi_lab.authorization.rps.GEOSSReadRolePolicySet;
 import eu.essi_lab.authorization.rps.GEOSSWriteRolePolicySet;
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -93,7 +89,7 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
     @Override
     public boolean isAuthorized(RequestMessage message) throws GSException {
 
-	if (JavaOptions.isEnabled(JavaOptions.SKIP_AUTHORIZATION)) {
+	if (JavaOptions.isEnabled(JavaOptions.SKIP_REQUESTS_AUTHORIZATION)) {
 
 	    return true;
 	}
@@ -105,7 +101,7 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	String role = null;
 	String identifier = null;
 
-	if (Objects.nonNull(requestUser) && requestUser.isPresent()) {
+	if (requestUser != null && requestUser.isPresent()) {
 
 	    role = requestUser.get().getRole();
 	    identifier = requestUser.get().getIdentifier();

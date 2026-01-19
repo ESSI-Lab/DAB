@@ -23,7 +23,9 @@ public class JavaOptionsTest {
 
 	Assert.assertFalse(JavaOptions.FORCE_VOLATILE_DB.getDefaultValue().get());
 
-	Assert.assertFalse(JavaOptions.SKIP_AUTHORIZATION.getDefaultValue().get());
+	Assert.assertFalse(JavaOptions.SKIP_CONFIG_AUTHORIZATION.getDefaultValue().get());
+
+	Assert.assertFalse(JavaOptions.SKIP_REQUESTS_AUTHORIZATION.getDefaultValue().get());
 
 	Assert.assertFalse(JavaOptions.SKIP_HEALTH_CHECK.getDefaultValue().get());
 
