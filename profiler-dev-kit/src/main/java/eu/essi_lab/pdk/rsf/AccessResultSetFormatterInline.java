@@ -170,6 +170,10 @@ public class AccessResultSetFormatterInline extends AccessResultSetFormatter<Dat
 
 	    builder.type(MediaType.TEXT_PLAIN);
 
+	} else if (dataFormat.equals(DataFormat.CSV())) {
+
+	    builder.type(new MediaType("text", "csv"));
+
 	}
 
 	return builder;

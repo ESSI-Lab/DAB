@@ -42,26 +42,27 @@ public enum WML2QualityCategory {
 	return toString().toLowerCase();
     }
 
-    public String getVocabulary() {
+    public static String getVocabulary() {
 	return "http://www.opengis.net/def/waterml/2.0/quality";
     }
 
     public static WML2QualityCategory decode(String quality) {
+
 	for (WML2QualityCategory q : values()) {
 	    if (q.getLabel().equalsIgnoreCase(quality)) {
 		return q;
 	    }	   
 	}
-	return decodeUri(quality);
-    }
-
-    public static WML2QualityCategory decodeUri(String quality) {
 	for (WML2QualityCategory q : values()) {
 	    if (q.getUri().equalsIgnoreCase(quality)) {
 		return q;
 	    }
 	}
 	return null;
+    }
+
+    public static WML2QualityCategory decodeUri(String quality) {
+	return decode(quality);
     }
 
 }

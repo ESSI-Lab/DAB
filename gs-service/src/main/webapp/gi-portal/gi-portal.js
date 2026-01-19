@@ -83,6 +83,149 @@ function lang() {
 	return i18n.current;
 }
 
+/**
+ * Converts ISO8601 duration to a sortable numeric value (total seconds)
+ * @param {string} iso8601Value - The ISO8601 duration string
+ * @returns {number} - Total seconds for sorting, or 0 if not ISO8601
+ */
+function getISO8601DurationSortValue(iso8601Value) {
+	if (!iso8601Value || typeof iso8601Value !== 'string' || !iso8601Value.startsWith('P')) {
+		return 0;
+	}
+
+	// Parse ISO8601 pattern: P[nY][nM][nD][T[nH][nM][nS]]
+	const pattern = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/;
+	const match = iso8601Value.match(pattern);
+	
+	if (!match) {
+		return 0;
+	}
+
+	const [, years, months, days, hours, minutes, seconds] = match.map(v => v ? parseInt(v, 10) : 0);
+	
+	// Convert to total seconds for comparison
+	// Note: Using approximate values for months and years (30 days/month, 365 days/year)
+	const totalSeconds = 
+		(years * 365 * 24 * 60 * 60) +
+		(months * 30 * 24 * 60 * 60) +
+		(days * 24 * 60 * 60) +
+		(hours * 60 * 60) +
+		(minutes * 60) +
+		seconds;
+	
+	return totalSeconds;
+}
+
+/**
+ * Converts ISO8601 duration strings to natural language
+ * @param {string} iso8601Value - The ISO8601 duration string (e.g., "P1D", "PT30M", "PT5H")
+ * @returns {string} - Natural language representation or original value if not ISO8601
+ */
+function formatISO8601Duration(iso8601Value) {
+	// Only process values that start with 'P' (ISO8601 duration indicator)
+	if (!iso8601Value || typeof iso8601Value !== 'string' || !iso8601Value.startsWith('P')) {
+		return iso8601Value;
+	}
+
+	const currentLang = lang() || 'en';
+	
+	// Common ISO8601 duration mappings for frequently used values
+	const mappings = {
+		en: {
+			'P1Y': 'yearly',
+			'P1M': 'monthly',
+			'P1W': 'weekly',
+			'P1D': 'daily',
+			'PT1H': 'hourly',
+			'PT1M': 'every minute'
+		},
+		it: {
+			'P1Y': 'annuale',
+			'P1M': 'mensile',
+			'P1W': 'settimanale',
+			'P1D': 'giornaliero',
+			'PT1H': 'orario',
+			'PT1M': 'ogni minuto'
+		}
+	};
+
+	// Check for exact matches first
+	if (mappings[currentLang] && mappings[currentLang][iso8601Value]) {
+		return mappings[currentLang][iso8601Value];
+	}
+
+	// Parse ISO8601 pattern: P[nY][nM][nD][T[nH][nM][nS]]
+	// Examples: P1D, PT1H, PT30M, PT5H, PT20M, P1Y2M3DT4H5M6S
+	const pattern = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/;
+	const match = iso8601Value.match(pattern);
+	
+	if (!match) {
+		return iso8601Value; // Not a valid ISO8601 duration, return as-is
+	}
+
+	const [, years, months, days, hours, minutes, seconds] = match.map(v => v ? parseInt(v, 10) : 0);
+	
+	// Check if this is a time-only duration (PT...)
+	const isTimeOnly = !years && !months && !days && (hours || minutes || seconds);
+	
+	// Check if this is a date-only duration (P... without T)
+	const isDateOnly = (years || months || days) && !hours && !minutes && !seconds;
+	
+	// Check if this is a single unit duration (only one component)
+	const componentCount = [years, months, days, hours, minutes, seconds].filter(v => v > 0).length;
+	const isSingleUnit = componentCount === 1;
+
+	if (currentLang === 'en') {
+		// English formatting
+		if (isTimeOnly && isSingleUnit) {
+			// Single time unit: "every X hours/minutes"
+			if (hours) return hours === 1 ? 'hourly' : `every ${hours} hours`;
+			if (minutes) return minutes === 1 ? 'every minute' : `every ${minutes} minutes`;
+			if (seconds) return seconds === 1 ? 'every second' : `every ${seconds} seconds`;
+		} else if (isDateOnly && isSingleUnit) {
+			// Single date unit: use natural forms
+			if (years) return years === 1 ? 'yearly' : `every ${years} years`;
+			if (months) return months === 1 ? 'monthly' : `every ${months} months`;
+			if (days) return days === 1 ? 'daily' : `every ${days} days`;
+		}
+		
+		// Multiple components or complex durations
+		const parts = [];
+		if (years) parts.push(years === 1 ? '1 year' : `${years} years`);
+		if (months) parts.push(months === 1 ? '1 month' : `${months} months`);
+		if (days) parts.push(days === 1 ? '1 day' : `${days} days`);
+		if (hours) parts.push(hours === 1 ? '1 hour' : `${hours} hours`);
+		if (minutes) parts.push(minutes === 1 ? '1 minute' : `${minutes} minutes`);
+		if (seconds) parts.push(seconds === 1 ? '1 second' : `${seconds} seconds`);
+		
+		return parts.length > 0 ? parts.join(', ') : iso8601Value;
+	} else {
+		// Italian formatting
+		if (isTimeOnly && isSingleUnit) {
+			// Single time unit: "ogni X ore/minuti"
+			if (hours) return hours === 1 ? 'orario' : `ogni ${hours} ore`;
+			if (minutes) return minutes === 1 ? 'ogni minuto' : `ogni ${minutes} minuti`;
+			if (seconds) return seconds === 1 ? 'ogni secondo' : `ogni ${seconds} secondi`;
+		} else if (isDateOnly && isSingleUnit) {
+			// Single date unit: use natural forms
+			if (years) return years === 1 ? 'annuale' : `ogni ${years} anni`;
+			if (months) return months === 1 ? 'mensile' : `ogni ${months} mesi`;
+			if (days) return days === 1 ? 'giornaliero' : `ogni ${days} giorni`;
+		}
+		
+		// Multiple components or complex durations
+		const parts = [];
+		if (years) parts.push(years === 1 ? '1 anno' : `${years} anni`);
+		if (months) parts.push(months === 1 ? '1 mese' : `${months} mesi`);
+		if (days) parts.push(days === 1 ? '1 giorno' : `${days} giorni`);
+		if (hours) parts.push(hours === 1 ? '1 ora' : `${hours} ore`);
+		if (minutes) parts.push(minutes === 1 ? '1 minuto' : `${minutes} minuti`);
+		if (seconds) parts.push(seconds === 1 ? '1 secondo' : `${seconds} secondi`);
+		
+		return parts.length > 0 ? parts.join(', ') : iso8601Value;
+	}
+}
+
 // Expose translator globally for GIAPI widgets
 try { window.__t = t; } catch (e) { }
 
@@ -139,6 +282,15 @@ function initializeLogin(config) {
 		<button id=\"logoutBtn\" class=\"login-button\" style=\"display: none;\">${t('logout')}</button>
 		<button id=\"langBtn\" class=\"login-button lang-button\" title=\"${t('menu_change_language')}\">${curLang}</button>
 	`;
+	
+	// Adjust login container top position to better align with other buttons
+	// This will be set after headerDiv is ready
+	setTimeout(function() {
+		var loginContainerEl = document.querySelector('.login-container');
+		if (loginContainerEl) {
+			loginContainerEl.style.top = '2px'; // Adjust to match button positions
+		}
+	}, 100);
 
 	// Append login container to headerDiv instead of body
 	const headerDiv = document.getElementById('headerDiv');
@@ -1235,11 +1387,13 @@ export function initializePortal(config) {
 					jQuery('#paginator-widget').css('display', 'none');
 				}
 
-				// refreshes the filters accordion 
+				// refreshes the filters accordion (only if it's initialized)
 				if (ui.newPanel.selector === '#filters-tab') {
-					jQuery('#filters-tab').accordion('refresh');
-					// Ensure collapsible option is set after refresh
-					jQuery('#filters-tab').accordion('option', 'collapsible', true);
+					var $filtersTab = jQuery('#filters-tab');
+					// Check if accordion is initialized before trying to refresh
+					if ($filtersTab.hasClass('ui-accordion')) {
+						$filtersTab.accordion('refresh');
+					}
 				}
 			}
 		});
@@ -1248,10 +1402,231 @@ export function initializePortal(config) {
 		// header settings
 		//
 		jQuery('#headerDiv').css('padding', '10px');
-		jQuery('#headerDiv').css('padding-top', '5px');
+		jQuery('#headerDiv').css('padding-top', '2px'); // Reduced padding-top to align buttons better
 		jQuery('#headerDiv').css('padding-left', '10px');
 		jQuery('#headerDiv').css('margin-left', '0px');
 		jQuery('#headerDiv').css('height', '30px');
+		jQuery('#headerDiv').css('position', 'relative'); // Ensure relative positioning for absolute children
+
+		//------------------------------------------------------------------
+		// Clear All Constraints function
+		//
+		function clearAllConstraints() {
+			// Clear text constraints (what, from, to, and all advanced parameters)
+			if (GIAPI.search.constWidget) {
+				// Clear what constraint
+				if (config.generalTermSearch == undefined || config.generalTermSearch) {
+					jQuery('#' + GIAPI.search.constWidget.getId('what')).val('');
+				}
+				
+				// Clear temporal constraints
+				jQuery('#' + GIAPI.search.constWidget.getId('from')).val('');
+				jQuery('#' + GIAPI.search.constWidget.getId('to')).val('');
+				
+				// Clear all advanced constraint fields
+				var advancedKeys = [
+					'instrumentTitle', 'attributeTitle', 'platformTitle', 'isValidated',
+					'riverName', 'timeInterpolation', 'intendedObservationSpacing',
+					'aggregationDuration'
+				];
+				advancedKeys.forEach(function(key) {
+					var id = GIAPI.search.constWidget.getId(key);
+					if (jQuery('#' + id).length) {
+						jQuery('#' + id).val('');
+					}
+				});
+				
+				// Set semantic search to default: "Semantic search w/ translations and narrow matches" (value: 'true')
+				var semanticSearchId = GIAPI.search.constWidget.getId('semanticSearch');
+				if (jQuery('#' + semanticSearchId).length) {
+					jQuery('#' + semanticSearchId).val('true');
+				}
+			}
+			
+			// Clear spatial constraints (map selection)
+			if (GIAPI.search.resultsMapWidget) {
+				var olMap = GIAPI.search.resultsMapWidget.olMap;
+				if (olMap && olMap.selectionVisible) {
+					olMap.selectionVisible(false);
+				}
+				// Clear input control fields (south, west, north, east)
+				var mapElement = GIAPI.search.resultsMapWidget.map ? 
+					GIAPI.search.resultsMapWidget.map.getTargetElement() : null;
+				if (mapElement) {
+					var inputControl = jQuery(mapElement).find('.cnst-widget-where-input-control');
+					if (inputControl.length) {
+						// Clear all text input fields in the input control
+						inputControl.find('input[type="text"]').val('');
+					}
+				}
+			}
+			
+			// Clear sources selection (select all sources)
+			if (GIAPI.search.sourcesWidget) {
+				// Use the "check all" checkbox to select all sources
+				// This is the proper way as it handles both UI and source.include() calls
+				var checkAll = jQuery('#check_all');
+				if (checkAll.length) {
+					if (!checkAll.is(':checked')) {
+						// Trigger click on check_all, which will automatically check all individual sources
+						// and call source.include(true) for each source
+						checkAll.click();
+					}
+				} else {
+					// Fallback: if check_all doesn't exist, find all individual source checkboxes
+					// Source checkboxes have IDs like check_0, check_1, check_2, etc.
+					var sourceIndex = 0;
+					while (true) {
+						var checkId = 'check_' + sourceIndex;
+						var checkbox = jQuery('#' + checkId);
+						if (checkbox.length) {
+							if (!checkbox.is(':checked')) {
+								checkbox.click();
+							}
+							sourceIndex++;
+						} else {
+							// No more checkboxes found
+							break;
+						}
+					}
+				}
+			}
+			
+			// Clear filters (TermFrequency selections)
+			if (GIAPI.search.tfWidget && GIAPI.search.tfWidget.tfObject) {
+				var tfObject = GIAPI.search.tfWidget.tfObject;
+				var targets = tfObject.targets();
+				if (targets && targets.length > 0) {
+					// Clear all checked items for each target
+					targets.forEach(function(target) {
+						tfObject.clearCheckedItems(target);
+					});
+					// Clear all jtable selections
+					jQuery('#filters-tab table.jtable').each(function() {
+						var tableId = jQuery(this).attr('id');
+						if (tableId) {
+							jQuery('#' + tableId).jtable('unselectAllRows');
+						}
+					});
+				}
+			}
+			
+			// Trigger a new search with cleared constraints
+			setTimeout(function() {
+				GIAPI.search.discover();
+			}, 100);
+		}
+
+		//------------------------------------------------------------------
+		// Add Clear All button to header
+		//
+		// Helper function to get translation with fallback
+		function getTranslation(key, fallback) {
+			var translation = t(key);
+			// If translation returns the key itself, it means translation wasn't found in either current language or English
+			// In that case, use the fallback
+			if (translation === key) {
+				return fallback;
+			}
+			return translation;
+		}
+		
+		const clearAllButton = document.createElement('button');
+		clearAllButton.id = 'clearAllButton';
+		clearAllButton.className = 'login-button';
+		// Use t() directly - it will use current language, fallback to English, or return key
+		// The t() function checks i18n[i18n.current][key] first, then i18n.en[key], then returns key
+		var buttonText = t('clear_all');
+		// If we got the key back, it means translation wasn't found in current language or English
+		if (buttonText === 'clear_all') {
+			buttonText = 'Clear All'; // Fallback to English
+		}
+		// Add icon and text
+		clearAllButton.innerHTML = '<i class="fa fa-times" style="margin-right: 5px;"></i>' + buttonText;
+		// Remove custom inline styles - use login-button class styling instead
+		var buttonTitle = t('clear_all_tooltip');
+		if (buttonTitle === 'clear_all_tooltip') {
+			buttonTitle = 'Clear all search constraints'; // Fallback to English
+		}
+		clearAllButton.title = buttonTitle;
+		clearAllButton.addEventListener('click', function(e) {
+			e.preventDefault();
+			
+			// Create a better confirmation dialog
+			const confirmDialog = $('<div>').css({
+				'padding': '15px',
+				'min-width': '300px'
+			});
+			
+			// Add icon and message
+			const messageDiv = $('<div>').css({
+				'display': 'flex',
+				'align-items': 'flex-start',
+				'margin-bottom': '15px'
+			});
+			
+			const iconDiv = $('<div>').html('<i class="fa fa-exclamation-triangle" style="font-size: 24px; color: #e74c3c; margin-right: 12px; margin-top: 2px;"></i>');
+			messageDiv.append(iconDiv);
+			
+			const textDiv = $('<div>').css({
+				'flex': '1',
+				'line-height': '1.5'
+			});
+			var confirmText = t('confirm_clear_all');
+			var detailsText = t('confirm_clear_all_details');
+			var titleText = t('clear_all_title');
+			var clearButtonText = t('clear_all');
+			var cancelButtonText = t('cancel');
+			
+			textDiv.append($('<p>').text((confirmText === 'confirm_clear_all') ? 'Are you sure you want to clear all constraints?' : confirmText).css({
+				'margin': '0 0 8px 0',
+				'font-size': '14px',
+				'color': '#2c3e50'
+			}));
+			textDiv.append($('<p>').text((detailsText === 'confirm_clear_all_details') ? 'This will reset all search parameters including text, dates, spatial extent, sources, and filters.' : detailsText).css({
+				'margin': '0',
+				'font-size': '12px',
+				'color': '#7f8c8d',
+				'font-style': 'italic'
+			}));
+			messageDiv.append(textDiv);
+			
+			confirmDialog.append(messageDiv);
+			
+			// Show dialog
+			confirmDialog.dialog({
+				title: (titleText === 'clear_all_title') ? 'Clear All Constraints' : titleText,
+				modal: true,
+				width: 450,
+				resizable: false,
+				classes: {
+					"ui-dialog": "clear-all-dialog"
+				},
+				buttons: [
+					{
+						text: (clearButtonText === 'clear_all') ? 'Clear All' : clearButtonText,
+						class: 'login-button',
+						click: function() {
+							$(this).dialog('close');
+							clearAllConstraints();
+						}
+					},
+					{
+						text: (cancelButtonText === 'cancel') ? 'Cancel' : cancelButtonText,
+						click: function() {
+							$(this).dialog('close');
+						}
+					}
+				],
+				close: function() {
+					$(this).dialog('destroy').remove();
+				}
+			});
+		});
+		
+		// Store the button reference - will be appended after advanced search setup
+		// Store it in a variable accessible to the advanced search setup code
+		window._clearAllButton = clearAllButton;
 
 		//------------------------------------------------------------------
 		// portal header row with logos and titles (if configured)
@@ -1266,6 +1641,8 @@ export function initializePortal(config) {
 				// Left section: logo-left + title-left
 				const leftSection = document.createElement('div');
 				leftSection.className = 'portal-header-left';
+				leftSection.style.padding = '0';
+				leftSection.style.margin = '0';
 				
 				if (config['logo-left']) {
 					// Support multiple comma-separated logos in "logo-left"
@@ -1288,6 +1665,8 @@ export function initializePortal(config) {
 							const leftLogoImg = document.createElement('img');
 							leftLogoImg.className = 'portal-header-logo-left';
 							leftLogoImg.alt = 'Left logo';
+							leftLogoImg.style.padding = '0';
+							leftLogoImg.style.margin = '0';
 
 							// Use path as-is if relative, or full URL if absolute
 							const leftLogoSrc = logoSrc.startsWith('http') ? logoSrc : logoSrc;
@@ -1326,42 +1705,57 @@ export function initializePortal(config) {
 				// Right section: logo-right + title-right
 				const rightSection = document.createElement('div');
 				rightSection.className = 'portal-header-right';
+				rightSection.style.padding = '0';
+				rightSection.style.margin = '0';
 				
 				if (config['logo-right']) {
-					const rightLogoImg = document.createElement('img');
-					rightLogoImg.className = 'portal-header-logo-right';
-					rightLogoImg.alt = 'Right logo';
-					// Use path as-is if relative, or full URL if absolute
-					const rightLogoSrc = config['logo-right'].startsWith('http') ? config['logo-right'] : config['logo-right'];
-					
-					// Function to recalculate position
-					const recalculatePosition = function() {
-						setTimeout(function() {
-							if (window.positionTabsCallback) {
-								window.positionTabsCallback();
+					// Support multiple comma-separated logos in "logo-right"
+					const rightLogos = String(config['logo-right'])
+						.split(',')
+						.map(function(item) { return item.trim(); })
+						.filter(function(item) { return item.length > 0; });
+
+					if (rightLogos.length > 0) {
+						// Function to recalculate position
+						const recalculatePosition = function() {
+							setTimeout(function() {
+								if (window.positionTabsCallback) {
+									window.positionTabsCallback();
+								}
+							}, 10);
+						};
+
+						rightLogos.forEach(function(logoSrc) {
+							const rightLogoImg = document.createElement('img');
+							rightLogoImg.className = 'portal-header-logo-right';
+							rightLogoImg.alt = 'Right logo';
+							rightLogoImg.style.padding = '0';
+							rightLogoImg.style.margin = '0';
+
+							// Use path as-is if relative, or full URL if absolute
+							const rightLogoSrc = logoSrc.startsWith('http') ? logoSrc : logoSrc;
+
+							// Add load listener to recalculate position when image loads
+							rightLogoImg.addEventListener('load', recalculatePosition);
+							// Also handle errors (image fails to load)
+							rightLogoImg.addEventListener('error', recalculatePosition);
+
+							// Add click handler if href is provided
+							if (config['logo-right-href']) {
+								rightLogoImg.style.cursor = 'pointer';
+								rightLogoImg.addEventListener('click', function() {
+									window.open(config['logo-right-href'], '_blank', 'noopener,noreferrer');
+								});
 							}
-						}, 10);
-					};
-					
-					// Add load listener to recalculate position when image loads
-					rightLogoImg.addEventListener('load', recalculatePosition);
-					// Also handle errors (image fails to load)
-					rightLogoImg.addEventListener('error', recalculatePosition);
-					
-					// Add click handler if href is provided
-					if (config['logo-right-href']) {
-						rightLogoImg.style.cursor = 'pointer';
-						rightLogoImg.addEventListener('click', function() {
-							window.open(config['logo-right-href'], '_blank', 'noopener,noreferrer');
+
+							rightLogoImg.src = rightLogoSrc;
+							rightSection.appendChild(rightLogoImg);
+
+							// If image is already loaded (cached), trigger recalculation
+							if (rightLogoImg.complete) {
+								recalculatePosition();
+							}
 						});
-					}
-					
-					rightLogoImg.src = rightLogoSrc;
-					rightSection.appendChild(rightLogoImg);
-					
-					// If image is already loaded (cached), trigger recalculation
-					if (rightLogoImg.complete) {
-						recalculatePosition();
 					}
 				}
 				
@@ -1418,14 +1812,11 @@ export function initializePortal(config) {
 
 		//------------------------------------------------------------------
 		// search button
-		//
-		jQuery('#search-button').css('margin-left', '-3px');
-		jQuery('#search-button').css('margin-top', '5px');
+		// Note: Styling is now applied after the button is created (see below)
 
 		//------------------------------------------------------------------
 		// adv search button
-		//
-		jQuery('#adv-search-button').css('margin-top', '6px');
+		// Note: Styling is now applied after the button is created (see advancedSearch setup)
 
 		//------------------------------------------------------------------
 		// tabs
@@ -1438,6 +1829,12 @@ export function initializePortal(config) {
 
 		// Tabs and paginator now flow naturally in the document, no positioning needed
 		jQuery('#tabs-div').css('padding', '0px');
+		// Ensure tab panels are properly contained (filters-tab will override overflow-y)
+		jQuery('#tabs-div .tabs-element').css({
+			'position': 'relative'
+		});
+		// Ensure results-tab and sources-tab don't overflow
+		jQuery('#results-tab, #sources-tab').css('overflow', 'hidden');
 
 		//------------------------------------------------------------------
 		// results tab
@@ -1497,8 +1894,9 @@ export function initializePortal(config) {
 		// filters tab     
 		//
 		jQuery('#filters-tab').css('width', '100%');
-		jQuery('#filters-tab').css('height', '100%');
 		jQuery('#filters-tab').css('margin-top', '3px');
+		jQuery('#filters-tab').css('overflow-y', 'auto');
+		jQuery('#filters-tab').css('overflow-x', 'hidden');
 		jQuery('#filters-tab-link').text(t("filters_tab"));
 
 		//------------------------------------------------------------------
@@ -1666,10 +2064,14 @@ export function initializePortal(config) {
 			contentWrapper.append(map);
 
 			// If a beta-message is configured, add a small beta badge over the map
-			if (config['beta-message']) {
+			// Check for beta-message and beta-title in translation keys first, then fall back to config
+			var betaMessage = (t('beta-message') !== 'beta-message' ? t('beta-message') : null) || config['beta-message'];
+			var betaTitle = (t('beta-title') !== 'beta-title' ? t('beta-title') : null) || config['beta-title'] || 'beta';
+			
+			if (betaMessage) {
 				var betaBadge = jQuery(
 					'<div class="beta-badge">' +
-						'<span>beta</span>' +
+						'<span>' + betaTitle + '</span>' +
 						'<i class="fa fa-info-circle" aria-hidden="true"></i>' +
 					'</div>'
 				);
@@ -1685,7 +2087,7 @@ export function initializePortal(config) {
 						}
 						tooltipVisible = false;
 					} else {
-						tooltip = jQuery('<div class="beta-badge-tooltip"></div>').text(config['beta-message']);
+						tooltip = jQuery('<div class="beta-badge-tooltip"></div>').text(betaMessage);
 						betaBadge.append(tooltip);
 						tooltipVisible = true;
 					}
@@ -1782,7 +2184,7 @@ export function initializePortal(config) {
 		// search button
 		//
 		var searchButton = GIAPI.FontAwesomeButton({
-			'width': 100,
+			'width': 120, // Increased width to prevent wrapping
 			'label': t('search'),
 			'icon': 'fa-search',
 			'handler': function() {
@@ -1804,6 +2206,75 @@ export function initializePortal(config) {
 		searchButton.css('label', 'font-size', '1.2em');
 
 		jQuery('#search-button').append(searchButton.div());
+		
+		// Style the search button to match login-button style
+		// Apply login-button styling to the search button container
+		jQuery('#search-button .font-awesome-button').css({
+			'background-color': '#2c3e50',
+			'color': 'white',
+			'border': 'none',
+			'border-radius': '4px',
+			'padding': '6px 10px', // Reduced padding to match advanced button
+			'cursor': 'pointer',
+			'font-size': '14px',
+			'transition': 'background-color 0.3s',
+			'box-shadow': 'none', // Remove default hover shadow
+			'line-height': '1.4', // Consistent line height
+			'height': '32px', // Match other buttons exactly
+			'box-sizing': 'border-box',
+			'white-space': 'nowrap', // Prevent text wrapping
+			'display': 'flex', // Use flexbox for proper alignment
+			'align-items': 'center', // Center items vertically
+			'justify-content': 'center', // Center items horizontally
+			'gap': '4px' // Reduced gap to match advanced button
+		});
+		
+		// Ensure icon and label stay inline
+		jQuery('#search-button .font-awesome-button-icon').css({
+			'display': 'inline-block',
+			'vertical-align': 'middle',
+			'flex-shrink': '0' // Prevent icon from shrinking
+		});
+		
+		jQuery('#search-button .font-awesome-button-label').css({
+			'display': 'inline-block',
+			'vertical-align': 'middle',
+			'white-space': 'nowrap' // Prevent label text from wrapping
+		});
+		
+		// Add hover effect to match login-button
+		jQuery('#search-button .font-awesome-button').hover(
+			function() {
+				jQuery(this).css('background-color', '#34495e');
+			},
+			function() {
+				jQuery(this).css('background-color', '#2c3e50');
+			}
+		);
+		
+		// Align search button container properly
+		// Use a small negative margin to move up and align with login buttons
+		jQuery('#search-button').css({
+			'margin-left': '-3px',
+			'margin-top': '0px', // Start with 0, will be adjusted
+			'vertical-align': 'top',
+			'display': 'inline-block',
+			'line-height': 'normal'
+		});
+		
+		// Fine-tune alignment after a short delay to ensure DOM is ready
+		setTimeout(function() {
+			var searchBtn = jQuery('#search-button');
+			var loginBtn = jQuery('.login-container');
+			if (searchBtn.length && loginBtn.length) {
+				var searchTop = searchBtn.position().top;
+				var loginTop = loginBtn.position().top;
+				var offset = loginTop - searchTop;
+				if (Math.abs(offset) > 1) {
+					searchBtn.css('margin-top', offset + 'px');
+				}
+			}
+		}, 200);
 
 		//------------------------------------------------------------------
 		// hide results button
@@ -1904,6 +2375,7 @@ export function initializePortal(config) {
 		jQuery('#mapControlDiv').css('position', 'relative');
 		jQuery('#mapControlDiv').css('top', '5px');
 		jQuery('#mapControlDiv').css('z-index', '1');
+		jQuery('#mapControlDiv').css('background-color', '#c0c0c0'); // Match headerDiv background
 
 		jQuery('#where-div').append(document.getElementById("mapControlDiv"));
 
@@ -2082,12 +2554,30 @@ export function initializePortal(config) {
 						// Find the select element using the correct ID
 						const selectElement = document.getElementById(spacingId);
 						if (selectElement) {
+							// Sort durations by value (largest first), keeping non-ISO8601 values at the end
+							const sortedTypes = [...data.intendedObservationSpacing].sort((a, b) => {
+								const aValue = getISO8601DurationSortValue(a.value);
+								const bValue = getISO8601DurationSortValue(b.value);
+								// If both are ISO8601, sort by value (descending - largest first)
+								if (aValue > 0 && bValue > 0) {
+									return bValue - aValue;
+								}
+								// If only one is ISO8601, put ISO8601 first
+								if (aValue > 0) return -1;
+								if (bValue > 0) return 1;
+								// If neither is ISO8601, maintain original order
+								return 0;
+							});
+
 							const options = [
 								{ label: t("select_observation_spacing"), value: '' },
-								...data.intendedObservationSpacing.map(type => ({
-									label: `${type.value} (${type.observationCount} observations)`,
-									value: type.value
-								}))
+								...sortedTypes.map(type => {
+									const displayValue = formatISO8601Duration(type.value);
+									return {
+										label: `${displayValue} (${type.observationCount} observations)`,
+										value: type.value
+									};
+								})
 							];
 
 							// Update the select options
@@ -2125,12 +2615,30 @@ export function initializePortal(config) {
 						// Find the select element using the correct ID
 						const selectElement = document.getElementById(durationId);
 						if (selectElement) {
+							// Sort durations by value (largest first), keeping non-ISO8601 values at the end
+							const sortedTypes = [...data.aggregationDuration].sort((a, b) => {
+								const aValue = getISO8601DurationSortValue(a.value);
+								const bValue = getISO8601DurationSortValue(b.value);
+								// If both are ISO8601, sort by value (descending - largest first)
+								if (aValue > 0 && bValue > 0) {
+									return bValue - aValue;
+								}
+								// If only one is ISO8601, put ISO8601 first
+								if (aValue > 0) return -1;
+								if (bValue > 0) return 1;
+								// If neither is ISO8601, maintain original order
+								return 0;
+							});
+
 							const options = [
 								{ label: t("select_aggregation_duration"), value: '' },
-								...data.aggregationDuration.map(type => ({
-									label: `${type.value} (${type.observationCount} observations)`,
-									value: type.value
-								}))
+								...sortedTypes.map(type => {
+									const displayValue = formatISO8601Duration(type.value);
+									return {
+										label: `${displayValue} (${type.observationCount} observations)`,
+										value: type.value
+									};
+								})
 							];
 
 							// Update the select options
@@ -2212,7 +2720,152 @@ export function initializePortal(config) {
 					'margin-top': '5px',
 					'z-index': '1000'
 				});
-			}, 0);
+				
+				// Style the advanced search button to match login-button style
+				var $advButton = $advSearchDiv.find('.font-awesome-button');
+				if ($advButton.length) {
+					$advButton.css({
+						'background-color': '#2c3e50',
+						'color': 'white',
+						'border': 'none',
+						'border-radius': '4px',
+						'padding': '6px 10px', // Reduced padding to make button more compact
+						'cursor': 'pointer',
+						'font-size': '14px',
+						'transition': 'background-color 0.3s',
+						'box-shadow': 'none', // Remove default hover shadow
+						'line-height': '1.4', // Consistent line height
+						'height': 'auto', // Let height be determined by content
+						'min-height': '32px', // Match login button height
+						'width': 'auto', // Override the fixed 250px width to fit content
+						'min-width': 'auto', // Remove any min-width constraint
+						'box-sizing': 'border-box',
+						'vertical-align': 'middle',
+						'margin': '0',
+						'white-space': 'nowrap', // Prevent text wrapping
+						'display': 'flex', // Use flexbox for proper alignment
+						'align-items': 'center', // Center items vertically
+						'justify-content': 'center', // Center items horizontally
+						'gap': '4px' // Reduced gap between icon and label
+					});
+					
+					// Ensure icon and label stay inline
+					$advButton.find('.font-awesome-button-icon').css({
+						'display': 'inline-block',
+						'vertical-align': 'middle',
+						'flex-shrink': '0' // Prevent icon from shrinking
+					});
+					
+					$advButton.find('.font-awesome-button-label').css({
+						'display': 'inline-block',
+						'vertical-align': 'middle',
+						'white-space': 'nowrap' // Prevent label text from wrapping
+					});
+					
+					// Add hover effect to match login-button
+					$advButton.off('mouseenter mouseleave').on('mouseenter', function() {
+						jQuery(this).css('background-color', '#34495e');
+					}).on('mouseleave', function() {
+						jQuery(this).css('background-color', '#2c3e50');
+					});
+				}
+				
+				// Align advanced search div properly to match other buttons
+				$advSearchDiv.css({
+					'margin-top': '0px', // Will be adjusted to match search button
+					'vertical-align': 'top',
+					'display': 'inline-block',
+					'line-height': 'normal'
+				});
+				
+				// Fine-tune alignment to match search button
+				setTimeout(function() {
+					var searchBtn = jQuery('#search-button');
+					if (searchBtn.length) {
+						var searchTop = searchBtn.position().top;
+						var advTop = $advSearchDiv.position().top;
+						var offset = searchTop - advTop;
+						if (Math.abs(offset) > 1) {
+							$advSearchDiv.css('margin-top', (parseFloat($advSearchDiv.css('margin-top')) || 0) + offset + 'px');
+						}
+					}
+				}, 250);
+				
+				// Also ensure the table inside (which contains the button) is aligned
+				$advSearchDiv.find('table').css({
+					'vertical-align': 'middle',
+					'margin': '0',
+					'border-spacing': '0',
+					'border-collapse': 'collapse'
+				});
+				
+				// Align the table cells and the button inside
+				$advSearchDiv.find('table td').css({
+					'vertical-align': 'middle',
+					'padding': '0'
+				});
+				
+				// Ensure the button inside the table cell is also aligned
+				$advButton.css({
+					'vertical-align': 'middle',
+					'margin': '0'
+				});
+				
+				// Append Clear All button after the advanced search div
+				var clearAllBtn = window._clearAllButton || document.getElementById('clearAllButton');
+				if (clearAllBtn) {
+					// Check if button is already in DOM, if not append it
+					if (!clearAllBtn.parentNode) {
+						$advSearchDiv.after(clearAllBtn);
+					}
+					// Style the button to match search and advanced buttons
+					jQuery(clearAllBtn).css({
+						'margin-left': '10px',
+						'margin-right': '8px',
+						'margin-top': '0px', // Will be adjusted to match search button
+						'vertical-align': 'top',
+						'display': 'inline-block',
+						'line-height': '1.4', // Consistent line height
+						'height': '32px', // Match button height exactly
+						'box-sizing': 'border-box',
+						'padding': '8px 15px', // Match search button padding
+						'white-space': 'nowrap' // Prevent text wrapping
+					});
+					
+					// Fine-tune alignment to match search button
+					setTimeout(function() {
+						var searchBtn = jQuery('#search-button');
+						if (searchBtn.length && clearAllBtn) {
+							var searchTop = searchBtn.position().top;
+							var clearTop = jQuery(clearAllBtn).position().top;
+							var offset = searchTop - clearTop;
+							if (Math.abs(offset) > 1) {
+								jQuery(clearAllBtn).css('margin-top', (parseFloat(jQuery(clearAllBtn).css('margin-top')) || 0) + offset + 'px');
+							}
+						}
+					}, 300);
+				}
+			}, 100); // Increased timeout to ensure everything is ready
+		} else {
+			// If no advanced constraints, append after search button
+			setTimeout(function() {
+				var clearAllBtn = window._clearAllButton || document.getElementById('clearAllButton');
+				if (clearAllBtn && !clearAllBtn.parentNode) {
+					jQuery('#search-button').after(clearAllBtn);
+					jQuery(clearAllBtn).css({
+						'margin-left': '10px',
+						'margin-right': '8px',
+						'margin-top': '2px', // Match search button's margin-top
+						'vertical-align': 'middle',
+						'display': 'inline-block',
+						'line-height': '1.4',
+						'height': '32px', // Match button height exactly
+						'box-sizing': 'border-box',
+						'padding': '8px 15px', // Match search button padding
+						'white-space': 'nowrap' // Prevent text wrapping
+					});
+				}
+			}, 100);
 		}
 
 		//------------------------------------
@@ -2682,19 +3335,267 @@ export function initializePortal(config) {
 			}
 		);
 
-		// Make the accordion collapsible so clicking an open section closes it
-		if (jQuery('#filters-tab').hasClass('ui-accordion')) {
-			jQuery('#filters-tab').accordion('option', 'collapsible', true);
-		} else {
-			// If accordion isn't initialized yet, set it up after a short delay
+		// Simple filter accordion management - allow multiple panels open, all start closed
+		// The accordion is initialized by TermFrequencyWidget with beforeActivate returning false
+		// So we handle all state management ourselves
+		var originalUpdate = GIAPI.search.tfWidget.update;
+		var openPanelIndices = []; // Simple array tracking which panels are open
+		var isFirstInit = true;
+		var mutationObserver = null; // Observer to watch for table content changes
+		
+		// Function to adjust jtable container heights to fit content
+		var adjustJtableHeights = function($filtersTab) {
+			$filtersTab.find('[widget="tf"]').each(function() {
+				var $container = jQuery(this);
+				var $table = $container.find('table.jtable');
+				var $tbody = $table.find('tbody');
+				var rowCount = $tbody.find('tr.jtable-data-row').length;
+				
+				// Always set height to auto to fit content
+				$container.css({
+					'height': 'auto',
+					'min-height': 'auto',
+					'max-height': '550px' // Keep max-height from divCSS
+				});
+				$table.css({
+					'height': 'auto',
+					'min-height': 'auto',
+					'max-height': 'none'
+				});
+				$tbody.css({
+					'height': 'auto',
+					'min-height': 'auto',
+					'max-height': 'none'
+				});
+				
+				// Also ensure the accordion content div doesn't have fixed height
+				var $contentDiv = $container.closest('.ui-accordion-content');
+				if ($contentDiv.length) {
+					$contentDiv.css({
+						'height': 'auto',
+						'min-height': 'auto'
+					});
+				}
+			});
+		};
+		
+		// Simple function to toggle a panel
+		var togglePanel = function($header, open) {
+			var $content = $header.next();
+			if (open) {
+				$content.slideDown(300);
+				$header.addClass('ui-accordion-header-active ui-state-active').removeClass('ui-state-default');
+				$header.find('.ui-accordion-header-icon').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+				// Adjust heights after opening
+				setTimeout(function() {
+					adjustJtableHeights(jQuery('#filters-tab'));
+				}, 350);
+			} else {
+				$content.slideUp(300);
+				$header.removeClass('ui-accordion-header-active ui-state-active').addClass('ui-state-default');
+				$header.find('.ui-accordion-header-icon').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+			}
+		};
+		
+		// Setup click handlers for panels
+		var setupPanelHandlers = function($filtersTab) {
+			// Remove all existing handlers and add our custom one
+			$filtersTab.find('h3').off('click.accordion click.customAccordion').on('click.customAccordion', function(event) {
+				event.stopPropagation();
+				event.preventDefault();
+				
+				var $header = jQuery(this);
+				var headerIndex = $header.index();
+				var isActive = $header.hasClass('ui-accordion-header-active');
+				
+				if (isActive) {
+					// Close this panel
+					togglePanel($header, false);
+					// Remove from open list
+					var idx = openPanelIndices.indexOf(headerIndex);
+					if (idx > -1) {
+						openPanelIndices.splice(idx, 1);
+					}
+				} else {
+					// Open this panel
+					togglePanel($header, true);
+					// Add to open list if not already there
+					if (openPanelIndices.indexOf(headerIndex) === -1) {
+						openPanelIndices.push(headerIndex);
+					}
+				}
+			});
+		};
+		
+		// Wrap update to preserve open panels
+		GIAPI.search.tfWidget.update = function(resultSet) {
+			var $filtersTab = jQuery('#filters-tab');
+			
+			// Before update: get currently open panels (check both our state and DOM)
+			var panelsToRestore = [];
+			if ($filtersTab.hasClass('ui-accordion')) {
+				$filtersTab.find('h3').each(function(index) {
+					var $header = jQuery(this);
+					// Check if panel is open in DOM or in our state
+					if ($header.hasClass('ui-accordion-header-active') || openPanelIndices.indexOf(index) !== -1) {
+						panelsToRestore.push(index);
+					}
+				});
+			}
+			
+			// Call original update (this will refresh the accordion structure)
+			var result = originalUpdate.call(this, resultSet);
+			
+			// After update: restore panels and setup handlers
 			setTimeout(function() {
-				if (jQuery('#filters-tab').hasClass('ui-accordion')) {
-					jQuery('#filters-tab').accordion('option', 'collapsible', true);
+				if ($filtersTab.hasClass('ui-accordion')) {
+					// Ensure accordion settings are correct
+					$filtersTab.accordion('option', 'collapsible', true);
+					$filtersTab.accordion('option', 'beforeActivate', function() {
+						return false; // Prevent accordion from managing state
+					});
+					
+					// On first init, close all panels
+					if (isFirstInit) {
+						$filtersTab.find('h3').each(function() {
+							var $header = jQuery(this);
+							var $content = $header.next();
+							$content.hide();
+							togglePanel($header, false);
+						});
+						openPanelIndices = [];
+						isFirstInit = false;
+					} else {
+						// Restore panels that were open
+						panelsToRestore.forEach(function(panelIndex) {
+							var $header = $filtersTab.find('h3').eq(panelIndex);
+							if ($header.length) {
+								togglePanel($header, true);
+								if (openPanelIndices.indexOf(panelIndex) === -1) {
+									openPanelIndices.push(panelIndex);
+								}
+							}
+						});
+					}
+					
+					// Setup click handlers
+					setupPanelHandlers($filtersTab);
+					
+					// Adjust jtable heights to fit content (fix white space issue)
+					adjustJtableHeights($filtersTab);
+					// Also adjust after a short delay to catch any delayed rendering
+					setTimeout(function() {
+						adjustJtableHeights($filtersTab);
+					}, 200);
+					
+					// Setup MutationObserver to watch for table content changes
+					if (mutationObserver) {
+						mutationObserver.disconnect();
+					}
+					mutationObserver = new MutationObserver(function(mutations) {
+						adjustJtableHeights($filtersTab);
+					});
+					// Observe all jtable containers for changes
+					$filtersTab.find('[widget="tf"]').each(function() {
+						mutationObserver.observe(this, {
+							childList: true,
+							subtree: true,
+							attributes: false
+						});
+					});
 				}
 			}, 100);
-		}
+			
+			return result;
+		};
+		
+		// Initial setup (before first update)
+		setTimeout(function() {
+			var $filtersTab = jQuery('#filters-tab');
+			if ($filtersTab.hasClass('ui-accordion')) {
+				// Ensure accordion settings
+				$filtersTab.accordion('option', 'collapsible', true);
+				$filtersTab.accordion('option', 'beforeActivate', function() {
+					return false; // Prevent accordion from managing state
+				});
+				
+				// Close all panels initially
+				$filtersTab.find('h3').each(function() {
+					var $header = jQuery(this);
+					var $content = $header.next();
+					$content.hide();
+					togglePanel($header, false);
+				});
+				openPanelIndices = [];
+				
+				// Setup click handlers
+				setupPanelHandlers($filtersTab);
+			}
+		}, 100);
 
-		jQuery('#filters-tab').css('height', jQuery(window).height() - 150);
+		// Set height and ensure scrolling works properly
+		// Calculate available height based on the left-sidebar container
+		var calculateFiltersTabHeight = function() {
+			var leftSidebar = jQuery('#left-sidebar');
+			if (leftSidebar.length && leftSidebar.is(':visible')) {
+				// Calculate based on available space in left-sidebar
+				var sidebarHeight = leftSidebar.height();
+				var tabsHeight = jQuery('#tabs-ul').outerHeight(true) || 40;
+				var paginatorHeight = jQuery('#paginator-widget').is(':visible') ? jQuery('#paginator-widget').outerHeight(true) : 0;
+				var margins = 10; // Small margin for spacing
+				var availableHeight = sidebarHeight - tabsHeight - paginatorHeight - margins;
+				// Ensure minimum height
+				return Math.max(availableHeight, 300);
+			} else {
+				// Fallback to window-based calculation if sidebar not available
+				var windowHeight = jQuery(window).height();
+				var headerHeight = jQuery('#headerDiv').outerHeight(true) || 0;
+				var portalHeaderHeight = jQuery('#portalHeaderRow').outerHeight(true) || 0;
+				var tabsHeight = jQuery('#tabs-ul').outerHeight(true) || 40;
+				var margins = 200;
+				var availableHeight = windowHeight - headerHeight - portalHeaderHeight - tabsHeight - margins;
+				return Math.max(availableHeight, 300);
+			}
+		};
+		
+		// Ensure filters-tab is properly contained
+		jQuery('#filters-tab').css({
+			'position': 'relative',
+			'overflow-y': 'auto',
+			'overflow-x': 'hidden',
+			'background-color': 'white',
+			'z-index': '1'
+		});
+		
+		// Set initial height after a short delay to ensure layout is ready
+		setTimeout(function() {
+			var filtersTabHeight = calculateFiltersTabHeight();
+			jQuery('#filters-tab').css({
+				'height': filtersTabHeight + 'px',
+				'max-height': filtersTabHeight + 'px',
+				'min-height': '300px'
+			});
+		}, 100);
+		
+		// Update height on window resize
+		jQuery(window).on('resize', function() {
+			var newHeight = calculateFiltersTabHeight();
+			jQuery('#filters-tab').css({
+				'height': newHeight + 'px',
+				'max-height': newHeight + 'px'
+			});
+		});
+		
+		// Also update when tabs are activated (in case paginator visibility changes)
+		jQuery('#tabs-div').on('tabsactivate', function() {
+			setTimeout(function() {
+				var newHeight = calculateFiltersTabHeight();
+				jQuery('#filters-tab').css({
+					'height': newHeight + 'px',
+					'max-height': newHeight + 'px'
+				});
+			}, 50);
+		});
 
 
 		//------------------------------------
@@ -2790,6 +3691,13 @@ export function initializePortal(config) {
 				{ 'key': 'ontologyIds', 'value': ontologyIds }
 			);
 		}
+		
+		// Add bboxUnion parameter if zoomOnResults is enabled
+		if (config.zoomOnResults === true) {
+			constraints.kvp.push(
+				{ 'key': 'bboxUnion', 'value': 'true' }
+			);
+		}
 		 
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
 		// set the termFrequency option
@@ -2836,6 +3744,17 @@ export function initializePortal(config) {
 		if (GIAPI.UI_Utils.discoverDialog('isOpen')) {
 			GIAPI.UI_Utils.discoverDialog('close');
 		}
+		
+		// Handle zoom based on result set size and zoomOnResults setting
+		if (config.zoomOnResults === true) {
+			if (resultSet.size < 1000 && response.bboxUnion) {
+				// Zoom to bboxUnion for smaller result sets
+				window.GIAPI.zoomToBoundingBox(response.bboxUnion);
+			} else if (resultSet.size >= 1000) {
+				// Reset to default initial extent for larger result sets
+				window.GIAPI.zoomToDefaultExtent();
+			}
+		}
 	};
 
 	if (config.resultsVisibility !== undefined && !config.resultsVisibility) {
@@ -2868,16 +3787,64 @@ export function initializePortal(config) {
 			}
 		}
 		if (olMap && typeof olMap.fitBounds === 'function') {
+			
+			// Add padding to bbox to better frame stations, especially for point bboxes
+			var padding = 0.05; // Default padding for non-point bboxes (degrees)
+			var isPoint = (bbox.west === bbox.east && bbox.south === bbox.north);
+			
+			if (isPoint) {
+				// For point bboxes, use larger padding (0.1 degrees) to avoid too much zoom
+				padding = 0.1;
+			}
+			
+			// Apply padding to bbox coordinates
+			var paddedBbox = {
+				west: bbox.west - padding,
+				south: bbox.south - padding,
+				east: bbox.east + padding,
+				north: bbox.north + padding
+			};
+			
+			// Clamp coordinates to valid ranges
+			paddedBbox.west = Math.max(-180, paddedBbox.west);
+			paddedBbox.south = Math.max(-90, paddedBbox.south);
+			paddedBbox.east = Math.min(180, paddedBbox.east);
+			paddedBbox.north = Math.min(90, paddedBbox.north);
 
-
-			var minlatLon = ol.proj.transform([bbox.west, bbox.south], 'EPSG:4326', 'EPSG:3857');
-			var maxlatLon = ol.proj.transform([bbox.east, bbox.north], 'EPSG:4326', 'EPSG:3857');
-
-
+			var minlatLon = ol.proj.transform([paddedBbox.west, paddedBbox.south], 'EPSG:4326', 'EPSG:3857');
+			var maxlatLon = ol.proj.transform([paddedBbox.east, paddedBbox.north], 'EPSG:4326', 'EPSG:3857');
 
 			var tbbox = { 'south': minlatLon[1], 'west': minlatLon[0], 'north': maxlatLon[1], 'east': maxlatLon[0] };
 
 			olMap.fitBounds(tbbox);
+		} else {
+			alert('Map zoom function not available.');
+		}
+	};
+	
+	// Function to reset map to default initial extent from config
+	window.GIAPI.zoomToDefaultExtent = function() {
+		var mapWidget = GIAPI.search && GIAPI.search.resultsMapWidget;
+		var olMap = null;
+		if (mapWidget) {
+			if (mapWidget.map) {
+				olMap = mapWidget.map;
+			} else if (mapWidget.olMap) {
+				olMap = mapWidget.olMap;
+			}
+		}
+		if (olMap && olMap.getView) {
+			var view = olMap.getView();
+			var centerLat = config.centerLat !== undefined ? config.centerLat : 0;
+			var centerLon = config.centerLon !== undefined ? config.centerLon : 0;
+			var zoom = config.zoom !== undefined ? config.zoom : 4;
+			
+			// Transform center coordinates to map projection
+			var center = ol.proj.transform([centerLon, centerLat], 'EPSG:4326', 'EPSG:3857');
+			
+			// Set center and zoom
+			view.setCenter(center);
+			view.setZoom(zoom);
 		} else {
 			alert('Map zoom function not available.');
 		}

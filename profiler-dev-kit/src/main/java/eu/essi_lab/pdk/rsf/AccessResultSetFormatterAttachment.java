@@ -86,6 +86,9 @@ public class AccessResultSetFormatterAttachment extends AccessResultSetFormatter
 	} else if (dataFormat.equals(DataFormat.DDS())) {
 
 	    extension = ".dds";
+	} else if (dataFormat.equals(DataFormat.CSV())) {
+
+	    extension = ".csv";
 	}
 
 	String filename = "dataset" + extension;

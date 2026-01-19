@@ -1421,6 +1421,29 @@ var download = function(button, event, data) {
 		modal: true,
 		open: function() {
 			var $dialog = $(this).dialog("widget");
+			var $dialogContent = $("#dialog-download");
+			
+			// Always create/update the dialog content with format selection
+			$dialogContent.empty();
+			var $formatLabel = $("<label>").attr("for", "format").text(t('please_select_data_format') + ":").css({
+				"display": "block",
+				"margin-bottom": "5px"
+			});
+			var $formatSelect = $("<select>").attr("id", "format").css({
+				"width": "100%",
+				"padding": "5px",
+				"margin-top": "10px",
+				"margin-bottom": "10px"
+			});
+
+			// Add format options
+			$formatSelect.append($("<option>").attr("value", "waterml").text("WaterML 1.0"));
+			$formatSelect.append($("<option>").attr("value", "waterml2").text("WaterML 2.0"));
+			$formatSelect.append($("<option>").attr("value", "netcdf").text("NetCDF"));
+			$formatSelect.append($("<option>").attr("value", "csv").text("CSV"));
+			
+			$dialogContent.append($formatLabel);
+			$dialogContent.append($formatSelect);
 			
 			// Use CSS transform to center - this is more reliable
 			$dialog.css({

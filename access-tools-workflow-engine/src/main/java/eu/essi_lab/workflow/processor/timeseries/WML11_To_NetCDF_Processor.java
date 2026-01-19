@@ -397,7 +397,7 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 		}
 		ancillaryVariables.add(variable);
 	    }
-	    if (!qualityControlLevels.isEmpty()) {
+	    if (!qualityControlLevels.isEmpty() || !qualityControlLevelCode.isEmpty()) {
 		NetCDFVariable<String> variable = new NetCDFVariable<String>(netCDFVariableName + "_quality_control_level_code",
 			qualityControlLevelCode, null, DataType.STRING);
 		variable.addAttribute("long_name", "Quality control level code");
