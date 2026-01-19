@@ -66,6 +66,10 @@ public class PointBuilder {
 	    qualityObject.put("term", wmlQuality.getLabel());
 	    qualityObject.put("vocabulary", wmlQuality.getVocabulary());
 	    metadata.put("quality", qualityObject);    
+	}else{
+	    JSONObject qualityObject = new JSONObject();
+	    qualityObject.put("term", quality);
+	    metadata.put("quality", qualityObject);
 	}
 	
     }

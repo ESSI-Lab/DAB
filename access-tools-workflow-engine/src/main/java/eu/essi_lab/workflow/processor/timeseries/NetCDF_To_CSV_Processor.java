@@ -87,6 +87,28 @@ public class NetCDF_To_CSV_Processor extends DataProcessor {
 		variableLongName = mainVariable.getShortName();
 	    }
 
+	    // Extract ancillary variables
+	    List<VariableSimpleIF> ancillaryVariableList = new ArrayList<>();
+	    Attribute ancillaryVariablesAttribute = mainVariable.findAttributeIgnoreCase("ancillary_variables");
+	    if (ancillaryVariablesAttribute != null) {
+		String ancillaryVariablesString = ancillaryVariablesAttribute.getStringValue();
+		if (ancillaryVariablesString != null && !ancillaryVariablesString.trim().isEmpty()) {
+		    // Ancillary variables are space-separated
+		    String[] ancillaryVarNames = ancillaryVariablesString.trim().split("\\s+");
+		    for (String varName : ancillaryVarNames) {
+			if (varName != null && !varName.trim().isEmpty()) {
+			    // Find the variable in the dataset
+			    for (VariableSimpleIF var : dataVariables) {
+				if (var.getShortName().equals(varName.trim())) {
+				    ancillaryVariableList.add(var);
+				    break;
+				}
+			    }
+			}
+		    }
+		}
+	    }
+
 	    String stationName = "";
 	    Station station = null;
 
@@ -113,7 +135,17 @@ public class NetCDF_To_CSV_Processor extends DataProcessor {
 
 	    try (FileWriter writer = new FileWriter(csvFile)) {
 		// Write CSV header
-		writer.append("time,value,quality_code,station_name,parameter\n");
+		StringBuilder header = new StringBuilder("time,value,station_name,parameter");
+		for (VariableSimpleIF ancVar : ancillaryVariableList) {
+		    String ancVarName = ancVar.getShortName();
+		    Attribute ancLongNameAttr = ancVar.findAttributeIgnoreCase("long_name");
+		    if (ancLongNameAttr != null) {
+			ancVarName = ancLongNameAttr.getStringValue();
+		    }
+		    header.append(",").append(escapeCsvValue(ancVarName));
+		}
+		header.append("\n");
+		writer.append(header.toString());
 
 		// Write data rows
 		while (pfc.hasNext()) {
@@ -139,31 +171,66 @@ public class NetCDF_To_CSV_Processor extends DataProcessor {
 			valueStr = value.toString();
 		    }
 
-		    // Extract quality code
-		    String qualifier = "";
 		    List<StructureMembers.Member> members = featureData.getMembers();
-		    for (StructureMembers.Member member : members) {
-			if (member.getName().contains("quality_control_level_code")) {
-			    qualifier = featureData.getScalarString(member.getName());
-			    if (qualifier == null) {
-				qualifier = "";
-			    }
-			    break;
-			}
-		    }
 
 		    // Escape CSV values (handle commas and quotes)
 		    String escapedTime = escapeCsvValue(timeString);
 		    String escapedValue = escapeCsvValue(valueStr);
-		    String escapedQuality = escapeCsvValue(qualifier);
+
 		    String escapedStation = escapeCsvValue(stationName);
 		    String escapedParameter = escapeCsvValue(variableLongName);
 
 		    writer.append(escapedTime).append(",");
 		    writer.append(escapedValue).append(",");
-		    writer.append(escapedQuality).append(",");
 		    writer.append(escapedStation).append(",");
-		    writer.append(escapedParameter).append("\n");
+		    writer.append(escapedParameter);
+
+		    // Extract and write ancillary variable values
+		    for (VariableSimpleIF ancVar : ancillaryVariableList) {
+			String ancVarName = ancVar.getShortName();
+			String ancValueStr = "";
+			
+			// Try to get the value from featureData
+			try {
+			    // First, find the member to check its data type
+			    StructureMembers.Member member = null;
+			    for (StructureMembers.Member m : members) {
+				if (m.getName().equals(ancVarName)) {
+				    member = m;
+				    break;
+				}
+			    }
+			    
+			    if (member != null && member.getDataType().isNumeric()) {
+				// For numeric types, try to get as double
+				try {
+				    Double ancValue = featureData.getScalarDouble(ancVarName);
+				    if (ancValue != null && !ancValue.isNaN() && !ancValue.isInfinite()) {
+					ancValueStr = ancValue.toString();
+				    }
+				} catch (Exception e) {
+				    // If getScalarDouble fails, try as string
+				    String ancValueString = featureData.getScalarString(ancVarName);
+				    if (ancValueString != null) {
+					ancValueStr = ancValueString;
+				    }
+				}
+			    } else {
+				// For non-numeric types, get as string
+				String ancValueString = featureData.getScalarString(ancVarName);
+				if (ancValueString != null) {
+				    ancValueStr = ancValueString;
+				}
+			    }
+			} catch (Exception e) {
+			    // If extraction fails, leave as empty string
+			    ancValueStr = "";
+			}
+			
+			writer.append(",").append(escapeCsvValue(ancValueStr));
+		    }
+
+		    writer.append("\n");
 		}
 	    }
 

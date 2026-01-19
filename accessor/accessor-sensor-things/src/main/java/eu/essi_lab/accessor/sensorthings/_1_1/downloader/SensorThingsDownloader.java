@@ -286,12 +286,12 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 	    JSONArray arrayElement = (JSONArray) dataElement;
 
 	    String phenomenonTime = getPhenomenonTime(arrayElement, phenomenonTimeIndex);
-	    double result = arrayElement.getDouble(resultIndex);
+	    BigDecimal result = arrayElement.getBigDecimal(resultIndex);
 
 	    ValueSingleVariable v = new ValueSingleVariable();
 
 	    try {
-		v.setValue(new BigDecimal(result));
+		v.setValue(result);
 
 		GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 		c.setTime(ISO8601DateTimeUtils.parseISO8601ToDate(phenomenonTime).get());
