@@ -297,7 +297,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    if (!formats.isEmpty()) {
 		JSONArray array = new JSONArray();
 		for (Format format : formats) {
-		    if (format.getName() != null && !format.getName().equals("")) {
+		    if (format.getName() != null && !format.getName().isEmpty()) {
 			array.put(format.getName());
 		    }
 		}
