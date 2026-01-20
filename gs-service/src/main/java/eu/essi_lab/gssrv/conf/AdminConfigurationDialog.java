@@ -63,18 +63,9 @@ class AdminConfigurationDialog extends SettingEditDialog {
 
 	getCancelButton().getStyle().set("display", "none");
 
-	setTitle("Configure administrator role");
+	setTitle("Administration settings");
 
 	VerticalLayout contentLayout = getContentLayout();
-
-	Label label = ComponentFactory
-		.createLabel("In order to proceed, configure the administrator role and click 'Apply changes' button");
-	label.getStyle().set("margin-left", "5px");
-	label.getStyle().set("margin-top", "10px");
-	label.getStyle().set("margin-bottom", "10px");
-	label.getStyle().set("font-size", "18px");
-
-	contentLayout.addComponentAtIndex(0, label);
 
 	contentLayout.setHeight(620, Unit.PIXELS);
     }
