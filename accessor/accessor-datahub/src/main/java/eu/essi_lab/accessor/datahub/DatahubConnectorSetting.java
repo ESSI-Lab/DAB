@@ -21,9 +21,13 @@ package eu.essi_lab.accessor.datahub;
  * #L%
  */
 
+import java.util.Optional;
+
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
+import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.cfga.option.StringOptionBuilder;
 
 /**
  * @author Generated
@@ -31,14 +35,75 @@ import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 public class DatahubConnectorSetting extends HarvestedConnectorSetting {
 
     private static final int DEFAULT_PAGE_SIZE = 50;
+    
+    private static final String USERNAME_OPTION_KEY = "username";
+    private static final String PASSWORD_OPTION_KEY = "password";
+    private static final String IDENTIFIERS_URL_OPTION_KEY = "identifiersUrl";
 
     /**
      * 
      */
     public DatahubConnectorSetting() {
 
-	setPageSize(DEFAULT_PAGE_SIZE);
+	 setPageSize(DEFAULT_PAGE_SIZE);
+	
+	// Add username option
+	Option<String> usernameOption = StringOptionBuilder.get().//
+		withKey(USERNAME_OPTION_KEY).//
+		withLabel("Username").//
+		cannotBeDisabled().//
+		build();
+		addOption(usernameOption);
+	
+	// Add password option
+	Option<String> passwordOption = StringOptionBuilder.get().//
+		withKey(PASSWORD_OPTION_KEY).//
+		withLabel("Password").//
+		cannotBeDisabled().//
+		build();
+	addOption(passwordOption);
+	
+	// Add identifiers URL option
+	Option<String> identifiersUrlOption = StringOptionBuilder.get().//
+		withKey(IDENTIFIERS_URL_OPTION_KEY).//
+		withLabel("Identifiers URL (http:// or file://)").//
+		cannotBeDisabled().//
+		build();
+	addOption(identifiersUrlOption);
     }
+    
+    /**
+     * @return
+     */
+    public Optional<String> getUsername() { 
+		Optional<Option<String>> option = getOption(USERNAME_OPTION_KEY, String.class);
+		if (option.isPresent()) {
+			return option.get().getOptionalValue();
+		}
+		return Optional.empty();
+    }
+    
+    /**
+     * @return
+     */
+    public Optional<String> getPassword() {
+		Optional<Option<String>> option = getOption(PASSWORD_OPTION_KEY, String.class);
+	if (option.isPresent()) {
+	    return option.get().getOptionalValue();
+	}
+	return Optional.empty();
+    }
+    
+    /**
+     * @return
+     */
+    public Optional<String> getIdentifiersUrl() {
+		Optional<Option<String>> option = getOption(IDENTIFIERS_URL_OPTION_KEY, String.class);
+		if (option.isPresent()) {
+			return option.get().getOptionalValue();
+		}
+		return Optional.empty();
+	}
 
     /**
      * @param object
