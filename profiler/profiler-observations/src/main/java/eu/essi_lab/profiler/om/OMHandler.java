@@ -38,7 +38,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -115,7 +117,6 @@ import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.om.JSONObservation.ObservationType;
 import eu.essi_lab.profiler.om.OMRequest.APIParameters;
 import eu.essi_lab.profiler.om.ObservationMapper.Property;
-import eu.essi_lab.profiler.om.resultwriter.CSVResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.EmptyResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.JSONObservationResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.ResultWriter;
@@ -1082,7 +1083,7 @@ public class OMHandler extends StreamingRequestHandler {
 			    }
 			    
 			    // Read qualifiers from the qualifiers attribute (WaterML 1.1 format)
-			    String quality = null;
+			    Map<String, String> qualifiers = new HashMap<>();
 			    Attribute qualifiersAttribute = startElement.getAttributeByName(new QName("qualifiers"));
 			    if (qualifiersAttribute != null) {
 				String qualifiersString = qualifiersAttribute.getValue();
@@ -1091,18 +1092,41 @@ public class OMHandler extends StreamingRequestHandler {
 					// URL decode the qualifiers string
 					String decodedQualifiers = URLDecoder.decode(qualifiersString, StandardCharsets.UTF_8.name());
 					// Qualifiers are space-separated key:value pairs
-					// Combine them into a single quality string
-					quality = decodedQualifiers;
+					// Parse them into a map
+					String[] qualifierPairs = decodedQualifiers.split("\\s+");
+					for (String pair : qualifierPairs) {
+					    if (pair != null && !pair.trim().isEmpty()) {
+						int colonIndex = pair.indexOf(':');
+						if (colonIndex > 0 && colonIndex < pair.length() - 1) {
+						    String key = pair.substring(0, colonIndex);
+						    String qualifierValue = pair.substring(colonIndex + 1).replace("_"," ");
+						    qualifiers.put(key, qualifierValue);
+						} else {
+						    // If no colon, use the whole string as value with a default key
+						    qualifiers.put("qualifier", pair);
+						}
+					    }
+					}
 				    } catch (Exception e) {
-					// If decoding fails, use the original string
-					quality = qualifiersString;
+					// If decoding fails, try to parse the original string
+					String[] qualifierPairs = qualifiersString.split("\\s+");
+					for (String pair : qualifierPairs) {
+					    if (pair != null && !pair.trim().isEmpty()) {
+						int colonIndex = pair.indexOf(':');
+						if (colonIndex > 0 && colonIndex < pair.length() - 1) {
+						    String key = pair.substring(0, colonIndex);
+						    String qualifierValue = pair.substring(colonIndex + 1);
+						    qualifiers.put(key, qualifierValue);
+						}
+					    }
+					}
 				    }
 				}
 			    } else {
 				// Fallback to qualityControlLevelCode for backward compatibility
 				Attribute qualityAttribute = startElement.getAttributeByName(new QName("qualityControlLevelCode"));
 				if (qualityAttribute != null) {
-				    quality = qualityAttribute.getValue();
+				    qualifiers.put("qualityControlLevelCode", qualityAttribute.getValue());
 				}
 			    }
 
@@ -1110,7 +1134,7 @@ public class OMHandler extends StreamingRequestHandler {
 			    try {
 				if (d.isPresent()) {
 
-				    writer.writeDataObject(date, v, quality, observation, coord);
+				    writer.writeDataObject(date, v, qualifiers, observation, coord);
 
 				}
 			    } catch (Exception e) {

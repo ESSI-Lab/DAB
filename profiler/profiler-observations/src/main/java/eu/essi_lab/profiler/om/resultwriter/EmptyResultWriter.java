@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import eu.essi_lab.profiler.om.JSONObservation;
 
@@ -36,7 +37,7 @@ public class EmptyResultWriter extends ResultWriter {
 	}
 
 	@Override
-	public void writeDataContent(String date, BigDecimal v, String quality, JSONObservation observation, List<Double> coord)
+	public void writeDataContent(String date, BigDecimal v, Map<String, String> qualifiers, JSONObservation observation, List<Double> coord)
 			throws IOException {
 		// TODO Auto-generated method stub
 

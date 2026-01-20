@@ -3,10 +3,7 @@ package eu.essi_lab.profiler.om.resultwriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.json.JSONObject;
 
@@ -44,7 +41,7 @@ public class JSONObservationResultWriter extends ResultWriter {
 	}
 
 	@Override
-	public void writeDataContent(String date, BigDecimal v, String quality, JSONObservation observation,
+	public void writeDataContent(String date, BigDecimal v, Map<String, String> qualifiers, JSONObservation observation,
 			List<Double> coord) {
 		Optional<Date> d = ISO8601DateTimeUtils.parseISO8601ToDate(date);
 		try {
@@ -52,9 +49,9 @@ public class JSONObservationResultWriter extends ResultWriter {
 
 			JSONObject point = null;
 			if (coord != null) {
-				point = observation.getPointAndLocationAndQuality(d.get(), v, coord, quality);
+				point = observation.getPointAndLocationAndQualifiers(d.get(), v, coord, qualifiers);
 			} else {
-				point = observation.getPointAndQuality(d.get(), v, quality);
+				point = observation.getPointAndQualifiers(d.get(), v, qualifiers);
 			}
 			writer.write(point.toString());
 			first = false;
