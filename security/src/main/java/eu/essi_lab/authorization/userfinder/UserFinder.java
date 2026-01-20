@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.authorization.userfinder;
 
@@ -80,6 +80,7 @@ public class UserFinder {
 
     private static List<GSUser> users;
     private static final ExpiringCache<View> VIEWS = new ExpiringCache<>();
+
     static {
 	VIEWS.setDuration(VIEWS_CACHE_DURATION);
     }
@@ -123,7 +124,9 @@ public class UserFinder {
 		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 		}
 	    }
-	};
+	}
+
+	;
     }
 
     private Optional<String> email;
@@ -137,7 +140,7 @@ public class UserFinder {
     protected TokenProvider tokenProvider;
 
     /**
-     * 
+     *
      */
     public UserFinder() {
 
@@ -210,17 +213,16 @@ public class UserFinder {
     /**
      * Finds the user who originates the supplied <code>request</code>.<br>
      * <br>
-     * For the authentication mechanism which allows
-     * the admin user to initialize and manage the configuration, the returned user must have the registered
-     * administration identifier (e.g.: the email by which the user is registered with Google OAuth 2.0). In this case
-     * the role can be omitted since the authentication is based on the matching between the user identifier and the
-     * identifier written in the configuration.<br>
+     * For the authentication mechanism which allows the admin user to initialize and manage the configuration, the returned user must have
+     * the registered administration identifier (e.g.: the email by which the user is registered with Google OAuth 2.0). In this case the
+     * role can be omitted since the authentication is based on the matching between the user identifier and the identifier written in the
+     * configuration.<br>
      * <br>
-     * For discovery and access requests, the returned user must have at least
-     * the {@link GSUser#getRole()} since this attribute is required to execute the authorization mechanism.
+     * For discovery and access requests, the returned user must have at least the {@link GSUser#getRole()} since this attribute is required
+     * to execute the authorization mechanism.
      * <br>
      * If no user can be identified, the user with the {@link BasicRole#ANONYMOUS} role must be returned
-     * 
+     *
      * @param request
      * @return
      */
@@ -245,13 +247,13 @@ public class UserFinder {
 
 	Optional<GSUser> user = users.stream().filter(u -> //
 
-	// user must be disabled
-	!u.isEnabled() &&
+		// user must be disabled
+		!u.isEnabled() &&
 
-	//
-	// normal case, string equality comparison
-	//
-		identifier.equals(u.getIdentifier())).findFirst();
+			//
+			// normal case, string equality comparison
+			//
+			identifier.equals(u.getIdentifier())).findFirst();
 
 	if (user.isPresent()) {
 
@@ -467,35 +469,25 @@ public class UserFinder {
 		stream().//
 
 		// user must be enabled
-		filter(u -> u.isEnabled()).//
+			filter(GSUser::isEnabled).//
 
 		// the user properties contains one of the found properties identifiers
-		filter(u -> u.getProperties().stream().anyMatch(p -> identifiers.contains(p))).//
+			filter(u -> u.getProperties().stream().anyMatch(identifiers::contains)).//
 
-		findFirst();
+			findFirst();
 
-	if (!user.isPresent()) {
+	if (user.isEmpty()) {
 
 	    user = Optional.of(BasicRole.createAnonymousUser());
 
 	    //
 	    // if the request is executed by a user logged with OAuth 2.0, then the token provider returns the
-	    // email used as identifier. if such user is not registered in the userbase, the returned user will
-	    // have the anonymous role with the email as identifier.
-	    // the ESSIAdminService allows such user to handle the config since
-	    // to determinate if the email owns to the admin, it makes a comparison with the config user email.
-	    // anyway the user can be an admin user registered in the configuration, and the isAdmin checks it
+	    // email used as identifier and compares it with the configured admin email
 	    //
-	    if (email.isPresent()) {
+	    if (email.isPresent() && isAdmin(email.get())){
 
 		user.get().setIdentifier(email.get());
-
-		if (isAdmin(user.get())) {
-
-		    // GSLoggerFactory.getLogger(getClass()).debug("Admin user registered in the configuration");
-
-		    user.get().setRole(BasicRole.ADMIN.getRole());
-		}
+		user.get().setRole(BasicRole.ADMIN.getRole());
 	    }
 	}
 
@@ -506,7 +498,7 @@ public class UserFinder {
 
 	if (logBuilder != null) {
 
-	    logBuilder.append("\n- User found: " + user.get());
+	    logBuilder.append("\n- User found: ").append(user.get());
 
 	    GSLoggerFactory.getLogger(getClass()).debug(logBuilder.toString());
 	}
@@ -528,15 +520,13 @@ public class UserFinder {
 
 	Optional<View> view = Optional.ofNullable(VIEWS.get(identifier));
 
-	if (!view.isPresent()) {
+	if (view.isEmpty()) {
 
 	    try {
 		view = viewsReader.getView(identifier);
 
-		if (view.isPresent()) {
+		view.ifPresent(value -> VIEWS.put(identifier, value));
 
-		    VIEWS.put(identifier, view.get());
-		}
 	    } catch (GSException e) {
 
 		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
@@ -565,16 +555,14 @@ public class UserFinder {
 
 	    if (dynamicView.isPresent()) {
 
-		if (dynamicView.get() instanceof DynamicViewAnd) {
+		if (dynamicView.get() instanceof DynamicViewAnd dva) {
 
-		    DynamicViewAnd dva = (DynamicViewAnd) dynamicView.get();
 		    List<Bond> operands = dva.getDynamicBond().getOperands();
 
 		    for (Bond operand : operands) {
 
-			if (operand instanceof ViewBond) {
+			if (operand instanceof ViewBond viewBond) {
 
-			    ViewBond viewBond = (ViewBond) operand;
 			    view = getView(viewBond.getViewIdentifier());
 
 			    if (view.isPresent()) {
@@ -591,22 +579,17 @@ public class UserFinder {
     }
 
     /**
-     * Determines if the given user is an admin by comparing its identifier with the one provided by the configuration
-     * 
+     * Determines if the given user is an admin by comparing its identifier (e-mail) with the one provided by the configuration
+     *
      * @param user
      * @return
      * @throws GSException
      */
-    private boolean isAdmin(GSUser user) throws GSException {
+    private boolean isAdmin(String email) throws GSException {
 
-	Optional<String> configRootUser = ConfigurationWrapper.readAdminIdentifier();
+	Optional<String> adminUser = ConfigurationWrapper.readAdminIdentifier();
 
-	if (configRootUser.isPresent()) {
-
-	    return user.getIdentifier() != null && user.getIdentifier().equalsIgnoreCase(configRootUser.get());
-	}
-
-	return false;
+	return adminUser.filter(email::equalsIgnoreCase).isPresent();
     }
 
 }
