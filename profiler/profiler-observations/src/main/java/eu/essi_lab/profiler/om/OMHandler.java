@@ -209,7 +209,7 @@ public class OMHandler extends StreamingRequestHandler {
 	    View view = manager.getView(optView.get()).get();
 
 	    // only in this case permissions are checked
-	    if (view.getSourceDeployment().equals("his-central")){
+	    if (view.getSourceDeployment()!=null&& view.getSourceDeployment().equals("his-central")){
 
 		if (!user.hasPermission("api")) {
 		    printErrorMessage(output, "The user has not correct permissions");
