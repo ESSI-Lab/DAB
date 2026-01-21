@@ -37,6 +37,7 @@ import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.HostNamePropertyUtils;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -140,10 +141,10 @@ public class HarvestingReportsHandler {
 
 	String message = "Label: " + source.getLabel() + "\n";
 	message += "Endpoint: " + source.getEndpoint() + "\n";
-	message += "Id: " + source.getUniqueIdentifier() + "\n";
+	message += "Source id: " + source.getUniqueIdentifier() + "\n";
 	message += "Recovering: " + isRecovering + "\n";
 	message += "Resumed: " + resumed + "\n";
-	message += "Host: " + HostNamePropertyUtils.getHostNameProperty() + "\n";
+	message += "Host: " + HostNamePropertyUtils.getHostNameProperty() + "\n\n";
 
 	if (Objects.nonNull(harvestingProperties)) {
 
@@ -153,10 +154,13 @@ public class HarvestingReportsHandler {
 	    int resourcesCount = harvestingProperties.getResourcesCount();
 
 	    if (harvCount > 0) {
-		message += "Start time: " + startTime + "\n";
-		message += "End time: " + endTime + "\n";
-		message += "Harvesting #: " + harvCount + "\n";
-		message += "Resources #: " + resourcesCount + "\n";
+		message += "Number of previous harvesting done #: " + harvCount + "\n";
+		message += "Last harvesting took: "+ ISO8601DateTimeUtils.humanDuration(startTime,endTime)+"\n";
+		message += "Last harvesting start time: " + startTime + "\n";
+		message += "Last harvesting end time: " + endTime + "\n";
+		message += "Last harvesting resources #: " + resourcesCount + "\n";
+	    }else{
+		message += "This is the first harvesting of this source\n";
 	    }
 	}
 

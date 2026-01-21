@@ -69,6 +69,14 @@
 						}
 					},
 					{
+						"name": "featureName",
+						"in": "query",
+						"description": "Name of the feature",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "observationIdentifier",
 						"in": "query",
 						"description": "Identifier of the observation",
@@ -250,6 +258,14 @@
 						"name": "localFeatureIdentifier",
 						"in": "query",
 						"description": "Identifier of the feature specified by the data provider",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "featureName",
+						"in": "query",
+						"description": "Name of the feature",
 						"schema": {
 							"type": "string"
 						}
@@ -444,6 +460,14 @@
 						"name": "localFeatureIdentifier",
 						"in": "query",
 						"description": "Identifier of the feature specified by the data provider",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "featureName",
+						"in": "query",
+						"description": "Name of the feature",
 						"schema": {
 							"type": "string"
 						}
@@ -648,6 +672,14 @@
 						"name": "localFeatureIdentifier",
 						"in": "query",
 						"description": "Identifier of the feature specified by the data provider",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "featureName",
+						"in": "query",
+						"description": "Name of the feature",
 						"schema": {
 							"type": "string"
 						}

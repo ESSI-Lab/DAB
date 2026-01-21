@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.om;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.datatype.Duration;
 
@@ -189,6 +190,19 @@ public class JSONObservation {
    	return point;
        }
 
+    public void addPointAndQualifiers(Date date, BigDecimal value, Map<String, String> qualifiers) {
+	JSONObject point = getPointAndQualifiers(date, value, qualifiers);
+	points.put(point);
+    }
+    
+    public JSONObject getPointAndQualifiers(Date date, BigDecimal value, Map<String, String> qualifiers) {
+   	PointBuilder builder = new PointBuilder();
+   	builder.setDateValue(date,value);
+   	builder.setQualifiers(qualifiers);
+   	JSONObject point = builder.build();
+   	return point;
+       }
+
     public void addPointAndLocation(Date date, BigDecimal value, List<Double> coordinates) {
 	JSONObject point = getPointAndLocation (date,value,coordinates);
 	points.put(point);
@@ -212,6 +226,20 @@ public class JSONObservation {
    	builder.setDateValue(date,value);
    	builder.setLocation(getGeometryName(),coordinates);
    	builder.setQuality(quality);
+   	JSONObject point = builder.build();
+   	return point;
+       }
+
+    public void addPointAndLocationAndQualifiers(Date date, BigDecimal value, List<Double> coordinates, Map<String, String> qualifiers) {
+	JSONObject point = getPointAndLocationAndQualifiers(date, value, coordinates, qualifiers);
+	points.put(point);
+    }
+    
+    public JSONObject getPointAndLocationAndQualifiers(Date date, BigDecimal value, List<Double> coordinates, Map<String, String> qualifiers) {
+   	PointBuilder builder = new PointBuilder();
+   	builder.setDateValue(date,value);
+   	builder.setLocation(getGeometryName(),coordinates);
+   	builder.setQualifiers(qualifiers);
    	JSONObject point = builder.build();
    	return point;
        }

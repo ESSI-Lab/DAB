@@ -41,11 +41,6 @@ import eu.essi_lab.model.exceptions.GSException;
 public abstract class Database implements SupportChecker, Configurable<DatabaseSetting> {
 
     /**
-     * 
-     */
-    public static final Integer MAX_RESULT_WINDOW_SIZE = 10000;
-
-    /**
      * @author Fabrizio
      */
     public enum IdentifierType {

@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.om;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -72,6 +73,64 @@ public class PointBuilder {
 	    metadata.put("quality", qualityObject);
 	}
 	
+    }
+
+    public void setQualifiers(Map<String, String> qualifiers) {
+	if (qualifiers == null || qualifiers.isEmpty()) {
+	    return;
+	}
+	JSONObject metadata = null;
+	if (point.has("metadata")) {
+	    metadata = point.getJSONObject("metadata");
+	} else {
+	    metadata = new JSONObject();
+	    point.put("metadata", metadata);
+	}
+	
+	JSONArray qualifiersArray = new JSONArray();
+	for (Map.Entry<String, String> entry : qualifiers.entrySet()) {
+	    String key = entry.getKey();
+	    String value = entry.getValue();
+	    
+	    if (value == null || value.trim().isEmpty()) {
+		continue;
+	    }
+	    
+	    JSONObject qualifierObject = new JSONObject();
+	    
+	    // Check if the value is a URI (starts with http)
+	    WML2QualityCategory wmlQuality = null;
+	    if (value.startsWith("http")) {
+		wmlQuality = WML2QualityCategory.decodeUri(value);
+		if (wmlQuality != null) {
+		    qualifierObject.put("term", wmlQuality.getLabel());
+		    qualifierObject.put("vocabulary", wmlQuality.getVocabulary());
+		} else {
+		    qualifierObject.put("term", value);
+		}
+	    } else {
+		qualifierObject.put("term", value);
+	    }
+	    
+	    // Add the qualifier key as a property if it's not the default "quality" key
+	    if (!key.equals("quality") && !key.equals("qualityControlLevelCode")) {
+		qualifierObject.put("key", key);
+	    }
+	    
+	    qualifiersArray.put(qualifierObject);
+	}
+	
+	if (qualifiersArray.length() > 0) {
+	    if (qualifiersArray.length() == 1) {
+		// If only one qualifier, put it as "quality" for backward compatibility
+		metadata.put("quality", qualifiersArray.get(0));
+	    } else {
+		// If multiple qualifiers, put them as an array
+		metadata.put("qualifiers", qualifiersArray);
+		// Also put the first one as "quality" for backward compatibility
+		metadata.put("quality", qualifiersArray.get(0));
+	    }
+	}
     }
 
     public void setLocation(String geometryName, List<Double> coordinates) {

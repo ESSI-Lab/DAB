@@ -261,12 +261,7 @@ $(document).ready(function() {
 	}
 });
 
-GWIS._nwisRootUrl = "../../gwis"; // this is the URL of the profiler. E.g. https://gs-service-production.geodab.eu/gs-service/services/bnhs
-
-//
-//
-//
-
+// Time series plots (formerly GWIS-based) and shared helpers
 var plots = [];
 
 var cutDate = function(date) {
@@ -324,6 +319,18 @@ var findValue = function(data, i, targetKey) {
 	return value;
 }
 
+// Get attribute label with language support (uses attribute_label_it for Italian, attribute_label otherwise)
+var getAttributeLabel = function(data, i) {
+	var currentLang = lang();
+	if (currentLang === 'it') {
+		var itLabel = findValue(data, i, 'attribute_label_it');
+		if (itLabel !== undefined && itLabel !== null && itLabel !== "") {
+			return itLabel;
+		}
+	}
+	return findValue(data, i, 'attribute_label');
+}
+
 var convertDate = function(isoDate) {
 
 	var year = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(new Date(isoDate));
@@ -350,17 +357,29 @@ var createDataTable = function(data, i) {
 
 	items.push("<tr><td class='data_table_header' colspan='2'>" + t('timeseries_metadata') + "</td></tr>");
 
-	items.push("<tr><td class='data_table_label_td'>" + t('observed_variable') + "</td><td>" + findValue(data, i, 'attribute_label') + "</td></tr>");
+	items.push("<tr><td class='data_table_label_td'>" + t('observed_variable') + "</td><td>" + getAttributeLabel(data, i) + "</td></tr>");
 
+	var attributeUnits = findValue(data, i, 'attribute_units');
 	var unitAbbr = findValue(data, i, 'attribute_units_abbreviation');
-
-					if (unitAbbr !== undefined && unitAbbr !== null && unitAbbr !== "") {
-					  unitAbbr = " (" + unitAbbr + ")";
-					} else {
-					  unitAbbr = "";
-					}
+	
+	var unitDisplay = "";
+	if (attributeUnits !== undefined && attributeUnits !== null && attributeUnits !== "") {
+		// If attribute_units exists, show it with abbreviation in parentheses if available
+		if (unitAbbr !== undefined && unitAbbr !== null && unitAbbr !== "") {
+			unitDisplay = attributeUnits + " (" + unitAbbr + ")";
+		} else {
+			unitDisplay = attributeUnits;
+		}
+	} else {
+		// If attribute_units is undefined, just show the abbreviation
+		if (unitAbbr !== undefined && unitAbbr !== null && unitAbbr !== "") {
+			unitDisplay = unitAbbr;
+		} else {
+			unitDisplay = "";
+		}
+	}
 					
-	items.push("<tr><td>" + t('measurement_unit') + "</td><td>"+ findValue(data, i, 'attribute_units')  + unitAbbr +"</td></tr>");	
+	items.push("<tr><td>" + t('measurement_unit') + "</td><td>" + unitDisplay + "</td></tr>");	
 
 	items.push("<tr><td>" + t('temporal_extent') + "</td><td>" + tempExtent + "</td></tr>");
 
@@ -509,7 +528,7 @@ var getSpatialExtent = function(data, i) {
 	area = (area && area !== '#N/A') ? "river drainage area: " + area + " mq" : "river drainage area not available, ";
 	effArea = (effArea && effArea !== '#N/A') ? "river effective drainage area: " + effArea + " mq" : "river effective drainage area not available";
 
-	return findValue(data, i, 'attribute_label') + " by gauge.  " + area + " " + effArea + " (" + shape + ")";
+	return getAttributeLabel(data, i) + " by gauge.  " + area + " " + effArea + " (" + shape + ")";
 };
 
 var normalizeRoleLabel = function(role) {
@@ -767,49 +786,478 @@ var renderOrganizations = function($container, organizations) {
 
 
 
-var createPlot = function(data, i, recent) {
+// Build OM API URL for a given time series and time window
+var buildOmApiUrl = function(timeseriesId, startTime, endTime) {
+	// Use relative path so token/view are inherited from the current URL.
+	// Current page is typically .../view/<viewId>/annali/bnhs/station/<stationCode>
+	// OM API lives at .../view/<viewId>/annali/om-api/observations
+	var baseUrl = "../../om-api/observations";
+	var params = [];
+	if (timeseriesId) {
+		params.push("observationIdentifier=" + encodeURIComponent(timeseriesId));
+	}
+	if (startTime) {
+		params.push("beginPosition=" + encodeURIComponent(startTime));
+	}
+	if (endTime) {
+		params.push("endPosition=" + encodeURIComponent(endTime));
+	}
+	params.push("includeData=true");
+	params.push("limit=1");
+	return baseUrl + "?" + params.join("&");
+};
 
-	var startTime = recent ? data[i].time_end_recent.value : cutDate(data[i].time_start.value);
+// Analyze qualifiers for a set of points and update the qualifiers box UI
+var updateQualifiersBox = function(seriesIndex, points) {
 
-	var endTime = cutDate(data[i].time_end.value);
-	
+	var boxId = "qualifiers-box_" + seriesIndex;
+	var $box = $("#" + boxId);
+	if ($box.length === 0) {
+		$box = $("<div></div>", {
+			id: boxId,
+			class: "qualifiers-box"
+		}).css({
+			"margin-top": "10px",
+			"padding": "8px",
+			"border": "1px solid #ccc",
+			"background-color": "#f9f9f9",
+			"font-size": "12px",
+			"max-width": "420px"
+		}).appendTo("#bottom-td_" + seriesIndex);
+	}
 
+	// Collect qualifiers per point
+	var qualifiersPerPoint = [];
+	for (var p = 0; p < points.length; p++) {
+		var pt = points[p] || {};
+		var meta = pt.metadata || {};
+		var quals = meta.qualifiers || [];
+		if (!Array.isArray(quals)) {
+			quals = [quals];
+		}
+		qualifiersPerPoint.push(quals);
+	}
 
-	return GWIS.plot({
-
-		title: data[i].attribute_label.value + " " + t('at_station') + " " + data[i].platform_label.value,
-
-		xlabel: t('time'),
-
-		ylabel: data[i].attribute_label.value + " (" + data[i].attribute_units_abbreviation.value + ")",
-
-		start_dt: startTime,
-
-		end_dt: endTime,
-
-		div_id: "plot_" + i,
-
-		series: [
-			{
-				site: data[i].platform_id.value,
-				pcode: data[i].attribute_id.value,
-				stroke_pattern: [7, 3],
-				draw_points: true,
-				label: data[i].attribute_label.value + " in " + data[i].attribute_units_abbreviation.value
-
+	var allKeysMap = {};
+	for (var i = 0; i < qualifiersPerPoint.length; i++) {
+		var qArr = qualifiersPerPoint[i];
+		for (var j = 0; j < qArr.length; j++) {
+			var q = qArr[j] || {};
+			var key = q.key || "";
+			if (!key) {
+				continue;
 			}
-		],
+			allKeysMap[key] = true;
+		}
+	}
 
-		iv_local_or_utc: "utc",
+	var commonQualifiers = {};
+	var variableQualifiers = {};
 
-		controls: "all",
+	for (var key in allKeysMap) {
+		if (!Object.prototype.hasOwnProperty.call(allKeysMap, key)) {
+			continue;
+		}
+		var valuesForKey = [];
+		var allEqual = true;
+		var firstValueSet = false;
+		var firstValue = null;
 
-		on_success: function(plot) {
-			// Date pickers are initialized separately on page load; no need to re-init here.
+		for (var pi = 0; pi < qualifiersPerPoint.length; pi++) {
+			var qList = qualifiersPerPoint[pi];
+			var valueForPoint = null;
+			for (var qi = 0; qi < qList.length; qi++) {
+				if (qList[qi] && qList[qi].key === key) {
+					valueForPoint = qList[qi].term || "";
+					break;
+				}
+			}
+			valuesForKey.push(valueForPoint);
+			if (!firstValueSet) {
+				firstValue = valueForPoint;
+				firstValueSet = true;
+			} else if (valueForPoint !== firstValue) {
+				allEqual = false;
+			}
+		}
+
+		if (allEqual) {
+			commonQualifiers[key] = firstValue;
+		} else {
+			variableQualifiers[key] = valuesForKey;
+		}
+	}
+
+	// Store variable qualifiers so hover handler can update values
+	if (!plots[seriesIndex]) {
+		plots[seriesIndex] = {};
+	}
+	plots[seriesIndex].variableQualifiers = variableQualifiers;
+
+	// Build UI content
+	$box.empty();
+
+
+
+	// Helper: get a human-readable, localized label for a qualifier key
+	var qualifierLabel = function(key) {
+		if (!key) {
+			return '';
+		}
+		// Try i18n key like "qualifier_qualityFlag"
+		var tKey = 'qualifier_' + key;
+		var translated = t(tKey);
+		if (translated && translated !== tKey) {
+			return translated;
+		}
+		// Fallback: normalize key (camelCase / snake_case) to spaced label
+		var normalized = key.replace(/_/g, ' ');
+		normalized = normalized.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+		normalized = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+		return normalized;
+	};
+
+	// Predefined order for qualifiers
+	var qualifierOrder = [
+		'referenceCitation',
+		'editorIndividual',
+		'editorRole',
+		'editorOrganization',
+		'annalBasinName',
+		'annalStationName',		
+		'annalInstrumentType',
+		'annalInstrumentQuote',
+		'qualityFlag'
+	];
+
+	// Helper: get sort order for a qualifier key (lower = earlier)
+	var qualifierSortOrder = function(key) {
+		var index = qualifierOrder.indexOf(key);
+		return index >= 0 ? index : 999; // Unknown keys go to the end
+	};
+
+	// Sort common qualifier keys according to predefined order
+	var commonKeys = [];
+	for (var cKey in commonQualifiers) {
+		if (Object.prototype.hasOwnProperty.call(commonQualifiers, cKey)) {
+			commonKeys.push(cKey);
+		}
+	}
+	commonKeys.sort(function(a, b) {
+		return qualifierSortOrder(a) - qualifierSortOrder(b);
+	});
+
+	// Common qualifiers (identical for all points)
+	var hasCommon = false;
+	for (var ci = 0; ci < commonKeys.length; ci++) {
+		var cKey = commonKeys[ci];
+		hasCommon = true;
+		var cVal = commonQualifiers[cKey];
+		var cLabel = qualifierLabel(cKey);
+		var $row = $("<div></div>").css({ "margin-bottom": "2px" });
+		$row.append($("<span></span>").css({ "font-weight": "bold" }).text(cLabel + ": "));
+		$row.append($("<span></span>").text(cVal));
+		$box.append($row);
+	}
+
+	// Sort variable qualifier keys according to predefined order
+	var variableKeys = [];
+	for (var vKey in variableQualifiers) {
+		if (Object.prototype.hasOwnProperty.call(variableQualifiers, vKey)) {
+			variableKeys.push(vKey);
+		}
+	}
+	variableKeys.sort(function(a, b) {
+		return qualifierSortOrder(a) - qualifierSortOrder(b);
+	});
+
+	// Variable qualifiers (change per point; show placeholder until hover)
+	var hasVariable = false;
+	for (var vi = 0; vi < variableKeys.length; vi++) {
+		var vKey = variableKeys[vi];
+		hasVariable = true;
+		var vLabel = qualifierLabel(vKey);
+		var placeholder = t('hover_to_display');
+		var spanId = "qual-var_" + seriesIndex + "_" + vKey;
+		var $vRow = $("<div></div>").css({ "margin-bottom": "2px" });
+		$vRow.append($("<span></span>").css({ "font-weight": "bold" }).text(vLabel + ": "));
+		$vRow.append($("<span></span>").attr("id", spanId).text(placeholder));
+		$box.append($vRow);
+	}
+
+	if (!hasCommon && !hasVariable) {
+		$box.append($("<div></div>").text(t('no_data_available')));
+	}
+};
+
+// Create / update a time series plot in the given div using Plotly and OM JSON
+var createPlot = function(data, i) {
+
+	var containerId = "plot_" + i;
+	var $container = $("#" + containerId);
+
+	// Fallback if container is missing
+	if ($container.length === 0) {
+		return;
+	}
+
+	// Extract current time window from metadata (already kept in sync with datepickers)
+	var startTime = cutDate(data[i].time_start.value);
+	var endTime = cutDate(data[i].time_end.value);
+
+	// Extract time series identifier for OM API
+	var timeseriesId = findValue(data, i, 'timeseries_id');
+
+	if (!timeseriesId) {
+		$container.html('<div style="padding: 20px; text-align: center; color: red;">' +
+			t('no_data_available') + ' (' + 'missing timeseries_id' + ')' +
+			'</div>');
+		return;
+	}
+
+	// Show loading message
+	$container.html('<div style="padding: 20px; text-align: center;">' + t('loading') + '...</div>');
+
+	// Ensure Plotly is available (similar pattern as rating curves)
+	var ensurePlotlyAndRender = function(points) {
+		if (typeof Plotly === 'undefined') {
+			var plotlyScript = document.querySelector('script[src*="plotly"]');
+			if (!plotlyScript) {
+				$container.html('<div style="padding: 20px; text-align: center; color: red;">' +
+					t('plot_library_error') + '<br><small>Plotly.js script tag not found</small></div>');
+				return;
+			}
+			var attempts = 0;
+			var maxAttempts = 50;
+			var checkPlotly = setInterval(function() {
+				attempts++;
+				if (typeof Plotly !== 'undefined') {
+					clearInterval(checkPlotly);
+					renderPlot(points);
+				} else if (attempts >= maxAttempts) {
+					clearInterval(checkPlotly);
+					$container.html('<div style="padding: 20px; text-align: center; color: red;">' +
+						t('plot_library_error') + '<br><small>Check browser console for details</small></div>');
+				}
+			}, 100);
+		} else {
+			renderPlot(points);
+		}
+	};
+
+	// Render the Plotly time series chart
+	var renderPlot = function(points) {
+		if (!points || points.length === 0) {
+			$container.html('<div style="padding: 20px; text-align: center;">' + t('no_data_available') + '</div>');
+			return;
+		}
+
+		var times = [];
+		var values = [];
+		var qualityFlags = [];
+		for (var p = 0; p < points.length; p++) {
+			var pt = points[p];
+			if (pt.time && pt.time.instant != null && typeof pt.value !== 'undefined' && pt.value !== null) {
+				times.push(pt.time.instant);
+				values.push(pt.value);
+				
+				// Extract qualityFlag from qualifiers
+				var qualityFlag = "";
+				var meta = pt.metadata || {};
+				var quals = meta.qualifiers || [];
+				if (!Array.isArray(quals)) {
+					quals = [quals];
+				}
+				for (var q = 0; q < quals.length; q++) {
+					if (quals[q] && quals[q].key === "qualityFlag") {
+						qualityFlag = quals[q].term || "";
+						break;
+					}
+				}
+				qualityFlags.push(qualityFlag);
+			}
+		}
+
+		if (times.length === 0) {
+			$container.html('<div style="padding: 20px; text-align: center;">' + t('no_data_available') + '</div>');
+			return;
+		}
+
+		var yUnitAbbr = data[i].attribute_units_abbreviation && data[i].attribute_units_abbreviation.value ?
+			data[i].attribute_units_abbreviation.value : "";
+		var yAxisTitle = getAttributeLabel(data, i) +
+			(yUnitAbbr ? " (" + yUnitAbbr + ")" : "");
+
+		// Clear any previous content such as the "Loading..." label
+		$container.empty();
+
+		// Build hover text array with qualityFlag and units
+		var hoverTexts = [];
+		for (var h = 0; h < times.length; h++) {
+			var hoverText = times[h];
+			var valueWithUnit = values[h];
+			if (yUnitAbbr) {
+				valueWithUnit = valueWithUnit + " " + yUnitAbbr;
+			}
+			hoverText += "<br>" + valueWithUnit;
+			if (qualityFlags[h]) {
+				hoverText += "<br>qualityFlag: " + qualityFlags[h];
+			}
+			hoverTexts.push(hoverText);
+		}
+
+		var trace = {
+			x: times,
+			y: values,
+			type: 'scatter',
+			mode: 'lines+markers',
+			name: getAttributeLabel(data, i),
+			line: {
+				color: '#00529c',
+				width: 2
+			},
+			marker: {
+				color: '#00529c',
+				size: 4
+			},
+			hovertemplate: '%{text}<extra></extra>',
+			text: hoverTexts
+		};
+
+		var layout = {
+			title: {
+				text: getAttributeLabel(data, i) + " " + t('at_station') + " " + data[i].platform_label.value,
+				font: {
+					size: 16,
+					color: '#000000'
+				}
+			},
+			xaxis: {
+				title: {
+					text: t('time')
+				},
+				showgrid: true,
+				gridcolor: '#e0e0e0'
+			},
+			yaxis: {
+				title: {
+					text: yAxisTitle
+				},
+				showgrid: true,
+				gridcolor: '#e0e0e0'
+			},
+			plot_bgcolor: '#ffffff',
+			paper_bgcolor: '#ffffff',
+			hovermode: 'closest',
+			margin: {
+				l: 60,
+				r: 30,
+				t: 50,
+				b: 50
+			},
+			showlegend: false
+		};
+
+		var config = {
+			displayModeBar: true,
+			displaylogo: false,
+			modeBarButtonsToRemove: ['lasso2d', 'select2d'],
+			responsive: true
+		};
+
+		var plotElement = document.getElementById(containerId);
+		if (!plotElement) {
+			return;
+		}
+
+		Plotly.newPlot(containerId, [trace], layout, config);
+
+		// Attach hover handler once to update variable qualifier values
+		if (!plotElement._qualifiersHoverBound) {
+			plotElement._qualifiersHoverBound = true;
+			plotElement.on('plotly_hover', function(eventData) {
+				if (!eventData || !eventData.points || !eventData.points.length) {
+					return;
+				}
+				var pointIndex = eventData.points[0].pointIndex;
+				var seriesMeta = plots[i] && plots[i].variableQualifiers;
+				if (!seriesMeta) {
+					return;
+				}
+				for (var vKey in seriesMeta) {
+					if (!Object.prototype.hasOwnProperty.call(seriesMeta, vKey)) {
+						continue;
+					}
+					var vals = seriesMeta[vKey];
+					var term = (vals && typeof vals[pointIndex] !== 'undefined' && vals[pointIndex] !== null) ?
+						vals[pointIndex] : "";
+					var spanId = "qual-var_" + i + "_" + vKey;
+					var $span = $("#" + spanId);
+					if ($span.length) {
+						if (term === "") {
+							var placeholder = t('no_data_available');
+							$span.text(placeholder);
+						} else {
+							$span.text(term);
+						}
+					}
+				}
+			});
+
+			plotElement.on('plotly_unhover', function() {
+				var seriesMeta = plots[i] && plots[i].variableQualifiers;
+				if (!seriesMeta) {
+					return;
+				}
+				for (var vKey in seriesMeta) {
+					if (!Object.prototype.hasOwnProperty.call(seriesMeta, vKey)) {
+						continue;
+					}
+					var spanId = "qual-var_" + i + "_" + vKey;
+					var $span = $("#" + spanId);
+					if ($span.length) {
+						var placeholder = t('hover_to_display');
+						$span.text(placeholder);
+					}
+				}
+			});
+		}
+	};
+
+	// Fetch data from OM API
+	var url = buildOmApiUrl(timeseriesId, startTime, endTime);
+
+	$.ajax({
+		url: url,
+		type: 'GET',
+		dataType: 'json',
+		success: function(response) {
+			try {
+				var members = response && response.member;
+				if (!members || !members.length) {
+					ensurePlotlyAndRender([]);
+					return;
+				}
+				var observation = members[0];
+				var result = observation.result || {};
+				var points = result.points || [];
+
+				// Update qualifiers box (common + variable qualifiers)
+				if (points && points.length) {
+					updateQualifiersBox(i, points);
+				}
+
+				ensurePlotlyAndRender(points);
+			} catch (e) {
+				console.error('Error parsing OM API response:', e);
+				$container.html('<div style="padding: 20px; text-align: center; color: red;">' +
+					t('no_data_available') + '</div>');
+			}
 		},
-
-		on_error: function(plot) {
-			// Date pickers are initialized separately on page load; no need to re-init here.
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.error('Error loading OM API data:', textStatus, errorThrown);
+			$container.html('<div style="padding: 20px; text-align: center; color: red;">' +
+				t('no_data_available') + '</div>');
 		}
 	});
 };
@@ -1378,7 +1826,7 @@ var createLayoutTable = function(data, i, k) {
 	// Prefer the time series title from the response (when available), otherwise fallback to observed property label
 	var seriesTitle = findValue(data, i, 'title');
 	if (typeof seriesTitle === 'undefined' || seriesTitle === null || ('' + seriesTitle).trim() === '') {
-		seriesTitle = data[i].attribute_label.value;
+		seriesTitle = getAttributeLabel(data, i);
 	}
 	var label = seriesTitle; // +" from "+convertDate(data[i].time_start.value)+" to "+convertDate(data[i].time_end.value);
 
@@ -1514,8 +1962,8 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 		indexes.push(i);
 	}
 	indexes.sort(function(a, b) {
-		v1 = findValue(data, a, 'attribute_label');
-		v2 = findValue(data, b, 'attribute_label');
+		v1 = getAttributeLabel(data, a);
+		v2 = getAttributeLabel(data, b);
 		if (v1 < v2) {
 			return -1;
 		}
@@ -1604,6 +2052,8 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 	}
 
 	document.getElementById('geolocation-td').innerHTML = geoLocation;
+
+	var timeserisId = findValue(data, 0, 'timeseries_id');
 
 	// Fetch rating curves for this platform
 	var platformId = findValue(data, 0, 'platform_id');

@@ -21,29 +21,25 @@ package eu.essi_lab.lib.utils;
  * #L%
  */
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.TimeZone;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
 
 public class ISO8601DateTimeUtils {
 
@@ -68,6 +64,39 @@ public class ISO8601DateTimeUtils {
 
     private ISO8601DateTimeUtils() {
 	// force static usage
+    }
+
+    public static String humanDuration(String isoStart, String isoEnd) {
+	OffsetDateTime start = OffsetDateTime.parse(isoStart);
+	OffsetDateTime end = OffsetDateTime.parse(isoEnd);
+
+	if (end.isBefore(start)) {
+	    throw new IllegalArgumentException("End datetime must be after start datetime");
+	}
+
+	java.time.Duration duration = java.time.Duration.between(start, end);
+
+	long days = duration.toDays();
+	duration = duration.minus(days, ChronoUnit.DAYS);
+
+	long hours = duration.toHours();
+	duration = duration.minus(hours, ChronoUnit.HOURS);
+
+	long minutes = duration.toMinutes();
+
+	StringBuilder result = new StringBuilder();
+
+	if (days > 0) {
+	    result.append(days).append(days == 1 ? " day " : " days ");
+	}
+	if (hours > 0) {
+	    result.append(hours).append(hours == 1 ? " hour " : " hours ");
+	}
+	if (minutes > 0 || result.length() == 0) {
+	    result.append(minutes).append(minutes == 1 ? " minute" : " minutes");
+	}
+
+	return result.toString().trim();
     }
 
     public static String normalizeISO8601Duration(String isoDuration) {
@@ -479,10 +508,10 @@ public class ISO8601DateTimeUtils {
     }
 
     public static void main(String[] args) throws Exception {
-	System.out.println("test");
-	Optional<Date> d = ISO8601DateTimeUtils.parseISO8601ToDate("2024-11-05T16:15:00 00Z");
-	
-	System.out.println(d.get());
+	String start = "2024-01-01T10:15:00Z";
+	String end   = "2024-01-03T13:45:00Z";
+
+	System.out.println(humanDuration(start, end));
 
     }
 

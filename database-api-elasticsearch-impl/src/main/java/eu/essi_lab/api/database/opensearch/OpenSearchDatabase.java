@@ -67,6 +67,12 @@ public class OpenSearchDatabase extends Database {
 
     public static boolean debugQueries = false;
 
+
+    /**
+     *
+     */
+    public static final Integer MAX_RESULT_WINDOW_SIZE = 10000;
+
     static {
 
 	debugQueries = JavaOptions.isEnabled(JavaOptions.DEBUG_OPENSEARCH_QUERIES);
