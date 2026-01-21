@@ -38,13 +38,14 @@ public class GetViewIdentifiersRequest {
     private String creator;
     private String owner;
     private ViewVisibility viewVisibility;
+    private String sourceDeployment;
 
     /**
      * @return
      */
     public static GetViewIdentifiersRequest create() {
 
-	return new GetViewIdentifiersRequest(null, null, null, null, null);
+	return new GetViewIdentifiersRequest(null, null, null, null, null, null);
     }
 
     /**
@@ -53,16 +54,16 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest withCreator(String creator) {
 
-	return new GetViewIdentifiersRequest(null, null, creator, null, null);
+	return new GetViewIdentifiersRequest(null, null, creator, null, null, null);
     }
 
     /**
-     * @param creator
+     * @param owner
      * @return
      */
     public static GetViewIdentifiersRequest withOwner(String owner) {
 
-	return new GetViewIdentifiersRequest(null, null, null, owner, null);
+	return new GetViewIdentifiersRequest(null, null, null, owner, null, null);
     }
 
     /**
@@ -73,7 +74,7 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest withCreator(Integer start, Integer count, String creator) {
 
-	return new GetViewIdentifiersRequest(start, count, creator, null, null);
+	return new GetViewIdentifiersRequest(start, count, creator, null, null, null);
     }
 
     /**
@@ -84,7 +85,7 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest withOwner(Integer start, Integer count, String owner) {
 
-	return new GetViewIdentifiersRequest(start, count, null, owner, null);
+	return new GetViewIdentifiersRequest(start, count, null, owner, null, null);
     }
 
     /**
@@ -94,7 +95,7 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest create(Integer start, Integer count) {
 
-	return new GetViewIdentifiersRequest(start, count, null, null, null);
+	return new GetViewIdentifiersRequest(start, count, null, null, null, null);
     }
 
     /**
@@ -106,7 +107,7 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest create(Integer start, Integer count, String creator, String owner) {
 
-	return new GetViewIdentifiersRequest(start, count, creator, owner, null);
+	return new GetViewIdentifiersRequest(start, count, creator, owner, null, null);
     }
 
     /**
@@ -120,7 +121,7 @@ public class GetViewIdentifiersRequest {
     public static GetViewIdentifiersRequest create(Integer start, Integer count, String creator, String owner,
 	    ViewVisibility viewVisibity) {
 
-	return new GetViewIdentifiersRequest(start, count, creator, owner, viewVisibity);
+	return new GetViewIdentifiersRequest(start, count, creator, owner, viewVisibity, null);
     }
 
     /**
@@ -131,7 +132,7 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest create(String creator, String owner, ViewVisibility viewVisibity) {
 
-	return new GetViewIdentifiersRequest(null, null, creator, owner, viewVisibity);
+	return new GetViewIdentifiersRequest(null, null, creator, owner, viewVisibity, null);
     }
 
     /**
@@ -141,7 +142,7 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest create(String creator, ViewVisibility viewVisibity) {
 
-	return new GetViewIdentifiersRequest(null, null, creator, null, viewVisibity);
+	return new GetViewIdentifiersRequest(null, null, creator, null, viewVisibity, null);
     }
 
     /**
@@ -150,7 +151,7 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest create(String creator) {
 
-	return new GetViewIdentifiersRequest(null, null, creator, null, null);
+	return new GetViewIdentifiersRequest(null, null, creator, null, null, null);
     }
     
     /**
@@ -159,7 +160,7 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest create(ViewVisibility viewVisibity) {
 
-	return new GetViewIdentifiersRequest(null, null, null, null, viewVisibity);
+	return new GetViewIdentifiersRequest(null, null, null, null, viewVisibity, null);
     }
 
     /**
@@ -169,7 +170,7 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest create(String creator, String owner) {
 
-	return new GetViewIdentifiersRequest(null, null, creator, owner, null);
+	return new GetViewIdentifiersRequest(null, null, creator, owner, null, null);
     }
 
     /**
@@ -181,7 +182,7 @@ public class GetViewIdentifiersRequest {
      */
     public static GetViewIdentifiersRequest create(Integer start, Integer count, String creator, ViewVisibility viewVisibity) {
 
-	return new GetViewIdentifiersRequest(start, count, creator, null, viewVisibity);
+	return new GetViewIdentifiersRequest(start, count, creator, null, viewVisibity, null);
     }
 
     /**
@@ -189,13 +190,31 @@ public class GetViewIdentifiersRequest {
      * @param count
      * @param creator
      * @param owner
+     * @param viewVisibility
+     * @param sourceDeployment
+     * @return
      */
-    private GetViewIdentifiersRequest(Integer start, Integer count, String creator, String owner, ViewVisibility viewVisibility) {
+    public static GetViewIdentifiersRequest create(Integer start, Integer count, String creator, String owner,
+	    ViewVisibility viewVisibility, String sourceDeployment) {
+
+	return new GetViewIdentifiersRequest(start, count, creator, owner, viewVisibility, sourceDeployment);
+    }
+
+    /**
+     * @param start
+     * @param count
+     * @param creator
+     * @param owner
+     * @param viewVisibility
+     * @param sourceDeployment
+     */
+    private GetViewIdentifiersRequest(Integer start, Integer count, String creator, String owner, ViewVisibility viewVisibility, String sourceDeployment) {
 	this.start = start;
 	this.count = count;
 	this.creator = creator;
 	this.owner = owner;
 	this.viewVisibility = viewVisibility;
+	this.sourceDeployment = sourceDeployment;
     }
 
     /**
@@ -236,5 +255,13 @@ public class GetViewIdentifiersRequest {
     public Optional<ViewVisibility> getVisibility() {
 
 	return Optional.ofNullable(viewVisibility);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getSourceDeployment() {
+
+	return Optional.ofNullable(sourceDeployment);
     }
 }

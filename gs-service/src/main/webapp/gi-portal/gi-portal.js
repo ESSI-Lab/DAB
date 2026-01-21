@@ -2,6 +2,7 @@ import { GIAPI } from '../giapi/core/GIAPI.js';
 
 var view = '';
 var token = '';
+var availableViews = []; // Store views fetched for the current source deployment
 
 
 var getUrlParameter = function getUrlParameter(sParam) {
@@ -1069,6 +1070,23 @@ function initializeLogin(config) {
 							const value = propMap[name];
 							if (name === 'permissions') {
 								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-permissions-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
+							} else if (name === 'allowedViews') {
+								// Format allowedViews to show view labels with IDs in parentheses
+								let displayValue = value;
+								if (value && availableViews.length > 0) {
+									const viewIds = value.split(',').map(v => v.trim()).filter(Boolean);
+									const viewLabels = viewIds.map(id => {
+										const view = availableViews.find(v => v.id === id);
+										if (view) {
+											const label = view.label || id;
+											return label + ' (' + id + ')';
+										}
+										return id;
+									});
+									displayValue = viewLabels.join(', ');
+								}
+								// Store the actual value (IDs) in data attribute for editing
+								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}' data-prop-value='${value || ''}'>${displayValue}</span> <button class='edit-views-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							} else {
 								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-prop-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							}
@@ -1077,6 +1095,10 @@ function initializeLogin(config) {
 						// Add 'Add Permissions' button if permissions property is missing
 						if (!('permissions' in propMap)) {
 							details += `<div style='margin-top:12px'><button id='add-permissions-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> ${t('add_permissions')}</button></div>`;
+						}
+						// Add 'Add Allowed Views' button if allowedViews property is missing
+						if (!('allowedViews' in propMap)) {
+							details += `<div style='margin-top:12px'><button id='add-allowed-views-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> Add Allowed Views</button></div>`;
 						}
 						const detailsDialog = $('<div>').html(details).dialog({
 							title: t('details_title'),
@@ -1152,6 +1174,39 @@ function initializeLogin(config) {
 									});
 							});
 						});
+						// Add handler for Add Allowed Views button
+						detailsDialog.on('click', '#add-allowed-views-btn', function() {
+							showViewsDialog('', function(allowedViews) {
+								if (allowedViews === null) return;
+								const email = localStorage.getItem('userEmail');
+								const apiKey = localStorage.getItem('authToken');
+								const userIdentifier = user.identifier;
+								if (!email || !apiKey || !userIdentifier) {
+									alert('Missing credentials or user identifier.');
+									return;
+								}
+								fetch('../services/support/updateUser', {
+									method: 'POST',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'allowedViews', propertyValue: allowedViews })
+								})
+									.then(response => response.json())
+									.then(result => {
+										if (result.success) {
+											alert('Allowed views added.');
+											detailsDialog.dialog('close');
+											// Refresh the main user list panel
+											dialogContent.dialog('close');
+											document.getElementById('listUsersBtn').click();
+										} else {
+											alert('Failed to add allowed views: ' + (result.message || 'Unknown error'));
+										}
+									})
+									.catch(err => {
+										alert('Error adding allowed views: ' + err);
+									});
+							});
+						});
 						// Edit permissions handler
 						detailsDialog.on('click', '.edit-permissions-btn', function(e) {
 							e.preventDefault();
@@ -1186,6 +1241,44 @@ function initializeLogin(config) {
 									})
 									.catch(err => {
 										alert('Error updating permissions: ' + err);
+									});
+							});
+						});
+						// Edit allowedViews handler
+						detailsDialog.on('click', '.edit-views-btn', function(e) {
+							e.preventDefault();
+							const propName = $(this).data('prop-name');
+							// Get the actual value (IDs) from the data attribute
+							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
+							const oldValue = valueSpan.data('prop-value') || propMap['allowedViews'] || '';
+							showViewsDialog(oldValue, function(newAllowedViews) {
+								if (newAllowedViews === oldValue) return;
+								const email = localStorage.getItem('userEmail');
+								const apiKey = localStorage.getItem('authToken');
+								const userIdentifier = user.identifier;
+								if (!email || !apiKey || !userIdentifier) {
+									alert('Missing credentials or user identifier.');
+									return;
+								}
+								fetch('../services/support/updateUser', {
+									method: 'POST',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'allowedViews', propertyValue: newAllowedViews })
+								})
+									.then(response => response.json())
+									.then(result => {
+										if (result.success) {
+											alert('Allowed views updated.');
+											detailsDialog.dialog('close');
+											// Refresh the main user list panel
+											dialogContent.dialog('close');
+											document.getElementById('listUsersBtn').click();
+										} else {
+											alert('Failed to update allowed views: ' + (result.message || 'Unknown error'));
+										}
+									})
+									.catch(err => {
+										alert('Error updating allowed views: ' + err);
 									});
 							});
 						});
@@ -1261,6 +1354,28 @@ function initializeLogin(config) {
 									.catch(err => {
 										resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
 									});
+								// Fetch views for the current source deployment
+								const sourceDeployment = window.config && window.config.view ? window.config.view : view;
+								if (sourceDeployment && email && apiKey) {
+									fetch(`../services/support/views?sourceDeployment=${encodeURIComponent(sourceDeployment)}`, {
+										method: 'POST',
+										headers: { 'Content-Type': 'application/json' },
+										body: JSON.stringify({ email: email, apiKey: apiKey })
+									})
+										.then(response => {
+											if (!response.ok) {
+												return response.json().then(err => Promise.reject(err));
+											}
+											return response.json();
+										})
+										.then(views => {
+											console.log('Views fetched:', views);
+											// Views are available for use if needed
+										})
+										.catch(err => {
+											console.error('Error fetching views:', err);
+										});
+								}
 							}
 						},
 						{
@@ -1298,6 +1413,29 @@ function initializeLogin(config) {
 					.catch(err => {
 						resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
 					});
+				// Fetch views for the current source deployment
+				const sourceDeployment = window.config && window.config.view ? window.config.view : view;
+				if (sourceDeployment && email && apiKey) {
+					fetch(`../services/support/views?sourceDeployment=${encodeURIComponent(sourceDeployment)}`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ email: email, apiKey: apiKey })
+					})
+						.then(response => {
+							if (!response.ok) {
+								return response.json().then(err => Promise.reject(err));
+							}
+							return response.json();
+						})
+						.then(views => {
+							console.log('Views fetched:', views);
+							// Store views globally for use in allowedViews dialog
+							availableViews = Array.isArray(views) ? views : [];
+						})
+						.catch(err => {
+							console.error('Error fetching views:', err);
+						});
+				}
 			});
 		}
 
@@ -3870,6 +4008,55 @@ function showPermissionsDialog(currentPermissions, onSave) {
 		title: 'Set Permissions',
 		modal: true,
 		width: 400,
+		buttons: [
+			{
+				text: 'Save',
+				click: function() {
+					const checked = dialogDiv.find('input[type=checkbox]:checked').map(function() { return this.value; }).get();
+					onSave(checked.join(','));
+					$(this).dialog('close');
+				}
+			},
+			{
+				text: 'Cancel',
+				click: function() { $(this).dialog('close'); }
+			}
+		]
+	});
+}
+
+function showViewsDialog(currentViews, onSave) {
+	if (availableViews.length === 0) {
+		alert('No views available. Please ensure views are loaded.');
+		return;
+	}
+	const selected = (currentViews || '').split(',').map(v => v.trim()).filter(Boolean);
+	const dialogDiv = $('<div>').css({ 'padding': '10px', 'max-height': '400px', 'overflow-y': 'auto' });
+	dialogDiv.append($('<div>').text('Select allowed views:').css({ 'margin-bottom': '10px', 'font-weight': 'bold' }));
+	
+	// Create a container for checkboxes with better layout
+	const checkboxContainer = $('<div>').css({ 'display': 'flex', 'flex-direction': 'column', 'gap': '8px' });
+	
+	availableViews.forEach(view => {
+		const viewId = view.id || '';
+		const viewLabel = view.label || viewId;
+		// Display label with ID in parentheses
+		const displayText = viewLabel + (viewId ? ' (' + viewId + ')' : '');
+		const checkbox = $('<input type="checkbox">').attr('id', 'view_' + viewId.replace(/[^a-zA-Z0-9]/g, '_')).val(viewId);
+		if (selected.includes(viewId)) checkbox.prop('checked', true);
+		const label = $('<label>').attr('for', 'view_' + viewId.replace(/[^a-zA-Z0-9]/g, '_'))
+			.css({ 'cursor': 'pointer', 'display': 'flex', 'align-items': 'center', 'gap': '8px' })
+			.append(checkbox)
+			.append($('<span>').text(displayText));
+		checkboxContainer.append($('<div>').append(label));
+	});
+	
+	dialogDiv.append(checkboxContainer);
+	
+	dialogDiv.dialog({
+		title: 'Set Allowed Views',
+		modal: true,
+		width: 500,
 		buttons: [
 			{
 				text: 'Save',

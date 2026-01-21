@@ -694,6 +694,24 @@ public class OpenSearchQueryBuilder {
 	    Optional<String> owner, //
 	    Optional<ViewVisibility> visibility) {
 
+	return buildSearchViewsQuery(databaseId, creator, owner, visibility, Optional.empty());
+    }
+
+    /**
+     * @param databaseId
+     * @param creator
+     * @param owner
+     * @param visibility
+     * @param sourceDeployment
+     * @return
+     */
+    public static Query buildSearchViewsQuery(//
+	    String databaseId, //
+	    Optional<String> creator, //
+	    Optional<String> owner, //
+	    Optional<ViewVisibility> visibility, //
+	    Optional<String> sourceDeployment) {
+
 	Query databaseIdQuery = buildDatabaseIdQuery(databaseId);
 
 	List<Query> filterList = new ArrayList<>();
@@ -703,6 +721,8 @@ public class OpenSearchQueryBuilder {
 	owner.ifPresent(s -> filterList.add(buildViewOwnerQuery(s)));
 
 	visibility.ifPresent(viewVisibility -> filterList.add(buildViewVisibilityQuery(viewVisibility.name())));
+
+	sourceDeployment.ifPresent(s -> filterList.add(buildViewSourceDeploymentQuery(s)));
 
 	filterList.add(databaseIdQuery);
 
@@ -1475,6 +1495,15 @@ public class OpenSearchQueryBuilder {
     private static Query buildViewOwnerQuery(String owner) {
 
 	return buildMatchPhraseQuery(ViewsMapping.VIEW_OWNER, owner);
+    }
+
+    /**
+     * @param sourceDeployment
+     * @return
+     */
+    private static Query buildViewSourceDeploymentQuery(String sourceDeployment) {
+
+	return buildMatchPhraseQuery(ViewsMapping.SOURCE_DEPLOYMENT, sourceDeployment);
     }
 
     /**

@@ -152,7 +152,8 @@ public class OpenSearchReader implements DatabaseReader {
 		database.getIdentifier(), //
 		request.getCreator(), //
 		request.getOwner(), //
-		request.getVisibility()//
+		request.getVisibility(), //
+		request.getSourceDeployment()//
 	);
 	try {
 

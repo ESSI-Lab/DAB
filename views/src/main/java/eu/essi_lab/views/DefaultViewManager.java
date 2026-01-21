@@ -235,4 +235,15 @@ public class DefaultViewManager implements IViewManager {
 
     }
 
+    /**
+     * Gets the list of view identifiers
+     *
+     * @return
+     * @throws GSException
+     */
+    public List<String> getViewIdentifiers(GetViewIdentifiersRequest vir) throws GSException {
+	return reader.getViewIdentifiers(vir);
+
+    }
+
 }

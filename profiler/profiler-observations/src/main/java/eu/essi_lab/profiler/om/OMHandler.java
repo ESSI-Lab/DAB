@@ -58,9 +58,14 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
+import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.GetViewIdentifiersRequest;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.opensearch.*;
 import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.views.DefaultViewManager;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.base.Charsets;
@@ -196,11 +201,43 @@ public class OMHandler extends StreamingRequestHandler {
 
 	// check permissions
 	Optional<String> optView = webRequest.extractViewId();
-	if (optView.isPresent() && optView.get().equals("his-central")) {
-	    if (!user.hasPermission("api")) {
-		printErrorMessage(output, "The user has not correct permissions");
-		return;
+	if (optView.isPresent()) {
+
+	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
+	    DefaultViewManager manager = new DefaultViewManager();
+	    manager.setDatabaseReader(reader);
+	    View view = manager.getView(optView.get()).get();
+
+	    // only in this case permissions are checked
+	    if (view.getSourceDeployment().equals("his-central")){
+
+		if (!user.hasPermission("api")) {
+		    printErrorMessage(output, "The user has not correct permissions");
+		    return;
+		}
+
+		String[] allowedViews = user.getAllowedViews();
+
+		if (allowedViews == null || allowedViews.length == 0) {
+		    // all views are considered valid
+		}else{
+		    boolean found = false;
+		    for (String viewId : allowedViews) {
+			if (view.getId().equals(viewId)) {
+			    found = true;
+			}
+		    }
+		    if (!found) {
+			printErrorMessage(output, "The user has not permissions to access this view: "+view.getId());
+			return;
+		    }
+		}
+
+
+
 	    }
+
+
 	}
 
 	OMRequest request = new OMRequest(webRequest);
