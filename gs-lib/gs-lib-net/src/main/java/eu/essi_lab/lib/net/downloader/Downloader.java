@@ -319,7 +319,7 @@ public class Downloader {
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    GSLoggerFactory.getLogger(getClass()).error("Failed to download string from: " + url, e);
 	}
 
 	return Optional.empty();
@@ -354,7 +354,7 @@ public class Downloader {
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    GSLoggerFactory.getLogger(getClass()).error("Failed to download stream from: " + url, e);
 	}
 
 	return Optional.empty();
@@ -402,7 +402,7 @@ public class Downloader {
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    GSLoggerFactory.getLogger(getClass()).error("Failed to download response from: " + url, e);
 	}
 
 	return opt;
