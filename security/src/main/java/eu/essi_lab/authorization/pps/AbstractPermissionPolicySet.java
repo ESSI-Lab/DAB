@@ -52,12 +52,12 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     /**
      *
      */
-    public static final int DEFAULT_ANONYMOUS_OFFSET_LIMIT = 200;
+    public static final int DEFAULT_ANONYMOUS_OFFSET_LIMIT = -1;
 
     /**
      *
      */
-    public static final int DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT = 50;
+    public static final int DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT = 200;
 
     /**
      *
