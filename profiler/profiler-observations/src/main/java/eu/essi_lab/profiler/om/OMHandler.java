@@ -58,6 +58,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
+import eu.essi_lab.api.database.opensearch.*;
 import eu.essi_lab.lib.xml.*;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
@@ -156,10 +157,10 @@ public class OMHandler extends StreamingRequestHandler {
 	ValidationMessage message = new ValidationMessage();
 	message.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
 
-	if (limit != null && offset != null && (limit + offset > Database.MAX_RESULT_WINDOW_SIZE)) {
+	if (limit != null && offset != null && (limit + offset > OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE)) {
 
 	    message.setResult(ValidationResult.VALIDATION_FAILED);
-	    message.setError("Result window is too large, offset + limit must be less than or equal to: " + Database.MAX_RESULT_WINDOW_SIZE
+	    message.setError("Result window is too large, offset + limit must be less than or equal to: " + OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE
 		    + " but was " + (limit + offset));
 	    message.setErrorCode("400");
 	}
