@@ -1587,14 +1587,14 @@ export function initializePortal(config) {
 				if (olMap && olMap.selectionVisible) {
 					olMap.selectionVisible(false);
 				}
-				// Clear input control fields (south, west, north, east)
+				// Clear input control fields (south, west, north, east, and location)
 				var mapElement = GIAPI.search.resultsMapWidget.map ? 
 					GIAPI.search.resultsMapWidget.map.getTargetElement() : null;
 				if (mapElement) {
 					var inputControl = jQuery(mapElement).find('.cnst-widget-where-input-control');
 					if (inputControl.length) {
-						// Clear all text input fields in the input control
-						inputControl.find('input[type="text"]').val('');
+						// Clear all input fields in the input control (text, number, and any other types)
+						inputControl.find('input').val('');
 					}
 				}
 			}
@@ -2472,6 +2472,10 @@ export function initializePortal(config) {
 		//
 		GIAPI.search.constWidget = GIAPI.ConstraintsWidget(GIAPI.search.dab, {
 			'ontology': config.ontology,
+			'ontologyBrowserUrl': config.ontologyBrowserUrl,
+			'ontologyTreeUrl': config.ontologyTreeUrl,
+			'conceptBaseUrl': config.conceptBaseUrl,
+			'ontologyLabel': config.ontologyLabel,
 			'keyDownAction': (function() { GIAPI.search.discover(); }),
 			'fieldsWidth': 205,
 			'enableBrowseGEMET': config.enableBrowseGEMET
@@ -3882,14 +3886,29 @@ export function initializePortal(config) {
 		if (GIAPI.UI_Utils.discoverDialog('isOpen')) {
 			GIAPI.UI_Utils.discoverDialog('close');
 		}
-		
 		// Handle zoom based on result set size and zoomOnResults setting
 		if (config.zoomOnResults === true) {
+			// Check if a bounding box is specified in the query
+			var where = GIAPI.search.resultsMapWidget.where();
+			var hasQueryBbox = where && where.south && where.west && where.north && where.east;
+			
 			if (resultSet.size < 1000 && response.bboxUnion) {
 				// Zoom to bboxUnion for smaller result sets
 				window.GIAPI.zoomToBoundingBox(response.bboxUnion);
+			} else if (hasQueryBbox && response.bboxUnion) {
+				// Zoom to bboxUnion if a bounding box is specified in the query
+				window.GIAPI.zoomToBoundingBox(response.bboxUnion);
+			} else if (hasQueryBbox && !response.bboxUnion) {
+				// If query has bbox but no bboxUnion in response, construct bbox from query
+				var queryBbox = {
+					west: where.west,
+					south: where.south,
+					east: where.east,
+					north: where.north
+				};
+				window.GIAPI.zoomToBoundingBox(queryBbox);
 			} else if (resultSet.size >= 1000) {
-				// Reset to default initial extent for larger result sets
+				// Reset to default initial extent for larger result sets without query bbox
 				window.GIAPI.zoomToDefaultExtent();
 			}
 		}

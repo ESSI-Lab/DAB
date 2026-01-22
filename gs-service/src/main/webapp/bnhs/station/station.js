@@ -1057,7 +1057,8 @@ var createPlot = function(data, i) {
 		var qualityFlags = [];
 		for (var p = 0; p < points.length; p++) {
 			var pt = points[p];
-			if (pt.time && pt.time.instant != null && typeof pt.value !== 'undefined' && pt.value !== null) {
+			// Skip missing data values (-9999)
+			if (pt.time && pt.time.instant != null && typeof pt.value !== 'undefined' && pt.value !== null && pt.value !== -9999) {
 				times.push(pt.time.instant);
 				values.push(pt.value);
 				

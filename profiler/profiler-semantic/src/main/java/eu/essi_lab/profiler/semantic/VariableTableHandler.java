@@ -72,7 +72,7 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 public class VariableTableHandler implements WebRequestHandler, WebRequestValidator {
 
     /**
-     * 
+     *
      */
     private static final int DEFAULT_PAGE_SIZE = 1000;
 
@@ -92,9 +92,9 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	SemanticCompletenessReport scr = new SemanticCompletenessReport();
 	HydroOntology ontology = null;
 	if (viewId.equals("his-central")) {
-	    scr.addConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/65", "Precipitation");
-	    scr.addConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/3", "Level");
-	    scr.addConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/76", "Flux, discharge");
+	    scr.addConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/65", "Precipitation");
+	    scr.addConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/3", "Level");
+	    scr.addConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/76", "Flux, discharge");
 	    ontology = new HISCentralOntology();
 	}
 
@@ -246,8 +246,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		info.setCountry(country);
 		info.setCountryISO3(countryISO3);
 
-		String csv = uniqueVariableCode + "\t" + protocol + "\t" + variableCode + "\t" + variableName + "\t" + variableDescription
-			+ "\t\n";
+		String csv = uniqueVariableCode + "\t" + protocol + "\t" + variableCode + "\t" + variableName + "\t" + variableDescription + "\t\n";
 		rows.add(new SimpleEntry<RowInfo, String>(info, csv));
 
 	    }
@@ -287,8 +286,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    + "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
 		    + "Begin:" + stats.getBegin() + "<br/>"//
 		    + "End:" + stats.getEnd() + "<br/>"//
-		    + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth()
-		    + "<br/>" //
+		    + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth() + "<br/>" //
 		    + "Altitude:" + stats.getMinimumAltitude() + "/" + stats.getMaximumAltitude() + "<br/>"//
 		    + "</td></tr>" + "" //
 		    + "<tr>" + //
@@ -346,12 +344,12 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    for (SimpleEntry<RowInfo, String> row : rows) {
 		RowInfo ri = row.getKey();
 		content += "<tr>" + //
-		// getRow(ri.getSiteCount()) + //
-		// getRow(ri.getAttributeCount()) + // 1
-		// getRow(ri.getTimeseriesCount()) + // 1
-		// getRow(ri.getBegin()) + //
-		// getRow(ri.getEnd()) + //
-		// getRow(ri.getWest() + "," + ri.getSouth() + "," + ri.getEast() + "," + ri.getNorth()) + // 1
+			// getRow(ri.getSiteCount()) + //
+			// getRow(ri.getAttributeCount()) + // 1
+			// getRow(ri.getTimeseriesCount()) + // 1
+			// getRow(ri.getBegin()) + //
+			// getRow(ri.getEnd()) + //
+			// getRow(ri.getWest() + "," + ri.getSouth() + "," + ri.getEast() + "," + ri.getNorth()) + // 1
 			getRow(ri.getUniqueVariableCode()) + //
 			getRow(ri.getVariableCode()) + //
 			getRow(ri.getVariableName()) + //

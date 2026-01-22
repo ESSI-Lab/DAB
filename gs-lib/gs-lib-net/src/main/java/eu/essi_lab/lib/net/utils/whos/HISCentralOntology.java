@@ -21,8 +21,11 @@ package eu.essi_lab.lib.net.utils.whos;
  * #L%
  */
 
-public class HISCentralOntology extends HydroOntology{
+public class HISCentralOntology extends HydroOntology {
+    public static final String HIS_CENTRAL_HOSTNAME = "http://his-central-ontology.geodab.eu";
+    public static final String HIS_CENTRAL_BASE_URI = HIS_CENTRAL_HOSTNAME + "/hydro-ontology";
+
     public HISCentralOntology() {
-	super("http://his-central-ontology.geodab.eu/hydro-ontology");
+	super(HIS_CENTRAL_BASE_URI);
     }
 }

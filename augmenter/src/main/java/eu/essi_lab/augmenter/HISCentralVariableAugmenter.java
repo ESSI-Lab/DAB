@@ -37,9 +37,9 @@ import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 
 /**
- * It checks variable name to find out a correspondent concept URI in Hydro ontology. If
- * found, it adds it in a specific metadata field (attribute URI)
- * 
+ * It checks variable name to find out a correspondent concept URI in Hydro ontology. If found, it adds it in a specific metadata field
+ * (attribute URI)
+ *
  * @author boldrini
  */
 public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSetting> {
@@ -47,6 +47,7 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
     public HISCentralVariableAugmenter() {
 
     }
+
     HydroOntology ontology = new HISCentralOntology();
 
     /**
@@ -66,10 +67,10 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 	Optional<String> uri = extensionHandler.getObservedPropertyURI();
 	if (uri.isPresent()) {
 
-	    if (uri.get().contains("his-central-ontology")){
+	    if (uri.get().contains("his-central-ontology")) {
 		GSLoggerFactory.getLogger(getClass()).info("HIS-Central Variable URI already present in original metadata");
 		return Optional.of(resource);
-	    }else  if (uri.get().contains("codes.wmo.int")) {
+	    } else if (uri.get().contains("codes.wmo.int")) {
 		List<SKOSConcept> concepts = ontology.findConcepts(uri.get(), false, true);
 		if (!concepts.isEmpty()) {
 		    extensionHandler.clearObservedPropertyURI();
@@ -79,10 +80,9 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 		    return Optional.of(resource);
 		}
 
-	    }else{
-		GSLoggerFactory.getLogger(getClass()).warn("Unexpected uri found: "+uri.get());
+	    } else {
+		GSLoggerFactory.getLogger(getClass()).warn("Unexpected uri found: " + uri.get());
 	    }
-
 
 	}
 	CoverageDescription coverageDescription = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
@@ -127,44 +127,41 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
     }
 
     public List<SKOSConcept> getConcepts(String variable) {
-	List<SKOSConcept> ret = ontology.findConcepts(variable, false,true);
+	List<SKOSConcept> ret = ontology.findConcepts(variable, false, true);
 	List<SKOSConcept> toRemove = new ArrayList<SKOSConcept>();
 	List<SKOSConcept> toAdd = new ArrayList<SKOSConcept>();
 	for (SKOSConcept concept : ret) {
 	    switch (concept.getURI()) {
 
-		
-		
-	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/3": // level
+	    case HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/3": // level
 		toRemove.add(concept);
-		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/11")); // level, stream 
+		toAdd.add(new SKOSConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/11")); // level, stream
 		break;
-	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/3b": // water level
+	    case HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/3b": // water level
 		toRemove.add(concept);
-		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/11")); // level, stream 
+		toAdd.add(new SKOSConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/11")); // level, stream
 		break;
-	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/40": // temperature
+	    case HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/40": // temperature
 		toRemove.add(concept);
-		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/49")); // temperature, air 
+		toAdd.add(new SKOSConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/49")); // temperature, air
 		break;
-	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/132": // humidity
+	    case HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/132": // humidity
 		toRemove.add(concept);
-		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/133")); // relative humidity
-		break;		
-	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/52": // pressure
-		toRemove.add(concept);
-		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/55")); // atmospheric pressure
+		toAdd.add(new SKOSConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/133")); // relative humidity
 		break;
-	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/53": // air pressure
+	    case HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/52": // pressure
 		toRemove.add(concept);
-		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/55")); // atmospheric pressure
+		toAdd.add(new SKOSConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/55")); // atmospheric pressure
 		break;
-	    case "http://his-central-ontology.geodab.eu/hydro-ontology/concept/6": // snow level
+	    case HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/53": // air pressure
 		toRemove.add(concept);
-		toAdd.add(new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/9")); // snow depth
+		toAdd.add(new SKOSConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/55")); // atmospheric pressure
+		break;
+	    case HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/6": // snow level
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/9")); // snow depth
 		break;
 
-		
 	    default:
 		break;
 	    }
