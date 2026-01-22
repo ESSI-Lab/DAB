@@ -38,7 +38,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -56,8 +58,14 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
+import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.GetViewIdentifiersRequest;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.api.database.opensearch.*;
 import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.views.DefaultViewManager;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.base.Charsets;
@@ -115,7 +123,6 @@ import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.om.JSONObservation.ObservationType;
 import eu.essi_lab.profiler.om.OMRequest.APIParameters;
 import eu.essi_lab.profiler.om.ObservationMapper.Property;
-import eu.essi_lab.profiler.om.resultwriter.CSVResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.EmptyResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.JSONObservationResultWriter;
 import eu.essi_lab.profiler.om.resultwriter.ResultWriter;
@@ -155,10 +162,10 @@ public class OMHandler extends StreamingRequestHandler {
 	ValidationMessage message = new ValidationMessage();
 	message.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
 
-	if (limit != null && offset != null && (limit + offset > Database.MAX_RESULT_WINDOW_SIZE)) {
+	if (limit != null && offset != null && (limit + offset > OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE)) {
 
 	    message.setResult(ValidationResult.VALIDATION_FAILED);
-	    message.setError("Result window is too large, offset + limit must be less than or equal to: " + Database.MAX_RESULT_WINDOW_SIZE
+	    message.setError("Result window is too large, offset + limit must be less than or equal to: " + OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE
 		    + " but was " + (limit + offset));
 	    message.setErrorCode("400");
 	}
@@ -194,11 +201,43 @@ public class OMHandler extends StreamingRequestHandler {
 
 	// check permissions
 	Optional<String> optView = webRequest.extractViewId();
-	if (optView.isPresent() && optView.get().equals("his-central")) {
-	    if (!user.hasPermission("api")) {
-		printErrorMessage(output, "The user has not correct permissions");
-		return;
+	if (optView.isPresent()) {
+
+	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
+	    DefaultViewManager manager = new DefaultViewManager();
+	    manager.setDatabaseReader(reader);
+	    View view = manager.getView(optView.get()).get();
+
+	    // only in this case permissions are checked
+	    if (view.getSourceDeployment()!=null&& view.getSourceDeployment().equals("his-central")){
+
+		if (!user.hasPermission("api")) {
+		    printErrorMessage(output, "The user has not correct permissions");
+		    return;
+		}
+
+		String[] allowedViews = user.getAllowedViews();
+
+		if (allowedViews == null || allowedViews.length == 0) {
+		    // all views are considered valid
+		}else{
+		    boolean found = false;
+		    for (String viewId : allowedViews) {
+			if (view.getId().equals(viewId)) {
+			    found = true;
+			}
+		    }
+		    if (!found) {
+			printErrorMessage(output, "The user has not permissions to access this view: "+view.getId());
+			return;
+		    }
+		}
+
+
+
 	    }
+
+
 	}
 
 	OMRequest request = new OMRequest(webRequest);
@@ -1082,7 +1121,7 @@ public class OMHandler extends StreamingRequestHandler {
 			    }
 			    
 			    // Read qualifiers from the qualifiers attribute (WaterML 1.1 format)
-			    String quality = null;
+			    Map<String, String> qualifiers = new HashMap<>();
 			    Attribute qualifiersAttribute = startElement.getAttributeByName(new QName("qualifiers"));
 			    if (qualifiersAttribute != null) {
 				String qualifiersString = qualifiersAttribute.getValue();
@@ -1091,18 +1130,41 @@ public class OMHandler extends StreamingRequestHandler {
 					// URL decode the qualifiers string
 					String decodedQualifiers = URLDecoder.decode(qualifiersString, StandardCharsets.UTF_8.name());
 					// Qualifiers are space-separated key:value pairs
-					// Combine them into a single quality string
-					quality = decodedQualifiers;
+					// Parse them into a map
+					String[] qualifierPairs = decodedQualifiers.split("\\s+");
+					for (String pair : qualifierPairs) {
+					    if (pair != null && !pair.trim().isEmpty()) {
+						int colonIndex = pair.indexOf(':');
+						if (colonIndex > 0 && colonIndex < pair.length() - 1) {
+						    String key = pair.substring(0, colonIndex);
+						    String qualifierValue = pair.substring(colonIndex + 1).replace("_"," ");
+						    qualifiers.put(key, qualifierValue);
+						} else {
+						    // If no colon, use the whole string as value with a default key
+						    qualifiers.put("qualifier", pair);
+						}
+					    }
+					}
 				    } catch (Exception e) {
-					// If decoding fails, use the original string
-					quality = qualifiersString;
+					// If decoding fails, try to parse the original string
+					String[] qualifierPairs = qualifiersString.split("\\s+");
+					for (String pair : qualifierPairs) {
+					    if (pair != null && !pair.trim().isEmpty()) {
+						int colonIndex = pair.indexOf(':');
+						if (colonIndex > 0 && colonIndex < pair.length() - 1) {
+						    String key = pair.substring(0, colonIndex);
+						    String qualifierValue = pair.substring(colonIndex + 1);
+						    qualifiers.put(key, qualifierValue);
+						}
+					    }
+					}
 				    }
 				}
 			    } else {
 				// Fallback to qualityControlLevelCode for backward compatibility
 				Attribute qualityAttribute = startElement.getAttributeByName(new QName("qualityControlLevelCode"));
 				if (qualityAttribute != null) {
-				    quality = qualityAttribute.getValue();
+				    qualifiers.put("qualityControlLevelCode", qualityAttribute.getValue());
 				}
 			    }
 
@@ -1110,7 +1172,7 @@ public class OMHandler extends StreamingRequestHandler {
 			    try {
 				if (d.isPresent()) {
 
-				    writer.writeDataObject(date, v, quality, observation, coord);
+				    writer.writeDataObject(date, v, qualifiers, observation, coord);
 
 				}
 			    } catch (Exception e) {

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.profiler.os;
 
@@ -32,12 +32,17 @@ import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 public class OSProfilerSetting extends ProfilerSetting {
 
     /**
-     * 
+     *
      */
     public static final String OPEN_SEARCH_PROFILER_TYPE = "OpenSearch";
 
     /**
-     * 
+     *
+     */
+    public static final String MAX_RESULT_WINDOW_SIZE = "maxResultWindowSize";
+
+    /**
+     *
      */
     public OSProfilerSetting() {
 

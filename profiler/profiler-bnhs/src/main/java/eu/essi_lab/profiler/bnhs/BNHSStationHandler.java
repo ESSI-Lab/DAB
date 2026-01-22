@@ -39,6 +39,9 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.datatype.Duration;
 
+import eu.essi_lab.access.compliance.DataComplianceReport;
+import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
+import eu.essi_lab.lib.net.utils.whos.*;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -48,11 +51,6 @@ import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.net.utils.whos.HydroOntology;
-import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
-import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
-import eu.essi_lab.lib.net.utils.whos.WMOOntology;
-import eu.essi_lab.lib.net.utils.whos.WMOUnit;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -263,11 +261,15 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    }
 
 	    StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
-
+	    boolean hisCentral = false;
 	    Optional<View> optionalView = WebRequestTransformer.findView(storageUri, viewId);
 
 	    if (optionalView.isPresent()) {
 		 discoveryMessage.setView(optionalView.get());
+		 String creator = optionalView.get().getCreator();
+		 if (creator!=null && creator.toLowerCase().contains("his")) {
+		     hisCentral = true;
+		 }
 	    }
 
 	    discoveryMessage.setPermittedBond(bond);
@@ -303,6 +305,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		String attributeId = resource.getExtensionHandler().getUniqueAttributeIdentifier().isPresent() ? //
 			resource.getExtensionHandler().getUniqueAttributeIdentifier().get() : "";
 		String attributeLabel = "";
+		String attributeLabelIt = "";
 		try {
 		    attributeLabel = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
 			    .getAttributeTitle();
@@ -313,28 +316,36 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		if (optionalAttributeURI.isPresent()) {
 		    String uri = optionalAttributeURI.get();
 		    if (uri != null) {
-			HydroOntology ontology = new WHOSOntology();
+			HydroOntology ontology;
+			if (hisCentral){
+			    ontology=new HISCentralOntology();
+			}else{
+			    ontology = new WHOSOntology();
+			}
 			SKOSConcept concept = ontology.getConcept(uri);
 			if (concept != null) {
 			    attributeLabel = concept.getPreferredLabel("en");
-			    HashSet<String> closeMatches = concept.getCloseMatches();
-			    if (closeMatches != null && !closeMatches.isEmpty()) {
-				try {
-				    WMOOntology wmoOntology = new WMOOntology();
-				    for (String closeMatch : closeMatches) {
-					SKOSConcept variable = wmoOntology.getVariable(closeMatch);
-					if (variable != null) {
-					   String preferredLabel = variable.getPreferredLabel("en");
-					    if (preferredLabel != null) {
-						attributeLabel = preferredLabel;
-					    }
-					}
-				    }
-				} catch (Exception e) {
-				    e.printStackTrace();
-				}
-
+			    attributeLabelIt = concept.getPreferredLabel("it");
+			    if (attributeLabelIt == null) {
+				attributeLabelIt = attributeLabel;
 			    }
+//			    HashSet<String> closeMatches = concept.getCloseMatches();
+//			    if (closeMatches != null && !closeMatches.isEmpty()) {
+//				try {
+//				    WMOOntology wmoOntology = new WMOOntology();
+//				    for (String closeMatch : closeMatches) {
+//					SKOSConcept variable = wmoOntology.getVariable(closeMatch);
+//					if (variable != null) {
+//					   String preferredLabel = variable.getPreferredLabel("en");
+//					    if (preferredLabel != null) {
+//						attributeLabel = preferredLabel;
+//					    }
+//					}
+//				    }
+//				} catch (Exception e) {
+//				    e.printStackTrace();
+//				}
+//			    }
 			}
 		    }
 		}
@@ -528,6 +539,13 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		    object = create(object, "latitude", bbox.getBigDecimalNorth().toString(), "latitude");
 		    object = create(object, "longitude", bbox.getBigDecimalEast().toString(), "longitude");
 		}
+		ReportsMetadataHandler rmh = new ReportsMetadataHandler(resource);
+		List<DataComplianceReport> reports = rmh.getReports();
+		if (!reports.isEmpty()) {
+		    String onlineId = reports.getFirst().getOnlineId();
+		    object = create(object, "timeseries_id", onlineId, "Timeseries ID");
+		}
+
 
 		object = create(object, "title", resource.getHarmonizedMetadata().getCoreMetadata().getTitle(), "Title");
 
@@ -549,6 +567,8 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		object = create(object, "attribute_id", attributeId, "Observed variable ID");
 
 		object = create(object, "attribute_label", attributeLabel, "Observed variable");
+
+		object = create(object, "attribute_label_it", attributeLabelIt, "Variabile osservata");
 
 		object = create(object, "attribute_missing_value", attributeMissingValue, "Attribute missing value");
 

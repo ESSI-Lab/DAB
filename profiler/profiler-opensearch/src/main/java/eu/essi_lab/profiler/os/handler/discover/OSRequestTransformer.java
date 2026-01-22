@@ -22,10 +22,8 @@ package eu.essi_lab.profiler.os.handler.discover;
  */
 
 import com.google.common.collect.*;
-import eu.essi_lab.api.database.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.*;
-import eu.essi_lab.jaxb.wms._1_3_0.xlink.*;
 import eu.essi_lab.lib.odip.rosetta.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.lib.xml.*;
@@ -610,23 +608,38 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     @Override
     protected Page getPage(WebRequest request) {
 
-	if (!request.getFormData().isPresent()) {
+	if (request.getFormData().isEmpty()) {
 	    return new Page(1, 10);
 	}
 
-	KeyValueParser keyValueParser = new KeyValueParser(request.getFormData().get());
-	OSRequestParser parser = new OSRequestParser(keyValueParser);
+	OSRequestParser parser = new OSRequestParser(new KeyValueParser(request.getFormData().get()));
 
 	int startIndex = Integer.parseInt(parser.parse(OSParameters.START_INDEX));
 	int count = Integer.parseInt(parser.parse(OSParameters.COUNT));
 
-	int winSize = startIndex + count;
-	if (winSize > Database.MAX_RESULT_WINDOW_SIZE) {
+	int maxResultWindowSize = getMaxResultWindowSize();
 
-	    startIndex = Database.MAX_RESULT_WINDOW_SIZE - count;
+	if (startIndex + count > maxResultWindowSize) {
+
+	    startIndex = maxResultWindowSize - count;
 	}
 
 	return new Page(startIndex, count);
+    }
+
+    /**
+     * Unless explicitly set in the profiler setting with {@link OSProfilerSetting#MAX_RESULT_WINDOW_SIZE} key value option,
+     * the max window size is unlimited
+     *
+     * @return
+     */
+    private int getMaxResultWindowSize() {
+
+	return getSetting().//
+		map(s -> s.readKeyValue(OSProfilerSetting.MAX_RESULT_WINDOW_SIZE).//
+		map(Integer::parseInt).//
+		orElse(Integer.MAX_VALUE)).//
+		orElse(Integer.MAX_VALUE);
     }
 
     /**

@@ -64,6 +64,17 @@
   "discharge": "Portata",
   "no_data_available": "Nessun dato disponibile",
   "rating_curve": "Scale di deflusso",
-  "plot_library_error": "Errore: Libreria grafica non caricata"
+  "plot_library_error": "Errore: Libreria grafica non caricata",
+  "qualifiers": "Qualificatori",
+  "hover_to_display": "<passa sul grafico per visualizzare>",
+  "qualifier_qualityFlag": "Codice di validazione",
+  "qualifier_editorIndividual": "Curatore (individuo)",
+  "qualifier_annalInstrumentType": "Tipo di strumento (annali)",
+  "qualifier_referenceCitation": "Riferimento bibliografico",
+  "qualifier_annalBasinName": "Nome bacino (annali)",
+  "qualifier_editorRole": "Ruolo del curatore",
+  "qualifier_annalInstrumentQuote": "Quota strumento (annali)",
+  "qualifier_annalStationName": "Nome stazione (annali)",
+  "qualifier_editorOrganization": "Organizzazione del curatore"
 }
 

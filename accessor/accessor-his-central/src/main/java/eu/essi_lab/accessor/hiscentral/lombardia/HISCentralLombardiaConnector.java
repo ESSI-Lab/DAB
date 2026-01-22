@@ -156,7 +156,9 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 			BigDecimal utm32Nord = station.getUtm32TNord();
 
 			if (utm32Est == null) {
-				return ret;
+			    GSLoggerFactory.getLogger(getClass())
+				    .error("Empty BBOX for station with id: " + stationId + " and name " + nomeStazione + "] ");
+//				return ret;
 			}
 
 			List<Sensore> sensors = client.elencoSensori(stationId);

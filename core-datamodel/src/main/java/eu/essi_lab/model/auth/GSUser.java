@@ -53,26 +53,26 @@ import eu.essi_lab.model.GSProperty;
 public class GSUser extends DOMSerializer implements Serializable {
 
     /**
-     * 
+     *
      */
     public static final String ESSI_LAB_DOMAIN = "@essi-lab.eu";
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 396389490559553620L;
 
     /**
-     * 
+     *
      */
     public static final String IDENTIFIER_TYPE_ELEMENT_NAME = "identifierType";
 
     /**
-     * 
+     *
      */
     public static final String AUTH_PROVIDER = "authProvider";
     /**
-     * 
+     *
      */
     public static final String ROLE = "role";
 
@@ -94,6 +94,7 @@ public class GSUser extends DOMSerializer implements Serializable {
     private List<GSProperty> properties;
 
     private static JAXBContext context;
+
     static {
 	try {
 	    context = JAXBContext.newInstance(GSUser.class);
@@ -155,7 +156,7 @@ public class GSUser extends DOMSerializer implements Serializable {
     }
 
     /**
-     * 
+     *
      */
     public GSUser() {
 
@@ -226,11 +227,10 @@ public class GSUser extends DOMSerializer implements Serializable {
     }
 
     /**
-     * 
      * @param authProvider
      */
     public void setAuthProvider(String authProvider) {
-	
+
 	this.authProvider = authProvider;
     }
 
@@ -254,7 +254,7 @@ public class GSUser extends DOMSerializer implements Serializable {
      */
     @XmlTransient
     public Boolean isEnabled() {
-	
+
 	return enabled;
     }
 
@@ -262,20 +262,20 @@ public class GSUser extends DOMSerializer implements Serializable {
      * @param role
      */
     public void setEnabled(boolean enabled) {
-	
+
 	this.enabled = enabled;
     }
 
     @SuppressWarnings("rawtypes")
     @XmlTransient
     public List<GSProperty> getProperties() {
-	
+
 	return properties;
     }
 
     @SuppressWarnings("rawtypes")
     public Optional<GSProperty> getProperty(String name) {
-	
+
 	for (GSProperty property : properties) {
 	    if (property.getName() != null && property.getName().equals(name)) {
 		return Optional.of(property);
@@ -296,7 +296,7 @@ public class GSUser extends DOMSerializer implements Serializable {
 
     @SuppressWarnings("rawtypes")
     public void setAttributes(List<GSProperty> attributes) {
-	
+
 	this.properties = attributes;
     }
 
@@ -330,7 +330,7 @@ public class GSUser extends DOMSerializer implements Serializable {
 
     @Override
     public int hashCode() {
-	
+
 	return Objects.hash(getAuthProvider(), getIdentifier(), getProperties());
     }
 
@@ -447,6 +447,25 @@ public class GSUser extends DOMSerializer implements Serializable {
 
 	}
 	return false;
+
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String[] getAllowedViews() {
+
+	Optional<String> optPerm = getStringPropertyValue("allowedViews");
+
+	if (optPerm.isPresent()) {
+
+	    String allowedViewsString = optPerm.get().trim();
+	    String[] ret = allowedViewsString.split(",");
+	    return ret;
+
+	}
+	return new String[] {};
 
     }
 }

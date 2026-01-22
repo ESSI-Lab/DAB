@@ -25,7 +25,9 @@ import java.io.IOException;
 
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 
@@ -41,14 +43,24 @@ public abstract class ResultWriter {
 
 	public void writeDataObject(String date, BigDecimal v, String quality, JSONObservation observation, List<Double> coord)
 			throws IOException {
+		// Convert single quality string to map for backward compatibility
+		Map<String, String> qualifiers = new HashMap<>();
+		if (quality != null && !quality.trim().isEmpty()) {
+			qualifiers.put("quality", quality);
+		}
+		writeDataObject(date, v, qualifiers, observation, coord);
+	}
+
+	public void writeDataObject(String date, BigDecimal v, Map<String, String> qualifiers, JSONObservation observation, List<Double> coord)
+			throws IOException {
 		if (!first) {
 			writeDataSeparator();
 		}
-		writeDataContent(date, v, quality, observation, coord);
+		writeDataContent(date, v, qualifiers, observation, coord);
 		first = false;
 	}
 
-	public abstract void writeDataContent(String date, BigDecimal v, String quality, JSONObservation observation,
+	public abstract void writeDataContent(String date, BigDecimal v, Map<String, String> qualifiers, JSONObservation observation,
 			List<Double> coord) throws IOException;
 
 	protected void writeDataSeparator() throws IOException {

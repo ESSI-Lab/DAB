@@ -35,7 +35,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.iso.datamodel.classes.Online;
+import eu.essi_lab.views.DefaultViewManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -43,8 +45,10 @@ import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.SourceCacheStats;
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.authorization.userfinder.UserFinder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.gssrv.portal.PortalTranslator;
@@ -68,6 +72,7 @@ import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.messages.stats.ComputationResult;
 import eu.essi_lab.messages.stats.ResponseItem;
 import eu.essi_lab.messages.stats.StatisticsMessage;
@@ -574,6 +579,62 @@ public class SupportService {
 	    ret.put(id, count);
 	}
 	return ret;
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("/views")
+    public Response getViews(LoginRequest request, @QueryParam("sourceDeployment") String sourceDeployment) {
+
+	if (sourceDeployment == null || sourceDeployment.isEmpty()) {
+	    return Response.serverError().entity(getErrorResponse("sourceDeployment parameter is required").toString()).build();
+	}
+
+	LoginResponse loginResponse = getLoginResponse(request);
+	if (!loginResponse.isSuccess()) {
+	    return Response.serverError().entity(getErrorResponse("Authentication failed").toString()).build();
+	}
+
+	if (!loginResponse.isAdmin()) {
+	    return Response.serverError().entity(getErrorResponse("Admin access required").toString()).build();
+	}
+
+	try {
+	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
+	    DefaultViewManager manager = new DefaultViewManager();
+	    manager.setDatabaseReader(reader);
+
+	    GetViewIdentifiersRequest vir = GetViewIdentifiersRequest.create(0, 1000, null, null, null, sourceDeployment);
+	    List<String> viewIds = manager.getViewIdentifiers(vir);
+
+	    JSONArray viewsArray = new JSONArray();
+
+	    // Views are already filtered by sourceDeployment at database level
+	    for (String viewId : viewIds) {
+		View view = manager.getView(viewId).get();
+		JSONObject viewJson = new JSONObject();
+		viewJson.put("label", view.getLabel() != null ? view.getLabel() : "");
+		viewJson.put("id", view.getId() != null ? view.getId() : "");
+		viewJson.put("creator", view.getCreator() != null ? view.getCreator() : "");
+		if (view.getCreationTime() != null) {
+		    viewJson.put("creationTime", ISO8601DateTimeUtils.getISO8601DateTime(view.getCreationTime()));
+		} else {
+		    viewJson.put("creationTime", "");
+		}
+		viewJson.put("visibility", view.getVisibility() != null ? view.getVisibility().name() : "");
+		viewJson.put("owner", view.getOwner() != null ? view.getOwner() : "");
+		viewJson.put("sourceDeployment", view.getSourceDeployment() != null ? view.getSourceDeployment() : "");
+		viewsArray.put(viewJson);
+	    }
+
+	    return Response.ok(viewsArray.toString(), MediaType.APPLICATION_JSON).build();
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Error retrieving views", e);
+	    return Response.serverError().entity(getErrorResponse("Error retrieving views: " + e.getMessage()).toString())
+		    .build();
+	}
     }
 
     private JSONObject getErrorResponse(String error) {

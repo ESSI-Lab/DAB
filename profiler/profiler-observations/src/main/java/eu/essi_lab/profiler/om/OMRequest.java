@@ -51,7 +51,8 @@ public class OMRequest {
 		ASYNCH_DOWNLOAD_NAME("asynchDownloadName"), //
 		BEGIN_DATE("beginDate", "startDate", "beginTime", "startTime", "begin", "beginPosition"), //
 		END_DATE("endDate", "endTime", "end", "endPosition"), //
-		PLATFORM_CODE("sampledFeature", "feature", "featureIdentifier", "featureId", "monitoringPoint",
+	    	PLATFORM_NAME("featureName", "platformName", "stationName","siteName"), //
+	    	PLATFORM_CODE("sampledFeature", "feature", "featureIdentifier", "featureId", "monitoringPoint",
 				"monitoringPointIdentifier", "platform", "platformCode", "site", "location", "siteCode"), //
 		LOCAL_PLATFORM_CODE("localFeatureIdentifier","localPlatformCode"), //
 		ONTOLOGY("ontology"), //
