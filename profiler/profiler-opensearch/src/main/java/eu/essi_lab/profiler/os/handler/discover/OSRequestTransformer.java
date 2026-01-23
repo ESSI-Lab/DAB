@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.os.handler.discover;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -41,6 +41,7 @@ import eu.essi_lab.model.resource.*;
 import eu.essi_lab.pdk.*;
 import eu.essi_lab.pdk.wrt.*;
 import eu.essi_lab.profiler.os.*;
+import eu.essi_lab.profiler.os.OSProfilerSetting.*;
 import eu.essi_lab.profiler.os.handler.discover.covering.*;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.*;
 import eu.essi_lab.profiler.os.handler.srvinfo.*;
@@ -628,15 +629,15 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     /**
-     * Unless explicitly set in the profiler setting with {@link OSProfilerSetting#MAX_RESULT_WINDOW_SIZE} key value option,
-     * the max window size is unlimited
+     * Unless explicitly set in the profiler setting with {@link KeyValueOptionKeys#MAX_RESULT_WINDOW_SIZE}
+     * key value option, the max window size is unlimited
      *
      * @return
      */
     private int getMaxResultWindowSize() {
 
 	return getSetting().//
-		map(s -> s.readKeyValue(OSProfilerSetting.MAX_RESULT_WINDOW_SIZE).//
+		map(s -> s.readKeyValue(KeyValueOptionKeys.MAX_RESULT_WINDOW_SIZE.getLabel()).//
 		map(Integer::parseInt).//
 		orElse(Integer.MAX_VALUE)).//
 		orElse(Integer.MAX_VALUE);

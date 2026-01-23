@@ -26,7 +26,8 @@ import java.util.Properties;
 
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.profiler.os.OSProfiler.KeyValueOptionKeys;
+import eu.essi_lab.profiler.os.*;
+import eu.essi_lab.profiler.os.OSProfilerSetting.KeyValueOptionKeys;
 
 /**
  * @author Fabrizio
@@ -54,7 +55,7 @@ public class CoveringModeOptionsReader {
      */
     public static boolean isCoveringModeEnabled(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty(SystemSetting.KeyValueOptionKeys.COVERING_MODE.getLabel(), setting);
+	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_ENABLED.getLabel(), setting);
 
 	return property.isPresent() && property.get().equals("enabled");
     }
@@ -67,18 +68,18 @@ public class CoveringModeOptionsReader {
 
 	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_MAX_ITERATIONS.getLabel(), setting);
 
-	return property.isPresent() ? Integer.valueOf(property.get()) : DEFAULT_MAX_ITERATIONS;
+	return property.map(Integer::valueOf).orElse(DEFAULT_MAX_ITERATIONS);
     }
 
     /**
      * @param setting
      * @return
      */
-    static double getPartitionSize(ProfilerSetting setting) {
+    static int getPartitionSize(ProfilerSetting setting) {
 
 	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_PARTITION_SIZE.getLabel(), setting);
 
-	return property.isPresent() ? Double.valueOf(property.get()) : DEFAULT_PARTITION_SIZE;
+	return property.map(Integer::valueOf).orElse(DEFAULT_PARTITION_SIZE);
     }
 
     /**
@@ -89,7 +90,7 @@ public class CoveringModeOptionsReader {
 
 	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_PAGE_SIZE.getLabel(), setting);
 
-	return property.isPresent() ? Optional.of(Integer.valueOf(property.get())) : Optional.empty();
+	return property.map(Integer::valueOf);
     }
 
     /**
@@ -100,7 +101,7 @@ public class CoveringModeOptionsReader {
 
 	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_COVERING_TRESHOLD.getLabel(), setting);
 
-	return property.isPresent() ? Integer.valueOf(property.get()) : DEFAULT_COVERING_TRESHOLD;
+	return property.map(Integer::valueOf).orElse(DEFAULT_COVERING_TRESHOLD);
     }
 
     /**
@@ -120,7 +121,7 @@ public class CoveringModeOptionsReader {
      */
     static boolean isViewOnlyEnabled(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_VIEW_ONLY.getLabel(), setting);
+	Optional<String> property = getProperty(OSProfilerSetting.KeyValueOptionKeys.COVERING_MODE_VIEW_ONLY.getLabel(), setting);
 
 	return property.isPresent() && property.get().equals("enabled");
     }
@@ -131,7 +132,7 @@ public class CoveringModeOptionsReader {
      */
     static boolean isTemporalConstraintEnabled(ProfilerSetting setting) {
 
-	Optional<String> property = getProperty(KeyValueOptionKeys.COVERING_MODE_TEMPORAL_CONSTRAINT.getLabel(), setting);
+	Optional<String> property = getProperty(OSProfilerSetting.KeyValueOptionKeys.COVERING_MODE_TEMPORAL_CONSTRAINT.getLabel(), setting);
 
 	return property.isPresent() && property.get().equals("enabled");
     }
