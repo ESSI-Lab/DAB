@@ -100,9 +100,6 @@ import jakarta.json.stream.JsonParser;
  */
 public class OpenSearchUtils {
 
-    private static final String HIS_CENTRAL_HYDRO_ONTOLOGY = "http://his-central-ontology.geodab.eu/hydro-ontology";
-    private static final String WMO_ONTOLOGY = "http://codes.wmo.int/wmdr";
-
     /**
      * @param response
      * @return
@@ -164,7 +161,7 @@ public class OpenSearchUtils {
 		item.setTerm(term);
 		String decoded = term;
 
-		if (term.startsWith(HIS_CENTRAL_HYDRO_ONTOLOGY)){
+		if (term.startsWith(HISCentralOntology.HIS_CENTRAL_BASE_URI)){
 		    HISCentralOntology ontology = new HISCentralOntology();
 		    SKOSConcept concept = ontology.getConcept(term);
 		    if (concept!=null){
