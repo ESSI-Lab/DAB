@@ -71,7 +71,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	 * MarkLogic option
 	 */
 	COVERING_MODE("coveringMode"), //
-	ENABLE_FILTERED_TRAILING_WILDCARD_QUERIES("enableFilteredTrailingWildcardQueries"),
 
 	/**
 	 * SPARQL proxy endpoint and forced accept header
@@ -106,8 +105,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	/**
 	 * Health check options
 	 */
-	TASK_AGE_HEALTH_CHECK_METHOD_TRESHOLD("taskAgeHealthCheckMethodTreshold"), //
-	FREE_MEMORY_HEALTH_CHECK_METHOD_TRESHOLD("freeMemoryHealthCheckMethodTreshold"), //
 	SEND_HEALTH_CHECK_REPORT("sendHealthCheckReport"), //
 	PROFILER_HEALTH_CHECK_METHOD_ENABLED("profilerHealthCheckMethodEnabled"),
 
@@ -137,11 +134,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	 * ConfigService option
 	 */
 	CONFIG_SERVICE_AUTHTOKEN("configServiceAuthToken"),
-
-	/**
-	 * XACMLAutorizer option
-	 */
-	DEV_MACHINE_AUTH("devMachineAuth"),
 
 	/**
 	 *

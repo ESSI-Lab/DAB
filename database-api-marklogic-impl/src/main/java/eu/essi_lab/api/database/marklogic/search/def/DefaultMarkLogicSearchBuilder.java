@@ -710,10 +710,8 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	    if (keyValueOption.isPresent()) {
 
 		Properties properties = keyValueOption.get();
-		Boolean enabled = Boolean.valueOf(properties
-			.getOrDefault(KeyValueOptionKeys.ENABLE_FILTERED_TRAILING_WILDCARD_QUERIES.getLabel(), "false").toString());
 
-		if (enabled && (value.startsWith("*") || value.endsWith("*"))) {
+		if (value.startsWith("*") || value.endsWith("*")) {
 
 		    unfilteredQuery = false;
 
