@@ -27,13 +27,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.ServiceLoader;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -78,6 +73,8 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 
     @Override
     public Response handle(WebRequest webRequest) throws GSException {
+
+	HashMap<String,TreeSet<String>> observedProperties = new HashMap<>();
 
 	Optional<String> optionalView = webRequest.extractViewId();
 
@@ -338,11 +335,25 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		public int compare(SimpleEntry<RowInfo, String> o1, SimpleEntry<RowInfo, String> o2) {
 		    String t1 = o1.getKey().getTimeseriesCount();
 		    String t2 = o2.getKey().getTimeseriesCount();
-		    return new Integer(Integer.parseInt(t2)).compareTo(Integer.parseInt(t1));
+		    return Integer.valueOf(Integer.parseInt(t2)).compareTo(Integer.parseInt(t1));
 		}
 	    });
 	    for (SimpleEntry<RowInfo, String> row : rows) {
 		RowInfo ri = row.getKey();
+		TreeSet<String> props = observedProperties.get(s.getLabel());
+		if (props == null) {
+		    props = new TreeSet<>();
+		    observedProperties.put(s.getLabel(), props);
+		}
+		if (ri.getVariableURI()!=null) {
+		    if (ri.getVariableURI().startsWith(HISCentralOntology.HIS_CENTRAL_BASE_URI)){
+			props.add(ontology.getConcept(ri.getVariableURI()).getPreferredLabel("en"));
+		    }else{
+			props.add(ri.getVariableURI());
+		    }
+		}else{
+		    props.add(ri.getVariableName());
+		}
 		content += "<tr>" + //
 			// getRow(ri.getSiteCount()) + //
 			// getRow(ri.getAttributeCount()) + // 1
@@ -407,6 +418,19 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    }
 	    str += "</table>";
 	}
+
+	Set<String> sourceLabels = observedProperties.keySet();
+	str+="<table border='1px'>";
+	str+="<tr><th>Source</th><th>Observed properties</th></tr>";
+	for(String  sourceLabel:sourceLabels){
+	    String props = "";
+	    TreeSet<String> ps = observedProperties.get(sourceLabel);
+	    for(String p: ps){
+		props+=p+",";
+	    }
+	    str+="<tr><td>"+sourceLabel+"</td><td>"+props+"</td></tr>";
+	}
+	str+="</table>";
 
 	str += "</body></html>";
 
