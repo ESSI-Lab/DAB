@@ -1,7 +1,16 @@
 package eu.essi_lab.cfga.gs.setting;
 
-import java.util.ArrayList;
-import java.util.List;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.validation.*;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
+import eu.essi_lab.lib.utils.*;
+import org.json.*;
+
+import java.util.*;
 
 /*-
  * #%L
@@ -13,39 +22,16 @@ import java.util.List;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import java.util.Optional;
-
-import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.cfga.setting.ConfigurationObject;
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
-import eu.essi_lab.cfga.option.BooleanChoice;
-import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.validation.ValidationContext;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
-import eu.essi_lab.cfga.setting.validation.Validator;
-import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
@@ -66,11 +52,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
      * @author Fabrizio
      */
     public enum KeyValueOptionKeys implements LabeledEnum {
-
-	/**
-	 * MarkLogic option
-	 */
-	COVERING_MODE("coveringMode"), //
 
 	/**
 	 * SPARQL proxy endpoint and forced accept header
@@ -111,29 +92,29 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	/**
 	 * DABStarter option
 	 */
-	SCHEDULER_START_DELAY("schedulerStartDelay"),
+	SCHEDULER_START_DELAY("schedulerStartDelay"),//
 
 	/**
 	 * Trust store options
 	 */
-	TRUST_STORE("trustStore"),
-	TRUST_STORE_PWD("trustStorePassword"),
-	TRUST_STORE_NAME("trustStoreName"),
+	TRUST_STORE("trustStore"), //
+	TRUST_STORE_PWD("trustStorePassword"), //
+	TRUST_STORE_NAME("trustStoreName"),//
 
 	/**
 	 * SOSConnector option
 	 */
-	SOS_100_PARALLEL_TASKS("sos100ParallelTasks"),
+	SOS_100_PARALLEL_TASKS("sos100ParallelTasks"),//
 
 	/**
 	 * Configurator option
 	 */
-	MULTIPLE_CONFIGURATION_TABS("multipleConfigurationTabs"),
+	MULTIPLE_CONFIGURATION_TABS("multipleConfigurationTabs"),//
 
 	/**
 	 * ConfigService option
 	 */
-	CONFIG_SERVICE_AUTHTOKEN("configServiceAuthToken"),
+	CONFIG_SERVICE_AUTHTOKEN("configServiceAuthToken"),//
 
 	/**
 	 *
@@ -169,7 +150,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     }
 
     /**
-     * 
+     *
      */
     public SystemSetting() {
 
@@ -269,7 +250,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	emailSetting.setIdentifier(EMAIL_SETTING_ID);
 
 	addSetting(emailSetting);
-	
+
 	//
 	// WMS Cache settings
 	//
@@ -313,8 +294,8 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	userdbSetting.enableCompactMode(false);
 	userdbSetting.setName("User database setting");
 	userdbSetting.setIdentifier(USERS_DATABASE_SETTING_ID);
-	userdbSetting
-		.setDescription("If enabled and configured, this setting allows to retrieve users information from a specific database");
+	userdbSetting.setDescription(
+		"If enabled and configured, this setting allows to retrieve users information from a specific database");
 	userdbSetting.removeVolatileSettings();
 	userdbSetting.setSelectionMode(SelectionMode.UNSET);
 
@@ -377,9 +358,9 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	    return list.//
 		    stream().//
 		    flatMap(s -> s.getOptions().stream()). //
-		    anyMatch(o -> o.isRequired() && !o.getKey().equals("configFolder")
-			    && o.getOptionalValue().isEmpty() && o.getOptionalSelectedValue().isEmpty());
- 	}
+		    anyMatch(o -> o.isRequired() && !o.getKey().equals("configFolder") && o.getOptionalValue().isEmpty()
+		    && o.getOptionalSelectedValue().isEmpty());
+	}
     }
 
     /**
@@ -404,7 +385,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
 	public DescriptorProvider() {
 
@@ -415,7 +396,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	}
 
 	/**
-	 *
 	 * @return
 	 */
 	public TabContentDescriptor get() {
@@ -434,7 +414,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     }
 
     /**
-     * 
+     *
      */
     public boolean isHarvestingReportMailEnabled() {
 
@@ -452,7 +432,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     }
 
     /**
-     * 
+     *
      */
     public boolean isAugmentationReportMailEnabled() {
 
@@ -470,7 +450,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     }
 
     /**
-     * 
+     *
      */
     public boolean isDownloadReportMailEnabled() {
 
@@ -488,7 +468,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     }
 
     /**
-     * 
+     *
      */
     public boolean isErrorLogsReportEnabled() {
 
@@ -513,7 +493,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	return Optional.empty();
     }
-    
+
     //
     // WMS Cache
     //
