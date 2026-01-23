@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.profiler.csw;
 
@@ -13,18 +13,19 @@ package eu.essi_lab.profiler.csw;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -32,7 +33,45 @@ import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 public class CSWProfilerSetting extends ProfilerSetting {
 
     /**
-     * 
+     * @author Fabrizio
+     */
+    public enum KeyValueOptionKeys implements LabeledEnum {
+
+	/**
+	 *
+	 */
+	USE_SEARCH_AFTER_OPTION("useSearchAfter"),
+
+	/**
+	 *
+	 */
+	SEARCH_AFTER_KEY_OPTION("searchAfterKey");
+
+	private String name;
+
+	/**
+	 * @param name
+	 */
+	private KeyValueOptionKeys(String name) {
+
+	    this.name = name;
+	}
+
+	@Override
+	public String toString() {
+
+	    return getLabel();
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return name;
+	}
+    }
+
+    /**
+     *
      */
     public CSWProfilerSetting() {
 
