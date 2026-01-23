@@ -10,56 +10,37 @@ package eu.essi_lab.lib.net.downloader;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import dev.failsafe.Failsafe;
-import dev.failsafe.FailsafeException;
-import dev.failsafe.RetryPolicy;
-import dev.failsafe.function.CheckedPredicate;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
-import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.exceptions.GSException;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Authenticator;
-import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpClient.Builder;
-import java.net.http.HttpClient.Redirect;
-import java.net.http.HttpClient.Version;
-import java.net.http.HttpHeaders;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-import org.apache.commons.io.IOUtils;
+import dev.failsafe.*;
+import dev.failsafe.function.*;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.*;
+import eu.essi_lab.lib.net.utils.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.exceptions.*;
+import org.apache.commons.io.*;
+
+import javax.net.ssl.*;
+import java.io.*;
+import java.net.*;
+import java.net.http.*;
+import java.net.http.HttpClient.*;
+import java.nio.charset.*;
+import java.security.*;
+import java.security.cert.*;
+import java.time.*;
+import java.time.temporal.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -147,7 +128,7 @@ public class Downloader {
     }
 
     /**
-     * @param condition     the condition by which a retry should be done
+     * @param condition the condition by which a retry should be done
      * @param delayTimeUnit
      * @param attempts
      * @param delay
@@ -644,7 +625,7 @@ public class Downloader {
 
 		GSLoggerFactory.getLogger(getClass()).debug("Using trust store");
 
-		X509TrustManager combinedTm = getX509TrustManager(trustStoreStream, trustStorePassword);
+		X509TrustManager combinedTm = getX509TrustManager(trustStoreStream, trustStorePassword, hostname);
 
 		SSLContext sslContext = SSLContext.getInstance("TLS");
 
@@ -675,10 +656,9 @@ public class Downloader {
      * @return
      * @throws Exception
      */
-    private X509TrustManager getX509TrustManager(InputStream stream, String pwd) throws Exception {
+    private X509TrustManager getX509TrustManager(InputStream stream, String pwd, String hostName) throws Exception {
 
-	TrustManagerFactory defaultTmf =
-		TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+	TrustManagerFactory defaultTmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 	defaultTmf.init((KeyStore) null); // system truststore
 
 	char[] charArray = null;
@@ -703,8 +683,7 @@ public class Downloader {
 
 	return new X509TrustManager() {
 	    @Override
-	    public void checkClientTrusted(X509Certificate[] chain, String authType)
-		    throws CertificateException {
+	    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 		try {
 		    customTm.checkClientTrusted(chain, authType);
 		} catch (CertificateException e) {
@@ -714,13 +693,12 @@ public class Downloader {
 	    }
 
 	    @Override
-	    public void checkServerTrusted(X509Certificate[] chain, String authType)
-		    throws CertificateException {
+	    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 		try {
 		    customTm.checkServerTrusted(chain, authType);
 		} catch (CertificateException e) {
 		    defaultTm.checkServerTrusted(chain, authType);
-		    GSLoggerFactory.getLogger(getClass()).error(e);
+		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage() + ": " + hostName);
 		}
 	    }
 
