@@ -3,11 +3,9 @@
  */
 package eu.essi_lab.cfga.adk.test;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
-import org.junit.Assert;
-import org.junit.Test;
-
-import eu.essi_lab.profiler.os.OSProfilerSetting;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.profiler.os.*;
+import org.junit.*;
 
 /**
  * @author Fabrizio
@@ -72,11 +70,11 @@ public class ProfilerSettingTest {
 	//
 	//
 
-	setting.putKeyValue(ProfilerSetting.RSM_THREADS_COUNT_PROPERTY, "-1");
+	setting.putKeyValue(ProfilerSetting.KeyValueOptionKeys.RSM_THREADS_COUNT_PROPERTY.getLabel(), "-1");
 
 	Assert.assertFalse(setting.getResultSetMapperThreadsCount().isPresent());
 
-	setting.putKeyValue(ProfilerSetting.RSM_THREADS_COUNT_PROPERTY, "11");
+	setting.putKeyValue(ProfilerSetting.KeyValueOptionKeys.RSM_THREADS_COUNT_PROPERTY.getLabel(), "11");
 
 	Assert.assertEquals(Integer.valueOf(11), setting.getResultSetMapperThreadsCount().get());
 

@@ -130,10 +130,15 @@ public abstract class DiscoveryResultSetMapper<T>
 
 	List<String> ids = ConfigurationWrapper.getGDCSourceSetting().getSelectedSourcesIds();
 
+	// ---
+ 	//
+	// if getResultSetMapperThreadsCount() is present, then a fixed thread pool
+	// of platform threads is used
 	//
-	// parallel mapping with a thread factory of unlimited virtual threads or
-	// limited platform threads
+	// if getResultSetMapperThreadsCount() is empty, then a thread per task executor
+	// of virtual threads is used
 	//
+ 	// ---
 
 	ThreadFactory virtualFactory = Thread.ofVirtual().//
 		name(getClass().getSimpleName() + "@" + message.getRequestId(true)).//
@@ -159,7 +164,9 @@ public abstract class DiscoveryResultSetMapper<T>
 		collect(Collectors.toList());//
 
 	    mappedResSet.setResultsList(out);
+
 	} finally {
+
 	    executor.shutdown();
 	}
 
