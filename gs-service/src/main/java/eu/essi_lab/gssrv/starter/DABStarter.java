@@ -22,6 +22,7 @@ package eu.essi_lab.gssrv.starter;
  */
 
 import eu.essi_lab.api.database.cfg.*;
+import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.augmenter.worker.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.check.*;
@@ -204,6 +205,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    initCaches();
 	}
 
+	initDatabase();
     }
 
     @Override
@@ -995,6 +997,15 @@ public class DABStarter implements ConfigurationChangeListener {
 		    .prepare(new FeatureLayer1StationsArcticRequest(), "whos-arctic", new FeatureLayer1StationsArctic());
 	default:
 	}
+    }
+
+    /**
+     *
+     * @throws GSException
+     */
+    private void initDatabase() throws GSException {
+
+	DatabaseFactory.get(ConfigurationWrapper.getDatabaseSetting().asStorageInfo());
     }
 
     /**
