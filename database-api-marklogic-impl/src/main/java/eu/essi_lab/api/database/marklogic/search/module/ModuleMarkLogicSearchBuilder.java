@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.marklogic.search.module;
 
@@ -13,38 +13,29 @@ package eu.essi_lab.api.database.marklogic.search.module;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Optional;
-import java.util.Properties;
-
-import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
-import eu.essi_lab.api.database.marklogic.MarkLogicModuleQueryBuilder;
-import eu.essi_lab.api.database.marklogic.search.MarkLogicSearchBuilder;
-import eu.essi_lab.api.database.marklogic.search.MarkLogicSpatialQueryBuilder;
-import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSearchBuilder;
-import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSpatialQueryBuilder;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.indexes.IndexedElements;
-import eu.essi_lab.lib.xml.QualifiedName;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.Queryable.ContentType;
-import eu.essi_lab.model.index.IndexedElement;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.api.database.marklogic.*;
+import eu.essi_lab.api.database.marklogic.search.*;
+import eu.essi_lab.api.database.marklogic.search.def.*;
+import eu.essi_lab.indexes.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.LogicalBond.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.Queryable.*;
+import eu.essi_lab.model.index.*;
+import eu.essi_lab.model.resource.*;
 
 /**
  * @author Fabrizio
@@ -102,15 +93,6 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
      * @return
      */
     private boolean isCoveringModeEnabled() {
-
-	Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
-	if (keyValueOption.isPresent()) {
-
-	    Properties properties = keyValueOption.get();
-	    String option = properties.getProperty(KeyValueOptionKeys.COVERING_MODE.getLabel());
-
-	    return option != null && option.equals("enabled");
-	}
 
 	return false;
     }
