@@ -36,7 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 
 /**
- * A filter which blocks the request and returns a 404 error code in case the request path owns to a offline profiler
+ * A filter which blocks the request and returns a 404 error code
+ * in case the request path owns to an offline profiler
  *
  * @author Fabrizio
  */
@@ -49,29 +50,11 @@ public class ProfilerServiceFilter implements Filter {
 
 	HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-//	WebRequest webRequest = new WebRequest(httpRequest, false);
-//
-//	boolean fromPresent = webRequest.readFromHeader().//
-//		filter(header -> header.toLowerCase().contains("bingbot") || header.toLowerCase().contains("microsoft")).//
-//		isPresent();
-//
-//	boolean agentPresent = webRequest.readUserAgentHeader().//
-//		filter(header -> header.toLowerCase().contains("microsoftpreview") || header.toLowerCase().contains("skypeuripreview")).//
-//		isPresent();
-//
-//	if (fromPresent || agentPresent) {
-//
-//	    HttpServletResponse httpResponse = (HttpServletResponse) response;
-//	    httpResponse.setStatus(404);
-//
-//	    return;
-//	}
-
 	String pathInfo = httpRequest.getPathInfo(); // e.g: /essi/oaipmh or /essi/opensearch/query
 
 	Optional<Boolean> online = pathInfo == null ? Optional.empty() : ConfigurationWrapper.isProfilerOnline(pathInfo);
 
-	if (online.isEmpty() || online.isPresent() && online.get()) {
+	if (online.isEmpty() || online.get()) {
 
 	    filterChain.doFilter(request, response);
 

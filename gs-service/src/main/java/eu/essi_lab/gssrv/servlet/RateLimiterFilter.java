@@ -10,53 +10,36 @@ package eu.essi_lab.gssrv.servlet;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
+import eu.essi_lab.configuration.*;
+import eu.essi_lab.lib.servlet.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.pdk.*;
+import eu.essi_lab.rip.*;
+import eu.essi_lab.shared.driver.es.stats.*;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
-
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.ExecutionModeSetting;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
-import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.lib.servlet.RequestManager;
-import eu.essi_lab.lib.utils.Chronometer;
-import eu.essi_lab.lib.utils.ExpiringCache;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.pdk.AbstractRequestBouncer;
-import eu.essi_lab.pdk.DistributedRequestBouncer;
-import eu.essi_lab.pdk.LocalRequestBouncer;
-import eu.essi_lab.rip.RuntimeInfoProvider;
-import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.ws.rs.core.Response.*;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -64,32 +47,33 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 public class RateLimiterFilter implements Filter {
 
     /**
-     * 
+     *
      */
     private static final long EXECUTION_WAIT_TIME = 10;
 
     /**
-     * 
+     *
      */
     private static final int TOO_MANY_REQUESTS_STATUS = 429;
 
     /**
-     * 
+     *
      */
     private Chronometer chronometer;
     private static ExpiringCache<String> successRequests;
+
     static {
 	successRequests = new ExpiringCache<String>();
 	successRequests.setDuration(TimeUnit.MINUTES.toMillis(20));
     }
 
     /**
-     * 
+     *
      */
     private static AbstractRequestBouncer bouncer;
 
     /**
-     * 
+     *
      */
     private static boolean everythingIsBlocked;
 
@@ -103,7 +87,7 @@ public class RateLimiterFilter implements Filter {
 
     /**
      * Initializing the Rate limiter here is safe, the configuration is ready
-     * 
+     *
      * @param filterConfig
      * @throws ServletException
      */
@@ -132,6 +116,12 @@ public class RateLimiterFilter implements Filter {
 	    ServletRequest servletRequest, //
 	    ServletResponse response, //
 	    FilterChain filterChain) throws IOException, ServletException {
+
+	if (UserFinderFilter.isVaadinRequest((HttpServletRequest) servletRequest)) {
+
+	    filterChain.doFilter(servletRequest, response);
+	    return;
+	}
 
 	// updates the current Thread name
 	String requestId = UUID.randomUUID().toString();
@@ -332,7 +322,7 @@ public class RateLimiterFilter implements Filter {
     }
 
     /**
-     * 
+     *
      */
     private void initRateLimiter() {
 

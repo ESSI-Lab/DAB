@@ -10,33 +10,27 @@ package eu.essi_lab.gssrv.servlet;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.IOException;
+import eu.essi_lab.authorization.*;
+import eu.essi_lab.authorization.userfinder.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.auth.*;
+import eu.essi_lab.model.exceptions.*;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
-import eu.essi_lab.authorization.BasicRole;
-import eu.essi_lab.authorization.userfinder.UserFinder;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.exceptions.GSException;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.io.*;
 
 /**
  * @author Fabrizio
@@ -50,24 +44,46 @@ public class UserFinderFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-	GSUser user = null;
+	HttpServletRequest httpRequest = (HttpServletRequest) request;
+
+	if (isVaadinRequest(httpRequest)) {
+
+	    chain.doFilter(request, response);
+	    return;
+	}
+
+	GSUser user = BasicRole.createAnonymousUser();
 
 	try {
 
-	    user = UserFinder.findCurrentUser((HttpServletRequest) request);
+	    user = UserFinder.findCurrentUser(httpRequest);
 
 	} catch (GSException e) {
-
-	    user = BasicRole.createAnonymousUser();
 
 	    GSLoggerFactory.getLogger(getClass()).error("Error occurred, unable to find current user. Using anonymous user");
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 
-	WebRequest.setCurrentUser(user, (HttpServletRequest) request);
+	WebRequest.setCurrentUser(user, httpRequest);
 
 	chain.doFilter(request, response);
+    }
+
+    /**
+     * @param httpRequest
+     * @return
+     */
+    static boolean isVaadinRequest(HttpServletRequest httpRequest) {
+
+	String queryString = httpRequest.getQueryString();
+	String requestURI = httpRequest.getRequestURI();
+
+	return (queryString != null && queryString.contains("v-r=")) || //
+		requestURI.contains("VAADIN") || //
+		requestURI.contains("sw.js") || //
+		requestURI.contains("sw-runtime-resources-precache.js");
+
     }
 
     @Override
