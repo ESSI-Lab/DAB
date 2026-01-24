@@ -126,11 +126,15 @@ public class DatahubMapper extends FileIdentifierMapper {
      * Maps basic identification information
      */
     private void mapBasicIdentification(JSONObject json, CoreMetadata coreMetadata, GSResource resource) {
-	// Identifier
-	String id = json.optString("id", null);
-	if (id != null) {
-	    coreMetadata.setIdentifier(id);
-	    coreMetadata.getMIMetadata().setFileIdentifier(id);
+	// Identifier (v3.6+: renamed from "id" to "identifier")
+	String identifier = json.optString("identifier", null);
+	// Backward compatibility: also check "id" for older versions
+	if (identifier == null) {
+	    identifier = json.optString("id", null);
+	}
+	if (identifier != null) {
+	    coreMetadata.setIdentifier(identifier);
+	    coreMetadata.getMIMetadata().setFileIdentifier(identifier);
 	}
 
 	// Title
@@ -697,16 +701,34 @@ public class DatahubMapper extends FileIdentifierMapper {
 		JSONObject formatObj = formats.optJSONObject(i);
 		if (formatObj != null) {
 		    Format format = new Format();
-		    String name = formatObj.optString("name", null);
-		    String version = formatObj.optString("version", null);
-		    String specification = formatObj.optString("specification", null);
-
-		    if (name != null) {
-			format.setName(name);
+		    
+		    // Handle name field - can be string (backward compatibility) or object with uri and label (v3.7)
+		    Object nameObj = formatObj.opt("name");
+		    if (nameObj != null) {
+			if (nameObj instanceof String) {
+			    // Backward compatibility: name is a string
+			    format.setName((String) nameObj);
+			} else if (nameObj instanceof JSONObject) {
+			    // New format: name is an object with uri and label
+			    JSONObject nameJson = (JSONObject) nameObj;
+			    String uri = nameJson.optString("uri", null);
+			    String label = nameJson.optString("label", null);
+			    if (uri != null && !uri.isEmpty()) {
+				// Use anchor when URI is available
+				format.setNameWithAnchor(uri, label != null ? label : "");
+			    } else if (label != null && !label.isEmpty()) {
+				// Fall back to plain text if no URI
+				format.setName(label);
+			    }
+			}
 		    }
+		    
+		    String version = formatObj.optString("version", null);
 		    if (version != null) {
 			format.setVersion(version);
 		    }
+		    
+		    String specification = formatObj.optString("specification", null);
 		    if (specification != null) {
 			format.setSpecification(specification);
 		    }
@@ -764,6 +786,12 @@ public class DatahubMapper extends FileIdentifierMapper {
 		    //
 		    // EXT_Online
 		    //
+
+		    // Map protocol_request (v3.7) - free text string for function
+		    String protocolRequest = onlineResourceObj.optString("protocol_request", null);
+		    if (protocolRequest != null && !protocolRequest.isEmpty()) {
+			online.setFunctionCode(protocolRequest);
+		    }
 
 		    String queryStringFragment = onlineResourceObj.optString("query_string_fragment", null);
 
@@ -1337,10 +1365,41 @@ public class DatahubMapper extends FileIdentifierMapper {
 	    coreMetadata.getMIMetadata().getDataIdentification().setSpatialRepresentationType(datasetType);
 	}
 
-	// Spatial resolution
-	Double spatialResolution = json.optDouble("spatial_resolution", Double.NaN);
-	if (!spatialResolution.isNaN()) {
-	    coreMetadata.getMIMetadata().getDataIdentification().setSpatialResolution(spatialResolution);
+	// Spatial resolution (v3.6+: object with value and uom, or number for backward compatibility)
+	Object spatialResolutionObj = json.opt("spatial_resolution");
+	if (spatialResolutionObj != null) {
+	    if (spatialResolutionObj instanceof JSONObject) {
+		// New format: object with value and uom
+		JSONObject spatialResolutionJson = (JSONObject) spatialResolutionObj;
+		// Handle both string and number values
+		Double value = null;
+		Object valueObj = spatialResolutionJson.opt("value");
+		if (valueObj instanceof Number) {
+		    value = ((Number) valueObj).doubleValue();
+		} else if (valueObj instanceof String) {
+		    try {
+			value = Double.parseDouble((String) valueObj);
+		    } catch (NumberFormatException e) {
+			// Ignore invalid number format
+		    }
+		} else {
+		    value = spatialResolutionJson.optDouble("value", Double.NaN);
+		}
+		String uom = spatialResolutionJson.optString("uom", null);
+		if (value != null && !value.isNaN()) {
+		    MDResolution resolution = new MDResolution();
+		    // Use provided uom, or default to "m" if not provided
+		    String unitOfMeasure = (uom != null && !uom.isEmpty()) ? uom : "m";
+		    resolution.setDistance(unitOfMeasure, value);
+		    coreMetadata.getMIMetadata().getDataIdentification().setSpatialResolution(resolution);
+		}
+	    } else if (spatialResolutionObj instanceof Number) {
+		// Backward compatibility: number (defaults to "m" unit)
+		Double spatialResolution = ((Number) spatialResolutionObj).doubleValue();
+		if (!spatialResolution.isNaN()) {
+		    coreMetadata.getMIMetadata().getDataIdentification().setSpatialResolution(spatialResolution);
+		}
+	    }
 	}
 
 	// Equivalent scale

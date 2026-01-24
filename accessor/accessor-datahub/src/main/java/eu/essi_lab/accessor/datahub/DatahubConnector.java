@@ -21,13 +21,10 @@ package eu.essi_lab.accessor.datahub;
  * #L%
  */
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -35,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -187,6 +185,9 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 	    }
 	    logger.info("Found {} identifiers to process", identifiers.size());
 
+	    // Track failed identifiers
+	    List<String> failedIdentifiers = new ArrayList<>();
+
 	    // Step 3: Process identifiers in blocks of 20
 	    for (int i = 0; i < identifiers.size(); i += IDENTIFIER_BATCH_SIZE) {
 		int end = Math.min(i + IDENTIFIER_BATCH_SIZE, identifiers.size());
@@ -195,18 +196,38 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 
 		for (String identifier : batch) {
 		    try {
+			identifier = identifier.replace("\",","");
+			identifier = identifier.replace("\"","");
 			String metadata = fetchMetadataForIdentifier(endpoint, accessToken, identifier);
 			if (metadata != null && !metadata.trim().isEmpty()) {
 			    ret.add(metadata);
 			    logger.debug("Successfully fetched metadata for identifier: {}", identifier);
 			} else {
 			    logger.warn("Empty metadata returned for identifier: {}", identifier);
+			    failedIdentifiers.add(identifier);
 			}
 		    } catch (Exception e) {
 			logger.error("Error fetching metadata for identifier: {}", identifier, e);
+			failedIdentifiers.add(identifier);
 			// Continue with next identifier
 		    }
 		}
+	    }
+
+	    // Print summary of failed identifiers at the end of harvesting
+	    if (!failedIdentifiers.isEmpty()) {
+		logger.warn("========================================");
+		logger.warn("HARVESTING SUMMARY - FAILED IDENTIFIERS");
+		logger.warn("========================================");
+		logger.warn("Total identifiers processed: {}", identifiers.size());
+		logger.warn("Successfully harvested: {}", ret.size());
+		logger.warn("Failed identifiers: {}", failedIdentifiers.size());
+		logger.warn("----------------------------------------");
+		logger.warn("List of failed identifiers:");
+		for (String failedId : failedIdentifiers) {
+		    logger.warn("  - {}", failedId);
+		}
+		logger.warn("========================================");
 	    }
 
 	    if (ret.isEmpty()) {
@@ -324,6 +345,8 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 
     /**
      * Reads identifiers from a URL (http://) or local file (file://)
+     * Supports both plain text (one identifier per line) and JSON format
+     * with a "datahub_urns" array
      * 
      * @return list of identifiers
      * @throws GSException
@@ -383,16 +406,32 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 		logger.debug("Reading from HTTP URL: {}", url);
 	    }
 
-	    // Read identifiers line by line
-	    try (BufferedReader reader = new BufferedReader(//
-		    new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-		String line;
-		while ((line = reader.readLine()) != null) {
-		    line = line.trim();
-		    if (!line.isEmpty()) {
-			identifiers.add(line);
+	    // Read entire content as string
+	    String content = IOStreamUtils.asUTF8String(inputStream);
+	    inputStream.close();
+
+	    // Try to parse as JSON first
+	    try {
+		JSONObject jsonObject = new JSONObject(content);
+		if (jsonObject.has("datahub_urns")) {
+		    // JSON format with datahub_urns array
+		    JSONArray urnsArray = jsonObject.getJSONArray("datahub_urns");
+		    for (int i = 0; i < urnsArray.length(); i++) {
+			String identifier = urnsArray.getString(i);
+			if (identifier != null && !identifier.trim().isEmpty()) {
+			    identifiers.add(identifier.trim());
+			}
 		    }
+		    logger.debug("Parsed {} identifiers from JSON format", identifiers.size());
+		} else {
+		    // JSON but no datahub_urns, fall back to line-by-line
+		    logger.debug("JSON format detected but no 'datahub_urns' field, falling back to line-by-line parsing");
+		    parseIdentifiersLineByLine(content, identifiers);
 		}
+	    } catch (org.json.JSONException e) {
+		// Not valid JSON, parse as plain text line by line
+		logger.debug("Content is not JSON, parsing as plain text");
+		parseIdentifiersLineByLine(content, identifiers);
 	    }
 
 	    logger.info("Read {} identifiers", identifiers.size());
@@ -409,6 +448,24 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 		    ErrorInfo.ERRORTYPE_SERVICE, //
 		    ErrorInfo.SEVERITY_ERROR, //
 		    DATAHUB_IDENTIFIERS_ERROR);
+	}
+    }
+
+    /**
+     * Parses identifiers from plain text content (one per line)
+     * 
+     * @param content
+     *            the content to parse
+     * @param identifiers
+     *            the list to add identifiers to
+     */
+    private void parseIdentifiersLineByLine(String content, List<String> identifiers) {
+	String[] lines = content.split("\\r?\\n");
+	for (String line : lines) {
+	    line = line.trim();
+	    if (!line.isEmpty()) {
+		identifiers.add(line);
+	    }
 	}
     }
 
@@ -442,12 +499,59 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 		    apiUrl, //
 		    HttpHeaderUtils.build(headers));
 
-	    // Execute request
-	    HttpResponse<InputStream> response = downloader.downloadResponse(request);
-	    int statusCode = response.statusCode();
+	    // Execute request with retry logic for status 500
+	    HttpResponse<InputStream> response = null;
+	    int statusCode = 0;
+	    int maxRetries = 3;
+	    int retryDelaySeconds = 5;
+	    
+	    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+		try {
+		    response = downloader.downloadResponse(request);
+		    statusCode = response.statusCode();
+		    
+		    // If status is 500 and not the last attempt, retry
+		    if (statusCode == 500 && attempt < maxRetries) {
+			logger.warn("Received status 500 for identifier {} (attempt {}/{}), retrying in {} seconds...", 
+				identifier, attempt, maxRetries, retryDelaySeconds);
+			Thread.sleep(retryDelaySeconds * 1000);
+			continue;
+		    }
+		    
+		    // Break the loop if successful or non-500 error
+		    break;
+		} catch (InterruptedException e) {
+		    Thread.currentThread().interrupt();
+		    logger.error("Retry interrupted for identifier: {}", identifier, e);
+		    return null;
+		} catch (Exception e) {
+		    // For other exceptions, retry if not the last attempt
+		    if (attempt < maxRetries) {
+			logger.warn("Exception during request for identifier {} (attempt {}/{}), retrying in {} seconds...", 
+				identifier, attempt, maxRetries, retryDelaySeconds, e);
+			try {
+			    Thread.sleep(retryDelaySeconds * 1000);
+			} catch (InterruptedException ie) {
+			    Thread.currentThread().interrupt();
+			    logger.error("Retry interrupted for identifier: {}", identifier, ie);
+			    return null;
+			}
+			continue;
+		    } else {
+			logger.error("Failed to fetch metadata for identifier {} after {} attempts", identifier, maxRetries, e);
+			return null;
+		    }
+		}
+	    }
 
-	    if (statusCode >= 400) {
-		logger.warn("Failed to fetch metadata for identifier {} with status code: {}", identifier, statusCode);
+	    if (response == null || statusCode >= 400) {
+		if (response == null) {
+		    logger.warn("Failed to fetch metadata for identifier {} - no response received (after {} attempts)", 
+			identifier, maxRetries);
+		} else {
+		    logger.warn("Failed to fetch metadata for identifier {} with status code: {} (after {} attempts)", 
+			identifier, statusCode, maxRetries);
+		}
 		return null;
 	    }
 

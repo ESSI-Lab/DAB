@@ -29,6 +29,7 @@ import javax.xml.bind.JAXBException;
 
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.jaxb.common.ObjectFactories;
+import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.CIOnLineFunctionCodePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourceType;
 import net.opengis.iso19139.gmd.v_20060504.URLPropertyType;
@@ -279,6 +280,8 @@ public class Online extends ISOMetadata<CIOnlineResourceType> {
 
 	return null;
     }
+
+  
 
     public JAXBElement<CIOnlineResourceType> getElement() {
 
