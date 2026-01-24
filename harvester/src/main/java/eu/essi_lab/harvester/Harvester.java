@@ -236,7 +236,7 @@ public class Harvester {
 		executionStage = customTask.getExecutionStage();
 	    }
 
-	    if (executionStage != null && executionStage == ExecutionStage.BEFORE_HARVESTING_END) {
+	    if (executionStage == ExecutionStage.BEFORE_HARVESTING_END) {
 
 		handleCustomTask(getAccessor().getSource(), context, status, request);
 	    }
@@ -247,7 +247,7 @@ public class Harvester {
 		    strategy, //
 		    Optional.ofNullable(status));
 
-	    if (executionStage != null && executionStage == ExecutionStage.AFTER_HARVESTING_END) {
+	    if (executionStage == ExecutionStage.AFTER_HARVESTING_END) {
 
 		handleCustomTask(getAccessor().getSource(), context, status, request);
 	    }
